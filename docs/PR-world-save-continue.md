@@ -1,0 +1,7 @@
+# feat(core): persist and validate the owned World for continue
+
+World now encodes a versioned, content-bound, bounded memory save and validates a complete candidate before replacing live state. The format retains the sole account, current travel/dock identity, equipment, cargo, finite G02 source/job/transfer/completion/clue state and paid Food/refill stock. Actual producer accounting totals reconcile saved cash, fuel, stock, cargo and transaction revisions. Load never creates a new profile, fit, source allocation, refill or balancing payment.
+
+Pending UI reviews and selected contacts are invalidated. In-place Continue advances above both saved and live UI sequences to prevent replay after repeated restores, while current genuine dock and NPC roster identities remain retained. A private receiving-preparation helper also removes complexity from G02 `prepare` without changing its action order or rollback boundary.
+
+Validation: six round-trip/tamper tests authored; existing test identities retained. Rustfmt parsing/formatting passes. Rust compilation/tests/Clippy and remote quality are UNRUN for this source. No Mac compiler/native/GPU job, desktop change, filesystem save or process-quit acceptance is claimed. The checksum detects corruption and is not external authentication. Root owns whole-artifact review, Dell checks and the host writer/UI integration. [Issue](ISSUE-world-save-continue.md), [complete criteria](WORLD-SAVE-CONTINUE.md).

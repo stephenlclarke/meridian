@@ -4,6 +4,9 @@
 
 #![forbid(unsafe_code)]
 
+mod persistence;
+pub(crate) use persistence::SavedServiceSummary;
+
 const SEEDS: &[u8] = include_bytes!("../../../assets/legacy/g01-food.markets");
 const STOCK_HOLD_TONNES: u16 = 92;
 const STOCK_FUEL_TENTHS: u16 = 130;
@@ -126,6 +129,12 @@ struct MarketData {
     owner: u64,
     revision: u64,
     quotes: [FoodQuote; 2],
+    bought: [u64; 2],
+    sold: [u64; 2],
+    refills: u64,
+    refilled_units: u64,
+    paid_tenths: u64,
+    credited_tenths: u64,
 }
 
 /// Only market stock is owned here. The actual account owns all credits, fuel and cargo.
@@ -165,6 +174,12 @@ impl StationMarkets {
                 owner,
                 revision: 0,
                 quotes: read_seeds(SEEDS)?,
+                bought: [0; 2],
+                sold: [0; 2],
+                refills: 0,
+                refilled_units: 0,
+                paid_tenths: 0,
+                credited_tenths: 0,
             },
         })
     }
@@ -259,6 +274,47 @@ impl StationMarkets {
                 }
             }
         };
+        let site = facts.site.index();
+        match event {
+            Event::BoughtFood { paid_tenths, .. } => {
+                next.bought[site] = next.bought[site]
+                    .checked_add(1)
+                    .ok_or(Error::SequenceExhausted)?;
+                next.paid_tenths = next
+                    .paid_tenths
+                    .checked_add(u64::from(paid_tenths))
+                    .ok_or(Error::SequenceExhausted)?;
+            }
+            Event::SoldFood {
+                credited_tenths, ..
+            } => {
+                next.sold[site] = next.sold[site]
+                    .checked_add(1)
+                    .ok_or(Error::SequenceExhausted)?;
+                next.credited_tenths = next
+                    .credited_tenths
+                    .checked_add(u64::from(credited_tenths))
+                    .ok_or(Error::SequenceExhausted)?;
+            }
+            Event::Refuelled {
+                added_fuel_tenths,
+                paid_tenths,
+                ..
+            } => {
+                next.refills = next
+                    .refills
+                    .checked_add(1)
+                    .ok_or(Error::SequenceExhausted)?;
+                next.refilled_units = next
+                    .refilled_units
+                    .checked_add(u64::from(added_fuel_tenths))
+                    .ok_or(Error::SequenceExhausted)?;
+                next.paid_tenths = next
+                    .paid_tenths
+                    .checked_add(u64::from(paid_tenths))
+                    .ok_or(Error::SequenceExhausted)?;
+            }
+        }
         Ok(Prepared {
             before: self.data,
             account,

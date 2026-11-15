@@ -4,8 +4,10 @@
 //! Its facts must come from actual contact, dock, equipment and profile state. The
 //! World navigation/contact lifecycle supplies them; prototype worlds cannot. See WORLD-G02.md.
 
+mod persistence;
 use super::{CLUE_ID, REWARD_TENTHS};
 use crate::station_services as services;
+pub(crate) use persistence::SavedDomainSummary;
 
 pub const SOURCE_ID: &str = "l337.contract/consented-freight";
 pub const BATCH_ID: &str = "avenor-utility-parts-01";
@@ -744,68 +746,7 @@ impl State {
                     }
                     (Purpose::Receive(id), Choice::ReceiveOne(_))
                     | (Purpose::Receive(id), Choice::ReceiveAll) => {
-                        require_contact(
-                            world,
-                            dock,
-                            world.contact.ok_or(Error::WrongActor)?.actor,
-                            ContactDefinition::RenasUtilityCrew,
-                            RENAS,
-                        )?;
-                        let current = job(&self.data, id)?;
-                        if current.status != JobStatus::Active {
-                            return Err(Error::NotActive);
-                        }
-                        let mask = match choice {
-                            Choice::ReceiveOne(unit) => one_unit_mask(current, unit)?,
-                            Choice::ReceiveAll => current.held,
-                            _ => return Err(Error::WrongChoice),
-                        };
-                        let remaining = current.held & !mask;
-                        let receiver = world.contact.ok_or(Error::WrongActor)?.actor;
-                        let completion = if remaining == 0 {
-                            plan.next_account.credits = account
-                                .data
-                                .credits
-                                .checked_add(REWARD_TENTHS)
-                                .ok_or(Error::CreditOverflow)?;
-                            Some(CompletionReceipt {
-                                job: id,
-                                sequence: plan.next.sequence,
-                                receiver,
-                                dock,
-                            })
-                        } else {
-                            None
-                        };
-                        let mut updated = *current;
-                        updated.held = remaining;
-                        updated.delivered |= mask;
-                        updated.transfers[updated.transfer_count as usize] = Some(Transfer {
-                            sequence: plan.next.sequence,
-                            mask,
-                            receiver,
-                            dock,
-                        });
-                        updated.transfer_count += 1;
-                        updated.completion = completion;
-                        if completion.is_some() {
-                            updated.status = JobStatus::Delivered;
-                        }
-                        plan.next.jobs[id.ordinal as usize] = Some(updated);
-                        let clue_awarded = completion.is_some() && self.data.clue.is_none();
-                        if clue_awarded {
-                            plan.next.clue = completion.map(|completion| ClueAward { completion });
-                        }
-                        let units = core::array::from_fn(|index| {
-                            (mask & (1 << index) != 0).then_some(current.issued[index])
-                        });
-                        plan.event = Event::Received {
-                            job: id,
-                            units,
-                            remaining: remaining.count_ones() as u8,
-                            completion,
-                            clue_awarded,
-                        };
+                        self.prepare_receiving(id, choice, dock, &mut plan)?;
                     }
                     (Purpose::Abandon(id), Choice::Abandon) => {
                         require_contact(
@@ -832,6 +773,79 @@ impl State {
             Command::Back => return Err(Error::WrongChoice),
         }
         Ok(plan)
+    }
+
+    fn prepare_receiving(
+        &self,
+        id: JobId,
+        choice: Choice,
+        dock: DockFacts,
+        plan: &mut Prepared,
+    ) -> Result<(), Error> {
+        let world = &plan.world;
+        require_contact(
+            world,
+            dock,
+            world.contact.ok_or(Error::WrongActor)?.actor,
+            ContactDefinition::RenasUtilityCrew,
+            RENAS,
+        )?;
+        let current = job(&self.data, id)?;
+        if current.status != JobStatus::Active {
+            return Err(Error::NotActive);
+        }
+        let mask = match choice {
+            Choice::ReceiveOne(unit) => one_unit_mask(current, unit)?,
+            Choice::ReceiveAll => current.held,
+            _ => return Err(Error::WrongChoice),
+        };
+        let remaining = current.held & !mask;
+        let receiver = world.contact.ok_or(Error::WrongActor)?.actor;
+        let completion = if remaining == 0 {
+            plan.next_account.credits = plan
+                .account
+                .credits
+                .checked_add(REWARD_TENTHS)
+                .ok_or(Error::CreditOverflow)?;
+            Some(CompletionReceipt {
+                job: id,
+                sequence: plan.next.sequence,
+                receiver,
+                dock,
+            })
+        } else {
+            None
+        };
+        let mut updated = *current;
+        updated.held = remaining;
+        updated.delivered |= mask;
+        updated.transfers[updated.transfer_count as usize] = Some(Transfer {
+            sequence: plan.next.sequence,
+            mask,
+            receiver,
+            dock,
+        });
+        updated.transfer_count += 1;
+        updated.completion = completion;
+        if completion.is_some() {
+            updated.status = JobStatus::Delivered;
+        }
+        plan.next.jobs[id.ordinal as usize] = Some(updated);
+        let clue_awarded = completion.is_some() && self.data.clue.is_none();
+        if clue_awarded {
+            plan.next.clue = completion.map(|completion| ClueAward { completion });
+        }
+        let units = core::array::from_fn(|index| {
+            (mask & (1 << index) != 0).then_some(current.issued[index])
+        });
+        plan.event = Event::Received {
+            job: id,
+            units,
+            remaining: remaining.count_ones() as u8,
+            completion,
+            clue_awarded,
+        };
+        Ok(())
     }
 
     /// Call only after the owning publication succeeds; a changed World/account refuses atomically.

@@ -1,4 +1,5 @@
 //! World-owned original G02 station contact and command lifecycle.
+mod persistence;
 use super::World;
 use crate::freight::g02::{
     self, ActorId, ContactDefinition, ContactFacts, DockFacts, StationKind, WorldFacts,
