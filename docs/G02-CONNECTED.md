@@ -1,6 +1,6 @@
 # G02 connected freight domain
 
-Status: source and eleven domain tests authored. Compilation, formatting, Clippy, test execution, save publication and the actual World journey are UNRUN for this branch. Existing flight/station test results do not validate this module.
+Status: the domain has eleven authored tests. A successor now joins it to actual World navigation/contact commands and adds three authored public-command journey/refusal tests; see [WORLD-G02.md](WORLD-G02.md). Compilation, formatting, Clippy, test execution and save publication remain UNRUN for this exact source. Existing flight/station results do not validate these changes.
 
 ## Source and scope
 
@@ -28,16 +28,16 @@ Acceptance allocates eight identified units without charging a deposit. Receivin
 
 This boundary does not implement a disk writer. The eventual World publication path must serialize the complete prospective game state, retain exclusive ownership through publication/commit, and prevent a failed disk publication from exposing the candidate. Do not perform an asynchronous write, change World, then treat a rejected commit as durable rollback. Real writer-failure and reload tests remain required.
 
-## Missing World joins
+## Historical domain boundary and current World join
 
 The source baseline had only one local station scene. Its snapshot mode and descriptive station port do not establish Avenor/Renas arrival, a current named contact or owned equipment. No helper in this module is permitted to manufacture those facts from presentation state.
 
 Root's World composition must own this mission state and its single account, use real fresh-profile creation exactly once, project current owner/hull/equipment identities and location/admission/contact facts, and debit ordinary fuel only through an actual navigation transition. Fresh identity allocation is an actual profile transition that Root must call once in World creation; it is not a load repair or an actor grant. The private owned inventory is retained with the same account. The crate-private station/contact fact structs are an integration boundary, not verified authority in isolation. There is no separate mission actor or second authoritative wallet. The original low-level `freight::SupplyBatch` remains isolated and cannot award this account's reward.
 
-Until that composition exists, there is no public playable command dispatcher, source-to-destination journey, persistent restore, physical delivery proof or UI claim of completion. Source stock must never be reset by creating a fresh mission state during load or reinstall. Save representation and restoration validation remain work for the owning World composition.
+The successor World composition now supplies the public dispatcher, actual navigation/dock producer and current roster/contact selection described in [WORLD-G02.md](WORLD-G02.md). Its public-command journey is authored but unexecuted; persistent restore and native UI completion remain unverified. Source stock must never be reset by creating a fresh mission state during load or reinstall. Save representation and restoration validation remain work for the owning World composition.
 
 ## Authored verification
 
 Eleven unit tests use explicit synthetic internal facts and the public command types. They cover original unit identity, seven/eight settlement, two disjoint allocations and source exhaustion, first clue retention, foreign/duplicate/out-of-order refusals, Back/replay/stale review, wrong owner/location/contact/equipment, hold/fuel checks, dropped/stale publication, final-payment overflow rollback, abandonment and suspended content. They also check that receiving does not demand fuel for a future trip, exact fresh-owned inventory, zero/duplicate/aliased birth IDs, forged equipment identities and refused unaffordable spending. The source of fresh-item semantics is `CommanderEquipment.swift:88-170`, `EquipmentTransactions.swift:75-94` and the initial three missiles in `Game.swift`; paid history is never invented.
 
-These are domain transition checks, not actual physical arrival or native game acceptance. The Dell owner must format and run the joined source's core tests, workspace checks and strict Clippy. Unused private integration boundaries may currently produce dead-code diagnostics until World calls them; do not suppress those diagnostics to claim a joined pass.
+These are domain transition checks, not actual physical arrival or native game acceptance. The Dell owner must format and run the complete joined source's core tests, workspace checks and strict Clippy. Private integration boundaries now have genuine World callers; no dead-code suppression is permitted. Normal paid fuel service supplies the existing account debit path.

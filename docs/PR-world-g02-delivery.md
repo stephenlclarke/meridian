@@ -1,0 +1,7 @@
+# feat(core): join G02 freight to actual World travel and contacts
+
+Freight could allocate and settle synthetic domain units but had no real World command path. World now retains one freight session alongside its existing account, creates Arlen/Renas crew roster entries only at genuine current dock publications, requires explicit current NPC contact, and dispatches confirmed freight commands against private facts from that same owner, ship, arrival, content and epoch. Launch, physical entry, contact changes and pause lifecycle invalidate stale consent. Normal docked fuel purchase uses the same account.
+
+The new public-command tests traverse fresh profile, Arlen consent, actual countdown/fuel debit, 16km in-flight arrival, controlled physical entry, real crew contact and seven/eight original-unit handover. Negative checks cover foreign/duplicate/order/replay units, contact ownership, Back, pause and stale ticks. The full account/World review binding is retained privately rather than copied into public command tokens.
+
+Validation: source whitespace and test-preservation inspection PASS; three World tests authored, all Rust execution/formatting/Clippy UNRUN for this exact source. No compiler/native/GPU work was started on the Mac. Existing domain11/navigation7 test functions are retained. Actual Dell validation, whole-artifact review and Root-owned desktop/native integration remain required. There is no disk/save/reload claim or dead-code warning waiver. [Criteria and API](WORLD-G02.md), [issue](ISSUE-world-g02-delivery.md).

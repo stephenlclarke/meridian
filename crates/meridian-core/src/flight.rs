@@ -1,3 +1,6 @@
+mod mission;
+pub use mission::{MissionError, MissionSnapshot, StationNpc};
+
 use crate::docking::StationPose;
 use crate::freight::g02::{CommanderAccount, FreshCommanderIds, StarterComponent};
 use crate::navigation::{
@@ -68,6 +71,7 @@ pub enum StepError {
     Collision,
     UnsafeEntry,
     UnsafeLaunch,
+    Paused,
 }
 
 impl fmt::Display for StepError {
@@ -81,6 +85,7 @@ impl fmt::Display for StepError {
             Self::InvalidMode => "command is not available in the current flight mode",
             Self::Collision => "continuous native station clearance refused the flight step",
             Self::UnsafeEntry => "original station entry conditions are not satisfied",
+            Self::Paused => "World is paused",
             Self::UnsafeLaunch => "source-defined original station launch is unavailable",
         })
     }
@@ -96,6 +101,7 @@ pub struct World {
     navigation_catalogue: Option<OriginalNavigation>,
     navigation: Option<NavigationState>,
     commander_account: Option<CommanderAccount>,
+    freight_session: Option<mission::FreightSession>,
 }
 
 impl Default for World {
@@ -121,6 +127,7 @@ impl World {
             navigation_catalogue: None,
             navigation: None,
             commander_account: None,
+            freight_session: None,
         }
     }
 
@@ -161,6 +168,7 @@ impl World {
         world.navigation_catalogue = Some(OriginalNavigation::bundled()?);
         world.commander_account = Some(account);
         world.navigation = Some(navigation);
+        world.freight_session = navigation.dock().map(mission::FreightSession::fresh);
         Ok(world)
     }
 
@@ -215,6 +223,7 @@ impl World {
         if expected_tick != self.state.tick {
             return Err(NavigationError::StaleCommand);
         }
+        if self.is_paused() { return Err(NavigationError::WrongMode); }
         if self.state.mode != FlightMode::Flight {
             return Err(NavigationError::WrongMode);
         }
@@ -290,6 +299,7 @@ impl World {
         if expected_tick != self.state.tick {
             return Err(StepError::StaleCommand);
         }
+        if self.is_paused() { return Err(StepError::Paused); }
         if self.state.mode != FlightMode::Docked {
             return Err(StepError::InvalidMode);
         }
@@ -305,8 +315,13 @@ impl World {
         if let Some(state) = &mut navigation {
             state.launch().map_err(|_| StepError::TickOverflow)?;
         }
+        let mission_epoch = self.freight_session.as_ref().map(|session| session.next_epoch())
+            .transpose().map_err(|_| StepError::TickOverflow)?;
         self.state = next;
         self.navigation = navigation;
+        if let Some((session, epoch)) = self.freight_session.as_mut().zip(mission_epoch) {
+            session.rebind_dock(None, epoch);
+        }
         Ok(())
     }
 
@@ -316,6 +331,7 @@ impl World {
     /// Rotation is local yaw, then pitch, then roll; translation uses the new pose/speed.
     /// Brake overrides throttle and uses the same reference deceleration magnitude.
     pub fn step(&mut self, input: FlightInput) -> Result<(), StepError> {
+        if self.is_paused() { return Err(StepError::Paused); }
         input.validate()?;
         let mut next = self.state;
         next.tick = next.tick.checked_add(1).ok_or(StepError::TickOverflow)?;
@@ -395,6 +411,7 @@ impl World {
 
     fn publish_step(&mut self, mut next: Snapshot) -> Result<(), StepError> {
         let mut navigation = self.navigation;
+        let mut mission_epoch = None;
         if let Some(state) = &mut navigation {
             let entry = next.mode == FlightMode::Docked && self.state.mode != FlightMode::Docked;
             let account = self
@@ -407,6 +424,10 @@ impl World {
             let arrival_debit = state
                 .step(entry, next.tick, account.fuel_tenths())
                 .map_err(|_| StepError::NonFiniteState)?;
+            if entry || arrival_debit.is_some() {
+                mission_epoch = self.freight_session.as_ref().map(|session| session.next_epoch())
+                    .transpose().map_err(|_| StepError::TickOverflow)?;
+            }
             if let Some(debit) = arrival_debit {
                 // Debit is checked before mutation; nothing fallible follows publication.
                 account
@@ -422,6 +443,9 @@ impl World {
         }
         self.state = next;
         self.navigation = navigation;
+        if let Some((session, epoch)) = self.freight_session.as_mut().zip(mission_epoch) {
+            session.rebind_dock(navigation.and_then(NavigationState::dock), epoch);
+        }
         Ok(())
     }
 }

@@ -8,5 +8,5 @@ pub mod freight;
 pub mod navigation;
 pub mod station;
 
-pub use flight::{FIXED_DELTA_SECONDS, FlightInput, Snapshot, StepError, World};
+pub use flight::{FIXED_DELTA_SECONDS, FlightInput, Snapshot, StepError, World, MissionError, MissionSnapshot, StationNpc};
 pub use station::{FlightMode, FlightStart, MotionRefusal, OriginalStationData, StationError};

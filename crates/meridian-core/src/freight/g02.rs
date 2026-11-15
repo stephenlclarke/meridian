@@ -2,7 +2,7 @@
 //!
 //! Only the owning World may enter the crate-private command/publication boundary.
 //! Its facts must come from actual contact, dock, equipment and profile state. The
-//! existing local docking prototype cannot supply those facts yet. See G02-CONNECTED.md.
+//! World navigation/contact lifecycle supplies them; prototype worlds cannot. See WORLD-G02.md.
 
 use super::{CLUE_ID, REWARD_TENTHS};
 
@@ -191,6 +191,16 @@ impl CommanderAccount {
         Ok(())
     }
 
+    /// Normal fuel service after World validates a genuine current station admission.
+    pub(crate) fn refill_standard_tank(&mut self) -> Result<u32, Error> {
+        let missing = 130_u16.checked_sub(self.data.fuel_tenths).ok_or(Error::InvalidFit)?;
+        if missing == 0 { return Err(Error::TankFull); }
+        let price = u32::from(missing) * 2;
+        self.debit(price)?;
+        self.data.fuel_tenths = 130;
+        Ok(price)
+    }
+
     /// World navigation, after its real passage checks, consumes normal owned fuel.
     pub(crate) fn debit_fuel(&mut self, amount: u16) -> Result<(), Error> {
         let fuel = self.data.fuel_tenths.checked_sub(amount).ok_or(Error::InsufficientFuel)?;
@@ -206,7 +216,7 @@ pub enum Error {
     WrongOwner, MissingEquipment, UnpaidEquipment, InvalidFit, NotDocked, WrongStation,
     WrongActor, ContentUnavailable, Paused, InsufficientFuel, InsufficientFunds,
     HoldFull, ActiveJob, SourceExhausted, UnknownJob, NotActive, StaleReview,
-    WrongChoice, ForeignUnit, AlreadyTransferred, OutOfOrder, CreditOverflow,
+    TankFull, WrongChoice, ForeignUnit, AlreadyTransferred, OutOfOrder, CreditOverflow,
     SequenceExhausted, StalePublication,
 }
 
@@ -221,10 +231,12 @@ struct Binding { account: AccountData, world: WorldFacts, revision: u64 }
 pub struct Review {
     nonce: u64,
     purpose: Purpose,
-    binding: Binding,
     next_unit: Option<GoodsId>,
     remaining: u8,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct PendingReview { review: Review, binding: Binding }
 
 impl Review {
     pub fn next_unit(self) -> Option<GoodsId> { self.next_unit }
@@ -287,7 +299,7 @@ struct Data { owner: u64, revision: u64, sequence: u64, allocated: u8,
 /// Source/custody/wallet operations are synchronous under the single owning World.
 /// No public initializer, admission callback or receipt-acceptance factory is exposed.
 #[derive(Debug)]
-pub struct State { data: Data, ui_sequence: u64, pending: Option<Review> }
+pub struct State { data: Data, ui_sequence: u64, pending: Option<PendingReview> }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Snapshot { pub available_source_units: u8, pub held_tonnes: u8,
@@ -297,8 +309,8 @@ pub struct Snapshot { pub available_source_units: u8, pub held_tonnes: u8,
 /// It is not Clone; commit rechecks the full original account, state, UI and World context.
 #[derive(Debug)]
 pub(crate) struct Prepared {
-    old: Data, old_ui: u64, old_pending: Option<Review>, account: AccountData, world: WorldFacts,
-    next: Data, next_ui: u64, next_pending: Option<Review>, next_account: AccountData, event: Event,
+    old: Data, old_ui: u64, old_pending: Option<PendingReview>, account: AccountData, world: WorldFacts,
+    next: Data, next_ui: u64, next_pending: Option<PendingReview>, next_account: AccountData, event: Event,
 }
 
 impl State {
@@ -340,9 +352,9 @@ impl State {
                 require_contact(world, dock, actor, ContactDefinition::Arlen, AVENOR)?;
                 require_acceptance(&self.data, &account.data)?;
                 let review = Review { nonce: plan.next_ui, purpose: Purpose::Accept,
-                    binding: Binding { account: account.data, world: *world, revision: self.data.revision },
                     next_unit: None, remaining: 8 };
-                plan.next_pending = Some(review);
+                plan.next_pending = Some(PendingReview { review, binding: Binding {
+                    account: account.data, world: *world, revision: self.data.revision } });
                 plan.event = Event::Reviewed(review);
             }
             Command::ReviewReceiving { actor, job: id } |
@@ -355,14 +367,14 @@ impl State {
                     if receiving { RENAS } else { AVENOR })?;
                 let review = Review { nonce: plan.next_ui,
                     purpose: if receiving { Purpose::Receive(id) } else { Purpose::Abandon(id) },
-                    binding: Binding { account: account.data, world: *world, revision: self.data.revision },
                     next_unit: next_unit(current), remaining: current.held.count_ones() as u8 };
-                plan.next_pending = Some(review);
+                plan.next_pending = Some(PendingReview { review, binding: Binding {
+                    account: account.data, world: *world, revision: self.data.revision } });
                 plan.event = Event::Reviewed(review);
             }
             Command::Confirm { review, choice } => {
-                if self.pending != Some(review) || review.binding != (Binding {
-                    account: account.data, world: *world, revision: self.data.revision }) {
+                if self.pending != Some(PendingReview { review, binding: Binding {
+                    account: account.data, world: *world, revision: self.data.revision } }) {
                     return Err(Error::StaleReview);
                 }
                 plan.next_pending = None;
@@ -372,7 +384,7 @@ impl State {
                     .ok_or(Error::SequenceExhausted)?;
                 match (review.purpose, choice) {
                     (Purpose::Accept, Choice::Accept) => {
-                        require_contact(world, dock, review.binding.world.contact.ok_or(Error::WrongActor)?.actor,
+                        require_contact(world, dock, world.contact.ok_or(Error::WrongActor)?.actor,
                             ContactDefinition::Arlen, AVENOR)?;
                         require_acceptance(&self.data, &account.data)?;
                         let ordinal = self.data.allocated;
@@ -387,7 +399,7 @@ impl State {
                     }
                     (Purpose::Receive(id), Choice::ReceiveOne(_)) |
                     (Purpose::Receive(id), Choice::ReceiveAll) => {
-                        require_contact(world, dock, review.binding.world.contact.ok_or(Error::WrongActor)?.actor,
+                        require_contact(world, dock, world.contact.ok_or(Error::WrongActor)?.actor,
                             ContactDefinition::RenasUtilityCrew, RENAS)?;
                         let current = job(&self.data, id)?;
                         if current.status != JobStatus::Active { return Err(Error::NotActive); }
@@ -420,7 +432,7 @@ impl State {
                             remaining: remaining.count_ones() as u8, completion, clue_awarded };
                     }
                     (Purpose::Abandon(id), Choice::Abandon) => {
-                        require_contact(world, dock, review.binding.world.contact.ok_or(Error::WrongActor)?.actor,
+                        require_contact(world, dock, world.contact.ok_or(Error::WrongActor)?.actor,
                             ContactDefinition::Arlen, AVENOR)?;
                         let current = job(&self.data, id)?;
                         if current.status != JobStatus::Active { return Err(Error::NotActive); }
@@ -485,7 +497,7 @@ fn validate_account(data: &Data, account: &AccountData) -> Result<(), Error> {
         inventory: fit.inventory, items: fit.items.map(|item| item.id) })?;
     for (index, item) in fit.items.iter().enumerate() {
         if item.owner != account.owner { return Err(Error::WrongOwner); }
-        if item.origin != EquipmentOrigin::StandardBirth { return Err(Error::UnpaidEquipment); }
+        if item.origin == EquipmentOrigin::Unpaid { return Err(Error::UnpaidEquipment); }
         if item.component != STARTER_COMPONENTS[index]
             || item.fitted_hull.is_some_and(|hull| hull != account.hull) {
             return Err(Error::InvalidFit);
@@ -504,7 +516,7 @@ fn current_dock(account: &AccountData, world: &WorldFacts) -> Result<DockFacts, 
     if world.content_digest != Some(CONTENT_DIGEST) { return Err(Error::ContentUnavailable); }
     let dock = world.dock.ok_or(Error::NotDocked)?;
     if dock.owner != account.owner || dock.hull != account.hull { return Err(Error::WrongOwner); }
-    if dock.kind != StationKind::MainOrbital || dock.arrival_sequence == 0 {
+    if dock.kind == StationKind::Other || dock.arrival_sequence == 0 {
         return Err(Error::WrongStation);
     }
     Ok(dock)
