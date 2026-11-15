@@ -8,7 +8,7 @@ A docked exterior camera faces the original port. Flight uses a pilot view near 
 
 ## Validation
 
-Authored three independent presentation tests for transform order, port-facing camera coordinates and near-port station rendering with reused buffers. Existing mesh and flight tests remain. Rust formatting completed. Compilation, tests, strict Clippy and native graphics/controls are UNRUN for this slice until the core/content packet is joined and validated on the Dell.
+Authored a catch-up-frame regression that drives an actual overspeed station crossing followed by a clear tick and checks the refusal is still presented. Authored three independent presentation tests for transform order, port-facing camera coordinates and near-port station rendering with reused buffers. Existing mesh and flight tests remain. Rust formatting completed. Compilation, tests, strict Clippy and native graphics/controls are UNRUN for this slice until the core/content packet is joined and validated on the Dell.
 
 ## Compatibility and limits
 
