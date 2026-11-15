@@ -87,15 +87,63 @@ pub(crate) struct WorldFacts {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum EquipmentOrigin { StandardBirth, Unpaid }
 
-/// The first supported fit is the actual owned starter. This is not a paid-kit grant.
-/// The owning equipment implementation must supply this from its real inventory.
+/// IDs allocated once by the owning fresh-profile boundary, never a decoder or mission command.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) struct StarterFit {
+pub(crate) struct FreshCommanderIds {
     pub(crate) owner: u64,
     pub(crate) hull: u64,
     pub(crate) inventory: u64,
-    pub(crate) drive_item: u64,
-    pub(crate) origin: EquipmentOrigin,
+    pub(crate) items: [u64; 8],
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum StarterComponent {
+    BasicShield, BasicNavigation, BasicEnergy, BasicDrive, FrontPulseLaser, Missile(u8),
+}
+
+const STARTER_COMPONENTS: [StarterComponent; 8] = [
+    StarterComponent::BasicShield, StarterComponent::BasicNavigation,
+    StarterComponent::BasicEnergy, StarterComponent::BasicDrive,
+    StarterComponent::FrontPulseLaser, StarterComponent::Missile(0),
+    StarterComponent::Missile(1), StarterComponent::Missile(2),
+];
+
+/// Read-only owned property. Construction is private to the actual fresh-account transition.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct OwnedStarterItem {
+    id: u64,
+    owner: u64,
+    component: StarterComponent,
+    origin: EquipmentOrigin,
+    fitted_hull: Option<u64>,
+}
+
+impl OwnedStarterItem {
+    pub(crate) fn id(&self) -> u64 { self.id }
+    pub(crate) fn owner(&self) -> u64 { self.owner }
+    pub(crate) fn component(&self) -> StarterComponent { self.component }
+    pub(crate) fn fitted_hull(&self) -> Option<u64> { self.fitted_hull }
+}
+
+/// Actual fixed starter property retained with the account, not a caller-projected valid-fit flag.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct StarterFit {
+    owner: u64,
+    hull: u64,
+    inventory: u64,
+    items: [OwnedStarterItem; 8],
+}
+
+fn validate_birth_ids(ids: FreshCommanderIds) -> Result<(), Error> {
+    let mut all = [0; 11];
+    all[0] = ids.owner;
+    all[1] = ids.hull;
+    all[2] = ids.inventory;
+    all[3..].copy_from_slice(&ids.items);
+    for (index, id) in all.iter().enumerate() {
+        if *id == 0 || all[..index].contains(id) { return Err(Error::InvalidFit); }
+    }
+    Ok(())
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -115,10 +163,19 @@ pub(crate) struct CommanderAccount { data: AccountData }
 
 impl CommanderAccount {
     /// Called once by the real fresh-profile/owned-starter creation path, never on load/restock.
-    pub(crate) fn born_sh025(owner: u64, hull: u64, inventory: u64, drive_item: u64) -> Self {
-        Self { data: AccountData { owner, hull, revision: 0, credits: 7200, other_tonnes: 0,
-            fuel_tenths: 130, fit: Some(StarterFit { owner, hull, inventory, drive_item,
-                origin: EquipmentOrigin::StandardBirth }) } }
+    pub(crate) fn born_sh025(ids: FreshCommanderIds) -> Result<Self, Error> {
+        validate_birth_ids(ids)?;
+        let items = core::array::from_fn(|index| OwnedStarterItem {
+            id: ids.items[index], owner: ids.owner, component: STARTER_COMPONENTS[index],
+            origin: EquipmentOrigin::StandardBirth, fitted_hull: Some(ids.hull),
+        });
+        Ok(Self { data: AccountData { owner: ids.owner, hull: ids.hull, revision: 0,
+            credits: 7200, other_tonnes: 0, fuel_tenths: 130,
+            fit: Some(StarterFit { owner: ids.owner, hull: ids.hull, inventory: ids.inventory, items }) } })
+    }
+
+    pub(crate) fn starter_items(&self) -> Option<&[OwnedStarterItem; 8]> {
+        self.data.fit.as_ref().map(|fit| &fit.items)
     }
 
     pub(crate) fn credits_tenths(&self) -> u32 { self.data.credits }
@@ -424,10 +481,18 @@ fn validate_account(data: &Data, account: &AccountData) -> Result<(), Error> {
     if account.owner != data.owner { return Err(Error::WrongOwner); }
     let fit = account.fit.ok_or(Error::MissingEquipment)?;
     if fit.owner != account.owner || fit.hull != account.hull { return Err(Error::WrongOwner); }
-    if fit.origin != EquipmentOrigin::StandardBirth { return Err(Error::UnpaidEquipment); }
-    if fit.inventory == 0 || fit.drive_item == 0 || account.fuel_tenths > 130 {
-        return Err(Error::InvalidFit);
+    validate_birth_ids(FreshCommanderIds { owner: account.owner, hull: account.hull,
+        inventory: fit.inventory, items: fit.items.map(|item| item.id) })?;
+    for (index, item) in fit.items.iter().enumerate() {
+        if item.owner != account.owner { return Err(Error::WrongOwner); }
+        if item.origin != EquipmentOrigin::StandardBirth { return Err(Error::UnpaidEquipment); }
+        if item.component != STARTER_COMPONENTS[index]
+            || item.fitted_hull.is_some_and(|hull| hull != account.hull) {
+            return Err(Error::InvalidFit);
+        }
     }
+    if fit.items[3].fitted_hull != Some(account.hull) { return Err(Error::MissingEquipment); }
+    if account.fuel_tenths > 130 { return Err(Error::InvalidFit); }
     if u32::from(account.other_tonnes) + u32::from(held(data)) > u32::from(HOLD_TONNES) {
         return Err(Error::InvalidFit);
     }
@@ -477,10 +542,13 @@ mod tests {
             let station = ActorId { entity: 10, generation: 1 };
             Self {
                 state: State::new_commander(owner),
-                account: CommanderAccount::born_sh025(owner, 2, 3, 4),
+                account: CommanderAccount::born_sh025(FreshCommanderIds {
+                    owner, hull: owner + 100, inventory: owner + 200,
+                    items: core::array::from_fn(|index| owner + 300 + index as u64),
+                }).unwrap(),
                 world: WorldFacts {
                     epoch: 1, paused: false, content_digest: Some(CONTENT_DIGEST),
-                    dock: Some(DockFacts { owner, hull: 2, system: AVENOR,
+                    dock: Some(DockFacts { owner, hull: owner + 100, system: AVENOR,
                         kind: StationKind::MainOrbital, station_actor: station, arrival_sequence: 1 }),
                     contact: Some(ContactFacts { actor: ActorId { entity: 11, generation: 1 },
                         station_actor: station, definition: ContactDefinition::Arlen, roster_revision: 1 }),
@@ -643,7 +711,7 @@ mod tests {
         f.account.data.fit = None;
         f.refuses(command, Error::MissingEquipment);
         f.account.data.fit = fit;
-        f.account.data.fit.as_mut().unwrap().origin = EquipmentOrigin::Unpaid;
+        f.account.data.fit.as_mut().unwrap().items[3].origin = EquipmentOrigin::Unpaid;
         f.refuses(command, Error::UnpaidEquipment);
         f.account.data.fit = fit;
         f.account.data.other_tonnes = 85;
@@ -719,4 +787,58 @@ mod tests {
         f.receive(job, Choice::ReceiveAll);
         assert_eq!(f.account.credits_tenths(), 14500);
     }
+
+    #[test]
+    fn fresh_profile_creates_exact_owned_standard_items_and_rejects_bad_ids() {
+        let ids = FreshCommanderIds { owner: 1, hull: 2, inventory: 3,
+            items: [4, 5, 6, 7, 8, 9, 10, 11] };
+        let account = CommanderAccount::born_sh025(ids).unwrap();
+        let items = account.starter_items().unwrap();
+        for (index, item) in items.iter().enumerate() {
+            assert_eq!(item.id(), ids.items[index]);
+            assert_eq!(item.owner(), ids.owner);
+            assert_eq!(item.component(), STARTER_COMPONENTS[index]);
+            assert_eq!(item.fitted_hull(), Some(ids.hull));
+            assert_eq!(item.origin, EquipmentOrigin::StandardBirth);
+        }
+        assert_eq!(account.credits_tenths(), 7200);
+        assert_eq!(account.fuel_tenths(), 130);
+        let mut bad = ids;
+        bad.items[7] = bad.items[0];
+        assert_eq!(CommanderAccount::born_sh025(bad), Err(Error::InvalidFit));
+        bad = ids;
+        bad.items[0] = 0;
+        assert_eq!(CommanderAccount::born_sh025(bad), Err(Error::InvalidFit));
+        bad = ids;
+        bad.items[0] = bad.hull;
+        assert_eq!(CommanderAccount::born_sh025(bad), Err(Error::InvalidFit));
+    }
+
+    #[test]
+    fn forged_inventory_and_unpaid_spending_refuse_without_allocating_or_debiting() {
+        let mut f = Fixture::new(1);
+        let original = f.account.data;
+        assert_eq!(f.account.debit(7201), Err(Error::InsufficientFunds));
+        assert_eq!(f.account.data, original);
+        assert_eq!(f.account.debit_fuel(131), Err(Error::InsufficientFuel));
+        assert_eq!(f.account.data, original);
+        let actor = f.actor();
+        let command = Command::ReviewOffer { actor };
+        f.account.data.fit.as_mut().unwrap().items[3].fitted_hull = None;
+        f.refuses(command, Error::MissingEquipment);
+        f.account.data = original;
+        f.account.data.fit.as_mut().unwrap().items[0].owner = 99;
+        f.refuses(command, Error::WrongOwner);
+        f.account.data = original;
+        f.account.data.fit.as_mut().unwrap().items[0].fitted_hull = Some(99);
+        f.refuses(command, Error::InvalidFit);
+        f.account.data = original;
+        f.account.data.fit.as_mut().unwrap().items[1].id = original.fit.unwrap().items[0].id;
+        f.refuses(command, Error::InvalidFit);
+        f.account.data = original;
+        f.account.data.fit.as_mut().unwrap().items[0].component = StarterComponent::BasicDrive;
+        f.refuses(command, Error::InvalidFit);
+        assert_eq!(f.state.snapshot().available_source_units, 16);
+    }
+
 }
