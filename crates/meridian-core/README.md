@@ -1,5 +1,7 @@
 # Meridian core: first source slice
 
+The next authored slice adds [World-owned original navigation and physical destination admission](../../docs/WORLD-NAVIGATION.md). Its fresh commander uses the single connected freight account for fuel and credits. New navigation Rust tests remain UNRUN pending the composed Dell artifact; importer checks are recorded separately.
+
 Dependency-free headless Rust source. Root owns the workspace and renderer. `World::new`, `World::step(FlightInput)` and `World::snapshot` expose the agreed integration API. One accepted step advances exactly 1/60 second. Snapshot is Copy, position is XYZ, quaternion is XYZW, forward is local +Z and up is +Y. Initial position is `[0, 0, -600]`, identity rotation and zero speed.
 
 Inputs must be finite and within [-1, 1]; rejection leaves state unchanged. Positive pitch raises the nose, yaw turns toward local +X and roll rotates about local +Z. Rotation composes local yaw, pitch, roll. Throttle is signed acceleration: zero coasts and negative slows to zero without reverse. Brake overrides throttle using the same reference deceleration magnitude. Translation follows the updated orientation and speed. These are explicit first-slice kinematic conventions, not a completed port of legacy inertia, braking, collisions or physical units.

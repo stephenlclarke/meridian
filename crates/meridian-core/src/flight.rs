@@ -1,4 +1,9 @@
 use crate::docking::StationPose;
+use crate::freight::g02::{CommanderAccount, FreshCommanderIds, StarterComponent};
+use crate::navigation::{
+    CommanderId, DockContext, NavigationError, NavigationSnapshot, NavigationState,
+    OriginalNavigation, PlayerShipId, SystemId,
+};
 use crate::station::{
     DISTANCE_PER_SPEED_UNIT, FlightMode, FlightStart, MotionRefusal, OriginalStationData,
     StationError, flight_pose,
@@ -49,6 +54,7 @@ pub struct Snapshot {
     pub mode: FlightMode,
     pub station: Option<StationPose>,
     pub motion_refusal: Option<MotionRefusal>,
+    pub navigation: Option<NavigationSnapshot>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -87,6 +93,9 @@ impl std::error::Error for StepError {}
 pub struct World {
     state: Snapshot,
     station_data: Option<OriginalStationData>,
+    navigation_catalogue: Option<OriginalNavigation>,
+    navigation: Option<NavigationState>,
+    commander_account: Option<CommanderAccount>,
 }
 
 impl Default for World {
@@ -106,13 +115,133 @@ impl World {
                 mode: FlightMode::Flight,
                 station: None,
                 motion_refusal: None,
+                navigation: None,
             },
             station_data: None,
+            navigation_catalogue: None,
+            navigation: None,
+            commander_account: None,
         }
     }
 
     pub fn snapshot(&self) -> Snapshot {
-        self.state
+        let mut snapshot = self.state;
+        snapshot.navigation = self
+            .navigation
+            .zip(self.commander_account.as_ref())
+            .map(|(navigation, account)| navigation.snapshot(account.fuel_tenths()));
+        snapshot
+    }
+
+    /// New profile using original Avenor/SH025/full-tank/owned Basic-drive defaults.
+    /// The host owns unique profile seed allocation; the core has no global ID or wall clock.
+    pub fn new_commander(seed: u64) -> Result<Self, NavigationError> {
+        if seed == 0 || seed.checked_add(10).is_none() {
+            return Err(NavigationError::InvalidProfileIdentity);
+        }
+        let ids = FreshCommanderIds {
+            owner: seed,
+            hull: seed + 1,
+            inventory: seed + 2,
+            items: core::array::from_fn(|index| seed + 3 + index as u64),
+        };
+        let account = CommanderAccount::born_sh025(ids)
+            .map_err(|_| NavigationError::InvalidProfileIdentity)?;
+        let drive = account
+            .starter_items()
+            .and_then(|items| {
+                items
+                    .iter()
+                    .find(|item| item.component() == StarterComponent::BasicDrive)
+            })
+            .ok_or(NavigationError::InvalidProfileIdentity)?;
+        let navigation = NavigationState::new(seed, ids.hull, drive.id());
+        let mut world =
+            Self::at_original_station().map_err(|_| NavigationError::StationUnavailable)?;
+        world.navigation_catalogue = Some(OriginalNavigation::bundled()?);
+        world.commander_account = Some(account);
+        world.navigation = Some(navigation);
+        Ok(world)
+    }
+
+    pub fn credits_tenths(&self) -> Option<u32> {
+        self.commander_account
+            .as_ref()
+            .map(CommanderAccount::credits_tenths)
+    }
+
+    fn has_bound_navigation_fit(navigation: NavigationState, account: &CommanderAccount) -> bool {
+        let Some(items) = account.starter_items() else {
+            return false;
+        };
+        let owned = |item: &&crate::freight::g02::OwnedStarterItem| {
+            item.owner() == navigation.owner().seed()
+                && item.fitted_hull() == Some(navigation.ship().ordinal())
+        };
+        items.iter().filter(owned).any(|item| {
+            item.component() == StarterComponent::BasicDrive
+                && item.id() == navigation.drive_item_id()
+        }) && items
+            .iter()
+            .filter(owned)
+            .any(|item| item.component() == StarterComponent::BasicNavigation)
+    }
+
+    pub fn commander_id(&self) -> Option<CommanderId> {
+        self.navigation.map(NavigationState::owner)
+    }
+
+    pub fn player_ship_id(&self) -> Option<PlayerShipId> {
+        self.navigation.map(NavigationState::ship)
+    }
+
+    pub fn current_dock_context(&self) -> Option<DockContext> {
+        if self.state.mode != FlightMode::Docked {
+            return None;
+        }
+        self.navigation.and_then(NavigationState::dock)
+    }
+
+    pub fn dock_context_is_current(&self, context: &DockContext) -> bool {
+        self.current_dock_context().as_ref() == Some(context)
+    }
+
+    /// Begin a real fitted-drive jump. Fuel is charged once, only on actual arrival.
+    pub fn request_jump(
+        &mut self,
+        target: SystemId,
+        expected_tick: u64,
+    ) -> Result<(), NavigationError> {
+        if expected_tick != self.state.tick {
+            return Err(NavigationError::StaleCommand);
+        }
+        if self.state.mode != FlightMode::Flight {
+            return Err(NavigationError::WrongMode);
+        }
+        let catalogue = self
+            .navigation_catalogue
+            .as_ref()
+            .ok_or(NavigationError::WrongMode)?;
+        let mut navigation = self.navigation.ok_or(NavigationError::WrongMode)?;
+        let station = self
+            .state
+            .station
+            .ok_or(NavigationError::StationUnavailable)?;
+        let position = self.state.position.map(f64::from);
+        let center = station.pose.position;
+        let distance = (position[0] - center.x)
+            .hypot(position[1] - center.y)
+            .hypot(position[2] - center.z);
+        let account = self
+            .commander_account
+            .as_ref()
+            .ok_or(NavigationError::WrongMode)?;
+        if !Self::has_bound_navigation_fit(navigation, account) {
+            return Err(NavigationError::WrongMode);
+        }
+        navigation.begin_jump(catalogue, target, distance, account.fuel_tenths())?;
+        self.navigation = Some(navigation);
+        Ok(())
     }
 
     /// Explicit authored new-commander dock context; no in-flight arrival is inferred.
@@ -172,7 +301,12 @@ impl World {
         next.speed = start.speed;
         next.mode = FlightMode::Launching;
         next.motion_refusal = None;
+        let mut navigation = self.navigation;
+        if let Some(state) = &mut navigation {
+            state.launch().map_err(|_| StepError::TickOverflow)?;
+        }
         self.state = next;
+        self.navigation = navigation;
         Ok(())
     }
 
@@ -187,8 +321,7 @@ impl World {
         next.tick = next.tick.checked_add(1).ok_or(StepError::TickOverflow)?;
         next.motion_refusal = None;
         if next.mode == FlightMode::Docked {
-            self.state = next;
-            return Ok(());
+            return self.publish_step(next);
         }
         if !self.state.speed.is_finite() || !(0.0..=MAX_SPEED).contains(&self.state.speed) {
             return Err(StepError::NonFiniteState);
@@ -241,8 +374,7 @@ impl World {
                     stopped.speed = 0.0;
                     stopped.mode = FlightMode::Flight;
                     stopped.motion_refusal = Some(MotionRefusal::EntryConditions);
-                    self.state = stopped;
-                    return Ok(());
+                    return self.publish_step(stopped);
                 }
                 next.mode = FlightMode::Docked;
                 next.speed = 0.0;
@@ -253,13 +385,43 @@ impl World {
                     stopped.speed = 0.0;
                     stopped.mode = FlightMode::Flight;
                     stopped.motion_refusal = Some(MotionRefusal::StationContact);
-                    self.state = stopped;
-                    return Ok(());
+                    return self.publish_step(stopped);
                 }
                 next.mode = FlightMode::Flight;
             }
         }
+        self.publish_step(next)
+    }
+
+    fn publish_step(&mut self, mut next: Snapshot) -> Result<(), StepError> {
+        let mut navigation = self.navigation;
+        if let Some(state) = &mut navigation {
+            let entry = next.mode == FlightMode::Docked && self.state.mode != FlightMode::Docked;
+            let account = self
+                .commander_account
+                .as_mut()
+                .ok_or(StepError::NonFiniteState)?;
+            if !Self::has_bound_navigation_fit(*state, account) {
+                return Err(StepError::NonFiniteState);
+            }
+            let arrival_debit = state
+                .step(entry, next.tick, account.fuel_tenths())
+                .map_err(|_| StepError::NonFiniteState)?;
+            if let Some(debit) = arrival_debit {
+                // Debit is checked before mutation; nothing fallible follows publication.
+                account
+                    .debit_fuel(debit)
+                    .map_err(|_| StepError::NonFiniteState)?;
+                // Source arrival places the station16000 ahead. This is its equivalent
+                // station-local frame, not an earned dock or a proximity teleport.
+                next.position = [0.0, 0.0, 16000.0];
+                next.orientation = [0.0, 1.0, 0.0, 0.0];
+                next.mode = FlightMode::Flight;
+                next.motion_refusal = None;
+            }
+        }
         self.state = next;
+        self.navigation = navigation;
         Ok(())
     }
 }
