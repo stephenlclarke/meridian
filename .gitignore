@@ -2,3 +2,8 @@
 .DS_Store
 *.profraw
 __pycache__/
+
+# Generated test and analysis reports
+coverage/
+.coverage
+.scannerwork/

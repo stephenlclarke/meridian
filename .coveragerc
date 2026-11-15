@@ -1,0 +1,7 @@
+[run]
+source = tools
+relative_files = True
+omit = tools/test_*.py
+
+[report]
+show_missing = True
