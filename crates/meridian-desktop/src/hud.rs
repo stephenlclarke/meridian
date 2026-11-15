@@ -74,6 +74,17 @@ fn quad(output: &mut Vec<Vertex>, rect: [f32; 4], color: [f32; 3], size: [f32; 2
     ]);
 }
 
+fn text_scale(width: u32) -> f32 {
+    (width as f32 / (MAX_COLUMNS as f32 * 6.0 + 16.0)).clamp(1.0, 2.0)
+}
+
+pub fn line_budget(width: u32, height: u32) -> usize {
+    if width == 0 || height == 0 {
+        return 0;
+    }
+    ((height.saturating_sub(16) as f32 / (9.0 * text_scale(width))) as usize).min(MAX_LINES)
+}
+
 /// Bounded, reusable CPU buffer; text is presentation only and cannot issue commands.
 pub fn vertices(lines: &[String], width: u32, height: u32, output: &mut Vec<Vertex>) {
     output.clear();
@@ -81,8 +92,8 @@ pub fn vertices(lines: &[String], width: u32, height: u32, output: &mut Vec<Vert
         return;
     }
     let size = [width as f32, height as f32];
-    let scale = (size[0] / (MAX_COLUMNS as f32 * 6.0 + 16.0)).clamp(1.0, 2.0);
-    let count = lines.len().min(MAX_LINES).min((height / 10) as usize);
+    let scale = text_scale(width);
+    let count = lines.len().min(line_budget(width, height));
     let top = (size[1] - count as f32 * 9.0 * scale - 16.0).max(0.0);
     quad(
         output,
@@ -115,13 +126,20 @@ mod tests {
         let lines = vec!["W".repeat(MAX_COLUMNS + 100); MAX_LINES + 20];
         let mut output = Vec::with_capacity(MAX_VERTICES);
         let capacity = output.capacity();
-        for size in [[1920, 1080], [640, 480], [1, 1], [0, 720]] {
+        for size in [[1920, 1080], [1280, 100], [640, 360], [1, 1], [0, 720]] {
             vertices(&lines, size[0], size[1], &mut output);
             assert!(output.len() <= MAX_VERTICES);
             assert_eq!(output.capacity(), capacity);
             assert!(output.iter().flat_map(|v| v.position).all(f32::is_finite));
+            assert!(
+                output
+                    .iter()
+                    .all(|v| v.position[0].abs() <= 1.000001 && v.position[1].abs() <= 1.000001)
+            );
         }
         assert!(output.is_empty());
+        assert_eq!(line_budget(1280, 100), 4);
+        assert_eq!(line_budget(640, 360), MAX_LINES);
     }
     #[test]
     fn original_letters_are_legible_nonempty_and_lowercase_maps_identically() {

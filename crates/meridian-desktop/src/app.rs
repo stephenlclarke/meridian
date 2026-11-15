@@ -236,7 +236,8 @@ impl ApplicationHandler for App {
         }
         let attributes = Window::default_attributes()
             .with_title("Meridian - initializing graphics")
-            .with_inner_size(winit::dpi::LogicalSize::new(1280.0, 720.0));
+            .with_inner_size(winit::dpi::LogicalSize::new(1280.0, 720.0))
+            .with_min_inner_size(winit::dpi::LogicalSize::new(640.0, 360.0));
         let window = match event_loop.create_window(attributes) {
             Ok(window) => Arc::new(window),
             Err(error) => return self.fail(event_loop, error),

@@ -159,6 +159,28 @@ impl Session {
                 "PAUSED / UNFOCUSED"
             }
         )];
+        let review_line = if let Some((review, _)) = self.pending {
+            match review.next_unit() {
+                Some(unit) => format!(
+                    "REVIEW: RECEIVE UNIT {} | {} REMAIN | ENTER CONFIRMS, B CANCELS",
+                    unit.serial(),
+                    review.remaining_units()
+                ),
+                None => "REVIEW: ACCEPT EIGHT TONNES FOR RENAS | 730 CR ON COMPLETION | ENTER / B"
+                    .into(),
+            }
+        } else {
+            "T SELECTS THE CURRENT CONTACT; R OPENS A REVIEW BEFORE ENTER CAN CONFIRM".into()
+        };
+        lines.push(
+            notice
+                .unwrap_or("CLICK THE FLIGHT VIEW TO FOCUS THE CONTROLS")
+                .to_string(),
+        );
+        lines.push(review_line);
+        lines.push(
+            "L LAUNCH | J AVENOR/RENAS JUMP | T CONTACT | R REVIEW | ENTER CONFIRM | B BACK".into(),
+        );
         let credit = world.credits_tenths().unwrap_or(0);
         if let Some(navigation) = snapshot.navigation {
             lines.push(format!(
@@ -196,28 +218,9 @@ impl Session {
                 None => "T: CONTACT THE CURRENT STATION CREW WHEN DOCKED".into(),
             });
         }
-        if let Some((review, _)) = self.pending {
-            lines.push(match review.next_unit() {
-                Some(unit) => format!(
-                    "REVIEW: RECEIVE UNIT {} | {} REMAIN | ENTER CONFIRMS, B CANCELS",
-                    unit.serial(),
-                    review.remaining_units()
-                ),
-                None => "REVIEW: ACCEPT EIGHT TONNES FOR RENAS | 730 CR ON COMPLETION | ENTER / B"
-                    .into(),
-            });
-        }
         lines.push("W/S THRUST | ARROWS PITCH | A/D YAW | Q/E ROLL | SPACE BRAKE".into());
         lines.push(
-            "L LAUNCH | J AVENOR/RENAS JUMP | T CONTACT | R REVIEW | ENTER CONFIRM | B BACK".into(),
-        );
-        lines.push(
             "F PAID REFUEL | P PAUSE | F11 FULLSCREEN | ESC QUIT | NO SAVE IN THIS BUILD".into(),
-        );
-        lines.push(
-            notice
-                .unwrap_or("CLICK THE FLIGHT VIEW TO FOCUS THE CONTROLS")
-                .to_string(),
         );
         lines
     }
@@ -360,5 +363,22 @@ mod tests {
         assert!(ui.command(&mut world, Action::Refuel).is_ok());
         assert_eq!(world.credits_tenths(), Some(14432));
         assert_eq!(world.snapshot().navigation.map(|n| n.fuel_units), Some(130));
+    }
+    #[test]
+    fn narrow_height_keeps_current_review_refusal_and_action_keys_first() {
+        let mut world = world();
+        let mut ui = Session::default();
+        ui.command(&mut world, Action::Contact)
+            .unwrap_or_else(|e| panic!("{e}"));
+        ui.command(&mut world, Action::Review)
+            .unwrap_or_else(|e| panic!("{e}"));
+        let lines = ui.lines(&world, false, Some("ENTRY REFUSED: SLOW DOWN"));
+        let count = crate::hud::line_budget(1280, 100);
+        let visible = &lines[..count];
+        assert_eq!(count, 4);
+        assert!(visible[1].contains("ENTRY REFUSED"));
+        assert!(visible[2].contains("REVIEW: ACCEPT EIGHT"));
+        assert!(visible[3].contains("ENTER CONFIRM"));
+        assert!(lines.len() <= crate::hud::line_budget(640, 360));
     }
 }
