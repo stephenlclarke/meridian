@@ -101,13 +101,13 @@ impl App {
         self.last_frame = Instant::now();
         self.clock.reset();
         self.game.session.invalidate();
-        if self.game.playing() {
-            if let Err(error) = self.game.world.request_pause(
+        if self.game.playing()
+            && let Err(error) = self.game.world.request_pause(
                 self.paused || !self.focused || self.occluded,
                 self.game.world.snapshot().tick,
-            ) {
-                self.notice = Some(error.to_string());
-            }
+            )
+        {
+            self.notice = Some(error.to_string());
         }
         self.request_redraw();
     }
