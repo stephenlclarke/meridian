@@ -180,7 +180,11 @@ mod tests {
             .env("MERIDIAN_STORAGE_TEST_MODE", mode)
             .status()
             .unwrap_or_else(|e| panic!("{e}"));
-        assert!(status.success());
+        if mode == "exit_without_drop" {
+            assert_eq!(status.code(), Some(17));
+        } else {
+            assert!(status.success());
+        }
     }
 
     #[test]
@@ -191,6 +195,11 @@ mod tests {
         };
         match std::env::var("MERIDIAN_STORAGE_TEST_MODE").as_deref() {
             Ok("locked") => assert!(Store::open(path.into()).is_err()),
+            Ok("exit_without_drop") => {
+                let _held = store(Path::new(&path));
+                // Deliberately bypass Rust Drop; the parent verifies OS lease release after exit.
+                std::process::exit(17);
+            }
             Ok("continued") => assert_eq!(
                 store(Path::new(&path))
                     .load(100)
@@ -212,6 +221,7 @@ mod tests {
         child(&directory.0, "locked");
         saved(active.save(b"second valid save", 100));
         drop(active);
+        child(&directory.0, "exit_without_drop");
         child(&directory.0, "continued");
         assert!(directory.0.join("session.lock").exists());
     }

@@ -184,7 +184,7 @@ impl App {
                 self.paused = true;
                 self.reset_input();
                 self.quit_failed = true;
-                self.notice = Some(format!("{error}. P resumes; Q quits without another save."));
+                self.notice = Some(format!("P resumes; Q quits without saving again. {error}"));
                 self.request_redraw();
             }
         }
