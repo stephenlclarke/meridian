@@ -5,6 +5,7 @@
 //! World navigation/contact lifecycle supplies them; prototype worlds cannot. See WORLD-G02.md.
 
 use super::{CLUE_ID, REWARD_TENTHS};
+use crate::station_services as services;
 
 pub const SOURCE_ID: &str = "l337.contract/consented-freight";
 pub const BATCH_ID: &str = "avenor-utility-parts-01";
@@ -195,6 +196,8 @@ struct AccountData {
     revision: u64,
     credits: u32,
     other_tonnes: u16,
+    food_tonnes: u16,
+    reserved_food_tonnes: u16,
     fuel_tenths: u16,
     fit: Option<StarterFit>,
 }
@@ -223,6 +226,8 @@ impl CommanderAccount {
                 revision: 0,
                 credits: 7200,
                 other_tonnes: 0,
+                food_tonnes: 0,
+                reserved_food_tonnes: 0,
                 fuel_tenths: 130,
                 fit: Some(StarterFit {
                     owner: ids.owner,
@@ -263,18 +268,59 @@ impl CommanderAccount {
         Ok(())
     }
 
-    /// Normal fuel service after World validates a genuine current station admission.
-    pub(crate) fn refill_standard_tank(&mut self) -> Result<u32, Error> {
-        let missing = 130_u16
-            .checked_sub(self.data.fuel_tenths)
-            .ok_or(Error::InvalidFit)?;
-        if missing == 0 {
-            return Err(Error::TankFull);
+    pub(crate) fn service_projection(
+        &self,
+        freight: &State,
+    ) -> Result<services::AccountProjection, services::Error> {
+        validate_account(&freight.data, &self.data).map_err(service_error)?;
+        Ok(services::AccountProjection {
+            owner: self.data.owner,
+            hull: self.data.hull,
+            revision: self.data.revision,
+            credits_tenths: self.data.credits,
+            fuel_tenths: self.data.fuel_tenths,
+            food_tonnes: self.data.food_tonnes,
+            reserved_food_tonnes: self.data.reserved_food_tonnes,
+            used_tonnes: u16::try_from(occupied_tonnes(&freight.data, &self.data))
+                .map_err(|_| services::Error::InvalidAccount)?,
+        })
+    }
+
+    /// The only ordinary service mutation: checked account and stock publish together.
+    /// No caller-supplied price, cash balance, fuel amount or cargo grant enters this boundary.
+    pub(crate) fn execute_station_service(
+        &mut self,
+        freight: &State,
+        markets: &mut services::StationMarkets,
+        facts: services::ServiceFacts,
+        command: services::Command,
+    ) -> Result<services::Event, services::Error> {
+        let before = self.service_projection(freight)?;
+        let plan = markets.prepare(before, Some(facts), command)?;
+        let change =
+            plan.checked_change(markets, self.service_projection(freight)?, Some(facts))?;
+        let after = change.account_after;
+        let mut candidate = Self { data: self.data };
+        match change.event {
+            services::Event::BoughtFood { paid_tenths, .. }
+            | services::Event::Refuelled { paid_tenths, .. } => {
+                candidate.debit(paid_tenths).map_err(service_error)?;
+            }
+            services::Event::SoldFood { .. } => {
+                candidate.data.credits = after.credits_tenths;
+                candidate.data.revision = after.revision;
+            }
         }
-        let price = u32::from(missing) * 2;
-        self.debit(price)?;
-        self.data.fuel_tenths = 130;
-        Ok(price)
+        candidate.data.food_tonnes = after.food_tonnes;
+        candidate.data.fuel_tenths = after.fuel_tenths;
+        // This also checks actual owned fit, all remaining identified freight and reservations.
+        // Copying the account preserves equipment/other cargo instead of reconstructing it.
+        if candidate.service_projection(freight)? != after {
+            return Err(services::Error::InvalidAccount);
+        }
+        self.data = candidate.data;
+        *markets = change.market;
+        Ok(change.event)
     }
 
     /// World navigation, after its real passage checks, consumes normal owned fuel.
@@ -314,7 +360,6 @@ pub enum Error {
     UnknownJob,
     NotActive,
     StaleReview,
-    TankFull,
     WrongChoice,
     ForeignUnit,
     AlreadyTransferred,
@@ -887,10 +932,25 @@ fn validate_account(data: &Data, account: &AccountData) -> Result<(), Error> {
     if account.fuel_tenths > 130 {
         return Err(Error::InvalidFit);
     }
-    if u32::from(account.other_tonnes) + u32::from(held(data)) > u32::from(HOLD_TONNES) {
+    if account.reserved_food_tonnes > account.food_tonnes
+        || occupied_tonnes(data, account) > u32::from(HOLD_TONNES)
+    {
         return Err(Error::InvalidFit);
     }
     Ok(())
+}
+
+fn occupied_tonnes(data: &Data, account: &AccountData) -> u32 {
+    u32::from(account.other_tonnes) + u32::from(account.food_tonnes) + u32::from(held(data))
+}
+
+fn service_error(error: Error) -> services::Error {
+    match error {
+        Error::InsufficientFunds => services::Error::InsufficientFunds,
+        Error::SequenceExhausted => services::Error::SequenceExhausted,
+        Error::WrongOwner => services::Error::WrongOwner,
+        _ => services::Error::InvalidAccount,
+    }
 }
 
 fn current_dock(account: &AccountData, world: &WorldFacts) -> Result<DockFacts, Error> {
@@ -942,7 +1002,7 @@ fn require_acceptance(data: &Data, account: &AccountData) -> Result<(), Error> {
     if data.allocated >= 2 {
         return Err(Error::SourceExhausted);
     }
-    if u32::from(account.other_tonnes) + u32::from(held(data)) + 8 > u32::from(HOLD_TONNES) {
+    if occupied_tonnes(data, account) + 8 > u32::from(HOLD_TONNES) {
         return Err(Error::HoldFull);
     }
     if account.fuel_tenths < DEPARTURE_FUEL_TENTHS {
@@ -1425,5 +1485,131 @@ mod tests {
         f.account.data.fit.as_mut().unwrap().items[0].component = StarterComponent::BasicDrive;
         f.refuses(command, Error::InvalidFit);
         assert_eq!(f.state.snapshot().available_source_units, 16);
+    }
+
+    fn service_facts(f: &Fixture) -> services::ServiceFacts {
+        services::ServiceFacts {
+            owner: f.account.data.owner,
+            hull: f.account.data.hull,
+            site: services::MarketSite::Avenor,
+            station_entity: 1,
+            visit: 1,
+            dock_sequence: 1,
+            epoch: f.world.epoch,
+            paused: false,
+        }
+    }
+
+    #[test]
+    fn service_hold_reservations_and_fit_preserve_actual_account_and_eight_unit_custody() {
+        // Synthetic boundary fixture: no public cargo/credit/equipment grant is introduced.
+        let mut f = Fixture::new(1);
+        let (job, units) = f.accept();
+        f.account.data.food_tonnes = 84;
+        let mut market = services::StationMarkets::new_commander(1).unwrap();
+        let facts = service_facts(&f);
+        let before = f.account.data;
+        let freight_before = f.state.data;
+        let quote = market.quote(facts.site);
+        assert_eq!(
+            f.account.service_projection(&f.state).unwrap().used_tonnes,
+            92
+        );
+        assert_eq!(
+            f.account.execute_station_service(
+                &f.state,
+                &mut market,
+                facts,
+                services::Command::BuyFood
+            ),
+            Err(services::Error::HoldFull)
+        );
+        assert_eq!(
+            (f.account.data, f.state.data, market.quote(facts.site)),
+            (before, freight_before, quote)
+        );
+        f.account
+            .execute_station_service(&f.state, &mut market, facts, services::Command::SellFood)
+            .unwrap();
+        f.account
+            .execute_station_service(&f.state, &mut market, facts, services::Command::BuyFood)
+            .unwrap();
+        assert_eq!(f.account.data.food_tonnes, 84);
+        assert_eq!(f.account.data.fit, before.fit);
+        assert_eq!(f.state.data, freight_before);
+        assert_eq!(f.state.issued_units(job), Some(units));
+        f.account.data.reserved_food_tonnes = 84;
+        let before = f.account.data;
+        let quote = market.quote(facts.site);
+        assert_eq!(
+            f.account.execute_station_service(
+                &f.state,
+                &mut market,
+                facts,
+                services::Command::SellFood
+            ),
+            Err(services::Error::NoSellableCargo)
+        );
+        assert_eq!(
+            (f.account.data, f.state.data, market.quote(facts.site)),
+            (before, freight_before, quote)
+        );
+        f.account.data.fit.as_mut().unwrap().items[3].fitted_hull = None;
+        let before = f.account.data;
+        assert_eq!(
+            f.account.execute_station_service(
+                &f.state,
+                &mut market,
+                facts,
+                services::Command::RefillFuel
+            ),
+            Err(services::Error::InvalidAccount)
+        );
+        assert_eq!(
+            (f.account.data, f.state.data, market.quote(facts.site)),
+            (before, freight_before, quote)
+        );
+    }
+
+    #[test]
+    fn real_food_property_counts_for_freight_acceptance_and_service_failure_is_jointly_atomic() {
+        let mut f = Fixture::new(1);
+        f.account.data.food_tonnes = 85;
+        f.refuses(Command::ReviewOffer { actor: f.actor() }, Error::HoldFull);
+        f.account.data.food_tonnes = 0;
+        f.account.data.fuel_tenths = 96;
+        f.account.data.credits = 67;
+        let mut market = services::StationMarkets::new_commander(1).unwrap();
+        let facts = service_facts(&f);
+        let before = (f.account.data, f.state.data, market.quote(facts.site));
+        assert_eq!(
+            f.account.execute_station_service(
+                &f.state,
+                &mut market,
+                facts,
+                services::Command::RefillFuel
+            ),
+            Err(services::Error::InsufficientFunds)
+        );
+        assert_eq!(
+            (f.account.data, f.state.data, market.quote(facts.site)),
+            before
+        );
+        f.account.data.credits = 7200;
+        f.account.data.revision = u64::MAX;
+        let before = (f.account.data, f.state.data, market.quote(facts.site));
+        assert_eq!(
+            f.account.execute_station_service(
+                &f.state,
+                &mut market,
+                facts,
+                services::Command::BuyFood
+            ),
+            Err(services::Error::SequenceExhausted)
+        );
+        assert_eq!(
+            (f.account.data, f.state.data, market.quote(facts.site)),
+            before
+        );
     }
 }

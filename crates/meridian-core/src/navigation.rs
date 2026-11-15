@@ -51,6 +51,7 @@ pub enum NavigationError {
     SequenceExhausted,
     StationUnavailable,
     InvalidProfileIdentity,
+    ServiceUnavailable,
 }
 impl fmt::Display for NavigationError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -69,6 +70,7 @@ impl fmt::Display for NavigationError {
             Self::InsufficientFuel => "the current tank cannot fund this journey",
             Self::SequenceExhausted => "travel or actor sequence exhausted",
             Self::StationUnavailable => "original station content is unavailable",
+            Self::ServiceUnavailable => "original station service content is unavailable",
             Self::InvalidProfileIdentity => {
                 "fresh profile IDs must be nonzero, distinct and unexhausted"
             }

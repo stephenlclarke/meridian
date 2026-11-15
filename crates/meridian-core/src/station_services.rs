@@ -45,6 +45,7 @@ pub enum Error {
     InvalidAccount,
     WrongOwner,
     NotDocked,
+    UnsupportedStation,
     Paused,
     StalePublication,
     InsufficientFunds,
@@ -107,6 +108,17 @@ pub enum Event {
         added_fuel_tenths: u16,
         paid_tenths: u32,
     },
+}
+impl Event {
+    /// Actual cash spent by this committed ordinary service, excluding sale proceeds.
+    pub fn paid_tenths(self) -> u32 {
+        match self {
+            Self::BoughtFood { paid_tenths, .. } | Self::Refuelled { paid_tenths, .. } => {
+                paid_tenths
+            }
+            Self::SoldFood { .. } => 0,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
