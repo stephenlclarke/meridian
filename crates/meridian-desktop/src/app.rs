@@ -97,7 +97,7 @@ impl App {
                 snapshot.speed,
                 snapshot.tick,
                 if active { "RUNNING" } else { "PAUSED" },
-                contact_notice.as_deref().or(self.notice.as_deref())
+                contact_notice.or(self.notice.as_deref())
                     .unwrap_or("Click inside to control"),
             ));
             let station = snapshot
