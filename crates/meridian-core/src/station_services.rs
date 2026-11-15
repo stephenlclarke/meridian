@@ -274,47 +274,7 @@ impl StationMarkets {
                 }
             }
         };
-        let site = facts.site.index();
-        match event {
-            Event::BoughtFood { paid_tenths, .. } => {
-                next.bought[site] = next.bought[site]
-                    .checked_add(1)
-                    .ok_or(Error::SequenceExhausted)?;
-                next.paid_tenths = next
-                    .paid_tenths
-                    .checked_add(u64::from(paid_tenths))
-                    .ok_or(Error::SequenceExhausted)?;
-            }
-            Event::SoldFood {
-                credited_tenths, ..
-            } => {
-                next.sold[site] = next.sold[site]
-                    .checked_add(1)
-                    .ok_or(Error::SequenceExhausted)?;
-                next.credited_tenths = next
-                    .credited_tenths
-                    .checked_add(u64::from(credited_tenths))
-                    .ok_or(Error::SequenceExhausted)?;
-            }
-            Event::Refuelled {
-                added_fuel_tenths,
-                paid_tenths,
-                ..
-            } => {
-                next.refills = next
-                    .refills
-                    .checked_add(1)
-                    .ok_or(Error::SequenceExhausted)?;
-                next.refilled_units = next
-                    .refilled_units
-                    .checked_add(u64::from(added_fuel_tenths))
-                    .ok_or(Error::SequenceExhausted)?;
-                next.paid_tenths = next
-                    .paid_tenths
-                    .checked_add(u64::from(paid_tenths))
-                    .ok_or(Error::SequenceExhausted)?;
-            }
-        }
+        record_accounting(&mut next, facts.site.index(), event)?;
         Ok(Prepared {
             before: self.data,
             account,
@@ -324,6 +284,50 @@ impl StationMarkets {
             event,
         })
     }
+}
+
+fn record_accounting(next: &mut MarketData, site: usize, event: Event) -> Result<(), Error> {
+    match event {
+        Event::BoughtFood { paid_tenths, .. } => {
+            next.bought[site] = next.bought[site]
+                .checked_add(1)
+                .ok_or(Error::SequenceExhausted)?;
+            next.paid_tenths = next
+                .paid_tenths
+                .checked_add(u64::from(paid_tenths))
+                .ok_or(Error::SequenceExhausted)?;
+        }
+        Event::SoldFood {
+            credited_tenths, ..
+        } => {
+            next.sold[site] = next.sold[site]
+                .checked_add(1)
+                .ok_or(Error::SequenceExhausted)?;
+            next.credited_tenths = next
+                .credited_tenths
+                .checked_add(u64::from(credited_tenths))
+                .ok_or(Error::SequenceExhausted)?;
+        }
+        Event::Refuelled {
+            added_fuel_tenths,
+            paid_tenths,
+            ..
+        } => {
+            next.refills = next
+                .refills
+                .checked_add(1)
+                .ok_or(Error::SequenceExhausted)?;
+            next.refilled_units = next
+                .refilled_units
+                .checked_add(u64::from(added_fuel_tenths))
+                .ok_or(Error::SequenceExhausted)?;
+            next.paid_tenths = next
+                .paid_tenths
+                .checked_add(u64::from(paid_tenths))
+                .ok_or(Error::SequenceExhausted)?;
+        }
+    }
+    Ok(())
 }
 
 impl Prepared {
