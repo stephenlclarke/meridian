@@ -2,7 +2,7 @@
 
 Meridian is a fresh Rust reimplementation of the existing Elite/L337 game. It reuses selected assets and intentional mechanics through a traceable import and parity process. Graphics use wgpu, as requested by Stephen on 15 November 2026. The existing Swift application continues its separate delivery and fleet work.
 
-Status: first flight slice authored in Rust: headless fixed-step simulation, direct wgpu desktop renderer, original SH025 display mesh and scoped freight domain rules. Rust compilation, Rust tests and actual GPU play remain UNRUN while the current Swift delivery owns the execution lane. The private GitHub repository is [stephenlclarke/meridian](https://github.com/stephenlclarke/meridian). The local checkout is `~/github/meridian`; `origin` points to that repository.
+Status: first flight and docking geometry source implemented: headless fixed-step simulation, direct wgpu desktop renderer, original SH025 display mesh and scoped freight domain rules. On the Dell, source revision ec2fd1e passes workspace compilation, all 33 Rust tests and strict Clippy under both Ubuntu WSL2 and native Windows MSVC. Actual GPU play remains UNRUN. The private GitHub repository is [stephenlclarke/meridian](https://github.com/stephenlclarke/meridian). The local checkout is `~/github/meridian`; `origin` points to that repository.
 
 ## Start here
 
