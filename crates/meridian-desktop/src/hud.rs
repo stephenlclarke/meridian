@@ -57,6 +57,9 @@ fn glyph(character: char) -> [u8; 7] {
         ',' => [0, 0, 0, 0, 4, 4, 8],
         '!' => [4, 4, 4, 4, 4, 0, 4],
         '|' => [4; 7],
+        '[' => [14, 8, 8, 8, 8, 8, 14],
+        ']' => [14, 2, 2, 2, 2, 2, 14],
+        '>' => [16, 8, 4, 2, 4, 8, 16],
         ' ' => [0; 7],
         _ => [14, 17, 1, 2, 4, 0, 4],
     }
@@ -153,5 +156,27 @@ mod tests {
         }
         assert_eq!(glyph(' '), [0; 7]);
         assert_eq!(glyph('\u{2603}'), glyph('?'));
+    }
+    #[test]
+    fn market_controls_and_all_original_names_have_drawable_glyphs() {
+        let mut world = meridian_core::World::new_commander(7001).unwrap_or_else(|e| panic!("{e}"));
+        let mut session = crate::session::Session::default();
+        session
+            .command(&mut world, crate::session::Action::ToggleMarket)
+            .unwrap_or_else(|e| panic!("{e}"));
+        for _ in 0..17 {
+            for line in session.lines(&world, true, Some("MARKET")) {
+                for character in line.chars() {
+                    assert_ne!(
+                        glyph(character),
+                        glyph('?'),
+                        "missing glyph {character:?} in {line}"
+                    );
+                }
+            }
+            session
+                .command(&mut world, crate::session::Action::NextCommodity)
+                .unwrap_or_else(|e| panic!("{e}"));
+        }
     }
 }

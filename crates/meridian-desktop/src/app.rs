@@ -202,8 +202,11 @@ impl App {
             KeyCode::Enter => Action::Confirm,
             KeyCode::KeyB => Action::Back,
             KeyCode::KeyF => Action::Refuel,
-            KeyCode::KeyG => Action::BuyFood,
-            KeyCode::KeyH => Action::SellFood,
+            KeyCode::KeyG => Action::BuySelected,
+            KeyCode::KeyH => Action::SellSelected,
+            KeyCode::KeyM => Action::ToggleMarket,
+            KeyCode::BracketLeft => Action::PreviousCommodity,
+            KeyCode::BracketRight => Action::NextCommodity,
             _ => return,
         };
         self.notice = Some(match self.game.command(action) {

@@ -314,8 +314,8 @@ mod tests {
                 .new_commander(9301)
                 .unwrap_or_else(|e| panic!("{e}"))
         );
-        action(&mut profile, Action::BuyFood);
-        action(&mut profile, Action::SellFood);
+        action(&mut profile, Action::BuySelected);
+        action(&mut profile, Action::SellSelected);
         for value in [Action::Contact, Action::Review, Action::Confirm] {
             action(&mut profile, value);
         }
