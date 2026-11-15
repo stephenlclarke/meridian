@@ -1,0 +1,20 @@
+Meridian - Proprietary Source-Visible License
+
+Copyright (c) 2026 Stephen Clarke. All rights reserved.
+
+Meridian's original source code, documentation and newly authored content are
+proprietary. Public access to this repository does not grant permission to use,
+modify, distribute, sublicense or sell that material. Permission for those
+activities requires a separate written agreement from the copyright holder.
+
+The viewing and repository-forking rights provided by GitHub's applicable terms
+remain available on that platform. They do not grant additional rights to use or
+distribute Meridian outside those terms.
+
+Files and dependencies accompanied by separate license notices remain governed
+by those notices. In particular, retained MIT notices for reused original L337
+assets and the licenses of third-party Rust dependencies are not replaced by
+this license. Do not remove their required notices.
+
+Commercial releases are distributed under their applicable end-user terms.
+This source-access license does not replace an App Store end-user agreement.
