@@ -2,7 +2,17 @@
 
 Date: 15 November 2026.
 
-## Current station slice
+## Current integrated first-playable source
+
+Save/Continue is integrated at main `df2b1301369b90272df1c58917b6303df8efeefd` through [PR 8](https://github.com/stephenlclarke/meridian/pull/8), joining flight, station launch/docking, navigation/fuel, Food trading and actual G02 freight. Exact tested source `9aa927670eeb9990ab9c2a075475339ba2a80553` passes 102 top-level Rust tests (75 core and 27 desktop), formatting, compilation and strict Clippy on both Dell Linux and native Windows. Nested child harness summaries are included, not extra cases. Both 25-test importer runs retain exit zero. Hosted Linux, Windows and macOS checks pass; main CI/SonarQube run 43765301032 succeeds.
+
+The Windows executable SHA-256 is `cd6009c2956439ec9423ed330b18a03d0dc36b1d1b6226bebf744a6d30cc5936`; it has not launched. Actual separate-process Profile/Store tests cover disk continuation and once-only receiving/payment, not native window input or graphics. Root independently checked the staged executable hash and Linux source identity. Windows Git/source and native command exits have owner-retained evidence. Root observed Windows START after completion, so no live native process observation is claimed.
+
+The MBP is the primary Metal rendering, controls and packaged journey target, after the current Swift run releases the Mac execution lane. The prior human-verified Windows flight preview remains separate. Actual new graphics, held input, native window-close and packaged full-journey acceptance remain open. Original reduced SH028 mesh lineage limits and per-mission/fleet acceptance requirements remain explicit.
+
+The following sections retain earlier exact-source results and preparation notes. Their UNRUN statements and older counts describe those historical slices and do not supersede the current result above.
+
+## Earlier station slice
 
 [PR 1](https://github.com/stephenlclarke/meridian/pull/1) is merged as `7aee6b6d80d7c9ac32c52148a2134cc26d6ef62b`, with the exact reviewed `830b731` tree. World now owns the explicit docked start, tick-bound L launch, flight and automatic physical entrance admission. The desktop renders the original SH028 display mesh, uses an exterior docked observer and a pilot camera near the entrance, and preserves contact notices across catch-up ticks. Conservative contact stops at the last clear pose; original damage, impulse, sliding and full display-surface collision parity are not claimed.
 
