@@ -1,0 +1,9 @@
+# feat(storage): prepare atomic host save custody
+
+This is an in-progress component of the complete save/quit/continue slice, not a playable save feature. The storage module is included only in the test harness until the actual World codec and desktop commands are joined. It accepts opaque bytes and the core format's maximum size; it cannot inspect or manufacture gameplay state, consent, receipts, equipment or payment.
+
+An OS file lease excludes another cooperating game process. A newly created private staging file receives all bytes and file synchronization before a same-directory rename replaces the save. Only that owned staging pathname is eligible for cleanup. Unix then attempts directory synchronization; a post-publication failure returns an explicit published result. Windows uses synchronized file data and successful rename without claiming portable directory-flush or power-loss guarantees. The prior file is preserved on failures before publication. No save fallback, migration, old-profile import or automatic repair is provided.
+
+Authored tests use real temporary files and child processes for exclusive custody and cold file continuation, injected partial-write failure, size limits, existing-file replacement and failed rename without touching the destination. These are byte-store tests, not World roundtrip or actual game/save acceptance. Source formatting passes; compilation, tests and Clippy remain UNRUN. Join with G3's complete codec and the actual host UI before the one whole-artifact independent review and exact Dell qualification.
+
+Implementation references: [Rust File locking and synchronization](https://doc.rust-lang.org/std/fs/struct.File.html#method.try_lock) and [same-filesystem rename semantics](https://doc.rust-lang.org/std/fs/fn.rename.html). This component uses the existing Rust 1.99 toolchain and adds no dependencies, imported assets or resource settings.
