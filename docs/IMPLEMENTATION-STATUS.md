@@ -1,8 +1,18 @@
-# First implementation slice
+# Implementation and validation status
 
 Date: 15 November 2026.
 
-## Authored
+## Current station slice
+
+[PR 1](https://github.com/stephenlclarke/meridian/pull/1) is merged as `7aee6b6d80d7c9ac32c52148a2134cc26d6ef62b`, with the exact reviewed `830b731` tree. World now owns the explicit docked start, tick-bound L launch, flight and automatic physical entrance admission. The desktop renders the original SH028 display mesh, uses an exterior docked observer and a pilot camera near the entrance, and preserves contact notices across catch-up ticks. Conservative contact stops at the last clear pose; original damage, impulse, sliding and full display-surface collision parity are not claimed.
+
+At Rust source `502fa654a9aa94e4c47b9b34bcd84c65b055c448`, both Dell Linux and native Windows pass workspace/all-target checks, all 46 Rust tests (35 core and 11 desktop), and strict Clippy. Windows builds the station executable with SHA-256 `d00e3c712eda8e68c1d54c34aa46895fbd211abfd2bc1e8765d27f765a5414f6`. The later Python-only `830b731` correction leaves Rust, Cargo and assets byte-identical. Nine final Python importer tests and exact immutable-source re-import pass; formatting and all 26 Markdown files pass lint. Independent whole-source and security-delta reviews are clear, and the final PR SonarCloud check passes. The initial source-location re-import failure and initial Sonar security failure remain historical failures, resolved by locating the exact pinned blobs and constraining the importer command respectively.
+
+The station executable has not started. Windows interactive access is locked/inaccessible; no new GPU backend, scene, L-launch, window behavior or player-controlled docking result is inferred from headless tests. The earlier verified flight preview remains separate and available. Current station native UI acceptance remains open until interactive access returns. No new actual-game journey, legacy hull, mission or commercial release acceptance is claimed.
+
+The sections below retain the earlier flight slice and its exact evidence. Navigation/travel/fuel and connected G02 freight are separate active source slices; their genuine World location, contact, owned fit, sole account and publication joins must be complete before full-journey qualification.
+
+## Initial flight source
 
 - Dependency-free meridian-core: one mutable World, explicit held inputs, fixed 1/60 tick, normalized xyzw quaternion, finite/range checks and transactional rejection. SH025 speed/acceleration/rotation parameters are source-derived reference units. Input signs, brake/coast behavior and tick integration are explicit prototype conventions awaiting trajectory parity.
 - Separate scoped G02 freight domain model and meaningful headless tests. This does not validate real consent, receiver identity, cargo, paid resources, wallet publication, trusted receipts or saved state. It is not connected to the flight shell.
@@ -32,7 +42,7 @@ Corrected automated captures were white despite the human-visible scene. Keep th
 
 1. Preserve the exact passing Dell evidence; G1 still needs Mac compiler/backend qualification when app delivery permits it. Fix actual failures within the same slice.
 2. Qualify the prototype on an actual Mac when its execution lane is available. Preserve the distinct Windows human verification and automated capture limits; measure performance separately.
-3. Implement the real station/flight contact and admission loop plus source route/fuel/economy. Replace navigation fixtures with qualified content, not a dock flag shortcut.
+3. Qualify the integrated station contact/admission loop in the native UI, then complete source route/fuel/economy and actual World mission joins. Keep physical admission separate from descriptive snapshots.
 4. Integrate the G02 finite source, consent/custody, receiver and failed-publication semantics; implement versioned save/quit/continue before claiming the complete first playable.
 
 The authoritative milestone remains [FIRST-PLAYABLE.md](FIRST-PLAYABLE.md). Do not close it on a flight prototype, unit-test count or source review alone.
