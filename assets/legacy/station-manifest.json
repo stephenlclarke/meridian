@@ -1,0 +1,118 @@
+{
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourceFiles": [
+    {
+      "id": "SH025",
+      "path": "Sources/L337Core/Resources/Ships/SH025.toml",
+      "sha256": "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883",
+      "bytes": 690857
+    },
+    {
+      "id": "SH028",
+      "path": "Sources/L337Core/Resources/Ships/SH028.toml",
+      "sha256": "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9",
+      "bytes": 1397484
+    }
+  ],
+  "outputs": {
+    "sh028.mesh": {
+      "sha256": "123a63ff56db7965baba2f54d3ed4b5feab62c47115aef0a5d9a2970b6cb897e",
+      "bytes": 724032
+    },
+    "sh028.physics": {
+      "sha256": "cd54d30cab638f6b33feacf1fa78c9136f8ce346e8cc6133259bfc0472c259d5",
+      "bytes": 12400
+    },
+    "sh025.physics": {
+      "sha256": "b43418aee89564759a5db789f8efa604222a392c69a2024c7a9ed2156eff434d",
+      "bytes": 24448
+    },
+    "sh028.port": {
+      "sha256": "31a7ed33803e78ebbe7bb87c0658e47a786e8bba9107d513b2e534ccd30cf71f",
+      "bytes": 188
+    }
+  },
+  "station": {
+    "id": "SH028",
+    "name": "Lion Citadel",
+    "displayVertices": 5888,
+    "displayTriangles": 10056,
+    "nativeVertices": 272,
+    "nativeTriangles": 488,
+    "port": {
+      "center": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 136.32
+      },
+      "outward": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 1.0
+      },
+      "up": {
+        "x": 0.0,
+        "y": 1.0,
+        "z": 0.0
+      },
+      "tunnelDepth": 53.52,
+      "aperture": [
+        {
+          "x": -62.32,
+          "y": -50.8,
+          "z": 0.0
+        },
+        {
+          "x": 62.32,
+          "y": -50.8,
+          "z": 0.0
+        },
+        {
+          "x": 62.32,
+          "y": 50.8,
+          "z": 0.0
+        },
+        {
+          "x": -62.32,
+          "y": 50.8,
+          "z": 0.0
+        }
+      ]
+    },
+    "geometryContext": "Explicit new uniform80metres/sourceunit authoring estimate; sourceunitsundeclared, +Zforward/+Yup/sourceorigin retained. Publicdimensions describefullvisiblebounds; boundednativeLODdimensions [270.71999999999997, 241.92000000000002, 248.32]metres differ bydisclosedomittedmicrogeometry/coarsecurves. Actualrectangularaperture124.64x101.6m/frontplaneZ136.32/depth53.52 sharethis exactnativeframe. Notmeasuredcalibration, fullsurfacecollisionequivalence, allhullroute, docking, structuralengineering or renderingacceptance."
+  },
+  "player": {
+    "id": "SH025",
+    "nativeVertices": 536,
+    "nativeTriangles": 964,
+    "geometryContext": "F01-SH025-CALIBRATION-v1: project estimate, maximum bounding extent 120 metres for size-tier-2 multirole hull; not an authored measurement or predecessor dimension. Uniform scale 36.95309420575483 from approved original nativeDesign bounds, +Z forward/+Y up; retain proportions and openings. Hull SHA256 33f4113a86ba833d4a0178984ca3bb6c963bbdeabc8eb9c38059d5a17d665671; specification SHA256 8c608e9f1a9a325b3c275f64a9428832c4f6890b7465f966c907daa70b4db313. Actual docking clearance remains unqualified.",
+    "game": {
+      "cargo": 92,
+      "speed": 34.3,
+      "acceleration": 9.1,
+      "energy": 380,
+      "recharge": 4.2,
+      "roll": 0.79,
+      "pitch": 0.7,
+      "yaw": 0.65,
+      "shield": 300,
+      "shieldRecharge": 1.8,
+      "fuel": 130,
+      "jump": 9,
+      "spool": 15,
+      "missiles": 9,
+      "facings": 15,
+      "cargoExpansion": 35,
+      "price": 362000,
+      "workTools": [
+        "salvageCutter"
+      ]
+    }
+  },
+  "displayFormat": "Original triangle order LEf32 xyz + linearRGB,24B/vertex; no UV/textures",
+  "physicalFormat": "MPHYS001 + LEu32 vertex/triangle counts + LEf64 xyz + LEu32 triangle indices; source frame/values unchanged",
+  "portFormat": "MPORT001 + LEf64 center/outward/up/depth + LEu32 aperture count + LEf64 xyz",
+  "notice": "assets/legacy/Elite-L337-MIT.txt",
+  "scope": "SH028 bounded native collision LOD, not full display surface equivalence or legacy171 fleet acceptance. No original save/profile or mission authority imported.",
+  "importer": "tools/import_station.py"
+}
