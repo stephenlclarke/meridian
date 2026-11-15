@@ -16,7 +16,7 @@ Python import tests passed: source mismatch refusal, committed mesh hash/size/fi
 
 The joined slice contains 33 authored Rust tests: the original 12 core and 7 desktop-side tests, plus 14 independently source-reviewed docking geometry tests. The pause regression covers a resume after 600 seconds without paused redraws; host pause also resets timing and requests one status repaint. Execution results remain separate from source review.
 
-The first Dell Linux workspace check at caab7db failed with E0599 because the pinned wgpu instance descriptor has no Default implementation. The correction uses its explicit display-handle constructor. Exact corrected-head workspace check, tests and Clippy are pending on the Dell. Actual GPU launch, frame inspection and performance remain UNRUN. The human authorized Dell Linux and native Windows builds in parallel; G1 retains the Mac execution lane for the Swift 548-case qualification and updated app. There is no playable or commercial acceptance claim.
+The first Dell Linux workspace check at caab7db failed with E0599 because the pinned wgpu instance descriptor has no Default implementation. At corrected 78cfaad, the Linux workspace all-target check and all 33 Rust tests pass (26 core and 7 desktop), while Clippy fails on three mesh-decoder lints. The decoder correction preserves validation and uses typed slice chunks; exact corrected-head checks are pending. Actual GPU launch, frame inspection and performance remain UNRUN. The human authorized Dell Linux and native Windows builds in parallel; G1 retains the Mac execution lane for the Swift 548-case qualification and updated app. There is no playable or commercial acceptance claim.
 
 ## Next concrete acceptance
 

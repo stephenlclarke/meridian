@@ -12,15 +12,17 @@ pub fn load_ship() -> Result<Vec<Vertex>, String> {
 }
 
 fn decode_mesh(bytes: &[u8]) -> Result<Vec<Vertex>, String> {
-    if bytes.is_empty() || bytes.len() % 72 != 0 {
+    if bytes.is_empty() || !bytes.len().is_multiple_of(72) {
         return Err("Imported ship must contain complete 24-byte triangle vertices".into());
     }
     bytes
-        .chunks_exact(24)
+        .as_chunks::<24>()
+        .0
+        .iter()
         .map(|vertex| {
             let mut values = [0.0; 6];
-            for (value, chunk) in values.iter_mut().zip(vertex.chunks_exact(4)) {
-                *value = f32::from_le_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]);
+            for (value, chunk) in values.iter_mut().zip(vertex.as_chunks::<4>().0.iter()) {
+                *value = f32::from_le_bytes(*chunk);
             }
             if values.iter().any(|value| !value.is_finite()) {
                 return Err("Imported ship has non-finite vertex data".into());
