@@ -19,7 +19,7 @@ The current MBA keeps its fleet work. The offered 16 GB M2 MacBook Pro remains u
 
 ## Planned implementation checks
 
-When Rust code is introduced, provide repository Makefile targets for formatting, cargo check, unit/integration tests, clippy, headless journey replay, asset validation, actual GPU smoke tests and packaged-app qualification. Pin toolchain/dependencies and keep Cargo.lock. Run meaningful regression and property tests for transactions, save validation, identities, bounded queues and numeric invariants. The current planning-only Makefile implements docs-check only; no pretend green CI targets exist.
+When Rust code is introduced, provide repository Makefile targets for formatting, cargo check, unit/integration tests, clippy, headless journey replay, asset validation, actual GPU smoke tests and packaged-app qualification. Pin toolchain/dependencies and keep Cargo.lock. Run meaningful regression and property tests for transactions, save validation, identities, bounded queues and numeric invariants. The Makefile now implements docs-check, assets-check, fmt/fmt-check, check, test, clippy, ci and run. Only documentation, formatting and Python asset checks may currently be reported from the first source slice; Cargo compilation and GPU execution await the existing G1 lane.
 
 Aim for at least 90 percent focused new-code line coverage per shared guidance, with evidence-backed exceptions. Coverage is not mission acceptance. Add sanitizers or interpreter checks appropriate to owned unsafe/platform code when introduced. Qualify each shipped OS/backend on actual hardware and preserve failures. Required checks must pass for the exact final source revision; do not treat the Swift project's existing coverage or acceptance as Meridian evidence.
 

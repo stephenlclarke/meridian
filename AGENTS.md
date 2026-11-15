@@ -10,4 +10,4 @@ Trace reused content to an immutable legacy revision and retain its provenance a
 
 The existing G1 session remains the sole current native/compiler/CI/save executor. Until that ownership changes explicitly, prepare source and tests without launching competing compilation, GPU jobs or new native processes. Keep the existing app delivery and MBA fleet work moving independently.
 
-This initial repository contains plans only. Do not report proposed checks as implemented or passing. Follow Conventional Commits. Do not publish a remote or make an App Store submission merely because this repository exists.
+This repository now contains first-slice source and tests. Read docs/IMPLEMENTATION-STATUS.md for actual validation; do not report authored tests or proposed checks as passing. Follow Conventional Commits. Do not publish a remote or make an App Store submission merely because this repository exists.

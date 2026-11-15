@@ -1,0 +1,17 @@
+{
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourcePath": "Sources/L337Core/Resources/Ships/SH025.toml",
+  "sourceSHA256": "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883",
+  "sourceBytes": 690857,
+  "output": "assets/legacy/sh025.mesh",
+  "outputSHA256": "b85d726da742da00a68643429fc109b28343e164601aa013abb9aa045717c6d7",
+  "outputBytes": 250848,
+  "triangles": 3484,
+  "format": "Triangle-list LE f32 xyz + linear RGB, 24 bytes per vertex",
+  "transform": "Source triangle order/xyz unchanged; expand indices; sRGB palette to linear RGB",
+  "coordinateConvention": "+Z forward, +Y up; source SH025 calibration retained as estimate",
+  "license": "MIT; source design and appearance declarations; retained top-level notice",
+  "notice": "assets/legacy/Elite-L337-MIT.txt",
+  "scope": "Display-only prototype. No UV/textures, collision mesh or hull admission claim.",
+  "importer": "tools/import_ship.py"
+}

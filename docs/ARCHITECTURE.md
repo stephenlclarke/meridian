@@ -4,7 +4,7 @@
 
 Build a releasable single-player space game with a portable Rust simulation and a direct wgpu renderer. The first supported release target is an Apple Silicon Mac desktop app. Windows is the next portability target, with Linux useful for core development and tests. Browser, mobile, multiplayer and full legacy parity are outside the first playable scope. Mac App Store distribution remains a later qualified delivery target, not an automatic result of using Rust.
 
-Rust and wgpu are chosen. winit is the proposed desktop window/input adapter. Exact crate versions, Rust toolchain and deployment OS minimums will be pinned in Cargo.lock/toolchain configuration during the first implementation slice, after compatibility is checked. No engine dependency or placeholder Cargo workspace is added just to imply implementation progress.
+Rust and wgpu are chosen. winit is the proposed desktop window/input adapter. The first implementation pins wgpu 29.0.4, winit 0.30.13, pollster 0.4.0 and bytemuck 1.25.2 in Cargo.lock, with Rust 1.99.0. Those locally available APIs were inspected for source compatibility; compile/GPU compatibility is not yet verified. Deployment OS minimums remain open. The workspace contains a real headless core and desktop implementation.
 
 ## Ownership and execution
 

@@ -24,7 +24,7 @@ The local immutable reference inspected for planning is `/Volumes/SSD/offload/l3
 
 ## Asset import contract
 
-Use an explicit per-file manifest with source repository/revision/path, SHA-256 and size, origin/author, exact notice/license reference, import transformation/version, output path/hash, units/axes/winding/material mapping and consumer milestone. Record reuse status separately from implementation and game acceptance. Initial imported count is zero; no source assets have been copied into Meridian yet.
+Use an explicit per-file manifest with source repository/revision/path, SHA-256 and size, origin/author, exact notice/license reference, import transformation/version, output path/hash, units/axes/winding/material mapping and consumer milestone. Record reuse status separately from implementation and game acceptance. The first implementation imports one SH025 display mesh and its MIT notice, with the exact source and output hashes in assets/legacy/manifest.json. This expands all 3,484 source triangles, preserves positions/order and converts the source palette to linear RGB. UV textures and physical/collision admission remain unimplemented.
 
 Import only the first journey's closure. Runtime consumes validated packaged data and never scans or decodes the entire legacy catalogue at startup. Conversion should be reproducible offline, with independent bounds, topology/UV/material and identity checks where relevant. Preserve original collision/contact/physical constraints; new renderer tessellation does not grant permission to relax source requirements. Future MBA fleet results enter through a new immutable source reference, not a live authoring directory.
 
