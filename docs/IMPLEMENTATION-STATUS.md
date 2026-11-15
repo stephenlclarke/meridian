@@ -47,7 +47,6 @@ Corrected automated captures were white despite the human-visible scene. Keep th
 
 The authoritative milestone remains [FIRST-PLAYABLE.md](FIRST-PLAYABLE.md). Do not close it on a flight prototype, unit-test count or source review alone.
 
-
 ## Joined World freight and desktop HUD candidate
 
 The candidate documented in [the source packet](PR-world-flight-hud.md) joins frozen G3 World freight and MC1 navigation to actual desktop commands, with a live code-drawn wgpu overlay. The host allocates a new ephemeral commander identity; the core keeps ownership and authority. No font, texture or other art file was added. Existing original L337 navigation bytes have their separate authoring audit; the reduced SH028 collision-mesh lineage gap remains explicit.
