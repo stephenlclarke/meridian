@@ -4,6 +4,7 @@ import importlib.util
 import json
 from pathlib import Path
 import struct
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -20,10 +21,35 @@ class StationImportTests(unittest.TestCase):
 
     def test_reads_the_explicit_git_revision_instead_of_working_files_or_head(self):
         raw = b'isolated source input'
-        with patch.dict(IMPORTER.PINS, {'SH025':hashlib.sha256(raw).hexdigest()}):
-            with patch.object(IMPORTER.subprocess, 'check_output', return_value=raw) as call:
-                self.assertEqual(IMPORTER.read_blob(Path('/reference-objects'),'SH025'),raw)
-                call.assert_called_once_with(['git','-C','/reference-objects','show',IMPORTER.REVISION+':Sources/L337Core/Resources/Ships/SH025.toml'])
+        with tempfile.TemporaryDirectory(prefix='--reference-objects-') as directory:
+            repository = Path(directory).resolve()
+            with patch.dict(IMPORTER.PINS, {'SH025': hashlib.sha256(raw).hexdigest()}):
+                with patch.object(IMPORTER.subprocess, 'check_output', return_value=raw) as call:
+                    self.assertEqual(IMPORTER.read_blob(repository, 'SH025'), raw)
+                    call.assert_called_once_with(
+                        ['git', '--no-pager', 'show', '--no-ext-diff', '--no-textconv',
+                         IMPORTER.REVISION + ':Sources/L337Core/Resources/Ships/SH025.toml'],
+                        cwd=repository,
+                    )
+
+    def test_unselected_or_option_like_blob_identifier_never_reaches_git(self):
+        for identifier in ['SH029', '--output=unexpected', '../SH025', 'SH025;echo injected']:
+            with self.subTest(identifier=identifier):
+                with patch.object(IMPORTER.subprocess, 'check_output') as call:
+                    with self.assertRaisesRegex(ValueError, 'Unselected'):
+                        IMPORTER.read_blob(ROOT, identifier)
+                    call.assert_not_called()
+
+    def test_non_directory_source_never_reaches_git(self):
+        with patch.object(IMPORTER.subprocess, 'check_output') as call:
+            with self.assertRaisesRegex(ValueError, 'directory'):
+                IMPORTER.read_blob(Path(__file__), 'SH025')
+            call.assert_not_called()
+
+    def test_read_blob_still_rejects_wrong_hash_after_fixed_command(self):
+        with patch.object(IMPORTER.subprocess, 'check_output', return_value=b'foreign'):
+            with self.assertRaisesRegex(ValueError, 'hash mismatch'):
+                IMPORTER.read_blob(ROOT, 'SH025')
 
     def test_packaged_outputs_hash_counts_format_and_notice_match(self):
         manifest=json.loads((ROOT/'assets/legacy/station-manifest.json').read_text())
@@ -34,11 +60,12 @@ class StationImportTests(unittest.TestCase):
             self.assertEqual(hashlib.sha256(raw).hexdigest(), expected['sha256'])
             self.assertEqual(len(raw),expected['bytes'])
         self.assertEqual(len((ROOT/'assets/legacy/sh028.mesh').read_bytes()),10056*3*24)
-        for name,counts in [('sh028.physics',(272,488)),('sh025.physics',(536,964))]:
+        for name, expected_counts in [('sh028.physics',(272,488)),('sh025.physics',(536,964))]:
             raw=(ROOT/'assets/legacy'/name).read_bytes()
             self.assertEqual(raw[:8],b'MPHYS001')
-            vertices,triangles=struct.unpack_from('<II',raw,8)
-            self.assertEqual((vertices,triangles),counts)
+            actual_counts = struct.unpack_from('<II', raw, 8)
+            vertices, triangles = actual_counts
+            self.assertEqual(actual_counts, expected_counts)
             self.assertEqual(len(raw),16+vertices*24+triangles*12)
             indices=struct.unpack_from('<'+'I'*(triangles*3),raw,16+vertices*24)
             self.assertTrue(all(i<vertices for i in indices))

@@ -17,8 +17,20 @@ PINS = {
 
 
 def read_blob(repository, identifier):
-    path = f'Sources/L337Core/Resources/Ships/{identifier}.toml'
-    raw = subprocess.check_output(['git', '-C', str(repository), 'show', REVISION + ':' + path])
+    sources = {
+        'SH025': REVISION + ':Sources/L337Core/Resources/Ships/SH025.toml',
+        'SH028': REVISION + ':Sources/L337Core/Resources/Ships/SH028.toml',
+    }
+    if identifier not in sources:
+        raise ValueError('Unselected source identifier')
+    directory = Path(repository).resolve(strict=True)
+    if not directory.is_dir():
+        raise ValueError('Source repository must be a directory')
+    # Only fixed blob specifications reach argv; the caller's directory is a cwd.
+    raw = subprocess.check_output(
+        ['git', '--no-pager', 'show', '--no-ext-diff', '--no-textconv', sources[identifier]],
+        cwd=directory,
+    )
     if hashlib.sha256(raw).hexdigest() != PINS[identifier]:
         raise ValueError('Immutable source hash mismatch: ' + identifier)
     return raw

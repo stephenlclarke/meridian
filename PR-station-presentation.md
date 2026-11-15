@@ -15,3 +15,7 @@ Authored a catch-up-frame regression that drives an actual overspeed station cro
 The original free-flight World and mesh test mode remain available. The app starts in the new station scenario. Missing or invalid station data fails startup instead of substituting fixture geometry. The station native collision LOD is declared separately from the complete display. Full first-playable mission, economy and saves remain open.
 
 Linked issue: [Station presentation](ISSUE-station-presentation.md).
+
+## PR 1 quality-check correction
+
+GitHub [PR 1](https://github.com/stephenlclarke/meridian/pull/1) reported a command-argument security finding in the station importer. The importer now selects only two fixed Git blob specifications, validates a real source directory, uses it as the subprocess working directory and disables external diff/text conversion. Regression tests reject unknown or option-like identifiers and non-directory inputs before Git runs; the SHA check still rejects foreign bytes. All nine Python import tests and exact original-source re-import pass. Rust source/assets remain byte-identical to the candidate that passed all 46 tests on both targets. The assertion-order annotation is addressed with explicit actual/expected variable names.
