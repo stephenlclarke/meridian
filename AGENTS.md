@@ -10,4 +10,4 @@ Trace reused content to an immutable legacy revision and retain its provenance a
 
 The existing G1 session remains the sole current native/compiler/CI/save executor. Until that ownership changes explicitly, prepare source and tests without launching competing compilation, GPU jobs or new native processes. Keep the existing app delivery and MBA fleet work moving independently.
 
-This repository now contains first-slice source and tests. Read docs/IMPLEMENTATION-STATUS.md for actual validation; do not report authored tests or proposed checks as passing. Follow Conventional Commits. Do not publish a remote or make an App Store submission merely because this repository exists.
+This repository now contains first-slice source and tests. Read docs/IMPLEMENTATION-STATUS.md for actual validation; do not report authored tests or proposed checks as passing. Follow Conventional Commits. The user authorized storing this implementation in the private stephenlclarke/meridian GitHub repository, with the local checkout at ~/github/meridian. Keep the appropriate committed implementation synchronized with origin. App Store submission remains a separate release step.

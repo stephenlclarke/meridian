@@ -10,7 +10,7 @@ Python asset checks and reproducible import pass. Formatting and documentation c
 
 ## Compatibility and risks
 
-This is the beginning of the first playable. Source-backed flight parameters still need trajectory parity. Navigation rings are fixtures; material palette rendering omits UV textures. Real docking, consent/custody/receiver authority, economy and durable continuation are not implemented. Legacy saves are untouched and no new remote is published.
+This is the beginning of the first playable. Source-backed flight parameters still need trajectory parity. Navigation rings are fixtures; material palette rendering omits UV textures. Real docking, consent/custody/receiver authority, economy and durable continuation are not implemented. Legacy saves are untouched. The reviewed source is stored in the private stephenlclarke/meridian repository; GitHub publication does not establish runtime or release acceptance.
 
 ## Links
 
