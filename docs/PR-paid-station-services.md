@@ -1,0 +1,5 @@
+# feat(core): prepare paid original station fuel and Food trade
+
+The new station-service kernel prepares checked stock/account changes for one-tonne Food buy/sell and a paid full stock-SH025 fuel refill. Fixed original Avenor/Renas ask/bid and initial stock retain exact immutable source hashes. Current stock is private owner-bound state; commands carry no caller price. The kernel checks actual projected cash, cargo, protected reservations, hold, fuel and current berth, then rechecks the complete binding before producing a single-use candidate.
+
+All17 Python importer tests and exact source re-import pass. Rust formatting/whitespace pass. Eight Rust domain tests are authored but UNRUN. The shared lib/World/account are untouched; Root/G3 must supply the genuine sole-account projection/apply and actual docking service command join before this can be compiled as part of the crate or accepted as playable. See [source, join contract and acceptance](PAID-STATION-SERVICES.md) and [problem](ISSUE-paid-station-services.md). No new wallet, duplicate cargo owner, free refuel, save writer or synthetic physical receipt is introduced.

@@ -1,0 +1,42 @@
+# Paid station fuel and ordinary Food commerce
+
+Status: source and eight domain tests authored; Rust execution, the actual World/account join and playable service acceptance are pending. This isolated slice adds new files only and leaves the active World, freight account, renderer and module declarations untouched.
+
+## Original rules and provenance
+
+All source reads use exact Git blobs at `a11fe16924d87d06021816f9037952afcbac08db`, tree `68fec574df12ddf74acb14747e0dd6839f478642`. The source repository's working files and live saves are never read. `tools/import_station_services.py` authenticates the original market manifest SHA `fcc9180da8b415bb2ac0666acae197dc30f5862dac79d613fb6c6e6dfdb8e5c3` and payload SHA `4f7e7c9235f13f8151f2d53051828078f6c7d701ffd119c15031dd9137176c5d`, then selects only commodity0 Food, one-tonne units, at the two actual first-journey stations. Fixed allowlisted blob arguments, external-helper disabling, directory validation and exact source hashes retain the hardened import pattern.
+
+| Source at that revision | Retained rule |
+| --- | --- |
+| `Sources/L337Core/Resources/OriginalMarkets/markets.json` | Avenor G01-S007: ask226, bid208 credit tenths, initial stock128; Renas G01-S185: ask216, bid196, initial stock112 |
+| `OriginalMarketCatalogue.swift` and `OriginalLiveMarkets.swift` under `Sources/L337Core` | Exact original initial seeds; stable commodity IDs; immutable ask/bid with separately owned live stock; no procedural quote fallback or reset on revisit |
+| `Sources/L337Core/Game.swift:5827-5887` | One unit per ordinary buy/sell action; purchase needs stock, actual funds and free hold; sale needs actual sellable ordinary cargo; sale credits saturate at4294967295; quantity bound is 64-bit `Int.max/17` |
+| `Sources/L337Core/Game.swift:2578`, `Plugh.swift:72-80` and `EquipmentActorTransactions.swift:165-230` | Normal fuel price2 credit tenths per missing fuel tenth; full refill of actual owned capacity; sufficient funds and current equipment-service context; candidate validation before publication |
+| `Sources/L337Core/NativeStationServices.swift:176-180` | Actual current station service admission, shared by ordinary market and equipment/fuel services |
+| `Sources/L337Core/NativeFirstCommodityTrade.swift` and `NativeFirstCommoditySale.swift` | Ordinary buy/sell balance and stock deltas are historical results; their descriptive receipts do not grant cargo or payment authority |
+
+Imported output hashes, source quote metadata, retained MIT notice and original descriptive proposal statuses are in `assets/legacy/station-services-manifest.json`. Those statuses are preserved; extraction does not claim legacy proposal installation, commercial clearance or actual gameplay acceptance.
+
+The bounded implementation supports stock SH025 with92t hold and130 fuel tenths, original Avenor/Renas main orbital services, ordinary Food and a complete paid refill. It does not implement Plugh discounts, other goods, fitted capacity upgrades, cheats, market NPC activity, finance escrow or arbitrary services. Other locations must refuse in the World adapter. The per-unit Food trade retains the source spread: an Avenor buy/sell loses1.8 CR; Renas loses2.0 CR. A refill after the34-tenth Avenor/Renas journey costs68 credit tenths, or6.8 CR. A full tank changes no fuel and costs0, consistent with the original full-refill calculation.
+
+## Ownership and exact composition contract
+
+`station_services.rs` contains a dependency-free bounded transaction kernel. `StationMarkets` owns only current market stock, bound to the actual new commander's owner. Its initializer is crate-private and must run once at actual profile birth. It must never be used to recreate stock during a visit, load, depletion, reinstall or command retry. Public `MarketSite`, `FoodQuote`, `Command` and `Event` are descriptive values; no public price, constructor, receipt factory or service fact can authorize a transaction.
+
+`AccountProjection` is a transient read of the actual sole commander account, including owner, hull, account revision, credits, fuel, actual ordinary Food, reserved Food and total used hold. It stores no authoritative wallet or inventory. Total used hold must include G02's identified held Machinery and all other physical cargo. Ordinary Food quantity must come from the account's real commodity property; it must never be inferred from mission tonnes or a UI label. No protected or identified mission unit is transferred by this kernel.
+
+`ServiceFacts` must be projected inside World from its actual current initial berth or physical docking context. Bind the actual owner/hull, galaxy0 system7 or185, main-orbital actor entity1, visit, dock sequence, current epoch and pause state. A selected market site, presentation snapshot, position or caller's Boolean must never create this fact. Root retains the actual World/contact composition; no synthetic test fact is a positive physical authority proof.
+
+`prepare` returns a non-cloneable prospective change without mutating either market or account. `checked_change` consumes that plan and rechecks the complete account projection, complete market state and exact current service facts. Changed fuel, money, cargo, revision, stock, pause or berth makes it stale. Dropping a plan leaves all state unchanged. Prices come only from the imported fixed seeds, never from a command argument. Refill uses actual missing fuel; failed funds, capacity, stock, protected custody and sequence checks refuse before publication.
+
+The owning integration must add the minimal private account projection/apply boundary, without a second wallet or inventory. After `checked_change`, under one exclusive World mutation and with no intervening await, validate the candidate account revision/property and publish `Change.market` together with `Change.account_after`; return `Change.event` only after both are committed. Perform all fallible checks before publishing either side. An account apply failure must leave market, cargo, credits and fuel unchanged. If durable publication is later required, serialize/publish the whole prospective World before committing; these source files do not contain a disk writer or restore factory.
+
+The account's existing `other_tonnes` is not sufficient proof of a Food item. The join must retain real ordinary commodity quantity in that same account and include it in G02's hold checks. Root/G3 own that shared account edit while this slice remains frozen. Source ordinary-sale saturation deliberately differs from the G02 reward rule, which refuses overflow. Do not replace either with the other.
+
+## Validation and acceptance still required
+
+Eight authored Rust tests cover exact original seeds and malformed content; one-tonne buy/sell and spread; independent retained station stock; paid refill and exact/insufficient funds; stock/hold/reserved custody refusal; wrong owner/missing/paused berth; dropped/stale candidates; and ordinary sale cap/stock/sequence overflow. Their private synthetic projections test arithmetic and transaction bindings only. They do not establish actual property, docking or playable service admission. The file is intentionally not declared in the shared lib yet; Root must compose it or the Dell owner can run this dependency-free file as a standalone Rust test module. No Mac compilation or GPU work was run.
+
+All17 Python importer tests pass, including four service checks. Exact pinned market re-import reproduces the committed46-byte seed output and manifest. Rust formatting parses/formats the new file, and whitespace checks pass. Rust compilation, eight tests, strict Clippy, independent review and actual World/account integration remain pending; no authored count is reported as a pass.
+
+Before playable acceptance, execute real World commands at Avenor and Renas: buy one Food, check exact cash/stock/cargo changes, sell that same ordinary unit, and verify source bid/spread. Travel must debit34 actual fuel tenths, then paid refill must debit68 credits and add exactly34 fuel tenths. Wrong/flight/stale/paused service calls, full hold including G02 cargo, insufficient cash/stock, reserved cargo, duplicate/stale publication and account/disk failure must preserve the entire prior state. Test that G02's identified Machinery and once-only reward/clue remain intact, stock is not reset on return, and cold continuation preserves balances, cargo and stock when the save slice exists.
