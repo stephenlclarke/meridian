@@ -6,6 +6,7 @@ pub mod docking;
 mod flight;
 pub mod freight;
 pub mod navigation;
+pub mod save;
 pub mod station;
 pub mod station_services;
 

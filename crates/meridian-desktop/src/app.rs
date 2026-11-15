@@ -16,8 +16,9 @@ use winit::{
 };
 
 use crate::clock::FixedClock;
+use crate::profile::Profile;
 use crate::renderer::{Renderer, StationScene};
-use crate::session::{Action, Session};
+use crate::session::Action;
 
 // Ephemeral profile IDs are allocated by the host, never by the deterministic core.
 fn fresh_profile_seed() -> u64 {
@@ -45,8 +46,8 @@ fn step_frame(
 
 // This shell owns the World synchronously. No gameplay mutation occurs in renderer code.
 struct App {
-    world: World,
-    session: Session,
+    game: Profile,
+    quit_failed: bool,
     renderer: Option<Renderer>,
     keys: HashSet<KeyCode>,
     paused: bool,
@@ -61,8 +62,10 @@ struct App {
 impl App {
     fn new() -> Result<Self, Box<dyn Error>> {
         Ok(Self {
-            world: World::new_commander(fresh_profile_seed())?,
-            session: Session::default(),
+            game: Profile::open(crate::profile::directory_from_args(
+                std::env::args_os().skip(1),
+            )?)?,
+            quit_failed: false,
             renderer: None,
             keys: HashSet::new(),
             paused: false,
@@ -97,11 +100,13 @@ impl App {
         self.keys.clear();
         self.last_frame = Instant::now();
         self.clock.reset();
-        self.session.invalidate();
-        if let Err(error) = self.world.request_pause(
-            self.paused || !self.focused || self.occluded,
-            self.world.snapshot().tick,
-        ) {
+        self.game.session.invalidate();
+        if self.game.playing()
+            && let Err(error) = self.game.world.request_pause(
+                self.paused || !self.focused || self.occluded,
+                self.game.world.snapshot().tick,
+            )
+        {
             self.notice = Some(error.to_string());
         }
         self.request_redraw();
@@ -109,8 +114,30 @@ impl App {
 
     fn key(&mut self, code: KeyCode, event_loop: &ActiveEventLoop) {
         match code {
-            KeyCode::Escape => event_loop.exit(),
-            KeyCode::KeyP => {
+            KeyCode::Escape => self.request_quit(event_loop),
+            KeyCode::KeyQ if self.quit_failed => event_loop.exit(),
+            KeyCode::KeyN if !self.game.playing() => {
+                self.notice = Some(match self.game.new_commander(fresh_profile_seed()) {
+                    Ok(true) => {
+                        self.sync_profile_controls();
+                        "New commander ready".into()
+                    }
+                    Ok(false) => {
+                        "Press N again to confirm new game; existing save is not changed yet".into()
+                    }
+                    Err(error) => error,
+                });
+            }
+            KeyCode::KeyC if !self.game.playing() => self.load_profile(),
+            KeyCode::F9 if self.game.playing() => self.load_profile(),
+            KeyCode::F5 if self.game.playing() => {
+                self.notice = Some(match self.game.save() {
+                    Ok(message) => message,
+                    Err(error) => error,
+                });
+            }
+            KeyCode::KeyP if self.game.playing() => {
+                self.quit_failed = false;
                 self.paused = !self.paused;
                 self.reset_input();
             }
@@ -129,6 +156,40 @@ impl App {
         self.request_redraw();
     }
 
+    fn sync_profile_controls(&mut self) {
+        self.paused = self.game.world.mission_snapshot().is_some_and(|m| m.paused);
+        self.quit_failed = false;
+        self.reset_input();
+    }
+
+    fn load_profile(&mut self) {
+        match self.game.continue_saved() {
+            Ok(()) => {
+                self.sync_profile_controls();
+                self.notice =
+                    Some("Commander continued; select the actual current crew with T".into());
+            }
+            Err(error) => {
+                self.notice = Some(format!(
+                    "Continue refused; save and current game retained: {error}"
+                ))
+            }
+        }
+    }
+
+    fn request_quit(&mut self, event_loop: &ActiveEventLoop) {
+        match self.game.prepare_quit() {
+            Ok(()) => event_loop.exit(),
+            Err(error) => {
+                self.paused = true;
+                self.reset_input();
+                self.quit_failed = true;
+                self.notice = Some(format!("P resumes; Q quits without saving again. {error}"));
+                self.request_redraw();
+            }
+        }
+    }
+
     fn game_key(&mut self, code: KeyCode) {
         let action = match code {
             KeyCode::KeyL => Action::Launch,
@@ -142,7 +203,7 @@ impl App {
             KeyCode::KeyH => Action::SellFood,
             _ => return,
         };
-        self.notice = Some(match self.session.command(&mut self.world, action) {
+        self.notice = Some(match self.game.command(action) {
             Ok(message) => message,
             Err(error) => error,
         });
@@ -152,7 +213,7 @@ impl App {
         let now = Instant::now();
         let elapsed = now.duration_since(self.last_frame).as_secs_f64();
         self.last_frame = now;
-        let active = self.focused && !self.occluded && !self.paused;
+        let active = self.focused && !self.occluded && !self.paused && self.game.playing();
         let ticks = self.clock.ticks(elapsed, active);
         let mut frame_refusal = None;
         if active {
@@ -163,7 +224,7 @@ impl App {
                 throttle: self.axis(KeyCode::KeyW, KeyCode::KeyS),
                 brake: self.keys.contains(&KeyCode::Space),
             };
-            match step_frame(&mut self.world, input, ticks) {
+            match step_frame(&mut self.game.world, input, ticks) {
                 Ok(refusal) => frame_refusal = refusal,
                 Err(error) if matches!(error, StepError::Collision | StepError::UnsafeEntry) => {
                     self.notice = Some(error.to_string());
@@ -187,11 +248,9 @@ impl App {
                 .into(),
             );
         }
-        let hud_lines = self
-            .session
-            .lines(&self.world, active, self.notice.as_deref());
+        let hud_lines = self.game.lines(active, self.notice.as_deref());
         if let Some(renderer) = &mut self.renderer {
-            let snapshot = self.world.snapshot();
+            let snapshot = self.game.world.snapshot();
             let mode = match snapshot.mode {
                 FlightMode::Docked => "DOCKED - L launch",
                 FlightMode::Launching => "LAUNCHING",
@@ -216,14 +275,15 @@ impl App {
                 contact_notice.or(self.notice.as_deref())
                     .unwrap_or("Click inside to control"),
             ));
-            let station = snapshot
-                .station
-                .zip(self.world.station_port())
-                .map(|(pose, port)| StationScene {
-                    pose,
-                    port,
-                    docked: snapshot.mode == FlightMode::Docked,
-                });
+            let station =
+                snapshot
+                    .station
+                    .zip(self.game.world.station_port())
+                    .map(|(pose, port)| StationScene {
+                        pose,
+                        port,
+                        docked: snapshot.mode == FlightMode::Docked,
+                    });
             if let Err(error) = renderer.draw(&snapshot, station, &hud_lines) {
                 self.fail(event_loop, error);
             }
@@ -256,7 +316,7 @@ impl ApplicationHandler for App {
             return;
         }
         match event {
-            WindowEvent::CloseRequested => event_loop.exit(),
+            WindowEvent::CloseRequested => self.request_quit(event_loop),
             WindowEvent::Resized(size) => {
                 if let Some(renderer) = &mut self.renderer {
                     renderer.resize(size);
@@ -288,7 +348,12 @@ impl ApplicationHandler for App {
 
     fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
         if let Some(renderer) = &self.renderer {
-            if self.occluded || !self.focused || self.paused || renderer.is_zero_sized() {
+            if self.occluded
+                || !self.focused
+                || self.paused
+                || !self.game.playing()
+                || renderer.is_zero_sized()
+            {
                 event_loop.set_control_flow(ControlFlow::Wait);
             } else {
                 event_loop.set_control_flow(ControlFlow::Poll);

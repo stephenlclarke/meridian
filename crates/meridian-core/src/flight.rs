@@ -1,4 +1,5 @@
 mod mission;
+mod persistence;
 mod services;
 pub use mission::{MissionError, MissionSnapshot, StationNpc};
 pub use services::ServiceSnapshot;

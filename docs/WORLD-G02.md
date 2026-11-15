@@ -42,3 +42,7 @@ Required before acceptance: final whole-artifact source review; Dell formatting,
 ## Limits
 
 The transaction publishes memory only. It does not serialize a prospective game, atomically replace a save, restore validated mission/account state or test disk failure. Do not claim continuation/reload completion. General equipment purchases/refits, item firing/unfitting, other hulls, other commodity trades and loss recovery remain unsupported; existing standard equipment is actual retained property. Ordinary Food commerce and paid refill are joined source with new execution pending. The original station geometry's documented collision and physical fidelity limits remain unchanged.
+
+## Save/continue successor
+
+The core now authors versioned full-World memory encoding and candidate validation; see [WORLD-SAVE-CONTINUE.md](WORLD-SAVE-CONTINUE.md). The earlier memory-only mission publication boundary remains synchronous. Disk writing, process restart and native UI acceptance remain separate, and the new Rust tests are UNRUN.

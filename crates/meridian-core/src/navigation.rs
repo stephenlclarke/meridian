@@ -1,6 +1,8 @@
 //! Original G01 coordinates and stock SH025/Basic-drive travel rules from immutable a11.
 //! Descriptive catalogue/route values never constitute docking or mission authority.
+mod persistence;
 use core::fmt;
+pub(crate) use persistence::SavedNavigationSummary;
 use std::collections::VecDeque;
 
 const CATALOGUE: &[u8] = include_bytes!("../../../assets/legacy/g01.navigation");
@@ -343,6 +345,9 @@ pub(crate) struct NavigationState {
     dock_sequence: u64,
     dock: Option<DockContext>,
     pending: Option<PendingJump>,
+    launches: u64,
+    completed_jumps: u64,
+    fuel_spent: u64,
 }
 impl NavigationState {
     pub(crate) fn new(seed: u64, hull: u64, drive_item: u64) -> Self {
@@ -364,6 +369,9 @@ impl NavigationState {
             dock_sequence: 1,
             dock: None,
             pending: None,
+            launches: 0,
+            completed_jumps: 0,
+            fuel_spent: 0,
         };
         state.dock = Some(state.context(0, DockOrigin::InitialStart));
         state
@@ -403,10 +411,16 @@ impl NavigationState {
         self.drive.item_ordinal
     }
     pub(crate) fn launch(&mut self) -> Result<(), NavigationError> {
-        self.visit = self
+        let visit = self
             .visit
             .checked_add(1)
             .ok_or(NavigationError::SequenceExhausted)?;
+        let launches = self
+            .launches
+            .checked_add(1)
+            .ok_or(NavigationError::SequenceExhausted)?;
+        self.visit = visit;
+        self.launches = launches;
         self.dock = None;
         self.pending = None;
         Ok(())
@@ -487,6 +501,16 @@ impl NavigationState {
             .visit
             .checked_add(1)
             .ok_or(NavigationError::SequenceExhausted)?;
+        let completed_jumps = self
+            .completed_jumps
+            .checked_add(1)
+            .ok_or(NavigationError::SequenceExhausted)?;
+        let fuel_spent = self
+            .fuel_spent
+            .checked_add(u64::from(jump.fuel_debit))
+            .ok_or(NavigationError::SequenceExhausted)?;
+        self.completed_jumps = completed_jumps;
+        self.fuel_spent = fuel_spent;
         self.visit = visit;
         self.system = jump.destination;
         self.pending = None;

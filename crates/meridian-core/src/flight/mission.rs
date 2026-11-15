@@ -1,4 +1,5 @@
 //! World-owned original G02 station contact and command lifecycle.
+mod persistence;
 use super::World;
 use crate::freight::g02::{
     self, ActorId, ContactDefinition, ContactFacts, DockFacts, StationKind, WorldFacts,
@@ -126,6 +127,13 @@ impl World {
                 paused: session.paused,
                 contact: session.contact,
             })
+    }
+
+    /// Existing validated custody handle for presentation; it grants no contact or receiving consent.
+    pub fn active_freight_job(&self) -> Option<g02::JobId> {
+        self.freight_session
+            .as_ref()
+            .and_then(|session| session.state.active_job())
     }
 
     pub fn station_contacts(&self) -> Vec<StationNpc> {
