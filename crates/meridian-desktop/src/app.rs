@@ -100,7 +100,7 @@ impl ApplicationHandler for App {
             Ok(window) => Arc::new(window),
             Err(error) => return self.fail(event_loop, error),
         };
-        match pollster::block_on(Renderer::new(window)) {
+        match pollster::block_on(Renderer::new(window, event_loop.owned_display_handle())) {
             Ok(renderer) => self.renderer = Some(renderer),
             Err(error) => self.fail(event_loop, error),
         }

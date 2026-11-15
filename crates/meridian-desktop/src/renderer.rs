@@ -5,7 +5,7 @@ use std::sync::{
 
 use meridian_core::Snapshot;
 use wgpu::util::DeviceExt;
-use winit::{dpi::PhysicalSize, window::Window};
+use winit::{dpi::PhysicalSize, event_loop::OwnedDisplayHandle, window::Window};
 
 use crate::mesh::{self, Vertex};
 
@@ -29,8 +29,10 @@ pub struct Renderer {
 }
 
 impl Renderer {
-    pub async fn new(window: Arc<Window>) -> Result<Self, String> {
-        let instance = wgpu::Instance::new(wgpu::InstanceDescriptor::default());
+    pub async fn new(window: Arc<Window>, display: OwnedDisplayHandle) -> Result<Self, String> {
+        let instance = wgpu::Instance::new(wgpu::InstanceDescriptor::new_with_display_handle(
+            Box::new(display),
+        ));
         let surface = instance
             .create_surface(window.clone())
             .map_err(|e| e.to_string())?;

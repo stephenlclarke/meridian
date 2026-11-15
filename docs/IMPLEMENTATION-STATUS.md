@@ -14,9 +14,9 @@ Date: 15 November 2026.
 
 Python import tests passed: source mismatch refusal, committed mesh hash/size/first indexed vertex and retained notice. Re-importing the exact pinned TOML reproduces the committed mesh and manifest. Rust formatting parses/formats the authored source; this does not type-check it or validate WGSL. Cargo.lock was resolved offline from existing registry metadata without compilation.
 
-The joined slice now contains 19 authored Rust tests (12 core and 7 desktop-side tests). The pause regression covers a resume after 600 seconds without paused redraws; host pause also resets timing and requests one status repaint. These tests are authored, not executed.
+The joined slice contains 33 authored Rust tests: the original 12 core and 7 desktop-side tests, plus 14 independently source-reviewed docking geometry tests. The pause regression covers a resume after 600 seconds without paused redraws; host pause also resets timing and requests one status repaint. Execution results remain separate from source review.
 
-Cargo check, Rust tests, clippy, actual GPU launch, frame inspection and performance are UNRUN. G1 retains sole compiler/native/GPU ownership while the current Swift 548-case qualification and updated app take priority. The source is ready for that validation when a safe execution slot exists; there is no playable or commercial acceptance claim.
+The first Dell Linux workspace check at caab7db failed with E0599 because the pinned wgpu instance descriptor has no Default implementation. The correction uses its explicit display-handle constructor. Exact corrected-head workspace check, tests and Clippy are pending on the Dell. Actual GPU launch, frame inspection and performance remain UNRUN. The human authorized Dell Linux and native Windows builds in parallel; G1 retains the Mac execution lane for the Swift 548-case qualification and updated app. There is no playable or commercial acceptance claim.
 
 ## Next concrete acceptance
 
