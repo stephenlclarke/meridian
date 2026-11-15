@@ -18,7 +18,7 @@ The Dell Latitude 7420 is configured with Ubuntu 22.04.5 LTS in WSL2 and native 
 
 From the Mac, `ssh latitude` opens Ubuntu through the native Windows SSH bridge; `ssh latitude-windows` opens Windows. Both routes verify pinned host keys. Windows and WSL can also connect back through their separate dedicated SSH keys. Credentials and private key material do not belong in this repository.
 
-Linux checkout: `/home/sclarke/github/meridian`. Native Windows checkout: `C:\Users\steph\github\meridian`. Both track the existing private GitHub repository. Keep Linux work under the Linux filesystem and Windows build outputs in the Windows checkout; do not share a Cargo target directory across platforms.
+Linux checkout: `/home/sclarke/github/meridian`. Native Windows checkout: `C:\Users\steph\github\meridian`. Both track the public GitHub repository. Keep Linux work under the Linux filesystem and Windows build outputs in the Windows checkout; do not share a Cargo target directory across platforms.
 
 In Ubuntu, enter the checkout and use `make check`, `make test` and `make clippy`. In a Windows Developer PowerShell with the MSVC environment available, enter the Windows checkout and run:
 
