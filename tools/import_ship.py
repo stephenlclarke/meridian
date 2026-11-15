@@ -15,6 +15,16 @@ SOURCE_PATH = "Sources/L337Core/Resources/Ships/SH025.toml"
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def _checked_position(vertices: list[list[float]], index: int) -> list[float]:
+    """Check a source index before reading its finite three-dimensional position."""
+    if not 0 <= index < len(vertices):
+        raise ValueError("Source triangle index is out of range")
+    position = vertices[index]
+    if len(position) != 3 or not all(math.isfinite(x) for x in position):
+        raise ValueError("Source position is not finite 3D data")
+    return position
+
+
 def convert(raw: bytes) -> bytes:
     """Refuse a different reference and preserve all source triangles in order."""
     if hashlib.sha256(raw).hexdigest() != SOURCE_SHA256:
@@ -39,11 +49,7 @@ def convert(raw: bytes) -> bytes:
         # Source palette channels are sRGB; the GPU surface expects linear shader output.
         linear = [c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in rgb]
         for index in face:
-            if not 0 <= index < len(vertices):
-                raise ValueError("Source triangle index is out of range")
-            position = vertices[index]
-            if len(position) != 3 or not all(math.isfinite(x) for x in position):
-                raise ValueError("Source position is not finite 3D data")
+            position = _checked_position(vertices, index)
             output.extend(struct.pack("<6f", *position, *linear))
     return bytes(output)
 
