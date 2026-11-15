@@ -1,6 +1,8 @@
 //! Isolated G02 domain rules. No receiver, consent, wallet, save or trusted-receipt authority.
 //! Integration must validate those boundaries before applying a returned completion delta.
 
+pub mod g02;
+
 pub const REWARD_TENTHS: u32 = 7300;
 pub const CLUE_ID: &str = "consented-freight-family-trace";
 

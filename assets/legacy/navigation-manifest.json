@@ -1,0 +1,15 @@
+{
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourcePath": "Sources/L337Core/Resources/OriginalWorlds/catalogue.json",
+  "sourceSHA256": "120543eedc02a705cce0e37d026125bf926ec22651cff9337ca5d943f2ffd99d",
+  "sourceBytes": 1660913,
+  "sourceVersion": "l337-world-1",
+  "output": "assets/legacy/g01.navigation",
+  "outputSHA256": "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823",
+  "outputBytes": 6510,
+  "systems": 256,
+  "coordinateUnit": "Cartesian LY; hypot(dx,dy), no anisotropic conversion/rounding",
+  "format": "MNAV0001 + LEu16 count; per row LEu16 system, LEf64 xLY/yLY, u8 UTF8-name length, name bytes",
+  "notice": "assets/legacy/Elite-L337-MIT.txt",
+  "scope": "Original G01 only; no galaxy fallback or gameplay authority from descriptive coordinates"
+}

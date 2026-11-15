@@ -46,3 +46,11 @@ Corrected automated captures were white despite the human-visible scene. Keep th
 4. Integrate the G02 finite source, consent/custody, receiver and failed-publication semantics; implement versioned save/quit/continue before claiming the complete first playable.
 
 The authoritative milestone remains [FIRST-PLAYABLE.md](FIRST-PLAYABLE.md). Do not close it on a flight prototype, unit-test count or source review alone.
+
+## Joined World freight and desktop HUD candidate
+
+The candidate documented in [the source packet](PR-world-flight-hud.md) joins frozen G3 World freight and MC1 navigation to actual desktop commands, with a live code-drawn wgpu overlay. The host allocates a new ephemeral commander identity; the core keeps ownership and authority. No font, texture or other art file was added. Existing original L337 navigation bytes have their separate authoring audit; the reduced SH028 collision-mesh lineage gap remains explicit.
+
+Root ran source formatting, whitespace checks and 21 Python importer tests successfully. All joined Rust compilation/tests/Clippy and GPU/input acceptance are UNRUN. Newly authored desktop tests exercise explicit contact and review confirmation, cancellation, pause invalidation, bounded HUD geometry and the full public command journey. Those authored tests are not passing evidence. The HUD states that this build has no save, so no continuation or complete first-playable result is claimed.
+
+Latest actual source qualification: the corrected `218267a87a97e99a65ef5ba4f4f44ddbbc813119` passes all three hosted OS lanes in [CI run 43758148880](https://github.com/stephenlclarke/meridian/actions/runs/43758148880): 56 core plus 17 desktop Rust tests, strict Clippy, formatting and compilation; 21 Python importer tests and documentation also pass. G2 closed the sole HUD resize finding and cleared the complete source artifact. The existing Dell owner is separately building and checking that exact native candidate. No actual native HUD/GPU/held-input, save/continue, ordinary trade or complete-game acceptance is inferred. Earlier UNRUN notes above describe preparation before this result.
