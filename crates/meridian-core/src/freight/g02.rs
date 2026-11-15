@@ -580,6 +580,15 @@ impl State {
         }
     }
 
+    pub(crate) fn active_job(&self) -> Option<JobId> {
+        self.data
+            .jobs
+            .iter()
+            .flatten()
+            .find(|job| job.status == JobStatus::Active && job.held != 0)
+            .map(|job| job.id)
+    }
+
     pub fn issued_units(&self, id: JobId) -> Option<[GoodsId; 8]> {
         job(&self.data, id).ok().map(|job| job.issued)
     }

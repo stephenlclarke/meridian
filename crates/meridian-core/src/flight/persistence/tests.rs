@@ -181,6 +181,7 @@ fn seven_unit_continue_pays_only_actual_eighth_and_completed_continue_cannot_rep
     let balance = world.credits_tenths().unwrap();
     let mut world = roundtrip(&world);
     assert_eq!(world.mission_snapshot().unwrap().freight.held_tonnes, 1);
+    assert_eq!(world.active_freight_job(), Some(job));
     assert!(world.mission_snapshot().unwrap().freight.clue.is_none());
     assert_eq!(
         action(
@@ -214,6 +215,7 @@ fn seven_unit_continue_pays_only_actual_eighth_and_completed_continue_cannot_rep
     let done_bytes = world.save_bytes().unwrap();
     let mut world = roundtrip(&world);
     assert_eq!(world.mission_snapshot().unwrap().freight.clue, clue);
+    assert_eq!(world.active_freight_job(), None);
     assert_eq!(
         world
             .mission_snapshot()

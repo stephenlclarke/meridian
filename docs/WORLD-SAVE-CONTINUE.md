@@ -6,6 +6,8 @@ Status: version-one core encoding, decoding, semantic validation and six round-t
 
 `World::save_bytes()` returns `Result<Vec<u8>, save::SaveError>`. It validates the complete owned World before emitting a bounded binary envelope. `World::from_save_bytes(bytes)` constructs and validates an isolated candidate. `World::restore_bytes(bytes)` validates the entire candidate and invalidates its transient UI state before one final assignment replaces the live World. Any error leaves the live World unchanged.
 
+`World::active_freight_job()` returns the existing opaque active custody handle for a continued receiving UI. It does not create a job or grant contact, docking or receipt authority; the normal current NPC review/confirm flow remains required. The partial-seven continuation test checks this projection and completed continuation returns no active job.
+
 The core has no filesystem, window, GPU, wall-clock, global identity allocator or external process dependency. Root's host must own atomic disk writing, file custody, real quit/restart interaction and user-visible errors. There is no migration, best-effort repair, fallback new game, restock or compatibility alias.
 
 ## Format and retained state
