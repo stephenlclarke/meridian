@@ -116,6 +116,7 @@ impl ApplicationHandler for App {
             WindowEvent::Resized(size) => {
                 if let Some(renderer) = &mut self.renderer {
                     renderer.resize(size);
+                    renderer.window.request_redraw();
                 }
             }
             WindowEvent::Focused(focused) => {
@@ -123,11 +124,17 @@ impl ApplicationHandler for App {
                 self.keys.clear();
                 self.last_frame = Instant::now();
                 self.clock.reset();
+                if let Some(renderer) = &self.renderer {
+                    renderer.window.request_redraw();
+                }
             }
             WindowEvent::Occluded(occluded) => {
                 self.occluded = occluded;
                 self.last_frame = Instant::now();
                 self.clock.reset();
+                if let Some(renderer) = &self.renderer {
+                    renderer.window.request_redraw();
+                }
             }
             WindowEvent::KeyboardInput { event, .. } => {
                 if let PhysicalKey::Code(code) = event.physical_key {
@@ -154,6 +161,7 @@ impl ApplicationHandler for App {
                                         Some(Fullscreen::Borderless(None))
                                     };
                                     renderer.window.set_fullscreen(mode);
+                                    renderer.window.request_redraw();
                                 }
                             }
                             _ => {}

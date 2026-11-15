@@ -210,6 +210,7 @@ impl Renderer {
             }
             wgpu::CurrentSurfaceTexture::Outdated => {
                 self.surface.configure(&self.device, &self.config);
+                self.window.request_redraw();
                 return Ok(());
             }
             wgpu::CurrentSurfaceTexture::Lost => {
@@ -218,6 +219,7 @@ impl Renderer {
                     .create_surface(self.window.clone())
                     .map_err(|e| e.to_string())?;
                 self.surface.configure(&self.device, &self.config);
+                self.window.request_redraw();
                 return Ok(());
             }
             wgpu::CurrentSurfaceTexture::Validation => {
