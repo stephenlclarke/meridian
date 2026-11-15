@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "observedAtUTC": "2026-11-15T19:43:29.035563+00:00",
+  "owner": "MC1; sent only through Root",
+  "scope": [
+    "9e22 G01 catalogue content",
+    "9f420 original Food market seeds"
+  ],
+  "policy": "Exclude Elite/Oolite-derived third-party assets; independently original L337 project content may be reused after provenance verification",
+  "assessment": "Original L337 authoring supported by inspected generator/input graph, exact full-output reproduction, project authoring records and immutable adoption history. No inherited Elite/Oolite coordinate/name/price-table content found in this checked graph. Root retains final policy and unrelated asset clearance.",
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "files": {
+    "planet-names/generate.py": {
+      "bytes": 9015,
+      "sha256": "e2fd40c0f0bc88255c28f146b947252b4e56cb0c6f76c59d00c13bcf4cf5c7d1"
+    },
+    "planet-names/authoring.json": {
+      "bytes": 9153,
+      "sha256": "71b057e8476bdb4b84855519b5d4fd3597e67dac0a451920633a8201fef9ef5e"
+    },
+    "planet-names/catalogue.json": {
+      "bytes": 207606,
+      "sha256": "27967a31b02b82d3215dabcd9bfdb835c56fe339f3f547cc112145d990cb34d4"
+    },
+    "planet-names/manifest.json": {
+      "bytes": 5377,
+      "sha256": "3dbc2f300cb5c872ba6f52b56a7054964b8a34b5b675b3c1927c0d46cd3ade0e"
+    },
+    "original-world-economy/generate.py": {
+      "bytes": 15003,
+      "sha256": "05f54ff56d624f3090252a70306f145f092d22c881cd4d6faea227cb945250ed"
+    },
+    "original-world-economy/authoring.toml": {
+      "bytes": 6489,
+      "sha256": "41b7acaac427a4e419d40a410df34e19336d58cc83d3a327df134375c96c00e2"
+    },
+    "original-world-economy/catalogue.json": {
+      "bytes": 1660913,
+      "sha256": "120543eedc02a705cce0e37d026125bf926ec22651cff9337ca5d943f2ffd99d"
+    },
+    "original-world-economy/manifest.json": {
+      "bytes": 6646,
+      "sha256": "751df1d088ed626115992ea9dab280c7397c32d407843542e0982f649f6f5ccb"
+    },
+    "original-world-economy/README.md": {
+      "bytes": 5304,
+      "sha256": "d2829487fc716266a766fd016233979eadd23f0e5e84ceb8692eb9feadd925a9"
+    },
+    "l337-content-proposal/original-world-economy/authoring.toml": {
+      "bytes": 6664,
+      "sha256": "47d83caae5a9b22a4a932f19c55f79c5cb5435b962826a0969ece096b11f80eb"
+    },
+    "l337-content-proposal/original-world-economy/catalogue.json": {
+      "bytes": 1660913,
+      "sha256": "120543eedc02a705cce0e37d026125bf926ec22651cff9337ca5d943f2ffd99d"
+    },
+    "l337-content-proposal/original-world-economy/markets-01.toml": {
+      "bytes": 831079,
+      "sha256": "cf3b48bc2b60dddf7f67e90300a2ff854ec9978881a8452c9aba8570a06adc51"
+    },
+    "l337-content-proposal/original-world-economy/markets-02.toml": {
+      "bytes": 831176,
+      "sha256": "027c0d203858c87fcf1a70257ae81387d8436044f7430e08f594dd4929ad136c"
+    },
+    "l337-content-proposal/original-world-economy/markets-03.toml": {
+      "bytes": 830707,
+      "sha256": "45709853ee79f62eff842dd51a15fe68527188cc7b621fea9b0615153ae68b30"
+    },
+    "l337-content-proposal/original-world-economy/markets-04.toml": {
+      "bytes": 830492,
+      "sha256": "af8874622b7d10195309de12587af40dc049086f1bbce7f052a352074d36f3ab"
+    },
+    "l337-content-proposal/original-world-economy/markets-05.toml": {
+      "bytes": 831580,
+      "sha256": "8897412d357d1f652ffeb21f10eab5cfc0b971692805a082d9505d578f68030f"
+    },
+    "l337-content-proposal/original-world-economy/markets-06.toml": {
+      "bytes": 830819,
+      "sha256": "d143054034902ca154bd246d9ba10fbc9fc3f337b8e9566992b3d5868f6642c6"
+    },
+    "l337-content-proposal/original-world-economy/markets-07.toml": {
+      "bytes": 831108,
+      "sha256": "aa08410ca1830c3c6e31a12cde770725239bbb6a172b5a2115bf0004e14e0c5a"
+    },
+    "l337-content-proposal/original-world-economy/markets-08.toml": {
+      "bytes": 830972,
+      "sha256": "f34eb7864f34dd208598a152f0262e618048d7bd1212f2803b858dbfdfa97e49"
+    }
+  },
+  "actualReadOnlyChecks": {
+    "newNameGeneration": "PASS: selected pure candidate function plus authored syllable palettes/overrides/exclusion rules exactly reproduces all2048 approved name records",
+    "historicalNameOverlap": "PASS: zero; historical names are rejection/exclusion input only, never syllable/name content output",
+    "worldGeneration": "PASS: selected pure rng_for/clamp/generate_galaxy functions with accepted authoring and new-name catalogue exactly reproduce all2048 world records and catalogue SHA120543eedc02a705cce0e37d026125bf926ec22651cff9337ca5d943f2ffd99d",
+    "marketGeneration": "PASS: pure market_row with independently generated worlds and authoring reproduces all34816 accepted market rows, all8galaxies, zero mismatches",
+    "marketPackaging": "PASS: independent canonical regrouping/serialization of accepted TOML rows exactly reproduces5642852-byte runtime JSON SHA4f7e7c9235f13f8151f2d53051828078f6c7d701ffd119c15031dd9137176c5d",
+    "authoringSerialization": "PASS: original6489-byte TOML and accepted6664-byte TOML have exactly equal semantic dictionaries; byte difference is serialization only",
+    "adoptionHistory": "PASS: both8a3021b75fabf01b4743538aba0ffe7ca0bfb161 underSources/EliteCore and4d0903d72683f3b031d5deafd74056301803d2f2 underSources/L337Core contain the exact same catalogue and market hashes"
+  },
+  "generatorReferences": {
+    "names": "planet-names/generate.py: candidate uses SHA256 of project seed+stable ID+attempt and authored syllable palettes; main excludes historical names and emits only new records",
+    "worlds": "original-world-economy/generate.py: generate_galaxy uses independent RNG, three density peaks and warp; market_row uses sector production/demand/new commodity budgets; source universe tables are not read",
+    "runtimeMarketCompiler": {
+      "path": "Tools/prepare-original-markets.py at a11",
+      "sha256": "2e4e450ec53cc85c6a082dd2bcd63149597d3c347d1f72b0cc0486dac3ea23a3",
+      "behavior": "authenticates accepted10input files; validates and groups exact rows; no repricing or table generation"
+    }
+  },
+  "history": [
+    {
+      "commit": "8a3021b75fabf01b4743538aba0ffe7ca0bfb161",
+      "author": "Steve",
+      "date": "2026-10-29T09:40:04Z",
+      "subject": "feat(m01): add scripted missions and original-world gameplay"
+    },
+    {
+      "commit": "4d0903d72683f3b031d5deafd74056301803d2f2",
+      "author": "Steve",
+      "date": "2026-10-30T11:26:23Z",
+      "subject": "feat: adopt L337 identity and original equipment costs (#283)"
+    }
+  ],
+  "limits": [
+    "Generators are retained project authoring artifacts outside the source Git tree; exact files are hashed here. Inspected Git history establishes adoption, not an independent legal ownership adjudication.",
+    "Historical stable identities and common commodity labels remain mechanical/reference identities; historical names are excluded from generated output.",
+    "The original generator imports Pillow and a system Arial font for preview maps only; those preview images/fonts are not used in MC1 catalogue/market binary outputs.",
+    "SH025/SH028 geometry/material provenance remains Root audit scope; mission/NPC provenance remains G3/Root scope.",
+    "No generator main, output mutation, asset replacement, repository/history change or push was executed during this audit."
+  ],
+  "archivedFromSHA256": "2640994f208e7ad78ca0c4df495aec96e4a8768e820ca9fe61b208d4deaad242",
+  "archiveNote": "Faithful prior read-only audit receipt; removed host-specific absolute authoring paths and public Git author email. Logical file keys and all hashes/results/limits are retained."
+}
