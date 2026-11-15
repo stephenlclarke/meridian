@@ -4,10 +4,17 @@ use std::sync::{
 };
 
 use meridian_core::Snapshot;
+use meridian_core::docking::{DockingPort, StationPose};
 use wgpu::util::DeviceExt;
 use winit::{dpi::PhysicalSize, event_loop::OwnedDisplayHandle, window::Window};
 
 use crate::mesh::{self, Vertex};
+
+pub struct StationScene<'a> {
+    pub pose: StationPose,
+    pub port: &'a DockingPort,
+    pub docked: bool,
+}
 
 pub struct Renderer {
     surface: wgpu::Surface<'static>,
@@ -23,6 +30,7 @@ pub struct Renderer {
     vertices: wgpu::Buffer,
     depth: wgpu::TextureView,
     ship: Vec<Vertex>,
+    station: Vec<Vertex>,
     frame: Vec<Vertex>,
     vertex_capacity: usize,
     device_lost: Arc<AtomicBool>,
@@ -125,7 +133,8 @@ impl Renderer {
             }],
         });
         let ship = mesh::load_ship()?;
-        let vertex_capacity = ship.len() + 3 * 32 * 6;
+        let station = mesh::load_station()?;
+        let vertex_capacity = ship.len() + station.len() + 3 * 32 * 6;
         let vertices = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("Reused frame vertices"),
             size: (vertex_capacity * std::mem::size_of::<Vertex>()) as u64,
@@ -147,6 +156,7 @@ impl Renderer {
             vertices,
             depth,
             ship,
+            station,
             frame: Vec::with_capacity(vertex_capacity),
             vertex_capacity,
             device_lost,
@@ -195,7 +205,11 @@ impl Renderer {
         );
     }
 
-    pub fn draw(&mut self, snapshot: &Snapshot) -> Result<(), String> {
+    pub fn draw(
+        &mut self,
+        snapshot: &Snapshot,
+        station: Option<StationScene<'_>>,
+    ) -> Result<(), String> {
         if self.device_lost.load(Ordering::Acquire) {
             return Err("Graphics device lost; exiting without changing any save".into());
         }
@@ -226,7 +240,17 @@ impl Renderer {
                 return Err("Surface validation failed".into());
             }
         };
-        mesh::frame_vertices(snapshot, &self.ship, &mut self.frame);
+        mesh::frame_vertices(
+            snapshot,
+            &self.ship,
+            station.map(|scene| mesh::StationRender {
+                vertices: &self.station,
+                pose: scene.pose,
+                port: scene.port,
+                docked: scene.docked,
+            }),
+            &mut self.frame,
+        )?;
         if self.frame.len() > self.vertex_capacity {
             return Err("Frame exceeded its declared vertex capacity".into());
         }

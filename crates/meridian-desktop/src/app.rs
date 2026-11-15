@@ -1,6 +1,6 @@
 use std::{collections::HashSet, error::Error, sync::Arc, time::Instant};
 
-use meridian_core::{FlightInput, World};
+use meridian_core::{FlightInput, FlightMode, MotionRefusal, StepError, World};
 use winit::{
     application::ApplicationHandler,
     event::{ElementState, WindowEvent},
@@ -10,7 +10,7 @@ use winit::{
 };
 
 use crate::clock::FixedClock;
-use crate::renderer::Renderer;
+use crate::renderer::{Renderer, StationScene};
 
 // This shell owns the World synchronously. No gameplay mutation occurs in renderer code.
 struct App {
@@ -23,12 +23,13 @@ struct App {
     last_frame: Instant,
     clock: FixedClock,
     error: Option<String>,
+    notice: Option<String>,
 }
 
 impl App {
-    fn new() -> Self {
-        Self {
-            world: World::new(),
+    fn new() -> Result<Self, Box<dyn Error>> {
+        Ok(Self {
+            world: World::at_original_station()?,
             renderer: None,
             keys: HashSet::new(),
             paused: false,
@@ -37,7 +38,8 @@ impl App {
             last_frame: Instant::now(),
             clock: FixedClock::default(),
             error: None,
-        }
+            notice: None,
+        })
     }
 
     fn fail(&mut self, event_loop: &ActiveEventLoop, error: impl ToString) {
@@ -68,20 +70,45 @@ impl App {
             };
             for _ in 0..ticks {
                 if let Err(error) = self.world.step(input) {
-                    self.fail(event_loop, format!("Simulation refused input: {error:?}"));
+                    if matches!(error, StepError::Collision | StepError::UnsafeEntry) {
+                        self.notice = Some(error.to_string());
+                        break;
+                    }
+                    self.fail(event_loop, format!("Simulation refused input: {error}"));
                     return;
                 }
             }
         }
         if let Some(renderer) = &mut self.renderer {
             let snapshot = self.world.snapshot();
+            let mode = match snapshot.mode {
+                FlightMode::Docked => "DOCKED - L launch",
+                FlightMode::Launching => "LAUNCHING",
+                FlightMode::Flight => "FLIGHT - align with the station entrance to dock",
+            };
+            let contact_notice = snapshot.motion_refusal.map(|refusal| match refusal {
+                MotionRefusal::StationContact => "Station contact: stopped at last clear position",
+                MotionRefusal::EntryConditions => {
+                    "Entry refused: align with the entrance and slow down"
+                }
+            });
             renderer.window.set_title(&format!(
-                "Meridian flight prototype | speed {:.1} reference units | tick {} | {} | W/S thrust, arrows pitch, A/D yaw, Q/E roll, Space brake, P pause, F11 fullscreen",
+                "Meridian | {mode} | speed {:.1} | tick {} | {} | {} | W/S thrust, arrows pitch, A/D yaw, Q/E roll, Space brake, P pause, F11 fullscreen",
                 snapshot.speed,
                 snapshot.tick,
-                if active { "FLIGHT" } else { "PAUSED" },
+                if active { "RUNNING" } else { "PAUSED" },
+                contact_notice.as_deref().or(self.notice.as_deref())
+                    .unwrap_or("Click inside to control"),
             ));
-            if let Err(error) = renderer.draw(&snapshot) {
+            let station = snapshot
+                .station
+                .zip(self.world.station_port())
+                .map(|(pose, port)| StationScene {
+                    pose,
+                    port,
+                    docked: snapshot.mode == FlightMode::Docked,
+                });
+            if let Err(error) = renderer.draw(&snapshot, station) {
                 self.fail(event_loop, error);
             }
         }
@@ -144,6 +171,20 @@ impl ApplicationHandler for App {
                         self.keys.insert(code);
                         match code {
                             KeyCode::Escape => event_loop.exit(),
+                            KeyCode::KeyL => {
+                                if self.paused {
+                                    self.notice = Some("Resume with P before launching".into());
+                                } else {
+                                    self.notice = self
+                                        .world
+                                        .request_launch(self.world.snapshot().tick)
+                                        .err()
+                                        .map(|error| error.to_string());
+                                }
+                                if let Some(renderer) = &self.renderer {
+                                    renderer.window.request_redraw();
+                                }
+                            }
                             KeyCode::KeyP => {
                                 self.paused = !self.paused;
                                 self.keys.clear();
@@ -188,7 +229,7 @@ impl ApplicationHandler for App {
 
 pub fn run() -> Result<(), Box<dyn Error>> {
     let event_loop = EventLoop::new()?;
-    let mut app = App::new();
+    let mut app = App::new()?;
     event_loop.run_app(&mut app)?;
     if let Some(error) = app.error {
         return Err(std::io::Error::other(error).into());
