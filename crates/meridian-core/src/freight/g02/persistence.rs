@@ -346,12 +346,11 @@ impl State {
             {
                 return Err(invalid);
             }
-            if let Some(c) = previous_completion {
-                if job.issuer.arrival_sequence <= c.dock.arrival_sequence
-                    || job.issuer.station_actor.generation <= c.dock.station_actor.generation
-                {
-                    return Err(invalid);
-                }
+            if let Some(c) = previous_completion
+                && (job.issuer.arrival_sequence <= c.dock.arrival_sequence
+                    || job.issuer.station_actor.generation <= c.dock.station_actor.generation)
+            {
+                return Err(invalid);
             }
             sequence = validate_job(job, sequence, nav, epoch)?;
             if let Some(c) = job.completion {
@@ -428,12 +427,11 @@ fn validate_job(
         {
             return Err(invalid);
         }
-        if let Some(previous) = last {
-            if t.dock.arrival_sequence < previous.dock.arrival_sequence
-                || t.receiver.generation < previous.receiver.generation
-            {
-                return Err(invalid);
-            }
+        if let Some(previous) = last
+            && (t.dock.arrival_sequence < previous.dock.arrival_sequence
+                || t.receiver.generation < previous.receiver.generation)
+        {
+            return Err(invalid);
         }
         remaining &= !t.mask;
         delivered |= t.mask;
