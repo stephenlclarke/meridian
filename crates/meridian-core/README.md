@@ -11,3 +11,23 @@ The isolated `freight` module takes an explicit caller-provided stable source id
 Authored tests cover invalid input rollback, deterministic traces, quaternion normalization/signs, acceleration/speed/coasting/braking, terminal tick/candidate rejection, finite source exhaustion, disjoint unit allocation, seven-plus-one settlement and duplicate/foreign-unit and cross-source refusal. Formatting passed in the joined Root slice. Compilation, clippy and all Rust tests remain UNRUN while G1 retains native/compiler ownership. No build, actual wgpu flight, physical docking, economy, G02 receiving or Save/Quit/Continue acceptance is claimed.
 
 The crate inherits version, edition, Rust minimum, publish policy and lints from Root's workspace. Production code keeps the workspace unwrap/expect denial; only `cfg(test)` modules allow assertion-style unwraps.
+
+## Pure docking geometry
+
+The `docking` module uses explicit `f64` column bases, poses, port polygons and borrowed mesh data. It has no World, station ID, command, GPU, filesystem, clock or save dependency. `StationPose::entrance_frame` applies local +Z station roll before the column orientation. `EntranceFrame::assess` reports geometry predicates and projected coordinates; neither result admits docking or creates a receipt. Inputs use the same native model/reference frame as the caller's admitted data, with no implicit scale conversion or bridge to the flight shell's `f32` snapshot.
+
+| Primitive | Preserved reference rule |
+| --- | --- |
+| Entrance region | Player is strictly behind the entrance plane; absolute projections on model X, entrance up and model Z are each below90 |
+| Point entry gate | Absolute lateral below25, vertical below8, depth at most1 and strictly above-25; outward Z below-0.98; absolute roll phase below0.1; speed below144; spin error below0.1 or absolute roll below0.15 |
+| Aligned aperture fit | Every mesh vertex is strictly more than the nonnegative margin inside every counterclockwise convex polygon edge, in port-local x/y |
+| Transformed aperture fit | Transform every whole-mesh vertex through player pose, station dot/transpose coordinates and port-center subtraction before the same strict half-plane test |
+| Native approach geometry | Mesh maximum vertex radius plus400, then another1000 for approach distance; approach point is entrance position plus outward times explicit distance |
+
+The entry gate deliberately retains the reference's finite scalar comparison, including its absence of a lower speed bound. The caller must supply actual valid relative motion. The aperture projection does not constrain longitudinal extent, sweep against station triangles, establish a safe route or test other actors. It cannot authorize launch, contact, arrival, paid services, freight receiving or save publication. Prototype navigation rings remain fixtures.
+
+Port validation preserves3–64 planar vertices, strict convex counterclockwise edges, the1e-8 unit/orthogonality tolerance and source coordinate bound1e12. Mesh checks preserve source vertex/face/index requirements; these are not a watertight-solid proof. Basis validation uses the original strict1e-4 length/dot tolerance without normalization or a new determinant rule. Its dot/transpose operation is the source operation for admitted near-orthogonal bases, not a general matrix inverse. Non-finite input and computed geometry refuse through typed errors or a failed clearance predicate; approach distance and clearance margin must be finite/nonnegative. No malformed-input path grants docking.
+
+Sources are immutable `a11fe16924d87d06021816f9037952afcbac08db`: `DockingGeometry.swift`, station-only transforms and approach offsets in `AutoTargetControl.swift`, `NativeStationGeometry.Port`, `nativeStationHullFits`, related `L337Math` and the original entrance/navigation/geometry tests. The SH028 center/aperture/depth appear only as source-pinned unit-test data, not a station factory or admitted content. The source's authored estimate and geometry limitations remain; no physical calibration or commercial content clearance is claimed. See the root [reference packet and criteria](../../PR-docking-geometry-primitives.md) and retained [MIT notice](../../assets/legacy/Elite-L337-MIT.txt).
+
+Fourteen docking tests are authored for reference depth fixtures, strict edges, phase/spin/facing, independent transformed-coordinate and triangle fixtures, orientation-dependent whole-mesh fit, invalid data and approach offsets. Rust formatting parses/formats the source. Compilation, all fourteen Rust tests, clippy, trajectory/collision/native docking and actual wgpu integration remain UNRUN while G1 owns execution. This component does not complete first-playable P2.
