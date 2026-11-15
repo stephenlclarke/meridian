@@ -312,6 +312,12 @@ mod tests {
         world.request_contact(npc, 0).unwrap();
         let offer = Command::ReviewOffer { actor: npc.actor() };
         let review = reviewed(&mut world, offer);
+        // Same first review nonce, purpose and NPC slot in a different real profile.
+        let mut foreign = World::new_commander(71).unwrap();
+        let foreign_contact = foreign.station_contacts()[0];
+        foreign.request_contact(foreign_contact, 0).unwrap();
+        let foreign_review = reviewed(&mut foreign, Command::ReviewOffer { actor: foreign_contact.actor() });
+        refuses(&mut world, Command::Confirm { review: foreign_review, choice: Choice::Accept }, Error::StaleReview);
         command(&mut world, Command::Back).unwrap();
         refuses(&mut world, Command::Confirm { review, choice: Choice::Accept }, Error::StaleReview);
         let review = reviewed(&mut world, offer);

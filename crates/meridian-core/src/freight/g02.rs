@@ -229,6 +229,8 @@ struct Binding { account: AccountData, world: WorldFacts, revision: u64 }
 /// Descriptive review; private fields and live pending-review matching prevent fabricated consent.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Review {
+    owner: u64,
+    hull: u64,
     nonce: u64,
     purpose: Purpose,
     next_unit: Option<GoodsId>,
@@ -351,7 +353,8 @@ impl State {
             Command::ReviewOffer { actor } => {
                 require_contact(world, dock, actor, ContactDefinition::Arlen, AVENOR)?;
                 require_acceptance(&self.data, &account.data)?;
-                let review = Review { nonce: plan.next_ui, purpose: Purpose::Accept,
+                let review = Review { owner: self.data.owner, hull: account.data.hull,
+                    nonce: plan.next_ui, purpose: Purpose::Accept,
                     next_unit: None, remaining: 8 };
                 plan.next_pending = Some(PendingReview { review, binding: Binding {
                     account: account.data, world: *world, revision: self.data.revision } });
@@ -365,7 +368,7 @@ impl State {
                 require_contact(world, dock, actor,
                     if receiving { ContactDefinition::RenasUtilityCrew } else { ContactDefinition::Arlen },
                     if receiving { RENAS } else { AVENOR })?;
-                let review = Review { nonce: plan.next_ui,
+                let review = Review { owner: self.data.owner, hull: account.data.hull, nonce: plan.next_ui,
                     purpose: if receiving { Purpose::Receive(id) } else { Purpose::Abandon(id) },
                     next_unit: next_unit(current), remaining: current.held.count_ones() as u8 };
                 plan.next_pending = Some(PendingReview { review, binding: Binding {
