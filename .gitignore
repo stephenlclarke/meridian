@@ -7,3 +7,8 @@ __pycache__/
 coverage/
 .coverage
 .scannerwork/
+
+# Local commander files are private runtime data.
+commander.meridian
+session.lock
+.save-*.pending

@@ -24,6 +24,13 @@ pub struct Session {
 }
 
 impl Session {
+    pub fn from_world(world: &World) -> Self {
+        Self {
+            job: world.active_freight_job(),
+            pending: None,
+        }
+    }
+
     pub fn invalidate(&mut self) {
         self.pending = None;
     }
@@ -274,9 +281,8 @@ impl Session {
             ));
         }
         lines.push("W/S THRUST | ARROWS PITCH | A/D YAW | Q/E ROLL | SPACE BRAKE".into());
-        lines.push(
-            "G BUY 1 FOOD | H SELL 1 FOOD | F REFUEL | P PAUSE | F11 | ESC QUIT | NO SAVE".into(),
-        );
+        lines.push("G BUY 1 FOOD | H SELL 1 FOOD | F REFUEL | P PAUSE | F11 FULLSCREEN".into());
+        lines.push("F5 SAVE | F9 RELOAD SAVE | ESC SAVE AND QUIT".into());
         lines
     }
 }
@@ -329,7 +335,7 @@ mod tests {
             world.credits_tenths(),
         );
         let lines = ui.lines(&world, false, None);
-        assert!(lines.iter().any(|l| l.contains("NO SAVE")));
+        assert!(lines.iter().any(|l| l.contains("F5 SAVE")));
         assert_eq!(
             before,
             (

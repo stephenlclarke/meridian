@@ -1,7 +1,7 @@
 //! Original code-drawn glyphs: no imported bitmap, font or texture assets.
 use crate::mesh::Vertex;
 
-pub const MAX_LINES: usize = 12;
+pub const MAX_LINES: usize = 14;
 pub const MAX_COLUMNS: usize = 96;
 pub const MAX_VERTICES: usize = 6 + MAX_LINES * MAX_COLUMNS * 35 * 6;
 

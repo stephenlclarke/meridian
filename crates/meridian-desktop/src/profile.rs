@@ -1,0 +1,435 @@
+//! Actual title, profile and save lifecycle used by the window shell and headless process tests.
+use crate::{
+    session::{Action, Session},
+    storage::{SaveCommit, Store},
+};
+use meridian_core::{World, save::MAX_SAVE_BYTES};
+use std::{io, path::PathBuf};
+
+pub struct Profile {
+    pub world: World,
+    pub session: Session,
+    store: Store,
+    playing: bool,
+    has_save: bool,
+    new_armed: bool,
+}
+
+impl Profile {
+    pub fn open(directory: PathBuf) -> Result<Self, Box<dyn std::error::Error>> {
+        let store = Store::open(directory)?;
+        // An unreadable existing slot must not silently become a new commander.
+        let has_save = !matches!(store.load(MAX_SAVE_BYTES), Ok(None));
+        Ok(Self {
+            world: World::at_original_station()?,
+            session: Session::default(),
+            store,
+            playing: false,
+            has_save,
+            new_armed: false,
+        })
+    }
+    pub fn playing(&self) -> bool {
+        self.playing
+    }
+
+    pub fn new_commander(&mut self, seed: u64) -> Result<bool, String> {
+        if self.playing {
+            return Err("Start a new commander from the title screen".into());
+        }
+        if self.has_save && !self.new_armed {
+            self.new_armed = true;
+            return Ok(false);
+        }
+        let world = World::new_commander(seed).map_err(|e| e.to_string())?;
+        self.world = world;
+        self.session = Session::default();
+        self.playing = true;
+        self.new_armed = false;
+        Ok(true)
+    }
+
+    pub fn continue_saved(&mut self) -> Result<(), String> {
+        let bytes = self
+            .store
+            .load(MAX_SAVE_BYTES)
+            .map_err(|e| e.to_string())?
+            .ok_or("No saved commander exists in this save slot")?;
+        if self.playing {
+            self.world
+                .restore_bytes(&bytes)
+                .map_err(|e| e.to_string())?;
+        } else {
+            let world = World::from_save_bytes(&bytes).map_err(|e| e.to_string())?;
+            self.world = world;
+        }
+        self.session = Session::from_world(&self.world);
+        self.playing = true;
+        self.has_save = true;
+        self.new_armed = false;
+        Ok(())
+    }
+
+    pub fn command(&mut self, action: Action) -> Result<String, String> {
+        if !self.playing {
+            return Err("N starts a new commander; C continues the existing save".into());
+        }
+        self.session.command(&mut self.world, action)
+    }
+
+    pub fn save(&mut self) -> Result<String, String> {
+        if !self.playing {
+            return Err("No active commander to save".into());
+        }
+        let bytes = self.world.save_bytes().map_err(|e| e.to_string())?;
+        let committed = self
+            .store
+            .save(&bytes, MAX_SAVE_BYTES)
+            .map_err(|e| format!("Save failed; previous file retained: {e}"))?;
+        self.has_save = true;
+        match committed {
+            #[cfg(unix)]
+            SaveCommit::DirectorySynced => Ok("Commander saved".into()),
+            SaveCommit::Published {
+                directory_sync_error: None,
+            } => Ok("Commander saved".into()),
+            SaveCommit::Published {
+                directory_sync_error: Some(error),
+            } => Err(format!(
+                "New save is written, but directory synchronization failed: {error}"
+            )),
+        }
+    }
+
+    pub fn prepare_quit(&mut self) -> Result<(), String> {
+        if self.playing {
+            self.save()?;
+        }
+        Ok(())
+    }
+
+    pub fn lines(&self, active: bool, notice: Option<&str>) -> Vec<String> {
+        if self.playing {
+            return self.session.lines(&self.world, active, notice);
+        }
+        vec![
+            "MERIDIAN".into(),
+            "C CONTINUE SAVED COMMANDER | N NEW COMMANDER | ESC QUIT".into(),
+            if self.has_save {
+                "AN EXISTING SAVE IS RETAINED UNTIL AN EXPLICIT NEW GAME IS SAVED".into()
+            } else {
+                "NO SAVED COMMANDER IN THIS SLOT - PRESS N TO BEGIN".into()
+            },
+            if self.new_armed {
+                "PRESS N AGAIN TO CONFIRM A NEW COMMANDER; C KEEPS AND CONTINUES THE SAVE".into()
+            } else {
+                "CLICK INSIDE THE WINDOW TO FOCUS THE CONTROLS".into()
+            },
+            notice
+                .unwrap_or("F5 SAVES IN GAME; ESC SAVES AND QUITS; F9 RELOADS THE CURRENT SAVE")
+                .into(),
+        ]
+    }
+}
+
+pub fn directory_from_args(args: impl Iterator<Item = std::ffi::OsString>) -> io::Result<PathBuf> {
+    let mut args = args;
+    if let Some(flag) = args.next() {
+        if flag != "--save-dir" {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "Expected --save-dir PATH",
+            ));
+        }
+        let path = args.next().filter(|p| !p.is_empty()).ok_or_else(|| {
+            io::Error::new(io::ErrorKind::InvalidInput, "--save-dir needs a path")
+        })?;
+        if args.next().is_some() {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "Unexpected additional argument",
+            ));
+        }
+        return Ok(path.into());
+    }
+    default_directory()
+}
+
+#[cfg(target_os = "windows")]
+fn default_directory() -> io::Result<PathBuf> {
+    std::env::var_os("LOCALAPPDATA")
+        .map(|p| PathBuf::from(p).join("Meridian").join("saves"))
+        .ok_or_else(|| {
+            io::Error::new(
+                io::ErrorKind::NotFound,
+                "LOCALAPPDATA is unavailable; use --save-dir PATH",
+            )
+        })
+}
+#[cfg(target_os = "macos")]
+fn default_directory() -> io::Result<PathBuf> {
+    std::env::var_os("HOME")
+        .map(|p| PathBuf::from(p).join("Library/Application Support/Meridian/saves"))
+        .ok_or_else(|| {
+            io::Error::new(
+                io::ErrorKind::NotFound,
+                "Home directory is unavailable; use --save-dir PATH",
+            )
+        })
+}
+#[cfg(not(any(target_os = "windows", target_os = "macos")))]
+fn default_directory() -> io::Result<PathBuf> {
+    if let Some(path) = std::env::var_os("XDG_DATA_HOME").filter(|p| !p.is_empty()) {
+        let path = PathBuf::from(path);
+        if path.is_absolute() {
+            return Ok(path.join("meridian/saves"));
+        }
+    }
+    std::env::var_os("HOME")
+        .map(|p| PathBuf::from(p).join(".local/share/meridian/saves"))
+        .ok_or_else(|| {
+            io::Error::new(
+                io::ErrorKind::NotFound,
+                "Home directory is unavailable; use --save-dir PATH",
+            )
+        })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use meridian_core::{
+        FlightInput, FlightMode,
+        navigation::{BASIC_SPOOL_TICKS, DockOrigin, SystemId},
+    };
+    use std::{
+        collections::hash_map::RandomState,
+        fs,
+        hash::{BuildHasher, Hasher},
+        path::Path,
+        process::Command,
+    };
+    struct TestDirectory(PathBuf);
+    impl TestDirectory {
+        fn new() -> Self {
+            let nonce = RandomState::new().build_hasher().finish();
+            let path = std::env::temp_dir().join(format!(
+                "meridian-profile-test-{}-{nonce:016x}",
+                std::process::id()
+            ));
+            fs::create_dir(&path).unwrap_or_else(|e| panic!("{e}"));
+            Self(path)
+        }
+    }
+    impl Drop for TestDirectory {
+        fn drop(&mut self) {
+            let _ = fs::remove_dir_all(&self.0);
+        }
+    }
+    fn open(path: &Path) -> Profile {
+        Profile::open(path.to_path_buf()).unwrap_or_else(|e| panic!("{e}"))
+    }
+    fn action(profile: &mut Profile, value: Action) {
+        profile.command(value).unwrap_or_else(|e| panic!("{e}"));
+    }
+    fn travel(profile: &mut Profile) {
+        action(profile, Action::Launch);
+        profile
+            .world
+            .step(FlightInput::default())
+            .unwrap_or_else(|e| panic!("{e}"));
+        action(profile, Action::Jump);
+        for _ in 0..BASIC_SPOOL_TICKS {
+            profile
+                .world
+                .step(FlightInput::default())
+                .unwrap_or_else(|e| panic!("{e}"));
+        }
+        for _ in 0..9000 {
+            let state = profile.world.snapshot();
+            if state.mode == FlightMode::Docked {
+                break;
+            }
+            let speed = if state.position[2] > 2500.0 {
+                34.3
+            } else {
+                4.0
+            };
+            profile
+                .world
+                .step(FlightInput {
+                    throttle: ((speed - state.speed) / (9.1 / 60.0)).clamp(-1.0, 1.0),
+                    ..FlightInput::default()
+                })
+                .unwrap_or_else(|e| panic!("{e}"));
+        }
+        assert_eq!(
+            profile.world.current_dock_context().map(|d| d.origin()),
+            Some(DockOrigin::PhysicalEntry)
+        );
+        assert_eq!(
+            profile.world.snapshot().navigation.map(|n| n.system),
+            Some(SystemId::RENAS)
+        );
+    }
+    #[test]
+    fn cold_continue_child() {
+        // Normal test discovery does no work; only the parent's explicit fresh child opens its slot.
+        let Some(path) = std::env::var_os("MERIDIAN_PROFILE_TEST_SLOT") else {
+            return;
+        };
+        let mut profile = open(Path::new(&path));
+        profile.continue_saved().unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(
+            profile
+                .world
+                .mission_snapshot()
+                .map(|m| m.freight.held_tonnes),
+            Some(1)
+        );
+        assert_eq!(profile.world.credits_tenths(), Some(7182));
+        assert!(profile.world.active_freight_job().is_some());
+        action(&mut profile, Action::Contact);
+        action(&mut profile, Action::Review);
+        action(&mut profile, Action::Confirm);
+        assert_eq!(profile.world.credits_tenths(), Some(14482));
+        assert!(
+            profile
+                .world
+                .mission_snapshot()
+                .and_then(|m| m.freight.clue)
+                .is_some()
+        );
+        profile.prepare_quit().unwrap_or_else(|e| panic!("{e}"));
+    }
+    #[test]
+    fn real_process_cold_continue_completes_eighth_unit_once_and_survives_another_continue() {
+        let directory = TestDirectory::new();
+        let mut profile = open(&directory.0);
+        assert!(!profile.playing());
+        assert!(profile.save().is_err());
+        assert!(profile.command(Action::Contact).is_err());
+        assert!(
+            profile
+                .new_commander(9301)
+                .unwrap_or_else(|e| panic!("{e}"))
+        );
+        action(&mut profile, Action::BuyFood);
+        action(&mut profile, Action::SellFood);
+        for value in [Action::Contact, Action::Review, Action::Confirm] {
+            action(&mut profile, value);
+        }
+        travel(&mut profile);
+        action(&mut profile, Action::Contact);
+        for _ in 0..7 {
+            action(&mut profile, Action::Review);
+            action(&mut profile, Action::Confirm);
+        }
+        profile.save().unwrap_or_else(|e| panic!("{e}"));
+        drop(profile);
+        let executable = std::env::current_exe().unwrap_or_else(|e| panic!("{e}"));
+        let status = Command::new(executable)
+            .args([
+                "--exact",
+                "profile::tests::cold_continue_child",
+                "--nocapture",
+            ])
+            .env("MERIDIAN_PROFILE_TEST_SLOT", &directory.0)
+            .status()
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert!(status.success());
+        let mut continued = open(&directory.0);
+        continued.continue_saved().unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(continued.world.credits_tenths(), Some(14482));
+        assert_eq!(
+            continued
+                .world
+                .mission_snapshot()
+                .map(|m| (m.freight.held_tonnes, m.freight.completed_jobs)),
+            Some((0, 1))
+        );
+        action(&mut continued, Action::Contact);
+        assert!(continued.command(Action::Review).is_err());
+        assert!(continued.command(Action::Confirm).is_err());
+        assert_eq!(continued.world.credits_tenths(), Some(14482));
+    }
+    #[test]
+    fn corrupt_continue_refuses_without_fallback_and_new_game_needs_explicit_confirmation() {
+        let directory = TestDirectory::new();
+        let save = directory.0.join("commander.meridian");
+        fs::write(&save, b"bad save").unwrap_or_else(|e| panic!("{e}"));
+        let mut profile = open(&directory.0);
+        let before = profile.world.snapshot();
+        assert!(profile.continue_saved().is_err());
+        assert_eq!(profile.world.snapshot(), before);
+        assert!(!profile.playing());
+        assert!(
+            !profile
+                .new_commander(9401)
+                .unwrap_or_else(|e| panic!("{e}"))
+        );
+        assert_eq!(profile.world.snapshot(), before);
+        assert!(
+            profile
+                .new_commander(9401)
+                .unwrap_or_else(|e| panic!("{e}"))
+        );
+        assert_eq!(
+            fs::read(&save).unwrap_or_else(|e| panic!("{e}")),
+            b"bad save"
+        );
+        profile.save().unwrap_or_else(|e| panic!("{e}"));
+        let prior = profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+        fs::write(&save, b"damaged replacement").unwrap_or_else(|e| panic!("{e}"));
+        assert!(profile.continue_saved().is_err());
+        assert_eq!(
+            profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}")),
+            prior
+        );
+        assert_eq!(
+            fs::read(&save).unwrap_or_else(|e| panic!("{e}")),
+            b"damaged replacement"
+        );
+    }
+    #[test]
+    fn failed_quit_save_cannot_claim_exit_ready_or_change_the_live_world() {
+        let directory = TestDirectory::new();
+        let mut profile = open(&directory.0);
+        assert!(profile.prepare_quit().is_ok());
+        assert!(
+            profile
+                .new_commander(9501)
+                .unwrap_or_else(|e| panic!("{e}"))
+        );
+        let before = profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+        let destination = directory.0.join("commander.meridian");
+        fs::create_dir(&destination).unwrap_or_else(|e| panic!("{e}"));
+        fs::write(destination.join("sentinel"), b"retain").unwrap_or_else(|e| panic!("{e}"));
+        assert!(profile.prepare_quit().is_err());
+        assert!(profile.playing());
+        assert_eq!(
+            profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}")),
+            before
+        );
+        assert_eq!(
+            fs::read(destination.join("sentinel")).unwrap_or_else(|e| panic!("{e}")),
+            b"retain"
+        );
+    }
+    #[test]
+    fn explicit_slot_arguments_are_exact_and_do_not_guess_on_invalid_input() {
+        assert_eq!(
+            directory_from_args(["--save-dir", "fixture-slot"].map(Into::into).into_iter())
+                .unwrap_or_else(|e| panic!("{e}")),
+            PathBuf::from("fixture-slot")
+        );
+        for args in [
+            vec!["--save-dir"],
+            vec!["--save-dir", ""],
+            vec!["unknown"],
+            vec!["--save-dir", "slot", "extra"],
+        ] {
+            assert!(directory_from_args(args.into_iter().map(Into::into)).is_err());
+        }
+    }
+}
