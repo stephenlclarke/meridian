@@ -5,6 +5,7 @@
 //! World navigation/contact lifecycle supplies them; prototype worlds cannot. See WORLD-G02.md.
 
 mod persistence;
+pub mod presentation;
 use super::{CLUE_ID, REWARD_TENTHS};
 use crate::station_services as services;
 pub(crate) use persistence::SavedDomainSummary;

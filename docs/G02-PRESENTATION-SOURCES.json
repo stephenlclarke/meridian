@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "mission": "G02 consented freight supply",
+  "legacyRepository": "https://github.com/stephenlclarke/l337",
+  "immutableRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "immutableTree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "originalPackDigest": "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572",
+  "meridianBase": "df2b1301369b90272df1c58917b6303df8efeefd",
+  "sourceInputs": [
+    {
+      "repository": "stephenlclarke/l337",
+      "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-consented-freight/manifest.toml",
+      "sha256": "8bb5f739bf3c4658d6709b20149c8adcce0e1f32a3c7a67da39c35db8d8a46d4",
+      "bytes": 2890,
+      "use": "Mission identity, finite source, receiver consent, original one/all labels, exact receiving/abandonment text, terms and MIT declaration"
+    },
+    {
+      "repository": "stephenlclarke/l337",
+      "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-consented-freight/scripts/main.lua",
+      "sha256": "2eb7865a6990e7a4badcdc20d7ff83f09967a8f50222697b91ed0e8cb61b1c22",
+      "bytes": 1581,
+      "use": "Original offer and accepted journal; callbacks and source/destination contact roles inspected, no Lua copied or executed"
+    },
+    {
+      "repository": "stephenlclarke/l337",
+      "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+      "path": "Sources/L337Core/OriginalConsentedFreightSupplyCommands.swift",
+      "sha256": "d14a4a421700a83c2a4c138010732c37cf548b93c2fad063180da99448d5028e",
+      "bytes": 3053,
+      "use": "Eight-original allocation, consented receiving and finite stock reference"
+    },
+    {
+      "repository": "stephenlclarke/l337",
+      "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+      "path": "Sources/L337Core/ScriptContractCore.swift",
+      "sha256": "1218a1fd871d6ada67584744877d0c6f0d625f34874fa0e31e4061d98b1b32ba",
+      "bytes": 31258,
+      "use": "Original contract accounting/receipt reference"
+    },
+    {
+      "repository": "stephenlclarke/l337",
+      "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+      "path": "Sources/L337Core/ScriptClueJournal.swift",
+      "sha256": "e68be950d4b178ad8a4e91530d891ca937b7f618b00259a6c3a48fae9ece7f35",
+      "bytes": 3902,
+      "use": "Original first-completion clue/receipt reference"
+    },
+    {
+      "repository": "stephenlclarke/l337",
+      "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+      "path": "LICENSE",
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766",
+      "bytes": 1071,
+      "use": "Exact retained source notice"
+    }
+  ],
+  "retainedNotice": {
+    "path": "assets/legacy/Elite-L337-MIT.txt",
+    "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766",
+    "equalToImmutableLegacyLicense": true,
+    "changed": false
+  },
+  "transform": {
+    "kind": "Source-authored Rust text projection; no Lua interpreter or content engine",
+    "offer": "Exact generated Lua offer strings with supported plan.reward/10 = 730 and plan.route_legs = 1 substitutions; verified without executing Lua",
+    "acceptedJournal": "Exact original accepted callback journal text",
+    "receivingAndAbandonment": "Exact original manifest dialogue text and original one/all labels",
+    "identityNotice": "Exact substring of original manifest briefing",
+    "newEditorialText": "Objective descriptions, titles split from speaker, Back/accept/abandon labels and first-clue-only reminder are new Meridian presentation grounded in the unchanged rules; not claimed verbatim source text",
+    "authority": "No grant, review factory, permission, completion or clue minted by presentation"
+  },
+  "output": {
+    "path": "crates/meridian-core/src/freight/g02/presentation.rs",
+    "sha256": "35b5c26d466f5a3d6782323ba07a5611fcdcecac434cca1bec0d9c9147d14ec0"
+  },
+  "scope": {
+    "sourceUnits": 16,
+    "jobOriginalTonnes": 8,
+    "supportedNativeRouteLegs": 1,
+    "rewardCreditTenths": 7300,
+    "origin": "Avenor G01-S007 main orbital / ARLEN",
+    "destination": "Renas G01-S185 main orbital / utility receiving crew",
+    "deadline": null,
+    "depositCreditTenths": 0,
+    "berths": 0,
+    "completion": "Only the final original-unit transfer commits the job payment and first trusted family clue; no restock on loss or abandonment"
+  },
+  "validation": "Authored source fidelity and rustfmt parsing only. Rust compilation/tests, joined UI and actual game acceptance remain pending; no blanket asset/rights clearance."
+}
