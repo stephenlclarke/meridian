@@ -203,6 +203,9 @@ struct AccountData {
     reserved_food_tonnes: u16,
     fuel_tenths: u16,
     fit: Option<StarterFit>,
+    other_commodities: [u64; 16],
+    reserved_commodities: [u64; 16],
+    legal: u8,
 }
 
 /// One World-owned account, not a second mission wallet or an authority actor.
@@ -232,6 +235,9 @@ impl CommanderAccount {
                 food_tonnes: 0,
                 reserved_food_tonnes: 0,
                 fuel_tenths: 130,
+                other_commodities: [0; 16],
+                reserved_commodities: [0; 16],
+                legal: 0,
                 fit: Some(StarterFit {
                     owner: ids.owner,
                     hull: ids.hull,
@@ -249,6 +255,18 @@ impl CommanderAccount {
     pub(crate) fn credits_tenths(&self) -> u32 {
         self.data.credits
     }
+    pub(crate) fn legal_value(&self) -> u8 {
+        self.data.legal
+    }
+    /// Real launch only, after all fallible launch checks. Native kg/g never contribute.
+    pub(crate) fn record_departure_legality(&mut self) {
+        let weight = self.data.other_commodities[2]
+            + 2 * self.data.other_commodities[5]
+            + self.data.other_commodities[9];
+        // Valid actual SH025 accounts bound all these tonne goods by the 92t hold.
+        self.data.legal |= weight as u8;
+    }
+
     pub(crate) fn fuel_tenths(&self) -> u16 {
         self.data.fuel_tenths
     }
@@ -284,6 +302,8 @@ impl CommanderAccount {
             fuel_tenths: self.data.fuel_tenths,
             food_tonnes: self.data.food_tonnes,
             reserved_food_tonnes: self.data.reserved_food_tonnes,
+            other_commodities: self.data.other_commodities,
+            reserved_commodities: self.data.reserved_commodities,
             used_tonnes: u16::try_from(occupied_tonnes(&freight.data, &self.data))
                 .map_err(|_| services::Error::InvalidAccount)?,
         })
@@ -305,16 +325,18 @@ impl CommanderAccount {
         let after = change.account_after;
         let mut candidate = Self { data: self.data };
         match change.event {
-            services::Event::BoughtFood { paid_tenths, .. }
+            services::Event::BoughtCommodity { paid_tenths, .. }
+            | services::Event::BoughtFood { paid_tenths, .. }
             | services::Event::Refuelled { paid_tenths, .. } => {
                 candidate.debit(paid_tenths).map_err(service_error)?;
             }
-            services::Event::SoldFood { .. } => {
+            services::Event::SoldFood { .. } | services::Event::SoldCommodity { .. } => {
                 candidate.data.credits = after.credits_tenths;
                 candidate.data.revision = after.revision;
             }
         }
         candidate.data.food_tonnes = after.food_tonnes;
+        candidate.data.other_commodities = after.other_commodities;
         candidate.data.fuel_tenths = after.fuel_tenths;
         // This also checks actual owned fit, all remaining identified freight and reservations.
         // Copying the account preserves equipment/other cargo instead of reconstructing it.
@@ -956,16 +978,25 @@ fn validate_account(data: &Data, account: &AccountData) -> Result<(), Error> {
     if account.fuel_tenths > 130 {
         return Err(Error::InvalidFit);
     }
-    if account.reserved_food_tonnes > account.food_tonnes
-        || occupied_tonnes(data, account) > u32::from(HOLD_TONNES)
+    if !services::valid_native_quantities(account.other_commodities, account.reserved_commodities)
+        || account.reserved_food_tonnes > account.food_tonnes
+        || occupied_tonnes(data, account) > u128::from(HOLD_TONNES)
     {
         return Err(Error::InvalidFit);
     }
     Ok(())
 }
 
-fn occupied_tonnes(data: &Data, account: &AccountData) -> u32 {
-    u32::from(account.other_tonnes) + u32::from(account.food_tonnes) + u32::from(held(data))
+fn occupied_tonnes(data: &Data, account: &AccountData) -> u128 {
+    u128::from(account.other_tonnes)
+        + u128::from(account.food_tonnes)
+        + u128::from(held(data))
+        + services::CommodityId::ALL[1..]
+            .iter()
+            .zip(account.other_commodities)
+            .filter(|(id, _)| id.unit() == services::CargoUnit::Tonne)
+            .map(|(_, quantity)| u128::from(quantity))
+            .sum::<u128>()
 }
 
 fn service_error(error: Error) -> services::Error {
@@ -1026,7 +1057,7 @@ fn require_acceptance(data: &Data, account: &AccountData) -> Result<(), Error> {
     if data.allocated >= 2 {
         return Err(Error::SourceExhausted);
     }
-    if occupied_tonnes(data, account) + 8 > u32::from(HOLD_TONNES) {
+    if occupied_tonnes(data, account) + 8 > u128::from(HOLD_TONNES) {
         return Err(Error::HoldFull);
     }
     if account.fuel_tenths < DEPARTURE_FUEL_TENTHS {

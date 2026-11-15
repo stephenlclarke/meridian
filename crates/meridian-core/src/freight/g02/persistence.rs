@@ -9,6 +9,9 @@ pub(crate) struct SavedDomainSummary {
     pub(crate) credits: u32,
     pub(crate) fuel: u16,
     pub(crate) food: u16,
+    pub(crate) other_commodities: [u64; 16],
+    pub(crate) legal: u8,
+    pub(crate) launches: u64,
     pub(crate) completed: u8,
 }
 fn write_actor(w: &mut Writer, a: ActorId) {
@@ -141,6 +144,13 @@ impl CommanderAccount {
                 write_item(w, item);
             }
         });
+        for quantity in d.other_commodities {
+            w.u64(quantity);
+        }
+        for quantity in d.reserved_commodities {
+            w.u64(quantity);
+        }
+        w.u8(d.legal);
     }
     pub(crate) fn decode_save(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         Ok(Self {
@@ -161,6 +171,9 @@ impl CommanderAccount {
                         items: r.array(read_item)?,
                     })
                 })?,
+                other_commodities: r.array(|r| r.u64())?,
+                reserved_commodities: r.array(|r| r.u64())?,
+                legal: r.u8()?,
             },
         })
     }
@@ -181,6 +194,7 @@ impl CommanderAccount {
             || fit.items[3].id != nav.drive
             || self.data.other_tonnes != 0
             || self.data.reserved_food_tonnes != 0
+            || self.data.reserved_commodities != [0; 16]
         {
             return Err(SaveError::InvalidState(
                 "unsupported or foreign account property",
@@ -200,6 +214,9 @@ impl CommanderAccount {
             credits: self.data.credits,
             fuel: self.data.fuel_tenths,
             food: self.data.food_tonnes,
+            other_commodities: self.data.other_commodities,
+            legal: self.data.legal,
+            launches: nav.launches,
             completed: state.snapshot().completed_jobs,
         })
     }

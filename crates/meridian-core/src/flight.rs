@@ -334,6 +334,9 @@ impl World {
             .map(|session| session.next_epoch())
             .transpose()
             .map_err(|_| StepError::TickOverflow)?;
+        if let Some(account) = &mut self.commander_account {
+            account.record_departure_legality();
+        }
         self.state = next;
         self.navigation = navigation;
         if let Some((session, epoch)) = self.freight_session.as_mut().zip(mission_epoch) {

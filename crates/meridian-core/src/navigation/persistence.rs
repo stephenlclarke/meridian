@@ -10,6 +10,7 @@ pub(crate) struct SavedNavigationSummary {
     pub(crate) visit: u64,
     pub(crate) dock_sequence: u64,
     pub(crate) jumps: u64,
+    pub(crate) launches: u64,
     pub(crate) fuel_spent: u64,
 }
 
@@ -206,6 +207,7 @@ impl NavigationState {
             visit: self.visit,
             dock_sequence: self.dock_sequence,
             jumps: self.completed_jumps,
+            launches: self.launches,
             fuel_spent: self.fuel_spent,
         })
     }

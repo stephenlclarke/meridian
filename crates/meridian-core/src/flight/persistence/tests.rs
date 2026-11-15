@@ -379,7 +379,7 @@ fn semantically_tampered_wallet_cargo_fit_units_stock_and_completion_are_refused
     let account = account_start(&world);
     let domain = domain_start(&world);
     let market = markets_start(&world);
-    // Version-one wire fields, with a valid replacement checksum: this exercises semantic checks.
+    // Preserved Food/account prefix wire fields, with a valid replacement checksum: this exercises semantic checks.
     for (offset, replacement) in [
         (account + 24, 1_u32.to_le_bytes().to_vec()), // Unsupported extra credit/payment.
         (account + 30, 1_u16.to_le_bytes().to_vec()), // Food absent from the actual market ledger.
@@ -452,4 +452,109 @@ fn abandoned_allocations_stay_exhausted_after_continue_without_replacement_stock
     assert_eq!(world.mission_snapshot().unwrap().freight.held_tonnes, 0);
     assert_eq!(world.credits_tenths(), Some(7200));
     assert!(world.mission_snapshot().unwrap().freight.clue.is_none());
+}
+
+#[test]
+fn native_commodity_cargo_stock_and_money_continue_together_and_old_version_refuses_atomically() {
+    use station_services::{Command as Trade, CommodityId};
+    let mut world = World::new_commander(1201).unwrap();
+    for id in [
+        CommodityId::Gold,
+        CommodityId::GemStones,
+        CommodityId::Machinery,
+    ] {
+        world
+            .request_station_service(Trade::BuyCommodity(id), world.snapshot().tick)
+            .unwrap();
+    }
+    assert_eq!(world.credits_tenths(), Some(646));
+    assert_eq!(world.service_snapshot().unwrap().used_tonnes, 1);
+    let restored = roundtrip(&world);
+    for id in CommodityId::ALL {
+        assert_eq!(
+            restored.commodity_quantity(id),
+            world.commodity_quantity(id)
+        );
+        assert_eq!(restored.commodity_quote(id), world.commodity_quote(id));
+    }
+    assert_eq!(restored.legal_value(), Some(0));
+    let valid = world.save_bytes().unwrap();
+    let mut old_version = valid.clone();
+    old_version[8..10].copy_from_slice(&1_u16.to_le_bytes());
+    reseal(&mut old_version);
+    assert_eq!(
+        world.restore_bytes(&old_version),
+        Err(SaveError::UnsupportedVersion)
+    );
+    assert_eq!(world.save_bytes().unwrap(), valid);
+    // Account extension follows the exact pre-existing owned-fit prefix.
+    let account_extension = account_start(&world) + 61 + 8 * 28;
+    let market_extension = markets_start(&world) + 16 + 2 * 17 + 4 * 8 + 4 * 8;
+    for (offset, value) in [
+        (account_extension + 7 * 8, 2_u64), // ordinary Machinery absent from purchases
+        (account_extension + 12 * 8, 0),    // missing paid native kilogram
+        (market_extension + 7 * 8, 54),     // unexplained stock reset after buying
+        (market_extension + 2 * 16 * 8 + 7 * 8, 2), // forged Machinery buy count
+    ] {
+        let mut bad = valid.clone();
+        bad[offset..offset + 8].copy_from_slice(&value.to_le_bytes());
+        reseal(&mut bad);
+        assert_refused_unchanged(&mut world, &bad);
+        assert_eq!(world.save_bytes().unwrap(), valid);
+    }
+}
+
+#[test]
+fn paid_full_original_catalogue_transactions_continue_after_genuine_freight_income() {
+    use station_services::{Command as Trade, CommodityId};
+    let mut world = World::new_commander(1301).unwrap();
+    let (job, _) = accept(&mut world);
+    destination(&mut world);
+    let actor = contact(&mut world);
+    receive(&mut world, actor, job, Choice::ReceiveAll);
+    assert_eq!(world.credits_tenths(), Some(14500));
+    for id in CommodityId::ALL
+        .into_iter()
+        .filter(|id| *id != CommodityId::AlienItems)
+    {
+        world
+            .request_station_service(Trade::BuyCommodity(id), world.snapshot().tick)
+            .unwrap();
+        let loaded = roundtrip(&world);
+        assert_eq!(loaded.commodity_quantity(id), Some(1));
+        assert_eq!(loaded.commodity_quote(id), world.commodity_quote(id));
+        world
+            .request_station_service(Trade::SellCommodity(id), world.snapshot().tick)
+            .unwrap();
+        let loaded = roundtrip(&world);
+        assert_eq!(loaded.commodity_quantity(id), Some(0));
+    }
+    assert_eq!(
+        world
+            .commodity_quote(CommodityId::AlienItems)
+            .unwrap()
+            .stock,
+        0
+    );
+}
+
+#[test]
+fn impossible_export_legal_bits_refuse_without_replacing_actual_cargo() {
+    use station_services::{Command as Trade, CommodityId};
+    let mut world = World::new_commander(1501).unwrap();
+    world
+        .request_station_service(Trade::BuyCommodity(CommodityId::Narcotics), 0)
+        .unwrap();
+    launch(&mut world);
+    assert_eq!(world.legal_value(), Some(2));
+    let valid = world.save_bytes().unwrap();
+    let legal = account_start(&world) + 61 + 8 * 28 + 2 * 16 * 8;
+    for value in [1, 3, 255] {
+        // Only one Narcotics unit was ever bought: export bits can only include 2.
+        let mut bad = valid.clone();
+        bad[legal] = value;
+        reseal(&mut bad);
+        assert_refused_unchanged(&mut world, &bad);
+        assert_eq!(world.save_bytes().unwrap(), valid);
+    }
 }
