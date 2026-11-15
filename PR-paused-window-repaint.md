@@ -6,6 +6,6 @@ The original native Windows run selected Intel Iris Xe / Vulkan and produced a v
 
 Before accepting the correction, run workspace check, all existing 33 tests and strict Clippy on the changed source. On the Dell, pause and hold a stable tick, enter and leave fullscreen, resize to different aspect ratios, minimize/restore and switch focus. Capture fresh full-window frames with no stale borders and confirm paused ticks stay fixed. Resume and verify rendering and normal simulation without paused-time catch-up. Check clean Escape and normal close. Original tests and assertions remain unchanged; actual held-key controls require their own input evidence.
 
-Formatting and Markdown checks are prepared separately from these pending native results. Actual Mac backend, complete gameplay, docking, receiving and save acceptance remain open.
+At source 4b55126, Windows workspace check, all 33 tests, strict Clippy and desktop build pass. Root verified the actual new process/image identity after launch. Stephen confirmed the scene is visible, focused controls work and paused fullscreen/resize, minimize/restore and held-key focus release work. Automated corrected captures remained white and cannot independently prove the repair; the actual human confirmation is recorded separately. The corrected run stayed open at the user's request, so normal window-close was not newly tested. Actual Mac backend, complete gameplay, docking, receiving and save acceptance remain open.
 
 See [problem](ISSUE-paused-window-repaint.md).

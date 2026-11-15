@@ -20,12 +20,18 @@ The first Dell Linux workspace check at caab7db failed with E0599 because the pi
 
 Source revision ec2fd1ef931342b69614c2acdd0fbafccf77bf3c, tree 4ac2381728efbde089aa05fde202705cf5e856d7, passes workspace all-target check, all 33 tests (26 core and 7 desktop) and Clippy with warnings denied on both Dell targets: x86_64-unknown-linux-gnu under Ubuntu 22.04.5 LTS in WSL2, and native x86_64-pc-windows-msvc. Both use Rust 1.99.0. A separate native Windows Rust executable also linked, ran and passed a file write/read check with MSVC 19.44 and Windows SDK 10.0.26100.0. Later documentation commits reuse this exact unchanged source evidence; they are not separate native test runs.
 
-Actual GPU launch, frame inspection and performance remain UNRUN. The human authorized Dell Linux and native Windows builds in parallel; G1 retains the Mac execution lane for the Swift 548 baseline cases plus the new regression and updated app. There is no playable or commercial acceptance claim.
+## Native Windows flight verification
+
+Source 4b55126d02d7c5a9781ef76aba7bbcf041a8fa65, tree 937c172d9043fc2dfc197fb8742248a106c94d97, passes Windows workspace check, all 33 tests, strict Clippy and the native desktop build. The actual executable SHA-256 is e14baa27e885238cdf0e44a08690f4bb618aa7da361aab8f7da0b0babb7eff34. Root independently verified its running Windows session, process/image identity and clean source checkout after launch.
+
+wgpu selected Intel Iris Xe / Vulkan, driver 101.7077. The first native run produced an actual coloured SH025/ring scene with limited depth evidence, but paused fullscreen left a stale frame. The correction requests repaint after window changes and surface recovery without advancing a paused World. Stephen confirmed the corrected scene is visible and, after clicking the window for focus, all requested held flight controls, brake, pause/resume, paused fullscreen/resize, minimize/restore and held-key focus release work. The initial all-keys report resolved after focusing the window. This is human verification of the actual native run, not an inference from the passing tests.
+
+Corrected automated captures were white despite the human-visible scene. Keep that capture limitation and the original failed frames explicit; do not manufacture corrected screenshots. Escape exited the first run cleanly; the corrected app was intentionally left open, so normal window-close was not newly executed. Actual Mac GPU launch, performance, complete gameplay, docking, receiving and save acceptance remain open. The human authorized Dell work in parallel; G1 retains the Mac execution lane for the current Swift app correction and delivery.
 
 ## Next concrete acceptance
 
 1. Preserve the exact passing Dell evidence; G1 still needs Mac compiler/backend qualification when app delivery permits it. Fix actual failures within the same slice.
-2. Launch the wgpu prototype on an actual Mac. Confirm mesh, color/depth, controls, pause/focus/fullscreen/resize/minimize/quit and clean error reporting. Record the actual adapter/backend and image evidence.
+2. Qualify the prototype on an actual Mac when its execution lane is available. Preserve the distinct Windows human verification and automated capture limits; measure performance separately.
 3. Implement the real station/flight contact and admission loop plus source route/fuel/economy. Replace navigation fixtures with qualified content, not a dock flag shortcut.
 4. Integrate the G02 finite source, consent/custody, receiver and failed-publication semantics; implement versioned save/quit/continue before claiming the complete first playable.
 
