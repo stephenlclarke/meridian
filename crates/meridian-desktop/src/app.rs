@@ -138,6 +138,8 @@ impl App {
             KeyCode::Enter => Action::Confirm,
             KeyCode::KeyB => Action::Back,
             KeyCode::KeyF => Action::Refuel,
+            KeyCode::KeyG => Action::BuyFood,
+            KeyCode::KeyH => Action::SellFood,
             _ => return,
         };
         self.notice = Some(match self.session.command(&mut self.world, action) {
