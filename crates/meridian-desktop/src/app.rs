@@ -1,4 +1,10 @@
-use std::{collections::HashSet, error::Error, sync::Arc, time::Instant};
+use std::{
+    collections::{HashSet, hash_map::RandomState},
+    error::Error,
+    hash::{BuildHasher, Hasher},
+    sync::Arc,
+    time::Instant,
+};
 
 use meridian_core::{FlightInput, FlightMode, MotionRefusal, StepError, World};
 use winit::{
@@ -11,6 +17,17 @@ use winit::{
 
 use crate::clock::FixedClock;
 use crate::renderer::{Renderer, StationScene};
+use crate::session::{Action, Session};
+
+// Ephemeral profile IDs are allocated by the host, never by the deterministic core.
+fn fresh_profile_seed() -> u64 {
+    loop {
+        let seed = RandomState::new().build_hasher().finish();
+        if seed != 0 && seed <= u64::MAX - 10 {
+            return seed;
+        }
+    }
+}
 
 // A catch-up frame must retain a contact reported before a later clear tick.
 fn step_frame(
@@ -29,6 +46,7 @@ fn step_frame(
 // This shell owns the World synchronously. No gameplay mutation occurs in renderer code.
 struct App {
     world: World,
+    session: Session,
     renderer: Option<Renderer>,
     keys: HashSet<KeyCode>,
     paused: bool,
@@ -43,7 +61,8 @@ struct App {
 impl App {
     fn new() -> Result<Self, Box<dyn Error>> {
         Ok(Self {
-            world: World::at_original_station()?,
+            world: World::new_commander(fresh_profile_seed())?,
+            session: Session::default(),
             renderer: None,
             keys: HashSet::new(),
             paused: false,
@@ -66,6 +85,65 @@ impl App {
     fn axis(&self, positive: KeyCode, negative: KeyCode) -> f32 {
         f32::from(u8::from(self.keys.contains(&positive)))
             - f32::from(u8::from(self.keys.contains(&negative)))
+    }
+
+    fn request_redraw(&self) {
+        if let Some(renderer) = &self.renderer {
+            renderer.window.request_redraw();
+        }
+    }
+
+    fn reset_input(&mut self) {
+        self.keys.clear();
+        self.last_frame = Instant::now();
+        self.clock.reset();
+        self.session.invalidate();
+        if let Err(error) = self.world.request_pause(
+            self.paused || !self.focused || self.occluded,
+            self.world.snapshot().tick,
+        ) {
+            self.notice = Some(error.to_string());
+        }
+        self.request_redraw();
+    }
+
+    fn key(&mut self, code: KeyCode, event_loop: &ActiveEventLoop) {
+        match code {
+            KeyCode::Escape => event_loop.exit(),
+            KeyCode::KeyP => {
+                self.paused = !self.paused;
+                self.reset_input();
+            }
+            KeyCode::F11 => {
+                if let Some(renderer) = &self.renderer {
+                    let mode = if renderer.window.fullscreen().is_some() {
+                        None
+                    } else {
+                        Some(Fullscreen::Borderless(None))
+                    };
+                    renderer.window.set_fullscreen(mode);
+                }
+            }
+            _ => self.game_key(code),
+        }
+        self.request_redraw();
+    }
+
+    fn game_key(&mut self, code: KeyCode) {
+        let action = match code {
+            KeyCode::KeyL => Action::Launch,
+            KeyCode::KeyJ => Action::Jump,
+            KeyCode::KeyT => Action::Contact,
+            KeyCode::KeyR => Action::Review,
+            KeyCode::Enter => Action::Confirm,
+            KeyCode::KeyB => Action::Back,
+            KeyCode::KeyF => Action::Refuel,
+            _ => return,
+        };
+        self.notice = Some(match self.session.command(&mut self.world, action) {
+            Ok(message) => message,
+            Err(error) => error,
+        });
     }
 
     fn redraw(&mut self, event_loop: &ActiveEventLoop) {
@@ -94,6 +172,22 @@ impl App {
                 }
             }
         }
+        if let Some(refusal) = frame_refusal {
+            self.notice = Some(
+                match refusal {
+                    MotionRefusal::StationContact => {
+                        "Station contact: stopped at last clear position"
+                    }
+                    MotionRefusal::EntryConditions => {
+                        "Entry refused: align with entrance and slow down"
+                    }
+                }
+                .into(),
+            );
+        }
+        let hud_lines = self
+            .session
+            .lines(&self.world, active, self.notice.as_deref());
         if let Some(renderer) = &mut self.renderer {
             let snapshot = self.world.snapshot();
             let mode = match snapshot.mode {
@@ -128,7 +222,7 @@ impl App {
                     port,
                     docked: snapshot.mode == FlightMode::Docked,
                 });
-            if let Err(error) = renderer.draw(&snapshot, station) {
+            if let Err(error) = renderer.draw(&snapshot, station, &hud_lines) {
                 self.fail(event_loop, error);
             }
         }
@@ -168,65 +262,19 @@ impl ApplicationHandler for App {
             }
             WindowEvent::Focused(focused) => {
                 self.focused = focused;
-                self.keys.clear();
-                self.last_frame = Instant::now();
-                self.clock.reset();
-                if let Some(renderer) = &self.renderer {
-                    renderer.window.request_redraw();
-                }
+                self.reset_input();
             }
             WindowEvent::Occluded(occluded) => {
                 self.occluded = occluded;
-                self.last_frame = Instant::now();
-                self.clock.reset();
-                if let Some(renderer) = &self.renderer {
-                    renderer.window.request_redraw();
-                }
+                self.reset_input();
             }
             WindowEvent::KeyboardInput { event, .. } => {
                 if let PhysicalKey::Code(code) = event.physical_key {
                     if event.state == ElementState::Released {
                         self.keys.remove(&code);
-                    } else if !event.repeat {
+                    } else if !event.repeat && self.focused && !self.occluded {
                         self.keys.insert(code);
-                        match code {
-                            KeyCode::Escape => event_loop.exit(),
-                            KeyCode::KeyL => {
-                                if self.paused {
-                                    self.notice = Some("Resume with P before launching".into());
-                                } else {
-                                    self.notice = self
-                                        .world
-                                        .request_launch(self.world.snapshot().tick)
-                                        .err()
-                                        .map(|error| error.to_string());
-                                }
-                                if let Some(renderer) = &self.renderer {
-                                    renderer.window.request_redraw();
-                                }
-                            }
-                            KeyCode::KeyP => {
-                                self.paused = !self.paused;
-                                self.keys.clear();
-                                self.last_frame = Instant::now();
-                                self.clock.reset();
-                                if let Some(renderer) = &self.renderer {
-                                    renderer.window.request_redraw();
-                                }
-                            }
-                            KeyCode::F11 => {
-                                if let Some(renderer) = &self.renderer {
-                                    let mode = if renderer.window.fullscreen().is_some() {
-                                        None
-                                    } else {
-                                        Some(Fullscreen::Borderless(None))
-                                    };
-                                    renderer.window.set_fullscreen(mode);
-                                    renderer.window.request_redraw();
-                                }
-                            }
-                            _ => {}
-                        }
+                        self.key(code, event_loop);
                     }
                 }
             }

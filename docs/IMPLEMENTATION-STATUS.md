@@ -46,3 +46,10 @@ Corrected automated captures were white despite the human-visible scene. Keep th
 4. Integrate the G02 finite source, consent/custody, receiver and failed-publication semantics; implement versioned save/quit/continue before claiming the complete first playable.
 
 The authoritative milestone remains [FIRST-PLAYABLE.md](FIRST-PLAYABLE.md). Do not close it on a flight prototype, unit-test count or source review alone.
+
+
+## Joined World freight and desktop HUD candidate
+
+The candidate documented in [the source packet](PR-world-flight-hud.md) joins frozen G3 World freight and MC1 navigation to actual desktop commands, with a live code-drawn wgpu overlay. The host allocates a new ephemeral commander identity; the core keeps ownership and authority. No font, texture or other art file was added. Existing original L337 navigation bytes have their separate authoring audit; the reduced SH028 collision-mesh lineage gap remains explicit.
+
+Root ran source formatting, whitespace checks and 21 Python importer tests successfully. All joined Rust compilation/tests/Clippy and GPU/input acceptance are UNRUN. Newly authored desktop tests exercise explicit contact and review confirmation, cancellation, pause invalidation, bounded HUD geometry and the full public command journey. Those authored tests are not passing evidence. The HUD states that this build has no save, so no continuation or complete first-playable result is claimed.

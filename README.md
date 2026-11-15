@@ -35,6 +35,10 @@ Read [implementation status](docs/IMPLEMENTATION-STATUS.md) before running the p
 
 Run `make docs-check` to lint the documents and `make assets-check` for headless Python import checks. The legacy milestone breakdown was prepared by the existing G3 session from immutable source. The full journey, native docking acceptance, economy, mission authority, saves and a packaged playable app remain in progress; the first milestone is not complete.
 
+## World freight and HUD candidate
+
+The next source candidate starts an owned commander and connects original Avenor/Renas travel, physical station admission, actual crew contact and the eight-tonne G02 freight job to desktop controls. Its wgpu HUD uses newly authored code-drawn glyphs, without imported fonts or textures. L launches; J requests the other journey system; T selects the current station contact; R reviews; Enter confirms one reviewed action; B cancels; F buys missing fuel. Flight controls remain unchanged. This source is not yet compiled or accepted as a replacement playable; see [the joined packet](docs/PR-world-flight-hud.md). Ordinary trading and durable save/continue remain open.
+
 ## License and quality checks
 
 Meridian's new code is proprietary/source-visible under [LICENSE](LICENSE). The public repository permits inspection under GitHub's terms; it is not a permissive open-source grant. Separately licensed original L337 assets retain their applicable notices. Only verified original project-authored assets are eligible for reuse; original Elite/Oolite or other third-party art, models, textures, audio and fonts are excluded.

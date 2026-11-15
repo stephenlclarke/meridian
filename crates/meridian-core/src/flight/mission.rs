@@ -1,6 +1,8 @@
 //! World-owned original G02 station contact and command lifecycle.
 use super::World;
-use crate::freight::g02::{self, ActorId, ContactDefinition, ContactFacts, DockFacts, StationKind, WorldFacts};
+use crate::freight::g02::{
+    self, ActorId, ContactDefinition, ContactFacts, DockFacts, StationKind, WorldFacts,
+};
 use crate::navigation::{DockContext, SystemId};
 use core::fmt;
 
@@ -13,20 +15,31 @@ pub struct StationNpc {
     roster_revision: u64,
 }
 impl StationNpc {
-    pub fn actor(self) -> ActorId { self.actor }
-    pub fn definition(self) -> ContactDefinition { self.definition }
+    pub fn actor(self) -> ActorId {
+        self.actor
+    }
+    pub fn definition(self) -> ContactDefinition {
+        self.definition
+    }
     pub fn name(self) -> &'static str {
         match self.definition {
             ContactDefinition::Arlen => "Arlen",
             ContactDefinition::RenasUtilityCrew => "Renas utility receiving crew",
         }
     }
-    pub fn dock(self) -> DockContext { self.dock }
+    pub fn dock(self) -> DockContext {
+        self.dock
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MissionError {
-    NoCommander, StaleCommand, NotDocked, WrongContact, Paused, SequenceExhausted,
+    NoCommander,
+    StaleCommand,
+    NotDocked,
+    WrongContact,
+    Paused,
+    SequenceExhausted,
     Freight(g02::Error),
 }
 impl fmt::Display for MissionError {
@@ -61,13 +74,20 @@ pub(super) struct FreightSession {
 }
 impl FreightSession {
     pub(super) fn fresh(dock: DockContext) -> Self {
-        let mut session = Self { state: g02::State::new_commander(dock.owner().seed()),
-            epoch: 1, paused: false, roster: None, contact: None };
+        let mut session = Self {
+            state: g02::State::new_commander(dock.owner().seed()),
+            epoch: 1,
+            paused: false,
+            roster: None,
+            contact: None,
+        };
         session.rebind_dock(Some(dock), 1);
         session
     }
     pub(super) fn next_epoch(&self) -> Result<u64, MissionError> {
-        self.epoch.checked_add(1).ok_or(MissionError::SequenceExhausted)
+        self.epoch
+            .checked_add(1)
+            .ok_or(MissionError::SequenceExhausted)
     }
     /// Called only at World profile creation, launch, jump arrival or physical entry publication.
     pub(super) fn rebind_dock(&mut self, dock: Option<DockContext>, epoch: u64) {
@@ -79,38 +99,72 @@ impl FreightSession {
                 SystemId::RENAS => (3, ContactDefinition::RenasUtilityCrew),
                 _ => return None,
             };
-            Some(StationNpc { dock, actor: ActorId { entity, generation: epoch },
-                definition, roster_revision: epoch })
+            Some(StationNpc {
+                dock,
+                actor: ActorId {
+                    entity,
+                    generation: epoch,
+                },
+                definition,
+                roster_revision: epoch,
+            })
         });
     }
 }
 
 impl World {
     pub fn mission_snapshot(&self) -> Option<MissionSnapshot> {
-        self.freight_session.as_ref().map(|session| MissionSnapshot {
-            freight: session.state.snapshot(), paused: session.paused, contact: session.contact,
-        })
+        self.freight_session
+            .as_ref()
+            .map(|session| MissionSnapshot {
+                freight: session.state.snapshot(),
+                paused: session.paused,
+                contact: session.contact,
+            })
     }
 
     pub fn station_contacts(&self) -> Vec<StationNpc> {
-        let Some(session) = &self.freight_session else { return Vec::new(); };
-        session.roster.filter(|npc| self.dock_context_is_current(&npc.dock))
-            .into_iter().collect()
+        let Some(session) = &self.freight_session else {
+            return Vec::new();
+        };
+        session
+            .roster
+            .filter(|npc| self.dock_context_is_current(&npc.dock))
+            .into_iter()
+            .collect()
     }
 
     fn station_command_admission(&self, tick: u64) -> Result<&FreightSession, MissionError> {
-        if tick != self.state.tick { return Err(MissionError::StaleCommand); }
-        let session = self.freight_session.as_ref().ok_or(MissionError::NoCommander)?;
-        if session.paused { return Err(MissionError::Paused); }
+        if tick != self.state.tick {
+            return Err(MissionError::StaleCommand);
+        }
+        let session = self
+            .freight_session
+            .as_ref()
+            .ok_or(MissionError::NoCommander)?;
+        if session.paused {
+            return Err(MissionError::Paused);
+        }
         Ok(session)
     }
 
-    pub fn request_contact(&mut self, npc: StationNpc, expected_tick: u64) -> Result<(), MissionError> {
+    pub fn request_contact(
+        &mut self,
+        npc: StationNpc,
+        expected_tick: u64,
+    ) -> Result<(), MissionError> {
         let session = self.station_command_admission(expected_tick)?;
-        if !self.dock_context_is_current(&npc.dock) { return Err(MissionError::NotDocked); }
-        if session.roster != Some(npc) { return Err(MissionError::WrongContact); }
+        if !self.dock_context_is_current(&npc.dock) {
+            return Err(MissionError::NotDocked);
+        }
+        if session.roster != Some(npc) {
+            return Err(MissionError::WrongContact);
+        }
         let epoch = session.next_epoch()?;
-        let session = self.freight_session.as_mut().ok_or(MissionError::NoCommander)?;
+        let session = self
+            .freight_session
+            .as_mut()
+            .ok_or(MissionError::NoCommander)?;
         session.epoch = epoch;
         session.contact = Some(npc);
         Ok(())
@@ -118,8 +172,13 @@ impl World {
 
     /// Normal application pause command; it cannot supply mission consent or location.
     pub fn request_pause(&mut self, paused: bool, expected_tick: u64) -> Result<(), MissionError> {
-        if expected_tick != self.state.tick { return Err(MissionError::StaleCommand); }
-        let session = self.freight_session.as_mut().ok_or(MissionError::NoCommander)?;
+        if expected_tick != self.state.tick {
+            return Err(MissionError::StaleCommand);
+        }
+        let session = self
+            .freight_session
+            .as_mut()
+            .ok_or(MissionError::NoCommander)?;
         let epoch = session.next_epoch()?;
         session.epoch = epoch;
         session.paused = paused;
@@ -127,51 +186,90 @@ impl World {
     }
 
     pub(super) fn is_paused(&self) -> bool {
-        self.freight_session.as_ref().is_some_and(|session| session.paused)
+        self.freight_session
+            .as_ref()
+            .is_some_and(|session| session.paused)
     }
 
     fn freight_facts(&self) -> Result<WorldFacts, MissionError> {
-        let session = self.freight_session.as_ref().ok_or(MissionError::NoCommander)?;
+        let session = self
+            .freight_session
+            .as_ref()
+            .ok_or(MissionError::NoCommander)?;
         let dock = self.current_dock_context();
         let station_actor = dock.map(|context| ActorId {
-            entity: context.actor_entity(), generation: context.visit(),
+            entity: context.actor_entity(),
+            generation: context.visit(),
         });
-        let contact = session.contact.filter(|npc| {
-            dock == Some(npc.dock) && session.roster == Some(*npc)
-        });
+        let contact = session
+            .contact
+            .filter(|npc| dock == Some(npc.dock) && session.roster == Some(*npc));
         Ok(WorldFacts {
-            epoch: session.epoch, paused: session.paused,
+            epoch: session.epoch,
+            paused: session.paused,
             content_digest: Some(g02::CONTENT_DIGEST),
-            dock: dock.zip(station_actor).map(|(context, station_actor)| DockFacts {
-                owner: context.owner().seed(), hull: context.ship().ordinal(),
-                system: g02::System { galaxy: context.system().galaxy, system: context.system().system },
-                kind: StationKind::MainOrbital, station_actor, arrival_sequence: context.sequence(),
-            }),
-            contact: contact.zip(station_actor).map(|(npc, station_actor)| ContactFacts {
-                actor: npc.actor, station_actor, definition: npc.definition,
-                roster_revision: npc.roster_revision,
-            }),
+            dock: dock
+                .zip(station_actor)
+                .map(|(context, station_actor)| DockFacts {
+                    owner: context.owner().seed(),
+                    hull: context.ship().ordinal(),
+                    system: g02::System {
+                        galaxy: context.system().galaxy,
+                        system: context.system().system,
+                    },
+                    kind: StationKind::MainOrbital,
+                    station_actor,
+                    arrival_sequence: context.sequence(),
+                }),
+            contact: contact
+                .zip(station_actor)
+                .map(|(npc, station_actor)| ContactFacts {
+                    actor: npc.actor,
+                    station_actor,
+                    definition: npc.definition,
+                    roster_revision: npc.roster_revision,
+                }),
         })
     }
 
     /// Executes a confirmed domain command only against this World's actual current facts.
     /// This synchronous transaction publishes memory only; no disk persistence is claimed.
-    pub fn request_freight(&mut self, command: g02::Command, expected_tick: u64)
-        -> Result<g02::Event, MissionError> {
+    pub fn request_freight(
+        &mut self,
+        command: g02::Command,
+        expected_tick: u64,
+    ) -> Result<g02::Event, MissionError> {
         self.station_command_admission(expected_tick)?;
         let facts = self.freight_facts()?;
-        let account = self.commander_account.as_mut().ok_or(MissionError::NoCommander)?;
-        let session = self.freight_session.as_mut().ok_or(MissionError::NoCommander)?;
-        let plan = session.state.prepare(account, &facts, command).map_err(MissionError::Freight)?;
-        session.state.commit(account, &facts, plan).map_err(MissionError::Freight)
+        let account = self
+            .commander_account
+            .as_mut()
+            .ok_or(MissionError::NoCommander)?;
+        let session = self
+            .freight_session
+            .as_mut()
+            .ok_or(MissionError::NoCommander)?;
+        let plan = session
+            .state
+            .prepare(account, &facts, command)
+            .map_err(MissionError::Freight)?;
+        session
+            .state
+            .commit(account, &facts, plan)
+            .map_err(MissionError::Freight)
     }
 
     /// Original ordinary main-orbital fuel service: two credit tenths per missing fuel tenth.
     pub fn request_refuel(&mut self, expected_tick: u64) -> Result<u32, MissionError> {
         self.station_command_admission(expected_tick)?;
         self.current_dock_context().ok_or(MissionError::NotDocked)?;
-        let account = self.commander_account.as_mut().ok_or(MissionError::NoCommander)?;
-        account.refill_standard_tank().map_err(MissionError::Freight)
+        let account = self
+            .commander_account
+            .as_mut()
+            .ok_or(MissionError::NoCommander)?;
+        account
+            .refill_standard_tank()
+            .map_err(MissionError::Freight)
     }
 }
 
@@ -179,9 +277,9 @@ impl World {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
-    use crate::{FlightInput, FlightMode, StepError};
     use crate::freight::g02::{Choice, Command, Error, Event, GoodsId, JobId, Review};
     use crate::navigation::{BASIC_SPOOL_TICKS, DockOrigin};
+    use crate::{FlightInput, FlightMode, StepError};
 
     fn command(world: &mut World, command: Command) -> Result<Event, MissionError> {
         world.request_freight(command, world.snapshot().tick)
@@ -196,13 +294,33 @@ mod tests {
         let npc = world.station_contacts()[0];
         world.request_contact(npc, world.snapshot().tick).unwrap();
         let review = reviewed(world, Command::ReviewOffer { actor: npc.actor() });
-        match command(world, Command::Confirm { review, choice: Choice::Accept }).unwrap() {
+        match command(
+            world,
+            Command::Confirm {
+                review,
+                choice: Choice::Accept,
+            },
+        )
+        .unwrap()
+        {
             Event::Accepted { job, units } => (job, units),
             event => panic!("expected allocation, got {event:?}"),
         }
     }
-    fn fingerprint(world: &World) -> (crate::Snapshot, Option<MissionSnapshot>, Option<u32>, Vec<StationNpc>) {
-        (world.snapshot(), world.mission_snapshot(), world.credits_tenths(), world.station_contacts())
+    fn fingerprint(
+        world: &World,
+    ) -> (
+        crate::Snapshot,
+        Option<MissionSnapshot>,
+        Option<u32>,
+        Vec<StationNpc>,
+    ) {
+        (
+            world.snapshot(),
+            world.mission_snapshot(),
+            world.credits_tenths(),
+            world.station_contacts(),
+        )
     }
     fn refuses(world: &mut World, value: Command, error: Error) {
         let before = fingerprint(world);
@@ -215,26 +333,50 @@ mod tests {
         assert!(world.station_contacts().is_empty());
         assert!(!world.dock_context_is_current(&old));
         world.step(FlightInput::default()).unwrap();
-        world.request_jump(SystemId::RENAS, world.snapshot().tick).unwrap();
-        for _ in 1..BASIC_SPOOL_TICKS { world.step(FlightInput::default()).unwrap(); }
+        world
+            .request_jump(SystemId::RENAS, world.snapshot().tick)
+            .unwrap();
+        for _ in 1..BASIC_SPOOL_TICKS {
+            world.step(FlightInput::default()).unwrap();
+        }
         assert_eq!(world.snapshot().navigation.unwrap().fuel_units, 130);
-        assert_eq!(world.snapshot().navigation.unwrap().travel.unwrap().remaining_ticks, 1);
+        assert_eq!(
+            world
+                .snapshot()
+                .navigation
+                .unwrap()
+                .travel
+                .unwrap()
+                .remaining_ticks,
+            1
+        );
         world.step(FlightInput::default()).unwrap();
         assert_eq!(world.snapshot().position, [0.0, 0.0, 16000.0]);
         assert_eq!(world.snapshot().navigation.unwrap().fuel_units, 96);
         assert_eq!(world.snapshot().mode, FlightMode::Flight);
         assert!(world.current_dock_context().is_none());
         assert!(world.station_contacts().is_empty());
-        assert_eq!(world.request_refuel(world.snapshot().tick), Err(MissionError::NotDocked));
+        assert_eq!(
+            world.request_refuel(world.snapshot().tick),
+            Err(MissionError::NotDocked)
+        );
         // Same public control approach as the independent navigation test: no pose injection.
         for _ in 0..9000 {
             let before = world.snapshot();
-            if before.mode == FlightMode::Docked { break; }
-            let target_speed = if before.position[2] > 2500.0 { 34.3 } else { 4.0 };
-            world.step(FlightInput {
-                throttle: ((target_speed - before.speed) / (9.1 / 60.0)).clamp(-1.0, 1.0),
-                ..FlightInput::default()
-            }).unwrap();
+            if before.mode == FlightMode::Docked {
+                break;
+            }
+            let target_speed = if before.position[2] > 2500.0 {
+                34.3
+            } else {
+                4.0
+            };
+            world
+                .step(FlightInput {
+                    throttle: ((target_speed - before.speed) / (9.1 / 60.0)).clamp(-1.0, 1.0),
+                    ..FlightInput::default()
+                })
+                .unwrap();
             assert_eq!(world.snapshot().motion_refusal, None);
         }
         assert_eq!(world.snapshot().mode, FlightMode::Docked);
@@ -252,43 +394,136 @@ mod tests {
         assert_eq!(source.definition(), ContactDefinition::Arlen);
         assert_eq!(source.name(), "Arlen");
         assert_eq!(source.dock().origin(), DockOrigin::InitialStart);
-        refuses(&mut world, Command::ReviewOffer { actor: source.actor() }, Error::WrongActor);
+        refuses(
+            &mut world,
+            Command::ReviewOffer {
+                actor: source.actor(),
+            },
+            Error::WrongActor,
+        );
         let (job, units) = accept(&mut world);
         assert_eq!(world.credits_tenths(), Some(7200));
         assert_eq!(world.mission_snapshot().unwrap().freight.held_tonnes, 8);
-        refuses(&mut world, Command::ReviewReceiving { actor: source.actor(), job }, Error::WrongStation);
+        refuses(
+            &mut world,
+            Command::ReviewReceiving {
+                actor: source.actor(),
+                job,
+            },
+            Error::WrongStation,
+        );
         travel_to_receiving_station(&mut world);
-        assert_eq!(world.request_contact(source, world.snapshot().tick), Err(MissionError::NotDocked));
+        assert_eq!(
+            world.request_contact(source, world.snapshot().tick),
+            Err(MissionError::NotDocked)
+        );
         let crew = world.station_contacts()[0];
         assert_eq!(crew.definition(), ContactDefinition::RenasUtilityCrew);
         assert_ne!(crew.actor(), source.actor());
-        refuses(&mut world, Command::ReviewReceiving { actor: crew.actor(), job }, Error::WrongActor);
+        refuses(
+            &mut world,
+            Command::ReviewReceiving {
+                actor: crew.actor(),
+                job,
+            },
+            Error::WrongActor,
+        );
         world.request_contact(crew, world.snapshot().tick).unwrap();
-        refuses(&mut world, Command::ReviewOffer { actor: source.actor() }, Error::WrongStation);
+        refuses(
+            &mut world,
+            Command::ReviewOffer {
+                actor: source.actor(),
+            },
+            Error::WrongStation,
+        );
         let (_, foreign) = accept(&mut World::new_commander(901).unwrap());
-        let review = reviewed(&mut world, Command::ReviewReceiving { actor: crew.actor(), job });
-        refuses(&mut world, Command::Confirm { review, choice: Choice::ReceiveOne(foreign[0]) }, Error::ForeignUnit);
-        refuses(&mut world, Command::Confirm { review, choice: Choice::ReceiveOne(units[1]) }, Error::OutOfOrder);
+        let review = reviewed(
+            &mut world,
+            Command::ReviewReceiving {
+                actor: crew.actor(),
+                job,
+            },
+        );
+        refuses(
+            &mut world,
+            Command::Confirm {
+                review,
+                choice: Choice::ReceiveOne(foreign[0]),
+            },
+            Error::ForeignUnit,
+        );
+        refuses(
+            &mut world,
+            Command::Confirm {
+                review,
+                choice: Choice::ReceiveOne(units[1]),
+            },
+            Error::OutOfOrder,
+        );
         let mut last_review = review;
         for (index, unit) in units.iter().enumerate() {
-            let review = if index == 0 { review } else {
-                reviewed(&mut world, Command::ReviewReceiving { actor: crew.actor(), job })
+            let review = if index == 0 {
+                review
+            } else {
+                reviewed(
+                    &mut world,
+                    Command::ReviewReceiving {
+                        actor: crew.actor(),
+                        job,
+                    },
+                )
             };
             last_review = review;
             assert_eq!(review.next_unit(), Some(*unit));
-            let result = command(&mut world, Command::Confirm { review, choice: Choice::ReceiveOne(*unit) }).unwrap();
-            let Event::Received { units: received, remaining, completion, clue_awarded, .. } = result else {
+            let result = command(
+                &mut world,
+                Command::Confirm {
+                    review,
+                    choice: Choice::ReceiveOne(*unit),
+                },
+            )
+            .unwrap();
+            let Event::Received {
+                units: received,
+                remaining,
+                completion,
+                clue_awarded,
+                ..
+            } = result
+            else {
                 panic!("expected custody transfer");
             };
-            assert_eq!(received.iter().flatten().copied().collect::<Vec<_>>(), vec![*unit]);
+            assert_eq!(
+                received.iter().flatten().copied().collect::<Vec<_>>(),
+                vec![*unit]
+            );
             assert_eq!(remaining, 7 - index as u8);
             assert_eq!(completion.is_some(), index == 7);
             assert_eq!(clue_awarded, index == 7);
-            assert_eq!(world.credits_tenths(), Some(if index == 7 { 14500 } else { 7200 }));
-            assert_eq!(world.mission_snapshot().unwrap().freight.clue.is_some(), index == 7);
+            assert_eq!(
+                world.credits_tenths(),
+                Some(if index == 7 { 14500 } else { 7200 })
+            );
+            assert_eq!(
+                world.mission_snapshot().unwrap().freight.clue.is_some(),
+                index == 7
+            );
             if index == 0 {
-                let next = reviewed(&mut world, Command::ReviewReceiving { actor: crew.actor(), job });
-                refuses(&mut world, Command::Confirm { review: next, choice: Choice::ReceiveOne(*unit) }, Error::AlreadyTransferred);
+                let next = reviewed(
+                    &mut world,
+                    Command::ReviewReceiving {
+                        actor: crew.actor(),
+                        job,
+                    },
+                );
+                refuses(
+                    &mut world,
+                    Command::Confirm {
+                        review: next,
+                        choice: Choice::ReceiveOne(*unit),
+                    },
+                    Error::AlreadyTransferred,
+                );
             }
         }
         let done = world.mission_snapshot().unwrap();
@@ -296,8 +531,22 @@ mod tests {
         assert_eq!(done.freight.available_source_units, 8);
         assert_eq!(done.freight.completed_jobs, 1);
         assert_eq!(done.freight.clue.unwrap().completion().job(), job);
-        refuses(&mut world, Command::Confirm { review: last_review, choice: Choice::ReceiveAll }, Error::StaleReview);
-        refuses(&mut world, Command::ReviewReceiving { actor: crew.actor(), job }, Error::NotActive);
+        refuses(
+            &mut world,
+            Command::Confirm {
+                review: last_review,
+                choice: Choice::ReceiveAll,
+            },
+            Error::StaleReview,
+        );
+        refuses(
+            &mut world,
+            Command::ReviewReceiving {
+                actor: crew.actor(),
+                job,
+            },
+            Error::NotActive,
+        );
         assert_eq!(world.credits_tenths(), Some(14500));
     }
 
@@ -307,7 +556,10 @@ mod tests {
         let npc = world.station_contacts()[0];
         let foreign_npc = World::new_commander(71).unwrap().station_contacts()[0];
         let before = fingerprint(&world);
-        assert_eq!(world.request_contact(foreign_npc, 0), Err(MissionError::NotDocked));
+        assert_eq!(
+            world.request_contact(foreign_npc, 0),
+            Err(MissionError::NotDocked)
+        );
         assert_eq!(fingerprint(&world), before);
         world.request_contact(npc, 0).unwrap();
         let offer = Command::ReviewOffer { actor: npc.actor() };
@@ -316,13 +568,39 @@ mod tests {
         let mut foreign = World::new_commander(71).unwrap();
         let foreign_contact = foreign.station_contacts()[0];
         foreign.request_contact(foreign_contact, 0).unwrap();
-        let foreign_review = reviewed(&mut foreign, Command::ReviewOffer { actor: foreign_contact.actor() });
-        refuses(&mut world, Command::Confirm { review: foreign_review, choice: Choice::Accept }, Error::StaleReview);
+        let foreign_review = reviewed(
+            &mut foreign,
+            Command::ReviewOffer {
+                actor: foreign_contact.actor(),
+            },
+        );
+        refuses(
+            &mut world,
+            Command::Confirm {
+                review: foreign_review,
+                choice: Choice::Accept,
+            },
+            Error::StaleReview,
+        );
         command(&mut world, Command::Back).unwrap();
-        refuses(&mut world, Command::Confirm { review, choice: Choice::Accept }, Error::StaleReview);
+        refuses(
+            &mut world,
+            Command::Confirm {
+                review,
+                choice: Choice::Accept,
+            },
+            Error::StaleReview,
+        );
         let review = reviewed(&mut world, offer);
         world.request_contact(npc, 0).unwrap();
-        refuses(&mut world, Command::Confirm { review, choice: Choice::Accept }, Error::StaleReview);
+        refuses(
+            &mut world,
+            Command::Confirm {
+                review,
+                choice: Choice::Accept,
+            },
+            Error::StaleReview,
+        );
         let review = reviewed(&mut world, offer);
         world.request_pause(true, 0).unwrap();
         let paused = fingerprint(&world);
@@ -332,32 +610,74 @@ mod tests {
         assert_eq!(world.step(FlightInput::default()), Err(StepError::Paused));
         assert_eq!(fingerprint(&world), paused);
         world.request_pause(false, 0).unwrap();
-        refuses(&mut world, Command::Confirm { review, choice: Choice::Accept }, Error::StaleReview);
+        refuses(
+            &mut world,
+            Command::Confirm {
+                review,
+                choice: Choice::Accept,
+            },
+            Error::StaleReview,
+        );
         world.step(FlightInput::default()).unwrap();
         let before = fingerprint(&world);
-        assert_eq!(world.request_freight(offer, 0), Err(MissionError::StaleCommand));
+        assert_eq!(
+            world.request_freight(offer, 0),
+            Err(MissionError::StaleCommand)
+        );
         assert_eq!(fingerprint(&world), before);
         for mut prototype in [World::new(), World::at_original_station().unwrap()] {
             assert!(prototype.station_contacts().is_empty());
-            assert_eq!(prototype.request_freight(Command::Back, 0), Err(MissionError::NoCommander));
+            assert_eq!(
+                prototype.request_freight(Command::Back, 0),
+                Err(MissionError::NoCommander)
+            );
         }
     }
 
     #[test]
     fn real_station_fuel_purchase_updates_same_account_and_invalidates_receiving_review() {
         let mut world = World::new_commander(101).unwrap();
-        assert_eq!(world.request_refuel(0), Err(MissionError::Freight(Error::TankFull)));
+        assert_eq!(
+            world.request_refuel(0),
+            Err(MissionError::Freight(Error::TankFull))
+        );
         let (job, _) = accept(&mut world);
         travel_to_receiving_station(&mut world);
         let crew = world.station_contacts()[0];
         world.request_contact(crew, world.snapshot().tick).unwrap();
-        let review = reviewed(&mut world, Command::ReviewReceiving { actor: crew.actor(), job });
+        let review = reviewed(
+            &mut world,
+            Command::ReviewReceiving {
+                actor: crew.actor(),
+                job,
+            },
+        );
         assert_eq!(world.request_refuel(world.snapshot().tick), Ok(68));
         assert_eq!(world.credits_tenths(), Some(7132));
         assert_eq!(world.snapshot().navigation.unwrap().fuel_units, 130);
-        refuses(&mut world, Command::Confirm { review, choice: Choice::ReceiveAll }, Error::StaleReview);
-        let review = reviewed(&mut world, Command::ReviewReceiving { actor: crew.actor(), job });
-        command(&mut world, Command::Confirm { review, choice: Choice::ReceiveAll }).unwrap();
+        refuses(
+            &mut world,
+            Command::Confirm {
+                review,
+                choice: Choice::ReceiveAll,
+            },
+            Error::StaleReview,
+        );
+        let review = reviewed(
+            &mut world,
+            Command::ReviewReceiving {
+                actor: crew.actor(),
+                job,
+            },
+        );
+        command(
+            &mut world,
+            Command::Confirm {
+                review,
+                choice: Choice::ReceiveAll,
+            },
+        )
+        .unwrap();
         assert_eq!(world.credits_tenths(), Some(14432));
     }
 }

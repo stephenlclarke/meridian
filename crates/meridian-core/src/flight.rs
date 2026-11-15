@@ -223,7 +223,9 @@ impl World {
         if expected_tick != self.state.tick {
             return Err(NavigationError::StaleCommand);
         }
-        if self.is_paused() { return Err(NavigationError::WrongMode); }
+        if self.is_paused() {
+            return Err(NavigationError::WrongMode);
+        }
         if self.state.mode != FlightMode::Flight {
             return Err(NavigationError::WrongMode);
         }
@@ -299,7 +301,9 @@ impl World {
         if expected_tick != self.state.tick {
             return Err(StepError::StaleCommand);
         }
-        if self.is_paused() { return Err(StepError::Paused); }
+        if self.is_paused() {
+            return Err(StepError::Paused);
+        }
         if self.state.mode != FlightMode::Docked {
             return Err(StepError::InvalidMode);
         }
@@ -315,8 +319,12 @@ impl World {
         if let Some(state) = &mut navigation {
             state.launch().map_err(|_| StepError::TickOverflow)?;
         }
-        let mission_epoch = self.freight_session.as_ref().map(|session| session.next_epoch())
-            .transpose().map_err(|_| StepError::TickOverflow)?;
+        let mission_epoch = self
+            .freight_session
+            .as_ref()
+            .map(|session| session.next_epoch())
+            .transpose()
+            .map_err(|_| StepError::TickOverflow)?;
         self.state = next;
         self.navigation = navigation;
         if let Some((session, epoch)) = self.freight_session.as_mut().zip(mission_epoch) {
@@ -331,7 +339,9 @@ impl World {
     /// Rotation is local yaw, then pitch, then roll; translation uses the new pose/speed.
     /// Brake overrides throttle and uses the same reference deceleration magnitude.
     pub fn step(&mut self, input: FlightInput) -> Result<(), StepError> {
-        if self.is_paused() { return Err(StepError::Paused); }
+        if self.is_paused() {
+            return Err(StepError::Paused);
+        }
         input.validate()?;
         let mut next = self.state;
         next.tick = next.tick.checked_add(1).ok_or(StepError::TickOverflow)?;
@@ -425,8 +435,12 @@ impl World {
                 .step(entry, next.tick, account.fuel_tenths())
                 .map_err(|_| StepError::NonFiniteState)?;
             if entry || arrival_debit.is_some() {
-                mission_epoch = self.freight_session.as_ref().map(|session| session.next_epoch())
-                    .transpose().map_err(|_| StepError::TickOverflow)?;
+                mission_epoch = self
+                    .freight_session
+                    .as_ref()
+                    .map(|session| session.next_epoch())
+                    .transpose()
+                    .map_err(|_| StepError::TickOverflow)?;
             }
             if let Some(debit) = arrival_debit {
                 // Debit is checked before mutation; nothing fallible follows publication.

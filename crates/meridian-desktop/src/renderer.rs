@@ -8,6 +8,7 @@ use meridian_core::docking::{DockingPort, StationPose};
 use wgpu::util::DeviceExt;
 use winit::{dpi::PhysicalSize, event_loop::OwnedDisplayHandle, window::Window};
 
+use crate::hud;
 use crate::mesh::{self, Vertex};
 
 pub struct StationScene<'a> {
@@ -34,6 +35,9 @@ pub struct Renderer {
     frame: Vec<Vertex>,
     vertex_capacity: usize,
     device_lost: Arc<AtomicBool>,
+    hud_pipeline: wgpu::RenderPipeline,
+    hud_vertices: wgpu::Buffer,
+    hud_frame: Vec<Vertex>,
 }
 
 impl Renderer {
@@ -114,6 +118,45 @@ impl Renderer {
             multiview_mask: None,
             cache: None,
         });
+        let hud_shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+            label: Some("Original Meridian HUD"),
+            source: wgpu::ShaderSource::Wgsl(include_str!("hud.wgsl").into()),
+        });
+        let hud_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+            label: Some("HUD overlay"),
+            layout: None,
+            vertex: wgpu::VertexState {
+                module: &hud_shader,
+                entry_point: Some("vertex_main"),
+                compilation_options: Default::default(),
+                buffers: &[wgpu::VertexBufferLayout {
+                    array_stride: std::mem::size_of::<Vertex>() as u64,
+                    step_mode: wgpu::VertexStepMode::Vertex,
+                    attributes: &wgpu::vertex_attr_array![0 => Float32x3, 1 => Float32x3],
+                }],
+            },
+            fragment: Some(wgpu::FragmentState {
+                module: &hud_shader,
+                entry_point: Some("fragment_main"),
+                compilation_options: Default::default(),
+                targets: &[Some(wgpu::ColorTargetState {
+                    format: config.format,
+                    blend: None,
+                    write_mask: wgpu::ColorWrites::ALL,
+                })],
+            }),
+            primitive: Default::default(),
+            depth_stencil: None,
+            multisample: Default::default(),
+            multiview_mask: None,
+            cache: None,
+        });
+        let hud_vertices = device.create_buffer(&wgpu::BufferDescriptor {
+            label: Some("Bounded HUD vertices"),
+            size: (hud::MAX_VERTICES * std::mem::size_of::<Vertex>()) as u64,
+            usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+            mapped_at_creation: false,
+        });
         let projection = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Projection"),
             contents: bytemuck::cast_slice(&[
@@ -160,6 +203,9 @@ impl Renderer {
             frame: Vec::with_capacity(vertex_capacity),
             vertex_capacity,
             device_lost,
+            hud_pipeline,
+            hud_vertices,
+            hud_frame: Vec::with_capacity(hud::MAX_VERTICES),
         })
     }
 
@@ -209,6 +255,7 @@ impl Renderer {
         &mut self,
         snapshot: &Snapshot,
         station: Option<StationScene<'_>>,
+        hud_lines: &[String],
     ) -> Result<(), String> {
         if self.device_lost.load(Ordering::Acquire) {
             return Err("Graphics device lost; exiting without changing any save".into());
@@ -256,6 +303,14 @@ impl Renderer {
         }
         self.queue
             .write_buffer(&self.vertices, 0, bytemuck::cast_slice(&self.frame));
+        hud::vertices(
+            hud_lines,
+            self.config.width,
+            self.config.height,
+            &mut self.hud_frame,
+        );
+        self.queue
+            .write_buffer(&self.hud_vertices, 0, bytemuck::cast_slice(&self.hud_frame));
         let view = frame.texture.create_view(&Default::default());
         let mut encoder = self.device.create_command_encoder(&Default::default());
         {
@@ -289,6 +344,24 @@ impl Renderer {
             pass.set_bind_group(0, &self.projection_group, &[]);
             pass.set_vertex_buffer(0, self.vertices.slice(..));
             pass.draw(0..self.frame.len() as u32, 0..1);
+        }
+        {
+            let colors = [Some(wgpu::RenderPassColorAttachment {
+                view: &view,
+                depth_slice: None,
+                resolve_target: None,
+                ops: wgpu::Operations {
+                    load: wgpu::LoadOp::Load,
+                    store: wgpu::StoreOp::Store,
+                },
+            })];
+            let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                color_attachments: &colors,
+                ..Default::default()
+            });
+            pass.set_pipeline(&self.hud_pipeline);
+            pass.set_vertex_buffer(0, self.hud_vertices.slice(..));
+            pass.draw(0..self.hud_frame.len() as u32, 0..1);
         }
         self.queue.submit([encoder.finish()]);
         self.window.pre_present_notify();
