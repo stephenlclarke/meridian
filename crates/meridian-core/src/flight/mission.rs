@@ -41,6 +41,7 @@ pub enum MissionError {
     Paused,
     SequenceExhausted,
     Freight(g02::Error),
+    Service(crate::station_services::Error),
 }
 impl fmt::Display for MissionError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -52,6 +53,7 @@ impl fmt::Display for MissionError {
             Self::Paused => f.write_str("World is paused"),
             Self::SequenceExhausted => f.write_str("station contact sequence exhausted"),
             Self::Freight(error) => write!(f, "freight command refused: {error:?}"),
+            Self::Service(error) => write!(f, "station service refused: {error:?}"),
         }
     }
 }
@@ -88,6 +90,9 @@ impl FreightSession {
         self.epoch
             .checked_add(1)
             .ok_or(MissionError::SequenceExhausted)
+    }
+    pub(super) fn epoch(&self) -> u64 {
+        self.epoch
     }
     /// Called only at World profile creation, launch, jump arrival or physical entry publication.
     pub(super) fn rebind_dock(&mut self, dock: Option<DockContext>, epoch: u64) {
@@ -134,7 +139,10 @@ impl World {
             .collect()
     }
 
-    fn station_command_admission(&self, tick: u64) -> Result<&FreightSession, MissionError> {
+    pub(super) fn station_command_admission(
+        &self,
+        tick: u64,
+    ) -> Result<&FreightSession, MissionError> {
         if tick != self.state.tick {
             return Err(MissionError::StaleCommand);
         }
@@ -256,19 +264,6 @@ impl World {
         session
             .state
             .commit(account, &facts, plan)
-            .map_err(MissionError::Freight)
-    }
-
-    /// Original ordinary main-orbital fuel service: two credit tenths per missing fuel tenth.
-    pub fn request_refuel(&mut self, expected_tick: u64) -> Result<u32, MissionError> {
-        self.station_command_admission(expected_tick)?;
-        self.current_dock_context().ok_or(MissionError::NotDocked)?;
-        let account = self
-            .commander_account
-            .as_mut()
-            .ok_or(MissionError::NoCommander)?;
-        account
-            .refill_standard_tank()
             .map_err(MissionError::Freight)
     }
 }
@@ -637,10 +632,7 @@ mod tests {
     #[test]
     fn real_station_fuel_purchase_updates_same_account_and_invalidates_receiving_review() {
         let mut world = World::new_commander(101).unwrap();
-        assert_eq!(
-            world.request_refuel(0),
-            Err(MissionError::Freight(Error::TankFull))
-        );
+        assert_eq!(world.request_refuel(0), Ok(0));
         let (job, _) = accept(&mut world);
         travel_to_receiving_station(&mut world);
         let crew = world.station_contacts()[0];

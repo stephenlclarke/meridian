@@ -1,5 +1,7 @@
 mod mission;
+mod services;
 pub use mission::{MissionError, MissionSnapshot, StationNpc};
+pub use services::ServiceSnapshot;
 
 use crate::docking::StationPose;
 use crate::freight::g02::{CommanderAccount, FreshCommanderIds, StarterComponent};
@@ -102,6 +104,7 @@ pub struct World {
     navigation: Option<NavigationState>,
     commander_account: Option<CommanderAccount>,
     freight_session: Option<mission::FreightSession>,
+    station_markets: Option<crate::station_services::StationMarkets>,
 }
 
 impl Default for World {
@@ -128,6 +131,7 @@ impl World {
             navigation: None,
             commander_account: None,
             freight_session: None,
+            station_markets: None,
         }
     }
 
@@ -169,6 +173,10 @@ impl World {
         world.commander_account = Some(account);
         world.navigation = Some(navigation);
         world.freight_session = navigation.dock().map(mission::FreightSession::fresh);
+        world.station_markets = Some(
+            crate::station_services::StationMarkets::new_commander(seed)
+                .map_err(|_| NavigationError::ServiceUnavailable)?,
+        );
         Ok(world)
     }
 

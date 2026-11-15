@@ -24,10 +24,12 @@ The content identity is the fixed original G02 rules compiled into this Rust por
 | `World::mission_snapshot()` | Freight custody/source/clue, current selected contact and pause state |
 | `World::request_pause(paused, expected_tick)` | Normal pause lifecycle; paused World does not step, launch, travel or execute freight/contact commands |
 | `World::request_refuel(expected_tick)` | Pay the original ordinary main-orbital fuel price from the same account |
+| `World::request_station_service(command, expected_tick)` | Actual ordinary Food buy/sell and shared paid refill at the genuine supported berth |
+| `World::service_snapshot()` | Descriptive actual Food/reservations/total hold and current market |
 
 `StationNpc` has read-only `actor`, `definition`, `name` and `dock` methods. It has no public constructor. `MissionError` distinguishes missing profile, stale command, missing dock, wrong contact, paused state, sequence exhaustion and the original freight refusal. The existing public flight/navigation commands retain their purpose. Desktop controls remain a separate Root-owned join.
 
-Normal refuelling uses the actual current admission and the same fuel/credit account. The original source is immutable a11 `Plugh.swift:72-80`, `Game.swift` Fuel equipment base price 2, and `EquipmentActorTransactions.swift:220-231`: refill the actual missing fuel at two credit tenths per fuel tenth. The current navigation slice supports ordinary main-orbital systems, not a secret-port discount. The service checks charge/revision before mutation and refuses a full tank. It does not grant equipment, paid prerequisite history or free travel fuel. Updating the account invalidates earlier freight reviews.
+Normal refuelling now delegates to the sole [paid station-service kernel](PAID-STATION-SERVICES.md), alongside actual ordinary Food commerce. The original source is immutable a11 `Plugh.swift:72-80`, `Game.swift` Fuel equipment base price2, and `EquipmentActorTransactions.swift:220-231`: refill actual missing fuel at two credit tenths per fuel tenth. The bounded services support genuine Avenor/Renas main-orbital admission, without a secret-port discount. Checks complete before joint account/stock mutation; an already full tank returns zero cost under the source full-refill rule. It grants no equipment or travel fuel without the required debit. Account mutation invalidates earlier freight reviews, and ordinary Food plus all identified held cargo share the actual92t hold.
 
 ## Authored checks and required execution
 
@@ -39,4 +41,4 @@ Required before acceptance: final whole-artifact source review; Dell formatting,
 
 ## Limits
 
-The transaction publishes memory only. It does not serialize a prospective game, atomically replace a save, restore validated mission/account state or test disk failure. Do not claim continuation/reload completion. General equipment purchases/refits, item firing/unfitting, other hulls, cargo trading and loss recovery remain unsupported; existing standard equipment is actual retained property. The original station geometry's documented collision and physical fidelity limits remain unchanged.
+The transaction publishes memory only. It does not serialize a prospective game, atomically replace a save, restore validated mission/account state or test disk failure. Do not claim continuation/reload completion. General equipment purchases/refits, item firing/unfitting, other hulls, other commodity trades and loss recovery remain unsupported; existing standard equipment is actual retained property. Ordinary Food commerce and paid refill are joined source with new execution pending. The original station geometry's documented collision and physical fidelity limits remain unchanged.

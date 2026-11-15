@@ -1,5 +1,7 @@
 # Meridian core: first source slice
 
+World now joins [paid station services and actual ordinary Food property](../../docs/PAID-STATION-SERVICES.md) to the same account and genuine docking context as G02. Three public World tests and two account-boundary tests are newly authored; their final joined execution remains pending on the Dell. The earlier standalone kernel pass is scoped separately.
+
 The next authored slice adds [World-owned original navigation and physical destination admission](../../docs/WORLD-NAVIGATION.md). Its fresh commander uses the single connected freight account for fuel and credits. New navigation Rust tests remain UNRUN pending the composed Dell artifact; importer checks are recorded separately.
 
 Dependency-free headless Rust source. Root owns the workspace and renderer. `World::new`, `World::step(FlightInput)` and `World::snapshot` expose the agreed integration API. One accepted step advances exactly 1/60 second. Snapshot is Copy, position is XYZ, quaternion is XYZW, forward is local +Z and up is +Y. Initial position is `[0, 0, -600]`, identity rotation and zero speed.

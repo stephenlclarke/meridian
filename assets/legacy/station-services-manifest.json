@@ -1,0 +1,55 @@
+{
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sources": {
+    "manifest": {
+      "path": "Sources/L337Core/Resources/OriginalMarkets/manifest.json",
+      "sha256": "fcc9180da8b415bb2ac0666acae197dc30f5862dac79d613fb6c6e6dfdb8e5c3"
+    },
+    "markets": {
+      "path": "Sources/L337Core/Resources/OriginalMarkets/markets.json",
+      "sha256": "4f7e7c9235f13f8151f2d53051828078f6c7d701ffd119c15031dd9137176c5d"
+    }
+  },
+  "selectedQuotes": [
+    {
+      "askTenthsCR": 226,
+      "bidTenthsCR": 208,
+      "epoch": 0,
+      "index": 0,
+      "name": "Food",
+      "stock": 128,
+      "system": 7,
+      "targetStock": 126,
+      "unit": "t",
+      "worldVersion": "l337-world-1"
+    },
+    {
+      "askTenthsCR": 216,
+      "bidTenthsCR": 196,
+      "epoch": 0,
+      "index": 0,
+      "name": "Food",
+      "stock": 112,
+      "system": 185,
+      "targetStock": 143,
+      "unit": "t",
+      "worldVersion": "l337-world-1"
+    }
+  ],
+  "output": "assets/legacy/g01-food.markets",
+  "outputSHA256": "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa",
+  "outputBytes": 46,
+  "format": "MMKT0001 + LEu16 count; rows LEu16 system, LEu32 ask/bid credit tenths, LEu64 initial stock",
+  "sourceDescriptiveStatuses": {
+    "markets-01.toml": "Private proposal only; not installed",
+    "markets-02.toml": "Private proposal only; not installed",
+    "markets-03.toml": "Private proposal only; not installed",
+    "markets-04.toml": "Private proposal only; not installed",
+    "markets-05.toml": "Private proposal only; not installed",
+    "markets-06.toml": "Private proposal only; not installed",
+    "markets-07.toml": "Private proposal only; not installed",
+    "markets-08.toml": "Private proposal only; not installed"
+  },
+  "scope": "Original initial seeds only; not live/current stock, market activation, physical admission or playable acceptance",
+  "notice": "assets/legacy/Elite-L337-MIT.txt"
+}

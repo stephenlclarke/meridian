@@ -1,6 +1,7 @@
 //! Desktop selections hold only opaque World-issued values; they grant no authority.
 use meridian_core::freight::g02::{Choice, Command, ContactDefinition, Event, JobId, Review};
 use meridian_core::navigation::SystemId;
+use meridian_core::station_services;
 use meridian_core::{FlightMode, World};
 
 #[derive(Clone, Copy)]
@@ -10,6 +11,8 @@ pub enum Action {
     Confirm,
     Back,
     Refuel,
+    BuyFood,
+    SellFood,
     Jump,
     Launch,
 }
@@ -48,6 +51,7 @@ impl Session {
                 ..
             } => {
                 if completion.is_some() {
+                    self.job = None;
                     Ok("Freight complete. 730 CR and trusted clue awarded once.".into())
                 } else {
                     Ok(format!(
@@ -84,7 +88,14 @@ impl Session {
                     .and_then(|m| m.contact)
                     .ok_or("T selects the current station contact first")?;
                 let command = match npc.definition() {
-                    ContactDefinition::Arlen => Command::ReviewOffer { actor: npc.actor() },
+                    ContactDefinition::Arlen => {
+                        if self.job.is_some() {
+                            return Err(
+                                "Complete the current freight job before accepting another".into(),
+                            );
+                        }
+                        Command::ReviewOffer { actor: npc.actor() }
+                    }
                     ContactDefinition::RenasUtilityCrew => Command::ReviewReceiving {
                         actor: npc.actor(),
                         job: self.job.ok_or("No accepted freight job in this session")?,
@@ -102,6 +113,31 @@ impl Session {
             Action::Back => {
                 self.invalidate();
                 self.freight(world, Command::Back)
+            }
+            Action::BuyFood | Action::SellFood => {
+                self.invalidate();
+                let command = match action {
+                    Action::BuyFood => station_services::Command::BuyFood,
+                    _ => station_services::Command::SellFood,
+                };
+                let event = world
+                    .request_station_service(command, world.snapshot().tick)
+                    .map_err(|e| e.to_string())?;
+                Ok(match event {
+                    station_services::Event::BoughtFood { paid_tenths, .. } => format!(
+                        "Bought one Food tonne for {}.{} CR.",
+                        paid_tenths / 10,
+                        paid_tenths % 10
+                    ),
+                    station_services::Event::SoldFood {
+                        credited_tenths, ..
+                    } => format!(
+                        "Sold one Food tonne for {}.{} CR.",
+                        credited_tenths / 10,
+                        credited_tenths % 10
+                    ),
+                    station_services::Event::Refuelled { .. } => "Fuel service complete.".into(),
+                })
             }
             Action::Refuel => {
                 self.invalidate();
@@ -218,9 +254,28 @@ impl Session {
                 None => "T: CONTACT THE CURRENT STATION CREW WHEN DOCKED".into(),
             });
         }
+        if let Some(service) = world.service_snapshot() {
+            let market = service
+                .current_market
+                .map(|quote| {
+                    format!(
+                        "BUY {}.{} / SELL {}.{} CR | STOCK {}",
+                        quote.ask_tenths / 10,
+                        quote.ask_tenths % 10,
+                        quote.bid_tenths / 10,
+                        quote.bid_tenths % 10,
+                        quote.stock
+                    )
+                })
+                .unwrap_or_else(|| "MARKET REQUIRES A SUPPORTED CURRENT BERTH".into());
+            lines.push(format!(
+                "FOOD {}T | HOLD {}/92T | {market}",
+                service.food_tonnes, service.used_tonnes
+            ));
+        }
         lines.push("W/S THRUST | ARROWS PITCH | A/D YAW | Q/E ROLL | SPACE BRAKE".into());
         lines.push(
-            "F PAID REFUEL | P PAUSE | F11 FULLSCREEN | ESC QUIT | NO SAVE IN THIS BUILD".into(),
+            "G BUY 1 FOOD | H SELL 1 FOOD | F REFUEL | P PAUSE | F11 | ESC QUIT | NO SAVE".into(),
         );
         lines
     }
@@ -380,5 +435,45 @@ mod tests {
         assert!(visible[2].contains("REVIEW: ACCEPT EIGHT"));
         assert!(visible[3].contains("ENTER CONFIRM"));
         assert!(lines.len() <= crate::hud::line_budget(640, 360));
+    }
+    #[test]
+    fn ordinary_food_ui_changes_the_real_shared_wallet_hold_and_stock() {
+        let mut world = world();
+        let mut ui = Session::default();
+        let initial = (world.service_snapshot(), world.credits_tenths());
+        assert!(ui.command(&mut world, Action::SellFood).is_err());
+        assert_eq!(initial, (world.service_snapshot(), world.credits_tenths()));
+        ui.command(&mut world, Action::BuyFood)
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(world.credits_tenths(), Some(6974));
+        assert_eq!(
+            world.service_snapshot().map(|s| (
+                s.food_tonnes,
+                s.used_tonnes,
+                s.current_market.map(|m| m.stock)
+            )),
+            Some((1, 1, Some(127)))
+        );
+        for action in [Action::Contact, Action::Review, Action::Confirm] {
+            ui.command(&mut world, action)
+                .unwrap_or_else(|e| panic!("{e}"));
+        }
+        assert!(ui.command(&mut world, Action::Review).is_err());
+        ui.command(&mut world, Action::BuyFood)
+            .unwrap_or_else(|e| panic!("{e}"));
+        ui.command(&mut world, Action::SellFood)
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(world.credits_tenths(), Some(6956));
+        assert_eq!(
+            world
+                .service_snapshot()
+                .map(|s| (s.food_tonnes, s.used_tonnes)),
+            Some((1, 9))
+        );
+        assert_eq!(
+            world.mission_snapshot().map(|m| m.freight.held_tonnes),
+            Some(8)
+        );
+        assert!(ui.lines(&world, true, None).len() <= crate::hud::line_budget(640, 360));
     }
 }
