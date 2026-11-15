@@ -1,6 +1,6 @@
 use std::{collections::HashSet, error::Error, sync::Arc, time::Instant};
 
-use meridian_core::{FlightInput, World};
+use meridian_core::{FlightInput, FlightMode, MotionRefusal, StepError, World};
 use winit::{
     application::ApplicationHandler,
     event::{ElementState, WindowEvent},
@@ -10,7 +10,21 @@ use winit::{
 };
 
 use crate::clock::FixedClock;
-use crate::renderer::Renderer;
+use crate::renderer::{Renderer, StationScene};
+
+// A catch-up frame must retain a contact reported before a later clear tick.
+fn step_frame(
+    world: &mut World,
+    input: FlightInput,
+    ticks: usize,
+) -> Result<Option<MotionRefusal>, StepError> {
+    let mut refusal = None;
+    for _ in 0..ticks {
+        world.step(input)?;
+        refusal = world.snapshot().motion_refusal.or(refusal);
+    }
+    Ok(refusal)
+}
 
 // This shell owns the World synchronously. No gameplay mutation occurs in renderer code.
 struct App {
@@ -23,12 +37,13 @@ struct App {
     last_frame: Instant,
     clock: FixedClock,
     error: Option<String>,
+    notice: Option<String>,
 }
 
 impl App {
-    fn new() -> Self {
-        Self {
-            world: World::new(),
+    fn new() -> Result<Self, Box<dyn Error>> {
+        Ok(Self {
+            world: World::at_original_station()?,
             renderer: None,
             keys: HashSet::new(),
             paused: false,
@@ -37,7 +52,8 @@ impl App {
             last_frame: Instant::now(),
             clock: FixedClock::default(),
             error: None,
-        }
+            notice: None,
+        })
     }
 
     fn fail(&mut self, event_loop: &ActiveEventLoop, error: impl ToString) {
@@ -58,6 +74,7 @@ impl App {
         self.last_frame = now;
         let active = self.focused && !self.occluded && !self.paused;
         let ticks = self.clock.ticks(elapsed, active);
+        let mut frame_refusal = None;
         if active {
             let input = FlightInput {
                 pitch: self.axis(KeyCode::ArrowUp, KeyCode::ArrowDown),
@@ -66,22 +83,52 @@ impl App {
                 throttle: self.axis(KeyCode::KeyW, KeyCode::KeyS),
                 brake: self.keys.contains(&KeyCode::Space),
             };
-            for _ in 0..ticks {
-                if let Err(error) = self.world.step(input) {
-                    self.fail(event_loop, format!("Simulation refused input: {error:?}"));
+            match step_frame(&mut self.world, input, ticks) {
+                Ok(refusal) => frame_refusal = refusal,
+                Err(error) if matches!(error, StepError::Collision | StepError::UnsafeEntry) => {
+                    self.notice = Some(error.to_string());
+                }
+                Err(error) => {
+                    self.fail(event_loop, format!("Simulation refused input: {error}"));
                     return;
                 }
             }
         }
         if let Some(renderer) = &mut self.renderer {
             let snapshot = self.world.snapshot();
+            let mode = match snapshot.mode {
+                FlightMode::Docked => "DOCKED - L launch",
+                FlightMode::Launching => "LAUNCHING",
+                FlightMode::Flight => "FLIGHT - align with the station entrance to dock",
+            };
+            let contact_notice =
+                frame_refusal
+                    .or(snapshot.motion_refusal)
+                    .map(|refusal| match refusal {
+                        MotionRefusal::StationContact => {
+                            "Station contact: stopped at last clear position"
+                        }
+                        MotionRefusal::EntryConditions => {
+                            "Entry refused: align with the entrance and slow down"
+                        }
+                    });
             renderer.window.set_title(&format!(
-                "Meridian flight prototype | speed {:.1} reference units | tick {} | {} | W/S thrust, arrows pitch, A/D yaw, Q/E roll, Space brake, P pause, F11 fullscreen",
+                "Meridian | {mode} | speed {:.1} | tick {} | {} | {} | W/S thrust, arrows pitch, A/D yaw, Q/E roll, Space brake, P pause, F11 fullscreen",
                 snapshot.speed,
                 snapshot.tick,
-                if active { "FLIGHT" } else { "PAUSED" },
+                if active { "RUNNING" } else { "PAUSED" },
+                contact_notice.or(self.notice.as_deref())
+                    .unwrap_or("Click inside to control"),
             ));
-            if let Err(error) = renderer.draw(&snapshot) {
+            let station = snapshot
+                .station
+                .zip(self.world.station_port())
+                .map(|(pose, port)| StationScene {
+                    pose,
+                    port,
+                    docked: snapshot.mode == FlightMode::Docked,
+                });
+            if let Err(error) = renderer.draw(&snapshot, station) {
                 self.fail(event_loop, error);
             }
         }
@@ -144,6 +191,20 @@ impl ApplicationHandler for App {
                         self.keys.insert(code);
                         match code {
                             KeyCode::Escape => event_loop.exit(),
+                            KeyCode::KeyL => {
+                                if self.paused {
+                                    self.notice = Some("Resume with P before launching".into());
+                                } else {
+                                    self.notice = self
+                                        .world
+                                        .request_launch(self.world.snapshot().tick)
+                                        .err()
+                                        .map(|error| error.to_string());
+                                }
+                                if let Some(renderer) = &self.renderer {
+                                    renderer.window.request_redraw();
+                                }
+                            }
                             KeyCode::KeyP => {
                                 self.paused = !self.paused;
                                 self.keys.clear();
@@ -188,10 +249,46 @@ impl ApplicationHandler for App {
 
 pub fn run() -> Result<(), Box<dyn Error>> {
     let event_loop = EventLoop::new()?;
-    let mut app = App::new();
+    let mut app = App::new()?;
     event_loop.run_app(&mut app)?;
     if let Some(error) = app.error {
         return Err(std::io::Error::other(error).into());
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use meridian_core::{FIXED_DELTA_SECONDS, FlightStart};
+
+    #[test]
+    fn catch_up_frame_keeps_entry_refusal_after_a_later_clear_tick() {
+        let mut world = World::in_flight_at_original_station(FlightStart {
+            position: [0.0, 0.0, 260.0],
+            orientation: [0.0, 1.0, 0.0, 0.0],
+            speed: 9.0,
+        })
+        .unwrap_or_else(|error| panic!("{error}"));
+        for _ in 0..100 {
+            let state = world.snapshot();
+            if state.position[2] - state.speed * 18.0 * FIXED_DELTA_SECONDS <= 136.32 {
+                break;
+            }
+            world
+                .step(FlightInput::default())
+                .unwrap_or_else(|error| panic!("{error}"));
+            assert_eq!(world.snapshot().motion_refusal, None);
+        }
+        let before = world.snapshot();
+        let notice = step_frame(&mut world, FlightInput::default(), 2)
+            .unwrap_or_else(|error| panic!("{error}"));
+        let after = world.snapshot();
+        assert_eq!(notice, Some(MotionRefusal::EntryConditions));
+        assert_eq!(after.motion_refusal, None);
+        assert_eq!(after.position, before.position);
+        assert_eq!(after.speed, 0.0);
+        assert_eq!(after.mode, FlightMode::Flight);
+        assert_eq!(after.tick, before.tick + 2);
+    }
 }

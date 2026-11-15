@@ -1,3 +1,8 @@
+use crate::docking::StationPose;
+use crate::station::{
+    DISTANCE_PER_SPEED_UNIT, FlightMode, FlightStart, MotionRefusal, OriginalStationData,
+    StationError, flight_pose,
+};
 use core::fmt;
 
 pub const FIXED_DELTA_SECONDS: f32 = 1.0 / 60.0;
@@ -41,6 +46,9 @@ pub struct Snapshot {
     pub orientation: [f32; 4],
     pub speed: f32,
     pub tick: u64,
+    pub mode: FlightMode,
+    pub station: Option<StationPose>,
+    pub motion_refusal: Option<MotionRefusal>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -49,6 +57,11 @@ pub enum StepError {
     InputOutOfRange,
     TickOverflow,
     NonFiniteState,
+    StaleCommand,
+    InvalidMode,
+    Collision,
+    UnsafeEntry,
+    UnsafeLaunch,
 }
 
 impl fmt::Display for StepError {
@@ -58,6 +71,11 @@ impl fmt::Display for StepError {
             Self::InputOutOfRange => "held flight controls must be within [-1, 1]",
             Self::TickOverflow => "simulation tick exhausted",
             Self::NonFiniteState => "flight step cannot produce a valid finite pose",
+            Self::StaleCommand => "command does not match the current simulation tick",
+            Self::InvalidMode => "command is not available in the current flight mode",
+            Self::Collision => "continuous native station clearance refused the flight step",
+            Self::UnsafeEntry => "original station entry conditions are not satisfied",
+            Self::UnsafeLaunch => "source-defined original station launch is unavailable",
         })
     }
 }
@@ -68,6 +86,7 @@ impl std::error::Error for StepError {}
 #[derive(Debug)]
 pub struct World {
     state: Snapshot,
+    station_data: Option<OriginalStationData>,
 }
 
 impl Default for World {
@@ -84,7 +103,11 @@ impl World {
                 orientation: [0.0, 0.0, 0.0, 1.0],
                 speed: 0.0,
                 tick: 0,
+                mode: FlightMode::Flight,
+                station: None,
+                motion_refusal: None,
             },
+            station_data: None,
         }
     }
 
@@ -92,13 +115,84 @@ impl World {
         self.state
     }
 
-    /// Advance exactly one 1/60-second tick. Any rejection leaves World unchanged.
+    /// Explicit authored new-commander dock context; no in-flight arrival is inferred.
+    pub fn at_original_station() -> Result<Self, StationError> {
+        Self::at_station(OriginalStationData::bundled()?)
+    }
+
+    /// Desktop can supply the byte-exact original station/hull/port binding explicitly.
+    pub fn at_station(data: OriginalStationData) -> Result<Self, StationError> {
+        data.launch_start()?;
+        let mut world = Self::new();
+        world.state.position = [0.0; 3]; // No flight body exists while docked; this is not a bay.
+        world.state.mode = FlightMode::Docked;
+        world.state.station = Some(data.station_pose());
+        world.station_data = Some(data);
+        Ok(world)
+    }
+
+    /// Validated initial flight scenario/replay input, not a mutation/teleport command.
+    pub fn in_flight_at_original_station(start: FlightStart) -> Result<Self, StationError> {
+        let data = OriginalStationData::bundled()?;
+        let norm = start.orientation.iter().map(|v| v * v).sum::<f32>();
+        if !start.speed.is_finite()
+            || !(0.0..=MAX_SPEED).contains(&start.speed)
+            || !norm.is_finite()
+            || (norm - 1.0).abs() > 1e-5
+            || !data.initial_flight_is_clear(start)
+        {
+            return Err(StationError::InvalidPose);
+        }
+        let mut world = Self::at_station(data)?;
+        world.state.position = start.position;
+        world.state.orientation = normalize(start.orientation).ok_or(StationError::InvalidPose)?;
+        world.state.speed = start.speed;
+        world.state.mode = FlightMode::Flight;
+        Ok(world)
+    }
+
+    pub fn station_port(&self) -> Option<&crate::docking::DockingPort> {
+        self.station_data.as_ref().map(OriginalStationData::port)
+    }
+
+    /// Stage the source-derived safe exterior spawn, then normal ticks finish launch.
+    /// Rejected, duplicate and stale commands leave the complete state unchanged.
+    pub fn request_launch(&mut self, expected_tick: u64) -> Result<(), StepError> {
+        if expected_tick != self.state.tick {
+            return Err(StepError::StaleCommand);
+        }
+        if self.state.mode != FlightMode::Docked {
+            return Err(StepError::InvalidMode);
+        }
+        let data = self.station_data.as_ref().ok_or(StepError::InvalidMode)?;
+        let start = data.launch_start().map_err(|_| StepError::UnsafeLaunch)?;
+        let mut next = self.state;
+        next.position = start.position;
+        next.orientation = start.orientation;
+        next.speed = start.speed;
+        next.mode = FlightMode::Launching;
+        next.motion_refusal = None;
+        self.state = next;
+        Ok(())
+    }
+
+    /// Advance exactly one 1/60-second tick. Errors leave World unchanged.
+    /// A station motion refusal is an accepted safe stop at the last clear pose,
+    /// reported through Snapshot.motion_refusal; damage/contact-response parity is pending.
     /// Rotation is local yaw, then pitch, then roll; translation uses the new pose/speed.
     /// Brake overrides throttle and uses the same reference deceleration magnitude.
     pub fn step(&mut self, input: FlightInput) -> Result<(), StepError> {
         input.validate()?;
         let mut next = self.state;
         next.tick = next.tick.checked_add(1).ok_or(StepError::TickOverflow)?;
+        next.motion_refusal = None;
+        if next.mode == FlightMode::Docked {
+            self.state = next;
+            return Ok(());
+        }
+        if !self.state.speed.is_finite() || !(0.0..=MAX_SPEED).contains(&self.state.speed) {
+            return Err(StepError::NonFiniteState);
+        }
 
         let yaw = axis_rotation(1, input.yaw * YAW_RATE * FIXED_DELTA_SECONDS);
         let pitch = axis_rotation(0, -input.pitch * PITCH_RATE * FIXED_DELTA_SECONDS);
@@ -113,11 +207,57 @@ impl World {
         next.speed =
             (next.speed + throttle * ACCELERATION * FIXED_DELTA_SECONDS).clamp(0.0, MAX_SPEED);
         let forward = forward(next.orientation);
+        let distance_scale = if self.station_data.is_some() {
+            DISTANCE_PER_SPEED_UNIT
+        } else {
+            1.0
+        };
         for (position, direction) in next.position.iter_mut().zip(forward) {
-            *position += direction * next.speed * FIXED_DELTA_SECONDS;
+            *position += direction * next.speed * FIXED_DELTA_SECONDS * distance_scale;
         }
         if !next.speed.is_finite() || next.position.iter().any(|value| !value.is_finite()) {
             return Err(StepError::NonFiniteState);
+        }
+        if let Some(data) = &self.station_data {
+            let before = flight_pose(self.state.position, self.state.orientation)
+                .ok_or(StepError::NonFiniteState)?;
+            let after =
+                flight_pose(next.position, next.orientation).ok_or(StepError::NonFiniteState)?;
+            let angular_travel = f64::from(
+                input.pitch.abs() * PITCH_RATE
+                    + input.yaw.abs() * YAW_RATE
+                    + input.roll.abs() * ROLL_RATE,
+            ) * f64::from(FIXED_DELTA_SECONDS);
+            if data.crosses_aperture(before, after) {
+                if !data.entry_clear(
+                    before,
+                    after,
+                    f64::from(next.speed * DISTANCE_PER_SPEED_UNIT),
+                    f64::from(input.roll * ROLL_RATE),
+                    angular_travel,
+                ) {
+                    let mut stopped = self.state;
+                    stopped.tick = next.tick;
+                    stopped.speed = 0.0;
+                    stopped.mode = FlightMode::Flight;
+                    stopped.motion_refusal = Some(MotionRefusal::EntryConditions);
+                    self.state = stopped;
+                    return Ok(());
+                }
+                next.mode = FlightMode::Docked;
+                next.speed = 0.0;
+            } else {
+                if !data.motion_clear(before, after, angular_travel) {
+                    let mut stopped = self.state;
+                    stopped.tick = next.tick;
+                    stopped.speed = 0.0;
+                    stopped.mode = FlightMode::Flight;
+                    stopped.motion_refusal = Some(MotionRefusal::StationContact);
+                    self.state = stopped;
+                    return Ok(());
+                }
+                next.mode = FlightMode::Flight;
+            }
         }
         self.state = next;
         Ok(())
