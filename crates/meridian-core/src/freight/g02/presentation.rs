@@ -197,7 +197,7 @@ pub fn objective(world: &World) -> Option<ObjectivePresentation> {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
-    use crate::freight::g02::{ActorId, Command, Error, Event, JobId};
+    use crate::freight::g02::{ActorId, Command, Error, Event, GoodsId, JobId};
     use crate::navigation::{BASIC_SPOOL_TICKS, DockOrigin, SystemId};
     use crate::{FlightInput, FlightMode, MissionError};
 
@@ -219,9 +219,13 @@ mod tests {
     }
 
     fn accept(world: &mut World) -> JobId {
+        accept_with_units(world).0
+    }
+
+    fn accept_with_units(world: &mut World) -> (JobId, [GoodsId; 8]) {
         let actor = select_contact(world);
         let token = issued_review(world, Command::ReviewOffer { actor });
-        let Event::Accepted { job, .. } = command(
+        let Event::Accepted { job, units } = command(
             world,
             Command::Confirm {
                 review: token,
@@ -231,7 +235,7 @@ mod tests {
         .unwrap() else {
             panic!("expected actual original allocation");
         };
-        job
+        (job, units)
     }
 
     fn fly_to_receiving_crew(world: &mut World) -> ActorId {
@@ -313,14 +317,16 @@ mod tests {
     }
 
     #[test]
-    fn abandonment_with_no_next_unit_is_never_an_offer_or_a_restock() {
+    fn abandonment_purpose_preserves_original_identity_without_restock() {
         let mut world = World::new_commander(502).unwrap();
         for remaining in [8, 0] {
-            let job = accept(&mut world);
+            let (job, units) = accept_with_units(&mut world);
             let actor = select_contact(&mut world);
             let token = issued_review(&mut world, Command::ReviewAbandonment { actor, job });
-            assert_eq!(token.next_unit(), None);
+            assert_eq!(token.next_unit(), Some(units[0]));
             assert_eq!(review(token, Choice::Accept), None);
+            assert_eq!(review(token, Choice::ReceiveOne(units[0])), None);
+            assert_eq!(review(token, Choice::ReceiveAll), None);
             let before = world.save_bytes().unwrap();
             let view = review(token, Choice::Abandon).unwrap();
             assert_eq!(view.kind, ReviewKind::Abandonment);

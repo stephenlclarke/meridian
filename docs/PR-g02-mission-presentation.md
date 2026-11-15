@@ -2,7 +2,7 @@
 
 ## Problem and behavior
 
-G02 gameplay exists, but generic review notices omit the original story and important finite-cargo terms. A review with no next unit could be either acceptance or abandonment. Add source-grounded, typed presentation so players can understand exactly which action they are reviewing and which original units remain. See [the issue](ISSUE-g02-mission-presentation.md).
+G02 gameplay exists, but generic review notices omit the original story and important finite-cargo terms. Receiving and abandonment reviews both retain the next held original unit, so next-unit presence cannot identify the selected action. Add source-grounded, typed presentation so players can understand exactly which action they are reviewing and which original units remain. See [the issue](ISSUE-g02-mission-presentation.md).
 
 ## Changes
 
@@ -16,7 +16,7 @@ No World transition, G3665 save/accounting rule, receipt, identity, cargo, rewar
 
 Four new tests exercise genuine public commands: offer/Back with no allocation or permission resurrection; real abandonment and finite exhaustion without success/restock; the actual flight/jump/physical dock and seven/eighth handovers with one/all choice distinction and cold memory continuation; and no objective for prototype worlds. Presentation is checked against unchanged encoded World bytes. The cold receiving test rejects an earlier review, uses a fresh actual crew review for the eighth, verifies one 730 CR payment/first clue and refuses repeat confirmation.
 
-Exact source-fidelity checks reproduce the original Lua offer text through only the supported 730/L1 substitutions, compare the accepted journal and receiving/abandonment text, original choice labels, identity warning and destination, and verify the existing notice against the immutable source LICENSE. Rustfmt parsing, Markdown and diff checks are source-only. All new Rust compilation/tests/Clippy and joined desktop/native acceptance remain unrun in the author lane. Existing source tests and source-review evidence are not relabelled as actual-game completion.
+Exact source-fidelity checks reproduce the original Lua offer text through only the supported 730/L1 substitutions, compare the accepted journal and receiving/abandonment text, original choice labels, identity warning and destination, and verify the existing notice against the immutable source LICENSE. Rustfmt parsing, Markdown and diff checks are source-only. The initial joined `37e2170` run [43767000952](https://github.com/stephenlclarke/meridian/actions/runs/43767000952) failed the abandonment test because it incorrectly expected `None`; the domain correctly retains `Some(next original unit)`. The corrected test uses the exact unit from its actual allocation event and retains every original guard, adding explicit receiving-choice mismatches. Production projection/domain code is unchanged. Corrected-candidate compilation/tests/Clippy and joined desktop/native acceptance remain pending through the whole joined execution lane. Existing source tests and source-review evidence are not relabelled as actual-game completion.
 
 ## Required joined acceptance
 

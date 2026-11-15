@@ -73,7 +73,7 @@
   },
   "output": {
     "path": "crates/meridian-core/src/freight/g02/presentation.rs",
-    "sha256": "35b5c26d466f5a3d6782323ba07a5611fcdcecac434cca1bec0d9c9147d14ec0"
+    "sha256": "a6979244e8dd497ab01b050b49451c4b9c67be7ff26b05b8e249dae93783d865"
   },
   "scope": {
     "sourceUnits": 16,
@@ -87,5 +87,13 @@
     "berths": 0,
     "completion": "Only the final original-unit transfer commits the job payment and first trusted family clue; no restock on loss or abandonment"
   },
-  "validation": "Authored source fidelity and rustfmt parsing only. Rust compilation/tests, joined UI and actual game acceptance remain pending; no blanket asset/rights clearance."
+  "validation": "Original text and notice fidelity remain unchanged. Prior joined run failed its incorrect test assumption; this test/docs correction has parser/source checks only and awaits whole-candidate review/execution.",
+  "knownPriorFailure": {
+    "joinedRevision": "37e21708097a57126a9ce1c10b96571313ddaaf2",
+    "run": "https://github.com/stephenlclarke/meridian/actions/runs/43767000952",
+    "finding": "The authored abandonment test incorrectly expected no next unit; the unchanged domain retains the next held original unit for both receiving and abandonment.",
+    "correction": "Compare with Some(actual Accepted.units[0]), distinguish typed purpose from acceptance and receiving choices, and preserve all original no-authority/no-restock assertions.",
+    "productionProjectionAndDomainUnchanged": true,
+    "correctedExecution": "Pending whole joined candidate, not retried unchanged."
+  }
 }
