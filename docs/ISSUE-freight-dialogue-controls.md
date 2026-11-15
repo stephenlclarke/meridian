@@ -4,7 +4,7 @@ The desktop exposes single-unit receiving but omits the original Receive-all and
 
 ## Required behavior
 
-Keep World-issued review and actor authority. V opens a receiving review for all currently held identified units at the genuine Renas contact; X opens abandonment with Arlen. Neither key commits. Enter confirms the displayed choice, and B cancels. Abandonment must release the local active-job selection without replenishing the finite source or granting rewards. Preserve the existing eight single-unit receiving path and all save semantics.
+Keep World-issued review and actor authority. V opens a receiving review for all currently held identified units at the genuine Renas contact; X opens abandonment with Arlen. I shows current mission details and invalidates any local pending confirmation. Neither V nor X commits. Enter confirms the displayed choice, and B cancels. Abandonment must release the local active-job selection without replenishing the finite source or granting rewards. Preserve the existing eight single-unit receiving path and all save semantics.
 
 ## Validation and limits
 

@@ -1,4 +1,5 @@
 //! Desktop selections hold only opaque World-issued values; they grant no authority.
+use meridian_core::freight::g02::presentation;
 use meridian_core::freight::g02::{Choice, Command, ContactDefinition, Event, JobId, Review};
 use meridian_core::navigation::SystemId;
 use meridian_core::station_services;
@@ -10,6 +11,7 @@ pub enum Action {
     Review,
     ReviewAll,
     ReviewAbandonment,
+    MissionDetails,
     Confirm,
     Back,
     Refuel,
@@ -23,6 +25,7 @@ pub enum Action {
 pub struct Session {
     job: Option<JobId>,
     pending: Option<(Review, Choice)>,
+    show_objective: bool,
 }
 
 impl Session {
@@ -30,11 +33,13 @@ impl Session {
         Self {
             job: world.active_freight_job(),
             pending: None,
+            show_objective: false,
         }
     }
 
     pub fn invalidate(&mut self) {
         self.pending = None;
+        self.show_objective = false;
     }
 
     fn freight(&mut self, world: &mut World, command: Command) -> Result<String, String> {
@@ -65,7 +70,7 @@ impl Session {
             } => {
                 if completion.is_some() {
                     self.job = None;
-                    Ok("Freight complete. 730 CR and trusted clue awarded once.".into())
+                    Ok("Freight complete. 730 CR settled. First family clue recorded; no repeat settlement.".into())
                 } else {
                     Ok(format!(
                         "One tonne received. {remaining} remain; R reviews the next unit."
@@ -80,8 +85,51 @@ impl Session {
         }
     }
 
+    fn review_command(&mut self, world: &mut World, action: Action) -> Result<String, String> {
+        self.invalidate();
+        let npc = world
+            .mission_snapshot()
+            .and_then(|m| m.contact)
+            .ok_or("T selects the current station contact first")?;
+        let command = match (action, npc.definition()) {
+            (Action::ReviewAbandonment, ContactDefinition::Arlen) => Command::ReviewAbandonment {
+                actor: npc.actor(),
+                job: self.job.ok_or("No active freight job to abandon")?,
+            },
+            (Action::Review, ContactDefinition::Arlen) => {
+                if self.job.is_some() {
+                    return Err("Complete the current freight job before accepting another".into());
+                }
+                Command::ReviewOffer { actor: npc.actor() }
+            }
+            (Action::Review | Action::ReviewAll, ContactDefinition::RenasUtilityCrew) => {
+                Command::ReviewReceiving {
+                    actor: npc.actor(),
+                    job: self.job.ok_or("No accepted freight job in this session")?,
+                }
+            }
+            _ => {
+                return Err(
+                    "V reviews receiving at Renas; X reviews abandonment with Arlen".into(),
+                );
+            }
+        };
+        let message = self.freight(world, command)?;
+        if matches!(action, Action::ReviewAll)
+            && let Some((_, choice)) = self.pending.as_mut()
+        {
+            *choice = Choice::ReceiveAll;
+        }
+        Ok(message)
+    }
+
     pub fn command(&mut self, world: &mut World, action: Action) -> Result<String, String> {
         match action {
+            Action::MissionDetails => {
+                self.invalidate();
+                self.show_objective = true;
+                Ok("Mission details. T contacts crew; R opens a new review.".into())
+            }
             Action::Contact => {
                 self.invalidate();
                 let npc = world
@@ -98,45 +146,7 @@ impl Session {
                 ))
             }
             Action::Review | Action::ReviewAll | Action::ReviewAbandonment => {
-                self.invalidate();
-                let npc = world
-                    .mission_snapshot()
-                    .and_then(|m| m.contact)
-                    .ok_or("T selects the current station contact first")?;
-                let command = match (action, npc.definition()) {
-                    (Action::ReviewAbandonment, ContactDefinition::Arlen) => {
-                        Command::ReviewAbandonment {
-                            actor: npc.actor(),
-                            job: self.job.ok_or("No active freight job to abandon")?,
-                        }
-                    }
-                    (Action::Review, ContactDefinition::Arlen) => {
-                        if self.job.is_some() {
-                            return Err(
-                                "Complete the current freight job before accepting another".into(),
-                            );
-                        }
-                        Command::ReviewOffer { actor: npc.actor() }
-                    }
-                    (Action::Review | Action::ReviewAll, ContactDefinition::RenasUtilityCrew) => {
-                        Command::ReviewReceiving {
-                            actor: npc.actor(),
-                            job: self.job.ok_or("No accepted freight job in this session")?,
-                        }
-                    }
-                    _ => {
-                        return Err(
-                            "V reviews receiving at Renas; X reviews abandonment with Arlen".into(),
-                        );
-                    }
-                };
-                let message = self.freight(world, command)?;
-                if matches!(action, Action::ReviewAll)
-                    && let Some((_, choice)) = self.pending.as_mut()
-                {
-                    *choice = Choice::ReceiveAll;
-                }
-                Ok(message)
+                self.review_command(world, action)
             }
             Action::Confirm => {
                 let (review, choice) = self
@@ -207,6 +217,36 @@ impl Session {
         }
     }
 
+    fn append_mission_panel(&self, world: &World, lines: &mut Vec<String>) -> bool {
+        if let Some((review, choice)) = self.pending
+            && let Some(dialogue) = presentation::review(review, choice)
+        {
+            append_paragraph(lines, dialogue.body);
+            append_paragraph(lines, dialogue.notice);
+            return true;
+        }
+        if self.show_objective
+            && let Some(objective) = presentation::objective(world)
+        {
+            append_paragraph(lines, objective.description);
+            if matches!(
+                objective.kind,
+                presentation::ObjectiveKind::DeliverOriginals
+            ) {
+                append_paragraph(lines, presentation::ACCEPTED_JOURNAL);
+            }
+            append_paragraph(lines, presentation::IDENTITY_NOTICE);
+            lines.push(format!(
+                "ORIGINAL TONNES HELD {} | UNALLOCATED SOURCE {} | COMPLETED JOBS {}",
+                objective.held_original_tonnes,
+                objective.available_source_units,
+                objective.completed_jobs
+            ));
+            return true;
+        }
+        false
+    }
+
     pub fn lines(&self, world: &World, active: bool, notice: Option<&str>) -> Vec<String> {
         let snapshot = world.snapshot();
         let name = snapshot
@@ -261,6 +301,9 @@ impl Session {
         lines.push(
             "L LAUNCH | J JUMP | T CONTACT | R REVIEW | V RECEIVE ALL | X ABANDON | ENTER CONFIRM | B BACK".into(),
         );
+        if self.append_mission_panel(world, &mut lines) {
+            return lines;
+        }
         let credit = world.credits_tenths().unwrap_or(0);
         if let Some(navigation) = snapshot.navigation {
             lines.push(format!(
@@ -319,8 +362,25 @@ impl Session {
         }
         lines.push("W/S THRUST | ARROWS PITCH | A/D YAW | Q/E ROLL | SPACE BRAKE".into());
         lines.push("G BUY 1 FOOD | H SELL 1 FOOD | F REFUEL | P PAUSE | F11 FULLSCREEN".into());
-        lines.push("F5 SAVE | F9 RELOAD SAVE | ESC SAVE AND QUIT".into());
+        lines.push("I MISSION DETAILS | F5 SAVE | F9 RELOAD SAVE | ESC SAVE AND QUIT".into());
         lines
+    }
+}
+
+/// Original fixed dialogue is word-wrapped before the renderer's column bound.
+fn append_paragraph(lines: &mut Vec<String>, paragraph: &str) {
+    let mut line = String::new();
+    for word in paragraph.split_whitespace() {
+        if !line.is_empty() && line.len() + 1 + word.len() > crate::hud::MAX_COLUMNS {
+            lines.push(std::mem::take(&mut line));
+        }
+        if !line.is_empty() {
+            line.push(' ');
+        }
+        line.push_str(word);
+    }
+    if !line.is_empty() {
+        lines.push(line);
     }
 }
 
@@ -607,5 +667,60 @@ mod tests {
                 assert!(ui.command(&mut world, Action::Review).is_err());
             }
         }
+    }
+    #[test]
+    fn original_terms_fit_the_review_and_details_cannot_confirm_a_hidden_review() {
+        let mut world = world();
+        let mut ui = Session::default();
+        for action in [Action::Contact, Action::Review] {
+            ui.command(&mut world, action)
+                .unwrap_or_else(|e| panic!("{e}"));
+        }
+        let before = (
+            world.snapshot(),
+            world.mission_snapshot(),
+            world.credits_tenths(),
+        );
+        let lines = ui.lines(&world, true, None);
+        assert!(lines.len() <= crate::hud::line_budget(640, 360));
+        assert!(
+            lines
+                .iter()
+                .all(|line| line.len() <= crate::hud::MAX_COLUMNS)
+        );
+        let terms = lines[4..].join(" ");
+        assert!(terms.contains(presentation::OFFER_BRIEFING));
+        assert!(terms.contains(presentation::IDENTITY_NOTICE));
+        assert_eq!(
+            before,
+            (
+                world.snapshot(),
+                world.mission_snapshot(),
+                world.credits_tenths()
+            )
+        );
+        ui.command(&mut world, Action::MissionDetails)
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert!(ui.command(&mut world, Action::Confirm).is_err());
+        assert_eq!(
+            world.mission_snapshot().map(|m| m.freight.held_tonnes),
+            Some(0)
+        );
+        for action in [Action::Review, Action::Confirm, Action::MissionDetails] {
+            ui.command(&mut world, action)
+                .unwrap_or_else(|e| panic!("{e}"));
+        }
+        let details = ui.lines(&world, true, None);
+        assert!(details.len() <= crate::hud::line_budget(640, 360));
+        assert!(
+            details
+                .iter()
+                .all(|line| line.len() <= crate::hud::MAX_COLUMNS)
+        );
+        assert!(
+            details[4..]
+                .join(" ")
+                .contains(presentation::ACCEPTED_JOURNAL)
+        );
     }
 }
