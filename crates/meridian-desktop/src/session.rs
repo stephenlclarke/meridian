@@ -8,6 +8,8 @@ use meridian_core::{FlightMode, World};
 pub enum Action {
     Contact,
     Review,
+    ReviewAll,
+    ReviewAbandonment,
     Confirm,
     Back,
     Refuel,
@@ -41,10 +43,14 @@ impl Session {
             .map_err(|e| e.to_string())?;
         match event {
             Event::Reviewed(review) => {
-                let choice = review
-                    .next_unit()
-                    .map(Choice::ReceiveOne)
-                    .unwrap_or(Choice::Accept);
+                let choice = match command {
+                    Command::ReviewOffer { .. } => Choice::Accept,
+                    Command::ReviewAbandonment { .. } => Choice::Abandon,
+                    Command::ReviewReceiving { .. } => Choice::ReceiveOne(
+                        review.next_unit().ok_or("No identified unit to receive")?,
+                    ),
+                    _ => return Err("Unexpected freight review response".into()),
+                };
                 self.pending = Some((review, choice));
                 Ok("Review ready. Enter confirms; B cancels.".into())
             }
@@ -67,7 +73,10 @@ impl Session {
                 }
             }
             Event::Back => Ok("Review cancelled.".into()),
-            Event::Abandoned { .. } => Ok("Freight abandoned.".into()),
+            Event::Abandoned { .. } => {
+                self.job = None;
+                Ok("Freight abandoned. Allocated units are not restocked.".into())
+            }
         }
     }
 
@@ -88,14 +97,20 @@ impl Session {
                     npc.name()
                 ))
             }
-            Action::Review => {
+            Action::Review | Action::ReviewAll | Action::ReviewAbandonment => {
                 self.invalidate();
                 let npc = world
                     .mission_snapshot()
                     .and_then(|m| m.contact)
                     .ok_or("T selects the current station contact first")?;
-                let command = match npc.definition() {
-                    ContactDefinition::Arlen => {
+                let command = match (action, npc.definition()) {
+                    (Action::ReviewAbandonment, ContactDefinition::Arlen) => {
+                        Command::ReviewAbandonment {
+                            actor: npc.actor(),
+                            job: self.job.ok_or("No active freight job to abandon")?,
+                        }
+                    }
+                    (Action::Review, ContactDefinition::Arlen) => {
                         if self.job.is_some() {
                             return Err(
                                 "Complete the current freight job before accepting another".into(),
@@ -103,12 +118,25 @@ impl Session {
                         }
                         Command::ReviewOffer { actor: npc.actor() }
                     }
-                    ContactDefinition::RenasUtilityCrew => Command::ReviewReceiving {
-                        actor: npc.actor(),
-                        job: self.job.ok_or("No accepted freight job in this session")?,
-                    },
+                    (Action::Review | Action::ReviewAll, ContactDefinition::RenasUtilityCrew) => {
+                        Command::ReviewReceiving {
+                            actor: npc.actor(),
+                            job: self.job.ok_or("No accepted freight job in this session")?,
+                        }
+                    }
+                    _ => {
+                        return Err(
+                            "V reviews receiving at Renas; X reviews abandonment with Arlen".into(),
+                        );
+                    }
                 };
-                self.freight(world, command)
+                let message = self.freight(world, command)?;
+                if matches!(action, Action::ReviewAll)
+                    && let Some((_, choice)) = self.pending.as_mut()
+                {
+                    *choice = Choice::ReceiveAll;
+                }
+                Ok(message)
             }
             Action::Confirm => {
                 let (review, choice) = self
@@ -202,15 +230,24 @@ impl Session {
                 "PAUSED / UNFOCUSED"
             }
         )];
-        let review_line = if let Some((review, _)) = self.pending {
-            match review.next_unit() {
-                Some(unit) => format!(
+        let review_line = if let Some((review, choice)) = self.pending {
+            match choice {
+                Choice::ReceiveOne(unit) => format!(
                     "REVIEW: RECEIVE UNIT {} | {} REMAIN | ENTER CONFIRMS, B CANCELS",
                     unit.serial(),
                     review.remaining_units()
                 ),
-                None => "REVIEW: ACCEPT EIGHT TONNES FOR RENAS | 730 CR ON COMPLETION | ENTER / B"
-                    .into(),
+                Choice::ReceiveAll => format!(
+                    "REVIEW: RECEIVE ALL {} IDENTIFIED TONNES | ENTER CONFIRMS, B CANCELS",
+                    review.remaining_units()
+                ),
+                Choice::Abandon => {
+                    "REVIEW: ABANDON FREIGHT | NO REWARD OR RESTOCK | ENTER / B".into()
+                }
+                Choice::Accept => {
+                    "REVIEW: ACCEPT EIGHT TONNES FOR RENAS | 730 CR ON COMPLETION | ENTER / B"
+                        .into()
+                }
             }
         } else {
             "T SELECTS THE CURRENT CONTACT; R OPENS A REVIEW BEFORE ENTER CAN CONFIRM".into()
@@ -222,7 +259,7 @@ impl Session {
         );
         lines.push(review_line);
         lines.push(
-            "L LAUNCH | J AVENOR/RENAS JUMP | T CONTACT | R REVIEW | ENTER CONFIRM | B BACK".into(),
+            "L LAUNCH | J JUMP | T CONTACT | R REVIEW | V RECEIVE ALL | X ABANDON | ENTER CONFIRM | B BACK".into(),
         );
         let credit = world.credits_tenths().unwrap_or(0);
         if let Some(navigation) = snapshot.navigation {
@@ -345,8 +382,7 @@ mod tests {
             )
         );
     }
-    #[test]
-    fn actual_desktop_commands_deliver_eight_units_after_public_flight_and_entry() {
+    fn arrive_with_identified_freight() -> (World, Session) {
         use meridian_core::FlightInput;
         use meridian_core::navigation::{BASIC_SPOOL_TICKS, DockOrigin};
         let mut world = world();
@@ -399,6 +435,12 @@ mod tests {
         );
         ui.command(&mut world, Action::Contact)
             .unwrap_or_else(|e| panic!("{e}"));
+        (world, ui)
+    }
+
+    #[test]
+    fn actual_desktop_commands_deliver_eight_units_after_public_flight_and_entry() {
+        let (mut world, mut ui) = arrive_with_identified_freight();
         for index in 0..8 {
             ui.command(&mut world, Action::Review)
                 .unwrap_or_else(|e| panic!("{e}"));
@@ -481,5 +523,89 @@ mod tests {
             Some(8)
         );
         assert!(ui.lines(&world, true, None).len() <= crate::hud::line_budget(640, 360));
+    }
+    #[test]
+    fn receive_all_requires_review_and_settles_the_real_job_once() {
+        let (mut world, mut ui) = arrive_with_identified_freight();
+        ui.command(&mut world, Action::ReviewAll)
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(
+            world.mission_snapshot().map(|m| m.freight.held_tonnes),
+            Some(8)
+        );
+        assert_eq!(world.credits_tenths(), Some(7200));
+        assert!(ui.lines(&world, true, None)[2].contains("RECEIVE ALL 8"));
+        ui.command(&mut world, Action::Back)
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert!(ui.command(&mut world, Action::Confirm).is_err());
+        ui.command(&mut world, Action::ReviewAll)
+            .unwrap_or_else(|e| panic!("{e}"));
+        ui.command(&mut world, Action::Confirm)
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(
+            world.mission_snapshot().map(|m| m.freight.held_tonnes),
+            Some(0)
+        );
+        assert_eq!(world.credits_tenths(), Some(14500));
+        assert!(
+            world
+                .mission_snapshot()
+                .and_then(|m| m.freight.clue)
+                .is_some()
+        );
+        assert!(ui.command(&mut world, Action::Confirm).is_err());
+        assert!(ui.command(&mut world, Action::ReviewAll).is_err());
+        assert_eq!(world.credits_tenths(), Some(14500));
+    }
+
+    #[test]
+    fn abandonment_is_an_explicit_cancellable_review_and_never_restocks() {
+        let mut world = world();
+        let mut ui = Session::default();
+        for action in [Action::ReviewAll, Action::ReviewAbandonment] {
+            assert!(ui.command(&mut world, action).is_err());
+        }
+        ui.command(&mut world, Action::Contact)
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert!(ui.command(&mut world, Action::ReviewAll).is_err());
+        assert!(ui.command(&mut world, Action::ReviewAbandonment).is_err());
+        for index in 0..2 {
+            for action in [Action::Review, Action::Confirm, Action::ReviewAbandonment] {
+                ui.command(&mut world, action)
+                    .unwrap_or_else(|e| panic!("{e}"));
+            }
+            assert_eq!(
+                world.mission_snapshot().map(|m| m.freight.held_tonnes),
+                Some(8)
+            );
+            assert!(ui.lines(&world, true, None)[2].contains("ABANDON FREIGHT"));
+            ui.command(&mut world, Action::Back)
+                .unwrap_or_else(|e| panic!("{e}"));
+            assert!(ui.command(&mut world, Action::Confirm).is_err());
+            ui.command(&mut world, Action::ReviewAbandonment)
+                .unwrap_or_else(|e| panic!("{e}"));
+            ui.command(&mut world, Action::Confirm)
+                .unwrap_or_else(|e| panic!("{e}"));
+            assert!(ui.job.is_none());
+            assert_eq!(
+                world.mission_snapshot().map(|m| m.freight.held_tonnes),
+                Some(0)
+            );
+            assert_eq!(world.credits_tenths(), Some(7200));
+            assert!(
+                world
+                    .mission_snapshot()
+                    .and_then(|m| m.freight.clue)
+                    .is_none()
+            );
+            if index == 1 {
+                let saved = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+                world = World::from_save_bytes(&saved).unwrap_or_else(|e| panic!("{e}"));
+                ui = Session::from_world(&world);
+                ui.command(&mut world, Action::Contact)
+                    .unwrap_or_else(|e| panic!("{e}"));
+                assert!(ui.command(&mut world, Action::Review).is_err());
+            }
+        }
     }
 }

@@ -196,6 +196,8 @@ impl App {
             KeyCode::KeyJ => Action::Jump,
             KeyCode::KeyT => Action::Contact,
             KeyCode::KeyR => Action::Review,
+            KeyCode::KeyV => Action::ReviewAll,
+            KeyCode::KeyX => Action::ReviewAbandonment,
             KeyCode::Enter => Action::Confirm,
             KeyCode::KeyB => Action::Back,
             KeyCode::KeyF => Action::Refuel,

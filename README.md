@@ -48,3 +48,7 @@ The next complete source candidate adds a title with N for a new commander and C
 Meridian's new code is proprietary/source-visible under [LICENSE](LICENSE). The public repository permits inspection under GitHub's terms; it is not a permissive open-source grant. Separately licensed original L337 assets retain their applicable notices. Only verified original project-authored assets are eligible for reuse; original Elite/Oolite or other third-party art, models, textures, audio and fonts are excluded.
 
 GitHub Actions checks formatting, workspace compilation, tests and strict Clippy on Linux, Windows and macOS. It also runs the asset/import tests and documentation lint, and produces Rust LCOV, Clippy JSON and Python coverage reports. SonarQube Cloud analysis publishes only from committed `main`, uses the exact commit SHA as the analysis version, verifies the effective Previous version new-code policy and waits for the quality gate. Badges show the service's measured status; passing headless checks do not imply native GPU or full playable acceptance.
+
+## Freight dialogue and explicit choices candidate
+
+The next source slice adds V to review receiving all held mission units and X to review abandonment with Arlen. Enter confirms the displayed choice; B cancels. Original contract dialogue is being joined with the existing mission owner. These controls are authored and unqualified until the complete artifact passes review and validation; see [the implementation packet](docs/PR-freight-dialogue-controls.md).
