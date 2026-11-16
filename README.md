@@ -96,5 +96,4 @@ In the next-preview development candidate, `/` toggles controls help and ordinar
 
 The [planet and sun implementation](docs/CELESTIAL-SHADING.md) binds core-owned bodies and procedural surfaces, with swept flight safety and explicit native acceptance limits.
 
-
 The next preview is under development: cockpit HUD, five docked pages and durable modular equipment controls are composed in source. This is not a new playable release. See [docked preview integration](docs/DOCKED-PREVIEW.md) for controls, exact scope and pending native acceptance.

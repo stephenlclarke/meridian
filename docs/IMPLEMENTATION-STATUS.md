@@ -133,5 +133,4 @@ The current candidate joins the cockpit HUD with the first paid-missile equipmen
 
 The candidate also joins the actual World-owned planet/sun provider and WGSL shading. The source owner passed 200 core and ten focused desktop tests on its isolated source; these do not qualify the composed equipment/HUD candidate. Composed rendering uses complete projectile slices together with the celestial scene and cockpit. The new Profile cold-continuation test checks the unchanged disk save and all gameplay snapshots, and rejects a pre-Continue fitting review; it deliberately permits the existing review-authority rotation. All composed Rust tests and native visuals remain unrun.
 
-
 The next-preview source now composes the five docked GPU pages, current-world planet preview, semantic keyboard/mouse host, durable market/cargo/module/ammunition actions and compact cockpit. G1 adapter focused tests passed on its own frozen source; the Root composition has not compiled or run and requires one whole review followed by owning platform/native qualification. Full equipment, ship exchange, mining/salvage/bounties and mission expansion remain open.

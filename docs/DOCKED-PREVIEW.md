@@ -8,7 +8,6 @@ The Profile publishes complete prepared saves before committing ammunition, modu
 
 The preview does not claim the complete equipment catalogue, all ships, mining, bounties or new missions. Those requirements remain open. Catalogued ships are separate from admitted model and ship-exchange authority. Real current-format save, cold Continue, failed publication and actual Mac keyboard/mouse/render tests are required after the complete source review.
 
-
 ## Controls and qualification
 
 While docked, 1 through 5 select galaxy, system, showroom, trading and equipment. M opens trading and O opens equipment. Arrow keys, Tab/Shift+Tab, Enter and Escape navigate; / opens search. G/H buy and sell, Y/U fit and store, and ] changes equipment slot. The page displays the available bindings. Mouse clicks, wheel scrolling and chart/model dragging use logical coordinates. Only admitted world routes can be selected for the subsequent J jump. Unavailable ships cannot be exchanged.
