@@ -1,7 +1,0 @@
-# Fly actual finite starter missiles
-
-The core now binds explicit current practice lock, arm and release to the actual highest compatible owned pylon round. It removes that item once, retains it in a distinct World-owned projectile origin and advances source missile guidance and swept contacts at fixed ticks. Native station/player effects use the existing ordinary-impact owner; exact practice hits remain harmless. Pulse and missile rays see live missile bodies, and actual pending launch/end state controls ceasefire credit.
-
-The original seven-vertex programmatic geometry is closed against all 171 catalogue definitions and preserving activation constructors. No new asset is imported. The current v7 save boundary explicitly refuses armed, locked or used missile state, including ended history, before saving or replacing a World. Untouched v4-v7 saved inventories retain their original physical items. This slice does not claim full T02 continuation or live player-hit acceptance.
-
-Ten meaningful regressions are authored and unrun. Rustfmt parser/format, source correspondence and whitespace checks are the author-lane checks; compiler/tests/Clippy and native acceptance remain pending. Root owns desktop controls/HUD/rendering and the new `PulseContact::Projectile` notice arm. G2 reviews the complete source/tests/criteria/binding packet before execution. See [full rules and limits](FINITE-STARTER-MISSILES.md) and [the problem](ISSUE-finite-starter-missiles.md).

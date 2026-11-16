@@ -1,5 +1,7 @@
 # Meridian: legacy-source milestones for a fresh Rust successor
 
+Historical feature contract and author-stage notes. For current delivered behavior, exact validation and open limits, read [implementation status](IMPLEMENTATION-STATUS.md). Earlier UNRUN statements below apply to the original handoff, not the latest delivered source.
+
 Prepared 15 November 2026 from immutable legacy commit `a11fe16924d87d06021816f9037952afcbac08db` at `/Volumes/SSD/offload/l337-g1-pr335-equipment-compose.UtqLRJ/required-cold-runtime.a11fe169/elite`. Source reading only: no compiler, native app, tests, profiling or probes were run. This is a proposed implementation sequence, not a playable-completion claim. G1's existing cold548/app delivery and G4's MBA fleet lane remain separate and untouched. Root owns architecture and the isolated `/Users/sclarke/github/meridian` repository.
 
 The human-selected direction is a Rust simulation with a direct **wgpu** renderer, without Unity, Godot or Bevy. **winit** is the proposed desktop shell, not a newly verified dependency/version choice. The milestone boundaries below describe game behavior and can remain stable while Root finalizes Rust crate boundaries and renderer details.

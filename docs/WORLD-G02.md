@@ -1,5 +1,7 @@
 # World G02 freight journey
 
+Historical feature contract and author-stage notes. For current delivered behavior, exact validation and open limits, read [implementation status](IMPLEMENTATION-STATUS.md). Earlier UNRUN statements below apply to the original handoff, not the latest delivered source.
+
 Status: World integration and three public-command journey/refusal tests are authored. Formatting, compilation, Clippy and test execution are UNRUN on this source. No desktop interaction, native graphics or save/reload acceptance is claimed. This successor starts at navigation commit `9e22d877dbcbce559a41a3baed165ff7da536dec`, tree `6457d430e6963b3fd31f9bfcabea9401eea51a3e`, which includes the frozen owned-starter packet and station main.
 
 ## Actual ownership and authority

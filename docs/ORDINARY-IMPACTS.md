@@ -1,5 +1,7 @@
 # Ordinary impacts and T02 failure
 
+Historical feature contract and author-stage notes. For current delivered behavior, exact validation and open limits, read [implementation status](IMPLEMENTATION-STATUS.md). Earlier UNRUN statements below apply to the original handoff, not the latest delivered source.
+
 This core predecessor starts at exact main `51dcc129351fd216724366f27cd6af474b4a42c5`. It binds the existing actual front Pulse command to ordinary main-station impacts and permanent T02 failure. Source and tests are authored; compilation, tests, strict Clippy and desktop acceptance are unrun in the author lane.
 
 ## Immutable original rules

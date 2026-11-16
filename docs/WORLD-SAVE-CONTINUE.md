@@ -1,5 +1,7 @@
 # World save and continue
 
+Historical feature contract and author-stage notes. For current delivered behavior, exact validation and open limits, read [implementation status](IMPLEMENTATION-STATUS.md). Earlier UNRUN statements below apply to the original handoff, not the latest delivered source.
+
 Historical save-core source status: version-one encoding, decoding, semantic validation and six round-trip/tamper tests were authored on paid-services base `5531b8407fd690ca5a5f4155014574a6838c4de1`. Rustfmt parsing/formatting passes. Compilation, Rust tests, Clippy, remote quality checks and native UI acceptance are UNRUN on this exact successor. No filesystem operation or actual process quit/Continue has been performed by this implementation.
 
 ## Public memory API
