@@ -10,6 +10,14 @@ pub fn view_name(view: FlightView) -> &'static str {
     }
 }
 
+pub fn review_title(action: FlightReceptionAction) -> &'static str {
+    match action {
+        FlightReceptionAction::Accept => "FLIGHT LESSON CONSENT",
+        FlightReceptionAction::Receive => "FLIGHT LESSON RECEPTION",
+        FlightReceptionAction::Cancel => "CANCEL FLIGHT LESSON",
+    }
+}
+
 pub fn terms(action: FlightReceptionAction) -> &'static str {
     match action {
         FlightReceptionAction::Accept => {

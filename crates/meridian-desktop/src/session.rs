@@ -178,6 +178,39 @@ impl Session {
         Ok(message)
     }
 
+    fn review_flight_lesson(&mut self, world: &World, action: Action) -> Result<String, String> {
+        self.invalidate();
+        let kind = if matches!(action, Action::CancelFlightLesson) {
+            FlightReceptionAction::Cancel
+        } else if world
+            .flight_reception_snapshot()
+            .is_some_and(|s| s.active.is_some())
+        {
+            FlightReceptionAction::Receive
+        } else {
+            FlightReceptionAction::Accept
+        };
+        self.pending_flight = Some(
+            world
+                .review_flight_reception(kind, world.snapshot().tick)
+                .map_err(|e| e.to_string())?,
+        );
+        Ok("Flight lesson review ready. Enter confirms and saves; B cancels.".into())
+    }
+
+    fn append_flight_lesson_panel(&self, world: &World, lines: &mut Vec<String>) -> bool {
+        if let Some(review) = self.pending_flight {
+            lines.push(self.review_line());
+            append_paragraph(lines, crate::flight_lesson::terms(review.action()));
+            true
+        } else if self.show_flight_lesson {
+            crate::flight_lesson::append_details(world, lines);
+            true
+        } else {
+            false
+        }
+    }
+
     pub fn command(&mut self, world: &mut World, action: Action) -> Result<String, String> {
         if self.pending_flight.take().is_some() && matches!(action, Action::Back) {
             return Ok("Flight lesson review cancelled.".into());
@@ -187,23 +220,7 @@ impl Session {
         }
         match action {
             Action::ReviewFlightLesson | Action::CancelFlightLesson => {
-                self.invalidate();
-                let kind = if matches!(action, Action::CancelFlightLesson) {
-                    FlightReceptionAction::Cancel
-                } else if world
-                    .flight_reception_snapshot()
-                    .is_some_and(|s| s.active.is_some())
-                {
-                    FlightReceptionAction::Receive
-                } else {
-                    FlightReceptionAction::Accept
-                };
-                self.pending_flight = Some(
-                    world
-                        .review_flight_reception(kind, world.snapshot().tick)
-                        .map_err(|e| e.to_string())?,
-                );
-                Ok("Flight lesson review ready. Enter confirms and saves; B cancels.".into())
+                self.review_flight_lesson(world, action)
             }
             Action::FlightLessonDetails => {
                 self.invalidate();
@@ -428,8 +445,8 @@ impl Session {
     fn review_line(&self) -> String {
         if let Some(review) = self.pending_flight {
             return format!(
-                "FLIGHT LESSON {:?} | ENTER CONFIRMS AND SAVES | B CANCELS",
-                review.action()
+                "{} | ENTER CONFIRMS AND SAVES | B CANCELS",
+                crate::flight_lesson::review_title(review.action())
             );
         }
         if let Some(selection) = self.pending_practice {
@@ -502,23 +519,15 @@ impl Session {
                 .unwrap_or("CLICK THE FLIGHT VIEW TO FOCUS THE CONTROLS")
                 .to_string(),
         );
+        if self.append_flight_lesson_panel(world, &mut lines) {
+            return lines;
+        }
         let compact_flight = snapshot.mode == FlightMode::Flight
-            && self.pending_flight.is_none()
-            && !self.show_flight_lesson
             && self.pending_practice.is_none()
             && self.pending.is_none()
             && !self.show_objective
             && !self.equipment_open
             && !self.market_open;
-        if let Some(review) = self.pending_flight {
-            lines.push(review_line);
-            append_paragraph(&mut lines, crate::flight_lesson::terms(review.action()));
-            return lines;
-        }
-        if self.show_flight_lesson {
-            crate::flight_lesson::append_details(world, &mut lines);
-            return lines;
-        }
         if !compact_flight {
             lines.push(review_line);
             lines.push(self.panel_controls().into());

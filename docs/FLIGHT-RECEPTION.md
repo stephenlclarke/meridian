@@ -1,6 +1,6 @@
 # Original T01 flight and reception
 
-This is an authored core successor to the qualified Gunnery Attempts Preview, rooted at protected main `aa1cee02ecffa6be835137c2aa5d208054fb28d8`. Its tests have not run. Desktop joining, whole review, exact-source compiler/Clippy/Sonar and actual native acceptance remain pending. It does not change the installed or published v9 app or its profiles.
+This is an authored joined successor to the qualified Gunnery Attempts Preview, rooted at protected main `aa1cee02ecffa6be835137c2aa5d208054fb28d8`. Its tests have not run. Whole review, exact-source compiler/Clippy/Sonar and actual native acceptance remain pending. It does not change the installed or published v9 app or its profiles.
 
 ## Immutable source and independent expectations
 
