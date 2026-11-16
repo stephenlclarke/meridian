@@ -67,6 +67,8 @@ The 29 authored Rust tests cover source taxonomy/G01 parity, malformed reference
 
 G1's first compiler attempt against `7b9e2738b9e000b809a32c0dc0c8b4b0b3c6598e` failed with E0004: `control` did not match `ReviewConfirm` and `ReviewCancel`. The revised source explicitly handles both: confirmation uses the existing current-review and pause checks, cancellation uses only the current review token, and either control without a current review is ignored. The earlier failed result remains evidence; the correction still needs compilation and test execution on G1's owned lane.
 
+G1's next compiler attempt against `28370eb9fb1e7c9978ba86fd246c175cbe420523` failed with E0624: the new no-current-review regression test called private `control` from its sibling test module. The test now creates an actual modal frame, removes current review authority and sends both pointer clicks through public `handle`, retaining the assertion that neither emits a request. Method visibility and production behavior are unchanged. Compilation and all 29 tests still need execution on G1's lane.
+
 Root's full review/join packet must include this implementation, its tests, [INTEGRATION.json](INTEGRATION.json), the exact commit/delta and the actual G3/G4/MC1/G1 binding changes. G1 owns Mac compilation and native graphics; Dell retains native Windows/Linux qualification. Do not run an extra compiler/native session to produce a substitute result. After independent source review and the serial join, the owners must:
 
 1. Run the joined source's `make ci`, focused docked tests, coverage/Clippy and required platform checks; retain exact commit, tools, commands, raw logs and terminal outcomes. Authored counts must not become passing counts without those results.

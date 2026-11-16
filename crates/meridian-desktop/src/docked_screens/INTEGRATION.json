@@ -79,10 +79,18 @@
   "nativeCriteria": "README.md validation and acceptance section; exact joined source, real keyboard+mouse, all five rendered screens, full module effects/refusals/durable failure/cold continuation",
   "releaseGate": "HUD + all5 docked menus + actual working modular equipment accepted together; no new missions/Lua/fullfleet prerequisite; existing exclusive publisher verifies real qualified boundary",
   "markerClipping": "Each Marker.clip is ChartLayout.plot; G1 clips circles and current/selection decorations to it.",
-  "priorCompilerResult": {
-    "source": "7b9e2738b9e000b809a32c0dc0c8b4b0b3c6598e",
-    "owner": "G1",
-    "outcome": "FAILED E0004 non-exhaustive Control::ReviewConfirm/ReviewCancel; corrected in revised source, recompile pending",
-    "rawLog": "/Volumes/SSD/offload/meridian-g1-mbp-docked-render.5c81d65/evidence/renderer-first.log"
-  }
+  "priorCompilerResults": [
+    {
+      "source": "7b9e2738b9e000b809a32c0dc0c8b4b0b3c6598e",
+      "owner": "G1",
+      "outcome": "FAILED E0004 non-exhaustive Control::ReviewConfirm/ReviewCancel; corrected in revised source, recompile pending",
+      "rawLog": "/Volumes/SSD/offload/meridian-g1-mbp-docked-render.5c81d65/evidence/renderer-first.log"
+    },
+    {
+      "source": "28370eb9fb1e7c9978ba86fd246c175cbe420523",
+      "owner": "G1",
+      "outcome": "FAILED E0624 regression test called private control; corrected through public handle dispatch, recompile pending",
+      "rawLog": "/Volumes/SSD/offload/meridian-g1-mbp-docked-render.5c81d65/evidence/renderer-corrected.log"
+    }
+  ]
 }

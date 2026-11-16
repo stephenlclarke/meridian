@@ -569,10 +569,8 @@ fn modal_blocks_clickthrough_and_confirms_only_the_supplied_review_token() {
 fn review_controls_without_a_current_review_never_issue_requests() {
     let c = catalogue();
     let w = world();
-    let ctx = context(&w, &c);
+    let mut ctx = context(&w, &c);
     let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
-    assert_eq!(ui.control(&Control::ReviewConfirm, &ctx), Outcome::Ignored);
-    assert_eq!(ui.control(&Control::ReviewCancel, &ctx), Outcome::Ignored);
     let frame = ui.frame(&ctx, view());
     assert!(
         frame
@@ -580,6 +578,21 @@ fn review_controls_without_a_current_review_never_issue_requests() {
             .iter()
             .all(|hit| !matches!(hit.control, Control::ReviewConfirm | Control::ReviewCancel))
     );
+    let review = Review {
+        token: 655,
+        title: "Expired review fixture".into(),
+        details: vec![],
+        can_confirm: true,
+        refusal: None,
+    };
+    ctx.review = Some(&review);
+    let painted = ui.frame(&ctx, view());
+    // Retain a painted modal after its authority disappears, even without a stamp change.
+    ctx.review = None;
+    for control in [Control::ReviewConfirm, Control::ReviewCancel] {
+        let input = Input::Click(point(&painted, &control));
+        assert_eq!(ui.handle(input, &painted, &ctx), Outcome::Ignored);
+    }
 }
 #[test]
 fn missing_equipment_provider_is_visible_and_never_a_fake_shop() {
