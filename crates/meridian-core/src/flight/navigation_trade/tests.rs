@@ -739,3 +739,81 @@ fn actual_trade_round_trip_keeps_eight_original_g02_units_and_gunnery_owner() {
     );
     let _continued = cold(&w);
 }
+
+#[test]
+fn omitted_actual_fuel_receipt_refuses_active_and_completed_food_journeys_atomically() {
+    let mut active = commander(7501);
+    plan(&mut active, Id::Food);
+    service(&mut active, Command::BuyFood);
+    journey(&mut active, SystemId::RENAS);
+    assert_eq!(service(&mut active, Command::RefillFuel).paid_tenths(), 68);
+    assert_eq!(snap(&active).attempts[0].fuel_paid_tenths, 68);
+    // Coherent-checksum negative fixture: only the retained receipt list is erased.
+    // Actual wallet, shop counters, tank and journey evidence stay byte-for-byte unchanged.
+    reject(&mut active, |w| w.navigation_trade.attempts[0].fuel.clear());
+
+    let mut completed = commander(7502);
+    complete(&mut completed, Id::Food);
+    assert_eq!(
+        snap(&completed).attempts[0].cash_difference_tenths,
+        Some(-98)
+    );
+    reject(&mut completed, |w| {
+        w.navigation_trade.attempts[0].fuel.clear()
+    });
+    assert_eq!(snap(&completed).attempts[0].fuel_paid_tenths, 68);
+    assert_eq!(
+        snap(&completed).attempts[0].cash_difference_tenths,
+        Some(-98)
+    );
+    assert!(snap(&completed).trace.is_some());
+}
+
+#[test]
+fn fuel_continuity_refuses_changed_tank_revision_and_terminal_anchors() {
+    let mut w = commander(7601);
+    complete(&mut w, Id::Food);
+    reject(&mut w, |w| {
+        some(w.navigation_trade.attempts[0].buy.as_mut()).fuel_at_trade -= 1
+    });
+    reject(&mut w, |w| {
+        let j = &mut w.navigation_trade.attempts[0].journeys[1];
+        j.fuel_before -= 1;
+        j.fuel_after -= 1; // Debit arithmetic still balances; tank chain does not.
+    });
+    reject(&mut w, |w| {
+        let revision = w.navigation_trade.attempts[0].fuel[0].account_revision;
+        w.navigation_trade.attempts[0].journeys[1].account_revision = revision;
+    });
+    reject(&mut w, |w| {
+        some(w.navigation_trade.attempts[0].terminal.as_mut())
+            .fuel
+            .fuel -= 1
+    });
+    reject(&mut w, |w| {
+        some(w.navigation_trade.attempts[0].terminal.as_mut())
+            .fuel
+            .refilled_units = 0
+    });
+    reject(&mut w, |w| {
+        some(w.navigation_trade.attempts[0].plan.as_mut()).refilled_at_plan += 1
+    });
+}
+
+#[test]
+fn ordinary_fuel_before_plan_and_after_terminal_stays_outside_lesson_cost() {
+    let mut w = commander(7701);
+    journey(&mut w, SystemId::RENAS);
+    assert_eq!(service(&mut w, Command::RefillFuel).paid_tenths(), 68);
+    journey(&mut w, SystemId::AVENOR);
+    assert_eq!(some(w.snapshot().navigation).fuel_units, 96);
+    complete(&mut w, Id::Food);
+    let before = snap(&w).attempts[0].clone();
+    assert_eq!(before.fuel_paid_tenths, 136);
+    assert_eq!(before.cash_difference_tenths, Some(-166));
+    // A genuine later ordinary purchase changes global refill counters and the wallet,
+    // while the completed lesson retains its own actual end anchor and cost.
+    assert_eq!(service(&mut w, Command::RefillFuel).paid_tenths(), 68);
+    assert_eq!(snap(&w).attempts[0], before);
+    let _continued = cold(&w);
+}
