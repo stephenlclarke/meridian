@@ -718,18 +718,30 @@ mod tests {
                 );
             }
         }
-        let mut world = World::new_commander(991).unwrap();
-        let review = world.review_practice(0).unwrap();
+        let mut world = World::new_commander(991).unwrap_or_else(|error| panic!("{error}"));
+        let review = world
+            .review_practice(0)
+            .unwrap_or_else(|error| panic!("{error}"));
         world
             .prepare_practice_confirmation(review, 0)
-            .unwrap()
+            .unwrap_or_else(|error| panic!("{error}"))
             .commit();
-        world.request_launch(0).unwrap();
-        world.step(meridian_core::FlightInput::default()).unwrap();
+        world
+            .request_launch(0)
+            .unwrap_or_else(|error| panic!("{error}"));
+        world
+            .step(meridian_core::FlightInput::default())
+            .unwrap_or_else(|error| panic!("{error}"));
         let mut session = Session::from_world(&world);
         assert_visible(&session, &world, "LAUNCH USES ONE ROUND");
-        let before = world.missile_snapshot().unwrap();
-        let beacons = world.practice_snapshot().unwrap().beacons.unwrap();
+        let before = world
+            .missile_snapshot()
+            .unwrap_or_else(|| panic!("Expected missile_snapshot"));
+        let beacons = world
+            .practice_snapshot()
+            .unwrap_or_else(|| panic!("Expected practice_snapshot"))
+            .beacons
+            .unwrap_or_else(|| panic!("Expected beacons"));
         for expected in [
             Some(beacons[0].id),
             Some(beacons[1].id),
@@ -738,32 +750,54 @@ mod tests {
         ] {
             session
                 .command(&mut world, Action::CycleMissileLock)
-                .unwrap();
-            assert_eq!(world.missile_snapshot().unwrap().lock, expected);
+                .unwrap_or_else(|error| panic!("{error}"));
+            assert_eq!(
+                world
+                    .missile_snapshot()
+                    .unwrap_or_else(|| panic!("Expected missile_snapshot"))
+                    .lock,
+                expected
+            );
         }
         session
             .command(&mut world, Action::CycleMissileLock)
-            .unwrap();
+            .unwrap_or_else(|error| panic!("{error}"));
         session
             .command(&mut world, Action::ToggleMissileArm)
-            .unwrap();
+            .unwrap_or_else(|error| panic!("{error}"));
         assert!(world.save_bytes().is_err());
         assert_visible(&session, &world, "F4 SAFE/UNLOCK TO SAVE");
-        session.command(&mut world, Action::ClearMissile).unwrap();
+        session
+            .command(&mut world, Action::ClearMissile)
+            .unwrap_or_else(|error| panic!("{error}"));
         assert!(world.save_bytes().is_ok());
         session
             .command(&mut world, Action::CycleMissileLock)
-            .unwrap();
+            .unwrap_or_else(|error| panic!("{error}"));
         session
             .command(&mut world, Action::ToggleMissileArm)
-            .unwrap();
-        session.command(&mut world, Action::FireMissile).unwrap();
+            .unwrap_or_else(|error| panic!("{error}"));
+        session
+            .command(&mut world, Action::FireMissile)
+            .unwrap_or_else(|error| panic!("{error}"));
         assert_visible(&session, &world, "SAVING UNAVAILABLE");
-        let after = world.missile_snapshot().unwrap();
+        let after = world
+            .missile_snapshot()
+            .unwrap_or_else(|| panic!("Expected missile_snapshot"));
         assert_eq!(after.rounds[2], None);
         assert_eq!(after.rounds[..2], before.rounds[..2]);
-        let projectile = after.projectiles.into_iter().flatten().next().unwrap();
-        assert_eq!(projectile.origin.item, before.rounds[2].unwrap().item);
+        let projectile = after
+            .projectiles
+            .into_iter()
+            .flatten()
+            .next()
+            .unwrap_or_else(|| panic!("Expected next"));
+        assert_eq!(
+            projectile.origin.item,
+            before.rounds[2]
+                .unwrap_or_else(|| panic!("Expected rounds[2]"))
+                .item
+        );
         assert_eq!(projectile.target, beacons[0].id);
         assert!(
             session
@@ -771,10 +805,14 @@ mod tests {
                 .iter()
                 .any(|s| s.contains("SAVING UNAVAILABLE"))
         );
-        session.command(&mut world, Action::ClearMissile).unwrap();
+        session
+            .command(&mut world, Action::ClearMissile)
+            .unwrap_or_else(|error| panic!("{error}"));
         assert!(world.save_bytes().is_err());
         let snapshot = world.missile_snapshot();
-        world.request_pause(true, world.snapshot().tick).unwrap();
+        world
+            .request_pause(true, world.snapshot().tick)
+            .unwrap_or_else(|error| panic!("{error}"));
         assert!(session.command(&mut world, Action::FireMissile).is_err());
         assert_eq!(world.missile_snapshot(), snapshot);
     }

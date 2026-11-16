@@ -397,36 +397,60 @@ pub fn frame_vertices(
 mod tests {
     #[test]
     fn actual_missile_renders_original_mesh_then_removes_ended_body() {
-        let mut world = meridian_core::World::new_commander(992).unwrap();
-        let review = world.review_practice(0).unwrap();
+        let mut world =
+            meridian_core::World::new_commander(992).unwrap_or_else(|error| panic!("{error}"));
+        let review = world
+            .review_practice(0)
+            .unwrap_or_else(|error| panic!("{error}"));
         world
             .prepare_practice_confirmation(review, 0)
-            .unwrap()
+            .unwrap_or_else(|error| panic!("{error}"))
             .commit();
-        world.request_launch(0).unwrap();
-        world.step(meridian_core::FlightInput::default()).unwrap();
-        let target = world.practice_snapshot().unwrap().beacons.unwrap()[1].id;
+        world
+            .request_launch(0)
+            .unwrap_or_else(|error| panic!("{error}"));
+        world
+            .step(meridian_core::FlightInput::default())
+            .unwrap_or_else(|error| panic!("{error}"));
+        let target = world
+            .practice_snapshot()
+            .unwrap_or_else(|| panic!("Expected practice_snapshot"))
+            .beacons
+            .unwrap_or_else(|| panic!("Expected beacons"))[1]
+            .id;
         let tick = world.snapshot().tick;
-        world.request_missile_lock(Some(target), tick).unwrap();
-        world.request_missile_arm(true, tick).unwrap();
-        world.request_fire_missile(tick).unwrap();
-        let vertices = load_station().unwrap();
+        world
+            .request_missile_lock(Some(target), tick)
+            .unwrap_or_else(|error| panic!("{error}"));
+        world
+            .request_missile_arm(true, tick)
+            .unwrap_or_else(|error| panic!("{error}"));
+        world
+            .request_fire_missile(tick)
+            .unwrap_or_else(|error| panic!("{error}"));
+        let vertices = load_station().unwrap_or_else(|error| panic!("{error}"));
         let render = |world: &meridian_core::World| {
             let snapshot = world.snapshot();
             let station = StationRender {
                 vertices: &vertices,
-                pose: snapshot.station.unwrap(),
-                port: world.station_port().unwrap(),
+                pose: snapshot
+                    .station
+                    .unwrap_or_else(|| panic!("Expected station")),
+                port: world
+                    .station_port()
+                    .unwrap_or_else(|| panic!("Expected station_port")),
                 docked: false,
             };
             let mut frame = Vec::new();
             append_missiles(
                 &snapshot,
                 station,
-                &world.missile_snapshot().unwrap(),
+                &world
+                    .missile_snapshot()
+                    .unwrap_or_else(|| panic!("Expected missile_snapshot")),
                 &mut frame,
             )
-            .unwrap();
+            .unwrap_or_else(|error| panic!("{error}"));
             frame
         };
         let frame = render(&world);
@@ -439,7 +463,7 @@ mod tests {
         for _ in 0..1500 {
             if world
                 .missile_snapshot()
-                .unwrap()
+                .unwrap_or_else(|error| panic!("{error}"))
                 .projectiles
                 .iter()
                 .flatten()
@@ -447,7 +471,9 @@ mod tests {
             {
                 break;
             }
-            world.step(meridian_core::FlightInput::default()).unwrap();
+            world
+                .step(meridian_core::FlightInput::default())
+                .unwrap_or_else(|error| panic!("{error}"));
         }
         assert!(render(&world).is_empty());
     }
