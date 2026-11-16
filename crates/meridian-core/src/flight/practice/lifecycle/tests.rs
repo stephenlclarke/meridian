@@ -592,8 +592,8 @@ fn terminal_history_after_later_docks(seed: u64, completed: bool) -> World {
     assert_eq!(old.terminal_dock(), Some(terminal));
     assert!(world.current_dock_context().unwrap().sequence() >= terminal.sequence() + 2);
     assert!(world.current_dock_context().unwrap().visit() > terminal.visit());
-    assert!(terminal.sequence() + 1 <= terminal.visit());
-    assert!(terminal.tick() + 1 <= old.terminal_tick().unwrap());
+    assert!(terminal.sequence() < terminal.visit());
+    assert!(terminal.tick() < old.terminal_tick().unwrap());
     assert!(old.retired.unwrap().tick < terminal.tick() - 1);
     world
 }
