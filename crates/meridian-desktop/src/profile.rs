@@ -83,6 +83,10 @@ impl Profile {
                     self.world.prepare_practice_confirmation(review, tick),
                     "Practice confirmed and saved. L launches.",
                 ),
+                PracticeSelection::Closure(review) => (
+                    self.world.prepare_practice_closure(review, tick),
+                    "Practice closed and saved. F10 reviews a fresh attempt; ammunition is not refilled.",
+                ),
                 PracticeSelection::Reception(review) => (
                     self.world.prepare_practice_reception(review, tick),
                     "Practice reception saved. Safe Gunnery Family Trace recorded.",
@@ -673,6 +677,144 @@ mod tests {
         );
         assert!(profile.command(Action::Confirm).is_err());
         assert!(profile.command(Action::ReviewPractice).is_ok());
+    }
+
+    #[test]
+    fn practice_closure_write_failure_preserves_open_attempt_and_prior_slot() {
+        let directory = TestDirectory::new();
+        let mut profile = open(&directory.0);
+        assert!(
+            profile
+                .new_commander(9505)
+                .unwrap_or_else(|e| panic!("{e}"))
+        );
+        action(&mut profile, Action::ReviewPractice);
+        action(&mut profile, Action::Confirm);
+        let before = profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+        action(&mut profile, Action::ReviewPracticeClosure);
+        action(&mut profile, Action::Back);
+        assert!(profile.command(Action::Confirm).is_err());
+        assert_eq!(
+            profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}")),
+            before
+        );
+        let destination = directory.0.join("commander.meridian");
+        let retained = directory.0.join("retained-valid-slot");
+        fs::rename(&destination, &retained).unwrap_or_else(|e| panic!("{e}"));
+        fs::create_dir(&destination).unwrap_or_else(|e| panic!("{e}"));
+        fs::write(destination.join("sentinel"), b"retain").unwrap_or_else(|e| panic!("{e}"));
+        action(&mut profile, Action::ReviewPracticeClosure);
+        assert!(profile.command(Action::Confirm).is_err());
+        assert_eq!(
+            profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}")),
+            before
+        );
+        assert_eq!(fs::read(retained).unwrap_or_else(|e| panic!("{e}")), before);
+        assert_eq!(
+            fs::read(destination.join("sentinel")).unwrap_or_else(|e| panic!("{e}")),
+            b"retain"
+        );
+        assert!(profile.command(Action::Confirm).is_err());
+        assert!(profile.command(Action::ReviewPractice).is_err());
+        assert!(profile.command(Action::ReviewPracticeClosure).is_ok());
+    }
+
+    #[test]
+    fn practice_lifecycle_cold_child() {
+        let Some(path) = std::env::var_os("MERIDIAN_PRACTICE_LIFECYCLE_SLOT") else {
+            return;
+        };
+        let directory = Path::new(&path);
+        let mut profile = open(directory);
+        profile.continue_saved().unwrap_or_else(|e| panic!("{e}"));
+        let ledger = profile
+            .world
+            .practice_ledger_snapshot()
+            .unwrap_or_else(|| panic!("no ledger"));
+        assert_eq!(ledger.attempts.len(), 1);
+        assert_eq!(ledger.active, None);
+        assert_eq!(
+            ledger.attempts[0].outcome,
+            Some(meridian_core::PracticeOutcome::Abandoned)
+        );
+        assert_eq!(ledger.trace, None);
+        assert!(profile.command(Action::ReviewPracticeReception).is_err());
+        assert!(profile.command(Action::ReviewPracticeClosure).is_err());
+        action(&mut profile, Action::ReviewPractice);
+        action(&mut profile, Action::Confirm);
+        let retry = profile
+            .world
+            .practice_ledger_snapshot()
+            .unwrap_or_else(|| panic!("no ledger"));
+        assert_eq!(retry.attempts.len(), 2);
+        assert_eq!(retry.attempts[0], ledger.attempts[0]);
+        assert_ne!(retry.attempts[0].id, retry.attempts[1].id);
+        assert_eq!(retry.active, Some(retry.attempts[1].id));
+        assert_eq!(retry.trace, None);
+        assert!(profile.command(Action::ReviewPractice).is_err());
+        profile.prepare_quit().unwrap_or_else(|e| panic!("{e}"));
+    }
+
+    #[test]
+    fn actual_new_process_continues_closed_attempt_and_explicitly_saves_distinct_retry() {
+        let directory = TestDirectory::new();
+        let mut profile = open(&directory.0);
+        assert!(
+            profile
+                .new_commander(9506)
+                .unwrap_or_else(|e| panic!("{e}"))
+        );
+        action(&mut profile, Action::ReviewPractice);
+        action(&mut profile, Action::Confirm);
+        let missiles = profile.world.missile_snapshot();
+        let combat = profile.world.combat_snapshot();
+        let credits = profile.world.credits_tenths();
+        action(&mut profile, Action::ReviewPracticeClosure);
+        action(&mut profile, Action::Confirm);
+        let closed = profile
+            .world
+            .practice_ledger_snapshot()
+            .unwrap_or_else(|| panic!("no ledger"));
+        let saved =
+            fs::read(directory.0.join("commander.meridian")).unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(
+            saved,
+            profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}"))
+        );
+        assert_eq!(
+            closed.attempts[0].outcome,
+            Some(meridian_core::PracticeOutcome::Abandoned)
+        );
+        assert_eq!(closed.active, None);
+        assert_eq!(profile.world.missile_snapshot(), missiles);
+        assert_eq!(profile.world.combat_snapshot(), combat);
+        assert_eq!(profile.world.credits_tenths(), credits);
+        drop(profile);
+        let status = Command::new(std::env::current_exe().unwrap_or_else(|e| panic!("{e}")))
+            .args([
+                "--exact",
+                "profile::tests::practice_lifecycle_cold_child",
+                "--nocapture",
+            ])
+            .env("MERIDIAN_PRACTICE_LIFECYCLE_SLOT", &directory.0)
+            .status()
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert!(status.success());
+        let mut cold = open(&directory.0);
+        cold.continue_saved().unwrap_or_else(|e| panic!("{e}"));
+        let retry = cold
+            .world
+            .practice_ledger_snapshot()
+            .unwrap_or_else(|| panic!("no ledger"));
+        assert_eq!(retry.attempts.len(), 2);
+        assert_eq!(retry.attempts[0], closed.attempts[0]);
+        assert_eq!(retry.attempts[1].outcome, None);
+        assert_eq!(retry.active, Some(retry.attempts[1].id));
+        assert_eq!(retry.offers_remaining + 1, closed.offers_remaining);
+        assert_eq!(retry.trace, None);
+        assert_eq!(cold.world.missile_snapshot(), missiles);
+        assert_eq!(cold.world.combat_snapshot(), combat);
+        assert_eq!(cold.world.credits_tenths(), credits);
     }
 
     #[test]

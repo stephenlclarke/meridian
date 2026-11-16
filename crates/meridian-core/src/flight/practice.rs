@@ -5,6 +5,11 @@ use crate::navigation::{DockContext, NavigationState, SystemId};
 use crate::station::OriginalStationData;
 
 mod geometry;
+pub(super) mod lifecycle;
+pub use lifecycle::{
+    PRACTICE_MAX_OFFERS, PracticeAttemptId, PracticeAttemptSnapshot, PracticeClosureReview,
+    PracticeLedgerSnapshot, PracticeOutcome,
+};
 mod persistence;
 pub(super) mod reception;
 pub use reception::{
@@ -26,6 +31,8 @@ pub struct PracticeReview {
     dock: DockContext,
     tick: u64,
     epoch: u64,
+    fingerprint: u64,
+    attempt: PracticeAttemptId,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PracticeError {
@@ -36,6 +43,10 @@ pub enum PracticeError {
     AlreadyConsented,
     ReceptionNotReady,
     AlreadyReceived,
+    NoActiveAttempt,
+    OfferCapacity,
+    MissionCapacity,
+    SharedCapacity,
     Save(crate::save::SaveError),
 }
 impl core::fmt::Display for PracticeError {
@@ -47,7 +58,11 @@ impl core::fmt::Display for PracticeError {
             Self::AvenorBerthRequired => "Practice consent requires the actual Avenor main berth",
             Self::AlreadyConsented => "This commander already has a practice attempt",
             Self::ReceptionNotReady => "Reception requires three distinct hits, three quiet flight seconds and a subsequent Avenor entry",
-            Self::AlreadyReceived => "This commander already received the practice trace",
+            Self::AlreadyReceived => "This attempt already received verified practice",
+            Self::NoActiveAttempt => "There is no open practice attempt to close",
+            Self::OfferCapacity => "The retained Avenor practice offer capacity is full",
+            Self::MissionCapacity => "The native mission record capacity is full",
+            Self::SharedCapacity => "Three Original contracts or services are already active",
             Self::Save(error) => return write!(f, "Practice save preparation failed: {error}"),
         })
     }
@@ -136,6 +151,9 @@ struct Retirement {
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(super) struct Practice {
+    attempt: u8,
+    settlement: Option<PracticeOutcome>,
+    cancel: Option<lifecycle::Closure>,
     consent: DockContext,
     confirmed_tick: u64,
     range: Option<Range>,
@@ -174,7 +192,7 @@ impl Practice {
         }
     }
     fn active_range(self) -> Option<Range> {
-        (self.retired.is_none() && self.ordinary_hit.is_none())
+        (self.retired.is_none() && self.ordinary_hit.is_none() && !self.reception_is_terminal())
             .then_some(self.range)
             .flatten()
     }
@@ -185,7 +203,7 @@ impl Practice {
         nav: NavigationState,
         data: &OriginalStationData,
     ) {
-        if self.retired.is_some() || opening == FlightMode::Docked {
+        if self.reception_is_terminal() || self.retired.is_some() || opening == FlightMode::Docked {
             return;
         }
         let nav = nav.snapshot(0);
@@ -368,7 +386,7 @@ impl Practice {
         });
         let status = if self.ordinary_hit.is_some() {
             PracticeStatus::Failed
-        } else if self.retired.is_some() {
+        } else if self.retired.is_some() || self.cancel.is_some() {
             PracticeStatus::Retired
         } else if beacons.is_some() {
             PracticeStatus::Active
@@ -391,6 +409,8 @@ pub struct PreparedPracticeConfirmation<'a> {
     world: &'a mut World,
     practice: Practice,
     bytes: Vec<u8>,
+    history: Vec<Practice>,
+    trace: Option<PracticeAttemptId>,
 }
 impl PreparedPracticeConfirmation<'_> {
     pub fn bytes(&self) -> &[u8] {
@@ -400,6 +420,8 @@ impl PreparedPracticeConfirmation<'_> {
     /// Call after the host has published the prepared bytes.
     pub fn commit(self) {
         self.world.practice = Some(self.practice);
+        self.world.practice_history = self.history;
+        self.world.practice_trace = self.trace;
     }
 }
 
@@ -419,13 +441,19 @@ impl World {
             .current_dock_context()
             .filter(|dock| dock.system() == SystemId::AVENOR)
             .ok_or(PracticeError::AvenorBerthRequired)?;
-        if self.practice.is_some() {
+        if self.practice.is_some_and(|p| !p.reception_is_terminal()) {
             return Err(PracticeError::AlreadyConsented);
         }
+        self.check_practice_capacity()?;
         Ok(PracticeReview {
             dock,
             tick: expected_tick,
             epoch: session.epoch(),
+            fingerprint: self.practice_fingerprint(),
+            attempt: lifecycle::next_attempt_id(
+                dock.owner().seed(),
+                self.practice_history.len() + usize::from(self.practice.is_some()),
+            ),
         })
     }
 
@@ -440,10 +468,19 @@ impl World {
         if review.dock != current.dock
             || review.epoch != current.epoch
             || review.tick > current.tick
+            || review.fingerprint != current.fingerprint
+            || review.attempt != current.attempt
         {
             return Err(PracticeError::StaleReview);
         }
+        let mut history = self.practice_history.clone();
+        if let Some(previous) = self.practice {
+            history.push(previous);
+        }
         let practice = Practice {
+            attempt: current.attempt.ordinal(),
+            settlement: None,
+            cancel: None,
             consent: current.dock,
             confirmed_tick: expected_tick,
             range: None,
@@ -453,12 +490,15 @@ impl World {
             pending_missiles: 0,
         };
         let bytes = self
-            .save_bytes_with_practice(Some(practice))
+            .save_bytes_with_practice_history(Some(practice), &history, self.practice_trace)
             .map_err(PracticeError::Save)?;
+        let trace = self.practice_trace;
         Ok(PreparedPracticeConfirmation {
             world: self,
             practice,
             bytes,
+            history,
+            trace,
         })
     }
 

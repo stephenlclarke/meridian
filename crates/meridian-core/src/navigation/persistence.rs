@@ -1,4 +1,10 @@
-use super::*;
+#[cfg(test)]
+use super::NavigationError;
+use super::{
+    BASIC_SPOOL_TICKS, CommanderId, DockContext, DockOrigin, NavigationState, OriginalNavigation,
+    PendingJump, PlayerShipId, STOCK_JUMP_REACH_LY, StarterBasicDrive, SystemId,
+    stock_jump_fuel_cost,
+};
 use crate::save::{Reader, SaveError, Writer};
 use crate::station::FlightMode;
 
@@ -219,7 +225,7 @@ impl NavigationState {
 
 #[cfg(test)]
 mod counter_tests {
-    use super::*;
+    use super::{FlightMode, NavigationError, NavigationState, OriginalNavigation};
 
     #[test]
     fn exhausted_launch_and_admission_counters_refuse_before_mutation() {

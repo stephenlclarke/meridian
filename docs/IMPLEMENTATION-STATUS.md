@@ -28,6 +28,18 @@ Root audited the sealed native packet and its 19 retained v8 checkpoint files pl
 
 Native v8 station-hit/interception cold journeys were not repeated; their exact core regressions passed. A genuine live player hit and full T02 acceptance remain open. Protected integration, exact-main CI/Sonar, exact-main rebuild/signing and the separate installed v8 delivery have passed. The scoped native candidate evidence retains its original source identity; installation does not broaden those acceptance limits.
 
+## Qualified candidate: attempt closure and retry
+
+Current source adds [reviewed closure and retry](SAFE-GUNNERY-ATTEMPTS.md): F7 reviews failed or incomplete closure at the actual Avenor berth; Enter publishes the save before committing live state, while B cancels. F10 reviews a new attempt after terminal settlement. The HUD uses the current attempt outcome, independently of a previous first trace; I shows retained outcome counts and first-clue status. No refund, reward or ammunition reset occurs.
+
+Candidate `3b5a18b` passed 159 core plus 49 desktop tests (208 top-level Rust cases), 48 importer tests, strict Clippy and release builds on Mac, Linux and native Windows. Nested child-process summaries are excluded. Signed Metal qualification and Root audit covered failed/abandoned closures, explicit retries, paused live retry continuation and two receptions with one retained first trace. Twenty-three named v9 files, seven cold comparisons and ten normal process exits were checked. Six unpaused docked cold sessions advanced ordinary UI ticks; the paused live retry preserved every observed state field. A misaligned approach was recovered with public F9 from the owner's retained valid checkpoint, then a corrected physical approach; both paths remain in evidence. The read-only observer is not a full semantic validator.
+
+Joined candidate `3b57229ac15e1d6c37d2579c1ce667136571db3d`, tree `18d261938d883e89c9d5943131d63ca6b3cda61c`, passed independent whole-source review and current Mac, Linux and genuine native Windows checks: 159 core plus 49 desktop tests (208 top-level Rust cases), 68 Python tests (48 importers plus 20 release tooling), 28 Markdown files, formatting, workspace check, strict Clippy and release builds. Root verified all 131 source pins per platform and Dell's 60 retained artifact files. Short compiler jobs finished before Root process observation; their raw START/terminal/log records were verified later without visibility reruns.
+
+Four current-source Metal/M5 Pro processes exited normally after affected closure cancellation/confirmation, explicit retry and cold Continue, incomplete abandonment, completed history/new-attempt handling and paused live missile HUD/F5/F9 checks. Root checked 206 immutable references and nine valid save snapshots, and visually reviewed history and missile rows. Four misbound intermediate captures were preserved and excluded; correctly bound terminal saves supplied final history/missile evidence. The first run's final mutable slot is bound by its hash to the next cold START, rather than presented as a separately retained final snapshot. Seven mutable slot references are excluded from immutable proof. Paused missile gameplay bytes match the copied parent outside the documented UI publication counters and checksum. A title-only CUA auto-relaunch was closed before Continue/New and supplies no acceptance. Parent flight/reception journeys remain parent-only evidence.
+
+The subsequent documentation-only update changes no qualified source code or assets. Exact-main Sonar issue closure and v9 packaging/delivery remain pending. The installed and published v8 previews are unchanged. Full T02, live player-hit and broader acceptance remain open.
+
 ## GitHub preview distribution
 
 [Durable Missiles Preview v0.1.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.1.0-preview.1) is published for macOS arm64 and Windows x64, with an immutable annotated tag at gameplay main ab238c3fd7e9cea51843c2fcf17d5ecf87bca60b. All four downloadable assets matched their recorded checksums; the downloaded Mac app passed strict extracted Developer ID signature verification. Windows retains the qualified unsigned development-profile executable from 58f45c8, with byte-identical non-Markdown source through ab238c3; native Windows gameplay remains unobserved and the Visual C++ x64 runtime is required. No prior release needed deletion. Future publications retain only the newest three managed previews.
@@ -38,7 +50,9 @@ Dependency notice coverage was independently reviewed for the actual Mac 80-pack
 
 ## Save compatibility
 
-Current source writes version 8, including arm/lock/cooldown, actual consumed pylon items, live/ended projectiles, motion/contact history and practice receipts/quiet state. Exact supported v4-v7 readers retain genuine prior unused missile stock; a used-v7 migration is never invented. Versions 1-3 remain unsupported. Invalid candidates refuse without repair, fallback, re-emission or stock grants.
+The installed Durable Missiles Preview writes version 8, including arm/lock/cooldown, actual consumed pylon items, live/ended projectiles, motion/contact history and practice receipts/quiet state. Exact supported v4-v7 readers retain genuine prior unused missile stock; a used-v7 migration is never invented. Versions 1-3 remain unsupported. Invalid candidates refuse without repair, fallback, re-emission or stock grants.
+
+The authored successor writes v9 with bounded attempt history, terminal receipts and the first-trace pointer, and explicit v4-v8 readers. It requires isolated candidate profiles until qualified. No used-v7 migration is invented.
 
 The earlier installed Finite Missiles Preview still writes v7 and refuses saving/restoring after any missile use. Keep its dedicated profiles and all earlier previews unchanged. Use the delivered v8 launcher for its separate saves-v8 directory; opening the bundle directly uses the default save location.
 
@@ -46,7 +60,7 @@ The earlier installed Finite Missiles Preview still writes v7 and refuses saving
 
 - Memory qualification is unresolved. The original in-flight scan reported 416 objects/19,936 bytes in three XPC root cycles. Later cold and instrumented zero scans did not reproduce the original fresh setup/age trigger. They establish neither a cure nor OS-only responsibility; no evidenced source fix exists.
 - Sustained minimize, held-key focus-loss, measured FPS/p95 and race evidence remain open. The minimum-size missile HUD check does not qualify all window behavior.
-- Apple notarization is blocked by the required-agreement HTTP403. A dependency notice also limits commercial distribution. No legal acceptance or unchanged notarization retry is authorized.
+- Apple notarization is blocked by the required-agreement HTTP403. Retained original-input obligations and the upstream Apple SDK policy remain commercial-distribution limits. No legal acceptance or unchanged notarization retry is authorized.
 - Full first-playable/release acceptance, all 171 expanded fleet and all 64 expanded mission acceptances remain separate and open. Legacy baseline is 23 of 162 ships plus four of six stations. Source catalogue entries are not accepted playable hulls.
 
 Earlier exact-source tests and failures remain in Git history, merged PRs and retained delivery evidence. They must not be transferred to a newer source or counted as new acceptance. Historical feature contracts describe their original boundaries; this page records the current delivered checkpoint.

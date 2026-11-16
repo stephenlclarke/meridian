@@ -4,8 +4,8 @@ use meridian_core::freight::g02::{Choice, Command, ContactDefinition, Event, Job
 use meridian_core::navigation::SystemId;
 use meridian_core::station_services::{self, CommodityId};
 use meridian_core::{
-    FlightMode, PRACTICE_QUIET_TICKS, PracticeReceptionReview, PracticeReview, PracticeStatus,
-    World,
+    FlightMode, PRACTICE_QUIET_TICKS, PracticeClosureReview, PracticeOutcome,
+    PracticeReceptionReview, PracticeReview, PracticeStatus, World,
 };
 
 #[derive(Clone, Copy)]
@@ -21,6 +21,7 @@ pub enum Action {
     MissionDetails,
     ReviewPractice,
     ReviewPracticeReception,
+    ReviewPracticeClosure,
     Confirm,
     Back,
     Refuel,
@@ -41,6 +42,7 @@ pub enum Action {
 pub(crate) enum PracticeSelection {
     Consent(PracticeReview),
     Reception(PracticeReceptionReview),
+    Closure(PracticeClosureReview),
 }
 
 pub struct Session {
@@ -193,6 +195,14 @@ impl Session {
                 self.pending_practice = Some(PracticeSelection::Reception(review));
                 Ok("Avenor practice reception".into())
             }
+            Action::ReviewPracticeClosure => {
+                self.invalidate();
+                let review = world
+                    .review_practice_closure(world.snapshot().tick)
+                    .map_err(|error| error.to_string())?;
+                self.pending_practice = Some(PracticeSelection::Closure(review));
+                Ok("Avenor practice closure review".into())
+            }
             Action::MissionDetails => {
                 self.invalidate();
                 self.show_objective = true;
@@ -344,9 +354,62 @@ impl Session {
                 objective.available_source_units,
                 objective.completed_jobs
             ));
+            if let Some(ledger) = world.practice_ledger_snapshot() {
+                let count = |outcome| {
+                    ledger
+                        .attempts
+                        .iter()
+                        .filter(|a| a.outcome == Some(outcome))
+                        .count()
+                };
+                lines.push(format!(
+                    "PRACTICE HISTORY | COMPLETE {} | FAILED {} | ABANDONED {} | OFFERS LEFT {}",
+                    count(PracticeOutcome::Complete),
+                    count(PracticeOutcome::Failed),
+                    count(PracticeOutcome::Abandoned),
+                    ledger.offers_remaining
+                ));
+                lines.push(if ledger.trace.is_some() {
+                    "SAFE GUNNERY FAMILY TRACE RECORDED ONCE".into()
+                } else {
+                    "SAFE GUNNERY FAMILY TRACE NOT YET RECORDED".into()
+                });
+            }
             return true;
         }
         false
+    }
+
+    fn review_line(&self) -> String {
+        if let Some(selection) = self.pending_practice {
+            let title = match selection {
+                PracticeSelection::Consent(_) => "PRACTICE REVIEW",
+                PracticeSelection::Reception(_) => "PRACTICE RECEPTION",
+                PracticeSelection::Closure(_) => "CLOSE PRACTICE ATTEMPT",
+            };
+            format!("{title} | ENTER CONFIRMS AND SAVES | B CANCELS")
+        } else if let Some((review, choice)) = self.pending {
+            match choice {
+                Choice::ReceiveOne(unit) => format!(
+                    "REVIEW: RECEIVE UNIT {} | {} REMAIN | ENTER CONFIRMS, B CANCELS",
+                    unit.serial(),
+                    review.remaining_units()
+                ),
+                Choice::ReceiveAll => format!(
+                    "REVIEW: RECEIVE ALL {} IDENTIFIED TONNES | ENTER CONFIRMS, B CANCELS",
+                    review.remaining_units()
+                ),
+                Choice::Abandon => {
+                    "REVIEW: ABANDON FREIGHT | NO REWARD OR RESTOCK | ENTER / B".into()
+                }
+                Choice::Accept => {
+                    "REVIEW: ACCEPT EIGHT TONNES FOR RENAS | 730 CR ON COMPLETION | ENTER / B"
+                        .into()
+                }
+            }
+        } else {
+            "T SELECTS THE CURRENT CONTACT; R OPENS A REVIEW BEFORE ENTER CAN CONFIRM".into()
+        }
     }
 
     pub fn lines(&self, world: &World, active: bool, notice: Option<&str>) -> Vec<String> {
@@ -372,34 +435,7 @@ impl Session {
                 "PAUSED / UNFOCUSED"
             }
         )];
-        let review_line = if let Some(selection) = self.pending_practice {
-            let title = match selection {
-                PracticeSelection::Consent(_) => "PRACTICE REVIEW",
-                PracticeSelection::Reception(_) => "PRACTICE RECEPTION",
-            };
-            format!("{title} | ENTER CONFIRMS AND SAVES | B CANCELS")
-        } else if let Some((review, choice)) = self.pending {
-            match choice {
-                Choice::ReceiveOne(unit) => format!(
-                    "REVIEW: RECEIVE UNIT {} | {} REMAIN | ENTER CONFIRMS, B CANCELS",
-                    unit.serial(),
-                    review.remaining_units()
-                ),
-                Choice::ReceiveAll => format!(
-                    "REVIEW: RECEIVE ALL {} IDENTIFIED TONNES | ENTER CONFIRMS, B CANCELS",
-                    review.remaining_units()
-                ),
-                Choice::Abandon => {
-                    "REVIEW: ABANDON FREIGHT | NO REWARD OR RESTOCK | ENTER / B".into()
-                }
-                Choice::Accept => {
-                    "REVIEW: ACCEPT EIGHT TONNES FOR RENAS | 730 CR ON COMPLETION | ENTER / B"
-                        .into()
-                }
-            }
-        } else {
-            "T SELECTS THE CURRENT CONTACT; R OPENS A REVIEW BEFORE ENTER CAN CONFIRM".into()
-        };
+        let review_line = self.review_line();
         lines.push(
             notice
                 .unwrap_or("CLICK THE FLIGHT VIEW TO FOCUS THE CONTROLS")
@@ -422,14 +458,7 @@ impl Session {
             });
         }
         if let Some(selection) = self.pending_practice {
-            let terms = match selection {
-                PracticeSelection::Consent(_) => {
-                    "Hit the three uncrewed beacons with the fitted front Pulse Laser. Stop firing for three uninterrupted seconds in flight, then dock at Avenor and review reception with F8. No fee or cash reward."
-                }
-                PracticeSelection::Reception(_) => {
-                    "Confirm reception at the Avenor main berth to record the Safe Gunnery Family Trace. No cash reward."
-                }
-            };
+            let terms = practice_terms(selection);
             append_paragraph(&mut lines, terms);
             return lines;
         }
@@ -450,80 +479,9 @@ impl Session {
             }
             return lines;
         }
-        if let Some(missiles) = world.missile_snapshot() {
-            let remaining = missiles.rounds.iter().flatten().count();
-            let pending = missiles
-                .projectiles
-                .iter()
-                .flatten()
-                .filter(|p| p.ended.is_none())
-                .count();
-            let lock = missiles.lock.map_or_else(
-                || "NONE".into(),
-                |id| format!("BEACON {}", id.ordinal() + 1),
-            );
-            if snapshot.mode == FlightMode::Flight {
-                lines.push(format!(
-                    "MISSILES {remaining}/3 | {} | LOCK {lock} | IN FLIGHT {pending} | COOLDOWN {}",
-                    if missiles.armed { "ARMED" } else { "SAFE" },
-                    missiles.cooldown_ticks
-                ));
-                lines.push("F1 NEXT LOCK | F2 ARM/SAFE | F3 LAUNCH | F4 SAFE AND UNLOCK".into());
-            }
-            lines.push("F5 SAVES COMPLETE MISSILE SESSION | F9 CONTINUES SAVED STATE".into());
-        }
-        if let Some(practice) = world.practice_snapshot() {
-            let reception = world.practice_reception_snapshot();
-            match practice.status {
-                PracticeStatus::Unaccepted
-                    if snapshot.mode == FlightMode::Docked
-                        && snapshot
-                            .navigation
-                            .is_some_and(|nav| nav.system == SystemId::AVENOR) =>
-                {
-                    lines.push("F10 REVIEW AVENOR PRACTICE".into());
-                }
-                PracticeStatus::Consented => {
-                    lines.push("PRACTICE ACCEPTED | LAUNCH AND FLY CLEAR".into());
-                }
-                PracticeStatus::Active => {
-                    let line = match reception {
-                        Some(state) if state.ready => "CEASEFIRE COMPLETE | DOCK AT AVENOR".into(),
-                        Some(state) if practice.first_hits == 3 => format!(
-                            "CEASEFIRE {:.2} / {:.2} SEC | KEEP Z RELEASED",
-                            f32::from(state.quiet_ticks) / 60.0,
-                            f32::from(PRACTICE_QUIET_TICKS) / 60.0,
-                        ),
-                        _ => format!("PRACTICE BEACONS HIT {}/3 | Z FIRE", practice.first_hits),
-                    };
-                    lines.push(line);
-                }
-                PracticeStatus::Failed => {
-                    lines.push("SAFE GUNNERY FAILED | ORDINARY TARGET HIT | NO TRACE AWARD".into());
-                }
-                PracticeStatus::Retired => {
-                    let line = match reception {
-                        Some(state) if state.trace.is_some() => {
-                            "SAFE GUNNERY FAMILY TRACE RECORDED".into()
-                        }
-                        Some(state)
-                            if state.ready
-                                && world.review_practice_reception(snapshot.tick).is_ok() =>
-                        {
-                            "F8 REVIEW AVENOR PRACTICE RECEPTION".into()
-                        }
-                        Some(state) if state.ready => {
-                            "DOCK AT AVENOR FOR PRACTICE RECEPTION".into()
-                        }
-                        _ => format!(
-                            "PRACTICE RANGE CLOSED | BEACONS HIT {}/3",
-                            practice.first_hits
-                        ),
-                    };
-                    lines.push(line);
-                }
-                PracticeStatus::Unaccepted => {}
-            }
+        append_missile_panel(world, snapshot.mode, &mut lines);
+        if let Some(line) = practice_line(world) {
+            lines.push(line);
         }
         let credit = world.credits_tenths().unwrap_or(0);
         if let Some(navigation) = snapshot.navigation {
@@ -605,6 +563,114 @@ impl Session {
     }
 }
 
+fn append_missile_panel(world: &World, mode: FlightMode, lines: &mut Vec<String>) {
+    if let Some(missiles) = world.missile_snapshot() {
+        let remaining = missiles.rounds.iter().flatten().count();
+        let pending = missiles
+            .projectiles
+            .iter()
+            .flatten()
+            .filter(|p| p.ended.is_none())
+            .count();
+        let lock = missiles.lock.map_or_else(
+            || "NONE".into(),
+            |id| format!("BEACON {}", id.ordinal() + 1),
+        );
+        if mode == FlightMode::Flight {
+            lines.push(format!(
+                "MISSILES {remaining}/3 | {} | LOCK {lock} | IN FLIGHT {pending} | COOLDOWN {}",
+                if missiles.armed { "ARMED" } else { "SAFE" },
+                missiles.cooldown_ticks
+            ));
+            lines.push("F1 NEXT LOCK | F2 ARM/SAFE | F3 LAUNCH | F4 SAFE AND UNLOCK".into());
+        }
+        lines.push("F5 SAVES COMPLETE MISSILE SESSION | F9 CONTINUES SAVED STATE".into());
+    }
+}
+
+fn practice_terms(selection: PracticeSelection) -> &'static str {
+    match selection {
+        PracticeSelection::Consent(_) => {
+            "Hit the three uncrewed beacons with the fitted front Pulse Laser. Stop firing for three uninterrupted seconds in flight, then dock at Avenor and review reception with F8. No fee or cash reward."
+        }
+        PracticeSelection::Reception(_) => {
+            "Confirm reception at the Avenor main berth. The first Safe Gunnery Family Trace stays recorded once. No cash reward."
+        }
+        PracticeSelection::Closure(review) => match review.outcome() {
+            PracticeOutcome::Failed => {
+                "Close this failed attempt. Its ordinary hit and all weapon history stay recorded. No reward, refund or ammunition refill. F10 can review a fresh attempt after closure. B cancels."
+            }
+            _ => {
+                "Abandon this incomplete attempt. Its history stays recorded. No reward, refund or ammunition refill. F10 can review a fresh attempt after closure. B cancels."
+            }
+        },
+    }
+}
+
+fn practice_line(world: &World) -> Option<String> {
+    let snapshot = world.snapshot();
+    let practice = world.practice_snapshot()?;
+    let reception = world.practice_reception_snapshot();
+    let ledger = world.practice_ledger_snapshot();
+    let outcome = ledger
+        .as_ref()
+        .and_then(|l| l.attempts.last())
+        .and_then(|a| a.outcome);
+    let line = if let Some(outcome) = outcome {
+        let result = match outcome {
+            PracticeOutcome::Complete => "COMPLETE",
+            PracticeOutcome::Failed => "FAILED",
+            PracticeOutcome::Abandoned => "ABANDONED",
+        };
+        let next = if world.review_practice(snapshot.tick).is_ok() {
+            "F10 REVIEW NEW ATTEMPT"
+        } else {
+            "NEW REVIEW REQUIRES AVAILABLE AVENOR OFFER"
+        };
+        format!("PRACTICE {result} | {next}")
+    } else {
+        let close = if world.review_practice_closure(snapshot.tick).is_ok() {
+            " | F7 REVIEW CLOSURE"
+        } else {
+            ""
+        };
+        let state = match practice.status {
+            PracticeStatus::Unaccepted => {
+                if world.review_practice(snapshot.tick).is_ok() {
+                    "F10 REVIEW AVENOR PRACTICE".into()
+                } else {
+                    "PRACTICE REVIEW REQUIRES AVENOR BERTH".into()
+                }
+            }
+            PracticeStatus::Consented => "PRACTICE ACCEPTED | L LAUNCH".into(),
+            PracticeStatus::Failed => "PRACTICE FAILED | ORDINARY TARGET HIT".into(),
+            PracticeStatus::Active if practice.first_hits < 3 => {
+                format!("PRACTICE BEACONS HIT {}/3 | Z FIRE", practice.first_hits)
+            }
+            PracticeStatus::Active => match reception {
+                Some(state) if state.ready => "CEASEFIRE COMPLETE | DOCK AT AVENOR".into(),
+                Some(state) => format!(
+                    "CEASEFIRE {:.2} / {:.2} SEC | KEEP Z RELEASED",
+                    f32::from(state.quiet_ticks) / 60.0,
+                    f32::from(PRACTICE_QUIET_TICKS) / 60.0,
+                ),
+                _ => "PRACTICE IN PROGRESS".into(),
+            },
+            PracticeStatus::Retired => {
+                if world.review_practice_reception(snapshot.tick).is_ok() {
+                    "F8 REVIEW PRACTICE RECEPTION".into()
+                } else if reception.is_some_and(|state| state.ready) {
+                    "DOCK AT AVENOR FOR PRACTICE RECEPTION".into()
+                } else {
+                    format!("RANGE CLOSED | BEACONS HIT {}/3", practice.first_hits)
+                }
+            }
+        };
+        format!("{state}{close}")
+    };
+    Some(line)
+}
+
 /// Original fixed dialogue is word-wrapped before the renderer's column bound.
 fn append_paragraph(lines: &mut Vec<String>, paragraph: &str) {
     let mut line = String::new();
@@ -680,6 +746,65 @@ fn missile_command(world: &mut World, action: Action) -> Result<String, String> 
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn closure_review_history_and_fresh_consent_are_visible_without_reopening_old_attempt() {
+        let mut world = World::new_commander(992).unwrap_or_else(|e| panic!("{e}"));
+        let mut session = Session::from_world(&world);
+        let review = world.review_practice(0).unwrap_or_else(|e| panic!("{e}"));
+        world
+            .prepare_practice_confirmation(review, 0)
+            .unwrap_or_else(|e| panic!("{e}"))
+            .commit();
+        assert!(
+            session
+                .lines(&world, true, None)
+                .join("\n")
+                .contains("F7 REVIEW CLOSURE")
+        );
+        session
+            .command(&mut world, Action::ReviewPracticeClosure)
+            .unwrap_or_else(|e| panic!("{e}"));
+        let panel = session.lines(&world, true, None).join(" ");
+        for term in [
+            "CLOSE PRACTICE ATTEMPT",
+            "ENTER CONFIRMS AND SAVES",
+            "B CANCELS",
+            "Abandon",
+            "No reward, refund",
+            "ammunition refill",
+        ] {
+            assert!(panel.contains(term), "Missing closure term: {term}");
+        }
+        session
+            .command(&mut world, Action::Back)
+            .unwrap_or_else(|e| panic!("{e}"));
+        let review = world
+            .review_practice_closure(0)
+            .unwrap_or_else(|e| panic!("{e}"));
+        world
+            .prepare_practice_closure(review, 0)
+            .unwrap_or_else(|e| panic!("{e}"))
+            .commit();
+        let closed = session.lines(&world, true, None).join("\n");
+        assert!(closed.contains("PRACTICE ABANDONED | F10 REVIEW NEW ATTEMPT"));
+        session
+            .command(&mut world, Action::MissionDetails)
+            .unwrap_or_else(|e| panic!("{e}"));
+        let history = session.lines(&world, true, None).join("\n");
+        assert!(history.contains("ABANDONED 1"));
+        assert!(history.contains("TRACE NOT YET RECORDED"));
+        session.invalidate();
+        let review = world.review_practice(0).unwrap_or_else(|e| panic!("{e}"));
+        world
+            .prepare_practice_confirmation(review, 0)
+            .unwrap_or_else(|e| panic!("{e}"))
+            .commit();
+        let fresh = session.lines(&world, true, None).join("\n");
+        assert!(fresh.contains("PRACTICE ACCEPTED | L LAUNCH"));
+        assert!(!fresh.contains("PRACTICE ABANDONED"));
+        assert!(!fresh.contains("F8 REVIEW"));
+    }
+
     #[test]
     fn missile_controls_cycle_actual_locks_consume_a_round_and_continue_state() {
         fn assert_visible(session: &Session, world: &World, warning: &str) {

@@ -724,6 +724,9 @@ impl State {
         }
     }
 
+    pub(crate) fn retained_mission_records(&self) -> usize {
+        usize::from(self.data.allocated)
+    }
     pub(crate) fn active_job(&self) -> Option<JobId> {
         self.data
             .jobs
