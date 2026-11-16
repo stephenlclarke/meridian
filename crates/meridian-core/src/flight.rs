@@ -34,6 +34,7 @@ pub use combat::{
     PlayerCondition, SHIELD_CAPACITY,
 };
 mod equipment;
+pub use equipment::{EquipmentPreparationError, PreparedEquipment};
 mod mission;
 mod persistence;
 mod practice;

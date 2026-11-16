@@ -95,8 +95,8 @@ fn equipment() -> EquipmentPanel {
         }],
         equipment_units: [5, 24],
         utility_mounts: [1, 3],
-        assigned_crew: 1,
-        required_crew: 1,
+        assigned_crew: Some(1),
+        required_crew: Some(1),
         feedback: "Fitted the same owned module".into(),
     }
 }

@@ -194,8 +194,8 @@ pub struct EquipmentPanel {
     pub rows: Vec<EquipmentRow>,
     pub equipment_units: [u32; 2],
     pub utility_mounts: [u32; 2],
-    pub assigned_crew: u32,
-    pub required_crew: u32,
+    pub assigned_crew: Option<u32>,
+    pub required_crew: Option<u32>,
     pub feedback: String,
 }
 #[derive(Debug, Clone, Copy)]

@@ -62,3 +62,5 @@ pub use flight::{
 };
 
 pub use flight::FlightResourcesSnapshot;
+
+pub use flight::{EquipmentPreparationError, PreparedEquipment};

@@ -951,7 +951,10 @@ fn equipment(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
             panel.utility_mounts[0],
             panel.utility_mounts[1]
         ),
-        format!("Crew {}/{}", panel.assigned_crew, panel.required_crew),
+        match (panel.assigned_crew, panel.required_crew) {
+            (Some(assigned), Some(required)) => format!("Crew {assigned}/{required}"),
+            _ => "Crew information unavailable".into(),
+        },
     ];
     if let OfferQuantity::Available(n) = row.quantity {
         lines.push(format!("Available: {n}"));

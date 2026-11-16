@@ -43,3 +43,72 @@ impl World {
 
 #[cfg(test)]
 pub(super) mod tests;
+
+/// Prospective cargo fitting keeps the live account unchanged until durable publication.
+pub struct PreparedEquipment<'a> {
+    world: &'a mut World,
+    account: crate::freight::g02::CommanderAccount,
+    event: Event,
+    bytes: Vec<u8>,
+}
+#[derive(Debug)]
+pub enum EquipmentPreparationError {
+    Command(MissionError),
+    Save(crate::save::SaveError),
+}
+impl core::fmt::Display for EquipmentPreparationError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::Command(error) => write!(f, "{error}"),
+            Self::Save(error) => write!(f, "{error}"),
+        }
+    }
+}
+impl std::error::Error for EquipmentPreparationError {}
+impl PreparedEquipment<'_> {
+    pub fn bytes(&self) -> &[u8] {
+        &self.bytes
+    }
+    pub fn event(&self) -> Event {
+        self.event
+    }
+    pub fn commit(self) -> Event {
+        self.world.commander_account = Some(self.account);
+        self.event
+    }
+}
+impl World {
+    pub fn prepare_equipment(
+        &mut self,
+        command: Command,
+        tick: u64,
+    ) -> Result<PreparedEquipment<'_>, EquipmentPreparationError> {
+        let command_error = EquipmentPreparationError::Command;
+        let facts = self.current_service_facts(tick).map_err(command_error)?;
+        let account = self
+            .commander_account
+            .as_ref()
+            .ok_or_else(|| command_error(MissionError::NoCommander))?;
+        let session = self
+            .freight_session
+            .as_ref()
+            .ok_or_else(|| command_error(MissionError::NoCommander))?;
+        let (account, event) = account
+            .prepare_equipment(
+                &session.state,
+                facts,
+                command,
+                self.navigation_trade.reservations().capacity,
+            )
+            .map_err(|error| command_error(MissionError::Equipment(error)))?;
+        let bytes = self
+            .save_bytes_with_modules(&account, &self.modular)
+            .map_err(EquipmentPreparationError::Save)?;
+        Ok(PreparedEquipment {
+            world: self,
+            account,
+            event,
+            bytes,
+        })
+    }
+}

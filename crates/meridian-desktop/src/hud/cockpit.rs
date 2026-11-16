@@ -35,7 +35,7 @@ impl Cockpit {
     /// Capture once on the simulation-owning event loop; drawing has no World reference.
     pub fn capture(world: &World, flight: Snapshot) -> Self {
         let combat = world.combat_snapshot();
-        let laser = world.pulse_laser_snapshot();
+        let resources = world.flight_resources_snapshot();
         let missile = world.missile_snapshot();
         let station = flight.station.map(|s| relative(flight, s.pose.position));
         let mut contacts = [None; MAX_CONTACTS];
@@ -68,7 +68,7 @@ impl Cockpit {
                 f32::from(c.player.energy_hundredths)
                     / f32::from(meridian_core::ENERGY_CAPACITY_HUNDREDTHS)
             }),
-            heat: laser.map(|l| f32::from(l.heat_fifths) / (5.0 * 255.0)),
+            heat: resources.map(|l| f32::from(l.heat_fifths) / (5.0 * 255.0)),
             fuel: flight.navigation.map(|n| {
                 f32::from(n.fuel_units) / f32::from(meridian_core::navigation::FUEL_CAPACITY)
             }),

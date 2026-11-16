@@ -11,6 +11,9 @@ use meridian_core::{
 
 #[derive(Clone, Copy)]
 pub enum Action {
+    Module(meridian_core::ModuleAction),
+    CargoEquipment(meridian_core::equipment::Command),
+    StationService(meridian_core::station_services::Command),
     ToggleControls,
     Ammunition(meridian_core::AmmunitionAction),
     ReviewTradeLesson,
@@ -303,7 +306,10 @@ impl Session {
                 }
                 .into())
             }
-            Action::Ammunition(_) => {
+            Action::Ammunition(_)
+            | Action::Module(_)
+            | Action::CargoEquipment(_)
+            | Action::StationService(_) => {
                 Err("Equipment changes require the durable profile path".into())
             }
             Action::ReviewTradeLesson | Action::PlanTradeLesson | Action::CancelTradeLesson => {

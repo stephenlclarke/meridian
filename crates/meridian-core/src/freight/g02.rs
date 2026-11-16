@@ -372,6 +372,18 @@ impl CommanderAccount {
     pub(crate) fn hold_capacity(&self) -> u16 {
         self.data.equipment.capacity()
     }
+    pub(crate) fn prepare_equipment(
+        &self,
+        freight: &State,
+        facts: services::ServiceFacts,
+        command: crate::equipment::Command,
+        reserved_capacity: u16,
+    ) -> Result<(Self, crate::equipment::Event), crate::equipment::Error> {
+        let mut candidate = Self { data: self.data };
+        let event = candidate.execute_equipment(freight, facts, command, reserved_capacity)?;
+        Ok((candidate, event))
+    }
+
     pub(crate) fn execute_equipment(
         &mut self,
         freight: &State,

@@ -74,6 +74,82 @@ impl Profile {
         if !self.playing {
             return Err("N starts a new commander; C continues the existing save".into());
         }
+        if let Action::Module(command) = action {
+            let tick = self.world.snapshot().tick;
+            let review = self
+                .world
+                .review_module(command, tick)
+                .map_err(|e| e.to_string())?;
+            let prepared = self
+                .world
+                .prepare_module(review, tick)
+                .map_err(|e| e.to_string())?;
+            let item = prepared.item();
+            let published = self
+                .store
+                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .map_err(|e| format!("Module change could not be saved: {e}"))?;
+            prepared.commit();
+            self.has_save = true;
+            self.session.invalidate();
+            return publication_message(
+                published,
+                format!("Module item {item} updated and saved."),
+            );
+        }
+        let cargo = match action {
+            Action::CargoEquipment(command) => Some(command),
+            Action::PurchaseCargoBay => Some(meridian_core::equipment::Command::PurchaseCargoBay),
+            Action::FitCargoBay | Action::UnfitCargoBay => {
+                let item = self
+                    .world
+                    .equipment_snapshot()
+                    .and_then(|s| s.owned)
+                    .ok_or("No owned cargo bay")?
+                    .id;
+                Some(if matches!(action, Action::FitCargoBay) {
+                    meridian_core::equipment::Command::FitCargoBay(item)
+                } else {
+                    meridian_core::equipment::Command::UnfitCargoBay(item)
+                })
+            }
+            _ => None,
+        };
+        if let Some(command) = cargo {
+            let tick = self.world.snapshot().tick;
+            let prepared = self
+                .world
+                .prepare_equipment(command, tick)
+                .map_err(|e| e.to_string())?;
+            let event = prepared.event();
+            let published = self
+                .store
+                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .map_err(|e| format!("Cargo equipment change could not be saved: {e}"))?;
+            prepared.commit();
+            self.has_save = true;
+            self.session.invalidate();
+            return publication_message(
+                published,
+                format!("Cargo equipment updated and saved: {event:?}"),
+            );
+        }
+        if let Action::StationService(command) = action {
+            let tick = self.world.snapshot().tick;
+            let prepared = self
+                .world
+                .prepare_station_service(command, tick)
+                .map_err(|e| e.to_string())?;
+            let message = crate::market::service_message(prepared.event())?;
+            let published = self
+                .store
+                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .map_err(|e| format!("Market change could not be saved: {e}"))?;
+            prepared.commit();
+            self.has_save = true;
+            self.session.invalidate();
+            return publication_message(published, message);
+        }
         if let Action::Ammunition(command) = action {
             let tick = self.world.snapshot().tick;
             let review = self

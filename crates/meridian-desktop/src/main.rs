@@ -1,6 +1,8 @@
 mod app;
 pub mod celestial;
 mod clock;
+mod docked;
+mod docked_screens;
 mod equipment;
 mod flight_lesson;
 mod hud;

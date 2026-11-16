@@ -68,6 +68,12 @@ impl DockedScreens {
     pub fn selected_system(&self) -> SystemId {
         self.selected_world
     }
+    pub fn reset_equipment_selection(&mut self) {
+        self.equipment_index = 0;
+        self.option_index = 0;
+        self.scroll = 0;
+        self.bump();
+    }
     pub fn selected_ship(&self) -> &str {
         &self.ship
     }
