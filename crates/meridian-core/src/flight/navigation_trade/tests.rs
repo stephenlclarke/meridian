@@ -202,7 +202,7 @@ fn repeated_success_retains_first_trace_and_all_old_family_resources() {
     assert_eq!(snap(&w).attempts.len(), 2);
     assert_eq!(some(w.practice_ledger_snapshot()).trace, None);
     assert_eq!(some(w.flight_reception_snapshot()).trace, None);
-    assert_eq!(some(w.mission_snapshot()).freight.clue, false);
+    assert_eq!(some(w.mission_snapshot()).freight.clue, None);
 }
 #[test]
 fn separate_accept_plan_back_and_market_fuel_terminal_drop_preserve_live_bytes() {
