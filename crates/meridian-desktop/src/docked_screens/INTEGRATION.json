@@ -1,5 +1,5 @@
 {
-  "status": "AUTHORED_SOURCE_ONLY;COMPILER_TESTS_NATIVE_UNRUN",
+  "status": "G1_PRIOR_MODULE_COMPILE_29_TESTS_PASS;CLIPPY_CORRECTION_REVALIDATION_PENDING;NATIVE_UNRUN",
   "base": "8da5d64f9e8c9425b3cae120abfb723fab3ae50e",
   "pathOwnership": "Only crates/meridian-desktop/src/docked_screens/**",
   "registerAtRootSerialJoin": "mod docked_screens; in desktop main.rs; connect actual App input/Profile/World/G1 renderer without moving simulation ownership",
@@ -75,7 +75,7 @@
     "focus_loss_stops_text_and_rotation_without_changing_the_commander",
     "planet_preview_is_a_provider_request_for_the_selected_real_world_only"
   ],
-  "testExecution": "UNRUN; no cargo/check/test/clippy/build/GUI/signing executed by author",
+  "testExecution": "G1 cargo test -p meridian-desktop docked_ passed 41: all29 module +8 renderer +4 existing name-matched tests, against module918717; latest bounded lint correction not yet revalidated. Author launched no compiler/native work.",
   "nativeCriteria": "README.md validation and acceptance section; exact joined source, real keyboard+mouse, all five rendered screens, full module effects/refusals/durable failure/cold continuation",
   "releaseGate": "HUD + all5 docked menus + actual working modular equipment accepted together; no new missions/Lua/fullfleet prerequisite; existing exclusive publisher verifies real qualified boundary",
   "markerClipping": "Each Marker.clip is ChartLayout.plot; G1 clips circles and current/selection decorations to it.",
@@ -92,5 +92,38 @@
       "outcome": "FAILED E0624 regression test called private control; corrected through public handle dispatch, recompile pending",
       "rawLog": "/Volumes/SSD/offload/meridian-g1-mbp-docked-render.5c81d65/evidence/renderer-corrected.log"
     }
-  ]
+  ],
+  "g1Validation": {
+    "moduleHead": "91871716c9501f01c3305287f9a7538855965fc1",
+    "owner": "G1 sole Mac compiler lane",
+    "focusedCommand": "cargo test -p meridian-desktop docked_",
+    "focusedResult": {
+      "passed": 41,
+      "failed": 0,
+      "filteredOut": 68,
+      "modulePassed": 29,
+      "rendererPassed": 8,
+      "existingNameMatchedPassed": 4
+    },
+    "focusedLog": {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-docked-render.5c81d65/evidence/docked-focused.log",
+      "sha256": "c809ed0b0a41e2105812bd52892bb14e5d5c881567e30a1c0b885a25b6029dab"
+    },
+    "strictClippy": {
+      "outcome": "FAILED six module findings; bounded correction pending G1 revalidation",
+      "findings": [
+        "controller.rs:185 collapsible_if",
+        "controller.rs:209 collapsible_if",
+        "controller.rs:226 if_same_then_else",
+        "controller.rs:478 collapsible_if",
+        "controller.rs:663 collapsible_if",
+        "presentation.rs:624 manual_clamp"
+      ],
+      "log": {
+        "path": "/Volumes/SSD/offload/meridian-g1-mbp-docked-render.5c81d65/evidence/clippy.log",
+        "sha256": "7dafe09a69a5b96f34a7982e8e53b933a85b704ae401a86de7590fe5647a1e9f"
+      }
+    },
+    "native": "UNRUN"
+  }
 }
