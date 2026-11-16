@@ -411,16 +411,15 @@ impl State {
             {
                 return Err(INVALID);
             }
-            if let Some(previous) = prior {
-                if o.emission <= previous.emission
+            if let Some(previous) = prior
+                && (o.emission <= previous.emission
                     || o.launched_tick.saturating_sub(previous.launched_tick)
                         < u64::from(MISSILE_COOLDOWN_TICKS)
                     || o.physical_tick.saturating_sub(previous.physical_tick)
                         < u64::from(MISSILE_COOLDOWN_TICKS)
-                    || o.owner != previous.owner
-                {
-                    return Err(INVALID);
-                }
+                    || o.owner != previous.owner)
+            {
+                return Err(INVALID);
             }
             prior = Some(o);
             let lesson = practice.ok_or(INVALID)?;
@@ -515,13 +514,12 @@ impl State {
                 {
                     return Err(INVALID);
                 }
-                if let (Some(a), Some(b)) = (self.impacts[j], self.impacts[i]) {
-                    if a.incident == b.incident
+                if let (Some(a), Some(b)) = (self.impacts[j], self.impacts[i])
+                    && (a.incident == b.incident
                         || (a.tick < b.tick && a.incident > b.incident)
-                        || (a.tick > b.tick && a.incident < b.incident)
-                    {
-                        return Err(INVALID);
-                    }
+                        || (a.tick > b.tick && a.incident < b.incident))
+                {
+                    return Err(INVALID);
                 }
             }
         }
@@ -605,13 +603,11 @@ impl State {
                     id,
                     first_hit: true,
                 }) = p.contact
-                {
-                    if !lesson
+                    && !lesson
                         .missile_receipts()
                         .contains(&(id, Some((p.last_tick, p.origin))))
-                    {
-                        return Err(INVALID);
-                    }
+                {
+                    return Err(INVALID);
                 }
             }
             lesson.validate_missile_quiet(self.projectiles)?;
