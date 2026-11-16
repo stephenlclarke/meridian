@@ -1,3 +1,10 @@
+mod navigation_trade;
+pub use navigation_trade::{
+    NavigationTonneId, NavigationTradeAction, NavigationTradeAttemptSnapshot, NavigationTradeError,
+    NavigationTradeId, NavigationTradeMarketSnapshot, NavigationTradeOutcome,
+    NavigationTradePlanSnapshot, NavigationTradeReview, NavigationTradeSnapshot,
+    NavigationTradeTrace, PreparedNavigationTrade, PreparedStationService,
+};
 mod flight_reception;
 pub use flight_reception::{
     FLIGHT_RECEPTION_MAX_BERTH_RECORDS, FlightReceptionAction, FlightReceptionAttemptSnapshot,
@@ -138,6 +145,7 @@ pub struct World {
     pulse: weapons::PulseResources,
     combat: combat::State,
     missiles: missiles::State,
+    navigation_trade: navigation_trade::State,
     flight_reception: flight_reception::State,
     practice: Option<practice::Practice>,
     practice_history: Vec<practice::Practice>,
@@ -172,6 +180,7 @@ impl World {
             pulse: weapons::PulseResources::default(),
             combat: combat::State::default(),
             missiles: missiles::State::default(),
+            navigation_trade: navigation_trade::State::default(),
             flight_reception: flight_reception::State::default(),
             practice: None,
             practice_history: Vec::new(),
@@ -521,6 +530,8 @@ impl World {
             }
         }
         let prepared = self.prepare_missile_step(next, navigation)?;
+        let navigation_trade =
+            self.prepare_navigation_trade_step(navigation, planned_debit, next.tick)?;
         if let Some(debit) = planned_debit {
             self.commander_account
                 .as_mut()
@@ -529,6 +540,9 @@ impl World {
                 .map_err(|_| StepError::NonFiniteState)?;
         }
         // No fallible operation follows the first account mutation.
+        if let Some(navigation_trade) = navigation_trade {
+            self.navigation_trade = navigation_trade;
+        }
         self.missiles = prepared.missiles;
         self.combat = prepared.combat;
         self.pulse = prepared.pulse;

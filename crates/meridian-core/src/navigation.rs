@@ -407,6 +407,9 @@ impl NavigationState {
     pub(crate) fn ship(self) -> PlayerShipId {
         self.ship
     }
+    pub(crate) fn jump_sequence(self) -> u64 {
+        self.completed_jumps
+    }
     pub(crate) fn drive_item_id(self) -> u64 {
         self.drive.item_ordinal
     }

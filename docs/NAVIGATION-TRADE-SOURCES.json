@@ -1,0 +1,85 @@
+{
+  "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "tree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "files": [
+    {
+      "path": "docs/meridian/missions/gameplay/T04-NAVIGATION-TRADE.md",
+      "gitBlob": "ac82955b9ee559fd7556c238225808b923d7af44",
+      "bytes": 6678,
+      "sha256": "942ddd19f4b26bb8de9e4c3b08aa95b6e357484a4b60974c86d55847936fe34a"
+    },
+    {
+      "path": "Sources/L337Core/ScriptNavigationTradeState.swift",
+      "gitBlob": "0e5d0251c051d6ad3bf3e6a6da3e5ba02f8b807b",
+      "bytes": 15540,
+      "sha256": "52043ac3d4208fa2b5cf8b914cd0beddc9a43bdbd0387b9a46fa4f536070f5f2"
+    },
+    {
+      "path": "Sources/L337Core/ScriptNavigationTradeRuntime.swift",
+      "gitBlob": "6fb00d316a39ab0c51a10312505c32033c0343ad",
+      "bytes": 16604,
+      "sha256": "f9328c70e72f10714feb6f41ece7a46488dc9d9109a473311f566335546577e1"
+    },
+    {
+      "path": "Sources/L337Core/ScriptNavigationTradeSave.swift",
+      "gitBlob": "87a6b43783bf6396e8f38838503af1eb8333438f",
+      "bytes": 4918,
+      "sha256": "25f6ad3ba35e40aa5e09268745f4e38fafb07cb71c60b6755426f3dad598d6e9"
+    },
+    {
+      "path": "Sources/L337Core/ScriptNavigationTradeContent.swift",
+      "gitBlob": "6eef274ff646ef082cfcabfaaa98e18be7301450",
+      "bytes": 777,
+      "sha256": "d666e811f69418b0e1abb1c68a53869668cd177a577081b87884ab8ce8967daa"
+    },
+    {
+      "path": "Sources/L337Core/OriginalServiceReservationPolicy.swift",
+      "gitBlob": "3da14a80aab9fcdb68346ad743e672a54c140e8b",
+      "bytes": 1982,
+      "sha256": "4084be20f133ee6dd4fe29d2abc85d90949f307e2d0339b7e0398628cd9cdeff"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-navigation-trade/manifest.toml",
+      "gitBlob": "f536b5dcc1d5783467ab8a202736cf1dd85c1c70",
+      "bytes": 2872,
+      "sha256": "31d93d59496147301ac306f652e740175e5af653a77c7d2063cc970e5f09d478"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-navigation-trade/scripts/main.lua",
+      "gitBlob": "8c19d11780ae43db93cdbfdd50a634afb628b684",
+      "bytes": 1943,
+      "sha256": "b70f4ff91c34e80682d5b3016426e7ee47e19d6767b5a81e22671b68188cde10"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-navigation-trade/README.md",
+      "gitBlob": "2c92f16546f6d370946f5201f6d0abb45a8ae063",
+      "bytes": 2063,
+      "sha256": "aeb1c30ffabbaf014f7e931c5e1464367e5f360d20e2bc56221c9069c57f4f4c"
+    },
+    {
+      "path": "Tests/L337CoreTests/OriginalNavigationTradeDeliveryTests.swift",
+      "gitBlob": "e7a757607520fbf833bdb4ba9a09f206be78acb5",
+      "bytes": 14221,
+      "sha256": "ff288379266b14d9b1357e1c00b1327849fc69c5682bd2d6cb7357c480f65c46"
+    },
+    {
+      "path": "Tests/L337CoreTests/ScriptNavigationTradeTests.swift",
+      "gitBlob": "2ad905940ac381c1a54fecdff68b26ae7da1e3af",
+      "bytes": 20046,
+      "sha256": "081d48184fe479da2f9ab9ad09318e92eb2021a2908693e779db31aa3dca40c4"
+    },
+    {
+      "path": "Tests/L337CoreTests/ScriptNavigationTradeSaveTests.swift",
+      "gitBlob": "92932f7731e0f84941b52a88a17364dee6c9ce7b",
+      "bytes": 7423,
+      "sha256": "12e5c94467bd5266862225fb38a2d49281970de9b15a5055668ef56fa068890f"
+    },
+    {
+      "path": "Tests/L337CoreTests/ScriptNavigationTradeFixture.swift",
+      "gitBlob": "d9a5bf3dcc68955afa046b8acb5d7cfed06f386d",
+      "bytes": 8218,
+      "sha256": "acd3a61c0481a15ccf467bff9f1a93317966d9ad6f17ce91c275cada9fbc5f5d"
+    }
+  ],
+  "scope": "Immutable source blobs frozen before Rust implementation. Historical Swift fixture results are not Rust/native acceptance."
+}

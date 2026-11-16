@@ -366,6 +366,7 @@ impl CommanderAccount {
         freight: &State,
         facts: services::ServiceFacts,
         command: crate::equipment::Command,
+        reserved_capacity: u16,
     ) -> Result<crate::equipment::Event, crate::equipment::Error> {
         use crate::equipment::Error as EquipmentError;
         let projection = self
@@ -373,11 +374,15 @@ impl CommanderAccount {
             .map_err(EquipmentError::Service)?;
         services::validate_service(self.data.owner, projection, Some(facts))
             .map_err(EquipmentError::Service)?;
+        let used = projection
+            .used_tonnes
+            .checked_add(reserved_capacity)
+            .ok_or(EquipmentError::HoldFull)?;
         let (equipment, event) = self.data.equipment.prepare(
             self.data.owner,
             self.data.hull,
             self.data.revision,
-            projection.used_tonnes,
+            used,
             facts.site,
             command,
         )?;
@@ -390,9 +395,14 @@ impl CommanderAccount {
                 _ => EquipmentError::InvalidState,
             })?;
         candidate.data.equipment = equipment;
-        candidate
+        let after = candidate
             .service_projection(freight)
             .map_err(EquipmentError::Service)?;
+        if u32::from(after.used_tonnes) + u32::from(reserved_capacity)
+            > u32::from(after.hold_capacity_tonnes)
+        {
+            return Err(EquipmentError::HoldFull);
+        }
         self.data = candidate.data;
         Ok(event)
     }
@@ -439,8 +449,8 @@ impl CommanderAccount {
         })
     }
 
-    /// The only ordinary service mutation: checked account and stock publish together.
-    /// No caller-supplied price, cash balance, fuel amount or cargo grant enters this boundary.
+    #[cfg(test)]
+    /// Retained ordinary domain entry point; World uses the prospective result for joint lesson publication.
     pub(crate) fn execute_station_service(
         &mut self,
         freight: &State,
@@ -448,10 +458,32 @@ impl CommanderAccount {
         facts: services::ServiceFacts,
         command: services::Command,
     ) -> Result<services::Event, services::Error> {
-        let before = self.service_projection(freight)?;
+        let (account, market, event) = self.prepare_station_service(
+            freight,
+            markets,
+            facts,
+            command,
+            services::Reservations::default(),
+        )?;
+        self.data = account.data;
+        *markets = market;
+        Ok(event)
+    }
+    pub(crate) fn prepare_station_service(
+        &self,
+        freight: &State,
+        markets: &services::StationMarkets,
+        facts: services::ServiceFacts,
+        command: services::Command,
+        reservations: services::Reservations,
+    ) -> Result<(Self, services::StationMarkets, services::Event), services::Error> {
+        let before = reservations.apply(self.service_projection(freight)?)?;
         let plan = markets.prepare(before, Some(facts), command)?;
-        let change =
-            plan.checked_change(markets, self.service_projection(freight)?, Some(facts))?;
+        let change = plan.checked_change(
+            markets,
+            reservations.apply(self.service_projection(freight)?)?,
+            Some(facts),
+        )?;
         let after = change.account_after;
         let mut candidate = Self { data: self.data };
         match change.event {
@@ -470,12 +502,10 @@ impl CommanderAccount {
         candidate.data.fuel_tenths = after.fuel_tenths;
         // This also checks actual owned fit, all remaining identified freight and reservations.
         // Copying the account preserves equipment/other cargo instead of reconstructing it.
-        if candidate.service_projection(freight)? != after {
+        if reservations.apply(candidate.service_projection(freight)?)? != after {
             return Err(services::Error::InvalidAccount);
         }
-        self.data = candidate.data;
-        *markets = change.market;
-        Ok(change.event)
+        Ok((candidate, change.market, change.event))
     }
 
     /// World navigation, after its real passage checks, consumes normal owned fuel.

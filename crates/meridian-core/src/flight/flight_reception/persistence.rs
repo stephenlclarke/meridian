@@ -54,7 +54,9 @@ impl State {
         history: &[practice::Practice],
     ) -> Result<(), SaveError> {
         let (own_records, own_active) = self.occupancy();
+        let (t04_records, t04_active) = world.navigation_trade.occupancy();
         let records = own_records
+            + t04_records
             + history.len()
             + usize::from(practice.is_some())
             + world
@@ -62,6 +64,7 @@ impl State {
                 .as_ref()
                 .map_or(0, |s| s.state.retained_mission_records());
         let active = own_active
+            + t04_active
             + usize::from(practice.is_some_and(|p| !p.reception_is_terminal()))
             + usize::from(world.active_freight_job().is_some());
         if records > MAX_RECORDS || active > MAX_ACTIVE {

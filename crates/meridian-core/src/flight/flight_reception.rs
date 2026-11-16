@@ -253,18 +253,21 @@ impl World {
         }
         Ok(())
     }
-    // Only currently implemented owners count: original G02, T02 and this T01 ledger.
+    // Only implemented owners count: original G02, T02, T01 and T04.
     pub(super) fn original_service_occupancy(&self) -> (usize, usize) {
         let (records, active) = self.flight_reception.occupancy();
+        let (t04_records, t04_active) = self.navigation_trade.occupancy();
         let practice_count = self.practice_history.len() + usize::from(self.practice.is_some());
         (
             records
+                + t04_records
                 + practice_count
                 + self
                     .freight_session
                     .as_ref()
                     .map_or(0, |s| s.state.retained_mission_records()),
             active
+                + t04_active
                 + usize::from(self.active_freight_job().is_some())
                 + usize::from(self.practice.is_some_and(|p| !p.reception_is_terminal())),
         )
