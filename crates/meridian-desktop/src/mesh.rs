@@ -496,7 +496,7 @@ mod tests {
                 {
                     return false;
                 }
-                let project = |[x, y, z]| [x * 1.6 / z, y * 1.6 / z];
+                let project = |[x, y, z]: [f32; 3]| [x * 1.6 / z, y * 1.6 / z];
                 let [[ax, ay], [bx, by], [cx, cy]] = [a, b, c].map(project);
                 ((bx - ax) * (cy - ay) - (by - ay) * (cx - ax)).abs() > 0.0001
             });
