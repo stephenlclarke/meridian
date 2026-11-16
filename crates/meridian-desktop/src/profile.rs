@@ -401,7 +401,7 @@ fn default_directory() -> io::Result<PathBuf> {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
     use meridian_core::{
         FlightInput, FlightMode,
@@ -414,9 +414,9 @@ mod tests {
         path::Path,
         process::Command,
     };
-    pub(super) struct TestDirectory(pub(super) PathBuf);
+    pub(crate) struct TestDirectory(pub(crate) PathBuf);
     impl TestDirectory {
-        pub(super) fn new() -> Self {
+        pub(crate) fn new() -> Self {
             let nonce = RandomState::new().build_hasher().finish();
             let path = std::env::temp_dir().join(format!(
                 "meridian-profile-test-{}-{nonce:016x}",
@@ -431,7 +431,7 @@ mod tests {
             let _ = fs::remove_dir_all(&self.0);
         }
     }
-    pub(super) fn open(path: &Path) -> Profile {
+    pub(crate) fn open(path: &Path) -> Profile {
         Profile::open(path.to_path_buf()).unwrap_or_else(|e| panic!("{e}"))
     }
     pub(super) fn action(profile: &mut Profile, value: Action) {

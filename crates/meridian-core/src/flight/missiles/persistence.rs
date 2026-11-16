@@ -1006,7 +1006,7 @@ impl State {
         Ok(())
     }
 
-    fn motion_body_expected(&self, slot: usize, i: usize, m: Motion) -> bool {
+    fn motion_body_expected(&self, slot: usize, i: usize, m: &Motion) -> bool {
         self.projectiles[slot].is_some_and(|other| {
             if other.origin.launched_tick >= m.flight.tick {
                 return false;

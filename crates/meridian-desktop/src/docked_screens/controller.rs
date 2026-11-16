@@ -637,7 +637,7 @@ impl DockedScreens {
             Key::Previous | Key::Next | Key::PagePrevious | Key::PageNext => {
                 self.move_selection(selection_step(key), c)
             }
-            Key::Confirm => return self.equipment(EquipmentOperation::Buy, c),
+            Key::Confirm | Key::Buy => return self.equipment(EquipmentOperation::Buy, c),
             Key::Fit => return self.equipment(EquipmentOperation::Fit, c),
             Key::Store => return self.equipment(EquipmentOperation::Store, c),
             Key::Details => {
