@@ -534,13 +534,13 @@ fn actual_missile_mesh_obstructs_sight_and_open_station_doorway_stays_clear() {
     let mut sample = some(world.flight_reception_sample(origin.owner.visit));
     assert!(world.flight_sample_bodies_valid(sample, false));
     let mut missing = sample;
-    missing.bodies = [None; 3];
+    missing.bodies.fill(None);
     assert!(!world.flight_sample_bodies_valid(missing, false));
     sample.flight.position = [0.0, 5.0, (p.position.z - 100.0) as f32];
     sample.flight.orientation = [0.0, 0.0, 0.0, 1.0];
     assert!(!world.flight_sample_sight_clear(sample));
     let mut clear = sample;
-    clear.bodies = [None; 3];
+    clear.bodies.fill(None);
     assert!(world.flight_sample_sight_clear(clear));
     // A real public approach through the native station opening requires no fabricated wall.
     let mut world = commander(5002);
