@@ -605,115 +605,34 @@ impl Session {
         }
     }
 
-    pub fn lines(&self, world: &World, active: bool, notice: Option<&str>) -> Vec<String> {
-        let snapshot = world.snapshot();
-        let name = snapshot
-            .navigation
-            .map(|n| match n.system {
-                SystemId::AVENOR => "AVENOR",
-                SystemId::RENAS => "RENAS",
-                _ => "UNKNOWN SYSTEM",
-            })
-            .unwrap_or("NO COMMANDER");
-        let mode = match snapshot.mode {
-            FlightMode::Docked => "DOCKED",
-            FlightMode::Launching => "LAUNCHING",
-            FlightMode::Flight => "FLIGHT",
-        };
-        let mut lines = vec![format!(
-            "MERIDIAN | {name} | {mode} | {} | VIEW {}",
-            if active {
-                "RUNNING"
-            } else {
-                "PAUSED / UNFOCUSED"
-            },
-            crate::flight_lesson::view_name(world.flight_view())
-        )];
-        let review_line = self.review_line();
-        lines.push(notice.map_or_else(|| crate::flight_lesson::line(world), str::to_string));
-        if let Some(review) = self.pending_trade {
-            lines.push(review_line);
-            crate::trade_lesson::append_review(review, &mut lines);
-            return lines;
-        }
-        if self.show_trade_lesson {
-            crate::trade_lesson::append_details(world, &mut lines);
-            return lines;
-        }
-        if self.append_flight_lesson_panel(world, &mut lines) {
-            return lines;
-        }
-        let compact_flight = snapshot.mode == FlightMode::Flight
-            && self.pending_practice.is_none()
-            && self.pending.is_none()
-            && !self.show_objective
-            && !self.equipment_open
-            && !self.market_open;
-        if self.show_controls
-            && self.pending_practice.is_none()
-            && self.pending.is_none()
-            && !self.show_objective
-        {
-            lines.extend([
-                "FLIGHT: W/S THRUST | ARROWS PITCH | A/D YAW | Q/E ROLL | SPACE BRAKE | J JUMP",
-                "WEAPONS: Z FIRE FRONT PULSE | F1 NEXT LOCK | F2 ARM/SAFE | F3 MISSILE | F4 SAFE",
-                "VIEWS: 0 FRONT | 1 REAR | 2 LEFT | 3 RIGHT",
-                "DOCKED: L LAUNCH | M MARKET | O EQUIPMENT | F REFUEL",
-                "MARKET: [ / ] SELECT | G BUY ONE UNIT | H SELL ONE UNIT",
-                "FLIGHT LESSON: F6 REVIEW | F12 CANCEL | C DETAILS",
-                "TRADE LESSON: 4 REVIEW | 5 PLAN | 6 CANCEL | 7 DETAILS",
-                "F5 SAVE | F9 RELOAD | P PAUSE | F11 FULLSCREEN | ESC SAVE AND QUIT | / CLOSE HELP",
-            ].into_iter().map(str::to_owned));
-            return lines;
-        }
-        if compact_flight {
-            append_missile_panel(world, snapshot.mode, &mut lines);
-            if let Some(line) = practice_line(world) {
-                lines.push(line);
-            }
-            if let Some(travel) = snapshot.navigation.and_then(|nav| nav.travel) {
-                lines.push(format!(
-                    "JUMP COUNTDOWN: {:.1} SECONDS",
-                    travel.remaining_ticks as f32 / 60.0
-                ));
-            }
-            lines.push(
-                "Z FIRE FRONT PULSE | SPACE BRAKE | P PAUSE | F5 SAVE | ESC SAVE AND QUIT | / HELP"
-                    .into(),
-            );
-            lines.push(CRITICAL_CONTROLS.into());
-            return lines;
-        }
-        if !compact_flight {
-            lines.push(review_line);
-            lines.push(self.panel_controls().into());
-        }
-        if let Some(selection) = self.pending_practice {
-            let terms = practice_terms(selection);
-            append_paragraph(&mut lines, terms);
-            return lines;
-        }
-        if self.append_mission_panel(world, &mut lines) {
-            return lines;
-        }
-        if self.equipment_open {
-            if let Err(error) = crate::equipment::append_panel(world, &mut lines) {
-                append_paragraph(&mut lines, &error);
-            }
-            return lines;
-        }
-        if self.market_open {
-            if let Err(error) =
-                crate::market::append_panel(world, self.selected_commodity, &mut lines)
-            {
-                append_paragraph(&mut lines, &error);
-            }
-            return lines;
-        }
-        append_missile_panel(world, snapshot.mode, &mut lines);
+    fn append_compact_flight(
+        world: &World,
+        snapshot: meridian_core::Snapshot,
+        lines: &mut Vec<String>,
+    ) {
+        append_missile_panel(world, snapshot.mode, lines);
         if let Some(line) = practice_line(world) {
             lines.push(line);
         }
+        if let Some(travel) = snapshot.navigation.and_then(|nav| nav.travel) {
+            lines.push(format!(
+                "JUMP COUNTDOWN: {:.1} SECONDS",
+                travel.remaining_ticks as f32 / 60.0
+            ));
+        }
+        lines.push(
+            "Z FIRE FRONT PULSE | SPACE BRAKE | P PAUSE | F5 SAVE | ESC SAVE AND QUIT | / HELP"
+                .into(),
+        );
+        lines.push(CRITICAL_CONTROLS.into());
+    }
+
+    fn append_flight_status(
+        world: &World,
+        snapshot: meridian_core::Snapshot,
+        compact_flight: bool,
+        lines: &mut Vec<String>,
+    ) {
         let credit = world.credits_tenths().unwrap_or(0);
         if let Some(navigation) = snapshot.navigation {
             lines.push(format!(
@@ -790,6 +709,104 @@ impl Session {
             "O EQUIPMENT | M MARKET | G BUY | H SELL | F REFUEL | P PAUSE | F11 FULLSCREEN".into(),
         );
         lines.push(CRITICAL_CONTROLS.into());
+    }
+
+    pub fn lines(&self, world: &World, active: bool, notice: Option<&str>) -> Vec<String> {
+        let snapshot = world.snapshot();
+        let name = snapshot
+            .navigation
+            .map(|n| match n.system {
+                SystemId::AVENOR => "AVENOR",
+                SystemId::RENAS => "RENAS",
+                _ => "UNKNOWN SYSTEM",
+            })
+            .unwrap_or("NO COMMANDER");
+        let mode = match snapshot.mode {
+            FlightMode::Docked => "DOCKED",
+            FlightMode::Launching => "LAUNCHING",
+            FlightMode::Flight => "FLIGHT",
+        };
+        let mut lines = vec![format!(
+            "MERIDIAN | {name} | {mode} | {} | VIEW {}",
+            if active {
+                "RUNNING"
+            } else {
+                "PAUSED / UNFOCUSED"
+            },
+            crate::flight_lesson::view_name(world.flight_view())
+        )];
+        let review_line = self.review_line();
+        lines.push(notice.map_or_else(|| crate::flight_lesson::line(world), str::to_string));
+        if let Some(review) = self.pending_trade {
+            lines.push(review_line);
+            crate::trade_lesson::append_review(review, &mut lines);
+            return lines;
+        }
+        if self.show_trade_lesson {
+            crate::trade_lesson::append_details(world, &mut lines);
+            return lines;
+        }
+        if self.append_flight_lesson_panel(world, &mut lines) {
+            return lines;
+        }
+        let compact_flight = snapshot.mode == FlightMode::Flight
+            && self.pending_practice.is_none()
+            && self.pending.is_none()
+            && !self.show_objective
+            && !self.equipment_open
+            && !self.market_open;
+        if self.show_controls
+            && self.pending_practice.is_none()
+            && self.pending.is_none()
+            && !self.show_objective
+        {
+            lines.extend([
+                "FLIGHT: W/S THRUST | ARROWS PITCH | A/D YAW | Q/E ROLL | SPACE BRAKE | J JUMP",
+                "WEAPONS: Z FIRE FRONT PULSE | F1 NEXT LOCK | F2 ARM/SAFE | F3 MISSILE | F4 SAFE",
+                "VIEWS: 0 FRONT | 1 REAR | 2 LEFT | 3 RIGHT",
+                "DOCKED: L LAUNCH | M MARKET | O EQUIPMENT | F REFUEL",
+                "MARKET: [ / ] SELECT | G BUY ONE UNIT | H SELL ONE UNIT",
+                "FLIGHT LESSON: F6 REVIEW | F12 CANCEL | C DETAILS",
+                "TRADE LESSON: 4 REVIEW | 5 PLAN | 6 CANCEL | 7 DETAILS",
+                "F5 SAVE | F9 RELOAD | P PAUSE | F11 FULLSCREEN | ESC SAVE AND QUIT | / CLOSE HELP",
+            ].into_iter().map(str::to_owned));
+            return lines;
+        }
+        if compact_flight {
+            Self::append_compact_flight(world, snapshot, &mut lines);
+            return lines;
+        }
+        if !compact_flight {
+            lines.push(review_line);
+            lines.push(self.panel_controls().into());
+        }
+        if let Some(selection) = self.pending_practice {
+            let terms = practice_terms(selection);
+            append_paragraph(&mut lines, terms);
+            return lines;
+        }
+        if self.append_mission_panel(world, &mut lines) {
+            return lines;
+        }
+        if self.equipment_open {
+            if let Err(error) = crate::equipment::append_panel(world, &mut lines) {
+                append_paragraph(&mut lines, &error);
+            }
+            return lines;
+        }
+        if self.market_open {
+            if let Err(error) =
+                crate::market::append_panel(world, self.selected_commodity, &mut lines)
+            {
+                append_paragraph(&mut lines, &error);
+            }
+            return lines;
+        }
+        append_missile_panel(world, snapshot.mode, &mut lines);
+        if let Some(line) = practice_line(world) {
+            lines.push(line);
+        }
+        Self::append_flight_status(world, snapshot, compact_flight, &mut lines);
         lines
     }
 }

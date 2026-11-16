@@ -506,6 +506,20 @@ impl Geometry {
         if let Some(r) = frame.hovered {
             outline(&mut self.shapes, r, canvas, colour(Ink::Yellow, srgb), size);
         }
+        self.append_previews(frame, model, canvas, srgb, planet_system)?;
+        if self.shapes.len() > MAX_GEOMETRY || self.models.len() > MAX_MODEL_VERTICES {
+            return Err("docked geometry exceeds fixed buffer capacity".into());
+        }
+        Ok(())
+    }
+    fn append_previews(
+        &mut self,
+        frame: &Frame,
+        model: &Model,
+        canvas: Rect,
+        srgb: bool,
+        planet_system: Option<meridian_core::navigation::SystemId>,
+    ) -> Result<(), String> {
         for p in &frame.models {
             if !model.matches(p) {
                 self.unavailable_models += 1;
@@ -540,9 +554,6 @@ impl Geometry {
                     srgb,
                 )?;
             }
-        }
-        if self.shapes.len() > MAX_GEOMETRY || self.models.len() > MAX_MODEL_VERTICES {
-            return Err("docked geometry exceeds fixed buffer capacity".into());
         }
         Ok(())
     }

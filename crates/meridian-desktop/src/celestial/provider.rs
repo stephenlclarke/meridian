@@ -1,8 +1,9 @@
-use super::*;
+use super::{BodyId, Palette, Planet, Scene, Sun, SurfaceData};
 use meridian_core::{
     FlightMode,
     celestial::{Snapshot as CoreScene, SurfaceMaps, SurfaceRecipe},
 };
+use std::sync::Arc;
 /// Bounded presentation cache for the actual core-owned system visit and recipe.
 #[derive(Default)]
 pub struct WorldAdapter {

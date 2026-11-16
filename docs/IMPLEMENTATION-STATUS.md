@@ -2,6 +2,14 @@
 
 Reviewed against actual delivery evidence on 16 November 2026. This document distinguishes installed gameplay from source awaiting execution. Update it with every delivery or material acceptance change; test counts belong to their exact source.
 
+## Quality correction awaiting owning Rust validation
+
+Main `8230456` passed all six hosted jobs and returned an overall Sonar gate OK. This does not close the release blocker: Sonar reported zero coverage on 13 new executable lines with the small-change coverage condition ignored, invalid Python XML source directories and missing module-relative Rust reports. Fifteen source findings from the earlier preview analysis also remained open. Publication stays held; the prior failed analysis and the later gate/attribution distinction remain recorded.
+
+The following candidate binds every Python coverage class to its unique real repository file and an absolute source root, preserving every original line/branch measurement and the raw report. Ambiguous, missing, outside-project and traversal inputs refuse. Main CI supplies absolute Rust LCOV/Clippy paths to Cargo-module sensors and imports the normalized Python report. The six new report-path tests pass alongside all existing Python tests: 88 total. The importer, verifier and mapping helper have local statement coverage 46/46, 36/36 and 49/49 respectively. This is local line coverage, not a claim that Sonar has accepted the new mapping.
+
+The candidate also addresses the 15 identified source findings through explicit Rust imports, extraction of existing redraw/input/menu/status/rendering phases, and decomposition of the Python catalogue builder with its original assertions and byte output preserved. Existing Rust test bodies remain unchanged. These are production Rust source changes: the older all-Rust-identical-to-e470 predicate does not apply to this candidate. G2 must review the complete joined source, and G1/Dell must qualify its actual compiler/native identity before release. No new gameplay feature, weakened assertion, coverage exclusion, threshold or baseline change is introduced.
+
 ## Release coverage correction
 
 Protected main `0515e63` passed platform tests, documentation and the coverage-report job, then failed Sonar's unchanged 80 percent new-code coverage gate: all 70 new executable Python lines in the two docked reference tools were unmeasured/uncovered. The original Python coverage configuration included only top-level `tools`, while the new helpers live under `crates/meridian-desktop/src/docked_screens/tools`. Publication is held; the qualified signed local Mac package is separate from a public release.

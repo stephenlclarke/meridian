@@ -388,47 +388,7 @@ impl Docked {
                 operation,
                 option,
             } => {
-                if option.is_some() {
-                    return Err("This equipment has no configurable option".into());
-                }
-                let panel = equipment_panel(world, &self.slot, &self.feedback)?;
-                if slot != self.slot {
-                    return Err("Equipment slot changed".into());
-                }
-                let row = panel
-                    .rows
-                    .iter()
-                    .find(|r| {
-                        r.node == node
-                            && if operation == ui::EquipmentOperation::Buy {
-                                r.instance.is_none()
-                            } else {
-                                r.instance == instance
-                            }
-                    })
-                    .ok_or("Equipment selection changed")?;
-                let allowed = match operation {
-                    ui::EquipmentOperation::Buy => row.can_buy,
-                    ui::EquipmentOperation::Fit => row.can_fit,
-                    ui::EquipmentOperation::Store => row.can_store,
-                    _ => false,
-                };
-                if !allowed {
-                    return Err(row
-                        .refusal
-                        .clone()
-                        .unwrap_or_else(|| "This fitting action is unavailable".into()));
-                }
-                let action = equipment_action(world, &node, instance, &slot, operation)?;
-                let details = vec![
-                    row.name.clone(),
-                    row.price_tenths.map_or_else(
-                        || "Owned item; no charge for fitting or storing".into(),
-                        |p| format!("Offer {}.{} CR", p / 10, p % 10),
-                    ),
-                    "Confirm publishes the complete equipment change".into(),
-                ];
-                self.review(world, Intent::Change(action), "Equipment review", details)?;
+                self.review_equipment(world, node, instance, slot, operation, option)?;
             }
             ui::Request::ReviewShipExchange(_) => {
                 return Err("Ship exchange is not yet available for this hull".into());
@@ -439,6 +399,59 @@ impl Docked {
         }
         Ok(())
     }
+    fn review_equipment(
+        &mut self,
+        world: &World,
+        node: String,
+        instance: Option<u64>,
+        slot: String,
+        operation: ui::EquipmentOperation,
+        option: Option<String>,
+    ) -> Result<(), String> {
+        if option.is_some() {
+            return Err("This equipment has no configurable option".into());
+        }
+        let panel = equipment_panel(world, &self.slot, &self.feedback)?;
+        if slot != self.slot {
+            return Err("Equipment slot changed".into());
+        }
+        let row = panel
+            .rows
+            .iter()
+            .find(|r| {
+                r.node == node
+                    && if operation == ui::EquipmentOperation::Buy {
+                        r.instance.is_none()
+                    } else {
+                        r.instance == instance
+                    }
+            })
+            .ok_or("Equipment selection changed")?;
+        let allowed = match operation {
+            ui::EquipmentOperation::Buy => row.can_buy,
+            ui::EquipmentOperation::Fit => row.can_fit,
+            ui::EquipmentOperation::Store => row.can_store,
+            _ => false,
+        };
+        if !allowed {
+            return Err(row
+                .refusal
+                .clone()
+                .unwrap_or_else(|| "This fitting action is unavailable".into()));
+        }
+        let action = equipment_action(world, &node, instance, &slot, operation)?;
+        let details = vec![
+            row.name.clone(),
+            row.price_tenths.map_or_else(
+                || "Owned item; no charge for fitting or storing".into(),
+                |p| format!("Offer {}.{} CR", p / 10, p % 10),
+            ),
+            "Confirm publishes the complete equipment change".into(),
+        ];
+        self.review(world, Intent::Change(action), "Equipment review", details)?;
+        Ok(())
+    }
+
     fn review(
         &mut self,
         world: &World,

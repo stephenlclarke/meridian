@@ -1,4 +1,4 @@
-.PHONY: docs-check fmt fmt-check check test clippy assets-check ci run preview-plan preview-release
+.PHONY: coverage-paths docs-check fmt fmt-check check test clippy assets-check ci run preview-plan preview-release
 
 docs-check:
 	markdownlint-cli2 "**/*.md"
@@ -20,6 +20,10 @@ clippy:
 
 assets-check:
 	python3 -B -m unittest discover -s tools -p 'test_*.py' -v
+
+# Preserve raw measurements and bind filenames for Cargo-module Sonar sensors.
+coverage-paths:
+	python3 -B tools/coverage_paths.py --root "$(CURDIR)" --input coverage/python.xml --output coverage/python-sonar.xml
 
 ci: docs-check fmt-check assets-check check test clippy
 

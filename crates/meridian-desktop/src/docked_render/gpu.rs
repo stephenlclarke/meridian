@@ -1,4 +1,5 @@
-use super::*;
+use super::{Geometry, MAX_GEOMETRY, MAX_GLYPHS, MAX_MODEL_VERTICES, Model, TextVertex, atlas};
+use crate::{docked_screens::Frame, mesh::Vertex};
 pub struct Pass {
     shape_pipeline: wgpu::RenderPipeline,
     model_pipeline: wgpu::RenderPipeline,
