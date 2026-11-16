@@ -54,7 +54,7 @@ impl Range {
 }
 
 impl Practice {
-    pub(super) fn validate_missile_quiet(
+    pub(in crate::flight) fn validate_missile_quiet(
         self,
         projectiles: [Option<crate::flight::ProjectileSnapshot>; 3],
     ) -> Result<(), crate::save::SaveError> {
