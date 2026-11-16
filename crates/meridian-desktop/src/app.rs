@@ -290,7 +290,7 @@ impl App {
         });
         let pulse_notice = self.pulse.map(|shot| match shot.contact {
             PulseContact::Clear => "Pulse fired",
-            PulseContact::StationBlocked { .. } => "Pulse stopped by station hull",
+            PulseContact::StationBlocked { .. } => "Station struck | legal incident recorded",
             PulseContact::PracticeBeacon {
                 first_hit: true, ..
             } => "Practice beacon hit",
