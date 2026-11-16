@@ -30,12 +30,12 @@ def build(reference):
                 fields.append("\t".join(text(x) for x in [d["id"],group,key,value]))
     assert kinds=={"ship":162,"station":6,"capsule":1,"platform":1,"other":1}
     outputs={"worlds.tsv":"\n".join(worlds)+"\n","objects.tsv":"\n".join(ships)+"\n","specifications.tsv":"\n".join(fields)+"\n"}
-    for name,value in outputs.items():(ROOT/"data"/name).write_text(value)
+    for name,value in outputs.items():(ROOT/"data"/name).write_bytes(value.encode("utf-8"))
     for name in ["ScreenNavigation","StationScreenGuide","DockedChartDisplay","GalaxyBrowsing","SystemDisplay","ShipShowroom","ShowroomDisplay","ShowroomGeometry","EquipmentDisplay","EquipmentGroups","EquipmentRuntimeCatalog","EquipmentModuleReadout","EquipmentModuleTemplates","MarketDisplayOrder","MarketInteraction","StationDisplay","ChartDisplay","CompactScreens","GameTypography","Display","CockpitDisplay","OriginalFleetR3Data","OriginalFleetDefinition"]:read("Sources/L337Core/"+name+".swift")
     read("Sources/L337Mac/L337App.swift")
     license=read("LICENSE");(ROOT/"ORIGINAL-L337-MIT.txt").write_bytes(license)
     manifest={"revision":REVISION,"tree":"68fec574df12ddf74acb14747e0dd6839f478642","scope":"Exact display facts and screen behavior references. No meshes/textures/Elite/Oolite assets imported; no acquisition, runtime readiness or legal clearance inferred from authored catalogue.","objects":171,"ships":162,"otherObjectKinds":{k:v for k,v in kinds.items() if k!="ship"},"normalWorlds":2048,"hiddenPlughWorldsImported":False,"sources":sources,"outputs":[{"path":"data/"+n,"bytes":len(v.encode()),"sha256":hashlib.sha256(v.encode()).hexdigest()} for n,v in outputs.items()]}
-    (ROOT/"SOURCE.json").write_text(json.dumps(manifest,indent=2)+"\n")
+    (ROOT/"SOURCE.json").write_bytes((json.dumps(manifest,indent=2)+"\n").encode("utf-8"))
     print(json.dumps({"worlds":2048,"ships":162,"objects":171,"specifications":len(fields),"referenceFiles":len(sources)}))
 
 def main(argv=None):

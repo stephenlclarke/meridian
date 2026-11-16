@@ -118,6 +118,21 @@ class DockedReferenceTests(unittest.TestCase):
         self.assertEqual(result['authoredRustTests'], 2)
         self.assertTrue(result['negativeOriginalCoordinatesPreserved'])
 
+    def test_generated_bytes_are_utf8_lf_and_match_the_manifest_on_every_platform(self):
+        self.worlds['systems'][0]['name'] = 'Fixture \u03a9'
+        self.build()
+        expected = '0\t0\tFixture \u03a9\t-1.5\t'.encode('utf-8')
+        self.assertTrue((self.root / 'data/worlds.tsv').read_bytes().startswith(expected))
+        manifest = json.loads((self.root / 'SOURCE.json').read_bytes())
+        self.assertNotIn(b'\r', (self.root / 'SOURCE.json').read_bytes())
+        for item in manifest['outputs']:
+            raw = (self.root / item['path']).read_bytes()
+            self.assertNotIn(b'\r', raw)
+            self.assertTrue(raw.endswith(b'\n'))
+            self.assertEqual(len(raw), item['bytes'])
+            self.assertEqual(hashlib.sha256(raw).hexdigest(), item['sha256'])
+        self.assertEqual(VERIFIER.verify(self.reference)['worlds'], 2048)
+
     def test_import_rejects_tsv_separator_world_count_and_object_kind_changes(self):
         for separator in ['\t', '\n', '\r']:
             with self.subTest(separator=repr(separator)):
