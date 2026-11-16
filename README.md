@@ -1,6 +1,7 @@
 # Meridian
 
-[![CI](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml)
+Main: [![Main CI](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml?query=branch%3Amain+event%3Apush)
+Pull requests: [![Pull request CI](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml/badge.svg?event=pull_request)](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml?query=event%3Apull_request)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=alert_status)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=coverage)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=bugs)](https://sonarcloud.io/project/issues?id=stephenlclarke_Meridian&types=BUG)
