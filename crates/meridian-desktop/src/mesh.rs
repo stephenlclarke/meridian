@@ -463,7 +463,7 @@ mod tests {
         for _ in 0..1500 {
             if world
                 .missile_snapshot()
-                .unwrap_or_else(|error| panic!("{error}"))
+                .unwrap_or_else(|| panic!("Expected missile snapshot"))
                 .projectiles
                 .iter()
                 .flatten()
