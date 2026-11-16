@@ -124,6 +124,20 @@ impl World {
         self.validate_saved_world(practice, history, trace, &self.flight_reception)?;
         self.encode_saved_world(practice, history, trace, &self.flight_reception)
     }
+    /// Bind all checked saved state except the current simulation tick. A docked redraw
+    /// advances only that clock; historical permission/reading/dock/terminal clocks stay bound.
+    /// The normalized bytes are fingerprint input only, never a save or a mutated World.
+    pub(super) fn flight_reception_material_fingerprint(&self) -> Result<u64, SaveError> {
+        let mut bytes = self.save_bytes()?;
+        let flight_start = MAGIC.len() + size_of::<u16>() + CONTENT.len() + size_of::<u64>();
+        let mut material = self.state;
+        material.tick = 0;
+        let mut encoded = Writer::new();
+        write_flight(&mut encoded, &material);
+        bytes[flight_start..flight_start + encoded.bytes.len()].copy_from_slice(&encoded.bytes);
+        // The stored checksum also derives from the ordinary tick; hash its checked body.
+        Ok(checksum(&bytes[..bytes.len() - size_of::<u64>()]))
+    }
     pub(super) fn save_bytes_with_flight_reception(
         &self,
         lesson: &flight_reception::State,

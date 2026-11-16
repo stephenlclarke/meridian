@@ -2,7 +2,7 @@
 use super::{FlightMode, Snapshot, World, flight_pose};
 use crate::docking::{RigidPose, Vec3};
 use crate::navigation::{DockContext, DockOrigin, PlayerShipId, SavedNavigationSummary};
-use crate::save::{Reader, SaveError, Writer, checksum};
+use crate::save::{Reader, SaveError, Writer};
 
 mod persistence;
 mod sight;
@@ -316,7 +316,9 @@ impl World {
                 }
             }
         }
-        let bytes = self.save_bytes().map_err(FlightReceptionError::Save)?;
+        let fingerprint = self
+            .flight_reception_material_fingerprint()
+            .map_err(FlightReceptionError::Save)?;
         Ok(FlightReceptionReview {
             action,
             dock,
@@ -326,7 +328,7 @@ impl World {
                 .as_ref()
                 .ok_or(FlightReceptionError::NoCommander)?
                 .epoch(),
-            fingerprint: checksum(&bytes),
+            fingerprint,
         })
     }
     fn check_flight_reception_capacity(
@@ -361,7 +363,11 @@ impl World {
         expected_tick: u64,
     ) -> Result<PreparedFlightReception<'_>, FlightReceptionError> {
         let current = self.review_flight_reception(review.action, expected_tick)?;
-        if review != current {
+        if review.dock != current.dock
+            || review.epoch != current.epoch
+            || review.tick > current.tick
+            || review.fingerprint != current.fingerprint
+        {
             return Err(FlightReceptionError::StaleReview);
         }
         let mut candidate = self.flight_reception.clone();
