@@ -65,16 +65,17 @@ Hold **Z** during flight to fire. The desktop samples the held trigger after
 successful fixed steps, clears it with the existing focus and pause input
 reset, and suppresses it during jump spool. The flight HUD displays energy,
 heat and cooldown. The existing depth-tested scene draws a short ribbon from
-the committed origin to the committed endpoint. A centered pulse can appear
-foreshortened in the pilot view, so the HUD also reports a clear shot or a
-station obstruction. The desktop never chooses a contact or changes a
+the committed origin to the committed endpoint, with a depth-tested flash
+on the beam centerline so a centered shot stays visible in the pilot view.
+The HUD reports a clear shot or a station obstruction. The desktop never chooses a contact or changes a
 discharge's resource cost.
 
 Six authored regressions cover fitted public discharge and refusal, cadence
 and thermal recovery, real jump/aim with clear and blocked rays, hot Continue
 and resealed save refusal, physical docking resource behavior, and the
 bounded native geometry including range edge. A desktop regression covers a
-held trigger across fixed ticks and release. The whole joined source needs
+held trigger across fixed ticks and release. A projection regression covers
+end-on clear and blocked shots, including a short blocked segment. The whole joined source needs
 independent review and one coordinated Dell execution of format, compiler,
 tests and strict Clippy. Desktop acceptance should exercise trigger sampling,
 beam endpoint, feedback, and Continue with a hot laser. Rust execution and

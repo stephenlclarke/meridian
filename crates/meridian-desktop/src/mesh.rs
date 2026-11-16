@@ -145,7 +145,7 @@ fn append_mesh(
     Ok(())
 }
 
-pub const PULSE_VERTEX_COUNT: usize = 6;
+pub const PULSE_VERTEX_COUNT: usize = 12;
 
 pub fn append_pulse(
     snapshot: &Snapshot,
@@ -162,21 +162,59 @@ pub fn append_pulse(
     };
     let start = view(shot.origin);
     let end = view(shot.end);
-    // A narrow camera-space ribbon uses both committed endpoints and the scene depth test.
-    let vertex = |center: Vec3, side: f64| Vertex {
-        position: [(center.x + side) as f32, center.y as f32, center.z as f32],
+    let extent = difference(end, start);
+    let length = extent.dot(extent).sqrt();
+    if !length.is_finite() {
+        return Err("Pulse transform produced a non-finite segment".into());
+    }
+    if length == 0.0 {
+        return Ok(());
+    }
+    let vertex = |center: Vec3, x: f64, y: f64| Vertex {
+        position: [
+            (center.x + x) as f32,
+            (center.y + y) as f32,
+            center.z as f32,
+        ],
         color: [1.0, 0.24, 0.09],
     };
-    let quad = [
-        vertex(start, -1.0),
-        vertex(start, 1.0),
-        vertex(end, 1.0),
-        vertex(end, -1.0),
+    let ribbon = [
+        vertex(start, -1.0, 0.0),
+        vertex(start, 1.0, 0.0),
+        vertex(end, 1.0, 0.0),
+        vertex(end, -1.0, 0.0),
     ];
-    if quad.iter().flat_map(|v| v.position).any(|v| !v.is_finite()) {
+    // An end-on beam projects to a line. Put a depth-tested flash on its
+    // centerline near the emitter, inside even a short obstructed segment.
+    let mut along = (12.0 / length).min(0.5);
+    // Match the flight projection's near plane for a short visible segment.
+    let near = 1.0;
+    if start.z + along * extent.z <= near && start.z <= near && end.z > near {
+        let visible_start = (near - start.z) / extent.z;
+        along = (1.0 + visible_start) * 0.5;
+    }
+    let center = Vec3::new(
+        start.x + along * extent.x,
+        start.y + along * extent.y,
+        start.z + along * extent.z,
+    );
+    let flash = [
+        vertex(center, -0.35, -0.35),
+        vertex(center, 0.35, -0.35),
+        vertex(center, 0.35, 0.35),
+        vertex(center, -0.35, 0.35),
+    ];
+    if ribbon
+        .iter()
+        .chain(&flash)
+        .flat_map(|v| v.position)
+        .any(|v| !v.is_finite())
+    {
         return Err("Pulse transform produced a non-finite vertex".into());
     }
-    output.extend([quad[0], quad[1], quad[2], quad[0], quad[2], quad[3]]);
+    for quad in [ribbon, flash] {
+        output.extend([quad[0], quad[1], quad[2], quad[0], quad[2], quad[3]]);
+    }
     Ok(())
 }
 
@@ -411,6 +449,61 @@ mod tests {
         assert!(frame[0].position[1].abs() < 1.0e-5);
         assert!((frame[0].position[2] - 600.0).abs() < 1.0e-4);
         assert_eq!(snapshot, before);
+    }
+
+    #[test]
+    fn centered_pilot_pulse_has_visible_projected_area_before_clear_and_blocked_endpoints() {
+        use meridian_core::PulseContact;
+
+        let mut snapshot = meridian_core::World::new().snapshot();
+        snapshot.position = [0.0, 0.0, 300.0];
+        let port = reference_port();
+        let station = StationRender {
+            vertices: &[],
+            pose: reference_station_pose(),
+            port: &port,
+            docked: false,
+        };
+        assert!(
+            !camera_for(&snapshot, station)
+                .unwrap_or_else(|e| panic!("{e}"))
+                .draw_ship
+        );
+        let origin = point(snapshot.position);
+        for (distance, contact) in [
+            (6000.0, PulseContact::Clear),
+            (136.32, PulseContact::StationBlocked { distance: 136.32 }),
+            (1.25, PulseContact::StationBlocked { distance: 1.25 }),
+        ] {
+            let shot = PulseShot {
+                tick: snapshot.tick,
+                fitted_item_id: 1,
+                origin,
+                direction: Vec3::new(0.0, 0.0, 1.0),
+                end: Vec3::new(origin.x, origin.y, origin.z + distance),
+                contact,
+            };
+            let mut output = Vec::with_capacity(PULSE_VERTEX_COUNT);
+            append_pulse(&snapshot, station, &shot, &mut output)
+                .unwrap_or_else(|error| panic!("{error}"));
+            // Match flight.wgsl's perspective division at aspect 1.
+            let has_visible_triangle = output.chunks_exact(3).any(|vertices| {
+                let [a, b, c] =
+                    [vertices[0], vertices[1], vertices[2]].map(|vertex| vertex.position);
+                if [a, b, c]
+                    .iter()
+                    .any(|&[_, _, z]| z <= 1.0 || f64::from(z) >= distance)
+                {
+                    return false;
+                }
+                let project = |[x, y, z]| [x * 1.6 / z, y * 1.6 / z];
+                let [[ax, ay], [bx, by], [cx, cy]] = [a, b, c].map(project);
+                ((bx - ax) * (cy - ay) - (by - ay) * (cx - ax)).abs() > 0.0001
+            });
+            assert!(has_visible_triangle, "{contact:?}");
+            assert_eq!(output.len(), PULSE_VERTEX_COUNT);
+            assert!((f64::from(output[2].position[2]) - distance).abs() < 0.001);
+        }
     }
 
     #[test]
