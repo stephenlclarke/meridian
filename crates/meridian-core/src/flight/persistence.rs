@@ -659,14 +659,16 @@ impl World {
             nav.jumps,
             nav.fuel_spent,
             self.combat.penalties(),
-            ammunition
-                .paid
-                .checked_add(modular.paid)
-                .ok_or(SaveError::InvalidState("paid equipment overflow"))?,
-            ammunition
-                .extra_revisions
-                .checked_add(modular.revision)
-                .ok_or(SaveError::SequenceExhausted)?,
+            SavedEquipmentAccounting {
+                paid: ammunition
+                    .paid
+                    .checked_add(modular.paid)
+                    .ok_or(SaveError::InvalidState("paid equipment overflow"))?,
+                revisions: ammunition
+                    .extra_revisions
+                    .checked_add(modular.revision)
+                    .ok_or(SaveError::SequenceExhausted)?,
+            },
             self.mining.work_count(),
         )?;
         if navigation
@@ -710,14 +712,18 @@ fn read_practice(
     Ok(practice)
 }
 
+struct SavedEquipmentAccounting {
+    paid: u32,
+    revisions: u64,
+}
+
 fn validate_accounting(
     d: SavedDomainSummary,
     s: SavedServiceSummary,
     jumps: u64,
     fuel_spent: u64,
     penalties: u8,
-    ammunition_paid: u32,
-    ammunition_revisions: u64,
+    equipment: SavedEquipmentAccounting,
     mining_work: u64,
 ) -> Result<(), SaveError> {
     let income = 7200_u128
@@ -732,7 +738,7 @@ fn validate_accounting(
             "unjustified market credit saturation",
         ));
     }
-    let paid = u128::from(s.paid) + u128::from(d.equipment_paid) + u128::from(ammunition_paid);
+    let paid = u128::from(s.paid) + u128::from(d.equipment_paid) + u128::from(equipment.paid);
     if income < paid
         || income - paid != u128::from(d.credits)
         || fuel < u128::from(fuel_spent)
@@ -748,7 +754,8 @@ fn validate_accounting(
                 + u128::from(d.equipment_revision)
                 + u128::from(d.consumed_missiles)
                 + u128::from(
-                    ammunition_revisions
+                    equipment
+                        .revisions
                         .checked_sub(u64::from(d.consumed_missiles))
                         .ok_or(SaveError::InvalidState("missile fit revision"))?,
                 )
