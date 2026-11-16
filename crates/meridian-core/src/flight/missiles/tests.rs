@@ -482,7 +482,7 @@ fn actual_spent_custody_refuses_save_restore_and_preserves_funded_paid_gear() {
     assert_eq!(world.credits_tenths(), cash);
     world
         .request_equipment(
-            crate::equipment::Command::StoreCargoBay,
+            crate::equipment::Command::UnfitCargoBay(paid.id),
             world.snapshot().tick,
         )
         .unwrap();
