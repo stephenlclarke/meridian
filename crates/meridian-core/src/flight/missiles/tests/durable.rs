@@ -452,3 +452,102 @@ fn original_readers_keep_owned_stock_and_refuse_a_fake_used_v7_migration() {
     fake[end..].copy_from_slice(&digest.to_le_bytes());
     refused_unchanged(&mut world, &fake);
 }
+
+#[test]
+fn same_tick_coordinated_launch_pose_clock_and_behind_target_are_atomic_refusals() {
+    let (mut world, origin) = active(2721);
+    let before = world.snapshot();
+    corrupted(&mut world, |w| {
+        let p = w.missiles.projectiles[0].as_mut().unwrap();
+        p.origin.launch_position.x += 1.0;
+        p.origin.muzzle.x += 1.0;
+        p.position.x += 1.0;
+    });
+    corrupted(&mut world, |w| {
+        let p = w.missiles.projectiles[0].as_mut().unwrap();
+        let direction = add(p.origin.orientation.z, scale(p.origin.orientation.x, 0.05));
+        p.origin.orientation = pose(p.origin.launch_position, direction)
+            .unwrap()
+            .orientation;
+        p.origin.muzzle = add(
+            p.origin.launch_position,
+            scale(p.origin.orientation.z, MISSILE_MUZZLE_DISTANCE),
+        );
+        p.position = p.origin.muzzle;
+        p.direction = p.origin.orientation.z;
+    });
+    corrupted(&mut world, |w| {
+        let p = w.missiles.projectiles[0].as_mut().unwrap();
+        p.origin.physical_tick = p.origin.physical_tick.checked_sub(1).unwrap();
+        w.missiles.cooldown = MISSILE_COOLDOWN_TICKS - 1;
+    });
+    assert_eq!(world.snapshot(), before);
+    assert_eq!(projectile(&world, origin.projectile).origin, origin);
+    let _valid = cold(&world);
+
+    // Both IDs belong to the live range, but only the forward one could be launched at.
+    let mut front = practice(2731);
+    let beacons = front.practice_snapshot().unwrap().beacons.unwrap();
+    fly_axis(
+        &mut front,
+        2,
+        (beacons[0].pose.position.z + beacons[2].pose.position.z) / 2.0,
+        1.0,
+    );
+    aim_at(&mut front, beacons[2].pose.position);
+    let origin = fire(&mut front, beacons[2].id);
+    assert!(sub(beacons[0].pose.position, origin.launch_position).dot(origin.orientation.z) < 0.0);
+    corrupted(&mut front, |w| {
+        w.missiles.projectiles[0].as_mut().unwrap().target = beacons[0].id
+    });
+    let _valid = cold(&front);
+}
+
+#[test]
+fn current_launch_binding_preserves_later_same_tick_pulse_and_historical_origins() {
+    let (mut world, origin) = active(2741);
+    let ship = crate::flight::flight_pose(world.snapshot().position, world.snapshot().orientation)
+        .unwrap();
+    assert_eq!(origin.launch_position, ship.position);
+    assert_eq!(origin.orientation, ship.orientation);
+    assert_eq!(origin.physical_tick, world.combat.physical_tick());
+    let _launched = cold(&world);
+    assert!(matches!(
+        shoot(&mut world).contact,
+        PulseContact::Projectile { .. }
+    ));
+    let intercepted = projectile(&world, origin.projectile);
+    assert_eq!(world.snapshot().tick, origin.launched_tick);
+    assert_eq!(world.combat.physical_tick(), origin.physical_tick);
+    assert!(intercepted.intercepting_emission.unwrap() > origin.emission);
+    let mut loaded = cold(&world);
+    together(&mut world, &mut loaded, 20);
+    assert_ne!(
+        crate::flight::flight_pose(world.snapshot().position, world.snapshot().orientation)
+            .unwrap()
+            .position,
+        origin.launch_position
+    );
+    assert_eq!(projectile(&loaded, origin.projectile).origin, origin);
+    assert_eq!(
+        projectile(&loaded, origin.projectile).ended,
+        Some(MissileEnd::Intercepted)
+    );
+    let _historical_ended = cold(&loaded);
+
+    let (mut live, live_origin) = active(2751);
+    let mut continued = cold(&live);
+    together(&mut live, &mut continued, 20);
+    assert!(projectile(&live, live_origin.projectile).ended.is_none());
+    assert_ne!(
+        crate::flight::flight_pose(live.snapshot().position, live.snapshot().orientation)
+            .unwrap()
+            .position,
+        live_origin.launch_position
+    );
+    assert_eq!(
+        projectile(&continued, live_origin.projectile).origin,
+        live_origin
+    );
+    let _historical_live = cold(&continued);
+}

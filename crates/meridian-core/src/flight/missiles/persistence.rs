@@ -435,6 +435,24 @@ impl State {
             {
                 return Err(INVALID);
             }
+            let target = lesson.retained_missile_target(p.target).ok_or(INVALID)?;
+            if sub(target.position, o.launch_position).dot(o.orientation.z) <= 0.0 {
+                return Err(INVALID);
+            }
+            if o.launched_tick == world.state.tick {
+                let ship = super::super::flight_pose(world.state.position, world.state.orientation)
+                    .ok_or(INVALID)?;
+                // Same-tick commands may fire Pulse or pause, but cannot move the craft
+                // or advance the physical clock. Historical origins stay independent.
+                if o.launch_position != ship.position
+                    || o.orientation != ship.orientation
+                    || o.physical_tick != world.combat.physical_tick()
+                    || o.owner != owner
+                    || world.state.mode != FlightMode::Flight
+                {
+                    return Err(INVALID);
+                }
+            }
             self.validate_motion(world, lesson, p, i)?;
             match p.ended {
                 None => {
