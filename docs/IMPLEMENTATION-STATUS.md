@@ -1,5 +1,7 @@
 # Implementation and validation status
 
+Background asteroid-mining work is described in [its current contract](ASTEROID-MINING.md). The main-based source adds real finite belt bodies, collision/raycast and conserved account transfer, with thirteen new Rust tests and five separate real paid-tool composition tests authored **UNRUN**. Genuine paid-tool integration, chart/render controls, independent review and all compiler/native acceptance remain pending. This is not a delivered mining build; the installed/published previews below are unchanged. Optional unmerged Lua and unfinished mission authoring are outside this slice.
+
 Reviewed against actual delivery evidence on 16 November 2026. This document distinguishes installed gameplay from source awaiting execution. Update it with every delivery or material acceptance change; test counts belong to their exact source.
 
 ## Latest installed and published preview

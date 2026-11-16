@@ -287,6 +287,9 @@ impl App {
         if let Some(refusal) = frame_refusal {
             self.notice = Some(
                 match refusal {
+                    MotionRefusal::AsteroidContact => {
+                        "Asteroid contact: stopped at last clear position"
+                    }
                     MotionRefusal::StationContact => {
                         "Station contact: stopped at last clear position"
                     }
@@ -306,6 +309,7 @@ impl App {
         });
         let pulse_notice = self.pulse.map(|shot| match shot.contact {
             PulseContact::Clear => "Pulse fired",
+            PulseContact::AsteroidBlocked { .. } => "Rock struck | no mining yield from Pulse",
             PulseContact::Projectile { .. } => "Pulse intercepted missile",
             PulseContact::StationBlocked { .. } => "Station struck | legal incident recorded",
             PulseContact::PracticeBeacon {
@@ -327,6 +331,9 @@ impl App {
                 frame_refusal
                     .or(snapshot.motion_refusal)
                     .map(|refusal| match refusal {
+                        MotionRefusal::AsteroidContact => {
+                            "Asteroid contact: stopped at last clear position"
+                        }
                         MotionRefusal::StationContact => {
                             "Station contact: stopped at last clear position"
                         }

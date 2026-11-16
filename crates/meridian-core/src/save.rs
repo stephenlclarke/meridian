@@ -1,7 +1,7 @@
 //! Bounded, versioned memory representation. The host owns atomic disk publication.
 use core::fmt;
 
-pub const SAVE_VERSION: u16 = 11;
+pub const SAVE_VERSION: u16 = 12;
 pub const MAX_SAVE_BYTES: usize = 65_536;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

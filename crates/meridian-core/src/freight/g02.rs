@@ -508,6 +508,43 @@ impl CommanderAccount {
         Ok((candidate, change.market, change.event))
     }
 
+    /// World has already queried the real finite mining body/tool. This stages one native
+    /// commodity unit in the sole account; it grants neither money nor market stock.
+    pub(crate) fn prepare_mining_yield(
+        &self,
+        freight: &State,
+        commodity: services::CommodityId,
+        reservations: services::Reservations,
+    ) -> Result<Self, services::Error> {
+        if !matches!(
+            commodity,
+            services::CommodityId::Minerals
+                | services::CommodityId::Alloys
+                | services::CommodityId::Gold
+                | services::CommodityId::Platinum
+        ) {
+            return Err(services::Error::InvalidAccount);
+        }
+        let before = reservations.apply(self.service_projection(freight)?)?;
+        if commodity.unit() == services::CargoUnit::Tonne
+            && before.used_tonnes >= before.hold_capacity_tonnes
+        {
+            return Err(services::Error::HoldFull);
+        }
+        let mut candidate = Self { data: self.data };
+        let quantity = &mut candidate.data.other_commodities[commodity.index() - 1];
+        *quantity = quantity
+            .checked_add(1)
+            .ok_or(services::Error::InvalidAccount)?;
+        candidate.data.revision = candidate
+            .data
+            .revision
+            .checked_add(1)
+            .ok_or(services::Error::InvalidAccount)?;
+        reservations.apply(candidate.service_projection(freight)?)?;
+        Ok(candidate)
+    }
+
     /// World navigation, after its real passage checks, consumes normal owned fuel.
     pub(crate) fn debit_fuel(&mut self, amount: u16) -> Result<(), Error> {
         let fuel = self
@@ -525,6 +562,9 @@ impl CommanderAccount {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod mining_custody_tests;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Error {

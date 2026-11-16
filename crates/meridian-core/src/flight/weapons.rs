@@ -51,6 +51,10 @@ pub enum PulseContact {
         distance: f64,
     },
     Clear,
+    AsteroidBlocked {
+        id: crate::mining::AsteroidId,
+        distance: f64,
+    },
     StationBlocked {
         distance: f64,
     },
@@ -125,6 +129,16 @@ impl PulseResources {
             heat: self.heat + HEAT_COST_FIFTHS,
             cooldown: PULSE_COOLDOWN_TICKS,
         })
+    }
+    /// Verified mining profile: 1 energy, 10 heat, 0.3-second cooldown. Existing ship
+    /// stores use hundredths/fifths; a mining stroke requires opening heat at most230.
+    /// These shared resource costs happen to equal front Pulse's current costs, but the
+    /// genuine fitted mining-tool capability is independently required by World.
+    pub(super) fn prepare_mining_discharge(self) -> Result<Self, FireError> {
+        if self.heat > 230 * 5 {
+            return Err(FireError::Overheated);
+        }
+        self.prepare_discharge()
     }
     pub(super) fn alive(self) -> bool {
         self.energy > 0
@@ -288,14 +302,18 @@ impl World {
             .ok_or(FireError::InvalidGeometry)?
             .beam_block_distance(station, pose.position, pose.orientation.z, PULSE_RANGE)
             .map_err(|_| FireError::InvalidGeometry)?;
+        let asteroid = self
+            .mining_beam_contact(pose, PULSE_RANGE)
+            .filter(|contact| distance.is_none_or(|station| contact.distance < station));
+        let solid_distance = asteroid.map(|contact| contact.distance).or(distance);
         let projectile = self
-            .nearest_missile(pose, distance.unwrap_or(PULSE_RANGE))
-            .filter(|(_, d)| distance.is_none_or(|station| *d < station));
+            .nearest_missile(pose, solid_distance.unwrap_or(PULSE_RANGE))
+            .filter(|(_, d)| solid_distance.is_none_or(|solid| *d < solid));
         let cap = projectile.map_or(PULSE_RANGE, |(_, d)| d);
         let mut practice = self.practice;
         let hit = practice
             .as_mut()
-            .and_then(|p| p.contact_limited(self.state, pose, cap, distance));
+            .and_then(|p| p.contact_limited(self.state, pose, cap, solid_distance));
         if let Some((id, distance, first_hit)) = hit {
             return Ok((
                 practice,
@@ -312,6 +330,16 @@ impl World {
                 practice,
                 PulseContact::Projectile { id, distance },
                 distance,
+            ));
+        }
+        if let Some(contact) = asteroid {
+            return Ok((
+                practice,
+                PulseContact::AsteroidBlocked {
+                    id: contact.asteroid,
+                    distance: contact.distance,
+                },
+                contact.distance,
             ));
         }
         Ok((
