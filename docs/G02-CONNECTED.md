@@ -1,5 +1,7 @@
 # G02 connected freight domain
 
+Historical feature contract and author-stage notes. For current delivered behavior, exact validation and open limits, read [implementation status](IMPLEMENTATION-STATUS.md). Earlier UNRUN statements below apply to the original handoff, not the latest delivered source.
+
 Status: the domain has eleven authored tests. A successor now joins it to actual World navigation/contact commands and adds three authored public-command journey/refusal tests; see [WORLD-G02.md](WORLD-G02.md). Compilation, formatting, Clippy, test execution and save publication remain UNRUN for this exact source. Existing flight/station results do not validate these changes.
 
 ## Source and scope

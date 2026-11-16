@@ -1,5 +1,7 @@
 # Ordinary commodity trading
 
+Historical feature contract and author-stage notes. For current delivered behavior, exact validation and open limits, read [implementation status](IMPLEMENTATION-STATUS.md). Earlier UNRUN statements below apply to the original handoff, not the latest delivered source.
+
 This records the historical version-two commodity component. The current M2
 [paid-equipment successor](PAID-EQUIPMENT.md) adds actual 92/127-tonne capacity
 and explicitly changes the save boundary to version three.
