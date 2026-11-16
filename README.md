@@ -90,10 +90,10 @@ Compiled source `bb5862b` passed whole-source review and bounded corrections. Ma
 
 The cockpit instrument implementation and its current validation limits are described in [Cockpit instruments](docs/COCKPIT-HUD.md).
 
-The next playable preview is being developed around a working cockpit HUD, docked galaxy/system/showroom/trading/equipment screens and real modular equipment. The current integration candidate is unqualified; authored source and focused owner tests are not a new playable release. Mining/salvage, EMP, bounty hunting and the other ship systems precede new mission delivery.
+The next HUD, five docked screens and initial modular equipment candidate passed platform qualification on macOS, Linux and native Windows, plus bounded signed Mac gameplay and paid-equipment cold Continue. It is not published yet: protected merge, exact-main CI/Sonar and final packages remain pending. Full equipment, mining/salvage, EMP, bounties, further authored hulls and NPC populations remain core work before new missions.
 
 In the next-preview development candidate, `/` toggles controls help and ordinary flight uses a compact overlay above the cockpit. This change is not in the published v0.4 binary.
 
 The [planet and sun implementation](docs/CELESTIAL-SHADING.md) binds core-owned bodies and procedural surfaces, with swept flight safety and explicit native acceptance limits.
 
-The next preview is under development: cockpit HUD, five docked pages and durable modular equipment controls are composed in source. This is not a new playable release. See [docked preview integration](docs/DOCKED-PREVIEW.md) for controls, exact scope and pending native acceptance.
+See [docked preview qualification](docs/DOCKED-PREVIEW.md) for controls, actual tests and native results, release gates and explicit limits. XYZZY/Commander Clarke is a separate following feature.

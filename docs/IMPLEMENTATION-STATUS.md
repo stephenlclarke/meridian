@@ -2,13 +2,13 @@
 
 Reviewed against actual delivery evidence on 16 November 2026. This document distinguishes installed gameplay from source awaiting execution. Update it with every delivery or material acceptance change; test counts belong to their exact source.
 
-## Modular mining-tool source awaiting execution
+## HUD, docked screens and initial modular equipment candidate
 
-The [modular equipment increment](MODULAR-EQUIPMENT.md) authors genuine paid front Mining Laser fitting, same-item Pulse storage/refit, shared resource preparation and a ship-resource readout that remains valid without Pulse fitted. Thirteen standalone and two Root-join cases are **UNRUN**. Actual mining/screen/profile/fleet composition and the full remaining modular catalogue are open. Published previews and profiles are unchanged.
+Candidate `e470017` passed whole-source review and corrections, then macOS, Linux and native Windows each passed 358 top-level Rust tests (229 core plus 129 desktop), 74 Python tests, 37 Markdown files, formatting, workspace checks, strict Clippy and a locked release build. The five required hosted PR checks passed. These results qualify the composed candidate, superseding the earlier unrun standalone modular-tool and paid-missile packets; they do not qualify subsequent equipment or mining branches.
 
-## Paid missile author increment
+Bounded actual signed Metal qualification passed all five pages, keyboard/mouse actions, four flight views, ordinary trade/refusals, seven genuine funding legs, failed-save rollback, paid Mining Laser purchase, same-item store/refit, six additional missiles and a fresh cold Continue retaining nine missiles and 410.6 CR. All three native processes exited zero. Root verified receipt/checkpoint/observer and raw CUA custody. See [docked preview qualification](DOCKED-PREVIEW.md) for exact limits. Minimum compact native size, exact Roll label and native forced-skip/stale-review injection remain unobserved; memory/FPS remain unresolved. No new public release or full-equipment/mining/fleet acceptance is claimed.
 
-The [paid missile source](PAID-MISSILES.md) adds prepared paid ownership/store/refit, nine native SH025 positions, retained additional launch/contact receipts and explicit current-format saves. New tests, compiler/Clippy and native qualification are **UNRUN** for this increment. Existing delivery results below remain bound to their original commits. Full modular equipment and its real docked screen remain open core work before further missions.
+Protected merge, exact-main CI/Sonar and canonical packages/download verification are pending. The existing public v0.4 preview and all previous installed previews/profiles remain separate. Following development includes quantity trading, physical mining, energy/laser equipment, explicit XYZZY/Commander Clarke, further authored hulls and all seven requested NPC populations. Changed source tests remain unrun until their own owning execution. New missions follow core gameplay.
 
 ## Latest installed and published preview
 
@@ -133,4 +133,4 @@ The current candidate joins the cockpit HUD with the first paid-missile equipmen
 
 The candidate also joins the actual World-owned planet/sun provider and WGSL shading. The source owner passed 200 core and ten focused desktop tests on its isolated source; these do not qualify the composed equipment/HUD candidate. Composed rendering uses complete projectile slices together with the celestial scene and cockpit. The new Profile cold-continuation test checks the unchanged disk save and all gameplay snapshots, and rejects a pre-Continue fitting review; it deliberately permits the existing review-authority rotation. All composed Rust tests and native visuals remain unrun.
 
-The next-preview source now composes the five docked GPU pages, current-world planet preview, semantic keyboard/mouse host, durable market/cargo/module/ammunition actions and compact cockpit. G1 adapter focused tests passed on its own frozen source; the Root composition has not compiled or run and requires one whole review followed by owning platform/native qualification. Full equipment, ship exchange, mining/salvage/bounties and mission expansion remain open.
+The composed HUD/docked/equipment candidate has now passed the platform and bounded native qualification recorded above. Full equipment, ship exchange, mining/salvage/bounties, fleet/NPC expansion and new missions remain open; those requirements are not implied by the bounded preview result.
