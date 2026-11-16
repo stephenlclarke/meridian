@@ -50,6 +50,10 @@ O opens the equipment panel. K purchases and fits the original Large Cargo Bay f
 
 This slice uses save format 3 and refuses older formats without migration, repair or fallback. Keep the delivered Economy Preview and its profiles separate until this candidate is qualified. The equipment code and controls are not yet a delivered playable update. See the [combined slice](docs/PR-paid-equipment.md) and [original content contract](docs/PAID-CARGO-BAY-CONTENT.md).
 
+## Ordinary impact source slice
+
+The authored core predecessor records actual front Pulse station impacts, original legal windows and permanent T02 failure, with version 7 persistence and exact version 4-6 readers. The player damage reducer is prepared; finite missile launch/motion and its actual saved ordnance remain the successor. The joined desktop shows the failed attempt and accepted station-strike incident. Coordinated compilation, tests and native qualification are pending. This is source work, not an installed preview update. See [ordinary impact rules and limits](docs/ORDINARY-IMPACTS.md).
+
 ## License and quality checks
 
 Meridian's new code is proprietary/source-visible under [LICENSE](LICENSE). The public repository permits inspection under GitHub's terms; it is not a permissive open-source grant. Separately licensed original L337 assets retain their applicable notices. Only verified original project-authored assets are eligible for reuse; original Elite/Oolite or other third-party art, models, textures, audio and fonts are excluded.

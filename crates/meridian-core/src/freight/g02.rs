@@ -260,6 +260,10 @@ impl CommanderAccount {
     pub(crate) fn credits_tenths(&self) -> u32 {
         self.data.credits
     }
+    pub(crate) fn apply_ordinary_legal(&mut self, legal: u8) {
+        self.data.legal = legal;
+    }
+
     pub(crate) fn legal_value(&self) -> u8 {
         self.data.legal
     }

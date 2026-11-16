@@ -1,3 +1,7 @@
+mod combat;
+pub use combat::{
+    CombatIdentity, CombatSnapshot, OrdinaryImpact, OrdinaryTarget, OrdinaryWeapon, PlayerCondition,
+};
 mod equipment;
 mod mission;
 mod persistence;
@@ -118,6 +122,7 @@ pub struct World {
     freight_session: Option<mission::FreightSession>,
     station_markets: Option<crate::station_services::StationMarkets>,
     pulse: weapons::PulseResources,
+    combat: combat::State,
     practice: Option<practice::Practice>,
 }
 
@@ -147,6 +152,7 @@ impl World {
             freight_session: None,
             station_markets: None,
             pulse: weapons::PulseResources::default(),
+            combat: combat::State::default(),
             practice: None,
         }
     }
@@ -250,7 +256,9 @@ impl World {
         if self.is_paused() {
             return Err(NavigationError::WrongMode);
         }
-        if self.state.mode != FlightMode::Flight {
+        if self.state.mode != FlightMode::Flight
+            || self.combat_snapshot().is_some_and(|s| s.player.destroyed)
+        {
             return Err(NavigationError::WrongMode);
         }
         let catalogue = self
@@ -328,7 +336,9 @@ impl World {
         if self.is_paused() {
             return Err(StepError::Paused);
         }
-        if self.state.mode != FlightMode::Docked {
+        if self.state.mode != FlightMode::Docked
+            || self.combat_snapshot().is_some_and(|s| s.player.destroyed)
+        {
             return Err(StepError::InvalidMode);
         }
         let data = self.station_data.as_ref().ok_or(StepError::InvalidMode)?;
@@ -370,6 +380,12 @@ impl World {
             return Err(StepError::Paused);
         }
         input.validate()?;
+        if self.combat_snapshot().is_some_and(|s| s.player.destroyed) {
+            return Err(StepError::InvalidMode);
+        }
+        if !self.combat.can_advance(self.state.mode) {
+            return Err(StepError::TickOverflow);
+        }
         let mut next = self.state;
         next.tick = next.tick.checked_add(1).ok_or(StepError::TickOverflow)?;
         next.motion_refusal = None;
@@ -482,6 +498,7 @@ impl World {
                 next.motion_refusal = None;
             }
         }
+        self.combat.advance(self.state.mode, next.mode);
         self.pulse.advance(self.state.mode, next.mode);
         if let (Some(practice), Some(nav), Some(data)) =
             (&mut self.practice, navigation, &self.station_data)

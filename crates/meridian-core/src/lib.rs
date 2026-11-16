@@ -23,3 +23,7 @@ pub use flight::{
     PracticeError, PracticeReceptionReview, PracticeReceptionSnapshot, PracticeReview,
     PracticeSnapshot, PracticeStatus, PracticeTrace, PreparedPracticeConfirmation,
 };
+
+pub use flight::{
+    CombatIdentity, CombatSnapshot, OrdinaryImpact, OrdinaryTarget, OrdinaryWeapon, PlayerCondition,
+};

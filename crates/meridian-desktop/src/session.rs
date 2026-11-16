@@ -457,6 +457,9 @@ impl Session {
                     };
                     lines.push(line);
                 }
+                PracticeStatus::Failed => {
+                    lines.push("SAFE GUNNERY FAILED | ORDINARY TARGET HIT | NO TRACE AWARD".into());
+                }
                 PracticeStatus::Retired => {
                     let line = match reception {
                         Some(state) if state.trace.is_some() => {

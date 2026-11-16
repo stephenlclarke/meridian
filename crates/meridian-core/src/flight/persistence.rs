@@ -27,8 +27,18 @@ const V5_CONTENT: &[u8] = concat!(
 .as_bytes();
 
 // Rules and immutable content form the version-six compatibility boundary, not an authenticity key.
-const CONTENT: &[u8] = concat!(
+const V6_CONTENT: &[u8] = concat!(
     "meridian-world/rules/6;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
+    "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
+    "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
+    "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
+    "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823;",
+    "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa"
+)
+.as_bytes();
+
+const CONTENT: &[u8] = concat!(
+    "meridian-world/rules/7;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -91,6 +101,10 @@ impl World {
             practice.encode_reception(w)
         });
         w.option(practice.as_ref(), |w, practice| practice.encode(w));
+        self.combat.encode(&mut w);
+        w.option(practice.and_then(|p| p.ordinary_hit).as_ref(), |w, hit| {
+            hit.encode(w)
+        });
         self.pulse.encode_save(&mut w);
         let digest = checksum(&w.bytes);
         w.u64(digest);
@@ -146,8 +160,9 @@ impl World {
         let content = match version {
             4 if r.fixed::<{ V4_CONTENT.len() }>()?.as_slice() == V4_CONTENT => V4_CONTENT,
             5 if r.fixed::<{ V5_CONTENT.len() }>()?.as_slice() == V5_CONTENT => V5_CONTENT,
+            6 if r.fixed::<{ V6_CONTENT.len() }>()?.as_slice() == V6_CONTENT => V6_CONTENT,
             SAVE_VERSION if r.fixed::<{ CONTENT.len() }>()?.as_slice() == CONTENT => CONTENT,
-            4 | 5 | SAVE_VERSION => return Err(SaveError::ContentMismatch),
+            4 | 5 | 6 | SAVE_VERSION => return Err(SaveError::ContentMismatch),
             _ => return Err(SaveError::UnsupportedVersion),
         };
         if r.u64()? != compiled_content_fingerprint(content) {
@@ -157,7 +172,7 @@ impl World {
             OriginalStationData::bundled().map_err(|_| SaveError::ContentMismatch)?;
         let mut state = read_flight(&mut r)?;
         state.station = Some(station_data.station_pose());
-        let candidate = Self {
+        let mut candidate = Self {
             state,
             station_data: Some(station_data),
             navigation_catalogue: Some(
@@ -168,8 +183,19 @@ impl World {
             freight_session: Some(mission::FreightSession::decode_save(&mut r)?),
             station_markets: Some(StationMarkets::decode_save(&mut r)?),
             practice: read_practice(&mut r, version)?,
-            pulse: weapons::PulseResources::decode_save(&mut r)?,
+            pulse: weapons::PulseResources::default(),
+            combat: combat::State::default(),
         };
+        if version >= 7 {
+            candidate.combat = combat::State::decode(&mut r)?;
+            let ordinary_hit = r.option(combat::OrdinaryImpact::decode)?;
+            match (candidate.practice.as_mut(), ordinary_hit) {
+                (Some(practice), hit) => practice.ordinary_hit = hit,
+                (None, None) => {}
+                _ => return Err(SaveError::InvalidEncoding),
+            }
+        }
+        candidate.pulse = weapons::PulseResources::decode_save(&mut r)?;
         if !r.finished() {
             return Err(SaveError::InvalidEncoding);
         }
@@ -208,6 +234,34 @@ impl World {
             self.state.tick,
             account.fuel_tenths(),
         )?;
+        self.combat.validate(self)?;
+        if let (Some(attempt), Some(last)) = (
+            practice,
+            self.combat_snapshot().and_then(|s| s.last_ordinary_impact),
+        ) && !attempt.reception_is_terminal()
+            && last.attacker.visit > attempt.consent_visit()
+            && last.tick >= attempt.confirmation_tick()
+            && attempt.ordinary_hit.is_none()
+        {
+            return Err(SaveError::InvalidState("ordinary hit was removed from T02"));
+        }
+        if let Some(hit) = practice.and_then(|p| p.ordinary_hit) {
+            hit.validate(self)?;
+            if self
+                .combat_snapshot()
+                .and_then(|s| s.last_ordinary_impact)
+                .is_none_or(|last| {
+                    hit.incident > last.incident
+                        || hit.emission > last.emission
+                        || hit.physical_tick > last.physical_tick
+                        || (hit.incident == last.incident && hit != last)
+                })
+            {
+                return Err(SaveError::InvalidState(
+                    "T02 ordinary hit has no accepted incident",
+                ));
+            }
+        }
         self.pulse
             .validate_save(self.state.tick, self.state.mode, nav.launches)?;
         if let Some(practice) = practice {
@@ -220,7 +274,13 @@ impl World {
             account.hold_capacity(),
             account.equipment_state().historical_capacity(),
         )?;
-        validate_accounting(domain, services, nav.jumps, nav.fuel_spent)?;
+        validate_accounting(
+            domain,
+            services,
+            nav.jumps,
+            nav.fuel_spent,
+            self.combat.penalties(),
+        )?;
         if navigation
             .dock()
             .is_some_and(|dock| dock.origin() == crate::navigation::DockOrigin::InitialStart)
@@ -241,13 +301,13 @@ fn read_practice(
     if version == 4 {
         return Ok(None);
     }
-    let reception = if version == SAVE_VERSION {
+    let reception = if version >= 6 {
         r.option(practice::reception::Reception::decode)?
     } else {
         None
     };
     let mut practice = r.option(practice::Practice::decode)?;
-    if version == SAVE_VERSION {
+    if version >= 6 {
         match (practice.as_mut(), reception) {
             (Some(practice), Some(reception)) => practice.reception = reception,
             (None, None) => {}
@@ -262,6 +322,7 @@ fn validate_accounting(
     s: SavedServiceSummary,
     jumps: u64,
     fuel_spent: u64,
+    penalties: u8,
 ) -> Result<(), SaveError> {
     let income = 7200_u128
         + u128::from(d.completed) * u128::from(crate::freight::REWARD_TENTHS)
@@ -282,7 +343,7 @@ fn validate_accounting(
         || fuel - u128::from(fuel_spent) != u128::from(d.fuel)
         || u64::from(d.food) != s.food
         || d.other_commodities != s.other_commodities
-        || d.legal & !s.possible_legal_bits != 0
+        || !combat::legal_reachable(d.legal, s.possible_legal_bits, penalties)
         || (d.legal != 0 && d.launches == 0)
         || u128::from(d.revision)
             != u128::from(d.freight_revision)
@@ -370,7 +431,13 @@ pub(super) fn v4_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
     let prefix = 18 + CONTENT.len();
     // Snapshot through market bytes are unchanged. Remove both absent v6
     // practice tags immediately before the five old weapon bytes.
-    let tail = current.len() - 13;
+    let mut combat = Writer::new();
+    world.combat.encode(&mut combat);
+    combat.option(
+        world.practice.and_then(|p| p.ordinary_hit).as_ref(),
+        |w, hit| hit.encode(w),
+    );
+    let tail = current.len() - 13 - combat.bytes.len();
     assert_eq!(current[tail - 1], 0);
     assert_eq!(current[tail - 2], 0);
     let mut w = Writer::new();
@@ -381,7 +448,8 @@ pub(super) fn v4_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
     // original eight compiled resources.
     w.u64(0xaa91_4776_a63c_5f97);
     w.bytes.extend(&current[prefix..tail - 2]);
-    w.bytes.extend(&current[tail..tail + 5]);
+    w.bytes
+        .extend(&current[current.len() - 13..current.len() - 8]);
     let digest = checksum(&w.bytes);
     w.u64(digest);
     Ok(w.bytes)
@@ -397,7 +465,14 @@ pub(super) fn v5_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
         practice.encode_reception(w)
     });
     let start = 18 + CONTENT.len();
-    let reception_end = current.len() - 13 - legacy.bytes.len();
+    let mut combat = Writer::new();
+    world.combat.encode(&mut combat);
+    combat.option(
+        world.practice.and_then(|p| p.ordinary_hit).as_ref(),
+        |w, hit| hit.encode(w),
+    );
+    let combat_start = current.len() - 13 - combat.bytes.len();
+    let reception_end = combat_start - legacy.bytes.len();
     let reception_start = reception_end - reception.bytes.len();
     assert_eq!(
         &current[reception_start..reception_end],
@@ -410,10 +485,51 @@ pub(super) fn v5_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
     // Independently calculated from the exact v5 base header and assets.
     w.u64(0x46a9_5792_16cc_8694);
     w.bytes.extend(&current[start..reception_start]);
-    w.bytes.extend(&current[reception_end..current.len() - 8]);
+    w.bytes.extend(&current[reception_end..combat_start]);
+    w.bytes
+        .extend(&current[current.len() - 13..current.len() - 8]);
     let digest = checksum(&w.bytes);
     w.u64(digest);
     Ok(w.bytes)
+}
+
+#[cfg(test)]
+pub(super) fn v6_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
+    let current = world.save_bytes()?;
+    assert!(
+        world
+            .combat_snapshot()
+            .and_then(|s| s.last_ordinary_impact)
+            .is_none()
+    );
+    assert!(world.practice.and_then(|p| p.ordinary_hit).is_none());
+    let mut combat = Writer::new();
+    world.combat.encode(&mut combat);
+    combat.option::<combat::OrdinaryImpact>(None, |w, hit| hit.encode(w));
+    let start = 18 + CONTENT.len();
+    let end = current.len() - 13 - combat.bytes.len();
+    let mut w = Writer::new();
+    w.bytes.extend(MAGIC);
+    w.u16(6);
+    w.bytes.extend(V6_CONTENT);
+    w.u64(0x8594bde0949de645);
+    w.bytes.extend(&current[start..end]);
+    w.bytes
+        .extend(&current[current.len() - 13..current.len() - 8]);
+    let digest = checksum(&w.bytes);
+    w.u64(digest);
+    Ok(w.bytes)
+}
+
+#[cfg(test)]
+pub(super) fn combat_save_len(world: &World) -> usize {
+    let mut w = Writer::new();
+    world.combat.encode(&mut w);
+    w.option(
+        world.practice.and_then(|p| p.ordinary_hit).as_ref(),
+        |w, hit| hit.encode(w),
+    );
+    w.bytes.len()
 }
 
 #[cfg(test)]
