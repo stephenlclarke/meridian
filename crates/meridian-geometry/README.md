@@ -10,7 +10,7 @@ The previous five-hull execution at `0c2677b5` exhausted operations on every ori
 
 ## Validation
 
-The current two-lint correction is **UNRUN**. Parent joined source `de4e3bf` passed locked check and all 13 Rust tests, including both original-input decoder tests. Doc-tests declared zero cases. Strict Clippy failed on fixed-size byte chunking and a collapsible nested condition. The correction uses fixed two-byte array chunks behind the existing even-length guard and a short-circuiting let-chain for the same strip-finalization path. The author lane used rustfmt to parse and format the authored source. G1 owns actual compiler execution on the committed packet. The first compiler run should apply `integration/workspace-and-lock.patch` in the joined workspace and run the following checks.
+The current whole-five harness and its five Rust/six host regressions are **UNRUN**. Parent joined source `5d41f85` passed locked check, all 13 Rust tests and strict Clippy. Its original-input tests decode the five assets. Whole-five construction is the newly authored acceptance step. The author lane used rustfmt to parse and format the authored source. G1 owns actual compiler execution on the committed packet. The first compiler run should apply `integration/workspace-and-lock.patch` in the joined workspace and run the following checks.
 
 ```sh
 cargo check --locked -p meridian-geometry --all-targets
@@ -33,3 +33,15 @@ Standalone `FacetWitness::verify` admits the checked aggregate of all incoming c
 ## Protected local facet contacts
 
 An original triangle can contribute two disjoint exposed regions that meet at one physical protected point. The overlap fixture reaches that case on component 0, facet 9. The corrected local certificate retains every sector and checks each connected link component as a regular boundary path or cycle at protected points. Unprotected local vertices and the final closed 3D mesh retain their connected-link requirements. The new source-derived regression also checks that removing physical protection refuses the local shape and that the same disconnected sectors refuse as a complete closed-mesh link. Existing analytic volume, source-field, witness and invalid-input tests are retained byte for byte.
+
+## Executable original-five validation
+
+`cargo build --locked -p meridian-geometry --bin original_five` builds the explicit host harness. It uses the same pinned `OriginalAsset` and public `reconstruct` adapter for SH010, SH011, SH016, SH017 and SH166. Each hull declares five bodies for input decoding, construction, source/affine fields, facet certificates and closed topology/limits. A refused construction leaves its three dependent candidate bodies UNRUN. Original operation, storage, rational and triangle guards apply to the whole case. Dependent checks receive only the remaining original work/storage allowance.
+
+`tools/run_original_five.py` accepts the frozen joined workspace, its Root source manifest, the owner-built binary and a new output directory. It verifies source/lock/input hashes before launch, records the actual process/binary/source binding, checks the five-case result protocol and seals every output with SHA-256. The Rust host records monotonic timing, per-body operation deltas/terminal peaks and typed refusals. Complete returned candidates retain all exact triangle/source/style/UV data and full facet/contact witnesses. Files are labelled UNQUALIFIED-CANDIDATE because fleet/native admission remains a later consumer decision.
+
+```sh
+python3 crates/meridian-geometry/tools/run_original_five.py --project FROZEN_JOIN --source-binding ROOT_SOURCE_JSON --binary BUILT_ORIGINAL_FIVE --out NEW_ABSOLUTE_OUTPUT
+```
+
+Execution remains held for bounded G2 review and the G1/Root changed-run coordination. `integration/WHOLE-FIVE-CRITERIA.json` defines the 25 construction/dependent bodies, output binding and compiler/host checks. The five Rust harness regressions use typed failure state, residual budgets, JSON escaping and a small independent tetrahedron. Six host tests cover source and terminal binding, mutation/escape refusal and dependency propagation. Existing library tests and qualified geometry source remain byte exact.

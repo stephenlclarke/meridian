@@ -1,0 +1,27 @@
+{
+  "baseAuthorCommit": "86471133ed90f9b43af02e5c8ed6c1c5c0659bc4",
+  "qualifiedLibraryJoin": "5d41f85d16caf19feb443f2fb79bcd9b0ca13ac9",
+  "qualifiedLibraryTree": "282e75f0a7d8b7aa789bb09984ede62623dfae11",
+  "qualifiedLibraryPins": {
+    "crates/meridian-geometry/src/adapter.rs": "b0c8078d841b311a81dc54c9369386c2069820295d5a6e54d77e144d0b3ebe13",
+    "crates/meridian-geometry/src/arrangement.rs": "3ef52d23959b3b039cd0ca1a228830854b13c0373bdb46fa646536a6bc63cd30",
+    "crates/meridian-geometry/src/budget.rs": "7de9ea19f883caa83da99ece27f8173487990a1c0a408d78bb8e3354caba3898",
+    "crates/meridian-geometry/src/certificate.rs": "4810f64bb459d5a7df2cbdaf2dfc3597b6a2a5c20531a76be6e2625aeb986e65",
+    "crates/meridian-geometry/src/exact.rs": "becc68a02e65b2b63e138318805b3a090a91349ec1861ee38b635550c3df8443",
+    "crates/meridian-geometry/src/lib.rs": "5d8c2990676c735eb5a59e8ec60697b751f5d71c24dc7e31c14ab5d622ec5000",
+    "crates/meridian-geometry/src/source.rs": "9a8984561b8ab0d33a41c293dd27ff504fcdf3ad20207dbb567fa11d6c49ff79"
+  },
+  "unchangedExistingAssertions": true,
+  "libraryCodeDelta": [],
+  "dependencyOrWorkspaceLockDelta": [],
+  "newHostFiles": [
+    "src/bin/original_five.rs",
+    "tools/run_original_five.py",
+    "tools/test_run_original_five.py"
+  ],
+  "newRustUnitTests": 5,
+  "newHostUnitTests": 6,
+  "wholeFiveBodies": 25,
+  "execution": "UNRUN",
+  "qualifiedParentResultSHA256": "cb4fb43c62d8a7153bf5513217dbfda532ed1d5508fcbae133ee4a16ce37d3d5"
+}

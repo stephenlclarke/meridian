@@ -68,6 +68,31 @@
       "file": "src/certificate.rs",
       "name": "certificate::tests::protected_overlap_facet_keeps_each_regular_local_boundary_path",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/bin/original_five.rs",
+      "name": "construction_refusal_keeps_all_candidate_checks_unrun",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/bin/original_five.rs",
+      "name": "decode_refusal_keeps_construction_unrun",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/bin/original_five.rs",
+      "name": "remaining_budget_cannot_reset_the_original_case_limits",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/bin/original_five.rs",
+      "name": "artifact_strings_escape_json_and_bind_the_fixed_input",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/bin/original_five.rs",
+      "name": "small_closed_candidate_exercises_every_dependent_public_check",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -90,7 +115,9 @@
   "completeCheckCommands": [
     "cargo check --locked -p meridian-geometry --all-targets",
     "cargo test --locked -p meridian-geometry",
-    "cargo clippy --locked -p meridian-geometry --all-targets -- -D warnings"
+    "cargo clippy --locked -p meridian-geometry --all-targets -- -D warnings",
+    "cargo build --locked -p meridian-geometry --bin original_five",
+    "python3 -m unittest discover -s crates/meridian-geometry/tools -p test_run_original_five.py"
   ],
   "executionBindingRequired": [
     "exact joined Git commit and tree",
@@ -159,5 +186,13 @@
       "clippy.log": "fbe09f8942043690dadb42b87dbd5dc950384e2c2e0d94bfc0707c250a644ed8",
       "test.log": "d98d0696c4fe5b5cbcbb4f349180b0efa03c051a099cc7fd96ad2df2dea37edd"
     }
+  },
+  "wholeFiveHarness": {
+    "criteriaSHA256": "da4bd8e6614f817a41f08a77d1284cd8fc712cb3dfe6cf0864560160008cda01",
+    "rustTestsAuthored": 5,
+    "hostTestsAuthored": 6,
+    "execution": "UNRUN",
+    "construction": "HELD for review and owner execution",
+    "deltaSHA256": "3fd47a7e8b29fde4a28a3df8fb3f4f5c3d17f984640caab5b73f1efbe5f14167"
   }
 }

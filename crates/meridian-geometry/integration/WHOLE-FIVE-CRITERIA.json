@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "status": "AUTHORED_UNRUN",
+  "qualifiedLibraryJoin": "5d41f85d16caf19feb443f2fb79bcd9b0ca13ac9",
+  "qualifiedLibraryTree": "282e75f0a7d8b7aa789bb09984ede62623dfae11",
+  "qualifiedLibraryEvidenceSHA256": "cb4fb43c62d8a7153bf5513217dbfda532ed1d5508fcbae133ee4a16ce37d3d5",
+  "sourceAssets": [
+    "SH010",
+    "SH011",
+    "SH016",
+    "SH017",
+    "SH166"
+  ],
+  "sourceBindings": "fixtures/ORIGINAL-BINDINGS.json; compiled immutable OriginalAsset bytes",
+  "cases": 5,
+  "declaredBodies": 25,
+  "bodies": [
+    {
+      "name": "bound_original_decode",
+      "perCase": true,
+      "status": "UNRUN"
+    },
+    {
+      "name": "original_construction",
+      "perCase": true,
+      "status": "UNRUN"
+    },
+    {
+      "name": "source_and_affine_fields",
+      "perCase": true,
+      "status": "UNRUN"
+    },
+    {
+      "name": "complete_facet_certificates",
+      "perCase": true,
+      "status": "UNRUN"
+    },
+    {
+      "name": "closed_topology_and_limits",
+      "perCase": true,
+      "status": "UNRUN"
+    }
+  ],
+  "normalLimits": {
+    "chargedOperationsPerCaseIncludingDecodeConstructionDependentChecks": 2000000,
+    "liveStorageMemberships": 100000,
+    "rationalBits": 4096,
+    "completeCandidateTriangles": 512
+  },
+  "dependentBudget": "After construction, tighten remaining work and storage by actual spent operations and live source/candidate memberships. Postchecks cannot reset the case allowance. Report combined spent operations and base+scratch peak.",
+  "failurePolicy": "Decode refusal leaves construction and all dependent bodies UNRUN. Construction refusal leaves all three candidate bodies UNRUN. A dependent refusal/failure leaves later bodies UNRUN. Guard refusal and semantic FAIL are recorded separately.",
+  "timing": "Rust std::time::Instant and host time.monotonic_ns; no timing dependency enters library core",
+  "artifactBinding": "Root/G1 frozen source manifest verifies every source/lock/input byte before launch and after exit. Host binds physical binary hash, actual Popen pid/argv/start/terminal and hashes all files in ARTIFACTS.json. Rust copies execution binding and frozen original bindings into results. Binary/source compilation correspondence is checked by G1 compiler receipt and Root audit.",
+  "outputs": [
+    "ACTUAL-START.json",
+    "EXECUTION-BINDING.json",
+    "results/ORIGINAL-BINDINGS.json",
+    "results/WHOLE-FIVE-CRITERIA.json",
+    "results/{id}-CASE.json",
+    "results/TERMINAL.json",
+    "OWNER-TERMINAL.json",
+    "ARTIFACTS.json"
+  ],
+  "candidateOutputs": "Only a successful public reconstruct return writes {id}-UNQUALIFIED-CANDIDATE.facets and full {id}-WITNESSES.json. A construction refusal writes no candidate.",
+  "executeAfter": [
+    "G2 bounded harness review with unaffected qualified library proof",
+    "G1 changed focused compilation/tests/strict Clippy and build",
+    "Root/G1 one changed whole-five execution coordination after T04 priority"
+  ],
+  "compilerCommands": [
+    "cargo check --locked -p meridian-geometry --all-targets",
+    "cargo test --locked -p meridian-geometry",
+    "cargo clippy --locked -p meridian-geometry --all-targets -- -D warnings",
+    "cargo build --locked -p meridian-geometry --bin original_five"
+  ],
+  "hostTests": "python3 -m unittest discover -s crates/meridian-geometry/tools -p test_run_original_five.py",
+  "execute": "python3 crates/meridian-geometry/tools/run_original_five.py --project FROZEN_JOIN --source-binding ROOT_SOURCE_JSON --binary BUILT_ORIGINAL_FIVE --out NEW_ABSOLUTE_OUTPUT",
+  "fleetBaseline": {
+    "ships": 23,
+    "shipTotal": 162,
+    "stations": 4,
+    "stationTotal": 6
+  },
+  "all171Accepted": false,
+  "newHullAdmissions": 0,
+  "oldWholeFive": "Old sealed Swift/Python failures remain failure evidence. Rust earlier cutoffs grant no minimum/performance/acceptance credit.",
+  "hostTestsAuthored": 6,
+  "resultValidation": "Host checks all five case identities, frozen per-body input digests, 25 statuses/counts, measurements, candidate consistency, dependent UNRUN propagation and execution-binding bytes before sealing terminal."
+}

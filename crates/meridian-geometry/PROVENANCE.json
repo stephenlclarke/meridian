@@ -118,13 +118,12 @@
   "parentQualifiedSource": "7ef4df73825bdba87d3a2a2b59e6970d08fb3066",
   "currentCorrectionExecution": "UNRUN",
   "latestParentQualification": {
+    "sourceHead": "5d41f85d16caf19feb443f2fb79bcd9b0ca13ac9",
+    "sourceTree": "282e75f0a7d8b7aa789bb09984ede62623dfae11",
     "check": "PASS",
-    "rustTests": {
-      "pass": 13,
-      "fail": 0
-    },
-    "docTests": 0,
-    "strictClippy": "FAIL; two lint diagnostics"
+    "rustTests": 13,
+    "strictClippy": "PASS"
   },
-  "latestParentQualifiedJoin": "de4e3bff26d2382ea23896f4dabbbcdce70aa614"
+  "latestParentQualifiedJoin": "de4e3bff26d2382ea23896f4dabbbcdce70aa614",
+  "newHarnessExecution": "UNRUN"
 }

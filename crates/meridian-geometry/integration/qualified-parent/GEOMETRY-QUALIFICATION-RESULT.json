@@ -1,0 +1,121 @@
+{
+  "status": "PASS_FOCUSED_MAC_GEOMETRY_CHECK_TEST_STRICT_CLIPPY",
+  "recordedAt": "2026-11-16T16:47:42.768396+00:00",
+  "sourceCommit": "5d41f85d16caf19feb443f2fb79bcd9b0ca13ac9",
+  "sourceTree": "282e75f0a7d8b7aa789bb09984ede62623dfae11",
+  "stages": [
+    {
+      "name": "check",
+      "status": "PASS",
+      "exitCode": 0,
+      "wallSeconds": 1.3630161250475794,
+      "log": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.5d41f85/evidence/check.log",
+      "logSHA256": "67dc8f59737dbd9ea6778a5b7244390e07d5fb5afc096313d1b492913b58a822",
+      "startPID": 49494
+    },
+    {
+      "name": "test",
+      "status": "PASS",
+      "exitCode": 0,
+      "wallSeconds": 14.143410957884043,
+      "log": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.5d41f85/evidence/test.log",
+      "logSHA256": "d3098231073656cda5598d81e64b9dbd55e17a786980863f2d5bda39fc92a86a",
+      "startPID": 49625
+    },
+    {
+      "name": "clippy",
+      "status": "PASS",
+      "exitCode": 0,
+      "wallSeconds": 0.353493541944772,
+      "log": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.5d41f85/evidence/clippy.log",
+      "logSHA256": "e0677ca5fdc78267221e11a73d9fd490f1c9462be3acdf109fa59803ad6ef1d1",
+      "startPID": 49949
+    }
+  ],
+  "tests": {
+    "status": "PASS",
+    "count": 13,
+    "actualNamedResults": [
+      {
+        "name": "certificate::tests::protected_overlap_facet_keeps_each_regular_local_boundary_path",
+        "status": "PASS"
+      },
+      {
+        "name": "source::tests::exact_sections_match_independent_signed_contact_enumeration",
+        "status": "PASS"
+      },
+      {
+        "name": "out_of_facet_and_nonfinite_source_substitutions_refuse",
+        "status": "PASS"
+      },
+      {
+        "name": "finite_point_and_vertical_contacts_survive_classification_and_noding",
+        "status": "PASS"
+      },
+      {
+        "name": "incomplete_or_mutated_witness_is_rejected",
+        "status": "PASS"
+      },
+      {
+        "name": "independently_verified_witness_reserves_aggregate_nested_storage",
+        "status": "PASS"
+      },
+      {
+        "name": "transformed_component_ids_orientation_and_affine_uv_are_exact",
+        "status": "PASS"
+      },
+      {
+        "name": "invalid_originals_and_singular_links_refuse_without_candidate",
+        "status": "PASS"
+      },
+      {
+        "name": "original_budget_boundaries_and_refusals_remain_explicit",
+        "status": "PASS"
+      },
+      {
+        "name": "analytic_closed_originals_preserve_volume_source_fields_and_contact_witnesses",
+        "status": "PASS"
+      },
+      {
+        "name": "dense_original_derived_fixture_retains_a_bounded_failure_expectation",
+        "status": "PASS"
+      },
+      {
+        "name": "changed_original_bytes_refuse_before_source_reconstruction",
+        "status": "PASS"
+      },
+      {
+        "name": "every_original_input_preserves_components_facets_and_exact_corner_fields",
+        "status": "PASS"
+      }
+    ],
+    "doctests": 0,
+    "originalFiveScope": "Two methods cover five original source-input decode/refusal fixtures, not full original hull reconstruction or admission"
+  },
+  "compilerArtifacts": [
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.5d41f85/target/debug/deps/adapter-6a0c7676970b0281",
+      "bytes": 3850552,
+      "sha256": "859858c89ac5db8965b5e9683b23235990934c0d7081467c1140b362d0981053"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.5d41f85/target/debug/deps/meridian_geometry-6b3f7f65e6433e53",
+      "bytes": 2021536,
+      "sha256": "88a04123bde5ae749781ef7e1540b14702bd236d82ca0c67511a19217db9e2a5"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.5d41f85/target/debug/deps/original_inputs-20ce7de8b7a36894",
+      "bytes": 2990272,
+      "sha256": "d8828adf8b533039bc3e98ea30c3e2ffba2a03c6d969387ca4c331f9ab392e79"
+    }
+  ],
+  "sourceIntegrity": {
+    "all207TrackedFilesUnchanged": true,
+    "gitStatus": "",
+    "lockSHA256": "d2afa020fd62f66a9f3f5863f75a11216debb1d04cc6a74f2afbacfcf5393dbf"
+  },
+  "scope": "Focused Mac geometry crate check/test/strictClippy only. Original caps/assertions/gates unchanged. No original-five reconstruction, fleet admission, native graphics, performance, full-game, Swift or Python union acceptance.",
+  "priorFailures": "Preserved at7ef4df7andde4; none rebound to this source. Current named results executed once on current source.",
+  "observation": "Actual starts retained and sent after launch; compact short job results may be audited after completion. No rerun for live visibility.",
+  "next": "Root audits exact result and handles integration/current final-head gates; new full geometry acceptance remains separate. Mac executor lane free; audio frozen."
+}
