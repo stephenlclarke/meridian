@@ -487,9 +487,8 @@ mod tests {
             append_pulse(&snapshot, station, &shot, &mut output)
                 .unwrap_or_else(|error| panic!("{error}"));
             // Match flight.wgsl's perspective division at aspect 1.
-            let has_visible_triangle = output.chunks_exact(3).any(|vertices| {
-                let [a, b, c] =
-                    [vertices[0], vertices[1], vertices[2]].map(|vertex| vertex.position);
+            let has_visible_triangle = output.as_chunks::<3>().0.iter().any(|vertices| {
+                let [a, b, c] = vertices.map(|vertex| vertex.position);
                 if [a, b, c]
                     .iter()
                     .any(|&[_, _, z]| z <= 1.0 || f64::from(z) >= distance)
