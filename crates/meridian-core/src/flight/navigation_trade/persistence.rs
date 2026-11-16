@@ -1,7 +1,7 @@
 use super::{
-    Attempt, Balance, Fit, Fuel, INVALID, Journey, MAX_ACTIVE, MAX_RECEIPTS, MAX_RECORDS,
-    NavigationTonneId, NavigationTradeOutcome as Outcome, Plan, Reader, SaveError, State, Terminal,
-    Trade, World, Writer, legal_tonne, same_carrier, site,
+    Attempt, Balance, Fit, Fuel, FuelAnchor, INVALID, Journey, MAX_ACTIVE, MAX_RECEIPTS,
+    MAX_RECORDS, NavigationTonneId, NavigationTradeOutcome as Outcome, Plan, Reader, SaveError,
+    State, Terminal, Trade, World, Writer, legal_tonne, same_carrier, site,
 };
 use crate::flight::persistence::Commerce;
 use crate::navigation::{
@@ -186,20 +186,75 @@ impl Attempt {
         {
             return Err(INVALID);
         }
-        let markets = c.commerce.markets.ok_or(INVALID)?;
-        if self
-            .fuel
-            .iter()
-            .map(|f| u64::from(f.units_after - f.units_before))
-            .sum::<u64>()
-            > markets.fuel_accounting().0
-        {
-            return Err(INVALID);
-        }
+        self.validate_fuel_ledger(plan, c)?;
         if let Some(sale) = self.sale {
             sale.validate_sale(self, plan, c)?;
         }
         self.validate_terminal(c)
+    }
+    fn validate_fuel_ledger(&self, plan: Plan, c: &Context<'_>) -> Result<(), SaveError> {
+        let markets = c.commerce.markets.ok_or(INVALID)?;
+        let current = FuelAnchor {
+            refilled_units: markets.fuel_accounting().0,
+            fuel: c.commerce.account.ok_or(INVALID)?.fuel_tenths(),
+            jump: c.nav.jumps,
+        };
+        let end = self.terminal.map_or(current, |t| t.fuel);
+        let added = self
+            .fuel
+            .iter()
+            .map(|f| u64::from(f.units_after - f.units_before))
+            .sum::<u64>();
+        if end.refilled_units > current.refilled_units
+            || end.jump > current.jump
+            || end.fuel > 130
+            || end.refilled_units.checked_sub(plan.refilled_at_plan) != Some(added)
+        {
+            return Err(INVALID);
+        }
+        if end.refilled_units == current.refilled_units
+            && end.jump == current.jump
+            && end.fuel != current.fuel
+        {
+            return Err(INVALID);
+        }
+        if let Some(buy) = self.buy {
+            self.validate_fuel_continuity(buy, end)?;
+        }
+        Ok(())
+    }
+    fn validate_fuel_continuity(&self, buy: Trade, end: FuelAnchor) -> Result<(), SaveError> {
+        let mut events = Vec::new();
+        for f in self.fuel.iter().filter(|f| f.transaction > buy.transaction) {
+            events.push((f.account_revision, f.tick, f.units_before, f.units_after));
+        }
+        for j in &self.journeys {
+            events.push((j.account_revision, j.tick, j.fuel_before, j.fuel_after));
+        }
+        if let Some(sale) = self.sale {
+            events.push((
+                sale.account_revision,
+                sale.tick,
+                sale.fuel_at_trade,
+                sale.fuel_at_trade,
+            ));
+        }
+        events.sort_unstable();
+        let mut revision = buy.account_revision;
+        let mut tick = buy.tick;
+        let mut fuel = buy.fuel_at_trade;
+        for (next_revision, next_tick, before, after) in events {
+            if next_revision <= revision || next_tick < tick || before != fuel {
+                return Err(INVALID);
+            }
+            revision = next_revision;
+            tick = next_tick;
+            fuel = after;
+        }
+        if fuel != end.fuel {
+            return Err(INVALID);
+        }
+        Ok(())
     }
     fn validate_journeys(&self, c: &Context<'_>) -> Result<(), SaveError> {
         if self.journeys.len() > MAX_RECEIPTS {
@@ -234,6 +289,12 @@ impl Attempt {
             return Ok(());
         };
         validate_dock(t.dock, c)?;
+        if t.fuel.fuel > 130
+            || t.fuel.jump > c.nav.jumps
+            || t.fuel.refilled_units > c.commerce.markets.ok_or(INVALID)?.fuel_accounting().0
+        {
+            return Err(INVALID);
+        }
         if !same_carrier(self.dock, t.dock)
             || t.tick < self.accepted_tick
             || t.tick < t.dock.tick()
@@ -273,6 +334,7 @@ impl Attempt {
                 Outcome::Complete => 0,
                 Outcome::Abandoned => 1,
             });
+            t.fuel.encode(w);
         });
     }
     fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
@@ -295,6 +357,7 @@ impl Attempt {
                 tick,
                 dock,
                 outcome,
+                fuel: FuelAnchor::decode(r)?,
             })
         })?;
         Ok(Self {
@@ -424,6 +487,7 @@ impl Plan {
             || distance > STOCK_JUMP_REACH_LY
             || distance > f64::from(self.fuel_at_plan) / 10.0
             || self.fuel_at_plan > 130
+            || self.refilled_at_plan > markets.fuel_accounting().0
             || stock_jump_fuel_cost(distance).map_err(|_| INVALID)? != self.fuel_debit
             || self.fuel_debit > self.fuel_at_plan
             || self.account_revision > p.revision
@@ -448,6 +512,7 @@ impl Plan {
         w.u64(self.distance.to_bits());
         w.u16(self.fuel_debit);
         w.u16(self.fuel_at_plan);
+        w.u64(self.refilled_at_plan);
         w.u32(self.credits_at_plan);
         w.u64(self.account_revision);
         w.u64(self.market_revision);
@@ -467,6 +532,7 @@ impl Plan {
             distance: f64::from_bits(r.u64()?),
             fuel_debit: r.u16()?,
             fuel_at_plan: r.u16()?,
+            refilled_at_plan: r.u64()?,
             credits_at_plan: r.u32()?,
             account_revision: r.u64()?,
             market_revision: r.u64()?,
@@ -514,6 +580,7 @@ impl Trade {
             || self.account_revision <= plan.account_revision
             || self.account_revision > account.revision
             || self.jump_sequence > c.nav.jumps
+            || self.fuel_at_trade > 130
             || self.after.bought.saturating_add(self.after.sold) > self.transaction
             || stock_at(
                 markets,
@@ -609,6 +676,7 @@ impl Trade {
         w.u64(self.transaction);
         w.u64(self.account_revision);
         w.u64(self.jump_sequence);
+        w.u16(self.fuel_at_trade);
         w.u32(self.price);
         self.before.encode(w);
         self.after.encode(w);
@@ -621,6 +689,7 @@ impl Trade {
             transaction: r.u64()?,
             account_revision: r.u64()?,
             jump_sequence: r.u64()?,
+            fuel_at_trade: r.u16()?,
             price: r.u32()?,
             before: Balance::decode(r)?,
             after: Balance::decode(r)?,
@@ -636,7 +705,16 @@ impl Journey {
             .ok_or(INVALID)?
             .distance_ly(self.origin, self.destination)
             .map_err(|_| INVALID)?;
-        if self.origin == self.destination
+        let account_revision = c
+            .commerce
+            .account
+            .ok_or(INVALID)?
+            .service_projection(&c.world.freight_session.as_ref().ok_or(INVALID)?.state)
+            .map_err(|_| INVALID)?
+            .revision;
+        if self.account_revision <= buy.account_revision
+            || self.account_revision > account_revision
+            || self.origin == self.destination
             || distance > STOCK_JUMP_REACH_LY
             || distance > f64::from(self.fuel_before) / 10.0
             || self.tick <= buy.tick
@@ -657,6 +735,7 @@ impl Journey {
     }
     fn encode(self, w: &mut Writer) {
         w.u64(self.tick);
+        w.u64(self.account_revision);
         w.u64(self.jump);
         write_system(w, self.origin);
         write_system(w, self.destination);
@@ -669,6 +748,7 @@ impl Journey {
     fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         Ok(Self {
             tick: r.u64()?,
+            account_revision: r.u64()?,
             jump: r.u64()?,
             origin: read_system(r)?,
             destination: read_system(r)?,
@@ -776,4 +856,19 @@ fn read_system(r: &mut Reader<'_>) -> Result<SystemId, SaveError> {
         galaxy: r.u8()?,
         system: r.u16()?,
     })
+}
+
+impl FuelAnchor {
+    fn encode(self, w: &mut Writer) {
+        w.u64(self.refilled_units);
+        w.u16(self.fuel);
+        w.u64(self.jump);
+    }
+    fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+        Ok(Self {
+            refilled_units: r.u64()?,
+            fuel: r.u16()?,
+            jump: r.u64()?,
+        })
+    }
 }

@@ -169,6 +169,7 @@ impl World {
             distance,
             fuel_debit: fuel,
             fuel_at_plan: p.fuel_tenths,
+            refilled_at_plan: markets.fuel_accounting().0,
             credits_at_plan: p.credits_tenths,
             account_revision: p.revision,
             market_revision: markets.transaction_revision(),
@@ -223,6 +224,9 @@ impl World {
                     dock: current.dock,
                     tick: current.tick,
                     outcome,
+                    fuel: self
+                        .navigation_trade_fuel_anchor()
+                        .ok_or(Error::NoCommander)?,
                 });
                 if outcome == Outcome::Complete && candidate.trace.is_none() {
                     candidate.trace = Some(i as u8);

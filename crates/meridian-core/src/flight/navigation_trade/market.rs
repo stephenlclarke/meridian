@@ -160,8 +160,15 @@ impl World {
             .as_ref()
             .ok_or(StepError::NonFiniteState)?
             .fuel_tenths();
+        let account_revision = self
+            .raw_service_projection()
+            .map_err(|_| StepError::NonFiniteState)?
+            .revision
+            .checked_add(1)
+            .ok_or(StepError::TickOverflow)?;
         a.journeys.push(Journey {
             tick,
+            account_revision,
             jump: after.jump_sequence(),
             origin: before.snapshot(fuel).system,
             destination: after.snapshot(fuel).system,
@@ -227,6 +234,7 @@ impl State {
                 transaction,
                 account_revision: after.revision,
                 jump_sequence: world.navigation.ok_or(Error::NoCommander)?.jump_sequence(),
+                fuel_at_trade: before.fuel_tenths,
                 price: if purpose == Purpose::Buy {
                     quote.ask_tenths
                 } else {

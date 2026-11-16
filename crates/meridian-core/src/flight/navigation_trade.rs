@@ -188,6 +188,7 @@ struct Plan {
     distance: f64,
     fuel_debit: u16,
     fuel_at_plan: u16,
+    refilled_at_plan: u64,
     credits_at_plan: u32,
     account_revision: u64,
     market_revision: u64,
@@ -210,6 +211,7 @@ struct Trade {
     transaction: u64,
     account_revision: u64,
     jump_sequence: u64,
+    fuel_at_trade: u16,
     price: u32,
     before: Balance,
     after: Balance,
@@ -217,6 +219,7 @@ struct Trade {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct Journey {
     tick: u64,
+    account_revision: u64,
     jump: u64,
     origin: SystemId,
     destination: SystemId,
@@ -240,10 +243,17 @@ struct Fuel {
     paid: u32,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct FuelAnchor {
+    refilled_units: u64,
+    fuel: u16,
+    jump: u64,
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct Terminal {
     tick: u64,
     dock: DockContext,
     outcome: NavigationTradeOutcome,
+    fuel: FuelAnchor,
 }
 #[derive(Debug, Clone, PartialEq)]
 struct Attempt {
@@ -434,3 +444,13 @@ impl PreparedStationService<'_> {
 }
 #[cfg(test)]
 mod tests;
+
+impl World {
+    fn navigation_trade_fuel_anchor(&self) -> Option<FuelAnchor> {
+        Some(FuelAnchor {
+            refilled_units: self.station_markets.as_ref()?.fuel_accounting().0,
+            fuel: self.commander_account.as_ref()?.fuel_tenths(),
+            jump: self.navigation?.jump_sequence(),
+        })
+    }
+}
