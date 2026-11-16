@@ -1,0 +1,171 @@
+SH001	Mule	mule	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH002	Gyrfalcon Assault	gyrfalcon	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH003	Gyrfalcon Command	gyrfalcon	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH004	Gyrfalcon Patrol	gyrfalcon	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH005	Bison	bison	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH006	Bison Mk II	bison	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH007	Impala Voyager	impala	ship	leisure	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH008	Goshawk Explorer	goshawk	ship	leisure	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH009	Goshawk Mk II	goshawk	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH010	Goshawk Mk II Custom	goshawk	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH011	Goshawk Scout	goshawk	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH012	Sable Liner	sable-liner	ship	leisure	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH013	Buffalo	buffalo	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH014	Buffalo Mk II	buffalo	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH015	Raven	raven	ship	pirate	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH016	Mole Miner	mole	ship	miner	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH017	Mole Prospector	mole	ship	miner	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH018	Onager	onager	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH019	Gazelle Explorer	gazelle	ship	leisure	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH020	Crow Prototype	crow	ship	pirate	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH021	Zebra	zebra	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH022	Peregrine Mk I	peregrine	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH023	Peregrine Mk III	peregrine	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH024	Peregrine Mk IV	peregrine	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH025	Peregrine Mk V	peregrine	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH026	Harrier	harrier	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH027	Ibex	ibex	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH028	Lion Citadel	lion-citadel	station	station	false	never	new-authored-design; implementation-and-playtesting-pending
+SH029	Okapi	okapi	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH030	Sparrowhawk	sparrowhawk	ship	bountyHunter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH031	Kite Interceptor	kite	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH032	Panther Explorer	panther	ship	leisure	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH033	Panther Scout	panther	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH034	Frog Station	frog	station	station	false	never	new-authored-design; implementation-and-playtesting-pending
+SH035	Stag Liner	stag	ship	leisure	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH036	Zebu	zebu	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH037	Vulture Mk I	vulture	ship	pirate	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH038	Vulture Mk II	vulture	ship	pirate	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH039	Vulture Mk III	vulture	ship	pirate	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH040	Newt Escape Pod	newt-escape-pod	capsule	capsule	true	never	new-authored-design; implementation-and-playtesting-pending
+SH041	Serval Fighter	serval	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH042	Saker	saker	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH043	Eagle Cruiser	eagle	ship	military	false	never	new-authored-design; implementation-and-playtesting-pending
+SH044	Harpy Assault	harpy	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH045	Erne Corvette	erne	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH046	Harpy Dropship	harpy	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH047	Harpy Gunship	harpy	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH048	Lanner	lanner	ship	bountyHunter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH049	Hyena	hyena	ship	pirate	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH050	Yak	yak	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH051	Jackal	jackal	ship	pirate	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH052	Banteng	banteng	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH053	Caracal Scout	caracal	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH054	Hobby Fighter	hobby	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH055	Condor	condor	ship	pirate	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH056	Aplomado Interceptor	aplomado	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH057	Falconet	falconet	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH058	Muskox	muskox	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH059	Barbary	barbary	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH060	Wombat	wombat	ship	miner	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH061	Saiga	saiga	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH062	Moose Clipper	moose	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH063	Seriema Courier	seriema	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH064	Arna Cutter	arna	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH065	Vulture Raider	vulture	ship	pirate	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH066	Rabbit Explorer	rabbit	ship	leisure	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH067	Rhinoceros Trader	rhinoceros	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH068	Badger	badger	ship	miner	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH069	Baza Fighter	baza	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH070	Baza Mk II	baza	ship	bountyHunter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH071	Griffon	griffon	ship	pirate	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH072	Griffon Mk II	griffon	ship	pirate	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH073	Griffon Spectre	griffon	ship	pirate	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH074	Dzo	dzo	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH075	Dzo Mk II	dzo	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH076	Hog	hog	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH077	Tamaraw	tamaraw	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH078	Oryx Voyager	oryx-voyager	ship	leisure	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH079	Carabao Freighter	carabao	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH080	Carabao Highliner	carabao	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH081	Jaguar	jaguar	ship	military	false	never	new-authored-design; implementation-and-playtesting-pending
+SH082	Cheetah	cheetah	ship	bountyHunter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH083	Hare Explorer	hare	ship	leisure	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH084	Llama	llama	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH085	Laggar	laggar	ship	bountyHunter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH086	Alpaca	alpaca	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH087	Elk	elk	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH088	Springbok Starliner	springbok	ship	leisure	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH089	Antelope	antelope	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH090	Elephant	elephant	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH091	Gopher	gopher	ship	miner	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH092	Aurochs	aurochs	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH093	Giraffe Liner	giraffe	ship	leisure	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH094	Shikra	shikra	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH095	Shikra Interdictor	shikra	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH096	Wisent	wisent	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH097	Wisent Mk II	wisent	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH098	Anoa	anoa	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH099	Ox	ox	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH100	Ox Mk II	ox	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH101	Cavy Racer	cavy	ship	leisure	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH102	Dhole Haven	dhole	station	station	false	never	new-authored-design; implementation-and-playtesting-pending
+SH103	Redtail Mk III	redtail	ship	bountyHunter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH104	Wildebeest	wildebeest	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH105	Tapir Shuttle	tapir	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH106	Tapir Mk II	tapir	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH107	Magpie	magpie	ship	pirate	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH108	Besra	besra	ship	bountyHunter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH109	Hippo	hippo	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH110	Leopard Fighter	leopard	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH111	Puma	puma	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH112	Larvaal Warden	larvaal-warden	ship	alien	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH113	Larvaal Ravager	larvaal-ravager	ship	alien	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH114	Larvaal Sentinel	larvaal-sentinel	ship	alien	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH115	Larvaal Lancer	larvaal-lancer	ship	alien	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH116	Larvaal Broodlord	larvaal-broodlord	ship	alien	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH117	Larvaal Provoker	larvaal-provoker	ship	alien	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH118	Larvaal Reaver	larvaal-reaver	ship	alien	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH119	Larvaal Wraith	larvaal-wraith	ship	alien	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH120	Larvaal Seeker	larvaal-seeker	ship	alien	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH121	Larvaal Mender	larvaal-mender	ship	alien	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH122	Larvaal Harvester	larvaal-harvester	ship	alien	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH123	Larvaal Sovereign	larvaal-sovereign	ship	alien	false	never	new-authored-design; implementation-and-playtesting-pending
+SH124	Larvaal Warship	larvaal-warship	ship	alien	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH125	Larvaal Drone	larvaal-drone	ship	alien	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH126	Mangalica	mangalica	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH127	Gaur Trader	gaur	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH128	Boar Transport	boar	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH129	Warthog Escort	warthog	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH130	Marmot Prospector	marmot	ship	miner	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH131	Warthog Light	warthog	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH132	Warthog Freighter	warthog	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH133	Warthog Tanker	warthog	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH134	Warthog Heavy	warthog	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH135	Javelina	javelina	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH136	Falcon Mk I	falcon	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH137	Falcon Mk II	falcon	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH138	Falcon Mk III	falcon	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH139	Falcon Mk IV	falcon	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH140	Chimango	chimango	ship	bountyHunter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH141	Salamander Station	salamander-station	station	station	false	never	new-authored-design; implementation-and-playtesting-pending
+SH142	Buzzard Mk II	buzzard	ship	bountyHunter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH143	Aardvark Miner	aardvark	ship	miner	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH144	Razorback	razorback	ship	trader	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH145	Kestrel	kestrel	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH146	Merlin	merlin	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH147	Hawk	hawk	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH148	Morepork	morepork	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH149	Owlet Mk II	owlet	ship	bountyHunter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH150	Reindeer Freighter	reindeer	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH151	Lynx Escort	lynx	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH152	Osprey Scout	osprey	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH153	Osprey Strike	osprey	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH154	Osprey Patrol	osprey	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH155	Osprey Support	osprey	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH156	Lion Bastion	lion-bastion	platform	platform	false	never	new-authored-design; implementation-and-playtesting-pending
+SH157	Wolf Scout	wolf	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH158	Wolf Mk I	wolf	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH159	Wolf Mk II	wolf	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH160	Wolf Cutter	wolf	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH161	Wolf Citadel	wolf	station	station	false	never	new-authored-design; implementation-and-playtesting-pending
+SH162	Larvaal Probe	larvaal-probe	other	other	false	never	new-authored-design; implementation-and-playtesting-pending
+SH163	Lammergeier	lammergeier	ship	pirate	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH164	Toad Drug Factory	toad-drug-factory	station	station	false	never	new-authored-design; implementation-and-playtesting-pending
+SH165	Secretarybird	secretarybird	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH166	Camel Rescue	camel	ship	transporter	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH167	Secretarybird Survey	secretarybird	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH168	Armadillo Miner	armadillo	ship	miner	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH169	Caracara Mk I	caracara	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH170	Caracara Mk II	caracara	ship	military	true	blueprintFabrication	new-authored-design; implementation-and-playtesting-pending
+SH171	Medusa	medusa	ship	alien	true	plughQuestFabrication	new-authored-design; implementation-and-playtesting-pending
