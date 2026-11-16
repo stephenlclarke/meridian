@@ -206,7 +206,8 @@ fn wrong_early_foreign_stale_paused_and_post_continue_reviews_refuse_atomically(
     assert_eq!(ok(foreign.save_bytes()), before);
     steps(&mut world, 1, FlightInput::default());
     assert!(world.prepare_flight_reception(review, 0).is_err());
-    assert!(world.prepare_flight_reception(review, 1).is_err());
+    // A current-tick command may confirm the unchanged review after a normal docked step.
+    drop(ok(world.prepare_flight_reception(review, 1)));
     let review = ok(world.review_flight_reception(Action::Accept, 1));
     let bytes = ok(world.save_bytes());
     ok(world.restore_bytes(&bytes));
@@ -646,4 +647,123 @@ fn original_gunnery_clue_and_owned_resources_survive_independent_flight_trace() 
     assert_eq!(some(world.missile_snapshot()).rounds, rounds);
     assert_ne!(some(snapshot(&world).trace).receipt_id, original.receipt_id);
     let _continued = cold(&world);
+}
+
+#[test]
+fn accept_receive_and_cancel_reviews_survive_ordinary_docked_ticks_and_stamp_actual_commit() {
+    for (i, action) in [Action::Accept, Action::Receive, Action::Cancel]
+        .into_iter()
+        .enumerate()
+    {
+        let mut world = commander(5401 + i as u64);
+        if action != Action::Accept {
+            confirm(&mut world, Action::Accept);
+        }
+        if action == Action::Receive {
+            approach(&mut world);
+            dock(&mut world);
+        }
+        let reviewed_tick = world.snapshot().tick;
+        let review = ok(world.review_flight_reception(action, reviewed_tick));
+        let before = snapshot(&world);
+        let original_bytes = ok(world.save_bytes());
+        steps(&mut world, 7, FlightInput::default());
+        let current_tick = world.snapshot().tick;
+        assert_eq!(current_tick, reviewed_tick + 7);
+        assert_eq!(snapshot(&world), before);
+        assert_ne!(ok(world.save_bytes()), original_bytes);
+        let delayed_bytes = ok(world.save_bytes());
+        assert!(
+            world
+                .prepare_flight_reception(review, reviewed_tick)
+                .is_err()
+        );
+        // Private review-field corruption is a negative fixture, never public consent.
+        let future = super::FlightReceptionReview {
+            tick: current_tick + 1,
+            ..review
+        };
+        assert!(
+            world
+                .prepare_flight_reception(future, current_tick)
+                .is_err()
+        );
+        assert_eq!(ok(world.save_bytes()), delayed_bytes);
+        let prepared = ok(world.prepare_flight_reception(review, current_tick));
+        let staged = ok(World::from_save_bytes(prepared.bytes()));
+        let after = snapshot(&staged);
+        prepared.commit();
+        assert_eq!(snapshot(&world), after);
+        let attempt = some(after.attempts.last());
+        if action == Action::Accept {
+            assert_eq!(attempt.accepted_tick, current_tick);
+        } else {
+            assert_eq!(attempt.terminal_tick, Some(current_tick));
+        }
+        let _continued = cold(&world);
+    }
+}
+
+fn delayed_material_refusal(world: &mut World, review: super::FlightReceptionReview) {
+    steps(world, 7, FlightInput::default());
+    let before = ok(world.save_bytes());
+    let snapshot_before = snapshot(world);
+    let tick = world.snapshot().tick;
+    assert!(matches!(
+        world.prepare_flight_reception(review, tick),
+        Err(Error::StaleReview)
+    ));
+    assert_eq!(ok(world.save_bytes()), before);
+    assert_eq!(snapshot(world), snapshot_before);
+}
+
+#[test]
+fn delayed_reviews_still_bind_shared_records_money_markets_view_pause_and_actual_dock() {
+    let mut world = commander(5501);
+    let review = ok(world.review_flight_reception(Action::Accept, 0));
+    consent(&mut world); // A real T02 reservation changes shared occupancy without changing tick.
+    delayed_material_refusal(&mut world, review);
+
+    let mut world = commander(5502);
+    let review = ok(world.review_flight_reception(Action::Accept, 0));
+    ok(world.request_station_service(
+        crate::station_services::Command::BuyCommodity(
+            crate::station_services::CommodityId::Minerals,
+        ),
+        0,
+    ));
+    delayed_material_refusal(&mut world, review);
+
+    let mut world = commander(5503);
+    let review = ok(world.review_flight_reception(Action::Accept, 0));
+    ok(world.request_flight_view(FlightView::Rear, 0));
+    delayed_material_refusal(&mut world, review);
+
+    let mut world = commander(5504);
+    let review = ok(world.review_flight_reception(Action::Accept, 0));
+    ok(world.request_pause(true, 0));
+    ok(world.request_pause(false, 0));
+    delayed_material_refusal(&mut world, review);
+
+    let mut world = commander(5505);
+    let review = ok(world.review_flight_reception(Action::Accept, 0));
+    let dock_before = some(world.current_dock_context());
+    stationary_facing_station(&mut world);
+    dock(&mut world);
+    assert!(some(world.current_dock_context()).sequence() > dock_before.sequence());
+    delayed_material_refusal(&mut world, review);
+}
+
+#[test]
+fn paid_fit_change_invalidates_delayed_review_even_after_actual_fit_is_restored() {
+    let mut world = crate::flight::equipment::tests::earned_world(5601);
+    let tick = world.snapshot().tick;
+    ok(world.request_equipment(crate::equipment::Command::PurchaseCargoBay, tick));
+    let item = some(some(world.equipment_snapshot()).owned).id;
+    let review = ok(world.review_flight_reception(Action::Accept, tick));
+    ok(world.request_equipment(crate::equipment::Command::UnfitCargoBay(item), tick));
+    ok(world.request_equipment(crate::equipment::Command::FitCargoBay(item), tick));
+    assert!(some(some(world.equipment_snapshot()).owned).fitted);
+    delayed_material_refusal(&mut world, review);
+    confirm(&mut world, Action::Accept);
 }
