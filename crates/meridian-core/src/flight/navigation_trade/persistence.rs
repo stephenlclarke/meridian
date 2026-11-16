@@ -640,8 +640,7 @@ impl Trade {
         let arrived = a
             .journeys
             .iter()
-            .filter(|j| j.tick <= self.tick)
-            .next_back()
+            .rfind(|j| j.tick <= self.tick)
             .ok_or(INVALID)?;
         let quote = c
             .commerce
