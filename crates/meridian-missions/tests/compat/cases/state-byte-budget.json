@@ -1,0 +1,46 @@
+{
+  "id": "state-byte-budget",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "on_event",
+    "source": "lua/state-byte-budget.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "kind": {
+          "type": "string",
+          "value": "test"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "credits": {
+          "type": "integer",
+          "value": 1000
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {}
+    }
+  },
+  "expected": {
+    "status": "error",
+    "error": {
+      "match": "contains",
+      "text": "Script data exceeds its byte budget."
+    },
+    "evaluationPublished": false,
+    "inputStateUnchanged": true
+  },
+  "referencePaths": [
+    "Sources/L337Core/ScriptEvaluator.swift",
+    "Sources/L337Core/ScriptValue.swift",
+    "Sources/MissionScript/MissionScript.c"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED",
+  "notes": "String262144 itself is allowed; encoded data-map overhead exceeds the separate262144 state budget. Output stays below default524288."
+}

@@ -1,0 +1,110 @@
+{
+  "id": "lossless-scalars-and-types",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "on_event",
+    "source": "lua/lossless-scalars-and-types.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "kind": {
+          "type": "string",
+          "value": "test"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "credits": {
+          "type": "integer",
+          "value": 1000
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {
+        "fraction": {
+          "type": "number",
+          "value": "3ff8000000000000"
+        },
+        "max": {
+          "type": "integer",
+          "value": 9223372036854775807
+        },
+        "min": {
+          "type": "integer",
+          "value": -9223372036854775808
+        },
+        "negativeZero": {
+          "type": "number",
+          "value": "8000000000000000"
+        },
+        "nul": {
+          "type": "string",
+          "value": "a\u0000b"
+        },
+        "oneFloat": {
+          "type": "number",
+          "value": "3ff0000000000000"
+        },
+        "oneInt": {
+          "type": "integer",
+          "value": 1
+        },
+        "utf8": {
+          "type": "string",
+          "value": "Caf\u00e9"
+        }
+      }
+    }
+  },
+  "expected": {
+    "status": "ok",
+    "data": {
+      "type": "object",
+      "value": {
+        "fraction": {
+          "type": "number",
+          "value": "3ff8000000000000"
+        },
+        "max": {
+          "type": "integer",
+          "value": 9223372036854775807
+        },
+        "min": {
+          "type": "integer",
+          "value": -9223372036854775808
+        },
+        "negativeZero": {
+          "type": "number",
+          "value": "8000000000000000"
+        },
+        "nul": {
+          "type": "string",
+          "value": "a\u0000b"
+        },
+        "oneFloat": {
+          "type": "number",
+          "value": "3ff0000000000000"
+        },
+        "oneInt": {
+          "type": "integer",
+          "value": 1
+        },
+        "utf8": {
+          "type": "string",
+          "value": "Caf\u00e9"
+        }
+      }
+    },
+    "commands": []
+  },
+  "referencePaths": [
+    "Sources/MissionScript/MissionScript.c",
+    "Sources/L337Core/ScriptValue.swift",
+    "Sources/L337Core/ScriptEvaluator.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

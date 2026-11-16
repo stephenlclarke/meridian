@@ -1,0 +1,60 @@
+{
+  "id": "scalar-tostring",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "on_event",
+    "source": "lua/scalar-tostring.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "kind": {
+          "type": "string",
+          "value": "test"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "credits": {
+          "type": "integer",
+          "value": 1000
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {}
+    }
+  },
+  "expected": {
+    "status": "ok",
+    "data": {
+      "type": "object",
+      "value": {
+        "a": {
+          "type": "string",
+          "value": "123"
+        },
+        "b": {
+          "type": "string",
+          "value": "true"
+        },
+        "c": {
+          "type": "string",
+          "value": "nil"
+        },
+        "d": {
+          "type": "string",
+          "value": "ok"
+        }
+      }
+    },
+    "commands": []
+  },
+  "referencePaths": [
+    "Sources/MissionScript/MissionScript.c",
+    "Sources/L337Core/ScriptEvaluator.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

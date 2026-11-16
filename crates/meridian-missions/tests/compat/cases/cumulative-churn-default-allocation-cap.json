@@ -1,0 +1,71 @@
+{
+  "id": "cumulative-churn-default-allocation-cap",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "on_event",
+    "source": "lua/cumulative-churn-default-allocation-cap.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "kind": {
+          "type": "string",
+          "value": "test"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "credits": {
+          "type": "integer",
+          "value": 1000
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {
+        "counter": {
+          "type": "integer",
+          "value": 2
+        }
+      }
+    },
+    "limitsOverride": {
+      "instructions": 1000000
+    }
+  },
+  "expected": {
+    "status": "error",
+    "error": {
+      "match": "contains",
+      "text": "not enough memory"
+    },
+    "evaluationPublished": false,
+    "inputStateUnchanged": true
+  },
+  "referencePaths": [
+    "Sources/MissionScript/MissionScript.c",
+    "Sources/CLua/lmem.c",
+    "Sources/CLua/lstring.h"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED",
+  "notes": "6000 distinct ephemeral8193..8196-byte strings exceed32MiB cumulative requested allocations while the default8MiB live heap can recycle. Raising instruction limit to the source-allowed1M isolates allocation from instruction exhaustion. No collectgarbage escape or invented budget. Expected memory refusal, no data/command publication; actual allocation/heap diagnostics must be retained by the owner.",
+  "followup": {
+    "freshVM": true,
+    "source": "lua/empty-array-becomes-empty-map.lua",
+    "stateFromOriginalInput": true,
+    "expected": {
+      "data": {
+        "type": "object",
+        "value": {
+          "counter": {
+            "type": "integer",
+            "value": 2
+          }
+        }
+      },
+      "commands": []
+    }
+  }
+}

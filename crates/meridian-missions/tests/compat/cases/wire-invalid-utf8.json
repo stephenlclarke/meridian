@@ -1,0 +1,18 @@
+{
+  "id": "wire-invalid-utf8",
+  "invocation": {
+    "operation": "wire_decode",
+    "bytes": "wire/wire-invalid-utf8.bin"
+  },
+  "expected": {
+    "status": "error",
+    "error": {
+      "match": "exact",
+      "text": "Script strings must be UTF-8."
+    }
+  },
+  "referencePaths": [
+    "Sources/L337Core/ScriptValue.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

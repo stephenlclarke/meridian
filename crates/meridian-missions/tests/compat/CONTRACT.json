@@ -1,0 +1,43 @@
+{
+  "status": "FROZEN_SOURCE_DERIVED_EXPECTATIONS_ALL_EXECUTION_UNRUN",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "fixtures": 139,
+  "hostModelScenarios": 15,
+  "valueFormat": "Canonical tagged-script-values-v1 shape. Parse integer values losslessly as signed64, number values as16 lowercase hex IEEE754 bits. Maps sort string keys for comparison; arrays retain order. This canonical comparison does not demand sorted raw C map output bytes.",
+  "callback": "Each evaluate invocation uses a new VM, text module returns handler table; named function receives(event,scopedSnapshot,explicitStateCopy), exactly one return result used. Only explicit returned data crosses callback invocations.",
+  "result": "Exact top-level fields data and commands; data must be map; commands dense array<=256, or empty map coerced to empty array. Command item/capability/native authority validation is a separate controller phase.",
+  "defaults": {
+    "instructions": 50000,
+    "heapBytes": 8388608,
+    "allocationBytes": 33554432,
+    "outputBytes": 524288
+  },
+  "C_bounds": {
+    "sourceBytesMax": 262144,
+    "inputBytesMax": 1048576,
+    "heapBytesMin": 65536,
+    "heapBytesMax": 16777216,
+    "allocationBytesMin": "heapBytes",
+    "allocationBytesMax": 67108864,
+    "outputBytesMin": 1,
+    "outputBytesMax": 1048576,
+    "instructionsMin": 1000,
+    "instructionsMax": 1000000,
+    "hookQuantum": 1000,
+    "depthExclusive": 32,
+    "itemsMax": 16384
+  },
+  "separateSwiftStateEncodeLimit": 262144,
+  "instructionSemantics": "Hook count adds1000; failure on count>=limit, includes top-level and callback Lua. Successful counts quantized, no invented instruction totals/allocator peaks. Infinite-loop case with2500 yields3000. Do not promise all invalid/recursive/allocation cases fail from the same guard.",
+  "errorComparison": "Exact only for deterministic source-defined host errors. contains permits mission chunk/line prefix. category means rejection without fabricated platform-specific Lua compiler/stack/memory wording. C keeps at most240 bytes from a string error; nonstring error becomes Script execution failed. No proposal may publish on failure.",
+  "executionBinding": "MC1 or existing G1/Dell execution adapters load corpus data without editing frozen expectations; record exact productionhead/tree, corpusmanifestSHA, invocation/result/error traces and platform/compiler/runtime identity. Compiler/native owners only. The corpus author did not execute Swift/Lua/Rust/native or claim test passes.",
+  "hostScenarioBoundary": "HOST-SCENARIOS are separate controller/native model contracts, not Lua execution fixtures or native proof. They require actual production authority joins and publisher fixtures. No fake descriptor supplied here confers authority.",
+  "modules": "Standalone sandbox has no require. Exact source-bound closed-module prelude supplies only local declared modules; fixtures freeze cache/cycle/error behavior. This is separate from any filesystem/module path validation.",
+  "coverageLimits": [
+    "Original pack entries/manifests retained as source provenance, only named pack cases carry explicit expectations; no blanket all-packs/full-controller acceptance.",
+    "No actual native collision/damage/reception/mission payment or GPU acceptance from evaluator fixtures.",
+    "No exhaustive malformed persisted mission graph coverage; wire-specific negatives are separate from typed persisted-data decoder.",
+    "No new dependencies, Cargo/App/shared production changes or inferred budget/legal policy."
+  ],
+  "authorVsReview": "G2 authored these fixtures. Root audits this artifact; G2 independent review applies to other authors production source, never self-review clearance."
+}

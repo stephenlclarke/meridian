@@ -1,0 +1,99 @@
+{
+  "id": "pack-courier-contact-origin",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "contact",
+    "source": "lua/pack-courier-contact-origin.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "kind": {
+          "type": "string",
+          "value": "test"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "contract": {
+          "type": "object",
+          "value": {
+            "destination_galaxy": {
+              "type": "integer",
+              "value": 0
+            },
+            "destination_system": {
+              "type": "integer",
+              "value": 9
+            },
+            "station_id": {
+              "type": "string",
+              "value": "origin"
+            }
+          }
+        },
+        "docked": {
+          "type": "bool",
+          "value": true
+        },
+        "galaxy": {
+          "type": "integer",
+          "value": 0
+        },
+        "main_station": {
+          "type": "bool",
+          "value": true
+        },
+        "station_id": {
+          "type": "string",
+          "value": "origin"
+        },
+        "system": {
+          "type": "integer",
+          "value": 7
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {
+        "counter": {
+          "type": "integer",
+          "value": 3
+        }
+      }
+    }
+  },
+  "expected": {
+    "status": "ok",
+    "data": {
+      "type": "object",
+      "value": {
+        "counter": {
+          "type": "integer",
+          "value": 3
+        }
+      }
+    },
+    "commands": [
+      {
+        "type": "object",
+        "value": {
+          "id": {
+            "type": "string",
+            "value": "courier-abandon"
+          },
+          "op": {
+            "type": "string",
+            "value": "dialogue.offer"
+          }
+        }
+      }
+    ]
+  },
+  "referencePaths": [
+    "Sources/L337Core/Resources/ScriptPacks/generated-couriers/scripts/main.lua"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

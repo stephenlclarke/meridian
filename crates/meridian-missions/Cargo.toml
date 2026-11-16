@@ -1,0 +1,28 @@
+[package]
+name = "meridian-missions"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.99"
+publish = false
+license-file = "../../LICENSE"
+
+# Isolated owner execution. Root removes this table when serially joining the workspace.
+[workspace]
+members = []
+exclude = ["vendor/mlua", "vendor/mlua-sys"]
+resolver = "3"
+
+[dependencies]
+meridian-core = { path = "../meridian-core" }
+meridian-mission-content = { path = "../meridian-mission-content" }
+mlua = { path = "vendor/mlua", version = "=0.12.2", default-features = false, features = ["lua55", "vendored"] }
+sha2 = "=0.11.1"
+toml = "=1.2.1"
+serde_json = "=1.0.154"
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"

@@ -1,0 +1,650 @@
+{
+  "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "tree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "root": "/Volumes/SSD/offload/l337-g1-pr335-equipment-compose.UtqLRJ/required-cold-runtime.a11fe169/elite",
+  "files": [
+    {
+      "path": "Sources/L337Core/ScriptEvaluator.swift",
+      "gitBlob": "b6c8093603c7acc36dd532d96570c80e7e920594",
+      "bytes": 3091,
+      "sha256": "89e05f0eb25b1558610cdc8db0e36d10be9f7a0e6788a939b26775a1d610c687"
+    },
+    {
+      "path": "Sources/L337Core/ScriptValue.swift",
+      "gitBlob": "46da592d10fadfdea6121ab98f583a1ba3e95bea",
+      "bytes": 6514,
+      "sha256": "c332722d7b01200defc6dca14abfbca76d6531117692356c95238bed9c4c0547"
+    },
+    {
+      "path": "Sources/MissionScript/MissionScript.c",
+      "gitBlob": "4102417e642e487ebba7179e9d49056f7320d670",
+      "bytes": 11648,
+      "sha256": "93f996598cca51bb5f325b2545ec5c835337420a048878b1788563b424c67192"
+    },
+    {
+      "path": "Sources/MissionScript/include/MissionScript.h",
+      "gitBlob": "316048d5e2d9ef165a2e173de75bc1f340761586",
+      "bytes": 714,
+      "sha256": "67e53c89f590a69a04f51c094241e45313bf7d48c021b9e70335db669c158992"
+    },
+    {
+      "path": "Sources/L337Core/ScriptRuntime.swift",
+      "gitBlob": "8f537f816e8c06bc1adfe20c5878ddf7385b0b5c",
+      "bytes": 5600,
+      "sha256": "c29a86ee8498d5c35c46b82b4783c1d100abb7a642515350115e98c64fc30894"
+    },
+    {
+      "path": "Sources/L337Core/ScriptDirector.swift",
+      "gitBlob": "68f7f4d3d0b65e174c71b5738d089fa19a4afa89",
+      "bytes": 83340,
+      "sha256": "a32e80d7bec0296c1500e55103545349a3a5631cde2cfb226640b4a952cd32d5"
+    },
+    {
+      "path": "Sources/L337Core/ScriptTransactions.swift",
+      "gitBlob": "58165b36c074b4e47714e2cd66496f04110c9ba6",
+      "bytes": 15215,
+      "sha256": "9c6f2bbb98712c4d1116f3f284477475b84e6e037c98da5be9410484dc78fe13"
+    },
+    {
+      "path": "Sources/L337Core/ScriptEventContext.swift",
+      "gitBlob": "3c083cb2448e0b80db75a79a3db6bfd20058c3fc",
+      "bytes": 5866,
+      "sha256": "2aee658e1eebef394e231c78aa6eab3746d710f289fa21325376927452f5f020"
+    },
+    {
+      "path": "Sources/L337Core/ScriptValueStorage.swift",
+      "gitBlob": "180cd1d63fe3dd89d8855be3a35881978183644a",
+      "bytes": 8902,
+      "sha256": "4ac5139f353a578e4dafa5504eba943b2af0040ee4af2eff3740e26176af6141"
+    },
+    {
+      "path": "Sources/L337Core/ScriptModules.swift",
+      "gitBlob": "0e4430570e67f434c6c58bf528416b32169a3bc2",
+      "bytes": 2562,
+      "sha256": "3a84eb374589f9a02a98b8e4659b3509d09ba38a6223c775b6185c7bc6580ee2"
+    },
+    {
+      "path": "Sources/L337Core/MissionNativeBridge.swift",
+      "gitBlob": "21cbb35f40d22c8c26aaa8e0ce7fa4462f90b83b",
+      "bytes": 90392,
+      "sha256": "69a7d21899a27ccd689831b15f272076d46dfd021ab93a75f34f71d981d6f6fa"
+    },
+    {
+      "path": "Tests/L337CoreTests/ScriptEvaluatorTests.swift",
+      "gitBlob": "dde990b64d3011bd575db44c359b866723e00d0e",
+      "bytes": 4753,
+      "sha256": "b9af53734375e143c0ac73a2b438706fd93a8998a8e63f29ca767015aa055d08"
+    },
+    {
+      "path": "Tests/L337CoreTests/ScriptValueStorageTests.swift",
+      "gitBlob": "154bbff4221bb478143612a18d449362fe78276a",
+      "bytes": 15384,
+      "sha256": "a1544169cbdf3c7d0d4aacb8be4d2db5dce2ad2003af2fe3d2218e672593e670"
+    },
+    {
+      "path": "Tests/L337CoreTests/ScriptEventHistoryTests.swift",
+      "gitBlob": "d6f9434ec18173de6186b417bcff83f130c5c46c",
+      "bytes": 12899,
+      "sha256": "552bc0aa34359e53016008b1f8f4c809b11a06071b9715f68b0df241efb2b90f"
+    },
+    {
+      "path": "Tests/L337CoreTests/MissionNativeBridgeTests.swift",
+      "gitBlob": "1b1d65d10789f610fb5745a331682ba10f88153d",
+      "bytes": 67925,
+      "sha256": "21b82ac639d41add1bec5d0f783d89e81b4f2e560e2df54779f4cd674c568027"
+    },
+    {
+      "path": "Sources/CLua/PROVENANCE.json",
+      "gitBlob": "1c042d74f1dc16235101b03bfde2a813db895b5e",
+      "bytes": 9096,
+      "sha256": "a378356284f593e8a5729e21f94f7781519dc0c586e5f9a1d462f32c312a1873"
+    },
+    {
+      "path": "Sources/CLua/lmem.c",
+      "gitBlob": "de8503d91b9faacabff0d8ff650af9a04df30e0e",
+      "bytes": 6245,
+      "sha256": "7a63908f22ac826f3eb6826bd106d4eed40a7df749da8a87c06713e980fad099"
+    },
+    {
+      "path": "Sources/CLua/lstring.h",
+      "gitBlob": "1643c3d82bf4e309028fc2aab55966462fd47ab3",
+      "bytes": 2100,
+      "sha256": "11174f9fb1a140afb2bad7b44471add3d143eb4fa6f249614fd5958211831f9b"
+    },
+    {
+      "path": "Sources/CLua/LICENSE.txt",
+      "gitBlob": "020214a9d8382c269afca5f0961f9c2fcb040c60",
+      "bytes": 1071,
+      "sha256": "a38e88aeffd124e9403aab4635ae3c0285d8d84147caef2df6fdce1b4c2bc971"
+    },
+    {
+      "path": "Sources/L337Core/Resources/Legal/Lua-LICENSE.txt",
+      "gitBlob": "020214a9d8382c269afca5f0961f9c2fcb040c60",
+      "bytes": 1071,
+      "sha256": "a38e88aeffd124e9403aab4635ae3c0285d8d84147caef2df6fdce1b4c2bc971"
+    },
+    {
+      "path": "LICENSE",
+      "gitBlob": "b27f022cea044295412849dec93512dad638f08e",
+      "bytes": 1071,
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/generated-couriers/manifest.toml",
+      "gitBlob": "c1f01e7e3c59f4070b94064a751d0e27de854826",
+      "bytes": 2271,
+      "sha256": "f4c2a1bb538f257a229cce4911c81c4471a0aa92b2d30fe1605959c0740407f6"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/generated-couriers/scripts/main.lua",
+      "gitBlob": "47bd0ac410346bdc1fba47ed8315a8d667c3cc6b",
+      "bytes": 2290,
+      "sha256": "7134b0c5633be2c742d9bcc3dc9768d1966dade002685060a6db3794b18de046"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/guiding-light/manifest.toml",
+      "gitBlob": "40b04423a7dcac736b07546a7e7c34bebe1f7ebb",
+      "bytes": 5538,
+      "sha256": "6a35a4adc4d81b55c0a8ddfc61b5fbfdd014d34f87212f54c5a01d55b2316f68"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/guiding-light/scripts/main.lua",
+      "gitBlob": "7ab6d0aa589f6b8b71adb41bb2606efdf54b550e",
+      "bytes": 5999,
+      "sha256": "24e60137dd70f34dff7c2807b6cf922e021993c6fd12276031f926aba9abe1d3"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-assembly-of-orbits/manifest.toml",
+      "gitBlob": "46dea5b8b661e5795668d280e95631d0f51deb5d",
+      "bytes": 2733,
+      "sha256": "dd4d1326e388b5f17ed7a0072745180662679cbbbee2e0a704f8b3fe5c613f00"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-assembly-of-orbits/scripts/main.lua",
+      "gitBlob": "9f70d87e257b95d0ea67e82714b29d22883b2310",
+      "bytes": 597,
+      "sha256": "fbac637d8248a1e4beb7915dbf23074372a37d004b919b9135a859602db738f0"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-bonded-freight/manifest.toml",
+      "gitBlob": "301c413493cec3ee3e0c86bfe2c43cb4d842f52c",
+      "bytes": 2982,
+      "sha256": "c8b08c9b1ee7e703b85a791f293f5c6af55ee90a226791bfd9c0ad03a2ba820e"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-bonded-freight/scripts/main.lua",
+      "gitBlob": "87c9b8f8ae8b98cbb8b66a704efe6243eaf163ed",
+      "bytes": 1881,
+      "sha256": "5610566f0078003d1a53b823a80bfbfa395479a60f96dc99f745e4ad93377a30"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-borrowed-voice/manifest.toml",
+      "gitBlob": "b92124b072c72038942f0c98ed25d3a18f04bea7",
+      "bytes": 3015,
+      "sha256": "367c8ccbb2cdf537a81e9e548423d6d55fd1f46c516fe8c4f72248bc3a743c6a"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-borrowed-voice/scripts/main.lua",
+      "gitBlob": "0302693ccfbe450372f8786066be0215cb8e49c3",
+      "bytes": 693,
+      "sha256": "fe302d20b0dc58ba837a967cb2205068a06b437f07eec2a2f0d0b5f15fdaf6d1"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-cabin-journey/manifest.toml",
+      "gitBlob": "9f806d0664401b9096c5df9497d93e6161599c40",
+      "bytes": 1763,
+      "sha256": "5ad860a6b7699895b8484e1d107f4e8d45546b845afd22631c239806f372c34e"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-cabin-journey/scripts/main.lua",
+      "gitBlob": "7ef665bd18d9b0338dc01f9d5d9fa1156f8f781c",
+      "bytes": 349,
+      "sha256": "c6e0140a8b2ef3597cf2d672207c28bd5bff7be3464490790393585fb68c78ff"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-cold-chain/manifest.toml",
+      "gitBlob": "5ba1c693c0376a8a50e459b8862b495296be82c2",
+      "bytes": 1760,
+      "sha256": "c00c9ca31654cbca1343970141f50d9efa53ff615ffa3645fd872c4c979ac2ce"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-cold-chain/scripts/main.lua",
+      "gitBlob": "28365c1af57b2e4e676624f4be0c9751f3a05853",
+      "bytes": 109,
+      "sha256": "f82376c0abfcf2fb2b8b2a4576287c2b73aea23f3ab3ed642b5538a618d792a4"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-consented-freight/manifest.toml",
+      "gitBlob": "0f3a4f5b9ab63e56c03c2d1b085223dd2920d1a9",
+      "bytes": 2890,
+      "sha256": "8bb5f739bf3c4658d6709b20149c8adcce0e1f32a3c7a67da39c35db8d8a46d4"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-consented-freight/scripts/main.lua",
+      "gitBlob": "7a404d675980f43b026e6aecf8bedd8c0f1722c2",
+      "bytes": 1581,
+      "sha256": "2eb7865a6990e7a4badcdc20d7ff83f09967a8f50222697b91ed0e8cb61b1c22"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-consented-survey/manifest.toml",
+      "gitBlob": "c2ab7bf9388103ccbdc5d94da7616cf8039864e8",
+      "bytes": 2804,
+      "sha256": "0a60028030e1423b2e0566dfe9484e7756c9c8fc332da4fec3a6267c156dc167"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-consented-survey/scripts/main.lua",
+      "gitBlob": "f178203e9aa683c905019cabb06914e3427b316f",
+      "bytes": 689,
+      "sha256": "3eeda0d3899b237a136cc78609ca758e5070793371aa2114e9c152c379f6ba79"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-corridor-defence/manifest.toml",
+      "gitBlob": "7f26cb9951bbed2ef95d5a38761e995b6270a767",
+      "bytes": 4159,
+      "sha256": "c0c223fbd8e427c81728ec75dcf3797183f90d80b596c0f77755a531f1213836"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-corridor-defence/scripts/main.lua",
+      "gitBlob": "72b5f86c915b80d8d719256dccf941f2822a77c3",
+      "bytes": 3788,
+      "sha256": "9662def8245e917d011c1a47ef8acba0d2e7e5378a41d1cdee9ecf1877fc226f"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-custody-rescue/manifest.toml",
+      "gitBlob": "b22baa9f973ea51b86885bc3c964da6cd5ed55c0",
+      "bytes": 3345,
+      "sha256": "57327777d7752607bb2de5a1b0f6cb22f73e2292982fd4dacfb8204f849ada18"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-custody-rescue/scripts/main.lua",
+      "gitBlob": "7c38392a85a9c9a4d3fbc1a8e3ee988848366ae5",
+      "bytes": 708,
+      "sha256": "43a68f1139bf9eba95c706e7cfae3764a81eb5151244bd39b737255a42fc3fad"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-defensive-flight/manifest.toml",
+      "gitBlob": "af8843c9636c7f8c4513c2d04bcd568ce272e4ff",
+      "bytes": 2541,
+      "sha256": "9e1b675d9749b77262e55e79620c15e7cb9df5d42a1dc62d863cc6c2f13b0ba8"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-defensive-flight/scripts/main.lua",
+      "gitBlob": "437030bcefe34d0657e48cde82ff8a0b207e4676",
+      "bytes": 476,
+      "sha256": "4486f6edc298142215ec78befc79b13461a6913ba7aa7a0e0ad7ab5771b5f7c4"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-field-relief/manifest.toml",
+      "gitBlob": "242b7744c35b195d5f7a8fcd06f8cc5c6594298a",
+      "bytes": 1692,
+      "sha256": "eafcdc767bcc71a7cf562c17b25098e01f97fb015ed0c44a053f720fb17ea0c9"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-field-relief/scripts/main.lua",
+      "gitBlob": "78a6b871b570bcf1e9001baf239c774806e95916",
+      "bytes": 85,
+      "sha256": "7a18547f33810434c18f61b4ce08c8a3f49e149793195b3778e4f7dff5881864"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-flight-reception/manifest.toml",
+      "gitBlob": "62fd5c98aae30521af2a16cfb705d19fd77d8286",
+      "bytes": 1646,
+      "sha256": "1c26539b4f08a5a876850b90e719575c07d26391206e9873378db994162911d8"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-flight-reception/scripts/main.lua",
+      "gitBlob": "454daa4e04d2b593f646447eb9ace421e531bf24",
+      "bytes": 381,
+      "sha256": "5c5c6ff45bf1c41dfd12d987e0d64d1ac5ed90731e3487798b8590f0c4c2ff5a"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-glass-meridian/manifest.toml",
+      "gitBlob": "e1c8c45b39ffdac9ed15b757eb676fb9ee5bb462",
+      "bytes": 3258,
+      "sha256": "cf7154ba29e37fbc1cb9a432d7d5d9fa14d0f56de4c3875d403a3e3f977e56d6"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-glass-meridian/scripts/main.lua",
+      "gitBlob": "40e3521e657a7175717a437bb2c8ff4c34425e6a",
+      "bytes": 431,
+      "sha256": "dec782fa5bf17241d4450a56d6e663c6256feab5a84ba29f87ea8e87cdc9042c"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-hollow-manifest/manifest.toml",
+      "gitBlob": "1070600c6c98f38ef77aa92b57cbe2f375ae5d53",
+      "bytes": 5462,
+      "sha256": "d8365dfe9171f210859996c2293a6f9cee5b83e0aa8e0e65d955dd20acc4db0a"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-hollow-manifest/scripts/main.lua",
+      "gitBlob": "58a306206d9299eb8e653c6d170431fbe28dc528",
+      "bytes": 882,
+      "sha256": "29c808ee6dbf4758e908559ba8e6375bd3cd644b89e13f5dec1f216ce6fb2db8"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-identified-salvage/manifest.toml",
+      "gitBlob": "72c3f1d0327a76a1d9a3cbb2fc98397393866340",
+      "bytes": 3200,
+      "sha256": "5078140248d3b65b6edc85d6d9fb37b77ebf305933e644b7315c9d81eae25a74"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-identified-salvage/scripts/main.lua",
+      "gitBlob": "44cd2f5c4b7fd9fe809b0f48f25878e5c7e2f01e",
+      "bytes": 692,
+      "sha256": "739a4686f710c007ac834d85dad6414da32fc7333193fae97eba8f76ea1f7511"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-induction-clinic/manifest.toml",
+      "gitBlob": "b7c922ae2a428e961da50b09545519442e1f8df7",
+      "bytes": 1233,
+      "sha256": "c11648961d7ae5b0b593ffabebe94d827450e99b653c7c9108b425699668bc6c"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-induction-clinic/scripts/main.lua",
+      "gitBlob": "28365c1af57b2e4e676624f4be0c9751f3a05853",
+      "bytes": 109,
+      "sha256": "f82376c0abfcf2fb2b8b2a4576287c2b73aea23f3ab3ed642b5538a618d792a4"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-induction-crew-log/manifest.toml",
+      "gitBlob": "6ca1167418a947727cffc81c9bd7be17661fce29",
+      "bytes": 3619,
+      "sha256": "1eaaa253bb005b2927f42d5a78c36c92aaf2b171ca2145634ef22ec91b146bd4"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-induction-crew-log/scripts/main.lua",
+      "gitBlob": "bd20fa22fc50a83247db5f303579033862ea15e5",
+      "bytes": 765,
+      "sha256": "ee936260f102ea9655740065abf4f82908b67e124331d69187cd925bfe6038dc"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-induction-seed/manifest.toml",
+      "gitBlob": "6039801258c49e50b41ee2cfa73d04831bbf0eaa",
+      "bytes": 1214,
+      "sha256": "9b99069cf87307ba2015fd490590a1b6f733dab574a4139d3ec012456d18bc41"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-induction-seed/scripts/main.lua",
+      "gitBlob": "28365c1af57b2e4e676624f4be0c9751f3a05853",
+      "bytes": 109,
+      "sha256": "f82376c0abfcf2fb2b8b2a4576287c2b73aea23f3ab3ed642b5538a618d792a4"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-induction-utility/manifest.toml",
+      "gitBlob": "152b0b6fa627019e2c8728ff61f10071ecb6821f",
+      "bytes": 2386,
+      "sha256": "a21ef9789fa3dfdef795a6b6116dc84a8d96a4a48b82d5f4c4c1d9187f67ef69"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-induction-utility/scripts/main.lua",
+      "gitBlob": "b06d25cccebf81a9d818fa09048102dcc7e5ad95",
+      "bytes": 726,
+      "sha256": "623ef205f5cd7f10a6754e56e7c47f7a703af76e6d93ac4947e7bf5bc7c81061"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-induction-workshop/manifest.toml",
+      "gitBlob": "27c30a9b217d84a81d9344c72696947c2d5a6ed7",
+      "bytes": 1260,
+      "sha256": "ed17f9c0781cfd4e093bc4b0e197c9cc900652cf6a60304747ac94c53b701410"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-induction-workshop/scripts/main.lua",
+      "gitBlob": "83bd9052077a5acdaf16ecc52945c59769bc0e33",
+      "bytes": 83,
+      "sha256": "7415df3d856d88f781ad910a69880b8a988186ef96b61cb3627ebff0a1333433"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-isolation-work/manifest.toml",
+      "gitBlob": "a7f5fb527fd04596e28c99427816fb24a4523921",
+      "bytes": 1076,
+      "sha256": "fe63ad249e1a7a959db6549086a579d59b19499ff8d5171e29c56d733300249d"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-isolation-work/scripts/main.lua",
+      "gitBlob": "7a2586dec685bf6e0da838f741b102295775cbe8",
+      "bytes": 380,
+      "sha256": "676a74cde9ac2cb4c21e0cd463df7f9ee6d52dfe0e67f23a918b92344975bed4"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-isolation-work-source/manifest.toml",
+      "gitBlob": "7702d3fa045dde4f31c7187c437194a00dc68db9",
+      "bytes": 2109,
+      "sha256": "de5c78dc3ffbfc6e612d741d1c5994f5bd7dfa0773c5fb9ab6e25bdf04958ea8"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-isolation-work-source/scripts/main.lua",
+      "gitBlob": "faa56508cfdba3b0caa3e2c79af0ef6b4729d911",
+      "bytes": 746,
+      "sha256": "5b3bf5517094242208715b93978f02b74166ca20061a77e7d81519d916dc9ab5"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-measured-extraction/manifest.toml",
+      "gitBlob": "fbdd53a35d8686195f488b11efea0008abd8f51a",
+      "bytes": 1999,
+      "sha256": "eef6f2c60582f01157206792e7305aef37260e0bf7f7ec22ed1935b76da92d38"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-measured-extraction/scripts/main.lua",
+      "gitBlob": "2d678a56e17ca2c7c6eac185610cc0fc9d1dcdc8",
+      "bytes": 508,
+      "sha256": "ba0685ec60e4f2a9c453252c853a2b77fc3055dec49625310c93e8b81173427d"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-memory-atlas/manifest.toml",
+      "gitBlob": "7cd89dd2fec3511821ad4c478e65c3ef73615bd8",
+      "bytes": 2636,
+      "sha256": "233511e3e1336d19bd1c9231272545a1292bf493d7405bcd16f64ede22a6622f"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-memory-atlas/scripts/main.lua",
+      "gitBlob": "d53e3af30c435cdf973ed3b7e19ff237011f402b",
+      "bytes": 630,
+      "sha256": "6b6efafbb9d6137098e2924973f7b91f47200fbe61a84105ed7d43ba52df078c"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-mutual-contribution/manifest.toml",
+      "gitBlob": "102453afc46c09a58529ac28d212b57d2c2a6de5",
+      "bytes": 1757,
+      "sha256": "5f2c060764af41c5aeabeba25f71c1456c32bdfb1825774ef3eae4e502a03ec5"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-mutual-contribution/scripts/main.lua",
+      "gitBlob": "bc9e662df7731be52711c15f752a7a17938ecc5e",
+      "bytes": 930,
+      "sha256": "aa9156b5acad4fd1c35deb1ba0e1fcc722881441c4386f43d65a9850400d52d5"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-navigation-trade/manifest.toml",
+      "gitBlob": "f536b5dcc1d5783467ab8a202736cf1dd85c1c70",
+      "bytes": 2872,
+      "sha256": "31d93d59496147301ac306f652e740175e5af653a77c7d2063cc970e5f09d478"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-navigation-trade/scripts/main.lua",
+      "gitBlob": "8c19d11780ae43db93cdbfdd50a634afb628b684",
+      "bytes": 1943,
+      "sha256": "b70f4ff91c34e80682d5b3016426e7ee47e19d6767b5a81e22671b68188cde10"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-orbital-evacuation/manifest.toml",
+      "gitBlob": "8dbacafb6f1f0471fc3e51d0ec4ef0b1100714ba",
+      "bytes": 1991,
+      "sha256": "d19a6f174fa6a6b92e731954394a21d0c716aaebf885481989f8578fe62adcda"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-orbital-evacuation/scripts/main.lua",
+      "gitBlob": "e12af2a2b41831f3cf3d09f0a8193c9b8450a7dc",
+      "bytes": 401,
+      "sha256": "f5999316b59e0cedbc91a8bd28fb9f67b143a69bc1774c6b4566405d5d3056a0"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-orbital-outlook/manifest.toml",
+      "gitBlob": "49d5b81ec662b9d0892c1129334ff22b63db4649",
+      "bytes": 2980,
+      "sha256": "c02de836274decdb293d54229a12ab676948ef91898970880f0cf2d876d0f3e8"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-orbital-outlook/scripts/main.lua",
+      "gitBlob": "548f882d17905db48ce8ded2173df5ceb679268f",
+      "bytes": 672,
+      "sha256": "62a29aa122e1d2f6f121aa5b4ee1be8534a63aa3361e3c20d691ad9140a776af"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-public-record/manifest.toml",
+      "gitBlob": "ee64a70ec7f5b7b5a270444e85a8f5fae081ad1f",
+      "bytes": 2861,
+      "sha256": "10b3968028ad67cd7aa8738750103910e60029783603a1d79e9a7c81e9428da9"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-public-record/scripts/main.lua",
+      "gitBlob": "d03aa324b1f192e886e10edb6dec97a7009d47cd",
+      "bytes": 635,
+      "sha256": "cb8c82f6f8a9df9676c71dd99742f675c78190c983bf34e06681295dc69a357f"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-quiet-choir/manifest.toml",
+      "gitBlob": "e8311c364717cef5731d241adde61562634973b4",
+      "bytes": 2698,
+      "sha256": "c8cc4cef754f24b61bc262f0a0fbe8196d91031057fecf28703622ea7ce675b6"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-quiet-choir/scripts/main.lua",
+      "gitBlob": "6252944ec25a16961e1e102c636b936e274fad53",
+      "bytes": 614,
+      "sha256": "60c1c8cca2ffe0f2bb14cc927f015a095b1e1c3860ac41ee24c9aa8f4027dbfe"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-record-recovery/manifest.toml",
+      "gitBlob": "55c8def151d802ae99a39e415565825946c230b2",
+      "bytes": 3101,
+      "sha256": "d970f0c0482a1a727fa7e210e9acd20494096ad86b8ce31247a847a9d2134bf0"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-record-recovery/scripts/main.lua",
+      "gitBlob": "5b49bf3ad5949ac3506eec3799f49496b0db12fb",
+      "bytes": 766,
+      "sha256": "99da582444ec33653cd242d50bd39e868a7a9a578835eb5c6687e4539ea7a5e9"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-repair-loop/manifest.toml",
+      "gitBlob": "d3f82c25a4a6ca554bf541857215f6d233da94db",
+      "bytes": 1657,
+      "sha256": "09251440895d5bdc9dd01d350fbc937b616838ef37ef0ba5d476fe569e638250"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-repair-loop/scripts/main.lua",
+      "gitBlob": "78a6b871b570bcf1e9001baf239c774806e95916",
+      "bytes": 85,
+      "sha256": "7a18547f33810434c18f61b4ce08c8a3f49e149793195b3778e4f7dff5881864"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-safe-gunnery/manifest.toml",
+      "gitBlob": "59614b61cc581410c3fa007350848e2983d3c0cd",
+      "bytes": 1989,
+      "sha256": "23a2d16b45005be0af5d127cbc344f0d735ad7768b3bbc0a4b6bfd3c520a66aa"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-safe-gunnery/scripts/main.lua",
+      "gitBlob": "9d0a51dd432715eb707b718561678261dfa43685",
+      "bytes": 531,
+      "sha256": "552744a2a6ce1f905ef9894b7b55e6b96c286e41ecca0ee663b83eb9729912c2"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-sealed-dispatch/manifest.toml",
+      "gitBlob": "986af6e9e4ca8680661f4b7e2596bc513115c889",
+      "bytes": 2021,
+      "sha256": "a3f16e1166361eee11593c935d3636befe6d2e51f3e018c8c005bd01c48c61be"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-sealed-dispatch/scripts/main.lua",
+      "gitBlob": "c4cb0e157454a31be0b78c8e95d93d9d767f9f60",
+      "bytes": 2298,
+      "sha256": "3464531c1891c3fca2fc05cb5f20375f2f54cddb266d5f3176b8d3efaac8b3bd"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-seed-transfer/manifest.toml",
+      "gitBlob": "49f4e2bebcd58f9b4bbc33a7309dba377458303d",
+      "bytes": 2049,
+      "sha256": "13b350f5e36697f106bcf8c2e2884ab4b2697b7af1640603934dc4d26f1b57b7"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-seed-transfer/scripts/main.lua",
+      "gitBlob": "28365c1af57b2e4e676624f4be0c9751f3a05853",
+      "bytes": 109,
+      "sha256": "f82376c0abfcf2fb2b8b2a4576287c2b73aea23f3ab3ed642b5538a618d792a4"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-signed-passage/manifest.toml",
+      "gitBlob": "a2b9e7108efeba4299de3b070d0203f3a3c9601f",
+      "bytes": 3027,
+      "sha256": "cd021318ebfe0951eab3d3013697c9f745a434cd8f4ec8c8568d793299c9fe9b"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-signed-passage/scripts/main.lua",
+      "gitBlob": "60693254e886fb3ca398c2552ae04c06d36b4ccf",
+      "bytes": 598,
+      "sha256": "69768637ce54385c22450d9b90f02e7a41efbf4ab939611908b909de11f30b0e"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-tithe-of-worlds/manifest.toml",
+      "gitBlob": "ce53c0933195622ad603e6fdfd20e2b8341dfb8c",
+      "bytes": 3980,
+      "sha256": "b19a24cf9171802487ae350c78cbb6823e8b5168e25bc7891ebee03e73e4b414"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-tithe-of-worlds/scripts/main.lua",
+      "gitBlob": "e74bd6892dfd9e11289a8d04a4f2ab33ad184236",
+      "bytes": 221,
+      "sha256": "8279601c2528e2ef16ecc3da55d0b19a733d6b31450d9d92f39f86a60aeb7f54"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-under-tow/manifest.toml",
+      "gitBlob": "66d050d14f59a6ee2a22cbd3decd72236518942a",
+      "bytes": 2649,
+      "sha256": "35ad65273115189f0415bbbcb7d8e95664c0d39e954e582cc12697d89aff8dcf"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-under-tow/scripts/main.lua",
+      "gitBlob": "2d886d90271f24da863fec108588210fbec27737",
+      "bytes": 605,
+      "sha256": "a48b01984c5d43136b8d94dde9485685c47f517d16d09190cb191ab66879dc35"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-verified-warrant/manifest.toml",
+      "gitBlob": "411f8eac863c969bd8fbcdc19ad253d26e93c06c",
+      "bytes": 3453,
+      "sha256": "b39e7f0ef17615c23f779153ec85d78ca53e94b2889fcc64b718e37b5455a94a"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-verified-warrant/scripts/main.lua",
+      "gitBlob": "17649c2ad340f0fe7181df0a70f1388be51581a3",
+      "bytes": 3679,
+      "sha256": "2056d7c9086d2c428b4acfa278bfa18586ac3b2a213a8763081f17e052b42674"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-wayfarer-induction/manifest.toml",
+      "gitBlob": "94e45e3ba8e86739640af52e35b477edb49ceff6",
+      "bytes": 2710,
+      "sha256": "51a47fe10fc6804259b5caff4c1825e46e2b716a784b961a1c83d23ffdcc2e76"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-wayfarer-induction/scripts/main.lua",
+      "gitBlob": "d47fff8c93408f236707ff5c1f66ed327b6ebfec",
+      "bytes": 415,
+      "sha256": "a2df150539bc471814b1465f452f36415ffad739539d6ff98f213b7eb383153c"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-wayfarer-seed-ark/manifest.toml",
+      "gitBlob": "e0468c686e781e558f29172b1b47fbba8b583c01",
+      "bytes": 2952,
+      "sha256": "f6a53f7eff835c198ca7402b6fdcdf76ee0c575d0e51ea95e228d95712348559"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-wayfarer-seed-ark/scripts/main.lua",
+      "gitBlob": "7b97dbc939f6d7a1b38d4bf967dc5da6d76817c2",
+      "bytes": 722,
+      "sha256": "4373073ea7af24b0e9bade5880751dad22056c712701aca7ef3e5802a961867d"
+    }
+  ],
+  "claims": "Source bindings only, no legacy execution rerun, no commercial/legal permission inferred."
+}

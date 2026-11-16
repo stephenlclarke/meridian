@@ -1,0 +1,370 @@
+[
+  {
+    "id": "allocator-freed-heap-does-not-refund-cumulative",
+    "operation": "allocator_accounting_contract",
+    "input": {
+      "heapLimit": 65536,
+      "allocationLimit": 65536,
+      "initialHeap": 0,
+      "initialAllocated": 0,
+      "requests": [
+        {
+          "newPointer": true,
+          "newSize": 32768
+        },
+        {
+          "oldSize": 32768,
+          "newSize": 16384
+        },
+        {
+          "oldSize": 16384,
+          "newSize": 0
+        },
+        {
+          "newPointer": true,
+          "newSize": 20000
+        }
+      ]
+    },
+    "expected": {
+      "trace": [
+        {
+          "success": true,
+          "heap": 32768,
+          "allocated": 32768
+        },
+        {
+          "success": true,
+          "heap": 16384,
+          "allocated": 49152
+        },
+        {
+          "success": true,
+          "heap": 0,
+          "allocated": 49152
+        },
+        {
+          "success": false,
+          "heap": 0,
+          "allocated": 49152
+        }
+      ],
+      "policy": "Charge whole new_size on every successful allocation/reallocation, even shrink; free only reduces live heap. Rejected allocation changes neither counter."
+    },
+    "refs": [
+      "Sources/MissionScript/MissionScript.c"
+    ]
+  },
+  {
+    "id": "allocator-new-pointer-type-tag-is-not-old-size",
+    "operation": "allocator_accounting_contract",
+    "input": {
+      "heapLimit": 65536,
+      "allocationLimit": 65536,
+      "initialHeap": 0,
+      "initialAllocated": 0,
+      "requests": [
+        {
+          "newPointer": true,
+          "oldSizeTypeTag": 5,
+          "newSize": 128
+        }
+      ]
+    },
+    "expected": {
+      "trace": [
+        {
+          "success": true,
+          "heap": 128,
+          "allocated": 128
+        }
+      ],
+      "policy": "Lua old_size is a type tag for a new pointer; replace it with zero."
+    },
+    "refs": [
+      "Sources/MissionScript/MissionScript.c"
+    ]
+  },
+  {
+    "id": "allocator-system-realloc-failure-keeps-counters",
+    "operation": "allocator_accounting_contract",
+    "input": {
+      "heapLimit": 65536,
+      "allocationLimit": 65536,
+      "initialHeap": 1024,
+      "initialAllocated": 1024,
+      "requests": [
+        {
+          "oldSize": 1024,
+          "newSize": 2048,
+          "systemReallocFails": true
+        }
+      ]
+    },
+    "expected": {
+      "trace": [
+        {
+          "success": false,
+          "heap": 1024,
+          "allocated": 1024
+        }
+      ],
+      "policy": "System allocation failure charges nothing and retains the previous allocation."
+    },
+    "refs": [
+      "Sources/MissionScript/MissionScript.c"
+    ]
+  },
+  {
+    "id": "event-reserved-fields-override-user-values",
+    "operation": "event_projection",
+    "input": {
+      "sequence": 7,
+      "kind": "mission.accepted",
+      "instance": "00000000-0000-0000-0000-000000000001",
+      "context": null,
+      "values": {
+        "kind": "forged",
+        "sequence": 999,
+        "instance_id": "forged",
+        "context": {
+          "forged": true
+        },
+        "custom": true
+      }
+    },
+    "expected": {
+      "type": "object",
+      "value": {
+        "context": {
+          "type": "null"
+        },
+        "custom": {
+          "type": "bool",
+          "value": true
+        },
+        "instance_id": {
+          "type": "string",
+          "value": "00000000-0000-0000-0000-000000000001"
+        },
+        "kind": {
+          "type": "string",
+          "value": "mission.accepted"
+        },
+        "sequence": {
+          "type": "integer",
+          "value": 7
+        }
+      }
+    },
+    "refs": [
+      "Sources/L337Core/ScriptDirector.swift"
+    ]
+  },
+  {
+    "id": "event-context-not-current-snapshot",
+    "operation": "host_event_scenario",
+    "input": {
+      "emittedContextSystem": 7,
+      "currentSnapshotSystem": 9
+    },
+    "expected": {
+      "eventContextSystem": 7,
+      "snapshotSystem": 9,
+      "note": "Historical envelope is distinct from current scoped query; do not regenerate it at dispatch."
+    },
+    "refs": [
+      "Sources/L337Core/ScriptDirector.swift",
+      "Sources/L337Core/ScriptEventContext.swift"
+    ]
+  },
+  {
+    "id": "unknown-event-handler-consumes-envelope",
+    "operation": "host_event_scenario",
+    "input": {
+      "activeUnsuspendedExactPack": true,
+      "eventKind": "unhandled",
+      "manifestHasHandler": false
+    },
+    "expected": {
+      "evaluationCalls": 0,
+      "removePendingEnvelope": true,
+      "nativeEffects": []
+    },
+    "refs": [
+      "Sources/L337Core/ScriptDirector.swift"
+    ]
+  },
+  {
+    "id": "already-acknowledged-event-not-replayed",
+    "operation": "host_event_scenario",
+    "input": {
+      "activeUnsuspendedExactPack": true,
+      "sequence": 7,
+      "acknowledgedThrough": 7
+    },
+    "expected": {
+      "evaluationCalls": 0,
+      "removePendingEnvelope": true,
+      "nativeEffects": []
+    },
+    "refs": [
+      "Sources/L337Core/ScriptDirector.swift",
+      "Sources/L337Core/ScriptEventContext.swift"
+    ]
+  },
+  {
+    "id": "missing-exact-pack-retains-and-suspends",
+    "operation": "host_event_scenario",
+    "input": {
+      "instanceActive": true,
+      "exactSavedPackAvailable": false
+    },
+    "expected": {
+      "evaluationCalls": 0,
+      "pendingEnvelopeRetained": true,
+      "suspension": "Restore the exact saved mission version and its requirements."
+    },
+    "refs": [
+      "Sources/L337Core/ScriptDirector.swift"
+    ]
+  },
+  {
+    "id": "deterministic-fault-rejects-proposal",
+    "operation": "host_event_scenario",
+    "input": {
+      "callbackDataMutation": {
+        "counter": 99
+      },
+      "callbackError": "expected fault",
+      "originalData": {
+        "counter": 2
+      }
+    },
+    "expected": {
+      "data": {
+        "type": "object",
+        "value": {
+          "counter": {
+            "type": "integer",
+            "value": 2
+          }
+        }
+      },
+      "nativeProposalEffects": [],
+      "instanceSuspended": true,
+      "notification": "MISSION SUSPENDED - SEE MISSION GALLERY",
+      "faultSave": "Only if MissionPackError and actual publisher exists; publication failure adds MISSION SUSPENDED - SAVE UNAVAILABLE. No failed filesystem write retry."
+    },
+    "refs": [
+      "Sources/L337Core/ScriptDirector.swift",
+      "Sources/L337Core/ScriptTransactions.swift"
+    ]
+  },
+  {
+    "id": "navigation-user-refusal-consumes-without-effects",
+    "operation": "host_event_scenario",
+    "input": {
+      "errorType": "ScriptNavigationTradeRefusal",
+      "sequence": 8
+    },
+    "expected": {
+      "removePendingEnvelope": true,
+      "acknowledge": 8,
+      "dialogue": null,
+      "proposalEffects": [],
+      "suspendedByThisPath": false
+    },
+    "refs": [
+      "Sources/L337Core/ScriptDirector.swift"
+    ]
+  },
+  {
+    "id": "single-drain-frozen-prefix",
+    "operation": "host_event_scenario",
+    "input": {
+      "pendingAtDrainStart": 65,
+      "derivedDuringDrain": 1
+    },
+    "expected": {
+      "maximumOriginalEnvelopesInBatch": 64,
+      "derivedNotAppendedToThisBatch": true
+    },
+    "refs": [
+      "Sources/L337Core/ScriptDirector.swift"
+    ]
+  },
+  {
+    "id": "native-descriptor-cannot-grant-authority",
+    "operation": "native_boundary_contract",
+    "input": {
+      "luaData": {
+        "encounterAdmitted": true,
+        "presence": "present",
+        "packDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    },
+    "expected": {
+      "LuaProjectionIsAuthority": false,
+      "required": "Actual retained record/installed exact pack/fit join, matching body/context, unique native actor and current scene revision.",
+      "nativeAcceptance": "UNRUN; no actual provider/native state supplied by corpus."
+    },
+    "refs": [
+      "Sources/L337Core/MissionNativeBridge.swift"
+    ]
+  },
+  {
+    "id": "native-bad-digest",
+    "operation": "native_boundary_contract",
+    "input": {
+      "baseline": "Otherwise structurally admissible descriptor with actual provider/body/context required separately",
+      "override": {
+        "packDigest": "not-a-digest"
+      }
+    },
+    "expected": {
+      "firstBridgeError": "invalidDescriptor",
+      "bindingCreated": false,
+      "nativeExecution": "UNRUN"
+    },
+    "refs": [
+      "Sources/L337Core/MissionNativeBridge.swift"
+    ]
+  },
+  {
+    "id": "native-not-admitted",
+    "operation": "native_boundary_contract",
+    "input": {
+      "baseline": "Otherwise structurally admissible descriptor with actual provider/body/context required separately",
+      "override": {
+        "encounterAdmitted": false
+      }
+    },
+    "expected": {
+      "firstBridgeError": "invalidDescriptor",
+      "bindingCreated": false,
+      "nativeExecution": "UNRUN"
+    },
+    "refs": [
+      "Sources/L337Core/MissionNativeBridge.swift"
+    ]
+  },
+  {
+    "id": "native-not-present",
+    "operation": "native_boundary_contract",
+    "input": {
+      "baseline": "Otherwise structurally admissible descriptor with actual provider/body/context required separately",
+      "override": {
+        "presence": "absent"
+      }
+    },
+    "expected": {
+      "firstBridgeError": "invalidDescriptor",
+      "bindingCreated": false,
+      "nativeExecution": "UNRUN"
+    },
+    "refs": [
+      "Sources/L337Core/MissionNativeBridge.swift"
+    ]
+  }
+]

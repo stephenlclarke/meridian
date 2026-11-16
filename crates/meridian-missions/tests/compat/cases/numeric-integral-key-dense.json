@@ -1,0 +1,57 @@
+{
+  "id": "numeric-integral-key-dense",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "on_event",
+    "source": "lua/numeric-integral-key-dense.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "kind": {
+          "type": "string",
+          "value": "test"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "credits": {
+          "type": "integer",
+          "value": 1000
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {}
+    }
+  },
+  "expected": {
+    "status": "ok",
+    "data": {
+      "type": "object",
+      "value": {
+        "x": {
+          "type": "array",
+          "value": [
+            {
+              "type": "string",
+              "value": "a"
+            },
+            {
+              "type": "string",
+              "value": "b"
+            }
+          ]
+        }
+      }
+    },
+    "commands": []
+  },
+  "referencePaths": [
+    "Sources/MissionScript/MissionScript.c",
+    "Sources/L337Core/ScriptEvaluator.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

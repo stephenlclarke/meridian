@@ -1,0 +1,52 @@
+{
+  "id": "sandbox-base-allowed",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "on_event",
+    "source": "lua/sandbox-base-allowed.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "kind": {
+          "type": "string",
+          "value": "test"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "credits": {
+          "type": "integer",
+          "value": 1000
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {}
+    }
+  },
+  "expected": {
+    "status": "ok",
+    "data": {
+      "type": "object",
+      "value": {
+        "n": {
+          "type": "integer",
+          "value": 12
+        },
+        "v": {
+          "type": "integer",
+          "value": 4
+        }
+      }
+    },
+    "commands": []
+  },
+  "referencePaths": [
+    "Sources/MissionScript/MissionScript.c",
+    "Sources/L337Core/ScriptEvaluator.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

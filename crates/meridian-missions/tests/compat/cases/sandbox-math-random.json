@@ -1,0 +1,49 @@
+{
+  "id": "sandbox-math-random",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "on_event",
+    "source": "lua/sandbox-math-random.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "kind": {
+          "type": "string",
+          "value": "test"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "credits": {
+          "type": "integer",
+          "value": 1000
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {}
+    }
+  },
+  "expected": {
+    "status": "ok",
+    "data": {
+      "type": "object",
+      "value": {
+        "absent": {
+          "type": "bool",
+          "value": true
+        }
+      }
+    },
+    "commands": []
+  },
+  "referencePaths": [
+    "Sources/MissionScript/MissionScript.c",
+    "Sources/L337Core/ScriptEvaluator.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED",
+  "notes": "No facility call is executed. This verifies absence in the evaluator base environment; a closed declared-module prelude can separately supply a local require."
+}

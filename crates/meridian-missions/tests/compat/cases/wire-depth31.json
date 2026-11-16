@@ -1,0 +1,172 @@
+{
+  "id": "wire-depth31",
+  "invocation": {
+    "operation": "wire_decode",
+    "bytes": "wire/wire-depth31.bin"
+  },
+  "expected": {
+    "status": "ok",
+    "value": {
+      "type": "array",
+      "value": [
+        {
+          "type": "array",
+          "value": [
+            {
+              "type": "array",
+              "value": [
+                {
+                  "type": "array",
+                  "value": [
+                    {
+                      "type": "array",
+                      "value": [
+                        {
+                          "type": "array",
+                          "value": [
+                            {
+                              "type": "array",
+                              "value": [
+                                {
+                                  "type": "array",
+                                  "value": [
+                                    {
+                                      "type": "array",
+                                      "value": [
+                                        {
+                                          "type": "array",
+                                          "value": [
+                                            {
+                                              "type": "array",
+                                              "value": [
+                                                {
+                                                  "type": "array",
+                                                  "value": [
+                                                    {
+                                                      "type": "array",
+                                                      "value": [
+                                                        {
+                                                          "type": "array",
+                                                          "value": [
+                                                            {
+                                                              "type": "array",
+                                                              "value": [
+                                                                {
+                                                                  "type": "array",
+                                                                  "value": [
+                                                                    {
+                                                                      "type": "array",
+                                                                      "value": [
+                                                                        {
+                                                                          "type": "array",
+                                                                          "value": [
+                                                                            {
+                                                                              "type": "array",
+                                                                              "value": [
+                                                                                {
+                                                                                  "type": "array",
+                                                                                  "value": [
+                                                                                    {
+                                                                                      "type": "array",
+                                                                                      "value": [
+                                                                                        {
+                                                                                          "type": "array",
+                                                                                          "value": [
+                                                                                            {
+                                                                                              "type": "array",
+                                                                                              "value": [
+                                                                                                {
+                                                                                                  "type": "array",
+                                                                                                  "value": [
+                                                                                                    {
+                                                                                                      "type": "array",
+                                                                                                      "value": [
+                                                                                                        {
+                                                                                                          "type": "array",
+                                                                                                          "value": [
+                                                                                                            {
+                                                                                                              "type": "array",
+                                                                                                              "value": [
+                                                                                                                {
+                                                                                                                  "type": "array",
+                                                                                                                  "value": [
+                                                                                                                    {
+                                                                                                                      "type": "array",
+                                                                                                                      "value": [
+                                                                                                                        {
+                                                                                                                          "type": "array",
+                                                                                                                          "value": [
+                                                                                                                            {
+                                                                                                                              "type": "array",
+                                                                                                                              "value": [
+                                                                                                                                {
+                                                                                                                                  "type": "null"
+                                                                                                                                }
+                                                                                                                              ]
+                                                                                                                            }
+                                                                                                                          ]
+                                                                                                                        }
+                                                                                                                      ]
+                                                                                                                    }
+                                                                                                                  ]
+                                                                                                                }
+                                                                                                              ]
+                                                                                                            }
+                                                                                                          ]
+                                                                                                        }
+                                                                                                      ]
+                                                                                                    }
+                                                                                                  ]
+                                                                                                }
+                                                                                              ]
+                                                                                            }
+                                                                                          ]
+                                                                                        }
+                                                                                      ]
+                                                                                    }
+                                                                                  ]
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "referencePaths": [
+    "Sources/L337Core/ScriptValue.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

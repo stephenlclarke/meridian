@@ -1,0 +1,62 @@
+{
+  "id": "argument-order-and-snapshot-copy",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "on_event",
+    "source": "lua/argument-order-and-snapshot-copy.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "kind": {
+          "type": "string",
+          "value": "contact"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "credits": {
+          "type": "integer",
+          "value": 1000
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {
+        "old": {
+          "type": "integer",
+          "value": 9
+        }
+      }
+    }
+  },
+  "expected": {
+    "status": "ok",
+    "data": {
+      "type": "object",
+      "value": {
+        "credit": {
+          "type": "integer",
+          "value": 1005
+        },
+        "event": {
+          "type": "string",
+          "value": "contact"
+        },
+        "old": {
+          "type": "integer",
+          "value": 9
+        }
+      }
+    },
+    "commands": []
+  },
+  "referencePaths": [
+    "Sources/MissionScript/MissionScript.c",
+    "Sources/L337Core/ScriptEvaluator.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED",
+  "notes": "Arguments are (event, scoped snapshot, explicit state). Native account must not change merely because Lua mutates its snapshot table."
+}

@@ -1,0 +1,22 @@
+{
+  "id": "stored-extra-field",
+  "invocation": {
+    "operation": "tagged_storage_decode",
+    "value": {
+      "type": "null",
+      "value": 0
+    }
+  },
+  "expected": {
+    "status": "error",
+    "error": {
+      "match": "exact",
+      "text": "Invalid saved script value fields."
+    }
+  },
+  "referencePaths": [
+    "Sources/L337Core/ScriptValueStorage.swift",
+    "Sources/L337Core/ScriptValue.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

@@ -1,0 +1,47 @@
+{
+  "id": "limits-allocation-below-heap",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "on_event",
+    "source": "lua/limits-allocation-below-heap.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "kind": {
+          "type": "string",
+          "value": "test"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "credits": {
+          "type": "integer",
+          "value": 1000
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {}
+    },
+    "limitsOverride": {
+      "allocationBytes": 100
+    }
+  },
+  "expected": {
+    "status": "error",
+    "error": {
+      "match": "exact",
+      "text": "Invalid Lua handler or execution limits."
+    },
+    "evaluationPublished": false,
+    "inputStateUnchanged": true
+  },
+  "referencePaths": [
+    "Sources/MissionScript/MissionScript.c",
+    "Sources/L337Core/ScriptEvaluator.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

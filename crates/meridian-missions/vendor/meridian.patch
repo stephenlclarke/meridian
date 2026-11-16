@@ -1,0 +1,376 @@
+--- upstream/mlua/Cargo.toml
++++ vendor/mlua/Cargo.toml
+@@ -32 +32 @@
+-readme = "README.md"
++readme = "README.upstream.txt"
+@@ -110,162 +109,0 @@
+-[[example]]
+-name = "async_http_client"
+-path = "examples/async_http_client.rs"
+-required-features = [
+-    "async",
+-    "macros",
+-]
+-
+-[[example]]
+-name = "async_http_reqwest"
+-path = "examples/async_http_reqwest.rs"
+-required-features = [
+-    "async",
+-    "serde",
+-    "macros",
+-]
+-
+-[[example]]
+-name = "async_http_server"
+-path = "examples/async_http_server.rs"
+-required-features = [
+-    "async",
+-    "macros",
+-    "send",
+-]
+-
+-[[example]]
+-name = "async_tcp_server"
+-path = "examples/async_tcp_server.rs"
+-required-features = [
+-    "async",
+-    "macros",
+-    "send",
+-]
+-
+-[[example]]
+-name = "guided_tour"
+-path = "examples/guided_tour.rs"
+-required-features = ["macros"]
+-
+-[[example]]
+-name = "repl"
+-path = "examples/repl.rs"
+-
+-[[example]]
+-name = "serde"
+-path = "examples/serde.rs"
+-required-features = ["serde"]
+-
+-[[example]]
+-name = "userdata"
+-path = "examples/userdata.rs"
+-required-features = ["macros"]
+-
+-[[test]]
+-name = "async"
+-path = "tests/async.rs"
+-
+-[[test]]
+-name = "buffer"
+-path = "tests/buffer.rs"
+-
+-[[test]]
+-name = "byte_string"
+-path = "tests/byte_string.rs"
+-
+-[[test]]
+-name = "chunk"
+-path = "tests/chunk.rs"
+-
+-[[test]]
+-name = "compile"
+-path = "tests/compile.rs"
+-
+-[[test]]
+-name = "conversion"
+-path = "tests/conversion.rs"
+-
+-[[test]]
+-name = "debug"
+-path = "tests/debug.rs"
+-
+-[[test]]
+-name = "error"
+-path = "tests/error.rs"
+-
+-[[test]]
+-name = "function"
+-path = "tests/function.rs"
+-
+-[[test]]
+-name = "hooks"
+-path = "tests/hooks.rs"
+-
+-[[test]]
+-name = "luau"
+-path = "tests/luau.rs"
+-
+-[[test]]
+-name = "memory"
+-path = "tests/memory.rs"
+-
+-[[test]]
+-name = "multi"
+-path = "tests/multi.rs"
+-
+-[[test]]
+-name = "scope"
+-path = "tests/scope.rs"
+-
+-[[test]]
+-name = "send"
+-path = "tests/send.rs"
+-
+-[[test]]
+-name = "serde"
+-path = "tests/serde.rs"
+-
+-[[test]]
+-name = "string"
+-path = "tests/string.rs"
+-
+-[[test]]
+-name = "table"
+-path = "tests/table.rs"
+-
+-[[test]]
+-name = "tests"
+-path = "tests/tests.rs"
+-
+-[[test]]
+-name = "thread"
+-path = "tests/thread.rs"
+-
+-[[test]]
+-name = "types"
+-path = "tests/types.rs"
+-
+-[[test]]
+-name = "userdata"
+-path = "tests/userdata.rs"
+-
+-[[test]]
+-name = "userdata_macro"
+-path = "tests/userdata_macro.rs"
+-
+-[[test]]
+-name = "value"
+-path = "tests/value.rs"
+-
+-[[bench]]
+-name = "benchmark"
+-path = "benches/benchmark.rs"
+-harness = false
+-required-features = ["async"]
+-
+-[[bench]]
+-name = "serde"
+-path = "benches/serde.rs"
+-harness = false
+-required-features = ["serde"]
+-
+@@ -288,0 +127 @@
++path = "../mlua-sys"
+@@ -327,61 +166,2 @@
+-[dev-dependencies.maplit]
+-version = "1.0"
+-
+-[dev-dependencies.serde]
+-version = "1.0"
+-features = ["derive"]
+-
+-[dev-dependencies.serde_json]
+-version = "1.0"
+-features = ["arbitrary_precision"]
+-
+-[dev-dependencies.static_assertions]
+-version = "1.0"
+-
+-[dev-dependencies.tokio]
+-version = "1.0"
+-features = [
+-    "macros",
+-    "rt",
+-    "time",
+-]
+-
+-[dev-dependencies.trybuild]
+-version = "1.0"
+-
+-[target.'cfg(not(target_family = "wasm"))'.dev-dependencies.criterion]
+-version = "0.8"
+-features = ["async_tokio"]
+-
+-[target.'cfg(not(target_family = "wasm"))'.dev-dependencies.http-body-util]
+-version = "0.1.1"
+-
+-[target.'cfg(not(target_family = "wasm"))'.dev-dependencies.hyper]
+-version = "1.2"
+-features = ["full"]
+-
+-[target.'cfg(not(target_family = "wasm"))'.dev-dependencies.hyper-util]
+-version = "0.1.3"
+-features = ["full"]
+-
+-[target.'cfg(not(target_family = "wasm"))'.dev-dependencies.reqwest]
+-version = "0.13"
+-features = ["json"]
+-
+-[target.'cfg(not(target_family = "wasm"))'.dev-dependencies.rustyline]
+-version = "18.0"
+-
+-[target.'cfg(not(target_family = "wasm"))'.dev-dependencies.tempfile]
+-version = "3"
+-
+-[target.'cfg(not(target_family = "wasm"))'.dev-dependencies.tokio]
+-version = "1.0"
+-features = ["full"]
+-
+-[lints.rust.unexpected_cfgs]
+-level = "warn"
+-priority = 0
+-check-cfg = [
+-    "cfg(tarpaulin_include)",
+-    "cfg(force_memory_limit)",
+-]
++# Retained third-party dependency; not a Meridian workspace member.
++[workspace]
+--- upstream/mlua/src/lib.rs
++++ vendor/mlua/src/lib.rs
+@@ -117 +117 @@
+-pub use crate::state::{Lua, LuaOptions, WeakLua};
++pub use crate::state::{AllocationBudget, Lua, LuaOptions, WeakLua};
+--- upstream/mlua/src/memory.rs
++++ vendor/mlua/src/memory.rs
+@@ -9,0 +10,2 @@
++    budget: Option<std::sync::Arc<crate::state::AllocationBudget>>,
++    enforce_allocation_budget: bool,
+@@ -20,0 +23,3 @@
++    pub(crate) fn with_budget(budget: Option<std::sync::Arc<crate::state::AllocationBudget>>) -> Self {
++        Self { budget, ..Self::default() }
++    }
+@@ -51,0 +57 @@
++        self.enforce_allocation_budget = self.budget.is_some();
+@@ -115,0 +122,5 @@
++    if mem_state.enforce_allocation_budget
++        && mem_state.budget.as_ref().is_some_and(|budget| !budget.permits(nsize))
++    {
++        return ptr::null_mut();
++    }
+@@ -129 +139,0 @@
+-    mem_state.used_memory += mem_diff;
+@@ -139 +149,5 @@
+-            alloc::handle_alloc_error(new_layout);
++            return ptr::null_mut();
++        }
++        mem_state.used_memory = new_used_memory;
++        if let Some(budget) = &mem_state.budget {
++            budget.record(nsize, mem_state.used_memory as usize);
+@@ -148 +162,5 @@
+-        alloc::handle_alloc_error(old_layout);
++        return ptr::null_mut();
++    }
++    mem_state.used_memory = new_used_memory;
++    if let Some(budget) = &mem_state.budget {
++        budget.record(nsize, mem_state.used_memory as usize);
+--- upstream/mlua/src/state/raw.rs
++++ vendor/mlua/src/state/raw.rs
+@@ -136 +136,2 @@
+-        let mem_state: *mut MemoryState = Box::into_raw(Box::default());
++        let mem_state: *mut MemoryState =
++            Box::into_raw(Box::new(MemoryState::with_budget(options.allocation_budget.clone())));
+@@ -139 +140,4 @@
+-            let seed = ffi::luaL_makeseed(ptr::null_mut());
++            let seed = match options.hash_seed {
++                Some(seed) => seed,
++                None => ffi::luaL_makeseed(ptr::null_mut()),
++            };
+--- upstream/mlua/src/state.rs
++++ vendor/mlua/src/state.rs
+@@ -205,0 +206,6 @@
++    /// Meridian extension: a deterministic Lua 5.5 hash seed when supplied.
++    #[cfg(feature = "lua55")]
++    pub hash_seed: Option<u32>,
++    /// Meridian extension: observe all successful VM allocation/reallocation requests.
++    /// Enforcement starts when the host calls `set_memory_limit`, after trusted VM setup.
++    pub allocation_budget: Option<std::sync::Arc<AllocationBudget>>,
+@@ -239,0 +246,3 @@
++            #[cfg(feature = "lua55")]
++            hash_seed: None,
++            allocation_budget: None,
+@@ -263,0 +273,38 @@
++    }
++}
++
++/// Meridian's cumulative allocator budget; no VM handles or native pointers escape.
++#[derive(Debug)]
++pub struct AllocationBudget {
++    limit: usize,
++    allocated: std::sync::atomic::AtomicUsize,
++    peak: std::sync::atomic::AtomicUsize,
++}
++
++impl AllocationBudget {
++    /// Start a separate observer for one fresh VM.
++    pub fn new(limit: usize) -> Self {
++        Self {
++            limit,
++            allocated: std::sync::atomic::AtomicUsize::new(0),
++            peak: std::sync::atomic::AtomicUsize::new(0),
++        }
++    }
++
++    /// Sum of new sizes for successful nonzero allocation/reallocation requests.
++    pub fn allocated_bytes(&self) -> usize {
++        self.allocated.load(std::sync::atomic::Ordering::Relaxed)
++    }
++
++    /// Maximum live VM allocation size observed, including trusted initialization.
++    pub fn peak_heap_bytes(&self) -> usize {
++        self.peak.load(std::sync::atomic::Ordering::Relaxed)
++    }
++
++    pub(crate) fn permits(&self, requested: usize) -> bool {
++        requested <= self.limit.saturating_sub(self.allocated_bytes())
++    }
++
++    pub(crate) fn record(&self, requested: usize, live: usize) {
++        self.allocated.fetch_add(requested, std::sync::atomic::Ordering::Relaxed);
++        self.peak.fetch_max(live, std::sync::atomic::Ordering::Relaxed);
+--- upstream/mlua-sys/Cargo.toml
++++ vendor/mlua-sys/Cargo.toml
+@@ -29 +29 @@
+-readme = "README.md"
++readme = "README.upstream.txt"
+@@ -76 +76 @@
+-version = ">= 551.0.2, < 551.1.0"
++version = "=551.1.0"
+@@ -93,0 +94,3 @@
++
++# Retained third-party dependency; not a Meridian workspace member.
++[workspace]
+--- upstream/mlua-sys/LICENSE
++++ vendor/mlua-sys/LICENSE
+@@ -0,0 +1,25 @@
++Both mlua and rlua are distributed under the MIT license, which is reproduced
++below:
++
++MIT License
++
++Copyright (c) 2019-2021 A. Orlenko
++Copyright (c) 2017 rlua
++
++Permission is hereby granted, free of charge, to any person obtaining a copy
++of this software and associated documentation files (the "Software"), to deal
++in the Software without restriction, including without limitation the rights
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++SOFTWARE.

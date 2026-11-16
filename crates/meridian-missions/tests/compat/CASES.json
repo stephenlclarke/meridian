@@ -1,0 +1,697 @@
+[
+  {
+    "id": "explicit-state-fresh-vm",
+    "path": "cases/explicit-state-fresh-vm.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "lossless-scalars-and-types",
+    "path": "cases/lossless-scalars-and-types.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "canonical-map-key-order",
+    "path": "cases/canonical-map-key-order.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "shared-dag-is-not-cycle",
+    "path": "cases/shared-dag-is-not-cycle.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "empty-array-becomes-empty-map",
+    "path": "cases/empty-array-becomes-empty-map.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "null-map-member-disappears",
+    "path": "cases/null-map-member-disappears.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "null-array-tail-disappears",
+    "path": "cases/null-array-tail-disappears.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "null-array-hole-is-sparse",
+    "path": "cases/null-array-hole-is-sparse.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "scalar-tostring",
+    "path": "cases/scalar-tostring.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "tostring-table-refused",
+    "path": "cases/tostring-table-refused.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "numeric-integral-key-dense",
+    "path": "cases/numeric-integral-key-dense.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "ordered-ipairs-and-math",
+    "path": "cases/ordered-ipairs-and-math.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "argument-order-and-snapshot-copy",
+    "path": "cases/argument-order-and-snapshot-copy.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "commands-remain-untrusted-values",
+    "path": "cases/commands-remain-untrusted-values.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "result-nan",
+    "path": "cases/result-nan.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "result-infinity",
+    "path": "cases/result-infinity.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "result-function",
+    "path": "cases/result-function.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "cyclic-result",
+    "path": "cases/cyclic-result.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "result-key-zero",
+    "path": "cases/result-key-zero.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "result-key-negative",
+    "path": "cases/result-key-negative.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "result-key-fraction",
+    "path": "cases/result-key-fraction.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "result-key-boolean",
+    "path": "cases/result-key-boolean.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "result-key-too-large",
+    "path": "cases/result-key-too-large.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sparse-table",
+    "path": "cases/sparse-table.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "mixed-table",
+    "path": "cases/mixed-table.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "shape-extra-field",
+    "path": "cases/shape-extra-field.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "shape-missing-data",
+    "path": "cases/shape-missing-data.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "shape-missing-commands",
+    "path": "cases/shape-missing-commands.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "shape-array-data",
+    "path": "cases/shape-array-data.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "shape-scalar-data",
+    "path": "cases/shape-scalar-data.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "shape-map-commands",
+    "path": "cases/shape-map-commands.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "shape-scalar-return",
+    "path": "cases/shape-scalar-return.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "shape-nil-return",
+    "path": "cases/shape-nil-return.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "empty-commands-map-coerces-array",
+    "path": "cases/empty-commands-map-coerces-array.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "commands-256",
+    "path": "cases/commands-256.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "commands-257",
+    "path": "cases/commands-257.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "output-depth",
+    "path": "cases/output-depth.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "output-collection",
+    "path": "cases/output-collection.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "state-byte-budget",
+    "path": "cases/state-byte-budget.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "output-budget-32",
+    "path": "cases/output-budget-32.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "instruction-default-top-level",
+    "path": "cases/instruction-default-top-level.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "instruction-default-callback",
+    "path": "cases/instruction-default-callback.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "instruction-hook-rounds-up",
+    "path": "cases/instruction-hook-rounds-up.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "recursive-runtime-failure",
+    "path": "cases/recursive-runtime-failure.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "allocation-bound-refusal",
+    "path": "cases/allocation-bound-refusal.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "cumulative-churn-default-allocation-cap",
+    "path": "cases/cumulative-churn-default-allocation-cap.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "cumulative-churn-source-allowed-64m",
+    "path": "cases/cumulative-churn-source-allowed-64m.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "explicit-error",
+    "path": "cases/explicit-error.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "nonstring-error-fallback",
+    "path": "cases/nonstring-error-fallback.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "module-scalar",
+    "path": "cases/module-scalar.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "module-missing-handler",
+    "path": "cases/module-missing-handler.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "module-nonfunction-handler",
+    "path": "cases/module-nonfunction-handler.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "syntax-error",
+    "path": "cases/syntax-error.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "binary-chunk-refused",
+    "path": "cases/binary-chunk-refused.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "invalid-handler-name",
+    "path": "cases/invalid-handler-name.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "handler-length-81",
+    "path": "cases/handler-length-81.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "limits-heap-small",
+    "path": "cases/limits-heap-small.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "limits-allocation-below-heap",
+    "path": "cases/limits-allocation-below-heap.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "limits-output-zero",
+    "path": "cases/limits-output-zero.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "limits-instructions-small",
+    "path": "cases/limits-instructions-small.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "limits-instructions-large",
+    "path": "cases/limits-instructions-large.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "limits-heap-large",
+    "path": "cases/limits-heap-large.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "limits-allocation-large",
+    "path": "cases/limits-allocation-large.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "limits-output-large",
+    "path": "cases/limits-output-large.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "source-over-256k",
+    "path": "cases/source-over-256k.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "validate-present",
+    "path": "cases/validate-present.json",
+    "operation": "validate"
+  },
+  {
+    "id": "validate-missing",
+    "path": "cases/validate-missing.json",
+    "operation": "validate"
+  },
+  {
+    "id": "validate-64",
+    "path": "cases/validate-64.json",
+    "operation": "validate"
+  },
+  {
+    "id": "validate-65",
+    "path": "cases/validate-65.json",
+    "operation": "validate"
+  },
+  {
+    "id": "sandbox-_G",
+    "path": "cases/sandbox-_G.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-collectgarbage",
+    "path": "cases/sandbox-collectgarbage.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-dofile",
+    "path": "cases/sandbox-dofile.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-loadfile",
+    "path": "cases/sandbox-loadfile.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-load",
+    "path": "cases/sandbox-load.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-print",
+    "path": "cases/sandbox-print.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-warn",
+    "path": "cases/sandbox-warn.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-pcall",
+    "path": "cases/sandbox-pcall.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-xpcall",
+    "path": "cases/sandbox-xpcall.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-getmetatable",
+    "path": "cases/sandbox-getmetatable.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-setmetatable",
+    "path": "cases/sandbox-setmetatable.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-rawget",
+    "path": "cases/sandbox-rawget.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-rawset",
+    "path": "cases/sandbox-rawset.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-rawequal",
+    "path": "cases/sandbox-rawequal.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-pairs",
+    "path": "cases/sandbox-pairs.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-next",
+    "path": "cases/sandbox-next.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-os",
+    "path": "cases/sandbox-os.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-io",
+    "path": "cases/sandbox-io.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-package",
+    "path": "cases/sandbox-package.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-debug",
+    "path": "cases/sandbox-debug.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-require",
+    "path": "cases/sandbox-require.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-coroutine",
+    "path": "cases/sandbox-coroutine.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-string",
+    "path": "cases/sandbox-string.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-table",
+    "path": "cases/sandbox-table.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-utf8",
+    "path": "cases/sandbox-utf8.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-math-random",
+    "path": "cases/sandbox-math-random.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-math-randomseed",
+    "path": "cases/sandbox-math-randomseed.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "sandbox-base-allowed",
+    "path": "cases/sandbox-base-allowed.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "pack-t01-accepted",
+    "path": "cases/pack-t01-accepted.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "pack-navigation-contact-unconfirmed",
+    "path": "cases/pack-navigation-contact-unconfirmed.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "pack-navigation-contact-sold",
+    "path": "cases/pack-navigation-contact-sold.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "pack-navigation-contact-lost",
+    "path": "cases/pack-navigation-contact-lost.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "pack-navigation-contact-flying",
+    "path": "cases/pack-navigation-contact-flying.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "pack-navigation-confirm-cancel",
+    "path": "cases/pack-navigation-confirm-cancel.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "pack-navigation-confirm-receive",
+    "path": "cases/pack-navigation-confirm-receive.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "pack-navigation-confirm-lost",
+    "path": "cases/pack-navigation-confirm-lost.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "pack-navigation-confirm-fit-before-cancel-branch",
+    "path": "cases/pack-navigation-confirm-fit-before-cancel-branch.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "pack-courier-contact-destination",
+    "path": "cases/pack-courier-contact-destination.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "pack-courier-contact-origin",
+    "path": "cases/pack-courier-contact-origin.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "pack-courier-contact-in-flight",
+    "path": "cases/pack-courier-contact-in-flight.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "pack-courier-generate-empty",
+    "path": "cases/pack-courier-generate-empty.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "pack-guiding-light-ordered-receipts",
+    "path": "cases/pack-guiding-light-ordered-receipts.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "pack-guiding-light-betrayed-suppresses-cues",
+    "path": "cases/pack-guiding-light-betrayed-suppresses-cues.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "modules-closed-cache",
+    "path": "cases/modules-closed-cache.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "modules-undeclared",
+    "path": "cases/modules-undeclared.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "modules-cyclic",
+    "path": "cases/modules-cyclic.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "modules-nontable",
+    "path": "cases/modules-nontable.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "modules-bad-name-type",
+    "path": "cases/modules-bad-name-type.json",
+    "operation": "evaluate"
+  },
+  {
+    "id": "wire-invalid-tag",
+    "path": "cases/wire-invalid-tag.json",
+    "operation": "wire_decode"
+  },
+  {
+    "id": "wire-trailing",
+    "path": "cases/wire-trailing.json",
+    "operation": "wire_decode"
+  },
+  {
+    "id": "wire-truncated-integer",
+    "path": "cases/wire-truncated-integer.json",
+    "operation": "wire_decode"
+  },
+  {
+    "id": "wire-truncated-string",
+    "path": "cases/wire-truncated-string.json",
+    "operation": "wire_decode"
+  },
+  {
+    "id": "wire-invalid-utf8",
+    "path": "cases/wire-invalid-utf8.json",
+    "operation": "wire_decode"
+  },
+  {
+    "id": "wire-infinite-double",
+    "path": "cases/wire-infinite-double.json",
+    "operation": "wire_decode"
+  },
+  {
+    "id": "wire-negative-zero",
+    "path": "cases/wire-negative-zero.json",
+    "operation": "wire_decode"
+  },
+  {
+    "id": "wire-int64-min",
+    "path": "cases/wire-int64-min.json",
+    "operation": "wire_decode"
+  },
+  {
+    "id": "wire-empty-array",
+    "path": "cases/wire-empty-array.json",
+    "operation": "wire_decode"
+  },
+  {
+    "id": "wire-empty-map",
+    "path": "cases/wire-empty-map.json",
+    "operation": "wire_decode"
+  },
+  {
+    "id": "wire-duplicate-key",
+    "path": "cases/wire-duplicate-key.json",
+    "operation": "wire_decode"
+  },
+  {
+    "id": "wire-collection-overflow",
+    "path": "cases/wire-collection-overflow.json",
+    "operation": "wire_decode"
+  },
+  {
+    "id": "wire-depth31",
+    "path": "cases/wire-depth31.json",
+    "operation": "wire_decode"
+  },
+  {
+    "id": "wire-depth32",
+    "path": "cases/wire-depth32.json",
+    "operation": "wire_decode"
+  },
+  {
+    "id": "input-depth32",
+    "path": "cases/input-depth32.json",
+    "operation": "wire_encode"
+  },
+  {
+    "id": "input-nonfinite",
+    "path": "cases/input-nonfinite.json",
+    "operation": "wire_encode"
+  },
+  {
+    "id": "input-string-over-limit",
+    "path": "cases/input-string-over-limit.json",
+    "operation": "wire_encode"
+  },
+  {
+    "id": "stored-extra-field",
+    "path": "cases/stored-extra-field.json",
+    "operation": "tagged_storage_decode"
+  },
+  {
+    "id": "stored-bad-number-length",
+    "path": "cases/stored-bad-number-length.json",
+    "operation": "tagged_storage_decode"
+  },
+  {
+    "id": "stored-uppercase-bits",
+    "path": "cases/stored-uppercase-bits.json",
+    "operation": "tagged_storage_decode"
+  },
+  {
+    "id": "stored-nonfinite",
+    "path": "cases/stored-nonfinite.json",
+    "operation": "tagged_storage_decode"
+  },
+  {
+    "id": "stored-unknown-type",
+    "path": "cases/stored-unknown-type.json",
+    "operation": "tagged_storage_decode"
+  }
+]

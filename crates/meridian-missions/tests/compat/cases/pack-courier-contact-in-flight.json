@@ -1,0 +1,56 @@
+{
+  "id": "pack-courier-contact-in-flight",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "contact",
+    "source": "lua/pack-courier-contact-in-flight.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "kind": {
+          "type": "string",
+          "value": "test"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "docked": {
+          "type": "bool",
+          "value": false
+        },
+        "main_station": {
+          "type": "bool",
+          "value": false
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {
+        "counter": {
+          "type": "integer",
+          "value": 3
+        }
+      }
+    }
+  },
+  "expected": {
+    "status": "ok",
+    "data": {
+      "type": "object",
+      "value": {
+        "counter": {
+          "type": "integer",
+          "value": 3
+        }
+      }
+    },
+    "commands": []
+  },
+  "referencePaths": [
+    "Sources/L337Core/Resources/ScriptPacks/generated-couriers/scripts/main.lua"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

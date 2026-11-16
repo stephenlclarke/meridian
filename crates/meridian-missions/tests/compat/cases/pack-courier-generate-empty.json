@@ -1,0 +1,48 @@
+{
+  "id": "pack-courier-generate-empty",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "generate",
+    "source": "lua/pack-courier-generate-empty.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "kind": {
+          "type": "string",
+          "value": "test"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "courier_plan": {
+          "type": "array",
+          "value": []
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {}
+    }
+  },
+  "expected": {
+    "status": "ok",
+    "data": {
+      "type": "object",
+      "value": {
+        "offers": {
+          "type": "object",
+          "value": {}
+        }
+      }
+    },
+    "commands": []
+  },
+  "referencePaths": [
+    "Sources/L337Core/Resources/ScriptPacks/generated-couriers/scripts/main.lua"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED",
+  "notes": "Empty offers Lua table canonicalizes to empty map, even though native consumers may accept it as an empty array."
+}

@@ -1,0 +1,18 @@
+{
+  "id": "wire-negative-zero",
+  "invocation": {
+    "operation": "wire_decode",
+    "bytes": "wire/wire-negative-zero.bin"
+  },
+  "expected": {
+    "status": "ok",
+    "value": {
+      "type": "number",
+      "value": "8000000000000000"
+    }
+  },
+  "referencePaths": [
+    "Sources/L337Core/ScriptValue.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

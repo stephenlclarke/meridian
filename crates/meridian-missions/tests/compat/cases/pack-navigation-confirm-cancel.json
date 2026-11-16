@@ -1,0 +1,106 @@
+{
+  "id": "pack-navigation-confirm-cancel",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "confirm",
+    "source": "lua/pack-navigation-confirm-cancel.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "choice_id": {
+          "type": "string",
+          "value": "cancel"
+        },
+        "dialogue_id": {
+          "type": "string",
+          "value": "progress"
+        },
+        "token": {
+          "type": "string",
+          "value": "T"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "credits": {
+          "type": "integer",
+          "value": 1000
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {
+        "retained": {
+          "type": "integer",
+          "value": 7
+        }
+      }
+    }
+  },
+  "expected": {
+    "status": "ok",
+    "data": {
+      "type": "object",
+      "value": {
+        "retained": {
+          "type": "integer",
+          "value": 7
+        }
+      }
+    },
+    "commands": [
+      {
+        "type": "object",
+        "value": {
+          "choice_id": {
+            "type": "string",
+            "value": "cancel"
+          },
+          "id": {
+            "type": "string",
+            "value": "progress"
+          },
+          "op": {
+            "type": "string",
+            "value": "dialogue.commit"
+          },
+          "token": {
+            "type": "string",
+            "value": "T"
+          }
+        }
+      },
+      {
+        "type": "object",
+        "value": {
+          "op": {
+            "type": "string",
+            "value": "training.trade.cancel"
+          }
+        }
+      },
+      {
+        "type": "object",
+        "value": {
+          "op": {
+            "type": "string",
+            "value": "mission.finish"
+          },
+          "outcome": {
+            "type": "string",
+            "value": "abandoned"
+          }
+        }
+      }
+    ]
+  },
+  "referencePaths": [
+    "Sources/L337Core/Resources/ScriptPacks/l337-navigation-trade/scripts/main.lua",
+    "Sources/L337Core/ScriptDirector.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED",
+  "notes": "Exact Lua emission order only. Native dialogue token/choice and training authority must still validate before any command effects publish."
+}

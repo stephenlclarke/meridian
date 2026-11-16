@@ -1,0 +1,62 @@
+{
+  "id": "commands-remain-untrusted-values",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "on_event",
+    "source": "lua/commands-remain-untrusted-values.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "kind": {
+          "type": "string",
+          "value": "test"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "credits": {
+          "type": "integer",
+          "value": 1000
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {}
+    }
+  },
+  "expected": {
+    "status": "ok",
+    "data": {
+      "type": "object",
+      "value": {}
+    },
+    "commands": [
+      {
+        "type": "integer",
+        "value": 17
+      },
+      {
+        "type": "object",
+        "value": {
+          "amount": {
+            "type": "integer",
+            "value": 999
+          },
+          "op": {
+            "type": "string",
+            "value": "invented.grant"
+          }
+        }
+      }
+    ]
+  },
+  "referencePaths": [
+    "Sources/MissionScript/MissionScript.c",
+    "Sources/L337Core/ScriptEvaluator.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED",
+  "notes": "Evaluator checks the command array shape, not native capability/command semantics. Subsequent controller validation must refuse unsupported effects; do not claim evaluator itself rejects this."
+}

@@ -1,0 +1,71 @@
+{
+  "id": "pack-t01-accepted",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "accepted",
+    "source": "lua/pack-t01-accepted.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "instance_id": {
+          "type": "string",
+          "value": "00000000-0000-0000-0000-000000000001"
+        },
+        "kind": {
+          "type": "string",
+          "value": "mission.accepted"
+        },
+        "sequence": {
+          "type": "integer",
+          "value": 1
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "credits": {
+          "type": "integer",
+          "value": 1000
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {
+        "old": {
+          "type": "string",
+          "value": "discarded"
+        }
+      }
+    }
+  },
+  "expected": {
+    "status": "ok",
+    "data": {
+      "type": "object",
+      "value": {}
+    },
+    "commands": [
+      {
+        "type": "object",
+        "value": {
+          "op": {
+            "type": "string",
+            "value": "journal.append"
+          },
+          "text": {
+            "type": "string",
+            "value": "Flight practice uses your current commander, owned fit and actual issuing berth. Launch, align and approach in the front view, then return through the real doorway. Separately confirm training reception. No extra payment; Back never wipes your save."
+          }
+        }
+      }
+    ]
+  },
+  "referencePaths": [
+    "Sources/L337Core/Resources/ScriptPacks/l337-flight-reception/scripts/main.lua",
+    "Sources/L337Core/Resources/ScriptPacks/l337-flight-reception/manifest.toml"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED",
+  "notes": "Lua only returns original presentation. It cannot supply consent, measured approach, native berth receipt, trace, payment or commander replacement."
+}

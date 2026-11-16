@@ -1,0 +1,49 @@
+{
+  "id": "allocation-bound-refusal",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "on_event",
+    "source": "lua/allocation-bound-refusal.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "kind": {
+          "type": "string",
+          "value": "test"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "credits": {
+          "type": "integer",
+          "value": 1000
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {}
+    },
+    "limitsOverride": {
+      "heapBytes": 65536,
+      "allocationBytes": 65536
+    }
+  },
+  "expected": {
+    "status": "error",
+    "error": {
+      "match": "category",
+      "text": "Script execution error"
+    },
+    "evaluationPublished": false,
+    "inputStateUnchanged": true
+  },
+  "referencePaths": [
+    "Sources/MissionScript/MissionScript.c",
+    "Sources/L337Core/ScriptEvaluator.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED",
+  "notes": "No exact allocator peak, timing or allocation-failure point is inferred."
+}

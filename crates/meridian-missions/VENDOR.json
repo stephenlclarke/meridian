@@ -1,0 +1,86 @@
+{
+  "status": "SOURCE_REVIEWED_EXECUTION_UNRUN",
+  "dependencies": [
+    {
+      "package": "mlua",
+      "version": "0.12.2",
+      "officialRegistryURL": "https://crates.io/api/v1/crates/mlua/0.12.2/download",
+      "registryArchiveSHA256": "7a7ae6b65bf54b7fdd4cf5b6f44f60862350ebf3fe3779b3a9cc005e7fa14f81",
+      "license": "MIT",
+      "changes": [
+        {
+          "path": "Cargo.toml",
+          "upstreamSHA256": "bdd9e1b49181fb25c89fc3504f0276ed47bda03023a976a6adfab6f853f11387",
+          "retainedSHA256": "6adada264c881c5cd50f3bf60da74367e9cd76179a0aefb06aa94f5d8ec944e1"
+        },
+        {
+          "path": "src/lib.rs",
+          "upstreamSHA256": "2d288f52cd1391f123a4b85d718585827b95725a0204343be4c649f8010de205",
+          "retainedSHA256": "3a045e806f6f003e9b47e6b212d1dbb1d0517eb4cb8caff2e24f22041fda6472"
+        },
+        {
+          "path": "src/memory.rs",
+          "upstreamSHA256": "fd4fdfee726f4eaeb10df3c19b7eccb85ffd10b1961e9461e9bb780183b8046d",
+          "retainedSHA256": "a5a22b7630b19da5265bbbaef50d35fa62fb8ff2eb0a2efcaccaf2c70d197383"
+        },
+        {
+          "path": "src/state/raw.rs",
+          "upstreamSHA256": "008784d13003e50372a3066ad24cf2444b593f74ff6b2e23d1b953bcb8ff7687",
+          "retainedSHA256": "662aa4d4467ca9c392001ac1e71242c1ae822dcdaa147c2283da0488ba57b439"
+        },
+        {
+          "path": "src/state.rs",
+          "upstreamSHA256": "b89470171fb6f45711ca68602b4460119e988563fef0201038e17708bf545fe7",
+          "retainedSHA256": "9849c4a9623a3d722347bce9a4c32bff3a7e0a4ce64f06cd1f120566e8958b3a"
+        }
+      ],
+      "retainedSubset": "Production src/build/Cargo/LICENSE; upstream README bytes retained verbatim as README.upstream.txt; unused dev/example/test target metadata omitted from mlua manifest",
+      "vcs": {
+        "git": {
+          "sha1": "a186d461c7772aed4cb0a9fa1d1899121c6450e7"
+        },
+        "path_in_vcs": ""
+      }
+    },
+    {
+      "package": "mlua-sys",
+      "version": "0.13.0",
+      "officialRegistryURL": "https://crates.io/api/v1/crates/mlua-sys/0.13.0/download",
+      "registryArchiveSHA256": "1631cda17bd6486410ab751d91f5fd4484f441589278cdad879eb3afc721a285",
+      "license": "MIT",
+      "changes": [
+        {
+          "path": "Cargo.toml",
+          "upstreamSHA256": "f829854175b4ec486eed35b902a6925ecfc770141952b940a419767a5496114c",
+          "retainedSHA256": "763a89b80b7388dbc18e7885beb279aa483dd6ff4a55293562c68720b130e38f"
+        },
+        {
+          "path": "LICENSE",
+          "upstreamSHA256": null,
+          "retainedSHA256": "63b61a30d3e3abcfcb1bda4b99f4eea9fdb7d6ab05fbc513461fef6cf89baf29"
+        }
+      ],
+      "retainedSubset": "Production src/build/Cargo/LICENSE; upstream README bytes retained verbatim as README.upstream.txt; unused dev/example/test target metadata omitted from mlua manifest",
+      "vcs": {
+        "git": {
+          "sha1": "a186d461c7772aed4cb0a9fa1d1899121c6450e7"
+        },
+        "path_in_vcs": "mlua-sys"
+      }
+    }
+  ],
+  "patch": {
+    "path": "vendor/meridian.patch",
+    "sha256": "9297222f25ce8aeacb883e9fe16845e941b6b838fb495eb34cde9c2ed76ca0cd",
+    "application": "Zero-context exact-source patch; original file hashes must match before git apply --unidiff-zero"
+  },
+  "purpose": [
+    "Lua5.5.1 matches original pinned CLua; mlua-sys exact lua-src551.1.0 builder range only, no C/FFI declaration edits",
+    "Safe cumulative allocation observer and deterministic hash seed1; successful realloc charges new_size, free no refund, failed alloc/realloc charges neither live nor cumulative bytes",
+    "No added unsafe blocks, pointer dereferences or FFI operations; existing upstream safe API/FFI dependency internals are retained, primary crate forbids unsafe",
+    "Trusted fixed VM initialization is counted and checked before untrusted code; cumulative enforcement starts with safe set_memory_limit",
+    "Local third-party workspace tables isolate retained dependencies; actual Cargo metadata confirms only meridian-missions is an owner workspace member"
+  ],
+  "mluaSysLicense": "Official monorepo LICENSE at crate VCS a186d461c7772aed4cb0a9fa1d1899121c6450e7; absent from registry subcrate archive; retained from exact upstream Git source",
+  "execution": "All Rust/native tests and allocator comparative runtime checks UNRUN until existing owner execution; source patch does not prove qualification"
+}

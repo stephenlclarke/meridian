@@ -1,0 +1,18 @@
+{
+  "id": "wire-duplicate-key",
+  "invocation": {
+    "operation": "wire_decode",
+    "bytes": "wire/wire-duplicate-key.bin"
+  },
+  "expected": {
+    "status": "error",
+    "error": {
+      "match": "exact",
+      "text": "Duplicate script result key."
+    }
+  },
+  "referencePaths": [
+    "Sources/L337Core/ScriptValue.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

@@ -1,0 +1,44 @@
+{
+  "id": "modules-cyclic",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "on_event",
+    "source": "lua/modules-cyclic.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "kind": {
+          "type": "string",
+          "value": "test"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "credits": {
+          "type": "integer",
+          "value": 1000
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {}
+    }
+  },
+  "expected": {
+    "status": "error",
+    "error": {
+      "match": "contains",
+      "text": "Cyclic mission module: a"
+    },
+    "evaluationPublished": false,
+    "inputStateUnchanged": true
+  },
+  "referencePaths": [
+    "Sources/L337Core/ScriptModules.swift",
+    "Sources/MissionScript/MissionScript.c"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

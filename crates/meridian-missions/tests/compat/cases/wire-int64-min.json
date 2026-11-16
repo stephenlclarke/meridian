@@ -1,0 +1,18 @@
+{
+  "id": "wire-int64-min",
+  "invocation": {
+    "operation": "wire_decode",
+    "bytes": "wire/wire-int64-min.bin"
+  },
+  "expected": {
+    "status": "ok",
+    "value": {
+      "type": "integer",
+      "value": -9223372036854775808
+    }
+  },
+  "referencePaths": [
+    "Sources/L337Core/ScriptValue.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

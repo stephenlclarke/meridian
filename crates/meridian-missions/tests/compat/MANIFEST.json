@@ -1,0 +1,1923 @@
+{
+  "stage": "COMPLETE_AUTHORED_FROZEN_CORPUS_UNRUN_ROOT_ARTIFACT_AUDIT_PENDING",
+  "createdAt": "2026-11-16T15:53:43.913488+00:00",
+  "referenceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "fixtureCount": 139,
+  "hostScenarioCount": 15,
+  "referenceFileCount": 107,
+  "payloads": [
+    {
+      "path": "CASES.json",
+      "bytes": 16471,
+      "sha256": "9fb502169707b3cff9a65f3596f0b121f0679fb30272c37cbe483c05a53f78e3"
+    },
+    {
+      "path": "CONTRACT.json",
+      "bytes": 3740,
+      "sha256": "2701fdcf29c97edd30171206cca34baabb4ce351c39554a00763ab1f0938f39c"
+    },
+    {
+      "path": "HOST-SCENARIOS.json",
+      "bytes": 9359,
+      "sha256": "8dc9c67b88fab304e05cbed85aef2103f1efe4fb5aebd431e15a7a12ba27d8af"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1492,
+      "sha256": "bfcea242109483d3f66a8fdec214c3aa3316f2b1ed1b633c8d99c7635c7af662"
+    },
+    {
+      "path": "REFERENCE.json",
+      "bytes": 28454,
+      "sha256": "1f43e224ddc92075d2611f5cc1f9c4d4a7236897ac8ba4e0cc59fc4cb00aeadd"
+    },
+    {
+      "path": "cases/allocation-bound-refusal.json",
+      "bytes": 1071,
+      "sha256": "0d1e63945e517a8e53a9d791be7fe929692132fbea79359b30a216ad4c0f8164"
+    },
+    {
+      "path": "cases/argument-order-and-snapshot-copy.json",
+      "bytes": 1327,
+      "sha256": "01ba433bd79354ad80d650885a0deb3009c7874a36784011a9d7ab7b13426484"
+    },
+    {
+      "path": "cases/binary-chunk-refused.json",
+      "bytes": 890,
+      "sha256": "487c59ecb00955188d305acc53bacea6089c1716907feb18613288e266ac889b"
+    },
+    {
+      "path": "cases/canonical-map-key-order.json",
+      "bytes": 1184,
+      "sha256": "b7e128e3ecb20e6ea4c2b12c4c49154486a9f91d61a7690ee1ac2ca90260e9d7"
+    },
+    {
+      "path": "cases/commands-256.json",
+      "bytes": 62901,
+      "sha256": "fa56a5c94cdc1548ea55e21ed49fb329d47d595c534b52f576b1993e4e372c61"
+    },
+    {
+      "path": "cases/commands-257.json",
+      "bytes": 930,
+      "sha256": "71db089f2a11363c29cf36bba25b6804710a89df5e1b102c654e14e92f9b0c91"
+    },
+    {
+      "path": "cases/commands-remain-untrusted-values.json",
+      "bytes": 1373,
+      "sha256": "156322f9ca094d8422d3d3d8f08113c90a1629ef97b343f6f8237e97287f5f4b"
+    },
+    {
+      "path": "cases/cumulative-churn-default-allocation-cap.json",
+      "bytes": 1843,
+      "sha256": "9de59dc1d0b65cb2c347405dd1b03641921e787d9407c65a711178c9bdcf8973"
+    },
+    {
+      "path": "cases/cumulative-churn-source-allowed-64m.json",
+      "bytes": 1220,
+      "sha256": "954c3bc992de049111d78ceeacd35cf6886ef34b51974780ba25619056198579"
+    },
+    {
+      "path": "cases/cyclic-result.json",
+      "bytes": 866,
+      "sha256": "92f5ae92ed73f8922c6355a415de4b35799670d68dd8ec8b5e8728e068c0365d"
+    },
+    {
+      "path": "cases/empty-array-becomes-empty-map.json",
+      "bytes": 1106,
+      "sha256": "8b3f124e921edd5f1d66a7dfe7ce923a9710b684f8720d03d90d5df0bc1b5460"
+    },
+    {
+      "path": "cases/empty-commands-map-coerces-array.json",
+      "bytes": 929,
+      "sha256": "602711999bedeabec87d11348387ed0076a5ada7272cf451ca0ffeed607f4e74"
+    },
+    {
+      "path": "cases/explicit-error.json",
+      "bytes": 868,
+      "sha256": "9d833e7a3dd504b71b7c723a5c55db0cbafa7ef947991b65e760fb6165afa84b"
+    },
+    {
+      "path": "cases/explicit-state-fresh-vm.json",
+      "bytes": 1890,
+      "sha256": "ab5446b087032434ff09636af6c0dd1d3b7dd6d0655bd958620f366f2dc3e380"
+    },
+    {
+      "path": "cases/handler-length-81.json",
+      "bytes": 970,
+      "sha256": "d3d66433612356bd07f199d8f2f5ad49445604d7af7d1fefb118551ccbb1c727"
+    },
+    {
+      "path": "cases/input-depth32.json",
+      "bytes": 12604,
+      "sha256": "2bb65e36e06f81cbbbaeb6e45d6edf3d27c8a4936674bae25f0b6d66dbf20e85"
+    },
+    {
+      "path": "cases/input-nonfinite.json",
+      "bytes": 407,
+      "sha256": "7e73082797417be83c0a0d6111af9456174c0a54859bd4c3b21b509ad38fb9d8"
+    },
+    {
+      "path": "cases/input-string-over-limit.json",
+      "bytes": 421,
+      "sha256": "323f93b071860746a5999f1770e7b843f4229d33c05eef183f27e1ef7f13e544"
+    },
+    {
+      "path": "cases/instruction-default-callback.json",
+      "bytes": 1083,
+      "sha256": "5fb0a59cc3dfedba827a9a2e5ca5dd8617ab40d84168f1e6779a602002c842e7"
+    },
+    {
+      "path": "cases/instruction-default-top-level.json",
+      "bytes": 1085,
+      "sha256": "7434c740ed9054229645528aef36943f9a9cf509c3f138273505b0b0d8710439"
+    },
+    {
+      "path": "cases/instruction-hook-rounds-up.json",
+      "bytes": 1193,
+      "sha256": "dc66606c45c9ce1dfc635801655ac53c258a2b94af91c4a75c73ec6f6658b49f"
+    },
+    {
+      "path": "cases/invalid-handler-name.json",
+      "bytes": 909,
+      "sha256": "e35cfaf74be7f939aea7d41350538c1eb9df582557aa9b41f5e07949d7c29931"
+    },
+    {
+      "path": "cases/limits-allocation-below-heap.json",
+      "bytes": 979,
+      "sha256": "59d476d3b12871c9fdaaa9133f4e2e2aec8c3737fb8012d83f397d7894b654b5"
+    },
+    {
+      "path": "cases/limits-allocation-large.json",
+      "bytes": 965,
+      "sha256": "b9323c66f35fa75b279b493a2824254e96cca29b1f40b79279f3a9cf29d0b080"
+    },
+    {
+      "path": "cases/limits-heap-large.json",
+      "bytes": 982,
+      "sha256": "57499adeec1e5baaefbbeadb758f80eb604fb6e0e2bc097151dab76695a91ed4"
+    },
+    {
+      "path": "cases/limits-heap-small.json",
+      "bytes": 953,
+      "sha256": "d3d13f3020257b04aa3eb23d9e3b601b53e891497f7bcfcc67554d7a9bafe067"
+    },
+    {
+      "path": "cases/limits-instructions-large.json",
+      "bytes": 965,
+      "sha256": "57a029af91efc93a3972595c6b223b0de486ef9e33939f0fd5002b0d43d16aca"
+    },
+    {
+      "path": "cases/limits-instructions-small.json",
+      "bytes": 961,
+      "sha256": "cba61c39126256cca2ce05f2822ad471dc5cc2eaa45b1537b0bc9455f58992a0"
+    },
+    {
+      "path": "cases/limits-output-large.json",
+      "bytes": 952,
+      "sha256": "373668ac01184cf2d7bb7e4fdc6ca576d24a946f90ea319a165bdb8bbab1fe55"
+    },
+    {
+      "path": "cases/limits-output-zero.json",
+      "bytes": 953,
+      "sha256": "50b441a4ac954c8ac983e6dafb08640119a66ec97cc63fa1ecd4b67c233eda96"
+    },
+    {
+      "path": "cases/lossless-scalars-and-types.json",
+      "bytes": 2377,
+      "sha256": "aa207deb2e85b0efe604af2708fd5fc7149ecf63bccbcd54f058aa9116199ed0"
+    },
+    {
+      "path": "cases/mixed-table.json",
+      "bytes": 877,
+      "sha256": "f080736b01798d813b4a8577a85e5a564f185c054533c5687cbec37141012548"
+    },
+    {
+      "path": "cases/module-missing-handler.json",
+      "bytes": 892,
+      "sha256": "28185395e5c6f0ccc9f2f3b2aec35aeca8b88bc2acac539eaf3fa0327c27c6f4"
+    },
+    {
+      "path": "cases/module-nonfunction-handler.json",
+      "bytes": 900,
+      "sha256": "c34c7b074ad458f111cb1871eef837432aeb450f8dad1192aeb6ef8e5b180fa1"
+    },
+    {
+      "path": "cases/module-scalar.json",
+      "bytes": 887,
+      "sha256": "fe36c1347f1c1dd4028270d0481cbb4a9ac01e3c65edd581d5950259cfc3eaaa"
+    },
+    {
+      "path": "cases/modules-bad-name-type.json",
+      "bytes": 903,
+      "sha256": "65d1f945898a14c82274d43364ba0710b2be5b5a6f65aae24efc835397ebf240"
+    },
+    {
+      "path": "cases/modules-closed-cache.json",
+      "bytes": 972,
+      "sha256": "68dd1ad28d6ec7e46c560fe4f0897c7af8e70656c586e33cb745b53c720c58bc"
+    },
+    {
+      "path": "cases/modules-cyclic.json",
+      "bytes": 876,
+      "sha256": "c12b66c2eae8fbb10ab95b54142b862d7fa240e05f83f68a7021c59ea54c6e4d"
+    },
+    {
+      "path": "cases/modules-nontable.json",
+      "bytes": 893,
+      "sha256": "aac4f377b829bc634f3480bae6590201fa820aa3b4e8987c7d6c1dd947eaf387"
+    },
+    {
+      "path": "cases/modules-undeclared.json",
+      "bytes": 894,
+      "sha256": "a0df433a8ced4c18116ae835692e63fc83145fc5e7727110c1076df6a8b8301b"
+    },
+    {
+      "path": "cases/nonstring-error-fallback.json",
+      "bytes": 895,
+      "sha256": "96ccd34358a7f2e8334d937c52788b103d36f2a77f6c5a4d2d8f47697ba3a02b"
+    },
+    {
+      "path": "cases/null-array-hole-is-sparse.json",
+      "bytes": 1141,
+      "sha256": "a45dfe7263cdb4470b6f1216191bca8e5cb3560d7d614d3eed5f967d26203007"
+    },
+    {
+      "path": "cases/null-array-tail-disappears.json",
+      "bytes": 1239,
+      "sha256": "c054a727010587c946304d466d6a2f4a2648aa02936fb7e1386755d481d540af"
+    },
+    {
+      "path": "cases/null-map-member-disappears.json",
+      "bytes": 1049,
+      "sha256": "af973ed16e0e3e80b32d1e318f97f123a434736efdeaa63cd89c85ebd21f55df"
+    },
+    {
+      "path": "cases/numeric-integral-key-dense.json",
+      "bytes": 1092,
+      "sha256": "d5c72a35c41c0a5fd6d32b86af61ad5bd56211e543aec178f4e58a5100b277db"
+    },
+    {
+      "path": "cases/ordered-ipairs-and-math.json",
+      "bytes": 984,
+      "sha256": "6b2884a81c271c7016ed13d1754e2910dd540e8c342de1472484c8cf29234ef6"
+    },
+    {
+      "path": "cases/output-budget-32.json",
+      "bytes": 936,
+      "sha256": "c402d6a0bdda468608f96a5c2698ae831dab455169cdbd5b5d48195c782493f8"
+    },
+    {
+      "path": "cases/output-collection.json",
+      "bytes": 948,
+      "sha256": "c426323bb3baa0ef6257d1a125e2636bf76396bdae7f6c2a3357cb84e904ae3c"
+    },
+    {
+      "path": "cases/output-depth.json",
+      "bytes": 880,
+      "sha256": "b682f2c5f9e4f40f9725351802392f348f0a84e6a1ebd194a5c5daa14ae38ffa"
+    },
+    {
+      "path": "cases/pack-courier-contact-destination.json",
+      "bytes": 2030,
+      "sha256": "be8e57114fc2ae6b94ca09b708bc19122988669c1e043d9367d5c03b2c26baaa"
+    },
+    {
+      "path": "cases/pack-courier-contact-in-flight.json",
+      "bytes": 1084,
+      "sha256": "aa68914ad64e6a5449d344d48a1a10d31d8a6ac56d4cb0b7658de9b43c99d384"
+    },
+    {
+      "path": "cases/pack-courier-contact-origin.json",
+      "bytes": 2021,
+      "sha256": "d86cc00e5ac1cd0664bbbfb76de78115ad1c544b972855d1d1ea4a887d1b3fde"
+    },
+    {
+      "path": "cases/pack-courier-generate-empty.json",
+      "bytes": 1033,
+      "sha256": "660f855b7548249bd129ed2e1bf01eb07d782d96cac5a600277ac3136dcd8551"
+    },
+    {
+      "path": "cases/pack-guiding-light-betrayed-suppresses-cues.json",
+      "bytes": 1834,
+      "sha256": "d3fd7c96949d4a25990725de2c2bfb4914cc3eb1f177f5337930b9e137bd1cd9"
+    },
+    {
+      "path": "cases/pack-guiding-light-ordered-receipts.json",
+      "bytes": 3018,
+      "sha256": "acd79bf4bebfcc59042a9769b24a3074e8930224941fc93b7ea7241ab28f531f"
+    },
+    {
+      "path": "cases/pack-navigation-confirm-cancel.json",
+      "bytes": 2285,
+      "sha256": "a00a7c5f2fa9bdf913a906760c12d7b2eb44c2062e31808b17a0d1f28678fd39"
+    },
+    {
+      "path": "cases/pack-navigation-confirm-fit-before-cancel-branch.json",
+      "bytes": 2764,
+      "sha256": "e094da4a972fe3cc4209e1b28729542bdb9c69f9fab315277ef5401c2e142b4d"
+    },
+    {
+      "path": "cases/pack-navigation-confirm-lost.json",
+      "bytes": 2274,
+      "sha256": "4f51fba15ede7ffa0b20b7b14e94b004c69e74fed338452dc7b37774e5e79eaf"
+    },
+    {
+      "path": "cases/pack-navigation-confirm-receive.json",
+      "bytes": 3220,
+      "sha256": "c7eb7c530730b16b17ccd5cee80941f83df2961be60aedfb662c60c54043212f"
+    },
+    {
+      "path": "cases/pack-navigation-contact-flying.json",
+      "bytes": 1389,
+      "sha256": "cb25ca442065189c9e3d18f7beefa7c70b8cc1690f40ebc8296e2a502665b870"
+    },
+    {
+      "path": "cases/pack-navigation-contact-lost.json",
+      "bytes": 1379,
+      "sha256": "0ebc12e5d1a85d36b326d8a42cc53775e2f39a8cd214b39391c8da7b7773a4ca"
+    },
+    {
+      "path": "cases/pack-navigation-contact-sold.json",
+      "bytes": 1382,
+      "sha256": "84744215ea36eb44802b223f806094f1dac2e0ed33a21f10f34ac13ebf1f982a"
+    },
+    {
+      "path": "cases/pack-navigation-contact-unconfirmed.json",
+      "bytes": 1399,
+      "sha256": "f5a993d7690758cad4a16c079b557c0e968178a046f08926edf6df9d76d817ed"
+    },
+    {
+      "path": "cases/pack-t01-accepted.json",
+      "bytes": 1865,
+      "sha256": "7d0b48c90501ae6a198efec92e2802b8b256909414528575fe48a7f3eff76b59"
+    },
+    {
+      "path": "cases/recursive-runtime-failure.json",
+      "bytes": 1047,
+      "sha256": "fc8e3e004ff76f23d514751973db1dfe6ffb3368552fb887f8e09181ff6386d3"
+    },
+    {
+      "path": "cases/result-function.json",
+      "bytes": 896,
+      "sha256": "d6170365947e906b850e798568a2b596bf15b9eb7b87c73c05d4cc8c105a44b7"
+    },
+    {
+      "path": "cases/result-infinity.json",
+      "bytes": 873,
+      "sha256": "88060dca2159e156873507261035ed777b9f95085c7d4388a01f8db6170f6566"
+    },
+    {
+      "path": "cases/result-key-boolean.json",
+      "bytes": 916,
+      "sha256": "35e315c419701f5d85413b5f0e41e71dddc37f30df31fb5c2847f187f48cec11"
+    },
+    {
+      "path": "cases/result-key-fraction.json",
+      "bytes": 918,
+      "sha256": "16a90e9effcc0827d4bb2e4da64e0e47f6fe1db5588433265cf77230808d9811"
+    },
+    {
+      "path": "cases/result-key-negative.json",
+      "bytes": 918,
+      "sha256": "c08109c62fbfd3d75e93e544ffae0e4a87326242dd30aa92bd2160361a79247b"
+    },
+    {
+      "path": "cases/result-key-too-large.json",
+      "bytes": 920,
+      "sha256": "0d6d1c0f05403d31c1b2a4977783c892ec18f1f98e103c9cc3b53f9ab4ab23d1"
+    },
+    {
+      "path": "cases/result-key-zero.json",
+      "bytes": 910,
+      "sha256": "61e2eb09fa20c7aa0cbc16ffbac04192b9b81cd1e372a0120a2985f82c3f4e53"
+    },
+    {
+      "path": "cases/result-nan.json",
+      "bytes": 863,
+      "sha256": "ae2fb349861af7cb117c2cc384260b9fbe96268ea0863462d0513cb474d37ece"
+    },
+    {
+      "path": "cases/sandbox-_G.json",
+      "bytes": 1053,
+      "sha256": "8a52f0fe4aff6536e994196842a07a739f4e87e7effdd411559bcf095ea7679f"
+    },
+    {
+      "path": "cases/sandbox-base-allowed.json",
+      "bytes": 972,
+      "sha256": "dbcc93f3db9248467294b1b798f217264865a509f5daf62767ce1ec78df23f6f"
+    },
+    {
+      "path": "cases/sandbox-collectgarbage.json",
+      "bytes": 1077,
+      "sha256": "a01650f9d1cab52ac25d16c67b42f362db0b440f9b482a492fa37ecc1d8db773"
+    },
+    {
+      "path": "cases/sandbox-coroutine.json",
+      "bytes": 1067,
+      "sha256": "4d9914e93b48b84349a08a312763219704627b4ae5204a42a363a715b904ff47"
+    },
+    {
+      "path": "cases/sandbox-debug.json",
+      "bytes": 1059,
+      "sha256": "a3b0f060e26e311e337567d351723ba58d8e9fdd1b7ad1926d268923096cb89d"
+    },
+    {
+      "path": "cases/sandbox-dofile.json",
+      "bytes": 1061,
+      "sha256": "e9388c20fa0adc770d963c761265e3eaf1f2fe4ffe47b0a8339f87d708b9703d"
+    },
+    {
+      "path": "cases/sandbox-getmetatable.json",
+      "bytes": 1073,
+      "sha256": "3f62eb4ccd9ee4ddcc9f698c9b4554d5b8cce51089cd2a7656f80f449526b3ff"
+    },
+    {
+      "path": "cases/sandbox-io.json",
+      "bytes": 1053,
+      "sha256": "7d384d0076164c3279edc810cef9b23564f564353b427cbee69e49e4085cfeca"
+    },
+    {
+      "path": "cases/sandbox-load.json",
+      "bytes": 1057,
+      "sha256": "48e8b464b90456ac43aacc80d36fa199dbe0955ba4fdc33fe88deab62e90e30f"
+    },
+    {
+      "path": "cases/sandbox-loadfile.json",
+      "bytes": 1065,
+      "sha256": "39a0da192175602e06c4247e47a5635bc68070a2ae612d7e7a8fa85d2b51e007"
+    },
+    {
+      "path": "cases/sandbox-math-random.json",
+      "bytes": 1071,
+      "sha256": "adedfafff220dc30827c84f53f80cf7bc90e43cb024568750c2c3c5bddf42882"
+    },
+    {
+      "path": "cases/sandbox-math-randomseed.json",
+      "bytes": 1079,
+      "sha256": "5dd869b9c954c259a24746e39616cd8a8722ee4c170b5c9af9e89b85cccd8139"
+    },
+    {
+      "path": "cases/sandbox-next.json",
+      "bytes": 1057,
+      "sha256": "37e50faf295177fa72764cfbb896b5ad9b89c28c867fde05b416113318dd288a"
+    },
+    {
+      "path": "cases/sandbox-os.json",
+      "bytes": 1053,
+      "sha256": "bafd104c971b013d4498aaba7a5a03e5a41ec04a6e53c3a816af00ff350422e2"
+    },
+    {
+      "path": "cases/sandbox-package.json",
+      "bytes": 1063,
+      "sha256": "748bd6e3465d1d5dffce815dd2dcfc3f60793683edb22475dc41d0ed059ac80d"
+    },
+    {
+      "path": "cases/sandbox-pairs.json",
+      "bytes": 1059,
+      "sha256": "ca1ed44b38c89ca2709354a597044327bc5215b4f9f7114ac73f435485590743"
+    },
+    {
+      "path": "cases/sandbox-pcall.json",
+      "bytes": 1059,
+      "sha256": "63c606cfadd10829b178564a7f754846fc1fa5b99c8d9795a28a805c0b66e4e3"
+    },
+    {
+      "path": "cases/sandbox-print.json",
+      "bytes": 1059,
+      "sha256": "0515eb8ef2e30c2bcf1175762aae2c0a836dcf8a41733eaa178d9848e6a81c26"
+    },
+    {
+      "path": "cases/sandbox-rawequal.json",
+      "bytes": 1065,
+      "sha256": "242bb1d1bc141aa94373a1ca0aafe6bc76de78d1af54e34bc5280fccfa2f5c38"
+    },
+    {
+      "path": "cases/sandbox-rawget.json",
+      "bytes": 1061,
+      "sha256": "47dfc36cecd01e50bbf712edffb9e09604ff59a6d0af1de00dd47bfa029d904c"
+    },
+    {
+      "path": "cases/sandbox-rawset.json",
+      "bytes": 1061,
+      "sha256": "6a4a92486e3701a58e49d3c9fe1b1b3fb0df460beb5cdd37baf434f993c4cc50"
+    },
+    {
+      "path": "cases/sandbox-require.json",
+      "bytes": 1063,
+      "sha256": "06c1bd8a440a6bc7408e7bfbf13b7d1cbe9f993e54170fa95dd68545610af208"
+    },
+    {
+      "path": "cases/sandbox-setmetatable.json",
+      "bytes": 1073,
+      "sha256": "ed3916855ae0ee4a4ebc647746202d2f09bd9983e6bfe1582b5401405f6de5b4"
+    },
+    {
+      "path": "cases/sandbox-string.json",
+      "bytes": 1061,
+      "sha256": "9f867ea411ac8c497f91532af808100f5b8032bdaf8bfe0f74ae78eb8437415f"
+    },
+    {
+      "path": "cases/sandbox-table.json",
+      "bytes": 1059,
+      "sha256": "875f2fd3ab151af1c1d2fe266918a270f49e09f25d47bd0b9ee5dff6d43bc313"
+    },
+    {
+      "path": "cases/sandbox-utf8.json",
+      "bytes": 1057,
+      "sha256": "7c33aa05c2a907f0f42193d0945e3a7eeae5d23717a557aaefa02635d46a2edf"
+    },
+    {
+      "path": "cases/sandbox-warn.json",
+      "bytes": 1057,
+      "sha256": "a23a7e11cfba8d170b84634e0d845187b7a58da39d47179ebe5c8e875fbd2fd6"
+    },
+    {
+      "path": "cases/sandbox-xpcall.json",
+      "bytes": 1061,
+      "sha256": "1e5deb843c6dd633f39a29740036684f78119aef540a7fb274a02997831c301e"
+    },
+    {
+      "path": "cases/scalar-tostring.json",
+      "bytes": 1125,
+      "sha256": "1de11a84196b923882f9f41c800428c8ae1a335dfd2acd80c62d3ef055555046"
+    },
+    {
+      "path": "cases/shape-array-data.json",
+      "bytes": 938,
+      "sha256": "3804e4942a0fb3b15c10443b883ce5568f8ee61e3f9b08f644e24de310644be1"
+    },
+    {
+      "path": "cases/shape-extra-field.json",
+      "bytes": 940,
+      "sha256": "b81f381733648f74508fe1e56b468b55ee11794c402d82d548cbd26084ffb081"
+    },
+    {
+      "path": "cases/shape-map-commands.json",
+      "bytes": 942,
+      "sha256": "8e38f072834dcc704779eb80e0e695c18c35561b9d09b1b951660fd30326446b"
+    },
+    {
+      "path": "cases/shape-missing-commands.json",
+      "bytes": 950,
+      "sha256": "0360b93fd9e5e460d7d34f61321cabe10be4e6f6c9157214a70957ce3da26371"
+    },
+    {
+      "path": "cases/shape-missing-data.json",
+      "bytes": 942,
+      "sha256": "4b1f8f51603ff738f65d9f8feb9276fe8d135dfe15b73b99cc5a2ad74af4b46c"
+    },
+    {
+      "path": "cases/shape-nil-return.json",
+      "bytes": 938,
+      "sha256": "10b9c614b4122c3ac1763f7e53b3099498c4a5fd85f4a07fc3dd25e1cf69e0da"
+    },
+    {
+      "path": "cases/shape-scalar-data.json",
+      "bytes": 940,
+      "sha256": "e94f51930119888d0443595fcc609329472e5679ab922a735df33f5f6a9db344"
+    },
+    {
+      "path": "cases/shape-scalar-return.json",
+      "bytes": 944,
+      "sha256": "f26dc0a5d695847e7359687fd69ea7f24e6d2bb06951a81083dce739415f3fef"
+    },
+    {
+      "path": "cases/shared-dag-is-not-cycle.json",
+      "bytes": 1181,
+      "sha256": "171443e7d1707b23fb571d8fe11f4a65143a8492eeb03cf7e3254f27a58c4b73"
+    },
+    {
+      "path": "cases/source-over-256k.json",
+      "bytes": 886,
+      "sha256": "24fde62ed568a5ceed355478500fc992b8200315544495bd9298fd7ef66889ad"
+    },
+    {
+      "path": "cases/sparse-table.json",
+      "bytes": 879,
+      "sha256": "15db54a2da9dfa4c84f216f6fcaf634aca47ba515b5740afd6ff736584572347"
+    },
+    {
+      "path": "cases/state-byte-budget.json",
+      "bytes": 1085,
+      "sha256": "7c8aa78e1f0206cdea1387d1c6f837f082b03a07d494d29f9755c4f210bc1c4d"
+    },
+    {
+      "path": "cases/stored-bad-number-length.json",
+      "bytes": 458,
+      "sha256": "485fd3abb190bfabe2ff6ce4a3f44f694f06ebdb60e7abacae26b02f11472895"
+    },
+    {
+      "path": "cases/stored-extra-field.json",
+      "bytes": 454,
+      "sha256": "f3297ea6310aa1d7d468fa05ca6c69dbc30f78c52e46fa733410fa13d89865b8"
+    },
+    {
+      "path": "cases/stored-nonfinite.json",
+      "bytes": 473,
+      "sha256": "13e99e28256567c505fa1e7eb33392f8cf0449b32e8da7de446114ac42ad9bab"
+    },
+    {
+      "path": "cases/stored-unknown-type.json",
+      "bytes": 459,
+      "sha256": "386a89c7016a8675dcdd62ae663567e7159ca7a87f8afd132b355f78ac61a98c"
+    },
+    {
+      "path": "cases/stored-uppercase-bits.json",
+      "bytes": 470,
+      "sha256": "a5c57fb1492afa01a8d4536f6fe8049530deb3478d2e4b9868008dd0d6f971a6"
+    },
+    {
+      "path": "cases/syntax-error.json",
+      "bytes": 1015,
+      "sha256": "83aa7256f472135367777b418fac9e20e53a1e8eb3431d10c30de5542ecaf2f2"
+    },
+    {
+      "path": "cases/tostring-table-refused.json",
+      "bytes": 906,
+      "sha256": "11409416fe345bd746d617473fc9fbabe767965871704c814ed3b292b11c92fc"
+    },
+    {
+      "path": "cases/validate-64.json",
+      "bytes": 2012,
+      "sha256": "09a41e0e23947fac2717b5ad35da046ae02755f51eb90877348fac3f2f7fe0db"
+    },
+    {
+      "path": "cases/validate-65.json",
+      "bytes": 2193,
+      "sha256": "72908d2cf0e234023ea005bdea3c8f33e2d5a887ad81164daf5ecc15cfe0dd8f"
+    },
+    {
+      "path": "cases/validate-missing.json",
+      "bytes": 1054,
+      "sha256": "9cba605f6478ddcd4530559fc7fad949a9b980218cf055533705543adf528c47"
+    },
+    {
+      "path": "cases/validate-present.json",
+      "bytes": 888,
+      "sha256": "814a0f97720264b6b101b797337458ae105eac4e73b14428c93f0fcdc1cb6be7"
+    },
+    {
+      "path": "cases/wire-collection-overflow.json",
+      "bytes": 390,
+      "sha256": "da283e1a5387146111ec80ba69d1f4c3fb70c2777c549a48f448c336613bab8f"
+    },
+    {
+      "path": "cases/wire-depth31.json",
+      "bytes": 11841,
+      "sha256": "f0962494f36ae3161d523a2862e28a036a0f9bebe28548edce64ee88c57aa52e"
+    },
+    {
+      "path": "cases/wire-depth32.json",
+      "bytes": 369,
+      "sha256": "c151f9eeedbc577496a8d8a923651a6c0cc3f040670abcf492511a20989f591d"
+    },
+    {
+      "path": "cases/wire-duplicate-key.json",
+      "bytes": 372,
+      "sha256": "cf0e438230d11bf9b60da7bf483a066905f67661bfd40d835b2a7e140cc6f628"
+    },
+    {
+      "path": "cases/wire-empty-array.json",
+      "bytes": 337,
+      "sha256": "24295996fbc022799e17ddd015c33790124e746e00ed594bd4d21dca2612acdd"
+    },
+    {
+      "path": "cases/wire-empty-map.json",
+      "bytes": 334,
+      "sha256": "fda32061f435e1435db548734a5f9898f99d3e0efae69713aaf2e80e13c011dc"
+    },
+    {
+      "path": "cases/wire-infinite-double.json",
+      "bytes": 372,
+      "sha256": "eb35b1a7da22fa6ab9d5fe6d3517b07245fe6217640b8d6fa70e653a2e0af961"
+    },
+    {
+      "path": "cases/wire-int64-min.json",
+      "bytes": 353,
+      "sha256": "3447e88ec388324655bd48cabdb7050d330e32ea66201d2f7da012a128b0ee41"
+    },
+    {
+      "path": "cases/wire-invalid-tag.json",
+      "bytes": 366,
+      "sha256": "b1f3c8dddc3e249586e9f57a602cd17a11614f8c3c43fb09d5d24426bdade353"
+    },
+    {
+      "path": "cases/wire-invalid-utf8.json",
+      "bytes": 371,
+      "sha256": "de5b354fa88d0f8d54ec71077700ce33a0aeedc9ef991e5e49be4daa838775df"
+    },
+    {
+      "path": "cases/wire-negative-zero.json",
+      "bytes": 358,
+      "sha256": "987c48557a669f06ffeb3cbbdbb50001b0d2c920c61042ce7a08a8972a8e0daa"
+    },
+    {
+      "path": "cases/wire-trailing.json",
+      "bytes": 363,
+      "sha256": "ca7a671838ae4ae41fe585af4425d9efd46a9736318c7c6d0b6425aad22c05fd"
+    },
+    {
+      "path": "cases/wire-truncated-integer.json",
+      "bytes": 376,
+      "sha256": "db09ce475e3f3d21f25ec8b97800a3dd391bbda6fb8e73fff3a1895631a464f7"
+    },
+    {
+      "path": "cases/wire-truncated-string.json",
+      "bytes": 374,
+      "sha256": "2d8a9658b270d788dbcc2db7bf134db1ac177e754039125ee4400a09389ccedb"
+    },
+    {
+      "path": "lua/allocation-bound-refusal.lua",
+      "bytes": 109,
+      "sha256": "ffefa5c0290db91ecdcd7402cd730efad33ed535463d4e6c3d17a1ded1428e82"
+    },
+    {
+      "path": "lua/argument-order-and-snapshot-copy.lua",
+      "bytes": 129,
+      "sha256": "9b28ea364f0d7c179db36ed7fddfee0babe096d24f08f1d8d4b9b1164e40bf21"
+    },
+    {
+      "path": "lua/binary-chunk-refused.lua",
+      "bytes": 12,
+      "sha256": "9e46656d04d5ef3bdb99d1c544a92c2bf171da550eedb49c038bdc48f568cb94"
+    },
+    {
+      "path": "lua/canonical-map-key-order.lua",
+      "bytes": 78,
+      "sha256": "070e6bd3046ea5f4b0bd0f78396abee3c290d5303f2c3c0e6b3edf4146ff7e2a"
+    },
+    {
+      "path": "lua/commands-256.lua",
+      "bytes": 116,
+      "sha256": "8526701abe0a7910b38fe473cc90bf9139497871c65426cad41fa66a66da6ffd"
+    },
+    {
+      "path": "lua/commands-257.lua",
+      "bytes": 112,
+      "sha256": "b0afb27fa5f3f002193784bc941b87045ca0a538815db2c786aaf27a92e8583f"
+    },
+    {
+      "path": "lua/commands-remain-untrusted-values.lua",
+      "bytes": 102,
+      "sha256": "e0d80bb688e624861cd9c954d13fe82ce4177668759687d7dede6d4c39eabd00"
+    },
+    {
+      "path": "lua/cumulative-churn-default-allocation-cap.lua",
+      "bytes": 186,
+      "sha256": "13b381e8a9943246ae755e51c05fbeb686960adc037ae21836be2079a9fabce1"
+    },
+    {
+      "path": "lua/cumulative-churn-source-allowed-64m.lua",
+      "bytes": 186,
+      "sha256": "13b381e8a9943246ae755e51c05fbeb686960adc037ae21836be2079a9fabce1"
+    },
+    {
+      "path": "lua/cyclic-result.lua",
+      "bytes": 88,
+      "sha256": "b9722d658b7e985ee4679e827bdbf1937386b01dbe1abc9b8ce4839f3b0d2c90"
+    },
+    {
+      "path": "lua/empty-array-becomes-empty-map.lua",
+      "bytes": 66,
+      "sha256": "d4615fa395a9131c94ef790edc2781e55b39e658224005c7a7bf599c3c4b0718"
+    },
+    {
+      "path": "lua/empty-commands-map-coerces-array.lua",
+      "bytes": 67,
+      "sha256": "efb3551c8601eb9a9527c507e924aa794a97faccd117d4cf79a528d55052f08b"
+    },
+    {
+      "path": "lua/explicit-error.lua",
+      "bytes": 62,
+      "sha256": "5a6c15a1dd8bc97e128f6ce7251ef347e141c7adaf8df02a60e7cd5d4fad59a2"
+    },
+    {
+      "path": "lua/explicit-state-fresh-vm.lua",
+      "bytes": 167,
+      "sha256": "a56ffd61dc9aeac7bca134b1a894c09ba6f95ee077a5315d6bfe1514f40b1aea"
+    },
+    {
+      "path": "lua/handler-length-81.lua",
+      "bytes": 66,
+      "sha256": "d4615fa395a9131c94ef790edc2781e55b39e658224005c7a7bf599c3c4b0718"
+    },
+    {
+      "path": "lua/instruction-default-callback.lua",
+      "bytes": 56,
+      "sha256": "1f23b1620a5cbac288612849920e91f4e33781955609397fc6738def2d838100"
+    },
+    {
+      "path": "lua/instruction-default-top-level.lua",
+      "bytes": 17,
+      "sha256": "c473eb52fc69fb0c07e52cb026acf8381d9eab08940e6df4be7d84f73c9121aa"
+    },
+    {
+      "path": "lua/instruction-hook-rounds-up.lua",
+      "bytes": 56,
+      "sha256": "1f23b1620a5cbac288612849920e91f4e33781955609397fc6738def2d838100"
+    },
+    {
+      "path": "lua/invalid-handler-name.lua",
+      "bytes": 66,
+      "sha256": "d4615fa395a9131c94ef790edc2781e55b39e658224005c7a7bf599c3c4b0718"
+    },
+    {
+      "path": "lua/limits-allocation-below-heap.lua",
+      "bytes": 66,
+      "sha256": "d4615fa395a9131c94ef790edc2781e55b39e658224005c7a7bf599c3c4b0718"
+    },
+    {
+      "path": "lua/limits-allocation-large.lua",
+      "bytes": 66,
+      "sha256": "d4615fa395a9131c94ef790edc2781e55b39e658224005c7a7bf599c3c4b0718"
+    },
+    {
+      "path": "lua/limits-heap-large.lua",
+      "bytes": 66,
+      "sha256": "d4615fa395a9131c94ef790edc2781e55b39e658224005c7a7bf599c3c4b0718"
+    },
+    {
+      "path": "lua/limits-heap-small.lua",
+      "bytes": 66,
+      "sha256": "d4615fa395a9131c94ef790edc2781e55b39e658224005c7a7bf599c3c4b0718"
+    },
+    {
+      "path": "lua/limits-instructions-large.lua",
+      "bytes": 66,
+      "sha256": "d4615fa395a9131c94ef790edc2781e55b39e658224005c7a7bf599c3c4b0718"
+    },
+    {
+      "path": "lua/limits-instructions-small.lua",
+      "bytes": 66,
+      "sha256": "d4615fa395a9131c94ef790edc2781e55b39e658224005c7a7bf599c3c4b0718"
+    },
+    {
+      "path": "lua/limits-output-large.lua",
+      "bytes": 66,
+      "sha256": "d4615fa395a9131c94ef790edc2781e55b39e658224005c7a7bf599c3c4b0718"
+    },
+    {
+      "path": "lua/limits-output-zero.lua",
+      "bytes": 66,
+      "sha256": "d4615fa395a9131c94ef790edc2781e55b39e658224005c7a7bf599c3c4b0718"
+    },
+    {
+      "path": "lua/lossless-scalars-and-types.lua",
+      "bytes": 66,
+      "sha256": "d4615fa395a9131c94ef790edc2781e55b39e658224005c7a7bf599c3c4b0718"
+    },
+    {
+      "path": "lua/mixed-table.lua",
+      "bytes": 86,
+      "sha256": "9ecca6b28cd435dcb500605e3ee07f171badcda9fa82995d14a574605f01a225"
+    },
+    {
+      "path": "lua/module-missing-handler.lua",
+      "bytes": 9,
+      "sha256": "7df8f0cd9e1cd0b204a760783671c0ccca4a3258dc7c51f59e9e2295c6c25315"
+    },
+    {
+      "path": "lua/module-nonfunction-handler.lua",
+      "bytes": 19,
+      "sha256": "729957f1049d66d99d4ffc720398578fd5d0e30d08d46197aa1b157f03d48f46"
+    },
+    {
+      "path": "lua/module-scalar.lua",
+      "bytes": 8,
+      "sha256": "486d9affb60dbb0063b03d8e23a6ccf6364ce203dc3a9f56f20e750eb41ecade"
+    },
+    {
+      "path": "lua/modules-bad-name-type.lua",
+      "bytes": 795,
+      "sha256": "2841264cd6324b8ab8c61b79256ac4532f74060df2d1e17d9e9a2abf1ddd9f6a"
+    },
+    {
+      "path": "lua/modules-closed-cache.lua",
+      "bytes": 906,
+      "sha256": "41bb433f413fb453de98c9f1f67889816f19c104637220363fdea63f0aad484b"
+    },
+    {
+      "path": "lua/modules-cyclic.lua",
+      "bytes": 885,
+      "sha256": "dcda64fa1229789aae9dbc66d76810c6520b42e1b1c4f418c99452ba0332f9d6"
+    },
+    {
+      "path": "lua/modules-nontable.lua",
+      "bytes": 796,
+      "sha256": "dd6eb567da3c74321314d59c478680f5dff55d82abc55b86f89a9d5b70102178"
+    },
+    {
+      "path": "lua/modules-undeclared.lua",
+      "bytes": 815,
+      "sha256": "f6692bff24491da3ebb26e2b18c0f0b526ddb822d43c1c0ba89f117bec2c85f6"
+    },
+    {
+      "path": "lua/nonstring-error-fallback.lua",
+      "bytes": 48,
+      "sha256": "3ab5e7dd8bd1467622b7dd85557262d0a6bee443c5afb3e4ff0ddcb9dc764b40"
+    },
+    {
+      "path": "lua/null-array-hole-is-sparse.lua",
+      "bytes": 66,
+      "sha256": "d4615fa395a9131c94ef790edc2781e55b39e658224005c7a7bf599c3c4b0718"
+    },
+    {
+      "path": "lua/null-array-tail-disappears.lua",
+      "bytes": 66,
+      "sha256": "d4615fa395a9131c94ef790edc2781e55b39e658224005c7a7bf599c3c4b0718"
+    },
+    {
+      "path": "lua/null-map-member-disappears.lua",
+      "bytes": 66,
+      "sha256": "d4615fa395a9131c94ef790edc2781e55b39e658224005c7a7bf599c3c4b0718"
+    },
+    {
+      "path": "lua/numeric-integral-key-dense.lua",
+      "bytes": 88,
+      "sha256": "9449de4e1b8cfe5dc5b2fbedac97e951fa3a7ea8d393b6c33c6af76a946a99a9"
+    },
+    {
+      "path": "lua/ordered-ipairs-and-math.lua",
+      "bytes": 149,
+      "sha256": "95b266ef64b5322012045512271032c3a2f1aff0deb67225dd624c3a69ca44cf"
+    },
+    {
+      "path": "lua/output-budget-32.lua",
+      "bytes": 100,
+      "sha256": "dc6edf0b348122b85ccaef4ed3b4a209338c0e10cfa6ea0a0686efcdb8cb8b38"
+    },
+    {
+      "path": "lua/output-collection.lua",
+      "bytes": 107,
+      "sha256": "8575876da33378294e2157350a3fc030a075970a086aaa83093ead595e0e49ca"
+    },
+    {
+      "path": "lua/output-depth.lua",
+      "bytes": 109,
+      "sha256": "d8b320aff44bb98f1cce0dd0fa0c83bc3011c8bfa519f9d40609795ad4dbe6b6"
+    },
+    {
+      "path": "lua/pack-courier-contact-destination.lua",
+      "bytes": 2290,
+      "sha256": "7134b0c5633be2c742d9bcc3dc9768d1966dade002685060a6db3794b18de046"
+    },
+    {
+      "path": "lua/pack-courier-contact-in-flight.lua",
+      "bytes": 2290,
+      "sha256": "7134b0c5633be2c742d9bcc3dc9768d1966dade002685060a6db3794b18de046"
+    },
+    {
+      "path": "lua/pack-courier-contact-origin.lua",
+      "bytes": 2290,
+      "sha256": "7134b0c5633be2c742d9bcc3dc9768d1966dade002685060a6db3794b18de046"
+    },
+    {
+      "path": "lua/pack-courier-generate-empty.lua",
+      "bytes": 2290,
+      "sha256": "7134b0c5633be2c742d9bcc3dc9768d1966dade002685060a6db3794b18de046"
+    },
+    {
+      "path": "lua/pack-guiding-light-betrayed-suppresses-cues.lua",
+      "bytes": 5999,
+      "sha256": "24e60137dd70f34dff7c2807b6cf922e021993c6fd12276031f926aba9abe1d3"
+    },
+    {
+      "path": "lua/pack-guiding-light-ordered-receipts.lua",
+      "bytes": 5999,
+      "sha256": "24e60137dd70f34dff7c2807b6cf922e021993c6fd12276031f926aba9abe1d3"
+    },
+    {
+      "path": "lua/pack-navigation-confirm-cancel.lua",
+      "bytes": 1943,
+      "sha256": "b70f4ff91c34e80682d5b3016426e7ee47e19d6767b5a81e22671b68188cde10"
+    },
+    {
+      "path": "lua/pack-navigation-confirm-fit-before-cancel-branch.lua",
+      "bytes": 1943,
+      "sha256": "b70f4ff91c34e80682d5b3016426e7ee47e19d6767b5a81e22671b68188cde10"
+    },
+    {
+      "path": "lua/pack-navigation-confirm-lost.lua",
+      "bytes": 1943,
+      "sha256": "b70f4ff91c34e80682d5b3016426e7ee47e19d6767b5a81e22671b68188cde10"
+    },
+    {
+      "path": "lua/pack-navigation-confirm-receive.lua",
+      "bytes": 1943,
+      "sha256": "b70f4ff91c34e80682d5b3016426e7ee47e19d6767b5a81e22671b68188cde10"
+    },
+    {
+      "path": "lua/pack-navigation-contact-flying.lua",
+      "bytes": 1943,
+      "sha256": "b70f4ff91c34e80682d5b3016426e7ee47e19d6767b5a81e22671b68188cde10"
+    },
+    {
+      "path": "lua/pack-navigation-contact-lost.lua",
+      "bytes": 1943,
+      "sha256": "b70f4ff91c34e80682d5b3016426e7ee47e19d6767b5a81e22671b68188cde10"
+    },
+    {
+      "path": "lua/pack-navigation-contact-sold.lua",
+      "bytes": 1943,
+      "sha256": "b70f4ff91c34e80682d5b3016426e7ee47e19d6767b5a81e22671b68188cde10"
+    },
+    {
+      "path": "lua/pack-navigation-contact-unconfirmed.lua",
+      "bytes": 1943,
+      "sha256": "b70f4ff91c34e80682d5b3016426e7ee47e19d6767b5a81e22671b68188cde10"
+    },
+    {
+      "path": "lua/pack-t01-accepted.lua",
+      "bytes": 381,
+      "sha256": "5c5c6ff45bf1c41dfd12d987e0d64d1ac5ed90731e3487798b8590f0c4c2ff5a"
+    },
+    {
+      "path": "lua/recursive-runtime-failure.lua",
+      "bytes": 86,
+      "sha256": "47662a5b65d149f4593a13c8bfb542aa8eb903c7ca7e0fd0934f193db38b5cee"
+    },
+    {
+      "path": "lua/result-function.lua",
+      "bytes": 83,
+      "sha256": "ec06556a17f43126d7c247ab030f26a7d8e0d63cfa7e1b433b9df99f09cf3dc0"
+    },
+    {
+      "path": "lua/result-infinity.lua",
+      "bytes": 72,
+      "sha256": "346691f803d0ce27a859886bd8ea7b41f3f23195e9f6c15ce6e70873e0fdc694"
+    },
+    {
+      "path": "lua/result-key-boolean.lua",
+      "bytes": 79,
+      "sha256": "a19b2f20095cb54eda2e80efb9e3ddd91677c6d6a36a47fcd1369c59daae0916"
+    },
+    {
+      "path": "lua/result-key-fraction.lua",
+      "bytes": 78,
+      "sha256": "5ae5f53e78c44888739cd08885a98a8fec6dd090f7ea7c0d9c04ad5f37039631"
+    },
+    {
+      "path": "lua/result-key-negative.lua",
+      "bytes": 77,
+      "sha256": "9588eee6281a1dcff71331184bf7d5d0f5e35a5518f8123ac6add401922f1c02"
+    },
+    {
+      "path": "lua/result-key-too-large.lua",
+      "bytes": 80,
+      "sha256": "43310a16a65bda0d4584c74f493b1211320284d1b041b4ede6e16a1aff898be1"
+    },
+    {
+      "path": "lua/result-key-zero.lua",
+      "bytes": 76,
+      "sha256": "831a2578ce6ab1a2b752e221513bd70cabf09b543977f114c043fd4cecd216b8"
+    },
+    {
+      "path": "lua/result-nan.lua",
+      "bytes": 72,
+      "sha256": "7f36f4b8b94907d7ab1e9b3cf8c34a926901e21b96be226a7b4e900bb3df13ba"
+    },
+    {
+      "path": "lua/sandbox-_G.lua",
+      "bytes": 83,
+      "sha256": "b6ede1a776080674ecaf981fa05b4aff545ae9ba5ce397db00d30335dccbda71"
+    },
+    {
+      "path": "lua/sandbox-base-allowed.lua",
+      "bytes": 190,
+      "sha256": "82c7a0a89014924b8ef503e80a9cfedb7bdf15e0aba563e6782983a6e6867ac9"
+    },
+    {
+      "path": "lua/sandbox-collectgarbage.lua",
+      "bytes": 95,
+      "sha256": "83cef04eb94641475f73edb74f6837732f0675ccdaea6c453162303100dfc863"
+    },
+    {
+      "path": "lua/sandbox-coroutine.lua",
+      "bytes": 90,
+      "sha256": "bc779f1c294814b125467ff754faed54160d56512bc51ab1a8ee29827f571661"
+    },
+    {
+      "path": "lua/sandbox-debug.lua",
+      "bytes": 86,
+      "sha256": "05d2788cbe0912129131ebcf922751f83fb36ffc942260f9065e65113817c1e4"
+    },
+    {
+      "path": "lua/sandbox-dofile.lua",
+      "bytes": 87,
+      "sha256": "dbc68461688948d73025b7f748953138b2ef581b24da83d07b1836931578e880"
+    },
+    {
+      "path": "lua/sandbox-getmetatable.lua",
+      "bytes": 93,
+      "sha256": "fb3a0e2d0d6b3b482f28233802daca324152fb7a8190c301b2cf057e2e568169"
+    },
+    {
+      "path": "lua/sandbox-io.lua",
+      "bytes": 83,
+      "sha256": "04c2e4f0538c991926c683b9805e110ac2d97f075ba8d672039198fa96aabb1f"
+    },
+    {
+      "path": "lua/sandbox-load.lua",
+      "bytes": 85,
+      "sha256": "71c0e75eac60a2599aac98bb84f76379c584e55b4d6a4742603f9160ad833db8"
+    },
+    {
+      "path": "lua/sandbox-loadfile.lua",
+      "bytes": 89,
+      "sha256": "a558c5140fee13a39a735e6bcd6e4cccb3ff7cc267241b3ca0ec04128f1aeb25"
+    },
+    {
+      "path": "lua/sandbox-math-random.lua",
+      "bytes": 92,
+      "sha256": "125d23f1b6f9366463dcc49c2adb2fede1235d6689ca6b7d07eff831aea876ec"
+    },
+    {
+      "path": "lua/sandbox-math-randomseed.lua",
+      "bytes": 96,
+      "sha256": "fc5dff3b2ea0aac508f7f4b54c16cac46cf6df330304ac8535bbcfba9d4d4817"
+    },
+    {
+      "path": "lua/sandbox-next.lua",
+      "bytes": 85,
+      "sha256": "5bc3fe2f75783da3c08e537d9bf2f16924bd6b01c80fe48a149c8467e2104f8c"
+    },
+    {
+      "path": "lua/sandbox-os.lua",
+      "bytes": 83,
+      "sha256": "9a8b04a373c1e0399a619f61fb9fbcc5e77fdfec06bcc70fb0708b43389648ce"
+    },
+    {
+      "path": "lua/sandbox-package.lua",
+      "bytes": 88,
+      "sha256": "daaad2a3006b226bf26cf25c54b2e672835f2f7150c1dc0a71537497fa6e1880"
+    },
+    {
+      "path": "lua/sandbox-pairs.lua",
+      "bytes": 86,
+      "sha256": "805bbfded6aacab7d42086fc019c0cec823bd72fa33ca5a75683c6c8094ee0a3"
+    },
+    {
+      "path": "lua/sandbox-pcall.lua",
+      "bytes": 86,
+      "sha256": "1a3b0193ccae36492d07a2365a0d2274d167a68bf67d58f8f356cbd285a8b591"
+    },
+    {
+      "path": "lua/sandbox-print.lua",
+      "bytes": 86,
+      "sha256": "2d56026d4a89405dbdea06ffd0bfb53cdaaea7aa9bf4d621f7733c39da724887"
+    },
+    {
+      "path": "lua/sandbox-rawequal.lua",
+      "bytes": 89,
+      "sha256": "34f0591c7257865a9e8f8b494af5bc7aa9b20b5433a137c74435f0e80c129e55"
+    },
+    {
+      "path": "lua/sandbox-rawget.lua",
+      "bytes": 87,
+      "sha256": "777b7feb1bcd11f5177bb09c4c93ac9c7f2988144b6ca1c6035a6acb644c7e2e"
+    },
+    {
+      "path": "lua/sandbox-rawset.lua",
+      "bytes": 87,
+      "sha256": "8571dbfa4501620afe327485654a7db141c390bcaf06966c930a1549e67c3e68"
+    },
+    {
+      "path": "lua/sandbox-require.lua",
+      "bytes": 88,
+      "sha256": "bc36477aa8285a25403e1975f5269f95e82587277ca8aa450c178e84fce38f8c"
+    },
+    {
+      "path": "lua/sandbox-setmetatable.lua",
+      "bytes": 93,
+      "sha256": "4e572c12bee89e30a2a5faf366bc6851dfd121c1e1496f7ecfd07d6d64509a62"
+    },
+    {
+      "path": "lua/sandbox-string.lua",
+      "bytes": 87,
+      "sha256": "a531ff1d1287e22f6bd7675f9863579931e24e68e9fecb49a793ca5de5547125"
+    },
+    {
+      "path": "lua/sandbox-table.lua",
+      "bytes": 86,
+      "sha256": "d9d0f5238f96667fa49fa7daf0831c28d3b50e68f49509974359223daab6cb34"
+    },
+    {
+      "path": "lua/sandbox-utf8.lua",
+      "bytes": 85,
+      "sha256": "dae819e39b2bfe5289b63bc6b2204d2cac3a7240d95cab3c1c8149a7bd41f139"
+    },
+    {
+      "path": "lua/sandbox-warn.lua",
+      "bytes": 85,
+      "sha256": "f17d292534c034e71bee0f5566d9152cabf5e0e6584af493d87fd737d9db842c"
+    },
+    {
+      "path": "lua/sandbox-xpcall.lua",
+      "bytes": 87,
+      "sha256": "3a8df145b7bdcb666cd3ce630a77bcb8d3ddbb81381695aea7cb904d09532c4d"
+    },
+    {
+      "path": "lua/scalar-tostring.lua",
+      "bytes": 132,
+      "sha256": "e33852807722ae1fd9ba3d121ed991487e672ce8a92b7eb5d91df0cf5e99b1ba"
+    },
+    {
+      "path": "lua/shape-array-data.lua",
+      "bytes": 68,
+      "sha256": "4923191183b53cc61d4b4281c8aed72c5fe8fbfe5c5e1fbdcc94180d2311d4cc"
+    },
+    {
+      "path": "lua/shape-extra-field.lua",
+      "bytes": 83,
+      "sha256": "25a39fbe3ae06317db7e147cb1ecd35801f7b7e4dd4c29200e2717d9b2f8ac15"
+    },
+    {
+      "path": "lua/shape-map-commands.lua",
+      "bytes": 74,
+      "sha256": "564d7dea568f7205c0eb36296cac636681309ee235c587b333be7a5a56aec2e5"
+    },
+    {
+      "path": "lua/shape-missing-commands.lua",
+      "bytes": 55,
+      "sha256": "3a1d382c6e8e066095ce3efe042fe94f090e987a18b51fab83238872772206e7"
+    },
+    {
+      "path": "lua/shape-missing-data.lua",
+      "bytes": 59,
+      "sha256": "868b1218dd9beaea423d0e2c2086cb5b57c335054980f1164ca3834b094ba22b"
+    },
+    {
+      "path": "lua/shape-nil-return.lua",
+      "bytes": 49,
+      "sha256": "846804556b868674881fdbe0e0d7bc55a6c36485ec3c8de6affff531de367af8"
+    },
+    {
+      "path": "lua/shape-scalar-data.lua",
+      "bytes": 66,
+      "sha256": "024fa42a74827c5968f184a0fd0ee8ce043c25a74e0ae68968303bfeb76e7d28"
+    },
+    {
+      "path": "lua/shape-scalar-return.lua",
+      "bytes": 47,
+      "sha256": "1595918821317afb528af42552942921dfe2bcbca75eec13cb2a46048447f77c"
+    },
+    {
+      "path": "lua/shared-dag-is-not-cycle.lua",
+      "bytes": 89,
+      "sha256": "c87894b809db8c60c0bc028338f02530bdf8ef5599074ee5146d049dfbea73c3"
+    },
+    {
+      "path": "lua/source-over-256k.lua",
+      "bytes": 262213,
+      "sha256": "d0c7cd8fdfde7d7ffa1df88b11c51205c0ce3dc6b926b73e6bbfc829828983d0"
+    },
+    {
+      "path": "lua/sparse-table.lua",
+      "bytes": 79,
+      "sha256": "971bf946ec774c9ea961252ab94f2497196f8be0b44e366aa527433df69c3239"
+    },
+    {
+      "path": "lua/state-byte-budget.lua",
+      "bytes": 109,
+      "sha256": "1f6aacd26fbb0733bbc386cc25e4595cdf99843b3dfdb54cf414df1ccccc1b42"
+    },
+    {
+      "path": "lua/syntax-error.lua",
+      "bytes": 12,
+      "sha256": "08d1774d7d2fd67d777b407dc561718f24a76963e71b1a7b266469b269429b5a"
+    },
+    {
+      "path": "lua/tostring-table-refused.lua",
+      "bytes": 81,
+      "sha256": "a1cf46defc34b3aa4be8f3527a860cac47df5cf377719c8182b6de9bc39e6af1"
+    },
+    {
+      "path": "lua/validate-64.lua",
+      "bytes": 66,
+      "sha256": "d4615fa395a9131c94ef790edc2781e55b39e658224005c7a7bf599c3c4b0718"
+    },
+    {
+      "path": "lua/validate-65.lua",
+      "bytes": 66,
+      "sha256": "d4615fa395a9131c94ef790edc2781e55b39e658224005c7a7bf599c3c4b0718"
+    },
+    {
+      "path": "lua/validate-missing.lua",
+      "bytes": 66,
+      "sha256": "d4615fa395a9131c94ef790edc2781e55b39e658224005c7a7bf599c3c4b0718"
+    },
+    {
+      "path": "lua/validate-present.lua",
+      "bytes": 66,
+      "sha256": "d4615fa395a9131c94ef790edc2781e55b39e658224005c7a7bf599c3c4b0718"
+    },
+    {
+      "path": "reference/LICENSE",
+      "bytes": 1071,
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+    },
+    {
+      "path": "reference/Sources/CLua/LICENSE.txt",
+      "bytes": 1071,
+      "sha256": "a38e88aeffd124e9403aab4635ae3c0285d8d84147caef2df6fdce1b4c2bc971"
+    },
+    {
+      "path": "reference/Sources/CLua/PROVENANCE.json",
+      "bytes": 9096,
+      "sha256": "a378356284f593e8a5729e21f94f7781519dc0c586e5f9a1d462f32c312a1873"
+    },
+    {
+      "path": "reference/Sources/CLua/lmem.c",
+      "bytes": 6245,
+      "sha256": "7a63908f22ac826f3eb6826bd106d4eed40a7df749da8a87c06713e980fad099"
+    },
+    {
+      "path": "reference/Sources/CLua/lstring.h",
+      "bytes": 2100,
+      "sha256": "11174f9fb1a140afb2bad7b44471add3d143eb4fa6f249614fd5958211831f9b"
+    },
+    {
+      "path": "reference/Sources/L337Core/MissionNativeBridge.swift",
+      "bytes": 90392,
+      "sha256": "69a7d21899a27ccd689831b15f272076d46dfd021ab93a75f34f71d981d6f6fa"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/Legal/Lua-LICENSE.txt",
+      "bytes": 1071,
+      "sha256": "a38e88aeffd124e9403aab4635ae3c0285d8d84147caef2df6fdce1b4c2bc971"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/generated-couriers/manifest.toml",
+      "bytes": 2271,
+      "sha256": "f4c2a1bb538f257a229cce4911c81c4471a0aa92b2d30fe1605959c0740407f6"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/generated-couriers/scripts/main.lua",
+      "bytes": 2290,
+      "sha256": "7134b0c5633be2c742d9bcc3dc9768d1966dade002685060a6db3794b18de046"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/guiding-light/manifest.toml",
+      "bytes": 5538,
+      "sha256": "6a35a4adc4d81b55c0a8ddfc61b5fbfdd014d34f87212f54c5a01d55b2316f68"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/guiding-light/scripts/main.lua",
+      "bytes": 5999,
+      "sha256": "24e60137dd70f34dff7c2807b6cf922e021993c6fd12276031f926aba9abe1d3"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-assembly-of-orbits/manifest.toml",
+      "bytes": 2733,
+      "sha256": "dd4d1326e388b5f17ed7a0072745180662679cbbbee2e0a704f8b3fe5c613f00"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-assembly-of-orbits/scripts/main.lua",
+      "bytes": 597,
+      "sha256": "fbac637d8248a1e4beb7915dbf23074372a37d004b919b9135a859602db738f0"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-bonded-freight/manifest.toml",
+      "bytes": 2982,
+      "sha256": "c8b08c9b1ee7e703b85a791f293f5c6af55ee90a226791bfd9c0ad03a2ba820e"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-bonded-freight/scripts/main.lua",
+      "bytes": 1881,
+      "sha256": "5610566f0078003d1a53b823a80bfbfa395479a60f96dc99f745e4ad93377a30"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-borrowed-voice/manifest.toml",
+      "bytes": 3015,
+      "sha256": "367c8ccbb2cdf537a81e9e548423d6d55fd1f46c516fe8c4f72248bc3a743c6a"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-borrowed-voice/scripts/main.lua",
+      "bytes": 693,
+      "sha256": "fe302d20b0dc58ba837a967cb2205068a06b437f07eec2a2f0d0b5f15fdaf6d1"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-cabin-journey/manifest.toml",
+      "bytes": 1763,
+      "sha256": "5ad860a6b7699895b8484e1d107f4e8d45546b845afd22631c239806f372c34e"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-cabin-journey/scripts/main.lua",
+      "bytes": 349,
+      "sha256": "c6e0140a8b2ef3597cf2d672207c28bd5bff7be3464490790393585fb68c78ff"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-cold-chain/manifest.toml",
+      "bytes": 1760,
+      "sha256": "c00c9ca31654cbca1343970141f50d9efa53ff615ffa3645fd872c4c979ac2ce"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-cold-chain/scripts/main.lua",
+      "bytes": 109,
+      "sha256": "f82376c0abfcf2fb2b8b2a4576287c2b73aea23f3ab3ed642b5538a618d792a4"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-consented-freight/manifest.toml",
+      "bytes": 2890,
+      "sha256": "8bb5f739bf3c4658d6709b20149c8adcce0e1f32a3c7a67da39c35db8d8a46d4"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-consented-freight/scripts/main.lua",
+      "bytes": 1581,
+      "sha256": "2eb7865a6990e7a4badcdc20d7ff83f09967a8f50222697b91ed0e8cb61b1c22"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-consented-survey/manifest.toml",
+      "bytes": 2804,
+      "sha256": "0a60028030e1423b2e0566dfe9484e7756c9c8fc332da4fec3a6267c156dc167"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-consented-survey/scripts/main.lua",
+      "bytes": 689,
+      "sha256": "3eeda0d3899b237a136cc78609ca758e5070793371aa2114e9c152c379f6ba79"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-corridor-defence/manifest.toml",
+      "bytes": 4159,
+      "sha256": "c0c223fbd8e427c81728ec75dcf3797183f90d80b596c0f77755a531f1213836"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-corridor-defence/scripts/main.lua",
+      "bytes": 3788,
+      "sha256": "9662def8245e917d011c1a47ef8acba0d2e7e5378a41d1cdee9ecf1877fc226f"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-custody-rescue/manifest.toml",
+      "bytes": 3345,
+      "sha256": "57327777d7752607bb2de5a1b0f6cb22f73e2292982fd4dacfb8204f849ada18"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-custody-rescue/scripts/main.lua",
+      "bytes": 708,
+      "sha256": "43a68f1139bf9eba95c706e7cfae3764a81eb5151244bd39b737255a42fc3fad"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-defensive-flight/manifest.toml",
+      "bytes": 2541,
+      "sha256": "9e1b675d9749b77262e55e79620c15e7cb9df5d42a1dc62d863cc6c2f13b0ba8"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-defensive-flight/scripts/main.lua",
+      "bytes": 476,
+      "sha256": "4486f6edc298142215ec78befc79b13461a6913ba7aa7a0e0ad7ab5771b5f7c4"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-field-relief/manifest.toml",
+      "bytes": 1692,
+      "sha256": "eafcdc767bcc71a7cf562c17b25098e01f97fb015ed0c44a053f720fb17ea0c9"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-field-relief/scripts/main.lua",
+      "bytes": 85,
+      "sha256": "7a18547f33810434c18f61b4ce08c8a3f49e149793195b3778e4f7dff5881864"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-flight-reception/manifest.toml",
+      "bytes": 1646,
+      "sha256": "1c26539b4f08a5a876850b90e719575c07d26391206e9873378db994162911d8"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-flight-reception/scripts/main.lua",
+      "bytes": 381,
+      "sha256": "5c5c6ff45bf1c41dfd12d987e0d64d1ac5ed90731e3487798b8590f0c4c2ff5a"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-glass-meridian/manifest.toml",
+      "bytes": 3258,
+      "sha256": "cf7154ba29e37fbc1cb9a432d7d5d9fa14d0f56de4c3875d403a3e3f977e56d6"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-glass-meridian/scripts/main.lua",
+      "bytes": 431,
+      "sha256": "dec782fa5bf17241d4450a56d6e663c6256feab5a84ba29f87ea8e87cdc9042c"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-hollow-manifest/manifest.toml",
+      "bytes": 5462,
+      "sha256": "d8365dfe9171f210859996c2293a6f9cee5b83e0aa8e0e65d955dd20acc4db0a"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-hollow-manifest/scripts/main.lua",
+      "bytes": 882,
+      "sha256": "29c808ee6dbf4758e908559ba8e6375bd3cd644b89e13f5dec1f216ce6fb2db8"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-identified-salvage/manifest.toml",
+      "bytes": 3200,
+      "sha256": "5078140248d3b65b6edc85d6d9fb37b77ebf305933e644b7315c9d81eae25a74"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-identified-salvage/scripts/main.lua",
+      "bytes": 692,
+      "sha256": "739a4686f710c007ac834d85dad6414da32fc7333193fae97eba8f76ea1f7511"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-induction-clinic/manifest.toml",
+      "bytes": 1233,
+      "sha256": "c11648961d7ae5b0b593ffabebe94d827450e99b653c7c9108b425699668bc6c"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-induction-clinic/scripts/main.lua",
+      "bytes": 109,
+      "sha256": "f82376c0abfcf2fb2b8b2a4576287c2b73aea23f3ab3ed642b5538a618d792a4"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-induction-crew-log/manifest.toml",
+      "bytes": 3619,
+      "sha256": "1eaaa253bb005b2927f42d5a78c36c92aaf2b171ca2145634ef22ec91b146bd4"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-induction-crew-log/scripts/main.lua",
+      "bytes": 765,
+      "sha256": "ee936260f102ea9655740065abf4f82908b67e124331d69187cd925bfe6038dc"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-induction-seed/manifest.toml",
+      "bytes": 1214,
+      "sha256": "9b99069cf87307ba2015fd490590a1b6f733dab574a4139d3ec012456d18bc41"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-induction-seed/scripts/main.lua",
+      "bytes": 109,
+      "sha256": "f82376c0abfcf2fb2b8b2a4576287c2b73aea23f3ab3ed642b5538a618d792a4"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-induction-utility/manifest.toml",
+      "bytes": 2386,
+      "sha256": "a21ef9789fa3dfdef795a6b6116dc84a8d96a4a48b82d5f4c4c1d9187f67ef69"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-induction-utility/scripts/main.lua",
+      "bytes": 726,
+      "sha256": "623ef205f5cd7f10a6754e56e7c47f7a703af76e6d93ac4947e7bf5bc7c81061"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-induction-workshop/manifest.toml",
+      "bytes": 1260,
+      "sha256": "ed17f9c0781cfd4e093bc4b0e197c9cc900652cf6a60304747ac94c53b701410"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-induction-workshop/scripts/main.lua",
+      "bytes": 83,
+      "sha256": "7415df3d856d88f781ad910a69880b8a988186ef96b61cb3627ebff0a1333433"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-isolation-work/manifest.toml",
+      "bytes": 1076,
+      "sha256": "fe63ad249e1a7a959db6549086a579d59b19499ff8d5171e29c56d733300249d"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-isolation-work/scripts/main.lua",
+      "bytes": 380,
+      "sha256": "676a74cde9ac2cb4c21e0cd463df7f9ee6d52dfe0e67f23a918b92344975bed4"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-isolation-work-source/manifest.toml",
+      "bytes": 2109,
+      "sha256": "de5c78dc3ffbfc6e612d741d1c5994f5bd7dfa0773c5fb9ab6e25bdf04958ea8"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-isolation-work-source/scripts/main.lua",
+      "bytes": 746,
+      "sha256": "5b3bf5517094242208715b93978f02b74166ca20061a77e7d81519d916dc9ab5"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-measured-extraction/manifest.toml",
+      "bytes": 1999,
+      "sha256": "eef6f2c60582f01157206792e7305aef37260e0bf7f7ec22ed1935b76da92d38"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-measured-extraction/scripts/main.lua",
+      "bytes": 508,
+      "sha256": "ba0685ec60e4f2a9c453252c853a2b77fc3055dec49625310c93e8b81173427d"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-memory-atlas/manifest.toml",
+      "bytes": 2636,
+      "sha256": "233511e3e1336d19bd1c9231272545a1292bf493d7405bcd16f64ede22a6622f"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-memory-atlas/scripts/main.lua",
+      "bytes": 630,
+      "sha256": "6b6efafbb9d6137098e2924973f7b91f47200fbe61a84105ed7d43ba52df078c"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-mutual-contribution/manifest.toml",
+      "bytes": 1757,
+      "sha256": "5f2c060764af41c5aeabeba25f71c1456c32bdfb1825774ef3eae4e502a03ec5"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-mutual-contribution/scripts/main.lua",
+      "bytes": 930,
+      "sha256": "aa9156b5acad4fd1c35deb1ba0e1fcc722881441c4386f43d65a9850400d52d5"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-navigation-trade/manifest.toml",
+      "bytes": 2872,
+      "sha256": "31d93d59496147301ac306f652e740175e5af653a77c7d2063cc970e5f09d478"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-navigation-trade/scripts/main.lua",
+      "bytes": 1943,
+      "sha256": "b70f4ff91c34e80682d5b3016426e7ee47e19d6767b5a81e22671b68188cde10"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-orbital-evacuation/manifest.toml",
+      "bytes": 1991,
+      "sha256": "d19a6f174fa6a6b92e731954394a21d0c716aaebf885481989f8578fe62adcda"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-orbital-evacuation/scripts/main.lua",
+      "bytes": 401,
+      "sha256": "f5999316b59e0cedbc91a8bd28fb9f67b143a69bc1774c6b4566405d5d3056a0"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-orbital-outlook/manifest.toml",
+      "bytes": 2980,
+      "sha256": "c02de836274decdb293d54229a12ab676948ef91898970880f0cf2d876d0f3e8"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-orbital-outlook/scripts/main.lua",
+      "bytes": 672,
+      "sha256": "62a29aa122e1d2f6f121aa5b4ee1be8534a63aa3361e3c20d691ad9140a776af"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-public-record/manifest.toml",
+      "bytes": 2861,
+      "sha256": "10b3968028ad67cd7aa8738750103910e60029783603a1d79e9a7c81e9428da9"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-public-record/scripts/main.lua",
+      "bytes": 635,
+      "sha256": "cb8c82f6f8a9df9676c71dd99742f675c78190c983bf34e06681295dc69a357f"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-quiet-choir/manifest.toml",
+      "bytes": 2698,
+      "sha256": "c8cc4cef754f24b61bc262f0a0fbe8196d91031057fecf28703622ea7ce675b6"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-quiet-choir/scripts/main.lua",
+      "bytes": 614,
+      "sha256": "60c1c8cca2ffe0f2bb14cc927f015a095b1e1c3860ac41ee24c9aa8f4027dbfe"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-record-recovery/manifest.toml",
+      "bytes": 3101,
+      "sha256": "d970f0c0482a1a727fa7e210e9acd20494096ad86b8ce31247a847a9d2134bf0"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-record-recovery/scripts/main.lua",
+      "bytes": 766,
+      "sha256": "99da582444ec33653cd242d50bd39e868a7a9a578835eb5c6687e4539ea7a5e9"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-repair-loop/manifest.toml",
+      "bytes": 1657,
+      "sha256": "09251440895d5bdc9dd01d350fbc937b616838ef37ef0ba5d476fe569e638250"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-repair-loop/scripts/main.lua",
+      "bytes": 85,
+      "sha256": "7a18547f33810434c18f61b4ce08c8a3f49e149793195b3778e4f7dff5881864"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-safe-gunnery/manifest.toml",
+      "bytes": 1989,
+      "sha256": "23a2d16b45005be0af5d127cbc344f0d735ad7768b3bbc0a4b6bfd3c520a66aa"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-safe-gunnery/scripts/main.lua",
+      "bytes": 531,
+      "sha256": "552744a2a6ce1f905ef9894b7b55e6b96c286e41ecca0ee663b83eb9729912c2"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-sealed-dispatch/manifest.toml",
+      "bytes": 2021,
+      "sha256": "a3f16e1166361eee11593c935d3636befe6d2e51f3e018c8c005bd01c48c61be"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-sealed-dispatch/scripts/main.lua",
+      "bytes": 2298,
+      "sha256": "3464531c1891c3fca2fc05cb5f20375f2f54cddb266d5f3176b8d3efaac8b3bd"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-seed-transfer/manifest.toml",
+      "bytes": 2049,
+      "sha256": "13b350f5e36697f106bcf8c2e2884ab4b2697b7af1640603934dc4d26f1b57b7"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-seed-transfer/scripts/main.lua",
+      "bytes": 109,
+      "sha256": "f82376c0abfcf2fb2b8b2a4576287c2b73aea23f3ab3ed642b5538a618d792a4"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-signed-passage/manifest.toml",
+      "bytes": 3027,
+      "sha256": "cd021318ebfe0951eab3d3013697c9f745a434cd8f4ec8c8568d793299c9fe9b"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-signed-passage/scripts/main.lua",
+      "bytes": 598,
+      "sha256": "69768637ce54385c22450d9b90f02e7a41efbf4ab939611908b909de11f30b0e"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-tithe-of-worlds/manifest.toml",
+      "bytes": 3980,
+      "sha256": "b19a24cf9171802487ae350c78cbb6823e8b5168e25bc7891ebee03e73e4b414"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-tithe-of-worlds/scripts/main.lua",
+      "bytes": 221,
+      "sha256": "8279601c2528e2ef16ecc3da55d0b19a733d6b31450d9d92f39f86a60aeb7f54"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-under-tow/manifest.toml",
+      "bytes": 2649,
+      "sha256": "35ad65273115189f0415bbbcb7d8e95664c0d39e954e582cc12697d89aff8dcf"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-under-tow/scripts/main.lua",
+      "bytes": 605,
+      "sha256": "a48b01984c5d43136b8d94dde9485685c47f517d16d09190cb191ab66879dc35"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-verified-warrant/manifest.toml",
+      "bytes": 3453,
+      "sha256": "b39e7f0ef17615c23f779153ec85d78ca53e94b2889fcc64b718e37b5455a94a"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-verified-warrant/scripts/main.lua",
+      "bytes": 3679,
+      "sha256": "2056d7c9086d2c428b4acfa278bfa18586ac3b2a213a8763081f17e052b42674"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-wayfarer-induction/manifest.toml",
+      "bytes": 2710,
+      "sha256": "51a47fe10fc6804259b5caff4c1825e46e2b716a784b961a1c83d23ffdcc2e76"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-wayfarer-induction/scripts/main.lua",
+      "bytes": 415,
+      "sha256": "a2df150539bc471814b1465f452f36415ffad739539d6ff98f213b7eb383153c"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-wayfarer-seed-ark/manifest.toml",
+      "bytes": 2952,
+      "sha256": "f6a53f7eff835c198ca7402b6fdcdf76ee0c575d0e51ea95e228d95712348559"
+    },
+    {
+      "path": "reference/Sources/L337Core/Resources/ScriptPacks/l337-wayfarer-seed-ark/scripts/main.lua",
+      "bytes": 722,
+      "sha256": "4373073ea7af24b0e9bade5880751dad22056c712701aca7ef3e5802a961867d"
+    },
+    {
+      "path": "reference/Sources/L337Core/ScriptDirector.swift",
+      "bytes": 83340,
+      "sha256": "a32e80d7bec0296c1500e55103545349a3a5631cde2cfb226640b4a952cd32d5"
+    },
+    {
+      "path": "reference/Sources/L337Core/ScriptEvaluator.swift",
+      "bytes": 3091,
+      "sha256": "89e05f0eb25b1558610cdc8db0e36d10be9f7a0e6788a939b26775a1d610c687"
+    },
+    {
+      "path": "reference/Sources/L337Core/ScriptEventContext.swift",
+      "bytes": 5866,
+      "sha256": "2aee658e1eebef394e231c78aa6eab3746d710f289fa21325376927452f5f020"
+    },
+    {
+      "path": "reference/Sources/L337Core/ScriptModules.swift",
+      "bytes": 2562,
+      "sha256": "3a84eb374589f9a02a98b8e4659b3509d09ba38a6223c775b6185c7bc6580ee2"
+    },
+    {
+      "path": "reference/Sources/L337Core/ScriptRuntime.swift",
+      "bytes": 5600,
+      "sha256": "c29a86ee8498d5c35c46b82b4783c1d100abb7a642515350115e98c64fc30894"
+    },
+    {
+      "path": "reference/Sources/L337Core/ScriptTransactions.swift",
+      "bytes": 15215,
+      "sha256": "9c6f2bbb98712c4d1116f3f284477475b84e6e037c98da5be9410484dc78fe13"
+    },
+    {
+      "path": "reference/Sources/L337Core/ScriptValue.swift",
+      "bytes": 6514,
+      "sha256": "c332722d7b01200defc6dca14abfbca76d6531117692356c95238bed9c4c0547"
+    },
+    {
+      "path": "reference/Sources/L337Core/ScriptValueStorage.swift",
+      "bytes": 8902,
+      "sha256": "4ac5139f353a578e4dafa5504eba943b2af0040ee4af2eff3740e26176af6141"
+    },
+    {
+      "path": "reference/Sources/MissionScript/MissionScript.c",
+      "bytes": 11648,
+      "sha256": "93f996598cca51bb5f325b2545ec5c835337420a048878b1788563b424c67192"
+    },
+    {
+      "path": "reference/Sources/MissionScript/include/MissionScript.h",
+      "bytes": 714,
+      "sha256": "67e53c89f590a69a04f51c094241e45313bf7d48c021b9e70335db669c158992"
+    },
+    {
+      "path": "reference/Tests/L337CoreTests/MissionNativeBridgeTests.swift",
+      "bytes": 67925,
+      "sha256": "21b82ac639d41add1bec5d0f783d89e81b4f2e560e2df54779f4cd674c568027"
+    },
+    {
+      "path": "reference/Tests/L337CoreTests/ScriptEvaluatorTests.swift",
+      "bytes": 4753,
+      "sha256": "b9af53734375e143c0ac73a2b438706fd93a8998a8e63f29ca767015aa055d08"
+    },
+    {
+      "path": "reference/Tests/L337CoreTests/ScriptEventHistoryTests.swift",
+      "bytes": 12899,
+      "sha256": "552bc0aa34359e53016008b1f8f4c809b11a06071b9715f68b0df241efb2b90f"
+    },
+    {
+      "path": "reference/Tests/L337CoreTests/ScriptValueStorageTests.swift",
+      "bytes": 15384,
+      "sha256": "a1544169cbdf3c7d0d4aacb8be4d2db5dce2ad2003af2fe3d2218e672593e670"
+    },
+    {
+      "path": "wire/wire-collection-overflow.bin",
+      "bytes": 5,
+      "sha256": "0734d2c8a4f74e9c04c1bcf2d90b34e51043d2e7963e28da1088e4c8a65b8610"
+    },
+    {
+      "path": "wire/wire-depth31.bin",
+      "bytes": 156,
+      "sha256": "b431803550160e1cb5ef8054ac0b7c234fc3d9ad0f1daae9880e595617ac251d"
+    },
+    {
+      "path": "wire/wire-depth32.bin",
+      "bytes": 161,
+      "sha256": "a91ad318f061376ada96e1706e4eee58ee4b8fd07ccf5ec2e86acb78c82416f9"
+    },
+    {
+      "path": "wire/wire-duplicate-key.bin",
+      "bytes": 17,
+      "sha256": "38682f2ee7562a3470d9829be994190acf7e42fed1fd81b726b304d748c59458"
+    },
+    {
+      "path": "wire/wire-empty-array.bin",
+      "bytes": 5,
+      "sha256": "b45482224b439a3d548c65378929b7dcc16a42288530b7b20d5c8103cc879d10"
+    },
+    {
+      "path": "wire/wire-empty-map.bin",
+      "bytes": 5,
+      "sha256": "e16ab60aa1eeb7074ca590e8a95bc4ce6264aa74f4f79359e580ede60b892bbe"
+    },
+    {
+      "path": "wire/wire-infinite-double.bin",
+      "bytes": 9,
+      "sha256": "52cafc688fd407885bcc5886e59a91025f0791b32a68098a203844044a8292a2"
+    },
+    {
+      "path": "wire/wire-int64-min.bin",
+      "bytes": 9,
+      "sha256": "b8b532b10ed59357afcf425b51ad45eec612f60ec77251160fb5622adad62bca"
+    },
+    {
+      "path": "wire/wire-invalid-tag.bin",
+      "bytes": 1,
+      "sha256": "a8100ae6aa1940d0b663bb31cd466142ebbdbd5187131b92d93818987832eb89"
+    },
+    {
+      "path": "wire/wire-invalid-utf8.bin",
+      "bytes": 6,
+      "sha256": "2ca01004010acb4d2034b08b9ae32d83ed84dcd854481d92cd6770f69f008745"
+    },
+    {
+      "path": "wire/wire-negative-zero.bin",
+      "bytes": 9,
+      "sha256": "a78e85468abe2fefc1c36a8278057b11574835a6940a2fcc5972f93e558dd838"
+    },
+    {
+      "path": "wire/wire-trailing.bin",
+      "bytes": 2,
+      "sha256": "96a296d224f285c67bee93c30f8a309157f0daa35dc5b87e410b78630a09cfc7"
+    },
+    {
+      "path": "wire/wire-truncated-integer.bin",
+      "bytes": 8,
+      "sha256": "35be322d094f9d154a8aba4733b8497f180353bd7ae7b0a15f90b586b549f28b"
+    },
+    {
+      "path": "wire/wire-truncated-string.bin",
+      "bytes": 5,
+      "sha256": "63cb7db7d8c0ef217b5e4bd8918f9a312551762a5129f21a747ebcf54297f0d4"
+    }
+  ],
+  "execution": "No Swift/Lua/Rust/compiler/native execution. Only fixture generation and independent source/hash/JSON integrity checks.",
+  "productionFilesChanged": [],
+  "next": "Root audits authored artifact; MC1 uses frozen expectations for its separate production packet. Review-ready other-author production packets take priority."
+}

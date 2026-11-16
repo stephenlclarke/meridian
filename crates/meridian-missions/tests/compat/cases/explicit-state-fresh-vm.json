@@ -1,0 +1,94 @@
+{
+  "id": "explicit-state-fresh-vm",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "on_event",
+    "source": "lua/explicit-state-fresh-vm.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "kind": {
+          "type": "string",
+          "value": "test"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "credits": {
+          "type": "integer",
+          "value": 1000
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {}
+    }
+  },
+  "expected": {
+    "status": "ok",
+    "data": {
+      "type": "object",
+      "value": {
+        "counter": {
+          "type": "integer",
+          "value": 1
+        }
+      }
+    },
+    "commands": [
+      {
+        "type": "object",
+        "value": {
+          "amount": {
+            "type": "integer",
+            "value": 2000
+          },
+          "op": {
+            "type": "string",
+            "value": "credits"
+          }
+        }
+      }
+    ]
+  },
+  "referencePaths": [
+    "Sources/L337Core/ScriptEvaluator.swift",
+    "Sources/L337Core/ScriptRuntime.swift",
+    "Tests/L337CoreTests/ScriptEvaluatorTests.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED",
+  "followup": {
+    "freshVM": true,
+    "stateFromPreviousData": true,
+    "expected": {
+      "data": {
+        "type": "object",
+        "value": {
+          "counter": {
+            "type": "integer",
+            "value": 2
+          }
+        }
+      },
+      "commands": [
+        {
+          "type": "object",
+          "value": {
+            "amount": {
+              "type": "integer",
+              "value": 2000
+            },
+            "op": {
+              "type": "string",
+              "value": "credits"
+            }
+          }
+        }
+      ]
+    },
+    "nativeEffect": "None: credits is an evaluator command value, not a granted operation."
+  }
+}

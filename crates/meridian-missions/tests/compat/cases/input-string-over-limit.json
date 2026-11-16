@@ -1,0 +1,22 @@
+{
+  "id": "input-string-over-limit",
+  "invocation": {
+    "operation": "wire_encode",
+    "value": {
+      "type": "string",
+      "value": "large"
+    },
+    "byteLimit": 2
+  },
+  "expected": {
+    "status": "error",
+    "error": {
+      "match": "exact",
+      "text": "Script string is too large."
+    }
+  },
+  "referencePaths": [
+    "Sources/L337Core/ScriptValue.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

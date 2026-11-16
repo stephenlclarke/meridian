@@ -1,0 +1,105 @@
+{
+  "id": "validate-64",
+  "invocation": {
+    "operation": "validate",
+    "handler": "on_event",
+    "source": "lua/validate-64.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "kind": {
+          "type": "string",
+          "value": "test"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "credits": {
+          "type": "integer",
+          "value": 1000
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {}
+    },
+    "declaredHandlers": [
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event",
+      "on_event"
+    ]
+  },
+  "expected": {
+    "status": "ok"
+  },
+  "referencePaths": [
+    "Sources/MissionScript/MissionScript.c",
+    "Sources/L337Core/ScriptEvaluator.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED",
+  "notes": "Evaluator validation only. Manifest duplicate-declaration checks are a separate pack-loader contract."
+}

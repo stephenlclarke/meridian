@@ -1,0 +1,21 @@
+{
+  "id": "input-nonfinite",
+  "invocation": {
+    "operation": "wire_encode",
+    "value": {
+      "type": "number",
+      "value": "7ff0000000000000"
+    }
+  },
+  "expected": {
+    "status": "error",
+    "error": {
+      "match": "exact",
+      "text": "Script numbers must be finite."
+    }
+  },
+  "referencePaths": [
+    "Sources/L337Core/ScriptValue.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

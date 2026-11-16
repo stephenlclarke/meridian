@@ -1,0 +1,52 @@
+{
+  "id": "cumulative-churn-source-allowed-64m",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "on_event",
+    "source": "lua/cumulative-churn-source-allowed-64m.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "kind": {
+          "type": "string",
+          "value": "test"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "credits": {
+          "type": "integer",
+          "value": 1000
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {}
+    },
+    "limitsOverride": {
+      "instructions": 1000000,
+      "allocationBytes": 67108864
+    }
+  },
+  "expected": {
+    "status": "ok",
+    "data": {
+      "type": "object",
+      "value": {
+        "last": {
+          "type": "integer",
+          "value": 8196
+        }
+      }
+    },
+    "commands": []
+  },
+  "referencePaths": [
+    "Sources/MissionScript/MissionScript.c"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED",
+  "notes": "Same executable source and8MiB heap with source-allowed64MiB cumulative cap. Positive comparator for allocation churn. All execution remains UNRUN; actual VM accounting/GC behavior must be reported, never inferred as a pass."
+}

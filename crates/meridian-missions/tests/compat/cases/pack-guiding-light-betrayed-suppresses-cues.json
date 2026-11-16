@@ -1,0 +1,83 @@
+{
+  "id": "pack-guiding-light-betrayed-suppresses-cues",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "transition",
+    "source": "lua/pack-guiding-light-betrayed-suppresses-cues.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "checkpoints": {
+          "type": "integer",
+          "value": 7
+        },
+        "cues": {
+          "type": "array",
+          "value": [
+            {
+              "type": "string",
+              "value": "hello"
+            }
+          ]
+        },
+        "receipts": {
+          "type": "array",
+          "value": [
+            {
+              "type": "string",
+              "value": "manifest"
+            },
+            {
+              "type": "string",
+              "value": "betrayed"
+            }
+          ]
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "provider": {
+          "type": "object",
+          "value": {
+            "betrayed": {
+              "type": "bool",
+              "value": true
+            }
+          }
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {}
+    }
+  },
+  "expected": {
+    "status": "ok",
+    "data": {
+      "type": "object",
+      "value": {}
+    },
+    "commands": [
+      {
+        "type": "object",
+        "value": {
+          "op": {
+            "type": "string",
+            "value": "journal.append"
+          },
+          "text": {
+            "type": "string",
+            "value": "Crimbo Dispatch: Native records identify a breach of this convoy contract. All unpaid rewards are void. Return any held relay to close its custody record."
+          }
+        }
+      }
+    ]
+  },
+  "referencePaths": [
+    "Sources/L337Core/Resources/ScriptPacks/guiding-light/scripts/main.lua"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

@@ -1,0 +1,71 @@
+{
+  "id": "pack-navigation-contact-unconfirmed",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "contact",
+    "source": "lua/pack-navigation-contact-unconfirmed.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "kind": {
+          "type": "string",
+          "value": "test"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "navigation_trade": {
+          "type": "object",
+          "value": {
+            "stage": {
+              "type": "string",
+              "value": "unconfirmed"
+            }
+          }
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {
+        "retained": {
+          "type": "integer",
+          "value": 7
+        }
+      }
+    }
+  },
+  "expected": {
+    "status": "ok",
+    "data": {
+      "type": "object",
+      "value": {
+        "retained": {
+          "type": "integer",
+          "value": 7
+        }
+      }
+    },
+    "commands": [
+      {
+        "type": "object",
+        "value": {
+          "id": {
+            "type": "string",
+            "value": "fit"
+          },
+          "op": {
+            "type": "string",
+            "value": "dialogue.offer"
+          }
+        }
+      }
+    ]
+  },
+  "referencePaths": [
+    "Sources/L337Core/Resources/ScriptPacks/l337-navigation-trade/scripts/main.lua"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

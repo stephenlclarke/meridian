@@ -1,0 +1,52 @@
+{
+  "id": "modules-closed-cache",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "on_event",
+    "source": "lua/modules-closed-cache.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "kind": {
+          "type": "string",
+          "value": "test"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "credits": {
+          "type": "integer",
+          "value": 1000
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {}
+    }
+  },
+  "expected": {
+    "status": "ok",
+    "data": {
+      "type": "object",
+      "value": {
+        "n": {
+          "type": "integer",
+          "value": 7
+        },
+        "same": {
+          "type": "bool",
+          "value": true
+        }
+      }
+    },
+    "commands": []
+  },
+  "referencePaths": [
+    "Sources/L337Core/ScriptModules.swift",
+    "Sources/MissionScript/MissionScript.c"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

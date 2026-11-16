@@ -1,0 +1,22 @@
+{
+  "id": "stored-unknown-type",
+  "invocation": {
+    "operation": "tagged_storage_decode",
+    "value": {
+      "type": "function",
+      "value": "x"
+    }
+  },
+  "expected": {
+    "status": "error",
+    "error": {
+      "match": "exact",
+      "text": "Unknown saved script value type."
+    }
+  },
+  "referencePaths": [
+    "Sources/L337Core/ScriptValueStorage.swift",
+    "Sources/L337Core/ScriptValue.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

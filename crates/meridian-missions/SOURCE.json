@@ -1,0 +1,163 @@
+{
+  "status": "AUTHOR_IMPLEMENTATION_COMPLETE_VALIDATION_PENDING_RUST_NATIVE_UNRUN",
+  "owner": "MC1; Root-only coordination; existing G1 compiler/native owner; G2 independent review",
+  "baseCommit": "a583b61e4e4536003414ee9f5448131744f62eb2",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "legacyTree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "references": [
+    {
+      "path": "Sources/L337Core/ScriptEvaluator.swift",
+      "bytes": 3091,
+      "sha256": "89e05f0eb25b1558610cdc8db0e36d10be9f7a0e6788a939b26775a1d610c687",
+      "gitBlob": "b6c8093603c7acc36dd532d96570c80e7e920594"
+    },
+    {
+      "path": "Sources/L337Core/ScriptRuntime.swift",
+      "bytes": 5600,
+      "sha256": "c29a86ee8498d5c35c46b82b4783c1d100abb7a642515350115e98c64fc30894",
+      "gitBlob": "8f537f816e8c06bc1adfe20c5878ddf7385b0b5c"
+    },
+    {
+      "path": "Sources/L337Core/MissionPack.swift",
+      "bytes": 7943,
+      "sha256": "daa1218f988b517cefc5ac4b160a86578a1fcee8a4ba04181d6ae55f0846b7fc",
+      "gitBlob": "8ad380b0a02beb4af6624b822775bc7499565b7d"
+    },
+    {
+      "path": "Sources/L337Core/MissionNativeBridge.swift",
+      "bytes": 90392,
+      "sha256": "69a7d21899a27ccd689831b15f272076d46dfd021ab93a75f34f71d981d6f6fa",
+      "gitBlob": "21cbb35f40d22c8c26aaa8e0ce7fa4462f90b83b"
+    },
+    {
+      "path": "Sources/L337Core/ScriptValue.swift",
+      "bytes": 6514,
+      "sha256": "c332722d7b01200defc6dca14abfbca76d6531117692356c95238bed9c4c0547",
+      "gitBlob": "46da592d10fadfdea6121ab98f583a1ba3e95bea"
+    },
+    {
+      "path": "Sources/L337Core/ScriptValueStorage.swift",
+      "bytes": 8902,
+      "sha256": "4ac5139f353a578e4dafa5504eba943b2af0040ee4af2eff3740e26176af6141",
+      "gitBlob": "180cd1d63fe3dd89d8855be3a35881978183644a"
+    },
+    {
+      "path": "Sources/L337Core/ScriptDirector.swift",
+      "bytes": 83340,
+      "sha256": "a32e80d7bec0296c1500e55103545349a3a5631cde2cfb226640b4a952cd32d5",
+      "gitBlob": "68f7f4d3d0b65e174c71b5738d089fa19a4afa89"
+    },
+    {
+      "path": "Sources/L337Core/ScriptEventContext.swift",
+      "bytes": 5866,
+      "sha256": "2aee658e1eebef394e231c78aa6eab3746d710f289fa21325376927452f5f020",
+      "gitBlob": "3c083cb2448e0b80db75a79a3db6bfd20058c3fc"
+    },
+    {
+      "path": "Sources/L337Core/ScriptPack.swift",
+      "bytes": 35503,
+      "sha256": "db59490e49cb168ba691a066cb051d0bff779c140e569c1d97bf6ef8c70522f2",
+      "gitBlob": "1da454c77d388e176868ec7a732ecb87cbf75c6e"
+    },
+    {
+      "path": "Sources/L337Core/ScriptModules.swift",
+      "bytes": 2562,
+      "sha256": "3a84eb374589f9a02a98b8e4659b3509d09ba38a6223c775b6185c7bc6580ee2",
+      "gitBlob": "0e4430570e67f434c6c58bf528416b32169a3bc2"
+    },
+    {
+      "path": "Sources/L337Core/ScriptTransactions.swift",
+      "bytes": 15215,
+      "sha256": "9c6f2bbb98712c4d1116f3f284477475b84e6e037c98da5be9410484dc78fe13",
+      "gitBlob": "58165b36c074b4e47714e2cd66496f04110c9ba6"
+    },
+    {
+      "path": "Sources/L337Core/ScriptMissionState.swift",
+      "bytes": 141398,
+      "sha256": "9799fac011ae66e6b4747144aa0689371afbe16d7028a860c0e5d2c1224dffb7",
+      "gitBlob": "9babb8e371252038e2cc390473f58ad578e5e35d"
+    },
+    {
+      "path": "Sources/L337Core/ScriptCommands.swift",
+      "bytes": 27669,
+      "sha256": "e3eb9748d56a94ee3bf4e6a8a6e19a9edd1e51a7b8fa2301884e8b166876044c",
+      "gitBlob": "8f3ec7c085e078eaff041e97776e02468ad24de2"
+    },
+    {
+      "path": "Sources/L337Core/ScriptPersistence.swift",
+      "bytes": 73279,
+      "sha256": "d41412006ef352ecaf6881f66467676e347ad42c86ad78e8732f72cad2c924ef",
+      "gitBlob": "e95c7344f53cb9e63d2a070735d34886aa6af5b7"
+    },
+    {
+      "path": "Sources/L337Core/PackValidation.swift",
+      "bytes": 9806,
+      "sha256": "ffa9b720daae1279e02b96190fa7c947028fe22090597578fb3fd98c2dcd37aa",
+      "gitBlob": "12a120afc006a54f6c59813820b5110eaf9520ed"
+    },
+    {
+      "path": "Sources/MissionScript/MissionScript.c",
+      "bytes": 11648,
+      "sha256": "93f996598cca51bb5f325b2545ec5c835337420a048878b1788563b424c67192",
+      "gitBlob": "4102417e642e487ebba7179e9d49056f7320d670"
+    },
+    {
+      "path": "Sources/MissionScript/include/MissionScript.h",
+      "bytes": 714,
+      "sha256": "67e53c89f590a69a04f51c094241e45313bf7d48c021b9e70335db669c158992",
+      "gitBlob": "316048d5e2d9ef165a2e173de75bc1f340761586"
+    },
+    {
+      "path": "Sources/CLua/PROVENANCE.json",
+      "bytes": 9096,
+      "sha256": "a378356284f593e8a5729e21f94f7781519dc0c586e5f9a1d462f32c312a1873",
+      "gitBlob": "1c042d74f1dc16235101b03bfde2a813db895b5e"
+    }
+  ],
+  "contentPrerequisite": {
+    "commit": "17c88a81b5446ca512cc8b4167995b27b480dc91",
+    "tree": "bfadb87db8cd8f6a16fdc7f62039d10c7a09c422",
+    "scope": "crates/meridian-mission-content/**",
+    "T01Definition": "l337.training/flight-reception",
+    "version": "1.0.0",
+    "legacyDigest": "bc01834e04f87816c8021b76fabe3d9b8f3af394ff8fcd420c4b7c3acf1350d4"
+  },
+  "corpus": {
+    "author": "G2; Root artifact audited",
+    "manifestSHA256": "3da46b069b5175fe5c5e4a9831fdac391c4de6b4bffe4259132c99800c9929d9",
+    "frozenInvocations": 139,
+    "payloadsVerified": 382,
+    "nativeModelScenarios": 15,
+    "execution": "All source-derived expectations remain unchanged; execution UNRUN"
+  },
+  "authoredTests": {
+    "frozenCompatibilityInvocations": 139,
+    "corpusIntegrity": 1,
+    "actualWorldControllerAndClosedModuleTests": 7,
+    "status": "UNRUN until existing owner execution"
+  },
+  "sourceChecks": {
+    "rustfmtParsing": "PASS after final formatting; no type-check/compile claimed",
+    "lockedCargoResolution": "PASS; actual Cargo1.99 metadata confirms only primary runtime member; exact local third-party dependency workspaces; no compilation/build scripts",
+    "corpusIntegrity": "PASS382payloads at exact frozen hash",
+    "modulePrelude": "PASS682bytes exactly match independent G2 frozen compiled prelude",
+    "notices": "52 resolved upstream package notices; registry originals authenticated,9EOF-only blank-line normalizations retain upstream+stored hashes and unchanged legal text",
+    "workspaceAudit": "PASS1member meridian-missions; root/shared manifest and lock unchanged"
+  },
+  "executionBinding": {
+    "sourceSHA": "UNRUN",
+    "sourceTree": "UNRUN",
+    "compilerPlatform": "UNRUN",
+    "LuaRuntime": "UNRUN",
+    "fixtureResults": "UNRUN",
+    "coverage": "UNRUN",
+    "required": "Exact composed commit/tree/lock, corpus manifest SHA, compiler/OS/backend, per-case result/errors/metrics/monotonic timings, actual World publish/failure/restore checks; no model scenario counted as native pass"
+  },
+  "scope": "Executable Lua evaluator/controller and T01 actual World preparation adapter; no current core/App/save/economy edits; no second simulation/native authority; no legacy-profile import",
+  "remaining": [
+    "Actual Rust/Clippy/corpus/native execution and independent review",
+    "Root shared workspace/lock and owned App/storage envelope wiring",
+    "Canonical native geometry/model resources and other native mission/command/board families",
+    "Full64mission and complete legacy persistence/extended Unicode manifest-parity acceptance are not claimed"
+  ]
+}

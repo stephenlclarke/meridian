@@ -1,0 +1,128 @@
+{
+  "id": "pack-guiding-light-ordered-receipts",
+  "invocation": {
+    "operation": "evaluate",
+    "handler": "transition",
+    "source": "lua/pack-guiding-light-ordered-receipts.lua",
+    "event": {
+      "type": "object",
+      "value": {
+        "checkpoints": {
+          "type": "integer",
+          "value": 5
+        },
+        "receipts": {
+          "type": "array",
+          "value": [
+            {
+              "type": "string",
+              "value": "manifest"
+            },
+            {
+              "type": "string",
+              "value": "ready"
+            }
+          ]
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "value": {
+        "provider": {
+          "type": "object",
+          "value": {
+            "betrayed": {
+              "type": "bool",
+              "value": false
+            },
+            "branch": {
+              "type": "string",
+              "value": "full"
+            }
+          }
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "value": {
+        "keep": {
+          "type": "integer",
+          "value": 1
+        }
+      }
+    }
+  },
+  "expected": {
+    "status": "ok",
+    "data": {
+      "type": "object",
+      "value": {
+        "keep": {
+          "type": "integer",
+          "value": 1
+        }
+      }
+    },
+    "commands": [
+      {
+        "type": "object",
+        "value": {
+          "op": {
+            "type": "string",
+            "value": "journal.append"
+          },
+          "text": {
+            "type": "string",
+            "value": "Santa: Manifest signed. Stay within eight kilometres while we make eighteen kilometres of route. Your relay has three lights to collect. There's no prize for bumping the sleigh."
+          }
+        }
+      },
+      {
+        "type": "object",
+        "value": {
+          "op": {
+            "type": "string",
+            "value": "journal.append"
+          },
+          "text": {
+            "type": "string",
+            "value": "Santa: All lights green and the timing checks out. Take that relay to Atisen's orbital dispatch desk. Safe passage, Commander."
+          }
+        }
+      },
+      {
+        "type": "object",
+        "value": {
+          "op": {
+            "type": "string",
+            "value": "journal.append"
+          },
+          "text": {
+            "type": "string",
+            "value": "Relay: First calibration light confirmed."
+          }
+        }
+      },
+      {
+        "type": "object",
+        "value": {
+          "op": {
+            "type": "string",
+            "value": "journal.append"
+          },
+          "text": {
+            "type": "string",
+            "value": "Relay: Third calibration light confirmed."
+          }
+        }
+      }
+    ]
+  },
+  "referencePaths": [
+    "Sources/L337Core/Resources/ScriptPacks/guiding-light/scripts/main.lua"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED",
+  "notes": "Receipt commands precede checkpoint commands; no invented payment or native receipt authority."
+}

@@ -1,0 +1,18 @@
+{
+  "id": "wire-trailing",
+  "invocation": {
+    "operation": "wire_decode",
+    "bytes": "wire/wire-trailing.bin"
+  },
+  "expected": {
+    "status": "error",
+    "error": {
+      "match": "exact",
+      "text": "Trailing script result bytes."
+    }
+  },
+  "referencePaths": [
+    "Sources/L337Core/ScriptValue.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}

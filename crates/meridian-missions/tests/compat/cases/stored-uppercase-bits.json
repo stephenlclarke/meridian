@@ -1,0 +1,22 @@
+{
+  "id": "stored-uppercase-bits",
+  "invocation": {
+    "operation": "tagged_storage_decode",
+    "value": {
+      "type": "number",
+      "value": "3FF0000000000000"
+    }
+  },
+  "expected": {
+    "status": "error",
+    "error": {
+      "match": "exact",
+      "text": "Invalid saved floating bits."
+    }
+  },
+  "referencePaths": [
+    "Sources/L337Core/ScriptValueStorage.swift",
+    "Sources/L337Core/ScriptValue.swift"
+  ],
+  "execution": "UNRUN_SOURCE_DERIVED"
+}
