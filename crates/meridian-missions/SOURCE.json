@@ -140,11 +140,11 @@
   },
   "sourceChecks": {
     "rustfmtParsing": "PASS after final formatting; no type-check/compile claimed",
-    "lockedCargoResolution": "PASS; actual Cargo1.99 metadata confirms only primary runtime member; exact local third-party dependency workspaces; no compilation/build scripts",
+    "lockedCargoResolution": "Prior isolated locked Cargo1.99 resolution PASS with one runtime member; dependency graph/manifests/lock unchanged by MC1. Root reports successful actual joined offline shared resolution; effective shared-lock notice closure is with Researcher. No compiler/build-script execution by MC1.",
     "corpusIntegrity": "PASS382payloads at exact frozen hash",
     "modulePrelude": "PASS682bytes exactly match independent G2 frozen compiled prelude",
     "notices": "52 resolved upstream package notices; registry originals authenticated,9EOF-only blank-line normalizations retain upstream+stored hashes and unchanged legal text",
-    "workspaceAudit": "PASS1member meridian-missions; root/shared manifest and lock unchanged"
+    "workspaceAudit": "Changed isolated copy of Root c3202f6 plus read-only Root manifests: original vendor tables retained, root members glob/exact excludes yielded four intended names under cargo metadata --no-deps --offline. No Root mutation, compiler or build scripts."
   },
   "executionBinding": {
     "sourceSHA": "UNRUN",
@@ -158,7 +158,7 @@
   "scope": "Executable Lua evaluator/controller and T01 actual World preparation adapter, bounded ordinary publication serializer and later native T01 transitions retaining original script state; no current core/App/save/economy edits; no second simulation/native authority; no legacy-profile import",
   "remaining": [
     "Actual Rust/Clippy/corpus/native execution and independent review",
-    "Root shared workspace/lock and owned App/storage envelope wiring",
+    "Root effective shared-lock notice closure and owned App/storage envelope qualification",
     "Canonical native geometry/model resources and other native mission/command/board families",
     "Full64mission and complete legacy persistence/extended Unicode manifest-parity acceptance are not claimed"
   ],
@@ -170,5 +170,14 @@
     "capComposition": "existing native65536 + original script body33554432 + script checksum32 + envelope48; inner native/script caps retained",
     "unaffected": "All original147 test bodies, G2 corpus/expectations, vendor patch/notices, Cargo manifests/locks, all core/App/root paths byte-unchanged",
     "status": "Five new source-authored tests UNRUN; independent review/compiler/Lua/Clippy/coverage/native validation pending"
+  },
+  "workspaceIntegrationCorrection": {
+    "parentCommit": "2ae88abccd6f4d4627b8d214e3e5b788d2a18979",
+    "cause": "Literal member directory prefix overrides vendor-descendant excludes; original integration directions were incomplete. Removing vendor tables only creates six unintended members.",
+    "fix": "Root-owned members=[crates/*], same exact vendor exclusions, remove only runtime child workspace, retain original vendor workspace tables; verifier requires four exact names/root-relative manifests/default members.",
+    "vendorChange": "None required. Original Cargo manifests/meridian.patch/VENDOR/notices and all152Rusttests byte-unchanged.",
+    "evidence": "Metadata-only changed scratch composition; actual Root shared lock/compiler/Lua/native acceptance remains pending.",
+    "officialSource": "https://github.com/rust-lang/cargo/blob/ddb37b06aba4dcf791fde56dd9fcf73ae7d05f7f/src/cargo/core/workspace.rs#L2166-L2182",
+    "rootFollowup": "Root reports actual joined metadata no-deps four members and offline shared resolution; cargo fmt --all additionally traverses excluded vendored path dependencies and reports upstream formatting. Root reports cargo fmt -- --check passes four project members. These are Root-owned observations, not MC1 compiler or runtime results; gate-command decision and shared-lock notice closure remain with Root/Researcher."
   }
 }

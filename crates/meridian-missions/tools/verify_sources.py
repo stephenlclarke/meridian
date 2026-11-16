@@ -27,6 +27,33 @@ def contained(root: Path, name: str) -> Path:
     return path
 
 
+def check_workspace_metadata(path: Path) -> dict:
+    metadata = read_json(path)
+    expected = {name: f'crates/{name}/Cargo.toml' for name in (
+        'meridian-core', 'meridian-desktop', 'meridian-mission-content', 'meridian-missions',
+    )}
+    members = metadata['workspace_members']
+    packages = {package['id']: package for package in metadata['packages']}
+    if len(members) != len(expected) or len(set(members)) != len(expected):
+        raise ValueError('Joined workspace must contain exactly four Meridian members, no vendors')
+    defaults = metadata['workspace_default_members']
+    if len(defaults) != len(expected) or set(defaults) != set(members):
+        raise ValueError('Joined default selection must cover all four Meridian members')
+    root = Path(metadata['workspace_root']).resolve()
+    names = set()
+    for member in members:
+        package = packages[member]
+        name = package['name']
+        if name not in expected or Path(package['manifest_path']).resolve() != root / expected[name]:
+            raise ValueError('Unexpected joined workspace member or manifest path: ' + name)
+        names.add(name)
+    if names != set(expected):
+        raise ValueError('Missing or duplicate joined workspace package name')
+    return {'members': sorted(names), 'defaultMembers': sorted(names),
+            'metadataSHA256': sha(path.read_bytes()),
+            'scope': 'Supplied Cargo metadata membership only; not compilation or execution'}
+
+
 def verify(reference: Path | None) -> dict:
     corpus = ROOT / 'tests/compat'
     if sha((corpus / 'MANIFEST.json').read_bytes()) != CORPUS_SHA:
@@ -89,9 +116,14 @@ def verify(reference: Path | None) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--reference', type=Path)
+    parser.add_argument('--workspace-metadata', type=Path,
+                        help='Check supplied Root-joined Cargo metadata for four exact members')
     parser.add_argument('--report', type=Path)
     args = parser.parse_args()
-    result = json.dumps(verify(args.reference), indent=2) + '\n'
+    result = verify(args.reference)
+    if args.workspace_metadata is not None:
+        result['joinedWorkspace'] = check_workspace_metadata(args.workspace_metadata)
+    result = json.dumps(result, indent=2) + '\n'
     if args.report is not None:
         args.report.write_text(result)
     print(result, end='')

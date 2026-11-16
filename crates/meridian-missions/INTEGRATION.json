@@ -11,14 +11,26 @@
   },
   "authoredScope": "crates/meridian-missions/** only",
   "rootManifestDelta": {
-    "addWorkspaceMember": "crates/meridian-missions",
     "addWorkspaceExcludes": [
       "crates/meridian-missions/vendor/mlua",
       "crates/meridian-missions/vendor/mlua-sys"
     ],
     "removeChildWorkspaceTable": "crates/meridian-missions/Cargo.toml [workspace] only after Root composition",
     "hostDependency": "Root decides its owned App/host path dependency to meridian-missions; no reverse dependency from meridian-core",
-    "verifyMembership": "Actual metadata must contain only intended Meridian members, never vendored mlua/mlua-sys; retained dependency workspace tables already isolate them"
+    "verifyMembership": "Run actual joined cargo metadata, then tools/verify_sources.py --workspace-metadata <artifact>; exactly four intended Meridian names/root-relative manifests/default members, never mlua/mlua-sys",
+    "setWorkspaceMemberPatterns": [
+      "crates/*"
+    ],
+    "expectedWorkspaceMembers": [
+      "meridian-core",
+      "meridian-desktop",
+      "meridian-mission-content",
+      "meridian-missions"
+    ],
+    "retainVendorWorkspaceTables": true,
+    "membershipCause": "Cargo literal member-prefix inclusion overrides descendant excludes; direct crates/meridian-missions membership includes vendor roots. Glob membership with existing exact excludes fixes it; removing vendor workspace tables alone still incorrectly includes six members.",
+    "ownership": "Root alone applies shared members/excludes/lock; MC1 changed no Root worktree or shared manifest/lock",
+    "formatCoverage": "Root observed cargo fmt --all -- --check traverses excluded vendored path dependencies and reports upstream formatting differences, without rewriting. Root observed cargo fmt -- --check covers four project members and PASS. Root owns gate-command decisions; maintained dependency patch review/tests remain required; no MC1 Root gate edits or upstream reformatting."
   },
   "newCrateDirectManifest": {
     "meridian-core": {
