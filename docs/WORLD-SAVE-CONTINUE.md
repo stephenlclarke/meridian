@@ -12,8 +12,12 @@ The core has no filesystem, window, GPU, wall-clock, global identity allocator o
 
 ## Format and retained state
 
-The [Avenor practice](PRACTICE-BEACONS.md) slice writes version 5 and rules
-5. Save v5 adds the original practice consent, opening pose and tick,
+[Avenor practice reception](PRACTICE-BEACONS.md) writes version 6 and rules
+6. Its optional quiet-time anchor and terminal receipt are saved with the
+practice owner and physical berth history. A genuine v5 practice save loads
+without inferred quiet time or completion.
+
+The practice-beacon predecessor wrote version 5 and rules 5. Save v5 adds the original practice consent, opening pose and tick,
 bound hit receipts and retirement facts. A genuine v4 envelope loads with
 the same prior paid equipment and weapon resources and no practice consent.
 Continue changes the live World only after whole-candidate validation.

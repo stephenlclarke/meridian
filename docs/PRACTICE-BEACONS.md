@@ -1,6 +1,6 @@
 # Avenor practice beacons
 
-At the Avenor main berth, press F10 to review one safe gunnery practice sortie. Enter confirms and saves the choice. B cancels. After launch, continue into clear flight to open the range. Hold Z to fire the fitted front Pulse Laser. The HUD counts each distinct beacon hit and the beacon flashes white.
+At the Avenor main berth, press F10 to review one safe gunnery practice sortie. Enter confirms and saves the choice. B cancels. After launch, continue into clear flight to open the range. Hold Z to fire the fitted front Pulse Laser. The HUD counts distinct beacon hits and a newly hit beacon flashes white. After the third hit, release Z for three continuous, unpaused flight seconds. Return to the actual Avenor main berth and press F8 to review reception. Enter confirms reception and saves the Safe Gunnery Family Trace once.
 
 The practice provider follows original L337 revision
 `a11fe16924d87d06021816f9037952afcbac08db` and its
@@ -18,10 +18,10 @@ new consent was written and the directory sync failed. Cold Continue retains
 the practice range and distinct hit receipts. The first physical dock or
 completed jump retires this attempt.
 
-This slice grants no payout or lesson completion. The full T02 ceasefire,
-physical reception and trusted trace, missile hits, ordinary damage and law,
-and traffic parity remain open. The beacons participate in the Pulse Laser
-ray. Ship-to-beacon physical collision remains open.
+Reception has zero cash payout. The fitted front Pulse Laser route covers
+the original three beacons, ceasefire and a separate physical reception. The
+original missile route, ordinary actor damage and law, practice traffic parity,
+and ship-to-beacon physical collision remain open.
 
 ## Qualification
 
@@ -37,3 +37,11 @@ ray. Ship-to-beacon physical collision remains open.
 - Run the joined workspace tests and strict Clippy. The desktop regressions
   cover delayed consent publication, cancellation, a real save replacement
   refusal, and cold reopen.
+- After all three distinct hits, verify a further discharge resets the
+  interval, including a shot stopped by the station. Paused time adds
+  nothing. A premature dock and Renas reception refuse. Complete the quiet
+  interval in flight, physically dock at Avenor, review with F8 and confirm
+  after ordinary dock ticks. Cold Continue retains the same receipt and the
+  cash balance. A second review cannot create another trace.
+- Load a pre-reception v5 practice save in isolation. An active save must
+  establish a new full quiet interval. A retired save cannot infer readiness.

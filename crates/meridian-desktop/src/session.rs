@@ -3,7 +3,10 @@ use meridian_core::freight::g02::presentation;
 use meridian_core::freight::g02::{Choice, Command, ContactDefinition, Event, JobId, Review};
 use meridian_core::navigation::SystemId;
 use meridian_core::station_services::{self, CommodityId};
-use meridian_core::{FlightMode, PracticeReview, PracticeStatus, World};
+use meridian_core::{
+    FlightMode, PRACTICE_QUIET_TICKS, PracticeReceptionReview, PracticeReview, PracticeStatus,
+    World,
+};
 
 #[derive(Clone, Copy)]
 pub enum Action {
@@ -13,6 +16,7 @@ pub enum Action {
     ReviewAbandonment,
     MissionDetails,
     ReviewPractice,
+    ReviewPracticeReception,
     Confirm,
     Back,
     Refuel,
@@ -29,10 +33,16 @@ pub enum Action {
     Launch,
 }
 
+#[derive(Clone, Copy)]
+pub(crate) enum PracticeSelection {
+    Consent(PracticeReview),
+    Reception(PracticeReceptionReview),
+}
+
 pub struct Session {
     job: Option<JobId>,
     pending: Option<(Review, Choice)>,
-    pub(crate) pending_practice: Option<PracticeReview>,
+    pub(crate) pending_practice: Option<PracticeSelection>,
     show_objective: bool,
     market_open: bool,
     equipment_open: bool,
@@ -161,8 +171,16 @@ impl Session {
                 let review = world
                     .review_practice(world.snapshot().tick)
                     .map_err(|error| error.to_string())?;
-                self.pending_practice = Some(review);
+                self.pending_practice = Some(PracticeSelection::Consent(review));
                 Ok("Avenor safe gunnery practice".into())
+            }
+            Action::ReviewPracticeReception => {
+                self.invalidate();
+                let review = world
+                    .review_practice_reception(world.snapshot().tick)
+                    .map_err(|error| error.to_string())?;
+                self.pending_practice = Some(PracticeSelection::Reception(review));
+                Ok("Avenor practice reception".into())
             }
             Action::MissionDetails => {
                 self.invalidate();
@@ -343,8 +361,12 @@ impl Session {
                 "PAUSED / UNFOCUSED"
             }
         )];
-        let review_line = if self.pending_practice.is_some() {
-            "PRACTICE REVIEW | ENTER CONFIRMS AND SAVES | B CANCELS".into()
+        let review_line = if let Some(selection) = self.pending_practice {
+            let title = match selection {
+                PracticeSelection::Consent(_) => "PRACTICE REVIEW",
+                PracticeSelection::Reception(_) => "PRACTICE RECEPTION",
+            };
+            format!("{title} | ENTER CONFIRMS AND SAVES | B CANCELS")
         } else if let Some((review, choice)) = self.pending {
             match choice {
                 Choice::ReceiveOne(unit) => format!(
@@ -380,11 +402,16 @@ impl Session {
         } else {
             "L LAUNCH | J JUMP | T CONTACT | R REVIEW | V RECEIVE ALL | X ABANDON | ENTER CONFIRM | B BACK".into()
         });
-        if self.pending_practice.is_some() {
-            append_paragraph(
-                &mut lines,
-                "Accept one Avenor practice sortie with the fitted front Pulse Laser. After launch, a clear range opens around three uncrewed beacons. Hit each distinct beacon. No fee or cash reward.",
-            );
+        if let Some(selection) = self.pending_practice {
+            let terms = match selection {
+                PracticeSelection::Consent(_) => {
+                    "Hit the three uncrewed beacons with the fitted front Pulse Laser. Stop firing for three uninterrupted seconds in flight, then dock at Avenor and review reception with F8. No fee or cash reward."
+                }
+                PracticeSelection::Reception(_) => {
+                    "Confirm reception at the Avenor main berth to record the Safe Gunnery Family Trace. No cash reward."
+                }
+            };
+            append_paragraph(&mut lines, terms);
             return lines;
         }
         if self.append_mission_panel(world, &mut lines) {
@@ -405,6 +432,7 @@ impl Session {
             return lines;
         }
         if let Some(practice) = world.practice_snapshot() {
+            let reception = world.practice_reception_snapshot();
             match practice.status {
                 PracticeStatus::Unaccepted
                     if snapshot.mode == FlightMode::Docked
@@ -418,16 +446,37 @@ impl Session {
                     lines.push("PRACTICE ACCEPTED | LAUNCH AND FLY CLEAR".into());
                 }
                 PracticeStatus::Active => {
-                    lines.push(format!(
-                        "PRACTICE BEACONS HIT {}/3 | Z FIRE",
-                        practice.first_hits
-                    ));
+                    let line = match reception {
+                        Some(state) if state.ready => "CEASEFIRE COMPLETE | DOCK AT AVENOR".into(),
+                        Some(state) if practice.first_hits == 3 => format!(
+                            "CEASEFIRE {:.2} / {:.2} SEC | KEEP Z RELEASED",
+                            f32::from(state.quiet_ticks) / 60.0,
+                            f32::from(PRACTICE_QUIET_TICKS) / 60.0,
+                        ),
+                        _ => format!("PRACTICE BEACONS HIT {}/3 | Z FIRE", practice.first_hits),
+                    };
+                    lines.push(line);
                 }
                 PracticeStatus::Retired => {
-                    lines.push(format!(
-                        "PRACTICE RANGE CLOSED | BEACONS HIT {}/3",
-                        practice.first_hits
-                    ));
+                    let line = match reception {
+                        Some(state) if state.trace.is_some() => {
+                            "SAFE GUNNERY FAMILY TRACE RECORDED".into()
+                        }
+                        Some(state)
+                            if state.ready
+                                && world.review_practice_reception(snapshot.tick).is_ok() =>
+                        {
+                            "F8 REVIEW AVENOR PRACTICE RECEPTION".into()
+                        }
+                        Some(state) if state.ready => {
+                            "DOCK AT AVENOR FOR PRACTICE RECEPTION".into()
+                        }
+                        _ => format!(
+                            "PRACTICE RANGE CLOSED | BEACONS HIT {}/3",
+                            practice.first_hits
+                        ),
+                    };
+                    lines.push(line);
                 }
                 PracticeStatus::Unaccepted => {}
             }
