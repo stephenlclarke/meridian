@@ -5,7 +5,9 @@
 #![forbid(unsafe_code)]
 
 mod commodities;
+mod quantities;
 pub use commodities::{CargoUnit, CommodityDefinition, CommodityId, CommodityQuote};
+pub use quantities::{CommodityTrade, CommodityTradeEvent, TradeSide};
 mod persistence;
 pub(crate) use persistence::SavedServiceSummary;
 
@@ -60,6 +62,8 @@ pub enum Error {
     HoldFull,
     NoSellableCargo,
     QuantityLimit,
+    ZeroQuantity,
+    PriceOverflow,
     SequenceExhausted,
 }
 
@@ -194,22 +198,22 @@ pub struct StationMarkets {
 
 /// Single-use prospective change. Dropping it changes neither stock nor the actual account.
 #[derive(Debug)]
-pub(crate) struct Prepared {
+pub(crate) struct Prepared<E = Event> {
     before: MarketData,
     account: AccountProjection,
     facts: ServiceFacts,
     next: MarketData,
     next_account: AccountProjection,
-    event: Event,
+    event: E,
 }
 
 /// World must publish both parts under exclusive ownership, with no intervening await.
 /// This is a checked candidate, not a saved receipt or permission to create a new account.
 #[derive(Debug)]
-pub(crate) struct Change {
+pub(crate) struct Change<E = Event> {
     pub(crate) market: StationMarkets,
     pub(crate) account_after: AccountProjection,
-    pub(crate) event: Event,
+    pub(crate) event: E,
 }
 
 impl StationMarkets {
@@ -440,14 +444,14 @@ fn record_accounting(next: &mut MarketData, site: usize, event: Event) -> Result
     Ok(())
 }
 
-impl Prepared {
+impl<E> Prepared<E> {
     /// Recheck the complete actual projection and current berth immediately before World publication.
     pub(crate) fn checked_change(
         self,
         market: &StationMarkets,
         account: AccountProjection,
         facts: Option<ServiceFacts>,
-    ) -> Result<Change, Error> {
+    ) -> Result<Change<E>, Error> {
         if market.data != self.before || account != self.account || facts != Some(self.facts) {
             return Err(Error::StalePublication);
         }
