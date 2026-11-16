@@ -302,6 +302,7 @@ pub struct Line {
 pub struct Marker {
     pub system: SystemId,
     pub point: [f64; 2],
+    pub clip: Rect,
     pub radius: f64,
     pub ink: Ink,
     pub current: bool,

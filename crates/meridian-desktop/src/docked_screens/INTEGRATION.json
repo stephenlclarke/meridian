@@ -65,15 +65,24 @@
     "incompatible_unowned_and_paused_equipment_actions_refuse",
     "slot_click_and_next_slot_request_real_projection_without_moving_equipment",
     "modal_blocks_clickthrough_and_confirms_only_the_supplied_review_token",
+    "review_controls_without_a_current_review_never_issue_requests",
     "missing_equipment_provider_is_visible_and_never_a_fake_shop",
     "real_body_identity_and_physical_position_flow_to_navigation_without_an_ore_store",
     "invalid_pointer_and_drag_values_do_not_change_orientation_or_issue_commands",
     "all_screen_geometry_is_finite_and_controls_stay_inside_supported_viewports",
+    "chart_markers_carry_plot_clipping_for_both_chart_scales",
     "visible_shortcuts_are_from_the_supplied_binding_map",
     "focus_loss_stops_text_and_rotation_without_changing_the_commander",
     "planet_preview_is_a_provider_request_for_the_selected_real_world_only"
   ],
   "testExecution": "UNRUN; no cargo/check/test/clippy/build/GUI/signing executed by author",
   "nativeCriteria": "README.md validation and acceptance section; exact joined source, real keyboard+mouse, all five rendered screens, full module effects/refusals/durable failure/cold continuation",
-  "releaseGate": "HUD + all5 docked menus + actual working modular equipment accepted together; no new missions/Lua/fullfleet prerequisite; existing exclusive publisher verifies real qualified boundary"
+  "releaseGate": "HUD + all5 docked menus + actual working modular equipment accepted together; no new missions/Lua/fullfleet prerequisite; existing exclusive publisher verifies real qualified boundary",
+  "markerClipping": "Each Marker.clip is ChartLayout.plot; G1 clips circles and current/selection decorations to it.",
+  "priorCompilerResult": {
+    "source": "7b9e2738b9e000b809a32c0dc0c8b4b0b3c6598e",
+    "owner": "G1",
+    "outcome": "FAILED E0004 non-exhaustive Control::ReviewConfirm/ReviewCancel; corrected in revised source, recompile pending",
+    "rawLog": "/Volumes/SSD/offload/meridian-g1-mbp-docked-render.5c81d65/evidence/renderer-first.log"
+  }
 }
