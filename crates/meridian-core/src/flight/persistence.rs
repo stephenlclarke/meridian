@@ -238,14 +238,12 @@ impl World {
         if let (Some(attempt), Some(last)) = (
             practice,
             self.combat_snapshot().and_then(|s| s.last_ordinary_impact),
-        ) {
-            if !attempt.reception_is_terminal()
-                && last.attacker.visit > attempt.consent_visit()
-                && last.tick >= attempt.confirmation_tick()
-                && attempt.ordinary_hit.is_none()
-            {
-                return Err(SaveError::InvalidState("ordinary hit was removed from T02"));
-            }
+        ) && !attempt.reception_is_terminal()
+            && last.attacker.visit > attempt.consent_visit()
+            && last.tick >= attempt.confirmation_tick()
+            && attempt.ordinary_hit.is_none()
+        {
+            return Err(SaveError::InvalidState("ordinary hit was removed from T02"));
         }
         if let Some(hit) = practice.and_then(|p| p.ordinary_hit) {
             hit.validate(self)?;
