@@ -12,7 +12,14 @@ The core has no filesystem, window, GPU, wall-clock, global identity allocator o
 
 ## Format and retained state
 
-The front Pulse Laser successor uses the `MERSAVE1` envelope, version `4`
+The [Avenor practice](PRACTICE-BEACONS.md) slice writes version 5 and rules
+5. Save v5 adds the original practice consent, opening pose and tick,
+bound hit receipts and retirement facts. A genuine v4 envelope loads with
+the same prior paid equipment and weapon resources and no practice consent.
+Continue changes the live World only after whole-candidate validation.
+The original v4 file remains in place until the player publishes a save.
+
+The front Pulse Laser predecessor used the `MERSAVE1` envelope, version `4`
 and rules `4`. The eight compiled content streams retain their fingerprint
 binding, including the original SH025 cargo-bay equipment record. The save
 appends five bytes of flight weapon resources after the market block, before
