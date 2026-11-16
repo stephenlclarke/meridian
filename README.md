@@ -1,5 +1,7 @@
 # Meridian
 
+Following-preview [finite NPC traffic source](docs/NPC-TRAFFIC.md) implements paid local SH025 traders, native pirate beams and recorded security incidents. All seven requested populations remain explicit; new tests and integration/native acceptance are pending. The frozen HUD/equipment preview remains separate.
+
 [![CI](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=alert_status)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=coverage)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)

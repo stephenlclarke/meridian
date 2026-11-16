@@ -1,0 +1,81 @@
+{
+  "legacyCommit": "a11fe16924d87d06021816f9037952afcbac08db",
+  "legacyTree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "sourceFiles": [
+    {
+      "path": "Sources/L337Core/TrafficIntent.swift",
+      "bytes": 6620,
+      "sha256": "716431a84c027585eb813666ff3039e3d30a73664f30126f75e8d1c45720112b",
+      "blob": "7d93c200816cb144d8625584e204e1763fd52a30"
+    },
+    {
+      "path": "Sources/L337Core/EncounterDirector.swift",
+      "bytes": 11954,
+      "sha256": "4caebad4a88e88ef461622ac65338821f748a27a208e2a3b5d6658758a5998c4",
+      "blob": "0da2f48d92bf460eb8bfeb23a4a5b329776717e7"
+    },
+    {
+      "path": "Sources/L337Core/NPCResources.swift",
+      "bytes": 6985,
+      "sha256": "d829716c2742e9a3d748a6e04bdd40225be602468ec776b79b131f77b8795dee",
+      "blob": "66371b88e264f5a603f792fe9f7f391b45098a63"
+    },
+    {
+      "path": "Sources/L337Core/StationSecurity.swift",
+      "bytes": 23260,
+      "sha256": "acfabd04972c49f3ab33b67164ef6cd500ca444953029922069196327326dfa3",
+      "blob": "270810cc138bd20007731545c33a6b726a060e84"
+    },
+    {
+      "path": "Sources/L337Core/StationPoliceSource.swift",
+      "bytes": 4601,
+      "sha256": "0e890d988147065f1bb3f58158cb6f82d32f210c43eb5b34d3450ec64d2acd4d",
+      "blob": "658d2a1b2ef2397246f088b4706d0aebf6681961"
+    },
+    {
+      "path": "Sources/L337Core/AmbientEncounterPolicy.swift",
+      "bytes": 4498,
+      "sha256": "cbb6bbc7786e01fae19c4618b5baa0af283ae8e773f8b985a5bf65699a8145ae",
+      "blob": "c4f54b70ccf7e14a8777054407daeac475d3570b"
+    },
+    {
+      "path": "Sources/L337Core/GameplayEncounters.swift",
+      "bytes": 31120,
+      "sha256": "767041c87146d0cc5d4b7cab502c18dec5d6a6e620af693f76dc32ccbc2d204a",
+      "blob": "672d17583254f6d164bf1dd11d096146fdafbfd1"
+    },
+    {
+      "path": "Sources/L337Core/Resources/Ships/SH025.toml",
+      "bytes": 690857,
+      "sha256": "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883",
+      "blob": "ec62ccae9acfc05b92c3c4591f079fc7ba4bf1cf"
+    },
+    {
+      "path": "Sources/L337Core/Resources/Ships/SH031.toml",
+      "bytes": 393077,
+      "sha256": "13e4d6b94a801c84dd89b9f4af9c8ba21151a33782b7e9a98c03ef503302772f",
+      "blob": "e1e1ab9b189e0d3eb515a4b03cbd057e0f76c3d4"
+    }
+  ],
+  "existingAssets": [
+    "assets/legacy/sh025.physics",
+    "assets/legacy/sh025.mesh",
+    "assets/legacy/sh028.physics",
+    "assets/legacy/sh028.port"
+  ],
+  "roleSource": {
+    "SH025": [
+      "trader",
+      "pirate",
+      "bountyHunter"
+    ],
+    "stationPolice": "StationPoliceSource specifically requires SH031; no substitute hull"
+  },
+  "newMeridianDesign": [
+    "finite NPC capital120000 tenths per trader; paid actual native manifest",
+    "local planar Avenor/Renas circuit and480/900 local tick births",
+    "deterministic pirate chance1in4 and one actor per role/system",
+    "128 retained beam receipts; four permanent lifetime slots; no automatic respawn"
+  ],
+  "execution": "No NPC compiler/test/native job run by author. Existing source resources read only; no real player profile or geometry-owner branch edited."
+}

@@ -19,7 +19,10 @@ fn apply(w: &mut World, action: AmmunitionAction) -> u64 {
 }
 fn cold(w: &World) -> World {
     let bytes = w.save_bytes().unwrap();
-    assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 13);
+    assert_eq!(
+        u16::from_le_bytes([bytes[8], bytes[9]]),
+        crate::save::SAVE_VERSION
+    );
     let other = World::from_save_bytes(&bytes).unwrap();
     assert_eq!(other.ammunition_snapshot(), w.ammunition_snapshot());
     assert_eq!(

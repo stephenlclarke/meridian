@@ -11,6 +11,7 @@ pub mod navigation;
 pub mod save;
 pub mod station;
 pub mod station_services;
+pub mod traffic;
 
 pub use flight::{
     ENERGY_CAPACITY_HUNDREDTHS, FIXED_DELTA_SECONDS, FireError, FlightInput, MAX_SPEED,

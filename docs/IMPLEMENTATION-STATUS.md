@@ -1,5 +1,7 @@
 # Implementation and validation status
 
+Following-preview [NPC traffic](NPC-TRAFFIC.md) is authored from frozen E470. It stages real SH025 trader/pirate bodies, finite paid native cargo, physical docking/sale, collision/rays and bounded hit/custody records. Sixteen new tests are **UNRUN**. Police requires absent SH031; the other four requested populations retain explicit source/controller gates. Rendering, complete ordnance/player-damage/legal joins, independent review and compiler/native acceptance remain open. This is development source, not an NPC playable build or a new hull qualification. The current preview and original player profiles remain unchanged.
+
 Reviewed against actual delivery evidence on 16 November 2026. This document distinguishes installed gameplay from source awaiting execution. Update it with every delivery or material acceptance change; test counts belong to their exact source.
 
 ## Modular mining-tool source awaiting execution

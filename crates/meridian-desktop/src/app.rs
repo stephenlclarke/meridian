@@ -424,6 +424,7 @@ impl App {
                     MotionRefusal::CelestialContact => {
                         "Celestial contact: stopped before the physical surface"
                     }
+                    MotionRefusal::NpcContact => "NPC hull contact: stopped at last clear position",
                     MotionRefusal::StationContact => {
                         "Station contact: stopped at last clear position"
                     }
@@ -442,6 +443,7 @@ impl App {
                 && snapshot.tick.saturating_sub(shot.tick) < 5
         });
         let pulse_notice = self.pulse.map(|shot| match shot.contact {
+            PulseContact::Npc { .. } => "NPC hull struck",
             PulseContact::Clear => "Pulse fired",
             PulseContact::Projectile { .. } => "Pulse intercepted missile",
             PulseContact::StationBlocked { .. } => "Station struck | legal incident recorded",
@@ -524,6 +526,9 @@ impl App {
                     .map(|refusal| match refusal {
                         MotionRefusal::CelestialContact => {
                             "Celestial contact: stopped before the physical surface"
+                        }
+                        MotionRefusal::NpcContact => {
+                            "NPC hull contact: stopped at last clear position"
                         }
                         MotionRefusal::StationContact => {
                             "Station contact: stopped at last clear position"

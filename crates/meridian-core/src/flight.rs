@@ -1,5 +1,6 @@
 mod celestial;
 mod navigation_trade;
+mod traffic;
 pub use navigation_trade::{
     NavigationTonneId, NavigationTradeAction, NavigationTradeAttemptSnapshot, NavigationTradeError,
     NavigationTradeId, NavigationTradeMarketSnapshot, NavigationTradeOutcome,
@@ -150,6 +151,7 @@ impl std::error::Error for StepError {}
 #[derive(Debug)]
 pub struct World {
     state: Snapshot,
+    traffic: crate::traffic::State,
     station_data: Option<OriginalStationData>,
     navigation_catalogue: Option<OriginalNavigation>,
     navigation: Option<NavigationState>,
@@ -187,6 +189,7 @@ impl World {
                 motion_refusal: None,
                 navigation: None,
             },
+            traffic: crate::traffic::State::default(),
             station_data: None,
             navigation_catalogue: None,
             navigation: None,
@@ -240,6 +243,7 @@ impl World {
         let navigation = NavigationState::new(seed, ids.hull, drive.id());
         let mut world =
             Self::at_original_station().map_err(|_| NavigationError::StationUnavailable)?;
+        world.traffic = crate::traffic::State::fresh(seed);
         world.navigation_catalogue = Some(OriginalNavigation::bundled()?);
         world.commander_account = Some(account);
         world.navigation = Some(navigation);
@@ -398,6 +402,11 @@ impl World {
         next.speed = start.speed;
         next.mode = FlightMode::Launching;
         next.motion_refusal = None;
+        let launch_pose =
+            flight_pose(next.position, next.orientation).ok_or(StepError::UnsafeLaunch)?;
+        if !self.traffic_motion_clear(launch_pose, launch_pose) {
+            return Err(StepError::UnsafeLaunch);
+        }
         let mut navigation = self.navigation;
         if let Some(state) = &mut navigation {
             state.launch().map_err(|_| StepError::TickOverflow)?;
@@ -496,6 +505,13 @@ impl World {
                     + input.yaw.abs() * YAW_RATE
                     + input.roll.abs() * ROLL_RATE,
             ) * f64::from(FIXED_DELTA_SECONDS);
+            if !self.traffic_motion_clear(before, after) {
+                let mut stopped = self.state;
+                stopped.tick = next.tick;
+                stopped.speed = 0.0;
+                stopped.motion_refusal = Some(MotionRefusal::NpcContact);
+                return self.publish_step(stopped);
+            }
             if data.crosses_aperture(before, after) {
                 if !data.entry_clear(
                     before,
@@ -563,6 +579,7 @@ impl World {
                 next.motion_refusal = None;
             }
         }
+        let traffic = self.prepare_traffic_step(next, navigation)?;
         let prepared = self.prepare_missile_step(next, navigation)?;
         let navigation_trade =
             self.prepare_navigation_trade_step(navigation, planned_debit, next.tick)?;
@@ -574,6 +591,10 @@ impl World {
                 .map_err(|_| StepError::NonFiniteState)?;
         }
         // No fallible operation follows the first account mutation.
+        if let Some((traffic, markets)) = traffic {
+            self.traffic = traffic;
+            self.station_markets = Some(markets);
+        }
         if let Some(navigation_trade) = navigation_trade {
             self.navigation_trade = navigation_trade;
         }
