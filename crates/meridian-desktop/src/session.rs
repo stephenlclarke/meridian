@@ -455,10 +455,12 @@ impl Session {
                 |id| format!("BEACON {}", id.ordinal() + 1),
             );
             lines.push(format!(
-                "MISSILES {remaining}/3 | {} | LOCK {lock} | IN FLIGHT {pending}",
-                if missiles.armed { "ARMED" } else { "SAFE" }
+                "MISSILES {remaining}/3 | {} | LOCK {lock} | IN FLIGHT {pending} | COOLDOWN {}",
+                if missiles.armed { "ARMED" } else { "SAFE" },
+                missiles.cooldown_ticks
             ));
             lines.push("F1 NEXT LOCK | F2 ARM/SAFE | F3 LAUNCH | F4 SAFE AND UNLOCK".into());
+            lines.push("LAUNCH USES ONE ROUND AND DISABLES SAVING FOR THIS SESSION".into());
             if missiles.projectiles.iter().any(Option::is_some) {
                 lines.push("MISSILE USED | SAVING UNAVAILABLE FOR THIS SESSION".into());
             } else if missiles.armed || missiles.lock.is_some() {
