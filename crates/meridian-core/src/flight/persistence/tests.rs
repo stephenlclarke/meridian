@@ -558,3 +558,126 @@ fn impossible_export_legal_bits_refuse_without_replacing_actual_cargo() {
         assert_eq!(world.save_bytes().unwrap(), valid);
     }
 }
+
+#[test]
+fn public_tick_zero_launch_immediately_saves_and_continues_launching_without_minting_state() {
+    use station_services::{Command as Trade, CommodityId};
+    let mut world = World::new_commander(1601).unwrap();
+    let initial = world.snapshot();
+    let owner = world.commander_id();
+    let hull = world.player_ship_id();
+    let narcotics = world.commodity_quote(CommodityId::Narcotics).unwrap();
+    let gems = world.commodity_quote(CommodityId::GemStones).unwrap();
+    for id in [CommodityId::Narcotics, CommodityId::GemStones] {
+        world
+            .request_station_service(Trade::BuyCommodity(id), 0)
+            .unwrap();
+    }
+    assert_eq!(world.snapshot().tick, 0);
+    assert_eq!(world.legal_value(), Some(0));
+    world.request_launch(0).unwrap(); // Deliberately no simulation step before save.
+    let launched = world.snapshot();
+    let expected = OriginalStationData::bundled()
+        .unwrap()
+        .launch_start()
+        .unwrap();
+    assert_eq!(launched.tick, 0);
+    assert_eq!(launched.mode, FlightMode::Launching);
+    assert_eq!(launched.position, expected.position);
+    assert_eq!(launched.orientation, expected.orientation);
+    assert_eq!(launched.speed, expected.speed);
+    assert_ne!(launched.position, initial.position);
+    assert_eq!(world.legal_value(), Some(2));
+    let bytes = world.save_bytes().unwrap();
+    let mut continued = World::from_save_bytes(&bytes).unwrap();
+    assert_eq!(continued.snapshot(), launched);
+    assert_eq!(continued.commander_id(), owner);
+    assert_eq!(continued.player_ship_id(), hull);
+    assert_eq!(continued.current_dock_context(), None);
+    assert_eq!(continued.legal_value(), Some(2));
+    assert_eq!(continued.credits_tenths(), Some(645));
+    assert_eq!(
+        continued.commodity_quantity(CommodityId::Narcotics),
+        Some(1)
+    );
+    assert_eq!(
+        continued.commodity_quantity(CommodityId::GemStones),
+        Some(1)
+    );
+    assert_eq!(continued.service_snapshot().unwrap().used_tonnes, 1);
+    assert_eq!(continued.mission_snapshot().unwrap().freight.held_tonnes, 0);
+    let before = continued.save_bytes().unwrap();
+    assert_eq!(continued.request_launch(0), Err(StepError::InvalidMode));
+    assert_eq!(
+        continued.request_station_service(Trade::BuyCommodity(CommodityId::Food), 0),
+        Err(MissionError::NotDocked)
+    );
+    assert_eq!(continued.save_bytes().unwrap(), before);
+    continued.step(FlightInput::default()).unwrap();
+    // Genuine public flight returns to the original finite station rows after Continue.
+    for target in [SystemId::RENAS, SystemId::AVENOR] {
+        if continued.snapshot().mode == FlightMode::Docked {
+            launch(&mut continued);
+        }
+        continued
+            .request_jump(target, continued.snapshot().tick)
+            .unwrap();
+        for _ in 0..BASIC_SPOOL_TICKS {
+            continued.step(FlightInput::default()).unwrap();
+        }
+        approach(&mut continued);
+    }
+    assert_eq!(continued.snapshot().navigation.unwrap().fuel_units, 62);
+    assert_eq!(continued.credits_tenths(), Some(645));
+    assert_eq!(continued.legal_value(), Some(2));
+    assert_eq!(
+        continued.commodity_quote(CommodityId::Narcotics).unwrap(),
+        station_services::CommodityQuote {
+            stock: narcotics.stock - 1,
+            ..narcotics
+        }
+    );
+    assert_eq!(
+        continued.commodity_quote(CommodityId::GemStones).unwrap(),
+        station_services::CommodityQuote {
+            stock: gems.stock - 1,
+            ..gems
+        }
+    );
+}
+
+#[test]
+fn forged_launch_admission_counts_and_wide_overflow_values_refuse_atomically() {
+    let mut world = World::new_commander(1701).unwrap();
+    world.request_launch(0).unwrap();
+    let valid = world.save_bytes().unwrap();
+    let mut flight = Writer::new();
+    write_flight(&mut flight, &world.state);
+    let nav = 18 + CONTENT.len() + flight.bytes.len();
+    // Owner8 + ship16 + bound drive32 + system3 precede visit/dock sequence.
+    let visit = nav + 8 + 16 + 32 + 3;
+    let dock_sequence = visit + 8;
+    // Navigation's final three fixed-width counters follow its two bounded options.
+    let counts = account_start(&world) - 3 * 8;
+    for (new_visit, new_dock, new_launches, new_jumps) in [
+        (3, 1, 2, 0), // A second launch cannot consume the same initial admission.
+        (3, 2, 2, 0), // Balanced admissions still require a physical-entry tick (tick remains zero).
+        (2, 0, 1, 0), // No zero dock sequence/subtraction underflow.
+        (1, 1, 1, 0), // Launch must advance visit.
+        (u64::MAX, u64::MAX, u64::MAX, 0), // visit=1+launches cannot wrap.
+        (u64::MAX, u64::MAX, u64::MAX, u64::MAX), // wide sums cannot wrap either.
+    ] {
+        let mut bad = valid.clone();
+        for (offset, value) in [
+            (visit, new_visit),
+            (dock_sequence, new_dock),
+            (counts, new_launches),
+            (counts + 8, new_jumps),
+        ] {
+            bad[offset..offset + 8].copy_from_slice(&value.to_le_bytes());
+        }
+        reseal(&mut bad);
+        assert_refused_unchanged(&mut world, &bad);
+        assert_eq!(world.save_bytes().unwrap(), valid);
+    }
+}
