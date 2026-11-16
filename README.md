@@ -56,7 +56,7 @@ The freight journey requires eight identified one-tonne deliveries and awards 73
 
 ## Preview releases
 
-Produced previews are to be published as [GitHub prereleases](https://github.com/stephenlclarke/meridian/releases) for macOS and Windows, with signed macOS apps, automatic Conventional Commit versions and immutable Git tags. Keep the newest three previews; delete older preview releases and their tags only after verifying the new downloads. The publisher and this policy are newly authored; no public preview has been published yet. The existing dependency-notice distribution blocker remains open. See [preview releases](docs/PREVIEW-RELEASES.md).
+[Download Durable Missiles Preview v0.1.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.1.0-preview.1) for macOS Apple silicon and Windows x64. Both public downloads were verified against their SHA256 checksums, and the downloaded Mac app passed extracted Developer ID signature verification. macOS is not notarized; Windows is unsigned and requires the Microsoft Visual C++ x64 runtime. Windows interactive gameplay remains unobserved. Versions come from Conventional Commits with immutable annotated tags; keep only the newest three published previews. See [preview releases](docs/PREVIEW-RELEASES.md).
 
 ## Build and contribute
 
