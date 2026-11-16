@@ -329,17 +329,17 @@ impl CommanderAccount {
             .revision
             .checked_add(1)
             .ok_or(Error::SequenceExhausted)?;
-        if let Some(id) = consume {
-            if !paid_round {
-                let fit = data.fit.as_mut().ok_or(Error::MissingEquipment)?;
-                let item = fit
-                    .items
-                    .iter_mut()
-                    .skip(5)
-                    .find(|item| item.is_some_and(|i| i.id == id))
-                    .ok_or(Error::MissingEquipment)?;
-                *item = None;
-            }
+        if let Some(id) = consume
+            && !paid_round
+        {
+            let fit = data.fit.as_mut().ok_or(Error::MissingEquipment)?;
+            let item = fit
+                .items
+                .iter_mut()
+                .skip(5)
+                .find(|item| item.is_some_and(|i| i.id == id))
+                .ok_or(Error::MissingEquipment)?;
+            *item = None;
         }
         data.ammunition_revision = data
             .ammunition_revision
