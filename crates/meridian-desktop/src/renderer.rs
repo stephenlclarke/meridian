@@ -253,6 +253,10 @@ impl Renderer {
             .create_view(&Default::default())
     }
 
+    pub fn logical_viewport(&self) -> [f64; 2] {
+        let size = self.size.to_logical::<f64>(self.window.scale_factor());
+        [size.width, size.height]
+    }
     pub fn is_zero_sized(&self) -> bool {
         self.size.width == 0 || self.size.height == 0
     }

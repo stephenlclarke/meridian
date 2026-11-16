@@ -122,7 +122,7 @@ struct Anchor {
 }
 impl Anchor {
     fn capture(world: &World) -> Result<Self, String> {
-        let ids = CommodityId::display_order().map_err(|e| e.to_string())?;
+        let ids = CommodityId::display_order().map_err(crate::market::content_error)?;
         Ok(Self {
             dock: world.current_dock_context(),
             credits: world.credits_tenths(),
@@ -182,6 +182,9 @@ impl Docked {
         })
     }
     pub fn open(&mut self, world: &World, screen: ui::Screen) -> Result<(), String> {
+        if self.pending.is_some() {
+            return Err("Confirm or cancel the current review first".into());
+        }
         if world.current_dock_context().is_none() {
             return Err("Dock at a station to open this screen".into());
         }
@@ -198,6 +201,19 @@ impl Docked {
     }
     pub fn active(&self, world: &World) -> bool {
         self.open && world.current_dock_context().is_some()
+    }
+    pub fn focus_lost(&mut self) {
+        self.screens.open(self.screens.screen());
+        self.painted = None;
+    }
+    pub fn screen(&self) -> ui::Screen {
+        self.screens.screen()
+    }
+    pub fn feedback(&mut self, message: String) {
+        self.feedback = message;
+    }
+    pub fn discard_frame(&mut self) {
+        self.painted = None;
     }
     pub fn search_active(&self) -> bool {
         self.painted.as_ref().is_some_and(|f| f.search_active)
@@ -320,6 +336,9 @@ impl Docked {
                 let quote = world
                     .commodity_quote(commodity)
                     .ok_or("No current commodity offer")?;
+                let definition = commodity
+                    .definition()
+                    .map_err(crate::market::content_error)?;
                 let price = if buy {
                     quote.ask_tenths
                 } else {
@@ -339,7 +358,13 @@ impl Docked {
                         "Sell commodity"
                     },
                     vec![
-                        format!("One native unit | {}.{} CR", price / 10, price % 10),
+                        format!(
+                            "{}: 1 {} | {}.{} CR",
+                            definition.name,
+                            definition.unit.symbol(),
+                            price / 10,
+                            price % 10
+                        ),
                         "Confirm changes cargo and credits together".into(),
                     ],
                 )?;
@@ -372,7 +397,11 @@ impl Docked {
                     .iter()
                     .find(|r| {
                         r.node == node
-                            && (operation == ui::EquipmentOperation::Buy || r.instance == instance)
+                            && if operation == ui::EquipmentOperation::Buy {
+                                r.instance.is_none()
+                            } else {
+                                r.instance == instance
+                            }
                     })
                     .ok_or("Equipment selection changed")?;
                 let allowed = match operation {
@@ -687,4 +716,168 @@ fn equipment_panel(
         required_crew: None,
         feedback: feedback.into(),
     })
+}
+
+/// Menu shortcuts are scoped to the current screen and never become flight commands.
+pub fn key(code: winit::keyboard::KeyCode, shift: bool, screen: ui::Screen) -> Option<ui::Key> {
+    use ui::Key as K;
+    use winit::keyboard::KeyCode as C;
+    Some(match code {
+        C::Tab if shift => K::PreviousTab,
+        C::Tab => K::NextTab,
+        C::Escape | C::KeyB if !shift => K::Back,
+        C::Enter => K::Confirm,
+        C::ArrowUp => K::Previous,
+        C::ArrowDown => K::Next,
+        C::PageUp => K::PagePrevious,
+        C::PageDown => K::PageNext,
+        C::Slash => K::Search,
+        C::Backspace => K::Erase,
+        C::Delete => K::ClearSearch,
+        C::KeyG => K::Buy,
+        C::KeyH => K::Sell,
+        C::KeyY => K::Fit,
+        C::KeyU => K::Store,
+        C::KeyO => K::Options,
+        C::KeyD => K::Details,
+        C::BracketRight if screen == ui::Screen::Equipment => K::NextSlot,
+        C::BracketRight => K::NextGalaxy,
+        C::BracketLeft => K::PreviousGalaxy,
+        C::KeyL => K::LocalChart,
+        C::KeyR if screen == ui::Screen::Showroom => K::Rotate,
+        C::KeyR => K::Route,
+        C::Space if screen == ui::Screen::Showroom => K::Rotate,
+        C::KeyA if screen == ui::Screen::Showroom => K::NextAxis,
+        C::ArrowLeft if screen == ui::Screen::Showroom => K::TurnLeft,
+        C::ArrowRight if screen == ui::Screen::Showroom => K::TurnRight,
+        C::Home if screen == ui::Screen::Showroom => K::ResetView,
+        C::Home => K::CurrentLocation,
+        C::KeyC => K::Compare,
+        C::KeyB if shift => K::PinBaseline,
+        C::KeyV => K::CurrentShip,
+        C::KeyX => K::Exchange,
+        C::KeyN => K::NextBody,
+        C::KeyM => K::PreviousBody,
+        C::KeyT => K::BodyRoute,
+        _ => return None,
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::profile::tests::{TestDirectory, open};
+    fn ok<T, E: core::fmt::Debug>(value: Result<T, E>) -> T {
+        value.unwrap_or_else(|e| panic!("{e:?}"))
+    }
+    fn start() -> (TestDirectory, Profile, Docked) {
+        let directory = TestDirectory::new();
+        let mut profile = open(&directory.0);
+        assert!(ok(profile.new_commander(89811)));
+        let mut menu = ok(Docked::new(&profile.world));
+        ok(menu.open(&profile.world, ui::Screen::Trading));
+        (directory, profile, menu)
+    }
+    fn present(menu: &mut Docked, profile: &Profile) {
+        let viewport = ui::Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));
+        let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
+        menu.presented(frame);
+    }
+    #[test]
+    fn real_market_review_confirm_publishes_one_native_tonne_once() {
+        let (directory, mut profile, mut menu) = start();
+        present(&mut menu, &profile);
+        let before = ok(profile.world.save_bytes());
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Buy)));
+        assert!(menu.pending.is_some());
+        assert_eq!(ok(profile.world.save_bytes()), before);
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm)));
+        assert!(menu.pending.is_none());
+        assert_eq!(profile.world.credits_tenths(), Some(6974));
+        assert_eq!(profile.world.commodity_quantity(CommodityId::Food), Some(1));
+        assert_eq!(
+            ok(std::fs::read(directory.0.join("commander.meridian"))),
+            ok(profile.world.save_bytes())
+        );
+        let after = ok(profile.world.save_bytes());
+        // A repeated confirmation of the old painted modal has no purchase authority.
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm)));
+        assert_eq!(ok(profile.world.save_bytes()), after);
+    }
+    #[test]
+    fn skipped_frames_do_not_publish_actionable_menu_geometry() {
+        let (_directory, mut profile, mut menu) = start();
+        let viewport = ui::Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));
+        let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
+        assert!(
+            menu.input(&mut profile, ui::Input::Key(ui::Key::Buy))
+                .is_err()
+        );
+        menu.presented(frame);
+        let next = ok(menu.build_frame(&profile.world, viewport, 0.0));
+        let before = ok(profile.world.save_bytes());
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Buy)));
+        assert!(menu.pending.is_none());
+        assert_eq!(ok(profile.world.save_bytes()), before);
+        menu.presented(next);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Buy)));
+        assert!(menu.pending.is_some());
+        assert_eq!(ok(profile.world.save_bytes()), before);
+    }
+    #[test]
+    fn changed_quote_or_wallet_requires_new_review_instead_of_double_purchase() {
+        let (_directory, mut profile, mut menu) = start();
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Buy)));
+        present(&mut menu, &profile);
+        ok(profile.command(Action::StationService(
+            station_services::Command::BuyCommodity(CommodityId::Food),
+        )));
+        let after_external_purchase = ok(profile.world.save_bytes());
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm)));
+        assert!(menu.pending.is_none());
+        assert!(menu.feedback.contains("Values changed"));
+        assert_eq!(ok(profile.world.save_bytes()), after_external_purchase);
+    }
+    #[test]
+    fn front_module_rows_and_pylon_slots_use_real_owned_instances_and_admission() {
+        let (_directory, profile, _menu) = start();
+        let panel = ok(equipment_panel(&profile.world, "front-laser", ""));
+        assert_eq!(panel.slots.len(), 11);
+        assert_eq!(panel.assigned_crew, None);
+        let pulse = panel
+            .rows
+            .iter()
+            .find(|r| r.node == ModuleKind::PulseLaser.node())
+            .unwrap_or_else(|| panic!("Pulse row"));
+        assert_eq!((pulse.owned, pulse.fitted), (1, 1));
+        assert!(pulse.instance.is_some());
+        assert!(!pulse.can_buy);
+        let mining = panel
+            .rows
+            .iter()
+            .find(|r| r.node == ModuleKind::MiningLaser.node())
+            .unwrap_or_else(|| panic!("Mining row"));
+        assert!(!mining.can_buy);
+        assert_eq!(mining.price_tenths, Some(33000));
+        let pylon = ok(equipment_panel(&profile.world, "pylon-3", ""));
+        let offer = pylon
+            .rows
+            .iter()
+            .find(|r| r.instance.is_none())
+            .unwrap_or_else(|| panic!("offer"));
+        assert!(offer.can_buy);
+        assert_eq!(offer.quantity, ui::OfferQuantity::NotTracked);
+        assert_eq!(
+            profile
+                .world
+                .missile_rounds()
+                .unwrap_or_else(|| panic!("rounds"))
+                .iter()
+                .flatten()
+                .count(),
+            3
+        );
+    }
 }

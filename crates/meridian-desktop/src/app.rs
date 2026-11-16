@@ -11,16 +11,17 @@ use meridian_core::{
 };
 use winit::{
     application::ApplicationHandler,
-    event::{ElementState, WindowEvent},
+    event::{ElementState, MouseButton, MouseScrollDelta, WindowEvent},
     event_loop::{ActiveEventLoop, ControlFlow, EventLoop},
-    keyboard::{KeyCode, PhysicalKey},
+    keyboard::{KeyCode, ModifiersState, PhysicalKey},
     window::{Fullscreen, Window, WindowId},
 };
 
 use crate::clock::FixedClock;
 use crate::profile::Profile;
-use crate::renderer::{HudScene, Renderer, SceneEffects, StationScene};
+use crate::renderer::{HudScene, Presentation, Renderer, SceneEffects, StationScene};
 use crate::session::Action;
+use crate::{docked::Docked, docked_screens as ui};
 
 // Ephemeral profile IDs are allocated by the host, never by the deterministic core.
 fn fresh_profile_seed() -> u64 {
@@ -65,6 +66,11 @@ struct App {
     keys: HashSet<KeyCode>,
     paused: bool,
     focused: bool,
+    docked: Option<Docked>,
+    modifiers: ModifiersState,
+    cursor: [f64; 2],
+    dragging: bool,
+    wheel: f64,
     occluded: bool,
     last_frame: Instant,
     clock: FixedClock,
@@ -86,6 +92,11 @@ impl App {
             keys: HashSet::new(),
             paused: false,
             focused: true,
+            docked: None,
+            modifiers: ModifiersState::empty(),
+            cursor: [0.0; 2],
+            dragging: false,
+            wheel: 0.0,
             occluded: false,
             last_frame: Instant::now(),
             clock: FixedClock::default(),
@@ -116,6 +127,10 @@ impl App {
 
     fn reset_input(&mut self) {
         self.keys.clear();
+        self.dragging = false;
+        if let Some(menu) = &mut self.docked {
+            menu.focus_lost();
+        }
         self.pulse = None;
         self.last_frame = Instant::now();
         self.clock.reset();
@@ -132,6 +147,24 @@ impl App {
     }
 
     fn key(&mut self, code: KeyCode, event_loop: &ActiveEventLoop) {
+        let global = matches!(
+            code,
+            KeyCode::F5 | KeyCode::F9 | KeyCode::F11 | KeyCode::KeyP
+        );
+        if self.menu_active() && !global {
+            if self.open_menu_key(code) {
+                return;
+            }
+            if let Some(key) = self.docked.as_ref().and_then(|menu| {
+                crate::docked::key(code, self.modifiers.shift_key(), menu.screen())
+            }) {
+                self.menu_input(ui::Input::Key(key));
+            }
+            return;
+        }
+        if !self.menu_active() && self.open_menu_key(code) {
+            return;
+        }
         match code {
             KeyCode::Escape => self.request_quit(event_loop),
             KeyCode::KeyQ if self.quit_failed => event_loop.exit(),
@@ -179,6 +212,20 @@ impl App {
         self.paused = self.game.world.mission_snapshot().is_some_and(|m| m.paused);
         self.quit_failed = false;
         self.reset_input();
+        self.docked = match Docked::new(&self.game.world) {
+            Ok(mut menu) => {
+                if self.game.world.current_dock_context().is_some() {
+                    if let Err(error) = menu.open(&self.game.world, ui::Screen::System) {
+                        self.notice = Some(error);
+                    }
+                }
+                Some(menu)
+            }
+            Err(error) => {
+                self.notice = Some(error);
+                None
+            }
+        };
     }
 
     fn load_profile(&mut self) {
@@ -209,6 +256,84 @@ impl App {
         }
     }
 
+    fn menu_active(&self) -> bool {
+        self.docked
+            .as_ref()
+            .is_some_and(|menu| menu.active(&self.game.world))
+    }
+    fn menu_input(&mut self, input: ui::Input) {
+        if let Some(menu) = &mut self.docked {
+            if let Err(error) = menu.input(&mut self.game, input) {
+                menu.feedback(error);
+            }
+        }
+        self.request_redraw();
+    }
+    fn open_menu_key(&mut self, code: KeyCode) -> bool {
+        if !self.game.playing() || self.game.world.current_dock_context().is_none() {
+            return false;
+        }
+        let screen = match code {
+            KeyCode::Digit1 => ui::Screen::Galaxy,
+            KeyCode::Digit2 => ui::Screen::System,
+            KeyCode::Digit3 => ui::Screen::Showroom,
+            KeyCode::Digit4 | KeyCode::KeyM if !self.menu_active() => ui::Screen::Trading,
+            KeyCode::Digit5 | KeyCode::KeyO if !self.menu_active() => ui::Screen::Equipment,
+            KeyCode::Digit4 => ui::Screen::Trading,
+            KeyCode::Digit5 => ui::Screen::Equipment,
+            _ => return false,
+        };
+        if self.docked.is_none() {
+            match Docked::new(&self.game.world) {
+                Ok(menu) => self.docked = Some(menu),
+                Err(error) => {
+                    self.notice = Some(error);
+                    return true;
+                }
+            }
+        }
+        self.keys.clear();
+        self.pulse = None;
+        self.wheel = 0.0;
+        if let Some(menu) = &mut self.docked {
+            if let Err(error) = menu.open(&self.game.world, screen) {
+                menu.feedback(error);
+            }
+        }
+        self.request_redraw();
+        true
+    }
+    fn pointer(&mut self, point: [f64; 2]) {
+        let previous = self.cursor;
+        self.cursor = point;
+        if self.menu_active() {
+            let input = if self.dragging {
+                ui::Input::Drag {
+                    from: previous,
+                    to: point,
+                    roll: self.modifiers.shift_key(),
+                }
+            } else {
+                ui::Input::PointerMoved(point)
+            };
+            self.menu_input(input);
+        }
+    }
+    fn scroll(&mut self, amount: f64) {
+        if !self.menu_active() || !amount.is_finite() {
+            return;
+        }
+        self.wheel -= amount;
+        let rows = self.wheel.trunc() as i32;
+        self.wheel -= f64::from(rows);
+        if rows != 0 {
+            self.menu_input(ui::Input::Scroll {
+                point: self.cursor,
+                rows,
+            });
+        }
+    }
+
     fn game_key(&mut self, code: KeyCode) {
         let action = match code {
             KeyCode::Slash => Action::ToggleControls,
@@ -228,7 +353,11 @@ impl App {
             KeyCode::F3 => Action::FireMissile,
             KeyCode::F4 => Action::ClearMissile,
             KeyCode::KeyL => Action::Launch,
-            KeyCode::KeyJ => Action::Jump,
+            KeyCode::KeyJ => self
+                .docked
+                .as_ref()
+                .and_then(|menu| menu.route)
+                .map_or(Action::Jump, Action::JumpTo),
             KeyCode::KeyT => Action::Contact,
             KeyCode::KeyR => Action::Review,
             KeyCode::KeyV => Action::ReviewAll,
@@ -325,6 +454,27 @@ impl App {
         });
         let notice = pulse_notice.or(self.notice.as_deref());
         let hud_lines = self.game.lines(active, notice);
+        let docked_frame = if self.menu_active() {
+            let viewport = self.renderer.as_ref().and_then(|r| {
+                let [width, height] = r.logical_viewport();
+                ui::Viewport::new(width, height)
+            });
+            match (self.docked.as_mut(), viewport) {
+                (Some(menu), Some(viewport)) => {
+                    match menu.build_frame(&self.game.world, viewport, elapsed) {
+                        Ok(frame) => Some(frame),
+                        Err(error) => {
+                            self.fail(event_loop, error);
+                            return;
+                        }
+                    }
+                }
+                _ => None,
+            }
+        } else {
+            None
+        };
+
         let cockpit = self
             .game
             .playing()
@@ -347,6 +497,17 @@ impl App {
             }
         };
 
+        let docked_planet = if docked_frame.is_some() {
+            match self.celestial.preview(self.game.world.celestial_snapshot()) {
+                Ok(scene) => scene,
+                Err(error) => {
+                    self.fail(event_loop, error);
+                    return;
+                }
+            }
+        } else {
+            None
+        };
         if let Some(renderer) = &mut self.renderer {
             let mode = match snapshot.mode {
                 FlightMode::Docked => "DOCKED - L launch",
@@ -386,7 +547,7 @@ impl App {
                     });
             let practice = self.game.world.practice_snapshot();
             renderer.set_flight_view(self.game.world.flight_view());
-            if let Err(error) = renderer.draw(
+            let presented = renderer.draw(
                 &snapshot,
                 station,
                 SceneEffects {
@@ -394,13 +555,22 @@ impl App {
                     missiles: &self.missile_bodies,
                     practice: practice.as_ref().and_then(|state| state.beacons.as_ref()),
                     celestial: celestial_scene.as_ref(),
+                    docked: docked_frame.as_ref(),
+                    docked_planet: docked_planet.as_ref(),
                 },
                 HudScene {
                     lines: &hud_lines,
                     cockpit: cockpit.as_ref(),
                 },
-            ) {
-                self.fail(event_loop, error);
+            );
+            match presented {
+                Ok(Presentation::Presented) => {
+                    if let (Some(menu), Some(frame)) = (&mut self.docked, docked_frame) {
+                        menu.presented(frame);
+                    }
+                }
+                Ok(Presentation::Skipped) => {}
+                Err(error) => self.fail(event_loop, error),
             }
         }
     }
@@ -433,6 +603,9 @@ impl ApplicationHandler for App {
         match event {
             WindowEvent::CloseRequested => self.request_quit(event_loop),
             WindowEvent::Resized(size) => {
+                if let Some(menu) = &mut self.docked {
+                    menu.discard_frame();
+                }
                 if let Some(renderer) = &mut self.renderer {
                     renderer.resize(size);
                     renderer.window.request_redraw();
@@ -446,12 +619,67 @@ impl ApplicationHandler for App {
                 self.occluded = occluded;
                 self.reset_input();
             }
+            WindowEvent::ModifiersChanged(modifiers) => self.modifiers = modifiers.state(),
+            WindowEvent::CursorMoved { position, .. } if self.focused && !self.occluded => {
+                let scale = self
+                    .renderer
+                    .as_ref()
+                    .map_or(1.0, |r| r.window.scale_factor());
+                self.pointer([position.x / scale, position.y / scale]);
+            }
+            WindowEvent::MouseInput {
+                state,
+                button: MouseButton::Left,
+                ..
+            } if self.focused && !self.occluded => {
+                self.dragging = state == ElementState::Pressed;
+                if self.dragging && self.menu_active() {
+                    self.menu_input(ui::Input::Click(self.cursor));
+                }
+            }
+            WindowEvent::MouseWheel { delta, .. } if self.focused && !self.occluded => {
+                let scale = self
+                    .renderer
+                    .as_ref()
+                    .map_or(1.0, |r| r.window.scale_factor());
+                self.scroll(match delta {
+                    MouseScrollDelta::LineDelta(_, rows) => f64::from(rows),
+                    MouseScrollDelta::PixelDelta(point) => point.y / scale / 20.0,
+                });
+            }
             WindowEvent::KeyboardInput { event, .. } => {
                 if let PhysicalKey::Code(code) = event.physical_key {
                     if event.state == ElementState::Released {
                         self.keys.remove(&code);
-                    } else if !event.repeat && self.focused && !self.occluded {
-                        self.keys.insert(code);
+                    } else if self.focused && !self.occluded {
+                        if self.menu_active()
+                            && self.docked.as_ref().is_some_and(Docked::search_active)
+                        {
+                            if let Some(text) = event
+                                .text
+                                .as_ref()
+                                .filter(|s| s.chars().all(|c| !c.is_control()))
+                            {
+                                self.menu_input(ui::Input::Text(text.to_string()));
+                                return;
+                            }
+                        }
+                        if event.repeat
+                            && !(self.menu_active()
+                                && matches!(
+                                    code,
+                                    KeyCode::ArrowUp
+                                        | KeyCode::ArrowDown
+                                        | KeyCode::PageUp
+                                        | KeyCode::PageDown
+                                        | KeyCode::Backspace
+                                ))
+                        {
+                            return;
+                        }
+                        if !self.menu_active() {
+                            self.keys.insert(code);
+                        }
                         self.key(code, event_loop);
                     }
                 }

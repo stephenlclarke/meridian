@@ -188,14 +188,14 @@ impl DockedScreens {
                     .filter(|_| self.local);
                 let layout =
                     ChartLayout::new(painted.viewport, context.catalogue, self.galaxy, local);
-                if layout.plot.contains(p) {
-                    if let Some(marker) = painted.markers.iter().min_by(|a, b| {
+                if layout.plot.contains(p)
+                    && let Some(marker) = painted.markers.iter().min_by(|a, b| {
                         let d = |m: &Marker| (m.point[0] - p[0]).hypot(m.point[1] - p[1]);
                         d(a).total_cmp(&d(b))
                             .then(a.system.system.cmp(&b.system.system))
-                    }) {
-                        self.select_world(marker.system, context);
-                    }
+                    })
+                {
+                    self.select_world(marker.system, context);
                 }
             }
             Outcome::Updated
@@ -212,10 +212,10 @@ impl DockedScreens {
             }
             self.search_index = 0;
             self.scroll = 0;
-            if self.screen == Screen::Showroom {
-                if let Some(first) = context.catalogue.search_ships(&self.query).first() {
-                    self.ship = first.id.into();
-                }
+            if self.screen == Screen::Showroom
+                && let Some(first) = context.catalogue.search_ships(&self.query).first()
+            {
+                self.ship = first.id.into();
             }
             Outcome::Updated
         } else {
@@ -229,9 +229,7 @@ impl DockedScreens {
         painted: &Frame,
         context: &Context<'_>,
     ) -> Outcome {
-        if context.review.is_some() {
-            Outcome::Ignored
-        } else if !painted.viewport.body().contains(point) {
+        if context.review.is_some() || !painted.viewport.body().contains(point) {
             Outcome::Ignored
         } else if self.screen == Screen::System
             || (self.detail && self.screen == Screen::Showroom)
@@ -481,14 +479,13 @@ impl DockedScreens {
         match key {
             Key::Back => self.searching = false,
             Key::Confirm => {
-                if self.screen == Screen::Galaxy {
-                    if let Some(w) = c
+                if self.screen == Screen::Galaxy
+                    && let Some(w) = c
                         .catalogue
                         .search_worlds(self.galaxy, &self.query)
                         .get(self.search_index)
-                    {
-                        self.select_world(w.id, c);
-                    }
+                {
+                    self.select_world(w.id, c);
                 }
                 self.searching = false;
             }
@@ -666,10 +663,10 @@ impl DockedScreens {
             .position(|slot| slot.id == panel.selected_slot)
             .unwrap_or(0);
         for step in 1..=panel.slots.len() {
-            if let Some(slot) = panel.slots.get((current + step) % panel.slots.len()) {
-                if slot.available {
-                    return Outcome::Request(Request::InspectEquipmentSlot(slot.id.clone()));
-                }
+            if let Some(slot) = panel.slots.get((current + step) % panel.slots.len())
+                && slot.available
+            {
+                return Outcome::Request(Request::InspectEquipmentSlot(slot.id.clone()));
             }
         }
         Outcome::Refused("No equipment slots available".into())

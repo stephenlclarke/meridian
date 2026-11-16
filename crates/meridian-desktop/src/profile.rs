@@ -84,7 +84,13 @@ impl Profile {
                 .world
                 .prepare_module(review, tick)
                 .map_err(|e| e.to_string())?;
-            let item = prepared.item();
+            let message = match command {
+                meridian_core::ModuleAction::PurchaseMiningLaser => {
+                    "Mining Laser purchased and fitted."
+                }
+                meridian_core::ModuleAction::Store { .. } => "Owned laser stored.",
+                meridian_core::ModuleAction::Install { .. } => "Owned laser fitted.",
+            };
             let published = self
                 .store
                 .save(prepared.bytes(), MAX_SAVE_BYTES)
@@ -92,10 +98,7 @@ impl Profile {
             prepared.commit();
             self.has_save = true;
             self.session.invalidate();
-            return publication_message(
-                published,
-                format!("Module item {item} updated and saved."),
-            );
+            return publication_message(published, format!("{message} Change saved."));
         }
         let cargo = match action {
             Action::CargoEquipment(command) => Some(command),
@@ -131,7 +134,19 @@ impl Profile {
             self.session.invalidate();
             return publication_message(
                 published,
-                format!("Cargo equipment updated and saved: {event:?}"),
+                match event {
+                    meridian_core::equipment::Event::Purchased { paid_tenths, .. } => format!(
+                        "Cargo bay purchased and fitted for {}.{} CR. Change saved.",
+                        paid_tenths / 10,
+                        paid_tenths % 10
+                    ),
+                    meridian_core::equipment::Event::Fitted { .. } => {
+                        "Owned cargo bay fitted. Change saved.".into()
+                    }
+                    meridian_core::equipment::Event::Stored { .. } => {
+                        "Owned cargo bay stored. Change saved.".into()
+                    }
+                },
             );
         }
         if let Action::StationService(command) = action {
@@ -160,7 +175,11 @@ impl Profile {
                 .world
                 .prepare_ammunition(review, tick)
                 .map_err(|e| e.to_string())?;
-            let item = prepared.item();
+            let message = match command {
+                meridian_core::AmmunitionAction::Purchase => "Missile purchased and fitted.",
+                meridian_core::AmmunitionAction::Store { .. } => "Owned missile stored.",
+                meridian_core::AmmunitionAction::Refit { .. } => "Owned missile fitted.",
+            };
             let published = self
                 .store
                 .save(prepared.bytes(), MAX_SAVE_BYTES)
@@ -168,10 +187,7 @@ impl Profile {
             prepared.commit();
             self.has_save = true;
             self.session.invalidate();
-            return publication_message(
-                published,
-                format!("Missile item {item} updated and saved."),
-            );
+            return publication_message(published, format!("{message} Change saved."));
         }
         if let Some(command) = self.session.station_service_command(action) {
             let tick = self.world.snapshot().tick;

@@ -621,7 +621,7 @@ fn showroom(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         if s.detail {
             0.0
         } else {
-            (details.height * 0.32).max(0.0).min(180.0)
+            (details.height * 0.32).clamp(0.0, 180.0)
         },
     );
     f.model_bounds = (!s.detail).then_some(model);

@@ -11,6 +11,7 @@ use meridian_core::{
 
 #[derive(Clone, Copy)]
 pub enum Action {
+    JumpTo(SystemId),
     Module(meridian_core::ModuleAction),
     CargoEquipment(meridian_core::equipment::Command),
     StationService(meridian_core::station_services::Command),
@@ -464,6 +465,13 @@ impl Session {
                 world
                     .request_refuel(world.snapshot().tick)
                     .map(|cost| format!("Paid {}.{} CR for fuel.", cost / 10, cost % 10))
+                    .map_err(|e| e.to_string())
+            }
+            Action::JumpTo(target) => {
+                self.invalidate();
+                world
+                    .request_jump(target, world.snapshot().tick)
+                    .map(|_| "Jump committed; fuel consumed at departure".into())
                     .map_err(|e| e.to_string())
             }
             Action::Jump => {

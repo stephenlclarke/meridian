@@ -444,3 +444,36 @@ fn original_v4_paid_and_hot_world_loads_with_no_t02_authority() {
         &crate::save::SAVE_VERSION.to_le_bytes()
     );
 }
+
+#[test]
+fn prospective_cargo_equipment_drop_and_commit_preserve_full_account_chronology() {
+    let mut world = earned_world(89801);
+    let before = world.save_bytes().unwrap();
+    let credit = world.credits_tenths().unwrap();
+    let tick = world.snapshot().tick;
+    let staged = {
+        let prepared = world
+            .prepare_equipment(Command::PurchaseCargoBay, tick)
+            .unwrap();
+        let bytes = prepared.bytes().to_vec();
+        let cold = World::from_save_bytes(&bytes).unwrap();
+        assert!(cold.equipment_snapshot().unwrap().owned.unwrap().fitted);
+        assert_eq!(cold.credits_tenths(), Some(credit - 28000));
+        bytes
+    };
+    assert_eq!(world.save_bytes().unwrap(), before);
+    world
+        .prepare_equipment(Command::PurchaseCargoBay, tick)
+        .unwrap()
+        .commit();
+    assert_eq!(world.save_bytes().unwrap(), staged);
+    assert_eq!(world.credits_tenths(), Some(credit - 28000));
+    let item = world.equipment_snapshot().unwrap().owned.unwrap().id;
+    let before = world.save_bytes().unwrap();
+    drop(
+        world
+            .prepare_equipment(Command::UnfitCargoBay(item), tick)
+            .unwrap(),
+    );
+    assert_eq!(world.save_bytes().unwrap(), before);
+}
