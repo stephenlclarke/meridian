@@ -10,6 +10,10 @@ use meridian_core::{
 
 #[derive(Clone, Copy)]
 pub enum Action {
+    CycleMissileLock,
+    ToggleMissileArm,
+    FireMissile,
+    ClearMissile,
     Contact,
     Review,
     ReviewAll,
@@ -166,6 +170,13 @@ impl Session {
             return Ok("Practice review cancelled.".into());
         }
         match action {
+            Action::CycleMissileLock
+            | Action::ToggleMissileArm
+            | Action::FireMissile
+            | Action::ClearMissile => {
+                self.invalidate();
+                missile_command(world, action)
+            }
             Action::ReviewPractice => {
                 self.invalidate();
                 let review = world
@@ -431,6 +442,29 @@ impl Session {
             }
             return lines;
         }
+        if let Some(missiles) = world.missile_snapshot() {
+            let remaining = missiles.rounds.iter().flatten().count();
+            let pending = missiles
+                .projectiles
+                .iter()
+                .flatten()
+                .filter(|p| p.ended.is_none())
+                .count();
+            let lock = missiles.lock.map_or_else(
+                || "NONE".into(),
+                |id| format!("BEACON {}", id.ordinal() + 1),
+            );
+            lines.push(format!(
+                "MISSILES {remaining}/3 | {} | LOCK {lock} | IN FLIGHT {pending}",
+                if missiles.armed { "ARMED" } else { "SAFE" }
+            ));
+            lines.push("F1 NEXT LOCK | F2 ARM/SAFE | F3 LAUNCH | F4 SAFE AND UNLOCK".into());
+            if missiles.projectiles.iter().any(Option::is_some) {
+                lines.push("MISSILE USED | SAVING UNAVAILABLE FOR THIS SESSION".into());
+            } else if missiles.armed || missiles.lock.is_some() {
+                lines.push("F4 SAFE AND UNLOCK BEFORE SAVING".into());
+            }
+        }
         if let Some(practice) = world.practice_snapshot() {
             let reception = world.practice_reception_snapshot();
             match practice.status {
@@ -579,8 +613,124 @@ fn append_paragraph(lines: &mut Vec<String>, paragraph: &str) {
     }
 }
 
+fn missile_command(world: &mut World, action: Action) -> Result<String, String> {
+    let state = world
+        .missile_snapshot()
+        .ok_or("An owned commander is required")?;
+    let tick = world.snapshot().tick;
+    match action {
+        Action::CycleMissileLock => {
+            let beacons = world
+                .practice_snapshot()
+                .and_then(|p| p.beacons)
+                .ok_or("No active practice beacons to lock")?;
+            let next = match state
+                .lock
+                .and_then(|id| beacons.iter().position(|b| b.id == id))
+            {
+                Some(index) => beacons.get(index + 1).map(|b| b.id),
+                None => Some(beacons[0].id),
+            };
+            world
+                .request_missile_lock(next, tick)
+                .map_err(|e| e.to_string())?;
+            Ok(next.map_or_else(
+                || "Missile lock cleared".into(),
+                |id| format!("Missile locked on beacon {}", id.ordinal() + 1),
+            ))
+        }
+        Action::ToggleMissileArm => {
+            world
+                .request_missile_arm(!state.armed, tick)
+                .map_err(|e| e.to_string())?;
+            Ok(if state.armed {
+                "Missile safe"
+            } else {
+                "Missile armed"
+            }
+            .into())
+        }
+        Action::FireMissile => {
+            world
+                .request_fire_missile(tick)
+                .map_err(|e| e.to_string())?;
+            Ok("Missile launched; consumed round cannot be saved in this version".into())
+        }
+        Action::ClearMissile => {
+            world
+                .request_missile_arm(false, tick)
+                .map_err(|e| e.to_string())?;
+            world
+                .request_missile_lock(None, tick)
+                .map_err(|e| e.to_string())?;
+            Ok("Missile safe and lock cleared".into())
+        }
+        _ => Err("Unsupported missile control".into()),
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn missile_controls_cycle_actual_locks_consume_a_round_and_keep_save_refusal() {
+        let mut world = World::new_commander(991).unwrap();
+        let review = world.review_practice(0).unwrap();
+        world
+            .prepare_practice_confirmation(review, 0)
+            .unwrap()
+            .commit();
+        world.request_launch(0).unwrap();
+        world.step(meridian_core::FlightInput::default()).unwrap();
+        let mut session = Session::from_world(&world);
+        let before = world.missile_snapshot().unwrap();
+        let beacons = world.practice_snapshot().unwrap().beacons.unwrap();
+        for expected in [
+            Some(beacons[0].id),
+            Some(beacons[1].id),
+            Some(beacons[2].id),
+            None,
+        ] {
+            session
+                .command(&mut world, Action::CycleMissileLock)
+                .unwrap();
+            assert_eq!(world.missile_snapshot().unwrap().lock, expected);
+        }
+        session
+            .command(&mut world, Action::CycleMissileLock)
+            .unwrap();
+        session
+            .command(&mut world, Action::ToggleMissileArm)
+            .unwrap();
+        assert!(world.save_bytes().is_err());
+        session.command(&mut world, Action::ClearMissile).unwrap();
+        assert!(world.save_bytes().is_ok());
+        session
+            .command(&mut world, Action::CycleMissileLock)
+            .unwrap();
+        session
+            .command(&mut world, Action::ToggleMissileArm)
+            .unwrap();
+        session.command(&mut world, Action::FireMissile).unwrap();
+        let after = world.missile_snapshot().unwrap();
+        assert_eq!(after.rounds[2], None);
+        assert_eq!(after.rounds[..2], before.rounds[..2]);
+        let projectile = after.projectiles.into_iter().flatten().next().unwrap();
+        assert_eq!(projectile.origin.item, before.rounds[2].unwrap().item);
+        assert_eq!(projectile.target, beacons[0].id);
+        assert!(
+            session
+                .lines(&world, true, None)
+                .iter()
+                .any(|s| s.contains("SAVING UNAVAILABLE"))
+        );
+        session.command(&mut world, Action::ClearMissile).unwrap();
+        assert!(world.save_bytes().is_err());
+        let snapshot = world.missile_snapshot();
+        world.request_pause(true, world.snapshot().tick).unwrap();
+        assert!(session.command(&mut world, Action::FireMissile).is_err());
+        assert_eq!(world.missile_snapshot(), snapshot);
+    }
+
     use super::*;
     fn world() -> World {
         World::new_commander(7001).unwrap_or_else(|e| panic!("{e}"))

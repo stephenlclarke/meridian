@@ -189,6 +189,49 @@ pub fn append_practice_beacons(
     Ok(())
 }
 
+// Three finite projectiles, each original eight-face mesh triangulated to ten triangles.
+pub const MISSILE_VERTEX_COUNT: usize = 3 * 10 * 3;
+
+pub fn append_missiles(
+    snapshot: &Snapshot,
+    station: StationRender<'_>,
+    missiles: &meridian_core::MissileSnapshot,
+    output: &mut Vec<Vertex>,
+) -> Result<(), String> {
+    let camera = camera_for(snapshot, station)?;
+    let mut vertices = [Vertex {
+        position: [0.0; 3],
+        color: [0.8; 3],
+    }; 30];
+    let mut count = 0;
+    for face in meridian_core::MISSILE_FACES {
+        for corner in 1..face.len() - 1 {
+            for index in [face[0], face[corner], face[corner + 1]] {
+                let point = meridian_core::MISSILE_VERTICES[index];
+                vertices[count].position = [point.x as f32, point.y as f32, point.z as f32];
+                count += 1;
+            }
+        }
+    }
+    for projectile in missiles
+        .projectiles
+        .iter()
+        .flatten()
+        .filter(|p| p.ended.is_none())
+    {
+        append_mesh(
+            &vertices,
+            RigidPose {
+                position: projectile.position,
+                orientation: projectile.origin.orientation,
+            },
+            &camera,
+            output,
+        )?;
+    }
+    Ok(())
+}
+
 pub const PULSE_VERTEX_COUNT: usize = 12;
 
 pub fn append_pulse(
@@ -352,6 +395,63 @@ pub fn frame_vertices(
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn actual_missile_renders_original_mesh_then_removes_ended_body() {
+        let mut world = meridian_core::World::new_commander(992).unwrap();
+        let review = world.review_practice(0).unwrap();
+        world
+            .prepare_practice_confirmation(review, 0)
+            .unwrap()
+            .commit();
+        world.request_launch(0).unwrap();
+        world.step(meridian_core::FlightInput::default()).unwrap();
+        let target = world.practice_snapshot().unwrap().beacons.unwrap()[1].id;
+        let tick = world.snapshot().tick;
+        world.request_missile_lock(Some(target), tick).unwrap();
+        world.request_missile_arm(true, tick).unwrap();
+        world.request_fire_missile(tick).unwrap();
+        let vertices = load_station().unwrap();
+        let render = |world: &meridian_core::World| {
+            let snapshot = world.snapshot();
+            let station = StationRender {
+                vertices: &vertices,
+                pose: snapshot.station.unwrap(),
+                port: world.station_port().unwrap(),
+                docked: false,
+            };
+            let mut frame = Vec::new();
+            append_missiles(
+                &snapshot,
+                station,
+                &world.missile_snapshot().unwrap(),
+                &mut frame,
+            )
+            .unwrap();
+            frame
+        };
+        let frame = render(&world);
+        assert_eq!(frame.len(), 30);
+        assert!(
+            frame
+                .iter()
+                .all(|v| v.position.iter().all(|x| x.is_finite()))
+        );
+        for _ in 0..1500 {
+            if world
+                .missile_snapshot()
+                .unwrap()
+                .projectiles
+                .iter()
+                .flatten()
+                .all(|p| p.ended.is_some())
+            {
+                break;
+            }
+            world.step(meridian_core::FlightInput::default()).unwrap();
+        }
+        assert!(render(&world).is_empty());
+    }
+
     use super::*;
 
     fn reference_port() -> DockingPort {

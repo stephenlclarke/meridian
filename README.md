@@ -67,3 +67,5 @@ GitHub Actions checks formatting, workspace compilation, tests and strict Clippy
 ## Freight dialogue and explicit choices candidate
 
 The next source slice adds V to review receiving all held mission units and X to review abandonment with Arlen. Enter confirms the displayed choice; B cancels. I shows current mission details. The review panel word-wraps original contract dialogue and warnings, joined with the existing mission owner. These controls are authored and unqualified until the complete artifact passes review and validation; see [the implementation packet](docs/PR-freight-dialogue-controls.md).
+
+The authored finite-missile desktop controls are **F1** next beacon lock, **F2** arm/safe, **F3** launch and **F4** safe/unlock. This unqualified slice refuses saving after any missile use; prior saved files remain intact. Controls, rendering and the core still require joined compiler/native qualification.

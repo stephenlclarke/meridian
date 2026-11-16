@@ -181,7 +181,8 @@ impl Renderer {
             + station.len()
             + 3 * 32 * 6
             + mesh::PULSE_VERTEX_COUNT
-            + mesh::PRACTICE_VERTEX_COUNT;
+            + mesh::PRACTICE_VERTEX_COUNT
+            + mesh::MISSILE_VERTEX_COUNT;
         let vertices = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("Reused frame vertices"),
             size: (vertex_capacity * std::mem::size_of::<Vertex>()) as u64,
@@ -260,6 +261,7 @@ impl Renderer {
         snapshot: &Snapshot,
         station: Option<StationScene<'_>>,
         pulse: Option<&PulseShot>,
+        missiles: Option<&meridian_core::MissileSnapshot>,
         practice: Option<&[PracticeBeaconSnapshot; 3]>,
         hud_lines: &[String],
     ) -> Result<(), String> {
@@ -302,6 +304,9 @@ impl Renderer {
         mesh::frame_vertices(snapshot, &self.ship, station, &mut self.frame)?;
         if let (Some(station), Some(beacons)) = (station, practice) {
             mesh::append_practice_beacons(snapshot, station, beacons, &mut self.frame)?;
+        }
+        if let (Some(station), Some(missiles)) = (station, missiles) {
+            mesh::append_missiles(snapshot, station, missiles, &mut self.frame)?;
         }
         if let (Some(station), Some(shot)) = (station, pulse) {
             mesh::append_pulse(snapshot, station, shot, &mut self.frame)?;
