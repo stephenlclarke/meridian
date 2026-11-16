@@ -22,10 +22,11 @@ pub fn append_panel(
         .ok_or("No commander market account")?;
     let credit = world.credits_tenths().ok_or("No commander wallet")?;
     lines.push(format!(
-        "CREDITS {}.{} CR | HOLD {}/92T | LEGAL VALUE {}",
+        "CREDITS {}.{} CR | HOLD {}/{}T | LEGAL VALUE {}",
         credit / 10,
         credit % 10,
         service.used_tonnes,
+        service.hold_capacity_tonnes,
         world.legal_value().ok_or("No commander legal record")?
     ));
     let definition = selected_commodity.definition().map_err(content_error)?;

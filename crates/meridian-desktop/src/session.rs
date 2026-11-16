@@ -16,6 +16,10 @@ pub enum Action {
     Back,
     Refuel,
     ToggleMarket,
+    ToggleEquipment,
+    PurchaseCargoBay,
+    FitCargoBay,
+    UnfitCargoBay,
     PreviousCommodity,
     NextCommodity,
     BuySelected,
@@ -29,6 +33,7 @@ pub struct Session {
     pending: Option<(Review, Choice)>,
     show_objective: bool,
     market_open: bool,
+    equipment_open: bool,
     selected_commodity: CommodityId,
 }
 
@@ -39,6 +44,7 @@ impl Default for Session {
             pending: None,
             show_objective: false,
             market_open: false,
+            equipment_open: false,
             selected_commodity: CommodityId::Food,
         }
     }
@@ -57,6 +63,7 @@ impl Session {
         self.pending = None;
         self.show_objective = false;
         self.market_open = false;
+        self.equipment_open = false;
     }
 
     fn freight(&mut self, world: &mut World, command: Command) -> Result<String, String> {
@@ -175,6 +182,24 @@ impl Session {
             Action::Back => {
                 self.invalidate();
                 self.freight(world, Command::Back)
+            }
+            Action::ToggleEquipment => {
+                let open = !self.equipment_open;
+                self.invalidate();
+                self.equipment_open = open;
+                Ok(if open {
+                    "Equipment: K purchases and fits; U stores; Y refits the owned cargo bay."
+                } else {
+                    "Equipment closed."
+                }
+                .into())
+            }
+            Action::PurchaseCargoBay | Action::FitCargoBay | Action::UnfitCargoBay => {
+                if !self.equipment_open {
+                    return Err("O opens equipment before a purchase or fitting action".into());
+                }
+                self.pending = None;
+                crate::equipment::command(world, action)
             }
             Action::ToggleMarket => {
                 let open = !self.market_open;
@@ -331,12 +356,20 @@ impl Session {
                 .to_string(),
         );
         lines.push(review_line);
-        lines.push(if self.market_open {
+        lines.push(if self.equipment_open {
+            "K BUY AND FIT | U STORE OWNED BAY | Y REFIT OWNED BAY | O CLOSE".into()
+        } else if self.market_open {
             "[ PREVIOUS | ] NEXT | G BUY 1 UNIT | H SELL 1 UNIT | M CLOSE MARKET | F REFUEL".into()
         } else {
             "L LAUNCH | J JUMP | T CONTACT | R REVIEW | V RECEIVE ALL | X ABANDON | ENTER CONFIRM | B BACK".into()
         });
         if self.append_mission_panel(world, &mut lines) {
+            return lines;
+        }
+        if self.equipment_open {
+            if let Err(error) = crate::equipment::append_panel(world, &mut lines) {
+                append_paragraph(&mut lines, &error);
+            }
             return lines;
         }
         if self.market_open {
@@ -399,14 +432,13 @@ impl Session {
                 })
                 .unwrap_or_else(|| "MARKET REQUIRES A SUPPORTED CURRENT BERTH".into());
             lines.push(format!(
-                "FOOD {}T | HOLD {}/92T | {market}",
-                service.food_tonnes, service.used_tonnes
+                "FOOD {}T | HOLD {}/{}T | {market}",
+                service.food_tonnes, service.used_tonnes, service.hold_capacity_tonnes
             ));
         }
         lines.push("W/S THRUST | ARROWS PITCH | A/D YAW | Q/E ROLL | SPACE BRAKE".into());
         lines.push(
-            "M MARKET | G BUY SELECTED | H SELL SELECTED | F REFUEL | P PAUSE | F11 FULLSCREEN"
-                .into(),
+            "O EQUIPMENT | M MARKET | G BUY | H SELL | F REFUEL | P PAUSE | F11 FULLSCREEN".into(),
         );
         lines.push("I MISSION DETAILS | F5 SAVE | F9 RELOAD SAVE | ESC SAVE AND QUIT".into());
         lines
@@ -630,6 +662,64 @@ mod tests {
         );
         assert!(ui.lines(&world, true, None).len() <= crate::hud::line_budget(640, 360));
     }
+    #[test]
+    fn equipment_panel_is_read_only_and_cannot_confirm_a_hidden_freight_offer() {
+        let mut world = world();
+        let mut ui = Session::default();
+        for action in [Action::Contact, Action::Review] {
+            ui.command(&mut world, action)
+                .unwrap_or_else(|e| panic!("{e}"));
+        }
+        let saved = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+        ui.command(&mut world, Action::ToggleEquipment)
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert!(ui.command(&mut world, Action::Confirm).is_err());
+        let lines = ui.lines(&world, true, None);
+        assert!(lines.iter().any(|line| line.contains("LARGE CARGO BAY")));
+        assert!(lines.iter().any(|line| line.contains("2800.0 CR")));
+        assert!(lines.iter().any(|line| line.contains("HOLD 0/92T")));
+        assert!(lines.len() <= crate::hud::line_budget(640, 360));
+        assert!(
+            lines
+                .iter()
+                .all(|line| line.len() <= crate::hud::MAX_COLUMNS)
+        );
+        assert_eq!(world.save_bytes().unwrap_or_else(|e| panic!("{e}")), saved);
+        ui.command(&mut world, Action::ToggleMarket)
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert!(!ui.equipment_open);
+        assert!(ui.market_open);
+        assert!(ui.command(&mut world, Action::PurchaseCargoBay).is_err());
+        assert_eq!(world.save_bytes().unwrap_or_else(|e| panic!("{e}")), saved);
+    }
+
+    #[test]
+    fn equipment_keys_require_open_panel_and_refusals_preserve_the_commander() {
+        let mut world = world();
+        let mut ui = Session::default();
+        let saved = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+        for action in [
+            Action::PurchaseCargoBay,
+            Action::FitCargoBay,
+            Action::UnfitCargoBay,
+        ] {
+            assert!(ui.command(&mut world, action).is_err());
+        }
+        ui.command(&mut world, Action::ToggleEquipment)
+            .unwrap_or_else(|e| panic!("{e}"));
+        let refusal = ui
+            .command(&mut world, Action::PurchaseCargoBay)
+            .err()
+            .unwrap_or_else(|| panic!("720 CR cannot fund a 2800 CR purchase"));
+        assert!(refusal.contains("InsufficientFunds"));
+        assert!(ui.command(&mut world, Action::FitCargoBay).is_err());
+        assert!(ui.command(&mut world, Action::UnfitCargoBay).is_err());
+        assert_eq!(world.save_bytes().unwrap_or_else(|e| panic!("{e}")), saved);
+        let cold = World::from_save_bytes(&saved).unwrap_or_else(|e| panic!("{e}"));
+        let restored = Session::from_world(&cold);
+        assert!(!restored.equipment_open);
+    }
+
     #[test]
     fn market_selection_reaches_every_original_row_without_mutating_world() {
         let mut world = world();
