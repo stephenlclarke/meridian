@@ -551,6 +551,10 @@ fn modal_blocks_clickthrough_and_confirms_only_the_supplied_review_token() {
         key(&mut a, &ctx, Key::Back),
         Outcome::Request(Request::CancelReview(655))
     );
+    assert_eq!(
+        click(&mut b, &ctx, Control::ReviewCancel),
+        Outcome::Request(Request::CancelReview(655))
+    );
     ctx.paused = true;
     assert!(matches!(
         key(&mut a, &ctx, Key::Confirm),
@@ -560,6 +564,22 @@ fn modal_blocks_clickthrough_and_confirms_only_the_supplied_review_token() {
         click(&mut b, &ctx, Control::ReviewConfirm),
         Outcome::Refused(_)
     ));
+}
+#[test]
+fn review_controls_without_a_current_review_never_issue_requests() {
+    let c = catalogue();
+    let w = world();
+    let ctx = context(&w, &c);
+    let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+    assert_eq!(ui.control(&Control::ReviewConfirm, &ctx), Outcome::Ignored);
+    assert_eq!(ui.control(&Control::ReviewCancel, &ctx), Outcome::Ignored);
+    let frame = ui.frame(&ctx, view());
+    assert!(
+        frame
+            .hits
+            .iter()
+            .all(|hit| !matches!(hit.control, Control::ReviewConfirm | Control::ReviewCancel))
+    );
 }
 #[test]
 fn missing_equipment_provider_is_visible_and_never_a_fake_shop() {
@@ -679,6 +699,36 @@ fn all_screen_geometry_is_finite_and_controls_stay_inside_supported_viewports() 
     }
     assert!(Viewport::new(f64::NAN, 800.0).is_none());
     assert!(Viewport::new(0.0, 0.0).is_none());
+}
+#[test]
+fn chart_markers_carry_plot_clipping_for_both_chart_scales() {
+    let c = catalogue();
+    let w = world();
+    let ctx = context(&w, &c);
+    let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+    for (width, height) in [(640.0, 360.0), (1000.0, 700.0), (1440.0, 1000.0)] {
+        let viewport = Viewport::new(width, height).unwrap_or_else(|| panic!("viewport"));
+        for local in [false, true] {
+            ui.local = local;
+            let nav = w
+                .snapshot()
+                .navigation
+                .unwrap_or_else(|| panic!("navigation"));
+            let origin = c.world(nav.system).unwrap_or_else(|| panic!("world"));
+            let layout = ChartLayout::new(
+                viewport,
+                &c,
+                ui.galaxy,
+                local.then_some((origin, nav.fuel_units)),
+            );
+            let frame = ui.frame(&ctx, viewport);
+            assert!(!frame.markers.is_empty());
+            for marker in &frame.markers {
+                assert_eq!(marker.clip, layout.plot);
+                assert!(marker.clip.contains(marker.point));
+            }
+        }
+    }
 }
 #[test]
 fn visible_shortcuts_are_from_the_supplied_binding_map() {

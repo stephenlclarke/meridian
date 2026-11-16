@@ -269,6 +269,7 @@ fn chart(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         f.markers.push(Marker {
             system: w.id,
             point: p,
+            clip: layout.plot,
             radius: if s.local {
                 (f64::from(w.radius_km) * 0.0017).clamp(4.0, 12.0)
             } else {

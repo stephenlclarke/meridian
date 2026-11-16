@@ -283,6 +283,10 @@ impl DockedScreens {
             return Outcome::Ignored;
         }
         match control {
+            Control::ReviewConfirm => self.review_confirm(c),
+            Control::ReviewCancel => c.review.map_or(Outcome::Ignored, |r| {
+                Outcome::Request(Request::CancelReview(r.token))
+            }),
             Control::Open(s) => {
                 self.open(*s);
                 Outcome::Updated
