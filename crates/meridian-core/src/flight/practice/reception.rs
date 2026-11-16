@@ -73,14 +73,14 @@ impl Practice {
 
     pub(in crate::flight) fn validate_missile_quiet(
         self,
-        projectiles: [Option<crate::flight::ProjectileSnapshot>; 3],
+        projectiles: &[Option<crate::flight::ProjectileSnapshot>],
     ) -> Result<(), crate::save::SaveError> {
         let invalid =
             crate::save::SaveError::InvalidState("missile ceasefire endpoint or lesson failure");
         if let Some(anchor) = self.reception.anchor
             && let Some(third) = self.range.and_then(Range::third_hit)
         {
-            for p in projectiles.into_iter().flatten() {
+            for p in projectiles.iter().flatten() {
                 let endpoint = if p.ended.is_some() {
                     p.last_tick
                 } else {
@@ -91,7 +91,7 @@ impl Practice {
                 }
             }
         }
-        for p in projectiles.into_iter().flatten() {
+        for p in projectiles.iter().flatten() {
             if matches!(
                 p.contact,
                 Some(

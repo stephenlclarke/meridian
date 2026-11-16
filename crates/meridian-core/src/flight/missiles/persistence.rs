@@ -1,4 +1,4 @@
-//! Version-eight bounded state and retained contact evidence. Decode never emits gameplay events.
+//! Explicit legacy/current retained contact evidence. Decode never emits gameplay events.
 use super::geometry::{add, length, mesh_distance, pose, scale, sub, unit};
 use super::{
     Beam, Body, CombatIdentity, FlightMode, MISSILE_COOLDOWN_TICKS, MISSILE_LIFETIME_TICKS,
@@ -172,11 +172,17 @@ fn read_projectile(r: &mut Reader<'_>) -> Result<ProjectileSnapshot, SaveError> 
     })
 }
 impl State {
-    pub(in crate::flight) fn encode(self, w: &mut Writer) {
+    pub(in crate::flight) fn encode(&self, w: &mut Writer) {
+        self.encode_version(w, 12);
+    }
+    pub(in crate::flight) fn encode_version(&self, w: &mut Writer, version: u16) {
+        if version >= 12 {
+            w.u16(self.projectiles.len() as u16);
+        }
         w.bool(self.armed);
         w.option(self.lock.as_ref(), |w, id| id.encode(w));
         w.u8(self.cooldown);
-        for i in 0..3 {
+        for i in 0..self.projectiles.len() {
             w.option(self.projectiles[i].as_ref(), projectile);
             w.option(self.motions[i].as_ref(), |w, m| {
                 vector(w, m.position);
@@ -185,7 +191,10 @@ impl State {
                 w.bool(m.cleared);
                 super::super::persistence::write_flight(w, &m.flight);
                 w.bool(m.player_alive);
-                for body in m.bodies {
+                if version >= 12 {
+                    w.u16(m.bodies.len() as u16);
+                }
+                for body in &m.bodies {
                     w.option(body.as_ref(), |w, b| {
                         b.id.encode(w);
                         vector(w, b.position);
@@ -201,7 +210,10 @@ impl State {
                 vector(w, s.origin);
                 vector(w, s.direction);
                 vector(w, s.end);
-                for body in b.bodies {
+                if version >= 12 {
+                    w.u16(b.bodies.len() as u16);
+                }
+                for body in &b.bodies {
                     w.option(body.as_ref(), |w, b| {
                         b.id.encode(w);
                         vector(w, b.position);
@@ -214,14 +226,26 @@ impl State {
             });
         }
     }
-    pub(in crate::flight) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+    pub(in crate::flight) fn decode(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
+        let count = if version >= 12 {
+            usize::from(r.u16()?)
+        } else {
+            3
+        };
+        if !(3..=256).contains(&count) {
+            return Err(INVALID);
+        }
         let mut state = Self {
             armed: r.bool()?,
             lock: r.option(PracticeBeaconId::decode)?,
             cooldown: r.u8()?,
             ..Self::default()
         };
-        for i in 0..3 {
+        state.projectiles.resize(count, None);
+        state.motions.resize(count, None);
+        state.impacts.resize(count, None);
+        state.beams.resize(count, None);
+        for i in 0..count {
             state.projectiles[i] = r.option(read_projectile)?;
             state.motions[i] = r.option(|r| {
                 Ok(Motion {
@@ -231,14 +255,7 @@ impl State {
                     cleared: r.bool()?,
                     flight: super::super::persistence::read_flight(r)?,
                     player_alive: r.bool()?,
-                    bodies: r.array(|r| {
-                        r.option(|r| {
-                            Ok(Body {
-                                id: ProjectileId::decode(r)?,
-                                position: read_vector(r)?,
-                            })
-                        })
-                    })?,
+                    bodies: read_bodies(r, version, count)?,
                 })
             })?;
             state.impacts[i] = r.option(OrdinaryImpact::decode)?;
@@ -249,14 +266,7 @@ impl State {
                 let origin = read_vector(r)?;
                 let direction = read_vector(r)?;
                 let end = read_vector(r)?;
-                let bodies = r.array(|r| {
-                    r.option(|r| {
-                        Ok(Body {
-                            id: ProjectileId::decode(r)?,
-                            position: read_vector(r)?,
-                        })
-                    })
-                })?;
+                let bodies = read_bodies(r, version, count)?;
                 Ok(Beam {
                     bodies,
                     emission,
@@ -276,16 +286,16 @@ impl State {
         }
         Ok(state)
     }
-    pub(in crate::flight) fn used(self) -> usize {
+    pub(in crate::flight) fn used(&self) -> usize {
         self.projectiles.iter().flatten().count()
     }
-    pub(in crate::flight) fn has_player_hit(self) -> bool {
+    pub(in crate::flight) fn has_player_hit(&self) -> bool {
         self.projectiles
             .iter()
             .flatten()
             .any(|p| matches!(p.contact, Some(MissileContact::Player { .. })))
     }
-    fn find(self, id: ProjectileId) -> Option<ProjectileSnapshot> {
+    fn find(&self, id: ProjectileId) -> Option<ProjectileSnapshot> {
         self.projectiles
             .iter()
             .flatten()
@@ -293,7 +303,7 @@ impl State {
             .copied()
     }
     pub(in crate::flight) fn has_undocked_player_hit(
-        self,
+        &self,
         practice: Option<super::super::practice::Practice>,
         history: &[super::super::practice::Practice],
         dock_sequence: u64,
@@ -305,7 +315,7 @@ impl State {
         })
     }
     pub(in crate::flight) fn validate_ordinary(
-        self,
+        &self,
         hit: OrdinaryImpact,
         world: &World,
     ) -> Result<(), SaveError> {
@@ -320,7 +330,7 @@ impl State {
             Some(MissileContact::Player { front }) => OrdinaryTarget::Player { front },
             _ => return Err(INVALID),
         };
-        let m = self.motions[i].ok_or(INVALID)?;
+        let m = self.motions[i].as_ref().ok_or(INVALID)?;
         if p.ended != Some(MissileEnd::Impact)
             || hit.weapon != OrdinaryWeapon::StandardMissile
             || hit.target != expected
@@ -350,18 +360,50 @@ impl State {
         Ok(())
     }
     pub(in crate::flight) fn validate(
-        self,
+        &self,
         world: &World,
         practice: Option<super::super::practice::Practice>,
         history: &[super::super::practice::Practice],
         dock_sequence: u64,
     ) -> Result<(), SaveError> {
+        if self.projectiles.len() < 3
+            || self.projectiles.len() > 256
+            || self.motions.len() != self.projectiles.len()
+            || self.impacts.len() != self.projectiles.len()
+            || self.beams.len() != self.projectiles.len()
+            || self
+                .motions
+                .iter()
+                .flatten()
+                .any(|m| m.bodies.len() > self.projectiles.len())
+            || self
+                .beams
+                .iter()
+                .flatten()
+                .any(|b| b.bodies.len() > self.projectiles.len())
+        {
+            return Err(INVALID);
+        }
         let owner = world.combat_identity().ok_or(INVALID)?;
         let snapshot = world.missile_snapshot().ok_or(INVALID)?;
         let used = self.used();
+        if self.projectiles.len() != used.max(3) {
+            return Err(INVALID);
+        }
         let mut prior: Option<MissileOrigin> = None;
-        self.validate_launcher(world, practice, snapshot.rounds, used)?;
-        for i in 0..3 {
+        self.validate_launcher(
+            world,
+            practice,
+            core::array::from_fn(|i| {
+                if i < 3 {
+                    snapshot.rounds[i]
+                } else {
+                    snapshot.additional_rounds[i - 3]
+                }
+            }),
+            used,
+        )?;
+        for i in 0..self.projectiles.len() {
             let Some(p) = self.projectiles[i] else {
                 if i < used
                     || self.motions[i].is_some()
@@ -391,10 +433,10 @@ impl State {
         Ok(())
     }
     fn validate_launcher(
-        self,
+        &self,
         world: &World,
         practice: Option<super::super::practice::Practice>,
-        rounds: [Option<MissileRound>; 3],
+        rounds: [Option<MissileRound>; 9],
         used: usize,
     ) -> Result<(), SaveError> {
         if self.cooldown > MISSILE_COOLDOWN_TICKS
@@ -409,12 +451,9 @@ impl State {
         {
             return Err(INVALID);
         }
-        // Each actual removal has exactly one origin; there is no decode-time birth/refill.
-        for (pylon, round) in rounds.iter().enumerate() {
-            if round.is_some() != (pylon < 3 - used) {
-                return Err(INVALID);
-            }
-        }
+        // Custody is replayed against the actual finite born and paid item graph by
+        // World validation. This launcher predicate retains arm/lock/cooldown checks.
+        let _ = used;
 
         Ok(())
     }
@@ -440,7 +479,6 @@ impl State {
             || o.owner.visit < 2
             || o.owner.visit > owner.visit
             || (o.owner.visit == owner.visit && o.owner.system != owner.system)
-            || o.item != owner.owner.checked_add(10 - i as u64).ok_or(INVALID)?
             || o.legal_at_launch > world.legal_value().ok_or(INVALID)?
             || o.emission == 0
             || o.emission > world.combat.emissions
@@ -534,7 +572,7 @@ impl State {
     }
 
     fn validate_end(
-        self,
+        &self,
         world: &World,
         owner: CombatIdentity,
         lesson: super::super::practice::Practice,
@@ -578,7 +616,7 @@ impl State {
     }
 
     fn validate_contact_receipts(
-        self,
+        &self,
         world: &World,
         p: ProjectileSnapshot,
         i: usize,
@@ -612,11 +650,13 @@ impl State {
         Ok(())
     }
 
-    fn validate_unique_receipts(self, i: usize) -> Result<(), SaveError> {
+    fn validate_unique_receipts(&self, i: usize) -> Result<(), SaveError> {
         for j in 0..i {
-            if self.beams[i]
-                .is_some_and(|b| self.beams[j].is_some_and(|a| a.emission == b.emission))
-            {
+            if self.beams[i].as_ref().is_some_and(|b| {
+                self.beams[j]
+                    .as_ref()
+                    .is_some_and(|a| a.emission == b.emission)
+            }) {
                 return Err(INVALID);
             }
             if let (Some(a), Some(b)) = (self.impacts[j], self.impacts[i])
@@ -632,7 +672,7 @@ impl State {
     }
 
     fn validate_shields(
-        self,
+        &self,
         world: &World,
         practice: Option<super::super::practice::Practice>,
         history: &[super::super::practice::Practice],
@@ -642,16 +682,20 @@ impl State {
         // Check the numeric result; loading never applies these effects to the World.
         let mut shields = [30_000_u16; 2];
         {
-            let mut hits = self.impacts.map(|hit| {
-                hit.filter(|hit| {
-                    self.projectiles
-                        .iter()
-                        .flatten()
-                        .find(|p| p.origin.emission == hit.emission)
-                        .and_then(|p| lesson_for_target(practice, history, p.target))
-                        .is_some_and(|p| !p.missile_docked_since_consent(dock_sequence))
+            let mut hits: Vec<_> = self
+                .impacts
+                .iter()
+                .map(|hit| {
+                    hit.filter(|hit| {
+                        self.projectiles
+                            .iter()
+                            .flatten()
+                            .find(|p| p.origin.emission == hit.emission)
+                            .and_then(|p| lesson_for_target(practice, history, p.target))
+                            .is_some_and(|p| !p.missile_docked_since_consent(dock_sequence))
+                    })
                 })
-            });
+                .collect();
             hits.sort_by_key(|h| h.map_or(u64::MAX, |h| h.incident));
             let mut clock = 0;
             for hit in hits.into_iter().flatten() {
@@ -694,7 +738,7 @@ impl State {
     }
 
     fn validate_cooldown(
-        self,
+        &self,
         world: &World,
         practice: Option<super::super::practice::Practice>,
         history: &[super::super::practice::Practice],
@@ -726,12 +770,14 @@ impl State {
     }
 
     fn validate_lesson_receipts(
-        self,
+        &self,
         lesson: super::super::practice::Practice,
     ) -> Result<(), SaveError> {
         let projectiles = self
             .projectiles
-            .map(|p| p.filter(|p| lesson.missile_owner_matches(p.origin.owner)));
+            .iter()
+            .map(|p| p.filter(|p| lesson.missile_owner_matches(p.origin.owner)))
+            .collect::<Vec<_>>();
         let pending = projectiles
             .iter()
             .flatten()
@@ -767,7 +813,7 @@ impl State {
                 return Err(INVALID);
             }
         }
-        for hit in self.impacts.into_iter().flatten() {
+        for hit in self.impacts.iter().copied().flatten() {
             if lesson.accepts_incident(hit)
                 && lesson.ordinary_hit.is_none_or(|first| {
                     first.incident > hit.incident
@@ -777,13 +823,13 @@ impl State {
                 return Err(INVALID);
             }
         }
-        lesson.validate_missile_quiet(projectiles)?;
+        lesson.validate_missile_quiet(&projectiles)?;
 
         Ok(())
     }
 
     fn validate_motion(
-        self,
+        &self,
         world: &World,
         lesson: super::super::practice::Practice,
         p: ProjectileSnapshot,
@@ -798,7 +844,7 @@ impl State {
         if p.age_ticks == 0 {
             return self.validate_newborn_motion(p, i);
         }
-        let m = self.motions[i].ok_or(INVALID)?;
+        let m = self.motions[i].as_ref().ok_or(INVALID)?;
         self.validate_motion_record(world, lesson, p, i, m, motion_tick)?;
         let target = lesson.retained_missile_target(p.target).ok_or(INVALID)?;
         let direction = unit(sub(target.position, m.position)).ok_or(INVALID)?;
@@ -895,7 +941,7 @@ impl State {
         Ok(())
     }
 
-    fn validate_newborn_motion(self, p: ProjectileSnapshot, i: usize) -> Result<(), SaveError> {
+    fn validate_newborn_motion(&self, p: ProjectileSnapshot, i: usize) -> Result<(), SaveError> {
         let o = p.origin;
         if self.motions[i].is_some()
             || p.position != o.muzzle
@@ -910,12 +956,12 @@ impl State {
     }
 
     fn validate_motion_record(
-        self,
+        &self,
         world: &World,
         lesson: super::super::practice::Practice,
         p: ProjectileSnapshot,
         i: usize,
-        m: Motion,
+        m: &Motion,
         motion_tick: u64,
     ) -> Result<(), SaveError> {
         let o = p.origin;
@@ -948,7 +994,7 @@ impl State {
         Ok(())
     }
 
-    fn motion_body_expected(self, slot: usize, i: usize, m: Motion) -> bool {
+    fn motion_body_expected(&self, slot: usize, i: usize, m: &Motion) -> bool {
         self.projectiles[slot].is_some_and(|other| {
             if other.origin.launched_tick >= m.flight.tick {
                 return false;
@@ -973,16 +1019,21 @@ impl State {
     }
 
     fn validate_motion_bodies(
-        self,
+        &self,
         p: ProjectileSnapshot,
         i: usize,
-        m: Motion,
+        m: &Motion,
         ray: RigidPose,
         travel: f64,
         best: &mut Option<(f64, MissileContact)>,
     ) -> Result<(), SaveError> {
         let o = p.origin;
-        for (slot, body) in m.bodies.into_iter().enumerate() {
+        for slot in m.bodies.len()..self.projectiles.len() {
+            if self.motion_body_expected(slot, i, m) {
+                return Err(INVALID);
+            }
+        }
+        for (slot, body) in m.bodies.iter().copied().enumerate() {
             let expected = self.motion_body_expected(slot, i, m);
 
             if body.is_some() != expected {
@@ -1019,7 +1070,7 @@ impl State {
                 choose(best, d, MissileContact::Projectile(body.id));
             }
         }
-        if m.bodies[i].is_none() {
+        if m.bodies.get(i).copied().flatten().is_none() {
             return Err(INVALID);
         }
 
@@ -1027,7 +1078,7 @@ impl State {
     }
 
     fn validate_interception(
-        self,
+        &self,
         world: &World,
         lesson: super::super::practice::Practice,
         p: ProjectileSnapshot,
@@ -1041,7 +1092,7 @@ impl State {
         {
             return Err(INVALID);
         }
-        if let Some(b) = self.beams[i] {
+        if let Some(b) = self.beams[i].as_ref() {
             let shot = b.shot;
             let PulseContact::Projectile { id, distance } = shot.contact else {
                 return Err(INVALID);
@@ -1062,7 +1113,14 @@ impl State {
             if distance != d || shot.end != add(shot.origin, scale(shot.direction, d)) {
                 return Err(INVALID);
             }
-            for (slot, body) in b.bodies.into_iter().enumerate() {
+            for other in self.projectiles.iter().skip(b.bodies.len()).flatten() {
+                if other.origin.emission < emission
+                    && (other.ended.is_none() || other.last_tick > shot.tick)
+                {
+                    return Err(INVALID);
+                }
+            }
+            for (slot, body) in b.bodies.iter().copied().enumerate() {
                 let expected = self.projectiles[slot].is_some_and(|other| {
                     other.origin.emission < emission
                         && (slot == i || other.ended.is_none() || other.last_tick > shot.tick)
@@ -1102,8 +1160,8 @@ impl State {
         Ok(())
     }
     fn validate_beam_identity(
-        self,
-        b: Beam,
+        &self,
+        b: &Beam,
         p: ProjectileSnapshot,
         emission: u64,
         id: ProjectileId,
@@ -1132,7 +1190,7 @@ impl State {
     }
 
     fn validate_beam_body(
-        self,
+        &self,
         body: Body,
         slot: usize,
         i: usize,
@@ -1187,4 +1245,29 @@ fn cross(a: Vec3, b: Vec3) -> Vec3 {
         a.z * b.x - a.x * b.z,
         a.x * b.y - a.y * b.x,
     )
+}
+
+fn read_bodies(
+    r: &mut Reader<'_>,
+    version: u16,
+    count: usize,
+) -> Result<Vec<Option<Body>>, SaveError> {
+    let len = if version >= 12 {
+        usize::from(r.u16()?)
+    } else {
+        3
+    };
+    if len < 3 || len > count {
+        return Err(INVALID);
+    }
+    (0..len)
+        .map(|_| {
+            r.option(|r| {
+                Ok(Body {
+                    id: ProjectileId::decode(r)?,
+                    position: read_vector(r)?,
+                })
+            })
+        })
+        .collect()
 }

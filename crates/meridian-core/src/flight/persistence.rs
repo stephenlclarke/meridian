@@ -85,8 +85,18 @@ const V10_CONTENT: &[u8] = concat!(
 )
 .as_bytes();
 
-const CONTENT: &[u8] = concat!(
+const V11_CONTENT: &[u8] = concat!(
     "meridian-world/rules/11;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
+    "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
+    "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
+    "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
+    "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823;",
+    "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa"
+)
+.as_bytes();
+
+const CONTENT: &[u8] = concat!(
+    "meridian-world/rules/13;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -119,6 +129,8 @@ pub(super) struct Commerce<'a> {
     pub(super) account: Option<&'a CommanderAccount>,
     pub(super) markets: Option<&'a StationMarkets>,
     pub(super) lesson: &'a navigation_trade::State,
+    pub(super) ammunition: &'a super::ammunition::State,
+    pub(super) modular: &'a super::modular::State,
 }
 impl<'a> Commerce<'a> {
     fn current(world: &'a World) -> Self {
@@ -126,6 +138,8 @@ impl<'a> Commerce<'a> {
             account: world.commander_account.as_ref(),
             markets: world.station_markets.as_ref(),
             lesson: &world.navigation_trade,
+            ammunition: &world.ammunition,
+            modular: &world.modular,
         }
     }
 }
@@ -205,6 +219,62 @@ impl World {
             account: Some(account),
             markets: Some(markets),
             lesson,
+            ammunition: &self.ammunition,
+            modular: &self.modular,
+        };
+        self.validate_saved_world(
+            self.practice,
+            &self.practice_history,
+            self.practice_trace,
+            &self.flight_reception,
+            &commerce,
+        )?;
+        self.encode_saved_world(
+            self.practice,
+            &self.practice_history,
+            self.practice_trace,
+            &self.flight_reception,
+            &commerce,
+        )
+    }
+    pub(super) fn save_bytes_with_ammunition(
+        &self,
+        account: &CommanderAccount,
+        ammunition: &super::ammunition::State,
+    ) -> Result<Vec<u8>, SaveError> {
+        let commerce = Commerce {
+            account: Some(account),
+            markets: self.station_markets.as_ref(),
+            lesson: &self.navigation_trade,
+            ammunition,
+            modular: &self.modular,
+        };
+        self.validate_saved_world(
+            self.practice,
+            &self.practice_history,
+            self.practice_trace,
+            &self.flight_reception,
+            &commerce,
+        )?;
+        self.encode_saved_world(
+            self.practice,
+            &self.practice_history,
+            self.practice_trace,
+            &self.flight_reception,
+            &commerce,
+        )
+    }
+    pub(super) fn save_bytes_with_modules(
+        &self,
+        account: &CommanderAccount,
+        modular: &super::modular::State,
+    ) -> Result<Vec<u8>, SaveError> {
+        let commerce = Commerce {
+            account: Some(account),
+            markets: self.station_markets.as_ref(),
+            lesson: &self.navigation_trade,
+            ammunition: &self.ammunition,
+            modular,
         };
         self.validate_saved_world(
             self.practice,
@@ -251,6 +321,8 @@ impl World {
             .markets
             .ok_or(SaveError::NoCommander)?
             .encode_save(&mut w);
+        commerce.modular.encode(&mut w);
+        commerce.ammunition.encode(&mut w);
         commerce.lesson.encode(&mut w);
         lesson.encode(&mut w);
         self.missiles.encode(&mut w);
@@ -334,8 +406,11 @@ impl World {
             8 if r.fixed::<{ V8_CONTENT.len() }>()?.as_slice() == V8_CONTENT => V8_CONTENT,
             9 if r.fixed::<{ V9_CONTENT.len() }>()?.as_slice() == V9_CONTENT => V9_CONTENT,
             10 if r.fixed::<{ V10_CONTENT.len() }>()?.as_slice() == V10_CONTENT => V10_CONTENT,
+            11 if r.fixed::<{ V11_CONTENT.len() }>()?.as_slice() == V11_CONTENT => V11_CONTENT,
             SAVE_VERSION if r.fixed::<{ CONTENT.len() }>()?.as_slice() == CONTENT => CONTENT,
-            4 | 5 | 6 | 7 | 8 | 9 | 10 | SAVE_VERSION => return Err(SaveError::ContentMismatch),
+            4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | SAVE_VERSION => {
+                return Err(SaveError::ContentMismatch);
+            }
             _ => return Err(SaveError::UnsupportedVersion),
         };
         if r.u64()? != compiled_content_fingerprint(content) {
@@ -349,18 +424,28 @@ impl World {
         let commander_account = CommanderAccount::decode_save(&mut r, version)?;
         let freight_session = mission::FreightSession::decode_save(&mut r)?;
         let station_markets = StationMarkets::decode_save(&mut r)?;
+        let modular = if version >= 13 {
+            super::modular::State::decode(&mut r)?
+        } else {
+            super::modular::State::default()
+        };
+        let ammunition = if version >= 12 {
+            super::ammunition::State::decode(&mut r)?
+        } else {
+            super::ammunition::State::default()
+        };
         let navigation_trade = if version >= 11 {
             navigation_trade::State::decode(&mut r)?
         } else {
             navigation_trade::State::default()
         };
         let flight_reception = if version >= 10 {
-            flight_reception::State::decode(&mut r)?
+            flight_reception::State::decode(&mut r, version)?
         } else {
             flight_reception::State::default()
         };
         let missiles = if version >= 8 {
-            missiles::State::decode(&mut r)?
+            missiles::State::decode(&mut r, version)?
         } else {
             missiles::State::default()
         };
@@ -380,6 +465,8 @@ impl World {
             freight_session: Some(freight_session),
             station_markets: Some(station_markets),
             missiles,
+            ammunition,
+            modular,
             flight_reception,
             navigation_trade,
             practice_history,
@@ -439,6 +526,19 @@ impl World {
             .ok_or(SaveError::NoCommander)?;
         let station = self.station_data.as_ref().ok_or(SaveError::NoCommander)?;
         validate_flight(&self.state)?;
+        if self.celestial_snapshot().is_some_and(|scene| {
+            [scene.planet, scene.sun].into_iter().any(|body| {
+                body.blocks_motion(
+                    self.state.position,
+                    self.state.position,
+                    station.player_radius(),
+                )
+            })
+        }) {
+            return Err(SaveError::InvalidState(
+                "player intersects physical celestial surface",
+            ));
+        }
         if self.state.station != Some(station.station_pose()) || self.state.navigation.is_some() {
             return Err(SaveError::InvalidState(
                 "immutable station or derived navigation",
@@ -464,6 +564,12 @@ impl World {
                 history.len() + usize::from(practice.is_some()),
                 usize::from(practice.is_some_and(|p| !p.reception_is_terminal())),
             ),
+        )?;
+        let modular = commerce.modular.ledger(self, account)?;
+        let ammunition = commerce.ammunition.ledger_with_module_count(
+            self,
+            account,
+            commerce.modular.paid_count(),
         )?;
         self.missiles
             .validate(self, practice, history, nav.dock_sequence)?;
@@ -518,6 +624,14 @@ impl World {
             nav.jumps,
             nav.fuel_spent,
             self.combat.penalties(),
+            ammunition
+                .paid
+                .checked_add(modular.paid)
+                .ok_or(SaveError::InvalidState("paid equipment overflow"))?,
+            ammunition
+                .extra_revisions
+                .checked_add(modular.revision)
+                .ok_or(SaveError::SequenceExhausted)?,
         )?;
         if navigation
             .dock()
@@ -566,6 +680,8 @@ fn validate_accounting(
     jumps: u64,
     fuel_spent: u64,
     penalties: u8,
+    ammunition_paid: u32,
+    ammunition_revisions: u64,
 ) -> Result<(), SaveError> {
     let income = 7200_u128
         + u128::from(d.completed) * u128::from(crate::freight::REWARD_TENTHS)
@@ -579,7 +695,7 @@ fn validate_accounting(
             "unjustified market credit saturation",
         ));
     }
-    let paid = u128::from(s.paid) + u128::from(d.equipment_paid);
+    let paid = u128::from(s.paid) + u128::from(d.equipment_paid) + u128::from(ammunition_paid);
     if income < paid
         || income - paid != u128::from(d.credits)
         || fuel < u128::from(fuel_spent)
@@ -594,6 +710,11 @@ fn validate_accounting(
                 + u128::from(jumps)
                 + u128::from(d.equipment_revision)
                 + u128::from(d.consumed_missiles)
+                + u128::from(
+                    ammunition_revisions
+                        .checked_sub(u64::from(d.consumed_missiles))
+                        .ok_or(SaveError::InvalidState("missile fit revision"))?,
+                )
     {
         return Err(SaveError::InvalidState(
             "wallet, cargo, fuel or payment chronology",
@@ -619,6 +740,7 @@ pub(super) fn write_flight(w: &mut Writer, s: &Snapshot) {
         None => 0,
         Some(MotionRefusal::StationContact) => 1,
         Some(MotionRefusal::EntryConditions) => 2,
+        Some(MotionRefusal::CelestialContact) => 3,
     });
 }
 pub(super) fn read_flight(r: &mut Reader<'_>) -> Result<Snapshot, SaveError> {
@@ -636,6 +758,7 @@ pub(super) fn read_flight(r: &mut Reader<'_>) -> Result<Snapshot, SaveError> {
         0 => None,
         1 => Some(MotionRefusal::StationContact),
         2 => Some(MotionRefusal::EntryConditions),
+        3 => Some(MotionRefusal::CelestialContact),
         _ => return Err(SaveError::InvalidEncoding),
     };
     Ok(Snapshot {
@@ -680,7 +803,13 @@ fn legacy_test_fixture(world: &World, version: u16) -> Result<Vec<u8>, SaveError
         &world.flight_reception,
         &Commerce::current(world),
     )?;
-    if world.navigation_trade != navigation_trade::State::default() {
+    if world.modular != super::modular::State::default() {
+        return Err(SaveError::UnsupportedVersion);
+    }
+    if world.ammunition != super::ammunition::State::default() || world.missiles.used() > 3 {
+        return Err(SaveError::UnsupportedMissiles);
+    }
+    if version < 11 && world.navigation_trade != navigation_trade::State::default() {
         return Err(SaveError::InvalidState("T04 requires v11"));
     }
     if version < 10 && world.flight_reception != flight_reception::State::default() {
@@ -702,6 +831,7 @@ fn legacy_test_fixture(world: &World, version: u16) -> Result<Vec<u8>, SaveError
         8 => V8_CONTENT,
         9 => V9_CONTENT,
         10 => V10_CONTENT,
+        11 => V11_CONTENT,
         _ => return Err(SaveError::UnsupportedVersion),
     };
     let mut w = Writer::new();
@@ -729,11 +859,14 @@ fn legacy_test_fixture(world: &World, version: u16) -> Result<Vec<u8>, SaveError
         .as_ref()
         .ok_or(SaveError::NoCommander)?
         .encode_save(&mut w);
+    if version >= 11 {
+        world.navigation_trade.encode(&mut w);
+    }
     if version >= 10 {
-        world.flight_reception.encode(&mut w);
+        world.flight_reception.encode_version(&mut w, version);
     }
     if version >= 8 {
-        world.missiles.encode(&mut w);
+        world.missiles.encode_version(&mut w, version);
     }
     if version >= 9 {
         practice::lifecycle::encode_history(&mut w, &world.practice_history, world.practice_trace);
@@ -815,4 +948,21 @@ pub(super) fn v9_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
 #[cfg(test)]
 pub(super) fn v10_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
     legacy_test_fixture(world, 10)
+}
+
+#[cfg(test)]
+mod paid_missile_format_tests {
+    use super::*;
+    #[test]
+    fn explicit_qualified_v11_is_read_without_relabelling_it_as_v12() {
+        let world = World::new_commander(8401).unwrap_or_else(|e| panic!("{e:?}"));
+        let old = legacy_test_fixture(&world, 11).unwrap_or_else(|e| panic!("{e:?}"));
+        assert_eq!(u16::from_le_bytes([old[8], old[9]]), 11);
+        let loaded = World::from_save_bytes(&old).unwrap_or_else(|e| panic!("{e:?}"));
+        assert_eq!(loaded.ammunition_snapshot(), world.ammunition_snapshot());
+        assert_eq!(loaded.credits_tenths(), world.credits_tenths());
+        let current = loaded.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
+        assert_eq!(u16::from_le_bytes([current[8], current[9]]), 13);
+        assert_ne!(old, current);
+    }
 }

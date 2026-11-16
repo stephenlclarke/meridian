@@ -1,0 +1,49 @@
+{
+  "legacyCommit": "a11fe16924d87d06021816f9037952afcbac08db",
+  "legacyTree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "files": [
+    {
+      "path": "Sources/L337Core/CockpitDisplay.swift",
+      "sha256": "cec7cbfaabb97201dafc8bd20a891c0f3471630a4756cd2c29b6b4a85fe53d5b",
+      "bytes": 12812
+    },
+    {
+      "path": "Sources/L337Core/StationNavigation.swift",
+      "sha256": "2fef25ab1080662a21998683870d0c1cfd994404532d78f2a584371d187caae5",
+      "bytes": 8358
+    },
+    {
+      "path": "Sources/L337Core/GameTypography.swift",
+      "sha256": "1276ae2462788271f4772de8b9ff68c309d0805d21b1918fd729f8ac1f6c8ba0",
+      "bytes": 1189
+    },
+    {
+      "path": "Sources/L337Core/Display.swift",
+      "sha256": "fb8e1d4cd3535e04c26ec6b7ae55139ce758802b1ba8504d0b4d903388620482",
+      "bytes": 33193
+    },
+    {
+      "path": "Sources/L337Core/FlightControlAuthority.swift",
+      "sha256": "3bc67f679a0c8714627a86c13584b1b420f923af673929374008500a3c98c0d3",
+      "bytes": 19289
+    },
+    {
+      "path": "Sources/L337Mac/L337App.swift",
+      "sha256": "807ea74304273109eac76172deb491cf4d5bc757508a360dc937f1a23c0c7171",
+      "bytes": 71433
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766",
+      "bytes": 1071
+    },
+    {
+      "path": "README.md",
+      "sha256": "0cb75903df20bace169e65485421b968ebbac5aa86a259df2e64db60ebb0a1c6",
+      "bytes": 150178
+    }
+  ],
+  "scope": "Cockpit groupings, responsive proportions, conventional palette, missile outline/scanner and station navigation reference. Existing Meridian code-drawn glyphs retained; no legacy BitmapFont table, original Elite/Oolite art, models or fonts imported by this change.",
+  "provenanceLimit": "Frozen source contains Stephen Clarke MIT LICENSE and README describes raster font as an independent approximation; neither source presence nor repository-wide license alone establishes original authorship of every historical component. Source-guided geometry and conventional palette are recorded as references, not relabelled original art. No authenticated legacy cockpit screenshot located; no direct screenshot parity claim.",
+  "sourceFields": "Real current World values only. Read-only capacities are exported from simulation constants, never duplicated in the HUD. Missing core simulations remain explicit N/A."
+}

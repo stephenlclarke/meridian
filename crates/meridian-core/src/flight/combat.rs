@@ -3,7 +3,7 @@ use super::{FireError, FlightMode, PulseContact, PulseShot, Snapshot, World, fli
 use crate::docking::Vec3;
 use crate::navigation::SystemId;
 use crate::save::{Reader, SaveError, Writer};
-const SHIELD_CAPACITY: u16 = 30_000;
+pub const SHIELD_CAPACITY: u16 = 30_000;
 const SHIELD_RECHARGE: u16 = 3;
 const ATTACK_WINDOW: u64 = 600;
 
@@ -346,7 +346,7 @@ impl World {
         })
     }
     pub fn combat_snapshot(&self) -> Option<CombatSnapshot> {
-        let laser = self.pulse_laser_snapshot()?;
+        let laser = self.flight_resources_snapshot()?;
         Some(CombatSnapshot {
             player: PlayerCondition {
                 front_shield_hundredths: self.combat.front,

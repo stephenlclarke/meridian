@@ -134,7 +134,7 @@ fn read_item(r: &mut Reader<'_>) -> Result<OwnedStarterItem, SaveError> {
 }
 impl CommanderAccount {
     pub(crate) fn encode_save(&self, w: &mut Writer) {
-        self.encode_version(w, 8);
+        self.encode_version(w, 13);
     }
     #[cfg(test)]
     pub(crate) fn encode_legacy_version(&self, w: &mut Writer, version: u16) {
@@ -170,9 +170,15 @@ impl CommanderAccount {
         }
         w.u8(d.legal);
         d.equipment.encode(w);
+        if version >= 12 {
+            w.u64(d.ammunition_revision);
+        }
+        if version >= 13 {
+            w.u64(d.modular_revision);
+        }
     }
     pub(crate) fn decode_save(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
-        Ok(Self {
+        let mut account = Self {
             data: AccountData {
                 owner: r.u64()?,
                 hull: r.u64()?,
@@ -200,8 +206,16 @@ impl CommanderAccount {
                 reserved_commodities: r.array(|r| r.u64())?,
                 legal: r.u8()?,
                 equipment: crate::equipment::State::decode(r)?,
+                ammunition_revision: if version >= 12 { r.u64()? } else { 0 },
+                modular_revision: if version >= 13 { r.u64()? } else { 0 },
             },
-        })
+        };
+        if version < 12 {
+            account.data.ammunition_revision = account.data.fit.map_or(0, |fit| {
+                fit.items[5..].iter().filter(|i| i.is_none()).count() as u64
+            });
+        }
+        Ok(account)
     }
     pub(crate) fn validate_saved_domain(
         &self,
@@ -230,7 +244,11 @@ impl CommanderAccount {
             || fit.items.iter().enumerate().any(|(i, item)| {
                 (i < 5 && item.is_none())
                     || item.is_some_and(|item| {
-                        item.id != nav.owner + 3 + i as u64 || item.fitted_hull != Some(nav.hull)
+                        item.id != nav.owner + 3 + i as u64
+                            || (item.fitted_hull != Some(nav.hull)
+                                && !(i == 4
+                                    && self.data.modular_revision > 0
+                                    && item.fitted_hull.is_none()))
                     })
             })
         {

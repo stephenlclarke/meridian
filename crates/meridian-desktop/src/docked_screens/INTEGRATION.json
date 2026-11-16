@@ -1,0 +1,129 @@
+{
+  "status": "G1_PRIOR_MODULE_COMPILE_29_TESTS_PASS;CLIPPY_CORRECTION_REVALIDATION_PENDING;NATIVE_UNRUN",
+  "base": "8da5d64f9e8c9425b3cae120abfb723fab3ae50e",
+  "pathOwnership": "Only crates/meridian-desktop/src/docked_screens/**",
+  "registerAtRootSerialJoin": "mod docked_screens; in desktop main.rs; connect actual App input/Profile/World/G1 renderer without moving simulation ownership",
+  "data": {
+    "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+    "worlds": 2048,
+    "ships": 162,
+    "otherObjects": 9,
+    "modelsImported": 0,
+    "hiddenPlughImported": false
+  },
+  "ownedScreens": [
+    "Galaxy",
+    "System",
+    "Showroom",
+    "Trading",
+    "Equipment"
+  ],
+  "requestOutputs": [
+    "Close",
+    "ReviewRoute",
+    "ReviewBodyRoute",
+    "ReviewCommodity",
+    "InspectEquipmentSlot",
+    "ReviewEquipment",
+    "ReviewShipExchange",
+    "ConfirmReview",
+    "CancelReview"
+  ],
+  "requiredBindings": {
+    "Root": "Context/actual binding hints, painted-frame material stamps, command reviews and prepared durable publication",
+    "G1": "Actual clipped draw/model/planet composition, logical-point input, sole Mac compiler/native scope",
+    "G3": "Full real module/slot/owned-instance/option/quote/compatibility/effect projection and prepared actions; current paid missile increment alone is not full modular acceptance",
+    "G4": "Admitted original asset handles and current hull/exchange ownership; authored ship listing is not 162 runtime adoptions",
+    "MC1": "Real stable(system,ordinal) body/provider positions and mining/depletion/cargo/save; no duplicate ore data in UI"
+  },
+  "missingAtBase": {
+    "fullModularEquipment": "Base8da5 supplies one cargo-bay service; G3 end-state core and Root adapter are required. Empty/disabled panel is not accepted functionality.",
+    "showroom": "All162 authored ships listed from source; only real supplied model handles preview. No ship exchange is invented where World lacks admission.",
+    "systemRoutes": "Browse2048 normal worlds; only host-supported actual routes/scenes can be reviewed.",
+    "planetShading": "Planet preview requests require an actual joined G1 provider; no raster/appearance asset is imported.",
+    "belt": "Conditional actual-provider entry/cue support only; no body/mineability/depletion is fabricated.",
+    "wantedBoard": "Future real bounty/tracking provider and subsequent screen increment; not a blocker for initial five screens."
+  },
+  "authoredTests": [
+    "exact_catalogue_taxonomy_is_162_ships_not_171_ships",
+    "every_imported_g01_coordinate_and_name_matches_real_core_content",
+    "malformed_or_partial_catalogues_refuse_instead_of_fabricating_data",
+    "search_orders_prefixes_and_retains_source_identities",
+    "all_five_tabs_are_navigable_by_pointer_and_semantic_keyboard",
+    "actual_market_bid_ask_stock_hold_native_units_and_legal_colours_are_projected",
+    "market_keyboard_pointer_equivalence_outputs_review_only_and_preserves_world",
+    "selection_changes_do_not_execute_the_selected_commodity",
+    "stale_painted_state_and_changed_session_refuse_without_actions",
+    "browsing_other_galaxies_never_authorises_travel_or_moves_commander",
+    "chart_pointer_and_keyboard_select_the_same_source_world",
+    "search_consumes_text_and_navigation_keys_without_firing_other_actions",
+    "model_previews_require_real_asset_handles_and_share_the_same_orientation",
+    "unsupported_exchange_cannot_be_inferred_from_catalogue_flyable_status",
+    "modular_equipment_displays_authoritative_offer_owned_fit_readout_and_feedback",
+    "modular_buy_fit_store_are_equivalent_review_intents_not_ui_owned_transactions",
+    "module_options_preserve_instance_and_slot_identity",
+    "incompatible_unowned_and_paused_equipment_actions_refuse",
+    "slot_click_and_next_slot_request_real_projection_without_moving_equipment",
+    "modal_blocks_clickthrough_and_confirms_only_the_supplied_review_token",
+    "review_controls_without_a_current_review_never_issue_requests",
+    "missing_equipment_provider_is_visible_and_never_a_fake_shop",
+    "real_body_identity_and_physical_position_flow_to_navigation_without_an_ore_store",
+    "invalid_pointer_and_drag_values_do_not_change_orientation_or_issue_commands",
+    "all_screen_geometry_is_finite_and_controls_stay_inside_supported_viewports",
+    "chart_markers_carry_plot_clipping_for_both_chart_scales",
+    "visible_shortcuts_are_from_the_supplied_binding_map",
+    "focus_loss_stops_text_and_rotation_without_changing_the_commander",
+    "planet_preview_is_a_provider_request_for_the_selected_real_world_only"
+  ],
+  "testExecution": "G1 cargo test -p meridian-desktop docked_ passed 41: all29 module +8 renderer +4 existing name-matched tests, against module918717; latest bounded lint correction not yet revalidated. Author launched no compiler/native work.",
+  "nativeCriteria": "README.md validation and acceptance section; exact joined source, real keyboard+mouse, all five rendered screens, full module effects/refusals/durable failure/cold continuation",
+  "releaseGate": "HUD + all5 docked menus + actual working modular equipment accepted together; no new missions/Lua/fullfleet prerequisite; existing exclusive publisher verifies real qualified boundary",
+  "markerClipping": "Each Marker.clip is ChartLayout.plot; G1 clips circles and current/selection decorations to it.",
+  "priorCompilerResults": [
+    {
+      "source": "7b9e2738b9e000b809a32c0dc0c8b4b0b3c6598e",
+      "owner": "G1",
+      "outcome": "FAILED E0004 non-exhaustive Control::ReviewConfirm/ReviewCancel; corrected in revised source, recompile pending",
+      "rawLog": "/Volumes/SSD/offload/meridian-g1-mbp-docked-render.5c81d65/evidence/renderer-first.log"
+    },
+    {
+      "source": "28370eb9fb1e7c9978ba86fd246c175cbe420523",
+      "owner": "G1",
+      "outcome": "FAILED E0624 regression test called private control; corrected through public handle dispatch, recompile pending",
+      "rawLog": "/Volumes/SSD/offload/meridian-g1-mbp-docked-render.5c81d65/evidence/renderer-corrected.log"
+    }
+  ],
+  "g1Validation": {
+    "moduleHead": "91871716c9501f01c3305287f9a7538855965fc1",
+    "owner": "G1 sole Mac compiler lane",
+    "focusedCommand": "cargo test -p meridian-desktop docked_",
+    "focusedResult": {
+      "passed": 41,
+      "failed": 0,
+      "filteredOut": 68,
+      "modulePassed": 29,
+      "rendererPassed": 8,
+      "existingNameMatchedPassed": 4
+    },
+    "focusedLog": {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-docked-render.5c81d65/evidence/docked-focused.log",
+      "sha256": "c809ed0b0a41e2105812bd52892bb14e5d5c881567e30a1c0b885a25b6029dab"
+    },
+    "strictClippy": {
+      "outcome": "FAILED six module findings; bounded correction pending G1 revalidation",
+      "findings": [
+        "controller.rs:185 collapsible_if",
+        "controller.rs:209 collapsible_if",
+        "controller.rs:226 if_same_then_else",
+        "controller.rs:478 collapsible_if",
+        "controller.rs:663 collapsible_if",
+        "presentation.rs:624 manual_clamp"
+      ],
+      "log": {
+        "path": "/Volumes/SSD/offload/meridian-g1-mbp-docked-render.5c81d65/evidence/clippy.log",
+        "sha256": "7dafe09a69a5b96f34a7982e8e53b933a85b704ae401a86de7590fe5647a1e9f"
+      }
+    },
+    "native": "UNRUN"
+  }
+}

@@ -1,3 +1,4 @@
+mod celestial;
 mod navigation_trade;
 pub use navigation_trade::{
     NavigationTonneId, NavigationTradeAction, NavigationTradeAttemptSnapshot, NavigationTradeError,
@@ -11,7 +12,17 @@ pub use flight_reception::{
     FlightReceptionError, FlightReceptionId, FlightReceptionOutcome, FlightReceptionReview,
     FlightReceptionSnapshot, FlightReceptionTrace, FlightView, PreparedFlightReception,
 };
+mod modular;
+pub use modular::{
+    FittedMiningTool, ModularEquipmentSnapshot, ModuleAction, ModuleError, ModuleKind, ModuleOffer,
+    ModuleProvenance, ModuleReview, ModuleSlot, OwnedModule, PreparedModule,
+};
+mod ammunition;
 mod missiles;
+pub use ammunition::{
+    AmmunitionAction, AmmunitionError, AmmunitionItem, AmmunitionReview, AmmunitionSnapshot,
+    MissilePurchase, PreparedAmmunition,
+};
 pub use missiles::{
     MISSILE_COOLDOWN_TICKS, MISSILE_FACES, MISSILE_LIFETIME_TICKS, MISSILE_MUZZLE_DISTANCE,
     MISSILE_RANGE, MISSILE_SPEED, MISSILE_VERTICES, MissileContact, MissileEnd, MissileError,
@@ -19,9 +30,11 @@ pub use missiles::{
 };
 mod combat;
 pub use combat::{
-    CombatIdentity, CombatSnapshot, OrdinaryImpact, OrdinaryTarget, OrdinaryWeapon, PlayerCondition,
+    CombatIdentity, CombatSnapshot, OrdinaryImpact, OrdinaryTarget, OrdinaryWeapon,
+    PlayerCondition, SHIELD_CAPACITY,
 };
 mod equipment;
+pub use equipment::{EquipmentPreparationError, PreparedEquipment};
 mod mission;
 mod persistence;
 mod practice;
@@ -37,7 +50,8 @@ mod weapons;
 pub use mission::{MissionError, MissionSnapshot, StationNpc};
 pub use services::ServiceSnapshot;
 pub use weapons::{
-    FireError, PULSE_COOLDOWN_TICKS, PULSE_RANGE, PulseContact, PulseLaserSnapshot, PulseShot,
+    ENERGY_CAPACITY_HUNDREDTHS, FireError, FlightResourcesSnapshot, PULSE_COOLDOWN_TICKS,
+    PULSE_RANGE, PulseContact, PulseLaserSnapshot, PulseShot,
 };
 
 use crate::docking::StationPose;
@@ -56,7 +70,7 @@ pub const FIXED_DELTA_SECONDS: f32 = 1.0 / 60.0;
 
 // SH025 [game], immutable legacy a11fe16924d87d06021816f9037952afcbac08db.
 // These are reference gameplay units, not an asserted SI or renderer-space calibration.
-const MAX_SPEED: f32 = 34.3;
+pub const MAX_SPEED: f32 = 34.3;
 const ACCELERATION: f32 = 9.1;
 const PITCH_RATE: f32 = 0.7;
 const YAW_RATE: f32 = 0.65;
@@ -145,6 +159,8 @@ pub struct World {
     pulse: weapons::PulseResources,
     combat: combat::State,
     missiles: missiles::State,
+    ammunition: ammunition::State,
+    modular: modular::State,
     navigation_trade: navigation_trade::State,
     flight_reception: flight_reception::State,
     practice: Option<practice::Practice>,
@@ -180,6 +196,8 @@ impl World {
             pulse: weapons::PulseResources::default(),
             combat: combat::State::default(),
             missiles: missiles::State::default(),
+            ammunition: ammunition::State::default(),
+            modular: modular::State::default(),
             navigation_trade: navigation_trade::State::default(),
             flight_reception: flight_reception::State::default(),
             practice: None,
@@ -403,7 +421,7 @@ impl World {
     }
 
     /// Advance exactly one 1/60-second tick. Errors leave World unchanged.
-    /// A station motion refusal is an accepted safe stop at the last clear pose,
+    /// A motion refusal is an accepted safe stop at the last clear pose,
     /// reported through Snapshot.motion_refusal; damage/contact-response parity is pending.
     /// Rotation is local yaw, then pitch, then roll; translation uses the new pose/speed.
     /// Brake overrides throttle and uses the same reference deceleration magnitude.
@@ -451,6 +469,22 @@ impl World {
         }
         if !next.speed.is_finite() || next.position.iter().any(|value| !value.is_finite()) {
             return Err(StepError::NonFiniteState);
+        }
+        if let Some(scene) = self.celestial_snapshot() {
+            let hull_radius = self
+                .station_data
+                .as_ref()
+                .map_or(0.0, |data| data.player_radius());
+            if [scene.planet, scene.sun]
+                .into_iter()
+                .any(|body| body.blocks_motion(self.state.position, next.position, hull_radius))
+            {
+                let mut stopped = self.state;
+                stopped.tick = next.tick;
+                stopped.speed = 0.0;
+                stopped.motion_refusal = Some(MotionRefusal::CelestialContact);
+                return self.publish_step(stopped);
+            }
         }
         if let Some(data) = &self.station_data {
             let before = flight_pose(self.state.position, self.state.orientation)

@@ -1,0 +1,723 @@
+//! L337 a11fe169 CockpitDisplay.swift gauge grouping/scanner and StationNavigation.swift.
+//! Only World snapshots supply readings. Missing simulations have no invented needle.
+use super::{glyph, quad};
+use crate::mesh::{Vertex, rotate_inverse};
+use meridian_core::{FlightMode, FlightView, Snapshot, World};
+
+const YELLOW: [f32; 3] = [1.0, 1.0, 0.0];
+const GREEN: [f32; 3] = [0.0, 1.0, 0.0];
+const BLUE: [f32; 3] = [68.0 / 255.0, 136.0 / 255.0, 1.0];
+const RED: [f32; 3] = [1.0, 0.0, 0.0];
+const CYAN: [f32; 3] = [0.0, 1.0, 1.0];
+// Projectile IDs use a checked u8 ordinal. Include every possible retained launch,
+// plus the station and three practice bodies, without allocating contacts each frame.
+pub const MAX_CONTACTS: usize = 4 + crate::mesh::MAX_MISSILE_PROJECTILES;
+// Two line quads per additional scanner contact; eight edges per added pylon icon.
+pub const MAX_VERTICES: usize = 30_000 + (MAX_CONTACTS - 7) * 12 + (9 - 3) * 8 * 6;
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Cockpit {
+    pub flight: Snapshot,
+    pub view: FlightView,
+    pub shield: [Option<f32>; 2],
+    pub energy: Option<f32>,
+    pub heat: Option<f32>,
+    pub fuel: Option<f32>,
+    pub missiles: usize,
+    pub armed: bool,
+    pub locked: bool,
+    pub destroyed: bool,
+    /// Player-relative contacts in front flight coordinates, independent of selected camera.
+    pub contacts: [Option<([f32; 3], [f32; 3])>; MAX_CONTACTS],
+    pub station: Option<[f32; 3]>,
+}
+impl Cockpit {
+    /// Capture once on the simulation-owning event loop; drawing has no World reference.
+    pub fn capture(world: &World, flight: Snapshot) -> Self {
+        let combat = world.combat_snapshot();
+        let resources = world.flight_resources_snapshot();
+        let missile = world.missile_snapshot();
+        let station = flight.station.map(|s| relative(flight, s.pose.position));
+        let mut contacts = [None; MAX_CONTACTS];
+        contacts[0] = station.map(|position| (position, GREEN));
+        if let Some(beacons) = world.practice_snapshot().and_then(|p| p.beacons) {
+            for (i, b) in beacons.into_iter().enumerate() {
+                contacts[i + 1] = Some((relative(flight, b.pose.position), CYAN));
+            }
+        }
+        for (contact, projectile) in contacts[4..]
+            .iter_mut()
+            .zip(world.missile_projectiles().filter(|p| p.ended.is_none()))
+        {
+            *contact = Some((relative(flight, projectile.position), RED));
+        }
+        Self {
+            flight,
+            view: world.flight_view(),
+            shield: [
+                combat.map(|c| {
+                    f32::from(c.player.front_shield_hundredths)
+                        / f32::from(meridian_core::SHIELD_CAPACITY)
+                }),
+                combat.map(|c| {
+                    f32::from(c.player.rear_shield_hundredths)
+                        / f32::from(meridian_core::SHIELD_CAPACITY)
+                }),
+            ],
+            energy: combat.map(|c| {
+                f32::from(c.player.energy_hundredths)
+                    / f32::from(meridian_core::ENERGY_CAPACITY_HUNDREDTHS)
+            }),
+            heat: resources.map(|l| f32::from(l.heat_fifths) / (5.0 * 255.0)),
+            fuel: flight.navigation.map(|n| {
+                f32::from(n.fuel_units) / f32::from(meridian_core::navigation::FUEL_CAPACITY)
+            }),
+            missiles: world
+                .missile_rounds()
+                .map_or(0, |rounds| rounds.iter().flatten().count()),
+            armed: missile.is_some_and(|m| m.armed),
+            locked: missile.is_some_and(|m| m.lock.is_some()),
+            destroyed: combat.is_some_and(|c| c.player.destroyed),
+            contacts,
+            station,
+        }
+    }
+    pub fn status(&self) -> &'static str {
+        if self.destroyed {
+            "DESTROYED"
+        } else if self.flight.mode == FlightMode::Docked {
+            "DOCKED"
+        } else if self.flight.mode == FlightMode::Launching {
+            "LAUNCHING"
+        } else {
+            "FLIGHT"
+        } // Hostile/Safe requires the unported active hostile-body authority.
+    }
+    pub fn station_navigation(&self) -> Option<(f32, f32, f32)> {
+        let p = self.station?;
+        let [x, y, z] = view_position(self.view, p);
+        Some((
+            p.iter().map(|v| v * v).sum::<f32>().sqrt(),
+            x.atan2(z).to_degrees(),
+            y.atan2(x.hypot(z)).to_degrees(),
+        ))
+    }
+}
+fn relative(s: Snapshot, p: meridian_core::docking::Vec3) -> [f32; 3] {
+    rotate_inverse(
+        s.orientation,
+        [
+            p.x as f32 - s.position[0],
+            p.y as f32 - s.position[1],
+            p.z as f32 - s.position[2],
+        ],
+    )
+}
+fn view_position(view: FlightView, [x, y, z]: [f32; 3]) -> [f32; 3] {
+    match view {
+        FlightView::Front => [x, y, z],
+        FlightView::Rear => [-x, y, -z],
+        FlightView::Left => [z, y, -x],
+        FlightView::Right => [-z, y, x],
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct Layout {
+    pub top: f32,
+    pub row: f32,
+    pub scale: f32,
+    pub side: f32,
+    pub radar: f32,
+    pub instrument_scale: f32,
+    pub left_columns: usize,
+}
+impl Layout {
+    pub fn new(width: u32, height: u32) -> Self {
+        let w = width as f32;
+        let scale = 1.25;
+        let instrument_scale: f32 = if w < 640.0 {
+            1.25
+        } else if w < 1100.0 {
+            1.5
+        } else {
+            2.0
+        };
+        let row = (instrument_scale * 7.0).ceil() + 6.0;
+        let radar = (w * 0.30).clamp(104.0, 560.0);
+        let side = (w - radar - 48.0) / 2.0;
+        let left_columns = if side >= 400.0 { 2 } else { 1 };
+        let rows = (6.0 / left_columns as f32).ceil().max(4.0);
+        let scanner_height: f32 = if w < 900.0 { 80.0 } else { 108.0 };
+        Self {
+            top: (height as f32 - (16.0 + row + (row * rows).max(scanner_height)))
+                .max(120.0)
+                .min(height as f32),
+            row,
+            scale,
+            side,
+            radar,
+            instrument_scale,
+            left_columns,
+        }
+    }
+}
+fn line(out: &mut Vec<Vertex>, a: [f32; 2], b: [f32; 2], color: [f32; 3], size: [f32; 2]) {
+    let dx = b[0] - a[0];
+    let dy = b[1] - a[1];
+    let length = dx.hypot(dy);
+    if length <= f32::EPSILON {
+        return;
+    }
+    let n = [-dy / length * 0.6, dx / length * 0.6];
+    let vertex = |p: [f32; 2], sign: f32| Vertex {
+        position: [
+            2.0 * (p[0] + n[0] * sign).clamp(0.0, size[0]) / size[0] - 1.0,
+            1.0 - 2.0 * (p[1] + n[1] * sign).clamp(0.0, size[1]) / size[1],
+            0.0,
+        ],
+        color,
+    };
+    out.extend_from_slice(&[
+        vertex(a, 1.0),
+        vertex(a, -1.0),
+        vertex(b, 1.0),
+        vertex(b, 1.0),
+        vertex(a, -1.0),
+        vertex(b, -1.0),
+    ]);
+}
+fn label(
+    out: &mut Vec<Vertex>,
+    text: &str,
+    x: f32,
+    y: f32,
+    scale: f32,
+    color: [f32; 3],
+    size: [f32; 2],
+) {
+    for (i, c) in text.chars().enumerate() {
+        for (row, bits) in glyph(c).into_iter().enumerate() {
+            for bit in 0..5 {
+                if bits & (1 << (4 - bit)) == 0 {
+                    continue;
+                }
+                let left = x + (i * 6 + bit) as f32 * scale;
+                let top = y + row as f32 * scale;
+                if left >= 0.0 && top >= 0.0 && left + scale <= size[0] && top + scale <= size[1] {
+                    quad(out, [left, top, left + scale, top + scale], color, size);
+                }
+            }
+        }
+    }
+}
+struct Gauge<'a> {
+    name: &'a str,
+    value: Option<f32>,
+    color: [f32; 3],
+}
+fn gauge(out: &mut Vec<Vertex>, reading: Gauge<'_>, x: f32, y: f32, l: Layout, size: [f32; 2]) {
+    let Gauge { name, value, color } = reading;
+    label(out, name, x, y, l.scale, YELLOW, size);
+    let bx = x + (l.side * 0.75).min(13.0 * 6.0 * l.instrument_scale);
+    let end = (x + l.side).min(bx + 160.0);
+    let by = y + 5.0;
+    line(out, [bx, by], [end, by], BLUE, size);
+    if let Some(v) = value.filter(|v| v.is_finite()) {
+        line(
+            out,
+            [bx, by],
+            [bx + (end - bx) * v.clamp(0.0, 1.0), by],
+            color,
+            size,
+        );
+    } else {
+        label(out, "N/A", bx, y, l.scale, CYAN, size);
+    }
+}
+fn scanner(out: &mut Vec<Vertex>, c: &Cockpit, l: Layout, size: [f32; 2]) {
+    let cx = size[0] / 2.0;
+    let rx = (l.radar - 12.0) / 2.0;
+    let ry = if size[0] < 900.0 { 32.0 } else { 46.0 };
+    let cy = l.top + 8.0 + l.row + 16.0 + ry;
+    label(
+        out,
+        "SCANNER",
+        cx - 21.0 * l.scale,
+        l.top + 8.0 + l.row,
+        l.scale,
+        YELLOW,
+        size,
+    );
+    for i in 0..64 {
+        let point = |n| {
+            let a = n as f32 * std::f32::consts::TAU / 64.0;
+            [cx + rx * a.cos(), cy + ry * a.sin()]
+        };
+        line(out, point(i), point(i + 1), GREEN, size);
+    }
+    line(out, [cx - rx, cy], [cx + rx, cy], GREEN, size);
+    line(out, [cx, cy - ry], [cx, cy + ry], GREEN, size);
+    for ([x, y, z], color) in c.contacts.iter().flatten() {
+        let sx = cx + (x / 4400.0 * rx).clamp(-rx + 2.0, rx - 2.0);
+        let sy = cy + (-z / 8500.0 * ry).clamp(-ry + 2.0, ry - 2.0);
+        let lift = (y / 3000.0 * ry).clamp(-ry / 2.0, ry / 2.0);
+        line(out, [sx, sy], [sx, sy - lift], *color, size);
+        line(
+            out,
+            [sx - 2.0, sy - lift],
+            [sx + 2.0, sy - lift],
+            *color,
+            size,
+        );
+    }
+}
+/// Appends bounded geometry after the existing review/control overlay, without gameplay access.
+pub fn append(c: &Cockpit, width: u32, height: u32, out: &mut Vec<Vertex>) {
+    if width < 320 || height < 240 {
+        return;
+    }
+    let size = [width as f32, height as f32];
+    let l = Layout::new(width, height);
+    quad(out, [0.0, l.top, size[0], size[1]], [0.0, 0.0, 0.0], size);
+    line(out, [0.0, l.top], [size[0], l.top], YELLOW, size);
+    label(
+        out,
+        &format!("STATUS: {}", c.status()),
+        12.0,
+        l.top + 8.0,
+        l.scale,
+        if c.destroyed { RED } else { GREEN },
+        size,
+    );
+    let x = (size[0] * 0.38).floor();
+    label(out, "Missiles", x, l.top + 8.0, l.scale, YELLOW, size);
+    let mut next = x + 8.0 * 6.0 * l.scale + 8.0;
+    if c.missiles == 0 {
+        label(out, "None", next, l.top + 8.0, l.scale, [1.0; 3], size);
+        next += 4.0 * 6.0 * l.scale;
+    } else {
+        let points = [
+            [5.0, 0.0],
+            [2.0, 4.0],
+            [2.0, 9.0],
+            [0.0, 12.0],
+            [5.0, 10.0],
+            [10.0, 12.0],
+            [8.0, 9.0],
+            [8.0, 4.0],
+            [5.0, 0.0],
+        ];
+        for _ in 0..c.missiles {
+            let scale = l.instrument_scale / 1.5;
+            for pair in points.windows(2) {
+                line(
+                    out,
+                    [next + pair[0][0] * scale, l.top + 8.0 + pair[0][1] * scale],
+                    [next + pair[1][0] * scale, l.top + 8.0 + pair[1][1] * scale],
+                    if c.armed { RED } else { GREEN },
+                    size,
+                );
+            }
+            next += 14.0 * scale;
+        }
+    }
+    label(
+        out,
+        if c.armed { "Armed" } else { "Unarmed" },
+        next + 8.0,
+        l.top + 8.0,
+        l.scale,
+        if c.armed { RED } else { [1.0; 3] },
+        size,
+    );
+    let left = [
+        ("FRONT SHIELD", c.shield[0], GREEN),
+        ("REAR SHIELD", c.shield[1], GREEN),
+        ("FUEL", c.fuel, GREEN),
+        ("CABIN TEMP", None, RED),
+        ("LASER HEAT", c.heat, RED),
+        ("ALTITUDE", None, YELLOW),
+    ];
+    let rows = 6 / l.left_columns;
+    let column_width = (l.side - (l.left_columns - 1) as f32 * 12.0) / l.left_columns as f32;
+    for (i, (name, value, color)) in left.into_iter().enumerate() {
+        let x = 12.0 + (i / rows) as f32 * (column_width + 12.0);
+        let y = l.top + 8.0 + l.row + (i % rows) as f32 * l.row;
+        gauge(
+            out,
+            Gauge { name, value, color },
+            x,
+            y,
+            Layout {
+                side: column_width,
+                ..l
+            },
+            size,
+        );
+    }
+    let instrument_width = l.side.min(13.0 * 6.0 * l.instrument_scale + 160.0);
+    let right = size[0] - 12.0 - instrument_width;
+    let right_layout = Layout {
+        side: instrument_width,
+        ..l
+    };
+    for (i, (name, value)) in [
+        ("SPEED", Some(c.flight.speed / meridian_core::MAX_SPEED)),
+        ("ROLL", None),
+        ("PITCH", None),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        gauge(
+            out,
+            Gauge {
+                name,
+                value,
+                color: GREEN,
+            },
+            right,
+            l.top + 8.0 + l.row * (i + 1) as f32,
+            right_layout,
+            size,
+        );
+    }
+    label(
+        out,
+        "ENERGY",
+        right,
+        l.top + 8.0 + 4.0 * l.row,
+        l.scale,
+        YELLOW,
+        size,
+    );
+    let bx = right + (instrument_width * 0.75).min(13.0 * 6.0 * l.instrument_scale);
+    let end = (right + instrument_width).min(bx + 160.0);
+    if let Some(energy) = c.energy {
+        for bank in 0..4 {
+            let y = l.top + 8.0 + 4.0 * l.row + bank as f32 * 3.0 + 4.0;
+            line(out, [bx, y], [end, y], BLUE, size);
+            line(
+                out,
+                [bx, y],
+                [
+                    bx + (end - bx) * (energy * 4.0 - bank as f32).clamp(0.0, 1.0),
+                    y,
+                ],
+                YELLOW,
+                size,
+            );
+        }
+    } else {
+        label(
+            out,
+            "N/A",
+            bx,
+            l.top + 8.0 + 4.0 * l.row,
+            l.scale,
+            CYAN,
+            size,
+        );
+    }
+    scanner(out, c, l, size);
+    if c.flight.mode != FlightMode::Docked
+        && let Some((distance, bearing, elevation)) = c.station_navigation()
+    {
+        let range = if distance >= 1_000_000_000.0 {
+            format!("{distance:.1e}")
+        } else if distance >= 1_000_000.0 {
+            format!("{:.1}M", distance / 1_000_000.0)
+        } else if distance >= 1000.0 {
+            format!("{:.1}K", distance / 1000.0)
+        } else {
+            format!("{distance:.0}")
+        };
+        let bearing_text = if bearing.abs().round() == 0.0 {
+            "AHEAD 0 DEG".into()
+        } else {
+            format!(
+                "{}{} {:.0} DEG",
+                if bearing.abs() > 90.0 { "BEHIND " } else { "" },
+                if bearing < 0.0 { "LEFT" } else { "RIGHT" },
+                bearing.abs()
+            )
+        };
+        let elevation_text = if elevation.abs().round() == 0.0 {
+            "LEVEL 0 DEG".into()
+        } else {
+            format!(
+                "{} {:.0} DEG",
+                if elevation < 0.0 { "DOWN" } else { "UP" },
+                elevation.abs()
+            )
+        };
+        for (i, text) in [
+            format!("STATION {range} UNITS"),
+            bearing_text,
+            elevation_text,
+        ]
+        .iter()
+        .enumerate()
+        {
+            label(
+                out,
+                text,
+                12.0,
+                12.0 + i as f32 * 14.0,
+                l.scale,
+                YELLOW,
+                size,
+            );
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use meridian_core::FlightInput;
+    fn world() -> World {
+        World::new_commander(90011).unwrap_or_else(|error| panic!("{error}"))
+    }
+    #[test]
+    fn paid_round_in_ninth_pylon_is_not_hidden_by_three_slot_snapshot_prefix() {
+        let mut world = world();
+        let review = world
+            .review_ammunition(meridian_core::AmmunitionAction::Purchase, 0)
+            .unwrap_or_else(|error| panic!("{error}"));
+        let prepared = world
+            .prepare_ammunition(review, 0)
+            .unwrap_or_else(|error| panic!("{error}"));
+        let item = prepared.commit();
+        for action in [
+            meridian_core::AmmunitionAction::Store { item },
+            meridian_core::AmmunitionAction::Refit { item, pylon: 8 },
+        ] {
+            let review = world
+                .review_ammunition(action, 0)
+                .unwrap_or_else(|error| panic!("{error}"));
+            world
+                .prepare_ammunition(review, 0)
+                .unwrap_or_else(|error| panic!("{error}"))
+                .commit();
+        }
+        let before = world.save_bytes().unwrap_or_else(|error| panic!("{error}"));
+        assert_eq!(
+            world
+                .missile_snapshot()
+                .unwrap_or_else(|| panic!("snapshot"))
+                .rounds
+                .iter()
+                .flatten()
+                .count(),
+            3
+        );
+        let cockpit = Cockpit::capture(&world, world.snapshot());
+        assert_eq!(cockpit.missiles, 4);
+        let mut vertices = Vec::with_capacity(super::super::MAX_VERTICES);
+        append(&cockpit, 640, 360, &mut vertices);
+        assert!(vertices.len() <= MAX_VERTICES);
+        assert_eq!(
+            world.save_bytes().unwrap_or_else(|error| panic!("{error}")),
+            before
+        );
+    }
+    #[test]
+    fn fresh_instruments_are_world_owned_and_rendering_cannot_change_save() {
+        let world = world();
+        let before = world.save_bytes().unwrap_or_else(|error| panic!("{error}"));
+        let c = Cockpit::capture(&world, world.snapshot());
+        assert_eq!(c.shield, [Some(1.0); 2]);
+        assert_eq!(c.energy, Some(1.0));
+        assert_eq!(c.fuel, Some(1.0));
+        assert_eq!(c.heat, Some(0.0));
+        assert_eq!(c.missiles, 3);
+        assert!(!c.armed);
+        assert!(!c.locked);
+        assert_eq!(c.status(), "DOCKED");
+        let mut out = Vec::with_capacity(super::super::MAX_VERTICES);
+        for [w, h] in [[640, 360], [1280, 720], [2560, 1600]] {
+            append(&c, w, h, &mut out);
+            out.clear();
+        }
+        assert_eq!(
+            world.save_bytes().unwrap_or_else(|error| panic!("{error}")),
+            before
+        );
+    }
+    #[test]
+    fn actual_flight_and_pulse_change_speed_energy_and_heat_readings() {
+        let mut world = world();
+        world
+            .request_launch(0)
+            .unwrap_or_else(|error| panic!("{error}"));
+        for _ in 0..600 {
+            world
+                .step(FlightInput::default())
+                .unwrap_or_else(|error| panic!("{error}"));
+            if world.snapshot().mode == FlightMode::Flight {
+                break;
+            }
+        }
+        assert_eq!(world.snapshot().mode, FlightMode::Flight);
+        world
+            .step(FlightInput {
+                throttle: 1.0,
+                ..FlightInput::default()
+            })
+            .unwrap_or_else(|error| panic!("{error}"));
+        let before = Cockpit::capture(&world, world.snapshot());
+        world
+            .request_fire_front_pulse(world.snapshot().tick)
+            .unwrap_or_else(|error| panic!("{error}"));
+        let after = Cockpit::capture(&world, world.snapshot());
+        assert!(after.flight.speed > 0.0);
+        assert!(after.energy < before.energy);
+        assert!(after.heat > before.heat);
+        assert_eq!(after.shield, before.shield);
+        assert_eq!(after.fuel, before.fuel);
+        assert_eq!(after.status(), "FLIGHT");
+    }
+    #[test]
+    fn original_scanner_axes_and_view_bearings_do_not_confuse_rear_with_front() {
+        let world = world();
+        let mut c = Cockpit::capture(&world, world.snapshot());
+        c.station = Some([0.0, 0.0, 100.0]);
+        assert_eq!(c.station_navigation(), Some((100.0, 0.0, 0.0)));
+        c.view = FlightView::Rear;
+        assert_eq!(
+            c.station_navigation()
+                .unwrap_or_else(|| panic!("missing station"))
+                .1
+                .abs(),
+            180.0
+        );
+        c.station = Some([-100.0, 0.0, 0.0]);
+        c.view = FlightView::Left;
+        assert_eq!(
+            c.station_navigation()
+                .unwrap_or_else(|| panic!("missing station"))
+                .1,
+            0.0
+        );
+        c.view = FlightView::Right;
+        assert_eq!(
+            c.station_navigation()
+                .unwrap_or_else(|| panic!("missing station"))
+                .1
+                .abs(),
+            180.0
+        );
+        c.view = FlightView::Front;
+        c.station = Some([0.0, 100.0, 100.0]);
+        assert_eq!(
+            c.station_navigation()
+                .unwrap_or_else(|| panic!("missing station"))
+                .2,
+            45.0
+        );
+    }
+    #[test]
+    fn gauges_are_clamped_and_unknown_readings_have_no_filled_bar() {
+        let mut out = Vec::new();
+        let size = [640.0, 360.0];
+        let l = Layout::new(640, 360);
+        for value in [None, Some(f32::NAN), Some(-1.0), Some(2.0)] {
+            out.clear();
+            gauge(
+                &mut out,
+                Gauge {
+                    name: "FUEL",
+                    value,
+                    color: GREEN,
+                },
+                12.0,
+                l.top + l.row,
+                l,
+                size,
+            );
+            let green = out.iter().filter(|v| v.color == GREEN).count();
+            if value.is_some_and(|v| v == 2.0) {
+                assert_eq!(green, 6);
+            } else {
+                assert_eq!(green, 0);
+            }
+            assert!(
+                out.iter()
+                    .all(|v| v.position.into_iter().all(f32::is_finite))
+            );
+        }
+    }
+    #[test]
+    fn cockpit_and_all_fourteen_control_rows_fit_compact_and_large_views_without_allocation_growth()
+    {
+        let world = world();
+        let c = Cockpit::capture(&world, world.snapshot());
+        let lines = vec!["W".repeat(super::super::MAX_COLUMNS); super::super::MAX_LINES];
+        let mut out = Vec::with_capacity(super::super::MAX_VERTICES);
+        let capacity = out.capacity();
+        for [w, h] in [
+            [0, 0],
+            [1, 1],
+            [320, 240],
+            [640, 360],
+            [1280, 720],
+            [2560, 1600],
+        ] {
+            super::super::vertices_with_cockpit(&lines, w, h, Some(&c), &mut out);
+            assert!(out.len() <= super::super::MAX_VERTICES);
+            assert_eq!(out.capacity(), capacity);
+            assert!(out.iter().all(|v| {
+                v.position
+                    .into_iter()
+                    .all(|n| n.is_finite() && n.abs() <= 1.000001)
+            }));
+            if w >= 640 {
+                assert_eq!(
+                    super::super::line_budget(w, Layout::new(w, h).top as u32),
+                    14
+                );
+            }
+        }
+    }
+    #[test]
+    fn reference_layout_breakpoints_keep_logical_point_geometry() {
+        let compact = Layout::new(640, 360);
+        assert_eq!(
+            (
+                compact.top,
+                compact.row,
+                compact.radar,
+                compact.side,
+                compact.scale,
+                compact.left_columns
+            ),
+            (225.0, 17.0, 192.0, 200.0, 1.25, 1)
+        );
+        let large = Layout::new(1280, 720);
+        assert_eq!(
+            (
+                large.top,
+                large.row,
+                large.radar,
+                large.side,
+                large.scale,
+                large.left_columns
+            ),
+            (576.0, 20.0, 384.0, 424.0, 1.25, 2)
+        );
+        assert_eq!(Layout::new(639, 360).instrument_scale, 1.25);
+        assert_eq!(Layout::new(640, 360).instrument_scale, 1.5);
+        assert_eq!(Layout::new(1100, 720).instrument_scale, 2.0);
+    }
+    #[test]
+    fn title_world_has_unknown_resources_instead_of_full_fake_needles() {
+        let world = World::at_original_station().unwrap_or_else(|error| panic!("{error}"));
+        let c = Cockpit::capture(&world, world.snapshot());
+        assert_eq!(c.shield, [None; 2]);
+        assert_eq!(c.energy, None);
+        assert_eq!(c.fuel, None);
+        assert_eq!(c.heat, None);
+    }
+}

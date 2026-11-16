@@ -29,6 +29,7 @@ pub enum FlightMode {
 pub enum MotionRefusal {
     StationContact,
     EntryConditions,
+    CelestialContact,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -214,6 +215,10 @@ pub struct OriginalStationData {
 }
 
 impl OriginalStationData {
+    pub(crate) fn player_radius(&self) -> f64 {
+        self.hull.radius
+    }
+
     pub fn bundled() -> Result<Self, StationError> {
         Self::from_bytes(STATION_BYTES, HULL_BYTES, PORT_BYTES)
     }

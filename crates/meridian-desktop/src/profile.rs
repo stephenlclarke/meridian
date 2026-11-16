@@ -74,6 +74,121 @@ impl Profile {
         if !self.playing {
             return Err("N starts a new commander; C continues the existing save".into());
         }
+        if let Action::Module(command) = action {
+            let tick = self.world.snapshot().tick;
+            let review = self
+                .world
+                .review_module(command, tick)
+                .map_err(|e| e.to_string())?;
+            let prepared = self
+                .world
+                .prepare_module(review, tick)
+                .map_err(|e| e.to_string())?;
+            let message = match command {
+                meridian_core::ModuleAction::PurchaseMiningLaser => {
+                    "Mining Laser purchased and fitted."
+                }
+                meridian_core::ModuleAction::Store { .. } => "Owned laser stored.",
+                meridian_core::ModuleAction::Install { .. } => "Owned laser fitted.",
+            };
+            let published = self
+                .store
+                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .map_err(|e| format!("Module change could not be saved: {e}"))?;
+            prepared.commit();
+            self.has_save = true;
+            self.session.invalidate();
+            return publication_message(published, format!("{message} Change saved."));
+        }
+        let cargo = match action {
+            Action::CargoEquipment(command) => Some(command),
+            Action::PurchaseCargoBay => Some(meridian_core::equipment::Command::PurchaseCargoBay),
+            Action::FitCargoBay | Action::UnfitCargoBay => {
+                let item = self
+                    .world
+                    .equipment_snapshot()
+                    .and_then(|s| s.owned)
+                    .ok_or("No owned cargo bay")?
+                    .id;
+                Some(if matches!(action, Action::FitCargoBay) {
+                    meridian_core::equipment::Command::FitCargoBay(item)
+                } else {
+                    meridian_core::equipment::Command::UnfitCargoBay(item)
+                })
+            }
+            _ => None,
+        };
+        if let Some(command) = cargo {
+            let tick = self.world.snapshot().tick;
+            let prepared = self
+                .world
+                .prepare_equipment(command, tick)
+                .map_err(|e| e.to_string())?;
+            let event = prepared.event();
+            let published = self
+                .store
+                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .map_err(|e| format!("Cargo equipment change could not be saved: {e}"))?;
+            prepared.commit();
+            self.has_save = true;
+            self.session.invalidate();
+            return publication_message(
+                published,
+                match event {
+                    meridian_core::equipment::Event::Purchased { paid_tenths, .. } => format!(
+                        "Cargo bay purchased and fitted for {}.{} CR. Change saved.",
+                        paid_tenths / 10,
+                        paid_tenths % 10
+                    ),
+                    meridian_core::equipment::Event::Fitted { .. } => {
+                        "Owned cargo bay fitted. Change saved.".into()
+                    }
+                    meridian_core::equipment::Event::Stored { .. } => {
+                        "Owned cargo bay stored. Change saved.".into()
+                    }
+                },
+            );
+        }
+        if let Action::StationService(command) = action {
+            let tick = self.world.snapshot().tick;
+            let prepared = self
+                .world
+                .prepare_station_service(command, tick)
+                .map_err(|e| e.to_string())?;
+            let message = crate::market::service_message(prepared.event())?;
+            let published = self
+                .store
+                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .map_err(|e| format!("Market change could not be saved: {e}"))?;
+            prepared.commit();
+            self.has_save = true;
+            self.session.invalidate();
+            return publication_message(published, message);
+        }
+        if let Action::Ammunition(command) = action {
+            let tick = self.world.snapshot().tick;
+            let review = self
+                .world
+                .review_ammunition(command, tick)
+                .map_err(|e| e.to_string())?;
+            let prepared = self
+                .world
+                .prepare_ammunition(review, tick)
+                .map_err(|e| e.to_string())?;
+            let message = match command {
+                meridian_core::AmmunitionAction::Purchase => "Missile purchased and fitted.",
+                meridian_core::AmmunitionAction::Store { .. } => "Owned missile stored.",
+                meridian_core::AmmunitionAction::Refit { .. } => "Owned missile fitted.",
+            };
+            let published = self
+                .store
+                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .map_err(|e| format!("Missile equipment change could not be saved: {e}"))?;
+            prepared.commit();
+            self.has_save = true;
+            self.session.invalidate();
+            return publication_message(published, format!("{message} Change saved."));
+        }
         if let Some(command) = self.session.station_service_command(action) {
             let tick = self.world.snapshot().tick;
             let prepared = self
@@ -286,7 +401,7 @@ fn default_directory() -> io::Result<PathBuf> {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
     use meridian_core::{
         FlightInput, FlightMode,
@@ -299,9 +414,9 @@ mod tests {
         path::Path,
         process::Command,
     };
-    struct TestDirectory(PathBuf);
+    pub(crate) struct TestDirectory(pub(crate) PathBuf);
     impl TestDirectory {
-        fn new() -> Self {
+        pub(crate) fn new() -> Self {
             let nonce = RandomState::new().build_hasher().finish();
             let path = std::env::temp_dir().join(format!(
                 "meridian-profile-test-{}-{nonce:016x}",
@@ -316,10 +431,10 @@ mod tests {
             let _ = fs::remove_dir_all(&self.0);
         }
     }
-    fn open(path: &Path) -> Profile {
+    pub(crate) fn open(path: &Path) -> Profile {
         Profile::open(path.to_path_buf()).unwrap_or_else(|e| panic!("{e}"))
     }
-    fn action(profile: &mut Profile, value: Action) {
+    pub(super) fn action(profile: &mut Profile, value: Action) {
         profile.command(value).unwrap_or_else(|e| panic!("{e}"));
     }
     fn travel(profile: &mut Profile) {
@@ -933,3 +1048,7 @@ fn publication_message(published: SaveCommit, message: String) -> Result<String,
 
 #[cfg(test)]
 mod trade_lesson_tests;
+
+#[cfg(test)]
+#[path = "profile/ammunition_tests.rs"]
+mod ammunition_tests;

@@ -2,6 +2,7 @@
 
 #![forbid(unsafe_code)]
 
+pub mod celestial;
 pub mod docking;
 pub mod equipment;
 mod flight;
@@ -12,9 +13,10 @@ pub mod station;
 pub mod station_services;
 
 pub use flight::{
-    FIXED_DELTA_SECONDS, FireError, FlightInput, MissionError, MissionSnapshot,
-    PULSE_COOLDOWN_TICKS, PULSE_RANGE, PulseContact, PulseLaserSnapshot, PulseShot,
-    ServiceSnapshot, Snapshot, StationNpc, StepError, World,
+    ENERGY_CAPACITY_HUNDREDTHS, FIXED_DELTA_SECONDS, FireError, FlightInput, MAX_SPEED,
+    MissionError, MissionSnapshot, PULSE_COOLDOWN_TICKS, PULSE_RANGE, PulseContact,
+    PulseLaserSnapshot, PulseShot, SHIELD_CAPACITY, ServiceSnapshot, Snapshot, StationNpc,
+    StepError, World,
 };
 pub use station::{FlightMode, FlightStart, MotionRefusal, OriginalStationData, StationError};
 
@@ -48,3 +50,17 @@ pub use flight::{
     NavigationTradePlanSnapshot, NavigationTradeReview, NavigationTradeSnapshot,
     NavigationTradeTrace, PreparedNavigationTrade, PreparedStationService,
 };
+
+pub use flight::{
+    AmmunitionAction, AmmunitionError, AmmunitionItem, AmmunitionReview, AmmunitionSnapshot,
+    MissilePurchase, PreparedAmmunition,
+};
+
+pub use flight::{
+    FittedMiningTool, ModularEquipmentSnapshot, ModuleAction, ModuleError, ModuleKind, ModuleOffer,
+    ModuleProvenance, ModuleReview, ModuleSlot, OwnedModule, PreparedModule,
+};
+
+pub use flight::FlightResourcesSnapshot;
+
+pub use flight::{EquipmentPreparationError, PreparedEquipment};

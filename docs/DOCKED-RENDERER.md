@@ -1,0 +1,33 @@
+# Docked screen renderer
+
+The renderer draws the immutable `docked_screens::Frame` on a black station-page background. It consumes the frame's logical-point labels, clipped lines, galaxy markers and range rings, hover region and approved preview requests. It does not draw the flight scene/HUD underneath a station page. Root owns the controller, pointer/keyboard bindings, data providers, painted-frame authority and all prepared/durable transactions; rendering cannot buy, fit, navigate or confirm anything.
+
+## Drawing and clipping
+
+Labels use an 80 by 56 single-channel atlas generated once from the existing Meridian code-drawn glyph function. This adds no external font or imported raster asset. Each visible character uses one clipped textured quad rather than one quad per bitmap pixel. The nearest-neighbour sampler retains the existing glyph design. Clipped glyph UVs are shortened with the geometry; the text is not stretched to fit a clipped box. Palette colours are converted for an sRGB render target, while imported model colours retain their existing linear RGB values.
+
+Lines and polygons clip in logical space before conversion to normalized device coordinates. Markers, current-system rings and selection outlines use the explicit `Marker.clip` plot rectangle, including their full extents. Range rings use their own clip. Hover outlines use the same logical rectangle produced by the controller. No independently guessed hit boxes or action regions are introduced. The frame viewport must match the current logical window size; a changed viewport is refused rather than painting geometry with a different pointer transform. Retina backing scale affects physical pixels, not the layout or pointer coordinates.
+
+The CPU/GPU geometry, glyph and model buffers have fixed declared capacities. Counts/text lengths are checked before building an oversized frame. All five supplied projections at compact and large viewports retain reusable vector capacity. This is a bounded-allocation implementation property, not measured FPS, leak or race acceptance.
+
+## Real previews
+
+The model registry currently advertises only SH025 with `assets/legacy/sh025.mesh`. The adapter verifies its compiled bytes and retained manifest binding, then uses the real triangle geometry and colours. Object ID and geometry key must both match. The preview applies the supplied yaw/pitch/roll orientation, fits the enclosing sphere, clips triangles and interpolates depth at clip boundaries. A depth-tested model pass handles self-occlusion and side-by-side views. It does not substitute SH025 for another authored ship; unsupported requests draw an explicit unavailable message. The 162-entry catalogue is not a claim of 162 available model assets.
+
+Planet previews require `WorldAdapter::preview` for the actual current system. The actual body/surface identities and World-generated maps remain bound to the current system visit. The station preview uses an explicit virtual camera within the supplied rectangle while retaining the real surface, tick-derived angle and sun lighting; it does not move the physical body. Other systems have no invented default planet image and display an unavailable message. The same logical bounds become a clipped physical-pixel scissor using the current backing scale.
+
+## Root join
+
+The exact pure-screen dependency for this packet is Researcher commit `76e2d567368dd2b0ab26df0c69a7411e16590b56`, including the explicit marker clip and corrected review dispatch. G1's isolated author branch derives from the completed celestial provider `5c81d65`, imports that pure-screen dependency, and adds the renderer/primitive/preview hunks. The complete handoff distinguishes dependency commits from the renderer commit.
+
+Register `docked_render` and the pure screen module. Supply the actual last projected `Frame` and actual current-system preview scene through `SceneEffects.docked` and `SceneEffects.docked_planet`. The author branch leaves these two App fields `None` because Root owns the real screen controller/input/data join; this is not a claim that this isolated App opens the station pages. Root combines these fields with the current HUD `HudScene` adapter and coherent modular-equipment providers. Advertise only the actual backend `MODELS` registry in `Context.models`, and request planet rendering only where the actual provider is available.
+
+`Renderer::draw` returns `Presentation::Presented` after submitting/presenting a frame and `Skipped` for zero-size, occluded/timeout and surface-recreation paths. Update the actionable last-painted frame only on `Presented`. Generic `Ok` must not grant a new painted-frame authority after a skipped draw. Input still goes through the pure controller's actual material stamps and Root's current review token; no renderer state is a transaction capability.
+
+## Validation and remaining acceptance
+
+On the isolated dependency/renderer composition, the `docked_` test group passed 42 tests: 29 pure-screen tests, eight renderer geometry/atlas/model/HiDPI tests, one actual-current-system planet preview projection test and four existing name-matched tests. Strict desktop all-target Clippy passed. The text WGSL is parsed and validated by the current Naga frontend; no actual GPU pipeline execution is claimed.
+
+Retained failures are explicit: the first pure-screen compile failed on missing review-control match arms; its correction exposed a private-method call in a new regression test; the final dependency fixed both through public dispatch. A renderer test then used exact floating equality for a clipped line endpoint and failed by about 1.4e-14; the same boundary check now uses a tight 1e-10 tolerance while retaining full clipping/depth assertions. Six pure-screen Clippy findings and a later adapter signature-mismatch compile failure are also retained; corrected source passed without waivers or removed tests.
+
+Native graphics and menu input remain unrun for this packet. After Root's coherent HUD/five-screen/modular-equipment join and independent review, G1 must qualify the exact source on the sole Mac lane: real pixels at compact/full-screen/Retina sizes; all five pages; keyboard and pointer equivalence; plot/label/model clipping; hover/search/scroll/focus/back/modal behavior; all three model rotation planes and comparison synchronization; current-system planet identity; genuine market/equipment effects/refusals; failed-write and cold continuation; and no actionable update after a skipped presentation. Source geometry or a screenshot alone cannot replace the live transaction/input journey. Published previews and real player profiles remain untouched.

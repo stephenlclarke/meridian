@@ -370,7 +370,20 @@ fn assert_paid_save_guards(world: &mut World) {
         .unwrap()
         .equipment_state()
         .encode(&mut equipment);
-    let start = matches[0] + account.bytes.len() - equipment.bytes.len();
+    // Paid ammunition and modular revisions follow equipment in the current account codec.
+    // Locate the actual encoded component, rather than treating it as the account suffix.
+    let equipment_offsets: Vec<_> = account
+        .bytes
+        .windows(equipment.bytes.len())
+        .enumerate()
+        .filter_map(|(i, b)| (b == equipment.bytes.as_slice()).then_some(i))
+        .collect();
+    assert_eq!(equipment_offsets.len(), 1);
+    let start = matches[0] + equipment_offsets[0];
+    assert_eq!(
+        &valid[start..start + equipment.bytes.len()],
+        equipment.bytes.as_slice()
+    );
     for (offset, replacement) in [
         (0, 0_u64.to_le_bytes().to_vec()), // paid record cannot have no equipment transaction
         (9, 999_u64.to_le_bytes().to_vec()), // item belonging to another commander
@@ -384,11 +397,19 @@ fn assert_paid_save_guards(world: &mut World) {
         (56, vec![0]),                     // fit flag inconsistent with transaction history
     ] {
         let mut bad = valid.clone();
+        assert_ne!(
+            &valid[start + offset..start + offset + replacement.len()],
+            replacement.as_slice(),
+            "corruption at equipment offset {offset} must change the target field"
+        );
         bad[start + offset..start + offset + replacement.len()].copy_from_slice(&replacement);
         let end = bad.len() - 8;
         let digest = checksum(&bad[..end]);
         bad[end..].copy_from_slice(&digest.to_le_bytes());
-        assert!(world.restore_bytes(&bad).is_err());
+        assert!(
+            world.restore_bytes(&bad).is_err(),
+            "equipment offset {offset} must be refused"
+        );
         assert_eq!(world.save_bytes().unwrap(), valid);
     }
     // A coherently encoded stored foundation cannot keep the fitted intrinsic
@@ -443,4 +464,37 @@ fn original_v4_paid_and_hot_world_loads_with_no_t02_authority() {
         &restored.save_bytes().unwrap()[8..10],
         &crate::save::SAVE_VERSION.to_le_bytes()
     );
+}
+
+#[test]
+fn prospective_cargo_equipment_drop_and_commit_preserve_full_account_chronology() {
+    let mut world = earned_world(89801);
+    let before = world.save_bytes().unwrap();
+    let credit = world.credits_tenths().unwrap();
+    let tick = world.snapshot().tick;
+    let staged = {
+        let prepared = world
+            .prepare_equipment(Command::PurchaseCargoBay, tick)
+            .unwrap();
+        let bytes = prepared.bytes().to_vec();
+        let cold = World::from_save_bytes(&bytes).unwrap();
+        assert!(cold.equipment_snapshot().unwrap().owned.unwrap().fitted);
+        assert_eq!(cold.credits_tenths(), Some(credit - 28000));
+        bytes
+    };
+    assert_eq!(world.save_bytes().unwrap(), before);
+    world
+        .prepare_equipment(Command::PurchaseCargoBay, tick)
+        .unwrap()
+        .commit();
+    assert_eq!(world.save_bytes().unwrap(), staged);
+    assert_eq!(world.credits_tenths(), Some(credit - 28000));
+    let item = world.equipment_snapshot().unwrap().owned.unwrap().id;
+    let before = world.save_bytes().unwrap();
+    drop(
+        world
+            .prepare_equipment(Command::UnfitCargoBay(item), tick)
+            .unwrap(),
+    );
+    assert_eq!(world.save_bytes().unwrap(), before);
 }

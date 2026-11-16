@@ -1,0 +1,89 @@
+{
+  "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "files": [
+    {
+      "path": "Sources/L337Core/Game.swift",
+      "gitBlob": "0f94ff0c7bf46d47e65e077cc3c5db37694bd706",
+      "bytes": 313817,
+      "sha256": "e5b4e30c835d460aa7ca6f77364db0aaeaf877bb9d73bacc162e9111b26e2e17"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentRuntimeCatalog.swift",
+      "gitBlob": "4f9bf9ec70d239e9c099f00a9c63a80d4648833d",
+      "bytes": 8337,
+      "sha256": "ccf1ee2a940175f0d1a26a65aaa7b62ca7cf61d0eb33906f8b8feb6664210e27"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentModuleTemplates.swift",
+      "gitBlob": "46574e607c0d12f275588f891e94780dde498ff9",
+      "bytes": 6099,
+      "sha256": "387f5623bc0a390864b29ca5f2662c52bd091c54b024f8761bf8b098610a566f"
+    },
+    {
+      "path": "Sources/L337Core/LaserSpecification.swift",
+      "gitBlob": "d8da97cbc4e28bb8b7078d2a3e01abe3c62afd75",
+      "bytes": 2653,
+      "sha256": "7ef4750ec3c25ad224131dc52a145baa901fb1dac6b5b33a17c15d8cb00043e3"
+    },
+    {
+      "path": "Sources/L337Core/MiningWorkTool.swift",
+      "gitBlob": "50b8bda198d30637df9f34eeffc235efc484fbcc",
+      "bytes": 5278,
+      "sha256": "dd4f900b13f1c7cbaa0d34f44070d20e007ad138a0d393be9a02b2ddaa31e717"
+    },
+    {
+      "path": "Sources/L337Core/GameplayWeapons.swift",
+      "gitBlob": "582560d2f5dcdb3ee27804ba0cedd5ecdced1f0b",
+      "bytes": 19711,
+      "sha256": "b0e3fa858afcc6fd646e0db51e02260e63e38394cde8a8aeeed783db058011c8"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentTransactions.swift",
+      "gitBlob": "3d51889a6dd1900faadfc172bbdab072995f1a21",
+      "bytes": 15785,
+      "sha256": "21a44066185ea17c8e3b262988c193cdef98bf88f80294d7a216767d93ad4f36"
+    },
+    {
+      "path": "Sources/L337Core/OriginalFleetR3Fitting.swift",
+      "gitBlob": "920e1d802e63ab9038e7885974618f4e9b402257",
+      "bytes": 4922,
+      "sha256": "5a50e94cb510d7ce51da194cc3570159a28f1b7bd126e140a948192412d913ee"
+    },
+    {
+      "path": "Sources/L337Core/ComponentFittingSlot.swift",
+      "gitBlob": "75c4c88c712a89c4a34379e2a477071b08e0cf05",
+      "bytes": 1172,
+      "sha256": "61a0381d142d0ed683de8cb7029ea6c7967a0653cc82d71d0ce3070c1f2361c7"
+    },
+    {
+      "path": "Sources/L337Core/OwnedEquipment.swift",
+      "gitBlob": "b0b5e5ea4f8bfdcf5077b62ef576526c1bc8e9c2",
+      "bytes": 3837,
+      "sha256": "c8a9e6eb6d859d917f8621cf9146b518521ea7708a5ad6ac68334efe9f9607cf"
+    },
+    {
+      "path": "Sources/L337Core/OwnedEquipmentInventory.swift",
+      "gitBlob": "bf17b9ec76686ce9e830472f45cb0db64f242663",
+      "bytes": 23031,
+      "sha256": "83009fdd488c170fff421cff398858acc77836d6668308ae69a743e8a1a7544f"
+    },
+    {
+      "path": "Sources/L337Core/Resources/Ships/SH025.toml",
+      "gitBlob": "ec62ccae9acfc05b92c3c4591f079fc7ba4bf1cf",
+      "bytes": 690857,
+      "sha256": "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883"
+    },
+    {
+      "path": "Tests/L337CoreTests/MiningWorkToolTests.swift",
+      "gitBlob": "e89b9aa4298ec54c0f50ac3fd50f9fb23caf63bb",
+      "bytes": 20175,
+      "sha256": "cfb4c610de1a139f9cb41498aac07bdc2ce0f60bad22de2be85ae3faea5b3666"
+    },
+    {
+      "path": "Tests/L337CoreTests/OwnedEquipmentMountSaveTests.swift",
+      "gitBlob": "6e8a6aecf88e652236e3b8aa202281ac9501c272",
+      "bytes": 3043,
+      "sha256": "d3e8dba5eb50edc4103823e238cecc03a5077830ee536bfc1e71ab175954340a"
+    }
+  ]
+}
