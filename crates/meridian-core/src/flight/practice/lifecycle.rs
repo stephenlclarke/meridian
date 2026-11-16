@@ -125,6 +125,9 @@ impl Practice {
     pub(in crate::flight) fn terminal_tick(self) -> Option<u64> {
         self.cancel.map(|c| c.tick).or(self.completed_tick())
     }
+    fn terminal_dock(self) -> Option<DockContext> {
+        self.cancel.map(|c| c.dock).or(self.completed_dock())
+    }
     pub(in crate::flight) fn accepts_incident(self, hit: crate::OrdinaryImpact) -> bool {
         hit.tick >= self.confirmation_tick()
             && hit.attacker.visit > self.consent_visit()
@@ -431,6 +434,18 @@ impl World {
                     || (old.range.is_some() && old.consent.sequence() >= p.consent.sequence()))
             {
                 return Err(INVALID);
+            }
+            if let Some(old) = previous {
+                let terminal = old.terminal_dock().ok_or(INVALID)?;
+                let ended = old.terminal_tick().ok_or(INVALID)?;
+                if terminal.sequence() > p.consent.sequence()
+                    || terminal.visit() > p.consent.visit()
+                    || terminal.tick() > p.consent.tick()
+                    || (terminal.sequence() == p.consent.sequence() && terminal != p.consent)
+                    || (terminal.sequence() < p.consent.sequence() && ended >= p.consent.tick())
+                {
+                    return Err(INVALID);
+                }
             }
             if p.completed_tick().is_some() && first.is_none() {
                 first = Some(p.attempt_id());

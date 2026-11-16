@@ -62,6 +62,9 @@ impl Practice {
     pub(in crate::flight) fn completed_tick(self) -> Option<u64> {
         self.reception.completion.map(|c| c.tick)
     }
+    pub(in crate::flight) fn completed_dock(self) -> Option<DockContext> {
+        self.reception.completion.map(|c| c.dock)
+    }
 
     pub(in crate::flight) fn validate_missile_quiet(
         self,

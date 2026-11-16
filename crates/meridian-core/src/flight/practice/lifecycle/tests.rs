@@ -536,3 +536,161 @@ fn closed_prelaunch_attempt_never_reopens_a_provider_without_new_consent() {
     assert_eq!(world.practice_snapshot().unwrap().first_hits, 0);
     assert_eq!(world.practice_ledger_snapshot().unwrap().attempts.len(), 1);
 }
+
+// The terminal berth differs from the retired range visit. Later physical docks
+// make the current-door check insufficient to validate the old terminal receipt.
+fn terminal_history_after_later_docks(seed: u64, completed: bool) -> World {
+    let mut world = World::new_commander(seed).unwrap();
+    consent(&mut world);
+    launch(&mut world);
+    if completed {
+        let beacons = world.practice_snapshot().unwrap().beacons.unwrap();
+        assert!(matches!(
+            shoot(&mut world).contact,
+            crate::PulseContact::PracticeBeacon {
+                first_hit: true,
+                ..
+            }
+        ));
+        stop(&mut world);
+        for i in [0, 2] {
+            aim_at(&mut world, beacons[i].pose.position);
+            shoot(&mut world);
+            step(&mut world, 18);
+        }
+        assert_eq!(world.practice_snapshot().unwrap().first_hits, 3);
+        step(&mut world, 180);
+    } else {
+        stop(&mut world);
+    }
+    for system in [SystemId::RENAS, SystemId::AVENOR] {
+        world.request_jump(system, world.snapshot().tick).unwrap();
+        for _ in 0..crate::navigation::BASIC_SPOOL_TICKS {
+            step(&mut world, 1);
+        }
+    }
+    dock(&mut world);
+    step(&mut world, 5);
+    if completed {
+        assert!(world.practice_reception_snapshot().unwrap().ready);
+        receive(&mut world);
+    } else {
+        assert_eq!(close(&mut world), PracticeOutcome::Abandoned);
+    }
+    world = cold(&world);
+    let terminal = world.practice.unwrap().terminal_dock().unwrap();
+    consent(&mut world);
+    assert_eq!(world.practice.unwrap().consent, terminal);
+    world = cold(&world);
+    for _ in 0..2 {
+        launch(&mut world);
+        stop(&mut world);
+        dock(&mut world);
+        world = cold(&world);
+    }
+    let old = world.practice_history[0];
+    assert_eq!(old.terminal_dock(), Some(terminal));
+    assert!(world.current_dock_context().unwrap().sequence() >= terminal.sequence() + 2);
+    assert!(world.current_dock_context().unwrap().visit() > terminal.visit());
+    assert!(terminal.sequence() + 1 <= terminal.visit());
+    assert!(terminal.tick() + 1 <= old.terminal_tick().unwrap());
+    assert!(old.retired.unwrap().tick < terminal.tick() - 1);
+    world
+}
+
+fn reject_single_terminal_dock_field_changes(world: &mut World) {
+    let old = world.practice_history[0];
+    let terminal = old.terminal_dock().unwrap();
+    let valid = world.save_bytes().unwrap();
+    let mut record = Writer::new();
+    old.encode_full(&mut record);
+    let starts: Vec<_> = valid
+        .windows(record.bytes.len())
+        .enumerate()
+        .filter_map(|(i, bytes)| (bytes == record.bytes).then_some(i))
+        .collect();
+    assert_eq!(starts.len(), 1);
+    let mut dock_bytes = Writer::new();
+    terminal.encode_save(&mut dock_bytes);
+    assert_eq!(dock_bytes.bytes.len(), 52);
+    let offsets: Vec<_> = record
+        .bytes
+        .windows(dock_bytes.bytes.len())
+        .enumerate()
+        .filter_map(|(i, bytes)| (bytes == dock_bytes.bytes).then_some(i))
+        .collect();
+    assert_eq!(offsets.len(), 1);
+    for (offset, expected) in [
+        (27, terminal.visit()),
+        (35, terminal.sequence()),
+        (43, terminal.tick()),
+    ] {
+        assert_eq!(
+            u64::from_le_bytes(dock_bytes.bytes[offset..offset + 8].try_into().unwrap()),
+            expected
+        );
+    }
+    for (field, replacement) in [
+        (35, terminal.sequence() + 1),
+        (27, terminal.visit() + 1),
+        (43, terminal.tick() + 1),
+        (43, terminal.tick() - 1),
+    ] {
+        let mut bad = valid.clone();
+        let offset = starts[0] + offsets[0] + field;
+        bad[offset..offset + 8].copy_from_slice(&replacement.to_le_bytes());
+        let end = bad.len() - 8;
+        assert_eq!(&bad[..offset], &valid[..offset]);
+        assert_eq!(&bad[offset + 8..end], &valid[offset + 8..end]);
+        let digest = checksum(&bad[..end]);
+        bad[end..].copy_from_slice(&digest.to_le_bytes());
+        refused(world, &bad);
+    }
+}
+
+#[test]
+fn cancelled_terminal_berth_precedes_retry_consent_despite_later_physical_docks() {
+    let mut world = terminal_history_after_later_docks(3901, false);
+    let before = world.practice_ledger_snapshot().unwrap();
+    assert_eq!(before.attempts[0].outcome, Some(PracticeOutcome::Abandoned));
+    assert_eq!(before.trace, None);
+    reject_single_terminal_dock_field_changes(&mut world);
+    assert_eq!(world.practice_ledger_snapshot().unwrap(), before);
+    let _continued = cold(&world);
+    // A genuinely later berth also permits a fresh consent after closing the retry.
+    assert_eq!(close(&mut world), PracticeOutcome::Abandoned);
+    let prior_dock = world.practice.unwrap().terminal_dock().unwrap();
+    launch(&mut world);
+    stop(&mut world);
+    dock(&mut world);
+    assert!(world.current_dock_context().unwrap().sequence() > prior_dock.sequence());
+    assert!(
+        world.current_dock_context().unwrap().tick()
+            > world.practice.unwrap().terminal_tick().unwrap()
+    );
+    consent(&mut world);
+    let continued = cold(&world);
+    assert_eq!(
+        continued.practice_ledger_snapshot().unwrap().attempts.len(),
+        3
+    );
+}
+
+#[test]
+fn completed_terminal_berth_precedes_retry_consent_and_preserves_first_trace() {
+    let mut world = terminal_history_after_later_docks(3902, true);
+    let before = world.practice_ledger_snapshot().unwrap();
+    assert_eq!(before.attempts[0].outcome, Some(PracticeOutcome::Complete));
+    assert!(before.trace.is_some());
+    assert_eq!(
+        before
+            .attempts
+            .iter()
+            .filter(|p| p.awarded_first_trace)
+            .count(),
+        1
+    );
+    reject_single_terminal_dock_field_changes(&mut world);
+    assert_eq!(world.practice_ledger_snapshot().unwrap(), before);
+    let _continued = cold(&world);
+}
