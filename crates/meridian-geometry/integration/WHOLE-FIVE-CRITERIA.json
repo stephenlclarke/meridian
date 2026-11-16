@@ -48,7 +48,7 @@
     "completeCandidateTriangles": 512
   },
   "dependentBudget": "After construction, tighten remaining work and storage by actual spent operations and live source/candidate memberships. Postchecks cannot reset the case allowance. Report combined spent operations and base+scratch peak.",
-  "failurePolicy": "Decode refusal leaves construction and all dependent bodies UNRUN. Construction refusal leaves all three candidate bodies UNRUN. A dependent refusal/failure leaves later bodies UNRUN. Guard refusal and semantic FAIL are recorded separately.",
+  "failurePolicy": "Only Operations/Storage/Rational/TriangleLimit are REFUSED. InvalidInput/Degenerate/ConflictingFields/NonManifold/UncertifiedContact/InvalidWitness are FAIL at every stage. Any failed dependency leaves all subsequent bodies UNRUN; decoding/construction failure returns no candidate.",
   "timing": "Rust std::time::Instant and host time.monotonic_ns; no timing dependency enters library core",
   "artifactBinding": "Root/G1 frozen source manifest verifies every source/lock/input byte before launch and after exit. Host binds physical binary hash, actual Popen pid/argv/start/terminal and hashes all files in ARTIFACTS.json. Rust copies execution binding and frozen original bindings into results. Binary/source compilation correspondence is checked by G1 compiler receipt and Root audit.",
   "outputs": [
@@ -84,6 +84,6 @@
   "all171Accepted": false,
   "newHullAdmissions": 0,
   "oldWholeFive": "Old sealed Swift/Python failures remain failure evidence. Rust earlier cutoffs grant no minimum/performance/acceptance credit.",
-  "hostTestsAuthored": 6,
-  "resultValidation": "Host checks all five case identities, frozen per-body input digests, 25 statuses/counts, measurements, candidate consistency, dependent UNRUN propagation and execution-binding bytes before sealing terminal."
+  "hostTestsAuthored": 8,
+  "resultValidation": "Host checks all five case identities, frozen per-body input digests, 25 statuses/counts, measurements, candidate consistency, dependent UNRUN propagation and execution-binding bytes before sealing terminal. A failed/refused body requires one known typed Failure with the matching status; incomplete cases cannot omit it."
 }

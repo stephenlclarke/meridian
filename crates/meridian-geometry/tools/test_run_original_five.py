@@ -82,7 +82,8 @@ class TerminalBindingTests(unittest.TestCase):
                        'peakStorageAtBodyTerminal': None if status == 'UNRUN' else 20}
                       for name, status in zip(names, ('PASS', 'REFUSED', 'UNRUN', 'UNRUN', 'UNRUN'), strict=True)]
             cases.append({'id': ident, 'bodies': bodies, 'completeCandidateReturned': False,
-                          'allCandidateChecksPassed': False, 'fleetAdmission': False})
+                          'allCandidateChecksPassed': False, 'fleetAdmission': False,
+                          'failure': {'kind': 'Operations', 'source': None, 'operationsAtRefusal': 2000001, 'detail': 'bounded fixture'}})
         return {'declaredBodies': 25, 'cases': cases, 'bodiesPass': 5, 'bodiesRefused': 5,
                 'bodiesFail': 0, 'bodiesUnrun': 15, 'all171Accepted': False,
                 'nativeAcceptance': False}, exports
@@ -101,6 +102,30 @@ class TerminalBindingTests(unittest.TestCase):
         body.update(status='PASS', chargedOperationDelta=0, peakStorageAtBodyTerminal=20)
         with self.assertRaisesRegex(ValueError, 'failed dependency'):
             HOST.validate_terminal(terminal, 1, exports)
+
+    def test_semantic_failure_is_fail_and_cannot_be_guard_refusal(self):
+        for kind in ('InvalidInput', 'Degenerate', 'ConflictingFields', 'NonManifold',
+                     'UncertifiedContact', 'InvalidWitness'):
+            with self.subTest(kind=kind):
+                terminal, exports = self.terminal()
+                terminal['cases'][0]['failure']['kind'] = kind
+                with self.assertRaisesRegex(ValueError, 'typed failure disagrees'):
+                    HOST.validate_terminal(terminal, 1, exports)
+                terminal['cases'][0]['bodies'][1]['status'] = 'FAIL'
+                terminal.update(bodiesRefused=4, bodiesFail=1)
+                HOST.validate_terminal(terminal, 1, exports)
+
+    def test_guard_failure_kind_and_missing_failure_are_checked(self):
+        for kind in ('Operations', 'Storage', 'Rational', 'TriangleLimit'):
+            terminal, exports = self.terminal()
+            terminal['cases'][0]['failure']['kind'] = kind
+            HOST.validate_terminal(terminal, 1, exports)
+        for failure in (None, {}, {'kind': 'Unknown'}):
+            with self.subTest(failure=failure):
+                terminal, exports = self.terminal()
+                terminal['cases'][0]['failure'] = failure
+                with self.assertRaisesRegex(ValueError, 'typed failure|failure kind'):
+                    HOST.validate_terminal(terminal, 1, exports)
 
 
 if __name__ == '__main__':

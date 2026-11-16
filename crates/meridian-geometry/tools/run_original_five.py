@@ -84,6 +84,22 @@ def validate_terminal(terminal, code, exports):
         for index, status in enumerate(statuses):
             if status != 'PASS' and any(value != 'UNRUN' for value in statuses[index+1:]):
                 raise ValueError('Rust terminal ran checks after a failed dependency')
+        failures = [status for status in statuses if status in ('FAIL', 'REFUSED')]
+        failure = row.get('failure')
+        if failures:
+            if len(failures) != 1 or not isinstance(failure, dict):
+                raise ValueError('Rust terminal failed body lacks one typed failure')
+            guard_kinds = ('Operations', 'Storage', 'Rational', 'TriangleLimit')
+            semantic_kinds = ('InvalidInput', 'Degenerate', 'ConflictingFields', 'NonManifold',
+                              'UncertifiedContact', 'InvalidWitness')
+            kind = failure.get('kind')
+            if kind not in guard_kinds + semantic_kinds:
+                raise ValueError('Rust terminal failure kind is missing or unknown')
+            expected_status = 'REFUSED' if kind in guard_kinds else 'FAIL'
+            if failures[0] != expected_status:
+                raise ValueError('Rust terminal typed failure disagrees with body status')
+        elif failure is not None or any(status != 'PASS' for status in statuses):
+            raise ValueError('Rust terminal incomplete case lacks a typed failure')
         if row['completeCandidateReturned'] != (statuses[1] == 'PASS'):
             raise ValueError('Rust terminal candidate disagrees with construction')
         if row['allCandidateChecksPassed'] != all(value == 'PASS' for value in statuses):

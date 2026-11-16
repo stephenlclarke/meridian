@@ -76,7 +76,7 @@
     },
     {
       "file": "src/bin/original_five.rs",
-      "name": "decode_refusal_keeps_construction_unrun",
+      "name": "semantic_decode_failure_keeps_construction_unrun",
       "status": "UNRUN"
     },
     {
@@ -92,6 +92,11 @@
     {
       "file": "src/bin/original_five.rs",
       "name": "small_closed_candidate_exercises_every_dependent_public_check",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/bin/original_five.rs",
+      "name": "typed_failures_classify_decode_and_construction_consistently",
       "status": "UNRUN"
     }
   ],
@@ -188,11 +193,18 @@
     }
   },
   "wholeFiveHarness": {
-    "criteriaSHA256": "da4bd8e6614f817a41f08a77d1284cd8fc712cb3dfe6cf0864560160008cda01",
-    "rustTestsAuthored": 5,
-    "hostTestsAuthored": 6,
+    "criteriaSHA256": "866bef6023b78957ef6880fe940949e0c476412e69153a19455ac20b0d10f431",
+    "rustTestsAuthored": 6,
+    "hostTestsAuthored": 8,
     "execution": "UNRUN",
     "construction": "HELD for review and owner execution",
     "deltaSHA256": "3fd47a7e8b29fde4a28a3df8fb3f4f5c3d17f984640caab5b73f1efbe5f14167"
+  },
+  "harnessFailureClassificationCorrection": {
+    "parentAuthorHead": "ae063a46ccdeca436393da4a112036155539a235",
+    "reviewedRootJoin": "fc4 (active bounded review)",
+    "finding": "P2 semantic failures incorrectly classified as REFUSED at decode/construction and unchecked in host terminal validation",
+    "status": "AUTHORED_UNRUN",
+    "qualifiedLibraryUnchanged": true
   }
 }

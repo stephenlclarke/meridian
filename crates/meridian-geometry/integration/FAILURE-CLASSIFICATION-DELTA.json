@@ -1,0 +1,40 @@
+{
+  "parentAuthorHead": "ae063a46ccdeca436393da4a112036155539a235",
+  "qualifiedLibraryPins": {
+    "crates/meridian-geometry/src/budget.rs": "7de9ea19f883caa83da99ece27f8173487990a1c0a408d78bb8e3354caba3898",
+    "crates/meridian-geometry/src/adapter.rs": "b0c8078d841b311a81dc54c9369386c2069820295d5a6e54d77e144d0b3ebe13",
+    "crates/meridian-geometry/src/lib.rs": "5d8c2990676c735eb5a59e8ec60697b751f5d71c24dc7e31c14ab5d622ec5000",
+    "crates/meridian-geometry/src/certificate.rs": "4810f64bb459d5a7df2cbdaf2dfc3597b6a2a5c20531a76be6e2625aeb986e65",
+    "crates/meridian-geometry/src/arrangement.rs": "3ef52d23959b3b039cd0ca1a228830854b13c0373bdb46fa646536a6bc63cd30",
+    "crates/meridian-geometry/src/source.rs": "9a8984561b8ab0d33a41c293dd27ff504fcdf3ad20207dbb567fa11d6c49ff79",
+    "crates/meridian-geometry/src/exact.rs": "becc68a02e65b2b63e138318805b3a090a91349ec1861ee38b635550c3df8443"
+  },
+  "libraryOrPriorThirteenAssertionsDelta": [],
+  "wholeFiveBodies": 25,
+  "classification": {
+    "REFUSED": [
+      "Operations",
+      "Storage",
+      "Rational",
+      "TriangleLimit"
+    ],
+    "FAIL": [
+      "InvalidInput",
+      "Degenerate",
+      "ConflictingFields",
+      "NonManifold",
+      "UncertifiedContact",
+      "InvalidWitness"
+    ]
+  },
+  "changes": [
+    "Shared check_status used by decode and construction record_failure.",
+    "Correct semantic decode regression oracle and all-kind/all-initial-stage Rust regression.",
+    "Host validates one known typed failure for a failing case and exact kind/status agreement.",
+    "Host fixtures contain typed guard failures and exercise valid FAIL controls, semantic-as-REFUSED rejection, missing/unknown failure rejection."
+  ],
+  "newAuthoredRustHarnessTestCount": 6,
+  "newAuthoredHostTestCount": 8,
+  "currentExecution": "UNRUN",
+  "compilerOrOriginalConstructionExecuted": false
+}

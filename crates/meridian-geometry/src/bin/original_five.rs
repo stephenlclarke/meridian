@@ -65,8 +65,8 @@ impl CaseReport {
             candidate: false,
         }
     }
-    fn refused(&mut self, stage: usize, error: Failure) {
-        self.bodies[stage] = Status::Refused;
+    fn record_failure(&mut self, stage: usize, error: Failure) {
+        self.bodies[stage] = check_status(&error);
         self.failure = Some(error);
     }
     fn json(&self) -> String {
@@ -447,7 +447,7 @@ fn run_case(asset: OriginalAsset, out: &Path) -> io::Result<CaseReport> {
             value
         }
         Err(error) => {
-            report.refused(0, error);
+            report.record_failure(0, error);
             report.body_metrics[0] = Some((budget.operations(), budget.peak_memberships()));
             report.operations = budget.operations();
             report.peak = budget.peak_memberships();
@@ -458,7 +458,7 @@ fn run_case(asset: OriginalAsset, out: &Path) -> io::Result<CaseReport> {
     let construction_start = budget.operations();
     match reconstruct(&originals, &mut budget) {
         Err(error) => {
-            report.refused(1, error);
+            report.record_failure(1, error);
             report.body_metrics[1] = Some((
                 budget.operations() - construction_start,
                 budget.peak_memberships(),
@@ -624,7 +624,7 @@ mod tests {
     fn construction_refusal_keeps_all_candidate_checks_unrun() {
         let mut report = CaseReport::pending(OriginalAsset::Sh010);
         report.bodies[0] = Status::Pass;
-        report.refused(1, refusal(FailureKind::Operations));
+        report.record_failure(1, refusal(FailureKind::Operations));
         assert_eq!(
             report.bodies,
             [
@@ -639,13 +639,13 @@ mod tests {
         assert!(report.json().contains("\"chargedOperationDelta\":null"));
     }
     #[test]
-    fn decode_refusal_keeps_construction_unrun() {
+    fn semantic_decode_failure_keeps_construction_unrun() {
         let mut report = CaseReport::pending(OriginalAsset::Sh166);
-        report.refused(0, refusal(FailureKind::InvalidInput));
+        report.record_failure(0, refusal(FailureKind::InvalidInput));
         assert_eq!(
             report.bodies,
             [
-                Status::Refused,
+                Status::Fail,
                 Status::Unrun,
                 Status::Unrun,
                 Status::Unrun,
@@ -653,6 +653,38 @@ mod tests {
             ]
         );
         assert!(!report.candidate);
+    }
+    #[test]
+    fn typed_failures_classify_decode_and_construction_consistently() {
+        let kinds = [
+            (FailureKind::Operations, Status::Refused),
+            (FailureKind::Storage, Status::Refused),
+            (FailureKind::Rational, Status::Refused),
+            (FailureKind::TriangleLimit, Status::Refused),
+            (FailureKind::InvalidInput, Status::Fail),
+            (FailureKind::Degenerate, Status::Fail),
+            (FailureKind::ConflictingFields, Status::Fail),
+            (FailureKind::NonManifold, Status::Fail),
+            (FailureKind::UncertifiedContact, Status::Fail),
+            (FailureKind::InvalidWitness, Status::Fail),
+        ];
+        for stage in [0, 1] {
+            for (kind, expected) in kinds {
+                let mut report = CaseReport::pending(OriginalAsset::Sh010);
+                if stage == 1 {
+                    report.bodies[0] = Status::Pass;
+                }
+                report.record_failure(stage, refusal(kind));
+                assert_eq!(report.bodies[stage], expected);
+                assert_eq!(report.failure.as_ref().map(|f| f.kind), Some(kind));
+                assert!(
+                    report.bodies[stage + 1..]
+                        .iter()
+                        .all(|s| *s == Status::Unrun)
+                );
+                assert!(!report.candidate);
+            }
+        }
     }
     #[test]
     fn remaining_budget_cannot_reset_the_original_case_limits() -> Result<(), Failure> {
