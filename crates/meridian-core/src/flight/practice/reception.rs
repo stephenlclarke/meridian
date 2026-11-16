@@ -1,4 +1,5 @@
 use super::*;
+use crate::flight::weapons::PulseResources;
 use crate::navigation::DockOrigin;
 use crate::save::{Reader, SaveError, Writer};
 
@@ -122,7 +123,7 @@ impl Practice {
         self,
         nav: crate::navigation::SavedNavigationSummary,
         flight: Snapshot,
-        cooldown: u8,
+        pulse: PulseResources,
         current_dock: Option<DockContext>,
     ) -> Result<(), SaveError> {
         let invalid = SaveError::InvalidState("T02 ceasefire or reception");
@@ -155,15 +156,10 @@ impl Practice {
             }
             return Ok(());
         }
-        if ready && cooldown != 0 {
+        if (ready && pulse.remaining_cooldown() != 0)
+            || (self.retired.is_none() && !pulse.fits_quiet_anchor(flight.tick, anchor))
+        {
             return Err(invalid);
-        }
-        if self.retired.is_none() && cooldown != 0 {
-            // Inside the same range there are no docked ticks or resource resets.
-            let elapsed = u64::from(crate::PULSE_COOLDOWN_TICKS - cooldown);
-            if flight.tick.saturating_sub(elapsed) > anchor {
-                return Err(invalid);
-            }
         }
         Ok(())
     }

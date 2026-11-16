@@ -124,6 +124,16 @@ impl PulseResources {
         self.cooldown
     }
 
+    /// During one uninterrupted flight the weapon clock advances once per
+    /// published tick. A quiet anchor upper-bounds the last possible shot.
+    pub(super) fn fits_quiet_anchor(self, tick: u64, anchor: u64) -> bool {
+        let Some(elapsed) = tick.checked_sub(anchor) else {
+            return false;
+        };
+        u64::from(self.cooldown) <= u64::from(PULSE_COOLDOWN_TICKS).saturating_sub(elapsed)
+            && u128::from(self.heat) <= maximum_reachable_heat(tick, elapsed)
+    }
+
     pub(super) fn encode_save(self, w: &mut Writer) {
         w.u16(self.energy);
         w.u16(self.heat);
@@ -158,7 +168,7 @@ impl PulseResources {
             FlightMode::Flight => elapsed >= 2 && launches >= 2,
         };
         if self.cooldown > PULSE_COOLDOWN_TICKS
-            || u128::from(self.heat) > maximum_reachable_heat(tick, elapsed)
+            || u128::from(self.heat) > maximum_reachable_heat(tick, u64::from(elapsed))
             || (self.energy != ENERGY_CAPACITY_HUNDREDTHS && self.energy != depleted_energy)
             || (early_full && !can_have_docked_since_shot)
             || ((ready || quiescent) && self.energy != ENERGY_CAPACITY_HUNDREDTHS)
@@ -177,8 +187,8 @@ impl PulseResources {
 // A shot needs tick 1 or later, and consecutive shots need at least a full
 // cooldown of airborne steps. Docked steps enlarge the global tick budget but
 // cannot clear cooldown. A docking reset discards all heat before it.
-fn maximum_reachable_heat(tick: u64, elapsed_since_shot_at_least: u8) -> u128 {
-    let latest_shot = tick.saturating_sub(u64::from(elapsed_since_shot_at_least));
+fn maximum_reachable_heat(tick: u64, elapsed_since_shot_at_least: u64) -> u128 {
+    let latest_shot = tick.saturating_sub(elapsed_since_shot_at_least);
     if latest_shot == 0 {
         return 0;
     }

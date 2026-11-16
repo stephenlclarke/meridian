@@ -291,3 +291,59 @@ fn assert_resealed_wrong_terminal_refused(world: &mut World, live: &[u8]) {
         assert_eq!(world.save_bytes().unwrap().as_slice(), live);
     }
 }
+
+#[test]
+fn v6_active_quiet_anchor_cannot_predate_a_recent_cooldown_zero_warm_pulse() {
+    use crate::save::{Writer, checksum};
+    let mut world = three_hits(1241);
+    let third_hit_tick = tick(&world);
+    for _ in 0..5 {
+        step(&mut world, 250);
+    }
+    let z = f64::from(world.snapshot().position[2]);
+    aim_at(&mut world, Vec3::new(1000.0, 0.0, z + 2000.0));
+    assert_eq!(shoot(&mut world).contact, PulseContact::Clear);
+    let discharge_tick = tick(&world);
+    step(&mut world, PULSE_COOLDOWN_TICKS);
+    let resources = world.pulse_laser_snapshot().unwrap();
+    assert_eq!((resources.cooldown_ticks, resources.heat_fifths), (0, 32));
+    let reception = world.practice_reception_snapshot().unwrap();
+    assert_eq!(reception.quiet_ticks, 18);
+    assert!(!reception.ready);
+    let live = world.save_bytes().unwrap();
+    let continued = World::from_save_bytes(&live).unwrap();
+    assert_eq!(continued.pulse_laser_snapshot(), Some(resources));
+    assert_eq!(continued.practice_reception_snapshot(), Some(reception));
+
+    let practice = world.practice.unwrap();
+    let mut encoded = Writer::new();
+    practice.encode(&mut encoded);
+    let reception_end = live.len() - 13 - 1 - encoded.bytes.len();
+    // Active v6 reception carries the anchor presence tag, eight anchor
+    // bytes, and an absent completion tag immediately before the practice.
+    let anchor = reception_end - 9;
+    assert_eq!(&live[anchor..anchor + 8], &discharge_tick.to_le_bytes());
+    assert_eq!(live[anchor - 1], 1);
+    assert_eq!(live[anchor + 8], 0);
+    let mut dirty = live.clone();
+    dirty[anchor..anchor + 8].copy_from_slice(&third_hit_tick.to_le_bytes());
+    let checksum_start = dirty.len() - 8;
+    let digest = checksum(&dirty[..checksum_start]);
+    dirty[checksum_start..].copy_from_slice(&digest.to_le_bytes());
+    // The existing practice receipts and genuine standalone pulse tail are retained.
+    assert_eq!(
+        &dirty[anchor + 8..checksum_start],
+        &live[anchor + 8..checksum_start]
+    );
+    assert_eq!(&dirty[..anchor], &live[..anchor]);
+    assert_eq!(
+        world.restore_bytes(&dirty),
+        Err(SaveError::InvalidState("T02 ceasefire or reception"))
+    );
+    assert_eq!(world.save_bytes().unwrap(), live);
+
+    step(&mut world, 162);
+    assert!(world.practice_reception_snapshot().unwrap().ready);
+    let ready_save = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    assert!(ready_save.practice_reception_snapshot().unwrap().ready);
+}
