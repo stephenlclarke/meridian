@@ -1,0 +1,37 @@
+{
+  "checkedPublishedVersions": [
+    {
+      "crate": "num-bigint",
+      "num": "0.4.8",
+      "checksum": "c89e69e7e0f03bea5ef08013795c25018e101932225a656383bd384495ecc367",
+      "license": "MIT OR Apache-2.0",
+      "rust_version": "1.60"
+    },
+    {
+      "crate": "num-rational",
+      "num": "0.4.2",
+      "checksum": "f83d14da390562dca69fc84082e73e548e1ad308d24accdedd2720017cb37824",
+      "license": "MIT OR Apache-2.0",
+      "rust_version": "1.60"
+    },
+    {
+      "crate": "num-integer",
+      "num": "0.1.46",
+      "checksum": "7969661fd2958a5cb096e56c8e1ad0444ac2bbcd0061bd28660485a44879858f",
+      "license": "MIT OR Apache-2.0",
+      "rust_version": "1.31"
+    },
+    {
+      "crate": "num-traits",
+      "num": "0.2.19",
+      "checksum": "071dfc062690e90b734c0b2273ce72ad0ffa95f0c74596bc250dcfd960262841",
+      "license": "MIT OR Apache-2.0",
+      "rust_version": "1.60"
+    }
+  ],
+  "metadataTemplate": "https://crates.io/api/v1/crates/{crate}/{num}",
+  "archiveTemplate": "https://static.crates.io/crates/{crate}/{crate}-{num}.crate",
+  "upstreamReleaseNotes": "https://raw.githubusercontent.com/rust-num/num-bigint/main/RELEASES.md",
+  "numBigintSelection": "0.4.8 is the current compatible 0.4 series including the 0.4.7 division regression correction. The 0.5 series changes optional random-generator dependencies, unused here.",
+  "licenseChoice": "MIT retained with full Apache alternative texts; no optional rand/serde features enabled"
+}

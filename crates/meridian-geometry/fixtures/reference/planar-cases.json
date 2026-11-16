@@ -1,0 +1,414 @@
+{
+  "domain": [
+    [
+      0,
+      0
+    ],
+    [
+      12,
+      0
+    ],
+    [
+      0,
+      12
+    ]
+  ],
+  "cases": [
+    {
+      "id": "uncut",
+      "barriers": [],
+      "regions": [],
+      "visible": "outside",
+      "area": "72",
+      "components": 1,
+      "holes": 0
+    },
+    {
+      "id": "rectangular_hole",
+      "barriers": [],
+      "regions": [
+        [
+          [
+            2,
+            2
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            2,
+            4
+          ]
+        ]
+      ],
+      "visible": "outside",
+      "area": "68",
+      "components": 1,
+      "holes": 1
+    },
+    {
+      "id": "two_holes",
+      "barriers": [],
+      "regions": [
+        [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            1,
+            2
+          ]
+        ],
+        [
+          [
+            5,
+            1
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            7,
+            3
+          ],
+          [
+            5,
+            3
+          ]
+        ]
+      ],
+      "visible": "outside",
+      "area": "67",
+      "components": 1,
+      "holes": 2
+    },
+    {
+      "id": "two_disconnected_islands",
+      "barriers": [],
+      "regions": [
+        [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            1,
+            2
+          ]
+        ],
+        [
+          [
+            5,
+            1
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            7,
+            3
+          ],
+          [
+            5,
+            3
+          ]
+        ]
+      ],
+      "visible": "inside",
+      "area": "5",
+      "components": 2,
+      "holes": 0
+    },
+    {
+      "id": "slanted_hole",
+      "barriers": [],
+      "regions": [
+        [
+          [
+            2,
+            2
+          ],
+          [
+            6,
+            2
+          ],
+          [
+            3,
+            5
+          ]
+        ]
+      ],
+      "visible": "outside",
+      "area": "66",
+      "components": 1,
+      "holes": 1
+    },
+    {
+      "id": "touching_holes_vertex",
+      "barriers": [],
+      "regions": [
+        [
+          [
+            1,
+            1
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            1,
+            3
+          ]
+        ],
+        [
+          [
+            3,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            3,
+            5
+          ]
+        ]
+      ],
+      "visible": "outside",
+      "area": "64",
+      "components": 1,
+      "holes": "contact"
+    },
+    {
+      "id": "collinear_partial_overlap_and_T",
+      "barriers": [
+        [
+          [
+            1,
+            3
+          ],
+          [
+            7,
+            3
+          ]
+        ],
+        [
+          [
+            3,
+            3
+          ],
+          [
+            9,
+            3
+          ]
+        ],
+        [
+          [
+            5,
+            1
+          ],
+          [
+            5,
+            5
+          ]
+        ]
+      ],
+      "regions": [],
+      "visible": "outside",
+      "area": "72",
+      "components": 1,
+      "holes": 0
+    },
+    {
+      "id": "isolated_exterior_contact",
+      "barriers": [
+        [
+          [
+            3,
+            3
+          ],
+          [
+            3,
+            3
+          ]
+        ]
+      ],
+      "regions": [],
+      "visible": "outside",
+      "area": "72",
+      "components": 1,
+      "holes": 0
+    },
+    {
+      "id": "vertical_finite_contact",
+      "barriers": [
+        [
+          [
+            3,
+            2
+          ],
+          [
+            3,
+            6
+          ]
+        ]
+      ],
+      "regions": [],
+      "visible": "outside",
+      "area": "72",
+      "components": 1,
+      "holes": 0
+    },
+    {
+      "id": "finite_crossings",
+      "barriers": [
+        [
+          [
+            1,
+            1
+          ],
+          [
+            8,
+            3
+          ]
+        ],
+        [
+          [
+            2,
+            6
+          ],
+          [
+            7,
+            1
+          ]
+        ],
+        [
+          [
+            0,
+            4
+          ],
+          [
+            7,
+            4
+          ]
+        ]
+      ],
+      "regions": [],
+      "visible": "outside",
+      "area": "72",
+      "components": 1,
+      "holes": 0
+    },
+    {
+      "id": "internal_finite_split_with_hole",
+      "barriers": [
+        [
+          [
+            0,
+            3
+          ],
+          [
+            8,
+            3
+          ]
+        ],
+        [
+          [
+            3,
+            0
+          ],
+          [
+            3,
+            8
+          ]
+        ]
+      ],
+      "regions": [
+        [
+          [
+            2,
+            2
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            2,
+            4
+          ]
+        ]
+      ],
+      "visible": "outside",
+      "area": "68",
+      "components": 1,
+      "holes": 1
+    },
+    {
+      "id": "rational_precision_hole",
+      "barriers": [],
+      "regions": [
+        [
+          [
+            "1/3",
+            "1/7"
+          ],
+          [
+            "4/3",
+            "1/7"
+          ],
+          [
+            "4/3",
+            "8/7"
+          ],
+          [
+            "1/3",
+            "8/7"
+          ]
+        ]
+      ],
+      "visible": "outside",
+      "area": "71",
+      "components": 1,
+      "holes": 1
+    }
+  ]
+}

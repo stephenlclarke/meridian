@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "baseCommit": "a583b61e4e4536003414ee9f5448131744f62eb2",
+  "owner": "G4 geometry author; G1 compiler/native/Dell execution; Root serial workspace join; G2 whole-source review",
+  "scope": "crates/meridian-geometry/**",
+  "tests": [
+    {
+      "file": "tests/adapter.rs",
+      "name": "analytic_closed_originals_preserve_volume_source_fields_and_contact_witnesses",
+      "status": "UNRUN"
+    },
+    {
+      "file": "tests/adapter.rs",
+      "name": "transformed_component_ids_orientation_and_affine_uv_are_exact",
+      "status": "UNRUN"
+    },
+    {
+      "file": "tests/adapter.rs",
+      "name": "finite_point_and_vertical_contacts_survive_classification_and_noding",
+      "status": "UNRUN"
+    },
+    {
+      "file": "tests/adapter.rs",
+      "name": "incomplete_or_mutated_witness_is_rejected",
+      "status": "UNRUN"
+    },
+    {
+      "file": "tests/adapter.rs",
+      "name": "invalid_originals_and_singular_links_refuse_without_candidate",
+      "status": "UNRUN"
+    },
+    {
+      "file": "tests/adapter.rs",
+      "name": "original_budget_boundaries_and_refusals_remain_explicit",
+      "status": "UNRUN"
+    },
+    {
+      "file": "tests/adapter.rs",
+      "name": "dense_original_derived_fixture_retains_a_bounded_failure_expectation",
+      "status": "UNRUN"
+    },
+    {
+      "file": "tests/adapter.rs",
+      "name": "out_of_facet_and_nonfinite_source_substitutions_refuse",
+      "status": "UNRUN"
+    },
+    {
+      "file": "tests/original_inputs.rs",
+      "name": "every_original_input_preserves_components_facets_and_exact_corner_fields",
+      "status": "UNRUN"
+    },
+    {
+      "file": "tests/original_inputs.rs",
+      "name": "changed_original_bytes_refuse_before_source_reconstruction",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/source.rs",
+      "name": "exact_sections_match_independent_signed_contact_enumeration",
+      "status": "UNRUN"
+    }
+  ],
+  "rustCompiler": "UNRUN",
+  "cargoResolution": "UNRUN",
+  "cargoTest": "UNRUN",
+  "cargoClippy": "UNRUN",
+  "authorChecks": {
+    "rustfmtSyntaxAndFormat": "PASS",
+    "markdownlintCrateReadme": "PASS",
+    "dependencyArchiveHashAndNotices": "PASS",
+    "originalInputExportAuthentication": "PASS"
+  },
+  "inputSourceExport": "No source union constructor invoked; recipe authentication and canonical exact input export only",
+  "limits": {
+    "operations": 2000000,
+    "logicalStorageMemberships": 100000,
+    "sourceAndOutputRationalBits": 4096,
+    "candidateTriangles": 512
+  },
+  "completeCheckCommands": [
+    "cargo check --locked -p meridian-geometry --all-targets",
+    "cargo test --locked -p meridian-geometry",
+    "cargo clippy --locked -p meridian-geometry --all-targets -- -D warnings"
+  ],
+  "executionBindingRequired": [
+    "exact joined Git commit and tree",
+    "Cargo.lock and crate source SHA256 manifest",
+    "physical compiler/version/target",
+    "actual owned process argv/PID/start and terminal",
+    "unmodified tests and full stdout/stderr",
+    "typed refusal and all prior fleet blockers retained"
+  ],
+  "wholeFive": "HELD pending G2 whole review and owner coordination after complete compiler/test/source binding",
+  "admissions": 0,
+  "fleetBaseline": {
+    "ships": 23,
+    "shipTotal": 162,
+    "stations": 4,
+    "stationTotal": 6
+  }
+}

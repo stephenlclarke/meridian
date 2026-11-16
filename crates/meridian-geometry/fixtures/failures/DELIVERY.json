@@ -1,0 +1,14 @@
+{
+  "packet": "/var/folders/y1/z__p0wn53pl5l52x_b7vqp_40000gn/T/elite-g4-reviewed-section-wholefive.rtug2h0h/reviewed-original210-wholefive-result.tar",
+  "packetSHA256": "9dcdbba4c66214732095025b42862861e080c90751671946e9f2c9fbdb5d165e",
+  "manifestSHA256": "c36e880062c685961cbc4fc0f7a7df22a5574752e73055384be5e94ef85419fc",
+  "membersVerified": 536,
+  "totalMembers": 537,
+  "terminalSHA256": "044eee064e0e15b27896cfe4ca001c7afa9ed9cce7cb49a9c15575809f7d60ce",
+  "actualLedgerSHA256": "5c2defb8b27e479b9873a7fe2cf98dcb5eb65340d433263bddf40fe00e26f1bc",
+  "outcomesSHA256": "4bf4173b076a4790d9cf188e2d4d0b079f1558384d22fad79aba6acb7f030e7d",
+  "comparisonSHA256": "efea4f7ac39c8d899385f2f3ee2f8ab285df80012eb92083ae1e04fa814000a0",
+  "decisionSHA256": "7990b57083b1e80134b96c329162dd250ab88bf7d86efe4e31a00c67dbe772e2",
+  "bindingSHA256": "b881366391528f95b7e4ec7cc6acc1a88f88808b12fd35c5bbc1a1898b0dcc86",
+  "rootAuditSHA256": "107d4c97cbddb08498ad4f386afb286c63e4fb32c09ac1ce81409fdd4b7a6737"
+}

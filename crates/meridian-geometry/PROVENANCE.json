@@ -1,0 +1,109 @@
+{
+  "meridianBase": "a583b61e4e4536003414ee9f5448131744f62eb2",
+  "immutableSwiftSnapshot": "/Volumes/SSD/offload/l337-g1-pr335-equipment-compose.UtqLRJ/required-cold-runtime.a11fe169/elite",
+  "sealedGeometryHead": "0c2677b5da76d00155e69ad0495a0413dbf38e48",
+  "sealedGeometrySourceSHA256": "d2d6b741f5f022a714da83640132b3ecf3b429ca82dfa74146e682ac0b5667ee",
+  "referenceFiles": [
+    {
+      "path": "CASES.json",
+      "bytes": 9177,
+      "sha256": "bfba51b92d0a08c3ec31de41643ca6d8976409dcd6ac5392ddc803443bedbc88"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1071,
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+    },
+    {
+      "path": "OriginalCamelRescuePhysicalSource.swift",
+      "bytes": 6757,
+      "sha256": "1a85d443679c0d2243c8ea99b3b68bd2c4a6cd928bd8336b9af52675560c16ee"
+    },
+    {
+      "path": "OriginalFleetCurrentHullSource.swift",
+      "bytes": 3209,
+      "sha256": "ab952998810a3f514679acc60460bcc0d5a9a2fa041450d1eff43813578cec62"
+    },
+    {
+      "path": "OriginalFleetShowroomModels.swift",
+      "bytes": 5661,
+      "sha256": "eef47b8e21bdd3bd8ea7019c02d1ccb4a3fac2b8117f5727530bf76378f070cc"
+    },
+    {
+      "path": "exact-source-arrangement.py",
+      "bytes": 79474,
+      "sha256": "aa400698c0094b0f4dd16aa7094c68879072f85a35858ac3501d8fda60488a80"
+    },
+    {
+      "path": "independent_planar_reference.py",
+      "bytes": 1633,
+      "sha256": "b3191dc38fbabc2d1d23dd91bd19401679e1a53ec850fb3394fb2a5ce7490e0d"
+    },
+    {
+      "path": "planar-cases.json",
+      "bytes": 5982,
+      "sha256": "6803cccb5180c85107c5bd8791b26fdd677fa7267f8b6c29182967d9484bb052"
+    },
+    {
+      "path": "test_source_arrangement_corridor_walk.py",
+      "bytes": 5699,
+      "sha256": "daf8387e70722d42b10fa906975c4a285783144e8dea05e45a1a23f6822500bc"
+    },
+    {
+      "path": "test_source_arrangement_incidence.py",
+      "bytes": 13891,
+      "sha256": "865e444c24c873501d1e85e14eef3cbceaa644886e3a565290a5afe023fce400"
+    },
+    {
+      "path": "test_source_arrangement_pruning.py",
+      "bytes": 8603,
+      "sha256": "6123a1d319715626172cd15cdd5c43b7ad3e9df3ee7615d80e134b24d56f20f9"
+    },
+    {
+      "path": "test_source_arrangement_recovery.py",
+      "bytes": 14562,
+      "sha256": "e8271802471ae8a60650472ce2875167c547d2b38c51e2e370193af9e5af00c2"
+    },
+    {
+      "path": "test_source_arrangement_regions.py",
+      "bytes": 17033,
+      "sha256": "b5970cf837e6f2e3235f6b7792e3d3fd65869dd9be4787058a238318effb87a1"
+    },
+    {
+      "path": "test_source_arrangement_schema_work.py",
+      "bytes": 8158,
+      "sha256": "379926857e002b83d06e1e8856a9664b368ebba73c2dca205f53b4acd8eec9cd"
+    },
+    {
+      "path": "test_source_arrangement_section_sign.py",
+      "bytes": 7953,
+      "sha256": "90bbe29eb59c655b29953de73ab9efd2acab4a5207b8f9ea323674be29dee56d"
+    },
+    {
+      "path": "test_source_arrangement_strips.py",
+      "bytes": 16148,
+      "sha256": "90ad98bf0e3dd20361639b4fb6fe012c1e72bc052d90b8268d87f1d0abe1828e"
+    }
+  ],
+  "license": "Original reference MIT; complete original notice retained as fixtures/reference/LICENSE",
+  "exportProtocol": "All eight recipe source pins checked before authenticate_inputs, exact Fraction(str(value)), owner-local facet ordering, transformed points and vertex/UV pairing retained. No union constructor called.",
+  "publicAPI": {
+    "OriginalAsset.decode": "Immutable byte-matched original inputs only",
+    "reconstruct": "Exact finite original-facet reconstruction with checked fields, intervals and links; returns Result<Hull,Failure>",
+    "FacetWitness.verify": "Independent mutual exact-region and physical interval validation; never grants fleet/native admission"
+  },
+  "portDeltas": [
+    "The candidate keeps canonical strips and triangulates noded cells with vertex-preserving ears. The previous global constrained-flip minimization is retained as reference, not invoked by this Rust crate.",
+    "Exact all-source traversal replaces the Python BVH caches in this initial port. Original work and storage upper bounds are retained, so conservative refusal is expected for large inputs.",
+    "Logical storage accounting uses conservative per-record reservations and all live witness/input/noding overlap. Charged operation totals follow Rust data structures; no equivalence to the Python measured operations is claimed."
+  ],
+  "runtimeExecution": "UNRUN; author lane rustfmt syntax parsing only; G1/Dell owner compiles exact committed packet",
+  "wholeFiveExecution": "HELD pending current complete implementation/test/criteria binding and G2 whole review",
+  "fleetAcceptance": {
+    "ships": 23,
+    "shipTotal": 162,
+    "stations": 4,
+    "stationTotal": 6,
+    "newAdmissions": 0
+  }
+}

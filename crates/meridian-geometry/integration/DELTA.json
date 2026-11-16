@@ -1,0 +1,18 @@
+{
+  "baseCommit": "a583b61e4e4536003414ee9f5448131744f62eb2",
+  "baseCargoTomlSHA256": "46e80c64f9d830e2433c304a278b3f46d90c6cdac7f9d2de79b37aa072217760",
+  "baseCargoLockSHA256": "9f929f19e175eb3e700f5e65f3128ac34b2663727498fe2dac7b0697501bcd5c",
+  "proposedCargoTomlSHA256": "082c12ebc1f9aaab8dd3c962acc06cc6e85bf8bcf6cc9a29c2c36cdfd91d9bec",
+  "proposedCargoLockSHA256": "d2afa020fd62f66a9f3f5863f75a11216debb1d04cc6a74f2afbacfcf5393dbf",
+  "newWorkspaceMembers": [
+    "crates/meridian-geometry"
+  ],
+  "newLockPackages": [
+    "meridian-geometry",
+    "num-bigint",
+    "num-integer",
+    "num-rational"
+  ],
+  "numTraitsExistingVersion": "0.2.19",
+  "resolutionExecution": "UNRUN; hand-authored exact published dependency graph for Root serial Cargo validation"
+}

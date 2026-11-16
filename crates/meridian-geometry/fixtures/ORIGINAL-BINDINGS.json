@@ -1,0 +1,267 @@
+[
+  {
+    "id": "SH010",
+    "sourceRevision": "0c2677b5da76d00155e69ad0495a0413dbf38e48",
+    "sourceBindingSHA256": "d2d6b741f5f022a714da83640132b3ecf3b429ca82dfa74146e682ac0b5667ee",
+    "components": 31,
+    "sourceTriangles": 1012,
+    "exportSHA256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc",
+    "blueprintSHA256": "e528e6c8921c6cc538c90e59a73bd6cfc6bbd08d935df6ec72fe00575ab591a1",
+    "recipeSHA256": "670ae78ace78eee1e0cf79462626c9349e58696a61885292b758a91841adf4ad",
+    "allEightInputPins": {
+      "source_bytes": {
+        "path": "docs/fleet-physical/source-field-originals/SH010-design.toml",
+        "bytes": 541477,
+        "sha256": "3e131707177a4b934ad969dc62da49963adf9aa6a71985e6dcf21c8ba9dd179c"
+      },
+      "resource_bytes": {
+        "path": "Sources/L337Core/Resources/Ships/SH010.toml",
+        "bytes": 565604,
+        "sha256": "66f8a18a52854fad92f8c0b1cb76ef3d0b6f7405d6e8e66e944b1b9e63bb89d3"
+      },
+      "r3_bytes": {
+        "path": "docs/fleet-design-v2/ships/SH010.toml",
+        "bytes": 3510,
+        "sha256": "755f776227dcb1d7816b5e426fbe239a98f0f9d1df46fc1ebdbd90c5b15e5983"
+      },
+      "ownership_bytes": {
+        "path": "docs/fleet-physical/creator-ownership-records/SH010.json",
+        "bytes": 113886,
+        "sha256": "5b3b4ff988a01b91e592fd73b048b2af8712c40b071406402def30b62f312bf9"
+      },
+      "library_bytes": {
+        "path": "Tools/showroom/exact-surface-union-source-arrangement.py",
+        "sha256": "e8fbf6a81c6c5acd3fa30eae82f6ff7686dac3ee20d93afa6523bea6093e8a99",
+        "bytes": 130941
+      },
+      "corrected_source_bytes": {
+        "path": "docs/fleet-physical/authorized-source-fields/SH010-design.toml",
+        "bytes": 541964,
+        "sha256": "9855262e5fe22959e5c440739d0e32a7f24c0ab17fb3f751a221e1090111a065"
+      },
+      "field_authority_bytes": {
+        "path": "docs/fleet-physical/authorized-source-fields/SH010-authority.json",
+        "bytes": 18345,
+        "sha256": "7d205e8a4ffbb8a2f203b61deb7ebdcc9d4b981d49f570405ab251652df99055"
+      },
+      "field_reader_bytes": {
+        "path": "Tools/showroom/authenticated-source-fields.py",
+        "bytes": 12751,
+        "sha256": "eb03fc8e77481c34afe7c3c433b5bdb94eeb4f37fd977e062eda2ab9bac229a4"
+      }
+    },
+    "constructorCalled": false
+  },
+  {
+    "id": "SH011",
+    "sourceRevision": "0c2677b5da76d00155e69ad0495a0413dbf38e48",
+    "sourceBindingSHA256": "d2d6b741f5f022a714da83640132b3ecf3b429ca82dfa74146e682ac0b5667ee",
+    "components": 31,
+    "sourceTriangles": 1012,
+    "exportSHA256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c",
+    "blueprintSHA256": "4430bae6cd675551edd1fa7381e28d2e792d4d72ee62124b25856d680e53b2f8",
+    "recipeSHA256": "7c066fef82216631f00b6f5d5a84f3158fc063a1fb831ffb18476642ae82c93b",
+    "allEightInputPins": {
+      "source_bytes": {
+        "path": "docs/fleet-physical/source-field-originals/SH011-design.toml",
+        "bytes": 541995,
+        "sha256": "f0e1bf789ccad1f445f9d576c03affc853b7beb41b6820c03739b7e45a5e6884"
+      },
+      "resource_bytes": {
+        "path": "Sources/L337Core/Resources/Ships/SH011.toml",
+        "bytes": 566126,
+        "sha256": "dec7c21964fd5e4521cde5c07fae024eb8c926607fc9223b2a3667830600729e"
+      },
+      "r3_bytes": {
+        "path": "docs/fleet-design-v2/ships/SH011.toml",
+        "bytes": 3499,
+        "sha256": "2d61d0afa8810dfec66208bee0b5b95555f64ddd9d2df76ce54b9a5c8a7c8ad1"
+      },
+      "ownership_bytes": {
+        "path": "docs/fleet-physical/creator-ownership-records/SH011.json",
+        "bytes": 113886,
+        "sha256": "7bd154d96c015d233a4689a00aeceb75d72f7bada29b0980fe290f706b102bc4"
+      },
+      "library_bytes": {
+        "path": "Tools/showroom/exact-surface-union-source-arrangement.py",
+        "sha256": "e8fbf6a81c6c5acd3fa30eae82f6ff7686dac3ee20d93afa6523bea6093e8a99",
+        "bytes": 130941
+      },
+      "corrected_source_bytes": {
+        "path": "docs/fleet-physical/authorized-source-fields/SH011-design.toml",
+        "bytes": 542451,
+        "sha256": "27fdb47cff2f87061342403c8b756c4630bf38a30bec841e31a103d6c1f0450f"
+      },
+      "field_authority_bytes": {
+        "path": "docs/fleet-physical/authorized-source-fields/SH011-authority.json",
+        "bytes": 18334,
+        "sha256": "6a18de984088110733c79dc8f6502c4499180f92c6e5e90a87ab7dedaed69f95"
+      },
+      "field_reader_bytes": {
+        "path": "Tools/showroom/authenticated-source-fields.py",
+        "bytes": 12751,
+        "sha256": "eb03fc8e77481c34afe7c3c433b5bdb94eeb4f37fd977e062eda2ab9bac229a4"
+      }
+    },
+    "constructorCalled": false
+  },
+  {
+    "id": "SH016",
+    "sourceRevision": "0c2677b5da76d00155e69ad0495a0413dbf38e48",
+    "sourceBindingSHA256": "d2d6b741f5f022a714da83640132b3ecf3b429ca82dfa74146e682ac0b5667ee",
+    "components": 33,
+    "sourceTriangles": 1100,
+    "exportSHA256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e",
+    "blueprintSHA256": "330a57329a4f8c3300c031732c9f96e30320f726e03056a94eda06a81e82d57b",
+    "recipeSHA256": "b9a85fbe06f431c98c8416ed18f7972043800e4dd6630c1ab7281392d031c8ad",
+    "allEightInputPins": {
+      "source_bytes": {
+        "path": "docs/fleet-physical/source-field-originals/SH016-design.toml",
+        "bytes": 1626122,
+        "sha256": "dd0e951f8c8d46e91b58fa65f45446fe8604f29f213439ddb060fe5c9ee248f6"
+      },
+      "resource_bytes": {
+        "path": "Sources/L337Core/Resources/Ships/SH016.toml",
+        "bytes": 1650274,
+        "sha256": "b23f6d0c214e199e19e6eaf71647cdbe45cc2a1c6b25935d30c1299335c5a2aa"
+      },
+      "r3_bytes": {
+        "path": "docs/fleet-design-v2/ships/SH016.toml",
+        "bytes": 3476,
+        "sha256": "d1bf21e0ad41a1fab71976310b850c67c28de10666f331b9b09e99363967d366"
+      },
+      "ownership_bytes": {
+        "path": "docs/fleet-physical/creator-ownership-records/SH016.json",
+        "bytes": 120342,
+        "sha256": "daafe7901746b8e97014909d2fbea61d1c3a88ef848e3221f88c8d91deb8032f"
+      },
+      "library_bytes": {
+        "path": "Tools/showroom/exact-surface-union-source-arrangement.py",
+        "sha256": "e8fbf6a81c6c5acd3fa30eae82f6ff7686dac3ee20d93afa6523bea6093e8a99",
+        "bytes": 130941
+      },
+      "corrected_source_bytes": {
+        "path": "docs/fleet-physical/authorized-source-fields/SH016-design.toml",
+        "bytes": 1626506,
+        "sha256": "66ea0ea80378c76a1bfdcba271a81537a79e4643c70c8624842fe0ab77e52b60"
+      },
+      "field_authority_bytes": {
+        "path": "docs/fleet-physical/authorized-source-fields/SH016-authority.json",
+        "bytes": 78402,
+        "sha256": "29f60851b6fe60d5d09864932afa505a66c2fb5038ee3d8502e6752141e9935e"
+      },
+      "field_reader_bytes": {
+        "path": "Tools/showroom/authenticated-source-fields.py",
+        "bytes": 12751,
+        "sha256": "eb03fc8e77481c34afe7c3c433b5bdb94eeb4f37fd977e062eda2ab9bac229a4"
+      }
+    },
+    "constructorCalled": false
+  },
+  {
+    "id": "SH017",
+    "sourceRevision": "0c2677b5da76d00155e69ad0495a0413dbf38e48",
+    "sourceBindingSHA256": "d2d6b741f5f022a714da83640132b3ecf3b429ca82dfa74146e682ac0b5667ee",
+    "components": 33,
+    "sourceTriangles": 1100,
+    "exportSHA256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a",
+    "blueprintSHA256": "227c0dc55255710686877bca3f301b21c32ce69da0261ce00574aa4a00724ad3",
+    "recipeSHA256": "7ee28c779e261a3c5e45930ebd83272980e32950c38e28bb77d4b38ddcff5e7e",
+    "allEightInputPins": {
+      "source_bytes": {
+        "path": "docs/fleet-physical/source-field-originals/SH017-design.toml",
+        "bytes": 1660724,
+        "sha256": "2a5efee25247b09a861d5112c7d070685b1f9aa2892143505fca28332fb2d4f3"
+      },
+      "resource_bytes": {
+        "path": "Sources/L337Core/Resources/Ships/SH017.toml",
+        "bytes": 1684899,
+        "sha256": "1a31ae1c3827227f79d7fa826d69c6970d34806400d9ab642d0db0f1ddcd2fb6"
+      },
+      "r3_bytes": {
+        "path": "docs/fleet-design-v2/ships/SH017.toml",
+        "bytes": 3503,
+        "sha256": "c31408f9cbf0e76af47c583fcf084080addb1d8e84970cc0168d7c065bae385a"
+      },
+      "ownership_bytes": {
+        "path": "docs/fleet-physical/creator-ownership-records/SH017.json",
+        "bytes": 120342,
+        "sha256": "f1f7dde5ea9df700c825b1ac9f1405eee63b02327225a12f0afab2350927d48b"
+      },
+      "library_bytes": {
+        "path": "Tools/showroom/exact-surface-union-source-arrangement.py",
+        "sha256": "e8fbf6a81c6c5acd3fa30eae82f6ff7686dac3ee20d93afa6523bea6093e8a99",
+        "bytes": 130941
+      },
+      "corrected_source_bytes": {
+        "path": "docs/fleet-physical/authorized-source-fields/SH017-design.toml",
+        "bytes": 1661426,
+        "sha256": "b2c0de78804053963252c7626bdbb5595ceee19da9508396ef0f6ab9e755cc05"
+      },
+      "field_authority_bytes": {
+        "path": "docs/fleet-physical/authorized-source-fields/SH017-authority.json",
+        "bytes": 98752,
+        "sha256": "924d9e79a7a43dc3d1b414332c2548606921eabd626e2f3ded173f01ada745e8"
+      },
+      "field_reader_bytes": {
+        "path": "Tools/showroom/authenticated-source-fields.py",
+        "bytes": 12751,
+        "sha256": "eb03fc8e77481c34afe7c3c433b5bdb94eeb4f37fd977e062eda2ab9bac229a4"
+      }
+    },
+    "constructorCalled": false
+  },
+  {
+    "id": "SH166",
+    "sourceRevision": "0c2677b5da76d00155e69ad0495a0413dbf38e48",
+    "sourceBindingSHA256": "d2d6b741f5f022a714da83640132b3ecf3b429ca82dfa74146e682ac0b5667ee",
+    "components": 29,
+    "sourceTriangles": 988,
+    "exportSHA256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f",
+    "blueprintSHA256": "8b39bd61aa4043b2463c65605f56a03e1ed09bd1f1e5f06d6bdf40bce2876250",
+    "recipeSHA256": "8239684125fff2425796657eef4caa9f1c4096c8912e1b8f8a98f130567e4ecd",
+    "allEightInputPins": {
+      "source_bytes": {
+        "path": "docs/fleet-physical/source-field-originals/SH166-design.toml",
+        "bytes": 534022,
+        "sha256": "5d782369e19a839d28bce557aa327701b0d9904e6381880fbabe9cf161f56db4"
+      },
+      "resource_bytes": {
+        "path": "Sources/L337Core/Resources/Ships/SH166.toml",
+        "bytes": 558931,
+        "sha256": "c795a90d0f80bb80fe37f9a23ae6d241810ea025915f31a1131179b421cbe31a"
+      },
+      "r3_bytes": {
+        "path": "docs/fleet-design-v2/ships/SH166.toml",
+        "bytes": 3604,
+        "sha256": "40cc092dc15ba1aa8a2b9bd67cd8c051663462df24374abaf46c798bbc147094"
+      },
+      "ownership_bytes": {
+        "path": "docs/fleet-physical/creator-ownership-records/SH166.json",
+        "bytes": 112561,
+        "sha256": "75d9262874760d662d35d0d1f69c5911be35e66a9cdf3967a15c6b4d98def806"
+      },
+      "library_bytes": {
+        "path": "Tools/showroom/exact-surface-union-source-arrangement.py",
+        "sha256": "e8fbf6a81c6c5acd3fa30eae82f6ff7686dac3ee20d93afa6523bea6093e8a99",
+        "bytes": 130941
+      },
+      "corrected_source_bytes": {
+        "path": "docs/fleet-physical/authorized-source-fields/SH166-design.toml",
+        "bytes": 534466,
+        "sha256": "92efcad2a00dca015015431cd9618fe0f1cd0c8d29d321b50c4c2205bb4b591f"
+      },
+      "field_authority_bytes": {
+        "path": "docs/fleet-physical/authorized-source-fields/SH166-authority.json",
+        "bytes": 79882,
+        "sha256": "363c56374b36bb91f1a894601cd5faa54dd3d1c7e22117dbeed5312e9a49851d"
+      },
+      "field_reader_bytes": {
+        "path": "Tools/showroom/authenticated-source-fields.py",
+        "bytes": 12751,
+        "sha256": "eb03fc8e77481c34afe7c3c433b5bdb94eeb4f37fd977e062eda2ab9bac229a4"
+      }
+    },
+    "constructorCalled": false
+  }
+]

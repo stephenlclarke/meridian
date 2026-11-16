@@ -1,0 +1,333 @@
+{
+  "counts": {
+    "declaredBodies": 210,
+    "passedBodies": 195,
+    "unrunBodies": 15,
+    "dependentUnrun": 15,
+    "failedBodies": 0,
+    "erroredBodies": 0,
+    "constructorRefusalEventsSeparate": 5
+  },
+  "seconds": 121.28152233362198,
+  "rows": [
+    {
+      "id": "SH010",
+      "construction": {
+        "class": "GoshawkMkIICustomCompleteUnionTests",
+        "constructionReturned": false,
+        "faces": null,
+        "exactOperations": null,
+        "status": "See retained setUpClass error; no geometry admission",
+        "constructorSeconds": 9.561002959031612,
+        "maximumNumericConversionErrorSourceUnitsOrUV": null
+      },
+      "dependentPass": 0,
+      "dependentUnrun": 3,
+      "dependentFail": 0,
+      "dependentError": 0,
+      "message": "Exact union operation budget exhausted; no partial result",
+      "exception": "UnionFailure",
+      "operations": 2000001,
+      "source": [
+        7,
+        64
+      ],
+      "sourceEntryOps": 1999613,
+      "stage": "source_arrangement",
+      "phase": "awaiting_constraints",
+      "prefixWitnessCount": 259,
+      "witnessSlots": 30510,
+      "retainedWorkSlots": 13121,
+      "witnessComplete": false,
+      "sectionWork": {
+        "hits": 2404,
+        "lookups": 7772,
+        "misses": 5368,
+        "planeKeysBuilt": 285,
+        "storedEndpoints": 8572,
+        "storedEntries": 5368,
+        "uncachedAtStorageBound": 0
+      },
+      "completedFacetWorkRecords": 284,
+      "completedIndexedWork": {
+        "indexedComplexWork": 102045,
+        "indexedPointAndConstraintBuildWork": 248850,
+        "indexedRecoveryWork": 490189,
+        "indexedDirectLocks": 1137,
+        "indexedMonotoneFlips": 593,
+        "indexedFallbacks": 10,
+        "indexedRollbackFlips": 33
+      },
+      "activeRegion": null,
+      "trace": [
+        "File \"/private/tmp/elite-g4-reviewed-section-wholefive.t9b_k9_n/frozen-wholefleet-source-batch/run-reviewed-source-arrangement-wholefive.py\", line 118, in timed_setup",
+        "File \"/private/tmp/elite-g4-reviewed-section-wholefive.t9b_k9_n/frozen-wholefleet-source-batch/project/docs/fleet-physical/SH010-surface-union-tests.py\", line 135, in setUpClass",
+        "File \"/private/tmp/elite-g4-reviewed-section-wholefive.t9b_k9_n/frozen-wholefleet-source-batch/project/docs/fleet-physical/SH010-surface-union-recipe.py\", line 124, in build_candidate_union",
+        "File \"<authenticated-exact-surface-union>\", line 2708, in surface_union",
+        "File \"<authenticated-exact-surface-union>\", line 2695, in surface_union",
+        "File \"<authenticated-exact-surface-union>\", line 2670, in _reconstruct_original_regions",
+        "File \"<authenticated-exact-surface-union>\", line 2464, in reconstruct_face",
+        "File \"<authenticated-exact-surface-union>\", line 2185, in possible_owners",
+        "File \"<authenticated-exact-surface-union>\", line 321, in step"
+      ],
+      "refusalSHA256": "a17a4496409ec55fa82d0b7dc454377363aee19eeeb5313b65d1fad879143452"
+    },
+    {
+      "id": "SH011",
+      "construction": {
+        "class": "GoshawkScoutCompleteUnionTests",
+        "constructionReturned": false,
+        "faces": null,
+        "exactOperations": null,
+        "status": "See retained setUpClass error; no geometry admission",
+        "constructorSeconds": 9.482681000139564,
+        "maximumNumericConversionErrorSourceUnitsOrUV": null
+      },
+      "dependentPass": 0,
+      "dependentUnrun": 3,
+      "dependentFail": 0,
+      "dependentError": 0,
+      "message": "Exact union operation budget exhausted; no partial result",
+      "exception": "UnionFailure",
+      "operations": 2000001,
+      "source": [
+        7,
+        40
+      ],
+      "sourceEntryOps": 1999278,
+      "stage": "source_arrangement",
+      "phase": "cell_arrangement",
+      "prefixWitnessCount": 238,
+      "witnessSlots": 28151,
+      "retainedWorkSlots": 12141,
+      "witnessComplete": false,
+      "sectionWork": {
+        "hits": 2415,
+        "lookups": 7275,
+        "misses": 4860,
+        "planeKeysBuilt": 261,
+        "storedEndpoints": 7758,
+        "storedEntries": 4860,
+        "uncachedAtStorageBound": 0
+      },
+      "completedFacetWorkRecords": 260,
+      "completedIndexedWork": {
+        "indexedComplexWork": 96100,
+        "indexedPointAndConstraintBuildWork": 239066,
+        "indexedRecoveryWork": 561738,
+        "indexedDirectLocks": 1044,
+        "indexedMonotoneFlips": 580,
+        "indexedFallbacks": 12,
+        "indexedRollbackFlips": 56
+      },
+      "activeRegion": null,
+      "trace": [
+        "File \"/private/tmp/elite-g4-reviewed-section-wholefive.t9b_k9_n/frozen-wholefleet-source-batch/run-reviewed-source-arrangement-wholefive.py\", line 118, in timed_setup",
+        "File \"/private/tmp/elite-g4-reviewed-section-wholefive.t9b_k9_n/frozen-wholefleet-source-batch/project/docs/fleet-physical/SH011-surface-union-tests.py\", line 135, in setUpClass",
+        "File \"/private/tmp/elite-g4-reviewed-section-wholefive.t9b_k9_n/frozen-wholefleet-source-batch/project/docs/fleet-physical/SH011-surface-union-recipe.py\", line 124, in build_candidate_union",
+        "File \"<authenticated-exact-surface-union>\", line 2708, in surface_union",
+        "File \"<authenticated-exact-surface-union>\", line 2695, in surface_union",
+        "File \"<authenticated-exact-surface-union>\", line 2670, in _reconstruct_original_regions",
+        "File \"<authenticated-exact-surface-union>\", line 2479, in reconstruct_face",
+        "File \"<authenticated-exact-surface-union>\", line 1264, in cells",
+        "File \"<authenticated-exact-surface-union>\", line 2467, in visible",
+        "File \"<authenticated-exact-surface-union>\", line 2297, in _outside_occupied",
+        "File \"<authenticated-exact-surface-union>\", line 2263, in ray",
+        "File \"<authenticated-exact-surface-union>\", line 2230, in query",
+        "File \"<authenticated-exact-surface-union>\", line 2248, in meets",
+        "File \"<authenticated-exact-surface-union>\", line 321, in step"
+      ],
+      "refusalSHA256": "993e345cecd46c92b0cdea34e5ad28aae7299a154a6134275da19286b1e0a512"
+    },
+    {
+      "id": "SH016",
+      "construction": {
+        "class": "MoleMinerCompleteUnionTests",
+        "constructionReturned": false,
+        "faces": null,
+        "exactOperations": null,
+        "status": "See retained setUpClass error; no geometry admission",
+        "constructorSeconds": 11.606426125392318,
+        "maximumNumericConversionErrorSourceUnitsOrUV": null
+      },
+      "dependentPass": 0,
+      "dependentUnrun": 3,
+      "dependentFail": 0,
+      "dependentError": 0,
+      "message": "Exact union operation budget exhausted; no partial result",
+      "exception": "UnionFailure",
+      "operations": 2000001,
+      "source": [
+        25,
+        24
+      ],
+      "sourceEntryOps": 1998058,
+      "stage": "source_arrangement",
+      "phase": "cell_arrangement",
+      "prefixWitnessCount": 723,
+      "witnessSlots": 54738,
+      "retainedWorkSlots": 29516,
+      "witnessComplete": false,
+      "sectionWork": {
+        "hits": 3906,
+        "lookups": 15379,
+        "misses": 11473,
+        "planeKeysBuilt": 797,
+        "storedEndpoints": 17330,
+        "storedEntries": 9504,
+        "uncachedAtStorageBound": 1969
+      },
+      "completedFacetWorkRecords": 796,
+      "completedIndexedWork": {
+        "indexedComplexWork": 106683,
+        "indexedPointAndConstraintBuildWork": 200209,
+        "indexedRecoveryWork": 220520,
+        "indexedDirectLocks": 1788,
+        "indexedMonotoneFlips": 451,
+        "indexedFallbacks": 13,
+        "indexedRollbackFlips": 15
+      },
+      "activeRegion": null,
+      "trace": [
+        "File \"/private/tmp/elite-g4-reviewed-section-wholefive.t9b_k9_n/frozen-wholefleet-source-batch/run-reviewed-source-arrangement-wholefive.py\", line 118, in timed_setup",
+        "File \"/private/tmp/elite-g4-reviewed-section-wholefive.t9b_k9_n/frozen-wholefleet-source-batch/project/docs/fleet-physical/SH016-surface-union-tests.py\", line 133, in setUpClass",
+        "File \"/private/tmp/elite-g4-reviewed-section-wholefive.t9b_k9_n/frozen-wholefleet-source-batch/project/docs/fleet-physical/SH016-surface-union-recipe.py\", line 124, in build_candidate_union",
+        "File \"<authenticated-exact-surface-union>\", line 2708, in surface_union",
+        "File \"<authenticated-exact-surface-union>\", line 2695, in surface_union",
+        "File \"<authenticated-exact-surface-union>\", line 2670, in _reconstruct_original_regions",
+        "File \"<authenticated-exact-surface-union>\", line 2479, in reconstruct_face",
+        "File \"<authenticated-exact-surface-union>\", line 1259, in cells",
+        "File \"<authenticated-exact-surface-union>\", line 1259, in <genexpr>",
+        "File \"<authenticated-exact-surface-union>\", line 1089, in orient",
+        "File \"<authenticated-exact-surface-union>\", line 321, in step"
+      ],
+      "refusalSHA256": "4e459cf7a839a926ab83b7ef13a0336a7918926595a19b8dbd364d5828b97eec"
+    },
+    {
+      "id": "SH017",
+      "construction": {
+        "class": "MoleProspectorCompleteUnionTests",
+        "constructionReturned": false,
+        "faces": null,
+        "exactOperations": null,
+        "status": "See retained setUpClass error; no geometry admission",
+        "constructorSeconds": 11.856526084244251,
+        "maximumNumericConversionErrorSourceUnitsOrUV": null
+      },
+      "dependentPass": 0,
+      "dependentUnrun": 3,
+      "dependentFail": 0,
+      "dependentError": 0,
+      "message": "Exact union operation budget exhausted; no partial result",
+      "exception": "UnionFailure",
+      "operations": 2000001,
+      "source": [
+        25,
+        39
+      ],
+      "sourceEntryOps": 1999835,
+      "stage": "source_arrangement",
+      "phase": "awaiting_constraints",
+      "prefixWitnessCount": 734,
+      "witnessSlots": 55713,
+      "retainedWorkSlots": 29762,
+      "witnessComplete": false,
+      "sectionWork": {
+        "hits": 3809,
+        "lookups": 15583,
+        "misses": 11774,
+        "planeKeysBuilt": 812,
+        "storedEndpoints": 17382,
+        "storedEntries": 9549,
+        "uncachedAtStorageBound": 2224
+      },
+      "completedFacetWorkRecords": 811,
+      "completedIndexedWork": {
+        "indexedComplexWork": 109251,
+        "indexedPointAndConstraintBuildWork": 200520,
+        "indexedRecoveryWork": 201356,
+        "indexedDirectLocks": 1773,
+        "indexedMonotoneFlips": 463,
+        "indexedFallbacks": 12,
+        "indexedRollbackFlips": 12
+      },
+      "activeRegion": null,
+      "trace": [
+        "File \"/private/tmp/elite-g4-reviewed-section-wholefive.t9b_k9_n/frozen-wholefleet-source-batch/run-reviewed-source-arrangement-wholefive.py\", line 118, in timed_setup",
+        "File \"/private/tmp/elite-g4-reviewed-section-wholefive.t9b_k9_n/frozen-wholefleet-source-batch/project/docs/fleet-physical/SH017-surface-union-tests.py\", line 133, in setUpClass",
+        "File \"/private/tmp/elite-g4-reviewed-section-wholefive.t9b_k9_n/frozen-wholefleet-source-batch/project/docs/fleet-physical/SH017-surface-union-recipe.py\", line 124, in build_candidate_union",
+        "File \"<authenticated-exact-surface-union>\", line 2708, in surface_union",
+        "File \"<authenticated-exact-surface-union>\", line 2695, in surface_union",
+        "File \"<authenticated-exact-surface-union>\", line 2670, in _reconstruct_original_regions",
+        "File \"<authenticated-exact-surface-union>\", line 2459, in reconstruct_face",
+        "File \"<authenticated-exact-surface-union>\", line 2164, in section_for",
+        "File \"<authenticated-exact-surface-union>\", line 2332, in _section",
+        "File \"<authenticated-exact-surface-union>\", line 321, in step"
+      ],
+      "refusalSHA256": "87026df4176d6a6deda9a1aae6f72b59d20876e0549ce60bb7a101c083e4b9c2"
+    },
+    {
+      "id": "SH166",
+      "construction": {
+        "class": "CamelRescueCompleteUnionTests",
+        "constructionReturned": false,
+        "faces": null,
+        "exactOperations": null,
+        "status": "See retained setUpClass error; no geometry admission",
+        "constructorSeconds": 9.41594974976033,
+        "maximumNumericConversionErrorSourceUnitsOrUV": null
+      },
+      "dependentPass": 0,
+      "dependentUnrun": 3,
+      "dependentFail": 0,
+      "dependentError": 0,
+      "message": "Exact union operation budget exhausted; no partial result",
+      "exception": "UnionFailure",
+      "operations": 2000001,
+      "source": [
+        26,
+        7
+      ],
+      "sourceEntryOps": 1999750,
+      "stage": "source_arrangement",
+      "phase": "awaiting_constraints",
+      "prefixWitnessCount": 843,
+      "witnessSlots": 56166,
+      "retainedWorkSlots": 34093,
+      "witnessComplete": false,
+      "sectionWork": {
+        "hits": 3667,
+        "lookups": 17001,
+        "misses": 13334,
+        "planeKeysBuilt": 896,
+        "storedEndpoints": 17684,
+        "storedEntries": 9610,
+        "uncachedAtStorageBound": 3724
+      },
+      "completedFacetWorkRecords": 895,
+      "completedIndexedWork": {
+        "indexedComplexWork": 104017,
+        "indexedPointAndConstraintBuildWork": 184462,
+        "indexedRecoveryWork": 225333,
+        "indexedDirectLocks": 1775,
+        "indexedMonotoneFlips": 497,
+        "indexedFallbacks": 16,
+        "indexedRollbackFlips": 20
+      },
+      "activeRegion": null,
+      "trace": [
+        "File \"/private/tmp/elite-g4-reviewed-section-wholefive.t9b_k9_n/frozen-wholefleet-source-batch/run-reviewed-source-arrangement-wholefive.py\", line 118, in timed_setup",
+        "File \"/private/tmp/elite-g4-reviewed-section-wholefive.t9b_k9_n/frozen-wholefleet-source-batch/project/docs/fleet-physical/SH166-surface-union-tests.py\", line 135, in setUpClass",
+        "File \"/private/tmp/elite-g4-reviewed-section-wholefive.t9b_k9_n/frozen-wholefleet-source-batch/project/docs/fleet-physical/SH166-surface-union-recipe.py\", line 124, in build_candidate_union",
+        "File \"<authenticated-exact-surface-union>\", line 2708, in surface_union",
+        "File \"<authenticated-exact-surface-union>\", line 2695, in surface_union",
+        "File \"<authenticated-exact-surface-union>\", line 2670, in _reconstruct_original_regions",
+        "File \"<authenticated-exact-surface-union>\", line 2446, in reconstruct_face",
+        "File \"<authenticated-exact-surface-union>\", line 2244, in near",
+        "File \"<authenticated-exact-surface-union>\", line 2234, in query",
+        "File \"<authenticated-exact-surface-union>\", line 321, in step"
+      ],
+      "refusalSHA256": "4ab011860b8e701717125ff4070ca043fa82e534fae6f07e08b74ab2994fe7e2"
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "phase": "PRE_RUST_EXECUTION",
+  "files": {
+    "ORIGINAL-BINDINGS.json": {
+      "bytes": 11618,
+      "sha256": "6115342c17444e3f368f4a72f1ea9cc578b9fff2d1a0f1ca2f19d33b225ebf66"
+    },
+    "SH010.facets": {
+      "bytes": 271440,
+      "sha256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc"
+    },
+    "SH011.facets": {
+      "bytes": 275800,
+      "sha256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c"
+    },
+    "SH016.facets": {
+      "bytes": 269463,
+      "sha256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e"
+    },
+    "SH017.facets": {
+      "bytes": 294258,
+      "sha256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a"
+    },
+    "SH166.facets": {
+      "bytes": 256311,
+      "sha256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f"
+    },
+    "failures/210-CHARGE-BOUNDS.json": {
+      "bytes": 9630,
+      "sha256": "dc1573413a846c29f8c60dd0d3344c0686885cc10be36625aec4a5de8ce23d9d"
+    },
+    "failures/ACTUAL-FIVE-RESULTS.json": {
+      "bytes": 14729,
+      "sha256": "4bf4173b076a4790d9cf188e2d4d0b079f1558384d22fad79aba6acb7f030e7d"
+    },
+    "failures/DECISION.json": {
+      "bytes": 10210,
+      "sha256": "765add0390b9b057c57c98851074c9edae967c792c3da95cbb40ecfdeea2eb83"
+    },
+    "failures/DELIVERY.json": {
+      "bytes": 999,
+      "sha256": "f3ff66073d4bb324f874513318e897869d4289a9dd0eaa0d60eebd743d6a191d"
+    },
+    "reference/CASES.json": {
+      "bytes": 9177,
+      "sha256": "bfba51b92d0a08c3ec31de41643ca6d8976409dcd6ac5392ddc803443bedbc88"
+    },
+    "reference/LICENSE": {
+      "bytes": 1071,
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+    },
+    "reference/OriginalCamelRescuePhysicalSource.swift": {
+      "bytes": 6757,
+      "sha256": "1a85d443679c0d2243c8ea99b3b68bd2c4a6cd928bd8336b9af52675560c16ee"
+    },
+    "reference/OriginalFleetCurrentHullSource.swift": {
+      "bytes": 3209,
+      "sha256": "ab952998810a3f514679acc60460bcc0d5a9a2fa041450d1eff43813578cec62"
+    },
+    "reference/OriginalFleetShowroomModels.swift": {
+      "bytes": 5661,
+      "sha256": "eef47b8e21bdd3bd8ea7019c02d1ccb4a3fac2b8117f5727530bf76378f070cc"
+    },
+    "reference/exact-source-arrangement.py": {
+      "bytes": 79474,
+      "sha256": "aa400698c0094b0f4dd16aa7094c68879072f85a35858ac3501d8fda60488a80"
+    },
+    "reference/independent_planar_reference.py": {
+      "bytes": 1633,
+      "sha256": "b3191dc38fbabc2d1d23dd91bd19401679e1a53ec850fb3394fb2a5ce7490e0d"
+    },
+    "reference/planar-cases.json": {
+      "bytes": 5982,
+      "sha256": "6803cccb5180c85107c5bd8791b26fdd677fa7267f8b6c29182967d9484bb052"
+    },
+    "reference/test_source_arrangement_corridor_walk.py": {
+      "bytes": 5699,
+      "sha256": "daf8387e70722d42b10fa906975c4a285783144e8dea05e45a1a23f6822500bc"
+    },
+    "reference/test_source_arrangement_incidence.py": {
+      "bytes": 13891,
+      "sha256": "865e444c24c873501d1e85e14eef3cbceaa644886e3a565290a5afe023fce400"
+    },
+    "reference/test_source_arrangement_pruning.py": {
+      "bytes": 8603,
+      "sha256": "6123a1d319715626172cd15cdd5c43b7ad3e9df3ee7615d80e134b24d56f20f9"
+    },
+    "reference/test_source_arrangement_recovery.py": {
+      "bytes": 14562,
+      "sha256": "e8271802471ae8a60650472ce2875167c547d2b38c51e2e370193af9e5af00c2"
+    },
+    "reference/test_source_arrangement_regions.py": {
+      "bytes": 17033,
+      "sha256": "b5970cf837e6f2e3235f6b7792e3d3fd65869dd9be4787058a238318effb87a1"
+    },
+    "reference/test_source_arrangement_schema_work.py": {
+      "bytes": 8158,
+      "sha256": "379926857e002b83d06e1e8856a9664b368ebba73c2dca205f53b4acd8eec9cd"
+    },
+    "reference/test_source_arrangement_section_sign.py": {
+      "bytes": 7953,
+      "sha256": "90bbe29eb59c655b29953de73ab9efd2acab4a5207b8f9ea323674be29dee56d"
+    },
+    "reference/test_source_arrangement_strips.py": {
+      "bytes": 16148,
+      "sha256": "90ad98bf0e3dd20361639b4fb6fe012c1e72bc052d90b8268d87f1d0abe1828e"
+    }
+  }
+}
