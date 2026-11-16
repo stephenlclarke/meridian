@@ -368,7 +368,7 @@ impl Session {
                 let (review, choice) = self
                     .pending
                     .take()
-                    .ok_or("R opens a fresh review before confirmation")?;
+                    .ok_or("Open a fresh review (trade: 4/5/6; freight: R; other lessons: their review key)")?;
                 self.freight(world, Command::Confirm { review, choice })
             }
             Action::Back => {

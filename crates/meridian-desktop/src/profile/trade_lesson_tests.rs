@@ -251,7 +251,16 @@ fn selected_commodity_plan_and_stale_reviews_are_visible_and_never_silently_repa
     assert_eq!(bytes(&p), before);
     action(&mut p, Action::PlanTradeLesson);
     ok(p.continue_saved());
-    assert!(p.command(Action::Confirm).is_err());
+    let before = bytes(&p);
+    let saved = ok(fs::read(d.0.join("commander.meridian")));
+    let error = p
+        .command(Action::Confirm)
+        .err()
+        .unwrap_or_else(|| panic!("invalidated plan committed"));
+    assert!(error.contains("trade: 4/5/6"));
+    assert!(error.contains("freight: R"));
+    assert_eq!(bytes(&p), before);
+    assert_eq!(ok(fs::read(d.0.join("commander.meridian"))), saved);
 }
 #[test]
 fn trade_reviews_and_details_fit_existing_hud_budget_with_selected_terms_and_costs() {
