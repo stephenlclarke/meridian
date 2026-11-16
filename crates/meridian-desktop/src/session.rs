@@ -405,14 +405,22 @@ impl Session {
                 .unwrap_or("CLICK THE FLIGHT VIEW TO FOCUS THE CONTROLS")
                 .to_string(),
         );
-        lines.push(review_line);
-        lines.push(if self.equipment_open {
+        let compact_flight = snapshot.mode == FlightMode::Flight
+            && self.pending_practice.is_none()
+            && self.pending.is_none()
+            && !self.show_objective
+            && !self.equipment_open
+            && !self.market_open;
+        if !compact_flight {
+            lines.push(review_line);
+            lines.push(if self.equipment_open {
             "K BUY AND FIT | U STORE OWNED BAY | Y REFIT OWNED BAY | O CLOSE".into()
         } else if self.market_open {
             "[ PREVIOUS | ] NEXT | G BUY 1 UNIT | H SELL 1 UNIT | M CLOSE MARKET | F REFUEL".into()
         } else {
             "L LAUNCH | J JUMP | T CONTACT | R REVIEW | V RECEIVE ALL | X ABANDON | ENTER CONFIRM | B BACK".into()
-        });
+            });
+        }
         if let Some(selection) = self.pending_practice {
             let terms = match selection {
                 PracticeSelection::Consent(_) => {
@@ -454,17 +462,22 @@ impl Session {
                 || "NONE".into(),
                 |id| format!("BEACON {}", id.ordinal() + 1),
             );
-            lines.push(format!(
-                "MISSILES {remaining}/3 | {} | LOCK {lock} | IN FLIGHT {pending} | COOLDOWN {}",
-                if missiles.armed { "ARMED" } else { "SAFE" },
-                missiles.cooldown_ticks
-            ));
-            lines.push("F1 NEXT LOCK | F2 ARM/SAFE | F3 LAUNCH | F4 SAFE AND UNLOCK".into());
-            lines.push("LAUNCH USES ONE ROUND AND DISABLES SAVING FOR THIS SESSION".into());
+            if snapshot.mode == FlightMode::Flight {
+                lines.push(format!(
+                    "MISSILES {remaining}/3 | {} | LOCK {lock} | IN FLIGHT {pending} | COOLDOWN {}",
+                    if missiles.armed { "ARMED" } else { "SAFE" },
+                    missiles.cooldown_ticks
+                ));
+                lines.push("F1 NEXT LOCK | F2 ARM/SAFE | F3 LAUNCH | F4 SAFE AND UNLOCK".into());
+            }
             if missiles.projectiles.iter().any(Option::is_some) {
                 lines.push("MISSILE USED | SAVING UNAVAILABLE FOR THIS SESSION".into());
             } else if missiles.armed || missiles.lock.is_some() {
-                lines.push("F4 SAFE AND UNLOCK BEFORE SAVING".into());
+                lines.push(
+                    "F4 SAFE/UNLOCK TO SAVE | LAUNCH DISABLES SAVING FOR THIS SESSION".into(),
+                );
+            } else if snapshot.mode == FlightMode::Flight {
+                lines.push("LAUNCH USES ONE ROUND AND DISABLES SAVING FOR THIS SESSION".into());
             }
         }
         if let Some(practice) = world.practice_snapshot() {
@@ -552,12 +565,14 @@ impl Session {
                     "NONE"
                 }
             ));
-            lines.push(match mission.contact {
-                Some(npc) => format!("CONTACT: {}", npc.name()),
-                None => "T: CONTACT THE CURRENT STATION CREW WHEN DOCKED".into(),
-            });
+            if !compact_flight {
+                lines.push(match mission.contact {
+                    Some(npc) => format!("CONTACT: {}", npc.name()),
+                    None => "T: CONTACT THE CURRENT STATION CREW WHEN DOCKED".into(),
+                });
+            }
         }
-        if let Some(service) = world.service_snapshot() {
+        if !compact_flight && let Some(service) = world.service_snapshot() {
             let market = service
                 .current_market
                 .map(|quote| {
@@ -589,7 +604,7 @@ impl Session {
                 laser.cooldown_ticks
             ));
         }
-        lines.push("W/S THRUST | ARROWS PITCH | A/D YAW | Q/E ROLL | SPACE BRAKE".into());
+        lines.push("W/S THRUST | ARROWS PITCH | A/D YAW | Q/E ROLL | SPACE BRAKE | J JUMP".into());
         lines.push(
             "O EQUIPMENT | M MARKET | G BUY | H SELL | F REFUEL | P PAUSE | F11 FULLSCREEN".into(),
         );
@@ -675,6 +690,34 @@ fn missile_command(world: &mut World, action: Action) -> Result<String, String> 
 mod tests {
     #[test]
     fn missile_controls_cycle_actual_locks_consume_a_round_and_keep_save_refusal() {
+        fn assert_visible(session: &Session, world: &World, warning: &str) {
+            let lines = session.lines(world, true, None);
+            let budget = crate::hud::line_budget(640, 360);
+            assert!(
+                lines.len() <= budget,
+                "Flight HUD has {} rows, budget {budget}",
+                lines.len()
+            );
+            let visible = lines
+                .into_iter()
+                .take(budget)
+                .collect::<Vec<_>>()
+                .join("\n");
+            for required in [
+                "MISSILES",
+                "PRACTICE BEACONS",
+                warning,
+                "Z FIRE FRONT PULSE",
+                "SPACE BRAKE",
+                "F5 SAVE",
+                "ESC SAVE AND QUIT",
+            ] {
+                assert!(
+                    visible.contains(required),
+                    "Visible flight HUD omitted {required}"
+                );
+            }
+        }
         let mut world = World::new_commander(991).unwrap();
         let review = world.review_practice(0).unwrap();
         world
@@ -684,6 +727,7 @@ mod tests {
         world.request_launch(0).unwrap();
         world.step(meridian_core::FlightInput::default()).unwrap();
         let mut session = Session::from_world(&world);
+        assert_visible(&session, &world, "LAUNCH USES ONE ROUND");
         let before = world.missile_snapshot().unwrap();
         let beacons = world.practice_snapshot().unwrap().beacons.unwrap();
         for expected in [
@@ -704,6 +748,7 @@ mod tests {
             .command(&mut world, Action::ToggleMissileArm)
             .unwrap();
         assert!(world.save_bytes().is_err());
+        assert_visible(&session, &world, "F4 SAFE/UNLOCK TO SAVE");
         session.command(&mut world, Action::ClearMissile).unwrap();
         assert!(world.save_bytes().is_ok());
         session
@@ -713,6 +758,7 @@ mod tests {
             .command(&mut world, Action::ToggleMissileArm)
             .unwrap();
         session.command(&mut world, Action::FireMissile).unwrap();
+        assert_visible(&session, &world, "SAVING UNAVAILABLE");
         let after = world.missile_snapshot().unwrap();
         assert_eq!(after.rounds[2], None);
         assert_eq!(after.rounds[..2], before.rounds[..2]);
