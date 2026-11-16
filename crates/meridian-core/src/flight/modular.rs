@@ -116,6 +116,12 @@ pub enum ModuleSlot {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleProvenance {
     StandardBirth,
+    XYZzy {
+        grant: u32,
+        dock: DockContext,
+        tick: u64,
+        account_revision: u64,
+    },
     Paid {
         transaction: u32,
         dock: DockContext,
@@ -202,6 +208,7 @@ pub struct ModuleReview {
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct Event {
+    xyzzy: bool,
     action: ModuleAction,
     item: u64,
     dock: DockContext,
@@ -309,9 +316,10 @@ impl Ledger {
             if self.items.iter().filter(|i| i.kind == kind).count() >= kind.maximum_owned() {
                 return Err(ModuleError::Capacity);
             }
-            if kind
-                .prerequisite()
-                .is_some_and(|required| !self.items.iter().any(|i| i.kind == required))
+            if !event.xyzzy
+                && kind
+                    .prerequisite()
+                    .is_some_and(|required| !self.items.iter().any(|i| i.kind == required))
             {
                 return Err(ModuleError::MissingPrerequisite);
             }
@@ -320,18 +328,27 @@ impl Ledger {
                 id: event.item,
                 kind,
                 slot: None,
-                provenance: ModuleProvenance::Paid {
-                    transaction,
-                    dock: event.dock,
-                    tick: event.tick,
-                    account_revision: event.revision,
-                    paid_tenths: price,
+                provenance: if event.xyzzy {
+                    ModuleProvenance::XYZzy {
+                        grant: transaction,
+                        dock: event.dock,
+                        tick: event.tick,
+                        account_revision: event.revision,
+                    }
+                } else {
+                    ModuleProvenance::Paid {
+                        transaction,
+                        dock: event.dock,
+                        tick: event.tick,
+                        account_revision: event.revision,
+                        paid_tenths: price,
+                    }
                 },
             });
             self.install(self.items.len() - 1, replacing)?;
             self.paid = self
                 .paid
-                .checked_add(price)
+                .checked_add(if event.xyzzy { 0 } else { price })
                 .ok_or(ModuleError::SequenceExhausted)?;
         } else {
             match event.action {
@@ -371,6 +388,15 @@ impl Ledger {
 }
 
 impl State {
+    fn purchase_count(&self) -> usize {
+        self.events
+            .iter()
+            .filter(|e| !e.xyzzy && e.action.purchase_kind().is_some())
+            .count()
+    }
+    fn grant_count(&self) -> usize {
+        self.events.iter().filter(|e| e.xyzzy).count()
+    }
     pub(super) fn paid_count(&self) -> usize {
         self.events
             .iter()
@@ -385,6 +411,7 @@ impl State {
         let owner = world.combat_identity().ok_or(INVALID)?.owner;
         let mut ledger = Ledger::born(owner)?;
         let mut transaction = 0_u32;
+        let mut grants = 0_u32;
         let mut previous: Option<Event> = None;
         for e in &self.events {
             super::ammunition::validate_berth_event(
@@ -395,27 +422,48 @@ impl State {
                 e.revision,
                 previous.map(|p| (p.dock.sequence(), p.tick, p.revision)),
             )?;
-            if let Some(kind) = e.action.purchase_kind() {
-                let (_, required) = kind.shop().ok_or(INVALID)?;
-                let site = super::services::service_site(e.dock.system()).ok_or(INVALID)?;
-                if crate::equipment::definition()
-                    .map_err(|_| INVALID)?
-                    .offer(site)
-                    .technology
-                    < required
+            let serial = if e.xyzzy {
+                if e.action.purchase_kind() != Some(ModuleKind::EliteEnergyUnit)
+                    || !world.xyzzy.authorizes(e.dock, e.tick, e.revision)
                 {
                     return Err(INVALID);
                 }
-                transaction = transaction.checked_add(1).ok_or(INVALID)?;
-                // Ammo owns the preceding 100000 paid identity positions. This domain never
-                // aliases a born item or a finite missile receipt on the same owner.
-                if transaction > 100000
+                grants = grants.checked_add(1).ok_or(INVALID)?;
+                if grants > 100000
                     || e.item
                         != owner
-                            .checked_add(100010 + u64::from(transaction))
+                            .checked_add(200010 + u64::from(grants))
                             .ok_or(INVALID)?
                 {
                     return Err(INVALID);
+                }
+                grants
+            } else {
+                transaction
+            };
+            if let Some(kind) = e.action.purchase_kind() {
+                if !e.xyzzy {
+                    let (_, required) = kind.shop().ok_or(INVALID)?;
+                    let site = super::services::service_site(e.dock.system()).ok_or(INVALID)?;
+                    if crate::equipment::definition()
+                        .map_err(|_| INVALID)?
+                        .offer(site)
+                        .technology
+                        < required
+                    {
+                        return Err(INVALID);
+                    }
+                    transaction = transaction.checked_add(1).ok_or(INVALID)?;
+                    // Ammo owns the preceding 100000 paid identity positions. This domain never
+                    // aliases a born item or a finite missile receipt on the same owner.
+                    if transaction > 100000
+                        || e.item
+                            != owner
+                                .checked_add(100010 + u64::from(transaction))
+                                .ok_or(INVALID)?
+                    {
+                        return Err(INVALID);
+                    }
                 }
             } else if match e.action {
                 ModuleAction::Store { item } | ModuleAction::Install { item, .. } => item != e.item,
@@ -423,7 +471,9 @@ impl State {
             } {
                 return Err(INVALID);
             }
-            ledger.apply(*e, transaction).map_err(|_| INVALID)?;
+            ledger
+                .apply(*e, if e.xyzzy { serial } else { transaction })
+                .map_err(|_| INVALID)?;
             previous = Some(*e);
         }
         for (offset, slot, component) in [
@@ -464,14 +514,21 @@ impl State {
     fn item_at(&self, owner: u64, item: u64, tick: u64, visit: u64) -> Option<OwnedModule> {
         let mut ledger = Ledger::born(owner).ok()?;
         let mut transaction = 0;
+        let mut grants = 0;
         for event in self.events.iter().filter(|e| e.tick <= tick) {
             if event.dock.visit() >= visit {
                 return None;
             }
             if event.action.purchase_kind().is_some() {
-                transaction += 1;
+                if event.xyzzy {
+                    grants += 1;
+                } else {
+                    transaction += 1;
+                }
             }
-            ledger.apply(*event, transaction).ok()?;
+            ledger
+                .apply(*event, if event.xyzzy { grants } else { transaction })
+                .ok()?;
         }
         ledger.items.into_iter().find(|i| i.id == item)
     }
@@ -494,6 +551,7 @@ impl State {
             e.dock.encode_save(w);
             w.u64(e.tick);
             w.u64(e.revision);
+            w.bool(e.xyzzy);
         }
     }
     pub(super) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
@@ -518,6 +576,7 @@ impl State {
             let dock = DockContext::decode_save(r)?;
             let tick = r.u64()?;
             let revision = r.u64()?;
+            let xyzzy = r.bool()?;
             let action = match tag {
                 0 => ModuleAction::PurchaseMiningLaser,
                 1 => ModuleAction::Store { item },
@@ -528,6 +587,7 @@ impl State {
                 _ => return Err(SaveError::InvalidEncoding),
             };
             events.push(Event {
+                xyzzy,
                 action,
                 item,
                 dock,
@@ -737,6 +797,7 @@ impl World {
             .map_err(ModuleError::Save)?;
         ledger.apply(
             Event {
+                xyzzy: false,
                 action,
                 item: 0,
                 dock,
@@ -793,7 +854,7 @@ impl World {
                 .dock
                 .owner()
                 .seed()
-                .checked_add(100011 + self.modular.paid_count() as u64)
+                .checked_add(100011 + self.modular.purchase_count() as u64)
                 .ok_or(ModuleError::SequenceExhausted)?
         } else {
             match review.action {
@@ -816,6 +877,7 @@ impl World {
             .checked_add(1)
             .ok_or(ModuleError::SequenceExhausted)?;
         let event = Event {
+            xyzzy: false,
             action: review.action,
             item,
             dock: review.dock,
@@ -826,7 +888,7 @@ impl World {
             .modular
             .ledger(self, current)
             .map_err(ModuleError::Save)?;
-        ledger.apply(event, (self.modular.paid_count() + 1) as u32)?;
+        ledger.apply(event, (self.modular.purchase_count() + 1) as u32)?;
         let owner = review.dock.owner().seed();
         let pulse_fitted = ledger.front().is_some_and(|i| i.id == owner + 7);
         let energy_fitted = ledger
@@ -855,3 +917,76 @@ mod tests;
 
 #[cfg(test)]
 mod energy_pulse_tests;
+
+impl World {
+    /// Only the explicit secret transaction calls this, never a menu/readout or ordinary purchase.
+    pub(super) fn grant_xyzzy_energy(
+        &mut self,
+        dock: DockContext,
+        tick: u64,
+    ) -> Result<(), SaveError> {
+        let current = self.commander_account.as_ref().ok_or(INVALID)?;
+        let ledger = self.modular.ledger(self, current)?;
+        if let Some(item) = ledger
+            .items
+            .iter()
+            .find(|i| i.kind == ModuleKind::EliteEnergyUnit)
+        {
+            if item.slot == Some(ModuleSlot::Energy) {
+                return Ok(());
+            }
+            let action = ModuleAction::Install {
+                item: item.id,
+                replacing: ledger.fitted(ModuleSlot::Energy).map(|i| i.id),
+            };
+            // Stage manually: the enclosing XYZZY candidate is published only once.
+            let event = Event {
+                xyzzy: false,
+                action,
+                item: item.id,
+                dock,
+                tick,
+                revision: current.revision().checked_add(1).ok_or(INVALID)?,
+            };
+            let mut ledger = ledger;
+            ledger.apply(event, 0).map_err(|_| INVALID)?;
+            let owner = dock.owner().seed();
+            let account = current
+                .prepare_module(0, ledger.front().is_some_and(|i| i.id == owner + 7), false)
+                .map_err(|_| INVALID)?;
+            self.commander_account = Some(account);
+            self.modular.events.push(event);
+            return Ok(());
+        }
+        let count = self.modular.grant_count();
+        if count >= 100000 {
+            return Err(INVALID);
+        }
+        let event = Event {
+            xyzzy: true,
+            action: ModuleAction::Purchase {
+                kind: ModuleKind::EliteEnergyUnit,
+            },
+            item: dock
+                .owner()
+                .seed()
+                .checked_add(200011 + count as u64)
+                .ok_or(INVALID)?,
+            dock,
+            tick,
+            revision: current.revision().checked_add(1).ok_or(INVALID)?,
+        };
+        let pulse_fitted = ledger
+            .front()
+            .is_some_and(|i| i.id == dock.owner().seed() + 7);
+        let account = current
+            .prepare_module(0, pulse_fitted, false)
+            .map_err(|_| INVALID)?;
+        self.commander_account = Some(account);
+        self.modular.events.push(event);
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod xyzzy_tests;

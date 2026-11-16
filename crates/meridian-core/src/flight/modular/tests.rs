@@ -26,7 +26,7 @@ fn apply(w: &mut World, action: ModuleAction) -> u64 {
 }
 fn cold(w: &World) -> World {
     let bytes = w.save_bytes().unwrap();
-    assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 15);
+    assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 16);
     let loaded = World::from_save_bytes(&bytes).unwrap();
     assert_eq!(snap(&loaded), snap(w));
     assert_eq!(loaded.credits_tenths(), w.credits_tenths());
@@ -281,6 +281,7 @@ fn source_canonical_repeatable_mining_node_refuses_sixth_owned_example() {
         ledger
             .apply(
                 Event {
+                    xyzzy: false,
                     action: ModuleAction::PurchaseMiningLaser,
                     item: 110000 + u64::from(transaction),
                     dock,
@@ -296,6 +297,7 @@ fn source_canonical_repeatable_mining_node_refuses_sixth_owned_example() {
     assert_eq!(
         ledger.apply(
             Event {
+                xyzzy: false,
                 action: ModuleAction::PurchaseMiningLaser,
                 item: 110006,
                 dock,

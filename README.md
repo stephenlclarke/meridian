@@ -27,6 +27,10 @@
 
 Meridian is a Rust reimplementation of the original L337 project, with direct wgpu graphics, one authoritative World and traceable original content. New code is [proprietary/source-visible](LICENSE); imported original content retains its own notices. Original Elite/Oolite assets are excluded.
 
+## Commander CLARKE / XYZZY source awaiting execution
+
+The [explicit secret-mode increment](docs/XYZZY.md) adds persisted Commander CLARKE, the original one-time finite1,000,000 CR cash reset, separate secret provenance for actual supported equipment, finite missile refill, cargo expansion and real unlimited-fuel supply. It is a supported subset; full legacy maximum outfit and unavailable automation are listed as dependencies. Seventeen new Rust cases are **UNRUN**. This author source is separate from frozen e470, published previews and legitimately earned acceptance. Root host presentation, serial composition, whole review and exact compiler/native checks remain required.
+
 ## Mining Laser combat source awaiting execution
 
 The [Mining Laser combat increment](docs/MINING-LASER-COMBAT.md) adds actual paid front firing, shared energy/heat/cooldown, typed historical station receipts and physical missile interception. Nine new Rust cases are **UNRUN**. No parent build result qualifies this source. Root serial integration, review and exact compiler/native acceptance remain required. Faster lasers, additional facings and the full remaining equipment effects stay open before new missions.

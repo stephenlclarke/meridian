@@ -407,6 +407,9 @@ impl NavigationState {
     pub(crate) fn ship(self) -> PlayerShipId {
         self.ship
     }
+    pub(crate) fn fuel_spent(self) -> u64 {
+        self.fuel_spent
+    }
     pub(crate) fn jump_sequence(self) -> u64 {
         self.completed_jumps
     }

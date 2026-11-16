@@ -46,6 +46,7 @@ pub struct AmmunitionItem {
     pub pylon: Option<u8>,
     pub purchase: Option<u32>,
     pub consumed: bool,
+    pub xyzzy: bool,
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MissilePurchase {
@@ -84,6 +85,7 @@ pub(super) struct State {
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct Event {
+    xyzzy: bool,
     action: AmmunitionAction,
     dock: DockContext,
     tick: u64,
@@ -156,6 +158,7 @@ impl Ledger {
                     pylon: Some(pylon),
                     purchase: Some(purchase),
                     consumed: false,
+                    xyzzy: false,
                 });
                 self.paid = self
                     .paid
@@ -245,6 +248,7 @@ impl State {
                 pylon: Some(pylon),
                 purchase: None,
                 consumed: false,
+                xyzzy: false,
             });
         }
         let mut launches = world
@@ -255,6 +259,7 @@ impl State {
             .map(|p| p.origin)
             .peekable();
         let mut purchases = 0_u32;
+        let mut grants = 0_u32;
         let mut previous: Option<Event> = None;
         for e in &self.events {
             validate_berth_event(
@@ -272,7 +277,22 @@ impl State {
                 }
                 ledger.launch(o)?;
             }
-            if e.action == AmmunitionAction::Purchase {
+            if e.xyzzy {
+                if e.action != AmmunitionAction::Purchase
+                    || !world.xyzzy.authorizes(e.dock, e.tick, e.revision)
+                {
+                    return Err(INVALID);
+                }
+                grants = grants.checked_add(1).ok_or(INVALID)?;
+                if grants > 100000
+                    || e.item
+                        != owner
+                            .checked_add(300010 + u64::from(grants))
+                            .ok_or(INVALID)?
+                {
+                    return Err(INVALID);
+                }
+            } else if e.action == AmmunitionAction::Purchase {
                 purchases = purchases.checked_add(1).ok_or(INVALID)?;
                 if purchases > 100000
                     || e.item
@@ -290,9 +310,16 @@ impl State {
             } {
                 return Err(INVALID);
             }
+            let paid_before = ledger.paid;
             ledger
                 .apply(e.action, e.item, purchases)
                 .map_err(|_| INVALID)?;
+            if e.xyzzy {
+                let item = ledger.items.last_mut().ok_or(INVALID)?;
+                item.purchase = None;
+                item.xyzzy = true;
+                ledger.paid = paid_before;
+            }
             previous = Some(*e);
         }
         for o in launches {
@@ -333,6 +360,7 @@ impl State {
             w.u64(e.tick);
             w.u64(e.revision);
             w.u64(e.item);
+            w.bool(e.xyzzy);
         }
     }
     pub(super) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
@@ -349,6 +377,7 @@ impl State {
             let tick = r.u64()?;
             let revision = r.u64()?;
             let item = r.u64()?;
+            let xyzzy = r.bool()?;
             let action = match tag {
                 0 => AmmunitionAction::Purchase,
                 1 => AmmunitionAction::Store { item },
@@ -356,6 +385,7 @@ impl State {
                 _ => return Err(SaveError::InvalidEncoding),
             };
             events.push(Event {
+                xyzzy,
                 action,
                 dock,
                 tick,
@@ -385,7 +415,7 @@ impl World {
             .ammunition
             .events
             .iter()
-            .filter(|e| e.action == AmmunitionAction::Purchase)
+            .filter(|e| !e.xyzzy && e.action == AmmunitionAction::Purchase)
             .enumerate()
             .map(|(i, e)| MissilePurchase {
                 transaction: (i + 1) as u32,
@@ -485,7 +515,7 @@ impl World {
             .ammunition
             .events
             .iter()
-            .filter(|e| e.action == AmmunitionAction::Purchase)
+            .filter(|e| !e.xyzzy && e.action == AmmunitionAction::Purchase)
             .count();
         let item = match review.action {
             AmmunitionAction::Purchase => review
@@ -509,6 +539,7 @@ impl World {
             .map_err(|_| AmmunitionError::SequenceExhausted)?;
         let mut state = self.ammunition.clone();
         state.events.push(Event {
+            xyzzy: false,
             action: review.action,
             dock: review.dock,
             tick,
@@ -576,3 +607,62 @@ pub(super) fn validate_berth_event(
     }
     Ok(())
 }
+
+impl World {
+    pub(super) fn grant_xyzzy_missiles(
+        &mut self,
+        dock: DockContext,
+        tick: u64,
+    ) -> Result<(), SaveError> {
+        loop {
+            let current = self.commander_account.as_ref().ok_or(INVALID)?;
+            let ledger = self.ammunition.ledger(self, current)?;
+            let Some(pylon) = ledger.rounds().iter().position(Option::is_none) else {
+                return Ok(());
+            };
+            let held = ledger
+                .items
+                .iter()
+                .find(|i| !i.consumed && i.pylon.is_none());
+            let (action, item, xyzzy) = if let Some(held) = held {
+                (
+                    AmmunitionAction::Refit {
+                        item: held.item,
+                        pylon: pylon as u8,
+                    },
+                    held.item,
+                    false,
+                )
+            } else {
+                let n = self.ammunition.events.iter().filter(|e| e.xyzzy).count();
+                if n >= 100000 {
+                    return Err(INVALID);
+                }
+                (
+                    AmmunitionAction::Purchase,
+                    dock.owner()
+                        .seed()
+                        .checked_add(300011 + n as u64)
+                        .ok_or(INVALID)?,
+                    true,
+                )
+            };
+            let account = current
+                .prepare_ammunition(0, None, false)
+                .map_err(|_| INVALID)?;
+            let event = Event {
+                xyzzy,
+                action,
+                dock,
+                tick,
+                revision: account.revision(),
+                item,
+            };
+            self.commander_account = Some(account);
+            self.ammunition.events.push(event);
+        }
+    }
+}
+
+#[cfg(test)]
+mod xyzzy_tests;

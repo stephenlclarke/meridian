@@ -20,7 +20,7 @@ fn mining(seed: u64) -> (World, u64) {
 }
 fn cold(w: &World) -> World {
     let bytes = w.save_bytes().unwrap();
-    assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 15);
+    assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 16);
     let loaded = World::from_save_bytes(&bytes).unwrap();
     assert_eq!(loaded.front_laser_snapshot(), w.front_laser_snapshot());
     assert_eq!(

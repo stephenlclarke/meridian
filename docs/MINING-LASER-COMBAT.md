@@ -27,3 +27,5 @@ Author checks are direct rustfmt, seven-file Markdown lint, whitespace and stati
 Native requires earned funds, paid Mining buy/refit, physical beam/contact/interception, actual energy/heat/cooldown and work mutual exclusion, correct Mining receipt, history after real refit, and quit/coldContinue without grant, refill or profile reset. Static checks do not establish native acceptance.
 
 Fast Beam/Military/Naval accounting/acquisition, all facings, shields, navigation/drives, targeting, EMP versus ECM, collection/salvage/rescue/passenger hardware, all-hull capacities and actual screen/profile integration remain open before new missions. Naval price0 is not a free offer;135000 secret-port purchase needs its actual discovered service.
+
+The separately authorized [XYZZY / Commander CLARKE increment](XYZZY.md) adds explicit secret grants only to supported current equipment. Paid acquisition and earned evidence remain distinct; full secret maximum outfit stays a dependency.

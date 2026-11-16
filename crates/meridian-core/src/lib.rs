@@ -11,6 +11,8 @@ pub mod save;
 pub mod station;
 pub mod station_services;
 
+pub use flight::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
+
 pub use flight::{
     FIXED_DELTA_SECONDS, FireError, FlightInput, FrontLaserSnapshot, MissionError, MissionSnapshot,
     PULSE_COOLDOWN_TICKS, PULSE_RANGE, PulseContact, PulseLaserSnapshot, PulseShot,

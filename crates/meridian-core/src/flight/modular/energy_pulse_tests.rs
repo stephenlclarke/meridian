@@ -26,7 +26,7 @@ fn apply(w: &mut World, action: ModuleAction) -> u64 {
 }
 fn cold(w: &World) -> World {
     let bytes = w.save_bytes().unwrap();
-    assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 15);
+    assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 16);
     let loaded = World::from_save_bytes(&bytes).unwrap();
     assert_eq!(
         loaded.modular_equipment_snapshot(),
@@ -322,6 +322,7 @@ fn all_stock_energy_definitions_retain_original_price_tech_cost_and_prerequisite
     let dock = world.current_dock_context().unwrap();
     let mut ledger = Ledger::born(11601).unwrap();
     let naval = Event {
+        xyzzy: false,
         action: ModuleAction::Purchase {
             kind: ModuleKind::NavalEnergyUnit,
         },
@@ -345,6 +346,7 @@ fn all_stock_energy_definitions_retain_original_price_tech_cost_and_prerequisite
         ledger
             .apply(
                 Event {
+                    xyzzy: false,
                     action: ModuleAction::Purchase { kind },
                     item: 111611 + u64::from(n),
                     dock,
@@ -361,6 +363,7 @@ fn all_stock_energy_definitions_retain_original_price_tech_cost_and_prerequisite
     assert_eq!(
         ledger.apply(
             Event {
+                xyzzy: false,
                 action: ModuleAction::Purchase {
                     kind: ModuleKind::ExtraEnergyUnit
                 },

@@ -19,7 +19,7 @@ fn apply(w: &mut World, action: AmmunitionAction) -> u64 {
 }
 fn cold(w: &World) -> World {
     let bytes = w.save_bytes().unwrap();
-    assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 15);
+    assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 16);
     let other = World::from_save_bytes(&bytes).unwrap();
     assert_eq!(other.ammunition_snapshot(), w.ammunition_snapshot());
     assert_eq!(
@@ -55,6 +55,7 @@ fn actual_paid_round_uses_first_free_of_nine_without_six_free_rounds() {
             item,
             pylon: Some(3),
             purchase: Some(1),
+            xyzzy: false,
             consumed: false
         }
     );

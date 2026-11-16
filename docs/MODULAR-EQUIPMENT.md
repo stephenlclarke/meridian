@@ -52,3 +52,5 @@ G2 must review the complete joined delta. Existing owners then run real reposito
 Root must complete real input and profile publication plus MC1 authority/resource integration, add the two real joined cases, bind all-hull native capabilities, and show independent resource values in the HUD. Native acceptance must buy a tool at a real main berth using earned money, store/refit actual items, select/approach the real belt, mine finite cargo with resource debit, sell it without a second wallet, dock, quit and cold Continue. Do not describe these authored criteria as completed gameplay. The full remaining modular catalogue and fitted effects stay on the critical path before further mission expansion.
 
 The [Mining Laser combat follow-up](MINING-LASER-COMBAT.md) adds actual combat firing from the same paid work item. Selected rock work retains its sealed authority and stricter heat guard. Nine new cases remain UNRUN.
+
+The separately authorized [XYZZY / Commander CLARKE increment](XYZZY.md) adds explicit secret grants only to supported current equipment. Paid acquisition and earned evidence remain distinct; full secret maximum outfit stays a dependency.

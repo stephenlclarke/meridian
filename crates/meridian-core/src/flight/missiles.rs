@@ -369,7 +369,7 @@ impl World {
             .ok_or(MissileError::NoCommander)?
             .items
             .iter()
-            .any(|i| i.item == round.item && i.purchase.is_some());
+            .any(|i| i.item == round.item && (i.purchase.is_some() || i.xyzzy));
         let account = self
             .commander_account
             .as_ref()

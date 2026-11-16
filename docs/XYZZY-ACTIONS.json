@@ -1,0 +1,226 @@
+{
+  "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "activationSource": "Sources/L337Core/ScreenNavigation.swift:xyzzy suffix detection and Game.swift:enableXYZzy/secretKey/refitXYZzyStarter",
+  "cashSource": "Sources/L337Core/XYZzyPolicy.swift:startXYZzyCash",
+  "hardwareSource": "Sources/L337Core/EquipmentMutations.swift:grantMaximumHardware/grantEquipment/grantMaximumMissiles",
+  "completeParity": false,
+  "implementedBoundary": "explicit docked atomic World candidate, existing SH025 supported effects; full unsupported menu actions are disabled dependencies, not on flags",
+  "actions": [
+    {
+      "key": "xyzzy",
+      "legacyBehavior": "Enable persisted mode; name CLARKE; one-time set10000000 tenths; maximum starter refit; enable original convenience flags. Repeated activation refits/renames without cash reset.",
+      "state": "PARTIAL_CORE",
+      "dependency": "Docked supported outfit implemented. In-flight refill anchors, full hull transfer, full equipment and automation dependencies below. No inert enabled flags."
+    },
+    {
+      "key": "0",
+      "legacyBehavior": "Cycle ShipDisplayStyle.",
+      "state": "HOST_REQUIRED",
+      "dependency": "Actual renderer style enum and presentation cycle; no core mechanics grant."
+    },
+    {
+      "key": "1",
+      "legacyBehavior": "Fit at least Docking Targeting Computer with xyzzy provenance.",
+      "state": "DEPENDENCY",
+      "dependency": "Owned targeting-family tiers, docking targeting control and fitting effects."
+    },
+    {
+      "key": "2",
+      "legacyBehavior": "Maximum hardware and refill current hull.",
+      "state": "PARTIAL_CORE",
+      "dependency": "Elite Energy, real cargo bay, finite nine-pylon fill and tank refill implemented; full maximum components listed below."
+    },
+    {
+      "key": "C",
+      "legacyBehavior": "Restore starter hull, portable item transfer and maximum hardware; preserve cash and cargo.",
+      "state": "PARTIAL_CORE",
+      "dependency": "Current core already SH025 and preserves hull identity. G4 real selected-hull portable transfer/refusal required for other hulls."
+    },
+    {
+      "key": "3",
+      "legacyBehavior": "Toggle virtual unlimited missiles; no owned round consumed.",
+      "state": "DEPENDENCY",
+      "dependency": "Explicit virtualUnlimited missile-origin source, retained launch/archive/T01 validation and capacity policy. Current grant is FINITE actual inventory, never labelled unlimited."
+    },
+    {
+      "key": "4",
+      "legacyBehavior": "Toggle unlimited fuel; when enabled fill tank; accepted travel does not debit owned fuel.",
+      "state": "IMPLEMENTED",
+      "dependency": "Native jump limit/current-fuel admission remain unchanged. Journal reconciles real recorded navigation debit and explicit supply; no paid fuel receipt."
+    },
+    {
+      "key": "5",
+      "legacyBehavior": "Display current jump distance from fuel and navigation.",
+      "state": "CORE_READOUT_HOST_REQUIRED",
+      "dependency": "Host reads xyzzy snapshot jump_limit_ly; no infinite jump clearance."
+    },
+    {
+      "key": "6",
+      "legacyBehavior": "Toggle automatic trade; immediately sell sellable hold/refuel/buy profitable finite exports when enabled at station, with active-trade-practice guard.",
+      "state": "DEPENDENCY",
+      "dependency": "Authoritative route/profit selection, bulk market transaction and landing automation; no fake autoTrade flag or commodity grant."
+    },
+    {
+      "key": "7",
+      "legacyBehavior": "Toggle speech.",
+      "state": "HOST_REQUIRED",
+      "dependency": "Actual TTS/audio lifecycle and persisted presentation preference."
+    },
+    {
+      "key": "8",
+      "legacyBehavior": "Toggle unlimited cargo; refuse off while cargo exceeds standard capacity.",
+      "state": "DEPENDENCY",
+      "dependency": "Wider aggregate tonne representation, reservations/market/cold proofs and legal-weight handling; current u16 aggregate/u8 departure weight cannot honestly represent original Int.max/17 capacity."
+    },
+    {
+      "key": "9",
+      "legacyBehavior": "Display current finite cash.",
+      "state": "CORE_READOUT_HOST_REQUIRED",
+      "dependency": "xyzzy_snapshot.cash_tenths. Unlimited cash is false; no repeat grant."
+    },
+    {
+      "key": "A",
+      "legacyBehavior": "Toggle automatic targeting; clear autonomous target when disabled.",
+      "state": "DEPENDENCY",
+      "dependency": "Real owned targeting controller, target selection lifecycle and disable/cancel behavior."
+    },
+    {
+      "key": "E",
+      "legacyBehavior": "Toggle automatic ECM.",
+      "state": "DEPENDENCY",
+      "dependency": "Actual ECM hardware, charge/cooldown, missile effects and automatic threat controller; EMP remains separate."
+    },
+    {
+      "key": "B",
+      "legacyBehavior": "Toggle military return fire; clear retaliation when disabled.",
+      "state": "DEPENDENCY",
+      "dependency": "NPC/retaliation controller, source ammunition and actual firing authority."
+    },
+    {
+      "key": "L",
+      "legacyBehavior": "Reset legal to0; set wanted amnesty from Blackjack wanted stage.",
+      "state": "DEPENDENCY",
+      "dependency": "Explicit legal reset receipt/generation across retained incident/market history, plus actual wanted/Blackjack state. Current legal validators are preserved; no bypass."
+    },
+    {
+      "key": "F",
+      "legacyBehavior": "Fit Fuel Scoops with xyzzy provenance.",
+      "state": "DEPENDENCY",
+      "dependency": "Owned scoop slot, physical fuel/cargo source acquisition and conservation."
+    },
+    {
+      "key": "arrows/pageup/pagedown",
+      "legacyBehavior": "Scroll secret choices.",
+      "state": "HOST_REQUIRED",
+      "dependency": "Host menu scrolling only."
+    },
+    {
+      "key": "escape/return",
+      "legacyBehavior": "Return to previous screen; keep secret mode active.",
+      "state": "HOST_REQUIRED",
+      "dependency": "Root menu lifecycle, without mode reset or cash change."
+    },
+    {
+      "key": "max/energy",
+      "legacyBehavior": "Grant/refit exact top stock Elite Energy, preserving stored customized/lower items.",
+      "state": "IMPLEMENTED",
+      "dependency": "Existing SH025 capacity1x/recharge4x; explicit XYZzy item. No fake preceding paid nodes."
+    },
+    {
+      "key": "max/shield",
+      "legacyBehavior": "Elite Shield Module.",
+      "state": "DEPENDENCY",
+      "dependency": "Actual shield-grade capacity and widened shield scalar, fit effects/resource fractions."
+    },
+    {
+      "key": "max/navigation",
+      "legacyBehavior": "Navigation: Military (display Advanced Navigation Computer).",
+      "state": "DEPENDENCY",
+      "dependency": "Actual navigation slot/custody/jump cap and historical journey validation."
+    },
+    {
+      "key": "max/drive",
+      "legacyBehavior": "Advanced hyperspace drive.",
+      "state": "DEPENDENCY",
+      "dependency": "Actual drive custody/spool/fuel/galaxy rules."
+    },
+    {
+      "key": "max/targeting",
+      "legacyBehavior": "Military targeting core plus Mining/Salvage specialist modules.",
+      "state": "DEPENDENCY",
+      "dependency": "Real targeting modules and specialist control authority, not UI availability flags."
+    },
+    {
+      "key": "max/lasers",
+      "legacyBehavior": "Naval Laser on every supported combat facing.",
+      "state": "DEPENDENCY",
+      "dependency": "Real Naval firing profile64/0.1s, multi-shot energy deficits, historical class/facing custody. No Pulse fallback labelled Naval."
+    },
+    {
+      "key": "max/Fuel Scoops",
+      "legacyBehavior": "Fuel Scoops utility.",
+      "state": "DEPENDENCY",
+      "dependency": "Actual scoop fitting/collection source owner."
+    },
+    {
+      "key": "max/E.C.M. System",
+      "legacyBehavior": "ECM utility.",
+      "state": "DEPENDENCY",
+      "dependency": "Real ECM charge/cooldown and missile defense effects."
+    },
+    {
+      "key": "max/Escape Pod",
+      "legacyBehavior": "Escape Pod utility.",
+      "state": "DEPENDENCY",
+      "dependency": "Actual owned capsule, ejection/rescue/transfers and once-only consumption."
+    },
+    {
+      "key": "max/Energy Bomb",
+      "legacyBehavior": "Energy Bomb utility.",
+      "state": "DEPENDENCY",
+      "dependency": "Actual blast/contact/attribution and finite ordnance consumption."
+    },
+    {
+      "key": "max/Large Cargo Bay",
+      "legacyBehavior": "Compatible hull-bound cargo expansion.",
+      "state": "IMPLEMENTED",
+      "dependency": "Actual92-to127 tonne hold, one equipment/utility unit, XYZzy grant or reuse original paid item unchanged."
+    },
+    {
+      "key": "max/Galactic Hyperdrive",
+      "legacyBehavior": "Galactic Hyperdrive utility.",
+      "state": "DEPENDENCY",
+      "dependency": "Actual owned inter-galaxy device/consumption and destination/runtime catalogue."
+    },
+    {
+      "key": "max/Salvage Cutter",
+      "legacyBehavior": "Salvage Cutter when native work tool supports it.",
+      "state": "DEPENDENCY",
+      "dependency": "MC1 actual salvage work target/source/cargo/resource controller and compatible fit."
+    },
+    {
+      "key": "max/EMP Pirate Blaster",
+      "legacyBehavior": "EMP utility.",
+      "state": "DEPENDENCY",
+      "dependency": "Actual distinct EMP grade/bank/charge/debit/disabling effect; no ECM alias."
+    },
+    {
+      "key": "max/mining-utility",
+      "legacyBehavior": "Dedicated Mining Laser only if native hull supports mining work slot.",
+      "state": "NOT_APPLICABLE_CURRENT_SH025",
+      "dependency": "SH025 source workTools only salvageCutter, so do not grant a fake dedicated mining utility. Existing paid front Mining path remains intact."
+    },
+    {
+      "key": "max/fuel-storage",
+      "legacyBehavior": "Grant four Fuel Storage Units,70 fuel units each.",
+      "state": "DEPENDENCY",
+      "dependency": "Actual four owned tank slots/compatibility/utility budget/capacity and save accounting; current tank remains130."
+    },
+    {
+      "key": "max/missiles",
+      "legacyBehavior": "Fill each vacant pylon from stored compatible pristine property first, otherwise explicit xyzzy finite grant.",
+      "state": "IMPLEMENTED",
+      "dependency": "Actual SH025 nine slots; spent IDs/origins retained; getters never refill; no paid receipt for granted rounds."
+    }
+  ]
+}

@@ -96,7 +96,7 @@ const V11_CONTENT: &[u8] = concat!(
 .as_bytes();
 
 const CONTENT: &[u8] = concat!(
-    "meridian-world/rules/15;front-mining-combat/v1/a11fe169;modular-energy-paid-pulse/v1/a11fe169;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
+    "meridian-world/rules/16;explicit-xyzzy/finite-cash-supported-outfit-v1/a11fe169;front-mining-combat/v1/a11fe169;modular-energy-paid-pulse/v1/a11fe169;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -321,6 +321,7 @@ impl World {
             .markets
             .ok_or(SaveError::NoCommander)?
             .encode_save(&mut w);
+        self.xyzzy.encode(&mut w);
         commerce.modular.encode(&mut w);
         commerce.ammunition.encode(&mut w);
         commerce.lesson.encode(&mut w);
@@ -424,6 +425,11 @@ impl World {
         let commander_account = CommanderAccount::decode_save(&mut r, version)?;
         let freight_session = mission::FreightSession::decode_save(&mut r)?;
         let station_markets = StationMarkets::decode_save(&mut r)?;
+        let xyzzy = if version >= 16 {
+            super::xyzzy::State::decode(&mut r)?
+        } else {
+            super::xyzzy::State::default()
+        };
         let modular = if version >= 13 {
             super::modular::State::decode(&mut r)?
         } else {
@@ -467,6 +473,7 @@ impl World {
             missiles,
             ammunition,
             modular,
+            xyzzy,
             flight_reception,
             navigation_trade,
             practice_history,
@@ -613,20 +620,24 @@ impl World {
             account.hold_capacity(),
             account.equipment_state().historical_capacity(),
         )?;
+        let secret = self.xyzzy.validate(self, account)?;
         validate_accounting(
             domain,
             services,
             nav.jumps,
             nav.fuel_spent,
             self.combat.penalties(),
-            ammunition
-                .paid
-                .checked_add(modular.paid)
-                .ok_or(SaveError::InvalidState("paid equipment overflow"))?,
-            ammunition
-                .extra_revisions
-                .checked_add(modular.revision)
-                .ok_or(SaveError::SequenceExhausted)?,
+            (
+                ammunition
+                    .paid
+                    .checked_add(modular.paid)
+                    .ok_or(SaveError::InvalidState("paid equipment overflow"))?,
+                ammunition
+                    .extra_revisions
+                    .checked_add(modular.revision)
+                    .ok_or(SaveError::SequenceExhausted)?,
+            ),
+            secret,
         )?;
         if navigation
             .dock()
@@ -675,16 +686,19 @@ fn validate_accounting(
     jumps: u64,
     fuel_spent: u64,
     penalties: u8,
-    ammunition_paid: u32,
-    ammunition_revisions: u64,
+    ammunition: (u32, u64),
+    secret: super::xyzzy::Terms,
 ) -> Result<(), SaveError> {
+    let (ammunition_paid, ammunition_revisions) = ammunition;
     let income = 7200_u128
         + u128::from(d.completed) * u128::from(crate::freight::REWARD_TENTHS)
         + u128::from(s.credited);
-    let fuel = 130_u128 + u128::from(s.refilled_units);
+    let income = adjust_secret_cash(income, secret.cash_adjustment)?;
+    let fuel = 130_u128 + u128::from(s.refilled_units) + secret.fuel_supplied;
     let available_gross = 7200_u128
         + u128::from(d.completed) * u128::from(crate::freight::REWARD_TENTHS)
         + s.gross_credit;
+    let available_gross = adjust_secret_cash(available_gross, secret.cash_adjustment)?;
     if s.gross_credit != u128::from(s.credited) && available_gross <= u128::from(u32::MAX) {
         return Err(SaveError::InvalidState(
             "unjustified market credit saturation",
@@ -701,6 +715,7 @@ fn validate_accounting(
         || (d.legal != 0 && d.launches == 0)
         || u128::from(d.revision)
             != u128::from(d.freight_revision)
+                + u128::from(secret.revisions)
                 + u128::from(s.revision)
                 + u128::from(jumps)
                 + u128::from(d.equipment_revision)
@@ -716,6 +731,14 @@ fn validate_accounting(
         ));
     }
     Ok(())
+}
+fn adjust_secret_cash(value: u128, adjustment: i128) -> Result<u128, SaveError> {
+    if adjustment >= 0 {
+        value.checked_add(adjustment as u128)
+    } else {
+        value.checked_sub(adjustment.unsigned_abs())
+    }
+    .ok_or(SaveError::InvalidState("XYZZY cash reset chronology"))
 }
 pub(super) fn write_flight(w: &mut Writer, s: &Snapshot) {
     for p in s.position {
@@ -796,6 +819,9 @@ fn legacy_test_fixture(world: &World, version: u16) -> Result<Vec<u8>, SaveError
         &world.flight_reception,
         &Commerce::current(world),
     )?;
+    if world.xyzzy != super::xyzzy::State::default() {
+        return Err(SaveError::InvalidState("XYZZY has no legacy format"));
+    }
     if world.modular != super::modular::State::default() {
         return Err(SaveError::UnsupportedVersion);
     }
@@ -955,7 +981,7 @@ mod paid_missile_format_tests {
         assert_eq!(loaded.ammunition_snapshot(), world.ammunition_snapshot());
         assert_eq!(loaded.credits_tenths(), world.credits_tenths());
         let current = loaded.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
-        assert_eq!(u16::from_le_bytes([current[8], current[9]]), 15);
+        assert_eq!(u16::from_le_bytes([current[8], current[9]]), 16);
         assert_ne!(old, current);
     }
 }
