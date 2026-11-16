@@ -2,8 +2,12 @@ mod equipment;
 mod mission;
 mod persistence;
 mod services;
+mod weapons;
 pub use mission::{MissionError, MissionSnapshot, StationNpc};
 pub use services::ServiceSnapshot;
+pub use weapons::{
+    FireError, PULSE_COOLDOWN_TICKS, PULSE_RANGE, PulseContact, PulseLaserSnapshot, PulseShot,
+};
 
 use crate::docking::StationPose;
 use crate::freight::g02::{CommanderAccount, FreshCommanderIds, StarterComponent};
@@ -107,6 +111,7 @@ pub struct World {
     commander_account: Option<CommanderAccount>,
     freight_session: Option<mission::FreightSession>,
     station_markets: Option<crate::station_services::StationMarkets>,
+    pulse: weapons::PulseResources,
 }
 
 impl Default for World {
@@ -134,6 +139,7 @@ impl World {
             commander_account: None,
             freight_session: None,
             station_markets: None,
+            pulse: weapons::PulseResources::default(),
         }
     }
 
@@ -468,6 +474,7 @@ impl World {
                 next.motion_refusal = None;
             }
         }
+        self.pulse.advance(self.state.mode, next.mode);
         self.state = next;
         self.navigation = navigation;
         if let Some((session, epoch)) = self.freight_session.as_mut().zip(mission_epoch) {

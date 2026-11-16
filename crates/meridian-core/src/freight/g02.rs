@@ -163,6 +163,9 @@ impl OwnedStarterItem {
     pub(crate) fn component(&self) -> StarterComponent {
         self.component
     }
+    pub(crate) fn is_standard_birth(&self) -> bool {
+        self.origin == EquipmentOrigin::StandardBirth
+    }
     pub(crate) fn fitted_hull(&self) -> Option<u64> {
         self.fitted_hull
     }

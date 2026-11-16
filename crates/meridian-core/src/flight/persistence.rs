@@ -4,9 +4,9 @@ use crate::save::{MAX_SAVE_BYTES, Reader, SAVE_VERSION, SaveError, Writer, check
 use crate::station_services::{SavedServiceSummary, StationMarkets};
 
 const MAGIC: &[u8; 8] = b"MERSAVE1";
-// Rules and immutable content form the version-three compatibility boundary, not an authenticity key.
+// Rules and immutable content form the version-four compatibility boundary, not an authenticity key.
 const CONTENT: &[u8] = concat!(
-    "meridian-world/rules/3;",
+    "meridian-world/rules/4;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -58,6 +58,7 @@ impl World {
             .as_ref()
             .ok_or(SaveError::NoCommander)?
             .encode_save(&mut w);
+        self.pulse.encode_save(&mut w);
         let digest = checksum(&w.bytes);
         w.u64(digest);
         if w.bytes.len() > MAX_SAVE_BYTES {
@@ -131,6 +132,7 @@ impl World {
             commander_account: Some(CommanderAccount::decode_save(&mut r)?),
             freight_session: Some(mission::FreightSession::decode_save(&mut r)?),
             station_markets: Some(StationMarkets::decode_save(&mut r)?),
+            pulse: weapons::PulseResources::decode_save(&mut r)?,
         };
         if !r.finished() {
             return Err(SaveError::InvalidEncoding);
@@ -170,6 +172,8 @@ impl World {
             self.state.tick,
             account.fuel_tenths(),
         )?;
+        self.pulse
+            .validate_save(self.state.tick, self.state.mode, nav.launches)?;
         session.validate_save(navigation.dock())?;
         let domain = account.validate_saved_domain(&session.state, nav, session.epoch())?;
         let services = markets.validate_save(
