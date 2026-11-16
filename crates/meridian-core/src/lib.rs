@@ -12,7 +12,7 @@ pub mod station;
 pub mod station_services;
 
 pub use flight::{
-    FIXED_DELTA_SECONDS, FireError, FlightInput, MissionError, MissionSnapshot,
+    FIXED_DELTA_SECONDS, FireError, FlightInput, FrontLaserSnapshot, MissionError, MissionSnapshot,
     PULSE_COOLDOWN_TICKS, PULSE_RANGE, PulseContact, PulseLaserSnapshot, PulseShot,
     ServiceSnapshot, Snapshot, StationNpc, StepError, World,
 };

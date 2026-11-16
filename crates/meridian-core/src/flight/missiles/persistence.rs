@@ -1179,7 +1179,9 @@ impl State {
         if b.emission != emission
             || emission <= p.origin.emission
             || shot.tick != p.last_tick
-            || !world.owned_front_pulse_at(shot.fitted_item_id, shot.tick, p.origin.owner)
+            || world
+                .owned_front_laser_at(shot.fitted_item_id, shot.tick, p.origin.owner)
+                .is_none()
             || id != p.origin.projectile
             || !valid_vector(shot.origin)
             || !valid_vector(shot.direction)

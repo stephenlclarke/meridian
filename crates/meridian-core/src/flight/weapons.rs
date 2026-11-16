@@ -1,4 +1,4 @@
-//! Fixed-tick front Pulse Laser resources and World-bound discharge.
+//! Fixed-tick shared laser resources and World-bound front discharge.
 use super::{FlightMode, World, flight_pose};
 use crate::docking::Vec3;
 use crate::save::{Reader, SaveError, Writer};
@@ -19,6 +19,7 @@ pub enum FireError {
     NoCommander,
     NotInFlight,
     NoFittedFrontPulseLaser,
+    NoFittedFrontLaser,
     NoCompatibleMiningTool,
     CoolingDown,
     Overheated,
@@ -32,14 +33,15 @@ impl fmt::Display for FireError {
             Self::StaleCommand => "Fire command does not match the current tick",
             Self::Paused => "World is paused",
             Self::NoCommander => "An owned commander profile is required",
-            Self::NotInFlight => "The front Pulse Laser requires active flight",
+            Self::NotInFlight => "The front laser requires active flight",
             Self::NoCompatibleMiningTool => "Fit a paid compatible mining laser",
+            Self::NoFittedFrontLaser => "No owned compatible front laser is fitted",
             Self::NoFittedFrontPulseLaser => "No owned front Pulse Laser is fitted",
-            Self::CoolingDown => "Pulse Laser is cooling down",
-            Self::Overheated => "Pulse Laser is overheated",
-            Self::InsufficientEnergy => "Pulse Laser has insufficient energy",
+            Self::CoolingDown => "Laser is cooling down",
+            Self::Overheated => "Laser is overheated",
+            Self::InsufficientEnergy => "Laser has insufficient energy",
             Self::SequenceExhausted => "Combat identity sequence exhausted",
-            Self::InvalidGeometry => "Pulse Laser could not query the physical scene",
+            Self::InvalidGeometry => "Laser could not query the physical scene",
         })
     }
 }
@@ -78,6 +80,16 @@ pub struct PulseLaserSnapshot {
     pub energy_hundredths: u16,
     pub heat_fifths: u16,
     pub cooldown_ticks: u8,
+}
+
+/// Actual fitted front combat laser; descriptive only, never an impact capability.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct FrontLaserSnapshot {
+    pub fitted_item_id: u64,
+    pub weapon: super::OrdinaryWeapon,
+    pub damage_hundredths: u16,
+    pub range: u16,
+    pub cooldown_ticks_per_shot: u8,
 }
 
 /// Shared electrical/weapon condition remains readable when a particular laser is stored.
@@ -346,6 +358,22 @@ impl World {
             .map(|i| i.id)
     }
 
+    pub(super) fn fitted_front_laser(&self) -> Option<(u64, super::OrdinaryWeapon)> {
+        let item = self.modular_front()?;
+        let weapon = super::OrdinaryWeapon::from_module(item.kind)?;
+        Some((item.id, weapon))
+    }
+    pub fn front_laser_snapshot(&self) -> Option<FrontLaserSnapshot> {
+        let (fitted_item_id, weapon) = self.fitted_front_laser()?;
+        Some(FrontLaserSnapshot {
+            fitted_item_id,
+            weapon,
+            damage_hundredths: weapon.damage_hundredths(),
+            range: 6000,
+            cooldown_ticks_per_shot: PULSE_COOLDOWN_TICKS,
+        })
+    }
+
     pub fn flight_resources_snapshot(&self) -> Option<FlightResourcesSnapshot> {
         self.commander_account.as_ref()?;
         Some(FlightResourcesSnapshot {
@@ -368,6 +396,20 @@ impl World {
     /// Attempt one front discharge from the current owned flight pose and fitted item.
     /// The caller supplies no ray, target, mount, damage, or physical step.
     pub fn request_fire_front_pulse(&mut self, expected_tick: u64) -> Result<PulseShot, FireError> {
+        self.fire_front_laser(expected_tick, true)
+    }
+
+    /// Fire the actual fitted Pulse or Mining Laser through the same physical scene.
+    /// Mining combat heat uses the original <240 guard; selected rock work stays <=230.
+    pub fn request_fire_front_laser(&mut self, expected_tick: u64) -> Result<PulseShot, FireError> {
+        self.fire_front_laser(expected_tick, false)
+    }
+
+    fn fire_front_laser(
+        &mut self,
+        expected_tick: u64,
+        pulse_only: bool,
+    ) -> Result<PulseShot, FireError> {
         if expected_tick != self.state.tick {
             return Err(FireError::StaleCommand);
         }
@@ -380,9 +422,14 @@ impl World {
         if self.state.mode != FlightMode::Flight {
             return Err(FireError::NotInFlight);
         }
-        let fitted_item_id = self
-            .fitted_front_pulse()
-            .ok_or(FireError::NoFittedFrontPulseLaser)?;
+        let fitted_item_id = if pulse_only {
+            self.fitted_front_pulse()
+                .ok_or(FireError::NoFittedFrontPulseLaser)?
+        } else {
+            self.fitted_front_laser()
+                .map(|(item, _)| item)
+                .ok_or(FireError::NoFittedFrontLaser)?
+        };
         self.pulse.prepare_discharge()?;
         let pose = flight_pose(self.state.position, self.state.orientation)
             .ok_or(FireError::InvalidGeometry)?;

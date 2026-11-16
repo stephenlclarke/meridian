@@ -26,7 +26,7 @@ fn apply(w: &mut World, action: ModuleAction) -> u64 {
 }
 fn cold(w: &World) -> World {
     let bytes = w.save_bytes().unwrap();
-    assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 14);
+    assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 15);
     let loaded = World::from_save_bytes(&bytes).unwrap();
     assert_eq!(snap(&loaded), snap(w));
     assert_eq!(loaded.credits_tenths(), w.credits_tenths());

@@ -27,6 +27,10 @@
 
 Meridian is a Rust reimplementation of the original L337 project, with direct wgpu graphics, one authoritative World and traceable original content. New code is [proprietary/source-visible](LICENSE); imported original content retains its own notices. Original Elite/Oolite assets are excluded.
 
+## Mining Laser combat source awaiting execution
+
+The [Mining Laser combat increment](docs/MINING-LASER-COMBAT.md) adds actual paid front firing, shared energy/heat/cooldown, typed historical station receipts and physical missile interception. Nine new Rust cases are **UNRUN**. No parent build result qualifies this source. Root serial integration, review and exact compiler/native acceptance remain required. Faster lasers, additional facings and the full remaining equipment effects stay open before new missions.
+
 ## Modular equipment source awaiting execution
 
 The [current equipment increment](docs/ENERGY-PAID-PULSE.md) adds paid Pulse replacement and real stock energy recharge to paid mining-tool and finite-missile fitting. It preserves actual ownership, one wallet, shared resources and historical paid firing receipts. Eleven new cases and prior source increments remain **UNRUN** here. Root must complete the actual screen/profile/MC1/HUD/fleet join and execution; the full remaining modular catalogue stays open before new missions. Published previews and profiles are unchanged.

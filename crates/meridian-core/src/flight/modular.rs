@@ -595,24 +595,31 @@ impl World {
         })
         .collect()
     }
+    pub(super) fn owned_front_laser_at(
+        &self,
+        item: u64,
+        tick: u64,
+        owner: super::CombatIdentity,
+    ) -> Option<super::OrdinaryWeapon> {
+        let current = self.combat_identity()?;
+        if current.owner != owner.owner || current.hull != owner.hull || owner.visit > current.visit
+        {
+            return None;
+        }
+        let item = self.modular.item_at(owner.owner, item, tick, owner.visit)?;
+        if item.slot != Some(ModuleSlot::FrontLaser) {
+            return None;
+        }
+        super::OrdinaryWeapon::from_module(item.kind)
+    }
+    #[cfg(test)]
     pub(super) fn owned_front_pulse_at(
         &self,
         item: u64,
         tick: u64,
         owner: super::CombatIdentity,
     ) -> bool {
-        let Some(current) = self.combat_identity() else {
-            return false;
-        };
-        if current.owner != owner.owner || current.hull != owner.hull || owner.visit > current.visit
-        {
-            return false;
-        }
-        self.modular
-            .item_at(owner.owner, item, tick, owner.visit)
-            .is_some_and(|i| {
-                i.kind == ModuleKind::PulseLaser && i.slot == Some(ModuleSlot::FrontLaser)
-            })
+        self.owned_front_laser_at(item, tick, owner) == Some(super::OrdinaryWeapon::FrontPulseLaser)
     }
     pub(super) fn energy_recharge_hundredths(&self) -> u16 {
         let multiplier = self
