@@ -28,6 +28,7 @@ Status: the signed local MBP preview at main `54b6920` contains flight, launch/d
 - [First playable milestone](docs/FIRST-PLAYABLE.md): one complete journey and its acceptance criteria.
 - [Legacy milestone breakdown](docs/LEGACY-MILESTONES.md): G3 source-grounded roadmap from the first playable to full mission and fleet parity.
 - [Legacy reuse](docs/LEGACY-REUSE.md): exact reference revision, content provenance and mechanics parity.
+- [Paid cargo bay content](docs/PAID-CARGO-BAY-CONTENT.md): one original SH025 equipment contract, provenance and reference fixtures for the next joined equipment slice.
 - [Development and delivery](docs/DEVELOPMENT.md): machine roles, checks and release evidence.
 - [Decision: Rust, wgpu and ownership](docs/decisions/0001-rust-wgpu-ownership.md).
 

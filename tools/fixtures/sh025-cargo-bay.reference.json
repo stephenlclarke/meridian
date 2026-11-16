@@ -1,0 +1,78 @@
+{
+  "schema": "meridian.original-cargo-bay-reference/1",
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "meridianStarterBase": "edaa29f8daefe849e55efcf69e7ed33d804aab77",
+  "status": "Source-derived independent reference cases; not Swift execution, Rust test results, physical admission or playable acceptance",
+  "definition": {
+    "id": "cargo-bay",
+    "name": "Large Cargo Bay",
+    "family": "utility-cargoExpansion",
+    "slot": "utility.cargoExpansion",
+    "hull": "SH025",
+    "priceTenthsCR": 28000,
+    "requiredTechnologyLevel": 4,
+    "baseHoldTonnes": 92,
+    "extraHoldTonnes": 35,
+    "utilityMounts": 3,
+    "equipmentBudgetUnits": 24,
+    "itemUtilityMountCost": 1,
+    "itemEquipmentUnitCost": 1
+  },
+  "starterItems": [
+    {"component": "BasicShield", "slot": "shield", "equipmentUnits": 0, "utilityMounts": 0, "reason": "Actual standard foundation at its real slot"},
+    {"component": "BasicNavigation", "slot": "navigation", "equipmentUnits": 0, "utilityMounts": 0, "reason": "Actual standard foundation at its real slot"},
+    {"component": "BasicEnergy", "slot": "energy", "equipmentUnits": 0, "utilityMounts": 0, "reason": "Actual standard foundation at its real slot"},
+    {"component": "BasicDrive", "slot": "drive", "equipmentUnits": 0, "utilityMounts": 0, "reason": "Actual standard foundation at its real slot"},
+    {"component": "FrontPulseLaser", "slot": "laser.front", "equipmentUnits": 0, "utilityMounts": 0, "reason": "Actual laser mount; native laser unit cost zero"},
+    {"component": "Missile0", "slot": "missile-pylon.0", "equipmentUnits": 0, "utilityMounts": 0, "reason": "Actual ammunition mount; native ammunition unit cost zero"},
+    {"component": "Missile1", "slot": "missile-pylon.1", "equipmentUnits": 0, "utilityMounts": 0, "reason": "Actual ammunition mount; native ammunition unit cost zero"},
+    {"component": "Missile2", "slot": "missile-pylon.2", "equipmentUnits": 0, "utilityMounts": 0, "reason": "Actual ammunition mount; native ammunition unit cost zero"}
+  ],
+  "budgetCases": [
+    {"id": "actual-eight-starters", "starterItems": 8, "bayFitted": false, "expectedEquipmentUnits": 0, "expectedUtilityMounts": 0, "expectedCapacityTonnes": 92, "allowed": true},
+    {"id": "same-starters-plus-paid-fitted-bay", "starterItems": 8, "bayFitted": true, "expectedEquipmentUnits": 1, "expectedUtilityMounts": 1, "expectedCapacityTonnes": 127, "allowed": true},
+    {"id": "bay-stored-same-hull", "starterItems": 8, "bayFitted": false, "bayStillOwned": true, "expectedEquipmentUnits": 0, "expectedUtilityMounts": 0, "expectedCapacityTonnes": 92, "allowed": true}
+  ],
+  "technologyCases": [
+    {"id": "below-required-one-based-level", "technology": 3, "eligibleByTechnology": false},
+    {"id": "exact-required-one-based-level", "technology": 4, "eligibleByTechnology": true},
+    {"id": "actual-avenor", "galaxy": 0, "system": 7, "technology": 12, "eligibleByTechnology": true},
+    {"id": "actual-renas", "galaxy": 0, "system": 185, "technology": 13, "eligibleByTechnology": true}
+  ],
+  "purchaseCases": [
+    {"id": "one-credit-tenth-short", "creditsBefore": 27999, "expectedCreditsAfter": 27999, "expectedNewItems": 0, "allowed": false},
+    {"id": "exact-payment", "creditsBefore": 28000, "expectedCreditsAfter": 0, "expectedNewItems": 1, "allowed": true},
+    {"id": "payment-with-change", "creditsBefore": 65000, "expectedCreditsAfter": 37000, "expectedNewItems": 1, "allowed": true},
+    {"id": "paid-bay-already-fitted", "creditsBefore": 65000, "bayAlreadyOwned": true, "bayFitted": true, "expectedCreditsAfter": 65000, "expectedNewItems": 0, "allowed": false},
+    {"id": "paid-bay-already-stored", "creditsBefore": 65000, "bayAlreadyOwned": true, "bayFitted": false, "expectedCreditsAfter": 65000, "expectedNewItems": 0, "allowed": false}
+  ],
+  "unfitCases": [
+    {"id": "empty-hold", "ordinaryTonnes": 0, "identifiedMissionTonnes": 0, "expectedCapacityTonnes": 92, "allowed": true},
+    {"id": "exact-base-hold", "ordinaryTonnes": 92, "identifiedMissionTonnes": 0, "expectedCapacityTonnes": 92, "allowed": true},
+    {"id": "one-tonne-above-base", "ordinaryTonnes": 93, "identifiedMissionTonnes": 0, "expectedCapacityTonnes": 127, "allowed": false},
+    {"id": "g02-custody-fits-base", "ordinaryTonnes": 84, "identifiedMissionTonnes": 8, "expectedCapacityTonnes": 92, "allowed": true},
+    {"id": "g02-custody-prevents-shrink", "ordinaryTonnes": 85, "identifiedMissionTonnes": 8, "expectedCapacityTonnes": 127, "allowed": false},
+    {"id": "full-expanded-hold", "ordinaryTonnes": 127, "identifiedMissionTonnes": 0, "expectedCapacityTonnes": 127, "allowed": false}
+  ],
+  "identityCases": [
+    {"id": "store-and-refit", "actions": ["unfit", "fit"], "samePaidItem": true, "sameBoundHull": true, "cashDelta": 0, "itemsDelta": 0, "capacitySequenceTonnes": [127, 92, 127]},
+    {"id": "foreign-owner", "allowed": false, "allStateUnchanged": true},
+    {"id": "foreign-bound-hull", "allowed": false, "allStateUnchanged": true},
+    {"id": "stale-item-or-inventory", "allowed": false, "allStateUnchanged": true},
+    {"id": "forged-or-unpaid-item", "allowed": false, "allStateUnchanged": true},
+    {"id": "replayed-purchase", "allowed": false, "allStateUnchanged": true}
+  ],
+  "sourceRules": {
+    "costAndTL": "Original authoring cargo-bay2800CR/TL4; Game.swift Equipment.base28000tenths/technology3; requiredTechnologyLevel adds1",
+    "starterZeroUnits": "ScriptEquipmentProjection.swift commonEquipmentUnitCost; EquipmentIssueTransactions.swift isIntrinsicFoundation; current actual standard starter identity/slots",
+    "bayOneUnitOneMount": "ScriptEquipmentProjection.swift default ordinary module cost1; OriginalFleetR3Fitting.swift counts actual utility/fuelStorage slots; original SH025 fitting24units/3mounts",
+    "paidIdentity": "EquipmentTransactions.swift acceptEquipmentPurchase and equipmentPurchaseLocation; OwnedEquipmentInventory.swift moved/store/validateStructure",
+    "capacity": "ShipPerformance.swift standardCargoCapacity; EquipmentMutations.swift candidate.isValid; Game.swift validAfterEquipment checkedCargoTonnes<=capacity"
+  },
+  "joinChecksStillRequired": [
+    "Actual current owner/hull/starter item admission, actual berth and typed paid command through World",
+    "Exact-head Rust implementation tests, independent review and owned Dell validation",
+    "Actual paid purchase, unfit/refit and cold save/restart retaining one paid hull-bound identity, balances, capacity, G02 custody and live markets",
+    "Unsupported save version refuses without migration, fallback, profile repair or reset"
+  ]
+}
