@@ -29,17 +29,13 @@ Meridian is a Rust reimplementation of the original L337 project, with direct wg
 
 ## Current delivery
 
-The signed local **Meridian Durable Missiles Preview** is installed from gameplay main `ab238c3` ([PR 19](https://github.com/stephenlclarke/meridian/pull/19)). It includes flight, physical docking, Avenor/Renas travel, seventeen-commodity trading, original G02 freight, paid cargo equipment, front Pulse fire, practice beacons/reception, ordinary station impacts and three finite owned missiles. Save v8 retains the complete missile session, including live/ended projectiles and consumed rounds. Mac, Linux and native Windows each passed 193 top-level Rust tests, 48 importer tests, strict Clippy and builds. Exact-main CI and SonarQube passed.
+The signed local **Meridian Gunnery Attempts Preview** is installed from qualified gameplay main `16d6ddb` ([PR 28](https://github.com/stephenlclarke/meridian/pull/28)) and published as [v0.2.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.2.0-preview.1). It retains flight, physical docking, Avenor/Renas travel, seventeen-commodity trading, original G02 freight, paid cargo equipment, front Pulse fire, practice beacons/reception, ordinary station impacts and three finite owned missiles. Save v9 retains complete missile sessions and bounded attempt history.
 
-Start it with `~/Applications/Launch Meridian Durable Missiles Preview.command`. This uses the preview's separate `Library/Application Support/Meridian Durable Missiles Preview/saves-v8` directory. Actual signed Metal cold checkpoints passed for armed/locked, paused live, impacted, exhausted and physical dock/relaunch states, plus copied v4-v7 Continue and invalid-save refusal. Final installed title/render/normal-close smoke exited zero without creating a commander save. All 24 installed files/modes matched staging; 197 prior artifact files/modes were unchanged.
+Start the installed app with `~/Applications/Launch Meridian Gunnery Attempts Preview.command`. It uses its separate `Library/Application Support/Meridian Gunnery Attempts Preview/saves-v9` directory. Downloaded portable packages instead use the adjacent empty `saves-v9` directory. Keep earlier previews and their dedicated profiles separate.
 
-The earlier **Finite Missiles Preview** remains available with its v7 save refusal after missile use. Keep its dedicated profiles separate; its warning still applies to that older app. The new Durable Missiles Preview saves complete v8 state. See [durable missile sessions](docs/DURABLE-MISSILE-SESSIONS.md) for scope and limits.
+The [safe-gunnery lifecycle](docs/SAFE-GUNNERY-ATTEMPTS.md) adds F7 reviewed closure at the actual Avenor berth, F10 explicit fresh consent and I history with the once-only first trace. Closure grants no reward, refund or ammunition. Mac, Linux and genuine native Windows each passed 208 top-level Rust tests and 74 Python tests (54 importers plus 20 release tooling), strict Clippy and release builds. Exact-main CI and Sonar passed with zero open findings. Scoped Metal closure/retry/history and Save/Continue evidence retains its original source identity; later panel changes received their own affected native check.
 
-This is a functional local preview. Memory qualification, sustained minimize/focus-loss, frame timing/race evidence and commercial distribution remain open. See [implementation status](docs/IMPLEMENTATION-STATUS.md) for the exact scope and limits. Existing preview apps and real player profiles remain separate.
-
-## Current source under development
-
-The [safe-gunnery attempt lifecycle](docs/SAFE-GUNNERY-ATTEMPTS.md) adds reviewed F7 closure at the actual Avenor berth, explicit F10 fresh consent and retained attempt history in save v9. I shows completed, failed and abandoned counts and the once-only first trace. Closure grants no reward, refund or ammunition. The joined candidate `3b57229` passed whole-source review, 208 top-level Rust tests and 68 Python tests per platform, strict Clippy and release builds on Mac, Linux and native Windows. Current Mac Metal closure/retry/history/HUD and Save/Continue checks passed with copied owned fixtures. Main `9f08211` failed its Sonar new-code coverage gate; a bounded correction is in progress. V9 packaging/delivery remains on hold. The installed v8 preview above is unchanged. Use a separate isolated save directory for candidate v9 execution.
+The installed signed app passed title/render/normal-close smoke without creating a commander save. The public downloads and extracted Mac signature were independently verified. This remains a functional preview: full game acceptance, memory qualification, window/focus edges, frame timing/race evidence and commercial acceptance remain open. See [implementation status](docs/IMPLEMENTATION-STATUS.md) for exact scope and retained failures.
 
 ## Play
 
@@ -53,14 +49,15 @@ N starts a commander; C continues. A second N confirms replacing the current com
 | O; K; U; Y | Equipment panel; buy/fit cargo bay; store; refit |
 | I; V; X | Mission details; review all held freight deliveries; review abandonment |
 | F1; F2; F3; F4 | Next practice lock; arm/safe; launch one missile; safe/unlock |
-| P; F11; F5; F9 | Pause; fullscreen; save; reload (complete missile state in v8) |
+| F7; F8; F10 | Review attempt closure; reception; fresh consent |
+| P; F11; F5; F9 | Pause; fullscreen; save; reload (missiles and attempt history in v9) |
 | Escape / window close | Save before exit; failure keeps the app open |
 
 The freight journey requires eight identified one-tonne deliveries and awards 730 CR plus the trusted clue once. Markets use finite stock and the same account as mission and equipment transactions. Invalid saves refuse without migration, repair or fallback.
 
 ## Preview releases
 
-[Download Durable Missiles Preview v0.1.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.1.0-preview.1) for macOS Apple silicon and Windows x64. Both public downloads were verified against their SHA256 checksums, and the downloaded Mac app passed extracted Developer ID signature verification. macOS is not notarized; Windows is unsigned and requires the Microsoft Visual C++ x64 runtime. Windows interactive gameplay remains unobserved. Versions come from Conventional Commits with immutable annotated tags; keep only the newest three published previews. See [preview releases](docs/PREVIEW-RELEASES.md).
+[Download Gunnery Attempts Preview v0.2.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.2.0-preview.1) for macOS Apple silicon and Windows x64. Both public downloads were verified against their SHA256 checksums, and the downloaded Mac app passed extracted Developer ID signature verification. macOS is not notarized; Windows is unsigned and requires the Microsoft Visual C++ x64 runtime. Windows interactive gameplay remains unobserved. Versions come from Conventional Commits with immutable annotated tags; keep only the newest three published previews. See [preview releases](docs/PREVIEW-RELEASES.md).
 
 ## Build and contribute
 
