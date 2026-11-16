@@ -4,7 +4,7 @@ Historical feature contract and author-stage notes. For current delivered behavi
 
 Delivered in the signed local Finite Missiles Preview from gameplay main `d5be89b` ([PR 17](https://github.com/stephenlclarke/meridian/pull/17)). Actual controls, rendering, three-round consumption, pending quiet/pause, first practice hit, station impact and no-refill dock/relaunch were qualified on Metal. The exact-source compiler suites passed; see [implementation status](IMPLEMENTATION-STATUS.md) for counts and limits.
 
-**Save boundary:** a missile-used session cannot currently be saved or restored over. This includes ended projectile and missile-hit history. Arming or locking also refuses saving until explicitly disarmed and unlocked. The existing saved profile remains untouched; refusal never restores a consumed round or drops a live projectile. Full T02 continuation remains open. Earlier previews and real profiles remain unchanged.
+**Historical version 7 save boundary:** the earlier installed preview refuses saving/restoring a missile-used session. Current repository source uses [complete version 8 missile sessions](DURABLE-MISSILE-SESSIONS.md). The earlier rule is retained here as the v7 contract. This includes ended projectile and missile-hit history. Arming or locking also refuses saving until explicitly disarmed and unlocked. The existing saved profile remains untouched; refusal never restores a consumed round or drops a live projectile. Full T02 continuation remains open. Earlier previews and real profiles remain unchanged.
 
 ## Immutable source and geometry closure
 
@@ -45,7 +45,7 @@ A missile's first exact practice contact retains its complete original emission 
 
 World prepares the complete missile, impact/resource, legal and practice step before any actual arrival fuel debit. Counter/geometry refusal leaves the old World intact. The final debit and publication have no subsequent fallible operation. The account's finite consumption quote also pins the exact opening account before removing the selected round once.
 
-The supported memory format remains version 7, with exact v4-v7 readers and original account bytes for an untouched launcher. Loading those already-supported inventories retains the actual saved three items; the loader does not call the fresh birth or consumption producer. Armed/locked/used missile state refuses `save_bytes`, confirmation-save preparation and replacement through `restore_bytes` before mutation. A future version must retain remaining physical ownership, live/ended projectile origins and missile hit receipts together before this boundary is relaxed.
+This historical slice used version 7, with exact v4-v7 readers and original account bytes for an untouched launcher. Loading those already-supported inventories retains the actual saved three items; the loader does not call the fresh birth or consumption producer. Armed/locked/used missile state refuses `save_bytes`, confirmation-save preparation and replacement through `restore_bytes` before mutation. A future version must retain remaining physical ownership, live/ended projectile origins and missile hit receipts together before this boundary is relaxed.
 
 ## Qualification and Root desktop join
 
@@ -55,4 +55,4 @@ The joined desktop binds F1 to cycle actual beacon locks, F2 to arm/safe, F3 to 
 
 ## Durable successor
 
-[Version 8 missile sessions](DURABLE-MISSILE-SESSIONS.md) is a separate source candidate. It must qualify real cold continuation before the delivered version 7 save boundary can be retired. Current failure/correction status is recorded in [implementation status](IMPLEMENTATION-STATUS.md).
+[Version 8 missile sessions](DURABLE-MISSILE-SESSIONS.md) passed scoped real cold continuation on the signed staged Metal candidate. The earlier installed v7 preview retains its boundary until a separate v8 preview is delivered. Current qualification and distribution limits are recorded in [implementation status](IMPLEMENTATION-STATUS.md).

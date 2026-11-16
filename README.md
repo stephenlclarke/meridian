@@ -10,7 +10,7 @@ Meridian is a Rust reimplementation of the original L337 project, with direct wg
 
 The signed local **Meridian Finite Missiles Preview** is delivered on the primary MBP graphics target from gameplay main `d5be89b` ([PR 17](https://github.com/stephenlclarke/meridian/pull/17)). It includes flight, physical docking, Avenor/Renas travel, seventeen-commodity trading, original G02 freight, paid cargo equipment, front Pulse fire, practice beacons/reception, ordinary station impacts and three finite owned missiles. Actual Metal gameplay and scoped cold continuation checks passed. Mac, Linux and native Windows validation passed 179 top-level Rust tests and 48 Python importer tests; exact-main CI and SonarQube passed.
 
-**Missile save limit:** any missile use, including ended projectile history, disables saving/restoring that session. Before firing, F4 clears lock/arm so saving can resume. A failed save preserves the previous file and keeps the app open; Q explicitly quits without saving. Use the preview's dedicated launcher and save directory. Durable missile Save v8 is separate reviewed source awaiting compiler and native qualification; it is not delivered by this preview.
+**Earlier installed v7 preview limit:** any missile use, including ended projectile history, disables saving/restoring that session. Before firing, F4 clears lock/arm so saving can resume. A failed save preserves the previous file and keeps the app open; Q explicitly quits without saving. Use the preview's dedicated launcher and save directory. The repository now supports complete missile Save v8. Reviewed candidate `58f45c8` passed 193 Rust tests, 48 importer tests, strict Clippy and builds on all three platforms, plus scoped actual Metal cold continuation for armed, live, impacted, exhausted and dock/relaunch states. A new installed preview is pending final protected merge/main CI and packaging. See [durable missile sessions](docs/DURABLE-MISSILE-SESSIONS.md); the existing v7 preview remains unchanged.
 
 This is a functional local preview. Memory qualification, sustained minimize/focus-loss, frame timing/race evidence and commercial distribution remain open. See [implementation status](docs/IMPLEMENTATION-STATUS.md) for the exact scope and limits. Existing preview apps and real player profiles remain separate.
 
@@ -26,7 +26,7 @@ N starts a commander; C continues. A second N confirms replacing the current com
 | O; K; U; Y | Equipment panel; buy/fit cargo bay; store; refit |
 | I; V; X | Mission details; review all held freight deliveries; review abandonment |
 | F1; F2; F3; F4 | Next practice lock; arm/safe; launch one missile; safe/unlock |
-| P; F11; F5; F9 | Pause; fullscreen; save; reload, subject to the missile limit |
+| P; F11; F5; F9 | Pause; fullscreen; save; reload (complete missile state in v8) |
 | Escape / window close | Save before exit; failure keeps the app open |
 
 The freight journey requires eight identified one-tonne deliveries and awards 730 CR plus the trusted clue once. Markets use finite stock and the same account as mission and equipment transactions. Invalid saves refuse without migration, repair or fallback.
