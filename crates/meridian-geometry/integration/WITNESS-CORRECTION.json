@@ -1,0 +1,29 @@
+{
+  "baseAuthoredHead": "1ea21e044767ee7a61ae27fc38aeffa8b8748096",
+  "rootJoinReviewed": "e7c2fc64ee7330117a73a6c04556f6e3630bccac",
+  "sourceCorrection": [
+    "src/budget.rs",
+    "src/certificate.rs"
+  ],
+  "newTests": [
+    "independently_verified_witness_reserves_aggregate_nested_storage"
+  ],
+  "incomingFormula": {
+    "owningWitness": 8,
+    "cellMembership": 1,
+    "pointWithCoordinates": 3,
+    "segmentWithPoints": 7,
+    "outputTriangleWithPoints": 10,
+    "contactStar": 6,
+    "sectorWithPoints": 7
+  },
+  "ownership": "Public verification reserves incoming witness while scratch runs and releases on both returns. Reconstruct reserves final geometry and all final witness records before cloning; private admitted verification reuses that exact reservation. Regions/input/noding temporaries release only after full audit.",
+  "testsStatus": "UNRUN",
+  "workspaceOrLockDelta": "NONE beyond previously supplied patch",
+  "limits": {
+    "operations": 2000000,
+    "storage": 100000,
+    "rationalBits": 4096,
+    "triangles": 512
+  }
+}

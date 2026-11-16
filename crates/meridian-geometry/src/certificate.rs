@@ -531,8 +531,18 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
                 ));
             }
         }
-        let reserve = 64 * (planar.len() + stars.len() + 1) + source.style().len() * planar.len();
-        b.retain(reserve)?;
+        let witness_members = incoming_witness_memberships(
+            &arrangement.cells,
+            arrangement.physical.len(),
+            arrangement.protected.len(),
+            planar.len(),
+            &stars,
+            b,
+        )?;
+        // Output facets and the complete final witness own separate records.
+        // Arrangement copies stay in `held` until the complete hull audit ends.
+        let geometry_members = (32 + source.style().len()) * planar.len();
+        b.retain(geometry_members + witness_members)?;
         for triangle in &planar {
             if triangles.len() >= b.limits().triangles {
                 return Err(b.fail(
@@ -577,7 +587,9 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
             contact_stars: stars,
             twice_area: expected,
         };
-        witness.verify(source, b)?;
+        // The final witness is already retained above. Public standalone verify
+        // reserves independently owned input; use the admitted path here.
+        witness.verify_admitted(source, b)?;
         witnesses.push(witness);
     }
     if triangles.is_empty() {
@@ -615,18 +627,57 @@ fn contains_convex(cell: &[Point2], p: &Point2, b: &mut Budget) -> Result<bool, 
     Ok(true)
 }
 
+fn incoming_witness_memberships(
+    cells: &[Cell],
+    physical: usize,
+    protected: usize,
+    triangles: usize,
+    stars: &[ContactStar],
+    b: &mut Budget,
+) -> Result<usize, Failure> {
+    // Two source identity fields, area and five owning vector memberships.
+    // Each point includes its containing membership and both coordinates.
+    let mut total = 8usize;
+    let mut add = |count: usize, width: usize, budget: &mut Budget| -> Result<(), Failure> {
+        budget.step(1)?;
+        total = count
+            .checked_mul(width)
+            .and_then(|value| total.checked_add(value))
+            .ok_or_else(|| {
+                budget.fail(FailureKind::Storage, "witness membership count overflow")
+            })?;
+        budget.guard(total)
+    };
+    add(cells.len(), 1, b)?;
+    for cell in cells {
+        add(cell.len(), 3, b)?;
+    }
+    add(physical, 7, b)?;
+    add(protected, 3, b)?;
+    add(triangles, 10, b)?;
+    add(stars.len(), 6, b)?;
+    for star in stars {
+        add(star.sectors.len(), 7, b)?;
+    }
+    Ok(total)
+}
+
 impl FacetWitness {
     /// Recheck the actual region, contact intervals and vertex links before publication.
     pub fn verify(&self, source: &Facet, b: &mut Budget) -> Result<(), Failure> {
         b.at(source.id());
-        b.guard(self.output_triangles.len())?;
-        b.guard(self.classified_cells.len())?;
-        b.guard(self.physical_segments.len())?;
-        b.guard(self.protected_points.len())?;
-        for cell in &self.classified_cells {
-            b.guard(cell.len())?;
-        }
+        let members = incoming_witness_memberships(
+            &self.classified_cells,
+            self.physical_segments.len(),
+            self.protected_points.len(),
+            self.output_triangles.len(),
+            &self.contact_stars,
+            b,
+        )?;
+        b.with_retained(members, |budget| self.verify_admitted(source, budget))
+    }
 
+    fn verify_admitted(&self, source: &Facet, b: &mut Budget) -> Result<(), Failure> {
         if self.source != source.id() {
             return Err(b.fail(
                 FailureKind::InvalidWitness,

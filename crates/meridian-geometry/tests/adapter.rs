@@ -340,3 +340,111 @@ fn out_of_facet_and_nonfinite_source_substitutions_refuse() -> Result<(), Failur
     let _: Rational = integer(1);
     Ok(())
 }
+
+#[test]
+fn independently_verified_witness_reserves_aggregate_nested_storage() -> Result<(), Failure> {
+    use meridian_geometry::{ContactStar, FacetWitness};
+    let faces = cube([0, 0, 0, 1, 1, 1], 0)?;
+    let source = &faces[0];
+    let segment = [p2(0, 0), p2(1, 0)];
+    let witness = FacetWitness {
+        source: source.id(),
+        classified_cells: Vec::new(),
+        physical_segments: vec![segment; 40],
+        protected_points: Vec::new(),
+        output_triangles: Vec::new(),
+        contact_stars: Vec::new(),
+        twice_area: integer(0),
+    };
+    let mut small = Budget::new(Limits {
+        storage_memberships: 100,
+        ..Limits::default()
+    })?;
+    assert_eq!(
+        witness.verify(source, &mut small).err().map(|e| e.kind),
+        Some(FailureKind::Storage)
+    );
+    assert!(small.peak_memberships() >= 280);
+    assert_eq!(small.retained_memberships(), 0);
+
+    // The incoming source/witness rows occupy eight owning witness slots
+    // and seven memberships per physical segment. An empty
+    // star audit additionally requires its existing 64-slot scratch guard.
+    let exact_limit = 8 + 7 * 40 + 64;
+    let mut admitted = Budget::new(Limits {
+        storage_memberships: exact_limit,
+        ..Limits::default()
+    })?;
+    witness.verify(source, &mut admitted)?;
+    assert_eq!(admitted.peak_memberships(), exact_limit);
+    assert_eq!(admitted.retained_memberships(), 0);
+    let mut short = Budget::new(Limits {
+        storage_memberships: exact_limit - 1,
+        ..Limits::default()
+    })?;
+    assert_eq!(
+        witness.verify(source, &mut short).err().map(|e| e.kind),
+        Some(FailureKind::Storage)
+    );
+    assert_eq!(short.retained_memberships(), 0);
+
+    // All individual vectors and nested arrays fit this cap. Their combined
+    // live footprint, including contact-star sectors, exceeds it.
+    let mut nested = witness.clone();
+    nested.physical_segments.clear();
+    nested.classified_cells = vec![vec![p2(0, 0); 12]; 2];
+    nested.contact_stars = vec![ContactStar {
+        point: p2(0, 0),
+        sectors: vec![[p2(0, 0), p2(1, 0)]; 4],
+        boundary_path: false,
+    }];
+    let mut small = Budget::new(Limits {
+        storage_memberships: 100,
+        ..Limits::default()
+    })?;
+    assert_eq!(
+        nested.verify(source, &mut small).err().map(|e| e.kind),
+        Some(FailureKind::Storage)
+    );
+    assert_eq!(small.retained_memberships(), 0);
+
+    // A verifier error releases its temporary reservation for the next call.
+    let mut b = budget()?;
+    nested.classified_cells.clear();
+    assert_eq!(
+        nested.verify(source, &mut b).err().map(|e| e.kind),
+        Some(FailureKind::InvalidWitness)
+    );
+    assert_eq!(b.retained_memberships(), 0);
+    // Reconstruction retains final geometry and witnesses once, while releasing
+    // its source, classified arrangement and global noding temporaries.
+    let mut b = budget()?;
+    let hull = reconstruct(&faces, &mut b)?;
+    let geometry = hull
+        .triangles()
+        .iter()
+        .map(|f| 32 + f.style().len())
+        .sum::<usize>();
+    let witnesses = hull
+        .witnesses()
+        .iter()
+        .map(|w| {
+            8 + w.classified_cells.len()
+                + 3 * w.classified_cells.iter().map(Vec::len).sum::<usize>()
+                + 7 * w.physical_segments.len()
+                + 3 * w.protected_points.len()
+                + 10 * w.output_triangles.len()
+                + 6 * w.contact_stars.len()
+                + 7 * w
+                    .contact_stars
+                    .iter()
+                    .map(|star| star.sectors.len())
+                    .sum::<usize>()
+        })
+        .sum::<usize>();
+    assert_eq!(b.retained_memberships(), geometry + witnesses);
+    let prior = b.retained_memberships();
+    witness.verify(source, &mut b)?;
+    assert_eq!(b.retained_memberships(), prior);
+    Ok(())
+}

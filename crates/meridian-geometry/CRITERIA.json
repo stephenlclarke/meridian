@@ -58,6 +58,11 @@
       "file": "src/source.rs",
       "name": "exact_sections_match_independent_signed_contact_enumeration",
       "status": "UNRUN"
+    },
+    {
+      "file": "tests/adapter.rs",
+      "name": "independently_verified_witness_reserves_aggregate_nested_storage",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -97,5 +102,14 @@
     "shipTotal": 162,
     "stations": 4,
     "stationTotal": 6
+  },
+  "wholeReviewCorrection": {
+    "parentAuthoredHead": "1ea21e044767ee7a61ae27fc38aeffa8b8748096",
+    "reviewedJoin": "e7c2fc64ee7330117a73a6c04556f6e3630bccac",
+    "receiptSHA256": "942ed071a6d8d3f90c1361869698b46f8df80a5cede6c33e99280bb194f64db1",
+    "wholeReviewCompleted": true,
+    "actionableFindings": 1,
+    "delta": "Checked aggregate incoming witness accounting; scoped standalone reservation including scratch; exact final construction retention once; bounded direct public regression",
+    "execution": "UNRUN"
   }
 }

@@ -1,0 +1,30 @@
+{
+  "head": "e7c2fc64ee7330117a73a6c04556f6e3630bccac",
+  "tree": "63507e703bf604d7b41d302ff20f5840dddcc61a",
+  "base": "a583b61e4e4536003414ee9f5448131744f62eb2",
+  "observedAt": "2026-11-16T16:11:43.419736+00:00",
+  "joinedManifest": {
+    "path": "/Users/sclarke/.codex/visualizations/2026/10/13/01a134a1-be40-77d0-9e11-64a775729232/evidence/MERIDIAN-E7C2FC6-GEOMETRY-JOINED-SOURCE.json",
+    "sha256": "f595b7508c6cd5e722f30b4037694e13760a38ee11c5a6e24e37d9c1024e5298"
+  },
+  "authorPacketManifest": {
+    "path": "/private/tmp/meridian-root-geometry-packet/MANIFEST.json",
+    "sha256": "846a4e9bed8d62a9f1405bd66236728ab862e39b123bf6c6a97f46c6512f1ce8"
+  },
+  "checks": {
+    "joinedTrackedPins": 196,
+    "authorCrateFilesGitAndTar": 57,
+    "ownerPacketPayloads": 6,
+    "changedPaths": 59,
+    "rootJoinOnly": "Cargo.toml workspace member and4new lock package records; all prior lock package records unchanged",
+    "referencePayloads": 16,
+    "frozenReferenceAndFailurePayloads": 26,
+    "originalDecoderAssets": 5,
+    "originalInputPinsPerAsset": 8,
+    "newTestsAuthoredUnrun": 11
+  },
+  "dependencyArchives": "All4 cached official crate archives checksum matched; retained orig manifests and MIT/Apache notices byte-identical to archive members; locked metadata matches. Official num-bigint release notes independently confirm0.4.8divisionregressionfix. Registrywebmetadata endpoint unavailable; no compiler/networkresolution run.",
+  "dependencyPrimarySource": "https://raw.githubusercontent.com/rust-num/num-bigint/main/RELEASES.md",
+  "execution": "Read-only Git/hash/tar/JSON/TOML/source inspection and own scalar/count arithmetic only; no authorhelpers/geometry/ray engines/compiler/tests/native executed.",
+  "status": "BINDING_CHECKS_PASS_WHOLE_SOURCE_FINDING_OPEN"
+}

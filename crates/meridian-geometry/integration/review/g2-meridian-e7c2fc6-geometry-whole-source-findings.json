@@ -1,0 +1,41 @@
+{
+  "verdict": "CHANGES_REQUESTED_SOURCE_ONLY",
+  "head": "e7c2fc64ee7330117a73a6c04556f6e3630bccac",
+  "tree": "63507e703bf604d7b41d302ff20f5840dddcc61a",
+  "base": "a583b61e4e4536003414ee9f5448131744f62eb2",
+  "observedAt": "2026-11-16T16:12:28.927778+00:00",
+  "proof": {
+    "path": "/private/tmp/g2-meridian-e7c2fc6-geometry-whole-checks.json",
+    "sha256": "ddee63fa21319aca6249c6c398fdec7697d6eea999974fb7fafd937169f814d8"
+  },
+  "findings": [
+    {
+      "priority": "P2",
+      "file": "crates/meridian-geometry/src/certificate.rs",
+      "line": 622,
+      "endLine": 627,
+      "title": "Reserve the combined incoming witness footprint before verification",
+      "problem": "FacetWitness::verify calls Budget::guard on individual vector lengths, including each cell independently. guard compares each scratch amount with retained but never adds these incoming witness records together or accounts their nested points/sector contents. The public mutable witness verifier can succeed beyond the requested storage limit while reporting a smaller peak.",
+      "sourceReproduction": {
+        "source": "Any valid Facet with a small triangle and valid UVs, constructed on a separate Budget.",
+        "witness": "Matching source id; classified_cells/output_triangles/contact_stars/protected_points empty; twice_area=0;physical_segments contains40 copies of an edge joining2sourcevertices.",
+        "budget": "Limits default except storage_memberships100.",
+        "trace": "Initial guards max40; empty facet_stars checks64; endpoint point/lift/uv checks add operations but no aggregate storage reservation; no classified cells means interval scratch is not entered. The function can returnOk with at least160 coordinate memberships in physical_segments alone while peak_memberships=64.",
+        "defaultCapVariant": "40,000 duplicated valid segments contain160,000coordinate memberships;34endpoint validation steps per segment=1,360,000charged operations below2M, yet individual vector guard40000 andempty stars64 remain below100000. This is source/scalar arithmetic, not an executed geometry result."
+      },
+      "requiredCorrection": "Charge a checked aggregate conservative incoming witness footprint including classified-cell corners, output triangles, physical intervals, protected points, contact-star records/sectors, and keep that reservation live while verification scratch is charged. Preserve caps and account for reconstruct already-retained ownership without silently double-charging or forgetting final live witnesses. Add direct public verify regression with aggregate fields exceeding a tightened storage cap and a valid under-cap control.",
+      "execution": "UNRUN; no geometry engine/compiler/test called."
+    }
+  ],
+  "wholeReviewCompleted": [
+    "Read all7production Rust modules, all11authoredtestentries, cratecriteria/readme/provenance/exportadapter and relevant immutable reference classifier/section/planar semantics.",
+    "Exact source facetid/winding/affineUV field; finite sections; clipped vertical-strip regions/point&vertical contacts; shared-node positive ears; mutual region/interval coverage; reciprocal edges and connected vertex links; positive volume/typed refusal ordering reviewed.",
+    "Legacy source-owner parity semantics explicitly retained, including nested/disconnected sheets; no invented union reinterpretation finding.",
+    "139preexistingpaths outside the rootmanifest/lockjoin preserved;196joinedpins,57cratefiles,6ownerpayloads,16references/26frozenpayloads and5decoderassetbindings checked.",
+    "Four dependency archives matched official locked checksums; retained origmanifests andcompleteMIT/Apachetexts byte-identical. Officialupstreamrelease notes support0.4.8selection. Priorlockrecords unchanged; Cargo resolutionUNRUN.",
+    "Allsource traversal/conservative reservations/canonical cell ears may refuse earlier under original2M/100k/4096/512caps. Oldminimizer/BVHreferences and oldfivefailures retained; no performance or admission credit."
+  ],
+  "otherActionableFindings": [],
+  "executionBoundary": "No project helper, geometry/ray engine, Rust/Swift/Python project tests, Cargo/compiler/Clippy/native/GPU or original-five construction run. Only read-onlysource/Git/hash/archive/TOML/JSON andownscalar/countarithmetic.11newtests remainUNRUN.",
+  "next": "Same-slice bounded correction/delta review with unaffected whole proof. Compiler qualification remains pending until source finding resolved; no broader restart or unchanged original-five rerun required."
+}

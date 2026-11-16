@@ -130,6 +130,16 @@ impl Budget {
         self.retained += members;
         Ok(())
     }
+    pub(crate) fn with_retained<T>(
+        &mut self,
+        members: usize,
+        operation: impl FnOnce(&mut Self) -> Result<T, Failure>,
+    ) -> Result<T, Failure> {
+        self.retain(members)?;
+        let result = operation(self);
+        self.release(members);
+        result
+    }
     pub(crate) fn release(&mut self, members: usize) {
         self.retained -= members;
     }
