@@ -1,4 +1,5 @@
 """Original service seed provenance and safe extraction; no Rust or actual World execution."""
+import copy
 import hashlib
 import importlib.util
 import json
@@ -14,7 +15,111 @@ IMPORTER = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(IMPORTER)
 
 
+def schema_markets():
+    # Synthetic parsed-schema inputs, not original provenance or playable content.
+    states = []
+    for system, ask, bid, stock in [(7, 226, 208, 128), (185, 216, 196, 112)]:
+        food = {'index': 0, 'name': 'Food', 'unit': 't', 'epoch': 0,
+                'system': system, 'worldVersion': 'l337-world-1',
+                'askTenthsCR': ask, 'bidTenthsCR': bid, 'stock': stock}
+        states.append({'galaxy': 0, 'system': system,
+                       'quotes': [food] + [{'index': index} for index in range(1, 17)]})
+    states.extend({'galaxy': 1, 'system': index, 'quotes': []} for index in range(2046))
+    return {'version': 'l337-world-1', 'markets': states}
+
+
+def convert_schema(markets, manifest_overrides=None):
+    raw_markets = json.dumps(markets).encode()
+    manifest = {'bytes': len(raw_markets),
+                'sha256': hashlib.sha256(raw_markets).hexdigest(),
+                'sourceDescriptiveStatuses': ['Synthetic schema fixture; not provenance']}
+    manifest.update(manifest_overrides or {})
+    raw_manifest = json.dumps(manifest).encode()
+    pins = {key: (IMPORTER.SOURCES[key][0], hashlib.sha256(raw).hexdigest())
+            for key, raw in [('markets', raw_markets), ('manifest', raw_manifest)]}
+    with patch.dict(IMPORTER.SOURCES, pins):
+        return IMPORTER.convert(raw_manifest, raw_markets)
+
+
 class ServiceImportTests(unittest.TestCase):
+    def test_schema_conversion_encodes_both_sites_without_changing_inputs(self):
+        markets = schema_markets()
+        original = copy.deepcopy(markets)
+        raw, metadata = convert_schema(markets)
+        self.assertEqual(raw, struct.pack('<8sHHIIQHIIQ', b'MMKT0001', 2,
+                                         7, 226, 208, 128, 185, 216, 196, 112))
+        decoded = json.loads(metadata)
+        self.assertEqual(decoded['outputSHA256'], hashlib.sha256(raw).hexdigest())
+        self.assertEqual([quote['system'] for quote in decoded['selectedQuotes']], [7, 185])
+        self.assertEqual(markets, original)
+
+    def test_schema_conversion_refuses_manifest_and_world_binding_changes(self):
+        for override in [{'bytes': 0}, {'sha256': 'foreign'}]:
+            with self.subTest(manifest=override):
+                with self.assertRaisesRegex(ValueError, 'manifest binding'):
+                    convert_schema(schema_markets(), override)
+        for change in ['version', 'count']:
+            markets = schema_markets()
+            if change == 'version':
+                markets['version'] = 'foreign-world'
+            else:
+                markets['markets'].pop()
+            with self.subTest(world=change):
+                with self.assertRaisesRegex(ValueError, 'manifest binding'):
+                    convert_schema(markets)
+
+    def test_schema_conversion_refuses_missing_duplicate_or_wrong_sized_markets(self):
+        for change in ['missing', 'duplicate', 'short', 'long']:
+            markets = schema_markets()
+            if change == 'missing':
+                markets['markets'][0]['galaxy'] = 1
+            elif change == 'duplicate':
+                markets['markets'][-1] = copy.deepcopy(markets['markets'][0])
+            elif change == 'short':
+                markets['markets'][0]['quotes'].pop()
+            else:
+                markets['markets'][0]['quotes'].append({'index': 17})
+            original = copy.deepcopy(markets)
+            with self.subTest(change=change):
+                with self.assertRaisesRegex(ValueError, 'station market'):
+                    convert_schema(markets)
+                self.assertEqual(markets, original)
+
+    def test_schema_conversion_refuses_missing_or_duplicate_food(self):
+        for index, replacement in [(0, 17), (1, 0)]:
+            markets = schema_markets()
+            markets['markets'][0]['quotes'][index]['index'] = replacement
+            with self.subTest(index=index):
+                with self.assertRaisesRegex(ValueError, 'Food quote'):
+                    convert_schema(markets)
+
+    def test_schema_conversion_refuses_changed_food_identity(self):
+        for field, value in [('name', 'foreign'), ('unit', 'kg'), ('epoch', 1),
+                             ('system', 185), ('worldVersion', 'foreign-world')]:
+            markets = schema_markets()
+            markets['markets'][0]['quotes'][0][field] = value
+            with self.subTest(field=field):
+                with self.assertRaisesRegex(ValueError, 'Food identity'):
+                    convert_schema(markets)
+
+    def test_schema_conversion_checks_price_and_stock_boundaries(self):
+        maximum_stock = (2 ** 63 - 1) // 17
+        invalid = [('bidTenthsCR', -1, 'price'), ('bidTenthsCR', 227, 'price'),
+                   ('askTenthsCR', 1000001, 'price'), ('stock', -1, 'stock'),
+                   ('stock', maximum_stock + 1, 'stock')]
+        for field, value, message in invalid:
+            markets = schema_markets()
+            markets['markets'][1]['quotes'][0][field] = value
+            with self.subTest(field=field, value=value):
+                with self.assertRaisesRegex(ValueError, message):
+                    convert_schema(markets)
+        markets = schema_markets()
+        markets['markets'][0]['quotes'][0].update(
+            bidTenthsCR=1000000, askTenthsCR=1000000, stock=maximum_stock)
+        raw, _ = convert_schema(markets)
+        self.assertEqual(struct.unpack_from('<HIIQ', raw, 10),
+                         (7, 1000000, 1000000, maximum_stock))
+
     def test_unselected_bytes_and_blob_selectors_refuse(self):
         with self.assertRaisesRegex(ValueError, 'hash mismatch'):
             IMPORTER.convert(b'foreign', b'foreign')

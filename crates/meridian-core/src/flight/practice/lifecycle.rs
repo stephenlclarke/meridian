@@ -1,5 +1,8 @@
 //! Retained original Avenor attempts. Reviews confer no terminal or allocation authority alone.
-use super::*;
+use super::{
+    DockContext, Practice, PracticeBeaconId, PracticeError, PracticeTrace,
+    PreparedPracticeConfirmation, SystemId, World, reception,
+};
 use crate::navigation::SavedNavigationSummary;
 use crate::save::{Reader, SaveError, Writer, checksum};
 pub const PRACTICE_MAX_OFFERS: usize = 16;
