@@ -5,7 +5,7 @@ use crate::station_services::{SavedServiceSummary, StationMarkets};
 
 const MAGIC: &[u8; 8] = b"MERSAVE1";
 // Rules and immutable content form the version-four compatibility boundary, not an authenticity key.
-const CONTENT: &[u8] = concat!(
+const V4_CONTENT: &[u8] = concat!(
     "meridian-world/rules/4;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
@@ -15,8 +15,19 @@ const CONTENT: &[u8] = concat!(
 )
 .as_bytes();
 
-fn compiled_content_fingerprint() -> u64 {
-    let mut bytes = CONTENT.to_vec();
+// Rules and immutable content form the version-five compatibility boundary, not an authenticity key.
+const CONTENT: &[u8] = concat!(
+    "meridian-world/rules/5;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
+    "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
+    "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
+    "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
+    "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823;",
+    "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa"
+)
+.as_bytes();
+
+fn compiled_content_fingerprint(content: &[u8]) -> u64 {
+    let mut bytes = content.to_vec();
     for part in [
         include_bytes!("../../../../assets/legacy/sh028.physics").as_slice(),
         include_bytes!("../../../../assets/legacy/sh025.physics").as_slice(),
@@ -36,12 +47,19 @@ fn compiled_content_fingerprint() -> u64 {
 impl World {
     /// Return a complete checked memory save. The host must atomically publish these bytes itself.
     pub fn save_bytes(&self) -> Result<Vec<u8>, SaveError> {
-        self.validate_saved_world()?;
+        self.save_bytes_with_practice(self.practice)
+    }
+
+    pub(super) fn save_bytes_with_practice(
+        &self,
+        practice: Option<practice::Practice>,
+    ) -> Result<Vec<u8>, SaveError> {
+        self.validate_saved_world(practice)?;
         let mut w = Writer::new();
         w.bytes.extend(MAGIC);
         w.u16(SAVE_VERSION);
         w.bytes.extend(CONTENT);
-        w.u64(compiled_content_fingerprint());
+        w.u64(compiled_content_fingerprint(CONTENT));
         write_flight(&mut w, &self.state);
         self.navigation
             .ok_or(SaveError::NoCommander)?
@@ -58,6 +76,7 @@ impl World {
             .as_ref()
             .ok_or(SaveError::NoCommander)?
             .encode_save(&mut w);
+        w.option(practice.as_ref(), |w, practice| practice.encode(w));
         self.pulse.encode_save(&mut w);
         let digest = checksum(&w.bytes);
         w.u64(digest);
@@ -109,13 +128,14 @@ impl World {
         if &r.fixed::<8>()? != MAGIC {
             return Err(SaveError::InvalidEncoding);
         }
-        if r.u16()? != SAVE_VERSION {
-            return Err(SaveError::UnsupportedVersion);
-        }
-        if r.fixed::<{ CONTENT.len() }>()?.as_slice() != CONTENT {
-            return Err(SaveError::ContentMismatch);
-        }
-        if r.u64()? != compiled_content_fingerprint() {
+        let version = r.u16()?;
+        let content = match version {
+            4 if r.fixed::<{ V4_CONTENT.len() }>()?.as_slice() == V4_CONTENT => V4_CONTENT,
+            SAVE_VERSION if r.fixed::<{ CONTENT.len() }>()?.as_slice() == CONTENT => CONTENT,
+            4 | SAVE_VERSION => return Err(SaveError::ContentMismatch),
+            _ => return Err(SaveError::UnsupportedVersion),
+        };
+        if r.u64()? != compiled_content_fingerprint(content) {
             return Err(SaveError::ContentMismatch);
         }
         let station_data =
@@ -132,16 +152,21 @@ impl World {
             commander_account: Some(CommanderAccount::decode_save(&mut r)?),
             freight_session: Some(mission::FreightSession::decode_save(&mut r)?),
             station_markets: Some(StationMarkets::decode_save(&mut r)?),
+            practice: if version == 4 {
+                None
+            } else {
+                r.option(practice::Practice::decode)?
+            },
             pulse: weapons::PulseResources::decode_save(&mut r)?,
         };
         if !r.finished() {
             return Err(SaveError::InvalidEncoding);
         }
-        candidate.validate_saved_world()?;
+        candidate.validate_saved_world(candidate.practice)?;
         Ok(candidate)
     }
 
-    fn validate_saved_world(&self) -> Result<(), SaveError> {
+    fn validate_saved_world(&self, practice: Option<practice::Practice>) -> Result<(), SaveError> {
         let navigation = self.navigation.ok_or(SaveError::NoCommander)?;
         let account = self
             .commander_account
@@ -174,6 +199,9 @@ impl World {
         )?;
         self.pulse
             .validate_save(self.state.tick, self.state.mode, nav.launches)?;
+        if let Some(practice) = practice {
+            practice.validate(nav, navigation, self.state, station)?;
+        }
         session.validate_save(navigation.dock())?;
         let domain = account.validate_saved_domain(&session.state, nav, session.epoch())?;
         let services = markets.validate_save(
@@ -299,6 +327,29 @@ fn validate_flight(s: &Snapshot) -> Result<(), SaveError> {
         return Err(SaveError::InvalidState("flight pose/speed"));
     }
     Ok(())
+}
+
+#[cfg(test)]
+pub(super) fn v4_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
+    let current = world.save_bytes()?;
+    assert!(world.practice.is_none());
+    let prefix = 18 + CONTENT.len();
+    // Snapshot through market bytes are unchanged. The v5 practice option is
+    // one absent byte immediately before the five old weapon bytes.
+    let tail = current.len() - 13;
+    assert_eq!(current[tail - 1], 0);
+    let mut w = Writer::new();
+    w.bytes.extend(MAGIC);
+    w.u16(4);
+    w.bytes.extend(V4_CONTENT);
+    // Independently calculated from the exact predecessor rules header and
+    // original eight compiled resources.
+    w.u64(0xaa91_4776_a63c_5f97);
+    w.bytes.extend(&current[prefix..tail - 1]);
+    w.bytes.extend(&current[tail..tail + 5]);
+    let digest = checksum(&w.bytes);
+    w.u64(digest);
+    Ok(w.bytes)
 }
 
 #[cfg(test)]

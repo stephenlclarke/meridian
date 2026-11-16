@@ -17,3 +17,8 @@ pub use flight::{
     ServiceSnapshot, Snapshot, StationNpc, StepError, World,
 };
 pub use station::{FlightMode, FlightStart, MotionRefusal, OriginalStationData, StationError};
+
+pub use flight::{
+    PRACTICE_HALF_SIDE, PracticeBeaconId, PracticeBeaconSnapshot, PracticeError, PracticeReview,
+    PracticeSnapshot, PracticeStatus, PreparedPracticeConfirmation,
+};

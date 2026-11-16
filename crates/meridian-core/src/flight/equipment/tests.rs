@@ -415,3 +415,29 @@ fn assert_paid_save_guards(world: &mut World) {
         assert_eq!(world.save_bytes().unwrap(), valid);
     }
 }
+
+#[test]
+fn original_v4_paid_and_hot_world_loads_with_no_t02_authority() {
+    use crate::PracticeStatus;
+    let mut world = earned_world(2411);
+    let _paid = purchase(&mut world);
+    world.request_launch(world.snapshot().tick).unwrap();
+    world.step(FlightInput::default()).unwrap();
+    world
+        .request_fire_front_pulse(world.snapshot().tick)
+        .unwrap();
+    let v4 = crate::flight::persistence::v4_test_fixture(&world).unwrap();
+    let restored = World::from_save_bytes(&v4).unwrap();
+    assert_eq!(restored.snapshot(), world.snapshot());
+    assert_eq!(restored.credits_tenths(), world.credits_tenths());
+    assert_eq!(restored.equipment_snapshot(), world.equipment_snapshot());
+    assert_eq!(
+        restored.pulse_laser_snapshot(),
+        world.pulse_laser_snapshot()
+    );
+    assert_eq!(
+        restored.practice_snapshot().unwrap().status,
+        PracticeStatus::Unaccepted
+    );
+    assert_eq!(&restored.save_bytes().unwrap()[8..10], &5_u16.to_le_bytes());
+}
