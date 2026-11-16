@@ -90,7 +90,7 @@ Compiled source `bb5862b` passed whole-source review and bounded corrections. Ma
 
 The cockpit instrument implementation and its current validation limits are described in [Cockpit instruments](docs/COCKPIT-HUD.md).
 
-The HUD, five docked screens and initial modular equipment candidate passed platform and bounded signed Mac gameplay qualification, and a separate signed local package is installed. Public release remains held: main `8230456` passed its CI gate, but report paths prevented coverage attribution and 15 maintained-source findings remained. The following quality correction binds report paths, refactors the flagged functions and replaces wildcard imports. It has 88 passing local Python tests; changed Rust compilation, native validation and a new correctly attributed main analysis are still pending. Full equipment, mining/salvage, EMP, bounties, further authored hulls and NPC populations remain core work before new missions.
+The HUD, five docked screens and initial modular equipment candidate passed three-platform qualification and bounded gameplay checks in the new signed Mac app. Current compiled correction `beab907` passed 372 Rust tests and 88 Python tests on each platform plus all five hosted checks. Its actual reports cover 256 of the original failed 306 changed lines (83.66 percent), with unmapped lines counted as uncovered. Public release remains held for final protected integration and exact-main Sonar acceptance. Full equipment, mining/salvage, EMP, bounties, further authored hulls and NPC populations remain core work before new missions.
 
 In the next-preview development candidate, `/` toggles controls help and ordinary flight uses a compact overlay above the cockpit. This change is not in the published v0.4 binary.
 

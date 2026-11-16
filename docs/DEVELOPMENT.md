@@ -49,3 +49,5 @@ Remove obsolete ISSUE-*.md and PR-*.md handoff copies once their useful content 
 6. Publish qualified macOS and Windows packages as a tagged GitHub prerelease using the [preview release workflow](PREVIEW-RELEASES.md). Derive its version from Conventional Commits. Verify downloadable bytes and keep only the newest three preview releases and their tags.
 
 Keep earlier installed previews and real profiles unchanged. Signing/local functional delivery does not establish notarization, commercial distribution or full first-playable acceptance. [Implementation status](IMPLEMENTATION-STATUS.md) records the latest qualified scope.
+
+When a committed-main coverage gate fails, preserve its exact source, original changed-line set and raw measurements. A correction must exercise the missing behavior and recheck that original set against actual new coverage; a subsequent Previous version baseline alone is not evidence of a fix. Keep unreachability and unobserved host boundaries explicit rather than inventing gameplay states or changing assertions.

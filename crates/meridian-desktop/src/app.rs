@@ -59,9 +59,10 @@ fn step_frame(
 
 // This shell owns the World synchronously. No gameplay mutation occurs in renderer code.
 // Retain the frame-wide contact even when a later catch-up tick is clear.
+#[derive(Debug, PartialEq, Eq)]
 enum FrameAdvance {
     Continue(Option<MotionRefusal>),
-    Fatal,
+    Fatal(StepError),
 }
 
 struct App {
@@ -88,10 +89,15 @@ struct App {
 
 impl App {
     fn new() -> Result<Self, Box<dyn Error>> {
-        Ok(Self {
-            game: Profile::open(crate::profile::directory_from_args(
-                std::env::args_os().skip(1),
-            )?)?,
+        let game = Profile::open(crate::profile::directory_from_args(
+            std::env::args_os().skip(1),
+        )?)?;
+        Ok(Self::with_profile(game))
+    }
+
+    fn with_profile(game: Profile) -> Self {
+        Self {
+            game,
             quit_failed: false,
             celestial: crate::celestial::WorldAdapter::default(),
             renderer: None,
@@ -110,7 +116,7 @@ impl App {
             notice: None,
             pulse: None,
             missile_bodies: Vec::with_capacity(crate::mesh::MAX_MISSILE_PROJECTILES),
-        })
+        }
     }
 
     fn fail(&mut self, event_loop: &ActiveEventLoop, error: impl ToString) {
@@ -150,6 +156,16 @@ impl App {
             self.notice = Some(error.to_string());
         }
         self.request_redraw();
+    }
+
+    fn focus_changed(&mut self, focused: bool) {
+        self.focused = focused;
+        self.reset_input();
+    }
+
+    fn occlusion_changed(&mut self, occluded: bool) {
+        self.occluded = occluded;
+        self.reset_input();
     }
 
     fn key(&mut self, code: KeyCode, event_loop: &ActiveEventLoop) {
@@ -392,14 +408,8 @@ impl App {
         });
     }
 
-    fn advance_frame(
-        &mut self,
-        event_loop: &ActiveEventLoop,
-        active: bool,
-        ticks: usize,
-    ) -> FrameAdvance {
-        let mut frame_refusal = None;
-        if active {
+    fn advance_frame(&mut self, active: bool, ticks: usize) -> FrameAdvance {
+        let result = if active {
             let input = FlightInput {
                 pitch: self.axis(KeyCode::ArrowUp, KeyCode::ArrowDown),
                 yaw: self.axis(KeyCode::KeyD, KeyCode::KeyA),
@@ -407,23 +417,28 @@ impl App {
                 throttle: self.axis(KeyCode::KeyW, KeyCode::KeyS),
                 brake: self.keys.contains(&KeyCode::Space),
             };
-            match step_frame(
+            step_frame(
                 &mut self.game.world,
                 input,
                 ticks,
                 self.keys.contains(&KeyCode::KeyZ),
                 &mut self.pulse,
-            ) {
-                Ok(refusal) => frame_refusal = refusal,
-                Err(error) if matches!(error, StepError::Collision | StepError::UnsafeEntry) => {
-                    self.notice = Some(error.to_string());
-                }
-                Err(error) => {
-                    self.fail(event_loop, format!("Simulation refused input: {error}"));
-                    return FrameAdvance::Fatal;
-                }
+            )
+        } else {
+            Ok(None)
+        };
+        self.frame_feedback(result)
+    }
+
+    fn frame_feedback(&mut self, result: Result<Option<MotionRefusal>, StepError>) -> FrameAdvance {
+        let frame_refusal = match result {
+            Ok(refusal) => refusal,
+            Err(error) if matches!(error, StepError::Collision | StepError::UnsafeEntry) => {
+                self.notice = Some(error.to_string());
+                None
             }
-        }
+            Err(error) => return FrameAdvance::Fatal(error),
+        };
         if let Some(refusal) = frame_refusal {
             self.notice = Some(
                 match refusal {
@@ -444,21 +459,36 @@ impl App {
     }
 
     fn keyboard_input(&mut self, event_loop: &ActiveEventLoop, event: winit::event::KeyEvent) {
-        if let PhysicalKey::Code(code) = event.physical_key {
-            if event.state == ElementState::Released {
+        if let Some(code) = self.route_keyboard(
+            event.physical_key,
+            event.state,
+            event.repeat,
+            event.text.as_deref(),
+        ) {
+            self.key(code, event_loop);
+        }
+    }
+
+    // Route held input and menu text without constructing a window or an event loop.
+    fn route_keyboard(
+        &mut self,
+        physical_key: PhysicalKey,
+        state: ElementState,
+        repeat: bool,
+        text: Option<&str>,
+    ) -> Option<KeyCode> {
+        if let PhysicalKey::Code(code) = physical_key {
+            if state == ElementState::Released {
                 self.keys.remove(&code);
             } else if self.focused && !self.occluded {
                 if self.menu_active()
                     && self.docked.as_ref().is_some_and(Docked::search_active)
-                    && let Some(text) = event
-                        .text
-                        .as_ref()
-                        .filter(|s| s.chars().all(|c| !c.is_control()))
+                    && let Some(text) = text.filter(|s| s.chars().all(|c| !c.is_control()))
                 {
                     self.menu_input(ui::Input::Text(text.to_string()));
-                    return;
+                    return None;
                 }
-                if event.repeat
+                if repeat
                     && !(self.menu_active()
                         && matches!(
                             code,
@@ -469,14 +499,15 @@ impl App {
                                 | KeyCode::Backspace
                         ))
                 {
-                    return;
+                    return None;
                 }
                 if !self.menu_active() {
                     self.keys.insert(code);
                 }
-                self.key(code, event_loop);
+                return Some(code);
             }
         }
+        None
     }
 
     fn redraw(&mut self, event_loop: &ActiveEventLoop) {
@@ -485,9 +516,12 @@ impl App {
         self.last_frame = now;
         let active = self.focused && !self.occluded && !self.paused && self.game.playing();
         let ticks = self.clock.ticks(elapsed, active);
-        let frame_refusal = match self.advance_frame(event_loop, active, ticks) {
+        let frame_refusal = match self.advance_frame(active, ticks) {
             FrameAdvance::Continue(refusal) => refusal,
-            FrameAdvance::Fatal => return,
+            FrameAdvance::Fatal(error) => {
+                self.fail(event_loop, format!("Simulation refused input: {error}"));
+                return;
+            }
         };
         let snapshot = self.game.world.snapshot();
         // The beam is a short-lived view of the committed shot, never saved or re-fired.
@@ -671,12 +705,10 @@ impl ApplicationHandler for App {
                 }
             }
             WindowEvent::Focused(focused) => {
-                self.focused = focused;
-                self.reset_input();
+                self.focus_changed(focused);
             }
             WindowEvent::Occluded(occluded) => {
-                self.occluded = occluded;
-                self.reset_input();
+                self.occlusion_changed(occluded);
             }
             WindowEvent::ModifiersChanged(modifiers) => self.modifiers = modifiers.state(),
             WindowEvent::CursorMoved { position, .. } if self.focused && !self.occluded => {
@@ -816,3 +848,6 @@ mod tests {
         assert_eq!(after.tick, before.tick + 2);
     }
 }
+
+#[cfg(test)]
+mod callback_tests;
