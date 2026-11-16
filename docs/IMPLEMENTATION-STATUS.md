@@ -28,9 +28,17 @@ Root audited the sealed native packet and its 19 retained v8 checkpoint files pl
 
 Native v8 station-hit/interception cold journeys were not repeated; their exact core regressions passed. A genuine live player hit and full T02 acceptance remain open. Protected integration, exact-main CI/Sonar, exact-main rebuild/signing and the separate installed v8 delivery have passed. The scoped native candidate evidence retains its original source identity; installation does not broaden those acceptance limits.
 
+## Authored successor: attempt closure and retry
+
+Current source adds [reviewed closure and retry](SAFE-GUNNERY-ATTEMPTS.md): F7 reviews failed or incomplete closure at the actual Avenor berth; Enter publishes the save before committing live state, while B cancels. F10 reviews a new attempt after terminal settlement. The HUD uses the current attempt outcome, independently of a previous first trace; I shows retained outcome counts and first-clue status. No refund, reward or ammunition reset occurs.
+
+The core and desktop changes include authored regression tests for retained history, first-clue identity, capacity and malformed saves, actual failed host publication, review cancellation and a genuine child-process abandoned-close/fresh-consent round trip. They have not run. Whole review, compiler/Clippy, host and native execution remain pending. The installed v8 preview and its acceptance evidence are unchanged; full T02 remains open.
+
 ## Save compatibility
 
-Current source writes version 8, including arm/lock/cooldown, actual consumed pylon items, live/ended projectiles, motion/contact history and practice receipts/quiet state. Exact supported v4-v7 readers retain genuine prior unused missile stock; a used-v7 migration is never invented. Versions 1-3 remain unsupported. Invalid candidates refuse without repair, fallback, re-emission or stock grants.
+The installed Durable Missiles Preview writes version 8, including arm/lock/cooldown, actual consumed pylon items, live/ended projectiles, motion/contact history and practice receipts/quiet state. Exact supported v4-v7 readers retain genuine prior unused missile stock; a used-v7 migration is never invented. Versions 1-3 remain unsupported. Invalid candidates refuse without repair, fallback, re-emission or stock grants.
+
+The authored successor writes v9 with bounded attempt history, terminal receipts and the first-trace pointer, and explicit v4-v8 readers. It requires isolated candidate profiles until qualified. No used-v7 migration is invented.
 
 The earlier installed Finite Missiles Preview still writes v7 and refuses saving/restoring after any missile use. Keep its dedicated profiles and all earlier previews unchanged. Use the delivered v8 launcher for its separate saves-v8 directory; opening the bundle directly uses the default save location.
 
