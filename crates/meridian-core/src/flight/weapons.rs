@@ -147,7 +147,7 @@ impl PulseResources {
             FlightMode::Flight => elapsed >= 2 && launches >= 2,
         };
         if self.cooldown > PULSE_COOLDOWN_TICKS
-            || self.heat >= HEAT_LIMIT_FIFTHS + HEAT_COST_FIFTHS
+            || u128::from(self.heat) > maximum_reachable_heat(tick, elapsed)
             || (self.energy != ENERGY_CAPACITY_HUNDREDTHS && self.energy != depleted_energy)
             || (early_full && !can_have_docked_since_shot)
             || ((ready || quiescent) && self.energy != ENERGY_CAPACITY_HUNDREDTHS)
@@ -161,6 +161,26 @@ impl PulseResources {
         }
         Ok(())
     }
+}
+
+// A shot needs tick 1 or later, and consecutive shots need at least a full
+// cooldown of airborne steps. Docked steps enlarge the global tick budget but
+// cannot clear cooldown. A docking reset discards all heat before it.
+fn maximum_reachable_heat(tick: u64, elapsed_since_shot_at_least: u8) -> u128 {
+    let latest_shot = tick.saturating_sub(u64::from(elapsed_since_shot_at_least));
+    if latest_shot == 0 {
+        return 0;
+    }
+    let earlier_shots = (latest_shot - 1) / u64::from(PULSE_COOLDOWN_TICKS);
+    // For each earlier shot that still contributes heat, at least one cooldown
+    // has cooled it. If any gap clears the heat, discard all preceding shots.
+    let net_heat_per_earlier_shot = HEAT_COST_FIFTHS - u16::from(PULSE_COOLDOWN_TICKS);
+    let cadence_bound = u128::from(HEAT_COST_FIFTHS)
+        + u128::from(earlier_shots) * u128::from(net_heat_per_earlier_shot);
+    let threshold_bound = u128::from(HEAT_LIMIT_FIFTHS + HEAT_COST_FIFTHS - 1);
+    cadence_bound
+        .min(threshold_bound)
+        .saturating_sub(u128::from(elapsed_since_shot_at_least))
 }
 
 impl World {

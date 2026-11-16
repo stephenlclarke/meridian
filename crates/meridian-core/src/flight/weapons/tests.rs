@@ -98,6 +98,9 @@ fn public_cadence_reaches_overheat_then_resumes_only_after_sufficient_flight_coo
             step(&mut world, 18);
         }
         fire(&mut world).unwrap();
+        let snapshot = world.pulse_laser_snapshot();
+        let restored = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+        assert_eq!(restored.pulse_laser_snapshot(), snapshot);
     }
     assert_eq!(world.pulse_laser_snapshot().unwrap().heat_fifths, 1234);
     step(&mut world, 18);
@@ -192,7 +195,13 @@ fn hot_in_flight_continue_retains_resources_and_refuses_resealed_corruption_and_
     refusal(&mut continued, FireError::CoolingDown);
     let before = continued.save_bytes().unwrap();
     let end = bytes.len() - 8;
-    for (offset, value) in [(8, 3), (end - 5, 255), (end - 3, 255), (end - 1, 19)] {
+    for (offset, value) in [
+        (8, 3),
+        (end - 5, 255),
+        (end - 3, 255),
+        (end - 3, 46), // A tick-one shot at tick six has at most 45 heat fifths.
+        (end - 1, 19),
+    ] {
         let mut bad = bytes.clone();
         bad[offset] = value;
         let digest = crate::save::checksum(&bad[..end]);
@@ -201,6 +210,16 @@ fn hot_in_flight_continue_retains_resources_and_refuses_resealed_corruption_and_
         assert_eq!(continued.save_bytes().unwrap(), before);
     }
     step(&mut continued, 13);
+    let ready = continued.pulse_laser_snapshot().unwrap();
+    assert_eq!((ready.cooldown_ticks, ready.heat_fifths), (0, 32));
+    let before = continued.save_bytes().unwrap();
+    let mut impossible = before.clone();
+    let end = impossible.len() - 8;
+    impossible[end - 3] = 33; // Ready implies at least 18 steps since the shot.
+    let digest = crate::save::checksum(&impossible[..end]);
+    impossible[end..].copy_from_slice(&digest.to_le_bytes());
+    assert!(continued.restore_bytes(&impossible).is_err());
+    assert_eq!(continued.save_bytes().unwrap(), before);
     fire(&mut continued).unwrap();
 }
 
@@ -246,9 +265,16 @@ fn physical_dock_restores_heat_and_energy_and_docked_steps_hold_cooldown() {
     refusal(&mut world, FireError::NotInFlight);
     world.request_launch(world.snapshot().tick).unwrap();
     assert_eq!(world.pulse_laser_snapshot(), Some(reset));
+    let restored = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    assert_eq!(restored.pulse_laser_snapshot(), Some(reset));
     step(&mut world, 1);
     assert_eq!(
         world.pulse_laser_snapshot().unwrap().cooldown_ticks,
         reset.cooldown_ticks - 1
+    );
+    let restored = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    assert_eq!(
+        restored.pulse_laser_snapshot(),
+        world.pulse_laser_snapshot()
     );
 }
