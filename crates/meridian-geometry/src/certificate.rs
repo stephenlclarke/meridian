@@ -10,6 +10,7 @@ use std::collections::{BTreeMap, BTreeSet};
 pub struct ContactStar {
     pub point: Point2,
     pub sectors: Vec<[Point2; 2]>,
+    /// True for a boundary vertex. Protected contacts can retain several local paths.
     pub boundary_path: bool,
 }
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -383,7 +384,61 @@ fn triangulate(mut cell: Cell, b: &mut Budget) -> Result<Vec<[Point2; 3]>, Failu
     }
     Ok(result)
 }
-fn facet_stars(triangles: &[[Point2; 3]], b: &mut Budget) -> Result<Vec<ContactStar>, Failure> {
+fn protected_facet_link(
+    sectors: &[[Point2; 2]],
+    boundary: bool,
+    b: &mut Budget,
+) -> Result<(), Failure> {
+    // Protected physical intersections are retained by the reference complex.
+    // A single original facet can contribute several disjoint boundary paths at
+    // one such point. Each path must be regular, and the final 3D mesh must still
+    // have one connected cycle there.
+    b.with_retained(24 * sectors.len() + 64, |budget| {
+        let mut incident: BTreeMap<Point2, Vec<usize>> = BTreeMap::new();
+        for (index, sector) in sectors.iter().enumerate() {
+            for endpoint in sector {
+                budget.step(1)?;
+                log_cost(incident.len(), budget)?;
+                incident.entry(endpoint.clone()).or_default().push(index);
+            }
+        }
+        let mut seen = BTreeSet::new();
+        for seed in 0..sectors.len() {
+            budget.step(1)?;
+            log_cost(seen.len(), budget)?;
+            if seen.contains(&seed) {
+                continue;
+            }
+            let mut pending = vec![seed];
+            let mut component = Vec::new();
+            while let Some(index) = pending.pop() {
+                budget.step(1)?;
+                log_cost(seen.len(), budget)?;
+                if !seen.insert(index) {
+                    continue;
+                }
+                component.push(sectors[index].clone());
+                for endpoint in &sectors[index] {
+                    log_cost(incident.len(), budget)?;
+                    for next in &incident[endpoint] {
+                        budget.step(1)?;
+                        if !seen.contains(next) {
+                            pending.push(*next);
+                        }
+                    }
+                }
+            }
+            connected_link(&component, !boundary, budget)?;
+        }
+        Ok(())
+    })
+}
+
+fn facet_stars(
+    triangles: &[[Point2; 3]],
+    protected: &BTreeSet<Point2>,
+    b: &mut Budget,
+) -> Result<Vec<ContactStar>, Failure> {
     b.guard(64 * triangles.len() + 64)?;
     let mut stars: BTreeMap<Point2, Vec<[Point2; 2]>> = BTreeMap::new();
     let mut incidence: BTreeMap<[Point2; 2], Vec<bool>> = BTreeMap::new();
@@ -419,7 +474,13 @@ fn facet_stars(triangles: &[[Point2; 3]], b: &mut Budget) -> Result<Vec<ContactS
     let mut result = Vec::new();
     for (point, sectors) in stars {
         let path = boundary.contains(&point);
-        connected_link(&sectors, !path, b)?;
+        b.step(1)?;
+        log_cost(protected.len(), b)?;
+        if protected.contains(&point) {
+            protected_facet_link(&sectors, path, b)?;
+        } else {
+            connected_link(&sectors, !path, b)?;
+        }
         result.push(ContactStar {
             point,
             sectors,
@@ -514,7 +575,7 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
             b.guard(32 * (planar.len() + new.len() + 1))?;
             planar.extend(new);
         }
-        let stars = facet_stars(&planar, b)?;
+        let stars = facet_stars(&planar, &arrangement.protected, b)?;
         // Every exposed protected point must survive in the actual output mesh.
         for p in &arrangement.protected {
             let mut in_region = false;
@@ -751,7 +812,16 @@ impl FacetWitness {
                 "incomplete mutual exact region coverage",
             ));
         }
-        if facet_stars(&self.output_triangles, b)? != self.contact_stars {
+        let stars = b.with_retained(3 * self.protected_points.len(), |budget| {
+            let mut protected = BTreeSet::new();
+            for point in &self.protected_points {
+                budget.step(1)?;
+                log_cost(protected.len(), budget)?;
+                protected.insert(point.clone());
+            }
+            facet_stars(&self.output_triangles, &protected, budget)
+        })?;
+        if stars != self.contact_stars {
             return Err(b.fail(FailureKind::InvalidWitness, "contact-star witness mismatch"));
         }
         for p in &self.protected_points {
@@ -979,4 +1049,49 @@ fn audit_original_sheets(faces: &[Facet], b: &mut Budget) -> Result<(), Failure>
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn protected_overlap_facet_keeps_each_regular_local_boundary_path() -> Result<(), Failure> {
+        // Frozen analytic overlap (0..2)^3 union (1..3)^3. Original facet9
+        // on component0's y=2 face projects to x+z>=2 in [0,2]^2.
+        // Removing x>1,z>1 leaves these two positive regions meeting at (1,1).
+        let p = |x, y| [integer(x), integer(y)];
+        let contact = p(1, 1);
+        let triangles = [
+            [p(0, 2), contact.clone(), p(1, 2)],
+            [contact.clone(), p(2, 0), p(2, 1)],
+        ];
+        let mut b = Budget::new(crate::Limits::default())?;
+        let protected = BTreeSet::from([contact.clone()]);
+        let stars = facet_stars(&triangles, &protected, &mut b)?;
+        let star = stars
+            .iter()
+            .find(|s| s.point == contact)
+            .ok_or_else(|| b.fail(FailureKind::InvalidWitness, "missing regression contact"))?;
+        assert_eq!(star.sectors.len(), 2);
+        assert!(star.boundary_path);
+        assert_eq!(
+            area(&triangles[0], &mut b)? + area(&triangles[1], &mut b)?,
+            integer(2)
+        );
+        assert_eq!(
+            facet_stars(&triangles, &BTreeSet::new(), &mut b)
+                .err()
+                .map(|e| e.kind),
+            Some(FailureKind::UncertifiedContact)
+        );
+        // Complete 3D links retain the original single-cycle requirement.
+        assert_eq!(
+            connected_link(&star.sectors, true, &mut b)
+                .err()
+                .map(|e| e.kind),
+            Some(FailureKind::UncertifiedContact)
+        );
+        Ok(())
+    }
 }

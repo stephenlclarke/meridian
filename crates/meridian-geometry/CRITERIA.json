@@ -63,6 +63,11 @@
       "file": "tests/adapter.rs",
       "name": "independently_verified_witness_reserves_aggregate_nested_storage",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/certificate.rs",
+      "name": "certificate::tests::protected_overlap_facet_keeps_each_regular_local_boundary_path",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -111,5 +116,20 @@
     "actionableFindings": 1,
     "delta": "Checked aggregate incoming witness accounting; scoped standalone reservation including scratch; exact final construction retention once; bounded direct public regression",
     "execution": "UNRUN"
+  },
+  "contactStarCorrection": {
+    "actualParentQualification": {
+      "check": "PASS",
+      "rustTests": {
+        "pass": 9,
+        "fail": 1,
+        "unrun": 2
+      },
+      "clippy": "NOT_STARTED"
+    },
+    "failedJoinedCommit": "7ef4df73825bdba87d3a2a2b59e6970d08fb3066",
+    "parentTestLogSHA256": "e26ce883e0fb6a694a0aae2a0d08d17be5b928c60d10dbd7115539e80cf29b95",
+    "causalEvidenceSHA256": "e20184b76ed41ba62a4529729fff77716a8ec1748daf9789ee43294fbbe3133b",
+    "currentCorrectionExecution": "UNRUN"
   }
 }

@@ -1,0 +1,130 @@
+{
+  "failedJoinedCommit": "7ef4df73825bdba87d3a2a2b59e6970d08fb3066",
+  "parentAuthorCommit": "47e99e4b5daa4915936acde39dcc1524d9df243c",
+  "actualParentQualification": {
+    "check": "PASS",
+    "rustTests": {
+      "pass": 9,
+      "fail": 1,
+      "unrun": 2
+    },
+    "clippy": "NOT_STARTED"
+  },
+  "failedUnchangedTest": "analytic_closed_originals_preserve_volume_source_fields_and_contact_witnesses",
+  "reportedFailure": {
+    "kind": "UncertifiedContact",
+    "source": [
+      0,
+      9
+    ],
+    "operations": 50734,
+    "detail": "contact-star boundary type mismatch"
+  },
+  "sourceDerivation": {
+    "method": "Exact scalar/source reasoning only; no geometry/test replay",
+    "analyticFixture": "union of [0,2]^3 and [1,3]^3; expected volume15",
+    "component0Facet9": {
+      "originalVertices": [
+        [
+          2,
+          2,
+          0
+        ],
+        [
+          0,
+          2,
+          2
+        ],
+        [
+          2,
+          2,
+          2
+        ]
+      ],
+      "projectedAxes": [
+        "x",
+        "z"
+      ],
+      "closedDomain": "x+z>=2, x<=2, z<=2",
+      "excludedOpenQuadrant": "x>1 and z>1",
+      "remainingPositiveTriangles": [
+        [
+          [
+            0,
+            2
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ]
+        ],
+        [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            2,
+            1
+          ]
+        ]
+      ],
+      "twiceAreas": [
+        1,
+        1
+      ],
+      "physicalProtectedPoint": [
+        1,
+        1
+      ],
+      "localLinkSectorsAtContact": [
+        [
+          [
+            0,
+            2
+          ],
+          [
+            1,
+            2
+          ]
+        ],
+        [
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            0
+          ]
+        ]
+      ],
+      "localComponents": 2,
+      "boundaryEnds": 4
+    }
+  },
+  "reference": {
+    "path": "fixtures/reference/exact-source-arrangement.py",
+    "sha256": "aa400698c0094b0f4dd16aa7094c68879072f85a35858ac3501d8fda60488a80",
+    "semanticAnchors": [
+      "FacetRegions.complex keeps all protected points and skips unprotected-star elimination for them.",
+      "FacetRegions.reconstruct requires protected points survive where exposed.",
+      "The complete boundary mesh keeps its reciprocal edges and one connected vertex-link cycle requirement."
+    ]
+  },
+  "correction": "At physically protected vertices, validate each connected local link component as a regular boundary path or cycle. Preserve all sectors in the witness. Unprotected local vertices keep single-component validation. The assembled 3D mesh keeps single connected-cycle validation at every vertex.",
+  "memoryAndWork": "Reserve complete incident/seen/component scratch while nested link validation runs. The verified public witness input reservation continues to cover all protected-point data, with the temporary lookup set admitted separately.",
+  "newRegression": "protected_overlap_facet_keeps_each_regular_local_boundary_path",
+  "assertionsRetained": "All prior tests/adapter.rs and tests/original_inputs.rs bytes unchanged. Existing private connected_link validation unchanged.",
+  "currentExecution": "UNRUN; bounded source review required before changed G1 execution",
+  "wholeFive": "HELD",
+  "newAdmissions": 0
+}

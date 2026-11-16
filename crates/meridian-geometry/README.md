@@ -10,7 +10,7 @@ The previous five-hull execution at `0c2677b5` exhausted operations on every ori
 
 ## Validation
 
-Rust compilation, tests and Clippy are **UNRUN**. The author lane used rustfmt to parse and format the authored source. G1 owns actual compiler execution on the committed packet. The first compiler run should apply `integration/workspace-and-lock.patch` in the joined workspace and run the following checks.
+The current correction is **UNRUN**. Parent joined source `7ef4df7` passed locked check, then passed nine Rust tests and failed the analytic overlap case at a protected facet contact. The two later original-input tests remained unrun and Clippy did not start. The author lane used rustfmt to parse and format the authored source. G1 owns actual compiler execution on the committed packet. The first compiler run should apply `integration/workspace-and-lock.patch` in the joined workspace and run the following checks.
 
 ```sh
 cargo check --locked -p meridian-geometry --all-targets
@@ -29,3 +29,7 @@ The crate pins num-bigint 0.4.8, num-rational 0.4.2 and num-traits 0.2.19. Publi
 ## Incoming witness storage
 
 Standalone `FacetWitness::verify` admits the checked aggregate of all incoming cells, corners, triangles, physical segments, protected points, contact-star records and sectors. That reservation remains live through scratch validation and releases on success or error. Construction reserves final geometry and each final witness once before publication and reuses that admission for its internal validation. A direct public regression covers the 40-segment/100-slot finding, aggregate nested cells/stars, exact and one-short scratch bounds, release on error, and retained final construction ownership. The authored regression remains UNRUN until G1 executes the corrected joined source.
+
+## Protected local facet contacts
+
+An original triangle can contribute two disjoint exposed regions that meet at one physical protected point. The overlap fixture reaches that case on component 0, facet 9. The corrected local certificate retains every sector and checks each connected link component as a regular boundary path or cycle at protected points. Unprotected local vertices and the final closed 3D mesh retain their connected-link requirements. The new source-derived regression also checks that removing physical protection refuses the local shape and that the same disconnected sectors refuse as a complete closed-mesh link. Existing analytic volume, source-field, witness and invalid-input tests are retained byte for byte.

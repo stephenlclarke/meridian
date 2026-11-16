@@ -105,5 +105,16 @@
     "stations": 4,
     "stationTotal": 6,
     "newAdmissions": 0
-  }
+  },
+  "parentRustQualification": {
+    "check": "PASS",
+    "rustTests": {
+      "pass": 9,
+      "fail": 1,
+      "unrun": 2
+    },
+    "clippy": "NOT_STARTED"
+  },
+  "parentQualifiedSource": "7ef4df73825bdba87d3a2a2b59e6970d08fb3066",
+  "currentCorrectionExecution": "UNRUN"
 }
