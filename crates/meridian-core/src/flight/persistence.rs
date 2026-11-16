@@ -200,7 +200,7 @@ impl World {
         self.pulse
             .validate_save(self.state.tick, self.state.mode, nav.launches)?;
         if let Some(practice) = practice {
-            practice.validate(nav, navigation, self.state, station)?;
+            practice.validate(nav, navigation, self.state, station, self.pulse)?;
         }
         session.validate_save(navigation.dock())?;
         let domain = account.validate_saved_domain(&session.state, nav, session.epoch())?;

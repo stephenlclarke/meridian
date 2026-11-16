@@ -1,4 +1,5 @@
 use super::*;
+use crate::flight::weapons::PulseResources;
 use crate::navigation::SavedNavigationSummary;
 use crate::save::{Reader, SaveError, Writer};
 const INVALID: SaveError = SaveError::InvalidState("T02 practice consent, visit or receipts");
@@ -54,6 +55,7 @@ impl Practice {
         navigation: NavigationState,
         flight: Snapshot,
         data: &OriginalStationData,
+        pulse: PulseResources,
     ) -> Result<(), SaveError> {
         let sortie = self.sortie().ok_or(INVALID)?;
         self.validate_consent(nav, flight.tick)?;
@@ -63,7 +65,17 @@ impl Practice {
             if range.opened_tick <= self.confirmed_tick || range.opened_tick > last_active_tick {
                 return Err(INVALID);
             }
-            range.validate(last_active_tick, data, flight.station.ok_or(INVALID)?)?;
+            range.validate(last_active_tick, flight, data)?;
+            if let Some(latest_hit) = range.hits.iter().flatten().map(|hit| hit.tick).max() {
+                // Every published step advances one global tick. Only a subset
+                // advances the weapon clock; docking and arrival retain cooldown.
+                // A later discharge can only raise the remainder of this floor.
+                let elapsed = flight.tick - latest_hit;
+                let minimum = u64::from(crate::PULSE_COOLDOWN_TICKS).saturating_sub(elapsed);
+                if u64::from(pulse.remaining_cooldown()) < minimum {
+                    return Err(INVALID);
+                }
+            }
         }
         Ok(())
     }
@@ -131,10 +143,11 @@ impl Range {
     fn validate(
         self,
         last_active_tick: u64,
+        flight: Snapshot,
         data: &OriginalStationData,
-        station: StationPose,
     ) -> Result<(), SaveError> {
-        let opening = self.opening.checked_pose(self.opened_tick)?;
+        let station = flight.station.ok_or(INVALID)?;
+        let opening = self.opening.checked_pose_at(self.opened_tick, flight)?;
         if !geometry::range_clear(data, station, opening) {
             return Err(INVALID);
         }
@@ -146,7 +159,7 @@ impl Range {
             if hit.tick < self.opened_tick || hit.tick > last_active_tick {
                 return Err(INVALID);
             }
-            let pose = hit.firing_pose.checked_pose(hit.tick)?;
+            let pose = hit.firing_pose.checked_pose_at(hit.tick, flight)?;
             let station_distance = data
                 .beam_block_distance(
                     station,
@@ -188,7 +201,13 @@ impl RecordedPose {
             orientation: r.array(|r| r.f32())?,
         })
     }
-    fn checked_pose(self, tick: u64) -> Result<RigidPose, SaveError> {
+    fn checked_pose_at(self, tick: u64, flight: Snapshot) -> Result<RigidPose, SaveError> {
+        if tick == flight.tick
+            && (self.position.map(f32::to_bits) != flight.position.map(f32::to_bits)
+                || self.orientation.map(f32::to_bits) != flight.orientation.map(f32::to_bits))
+        {
+            return Err(INVALID);
+        }
         let norm = self
             .orientation
             .iter()

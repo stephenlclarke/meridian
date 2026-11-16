@@ -328,3 +328,106 @@ fn resealed_range_authority_and_hit_pose_changes_refuse_without_live_replacement
         assert_eq!(world.save_bytes().unwrap(), live);
     }
 }
+
+fn assert_resealed_refusal(world: &mut World, live: &[u8], mut changed: Vec<u8>) {
+    let end = changed.len() - 8;
+    let digest = crate::save::checksum(&changed[..end]);
+    changed[end..].copy_from_slice(&digest.to_le_bytes());
+    assert_eq!(
+        world.restore_bytes(&changed),
+        Err(crate::save::SaveError::InvalidState(
+            "T02 practice consent, visit or receipts"
+        ))
+    );
+    assert_eq!(world.save_bytes().unwrap().as_slice(), live);
+}
+
+fn clear_pulse_tail(bytes: &mut [u8]) {
+    let start = bytes.len() - 13;
+    bytes[start..start + 2].copy_from_slice(&38_000_u16.to_le_bytes());
+    bytes[start + 2..start + 5].fill(0);
+}
+
+#[test]
+fn practice_receipt_requires_committed_pulse_and_exact_same_tick_flight_pose() {
+    use crate::save::Writer;
+    let mut world = World::new_commander(601).unwrap();
+    consent(&mut world);
+    launch(&mut world);
+    shoot(&mut world);
+    let live = world.save_bytes().unwrap();
+    let mut tail_only = live.clone();
+    clear_pulse_tail(&mut tail_only);
+    assert_resealed_refusal(&mut world, &live, tail_only);
+
+    let practice = world.practice.unwrap();
+    let mut mutated_opening = practice;
+    mutated_opening.range.as_mut().unwrap().opening.position[1] += 1.0;
+    let mut mutated_hit = practice;
+    mutated_hit.range.as_mut().unwrap().hits[1]
+        .as_mut()
+        .unwrap()
+        .firing_pose
+        .position[1] += 1.0;
+    // Both one-metre shifts still let the same ray hit the central 6m cube.
+    for mutated in [mutated_opening, mutated_hit] {
+        let mut bytes = Writer::new();
+        mutated.encode(&mut bytes);
+        let end = live.len() - 13;
+        let mut inconsistent = live.clone();
+        inconsistent[end - bytes.bytes.len()..end].copy_from_slice(&bytes.bytes);
+        assert_resealed_refusal(&mut world, &live, inconsistent);
+    }
+    let continued = World::from_save_bytes(&live).unwrap();
+    assert_eq!(continued.practice_snapshot(), world.practice_snapshot());
+    assert_eq!(
+        continued.pulse_laser_snapshot(),
+        world.pulse_laser_snapshot()
+    );
+}
+
+#[test]
+fn practice_hit_keeps_cooldown_floor_after_actual_hyperspace_retirement() {
+    let mut world = World::new_commander(611).unwrap();
+    consent(&mut world);
+    launch(&mut world);
+    for _ in 0..60 {
+        if world.snapshot().speed == 0.0 {
+            break;
+        }
+        world
+            .step(FlightInput {
+                brake: true,
+                ..FlightInput::default()
+            })
+            .unwrap();
+    }
+    world
+        .request_jump(SystemId::RENAS, world.snapshot().tick)
+        .unwrap();
+    for _ in 1..BASIC_SPOOL_TICKS {
+        step(&mut world, 1);
+    }
+    assert!(matches!(
+        shoot(&mut world).contact,
+        PulseContact::PracticeBeacon {
+            first_hit: true,
+            ..
+        }
+    ));
+    step(&mut world, 1);
+    assert_eq!(
+        world.practice_snapshot().unwrap().status,
+        PracticeStatus::Retired
+    );
+    assert_eq!(world.pulse_laser_snapshot().unwrap().cooldown_ticks, 17);
+    let live = world.save_bytes().unwrap();
+    let mut contradiction = live.clone();
+    clear_pulse_tail(&mut contradiction);
+    assert_resealed_refusal(&mut world, &live, contradiction);
+    let mut continued = World::from_save_bytes(&live).unwrap();
+    assert_eq!(continued.practice_snapshot(), world.practice_snapshot());
+    step(&mut continued, 17);
+    assert_eq!(continued.pulse_laser_snapshot().unwrap().cooldown_ticks, 0);
+    assert!(continued.save_bytes().is_ok());
+}

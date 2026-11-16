@@ -120,6 +120,10 @@ impl PulseResources {
             cooldown: PULSE_COOLDOWN_TICKS,
         })
     }
+    pub(super) fn remaining_cooldown(self) -> u8 {
+        self.cooldown
+    }
+
     pub(super) fn encode_save(self, w: &mut Writer) {
         w.u16(self.energy);
         w.u16(self.heat);
