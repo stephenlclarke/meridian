@@ -283,3 +283,66 @@ fn flight_lesson_cold_child() {
     action(&mut p, Action::Confirm);
     ok(p.prepare_quit());
 }
+
+#[test]
+fn normal_docked_launch_and_all_flight_views_keep_critical_rows_visible_at_minimum_size() {
+    fn visible(p: &Profile) {
+        let budget = crate::hud::line_budget(640, 360);
+        for notice in [None, Some("Actual input notice")] {
+            let lines = p.lines(true, notice);
+            assert!(
+                lines.len() <= budget,
+                "{} HUD rows exceed {budget}",
+                lines.len()
+            );
+            assert!(
+                lines
+                    .iter()
+                    .all(|line| line.len() <= crate::hud::MAX_COLUMNS)
+            );
+            let rendered = lines
+                .into_iter()
+                .take(budget)
+                .collect::<Vec<_>>()
+                .join("\n");
+            for control in [
+                "I MISSION DETAILS",
+                "C LESSON",
+                "F6/F12 REVIEW",
+                "F5 SAVE",
+                "F9 RELOAD SAVE",
+                "ESC SAVE AND QUIT",
+            ] {
+                assert!(
+                    rendered.contains(control),
+                    "Clipped critical control {control}"
+                );
+            }
+            assert!(rendered.contains(crate::flight_lesson::view_name(p.world.flight_view())));
+        }
+    }
+    let directory = Directory::new();
+    let mut p = directory.profile();
+    visible(&p);
+    action(&mut p, Action::ReviewFlightLesson);
+    action(&mut p, Action::Confirm);
+    visible(&p);
+    action(&mut p, Action::Launch);
+    visible(&p);
+    for _ in 0..600 {
+        if p.world.snapshot().mode == FlightMode::Flight {
+            break;
+        }
+        step(&mut p.world, FlightInput::default());
+    }
+    assert_eq!(p.world.snapshot().mode, FlightMode::Flight);
+    for view in [
+        FlightView::Front,
+        FlightView::Rear,
+        FlightView::Left,
+        FlightView::Right,
+    ] {
+        action(&mut p, Action::SetFlightView(view));
+        visible(&p);
+    }
+}

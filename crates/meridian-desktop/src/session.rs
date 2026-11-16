@@ -506,19 +506,16 @@ impl Session {
             FlightMode::Flight => "FLIGHT",
         };
         let mut lines = vec![format!(
-            "MERIDIAN | {name} | {mode} | {}",
+            "MERIDIAN | {name} | {mode} | {} | VIEW {}",
             if active {
                 "RUNNING"
             } else {
                 "PAUSED / UNFOCUSED"
-            }
+            },
+            crate::flight_lesson::view_name(world.flight_view())
         )];
         let review_line = self.review_line();
-        lines.push(
-            notice
-                .unwrap_or("CLICK THE FLIGHT VIEW TO FOCUS THE CONTROLS")
-                .to_string(),
-        );
+        lines.push(notice.map_or_else(|| crate::flight_lesson::line(world), str::to_string));
         if self.append_flight_lesson_panel(world, &mut lines) {
             return lines;
         }
@@ -554,7 +551,6 @@ impl Session {
             }
             return lines;
         }
-        lines.push(crate::flight_lesson::line(world));
         append_missile_panel(world, snapshot.mode, &mut lines);
         if let Some(line) = practice_line(world) {
             lines.push(line);
@@ -634,7 +630,7 @@ impl Session {
         lines.push(
             "O EQUIPMENT | M MARKET | G BUY | H SELL | F REFUEL | P PAUSE | F11 FULLSCREEN".into(),
         );
-        lines.push("I MISSION DETAILS | F5 SAVE | F9 RELOAD SAVE | ESC SAVE AND QUIT".into());
+        lines.push("I MISSION DETAILS | C LESSON | F6/F12 REVIEW | F5 SAVE | F9 RELOAD SAVE | ESC SAVE AND QUIT".into());
         lines
     }
 }
