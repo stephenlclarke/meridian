@@ -1,6 +1,6 @@
 //! Original T02 uncrewed practice provider for the current Avenor sortie.
 use super::{FlightMode, Snapshot, World, flight_pose};
-use crate::docking::{RigidPose, StationPose, Vec3};
+use crate::docking::{RigidPose, Vec3};
 use crate::navigation::{DockContext, NavigationState, SystemId};
 use crate::station::OriginalStationData;
 
