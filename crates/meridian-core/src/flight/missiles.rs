@@ -92,6 +92,7 @@ pub enum MissileContact {
         first_hit: bool,
     },
     Station,
+    Asteroid(crate::mining::AsteroidId),
     Player {
         front: bool,
     },
@@ -607,6 +608,13 @@ fn query_contact(
         .beam_block_distance(station, ray.position, ray.orientation.z, travel)
         .map_err(|_| StepError::NonFiniteState)?;
     let mut best = station_distance.map(|d| (d, MissileContact::Station));
+    if let Some(contact) = world.asteroid_beam_in_system(p.origin.owner.system, ray, travel) {
+        choose(
+            &mut best,
+            contact.distance,
+            MissileContact::Asteroid(contact.asteroid),
+        );
+    }
     if p.muzzle_cleared
         && prepared.pulse.alive()
         && let Some(d) = data
@@ -697,6 +705,8 @@ fn apply_contact(
                 practice.observe_ordinary_hit(hit);
             }
         }
+        // A physical rock stops the missile; it yields no mined material or station legal event.
+        MissileContact::Asteroid(_) => {}
         MissileContact::Projectile(id) => {
             for other in prepared.missiles.projectiles.iter_mut().flatten() {
                 if other.origin.projectile == id && other.ended.is_none() {
@@ -714,6 +724,7 @@ fn choose(best: &mut Option<(f64, MissileContact)>, distance: f64, contact: Miss
     fn order(contact: MissileContact) -> (u8, u64) {
         match contact {
             MissileContact::Station => (0, 0),
+            MissileContact::Asteroid(id) => (0, 1 + u64::from(id.ordinal())),
             MissileContact::Practice { id, .. } => (1, u64::from(id.ordinal())),
             MissileContact::Projectile(id) => (2, id.entity()),
             MissileContact::Player { .. } => (3, 0),

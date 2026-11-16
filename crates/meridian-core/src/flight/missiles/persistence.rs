@@ -100,6 +100,10 @@ fn contact(w: &mut Writer, c: MissileContact) {
             w.bool(first_hit);
         }
         MissileContact::Station => w.u8(1),
+        MissileContact::Asteroid(id) => {
+            w.u8(4);
+            w.u8(id.ordinal());
+        }
         MissileContact::Player { front } => {
             w.u8(2);
             w.bool(front);
@@ -119,6 +123,7 @@ fn read_contact(r: &mut Reader<'_>) -> Result<MissileContact, SaveError> {
         1 => MissileContact::Station,
         2 => MissileContact::Player { front: r.bool()? },
         3 => MissileContact::Projectile(ProjectileId::decode(r)?),
+        4 => MissileContact::Asteroid(crate::mining::AsteroidId::from_ordinal(r.u8()?)?),
         _ => return Err(SaveError::InvalidEncoding),
     })
 }
@@ -867,6 +872,13 @@ impl State {
             )
             .map_err(|_| INVALID)?;
         let mut best = station.map(|d| (d, MissileContact::Station));
+        if let Some(contact) = world.asteroid_beam_in_system(p.origin.owner.system, ray, travel) {
+            choose(
+                &mut best,
+                contact.distance,
+                MissileContact::Asteroid(contact.asteroid),
+            );
+        }
         if cleared
             && m.player_alive
             && let Some(d) = data

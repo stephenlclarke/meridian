@@ -86,7 +86,28 @@ impl StationMarkets {
         capacity: u16,
         historical_capacity: u16,
     ) -> Result<SavedServiceSummary, SaveError> {
+        self.validate_save_with_mining(owner, capacity, historical_capacity, [0; 16])
+    }
+    pub(crate) fn validate_save_with_mining(
+        &self,
+        owner: u64,
+        capacity: u16,
+        historical_capacity: u16,
+        mined: [u64; 16],
+    ) -> Result<SavedServiceSummary, SaveError> {
         let invalid = SaveError::InvalidState("market stock or accounting");
+        if CommodityId::ALL.into_iter().skip(1).any(|id| {
+            mined[id.index() - 1] != 0
+                && !matches!(
+                    id,
+                    CommodityId::Minerals
+                        | CommodityId::Alloys
+                        | CommodityId::Gold
+                        | CommodityId::Platinum
+                )
+        }) {
+            return Err(invalid);
+        }
         if owner == 0 || self.data.owner != owner {
             return Err(invalid);
         }
@@ -97,7 +118,7 @@ impl StationMarkets {
         let mut paid = food_summary.paid
             + u128::from(self.data.refilled_units) * u128::from(FUEL_PRICE_TENTHS);
         let mut gross_credit = food_summary.gross_credit;
-        let other = validate_other_markets(&self.data, historical_capacity)?;
+        let other = validate_other_markets(&self.data, historical_capacity, mined)?;
         bought += other.bought;
         sold += other.sold;
         paid += other.paid;
@@ -107,7 +128,7 @@ impl StationMarkets {
         if commodities::other_tonnes(other_commodities) + food > u128::from(capacity) {
             return Err(invalid);
         }
-        if sold > bought
+        if sold > bought + mined.into_iter().map(u128::from).sum::<u128>()
             || bought + sold + u128::from(self.data.refills) != u128::from(self.data.revision)
             || u128::from(self.data.refilled_units)
                 > u128::from(self.data.refills) * u128::from(STOCK_FUEL_TENTHS)
@@ -150,6 +171,7 @@ struct OtherSummary {
 fn validate_other_markets(
     data: &MarketData,
     historical_capacity: u16,
+    mined: [u64; 16],
 ) -> Result<OtherSummary, SaveError> {
     let invalid = SaveError::InvalidState("native commodity stock or accounting");
     let mut other_commodities = [0; 16];
@@ -182,7 +204,7 @@ fn validate_other_markets(
             paid += b * u128::from(seed.ask_tenths);
             gross_credit += s * u128::from(seed.bid_tenths);
         }
-        let held = commodity_bought
+        let held = (commodity_bought + u128::from(mined[index]))
             .checked_sub(commodity_sold)
             .ok_or(invalid)?;
         if held > u128::from(MAX_MARKET_QUANTITY) {

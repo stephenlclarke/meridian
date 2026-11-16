@@ -1,4 +1,5 @@
 mod celestial;
+mod mining;
 mod navigation_trade;
 pub use navigation_trade::{
     NavigationTonneId, NavigationTradeAction, NavigationTradeAttemptSnapshot, NavigationTradeError,
@@ -161,6 +162,9 @@ pub struct World {
     missiles: missiles::State,
     ammunition: ammunition::State,
     modular: modular::State,
+    mining: crate::mining::State,
+    // Ephemeral capability identity. Never encoded or reconstructed from saved numeric fields.
+    mining_scope: std::sync::Arc<()>,
     navigation_trade: navigation_trade::State,
     flight_reception: flight_reception::State,
     practice: Option<practice::Practice>,
@@ -198,6 +202,8 @@ impl World {
             missiles: missiles::State::default(),
             ammunition: ammunition::State::default(),
             modular: modular::State::default(),
+            mining: crate::mining::State::default(),
+            mining_scope: std::sync::Arc::new(()),
             navigation_trade: navigation_trade::State::default(),
             flight_reception: flight_reception::State::default(),
             practice: None,
@@ -514,12 +520,18 @@ impl World {
                 next.mode = FlightMode::Docked;
                 next.speed = 0.0;
             } else {
-                if !data.motion_clear(before, after, angular_travel) {
+                let station_clear = data.motion_clear(before, after, angular_travel);
+                let asteroid_clear = self.mining_motion_clear(before, after, angular_travel);
+                if !station_clear || !asteroid_clear {
                     let mut stopped = self.state;
                     stopped.tick = next.tick;
                     stopped.speed = 0.0;
                     stopped.mode = FlightMode::Flight;
-                    stopped.motion_refusal = Some(MotionRefusal::StationContact);
+                    stopped.motion_refusal = Some(if station_clear {
+                        MotionRefusal::AsteroidContact
+                    } else {
+                        MotionRefusal::StationContact
+                    });
                     return self.publish_step(stopped);
                 }
                 next.mode = FlightMode::Flight;

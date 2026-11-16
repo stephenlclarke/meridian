@@ -96,7 +96,7 @@ const V11_CONTENT: &[u8] = concat!(
 .as_bytes();
 
 const CONTENT: &[u8] = concat!(
-    "meridian-world/rules/13;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
+    "meridian-world/rules/14;mining/avenor-belt-v1-native-custody;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -119,6 +119,12 @@ fn compiled_content_fingerprint(content: &[u8]) -> u64 {
     ] {
         bytes.extend((part.len() as u64).to_le_bytes());
         bytes.extend(part);
+    }
+    // Prior explicit readers retain their exact content boundary and absent belt state.
+    if content == CONTENT {
+        let mining = crate::mining::content_bytes();
+        bytes.extend((mining.len() as u64).to_le_bytes());
+        bytes.extend(mining);
     }
     checksum(&bytes)
 }
@@ -336,6 +342,7 @@ impl World {
             hit.encode(w)
         });
         self.pulse.encode_save(&mut w);
+        self.mining.encode(&mut w);
         let digest = checksum(&w.bytes);
         w.u64(digest);
         if w.bytes.len() > MAX_SAVE_BYTES {
@@ -456,6 +463,8 @@ impl World {
         };
         let mut candidate = Self {
             state,
+            mining: crate::mining::State::legacy_absent(),
+            mining_scope: std::sync::Arc::new(()),
             station_data: Some(station_data),
             navigation_catalogue: Some(
                 OriginalNavigation::bundled().map_err(|_| SaveError::ContentMismatch)?,
@@ -485,6 +494,12 @@ impl World {
             }
         }
         candidate.pulse = weapons::PulseResources::decode_save(&mut r)?;
+        if version >= 12 {
+            candidate.mining = crate::mining::State::decode(&mut r)?;
+        }
+        if version < 12 && candidate.state.motion_refusal == Some(MotionRefusal::AsteroidContact) {
+            return Err(SaveError::InvalidEncoding);
+        }
         if !r.finished() {
             return Err(SaveError::InvalidEncoding);
         }
@@ -525,6 +540,12 @@ impl World {
             .as_ref()
             .ok_or(SaveError::NoCommander)?;
         let station = self.station_data.as_ref().ok_or(SaveError::NoCommander)?;
+        self.mining.validate()?;
+        if self.mining.work_count() > self.combat.emissions {
+            return Err(SaveError::InvalidState(
+                "mining yield without ship discharge",
+            ));
+        }
         validate_flight(&self.state)?;
         if self.celestial_snapshot().is_some_and(|scene| {
             [scene.planet, scene.sun].into_iter().any(|body| {
@@ -538,6 +559,11 @@ impl World {
             return Err(SaveError::InvalidState(
                 "player intersects physical celestial surface",
             ));
+        }
+        let pose = super::flight_pose(self.state.position, self.state.orientation)
+            .ok_or(SaveError::InvalidState("mining flight pose"))?;
+        if !self.mining_motion_clear(pose, pose, 0.0) {
+            return Err(SaveError::InvalidState("saved hull intersects mining body"));
         }
         if self.state.station != Some(station.station_pose()) || self.state.navigation.is_some() {
             return Err(SaveError::InvalidState(
@@ -613,11 +639,20 @@ impl World {
         }
         session.validate_save(navigation.dock())?;
         let domain = account.validate_saved_domain(&session.state, nav, session.epoch())?;
-        let services = markets.validate_save(
-            nav.owner,
-            account.hold_capacity(),
-            account.equipment_state().historical_capacity(),
-        )?;
+        let services = if self.mining.work_count() == 0 {
+            markets.validate_save(
+                nav.owner,
+                account.hold_capacity(),
+                account.equipment_state().historical_capacity(),
+            )?
+        } else {
+            markets.validate_save_with_mining(
+                nav.owner,
+                account.hold_capacity(),
+                account.equipment_state().historical_capacity(),
+                self.mining.extracted_quantities(),
+            )?
+        };
         validate_accounting(
             domain,
             services,
@@ -632,6 +667,7 @@ impl World {
                 .extra_revisions
                 .checked_add(modular.revision)
                 .ok_or(SaveError::SequenceExhausted)?,
+            self.mining.work_count(),
         )?;
         if navigation
             .dock()
@@ -682,6 +718,7 @@ fn validate_accounting(
     penalties: u8,
     ammunition_paid: u32,
     ammunition_revisions: u64,
+    mining_work: u64,
 ) -> Result<(), SaveError> {
     let income = 7200_u128
         + u128::from(d.completed) * u128::from(crate::freight::REWARD_TENTHS)
@@ -715,6 +752,7 @@ fn validate_accounting(
                         .checked_sub(u64::from(d.consumed_missiles))
                         .ok_or(SaveError::InvalidState("missile fit revision"))?,
                 )
+                + u128::from(mining_work)
     {
         return Err(SaveError::InvalidState(
             "wallet, cargo, fuel or payment chronology",
@@ -741,6 +779,7 @@ pub(super) fn write_flight(w: &mut Writer, s: &Snapshot) {
         Some(MotionRefusal::StationContact) => 1,
         Some(MotionRefusal::EntryConditions) => 2,
         Some(MotionRefusal::CelestialContact) => 3,
+        Some(MotionRefusal::AsteroidContact) => 4,
     });
 }
 pub(super) fn read_flight(r: &mut Reader<'_>) -> Result<Snapshot, SaveError> {
@@ -759,6 +798,7 @@ pub(super) fn read_flight(r: &mut Reader<'_>) -> Result<Snapshot, SaveError> {
         1 => Some(MotionRefusal::StationContact),
         2 => Some(MotionRefusal::EntryConditions),
         3 => Some(MotionRefusal::CelestialContact),
+        4 => Some(MotionRefusal::AsteroidContact),
         _ => return Err(SaveError::InvalidEncoding),
     };
     Ok(Snapshot {
@@ -803,6 +843,11 @@ fn legacy_test_fixture(world: &World, version: u16) -> Result<Vec<u8>, SaveError
         &world.flight_reception,
         &Commerce::current(world),
     )?;
+    if world.mining.work_count() != 0 {
+        return Err(SaveError::InvalidState(
+            "depleted mining belt requires current format",
+        ));
+    }
     if world.modular != super::modular::State::default() {
         return Err(SaveError::UnsupportedVersion);
     }
@@ -962,7 +1007,10 @@ mod paid_missile_format_tests {
         assert_eq!(loaded.ammunition_snapshot(), world.ammunition_snapshot());
         assert_eq!(loaded.credits_tenths(), world.credits_tenths());
         let current = loaded.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
-        assert_eq!(u16::from_le_bytes([current[8], current[9]]), 13);
+        assert_eq!(
+            u16::from_le_bytes([current[8], current[9]]),
+            crate::save::SAVE_VERSION
+        );
         assert_ne!(old, current);
     }
 }

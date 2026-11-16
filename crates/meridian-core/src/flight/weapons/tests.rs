@@ -90,6 +90,49 @@ fn public_fitted_discharge_checks_flight_pause_tick_and_exact_recharge_cadence()
 }
 
 #[test]
+fn mining_profile_has_distinct_opening_heat_gate_and_shared_exact_energy_heat_and_cadence() {
+    let resources = PulseResources {
+        energy: 38000,
+        heat: 1150,
+        cooldown: 0,
+    };
+    let mined = resources.prepare_mining_discharge().unwrap();
+    assert_eq!(
+        mined,
+        PulseResources {
+            energy: 37900,
+            heat: 1200,
+            cooldown: 18
+        }
+    );
+    let too_hot = PulseResources {
+        heat: 1151,
+        ..resources
+    };
+    assert_eq!(
+        too_hot.prepare_mining_discharge(),
+        Err(FireError::Overheated)
+    );
+    assert!(too_hot.prepare_discharge().is_ok());
+    assert_eq!(
+        PulseResources {
+            energy: 100,
+            ..resources
+        }
+        .prepare_mining_discharge(),
+        Err(FireError::InsufficientEnergy)
+    );
+    assert_eq!(
+        PulseResources {
+            cooldown: 1,
+            ..resources
+        }
+        .prepare_mining_discharge(),
+        Err(FireError::CoolingDown)
+    );
+}
+
+#[test]
 fn public_cadence_reaches_overheat_then_resumes_only_after_sufficient_flight_cooling() {
     let mut world = World::new_commander(601).unwrap();
     launch(&mut world);

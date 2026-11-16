@@ -1,5 +1,7 @@
 # Meridian
 
+Background [asteroid-mining core source](docs/ASTEROID-MINING.md) is under development. Its paid-tool, chart/render and runtime acceptance joins remain pending; it is separate from the next HUD, docked-menu and modular-equipment preview.
+
 [![CI](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=alert_status)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=coverage)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)

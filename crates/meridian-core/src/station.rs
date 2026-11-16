@@ -28,6 +28,7 @@ pub enum FlightMode {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MotionRefusal {
     StationContact,
+    AsteroidContact,
     EntryConditions,
     CelestialContact,
 }
@@ -348,6 +349,57 @@ impl OriginalStationData {
     /// Conservative continuous hull envelope against every native station triangle.
     /// Rotational displacement is bounded by radius*total angular travel, not endpoint sampling.
     pub fn motion_clear(&self, start: RigidPose, end: RigidPose, angular_travel: f64) -> bool {
+        self.motion_clear_geometry(
+            start,
+            end,
+            angular_travel,
+            (self.station.minimum, self.station.maximum),
+            self.station.faces.iter().map(|face| {
+                [
+                    self.station.vertices[face[0]],
+                    self.station.vertices[face[1]],
+                    self.station.vertices[face[2]],
+                ]
+            }),
+        )
+    }
+    pub(crate) fn asteroid_motion_clear(
+        &self,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+        body: crate::mining::AsteroidSnapshot,
+    ) -> bool {
+        let low = body.vertices.iter().fold(
+            Vec3::new(f64::INFINITY, f64::INFINITY, f64::INFINITY),
+            |a, b| Vec3::new(a.x.min(b.x), a.y.min(b.y), a.z.min(b.z)),
+        );
+        let high = body.vertices.iter().fold(
+            Vec3::new(f64::NEG_INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY),
+            |a, b| Vec3::new(a.x.max(b.x), a.y.max(b.y), a.z.max(b.z)),
+        );
+        self.motion_clear_geometry(
+            start,
+            end,
+            angular_travel,
+            (low, high),
+            crate::mining::ASTEROID_FACES.into_iter().map(|face| {
+                [
+                    body.vertices[face[0]],
+                    body.vertices[face[1]],
+                    body.vertices[face[2]],
+                ]
+            }),
+        )
+    }
+    fn motion_clear_geometry(
+        &self,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+        bounds: (Vec3, Vec3),
+        mut triangles: impl Iterator<Item = [Vec3; 3]>,
+    ) -> bool {
         if !finite(start.position)
             || !finite(end.position)
             || !start.orientation.is_valid_rotation()
@@ -413,27 +465,16 @@ impl OriginalStationData {
             ),
             add(high, Vec3::new(padding, padding, padding)),
         );
-        if swept_high.x < self.station.minimum.x
-            || swept_low.x > self.station.maximum.x
-            || swept_high.y < self.station.minimum.y
-            || swept_low.y > self.station.maximum.y
-            || swept_high.z < self.station.minimum.z
-            || swept_low.z > self.station.maximum.z
+        if swept_high.x < bounds.0.x
+            || swept_low.x > bounds.1.x
+            || swept_high.y < bounds.0.y
+            || swept_low.y > bounds.1.y
+            || swept_high.z < bounds.0.z
+            || swept_low.z > bounds.1.z
         {
             return true;
         }
-        !self.station.faces.iter().any(|face| {
-            swept_box_hits_triangle(
-                center,
-                half,
-                movement,
-                [
-                    self.station.vertices[face[0]],
-                    self.station.vertices[face[1]],
-                    self.station.vertices[face[2]],
-                ],
-            )
-        })
+        !triangles.any(|triangle| swept_box_hits_triangle(center, half, movement, triangle))
     }
     fn numeric_margin(&self, start: RigidPose, end: RigidPose) -> f64 {
         let scale = start
