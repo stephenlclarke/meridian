@@ -314,8 +314,18 @@ mod tests {
             .unwrap_or_else(|e| panic!("{e}"));
         let mut profile = open(directory);
         profile.continue_saved().unwrap_or_else(|e| panic!("{e}"));
+        // Continue intentionally invalidates prior UI reviews. The whole encoded
+        // state must match the public loader's one transition, not the old file.
+        let continued_before = World::from_save_bytes(&before)
+            .unwrap_or_else(|e| panic!("{e}"))
+            .save_bytes()
+            .unwrap_or_else(|e| panic!("{e}"));
         assert_eq!(
             profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}")),
+            continued_before
+        );
+        assert_eq!(
+            fs::read(directory.join("commander.meridian")).unwrap_or_else(|e| panic!("{e}")),
             before
         );
         assert!(profile.world.mission_snapshot().is_some_and(|m| m.paused));
@@ -333,6 +343,10 @@ mod tests {
                 .count(),
             1
         );
+        let expected = World::from_save_bytes(&expected)
+            .unwrap_or_else(|e| panic!("{e}"))
+            .save_bytes()
+            .unwrap_or_else(|e| panic!("{e}"));
         profile
             .world
             .request_pause(false, profile.world.snapshot().tick)
@@ -397,6 +411,15 @@ mod tests {
         let expected = profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
         fs::write(directory.0.join("expected-after-tick.meridian"), &expected)
             .unwrap_or_else(|e| panic!("{e}"));
+        let expected_missiles = profile.world.missile_snapshot();
+        let expected_practice = profile.world.practice_snapshot();
+        let expected_combat = profile.world.combat_snapshot();
+        let expected_flight = profile.world.snapshot();
+        let expected_mission = profile.world.mission_snapshot();
+        let continued_expected = World::from_save_bytes(&expected)
+            .unwrap_or_else(|e| panic!("{e}"))
+            .save_bytes()
+            .unwrap_or_else(|e| panic!("{e}"));
         drop(profile);
         let executable = std::env::current_exe().unwrap_or_else(|e| panic!("{e}"));
         let status = Command::new(executable)
@@ -409,12 +432,19 @@ mod tests {
             .status()
             .unwrap_or_else(|e| panic!("{e}"));
         assert!(status.success());
+        assert_eq!(
+            fs::read(directory.0.join("commander.meridian")).unwrap_or_else(|e| panic!("{e}")),
+            continued_expected
+        );
         let mut cold = open(&directory.0);
         cold.continue_saved().unwrap_or_else(|e| panic!("{e}"));
-        assert_eq!(
-            cold.world.save_bytes().unwrap_or_else(|e| panic!("{e}")),
-            expected
-        );
+        // These expectations come directly from the uninterrupted producer,
+        // independently of the public-loader byte comparison in the child.
+        assert_eq!(cold.world.missile_snapshot(), expected_missiles);
+        assert_eq!(cold.world.practice_snapshot(), expected_practice);
+        assert_eq!(cold.world.combat_snapshot(), expected_combat);
+        assert_eq!(cold.world.snapshot(), expected_flight);
+        assert_eq!(cold.world.mission_snapshot(), expected_mission);
         let continued = cold
             .world
             .missile_snapshot()
