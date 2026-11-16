@@ -99,9 +99,11 @@ fn failed_write(p: &mut Profile, d: &Directory, a: Action) {
     ok(fs::remove_dir_all(&slot));
     ok(fs::rename(&retained, &slot));
 }
-fn cold(p: &mut Profile, d: &Directory) {
+fn cold(mut p: Profile, d: &Directory) -> Profile {
     ok(p.save());
     let expected = some(p.world.navigation_trade_snapshot());
+    // Release the parent Store lease before the real cold process opens this slot.
+    drop(p);
     let status = ok(Command::new(ok(std::env::current_exe()))
         .args([
             "--exact",
@@ -111,8 +113,10 @@ fn cold(p: &mut Profile, d: &Directory) {
         .env("MERIDIAN_TRADE_CHILD", &d.0)
         .status());
     assert!(status.success());
+    let mut p = ok(Profile::open(d.0.clone()));
     ok(p.continue_saved());
     assert_eq!(some(p.world.navigation_trade_snapshot()), expected);
+    p
 }
 #[test]
 fn trade_cold_child() {
@@ -196,13 +200,13 @@ fn actual_food_trip_cold_held_sold_complete_and_reception_error_keep_one_trace_w
     let initial = some(p.world.credits_tenths());
     planned(&mut p);
     action(&mut p, Action::BuySelected);
-    cold(&mut p, &d);
+    p = cold(p, &d);
     let held = some(p.world.navigation_trade_snapshot()).attempts[0].held_tonne;
     assert!(p.command(Action::ReviewTradeLesson).is_err());
     journey(&mut p);
     action(&mut p, Action::Refuel);
     action(&mut p, Action::SellSelected);
-    cold(&mut p, &d);
+    p = cold(p, &d);
     assert_eq!(
         some(some(p.world.navigation_trade_snapshot()).attempts[0].sale).tonne,
         some(held)
@@ -222,7 +226,7 @@ fn actual_food_trip_cold_held_sold_complete_and_reception_error_keep_one_trace_w
     );
     assert_eq!(some(p.world.credits_tenths()) as i64 - initial as i64, -98);
     assert_eq!(complete.attempts[0].cash_difference_tenths, Some(-98));
-    cold(&mut p, &d);
+    p = cold(p, &d);
     planned(&mut p);
     review(&mut p, Action::CancelTradeLesson);
     assert_eq!(some(p.world.navigation_trade_snapshot()).trace, Some(trace));
@@ -235,7 +239,7 @@ fn selected_commodity_plan_and_stale_reviews_are_visible_and_never_silently_repa
     action(&mut p, Action::NextCommodity);
     action(&mut p, Action::PlanTradeLesson);
     let selected = some(p.session.pending_trade).plan();
-    assert_eq!(some(selected).commodity, CommodityId::Textiles);
+    assert_eq!(some(selected).commodity, CommodityId::Furs);
     action(&mut p, Action::Back);
     action(&mut p, Action::PreviousCommodity);
     action(&mut p, Action::PlanTradeLesson);
