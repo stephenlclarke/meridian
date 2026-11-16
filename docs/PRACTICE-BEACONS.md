@@ -33,7 +33,7 @@ and ship-to-beacon physical collision remain open.
   unchanged, and an obstructed shot that cannot credit a beacon.
 - Verify active hit state across cold Continue and retirement after a real
   physical dock or jump. Verify a previously qualified v4 paid-bay and hot
-  laser save loads in an isolated copy under the v5 executable.
+  laser save loads in an isolated copy under the v6 executable.
 - Run the joined workspace tests and strict Clippy. The desktop regressions
   cover delayed consent publication, cancellation, a real save replacement
   refusal, and cold reopen.
