@@ -30,7 +30,7 @@ Native v8 station-hit/interception cold journeys were not repeated; their exact 
 
 ## GitHub preview distribution
 
-The human requested tagged GitHub prereleases for produced macOS and Windows previews, signed macOS binaries, automatic Conventional Commit versions and retention of only the newest three previews. The publisher is authored with offline version/retention/download-verification regressions. Independent review and actual publication remain pending. There were no existing GitHub releases or tags at the first inspection. Platform owners are preparing portable archives; the unresolved hexf-parse notice remains an internal-only distribution blocker. Windows signing identity availability is being checked; no certificate purchase or service enrollment is authorized.
+The human requested tagged GitHub prereleases for produced macOS and Windows previews, signed macOS binaries, automatic Conventional Commit versions and retention of only the newest three previews. The publisher has passed independent source review and nine offline version/retention/download-verification and publication-order regressions. Actual publication remains pending. There were no existing GitHub releases or tags at the first inspection. Platform owners are preparing portable archives; the unresolved hexf-parse notice remains an internal-only distribution blocker. Windows signing identity availability is being checked; no certificate purchase or service enrollment is authorized.
 
 ## Save compatibility
 
