@@ -70,6 +70,7 @@ struct App {
     error: Option<String>,
     notice: Option<String>,
     pulse: Option<PulseShot>,
+    missile_bodies: Vec<meridian_core::ProjectileSnapshot>,
 }
 
 impl App {
@@ -89,6 +90,7 @@ impl App {
             error: None,
             notice: None,
             pulse: None,
+            missile_bodies: Vec::with_capacity(crate::mesh::MAX_MISSILE_PROJECTILES),
         })
     }
 
@@ -321,6 +323,13 @@ impl App {
             .game
             .playing()
             .then(|| crate::hud::cockpit::Cockpit::capture(&self.game.world, snapshot));
+        self.missile_bodies.clear();
+        self.missile_bodies.extend(
+            self.game
+                .world
+                .missile_projectiles()
+                .filter(|p| p.ended.is_none()),
+        );
         if let Some(renderer) = &mut self.renderer {
             let mode = match snapshot.mode {
                 FlightMode::Docked => "DOCKED - L launch",
@@ -361,7 +370,7 @@ impl App {
                 &snapshot,
                 station,
                 self.pulse.as_ref(),
-                self.game.world.missile_snapshot().as_ref(),
+                &self.missile_bodies,
                 practice.as_ref().and_then(|state| state.beacons.as_ref()),
                 HudScene {
                     lines: &hud_lines,

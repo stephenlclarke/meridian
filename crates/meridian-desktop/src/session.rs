@@ -11,6 +11,7 @@ use meridian_core::{
 
 #[derive(Clone, Copy)]
 pub enum Action {
+    Ammunition(meridian_core::AmmunitionAction),
     ReviewTradeLesson,
     PlanTradeLesson,
     CancelTradeLesson,
@@ -287,6 +288,9 @@ impl Session {
             return Ok("Practice review cancelled.".into());
         }
         match action {
+            Action::Ammunition(_) => {
+                Err("Equipment changes require the durable profile path".into())
+            }
             Action::ReviewTradeLesson | Action::PlanTradeLesson | Action::CancelTradeLesson => {
                 self.review_trade_lesson(world, action)
             }
@@ -728,11 +732,11 @@ impl Session {
 
 fn append_missile_panel(world: &World, mode: FlightMode, lines: &mut Vec<String>) {
     if let Some(missiles) = world.missile_snapshot() {
-        let remaining = missiles.rounds.iter().flatten().count();
-        let pending = missiles
-            .projectiles
-            .iter()
-            .flatten()
+        let remaining = world
+            .missile_rounds()
+            .map_or(0, |rounds| rounds.iter().flatten().count());
+        let pending = world
+            .missile_projectiles()
             .filter(|p| p.ended.is_none())
             .count();
         let lock = missiles.lock.map_or_else(
@@ -741,7 +745,7 @@ fn append_missile_panel(world: &World, mode: FlightMode, lines: &mut Vec<String>
         );
         if mode == FlightMode::Flight {
             lines.push(format!(
-                "MISSILES {remaining}/3 | {} | LOCK {lock} | IN FLIGHT {pending} | COOLDOWN {}",
+                "MISSILES {remaining}/9 | {} | LOCK {lock} | IN FLIGHT {pending} | COOLDOWN {}",
                 if missiles.armed { "ARMED" } else { "SAFE" },
                 missiles.cooldown_ticks
             ));

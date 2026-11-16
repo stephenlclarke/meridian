@@ -272,7 +272,7 @@ impl Renderer {
         snapshot: &Snapshot,
         station: Option<StationScene<'_>>,
         pulse: Option<&PulseShot>,
-        missiles: Option<&meridian_core::MissileSnapshot>,
+        missiles: &[meridian_core::ProjectileSnapshot],
         practice: Option<&[PracticeBeaconSnapshot; 3]>,
         hud: HudScene<'_>,
     ) -> Result<(), String> {
@@ -320,7 +320,7 @@ impl Renderer {
         if let (Some(station), Some(beacons)) = (station, practice) {
             mesh::append_practice_beacons(snapshot, station, beacons, &mut self.frame)?;
         }
-        if let (Some(station), Some(missiles)) = (station, missiles) {
+        if let Some(station) = station {
             mesh::append_missiles(snapshot, station, missiles, &mut self.frame)?;
         }
         if let (Some(station), Some(shot)) = (station, pulse) {

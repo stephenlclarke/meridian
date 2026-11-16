@@ -189,13 +189,14 @@ pub fn append_practice_beacons(
     Ok(())
 }
 
-// Three finite projectiles, each original eight-face mesh triangulated to ten triangles.
-pub const MISSILE_VERTEX_COUNT: usize = 3 * 10 * 3;
+// Every retained launch has a checked u8 ordinal; each mesh has ten triangles.
+pub const MAX_MISSILE_PROJECTILES: usize = u8::MAX as usize + 1;
+pub const MISSILE_VERTEX_COUNT: usize = MAX_MISSILE_PROJECTILES * 10 * 3;
 
 pub fn append_missiles(
     snapshot: &Snapshot,
     station: StationRender<'_>,
-    missiles: &meridian_core::MissileSnapshot,
+    missiles: &[meridian_core::ProjectileSnapshot],
     output: &mut Vec<Vertex>,
 ) -> Result<(), String> {
     let camera = camera_for(snapshot, station)?;
@@ -213,12 +214,7 @@ pub fn append_missiles(
             }
         }
     }
-    for projectile in missiles
-        .projectiles
-        .iter()
-        .flatten()
-        .filter(|p| p.ended.is_none())
-    {
+    for projectile in missiles.iter().filter(|p| p.ended.is_none()) {
         append_mesh(
             &vertices,
             RigidPose {
@@ -459,9 +455,7 @@ mod tests {
             append_missiles(
                 &snapshot,
                 station,
-                &world
-                    .missile_snapshot()
-                    .unwrap_or_else(|| panic!("Expected missile_snapshot")),
+                &world.missile_projectiles().collect::<Vec<_>>(),
                 &mut frame,
             )
             .unwrap_or_else(|error| panic!("{error}"));

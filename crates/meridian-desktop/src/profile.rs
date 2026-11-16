@@ -74,6 +74,29 @@ impl Profile {
         if !self.playing {
             return Err("N starts a new commander; C continues the existing save".into());
         }
+        if let Action::Ammunition(command) = action {
+            let tick = self.world.snapshot().tick;
+            let review = self
+                .world
+                .review_ammunition(command, tick)
+                .map_err(|e| e.to_string())?;
+            let prepared = self
+                .world
+                .prepare_ammunition(review, tick)
+                .map_err(|e| e.to_string())?;
+            let item = prepared.item();
+            let published = self
+                .store
+                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .map_err(|e| format!("Missile equipment change could not be saved: {e}"))?;
+            prepared.commit();
+            self.has_save = true;
+            self.session.invalidate();
+            return publication_message(
+                published,
+                format!("Missile item {item} updated and saved."),
+            );
+        }
         if let Some(command) = self.session.station_service_command(action) {
             let tick = self.world.snapshot().tick;
             let prepared = self
@@ -299,9 +322,9 @@ mod tests {
         path::Path,
         process::Command,
     };
-    struct TestDirectory(PathBuf);
+    pub(super) struct TestDirectory(pub(super) PathBuf);
     impl TestDirectory {
-        fn new() -> Self {
+        pub(super) fn new() -> Self {
             let nonce = RandomState::new().build_hasher().finish();
             let path = std::env::temp_dir().join(format!(
                 "meridian-profile-test-{}-{nonce:016x}",
@@ -316,10 +339,10 @@ mod tests {
             let _ = fs::remove_dir_all(&self.0);
         }
     }
-    fn open(path: &Path) -> Profile {
+    pub(super) fn open(path: &Path) -> Profile {
         Profile::open(path.to_path_buf()).unwrap_or_else(|e| panic!("{e}"))
     }
-    fn action(profile: &mut Profile, value: Action) {
+    pub(super) fn action(profile: &mut Profile, value: Action) {
         profile.command(value).unwrap_or_else(|e| panic!("{e}"));
     }
     fn travel(profile: &mut Profile) {
@@ -933,3 +956,7 @@ fn publication_message(published: SaveCommit, message: String) -> Result<String,
 
 #[cfg(test)]
 mod trade_lesson_tests;
+
+#[cfg(test)]
+#[path = "profile/ammunition_tests.rs"]
+mod ammunition_tests;

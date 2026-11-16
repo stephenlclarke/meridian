@@ -9,7 +9,11 @@ const GREEN: [f32; 3] = [0.0, 1.0, 0.0];
 const BLUE: [f32; 3] = [68.0 / 255.0, 136.0 / 255.0, 1.0];
 const RED: [f32; 3] = [1.0, 0.0, 0.0];
 const CYAN: [f32; 3] = [0.0, 1.0, 1.0];
-pub const MAX_VERTICES: usize = 30_000;
+// Projectile IDs use a checked u8 ordinal. Include every possible retained launch,
+// plus the station and three practice bodies, without allocating contacts each frame.
+pub const MAX_CONTACTS: usize = 4 + crate::mesh::MAX_MISSILE_PROJECTILES;
+// Two line quads per additional scanner contact; eight edges per added pylon icon.
+pub const MAX_VERTICES: usize = 30_000 + (MAX_CONTACTS - 7) * 12 + (9 - 3) * 8 * 6;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Cockpit {
@@ -24,7 +28,7 @@ pub struct Cockpit {
     pub locked: bool,
     pub destroyed: bool,
     /// Player-relative contacts in front flight coordinates, independent of selected camera.
-    pub contacts: [Option<([f32; 3], [f32; 3])>; 7],
+    pub contacts: [Option<([f32; 3], [f32; 3])>; MAX_CONTACTS],
     pub station: Option<[f32; 3]>,
 }
 impl Cockpit {
@@ -34,19 +38,18 @@ impl Cockpit {
         let laser = world.pulse_laser_snapshot();
         let missile = world.missile_snapshot();
         let station = flight.station.map(|s| relative(flight, s.pose.position));
-        let mut contacts = [None; 7];
+        let mut contacts = [None; MAX_CONTACTS];
         contacts[0] = station.map(|position| (position, GREEN));
         if let Some(beacons) = world.practice_snapshot().and_then(|p| p.beacons) {
             for (i, b) in beacons.into_iter().enumerate() {
                 contacts[i + 1] = Some((relative(flight, b.pose.position), CYAN));
             }
         }
-        if let Some(m) = missile {
-            for (i, p) in m.projectiles.into_iter().enumerate() {
-                contacts[i + 4] = p
-                    .filter(|p| p.ended.is_none())
-                    .map(|p| (relative(flight, p.position), RED));
-            }
+        for (contact, projectile) in contacts[4..]
+            .iter_mut()
+            .zip(world.missile_projectiles().filter(|p| p.ended.is_none()))
+        {
+            *contact = Some((relative(flight, projectile.position), RED));
         }
         Self {
             flight,
@@ -69,7 +72,9 @@ impl Cockpit {
             fuel: flight.navigation.map(|n| {
                 f32::from(n.fuel_units) / f32::from(meridian_core::navigation::FUEL_CAPACITY)
             }),
-            missiles: missile.map_or(0, |m| m.rounds.iter().flatten().count()),
+            missiles: world
+                .missile_rounds()
+                .map_or(0, |rounds| rounds.iter().flatten().count()),
             armed: missile.is_some_and(|m| m.armed),
             locked: missile.is_some_and(|m| m.lock.is_some()),
             destroyed: combat.is_some_and(|c| c.player.destroyed),
@@ -474,6 +479,49 @@ mod tests {
     use meridian_core::FlightInput;
     fn world() -> World {
         World::new_commander(90011).unwrap_or_else(|error| panic!("{error}"))
+    }
+    #[test]
+    fn paid_round_in_ninth_pylon_is_not_hidden_by_three_slot_snapshot_prefix() {
+        let mut world = world();
+        let review = world
+            .review_ammunition(meridian_core::AmmunitionAction::Purchase, 0)
+            .unwrap_or_else(|error| panic!("{error}"));
+        let prepared = world
+            .prepare_ammunition(review, 0)
+            .unwrap_or_else(|error| panic!("{error}"));
+        let item = prepared.commit();
+        for action in [
+            meridian_core::AmmunitionAction::Store { item },
+            meridian_core::AmmunitionAction::Refit { item, pylon: 8 },
+        ] {
+            let review = world
+                .review_ammunition(action, 0)
+                .unwrap_or_else(|error| panic!("{error}"));
+            world
+                .prepare_ammunition(review, 0)
+                .unwrap_or_else(|error| panic!("{error}"))
+                .commit();
+        }
+        let before = world.save_bytes().unwrap_or_else(|error| panic!("{error}"));
+        assert_eq!(
+            world
+                .missile_snapshot()
+                .unwrap_or_else(|| panic!("snapshot"))
+                .rounds
+                .iter()
+                .flatten()
+                .count(),
+            3
+        );
+        let cockpit = Cockpit::capture(&world, world.snapshot());
+        assert_eq!(cockpit.missiles, 4);
+        let mut vertices = Vec::with_capacity(super::super::MAX_VERTICES);
+        append(&cockpit, 640, 360, &mut vertices);
+        assert!(vertices.len() <= MAX_VERTICES);
+        assert_eq!(
+            world.save_bytes().unwrap_or_else(|error| panic!("{error}")),
+            before
+        );
     }
     #[test]
     fn fresh_instruments_are_world_owned_and_rendering_cannot_change_save() {
