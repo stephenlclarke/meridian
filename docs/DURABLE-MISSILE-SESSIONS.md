@@ -2,7 +2,7 @@
 
 ## Status and scope
 
-This source slice starts at merged finite-missile main `d5be89b9b1a515e9185d450687a558b20d9e1e7d`. Version 8 replaces the core's deliberate missile save refusal with a checked representation of the complete bounded session. The earlier installed preview remains untouched. Rust tests are authored and unrun in this source lane. Independent review, Root's desktop save/status join, G1 compilation and genuine host cold Save/Quit/Continue remain required.
+This source slice starts at merged finite-missile main `d5be89b9b1a515e9185d450687a558b20d9e1e7d`. Version 8 replaces the core's deliberate missile save refusal with a checked representation of the complete bounded session. The earlier installed preview remains untouched. Rust tests are authored and unrun in this source lane. Root's desktop save/status notices and child-process live-missile continuation regression are joined source. Independent review, G1 compilation and genuine native cold Save/Quit/Continue remain required.
 
 This is persistence work. It does not qualify full T02, a live player hit, original-game parity, new missile targets, ammunition purchases or reloads.
 
@@ -39,3 +39,5 @@ Nine new public-journey and corruption tests cover explicit lock/arm and age-zer
 The existing funded paid-gear regression now continues the actual consumed session and still checks paid identity, cash, physical dock, unfit and no regrant. Existing old-stock coverage includes v8, and the old ordinary-impact test explicitly requests its v7 fixture.
 
 Run the reviewed joined source through the missile tests, full core suite, strict Clippy and `make ci` using the designated executors. Root must remove stale desktop save warnings and refusal assertions, preserve ordinary host publication rules, and exercise a new process at live, paused, ended and exhausted checkpoints. Bind all outputs to the actual joined commit/tree. Source formatting or serialization alone does not qualify the host cold journey.
+
+The joined desktop advertises F5 complete missile-session saving and F9 saved-state continuation while retaining explicit lock/arm/fire/safe controls. The existing host lease, temporary write, flush and atomic replacement are unchanged. An authored parent/child process regression saves a paused live missile, closes the owner, continues in a fresh process, checks exact saved state and compares the next unpaused tick with the original uninterrupted World. All opaque round and origin IDs remain unchanged. These new tests are unrun.
