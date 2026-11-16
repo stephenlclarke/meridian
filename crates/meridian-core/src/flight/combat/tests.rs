@@ -428,3 +428,151 @@ fn actual_v6_hot_practice_continues_without_inventing_impact_or_discarding_hits(
         continued.practice_reception_snapshot()
     );
 }
+
+fn reseal(bytes: &mut [u8]) {
+    let end = bytes.len() - 8;
+    let digest = crate::save::checksum(&bytes[..end]);
+    bytes[end..].copy_from_slice(&digest.to_le_bytes());
+}
+
+fn assert_atomic_saved_refusal(world: &mut World, live: &[u8], mut changed: Vec<u8>) {
+    reseal(&mut changed);
+    assert!(world.restore_bytes(&changed).is_err());
+    assert_eq!(world.save_bytes().unwrap().as_slice(), live);
+}
+
+#[test]
+fn resealed_station_receipt_requires_owned_pulse_resources_without_practice_anchor() {
+    let mut world = World::new_commander(1471).unwrap();
+    // Genuine docked ticks leave room for a one-field physical-clock forgery
+    // that still passes the old physical_tick <= global_tick bound.
+    step(&mut world, 10);
+    launch(&mut world);
+    aim_station(&mut world);
+    shoot(&mut world);
+    assert!(world.practice.is_none());
+    let hit = world.combat.last.unwrap();
+    assert_eq!(hit.tick, world.state.tick);
+    assert_eq!(hit.physical_tick, world.combat.physical_tick);
+    let laser = world.pulse_laser_snapshot().unwrap();
+    assert_eq!(laser.cooldown_ticks, 18);
+    let live = world.save_bytes().unwrap();
+    let pulse_start = live.len() - 13;
+    let mut reset = live.clone();
+    reset[pulse_start..pulse_start + 2].copy_from_slice(&38_000_u16.to_le_bytes());
+    reset[pulse_start + 2..pulse_start + 5].fill(0);
+    assert_atomic_saved_refusal(&mut world, &live, reset);
+
+    let mut heat_only = live.clone();
+    heat_only[pulse_start + 2..pulse_start + 4].copy_from_slice(&0_u16.to_le_bytes());
+    assert_atomic_saved_refusal(&mut world, &live, heat_only);
+    let mut energy_only = live.clone();
+    energy_only[pulse_start..pulse_start + 2].copy_from_slice(&38_000_u16.to_le_bytes());
+    assert_atomic_saved_refusal(&mut world, &live, energy_only);
+
+    let combat_start = pulse_start - crate::flight::persistence::combat_save_len(&world);
+    let mut clock_only = live.clone();
+    let later = world.combat.physical_tick + 1;
+    assert!(later <= world.state.tick);
+    clock_only[combat_start + 16..combat_start + 24].copy_from_slice(&later.to_le_bytes());
+    assert_atomic_saved_refusal(&mut world, &live, clock_only);
+
+    let mut continued = World::from_save_bytes(&live).unwrap();
+    assert_eq!(continued.pulse_laser_snapshot(), Some(laser));
+    assert_eq!(
+        continued.request_fire_front_pulse(hit.tick),
+        Err(FireError::CoolingDown)
+    );
+    // A later clear shot can legitimately replace laser resource evidence
+    // without refreshing the last ordinary incident or its station window.
+    stop(&mut continued);
+    let z = f64::from(continued.snapshot().position[2]);
+    aim_at(&mut continued, Vec3::new(0.0, 0.0, z + 6000.0));
+    assert_eq!(shoot(&mut continued).contact, PulseContact::Clear);
+    assert_eq!(continued.combat.last, Some(hit));
+    assert!(World::from_save_bytes(&continued.save_bytes().unwrap()).is_ok());
+    aim_at(&mut continued, Vec3::new(0.0, 0.0, 0.0));
+    for _ in 0..9000 {
+        let snapshot = continued.snapshot();
+        if snapshot.mode == FlightMode::Docked {
+            break;
+        }
+        let target_speed = if snapshot.position[2] > 2500.0 {
+            34.3
+        } else {
+            4.0
+        };
+        continued
+            .step(crate::FlightInput {
+                throttle: ((target_speed - snapshot.speed) / (9.1 / 60.0)).clamp(-1.0, 1.0),
+                ..crate::FlightInput::default()
+            })
+            .unwrap();
+        assert_eq!(continued.snapshot().motion_refusal, None);
+    }
+    assert_eq!(continued.snapshot().mode, FlightMode::Docked);
+    assert_eq!(
+        continued.pulse_laser_snapshot().unwrap().energy_hundredths,
+        38_000
+    );
+    assert_eq!(continued.pulse_laser_snapshot().unwrap().heat_fifths, 0);
+    assert_eq!(continued.combat.last, Some(hit));
+    assert!(World::from_save_bytes(&continued.save_bytes().unwrap()).is_ok());
+}
+
+#[test]
+fn resealed_last_station_window_cannot_be_refreshed_without_a_new_incident() {
+    let mut world = new_flight(1481);
+    shoot(&mut world);
+    let hit = world.combat.last.unwrap();
+    for _ in 0..3 {
+        step(&mut world, 200);
+    }
+    step(&mut world, 1);
+    assert_eq!(world.combat.physical_tick - hit.physical_tick, 601);
+    let live = world.save_bytes().unwrap();
+    let combat_start = live.len() - 13 - crate::flight::persistence::combat_save_len(&world);
+    let window = world.combat.windows[0].unwrap();
+    assert_eq!(window.physical_tick, hit.physical_tick);
+    assert_eq!(window.visit, hit.attacker.visit);
+    // Derive the one-field window location from the original encoded window
+    // prefix, not a replacement state or a recomputed whole combat block.
+    let mut prefix = Writer::new();
+    prefix.u64(world.combat.emissions);
+    prefix.u64(world.combat.incidents);
+    prefix.u64(world.combat.physical_tick);
+    prefix.u16(world.combat.front);
+    prefix.u16(world.combat.rear);
+    prefix.u8(world.combat.penalties);
+    prefix.bool(world.combat.unbound_player_impact);
+    prefix.bool(true);
+    prefix.u64(window.visit);
+    let window_time = combat_start + prefix.bytes.len();
+    assert_eq!(
+        &live[window_time..window_time + 8],
+        &hit.physical_tick.to_le_bytes()
+    );
+    let mut refreshed = live.clone();
+    refreshed[window_time..window_time + 8]
+        .copy_from_slice(&world.combat.physical_tick.to_le_bytes());
+    assert_atomic_saved_refusal(&mut world, &live, refreshed);
+    assert_eq!(world.legal_value(), Some(64));
+    assert_eq!(world.combat.last, Some(hit));
+    let mut continued = World::from_save_bytes(&live).unwrap();
+    shoot(&mut continued);
+    assert_eq!(continued.legal_value(), Some(128));
+    assert!(continued.combat.last.unwrap().incident > hit.incident);
+    assert!(World::from_save_bytes(&continued.save_bytes().unwrap()).is_ok());
+
+    // A different real visit may retain an earlier station's exact window.
+    // Equality binds to that incident's visit, not the current navigation visit.
+    continued
+        .request_jump(SystemId::RENAS, continued.snapshot().tick)
+        .unwrap();
+    for _ in 0..crate::navigation::BASIC_SPOOL_TICKS {
+        step(&mut continued, 1);
+    }
+    let previous = continued.combat.last.unwrap();
+    assert!(previous.attacker.visit < continued.snapshot().navigation.unwrap().visit);
+    assert!(World::from_save_bytes(&continued.save_bytes().unwrap()).is_ok());
+}

@@ -139,6 +139,35 @@ impl PulseResources {
             && u128::from(self.heat) <= maximum_reachable_heat(tick, elapsed)
     }
 
+    /// An accepted station hit proves an actual Pulse discharge independently
+    /// of practice consent. Before its cooldown ends no later Pulse is possible.
+    pub(super) fn fits_ordinary_hit(self, elapsed_physical: u64, uninterrupted: bool) -> bool {
+        let remaining = u64::from(PULSE_COOLDOWN_TICKS).saturating_sub(elapsed_physical);
+        if u64::from(self.cooldown) < remaining
+            || (elapsed_physical < u64::from(PULSE_COOLDOWN_TICKS)
+                && u64::from(self.cooldown) != remaining)
+        {
+            return false;
+        }
+        if uninterrupted {
+            let heat_floor = u64::from(HEAT_COST_FIFTHS).saturating_sub(elapsed_physical);
+            if u64::from(self.heat) < heat_floor {
+                return false;
+            }
+            if elapsed_physical < u64::from(PULSE_COOLDOWN_TICKS) {
+                // No intervening docking reset or other legal shot can refill
+                // or debit this pool during the original shot's cooldown.
+                let energy = (u64::from(ENERGY_CAPACITY_HUNDREDTHS - ENERGY_COST_HUNDREDTHS)
+                    + elapsed_physical * u64::from(ENERGY_RECHARGE_HUNDREDTHS))
+                .min(u64::from(ENERGY_CAPACITY_HUNDREDTHS));
+                if u64::from(self.energy) != energy {
+                    return false;
+                }
+            }
+        }
+        true
+    }
+
     pub(super) fn encode_save(self, w: &mut Writer) {
         w.u16(self.energy);
         w.u16(self.heat);

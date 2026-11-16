@@ -222,9 +222,25 @@ impl State {
             {
                 return Err(invalid);
             }
+            let elapsed_global = world.state.tick - hit.tick;
+            let elapsed_physical = self.physical_tick - hit.physical_tick;
+            let uninterrupted =
+                hit.attacker.visit == identity.visit && world.state.mode == FlightMode::Flight;
+            // The physical clock advances only on a subset of global steps.
+            // At the receipt's own tick neither clock can have moved past it.
+            if elapsed_physical > elapsed_global
+                || (elapsed_global == 0 && !uninterrupted)
+                || !world
+                    .pulse
+                    .fits_ordinary_hit(elapsed_physical, uninterrupted)
+            {
+                return Err(invalid);
+            }
             let window =
                 self.windows[station_index(hit.attacker.system).ok_or(invalid)?].ok_or(invalid)?;
-            if window.visit < hit.attacker.visit || window.physical_tick < hit.physical_tick {
+            // Every refresh is an accepted ordinary incident and replaces last.
+            // Its own station window therefore has exactly the same endpoint.
+            if window.visit != hit.attacker.visit || window.physical_tick != hit.physical_tick {
                 return Err(invalid);
             }
         }
