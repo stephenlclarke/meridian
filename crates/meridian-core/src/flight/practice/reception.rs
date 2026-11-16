@@ -31,6 +31,7 @@ pub struct PracticeReceptionSnapshot {
     pub quiet_ticks: u16,
     pub ready: bool,
     pub trace: Option<PracticeTrace>,
+    pub ordinary_hit: Option<crate::OrdinaryImpact>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -53,9 +54,18 @@ impl Range {
 }
 
 impl Practice {
+    pub(in crate::flight) fn reception_is_terminal(self) -> bool {
+        self.reception.completion.is_some()
+    }
+    pub(in crate::flight) fn clear_failed_reception(&mut self) {
+        self.reception.anchor = None;
+    }
     /// The active range is pinned to one uninterrupted Avenor flight visit.
     /// Neither a docked step nor the step that ends that visit earns quiet time.
     fn quiet_ticks(self, tick: u64) -> u16 {
+        if self.ordinary_hit.is_some() {
+            return 0;
+        }
         let Some(anchor) = self.reception.anchor else {
             return 0;
         };
@@ -66,7 +76,8 @@ impl Practice {
     }
 
     pub(super) fn observe_quiet_step(&mut self, tick: u64) {
-        if self.reception.anchor.is_none()
+        if self.ordinary_hit.is_none()
+            && self.reception.anchor.is_none()
             && self.active_range().and_then(Range::third_hit).is_some()
         {
             // A v5 save has receipts, but no proven interval. Start at the
@@ -76,7 +87,10 @@ impl Practice {
     }
 
     pub(in crate::flight) fn observe_discharge(&mut self, tick: u64) {
-        if self.reception.completion.is_none() && self.range.and_then(Range::third_hit).is_some() {
+        if self.ordinary_hit.is_none()
+            && self.reception.completion.is_none()
+            && self.range.and_then(Range::third_hit).is_some()
+        {
             self.reception.anchor = Some(tick);
         }
     }
@@ -98,6 +112,7 @@ impl Practice {
     pub(super) fn reception_snapshot(self, tick: u64) -> PracticeReceptionSnapshot {
         let quiet_ticks = self.quiet_ticks(tick);
         PracticeReceptionSnapshot {
+            ordinary_hit: self.ordinary_hit,
             quiet_ticks,
             ready: quiet_ticks == PRACTICE_QUIET_TICKS && self.reception.completion.is_none(),
             trace: self.reception.completion.map(|completed| PracticeTrace {
@@ -127,6 +142,19 @@ impl Practice {
         current_dock: Option<DockContext>,
     ) -> Result<(), SaveError> {
         let invalid = SaveError::InvalidState("T02 ceasefire or reception");
+        if let Some(hit) = self.ordinary_hit {
+            if self.reception.anchor.is_some()
+                || self.reception.completion.is_some()
+                || hit.attacker.owner != self.consent.owner().seed()
+                || hit.attacker.hull != self.consent.ship().ordinal()
+                || hit.attacker.visit <= self.consent.visit()
+                || hit.tick < self.confirmed_tick
+                || hit.tick > flight.tick
+            {
+                return Err(invalid);
+            }
+            return Ok(());
+        }
         let Some(anchor) = self.reception.anchor else {
             return if self.reception.completion.is_none() {
                 Ok(())

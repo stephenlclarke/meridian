@@ -24,6 +24,7 @@ pub enum FireError {
     Overheated,
     InsufficientEnergy,
     InvalidGeometry,
+    SequenceExhausted,
 }
 impl fmt::Display for FireError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -36,6 +37,7 @@ impl fmt::Display for FireError {
             Self::CoolingDown => "Pulse Laser is cooling down",
             Self::Overheated => "Pulse Laser is overheated",
             Self::InsufficientEnergy => "Pulse Laser has insufficient energy",
+            Self::SequenceExhausted => "Combat identity sequence exhausted",
             Self::InvalidGeometry => "Pulse Laser could not query the physical scene",
         })
     }
@@ -104,7 +106,7 @@ impl PulseResources {
             self.heat = self.heat.saturating_sub(1);
         }
     }
-    fn prepare_discharge(self) -> Result<Self, FireError> {
+    pub(super) fn prepare_discharge(self) -> Result<Self, FireError> {
         if self.cooldown != 0 {
             return Err(FireError::CoolingDown);
         }
@@ -119,6 +121,9 @@ impl PulseResources {
             heat: self.heat + HEAT_COST_FIFTHS,
             cooldown: PULSE_COOLDOWN_TICKS,
         })
+    }
+    pub(super) fn damage_energy(&mut self, damage: u16) {
+        self.energy = self.energy.saturating_sub(damage);
     }
     pub(super) fn remaining_cooldown(self) -> u8 {
         self.cooldown
@@ -205,7 +210,7 @@ fn maximum_reachable_heat(tick: u64, elapsed_since_shot_at_least: u64) -> u128 {
 }
 
 impl World {
-    fn fitted_front_pulse(&self) -> Option<u64> {
+    pub(super) fn fitted_front_pulse(&self) -> Option<u64> {
         let nav = self.navigation?;
         let owner = nav.owner().seed();
         let hull = nav.ship().ordinal();
@@ -250,7 +255,7 @@ impl World {
         let fitted_item_id = self
             .fitted_front_pulse()
             .ok_or(FireError::NoFittedFrontPulseLaser)?;
-        let resources = self.pulse.prepare_discharge()?;
+        self.pulse.prepare_discharge()?;
         let pose = flight_pose(self.state.position, self.state.orientation)
             .ok_or(FireError::InvalidGeometry)?;
         let origin = pose.position;
@@ -262,8 +267,8 @@ impl World {
             .ok_or(FireError::InvalidGeometry)?
             .beam_block_distance(station, origin, direction, PULSE_RANGE)
             .map_err(|_| FireError::InvalidGeometry)?;
-        let practice_hit = self
-            .practice
+        let mut practice = self.practice;
+        let practice_hit = practice
             .as_mut()
             .and_then(|practice| practice.contact(self.state, pose, distance));
         let end_distance = practice_hit
@@ -286,18 +291,26 @@ impl World {
                 PulseContact::StationBlocked { distance }
             })
         };
-        if let Some(practice) = self.practice.as_mut() {
-            practice.observe_discharge(self.state.tick);
-        }
-        self.pulse = resources;
-        Ok(PulseShot {
+        let shot = PulseShot {
             tick: self.state.tick,
             fitted_item_id,
             origin,
             direction,
             end,
             contact,
-        })
+        };
+        let impact = self.prepare_pulse_impact(shot)?;
+        impact.commit(self)?;
+        if let (Some(candidate), Some(current)) = (&mut practice, self.practice) {
+            candidate.ordinary_hit = current.ordinary_hit;
+            candidate.reception = current.reception;
+        }
+        if let Some(practice) = practice.as_mut() {
+            practice.observe_discharge(self.state.tick);
+        }
+        self.practice = practice;
+
+        Ok(shot)
     }
 }
 

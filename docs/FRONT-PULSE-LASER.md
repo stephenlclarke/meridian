@@ -46,12 +46,7 @@ x=70, y=0 intersects the surface at z=136.32. The beam ends at the nearest
 triangle within range. Reported outcomes are a clear ray or a station
 obstruction in this bounded collision mesh.
 
-The current World lacks a live combat target roster with physical identity,
-qualified transformed target geometry, and health or impact ownership.
-Current station contacts are dock-service actors. A combat hit and its
-effects require those missing scene and damage bindings. The firing event
-therefore carries station contact geometry and no impact transaction,
-station damage, legal consequence, death or payout.
+The ordinary-impact predecessor now binds actual main-station contacts to original incident identity, legal consequences and permanent T02 failure. The original main-station damage guard admits no hull damage for this actor. A broader combat roster and actual missile launch remain later slices. See [the current ordinary-impact source contract](ORDINARY-IMPACTS.md). Compilation, tests and the failed-attempt desktop join are pending for that predecessor.
 
 Version 4 stores energy, heat and cooldown as five bytes following the
 existing market block. The original account, paid purchase receipt and

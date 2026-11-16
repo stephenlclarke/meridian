@@ -71,6 +71,7 @@ pub enum PracticeStatus {
     Consented,
     Active,
     Retired,
+    Failed,
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct PracticeBeaconSnapshot {
@@ -126,8 +127,27 @@ pub(super) struct Practice {
     range: Option<Range>,
     retired: Option<Retirement>,
     pub(super) reception: reception::Reception,
+    pub(super) ordinary_hit: Option<super::OrdinaryImpact>,
 }
 impl Practice {
+    pub(super) fn consent_visit(self) -> u64 {
+        self.consent.visit()
+    }
+    pub(super) fn confirmation_tick(self) -> u64 {
+        self.confirmed_tick
+    }
+    pub(super) fn observe_ordinary_hit(&mut self, hit: super::OrdinaryImpact) {
+        if self.ordinary_hit.is_none()
+            && !self.reception_is_terminal()
+            && hit.attacker.owner == self.consent.owner().seed()
+            && hit.attacker.hull == self.consent.ship().ordinal()
+            && hit.attacker.visit > self.consent.visit()
+            && hit.tick >= self.confirmed_tick
+        {
+            self.ordinary_hit = Some(hit);
+            self.clear_failed_reception();
+        }
+    }
     fn sortie(self) -> Option<u64> {
         self.consent.visit().checked_add(1)
     }
@@ -139,7 +159,9 @@ impl Practice {
         }
     }
     fn active_range(self) -> Option<Range> {
-        self.retired.is_none().then_some(self.range).flatten()
+        (self.retired.is_none() && self.ordinary_hit.is_none())
+            .then_some(self.range)
+            .flatten()
     }
     pub(super) fn after_step(
         &mut self,
@@ -211,7 +233,9 @@ impl Practice {
                 }
             }))
         });
-        let status = if self.retired.is_some() {
+        let status = if self.ordinary_hit.is_some() {
+            PracticeStatus::Failed
+        } else if self.retired.is_some() {
             PracticeStatus::Retired
         } else if beacons.is_some() {
             PracticeStatus::Active
@@ -292,6 +316,7 @@ impl World {
             range: None,
             retired: None,
             reception: reception::Reception::default(),
+            ordinary_hit: None,
         };
         let bytes = self
             .save_bytes_with_practice(Some(practice))
@@ -317,4 +342,4 @@ impl World {
 }
 
 #[cfg(test)]
-mod tests;
+pub(super) mod tests;

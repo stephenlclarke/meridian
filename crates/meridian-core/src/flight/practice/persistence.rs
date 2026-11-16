@@ -42,6 +42,7 @@ impl Practice {
                 })
             })?,
             reception: reception::Reception::default(),
+            ordinary_hit: None,
             retired: r.option(|r| {
                 Ok(Retirement {
                     tick: r.u64()?,

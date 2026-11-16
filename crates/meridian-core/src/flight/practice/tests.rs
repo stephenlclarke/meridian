@@ -5,25 +5,25 @@ use crate::docking::Basis3;
 use crate::navigation::BASIC_SPOOL_TICKS;
 use crate::{FlightInput, PulseContact};
 
-pub(super) fn consent(world: &mut World) {
+pub(in crate::flight) fn consent(world: &mut World) {
     let tick = world.snapshot().tick;
     let review = world.review_practice(tick).unwrap();
     let prepared = world.prepare_practice_confirmation(review, tick).unwrap();
     prepared.commit();
 }
 
-pub(super) fn step(world: &mut World, count: u8) {
+pub(in crate::flight) fn step(world: &mut World, count: u8) {
     for _ in 0..count {
         world.step(FlightInput::default()).unwrap();
     }
 }
 
-pub(super) fn launch(world: &mut World) {
+pub(in crate::flight) fn launch(world: &mut World) {
     world.request_launch(world.snapshot().tick).unwrap();
     step(world, 1);
 }
 
-pub(super) fn shoot(world: &mut World) -> crate::PulseShot {
+pub(in crate::flight) fn shoot(world: &mut World) -> crate::PulseShot {
     world
         .request_fire_front_pulse(world.snapshot().tick)
         .unwrap()
@@ -86,7 +86,7 @@ fn actual_avenor_review_is_bound_to_profile_tick_epoch_and_publication() {
     assert_eq!(world.credits_tenths(), Some(7200));
 }
 
-pub(super) fn aim_at(world: &mut World, target: Vec3) {
+pub(in crate::flight) fn aim_at(world: &mut World, target: Vec3) {
     let snapshot = world.snapshot();
     assert_eq!(snapshot.speed, 0.0);
     let pose = flight_pose(snapshot.position, snapshot.orientation).unwrap();
@@ -296,7 +296,11 @@ fn resealed_range_authority_and_hit_pose_changes_refuse_without_live_replacement
     let practice = world.practice.unwrap();
     let mut encoded = Writer::new();
     practice.encode(&mut encoded);
-    let start = live.len() - 8 - 5 - encoded.bytes.len();
+    let start = live.len()
+        - 8
+        - 5
+        - crate::flight::persistence::combat_save_len(&world)
+        - encoded.bytes.len();
     assert_eq!(&live[start..start + encoded.bytes.len()], encoded.bytes);
     let mut changed_opening = practice;
     changed_opening.range.as_mut().unwrap().opening.position = [2600.0, -700.0, 5700.0];
@@ -373,7 +377,7 @@ fn practice_receipt_requires_committed_pulse_and_exact_same_tick_flight_pose() {
     for mutated in [mutated_opening, mutated_hit] {
         let mut bytes = Writer::new();
         mutated.encode(&mut bytes);
-        let end = live.len() - 13;
+        let end = live.len() - 13 - crate::flight::persistence::combat_save_len(&world);
         let mut inconsistent = live.clone();
         inconsistent[end - bytes.bytes.len()..end].copy_from_slice(&bytes.bytes);
         assert_resealed_refusal(&mut world, &live, inconsistent);
