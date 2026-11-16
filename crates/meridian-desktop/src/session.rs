@@ -667,7 +667,7 @@ impl Session {
             return lines;
         }
         if compact_flight {
-            append_missile_panel(world, snapshot.mode, compact_flight, &mut lines);
+            append_missile_panel(world, snapshot.mode, &mut lines);
             if let Some(line) = practice_line(world) {
                 lines.push(line);
             }
@@ -681,6 +681,7 @@ impl Session {
                 "Z FIRE FRONT PULSE | SPACE BRAKE | P PAUSE | F5 SAVE | ESC SAVE AND QUIT | / HELP"
                     .into(),
             );
+            lines.push(CRITICAL_CONTROLS.into());
             return lines;
         }
         if !compact_flight {
@@ -709,7 +710,7 @@ impl Session {
             }
             return lines;
         }
-        append_missile_panel(world, snapshot.mode, compact_flight, &mut lines);
+        append_missile_panel(world, snapshot.mode, &mut lines);
         if let Some(line) = practice_line(world) {
             lines.push(line);
         }
@@ -796,7 +797,7 @@ impl Session {
 const CRITICAL_CONTROLS: &str =
     "I MISSION DETAILS | C LESSON | F6/F12 REVIEW | F5 SAVE | F9 RELOAD SAVE | ESC SAVE AND QUIT";
 
-fn append_missile_panel(world: &World, mode: FlightMode, compact: bool, lines: &mut Vec<String>) {
+fn append_missile_panel(world: &World, mode: FlightMode, lines: &mut Vec<String>) {
     if let Some(missiles) = world.missile_snapshot() {
         let remaining = world
             .missile_rounds()
@@ -817,14 +818,7 @@ fn append_missile_panel(world: &World, mode: FlightMode, compact: bool, lines: &
             ));
             lines.push("F1 NEXT LOCK | F2 ARM/SAFE | F3 LAUNCH | F4 SAFE AND UNLOCK".into());
         }
-        lines.push(
-            if compact {
-                CRITICAL_CONTROLS
-            } else {
-                "F5 SAVES COMPLETE MISSILE SESSION | F9 CONTINUES SAVED STATE"
-            }
-            .into(),
-        );
+        lines.push("F5 SAVES COMPLETE MISSILE SESSION | F9 CONTINUES SAVED STATE".into());
     }
 }
 
