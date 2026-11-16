@@ -284,5 +284,14 @@
     "parentHostPass": 9,
     "parentWholeFive": "5decodePASS/5StorageREFUSED/15dependentUNRUN/0candidate",
     "inputStorageDeltaOnly": "Source-derived37304..41560removed repeated memberships; no physical allocator/minimum claim"
+  },
+  "styleStorageClippyCorrection": {
+    "actualParentJoin": "24aee4f659cc68f786b3ae99bfc00c60027d078a",
+    "parentRustPass": 26,
+    "parentHostPass": 9,
+    "parentStrictClippy": "FAIL10findings; no dev build or original run",
+    "deltaSHA256": "3b42bf7dd930bd3d144cf8695508ee77b203e72647e172bf474060bb02341b76",
+    "currentExecution": "UNRUN",
+    "productionAndFrozenInputsChanged": false
   }
 }

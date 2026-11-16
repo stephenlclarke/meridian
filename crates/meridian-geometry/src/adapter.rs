@@ -159,7 +159,7 @@ mod tests {
 
     #[test]
     fn original_style_pool_preserves_exact_text_and_counts_only_shared_allocations()
-    -> Result<(), Failure> {
+    -> Result<(), Box<dyn std::error::Error>> {
         for asset in [
             OriginalAsset::Sh010,
             OriginalAsset::Sh011,
@@ -170,16 +170,20 @@ mod tests {
             let mut b = Budget::new(Limits::default())?;
             let faces = asset.decode(asset.pinned_bytes(), &mut b)?;
             // Independent pinned-byte oracle, not the pool or footprint helper.
-            let text = std::str::from_utf8(asset.pinned_bytes()).unwrap();
+            let text = std::str::from_utf8(asset.pinned_bytes())?;
             let mut expected_styles = BTreeSet::new();
             for (face, line) in faces.iter().zip(text.lines().skip(1)) {
-                let hex = line.split_whitespace().nth(2).unwrap();
-                let bytes = hex
-                    .as_bytes()
-                    .chunks_exact(2)
-                    .map(|p| u8::from_str_radix(std::str::from_utf8(p).unwrap(), 16).unwrap())
-                    .collect::<Vec<_>>();
-                let style = String::from_utf8(bytes).unwrap();
+                let hex = line
+                    .split_whitespace()
+                    .nth(2)
+                    .ok_or("missing bound style")?;
+                let (pairs, remainder) = hex.as_bytes().as_chunks::<2>();
+                assert!(remainder.is_empty());
+                let mut bytes = Vec::new();
+                for pair in pairs {
+                    bytes.push(u8::from_str_radix(std::str::from_utf8(pair)?, 16)?);
+                }
+                let style = String::from_utf8(bytes)?;
                 assert_eq!(face.style(), style);
                 expected_styles.insert(style);
             }
@@ -257,9 +261,9 @@ mod tests {
         })?;
         assert_eq!(
             Facet::input_memberships(&shared, &mut short)
-                .unwrap_err()
-                .kind,
-            FailureKind::Storage
+                .err()
+                .map(|error| error.kind),
+            Some(FailureKind::Storage)
         );
         assert_eq!(short.retained_memberships(), 0);
         assert!(short.peak_admitted_memberships() <= short.limits().storage_memberships);

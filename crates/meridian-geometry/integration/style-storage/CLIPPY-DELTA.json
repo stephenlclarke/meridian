@@ -1,0 +1,71 @@
+{
+  "parentAuthorHead": "5943212da52b4873177ebbef53d2fbc28e257611",
+  "actualQualifiedRootJoin": "24aee4f659cc68f786b3ae99bfc00c60027d078a",
+  "actualParentHandoff": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-24aee4f/geometry-24aee4f-terminal-handoff.json",
+    "sha256": "0e395108ec7bfbcffa177996f36d8d8fb23a0927b1ef14067a6feceff2471b8f"
+  },
+  "actualClippyLog": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-24aee4f/evidence/clippy.log",
+    "sha256": "805edde8398139bf5ddab4df5be82d1b847861115be54e1617e1e6f42ba97c8e",
+    "text": "    Checking meridian-geometry v0.1.0 (/home/sclarke/github/meridian-geometry-24aee4f/crates/meridian-geometry)\nerror: used `unwrap()` on a `Result` value\n   --> crates/meridian-geometry/src/adapter.rs:173:24\n    |\n173 |             let text = std::str::from_utf8(asset.pinned_bytes()).unwrap();\n    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = note: if this value is an `Err`, it will panic\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unwrap_used\n    = note: requested on the command line with `-D clippy::unwrap-used`\n\nerror: used `unwrap()` on an `Option` value\n   --> crates/meridian-geometry/src/adapter.rs:176:27\n    |\n176 |                 let hex = line.split_whitespace().nth(2).unwrap();\n    |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = note: if this value is `None`, it will panic\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unwrap_used\n\nerror: using `chunks_exact` with a constant chunk size\n   --> crates/meridian-geometry/src/adapter.rs:179:22\n    |\n179 |                     .chunks_exact(2)\n    |                      ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<2>().0.iter()`\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks\n    = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`\n    = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`\n\nerror: used `unwrap()` on a `Result` value\n   --> crates/meridian-geometry/src/adapter.rs:180:30\n    |\n180 |                     .map(|p| u8::from_str_radix(std::str::from_utf8(p).unwrap(), 16).unwrap())\n    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = note: if this value is an `Err`, it will panic\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unwrap_used\n\nerror: used `unwrap()` on a `Result` value\n   --> crates/meridian-geometry/src/adapter.rs:180:49\n    |\n180 |                     .map(|p| u8::from_str_radix(std::str::from_utf8(p).unwrap(), 16).unwrap())\n    |                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = note: if this value is an `Err`, it will panic\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unwrap_used\n\nerror: used `unwrap()` on a `Result` value\n   --> crates/meridian-geometry/src/adapter.rs:182:29\n    |\n182 |                 let style = String::from_utf8(bytes).unwrap();\n    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = note: if this value is an `Err`, it will panic\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unwrap_used\n\nerror: used `unwrap_err()` on a `Result` value\n   --> crates/meridian-geometry/src/adapter.rs:259:13\n    |\n259 | /             Facet::input_memberships(&shared, &mut short)\n260 | |                 .unwrap_err()\n    | |_____________________________^\n    |\n    = note: if this value is an `Ok`, it will panic\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unwrap_used\n\nerror: used `unwrap()` on an `Option` value\n   --> crates/meridian-geometry/src/pruning.rs:311:26\n    |\n311 |             let source = originals.iter().find(|f| f.id() == a.source).unwrap();\n    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = note: if this value is `None`, it will panic\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unwrap_used\n\nerror: used `unwrap_err()` on a `Result` value\n   --> crates/meridian-geometry/src/pruning.rs:333:9\n    |\n333 | /         before_style_storage::reconstruct(&singular, &mut old)\n334 | |             .unwrap_err()\n    | |_________________________^\n    |\n    = note: if this value is an `Ok`, it will panic\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unwrap_used\n\nerror: used `unwrap_err()` on a `Result` value\n   --> crates/meridian-geometry/src/pruning.rs:339:9\n    |\n339 |         crate::reconstruct(&singular, &mut new).unwrap_err().kind,\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = note: if this value is an `Ok`, it will panic\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unwrap_used\n\nerror: could not compile `meridian-geometry` (lib test) due to 10 previous errors\n"
+  },
+  "actualFocused": {
+    "check": "PASS",
+    "RustCases": 26,
+    "RustGroupCounts": [
+      9,
+      6,
+      9,
+      2,
+      0
+    ],
+    "hostTests": 9,
+    "strictClippy": {
+      "status": "FAIL",
+      "diagnostics": 10,
+      "unwrapUsed": 9,
+      "chunksExactToAsChunks": 1,
+      "maintainedPaths": [
+        "crates/meridian-geometry/src/adapter.rs",
+        "crates/meridian-geometry/src/pruning.rs"
+      ],
+      "lines": {
+        "adapter.rs": [
+          173,
+          176,
+          179,
+          180,
+          182,
+          259
+        ],
+        "pruning.rs": [
+          311,
+          333,
+          339
+        ]
+      }
+    },
+    "devHarnessBuild": "UNRUN"
+  },
+  "actualOriginalFive": "UNRUN; dev harness build not launched after strict Clippy failure",
+  "findingsAddressed": {
+    "unwrapOrUnwrapErr": 9,
+    "chunksExactToAsChunks": 1
+  },
+  "correction": [
+    "Independent test oracle propagates UTF8/hex/missing-field errors through its test Result. Same pinned bytes, independent parsing and exact style assertions. No production helper substituted.",
+    "Use fixed-size as_chunks::<2> and explicitly assert no trailing byte, retaining full input coverage.",
+    "Expected-error assertions compare err().map(kind) with Some(expected); an unexpected Ok still fails the assertion.",
+    "Missing synthetic witness source returns InvalidWitness, so the complete test still fails. No budget operation, output comparison or work measurement is removed."
+  ],
+  "preserved": [
+    "All26tests and all prior assertions; an extra empty-remainder assertion added.",
+    "Production prefixes/modules, frozen controls, limits, geometry, source IDs/fields, counters, input assets, Cargo and whole-five helper/harness byte exact to author parent.",
+    "Actual26Rust+9host success belongs only to Root24aee4; corrected source checks/tests/Clippy UNRUN.",
+    "Prior0f393all-fiveStorage/15dependentUNRUN/no candidates retained; no new original run or admission."
+  ],
+  "currentExecution": "UNRUN",
+  "lintAllowancesAdded": false,
+  "testWaiversAdded": false
+}

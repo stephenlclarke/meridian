@@ -308,7 +308,15 @@ fn complete_style_storage_controls_preserve_all_fields_witnesses_and_refusals()
                 .map(|s| (s.point.clone(), s.sectors.clone(), s.boundary_path))
                 .collect::<Vec<_>>();
             assert_eq!(current_stars(&a.contact_stars), stars);
-            let source = originals.iter().find(|f| f.id() == a.source).unwrap();
+            let source = originals
+                .iter()
+                .find(|f| f.id() == a.source)
+                .ok_or_else(|| {
+                    new.fail(
+                        FailureKind::InvalidWitness,
+                        "missing storage control source",
+                    )
+                })?;
             e.verify(source, &mut old)?;
             a.verify(source, &mut new)?;
         }
@@ -331,13 +339,15 @@ fn complete_style_storage_controls_preserve_all_fields_witnesses_and_refusals()
     let mut new = Budget::new(Limits::default())?;
     assert_eq!(
         before_style_storage::reconstruct(&singular, &mut old)
-            .unwrap_err()
-            .kind,
-        FailureKind::UncertifiedContact
+            .err()
+            .map(|error| error.kind),
+        Some(FailureKind::UncertifiedContact)
     );
     assert_eq!(
-        crate::reconstruct(&singular, &mut new).unwrap_err().kind,
-        FailureKind::UncertifiedContact
+        crate::reconstruct(&singular, &mut new)
+            .err()
+            .map(|error| error.kind),
+        Some(FailureKind::UncertifiedContact)
     );
     Ok(())
 }
