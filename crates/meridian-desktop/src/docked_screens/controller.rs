@@ -135,6 +135,18 @@ impl DockedScreens {
         if context.world.current_dock_context().is_none() {
             return Outcome::Refused("Dock at a station to use these screens".into());
         }
+        if matches!(self.screen, Screen::Galaxy | Screen::System)
+            && context.review.is_none()
+            && !context
+                .navigation_bodies
+                .iter()
+                .filter(|body| body.id.system == self.selected_world)
+                .eq(painted.navigation_inputs.iter())
+        {
+            return Outcome::Refused(
+                "Navigation positions changed; review the current screen again".into(),
+            );
+        }
         if let Input::PointerMoved(p) = input {
             self.hovered = painted
                 .hits
@@ -346,7 +358,17 @@ impl DockedScreens {
             Control::TradeMode(sell) => {
                 self.key(if *sell { Key::SellMode } else { Key::BuyMode }, c)
             }
-            Control::SelectBody(id) => self.body_route(*id, c),
+            Control::SelectBody(id) => {
+                if let Some(index) = c
+                    .navigation_bodies
+                    .iter()
+                    .filter(|body| body.id.system == self.selected_world)
+                    .position(|body| body.id == *id)
+                {
+                    self.body_index = index;
+                }
+                self.body_route(*id, c)
+            }
         }
     }
     fn review_confirm(&self, c: &Context<'_>) -> Outcome {

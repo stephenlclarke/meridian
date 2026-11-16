@@ -2,6 +2,7 @@
 mod catalogue;
 mod controller;
 mod layout;
+mod mining_navigation;
 mod presentation;
 #[cfg(test)]
 mod tests;
@@ -9,6 +10,7 @@ pub use catalogue::{Catalogue, ObjectRecord, Specification, WorldRecord};
 pub use controller::DockedScreens;
 pub use layout::{ChartLayout, Rect, Viewport};
 use meridian_core::{World, navigation::SystemId, station_services::CommodityId};
+pub use mining_navigation::{MINING_BELT_CUE_ORDINAL, mining_navigation_bodies};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Screen {
@@ -382,6 +384,7 @@ pub struct Frame {
     pub hovered: Option<Rect>,
     pub search_active: bool,
     pub(super) hits: Vec<Hit>,
+    pub(super) navigation_inputs: Vec<NavigationBody>,
     pub(super) model_bounds: Option<Rect>,
 }
 impl Frame {

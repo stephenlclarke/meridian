@@ -98,6 +98,12 @@ pub(super) fn project(s: &DockedScreens, c: &Context<'_>, v: Viewport) -> Frame 
         hovered: s.hovered,
         search_active: s.searching,
         hits: Vec::new(),
+        navigation_inputs: c
+            .navigation_bodies
+            .iter()
+            .filter(|body| body.id.system == s.selected_world)
+            .cloned()
+            .collect(),
         model_bounds: None,
     };
     let canvas = v.canvas();
@@ -415,7 +421,24 @@ fn world_details(s: &DockedScreens, c: &Context<'_>) -> Vec<String> {
     } else {
         "Reference only: travel to this system is unavailable".into()
     });
+    let mut destinations = c.navigation_bodies.iter().filter(|b| b.id.system == w.id);
+    if let Some(first) = destinations.next() {
+        rows.push(format!(
+            "Local destinations: {} (System tab)",
+            1 + destinations.count()
+        ));
+        rows.push(first.name.clone());
+        rows.push(position_text(first));
+    }
     rows
+}
+fn position_text(body: &NavigationBody) -> String {
+    if body.position_world.into_iter().all(f64::is_finite) {
+        let [x, y, z] = body.position_world;
+        format!("Station-local XYZ: {x:.0}, {y:.0}, {z:.0}")
+    } else {
+        "Station-local position unavailable".into()
+    }
 }
 fn system(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
     let full_body = f.viewport.body();
@@ -436,7 +459,9 @@ fn system(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         .iter()
         .filter(|b| b.id.system == s.selected_world)
         .collect();
-    let body_rows = (bodies.len().min(3) as f64) * 22.0 + if bodies.len() > 3 { 22.0 } else { 0.0 };
+    let body_rows = (bodies.len().min(3) as f64) * 22.0
+        + if bodies.len() > 3 { 22.0 } else { 0.0 }
+        + if bodies.is_empty() { 0.0 } else { 22.0 };
     paragraphs(
         f,
         &world_details(s, c),
@@ -448,10 +473,20 @@ fn system(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         ),
         s.scroll,
     );
+    if let Some(target) = bodies.get(s.body_index) {
+        label(
+            f,
+            position_text(target),
+            body.x,
+            body.y + body.height - 30.0 - body_rows,
+            Ink::Yellow,
+            body,
+        );
+    }
     let body_start = start(s.body_index, 3, bodies.len());
     for (index, target) in bodies.iter().skip(body_start).take(3).enumerate() {
         f.navigation_cues.push((*target).clone());
-        let text = target
+        let description = target
             .distance_world
             .filter(|d| d.is_finite() && *d >= 0.0)
             .map_or_else(
@@ -460,10 +495,17 @@ fn system(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
             );
         button(
             f,
-            &text,
+            &format!(
+                "{} {description}",
+                if body_start + index == s.body_index {
+                    ">"
+                } else {
+                    " "
+                }
+            ),
             Rect::new(
                 body.x,
-                body.y + body.height - 30.0 - body_rows + index as f64 * 22.0,
+                body.y + body.height - 8.0 - body_rows + index as f64 * 22.0,
                 body.width,
                 20.0,
             ),

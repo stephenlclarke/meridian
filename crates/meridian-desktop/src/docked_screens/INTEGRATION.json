@@ -73,7 +73,14 @@
     "chart_markers_carry_plot_clipping_for_both_chart_scales",
     "visible_shortcuts_are_from_the_supplied_binding_map",
     "focus_loss_stops_text_and_rotation_without_changing_the_commander",
-    "planet_preview_is_a_provider_request_for_the_selected_real_world_only"
+    "planet_preview_is_a_provider_request_for_the_selected_real_world_only",
+    "mining_projection_retains_real_centre_all_12_body_ids_positions_and_measured_ranges",
+    "no_mining_provider_means_no_belt_and_renas_has_no_fabricated_rocks",
+    "foreign_system_belt_inspection_never_measures_against_the_wrong_coordinate_frame",
+    "actual_rock_pointer_and_keyboard_select_the_same_position_without_travel_or_work",
+    "changed_body_position_availability_or_identity_refuses_even_with_an_unchanged_stamp",
+    "newly_available_belt_cannot_be_selected_from_an_older_empty_frame",
+    "cold_continue_preserves_all_mining_selection_addresses_and_actual_positions"
   ],
   "testExecution": "G1 cargo test -p meridian-desktop docked_ passed 41: all29 module +8 renderer +4 existing name-matched tests, against module918717; latest bounded lint correction not yet revalidated. Author launched no compiler/native work.",
   "nativeCriteria": "README.md validation and acceptance section; exact joined source, real keyboard+mouse, all five rendered screens, full module effects/refusals/durable failure/cold continuation",
@@ -125,5 +132,18 @@
       }
     },
     "native": "UNRUN"
+  },
+  "miningNavigationIncrement": {
+    "base": "9129c6f65ffea64a099bc1022c4e24de40487b13",
+    "mc1Receipt": "/private/tmp/meridian-mining-mc1/packet/SOURCE.json",
+    "mc1ReceiptSha256": "b7639ef0d34c622d26b95b8dbb295388eaaf27474ee97516b17a5dbebb53bc5b",
+    "projection": "mining_navigation_bodies(&World, selected_system)",
+    "guide": "MINING-NAVIGATION.md",
+    "newTests": 7,
+    "newTestsExecution": "UNRUN",
+    "hostJoin": "Root applies separately; no shared code changed",
+    "centreCueOrdinal": "u64::MAX is navigation-only, not an AsteroidId",
+    "renderingNative": "UNRUN; G1 ownership",
+    "previewCandidate": "e30fb82 unchanged"
   }
 }

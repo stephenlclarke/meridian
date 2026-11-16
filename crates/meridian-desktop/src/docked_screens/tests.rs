@@ -796,3 +796,226 @@ fn planet_preview_is_a_provider_request_for_the_selected_real_world_only() {
     assert_eq!(frame.planets.len(), 1);
     assert_eq!(frame.planets[0].system, SystemId::AVENOR);
 }
+
+#[test]
+fn mining_projection_retains_real_centre_all_12_body_ids_positions_and_measured_ranges() {
+    let w = world();
+    let before = w.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
+    let belt = w
+        .mining_belt_snapshot()
+        .unwrap_or_else(|| panic!("actual belt"));
+    let projected = mining_navigation_bodies(&w, SystemId::AVENOR);
+    assert_eq!(projected.len(), 13);
+    assert_eq!(projected[0].id.ordinal, MINING_BELT_CUE_ORDINAL);
+    assert_eq!(projected[0].position_world, [4000.0, 0.0, 8000.0]);
+    assert_eq!(projected[1].position_world, [4000.0, 0.0, 6000.0]);
+    let origin = w.snapshot().position.map(f64::from);
+    for (view, actual) in projected[1..].iter().zip(belt.bodies) {
+        assert_eq!(view.id.system, actual.id.system());
+        assert_eq!(view.id.ordinal, u64::from(actual.id.ordinal()));
+        assert_eq!(
+            view.position_world,
+            [actual.position.x, actual.position.y, actual.position.z]
+        );
+        let distance = (actual.position.x - origin[0])
+            .hypot(actual.position.y - origin[1])
+            .hypot(actual.position.z - origin[2]);
+        assert_eq!(view.distance_world, Some(distance));
+        assert!(view.can_target);
+    }
+    assert_eq!(w.save_bytes().unwrap_or_else(|e| panic!("{e:?}")), before);
+}
+
+#[test]
+fn no_mining_provider_means_no_belt_and_renas_has_no_fabricated_rocks() {
+    assert!(mining_navigation_bodies(&World::new(), SystemId::AVENOR).is_empty());
+    let w = world();
+    assert!(w.mining_destination(SystemId::RENAS).is_none());
+    assert!(mining_navigation_bodies(&w, SystemId::RENAS).is_empty());
+    let c = catalogue();
+    let bodies = mining_navigation_bodies(&w, SystemId::RENAS);
+    let mut ctx = context(&w, &c);
+    ctx.navigation_bodies = &bodies;
+    let mut ui = DockedScreens::new(SystemId::RENAS, "SH025");
+    ui.open(Screen::System);
+    let frame = ui.frame(&ctx, view());
+    assert!(frame.navigation_cues.is_empty());
+    assert!(
+        !frame
+            .labels
+            .iter()
+            .any(|l| l.text.contains("Station-local XYZ"))
+    );
+    assert!(matches!(
+        key(&mut ui, &ctx, Key::BodyRoute),
+        Outcome::Refused(_)
+    ));
+}
+
+#[test]
+fn foreign_system_belt_inspection_never_measures_against_the_wrong_coordinate_frame() {
+    let mut w = world();
+    w.request_launch(w.snapshot().tick)
+        .unwrap_or_else(|e| panic!("{e:?}"));
+    w.step(meridian_core::FlightInput::default())
+        .unwrap_or_else(|e| panic!("{e:?}"));
+    w.request_jump(SystemId::RENAS, w.snapshot().tick)
+        .unwrap_or_else(|e| panic!("{e:?}"));
+    for _ in 0..meridian_core::navigation::BASIC_SPOOL_TICKS {
+        w.step(meridian_core::FlightInput::default())
+            .unwrap_or_else(|e| panic!("{e:?}"));
+    }
+    assert_eq!(
+        w.snapshot()
+            .navigation
+            .unwrap_or_else(|| panic!("navigation"))
+            .system,
+        SystemId::RENAS
+    );
+    let before = w.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
+    let projected = mining_navigation_bodies(&w, SystemId::AVENOR);
+    assert_eq!(projected.len(), 1);
+    assert_eq!(projected[0].position_world, [4000.0, 0.0, 8000.0]);
+    assert_eq!(projected[0].distance_world, None);
+    assert!(!projected[0].can_target);
+    assert!(projected[0].refusal.is_some());
+    assert_eq!(w.save_bytes().unwrap_or_else(|e| panic!("{e:?}")), before);
+}
+
+#[test]
+fn actual_rock_pointer_and_keyboard_select_the_same_position_without_travel_or_work() {
+    let c = catalogue();
+    let w = world();
+    let bodies = mining_navigation_bodies(&w, SystemId::AVENOR);
+    let mut ctx = context(&w, &c);
+    ctx.navigation_bodies = &bodies;
+    let before = w.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
+    let mut keyboard = DockedScreens::new(SystemId::AVENOR, "SH025");
+    keyboard.open(Screen::System);
+    let mut pointer = DockedScreens::new(SystemId::AVENOR, "SH025");
+    pointer.open(Screen::System);
+    assert_eq!(key(&mut keyboard, &ctx, Key::NextBody), Outcome::Updated);
+    let expected = Outcome::Request(Request::ReviewBodyRoute(bodies[1].id));
+    assert_eq!(key(&mut keyboard, &ctx, Key::BodyRoute), expected);
+    assert_eq!(
+        click(&mut pointer, &ctx, Control::SelectBody(bodies[1].id)),
+        expected
+    );
+    let a = keyboard.frame(&ctx, view());
+    let b = pointer.frame(&ctx, view());
+    assert!(
+        a.labels
+            .iter()
+            .any(|l| l.text == "Station-local XYZ: 4000, 0, 6000")
+    );
+    assert_eq!(a.labels, b.labels);
+    assert!(
+        a.labels
+            .iter()
+            .any(|l| l.text.starts_with("> Avenor ore belt / rock 01"))
+    );
+    for planet_preview in [false, true] {
+        ctx.planet_previews = planet_preview;
+        for (width, height) in [(640.0, 360.0), (1000.0, 700.0), (1440.0, 1000.0)] {
+            let viewport = Viewport::new(width, height).unwrap_or_else(|| panic!("viewport"));
+            let frame = keyboard.frame(&ctx, viewport);
+            assert!(
+                frame
+                    .labels
+                    .iter()
+                    .any(|l| l.text == "Station-local XYZ: 4000, 0, 6000")
+            );
+            for (rect, _) in frame.actionable_regions() {
+                assert!(rect.x >= 0.0 && rect.y >= 0.0);
+                assert!(rect.x + rect.width <= width && rect.y + rect.height <= height);
+            }
+        }
+    }
+    for _ in 1..12 {
+        key(&mut keyboard, &ctx, Key::NextBody);
+    }
+    assert_eq!(
+        key(&mut keyboard, &ctx, Key::BodyRoute),
+        Outcome::Request(Request::ReviewBodyRoute(bodies[12].id))
+    );
+    let last = keyboard.frame(&ctx, view());
+    assert!(
+        last.navigation_cues
+            .iter()
+            .any(|body| body.id == bodies[12].id)
+    );
+    assert_eq!(w.save_bytes().unwrap_or_else(|e| panic!("{e:?}")), before);
+}
+
+#[test]
+fn changed_body_position_availability_or_identity_refuses_even_with_an_unchanged_stamp() {
+    let c = catalogue();
+    let w = world();
+    let bodies = mining_navigation_bodies(&w, SystemId::AVENOR);
+    let before = w.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
+    for mutation in 0..4 {
+        let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+        ui.open(Screen::System);
+        let mut ctx = context(&w, &c);
+        ctx.navigation_bodies = &bodies;
+        key(&mut ui, &ctx, Key::NextBody);
+        let painted = ui.frame(&ctx, view());
+        let at = point(&painted, &Control::SelectBody(bodies[1].id));
+        let mut changed = bodies.clone();
+        // Negative provider fixtures; these do not change the actual World or asteroid ledger.
+        match mutation {
+            0 => changed[1].position_world[0] += 1.0,
+            1 => changed[1].can_target = false,
+            2 => changed[1].id.ordinal += 100,
+            _ => {
+                changed.remove(1);
+            }
+        }
+        ctx.navigation_bodies = &changed;
+        assert!(matches!(
+            ui.handle(Input::Click(at), &painted, &ctx),
+            Outcome::Refused(_)
+        ));
+        assert!(matches!(
+            ui.handle(Input::Key(Key::BodyRoute), &painted, &ctx),
+            Outcome::Refused(_)
+        ));
+    }
+    assert_eq!(w.save_bytes().unwrap_or_else(|e| panic!("{e:?}")), before);
+}
+
+#[test]
+fn newly_available_belt_cannot_be_selected_from_an_older_empty_frame() {
+    let c = catalogue();
+    let w = world();
+    let mut ctx = context(&w, &c);
+    let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+    ui.open(Screen::System);
+    let painted = ui.frame(&ctx, view());
+    let bodies = mining_navigation_bodies(&w, SystemId::AVENOR);
+    ctx.navigation_bodies = &bodies;
+    assert!(matches!(
+        ui.handle(Input::Key(Key::BodyRoute), &painted, &ctx),
+        Outcome::Refused(_)
+    ));
+    assert_eq!(
+        key(&mut ui, &ctx, Key::BodyRoute),
+        Outcome::Request(Request::ReviewBodyRoute(bodies[0].id))
+    );
+}
+
+#[test]
+fn cold_continue_preserves_all_mining_selection_addresses_and_actual_positions() {
+    let w = world();
+    let bytes = w.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
+    let cold = World::from_save_bytes(&bytes).unwrap_or_else(|e| panic!("{e:?}"));
+    let cold_before = cold.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
+    assert_eq!(
+        mining_navigation_bodies(&w, SystemId::AVENOR),
+        mining_navigation_bodies(&cold, SystemId::AVENOR)
+    );
+    assert_eq!(
+        cold.save_bytes().unwrap_or_else(|e| panic!("{e:?}")),
+        cold_before
+    );
+}
