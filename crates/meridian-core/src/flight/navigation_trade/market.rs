@@ -1,3 +1,6 @@
+mod quantities;
+pub use quantities::PreparedCommodityTrade;
+
 use super::{
     Balance, Fuel, Journey, MAX_RECEIPTS, NavigationTonneId, NavigationTradeError as Error,
     PreparedStationService, State, Trade, World, quantity, site,

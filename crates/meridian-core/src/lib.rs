@@ -48,7 +48,7 @@ pub use flight::{
     NavigationTonneId, NavigationTradeAction, NavigationTradeAttemptSnapshot, NavigationTradeError,
     NavigationTradeId, NavigationTradeMarketSnapshot, NavigationTradeOutcome,
     NavigationTradePlanSnapshot, NavigationTradeReview, NavigationTradeSnapshot,
-    NavigationTradeTrace, PreparedNavigationTrade, PreparedStationService,
+    NavigationTradeTrace, PreparedCommodityTrade, PreparedNavigationTrade, PreparedStationService,
 };
 
 pub use flight::{

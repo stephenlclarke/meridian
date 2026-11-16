@@ -531,6 +531,39 @@ impl CommanderAccount {
         Ok((candidate, change.market, change.event))
     }
 
+    /// Stage an atomic ordinary quantity trade in this sole account. Existing native-unit
+    /// counters/revision semantics are preserved; no per-unit debit or publication loop runs.
+    pub(crate) fn prepare_commodity_trade(
+        &self,
+        freight: &State,
+        markets: &services::StationMarkets,
+        facts: services::ServiceFacts,
+        trade: services::CommodityTrade,
+        reservations: services::Reservations,
+    ) -> Result<
+        (
+            Self,
+            services::StationMarkets,
+            services::CommodityTradeEvent,
+        ),
+        services::Error,
+    > {
+        let before = reservations.apply(self.service_projection(freight)?)?;
+        let plan = markets.prepare_commodity_trade(before, Some(facts), trade)?;
+        let change = plan.checked_change(markets, before, Some(facts))?;
+        let after = change.account_after;
+        let mut candidate = Self { data: self.data };
+        candidate.data.credits = after.credits_tenths;
+        candidate.data.revision = after.revision;
+        candidate.data.food_tonnes = after.food_tonnes;
+        candidate.data.other_commodities = after.other_commodities;
+        // Full actual fit, identified freight and ordinary reservations are checked again.
+        if reservations.apply(candidate.service_projection(freight)?)? != after {
+            return Err(services::Error::InvalidAccount);
+        }
+        Ok((candidate, change.market, change.event))
+    }
+
     /// World navigation, after its real passage checks, consumes normal owned fuel.
     pub(crate) fn debit_fuel(&mut self, amount: u16) -> Result<(), Error> {
         let fuel = self

@@ -1,5 +1,7 @@
 # Meridian
 
+Following-preview [atomic quantity trading](docs/COMMODITY-TRADING.md#atomic-quantity-trading) is authored from frozen E470 source. The core prepares a complete paid bulk transaction/save; quantity controls, host composition and owned compiler/native validation remain pending.
+
 [![CI](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=alert_status)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=coverage)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)

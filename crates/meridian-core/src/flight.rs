@@ -4,7 +4,7 @@ pub use navigation_trade::{
     NavigationTonneId, NavigationTradeAction, NavigationTradeAttemptSnapshot, NavigationTradeError,
     NavigationTradeId, NavigationTradeMarketSnapshot, NavigationTradeOutcome,
     NavigationTradePlanSnapshot, NavigationTradeReview, NavigationTradeSnapshot,
-    NavigationTradeTrace, PreparedNavigationTrade, PreparedStationService,
+    NavigationTradeTrace, PreparedCommodityTrade, PreparedNavigationTrade, PreparedStationService,
 };
 mod flight_reception;
 pub use flight_reception::{

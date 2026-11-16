@@ -7,6 +7,7 @@ use crate::station_services::{self as services, CommodityId, StationMarkets};
 
 mod actions;
 mod market;
+pub use market::PreparedCommodityTrade;
 mod persistence;
 
 const MAX_RECORDS: usize = 128;
@@ -51,6 +52,7 @@ pub enum NavigationTradeError {
     NotReady,
     ReceiptCapacity,
     CreditOverflow,
+    SingleUnitRequired,
     Service(services::Error),
     Save(SaveError),
 }
