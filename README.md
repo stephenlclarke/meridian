@@ -29,19 +29,15 @@ Meridian is a Rust reimplementation of the original L337 project, with direct wg
 
 ## Current delivery
 
-The signed local **Meridian Gunnery Attempts Preview** is installed from qualified gameplay main `16d6ddb` ([PR 28](https://github.com/stephenlclarke/meridian/pull/28)) and published as [v0.2.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.2.0-preview.1). It retains flight, physical docking, Avenor/Renas travel, seventeen-commodity trading, original G02 freight, paid cargo equipment, front Pulse fire, practice beacons/reception, ordinary station impacts and three finite owned missiles. Save v9 retains complete missile sessions and bounded attempt history.
+The signed local **Meridian Flight Lesson Preview** is installed from qualified gameplay main `a583b61` ([PR 31](https://github.com/stephenlclarke/meridian/pull/31)) and published as [v0.3.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.3.0-preview.1). It adds the [original flight-and-reception lesson](docs/FLIGHT-RECEPTION.md) and World-owned front/rear/left/right views. It retains flight, physical docking, Avenor/Renas travel, seventeen-commodity trading, original G02 freight, paid cargo equipment, front Pulse fire, practice beacons/reception, station impacts and three finite owned missiles. Save v10 retains the lesson, missile sessions and attempt history, with explicit v4-v9 readers.
 
-Start the installed app with `~/Applications/Launch Meridian Gunnery Attempts Preview.command`. It uses its separate `Library/Application Support/Meridian Gunnery Attempts Preview/saves-v9` directory. Downloaded portable packages instead use the adjacent empty `saves-v9` directory. Keep earlier previews and their dedicated profiles separate.
+Start the installed app with `~/Applications/Launch Meridian Flight Lesson Preview.command`. It uses its separate `Library/Application Support/Meridian Flight Lesson Preview/saves-v10` directory. Downloaded portable packages use the adjacent empty `saves-v10` directory. Keep earlier previews and their dedicated profiles separate.
 
-The [safe-gunnery lifecycle](docs/SAFE-GUNNERY-ATTEMPTS.md) adds F7 reviewed closure at the actual Avenor berth, F10 explicit fresh consent and I history with the once-only first trace. Closure grants no reward, refund or ammunition. Mac, Linux and genuine native Windows each passed 208 top-level Rust tests and 74 Python tests (54 importers plus 20 release tooling), strict Clippy and release builds. Exact-main CI and Sonar passed with zero open findings. Scoped Metal closure/retry/history and Save/Continue evidence retains its original source identity; later panel changes received their own affected native check.
+F6 reviews lesson consent or reception, F12 reviews cancellation and C shows lesson details while playing. Keys 0/1/2/3 select front/rear/left/right views. Actual Mac qualification completed measured closing flight, swept return, separate zero-cash reception and first trace, cancellation/retry, four views and two cold Save/Quit/Continue pairs. A transient native pulse flash remains unobserved. The [safe-gunnery lifecycle](docs/SAFE-GUNNERY-ATTEMPTS.md) retains F7 closure, F10 fresh consent and I history without reward, refund or ammunition grants.
 
-The installed signed app passed title/render/normal-close smoke without creating a commander save. The public downloads and extracted Mac signature were independently verified. This remains a functional preview: full game acceptance, memory qualification, window/focus edges, frame timing/race evidence and commercial acceptance remain open. See [implementation status](docs/IMPLEMENTATION-STATUS.md) for exact scope and retained failures.
+Mac, Linux and native Windows each passed 231 top-level Rust tests and 74 Python tests (54 importers plus 20 release tooling), strict Clippy and release builds on compiled source `152ac26`. Tagged main `a583b61` retains 136 of its 139 tracked blobs; only README, implementation status and the flight guide differ. These distinct trees do not imply a main rebuild. Exact-main CI and Sonar passed with zero open findings.
 
-## Qualified flight lesson candidate
-
-The [original flight-and-reception lesson](docs/FLIGHT-RECEPTION.md) has passed whole-source review and current qualification on candidate `152ac26`. Mac, Linux and native Windows each passed 231 top-level Rust tests, 74 Python tests, strict Clippy and release builds. F6 reviews consent or reception, F12 reviews cancellation and C shows lesson details while playing. Keys 0/1/2/3 select front/rear/left/right views. Save v10 retains the lesson with explicit v4-v9 readers.
-
-A signed staged Mac run completed an actual measured approach, swept return, separate zero-cash reception and first family trace, real quit/cold Continue, cancellation and fresh consent. Four render directions and saved right-view retention passed; a short native pulse flash was not clearly captured and remains unobserved. Integration, authoritative main Sonar and v10 installation/publication remain pending. The published v9 preview above is unchanged.
+The installed signed app passed title/render/normal-close smoke without creating a commander save. Public downloads and the extracted Mac Developer ID signature were independently verified. Three published previews are retained. This remains a functional preview: full game acceptance, memory qualification, window/focus edges, frame timing/race evidence and commercial acceptance remain open. See [implementation status](docs/IMPLEMENTATION-STATUS.md) for exact scope and retained failures.
 
 ## Play
 
@@ -56,14 +52,15 @@ N starts a commander; C continues. A second N confirms replacing the current com
 | I; V; X | Mission details; review all held freight deliveries; review abandonment |
 | F1; F2; F3; F4 | Next practice lock; arm/safe; launch one missile; safe/unlock |
 | F7; F8; F10 | Review attempt closure; reception; fresh consent |
-| P; F11; F5; F9 | Pause; fullscreen; save; reload (missiles and attempt history in v9) |
+| F6; F12; C; 0/1/2/3 | Flight lesson consent/reception; cancellation; details; view direction |
+| P; F11; F5; F9 | Pause; fullscreen; save; reload (lesson and attempt history in v10) |
 | Escape / window close | Save before exit; failure keeps the app open |
 
 The freight journey requires eight identified one-tonne deliveries and awards 730 CR plus the trusted clue once. Markets use finite stock and the same account as mission and equipment transactions. Invalid saves refuse without migration, repair or fallback.
 
 ## Preview releases
 
-[Download Gunnery Attempts Preview v0.2.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.2.0-preview.1) for macOS Apple silicon and Windows x64. Both public downloads were verified against their SHA256 checksums, and the downloaded Mac app passed extracted Developer ID signature verification. macOS is not notarized; Windows is unsigned and requires the Microsoft Visual C++ x64 runtime. Windows interactive gameplay remains unobserved. Versions come from Conventional Commits with immutable annotated tags; keep only the newest three published previews. See [preview releases](docs/PREVIEW-RELEASES.md).
+[Download Flight Lesson Preview v0.3.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.3.0-preview.1) for macOS Apple silicon and Windows x64. Both public downloads were verified against their SHA256 checksums, and the downloaded Mac app passed extracted Developer ID signature verification. macOS is not notarized; Windows is unsigned and requires the Microsoft Visual C++ x64 runtime. Windows interactive gameplay remains unobserved. Versions come from Conventional Commits with immutable annotated tags; keep only the newest three published previews. See [preview releases](docs/PREVIEW-RELEASES.md).
 
 ## Build and contribute
 
