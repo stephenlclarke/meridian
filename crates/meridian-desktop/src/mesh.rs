@@ -1,5 +1,5 @@
-use meridian_core::Snapshot;
 use meridian_core::docking::{Basis3, DockingPort, RigidPose, StationPose, Vec3};
+use meridian_core::{PulseShot, Snapshot};
 
 #[repr(C)]
 #[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
@@ -142,6 +142,41 @@ fn append_mesh(
             color: vertex.color,
         });
     }
+    Ok(())
+}
+
+pub const PULSE_VERTEX_COUNT: usize = 6;
+
+pub fn append_pulse(
+    snapshot: &Snapshot,
+    station: StationRender<'_>,
+    shot: &PulseShot,
+    output: &mut Vec<Vertex>,
+) -> Result<(), String> {
+    let camera = camera_for(snapshot, station)?;
+    let view = |world| {
+        camera
+            .pose
+            .orientation
+            .inverse_coordinates(difference(world, camera.pose.position))
+    };
+    let start = view(shot.origin);
+    let end = view(shot.end);
+    // A narrow camera-space ribbon uses both committed endpoints and the scene depth test.
+    let vertex = |center: Vec3, side: f64| Vertex {
+        position: [(center.x + side) as f32, center.y as f32, center.z as f32],
+        color: [1.0, 0.24, 0.09],
+    };
+    let quad = [
+        vertex(start, -1.0),
+        vertex(start, 1.0),
+        vertex(end, 1.0),
+        vertex(end, -1.0),
+    ];
+    if quad.iter().flat_map(|v| v.position).any(|v| !v.is_finite()) {
+        return Err("Pulse transform produced a non-finite vertex".into());
+    }
+    output.extend([quad[0], quad[1], quad[2], quad[0], quad[2], quad[3]]);
     Ok(())
 }
 

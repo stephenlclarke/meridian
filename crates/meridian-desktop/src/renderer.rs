@@ -3,8 +3,8 @@ use std::sync::{
     atomic::{AtomicBool, Ordering},
 };
 
-use meridian_core::Snapshot;
 use meridian_core::docking::{DockingPort, StationPose};
+use meridian_core::{PulseShot, Snapshot};
 use wgpu::util::DeviceExt;
 use winit::{dpi::PhysicalSize, event_loop::OwnedDisplayHandle, window::Window};
 
@@ -177,7 +177,7 @@ impl Renderer {
         });
         let ship = mesh::load_ship()?;
         let station = mesh::load_station()?;
-        let vertex_capacity = ship.len() + station.len() + 3 * 32 * 6;
+        let vertex_capacity = ship.len() + station.len() + 3 * 32 * 6 + mesh::PULSE_VERTEX_COUNT;
         let vertices = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("Reused frame vertices"),
             size: (vertex_capacity * std::mem::size_of::<Vertex>()) as u64,
@@ -255,6 +255,7 @@ impl Renderer {
         &mut self,
         snapshot: &Snapshot,
         station: Option<StationScene<'_>>,
+        pulse: Option<&PulseShot>,
         hud_lines: &[String],
     ) -> Result<(), String> {
         if self.device_lost.load(Ordering::Acquire) {
@@ -287,17 +288,16 @@ impl Renderer {
                 return Err("Surface validation failed".into());
             }
         };
-        mesh::frame_vertices(
-            snapshot,
-            &self.ship,
-            station.map(|scene| mesh::StationRender {
-                vertices: &self.station,
-                pose: scene.pose,
-                port: scene.port,
-                docked: scene.docked,
-            }),
-            &mut self.frame,
-        )?;
+        let station = station.map(|scene| mesh::StationRender {
+            vertices: &self.station,
+            pose: scene.pose,
+            port: scene.port,
+            docked: scene.docked,
+        });
+        mesh::frame_vertices(snapshot, &self.ship, station, &mut self.frame)?;
+        if let (Some(station), Some(shot)) = (station, pulse) {
+            mesh::append_pulse(snapshot, station, shot, &mut self.frame)?;
+        }
         if self.frame.len() > self.vertex_capacity {
             return Err("Frame exceeded its declared vertex capacity".into());
         }
