@@ -1,5 +1,9 @@
-use super::controller::DockedScreens;
-use super::*;
+use super::{
+    ChartLayout, Context, Control, Frame, Hit, Ink, Key, Label, Line, Marker, ModelPreview,
+    ObjectRecord, OfferQuantity, PlanetPreview, RangeRing, Rect, Review, Screen, Viewport,
+    controller::DockedScreens, money,
+};
+use meridian_core::station_services::CommodityId;
 
 fn fit(text: &str, width: f64) -> String {
     text.chars()
@@ -568,6 +572,56 @@ fn showroom(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         Ink::White,
         details,
     );
+    showroom_controls(s, f, details);
+    let model = Rect::new(
+        details.x,
+        details.y + 92.0,
+        details.width,
+        if s.detail {
+            0.0
+        } else {
+            (details.height * 0.32).clamp(0.0, 180.0)
+        },
+    );
+    f.model_bounds = (!s.detail).then_some(model);
+    let baseline = s.baseline.as_deref().unwrap_or(c.current_hull);
+    showroom_previews(s, c, f, model, ship, baseline);
+    let lines = showroom_specifications(s, c, ship, baseline);
+    let content = Rect::new(
+        details.x,
+        model.y + model.height + 8.0,
+        details.width,
+        (details.y + details.height - model.y - model.height - 64.0).max(0.0),
+    );
+    paragraphs(f, &lines, content, s.scroll);
+    let offer = c.exchanges.iter().find(|o| o.object == ship.id);
+    let enabled = offer.is_some_and(|o| o.refusal.is_none()) && !c.paused;
+    button(
+        f,
+        &offer.map_or_else(
+            || "Exchange unavailable".into(),
+            |o| {
+                format!(
+                    "Review exchange {} CR / trade-in {} CR",
+                    money(o.purchase_tenths),
+                    money(o.trade_in_tenths)
+                )
+            },
+        ),
+        Rect::new(
+            details.x,
+            details.y + details.height - 26.0,
+            details.width,
+            24.0,
+        ),
+        Control::Key(Key::Exchange),
+        enabled,
+        offer
+            .and_then(|o| o.refusal)
+            .or(Some("This ship is not available for exchange")),
+    );
+}
+fn showroom_controls(s: &DockedScreens, f: &mut Frame, details: Rect) {
     let control_width = (details.width / 4.0).max(1.0);
     for (i, (title, key)) in [
         ("Pin", Key::PinBaseline),
@@ -616,18 +670,16 @@ fn showroom(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         true,
         None,
     );
-    let model = Rect::new(
-        details.x,
-        details.y + 92.0,
-        details.width,
-        if s.detail {
-            0.0
-        } else {
-            (details.height * 0.32).clamp(0.0, 180.0)
-        },
-    );
-    f.model_bounds = (!s.detail).then_some(model);
-    let baseline = s.baseline.as_deref().unwrap_or(c.current_hull);
+}
+
+fn showroom_previews(
+    s: &DockedScreens,
+    c: &Context<'_>,
+    f: &mut Frame,
+    model: Rect,
+    ship: &ObjectRecord,
+    baseline: &str,
+) {
     let preview_ids = if s.compare {
         vec![baseline, ship.id]
     } else {
@@ -658,6 +710,14 @@ fn showroom(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
             );
         }
     }
+}
+
+fn showroom_specifications(
+    s: &DockedScreens,
+    c: &Context<'_>,
+    ship: &ObjectRecord,
+    baseline: &str,
+) -> Vec<String> {
     let mut lines = vec![
         format!(
             "Authored standard: {} | {}",
@@ -700,40 +760,9 @@ fn showroom(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
             format!("{}: {}", specification_label(spec.key), spec.value)
         });
     }
-    let content = Rect::new(
-        details.x,
-        model.y + model.height + 8.0,
-        details.width,
-        (details.y + details.height - model.y - model.height - 64.0).max(0.0),
-    );
-    paragraphs(f, &lines, content, s.scroll);
-    let offer = c.exchanges.iter().find(|o| o.object == ship.id);
-    let enabled = offer.is_some_and(|o| o.refusal.is_none()) && !c.paused;
-    button(
-        f,
-        &offer.map_or_else(
-            || "Exchange unavailable".into(),
-            |o| {
-                format!(
-                    "Review exchange {} CR / trade-in {} CR",
-                    money(o.purchase_tenths),
-                    money(o.trade_in_tenths)
-                )
-            },
-        ),
-        Rect::new(
-            details.x,
-            details.y + details.height - 26.0,
-            details.width,
-            24.0,
-        ),
-        Control::Key(Key::Exchange),
-        enabled,
-        offer
-            .and_then(|o| o.refusal)
-            .or(Some("This ship is not available for exchange")),
-    );
+    lines
 }
+
 fn category(id: meridian_core::station_services::CommodityId) -> Ink {
     match id.index() {
         3 | 6 | 10 => Ink::Orange,
