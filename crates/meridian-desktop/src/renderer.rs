@@ -24,6 +24,8 @@ pub struct HudScene<'a> {
 
 pub struct SceneEffects<'a> {
     pub pulse: Option<&'a PulseShot>,
+    pub mining: Option<&'a meridian_core::mining::BeltSnapshot>,
+    pub mining_visual: Option<crate::asteroid_render::MiningVisual>,
     pub missiles: &'a [meridian_core::ProjectileSnapshot],
     pub practice: Option<&'a [PracticeBeaconSnapshot; 3]>,
     pub celestial: Option<&'a crate::celestial::Scene>,
@@ -207,7 +209,9 @@ impl Renderer {
             + 3 * 32 * 6
             + mesh::PULSE_VERTEX_COUNT
             + mesh::PRACTICE_VERTEX_COUNT
-            + mesh::MISSILE_VERTEX_COUNT;
+            + mesh::MISSILE_VERTEX_COUNT
+            + crate::asteroid_render::VERTEX_COUNT
+            + crate::asteroid_render::BEAM_VERTEX_COUNT;
         let vertices = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("Reused frame vertices"),
             size: (vertex_capacity * std::mem::size_of::<Vertex>()) as u64,
@@ -306,6 +310,8 @@ impl Renderer {
 
         let SceneEffects {
             pulse,
+            mining,
+            mining_visual,
             missiles,
             practice,
             celestial,
@@ -405,6 +411,24 @@ impl Renderer {
             }
             if let (Some(station), Some(shot)) = (station, pulse) {
                 mesh::append_pulse(snapshot, station, shot, &mut self.frame)?;
+            }
+            if let (Some(station), Some(belt)) = (station, mining) {
+                crate::asteroid_render::append(
+                    snapshot,
+                    station,
+                    belt,
+                    celestial.and_then(|s| s.sun.map(|b| b.position)),
+                    &mut self.frame,
+                )?;
+                if let Some(visual) = mining_visual {
+                    crate::asteroid_render::append_beam(
+                        snapshot,
+                        station,
+                        belt,
+                        visual,
+                        &mut self.frame,
+                    )?;
+                }
             }
             mesh::apply_flight_view(self.flight_view, &mut self.frame);
             if self.frame.len() > self.vertex_capacity {

@@ -29,6 +29,8 @@ Background [asteroid-mining core source](docs/ASTEROID-MINING.md) is under devel
 
 Meridian is a Rust reimplementation of the original L337 project, with direct wgpu graphics, one authoritative World and traceable original content. New code is [proprietary/source-visible](LICENSE); imported original content retains its own notices. Original Elite/Oolite assets are excluded.
 
+The subsequent [physical asteroid renderer](docs/ASTEROID-RENDERER.md) uses the authoritative mining geometry and read-only chart/contact cues. Its actual work-input/publication hook and coherent native mining acceptance remain separate from the published cockpit preview.
+
 ## Modular mining-tool source awaiting execution
 
 The [modular equipment increment](docs/MODULAR-EQUIPMENT.md) authors genuine paid front Mining Laser fitting, same-item Pulse storage/refit, shared resource preparation and a ship-resource readout that remains valid without Pulse fitted. Thirteen standalone and two Root-join cases are **UNRUN**. Actual mining/screen/profile/fleet composition and the full remaining modular catalogue are open. Published previews and profiles are unchanged.

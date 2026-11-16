@@ -470,6 +470,29 @@ impl App {
                 "NAV {name} | RANGE {distance:.0} M | XYZ {x:.0} {y:.0} {z:.0}"
             ));
         }
+        if snapshot.mode == FlightMode::Flight
+            && let Some(belt) = self.game.world.mining_belt_snapshot()
+        {
+            let selected = self
+                .docked
+                .as_ref()
+                .and_then(|m| m.selected_body_cue(&self.game.world));
+            let address = selected.map(|target| (target.id.system, target.id.ordinal));
+            match crate::asteroid_render::hud_cue(snapshot, &belt, address) {
+                Ok(Some(cue)) => match cue.line() {
+                    Ok(line) => hud_lines.push(line),
+                    Err(error) => {
+                        self.fail(event_loop, error);
+                        return;
+                    }
+                },
+                Ok(None) => {}
+                Err(error) => {
+                    self.fail(event_loop, error);
+                    return;
+                }
+            }
+        }
         let docked_frame = if self.menu_active() {
             let viewport = self.renderer.as_ref().and_then(|r| {
                 let [width, height] = r.logical_viewport();
@@ -569,12 +592,15 @@ impl App {
                         docked: snapshot.mode == FlightMode::Docked,
                     });
             let practice = self.game.world.practice_snapshot();
+            let mining = self.game.world.mining_belt_snapshot();
             renderer.set_flight_view(self.game.world.flight_view());
             let presented = renderer.draw(
                 &snapshot,
                 station,
                 SceneEffects {
                     pulse: self.pulse.as_ref(),
+                    mining: mining.as_ref(),
+                    mining_visual: None, // Root retains a real admitted mining shot/opening pose on success.
                     missiles: &self.missile_bodies,
                     practice: practice.as_ref().and_then(|state| state.beacons.as_ref()),
                     celestial: celestial_scene.as_ref(),
