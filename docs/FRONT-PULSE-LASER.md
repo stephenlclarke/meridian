@@ -46,7 +46,7 @@ x=70, y=0 intersects the surface at z=136.32. The beam ends at the nearest
 triangle within range. Reported outcomes are a clear ray or a station
 obstruction in this bounded collision mesh.
 
-The ordinary-impact predecessor now binds actual main-station contacts to original incident identity, legal consequences and permanent T02 failure. The original main-station damage guard admits no hull damage for this actor. A broader combat roster and actual missile launch remain later slices. See [the current ordinary-impact source contract](ORDINARY-IMPACTS.md). Compilation, tests and the failed-attempt desktop join are pending for that predecessor.
+The ordinary-impact predecessor now binds actual main-station contacts to original incident identity, legal consequences and permanent T02 failure. The original main-station damage guard admits no hull damage for this actor. A broader combat roster and actual missile launch remain later slices. See [the current ordinary-impact source contract](ORDINARY-IMPACTS.md). The failed-attempt HUD and station-strike incident notice are joined source. Compilation, tests and native qualification remain pending for that predecessor.
 
 Version 4 stores energy, heat and cooldown as five bytes following the
 existing market block. The original account, paid purchase receipt and
@@ -62,7 +62,7 @@ reset, and suppresses it during jump spool. The flight HUD displays energy,
 heat and cooldown. The existing depth-tested scene draws a short ribbon from
 the committed origin to the committed endpoint, with a depth-tested flash
 on the beam centerline so a centered shot stays visible in the pilot view.
-The HUD reports a clear shot or a station obstruction. The desktop never chooses a contact or changes a
+The HUD reports a clear shot or an accepted station-strike incident. The desktop never chooses a contact or changes a
 discharge's resource cost.
 
 Six authored regressions cover fitted public discharge and refusal, cadence

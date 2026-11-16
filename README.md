@@ -52,7 +52,7 @@ This slice uses save format 3 and refuses older formats without migration, repai
 
 ## Ordinary impact source slice
 
-The authored core predecessor records actual front Pulse station impacts, original legal windows and permanent T02 failure, with version 7 persistence and exact version 4-6 readers. The player damage reducer is prepared; finite missile launch/motion and its actual saved ordnance remain the successor. Root's failed-attempt desktop message and coordinated compilation/tests are pending. This is source work, not an installed preview update. See [ordinary impact rules and limits](docs/ORDINARY-IMPACTS.md).
+The authored core predecessor records actual front Pulse station impacts, original legal windows and permanent T02 failure, with version 7 persistence and exact version 4-6 readers. The player damage reducer is prepared; finite missile launch/motion and its actual saved ordnance remain the successor. The joined desktop shows the failed attempt and accepted station-strike incident. Coordinated compilation, tests and native qualification are pending. This is source work, not an installed preview update. See [ordinary impact rules and limits](docs/ORDINARY-IMPACTS.md).
 
 ## License and quality checks
 
