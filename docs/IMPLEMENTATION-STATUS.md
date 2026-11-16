@@ -72,3 +72,9 @@ The earlier installed Finite Missiles Preview still writes v7 and refuses saving
 - Full first-playable/release acceptance, all 171 expanded fleet and all 64 expanded mission acceptances remain separate and open. Legacy baseline is 23 of 162 ships plus four of six stations. Source catalogue entries are not accepted playable hulls.
 
 Earlier exact-source tests and failures remain in Git history, merged PRs and retained delivery evidence. They must not be transferred to a newer source or counted as new acceptance. Historical feature contracts describe their original boundaries; this page records the current delivered checkpoint.
+
+## Authored successor: original flight and reception
+
+The [T01 core slice](FLIGHT-RECEPTION.md) adds current-owned-fit consent at the supported issuing Avenor/Renas main berth, a real front-view closing step within the original range/alignment limits, later physical doorway return and a separately prepared zero-cash reception. Bounded retained records, independent once-only family trace and shared G02/T02 occupancy are implemented. Version 10 adds the T01 ledger before the existing missile/practice/combat/weapon tail; explicit v4-v9 readers retain earlier state without inventing a T01 attempt or permission.
+
+The new public-journey, refusal, dropped-publication, fit-change, cancellation/capacity, clue/custody, geometry, compatibility and save-tamper tests are authored and UNRUN. The isolated fatal-reducer fixture is not an accepted native player hit or damage-save proof. Root owns desktop integration and writer-failure host tests; G2 whole review and designated exact-source platform/Clippy/Sonar/native qualification remain pending. No earlier result is rebound, and the installed/published v9 preview and profiles remain unchanged.

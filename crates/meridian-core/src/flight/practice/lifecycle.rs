@@ -246,6 +246,7 @@ impl World {
         current: Option<Practice>,
         history: &[Practice],
     ) -> (usize, usize) {
+        let (t01_records, t01_active) = self.flight_reception.occupancy();
         let records = self
             .freight_session
             .as_ref()
@@ -253,8 +254,8 @@ impl World {
         let active = usize::from(self.active_freight_job().is_some())
             + usize::from(current.is_some_and(|p| !p.reception_is_terminal()));
         (
-            records + history.len() + usize::from(current.is_some()),
-            active,
+            records + history.len() + usize::from(current.is_some()) + t01_records,
+            active + t01_active,
         )
     }
     pub(in crate::flight) fn check_practice_capacity(&self) -> Result<(), PracticeError> {
@@ -283,6 +284,7 @@ impl World {
         }
         self.missiles.encode(&mut w);
         self.combat.encode(&mut w);
+        self.flight_reception.encode(&mut w);
         checksum(&w.bytes)
     }
     pub(in crate::flight) fn first_practice_trace(&self) -> Option<PracticeTrace> {

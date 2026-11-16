@@ -70,3 +70,7 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Finite missile behavior and save boundary](docs/FINITE-STARTER-MISSILES.md)
 
 GitHub Actions validates Linux, Windows and macOS. Protected main requires pull requests, current required checks, linear history and resolved conversations; force pushes and deletion are blocked, including for administrators. SonarQube runs after merge from committed main with the exact commit SHA and Previous version policy. Historical change descriptions live in merged GitHub PRs and Git history rather than duplicate issue/PR Markdown files.
+
+## Authored next slice: flight and reception
+
+Core source adds the original no-cost [T01 flight and reception lesson](docs/FLIGHT-RECEPTION.md), measured by real World steps and received separately after a swept return to the issuing Avenor or Renas main berth. Save v10 retains permission, approach endpoints and terminal receipts, with explicit v4-v9 readers. The source and new tests are authored and UNRUN. Desktop controls, review, compiler/Clippy/Sonar and native acceptance remain pending. The installed/published Gunnery Attempts Preview remains v9 with its existing saves-v9 profile.

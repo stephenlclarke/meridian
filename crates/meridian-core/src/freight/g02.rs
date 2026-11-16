@@ -274,6 +274,15 @@ impl CommanderAccount {
         })
     }
 
+    /// Actual inventory/fit identity for a current-fit lesson; money/cargo are not fit revisions.
+    pub(crate) fn owned_fit_identity(&self) -> Option<(u64, [Option<u64>; 8], u64)> {
+        let fit = self.data.fit?;
+        Some((
+            fit.inventory,
+            fit.items.map(|item| item.map(|item| item.id)),
+            self.data.equipment.revision(),
+        ))
+    }
     pub(crate) fn starter_items(&self) -> Option<StarterItems<'_>> {
         self.data.fit.as_ref().map(|fit| StarterItems(&fit.items))
     }

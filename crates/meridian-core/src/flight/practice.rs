@@ -276,6 +276,20 @@ impl Practice {
             .find(|i| self.id(*i) == id)
             .map(|i| geometry::beacon_pose(frame, i))
     }
+    pub(in crate::flight) fn flight_sight_blocked(
+        self,
+        tick: u64,
+        visit: u64,
+        ray: RigidPose,
+        range: f64,
+        station: Option<f64>,
+    ) -> bool {
+        self.sortie() == Some(visit)
+            && self.range.is_some_and(|r| r.opened_tick <= tick)
+            && self.retired.is_none_or(|end| tick < end.tick)
+            && self.terminal_tick().is_none_or(|end| tick <= end)
+            && self.retained_missile_contact(ray, range, station).is_some()
+    }
     pub(super) fn retained_missile_contact(
         self,
         ray: RigidPose,
