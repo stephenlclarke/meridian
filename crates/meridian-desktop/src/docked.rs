@@ -968,4 +968,214 @@ mod tests {
             3
         );
     }
+
+    #[test]
+    fn presented_module_store_and_refit_keep_the_same_item_and_publish_before_continue() {
+        let (directory, mut profile, mut menu) = start();
+        ok(menu.open(&profile.world, ui::Screen::Equipment));
+        let original = profile
+            .world
+            .modular_equipment_snapshot()
+            .unwrap_or_else(|| panic!("Missing admitted equipment state"));
+        let item = original.items[0];
+        let credits = profile.world.credits_tenths();
+        let resources = profile.world.flight_resources_snapshot();
+        for operation in [ui::EquipmentOperation::Store, ui::EquipmentOperation::Fit] {
+            let before = ok(profile.world.save_bytes());
+            ok(menu.request(
+                &mut profile,
+                ui::Request::ReviewEquipment {
+                    node: item.kind.node().into(),
+                    instance: Some(item.id),
+                    slot: "front-laser".into(),
+                    operation,
+                    option: None,
+                },
+            ));
+            assert_eq!(ok(profile.world.save_bytes()), before);
+            let review = &menu
+                .pending
+                .as_ref()
+                .unwrap_or_else(|| panic!("Missing admitted equipment state"))
+                .view;
+            assert_eq!(review.title, "Equipment review");
+            assert!(review.details.iter().any(|s| s.contains("no charge")));
+            present(&mut menu, &profile);
+            ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm)));
+            let expected_slot =
+                (operation == ui::EquipmentOperation::Fit).then_some(ModuleSlot::FrontLaser);
+            let current = profile
+                .world
+                .modular_equipment_snapshot()
+                .unwrap_or_else(|| panic!("Missing admitted equipment state"));
+            assert_eq!(current.items.len(), original.items.len());
+            assert_eq!(current.items[0].id, item.id);
+            assert_eq!(current.items[0].kind, item.kind);
+            assert_eq!(current.items[0].slot, expected_slot);
+            assert_eq!(profile.world.credits_tenths(), credits);
+            assert_eq!(profile.world.flight_resources_snapshot(), resources);
+            let disk = ok(std::fs::read(directory.0.join("commander.meridian")));
+            assert_eq!(disk, ok(profile.world.save_bytes()));
+            let cold = ok(World::from_save_bytes(&disk));
+            assert_eq!(cold.modular_equipment_snapshot(), Some(current));
+            assert_eq!(cold.flight_resources_snapshot(), resources);
+            assert!(menu.pending.is_none());
+        }
+    }
+
+    #[test]
+    fn missile_offer_review_charges_once_and_failed_writer_cannot_publish_a_fitting() {
+        let (directory, mut profile, mut menu) = start();
+        ok(profile.save());
+        ok(menu.open(&profile.world, ui::Screen::Equipment));
+        ok(menu.request(
+            &mut profile,
+            ui::Request::InspectEquipmentSlot("pylon-3".into()),
+        ));
+        let before = ok(profile.world.save_bytes());
+        ok(menu.request(
+            &mut profile,
+            ui::Request::ReviewEquipment {
+                node: "missile-standard".into(),
+                instance: None,
+                slot: "pylon-3".into(),
+                operation: ui::EquipmentOperation::Buy,
+                option: None,
+            },
+        ));
+        assert_eq!(ok(profile.world.save_bytes()), before);
+        assert!(
+            menu.pending
+                .as_ref()
+                .unwrap_or_else(|| panic!("Missing admitted equipment state"))
+                .view
+                .details
+                .iter()
+                .any(|s| s == "Offer 180.0 CR")
+        );
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm)));
+        assert_eq!(profile.world.credits_tenths(), Some(5400));
+        let ammo = profile
+            .world
+            .ammunition_snapshot()
+            .unwrap_or_else(|| panic!("Missing admitted equipment state"));
+        assert_eq!(ammo.items.iter().filter(|i| !i.consumed).count(), 4);
+        let saved = ok(profile.world.save_bytes());
+        assert_eq!(
+            ok(std::fs::read(directory.0.join("commander.meridian"))),
+            saved
+        );
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm)));
+        assert_eq!(ok(profile.world.save_bytes()), saved);
+
+        let item = ammo
+            .items
+            .iter()
+            .find(|i| i.pylon == Some(3) && !i.consumed)
+            .unwrap_or_else(|| panic!("Missing admitted equipment state"));
+        ok(menu.request(
+            &mut profile,
+            ui::Request::ReviewEquipment {
+                node: "missile-standard".into(),
+                instance: Some(item.item),
+                slot: "pylon-3".into(),
+                operation: ui::EquipmentOperation::Store,
+                option: None,
+            },
+        ));
+        present(&mut menu, &profile);
+        let path = directory.0.join("commander.meridian");
+        let backup = directory.0.join("previous-save");
+        ok(std::fs::rename(&path, &backup));
+        ok(std::fs::create_dir(&path));
+        assert!(
+            menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm))
+                .is_err()
+        );
+        assert_eq!(ok(profile.world.save_bytes()), saved);
+        assert_eq!(ok(std::fs::read(&backup)), saved);
+        assert!(menu.pending.is_none());
+        ok(std::fs::remove_dir(&path));
+        ok(std::fs::rename(&backup, &path));
+    }
+
+    #[test]
+    fn invalid_equipment_reviews_preserve_game_and_never_create_confirmation_authority() {
+        let (_directory, mut profile, mut menu) = start();
+        ok(menu.open(&profile.world, ui::Screen::Equipment));
+        let item = profile
+            .world
+            .modular_equipment_snapshot()
+            .unwrap_or_else(|| panic!("Missing admitted equipment state"))
+            .items[0];
+        let before = ok(profile.world.save_bytes());
+        for (node, instance, slot, operation, option, reason) in [
+            (
+                item.kind.node(),
+                Some(item.id),
+                "front-laser",
+                ui::EquipmentOperation::Store,
+                Some("invented".into()),
+                "no configurable option",
+            ),
+            (
+                item.kind.node(),
+                Some(item.id),
+                "cargo-expansion",
+                ui::EquipmentOperation::Store,
+                None,
+                "slot changed",
+            ),
+            (
+                "unknown-module",
+                Some(item.id),
+                "front-laser",
+                ui::EquipmentOperation::Fit,
+                None,
+                "selection changed",
+            ),
+            (
+                item.kind.node(),
+                Some(u64::MAX),
+                "front-laser",
+                ui::EquipmentOperation::Fit,
+                None,
+                "selection changed",
+            ),
+            (
+                item.kind.node(),
+                Some(item.id),
+                "front-laser",
+                ui::EquipmentOperation::Configure,
+                None,
+                "unavailable",
+            ),
+            (
+                ModuleKind::MiningLaser.node(),
+                None,
+                "front-laser",
+                ui::EquipmentOperation::Buy,
+                None,
+                "InsufficientCredits",
+            ),
+        ] {
+            let refusal = menu
+                .request(
+                    &mut profile,
+                    ui::Request::ReviewEquipment {
+                        node: node.into(),
+                        instance,
+                        slot: slot.into(),
+                        operation,
+                        option,
+                    },
+                )
+                .err()
+                .unwrap_or_else(|| panic!("Invalid equipment request was accepted"));
+            assert!(refusal.contains(reason), "{refusal}");
+            assert!(menu.pending.is_none());
+            assert_eq!(ok(profile.world.save_bytes()), before);
+        }
+    }
 }
