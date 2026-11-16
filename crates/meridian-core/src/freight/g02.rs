@@ -217,6 +217,7 @@ struct AccountData {
     legal: u8,
     equipment: crate::equipment::State,
     ammunition_revision: u64,
+    modular_revision: u64,
 }
 
 /// One World-owned account, not a second mission wallet or an authority actor.
@@ -254,6 +255,7 @@ impl CommanderAccount {
                 legal: 0,
                 equipment: crate::equipment::State::default(),
                 ammunition_revision: 0,
+                modular_revision: 0,
                 fit: Some(StarterFit {
                     owner: ids.owner,
                     hull: ids.hull,
@@ -273,13 +275,39 @@ impl CommanderAccount {
             self.data
                 .equipment
                 .revision()
-                .checked_add(self.data.ammunition_revision)?,
+                .checked_add(self.data.ammunition_revision)?
+                .checked_add(self.data.modular_revision)?,
         ))
     }
     pub(crate) fn starter_items(&self) -> Option<StarterItems<'_>> {
         self.data.fit.as_ref().map(|fit| StarterItems(&fit.items))
     }
 
+    pub(crate) fn modular_revision(&self) -> u64 {
+        self.data.modular_revision
+    }
+    pub(crate) fn prepare_module(&self, paid: u32, pulse_fitted: bool) -> Result<Self, Error> {
+        let mut data = self.data;
+        data.credits = data
+            .credits
+            .checked_sub(paid)
+            .ok_or(Error::InsufficientFunds)?;
+        data.revision = data
+            .revision
+            .checked_add(1)
+            .ok_or(Error::SequenceExhausted)?;
+        data.modular_revision = data
+            .modular_revision
+            .checked_add(1)
+            .ok_or(Error::SequenceExhausted)?;
+        let pulse = data
+            .fit
+            .as_mut()
+            .and_then(|fit| fit.items[4].as_mut())
+            .ok_or(Error::MissingEquipment)?;
+        pulse.fitted_hull = pulse_fitted.then_some(data.hull);
+        Ok(Self { data })
+    }
     pub(crate) fn ammunition_revision(&self) -> u64 {
         self.data.ammunition_revision
     }
@@ -1140,14 +1168,16 @@ fn validate_cargo_and_utility(
     account: &AccountData,
     fit: &StarterFit,
 ) -> Result<(), Error> {
-    // Actual remaining starter items stay fitted. Consumed pylon rounds are absent;
+    // Remaining birth items stay fitted except an explicitly recorded modular Pulse store.
+    // Consumed pylon rounds are absent;
     // no held item receives an invented intrinsic/weapon budget exemption.
     if account.equipment.owned().is_some()
-        && fit
-            .items
-            .iter()
-            .flatten()
-            .any(|item| item.fitted_hull != Some(account.hull))
+        && fit.items.iter().enumerate().any(|(index, item)| {
+            item.is_some_and(|item| {
+                item.fitted_hull != Some(account.hull)
+                    && !(index == 4 && account.modular_revision > 0 && item.fitted_hull.is_none())
+            })
+        })
     {
         return Err(Error::InvalidFit);
     }

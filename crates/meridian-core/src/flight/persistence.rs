@@ -96,7 +96,7 @@ const V11_CONTENT: &[u8] = concat!(
 .as_bytes();
 
 const CONTENT: &[u8] = concat!(
-    "meridian-world/rules/12;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
+    "meridian-world/rules/13;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -130,6 +130,7 @@ pub(super) struct Commerce<'a> {
     pub(super) markets: Option<&'a StationMarkets>,
     pub(super) lesson: &'a navigation_trade::State,
     pub(super) ammunition: &'a super::ammunition::State,
+    pub(super) modular: &'a super::modular::State,
 }
 impl<'a> Commerce<'a> {
     fn current(world: &'a World) -> Self {
@@ -138,6 +139,7 @@ impl<'a> Commerce<'a> {
             markets: world.station_markets.as_ref(),
             lesson: &world.navigation_trade,
             ammunition: &world.ammunition,
+            modular: &world.modular,
         }
     }
 }
@@ -218,6 +220,7 @@ impl World {
             markets: Some(markets),
             lesson,
             ammunition: &self.ammunition,
+            modular: &self.modular,
         };
         self.validate_saved_world(
             self.practice,
@@ -244,6 +247,34 @@ impl World {
             markets: self.station_markets.as_ref(),
             lesson: &self.navigation_trade,
             ammunition,
+            modular: &self.modular,
+        };
+        self.validate_saved_world(
+            self.practice,
+            &self.practice_history,
+            self.practice_trace,
+            &self.flight_reception,
+            &commerce,
+        )?;
+        self.encode_saved_world(
+            self.practice,
+            &self.practice_history,
+            self.practice_trace,
+            &self.flight_reception,
+            &commerce,
+        )
+    }
+    pub(super) fn save_bytes_with_modules(
+        &self,
+        account: &CommanderAccount,
+        modular: &super::modular::State,
+    ) -> Result<Vec<u8>, SaveError> {
+        let commerce = Commerce {
+            account: Some(account),
+            markets: self.station_markets.as_ref(),
+            lesson: &self.navigation_trade,
+            ammunition: &self.ammunition,
+            modular,
         };
         self.validate_saved_world(
             self.practice,
@@ -290,6 +321,7 @@ impl World {
             .markets
             .ok_or(SaveError::NoCommander)?
             .encode_save(&mut w);
+        commerce.modular.encode(&mut w);
         commerce.ammunition.encode(&mut w);
         commerce.lesson.encode(&mut w);
         lesson.encode(&mut w);
@@ -392,6 +424,11 @@ impl World {
         let commander_account = CommanderAccount::decode_save(&mut r, version)?;
         let freight_session = mission::FreightSession::decode_save(&mut r)?;
         let station_markets = StationMarkets::decode_save(&mut r)?;
+        let modular = if version >= 13 {
+            super::modular::State::decode(&mut r)?
+        } else {
+            super::modular::State::default()
+        };
         let ammunition = if version >= 12 {
             super::ammunition::State::decode(&mut r)?
         } else {
@@ -429,6 +466,7 @@ impl World {
             station_markets: Some(station_markets),
             missiles,
             ammunition,
+            modular,
             flight_reception,
             navigation_trade,
             practice_history,
@@ -527,7 +565,12 @@ impl World {
                 usize::from(practice.is_some_and(|p| !p.reception_is_terminal())),
             ),
         )?;
-        let ammunition = commerce.ammunition.ledger(self, account)?;
+        let modular = commerce.modular.ledger(self, account)?;
+        let ammunition = commerce.ammunition.ledger_with_module_count(
+            self,
+            account,
+            commerce.modular.paid_count(),
+        )?;
         self.missiles
             .validate(self, practice, history, nav.dock_sequence)?;
         self.combat.validate(self)?;
@@ -581,8 +624,14 @@ impl World {
             nav.jumps,
             nav.fuel_spent,
             self.combat.penalties(),
-            ammunition.paid,
-            ammunition.extra_revisions,
+            ammunition
+                .paid
+                .checked_add(modular.paid)
+                .ok_or(SaveError::InvalidState("paid equipment overflow"))?,
+            ammunition
+                .extra_revisions
+                .checked_add(modular.revision)
+                .ok_or(SaveError::SequenceExhausted)?,
         )?;
         if navigation
             .dock()
@@ -754,6 +803,9 @@ fn legacy_test_fixture(world: &World, version: u16) -> Result<Vec<u8>, SaveError
         &world.flight_reception,
         &Commerce::current(world),
     )?;
+    if world.modular != super::modular::State::default() {
+        return Err(SaveError::UnsupportedVersion);
+    }
     if world.ammunition != super::ammunition::State::default() || world.missiles.used() > 3 {
         return Err(SaveError::UnsupportedMissiles);
     }
@@ -910,7 +962,7 @@ mod paid_missile_format_tests {
         assert_eq!(loaded.ammunition_snapshot(), world.ammunition_snapshot());
         assert_eq!(loaded.credits_tenths(), world.credits_tenths());
         let current = loaded.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
-        assert_eq!(u16::from_le_bytes([current[8], current[9]]), 12);
+        assert_eq!(u16::from_le_bytes([current[8], current[9]]), 13);
         assert_ne!(old, current);
     }
 }

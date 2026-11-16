@@ -229,6 +229,14 @@ impl State {
         world: &World,
         account: &CommanderAccount,
     ) -> Result<Ledger, SaveError> {
+        self.ledger_with_module_count(world, account, world.modular.paid_count())
+    }
+    pub(super) fn ledger_with_module_count(
+        &self,
+        world: &World,
+        account: &CommanderAccount,
+        modules: usize,
+    ) -> Result<Ledger, SaveError> {
         let owner = world.combat_identity().ok_or(INVALID)?.owner;
         let mut ledger = Ledger::default();
         for pylon in 0..3 {
@@ -249,45 +257,14 @@ impl State {
         let mut purchases = 0_u32;
         let mut previous: Option<Event> = None;
         for e in &self.events {
-            // A menu action is tied to an actual retained main-berth admission, never a producer alias.
-            let nav = world.navigation.ok_or(INVALID)?.validate_save(
-                world.navigation_catalogue.as_ref().ok_or(INVALID)?,
-                world.state.mode,
-                world.state.tick,
-                account.fuel_tenths(),
+            validate_berth_event(
+                world,
+                account,
+                e.dock,
+                e.tick,
+                e.revision,
+                previous.map(|p| (p.dock.sequence(), p.tick, p.revision)),
             )?;
-            if e.dock.ship().owner() != e.dock.owner()
-                || e.dock.owner().seed() != owner
-                || e.dock.ship().ordinal() != world.combat_identity().ok_or(INVALID)?.hull
-                || super::services::service_site(e.dock.system()).is_none()
-                || e.dock.sequence() == 0
-                || e.dock.sequence() > nav.dock_sequence
-                || e.dock.visit() < e.dock.sequence()
-                || e.dock.visit() > nav.visit
-                || e.dock.tick() > e.tick
-                || e.tick > world.state.tick
-                || e.revision == 0
-                || e.revision > account.revision()
-                || previous.is_some_and(|p| {
-                    e.tick < p.tick
-                        || e.revision <= p.revision
-                        || e.dock.sequence() < p.dock.sequence()
-                })
-                || world
-                    .current_dock_context()
-                    .is_some_and(|d| d.sequence() == e.dock.sequence() && d != e.dock)
-            {
-                return Err(INVALID);
-            }
-            match e.dock.origin() {
-                DockOrigin::InitialStart
-                    if e.dock.sequence() == 1
-                        && e.dock.visit() == 1
-                        && e.dock.tick() == 0
-                        && e.dock.system() == crate::navigation::SystemId::AVENOR => {}
-                DockOrigin::PhysicalEntry if e.dock.sequence() > 1 && e.dock.tick() > 0 => {}
-                _ => return Err(INVALID),
-            }
             while launches.peek().is_some_and(|o| o.launched_tick <= e.tick) {
                 let o = launches.next().ok_or(INVALID)?;
                 if o.launched_tick >= e.dock.tick() && o.owner.visit >= e.dock.visit() {
@@ -334,7 +311,7 @@ impl State {
         if ledger.extra_revisions != account.ammunition_revision() {
             return Err(INVALID);
         }
-        let foundation = 4 + usize::from(account.equipment_state().owned().is_some());
+        let foundation = 4 + usize::from(account.equipment_state().owned().is_some()) + modules;
         // The one reserved stock drive is exempt from the original ordinary-item bound.
         if ledger.items.iter().filter(|i| !i.consumed).count() + foundation > 256 {
             return Err(INVALID);
@@ -474,6 +451,7 @@ impl World {
         if ledger.items.iter().filter(|i| !i.consumed).count()
             + 4
             + usize::from(account.equipment_state().owned().is_some())
+            + self.modular.paid_count()
             > 256
         {
             return Err(AmmunitionError::Full);
@@ -552,3 +530,49 @@ impl World {
 
 #[cfg(test)]
 mod tests;
+
+pub(super) fn validate_berth_event(
+    world: &World,
+    account: &CommanderAccount,
+    dock: DockContext,
+    tick: u64,
+    revision: u64,
+    previous: Option<(u64, u64, u64)>,
+) -> Result<(), SaveError> {
+    let owner = world.combat_identity().ok_or(INVALID)?;
+    let nav = world.navigation.ok_or(INVALID)?.validate_save(
+        world.navigation_catalogue.as_ref().ok_or(INVALID)?,
+        world.state.mode,
+        world.state.tick,
+        account.fuel_tenths(),
+    )?;
+    if dock.ship().owner() != dock.owner()
+        || dock.owner().seed() != owner.owner
+        || dock.ship().ordinal() != world.combat_identity().ok_or(INVALID)?.hull
+        || super::services::service_site(dock.system()).is_none()
+        || dock.sequence() == 0
+        || dock.sequence() > nav.dock_sequence
+        || dock.visit() < dock.sequence()
+        || dock.visit() > nav.visit
+        || dock.tick() > tick
+        || tick > world.state.tick
+        || revision == 0
+        || revision > account.revision()
+        || previous.is_some_and(|p| tick < p.1 || revision <= p.2 || dock.sequence() < p.0)
+        || world
+            .current_dock_context()
+            .is_some_and(|d| d.sequence() == dock.sequence() && d != dock)
+    {
+        return Err(INVALID);
+    }
+    match dock.origin() {
+        DockOrigin::InitialStart
+            if dock.sequence() == 1
+                && dock.visit() == 1
+                && dock.tick() == 0
+                && dock.system() == crate::navigation::SystemId::AVENOR => {}
+        DockOrigin::PhysicalEntry if dock.sequence() > 1 && dock.tick() > 0 => {}
+        _ => return Err(INVALID),
+    }
+    Ok(())
+}

@@ -29,7 +29,7 @@ Every purchase/store/refit/consumption advances the ammunition fit revision. Exi
 
 ## Current save and continuation
 
-The current format is explicitly v12. It adds the account ammunition fit revision, acquisition/fitting events, variable retained projectile records and nine-body T01 sight samples. The v11 fuel-chain-v1 content boundary is retained verbatim; the pre-existing v4-v11 readers remain available. No published preview or existing profile is modified, and no old bytes are relabelled as v12. Greenfield product work does not require further compatibility expansion. Unsupported/corrupt files refuse without replacing the current World or last valid file.
+The paid missile first author increment used explicit v12; the following modular-tool source uses draft v13. Root must compose one explicit final equipment/mining format before execution. It adds the account ammunition fit revision, acquisition/fitting events, variable retained projectile records and nine-body T01 sight samples. The v11 fuel-chain-v1 content boundary is retained verbatim; the pre-existing v4-v11 readers remain available. No published preview or existing profile is modified, and no old bytes are relabelled as a new format. Greenfield product work does not require further compatibility expansion. Unsupported/corrupt files refuse without replacing the current World or last valid file.
 
 ## Acceptance for the execution owners
 

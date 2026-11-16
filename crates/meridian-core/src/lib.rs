@@ -55,3 +55,10 @@ pub use flight::{
     AmmunitionAction, AmmunitionError, AmmunitionItem, AmmunitionReview, AmmunitionSnapshot,
     MissilePurchase, PreparedAmmunition,
 };
+
+pub use flight::{
+    FittedMiningTool, ModularEquipmentSnapshot, ModuleAction, ModuleError, ModuleKind, ModuleOffer,
+    ModuleProvenance, ModuleReview, ModuleSlot, OwnedModule, PreparedModule,
+};
+
+pub use flight::FlightResourcesSnapshot;

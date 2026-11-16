@@ -20,6 +20,7 @@ pub enum FireError {
     NoCommander,
     NotInFlight,
     NoFittedFrontPulseLaser,
+    NoCompatibleMiningTool,
     CoolingDown,
     Overheated,
     InsufficientEnergy,
@@ -33,6 +34,7 @@ impl fmt::Display for FireError {
             Self::Paused => "World is paused",
             Self::NoCommander => "An owned commander profile is required",
             Self::NotInFlight => "The front Pulse Laser requires active flight",
+            Self::NoCompatibleMiningTool => "Fit a paid compatible mining laser",
             Self::NoFittedFrontPulseLaser => "No owned front Pulse Laser is fitted",
             Self::CoolingDown => "Pulse Laser is cooling down",
             Self::Overheated => "Pulse Laser is overheated",
@@ -79,6 +81,13 @@ pub struct PulseLaserSnapshot {
     pub cooldown_ticks: u8,
 }
 
+/// Shared electrical/weapon condition remains readable when a particular laser is stored.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct FlightResourcesSnapshot {
+    pub energy_hundredths: u16,
+    pub heat_fifths: u16,
+    pub cooldown_ticks: u8,
+}
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) struct PulseResources {
     energy: u16,
@@ -125,6 +134,13 @@ impl PulseResources {
             heat: self.heat + HEAT_COST_FIFTHS,
             cooldown: PULSE_COOLDOWN_TICKS,
         })
+    }
+    pub(super) fn prepare_mining_discharge(self) -> Result<Self, FireError> {
+        // Original selected mining work uses <=230 heat, sharing energy/heat/cooldown with lasers.
+        if self.heat > 1150 {
+            return Err(FireError::Overheated);
+        }
+        self.prepare_discharge()
     }
     pub(super) fn alive(self) -> bool {
         self.energy > 0
@@ -323,6 +339,12 @@ impl World {
         ))
     }
     pub(super) fn fitted_front_pulse(&self) -> Option<u64> {
+        if self
+            .modular_front()
+            .is_none_or(|i| i.kind != super::modular::ModuleKind::PulseLaser)
+        {
+            return None;
+        }
         let nav = self.navigation?;
         let owner = nav.owner().seed();
         let hull = nav.ship().ordinal();
@@ -340,6 +362,14 @@ impl World {
             .map(crate::freight::g02::OwnedStarterItem::id)
     }
 
+    pub fn flight_resources_snapshot(&self) -> Option<FlightResourcesSnapshot> {
+        self.commander_account.as_ref()?;
+        Some(FlightResourcesSnapshot {
+            energy_hundredths: self.pulse.energy,
+            heat_fifths: self.pulse.heat,
+            cooldown_ticks: self.pulse.cooldown,
+        })
+    }
     pub fn pulse_laser_snapshot(&self) -> Option<PulseLaserSnapshot> {
         Some(PulseLaserSnapshot {
             fitted_item_id: self.fitted_front_pulse()?,
