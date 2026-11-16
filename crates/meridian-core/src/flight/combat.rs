@@ -215,8 +215,8 @@ impl State {
         self.encode_version(w, 8);
     }
     #[cfg(test)]
-    pub(super) fn encode_v7(self, w: &mut Writer) {
-        self.encode_version(w, 7);
+    pub(super) fn encode_legacy_version(self, w: &mut Writer, version: u16) {
+        self.encode_version(w, version);
     }
     fn encode_version(self, w: &mut Writer, version: u16) {
         w.u64(self.emissions);

@@ -3,7 +3,7 @@ use super::*;
 use crate::flight::practice::tests::{aim_at, consent, launch, shoot, step};
 use crate::{FlightInput, PracticeStatus, PulseContact};
 
-fn stop(world: &mut World) {
+pub(in crate::flight) fn stop(world: &mut World) {
     for _ in 0..300 {
         if world.snapshot().speed == 0.0 {
             return;
@@ -23,7 +23,7 @@ fn practice(seed: u64) -> World {
     launch(&mut world);
     world
 }
-fn fire(world: &mut World, target: PracticeBeaconId) -> MissileOrigin {
+pub(in crate::flight) fn fire(world: &mut World, target: PracticeBeaconId) -> MissileOrigin {
     let tick = world.snapshot().tick;
     world.request_missile_lock(Some(target), tick).unwrap();
     world.request_missile_arm(true, tick).unwrap();
@@ -39,7 +39,7 @@ fn projectile(world: &World, id: ProjectileId) -> ProjectileSnapshot {
         .find(|p| p.origin.projectile == id)
         .unwrap()
 }
-fn finish(world: &mut World, id: ProjectileId) -> ProjectileSnapshot {
+pub(in crate::flight) fn finish(world: &mut World, id: ProjectileId) -> ProjectileSnapshot {
     for _ in 0..500 {
         let p = projectile(world, id);
         if p.ended.is_some() {
@@ -49,7 +49,7 @@ fn finish(world: &mut World, id: ProjectileId) -> ProjectileSnapshot {
     }
     panic!("finite projectile did not end");
 }
-fn fly_axis(world: &mut World, axis: usize, value: f64, speed: f32) {
+pub(in crate::flight) fn fly_axis(world: &mut World, axis: usize, value: f64, speed: f32) {
     stop(world);
     let opening = world.snapshot().position;
     let sign = (value - f64::from(opening[axis])).signum();
@@ -72,7 +72,7 @@ fn fly_axis(world: &mut World, axis: usize, value: f64, speed: f32) {
     }
     panic!("public axis flight did not reach waypoint");
 }
-fn dock(world: &mut World) {
+pub(in crate::flight) fn dock(world: &mut World) {
     stop(world);
     aim_at(world, Vec3::new(0.0, 0.0, 0.0));
     for _ in 0..9000 {

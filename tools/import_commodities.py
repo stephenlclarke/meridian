@@ -101,7 +101,7 @@ def definitions(authoring: dict[str, Any]) -> tuple[list[dict[str, Any]], list[i
 
 def source_semantics(raw: dict[str, bytes]) -> tuple[list[str], list[int]]:
     identities = raw['identities'].decode()
-    enum = re.search(r'public enum CommodityIdentity:[^{]+\{\s*case (.*?)\n  public var unit:', identities, re.S)
+    enum = re.search(r'public enum CommodityIdentity:[^{]+\{\s*case (.*?)\n {2}public var unit:', identities, re.S)
     if enum is None:
         raise ValueError('Missing native commodity identity source')
     names = [name.strip() for name in enum.group(1).replace('\n', '').split(',')]

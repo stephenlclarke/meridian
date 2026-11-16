@@ -4,8 +4,8 @@ use crate::docking::Vec3;
 use core::fmt;
 mod geometry;
 mod persistence;
-use geometry::*;
 pub use geometry::{MISSILE_FACES, MISSILE_VERTICES};
+use geometry::{add, length, mesh_distance, pose, scale, sub, unit};
 pub const MISSILE_SPEED: f64 = 792.0;
 pub const MISSILE_RANGE: f64 = 6000.0;
 pub const MISSILE_LIFETIME_TICKS: u16 = 1440;
@@ -674,4 +674,4 @@ fn choose(best: &mut Option<(f64, MissileContact)>, distance: f64, contact: Miss
 }
 
 #[cfg(test)]
-mod tests;
+pub(super) mod tests;

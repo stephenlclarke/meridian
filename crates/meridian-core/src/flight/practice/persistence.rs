@@ -1,4 +1,8 @@
-use super::*;
+use super::{
+    DockContext, FirstHit, FlightMode, NavigationState, OriginalStationData, Practice,
+    PracticeOutcome, Range, RecordedPose, Retirement, RigidPose, Snapshot, SystemId, geometry,
+    lifecycle, reception,
+};
 use crate::flight::weapons::PulseResources;
 use crate::navigation::SavedNavigationSummary;
 use crate::save::{Reader, SaveError, Writer};
@@ -6,11 +10,15 @@ const INVALID: SaveError = SaveError::InvalidState("T02 practice consent, visit 
 
 impl Practice {
     pub(in crate::flight) fn encode(self, w: &mut Writer) {
-        self.encode_version(w, 8);
+        self.encode_version(w, 9);
     }
     #[cfg(test)]
     pub(in crate::flight) fn encode_v7(self, w: &mut Writer) {
         self.encode_version(w, 7);
+    }
+    #[cfg(test)]
+    pub(in crate::flight) fn encode_v8(self, w: &mut Writer) {
+        self.encode_version(w, 8);
     }
     fn encode_version(self, w: &mut Writer, version: u16) {
         self.consent.encode_save(w);
@@ -35,9 +43,23 @@ impl Practice {
         if version >= 8 {
             w.u8(self.pending_missiles);
         }
+        if version >= 9 {
+            w.u8(self.attempt);
+            w.option(self.settlement.as_ref(), |w, o| {
+                w.u8(match o {
+                    PracticeOutcome::Complete => 0,
+                    PracticeOutcome::Failed => 1,
+                    PracticeOutcome::Abandoned => 2,
+                })
+            });
+            w.option(self.cancel.as_ref(), |w, c| c.encode(w));
+        }
     }
     pub(in crate::flight) fn decode(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
         let mut practice = Self {
+            attempt: 0,
+            settlement: None,
+            cancel: None,
             consent: DockContext::decode_save(r)?,
             confirmed_tick: r.u64()?,
             range: r.option(|r| {
@@ -72,6 +94,16 @@ impl Practice {
         if version >= 8 {
             practice.pending_missiles = r.u8()?;
         }
+        if version >= 9 {
+            practice.attempt = r.u8()?;
+            practice.settlement = r.option(|r| match r.u8()? {
+                0 => Ok(PracticeOutcome::Complete),
+                1 => Ok(PracticeOutcome::Failed),
+                2 => Ok(PracticeOutcome::Abandoned),
+                _ => Err(INVALID),
+            })?;
+            practice.cancel = r.option(lifecycle::Closure::decode)?;
+        }
         Ok(practice)
     }
     pub(in crate::flight) fn validate(
@@ -82,6 +114,7 @@ impl Practice {
         data: &OriginalStationData,
         pulse: PulseResources,
     ) -> Result<(), SaveError> {
+        self.validate_closure(nav, flight.tick)?;
         let sortie = self.sortie().ok_or(INVALID)?;
         self.validate_consent(nav, flight.tick)?;
         self.validate_lifetime(nav, navigation, flight, sortie)?;
@@ -144,6 +177,13 @@ impl Practice {
         flight: Snapshot,
         sortie: u64,
     ) -> Result<(), SaveError> {
+        if self.cancel.is_some() && self.range.is_none() && self.retired.is_none() {
+            return if self.cancel.is_some_and(|c| c.dock == self.consent) {
+                Ok(())
+            } else {
+                Err(INVALID)
+            };
+        }
         if let Some(retired) = self.retired {
             if retired.tick <= self.confirmed_tick
                 || retired.tick > flight.tick

@@ -1,5 +1,7 @@
 # Durable missile sessions
 
+This guide records the delivered v8 preview. The authored [attempt-lifecycle successor](SAFE-GUNNERY-ATTEMPTS.md) retains these missile invariants and adds v9 attempt history; review and execution are pending.
+
 ## Status and scope
 
 Version 8 replaces the deliberate finite-missile save refusal with a checked representation of the complete bounded session. Reviewed candidate `58f45c8` passed full Mac/Linux/native Windows checks: 193 top-level Rust tests, 48 importers, strict Clippy and desktop builds on each platform. Actual signed Metal cold checkpoints cover arm/lock, paused live flight, first impact, all three consumed/ended projectiles, physical docking and relaunch with zero ammunition. Isolated old v4-v7 Continue and invalid-checksum live refusal also passed. Root audited retained files, source and terminal records. [Implementation status](IMPLEMENTATION-STATUS.md) records precise scope and remaining limits.

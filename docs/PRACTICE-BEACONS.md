@@ -1,5 +1,7 @@
 # Avenor practice beacons
 
+The installed v8 preview follows the qualified single-attempt flow below. The authored [closure/retry successor](SAFE-GUNNERY-ATTEMPTS.md) adds F7 reviewed closure, F10 fresh consent and v9 history; review and execution are pending.
+
 At the Avenor main berth, press F10 to review one safe gunnery practice sortie. Enter confirms and saves the choice. B cancels. After launch, continue into clear flight to open the range. Hold Z to fire the fitted front Pulse Laser. The HUD counts distinct beacon hits and a newly hit beacon flashes white. After the third hit, release Z for three continuous, unpaused flight seconds. Return to the actual Avenor main berth and press F8 to review reception. Enter confirms reception and saves the Safe Gunnery Family Trace once.
 
 The practice provider follows original L337 revision

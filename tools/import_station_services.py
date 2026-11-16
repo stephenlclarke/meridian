@@ -32,6 +32,24 @@ def read_blob(repository, identifier):
     return raw
 
 
+def food_quote(markets, system):
+    states = [s for s in markets['markets'] if s['galaxy'] == 0 and s['system'] == system]
+    if len(states) != 1 or len(states[0]['quotes']) != 17:
+        raise ValueError('Original station market differs')
+    quotes = [q for q in states[0]['quotes'] if q['index'] == 0]
+    if len(quotes) != 1:
+        raise ValueError('Original Food quote differs')
+    quote = quotes[0]
+    if (quote['name'], quote['unit'], quote['epoch'], quote['system'], quote['worldVersion']) != (
+            'Food', 't', 0, system, 'l337-world-1'):
+        raise ValueError('Original Food identity differs')
+    if not 0 <= quote['bidTenthsCR'] <= quote['askTenthsCR'] <= 1000000:
+        raise ValueError('Invalid original price')
+    if not 0 <= quote['stock'] <= (2 ** 63 - 1) // 17:
+        raise ValueError('Invalid original stock')
+    return quote
+
+
 def convert(raw_manifest, raw_markets):
     for identifier, raw in [('manifest', raw_manifest), ('markets', raw_markets)]:
         if hashlib.sha256(raw).hexdigest() != SOURCES[identifier][1]:
@@ -46,20 +64,7 @@ def convert(raw_manifest, raw_markets):
     output = bytearray(struct.pack('<8sH', b'MMKT0001', 2))
     selected = []
     for system in [7, 185]:
-        states = [s for s in markets['markets'] if s['galaxy'] == 0 and s['system'] == system]
-        if len(states) != 1 or len(states[0]['quotes']) != 17:
-            raise ValueError('Original station market differs')
-        quotes = [q for q in states[0]['quotes'] if q['index'] == 0]
-        if len(quotes) != 1:
-            raise ValueError('Original Food quote differs')
-        quote = quotes[0]
-        if (quote['name'], quote['unit'], quote['epoch'], quote['system'], quote['worldVersion']) != (
-                'Food', 't', 0, system, 'l337-world-1'):
-            raise ValueError('Original Food identity differs')
-        if not 0 <= quote['bidTenthsCR'] <= quote['askTenthsCR'] <= 1000000:
-            raise ValueError('Invalid original price')
-        if not 0 <= quote['stock'] <= (2 ** 63 - 1) // 17:
-            raise ValueError('Invalid original stock')
+        quote = food_quote(markets, system)
         output.extend(struct.pack('<HIIQ', system, quote['askTenthsCR'], quote['bidTenthsCR'], quote['stock']))
         selected.append(quote)
     data = bytes(output)

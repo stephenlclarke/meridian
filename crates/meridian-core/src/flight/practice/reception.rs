@@ -1,4 +1,9 @@
-use super::*;
+use super::{
+    DockContext, Practice, PracticeAttemptId, PracticeError, PracticeOutcome,
+    PreparedPracticeConfirmation, Range, Snapshot, SystemId, World,
+};
+#[cfg(test)]
+use super::{FlightMode, Vec3};
 use crate::flight::weapons::PulseResources;
 use crate::navigation::DockOrigin;
 use crate::save::{Reader, SaveError, Writer};
@@ -13,6 +18,8 @@ pub struct PracticeReceptionReview {
     dock: DockContext,
     tick: u64,
     epoch: u64,
+    fingerprint: u64,
+    attempt: PracticeAttemptId,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -54,6 +61,16 @@ impl Range {
 }
 
 impl Practice {
+    pub(in crate::flight) fn upgrade_legacy_terminal(&mut self) {
+        self.settlement = self.completed_tick().map(|_| PracticeOutcome::Complete);
+    }
+    pub(in crate::flight) fn completed_tick(self) -> Option<u64> {
+        self.reception.completion.map(|c| c.tick)
+    }
+    pub(in crate::flight) fn completed_dock(self) -> Option<DockContext> {
+        self.reception.completion.map(|c| c.dock)
+    }
+
     pub(in crate::flight) fn validate_missile_quiet(
         self,
         projectiles: [Option<crate::flight::ProjectileSnapshot>; 3],
@@ -81,9 +98,9 @@ impl Practice {
                     crate::flight::MissileContact::Station
                         | crate::flight::MissileContact::Player { .. }
                 )
-            ) && !self.reception_is_terminal()
-                && p.last_tick >= self.confirmed_tick
-                && self.ordinary_hit.is_none()
+            ) && p.last_tick >= self.confirmed_tick
+                && self.terminal_tick().is_none_or(|end| p.last_tick <= end)
+                && self.ordinary_hit.is_none_or(|hit| hit.tick > p.last_tick)
             {
                 return Err(invalid);
             }
@@ -92,7 +109,7 @@ impl Practice {
     }
 
     pub(in crate::flight) fn reception_is_terminal(self) -> bool {
-        self.reception.completion.is_some()
+        self.settlement.is_some() || self.reception.completion.is_some() || self.cancel.is_some()
     }
     pub(in crate::flight) fn clear_failed_reception(&mut self) {
         self.reception.anchor = None;
@@ -126,7 +143,7 @@ impl Practice {
 
     pub(in crate::flight) fn observe_discharge(&mut self, tick: u64) {
         if self.ordinary_hit.is_none()
-            && self.reception.completion.is_none()
+            && !self.reception_is_terminal()
             && self.range.and_then(Range::third_hit).is_some()
         {
             self.reception.anchor = Some(tick);
@@ -180,6 +197,12 @@ impl Practice {
         current_dock: Option<DockContext>,
     ) -> Result<(), SaveError> {
         let invalid = SaveError::InvalidState("T02 ceasefire or reception");
+        if self
+            .terminal_tick()
+            .is_some_and(|end| self.reception.anchor.is_some_and(|anchor| anchor > end))
+        {
+            return Err(invalid);
+        }
         if let Some(hit) = self.ordinary_hit {
             if self.reception.anchor.is_some()
                 || self.reception.completion.is_some()
@@ -222,7 +245,7 @@ impl Practice {
             }
             return Ok(());
         }
-        if (ready && pulse.remaining_cooldown() != 0)
+        if (ready && !self.reception_is_terminal() && pulse.remaining_cooldown() != 0)
             || (self.retired.is_none() && !pulse.fits_quiet_anchor(flight.tick, anchor))
         {
             return Err(invalid);
@@ -246,7 +269,12 @@ impl Reception {
 }
 impl World {
     pub fn practice_reception_snapshot(&self) -> Option<PracticeReceptionSnapshot> {
-        Some(self.practice?.reception_snapshot(self.state.tick))
+        let mut snapshot = self.practice?.reception_snapshot(self.state.tick);
+        snapshot.trace = self.first_practice_trace();
+        if self.practice.is_some_and(|p| p.cancel.is_some()) {
+            snapshot.ready = false;
+        }
+        Some(snapshot)
     }
     pub fn review_practice_reception(
         &self,
@@ -267,6 +295,9 @@ impl World {
             .filter(|dock| dock.system() == SystemId::AVENOR)
             .ok_or(PracticeError::AvenorBerthRequired)?;
         let practice = self.practice.ok_or(PracticeError::ReceptionNotReady)?;
+        if practice.is_cancelled() {
+            return Err(PracticeError::NoActiveAttempt);
+        }
         if practice.reception.completion.is_some() {
             return Err(PracticeError::AlreadyReceived);
         }
@@ -279,6 +310,8 @@ impl World {
             dock,
             tick: expected_tick,
             epoch: session.epoch(),
+            fingerprint: self.practice_fingerprint(),
+            attempt: practice.attempt_id(),
         })
     }
     pub fn prepare_practice_reception(
@@ -290,21 +323,28 @@ impl World {
         if review.dock != current.dock
             || review.epoch != current.epoch
             || review.tick > current.tick
+            || review.fingerprint != current.fingerprint
+            || review.attempt != current.attempt
         {
             return Err(PracticeError::StaleReview);
         }
         let mut practice = self.practice.ok_or(PracticeError::ReceptionNotReady)?;
+        practice.settlement = Some(PracticeOutcome::Complete);
         practice.reception.completion = Some(Completion {
             dock: current.dock,
             tick: current.tick,
         });
+        let trace = self.practice_trace.or(Some(practice.attempt_id()));
+        let history = self.practice_history.clone();
         let bytes = self
-            .save_bytes_with_practice(Some(practice))
+            .save_bytes_with_practice_history(Some(practice), &history, trace)
             .map_err(PracticeError::Save)?;
         Ok(PreparedPracticeConfirmation {
             world: self,
             practice,
             bytes,
+            history,
+            trace,
         })
     }
 }

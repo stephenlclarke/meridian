@@ -37,6 +37,10 @@ The earlier **Finite Missiles Preview** remains available with its v7 save refus
 
 This is a functional local preview. Memory qualification, sustained minimize/focus-loss, frame timing/race evidence and commercial distribution remain open. See [implementation status](docs/IMPLEMENTATION-STATUS.md) for the exact scope and limits. Existing preview apps and real player profiles remain separate.
 
+## Current source under development
+
+The [safe-gunnery attempt lifecycle](docs/SAFE-GUNNERY-ATTEMPTS.md) adds reviewed F7 closure at the actual Avenor berth, explicit F10 fresh consent and retained attempt history in save v9. I shows completed, failed and abandoned counts and the once-only first trace. Closure grants no reward, refund or ammunition. Candidate `3b5a18b` passed scoped independent review, compiler/platform checks and native Mac lifecycle qualification. The current source also contains later Sonar maintenance changes, so whole-source review and changed-composition qualification remain pending; v9 is not delivered. The installed v8 preview above is unchanged. Use a separate isolated save directory for candidate v9 execution.
+
 ## Play
 
 N starts a commander; C continues. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.

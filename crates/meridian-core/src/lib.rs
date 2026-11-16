@@ -19,9 +19,11 @@ pub use flight::{
 pub use station::{FlightMode, FlightStart, MotionRefusal, OriginalStationData, StationError};
 
 pub use flight::{
-    PRACTICE_HALF_SIDE, PRACTICE_QUIET_TICKS, PracticeBeaconId, PracticeBeaconSnapshot,
-    PracticeError, PracticeReceptionReview, PracticeReceptionSnapshot, PracticeReview,
-    PracticeSnapshot, PracticeStatus, PracticeTrace, PreparedPracticeConfirmation,
+    PRACTICE_HALF_SIDE, PRACTICE_MAX_OFFERS, PRACTICE_QUIET_TICKS, PracticeAttemptId,
+    PracticeAttemptSnapshot, PracticeBeaconId, PracticeBeaconSnapshot, PracticeClosureReview,
+    PracticeError, PracticeLedgerSnapshot, PracticeOutcome, PracticeReceptionReview,
+    PracticeReceptionSnapshot, PracticeReview, PracticeSnapshot, PracticeStatus, PracticeTrace,
+    PreparedPracticeConfirmation,
 };
 
 pub use flight::{

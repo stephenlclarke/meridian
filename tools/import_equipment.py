@@ -186,14 +186,22 @@ def selected_definition(authoring: dict[str, Any], game: str) -> dict[str, Any]:
             'requiredTechnologyLevel': technology}
 
 
+def runtime_hull_block(fleet: str) -> str:
+    _, start, remaining = fleet.partition('private static let sh025:')
+    body, end, _ = remaining.partition('private static let sh026:')
+    if not start or not end:
+        raise ValueError('Missing authenticated SH025 runtime fitting')
+    return start + body
+
+
 def hull_fields(ship: dict[str, Any], r3: dict[str, Any], fleet: str) -> dict[str, int]:
     if (ship['id'], r3['id'], r3['schema']) != ('SH025', 'SH025', 'l337.fleet-design/2'):
         raise ValueError('Original equipment hull identity differs')
     if r3['fitting']['roleKitIncludedInBareHull'] is not False:
         raise ValueError('Original bare-hull role kit declaration differs')
     profile = unique(ship['profiles'], 'group', 'project-refit-v1')
-    block = re.search(r'private static let sh025:.*?(?=private static let sh026:)', fleet, re.S)
-    if block is None or SOURCES['r3'][1] not in block.group():
+    block = runtime_hull_block(fleet)
+    if SOURCES['r3'][1] not in block:
         raise ValueError('Missing authenticated SH025 runtime fitting')
     fields = {}
     selections = [
@@ -206,7 +214,7 @@ def hull_fields(ship: dict[str, Any], r3: dict[str, Any], fleet: str) -> dict[st
     ]
     for name, value, original, swift, profile_key in selections:
         integer(value, 255 if name == 'utilityMounts' else 65535, name, minimum=1)
-        numbers = re.findall(r'\b' + swift + r': (\d+)', block.group())
+        numbers = re.findall(r'\b' + swift + r': (\d+)', block)
         if value != original or numbers != [str(value)]:
             raise ValueError('Original hull/runtime capacity differs: ' + name)
         if profile_key and unique(profile['fields'], 'key', profile_key)['number'] != value:

@@ -1,6 +1,13 @@
 //! Version-eight bounded state and retained contact evidence. Decode never emits gameplay events.
-use super::*;
-use crate::docking::{Basis3, RigidPose};
+use super::geometry::{add, length, mesh_distance, pose, scale, sub, unit};
+use super::{
+    Beam, Body, CombatIdentity, FlightMode, MISSILE_COOLDOWN_TICKS, MISSILE_LIFETIME_TICKS,
+    MISSILE_MUZZLE_DISTANCE, MISSILE_RANGE, MISSILE_SPEED, MissileContact, MissileEnd,
+    MissileOrigin, MissileRound, Motion, PracticeBeaconId, ProjectileId, ProjectileSnapshot, State,
+    World, choose,
+};
+use crate::docking::{Basis3, RigidPose, Vec3};
+use crate::flight::practice::lifecycle::{lesson_for_target, lessons};
 use crate::flight::{OrdinaryImpact, OrdinaryTarget, OrdinaryWeapon, PulseContact, PulseShot};
 use crate::navigation::SystemId;
 use crate::save::{Reader, SaveError, Writer};
@@ -285,6 +292,18 @@ impl State {
             .find(|p| p.origin.projectile == id)
             .copied()
     }
+    pub(in crate::flight) fn has_undocked_player_hit(
+        self,
+        practice: Option<super::super::practice::Practice>,
+        history: &[super::super::practice::Practice],
+        dock_sequence: u64,
+    ) -> bool {
+        self.projectiles.iter().flatten().any(|p| {
+            matches!(p.contact, Some(MissileContact::Player { .. }))
+                && lesson_for_target(practice, history, p.target)
+                    .is_some_and(|p| !p.missile_docked_since_consent(dock_sequence))
+        })
+    }
     pub(in crate::flight) fn validate_ordinary(
         self,
         hit: OrdinaryImpact,
@@ -334,30 +353,14 @@ impl State {
         self,
         world: &World,
         practice: Option<super::super::practice::Practice>,
+        history: &[super::super::practice::Practice],
         dock_sequence: u64,
     ) -> Result<(), SaveError> {
         let owner = world.combat_identity().ok_or(INVALID)?;
         let snapshot = world.missile_snapshot().ok_or(INVALID)?;
         let used = self.used();
         let mut prior: Option<MissileOrigin> = None;
-        if self.cooldown > MISSILE_COOLDOWN_TICKS
-            || (self.armed && snapshot.rounds.iter().all(Option::is_none))
-        {
-            return Err(INVALID);
-        }
-        if self
-            .lock
-            .is_some_and(|id| practice.and_then(|p| p.missile_target(id)).is_none())
-            || ((self.armed || self.lock.is_some()) && world.state.mode != FlightMode::Flight)
-        {
-            return Err(INVALID);
-        }
-        // Each actual removal has exactly one origin; there is no decode-time birth/refill.
-        for (pylon, round) in snapshot.rounds.iter().enumerate() {
-            if round.is_some() != (pylon < 3 - used) {
-                return Err(INVALID);
-            }
-        }
+        self.validate_launcher(world, practice, snapshot.rounds, used)?;
         for i in 0..3 {
             let Some(p) = self.projectiles[i] else {
                 if i < used
@@ -370,164 +373,285 @@ impl State {
                 continue;
             };
             let o = p.origin;
-            if i >= used
-                || o.projectile
-                    != (ProjectileId {
-                        owner: owner.owner,
-                        visit: o.owner.visit,
-                        ordinal: i as u8,
-                    })
-                || o.owner.owner != owner.owner
-                || o.owner.hull != owner.hull
-                || o.owner.system != SystemId::AVENOR
-                || o.owner.visit < 2
-                || o.owner.visit > owner.visit
-                || (o.owner.visit == owner.visit && o.owner.system != owner.system)
-                || o.item != owner.owner.checked_add(10 - i as u64).ok_or(INVALID)?
-                || o.legal_at_launch > world.legal_value().ok_or(INVALID)?
-                || o.emission == 0
-                || o.emission > world.combat.emissions
-                || o.launched_tick == 0
-                || o.launched_tick > world.state.tick
-                || o.physical_tick > o.launched_tick
-                || o.physical_tick > world.combat.physical_tick()
-                || !valid_vector(o.launch_position)
-                || length(o.launch_position) > 30000.0 + o.launched_tick as f64 * 4.0
-                || !valid_basis(o.orientation)
-                || o.muzzle
-                    != add(
-                        o.launch_position,
-                        scale(o.orientation.z, MISSILE_MUZZLE_DISTANCE),
-                    )
-                || !valid_vector(p.position)
-                || !valid_vector(p.direction)
-                || (length(p.direction) - 1.0).abs() > 1e-9
-                || !p.propulsion_travel.is_finite()
-                || !(0.0..=MISSILE_RANGE).contains(&p.propulsion_travel)
-                || p.age_ticks > 455
-                || p.last_tick < o.launched_tick
-                || p.last_tick > world.state.tick
-                || length(sub(p.position, o.muzzle)) > p.propulsion_travel + 1e-7
-            {
-                return Err(INVALID);
-            }
-            if let Some(previous) = prior
-                && (o.emission <= previous.emission
-                    || o.launched_tick.saturating_sub(previous.launched_tick)
-                        < u64::from(MISSILE_COOLDOWN_TICKS)
-                    || o.physical_tick.saturating_sub(previous.physical_tick)
-                        < u64::from(MISSILE_COOLDOWN_TICKS)
-                    || o.owner != previous.owner)
-            {
-                return Err(INVALID);
-            }
+            Self::validate_projectile_identity(world, owner, p, o, i, used)?;
+            Self::validate_launch_order(o, prior)?;
             prior = Some(o);
-            let lesson = practice.ok_or(INVALID)?;
-            if !lesson.missile_owner_matches(o.owner)
-                || lesson.retained_missile_target(p.target).is_none()
-                || !lesson.missile_provider_interval(
-                    o.launched_tick,
-                    o.launched_tick
-                        .checked_add(u64::from(p.age_ticks))
-                        .ok_or(INVALID)?,
-                )
-            {
-                return Err(INVALID);
-            }
-            let target = lesson.retained_missile_target(p.target).ok_or(INVALID)?;
-            if sub(target.position, o.launch_position).dot(o.orientation.z) <= 0.0 {
-                return Err(INVALID);
-            }
-            if o.launched_tick == world.state.tick {
-                let ship = super::super::flight_pose(world.state.position, world.state.orientation)
-                    .ok_or(INVALID)?;
-                // Same-tick commands may fire Pulse or pause, but cannot move the craft
-                // or advance the physical clock. Historical origins stay independent.
-                if o.launch_position != ship.position
-                    || o.orientation != ship.orientation
-                    || o.physical_tick != world.combat.physical_tick()
-                    || o.owner != owner
-                    || world.state.mode != FlightMode::Flight
-                {
-                    return Err(INVALID);
-                }
-            }
+            let lesson = lesson_for_target(practice, history, p.target).ok_or(INVALID)?;
+            Self::validate_launch_context(world, owner, lesson, p)?;
             self.validate_motion(world, lesson, p, i)?;
-            match p.ended {
-                None => {
-                    if p.last_tick != world.state.tick
-                        || p.origin.owner != owner
-                        || world.state.mode != FlightMode::Flight
-                        || lesson.missile_target(p.target).is_none()
-                    {
-                        return Err(INVALID);
-                    }
-                }
-                Some(MissileEnd::RangeExpired) => {
-                    if p.propulsion_travel != MISSILE_RANGE || p.age_ticks != 455 {
-                        return Err(INVALID);
-                    }
-                }
-                Some(MissileEnd::LifetimeExpired) => return Err(INVALID), // finite source range ends first
-                Some(MissileEnd::TargetLost) => {
-                    if lesson.missile_provider_ended_at().is_none_or(|tick| {
-                        p.last_tick != tick && p.last_tick != tick.saturating_add(1)
-                    }) {
-                        return Err(INVALID);
-                    }
-                }
-                Some(MissileEnd::Culled) => {
-                    if !lesson.missile_retired_at(p.last_tick) {
-                        return Err(INVALID);
-                    }
-                }
-                Some(MissileEnd::Impact) => {}
-                Some(MissileEnd::Intercepted) => self.validate_interception(world, lesson, p, i)?,
-            }
-            if p.ended != Some(MissileEnd::Intercepted)
-                && (self.beams[i].is_some() || p.intercepting_emission.is_some())
-            {
+            self.validate_end(world, owner, lesson, p, i)?;
+            self.validate_contact_receipts(world, p, i)?;
+            self.validate_unique_receipts(i)?;
+        }
+        self.validate_shields(world, practice, history, dock_sequence)?;
+        self.validate_cooldown(world, practice, history, dock_sequence, prior)?;
+        for lesson in lessons(practice, history) {
+            self.validate_lesson_receipts(lesson)?;
+        }
+        Ok(())
+    }
+    fn validate_launcher(
+        self,
+        world: &World,
+        practice: Option<super::super::practice::Practice>,
+        rounds: [Option<MissileRound>; 3],
+        used: usize,
+    ) -> Result<(), SaveError> {
+        if self.cooldown > MISSILE_COOLDOWN_TICKS
+            || (self.armed && rounds.iter().all(Option::is_none))
+        {
+            return Err(INVALID);
+        }
+        if self
+            .lock
+            .is_some_and(|id| practice.and_then(|p| p.missile_target(id)).is_none())
+            || ((self.armed || self.lock.is_some()) && world.state.mode != FlightMode::Flight)
+        {
+            return Err(INVALID);
+        }
+        // Each actual removal has exactly one origin; there is no decode-time birth/refill.
+        for (pylon, round) in rounds.iter().enumerate() {
+            if round.is_some() != (pylon < 3 - used) {
                 return Err(INVALID);
-            }
-            if let Some(MissileContact::Projectile(id)) = p.contact {
-                let victim = self.find(id).ok_or(INVALID)?;
-                if victim.ended != Some(MissileEnd::Intercepted)
-                    || victim.last_tick != p.last_tick
-                    || victim.intercepting_emission != Some(o.emission)
-                {
-                    return Err(INVALID);
-                }
-            }
-            let ordinary = matches!(
-                p.contact,
-                Some(MissileContact::Station | MissileContact::Player { .. })
-            );
-            if ordinary != self.impacts[i].is_some() {
-                return Err(INVALID);
-            }
-            if let Some(hit) = self.impacts[i] {
-                self.validate_ordinary(hit, world)?;
-            }
-            for j in 0..i {
-                if self.beams[i]
-                    .is_some_and(|b| self.beams[j].is_some_and(|a| a.emission == b.emission))
-                {
-                    return Err(INVALID);
-                }
-                if let (Some(a), Some(b)) = (self.impacts[j], self.impacts[i])
-                    && (a.incident == b.incident
-                        || (a.tick < b.tick && a.incident > b.incident)
-                        || (a.tick > b.tick && a.incident < b.incident))
-                {
-                    return Err(INVALID);
-                }
             }
         }
+
+        Ok(())
+    }
+
+    fn validate_projectile_identity(
+        world: &World,
+        owner: CombatIdentity,
+        p: ProjectileSnapshot,
+        o: MissileOrigin,
+        i: usize,
+        used: usize,
+    ) -> Result<(), SaveError> {
+        if i >= used
+            || o.projectile
+                != (ProjectileId {
+                    owner: owner.owner,
+                    visit: o.owner.visit,
+                    ordinal: i as u8,
+                })
+            || o.owner.owner != owner.owner
+            || o.owner.hull != owner.hull
+            || o.owner.system != SystemId::AVENOR
+            || o.owner.visit < 2
+            || o.owner.visit > owner.visit
+            || (o.owner.visit == owner.visit && o.owner.system != owner.system)
+            || o.item != owner.owner.checked_add(10 - i as u64).ok_or(INVALID)?
+            || o.legal_at_launch > world.legal_value().ok_or(INVALID)?
+            || o.emission == 0
+            || o.emission > world.combat.emissions
+            || o.launched_tick == 0
+            || o.launched_tick > world.state.tick
+            || o.physical_tick > o.launched_tick
+            || o.physical_tick > world.combat.physical_tick()
+            || !valid_vector(o.launch_position)
+            || length(o.launch_position) > 30000.0 + o.launched_tick as f64 * 4.0
+            || !valid_basis(o.orientation)
+            || o.muzzle
+                != add(
+                    o.launch_position,
+                    scale(o.orientation.z, MISSILE_MUZZLE_DISTANCE),
+                )
+            || !valid_vector(p.position)
+            || !valid_vector(p.direction)
+            || (length(p.direction) - 1.0).abs() > 1e-9
+            || !p.propulsion_travel.is_finite()
+            || !(0.0..=MISSILE_RANGE).contains(&p.propulsion_travel)
+            || p.age_ticks > 455
+            || p.last_tick < o.launched_tick
+            || p.last_tick > world.state.tick
+            || length(sub(p.position, o.muzzle)) > p.propulsion_travel + 1e-7
+        {
+            return Err(INVALID);
+        }
+
+        Ok(())
+    }
+
+    fn validate_launch_order(
+        o: MissileOrigin,
+        prior: Option<MissileOrigin>,
+    ) -> Result<(), SaveError> {
+        if let Some(previous) = prior
+            && (o.emission <= previous.emission
+                || o.launched_tick <= previous.launched_tick
+                || o.physical_tick <= previous.physical_tick
+                || o.owner.visit < previous.owner.visit
+                || (o.owner.visit == previous.owner.visit
+                    && (o.launched_tick - previous.launched_tick
+                        < u64::from(MISSILE_COOLDOWN_TICKS)
+                        || o.physical_tick - previous.physical_tick
+                            < u64::from(MISSILE_COOLDOWN_TICKS))))
+        {
+            return Err(INVALID);
+        }
+
+        Ok(())
+    }
+
+    fn validate_launch_context(
+        world: &World,
+        owner: CombatIdentity,
+        lesson: super::super::practice::Practice,
+        p: ProjectileSnapshot,
+    ) -> Result<(), SaveError> {
+        let o = p.origin;
+        if !lesson.missile_owner_matches(o.owner)
+            || lesson.retained_missile_target(p.target).is_none()
+            || !lesson.missile_provider_interval(
+                o.launched_tick,
+                o.launched_tick
+                    .checked_add(u64::from(p.age_ticks))
+                    .ok_or(INVALID)?,
+            )
+        {
+            return Err(INVALID);
+        }
+        let target = lesson.retained_missile_target(p.target).ok_or(INVALID)?;
+        if sub(target.position, o.launch_position).dot(o.orientation.z) <= 0.0 {
+            return Err(INVALID);
+        }
+        if o.launched_tick == world.state.tick {
+            let ship = super::super::flight_pose(world.state.position, world.state.orientation)
+                .ok_or(INVALID)?;
+            // Same-tick commands may fire Pulse or pause, but cannot move the craft
+            // or advance the physical clock. Historical origins stay independent.
+            if o.launch_position != ship.position
+                || o.orientation != ship.orientation
+                || o.physical_tick != world.combat.physical_tick()
+                || o.owner != owner
+                || world.state.mode != FlightMode::Flight
+            {
+                return Err(INVALID);
+            }
+        }
+
+        Ok(())
+    }
+
+    fn validate_end(
+        self,
+        world: &World,
+        owner: CombatIdentity,
+        lesson: super::super::practice::Practice,
+        p: ProjectileSnapshot,
+        i: usize,
+    ) -> Result<(), SaveError> {
+        match p.ended {
+            None => {
+                if p.last_tick != world.state.tick
+                    || p.origin.owner != owner
+                    || world.state.mode != FlightMode::Flight
+                    || lesson.missile_target(p.target).is_none()
+                {
+                    return Err(INVALID);
+                }
+            }
+            Some(MissileEnd::RangeExpired) => {
+                if p.propulsion_travel != MISSILE_RANGE || p.age_ticks != 455 {
+                    return Err(INVALID);
+                }
+            }
+            Some(MissileEnd::LifetimeExpired) => return Err(INVALID), // finite source range ends first
+            Some(MissileEnd::TargetLost) => {
+                if lesson
+                    .missile_provider_ended_at()
+                    .is_none_or(|tick| p.last_tick != tick && p.last_tick != tick.saturating_add(1))
+                {
+                    return Err(INVALID);
+                }
+            }
+            Some(MissileEnd::Culled) => {
+                if !lesson.missile_retired_at(p.last_tick) {
+                    return Err(INVALID);
+                }
+            }
+            Some(MissileEnd::Impact) => {}
+            Some(MissileEnd::Intercepted) => self.validate_interception(world, lesson, p, i)?,
+        }
+
+        Ok(())
+    }
+
+    fn validate_contact_receipts(
+        self,
+        world: &World,
+        p: ProjectileSnapshot,
+        i: usize,
+    ) -> Result<(), SaveError> {
+        let o = p.origin;
+        if p.ended != Some(MissileEnd::Intercepted)
+            && (self.beams[i].is_some() || p.intercepting_emission.is_some())
+        {
+            return Err(INVALID);
+        }
+        if let Some(MissileContact::Projectile(id)) = p.contact {
+            let victim = self.find(id).ok_or(INVALID)?;
+            if victim.ended != Some(MissileEnd::Intercepted)
+                || victim.last_tick != p.last_tick
+                || victim.intercepting_emission != Some(o.emission)
+            {
+                return Err(INVALID);
+            }
+        }
+        let ordinary = matches!(
+            p.contact,
+            Some(MissileContact::Station | MissileContact::Player { .. })
+        );
+        if ordinary != self.impacts[i].is_some() {
+            return Err(INVALID);
+        }
+        if let Some(hit) = self.impacts[i] {
+            self.validate_ordinary(hit, world)?;
+        }
+
+        Ok(())
+    }
+
+    fn validate_unique_receipts(self, i: usize) -> Result<(), SaveError> {
+        for j in 0..i {
+            if self.beams[i]
+                .is_some_and(|b| self.beams[j].is_some_and(|a| a.emission == b.emission))
+            {
+                return Err(INVALID);
+            }
+            if let (Some(a), Some(b)) = (self.impacts[j], self.impacts[i])
+                && (a.incident == b.incident
+                    || (a.tick < b.tick && a.incident > b.incident)
+                    || (a.tick > b.tick && a.incident < b.incident))
+            {
+                return Err(INVALID);
+            }
+        }
+
+        Ok(())
+    }
+
+    fn validate_shields(
+        self,
+        world: &World,
+        practice: Option<super::super::practice::Practice>,
+        history: &[super::super::practice::Practice],
+        dock_sequence: u64,
+    ) -> Result<(), SaveError> {
         // The only admitted shield damage has all of its bounded missile receipts retained.
         // Check the numeric result; loading never applies these effects to the World.
         let mut shields = [30_000_u16; 2];
-        if !practice.is_some_and(|p| p.missile_docked_since_consent(dock_sequence)) {
-            let mut hits = self.impacts;
+        {
+            let mut hits = self.impacts.map(|hit| {
+                hit.filter(|hit| {
+                    self.projectiles
+                        .iter()
+                        .flatten()
+                        .find(|p| p.origin.emission == hit.emission)
+                        .and_then(|p| lesson_for_target(practice, history, p.target))
+                        .is_some_and(|p| !p.missile_docked_since_consent(dock_sequence))
+                })
+            });
             hits.sort_by_key(|h| h.map_or(u64::MAX, |h| h.incident));
             let mut clock = 0;
             for hit in hits.into_iter().flatten() {
@@ -565,8 +689,26 @@ impl State {
         {
             return Err(INVALID);
         }
+
+        Ok(())
+    }
+
+    fn validate_cooldown(
+        self,
+        world: &World,
+        practice: Option<super::super::practice::Practice>,
+        history: &[super::super::practice::Practice],
+        dock_sequence: u64,
+        prior: Option<MissileOrigin>,
+    ) -> Result<(), SaveError> {
         let expected_cooldown = if world.state.mode == FlightMode::Docked
-            || practice.is_some_and(|p| p.missile_docked_since_consent(dock_sequence))
+            || self
+                .projectiles
+                .iter()
+                .rev()
+                .find_map(|p| *p)
+                .and_then(|p| lesson_for_target(practice, history, p.target))
+                .is_some_and(|p| p.missile_docked_since_consent(dock_sequence))
         {
             0
         } else {
@@ -579,43 +721,67 @@ impl State {
         if self.cooldown != expected_cooldown {
             return Err(INVALID);
         }
-        if let Some(lesson) = practice {
-            if lesson.pending_missiles != self.pending() {
-                return Err(INVALID);
-            }
-            for (id, receipt) in lesson.missile_receipts() {
-                if let Some((tick, origin)) = receipt {
-                    let p = self.find(origin.projectile).ok_or(INVALID)?;
-                    if p.origin != origin
-                        || p.last_tick != tick
-                        || p.contact
-                            != Some(MissileContact::Practice {
-                                id,
-                                first_hit: true,
-                            })
-                    {
-                        return Err(INVALID);
-                    }
-                }
-            }
-            for p in self.projectiles.iter().flatten() {
-                if let Some(MissileContact::Practice {
-                    id,
-                    first_hit: true,
-                }) = p.contact
-                    && !lesson
-                        .missile_receipts()
-                        .contains(&(id, Some((p.last_tick, p.origin))))
+
+        Ok(())
+    }
+
+    fn validate_lesson_receipts(
+        self,
+        lesson: super::super::practice::Practice,
+    ) -> Result<(), SaveError> {
+        let projectiles = self
+            .projectiles
+            .map(|p| p.filter(|p| lesson.missile_owner_matches(p.origin.owner)));
+        let pending = projectiles
+            .iter()
+            .flatten()
+            .filter(|p| p.ended.is_none())
+            .count() as u8;
+        if lesson.pending_missiles != pending {
+            return Err(INVALID);
+        }
+        for (id, receipt) in lesson.missile_receipts() {
+            if let Some((tick, origin)) = receipt {
+                let p = self.find(origin.projectile).ok_or(INVALID)?;
+                if p.origin != origin
+                    || p.last_tick != tick
+                    || p.contact
+                        != Some(MissileContact::Practice {
+                            id,
+                            first_hit: true,
+                        })
                 {
                     return Err(INVALID);
                 }
             }
-            lesson.validate_missile_quiet(self.projectiles)?;
-        } else if used != 0 {
-            return Err(INVALID);
         }
+        for p in projectiles.iter().flatten() {
+            if let Some(MissileContact::Practice {
+                id,
+                first_hit: true,
+            }) = p.contact
+                && !lesson
+                    .missile_receipts()
+                    .contains(&(id, Some((p.last_tick, p.origin))))
+            {
+                return Err(INVALID);
+            }
+        }
+        for hit in self.impacts.into_iter().flatten() {
+            if lesson.accepts_incident(hit)
+                && lesson.ordinary_hit.is_none_or(|first| {
+                    first.incident > hit.incident
+                        || (first.incident == hit.incident && first != hit)
+                })
+            {
+                return Err(INVALID);
+            }
+        }
+        lesson.validate_missile_quiet(projectiles)?;
+
         Ok(())
     }
+
     fn validate_motion(
         self,
         world: &World,
@@ -628,57 +794,12 @@ impl State {
             .launched_tick
             .checked_add(u64::from(p.age_ticks))
             .ok_or(INVALID)?;
-        let no_motion_end = matches!(p.ended, Some(MissileEnd::Culled | MissileEnd::TargetLost));
-        let intercept = p.ended == Some(MissileEnd::Intercepted);
-        let expected_tick = if no_motion_end {
-            motion_tick.checked_add(1).ok_or(INVALID)?
-        } else {
-            motion_tick
-        };
-        if (!intercept && p.last_tick != expected_tick)
-            || (intercept
-                && (p.last_tick < motion_tick || p.last_tick > motion_tick.saturating_add(1)))
-            || (p.ended == Some(MissileEnd::Impact)) != p.contact.is_some()
-        {
-            return Err(INVALID);
-        }
+        Self::validate_motion_clock(p, motion_tick)?;
         if p.age_ticks == 0 {
-            if self.motions[i].is_some()
-                || p.position != o.muzzle
-                || p.direction != o.orientation.z
-                || p.propulsion_travel != 0.0
-                || p.muzzle_cleared
-            {
-                return Err(INVALID);
-            }
-            return Ok(());
+            return self.validate_newborn_motion(p, i);
         }
         let m = self.motions[i].ok_or(INVALID)?;
-        super::super::persistence::validate_flight(&m.flight)?;
-        if m.flight.tick != motion_tick
-            || m.flight.mode != FlightMode::Flight
-            || m.age.checked_add(1) != Some(p.age_ticks)
-            || !valid_vector(m.position)
-            || !m.travel.is_finite()
-            || (m.travel - f64::from(m.age) * (MISSILE_SPEED / 60.0)).abs() > 1e-7
-            || length(sub(m.position, o.muzzle)) > m.travel + 1e-7
-            || (m.flight.tick == world.state.tick
-                && (m.flight.position != world.state.position
-                    || m.flight.orientation != world.state.orientation))
-        {
-            return Err(INVALID);
-        }
-        if let Some(hit) = lesson.ordinary_hit
-            && hit.weapon == OrdinaryWeapon::StandardMissile
-            && hit.tick == m.flight.tick
-            && self
-                .impacts
-                .iter()
-                .position(|h| *h == Some(hit))
-                .is_some_and(|slot| slot < i)
-        {
-            return Err(INVALID);
-        }
+        self.validate_motion_record(world, lesson, p, i, m, motion_tick)?;
         let target = lesson.retained_missile_target(p.target).ok_or(INVALID)?;
         let direction = unit(sub(target.position, m.position)).ok_or(INVALID)?;
         if direction != p.direction {
@@ -719,65 +840,7 @@ impl State {
                 },
             );
         }
-        for (slot, body) in m.bodies.into_iter().enumerate() {
-            let expected = self.projectiles[slot].is_some_and(|other| {
-                if other.origin.launched_tick >= m.flight.tick {
-                    return false;
-                }
-                match other.ended {
-                    None => true,
-                    Some(_) if other.last_tick > m.flight.tick => true,
-                    Some(_) if other.last_tick < m.flight.tick => false,
-                    Some(MissileEnd::Intercepted) => {
-                        if self.beams[slot].is_some() {
-                            return true;
-                        }
-                        self.projectiles
-                            .iter()
-                            .flatten()
-                            .find(|p| Some(p.origin.emission) == other.intercepting_emission)
-                            .is_some_and(|p| usize::from(p.origin.projectile.ordinal) >= i)
-                    }
-                    Some(_) => slot >= i,
-                }
-            });
-            if body.is_some() != expected {
-                return Err(INVALID);
-            }
-            let Some(body) = body else {
-                continue;
-            };
-            let other = self.find(body.id).ok_or(INVALID)?;
-            if usize::from(body.id.ordinal) != slot
-                || other.origin.launched_tick > m.flight.tick
-                || (other.ended.is_some() && other.last_tick < m.flight.tick)
-                || !valid_vector(body.position)
-                || length(sub(body.position, other.origin.muzzle)) > other.propulsion_travel + 1e-7
-            {
-                return Err(INVALID);
-            }
-            if slot == i {
-                if body.position != m.position {
-                    return Err(INVALID);
-                }
-                continue;
-            }
-            if other.origin.owner.visit == o.owner.visit
-                && let Some(d) = mesh_distance(
-                    RigidPose {
-                        position: body.position,
-                        orientation: other.origin.orientation,
-                    },
-                    ray,
-                    travel,
-                )
-            {
-                choose(&mut best, d, MissileContact::Projectile(body.id));
-            }
-        }
-        if m.bodies[i].is_none() {
-            return Err(INVALID);
-        }
+        self.validate_motion_bodies(p, i, m, ray, travel, &mut best)?;
         if let Some((id, d)) = lesson.retained_missile_contact(
             ray,
             best.map_or(travel, |(d, _)| d.min(travel)),
@@ -813,6 +876,156 @@ impl State {
         }
         Ok(())
     }
+    fn validate_motion_clock(p: ProjectileSnapshot, motion_tick: u64) -> Result<(), SaveError> {
+        let no_motion_end = matches!(p.ended, Some(MissileEnd::Culled | MissileEnd::TargetLost));
+        let intercept = p.ended == Some(MissileEnd::Intercepted);
+        let expected_tick = if no_motion_end {
+            motion_tick.checked_add(1).ok_or(INVALID)?
+        } else {
+            motion_tick
+        };
+        if (!intercept && p.last_tick != expected_tick)
+            || (intercept
+                && (p.last_tick < motion_tick || p.last_tick > motion_tick.saturating_add(1)))
+            || (p.ended == Some(MissileEnd::Impact)) != p.contact.is_some()
+        {
+            return Err(INVALID);
+        }
+
+        Ok(())
+    }
+
+    fn validate_newborn_motion(self, p: ProjectileSnapshot, i: usize) -> Result<(), SaveError> {
+        let o = p.origin;
+        if self.motions[i].is_some()
+            || p.position != o.muzzle
+            || p.direction != o.orientation.z
+            || p.propulsion_travel != 0.0
+            || p.muzzle_cleared
+        {
+            return Err(INVALID);
+        }
+
+        Ok(())
+    }
+
+    fn validate_motion_record(
+        self,
+        world: &World,
+        lesson: super::super::practice::Practice,
+        p: ProjectileSnapshot,
+        i: usize,
+        m: Motion,
+        motion_tick: u64,
+    ) -> Result<(), SaveError> {
+        let o = p.origin;
+        super::super::persistence::validate_flight(&m.flight)?;
+        if m.flight.tick != motion_tick
+            || m.flight.mode != FlightMode::Flight
+            || m.age.checked_add(1) != Some(p.age_ticks)
+            || !valid_vector(m.position)
+            || !m.travel.is_finite()
+            || (m.travel - f64::from(m.age) * (MISSILE_SPEED / 60.0)).abs() > 1e-7
+            || length(sub(m.position, o.muzzle)) > m.travel + 1e-7
+            || (m.flight.tick == world.state.tick
+                && (m.flight.position != world.state.position
+                    || m.flight.orientation != world.state.orientation))
+        {
+            return Err(INVALID);
+        }
+        if let Some(hit) = lesson.ordinary_hit
+            && hit.weapon == OrdinaryWeapon::StandardMissile
+            && hit.tick == m.flight.tick
+            && self
+                .impacts
+                .iter()
+                .position(|h| *h == Some(hit))
+                .is_some_and(|slot| slot < i)
+        {
+            return Err(INVALID);
+        }
+
+        Ok(())
+    }
+
+    fn motion_body_expected(self, slot: usize, i: usize, m: Motion) -> bool {
+        self.projectiles[slot].is_some_and(|other| {
+            if other.origin.launched_tick >= m.flight.tick {
+                return false;
+            }
+            match other.ended {
+                None => true,
+                Some(_) if other.last_tick > m.flight.tick => true,
+                Some(_) if other.last_tick < m.flight.tick => false,
+                Some(MissileEnd::Intercepted) => {
+                    if self.beams[slot].is_some() {
+                        return true;
+                    }
+                    self.projectiles
+                        .iter()
+                        .flatten()
+                        .find(|p| Some(p.origin.emission) == other.intercepting_emission)
+                        .is_some_and(|p| usize::from(p.origin.projectile.ordinal) >= i)
+                }
+                Some(_) => slot >= i,
+            }
+        })
+    }
+
+    fn validate_motion_bodies(
+        self,
+        p: ProjectileSnapshot,
+        i: usize,
+        m: Motion,
+        ray: RigidPose,
+        travel: f64,
+        best: &mut Option<(f64, MissileContact)>,
+    ) -> Result<(), SaveError> {
+        let o = p.origin;
+        for (slot, body) in m.bodies.into_iter().enumerate() {
+            let expected = self.motion_body_expected(slot, i, m);
+
+            if body.is_some() != expected {
+                return Err(INVALID);
+            }
+            let Some(body) = body else {
+                continue;
+            };
+            let other = self.find(body.id).ok_or(INVALID)?;
+            if usize::from(body.id.ordinal) != slot
+                || other.origin.launched_tick > m.flight.tick
+                || (other.ended.is_some() && other.last_tick < m.flight.tick)
+                || !valid_vector(body.position)
+                || length(sub(body.position, other.origin.muzzle)) > other.propulsion_travel + 1e-7
+            {
+                return Err(INVALID);
+            }
+            if slot == i {
+                if body.position != m.position {
+                    return Err(INVALID);
+                }
+                continue;
+            }
+            if other.origin.owner.visit == o.owner.visit
+                && let Some(d) = mesh_distance(
+                    RigidPose {
+                        position: body.position,
+                        orientation: other.origin.orientation,
+                    },
+                    ray,
+                    travel,
+                )
+            {
+                choose(best, d, MissileContact::Projectile(body.id));
+            }
+        }
+        if m.bodies[i].is_none() {
+            return Err(INVALID);
+        }
+
+        Ok(())
+    }
+
     fn validate_interception(
         self,
         world: &World,
@@ -833,25 +1046,7 @@ impl State {
             let PulseContact::Projectile { id, distance } = shot.contact else {
                 return Err(INVALID);
             };
-            if self
-                .projectiles
-                .iter()
-                .flatten()
-                .any(|p| p.origin.emission == emission)
-            {
-                return Err(INVALID);
-            }
-            if b.emission != emission
-                || emission <= p.origin.emission
-                || shot.tick != p.last_tick
-                || shot.fitted_item_id != p.origin.owner.owner.checked_add(7).ok_or(INVALID)?
-                || id != p.origin.projectile
-                || !valid_vector(shot.origin)
-                || !valid_vector(shot.direction)
-                || (length(shot.direction) - 1.0).abs() > 1e-9
-            {
-                return Err(INVALID);
-            }
+            self.validate_beam_identity(b, p, emission, id)?;
             let mut ray = pose(shot.origin, shot.direction).ok_or(INVALID)?;
             // Pulse uses the exact quaternion-derived forward column without normalization.
             ray.orientation.z = shot.direction;
@@ -876,30 +1071,7 @@ impl State {
                     return Err(INVALID);
                 }
                 if let Some(body) = body {
-                    let other = self.find(body.id).ok_or(INVALID)?;
-                    if usize::from(body.id.ordinal) != slot
-                        || !valid_vector(body.position)
-                        || length(sub(body.position, other.origin.muzzle))
-                            > other.propulsion_travel + 1e-7
-                    {
-                        return Err(INVALID);
-                    }
-                    if slot == i {
-                        if body.position != p.position {
-                            return Err(INVALID);
-                        }
-                    } else if mesh_distance(
-                        RigidPose {
-                            position: body.position,
-                            orientation: other.origin.orientation,
-                        },
-                        ray,
-                        d,
-                    )
-                    .is_some_and(|near| near < d || (near == d && body.id.entity() < id.entity()))
-                    {
-                        return Err(INVALID);
-                    }
+                    self.validate_beam_body(body, slot, i, p.position, ray, (d, id))?;
                 }
             }
             let station = world
@@ -927,6 +1099,73 @@ impl State {
         }) {
             return Err(INVALID);
         }
+        Ok(())
+    }
+    fn validate_beam_identity(
+        self,
+        b: Beam,
+        p: ProjectileSnapshot,
+        emission: u64,
+        id: ProjectileId,
+    ) -> Result<(), SaveError> {
+        let shot = b.shot;
+        if self
+            .projectiles
+            .iter()
+            .flatten()
+            .any(|p| p.origin.emission == emission)
+        {
+            return Err(INVALID);
+        }
+        if b.emission != emission
+            || emission <= p.origin.emission
+            || shot.tick != p.last_tick
+            || shot.fitted_item_id != p.origin.owner.owner.checked_add(7).ok_or(INVALID)?
+            || id != p.origin.projectile
+            || !valid_vector(shot.origin)
+            || !valid_vector(shot.direction)
+            || (length(shot.direction) - 1.0).abs() > 1e-9
+        {
+            return Err(INVALID);
+        }
+        Ok(())
+    }
+
+    fn validate_beam_body(
+        self,
+        body: Body,
+        slot: usize,
+        i: usize,
+        position: Vec3,
+        ray: RigidPose,
+        nearest: (f64, ProjectileId),
+    ) -> Result<(), SaveError> {
+        let (d, id) = nearest;
+
+        let other = self.find(body.id).ok_or(INVALID)?;
+        if usize::from(body.id.ordinal) != slot
+            || !valid_vector(body.position)
+            || length(sub(body.position, other.origin.muzzle)) > other.propulsion_travel + 1e-7
+        {
+            return Err(INVALID);
+        }
+        if slot == i {
+            if body.position != position {
+                return Err(INVALID);
+            }
+        } else if mesh_distance(
+            RigidPose {
+                position: body.position,
+                orientation: other.origin.orientation,
+            },
+            ray,
+            d,
+        )
+        .is_some_and(|near| near < d || (near == d && body.id.entity() < id.entity()))
+        {
+            return Err(INVALID);
+        }
+
         Ok(())
     }
 }

@@ -10,6 +10,7 @@ import tomllib
 from pathlib import Path
 
 REPOSITORY = "stephenlclarke/meridian"
+CODESIGN = "/usr/bin/codesign"
 STAGING_ROOT = Path.home() / ".local/share/meridian-preview-releases"
 PACKAGE_FILES = ("Meridian-macos-arm64.zip", "Meridian-windows-x64.zip", "RELEASE-NOTES.md")
 TAG = re.compile(r"v(\d+)\.(\d+)\.(\d+)-preview\.([1-9]\d*)\Z")
@@ -19,7 +20,7 @@ REQUIRED_CHECKS = {"Rust (ubuntu-latest)", "Rust (windows-latest)", "Rust (macos
 
 
 def run(executable, *args):
-    if executable not in {"git", "gh", "/usr/bin/ditto", "/usr/bin/codesign"}:
+    if executable not in {"git", "gh", "/usr/bin/ditto", CODESIGN}:
         raise ValueError("Only the fixed release tools may run")
     return subprocess.check_output([executable, *args], text=True).strip()
 
@@ -132,9 +133,9 @@ def verify_macos(archive):
         apps = list(Path(temporary).rglob("*.app"))
         if len(apps) != 1:
             raise ValueError("macOS archive must contain one .app bundle")
-        run("/usr/bin/codesign", "--verify", "--deep", "--strict", str(apps[0]))
+        run(CODESIGN, "--verify", "--deep", "--strict", str(apps[0]))
         result = subprocess.run(
-            ["/usr/bin/codesign", "-dvv", str(apps[0])], check=True,
+            [CODESIGN, "-dvv", str(apps[0])], check=True,
             text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         )
         if "Authority=Developer ID Application:" not in result.stderr:
