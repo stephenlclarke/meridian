@@ -744,7 +744,41 @@ fn category(id: meridian_core::station_services::CommodityId) -> Ink {
     }
 }
 fn market(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
-    let body = f.viewport.body();
+    let area = f.viewport.body();
+    let control_width = 44.0;
+    for (i, (title, key)) in [
+        ("-10", Key::QuantityLessTen),
+        ("-1", Key::QuantityLess),
+        ("+1", Key::QuantityMore),
+        ("+10", Key::QuantityMoreTen),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        button(
+            f,
+            title,
+            Rect::new(
+                area.x + i as f64 * control_width,
+                area.y,
+                control_width - 4.0,
+                21.0,
+            ),
+            Control::Key(key),
+            true,
+            None,
+        );
+    }
+    let unit = s.commodity.definition().map_or("?", |d| d.unit.symbol());
+    label(
+        f,
+        format!("Quantity: {} {}", s.quantity, unit),
+        area.x + 4.0 * control_width,
+        area.y,
+        Ink::Yellow,
+        area,
+    );
+    let body = Rect::new(area.x, area.y + 28.0, area.width, area.height - 28.0);
     let cell = body.width / 3.0;
     for (i, (title, control)) in [
         ("Buy", Control::TradeMode(false)),

@@ -111,3 +111,29 @@ pub fn service_message(event: station_services::Event) -> Result<String, String>
         cash % 10
     ))
 }
+
+pub fn commodity_trade_message(
+    event: station_services::CommodityTradeEvent,
+) -> Result<String, String> {
+    let definition = event.commodity.definition().map_err(content_error)?;
+    let (verb, cash) = match event.side {
+        station_services::TradeSide::Buy => ("Bought", event.paid_tenths),
+        station_services::TradeSide::Sell => ("Sold", event.credited_tenths),
+    };
+    let mut message = format!(
+        "{verb} {} {} {} for {}.{} CR.",
+        event.quantity,
+        definition.unit.symbol(),
+        definition.name,
+        cash / 10,
+        cash % 10
+    );
+    if event.side == station_services::TradeSide::Sell && event.gross_tenths != u64::from(cash) {
+        message.push_str(&format!(
+            " Gross {}.{} CR; wallet limit reduced actual proceeds.",
+            event.gross_tenths / 10,
+            event.gross_tenths % 10
+        ));
+    }
+    Ok(message)
+}

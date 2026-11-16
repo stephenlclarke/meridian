@@ -2,7 +2,9 @@
 
 ## Atomic quantity trading
 
-This following-preview core increment is based on frozen `e470017b1233e05d8e32781bdfd96d2936b90222`. It is authored development source; fifteen new component and public-command tests are **UNRUN**. The existing E470 preview remains frozen. Quantity controls and durable host composition belong to Root's later join, and this source does not establish a playable bulk-trading screen.
+This following-preview core increment is based on frozen `e470017b1233e05d8e32781bdfd96d2936b90222`. It is composed development source; fifteen new core tests and six new desktop tests are **UNRUN**. The existing E470 preview remains frozen. Root has joined quantity controls and durable host publication; independent review, owning compiler checks and actual bulk-trading screen acceptance remain pending.
+
+The market starts at one native unit. Left/Right adjust by one and Shift+Left/Right by ten; the visible -10/-1/+1/+10 buttons use the same semantic actions. Quantity cannot fall below one or wrap. Changing commodity resets quantity to one. The review captures the requested quantity, native unit, actual quote and exact total before Enter confirms. Sales show gross value and actual credited cash separately. Only the currently presented frame authorizes controls; changing quantity invalidates the old frame. An open transaction review blocks quantity changes. Save failure and complete-batch refusal leave the live World and previous save unchanged.
 
 A player supplies `station_services::CommodityTrade { side, commodity, quantity }` with `TradeSide::Buy` or `Sell`. `World::prepare_commodity_trade(intent, tick)` uses the actual supported current berth, sole CommanderAccount, native commodity row, finite stock and current lesson/freight reservations. It returns `PreparedCommodityTrade` with the exact receipt and complete semantically validated save bytes. `publish_with` commits the live account, market and lesson only after the host writer succeeds. Dropping preparation or writer failure leaves the complete live save unchanged. `request_commodity_trade` is the synchronous core equivalent; a durable host must prepare and publish first.
 

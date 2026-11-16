@@ -149,6 +149,22 @@ impl Profile {
                 },
             );
         }
+        if let Action::CommodityTrade(command) = action {
+            let tick = self.world.snapshot().tick;
+            let prepared = self
+                .world
+                .prepare_commodity_trade(command, tick)
+                .map_err(|e| e.to_string())?;
+            let message = crate::market::commodity_trade_message(prepared.event())?;
+            let published = self
+                .store
+                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .map_err(|e| format!("Market change could not be saved: {e}"))?;
+            prepared.commit();
+            self.has_save = true;
+            self.session.invalidate();
+            return publication_message(published, message);
+        }
         if let Action::StationService(command) = action {
             let tick = self.world.snapshot().tick;
             let prepared = self

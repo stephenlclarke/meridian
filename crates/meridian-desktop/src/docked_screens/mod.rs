@@ -60,6 +60,10 @@ pub enum Key {
     PreviousTab,
     Buy,
     Sell,
+    QuantityLess,
+    QuantityMore,
+    QuantityLessTen,
+    QuantityMoreTen,
     BuyMode,
     SellMode,
     LocalChart,
@@ -129,6 +133,7 @@ pub enum Request {
     ReviewCommodity {
         commodity: CommodityId,
         buy: bool,
+        quantity: u64,
     },
     ReviewEquipment {
         node: String,

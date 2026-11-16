@@ -1,6 +1,6 @@
 # Implementation and validation status
 
-Following the frozen E470 preview, [atomic commodity quantity trading](COMMODITY-TRADING.md#atomic-quantity-trading) adds a bounded native-unit transaction, exact totals and one complete prospective save. Fifteen new tests are authored **UNRUN**; no compiler, Clippy, coverage or native result binds this increment. Root owns later quantity UI/host composition and serial mining integration. The frozen preview and prior profiles are unchanged.
+Following the frozen E470 preview, [atomic commodity quantity trading](COMMODITY-TRADING.md#atomic-quantity-trading) adds a bounded native-unit transaction, exact totals and one complete prospective save. Twenty-one new tests are authored **UNRUN** (15 core and six desktop); no compiler, Clippy, coverage or native result binds this increment. Root has composed quantity UI/host publication and owns later serial mining integration. The frozen preview and prior profiles are unchanged.
 
 Reviewed against actual delivery evidence on 16 November 2026. This document distinguishes installed gameplay from source awaiting execution. Update it with every delivery or material acceptance change; test counts belong to their exact source.
 

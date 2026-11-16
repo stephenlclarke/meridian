@@ -246,6 +246,7 @@ fn market_keyboard_pointer_equivalence_outputs_review_only_and_preserves_world()
     let expected = Outcome::Request(Request::ReviewCommodity {
         commodity: CommodityId::Food,
         buy: true,
+        quantity: 1,
     });
     assert_eq!(key(&mut a, &ctx, Key::Confirm), expected);
     assert_eq!(click(&mut b, &ctx, Control::Key(Key::Confirm)), expected);
@@ -266,7 +267,8 @@ fn selection_changes_do_not_execute_the_selected_commodity() {
         key(&mut ui, &ctx, Key::Sell),
         Outcome::Request(Request::ReviewCommodity {
             commodity: CommodityId::Gold,
-            buy: false
+            buy: false,
+            quantity: 1,
         })
     );
 }
@@ -807,4 +809,108 @@ fn planet_preview_is_a_provider_request_for_the_selected_real_world_only() {
     let frame = ui.frame(&ctx, view());
     assert_eq!(frame.planets.len(), 1);
     assert_eq!(frame.planets[0].system, SystemId::AVENOR);
+}
+
+#[test]
+fn quantity_controls_match_keyboard_and_pointer_without_trading() {
+    let c = catalogue();
+    let w = world();
+    let ctx = context(&w, &c);
+    let before = w.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+    let mut keyboard = DockedScreens::new(SystemId::AVENOR, "SH025");
+    let mut pointer = DockedScreens::new(SystemId::AVENOR, "SH025");
+    keyboard.open(Screen::Trading);
+    pointer.open(Screen::Trading);
+    for command in [
+        Key::QuantityLessTen,
+        Key::QuantityMoreTen,
+        Key::QuantityMore,
+        Key::QuantityLess,
+    ] {
+        assert_eq!(key(&mut keyboard, &ctx, command), Outcome::Updated);
+        assert_eq!(
+            click(&mut pointer, &ctx, Control::Key(command)),
+            Outcome::Updated
+        );
+    }
+    let expected = Outcome::Request(Request::ReviewCommodity {
+        commodity: CommodityId::Food,
+        buy: true,
+        quantity: 11,
+    });
+    assert_eq!(key(&mut keyboard, &ctx, Key::Buy), expected);
+    assert_eq!(
+        click(&mut pointer, &ctx, Control::Key(Key::Confirm)),
+        expected
+    );
+    assert_eq!(w.save_bytes().unwrap_or_else(|e| panic!("{e}")), before);
+}
+
+#[test]
+fn changed_quantity_invalidates_old_frame_and_commodity_selection_resets_it() {
+    let c = catalogue();
+    let w = world();
+    let ctx = context(&w, &c);
+    let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+    ui.open(Screen::Trading);
+    let old = ui.frame(&ctx, view());
+    assert_eq!(
+        ui.handle(Input::Key(Key::QuantityMoreTen), &old, &ctx),
+        Outcome::Updated
+    );
+    assert!(matches!(
+        ui.handle(Input::Key(Key::Buy), &old, &ctx),
+        Outcome::Refused(_)
+    ));
+    assert_eq!(key(&mut ui, &ctx, Key::Next), Outcome::Updated);
+    assert_eq!(ui.quantity, 1);
+    assert_eq!(key(&mut ui, &ctx, Key::QuantityLess), Outcome::Updated);
+    assert_eq!(ui.quantity, 1);
+    ui.quantity = u64::MAX;
+    assert_eq!(key(&mut ui, &ctx, Key::QuantityMoreTen), Outcome::Updated);
+    assert_eq!(ui.quantity, u64::MAX);
+    assert_eq!(
+        click(&mut ui, &ctx, Control::SelectCommodity(CommodityId::Gold)),
+        Outcome::Updated
+    );
+    assert_eq!(
+        key(&mut ui, &ctx, Key::Sell),
+        Outcome::Request(Request::ReviewCommodity {
+            commodity: CommodityId::Gold,
+            buy: false,
+            quantity: 1,
+        })
+    );
+}
+
+#[test]
+fn quantity_pointer_controls_remain_visible_at_compact_viewport() {
+    let c = catalogue();
+    let w = world();
+    let ctx = context(&w, &c);
+    let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+    ui.open(Screen::Trading);
+    let viewport = Viewport::new(640.0, 360.0).unwrap_or_else(|| panic!("viewport"));
+    let frame = ui.frame(&ctx, viewport);
+    for command in [
+        Key::QuantityLessTen,
+        Key::QuantityLess,
+        Key::QuantityMore,
+        Key::QuantityMoreTen,
+    ] {
+        let hit = frame
+            .hits
+            .iter()
+            .find(|h| h.control == Control::Key(command))
+            .unwrap_or_else(|| panic!("quantity control missing"));
+        assert!(hit.enabled);
+        assert!(hit.bounds.x >= 0.0 && hit.bounds.x + hit.bounds.width <= viewport.width);
+        assert!(hit.bounds.y >= 0.0 && hit.bounds.y + hit.bounds.height <= viewport.height);
+    }
+    assert!(
+        frame
+            .labels
+            .iter()
+            .any(|l| l.text.contains("Quantity: 1 t"))
+    );
 }
