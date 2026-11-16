@@ -1,6 +1,7 @@
 mod app;
 mod clock;
 mod hud;
+mod market;
 mod mesh;
 mod profile;
 mod renderer;

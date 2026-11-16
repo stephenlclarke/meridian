@@ -1,0 +1,754 @@
+{
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourceTree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "sources": {
+    "authoring": {
+      "path": "Sources/L337Core/Resources/OriginalWorlds/authoring.toml",
+      "sha256": "47d83caae5a9b22a4a932f19c55f79c5cb5435b962826a0969ece096b11f80eb",
+      "bytes": 6664
+    },
+    "manifest": {
+      "path": "Sources/L337Core/Resources/OriginalMarkets/manifest.json",
+      "sha256": "fcc9180da8b415bb2ac0666acae197dc30f5862dac79d613fb6c6e6dfdb8e5c3",
+      "bytes": 3854
+    },
+    "markets": {
+      "path": "Sources/L337Core/Resources/OriginalMarkets/markets.json",
+      "sha256": "4f7e7c9235f13f8151f2d53051828078f6c7d701ffd119c15031dd9137176c5d",
+      "bytes": 5642852
+    },
+    "identities": {
+      "path": "Sources/L337Core/GameplayContracts.swift",
+      "sha256": "365ba38c3ed2dc3312eae0dfee677a3c8dec676fa0b9f925a53f1764a3e5496a",
+      "bytes": 9854
+    },
+    "cargo": {
+      "path": "Sources/L337Core/CommanderCargoValidation.swift",
+      "sha256": "05c5c1a872560370159c4db0f1701996c65f7a1142a9f8dcfd53e731b2397f32",
+      "bytes": 9113
+    },
+    "sellable": {
+      "path": "Sources/L337Core/BlackjackMission.swift",
+      "sha256": "b741355ac86300a8e791dde90ca6a318ae749009d76b0042cc0e768951be88d1",
+      "bytes": 3211
+    },
+    "display": {
+      "path": "Sources/L337Core/MarketDisplayOrder.swift",
+      "sha256": "3133b011340a50faca60df11869e9e0fb46d6157b6ffea23e5294e26503a9f54",
+      "bytes": 655
+    },
+    "game": {
+      "path": "Sources/L337Core/Game.swift",
+      "sha256": "e5b4e30c835d460aa7ca6f77364db0aaeaf877bb9d73bacc162e9111b26e2e17",
+      "bytes": 313817
+    },
+    "universe": {
+      "path": "Sources/L337Core/Universe.swift",
+      "sha256": "bc3cdb9d0c15d2f809c61de4bb3337735ebf7f087cc08c2eb079595e9cd6b849",
+      "bytes": 4291
+    },
+    "reservations": {
+      "path": "Sources/L337Core/ScriptNavigationTradeState.swift",
+      "sha256": "52043ac3d4208fa2b5cf8b914cd0beddc9a43bdbd0387b9a46fa4f536070f5f2",
+      "bytes": 15540
+    }
+  },
+  "definitions": [
+    {
+      "index": 0,
+      "name": "Food",
+      "unit": "t",
+      "sector": "agricultural",
+      "basePriceCR": 17.0,
+      "targetStock": 180,
+      "technology": 1,
+      "volatility": 0.07
+    },
+    {
+      "index": 1,
+      "name": "Textiles",
+      "unit": "t",
+      "sector": "consumer",
+      "basePriceCR": 36.0,
+      "targetStock": 116,
+      "technology": 2,
+      "volatility": 0.06
+    },
+    {
+      "index": 2,
+      "name": "Radioactives",
+      "unit": "t",
+      "sector": "industrial",
+      "basePriceCR": 410.0,
+      "targetStock": 19,
+      "technology": 12,
+      "volatility": 0.11
+    },
+    {
+      "index": 3,
+      "name": "Slaves",
+      "unit": "t",
+      "sector": "special",
+      "basePriceCR": 240.0,
+      "targetStock": 12,
+      "technology": 1,
+      "volatility": 0.19
+    },
+    {
+      "index": 4,
+      "name": "Liquor",
+      "unit": "t",
+      "sector": "consumer",
+      "basePriceCR": 72.0,
+      "targetStock": 71,
+      "technology": 4,
+      "volatility": 0.1
+    },
+    {
+      "index": 5,
+      "name": "Luxuries",
+      "unit": "t",
+      "sector": "consumer",
+      "basePriceCR": 620.0,
+      "targetStock": 22,
+      "technology": 13,
+      "volatility": 0.16
+    },
+    {
+      "index": 6,
+      "name": "Narcotics",
+      "unit": "t",
+      "sector": "agricultural",
+      "basePriceCR": 360.0,
+      "targetStock": 17,
+      "technology": 6,
+      "volatility": 0.23
+    },
+    {
+      "index": 7,
+      "name": "Computers",
+      "unit": "t",
+      "sector": "industrial",
+      "basePriceCR": 265.0,
+      "targetStock": 37,
+      "technology": 14,
+      "volatility": 0.1
+    },
+    {
+      "index": 8,
+      "name": "Machinery",
+      "unit": "t",
+      "sector": "industrial",
+      "basePriceCR": 118.0,
+      "targetStock": 58,
+      "technology": 7,
+      "volatility": 0.09
+    },
+    {
+      "index": 9,
+      "name": "Alloys",
+      "unit": "t",
+      "sector": "industrial",
+      "basePriceCR": 64.0,
+      "targetStock": 98,
+      "technology": 3,
+      "volatility": 0.07
+    },
+    {
+      "index": 10,
+      "name": "Weapons",
+      "unit": "t",
+      "sector": "industrial",
+      "basePriceCR": 310.0,
+      "targetStock": 24,
+      "technology": 10,
+      "volatility": 0.15
+    },
+    {
+      "index": 11,
+      "name": "Furs",
+      "unit": "t",
+      "sector": "agricultural",
+      "basePriceCR": 84.0,
+      "targetStock": 54,
+      "technology": 2,
+      "volatility": 0.13
+    },
+    {
+      "index": 12,
+      "name": "Minerals",
+      "unit": "t",
+      "sector": "extraction",
+      "basePriceCR": 28.0,
+      "targetStock": 145,
+      "technology": 1,
+      "volatility": 0.08
+    },
+    {
+      "index": 13,
+      "name": "Gold",
+      "unit": "kg",
+      "sector": "extraction",
+      "basePriceCR": 390.0,
+      "targetStock": 42,
+      "technology": 3,
+      "volatility": 0.12
+    },
+    {
+      "index": 14,
+      "name": "Platinum",
+      "unit": "kg",
+      "sector": "extraction",
+      "basePriceCR": 620.0,
+      "targetStock": 26,
+      "technology": 8,
+      "volatility": 0.14
+    },
+    {
+      "index": 15,
+      "name": "Gem-Stones",
+      "unit": "g",
+      "sector": "extraction",
+      "basePriceCR": 86.0,
+      "targetStock": 110,
+      "technology": 5,
+      "volatility": 0.18
+    },
+    {
+      "index": 16,
+      "name": "Alien Items",
+      "unit": "t",
+      "sector": "special",
+      "basePriceCR": 2100.0,
+      "targetStock": 4,
+      "technology": 17,
+      "volatility": 0.26
+    }
+  ],
+  "nativeIdentityCases": [
+    "food",
+    "textiles",
+    "radioactives",
+    "slaves",
+    "liquor",
+    "luxuries",
+    "narcotics",
+    "computers",
+    "machinery",
+    "alloys",
+    "firearms",
+    "furs",
+    "minerals",
+    "gold",
+    "platinum",
+    "gemstones",
+    "alienItems"
+  ],
+  "displayOrder": [
+    9,
+    8,
+    10,
+    2,
+    7,
+    12,
+    13,
+    15,
+    14,
+    1,
+    4,
+    5,
+    0,
+    11,
+    6,
+    3,
+    16
+  ],
+  "nativeUnits": {
+    "t": 0,
+    "kg": 1,
+    "g": 2
+  },
+  "departureLegalWeights": [
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    2,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "markets": [
+    {
+      "galaxy": 0,
+      "system": 7,
+      "quotes": [
+        {
+          "askTenthsCR": 226,
+          "bidTenthsCR": 208,
+          "epoch": 0,
+          "index": 0,
+          "name": "Food",
+          "stock": 128,
+          "system": 7,
+          "targetStock": 126,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 347,
+          "bidTenthsCR": 319,
+          "epoch": 0,
+          "index": 1,
+          "name": "Textiles",
+          "stock": 128,
+          "system": 7,
+          "targetStock": 157,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 5142,
+          "bidTenthsCR": 4746,
+          "epoch": 0,
+          "index": 2,
+          "name": "Radioactives",
+          "stock": 12,
+          "system": 7,
+          "targetStock": 14,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 3811,
+          "bidTenthsCR": 3517,
+          "epoch": 0,
+          "index": 3,
+          "name": "Slaves",
+          "stock": 4,
+          "system": 7,
+          "targetStock": 4,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 708,
+          "bidTenthsCR": 652,
+          "epoch": 0,
+          "index": 4,
+          "name": "Liquor",
+          "stock": 72,
+          "system": 7,
+          "targetStock": 88,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 9145,
+          "bidTenthsCR": 8441,
+          "epoch": 0,
+          "index": 5,
+          "name": "Luxuries",
+          "stock": 14,
+          "system": 7,
+          "targetStock": 16,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 5661,
+          "bidTenthsCR": 5225,
+          "epoch": 0,
+          "index": 6,
+          "name": "Narcotics",
+          "stock": 9,
+          "system": 7,
+          "targetStock": 10,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 3613,
+          "bidTenthsCR": 3335,
+          "epoch": 0,
+          "index": 7,
+          "name": "Computers",
+          "stock": 23,
+          "system": 7,
+          "targetStock": 23,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 1315,
+          "bidTenthsCR": 1213,
+          "epoch": 0,
+          "index": 8,
+          "name": "Machinery",
+          "stock": 54,
+          "system": 7,
+          "targetStock": 56,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 747,
+          "bidTenthsCR": 689,
+          "epoch": 0,
+          "index": 9,
+          "name": "Alloys",
+          "stock": 92,
+          "system": 7,
+          "targetStock": 114,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 4414,
+          "bidTenthsCR": 4074,
+          "epoch": 0,
+          "index": 10,
+          "name": "Weapons",
+          "stock": 18,
+          "system": 7,
+          "targetStock": 20,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 1193,
+          "bidTenthsCR": 1101,
+          "epoch": 0,
+          "index": 11,
+          "name": "Furs",
+          "stock": 35,
+          "system": 7,
+          "targetStock": 37,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 241,
+          "bidTenthsCR": 221,
+          "epoch": 0,
+          "index": 12,
+          "name": "Minerals",
+          "stock": 217,
+          "system": 7,
+          "targetStock": 218,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 4345,
+          "bidTenthsCR": 4009,
+          "epoch": 0,
+          "index": 13,
+          "name": "Gold",
+          "stock": 47,
+          "system": 7,
+          "targetStock": 58,
+          "unit": "kg",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 7605,
+          "bidTenthsCR": 7019,
+          "epoch": 0,
+          "index": 14,
+          "name": "Platinum",
+          "stock": 21,
+          "system": 7,
+          "targetStock": 28,
+          "unit": "kg",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 894,
+          "bidTenthsCR": 824,
+          "epoch": 0,
+          "index": 15,
+          "name": "Gem-Stones",
+          "stock": 106,
+          "system": 7,
+          "targetStock": 140,
+          "unit": "g",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 41338,
+          "bidTenthsCR": 38158,
+          "epoch": 0,
+          "index": 16,
+          "name": "Alien Items",
+          "stock": 0,
+          "system": 7,
+          "targetStock": 0,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        }
+      ]
+    },
+    {
+      "galaxy": 0,
+      "system": 185,
+      "quotes": [
+        {
+          "askTenthsCR": 216,
+          "bidTenthsCR": 196,
+          "epoch": 0,
+          "index": 0,
+          "name": "Food",
+          "stock": 112,
+          "system": 185,
+          "targetStock": 143,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 346,
+          "bidTenthsCR": 316,
+          "epoch": 0,
+          "index": 1,
+          "name": "Textiles",
+          "stock": 163,
+          "system": 185,
+          "targetStock": 150,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 5418,
+          "bidTenthsCR": 4950,
+          "epoch": 0,
+          "index": 2,
+          "name": "Radioactives",
+          "stock": 15,
+          "system": 185,
+          "targetStock": 16,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 3866,
+          "bidTenthsCR": 3532,
+          "epoch": 0,
+          "index": 3,
+          "name": "Slaves",
+          "stock": 5,
+          "system": 185,
+          "targetStock": 6,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 787,
+          "bidTenthsCR": 719,
+          "epoch": 0,
+          "index": 4,
+          "name": "Liquor",
+          "stock": 64,
+          "system": 185,
+          "targetStock": 85,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 7879,
+          "bidTenthsCR": 7199,
+          "epoch": 0,
+          "index": 5,
+          "name": "Luxuries",
+          "stock": 12,
+          "system": 185,
+          "targetStock": 16,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 5072,
+          "bidTenthsCR": 4634,
+          "epoch": 0,
+          "index": 6,
+          "name": "Narcotics",
+          "stock": 12,
+          "system": 185,
+          "targetStock": 11,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 3438,
+          "bidTenthsCR": 3140,
+          "epoch": 0,
+          "index": 7,
+          "name": "Computers",
+          "stock": 26,
+          "system": 185,
+          "targetStock": 27,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 1375,
+          "bidTenthsCR": 1255,
+          "epoch": 0,
+          "index": 8,
+          "name": "Machinery",
+          "stock": 58,
+          "system": 185,
+          "targetStock": 65,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 593,
+          "bidTenthsCR": 541,
+          "epoch": 0,
+          "index": 9,
+          "name": "Alloys",
+          "stock": 135,
+          "system": 185,
+          "targetStock": 130,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 4269,
+          "bidTenthsCR": 3901,
+          "epoch": 0,
+          "index": 10,
+          "name": "Weapons",
+          "stock": 19,
+          "system": 185,
+          "targetStock": 23,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 1102,
+          "bidTenthsCR": 1006,
+          "epoch": 0,
+          "index": 11,
+          "name": "Furs",
+          "stock": 38,
+          "system": 185,
+          "targetStock": 41,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 425,
+          "bidTenthsCR": 387,
+          "epoch": 0,
+          "index": 12,
+          "name": "Minerals",
+          "stock": 47,
+          "system": 185,
+          "targetStock": 60,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 6192,
+          "bidTenthsCR": 5658,
+          "epoch": 0,
+          "index": 13,
+          "name": "Gold",
+          "stock": 14,
+          "system": 185,
+          "targetStock": 16,
+          "unit": "kg",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 9032,
+          "bidTenthsCR": 8254,
+          "epoch": 0,
+          "index": 14,
+          "name": "Platinum",
+          "stock": 8,
+          "system": 185,
+          "targetStock": 9,
+          "unit": "kg",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 1455,
+          "bidTenthsCR": 1329,
+          "epoch": 0,
+          "index": 15,
+          "name": "Gem-Stones",
+          "stock": 32,
+          "system": 185,
+          "targetStock": 40,
+          "unit": "g",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 37041,
+          "bidTenthsCR": 33849,
+          "epoch": 0,
+          "index": 16,
+          "name": "Alien Items",
+          "stock": 0,
+          "system": 185,
+          "targetStock": 0,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        }
+      ]
+    }
+  ],
+  "outputs": {
+    "commodities.catalogue": {
+      "sha256": "2dbfb9e0abc0a6c2bad3dbabd9a44942f41a86d55c5c44e885ea3dd2bfbca451",
+      "bytes": 847
+    },
+    "g01-commodities.markets": {
+      "sha256": "8f9ec17f63a8e99a700ec5c01273ca67a8ec1cef42730edc10a8d778f0f1b253",
+      "bytes": 1138
+    }
+  },
+  "catalogueFormat": "MCOM0001 + LEu16 count17; rows u8 ID/unitTag/departureLegalWeight/nameBytes, UTF8name, u8 sectorBytes, UTF8sector, LEf64 basePriceCR, LEu64 targetStock, LEu16 technology, LEf64 volatility; final17u8 display-order IDs",
+  "marketFormat": "MMKT0002 + LEu16 marketCount2/commodityCount17; each LEu16 system then17rows u8 ID, LEu32 ask/bid credit tenths, LEu64 stock/targetStock/epoch",
+  "semantics": {
+    "ordinaryCommodityTonnes": "quantity for unit t; zero for kg/g, not fractional SI hold conversion",
+    "quantityBound": 542551296285575047,
+    "sellableCargo": "max(0,cargo[index]-markedFirearms(if10)-nativeCaptiveCount(if3)-reservedNavigationTradeCargo(index))",
+    "departureLegality": "legal |= cargo[3] + 2*cargo[6] + cargo[10]; no automatic purchase/sale fine",
+    "transaction": "one native unit per action; actual ask/bid, stock, funds, hold and sellable custody; sale caps credits at4294967295",
+    "authority": "definitions/quotes do not grant stock refill, cargo, custody, people consent, private approval, paid fitting or payment"
+  },
+  "originalAuthoring": {
+    "auditReceipt": "assets/legacy/original-economy-origin.json",
+    "auditReceiptSHA256": "a3a829192e7147ce5840924b1d0d8dbee419d8411f41057937ac26bdd1e557a8",
+    "worldEconomyGenerator": "original-world-economy/generate.py",
+    "generatorSHA256": "05f54ff56d624f3090252a70306f145f092d22c881cd4d6faea227cb945250ed",
+    "runtimeMarketCompiler": "Tools/prepare-original-markets.py",
+    "compilerSHA256": "2e4e450ec53cc85c6a082dd2bcd63149597d3c347d1f72b0cc0486dac3ea23a3",
+    "adoptedOriginalCommit": "8a3021b75fabf01b4743538aba0ffe7ca0bfb161",
+    "scope": "Original L337-authored budgets/supply-demand; independent original-output reproduction recorded by MC1; no Elite/Oolite coordinate/price tables as generator inputs"
+  },
+  "sourceDescriptiveStatuses": {
+    "markets-01.toml": "Private proposal only; not installed",
+    "markets-02.toml": "Private proposal only; not installed",
+    "markets-03.toml": "Private proposal only; not installed",
+    "markets-04.toml": "Private proposal only; not installed",
+    "markets-05.toml": "Private proposal only; not installed",
+    "markets-06.toml": "Private proposal only; not installed",
+    "markets-07.toml": "Private proposal only; not installed",
+    "markets-08.toml": "Private proposal only; not installed"
+  },
+  "notice": "assets/legacy/Elite-L337-MIT.txt",
+  "scope": "Exact17definitions and34initialquotes only; live stock/transactions/save/legality application remain World-owned; not playable or commercial clearance"
+}

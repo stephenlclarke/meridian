@@ -4,6 +4,8 @@
 
 #![forbid(unsafe_code)]
 
+mod commodities;
+pub use commodities::{CargoUnit, CommodityDefinition, CommodityId, CommodityQuote};
 mod persistence;
 pub(crate) use persistence::SavedServiceSummary;
 
@@ -12,7 +14,7 @@ const STOCK_HOLD_TONNES: u16 = 92;
 const STOCK_FUEL_TENTHS: u16 = 130;
 const FUEL_PRICE_TENTHS: u32 = 2;
 // Swift's supported 64-bit Int.max/17 quantity bound, not the immutable initial stock.
-const MAX_MARKET_QUANTITY: u64 = i64::MAX as u64 / 17;
+pub(crate) const MAX_MARKET_QUANTITY: u64 = i64::MAX as u64 / 17;
 
 /// Descriptive choice. The World adapter must map its actual current main-orbital admission.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -38,6 +40,8 @@ impl MarketSite {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Command {
     BuyFood,
+    BuyCommodity(CommodityId),
+    SellCommodity(CommodityId),
     SellFood,
     RefillFuel,
 }
@@ -79,6 +83,8 @@ pub(crate) struct AccountProjection {
     pub(crate) food_tonnes: u16,
     pub(crate) reserved_food_tonnes: u16,
     pub(crate) used_tonnes: u16,
+    pub(crate) other_commodities: [u64; 16],
+    pub(crate) reserved_commodities: [u64; 16],
 }
 
 /// Only a current World-owned initial berth/physical entry may supply this projection.
@@ -97,6 +103,17 @@ pub(crate) struct ServiceFacts {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Event {
+    BoughtCommodity {
+        site: MarketSite,
+        commodity: CommodityId,
+        paid_tenths: u32,
+    },
+    SoldCommodity {
+        site: MarketSite,
+        commodity: CommodityId,
+        bid_tenths: u32,
+        credited_tenths: u32,
+    },
     BoughtFood {
         site: MarketSite,
         paid_tenths: u32,
@@ -116,10 +133,10 @@ impl Event {
     /// Actual cash spent by this committed ordinary service, excluding sale proceeds.
     pub fn paid_tenths(self) -> u32 {
         match self {
-            Self::BoughtFood { paid_tenths, .. } | Self::Refuelled { paid_tenths, .. } => {
-                paid_tenths
-            }
-            Self::SoldFood { .. } => 0,
+            Self::BoughtCommodity { paid_tenths, .. }
+            | Self::BoughtFood { paid_tenths, .. }
+            | Self::Refuelled { paid_tenths, .. } => paid_tenths,
+            Self::SoldFood { .. } | Self::SoldCommodity { .. } => 0,
         }
     }
 }
@@ -135,6 +152,9 @@ struct MarketData {
     refilled_units: u64,
     paid_tenths: u64,
     credited_tenths: u64,
+    other_quotes: [[CommodityQuote; 16]; 2],
+    other_bought: [[u64; 16]; 2],
+    other_sold: [[u64; 16]; 2],
 }
 
 /// Only market stock is owned here. The actual account owns all credits, fuel and cargo.
@@ -180,6 +200,9 @@ impl StationMarkets {
                 refilled_units: 0,
                 paid_tenths: 0,
                 credited_tenths: 0,
+                other_quotes: commodities::read_market_seeds()?,
+                other_bought: [[0; 16]; 2],
+                other_sold: [[0; 16]; 2],
             },
         })
     }
@@ -195,19 +218,7 @@ impl StationMarkets {
         command: Command,
     ) -> Result<Prepared, Error> {
         validate_account(account)?;
-        let facts = facts.ok_or(Error::NotDocked)?;
-        if facts.paused {
-            return Err(Error::Paused);
-        }
-        if self.data.owner != account.owner
-            || facts.owner != account.owner
-            || facts.hull != account.hull
-        {
-            return Err(Error::WrongOwner);
-        }
-        if facts.station_entity != 1 || facts.visit == 0 || facts.dock_sequence == 0 {
-            return Err(Error::NotDocked);
-        }
+        let facts = validate_service(self.data.owner, account, facts)?;
         let mut next = self.data;
         let mut next_account = account;
         next.revision = next
@@ -218,6 +229,11 @@ impl StationMarkets {
             .revision
             .checked_add(1)
             .ok_or(Error::SequenceExhausted)?;
+        let command = match command {
+            Command::BuyCommodity(CommodityId::Food) => Command::BuyFood,
+            Command::SellCommodity(CommodityId::Food) => Command::SellFood,
+            command => command,
+        };
         let quote = &mut next.quotes[facts.site.index()];
         let event = match command {
             Command::BuyFood => {
@@ -259,6 +275,12 @@ impl StationMarkets {
                     credited_tenths: next_account.credits_tenths - account.credits_tenths,
                 }
             }
+            Command::BuyCommodity(id) => {
+                commodities::buy(&mut next, &mut next_account, facts.site, id)?
+            }
+            Command::SellCommodity(id) => {
+                commodities::sell(&mut next, &mut next_account, facts.site, id)?
+            }
             Command::RefillFuel => {
                 let missing = STOCK_FUEL_TENTHS - account.fuel_tenths;
                 let price = u32::from(missing) * FUEL_PRICE_TENTHS;
@@ -286,8 +308,50 @@ impl StationMarkets {
     }
 }
 
+fn validate_service(
+    owner: u64,
+    account: AccountProjection,
+    facts: Option<ServiceFacts>,
+) -> Result<ServiceFacts, Error> {
+    let facts = facts.ok_or(Error::NotDocked)?;
+    if facts.paused {
+        return Err(Error::Paused);
+    }
+    if owner != account.owner || facts.owner != account.owner || facts.hull != account.hull {
+        return Err(Error::WrongOwner);
+    }
+    if facts.station_entity != 1 || facts.visit == 0 || facts.dock_sequence == 0 {
+        return Err(Error::NotDocked);
+    }
+    Ok(facts)
+}
+
 fn record_accounting(next: &mut MarketData, site: usize, event: Event) -> Result<(), Error> {
     match event {
+        Event::BoughtCommodity {
+            commodity,
+            paid_tenths,
+            ..
+        } => {
+            let count = &mut next.other_bought[site][commodity.index() - 1];
+            *count = count.checked_add(1).ok_or(Error::SequenceExhausted)?;
+            next.paid_tenths = next
+                .paid_tenths
+                .checked_add(u64::from(paid_tenths))
+                .ok_or(Error::SequenceExhausted)?;
+        }
+        Event::SoldCommodity {
+            commodity,
+            credited_tenths,
+            ..
+        } => {
+            let count = &mut next.other_sold[site][commodity.index() - 1];
+            *count = count.checked_add(1).ok_or(Error::SequenceExhausted)?;
+            next.credited_tenths = next
+                .credited_tenths
+                .checked_add(u64::from(credited_tenths))
+                .ok_or(Error::SequenceExhausted)?;
+        }
         Event::BoughtFood { paid_tenths, .. } => {
             next.bought[site] = next.bought[site]
                 .checked_add(1)
@@ -349,6 +413,13 @@ impl Prepared {
     }
 }
 
+pub(crate) fn valid_native_quantities(quantities: [u64; 16], reserved: [u64; 16]) -> bool {
+    quantities
+        .iter()
+        .zip(reserved)
+        .all(|(&quantity, reserved)| quantity <= MAX_MARKET_QUANTITY && reserved <= quantity)
+}
+
 fn validate_account(account: AccountProjection) -> Result<(), Error> {
     if account.owner == 0
         || account.hull == 0
@@ -357,6 +428,9 @@ fn validate_account(account: AccountProjection) -> Result<(), Error> {
         || account.reserved_food_tonnes > account.food_tonnes
         || account.food_tonnes > account.used_tonnes
         || account.used_tonnes > STOCK_HOLD_TONNES
+        || !valid_native_quantities(account.other_commodities, account.reserved_commodities)
+        || commodities::other_tonnes(account.other_commodities) + u128::from(account.food_tonnes)
+            > u128::from(account.used_tonnes)
     {
         return Err(Error::InvalidAccount);
     }
@@ -414,6 +488,8 @@ mod tests {
             food_tonnes: 0,
             reserved_food_tonnes: 0,
             used_tonnes: 8,
+            other_commodities: [0; 16],
+            reserved_commodities: [0; 16],
         }
     }
     fn facts(site: MarketSite) -> ServiceFacts {
@@ -766,3 +842,6 @@ mod tests {
         ));
     }
 }
+
+#[cfg(test)]
+mod commodity_tests;

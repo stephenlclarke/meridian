@@ -2,7 +2,7 @@
 use meridian_core::freight::g02::presentation;
 use meridian_core::freight::g02::{Choice, Command, ContactDefinition, Event, JobId, Review};
 use meridian_core::navigation::SystemId;
-use meridian_core::station_services;
+use meridian_core::station_services::{self, CommodityId};
 use meridian_core::{FlightMode, World};
 
 #[derive(Clone, Copy)]
@@ -15,17 +15,33 @@ pub enum Action {
     Confirm,
     Back,
     Refuel,
-    BuyFood,
-    SellFood,
+    ToggleMarket,
+    PreviousCommodity,
+    NextCommodity,
+    BuySelected,
+    SellSelected,
     Jump,
     Launch,
 }
 
-#[derive(Default)]
 pub struct Session {
     job: Option<JobId>,
     pending: Option<(Review, Choice)>,
     show_objective: bool,
+    market_open: bool,
+    selected_commodity: CommodityId,
+}
+
+impl Default for Session {
+    fn default() -> Self {
+        Self {
+            job: None,
+            pending: None,
+            show_objective: false,
+            market_open: false,
+            selected_commodity: CommodityId::Food,
+        }
+    }
 }
 
 impl Session {
@@ -33,13 +49,14 @@ impl Session {
         Self {
             job: world.active_freight_job(),
             pending: None,
-            show_objective: false,
+            ..Self::default()
         }
     }
 
     pub fn invalidate(&mut self) {
         self.pending = None;
         self.show_objective = false;
+        self.market_open = false;
     }
 
     fn freight(&mut self, world: &mut World, command: Command) -> Result<String, String> {
@@ -159,30 +176,46 @@ impl Session {
                 self.invalidate();
                 self.freight(world, Command::Back)
             }
-            Action::BuyFood | Action::SellFood => {
+            Action::ToggleMarket => {
+                let open = !self.market_open;
                 self.invalidate();
+                self.market_open = open;
+                Ok(if open {
+                    "Market: [ and ] select; G buys one native unit; H sells one native unit."
+                } else {
+                    "Market closed."
+                }
+                .into())
+            }
+            Action::PreviousCommodity | Action::NextCommodity => {
+                self.invalidate();
+                let order = CommodityId::display_order().map_err(crate::market::content_error)?;
+                let index = order
+                    .iter()
+                    .position(|id| *id == self.selected_commodity)
+                    .ok_or("Selected commodity is absent from the original market order")?;
+                let offset = if matches!(action, Action::NextCommodity) {
+                    1
+                } else {
+                    order.len() - 1
+                };
+                self.selected_commodity = order[(index + offset) % order.len()];
+                self.market_open = true;
+                Ok("Commodity selected; G buys one native unit, H sells one native unit.".into())
+            }
+            Action::BuySelected | Action::SellSelected => {
+                self.invalidate();
+                self.market_open = true;
                 let command = match action {
-                    Action::BuyFood => station_services::Command::BuyFood,
-                    _ => station_services::Command::SellFood,
+                    Action::BuySelected => {
+                        station_services::Command::BuyCommodity(self.selected_commodity)
+                    }
+                    _ => station_services::Command::SellCommodity(self.selected_commodity),
                 };
                 let event = world
                     .request_station_service(command, world.snapshot().tick)
                     .map_err(|e| e.to_string())?;
-                Ok(match event {
-                    station_services::Event::BoughtFood { paid_tenths, .. } => format!(
-                        "Bought one Food tonne for {}.{} CR.",
-                        paid_tenths / 10,
-                        paid_tenths % 10
-                    ),
-                    station_services::Event::SoldFood {
-                        credited_tenths, ..
-                    } => format!(
-                        "Sold one Food tonne for {}.{} CR.",
-                        credited_tenths / 10,
-                        credited_tenths % 10
-                    ),
-                    station_services::Event::Refuelled { .. } => "Fuel service complete.".into(),
-                })
+                crate::market::service_message(event)
             }
             Action::Refuel => {
                 self.invalidate();
@@ -298,10 +331,20 @@ impl Session {
                 .to_string(),
         );
         lines.push(review_line);
-        lines.push(
-            "L LAUNCH | J JUMP | T CONTACT | R REVIEW | V RECEIVE ALL | X ABANDON | ENTER CONFIRM | B BACK".into(),
-        );
+        lines.push(if self.market_open {
+            "[ PREVIOUS | ] NEXT | G BUY 1 UNIT | H SELL 1 UNIT | M CLOSE MARKET | F REFUEL".into()
+        } else {
+            "L LAUNCH | J JUMP | T CONTACT | R REVIEW | V RECEIVE ALL | X ABANDON | ENTER CONFIRM | B BACK".into()
+        });
         if self.append_mission_panel(world, &mut lines) {
+            return lines;
+        }
+        if self.market_open {
+            if let Err(error) =
+                crate::market::append_panel(world, self.selected_commodity, &mut lines)
+            {
+                append_paragraph(&mut lines, &error);
+            }
             return lines;
         }
         let credit = world.credits_tenths().unwrap_or(0);
@@ -361,7 +404,10 @@ impl Session {
             ));
         }
         lines.push("W/S THRUST | ARROWS PITCH | A/D YAW | Q/E ROLL | SPACE BRAKE".into());
-        lines.push("G BUY 1 FOOD | H SELL 1 FOOD | F REFUEL | P PAUSE | F11 FULLSCREEN".into());
+        lines.push(
+            "M MARKET | G BUY SELECTED | H SELL SELECTED | F REFUEL | P PAUSE | F11 FULLSCREEN"
+                .into(),
+        );
         lines.push("I MISSION DETAILS | F5 SAVE | F9 RELOAD SAVE | ESC SAVE AND QUIT".into());
         lines
     }
@@ -549,9 +595,9 @@ mod tests {
         let mut world = world();
         let mut ui = Session::default();
         let initial = (world.service_snapshot(), world.credits_tenths());
-        assert!(ui.command(&mut world, Action::SellFood).is_err());
+        assert!(ui.command(&mut world, Action::SellSelected).is_err());
         assert_eq!(initial, (world.service_snapshot(), world.credits_tenths()));
-        ui.command(&mut world, Action::BuyFood)
+        ui.command(&mut world, Action::BuySelected)
             .unwrap_or_else(|e| panic!("{e}"));
         assert_eq!(world.credits_tenths(), Some(6974));
         assert_eq!(
@@ -567,9 +613,9 @@ mod tests {
                 .unwrap_or_else(|e| panic!("{e}"));
         }
         assert!(ui.command(&mut world, Action::Review).is_err());
-        ui.command(&mut world, Action::BuyFood)
+        ui.command(&mut world, Action::BuySelected)
             .unwrap_or_else(|e| panic!("{e}"));
-        ui.command(&mut world, Action::SellFood)
+        ui.command(&mut world, Action::SellSelected)
             .unwrap_or_else(|e| panic!("{e}"));
         assert_eq!(world.credits_tenths(), Some(6956));
         assert_eq!(
@@ -584,6 +630,93 @@ mod tests {
         );
         assert!(ui.lines(&world, true, None).len() <= crate::hud::line_budget(640, 360));
     }
+    #[test]
+    fn market_selection_reaches_every_original_row_without_mutating_world() {
+        let mut world = world();
+        let mut ui = Session::default();
+        let saved = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+        ui.command(&mut world, Action::ToggleMarket)
+            .unwrap_or_else(|e| panic!("{e}"));
+        let expected = [0, 11, 6, 3, 16, 9, 8, 10, 2, 7, 12, 13, 15, 14, 1, 4, 5];
+        for index in expected {
+            assert_eq!(ui.selected_commodity.index(), index);
+            let lines = ui.lines(&world, true, None);
+            assert!(lines[3].contains("G BUY 1 UNIT"));
+            assert!(
+                lines[5].contains(
+                    ui.selected_commodity
+                        .definition()
+                        .unwrap_or_else(|e| panic!("{e:?}"))
+                        .name
+                )
+            );
+            assert!(lines.len() <= crate::hud::line_budget(640, 360));
+            assert!(lines.iter().all(|l| l.len() <= crate::hud::MAX_COLUMNS));
+            ui.command(&mut world, Action::NextCommodity)
+                .unwrap_or_else(|e| panic!("{e}"));
+        }
+        assert_eq!(ui.selected_commodity, CommodityId::Food);
+        ui.command(&mut world, Action::PreviousCommodity)
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(ui.selected_commodity, CommodityId::Luxuries);
+        assert_eq!(world.save_bytes().unwrap_or_else(|e| panic!("{e}")), saved);
+    }
+
+    #[test]
+    fn selected_gold_trade_uses_native_kilograms_and_actual_wallet_and_stock() {
+        let mut world = world();
+        let mut ui = Session::default();
+        for _ in 0..11 {
+            ui.command(&mut world, Action::NextCommodity)
+                .unwrap_or_else(|e| panic!("{e}"));
+        }
+        assert_eq!(ui.selected_commodity, CommodityId::Gold);
+        ui.command(&mut world, Action::BuySelected)
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(world.credits_tenths(), Some(2855));
+        assert_eq!(world.commodity_quantity(CommodityId::Gold), Some(1));
+        assert_eq!(
+            world.commodity_quote(CommodityId::Gold).map(|q| q.stock),
+            Some(46)
+        );
+        assert_eq!(world.service_snapshot().map(|s| s.used_tonnes), Some(0));
+        let lines = ui.lines(&world, true, None).join(" ");
+        assert!(lines.contains("HELD 1 kg | RESERVED 0 kg"));
+        ui.command(&mut world, Action::SellSelected)
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(world.credits_tenths(), Some(6864));
+        assert_eq!(world.commodity_quantity(CommodityId::Gold), Some(0));
+        assert_eq!(
+            world.commodity_quote(CommodityId::Gold).map(|q| q.stock),
+            Some(47)
+        );
+    }
+
+    #[test]
+    fn market_cancels_hidden_freight_reviews_and_refuses_trades_without_berth() {
+        let mut world = world();
+        let mut ui = Session::default();
+        for action in [Action::Contact, Action::Review, Action::ToggleMarket] {
+            ui.command(&mut world, action)
+                .unwrap_or_else(|e| panic!("{e}"));
+        }
+        assert!(ui.command(&mut world, Action::Confirm).is_err());
+        assert_eq!(
+            world.mission_snapshot().map(|m| m.freight.held_tonnes),
+            Some(0)
+        );
+        ui.command(&mut world, Action::Launch)
+            .unwrap_or_else(|e| panic!("{e}"));
+        let saved = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+        assert!(ui.command(&mut world, Action::BuySelected).is_err());
+        assert!(
+            ui.lines(&world, true, None)
+                .iter()
+                .any(|l| l.contains("BERTH REQUIRED"))
+        );
+        assert_eq!(world.save_bytes().unwrap_or_else(|e| panic!("{e}")), saved);
+    }
+
     #[test]
     fn receive_all_requires_review_and_settles_the_real_job_once() {
         let (mut world, mut ui) = arrive_with_identified_freight();

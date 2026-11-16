@@ -10,6 +10,7 @@ pub(crate) struct SavedNavigationSummary {
     pub(crate) visit: u64,
     pub(crate) dock_sequence: u64,
     pub(crate) jumps: u64,
+    pub(crate) launches: u64,
     pub(crate) fuel_spent: u64,
 }
 
@@ -144,8 +145,12 @@ impl NavigationState {
             || u128::from(self.visit)
                 != 1 + u128::from(self.launches) + u128::from(self.completed_jumps)
             || self.dock_sequence == 0
-            || self.dock_sequence - 1 > self.launches
-            || self.launches > tick
+            // Launch is an explicit docked command and does not advance the simulation tick.
+            // Every later dock sequence is one distinct physical-entry step. Launches consume
+            // those admissions, leaving exactly one unconsumed admission iff currently docked.
+            || u128::from(self.launches) + u128::from(u8::from(mode == FlightMode::Docked))
+                != u128::from(self.dock_sequence)
+            || self.dock_sequence - 1 > tick
             || self.completed_jumps > tick
             || self.completed_jumps == 0
                 && (self.fuel_spent != 0 || self.system != SystemId::AVENOR)
@@ -206,7 +211,51 @@ impl NavigationState {
             visit: self.visit,
             dock_sequence: self.dock_sequence,
             jumps: self.completed_jumps,
+            launches: self.launches,
             fuel_spent: self.fuel_spent,
         })
+    }
+}
+
+#[cfg(test)]
+mod counter_tests {
+    use super::*;
+
+    #[test]
+    fn exhausted_launch_and_admission_counters_refuse_before_mutation() {
+        // Internal arithmetic boundaries only; the public producer/Continue proof lives
+        // in flight persistence tests and uses no caller-created navigation authority.
+        for (visit, launches) in [(u64::MAX, 0), (1, u64::MAX)] {
+            let mut navigation = NavigationState::new(101, 102, 107);
+            navigation.visit = visit;
+            navigation.launches = launches;
+            let before = navigation;
+            assert_eq!(navigation.launch(), Err(NavigationError::SequenceExhausted));
+            assert_eq!(navigation, before);
+        }
+        let catalogue = match OriginalNavigation::bundled() {
+            Ok(catalogue) => catalogue,
+            Err(error) => panic!("bundled navigation: {error:?}"),
+        };
+        let mut maximum_tick = NavigationState::new(101, 102, 107);
+        assert!(
+            maximum_tick
+                .validate_save(&catalogue, FlightMode::Docked, u64::MAX, 130)
+                .is_ok()
+        );
+        assert_eq!(maximum_tick.launch(), Ok(()));
+        assert!(
+            maximum_tick
+                .validate_save(&catalogue, FlightMode::Launching, u64::MAX, 130)
+                .is_ok()
+        );
+        let mut navigation = NavigationState::new(101, 102, 107);
+        navigation.dock_sequence = u64::MAX;
+        let before = navigation;
+        assert_eq!(
+            navigation.step(true, u64::MAX, 130),
+            Err(NavigationError::SequenceExhausted)
+        );
+        assert_eq!(navigation, before);
     }
 }

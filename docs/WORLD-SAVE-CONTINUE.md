@@ -1,6 +1,6 @@
 # World save and continue
 
-Status: version-one core encoding, decoding, semantic validation and six round-trip/tamper tests are authored on paid-services base `5531b8407fd690ca5a5f4155014574a6838c4de1`. Rustfmt parsing/formatting passes. Compilation, Rust tests, Clippy, remote quality checks and native UI acceptance are UNRUN on this exact successor. No filesystem operation or actual process quit/Continue has been performed by this implementation.
+Historical save-core source status: version-one encoding, decoding, semantic validation and six round-trip/tamper tests were authored on paid-services base `5531b8407fd690ca5a5f4155014574a6838c4de1`. Rustfmt parsing/formatting passes. Compilation, Rust tests, Clippy, remote quality checks and native UI acceptance are UNRUN on this exact successor. No filesystem operation or actual process quit/Continue has been performed by this implementation.
 
 ## Public memory API
 
@@ -12,7 +12,7 @@ The core has no filesystem, window, GPU, wall-clock, global identity allocator o
 
 ## Format and retained state
 
-The envelope has magic `MERSAVE1`, explicit version `1`, exact compiled rules/content binding plus a fingerprint of the actual five simulation resource byte streams, fixed-layout typed fields and a final 64-bit corruption checksum. The content binding pins G02 content, the selected station/hull source, the navigation data and Food market data. Inputs over 65,536 bytes, truncated numbers, invalid tags, extra trailing data, unsupported versions, changed content and mismatched checksums refuse. All arrays have compile-time bounded sizes; input-provided counts cannot allocate an unbounded collection.
+The current commodity successor uses magic `MERSAVE1`, explicit version `2`, rules `2`, exact compiled rules/content binding plus a fingerprint of seven actual simulation resource byte streams, fixed-layout typed fields and a final 64-bit corruption checksum. The original version-one format had five resource streams; old saves now refuse atomically without migration or reset. See [ordinary commodity trading](COMMODITY-TRADING.md) for this successor’s source-only validation status. The content binding pins G02 content, the selected station/hull source, the navigation data, Food market data, original seventeen commodity definitions and both full native markets. Inputs over 65,536 bytes, truncated numbers, invalid tags, extra trailing data, unsupported versions, changed content and mismatched checksums refuse. All arrays have compile-time bounded sizes; input-provided counts cannot allocate an unbounded collection.
 
 Persisted state includes the actual flight pose, quaternion, speed, tick, mode/refusal; owning commander/ship/drive IDs; current system, visit, admission sequence and initial-versus-physical dock origin; full pending jump destination/source/countdown/fuel/drive binding; the sole account's credits, fuel, owned equipment identities/components/provenance/fittings and actual cargo fields; all sixteen supplier unit identities through allocations, jobs, held/delivered masks and transfer histories; issuer/receiver station facts, completion receipts and first clue; both real station Food stocks and their prices; service/travel accounting totals; session epoch, pause state and existing NPC roster identity.
 

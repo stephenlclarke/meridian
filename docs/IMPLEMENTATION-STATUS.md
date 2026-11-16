@@ -1,5 +1,13 @@
 # Implementation and validation status
 
+## Current economy slice and installed preview
+
+The new ordinary economy joins content `4f4e3b6e4c46e57b8db7fbd1b448035ea74aa814`, core `3abb76141fd2c016bb7a87599590c82d3dc9c812`, and desktop `20d060e534c63d6e1b88ab3b5458bf928ea4baa8`, all based on main `54b6920f8db7d3935c4e3ffe1ed9d1d921d12e12`. It adds seventeen native commodities, exact two-station quotes, actual launch legality, shared finite-stock/accounting transactions, market selection and explicit save-v2 boundaries. Joined Rust tests, compilation, Clippy and native acceptance are **UNRUN**. Formatting passes; the separate content owner passed 37 Python tests and fixed-source reproduction. See [the joined change](../PR-ordinary-market-desktop.md), [content](COMMODITY-CONTENT.md) and [core rules](COMMODITY-TRADING.md).
+
+The installed `/Users/sclarke/Applications/Meridian.app` stays at signed main `54b6920`. The preceding `3ca1403` packaged Metal app passed the actual freight/trading/travel/physical-entry journey, once-only payment/clue and two cold Continue checkpoints. The successor's HUD-only change passed a separate native rendering check. This is a local preview with explicitly scoped evidence: compact resize, sustained minimize and held-key focus-loss tests remain open, FPS/p95 and race sanitizer are unmeasured, and Apple notarization is blocked by a required-agreement HTTP403. Do not call the whole first playable accepted or transfer the prior 109-test result to the new economy source.
+
+## Earlier integrated Save/Continue checkpoint
+
 Date: 15 November 2026.
 
 ## Current integrated first-playable source

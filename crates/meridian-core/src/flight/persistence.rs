@@ -4,9 +4,9 @@ use crate::save::{MAX_SAVE_BYTES, Reader, SAVE_VERSION, SaveError, Writer, check
 use crate::station_services::{SavedServiceSummary, StationMarkets};
 
 const MAGIC: &[u8; 8] = b"MERSAVE1";
-// Rules and immutable content form the version-one compatibility boundary, not an authenticity key.
+// Rules and immutable content form the version-two compatibility boundary, not an authenticity key.
 const CONTENT: &[u8] = concat!(
-    "meridian-world/rules/1;",
+    "meridian-world/rules/2;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -23,6 +23,8 @@ fn compiled_content_fingerprint() -> u64 {
         include_bytes!("../../../../assets/legacy/sh028.port").as_slice(),
         include_bytes!("../../../../assets/legacy/g01.navigation").as_slice(),
         include_bytes!("../../../../assets/legacy/g01-food.markets").as_slice(),
+        include_bytes!("../../../../assets/legacy/commodities.catalogue").as_slice(),
+        include_bytes!("../../../../assets/legacy/g01-commodities.markets").as_slice(),
     ] {
         bytes.extend((part.len() as u64).to_le_bytes());
         bytes.extend(part);
@@ -207,6 +209,9 @@ fn validate_accounting(
         || fuel < u128::from(fuel_spent)
         || fuel - u128::from(fuel_spent) != u128::from(d.fuel)
         || u64::from(d.food) != s.food
+        || d.other_commodities != s.other_commodities
+        || d.legal & !s.possible_legal_bits != 0
+        || (d.legal != 0 && d.launches == 0)
         || u128::from(d.revision)
             != u128::from(d.freight_revision) + u128::from(s.revision) + u128::from(jumps)
     {

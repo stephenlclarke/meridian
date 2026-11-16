@@ -1,7 +1,9 @@
 //! Actual World station admission and the sole account/market transaction.
 use super::{MissionError, World};
 use crate::navigation::SystemId;
-use crate::station_services::{self as services, FoodQuote, MarketSite, ServiceFacts};
+use crate::station_services::{
+    self as services, CommodityId, CommodityQuote, FoodQuote, MarketSite, ServiceFacts,
+};
 
 /// Presentation only. Editing this copy cannot create cargo, a price or service admission.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -13,6 +15,36 @@ pub struct ServiceSnapshot {
 }
 
 impl World {
+    pub fn commodity_quote(&self, id: CommodityId) -> Option<CommodityQuote> {
+        let site = service_site(self.current_dock_context()?.system())?;
+        Some(self.station_markets.as_ref()?.commodity_quote(site, id))
+    }
+    pub fn commodity_quantity(&self, id: CommodityId) -> Option<u64> {
+        let account = self.commander_account.as_ref()?;
+        let projection = account
+            .service_projection(&self.freight_session.as_ref()?.state)
+            .ok()?;
+        Some(if id == CommodityId::Food {
+            u64::from(projection.food_tonnes)
+        } else {
+            projection.other_commodities[id.index() - 1]
+        })
+    }
+    pub fn reserved_commodity_quantity(&self, id: CommodityId) -> Option<u64> {
+        let account = self.commander_account.as_ref()?;
+        let projection = account
+            .service_projection(&self.freight_session.as_ref()?.state)
+            .ok()?;
+        Some(if id == CommodityId::Food {
+            u64::from(projection.reserved_food_tonnes)
+        } else {
+            projection.reserved_commodities[id.index() - 1]
+        })
+    }
+    pub fn legal_value(&self) -> Option<u8> {
+        Some(self.commander_account.as_ref()?.legal_value())
+    }
+
     pub fn service_snapshot(&self) -> Option<ServiceSnapshot> {
         let session = self.freight_session.as_ref()?;
         let account = self.commander_account.as_ref()?;
@@ -439,5 +471,130 @@ mod tests {
         dock(&mut world);
         assert_eq!(world.current_dock_context().unwrap().system().system, 0);
         refuses(&mut world, Command::BuyFood, Error::UnsupportedStation);
+    }
+    #[test]
+    fn ordinary_machinery_never_sells_or_replaces_the_eight_identified_freight_units() {
+        let mut world = World::new_commander(901).unwrap();
+        let (job, units) = accept(&mut world);
+        let held = world.mission_snapshot().unwrap().freight;
+        assert_eq!(world.commodity_quantity(CommodityId::Machinery), Some(0));
+        refuses(
+            &mut world,
+            Command::SellCommodity(CommodityId::Machinery),
+            Error::NoSellableCargo,
+        );
+        action(&mut world, Command::BuyCommodity(CommodityId::Machinery)).unwrap();
+        action(&mut world, Command::SellCommodity(CommodityId::Machinery)).unwrap();
+        assert_eq!(world.mission_snapshot().unwrap().freight, held);
+        action(&mut world, Command::BuyCommodity(CommodityId::Machinery)).unwrap();
+        assert_eq!(world.service_snapshot().unwrap().used_tonnes, 10); // Food + actual ordinary unit + eight mission units.
+        launch(&mut world);
+        jump(&mut world, SystemId::RENAS);
+        dock(&mut world);
+        let npc = world.station_contacts()[0];
+        world.request_contact(npc, world.snapshot().tick).unwrap();
+        for unit in units {
+            let pending = review(
+                &mut world,
+                g02::Command::ReviewReceiving {
+                    actor: npc.actor(),
+                    job,
+                },
+            );
+            assert_eq!(pending.next_unit(), Some(unit));
+            freight(
+                &mut world,
+                g02::Command::Confirm {
+                    review: pending,
+                    choice: Choice::ReceiveOne(unit),
+                },
+            )
+            .unwrap();
+        }
+        assert_eq!(world.mission_snapshot().unwrap().freight.held_tonnes, 0);
+        assert_eq!(world.commodity_quantity(CommodityId::Machinery), Some(1));
+        assert_eq!(world.service_snapshot().unwrap().used_tonnes, 2);
+        action(&mut world, Command::SellCommodity(CommodityId::Machinery)).unwrap();
+        assert_eq!(world.commodity_quantity(CommodityId::Machinery), Some(0));
+        refuses(
+            &mut world,
+            Command::SellCommodity(CommodityId::Machinery),
+            Error::NoSellableCargo,
+        );
+    }
+
+    #[test]
+    fn legal_record_changes_only_on_successful_real_launch_and_survives_sale_and_continue() {
+        let mut world = World::new_commander(1001).unwrap();
+        action(&mut world, Command::BuyCommodity(CommodityId::Slaves)).unwrap();
+        assert_eq!(world.legal_value(), Some(0));
+        world.step(FlightInput::default()).unwrap();
+        assert_eq!(world.request_launch(0), Err(crate::StepError::StaleCommand));
+        assert_eq!(world.legal_value(), Some(0));
+        world.request_pause(true, world.snapshot().tick).unwrap();
+        assert_eq!(
+            world.request_launch(world.snapshot().tick),
+            Err(crate::StepError::Paused)
+        );
+        assert_eq!(world.legal_value(), Some(0));
+        world.request_pause(false, world.snapshot().tick).unwrap();
+        launch(&mut world);
+        assert_eq!(world.legal_value(), Some(1));
+        let mut world = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+        assert_eq!(world.legal_value(), Some(1));
+        jump(&mut world, SystemId::RENAS);
+        dock(&mut world);
+        action(&mut world, Command::SellCommodity(CommodityId::Slaves)).unwrap();
+        assert_eq!(world.legal_value(), Some(1));
+        action(&mut world, Command::BuyCommodity(CommodityId::Narcotics)).unwrap();
+        launch(&mut world);
+        assert_eq!(world.legal_value(), Some(3)); // 1 OR (2 * one Narcotics); not a trade ban or fine.
+        let continued = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+        assert_eq!(continued.legal_value(), Some(3));
+        let mut sold_before_departure = World::new_commander(1101).unwrap();
+        action(
+            &mut sold_before_departure,
+            Command::BuyCommodity(CommodityId::Weapons),
+        )
+        .unwrap();
+        action(
+            &mut sold_before_departure,
+            Command::SellCommodity(CommodityId::Weapons),
+        )
+        .unwrap();
+        launch(&mut sold_before_departure);
+        assert_eq!(sold_before_departure.legal_value(), Some(0));
+    }
+    #[test]
+    fn every_typed_commodity_uses_actual_stale_paused_and_airborne_admission() {
+        let mut world = World::new_commander(1401).unwrap();
+        world.step(FlightInput::default()).unwrap();
+        let before = world.save_bytes().unwrap();
+        for id in CommodityId::ALL {
+            assert_eq!(
+                world.request_station_service(Command::BuyCommodity(id), 0),
+                Err(MissionError::StaleCommand)
+            );
+            assert_eq!(world.save_bytes().unwrap(), before);
+        }
+        world.request_pause(true, world.snapshot().tick).unwrap();
+        let before = world.save_bytes().unwrap();
+        for id in CommodityId::ALL {
+            assert_eq!(
+                action(&mut world, Command::BuyCommodity(id)),
+                Err(MissionError::Paused)
+            );
+            assert_eq!(world.save_bytes().unwrap(), before);
+        }
+        world.request_pause(false, world.snapshot().tick).unwrap();
+        launch(&mut world);
+        let before = world.save_bytes().unwrap();
+        for id in CommodityId::ALL {
+            assert_eq!(
+                action(&mut world, Command::SellCommodity(id)),
+                Err(MissionError::NotDocked)
+            );
+            assert_eq!(world.save_bytes().unwrap(), before);
+        }
     }
 }
