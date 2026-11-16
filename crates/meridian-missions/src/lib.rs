@@ -9,7 +9,9 @@ mod tagged;
 mod value;
 
 pub use adapter::{
-    PreparedFlightAcceptance, prepare_flight_acceptance, restore_flight_publication,
+    MAX_FLIGHT_PUBLICATION_BYTES, PreparedFlightAcceptance, PreparedFlightTransition,
+    prepare_flight_acceptance, prepare_flight_transition, restore_flight_publication,
+    serialize_flight_publication,
 };
 pub use controller::{Action, Event, Instance, PendingTransition, Status};
 pub use evaluator::{Evaluation, Limits, evaluate, validate};

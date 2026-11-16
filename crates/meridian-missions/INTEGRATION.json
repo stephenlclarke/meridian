@@ -230,7 +230,11 @@
     "prepare": "prepare_flight_acceptance receives actual World opaque T01 review; no Lua acceptance authority",
     "publish": "Atomic owned host writes full MMIS0001 envelope then preparation.publish commits both in memory",
     "restore": "restore_flight_publication validates checksum,lengths,native World,script state,actual retained T01 binding and exact/missing content suspension",
-    "compatibility": "New explicit envelope; no old save fallback, migration or profile reset; existing v10 preview separate"
+    "compatibility": "New explicit envelope; no old save fallback, migration or profile reset; existing v10 preview separate",
+    "ordinaryAndProspectiveSave": "serialize_flight_publication(actualNativeBytes, &retainedInstance); host publishes full returned envelope before its owned native commit",
+    "laterT01": "prepare_flight_transition(actualWorld,retainedInstance,opaqueReview,tick), then publish; no Lua lifecycle callback or binding reset",
+    "storeBound": "MAX_FLIGHT_PUBLICATION_BYTES =33620048 on load and save; native65536/script33554464 caps remain independent",
+    "preAcceptance": "No mission envelope before first real Accept; fresh unbound in-memory Instance and explicit native saves; refused MMIS envelope never falls back to native/new Instance"
   },
   "requiredExecution": "Existing G1/Dell owner only; semantic/runtime tests and Clippy UNRUN; exact candidate bindings required",
   "qualityGate": "Root sonar.sources currently includes crates; no analysis setting/threshold/suppression changed by MC1. Third-party dependency source and small maintained patch remain explicitly identified; preserve required quality gates during actual integration."

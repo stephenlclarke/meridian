@@ -1,19 +1,31 @@
-//! First supported native path: original T01 accepted callback joined to actual World preparation.
+//! Original T01 acceptance and preservation of its explicit state across native publications.
+use crate::controller::MAX_SCRIPT_STATE_BYTES;
 use crate::{Action, Error, Event, Instance, Pack, Value};
+use meridian_core::save::MAX_SAVE_BYTES;
 use meridian_core::{FlightReceptionAction, FlightReceptionReview, PreparedFlightReception, World};
 use sha2::{Digest, Sha256};
 
 const T01_DIGEST: &str = "bc01834e04f87816c8021b76fabe3d9b8f3af394ff8fcd420c4b7c3acf1350d4";
 const MAGIC: &[u8; 8] = b"MMIS0001";
+const ENVELOPE_OVERHEAD: usize = 48;
+
+/// Maximum complete MMIS0001 publication: native save cap + complete script-frame cap +
+/// envelope framing/checksum. Hosts must apply this bound to file reads and atomic writes.
+/// Each contained native save and script frame still has its own independent size limit.
+pub const MAX_FLIGHT_PUBLICATION_BYTES: usize =
+    MAX_SAVE_BYTES + MAX_SCRIPT_STATE_BYTES + ENVELOPE_OVERHEAD;
 
 /// Holds exclusive borrows through publication. It contains no Lua VM or callable script handle.
-pub struct PreparedFlightAcceptance<'a> {
+pub struct PreparedFlightTransition<'a> {
     native: PreparedFlightReception<'a>,
     instance: &'a mut Instance,
     candidate: Instance,
     bytes: Vec<u8>,
 }
-impl PreparedFlightAcceptance<'_> {
+/// The original accepted-callback preparation uses the same atomic native/script publication.
+pub type PreparedFlightAcceptance<'a> = PreparedFlightTransition<'a>;
+
+impl PreparedFlightTransition<'_> {
     pub fn bytes(&self) -> &[u8] {
         &self.bytes
     }
@@ -103,9 +115,9 @@ pub fn prepare_flight_acceptance<'a>(
     }
     let mut candidate = transition.candidate;
     candidate.native_binding = Some((active.owner(), active.ordinal()));
-    let script = candidate.to_bytes()?;
-    let bytes = envelope(native.bytes(), &script)?;
-    Ok(PreparedFlightAcceptance {
+    validate_binding(&candidate_world, &candidate)?;
+    let bytes = envelope(native.bytes(), &candidate.to_bytes()?)?;
+    Ok(PreparedFlightTransition {
         native,
         instance,
         candidate,
@@ -113,11 +125,50 @@ pub fn prepare_flight_acceptance<'a>(
     })
 }
 
+/// Prepares a later real T01 Accept, Cancel or Receive without executing a Lua lifecycle callback.
+/// The retained binding identifies the original accepted attempt in native history. Later accepts
+/// never rebind it or replay its journal. Suspension and pending explicit state remain unchanged.
+pub fn prepare_flight_transition<'a>(
+    world: &'a mut World,
+    instance: &'a mut Instance,
+    review: FlightReceptionReview,
+    expected_tick: u64,
+) -> Result<PreparedFlightTransition<'a>, Error> {
+    validate_binding(world, instance)?;
+    let native = world
+        .prepare_flight_reception(review, expected_tick)
+        .map_err(|e| Error::World(e.to_string()))?;
+    let bytes = serialize_flight_publication(native.bytes(), instance)?;
+    let candidate = instance.clone();
+    Ok(PreparedFlightTransition {
+        native,
+        instance,
+        candidate,
+        bytes,
+    })
+}
+
+/// Wraps actual current/prospective native save bytes with retained, already-bound script state.
+/// This validates both payloads and their real T01 binding without executing Lua or committing
+/// native proposals. The host owns publication ordering and any subsequent native commit.
+/// An unbound instance before the first real accepted callback is not a mission publication.
+pub fn serialize_flight_publication(native: &[u8], instance: &Instance) -> Result<Vec<u8>, Error> {
+    if native.len() > MAX_SAVE_BYTES {
+        return Err(Error::Limit("native publication bytes"));
+    }
+    let world = World::from_save_bytes(native).map_err(|e| Error::World(e.to_string()))?;
+    validate_binding(&world, instance)?;
+    envelope(native, &instance.to_bytes()?)
+}
+
 pub fn restore_flight_publication(
     bytes: &[u8],
     pack: Option<&Pack>,
 ) -> Result<(World, Instance), Error> {
-    if bytes.len() < 48 || &bytes[..8] != MAGIC {
+    if bytes.len() > MAX_FLIGHT_PUBLICATION_BYTES {
+        return Err(Error::Limit("mission publication bytes"));
+    }
+    if bytes.len() < ENVELOPE_OVERHEAD || &bytes[..8] != MAGIC {
         return Err(Error::Codec("unsupported mission publication"));
     }
     let (body, checksum) = bytes.split_at(bytes.len() - 32);
@@ -137,9 +188,20 @@ pub fn restore_flight_publication(
     if world_length > body.len() - 16 || script_length != body.len() - 16 - world_length {
         return Err(Error::Codec("mission publication lengths"));
     }
+    if world_length > MAX_SAVE_BYTES || script_length > MAX_SCRIPT_STATE_BYTES {
+        return Err(Error::Limit("mission publication payload bytes"));
+    }
     let world = World::from_save_bytes(&body[16..16 + world_length])
         .map_err(|e| Error::World(e.to_string()))?;
     let instance = Instance::from_bytes(&body[16 + world_length..])?;
+    validate_binding(&world, &instance)?;
+    if let Some(pack) = pack {
+        require_t01(pack)?;
+    }
+    let instance = instance.reconcile(pack)?;
+    Ok((world, instance))
+}
+fn validate_binding(world: &World, instance: &Instance) -> Result<(), Error> {
     if instance.identity.definition != "l337.training/flight-reception"
         || instance.identity.version != "1.0.0"
         || instance.identity.digest != T01_DIGEST
@@ -154,11 +216,7 @@ pub fn restore_flight_publication(
     }) {
         return Err(Error::Identity);
     }
-    if let Some(pack) = pack {
-        require_t01(pack)?;
-    }
-    let instance = instance.reconcile(pack)?;
-    Ok((world, instance))
+    Ok(())
 }
 fn require_t01(pack: &Pack) -> Result<(), Error> {
     let identity = pack.identity();
@@ -171,6 +229,9 @@ fn require_t01(pack: &Pack) -> Result<(), Error> {
     Ok(())
 }
 fn envelope(world: &[u8], script: &[u8]) -> Result<Vec<u8>, Error> {
+    if world.len() > MAX_SAVE_BYTES || script.len() > MAX_SCRIPT_STATE_BYTES {
+        return Err(Error::Limit("mission publication payload bytes"));
+    }
     let mut bytes = MAGIC.to_vec();
     for length in [world.len(), script.len()] {
         bytes.extend(

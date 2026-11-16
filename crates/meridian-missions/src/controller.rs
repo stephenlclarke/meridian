@@ -3,6 +3,7 @@ use crate::{Error, Identity, Limits, Pack, Value, evaluate};
 use std::collections::VecDeque;
 
 mod persistence;
+pub(crate) use persistence::MAX_SCRIPT_STATE_BYTES;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Status {

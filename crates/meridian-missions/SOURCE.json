@@ -134,7 +134,9 @@
     "frozenCompatibilityInvocations": 139,
     "corpusIntegrity": 1,
     "actualWorldControllerAndClosedModuleTests": 7,
-    "status": "UNRUN until existing owner execution"
+    "status": "UNRUN until existing owner execution",
+    "publicationPreservation": 5,
+    "total": 152
   },
   "sourceChecks": {
     "rustfmtParsing": "PASS after final formatting; no type-check/compile claimed",
@@ -153,11 +155,20 @@
     "coverage": "UNRUN",
     "required": "Exact composed commit/tree/lock, corpus manifest SHA, compiler/OS/backend, per-case result/errors/metrics/monotonic timings, actual World publish/failure/restore checks; no model scenario counted as native pass"
   },
-  "scope": "Executable Lua evaluator/controller and T01 actual World preparation adapter; no current core/App/save/economy edits; no second simulation/native authority; no legacy-profile import",
+  "scope": "Executable Lua evaluator/controller and T01 actual World preparation adapter, bounded ordinary publication serializer and later native T01 transitions retaining original script state; no current core/App/save/economy edits; no second simulation/native authority; no legacy-profile import",
   "remaining": [
     "Actual Rust/Clippy/corpus/native execution and independent review",
     "Root shared workspace/lock and owned App/storage envelope wiring",
     "Canonical native geometry/model resources and other native mission/command/board families",
     "Full64mission and complete legacy persistence/extended Unicode manifest-parity acceptance are not claimed"
-  ]
+  ],
+  "boundedPublicationDelta": {
+    "parentCommit": "aef874f3f390060bcc27c29a78724f6d3b1ca1fb",
+    "serializer": "serialize_flight_publication validates current/prospective native bytes, explicit script storage and retained real original T01 identity/binding; preserves both supplied byte payloads",
+    "laterNativeTransitions": "prepare_flight_transition delegates genuine later Accept/Cancel/Receive to World and retains script bytes/origin binding verbatim; no Lua replay, rebinding, synthetic events or unsupported dispatch",
+    "completePublicationCap": 33620048,
+    "capComposition": "existing native65536 + original script body33554432 + script checksum32 + envelope48; inner native/script caps retained",
+    "unaffected": "All original147 test bodies, G2 corpus/expectations, vendor patch/notices, Cargo manifests/locks, all core/App/root paths byte-unchanged",
+    "status": "Five new source-authored tests UNRUN; independent review/compiler/Lua/Clippy/coverage/native validation pending"
+  }
 }

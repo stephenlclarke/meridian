@@ -6,6 +6,7 @@ use std::collections::VecDeque;
 
 const MAGIC: &[u8; 8] = b"MLST0001";
 const STORAGE_BYTES: usize = 33_554_432; // Original typed script storage aggregate byte budget.
+pub(crate) const MAX_SCRIPT_STATE_BYTES: usize = STORAGE_BYTES + 32;
 
 impl Instance {
     pub fn to_bytes(&self) -> Result<Vec<u8>, Error> {
@@ -61,7 +62,7 @@ impl Instance {
         Ok(bytes)
     }
     pub fn from_bytes(bytes: &[u8]) -> Result<Self, Error> {
-        if bytes.len() < 40 || bytes.len() > STORAGE_BYTES + 32 {
+        if bytes.len() < 40 || bytes.len() > MAX_SCRIPT_STATE_BYTES {
             return Err(Error::Codec("script storage size"));
         }
         let (body, checksum) = bytes.split_at(bytes.len() - 32);
