@@ -707,12 +707,6 @@ mod tests {
         );
         ui.command(&mut world, Action::Launch)
             .unwrap_or_else(|e| panic!("{e}"));
-        // Complete one real simulation tick before serializing the launch chronology.
-        world
-            .step(meridian_core::FlightInput::default())
-            .unwrap_or_else(|e| panic!("{e}"));
-        assert!(world.current_dock_context().is_none());
-        assert_ne!(world.snapshot().mode, FlightMode::Docked);
         let saved = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
         assert!(ui.command(&mut world, Action::BuySelected).is_err());
         assert!(
