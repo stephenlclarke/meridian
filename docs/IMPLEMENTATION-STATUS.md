@@ -4,9 +4,11 @@ Reviewed against actual delivery evidence on 16 November 2026. This document dis
 
 ## Latest installed preview
 
-Gameplay main `d5be89b9b1a515e9185d450687a558b20d9e1e7d`, tree `e13b6447396ff2e2578f0e51ba7c712282935aaa`, is the protected merge of [PR 17](https://github.com/stephenlclarke/meridian/pull/17). The signed local `Meridian Finite Missiles Preview.app` and adjacent launcher/Read Me use a separate save directory. The installed signed executable SHA-256 is `002c208a4dc9d3a3fb07265a2b12fae8dbe7a9beb7e0063d3e78d1726d594e24`. All 24 delivered files/modes/signature and 171 unchanged prior artifact files/modes were independently verified. Normal installed title/render/close exited zero without creating a commander save.
+Gameplay main `ab238c3fd7e9cea51843c2fcf17d5ecf87bca60b`, tree `f9e91748dd2b16e21042252f5025b39a083c284a`, is the protected merge of [PR 19](https://github.com/stephenlclarke/meridian/pull/19). The signed local `Meridian Durable Missiles Preview.app`, adjacent launcher and Read Me are installed. Use `Launch Meridian Durable Missiles Preview.command` for its separate saves-v8 directory. The installed signed executable SHA-256 is `8dd29e10ee516aafd7eeebea47b3c2a74e2ff265318d8ed405414ec3eca294d6`. Root verified all 24 staged/installed files and modes, strict signature validity and 197 unchanged prior artifact files/modes across eight earlier bundles and adjacent files. Normal installed Metal title/render/close exited zero without creating a commander save. No player profile was accessed by the installer.
 
-Mac, Linux and native Windows validation passed 136 core plus 43 desktop tests: 179 top-level Rust tests. Each applicable Python importer suite passed 48 tests. Nested subprocess summaries are not additional cases. Native Windows Python execution was verified separately from WSL. [Main CI 43834783303](https://github.com/stephenlclarke/meridian/actions/runs/43834783303) and exact-main SonarQube passed. Headless Windows validation does not establish Windows GPU/input acceptance.
+Mac, Linux and native Windows qualification passed 148 core plus 45 desktop tests: 193 top-level Rust cases. Each importer suite passed 48 tests. Nested subprocess summaries are not additional cases. Genuine native Windows Python and WSL Python are recorded separately. [Main CI 43848254042](https://github.com/stephenlclarke/meridian/actions/runs/43848254042) passed all six jobs, including exact-main SonarQube with Previous version policy and quality gate PASS. Headless Windows qualification does not establish Windows GPU/input acceptance.
+
+The six Markdown files changed between qualified runtime `58f45c8` and the delivered main tree were independently reviewed; every other tracked blob was identical. G1 rebuilt and signed exact committed main. Its unsigned release executable was byte-identical to the gameplay-qualified candidate, and signed/unsigned text sections matched. Earlier failed sources and their corrections remain separate evidence.
 
 ## Actual gameplay evidence
 
@@ -24,13 +26,13 @@ Isolated copied version 4-7 saves loaded and saved through version 8 while the o
 
 Root audited the sealed native packet and its 19 retained v8 checkpoint files plus eight original/continued compatibility files. Some intermediate UI metadata records earlier contents of an overwritten slot without a retained exact copy; those records are not independent immutable byte evidence. Named retained checkpoint copies and their source bindings/checksums underpin the state comparisons. The read-only observer inspects bounded fixtures, not the full semantic graph; core/host tests provide separate validation.
 
-Native v8 station-hit/interception cold journeys were not repeated; their exact core regressions passed. A genuine live player hit and full T02 acceptance remain open. This candidate qualification does not replace an installed preview: protected integration, exact-main CI/Sonar and separate installed delivery remain pending.
+Native v8 station-hit/interception cold journeys were not repeated; their exact core regressions passed. A genuine live player hit and full T02 acceptance remain open. Protected integration, exact-main CI/Sonar, exact-main rebuild/signing and the separate installed v8 delivery have passed. The scoped native candidate evidence retains its original source identity; installation does not broaden those acceptance limits.
 
 ## Save compatibility
 
 Current source writes version 8, including arm/lock/cooldown, actual consumed pylon items, live/ended projectiles, motion/contact history and practice receipts/quiet state. Exact supported v4-v7 readers retain genuine prior unused missile stock; a used-v7 migration is never invented. Versions 1-3 remain unsupported. Invalid candidates refuse without repair, fallback, re-emission or stock grants.
 
-The earlier installed Finite Missiles Preview still writes v7 and refuses saving/restoring after any missile use. Keep its dedicated profiles and all earlier previews unchanged. New v8 gameplay must use a separate explicit save directory until a qualified installed delivery provides its launcher.
+The earlier installed Finite Missiles Preview still writes v7 and refuses saving/restoring after any missile use. Keep its dedicated profiles and all earlier previews unchanged. Use the delivered v8 launcher for its separate saves-v8 directory; opening the bundle directly uses the default save location.
 
 ## Open acceptance and distribution limits
 

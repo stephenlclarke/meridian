@@ -4,7 +4,7 @@ Historical feature contract and author-stage notes. For current delivered behavi
 
 Historical save-core source status: version-one encoding, decoding, semantic validation and six round-trip/tamper tests were authored on paid-services base `5531b8407fd690ca5a5f4155014574a6838c4de1`. Rustfmt parsing/formatting passes. Compilation, Rust tests, Clippy, remote quality checks and native UI acceptance are UNRUN on this exact successor. No filesystem operation or actual process quit/Continue has been performed by this implementation.
 
-Current source writes [complete version 8 missile sessions](DURABLE-MISSILE-SESSIONS.md), with exact supported v4-v7 readers. Scoped actual cold continuation is qualified on candidate `58f45c8`; [implementation status](IMPLEMENTATION-STATUS.md) distinguishes that result from installed delivery. The older format descriptions below remain historical contracts.
+Current source writes [complete version 8 missile sessions](DURABLE-MISSILE-SESSIONS.md), with exact supported v4-v7 readers. Scoped actual cold continuation is qualified on candidate `58f45c8`; the separate Durable Missiles Preview is delivered from main `ab238c3`. [Implementation status](IMPLEMENTATION-STATUS.md) preserves both source identities and their actual evidence. The older format descriptions below remain historical contracts.
 
 ## Public memory API
 
