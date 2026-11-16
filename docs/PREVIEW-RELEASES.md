@@ -20,17 +20,13 @@ Plan without publication:
 make preview-plan PREVIEW_COMMIT=EXACT_40_CHARACTER_MAIN_SHA
 ```
 
-After owner packaging, independent review, qualification and notice resolution:
+After owner packaging, independent review, qualification and notice resolution, prepare one directory under `~/.local/share/meridian-preview-releases/`, for example `durable-v8`. It must contain `Meridian-macos-arm64.zip`, `Meridian-windows-x64.zip` and `RELEASE-NOTES.md`. Copy only the identified qualified packages and public notes into that directory. Package identifiers permit lowercase letters, digits and hyphens. Symlinked directories/files and paths outside release staging refuse. The publisher writes its new `release-receipt.json` there with exclusive creation; it never accepts arbitrary read/write paths from CLI arguments.
 
 ```sh
-make preview-release PREVIEW_COMMIT=EXACT_40_CHARACTER_MAIN_SHA \
-  PREVIEW_MACOS=/absolute/path/Meridian-macos-arm64.zip \
-  PREVIEW_WINDOWS=/absolute/path/Meridian-windows-x64.zip \
-  PREVIEW_NOTES=/absolute/path/release-notes.md \
-  PREVIEW_RECEIPT=/absolute/path/new-release-receipt.json
+make preview-release PREVIEW_COMMIT=EXACT_40_CHARACTER_MAIN_SHA PREVIEW_PACKAGE=durable-v8
 ```
 
-Run from the release tooling checkout on macOS with gh authenticated for stephenlclarke/meridian and the source history available locally. No signing keys are uploaded by this script. Use reviewed packages; never upload player profiles or local execution reports. The release source SHA can differ from the publisher's newer documentation/tooling commit; record both in ordinary delivery evidence.
+Run from the release tooling checkout on macOS with gh authenticated for stephenlclarke/meridian and the source history available locally. No signing keys are uploaded by this script. Use reviewed packages; never upload player profiles or local execution reports. The runner permits only the fixed release executables. CLI and remote Git SHAs are validated and reconstructed before entering argv; workspace versions are numeric SemVer. Metadata files open fixed generated paths before writing notes as data. The release source SHA can differ from the publisher's newer documentation/tooling commit; record both in ordinary delivery evidence.
 
 ## Publication and three-preview retention
 

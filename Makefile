@@ -31,4 +31,4 @@ preview-plan:
 	python3 -B tools/preview_release.py --commit "$(PREVIEW_COMMIT)" --plan
 
 preview-release:
-	python3 -B tools/preview_release.py --commit "$(PREVIEW_COMMIT)" --macos "$(PREVIEW_MACOS)" --windows "$(PREVIEW_WINDOWS)" --notes "$(PREVIEW_NOTES)" --receipt "$(PREVIEW_RECEIPT)"
+	python3 -B tools/preview_release.py --commit "$(PREVIEW_COMMIT)" --package "$(PREVIEW_PACKAGE)"
