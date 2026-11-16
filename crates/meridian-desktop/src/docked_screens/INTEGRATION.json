@@ -1,5 +1,5 @@
 {
-  "status": "G1_PRIOR_MODULE_COMPILE_29_TESTS_PASS;CLIPPY_CORRECTION_REVALIDATION_PENDING;NATIVE_UNRUN",
+  "status": "AUTHOR_XYZZY_UI;NEW12_TESTS_UNRUN;HOST_CORE_JOIN_AND_NATIVE_PENDING;PRIOR_VALIDATION_HISTORICAL",
   "base": "8da5d64f9e8c9425b3cae120abfb723fab3ae50e",
   "pathOwnership": "Only crates/meridian-desktop/src/docked_screens/**",
   "registerAtRootSerialJoin": "mod docked_screens; in desktop main.rs; connect actual App input/Profile/World/G1 renderer without moving simulation ownership",
@@ -73,9 +73,21 @@
     "chart_markers_carry_plot_clipping_for_both_chart_scales",
     "visible_shortcuts_are_from_the_supplied_binding_map",
     "focus_loss_stops_text_and_rotation_without_changing_the_commander",
-    "planet_preview_is_a_provider_request_for_the_selected_real_world_only"
+    "planet_preview_is_a_provider_request_for_the_selected_real_world_only",
+    "xyzzy_suffix_requires_explicit_complete_input_and_never_mutates_normal_world",
+    "xyzzy_focus_and_screen_changes_reset_partial_entry_and_menu_capture",
+    "xyzzy_menu_read_and_explicit_pointer_activation_only_request_a_host_review",
+    "xyzzy_supported_2_c_4_keyboard_text_and_pointer_requests_are_equivalent",
+    "xyzzy_unavailable_inactive_paused_and_core_refusals_never_emit_grants",
+    "xyzzy_all_36_original_entries_are_retained_and_unsupported_actions_stay_disabled",
+    "xyzzy_modal_owns_text_and_confirmation_cancel_never_changes_core_state",
+    "xyzzy_changed_cash_fuel_offer_or_profile_refuses_a_stale_frame_even_with_same_stamp",
+    "xyzzy_core_name_finite_cash_actual_fuel_mode_and_native_jump_limit_are_visible",
+    "xyzzy_starter_hull_transfer_is_not_invented_for_other_hulls",
+    "xyzzy_menu_geometry_dependency_paging_and_exit_preserve_actual_active_state",
+    "xyzzy_printable_focus_probe_precedes_normal_fit_keys_without_granting_authority"
   ],
-  "testExecution": "G1 cargo test -p meridian-desktop docked_ passed 41: all29 module +8 renderer +4 existing name-matched tests, against module918717; latest bounded lint correction not yet revalidated. Author launched no compiler/native work.",
+  "testExecution": "Historical pre-feature G1 run passed29 module tests within41 focused cases. Current41 authored UI tests (29 retained+12new) are UNRUN for this increment; no compiler/native invoked by author.",
   "nativeCriteria": "README.md validation and acceptance section; exact joined source, real keyboard+mouse, all five rendered screens, full module effects/refusals/durable failure/cold continuation",
   "releaseGate": "HUD + all5 docked menus + actual working modular equipment accepted together; no new missions/Lua/fullfleet prerequisite; existing exclusive publisher verifies real qualified boundary",
   "markerClipping": "Each Marker.clip is ChartLayout.plot; G1 clips circles and current/selection decorations to it.",
@@ -125,5 +137,19 @@
       }
     },
     "native": "UNRUN"
+  },
+  "xyzzyPresentation": {
+    "guide": "XYZzy-UI.md",
+    "provenance": "XYZzy-UI-SOURCES.json",
+    "newTests": 12,
+    "execution": "ALL_UNRUN",
+    "newBorrowedContext": "xyzzy:Option<&XyzzyPanel> projected from actualG3 snapshot+fresh review admission",
+    "newRequest": "ReviewXyzzy(local XyzzyAction), one-to-one real core action mapping",
+    "hostRequirements": "Root event capture before fit/page aliases; modal/material validation; fresh actual review+prepare at confirmation; durable exact bytes before commit; invalidate reviews/scopes; actual global name/HUD; one composed save format",
+    "completeLegacyParity": false,
+    "inventoryEntries": 36,
+    "qualityBase": "f169c17834633cad582e05531a38544aa30833b1",
+    "sharedHostCoreProfileChanged": false,
+    "releaseDependency": false
   }
 }

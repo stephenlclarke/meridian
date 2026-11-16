@@ -1,7 +1,7 @@
 use super::{
     ChartLayout, Context, Control, Frame, Hit, Ink, Key, Label, Line, Marker, ModelPreview,
     ObjectRecord, OfferQuantity, PlanetPreview, RangeRing, Rect, Review, Screen, Viewport,
-    controller::DockedScreens, money,
+    XyzzyAction, controller::DockedScreens, money, xyzzy,
 };
 use meridian_core::station_services::CommodityId;
 
@@ -103,6 +103,7 @@ pub(super) fn project(s: &DockedScreens, c: &Context<'_>, v: Viewport) -> Frame 
         search_active: s.searching,
         hits: Vec::new(),
         model_bounds: None,
+        xyzzy_input: c.xyzzy.cloned(),
     };
     let canvas = v.canvas();
     label(
@@ -124,6 +125,27 @@ pub(super) fn project(s: &DockedScreens, c: &Context<'_>, v: Viewport) -> Frame 
         );
     }
     label(&mut f, summary, 16.0, 29.0, Ink::White, canvas);
+    if let Some(panel) = c.xyzzy {
+        let clip = Rect::new(180.0, 7.0, (v.width - 330.0).max(1.0), 22.0);
+        label(
+            &mut f,
+            format!("{} | {}", panel.commander_name, panel.label),
+            clip.x,
+            10.0,
+            Ink::Yellow,
+            clip,
+        );
+    }
+    if s.screen == Screen::Equipment {
+        button(
+            &mut f,
+            "XYZZY menu",
+            Rect::new(v.width - 140.0, 7.0, 124.0, 22.0),
+            Control::Key(Key::XyzzyMenu),
+            true,
+            None,
+        );
+    }
     let cell = (v.width - 32.0) / Screen::ALL.len() as f64;
     for (index, screen) in Screen::ALL.into_iter().enumerate() {
         button(
@@ -894,6 +916,10 @@ fn market(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
     );
 }
 fn equipment(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
+    if s.xyzzy_menu_open() {
+        xyzzy_equipment(s, c, f);
+        return;
+    }
     let body = f.viewport.body();
     let Some(panel) = c.equipment else {
         paragraphs(
@@ -1096,6 +1122,160 @@ fn equipment(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         !panel.slots.is_empty(),
         None,
     );
+}
+fn xyzzy_equipment(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
+    let body = f.viewport.body();
+    let mut rows = if let Some(panel) = c.xyzzy {
+        vec![
+            format!("{} | {}", panel.commander_name, panel.label),
+            format!(
+                "9 Cash: {} CR (FINITE) | Fuel: {}",
+                money(u64::from(panel.cash_tenths)),
+                if panel.unlimited_fuel {
+                    "UNLIMITED supply"
+                } else {
+                    "ORDINARY debit"
+                }
+            ),
+            if panel.jump_limit_ly.is_finite() && panel.jump_limit_ly >= 0.0 {
+                format!(
+                    "5 Jump limit: {:.1} ly | Cash grant: {} | {}",
+                    panel.jump_limit_ly,
+                    if panel.cash_granted_once {
+                        "already used"
+                    } else {
+                        "once on activation"
+                    },
+                    if panel.full_legacy_outfit_available {
+                        "This menu remains a supported subset"
+                    } else {
+                        "Partial outfit only"
+                    }
+                )
+            } else {
+                "5 Jump limit unavailable | Supported SH025 outfit only".into()
+            },
+        ]
+    } else {
+        vec![
+            "XYZZY provider unavailable; no activation or grant".into(),
+            "Finite cash and fuel mode must come from current core state".into(),
+        ]
+    };
+    if c.xyzzy.is_some_and(|p| !p.active) {
+        rows[0] = "XYZZY INACTIVE: activation requires confirmation".into();
+    }
+    for (index, text) in rows.iter().take(3).enumerate() {
+        label(
+            f,
+            text,
+            body.x,
+            body.y + index as f64 * 20.0,
+            Ink::Yellow,
+            body,
+        );
+    }
+    let cell = body.width / 4.0;
+    for (index, (title, key, action)) in [
+        ("Activate / reopen", Key::XyzzyEnter, XyzzyAction::Enter),
+        (
+            "2 Supported max",
+            Key::XyzzyMaximum,
+            XyzzyAction::MaximumSupportedHardware,
+        ),
+        (
+            "C SH025 refit",
+            Key::XyzzyStarter,
+            XyzzyAction::RestoreStarter,
+        ),
+        (
+            "4 Fuel toggle",
+            Key::XyzzyFuel,
+            XyzzyAction::ToggleUnlimitedFuel,
+        ),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let refusal = s.xyzzy_refusal(action, c);
+        button(
+            f,
+            title,
+            Rect::new(
+                body.x + index as f64 * cell,
+                body.y + 62.0,
+                cell - 4.0,
+                22.0,
+            ),
+            Control::Key(key),
+            refusal.is_none(),
+            refusal.as_deref(),
+        );
+    }
+    let list = Rect::new(
+        body.x,
+        body.y + 90.0,
+        body.width,
+        (body.height - 118.0).max(0.0),
+    );
+    xyzzy_inventory(s, f, list);
+    button(
+        f,
+        "Previous",
+        Rect::new(body.x, body.y + body.height - 24.0, 110.0, 22.0),
+        Control::Key(Key::PagePrevious),
+        true,
+        None,
+    );
+    button(
+        f,
+        "Next",
+        Rect::new(body.x + 118.0, body.y + body.height - 24.0, 110.0, 22.0),
+        Control::Key(Key::PageNext),
+        true,
+        None,
+    );
+    label(
+        f,
+        "Unavailable dependencies remain disabled; full legacy outfit unavailable",
+        body.x + 240.0,
+        body.y + body.height - 18.0,
+        Ink::Orange,
+        body,
+    );
+}
+fn xyzzy_inventory(s: &DockedScreens, f: &mut Frame, list: Rect) {
+    let count = (list.height / 22.0).floor() as usize;
+    let entries: Vec<_> = xyzzy::inventory_entries().collect();
+    let offset = s.scroll.min(entries.len().saturating_sub(count));
+    for (index, entry) in entries.iter().skip(offset).take(count).enumerate() {
+        let bounds = Rect::new(list.x, list.y + index as f64 * 22.0, list.width, 20.0);
+        if entry.unavailable() {
+            button(
+                f,
+                &format!("[{}] Unavailable: {}", entry.key, entry.behavior),
+                bounds,
+                Control::XyzzyUnavailable(offset + index),
+                false,
+                Some(entry.reason),
+            );
+        } else {
+            let kind = match entry.key {
+                "5" | "9" => "Readout above",
+                "arrows/pageup/pagedown" | "escape/return" => "Menu control",
+                "xyzzy" | "2" | "C" | "4" => "Review above (subset)",
+                _ => "Supported max description",
+            };
+            label(
+                f,
+                format!("[{}] {kind}: {}", entry.key, entry.behavior),
+                bounds.x + 4.0,
+                bounds.y + 5.0,
+                Ink::Green,
+                bounds,
+            );
+        }
+    }
 }
 fn modal(c: &Context<'_>, review: &Review, f: &mut Frame) {
     // Modal owns all hits. Underlying controls cannot receive a click through the review.

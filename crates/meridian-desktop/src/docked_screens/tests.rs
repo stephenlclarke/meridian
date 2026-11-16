@@ -29,6 +29,7 @@ fn context<'a>(world: &'a World, catalogue: &'a Catalogue) -> Context<'a> {
         navigation_bodies: &[],
         exchanges: &[],
         equipment: None,
+        xyzzy: None,
         review: None,
         bindings: &[],
     }
@@ -807,4 +808,390 @@ fn planet_preview_is_a_provider_request_for_the_selected_real_world_only() {
     let frame = ui.frame(&ctx, view());
     assert_eq!(frame.planets.len(), 1);
     assert_eq!(frame.planets[0].system, SystemId::AVENOR);
+}
+
+// Read-only UI fixtures, not core activation or grant proofs. Root must project real G3 state.
+fn xyzzy_fixture(active: bool) -> XyzzyPanel {
+    XyzzyPanel {
+        active,
+        commander_name: if active { "CLARKE" } else { "Rowan Calder" }.into(),
+        label: if active {
+            "XYZZY / COMMANDER CLARKE / SUPPORTED OUTFIT ONLY"
+        } else {
+            "NORMAL COMMANDER"
+        }
+        .into(),
+        cash_tenths: if active { 10_000_000 } else { 7200 },
+        cash_granted_once: active,
+        unlimited_fuel: active,
+        jump_limit_ly: 9.0,
+        full_legacy_outfit_available: false,
+        offers: [
+            XyzzyAction::Enter,
+            XyzzyAction::MaximumSupportedHardware,
+            XyzzyAction::RestoreStarter,
+            XyzzyAction::ToggleUnlimitedFuel,
+        ]
+        .into_iter()
+        .map(|action| XyzzyOffer {
+            action,
+            refusal: None,
+        })
+        .collect(),
+    }
+}
+fn text(ui: &mut DockedScreens, c: &Context<'_>, value: &str) -> Outcome {
+    let frame = ui.frame(c, view());
+    ui.handle(Input::Text(value.into()), &frame, c)
+}
+#[test]
+fn xyzzy_suffix_requires_explicit_complete_input_and_never_mutates_normal_world() {
+    let c = catalogue();
+    let w = world();
+    let panel = xyzzy_fixture(false);
+    let mut ctx = context(&w, &c);
+    ctx.xyzzy = Some(&panel);
+    let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+    ui.open(Screen::Equipment);
+    let before = w.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
+    for ch in ["x", "X", "Y", "z", "Z"] {
+        assert_eq!(text(&mut ui, &ctx, ch), Outcome::Updated);
+    }
+    assert!(!ui.xyzzy_menu_open());
+    assert_eq!(
+        text(&mut ui, &ctx, "y"),
+        Outcome::Request(Request::ReviewXyzzy(XyzzyAction::Enter))
+    );
+    assert!(ui.xyzzy_menu_open());
+    assert!(!panel.active);
+    assert_eq!(w.save_bytes().unwrap_or_else(|e| panic!("{e:?}")), before);
+}
+#[test]
+fn xyzzy_focus_and_screen_changes_reset_partial_entry_and_menu_capture() {
+    let c = catalogue();
+    let w = world();
+    let panel = xyzzy_fixture(false);
+    let mut ctx = context(&w, &c);
+    ctx.xyzzy = Some(&panel);
+    let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+    ui.open(Screen::Equipment);
+    text(&mut ui, &ctx, "xyzz");
+    let frame = ui.frame(&ctx, view());
+    assert_eq!(ui.handle(Input::FocusLost, &frame, &ctx), Outcome::Updated);
+    assert_eq!(text(&mut ui, &ctx, "y"), Outcome::Ignored);
+    text(&mut ui, &ctx, "xyzz");
+    ui.open(Screen::Trading);
+    assert!(!ui.captures_xyzzy_text("xyzzy"));
+    assert_eq!(text(&mut ui, &ctx, "xyzzy"), Outcome::Ignored);
+    ui.open(Screen::Equipment);
+    assert_eq!(text(&mut ui, &ctx, "y"), Outcome::Ignored);
+    key(&mut ui, &ctx, Key::XyzzyMenu);
+    assert!(ui.xyzzy_menu_open());
+    let frame = ui.frame(&ctx, view());
+    ui.handle(Input::FocusLost, &frame, &ctx);
+    assert!(!ui.xyzzy_menu_open());
+    assert!(!ui.captures_xyzzy_text("4"));
+}
+#[test]
+fn xyzzy_menu_read_and_explicit_pointer_activation_only_request_a_host_review() {
+    let c = catalogue();
+    let w = world();
+    let panel = xyzzy_fixture(false);
+    let mut ctx = context(&w, &c);
+    ctx.xyzzy = Some(&panel);
+    let before = w.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
+    let mut keyboard = DockedScreens::new(SystemId::AVENOR, "SH025");
+    keyboard.open(Screen::Equipment);
+    let mut pointer = DockedScreens::new(SystemId::AVENOR, "SH025");
+    pointer.open(Screen::Equipment);
+    assert_eq!(key(&mut keyboard, &ctx, Key::XyzzyMenu), Outcome::Updated);
+    assert_eq!(
+        click(&mut pointer, &ctx, Control::Key(Key::XyzzyMenu)),
+        Outcome::Updated
+    );
+    assert_eq!(
+        keyboard.frame(&ctx, view()).labels,
+        pointer.frame(&ctx, view()).labels
+    );
+    let expected = Outcome::Request(Request::ReviewXyzzy(XyzzyAction::Enter));
+    assert_eq!(key(&mut keyboard, &ctx, Key::XyzzyEnter), expected);
+    assert_eq!(
+        click(&mut pointer, &ctx, Control::Key(Key::XyzzyEnter)),
+        expected
+    );
+    assert!(!panel.active);
+    assert_eq!(w.save_bytes().unwrap_or_else(|e| panic!("{e:?}")), before);
+}
+#[test]
+fn xyzzy_supported_2_c_4_keyboard_text_and_pointer_requests_are_equivalent() {
+    let c = catalogue();
+    let w = world();
+    let panel = xyzzy_fixture(true);
+    let mut ctx = context(&w, &c);
+    ctx.xyzzy = Some(&panel);
+    let before = w.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
+    for (action, binding, typed) in [
+        (
+            XyzzyAction::MaximumSupportedHardware,
+            Key::XyzzyMaximum,
+            "2",
+        ),
+        (XyzzyAction::RestoreStarter, Key::XyzzyStarter, "C"),
+        (XyzzyAction::ToggleUnlimitedFuel, Key::XyzzyFuel, "4"),
+    ] {
+        let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+        ui.open(Screen::Equipment);
+        key(&mut ui, &ctx, Key::XyzzyMenu);
+        let expected = Outcome::Request(Request::ReviewXyzzy(action));
+        assert_eq!(key(&mut ui, &ctx, binding), expected);
+        assert_eq!(click(&mut ui, &ctx, Control::Key(binding)), expected);
+        assert_eq!(text(&mut ui, &ctx, typed), expected);
+    }
+    assert_eq!(w.save_bytes().unwrap_or_else(|e| panic!("{e:?}")), before);
+}
+#[test]
+fn xyzzy_unavailable_inactive_paused_and_core_refusals_never_emit_grants() {
+    let c = catalogue();
+    let w = world();
+    let mut ctx = context(&w, &c);
+    let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+    ui.open(Screen::Equipment);
+    assert!(matches!(text(&mut ui, &ctx, "xyzzy"), Outcome::Refused(_)));
+    assert!(
+        ui.frame(&ctx, view())
+            .labels
+            .iter()
+            .any(|l| l.text.contains("provider unavailable"))
+    );
+    let inactive = xyzzy_fixture(false);
+    ctx.xyzzy = Some(&inactive);
+    assert!(matches!(
+        key(&mut ui, &ctx, Key::XyzzyMaximum),
+        Outcome::Refused(_)
+    ));
+    let mut refused = xyzzy_fixture(true);
+    refused.offers[1].refusal = Some("Actual active fuel practice refuses".into());
+    ctx.xyzzy = Some(&refused);
+    let expected = Outcome::Refused("Actual active fuel practice refuses".into());
+    assert_eq!(key(&mut ui, &ctx, Key::XyzzyMaximum), expected);
+    assert_eq!(
+        click(&mut ui, &ctx, Control::Key(Key::XyzzyMaximum)),
+        expected
+    );
+    ctx.paused = true;
+    assert!(matches!(text(&mut ui, &ctx, "4"), Outcome::Refused(_)));
+    assert!(matches!(
+        click(&mut ui, &ctx, Control::Key(Key::XyzzyFuel)),
+        Outcome::Refused(_)
+    ));
+}
+#[test]
+fn xyzzy_all_36_original_entries_are_retained_and_unsupported_actions_stay_disabled() {
+    assert_eq!(include_str!("data/xyzzy-actions.tsv").lines().count(), 36);
+    let dependencies: Vec<_> = xyzzy::dependencies().collect();
+    for name in [
+        "0",
+        "1",
+        "3",
+        "6",
+        "7",
+        "8",
+        "A",
+        "E",
+        "B",
+        "L",
+        "F",
+        "max/lasers",
+        "max/EMP Pirate Blaster",
+    ] {
+        assert!(dependencies.iter().any(|entry| entry.key == name));
+    }
+    let c = catalogue();
+    let w = world();
+    let mut panel = xyzzy_fixture(true);
+    // A read-only flag cannot grant unsupported UI actions, even in a contradictory fixture.
+    panel.full_legacy_outfit_available = true;
+    let mut ctx = context(&w, &c);
+    ctx.xyzzy = Some(&panel);
+    let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+    ui.open(Screen::Equipment);
+    key(&mut ui, &ctx, Key::XyzzyMenu);
+    let frame = ui.frame(&ctx, view());
+    let hit = frame
+        .hits
+        .iter()
+        .find(|h| h.control == Control::XyzzyUnavailable(1))
+        .unwrap_or_else(|| panic!("disabled dependency"));
+    assert!(!hit.enabled);
+    assert_eq!(
+        click(&mut ui, &ctx, Control::XyzzyUnavailable(1)),
+        Outcome::Refused(dependencies[0].reason.into())
+    );
+    assert!(matches!(text(&mut ui, &ctx, "3"), Outcome::Refused(_)));
+    assert!(matches!(text(&mut ui, &ctx, "A"), Outcome::Refused(_)));
+}
+#[test]
+fn xyzzy_modal_owns_text_and_confirmation_cancel_never_changes_core_state() {
+    let c = catalogue();
+    let w = world();
+    let panel = xyzzy_fixture(false);
+    let review = Review {
+        token: 912,
+        title: "Explicit XYZZY review fixture".into(),
+        details: vec!["First activation SETS finite cash once; no added cash".into()],
+        can_confirm: true,
+        refusal: None,
+    };
+    let mut ctx = context(&w, &c);
+    ctx.xyzzy = Some(&panel);
+    let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+    ui.open(Screen::Equipment);
+    text(&mut ui, &ctx, "xyzzy");
+    let before = w.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
+    ctx.review = Some(&review);
+    assert_eq!(text(&mut ui, &ctx, "2"), Outcome::Ignored);
+    assert_eq!(key(&mut ui, &ctx, Key::XyzzyFuel), Outcome::Ignored);
+    assert_eq!(
+        key(&mut ui, &ctx, Key::Confirm),
+        Outcome::Request(Request::ConfirmReview(912))
+    );
+    assert_eq!(
+        click(&mut ui, &ctx, Control::ReviewCancel),
+        Outcome::Request(Request::CancelReview(912))
+    );
+    assert_eq!(w.save_bytes().unwrap_or_else(|e| panic!("{e:?}")), before);
+}
+#[test]
+fn xyzzy_changed_cash_fuel_offer_or_profile_refuses_a_stale_frame_even_with_same_stamp() {
+    let c = catalogue();
+    let w = world();
+    let panel = xyzzy_fixture(true);
+    for change in 0..4 {
+        let mut changed = panel.clone();
+        match change {
+            0 => changed.cash_tenths -= 1,
+            1 => changed.unlimited_fuel = false,
+            2 => changed.offers.clear(),
+            _ => changed.commander_name = "Different current commander".into(),
+        }
+        let mut ctx = context(&w, &c);
+        ctx.xyzzy = Some(&panel);
+        let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+        ui.open(Screen::Equipment);
+        key(&mut ui, &ctx, Key::XyzzyMenu);
+        let painted = ui.frame(&ctx, view());
+        let at = point(&painted, &Control::Key(Key::XyzzyFuel));
+        ctx.xyzzy = Some(&changed);
+        assert!(matches!(
+            ui.handle(Input::Click(at), &painted, &ctx),
+            Outcome::Refused(_)
+        ));
+        assert!(matches!(
+            ui.handle(Input::Text("4".into()), &painted, &ctx),
+            Outcome::Refused(_)
+        ));
+    }
+}
+#[test]
+fn xyzzy_core_name_finite_cash_actual_fuel_mode_and_native_jump_limit_are_visible() {
+    let c = catalogue();
+    let w = world();
+    let panel = xyzzy_fixture(true);
+    let mut ctx = context(&w, &c);
+    ctx.xyzzy = Some(&panel);
+    let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+    ui.open(Screen::Equipment);
+    key(&mut ui, &ctx, Key::XyzzyMenu);
+    let frame = ui.frame(&ctx, view());
+    for word in [
+        "CLARKE",
+        "XYZZY",
+        "1000000.0 CR (FINITE)",
+        "UNLIMITED supply",
+        "9.0 ly",
+        "Partial outfit only",
+    ] {
+        assert!(frame.labels.iter().any(|l| l.text.contains(word)), "{word}");
+    }
+    assert_eq!(text(&mut ui, &ctx, "5"), Outcome::Updated);
+    assert_eq!(text(&mut ui, &ctx, "9"), Outcome::Updated);
+}
+#[test]
+fn xyzzy_starter_hull_transfer_is_not_invented_for_other_hulls() {
+    let c = catalogue();
+    let w = world();
+    let panel = xyzzy_fixture(true);
+    let mut ctx = context(&w, &c);
+    ctx.xyzzy = Some(&panel);
+    ctx.current_hull = "SH099";
+    let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+    ui.open(Screen::Equipment);
+    key(&mut ui, &ctx, Key::XyzzyMenu);
+    assert!(matches!(text(&mut ui, &ctx, "C"), Outcome::Refused(_)));
+    assert!(matches!(
+        click(&mut ui, &ctx, Control::Key(Key::XyzzyStarter)),
+        Outcome::Refused(_)
+    ));
+}
+#[test]
+fn xyzzy_menu_geometry_dependency_paging_and_exit_preserve_actual_active_state() {
+    let c = catalogue();
+    let w = world();
+    let panel = xyzzy_fixture(true);
+    let mut ctx = context(&w, &c);
+    ctx.xyzzy = Some(&panel);
+    let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+    ui.open(Screen::Equipment);
+    key(&mut ui, &ctx, Key::XyzzyMenu);
+    for (width, height) in [(640.0, 360.0), (1000.0, 700.0), (1440.0, 1000.0)] {
+        let viewport = Viewport::new(width, height).unwrap_or_else(|| panic!("viewport"));
+        for _ in 0..10 {
+            let frame = ui.frame(&ctx, viewport);
+            for (r, _) in frame.actionable_regions() {
+                assert!(
+                    r.x >= 0.0 && r.y >= 0.0 && r.x + r.width <= width && r.y + r.height <= height
+                );
+            }
+            for l in &frame.labels {
+                assert!(l.clip.contains(l.at));
+            }
+            key(&mut ui, &ctx, Key::PageNext);
+        }
+    }
+    let frame = ui.frame(&ctx, view());
+    assert!(
+        frame
+            .labels
+            .iter()
+            .any(|l| l.text.contains("max/fuel-storage"))
+    );
+    assert_eq!(key(&mut ui, &ctx, Key::Back), Outcome::Updated);
+    assert!(!ui.xyzzy_menu_open());
+    assert!(panel.active);
+    assert!(
+        ui.frame(&ctx, view())
+            .labels
+            .iter()
+            .any(|l| l.text.contains("CLARKE"))
+    );
+}
+#[test]
+fn xyzzy_printable_focus_probe_precedes_normal_fit_keys_without_granting_authority() {
+    let c = catalogue();
+    let w = world();
+    let panel = xyzzy_fixture(false);
+    let mut ctx = context(&w, &c);
+    ctx.xyzzy = Some(&panel);
+    let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+    ui.open(Screen::Equipment);
+    let before = w.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
+    assert!(!ui.captures_xyzzy_text("y"));
+    assert!(ui.captures_xyzzy_text("x"));
+    text(&mut ui, &ctx, "x");
+    assert!(ui.captures_xyzzy_text("y"));
+    assert_eq!(text(&mut ui, &ctx, "y"), Outcome::Updated);
+    assert_eq!(text(&mut ui, &ctx, "q"), Outcome::Updated);
+    assert!(!ui.captures_xyzzy_text("y"));
+    assert!(!panel.active);
+    assert_eq!(w.save_bytes().unwrap_or_else(|e| panic!("{e:?}")), before);
 }

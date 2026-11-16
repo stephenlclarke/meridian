@@ -1,0 +1,36 @@
+xyzzy	Enable persisted mode; name CLARKE; one-time set10000000 tenths; maximum starter refit; enable original convenience flags. Repeated activation refits/renames without cash reset.	PARTIAL_CORE	Docked supported outfit implemented. In-flight refill anchors, full hull transfer, full equipment and automation dependencies below. No inert enabled flags.
+0	Cycle ShipDisplayStyle.	HOST_REQUIRED	Actual renderer style enum and presentation cycle; no core mechanics grant.
+1	Fit at least Docking Targeting Computer with xyzzy provenance.	DEPENDENCY	Owned targeting-family tiers, docking targeting control and fitting effects.
+2	Maximum hardware and refill current hull.	PARTIAL_CORE	Elite Energy, real cargo bay, finite nine-pylon fill and tank refill implemented; full maximum components listed below.
+C	Restore starter hull, portable item transfer and maximum hardware; preserve cash and cargo.	PARTIAL_CORE	Current core already SH025 and preserves hull identity. G4 real selected-hull portable transfer/refusal required for other hulls.
+3	Toggle virtual unlimited missiles; no owned round consumed.	DEPENDENCY	Explicit virtualUnlimited missile-origin source, retained launch/archive/T01 validation and capacity policy. Current grant is FINITE actual inventory, never labelled unlimited.
+4	Toggle unlimited fuel; when enabled fill tank; accepted travel does not debit owned fuel.	IMPLEMENTED	Native jump limit/current-fuel admission remain unchanged. Journal reconciles real recorded navigation debit and explicit supply; no paid fuel receipt.
+5	Display current jump distance from fuel and navigation.	CORE_READOUT_HOST_REQUIRED	Host reads xyzzy snapshot jump_limit_ly; no infinite jump clearance.
+6	Toggle automatic trade; immediately sell sellable hold/refuel/buy profitable finite exports when enabled at station, with active-trade-practice guard.	DEPENDENCY	Authoritative route/profit selection, bulk market transaction and landing automation; no fake autoTrade flag or commodity grant.
+7	Toggle speech.	HOST_REQUIRED	Actual TTS/audio lifecycle and persisted presentation preference.
+8	Toggle unlimited cargo; refuse off while cargo exceeds standard capacity.	DEPENDENCY	Wider aggregate tonne representation, reservations/market/cold proofs and legal-weight handling; current u16 aggregate/u8 departure weight cannot honestly represent original Int.max/17 capacity.
+9	Display current finite cash.	CORE_READOUT_HOST_REQUIRED	xyzzy_snapshot.cash_tenths. Unlimited cash is false; no repeat grant.
+A	Toggle automatic targeting; clear autonomous target when disabled.	DEPENDENCY	Real owned targeting controller, target selection lifecycle and disable/cancel behavior.
+E	Toggle automatic ECM.	DEPENDENCY	Actual ECM hardware, charge/cooldown, missile effects and automatic threat controller; EMP remains separate.
+B	Toggle military return fire; clear retaliation when disabled.	DEPENDENCY	NPC/retaliation controller, source ammunition and actual firing authority.
+L	Reset legal to0; set wanted amnesty from Blackjack wanted stage.	DEPENDENCY	Explicit legal reset receipt/generation across retained incident/market history, plus actual wanted/Blackjack state. Current legal validators are preserved; no bypass.
+F	Fit Fuel Scoops with xyzzy provenance.	DEPENDENCY	Owned scoop slot, physical fuel/cargo source acquisition and conservation.
+arrows/pageup/pagedown	Scroll secret choices.	HOST_REQUIRED	Host menu scrolling only.
+escape/return	Return to previous screen; keep secret mode active.	HOST_REQUIRED	Root menu lifecycle, without mode reset or cash change.
+max/energy	Grant/refit exact top stock Elite Energy, preserving stored customized/lower items.	IMPLEMENTED	Existing SH025 capacity1x/recharge4x; explicit XYZzy item. No fake preceding paid nodes.
+max/shield	Elite Shield Module.	DEPENDENCY	Actual shield-grade capacity and widened shield scalar, fit effects/resource fractions.
+max/navigation	Navigation: Military (display Advanced Navigation Computer).	DEPENDENCY	Actual navigation slot/custody/jump cap and historical journey validation.
+max/drive	Advanced hyperspace drive.	DEPENDENCY	Actual drive custody/spool/fuel/galaxy rules.
+max/targeting	Military targeting core plus Mining/Salvage specialist modules.	DEPENDENCY	Real targeting modules and specialist control authority, not UI availability flags.
+max/lasers	Naval Laser on every supported combat facing.	DEPENDENCY	Real Naval firing profile64/0.1s, multi-shot energy deficits, historical class/facing custody. No Pulse fallback labelled Naval.
+max/Fuel Scoops	Fuel Scoops utility.	DEPENDENCY	Actual scoop fitting/collection source owner.
+max/E.C.M. System	ECM utility.	DEPENDENCY	Real ECM charge/cooldown and missile defense effects.
+max/Escape Pod	Escape Pod utility.	DEPENDENCY	Actual owned capsule, ejection/rescue/transfers and once-only consumption.
+max/Energy Bomb	Energy Bomb utility.	DEPENDENCY	Actual blast/contact/attribution and finite ordnance consumption.
+max/Large Cargo Bay	Compatible hull-bound cargo expansion.	IMPLEMENTED	Actual92-to127 tonne hold, one equipment/utility unit, XYZzy grant or reuse original paid item unchanged.
+max/Galactic Hyperdrive	Galactic Hyperdrive utility.	DEPENDENCY	Actual owned inter-galaxy device/consumption and destination/runtime catalogue.
+max/Salvage Cutter	Salvage Cutter when native work tool supports it.	DEPENDENCY	MC1 actual salvage work target/source/cargo/resource controller and compatible fit.
+max/EMP Pirate Blaster	EMP utility.	DEPENDENCY	Actual distinct EMP grade/bank/charge/debit/disabling effect; no ECM alias.
+max/mining-utility	Dedicated Mining Laser only if native hull supports mining work slot.	NOT_APPLICABLE_CURRENT_SH025	SH025 source workTools only salvageCutter, so do not grant a fake dedicated mining utility. Existing paid front Mining path remains intact.
+max/fuel-storage	Grant four Fuel Storage Units,70 fuel units each.	DEPENDENCY	Actual four owned tank slots/compatibility/utility budget/capacity and save accounting; current tank remains130.
+max/missiles	Fill each vacant pylon from stored compatible pristine property first, otherwise explicit xyzzy finite grant.	IMPLEMENTED	Actual SH025 nine slots; spent IDs/origins retained; getters never refill; no paid receipt for granted rounds.

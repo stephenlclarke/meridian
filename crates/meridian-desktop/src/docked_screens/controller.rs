@@ -1,6 +1,6 @@
 use super::{
     ChartLayout, Context, Control, EquipmentOperation, Frame, Input, Key, Marker, NavigationBodyId,
-    Orientation, Outcome, Rect, Request, Screen, Viewport, moved, presentation,
+    Orientation, Outcome, Rect, Request, Screen, Viewport, XyzzyAction, moved, presentation, xyzzy,
 };
 use meridian_core::{navigation::SystemId, station_services::CommodityId};
 #[derive(Debug)]
@@ -30,6 +30,8 @@ pub struct DockedScreens {
     pub(super) axis: u8,
     pub(super) hovered: Option<Rect>,
     pub(super) ui_revision: u64,
+    pub(super) xyzzy_open: bool,
+    pub(super) xyzzy_prefix: usize,
 }
 impl DockedScreens {
     pub fn new(current: SystemId, hull: &str) -> Self {
@@ -63,10 +65,26 @@ impl DockedScreens {
             axis: 2,
             hovered: None,
             ui_revision: 0,
+            xyzzy_open: false,
+            xyzzy_prefix: 0,
         }
     }
     pub fn screen(&self) -> Screen {
         self.screen
+    }
+    pub fn xyzzy_menu_open(&self) -> bool {
+        self.screen == Screen::Equipment && self.xyzzy_open
+    }
+    /// Host checks this before mapping the same printable event to fitting/tab shortcuts.
+    /// This is focus ownership only; it never reads or changes secret authority.
+    pub fn captures_xyzzy_text(&self, text: &str) -> bool {
+        self.screen == Screen::Equipment
+            && (self.xyzzy_open
+                || self.xyzzy_prefix != 0
+                || text
+                    .chars()
+                    .next()
+                    .is_some_and(|ch| ch.eq_ignore_ascii_case(&'x')))
     }
     pub fn selected_system(&self) -> SystemId {
         self.selected_world
@@ -81,6 +99,8 @@ impl DockedScreens {
         &self.ship
     }
     pub fn open(&mut self, screen: Screen) {
+        self.xyzzy_open = false;
+        self.xyzzy_prefix = 0;
         self.screen = screen;
         self.searching = false;
         self.query.clear();
@@ -124,6 +144,8 @@ impl DockedScreens {
     }
     pub fn handle(&mut self, input: Input, painted: &Frame, context: &Context<'_>) -> Outcome {
         if matches!(input, Input::FocusLost) {
+            self.xyzzy_prefix = 0;
+            self.xyzzy_open = false;
             self.searching = false;
             self.rotation_paused = true;
             self.bump();
@@ -137,6 +159,15 @@ impl DockedScreens {
         }
         if context.world.current_dock_context().is_none() {
             return Outcome::Refused("Dock at a station to use these screens".into());
+        }
+        if self.screen == Screen::Equipment
+            && context.review.is_none()
+            && context.xyzzy != painted.xyzzy_input.as_ref()
+        {
+            return Outcome::Refused("XYZZY state changed; review the current screen again".into());
+        }
+        if !matches!(input, Input::Text(_) | Input::PointerMoved(_)) {
+            self.xyzzy_prefix = 0;
         }
         if let Input::PointerMoved(p) = input {
             self.hovered = painted
@@ -206,7 +237,10 @@ impl DockedScreens {
     }
     fn text_input(&mut self, text: String, context: &Context<'_>) -> Outcome {
         if context.review.is_some() {
+            self.xyzzy_prefix = 0;
             Outcome::Ignored
+        } else if self.screen == Screen::Equipment {
+            self.xyzzy_text(&text, context)
         } else if self.searching {
             for c in text.chars().filter(|c| !c.is_control()) {
                 if self.query.chars().count() < 64 {
@@ -225,6 +259,83 @@ impl DockedScreens {
             Outcome::Ignored
         }
     }
+    fn xyzzy_text(&mut self, text: &str, c: &Context<'_>) -> Outcome {
+        if self.xyzzy_menu_open() && text.chars().count() == 1 {
+            let action = match text.to_ascii_lowercase().as_str() {
+                "2" => Some(XyzzyAction::MaximumSupportedHardware),
+                "c" => Some(XyzzyAction::RestoreStarter),
+                "4" => Some(XyzzyAction::ToggleUnlimitedFuel),
+                "5" | "9" => return Outcome::Updated,
+                _ => None,
+            };
+            if let Some(action) = action {
+                self.xyzzy_prefix = 0;
+                return self.xyzzy_request(action, c);
+            }
+            if let Some(entry) =
+                xyzzy::dependencies().find(|entry| entry.key.eq_ignore_ascii_case(text))
+            {
+                self.xyzzy_prefix = 0;
+                return Outcome::Refused(entry.reason.into());
+            }
+        }
+        let (consumed, complete) = xyzzy::advance_prefix(&mut self.xyzzy_prefix, text);
+        if complete {
+            self.xyzzy_open = true;
+            self.scroll = 0;
+            self.xyzzy_request(XyzzyAction::Enter, c)
+        } else if consumed || self.xyzzy_menu_open() {
+            Outcome::Updated
+        } else {
+            Outcome::Ignored
+        }
+    }
+    pub(super) fn xyzzy_refusal(&self, action: XyzzyAction, c: &Context<'_>) -> Option<String> {
+        if !self.xyzzy_menu_open() {
+            Some("Open the XYZZY equipment menu first".into())
+        } else if c.paused {
+            Some("Resume before reviewing XYZZY changes".into())
+        } else if action == XyzzyAction::RestoreStarter && c.current_hull != "SH025" {
+            Some("Starter hull transfer is unavailable for this hull".into())
+        } else if let Some(panel) = c.xyzzy {
+            if action != XyzzyAction::Enter && !panel.active {
+                Some("Confirm explicit XYZZY activation first".into())
+            } else {
+                panel.refusal(action)
+            }
+        } else {
+            Some("XYZZY core provider is unavailable".into())
+        }
+    }
+    fn xyzzy_request(&self, action: XyzzyAction, c: &Context<'_>) -> Outcome {
+        self.xyzzy_refusal(action, c).map_or_else(
+            || Outcome::Request(Request::ReviewXyzzy(action)),
+            Outcome::Refused,
+        )
+    }
+    fn xyzzy_key(&mut self, key: Key, c: &Context<'_>) -> Outcome {
+        let action = match key {
+            Key::XyzzyEnter => XyzzyAction::Enter,
+            Key::XyzzyMaximum => XyzzyAction::MaximumSupportedHardware,
+            Key::XyzzyStarter => XyzzyAction::RestoreStarter,
+            Key::XyzzyFuel => XyzzyAction::ToggleUnlimitedFuel,
+            Key::Back | Key::Confirm | Key::XyzzyMenu => {
+                self.xyzzy_open = false;
+                self.scroll = 0;
+                return Outcome::Updated;
+            }
+            Key::Previous | Key::Next | Key::PagePrevious | Key::PageNext => {
+                self.scroll = moved(
+                    self.scroll,
+                    selection_step(key),
+                    xyzzy::inventory_entries().count(),
+                );
+                return Outcome::Updated;
+            }
+            _ => return Outcome::Ignored,
+        };
+        self.xyzzy_request(action, c)
+    }
     fn scroll_input(
         &mut self,
         point: [f64; 2],
@@ -234,6 +345,9 @@ impl DockedScreens {
     ) -> Outcome {
         if context.review.is_some() || !painted.viewport.body().contains(point) {
             Outcome::Ignored
+        } else if self.xyzzy_menu_open() {
+            self.scroll = moved(self.scroll, rows, xyzzy::inventory_entries().count());
+            Outcome::Updated
         } else if self.screen == Screen::System
             || (self.detail && self.screen == Screen::Showroom)
             || (self.screen == Screen::Galaxy && {
@@ -290,6 +404,13 @@ impl DockedScreens {
             return Outcome::Ignored;
         }
         match control {
+            Control::XyzzyUnavailable(index) => xyzzy::inventory_entries()
+                .nth(*index)
+                .filter(|entry| entry.unavailable())
+                .map_or_else(
+                    || Outcome::Refused("Unavailable XYZZY action".into()),
+                    |entry| Outcome::Refused(entry.reason.into()),
+                ),
             Control::ReviewConfirm => self.review_confirm(c),
             Control::ReviewCancel => c.review.map_or(Outcome::Ignored, |r| {
                 Outcome::Request(Request::CancelReview(r.token))
@@ -435,6 +556,14 @@ impl DockedScreens {
         }
     }
     fn key(&mut self, key: Key, c: &Context<'_>) -> Outcome {
+        if self.xyzzy_menu_open() && !matches!(key, Key::NextTab | Key::PreviousTab) {
+            return self.xyzzy_key(key, c);
+        }
+        if self.screen == Screen::Equipment && key == Key::XyzzyMenu {
+            self.xyzzy_open = true;
+            self.scroll = 0;
+            return Outcome::Updated;
+        }
         if self.searching {
             return self.search_key(key, c);
         }

@@ -5,10 +5,12 @@ mod layout;
 mod presentation;
 #[cfg(test)]
 mod tests;
+mod xyzzy;
 pub use catalogue::{Catalogue, ObjectRecord, Specification, WorldRecord};
 pub use controller::DockedScreens;
 pub use layout::{ChartLayout, Rect, Viewport};
 use meridian_core::{World, navigation::SystemId, station_services::CommodityId};
+pub use xyzzy::{XyzzyAction, XyzzyOffer, XyzzyPanel};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Screen {
@@ -85,6 +87,11 @@ pub enum Key {
     NextBody,
     PreviousBody,
     BodyRoute,
+    XyzzyMenu,
+    XyzzyEnter,
+    XyzzyMaximum,
+    XyzzyStarter,
+    XyzzyFuel,
 }
 #[derive(Debug, Clone, PartialEq)]
 pub enum Input {
@@ -126,6 +133,7 @@ pub enum Request {
     Close,
     ReviewRoute(SystemId),
     ReviewBodyRoute(NavigationBodyId),
+    ReviewXyzzy(XyzzyAction),
     ReviewCommodity {
         commodity: CommodityId,
         buy: bool,
@@ -233,6 +241,7 @@ pub struct Context<'a> {
     pub navigation_bodies: &'a [NavigationBody],
     pub exchanges: &'a [ShipExchange<'a>],
     pub equipment: Option<&'a EquipmentPanel>,
+    pub xyzzy: Option<&'a XyzzyPanel>,
     pub review: Option<&'a Review>,
     pub bindings: &'a [BindingHint<'a>],
 }
@@ -358,6 +367,7 @@ pub(super) enum Control {
     ReviewCancel,
     TradeMode(bool),
     SelectBody(NavigationBodyId),
+    XyzzyUnavailable(usize),
 }
 #[derive(Debug, Clone, PartialEq)]
 pub(super) struct Hit {
@@ -383,6 +393,7 @@ pub struct Frame {
     pub search_active: bool,
     pub(super) hits: Vec<Hit>,
     pub(super) model_bounds: Option<Rect>,
+    pub(super) xyzzy_input: Option<XyzzyPanel>,
 }
 impl Frame {
     pub fn actionable_regions(&self) -> impl Iterator<Item = (Rect, bool)> + '_ {

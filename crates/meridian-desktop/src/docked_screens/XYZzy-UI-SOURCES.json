@@ -1,0 +1,40 @@
+{
+  "status": "SOURCE_PROVENANCE_ONLY;NO_COMPILER_TEST_NATIVE_OR_CORE_ACCEPTANCE",
+  "g3Head": "b6017a5903c4491170e4c520af40a0c5577a7eb9",
+  "g3Receipt": "/private/tmp/meridian-g3-xyzzy-b6017a5/SOURCE.json",
+  "g3ReceiptSHA256": "410ee8fb6a683fe95585a67c213ecb874156c34215975eef16dc5ab8aa230260",
+  "frozenLegacyReference": "a11fe16924d87d06021816f9037952afcbac08db",
+  "completeLegacyParity": false,
+  "g3Inputs": [
+    {
+      "path": "docs/XYZZY.md",
+      "bytes": 7624,
+      "sha256": "90f4766b69435acf6b24031e5e669a9f5212f47b2166da58dbe4d676c41c255e"
+    },
+    {
+      "path": "docs/XYZZY-ACTIONS.json",
+      "bytes": 10305,
+      "sha256": "9798cf44ea73515c95973d5b39614df8dcfcfa83b297bed990cfe0dd6e4572c4"
+    },
+    {
+      "path": "crates/meridian-core/src/flight/xyzzy.rs",
+      "bytes": 13494,
+      "sha256": "312496394fe57783177fb937b685bd4c96b9b87697f8113792b3e16815ad8c6e"
+    },
+    {
+      "path": "crates/meridian-core/src/lib.rs",
+      "bytes": 2592,
+      "sha256": "2d9098dc99d1405bb65f1e16a0c27a2c68b82bc308d0deeb115d45884ae549ce"
+    }
+  ],
+  "inventoryEntries": 36,
+  "inventoryOutput": {
+    "path": "data/xyzzy-actions.tsv",
+    "bytes": 6236,
+    "sha256": "59c040fda79a1b8f022a26f4653f419532fa4b79927600dee628626dce4864e1"
+  },
+  "retainedOriginalMIT": "ORIGINAL-L337-MIT.txt",
+  "qualityBase": "f169c17834633cad582e05531a38544aa30833b1",
+  "originalLocalCheckpoint": "3c77f243de09eae48b3b49a83fa3fbd5d4e809bf",
+  "rebaseReason": "Retain exact import/showroom quality cleanup rather than overwrite it; no shared Root files altered."
+}
