@@ -27,6 +27,10 @@
 
 Meridian is a Rust reimplementation of the original L337 project, with direct wgpu graphics, one authoritative World and traceable original content. New code is [proprietary/source-visible](LICENSE); imported original content retains its own notices. Original Elite/Oolite assets are excluded.
 
+## Paid missile source awaiting execution
+
+The [paid standard missile core increment](docs/PAID-MISSILES.md) authors actual 180 CR purchase, nine-position SH025 fitting, same-item storage/refit and retained later launches with explicit v12 saves. Its new tests and runtime qualification are **UNRUN**. It is the first increment toward the required full modular equipment system; that broader system, docked screen integration and all-hull compatibility remain open. Published previews and their profiles remain unchanged.
+
 ## Current delivery
 
 The signed local **Meridian Flight Lesson Preview** is installed from qualified gameplay main `a583b61` ([PR 31](https://github.com/stephenlclarke/meridian/pull/31)) and published as [v0.3.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.3.0-preview.1). It adds the [original flight-and-reception lesson](docs/FLIGHT-RECEPTION.md) and World-owned front/rear/left/right views. It retains flight, physical docking, Avenor/Renas travel, seventeen-commodity trading, original G02 freight, paid cargo equipment, front Pulse fire, practice beacons/reception, station impacts and three finite owned missiles. Save v10 retains the lesson, missile sessions and attempt history, with explicit v4-v9 readers.

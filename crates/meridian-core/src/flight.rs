@@ -11,7 +11,12 @@ pub use flight_reception::{
     FlightReceptionError, FlightReceptionId, FlightReceptionOutcome, FlightReceptionReview,
     FlightReceptionSnapshot, FlightReceptionTrace, FlightView, PreparedFlightReception,
 };
+mod ammunition;
 mod missiles;
+pub use ammunition::{
+    AmmunitionAction, AmmunitionError, AmmunitionItem, AmmunitionReview, AmmunitionSnapshot,
+    MissilePurchase, PreparedAmmunition,
+};
 pub use missiles::{
     MISSILE_COOLDOWN_TICKS, MISSILE_FACES, MISSILE_LIFETIME_TICKS, MISSILE_MUZZLE_DISTANCE,
     MISSILE_RANGE, MISSILE_SPEED, MISSILE_VERTICES, MissileContact, MissileEnd, MissileError,
@@ -147,6 +152,7 @@ pub struct World {
     pulse: weapons::PulseResources,
     combat: combat::State,
     missiles: missiles::State,
+    ammunition: ammunition::State,
     navigation_trade: navigation_trade::State,
     flight_reception: flight_reception::State,
     practice: Option<practice::Practice>,
@@ -182,6 +188,7 @@ impl World {
             pulse: weapons::PulseResources::default(),
             combat: combat::State::default(),
             missiles: missiles::State::default(),
+            ammunition: ammunition::State::default(),
             navigation_trade: navigation_trade::State::default(),
             flight_reception: flight_reception::State::default(),
             practice: None,

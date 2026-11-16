@@ -49,3 +49,8 @@ pub use flight::{
     NavigationTradePlanSnapshot, NavigationTradeReview, NavigationTradeSnapshot,
     NavigationTradeTrace, PreparedNavigationTrade, PreparedStationService,
 };
+
+pub use flight::{
+    AmmunitionAction, AmmunitionError, AmmunitionItem, AmmunitionReview, AmmunitionSnapshot,
+    MissilePurchase, PreparedAmmunition,
+};

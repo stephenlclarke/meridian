@@ -25,6 +25,7 @@ pub enum MissileError {
     CoolingDown,
     InvalidGeometry,
     SequenceExhausted,
+    SaveRefused,
 }
 impl fmt::Display for MissileError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -39,6 +40,7 @@ impl fmt::Display for MissileError {
             Self::NotArmed => "Missile is not armed",
             Self::CoolingDown => "Missile launcher is cooling down",
             Self::InvalidGeometry => "Missile physical scene is unavailable",
+            Self::SaveRefused => "Missile discharge cannot be retained in a valid save",
             Self::SequenceExhausted => "Missile identity sequence exhausted",
         })
     }
@@ -116,28 +118,29 @@ pub struct MissileRound {
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct MissileSnapshot {
+    pub additional_rounds: [Option<MissileRound>; 6],
     pub rounds: [Option<MissileRound>; 3],
     pub armed: bool,
     pub lock: Option<PracticeBeaconId>,
     pub cooldown_ticks: u8,
     pub projectiles: [Option<ProjectileSnapshot>; 3],
 }
-#[derive(Debug, Clone, Copy, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq)]
 pub(super) struct State {
     armed: bool,
     lock: Option<PracticeBeaconId>,
     cooldown: u8,
-    projectiles: [Option<ProjectileSnapshot>; 3],
-    motions: [Option<Motion>; 3],
-    impacts: [Option<super::OrdinaryImpact>; 3],
-    beams: [Option<Beam>; 3],
+    pub(super) projectiles: Vec<Option<ProjectileSnapshot>>,
+    motions: Vec<Option<Motion>>,
+    impacts: Vec<Option<super::OrdinaryImpact>>,
+    beams: Vec<Option<Beam>>,
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
 struct Body {
     id: ProjectileId,
     position: Vec3,
 }
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 struct Motion {
     position: Vec3,
     travel: f64,
@@ -145,17 +148,51 @@ struct Motion {
     cleared: bool,
     flight: Snapshot,
     player_alive: bool,
-    bodies: [Option<Body>; 3],
+    bodies: Vec<Option<Body>>,
 }
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 struct Beam {
     shot: super::PulseShot,
     emission: u64,
-    bodies: [Option<Body>; 3],
+    bodies: Vec<Option<Body>>,
+}
+impl Default for State {
+    fn default() -> Self {
+        Self {
+            armed: false,
+            lock: None,
+            cooldown: 0,
+            projectiles: vec![None; 3],
+            motions: vec![None; 3],
+            impacts: vec![None; 3],
+            beams: vec![None; 3],
+        }
+    }
+}
+impl State {
+    fn bodies(&self) -> Vec<Option<Body>> {
+        self.projectiles
+            .iter()
+            .map(|p| {
+                p.filter(|p| p.ended.is_none()).map(|p| Body {
+                    id: p.origin.projectile,
+                    position: p.position,
+                })
+            })
+            .collect()
+    }
+    fn extend_for_launch(&mut self, index: usize) {
+        if index == self.projectiles.len() {
+            self.projectiles.push(None);
+            self.motions.push(None);
+            self.impacts.push(None);
+            self.beams.push(None);
+        }
+    }
 }
 impl State {
     #[cfg(test)]
-    pub(super) fn save_supported(self) -> bool {
+    pub(super) fn save_supported(&self) -> bool {
         !self.armed && self.lock.is_none() && self.projectiles.iter().all(Option::is_none)
     }
     pub(super) fn intercept(
@@ -165,12 +202,7 @@ impl State {
         emission: u64,
         shot: super::PulseShot,
     ) -> bool {
-        let bodies = self.projectiles.map(|p| {
-            p.filter(|p| p.ended.is_none()).map(|p| Body {
-                id: p.origin.projectile,
-                position: p.position,
-            })
-        });
+        let bodies = self.bodies();
         for p in self.projectiles.iter_mut().flatten() {
             if p.origin.projectile == id && p.ended.is_none() {
                 p.ended = Some(MissileEnd::Intercepted);
@@ -191,7 +223,7 @@ impl State {
         self.lock = None;
         self.cooldown = 0;
     }
-    pub(super) fn pending(self) -> u8 {
+    pub(super) fn pending(&self) -> u8 {
         self.projectiles
             .iter()
             .flatten()
@@ -263,28 +295,23 @@ impl World {
         }
         Ok(owner)
     }
+    /// Every retained origin, including paid rounds beyond the original three.
+    pub fn missile_projectiles(&self) -> impl Iterator<Item = ProjectileSnapshot> + '_ {
+        self.missiles.projectiles.iter().flatten().copied()
+    }
+    pub fn missile_rounds(&self) -> Option<[Option<MissileRound>; 9]> {
+        self.ammunition_rounds()
+    }
     pub fn missile_snapshot(&self) -> Option<MissileSnapshot> {
-        let owner = self.combat_identity()?;
-        let mut rounds = [None; 3];
-        for item in self.commander_account.as_ref()?.starter_items()?.iter() {
-            if let super::StarterComponent::Missile(pylon) = item.component()
-                && item.owner() == owner.owner
-                && item.fitted_hull() == Some(owner.hull)
-                && item.is_standard_birth()
-                && let Some(slot) = rounds.get_mut(usize::from(pylon))
-            {
-                *slot = Some(MissileRound {
-                    item: item.id(),
-                    pylon,
-                });
-            }
-        }
+        self.combat_identity()?;
+        let rounds = self.ammunition_rounds()?;
         Some(MissileSnapshot {
-            rounds,
+            rounds: core::array::from_fn(|i| rounds[i]),
             armed: self.missiles.armed,
             lock: self.missiles.lock,
             cooldown_ticks: self.missiles.cooldown,
-            projectiles: self.missiles.projectiles,
+            projectiles: core::array::from_fn(|i| self.missiles.projectiles[i]),
+            additional_rounds: core::array::from_fn(|i| rounds[3 + i]),
         })
     }
     pub fn request_missile_lock(
@@ -303,12 +330,12 @@ impl World {
     }
     pub fn request_missile_arm(&mut self, armed: bool, tick: u64) -> Result<(), MissileError> {
         self.missile_command(tick)?;
-        if armed {
-            self.commander_account
-                .as_ref()
-                .ok_or(MissileError::NoCommander)?
-                .quote_missile()
-                .map_err(round_error)?;
+        if armed
+            && self
+                .ammunition_rounds()
+                .is_none_or(|r| r.iter().all(Option::is_none))
+        {
+            return Err(MissileError::NoAmmunition);
         }
         self.missiles.armed = armed;
         Ok(())
@@ -333,28 +360,34 @@ impl World {
         if sub(target_pose.position, player.position).dot(player.orientation.z) <= 0.0 {
             return Err(MissileError::TargetBehind);
         }
-        let quote = self
+        let round = self
+            .ammunition_rounds()
+            .and_then(|r| r.into_iter().rev().flatten().next())
+            .ok_or(MissileError::NoAmmunition)?;
+        let paid_round = self
+            .ammunition_snapshot()
+            .ok_or(MissileError::NoCommander)?
+            .items
+            .iter()
+            .any(|i| i.item == round.item && i.purchase.is_some());
+        let account = self
             .commander_account
             .as_ref()
             .ok_or(MissileError::NoCommander)?
-            .quote_missile()
+            .prepare_ammunition(0, Some(round.item), paid_round)
             .map_err(round_error)?;
-        let index = self
-            .missiles
-            .projectiles
-            .iter()
-            .position(Option::is_none)
-            .ok_or(MissileError::SequenceExhausted)?;
+        let index = self.missiles.used();
+        let ordinal = u8::try_from(index).map_err(|_| MissileError::SequenceExhausted)?;
         let (combat, emission) = self.combat.reserve_missile_emission()?;
         let origin = MissileOrigin {
             projectile: ProjectileId {
                 owner: owner.owner,
                 visit: owner.visit,
-                ordinal: index as u8,
+                ordinal,
             },
             owner,
             emission,
-            item: quote.item().id(),
+            item: round.item,
             launched_tick: tick,
             legal_at_launch: self.legal_value().ok_or(MissileError::NoCommander)?,
             physical_tick: self.combat.physical_tick(),
@@ -384,18 +417,25 @@ impl World {
             last_tick: tick,
             intercepting_emission: None,
         };
-        self.commander_account
-            .as_mut()
-            .ok_or(MissileError::NoCommander)?
-            .consume_missile(quote)
-            .map_err(round_error)?;
+        let old_account = self.commander_account.replace(account);
+        let old_combat = self.combat;
+        let old_missiles = self.missiles.clone();
+        let old_practice = self.practice;
         self.combat = combat;
+        self.missiles.extend_for_launch(index);
         self.missiles.projectiles[index] = Some(projectile);
         self.missiles.armed = false;
         self.missiles.cooldown = MISSILE_COOLDOWN_TICKS;
         if let Some(p) = &mut self.practice {
             p.pending_missiles = self.missiles.pending();
             p.observe_discharge(tick);
+        }
+        if self.save_bytes().is_err() {
+            self.commander_account = old_account;
+            self.combat = old_combat;
+            self.missiles = old_missiles;
+            self.practice = old_practice;
+            return Err(MissileError::SaveRefused);
         }
         Ok(origin)
     }
@@ -406,7 +446,7 @@ impl World {
         navigation: Option<super::NavigationState>,
     ) -> Result<PreparedStep, StepError> {
         let mut prepared = PreparedStep {
-            missiles: self.missiles,
+            missiles: self.missiles.clone(),
             combat: self.combat,
             pulse: self.pulse,
             practice: self.practice,
@@ -418,7 +458,7 @@ impl World {
             prepared.missiles.cooldown = prepared.missiles.cooldown.saturating_sub(1);
         }
         let visit = navigation.map(|n| n.snapshot(0).visit);
-        for index in 0..3 {
+        for index in 0..prepared.missiles.projectiles.len() {
             let Some(mut projectile) = prepared.missiles.projectiles[index] else {
                 continue;
             };
@@ -439,12 +479,7 @@ impl World {
                     cleared: projectile.muzzle_cleared,
                     flight: next,
                     player_alive: prepared.pulse.alive(),
-                    bodies: prepared.missiles.projectiles.map(|p| {
-                        p.filter(|p| p.ended.is_none()).map(|p| Body {
-                            id: p.origin.projectile,
-                            position: p.position,
-                        })
-                    }),
+                    bodies: prepared.missiles.bodies(),
                 });
                 advance_projectile(
                     self,
@@ -587,7 +622,7 @@ fn query_contact(
             },
         ));
     }
-    for other_index in 0..3 {
+    for other_index in 0..prepared.missiles.projectiles.len() {
         if other_index == index {
             continue;
         }

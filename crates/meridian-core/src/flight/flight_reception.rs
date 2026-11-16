@@ -129,7 +129,7 @@ pub(super) struct Sample {
     flight: Snapshot,
     visit: u64,
     physical_tick: u64,
-    bodies: [Option<SightBody>; 3],
+    bodies: [Option<SightBody>; 9],
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
 struct Reading {

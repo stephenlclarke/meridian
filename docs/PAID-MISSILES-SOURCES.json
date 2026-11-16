@@ -1,0 +1,133 @@
+{
+  "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "tree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "root": "/Volumes/SSD/offload/l337-g1-pr335-equipment-compose.UtqLRJ/required-cold-runtime.a11fe169/elite",
+  "files": [
+    {
+      "path": "Sources/L337Core/CommanderEquipment.swift",
+      "gitBlob": "ec56201878eaa7386b3aafec84c20b473e3316b2",
+      "bytes": 10011,
+      "sha256": "d5c9334210269abec7c3c4f2d16258a837b9dceb00dcec7184ffd92ae0ecec0c"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentRuntimeCatalog.swift",
+      "gitBlob": "4f9bf9ec70d239e9c099f00a9c63a80d4648833d",
+      "bytes": 8337,
+      "sha256": "ccf1ee2a940175f0d1a26a65aaa7b62ca7cf61d0eb33906f8b8feb6664210e27"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentTransactions.swift",
+      "gitBlob": "3d51889a6dd1900faadfc172bbdab072995f1a21",
+      "bytes": 15785,
+      "sha256": "21a44066185ea17c8e3b262988c193cdef98bf88f80294d7a216767d93ad4f36"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentPurchaseProgression.swift",
+      "gitBlob": "91e79ba4e50fc1f12236e8b4a25d16a3b26d84d4",
+      "bytes": 24305,
+      "sha256": "770618fcbb38330f568dbb862fc471762552cc17b55edfd407a1eb7462b0460c"
+    },
+    {
+      "path": "Sources/L337Core/OriginalFleetR3Fitting.swift",
+      "gitBlob": "920e1d802e63ab9038e7885974618f4e9b402257",
+      "bytes": 4922,
+      "sha256": "5a50e94cb510d7ce51da194cc3570159a28f1b7bd126e140a948192412d913ee"
+    },
+    {
+      "path": "Sources/L337Core/AlienMissileDefinition.swift",
+      "gitBlob": "486cf1bfb9eaba63cfc68924fe550048a13b7e05",
+      "bytes": 927,
+      "sha256": "f780b221baec6568fca625f2f5cadb8239ed31e4acda12c41319edd97759946f"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentActorTransactions.swift",
+      "gitBlob": "85942f02b2c0b3856921e18506864bd8802f61ae",
+      "bytes": 10255,
+      "sha256": "b81db1e1f95ff5e214d4e0104aae1340af3096b00c69a65d2ce037527af8962a"
+    },
+    {
+      "path": "Sources/L337Core/NativeStationServices.swift",
+      "gitBlob": "2cee373b3f198ff174f44f6039a803e1891918ac",
+      "bytes": 10858,
+      "sha256": "e74815c9dca25f05da4a8d9f5664c3492760b365c8f8b51cb6408a77acbe3559"
+    },
+    {
+      "path": "Sources/L337Core/Plugh.swift",
+      "gitBlob": "faf40ce4d170b33d26dc14f185d08acb30130a3a",
+      "bytes": 4508,
+      "sha256": "2c43ae0738fa93375eb51a4859e11bc33e7bf9e7496ff432f140e813baa6b8eb"
+    },
+    {
+      "path": "Sources/L337Core/Game.swift",
+      "gitBlob": "0f94ff0c7bf46d47e65e077cc3c5db37694bd706",
+      "bytes": 313817,
+      "sha256": "e5b4e30c835d460aa7ca6f77364db0aaeaf877bb9d73bacc162e9111b26e2e17"
+    },
+    {
+      "path": "Sources/L337Core/Resources/OriginalWorlds/authoring.toml",
+      "gitBlob": "0373b5cb3e2a18ef4d4f372c7a64952b2964a456",
+      "bytes": 6664,
+      "sha256": "47d83caae5a9b22a4a932f19c55f79c5cb5435b962826a0969ece096b11f80eb"
+    },
+    {
+      "path": "Sources/L337Core/Resources/Ships/SH025.toml",
+      "gitBlob": "ec62ccae9acfc05b92c3c4591f079fc7ba4bf1cf",
+      "bytes": 690857,
+      "sha256": "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883"
+    },
+    {
+      "path": "Tests/L337CoreTests/EquipmentAmmunitionTransactionTests.swift",
+      "gitBlob": "96438a4a98da860974a97dda5be14fbdcb1be6e8",
+      "bytes": 1871,
+      "sha256": "1fb53b62ef8d2c9d4ba88ddb31ff47c30da8a1eb4b5a3a897d02c543a28aeefd"
+    },
+    {
+      "path": "Tests/L337CoreTests/OriginalEquipmentStockValuesTests.swift",
+      "gitBlob": "19f5a3e1009fd2f04f3e3de1c02500651e2ba231",
+      "bytes": 8817,
+      "sha256": "62a91840327bb68896ff04db312f644bc8f6916b2889fa7ce5457133e2c04c89"
+    },
+    {
+      "path": "Tests/L337CoreTests/OwnedEquipmentTests.swift",
+      "gitBlob": "1a283a32f6d5d6fd09cc8948f4bfe675c0e35b4c",
+      "bytes": 30489,
+      "sha256": "07299f2c07b988b96ade3c357ea551094525f30d081e12c7ce14fce72d4e39c0"
+    },
+    {
+      "path": "Tests/L337CoreTests/OwnedEquipmentInventoryTests.swift",
+      "gitBlob": "8b90759816e5978dea4956241b16366e0ce55ce2",
+      "bytes": 13123,
+      "sha256": "76d179c8a94f13e5d5b98fe2ca3358bbe7d8efeb0db61655d86078271955de10"
+    },
+    {
+      "path": "Tests/L337CoreTests/EquipmentPurchaseProgressionTests.swift",
+      "gitBlob": "41a382f1e5933f8aa225e3fc442544dee442fb7b",
+      "bytes": 21235,
+      "sha256": "873341ec41767bee6f2e3583961ef6dca86ea3da63e69c7c55573eb989e6e10d"
+    },
+    {
+      "path": "Tests/L337CoreTests/EquipmentRuntimeTransactionTests.swift",
+      "gitBlob": "d0be4c9dacb30362e5d036f567a771fe6b72c5f0",
+      "bytes": 17613,
+      "sha256": "8ed00ff445ef8ce73a8e18baaa7e13cdf1cb11fc9abad760f736b341c0d20bd8"
+    },
+    {
+      "path": "Tests/L337CoreTests/OriginalFleetR3FittingUnitTests.swift",
+      "gitBlob": "1034030a045c9e53be55967ce4ce9a8eda0629f0",
+      "bytes": 5638,
+      "sha256": "4f24e881695b1e60cc5c1fe425bfe37747cf0e5ac5d82c3e1f5be8ae5c147a4f"
+    },
+    {
+      "path": "Sources/L337Core/OwnedEquipment.swift",
+      "gitBlob": "b0b5e5ea4f8bfdcf5077b62ef576526c1bc8e9c2",
+      "bytes": 3837,
+      "sha256": "c8a9e6eb6d859d917f8621cf9146b518521ea7708a5ad6ac68334efe9f9607cf"
+    },
+    {
+      "path": "Sources/L337Core/OwnedEquipmentInventory.swift",
+      "gitBlob": "bf17b9ec76686ce9e830472f45cb0db64f242663",
+      "bytes": 23031,
+      "sha256": "83009fdd488c170fff421cff398858acc77836d6668308ae69a743e8a1a7544f"
+    }
+  ]
+}

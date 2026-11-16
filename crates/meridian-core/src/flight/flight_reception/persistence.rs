@@ -12,6 +12,9 @@ use crate::navigation::{DockContext, DockOrigin, SystemId};
 
 impl State {
     pub(in crate::flight) fn encode(&self, w: &mut Writer) {
+        self.encode_version(w, 12);
+    }
+    pub(in crate::flight) fn encode_version(&self, w: &mut Writer, version: u16) {
         w.u8(match self.view {
             FlightView::Front => 0,
             FlightView::Rear => 1,
@@ -20,11 +23,11 @@ impl State {
         });
         w.u8(self.attempts.len() as u8);
         for a in &self.attempts {
-            a.encode(w);
+            a.encode(w, version);
         }
         w.option(self.trace.as_ref(), |w, id| w.u8(*id));
     }
-    pub(in crate::flight) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+    pub(in crate::flight) fn decode(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
         let view = match r.u8()? {
             0 => FlightView::Front,
             1 => FlightView::Rear,
@@ -38,7 +41,7 @@ impl State {
         }
         let mut attempts = Vec::with_capacity(count);
         for _ in 0..count {
-            attempts.push(Attempt::decode(r)?);
+            attempts.push(Attempt::decode(r, version)?);
         }
         Ok(Self {
             view,
@@ -117,7 +120,7 @@ fn validate_next(old: Attempt, next: Attempt) -> Result<(), SaveError> {
     Ok(())
 }
 impl Attempt {
-    fn encode(self, w: &mut Writer) {
+    fn encode(self, w: &mut Writer, version: u16) {
         self.dock.encode_save(w);
         w.u64(self.accepted_tick);
         w.u64(self.fit.inventory);
@@ -126,8 +129,8 @@ impl Attempt {
             w.option(item.as_ref(), |w, item| w.u64(*item));
         }
         w.option(self.reading.as_ref(), |w, reading| {
-            reading.first.encode(w);
-            reading.last.encode(w);
+            reading.first.encode(w, version);
+            reading.last.encode(w, version);
         });
         w.option(self.terminal.as_ref(), |w, t| {
             w.u8(match t.outcome {
@@ -139,7 +142,7 @@ impl Attempt {
             w.option(t.dock.as_ref(), |w, d| d.encode_save(w));
         });
     }
-    fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+    fn decode(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
         let dock = DockContext::decode_save(r)?;
         let accepted_tick = r.u64()?;
         let inventory = r.u64()?;
@@ -151,8 +154,8 @@ impl Attempt {
         };
         let reading = r.option(|r| {
             Ok(Reading {
-                first: Sample::decode(r)?,
-                last: Sample::decode(r)?,
+                first: Sample::decode(r, version)?,
+                last: Sample::decode(r, version)?,
             })
         })?;
         let terminal = r.option(|r| {
@@ -326,11 +329,15 @@ impl Reading {
     }
 }
 impl Sample {
-    fn encode(self, w: &mut Writer) {
+    fn encode(self, w: &mut Writer, version: u16) {
         write_flight(w, &self.flight);
         w.u64(self.visit);
         w.u64(self.physical_tick);
-        for body in self.bodies {
+        for body in self
+            .bodies
+            .into_iter()
+            .take(if version >= 12 { 9 } else { 3 })
+        {
             w.option(body.as_ref(), |w, body| {
                 w.u8(body.ordinal);
                 for value in [body.position.x, body.position.y, body.position.z] {
@@ -339,23 +346,27 @@ impl Sample {
             });
         }
     }
-    fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+    fn decode(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
         Ok(Self {
             flight: read_flight(r)?,
             visit: r.u64()?,
             physical_tick: r.u64()?,
-            bodies: r.array(|r| {
-                r.option(|r| {
-                    Ok(SightBody {
-                        ordinal: r.u8()?,
-                        position: Vec3::new(
-                            f64::from_bits(r.u64()?),
-                            f64::from_bits(r.u64()?),
-                            f64::from_bits(r.u64()?),
-                        ),
-                    })
-                })
-            })?,
+            bodies: {
+                let mut bodies = [None; 9];
+                for body in bodies.iter_mut().take(if version >= 12 { 9 } else { 3 }) {
+                    *body = r.option(|r| {
+                        Ok(SightBody {
+                            ordinal: r.u8()?,
+                            position: Vec3::new(
+                                f64::from_bits(r.u64()?),
+                                f64::from_bits(r.u64()?),
+                                f64::from_bits(r.u64()?),
+                            ),
+                        })
+                    })?;
+                }
+                bodies
+            },
         })
     }
 }
