@@ -30,5 +30,12 @@ def verify(reference):
         if '://' not in target:assert (ROOT/target).is_file(),target
     return {'status':'SOURCE_ONLY_PASS;DOES_NOT_EXECUTE_RUST_TESTS','immutableSourceFiles':len(manifest['sources']),'worlds':len(worlds),'ships':162,'otherObjects':9,'specificationFields':len(specs),'authoredRustTests':len(tests),'negativeOriginalCoordinatesPreserved':any(float(w[3])<0 or float(w[4])<0 for w in worlds)}
 
-if __name__=='__main__':
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--reference',required=True,type=Path);args=parser.parse_args();print(json.dumps(verify(args.reference)))
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--reference', required=True, type=Path)
+    args = parser.parse_args(argv)
+    print(json.dumps(verify(args.reference)))
+
+
+if __name__ == '__main__':
+    main()

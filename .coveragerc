@@ -1,5 +1,7 @@
 [run]
-source = tools
+source =
+    tools
+    crates/meridian-desktop/src/docked_screens/tools
 relative_files = True
 omit = tools/test_*.py
 

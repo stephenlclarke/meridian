@@ -90,7 +90,7 @@ Compiled source `bb5862b` passed whole-source review and bounded corrections. Ma
 
 The cockpit instrument implementation and its current validation limits are described in [Cockpit instruments](docs/COCKPIT-HUD.md).
 
-The next HUD, five docked screens and initial modular equipment candidate passed platform qualification on macOS, Linux and native Windows, plus bounded signed Mac gameplay and paid-equipment cold Continue. It is not published yet: protected merge, exact-main CI/Sonar and final packages remain pending. Full equipment, mining/salvage, EMP, bounties, further authored hulls and NPC populations remain core work before new missions.
+The HUD, five docked screens and initial modular equipment candidate passed platform qualification on macOS, Linux and native Windows, plus bounded signed Mac gameplay and paid-equipment cold Continue. It merged through PR 34, but publication is held on a Sonar coverage failure in two reference tools. A correction adds import/integrity tests, includes those nested tools in coverage measurement and fixes Windows newline translation in generated reference files. Local Python validation passes; changed final-head and exact-main quality checks remain pending. Full equipment, mining/salvage, EMP, bounties, further authored hulls and NPC populations remain core work before new missions.
 
 In the next-preview development candidate, `/` toggles controls help and ordinary flight uses a compact overlay above the cockpit. This change is not in the published v0.4 binary.
 
