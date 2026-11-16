@@ -209,6 +209,7 @@ impl App {
 
     fn game_key(&mut self, code: KeyCode) {
         let action = match code {
+            KeyCode::Slash => Action::ToggleControls,
             KeyCode::Digit0 => Action::SetFlightView(FlightView::Front),
             KeyCode::Digit1 => Action::SetFlightView(FlightView::Rear),
             KeyCode::Digit2 => Action::SetFlightView(FlightView::Left),

@@ -11,6 +11,7 @@ use meridian_core::{
 
 #[derive(Clone, Copy)]
 pub enum Action {
+    ToggleControls,
     Ammunition(meridian_core::AmmunitionAction),
     ReviewTradeLesson,
     PlanTradeLesson,
@@ -56,6 +57,7 @@ pub(crate) enum PracticeSelection {
 }
 
 pub struct Session {
+    show_controls: bool,
     job: Option<JobId>,
     pending: Option<(Review, Choice)>,
     pub(crate) pending_trade: Option<NavigationTradeReview>,
@@ -72,6 +74,7 @@ pub struct Session {
 impl Default for Session {
     fn default() -> Self {
         Self {
+            show_controls: false,
             job: None,
             pending: None,
             pending_trade: None,
@@ -97,6 +100,7 @@ impl Session {
     }
 
     pub fn invalidate(&mut self) {
+        self.show_controls = false;
         self.pending_trade = None;
         self.show_trade_lesson = false;
         self.pending_flight = None;
@@ -278,16 +282,27 @@ impl Session {
     }
 
     pub fn command(&mut self, world: &mut World, action: Action) -> Result<String, String> {
-        if self.pending_trade.take().is_some() && matches!(action, Action::Back) {
-            return Ok("Trade lesson review cancelled.".into());
-        }
-        if self.pending_flight.take().is_some() && matches!(action, Action::Back) {
-            return Ok("Flight lesson review cancelled.".into());
-        }
-        if self.pending_practice.take().is_some() && matches!(action, Action::Back) {
-            return Ok("Practice review cancelled.".into());
+        if !matches!(action, Action::ToggleControls) {
+            if self.pending_trade.take().is_some() && matches!(action, Action::Back) {
+                return Ok("Trade lesson review cancelled.".into());
+            }
+            if self.pending_flight.take().is_some() && matches!(action, Action::Back) {
+                return Ok("Flight lesson review cancelled.".into());
+            }
+            if self.pending_practice.take().is_some() && matches!(action, Action::Back) {
+                return Ok("Practice review cancelled.".into());
+            }
         }
         match action {
+            Action::ToggleControls => {
+                self.show_controls = !self.show_controls;
+                Ok(if self.show_controls {
+                    "Controls shown; / closes help"
+                } else {
+                    "Controls hidden"
+                }
+                .into())
+            }
             Action::Ammunition(_) => {
                 Err("Equipment changes require the durable profile path".into())
             }
@@ -620,6 +635,40 @@ impl Session {
             && !self.show_objective
             && !self.equipment_open
             && !self.market_open;
+        if self.show_controls
+            && self.pending_practice.is_none()
+            && self.pending.is_none()
+            && !self.show_objective
+        {
+            lines.extend([
+                "FLIGHT: W/S THRUST | ARROWS PITCH | A/D YAW | Q/E ROLL | SPACE BRAKE | J JUMP",
+                "WEAPONS: Z FIRE FRONT PULSE | F1 NEXT LOCK | F2 ARM/SAFE | F3 MISSILE | F4 SAFE",
+                "VIEWS: 0 FRONT | 1 REAR | 2 LEFT | 3 RIGHT",
+                "DOCKED: L LAUNCH | M MARKET | O EQUIPMENT | F REFUEL",
+                "MARKET: [ / ] SELECT | G BUY ONE UNIT | H SELL ONE UNIT",
+                "FLIGHT LESSON: F6 REVIEW | F12 CANCEL | C DETAILS",
+                "TRADE LESSON: 4 REVIEW | 5 PLAN | 6 CANCEL | 7 DETAILS",
+                "F5 SAVE | F9 RELOAD | P PAUSE | F11 FULLSCREEN | ESC SAVE AND QUIT | / CLOSE HELP",
+            ].into_iter().map(str::to_owned));
+            return lines;
+        }
+        if compact_flight {
+            append_missile_panel(world, snapshot.mode, &mut lines);
+            if let Some(line) = practice_line(world) {
+                lines.push(line);
+            }
+            if let Some(travel) = snapshot.navigation.and_then(|nav| nav.travel) {
+                lines.push(format!(
+                    "JUMP COUNTDOWN: {:.1} SECONDS",
+                    travel.remaining_ticks as f32 / 60.0
+                ));
+            }
+            lines.push(
+                "Z FIRE FRONT PULSE | SPACE BRAKE | P PAUSE | F5 SAVE | ESC SAVE AND QUIT | / HELP"
+                    .into(),
+            );
+            return lines;
+        }
         if !compact_flight {
             lines.push(review_line);
             lines.push(self.panel_controls().into());
@@ -972,6 +1021,56 @@ mod tests {
         assert!(!fresh.contains("F8 REVIEW"));
     }
 
+    #[test]
+    fn default_flight_overlay_keeps_warning_and_critical_controls_without_debug_rows() {
+        let mut world = World::new_commander(84801).unwrap_or_else(|e| panic!("{e}"));
+        world.request_launch(0).unwrap_or_else(|e| panic!("{e}"));
+        world
+            .step(meridian_core::FlightInput::default())
+            .unwrap_or_else(|e| panic!("{e}"));
+        let ui = Session::default();
+        let before = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+        let lines = ui.lines(&world, true, Some("ENTRY REFUSED: SLOW DOWN"));
+        assert!(lines.len() <= 8, "{} overlay lines", lines.len());
+        assert!(lines[1].contains("ENTRY REFUSED"));
+        let text = lines.join(" ");
+        for required in [
+            "MISSILES",
+            "F5 SAVE",
+            "ESC SAVE AND QUIT",
+            "/ HELP",
+            "SPACE BRAKE",
+        ] {
+            assert!(text.contains(required), "{required}");
+        }
+        assert!(!text.contains("POSITION "));
+        assert!(!text.contains("THRUST"));
+        assert_eq!(world.save_bytes().unwrap_or_else(|e| panic!("{e}")), before);
+    }
+    #[test]
+    fn controls_toggle_preserves_live_world_and_pending_trade_review() {
+        let mut world = World::new_commander(84802).unwrap_or_else(|e| panic!("{e}"));
+        let mut ui = Session::default();
+        ui.command(&mut world, Action::ReviewTradeLesson)
+            .unwrap_or_else(|e| panic!("{e}"));
+        let pending = ui.pending_trade.unwrap_or_else(|| panic!("review"));
+        let before = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+        for _ in 0..2 {
+            ui.command(&mut world, Action::ToggleControls)
+                .unwrap_or_else(|e| panic!("{e}"));
+        }
+        assert_eq!(ui.pending_trade, Some(pending));
+        assert_eq!(world.save_bytes().unwrap_or_else(|e| panic!("{e}")), before);
+        ui.command(&mut world, Action::Back)
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert!(ui.pending_trade.is_none());
+        ui.command(&mut world, Action::ToggleControls)
+            .unwrap_or_else(|e| panic!("{e}"));
+        let help = ui.lines(&world, false, None).join(" ");
+        assert!(help.contains("W/S THRUST"));
+        assert!(help.contains("/ CLOSE HELP"));
+        assert_eq!(world.save_bytes().unwrap_or_else(|e| panic!("{e}")), before);
+    }
     #[test]
     fn missile_controls_cycle_actual_locks_consume_a_round_and_continue_state() {
         fn assert_visible(session: &Session, world: &World, warning: &str) {

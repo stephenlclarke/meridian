@@ -21,3 +21,7 @@ Native current-source visual and input comparison remains pending. No authentica
 ## Joined equipment feed
 
 The next-preview candidate now captures all nine fitted missile positions and every retained projectile through the complete World APIs. The renderer reuses a bounded projectile buffer; the scanner has fixed space for every checked-u8 launch identity. The previous three-entry compatibility snapshot is used only for arm/lock controls. A new real paid-item test checks the ninth pylon without mutating the save. These joined Rust changes and the three new desktop tests are authored and unrun; the earlier ten focused HUD passes apply only to the original HUD source. Docked screens and the rest of modular equipment remain in progress.
+
+## Flight overlay and controls
+
+The next-preview candidate uses a compact default flight overlay for current status, notices, missile safety, practice state and jump countdown. Instrument gauges carry the numeric ship readings. `/` opens the keyboard help; toggling help preserves pending reviews and does not issue a gameplay command. Confirmation panels retain priority. Two new regression tests cover warning/control visibility and unchanged World/review state. These composed changes remain uncompiled and unqualified until the complete menu/equipment join is reviewed.
