@@ -1,5 +1,7 @@
 # Immediate launch save correction
 
+Historical feature contract and author-stage notes. For current delivered behavior, exact validation and open limits, read [implementation status](IMPLEMENTATION-STATUS.md). Earlier UNRUN statements below apply to the original handoff, not the latest delivered source.
+
 This bounded core correction starts at exact joined source
 `2b03a4f4a440ba0dd5ff13dcbb45f553fdca070a`. The execution owner reported both
 Dell platforms compiled that source and its 89 core tests passed, but the

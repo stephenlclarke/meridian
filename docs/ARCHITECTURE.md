@@ -1,5 +1,7 @@
 # Architecture
 
+Historical feature contract and author-stage notes. For current delivered behavior, exact validation and open limits, read [implementation status](IMPLEMENTATION-STATUS.md). Earlier UNRUN statements below apply to the original handoff, not the latest delivered source.
+
 ## Product intent and scope
 
 Build a releasable single-player space game with a portable Rust simulation and a direct wgpu renderer. The first supported release target is an Apple Silicon Mac desktop app. Windows is the next portability target, with Linux useful for core development and tests. Browser, mobile, multiplayer and full legacy parity are outside the first playable scope. Mac App Store distribution remains a later qualified delivery target, not an automatic result of using Rust.

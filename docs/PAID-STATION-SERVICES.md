@@ -1,5 +1,7 @@
 # Paid station fuel and ordinary Food commerce
 
+Historical feature contract and author-stage notes. For current delivered behavior, exact validation and open limits, read [implementation status](IMPLEMENTATION-STATUS.md). Earlier UNRUN statements below apply to the original handoff, not the latest delivered source.
+
 Status: the paid-service kernel is now joined to the actual World/account at frozen G3 base `a4a8f9573c86c4bae83a7bc56862d783a75d50c6`. Three public World tests and two account-boundary tests are newly authored. The existing eight standalone kernel tests passed on the Dell at `9f420f3`; that evidence does not validate this new join. Final joined Rust execution, independent review, desktop interaction and playable service acceptance remain pending. No native compilation or GPU work ran on the Mac.
 
 ## Original rules and provenance

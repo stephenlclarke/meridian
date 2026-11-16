@@ -1,5 +1,7 @@
 # G02 mission dialogue and objectives
 
+Historical feature contract and author-stage notes. For current delivered behavior, exact validation and open limits, read [implementation status](IMPLEMENTATION-STATUS.md). Earlier UNRUN statements below apply to the original handoff, not the latest delivered source.
+
 ## Scope and source
 
 The first playable requires the original consented-freight story and terms alongside its actual custody/settlement mechanics. At Meridian base `df2b1301369b90272df1c58917b6303df8efeefd`, the World already supports G02 offer, one/all receiving, abandonment and durable continuation. Desktop review text is generic and does not present the original full offer or crew consent. It also distinguishes offer/receiving using next-unit presence. Receiving and abandonment reviews both retain the next held original unit, so that heuristic cannot identify an abandonment action. This slice supplies concrete read-only G02 presentation; Root owns the desktop integration.
@@ -46,4 +48,4 @@ The first joined candidate `37e21708097a57126a9ce1c10b96571313ddaaf2` failed [CI
 
 Rustfmt parsing, source fidelity/hash comparisons and scoped documentation checks are source-only evidence. Corrected-candidate compilation, tests, strict Clippy, joined desktop readability/input and native game acceptance are pending. Root joins the presentation with its Session/Profile/renderer work, including explicit one/all/abandon actions, then routes one complete candidate through the existing Dell owner. There is no separate leaf-run gate or competing Mac compiler/GPU job.
 
-Root's UI must retain refusal/status and the explicit pending choice plus confirm/cancel controls while wrapping the original body and warning. Do not truncate the terms into a generic review-ready notice or interpret presented choices as new authority. See [the implementation handoff](PR-g02-mission-presentation.md).
+Root's UI must retain refusal/status and the explicit pending choice plus confirm/cancel controls while wrapping the original body and warning. Do not truncate the terms into a generic review-ready notice or interpret presented choices as new authority. See [current implementation status](IMPLEMENTATION-STATUS.md).

@@ -1,5 +1,7 @@
 # World navigation and physical destination admission
 
+Historical feature contract and author-stage notes. For current delivered behavior, exact validation and open limits, read [implementation status](IMPLEMENTATION-STATUS.md). Earlier UNRUN statements below apply to the original handoff, not the latest delivered source.
+
 Status: source and seven Rust tests authored; Rust execution and native UI acceptance remain pending on the existing Dell lane. This slice is based on station main `7aee6b6` and G3's connected freight/owned-starter commit `42a4e94`. It does not complete the first playable.
 
 ## Reference and content

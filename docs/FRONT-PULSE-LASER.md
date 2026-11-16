@@ -1,5 +1,7 @@
 # SH025 front Pulse Laser
 
+Historical feature contract and author-stage notes. For current delivered behavior, exact validation and open limits, read [implementation status](IMPLEMENTATION-STATUS.md). Earlier UNRUN statements below apply to the original handoff, not the latest delivered source.
+
 Source baseline `d5308bf757ae1324a0c995d3b9004e1059620d1d` retains the
 paid Large Cargo Bay. The front Pulse Laser uses the actual standard birth
 item in that same account and hull. The command changes laser resources and

@@ -1,5 +1,7 @@
 # Paid SH025 cargo expansion
 
+Historical feature contract and author-stage notes. For current delivered behavior, exact validation and open limits, read [implementation status](IMPLEMENTATION-STATUS.md). Earlier UNRUN statements below apply to the original handoff, not the latest delivered source.
+
 Status: one coherent M2 core slice is authored on exact main
 `edaa29f8daefe849e55efcf69e7ed33d804aab77`. Formatting and source checks pass;
 compilation, Rust test execution, strict Clippy, whole-slice review and native

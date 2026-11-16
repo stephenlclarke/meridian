@@ -1,7 +1,0 @@
-# G02 original dialogue and objective presentation is missing
-
-The first-playable and legacy milestone specifications require the original consented-freight journey. The implemented World mechanics already retain original identities, real contact/dock authority, finite stock, seven/eighth settlement and save continuation. Desktop review currently supplies generic text and supports only its selected one-unit action. The original ARLEN offer/accepted journal, receiver consent, same-unit restriction and abandonment/no-restock terms are missing from the presentation.
-
-Receiving and abandonment reviews both retain the next held original unit. Its presence cannot distinguish those actions; use the actual typed purpose and explicit selected choice. Receiving all also needs an explicit selected choice rather than an inference from next-unit presence. This must be corrected without changing mission authority, cargo, stock, payments, receipts or persistence.
-
-Implement a G02-specific read-only projection with typed review purposes/choices and actual World objectives. Preserve exact immutable original strings and notices, record their provenance and add meaningful public-command tests. Root owns the Session/Profile/renderer join and desktop actions. The Researcher owns only a new presentation module, its single declaration in G02 and scoped documentation. No generic mission engine or Lua execution is required. See [the specification](G02-PRESENTATION.md) and [the delivery](PR-g02-mission-presentation.md).

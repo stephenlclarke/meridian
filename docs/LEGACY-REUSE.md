@@ -1,5 +1,7 @@
 # Legacy reuse and parity
 
+Historical feature contract and author-stage notes. For current delivered behavior, exact validation and open limits, read [implementation status](IMPLEMENTATION-STATUS.md). Earlier UNRUN statements below apply to the original handoff, not the latest delivered source.
+
 ## Reference
 
 The initial immutable legacy reference is Elite/L337 commit `a11fe16924d87d06021816f9037952afcbac08db`, tree `68fec574df12ddf74acb14747e0dd6839f478642`. It is a source reference, not a claim of full native qualification. Current Swift qualification and MBA fleet authoring continue separately; later source changes require a deliberate manifest update.

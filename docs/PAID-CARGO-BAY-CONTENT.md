@@ -1,5 +1,7 @@
 # Original SH025 paid cargo bay content
 
+Historical feature contract and author-stage notes. For current delivered behavior, exact validation and open limits, read [implementation status](IMPLEMENTATION-STATUS.md). Earlier UNRUN statements below apply to the original handoff, not the latest delivered source.
+
 This component supplies one original equipment item to the paid equipment slice: Large Cargo Bay, original ID `cargo-bay`. Root owns the desktop join; G3 owns all Rust content decoding, account, commands and save changes. MC1 supplies only immutable content, extraction, provenance and independent source-derived fixtures from main `edaa29f8daefe849e55efcf69e7ed33d804aab77`. This component changes no installed app, profile, core or desktop behavior by itself.
 
 ## Original source and admission
