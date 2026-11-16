@@ -2,6 +2,14 @@
 
 Reviewed against actual delivery evidence on 16 November 2026. This document distinguishes installed gameplay from source awaiting execution. Update it with every delivery or material acceptance change; test counts belong to their exact source.
 
+## Release coverage correction
+
+Protected main `0515e63` passed platform tests, documentation and the coverage-report job, then failed Sonar's unchanged 80 percent new-code coverage gate: all 70 new executable Python lines in the two docked reference tools were unmeasured/uncovered. The original Python coverage configuration included only top-level `tools`, while the new helpers live under `crates/meridian-desktop/src/docked_screens/tools`. Publication is held; the qualified signed local Mac package is separate from a public release.
+
+The following correction expands measurement to those nested helpers and adds seven synthetic-schema import/integrity tests. It exercises complete ordered world/object extraction, fixed immutable Git-read arguments, scalar/list/boolean TSV handling, content hashes, wrong revision, same-size tampering, malformed world ordering/nonfinite coordinates, unknown object/specification identities, authored-test inventory, document links and required CLI arguments. The CLI adapters expose `main(argv)` for direct testing; their existing build/verify assertions are unchanged. All 81 Python tests pass locally with coverage 43/43 lines for the importer and 36/36 for the verifier (79/79 combined, 100 percent), including actual command-line refusal when the required reference argument is absent. These fixtures are not original content, asset provenance or gameplay acceptance.
+
+No Rust, game assets, dependencies, save format, native controls or compiled payload changes. Independent review, final-head checks and a new exact-main Sonar result remain pending. The failed analysis and its Previous version baseline remain recorded; no exclusion, threshold, baseline or assertion is weakened. Existing native qualification applies only through verified unchanged runtime source; current main/source metadata must be rebound before publication.
+
 ## HUD, docked screens and initial modular equipment candidate
 
 Candidate `e470017` passed whole-source review and corrections, then macOS, Linux and native Windows each passed 358 top-level Rust tests (229 core plus 129 desktop), 74 Python tests, 37 Markdown files, formatting, workspace checks, strict Clippy and a locked release build. The five required hosted PR checks passed. These results qualify the composed candidate, superseding the earlier unrun standalone modular-tool and paid-missile packets; they do not qualify subsequent equipment or mining branches.

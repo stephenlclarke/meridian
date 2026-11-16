@@ -38,5 +38,11 @@ def build(reference):
     (ROOT/"SOURCE.json").write_text(json.dumps(manifest,indent=2)+"\n")
     print(json.dumps({"worlds":2048,"ships":162,"objects":171,"specifications":len(fields),"referenceFiles":len(sources)}))
 
-if __name__=="__main__":
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument("--reference",required=True,type=Path);build(parser.parse_args().reference)
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--reference", required=True, type=Path)
+    build(parser.parse_args(argv).reference)
+
+
+if __name__ == "__main__":
+    main()
