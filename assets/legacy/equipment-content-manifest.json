@@ -1,0 +1,450 @@
+{
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourceTree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "sources": {
+    "authoring": {
+      "path": "Sources/L337Core/Resources/OriginalWorlds/authoring.toml",
+      "sha256": "47d83caae5a9b22a4a932f19c55f79c5cb5435b962826a0969ece096b11f80eb",
+      "bytes": 6664
+    },
+    "worlds": {
+      "path": "Sources/L337Core/Resources/OriginalWorlds/catalogue.json",
+      "sha256": "120543eedc02a705cce0e37d026125bf926ec22651cff9337ca5d943f2ffd99d",
+      "bytes": 1660913
+    },
+    "ship": {
+      "path": "Sources/L337Core/Resources/Ships/SH025.toml",
+      "sha256": "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883",
+      "bytes": 690857
+    },
+    "r3": {
+      "path": "docs/fleet-design-v2/ships/SH025.toml",
+      "sha256": "a305641b7be704a2af0129e146d4ef1d72d165a1cbc7b935458c4c35aea14cc0",
+      "bytes": 3492
+    },
+    "game": {
+      "path": "Sources/L337Core/Game.swift",
+      "sha256": "e5b4e30c835d460aa7ca6f77364db0aaeaf877bb9d73bacc162e9111b26e2e17",
+      "bytes": 313817
+    },
+    "plugh": {
+      "path": "Sources/L337Core/Plugh.swift",
+      "sha256": "2c43ae0738fa93375eb51a4859e11bc33e7bf9e7496ff432f140e813baa6b8eb",
+      "bytes": 4508
+    },
+    "runtime": {
+      "path": "Sources/L337Core/EquipmentRuntimeCatalog.swift",
+      "sha256": "ccf1ee2a940175f0d1a26a65aaa7b62ca7cf61d0eb33906f8b8feb6664210e27",
+      "bytes": 8337
+    },
+    "purchases": {
+      "path": "Sources/L337Core/EquipmentTransactions.swift",
+      "sha256": "21a44066185ea17c8e3b262988c193cdef98bf88f80294d7a216767d93ad4f36",
+      "bytes": 15785
+    },
+    "progression": {
+      "path": "Sources/L337Core/EquipmentPurchaseProgression.swift",
+      "sha256": "770618fcbb38330f568dbb862fc471762552cc17b55edfd407a1eb7462b0460c",
+      "bytes": 24305
+    },
+    "commander": {
+      "path": "Sources/L337Core/CommanderEquipment.swift",
+      "sha256": "d5c9334210269abec7c3c4f2d16258a837b9dceb00dcec7184ffd92ae0ecec0c",
+      "bytes": 10011
+    },
+    "mutations": {
+      "path": "Sources/L337Core/EquipmentMutations.swift",
+      "sha256": "a1d0bece73e7d6370f4cab8fc952d2e25a3d20dfceb89ce8fab189c4b65941d5",
+      "bytes": 16275
+    },
+    "inventory": {
+      "path": "Sources/L337Core/OwnedEquipmentInventory.swift",
+      "sha256": "83009fdd488c170fff421cff398858acc77836d6668308ae69a743e8a1a7544f",
+      "bytes": 23031
+    },
+    "interaction": {
+      "path": "Sources/L337Core/InventoryInteraction.swift",
+      "sha256": "7d6e3e89b256577c4516365863071159f96fafc70588bbd9c307ca9e4d72a6cc",
+      "bytes": 18050
+    },
+    "performance": {
+      "path": "Sources/L337Core/ShipPerformance.swift",
+      "sha256": "b4647854a09f33a3c75f4e9218fdcade5f45eaa55c8b1014714fbfd183bd3d58",
+      "bytes": 4701
+    },
+    "fleet": {
+      "path": "Sources/L337Core/OriginalFleetR3Data.swift",
+      "sha256": "ceba81e0702526ed3ff0e6e7f28868bae4ab508ae9ac6bfa9f18d63d78d7946a",
+      "bytes": 285755
+    },
+    "fitting": {
+      "path": "Sources/L337Core/OriginalFleetR3Fitting.swift",
+      "sha256": "5a50e94cb510d7ce51da194cc3570159a28f1b7bd126e140a948192412d913ee",
+      "bytes": 4922
+    },
+    "stations": {
+      "path": "Sources/L337Core/NativeStationServices.swift",
+      "sha256": "e74815c9dca25f05da4a8d9f5664c3492760b365c8f8b51cb6408a77acbe3559",
+      "bytes": 10858
+    },
+    "projection": {
+      "path": "Sources/L337Core/ScriptEquipmentProjection.swift",
+      "sha256": "a1c3ffad9881c7d02f5a6cd31e6a51015b5c7735f43781f54850197e9313dac1",
+      "bytes": 6058
+    },
+    "foundation": {
+      "path": "Sources/L337Core/EquipmentIssueTransactions.swift",
+      "sha256": "42653749b42fdb20af4577d41edc8527aff8c3990ac62ea331c44374850e88fa",
+      "bytes": 26368
+    },
+    "accommodation": {
+      "path": "Sources/L337Core/ShipAccommodation.swift",
+      "sha256": "3866b7df7464409a1e12128605dc768c190190c0a821ee5f57f7c3694aaf3166",
+      "bytes": 11515
+    },
+    "passengers": {
+      "path": "Sources/L337Core/PassengerCustody.swift",
+      "sha256": "9bb1f6239ce2b77c2bd6c7ce11f75a18d639c86ed5e74ad112be659cf6f88db1",
+      "bytes": 15804
+    },
+    "drive": {
+      "path": "Sources/L337Core/HyperspaceDriveDefinition.swift",
+      "sha256": "931e8c50576e69dbaa41819b25e5a61c9ccdecefae9a581cb432ba76a89a91d3",
+      "bytes": 2713
+    },
+    "shield": {
+      "path": "Sources/L337Core/ShieldBooster.swift",
+      "sha256": "a7a91bc9d94a4f8e805192752a0ee69e2e9f5fb4117b48941dc68ad4bc2ec528",
+      "bytes": 4071
+    }
+  },
+  "definition": {
+    "id": "cargo-bay",
+    "name": "Large Cargo Bay",
+    "family": "utility-cargoExpansion",
+    "slot": "utility.cargoExpansion",
+    "hull": "SH025",
+    "priceTenthsCR": 28000,
+    "requiredTechnologyLevel": 4,
+    "baseHoldTonnes": 92,
+    "extraHoldTonnes": 35,
+    "utilityMounts": 3,
+    "equipmentBudgetUnits": 24,
+    "itemUtilityMountCost": 1,
+    "itemEquipmentUnitCost": 1
+  },
+  "sites": [
+    {
+      "galaxy": 0,
+      "system": 7,
+      "name": "Avenor",
+      "technology": 12
+    },
+    {
+      "galaxy": 0,
+      "system": 185,
+      "name": "Renas",
+      "technology": 13
+    }
+  ],
+  "sourceWitnesses": {
+    "game": [
+      {
+        "line": 2541,
+        "text": "public var requiredTechnologyLevel: Int { technology + 1 }"
+      },
+      {
+        "line": 2522,
+        "text": "guard (checkedCargoTonnes.map { $0 <= capacity } ?? false) else { return false }"
+      }
+    ],
+    "runtime": [
+      {
+        "line": 12,
+        "text": "(\"Large Cargo Bay\", .cargoExpansion)"
+      },
+      {
+        "line": 18,
+        "text": ".init(\"utility-\" + utility.rawValue)"
+      },
+      {
+        "line": 96,
+        "text": "case .utility(let utility): slot = \"utility.\" + utility.rawValue"
+      },
+      {
+        "line": 137,
+        "text": "if utility == .cargoExpansion && performance.cargoExpansion == 0 { return nil }"
+      },
+      {
+        "line": 167,
+        "text": "limits[node.id.family] = 1"
+      }
+    ],
+    "purchases": [
+      {
+        "line": 176,
+        "text": "boundHull: quote.location?.slot == .utility(.cargoExpansion) ? inventory.activeHull : nil"
+      },
+      {
+        "line": 292,
+        "text": "history.paid.contains(where: { $0.node == node })"
+      },
+      {
+        "line": 293,
+        "text": "inventory.items.contains(where: { $0.node == node })"
+      },
+      {
+        "line": 182,
+        "text": "items.append(item.moved(to: quote.location))"
+      },
+      {
+        "line": 188,
+        "text": "if !candidate.unlimitedCash { candidate.credits -= application.requiredDebit }"
+      }
+    ],
+    "progression": [
+      {
+        "line": 360,
+        "text": "guard snapshot.funds >= offer.price else {"
+      },
+      {
+        "line": 293,
+        "text": "throw EquipmentPurchaseError.replayedTransaction"
+      },
+      {
+        "line": 506,
+        "text": "policy: index == 0 && standard ? .standardFoundation : .shop,"
+      },
+      {
+        "line": 516,
+        "text": "(\"Navigation: Basic\", \"Basic Navigation Computer\"),"
+      },
+      {
+        "line": 523,
+        "text": "(\"Basic Energy System\", \"Basic Energy System\"),"
+      },
+      {
+        "line": 531,
+        "text": "(\"Basic Shield\", \"Basic Shield\"),"
+      }
+    ],
+    "commander": [
+      {
+        "line": 77,
+        "text": "try OriginalFleetR3Fitting.validateUtilities("
+      },
+      {
+        "line": 156,
+        "text": "standard: laser == .pulse && mount == .front)"
+      },
+      {
+        "line": 177,
+        "text": "for pylon in 0..<missiles { try append(\"Missile\", at: .missilePylon(pylon)) }"
+      }
+    ],
+    "mutations": [
+      {
+        "line": 170,
+        "text": "guard candidate.isValid() else { throw EquipmentRuntimeError.incompatibleFit }"
+      },
+      {
+        "line": 232,
+        "text": "try inventory.store(expected: item, expectedRevision: expectedRevision, context: context)"
+      },
+      {
+        "line": 355,
+        "text": "guard docked, ownedEquipmentEventCapacityAvailable else {"
+      }
+    ],
+    "inventory": [
+      {
+        "line": 50,
+        "text": "boundHull: boundHull, preferredSlot: preferredSlot, retainedLegacyState: retainedLegacyState,"
+      },
+      {
+        "line": 422,
+        "text": "guard item.boundHull.map({ $0 == activeHull }) ?? true,"
+      },
+      {
+        "line": 350,
+        "text": "items[index] = item.moved(to: nil)"
+      },
+      {
+        "line": 470,
+        "text": "guard let index = items.firstIndex(where: { $0.id == expected.id }), items[index] == expected"
+      }
+    ],
+    "interaction": [
+      {
+        "line": 329,
+        "text": "![ComponentFittingSlot.shield, .energy, .navigation, .drive].contains {"
+      }
+    ],
+    "performance": [
+      {
+        "line": 69,
+        "text": "performance.cargo + (equipment.contains(\"Large Cargo Bay\") ? performance.cargoExpansion : 0)"
+      }
+    ],
+    "fitting": [
+      {
+        "line": 79,
+        "text": "case .utility, .fuelStorage: return true"
+      },
+      {
+        "line": 86,
+        "text": "guard ordinaryMountCount <= fitting.utilityMounts else {"
+      },
+      {
+        "line": 55,
+        "text": "default: return fitting.equipmentUnits"
+      }
+    ],
+    "stations": [
+      {
+        "line": 177,
+        "text": "docked && dockedAtMainStation && commander.nativeStationStateValid"
+      },
+      {
+        "line": 178,
+        "text": "&& commander.nativeStations?.ledger.currentDock == nil"
+      },
+      {
+        "line": 180,
+        "text": "var stationAllowsEquipmentServices: Bool { stationAllowsMarketServices }"
+      }
+    ],
+    "plugh": [
+      {
+        "line": 69,
+        "text": "item.requiredTechnologyLevel <= currentSystem.technology"
+      },
+      {
+        "line": 78,
+        "text": "return atPlugh ? Plugh.discount(price) : item.price"
+      }
+    ],
+    "projection": [
+      {
+        "line": 5,
+        "text": "if node.family == EquipmentRuntimeCatalog.laserFamily"
+      },
+      {
+        "line": 6,
+        "text": "|| node.family == EquipmentRuntimeCatalog.ammunitionFamily"
+      },
+      {
+        "line": 19,
+        "text": "EquipmentIssueTransactions.isIntrinsicFoundation(item) || isLegacyDockingItem(item)"
+      },
+      {
+        "line": 15,
+        "text": "return ShieldBooster.from(node.key) == nil ? 1 : 2"
+      }
+    ],
+    "foundation": [
+      {
+        "line": 258,
+        "text": "guard item.provenance == .standard,"
+      },
+      {
+        "line": 260,
+        "text": "$0.id == item.node && $0.policy == .standardFoundation"
+      },
+      {
+        "line": 264,
+        "text": "case (EquipmentPurchaseCatalog.shields, .shield),"
+      },
+      {
+        "line": 265,
+        "text": "(EquipmentPurchaseCatalog.energy, .energy),"
+      },
+      {
+        "line": 266,
+        "text": "(EquipmentPurchaseCatalog.navigation, .navigation),"
+      },
+      {
+        "line": 267,
+        "text": "(HyperspaceDriveDefinition.purchaseFamily, .drive):"
+      }
+    ],
+    "accommodation": [
+      {
+        "line": 202,
+        "text": "profile.equipmentUnits - otherFittedEquipmentUnits - cabins.count"
+      }
+    ],
+    "passengers": [
+      {
+        "line": 226,
+        "text": "return allowsXYZzyMaximumOutfit || passengerFit?.allowed == true"
+      }
+    ],
+    "drive": [
+      {
+        "line": 14,
+        "text": "case .basic: \"Basic Hyperspace Drive\""
+      },
+      {
+        "line": 76,
+        "text": "policy: tier == .basic ? .standardFoundation : .shop,"
+      }
+    ],
+    "shield": [
+      {
+        "line": 18,
+        "text": "public var equipmentName: String { label + \" Shield Booster\" }"
+      },
+      {
+        "line": 36,
+        "text": "static func from(_ name: String) -> Self? { allCases.first { $0.equipmentName == name } }"
+      }
+    ]
+  },
+  "output": "assets/legacy/sh025-cargo-bay.equipment",
+  "outputBytes": 107,
+  "outputSHA256": "2e99546d65fec686e65275599c0ac529a17551655678fd65e4b794e74104b83d",
+  "format": "MEQP0001 + LEu32 priceTenthsCR, u8 requiredTL, LEu16 base/extraHoldTonnes, u8 utilityMounts, LEu16 equipmentBudgetUnits, u8 itemUtilityMountCost/itemEquipmentUnitCost; five u8-length-prefixed UTF8 id/name/family/slot/hull; u8 siteCount then LEu16 system/u8 technology at galaxy0; no trailing bytes",
+  "starterAdmission": {
+    "source": "Current edaa starter fit matched to original source standard/provenance/slot rules",
+    "items": [
+      "Basic Shield",
+      "Navigation: Basic",
+      "Basic Energy System",
+      "Basic Hyperspace Drive",
+      "Front Pulse Laser",
+      "Missile pylon0",
+      "Missile pylon1",
+      "Missile pylon2"
+    ],
+    "before": {
+      "equipmentUnits": 0,
+      "utilityMounts": 0
+    },
+    "withPaidFittedCargoBay": {
+      "equipmentUnits": 1,
+      "utilityMounts": 1
+    },
+    "limits": {
+      "equipmentUnits": 24,
+      "utilityMounts": 3
+    },
+    "authority": "Reference calculation only; owner must inspect actual retained starter items and paid bay, not trust this projection"
+  },
+  "semantics": {
+    "purchase": "Actual ordinary main-station service and minimum TL4, authoritative28000 debit, unique paid item auto-fitted to active hull; refuse duplicate even when stored",
+    "fit": "Exact actual paid hull-bound item at utility.cargoExpansion; storage retains item/provenance/boundHull; no repeated payment, refund or new device",
+    "capacity": "92t without fitted bay;127t with fitted bay; unfit refuses if actual occupied hold exceeds92t, including identified mission property",
+    "station": "Source purchase requires actual main station; source fit/store requires docked; this joined slice supports the two original main orbitals only",
+    "nonAuthority": "No role-kit grant, geometry change, crew, people consent, hull acquisition, free stock, migration or playable acceptance"
+  },
+  "origin": {
+    "equipmentBudgetsAudit": "assets/legacy/original-economy-origin.json",
+    "equipmentBudgetsAuditSHA256": "a3a829192e7147ce5840924b1d0d8dbee419d8411f41057937ac26bdd1e557a8",
+    "hull": "Pinned original project SH025 R3 and active runtime TOML agree on capacities; no geometry/material/font/bitmap copied or changed",
+    "preservedR3DecisionStatus": "new-authored-design; implementation-and-playtesting-pending",
+    "scope": "Original project-authored data and source-derived mechanics; historical generic labels retained; no third-party Elite/Oolite assets"
+  },
+  "notice": "assets/legacy/Elite-L337-MIT.txt",
+  "scope": "One immutable equipment content component; no runtime/save/desktop implementation or acceptance"
+}

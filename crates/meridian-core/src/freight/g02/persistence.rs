@@ -13,6 +13,8 @@ pub(crate) struct SavedDomainSummary {
     pub(crate) legal: u8,
     pub(crate) launches: u64,
     pub(crate) completed: u8,
+    pub(crate) equipment_revision: u64,
+    pub(crate) equipment_paid: u32,
 }
 fn write_actor(w: &mut Writer, a: ActorId) {
     w.u64(a.entity);
@@ -151,6 +153,7 @@ impl CommanderAccount {
             w.u64(quantity);
         }
         w.u8(d.legal);
+        d.equipment.encode(w);
     }
     pub(crate) fn decode_save(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         Ok(Self {
@@ -174,6 +177,7 @@ impl CommanderAccount {
                 other_commodities: r.array(|r| r.u64())?,
                 reserved_commodities: r.array(|r| r.u64())?,
                 legal: r.u8()?,
+                equipment: crate::equipment::State::decode(r)?,
             },
         })
     }
@@ -218,6 +222,8 @@ impl CommanderAccount {
             legal: self.data.legal,
             launches: nav.launches,
             completed: state.snapshot().completed_jobs,
+            equipment_revision: self.data.equipment.revision(),
+            equipment_paid: self.data.equipment.paid(),
         })
     }
 }

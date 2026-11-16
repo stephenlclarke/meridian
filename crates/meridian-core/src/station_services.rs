@@ -10,7 +10,7 @@ mod persistence;
 pub(crate) use persistence::SavedServiceSummary;
 
 const SEEDS: &[u8] = include_bytes!("../../../assets/legacy/g01-food.markets");
-const STOCK_HOLD_TONNES: u16 = 92;
+
 const STOCK_FUEL_TENTHS: u16 = 130;
 const FUEL_PRICE_TENTHS: u32 = 2;
 // Swift's supported 64-bit Int.max/17 quantity bound, not the immutable initial stock.
@@ -83,6 +83,7 @@ pub(crate) struct AccountProjection {
     pub(crate) food_tonnes: u16,
     pub(crate) reserved_food_tonnes: u16,
     pub(crate) used_tonnes: u16,
+    pub(crate) hold_capacity_tonnes: u16,
     pub(crate) other_commodities: [u64; 16],
     pub(crate) reserved_commodities: [u64; 16],
 }
@@ -240,7 +241,7 @@ impl StationMarkets {
                 if quote.stock == 0 {
                     return Err(Error::OutOfStock);
                 }
-                if account.used_tonnes >= STOCK_HOLD_TONNES {
+                if account.used_tonnes >= account.hold_capacity_tonnes {
                     return Err(Error::HoldFull);
                 }
                 next_account.credits_tenths = account
@@ -308,7 +309,7 @@ impl StationMarkets {
     }
 }
 
-fn validate_service(
+pub(crate) fn validate_service(
     owner: u64,
     account: AccountProjection,
     facts: Option<ServiceFacts>,
@@ -427,7 +428,12 @@ fn validate_account(account: AccountProjection) -> Result<(), Error> {
         || account.fuel_tenths > STOCK_FUEL_TENTHS
         || account.reserved_food_tonnes > account.food_tonnes
         || account.food_tonnes > account.used_tonnes
-        || account.used_tonnes > STOCK_HOLD_TONNES
+        || account.used_tonnes > account.hold_capacity_tonnes
+        || ![
+            crate::equipment::STANDARD_HOLD_TONNES,
+            crate::equipment::EXPANDED_HOLD_TONNES,
+        ]
+        .contains(&account.hold_capacity_tonnes)
         || !valid_native_quantities(account.other_commodities, account.reserved_commodities)
         || commodities::other_tonnes(account.other_commodities) + u128::from(account.food_tonnes)
             > u128::from(account.used_tonnes)
@@ -488,6 +494,7 @@ mod tests {
             food_tonnes: 0,
             reserved_food_tonnes: 0,
             used_tonnes: 8,
+            hold_capacity_tonnes: 92,
             other_commodities: [0; 16],
             reserved_commodities: [0; 16],
         }

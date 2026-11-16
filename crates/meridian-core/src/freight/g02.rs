@@ -23,7 +23,6 @@ pub const RENAS: System = System {
 };
 pub const ROUTE_DISTANCE_LY: f64 = 3.364975176728651;
 pub const DEPARTURE_FUEL_TENTHS: u16 = 34;
-const HOLD_TONNES: u16 = 92; // Current supported first-playable SH025, not all possible G02 ships.
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct System {
@@ -206,6 +205,7 @@ struct AccountData {
     other_commodities: [u64; 16],
     reserved_commodities: [u64; 16],
     legal: u8,
+    equipment: crate::equipment::State,
 }
 
 /// One World-owned account, not a second mission wallet or an authority actor.
@@ -218,6 +218,7 @@ impl CommanderAccount {
     /// Called once by the real fresh-profile/owned-starter creation path, never on load/restock.
     pub(crate) fn born_sh025(ids: FreshCommanderIds) -> Result<Self, Error> {
         validate_birth_ids(ids)?;
+        crate::equipment::definition().map_err(|_| Error::InvalidFit)?;
         let items = core::array::from_fn(|index| OwnedStarterItem {
             id: ids.items[index],
             owner: ids.owner,
@@ -238,6 +239,7 @@ impl CommanderAccount {
                 other_commodities: [0; 16],
                 reserved_commodities: [0; 16],
                 legal: 0,
+                equipment: crate::equipment::State::default(),
                 fit: Some(StarterFit {
                     owner: ids.owner,
                     hull: ids.hull,
@@ -263,10 +265,51 @@ impl CommanderAccount {
         let weight = self.data.other_commodities[2]
             + 2 * self.data.other_commodities[5]
             + self.data.other_commodities[9];
-        // Valid actual SH025 accounts bound all these tonne goods by the 92t hold.
+        // Valid actual SH025 accounts bound all these tonne goods by the current 92t/127t hold (maximum export weight254).
         self.data.legal |= weight as u8;
     }
 
+    pub(crate) fn equipment_state(&self) -> crate::equipment::State {
+        self.data.equipment
+    }
+    pub(crate) fn hold_capacity(&self) -> u16 {
+        self.data.equipment.capacity()
+    }
+    pub(crate) fn execute_equipment(
+        &mut self,
+        freight: &State,
+        facts: services::ServiceFacts,
+        command: crate::equipment::Command,
+    ) -> Result<crate::equipment::Event, crate::equipment::Error> {
+        use crate::equipment::Error as EquipmentError;
+        let projection = self
+            .service_projection(freight)
+            .map_err(EquipmentError::Service)?;
+        services::validate_service(self.data.owner, projection, Some(facts))
+            .map_err(EquipmentError::Service)?;
+        let (equipment, event) = self.data.equipment.prepare(
+            self.data.owner,
+            self.data.hull,
+            self.data.revision,
+            projection.used_tonnes,
+            facts.site,
+            command,
+        )?;
+        let mut candidate = Self { data: self.data };
+        candidate
+            .debit(event.paid_tenths())
+            .map_err(|error| match error {
+                Error::InsufficientFunds => EquipmentError::InsufficientFunds,
+                Error::SequenceExhausted => EquipmentError::SequenceExhausted,
+                _ => EquipmentError::InvalidState,
+            })?;
+        candidate.data.equipment = equipment;
+        candidate
+            .service_projection(freight)
+            .map_err(EquipmentError::Service)?;
+        self.data = candidate.data;
+        Ok(event)
+    }
     pub(crate) fn fuel_tenths(&self) -> u16 {
         self.data.fuel_tenths
     }
@@ -300,6 +343,7 @@ impl CommanderAccount {
             revision: self.data.revision,
             credits_tenths: self.data.credits,
             fuel_tenths: self.data.fuel_tenths,
+            hold_capacity_tonnes: self.hold_capacity(),
             food_tonnes: self.data.food_tonnes,
             reserved_food_tonnes: self.data.reserved_food_tonnes,
             other_commodities: self.data.other_commodities,
@@ -975,12 +1019,34 @@ fn validate_account(data: &Data, account: &AccountData) -> Result<(), Error> {
     if fit.items[3].fitted_hull != Some(account.hull) {
         return Err(Error::MissingEquipment);
     }
+    validate_cargo_and_utility(data, account, &fit)
+}
+
+fn validate_cargo_and_utility(
+    data: &Data,
+    account: &AccountData,
+    fit: &StarterFit,
+) -> Result<(), Error> {
+    // The supported eight starter items remain fitted. Their actual intrinsic/weapon
+    // basis costs zero units/mounts; no descriptor can grant that exemption to a held item.
+    if account.equipment.owned().is_some()
+        && fit
+            .items
+            .iter()
+            .any(|item| item.fitted_hull != Some(account.hull))
+    {
+        return Err(Error::InvalidFit);
+    }
+    account
+        .equipment
+        .validate(account.owner, account.hull, account.revision)
+        .map_err(|_| Error::InvalidFit)?;
     if account.fuel_tenths > 130 {
         return Err(Error::InvalidFit);
     }
     if !services::valid_native_quantities(account.other_commodities, account.reserved_commodities)
         || account.reserved_food_tonnes > account.food_tonnes
-        || occupied_tonnes(data, account) > u128::from(HOLD_TONNES)
+        || occupied_tonnes(data, account) > u128::from(account.equipment.capacity())
     {
         return Err(Error::InvalidFit);
     }
@@ -1057,7 +1123,7 @@ fn require_acceptance(data: &Data, account: &AccountData) -> Result<(), Error> {
     if data.allocated >= 2 {
         return Err(Error::SourceExhausted);
     }
-    if occupied_tonnes(data, account) + 8 > u128::from(HOLD_TONNES) {
+    if occupied_tonnes(data, account) + 8 > u128::from(account.equipment.capacity()) {
         return Err(Error::HoldFull);
     }
     if account.fuel_tenths < DEPARTURE_FUEL_TENTHS {

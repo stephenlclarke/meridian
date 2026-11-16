@@ -1,3 +1,4 @@
+mod equipment;
 mod mission;
 mod persistence;
 mod services;

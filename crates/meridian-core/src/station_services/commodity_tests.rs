@@ -10,6 +10,7 @@ fn account() -> AccountProjection {
         food_tonnes: 0,
         reserved_food_tonnes: 0,
         used_tonnes: 0,
+        hold_capacity_tonnes: 92,
         other_commodities: [0; 16],
         reserved_commodities: [0; 16],
     }
@@ -112,7 +113,7 @@ fn original_seventeen_quotes_and_each_native_purchase_sale_reconcile() {
             );
             assert_eq!(sold.account_after.used_tonnes, 0);
             assert_eq!(sold.market.commodity_quote(site, id), quote);
-            let summary = sold.market.validate_save(101).unwrap();
+            let summary = sold.market.validate_save(101, 92, 92).unwrap();
             assert_eq!(summary.other_commodities, [0; 16]);
             assert_eq!(summary.food, 0);
             assert_eq!(summary.paid, u64::from(quote.ask_tenths));
