@@ -412,6 +412,16 @@ impl Session {
         }
     }
 
+    fn panel_controls(&self) -> &'static str {
+        if self.equipment_open {
+            "K BUY AND FIT | U STORE OWNED BAY | Y REFIT OWNED BAY | O CLOSE"
+        } else if self.market_open {
+            "[ PREVIOUS | ] NEXT | G BUY 1 UNIT | H SELL 1 UNIT | M CLOSE MARKET | F REFUEL"
+        } else {
+            "L LAUNCH | J JUMP | T CONTACT | R REVIEW | V RECEIVE ALL | X ABANDON | ENTER CONFIRM | B BACK"
+        }
+    }
+
     pub fn lines(&self, world: &World, active: bool, notice: Option<&str>) -> Vec<String> {
         let snapshot = world.snapshot();
         let name = snapshot
@@ -449,13 +459,7 @@ impl Session {
             && !self.market_open;
         if !compact_flight {
             lines.push(review_line);
-            lines.push(if self.equipment_open {
-            "K BUY AND FIT | U STORE OWNED BAY | Y REFIT OWNED BAY | O CLOSE".into()
-        } else if self.market_open {
-            "[ PREVIOUS | ] NEXT | G BUY 1 UNIT | H SELL 1 UNIT | M CLOSE MARKET | F REFUEL".into()
-        } else {
-            "L LAUNCH | J JUMP | T CONTACT | R REVIEW | V RECEIVE ALL | X ABANDON | ENTER CONFIRM | B BACK".into()
-            });
+            lines.push(self.panel_controls().into());
         }
         if let Some(selection) = self.pending_practice {
             let terms = practice_terms(selection);
