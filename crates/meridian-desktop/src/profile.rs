@@ -74,6 +74,40 @@ impl Profile {
         if !self.playing {
             return Err("N starts a new commander; C continues the existing save".into());
         }
+        if let Some(command) = self.session.station_service_command(action) {
+            let tick = self.world.snapshot().tick;
+            let prepared = self
+                .world
+                .prepare_station_service(command, tick)
+                .map_err(|e| e.to_string())?;
+            let message = crate::market::service_message(prepared.event())?;
+            let published = self
+                .store
+                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .map_err(|e| format!("Market transaction could not be saved: {e}"))?;
+            prepared.commit();
+            self.has_save = true;
+            return publication_message(published, message);
+        }
+        if matches!(action, Action::Confirm)
+            && let Some(review) = self.session.pending_trade.take()
+        {
+            let tick = self.world.snapshot().tick;
+            let prepared = self
+                .world
+                .prepare_navigation_trade(review, tick)
+                .map_err(|e| e.to_string())?;
+            let published = self
+                .store
+                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .map_err(|e| format!("Trade lesson confirmation could not be saved: {e}"))?;
+            prepared.commit();
+            self.has_save = true;
+            return publication_message(
+                published,
+                "Trade lesson confirmed and saved. 7 shows its state.".into(),
+            );
+        }
         if matches!(action, Action::Confirm)
             && let Some(review) = self.session.pending_flight.take()
         {
@@ -885,3 +919,17 @@ mod tests {
 
 #[cfg(test)]
 mod flight_lesson_tests;
+
+fn publication_message(published: SaveCommit, message: String) -> Result<String, String> {
+    match published {
+        SaveCommit::Published {
+            directory_sync_error: Some(error),
+        } => Err(format!(
+            "Transaction was written, but directory synchronization failed: {error}"
+        )),
+        _ => Ok(message),
+    }
+}
+
+#[cfg(test)]
+mod trade_lesson_tests;

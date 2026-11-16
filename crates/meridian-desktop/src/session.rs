@@ -4,13 +4,17 @@ use meridian_core::freight::g02::{Choice, Command, ContactDefinition, Event, Job
 use meridian_core::navigation::SystemId;
 use meridian_core::station_services::{self, CommodityId};
 use meridian_core::{
-    FlightMode, FlightReceptionAction, FlightReceptionReview, FlightView, PRACTICE_QUIET_TICKS,
-    PracticeClosureReview, PracticeOutcome, PracticeReceptionReview, PracticeReview,
-    PracticeStatus, World,
+    FlightMode, FlightReceptionAction, FlightReceptionReview, FlightView, NavigationTradeAction,
+    NavigationTradeReview, PRACTICE_QUIET_TICKS, PracticeClosureReview, PracticeOutcome,
+    PracticeReceptionReview, PracticeReview, PracticeStatus, World,
 };
 
 #[derive(Clone, Copy)]
 pub enum Action {
+    ReviewTradeLesson,
+    PlanTradeLesson,
+    CancelTradeLesson,
+    TradeLessonDetails,
     ReviewFlightLesson,
     CancelFlightLesson,
     FlightLessonDetails,
@@ -53,6 +57,8 @@ pub(crate) enum PracticeSelection {
 pub struct Session {
     job: Option<JobId>,
     pending: Option<(Review, Choice)>,
+    pub(crate) pending_trade: Option<NavigationTradeReview>,
+    show_trade_lesson: bool,
     pub(crate) pending_flight: Option<FlightReceptionReview>,
     show_flight_lesson: bool,
     pub(crate) pending_practice: Option<PracticeSelection>,
@@ -67,6 +73,8 @@ impl Default for Session {
         Self {
             job: None,
             pending: None,
+            pending_trade: None,
+            show_trade_lesson: false,
             pending_flight: None,
             show_flight_lesson: false,
             pending_practice: None,
@@ -88,6 +96,8 @@ impl Session {
     }
 
     pub fn invalidate(&mut self) {
+        self.pending_trade = None;
+        self.show_trade_lesson = false;
         self.pending_flight = None;
         self.show_flight_lesson = false;
         self.pending = None;
@@ -211,7 +221,65 @@ impl Session {
         }
     }
 
+    fn review_trade_lesson(&mut self, world: &World, action: Action) -> Result<String, String> {
+        self.invalidate();
+        let kind = match action {
+            Action::CancelTradeLesson => NavigationTradeAction::Cancel,
+            Action::PlanTradeLesson => {
+                let current = world
+                    .snapshot()
+                    .navigation
+                    .ok_or("No current navigation")?
+                    .system;
+                let destination = if current == SystemId::AVENOR {
+                    SystemId::RENAS
+                } else {
+                    SystemId::AVENOR
+                };
+                NavigationTradeAction::Plan {
+                    destination,
+                    commodity: self.selected_commodity,
+                }
+            }
+            _ if world
+                .navigation_trade_snapshot()
+                .is_some_and(|s| s.active.is_some()) =>
+            {
+                NavigationTradeAction::Receive
+            }
+            _ => NavigationTradeAction::Accept,
+        };
+        self.pending_trade = Some(
+            world
+                .review_navigation_trade(kind, world.snapshot().tick)
+                .map_err(|e| e.to_string())?,
+        );
+        Ok("Trade lesson review. Enter confirms and saves; B cancels. 5 reviews the selected commodity plan.".into())
+    }
+
+    // Profile publishes these ordinary transactions before committing World. Session-only
+    // callers retain the existing in-memory compatibility path below.
+    pub(crate) fn station_service_command(
+        &mut self,
+        action: Action,
+    ) -> Option<station_services::Command> {
+        let command = match action {
+            Action::BuySelected => station_services::Command::BuyCommodity(self.selected_commodity),
+            Action::SellSelected => {
+                station_services::Command::SellCommodity(self.selected_commodity)
+            }
+            Action::Refuel => station_services::Command::RefillFuel,
+            _ => return None,
+        };
+        self.invalidate();
+        self.market_open = !matches!(action, Action::Refuel);
+        Some(command)
+    }
+
     pub fn command(&mut self, world: &mut World, action: Action) -> Result<String, String> {
+        if self.pending_trade.take().is_some() && matches!(action, Action::Back) {
+            return Ok("Trade lesson review cancelled.".into());
+        }
         if self.pending_flight.take().is_some() && matches!(action, Action::Back) {
             return Ok("Flight lesson review cancelled.".into());
         }
@@ -219,6 +287,14 @@ impl Session {
             return Ok("Practice review cancelled.".into());
         }
         match action {
+            Action::ReviewTradeLesson | Action::PlanTradeLesson | Action::CancelTradeLesson => {
+                self.review_trade_lesson(world, action)
+            }
+            Action::TradeLessonDetails => {
+                self.invalidate();
+                self.show_trade_lesson = true;
+                Ok("Trade lesson details. 4 consent/reception; 5 plan; 6 cancel.".into())
+            }
             Action::ReviewFlightLesson | Action::CancelFlightLesson => {
                 self.review_flight_lesson(world, action)
             }
@@ -443,6 +519,12 @@ impl Session {
     }
 
     fn review_line(&self) -> String {
+        if let Some(review) = self.pending_trade {
+            return format!(
+                "{} | ENTER CONFIRMS AND SAVES | B CANCELS",
+                crate::trade_lesson::review_title(review.action())
+            );
+        }
         if let Some(review) = self.pending_flight {
             return format!(
                 "{} | ENTER CONFIRMS AND SAVES | B CANCELS",
@@ -482,11 +564,11 @@ impl Session {
 
     fn panel_controls(&self) -> &'static str {
         if self.equipment_open {
-            "K BUY AND FIT | U STORE OWNED BAY | Y REFIT OWNED BAY | O CLOSE"
+            "K BUY AND FIT | U STORE OWNED BAY | Y REFIT OWNED BAY | O CLOSE | 7 TRADE LESSON"
         } else if self.market_open {
-            "[ PREVIOUS | ] NEXT | G BUY 1 UNIT | H SELL 1 UNIT | M CLOSE MARKET | F REFUEL"
+            "[ PREVIOUS | ] NEXT | G BUY 1 UNIT | H SELL 1 UNIT | M CLOSE MARKET | F REFUEL | 5 PLAN"
         } else {
-            "L LAUNCH | J JUMP | T CONTACT | R REVIEW | V RECEIVE ALL | X ABANDON | ENTER CONFIRM | B BACK"
+            "L LAUNCH | J JUMP | T CONTACT | R REVIEW | V RECEIVE ALL | X ABANDON | ENTER CONFIRM | 7 TRADE"
         }
     }
 
@@ -516,6 +598,15 @@ impl Session {
         )];
         let review_line = self.review_line();
         lines.push(notice.map_or_else(|| crate::flight_lesson::line(world), str::to_string));
+        if let Some(review) = self.pending_trade {
+            lines.push(review_line);
+            crate::trade_lesson::append_review(review, &mut lines);
+            return lines;
+        }
+        if self.show_trade_lesson {
+            crate::trade_lesson::append_details(world, &mut lines);
+            return lines;
+        }
         if self.append_flight_lesson_panel(world, &mut lines) {
             return lines;
         }
