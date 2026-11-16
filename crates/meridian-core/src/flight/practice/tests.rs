@@ -5,25 +5,25 @@ use crate::docking::Basis3;
 use crate::navigation::BASIC_SPOOL_TICKS;
 use crate::{FlightInput, PulseContact};
 
-fn consent(world: &mut World) {
+pub(super) fn consent(world: &mut World) {
     let tick = world.snapshot().tick;
     let review = world.review_practice(tick).unwrap();
     let prepared = world.prepare_practice_confirmation(review, tick).unwrap();
     prepared.commit();
 }
 
-fn step(world: &mut World, count: u8) {
+pub(super) fn step(world: &mut World, count: u8) {
     for _ in 0..count {
         world.step(FlightInput::default()).unwrap();
     }
 }
 
-fn launch(world: &mut World) {
+pub(super) fn launch(world: &mut World) {
     world.request_launch(world.snapshot().tick).unwrap();
     step(world, 1);
 }
 
-fn shoot(world: &mut World) -> crate::PulseShot {
+pub(super) fn shoot(world: &mut World) -> crate::PulseShot {
     world
         .request_fire_front_pulse(world.snapshot().tick)
         .unwrap()
@@ -86,13 +86,13 @@ fn actual_avenor_review_is_bound_to_profile_tick_epoch_and_publication() {
     assert_eq!(world.credits_tenths(), Some(7200));
 }
 
-fn aim_at(world: &mut World, target: Vec3) {
+pub(super) fn aim_at(world: &mut World, target: Vec3) {
     let snapshot = world.snapshot();
     assert_eq!(snapshot.speed, 0.0);
     let pose = flight_pose(snapshot.position, snapshot.orientation).unwrap();
     let aim = (target.x - pose.position.x).atan2(target.z - pose.position.z);
     let yaw = (aim - pose.orientation.z.x.atan2(pose.orientation.z.z)) as f32;
-    let ticks = (yaw.abs() / (0.65 / 60.0)).ceil() as u8;
+    let ticks = (yaw.abs() / (0.65 / 60.0)).ceil() as u16;
     for _ in 0..ticks {
         world
             .step(FlightInput {

@@ -1,6 +1,6 @@
 //! Actual title, profile and save lifecycle used by the window shell and headless process tests.
 use crate::{
-    session::{Action, Session},
+    session::{Action, PracticeSelection, Session},
     storage::{SaveCommit, Store},
 };
 use meridian_core::{World, save::MAX_SAVE_BYTES};
@@ -75,13 +75,20 @@ impl Profile {
             return Err("N starts a new commander; C continues the existing save".into());
         }
         if matches!(action, Action::Confirm)
-            && let Some(review) = self.session.pending_practice.take()
+            && let Some(selection) = self.session.pending_practice.take()
         {
             let tick = self.world.snapshot().tick;
-            let prepared = self
-                .world
-                .prepare_practice_confirmation(review, tick)
-                .map_err(|error| error.to_string())?;
+            let (prepared, success) = match selection {
+                PracticeSelection::Consent(review) => (
+                    self.world.prepare_practice_confirmation(review, tick),
+                    "Practice confirmed and saved. L launches.",
+                ),
+                PracticeSelection::Reception(review) => (
+                    self.world.prepare_practice_reception(review, tick),
+                    "Practice reception saved. Safe Gunnery Family Trace recorded.",
+                ),
+            };
+            let prepared = prepared.map_err(|error| error.to_string())?;
             let published = self
                 .store
                 .save(prepared.bytes(), MAX_SAVE_BYTES)
@@ -94,7 +101,7 @@ impl Profile {
                 } => Err(format!(
                     "Practice confirmation was written, but directory synchronization failed: {error}"
                 )),
-                _ => Ok("Practice confirmed and saved. L launches.".into()),
+                _ => Ok(success.into()),
             };
         }
         self.session.command(&mut self.world, action)
@@ -512,6 +519,32 @@ mod tests {
         );
         assert!(profile.command(Action::Confirm).is_err());
         assert!(profile.command(Action::ReviewPractice).is_ok());
+    }
+
+    #[test]
+    fn premature_reception_clears_consent_review_without_publishing() {
+        let directory = TestDirectory::new();
+        let mut profile = open(&directory.0);
+        assert!(
+            profile
+                .new_commander(9504)
+                .unwrap_or_else(|e| panic!("{e}"))
+        );
+        profile.save().unwrap_or_else(|e| panic!("{e}"));
+        let destination = directory.0.join("commander.meridian");
+        let before = fs::read(&destination).unwrap_or_else(|e| panic!("{e}"));
+
+        action(&mut profile, Action::ReviewPractice);
+        assert!(profile.command(Action::ReviewPracticeReception).is_err());
+        assert!(profile.command(Action::Confirm).is_err());
+        assert_eq!(
+            fs::read(destination).unwrap_or_else(|e| panic!("{e}")),
+            before
+        );
+        assert_eq!(
+            profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}")),
+            before
+        );
     }
 
     #[test]

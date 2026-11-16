@@ -214,6 +214,7 @@ impl App {
             KeyCode::KeyV => Action::ReviewAll,
             KeyCode::KeyX => Action::ReviewAbandonment,
             KeyCode::KeyI => Action::MissionDetails,
+            KeyCode::F8 => Action::ReviewPracticeReception,
             KeyCode::F10 => Action::ReviewPractice,
             KeyCode::Enter => Action::Confirm,
             KeyCode::KeyB => Action::Back,

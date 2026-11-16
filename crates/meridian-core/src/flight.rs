@@ -3,8 +3,9 @@ mod mission;
 mod persistence;
 mod practice;
 pub use practice::{
-    PRACTICE_HALF_SIDE, PracticeBeaconId, PracticeBeaconSnapshot, PracticeError, PracticeReview,
-    PracticeSnapshot, PracticeStatus, PreparedPracticeConfirmation,
+    PRACTICE_HALF_SIDE, PRACTICE_QUIET_TICKS, PracticeBeaconId, PracticeBeaconSnapshot,
+    PracticeError, PracticeReceptionReview, PracticeReceptionSnapshot, PracticeReview,
+    PracticeSnapshot, PracticeStatus, PracticeTrace, PreparedPracticeConfirmation,
 };
 mod services;
 mod weapons;
