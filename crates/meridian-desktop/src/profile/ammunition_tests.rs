@@ -53,12 +53,58 @@ fn paid_round_store_refit_and_cold_continue_retain_item_and_wallet() {
         Action::Ammunition(AmmunitionAction::Refit { item, pylon: 8 }),
     );
     let before = ok(profile.world.save_bytes());
-    assert_eq!(inventory(&profile).purchases.len(), 1);
+    let before_inventory = inventory(&profile);
+    let before_flight = profile.world.snapshot();
+    let before_equipment = profile.world.equipment_snapshot();
+    let before_services = profile.world.service_snapshot();
+    let before_combat = profile.world.combat_snapshot();
+    let before_pulse = profile.world.pulse_laser_snapshot();
+    let before_mission = profile.world.mission_snapshot();
+    let before_practice = profile.world.practice_snapshot();
+    let before_flight_lesson = profile.world.flight_reception_snapshot();
+    let before_trade_lesson = profile.world.navigation_trade_snapshot();
+    let before_celestial = profile.world.celestial_snapshot();
+    let before_rounds = profile.world.missile_rounds();
+    let before_projectiles = profile.world.missile_projectiles().collect::<Vec<_>>();
+    let old_review = ok(profile
+        .world
+        .review_ammunition(AmmunitionAction::Store { item }, before_flight.tick));
+    assert_eq!(before_inventory.purchases.len(), 1);
     ok(profile.prepare_quit());
     drop(profile);
     let mut continued = open(&directory.0);
     ok(continued.continue_saved());
-    assert_eq!(ok(continued.world.save_bytes()), before);
+    // Continue intentionally rotates UI review authority. It must preserve the saved file
+    // and every gameplay domain, while rejecting a pre-Continue fitting review.
+    assert_eq!(ok(fs::read(directory.0.join("commander.meridian"))), before);
+    assert_eq!(inventory(&continued), before_inventory);
+    assert_eq!(continued.world.snapshot(), before_flight);
+    assert_eq!(continued.world.equipment_snapshot(), before_equipment);
+    assert_eq!(continued.world.service_snapshot(), before_services);
+    assert_eq!(continued.world.combat_snapshot(), before_combat);
+    assert_eq!(continued.world.pulse_laser_snapshot(), before_pulse);
+    assert_eq!(continued.world.mission_snapshot(), before_mission);
+    assert_eq!(continued.world.practice_snapshot(), before_practice);
+    assert_eq!(
+        continued.world.flight_reception_snapshot(),
+        before_flight_lesson
+    );
+    assert_eq!(
+        continued.world.navigation_trade_snapshot(),
+        before_trade_lesson
+    );
+    assert_eq!(continued.world.celestial_snapshot(), before_celestial);
+    assert_eq!(continued.world.missile_rounds(), before_rounds);
+    assert_eq!(
+        continued.world.missile_projectiles().collect::<Vec<_>>(),
+        before_projectiles
+    );
+    assert!(matches!(
+        continued
+            .world
+            .prepare_ammunition(old_review, before_flight.tick),
+        Err(meridian_core::AmmunitionError::StaleReview)
+    ));
     assert_eq!(continued.world.credits_tenths(), Some(5400));
     assert_eq!(
         inventory(&continued)

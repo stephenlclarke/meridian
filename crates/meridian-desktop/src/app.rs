@@ -395,7 +395,10 @@ impl App {
                     practice: practice.as_ref().and_then(|state| state.beacons.as_ref()),
                     celestial: celestial_scene.as_ref(),
                 },
-                HudScene { lines: &hud_lines, cockpit: cockpit.as_ref() },
+                HudScene {
+                    lines: &hud_lines,
+                    cockpit: cockpit.as_ref(),
+                },
             ) {
                 self.fail(event_loop, error);
             }

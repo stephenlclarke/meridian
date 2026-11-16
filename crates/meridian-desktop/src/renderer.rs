@@ -284,8 +284,16 @@ impl Renderer {
         effects: SceneEffects<'_>,
         hud: HudScene<'_>,
     ) -> Result<(), String> {
-        let HudScene { lines: hud_lines, cockpit } = hud;
-        let SceneEffects { pulse, missiles, practice, celestial } = effects;
+        let HudScene {
+            lines: hud_lines,
+            cockpit,
+        } = hud;
+        let SceneEffects {
+            pulse,
+            missiles,
+            practice,
+            celestial,
+        } = effects;
         if self.device_lost.load(Ordering::Acquire) {
             return Err("Graphics device lost; exiting without changing any save".into());
         }
