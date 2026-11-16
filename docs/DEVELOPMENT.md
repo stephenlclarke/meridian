@@ -27,6 +27,8 @@ Bundle implementation, meaningful tests, criteria, exact delta and execution pre
 
 Protect main through pull requests, current required GitHub checks, linear history and resolved conversations, with administrator enforcement and no force pushes/deletion. Retain independent source review. Publish SonarQube only from committed main using the exact 40-character SHA as projectVersion/scm.revision, verify Previous version policy and wait for its quality gate. The main-only Sonar job is a postmerge gate.
 
+Preview publication runs asynchronously in the existing release session. G1 and Dell retain their packaging and compiler responsibilities; the release operator handles tags, uploads, download verification, receipts and retention. Root continues functionality and integration without waiting for network publication. Each release remains bound to its qualified immutable source; a later main commit does not change an in-flight release. See [preview release ownership](PREVIEW-RELEASES.md).
+
 ## Repository maintenance
 
 Update README, implementation status and affected guides in the same change as behavior or acceptance. Keep a single current status page; identify historical contracts as historical. Replace stale pending/UNRUN wording when exact evidence exists, while preserving unresolved limits and failures. Keep PR descriptions aligned with their final scope and validation.
