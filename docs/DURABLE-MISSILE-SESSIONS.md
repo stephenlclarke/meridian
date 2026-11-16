@@ -4,7 +4,7 @@
 
 Version 8 replaces the deliberate finite-missile save refusal with a checked representation of the complete bounded session. Reviewed candidate `58f45c8` passed full Mac/Linux/native Windows checks: 193 top-level Rust tests, 48 importers, strict Clippy and desktop builds on each platform. Actual signed Metal cold checkpoints cover arm/lock, paused live flight, first impact, all three consumed/ended projectiles, physical docking and relaunch with zero ammunition. Isolated old v4-v7 Continue and invalid-checksum live refusal also passed. Root audited retained files, source and terminal records. [Implementation status](IMPLEMENTATION-STATUS.md) records precise scope and remaining limits.
 
-The earlier installed v7 preview and real profiles remain untouched. Protected merge, exact-main CI/Sonar and a separate v8 preview delivery remain pending.
+The separate signed **Meridian Durable Missiles Preview** is installed from protected main `ab238c3`. Exact-main CI/Sonar, final committed-main rebuild/signature and installed Metal title/normal-close smoke passed. Use its adjacent launcher for the separate saves-v8 directory. The earlier v7 preview and real profiles remain untouched. See [implementation status](IMPLEMENTATION-STATUS.md) for exact delivered source and artifact identity.
 
 This is persistence work. It does not qualify full T02, a live player hit, original-game parity, new missile targets, ammunition purchases or reloads.
 

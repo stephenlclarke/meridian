@@ -55,4 +55,4 @@ The joined desktop binds F1 to cycle actual beacon locks, F2 to arm/safe, F3 to 
 
 ## Durable successor
 
-[Version 8 missile sessions](DURABLE-MISSILE-SESSIONS.md) passed scoped real cold continuation on the signed staged Metal candidate. The earlier installed v7 preview retains its boundary until a separate v8 preview is delivered. Current qualification and distribution limits are recorded in [implementation status](IMPLEMENTATION-STATUS.md).
+[Version 8 missile sessions](DURABLE-MISSILE-SESSIONS.md) passed scoped real cold continuation on the signed staged Metal candidate. The separate Durable Missiles Preview is now delivered from main `ab238c3`; the earlier v7 preview retains its own save boundary and profiles. Current qualification and distribution limits are recorded in [implementation status](IMPLEMENTATION-STATUS.md).
