@@ -23,18 +23,26 @@ fn cold(world: &World) -> World {
     loaded
 }
 fn close(world: &mut World) -> PracticeOutcome {
-    assert_eq!(
-        world.practice_ledger_snapshot().unwrap().attempts[0].outcome,
-        None
-    );
+    let before = world.practice_ledger_snapshot().unwrap();
+    let current = before.attempts.last().unwrap();
+    assert_eq!(before.active, Some(current.id));
+    assert_eq!(current.outcome, None);
     let review = world
         .review_practice_closure(world.snapshot().tick)
         .unwrap();
+    assert_eq!(review.attempt(), current.id);
     let outcome = review.outcome();
     world
         .prepare_practice_closure(review, world.snapshot().tick)
         .unwrap()
         .commit();
+    let after = world.practice_ledger_snapshot().unwrap();
+    assert_eq!(after.active, None);
+    assert_eq!(after.attempts.len(), before.attempts.len());
+    assert_eq!(after.attempts.last().unwrap().id, current.id);
+    assert_eq!(after.attempts.last().unwrap().outcome, Some(outcome));
+    let archived = before.attempts.len() - 1;
+    assert_eq!(&after.attempts[..archived], &before.attempts[..archived]);
     outcome
 }
 fn receive(world: &mut World) {
