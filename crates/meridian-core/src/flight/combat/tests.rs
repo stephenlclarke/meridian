@@ -576,3 +576,29 @@ fn resealed_last_station_window_cannot_be_refreshed_without_a_new_incident() {
     assert!(previous.attacker.visit < continued.snapshot().navigation.unwrap().visit);
     assert!(World::from_save_bytes(&continued.save_bytes().unwrap()).is_ok());
 }
+
+#[test]
+fn unsupported_damage_boundary_precedes_missile_graph_on_save_and_atomic_restore() {
+    let mut world = new_flight(2761);
+    let supported = world.save_bytes().unwrap();
+    // Negative fixture only: this private reducer has no retained ordnance origin.
+    world.combat.resolve_impact(
+        &mut world.pulse,
+        OrdinaryTarget::Player { front: true },
+        OrdinaryWeapon::StandardMissile,
+    );
+    let expected = SaveError::InvalidState("unsupported ordnance damage boundary");
+    let condition = world.combat_snapshot();
+    let ordnance = world.missile_snapshot();
+    let flight = world.snapshot();
+    assert_eq!(world.save_bytes(), Err(expected));
+    assert_eq!(world.combat_snapshot(), condition);
+    assert_eq!(world.missile_snapshot(), ordnance);
+    assert_eq!(world.snapshot(), flight);
+    let unsupported = world.unchecked_test_save().unwrap();
+    assert_eq!(World::from_save_bytes(&unsupported).err(), Some(expected));
+    let mut live = World::from_save_bytes(&supported).unwrap();
+    let before = live.save_bytes().unwrap();
+    assert_eq!(live.restore_bytes(&unsupported), Err(expected));
+    assert_eq!(live.save_bytes().unwrap(), before);
+}

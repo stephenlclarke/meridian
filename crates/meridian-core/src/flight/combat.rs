@@ -254,9 +254,7 @@ impl State {
             last: r.option(|r| OrdinaryImpact::decode_version(r, version))?,
         })
     }
-    pub(super) fn validate(self, world: &World) -> Result<(), SaveError> {
-        let invalid = SaveError::InvalidState("ordinary combat identity or resources");
-        let identity = world.combat_identity().ok_or(invalid)?;
+    pub(super) fn validate_damage_boundary(self, world: &World) -> Result<(), SaveError> {
         if self.unbound_player_impact
             || self.front > SHIELD_CAPACITY
             || self.rear > SHIELD_CAPACITY
@@ -267,6 +265,12 @@ impl State {
                 "unsupported ordnance damage boundary",
             ));
         }
+        Ok(())
+    }
+    pub(super) fn validate(self, world: &World) -> Result<(), SaveError> {
+        let invalid = SaveError::InvalidState("ordinary combat identity or resources");
+        let identity = world.combat_identity().ok_or(invalid)?;
+        self.validate_damage_boundary(world)?;
         let maximum_emissions = if world.state.tick == 0 {
             0
         } else {

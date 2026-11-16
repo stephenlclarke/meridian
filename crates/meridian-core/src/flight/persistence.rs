@@ -263,6 +263,9 @@ impl World {
             self.state.tick,
             account.fuel_tenths(),
         )?;
+        // Refuse unbound reducer damage with its established boundary before the
+        // missile graph checks the numeric shield result against retained origins.
+        self.combat.validate_damage_boundary(self)?;
         self.missiles.validate(self, practice, nav.dock_sequence)?;
         self.combat.validate(self)?;
         if let (Some(attempt), Some(last)) = (
