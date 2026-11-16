@@ -674,4 +674,4 @@ fn choose(best: &mut Option<(f64, MissileContact)>, distance: f64, contact: Miss
 }
 
 #[cfg(test)]
-mod tests;
+pub(super) mod tests;

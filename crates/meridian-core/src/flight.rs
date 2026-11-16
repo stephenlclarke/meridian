@@ -13,9 +13,11 @@ mod mission;
 mod persistence;
 mod practice;
 pub use practice::{
-    PRACTICE_HALF_SIDE, PRACTICE_QUIET_TICKS, PracticeBeaconId, PracticeBeaconSnapshot,
-    PracticeError, PracticeReceptionReview, PracticeReceptionSnapshot, PracticeReview,
-    PracticeSnapshot, PracticeStatus, PracticeTrace, PreparedPracticeConfirmation,
+    PRACTICE_HALF_SIDE, PRACTICE_MAX_OFFERS, PRACTICE_QUIET_TICKS, PracticeAttemptId,
+    PracticeAttemptSnapshot, PracticeBeaconId, PracticeBeaconSnapshot, PracticeClosureReview,
+    PracticeError, PracticeLedgerSnapshot, PracticeOutcome, PracticeReceptionReview,
+    PracticeReceptionSnapshot, PracticeReview, PracticeSnapshot, PracticeStatus, PracticeTrace,
+    PreparedPracticeConfirmation,
 };
 mod services;
 mod weapons;
@@ -131,6 +133,8 @@ pub struct World {
     combat: combat::State,
     missiles: missiles::State,
     practice: Option<practice::Practice>,
+    practice_history: Vec<practice::Practice>,
+    practice_trace: Option<practice::PracticeAttemptId>,
 }
 
 impl Default for World {
@@ -162,6 +166,8 @@ impl World {
             combat: combat::State::default(),
             missiles: missiles::State::default(),
             practice: None,
+            practice_history: Vec::new(),
+            practice_trace: None,
         }
     }
 

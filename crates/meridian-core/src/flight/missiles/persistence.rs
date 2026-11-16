@@ -1,6 +1,7 @@
 //! Version-eight bounded state and retained contact evidence. Decode never emits gameplay events.
 use super::*;
 use crate::docking::{Basis3, RigidPose};
+use crate::flight::practice::lifecycle::{lesson_for_target, lessons};
 use crate::flight::{OrdinaryImpact, OrdinaryTarget, OrdinaryWeapon, PulseContact, PulseShot};
 use crate::navigation::SystemId;
 use crate::save::{Reader, SaveError, Writer};
@@ -285,6 +286,18 @@ impl State {
             .find(|p| p.origin.projectile == id)
             .copied()
     }
+    pub(in crate::flight) fn has_undocked_player_hit(
+        self,
+        practice: Option<super::super::practice::Practice>,
+        history: &[super::super::practice::Practice],
+        dock_sequence: u64,
+    ) -> bool {
+        self.projectiles.iter().flatten().any(|p| {
+            matches!(p.contact, Some(MissileContact::Player { .. }))
+                && lesson_for_target(practice, history, p.target)
+                    .is_some_and(|p| !p.missile_docked_since_consent(dock_sequence))
+        })
+    }
     pub(in crate::flight) fn validate_ordinary(
         self,
         hit: OrdinaryImpact,
@@ -334,6 +347,7 @@ impl State {
         self,
         world: &World,
         practice: Option<super::super::practice::Practice>,
+        history: &[super::super::practice::Practice],
         dock_sequence: u64,
     ) -> Result<(), SaveError> {
         let owner = world.combat_identity().ok_or(INVALID)?;
@@ -413,16 +427,19 @@ impl State {
             }
             if let Some(previous) = prior
                 && (o.emission <= previous.emission
-                    || o.launched_tick.saturating_sub(previous.launched_tick)
-                        < u64::from(MISSILE_COOLDOWN_TICKS)
-                    || o.physical_tick.saturating_sub(previous.physical_tick)
-                        < u64::from(MISSILE_COOLDOWN_TICKS)
-                    || o.owner != previous.owner)
+                    || o.launched_tick <= previous.launched_tick
+                    || o.physical_tick <= previous.physical_tick
+                    || o.owner.visit < previous.owner.visit
+                    || (o.owner.visit == previous.owner.visit
+                        && (o.launched_tick - previous.launched_tick
+                            < u64::from(MISSILE_COOLDOWN_TICKS)
+                            || o.physical_tick - previous.physical_tick
+                                < u64::from(MISSILE_COOLDOWN_TICKS))))
             {
                 return Err(INVALID);
             }
             prior = Some(o);
-            let lesson = practice.ok_or(INVALID)?;
+            let lesson = lesson_for_target(practice, history, p.target).ok_or(INVALID)?;
             if !lesson.missile_owner_matches(o.owner)
                 || lesson.retained_missile_target(p.target).is_none()
                 || !lesson.missile_provider_interval(
@@ -526,8 +543,17 @@ impl State {
         // The only admitted shield damage has all of its bounded missile receipts retained.
         // Check the numeric result; loading never applies these effects to the World.
         let mut shields = [30_000_u16; 2];
-        if !practice.is_some_and(|p| p.missile_docked_since_consent(dock_sequence)) {
-            let mut hits = self.impacts;
+        {
+            let mut hits = self.impacts.map(|hit| {
+                hit.filter(|hit| {
+                    self.projectiles
+                        .iter()
+                        .flatten()
+                        .find(|p| p.origin.emission == hit.emission)
+                        .and_then(|p| lesson_for_target(practice, history, p.target))
+                        .is_some_and(|p| !p.missile_docked_since_consent(dock_sequence))
+                })
+            });
             hits.sort_by_key(|h| h.map_or(u64::MAX, |h| h.incident));
             let mut clock = 0;
             for hit in hits.into_iter().flatten() {
@@ -566,7 +592,13 @@ impl State {
             return Err(INVALID);
         }
         let expected_cooldown = if world.state.mode == FlightMode::Docked
-            || practice.is_some_and(|p| p.missile_docked_since_consent(dock_sequence))
+            || self
+                .projectiles
+                .iter()
+                .rev()
+                .find_map(|p| *p)
+                .and_then(|p| lesson_for_target(practice, history, p.target))
+                .is_some_and(|p| p.missile_docked_since_consent(dock_sequence))
         {
             0
         } else {
@@ -579,8 +611,16 @@ impl State {
         if self.cooldown != expected_cooldown {
             return Err(INVALID);
         }
-        if let Some(lesson) = practice {
-            if lesson.pending_missiles != self.pending() {
+        for lesson in lessons(practice, history) {
+            let projectiles = self
+                .projectiles
+                .map(|p| p.filter(|p| lesson.missile_owner_matches(p.origin.owner)));
+            let pending = projectiles
+                .iter()
+                .flatten()
+                .filter(|p| p.ended.is_none())
+                .count() as u8;
+            if lesson.pending_missiles != pending {
                 return Err(INVALID);
             }
             for (id, receipt) in lesson.missile_receipts() {
@@ -598,7 +638,7 @@ impl State {
                     }
                 }
             }
-            for p in self.projectiles.iter().flatten() {
+            for p in projectiles.iter().flatten() {
                 if let Some(MissileContact::Practice {
                     id,
                     first_hit: true,
@@ -610,9 +650,17 @@ impl State {
                     return Err(INVALID);
                 }
             }
-            lesson.validate_missile_quiet(self.projectiles)?;
-        } else if used != 0 {
-            return Err(INVALID);
+            for hit in self.impacts.into_iter().flatten() {
+                if lesson.accepts_incident(hit)
+                    && lesson.ordinary_hit.is_none_or(|first| {
+                        first.incident > hit.incident
+                            || (first.incident == hit.incident && first != hit)
+                    })
+                {
+                    return Err(INVALID);
+                }
+            }
+            lesson.validate_missile_quiet(projectiles)?;
         }
         Ok(())
     }

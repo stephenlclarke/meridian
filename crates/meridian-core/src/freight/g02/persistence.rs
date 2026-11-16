@@ -133,8 +133,8 @@ impl CommanderAccount {
         self.encode_version(w, 8);
     }
     #[cfg(test)]
-    pub(crate) fn encode_v7(&self, w: &mut Writer) {
-        self.encode_version(w, 7);
+    pub(crate) fn encode_legacy_version(&self, w: &mut Writer, version: u16) {
+        self.encode_version(w, version);
     }
     fn encode_version(&self, w: &mut Writer, version: u16) {
         let d = self.data;
