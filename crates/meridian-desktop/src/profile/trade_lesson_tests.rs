@@ -125,7 +125,10 @@ fn trade_cold_child() {
     };
     let path = PathBuf::from(path);
     let original = ok(fs::read(path.join("commander.meridian")));
-    assert_eq!(u16::from_le_bytes([original[8], original[9]]), 11);
+    assert_eq!(
+        u16::from_le_bytes([original[8], original[9]]),
+        meridian_core::save::SAVE_VERSION
+    );
     let expected = ok(World::from_save_bytes(&original));
     let mut p = ok(Profile::open(path));
     ok(p.continue_saved());
