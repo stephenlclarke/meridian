@@ -387,7 +387,7 @@ impl World {
             contact,
         };
         let impact = self.prepare_pulse_impact(shot)?;
-        let mut missiles = self.missiles;
+        let mut missiles = self.missiles.clone();
         if let PulseContact::Projectile { id, .. } = contact
             && !missiles.intercept(id, self.state.tick, impact.emission(), shot)
         {

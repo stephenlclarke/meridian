@@ -2,6 +2,10 @@
 
 Reviewed against actual delivery evidence on 16 November 2026. This document distinguishes installed gameplay from source awaiting execution. Update it with every delivery or material acceptance change; test counts belong to their exact source.
 
+## Paid missile author increment
+
+The [paid missile source](PAID-MISSILES.md) adds prepared paid ownership/store/refit, nine native SH025 positions, retained additional launch/contact receipts and explicit v12 saves. New tests, compiler/Clippy and native qualification are **UNRUN** for this increment. Existing delivery results below remain bound to their original commits. Full modular equipment and its real docked screen remain open core work before further missions.
+
 ## Latest installed and published preview
 
 [Flight Lesson Preview v0.3.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.3.0-preview.1) is published for macOS arm64 and Windows x64. Its immutable annotated tag resolves to main `a583b61e4e4536003414ee9f5448131744f62eb2`, tree `ab0530464560eccb23bba6adee62189a1b2148f0`. The compiled source is `152ac26ba848e2ac0c8cb63efec016a10b383155`, tree `a0bb78afde77f3e0298c1e99224fdf90621b229d`: 136 of 139 tracked blobs match, and only README, this status document and the flight guide differ. The trees are distinct; this does not claim a main rebuild. Mac, Linux and native Windows each passed 175 core plus 56 desktop tests (231 top-level Rust cases), 74 Python tests (54 importers plus 20 publisher), formatting, strict Clippy and release builds on that compiled source. Nested subprocess summaries are excluded. [Exact-main CI 43897133293](https://github.com/stephenlclarke/meridian/actions/runs/43897133293) passed all six jobs, including exact-SHA Sonar with Previous version policy and zero open findings.

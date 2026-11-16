@@ -187,18 +187,6 @@ impl<'a> StarterItems<'a> {
         self.0.iter().flatten()
     }
 }
-pub(crate) struct MissileRoundQuote {
-    opening: AccountData,
-    index: usize,
-    round: OwnedStarterItem,
-    revision: u64,
-}
-impl MissileRoundQuote {
-    pub(crate) fn item(&self) -> OwnedStarterItem {
-        self.round
-    }
-}
-
 fn validate_birth_ids(ids: FreshCommanderIds) -> Result<(), Error> {
     let mut all = [0; 11];
     all[0] = ids.owner;
@@ -228,6 +216,7 @@ struct AccountData {
     reserved_commodities: [u64; 16],
     legal: u8,
     equipment: crate::equipment::State,
+    ammunition_revision: u64,
 }
 
 /// One World-owned account, not a second mission wallet or an authority actor.
@@ -264,6 +253,7 @@ impl CommanderAccount {
                 reserved_commodities: [0; 16],
                 legal: 0,
                 equipment: crate::equipment::State::default(),
+                ammunition_revision: 0,
                 fit: Some(StarterFit {
                     owner: ids.owner,
                     hull: ids.hull,
@@ -280,62 +270,55 @@ impl CommanderAccount {
         Some((
             fit.inventory,
             fit.items.map(|item| item.map(|item| item.id)),
-            self.data.equipment.revision(),
+            self.data
+                .equipment
+                .revision()
+                .checked_add(self.data.ammunition_revision)?,
         ))
     }
     pub(crate) fn starter_items(&self) -> Option<StarterItems<'_>> {
         self.data.fit.as_ref().map(|fit| StarterItems(&fit.items))
     }
 
-    pub(crate) fn quote_missile(&self) -> Result<MissileRoundQuote, Error> {
-        let fit = self.data.fit.ok_or(Error::MissingEquipment)?;
-        let (index, round) = fit
-            .items
-            .iter()
-            .enumerate()
-            .rev()
-            .find_map(|(index, round)| {
-                round
-                    .filter(|r| {
-                        matches!(r.component, StarterComponent::Missile(_))
-                            && r.owner == self.data.owner
-                            && r.fitted_hull == Some(self.data.hull)
-                            && r.origin == EquipmentOrigin::StandardBirth
-                    })
-                    .map(|round| (index, round))
-            })
-            .ok_or(Error::MissingEquipment)?;
-        if round.owner != self.data.owner
-            || round.fitted_hull != Some(self.data.hull)
-            || round.origin != EquipmentOrigin::StandardBirth
-        {
-            return Err(Error::InvalidFit);
-        }
-        Ok(MissileRoundQuote {
-            opening: self.data,
-            index,
-            round,
-            revision: self
-                .data
-                .revision
-                .checked_add(1)
-                .ok_or(Error::SequenceExhausted)?,
-        })
+    pub(crate) fn ammunition_revision(&self) -> u64 {
+        self.data.ammunition_revision
     }
-
-    pub(crate) fn consume_missile(&mut self, quote: MissileRoundQuote) -> Result<(), Error> {
-        if self.data != quote.opening {
-            return Err(Error::InvalidFit);
-        }
-        let fit = self.data.fit.as_mut().ok_or(Error::MissingEquipment)?;
-        if fit.items[quote.index] != Some(quote.round) {
-            return Err(Error::InvalidFit);
-        }
-        fit.items[quote.index] = None;
-        self.data.revision = quote.revision;
-        Ok(())
+    pub(crate) fn revision(&self) -> u64 {
+        self.data.revision
     }
-
+    pub(crate) fn prepare_ammunition(
+        &self,
+        paid: u32,
+        consume: Option<u64>,
+        paid_round: bool,
+    ) -> Result<Self, Error> {
+        let mut data = self.data;
+        data.credits = data
+            .credits
+            .checked_sub(paid)
+            .ok_or(Error::InsufficientFunds)?;
+        data.revision = data
+            .revision
+            .checked_add(1)
+            .ok_or(Error::SequenceExhausted)?;
+        if let Some(id) = consume {
+            if !paid_round {
+                let fit = data.fit.as_mut().ok_or(Error::MissingEquipment)?;
+                let item = fit
+                    .items
+                    .iter_mut()
+                    .skip(5)
+                    .find(|item| item.is_some_and(|i| i.id == id))
+                    .ok_or(Error::MissingEquipment)?;
+                *item = None;
+            }
+        }
+        data.ammunition_revision = data
+            .ammunition_revision
+            .checked_add(1)
+            .ok_or(Error::SequenceExhausted)?;
+        Ok(Self { data })
+    }
     pub(crate) fn credits_tenths(&self) -> u32 {
         self.data.credits
     }

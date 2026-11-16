@@ -35,7 +35,7 @@ fn confirm(world: &mut World, action: Action) {
 }
 fn cold(world: &World) -> World {
     let bytes = ok(world.save_bytes());
-    assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 11);
+    assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 12);
     let loaded = ok(World::from_save_bytes(&bytes));
     assert_eq!(loaded.snapshot(), world.snapshot());
     assert_eq!(snapshot(&loaded), snapshot(world));

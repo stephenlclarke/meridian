@@ -73,7 +73,7 @@ fn journey(w: &mut World, to: SystemId) {
 }
 fn cold(w: &World) -> World {
     let bytes = ok(w.save_bytes());
-    assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 11);
+    assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 12);
     let loaded = ok(World::from_save_bytes(&bytes));
     assert_eq!(loaded.snapshot(), w.snapshot());
     assert_eq!(snap(&loaded), snap(w));
