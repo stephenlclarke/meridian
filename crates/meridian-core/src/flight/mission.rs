@@ -41,6 +41,7 @@ pub enum MissionError {
     WrongContact,
     Paused,
     SequenceExhausted,
+    SharedCapacity,
     Freight(g02::Error),
     Service(crate::station_services::Error),
     Equipment(crate::equipment::Error),
@@ -54,6 +55,9 @@ impl fmt::Display for MissionError {
             Self::WrongContact => f.write_str("contact is not in this current station roster"),
             Self::Paused => f.write_str("World is paused"),
             Self::SequenceExhausted => f.write_str("station contact sequence exhausted"),
+            Self::SharedCapacity => {
+                f.write_str("Original mission or active service capacity is full")
+            }
             Self::Freight(error) => write!(f, "freight command refused: {error:?}"),
             Self::Service(error) => write!(f, "station service refused: {error:?}"),
             Self::Equipment(error) => write!(f, "{error}"),
@@ -258,6 +262,16 @@ impl World {
         expected_tick: u64,
     ) -> Result<g02::Event, MissionError> {
         self.station_command_admission(expected_tick)?;
+        if matches!(
+            command,
+            g02::Command::Confirm {
+                choice: g02::Choice::Accept,
+                ..
+            }
+        ) && !self.original_service_has_capacity()
+        {
+            return Err(MissionError::SharedCapacity);
+        }
         let facts = self.freight_facts()?;
         let account = self
             .commander_account

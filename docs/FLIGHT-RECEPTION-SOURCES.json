@@ -1,0 +1,62 @@
+{
+  "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "tree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "files": [
+    {
+      "path": "docs/meridian/missions/gameplay/T01-FLIGHT-RECEPTION.md",
+      "gitBlob": "6dde9000caa4de5a63f98ab945db2204df9aaeab",
+      "sha256": "143bbc65955d4c2f3a670aea3a6be77c8c336d1815e654986bb46eaceb4a4ad3",
+      "bytes": 6013
+    },
+    {
+      "path": "Sources/L337Core/NativeFlightReception.swift",
+      "gitBlob": "242e8d0f29c5dbd95ed1b50322e0ef7e8cc507ff",
+      "sha256": "d9043a73ecdf40048d6d2e52a97cda49452015933a83fcc759b59b3346d36e5b",
+      "bytes": 11489
+    },
+    {
+      "path": "Sources/L337Core/NativeFlightReceptionBoard.swift",
+      "gitBlob": "7ada2b41e96d1c4245d4a1cefbc593aa33d76582",
+      "sha256": "6010b6989cf8f9f2c3ad776fed326a44257589540043766c44dd37173d7ede87",
+      "bytes": 15466
+    },
+    {
+      "path": "Sources/L337Core/NativeFlightReceptionSave.swift",
+      "gitBlob": "05a68e2d30c1990fb7c27d9961ccfa44db2a7a8e",
+      "sha256": "b1e5855a1b6abddad26de2166169921cea332c943c78c4c3590aa8ea85012397",
+      "bytes": 11760
+    },
+    {
+      "path": "Tests/L337CoreTests/NativeFlightReceptionUnitTests.swift",
+      "gitBlob": "bc1e6d4c8acd6e9945517c0afd08095925f46350",
+      "sha256": "f7930b97f0132420b6236a7ca103b1fa8450d280e2b21aec6e94221316afc96d",
+      "bytes": 9130
+    },
+    {
+      "path": "Sources/L337Core/OriginalServiceReservationPolicy.swift",
+      "gitBlob": "3da14a80aab9fcdb68346ad743e672a54c140e8b",
+      "sha256": "4084be20f133ee6dd4fe29d2abc85d90949f307e2d0339b7e0398628cd9cdeff",
+      "bytes": 1982
+    },
+    {
+      "path": "Sources/L337Core/Game.swift",
+      "gitBlob": "0f94ff0c7bf46d47e65e077cc3c5db37694bd706",
+      "sha256": "e5b4e30c835d460aa7ca6f77364db0aaeaf877bb9d73bacc162e9111b26e2e17",
+      "bytes": 313817
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-flight-reception/manifest.toml",
+      "gitBlob": "62fd5c98aae30521af2a16cfb705d19fd77d8286",
+      "sha256": "1c26539b4f08a5a876850b90e719575c07d26391206e9873378db994162911d8",
+      "bytes": 1646
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-flight-reception/scripts/main.lua",
+      "gitBlob": "454daa4e04d2b593f646447eb9ace421e531bf24",
+      "sha256": "5c5c6ff45bf1c41dfd12d987e0d64d1ac5ed90731e3487798b8590f0c4c2ff5a",
+      "bytes": 381
+    }
+  ],
+  "note": "State and sample/reading definitions live in NativeFlightReception.swift; no separate NativeFlightReceptionState.swift or Progress.swift exists in this immutable tree. Game.swift captures before native movement and commits afterward.",
+  "scope": "Immutable reference blobs frozen before Rust implementation; source/test expectations only, no native acceptance transferred."
+}

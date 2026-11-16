@@ -4,7 +4,7 @@ use std::sync::{
 };
 
 use meridian_core::docking::{DockingPort, StationPose};
-use meridian_core::{PracticeBeaconSnapshot, PulseShot, Snapshot};
+use meridian_core::{FlightView, PracticeBeaconSnapshot, PulseShot, Snapshot};
 use wgpu::util::DeviceExt;
 use winit::{dpi::PhysicalSize, event_loop::OwnedDisplayHandle, window::Window};
 
@@ -18,6 +18,7 @@ pub struct StationScene<'a> {
 }
 
 pub struct Renderer {
+    flight_view: FlightView,
     surface: wgpu::Surface<'static>,
     pub window: Arc<Window>,
     instance: wgpu::Instance,
@@ -193,6 +194,7 @@ impl Renderer {
         Ok(Self {
             surface,
             window,
+            flight_view: FlightView::Front,
             instance,
             device,
             queue,
@@ -256,6 +258,10 @@ impl Renderer {
         );
     }
 
+    pub fn set_flight_view(&mut self, view: FlightView) {
+        self.flight_view = view;
+    }
+
     pub fn draw(
         &mut self,
         snapshot: &Snapshot,
@@ -311,6 +317,7 @@ impl Renderer {
         if let (Some(station), Some(shot)) = (station, pulse) {
             mesh::append_pulse(snapshot, station, shot, &mut self.frame)?;
         }
+        mesh::apply_flight_view(self.flight_view, &mut self.frame);
         if self.frame.len() > self.vertex_capacity {
             return Err("Frame exceeded its declared vertex capacity".into());
         }

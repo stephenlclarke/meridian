@@ -393,6 +393,20 @@ pub fn frame_vertices(
     Ok(())
 }
 
+/// Rotate every scene primitive in the same camera frame. This never changes World pose or aim.
+pub fn apply_flight_view(view: meridian_core::FlightView, vertices: &mut [Vertex]) {
+    use meridian_core::FlightView;
+    for vertex in vertices {
+        let [x, y, z] = vertex.position;
+        vertex.position = match view {
+            FlightView::Front => [x, y, z],
+            FlightView::Rear => [-x, y, -z],
+            FlightView::Left => [z, y, -x],
+            FlightView::Right => [-z, y, x],
+        };
+    }
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
@@ -703,5 +717,37 @@ mod tests {
             assert_eq!(frame.capacity(), capacity);
             assert_eq!(frame[0].position, [1.0, 2.0, 136.32_f32 - 300.0]);
         }
+    }
+}
+
+#[cfg(test)]
+mod flight_view_tests {
+    use super::{Vertex, apply_flight_view};
+    use meridian_core::FlightView;
+
+    #[test]
+    fn actual_view_axes_keep_scene_distance_and_color_and_rear_objects_behind_front() {
+        let original = Vertex {
+            position: [-8.0, 3.0, 20.0],
+            color: [0.1, 0.2, 0.3],
+        };
+        let mut scene = [original];
+        apply_flight_view(FlightView::Front, &mut scene);
+        assert_eq!(scene[0].position, original.position);
+        apply_flight_view(FlightView::Rear, &mut scene);
+        assert!(scene[0].position[2] < 0.0);
+        assert_eq!(scene[0].position[0], 8.0);
+        apply_flight_view(FlightView::Rear, &mut scene);
+        assert_eq!(scene[0].position, original.position);
+        apply_flight_view(FlightView::Left, &mut scene);
+        assert!(scene[0].position[2] > 0.0); // The original port-side object is ahead in left view.
+        assert_eq!(scene[0].position[0], 20.0);
+        assert_eq!(scene[0].position[1], 3.0);
+        assert_eq!(scene[0].position.iter().map(|v| v * v).sum::<f32>(), 473.0);
+        assert_eq!(scene[0].color, original.color);
+        apply_flight_view(FlightView::Right, &mut scene);
+        assert_eq!(scene[0].position, original.position);
+        apply_flight_view(FlightView::Right, &mut scene);
+        assert!(scene[0].position[2] < 0.0); // The same port-side object is behind a right-facing camera.
     }
 }

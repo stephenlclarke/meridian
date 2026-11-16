@@ -1,3 +1,9 @@
+mod flight_reception;
+pub use flight_reception::{
+    FLIGHT_RECEPTION_MAX_BERTH_RECORDS, FlightReceptionAction, FlightReceptionAttemptSnapshot,
+    FlightReceptionError, FlightReceptionId, FlightReceptionOutcome, FlightReceptionReview,
+    FlightReceptionSnapshot, FlightReceptionTrace, FlightView, PreparedFlightReception,
+};
 mod missiles;
 pub use missiles::{
     MISSILE_COOLDOWN_TICKS, MISSILE_FACES, MISSILE_LIFETIME_TICKS, MISSILE_MUZZLE_DISTANCE,
@@ -132,6 +138,7 @@ pub struct World {
     pulse: weapons::PulseResources,
     combat: combat::State,
     missiles: missiles::State,
+    flight_reception: flight_reception::State,
     practice: Option<practice::Practice>,
     practice_history: Vec<practice::Practice>,
     practice_trace: Option<practice::PracticeAttemptId>,
@@ -165,6 +172,7 @@ impl World {
             pulse: weapons::PulseResources::default(),
             combat: combat::State::default(),
             missiles: missiles::State::default(),
+            flight_reception: flight_reception::State::default(),
             practice: None,
             practice_history: Vec::new(),
             practice_trace: None,
@@ -478,6 +486,7 @@ impl World {
     }
 
     fn publish_step(&mut self, mut next: Snapshot) -> Result<(), StepError> {
+        let flight_reception_start = self.flight_reception_start();
         let mut navigation = self.navigation;
         let mut mission_epoch = None;
         let mut planned_debit = None;
@@ -534,6 +543,7 @@ impl World {
         }
         self.state = next;
         self.navigation = navigation;
+        self.observe_flight_reception(flight_reception_start);
         if let Some((session, epoch)) = self.freight_session.as_mut().zip(mission_epoch) {
             session.rebind_dock(navigation.and_then(NavigationState::dock), epoch);
         }

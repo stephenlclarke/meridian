@@ -1,7 +1,7 @@
 use super::{
     CommanderAccount, DISTANCE_PER_SPEED_UNIT, FIXED_DELTA_SECONDS, FlightMode, MAX_SPEED,
     MotionRefusal, NavigationState, OriginalNavigation, OriginalStationData, Snapshot, World,
-    combat, missiles, mission, practice, weapons,
+    combat, flight_reception, missiles, mission, practice, weapons,
 };
 #[cfg(test)]
 use super::{
@@ -65,8 +65,18 @@ const V8_CONTENT: &[u8] = concat!(
 )
 .as_bytes();
 
-const CONTENT: &[u8] = concat!(
+const V9_CONTENT: &[u8] = concat!(
     "meridian-world/rules/9;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
+    "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
+    "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
+    "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
+    "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823;",
+    "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa"
+)
+.as_bytes();
+
+const CONTENT: &[u8] = concat!(
+    "meridian-world/rules/10;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -111,8 +121,39 @@ impl World {
         history: &[practice::Practice],
         trace: Option<practice::PracticeAttemptId>,
     ) -> Result<Vec<u8>, SaveError> {
-        self.validate_saved_world(practice, history, trace)?;
-        self.encode_saved_world(practice, history, trace)
+        self.validate_saved_world(practice, history, trace, &self.flight_reception)?;
+        self.encode_saved_world(practice, history, trace, &self.flight_reception)
+    }
+    /// Bind all checked saved state except the current simulation tick. A docked redraw
+    /// advances only that clock; historical permission/reading/dock/terminal clocks stay bound.
+    /// The normalized bytes are fingerprint input only, never a save or a mutated World.
+    pub(super) fn flight_reception_material_fingerprint(&self) -> Result<u64, SaveError> {
+        let mut bytes = self.save_bytes()?;
+        let flight_start = MAGIC.len() + size_of::<u16>() + CONTENT.len() + size_of::<u64>();
+        let mut material = self.state;
+        material.tick = 0;
+        let mut encoded = Writer::new();
+        write_flight(&mut encoded, &material);
+        bytes[flight_start..flight_start + encoded.bytes.len()].copy_from_slice(&encoded.bytes);
+        // The stored checksum also derives from the ordinary tick; hash its checked body.
+        Ok(checksum(&bytes[..bytes.len() - size_of::<u64>()]))
+    }
+    pub(super) fn save_bytes_with_flight_reception(
+        &self,
+        lesson: &flight_reception::State,
+    ) -> Result<Vec<u8>, SaveError> {
+        self.validate_saved_world(
+            self.practice,
+            &self.practice_history,
+            self.practice_trace,
+            lesson,
+        )?;
+        self.encode_saved_world(
+            self.practice,
+            &self.practice_history,
+            self.practice_trace,
+            lesson,
+        )
     }
     // Encoding is separate so negative tests can exercise the loader with coherent checksums.
     fn encode_saved_world(
@@ -120,6 +161,7 @@ impl World {
         practice: Option<practice::Practice>,
         history: &[practice::Practice],
         trace: Option<practice::PracticeAttemptId>,
+        lesson: &flight_reception::State,
     ) -> Result<Vec<u8>, SaveError> {
         let mut w = Writer::new();
         w.bytes.extend(MAGIC);
@@ -142,6 +184,7 @@ impl World {
             .as_ref()
             .ok_or(SaveError::NoCommander)?
             .encode_save(&mut w);
+        lesson.encode(&mut w);
         self.missiles.encode(&mut w);
         practice::lifecycle::encode_history(&mut w, history, trace);
         w.option(practice.as_ref(), |w, practice| {
@@ -163,7 +206,12 @@ impl World {
 
     #[cfg(test)]
     pub(super) fn unchecked_test_save(&self) -> Result<Vec<u8>, SaveError> {
-        self.encode_saved_world(self.practice, &self.practice_history, self.practice_trace)
+        self.encode_saved_world(
+            self.practice,
+            &self.practice_history,
+            self.practice_trace,
+            &self.flight_reception,
+        )
     }
 
     /// Decode and validate a whole candidate without touching another World or repairing data.
@@ -215,8 +263,9 @@ impl World {
             6 if r.fixed::<{ V6_CONTENT.len() }>()?.as_slice() == V6_CONTENT => V6_CONTENT,
             7 if r.fixed::<{ V7_CONTENT.len() }>()?.as_slice() == V7_CONTENT => V7_CONTENT,
             8 if r.fixed::<{ V8_CONTENT.len() }>()?.as_slice() == V8_CONTENT => V8_CONTENT,
+            9 if r.fixed::<{ V9_CONTENT.len() }>()?.as_slice() == V9_CONTENT => V9_CONTENT,
             SAVE_VERSION if r.fixed::<{ CONTENT.len() }>()?.as_slice() == CONTENT => CONTENT,
-            4 | 5 | 6 | 7 | 8 | SAVE_VERSION => return Err(SaveError::ContentMismatch),
+            4 | 5 | 6 | 7 | 8 | 9 | SAVE_VERSION => return Err(SaveError::ContentMismatch),
             _ => return Err(SaveError::UnsupportedVersion),
         };
         if r.u64()? != compiled_content_fingerprint(content) {
@@ -230,6 +279,11 @@ impl World {
         let commander_account = CommanderAccount::decode_save(&mut r, version)?;
         let freight_session = mission::FreightSession::decode_save(&mut r)?;
         let station_markets = StationMarkets::decode_save(&mut r)?;
+        let flight_reception = if version >= 10 {
+            flight_reception::State::decode(&mut r)?
+        } else {
+            flight_reception::State::default()
+        };
         let missiles = if version >= 8 {
             missiles::State::decode(&mut r)?
         } else {
@@ -251,6 +305,7 @@ impl World {
             freight_session: Some(freight_session),
             station_markets: Some(station_markets),
             missiles,
+            flight_reception,
             practice_history,
             practice_trace,
             practice: read_practice(&mut r, version)?,
@@ -281,6 +336,7 @@ impl World {
             candidate.practice,
             &candidate.practice_history,
             candidate.practice_trace,
+            &candidate.flight_reception,
         )?;
         Ok(candidate)
     }
@@ -290,6 +346,7 @@ impl World {
         practice: Option<practice::Practice>,
         history: &[practice::Practice],
         trace: Option<practice::PracticeAttemptId>,
+        lesson: &flight_reception::State,
     ) -> Result<(), SaveError> {
         let navigation = self.navigation.ok_or(SaveError::NoCommander)?;
         let account = self
@@ -325,6 +382,7 @@ impl World {
         // missile graph checks the numeric shield result against retained origins.
         self.combat.validate_damage_boundary(self)?;
         self.validate_practice_ledger(practice, history, trace, nav)?;
+        lesson.validate(self, nav, practice, history)?;
         self.missiles
             .validate(self, practice, history, nav.dock_sequence)?;
         self.combat.validate(self)?;
@@ -537,11 +595,16 @@ fn legacy_test_fixture(world: &World, version: u16) -> Result<Vec<u8>, SaveError
         world.practice,
         &world.practice_history,
         world.practice_trace,
+        &world.flight_reception,
     )?;
-    if !world.practice_history.is_empty()
-        || world
-            .practice
-            .is_some_and(|p| p.is_cancelled() || p.attempt_id().ordinal() != 0)
+    if world.flight_reception != flight_reception::State::default() {
+        return Err(SaveError::InvalidState("T01 requires v10"));
+    }
+    if version < 9
+        && (!world.practice_history.is_empty()
+            || world
+                .practice
+                .is_some_and(|p| p.is_cancelled() || p.attempt_id().ordinal() != 0))
     {
         return Err(SaveError::InvalidState("attempts require v9"));
     }
@@ -551,6 +614,7 @@ fn legacy_test_fixture(world: &World, version: u16) -> Result<Vec<u8>, SaveError
         6 => V6_CONTENT,
         7 => V7_CONTENT,
         8 => V8_CONTENT,
+        9 => V9_CONTENT,
         _ => return Err(SaveError::UnsupportedVersion),
     };
     let mut w = Writer::new();
@@ -581,12 +645,17 @@ fn legacy_test_fixture(world: &World, version: u16) -> Result<Vec<u8>, SaveError
     if version >= 8 {
         world.missiles.encode(&mut w);
     }
+    if version >= 9 {
+        practice::lifecycle::encode_history(&mut w, &world.practice_history, world.practice_trace);
+    }
     if version >= 6 {
         w.option(world.practice.as_ref(), |w, p| p.encode_reception(w));
     }
     if version >= 5 {
         w.option(world.practice.as_ref(), |w, p| {
-            if version >= 8 {
+            if version >= 9 {
+                p.encode(w)
+            } else if version >= 8 {
                 p.encode_v8(w)
             } else {
                 p.encode_v7(w)
@@ -647,3 +716,8 @@ pub(super) fn combat_save_len(world: &World) -> usize {
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+pub(super) fn v9_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
+    legacy_test_fixture(world, 9)
+}

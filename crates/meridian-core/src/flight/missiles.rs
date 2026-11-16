@@ -207,6 +207,24 @@ pub(super) struct PreparedStep {
     pub(super) legal: u8,
 }
 impl World {
+    /// Historical T01 sight reuses the exact native missile mesh and retained launch orientation.
+    pub(super) fn retained_flight_body_distance(
+        &self,
+        ordinal: usize,
+        position: crate::docking::Vec3,
+        ray: crate::docking::RigidPose,
+        limit: f64,
+    ) -> Option<f64> {
+        let projectile = self.missiles.projectiles.get(ordinal).copied().flatten()?;
+        mesh_distance(
+            crate::docking::RigidPose {
+                position,
+                orientation: projectile.origin.orientation,
+            },
+            ray,
+            limit,
+        )
+    }
     pub(super) fn nearest_missile(
         &self,
         ray: crate::docking::RigidPose,

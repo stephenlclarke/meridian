@@ -37,6 +37,12 @@ The [safe-gunnery lifecycle](docs/SAFE-GUNNERY-ATTEMPTS.md) adds F7 reviewed clo
 
 The installed signed app passed title/render/normal-close smoke without creating a commander save. The public downloads and extracted Mac signature were independently verified. This remains a functional preview: full game acceptance, memory qualification, window/focus edges, frame timing/race evidence and commercial acceptance remain open. See [implementation status](docs/IMPLEMENTATION-STATUS.md) for exact scope and retained failures.
 
+## Qualified flight lesson candidate
+
+The [original flight-and-reception lesson](docs/FLIGHT-RECEPTION.md) has passed whole-source review and current qualification on candidate `152ac26`. Mac, Linux and native Windows each passed 231 top-level Rust tests, 74 Python tests, strict Clippy and release builds. F6 reviews consent or reception, F12 reviews cancellation and C shows lesson details while playing. Keys 0/1/2/3 select front/rear/left/right views. Save v10 retains the lesson with explicit v4-v9 readers.
+
+A signed staged Mac run completed an actual measured approach, swept return, separate zero-cash reception and first family trace, real quit/cold Continue, cancellation and fresh consent. Four render directions and saved right-view retention passed; a short native pulse flash was not clearly captured and remains unobserved. Integration, authoritative main Sonar and v10 installation/publication remain pending. The published v9 preview above is unchanged.
+
 ## Play
 
 N starts a commander; C continues. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.
