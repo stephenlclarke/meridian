@@ -215,14 +215,71 @@ fn connected_link<const N: usize>(
     }
     Ok(())
 }
+#[derive(Clone)]
+struct Bounds {
+    lower: Point3,
+    upper: Point3,
+}
+impl Bounds {
+    fn for_facet(face: &Facet, b: &mut Budget) -> Result<Self, Failure> {
+        b.step(6)?;
+        let v = face.vertices();
+        Ok(Self {
+            lower: std::array::from_fn(|k| {
+                v[0].point[k]
+                    .clone()
+                    .min(v[1].point[k].clone())
+                    .min(v[2].point[k].clone())
+            }),
+            upper: std::array::from_fn(|k| {
+                v[0].point[k]
+                    .clone()
+                    .max(v[1].point[k].clone())
+                    .max(v[2].point[k].clone())
+            }),
+        })
+    }
+    fn include(&mut self, other: &Self) {
+        for k in 0..3 {
+            self.lower[k] = self.lower[k].clone().min(other.lower[k].clone());
+            self.upper[k] = self.upper[k].clone().max(other.upper[k].clone());
+        }
+    }
+    fn meets(&self, other: &Self, b: &mut Budget) -> Result<bool, Failure> {
+        b.step(1)?;
+        Ok((0..3).all(|k| self.lower[k] <= other.upper[k] && other.lower[k] <= self.upper[k]))
+    }
+    fn contains(&self, point: &Point3, b: &mut Budget) -> Result<bool, Failure> {
+        b.step(1)?;
+        Ok((0..3).all(|k| self.lower[k] <= point[k] && point[k] <= self.upper[k]))
+    }
+}
+fn component_bounds(originals: &[Facet], b: &mut Budget) -> Result<BTreeMap<u32, Bounds>, Failure> {
+    let mut result: BTreeMap<u32, Bounds> = BTreeMap::new();
+    for face in originals {
+        let bounds = Bounds::for_facet(face, b)?;
+        b.step(6)?;
+        log_cost(result.len(), b)?;
+        result
+            .entry(face.id().component)
+            .and_modify(|old| old.include(&bounds))
+            .or_insert(bounds);
+    }
+    Ok(result)
+}
+
 fn occupied(
     p: &Point3,
     normal: &Point3,
     originals: &[Facet],
-    owners: &BTreeSet<u32>,
+    owners: &BTreeMap<u32, Bounds>,
     b: &mut Budget,
 ) -> Result<bool, Failure> {
-    for owner in owners {
+    for (owner, bounds) in owners {
+        // Strict exclusion only. Equality keeps all face/edge/point contacts.
+        if !bounds.contains(p, b)? {
+            continue;
+        }
         let mut attempt = 0u64;
         loop {
             b.step(1)?;
@@ -282,7 +339,8 @@ fn visible(
     face: &Facet,
     sample: &Point2,
     originals: &[Facet],
-    owners: &BTreeSet<u32>,
+    owners: &BTreeMap<u32, Bounds>,
+    coplanar: &[&Facet],
     b: &mut Budget,
 ) -> Result<bool, Failure> {
     let p = face.lift(sample, b)?;
@@ -290,16 +348,8 @@ fn visible(
         return Ok(false);
     }
     let mut winner = face.id();
-    for other in originals {
+    for other in coplanar {
         b.step(1)?;
-        if cross(face.normal(), other.normal())
-            .iter()
-            .any(|v| !v.is_zero())
-            || !other.distance(&p).is_zero()
-            || dot(face.normal(), other.normal()) <= integer(0)
-        {
-            continue;
-        }
         if !other.contains(&p, b)?.0 {
             continue;
         }
@@ -547,6 +597,11 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
     }
     audit_original_components(originals, &owners, b)?;
     audit_original_sheets(originals, b)?;
+    // One owner map plus the two transient facet boxes. Source audit maps
+    // have already been released, and this map releases before final noding.
+    let bounds_members = 10 * owners.len() + 32;
+    b.retain(bounds_members)?;
+    let owner_bounds = component_bounds(originals, b)?;
     let mut regions = Vec::new();
     let mut all_points = BTreeSet::new();
     let mut held = 0usize;
@@ -557,22 +612,42 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
             domain.reverse();
         }
         let mut barriers = Vec::new();
+        let mut coplanar = Vec::new();
+        let face_bounds = Bounds::for_facet(face, b)?;
         for other in originals {
             b.step(1)?;
             if face.id() == other.id() {
                 continue;
             }
-            let (segments, _) = face.section(other, b)?;
-            b.guard(8 * (barriers.len() + segments.len() + 1))?;
+            let other_bounds = Bounds::for_facet(other, b)?;
+            if !face_bounds.meets(&other_bounds, b)? {
+                continue;
+            }
+            let (segments, same_plane) = face.section(other, b)?;
+            b.guard(8 * (barriers.len() + segments.len() + 1) + coplanar.len() + 1)?;
             barriers.extend(
                 segments
                     .into_iter()
                     .map(|[a, c]| [project(&a, face.axis()), project(&c, face.axis())]),
             );
+            if same_plane && dot(face.normal(), other.normal()) > integer(0) {
+                b.step(1)?;
+                coplanar.push(other);
+            }
         }
-        let arrangement = Arrangement::build(&domain, &barriers, b, |sample, budget| {
-            visible(face, sample, originals, &owners, budget)
+        let arrangement = b.with_retained(coplanar.len(), |budget| {
+            let result = Arrangement::build(&domain, &barriers, budget, |sample, local| {
+                visible(face, sample, originals, &owner_bounds, &coplanar, local)
+            });
+            drop(coplanar);
+            result
         })?;
+        drop(barriers);
+        // The original witness publisher retains no record for an invisible
+        // facet. Its authenticated original triangle remains in `originals`.
+        if arrangement.cells.is_empty() {
+            continue;
+        }
         let members = arrangement.cells.iter().map(Vec::len).sum::<usize>();
         let reserve = 16 * (members + arrangement.protected.len() + arrangement.physical.len() + 1);
         b.retain(reserve)?;
@@ -590,6 +665,8 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
         }
         regions.push((face, arrangement));
     }
+    drop(owner_bounds);
+    b.release(bounds_members);
     let point_members = 8 * all_points.len();
     b.retain(point_members)?;
     let mut triangles = Vec::new();
@@ -1214,6 +1291,31 @@ mod tests {
             Some(FailureKind::UncertifiedContact)
         );
         assert_eq!(b.retained_memberships(), 0);
+        Ok(())
+    }
+    #[test]
+    fn closed_component_bounds_retain_face_edge_and_point_equalities() -> Result<(), Failure> {
+        let bounds = Bounds {
+            lower: [integer(0), integer(0), integer(0)],
+            upper: [integer(1), integer(1), integer(1)],
+        };
+        let mut b = Budget::new(crate::Limits::default())?;
+        for point in [[1, 0, 0], [1, 1, 0], [1, 1, 1]] {
+            assert!(bounds.contains(&point.map(integer), &mut b)?);
+        }
+        assert!(!bounds.contains(&[integer(2), integer(0), integer(0)], &mut b)?);
+        for lower in [[1, 0, 0], [1, 1, 0], [1, 1, 1]] {
+            let other = Bounds {
+                lower: lower.map(integer),
+                upper: lower.map(|v| integer(v + 1)),
+            };
+            assert!(bounds.meets(&other, &mut b)?);
+        }
+        let disjoint = Bounds {
+            lower: [integer(2), integer(0), integer(0)],
+            upper: [integer(3), integer(1), integer(1)],
+        };
+        assert!(!bounds.meets(&disjoint, &mut b)?);
         Ok(())
     }
 }

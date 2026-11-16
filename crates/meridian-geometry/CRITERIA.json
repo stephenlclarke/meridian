@@ -108,6 +108,16 @@
       "file": "src/certificate.rs",
       "name": "certificate::tests::owner_streaming_keeps_all_sheets_of_one_component_in_one_link_audit",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/pruning.rs",
+      "name": "pruning::complete_frozen_solids_preserve_all_exposed_fields_witnesses_and_charged_work",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/certificate.rs",
+      "name": "certificate::tests::closed_component_bounds_retain_face_edge_and_point_equalities",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -129,7 +139,7 @@
   },
   "completeCheckCommands": [
     "cargo check --locked -p meridian-geometry --all-targets",
-    "cargo test --locked -p meridian-geometry",
+    "cargo test --locked -p meridian-geometry -- --nocapture",
     "cargo clippy --locked -p meridian-geometry --all-targets -- -D warnings",
     "cargo build --locked -p meridian-geometry --bin original_five",
     "python3 -m unittest discover -s crates/meridian-geometry/tools -p test_run_original_five.py"
@@ -203,7 +213,7 @@
     }
   },
   "wholeFiveHarness": {
-    "criteriaSHA256": "5cc3135fae08c47b8304b3adfbcaaddc9eeaab956d5b56da354fa5ede416ee0b",
+    "criteriaSHA256": "ace9c47feecd0aa7b0507f15492e3a1d01edc00a4e0a489c707f5955701dd9c8",
     "rustTestsAuthored": 6,
     "hostTestsAuthored": 9,
     "execution": "UNRUN",
@@ -234,5 +244,20 @@
       }
     },
     "currentExecution": "UNRUN"
+  },
+  "exactPruningCorrection": {
+    "deltaSHA256": "9496021282d0b9b935e79bf0f1943ac9e80fdd4071b38a3878339741b54e24fa",
+    "frozenBeforeSUTSHA256": "f3faec8f887fe4b1b306a7d6016559b46ff66066878ba98cac861089e4c27839",
+    "qualifiedParent": {
+      "focusedRustPass": 21,
+      "hostPass": 9,
+      "wholeDecodePass": 5,
+      "wholeConstructionRefused": 5,
+      "semanticFail": 0,
+      "dependentUnrun": 15,
+      "candidates": 0
+    },
+    "currentExecution": "UNRUN",
+    "compiledControlFreezeSHA256": "f9a4b9177284f4afefc8b8e349dad693d80c4f2d71ef7608665c908f5013125e"
   }
 }

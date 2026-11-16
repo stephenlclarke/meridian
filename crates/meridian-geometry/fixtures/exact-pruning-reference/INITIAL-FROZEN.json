@@ -1,0 +1,16 @@
+{
+  "parentAuthorHead": "44295de45e0995fba17f17eeea8b0b5af853376a",
+  "qualifiedRootJoin": "1287511e0ffb3f3aa48949cfac6ebdcff588cbf5",
+  "referenceImplementation": "Byte-exact parent production prefix before cfg(test); no original-five execution.",
+  "phase": "BEFORE_PRUNING_SUCCESSOR_AUTHORING",
+  "files": {
+    "CASES.json": {
+      "sha256": "f7a0e6665cfd9337145c9b9715e26516f164acd0612590dc07093bafe95e4e5d",
+      "bytes": 3170
+    },
+    "before-certificate.rs": {
+      "sha256": "bce924b81182a503379f7b18b256a8e7c1b892f006356433107967219689da4f",
+      "bytes": 37232
+    }
+  }
+}

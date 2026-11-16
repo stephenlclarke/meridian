@@ -1,0 +1,55 @@
+{
+  "parentAuthorHead": "44295de45e0995fba17f17eeea8b0b5af853376a",
+  "qualifiedParentJoin": "1287511e0ffb3f3aa48949cfac6ebdcff588cbf5",
+  "parentHandoffSHA256": "9810f3c31c22e265a8b9341072978a0a631e1eda4fa9959fef5ef0986f2d7283",
+  "parentTerminalSHA256": "fb1a4fe418ff9d56ba660e5138e088a5d97c682027dc05aa39b2c055ebd3d97f",
+  "referenceSourceSHA256": "aa400698c0094b0f4dd16aa7094c68879072f85a35858ac3501d8fda60488a80",
+  "beforeSUTFrozenControlsSHA256": "f3faec8f887fe4b1b306a7d6016559b46ff66066878ba98cac861089e4c27839",
+  "preservedReferenceSemantics": [
+    "OriginalFaceIndex.possible_owners/containing_owners keep closed equality contacts and reject only strict owner bounds separation.",
+    "OriginalFaceIndex.near uses closed facet AABB candidates before plane sections.",
+    "reconstruct_face retains same-plane positive-normal candidates once for per-cell field agreement and ownership ties.",
+    "_retain_facet_region_witness returns immediately for no classified cells; original input authentication remains retained."
+  ],
+  "changedImplementation": [
+    "Build charged conservative per-component bounds only after original component/sheet audits. Retain ten memberships per owner plus32 shared facet-box scratch, release after facet collection and before final noding.",
+    "Reject strictly outside owners before ray visits; preserve equality contacts, current owner parity, retry directions and complete exact ray/triangle logic.",
+    "Compute charged transient facet bounds before sections. Retain closed-overlap positive-normal coplanar references for field checks; admit their lifetime during arrangement, then drop raw constraints/references.",
+    "Drop only arrangements with no exposed cells before region/witness retention. Every authenticated original is still retained and every exposed witness remains fully encoded.",
+    "Complete candidate geometry, affine fields, physical intervals, protected stars, global topology, volume and original2M/100k/4096/512guards remain mandatory."
+  ],
+  "causalLimits": "The parent terminal identifies exact work/storage cutoffs but has no cumulative charged stage split or per-facet empty-region counts. The source proves needless full-owner rays and persistent empty records; no original whole-hull reduction, dominant stage, completion or minimum storage can be inferred. Frozen complete synthetic controls must qualify actual charged savings and exact output before an owned changed whole-five decision.",
+  "frozenControlAcceptance": {
+    "completeGeometryAndAffineFields": "exact ordered Facet equality",
+    "visibleWitnesses": "exact source/cells/physical/protected/output/stars/area equality",
+    "emptyWitnesses": "only zero-classified records omitted, matching original publisher",
+    "work": "all complete construct and public witness validation charges included; strict saving on four/eight disconnected controls, retain other results",
+    "contactRefusal": "same UncertifiedContact outcome for singular vertex fixture"
+  },
+  "parentActual": {
+    "focusedRustPass": 21,
+    "hostPass": 9,
+    "wholeDecodePass": 5,
+    "wholeConstructionRefused": 5,
+    "semanticFail": 0,
+    "dependentUnrun": 15,
+    "candidates": 0
+  },
+  "currentExecution": "UNRUN",
+  "compilerOrOriginalConstructionExecuted": false,
+  "baseline": {
+    "ships": 23,
+    "shipTotal": 162,
+    "stations": 4,
+    "stationTotal": 6
+  },
+  "all171Accepted": false,
+  "compiledControlFreezeSHA256": "f9a4b9177284f4afefc8b8e349dad693d80c4f2d71ef7608665c908f5013125e",
+  "beforeSUTFreezePath": "fixtures/exact-pruning-reference/INITIAL-FROZEN.json",
+  "compiledControlNormalization": {
+    "file": "before-certificate.rs",
+    "rule": "Remove exactly one final blank line; all Rust production bytes before that line are identical to the frozen parent prefix.",
+    "originalSHA256": "bce924b81182a503379f7b18b256a8e7c1b892f006356433107967219689da4f",
+    "normalizedSHA256": "7ad155fc8254bac5f9240a9144112c87304a5db393a5bf38ded3f94bddd192c1"
+  }
+}

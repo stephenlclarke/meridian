@@ -118,22 +118,22 @@
   "parentQualifiedSource": "7ef4df73825bdba87d3a2a2b59e6970d08fb3066",
   "currentCorrectionExecution": "UNRUN",
   "latestParentQualification": {
-    "sourceHead": "3c9d2de8a08129cfae814444604d9b17bffd843c",
-    "sourceTree": "36df01d8b1468f27f6ed6edf9e0d689696ab304a",
-    "rustTests": 19,
-    "hostTests": 8,
-    "check": "PASS",
-    "strictClippy": "PASS",
-    "build": "PASS",
-    "construction": {
-      "decoded": 5,
-      "storageRefused": 5,
-      "semanticFailed": 0,
-      "dependentUnrun": 15,
-      "candidates": 0
-    }
+    "sourceHead": "1287511e0ffb3f3aa48949cfac6ebdcff588cbf5",
+    "focusedRustPass": 21,
+    "hostPass": 9,
+    "wholeDecodePass": 5,
+    "wholeConstructionRefused": 5,
+    "semanticFail": 0,
+    "dependentUnrun": 15,
+    "candidates": 0
   },
   "latestParentQualifiedJoin": "de4e3bff26d2382ea23896f4dabbbcdce70aa614",
   "newHarnessExecution": "UNRUN",
-  "latestCorrection": "Whole-owner streaming topology audit, separately labelled admitted/refused logical reservation telemetry"
+  "latestCorrection": "Whole-owner streaming topology audit, separately labelled admitted/refused logical reservation telemetry",
+  "exactPruningReference": [
+    "OriginalFaceIndex.possible_owners/containing_owners keep closed equality contacts and reject only strict owner bounds separation.",
+    "OriginalFaceIndex.near uses closed facet AABB candidates before plane sections.",
+    "reconstruct_face retains same-plane positive-normal candidates once for per-cell field agreement and ownership ties.",
+    "_retain_facet_region_witness returns immediately for no classified cells; original input authentication remains retained."
+  ]
 }

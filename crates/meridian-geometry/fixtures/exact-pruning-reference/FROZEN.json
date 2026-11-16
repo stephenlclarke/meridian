@@ -1,0 +1,23 @@
+{
+  "parentAuthorHead": "44295de45e0995fba17f17eeea8b0b5af853376a",
+  "qualifiedRootJoin": "1287511e0ffb3f3aa48949cfac6ebdcff588cbf5",
+  "referenceImplementation": "Byte-exact parent production prefix before cfg(test); no original-five execution.",
+  "phase": "BEFORE_PRUNING_SUCCESSOR_AUTHORING",
+  "files": {
+    "CASES.json": {
+      "sha256": "f7a0e6665cfd9337145c9b9715e26516f164acd0612590dc07093bafe95e4e5d",
+      "bytes": 3170
+    },
+    "before-certificate.rs": {
+      "sha256": "7ad155fc8254bac5f9240a9144112c87304a5db393a5bf38ded3f94bddd192c1",
+      "bytes": 37231
+    }
+  },
+  "initialBeforeSUTFreezeSHA256": "f3faec8f887fe4b1b306a7d6016559b46ff66066878ba98cac861089e4c27839",
+  "packagingNormalization": {
+    "file": "before-certificate.rs",
+    "rule": "Remove exactly one final blank line; all Rust production bytes before that line are identical to the frozen parent prefix.",
+    "originalSHA256": "bce924b81182a503379f7b18b256a8e7c1b892f006356433107967219689da4f",
+    "normalizedSHA256": "7ad155fc8254bac5f9240a9144112c87304a5db393a5bf38ded3f94bddd192c1"
+  }
+}

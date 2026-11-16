@@ -13,3 +13,6 @@ pub use budget::{Budget, Failure, FailureKind, Limits};
 pub use certificate::{ContactStar, FacetWitness, Hull, reconstruct};
 pub use exact::{Point2, Point3, Rational, fraction, integer};
 pub use source::{AffineTransform, Facet, SourceId, Vertex};
+
+#[cfg(test)]
+mod pruning;
