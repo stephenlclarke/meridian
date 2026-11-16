@@ -1,0 +1,2 @@
+# Asset and provenance hashes identify exact bytes on every platform.
+assets/legacy/** -text
