@@ -54,6 +54,10 @@ This slice uses save format 3 and refuses older formats without migration, repai
 
 The authored core predecessor records actual front Pulse station impacts, original legal windows and permanent T02 failure, with version 7 persistence and exact version 4-6 readers. The player damage reducer is prepared; finite missile launch/motion and its actual saved ordnance remain the successor. The joined desktop shows the failed attempt and accepted station-strike incident. Coordinated compilation, tests and native qualification are pending. This is source work, not an installed preview update. See [ordinary impact rules and limits](docs/ORDINARY-IMPACTS.md).
 
+## Finite missile source slice
+
+The authored core successor adds explicit practice-beacon lock/arm/release, actual three-round item consumption, World-owned guided projectiles, swept impacts and pending ceasefire timing. A missile-used session cannot yet be saved or restored over; the existing profile stays intact. Untouched v4-v7 stock remains supported. Ten regressions are authored and unrun; Root's desktop join, independent review and coordinated execution remain pending. This is not an installed preview update or full T02 continuation. See [finite missile rules and boundaries](docs/FINITE-STARTER-MISSILES.md).
+
 ## License and quality checks
 
 Meridian's new code is proprietary/source-visible under [LICENSE](LICENSE). The public repository permits inspection under GitHub's terms; it is not a permissive open-source grant. Separately licensed original L337 assets retain their applicable notices. Only verified original project-authored assets are eligible for reuse; original Elite/Oolite or other third-party art, models, textures, audio and fonts are excluded.

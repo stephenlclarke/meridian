@@ -177,7 +177,26 @@ struct StarterFit {
     owner: u64,
     hull: u64,
     inventory: u64,
-    items: [OwnedStarterItem; 8],
+    items: [Option<OwnedStarterItem>; 8],
+}
+
+#[derive(Clone, Copy)]
+pub(crate) struct StarterItems<'a>(&'a [Option<OwnedStarterItem>; 8]);
+impl<'a> StarterItems<'a> {
+    pub(crate) fn iter(self) -> impl Iterator<Item = &'a OwnedStarterItem> {
+        self.0.iter().flatten()
+    }
+}
+pub(crate) struct MissileRoundQuote {
+    opening: AccountData,
+    index: usize,
+    round: OwnedStarterItem,
+    revision: u64,
+}
+impl MissileRoundQuote {
+    pub(crate) fn item(&self) -> OwnedStarterItem {
+        self.round
+    }
 }
 
 fn validate_birth_ids(ids: FreshCommanderIds) -> Result<(), Error> {
@@ -222,12 +241,14 @@ impl CommanderAccount {
     pub(crate) fn born_sh025(ids: FreshCommanderIds) -> Result<Self, Error> {
         validate_birth_ids(ids)?;
         crate::equipment::definition().map_err(|_| Error::InvalidFit)?;
-        let items = core::array::from_fn(|index| OwnedStarterItem {
-            id: ids.items[index],
-            owner: ids.owner,
-            component: STARTER_COMPONENTS[index],
-            origin: EquipmentOrigin::StandardBirth,
-            fitted_hull: Some(ids.hull),
+        let items = core::array::from_fn(|index| {
+            Some(OwnedStarterItem {
+                id: ids.items[index],
+                owner: ids.owner,
+                component: STARTER_COMPONENTS[index],
+                origin: EquipmentOrigin::StandardBirth,
+                fitted_hull: Some(ids.hull),
+            })
         });
         Ok(Self {
             data: AccountData {
@@ -253,8 +274,57 @@ impl CommanderAccount {
         })
     }
 
-    pub(crate) fn starter_items(&self) -> Option<&[OwnedStarterItem; 8]> {
-        self.data.fit.as_ref().map(|fit| &fit.items)
+    pub(crate) fn starter_items(&self) -> Option<StarterItems<'_>> {
+        self.data.fit.as_ref().map(|fit| StarterItems(&fit.items))
+    }
+
+    pub(crate) fn quote_missile(&self) -> Result<MissileRoundQuote, Error> {
+        let fit = self.data.fit.ok_or(Error::MissingEquipment)?;
+        let (index, round) = fit
+            .items
+            .iter()
+            .enumerate()
+            .rev()
+            .find_map(|(index, round)| {
+                round
+                    .filter(|r| {
+                        matches!(r.component, StarterComponent::Missile(_))
+                            && r.owner == self.data.owner
+                            && r.fitted_hull == Some(self.data.hull)
+                            && r.origin == EquipmentOrigin::StandardBirth
+                    })
+                    .map(|round| (index, round))
+            })
+            .ok_or(Error::MissingEquipment)?;
+        if round.owner != self.data.owner
+            || round.fitted_hull != Some(self.data.hull)
+            || round.origin != EquipmentOrigin::StandardBirth
+        {
+            return Err(Error::InvalidFit);
+        }
+        Ok(MissileRoundQuote {
+            opening: self.data,
+            index,
+            round,
+            revision: self
+                .data
+                .revision
+                .checked_add(1)
+                .ok_or(Error::SequenceExhausted)?,
+        })
+    }
+
+    pub(crate) fn consume_missile(&mut self, quote: MissileRoundQuote) -> Result<(), Error> {
+        if self.data != quote.opening {
+            return Err(Error::InvalidFit);
+        }
+        let fit = self.data.fit.as_mut().ok_or(Error::MissingEquipment)?;
+        if fit.items[quote.index] != Some(quote.round) {
+            return Err(Error::InvalidFit);
+        }
+        fit.items[quote.index] = None;
+        self.data.revision = quote.revision;
+        Ok(())
     }
 
     pub(crate) fn credits_tenths(&self) -> u32 {
@@ -1004,13 +1074,24 @@ fn validate_account(data: &Data, account: &AccountData) -> Result<(), Error> {
     if fit.owner != account.owner || fit.hull != account.hull {
         return Err(Error::WrongOwner);
     }
-    validate_birth_ids(FreshCommanderIds {
-        owner: account.owner,
-        hull: account.hull,
-        inventory: fit.inventory,
-        items: fit.items.map(|item| item.id),
-    })?;
+    let mut seen = [0_u64; 11];
+    seen[..3].copy_from_slice(&[account.owner, account.hull, fit.inventory]);
+    let mut seen_count = 3;
+    if seen[..3].contains(&0) || seen[0] == seen[1] || seen[0] == seen[2] || seen[1] == seen[2] {
+        return Err(Error::InvalidFit);
+    }
     for (index, item) in fit.items.iter().enumerate() {
+        let Some(item) = item else {
+            if index < 5 {
+                return Err(Error::MissingEquipment);
+            }
+            continue;
+        };
+        if item.id == 0 || seen[..seen_count].contains(&item.id) {
+            return Err(Error::InvalidFit);
+        }
+        seen[seen_count] = item.id;
+        seen_count += 1;
         if item.owner != account.owner {
             return Err(Error::WrongOwner);
         }
@@ -1023,7 +1104,7 @@ fn validate_account(data: &Data, account: &AccountData) -> Result<(), Error> {
             return Err(Error::InvalidFit);
         }
     }
-    if fit.items[3].fitted_hull != Some(account.hull) {
+    if fit.items[3].is_none_or(|item| item.fitted_hull != Some(account.hull)) {
         return Err(Error::MissingEquipment);
     }
     validate_cargo_and_utility(data, account, &fit)
@@ -1034,12 +1115,13 @@ fn validate_cargo_and_utility(
     account: &AccountData,
     fit: &StarterFit,
 ) -> Result<(), Error> {
-    // The supported eight starter items remain fitted. Their actual intrinsic/weapon
-    // basis costs zero units/mounts; no descriptor can grant that exemption to a held item.
+    // Actual remaining starter items stay fitted. Consumed pylon rounds are absent;
+    // no held item receives an invented intrinsic/weapon budget exemption.
     if account.equipment.owned().is_some()
         && fit
             .items
             .iter()
+            .flatten()
             .any(|item| item.fitted_hull != Some(account.hull))
     {
         return Err(Error::InvalidFit);
@@ -1456,7 +1538,10 @@ mod tests {
         f.account.data.fit = None;
         f.refuses(command, Error::MissingEquipment);
         f.account.data.fit = fit;
-        f.account.data.fit.as_mut().unwrap().items[3].origin = EquipmentOrigin::Unpaid;
+        f.account.data.fit.as_mut().unwrap().items[3]
+            .as_mut()
+            .unwrap()
+            .origin = EquipmentOrigin::Unpaid;
         f.refuses(command, Error::UnpaidEquipment);
         f.account.data.fit = fit;
         f.account.data.other_tonnes = 85;
@@ -1598,19 +1683,34 @@ mod tests {
         assert_eq!(f.account.data, original);
         let actor = f.actor();
         let command = Command::ReviewOffer { actor };
-        f.account.data.fit.as_mut().unwrap().items[3].fitted_hull = None;
+        f.account.data.fit.as_mut().unwrap().items[3]
+            .as_mut()
+            .unwrap()
+            .fitted_hull = None;
         f.refuses(command, Error::MissingEquipment);
         f.account.data = original;
-        f.account.data.fit.as_mut().unwrap().items[0].owner = 99;
+        f.account.data.fit.as_mut().unwrap().items[0]
+            .as_mut()
+            .unwrap()
+            .owner = 99;
         f.refuses(command, Error::WrongOwner);
         f.account.data = original;
-        f.account.data.fit.as_mut().unwrap().items[0].fitted_hull = Some(99);
+        f.account.data.fit.as_mut().unwrap().items[0]
+            .as_mut()
+            .unwrap()
+            .fitted_hull = Some(99);
         f.refuses(command, Error::InvalidFit);
         f.account.data = original;
-        f.account.data.fit.as_mut().unwrap().items[1].id = original.fit.unwrap().items[0].id;
+        f.account.data.fit.as_mut().unwrap().items[1]
+            .as_mut()
+            .unwrap()
+            .id = original.fit.unwrap().items[0].as_ref().unwrap().id;
         f.refuses(command, Error::InvalidFit);
         f.account.data = original;
-        f.account.data.fit.as_mut().unwrap().items[0].component = StarterComponent::BasicDrive;
+        f.account.data.fit.as_mut().unwrap().items[0]
+            .as_mut()
+            .unwrap()
+            .component = StarterComponent::BasicDrive;
         f.refuses(command, Error::InvalidFit);
         assert_eq!(f.state.snapshot().available_source_units, 16);
     }
@@ -1682,7 +1782,10 @@ mod tests {
             (f.account.data, f.state.data, market.quote(facts.site)),
             (before, freight_before, quote)
         );
-        f.account.data.fit.as_mut().unwrap().items[3].fitted_hull = None;
+        f.account.data.fit.as_mut().unwrap().items[3]
+            .as_mut()
+            .unwrap()
+            .fitted_hull = None;
         let before = f.account.data;
         assert_eq!(
             f.account.execute_station_service(

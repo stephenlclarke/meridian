@@ -42,4 +42,4 @@ impl World {
 }
 
 #[cfg(test)]
-mod tests;
+pub(super) mod tests;

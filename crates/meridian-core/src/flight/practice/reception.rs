@@ -63,7 +63,7 @@ impl Practice {
     /// The active range is pinned to one uninterrupted Avenor flight visit.
     /// Neither a docked step nor the step that ends that visit earns quiet time.
     fn quiet_ticks(self, tick: u64) -> u16 {
-        if self.ordinary_hit.is_some() {
+        if self.ordinary_hit.is_some() || self.pending_missiles != 0 {
             return 0;
         }
         let Some(anchor) = self.reception.anchor else {
@@ -77,6 +77,7 @@ impl Practice {
 
     pub(super) fn observe_quiet_step(&mut self, tick: u64) {
         if self.ordinary_hit.is_none()
+            && self.pending_missiles == 0
             && self.reception.anchor.is_none()
             && self.active_range().and_then(Range::third_hit).is_some()
         {
@@ -142,6 +143,11 @@ impl Practice {
         current_dock: Option<DockContext>,
     ) -> Result<(), SaveError> {
         let invalid = SaveError::InvalidState("T02 ceasefire or reception");
+        if self.pending_missiles != 0 {
+            return Err(SaveError::InvalidState(
+                "unsupported pending projectile save boundary",
+            ));
+        }
         if let Some(hit) = self.ordinary_hit {
             if self.reception.anchor.is_some()
                 || self.reception.completion.is_some()

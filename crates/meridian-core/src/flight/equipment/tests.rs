@@ -73,7 +73,7 @@ fn refuses(world: &mut World, command: Command, error: EquipmentError) {
 }
 // Funds come entirely from genuine original finite markets and charged public travel.
 // The independent expected cash sequence is deliberately not computed from the implementation.
-fn earned_world(seed: u64) -> World {
+pub(in crate::flight) fn earned_world(seed: u64) -> World {
     let mut world = World::new_commander(seed).unwrap();
     for (quantity, expected) in [(29, 11434), (47, 18296), (75, 29042)] {
         if world.snapshot().navigation.unwrap().system != SystemId::AVENOR {

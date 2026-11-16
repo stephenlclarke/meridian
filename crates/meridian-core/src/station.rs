@@ -4,7 +4,7 @@
 use crate::docking::{Basis3, DockingPort, HullMesh, RigidPose, StationPose, Vec3};
 use core::fmt;
 
-mod beam;
+pub(crate) mod beam;
 
 const STATION_BYTES: &[u8] = include_bytes!("../../../assets/legacy/sh028.physics");
 const HULL_BYTES: &[u8] = include_bytes!("../../../assets/legacy/sh025.physics");

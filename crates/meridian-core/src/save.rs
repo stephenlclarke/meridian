@@ -10,6 +10,7 @@ pub enum SaveError {
     TooLarge,
     Truncated,
     UnsupportedVersion,
+    UnsupportedMissiles,
     ContentMismatch,
     ChecksumMismatch,
     InvalidEncoding,
@@ -19,6 +20,9 @@ pub enum SaveError {
 impl fmt::Display for SaveError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Self::UnsupportedMissiles => {
+                f.write_str("Missile sessions cannot be saved or restored yet")
+            }
             Self::InvalidState(reason) => write!(f, "invalid saved World: {reason}"),
             other => write!(f, "World save refused: {other:?}"),
         }

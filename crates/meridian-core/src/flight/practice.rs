@@ -79,6 +79,7 @@ pub struct PracticeBeaconSnapshot {
     pub pose: RigidPose,
     pub hit: bool,
     pub flashing: bool,
+    pub missile_hit: Option<super::MissileOrigin>,
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct PracticeSnapshot {
@@ -108,6 +109,7 @@ impl RecordedPose {
 struct FirstHit {
     tick: u64,
     firing_pose: RecordedPose,
+    missile: Option<super::MissileOrigin>,
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
 struct Range {
@@ -128,6 +130,7 @@ pub(super) struct Practice {
     retired: Option<Retirement>,
     pub(super) reception: reception::Reception,
     pub(super) ordinary_hit: Option<super::OrdinaryImpact>,
+    pub(super) pending_missiles: u8,
 }
 impl Practice {
     pub(super) fn consent_visit(self) -> u64 {
@@ -200,14 +203,16 @@ impl Practice {
         }
         self.observe_quiet_step(next.tick);
     }
-    pub(super) fn contact(
+    pub(super) fn contact_limited(
         &mut self,
         shot: Snapshot,
         pose: RigidPose,
+        limit: f64,
         station_distance: Option<f64>,
     ) -> Option<(PracticeBeaconId, f64, bool)> {
         let range = self.active_range()?;
-        let (ordinal, distance) = geometry::nearest(range.opening.pose()?, pose, station_distance)?;
+        let (ordinal, distance) =
+            geometry::nearest_segment(range.opening.pose()?, pose, limit, station_distance)?;
         let id = self.id(ordinal);
         let slot = &mut self.range.as_mut()?.hits[ordinal];
         let first_hit = slot.is_none();
@@ -215,9 +220,54 @@ impl Practice {
             *slot = Some(FirstHit {
                 tick: shot.tick,
                 firing_pose: RecordedPose::from_snapshot(shot),
+                missile: None,
             });
         }
         Some((id, distance, first_hit))
+    }
+    pub(super) fn missile_target(self, id: PracticeBeaconId) -> Option<RigidPose> {
+        let range = self.active_range()?;
+        let frame = range.opening.pose()?;
+        (0..3)
+            .find(|ordinal| self.id(*ordinal) == id)
+            .map(|ordinal| geometry::beacon_pose(frame, ordinal))
+    }
+    pub(super) fn missile_contact(
+        self,
+        ray: RigidPose,
+        range: f64,
+        obstacle: Option<f64>,
+    ) -> Option<(PracticeBeaconId, f64)> {
+        let active = self.active_range()?;
+        let (ordinal, distance) =
+            geometry::nearest_segment(active.opening.pose()?, ray, range, obstacle)?;
+        Some((self.id(ordinal), distance))
+    }
+    pub(super) fn record_missile_hit(
+        &mut self,
+        id: PracticeBeaconId,
+        origin: super::MissileOrigin,
+        flight: Snapshot,
+    ) -> bool {
+        let Some(ordinal) = (0..3).find(|ordinal| self.id(*ordinal) == id) else {
+            return false;
+        };
+        if self.active_range().is_none() {
+            return false;
+        }
+        let Some(range) = self.range.as_mut() else {
+            return false;
+        };
+        let slot = &mut range.hits[ordinal];
+        if slot.is_none() {
+            *slot = Some(FirstHit {
+                tick: flight.tick,
+                firing_pose: RecordedPose::from_snapshot(flight),
+                missile: Some(origin),
+            });
+            return true;
+        }
+        false
     }
     fn snapshot(self, tick: u64) -> PracticeSnapshot {
         let beacons = self.active_range().and_then(|range| {
@@ -228,6 +278,7 @@ impl Practice {
                     id: self.id(ordinal),
                     pose: geometry::beacon_pose(frame, ordinal),
                     hit: hit.is_some(),
+                    missile_hit: range.hits[ordinal].and_then(|hit| hit.missile),
                     flashing: hit
                         .is_some_and(|receipt| tick.saturating_sub(receipt.tick) <= FLASH_TICKS),
                 }
@@ -317,6 +368,7 @@ impl World {
             retired: None,
             reception: reception::Reception::default(),
             ordinary_hit: None,
+            pending_missiles: 0,
         };
         let bytes = self
             .save_bytes_with_practice(Some(practice))
