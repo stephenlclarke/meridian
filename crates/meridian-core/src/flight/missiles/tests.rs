@@ -1,7 +1,6 @@
 #![allow(clippy::unwrap_used)]
 use super::*;
 use crate::flight::practice::tests::{aim_at, consent, launch, shoot, step};
-use crate::save::SaveError;
 use crate::{FlightInput, PracticeStatus, PulseContact};
 
 fn stop(world: &mut World) {
@@ -437,7 +436,7 @@ fn actual_missile_hits_nearest_native_station_and_records_ordinary_failure() {
 }
 
 #[test]
-fn actual_spent_custody_refuses_save_restore_and_preserves_funded_paid_gear() {
+fn actual_spent_custody_continues_and_preserves_funded_paid_gear() {
     let mut world = crate::flight::equipment::tests::earned_world(1681);
     // Earned funds finish at Renas. Return through charged public travel before consent.
     if world.snapshot().navigation.unwrap().fuel_units < 68 {
@@ -465,15 +464,19 @@ fn actual_spent_custody_refuses_save_restore_and_preserves_funded_paid_gear() {
     world
         .request_missile_lock(Some(target), world.snapshot().tick)
         .unwrap();
-    assert!(world.save_bytes().is_err());
+    assert!(world.save_bytes().is_ok());
     world
         .request_missile_lock(None, world.snapshot().tick)
         .unwrap();
     assert!(world.save_bytes().is_ok());
     let origin = fire(&mut world, target);
     let before = world.missile_snapshot();
-    assert!(world.save_bytes().is_err());
-    assert!(world.restore_bytes(&saved).is_err());
+    let active = world.save_bytes().unwrap();
+    let mut corrupt = active.clone();
+    corrupt[0] ^= 1;
+    assert!(world.restore_bytes(&corrupt).is_err());
+    assert_eq!(world.missile_snapshot(), before);
+    world = World::from_save_bytes(&active).unwrap();
     assert_eq!(world.missile_snapshot(), before);
     assert_eq!(
         World::from_save_bytes(&saved)
@@ -510,7 +513,10 @@ fn actual_spent_custody_refuses_save_restore_and_preserves_funded_paid_gear() {
             .count(),
         2
     );
-    assert_eq!(world.save_bytes(), Err(SaveError::UnsupportedMissiles));
+    let docked = world.save_bytes().unwrap();
+    world = World::from_save_bytes(&docked).unwrap();
+    assert_eq!(world.equipment_snapshot().unwrap().owned, Some(stored));
+    assert_eq!(world.credits_tenths(), cash);
     launch(&mut world);
     assert_eq!(
         world
@@ -573,13 +579,14 @@ fn pure_source_geometry_retains_missile_faces_and_player_surface_without_grantin
 }
 
 #[test]
-fn untouched_controller_preserves_exact_v4_v5_v6_v7_owned_rounds_without_a_grant() {
+fn untouched_controller_preserves_exact_v4_through_v8_owned_rounds_without_a_grant() {
     let world = World::new_commander(1691).unwrap();
     let expected = world.missile_snapshot().unwrap();
     let saves = [
         crate::flight::persistence::v4_test_fixture(&world).unwrap(),
         crate::flight::persistence::v5_test_fixture(&world).unwrap(),
         crate::flight::persistence::v6_test_fixture(&world).unwrap(),
+        crate::flight::persistence::v7_test_fixture(&world).unwrap(),
         world.save_bytes().unwrap(),
     ];
     for bytes in saves {
@@ -597,3 +604,5 @@ fn untouched_controller_preserves_exact_v4_v5_v6_v7_owned_rounds_without_a_grant
         );
     }
 }
+
+mod durable;

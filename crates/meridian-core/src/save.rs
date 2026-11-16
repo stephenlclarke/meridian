@@ -1,7 +1,7 @@
 //! Bounded, versioned memory representation. The host owns atomic disk publication.
 use core::fmt;
 
-pub const SAVE_VERSION: u16 = 7;
+pub const SAVE_VERSION: u16 = 8;
 pub const MAX_SAVE_BYTES: usize = 65_536;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -21,7 +21,7 @@ impl fmt::Display for SaveError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::UnsupportedMissiles => {
-                f.write_str("Missile sessions cannot be saved or restored yet")
+                f.write_str("Legacy save format cannot represent missile sessions")
             }
             Self::InvalidState(reason) => write!(f, "invalid saved World: {reason}"),
             other => write!(f, "World save refused: {other:?}"),

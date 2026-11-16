@@ -61,6 +61,18 @@ pub struct PracticeBeaconId {
     ordinal: u8,
 }
 impl PracticeBeaconId {
+    pub(super) fn encode(self, w: &mut crate::save::Writer) {
+        w.u64(self.owner);
+        w.u64(self.visit);
+        w.u8(self.ordinal);
+    }
+    pub(super) fn decode(r: &mut crate::save::Reader<'_>) -> Result<Self, crate::save::SaveError> {
+        Ok(Self {
+            owner: r.u64()?,
+            visit: r.u64()?,
+            ordinal: r.u8()?,
+        })
+    }
     pub fn ordinal(self) -> u8 {
         self.ordinal
     }
@@ -224,6 +236,76 @@ impl Practice {
             });
         }
         Some((id, distance, first_hit))
+    }
+    pub(super) fn missile_owner_matches(self, owner: super::CombatIdentity) -> bool {
+        owner.owner == self.consent.owner().seed()
+            && owner.hull == self.consent.ship().ordinal()
+            && owner.system == SystemId::AVENOR
+            && Some(owner.visit) == self.sortie()
+    }
+    pub(super) fn missile_docked_since_consent(self, sequence: u64) -> bool {
+        sequence > self.consent.sequence()
+    }
+    pub(super) fn missile_provider_ended_at(self) -> Option<u64> {
+        self.ordinary_hit.map(|h| h.tick)
+    }
+    pub(super) fn missile_retired_at(self, tick: u64) -> bool {
+        self.retired.is_some_and(|r| r.tick == tick)
+    }
+    pub(super) fn retained_missile_target(self, id: PracticeBeaconId) -> Option<RigidPose> {
+        let frame = self.range?.opening.pose()?;
+        (0..3)
+            .find(|i| self.id(*i) == id)
+            .map(|i| geometry::beacon_pose(frame, i))
+    }
+    pub(super) fn retained_missile_contact(
+        self,
+        ray: RigidPose,
+        limit: f64,
+        station: Option<f64>,
+    ) -> Option<(PracticeBeaconId, f64)> {
+        let frame = self.range?.opening.pose()?;
+        let (ordinal, distance) = geometry::nearest_segment(frame, ray, limit, station)?;
+        Some((self.id(ordinal), distance))
+    }
+    pub(super) fn missile_first_hit_status(
+        self,
+        id: PracticeBeaconId,
+        origin: super::MissileOrigin,
+        tick: u64,
+    ) -> Option<bool> {
+        let i = (0..3).find(|i| self.id(*i) == id)?;
+        let hit = self.range?.hits[i]?;
+        if hit.tick == tick && hit.missile == Some(origin) {
+            return Some(true);
+        }
+        if hit.tick < tick
+            || (hit.tick == tick
+                && hit
+                    .missile
+                    .is_some_and(|other| other.projectile.entity() < origin.projectile.entity()))
+        {
+            return Some(false);
+        }
+        None
+    }
+    pub(super) fn missile_receipts(
+        self,
+    ) -> [(PracticeBeaconId, Option<(u64, super::MissileOrigin)>); 3] {
+        core::array::from_fn(|i| {
+            (
+                self.id(i),
+                self.range
+                    .and_then(|r| r.hits[i])
+                    .and_then(|h| h.missile.map(|o| (h.tick, o))),
+            )
+        })
+    }
+    pub(super) fn missile_provider_interval(self, launch: u64, last_motion: u64) -> bool {
+        self.range.is_some_and(|r| launch >= r.opened_tick)
+            && launch > self.confirmed_tick
+            && self.retired.is_none_or(|r| last_motion < r.tick)
+            && self.ordinary_hit.is_none_or(|h| last_motion <= h.tick)
     }
     pub(super) fn missile_target(self, id: PracticeBeaconId) -> Option<RigidPose> {
         let range = self.active_range()?;

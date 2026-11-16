@@ -385,7 +385,7 @@ fn semantically_tampered_wallet_cargo_fit_units_stock_and_completion_are_refused
         (account + 30, 1_u16.to_le_bytes().to_vec()), // Food absent from the actual market ledger.
         (account + 34, 131_u16.to_le_bytes().to_vec()),
         (account + 37, 999_u64.to_le_bytes().to_vec()), // Foreign inventory owner.
-        (account + 61 + 28, 804_u64.to_le_bytes().to_vec()), // Duplicate first item ID.
+        (account + 62 + 29, 804_u64.to_le_bytes().to_vec()), // Duplicate first item ID.
         (domain + 43, vec![1]),                         // Duplicate first/second goods serial.
         (domain + 109, vec![1]), // Delivered status with eight still-held units/no transfer.
         (market + 25, 0_u64.to_le_bytes().to_vec()), // Stock not explained by real trades.
@@ -488,7 +488,7 @@ fn native_commodity_cargo_stock_and_money_continue_together_and_old_version_refu
     );
     assert_eq!(world.save_bytes().unwrap(), valid);
     // Account extension follows the exact pre-existing owned-fit prefix.
-    let account_extension = account_start(&world) + 61 + 8 * 28;
+    let account_extension = account_start(&world) + 61 + 8 * 29;
     let market_extension = markets_start(&world) + 16 + 2 * 17 + 4 * 8 + 4 * 8;
     for (offset, value) in [
         (account_extension + 7 * 8, 2_u64), // ordinary Machinery absent from purchases
@@ -548,7 +548,7 @@ fn impossible_export_legal_bits_refuse_without_replacing_actual_cargo() {
     launch(&mut world);
     assert_eq!(world.legal_value(), Some(2));
     let valid = world.save_bytes().unwrap();
-    let legal = account_start(&world) + 61 + 8 * 28 + 2 * 16 * 8;
+    let legal = account_start(&world) + 61 + 8 * 29 + 2 * 16 * 8;
     for value in [1, 3, 255] {
         // Only one Narcotics unit was ever bought: export bits can only include 2.
         let mut bad = valid.clone();

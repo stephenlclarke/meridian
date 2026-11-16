@@ -15,6 +15,7 @@ pub(crate) struct SavedDomainSummary {
     pub(crate) completed: u8,
     pub(crate) equipment_revision: u64,
     pub(crate) equipment_paid: u32,
+    pub(crate) consumed_missiles: u8,
 }
 fn write_actor(w: &mut Writer, a: ActorId) {
     w.u64(a.entity);
@@ -129,6 +130,13 @@ fn read_item(r: &mut Reader<'_>) -> Result<OwnedStarterItem, SaveError> {
 }
 impl CommanderAccount {
     pub(crate) fn encode_save(&self, w: &mut Writer) {
+        self.encode_version(w, 8);
+    }
+    #[cfg(test)]
+    pub(crate) fn encode_v7(&self, w: &mut Writer) {
+        self.encode_version(w, 7);
+    }
+    fn encode_version(&self, w: &mut Writer, version: u16) {
         let d = self.data;
         w.u64(d.owner);
         w.u64(d.hull);
@@ -142,8 +150,12 @@ impl CommanderAccount {
             w.u64(fit.owner);
             w.u64(fit.hull);
             w.u64(fit.inventory);
-            for item in fit.items.iter().flatten() {
-                write_item(w, item);
+            for item in &fit.items {
+                if version >= 8 {
+                    w.option(item.as_ref(), write_item);
+                } else if let Some(item) = item {
+                    write_item(w, item);
+                }
             }
         });
         for quantity in d.other_commodities {
@@ -155,7 +167,7 @@ impl CommanderAccount {
         w.u8(d.legal);
         d.equipment.encode(w);
     }
-    pub(crate) fn decode_save(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+    pub(crate) fn decode_save(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
         Ok(Self {
             data: AccountData {
                 owner: r.u64()?,
@@ -171,7 +183,13 @@ impl CommanderAccount {
                         owner: r.u64()?,
                         hull: r.u64()?,
                         inventory: r.u64()?,
-                        items: r.array(|r| read_item(r).map(Some))?,
+                        items: r.array(|r| {
+                            if version >= 8 {
+                                r.option(read_item)
+                            } else {
+                                read_item(r).map(Some)
+                            }
+                        })?,
                     })
                 })?,
                 other_commodities: r.array(|r| r.u64())?,
@@ -206,9 +224,10 @@ impl CommanderAccount {
         }
         if fit.inventory != nav.owner + 2
             || fit.items.iter().enumerate().any(|(i, item)| {
-                item.is_none_or(|item| {
-                    item.id != nav.owner + 3 + i as u64 || item.fitted_hull != Some(nav.hull)
-                })
+                (i < 5 && item.is_none())
+                    || item.is_some_and(|item| {
+                        item.id != nav.owner + 3 + i as u64 || item.fitted_hull != Some(nav.hull)
+                    })
             })
         {
             return Err(SaveError::InvalidState("starter identity or fitting"));
@@ -226,6 +245,7 @@ impl CommanderAccount {
             completed: state.snapshot().completed_jobs,
             equipment_revision: self.data.equipment.revision(),
             equipment_paid: self.data.equipment.paid(),
+            consumed_missiles: fit.items[5..].iter().filter(|i| i.is_none()).count() as u8,
         })
     }
 }

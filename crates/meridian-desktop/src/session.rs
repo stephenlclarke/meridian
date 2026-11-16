@@ -470,15 +470,7 @@ impl Session {
                 ));
                 lines.push("F1 NEXT LOCK | F2 ARM/SAFE | F3 LAUNCH | F4 SAFE AND UNLOCK".into());
             }
-            if missiles.projectiles.iter().any(Option::is_some) {
-                lines.push("MISSILE USED | SAVING UNAVAILABLE FOR THIS SESSION".into());
-            } else if missiles.armed || missiles.lock.is_some() {
-                lines.push(
-                    "F4 SAFE/UNLOCK TO SAVE | LAUNCH DISABLES SAVING FOR THIS SESSION".into(),
-                );
-            } else if snapshot.mode == FlightMode::Flight {
-                lines.push("LAUNCH USES ONE ROUND AND DISABLES SAVING FOR THIS SESSION".into());
-            }
+            lines.push("F5 SAVES COMPLETE MISSILE SESSION | F9 CONTINUES SAVED STATE".into());
         }
         if let Some(practice) = world.practice_snapshot() {
             let reception = world.practice_reception_snapshot();
@@ -671,7 +663,7 @@ fn missile_command(world: &mut World, action: Action) -> Result<String, String> 
             world
                 .request_fire_missile(tick)
                 .map_err(|e| e.to_string())?;
-            Ok("Missile launched; consumed round cannot be saved in this version".into())
+            Ok("Missile launched; F5 saves the owned round and projectile state".into())
         }
         Action::ClearMissile => {
             world
@@ -689,7 +681,7 @@ fn missile_command(world: &mut World, action: Action) -> Result<String, String> 
 #[cfg(test)]
 mod tests {
     #[test]
-    fn missile_controls_cycle_actual_locks_consume_a_round_and_keep_save_refusal() {
+    fn missile_controls_cycle_actual_locks_consume_a_round_and_continue_state() {
         fn assert_visible(session: &Session, world: &World, warning: &str) {
             let lines = session.lines(world, true, None);
             let budget = crate::hud::line_budget(640, 360);
@@ -733,7 +725,7 @@ mod tests {
             .step(meridian_core::FlightInput::default())
             .unwrap_or_else(|error| panic!("{error}"));
         let mut session = Session::from_world(&world);
-        assert_visible(&session, &world, "LAUNCH USES ONE ROUND");
+        assert_visible(&session, &world, "F5 SAVES COMPLETE MISSILE SESSION");
         let before = world
             .missile_snapshot()
             .unwrap_or_else(|| panic!("Expected missile_snapshot"));
@@ -765,8 +757,8 @@ mod tests {
         session
             .command(&mut world, Action::ToggleMissileArm)
             .unwrap_or_else(|error| panic!("{error}"));
-        assert!(world.save_bytes().is_err());
-        assert_visible(&session, &world, "F4 SAFE/UNLOCK TO SAVE");
+        assert!(world.save_bytes().is_ok());
+        assert_visible(&session, &world, "F5 SAVES COMPLETE MISSILE SESSION");
         session
             .command(&mut world, Action::ClearMissile)
             .unwrap_or_else(|error| panic!("{error}"));
@@ -780,7 +772,7 @@ mod tests {
         session
             .command(&mut world, Action::FireMissile)
             .unwrap_or_else(|error| panic!("{error}"));
-        assert_visible(&session, &world, "SAVING UNAVAILABLE");
+        assert_visible(&session, &world, "F5 SAVES COMPLETE MISSILE SESSION");
         let after = world
             .missile_snapshot()
             .unwrap_or_else(|| panic!("Expected missile_snapshot"));
@@ -803,12 +795,17 @@ mod tests {
             session
                 .lines(&world, true, None)
                 .iter()
-                .any(|s| s.contains("SAVING UNAVAILABLE"))
+                .any(|s| s.contains("F5 SAVES COMPLETE MISSILE SESSION"))
         );
         session
             .command(&mut world, Action::ClearMissile)
             .unwrap_or_else(|error| panic!("{error}"));
-        assert!(world.save_bytes().is_err());
+        assert!(world.save_bytes().is_ok());
+        let bytes = world.save_bytes().unwrap_or_else(|error| panic!("{error}"));
+        let continued = World::from_save_bytes(&bytes).unwrap_or_else(|error| panic!("{error}"));
+        assert_eq!(continued.missile_snapshot(), world.missile_snapshot());
+        assert_eq!(continued.practice_snapshot(), world.practice_snapshot());
+        assert_eq!(continued.combat_snapshot(), world.combat_snapshot());
         let snapshot = world.missile_snapshot();
         world
             .request_pause(true, world.snapshot().tick)

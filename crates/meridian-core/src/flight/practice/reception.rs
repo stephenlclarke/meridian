@@ -54,6 +54,43 @@ impl Range {
 }
 
 impl Practice {
+    pub(in crate::flight) fn validate_missile_quiet(
+        self,
+        projectiles: [Option<crate::flight::ProjectileSnapshot>; 3],
+    ) -> Result<(), crate::save::SaveError> {
+        let invalid =
+            crate::save::SaveError::InvalidState("missile ceasefire endpoint or lesson failure");
+        if let Some(anchor) = self.reception.anchor
+            && let Some(third) = self.range.and_then(Range::third_hit)
+        {
+            for p in projectiles.into_iter().flatten() {
+                let endpoint = if p.ended.is_some() {
+                    p.last_tick
+                } else {
+                    p.origin.launched_tick
+                };
+                if endpoint >= third && anchor < endpoint {
+                    return Err(invalid);
+                }
+            }
+        }
+        for p in projectiles.into_iter().flatten() {
+            if matches!(
+                p.contact,
+                Some(
+                    crate::flight::MissileContact::Station
+                        | crate::flight::MissileContact::Player { .. }
+                )
+            ) && !self.reception_is_terminal()
+                && p.last_tick >= self.confirmed_tick
+                && self.ordinary_hit.is_none()
+            {
+                return Err(invalid);
+            }
+        }
+        Ok(())
+    }
+
     pub(in crate::flight) fn reception_is_terminal(self) -> bool {
         self.reception.completion.is_some()
     }
@@ -143,11 +180,6 @@ impl Practice {
         current_dock: Option<DockContext>,
     ) -> Result<(), SaveError> {
         let invalid = SaveError::InvalidState("T02 ceasefire or reception");
-        if self.pending_missiles != 0 {
-            return Err(SaveError::InvalidState(
-                "unsupported pending projectile save boundary",
-            ));
-        }
         if let Some(hit) = self.ordinary_hit {
             if self.reception.anchor.is_some()
                 || self.reception.completion.is_some()

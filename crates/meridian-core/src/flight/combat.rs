@@ -61,8 +61,8 @@ struct AttackWindow {
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(super) struct State {
-    emissions: u64,
-    incidents: u64,
+    pub(super) emissions: u64,
+    pub(super) incidents: u64,
     physical_tick: u64,
     front: u16,
     rear: u16,
@@ -212,6 +212,13 @@ impl State {
         // the original station susceptibility guard admits no hull damage.
     }
     pub(super) fn encode(self, w: &mut Writer) {
+        self.encode_version(w, 8);
+    }
+    #[cfg(test)]
+    pub(super) fn encode_v7(self, w: &mut Writer) {
+        self.encode_version(w, 7);
+    }
+    fn encode_version(self, w: &mut Writer, version: u16) {
         w.u64(self.emissions);
         w.u64(self.incidents);
         w.u64(self.physical_tick);
@@ -225,9 +232,9 @@ impl State {
                 w.u64(x.physical_tick);
             });
         }
-        w.option(self.last.as_ref(), |w, hit| hit.encode(w));
+        w.option(self.last.as_ref(), |w, hit| hit.encode_version(w, version));
     }
-    pub(super) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+    pub(super) fn decode(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
         Ok(Self {
             emissions: r.u64()?,
             incidents: r.u64()?,
@@ -244,33 +251,39 @@ impl State {
                     })
                 })
             })?,
-            last: r.option(OrdinaryImpact::decode)?,
+            last: r.option(|r| OrdinaryImpact::decode_version(r, version))?,
         })
     }
-    pub(super) fn validate(self, world: &World) -> Result<(), SaveError> {
-        let invalid = SaveError::InvalidState("ordinary combat identity or resources");
-        let identity = world.combat_identity().ok_or(invalid)?;
+    pub(super) fn validate_damage_boundary(self, world: &World) -> Result<(), SaveError> {
         if self.unbound_player_impact
-            || self.front != SHIELD_CAPACITY
-            || self.rear != SHIELD_CAPACITY
+            || self.front > SHIELD_CAPACITY
+            || self.rear > SHIELD_CAPACITY
+            || ((self.front != SHIELD_CAPACITY || self.rear != SHIELD_CAPACITY)
+                && !world.missiles.has_player_hit())
         {
             return Err(SaveError::InvalidState(
                 "unsupported ordnance damage boundary",
             ));
         }
+        Ok(())
+    }
+    pub(super) fn validate(self, world: &World) -> Result<(), SaveError> {
+        let invalid = SaveError::InvalidState("ordinary combat identity or resources");
+        let identity = world.combat_identity().ok_or(invalid)?;
+        self.validate_damage_boundary(world)?;
         let maximum_emissions = if world.state.tick == 0 {
             0
         } else {
             1 + (world.state.tick - 1) / 18
         };
         if self.physical_tick > world.state.tick
-            || self.emissions > maximum_emissions
+            || self.emissions > maximum_emissions.saturating_add(world.missiles.used() as u64)
             || self.incidents > self.emissions
             || self.penalties > 4
             || u64::from(self.penalties) > self.incidents
             || (self.incidents == 0) != self.last.is_none()
             || (self.incidents == 0 && self.windows.iter().any(Option::is_some))
-            || (self.incidents != 0 && self.penalties == 0)
+            || (self.incidents != 0 && self.penalties == 0 && !world.missiles.has_player_hit())
         {
             return Err(invalid);
         }
@@ -298,11 +311,17 @@ impl State {
             // At the receipt's own tick neither clock can have moved past it.
             if elapsed_physical > elapsed_global
                 || (elapsed_global == 0 && !uninterrupted)
-                || !world
-                    .pulse
-                    .fits_ordinary_hit(elapsed_physical, uninterrupted)
+                || (hit.weapon == OrdinaryWeapon::FrontPulseLaser
+                    && !world.pulse.fits_ordinary_hit(
+                        elapsed_physical,
+                        uninterrupted,
+                        world.missiles.has_player_hit(),
+                    ))
             {
                 return Err(invalid);
+            }
+            if hit.target != OrdinaryTarget::MainStation {
+                return Ok(());
             }
             let window =
                 self.windows[station_index(hit.attacker.system).ok_or(invalid)?].ok_or(invalid)?;
@@ -459,7 +478,13 @@ impl PreparedPulseImpact {
     }
 }
 impl OrdinaryImpact {
+    pub(super) fn matches_flight(self, flight: Snapshot) -> bool {
+        self.position == flight.position && self.orientation == flight.orientation
+    }
     pub(super) fn encode(self, w: &mut Writer) {
+        self.encode_version(w, 8);
+    }
+    pub(super) fn encode_version(self, w: &mut Writer, version: u16) {
         w.u64(self.victim_entity);
         w.u64(self.attacker.owner);
         w.u64(self.attacker.hull);
@@ -484,10 +509,24 @@ impl OrdinaryImpact {
         for n in self.orientation {
             w.f32(n);
         }
+        if version >= 8 {
+            w.u8(match self.weapon {
+                OrdinaryWeapon::FrontPulseLaser => 0,
+                OrdinaryWeapon::StandardMissile => 1,
+            });
+            w.u8(match self.target {
+                OrdinaryTarget::MainStation => 0,
+                OrdinaryTarget::Player { front: true } => 1,
+                OrdinaryTarget::Player { front: false } => 2,
+            });
+        }
     }
     pub(super) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+        Self::decode_version(r, 8)
+    }
+    pub(super) fn decode_version(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
         let victim_entity = r.u64()?;
-        Ok(Self {
+        let mut hit = Self {
             victim_entity,
             weapon: OrdinaryWeapon::FrontPulseLaser,
             target: OrdinaryTarget::MainStation,
@@ -512,11 +551,28 @@ impl OrdinaryImpact {
             ),
             position: r.array(|r| r.f32())?,
             orientation: r.array(|r| r.f32())?,
-        })
+        };
+        if version >= 8 {
+            hit.weapon = match r.u8()? {
+                0 => OrdinaryWeapon::FrontPulseLaser,
+                1 => OrdinaryWeapon::StandardMissile,
+                _ => return Err(SaveError::InvalidEncoding),
+            };
+            hit.target = match r.u8()? {
+                0 => OrdinaryTarget::MainStation,
+                1 => OrdinaryTarget::Player { front: true },
+                2 => OrdinaryTarget::Player { front: false },
+                _ => return Err(SaveError::InvalidEncoding),
+            };
+        }
+        Ok(hit)
     }
     pub(super) fn validate(self, world: &World) -> Result<(), SaveError> {
         let invalid = SaveError::InvalidState("ordinary impact receipt");
         let current = world.combat_identity().ok_or(invalid)?;
+        if self.weapon == OrdinaryWeapon::StandardMissile {
+            return world.missiles.validate_ordinary(self, world);
+        }
         let pose = flight_pose(self.position, self.orientation).ok_or(invalid)?;
         let station = world.state.station.ok_or(invalid)?;
         let distance = world

@@ -6,6 +6,13 @@ const INVALID: SaveError = SaveError::InvalidState("T02 practice consent, visit 
 
 impl Practice {
     pub(in crate::flight) fn encode(self, w: &mut Writer) {
+        self.encode_version(w, 8);
+    }
+    #[cfg(test)]
+    pub(in crate::flight) fn encode_v7(self, w: &mut Writer) {
+        self.encode_version(w, 7);
+    }
+    fn encode_version(self, w: &mut Writer, version: u16) {
         self.consent.encode_save(w);
         w.u64(self.confirmed_tick);
         w.option(self.range.as_ref(), |w, range| {
@@ -15,6 +22,9 @@ impl Practice {
                 w.option(hit.as_ref(), |w, hit| {
                     w.u64(hit.tick);
                     hit.firing_pose.encode(w);
+                    if version >= 8 {
+                        w.option(hit.missile.as_ref(), |w, origin| origin.encode(w));
+                    }
                 });
             }
         });
@@ -22,9 +32,12 @@ impl Practice {
             w.u64(retired.tick);
             w.u64(retired.visit);
         });
+        if version >= 8 {
+            w.u8(self.pending_missiles);
+        }
     }
-    pub(in crate::flight) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
-        Ok(Self {
+    pub(in crate::flight) fn decode(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
+        let mut practice = Self {
             consent: DockContext::decode_save(r)?,
             confirmed_tick: r.u64()?,
             range: r.option(|r| {
@@ -36,7 +49,11 @@ impl Practice {
                             Ok(FirstHit {
                                 tick: r.u64()?,
                                 firing_pose: RecordedPose::decode(r)?,
-                                missile: None,
+                                missile: if version >= 8 {
+                                    r.option(super::super::MissileOrigin::decode)?
+                                } else {
+                                    None
+                                },
                             })
                         })
                     })?,
@@ -51,7 +68,11 @@ impl Practice {
                     visit: r.u64()?,
                 })
             })?,
-        })
+        };
+        if version >= 8 {
+            practice.pending_missiles = r.u8()?;
+        }
+        Ok(practice)
     }
     pub(in crate::flight) fn validate(
         self,
@@ -70,7 +91,14 @@ impl Practice {
                 return Err(INVALID);
             }
             range.validate(last_active_tick, flight, data)?;
-            if let Some(latest_hit) = range.hits.iter().flatten().map(|hit| hit.tick).max() {
+            if let Some(latest_hit) = range
+                .hits
+                .iter()
+                .flatten()
+                .filter(|hit| hit.missile.is_none())
+                .map(|hit| hit.tick)
+                .max()
+            {
                 // Every published step advances one global tick. Only a subset
                 // advances the weapon clock; docking and arrival retain cooldown.
                 // A later discharge can only raise the remainder of this floor.
@@ -160,15 +188,13 @@ impl Range {
             let Some(hit) = slot else {
                 continue;
             };
-            if hit.missile.is_some() {
-                return Err(SaveError::InvalidState(
-                    "unsupported missile hit save boundary",
-                ));
-            }
             if hit.tick < self.opened_tick || hit.tick > last_active_tick {
                 return Err(INVALID);
             }
             let pose = hit.firing_pose.checked_pose_at(hit.tick, flight)?;
+            if hit.missile.is_some() {
+                continue;
+            } // World cross-validates the retained projectile contact.
             let station_distance = data
                 .beam_block_distance(
                     station,

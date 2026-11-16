@@ -303,6 +303,160 @@ mod tests {
         );
     }
     #[test]
+    fn missile_cold_continue_child() {
+        let Some(path) = std::env::var_os("MERIDIAN_MISSILE_TEST_SLOT") else {
+            return;
+        };
+        let directory = Path::new(&path);
+        let before =
+            fs::read(directory.join("commander.meridian")).unwrap_or_else(|e| panic!("{e}"));
+        let expected = fs::read(directory.join("expected-after-tick.meridian"))
+            .unwrap_or_else(|e| panic!("{e}"));
+        let mut profile = open(directory);
+        profile.continue_saved().unwrap_or_else(|e| panic!("{e}"));
+        // Continue intentionally invalidates prior UI reviews. The whole encoded
+        // state must match the public loader's one transition, not the old file.
+        let continued_before = World::from_save_bytes(&before)
+            .unwrap_or_else(|e| panic!("{e}"))
+            .save_bytes()
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(
+            profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}")),
+            continued_before
+        );
+        assert_eq!(
+            fs::read(directory.join("commander.meridian")).unwrap_or_else(|e| panic!("{e}")),
+            before
+        );
+        assert!(profile.world.mission_snapshot().is_some_and(|m| m.paused));
+        let missiles = profile
+            .world
+            .missile_snapshot()
+            .unwrap_or_else(|| panic!("missing missiles"));
+        assert_eq!(missiles.rounds.iter().flatten().count(), 2);
+        assert_eq!(
+            missiles
+                .projectiles
+                .iter()
+                .flatten()
+                .filter(|p| p.ended.is_none())
+                .count(),
+            1
+        );
+        let expected = World::from_save_bytes(&expected)
+            .unwrap_or_else(|e| panic!("{e}"))
+            .save_bytes()
+            .unwrap_or_else(|e| panic!("{e}"));
+        profile
+            .world
+            .request_pause(false, profile.world.snapshot().tick)
+            .unwrap_or_else(|e| panic!("{e}"));
+        profile
+            .world
+            .step(Default::default())
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(
+            profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}")),
+            expected
+        );
+        profile.prepare_quit().unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(
+            fs::read(directory.join("commander.meridian")).unwrap_or_else(|e| panic!("{e}")),
+            expected
+        );
+    }
+
+    #[test]
+    fn real_process_preserves_paused_live_missile_and_resumes_like_uninterrupted_world() {
+        let directory = TestDirectory::new();
+        let mut profile = open(&directory.0);
+        assert!(
+            profile
+                .new_commander(9610)
+                .unwrap_or_else(|e| panic!("{e}"))
+        );
+        action(&mut profile, Action::ReviewPractice);
+        action(&mut profile, Action::Confirm);
+        action(&mut profile, Action::Launch);
+        profile
+            .world
+            .step(Default::default())
+            .unwrap_or_else(|e| panic!("{e}"));
+        action(&mut profile, Action::CycleMissileLock);
+        action(&mut profile, Action::ToggleMissileArm);
+        action(&mut profile, Action::FireMissile);
+        for _ in 0..6 {
+            profile
+                .world
+                .step(Default::default())
+                .unwrap_or_else(|e| panic!("{e}"));
+        }
+        profile
+            .world
+            .request_pause(true, profile.world.snapshot().tick)
+            .unwrap_or_else(|e| panic!("{e}"));
+        let origin = profile
+            .world
+            .missile_snapshot()
+            .unwrap_or_else(|| panic!("missing missiles"));
+        profile.prepare_quit().unwrap_or_else(|e| panic!("{e}"));
+        profile
+            .world
+            .request_pause(false, profile.world.snapshot().tick)
+            .unwrap_or_else(|e| panic!("{e}"));
+        profile
+            .world
+            .step(Default::default())
+            .unwrap_or_else(|e| panic!("{e}"));
+        let expected = profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+        fs::write(directory.0.join("expected-after-tick.meridian"), &expected)
+            .unwrap_or_else(|e| panic!("{e}"));
+        let expected_missiles = profile.world.missile_snapshot();
+        let expected_practice = profile.world.practice_snapshot();
+        let expected_combat = profile.world.combat_snapshot();
+        let expected_flight = profile.world.snapshot();
+        let expected_mission = profile.world.mission_snapshot();
+        let continued_expected = World::from_save_bytes(&expected)
+            .unwrap_or_else(|e| panic!("{e}"))
+            .save_bytes()
+            .unwrap_or_else(|e| panic!("{e}"));
+        drop(profile);
+        let executable = std::env::current_exe().unwrap_or_else(|e| panic!("{e}"));
+        let status = Command::new(executable)
+            .args([
+                "--exact",
+                "profile::tests::missile_cold_continue_child",
+                "--nocapture",
+            ])
+            .env("MERIDIAN_MISSILE_TEST_SLOT", &directory.0)
+            .status()
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert!(status.success());
+        assert_eq!(
+            fs::read(directory.0.join("commander.meridian")).unwrap_or_else(|e| panic!("{e}")),
+            continued_expected
+        );
+        let mut cold = open(&directory.0);
+        cold.continue_saved().unwrap_or_else(|e| panic!("{e}"));
+        // These expectations come directly from the uninterrupted producer,
+        // independently of the public-loader byte comparison in the child.
+        assert_eq!(cold.world.missile_snapshot(), expected_missiles);
+        assert_eq!(cold.world.practice_snapshot(), expected_practice);
+        assert_eq!(cold.world.combat_snapshot(), expected_combat);
+        assert_eq!(cold.world.snapshot(), expected_flight);
+        assert_eq!(cold.world.mission_snapshot(), expected_mission);
+        let continued = cold
+            .world
+            .missile_snapshot()
+            .unwrap_or_else(|| panic!("missing missiles"));
+        assert_eq!(continued.rounds, origin.rounds);
+        assert_eq!(
+            continued.projectiles.map(|p| p.map(|p| p.origin)),
+            origin.projectiles.map(|p| p.map(|p| p.origin))
+        );
+    }
+
+    #[test]
     fn cold_continue_child() {
         // Normal test discovery does no work; only the parent's explicit fresh child opens its slot.
         let Some(path) = std::env::var_os("MERIDIAN_PROFILE_TEST_SLOT") else {
