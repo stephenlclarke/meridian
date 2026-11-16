@@ -45,7 +45,14 @@ impl std::error::Error for FireError {}
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum PulseContact {
     Clear,
-    StationBlocked { distance: f64 },
+    StationBlocked {
+        distance: f64,
+    },
+    PracticeBeacon {
+        id: super::PracticeBeaconId,
+        distance: f64,
+        first_hit: bool,
+    },
 }
 
 /// A committed discharge and its first physical beam endpoint. Presentation only.
@@ -113,6 +120,10 @@ impl PulseResources {
             cooldown: PULSE_COOLDOWN_TICKS,
         })
     }
+    pub(super) fn remaining_cooldown(self) -> u8 {
+        self.cooldown
+    }
+
     pub(super) fn encode_save(self, w: &mut Writer) {
         w.u16(self.energy);
         w.u16(self.heat);
@@ -241,15 +252,30 @@ impl World {
             .ok_or(FireError::InvalidGeometry)?
             .beam_block_distance(station, origin, direction, PULSE_RANGE)
             .map_err(|_| FireError::InvalidGeometry)?;
-        let end_distance = distance.unwrap_or(PULSE_RANGE);
+        let practice_hit = self
+            .practice
+            .as_mut()
+            .and_then(|practice| practice.contact(self.state, pose, distance));
+        let end_distance = practice_hit
+            .map(|(_, distance, _)| distance)
+            .or(distance)
+            .unwrap_or(PULSE_RANGE);
         let end = Vec3::new(
             origin.x + direction.x * end_distance,
             origin.y + direction.y * end_distance,
             origin.z + direction.z * end_distance,
         );
-        let contact = distance.map_or(PulseContact::Clear, |distance| {
-            PulseContact::StationBlocked { distance }
-        });
+        let contact = if let Some((id, distance, first_hit)) = practice_hit {
+            PulseContact::PracticeBeacon {
+                id,
+                distance,
+                first_hit,
+            }
+        } else {
+            distance.map_or(PulseContact::Clear, |distance| {
+                PulseContact::StationBlocked { distance }
+            })
+        };
         self.pulse = resources;
         Ok(PulseShot {
             tick: self.state.tick,

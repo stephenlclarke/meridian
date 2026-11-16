@@ -1,6 +1,11 @@
 mod equipment;
 mod mission;
 mod persistence;
+mod practice;
+pub use practice::{
+    PRACTICE_HALF_SIDE, PracticeBeaconId, PracticeBeaconSnapshot, PracticeError, PracticeReview,
+    PracticeSnapshot, PracticeStatus, PreparedPracticeConfirmation,
+};
 mod services;
 mod weapons;
 pub use mission::{MissionError, MissionSnapshot, StationNpc};
@@ -112,6 +117,7 @@ pub struct World {
     freight_session: Option<mission::FreightSession>,
     station_markets: Option<crate::station_services::StationMarkets>,
     pulse: weapons::PulseResources,
+    practice: Option<practice::Practice>,
 }
 
 impl Default for World {
@@ -140,6 +146,7 @@ impl World {
             freight_session: None,
             station_markets: None,
             pulse: weapons::PulseResources::default(),
+            practice: None,
         }
     }
 
@@ -475,6 +482,11 @@ impl World {
             }
         }
         self.pulse.advance(self.state.mode, next.mode);
+        if let (Some(practice), Some(nav), Some(data)) =
+            (&mut self.practice, navigation, &self.station_data)
+        {
+            practice.after_step(self.state.mode, next, nav, data);
+        }
         self.state = next;
         self.navigation = navigation;
         if let Some((session, epoch)) = self.freight_session.as_mut().zip(mission_epoch) {

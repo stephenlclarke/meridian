@@ -3,7 +3,7 @@ use meridian_core::freight::g02::presentation;
 use meridian_core::freight::g02::{Choice, Command, ContactDefinition, Event, JobId, Review};
 use meridian_core::navigation::SystemId;
 use meridian_core::station_services::{self, CommodityId};
-use meridian_core::{FlightMode, World};
+use meridian_core::{FlightMode, PracticeReview, PracticeStatus, World};
 
 #[derive(Clone, Copy)]
 pub enum Action {
@@ -12,6 +12,7 @@ pub enum Action {
     ReviewAll,
     ReviewAbandonment,
     MissionDetails,
+    ReviewPractice,
     Confirm,
     Back,
     Refuel,
@@ -31,6 +32,7 @@ pub enum Action {
 pub struct Session {
     job: Option<JobId>,
     pending: Option<(Review, Choice)>,
+    pub(crate) pending_practice: Option<PracticeReview>,
     show_objective: bool,
     market_open: bool,
     equipment_open: bool,
@@ -42,6 +44,7 @@ impl Default for Session {
         Self {
             job: None,
             pending: None,
+            pending_practice: None,
             show_objective: false,
             market_open: false,
             equipment_open: false,
@@ -61,6 +64,7 @@ impl Session {
 
     pub fn invalidate(&mut self) {
         self.pending = None;
+        self.pending_practice = None;
         self.show_objective = false;
         self.market_open = false;
         self.equipment_open = false;
@@ -148,7 +152,18 @@ impl Session {
     }
 
     pub fn command(&mut self, world: &mut World, action: Action) -> Result<String, String> {
+        if self.pending_practice.take().is_some() && matches!(action, Action::Back) {
+            return Ok("Practice review cancelled.".into());
+        }
         match action {
+            Action::ReviewPractice => {
+                self.invalidate();
+                let review = world
+                    .review_practice(world.snapshot().tick)
+                    .map_err(|error| error.to_string())?;
+                self.pending_practice = Some(review);
+                Ok("Avenor safe gunnery practice".into())
+            }
             Action::MissionDetails => {
                 self.invalidate();
                 self.show_objective = true;
@@ -328,7 +343,9 @@ impl Session {
                 "PAUSED / UNFOCUSED"
             }
         )];
-        let review_line = if let Some((review, choice)) = self.pending {
+        let review_line = if self.pending_practice.is_some() {
+            "PRACTICE REVIEW | ENTER CONFIRMS AND SAVES | B CANCELS".into()
+        } else if let Some((review, choice)) = self.pending {
             match choice {
                 Choice::ReceiveOne(unit) => format!(
                     "REVIEW: RECEIVE UNIT {} | {} REMAIN | ENTER CONFIRMS, B CANCELS",
@@ -363,6 +380,13 @@ impl Session {
         } else {
             "L LAUNCH | J JUMP | T CONTACT | R REVIEW | V RECEIVE ALL | X ABANDON | ENTER CONFIRM | B BACK".into()
         });
+        if self.pending_practice.is_some() {
+            append_paragraph(
+                &mut lines,
+                "Accept one Avenor practice sortie with the fitted front Pulse Laser. After launch, a clear range opens around three uncrewed beacons. Hit each distinct beacon. No fee or cash reward.",
+            );
+            return lines;
+        }
         if self.append_mission_panel(world, &mut lines) {
             return lines;
         }
@@ -379,6 +403,34 @@ impl Session {
                 append_paragraph(&mut lines, &error);
             }
             return lines;
+        }
+        if let Some(practice) = world.practice_snapshot() {
+            match practice.status {
+                PracticeStatus::Unaccepted
+                    if snapshot.mode == FlightMode::Docked
+                        && snapshot
+                            .navigation
+                            .is_some_and(|nav| nav.system == SystemId::AVENOR) =>
+                {
+                    lines.push("F10 REVIEW AVENOR PRACTICE".into());
+                }
+                PracticeStatus::Consented => {
+                    lines.push("PRACTICE ACCEPTED | LAUNCH AND FLY CLEAR".into());
+                }
+                PracticeStatus::Active => {
+                    lines.push(format!(
+                        "PRACTICE BEACONS HIT {}/3 | Z FIRE",
+                        practice.first_hits
+                    ));
+                }
+                PracticeStatus::Retired => {
+                    lines.push(format!(
+                        "PRACTICE RANGE CLOSED | BEACONS HIT {}/3",
+                        practice.first_hits
+                    ));
+                }
+                PracticeStatus::Unaccepted => {}
+            }
         }
         let credit = world.credits_tenths().unwrap_or(0);
         if let Some(navigation) = snapshot.navigation {

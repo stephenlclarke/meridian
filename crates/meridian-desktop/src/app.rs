@@ -214,6 +214,7 @@ impl App {
             KeyCode::KeyV => Action::ReviewAll,
             KeyCode::KeyX => Action::ReviewAbandonment,
             KeyCode::KeyI => Action::MissionDetails,
+            KeyCode::F10 => Action::ReviewPractice,
             KeyCode::Enter => Action::Confirm,
             KeyCode::KeyB => Action::Back,
             KeyCode::KeyF => Action::Refuel,
@@ -289,6 +290,12 @@ impl App {
         let pulse_notice = self.pulse.map(|shot| match shot.contact {
             PulseContact::Clear => "Pulse fired",
             PulseContact::StationBlocked { .. } => "Pulse stopped by station hull",
+            PulseContact::PracticeBeacon {
+                first_hit: true, ..
+            } => "Practice beacon hit",
+            PulseContact::PracticeBeacon {
+                first_hit: false, ..
+            } => "Practice beacon already counted",
         });
         let notice = pulse_notice.or(self.notice.as_deref());
         let hud_lines = self.game.lines(active, notice);
@@ -326,7 +333,14 @@ impl App {
                         port,
                         docked: snapshot.mode == FlightMode::Docked,
                     });
-            if let Err(error) = renderer.draw(&snapshot, station, self.pulse.as_ref(), &hud_lines) {
+            let practice = self.game.world.practice_snapshot();
+            if let Err(error) = renderer.draw(
+                &snapshot,
+                station,
+                self.pulse.as_ref(),
+                practice.as_ref().and_then(|state| state.beacons.as_ref()),
+                &hud_lines,
+            ) {
                 self.fail(event_loop, error);
             }
         }

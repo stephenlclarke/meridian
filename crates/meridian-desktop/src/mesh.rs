@@ -1,5 +1,5 @@
 use meridian_core::docking::{Basis3, DockingPort, RigidPose, StationPose, Vec3};
-use meridian_core::{PulseShot, Snapshot};
+use meridian_core::{PRACTICE_HALF_SIDE, PracticeBeaconSnapshot, PulseShot, Snapshot};
 
 #[repr(C)]
 #[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
@@ -141,6 +141,50 @@ fn append_mesh(
             position,
             color: vertex.color,
         });
+    }
+    Ok(())
+}
+
+// Three closed cubes, with two triangles per face.
+pub const PRACTICE_VERTEX_COUNT: usize = 3 * 6 * 6;
+
+pub fn append_practice_beacons(
+    snapshot: &Snapshot,
+    station: StationRender<'_>,
+    beacons: &[PracticeBeaconSnapshot; 3],
+    output: &mut Vec<Vertex>,
+) -> Result<(), String> {
+    let camera = camera_for(snapshot, station)?;
+    let side = PRACTICE_HALF_SIDE as f32;
+    let corners = [
+        [-side, -side, -side],
+        [side, -side, -side],
+        [side, side, -side],
+        [-side, side, -side],
+        [-side, -side, side],
+        [side, -side, side],
+        [side, side, side],
+        [-side, side, side],
+    ];
+    let faces = [
+        [0, 3, 2, 1],
+        [4, 5, 6, 7],
+        [0, 1, 5, 4],
+        [3, 7, 6, 2],
+        [0, 4, 7, 3],
+        [1, 2, 6, 5],
+    ];
+    for beacon in beacons {
+        let color = if beacon.flashing {
+            [1.0, 1.0, 1.0]
+        } else {
+            [0.0, 1.0, 1.0]
+        };
+        let vertices: [Vertex; 36] = std::array::from_fn(|index| Vertex {
+            position: corners[faces[index / 6][[0, 1, 2, 0, 2, 3][index % 6]]],
+            color,
+        });
+        append_mesh(&vertices, beacon.pose, &camera, output)?;
     }
     Ok(())
 }

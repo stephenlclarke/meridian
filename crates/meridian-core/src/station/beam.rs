@@ -77,6 +77,45 @@ fn triangle_distance(
     (distance.is_finite() && (0.0..=limit).contains(&distance)).then_some(distance)
 }
 
+impl OriginalStationData {
+    pub(crate) fn player_clearance_radius(&self) -> f64 {
+        self.hull.radius
+    }
+
+    /// Enclose the complete admitted station collision representation before
+    /// testing the source's strict 64 metre protected-volume separation.
+    pub(crate) fn practice_sphere_clears_station(
+        &self,
+        station: StationPose,
+        center: Vec3,
+        radius: f64,
+    ) -> bool {
+        let Ok(pose) = station.model_pose() else {
+            return false;
+        };
+        let mut low = [f64::INFINITY; 3];
+        let mut high = [f64::NEG_INFINITY; 3];
+        for vertex in &self.station.vertices {
+            let oriented = pose.orientation.apply(*vertex);
+            let point = super::add(pose.position, oriented);
+            for (i, coord) in [point.x, point.y, point.z].into_iter().enumerate() {
+                low[i] = low[i].min(coord);
+                high[i] = high[i].max(coord);
+            }
+        }
+        let [x, y, z] = [center.x, center.y, center.z];
+        let nearest = Vec3::new(
+            x.clamp(low[0], high[0]),
+            y.clamp(low[1], high[1]),
+            z.clamp(low[2], high[2]),
+        );
+        let delta = sub(center, nearest);
+        let numerical =
+            1e-8 * (center.dot(center).sqrt() + nearest.dot(nearest).sqrt() + radius).max(1.0);
+        delta.dot(delta).sqrt() - radius > 64.0 + numerical
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

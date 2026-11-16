@@ -74,6 +74,29 @@ impl Profile {
         if !self.playing {
             return Err("N starts a new commander; C continues the existing save".into());
         }
+        if matches!(action, Action::Confirm)
+            && let Some(review) = self.session.pending_practice.take()
+        {
+            let tick = self.world.snapshot().tick;
+            let prepared = self
+                .world
+                .prepare_practice_confirmation(review, tick)
+                .map_err(|error| error.to_string())?;
+            let published = self
+                .store
+                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .map_err(|error| format!("Practice confirmation could not be saved: {error}"))?;
+            prepared.commit();
+            self.has_save = true;
+            return match published {
+                SaveCommit::Published {
+                    directory_sync_error: Some(error),
+                } => Err(format!(
+                    "Practice confirmation was written, but directory synchronization failed: {error}"
+                )),
+                _ => Ok("Practice confirmed and saved. L launches.".into()),
+            };
+        }
         self.session.command(&mut self.world, action)
     }
 
@@ -416,6 +439,81 @@ mod tests {
             b"retain"
         );
     }
+    #[test]
+    fn practice_confirmation_publishes_after_docked_ticks_and_survives_cold_continue() {
+        let directory = TestDirectory::new();
+        let mut profile = open(&directory.0);
+        assert!(
+            profile
+                .new_commander(9502)
+                .unwrap_or_else(|e| panic!("{e}"))
+        );
+        action(&mut profile, Action::ReviewPractice);
+        action(&mut profile, Action::Back);
+        assert!(profile.command(Action::Confirm).is_err());
+        assert!(!directory.0.join("commander.meridian").exists());
+
+        action(&mut profile, Action::ReviewPractice);
+        profile
+            .world
+            .step(Default::default())
+            .unwrap_or_else(|e| panic!("{e}"));
+        action(&mut profile, Action::Confirm);
+        assert_eq!(
+            profile
+                .world
+                .practice_snapshot()
+                .unwrap_or_else(|| panic!("no practice snapshot"))
+                .status,
+            meridian_core::PracticeStatus::Consented
+        );
+        let bytes = profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(
+            fs::read(directory.0.join("commander.meridian")).unwrap_or_else(|e| panic!("{e}")),
+            bytes
+        );
+        drop(profile);
+        let mut cold = open(&directory.0);
+        cold.continue_saved().unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(
+            cold.world
+                .practice_snapshot()
+                .unwrap_or_else(|| panic!("no practice snapshot"))
+                .status,
+            meridian_core::PracticeStatus::Consented
+        );
+        assert!(cold.command(Action::ReviewPractice).is_err());
+    }
+
+    #[test]
+    fn practice_publication_failure_preserves_the_live_world_and_does_not_consent() {
+        let directory = TestDirectory::new();
+        let mut profile = open(&directory.0);
+        assert!(
+            profile
+                .new_commander(9503)
+                .unwrap_or_else(|e| panic!("{e}"))
+        );
+        profile.save().unwrap_or_else(|e| panic!("{e}"));
+        let destination = directory.0.join("commander.meridian");
+        let previous_slot = directory.0.join("previous-slot");
+        fs::rename(&destination, &previous_slot).unwrap_or_else(|e| panic!("{e}"));
+        fs::create_dir(&destination).unwrap_or_else(|e| panic!("{e}"));
+        let before = profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+        action(&mut profile, Action::ReviewPractice);
+        assert!(profile.command(Action::Confirm).is_err());
+        assert_eq!(
+            profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}")),
+            before
+        );
+        assert_eq!(
+            fs::read(previous_slot).unwrap_or_else(|e| panic!("{e}")),
+            before
+        );
+        assert!(profile.command(Action::Confirm).is_err());
+        assert!(profile.command(Action::ReviewPractice).is_ok());
+    }
+
     #[test]
     fn explicit_slot_arguments_are_exact_and_do_not_guess_on_invalid_input() {
         assert_eq!(
