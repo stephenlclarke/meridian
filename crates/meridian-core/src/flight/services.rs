@@ -21,10 +21,7 @@ impl World {
         Some(self.station_markets.as_ref()?.commodity_quote(site, id))
     }
     pub fn commodity_quantity(&self, id: CommodityId) -> Option<u64> {
-        let account = self.commander_account.as_ref()?;
-        let projection = account
-            .service_projection(&self.freight_session.as_ref()?.state)
-            .ok()?;
+        let projection = self.reserved_service_projection().ok()?;
         Some(if id == CommodityId::Food {
             u64::from(projection.food_tonnes)
         } else {
@@ -32,10 +29,7 @@ impl World {
         })
     }
     pub fn reserved_commodity_quantity(&self, id: CommodityId) -> Option<u64> {
-        let account = self.commander_account.as_ref()?;
-        let projection = account
-            .service_projection(&self.freight_session.as_ref()?.state)
-            .ok()?;
+        let projection = self.reserved_service_projection().ok()?;
         Some(if id == CommodityId::Food {
             u64::from(projection.reserved_food_tonnes)
         } else {
@@ -47,9 +41,7 @@ impl World {
     }
 
     pub fn service_snapshot(&self) -> Option<ServiceSnapshot> {
-        let session = self.freight_session.as_ref()?;
-        let account = self.commander_account.as_ref()?;
-        let projection = account.service_projection(&session.state).ok()?;
+        let projection = self.reserved_service_projection().ok()?;
         let site = self
             .current_dock_context()
             .and_then(|dock| service_site(dock.system()));
@@ -73,22 +65,8 @@ impl World {
         command: services::Command,
         expected_tick: u64,
     ) -> Result<services::Event, MissionError> {
-        let facts = self.current_service_facts(expected_tick)?;
-        let account = self
-            .commander_account
-            .as_mut()
-            .ok_or(MissionError::NoCommander)?;
-        let session = self
-            .freight_session
-            .as_ref()
-            .ok_or(MissionError::NoCommander)?;
-        let markets = self
-            .station_markets
-            .as_mut()
-            .ok_or(MissionError::NoCommander)?;
-        account
-            .execute_station_service(&session.state, markets, facts, command)
-            .map_err(MissionError::Service)
+        self.prepare_station_service(command, expected_tick)
+            .map(|prepared| prepared.commit())
     }
 
     pub(super) fn current_service_facts(

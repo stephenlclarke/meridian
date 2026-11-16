@@ -88,6 +88,34 @@ pub(crate) struct AccountProjection {
     pub(crate) reserved_commodities: [u64; 16],
 }
 
+/// Ephemeral World-owned tutorial reservations, over the sole actual account projection.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct Reservations {
+    pub(crate) capacity: u16,
+    pub(crate) commodity: Option<CommodityId>,
+}
+impl Reservations {
+    pub(crate) fn apply(self, mut account: AccountProjection) -> Result<AccountProjection, Error> {
+        account.used_tonnes = account
+            .used_tonnes
+            .checked_add(self.capacity)
+            .ok_or(Error::HoldFull)?;
+        if let Some(id) = self.commodity {
+            if id == CommodityId::Food {
+                account.reserved_food_tonnes = account
+                    .reserved_food_tonnes
+                    .checked_add(1)
+                    .ok_or(Error::InvalidAccount)?;
+            } else {
+                let slot = &mut account.reserved_commodities[id.index() - 1];
+                *slot = slot.checked_add(1).ok_or(Error::InvalidAccount)?;
+            }
+        }
+        validate_account(account)?;
+        Ok(account)
+    }
+}
+
 /// Only a current World-owned initial berth/physical entry may supply this projection.
 /// Its site must come from the bound galaxy0 system, not a UI selection or position test.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -208,6 +236,23 @@ impl StationMarkets {
         })
     }
 
+    pub(crate) fn transaction_revision(&self) -> u64 {
+        self.data.revision
+    }
+    pub(crate) fn commodity_counts(&self, site: MarketSite, id: CommodityId) -> (u64, u64) {
+        let i = site.index();
+        if id == CommodityId::Food {
+            (self.data.bought[i], self.data.sold[i])
+        } else {
+            (
+                self.data.other_bought[i][id.index() - 1],
+                self.data.other_sold[i][id.index() - 1],
+            )
+        }
+    }
+    pub(crate) fn fuel_accounting(&self) -> (u64, u64) {
+        (self.data.refilled_units, self.data.refills)
+    }
     pub fn quote(&self, site: MarketSite) -> FoodQuote {
         self.data.quotes[site.index()]
     }

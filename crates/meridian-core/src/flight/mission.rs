@@ -42,6 +42,7 @@ pub enum MissionError {
     Paused,
     SequenceExhausted,
     SharedCapacity,
+    NavigationTrade(super::NavigationTradeError),
     Freight(g02::Error),
     Service(crate::station_services::Error),
     Equipment(crate::equipment::Error),
@@ -58,6 +59,7 @@ impl fmt::Display for MissionError {
             Self::SharedCapacity => {
                 f.write_str("Original mission or active service capacity is full")
             }
+            Self::NavigationTrade(error) => write!(f, "{error}"),
             Self::Freight(error) => write!(f, "freight command refused: {error:?}"),
             Self::Service(error) => write!(f, "station service refused: {error:?}"),
             Self::Equipment(error) => write!(f, "{error}"),
@@ -271,6 +273,20 @@ impl World {
         ) && !self.original_service_has_capacity()
         {
             return Err(MissionError::SharedCapacity);
+        }
+        if matches!(
+            command,
+            g02::Command::Confirm {
+                choice: g02::Choice::Accept,
+                ..
+            }
+        ) {
+            let p = self
+                .reserved_service_projection()
+                .map_err(MissionError::Service)?;
+            if u32::from(p.used_tonnes) + 8 > u32::from(p.hold_capacity_tonnes) {
+                return Err(MissionError::Freight(g02::Error::HoldFull));
+            }
         }
         let facts = self.freight_facts()?;
         let account = self

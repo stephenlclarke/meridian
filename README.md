@@ -76,3 +76,7 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Finite missile behavior and save boundary](docs/FINITE-STARTER-MISSILES.md)
 
 GitHub Actions validates Linux, Windows and macOS. Protected main requires pull requests, current required checks, linear history and resolved conversations; force pushes and deletion are blocked, including for administrators. SonarQube runs after merge from committed main with the exact commit SHA and Previous version policy. Historical change descriptions live in merged GitHub PRs and Git history rather than duplicate issue/PR Markdown files.
+
+## Authored successor: navigation and trade
+
+The original [T04 navigation-and-trade lesson](docs/NAVIGATION-TRADE.md) adds separate acceptance and current-fit/route/stock confirmation, one reserved tonne bought and sold through actual ordinary market transactions, paid-fuel travel and a real return for separate zero-cash reception. Save v11 retains the identified original tonne and exact receipts, with explicit v4-v10 readers. The core and 14 new tests are authored and UNRUN; desktop joining, whole review and exact-source compiler/Clippy/Sonar/native acceptance remain pending. No earlier runtime result or installed/published preview is changed by this source slice.

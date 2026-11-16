@@ -1,7 +1,7 @@
 use super::{
     CommanderAccount, DISTANCE_PER_SPEED_UNIT, FIXED_DELTA_SECONDS, FlightMode, MAX_SPEED,
     MotionRefusal, NavigationState, OriginalNavigation, OriginalStationData, Snapshot, World,
-    combat, flight_reception, missiles, mission, practice, weapons,
+    combat, flight_reception, missiles, mission, navigation_trade, practice, weapons,
 };
 #[cfg(test)]
 use super::{
@@ -75,8 +75,18 @@ const V9_CONTENT: &[u8] = concat!(
 )
 .as_bytes();
 
-const CONTENT: &[u8] = concat!(
+const V10_CONTENT: &[u8] = concat!(
     "meridian-world/rules/10;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
+    "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
+    "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
+    "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
+    "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823;",
+    "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa"
+)
+.as_bytes();
+
+const CONTENT: &[u8] = concat!(
+    "meridian-world/rules/11;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -103,6 +113,22 @@ fn compiled_content_fingerprint(content: &[u8]) -> u64 {
     checksum(&bytes)
 }
 
+/// Immutable candidate references for a joint ordinary commerce/lesson save.
+/// World remains the sole live owner; these parts have no public constructor.
+pub(super) struct Commerce<'a> {
+    pub(super) account: Option<&'a CommanderAccount>,
+    pub(super) markets: Option<&'a StationMarkets>,
+    pub(super) lesson: &'a navigation_trade::State,
+}
+impl<'a> Commerce<'a> {
+    fn current(world: &'a World) -> Self {
+        Self {
+            account: world.commander_account.as_ref(),
+            markets: world.station_markets.as_ref(),
+            lesson: &world.navigation_trade,
+        }
+    }
+}
 impl World {
     /// Return a complete checked memory save. The host must atomically publish these bytes itself.
     pub fn save_bytes(&self) -> Result<Vec<u8>, SaveError> {
@@ -121,8 +147,20 @@ impl World {
         history: &[practice::Practice],
         trace: Option<practice::PracticeAttemptId>,
     ) -> Result<Vec<u8>, SaveError> {
-        self.validate_saved_world(practice, history, trace, &self.flight_reception)?;
-        self.encode_saved_world(practice, history, trace, &self.flight_reception)
+        self.validate_saved_world(
+            practice,
+            history,
+            trace,
+            &self.flight_reception,
+            &Commerce::current(self),
+        )?;
+        self.encode_saved_world(
+            practice,
+            history,
+            trace,
+            &self.flight_reception,
+            &Commerce::current(self),
+        )
     }
     /// Bind all checked saved state except the current simulation tick. A docked redraw
     /// advances only that clock; historical permission/reading/dock/terminal clocks stay bound.
@@ -147,12 +185,40 @@ impl World {
             &self.practice_history,
             self.practice_trace,
             lesson,
+            &Commerce::current(self),
         )?;
         self.encode_saved_world(
             self.practice,
             &self.practice_history,
             self.practice_trace,
             lesson,
+            &Commerce::current(self),
+        )
+    }
+    pub(super) fn save_bytes_with_navigation_trade(
+        &self,
+        lesson: &navigation_trade::State,
+        account: &CommanderAccount,
+        markets: &StationMarkets,
+    ) -> Result<Vec<u8>, SaveError> {
+        let commerce = Commerce {
+            account: Some(account),
+            markets: Some(markets),
+            lesson,
+        };
+        self.validate_saved_world(
+            self.practice,
+            &self.practice_history,
+            self.practice_trace,
+            &self.flight_reception,
+            &commerce,
+        )?;
+        self.encode_saved_world(
+            self.practice,
+            &self.practice_history,
+            self.practice_trace,
+            &self.flight_reception,
+            &commerce,
         )
     }
     // Encoding is separate so negative tests can exercise the loader with coherent checksums.
@@ -162,6 +228,7 @@ impl World {
         history: &[practice::Practice],
         trace: Option<practice::PracticeAttemptId>,
         lesson: &flight_reception::State,
+        commerce: &Commerce<'_>,
     ) -> Result<Vec<u8>, SaveError> {
         let mut w = Writer::new();
         w.bytes.extend(MAGIC);
@@ -172,18 +239,19 @@ impl World {
         self.navigation
             .ok_or(SaveError::NoCommander)?
             .encode_save(&mut w);
-        self.commander_account
-            .as_ref()
+        commerce
+            .account
             .ok_or(SaveError::NoCommander)?
             .encode_save(&mut w);
         self.freight_session
             .as_ref()
             .ok_or(SaveError::NoCommander)?
             .encode_save(&mut w);
-        self.station_markets
-            .as_ref()
+        commerce
+            .markets
             .ok_or(SaveError::NoCommander)?
             .encode_save(&mut w);
+        commerce.lesson.encode(&mut w);
         lesson.encode(&mut w);
         self.missiles.encode(&mut w);
         practice::lifecycle::encode_history(&mut w, history, trace);
@@ -211,6 +279,7 @@ impl World {
             &self.practice_history,
             self.practice_trace,
             &self.flight_reception,
+            &Commerce::current(self),
         )
     }
 
@@ -264,8 +333,9 @@ impl World {
             7 if r.fixed::<{ V7_CONTENT.len() }>()?.as_slice() == V7_CONTENT => V7_CONTENT,
             8 if r.fixed::<{ V8_CONTENT.len() }>()?.as_slice() == V8_CONTENT => V8_CONTENT,
             9 if r.fixed::<{ V9_CONTENT.len() }>()?.as_slice() == V9_CONTENT => V9_CONTENT,
+            10 if r.fixed::<{ V10_CONTENT.len() }>()?.as_slice() == V10_CONTENT => V10_CONTENT,
             SAVE_VERSION if r.fixed::<{ CONTENT.len() }>()?.as_slice() == CONTENT => CONTENT,
-            4 | 5 | 6 | 7 | 8 | 9 | SAVE_VERSION => return Err(SaveError::ContentMismatch),
+            4 | 5 | 6 | 7 | 8 | 9 | 10 | SAVE_VERSION => return Err(SaveError::ContentMismatch),
             _ => return Err(SaveError::UnsupportedVersion),
         };
         if r.u64()? != compiled_content_fingerprint(content) {
@@ -279,6 +349,11 @@ impl World {
         let commander_account = CommanderAccount::decode_save(&mut r, version)?;
         let freight_session = mission::FreightSession::decode_save(&mut r)?;
         let station_markets = StationMarkets::decode_save(&mut r)?;
+        let navigation_trade = if version >= 11 {
+            navigation_trade::State::decode(&mut r)?
+        } else {
+            navigation_trade::State::default()
+        };
         let flight_reception = if version >= 10 {
             flight_reception::State::decode(&mut r)?
         } else {
@@ -306,6 +381,7 @@ impl World {
             station_markets: Some(station_markets),
             missiles,
             flight_reception,
+            navigation_trade,
             practice_history,
             practice_trace,
             practice: read_practice(&mut r, version)?,
@@ -337,6 +413,7 @@ impl World {
             &candidate.practice_history,
             candidate.practice_trace,
             &candidate.flight_reception,
+            &Commerce::current(&candidate),
         )?;
         Ok(candidate)
     }
@@ -347,20 +424,15 @@ impl World {
         history: &[practice::Practice],
         trace: Option<practice::PracticeAttemptId>,
         lesson: &flight_reception::State,
+        commerce: &Commerce<'_>,
     ) -> Result<(), SaveError> {
         let navigation = self.navigation.ok_or(SaveError::NoCommander)?;
-        let account = self
-            .commander_account
-            .as_ref()
-            .ok_or(SaveError::NoCommander)?;
+        let account = commerce.account.ok_or(SaveError::NoCommander)?;
         let session = self
             .freight_session
             .as_ref()
             .ok_or(SaveError::NoCommander)?;
-        let markets = self
-            .station_markets
-            .as_ref()
-            .ok_or(SaveError::NoCommander)?;
+        let markets = commerce.markets.ok_or(SaveError::NoCommander)?;
         let catalogue = self
             .navigation_catalogue
             .as_ref()
@@ -383,6 +455,16 @@ impl World {
         self.combat.validate_damage_boundary(self)?;
         self.validate_practice_ledger(practice, history, trace, nav)?;
         lesson.validate(self, nav, practice, history)?;
+        commerce.lesson.validate(
+            self,
+            commerce,
+            nav,
+            lesson.occupancy(),
+            (
+                history.len() + usize::from(practice.is_some()),
+                usize::from(practice.is_some_and(|p| !p.reception_is_terminal())),
+            ),
+        )?;
         self.missiles
             .validate(self, practice, history, nav.dock_sequence)?;
         self.combat.validate(self)?;
@@ -596,8 +678,12 @@ fn legacy_test_fixture(world: &World, version: u16) -> Result<Vec<u8>, SaveError
         &world.practice_history,
         world.practice_trace,
         &world.flight_reception,
+        &Commerce::current(world),
     )?;
-    if world.flight_reception != flight_reception::State::default() {
+    if world.navigation_trade != navigation_trade::State::default() {
+        return Err(SaveError::InvalidState("T04 requires v11"));
+    }
+    if version < 10 && world.flight_reception != flight_reception::State::default() {
         return Err(SaveError::InvalidState("T01 requires v10"));
     }
     if version < 9
@@ -615,6 +701,7 @@ fn legacy_test_fixture(world: &World, version: u16) -> Result<Vec<u8>, SaveError
         7 => V7_CONTENT,
         8 => V8_CONTENT,
         9 => V9_CONTENT,
+        10 => V10_CONTENT,
         _ => return Err(SaveError::UnsupportedVersion),
     };
     let mut w = Writer::new();
@@ -642,6 +729,9 @@ fn legacy_test_fixture(world: &World, version: u16) -> Result<Vec<u8>, SaveError
         .as_ref()
         .ok_or(SaveError::NoCommander)?
         .encode_save(&mut w);
+    if version >= 10 {
+        world.flight_reception.encode(&mut w);
+    }
     if version >= 8 {
         world.missiles.encode(&mut w);
     }
@@ -720,4 +810,9 @@ mod tests;
 #[cfg(test)]
 pub(super) fn v9_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
     legacy_test_fixture(world, 9)
+}
+
+#[cfg(test)]
+pub(super) fn v10_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
+    legacy_test_fixture(world, 10)
 }

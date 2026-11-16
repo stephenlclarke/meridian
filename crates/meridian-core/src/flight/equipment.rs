@@ -4,8 +4,7 @@ use crate::equipment::{self, Command, Event, Snapshot};
 impl World {
     pub fn equipment_snapshot(&self) -> Option<Snapshot> {
         let account = self.commander_account.as_ref()?;
-        let session = self.freight_session.as_ref()?;
-        let projection = account.service_projection(&session.state).ok()?;
+        let projection = self.reserved_service_projection().ok()?;
         let definition = equipment::definition().ok()?;
         let site = self
             .current_dock_context()
@@ -27,6 +26,7 @@ impl World {
         expected_tick: u64,
     ) -> Result<Event, MissionError> {
         let facts = self.current_service_facts(expected_tick)?;
+        let reserved_capacity = self.navigation_trade.reservations().capacity;
         let account = self
             .commander_account
             .as_mut()
@@ -36,7 +36,7 @@ impl World {
             .as_ref()
             .ok_or(MissionError::NoCommander)?;
         account
-            .execute_equipment(&session.state, facts, command)
+            .execute_equipment(&session.state, facts, command, reserved_capacity)
             .map_err(MissionError::Equipment)
     }
 }
