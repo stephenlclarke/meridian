@@ -387,6 +387,23 @@ impl Session {
             );
             return lines;
         }
+        if self.append_mission_panel(world, &mut lines) {
+            return lines;
+        }
+        if self.equipment_open {
+            if let Err(error) = crate::equipment::append_panel(world, &mut lines) {
+                append_paragraph(&mut lines, &error);
+            }
+            return lines;
+        }
+        if self.market_open {
+            if let Err(error) =
+                crate::market::append_panel(world, self.selected_commodity, &mut lines)
+            {
+                append_paragraph(&mut lines, &error);
+            }
+            return lines;
+        }
         if let Some(practice) = world.practice_snapshot() {
             match practice.status {
                 PracticeStatus::Unaccepted
@@ -414,23 +431,6 @@ impl Session {
                 }
                 PracticeStatus::Unaccepted => {}
             }
-        }
-        if self.append_mission_panel(world, &mut lines) {
-            return lines;
-        }
-        if self.equipment_open {
-            if let Err(error) = crate::equipment::append_panel(world, &mut lines) {
-                append_paragraph(&mut lines, &error);
-            }
-            return lines;
-        }
-        if self.market_open {
-            if let Err(error) =
-                crate::market::append_panel(world, self.selected_commodity, &mut lines)
-            {
-                append_paragraph(&mut lines, &error);
-            }
-            return lines;
         }
         let credit = world.credits_tenths().unwrap_or(0);
         if let Some(navigation) = snapshot.navigation {
