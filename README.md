@@ -37,9 +37,11 @@ The [safe-gunnery lifecycle](docs/SAFE-GUNNERY-ATTEMPTS.md) adds F7 reviewed clo
 
 The installed signed app passed title/render/normal-close smoke without creating a commander save. The public downloads and extracted Mac signature were independently verified. This remains a functional preview: full game acceptance, memory qualification, window/focus edges, frame timing/race evidence and commercial acceptance remain open. See [implementation status](docs/IMPLEMENTATION-STATUS.md) for exact scope and retained failures.
 
-## Flight lesson source under development
+## Qualified flight lesson candidate
 
-The [original flight-and-reception lesson](docs/FLIGHT-RECEPTION.md) is authored on a separate candidate. F6 reviews consent or reception, F12 reviews cancellation and C shows lesson details while playing. Keys 0/1/2/3 select front/rear/left/right views. The World measures actual aligned closing flight and a later swept return to the issuing berth; Enter must save before committing consent or reception. The candidate writes v10 and has explicit v4-v9 readers. Its new core and desktop tests, complete joined review, compiler/native qualification and delivery remain pending. The published v9 preview above is unchanged.
+The [original flight-and-reception lesson](docs/FLIGHT-RECEPTION.md) has passed whole-source review and current qualification on candidate `152ac26`. Mac, Linux and native Windows each passed 231 top-level Rust tests, 74 Python tests, strict Clippy and release builds. F6 reviews consent or reception, F12 reviews cancellation and C shows lesson details while playing. Keys 0/1/2/3 select front/rear/left/right views. Save v10 retains the lesson with explicit v4-v9 readers.
+
+A signed staged Mac run completed an actual measured approach, swept return, separate zero-cash reception and first family trace, real quit/cold Continue, cancellation and fresh consent. Four render directions and saved right-view retention passed; a short native pulse flash was not clearly captured and remains unobserved. Integration, authoritative main Sonar and v10 installation/publication remain pending. The published v9 preview above is unchanged.
 
 ## Play
 
@@ -75,6 +77,3 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 
 GitHub Actions validates Linux, Windows and macOS. Protected main requires pull requests, current required checks, linear history and resolved conversations; force pushes and deletion are blocked, including for administrators. SonarQube runs after merge from committed main with the exact commit SHA and Previous version policy. Historical change descriptions live in merged GitHub PRs and Git history rather than duplicate issue/PR Markdown files.
 
-## Authored next slice: flight and reception
-
-Core source adds the original no-cost [T01 flight and reception lesson](docs/FLIGHT-RECEPTION.md), measured by real World steps and received separately after a swept return to the issuing Avenor or Renas main berth. Save v10 retains permission, approach endpoints and terminal receipts, with explicit v4-v9 readers. The source and new tests are authored and UNRUN. Desktop controls, review, compiler/Clippy/Sonar and native acceptance remain pending. The installed/published Gunnery Attempts Preview remains v9 with its existing saves-v9 profile.

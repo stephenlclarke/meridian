@@ -1,6 +1,6 @@
 # Original T01 flight and reception
 
-This is an authored joined successor to the qualified Gunnery Attempts Preview, rooted at protected main `aa1cee02ecffa6be835137c2aa5d208054fb28d8`. Its tests have not run. Whole review, exact-source compiler/Clippy/Sonar and actual native acceptance remain pending. It does not change the installed or published v9 app or its profiles.
+This successor to the qualified Gunnery Attempts Preview is rooted at protected main `aa1cee02ecffa6be835137c2aa5d208054fb28d8`. Candidate `152ac26` passed independent whole-source review, 231 top-level Rust tests and 74 Python tests on Mac, Linux and native Windows, strict Clippy and release builds. The signed staged Mac app completed the scoped actual lesson and cold-continuation checks recorded in [implementation status](IMPLEMENTATION-STATUS.md). Integration, authoritative exact-main Sonar and v10 installed/public delivery remain pending. The installed/published v9 app and profiles are unchanged.
 
 ## Immutable source and independent expectations
 
@@ -38,9 +38,9 @@ Version 10 has a new exact content/rules boundary. The T01 view/ledger is encode
 
 Explicit v4-v9 readers retain their exact content bytes and existing feature gates. Older formats initialize an empty T01 ledger/front view; they never synthesize a permission or reading. The new v9 fixture retains real terminal gunnery history and both current/old traces; existing v4-v8 compatibility regressions remain unchanged. Unsupported used-v7 migrations and versions 1-3 remain refused. No Swift save import or historical normal/alien schema migration is claimed.
 
-## Authored tests and execution binding
+## Tests and execution binding
 
-The new tests are in `crates/meridian-core/src/flight/flight_reception/tests.rs`. They are UNRUN. Public positive tests use normal launch, brake/yaw/throttle steps, actual approach and the existing swept doorway path; no pose or docking mutation earns permission. Geometry/reducer and corrupt-save fixtures are explicitly separate from those journeys.
+The sixteen new core tests in `crates/meridian-core/src/flight/flight_reception/tests.rs` passed on all three compiler platforms. Public positive tests use normal launch, brake/yaw/throttle steps, actual approach and the existing swept doorway path; no pose or docking mutation earns permission. Geometry/reducer and corrupt-save fixtures are explicitly separate from those journeys.
 
 The test criteria cover:
 
@@ -61,4 +61,4 @@ F6 reviews a new lesson when none is active, or reception for the active lesson 
 
 Keys 0/1/2/3 request World-owned front/rear/left/right view. The renderer rotates every scene primitive in the same camera frame using the committed World view; it does not change ship pose, weapon aim or manufacture a measurement. Continue restores the saved view. Only actual front-view physical flight can supply the core lesson reading. Existing flight, market, equipment, freight and safe-gunnery keys keep their meanings.
 
-Desktop regression tests are authored for all three writer-failure boundaries (Accept, Cancel and Receive), delayed Enter across ordinary docked ticks, Back without mutation, genuine public launch/approach/swept return, zero-cash reception retry, review invalidation on view changes, bounded lesson-details and normal docked/flight HUDs, retained cancellation/fresh consent across a real child process and camera axes. They are UNRUN. Source formatting and documentation checks do not establish compiler, native controls/rendering or full T01 acceptance. G1 and Dell execute only the exact reviewed joined source; no real player profile is used.
+Desktop regression tests are authored for all three writer-failure boundaries (Accept, Cancel and Receive), delayed Enter across ordinary docked ticks, Back without mutation, genuine public launch/approach/swept return, zero-cash reception retry, review invalidation on view changes, bounded lesson-details and normal docked/flight HUDs, retained cancellation/fresh consent across a real child process and camera axes. All seven desktop entries, including the child-process entry and renderer axis test, passed on all three compiler platforms. Actual staged Metal qualification covers one completed reception, cancellation/retry, four view directions and two cold pairs. A transient native pulse flash remains unobserved; the initial paused Rear request is excluded and a later active Rear frame provides that view proof. These results retain exact candidate source identity and do not establish full T01, all mission/fleet or commercial acceptance. No real player profile was used.
