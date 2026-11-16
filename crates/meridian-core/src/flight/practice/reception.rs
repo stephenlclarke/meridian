@@ -1,4 +1,9 @@
-use super::*;
+use super::{
+    DockContext, Practice, PracticeAttemptId, PracticeError, PracticeOutcome,
+    PreparedPracticeConfirmation, Range, Snapshot, SystemId, World,
+};
+#[cfg(test)]
+use super::{FlightMode, Vec3};
 use crate::flight::weapons::PulseResources;
 use crate::navigation::DockOrigin;
 use crate::save::{Reader, SaveError, Writer};
