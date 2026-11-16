@@ -39,7 +39,7 @@ This is a functional local preview. Memory qualification, sustained minimize/foc
 
 ## Current source under development
 
-The [safe-gunnery attempt lifecycle](docs/SAFE-GUNNERY-ATTEMPTS.md) adds reviewed F7 closure at the actual Avenor berth, explicit F10 fresh consent and retained attempt history in save v9. I shows completed, failed and abandoned counts and the once-only first trace. Closure grants no reward, refund or ammunition. Candidate `3b5a18b` passed scoped independent review, compiler/platform checks and native Mac lifecycle qualification. The current source also contains later Sonar maintenance changes, so whole-source review and changed-composition qualification remain pending; v9 is not delivered. The installed v8 preview above is unchanged. Use a separate isolated save directory for candidate v9 execution.
+The [safe-gunnery attempt lifecycle](docs/SAFE-GUNNERY-ATTEMPTS.md) adds reviewed F7 closure at the actual Avenor berth, explicit F10 fresh consent and retained attempt history in save v9. I shows completed, failed and abandoned counts and the once-only first trace. Closure grants no reward, refund or ammunition. The joined candidate `3b57229` passed whole-source review, 208 top-level Rust tests and 68 Python tests per platform, strict Clippy and release builds on Mac, Linux and native Windows. Current Mac Metal closure/retry/history/HUD and Save/Continue checks passed with copied owned fixtures. Exact-main Sonar, integration and v9 packaging/delivery remain pending. The installed v8 preview above is unchanged. Use a separate isolated save directory for candidate v9 execution.
 
 ## Play
 
