@@ -925,7 +925,7 @@ mod tests {
         assert_eq!(ok(profile.world.save_bytes()), after);
     }
     #[test]
-    fn quantity_review_publishes_all_units_and_cold_continue_retains_exact_save() {
+    fn quantity_review_publishes_all_units_and_cold_continue_preserves_gameplay() {
         let (directory, mut profile, mut menu) = start();
         present(&mut menu, &profile);
         ok(menu.input(&mut profile, ui::Input::Key(ui::Key::QuantityMoreTen)));
@@ -946,12 +946,39 @@ mod tests {
             saved
         );
         assert_visible_feedback(&mut menu, &profile, "Bought 11 t Food for 248.6 CR");
+        let flight = profile.world.snapshot();
+        let mission = profile.world.mission_snapshot();
+        let services = profile.world.service_snapshot();
+        let modules = profile.world.modular_equipment_snapshot();
+        let ammunition = profile.world.ammunition_snapshot();
+        let resources = profile.world.flight_resources_snapshot();
+        let old_review = ok(profile
+            .world
+            .review_ammunition(AmmunitionAction::Purchase, flight.tick));
+        // The public loader rotates review authority without rewriting the saved file.
+        let expected = ok(World::from_save_bytes(&saved));
+        let expected_continued = ok(expected.save_bytes());
         drop(profile);
         let mut cold = open(&directory.0);
         ok(cold.continue_saved());
-        assert_eq!(ok(cold.world.save_bytes()), saved);
+        assert_eq!(
+            ok(std::fs::read(directory.0.join("commander.meridian"))),
+            saved
+        );
+        assert_eq!(ok(cold.world.save_bytes()), expected_continued);
+        assert_eq!(cold.world.snapshot(), flight);
+        assert_eq!(cold.world.mission_snapshot(), mission);
+        assert_eq!(cold.world.service_snapshot(), services);
+        assert_eq!(cold.world.modular_equipment_snapshot(), modules);
+        assert_eq!(cold.world.ammunition_snapshot(), ammunition);
+        assert_eq!(cold.world.flight_resources_snapshot(), resources);
         assert_eq!(cold.world.credits_tenths(), Some(4714));
         assert_eq!(cold.world.commodity_quantity(CommodityId::Food), Some(11));
+        assert!(matches!(
+            cold.world.prepare_ammunition(old_review, flight.tick),
+            Err(meridian_core::AmmunitionError::StaleReview)
+        ));
+        assert_eq!(ok(cold.world.save_bytes()), expected_continued);
     }
 
     #[test]
