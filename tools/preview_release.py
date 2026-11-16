@@ -10,30 +10,49 @@ import tomllib
 from pathlib import Path
 
 REPOSITORY = "stephenlclarke/meridian"
+STAGING_ROOT = Path.home() / ".local/share/meridian-preview-releases"
+PACKAGE_FILES = ("Meridian-macos-arm64.zip", "Meridian-windows-x64.zip", "RELEASE-NOTES.md")
 TAG = re.compile(r"v(\d+)\.(\d+)\.(\d+)-preview\.([1-9]\d*)\Z")
 COMMIT = re.compile(r"([a-z]+)(?:\([^\n)]+\))?(!)?: ")
+REQUIRED_CHECKS = {"Rust (ubuntu-latest)", "Rust (windows-latest)", "Rust (macos-latest)",
+                   "Documentation", "Coverage reports", "SonarQube (main)"}
 
 
-def run(*args):
-    return subprocess.check_output(args, text=True).strip()
+def run(executable, *args):
+    if executable not in {"git", "gh", "/usr/bin/ditto", "/usr/bin/codesign"}:
+        raise ValueError("Only the fixed release tools may run")
+    return subprocess.check_output([executable, *args], text=True).strip()
+
+
+def source_commit(value):
+    if not re.fullmatch(r"[0-9a-f]{40}", value):
+        raise ValueError("Use an exact 40-character committed-main SHA")
+    return bytes.fromhex(value).hex()
 
 
 def api(path, *fields):
     return json.loads(run("gh", "api", path, *fields))
 
 
-def previews(releases):
+def previews(items):
     return sorted(
-        (r for r in releases if not r["draft"] and r["prerelease"]
-         and TAG.fullmatch(r["tag_name"])),
+        (r for r in items if not r["draft"] and r["prerelease"] and TAG.fullmatch(r["tag_name"])),
         key=lambda r: (r["published_at"], r["id"]), reverse=True,
     )
+
+
+def initial_tag(value):
+    match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", value)
+    if not match:
+        raise ValueError("Initial workspace version must be numeric SemVer")
+    major, minor, patch = map(int, match.groups())
+    return f"v{major}.{minor}.{patch}-preview.1"
 
 
 def next_tag(previous, messages, initial):
     """Only a preview's tag is its version; never infer from a branch name."""
     if previous is None:
-        return f"v{initial}-preview.1"
+        return initial_tag(initial)
     match = TAG.fullmatch(previous)
     if not match:
         raise ValueError("Not a managed preview tag")
@@ -64,6 +83,43 @@ def releases():
     return [release for page in pages for release in page]
 
 
+def plan(commit):
+    comparison = api(f"repos/{REPOSITORY}/compare/{commit}...main")
+    if comparison["status"] not in {"ahead", "identical"}:
+        raise ValueError("Preview source must be on remote main")
+    latest = previews(releases())
+    previous = latest[0]["tag_name"] if latest else None
+    revision = commit
+    if previous:
+        baseline = source_commit(api(f"repos/{REPOSITORY}/commits/{previous}")["sha"])
+        run("git", "merge-base", "--is-ancestor", baseline, commit)
+        if baseline == commit:
+            raise ValueError("This source already has a published preview")
+        revision = f"{baseline}..{commit}"
+    messages = [m.strip() for m in run("git", "log", "--format=%B%x00", revision).split("\0") if m.strip()]
+    cargo = tomllib.loads(run("git", "show", f"{commit}:Cargo.toml"))
+    tag = next_tag(previous, messages, cargo["workspace"]["package"]["version"])
+    return tag, [r["tag_name"] for r in latest[2:]]
+
+
+def package_files(identifier):
+    """Accept a package identifier, never agent-supplied filesystem paths."""
+    if not identifier or not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,63}", identifier):
+        raise ValueError("Package identifier must contain only lowercase letters, digits and hyphens")
+    if STAGING_ROOT.is_symlink():
+        raise ValueError("Release staging root must not be a symlink")
+    root = STAGING_ROOT.resolve(strict=True)
+    directory = root / identifier
+    if directory.is_symlink() or directory.resolve(strict=True).parent != root:
+        raise ValueError("Package directory must stay inside release staging")
+    paths = [directory / name for name in (*PACKAGE_FILES, "release-receipt.json")]
+    if any(p.is_symlink() or p.resolve().parent != directory for p in paths):
+        raise ValueError("Package files must not be symlinks or escape release staging")
+    if not all(p.is_file() for p in paths[:3]) or paths[3].exists():
+        raise ValueError("Require both ZIPs, RELEASE-NOTES.md and a new receipt filename")
+    return paths
+
+
 def digest(path):
     with path.open("rb") as stream:
         return hashlib.file_digest(stream, "sha256").hexdigest()
@@ -89,99 +145,86 @@ def verify_downloads(tag, expected):
     with tempfile.TemporaryDirectory(prefix="meridian-release-download-") as temporary:
         run("gh", "release", "download", tag, "--repo", REPOSITORY, "--dir", temporary)
         for name, sha in expected.items():
+            if name not in {*PACKAGE_FILES[:2], "SHA256SUMS.txt", "preview.json"}:
+                raise ValueError("Unexpected downloadable asset filename")
             if digest(Path(temporary) / name) != sha:
                 raise ValueError(f"Downloaded asset differs: {name}")
 
 
+def verify_checks(commit):
+    checks = api(f"repos/{REPOSITORY}/commits/{commit}/check-runs?per_page=100")["check_runs"]
+    latest = {}
+    for check in sorted(checks, key=lambda c: c["id"]):
+        latest[check["name"]] = check["conclusion"]
+    if any(latest.get(name) != "success" for name in REQUIRED_CHECKS):
+        raise ValueError("Exact-main CI and Sonar must pass before publication")
+
+
+def write_metadata(root, tag, commit, expected, notes):
+    checksums = root / "SHA256SUMS.txt"
+    metadata = root / "preview.json"
+    full_notes = root / "release-notes.md"
+    with checksums.open("x") as stream:
+        stream.writelines(f"{sha}  {name}\n" for name, sha in expected.items())
+    with metadata.open("x") as stream:
+        json.dump({"version": tag[1:], "source": commit, "assets": expected}, stream, indent=2)
+    with full_notes.open("x") as stream:
+        stream.write(notes)
+        stream.write(f"\n\nVersion: `{tag}`. Source: `{commit}`.\n")
+    return checksums, metadata, full_notes
+
+
+def create_draft(tag, commit, archives, checksums, metadata, notes):
+    # Tag/ref creation refuses conflicts. Published tags are never moved.
+    obj = api(f"repos/{REPOSITORY}/git/tags", "-f", f"tag={tag}",
+              "-f", f"message=Meridian {tag}\nSource: {commit}",
+              "-f", f"object={commit}", "-f", "type=commit")
+    api(f"repos/{REPOSITORY}/git/refs", "-f", f"ref=refs/tags/{tag}",
+        "-f", f"sha={source_commit(obj['sha'])}")
+    run("gh", "release", "create", tag, "--repo", REPOSITORY,
+        "--verify-tag", "--draft", "--prerelease", "--title", f"Meridian {tag}",
+        "--notes-file", str(notes), *(str(p) for p in archives), str(checksums), str(metadata))
+
+
 def publish(args):
-    if not re.fullmatch(r"[0-9a-f]{40}", args.commit):
-        raise ValueError("Use an exact 40-character committed-main SHA")
-    comparison = api(f"repos/{REPOSITORY}/compare/{args.commit}...main")
-    if comparison["status"] not in {"ahead", "identical"}:
-        raise ValueError("Preview source must be on remote main")
-    latest = previews(releases())
-    previous = latest[0]["tag_name"] if latest else None
-    revision = args.commit
-    if previous:
-        baseline = api(f"repos/{REPOSITORY}/commits/{previous}")["sha"]
-        run("git", "merge-base", "--is-ancestor", baseline, args.commit)
-        if baseline == args.commit:
-            raise ValueError("This source already has a published preview")
-        revision = f"{baseline}..{args.commit}"
-    messages = run("git", "log", "--format=%B%x00", revision).split("\0")
-    messages = [m.strip() for m in messages if m.strip()]
-    cargo = tomllib.loads(run("git", "show", f"{args.commit}:Cargo.toml"))
-    tag = next_tag(previous, messages, cargo["workspace"]["package"]["version"])
-    print(json.dumps({"tag": tag, "source": args.commit,
-                      "remove_after_verified_publication": [r["tag_name"] for r in latest[2:]]}))
+    commit = source_commit(args.commit)
+    tag, removal = plan(commit)
+    print(json.dumps({"tag": tag, "source": commit, "remove_after_verified_publication": removal}))
     if args.plan:
         return
-    if not all([args.macos, args.windows, args.notes, args.receipt]):
-        raise ValueError("Publication needs both platform archives, release notes and receipt path")
-    archives = [args.macos.resolve(), args.windows.resolve()]
-    if any(not p.is_file() or p.suffix.lower() != ".zip" for p in archives):
-        raise ValueError("Provide the qualified macOS and Windows ZIP files")
-    if archives[0].name == archives[1].name:
-        raise ValueError("Platform archives must have distinct filenames")
-    if args.receipt.exists() or not args.receipt.parent.is_dir():
-        raise ValueError("Receipt must name a new file in an existing external directory")
-    required = {"Rust (ubuntu-latest)", "Rust (windows-latest)",
-                "Rust (macos-latest)", "Documentation", "Coverage reports", "SonarQube (main)"}
-    checks = api(f"repos/{REPOSITORY}/commits/{args.commit}/check-runs?per_page=100")["check_runs"]
-    latest_checks = {}
-    for check in sorted(checks, key=lambda c: c["id"]):
-        latest_checks[check["name"]] = check["conclusion"]
-    if any(latest_checks.get(name) != "success" for name in required):
-        raise ValueError("Exact-main CI and Sonar must pass before publication")
-    verify_macos(archives[0])
+    macos, windows, notes, receipt_path = package_files(args.package)
+    verify_checks(commit)
+    verify_macos(macos)
+    archives = [macos, windows]
     expected = {p.name: digest(p) for p in archives}
-    notes = args.notes.read_text()
+    with notes.open() as stream:
+        content = stream.read()
     with tempfile.TemporaryDirectory(prefix="meridian-release-upload-") as temporary:
-        root = Path(temporary)
-        checksums = root / "SHA256SUMS.txt"
-        checksums.write_text("".join(f"{sha}  {name}\n" for name, sha in expected.items()))
-        metadata = root / "preview.json"
-        metadata.write_text(json.dumps({"version": tag[1:], "source": args.commit,
-                                        "assets": expected}, indent=2) + "\n")
-        full_notes = root / "release-notes.md"
-        full_notes.write_text(notes + f"\n\nVersion: `{tag}`. Source: `{args.commit}`.\n")
-        # Tag/ref creation refuses conflicts. Published tags are never moved.
-        obj = api(f"repos/{REPOSITORY}/git/tags", "-f", f"tag={tag}",
-                  "-f", f"message=Meridian {tag}\nSource: {args.commit}",
-                  "-f", f"object={args.commit}", "-f", "type=commit")
-        api(f"repos/{REPOSITORY}/git/refs", "-f", f"ref=refs/tags/{tag}",
-            "-f", f"sha={obj['sha']}")
-        run("gh", "release", "create", tag, "--repo", REPOSITORY,
-            "--verify-tag", "--draft", "--prerelease", "--title", f"Meridian {tag}",
-            "--notes-file", str(full_notes), *(str(p) for p in archives),
-            str(checksums), str(metadata))
+        checksums, metadata, full_notes = write_metadata(Path(temporary), tag, commit, expected, content)
+        create_draft(tag, commit, archives, checksums, metadata, full_notes)
         expected.update({p.name: digest(p) for p in [checksums, metadata]})
         verify_downloads(tag, expected)
         run("gh", "release", "edit", tag, "--repo", REPOSITORY,
             "--draft=false", "--prerelease", "--latest=false")
         verify_downloads(tag, expected)
         receipt = api(f"repos/{REPOSITORY}/releases/tags/{tag}")
-        with args.receipt.open("x") as stream:
+        with receipt_path.open("x") as stream:
             json.dump({"release": receipt, "verifiedDownloads": expected}, stream, indent=2)
             stream.write("\n")
             stream.flush()
             os.fsync(stream.fileno())
-        # Only managed published previews qualify, never stable or unrelated tags.
         for old in previews(releases())[3:]:
             run("gh", "release", "delete", old["tag_name"], "--repo", REPOSITORY,
                 "--yes", "--cleanup-tag")
         print(receipt["html_url"])
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--commit", required=True)
-    parser.add_argument("--macos", type=Path)
-    parser.add_argument("--windows", type=Path)
-    parser.add_argument("--notes", type=Path)
-    parser.add_argument("--receipt", type=Path)
+    parser.add_argument("--package", help="Identifier of a prepared package inside release staging")
     parser.add_argument("--plan", action="store_true", help="Read-only version and retention plan")
-    publish(parser.parse_args())
+    publish(parser.parse_args(argv))
 
 
 if __name__ == "__main__":
