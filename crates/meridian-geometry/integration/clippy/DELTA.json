@@ -1,0 +1,28 @@
+{
+  "parentAuthorHead": "6649fdaf57df77bb866f7f379326eee6e8ec990e",
+  "qualifiedJoin": "de4e3bff26d2382ea23896f4dabbbcdce70aa614",
+  "qualifiedTree": "a1c574ecb19ee506f14905583f1f5896bde0f821",
+  "parentActualResult": {
+    "check": "PASS",
+    "rustTests": {
+      "pass": 13,
+      "fail": 0
+    },
+    "docTests": 0,
+    "strictClippy": "FAIL; two lint diagnostics"
+  },
+  "exactDelta": {
+    "adapter.rs": "Use as_chunks::<2>().0 after the existing even-length guard. Thus remainder is empty, pairs and one step per pair are preserved.",
+    "arrangement.rs": "Combine the nested condition with a let-chain. run.take executes only after blocked || !convex. Existing orient/finish calls and guard/work charges are preserved."
+  },
+  "allPriorTestsAndAssertions": "Byte exact",
+  "limits": "2M/100k/4096/512",
+  "dependenciesAndLock": "Byte exact",
+  "currentCorrectionExecution": "UNRUN",
+  "evidence": {
+    "GEOMETRY-QUALIFICATION-RESULT.json": "88cd403e61f93e0e2c5085d96893b70822eb7ce12765ddc206af7d1068e10770",
+    "check.log": "920dfd406fdd12ec5173cce3931f89c90b83cba36a20eaad1d99d7e1eb6381a0",
+    "clippy.log": "fbe09f8942043690dadb42b87dbd5dc950384e2c2e0d94bfc0707c250a644ed8",
+    "test.log": "d98d0696c4fe5b5cbcbb4f349180b0efa03c051a099cc7fd96ad2df2dea37edd"
+  }
+}

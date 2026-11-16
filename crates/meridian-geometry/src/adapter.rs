@@ -109,7 +109,7 @@ fn decode_style(text: &str, b: &mut Budget) -> Result<String, Failure> {
         _ => None,
     };
     let mut result = Vec::new();
-    for pair in text.as_bytes().chunks_exact(2) {
+    for pair in text.as_bytes().as_chunks::<2>().0 {
         b.step(1)?;
         let first = digit(pair[0])
             .ok_or_else(|| b.fail(FailureKind::InvalidInput, "invalid style digit"))?;

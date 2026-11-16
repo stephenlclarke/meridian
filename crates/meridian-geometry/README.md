@@ -10,7 +10,7 @@ The previous five-hull execution at `0c2677b5` exhausted operations on every ori
 
 ## Validation
 
-The current correction is **UNRUN**. Parent joined source `7ef4df7` passed locked check, then passed nine Rust tests and failed the analytic overlap case at a protected facet contact. The two later original-input tests remained unrun and Clippy did not start. The author lane used rustfmt to parse and format the authored source. G1 owns actual compiler execution on the committed packet. The first compiler run should apply `integration/workspace-and-lock.patch` in the joined workspace and run the following checks.
+The current two-lint correction is **UNRUN**. Parent joined source `de4e3bf` passed locked check and all 13 Rust tests, including both original-input decoder tests. Doc-tests declared zero cases. Strict Clippy failed on fixed-size byte chunking and a collapsible nested condition. The correction uses fixed two-byte array chunks behind the existing even-length guard and a short-circuiting let-chain for the same strip-finalization path. The author lane used rustfmt to parse and format the authored source. G1 owns actual compiler execution on the committed packet. The first compiler run should apply `integration/workspace-and-lock.patch` in the joined workspace and run the following checks.
 
 ```sh
 cargo check --locked -p meridian-geometry --all-targets

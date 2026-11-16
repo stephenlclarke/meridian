@@ -1,0 +1,35 @@
+    Checking meridian-geometry v0.1.0 (/Volumes/SSD/offload/meridian-g1-mbp-geometry.de4e3bf/source/crates/meridian-geometry)
+error: using `chunks_exact` with a constant chunk size
+   --> crates/meridian-geometry/src/adapter.rs:112:33
+    |
+112 |     for pair in text.as_bytes().chunks_exact(2) {
+    |                                 ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<2>().0`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+    = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+error: this `if` statement can be collapsed
+   --> crates/meridian-geometry/src/arrangement.rs:292:21
+    |
+292 | /                     if blocked || !convex {
+293 | |                         if let Some(done) = run.take() {
+294 | |                             finish(done, &mut cells, &mut work, b)?;
+295 | |                         }
+296 | |                     }
+    | |_____________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+    = note: `-D clippy::collapsible-if` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+    |
+292 ~                     if (blocked || !convex) {
+293 ~                         && let Some(done) = run.take() {
+294 |                             finish(done, &mut cells, &mut work, b)?;
+295 ~                         }
+    |
+
+error: could not compile `meridian-geometry` (lib) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `meridian-geometry` (lib test) due to 2 previous errors

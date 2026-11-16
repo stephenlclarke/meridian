@@ -116,5 +116,15 @@
     "clippy": "NOT_STARTED"
   },
   "parentQualifiedSource": "7ef4df73825bdba87d3a2a2b59e6970d08fb3066",
-  "currentCorrectionExecution": "UNRUN"
+  "currentCorrectionExecution": "UNRUN",
+  "latestParentQualification": {
+    "check": "PASS",
+    "rustTests": {
+      "pass": 13,
+      "fail": 0
+    },
+    "docTests": 0,
+    "strictClippy": "FAIL; two lint diagnostics"
+  },
+  "latestParentQualifiedJoin": "de4e3bff26d2382ea23896f4dabbbcdce70aa614"
 }

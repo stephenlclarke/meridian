@@ -289,10 +289,10 @@ impl Arrangement {
                                 &hi_right,
                                 b,
                             )? <= integer(0);
-                    if blocked || !convex {
-                        if let Some(done) = run.take() {
-                            finish(done, &mut cells, &mut work, b)?;
-                        }
+                    if (blocked || !convex)
+                        && let Some(done) = run.take()
+                    {
+                        finish(done, &mut cells, &mut work, b)?;
                     }
                 }
                 let mut run = match run {
