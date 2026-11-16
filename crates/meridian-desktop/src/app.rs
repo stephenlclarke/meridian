@@ -457,7 +457,19 @@ impl App {
             } => "Practice beacon already counted",
         });
         let notice = pulse_notice.or(self.notice.as_deref());
-        let hud_lines = self.game.lines(active, notice);
+        let mut hud_lines = self.game.lines(active, notice);
+        if let Some(cue) = self
+            .docked
+            .as_ref()
+            .and_then(|menu| menu.selected_body_cue(&self.game.world))
+            && let Some(distance) = cue.distance_world
+        {
+            let [x, y, z] = cue.position_world;
+            let name: String = cue.name.chars().take(28).collect();
+            hud_lines.push(format!(
+                "NAV {name} | RANGE {distance:.0} M | XYZ {x:.0} {y:.0} {z:.0}"
+            ));
+        }
         let docked_frame = if self.menu_active() {
             let viewport = self.renderer.as_ref().and_then(|r| {
                 let [width, height] = r.logical_viewport();

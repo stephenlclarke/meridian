@@ -9,6 +9,18 @@ use meridian_core::{
 const ROUTES: [SystemId; 2] = [SystemId::AVENOR, SystemId::RENAS];
 pub const BINDINGS: &[ui::BindingHint<'static>] = &[
     ui::BindingHint {
+        key: ui::Key::NextBody,
+        label: "N",
+    },
+    ui::BindingHint {
+        key: ui::Key::PreviousBody,
+        label: "M",
+    },
+    ui::BindingHint {
+        key: ui::Key::BodyRoute,
+        label: "T",
+    },
+    ui::BindingHint {
         key: ui::Key::Previous,
         label: "Up",
     },
@@ -78,6 +90,7 @@ fn context<'a>(
     review: Option<&'a ui::Review>,
     stamp: ui::Stamp,
     selected: SystemId,
+    navigation_bodies: &'a [ui::NavigationBody],
 ) -> ui::Context<'a> {
     let navigation = world.snapshot().navigation;
     ui::Context {
@@ -93,7 +106,7 @@ fn context<'a>(
         models: &crate::docked_render::MODELS,
         planet_previews: navigation.is_some_and(|n| n.system == selected)
             && world.celestial_snapshot().is_some(),
-        navigation_bodies: &[],
+        navigation_bodies,
         exchanges: &[],
         equipment: Some(panel),
         review,
@@ -156,6 +169,7 @@ pub struct Docked {
     serial: u64,
     token: u64,
     pub route: Option<SystemId>,
+    body_cue: Option<ui::NavigationBodyId>,
 }
 impl Docked {
     pub fn new(world: &World) -> Result<Self, String> {
@@ -175,6 +189,7 @@ impl Docked {
             serial: 0,
             token: 0,
             route: None,
+            body_cue: None,
         })
     }
     pub fn open(&mut self, world: &World, screen: ui::Screen) -> Result<(), String> {
@@ -208,6 +223,13 @@ impl Docked {
     pub fn feedback(&mut self, message: String) {
         self.feedback = message;
     }
+    /// Presentation selection only; query the actual provider after every movement/arrival.
+    pub fn selected_body_cue(&self, world: &World) -> Option<ui::NavigationBody> {
+        let id = self.body_cue?;
+        ui::mining_navigation_bodies(world, id.system)
+            .into_iter()
+            .find(|body| body.id == id && body.can_target)
+    }
     pub fn discard_frame(&mut self) {
         self.painted = None;
     }
@@ -230,6 +252,7 @@ impl Docked {
             session: 1,
             revision: self.serial,
         };
+        let navigation_bodies = ui::mining_navigation_bodies(world, self.screens.selected_system());
         let c = context(
             world,
             &self.catalogue,
@@ -237,6 +260,7 @@ impl Docked {
             self.pending.as_ref().map(|p| &p.view),
             stamp,
             self.screens.selected_system(),
+            &navigation_bodies,
         );
         Ok(self.screens.frame(&c, viewport))
     }
@@ -259,6 +283,8 @@ impl Docked {
             .as_ref()
             .ok_or("Wait for the current screen to draw")?;
         let panel = equipment_panel(&profile.world, &self.slot, &self.feedback)?;
+        let navigation_bodies =
+            ui::mining_navigation_bodies(&profile.world, self.screens.selected_system());
         let c = context(
             &profile.world,
             &self.catalogue,
@@ -269,6 +295,7 @@ impl Docked {
                 revision: self.serial,
             },
             self.screens.selected_system(),
+            &navigation_bodies,
         );
         let outcome = self.screens.handle(input, painted, &c);
         match outcome {
@@ -433,8 +460,23 @@ impl Docked {
             ui::Request::ReviewShipExchange(_) => {
                 return Err("Ship exchange is not yet available for this hull".into());
             }
-            ui::Request::ReviewBodyRoute(_) => {
-                return Err("No current asteroid navigation provider is joined".into());
+            ui::Request::ReviewBodyRoute(id) => {
+                if paused(world) || self.pending.is_some() {
+                    return Err(
+                        "Finish the current review and resume before selecting a position cue"
+                            .into(),
+                    );
+                }
+                let body = ui::mining_navigation_bodies(world, id.system)
+                    .into_iter()
+                    .find(|body| body.id == id && body.can_target)
+                    .ok_or("This local navigation position is no longer available")?;
+                self.body_cue = Some(body.id);
+                let [x, y, z] = body.position_world;
+                self.feedback = format!(
+                    "Local cue selected: {}; station-local XYZ {x:.0}, {y:.0}, {z:.0}. Fly manually; no travel or mining performed.",
+                    body.name
+                );
             }
         }
         Ok(())
@@ -856,6 +898,38 @@ mod tests {
             assert_visible_feedback(&mut menu, &profile, "launch and press J");
             assert_eq!(ok(profile.world.save_bytes()), before);
         }
+    }
+    #[test]
+    fn actual_local_body_selection_is_ephemeral_and_continue_recreates_empty_selection() {
+        let (_directory, mut profile, mut menu) = start();
+        ok(profile.save());
+        ok(menu.open(&profile.world, ui::Screen::System));
+        let bodies = ui::mining_navigation_bodies(&profile.world, SystemId::AVENOR);
+        assert_eq!(bodies.len(), 13);
+        let rock = bodies[1].clone();
+        let before = ok(profile.world.save_bytes());
+        ok(menu.request(&mut profile, ui::Request::ReviewBodyRoute(rock.id)));
+        assert_eq!(menu.selected_body_cue(&profile.world), Some(rock.clone()));
+        assert_eq!(rock.position_world, [4000.0, 0.0, 6000.0]);
+        assert_eq!(ok(profile.world.save_bytes()), before);
+        let foreign = ui::NavigationBodyId {
+            system: SystemId::RENAS,
+            ordinal: rock.id.ordinal,
+        };
+        assert!(
+            menu.request(&mut profile, ui::Request::ReviewBodyRoute(foreign))
+                .is_err()
+        );
+        assert_eq!(menu.selected_body_cue(&profile.world), Some(rock.clone()));
+        assert_eq!(ok(profile.world.save_bytes()), before);
+        ok(profile.continue_saved());
+        // App's actual profile-sync path recreates Docked rather than serializing UI targets.
+        let after = ok(Docked::new(&profile.world));
+        assert!(after.selected_body_cue(&profile.world).is_none());
+        assert_eq!(
+            ui::mining_navigation_bodies(&profile.world, SystemId::AVENOR),
+            bodies
+        );
     }
     #[test]
     fn real_market_review_confirm_publishes_one_native_tonne_once() {

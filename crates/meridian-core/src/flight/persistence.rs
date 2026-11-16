@@ -1013,4 +1013,29 @@ mod paid_missile_format_tests {
         );
         assert_ne!(old, current);
     }
+    #[test]
+    fn explicit_v11_continue_retains_absent_mining_provider() {
+        let world = World::new_commander(8402).unwrap_or_else(|e| panic!("{e:?}"));
+        assert!(
+            world
+                .mining_destination(crate::navigation::SystemId::AVENOR)
+                .is_some()
+        );
+        let old = legacy_test_fixture(&world, 11).unwrap_or_else(|e| panic!("{e:?}"));
+        let loaded = World::from_save_bytes(&old).unwrap_or_else(|e| panic!("{e:?}"));
+        assert!(
+            loaded
+                .mining_destination(crate::navigation::SystemId::AVENOR)
+                .is_none()
+        );
+        assert!(loaded.mining_belt_snapshot().is_none());
+        let saved = loaded.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
+        let continued = World::from_save_bytes(&saved).unwrap_or_else(|e| panic!("{e:?}"));
+        assert!(
+            continued
+                .mining_destination(crate::navigation::SystemId::AVENOR)
+                .is_none()
+        );
+        assert!(continued.mining_belt_snapshot().is_none());
+    }
 }
