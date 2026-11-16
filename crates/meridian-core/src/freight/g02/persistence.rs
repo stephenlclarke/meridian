@@ -134,7 +134,7 @@ fn read_item(r: &mut Reader<'_>) -> Result<OwnedStarterItem, SaveError> {
 }
 impl CommanderAccount {
     pub(crate) fn encode_save(&self, w: &mut Writer) {
-        self.encode_version(w, 12);
+        self.encode_version(w, 13);
     }
     #[cfg(test)]
     pub(crate) fn encode_legacy_version(&self, w: &mut Writer, version: u16) {
@@ -173,6 +173,9 @@ impl CommanderAccount {
         if version >= 12 {
             w.u64(d.ammunition_revision);
         }
+        if version >= 13 {
+            w.u64(d.modular_revision);
+        }
     }
     pub(crate) fn decode_save(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
         let mut account = Self {
@@ -204,6 +207,7 @@ impl CommanderAccount {
                 legal: r.u8()?,
                 equipment: crate::equipment::State::decode(r)?,
                 ammunition_revision: if version >= 12 { r.u64()? } else { 0 },
+                modular_revision: if version >= 13 { r.u64()? } else { 0 },
             },
         };
         if version < 12 {
@@ -240,7 +244,11 @@ impl CommanderAccount {
             || fit.items.iter().enumerate().any(|(i, item)| {
                 (i < 5 && item.is_none())
                     || item.is_some_and(|item| {
-                        item.id != nav.owner + 3 + i as u64 || item.fitted_hull != Some(nav.hull)
+                        item.id != nav.owner + 3 + i as u64
+                            || (item.fitted_hull != Some(nav.hull)
+                                && !(i == 4
+                                    && self.data.modular_revision > 0
+                                    && item.fitted_hull.is_none()))
                     })
             })
         {

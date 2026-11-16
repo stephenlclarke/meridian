@@ -285,6 +285,7 @@ impl World {
         }
         self.missiles.encode(&mut w);
         self.ammunition.encode(&mut w);
+        self.modular.encode(&mut w);
         self.combat.encode(&mut w);
         self.flight_reception.encode(&mut w);
         self.navigation_trade.encode(&mut w);

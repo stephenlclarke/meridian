@@ -11,6 +11,11 @@ pub use flight_reception::{
     FlightReceptionError, FlightReceptionId, FlightReceptionOutcome, FlightReceptionReview,
     FlightReceptionSnapshot, FlightReceptionTrace, FlightView, PreparedFlightReception,
 };
+mod modular;
+pub use modular::{
+    FittedMiningTool, ModularEquipmentSnapshot, ModuleAction, ModuleError, ModuleKind, ModuleOffer,
+    ModuleProvenance, ModuleReview, ModuleSlot, OwnedModule, PreparedModule,
+};
 mod ammunition;
 mod missiles;
 pub use ammunition::{
@@ -151,6 +156,7 @@ pub struct World {
     combat: combat::State,
     missiles: missiles::State,
     ammunition: ammunition::State,
+    modular: modular::State,
     navigation_trade: navigation_trade::State,
     flight_reception: flight_reception::State,
     practice: Option<practice::Practice>,
@@ -187,6 +193,7 @@ impl World {
             combat: combat::State::default(),
             missiles: missiles::State::default(),
             ammunition: ammunition::State::default(),
+            modular: modular::State::default(),
             navigation_trade: navigation_trade::State::default(),
             flight_reception: flight_reception::State::default(),
             practice: None,
@@ -816,3 +823,5 @@ mod tests {
         assert_eq!(world.snapshot(), before);
     }
 }
+
+pub use weapons::FlightResourcesSnapshot;

@@ -346,7 +346,7 @@ impl World {
         })
     }
     pub fn combat_snapshot(&self) -> Option<CombatSnapshot> {
-        let laser = self.pulse_laser_snapshot()?;
+        let laser = self.flight_resources_snapshot()?;
         Some(CombatSnapshot {
             player: PlayerCondition {
                 front_shield_hundredths: self.combat.front,

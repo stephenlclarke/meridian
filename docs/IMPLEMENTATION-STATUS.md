@@ -2,9 +2,13 @@
 
 Reviewed against actual delivery evidence on 16 November 2026. This document distinguishes installed gameplay from source awaiting execution. Update it with every delivery or material acceptance change; test counts belong to their exact source.
 
+## Modular mining-tool source awaiting execution
+
+The [modular equipment increment](MODULAR-EQUIPMENT.md) authors genuine paid front Mining Laser fitting, same-item Pulse storage/refit, shared resource preparation and a ship-resource readout that remains valid without Pulse fitted. Thirteen standalone and two Root-join cases are **UNRUN**. Actual mining/screen/profile/fleet composition and the full remaining modular catalogue are open. Published previews and profiles are unchanged.
+
 ## Paid missile author increment
 
-The [paid missile source](PAID-MISSILES.md) adds prepared paid ownership/store/refit, nine native SH025 positions, retained additional launch/contact receipts and explicit v12 saves. New tests, compiler/Clippy and native qualification are **UNRUN** for this increment. Existing delivery results below remain bound to their original commits. Full modular equipment and its real docked screen remain open core work before further missions.
+The [paid missile source](PAID-MISSILES.md) adds prepared paid ownership/store/refit, nine native SH025 positions, retained additional launch/contact receipts and explicit current-format saves. New tests, compiler/Clippy and native qualification are **UNRUN** for this increment. Existing delivery results below remain bound to their original commits. Full modular equipment and its real docked screen remain open core work before further missions.
 
 ## Latest installed and published preview
 
