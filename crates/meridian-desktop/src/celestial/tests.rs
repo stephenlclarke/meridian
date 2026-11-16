@@ -290,3 +290,50 @@ fn complete_frame_refuses_bad_second_body_and_empty_or_subpixel_scene_stays_empt
             .all(|v| v.is_none())
     );
 }
+
+#[test]
+fn actual_world_provider_binds_generated_maps_reuses_surface_and_docked_or_title_draws_nothing() {
+    let world = world();
+    let core = world.celestial_snapshot();
+    let mut adapter = WorldAdapter::default();
+    assert!(
+        adapter
+            .scene(core, meridian_core::FlightMode::Docked)
+            .unwrap_or_else(|e| panic!("{e}"))
+            .is_none()
+    );
+    let a = adapter
+        .scene(core, meridian_core::FlightMode::Flight)
+        .unwrap_or_else(|e| panic!("{e}"))
+        .unwrap_or_else(|| panic!("scene"));
+    let b = adapter
+        .scene(core, meridian_core::FlightMode::Flight)
+        .unwrap_or_else(|e| panic!("{e}"))
+        .unwrap_or_else(|| panic!("scene"));
+    let pa = a.planet.as_ref().unwrap_or_else(|| panic!("planet"));
+    let pb = b.planet.as_ref().unwrap_or_else(|| panic!("planet"));
+    assert!(Arc::ptr_eq(&pa.surface, &pb.surface));
+    assert!(a.validate(world.snapshot()).is_ok());
+    assert_eq!(
+        pa.position,
+        core.unwrap_or_else(|| panic!("core")).planet.position
+    );
+    let bound = frame_plan(
+        &a,
+        world.snapshot(),
+        FlightView::Front,
+        Projection {
+            far: 100000.0,
+            ..projection()
+        },
+    )
+    .unwrap_or_else(|e| panic!("{e}"));
+    assert!(bound.uniforms.into_iter().all(|u| u.is_some()));
+    assert!(pa.surface.samples.windows(2).any(|p| p[0] != p[1]));
+    assert!(
+        adapter
+            .scene(None, meridian_core::FlightMode::Flight)
+            .unwrap_or_else(|e| panic!("{e}"))
+            .is_none()
+    );
+}

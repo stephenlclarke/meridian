@@ -59,6 +59,7 @@ fn step_frame(
 // This shell owns the World synchronously. No gameplay mutation occurs in renderer code.
 struct App {
     game: Profile,
+    celestial: crate::celestial::WorldAdapter,
     quit_failed: bool,
     renderer: Option<Renderer>,
     keys: HashSet<KeyCode>,
@@ -80,6 +81,7 @@ impl App {
                 std::env::args_os().skip(1),
             )?)?,
             quit_failed: false,
+            celestial: crate::celestial::WorldAdapter::default(),
             renderer: None,
             keys: HashSet::new(),
             paused: false,
@@ -290,6 +292,9 @@ impl App {
         if let Some(refusal) = frame_refusal {
             self.notice = Some(
                 match refusal {
+                    MotionRefusal::CelestialContact => {
+                        "Celestial contact: stopped before the physical surface"
+                    }
                     MotionRefusal::StationContact => {
                         "Station contact: stopped at last clear position"
                     }
@@ -331,6 +336,17 @@ impl App {
                 .missile_projectiles()
                 .filter(|p| p.ended.is_none()),
         );
+        let celestial_scene = match self
+            .celestial
+            .scene(self.game.world.celestial_snapshot(), snapshot.mode)
+        {
+            Ok(scene) => scene,
+            Err(error) => {
+                self.fail(event_loop, error.to_owned());
+                return;
+            }
+        };
+
         if let Some(renderer) = &mut self.renderer {
             let mode = match snapshot.mode {
                 FlightMode::Docked => "DOCKED - L launch",
@@ -341,6 +357,9 @@ impl App {
                 frame_refusal
                     .or(snapshot.motion_refusal)
                     .map(|refusal| match refusal {
+                        MotionRefusal::CelestialContact => {
+                            "Celestial contact: stopped before the physical surface"
+                        }
                         MotionRefusal::StationContact => {
                             "Station contact: stopped at last clear position"
                         }
@@ -374,7 +393,7 @@ impl App {
                     pulse: self.pulse.as_ref(),
                     missiles: &self.missile_bodies,
                     practice: practice.as_ref().and_then(|state| state.beacons.as_ref()),
-                    celestial: None, // Root joins the actual World-owned body snapshot.
+                    celestial: celestial_scene.as_ref(),
                 },
                 HudScene { lines: &hud_lines, cockpit: cockpit.as_ref() },
             ) {

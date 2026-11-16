@@ -10,12 +10,9 @@ pub const MAP_WIDTH: usize = 256;
 pub const MAP_HEIGHT: usize = 128;
 pub const MAP_SAMPLES: usize = MAP_WIDTH * MAP_HEIGHT;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct BodyId {
-    pub system: meridian_core::navigation::SystemId,
-    pub visit: u64,
-    pub entity: u64,
-}
+pub use meridian_core::celestial::BodyId;
+mod provider;
+pub use provider::WorldAdapter;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Palette {

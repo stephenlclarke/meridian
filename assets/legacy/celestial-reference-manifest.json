@@ -59,6 +59,7 @@
     "External Elite/Oolite art, models, textures or fonts"
   ],
   "provenance": "Requested L337 shading reference retained with its Stephen Clarke MIT license. Repository presence/license alone does not independently prove authorship of every historical component. No broader commercial clearance claimed.",
-  "runtimeDependency": "Root actual World-owned celestial scene/profile/maps and MC1 actual mesh/position/remaining-ore provider; absent inputs draw no body.",
-  "nativeAcceptance": "UNRUN. Focused Naga/source tests are not GPU execution or playable acceptance."
+  "runtimeDependency": "Actual core-owned World celestial provider, system-seeded Meridian surface recipes/maps and App binding implemented. MC1 actual asteroid mesh/position/remaining-ore provider and final Root HUD clip join remain.",
+  "nativeAcceptance": "UNRUN. Focused Naga/source tests are not GPU execution or playable acceptance.",
+  "meridianAuthored": "crates/meridian-core/src/celestial.rs owns new deterministic local placement, scale and procedural art; no copied legacy reset coordinates or external textures."
 }

@@ -1,3 +1,4 @@
+mod celestial;
 mod navigation_trade;
 pub use navigation_trade::{
     NavigationTonneId, NavigationTradeAction, NavigationTradeAttemptSnapshot, NavigationTradeError,
@@ -412,7 +413,7 @@ impl World {
     }
 
     /// Advance exactly one 1/60-second tick. Errors leave World unchanged.
-    /// A station motion refusal is an accepted safe stop at the last clear pose,
+    /// A motion refusal is an accepted safe stop at the last clear pose,
     /// reported through Snapshot.motion_refusal; damage/contact-response parity is pending.
     /// Rotation is local yaw, then pitch, then roll; translation uses the new pose/speed.
     /// Brake overrides throttle and uses the same reference deceleration magnitude.
@@ -460,6 +461,22 @@ impl World {
         }
         if !next.speed.is_finite() || next.position.iter().any(|value| !value.is_finite()) {
             return Err(StepError::NonFiniteState);
+        }
+        if let Some(scene) = self.celestial_snapshot() {
+            let hull_radius = self
+                .station_data
+                .as_ref()
+                .map_or(0.0, |data| data.player_radius());
+            if [scene.planet, scene.sun]
+                .into_iter()
+                .any(|body| body.blocks_motion(self.state.position, next.position, hull_radius))
+            {
+                let mut stopped = self.state;
+                stopped.tick = next.tick;
+                stopped.speed = 0.0;
+                stopped.motion_refusal = Some(MotionRefusal::CelestialContact);
+                return self.publish_step(stopped);
+            }
         }
         if let Some(data) = &self.station_data {
             let before = flight_pose(self.state.position, self.state.orientation)

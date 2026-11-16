@@ -2,6 +2,7 @@
 
 #![forbid(unsafe_code)]
 
+pub mod celestial;
 pub mod docking;
 pub mod equipment;
 mod flight;

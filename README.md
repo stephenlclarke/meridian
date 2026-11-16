@@ -90,4 +90,4 @@ The next playable preview is being developed around a working cockpit HUD, docke
 
 In the next-preview development candidate, `/` toggles controls help and ordinary flight uses a compact overlay above the cockpit. This change is not in the published v0.4 binary.
 
-The prepared [planet and sun shading slice](docs/CELESTIAL-SHADING.md) records its World-input dependencies and native acceptance limits.
+The [planet and sun implementation](docs/CELESTIAL-SHADING.md) binds core-owned bodies and procedural surfaces, with swept flight safety and explicit native acceptance limits.

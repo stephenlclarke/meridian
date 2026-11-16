@@ -488,6 +488,19 @@ impl World {
             .ok_or(SaveError::NoCommander)?;
         let station = self.station_data.as_ref().ok_or(SaveError::NoCommander)?;
         validate_flight(&self.state)?;
+        if self.celestial_snapshot().is_some_and(|scene| {
+            [scene.planet, scene.sun].into_iter().any(|body| {
+                body.blocks_motion(
+                    self.state.position,
+                    self.state.position,
+                    station.player_radius(),
+                )
+            })
+        }) {
+            return Err(SaveError::InvalidState(
+                "player intersects physical celestial surface",
+            ));
+        }
         if self.state.station != Some(station.station_pose()) || self.state.navigation.is_some() {
             return Err(SaveError::InvalidState(
                 "immutable station or derived navigation",
@@ -678,6 +691,7 @@ pub(super) fn write_flight(w: &mut Writer, s: &Snapshot) {
         None => 0,
         Some(MotionRefusal::StationContact) => 1,
         Some(MotionRefusal::EntryConditions) => 2,
+        Some(MotionRefusal::CelestialContact) => 3,
     });
 }
 pub(super) fn read_flight(r: &mut Reader<'_>) -> Result<Snapshot, SaveError> {
@@ -695,6 +709,7 @@ pub(super) fn read_flight(r: &mut Reader<'_>) -> Result<Snapshot, SaveError> {
         0 => None,
         1 => Some(MotionRefusal::StationContact),
         2 => Some(MotionRefusal::EntryConditions),
+        3 => Some(MotionRefusal::CelestialContact),
         _ => return Err(SaveError::InvalidEncoding),
     };
     Ok(Snapshot {
