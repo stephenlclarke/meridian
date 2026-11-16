@@ -1097,7 +1097,7 @@ impl State {
             let PulseContact::Projectile { id, distance } = shot.contact else {
                 return Err(INVALID);
             };
-            self.validate_beam_identity(b, p, emission, id)?;
+            self.validate_beam_identity(world, b, p, emission, id)?;
             let mut ray = pose(shot.origin, shot.direction).ok_or(INVALID)?;
             // Pulse uses the exact quaternion-derived forward column without normalization.
             ray.orientation.z = shot.direction;
@@ -1161,6 +1161,7 @@ impl State {
     }
     fn validate_beam_identity(
         &self,
+        world: &World,
         b: &Beam,
         p: ProjectileSnapshot,
         emission: u64,
@@ -1178,7 +1179,7 @@ impl State {
         if b.emission != emission
             || emission <= p.origin.emission
             || shot.tick != p.last_tick
-            || shot.fitted_item_id != p.origin.owner.owner.checked_add(7).ok_or(INVALID)?
+            || !world.owned_front_pulse_at(shot.fitted_item_id, shot.tick, p.origin.owner)
             || id != p.origin.projectile
             || !valid_vector(shot.origin)
             || !valid_vector(shot.direction)

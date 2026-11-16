@@ -1,5 +1,9 @@
 # Modular equipment: first mining-tool increment
 
+## Current follow-up
+
+The [energy and paid Pulse increment](ENERGY-PAID-PULSE.md) extends this first mining-tool source with generic stock purchases, an existing born-energy readout and actual recharge. Its local draft is v14; Root chooses the final composed format. This guide retains the first mining-tool boundary and its separate unrun criteria.
+
 ## Actual coverage and validation
 
 This source adds genuine paid front Mining Laser ownership and same-item removal/installation, including storage and refitting of the displaced born Pulse Laser. It is the second equipment increment after paid finite missiles, and is **not the complete modular equipment system**. Thirteen standalone Rust cases and two Root-join integration cases are authored and **UNRUN**. No compiler, Cargo, tests, Clippy, GPU or native process ran in the G3 author lane. Source/static formatting and provenance checks are reported separately from execution.

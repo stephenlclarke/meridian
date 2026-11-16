@@ -453,7 +453,11 @@ impl World {
             legal: self.legal_value().unwrap_or(0),
         };
         prepared.combat.advance(self.state.mode, next.mode);
-        prepared.pulse.advance(self.state.mode, next.mode);
+        prepared.pulse.advance(
+            self.state.mode,
+            next.mode,
+            self.energy_recharge_hundredths(),
+        );
         if self.state.mode != FlightMode::Docked {
             prepared.missiles.cooldown = prepared.missiles.cooldown.saturating_sub(1);
         }

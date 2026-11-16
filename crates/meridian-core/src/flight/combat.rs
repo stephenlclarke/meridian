@@ -316,6 +316,7 @@ impl State {
                         elapsed_physical,
                         uninterrupted,
                         world.missiles.has_player_hit(),
+                        world.energy_recharge_hundredths(),
                     ))
             {
                 return Err(invalid);
@@ -597,7 +598,7 @@ impl OrdinaryImpact {
         if self.victim_entity != 1
             || self.attacker.owner != current.owner
             || self.attacker.hull != current.hull
-            || self.item != current.owner.checked_add(7).ok_or(invalid)?
+            || !world.owned_front_pulse_at(self.item, self.tick, self.attacker)
             || station_index(self.attacker.system).is_none()
             || self.attacker.visit < 2
             || self.attacker.visit > current.visit

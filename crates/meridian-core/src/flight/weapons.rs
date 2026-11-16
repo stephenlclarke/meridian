@@ -1,7 +1,6 @@
 //! Fixed-tick front Pulse Laser resources and World-bound discharge.
 use super::{FlightMode, World, flight_pose};
 use crate::docking::Vec3;
-use crate::freight::g02::StarterComponent;
 use crate::save::{Reader, SaveError, Writer};
 use core::fmt;
 
@@ -9,7 +8,7 @@ pub const PULSE_RANGE: f64 = 6000.0;
 pub const PULSE_COOLDOWN_TICKS: u8 = 18;
 const ENERGY_CAPACITY_HUNDREDTHS: u16 = 38_000;
 const ENERGY_COST_HUNDREDTHS: u16 = 100;
-const ENERGY_RECHARGE_HUNDREDTHS: u16 = 7;
+pub(super) const ENERGY_RECHARGE_HUNDREDTHS: u16 = 7;
 const HEAT_LIMIT_FIFTHS: u16 = 1200;
 const HEAT_COST_FIFTHS: u16 = 50;
 
@@ -87,6 +86,8 @@ pub struct FlightResourcesSnapshot {
     pub energy_hundredths: u16,
     pub heat_fifths: u16,
     pub cooldown_ticks: u8,
+    pub energy_capacity_hundredths: u16,
+    pub energy_recharge_hundredths_per_tick: u16,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) struct PulseResources {
@@ -104,7 +105,7 @@ impl Default for PulseResources {
     }
 }
 impl PulseResources {
-    pub(super) fn advance(&mut self, opening: FlightMode, next: FlightMode) {
+    pub(super) fn advance(&mut self, opening: FlightMode, next: FlightMode, recharge: u16) {
         if opening == FlightMode::Docked {
             return;
         }
@@ -114,8 +115,7 @@ impl PulseResources {
             self.energy = ENERGY_CAPACITY_HUNDREDTHS;
             self.heat = 0;
         } else {
-            self.energy =
-                (self.energy + ENERGY_RECHARGE_HUNDREDTHS).min(ENERGY_CAPACITY_HUNDREDTHS);
+            self.energy = (self.energy + recharge).min(ENERGY_CAPACITY_HUNDREDTHS);
             self.heat = self.heat.saturating_sub(1);
         }
     }
@@ -169,6 +169,7 @@ impl PulseResources {
         elapsed_physical: u64,
         uninterrupted: bool,
         damaged: bool,
+        recharge: u16,
     ) -> bool {
         let remaining = u64::from(PULSE_COOLDOWN_TICKS).saturating_sub(elapsed_physical);
         if u64::from(self.cooldown) < remaining
@@ -186,7 +187,7 @@ impl PulseResources {
                 // No intervening docking reset or other legal shot can refill
                 // or debit this pool during the original shot's cooldown.
                 let energy = (u64::from(ENERGY_CAPACITY_HUNDREDTHS - ENERGY_COST_HUNDREDTHS)
-                    + elapsed_physical * u64::from(ENERGY_RECHARGE_HUNDREDTHS))
+                    + elapsed_physical * u64::from(recharge))
                 .min(u64::from(ENERGY_CAPACITY_HUNDREDTHS));
                 if (!damaged && u64::from(self.energy) != energy)
                     || (damaged && u64::from(self.energy) > energy)
@@ -215,6 +216,7 @@ impl PulseResources {
         tick: u64,
         mode: FlightMode,
         launches: u64,
+        recharge: u16,
     ) -> Result<(), SaveError> {
         if mode != FlightMode::Flight && self.energy != ENERGY_CAPACITY_HUNDREDTHS {
             return Err(SaveError::InvalidState("docked damaged player energy"));
@@ -225,24 +227,24 @@ impl PulseResources {
         undamaged.energy = if self.cooldown == 0 || mode != FlightMode::Flight {
             ENERGY_CAPACITY_HUNDREDTHS
         } else {
-            (ENERGY_CAPACITY_HUNDREDTHS - ENERGY_COST_HUNDREDTHS
-                + u16::from(elapsed) * ENERGY_RECHARGE_HUNDREDTHS)
+            (ENERGY_CAPACITY_HUNDREDTHS - ENERGY_COST_HUNDREDTHS + u16::from(elapsed) * recharge)
                 .min(ENERGY_CAPACITY_HUNDREDTHS)
         };
         if self.energy > undamaged.energy {
             return Err(SaveError::InvalidState("damaged player energy"));
         }
-        undamaged.validate_save(tick, mode, launches)
+        undamaged.validate_save(tick, mode, launches, recharge)
     }
     pub(super) fn validate_save(
         self,
         tick: u64,
         mode: FlightMode,
         launches: u64,
+        recharge: u16,
     ) -> Result<(), SaveError> {
         let elapsed = PULSE_COOLDOWN_TICKS.saturating_sub(self.cooldown);
         let depleted_energy = (ENERGY_CAPACITY_HUNDREDTHS - ENERGY_COST_HUNDREDTHS
-            + u16::from(elapsed) * ENERGY_RECHARGE_HUNDREDTHS)
+            + u16::from(elapsed) * recharge)
             .min(ENERGY_CAPACITY_HUNDREDTHS);
         let ready = self.cooldown == 0;
         let quiescent = mode != FlightMode::Flight;
@@ -339,27 +341,9 @@ impl World {
         ))
     }
     pub(super) fn fitted_front_pulse(&self) -> Option<u64> {
-        if self
-            .modular_front()
-            .is_none_or(|i| i.kind != super::modular::ModuleKind::PulseLaser)
-        {
-            return None;
-        }
-        let nav = self.navigation?;
-        let owner = nav.owner().seed();
-        let hull = nav.ship().ordinal();
-        self.commander_account
-            .as_ref()?
-            .starter_items()?
-            .iter()
-            .find(|item| {
-                item.component() == StarterComponent::FrontPulseLaser
-                    && item.owner() == owner
-                    && item.id() == owner + 7
-                    && item.fitted_hull() == Some(hull)
-                    && item.is_standard_birth()
-            })
-            .map(crate::freight::g02::OwnedStarterItem::id)
+        self.modular_front()
+            .filter(|i| i.kind == super::modular::ModuleKind::PulseLaser)
+            .map(|i| i.id)
     }
 
     pub fn flight_resources_snapshot(&self) -> Option<FlightResourcesSnapshot> {
@@ -368,6 +352,8 @@ impl World {
             energy_hundredths: self.pulse.energy,
             heat_fifths: self.pulse.heat,
             cooldown_ticks: self.pulse.cooldown,
+            energy_capacity_hundredths: ENERGY_CAPACITY_HUNDREDTHS,
+            energy_recharge_hundredths_per_tick: self.energy_recharge_hundredths(),
         })
     }
     pub fn pulse_laser_snapshot(&self) -> Option<PulseLaserSnapshot> {

@@ -96,7 +96,7 @@ const V11_CONTENT: &[u8] = concat!(
 .as_bytes();
 
 const CONTENT: &[u8] = concat!(
-    "meridian-world/rules/13;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
+    "meridian-world/rules/14;modular-energy-paid-pulse/v1/a11fe169;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -589,11 +589,19 @@ impl World {
             .missiles
             .has_undocked_player_hit(practice, history, nav.dock_sequence)
         {
-            self.pulse
-                .validate_damaged_save(self.state.tick, self.state.mode, nav.launches)?;
+            self.pulse.validate_damaged_save(
+                self.state.tick,
+                self.state.mode,
+                nav.launches,
+                self.energy_recharge_hundredths(),
+            )?;
         } else {
-            self.pulse
-                .validate_save(self.state.tick, self.state.mode, nav.launches)?;
+            self.pulse.validate_save(
+                self.state.tick,
+                self.state.mode,
+                nav.launches,
+                self.energy_recharge_hundredths(),
+            )?;
         }
         for attempt in practice::lifecycle::lessons(practice, history) {
             attempt.validate(nav, navigation, self.state, station, self.pulse)?;
@@ -947,7 +955,7 @@ mod paid_missile_format_tests {
         assert_eq!(loaded.ammunition_snapshot(), world.ammunition_snapshot());
         assert_eq!(loaded.credits_tenths(), world.credits_tenths());
         let current = loaded.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
-        assert_eq!(u16::from_le_bytes([current[8], current[9]]), 13);
+        assert_eq!(u16::from_le_bytes([current[8], current[9]]), 14);
         assert_ne!(old, current);
     }
 }

@@ -606,3 +606,5 @@ fn untouched_controller_preserves_exact_v4_through_v8_owned_rounds_without_a_gra
 }
 
 mod durable;
+
+mod paid_pulse;

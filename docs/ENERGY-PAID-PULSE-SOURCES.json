@@ -1,0 +1,101 @@
+{
+  "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "files": [
+    {
+      "path": "Sources/L337Core/Game.swift",
+      "gitBlob": "0f94ff0c7bf46d47e65e077cc3c5db37694bd706",
+      "bytes": 313817,
+      "sha256": "e5b4e30c835d460aa7ca6f77364db0aaeaf877bb9d73bacc162e9111b26e2e17"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentRuntimeCatalog.swift",
+      "gitBlob": "4f9bf9ec70d239e9c099f00a9c63a80d4648833d",
+      "bytes": 8337,
+      "sha256": "ccf1ee2a940175f0d1a26a65aaa7b62ca7cf61d0eb33906f8b8feb6664210e27"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentModuleTemplates.swift",
+      "gitBlob": "46574e607c0d12f275588f891e94780dde498ff9",
+      "bytes": 6099,
+      "sha256": "387f5623bc0a390864b29ca5f2662c52bd091c54b024f8761bf8b098610a566f"
+    },
+    {
+      "path": "Sources/L337Core/LaserSpecification.swift",
+      "gitBlob": "d8da97cbc4e28bb8b7078d2a3e01abe3c62afd75",
+      "bytes": 2653,
+      "sha256": "7ef4750ec3c25ad224131dc52a145baa901fb1dac6b5b33a17c15d8cb00043e3"
+    },
+    {
+      "path": "Sources/L337Core/GameplayWeapons.swift",
+      "gitBlob": "582560d2f5dcdb3ee27804ba0cedd5ecdced1f0b",
+      "bytes": 19711,
+      "sha256": "b0e3fa858afcc6fd646e0db51e02260e63e38394cde8a8aeeed783db058011c8"
+    },
+    {
+      "path": "Sources/L337Core/NavalMissions.swift",
+      "gitBlob": "9244ec4440994f19edd7f5a2a00e8e5b5f04dde0",
+      "bytes": 8076,
+      "sha256": "207eb8e4ba0e4428e89ddebdcbd1c438aa44808ee9b36095a649a484d8a19bb0"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentPurchaseProgression.swift",
+      "gitBlob": "91e79ba4e50fc1f12236e8b4a25d16a3b26d84d4",
+      "bytes": 24305,
+      "sha256": "770618fcbb38330f568dbb862fc471762552cc17b55edfd407a1eb7462b0460c"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentTransactions.swift",
+      "gitBlob": "3d51889a6dd1900faadfc172bbdab072995f1a21",
+      "bytes": 15785,
+      "sha256": "21a44066185ea17c8e3b262988c193cdef98bf88f80294d7a216767d93ad4f36"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentMutations.swift",
+      "gitBlob": "42d78044954801d6d06b46434489d40485a66b69",
+      "bytes": 16275,
+      "sha256": "a1d0bece73e7d6370f4cab8fc952d2e25a3d20dfceb89ce8fab189c4b65941d5"
+    },
+    {
+      "path": "Sources/L337Core/OwnedEquipment.swift",
+      "gitBlob": "b0b5e5ea4f8bfdcf5077b62ef576526c1bc8e9c2",
+      "bytes": 3837,
+      "sha256": "c8a9e6eb6d859d917f8621cf9146b518521ea7708a5ad6ac68334efe9f9607cf"
+    },
+    {
+      "path": "Sources/L337Core/OwnedEquipmentInventory.swift",
+      "gitBlob": "bf17b9ec76686ce9e830472f45cb0db64f242663",
+      "bytes": 23031,
+      "sha256": "83009fdd488c170fff421cff398858acc77836d6668308ae69a743e8a1a7544f"
+    },
+    {
+      "path": "Sources/L337Core/EffectiveEquipmentValidation.swift",
+      "gitBlob": "8a39f0cc83dfb64f7a54972c927e0503547f253e",
+      "bytes": 2270,
+      "sha256": "acbe2de75c6acf4ac48bc55c9f1dcb6e74f92b860b3230cabe41fbb01a4fb68d"
+    },
+    {
+      "path": "Sources/L337Core/Resources/Ships/SH025.toml",
+      "gitBlob": "ec62ccae9acfc05b92c3c4591f079fc7ba4bf1cf",
+      "bytes": 690857,
+      "sha256": "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883"
+    },
+    {
+      "path": "Sources/L337Core/Plugh.swift",
+      "gitBlob": "faf40ce4d170b33d26dc14f185d08acb30130a3a",
+      "bytes": 4508,
+      "sha256": "2c43ae0738fa93375eb51a4859e11bc33e7bf9e7496ff432f140e813baa6b8eb"
+    },
+    {
+      "path": "Tests/L337CoreTests/OwnedEquipmentMountSaveTests.swift",
+      "gitBlob": "6e8a6aecf88e652236e3b8aa202281ac9501c272",
+      "bytes": 3043,
+      "sha256": "d3e8dba5eb50edc4103823e238cecc03a5077830ee536bfc1e71ab175954340a"
+    },
+    {
+      "path": "Tests/L337CoreTests/OriginalEquipmentStockValuesTests.swift",
+      "gitBlob": "19f5a3e1009fd2f04f3e3de1c02500651e2ba231",
+      "bytes": 8817,
+      "sha256": "62a91840327bb68896ff04db312f644bc8f6916b2889fa7ce5457133e2c04c89"
+    }
+  ]
+}
