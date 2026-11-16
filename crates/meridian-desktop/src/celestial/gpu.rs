@@ -168,6 +168,35 @@ impl Pass {
         }
         Ok(())
     }
+    /// Prepare only an actual current-system preview; no fallback celestial data.
+    pub fn prepare_docked(
+        &mut self,
+        queue: &wgpu::Queue,
+        input: DockedPreview<'_>,
+    ) -> Result<bool, &'static str> {
+        self.active = [false; 2];
+        let Some(plan) = docked_plan(input)? else {
+            return Ok(false);
+        };
+        let planet = input
+            .scene
+            .and_then(|s| s.planet.as_ref())
+            .ok_or("missing preview planet")?;
+        self.clip = plan.clip;
+        let mut u = plan.uniforms[0].ok_or("missing preview uniforms")?;
+        u.night[3] = if self.output_srgb { 1.0 } else { 0.0 };
+        if !self
+            .cached
+            .as_ref()
+            .is_some_and(|old| Arc::ptr_eq(old, &planet.surface))
+        {
+            queue.write_buffer(&self.maps, 0, bytemuck::cast_slice(&planet.surface.samples));
+            self.cached = Some(Arc::clone(&planet.surface));
+        }
+        queue.write_buffer(&self.uniforms[0], 0, bytemuck::bytes_of(&u));
+        self.active[0] = true;
+        Ok(true)
+    }
     pub fn draw_surfaces(&self, pass: &mut wgpu::RenderPass<'_>) {
         self.draw(pass, &self.solid);
     }

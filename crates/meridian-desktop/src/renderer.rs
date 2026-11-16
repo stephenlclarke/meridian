@@ -27,11 +27,20 @@ pub struct SceneEffects<'a> {
     pub missiles: &'a [meridian_core::ProjectileSnapshot],
     pub practice: Option<&'a [PracticeBeaconSnapshot; 3]>,
     pub celestial: Option<&'a crate::celestial::Scene>,
+    pub docked: Option<&'a crate::docked_screens::Frame>,
+    pub docked_planet: Option<&'a crate::celestial::Scene>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Presentation {
+    Presented,
+    Skipped,
 }
 
 pub struct Renderer {
     flight_view: FlightView,
     celestial: crate::celestial::Pass,
+    docked: crate::docked_render::Pass,
     surface: wgpu::Surface<'static>,
     pub window: Arc<Window>,
     instance: wgpu::Instance,
@@ -94,6 +103,7 @@ impl Renderer {
             surface.configure(&device, &config);
         }
         let celestial = crate::celestial::Pass::new(&device, config.format);
+        let docked = crate::docked_render::Pass::new(&device, &queue, config.format)?;
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("Meridian flight WGSL"),
             source: wgpu::ShaderSource::Wgsl(include_str!("flight.wgsl").into()),
@@ -210,6 +220,7 @@ impl Renderer {
             window,
             flight_view: FlightView::Front,
             celestial,
+            docked,
             instance,
             device,
             queue,
@@ -287,57 +298,83 @@ impl Renderer {
         station: Option<StationScene<'_>>,
         effects: SceneEffects<'_>,
         hud: HudScene<'_>,
-    ) -> Result<(), String> {
+    ) -> Result<Presentation, String> {
         let HudScene {
             lines: hud_lines,
             cockpit,
         } = hud;
+
         let SceneEffects {
             pulse,
             missiles,
             practice,
             celestial,
+            docked,
+            docked_planet,
         } = effects;
         if self.device_lost.load(Ordering::Acquire) {
             return Err("Graphics device lost; exiting without changing any save".into());
         }
         if self.is_zero_sized() {
-            return Ok(());
+            return Ok(Presentation::Skipped);
         }
-        self.celestial
-            .prepare(
+        if let Some(menu) = docked {
+            let scale = self.window.scale_factor();
+            let logical = self.size.to_logical::<f64>(scale);
+            self.docked.prepare(
                 &self.queue,
-                celestial,
-                *snapshot,
-                self.flight_view,
-                crate::celestial::Projection {
-                    viewport: [self.config.width, self.config.height],
-                    clip: [
-                        0.0,
-                        0.0,
-                        self.config.width as f32,
-                        self.config.height as f32,
-                    ],
-                    center: [
-                        self.config.width as f32 / 2.0,
-                        self.config.height as f32 / 2.0,
-                    ],
-                    focal: self.config.height as f32 * 0.8,
-                    near: 1.0,
-                    far: 20000.0,
-                },
-            )
-            .map_err(str::to_owned)?;
+                menu,
+                [logical.width, logical.height],
+                docked_planet.and_then(|s| s.planet.as_ref().map(|p| p.id.system)),
+            )?;
+            self.celestial
+                .prepare_docked(
+                    &self.queue,
+                    crate::celestial::DockedPreview {
+                        scene: docked_planet,
+                        snapshot: *snapshot,
+                        request: menu.planets.first(),
+                        viewport: [self.config.width, self.config.height],
+                        scale,
+                    },
+                )
+                .map_err(str::to_owned)?;
+        } else {
+            self.celestial
+                .prepare(
+                    &self.queue,
+                    celestial,
+                    *snapshot,
+                    self.flight_view,
+                    crate::celestial::Projection {
+                        viewport: [self.config.width, self.config.height],
+                        clip: [
+                            0.0,
+                            0.0,
+                            self.config.width as f32,
+                            self.config.height as f32,
+                        ],
+                        center: [
+                            self.config.width as f32 / 2.0,
+                            self.config.height as f32 / 2.0,
+                        ],
+                        focal: self.config.height as f32 * 0.8,
+                        near: 1.0,
+                        far: 20000.0,
+                    },
+                )
+                .map_err(str::to_owned)?;
+        }
         let (frame, reconfigure) = match self.surface.get_current_texture() {
             wgpu::CurrentSurfaceTexture::Success(frame) => (frame, false),
             wgpu::CurrentSurfaceTexture::Suboptimal(frame) => (frame, true),
             wgpu::CurrentSurfaceTexture::Timeout | wgpu::CurrentSurfaceTexture::Occluded => {
-                return Ok(());
+                return Ok(Presentation::Skipped);
             }
             wgpu::CurrentSurfaceTexture::Outdated => {
                 self.surface.configure(&self.device, &self.config);
                 self.window.request_redraw();
-                return Ok(());
+                return Ok(Presentation::Skipped);
             }
             wgpu::CurrentSurfaceTexture::Lost => {
                 self.surface = self
@@ -346,53 +383,56 @@ impl Renderer {
                     .map_err(|e| e.to_string())?;
                 self.surface.configure(&self.device, &self.config);
                 self.window.request_redraw();
-                return Ok(());
+                return Ok(Presentation::Skipped);
             }
             wgpu::CurrentSurfaceTexture::Validation => {
                 return Err("Surface validation failed".into());
             }
         };
-        let station = station.map(|scene| mesh::StationRender {
-            vertices: &self.station,
-            pose: scene.pose,
-            port: scene.port,
-            docked: scene.docked,
-        });
-        mesh::frame_vertices(snapshot, &self.ship, station, &mut self.frame)?;
-        if let (Some(station), Some(beacons)) = (station, practice) {
-            mesh::append_practice_beacons(snapshot, station, beacons, &mut self.frame)?;
+        if docked.is_none() {
+            let station = station.map(|scene| mesh::StationRender {
+                vertices: &self.station,
+                pose: scene.pose,
+                port: scene.port,
+                docked: scene.docked,
+            });
+            mesh::frame_vertices(snapshot, &self.ship, station, &mut self.frame)?;
+            if let (Some(station), Some(beacons)) = (station, practice) {
+                mesh::append_practice_beacons(snapshot, station, beacons, &mut self.frame)?;
+            }
+            if let Some(station) = station {
+                mesh::append_missiles(snapshot, station, missiles, &mut self.frame)?;
+            }
+            if let (Some(station), Some(shot)) = (station, pulse) {
+                mesh::append_pulse(snapshot, station, shot, &mut self.frame)?;
+            }
+            mesh::apply_flight_view(self.flight_view, &mut self.frame);
+            if self.frame.len() > self.vertex_capacity {
+                return Err("Frame exceeded its declared vertex capacity".into());
+            }
+            self.queue
+                .write_buffer(&self.vertices, 0, bytemuck::cast_slice(&self.frame));
+            if cockpit.is_some() {
+                let logical = self.size.to_logical::<f64>(self.window.scale_factor());
+                hud::vertices_with_cockpit(
+                    hud_lines,
+                    logical.width.round() as u32,
+                    logical.height.round() as u32,
+                    cockpit,
+                    &mut self.hud_frame,
+                );
+            } else {
+                hud::vertices(
+                    hud_lines,
+                    self.config.width,
+                    self.config.height,
+                    &mut self.hud_frame,
+                );
+            }
+            self.queue
+                .write_buffer(&self.hud_vertices, 0, bytemuck::cast_slice(&self.hud_frame));
         }
-        if let Some(station) = station {
-            mesh::append_missiles(snapshot, station, missiles, &mut self.frame)?;
-        }
-        if let (Some(station), Some(shot)) = (station, pulse) {
-            mesh::append_pulse(snapshot, station, shot, &mut self.frame)?;
-        }
-        mesh::apply_flight_view(self.flight_view, &mut self.frame);
-        if self.frame.len() > self.vertex_capacity {
-            return Err("Frame exceeded its declared vertex capacity".into());
-        }
-        self.queue
-            .write_buffer(&self.vertices, 0, bytemuck::cast_slice(&self.frame));
-        if cockpit.is_some() {
-            let logical = self.size.to_logical::<f64>(self.window.scale_factor());
-            hud::vertices_with_cockpit(
-                hud_lines,
-                logical.width.round() as u32,
-                logical.height.round() as u32,
-                cockpit,
-                &mut self.hud_frame,
-            );
-        } else {
-            hud::vertices(
-                hud_lines,
-                self.config.width,
-                self.config.height,
-                &mut self.hud_frame,
-            );
-        }
-        self.queue
-            .write_buffer(&self.hud_vertices, 0, bytemuck::cast_slice(&self.hud_frame));
+
         let view = frame.texture.create_view(&Default::default());
         let mut encoder = self.device.create_command_encoder(&Default::default());
         {
@@ -402,9 +442,9 @@ impl Renderer {
                 resolve_target: None,
                 ops: wgpu::Operations {
                     load: wgpu::LoadOp::Clear(wgpu::Color {
-                        r: 0.003,
-                        g: 0.006,
-                        b: 0.018,
+                        r: if docked.is_some() { 0.0 } else { 0.003 },
+                        g: if docked.is_some() { 0.0 } else { 0.006 },
+                        b: if docked.is_some() { 0.0 } else { 0.018 },
                         a: 1.0,
                     }),
                     store: wgpu::StoreOp::Store,
@@ -422,13 +462,20 @@ impl Renderer {
                 }),
                 ..Default::default()
             });
-            self.celestial.draw_surfaces(&mut pass);
-            pass.set_scissor_rect(0, 0, self.config.width, self.config.height);
-            pass.set_pipeline(&self.pipeline);
-            pass.set_bind_group(0, &self.projection_group, &[]);
-            pass.set_vertex_buffer(0, self.vertices.slice(..));
-            pass.draw(0..self.frame.len() as u32, 0..1);
-            self.celestial.draw_halos(&mut pass);
+            if docked.is_some() {
+                self.celestial.draw_surfaces(&mut pass);
+                pass.set_scissor_rect(0, 0, self.config.width, self.config.height);
+                self.docked.draw_models(&mut pass);
+                self.celestial.draw_halos(&mut pass);
+            } else {
+                self.celestial.draw_surfaces(&mut pass);
+                pass.set_scissor_rect(0, 0, self.config.width, self.config.height);
+                pass.set_pipeline(&self.pipeline);
+                pass.set_bind_group(0, &self.projection_group, &[]);
+                pass.set_vertex_buffer(0, self.vertices.slice(..));
+                pass.draw(0..self.frame.len() as u32, 0..1);
+                self.celestial.draw_halos(&mut pass);
+            }
         }
         {
             let colors = [Some(wgpu::RenderPassColorAttachment {
@@ -444,9 +491,13 @@ impl Renderer {
                 color_attachments: &colors,
                 ..Default::default()
             });
-            pass.set_pipeline(&self.hud_pipeline);
-            pass.set_vertex_buffer(0, self.hud_vertices.slice(..));
-            pass.draw(0..self.hud_frame.len() as u32, 0..1);
+            if docked.is_some() {
+                self.docked.draw_overlay(&mut pass);
+            } else {
+                pass.set_pipeline(&self.hud_pipeline);
+                pass.set_vertex_buffer(0, self.hud_vertices.slice(..));
+                pass.draw(0..self.hud_frame.len() as u32, 0..1);
+            }
         }
         self.queue.submit([encoder.finish()]);
         self.window.pre_present_notify();
@@ -454,6 +505,6 @@ impl Renderer {
         if reconfigure {
             self.surface.configure(&self.device, &self.config);
         }
-        Ok(())
+        Ok(Presentation::Presented)
     }
 }

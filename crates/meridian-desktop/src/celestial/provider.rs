@@ -21,6 +21,19 @@ impl WorldAdapter {
         if mode == FlightMode::Docked {
             return Ok(None);
         }
+        self.material_scene(source)
+    }
+    pub fn preview(
+        &mut self,
+        source: Option<CoreScene>,
+        system: meridian_core::navigation::SystemId,
+    ) -> Result<Option<Scene>, &'static str> {
+        let Some(source) = source.filter(|s| s.planet.id.system == system) else {
+            return Ok(None);
+        };
+        self.material_scene(source)
+    }
+    fn material_scene(&mut self, source: CoreScene) -> Result<Option<Scene>, &'static str> {
         if !self
             .cached
             .as_ref()

@@ -6,7 +6,7 @@ pub const MAX_LINES: usize = 14;
 pub const MAX_COLUMNS: usize = 96;
 pub const MAX_VERTICES: usize = cockpit::MAX_VERTICES + 6 + MAX_LINES * MAX_COLUMNS * 35 * 6;
 
-fn glyph(character: char) -> [u8; 7] {
+pub(crate) fn glyph(character: char) -> [u8; 7] {
     match character.to_ascii_uppercase() {
         'A' => [14, 17, 17, 31, 17, 17, 17],
         'B' => [30, 17, 17, 30, 17, 17, 30],

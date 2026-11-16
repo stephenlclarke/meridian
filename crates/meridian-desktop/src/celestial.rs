@@ -381,6 +381,109 @@ fn frame_plan(
     }
     Ok(FramePlan { uniforms, clip })
 }
+#[derive(Clone, Copy)]
+pub struct DockedPreview<'a> {
+    pub scene: Option<&'a Scene>,
+    pub snapshot: Snapshot,
+    pub request: Option<&'a crate::docked_screens::PlanetPreview>,
+    pub viewport: [u32; 2],
+    pub scale: f64,
+}
+fn docked_plan(input: DockedPreview<'_>) -> Result<Option<FramePlan>, &'static str> {
+    let DockedPreview {
+        scene,
+        snapshot,
+        request,
+        viewport,
+        scale,
+    } = input;
+    let (Some(scene), Some(request)) = (scene, request) else {
+        return Ok(None);
+    };
+    scene.validate(snapshot)?;
+    let Some(planet) = scene
+        .planet
+        .as_ref()
+        .filter(|p| p.id.system == request.system)
+    else {
+        return Ok(None);
+    };
+    if !planet.radius.is_finite()
+        || planet.radius <= 0.0
+        || planet.radius > 10000.0
+        || !planet.angle.is_finite()
+    {
+        return Err("invalid actual planet preview geometry");
+    }
+    let r = request.bounds;
+    if !scale.is_finite()
+        || scale <= 0.0
+        || ![r.x, r.y, r.width, r.height]
+            .into_iter()
+            .all(f64::is_finite)
+        || r.width <= 0.0
+        || r.height <= 0.0
+    {
+        return Err("invalid planet preview bounds");
+    }
+    let left = (r.x * scale).max(0.0);
+    let top = (r.y * scale).max(0.0);
+    let right = ((r.x + r.width) * scale).min(f64::from(viewport[0]));
+    let bottom = ((r.y + r.height) * scale).min(f64::from(viewport[1]));
+    if right <= left || bottom <= top {
+        return Ok(None);
+    }
+    let clip = [
+        left.ceil() as u32,
+        top.ceil() as u32,
+        (right.floor() as u32).saturating_sub(left.ceil() as u32),
+        (bottom.floor() as u32).saturating_sub(top.ceil() as u32),
+    ];
+    if clip[2] == 0 || clip[3] == 0 {
+        return Ok(None);
+    }
+    let projection = Projection {
+        viewport,
+        clip: [
+            left as f32,
+            top as f32,
+            (right - left) as f32,
+            (bottom - top) as f32,
+        ],
+        center: [
+            ((r.x + r.width / 2.0) * scale) as f32,
+            ((r.y + r.height / 2.0) * scale) as f32,
+        ],
+        focal: 1.0,
+        near: 1.0,
+        far: 100000.0,
+    };
+    let disk = Disk {
+        center: projection.center,
+        radius: (r.width.min(r.height) * scale * 0.42) as f32,
+        view_depth: (planet.radius * 3.0) as f32,
+        world_radius: planet.radius as f32,
+    };
+    let position = view_position(snapshot, FlightView::Front, planet.position)?;
+    let sun = scene
+        .sun
+        .map(|s| view_position(snapshot, FlightView::Front, s.position))
+        .transpose()?;
+    let u = Uniforms::new(
+        disk,
+        projection,
+        Some(planet.surface.palette),
+        planet.angle,
+        flight_light(position, sun),
+    );
+    if !projection.valid() || !u.geometry.into_iter().chain(u.viewport).all(f32::is_finite) {
+        return Err("invalid projected planet preview");
+    }
+    Ok(Some(FramePlan {
+        uniforms: [Some(u), None],
+        clip,
+    }))
+}
 /// Thirteen vec4s match WGSL uniform layout without implicit host padding.
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Pod, Zeroable)]

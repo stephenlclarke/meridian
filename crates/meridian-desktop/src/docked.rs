@@ -7,10 +7,6 @@ use meridian_core::{
 };
 
 const ROUTES: [SystemId; 2] = [SystemId::AVENOR, SystemId::RENAS];
-const MODELS: [ui::AvailableModel<'static>; 1] = [ui::AvailableModel {
-    object: "SH025",
-    geometry_key: "SH025",
-}];
 pub const BINDINGS: &[ui::BindingHint<'static>] = &[
     ui::BindingHint {
         key: ui::Key::Previous,
@@ -94,7 +90,7 @@ fn context<'a>(
             .map(|n| (f64::from(n.fuel_units) / 10.0).min(STOCK_JUMP_REACH_LY)),
         full_reach_ly: Some(STOCK_JUMP_REACH_LY),
         route_targets: &ROUTES,
-        models: &MODELS,
+        models: &crate::docked_render::MODELS,
         planet_previews: navigation.is_some_and(|n| n.system == selected)
             && world.celestial_snapshot().is_some(),
         navigation_bodies: &[],

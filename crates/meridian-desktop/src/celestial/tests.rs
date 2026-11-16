@@ -337,3 +337,55 @@ fn actual_world_provider_binds_generated_maps_reuses_surface_and_docked_or_title
             .is_none()
     );
 }
+
+#[test]
+fn docked_preview_projection_uses_actual_current_body_and_exact_retina_clip() {
+    let world = world();
+    let mut adapter = WorldAdapter::default();
+    let system = world
+        .snapshot()
+        .navigation
+        .unwrap_or_else(|| panic!("nav"))
+        .system;
+    let scene = adapter
+        .preview(world.celestial_snapshot(), system)
+        .unwrap_or_else(|e| panic!("{e}"))
+        .unwrap_or_else(|| panic!("scene"));
+    let request = crate::docked_screens::PlanetPreview {
+        system,
+        bounds: crate::docked_screens::Rect::new(100.0, 120.0, 200.0, 100.0),
+    };
+    let input = DockedPreview {
+        scene: Some(&scene),
+        snapshot: world.snapshot(),
+        request: Some(&request),
+        viewport: [1280, 720],
+        scale: 2.0,
+    };
+    let plan = docked_plan(input)
+        .unwrap_or_else(|e| panic!("{e}"))
+        .unwrap_or_else(|| panic!("plan"));
+    assert_eq!(plan.clip, [200, 240, 400, 200]);
+    let u = plan.uniforms[0].unwrap_or_else(|| panic!("uniforms"));
+    assert_eq!(u.viewport, [1280.0, 720.0, 400.0, 340.0]);
+    assert_eq!(u.geometry[0], 84.0);
+    let other = crate::docked_screens::PlanetPreview {
+        system: meridian_core::navigation::SystemId::RENAS,
+        ..request
+    };
+    assert!(
+        docked_plan(DockedPreview {
+            request: Some(&other),
+            ..input
+        })
+        .unwrap_or_else(|e| panic!("{e}"))
+        .is_none()
+    );
+    assert!(
+        docked_plan(DockedPreview {
+            scale: f64::NAN,
+            ..input
+        })
+        .is_err()
+    );
+}
