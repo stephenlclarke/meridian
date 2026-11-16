@@ -118,12 +118,22 @@
   "parentQualifiedSource": "7ef4df73825bdba87d3a2a2b59e6970d08fb3066",
   "currentCorrectionExecution": "UNRUN",
   "latestParentQualification": {
-    "sourceHead": "5d41f85d16caf19feb443f2fb79bcd9b0ca13ac9",
-    "sourceTree": "282e75f0a7d8b7aa789bb09984ede62623dfae11",
+    "sourceHead": "3c9d2de8a08129cfae814444604d9b17bffd843c",
+    "sourceTree": "36df01d8b1468f27f6ed6edf9e0d689696ab304a",
+    "rustTests": 19,
+    "hostTests": 8,
     "check": "PASS",
-    "rustTests": 13,
-    "strictClippy": "PASS"
+    "strictClippy": "PASS",
+    "build": "PASS",
+    "construction": {
+      "decoded": 5,
+      "storageRefused": 5,
+      "semanticFailed": 0,
+      "dependentUnrun": 15,
+      "candidates": 0
+    }
   },
   "latestParentQualifiedJoin": "de4e3bff26d2382ea23896f4dabbbcdce70aa614",
-  "newHarnessExecution": "UNRUN"
+  "newHarnessExecution": "UNRUN",
+  "latestCorrection": "Whole-owner streaming topology audit, separately labelled admitted/refused logical reservation telemetry"
 }

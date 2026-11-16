@@ -84,6 +84,8 @@
   "all171Accepted": false,
   "newHullAdmissions": 0,
   "oldWholeFive": "Old sealed Swift/Python failures remain failure evidence. Rust earlier cutoffs grant no minimum/performance/acceptance credit.",
-  "hostTestsAuthored": 8,
-  "resultValidation": "Host checks all five case identities, frozen per-body input digests, 25 statuses/counts, measurements, candidate consistency, dependent UNRUN propagation and execution-binding bytes before sealing terminal. A failed/refused body requires one known typed Failure with the matching status; incomplete cases cannot omit it."
+  "hostTestsAuthored": 9,
+  "resultValidation": "Host checks all five case identities, frozen per-body input digests, 25 statuses/counts, measurements, candidate consistency, dependent UNRUN propagation and execution-binding bytes before sealing terminal. A failed/refused body requires one known typed Failure with the matching status; incomplete cases cannot omit it.",
+  "storageTelemetry": "Legacy peakStorageMemberships remains largest attempted reservation and may exceed cap on refusal. New peakAdmittedReservationMemberships counts only successful admissions. retainedBudgetMembershipsAtTerminal is a logical ledger snapshot. None is a physical allocated-memory measurement or minimum requirement.",
+  "currentChangedAlgorithm": "Stream complete original-owner topology audits; global candidate audit remains unpartitioned."
 }

@@ -49,6 +49,8 @@ struct CaseReport {
     failure: Option<Failure>,
     operations: u64,
     peak: usize,
+    admitted_peak: usize,
+    retained_at_terminal: usize,
     elapsed_nanos: u128,
     candidate: bool,
 }
@@ -61,6 +63,8 @@ impl CaseReport {
             failure: None,
             operations: 0,
             peak: 0,
+            admitted_peak: 0,
+            retained_at_terminal: 0,
             elapsed_nanos: 0,
             candidate: false,
         }
@@ -92,12 +96,14 @@ impl CaseReport {
             .as_ref()
             .map_or_else(|| "null".into(), failure_json);
         format!(
-            "{{\"id\":{},\"bodies\":[{}],\"failure\":{},\"operations\":{},\"peakStorageMemberships\":{},\"monotonicNanoseconds\":{},\"completeCandidateReturned\":{},\"allCandidateChecksPassed\":{},\"limits\":{{\"operations\":2000000,\"storageMemberships\":100000,\"rationalBits\":4096,\"triangles\":512}},\"sourceBinding\":\"EXECUTION-BINDING.json\",\"inputBindings\":\"ORIGINAL-BINDINGS.json\",\"fleetAdmission\":false}}",
+            "{{\"id\":{},\"bodies\":[{}],\"failure\":{},\"operations\":{},\"peakStorageMemberships\":{},\"peakAdmittedReservationMemberships\":{},\"retainedBudgetMembershipsAtTerminal\":{},\"storageAccounting\":\"logical reservations; attempted peaks include refused admissions, not measured allocated bytes\",\"monotonicNanoseconds\":{},\"completeCandidateReturned\":{},\"allCandidateChecksPassed\":{},\"limits\":{{\"operations\":2000000,\"storageMemberships\":100000,\"rationalBits\":4096,\"triangles\":512}},\"sourceBinding\":\"EXECUTION-BINDING.json\",\"inputBindings\":\"ORIGINAL-BINDINGS.json\",\"fleetAdmission\":false}}",
             quote(self.asset.id()),
             bodies,
             failure,
             self.operations,
             self.peak,
+            self.admitted_peak,
+            self.retained_at_terminal,
             self.elapsed_nanos,
             self.candidate,
             self.bodies.iter().all(|s| *s == Status::Pass)
@@ -451,6 +457,8 @@ fn run_case(asset: OriginalAsset, out: &Path) -> io::Result<CaseReport> {
             report.body_metrics[0] = Some((budget.operations(), budget.peak_memberships()));
             report.operations = budget.operations();
             report.peak = budget.peak_memberships();
+            report.admitted_peak = budget.peak_admitted_memberships();
+            report.retained_at_terminal = budget.retained_memberships();
             report.elapsed_nanos = start.elapsed().as_nanos();
             return Ok(report);
         }
@@ -507,6 +515,9 @@ fn run_case(asset: OriginalAsset, out: &Path) -> io::Result<CaseReport> {
                     report.peak = budget
                         .peak_memberships()
                         .max(held.saturating_add(checks.peak_memberships()));
+                    report.admitted_peak = budget
+                        .peak_admitted_memberships()
+                        .max(held.saturating_add(checks.peak_admitted_memberships()));
                 }
             }
             write_new(
@@ -521,6 +532,8 @@ fn run_case(asset: OriginalAsset, out: &Path) -> io::Result<CaseReport> {
     }
     report.operations = report.operations.max(budget.operations());
     report.peak = report.peak.max(budget.peak_memberships());
+    report.admitted_peak = report.admitted_peak.max(budget.peak_admitted_memberships());
+    report.retained_at_terminal = budget.retained_memberships();
     report.elapsed_nanos = start.elapsed().as_nanos();
     Ok(report)
 }

@@ -98,6 +98,16 @@
       "file": "src/bin/original_five.rs",
       "name": "typed_failures_classify_decode_and_construction_consistently",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/certificate.rs",
+      "name": "certificate::tests::original_topology_streams_owner_maps_under_the_same_storage_guard",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/certificate.rs",
+      "name": "certificate::tests::owner_streaming_keeps_all_sheets_of_one_component_in_one_link_audit",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -193,9 +203,9 @@
     }
   },
   "wholeFiveHarness": {
-    "criteriaSHA256": "866bef6023b78957ef6880fe940949e0c476412e69153a19455ac20b0d10f431",
+    "criteriaSHA256": "5cc3135fae08c47b8304b3adfbcaaddc9eeaab956d5b56da354fa5ede416ee0b",
     "rustTestsAuthored": 6,
-    "hostTestsAuthored": 8,
+    "hostTestsAuthored": 9,
     "execution": "UNRUN",
     "construction": "HELD for review and owner execution",
     "deltaSHA256": "3fd47a7e8b29fde4a28a3df8fb3f4f5c3d17f984640caab5b73f1efbe5f14167"
@@ -206,5 +216,23 @@
     "finding": "P2 semantic failures incorrectly classified as REFUSED at decode/construction and unchecked in host terminal validation",
     "status": "AUTHORED_UNRUN",
     "qualifiedLibraryUnchanged": true
+  },
+  "originalComponentAuditCorrection": {
+    "causalSHA256": "1d0a375824b4a751eebb968466aa49f05db7c2883cf8cd3edb531dbbfeac5b5a",
+    "parentActualExecution": {
+      "rustTests": 19,
+      "hostTests": 8,
+      "check": "PASS",
+      "strictClippy": "PASS",
+      "build": "PASS",
+      "construction": {
+        "decoded": 5,
+        "storageRefused": 5,
+        "semanticFailed": 0,
+        "dependentUnrun": 15,
+        "candidates": 0
+      }
+    },
+    "currentExecution": "UNRUN"
   }
 }

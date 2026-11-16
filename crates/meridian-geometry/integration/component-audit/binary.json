@@ -1,0 +1,15 @@
+{
+  "head": "3c9d2de8a08129cfae814444604d9b17bffd843c",
+  "tree": "36df01d8b1468f27f6ed6edf9e0d689696ab304a",
+  "profile": "dev/debug as assigned; not a release build",
+  "built": {
+    "path": "/home/sclarke/setup-work/station-linux-target/debug/original_five",
+    "bytes": 19998472,
+    "sha256": "62f81a3b3c0ee40a63921c36157e798cab7d6e8ff789df9ba68fc30def29e2d1"
+  },
+  "retained": {
+    "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-3c9d2de/linux/compiled-original_five",
+    "bytes": 19998472,
+    "sha256": "62f81a3b3c0ee40a63921c36157e798cab7d6e8ff789df9ba68fc30def29e2d1"
+  }
+}

@@ -83,6 +83,8 @@ class TerminalBindingTests(unittest.TestCase):
                       for name, status in zip(names, ('PASS', 'REFUSED', 'UNRUN', 'UNRUN', 'UNRUN'), strict=True)]
             cases.append({'id': ident, 'bodies': bodies, 'completeCandidateReturned': False,
                           'allCandidateChecksPassed': False, 'fleetAdmission': False,
+                          'peakStorageMemberships': 20, 'peakAdmittedReservationMemberships': 20,
+                          'retainedBudgetMembershipsAtTerminal': 0,
                           'failure': {'kind': 'Operations', 'source': None, 'operationsAtRefusal': 2000001, 'detail': 'bounded fixture'}})
         return {'declaredBodies': 25, 'cases': cases, 'bodiesPass': 5, 'bodiesRefused': 5,
                 'bodiesFail': 0, 'bodiesUnrun': 15, 'all171Accepted': False,
@@ -126,6 +128,18 @@ class TerminalBindingTests(unittest.TestCase):
                 terminal['cases'][0]['failure'] = failure
                 with self.assertRaisesRegex(ValueError, 'typed failure|failure kind'):
                     HOST.validate_terminal(terminal, 1, exports)
+
+    def test_refused_attempt_is_distinct_from_admitted_reservation(self):
+        terminal, exports = self.terminal()
+        row = terminal['cases'][0]
+        row['failure']['kind'] = 'Storage'
+        row['peakStorageMemberships'] = 176216
+        row['peakAdmittedReservationMemberships'] = 79000
+        row['retainedBudgetMembershipsAtTerminal'] = 79000
+        HOST.validate_terminal(terminal, 1, exports)
+        row['peakAdmittedReservationMemberships'] = 176216
+        with self.assertRaisesRegex(ValueError, 'confuses admitted storage'):
+            HOST.validate_terminal(terminal, 1, exports)
 
 
 if __name__ == '__main__':

@@ -70,11 +70,15 @@ fn log_cost(count: usize, b: &mut Budget) -> Result<(), Failure> {
 }
 
 /// Validate geometric two-sided incidence and the connected link at each vertex.
-fn audit_closed(faces: &[Facet], per_component: bool, b: &mut Budget) -> Result<(), Failure> {
+fn audit_closed<'a>(
+    faces: impl ExactSizeIterator<Item = &'a Facet> + Clone,
+    per_component: bool,
+    b: &mut Budget,
+) -> Result<(), Failure> {
     b.guard(96 * faces.len() + 64)?;
     let mut edges: BTreeMap<(u32, [Point3; 2]), Vec<bool>> = BTreeMap::new();
     let mut stars: BTreeMap<(u32, Point3), Vec<[Point3; 2]>> = BTreeMap::new();
-    for face in faces {
+    for face in faces.clone() {
         b.at(face.id());
         let owner = if per_component {
             face.id().component
@@ -130,6 +134,32 @@ fn audit_closed(faces: &[Facet], per_component: bool, b: &mut Budget) -> Result<
     }
     Ok(())
 }
+fn audit_original_components(
+    originals: &[Facet],
+    owners: &BTreeSet<u32>,
+    b: &mut Budget,
+) -> Result<(), Failure> {
+    // All original facets remain retained. Source topology maps are keyed by
+    // component, so finish and release one component's audit before the next.
+    // The completed union uses a separate global audit with no such partition.
+    for owner in owners {
+        b.step(originals.len() as u64)?;
+        let count = originals
+            .iter()
+            .filter(|f| f.id().component == *owner)
+            .count();
+        b.with_retained(count, |budget| {
+            let group = originals
+                .iter()
+                .filter(|f| f.id().component == *owner)
+                .collect::<Vec<_>>();
+            budget.step(originals.len() as u64)?;
+            audit_closed(group.iter().copied(), true, budget)
+        })?;
+    }
+    Ok(())
+}
+
 fn connected_link<const N: usize>(
     sectors: &[[[Rational; N]; 2]],
     cycle: bool,
@@ -515,7 +545,7 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
         }
         owners.insert(face.id().component);
     }
-    audit_closed(originals, true, b)?;
+    audit_original_components(originals, &owners, b)?;
     audit_original_sheets(originals, b)?;
     let mut regions = Vec::new();
     let mut all_points = BTreeSet::new();
@@ -656,7 +686,7 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
     if triangles.is_empty() {
         return Err(b.fail(FailureKind::InvalidWitness, "lost entire original exterior"));
     }
-    audit_closed(&triangles, false, b)?;
+    audit_closed(triangles.iter(), false, b)?;
     let mut volume = integer(0);
     for face in &triangles {
         b.at(face.id());
@@ -1092,6 +1122,98 @@ mod tests {
                 .map(|e| e.kind),
             Some(FailureKind::UncertifiedContact)
         );
+        Ok(())
+    }
+    fn tetrahedron(owner: u32, first_facet: u32, reflected: bool) -> Result<Vec<Facet>, Failure> {
+        let mut setup = Budget::new(crate::Limits::default())?;
+        let sign = if reflected { -1 } else { 1 };
+        let points = [[0, 0, 0], [sign, 0, 0], [0, sign, 0], [0, 0, sign]].map(|p| p.map(integer));
+        [[0, 2, 1], [0, 1, 3], [0, 3, 2], [1, 2, 3]]
+            .into_iter()
+            .enumerate()
+            .map(|(i, mut indices)| {
+                if reflected {
+                    indices.swap(1, 2);
+                }
+                Facet::new(
+                    SourceId {
+                        component: owner,
+                        facet: first_facet + i as u32,
+                    },
+                    indices.map(|j| Vertex {
+                        point: points[j].clone(),
+                        uv: [integer(0), integer(0)],
+                    }),
+                    "t".into(),
+                    &mut setup,
+                )
+            })
+            .collect()
+    }
+
+    #[test]
+    fn original_topology_streams_owner_maps_under_the_same_storage_guard() -> Result<(), Failure> {
+        let mut faces = Vec::new();
+        let owners = (0..20).collect::<BTreeSet<_>>();
+        for owner in &owners {
+            faces.extend(tetrahedron(*owner, 0, false)?);
+        }
+        let input_members =
+            40 * faces.len() + 64 + faces.iter().map(|f| f.style().len()).sum::<usize>();
+        let limits = crate::Limits {
+            storage_memberships: 4000,
+            ..crate::Limits::default()
+        };
+        let mut combined = Budget::new(limits)?;
+        combined.retain(input_members)?;
+        assert_eq!(
+            audit_closed(faces.iter(), true, &mut combined)
+                .err()
+                .map(|f| f.kind),
+            Some(FailureKind::Storage)
+        );
+        assert_eq!(combined.peak_admitted_memberships(), input_members);
+        assert_eq!(combined.retained_memberships(), input_members);
+        assert!(combined.peak_memberships() > limits.storage_memberships);
+
+        let mut streamed = Budget::new(limits)?;
+        streamed.retain(input_members)?;
+        audit_original_components(&faces, &owners, &mut streamed)?;
+        assert!(streamed.peak_memberships() <= limits.storage_memberships);
+        assert_eq!(
+            streamed.peak_admitted_memberships(),
+            streamed.peak_memberships()
+        );
+        assert_eq!(streamed.retained_memberships(), input_members);
+
+        // The last component is still audited and can refuse without leaking the group reservation.
+        faces.pop();
+        let mut open = Budget::new(limits)?;
+        open.retain(input_members)?;
+        assert_eq!(
+            audit_original_components(&faces, &owners, &mut open)
+                .err()
+                .map(|f| f.kind),
+            Some(FailureKind::NonManifold)
+        );
+        assert_eq!(open.retained_memberships(), input_members);
+        Ok(())
+    }
+
+    #[test]
+    fn owner_streaming_keeps_all_sheets_of_one_component_in_one_link_audit() -> Result<(), Failure>
+    {
+        let mut faces = tetrahedron(0, 0, false)?;
+        faces.extend(tetrahedron(0, 4, true)?);
+        let owners = BTreeSet::from([0]);
+        let mut b = Budget::new(crate::Limits::default())?;
+        assert_eq!(
+            audit_original_components(&faces, &owners, &mut b)
+                .err()
+                .map(|f| f.kind),
+            Some(FailureKind::UncertifiedContact)
+        );
+        assert_eq!(b.retained_memberships(), 0);
         Ok(())
     }
 }

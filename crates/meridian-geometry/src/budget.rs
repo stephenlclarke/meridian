@@ -58,6 +58,7 @@ pub struct Budget {
     operations: u64,
     retained: usize,
     peak: usize,
+    admitted_peak: usize,
     source: Option<SourceId>,
 }
 
@@ -81,6 +82,7 @@ impl Budget {
             operations: 0,
             retained: 0,
             peak: 0,
+            admitted_peak: 0,
             source: None,
         })
     }
@@ -92,6 +94,10 @@ impl Budget {
     }
     pub fn peak_memberships(&self) -> usize {
         self.peak
+    }
+    /// Largest successful logical reservation, distinct from refused attempts.
+    pub fn peak_admitted_memberships(&self) -> usize {
+        self.admitted_peak
     }
     pub fn retained_memberships(&self) -> usize {
         self.retained
@@ -123,6 +129,7 @@ impl Budget {
         if required > self.limits.storage_memberships {
             return Err(self.fail(FailureKind::Storage, "exact storage budget exhausted"));
         }
+        self.admitted_peak = self.admitted_peak.max(required);
         Ok(())
     }
     pub(crate) fn retain(&mut self, members: usize) -> Result<(), Failure> {

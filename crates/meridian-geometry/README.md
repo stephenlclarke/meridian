@@ -10,7 +10,7 @@ The previous five-hull execution at `0c2677b5` exhausted operations on every ori
 
 ## Validation
 
-The current whole-five harness and its six Rust/eight host regressions are **UNRUN**. Parent joined source `5d41f85` passed locked check, all 13 Rust tests and strict Clippy. Its original-input tests decode the five assets. Whole-five construction is the newly authored acceptance step. The author lane used rustfmt to parse and format the authored source. G1 owns actual compiler execution on the committed packet. The first compiler run should apply `integration/workspace-and-lock.patch` in the joined workspace and run the following checks.
+The current component-audit correction is **UNRUN**. Parent joined source `3c9d2de` passed locked check, all 19 Rust tests, eight host tests, strict Clippy and executable build on Dell Linux. Its actual original-five run decoded every source, then refused each construction at the 100,000-membership guard before topology-map allocation. All 15 dependent bodies remained UNRUN and zero candidates returned. The author lane used rustfmt to parse and format the authored source. G1 owns actual compiler execution on the committed packet. The first compiler run should apply `integration/workspace-and-lock.patch` in the joined workspace and run the following checks.
 
 ```sh
 cargo check --locked -p meridian-geometry --all-targets
@@ -44,8 +44,14 @@ An original triangle can contribute two disjoint exposed regions that meet at on
 python3 crates/meridian-geometry/tools/run_original_five.py --project FROZEN_JOIN --source-binding ROOT_SOURCE_JSON --binary BUILT_ORIGINAL_FIVE --out NEW_ABSOLUTE_OUTPUT
 ```
 
-Execution remains held for bounded G2 review and the G1/Root changed-run coordination. `integration/WHOLE-FIVE-CRITERIA.json` defines the 25 construction/dependent bodies, output binding and compiler/host checks. The six Rust harness regressions use typed failure state, residual budgets, JSON escaping and a small independent tetrahedron. Eight host tests cover source and terminal binding, mutation/escape refusal and dependency propagation. Existing library tests and qualified geometry source remain byte exact.
+Execution remains held for bounded G2 review and the G1/Root changed-run coordination. `integration/WHOLE-FIVE-CRITERIA.json` defines the 25 construction/dependent bodies, output binding and compiler/host checks. The six Rust harness regressions use typed failure state, residual budgets, JSON escaping and a small independent tetrahedron. Nine host tests cover source and terminal binding, mutation/escape refusal and dependency propagation. Existing library tests and qualified geometry source remain byte exact.
 
 ## Typed harness outcomes
 
 The same classification applies at decoding, construction and dependent checks. Operations, Storage, Rational and TriangleLimit failures report REFUSED. InvalidInput, Degenerate, ConflictingFields, NonManifold, UncertifiedContact and InvalidWitness report FAIL. Both outcomes stop dependent bodies with UNRUN. Host validation requires the typed failure, checks its kind against the body status and rejects missing/unknown failures or semantic failures presented as guard refusals. The current correction and its regressions remain UNRUN.
+
+## Original-component audit lifetime
+
+The corrected input audit borrows and audits one complete original component at a time while retaining all source facets. It releases that component's topology maps and borrowed reference list before the next component. The per-facet reservation policy and every edge, signed-volume and connected-link check remain in force. All sheets of one component share an audit. The completed candidate still receives one global topology audit.
+
+Storage output distinguishes the largest attempted logical reservation, the largest admitted reservation, and the retained budget ledger at the terminal stage. A refused attempted peak can exceed 100,000. These counters describe reservations and do not measure allocated bytes or a minimum storage requirement. `integration/component-audit/CAUSAL.json` binds the five actual refusal records to the exact source formula and records the proposed per-component reservation bounds. Current correction tests and whole-five execution are UNRUN.

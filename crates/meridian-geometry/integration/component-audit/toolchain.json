@@ -1,0 +1,41 @@
+{
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0\nLLVM version: 23.1.1\n",
+  "python": {
+    "executable": "/home/sclarke/setup-work/smoke/new-python/bin/python",
+    "version": "3.15.2 (main, Nov 11 2026, 00:19:20) [Clang 23.1.3 ]",
+    "platform": "linux"
+  },
+  "environment": {
+    "PATH": "/home/sclarke/.cargo/bin:/home/sclarke/setup-work/smoke/new-python/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/Go/bin:/mnt/c/Program Files/Warp/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/Git/ucrt64/bin:/mnt/c/Program Files/Git/usr/bin:/mnt/c/Users/steph/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/steph/go/bin:/mnt/c/Users/steph/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/steph/.cargo/bin",
+    "CARGO_TARGET_DIR": "/home/sclarke/setup-work/station-linux-target",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "CARGO_BUILD_JOBS": null,
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "RUSTC_BOOTSTRAP": null,
+    "RUSTC_LOG": null,
+    "LANG": "C.UTF-8",
+    "LC_ALL": null
+  },
+  "resources": "Default unrestricted; no added job/CPU/RSS/time caps. Geometry guards remain exactly the reviewed original limits.",
+  "cargoBinary": {
+    "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+    "bytes": 36160240,
+    "sha256": "e951141cc55a6cd7b9876d187bd30a3720e6086b99413af95e3b8de1cdd72f14"
+  },
+  "rustcBinary": {
+    "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+    "bytes": 647376,
+    "sha256": "f3834d26669b03f6855fa54bd2381443123e860167bc0c7a8dd137e5cf6e5e4f"
+  },
+  "clippy-driverBinary": {
+    "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/clippy-driver",
+    "bytes": 16256512,
+    "sha256": "ecf6d74d4e13728405acd3749bff486db899e793b5e3cd179ab663f7fe9d6fe6"
+  },
+  "gitBinary": {
+    "path": "/usr/bin/git",
+    "bytes": 4591208,
+    "sha256": "d2682f3a026c10db333f3f05a87f2b79c1ba5750f7c6d512879409fff622a1a5"
+  }
+}

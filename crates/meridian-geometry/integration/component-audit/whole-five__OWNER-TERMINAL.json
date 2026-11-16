@@ -1,0 +1,396 @@
+{
+  "exitCode": 1,
+  "rustExitCode": 1,
+  "monotonicElapsedNanoseconds": 1498897051,
+  "inputsAndBinaryUnchanged": true,
+  "postflightError": null,
+  "actualRustTerminal": {
+    "status": "ORIGINAL_GEOMETRY_BLOCKERS_RETAINED",
+    "declaredBodies": 25,
+    "bodiesPass": 5,
+    "bodiesRefused": 5,
+    "bodiesFail": 0,
+    "bodiesUnrun": 15,
+    "monotonicNanoseconds": 1468332760,
+    "cases": [
+      {
+        "id": "SH010",
+        "bodies": [
+          {
+            "name": "bound_original_decode",
+            "sourceAsset": "SH010",
+            "sourceInputSHA256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc",
+            "status": "PASS",
+            "chargedOperationDelta": 356448,
+            "peakStorageAtBodyTerminal": 40727,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          },
+          {
+            "name": "original_construction",
+            "sourceAsset": "SH010",
+            "sourceInputSHA256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc",
+            "status": "REFUSED",
+            "chargedOperationDelta": 10119,
+            "peakStorageAtBodyTerminal": 176216,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          },
+          {
+            "name": "source_and_affine_fields",
+            "sourceAsset": "SH010",
+            "sourceInputSHA256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc",
+            "status": "UNRUN",
+            "chargedOperationDelta": null,
+            "peakStorageAtBodyTerminal": null,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          },
+          {
+            "name": "complete_facet_certificates",
+            "sourceAsset": "SH010",
+            "sourceInputSHA256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc",
+            "status": "UNRUN",
+            "chargedOperationDelta": null,
+            "peakStorageAtBodyTerminal": null,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          },
+          {
+            "name": "closed_topology_and_limits",
+            "sourceAsset": "SH010",
+            "sourceInputSHA256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc",
+            "status": "UNRUN",
+            "chargedOperationDelta": null,
+            "peakStorageAtBodyTerminal": null,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          }
+        ],
+        "failure": {
+          "kind": "Storage",
+          "source": [
+            30,
+            11
+          ],
+          "operationsAtRefusal": 366567,
+          "detail": "exact storage budget exhausted"
+        },
+        "operations": 366567,
+        "peakStorageMemberships": 176216,
+        "monotonicNanoseconds": 308180524,
+        "completeCandidateReturned": false,
+        "allCandidateChecksPassed": false,
+        "limits": {
+          "operations": 2000000,
+          "storageMemberships": 100000,
+          "rationalBits": 4096,
+          "triangles": 512
+        },
+        "sourceBinding": "EXECUTION-BINDING.json",
+        "inputBindings": "ORIGINAL-BINDINGS.json",
+        "fleetAdmission": false
+      },
+      {
+        "id": "SH011",
+        "bodies": [
+          {
+            "name": "bound_original_decode",
+            "sourceAsset": "SH011",
+            "sourceInputSHA256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c",
+            "status": "PASS",
+            "chargedOperationDelta": 360808,
+            "peakStorageAtBodyTerminal": 40735,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          },
+          {
+            "name": "original_construction",
+            "sourceAsset": "SH011",
+            "sourceInputSHA256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c",
+            "status": "REFUSED",
+            "chargedOperationDelta": 10119,
+            "peakStorageAtBodyTerminal": 176216,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          },
+          {
+            "name": "source_and_affine_fields",
+            "sourceAsset": "SH011",
+            "sourceInputSHA256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c",
+            "status": "UNRUN",
+            "chargedOperationDelta": null,
+            "peakStorageAtBodyTerminal": null,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          },
+          {
+            "name": "complete_facet_certificates",
+            "sourceAsset": "SH011",
+            "sourceInputSHA256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c",
+            "status": "UNRUN",
+            "chargedOperationDelta": null,
+            "peakStorageAtBodyTerminal": null,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          },
+          {
+            "name": "closed_topology_and_limits",
+            "sourceAsset": "SH011",
+            "sourceInputSHA256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c",
+            "status": "UNRUN",
+            "chargedOperationDelta": null,
+            "peakStorageAtBodyTerminal": null,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          }
+        ],
+        "failure": {
+          "kind": "Storage",
+          "source": [
+            30,
+            11
+          ],
+          "operationsAtRefusal": 370927,
+          "detail": "exact storage budget exhausted"
+        },
+        "operations": 370927,
+        "peakStorageMemberships": 176216,
+        "monotonicNanoseconds": 331235533,
+        "completeCandidateReturned": false,
+        "allCandidateChecksPassed": false,
+        "limits": {
+          "operations": 2000000,
+          "storageMemberships": 100000,
+          "rationalBits": 4096,
+          "triangles": 512
+        },
+        "sourceBinding": "EXECUTION-BINDING.json",
+        "inputBindings": "ORIGINAL-BINDINGS.json",
+        "fleetAdmission": false
+      },
+      {
+        "id": "SH016",
+        "bodies": [
+          {
+            "name": "bound_original_decode",
+            "sourceAsset": "SH016",
+            "sourceInputSHA256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e",
+            "status": "PASS",
+            "chargedOperationDelta": 361863,
+            "peakStorageAtBodyTerminal": 44224,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          },
+          {
+            "name": "original_construction",
+            "sourceAsset": "SH016",
+            "sourceInputSHA256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e",
+            "status": "REFUSED",
+            "chargedOperationDelta": 11164,
+            "peakStorageAtBodyTerminal": 191528,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          },
+          {
+            "name": "source_and_affine_fields",
+            "sourceAsset": "SH016",
+            "sourceInputSHA256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e",
+            "status": "UNRUN",
+            "chargedOperationDelta": null,
+            "peakStorageAtBodyTerminal": null,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          },
+          {
+            "name": "complete_facet_certificates",
+            "sourceAsset": "SH016",
+            "sourceInputSHA256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e",
+            "status": "UNRUN",
+            "chargedOperationDelta": null,
+            "peakStorageAtBodyTerminal": null,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          },
+          {
+            "name": "closed_topology_and_limits",
+            "sourceAsset": "SH016",
+            "sourceInputSHA256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e",
+            "status": "UNRUN",
+            "chargedOperationDelta": null,
+            "peakStorageAtBodyTerminal": null,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          }
+        ],
+        "failure": {
+          "kind": "Storage",
+          "source": [
+            32,
+            43
+          ],
+          "operationsAtRefusal": 373027,
+          "detail": "exact storage budget exhausted"
+        },
+        "operations": 373027,
+        "peakStorageMemberships": 191528,
+        "monotonicNanoseconds": 249825456,
+        "completeCandidateReturned": false,
+        "allCandidateChecksPassed": false,
+        "limits": {
+          "operations": 2000000,
+          "storageMemberships": 100000,
+          "rationalBits": 4096,
+          "triangles": 512
+        },
+        "sourceBinding": "EXECUTION-BINDING.json",
+        "inputBindings": "ORIGINAL-BINDINGS.json",
+        "fleetAdmission": false
+      },
+      {
+        "id": "SH017",
+        "bodies": [
+          {
+            "name": "bound_original_decode",
+            "sourceAsset": "SH017",
+            "sourceInputSHA256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a",
+            "status": "PASS",
+            "chargedOperationDelta": 386658,
+            "peakStorageAtBodyTerminal": 44252,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          },
+          {
+            "name": "original_construction",
+            "sourceAsset": "SH017",
+            "sourceInputSHA256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a",
+            "status": "REFUSED",
+            "chargedOperationDelta": 11164,
+            "peakStorageAtBodyTerminal": 191528,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          },
+          {
+            "name": "source_and_affine_fields",
+            "sourceAsset": "SH017",
+            "sourceInputSHA256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a",
+            "status": "UNRUN",
+            "chargedOperationDelta": null,
+            "peakStorageAtBodyTerminal": null,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          },
+          {
+            "name": "complete_facet_certificates",
+            "sourceAsset": "SH017",
+            "sourceInputSHA256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a",
+            "status": "UNRUN",
+            "chargedOperationDelta": null,
+            "peakStorageAtBodyTerminal": null,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          },
+          {
+            "name": "closed_topology_and_limits",
+            "sourceAsset": "SH017",
+            "sourceInputSHA256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a",
+            "status": "UNRUN",
+            "chargedOperationDelta": null,
+            "peakStorageAtBodyTerminal": null,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          }
+        ],
+        "failure": {
+          "kind": "Storage",
+          "source": [
+            32,
+            43
+          ],
+          "operationsAtRefusal": 397822,
+          "detail": "exact storage budget exhausted"
+        },
+        "operations": 397822,
+        "peakStorageMemberships": 191528,
+        "monotonicNanoseconds": 304900484,
+        "completeCandidateReturned": false,
+        "allCandidateChecksPassed": false,
+        "limits": {
+          "operations": 2000000,
+          "storageMemberships": 100000,
+          "rationalBits": 4096,
+          "triangles": 512
+        },
+        "sourceBinding": "EXECUTION-BINDING.json",
+        "inputBindings": "ORIGINAL-BINDINGS.json",
+        "fleetAdmission": false
+      },
+      {
+        "id": "SH166",
+        "bodies": [
+          {
+            "name": "bound_original_decode",
+            "sourceAsset": "SH166",
+            "sourceInputSHA256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f",
+            "status": "PASS",
+            "chargedOperationDelta": 339303,
+            "peakStorageAtBodyTerminal": 39755,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          },
+          {
+            "name": "original_construction",
+            "sourceAsset": "SH166",
+            "sourceInputSHA256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f",
+            "status": "REFUSED",
+            "chargedOperationDelta": 9855,
+            "peakStorageAtBodyTerminal": 172040,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          },
+          {
+            "name": "source_and_affine_fields",
+            "sourceAsset": "SH166",
+            "sourceInputSHA256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f",
+            "status": "UNRUN",
+            "chargedOperationDelta": null,
+            "peakStorageAtBodyTerminal": null,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          },
+          {
+            "name": "complete_facet_certificates",
+            "sourceAsset": "SH166",
+            "sourceInputSHA256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f",
+            "status": "UNRUN",
+            "chargedOperationDelta": null,
+            "peakStorageAtBodyTerminal": null,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          },
+          {
+            "name": "closed_topology_and_limits",
+            "sourceAsset": "SH166",
+            "sourceInputSHA256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f",
+            "status": "UNRUN",
+            "chargedOperationDelta": null,
+            "peakStorageAtBodyTerminal": null,
+            "criteria": "WHOLE-FIVE-CRITERIA.json"
+          }
+        ],
+        "failure": {
+          "kind": "Storage",
+          "source": [
+            28,
+            43
+          ],
+          "operationsAtRefusal": 349158,
+          "detail": "exact storage budget exhausted"
+        },
+        "operations": 349158,
+        "peakStorageMemberships": 172040,
+        "monotonicNanoseconds": 232838858,
+        "completeCandidateReturned": false,
+        "allCandidateChecksPassed": false,
+        "limits": {
+          "operations": 2000000,
+          "storageMemberships": 100000,
+          "rationalBits": 4096,
+          "triangles": 512
+        },
+        "sourceBinding": "EXECUTION-BINDING.json",
+        "inputBindings": "ORIGINAL-BINDINGS.json",
+        "fleetAdmission": false
+      }
+    ],
+    "fleetBaseline": {
+      "ships": 23,
+      "shipTotal": 162,
+      "stations": 4,
+      "stationTotal": 6
+    },
+    "all171Accepted": false,
+    "nativeAcceptance": false
+  },
+  "sourceHead": "3c9d2de8a08129cfae814444604d9b17bffd843c",
+  "sourceTree": "36df01d8b1468f27f6ed6edf9e0d689696ab304a",
+  "noRetry": true,
+  "all171Accepted": false,
+  "nativeAcceptance": false
+}

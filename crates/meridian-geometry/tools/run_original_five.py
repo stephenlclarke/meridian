@@ -104,6 +104,13 @@ def validate_terminal(terminal, code, exports):
             raise ValueError('Rust terminal candidate disagrees with construction')
         if row['allCandidateChecksPassed'] != all(value == 'PASS' for value in statuses):
             raise ValueError('Rust terminal candidate-check summary mismatch')
+        attempted = row['peakStorageMemberships']
+        admitted = row['peakAdmittedReservationMemberships']
+        retained = row['retainedBudgetMembershipsAtTerminal']
+        if any(type(value) is not int for value in (attempted, admitted, retained)):
+            raise ValueError('Rust terminal storage counters must be exact integers')
+        if not 0 <= retained <= admitted <= min(attempted, 100000):
+            raise ValueError('Rust terminal confuses admitted storage with a refused attempt')
         if row['fleetAdmission']:
             raise ValueError('Rust terminal grants fleet admission')
     for status, key in [('PASS', 'bodiesPass'), ('REFUSED', 'bodiesRefused'),
