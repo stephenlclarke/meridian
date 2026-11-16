@@ -497,17 +497,21 @@ impl App {
             }
         };
 
-        let docked_planet = if docked_frame.is_some() {
-            match self.celestial.preview(self.game.world.celestial_snapshot()) {
-                Ok(scene) => scene,
-                Err(error) => {
-                    self.fail(event_loop, error);
-                    return;
+        let docked_planet =
+            if let Some(request) = docked_frame.as_ref().and_then(|f| f.planets.first()) {
+                match self
+                    .celestial
+                    .preview(self.game.world.celestial_snapshot(), request.system)
+                {
+                    Ok(scene) => scene,
+                    Err(error) => {
+                        self.fail(event_loop, error);
+                        return;
+                    }
                 }
-            }
-        } else {
-            None
-        };
+            } else {
+                None
+            };
         if let Some(renderer) = &mut self.renderer {
             let mode = match snapshot.mode {
                 FlightMode::Docked => "DOCKED - L launch",

@@ -438,6 +438,7 @@ fn modular_buy_fit_store_are_equivalent_review_intents_not_ui_owned_transactions
     let before = w.save_bytes().unwrap_or_else(|e| panic!("{e}"));
     for (keycode, operation) in [
         (Key::Confirm, EquipmentOperation::Buy),
+        (Key::Buy, EquipmentOperation::Buy),
         (Key::Fit, EquipmentOperation::Fit),
         (Key::Store, EquipmentOperation::Store),
     ] {
@@ -457,7 +458,18 @@ fn modular_buy_fit_store_are_equivalent_review_intents_not_ui_owned_transactions
             option: None,
         });
         assert_eq!(key(&mut a, &ctx, keycode), expected);
-        assert_eq!(click(&mut b, &ctx, Control::Key(keycode)), expected);
+        assert_eq!(
+            click(
+                &mut b,
+                &ctx,
+                Control::Key(if keycode == Key::Buy {
+                    Key::Confirm
+                } else {
+                    keycode
+                })
+            ),
+            expected
+        );
     }
     assert_eq!(w.save_bytes().unwrap_or_else(|e| panic!("{e}")), before);
 }

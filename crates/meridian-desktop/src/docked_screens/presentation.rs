@@ -159,7 +159,9 @@ pub(super) fn project(s: &DockedScreens, c: &Context<'_>, v: Viewport) -> Frame 
         .join(" | ");
     label(
         &mut f,
-        if hints.is_empty() {
+        if let Some(panel) = c.equipment.filter(|panel| !panel.feedback.is_empty()) {
+            panel.feedback.clone()
+        } else if hints.is_empty() {
             "Use pointer controls; keyboard bindings unavailable".into()
         } else {
             hints
@@ -963,9 +965,6 @@ fn equipment(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
     lines.extend(row.readout.iter().cloned());
     if let Some(reason) = &row.refusal {
         lines.push(reason.clone());
-    }
-    if !panel.feedback.is_empty() {
-        lines.push(panel.feedback.clone());
     }
     if s.options {
         let count = f.viewport.rows(details, 26.0);

@@ -247,6 +247,13 @@ impl Docked {
         }
     }
     pub fn input(&mut self, profile: &mut Profile, input: ui::Input) -> Result<(), String> {
+        let result = self.input_inner(profile, input);
+        if let Err(error) = &result {
+            self.feedback = error.clone();
+        }
+        result
+    }
+    fn input_inner(&mut self, profile: &mut Profile, input: ui::Input) -> Result<(), String> {
         let painted = self
             .painted
             .as_ref()
@@ -779,6 +786,77 @@ mod tests {
         let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
         menu.presented(frame);
     }
+    fn assert_visible_feedback(menu: &mut Docked, profile: &Profile, expected: &str) {
+        let viewport = ui::Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));
+        let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
+        let label = frame
+            .labels
+            .iter()
+            .find(|l| l.text.contains(expected))
+            .unwrap_or_else(|| panic!("Missing visible feedback: {expected}"));
+        assert!(label.at[0] >= label.clip.x && label.at[1] >= label.clip.y);
+        assert!(label.at[1] + 9.0 <= label.clip.y + label.clip.height);
+        assert!(label.text.chars().count() <= (label.clip.width / 7.5).floor() as usize);
+        menu.presented(frame);
+    }
+    #[test]
+    fn trading_writer_failure_is_visible_and_preserves_live_and_disk_state() {
+        let (directory, mut profile, mut menu) = start();
+        ok(profile.save());
+        let path = directory.0.join("commander.meridian");
+        let backup = directory.0.join("previous-save");
+        let before = ok(profile.world.save_bytes());
+        let previous = ok(std::fs::read(&path));
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Buy)));
+        present(&mut menu, &profile);
+        ok(std::fs::rename(&path, &backup));
+        ok(std::fs::create_dir(&path));
+        assert!(
+            menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm))
+                .is_err()
+        );
+        assert!(menu.pending.is_none());
+        let expected: String = menu.feedback.chars().take(24).collect();
+        assert!(!expected.is_empty());
+        assert_visible_feedback(&mut menu, &profile, &expected);
+        assert_eq!(ok(profile.world.save_bytes()), before);
+        assert_eq!(ok(std::fs::read(&backup)), previous);
+        ok(std::fs::remove_dir(&path));
+        ok(std::fs::rename(&backup, &path));
+        assert_eq!(ok(std::fs::read(&path)), previous);
+    }
+    #[test]
+    fn absent_cargo_sale_refusal_is_visible_on_trading() {
+        let (_directory, mut profile, mut menu) = start();
+        let before = ok(profile.world.save_bytes());
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Sell)));
+        assert!(menu.pending.is_some());
+        present(&mut menu, &profile);
+        assert!(
+            menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm))
+                .is_err()
+        );
+        let expected: String = menu.feedback.chars().take(24).collect();
+        assert!(!expected.is_empty());
+        assert_visible_feedback(&mut menu, &profile, &expected);
+        assert_eq!(ok(profile.world.save_bytes()), before);
+    }
+    #[test]
+    fn route_selection_instruction_is_visible_on_system_and_galaxy() {
+        let (_directory, mut profile, mut menu) = start();
+        let before = ok(profile.world.save_bytes());
+        for screen in [ui::Screen::System, ui::Screen::Galaxy] {
+            ok(menu.open(&profile.world, screen));
+            ok(menu.request(&mut profile, ui::Request::ReviewRoute(SystemId::RENAS)));
+            present(&mut menu, &profile);
+            ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm)));
+            assert_eq!(menu.route, Some(SystemId::RENAS));
+            assert_visible_feedback(&mut menu, &profile, "launch and press J");
+            assert_eq!(ok(profile.world.save_bytes()), before);
+        }
+    }
     #[test]
     fn real_market_review_confirm_publishes_one_native_tonne_once() {
         let (directory, mut profile, mut menu) = start();
@@ -834,6 +912,7 @@ mod tests {
         ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm)));
         assert!(menu.pending.is_none());
         assert!(menu.feedback.contains("Values changed"));
+        assert_visible_feedback(&mut menu, &profile, "Values changed");
         assert_eq!(ok(profile.world.save_bytes()), after_external_purchase);
     }
     #[test]
