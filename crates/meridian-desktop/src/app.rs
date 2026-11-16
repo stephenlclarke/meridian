@@ -207,6 +207,10 @@ impl App {
 
     fn game_key(&mut self, code: KeyCode) {
         let action = match code {
+            KeyCode::F1 => Action::CycleMissileLock,
+            KeyCode::F2 => Action::ToggleMissileArm,
+            KeyCode::F3 => Action::FireMissile,
+            KeyCode::F4 => Action::ClearMissile,
             KeyCode::KeyL => Action::Launch,
             KeyCode::KeyJ => Action::Jump,
             KeyCode::KeyT => Action::Contact,
@@ -290,6 +294,7 @@ impl App {
         });
         let pulse_notice = self.pulse.map(|shot| match shot.contact {
             PulseContact::Clear => "Pulse fired",
+            PulseContact::Projectile { .. } => "Pulse intercepted missile",
             PulseContact::StationBlocked { .. } => "Station struck | legal incident recorded",
             PulseContact::PracticeBeacon {
                 first_hit: true, ..
@@ -339,6 +344,7 @@ impl App {
                 &snapshot,
                 station,
                 self.pulse.as_ref(),
+                self.game.world.missile_snapshot().as_ref(),
                 practice.as_ref().and_then(|state| state.beacons.as_ref()),
                 &hud_lines,
             ) {

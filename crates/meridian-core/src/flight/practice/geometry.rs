@@ -35,7 +35,16 @@ pub(super) fn nearest(
     ray: RigidPose,
     station_distance: Option<f64>,
 ) -> Option<(usize, f64)> {
-    let cap = station_distance.unwrap_or(crate::PULSE_RANGE);
+    nearest_segment(frame, ray, crate::PULSE_RANGE, station_distance)
+}
+
+pub(super) fn nearest_segment(
+    frame: RigidPose,
+    ray: RigidPose,
+    range: f64,
+    station_distance: Option<f64>,
+) -> Option<(usize, f64)> {
+    let cap = station_distance.unwrap_or(range).min(range);
     let mut best = None;
     for ordinal in 0..OFFSETS.len() {
         let beacon = beacon_pose(frame, ordinal);

@@ -75,6 +75,9 @@ impl World {
         &self,
         practice: Option<practice::Practice>,
     ) -> Result<Vec<u8>, SaveError> {
+        if !self.missiles.save_supported() {
+            return Err(SaveError::UnsupportedMissiles);
+        }
         self.validate_saved_world(practice)?;
         let mut w = Writer::new();
         w.bytes.extend(MAGIC);
@@ -127,6 +130,9 @@ impl World {
 
     /// Replace this World only after complete candidate validation and UI sequence invalidation.
     pub fn restore_bytes(&mut self, bytes: &[u8]) -> Result<(), SaveError> {
+        if !self.missiles.save_supported() {
+            return Err(SaveError::UnsupportedMissiles);
+        }
         let mut candidate = Self::decode_saved_world(bytes)?;
         let floor = self
             .freight_session
@@ -185,6 +191,7 @@ impl World {
             practice: read_practice(&mut r, version)?,
             pulse: weapons::PulseResources::default(),
             combat: combat::State::default(),
+            missiles: missiles::State::default(),
         };
         if version >= 7 {
             candidate.combat = combat::State::decode(&mut r)?;

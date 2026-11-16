@@ -33,6 +33,8 @@ pub struct OrdinaryImpact {
     pub emission: u64,
     pub incident: u64,
     pub item: u64,
+    pub weapon: OrdinaryWeapon,
+    pub target: OrdinaryTarget,
     pub victim_entity: u64,
     pub tick: u64,
     pub physical_tick: u64,
@@ -99,6 +101,72 @@ pub(super) struct PreparedPulseImpact {
     hit: Option<OrdinaryImpact>,
 }
 impl State {
+    pub(super) fn physical_tick(self) -> u64 {
+        self.physical_tick
+    }
+    pub(super) fn reserve_missile_emission(self) -> Result<(Self, u64), super::MissileError> {
+        let mut next = self;
+        next.emissions = next
+            .emissions
+            .checked_add(1)
+            .ok_or(super::MissileError::SequenceExhausted)?;
+        Ok((next, next.emissions))
+    }
+    pub(super) fn record_missile_impact(
+        &mut self,
+        pulse: &mut super::weapons::PulseResources,
+        origin: super::MissileOrigin,
+        flight: Snapshot,
+        point: Vec3,
+        target: OrdinaryTarget,
+    ) -> Result<(OrdinaryImpact, u8), super::StepError> {
+        let incident = self
+            .incidents
+            .checked_add(1)
+            .ok_or(super::StepError::TickOverflow)?;
+        let mut penalty = 0;
+        if target == OrdinaryTarget::MainStation {
+            let index =
+                station_index(origin.owner.system).ok_or(super::StepError::NonFiniteState)?;
+            if self.windows[index].is_none_or(|last| {
+                last.visit != origin.owner.visit
+                    || self.physical_tick.saturating_sub(last.physical_tick) > ATTACK_WINDOW
+            }) {
+                penalty = 64;
+                self.penalties = self.penalties.saturating_add(1).min(4);
+            }
+            self.windows[index] = Some(AttackWindow {
+                visit: origin.owner.visit,
+                physical_tick: self.physical_tick,
+            });
+        }
+        self.incidents = incident;
+        let unsupported_before = self.unbound_player_impact;
+        self.resolve_impact(pulse, target, OrdinaryWeapon::StandardMissile);
+        // This contact has an actual retained ordnance origin. Keep any older
+        // unsupported marker; the missile controller separately refuses v7 saves.
+        self.unbound_player_impact = unsupported_before;
+        let hit = OrdinaryImpact {
+            attacker: origin.owner,
+            emission: origin.emission,
+            incident,
+            item: origin.item,
+            weapon: OrdinaryWeapon::StandardMissile,
+            target,
+            victim_entity: if target == OrdinaryTarget::MainStation {
+                1
+            } else {
+                0
+            },
+            tick: flight.tick,
+            physical_tick: self.physical_tick,
+            point,
+            position: flight.position,
+            orientation: flight.orientation,
+        };
+        self.last = Some(hit);
+        Ok((hit, penalty))
+    }
     pub(super) fn advance(&mut self, opening: FlightMode, next: FlightMode) {
         if opening == FlightMode::Docked {
             return;
@@ -248,7 +316,7 @@ impl State {
     }
 }
 impl World {
-    fn combat_identity(&self) -> Option<CombatIdentity> {
+    pub(super) fn combat_identity(&self) -> Option<CombatIdentity> {
         let nav = self.navigation?;
         let snapshot = nav.snapshot(self.commander_account.as_ref()?.fuel_tenths());
         Some(CombatIdentity {
@@ -287,37 +355,7 @@ impl World {
         {
             return Err(FireError::StaleCommand);
         }
-        let station = self.state.station.ok_or(FireError::InvalidGeometry)?;
-        let station_distance = self
-            .station_data
-            .as_ref()
-            .ok_or(FireError::InvalidGeometry)?
-            .beam_block_distance(
-                station,
-                pose.position,
-                pose.orientation.z,
-                super::PULSE_RANGE,
-            )
-            .map_err(|_| FireError::InvalidGeometry)?;
-        let mut practice = self.practice;
-        let practice_hit = practice
-            .as_mut()
-            .and_then(|p| p.contact(self.state, pose, station_distance));
-        let expected = if let Some((id, distance, first_hit)) = practice_hit {
-            PulseContact::PracticeBeacon {
-                id,
-                distance,
-                first_hit,
-            }
-        } else {
-            station_distance.map_or(PulseContact::Clear, |distance| {
-                PulseContact::StationBlocked { distance }
-            })
-        };
-        let distance = practice_hit
-            .map(|(_, distance, _)| distance)
-            .or(station_distance)
-            .unwrap_or(super::PULSE_RANGE);
+        let (_, expected, distance) = self.pulse_scene(pose)?;
         if shot.contact != expected || shot.end != add_scaled(shot.origin, shot.direction, distance)
         {
             return Err(FireError::InvalidGeometry);
@@ -352,6 +390,8 @@ impl World {
                 emission: next.emissions,
                 incident: next.incidents,
                 item: shot.fitted_item_id,
+                weapon: OrdinaryWeapon::FrontPulseLaser,
+                target: OrdinaryTarget::MainStation,
                 victim_entity: 1,
                 tick: shot.tick,
                 physical_tick: next.physical_tick,
@@ -387,6 +427,9 @@ impl World {
     }
 }
 impl PreparedPulseImpact {
+    pub(super) fn emission(&self) -> u64 {
+        self.next.emissions
+    }
     pub(super) fn commit(self, world: &mut World) -> Result<(), FireError> {
         if world
             .freight_session
@@ -446,6 +489,8 @@ impl OrdinaryImpact {
         let victim_entity = r.u64()?;
         Ok(Self {
             victim_entity,
+            weapon: OrdinaryWeapon::FrontPulseLaser,
+            target: OrdinaryTarget::MainStation,
             attacker: CombatIdentity {
                 owner: r.u64()?,
                 hull: r.u64()?,
@@ -486,6 +531,13 @@ impl OrdinaryImpact {
             )
             .map_err(|_| invalid)?
             .ok_or(invalid)?;
+        if self.weapon != OrdinaryWeapon::FrontPulseLaser
+            || self.target != OrdinaryTarget::MainStation
+        {
+            return Err(SaveError::InvalidState(
+                "unsupported missile impact save boundary",
+            ));
+        }
         if self.victim_entity != 1
             || self.attacker.owner != current.owner
             || self.attacker.hull != current.hull

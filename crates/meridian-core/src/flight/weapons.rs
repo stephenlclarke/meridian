@@ -46,6 +46,10 @@ impl std::error::Error for FireError {}
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum PulseContact {
+    Projectile {
+        id: super::ProjectileId,
+        distance: f64,
+    },
     Clear,
     StationBlocked {
         distance: f64,
@@ -121,6 +125,9 @@ impl PulseResources {
             heat: self.heat + HEAT_COST_FIFTHS,
             cooldown: PULSE_COOLDOWN_TICKS,
         })
+    }
+    pub(super) fn alive(self) -> bool {
+        self.energy > 0
     }
     pub(super) fn damage_energy(&mut self, damage: u16) {
         self.energy = self.energy.saturating_sub(damage);
@@ -239,6 +246,51 @@ fn maximum_reachable_heat(tick: u64, elapsed_since_shot_at_least: u64) -> u128 {
 }
 
 impl World {
+    pub(super) fn pulse_scene(
+        &self,
+        pose: crate::docking::RigidPose,
+    ) -> Result<(Option<super::practice::Practice>, PulseContact, f64), FireError> {
+        let station = self.state.station.ok_or(FireError::InvalidGeometry)?;
+        let distance = self
+            .station_data
+            .as_ref()
+            .ok_or(FireError::InvalidGeometry)?
+            .beam_block_distance(station, pose.position, pose.orientation.z, PULSE_RANGE)
+            .map_err(|_| FireError::InvalidGeometry)?;
+        let projectile = self
+            .nearest_missile(pose, distance.unwrap_or(PULSE_RANGE))
+            .filter(|(_, d)| distance.is_none_or(|station| *d < station));
+        let cap = projectile.map_or(PULSE_RANGE, |(_, d)| d);
+        let mut practice = self.practice;
+        let hit = practice
+            .as_mut()
+            .and_then(|p| p.contact_limited(self.state, pose, cap, distance));
+        if let Some((id, distance, first_hit)) = hit {
+            return Ok((
+                practice,
+                PulseContact::PracticeBeacon {
+                    id,
+                    distance,
+                    first_hit,
+                },
+                distance,
+            ));
+        }
+        if let Some((id, distance)) = projectile {
+            return Ok((
+                practice,
+                PulseContact::Projectile { id, distance },
+                distance,
+            ));
+        }
+        Ok((
+            practice,
+            distance.map_or(PulseContact::Clear, |distance| {
+                PulseContact::StationBlocked { distance }
+            }),
+            distance.unwrap_or(PULSE_RANGE),
+        ))
+    }
     pub(super) fn fitted_front_pulse(&self) -> Option<u64> {
         let nav = self.navigation?;
         let owner = nav.owner().seed();
@@ -289,37 +341,12 @@ impl World {
             .ok_or(FireError::InvalidGeometry)?;
         let origin = pose.position;
         let direction = pose.orientation.z;
-        let station = self.state.station.ok_or(FireError::InvalidGeometry)?;
-        let distance = self
-            .station_data
-            .as_ref()
-            .ok_or(FireError::InvalidGeometry)?
-            .beam_block_distance(station, origin, direction, PULSE_RANGE)
-            .map_err(|_| FireError::InvalidGeometry)?;
-        let mut practice = self.practice;
-        let practice_hit = practice
-            .as_mut()
-            .and_then(|practice| practice.contact(self.state, pose, distance));
-        let end_distance = practice_hit
-            .map(|(_, distance, _)| distance)
-            .or(distance)
-            .unwrap_or(PULSE_RANGE);
+        let (mut practice, contact, end_distance) = self.pulse_scene(pose)?;
         let end = Vec3::new(
             origin.x + direction.x * end_distance,
             origin.y + direction.y * end_distance,
             origin.z + direction.z * end_distance,
         );
-        let contact = if let Some((id, distance, first_hit)) = practice_hit {
-            PulseContact::PracticeBeacon {
-                id,
-                distance,
-                first_hit,
-            }
-        } else {
-            distance.map_or(PulseContact::Clear, |distance| {
-                PulseContact::StationBlocked { distance }
-            })
-        };
         let shot = PulseShot {
             tick: self.state.tick,
             fitted_item_id,
@@ -329,10 +356,18 @@ impl World {
             contact,
         };
         let impact = self.prepare_pulse_impact(shot)?;
+        let mut missiles = self.missiles;
+        if let PulseContact::Projectile { id, .. } = contact
+            && !missiles.intercept(id, self.state.tick, impact.emission())
+        {
+            return Err(FireError::InvalidGeometry);
+        }
         impact.commit(self)?;
+        self.missiles = missiles;
         if let (Some(candidate), Some(current)) = (&mut practice, self.practice) {
             candidate.ordinary_hit = current.ordinary_hit;
             candidate.reception = current.reception;
+            candidate.pending_missiles = self.missiles.pending();
         }
         if let Some(practice) = practice.as_mut() {
             practice.observe_discharge(self.state.tick);

@@ -1,3 +1,9 @@
+mod missiles;
+pub use missiles::{
+    MISSILE_COOLDOWN_TICKS, MISSILE_FACES, MISSILE_LIFETIME_TICKS, MISSILE_MUZZLE_DISTANCE,
+    MISSILE_RANGE, MISSILE_SPEED, MISSILE_VERTICES, MissileContact, MissileEnd, MissileError,
+    MissileOrigin, MissileRound, MissileSnapshot, ProjectileId, ProjectileSnapshot,
+};
 mod combat;
 pub use combat::{
     CombatIdentity, CombatSnapshot, OrdinaryImpact, OrdinaryTarget, OrdinaryWeapon, PlayerCondition,
@@ -123,6 +129,7 @@ pub struct World {
     station_markets: Option<crate::station_services::StationMarkets>,
     pulse: weapons::PulseResources,
     combat: combat::State,
+    missiles: missiles::State,
     practice: Option<practice::Practice>,
 }
 
@@ -153,6 +160,7 @@ impl World {
             station_markets: None,
             pulse: weapons::PulseResources::default(),
             combat: combat::State::default(),
+            missiles: missiles::State::default(),
             practice: None,
         }
     }
@@ -364,6 +372,7 @@ impl World {
         }
         self.state = next;
         self.navigation = navigation;
+        self.missiles.berth();
         if let Some((session, epoch)) = self.freight_session.as_mut().zip(mission_epoch) {
             session.rebind_dock(None, epoch);
         }
@@ -465,6 +474,7 @@ impl World {
     fn publish_step(&mut self, mut next: Snapshot) -> Result<(), StepError> {
         let mut navigation = self.navigation;
         let mut mission_epoch = None;
+        let mut planned_debit = None;
         if let Some(state) = &mut navigation {
             let entry = next.mode == FlightMode::Docked && self.state.mode != FlightMode::Docked;
             let account = self
@@ -486,10 +496,7 @@ impl World {
                     .map_err(|_| StepError::TickOverflow)?;
             }
             if let Some(debit) = arrival_debit {
-                // Debit is checked before mutation; nothing fallible follows publication.
-                account
-                    .debit_fuel(debit)
-                    .map_err(|_| StepError::NonFiniteState)?;
+                planned_debit = Some(debit);
                 // Source arrival places the station16000 ahead. This is its equivalent
                 // station-local frame, not an earned dock or a proximity teleport.
                 next.position = [0.0, 0.0, 16000.0];
@@ -498,8 +505,22 @@ impl World {
                 next.motion_refusal = None;
             }
         }
-        self.combat.advance(self.state.mode, next.mode);
-        self.pulse.advance(self.state.mode, next.mode);
+        let prepared = self.prepare_missile_step(next, navigation)?;
+        if let Some(debit) = planned_debit {
+            self.commander_account
+                .as_mut()
+                .ok_or(StepError::NonFiniteState)?
+                .debit_fuel(debit)
+                .map_err(|_| StepError::NonFiniteState)?;
+        }
+        // No fallible operation follows the first account mutation.
+        self.missiles = prepared.missiles;
+        self.combat = prepared.combat;
+        self.pulse = prepared.pulse;
+        self.practice = prepared.practice;
+        if let Some(account) = &mut self.commander_account {
+            account.apply_ordinary_legal(prepared.legal);
+        }
         if let (Some(practice), Some(nav), Some(data)) =
             (&mut self.practice, navigation, &self.station_data)
         {

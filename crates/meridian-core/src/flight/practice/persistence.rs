@@ -36,6 +36,7 @@ impl Practice {
                             Ok(FirstHit {
                                 tick: r.u64()?,
                                 firing_pose: RecordedPose::decode(r)?,
+                                missile: None,
                             })
                         })
                     })?,
@@ -43,6 +44,7 @@ impl Practice {
             })?,
             reception: reception::Reception::default(),
             ordinary_hit: None,
+            pending_missiles: 0,
             retired: r.option(|r| {
                 Ok(Retirement {
                     tick: r.u64()?,
@@ -158,6 +160,11 @@ impl Range {
             let Some(hit) = slot else {
                 continue;
             };
+            if hit.missile.is_some() {
+                return Err(SaveError::InvalidState(
+                    "unsupported missile hit save boundary",
+                ));
+            }
             if hit.tick < self.opened_tick || hit.tick > last_active_tick {
                 return Err(INVALID);
             }

@@ -45,7 +45,7 @@ impl OriginalStationData {
 }
 
 // Matches the original two-sided GameplayRaycast triangle narrow phase and range endpoints.
-fn triangle_distance(
+pub(crate) fn triangle_distance(
     origin: Vec3,
     direction: Vec3,
     a: Vec3,
@@ -78,6 +78,51 @@ fn triangle_distance(
 }
 
 impl OriginalStationData {
+    pub(crate) fn player_beam_distance(
+        &self,
+        pose: crate::docking::RigidPose,
+        origin: Vec3,
+        direction: Vec3,
+        range: f64,
+    ) -> Result<Option<f64>, StationError> {
+        if !pose.orientation.is_valid_rotation()
+            || !finite(pose.position)
+            || !finite(pose.orientation.x)
+            || !finite(pose.orientation.y)
+            || !finite(pose.orientation.z)
+            || !finite(origin)
+            || !finite(direction)
+            || (direction.dot(direction) - 1.0).abs() > 1e-9
+            || !range.is_finite()
+            || range <= 0.0
+        {
+            return Err(StationError::InvalidPose);
+        }
+        let local = |v: Vec3| {
+            Vec3::new(
+                v.dot(pose.orientation.x),
+                v.dot(pose.orientation.y),
+                v.dot(pose.orientation.z),
+            )
+        };
+        let origin = local(sub(origin, pose.position));
+        let direction = local(direction);
+        let mut nearest = None;
+        for face in &self.hull.faces {
+            let [a, b, c] = [
+                self.hull.vertices[face[0]],
+                self.hull.vertices[face[1]],
+                self.hull.vertices[face[2]],
+            ];
+            if let Some(distance) =
+                triangle_distance(origin, direction, a, b, c, nearest.unwrap_or(range))
+            {
+                nearest = Some(distance);
+            }
+        }
+        Ok(nearest)
+    }
+
     pub(crate) fn player_clearance_radius(&self) -> f64 {
         self.hull.radius
     }

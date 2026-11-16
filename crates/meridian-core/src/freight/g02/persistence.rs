@@ -142,7 +142,7 @@ impl CommanderAccount {
             w.u64(fit.owner);
             w.u64(fit.hull);
             w.u64(fit.inventory);
-            for item in &fit.items {
+            for item in fit.items.iter().flatten() {
                 write_item(w, item);
             }
         });
@@ -171,7 +171,7 @@ impl CommanderAccount {
                         owner: r.u64()?,
                         hull: r.u64()?,
                         inventory: r.u64()?,
-                        items: r.array(read_item)?,
+                        items: r.array(|r| read_item(r).map(Some))?,
                     })
                 })?,
                 other_commodities: r.array(|r| r.u64())?,
@@ -195,7 +195,7 @@ impl CommanderAccount {
             .ok_or(SaveError::InvalidState("missing fit"))?;
         if self.data.owner != nav.owner
             || self.data.hull != nav.hull
-            || fit.items[3].id != nav.drive
+            || fit.items[3].is_none_or(|item| item.id != nav.drive)
             || self.data.other_tonnes != 0
             || self.data.reserved_food_tonnes != 0
             || self.data.reserved_commodities != [0; 16]
@@ -206,7 +206,9 @@ impl CommanderAccount {
         }
         if fit.inventory != nav.owner + 2
             || fit.items.iter().enumerate().any(|(i, item)| {
-                item.id != nav.owner + 3 + i as u64 || item.fitted_hull != Some(nav.hull)
+                item.is_none_or(|item| {
+                    item.id != nav.owner + 3 + i as u64 || item.fitted_hull != Some(nav.hull)
+                })
             })
         {
             return Err(SaveError::InvalidState("starter identity or fitting"));
