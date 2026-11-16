@@ -214,10 +214,10 @@ impl App {
         self.reset_input();
         self.docked = match Docked::new(&self.game.world) {
             Ok(mut menu) => {
-                if self.game.world.current_dock_context().is_some() {
-                    if let Err(error) = menu.open(&self.game.world, ui::Screen::System) {
-                        self.notice = Some(error);
-                    }
+                if self.game.world.current_dock_context().is_some()
+                    && let Err(error) = menu.open(&self.game.world, ui::Screen::System)
+                {
+                    self.notice = Some(error);
                 }
                 Some(menu)
             }
@@ -262,10 +262,10 @@ impl App {
             .is_some_and(|menu| menu.active(&self.game.world))
     }
     fn menu_input(&mut self, input: ui::Input) {
-        if let Some(menu) = &mut self.docked {
-            if let Err(error) = menu.input(&mut self.game, input) {
-                menu.feedback(error);
-            }
+        if let Some(menu) = &mut self.docked
+            && let Err(error) = menu.input(&mut self.game, input)
+        {
+            menu.feedback(error);
         }
         self.request_redraw();
     }
@@ -295,10 +295,10 @@ impl App {
         self.keys.clear();
         self.pulse = None;
         self.wheel = 0.0;
-        if let Some(menu) = &mut self.docked {
-            if let Err(error) = menu.open(&self.game.world, screen) {
-                menu.feedback(error);
-            }
+        if let Some(menu) = &mut self.docked
+            && let Err(error) = menu.open(&self.game.world, screen)
+        {
+            menu.feedback(error);
         }
         self.request_redraw();
         true
@@ -658,15 +658,13 @@ impl ApplicationHandler for App {
                     } else if self.focused && !self.occluded {
                         if self.menu_active()
                             && self.docked.as_ref().is_some_and(Docked::search_active)
-                        {
-                            if let Some(text) = event
+                            && let Some(text) = event
                                 .text
                                 .as_ref()
                                 .filter(|s| s.chars().all(|c| !c.is_control()))
-                            {
-                                self.menu_input(ui::Input::Text(text.to_string()));
-                                return;
-                            }
+                        {
+                            self.menu_input(ui::Input::Text(text.to_string()));
+                            return;
                         }
                         if event.repeat
                             && !(self.menu_active()
