@@ -19,7 +19,8 @@ pub use missiles::{
 };
 mod combat;
 pub use combat::{
-    CombatIdentity, CombatSnapshot, OrdinaryImpact, OrdinaryTarget, OrdinaryWeapon, PlayerCondition,
+    CombatIdentity, CombatSnapshot, OrdinaryImpact, OrdinaryTarget, OrdinaryWeapon,
+    PlayerCondition, SHIELD_CAPACITY,
 };
 mod equipment;
 mod mission;
@@ -37,7 +38,8 @@ mod weapons;
 pub use mission::{MissionError, MissionSnapshot, StationNpc};
 pub use services::ServiceSnapshot;
 pub use weapons::{
-    FireError, PULSE_COOLDOWN_TICKS, PULSE_RANGE, PulseContact, PulseLaserSnapshot, PulseShot,
+    ENERGY_CAPACITY_HUNDREDTHS, FireError, PULSE_COOLDOWN_TICKS, PULSE_RANGE, PulseContact,
+    PulseLaserSnapshot, PulseShot,
 };
 
 use crate::docking::StationPose;
@@ -56,7 +58,7 @@ pub const FIXED_DELTA_SECONDS: f32 = 1.0 / 60.0;
 
 // SH025 [game], immutable legacy a11fe16924d87d06021816f9037952afcbac08db.
 // These are reference gameplay units, not an asserted SI or renderer-space calibration.
-const MAX_SPEED: f32 = 34.3;
+pub const MAX_SPEED: f32 = 34.3;
 const ACCELERATION: f32 = 9.1;
 const PITCH_RATE: f32 = 0.7;
 const YAW_RATE: f32 = 0.65;

@@ -1,9 +1,10 @@
 //! Original code-drawn glyphs: no imported bitmap, font or texture assets.
 use crate::mesh::Vertex;
+pub mod cockpit;
 
 pub const MAX_LINES: usize = 14;
 pub const MAX_COLUMNS: usize = 96;
-pub const MAX_VERTICES: usize = 6 + MAX_LINES * MAX_COLUMNS * 35 * 6;
+pub const MAX_VERTICES: usize = cockpit::MAX_VERTICES + 6 + MAX_LINES * MAX_COLUMNS * 35 * 6;
 
 fn glyph(character: char) -> [u8; 7] {
     match character.to_ascii_uppercase() {
@@ -94,17 +95,32 @@ pub fn line_budget(width: u32, height: u32) -> usize {
 
 /// Bounded, reusable CPU buffer; text is presentation only and cannot issue commands.
 pub fn vertices(lines: &[String], width: u32, height: u32, output: &mut Vec<Vertex>) {
+    vertices_with_cockpit(lines, width, height, None, output);
+}
+
+pub fn vertices_with_cockpit(
+    lines: &[String],
+    width: u32,
+    height: u32,
+    cockpit: Option<&cockpit::Cockpit>,
+    output: &mut Vec<Vertex>,
+) {
     output.clear();
     if width == 0 || height == 0 {
         return;
     }
     let size = [width as f32, height as f32];
     let scale = text_scale(width);
-    let count = lines.len().min(line_budget(width, height));
-    let top = (size[1] - count as f32 * 9.0 * scale - 16.0).max(0.0);
+    let bottom = if cockpit.is_some() && width >= 320 && height >= 240 {
+        cockpit::Layout::new(width, height).top
+    } else {
+        size[1]
+    };
+    let count = lines.len().min(line_budget(width, bottom as u32));
+    let top = (bottom - count as f32 * 9.0 * scale - 16.0).max(0.0);
     quad(
         output,
-        [0.0, top, size[0], size[1]],
+        [0.0, top, size[0], bottom],
         [0.006, 0.012, 0.025],
         size,
     );
@@ -122,6 +138,9 @@ pub fn vertices(lines: &[String], width: u32, height: u32, output: &mut Vec<Vert
                 }
             }
         }
+    }
+    if let Some(c) = cockpit {
+        cockpit::append(c, width, height, output);
     }
 }
 

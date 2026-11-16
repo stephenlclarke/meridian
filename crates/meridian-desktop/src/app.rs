@@ -19,7 +19,7 @@ use winit::{
 
 use crate::clock::FixedClock;
 use crate::profile::Profile;
-use crate::renderer::{Renderer, StationScene};
+use crate::renderer::{HudScene, Renderer, StationScene};
 use crate::session::Action;
 
 // Ephemeral profile IDs are allocated by the host, never by the deterministic core.
@@ -317,6 +317,10 @@ impl App {
         });
         let notice = pulse_notice.or(self.notice.as_deref());
         let hud_lines = self.game.lines(active, notice);
+        let cockpit = self
+            .game
+            .playing()
+            .then(|| crate::hud::cockpit::Cockpit::capture(&self.game.world, snapshot));
         if let Some(renderer) = &mut self.renderer {
             let mode = match snapshot.mode {
                 FlightMode::Docked => "DOCKED - L launch",
@@ -359,7 +363,10 @@ impl App {
                 self.pulse.as_ref(),
                 self.game.world.missile_snapshot().as_ref(),
                 practice.as_ref().and_then(|state| state.beacons.as_ref()),
-                &hud_lines,
+                HudScene {
+                    lines: &hud_lines,
+                    cockpit: cockpit.as_ref(),
+                },
             ) {
                 self.fail(event_loop, error);
             }

@@ -329,7 +329,7 @@ fn decode_mesh(bytes: &[u8]) -> Result<Vec<Vertex>, String> {
         .collect()
 }
 
-fn rotate_inverse(q: [f32; 4], v: [f32; 3]) -> [f32; 3] {
+pub(crate) fn rotate_inverse(q: [f32; 4], v: [f32; 3]) -> [f32; 3] {
     let u = [-q[0], -q[1], -q[2]];
     let cross = |a: [f32; 3], b: [f32; 3]| {
         [

@@ -3,7 +3,7 @@ use super::{FireError, FlightMode, PulseContact, PulseShot, Snapshot, World, fli
 use crate::docking::Vec3;
 use crate::navigation::SystemId;
 use crate::save::{Reader, SaveError, Writer};
-const SHIELD_CAPACITY: u16 = 30_000;
+pub const SHIELD_CAPACITY: u16 = 30_000;
 const SHIELD_RECHARGE: u16 = 3;
 const ATTACK_WINDOW: u64 = 600;
 

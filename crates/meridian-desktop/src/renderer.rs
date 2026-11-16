@@ -17,6 +17,11 @@ pub struct StationScene<'a> {
     pub docked: bool,
 }
 
+pub struct HudScene<'a> {
+    pub lines: &'a [String],
+    pub cockpit: Option<&'a hud::cockpit::Cockpit>,
+}
+
 pub struct Renderer {
     flight_view: FlightView,
     surface: wgpu::Surface<'static>,
@@ -269,8 +274,12 @@ impl Renderer {
         pulse: Option<&PulseShot>,
         missiles: Option<&meridian_core::MissileSnapshot>,
         practice: Option<&[PracticeBeaconSnapshot; 3]>,
-        hud_lines: &[String],
+        hud: HudScene<'_>,
     ) -> Result<(), String> {
+        let HudScene {
+            lines: hud_lines,
+            cockpit,
+        } = hud;
         if self.device_lost.load(Ordering::Acquire) {
             return Err("Graphics device lost; exiting without changing any save".into());
         }
@@ -323,12 +332,23 @@ impl Renderer {
         }
         self.queue
             .write_buffer(&self.vertices, 0, bytemuck::cast_slice(&self.frame));
-        hud::vertices(
-            hud_lines,
-            self.config.width,
-            self.config.height,
-            &mut self.hud_frame,
-        );
+        if cockpit.is_some() {
+            let logical = self.size.to_logical::<f64>(self.window.scale_factor());
+            hud::vertices_with_cockpit(
+                hud_lines,
+                logical.width.round() as u32,
+                logical.height.round() as u32,
+                cockpit,
+                &mut self.hud_frame,
+            );
+        } else {
+            hud::vertices(
+                hud_lines,
+                self.config.width,
+                self.config.height,
+                &mut self.hud_frame,
+            );
+        }
         self.queue
             .write_buffer(&self.hud_vertices, 0, bytemuck::cast_slice(&self.hud_frame));
         let view = frame.texture.create_view(&Default::default());
