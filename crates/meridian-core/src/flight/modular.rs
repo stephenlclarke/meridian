@@ -13,6 +13,9 @@ const INVALID: SaveError = SaveError::InvalidState("modular equipment ownership 
 pub enum ModuleKind {
     PulseLaser,
     MiningLaser,
+    BeamLaser,
+    MilitaryLaser,
+    NavalLaser,
     BasicEnergySystem,
     ExtraEnergyUnit,
     NavalEnergyUnit,
@@ -21,7 +24,11 @@ pub enum ModuleKind {
 impl ModuleKind {
     pub fn family(self) -> &'static str {
         match self {
-            Self::PulseLaser | Self::MiningLaser => "laser",
+            Self::PulseLaser
+            | Self::MiningLaser
+            | Self::BeamLaser
+            | Self::MilitaryLaser
+            | Self::NavalLaser => "laser",
             _ => "energy",
         }
     }
@@ -32,6 +39,9 @@ impl ModuleKind {
         match self {
             Self::PulseLaser => "Pulse Laser",
             Self::MiningLaser => "Mining Laser",
+            Self::BeamLaser => "Beam Laser",
+            Self::MilitaryLaser => "Military Laser",
+            Self::NavalLaser => "Naval Laser",
             Self::BasicEnergySystem => "Basic Energy System",
             Self::ExtraEnergyUnit => "Extra Energy Unit",
             Self::NavalEnergyUnit => "Naval Energy Unit",
@@ -40,7 +50,11 @@ impl ModuleKind {
     }
     pub fn slot(self) -> ModuleSlot {
         match self {
-            Self::PulseLaser | Self::MiningLaser => ModuleSlot::FrontLaser,
+            Self::PulseLaser
+            | Self::MiningLaser
+            | Self::BeamLaser
+            | Self::MilitaryLaser
+            | Self::NavalLaser => ModuleSlot::FrontLaser,
             _ => ModuleSlot::Energy,
         }
     }
@@ -65,6 +79,9 @@ impl ModuleKind {
         match self {
             Self::PulseLaser => Some((14500, 3)),
             Self::MiningLaser => Some((MINING_LASER_PRICE_TENTHS, MINING_LASER_REQUIRED_TL)),
+            Self::BeamLaser => Some((47000, 7)),
+            Self::MilitaryLaser => Some((164000, 14)),
+            Self::NavalLaser => None,
             Self::ExtraEnergyUnit => Some((72000, 9)),
             Self::NavalEnergyUnit => Some((196000, 17)),
             Self::EliteEnergyUnit => Some((135000, 14)),
@@ -81,7 +98,7 @@ impl ModuleKind {
     }
     fn maximum_owned(self) -> usize {
         match self {
-            Self::PulseLaser => 4,
+            Self::PulseLaser | Self::BeamLaser | Self::MilitaryLaser | Self::NavalLaser => 4,
             Self::MiningLaser => 5,
             _ => 1,
         }
@@ -94,6 +111,9 @@ impl ModuleKind {
             Self::ExtraEnergyUnit => 3,
             Self::NavalEnergyUnit => 4,
             Self::EliteEnergyUnit => 5,
+            Self::BeamLaser => 6,
+            Self::MilitaryLaser => 7,
+            Self::NavalLaser => 8,
         }
     }
     fn from_tag(tag: u8) -> Result<Self, SaveError> {
@@ -104,6 +124,9 @@ impl ModuleKind {
             3 => Ok(Self::ExtraEnergyUnit),
             4 => Ok(Self::NavalEnergyUnit),
             5 => Ok(Self::EliteEnergyUnit),
+            6 => Ok(Self::BeamLaser),
+            7 => Ok(Self::MilitaryLaser),
+            8 => Ok(Self::NavalLaser),
             _ => Err(SaveError::InvalidEncoding),
         }
     }
@@ -312,7 +335,11 @@ impl Ledger {
     }
     fn apply(&mut self, event: Event, transaction: u32) -> Result<(), ModuleError> {
         if let Some(kind) = event.action.purchase_kind() {
-            let (price, _) = kind.shop().ok_or(ModuleError::NotForSale)?;
+            let price = if event.xyzzy && kind == ModuleKind::NavalLaser {
+                0
+            } else {
+                kind.shop().ok_or(ModuleError::NotForSale)?.0
+            };
             if self.items.iter().filter(|i| i.kind == kind).count() >= kind.maximum_owned() {
                 return Err(ModuleError::Capacity);
             }
@@ -423,8 +450,10 @@ impl State {
                 previous.map(|p| (p.dock.sequence(), p.tick, p.revision)),
             )?;
             let serial = if e.xyzzy {
-                if e.action.purchase_kind() != Some(ModuleKind::EliteEnergyUnit)
-                    || !world.xyzzy.authorizes(e.dock, e.tick, e.revision)
+                if !matches!(
+                    e.action.purchase_kind(),
+                    Some(ModuleKind::EliteEnergyUnit | ModuleKind::NavalLaser)
+                ) || !world.xyzzy.authorizes(e.dock, e.tick, e.revision)
                 {
                     return Err(INVALID);
                 }
@@ -511,26 +540,30 @@ impl State {
         }
         Ok(ledger)
     }
-    fn item_at(&self, owner: u64, item: u64, tick: u64, visit: u64) -> Option<OwnedModule> {
+    fn ledger_at(&self, owner: u64, tick: u64, visit: u64) -> Option<Ledger> {
         let mut ledger = Ledger::born(owner).ok()?;
-        let mut transaction = 0;
+        let mut paid = 0;
         let mut grants = 0;
-        for event in self.events.iter().filter(|e| e.tick <= tick) {
-            if event.dock.visit() >= visit {
+        for e in self.events.iter().filter(|e| e.tick <= tick) {
+            if e.dock.visit() >= visit {
                 return None;
             }
-            if event.action.purchase_kind().is_some() {
-                if event.xyzzy {
+            if e.action.purchase_kind().is_some() {
+                if e.xyzzy {
                     grants += 1;
                 } else {
-                    transaction += 1;
+                    paid += 1;
                 }
             }
-            ledger
-                .apply(*event, if event.xyzzy { grants } else { transaction })
-                .ok()?;
+            ledger.apply(*e, if e.xyzzy { grants } else { paid }).ok()?;
         }
-        ledger.items.into_iter().find(|i| i.id == item)
+        Some(ledger)
+    }
+    fn item_at(&self, owner: u64, item: u64, tick: u64, visit: u64) -> Option<OwnedModule> {
+        self.ledger_at(owner, tick, visit)?
+            .items
+            .into_iter()
+            .find(|i| i.id == item)
     }
     pub(super) fn encode(&self, w: &mut Writer) {
         w.u32(self.events.len() as u32);
@@ -633,6 +666,8 @@ impl World {
         [
             ModuleKind::PulseLaser,
             ModuleKind::MiningLaser,
+            ModuleKind::BeamLaser,
+            ModuleKind::MilitaryLaser,
             ModuleKind::ExtraEnergyUnit,
             ModuleKind::NavalEnergyUnit,
             ModuleKind::EliteEnergyUnit,
@@ -778,6 +813,15 @@ impl World {
             return Err(ModuleError::BerthRequired);
         }
         if let Some(kind) = action.purchase_kind() {
+            if matches!(
+                kind,
+                ModuleKind::BeamLaser | ModuleKind::MilitaryLaser | ModuleKind::NavalLaser
+            ) && self.resource_history.is_none()
+            {
+                return Err(ModuleError::Save(SaveError::InvalidState(
+                    "fast lasers require fresh resource history",
+                )));
+            }
             let (price, required) = kind.shop().ok_or(ModuleError::NotForSale)?;
             if crate::equipment::definition()
                 .map_err(|_| ModuleError::BerthRequired)?
@@ -920,24 +964,26 @@ mod energy_pulse_tests;
 
 impl World {
     /// Only the explicit secret transaction calls this, never a menu/readout or ordinary purchase.
-    pub(super) fn grant_xyzzy_energy(
+    pub(super) fn grant_xyzzy_module(
         &mut self,
         dock: DockContext,
         tick: u64,
+        kind: ModuleKind,
     ) -> Result<(), SaveError> {
+        if !matches!(kind, ModuleKind::EliteEnergyUnit | ModuleKind::NavalLaser)
+            || self.resource_history.is_none()
+        {
+            return Err(INVALID);
+        }
         let current = self.commander_account.as_ref().ok_or(INVALID)?;
         let ledger = self.modular.ledger(self, current)?;
-        if let Some(item) = ledger
-            .items
-            .iter()
-            .find(|i| i.kind == ModuleKind::EliteEnergyUnit)
-        {
-            if item.slot == Some(ModuleSlot::Energy) {
+        if let Some(item) = ledger.items.iter().find(|i| i.kind == kind) {
+            if item.slot == Some(kind.slot()) {
                 return Ok(());
             }
             let action = ModuleAction::Install {
                 item: item.id,
-                replacing: ledger.fitted(ModuleSlot::Energy).map(|i| i.id),
+                replacing: ledger.fitted(kind.slot()).map(|i| i.id),
             };
             // Stage manually: the enclosing XYZZY candidate is published only once.
             let event = Event {
@@ -952,7 +998,13 @@ impl World {
             ledger.apply(event, 0).map_err(|_| INVALID)?;
             let owner = dock.owner().seed();
             let account = current
-                .prepare_module(0, ledger.front().is_some_and(|i| i.id == owner + 7), false)
+                .prepare_module(
+                    0,
+                    ledger.front().is_some_and(|i| i.id == owner + 7),
+                    ledger
+                        .fitted(ModuleSlot::Energy)
+                        .is_some_and(|i| i.id == owner + 5),
+                )
                 .map_err(|_| INVALID)?;
             self.commander_account = Some(account);
             self.modular.events.push(event);
@@ -964,9 +1016,7 @@ impl World {
         }
         let event = Event {
             xyzzy: true,
-            action: ModuleAction::Purchase {
-                kind: ModuleKind::EliteEnergyUnit,
-            },
+            action: ModuleAction::Purchase { kind },
             item: dock
                 .owner()
                 .seed()
@@ -976,11 +1026,19 @@ impl World {
             tick,
             revision: current.revision().checked_add(1).ok_or(INVALID)?,
         };
-        let pulse_fitted = ledger
-            .front()
-            .is_some_and(|i| i.id == dock.owner().seed() + 7);
+        let mut ledger = ledger;
+        ledger
+            .apply(event, (count + 1) as u32)
+            .map_err(|_| INVALID)?;
+        let owner = dock.owner().seed();
         let account = current
-            .prepare_module(0, pulse_fitted, false)
+            .prepare_module(
+                0,
+                ledger.front().is_some_and(|i| i.id == owner + 7),
+                ledger
+                    .fitted(ModuleSlot::Energy)
+                    .is_some_and(|i| i.id == owner + 5),
+            )
             .map_err(|_| INVALID)?;
         self.commander_account = Some(account);
         self.modular.events.push(event);
@@ -990,3 +1048,28 @@ impl World {
 
 #[cfg(test)]
 mod xyzzy_tests;
+
+impl World {
+    pub(super) fn replay_energy_recharge(&self, tick: u64, visit: u64) -> Option<u16> {
+        let owner = self.commander_id()?.seed();
+        let ledger = self.modular.ledger_at(owner, tick, visit)?;
+        Some(
+            super::weapons::ENERGY_RECHARGE_HUNDREDTHS
+                * ledger
+                    .fitted(ModuleSlot::Energy)
+                    .and_then(|i| i.kind.energy_recharge_multiplier())
+                    .unwrap_or(1),
+        )
+    }
+    pub(super) fn has_fast_module(&self) -> bool {
+        self.modular.events.iter().any(|e| {
+            matches!(
+                e.action.purchase_kind(),
+                Some(ModuleKind::BeamLaser | ModuleKind::MilitaryLaser | ModuleKind::NavalLaser)
+            )
+        })
+    }
+}
+
+#[cfg(test)]
+mod rapid_tests;

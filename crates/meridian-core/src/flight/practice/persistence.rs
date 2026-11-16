@@ -3,7 +3,6 @@ use super::{
     PracticeOutcome, Range, RecordedPose, Retirement, RigidPose, Snapshot, SystemId, geometry,
     lifecycle, reception,
 };
-use crate::flight::weapons::PulseResources;
 use crate::navigation::SavedNavigationSummary;
 use crate::save::{Reader, SaveError, Writer};
 const INVALID: SaveError = SaveError::InvalidState("T02 practice consent, visit or receipts");
@@ -112,8 +111,9 @@ impl Practice {
         navigation: NavigationState,
         flight: Snapshot,
         data: &OriginalStationData,
-        pulse: PulseResources,
+        world: &super::super::World,
     ) -> Result<(), SaveError> {
+        let pulse = world.pulse;
         self.validate_closure(nav, flight.tick)?;
         let sortie = self.sortie().ok_or(INVALID)?;
         self.validate_consent(nav, flight.tick)?;
@@ -136,13 +136,14 @@ impl Practice {
                 // advances the weapon clock; docking and arrival retain cooldown.
                 // A later discharge can only raise the remainder of this floor.
                 let elapsed = flight.tick - latest_hit;
-                let minimum = u64::from(crate::PULSE_COOLDOWN_TICKS).saturating_sub(elapsed);
+                let minimum = u64::from(world.resource_cooldown_at(latest_hit).ok_or(INVALID)?)
+                    .saturating_sub(elapsed);
                 if u64::from(pulse.remaining_cooldown()) < minimum {
                     return Err(INVALID);
                 }
             }
         }
-        self.validate_reception(nav, flight, pulse, navigation.dock())
+        self.validate_reception(nav, flight, world, navigation.dock())
     }
     fn validate_consent(self, nav: SavedNavigationSummary, tick: u64) -> Result<(), SaveError> {
         use crate::navigation::DockOrigin;

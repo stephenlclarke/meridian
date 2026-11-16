@@ -27,6 +27,10 @@
 
 Meridian is a Rust reimplementation of the original L337 project, with direct wgpu graphics, one authoritative World and traceable original content. New code is [proprietary/source-visible](LICENSE); imported original content retains its own notices. Original Elite/Oolite assets are excluded.
 
+## Fast front laser source awaiting execution
+
+The [fast-laser increment](docs/FAST-LASERS.md) adds genuine paid Beam, source-gated Military class and actual front Naval firing from explicit XYZZY provenance. Fresh profiles replay complete resource events from birth, including six-tick deficits, cooldown, heat, shields, docking and retained impacts. Seventeen standalone plus two Root/MC1 cases are **UNRUN**. Old Pulse/Mining guards remain; ordinary Naval sale, other facings, actual MC1 work-record binding and all-hull composition remain explicit requirements. No parent/e470/native result qualifies this source.
+
 ## Commander CLARKE / XYZZY source awaiting execution
 
 The [explicit secret-mode increment](docs/XYZZY.md) adds persisted Commander CLARKE, the original one-time finite1,000,000 CR cash reset, separate secret provenance for actual supported equipment, finite missile refill, cargo expansion and real unlimited-fuel supply. It is a supported subset; full legacy maximum outfit and unavailable automation are listed as dependencies. Seventeen new Rust cases are **UNRUN**. This author source is separate from frozen e470, published previews and legitimately earned acceptance. Root host presentation, serial composition, whole review and exact compiler/native checks remain required.

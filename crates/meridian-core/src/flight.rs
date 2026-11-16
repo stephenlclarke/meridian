@@ -1,3 +1,4 @@
+mod resource_history;
 mod xyzzy;
 pub(crate) use xyzzy::STARTING_CREDITS_TENTHS;
 pub use xyzzy::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
@@ -125,11 +126,15 @@ pub enum StepError {
     UnsafeEntry,
     UnsafeLaunch,
     Paused,
+    SaveRefused,
 }
 
 impl fmt::Display for StepError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         formatter.write_str(match self {
+            Self::SaveRefused => {
+                "Flight transition could not preserve the complete resource history"
+            }
             Self::NonFiniteInput => "flight input must be finite",
             Self::InputOutOfRange => "held flight controls must be within [-1, 1]",
             Self::TickOverflow => "simulation tick exhausted",
@@ -162,6 +167,7 @@ pub struct World {
     ammunition: ammunition::State,
     modular: modular::State,
     xyzzy: xyzzy::State,
+    resource_history: Option<resource_history::History>,
     navigation_trade: navigation_trade::State,
     flight_reception: flight_reception::State,
     practice: Option<practice::Practice>,
@@ -200,6 +206,7 @@ impl World {
             ammunition: ammunition::State::default(),
             modular: modular::State::default(),
             xyzzy: xyzzy::State::default(),
+            resource_history: None,
             navigation_trade: navigation_trade::State::default(),
             flight_reception: flight_reception::State::default(),
             practice: None,
@@ -246,6 +253,7 @@ impl World {
         world.commander_account = Some(account);
         world.navigation = Some(navigation);
         world.freight_session = navigation.dock().map(mission::FreightSession::fresh);
+        world.resource_history = Some(resource_history::History::default());
         world.station_markets = Some(
             crate::station_services::StationMarkets::new_commander(seed)
                 .map_err(|_| NavigationError::ServiceUnavailable)?,
@@ -410,6 +418,31 @@ impl World {
             .map(|session| session.next_epoch())
             .transpose()
             .map_err(|_| StepError::TickOverflow)?;
+        let mut history = self.resource_history.clone();
+        if let Some(h) = &mut history {
+            h.push(resource_history::Event::Launch {
+                dock: self.current_dock_context().ok_or(StepError::InvalidMode)?,
+                tick: expected_tick,
+            });
+        }
+        if history.is_some() {
+            let mut candidate =
+                Self::decode_saved_world(&self.save_bytes().map_err(|_| StepError::SaveRefused)?)
+                    .map_err(|_| StepError::SaveRefused)?;
+            candidate.publish_launch(next, navigation, mission_epoch, history.clone());
+            candidate.save_bytes().map_err(|_| StepError::SaveRefused)?;
+        }
+        self.publish_launch(next, navigation, mission_epoch, history);
+        Ok(())
+    }
+
+    fn publish_launch(
+        &mut self,
+        next: Snapshot,
+        navigation: Option<NavigationState>,
+        mission_epoch: Option<u64>,
+        history: Option<resource_history::History>,
+    ) {
         if let Some(account) = &mut self.commander_account {
             account.record_departure_legality();
         }
@@ -419,7 +452,7 @@ impl World {
         if let Some((session, epoch)) = self.freight_session.as_mut().zip(mission_epoch) {
             session.rebind_dock(None, epoch);
         }
-        Ok(())
+        self.resource_history = history;
     }
 
     /// Advance exactly one 1/60-second tick. Errors leave World unchanged.
@@ -552,6 +585,35 @@ impl World {
         let prepared = self.prepare_missile_step(next, navigation)?;
         let navigation_trade =
             self.prepare_navigation_trade_step(navigation, planned_debit, next.tick)?;
+        let boundary = FlightBoundary {
+            next,
+            navigation,
+            prepared,
+            navigation_trade,
+            planned_debit,
+            mission_epoch,
+            flight_reception_start,
+        };
+        if boundary.prepared.resource_history.is_some() {
+            let mut candidate =
+                Self::decode_saved_world(&self.save_bytes().map_err(|_| StepError::SaveRefused)?)
+                    .map_err(|_| StepError::SaveRefused)?;
+            candidate.commit_flight_boundary(boundary.clone())?;
+            candidate.save_bytes().map_err(|_| StepError::SaveRefused)?;
+        }
+        self.commit_flight_boundary(boundary)?;
+        Ok(())
+    }
+    fn commit_flight_boundary(&mut self, boundary: FlightBoundary) -> Result<(), StepError> {
+        let FlightBoundary {
+            next,
+            navigation,
+            prepared,
+            navigation_trade,
+            planned_debit,
+            mission_epoch,
+            flight_reception_start,
+        } = boundary;
         if let Some(debit) = planned_debit {
             self.commander_account
                 .as_mut()
@@ -562,6 +624,9 @@ impl World {
         // No fallible operation follows the first account mutation.
         if let Some(navigation_trade) = navigation_trade {
             self.navigation_trade = navigation_trade;
+        }
+        if let Some(history) = prepared.resource_history {
+            self.resource_history = Some(history);
         }
         self.missiles = prepared.missiles;
         self.combat = prepared.combat;
@@ -583,6 +648,17 @@ impl World {
         }
         Ok(())
     }
+}
+
+#[derive(Clone)]
+struct FlightBoundary {
+    next: Snapshot,
+    navigation: Option<NavigationState>,
+    prepared: missiles::PreparedStep,
+    navigation_trade: Option<navigation_trade::State>,
+    planned_debit: Option<u16>,
+    mission_epoch: Option<u64>,
+    flight_reception_start: Option<flight_reception::Sample>,
 }
 
 fn axis_rotation(axis: usize, angle: f32) -> [f32; 4] {

@@ -153,8 +153,8 @@
     {
       "key": "max/lasers",
       "legacyBehavior": "Naval Laser on every supported combat facing.",
-      "state": "DEPENDENCY",
-      "dependency": "Real Naval firing profile64/0.1s, multi-shot energy deficits, historical class/facing custody. No Pulse fallback labelled Naval."
+      "state": "PARTIAL_CORE",
+      "dependency": "Actual front Naval64/6tick with XYZzy provenance, resource replay and retained receipt/interception binding implemented. Other supported facings and genuine discovered secret-port135000 ordinary sale still require their actual owners."
     },
     {
       "key": "max/Fuel Scoops",
@@ -222,5 +222,6 @@
       "state": "IMPLEMENTED",
       "dependency": "Actual SH025 nine slots; spent IDs/origins retained; getters never refill; no paid receipt for granted rounds."
     }
-  ]
+  ],
+  "rapidFollowup": "Current author source adds actual front Naval; all other combat facings and ordinary discovered-port sale remain open."
 }

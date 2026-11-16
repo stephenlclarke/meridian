@@ -1182,6 +1182,10 @@ impl State {
             || world
                 .owned_front_laser_at(shot.fitted_item_id, shot.tick, p.origin.owner)
                 .is_none()
+            || !world.resource_history.as_ref().is_none_or(|h| {
+                h.shot_at(shot.tick)
+                    .is_some_and(|s| s.item == shot.fitted_item_id && s.emission == emission)
+            })
             || id != p.origin.projectile
             || !valid_vector(shot.origin)
             || !valid_vector(shot.direction)

@@ -281,6 +281,11 @@ impl World {
         if action != XyzzyAction::Enter && !self.xyzzy.active() {
             return Err(XyzzyError::Inactive);
         }
+        if action.outfit() && self.resource_history.is_none() {
+            return Err(XyzzyError::Save(SaveError::InvalidState(
+                "XYZZY maximum requires a fresh resource-history commander",
+            )));
+        }
         if self
             .navigation_trade_snapshot()
             .is_some_and(|s| s.active.is_some())
@@ -358,7 +363,16 @@ impl World {
         self.xyzzy.records.push(record);
         self.commander_account = Some(account);
         if review.action.outfit() {
-            self.grant_xyzzy_energy(review.dock, review.tick)?;
+            self.grant_xyzzy_module(
+                review.dock,
+                review.tick,
+                super::modular::ModuleKind::EliteEnergyUnit,
+            )?;
+            self.grant_xyzzy_module(
+                review.dock,
+                review.tick,
+                super::modular::ModuleKind::NavalLaser,
+            )?;
             self.grant_xyzzy_missiles(review.dock, review.tick)?;
             let account = self
                 .commander_account

@@ -17,6 +17,9 @@ pub enum OrdinaryTarget {
 pub enum OrdinaryWeapon {
     FrontPulseLaser,
     FrontMiningLaser,
+    FrontBeamLaser,
+    FrontMilitaryLaser,
+    FrontNavalLaser,
     StandardMissile,
 }
 
@@ -25,6 +28,9 @@ impl OrdinaryWeapon {
         match self {
             Self::FrontPulseLaser => 1500,
             Self::FrontMiningLaser => 5000,
+            Self::FrontBeamLaser => 1500,
+            Self::FrontMilitaryLaser => 2300,
+            Self::FrontNavalLaser => 6400,
             Self::StandardMissile => 16_000,
         }
     }
@@ -32,11 +38,42 @@ impl OrdinaryWeapon {
         match kind {
             super::modular::ModuleKind::PulseLaser => Some(Self::FrontPulseLaser),
             super::modular::ModuleKind::MiningLaser => Some(Self::FrontMiningLaser),
+            super::modular::ModuleKind::BeamLaser => Some(Self::FrontBeamLaser),
+            super::modular::ModuleKind::MilitaryLaser => Some(Self::FrontMilitaryLaser),
+            super::modular::ModuleKind::NavalLaser => Some(Self::FrontNavalLaser),
             _ => None,
         }
     }
-    fn is_laser(self) -> bool {
-        matches!(self, Self::FrontPulseLaser | Self::FrontMiningLaser)
+    pub(super) fn is_laser(self) -> bool {
+        self != Self::StandardMissile
+    }
+    pub(super) fn cooldown_ticks(self) -> u8 {
+        match self {
+            Self::FrontBeamLaser | Self::FrontMilitaryLaser | Self::FrontNavalLaser => 6,
+            Self::StandardMissile => 0,
+            _ => 18,
+        }
+    }
+    pub(super) fn tag(self) -> u8 {
+        match self {
+            Self::FrontPulseLaser => 0,
+            Self::StandardMissile => 1,
+            Self::FrontMiningLaser => 2,
+            Self::FrontBeamLaser => 3,
+            Self::FrontMilitaryLaser => 4,
+            Self::FrontNavalLaser => 5,
+        }
+    }
+    pub(super) fn from_tag(tag: u8) -> Result<Self, SaveError> {
+        match tag {
+            0 => Ok(Self::FrontPulseLaser),
+            1 => Ok(Self::StandardMissile),
+            2 => Ok(Self::FrontMiningLaser),
+            3 => Ok(Self::FrontBeamLaser),
+            4 => Ok(Self::FrontMilitaryLaser),
+            5 => Ok(Self::FrontNavalLaser),
+            _ => Err(SaveError::InvalidEncoding),
+        }
     }
 }
 
@@ -114,6 +151,7 @@ pub(super) struct PreparedPulseImpact {
     identity: CombatIdentity,
     opening_legal: u8,
     item: u64,
+    weapon: OrdinaryWeapon,
     opening_pulse: super::weapons::PulseResources,
     pulse: super::weapons::PulseResources,
     epoch: u64,
@@ -209,7 +247,7 @@ impl State {
     }
     // A future ordnance producer must first bind its own retained physical contact.
     // Keeping this reducer private prevents the host from submitting raw damage.
-    fn resolve_impact(
+    pub(super) fn resolve_impact(
         &mut self,
         pulse: &mut super::weapons::PulseResources,
         target: OrdinaryTarget,
@@ -329,7 +367,9 @@ impl State {
             // At the receipt's own tick neither clock can have moved past it.
             if elapsed_physical > elapsed_global
                 || (elapsed_global == 0 && !uninterrupted)
+                || (hit.weapon.is_laser() && !world.resource_hit_matches(hit))
                 || (hit.weapon.is_laser()
+                    && !world.rapid_resource_history()
                     && !world.pulse.fits_ordinary_hit(
                         elapsed_physical,
                         uninterrupted,
@@ -401,7 +441,7 @@ impl World {
         {
             return Err(FireError::InvalidGeometry);
         }
-        let mut pulse = self.pulse.prepare_discharge()?;
+        let mut pulse = self.pulse.prepare_laser_discharge(fitted.1)?;
         let mut next = self.combat;
         next.emissions = next
             .emissions
@@ -450,6 +490,7 @@ impl World {
             identity,
             opening_legal: legal,
             item: shot.fitted_item_id,
+            weapon: fitted.1,
             opening_pulse: self.pulse,
             pulse,
             epoch: self
@@ -478,9 +519,22 @@ impl PreparedPulseImpact {
             || world.pulse != self.opening_pulse
             || world.combat_identity() != Some(self.identity)
             || world.legal_value() != Some(self.opening_legal)
-            || world.fitted_front_laser().map(|(item, _)| item) != Some(self.item)
+            || world.fitted_front_laser() != Some((self.item, self.weapon))
         {
             return Err(FireError::StaleCommand);
+        }
+        if let Some(history) = &mut world.resource_history {
+            history.push(super::resource_history::Event::Shot(
+                super::resource_history::Shot {
+                    tick: self.flight.tick,
+                    physical: self.next.physical_tick,
+                    system: self.identity.system,
+                    visit: self.identity.visit,
+                    item: self.item,
+                    weapon: self.weapon,
+                    emission: self.next.emissions,
+                },
+            ));
         }
         world
             .commander_account
@@ -528,11 +582,7 @@ impl OrdinaryImpact {
             w.f32(n);
         }
         if version >= 8 {
-            w.u8(match self.weapon {
-                OrdinaryWeapon::FrontPulseLaser => 0,
-                OrdinaryWeapon::StandardMissile => 1,
-                OrdinaryWeapon::FrontMiningLaser => 2,
-            });
+            w.u8(self.weapon.tag());
             w.u8(match self.target {
                 OrdinaryTarget::MainStation => 0,
                 OrdinaryTarget::Player { front: true } => 1,
@@ -572,12 +622,7 @@ impl OrdinaryImpact {
             orientation: r.array(|r| r.f32())?,
         };
         if version >= 8 {
-            hit.weapon = match r.u8()? {
-                0 => OrdinaryWeapon::FrontPulseLaser,
-                1 => OrdinaryWeapon::StandardMissile,
-                2 => OrdinaryWeapon::FrontMiningLaser,
-                _ => return Err(SaveError::InvalidEncoding),
-            };
+            hit.weapon = OrdinaryWeapon::from_tag(r.u8()?)?;
             hit.target = match r.u8()? {
                 0 => OrdinaryTarget::MainStation,
                 1 => OrdinaryTarget::Player { front: true },
@@ -616,6 +661,7 @@ impl OrdinaryImpact {
             || self.attacker.owner != current.owner
             || self.attacker.hull != current.hull
             || world.owned_front_laser_at(self.item, self.tick, self.attacker) != Some(self.weapon)
+            || !world.resource_hit_matches(self)
             || station_index(self.attacker.system).is_none()
             || self.attacker.visit < 2
             || self.attacker.visit > current.visit
@@ -678,3 +724,40 @@ mod tests;
 
 #[cfg(test)]
 mod mining_laser_tests;
+
+impl State {
+    pub(super) fn replay_advance(&mut self, ticks: u64, docked: bool) {
+        self.front = (u128::from(self.front) + u128::from(ticks) * u128::from(SHIELD_RECHARGE))
+            .min(u128::from(SHIELD_CAPACITY)) as u16;
+        self.rear = (u128::from(self.rear) + u128::from(ticks) * u128::from(SHIELD_RECHARGE))
+            .min(u128::from(SHIELD_CAPACITY)) as u16;
+        if docked {
+            self.front = SHIELD_CAPACITY;
+            self.rear = SHIELD_CAPACITY;
+        }
+    }
+    pub(super) fn shield_resources(self) -> (u16, u16) {
+        (self.front, self.rear)
+    }
+}
+
+#[cfg(test)]
+mod fast_profile_tests {
+    use super::*;
+    #[test]
+    fn fast_source_damage_reducer_and_cadence_are_not_pulse_aliases() {
+        // Internal reducer fixture only; no public NPC victim is manufactured.
+        for (weapon, damage, left) in [
+            (OrdinaryWeapon::FrontBeamLaser, 1500, 28500),
+            (OrdinaryWeapon::FrontMilitaryLaser, 2300, 27700),
+            (OrdinaryWeapon::FrontNavalLaser, 6400, 23600),
+        ] {
+            assert_eq!(weapon.damage_hundredths(), damage);
+            assert_eq!(weapon.cooldown_ticks(), 6);
+            let mut state = State::default();
+            let mut pool = super::super::weapons::PulseResources::default();
+            state.resolve_impact(&mut pool, OrdinaryTarget::Player { front: true }, weapon);
+            assert_eq!(state.shield_resources(), (left, 30000));
+        }
+    }
+}

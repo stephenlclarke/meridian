@@ -26,10 +26,12 @@ pub enum FireError {
     InsufficientEnergy,
     InvalidGeometry,
     SequenceExhausted,
+    SaveRefused,
 }
 impl fmt::Display for FireError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(match self {
+            Self::SaveRefused => "Laser discharge could not preserve the complete save",
             Self::StaleCommand => "Fire command does not match the current tick",
             Self::Paused => "World is paused",
             Self::NoCommander => "An owned commander profile is required",
@@ -370,7 +372,7 @@ impl World {
             weapon,
             damage_hundredths: weapon.damage_hundredths(),
             range: 6000,
-            cooldown_ticks_per_shot: PULSE_COOLDOWN_TICKS,
+            cooldown_ticks_per_shot: weapon.cooldown_ticks(),
         })
     }
 
@@ -430,7 +432,11 @@ impl World {
                 .map(|(item, _)| item)
                 .ok_or(FireError::NoFittedFrontLaser)?
         };
-        self.pulse.prepare_discharge()?;
+        let weapon = self
+            .fitted_front_laser()
+            .ok_or(FireError::NoFittedFrontLaser)?
+            .1;
+        self.pulse.prepare_laser_discharge(weapon)?;
         let pose = flight_pose(self.state.position, self.state.orientation)
             .ok_or(FireError::InvalidGeometry)?;
         let origin = pose.position;
@@ -456,7 +462,15 @@ impl World {
         {
             return Err(FireError::InvalidGeometry);
         }
-        impact.commit(self)?;
+        let old_combat = self.combat;
+        let old_pulse = self.pulse;
+        let old_practice = self.practice;
+        let old_missiles = self.missiles.clone();
+        let old_history = self.resource_history.clone();
+        if let Err(error) = impact.commit(self) {
+            self.resource_history = old_history;
+            return Err(error);
+        }
         self.missiles = missiles;
         if let (Some(candidate), Some(current)) = (&mut practice, self.practice) {
             candidate.ordinary_hit = current.ordinary_hit;
@@ -467,10 +481,59 @@ impl World {
             practice.observe_discharge(self.state.tick);
         }
         self.practice = practice;
-
+        if self.resource_history.is_some() && self.save_bytes().is_err() {
+            self.combat = old_combat;
+            self.pulse = old_pulse;
+            self.practice = old_practice;
+            self.missiles = old_missiles;
+            self.resource_history = old_history;
+            return Err(FireError::SaveRefused);
+        }
         Ok(shot)
     }
 }
 
 #[cfg(test)]
 mod tests;
+
+impl PulseResources {
+    pub(super) fn prepare_laser_discharge(
+        self,
+        weapon: super::OrdinaryWeapon,
+    ) -> Result<Self, FireError> {
+        if !weapon.is_laser() {
+            return Err(FireError::NoFittedFrontLaser);
+        }
+        if weapon.cooldown_ticks() == PULSE_COOLDOWN_TICKS {
+            return self.prepare_discharge();
+        }
+        if self.cooldown != 0 {
+            return Err(FireError::CoolingDown);
+        }
+        if self.heat >= HEAT_LIMIT_FIFTHS {
+            return Err(FireError::Overheated);
+        }
+        if self.energy <= ENERGY_COST_HUNDREDTHS {
+            return Err(FireError::InsufficientEnergy);
+        }
+        Ok(Self {
+            energy: self.energy - ENERGY_COST_HUNDREDTHS,
+            heat: self.heat + HEAT_COST_FIFTHS,
+            cooldown: weapon.cooldown_ticks(),
+        })
+    }
+    pub(super) fn replay_advance(&mut self, ticks: u64, recharge: u16, docked: bool) {
+        self.energy = (u128::from(self.energy) + u128::from(ticks) * u128::from(recharge))
+            .min(u128::from(ENERGY_CAPACITY_HUNDREDTHS)) as u16;
+        self.heat = self
+            .heat
+            .saturating_sub(ticks.min(u64::from(u16::MAX)) as u16);
+        self.cooldown = self
+            .cooldown
+            .saturating_sub(ticks.min(u64::from(u8::MAX)) as u8);
+        if docked {
+            self.energy = ENERGY_CAPACITY_HUNDREDTHS;
+            self.heat = 0;
+        }
+    }
+}

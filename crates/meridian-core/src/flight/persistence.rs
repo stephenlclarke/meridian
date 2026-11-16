@@ -96,7 +96,7 @@ const V11_CONTENT: &[u8] = concat!(
 .as_bytes();
 
 const CONTENT: &[u8] = concat!(
-    "meridian-world/rules/16;explicit-xyzzy/finite-cash-supported-outfit-v1/a11fe169;front-mining-combat/v1/a11fe169;modular-energy-paid-pulse/v1/a11fe169;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
+    "meridian-world/rules/17;fresh-resource-replay-fast-front/v1/a11fe169;explicit-xyzzy/finite-cash-supported-outfit-v1/a11fe169;front-mining-combat/v1/a11fe169;modular-energy-paid-pulse/v1/a11fe169;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -336,6 +336,7 @@ impl World {
         w.option(practice.and_then(|p| p.ordinary_hit).as_ref(), |w, hit| {
             hit.encode(w)
         });
+        w.option(self.resource_history.as_ref(), |w, h| h.encode(w));
         self.pulse.encode_save(&mut w);
         let digest = checksum(&w.bytes);
         w.u64(digest);
@@ -384,7 +385,7 @@ impl World {
         Ok(())
     }
 
-    fn decode_saved_world(bytes: &[u8]) -> Result<Self, SaveError> {
+    pub(super) fn decode_saved_world(bytes: &[u8]) -> Result<Self, SaveError> {
         if bytes.len() > MAX_SAVE_BYTES {
             return Err(SaveError::TooLarge);
         }
@@ -474,6 +475,7 @@ impl World {
             ammunition,
             modular,
             xyzzy,
+            resource_history: None,
             flight_reception,
             navigation_trade,
             practice_history,
@@ -490,6 +492,9 @@ impl World {
                 (None, None) => {}
                 _ => return Err(SaveError::InvalidEncoding),
             }
+        }
+        if version >= 17 {
+            candidate.resource_history = r.option(super::resource_history::History::decode)?;
         }
         candidate.pulse = weapons::PulseResources::decode_save(&mut r)?;
         if !r.finished() {
@@ -567,6 +572,13 @@ impl World {
         )?;
         self.missiles
             .validate(self, practice, history, nav.dock_sequence)?;
+        if let Some(history) = &self.resource_history {
+            history.validate(self)?;
+        } else if self.has_fast_module() {
+            return Err(SaveError::InvalidState(
+                "fast equipment without fresh resource history",
+            ));
+        }
         self.combat.validate(self)?;
         for attempt in practice::lifecycle::lessons(practice, history) {
             if let Some(last) = self.combat_snapshot().and_then(|s| s.last_ordinary_impact)
@@ -592,26 +604,28 @@ impl World {
                 }
             }
         }
-        if self
-            .missiles
-            .has_undocked_player_hit(practice, history, nav.dock_sequence)
-        {
-            self.pulse.validate_damaged_save(
-                self.state.tick,
-                self.state.mode,
-                nav.launches,
-                self.energy_recharge_hundredths(),
-            )?;
-        } else {
-            self.pulse.validate_save(
-                self.state.tick,
-                self.state.mode,
-                nav.launches,
-                self.energy_recharge_hundredths(),
-            )?;
+        if !self.rapid_resource_history() {
+            if self
+                .missiles
+                .has_undocked_player_hit(practice, history, nav.dock_sequence)
+            {
+                self.pulse.validate_damaged_save(
+                    self.state.tick,
+                    self.state.mode,
+                    nav.launches,
+                    self.energy_recharge_hundredths(),
+                )?;
+            } else {
+                self.pulse.validate_save(
+                    self.state.tick,
+                    self.state.mode,
+                    nav.launches,
+                    self.energy_recharge_hundredths(),
+                )?;
+            }
         }
         for attempt in practice::lifecycle::lessons(practice, history) {
-            attempt.validate(nav, navigation, self.state, station, self.pulse)?;
+            attempt.validate(nav, navigation, self.state, station, self)?;
         }
         session.validate_save(navigation.dock())?;
         let domain = account.validate_saved_domain(&session.state, nav, session.epoch())?;
@@ -981,7 +995,42 @@ mod paid_missile_format_tests {
         assert_eq!(loaded.ammunition_snapshot(), world.ammunition_snapshot());
         assert_eq!(loaded.credits_tenths(), world.credits_tenths());
         let current = loaded.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
-        assert_eq!(u16::from_le_bytes([current[8], current[9]]), 16);
+        assert_eq!(u16::from_le_bytes([current[8], current[9]]), 17);
         assert_ne!(old, current);
+    }
+}
+
+#[cfg(test)]
+mod fresh_fast_history_tests {
+    use super::*;
+    #[test]
+    fn actual_v11_reader_stays_normal_and_does_not_fabricate_a_fast_resource_history() {
+        let fresh = World::new_commander(17401).unwrap_or_else(|e| panic!("{e:?}"));
+        let bytes = legacy_test_fixture(&fresh, 11).unwrap_or_else(|e| panic!("{e:?}"));
+        let mut old = World::from_save_bytes(&bytes).unwrap_or_else(|e| panic!("{e:?}"));
+        assert!(old.resource_history.is_none());
+        assert!(!old.xyzzy_snapshot().is_some_and(|s| s.active));
+        let before = old.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
+        assert!(matches!(
+            old.review_module(
+                crate::ModuleAction::Purchase {
+                    kind: crate::ModuleKind::BeamLaser
+                },
+                old.snapshot().tick
+            ),
+            Err(crate::ModuleError::Save(_))
+        ));
+        assert_eq!(old.save_bytes().unwrap_or_else(|e| panic!("{e:?}")), before);
+        old.request_launch(old.snapshot().tick)
+            .unwrap_or_else(|e| panic!("{e:?}"));
+        old.step(crate::FlightInput::default())
+            .unwrap_or_else(|e| panic!("{e:?}"));
+        assert_eq!(
+            old.request_fire_front_pulse(old.snapshot().tick)
+                .unwrap_or_else(|e| panic!("{e:?}"))
+                .fitted_item_id,
+            17408
+        );
+        assert!(old.save_bytes().is_ok());
     }
 }

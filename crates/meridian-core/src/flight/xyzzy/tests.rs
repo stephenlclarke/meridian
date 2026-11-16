@@ -20,7 +20,7 @@ fn apply(w: &mut World, action: XyzzyAction) {
 }
 fn cold(w: &World) -> World {
     let bytes = w.save_bytes().unwrap();
-    assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 16);
+    assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 17);
     let loaded = World::from_save_bytes(&bytes).unwrap();
     assert_eq!(loaded.xyzzy_snapshot(), w.xyzzy_snapshot());
     assert_eq!(loaded.snapshot(), w.snapshot());
@@ -75,7 +75,15 @@ fn explicit_activation_sets_clarke_once_and_grants_only_actual_supported_outfit_
         ModuleProvenance::XYZzy { grant: 1, .. }
     ));
     assert!(!modules.items.iter().any(|i| i.kind == ModuleKind::ExtraEnergyUnit || i.kind == ModuleKind::NavalEnergyUnit));
-    assert_eq!(w.front_laser_snapshot().unwrap().fitted_item_id, 14108);
+    let naval = w.front_laser_snapshot().unwrap();
+    assert_eq!(naval.weapon, crate::OrdinaryWeapon::FrontNavalLaser);
+    assert_eq!(
+        (naval.damage_hundredths, naval.cooldown_ticks_per_shot),
+        (6400, 6)
+    );
+    assert!(modules.items.iter().any(|i| i.id == 14108
+        && i.slot.is_none()
+        && i.provenance == ModuleProvenance::StandardBirth));
     let ammo = w.ammunition_snapshot().unwrap();
     assert_eq!(ammo.items.iter().filter(|i| i.pylon.is_some()).count(), 9);
     assert_eq!(
@@ -164,10 +172,29 @@ fn paid_purchase_after_secret_still_debits_and_reopening_or_maximum_never_repeat
     ] {
         apply(&mut w, action);
         assert_eq!(w.credits_tenths(), Some(9_985_500));
-        assert_eq!(w.modular_equipment_snapshot().unwrap().items, modules);
+        let mut expected = modules.clone();
+        for item in &mut expected {
+            if item.kind == ModuleKind::PulseLaser {
+                item.slot = None;
+            }
+            if item.kind == ModuleKind::NavalLaser {
+                item.slot = Some(ModuleSlot::FrontLaser);
+            }
+        }
+        assert_eq!(w.modular_equipment_snapshot().unwrap().items, expected);
         assert_eq!(w.ammunition_snapshot().unwrap().items, ammo);
         assert_eq!(w.equipment_snapshot().unwrap().owned, bay);
-        assert_eq!(w.front_laser_snapshot().unwrap().fitted_item_id, paid);
+        assert_eq!(
+            w.front_laser_snapshot().unwrap().weapon,
+            crate::OrdinaryWeapon::FrontNavalLaser
+        );
+        assert!(
+            w.modular_equipment_snapshot()
+                .unwrap()
+                .items
+                .iter()
+                .any(|i| i.id == paid && i.slot.is_none())
+        );
         cold(&w);
     }
 }
@@ -208,7 +235,10 @@ fn activation_after_real_earned_paid_items_preserves_payment_history_identity_ca
             .iter()
             .find(|i| i.id == paid)
             .unwrap(),
-        paid_item
+        crate::OwnedModule {
+            slot: None,
+            ..paid_item
+        }
     );
     assert_eq!(w.mission_snapshot().unwrap().freight, mission);
     // Readout balances change by the explicit cash/fuel grant; commodity custody remains empty.

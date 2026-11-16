@@ -231,12 +231,14 @@ impl State {
             .count() as u8
     }
 }
+#[derive(Clone)]
 pub(super) struct PreparedStep {
     pub(super) missiles: State,
     pub(super) combat: super::combat::State,
     pub(super) pulse: super::weapons::PulseResources,
     pub(super) practice: Option<super::practice::Practice>,
     pub(super) legal: u8,
+    pub(super) resource_history: Option<super::resource_history::History>,
 }
 impl World {
     /// Historical T01 sight reuses the exact native missile mesh and retained launch orientation.
@@ -451,7 +453,30 @@ impl World {
             pulse: self.pulse,
             practice: self.practice,
             legal: self.legal_value().unwrap_or(0),
+            resource_history: None,
         };
+        if let Some(history) = self.resource_history.as_ref() {
+            if next.mode == FlightMode::Docked && self.state.mode != FlightMode::Docked {
+                let mut h = history.clone();
+                h.push(super::resource_history::Event::Dock(
+                    navigation
+                        .and_then(|n| n.dock())
+                        .ok_or(StepError::NonFiniteState)?,
+                ));
+                prepared.resource_history = Some(h);
+            } else if let Some(nav) = navigation
+                && self
+                    .navigation
+                    .is_some_and(|old| old.snapshot(0).system != nav.snapshot(0).system)
+            {
+                let mut h = history.clone();
+                h.push(super::resource_history::Event::Arrival {
+                    tick: next.tick,
+                    system: nav.snapshot(0).system,
+                });
+                prepared.resource_history = Some(h);
+            }
+        }
         prepared.combat.advance(self.state.mode, next.mode);
         prepared.pulse.advance(
             self.state.mode,
@@ -576,7 +601,7 @@ fn advance_projectile(
     p.age_ticks = p.age_ticks.saturating_add(1);
     p.last_tick = next.tick;
     if let Some((_, mut contact)) = best {
-        contact = apply_contact(prepared, p, next, contact)?;
+        contact = apply_contact(world, prepared, p, next, contact)?;
         p.contact = Some(contact);
         p.ended = Some(MissileEnd::Impact);
     } else {
@@ -669,6 +694,7 @@ fn query_contact(
 }
 
 fn apply_contact(
+    world: &World,
     prepared: &mut PreparedStep,
     p: &ProjectileSnapshot,
     next: Snapshot,
@@ -696,6 +722,16 @@ fn apply_contact(
                 target,
             )?;
             prepared.missiles.impacts[usize::from(p.origin.projectile.ordinal)] = Some(hit);
+            if matches!(target, super::OrdinaryTarget::Player { .. })
+                && let Some(history) = world.resource_history.as_ref()
+            {
+                prepared
+                    .resource_history
+                    .get_or_insert_with(|| history.clone())
+                    .push(super::resource_history::Event::Damage(
+                        p.origin.projectile.ordinal,
+                    ));
+            }
             prepared.legal = prepared.legal.saturating_add(penalty);
             if let Some(practice) = &mut prepared.practice {
                 practice.observe_ordinary_hit(hit);
@@ -732,3 +768,17 @@ fn choose(best: &mut Option<(f64, MissileContact)>, distance: f64, contact: Miss
 
 #[cfg(test)]
 pub(super) mod tests;
+
+impl World {
+    pub(super) fn retained_resource_impacts(&self) -> Vec<(u8, super::OrdinaryImpact)> {
+        self.missiles
+            .impacts
+            .iter()
+            .enumerate()
+            .filter_map(|(i, h)| {
+                h.filter(|h| matches!(h.target, super::OrdinaryTarget::Player { .. }))
+                    .map(|h| (i as u8, h))
+            })
+            .collect()
+    }
+}
