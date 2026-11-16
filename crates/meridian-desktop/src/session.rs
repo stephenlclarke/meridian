@@ -189,7 +189,7 @@ impl Session {
             }
             Action::PreviousCommodity | Action::NextCommodity => {
                 self.invalidate();
-                let order = CommodityId::display_order().map_err(|e| e.to_string())?;
+                let order = CommodityId::display_order().map_err(crate::market::content_error)?;
                 let index = order
                     .iter()
                     .position(|id| *id == self.selected_commodity)
@@ -646,7 +646,7 @@ mod tests {
                 lines[5].contains(
                     ui.selected_commodity
                         .definition()
-                        .unwrap_or_else(|e| panic!("{e}"))
+                        .unwrap_or_else(|e| panic!("{e:?}"))
                         .name
                 )
             );

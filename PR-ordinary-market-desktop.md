@@ -17,3 +17,7 @@ Authored behavioral checks cover all seventeen source-ordered selections, read-o
 ## Joined acceptance
 
 Join exact frozen core/content components into one coherent artifact. Run the existing Dell owner compilation, tests, strict Clippy and asset/docs checks; get one independent whole-artifact review. Then qualify native Metal controls and representative tonne/kg/g trades, finite-stock/capacity/insufficient-funds refusals, mission custody and cold v2 continuation with the G1 owner. Do not silently load or reset a v1 profile, replace the installed preview before qualification, or infer graphics acceptance from headless tests.
+
+## Compiler correction
+
+The first exact joined candidate `bcddc62` failed compilation on both Dell targets because desktop catalogue callers assumed `station_services::Error` implements `Display`. Documentation, formatting and 37 importer tests passed per checkout; Rust tests, strict Clippy and binary production were not reached. Both lanes stopped without a retry. The correction maps typed catalogue errors to an explicit desktop content-read notice and uses Debug formatting in the affected test failure message. It changes no core API, accounting, content, save rules or behavioral assertion. The changed candidate requires delta review and a fresh owned qualification; no prior test pass is reused as compiler acceptance.

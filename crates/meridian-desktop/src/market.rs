@@ -2,12 +2,17 @@
 use meridian_core::World;
 use meridian_core::station_services::{self, CommodityId};
 
+pub fn content_error(_: station_services::Error) -> String {
+    "Original commodity data is unavailable; keep the current commander and report the error."
+        .into()
+}
+
 pub fn append_panel(
     world: &World,
     selected_commodity: CommodityId,
     lines: &mut Vec<String>,
 ) -> Result<(), String> {
-    let order = CommodityId::display_order().map_err(|e| e.to_string())?;
+    let order = CommodityId::display_order().map_err(content_error)?;
     let selected = order
         .iter()
         .position(|id| *id == selected_commodity)
@@ -23,7 +28,7 @@ pub fn append_panel(
         service.used_tonnes,
         world.legal_value().ok_or("No commander legal record")?
     ));
-    let definition = selected_commodity.definition().map_err(|e| e.to_string())?;
+    let definition = selected_commodity.definition().map_err(content_error)?;
     lines.push(format!(
         "SELECTED: {} | NATIVE UNIT {} | {}/17",
         definition.name,
@@ -34,7 +39,7 @@ pub fn append_panel(
     // Five source-ordered rows keep selection, actual quotes and controls visible at 640x360.
     let start = selected.saturating_sub(2).min(order.len() - 5);
     for &id in &order[start..start + 5] {
-        let definition = id.definition().map_err(|e| e.to_string())?;
+        let definition = id.definition().map_err(content_error)?;
         let quote = world.commodity_quote(id);
         let prices = quote
             .map(|q| {
@@ -90,7 +95,7 @@ pub fn service_message(event: station_services::Event) -> Result<String, String>
         } => ("Sold", commodity, credited_tenths),
         station_services::Event::Refuelled { .. } => return Ok("Fuel service complete.".into()),
     };
-    let definition = commodity.definition().map_err(|e| e.to_string())?;
+    let definition = commodity.definition().map_err(content_error)?;
     Ok(format!(
         "{verb} 1 {} {} for {}.{} CR.",
         definition.unit.symbol(),
