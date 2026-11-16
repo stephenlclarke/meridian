@@ -1,4 +1,4 @@
-.PHONY: docs-check fmt fmt-check check test clippy assets-check ci run
+.PHONY: docs-check fmt fmt-check check test clippy assets-check ci run preview-plan preview-release
 
 docs-check:
 	markdownlint-cli2 "**/*.md"
@@ -25,3 +25,10 @@ ci: docs-check fmt-check assets-check check test clippy
 
 run:
 	cargo run --locked -p meridian-desktop
+
+# Preview packages and notes are prepared by the existing platform owners.
+preview-plan:
+	python3 -B tools/preview_release.py --commit "$(PREVIEW_COMMIT)" --plan
+
+preview-release:
+	python3 -B tools/preview_release.py --commit "$(PREVIEW_COMMIT)" --macos "$(PREVIEW_MACOS)" --windows "$(PREVIEW_WINDOWS)" --notes "$(PREVIEW_NOTES)" --receipt "$(PREVIEW_RECEIPT)"

@@ -42,5 +42,6 @@ Remove obsolete ISSUE-*.md and PR-*.md handoff copies once their useful content 
 3. Qualify actual rendering/input, journey and cold continuation.
 4. Merge with final-head protected checks, then verify exact-main CI/Sonar.
 5. Package/sign and deliver the identified app with evidence and limits.
+6. Publish qualified macOS and Windows packages as a tagged GitHub prerelease using the [preview release workflow](PREVIEW-RELEASES.md). Derive its version from Conventional Commits. Verify downloadable bytes and keep only the newest three preview releases and their tags.
 
 Keep earlier installed previews and real profiles unchanged. Signing/local functional delivery does not establish notarization, commercial distribution or full first-playable acceptance. [Implementation status](IMPLEMENTATION-STATUS.md) records the latest qualified scope.

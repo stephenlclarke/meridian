@@ -33,6 +33,10 @@ N starts a commander; C continues. A second N confirms replacing the current com
 
 The freight journey requires eight identified one-tonne deliveries and awards 730 CR plus the trusted clue once. Markets use finite stock and the same account as mission and equipment transactions. Invalid saves refuse without migration, repair or fallback.
 
+## Preview releases
+
+Produced previews are to be published as [GitHub prereleases](https://github.com/stephenlclarke/meridian/releases) for macOS and Windows, with signed macOS apps, automatic Conventional Commit versions and immutable Git tags. Keep the newest three previews; delete older preview releases and their tags only after verifying the new downloads. The publisher and this policy are newly authored; no public preview has been published yet. The existing dependency-notice distribution blocker remains open. See [preview releases](docs/PREVIEW-RELEASES.md).
+
 ## Build and contribute
 
 The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain.toml) and [Cargo.lock](Cargo.lock). Use `make ci` for documentation, formatting, importers, compilation, tests and strict Clippy. `make run` starts the desktop app in an owned graphics session. G1 owns Mac compilation/native validation; Dell owns Linux/native Windows validation; MBA retains its existing fleet work.
