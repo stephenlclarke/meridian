@@ -1,0 +1,362 @@
+{
+  "parentAuthorHead": "bc131349aa8a7e182042133bf3436b1a00ce8298",
+  "qualifiedParentJoin": "311f1fea9a6dac696187f9003ed6bc4d39501e25",
+  "qualifiedParentTree": "36518811a8de716ce04a947d6fef838580928c51",
+  "parentHandoffSHA256": "1adc7c5350c5174ac32894fc1daee9a2702be8b49ea28684620674ed2af362cc",
+  "parentFocusedWorkSHA256": "79a8fb6cc594b3218b27750d67b786cf92e509bbbe44fd6a6d88986c970a9341",
+  "parentActualRows": [
+    {
+      "id": "SH010",
+      "statuses": [
+        {
+          "name": "bound_original_decode",
+          "status": "PASS"
+        },
+        {
+          "name": "original_construction",
+          "status": "REFUSED"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "status": "UNRUN"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "status": "UNRUN"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "status": "UNRUN"
+        }
+      ],
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          1,
+          57
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operationsAtRefusal": 2000001,
+      "attemptedPeak": 77758,
+      "admittedPeak": 77758,
+      "retainedAtTerminal": 74550,
+      "wallSeconds": 248.45509475,
+      "completeCandidate": false,
+      "allChecksPassed": false,
+      "fleetAdmission": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    },
+    {
+      "id": "SH011",
+      "statuses": [
+        {
+          "name": "bound_original_decode",
+          "status": "PASS"
+        },
+        {
+          "name": "original_construction",
+          "status": "REFUSED"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "status": "UNRUN"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "status": "UNRUN"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "status": "UNRUN"
+        }
+      ],
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          1,
+          60
+        ],
+        "operationsAtRefusal": 2000004,
+        "detail": "exact operation budget exhausted"
+      },
+      "operationsAtRefusal": 2000004,
+      "attemptedPeak": 77342,
+      "admittedPeak": 77342,
+      "retainedAtTerminal": 74246,
+      "wallSeconds": 238.928094265,
+      "completeCandidate": false,
+      "allChecksPassed": false,
+      "fleetAdmission": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    },
+    {
+      "id": "SH016",
+      "statuses": [
+        {
+          "name": "bound_original_decode",
+          "status": "PASS"
+        },
+        {
+          "name": "original_construction",
+          "status": "REFUSED"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "status": "UNRUN"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "status": "UNRUN"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "status": "UNRUN"
+        }
+      ],
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          0,
+          103
+        ],
+        "operationsAtRefusal": 2000003,
+        "detail": "exact operation budget exhausted"
+      },
+      "operationsAtRefusal": 2000003,
+      "attemptedPeak": 73434,
+      "admittedPeak": 73434,
+      "retainedAtTerminal": 71946,
+      "wallSeconds": 89.638521627,
+      "completeCandidate": false,
+      "allChecksPassed": false,
+      "fleetAdmission": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    },
+    {
+      "id": "SH017",
+      "statuses": [
+        {
+          "name": "bound_original_decode",
+          "status": "PASS"
+        },
+        {
+          "name": "original_construction",
+          "status": "REFUSED"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "status": "UNRUN"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "status": "UNRUN"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "status": "UNRUN"
+        }
+      ],
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          0,
+          101
+        ],
+        "operationsAtRefusal": 2000002,
+        "detail": "exact operation budget exhausted"
+      },
+      "operationsAtRefusal": 2000002,
+      "attemptedPeak": 73074,
+      "admittedPeak": 73074,
+      "retainedAtTerminal": 71578,
+      "wallSeconds": 105.902671474,
+      "completeCandidate": false,
+      "allChecksPassed": false,
+      "fleetAdmission": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    },
+    {
+      "id": "SH166",
+      "statuses": [
+        {
+          "name": "bound_original_decode",
+          "status": "PASS"
+        },
+        {
+          "name": "original_construction",
+          "status": "REFUSED"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "status": "UNRUN"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "status": "UNRUN"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "status": "UNRUN"
+        }
+      ],
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          1,
+          0
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operationsAtRefusal": 2000001,
+      "attemptedPeak": 69666,
+      "admittedPeak": 69666,
+      "retainedAtTerminal": 68210,
+      "wallSeconds": 95.361835644,
+      "completeCandidate": false,
+      "allChecksPassed": false,
+      "fleetAdmission": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    }
+  ],
+  "beforeSUTFreezeSHA256": "cee0f10152dec44a25d9fed1fdef0ab35aa5a20c705bb0195d502a522445cbac",
+  "causalFinding": "The qualified facet collector rebuilds each other immutable facet box per source visit, then performs a flat pair visit/meet scan. Even with hypothetical free box construction, the full flat visit/meet loop plus actual decode charges exceeds the original2M case cap for every sealed input. The terminal lacks an inner-stage work split: no claim that this loop is the dominant measured stage or that later work will now fit.",
+  "sourceDerivedBoundsAndFloor": [
+    {
+      "id": "SH010",
+      "facets": 1012,
+      "actualDecodeOperations": 359198,
+      "flatVisitAndMeetFloor": 2047276,
+      "decodePlusFlatVisitFloor": 2406474,
+      "cachedScalarBounds": 6072,
+      "conservativeNodeSlots": 255,
+      "retainedIndexMemberships": 11164,
+      "buildOrQueryStackMemberships": 120,
+      "temporaryCandidateMemberships": 1012
+    },
+    {
+      "id": "SH011",
+      "facets": 1012,
+      "actualDecodeOperations": 363558,
+      "flatVisitAndMeetFloor": 2047276,
+      "decodePlusFlatVisitFloor": 2410834,
+      "cachedScalarBounds": 6072,
+      "conservativeNodeSlots": 255,
+      "retainedIndexMemberships": 11164,
+      "buildOrQueryStackMemberships": 120,
+      "temporaryCandidateMemberships": 1012
+    },
+    {
+      "id": "SH016",
+      "facets": 1100,
+      "actualDecodeOperations": 365449,
+      "flatVisitAndMeetFloor": 2418900,
+      "decodePlusFlatVisitFloor": 2784349,
+      "cachedScalarBounds": 6600,
+      "conservativeNodeSlots": 511,
+      "retainedIndexMemberships": 14940,
+      "buildOrQueryStackMemberships": 128,
+      "temporaryCandidateMemberships": 1100
+    },
+    {
+      "id": "SH017",
+      "facets": 1100,
+      "actualDecodeOperations": 390244,
+      "flatVisitAndMeetFloor": 2418900,
+      "decodePlusFlatVisitFloor": 2809144,
+      "cachedScalarBounds": 6600,
+      "conservativeNodeSlots": 511,
+      "retainedIndexMemberships": 14940,
+      "buildOrQueryStackMemberships": 128,
+      "temporaryCandidateMemberships": 1100
+    },
+    {
+      "id": "SH166",
+      "facets": 988,
+      "actualDecodeOperations": 341473,
+      "flatVisitAndMeetFloor": 1951300,
+      "decodePlusFlatVisitFloor": 2292773,
+      "cachedScalarBounds": 5928,
+      "conservativeNodeSlots": 255,
+      "retainedIndexMemberships": 10972,
+      "buildOrQueryStackMemberships": 120,
+      "temporaryCandidateMemberships": 988
+    }
+  ],
+  "correction": [
+    "Cache exact six-scalar facet bounds once using the same charged Bounds::for_facet. Reuse them to form the same exact owner bounds.",
+    "Build a balanced tree over contiguous source ranges, leaves at most8 facets. Each node is the exact union of its descendants. No sorting, float conversion, approximate bounds, owner removal or occupancy shortcut.",
+    "Depth-first left-before-right query rejects only strictly separated closed boxes, tests individual cached boxes at surviving leaves, and emits ordinal candidates in original source order. The same finite section, coplanar field checks and contact rules process those candidates.",
+    "Charge every cached-bound construction, coordinate clone/union, node construction/visit, closed box meet, leaf visit and emitted candidate processing. Removed charges correspond to removed recomputation and skipped disjoint visits, not changed budget prices.",
+    "Admit8members/facet +12members per conservative node slot +8headers before building. Admit bounded recursion/traversal stack and up toNcandidate ordinal records in scopes, release on success/error. Drop index and owner bounds before final global noding; all original inputs/regions remain retained."
+  ],
+  "nodeBoundProof": "For N>0, k=ceil(log2(ceil(N/8))) bisections suffice: every contiguous range then has length at most8. Thus at most2^k leaves and2^(k+1)-1nodes. Original input admission bounds N before arithmetic or allocation.",
+  "candidateOrderProof": "Each node partitions one contiguous range into left and right halves. Query pushes right then left on a LIFO stack and visits leaf ordinals ascending. Rejection removes only boxes separated on a closed axis. Therefore surviving ordinals exactly equal the parent ascending closed-overlap scan, including face/edge/point equality.",
+  "unchanged": [
+    "All existing tests/assertions, frozen references, input assets and source field authority.",
+    "Adapter/source/budget/arrangement/exact modules, original whole-five harness/helper, workspace/lock patch and dependency selection.",
+    "Original sheet/topology audits, occupancy rays/parity/retries, finite plane sections, arrangement classification, complete affine fields and protected/global contact certificates.",
+    "2Moperations/100kmemberships/4096bits/512triangles. No counter discount, guard relaxation, globalCSG or incomplete output."
+  ],
+  "newTests": [
+    "Six frozen complete analytic solids compare every ordered Facet, volume and all witness source/cell/physical/protected/output/star/area fields plus both public verification charges. Strictly lower complete charged work for each; retain all peak/retained work/storage observations. Singular vertex contact retains UncertifiedContact.",
+    "Independent corner-pair strict-separation oracle checks complete ordered query results at12 sizes including1/8/9/17/33/49/65; tree node bound, exact scratch admission, one-short refusal, admitted peaks and release on success/error."
+  ],
+  "parentAdverseWorkPreserved": {
+    "earlierPruningIdentity": [
+      30277,
+      30792
+    ],
+    "currentQualifiedPruningIdentity": [
+      30277,
+      30804
+    ],
+    "currentQualifiedStyleIdentity": [
+      30792,
+      30815
+    ]
+  },
+  "parentQualification": {
+    "RustPass": 26,
+    "hostPass": 9,
+    "check": "PASS",
+    "strictClippy": "PASS",
+    "devBuild": "PASS",
+    "wholeFive": "5decodePASS/5OperationsREFUSED/15dependentUNRUN/0candidate"
+  },
+  "priorStorageFailuresRetained": true,
+  "currentCompilerTests": "UNRUN",
+  "currentWholeFive": "HELD pending one bounded review and changed owner qualification",
+  "newCandidates": 0,
+  "newFleetAdmissions": 0,
+  "physicalMemoryOrSpeedClaim": false,
+  "allOriginalShipsRemainInScope": true,
+  "HUDAndEquipmentIndependentPriorityUnchanged": true
+}

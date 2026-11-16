@@ -1,0 +1,145 @@
+{
+  "head": "311f1fea9a6dac696187f9003ed6bc4d39501e25",
+  "tree": "36518811a8de716ce04a947d6fef838580928c51",
+  "RustTestCounts": [
+    9,
+    6,
+    9,
+    2,
+    0
+  ],
+  "rawLogSHA256": "cf51cff1389396cca5da2a8e54ff84f8c010c965251f881062fb4e7a82cece0c",
+  "observations": {
+    "EXACT_PRUNING_COMPLETE": [
+      {
+        "fixture": "identity",
+        "oldOperations": 30277,
+        "newOperations": 30804,
+        "oldAttemptedPeak": 6552,
+        "newAttemptedPeak": 6552,
+        "oldRetained": 2016,
+        "newRetained": 2016,
+        "triangles": 12,
+        "exactOutputAndExposedWitnessMatch": true
+      },
+      {
+        "fixture": "overlap",
+        "oldOperations": 108136,
+        "newOperations": 106123,
+        "oldAttemptedPeak": 19368,
+        "newAttemptedPeak": 19368,
+        "oldRetained": 6552,
+        "newRetained": 6552,
+        "triangles": 48,
+        "exactOutputAndExposedWitnessMatch": true
+      },
+      {
+        "fixture": "buried",
+        "oldOperations": 49342,
+        "newOperations": 44750,
+        "oldAttemptedPeak": 9940,
+        "newAttemptedPeak": 7248,
+        "oldRetained": 2724,
+        "newRetained": 2016,
+        "triangles": 12,
+        "exactOutputAndExposedWitnessMatch": true
+      },
+      {
+        "fixture": "shared_face",
+        "oldOperations": 66170,
+        "newOperations": 66005,
+        "oldAttemptedPeak": 12108,
+        "newAttemptedPeak": 11056,
+        "oldRetained": 3636,
+        "newRetained": 3360,
+        "triangles": 20,
+        "exactOutputAndExposedWitnessMatch": true
+      },
+      {
+        "fixture": "four_disconnected",
+        "oldOperations": 163544,
+        "newOperations": 148482,
+        "oldAttemptedPeak": 25824,
+        "newAttemptedPeak": 25824,
+        "oldRetained": 8064,
+        "newRetained": 8064,
+        "triangles": 48,
+        "exactOutputAndExposedWitnessMatch": true
+      },
+      {
+        "fixture": "eight_oblique_disconnected",
+        "oldOperations": 440797,
+        "newOperations": 364394,
+        "oldAttemptedPeak": 51520,
+        "newAttemptedPeak": 51520,
+        "oldRetained": 16128,
+        "newRetained": 16128,
+        "triangles": 96,
+        "exactOutputAndExposedWitnessMatch": true
+      }
+    ],
+    "STYLE_STORAGE_COMPLETE": [
+      {
+        "fixture": "identity",
+        "oldOperations": 30792,
+        "newOperations": 30815,
+        "oldAttemptedPeak": 6552,
+        "newAttemptedPeak": 6356,
+        "oldRetained": 2016,
+        "newRetained": 2016,
+        "triangles": 12
+      },
+      {
+        "fixture": "overlap",
+        "oldOperations": 106099,
+        "newOperations": 106146,
+        "oldAttemptedPeak": 19368,
+        "newAttemptedPeak": 18956,
+        "oldRetained": 6552,
+        "newRetained": 6552,
+        "triangles": 48
+      },
+      {
+        "fixture": "buried",
+        "oldOperations": 44726,
+        "newOperations": 44773,
+        "oldAttemptedPeak": 7248,
+        "newAttemptedPeak": 6836,
+        "oldRetained": 2016,
+        "newRetained": 2016,
+        "triangles": 12
+      },
+      {
+        "fixture": "shared_face",
+        "oldOperations": 65981,
+        "newOperations": 66028,
+        "oldAttemptedPeak": 11056,
+        "newAttemptedPeak": 10644,
+        "oldRetained": 3360,
+        "newRetained": 3360,
+        "triangles": 20
+      },
+      {
+        "fixture": "four_disconnected",
+        "oldOperations": 148434,
+        "newOperations": 148529,
+        "oldAttemptedPeak": 25824,
+        "newAttemptedPeak": 24980,
+        "oldRetained": 8064,
+        "newRetained": 8064,
+        "triangles": 48
+      },
+      {
+        "fixture": "eight_oblique_disconnected",
+        "oldOperations": 364298,
+        "newOperations": 364489,
+        "oldAttemptedPeak": 51520,
+        "newAttemptedPeak": 49812,
+        "oldRetained": 16128,
+        "newRetained": 16128,
+        "triangles": 96
+      }
+    ]
+  },
+  "interpretation": "Complete frozen analytic assertions passed; logical charged work/storage only, not physical allocation or runtime comparison."
+}

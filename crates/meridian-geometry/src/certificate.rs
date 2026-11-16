@@ -254,16 +254,115 @@ impl Bounds {
         Ok((0..3).all(|k| self.lower[k] <= point[k] && point[k] <= self.upper[k]))
     }
 }
-fn component_bounds(originals: &[Facet], b: &mut Budget) -> Result<BTreeMap<u32, Bounds>, Failure> {
+// Contiguous ranges preserve original source order without a sort or tie rule.
+struct BoundsNode {
+    bounds: Bounds,
+    start: usize,
+    end: usize,
+    children: Option<[usize; 2]>,
+}
+struct FacetBoundsIndex {
+    facets: Vec<Bounds>,
+    nodes: Vec<BoundsNode>,
+    root: usize,
+}
+impl FacetBoundsIndex {
+    const LEAF_SIZE: usize = 8;
+    fn node_limit(count: usize) -> usize {
+        2 * count.div_ceil(Self::LEAF_SIZE).next_power_of_two() - 1
+    }
+    fn memberships(count: usize) -> usize {
+        // Cached six scalar bounds, record/order slots; node bounds, ranges,
+        // child links and record/tag slots; index/vector headers.
+        8 * count + 12 * Self::node_limit(count) + 8
+    }
+    fn stack_members(count: usize) -> usize {
+        8 * (count.ilog2() as usize + 2) + 32
+    }
+    // The caller retains the complete cache/node bound before entering here.
+    fn build(originals: &[Facet], b: &mut Budget) -> Result<Self, Failure> {
+        let mut index = Self {
+            facets: originals
+                .iter()
+                .map(|face| Bounds::for_facet(face, b))
+                .collect::<Result<_, _>>()?,
+            nodes: Vec::with_capacity(Self::node_limit(originals.len())),
+            root: 0,
+        };
+        index.root = b.with_retained(Self::stack_members(originals.len()), |b| {
+            index.build_range(0, originals.len(), b)
+        })?;
+        Ok(index)
+    }
+    fn build_range(&mut self, start: usize, end: usize, b: &mut Budget) -> Result<usize, Failure> {
+        let (bounds, children) = if end - start <= Self::LEAF_SIZE {
+            b.step(6)?;
+            let mut bounds = self.facets[start].clone();
+            for other in &self.facets[start + 1..end] {
+                b.step(6)?;
+                bounds.include(other);
+            }
+            (bounds, None)
+        } else {
+            let middle = start + (end - start) / 2;
+            let left = self.build_range(start, middle, b)?;
+            let right = self.build_range(middle, end, b)?;
+            b.step(12)?;
+            let mut bounds = self.nodes[left].bounds.clone();
+            bounds.include(&self.nodes[right].bounds);
+            (bounds, Some([left, right]))
+        };
+        b.step(1)?;
+        let node = self.nodes.len();
+        self.nodes.push(BoundsNode {
+            bounds,
+            start,
+            end,
+            children,
+        });
+        Ok(node)
+    }
+    // The caller retains up to one candidate ordinal per original facet.
+    fn candidates(&self, query: &Bounds, b: &mut Budget) -> Result<Vec<usize>, Failure> {
+        b.with_retained(Self::stack_members(self.facets.len()), |b| {
+            let mut pending = vec![self.root];
+            let mut candidates = Vec::new();
+            while let Some(index) = pending.pop() {
+                b.step(1)?;
+                let node = &self.nodes[index];
+                if !query.meets(&node.bounds, b)? {
+                    continue;
+                }
+                if let Some([left, right]) = node.children {
+                    pending.push(right);
+                    pending.push(left);
+                } else {
+                    for (offset, bounds) in self.facets[node.start..node.end].iter().enumerate() {
+                        b.step(1)?;
+                        if query.meets(bounds, b)? {
+                            candidates.push(node.start + offset);
+                        }
+                    }
+                }
+            }
+            Ok(candidates)
+        })
+    }
+}
+
+fn component_bounds(
+    originals: &[Facet],
+    facet_bounds: &[Bounds],
+    b: &mut Budget,
+) -> Result<BTreeMap<u32, Bounds>, Failure> {
     let mut result: BTreeMap<u32, Bounds> = BTreeMap::new();
-    for face in originals {
-        let bounds = Bounds::for_facet(face, b)?;
+    for (face, bounds) in originals.iter().zip(facet_bounds) {
         b.step(6)?;
         log_cost(result.len(), b)?;
         result
             .entry(face.id().component)
-            .and_modify(|old| old.include(&bounds))
-            .or_insert(bounds);
+            .and_modify(|old| old.include(bounds))
+            .or_insert_with(|| bounds.clone());
     }
     Ok(result)
 }
@@ -600,40 +699,43 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
     // have already been released, and this map releases before final noding.
     let bounds_members = 10 * owners.len() + 32;
     b.retain(bounds_members)?;
-    let owner_bounds = component_bounds(originals, b)?;
+    let facet_bounds_members = FacetBoundsIndex::memberships(originals.len());
+    b.retain(facet_bounds_members)?;
+    let facet_bounds = FacetBoundsIndex::build(originals, b)?;
+    let owner_bounds = component_bounds(originals, &facet_bounds.facets, b)?;
     let mut regions = Vec::new();
     let mut all_points = BTreeSet::new();
     let mut held = 0usize;
-    for face in originals {
+    for (face, face_bounds) in originals.iter().zip(&facet_bounds.facets) {
         b.at(face.id());
         let mut domain = face.domain().to_vec();
         if area(&domain, b)?.is_negative() {
             domain.reverse();
         }
-        let mut barriers = Vec::new();
-        let mut coplanar = Vec::new();
-        let face_bounds = Bounds::for_facet(face, b)?;
-        for other in originals {
-            b.step(1)?;
-            if face.id() == other.id() {
-                continue;
-            }
-            let other_bounds = Bounds::for_facet(other, b)?;
-            if !face_bounds.meets(&other_bounds, b)? {
-                continue;
-            }
-            let (segments, same_plane) = face.section(other, b)?;
-            b.guard(8 * (barriers.len() + segments.len() + 1) + coplanar.len() + 1)?;
-            barriers.extend(
-                segments
-                    .into_iter()
-                    .map(|[a, c]| [project(&a, face.axis()), project(&c, face.axis())]),
-            );
-            if same_plane && dot(face.normal(), other.normal()) > integer(0) {
+        let (barriers, coplanar) = b.with_retained(originals.len(), |b| {
+            let candidates = facet_bounds.candidates(face_bounds, b)?;
+            let mut barriers = Vec::new();
+            let mut coplanar = Vec::new();
+            for ordinal in candidates {
                 b.step(1)?;
-                coplanar.push(other);
+                let other = &originals[ordinal];
+                if face.id() == other.id() {
+                    continue;
+                }
+                let (segments, same_plane) = face.section(other, b)?;
+                b.guard(8 * (barriers.len() + segments.len() + 1) + coplanar.len() + 1)?;
+                barriers.extend(
+                    segments
+                        .into_iter()
+                        .map(|[a, c]| [project(&a, face.axis()), project(&c, face.axis())]),
+                );
+                if same_plane && dot(face.normal(), other.normal()) > integer(0) {
+                    b.step(1)?;
+                    coplanar.push(other);
+                }
             }
-        }
+            Ok((barriers, coplanar))
+        })?;
         let arrangement = b.with_retained(coplanar.len(), |budget| {
             let result = Arrangement::build(&domain, &barriers, budget, |sample, local| {
                 visible(face, sample, originals, &owner_bounds, &coplanar, local)
@@ -665,7 +767,8 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
         regions.push((face, arrangement));
     }
     drop(owner_bounds);
-    b.release(bounds_members);
+    drop(facet_bounds);
+    b.release(bounds_members + facet_bounds_members);
     let point_members = 8 * all_points.len();
     b.retain(point_members)?;
     let mut triangles = Vec::new();
@@ -1315,6 +1418,78 @@ mod tests {
             upper: [integer(3), integer(1), integer(1)],
         };
         assert!(!bounds.meets(&disjoint, &mut b)?);
+        Ok(())
+    }
+    #[test]
+    fn facet_bounds_index_matches_independent_closed_pairs_and_guards_scratch()
+    -> Result<(), Failure> {
+        let mut setup = Budget::new(crate::Limits::default())?;
+        let mut faces = Vec::new();
+        for ordinal in 0..65 {
+            let base = [ordinal % 17 - 8, (ordinal / 17) % 3, ordinal % 5 - 2];
+            let vertices = [[0, 0, 0], [1, 0, 0], [0, 1, 1]].map(|offset| Vertex {
+                point: std::array::from_fn(|k| integer(base[k] + offset[k])),
+                uv: [integer(0), integer(0)],
+            });
+            faces.push(Facet::new(
+                SourceId {
+                    component: 0,
+                    facet: ordinal as u32,
+                },
+                vertices,
+                String::new(),
+                &mut setup,
+            )?);
+        }
+        for count in [1, 7, 8, 9, 16, 17, 31, 32, 33, 49, 64, 65] {
+            let members = FacetBoundsIndex::memberships(count);
+            let scratch = FacetBoundsIndex::stack_members(count);
+            let mut b = Budget::new(crate::Limits {
+                storage_memberships: members + count + scratch,
+                ..crate::Limits::default()
+            })?;
+            b.with_retained(members, |b| {
+                let index = FacetBoundsIndex::build(&faces[..count], b)?;
+                assert!(index.nodes.len() <= FacetBoundsIndex::node_limit(count));
+                for (first, query) in faces[..count].iter().zip(&index.facets) {
+                    let actual = b.with_retained(count, |b| index.candidates(query, b))?;
+                    // Independent strict-separation oracle compares every corner
+                    // pair, rather than using cached extrema or tree nodes.
+                    let expected = faces[..count]
+                        .iter()
+                        .enumerate()
+                        .filter_map(|(i, second)| {
+                            let separated = (0..3).any(|k| {
+                                first.vertices().iter().all(|a| {
+                                    second.vertices().iter().all(|c| a.point[k] < c.point[k])
+                                }) || second.vertices().iter().all(|c| {
+                                    first.vertices().iter().all(|a| c.point[k] < a.point[k])
+                                })
+                            });
+                            (!separated).then_some(i)
+                        })
+                        .collect::<Vec<_>>();
+                    assert_eq!(actual, expected);
+                }
+                Ok(())
+            })?;
+            assert_eq!(b.retained_memberships(), 0);
+            assert_eq!(b.peak_admitted_memberships(), members + count + scratch);
+        }
+        let count = faces.len();
+        let members = FacetBoundsIndex::memberships(count);
+        let scratch = FacetBoundsIndex::stack_members(count);
+        let mut short = Budget::new(crate::Limits {
+            storage_memberships: members + count + scratch - 1,
+            ..crate::Limits::default()
+        })?;
+        let result = short.with_retained(members, |b| {
+            let index = FacetBoundsIndex::build(&faces, b)?;
+            b.with_retained(count, |b| index.candidates(&index.facets[0], b))
+        });
+        assert_eq!(result.err().map(|e| e.kind), Some(FailureKind::Storage));
+        assert_eq!(short.retained_memberships(), 0);
+        assert!(short.peak_admitted_memberships() <= short.limits().storage_memberships);
         Ok(())
     }
 }

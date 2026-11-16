@@ -1,0 +1,16 @@
+{
+  "phase": "BEFORE_FACET_BOUNDS_CACHE_SUCCESSOR_AUTHORING",
+  "parentAuthorHead": "bc131349aa8a7e182042133bf3436b1a00ce8298",
+  "qualifiedRootJoin": "311f1fea9a6dac696187f9003ed6bc4d39501e25",
+  "reference": "Immediate qualified certificate production prefix, final whitespace normalized only. Shared unchanged source/budget/adapter. Same complete analytic solids frozen before earlier successors.",
+  "files": {
+    "CASES.json": {
+      "bytes": 3170,
+      "sha256": "f7a0e6665cfd9337145c9b9715e26516f164acd0612590dc07093bafe95e4e5d"
+    },
+    "before-certificate.rs": {
+      "bytes": 40084,
+      "sha256": "e1f98cf5c20fbbe65c09920597d9ed0c7a76344bd8e711df30c6679cf5d7ca5a"
+    }
+  }
+}

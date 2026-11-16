@@ -133,6 +133,16 @@
       "file": "src/pruning.rs",
       "name": "pruning::complete_style_storage_controls_preserve_all_fields_witnesses_and_refusals",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/certificate.rs",
+      "name": "certificate::tests::facet_bounds_index_matches_independent_closed_pairs_and_guards_scratch",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/pruning.rs",
+      "name": "pruning::complete_bounds_cache_controls_preserve_fields_witnesses_and_reduce_work",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -293,5 +303,16 @@
     "deltaSHA256": "3b42bf7dd930bd3d144cf8695508ee77b203e72647e172bf474060bb02341b76",
     "currentExecution": "UNRUN",
     "productionAndFrozenInputsChanged": false
+  },
+  "boundsIndexCorrection": {
+    "qualifiedParentJoin": "311f1fea9a6dac696187f9003ed6bc4d39501e25",
+    "parentHandoffSHA256": "1adc7c5350c5174ac32894fc1daee9a2702be8b49ea28684620674ed2af362cc",
+    "deltaSHA256": "e317c10afc46c6ffcf24037788c1650320bb36fc67c74f2088c62eb76055b4b3",
+    "beforeSUTFreezeSHA256": "cee0f10152dec44a25d9fed1fdef0ab35aa5a20c705bb0195d502a522445cbac",
+    "parentRustPass": 26,
+    "parentHostPass": 9,
+    "parentWholeFive": "5OperationsREFUSED/15dependentUNRUN/0candidate",
+    "currentExecution": "UNRUN",
+    "newTestCount": 28
   }
 }

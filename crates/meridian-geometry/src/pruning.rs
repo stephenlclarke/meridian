@@ -351,3 +351,129 @@ fn complete_style_storage_controls_preserve_all_fields_witnesses_and_refusals()
     );
     Ok(())
 }
+
+mod before_bounds_cache {
+    include!("../fixtures/bounds-cache-reference/before-certificate.rs");
+}
+
+#[test]
+fn complete_bounds_cache_controls_preserve_fields_witnesses_and_reduce_work() -> Result<(), Failure>
+{
+    let cases = vec![
+        ("identity", vec![[0, 0, 0, 1, 1, 1]], false),
+        (
+            "overlap",
+            vec![[0, 0, 0, 2, 2, 2], [1, 1, 1, 3, 3, 3]],
+            false,
+        ),
+        (
+            "buried",
+            vec![[0, 0, 0, 3, 3, 3], [1, 1, 1, 2, 2, 2]],
+            false,
+        ),
+        (
+            "shared_face",
+            vec![[0, 0, 0, 1, 1, 1], [1, 0, 0, 2, 1, 1]],
+            false,
+        ),
+        (
+            "four_disconnected",
+            (0..4).map(|i| [3 * i, 0, 0, 3 * i + 1, 1, 1]).collect(),
+            false,
+        ),
+        (
+            "eight_oblique_disconnected",
+            (0..8).map(|i| [3 * i, 0, 0, 3 * i + 1, 1, 1]).collect(),
+            true,
+        ),
+    ];
+    for (id, boxes, shear) in cases {
+        let mut originals = Vec::new();
+        for (i, bounds) in boxes.into_iter().enumerate() {
+            originals.extend(cube(bounds, i as u32)?);
+        }
+        let mut setup = Budget::new(Limits::default())?;
+        if shear {
+            let transform = AffineTransform {
+                linear: [
+                    [integer(1), integer(0), integer(1)],
+                    [integer(0), integer(1), integer(0)],
+                    [integer(0), integer(0), integer(1)],
+                ],
+                translation: [integer(0), integer(0), integer(0)],
+            };
+            originals = originals
+                .iter()
+                .map(|f| transform.apply(f, &mut setup))
+                .collect::<Result<_, _>>()?;
+        }
+        let style: std::sync::Arc<str> = std::sync::Arc::from("material0/texture0");
+        originals = originals
+            .iter()
+            .map(|f| {
+                Facet::with_shared_style(f.id(), f.vertices().clone(), style.clone(), &mut setup)
+            })
+            .collect::<Result<_, _>>()?;
+        let mut old = Budget::new(Limits::default())?;
+        let expected = before_bounds_cache::reconstruct(&originals, &mut old)?;
+        let mut new = Budget::new(Limits::default())?;
+        let actual = crate::reconstruct(&originals, &mut new)?;
+        assert_eq!(actual.triangles(), expected.triangles(), "{id}");
+        assert_eq!(actual.exact_volume(), expected.exact_volume());
+        assert_eq!(actual.witnesses().len(), expected.witnesses().len());
+        for (a, e) in actual.witnesses().iter().zip(expected.witnesses()) {
+            assert_eq!(a.source, e.source);
+            assert_eq!(a.classified_cells, e.classified_cells);
+            assert_eq!(a.physical_segments, e.physical_segments);
+            assert_eq!(a.protected_points, e.protected_points);
+            assert_eq!(a.output_triangles, e.output_triangles);
+            assert_eq!(a.twice_area, e.twice_area);
+            let stars = e
+                .contact_stars
+                .iter()
+                .map(|s| (s.point.clone(), s.sectors.clone(), s.boundary_path))
+                .collect::<Vec<_>>();
+            assert_eq!(current_stars(&a.contact_stars), stars);
+            let source = originals
+                .iter()
+                .find(|f| f.id() == a.source)
+                .ok_or_else(|| {
+                    new.fail(
+                        FailureKind::InvalidWitness,
+                        "missing bounds-cache control source",
+                    )
+                })?;
+            e.verify(source, &mut old)?;
+            a.verify(source, &mut new)?;
+        }
+        assert!(new.operations() < old.operations(), "{id}");
+        assert_eq!(new.retained_memberships(), old.retained_memberships());
+        eprintln!(
+            "BOUNDS_CACHE_COMPLETE {{\"fixture\":\"{id}\",\"oldOperations\":{},\"newOperations\":{},\"oldAttemptedPeak\":{},\"newAttemptedPeak\":{},\"oldRetained\":{},\"newRetained\":{},\"triangles\":{}}}",
+            old.operations(),
+            new.operations(),
+            old.peak_memberships(),
+            new.peak_memberships(),
+            old.retained_memberships(),
+            new.retained_memberships(),
+            actual.triangles().len()
+        );
+    }
+    let mut singular = cube([0, 0, 0, 1, 1, 1], 0)?;
+    singular.extend(cube([1, 1, 1, 2, 2, 2], 1)?);
+    let mut old = Budget::new(Limits::default())?;
+    let mut new = Budget::new(Limits::default())?;
+    assert_eq!(
+        before_bounds_cache::reconstruct(&singular, &mut old)
+            .err()
+            .map(|error| error.kind),
+        Some(FailureKind::UncertifiedContact)
+    );
+    assert_eq!(
+        crate::reconstruct(&singular, &mut new)
+            .err()
+            .map(|error| error.kind),
+        Some(FailureKind::UncertifiedContact)
+    );
+    Ok(())
+}
