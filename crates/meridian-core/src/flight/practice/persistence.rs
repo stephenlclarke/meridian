@@ -41,6 +41,7 @@ impl Practice {
                     })?,
                 })
             })?,
+            reception: reception::Reception::default(),
             retired: r.option(|r| {
                 Ok(Retirement {
                     tick: r.u64()?,
@@ -77,7 +78,7 @@ impl Practice {
                 }
             }
         }
-        Ok(())
+        self.validate_reception(nav, flight, pulse.remaining_cooldown(), navigation.dock())
     }
     fn validate_consent(self, nav: SavedNavigationSummary, tick: u64) -> Result<(), SaveError> {
         use crate::navigation::DockOrigin;

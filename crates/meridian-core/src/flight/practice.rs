@@ -6,6 +6,10 @@ use crate::station::OriginalStationData;
 
 mod geometry;
 mod persistence;
+pub(super) mod reception;
+pub use reception::{
+    PRACTICE_QUIET_TICKS, PracticeReceptionReview, PracticeReceptionSnapshot, PracticeTrace,
+};
 
 pub const PRACTICE_HALF_SIDE: f64 = 3.0;
 const OFFSETS: [Vec3; 3] = [
@@ -30,6 +34,8 @@ pub enum PracticeError {
     NoCommander,
     AvenorBerthRequired,
     AlreadyConsented,
+    ReceptionNotReady,
+    AlreadyReceived,
     Save(crate::save::SaveError),
 }
 impl core::fmt::Display for PracticeError {
@@ -40,6 +46,8 @@ impl core::fmt::Display for PracticeError {
             Self::NoCommander => "An owned commander profile is required",
             Self::AvenorBerthRequired => "Practice consent requires the actual Avenor main berth",
             Self::AlreadyConsented => "This commander already has a practice attempt",
+            Self::ReceptionNotReady => "Reception requires three distinct hits, three quiet flight seconds and a subsequent Avenor entry",
+            Self::AlreadyReceived => "This commander already received the practice trace",
             Self::Save(error) => return write!(f, "Practice save preparation failed: {error}"),
         })
     }
@@ -117,6 +125,7 @@ pub(super) struct Practice {
     confirmed_tick: u64,
     range: Option<Range>,
     retired: Option<Retirement>,
+    pub(super) reception: reception::Reception,
 }
 impl Practice {
     fn sortie(self) -> Option<u64> {
@@ -167,6 +176,7 @@ impl Practice {
                 });
             }
         }
+        self.observe_quiet_step(next.tick);
     }
     pub(super) fn contact(
         &mut self,
@@ -281,6 +291,7 @@ impl World {
             confirmed_tick: expected_tick,
             range: None,
             retired: None,
+            reception: reception::Reception::default(),
         };
         let bytes = self
             .save_bytes_with_practice(Some(practice))

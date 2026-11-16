@@ -439,5 +439,8 @@ fn original_v4_paid_and_hot_world_loads_with_no_t02_authority() {
         restored.practice_snapshot().unwrap().status,
         PracticeStatus::Unaccepted
     );
-    assert_eq!(&restored.save_bytes().unwrap()[8..10], &5_u16.to_le_bytes());
+    assert_eq!(
+        &restored.save_bytes().unwrap()[8..10],
+        &crate::save::SAVE_VERSION.to_le_bytes()
+    );
 }

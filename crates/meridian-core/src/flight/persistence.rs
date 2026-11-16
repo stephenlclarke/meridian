@@ -16,8 +16,19 @@ const V4_CONTENT: &[u8] = concat!(
 .as_bytes();
 
 // Rules and immutable content form the version-five compatibility boundary, not an authenticity key.
-const CONTENT: &[u8] = concat!(
+const V5_CONTENT: &[u8] = concat!(
     "meridian-world/rules/5;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
+    "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
+    "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
+    "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
+    "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823;",
+    "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa"
+)
+.as_bytes();
+
+// Rules and immutable content form the version-six compatibility boundary, not an authenticity key.
+const CONTENT: &[u8] = concat!(
+    "meridian-world/rules/6;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -76,6 +87,9 @@ impl World {
             .as_ref()
             .ok_or(SaveError::NoCommander)?
             .encode_save(&mut w);
+        w.option(practice.as_ref(), |w, practice| {
+            practice.encode_reception(w)
+        });
         w.option(practice.as_ref(), |w, practice| practice.encode(w));
         self.pulse.encode_save(&mut w);
         let digest = checksum(&w.bytes);
@@ -131,8 +145,9 @@ impl World {
         let version = r.u16()?;
         let content = match version {
             4 if r.fixed::<{ V4_CONTENT.len() }>()?.as_slice() == V4_CONTENT => V4_CONTENT,
+            5 if r.fixed::<{ V5_CONTENT.len() }>()?.as_slice() == V5_CONTENT => V5_CONTENT,
             SAVE_VERSION if r.fixed::<{ CONTENT.len() }>()?.as_slice() == CONTENT => CONTENT,
-            4 | SAVE_VERSION => return Err(SaveError::ContentMismatch),
+            4 | 5 | SAVE_VERSION => return Err(SaveError::ContentMismatch),
             _ => return Err(SaveError::UnsupportedVersion),
         };
         if r.u64()? != compiled_content_fingerprint(content) {
@@ -152,11 +167,7 @@ impl World {
             commander_account: Some(CommanderAccount::decode_save(&mut r)?),
             freight_session: Some(mission::FreightSession::decode_save(&mut r)?),
             station_markets: Some(StationMarkets::decode_save(&mut r)?),
-            practice: if version == 4 {
-                None
-            } else {
-                r.option(practice::Practice::decode)?
-            },
+            practice: read_practice(&mut r, version)?,
             pulse: weapons::PulseResources::decode_save(&mut r)?,
         };
         if !r.finished() {
@@ -223,6 +234,29 @@ impl World {
         Ok(())
     }
 }
+fn read_practice(
+    r: &mut Reader<'_>,
+    version: u16,
+) -> Result<Option<practice::Practice>, SaveError> {
+    if version == 4 {
+        return Ok(None);
+    }
+    let reception = if version == SAVE_VERSION {
+        r.option(practice::reception::Reception::decode)?
+    } else {
+        None
+    };
+    let mut practice = r.option(practice::Practice::decode)?;
+    if version == SAVE_VERSION {
+        match (practice.as_mut(), reception) {
+            (Some(practice), Some(reception)) => practice.reception = reception,
+            (None, None) => {}
+            _ => return Err(SaveError::InvalidEncoding),
+        }
+    }
+    Ok(practice)
+}
+
 fn validate_accounting(
     d: SavedDomainSummary,
     s: SavedServiceSummary,
@@ -334,10 +368,11 @@ pub(super) fn v4_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
     let current = world.save_bytes()?;
     assert!(world.practice.is_none());
     let prefix = 18 + CONTENT.len();
-    // Snapshot through market bytes are unchanged. The v5 practice option is
-    // one absent byte immediately before the five old weapon bytes.
+    // Snapshot through market bytes are unchanged. Remove both absent v6
+    // practice tags immediately before the five old weapon bytes.
     let tail = current.len() - 13;
     assert_eq!(current[tail - 1], 0);
+    assert_eq!(current[tail - 2], 0);
     let mut w = Writer::new();
     w.bytes.extend(MAGIC);
     w.u16(4);
@@ -345,8 +380,37 @@ pub(super) fn v4_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
     // Independently calculated from the exact predecessor rules header and
     // original eight compiled resources.
     w.u64(0xaa91_4776_a63c_5f97);
-    w.bytes.extend(&current[prefix..tail - 1]);
+    w.bytes.extend(&current[prefix..tail - 2]);
     w.bytes.extend(&current[tail..tail + 5]);
+    let digest = checksum(&w.bytes);
+    w.u64(digest);
+    Ok(w.bytes)
+}
+
+#[cfg(test)]
+pub(super) fn v5_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
+    let current = world.save_bytes()?;
+    let mut legacy = Writer::new();
+    legacy.option(world.practice.as_ref(), |w, practice| practice.encode(w));
+    let mut reception = Writer::new();
+    reception.option(world.practice.as_ref(), |w, practice| {
+        practice.encode_reception(w)
+    });
+    let start = 18 + CONTENT.len();
+    let reception_end = current.len() - 13 - legacy.bytes.len();
+    let reception_start = reception_end - reception.bytes.len();
+    assert_eq!(
+        &current[reception_start..reception_end],
+        reception.bytes.as_slice()
+    );
+    let mut w = Writer::new();
+    w.bytes.extend(MAGIC);
+    w.u16(5);
+    w.bytes.extend(V5_CONTENT);
+    // Independently calculated from the exact v5 base header and assets.
+    w.u64(0x46a9_5792_16cc_8694);
+    w.bytes.extend(&current[start..reception_start]);
+    w.bytes.extend(&current[reception_end..current.len() - 8]);
     let digest = checksum(&w.bytes);
     w.u64(digest);
     Ok(w.bytes)

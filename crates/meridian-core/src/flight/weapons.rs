@@ -276,6 +276,9 @@ impl World {
                 PulseContact::StationBlocked { distance }
             })
         };
+        if let Some(practice) = self.practice.as_mut() {
+            practice.observe_discharge(self.state.tick);
+        }
         self.pulse = resources;
         Ok(PulseShot {
             tick: self.state.tick,
