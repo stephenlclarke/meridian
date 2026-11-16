@@ -56,7 +56,7 @@ The authored core predecessor records actual front Pulse station impacts, origin
 
 ## Finite missile source slice
 
-The authored core successor adds explicit practice-beacon lock/arm/release, actual three-round item consumption, World-owned guided projectiles, swept impacts and pending ceasefire timing. A missile-used session cannot yet be saved or restored over; the existing profile stays intact. Untouched v4-v7 stock remains supported. Ten regressions are authored and unrun; Root's desktop join, independent review and coordinated execution remain pending. This is not an installed preview update or full T02 continuation. See [finite missile rules and boundaries](docs/FINITE-STARTER-MISSILES.md).
+The finite-missile predecessor adds explicit practice-beacon lock/arm/release, actual three-round item consumption, World-owned guided projectiles, swept impacts and pending ceasefire timing. Its version 7 save refusal is the boundary superseded by the current source slice. Version 8 now retains complete live/ended missile sessions and consumed ownership, with exact v4-v7 readers and whole-candidate validation. Nine new tests are authored and unrun. Independent review, Root's desktop save/status join and coordinated compiler/native cold continuation remain pending. Existing installed previews and profiles stay untouched. Full T02 and actual player-hit acceptance remain separate. See [durable missile sessions](docs/DURABLE-MISSILE-SESSIONS.md) and the [finite launcher contract](docs/FINITE-STARTER-MISSILES.md).
 
 ## License and quality checks
 
@@ -68,4 +68,4 @@ GitHub Actions checks formatting, workspace compilation, tests and strict Clippy
 
 The next source slice adds V to review receiving all held mission units and X to review abandonment with Arlen. Enter confirms the displayed choice; B cancels. I shows current mission details. The review panel word-wraps original contract dialogue and warnings, joined with the existing mission owner. These controls are authored and unqualified until the complete artifact passes review and validation; see [the implementation packet](docs/PR-freight-dialogue-controls.md).
 
-The authored finite-missile desktop controls are **F1** next beacon lock, **F2** arm/safe, **F3** launch and **F4** safe/unlock. This unqualified slice refuses saving after any missile use; prior saved files remain intact. Controls, rendering and the core still require joined compiler/native qualification.
+The authored finite-missile desktop controls are **F1** next beacon lock, **F2** arm/safe, **F3** launch and **F4** safe/unlock. The current core writes missile sessions as version 8. Desktop launch/save notices and host cold continuation still need Root's join and designated execution before this source slice can be delivered; prior saved files remain intact.

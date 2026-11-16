@@ -148,7 +148,12 @@ impl PulseResources {
 
     /// An accepted station hit proves an actual Pulse discharge independently
     /// of practice consent. Before its cooldown ends no later Pulse is possible.
-    pub(super) fn fits_ordinary_hit(self, elapsed_physical: u64, uninterrupted: bool) -> bool {
+    pub(super) fn fits_ordinary_hit(
+        self,
+        elapsed_physical: u64,
+        uninterrupted: bool,
+        damaged: bool,
+    ) -> bool {
         let remaining = u64::from(PULSE_COOLDOWN_TICKS).saturating_sub(elapsed_physical);
         if u64::from(self.cooldown) < remaining
             || (elapsed_physical < u64::from(PULSE_COOLDOWN_TICKS)
@@ -167,7 +172,9 @@ impl PulseResources {
                 let energy = (u64::from(ENERGY_CAPACITY_HUNDREDTHS - ENERGY_COST_HUNDREDTHS)
                     + elapsed_physical * u64::from(ENERGY_RECHARGE_HUNDREDTHS))
                 .min(u64::from(ENERGY_CAPACITY_HUNDREDTHS));
-                if u64::from(self.energy) != energy {
+                if (!damaged && u64::from(self.energy) != energy)
+                    || (damaged && u64::from(self.energy) > energy)
+                {
                     return false;
                 }
             }
@@ -186,6 +193,30 @@ impl PulseResources {
             heat: r.u16()?,
             cooldown: r.u8()?,
         })
+    }
+    pub(super) fn validate_damaged_save(
+        self,
+        tick: u64,
+        mode: FlightMode,
+        launches: u64,
+    ) -> Result<(), SaveError> {
+        if mode != FlightMode::Flight && self.energy != ENERGY_CAPACITY_HUNDREDTHS {
+            return Err(SaveError::InvalidState("docked damaged player energy"));
+        }
+        // Damage can only lower energy. Keep the independent heat/cadence checks.
+        let mut undamaged = self;
+        let elapsed = PULSE_COOLDOWN_TICKS.saturating_sub(self.cooldown);
+        undamaged.energy = if self.cooldown == 0 || mode != FlightMode::Flight {
+            ENERGY_CAPACITY_HUNDREDTHS
+        } else {
+            (ENERGY_CAPACITY_HUNDREDTHS - ENERGY_COST_HUNDREDTHS
+                + u16::from(elapsed) * ENERGY_RECHARGE_HUNDREDTHS)
+                .min(ENERGY_CAPACITY_HUNDREDTHS)
+        };
+        if self.energy > undamaged.energy {
+            return Err(SaveError::InvalidState("damaged player energy"));
+        }
+        undamaged.validate_save(tick, mode, launches)
     }
     pub(super) fn validate_save(
         self,
@@ -358,7 +389,7 @@ impl World {
         let impact = self.prepare_pulse_impact(shot)?;
         let mut missiles = self.missiles;
         if let PulseContact::Projectile { id, .. } = contact
-            && !missiles.intercept(id, self.state.tick, impact.emission())
+            && !missiles.intercept(id, self.state.tick, impact.emission(), shot)
         {
             return Err(FireError::InvalidGeometry);
         }

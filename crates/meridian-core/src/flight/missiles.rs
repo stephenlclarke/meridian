@@ -3,6 +3,7 @@ use super::{CombatIdentity, FlightMode, PracticeBeaconId, Snapshot, StepError, W
 use crate::docking::Vec3;
 use core::fmt;
 mod geometry;
+mod persistence;
 use geometry::*;
 pub use geometry::{MISSILE_FACES, MISSILE_VERTICES};
 pub const MISSILE_SPEED: f64 = 792.0;
@@ -127,17 +128,59 @@ pub(super) struct State {
     lock: Option<PracticeBeaconId>,
     cooldown: u8,
     projectiles: [Option<ProjectileSnapshot>; 3],
+    motions: [Option<Motion>; 3],
+    impacts: [Option<super::OrdinaryImpact>; 3],
+    beams: [Option<Beam>; 3],
+}
+#[derive(Debug, Clone, Copy, PartialEq)]
+struct Body {
+    id: ProjectileId,
+    position: Vec3,
+}
+#[derive(Debug, Clone, Copy, PartialEq)]
+struct Motion {
+    position: Vec3,
+    travel: f64,
+    age: u16,
+    cleared: bool,
+    flight: Snapshot,
+    player_alive: bool,
+    bodies: [Option<Body>; 3],
+}
+#[derive(Debug, Clone, Copy, PartialEq)]
+struct Beam {
+    shot: super::PulseShot,
+    emission: u64,
+    bodies: [Option<Body>; 3],
 }
 impl State {
+    #[cfg(test)]
     pub(super) fn save_supported(self) -> bool {
         !self.armed && self.lock.is_none() && self.projectiles.iter().all(Option::is_none)
     }
-    pub(super) fn intercept(&mut self, id: ProjectileId, tick: u64, emission: u64) -> bool {
+    pub(super) fn intercept(
+        &mut self,
+        id: ProjectileId,
+        tick: u64,
+        emission: u64,
+        shot: super::PulseShot,
+    ) -> bool {
+        let bodies = self.projectiles.map(|p| {
+            p.filter(|p| p.ended.is_none()).map(|p| Body {
+                id: p.origin.projectile,
+                position: p.position,
+            })
+        });
         for p in self.projectiles.iter_mut().flatten() {
             if p.origin.projectile == id && p.ended.is_none() {
                 p.ended = Some(MissileEnd::Intercepted);
                 p.last_tick = tick;
                 p.intercepting_emission = Some(emission);
+                self.beams[usize::from(id.ordinal)] = Some(Beam {
+                    shot,
+                    emission,
+                    bodies,
+                });
                 return true;
             }
         }
@@ -371,6 +414,20 @@ impl World {
                 .practice
                 .and_then(|p| p.missile_target(projectile.target))
             {
+                prepared.missiles.motions[index] = Some(Motion {
+                    position: projectile.position,
+                    travel: projectile.propulsion_travel,
+                    age: projectile.age_ticks,
+                    cleared: projectile.muzzle_cleared,
+                    flight: next,
+                    player_alive: prepared.pulse.alive(),
+                    bodies: prepared.missiles.projectiles.map(|p| {
+                        p.filter(|p| p.ended.is_none()).map(|p| Body {
+                            id: p.origin.projectile,
+                            position: p.position,
+                        })
+                    }),
+                });
                 advance_projectile(
                     self,
                     &mut prepared,
@@ -581,6 +638,7 @@ fn apply_contact(
                 p.position,
                 target,
             )?;
+            prepared.missiles.impacts[usize::from(p.origin.projectile.ordinal)] = Some(hit);
             prepared.legal = prepared.legal.saturating_add(penalty);
             if let Some(practice) = &mut prepared.practice {
                 practice.observe_ordinary_hit(hit);

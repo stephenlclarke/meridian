@@ -37,8 +37,18 @@ const V6_CONTENT: &[u8] = concat!(
 )
 .as_bytes();
 
-const CONTENT: &[u8] = concat!(
+const V7_CONTENT: &[u8] = concat!(
     "meridian-world/rules/7;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
+    "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
+    "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
+    "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
+    "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823;",
+    "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa"
+)
+.as_bytes();
+
+const CONTENT: &[u8] = concat!(
+    "meridian-world/rules/8;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -75,10 +85,14 @@ impl World {
         &self,
         practice: Option<practice::Practice>,
     ) -> Result<Vec<u8>, SaveError> {
-        if !self.missiles.save_supported() {
-            return Err(SaveError::UnsupportedMissiles);
-        }
         self.validate_saved_world(practice)?;
+        self.encode_saved_world(practice)
+    }
+    // Encoding is separate so negative tests can exercise the loader with coherent checksums.
+    fn encode_saved_world(
+        &self,
+        practice: Option<practice::Practice>,
+    ) -> Result<Vec<u8>, SaveError> {
         let mut w = Writer::new();
         w.bytes.extend(MAGIC);
         w.u16(SAVE_VERSION);
@@ -100,6 +114,7 @@ impl World {
             .as_ref()
             .ok_or(SaveError::NoCommander)?
             .encode_save(&mut w);
+        self.missiles.encode(&mut w);
         w.option(practice.as_ref(), |w, practice| {
             practice.encode_reception(w)
         });
@@ -117,6 +132,11 @@ impl World {
         Ok(w.bytes)
     }
 
+    #[cfg(test)]
+    pub(super) fn unchecked_test_save(&self) -> Result<Vec<u8>, SaveError> {
+        self.encode_saved_world(self.practice)
+    }
+
     /// Decode and validate a whole candidate without touching another World or repairing data.
     pub fn from_save_bytes(bytes: &[u8]) -> Result<Self, SaveError> {
         let mut candidate = Self::decode_saved_world(bytes)?;
@@ -130,9 +150,6 @@ impl World {
 
     /// Replace this World only after complete candidate validation and UI sequence invalidation.
     pub fn restore_bytes(&mut self, bytes: &[u8]) -> Result<(), SaveError> {
-        if !self.missiles.save_supported() {
-            return Err(SaveError::UnsupportedMissiles);
-        }
         let mut candidate = Self::decode_saved_world(bytes)?;
         let floor = self
             .freight_session
@@ -167,8 +184,9 @@ impl World {
             4 if r.fixed::<{ V4_CONTENT.len() }>()?.as_slice() == V4_CONTENT => V4_CONTENT,
             5 if r.fixed::<{ V5_CONTENT.len() }>()?.as_slice() == V5_CONTENT => V5_CONTENT,
             6 if r.fixed::<{ V6_CONTENT.len() }>()?.as_slice() == V6_CONTENT => V6_CONTENT,
+            7 if r.fixed::<{ V7_CONTENT.len() }>()?.as_slice() == V7_CONTENT => V7_CONTENT,
             SAVE_VERSION if r.fixed::<{ CONTENT.len() }>()?.as_slice() == CONTENT => CONTENT,
-            4 | 5 | 6 | SAVE_VERSION => return Err(SaveError::ContentMismatch),
+            4 | 5 | 6 | 7 | SAVE_VERSION => return Err(SaveError::ContentMismatch),
             _ => return Err(SaveError::UnsupportedVersion),
         };
         if r.u64()? != compiled_content_fingerprint(content) {
@@ -185,17 +203,21 @@ impl World {
                 OriginalNavigation::bundled().map_err(|_| SaveError::ContentMismatch)?,
             ),
             navigation: Some(NavigationState::decode_save(&mut r)?),
-            commander_account: Some(CommanderAccount::decode_save(&mut r)?),
+            commander_account: Some(CommanderAccount::decode_save(&mut r, version)?),
             freight_session: Some(mission::FreightSession::decode_save(&mut r)?),
             station_markets: Some(StationMarkets::decode_save(&mut r)?),
+            missiles: if version >= 8 {
+                missiles::State::decode(&mut r)?
+            } else {
+                missiles::State::default()
+            },
             practice: read_practice(&mut r, version)?,
             pulse: weapons::PulseResources::default(),
             combat: combat::State::default(),
-            missiles: missiles::State::default(),
         };
         if version >= 7 {
-            candidate.combat = combat::State::decode(&mut r)?;
-            let ordinary_hit = r.option(combat::OrdinaryImpact::decode)?;
+            candidate.combat = combat::State::decode(&mut r, version)?;
+            let ordinary_hit = r.option(|r| combat::OrdinaryImpact::decode_version(r, version))?;
             match (candidate.practice.as_mut(), ordinary_hit) {
                 (Some(practice), hit) => practice.ordinary_hit = hit,
                 (None, None) => {}
@@ -241,6 +263,7 @@ impl World {
             self.state.tick,
             account.fuel_tenths(),
         )?;
+        self.missiles.validate(self, practice, nav.dock_sequence)?;
         self.combat.validate(self)?;
         if let (Some(attempt), Some(last)) = (
             practice,
@@ -259,7 +282,6 @@ impl World {
                 .and_then(|s| s.last_ordinary_impact)
                 .is_none_or(|last| {
                     hit.incident > last.incident
-                        || hit.emission > last.emission
                         || hit.physical_tick > last.physical_tick
                         || (hit.incident == last.incident && hit != last)
                 })
@@ -269,8 +291,15 @@ impl World {
                 ));
             }
         }
-        self.pulse
-            .validate_save(self.state.tick, self.state.mode, nav.launches)?;
+        if self.missiles.has_player_hit()
+            && !practice.is_some_and(|p| p.missile_docked_since_consent(nav.dock_sequence))
+        {
+            self.pulse
+                .validate_damaged_save(self.state.tick, self.state.mode, nav.launches)?;
+        } else {
+            self.pulse
+                .validate_save(self.state.tick, self.state.mode, nav.launches)?;
+        }
         if let Some(practice) = practice {
             practice.validate(nav, navigation, self.state, station, self.pulse)?;
         }
@@ -313,7 +342,7 @@ fn read_practice(
     } else {
         None
     };
-    let mut practice = r.option(practice::Practice::decode)?;
+    let mut practice = r.option(|r| practice::Practice::decode(r, version))?;
     if version >= 6 {
         match (practice.as_mut(), reception) {
             (Some(practice), Some(reception)) => practice.reception = reception,
@@ -357,6 +386,7 @@ fn validate_accounting(
                 + u128::from(s.revision)
                 + u128::from(jumps)
                 + u128::from(d.equipment_revision)
+                + u128::from(d.consumed_missiles)
     {
         return Err(SaveError::InvalidState(
             "wallet, cargo, fuel or payment chronology",
@@ -364,7 +394,7 @@ fn validate_accounting(
     }
     Ok(())
 }
-fn write_flight(w: &mut Writer, s: &Snapshot) {
+pub(super) fn write_flight(w: &mut Writer, s: &Snapshot) {
     for p in s.position {
         w.f32(p);
     }
@@ -384,7 +414,7 @@ fn write_flight(w: &mut Writer, s: &Snapshot) {
         Some(MotionRefusal::EntryConditions) => 2,
     });
 }
-fn read_flight(r: &mut Reader<'_>) -> Result<Snapshot, SaveError> {
+pub(super) fn read_flight(r: &mut Reader<'_>) -> Result<Snapshot, SaveError> {
     let position = r.array(|r| r.f32())?;
     let orientation = r.array(|r| r.f32())?;
     let speed = r.f32()?;
@@ -412,7 +442,7 @@ fn read_flight(r: &mut Reader<'_>) -> Result<Snapshot, SaveError> {
         motion_refusal,
     })
 }
-fn validate_flight(s: &Snapshot) -> Result<(), SaveError> {
+pub(super) fn validate_flight(s: &Snapshot) -> Result<(), SaveError> {
     let norm = s.orientation.iter().map(|v| v * v).sum::<f32>();
     let travel_bound = 16000.0
         + s.tick as f64
@@ -432,100 +462,83 @@ fn validate_flight(s: &Snapshot) -> Result<(), SaveError> {
 }
 
 #[cfg(test)]
-pub(super) fn v4_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
-    let current = world.save_bytes()?;
-    assert!(world.practice.is_none());
-    let prefix = 18 + CONTENT.len();
-    // Snapshot through market bytes are unchanged. Remove both absent v6
-    // practice tags immediately before the five old weapon bytes.
-    let mut combat = Writer::new();
-    world.combat.encode(&mut combat);
-    combat.option(
-        world.practice.and_then(|p| p.ordinary_hit).as_ref(),
-        |w, hit| hit.encode(w),
-    );
-    let tail = current.len() - 13 - combat.bytes.len();
-    assert_eq!(current[tail - 1], 0);
-    assert_eq!(current[tail - 2], 0);
+fn legacy_test_fixture(world: &World, version: u16) -> Result<Vec<u8>, SaveError> {
+    if !world.missiles.save_supported() {
+        return Err(SaveError::UnsupportedMissiles);
+    }
+    world.validate_saved_world(world.practice)?;
+    let content = match version {
+        4 => V4_CONTENT,
+        5 => V5_CONTENT,
+        6 => V6_CONTENT,
+        7 => V7_CONTENT,
+        _ => return Err(SaveError::UnsupportedVersion),
+    };
     let mut w = Writer::new();
     w.bytes.extend(MAGIC);
-    w.u16(4);
-    w.bytes.extend(V4_CONTENT);
-    // Independently calculated from the exact predecessor rules header and
-    // original eight compiled resources.
-    w.u64(0xaa91_4776_a63c_5f97);
-    w.bytes.extend(&current[prefix..tail - 2]);
-    w.bytes
-        .extend(&current[current.len() - 13..current.len() - 8]);
+    w.u16(version);
+    w.bytes.extend(content);
+    w.u64(compiled_content_fingerprint(content));
+    write_flight(&mut w, &world.state);
+    world
+        .navigation
+        .ok_or(SaveError::NoCommander)?
+        .encode_save(&mut w);
+    world
+        .commander_account
+        .as_ref()
+        .ok_or(SaveError::NoCommander)?
+        .encode_v7(&mut w);
+    world
+        .freight_session
+        .as_ref()
+        .ok_or(SaveError::NoCommander)?
+        .encode_save(&mut w);
+    world
+        .station_markets
+        .as_ref()
+        .ok_or(SaveError::NoCommander)?
+        .encode_save(&mut w);
+    if version >= 6 {
+        w.option(world.practice.as_ref(), |w, p| p.encode_reception(w));
+    }
+    if version >= 5 {
+        w.option(world.practice.as_ref(), |w, p| p.encode_v7(w));
+    }
+    if version >= 7 {
+        world.combat.encode_v7(&mut w);
+        w.option(
+            world.practice.and_then(|p| p.ordinary_hit).as_ref(),
+            |w, h| h.encode_version(w, 7),
+        );
+    }
+    world.pulse.encode_save(&mut w);
     let digest = checksum(&w.bytes);
     w.u64(digest);
     Ok(w.bytes)
 }
-
+#[cfg(test)]
+pub(super) fn v4_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
+    assert!(world.practice.is_none());
+    legacy_test_fixture(world, 4)
+}
 #[cfg(test)]
 pub(super) fn v5_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
-    let current = world.save_bytes()?;
-    let mut legacy = Writer::new();
-    legacy.option(world.practice.as_ref(), |w, practice| practice.encode(w));
-    let mut reception = Writer::new();
-    reception.option(world.practice.as_ref(), |w, practice| {
-        practice.encode_reception(w)
-    });
-    let start = 18 + CONTENT.len();
-    let mut combat = Writer::new();
-    world.combat.encode(&mut combat);
-    combat.option(
-        world.practice.and_then(|p| p.ordinary_hit).as_ref(),
-        |w, hit| hit.encode(w),
-    );
-    let combat_start = current.len() - 13 - combat.bytes.len();
-    let reception_end = combat_start - legacy.bytes.len();
-    let reception_start = reception_end - reception.bytes.len();
-    assert_eq!(
-        &current[reception_start..reception_end],
-        reception.bytes.as_slice()
-    );
-    let mut w = Writer::new();
-    w.bytes.extend(MAGIC);
-    w.u16(5);
-    w.bytes.extend(V5_CONTENT);
-    // Independently calculated from the exact v5 base header and assets.
-    w.u64(0x46a9_5792_16cc_8694);
-    w.bytes.extend(&current[start..reception_start]);
-    w.bytes.extend(&current[reception_end..combat_start]);
-    w.bytes
-        .extend(&current[current.len() - 13..current.len() - 8]);
-    let digest = checksum(&w.bytes);
-    w.u64(digest);
-    Ok(w.bytes)
+    legacy_test_fixture(world, 5)
 }
-
 #[cfg(test)]
 pub(super) fn v6_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
-    let current = world.save_bytes()?;
     assert!(
         world
             .combat_snapshot()
             .and_then(|s| s.last_ordinary_impact)
             .is_none()
     );
-    assert!(world.practice.and_then(|p| p.ordinary_hit).is_none());
-    let mut combat = Writer::new();
-    world.combat.encode(&mut combat);
-    combat.option::<combat::OrdinaryImpact>(None, |w, hit| hit.encode(w));
-    let start = 18 + CONTENT.len();
-    let end = current.len() - 13 - combat.bytes.len();
-    let mut w = Writer::new();
-    w.bytes.extend(MAGIC);
-    w.u16(6);
-    w.bytes.extend(V6_CONTENT);
-    w.u64(0x8594bde0949de645);
-    w.bytes.extend(&current[start..end]);
-    w.bytes
-        .extend(&current[current.len() - 13..current.len() - 8]);
-    let digest = checksum(&w.bytes);
-    w.u64(digest);
-    Ok(w.bytes)
+    legacy_test_fixture(world, 6)
+}
+#[cfg(test)]
+pub(super) fn v7_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
+    legacy_test_fixture(world, 7)
 }
 
 #[cfg(test)]

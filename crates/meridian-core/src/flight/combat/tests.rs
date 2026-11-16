@@ -419,7 +419,7 @@ fn actual_v6_hot_practice_continues_without_inventing_impact_or_discarding_hits(
         continued.practice_snapshot().unwrap().status,
         PracticeStatus::Failed
     );
-    let v7 = continued.save_bytes().unwrap();
+    let v7 = crate::flight::persistence::v7_test_fixture(&continued).unwrap();
     assert_eq!(u16::from_le_bytes([v7[8], v7[9]]), 7);
     assert_eq!(
         World::from_save_bytes(&v7)

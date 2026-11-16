@@ -2,7 +2,7 @@
 
 This source slice starts at delivered main `13061c3be202d85601648cad6bea4559ecf8f628`. It adds actual finite starter rounds, explicit qualified practice lock/arm/release, World-owned projectile actors, swept contacts and pending-projectile ceasefire. Ten regressions are authored and unrun. Compiler, tests, Clippy and native gameplay qualification remain with the existing executors after independent review and Root's desktop join.
 
-**Save boundary:** a missile-used session cannot currently be saved or restored over. This includes ended projectile and missile-hit history. Arming or locking also refuses saving until explicitly disarmed and unlocked. The existing saved profile remains untouched; refusal never restores a consumed round or drops a live projectile. Full T02 continuation remains open. This source does not change installed previews or real profiles.
+**Current persistence successor:** the original version 7 refusal described below is historical. Version 8 source now retains armed, locked and used missile sessions, including live and ended records and consumed items. Independent review, Root's desktop save/status join and designated cold continuation remain pending. See [durable missile sessions](DURABLE-MISSILE-SESSIONS.md). Full T02 and actual player-hit acceptance remain separate; installed previews and profiles are untouched.
 
 ## Immutable source and geometry closure
 
@@ -43,7 +43,7 @@ A missile's first exact practice contact retains its complete original emission 
 
 World prepares the complete missile, impact/resource, legal and practice step before any actual arrival fuel debit. Counter/geometry refusal leaves the old World intact. The final debit and publication have no subsequent fallible operation. The account's finite consumption quote also pins the exact opening account before removing the selected round once.
 
-The supported memory format remains version 7, with exact v4-v7 readers and original account bytes for an untouched launcher. Loading those already-supported inventories retains the actual saved three items; the loader does not call the fresh birth or consumption producer. Armed/locked/used missile state refuses `save_bytes`, confirmation-save preparation and replacement through `restore_bytes` before mutation. A future version must retain remaining physical ownership, live/ended projectile origins and missile hit receipts together before this boundary is relaxed.
+The finite-launch predecessor's memory format was version 7, with exact v4-v7 readers and original account bytes for an untouched launcher. Loading those already-supported inventories retains the actual saved three items; the loader does not call the fresh birth or consumption producer. Armed/locked/used missile state refuses `save_bytes`, confirmation-save preparation and replacement through `restore_bytes` before mutation. The version 8 source successor retains these together, as specified in the linked persistence contract; its review/execution and desktop join remain pending.
 
 ## Qualification and Root desktop join
 
