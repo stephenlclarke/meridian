@@ -58,6 +58,12 @@ fn step_frame(
 }
 
 // This shell owns the World synchronously. No gameplay mutation occurs in renderer code.
+// Retain the frame-wide contact even when a later catch-up tick is clear.
+enum FrameAdvance {
+    Continue(Option<MotionRefusal>),
+    Fatal,
+}
+
 struct App {
     game: Profile,
     celestial: crate::celestial::WorldAdapter,
@@ -386,7 +392,12 @@ impl App {
         });
     }
 
-    fn advance_frame(&mut self, event_loop: &ActiveEventLoop, active: bool, ticks: usize) -> bool {
+    fn advance_frame(
+        &mut self,
+        event_loop: &ActiveEventLoop,
+        active: bool,
+        ticks: usize,
+    ) -> FrameAdvance {
         let mut frame_refusal = None;
         if active {
             let input = FlightInput {
@@ -409,7 +420,7 @@ impl App {
                 }
                 Err(error) => {
                     self.fail(event_loop, format!("Simulation refused input: {error}"));
-                    return false;
+                    return FrameAdvance::Fatal;
                 }
             }
         }
@@ -429,7 +440,7 @@ impl App {
                 .into(),
             );
         }
-        true
+        FrameAdvance::Continue(frame_refusal)
     }
 
     fn keyboard_input(&mut self, event_loop: &ActiveEventLoop, event: winit::event::KeyEvent) {
@@ -474,9 +485,10 @@ impl App {
         self.last_frame = now;
         let active = self.focused && !self.occluded && !self.paused && self.game.playing();
         let ticks = self.clock.ticks(elapsed, active);
-        if !self.advance_frame(event_loop, active, ticks) {
-            return;
-        }
+        let frame_refusal = match self.advance_frame(event_loop, active, ticks) {
+            FrameAdvance::Continue(refusal) => refusal,
+            FrameAdvance::Fatal => return,
+        };
         let snapshot = self.game.world.snapshot();
         // The beam is a short-lived view of the committed shot, never saved or re-fired.
         self.pulse = self.pulse.filter(|shot| {
