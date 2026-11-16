@@ -19,6 +19,13 @@ pub use pack::{Identity, Manifest, Pack};
 pub use tagged::decode_tagged;
 pub use value::{Value, decode, encode};
 
+/// Provenance assigned only at the real Lua compiler or protected function-call boundary.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LuaFailureStage {
+    Compilation,
+    Execution,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Error {
     Limit(&'static str),
@@ -32,6 +39,12 @@ pub enum Error {
     Stale,
     World(String),
     Publish(String),
+    LuaFailure {
+        stage: LuaFailureStage,
+        cause: Box<Error>,
+    },
+    /// Invocation diagnostics also cover compiler/conversion failures; these metrics alone do
+    /// not identify a Lua execution failure. Use `lua_failure_stage` for typed provenance.
     Execution {
         cause: Box<Error>,
         instructions: u64,
@@ -44,7 +57,7 @@ impl core::fmt::Display for Error {
         match self {
             Self::Limit(text) | Self::Codec(text) | Self::Pack(text) => f.write_str(text),
             Self::Lua(text) => f.write_str(text),
-            Self::Execution { cause, .. } => write!(f, "{cause}"),
+            Self::LuaFailure { cause, .. } | Self::Execution { cause, .. } => write!(f, "{cause}"),
             other => write!(f, "mission controller: {other:?}"),
         }
     }
@@ -52,6 +65,15 @@ impl core::fmt::Display for Error {
 impl std::error::Error for Error {}
 
 impl Error {
+    /// Preflight, VM setup, host validation and value-conversion errors have no Lua failure stage.
+    pub fn lua_failure_stage(&self) -> Option<LuaFailureStage> {
+        match self {
+            Self::LuaFailure { stage, .. } => Some(*stage),
+            Self::Execution { cause, .. } => cause.lua_failure_stage(),
+            _ => None,
+        }
+    }
+
     pub fn instruction_count(&self) -> Option<u64> {
         match self {
             Self::Execution { instructions, .. } => Some(*instructions),

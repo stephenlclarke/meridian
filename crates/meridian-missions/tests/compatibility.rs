@@ -1,6 +1,8 @@
 //! Executes the Root-audited, G2-authored frozen corpus without changing its expectations.
 mod support;
-use meridian_missions::{Error, Limits, Value, decode, decode_tagged, encode, evaluate, validate};
+use meridian_missions::{
+    Error, Limits, LuaFailureStage, Value, decode, decode_tagged, encode, evaluate, validate,
+};
 use serde_json::{Value as Json, json};
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
@@ -89,7 +91,11 @@ fn expect_result(result: &Result<Json, Error>, expected: &Json, case: &str) {
                 text.contains(expected["error"]["text"].as_str().required()),
                 "{case}: {text}"
             ),
-            "category" => {} // Frozen corpus explicitly permits platform-specific compiler/memory text.
+            "category" => assert_eq!(
+                error.lua_failure_stage(),
+                Some(expected_failure_stage(expected)),
+                "{case}: wrong Lua failure stage: {error:?}"
+            ),
             other => panic!("unhandled frozen error matcher {other}"),
         }
         if let Some(exact) = expected["metrics"]["instructions"]["exact"].as_u64() {
@@ -104,6 +110,14 @@ fn expect_result(result: &Result<Json, Error>, expected: &Json, case: &str) {
         }
     }
 }
+fn expected_failure_stage(expected: &Json) -> LuaFailureStage {
+    match expected["error"]["text"].as_str().required() {
+        "Script compilation error" => LuaFailureStage::Compilation,
+        "Script execution error" => LuaFailureStage::Execution,
+        other => panic!("unhandled frozen error category {other}"),
+    }
+}
+
 fn run(id: &str) {
     let fixture = read_json(&root().join("cases").join(format!("{id}.json")));
     let invocation = &fixture["invocation"];
@@ -167,7 +181,8 @@ fn run(id: &str) {
         "runtime":"mlua0.12.2 with retained budget/seed patch; lua-src551.1.0/Lua5.5.1",
         "result":result.as_ref().ok(),"error":result.as_ref().err().map(ToString::to_string),
         "wallSeconds":wall_seconds,"referenceWallSeconds":"UNRUN",
-        "metrics":successful_metrics,"failureInstructions":result.as_ref().err().and_then(Error::instruction_count)})
+        "metrics":successful_metrics,"failureInstructions":result.as_ref().err().and_then(Error::instruction_count),
+        "failureStage":result.as_ref().err().and_then(Error::lua_failure_stage).map(|stage|format!("{stage:?}"))})
     );
     expect_result(&result, &fixture["expected"], id);
     if let Some(followup) = fixture.get("followup") {
@@ -217,6 +232,148 @@ fn frozen_corpus_manifest_and_every_payload_are_unchanged() {
             format!("{:x}", Sha256::digest(&bytes)),
             payload["sha256"].as_str().required()
         );
+    }
+}
+
+#[test]
+fn frozen_category_matcher_rejects_unrelated_and_opposite_stage_errors() {
+    for id in [
+        "binary-chunk-refused",
+        "syntax-error",
+        "allocation-bound-refusal",
+        "recursive-runtime-failure",
+    ] {
+        let fixture = read_json(&root().join("cases").join(format!("{id}.json")));
+        let expected = &fixture["expected"];
+        assert_eq!(expected["error"]["match"], "category");
+        let stage = expected_failure_stage(expected);
+        let opposite = match stage {
+            LuaFailureStage::Compilation => LuaFailureStage::Execution,
+            LuaFailureStage::Execution => LuaFailureStage::Compilation,
+        };
+        let errors = [
+            Error::Replay,
+            Error::Limit("Invalid script input or limits."),
+            Error::Pack("Missing named handler."),
+            Error::Codec("Result contains a nonserializable value."),
+            // Diagnostic text and the pre-existing metrics wrapper cannot manufacture provenance.
+            Error::Lua("Script compilation error; Script execution error".into()),
+            Error::Execution {
+                cause: Box::new(Error::Replay),
+                instructions: 0,
+                peak_heap_bytes: 0,
+                allocation_bytes: 0,
+            },
+            Error::LuaFailure {
+                stage: opposite,
+                cause: Box::new(Error::Lua("platform-specific diagnostic".into())),
+            },
+        ];
+        for error in errors {
+            let result: Result<Json, Error> = Err(error);
+            assert!(
+                std::panic::catch_unwind(|| expect_result(&result, expected, id)).is_err(),
+                "{id}: wrong-stage error was incorrectly credited: {result:?}"
+            );
+        }
+        // Matching typed provenance must also pass; an always-rejecting matcher is insufficient.
+        let matching = Err(Error::Execution {
+            cause: Box::new(Error::LuaFailure {
+                stage,
+                cause: Box::new(Error::Lua("platform-specific diagnostic".into())),
+            }),
+            instructions: 0,
+            peak_heap_bytes: 0,
+            allocation_bytes: 0,
+        });
+        expect_result(&matching, expected, id);
+    }
+}
+
+#[test]
+fn real_text_compiler_errors_keep_provenance_through_validator_and_evaluator() {
+    for id in ["binary-chunk-refused", "syntax-error"] {
+        let fixture = read_json(&root().join("cases").join(format!("{id}.json")));
+        let source =
+            std::fs::read(root().join(fixture["invocation"]["source"].as_str().required()))
+                .required();
+        let error = validate(&source, &["on_event".into()]).err().required();
+        assert_eq!(
+            error.lua_failure_stage(),
+            Some(LuaFailureStage::Compilation)
+        );
+        let error = evaluate(
+            &source,
+            "on_event",
+            &Value::empty_map(),
+            &Value::empty_map(),
+            &Value::empty_map(),
+            Limits::default(),
+        )
+        .err()
+        .required();
+        assert_eq!(
+            error.lua_failure_stage(),
+            Some(LuaFailureStage::Compilation)
+        );
+    }
+}
+
+#[test]
+fn real_module_and_handler_calls_are_distinct_from_preflight_and_host_validation() {
+    let module_error = b"error('module call diagnostic')";
+    let handler_error = b"return {run=function(e,w,d) error('handler call diagnostic') end}";
+    for source in [module_error.as_slice(), handler_error.as_slice()] {
+        let error = evaluate(
+            source,
+            "run",
+            &Value::empty_map(),
+            &Value::empty_map(),
+            &Value::empty_map(),
+            Limits::default(),
+        )
+        .err()
+        .required();
+        assert_eq!(error.lua_failure_stage(), Some(LuaFailureStage::Execution));
+    }
+    let error = validate(module_error, &["run".into()]).err().required();
+    assert_eq!(error.lua_failure_stage(), Some(LuaFailureStage::Execution));
+    let missing = validate(b"return {}", &["run".into()]).err().required();
+    assert_eq!(missing.lua_failure_stage(), None);
+    let valid = b"return {run=function(e,w,d) return {data=d,commands={}} end}";
+    for (source, handler, limits) in [
+        (valid.as_slice(), "invalid.handler", Limits::default()),
+        (
+            valid.as_slice(),
+            "run",
+            Limits {
+                instructions: 1,
+                ..Limits::default()
+            },
+        ),
+        (b"return 2".as_slice(), "run", Limits::default()),
+        (
+            b"return {run=function() return {data=false,commands={}} end}".as_slice(),
+            "run",
+            Limits::default(),
+        ),
+        (
+            b"return {run=function() return {data={bad=function()end},commands={}} end}".as_slice(),
+            "run",
+            Limits::default(),
+        ),
+    ] {
+        let error = evaluate(
+            source,
+            handler,
+            &Value::empty_map(),
+            &Value::empty_map(),
+            &Value::empty_map(),
+            limits,
+        )
+        .err()
+        .required();
+        assert_eq!(error.lua_failure_stage(), None, "{error:?}");
     }
 }
 

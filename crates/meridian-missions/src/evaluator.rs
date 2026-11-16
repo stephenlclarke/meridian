@@ -1,6 +1,6 @@
 //! One protected Lua 5.5 VM per callback. No host gameplay callbacks enter a Lua frame.
 use crate::value::{MAX_BYTES, MAX_DEPTH, MAX_ITEMS};
-use crate::{Error, Value, encode};
+use crate::{Error, LuaFailureStage, Value, encode};
 use mlua::{ChunkMode, Function, HookTriggers, Lua, LuaOptions, StdLib, Table, VmState};
 use std::cell::Cell;
 use std::collections::BTreeMap;
@@ -78,11 +78,14 @@ pub fn evaluate(
         let function: Function = module
             .raw_get(handler)
             .map_err(|_| Error::Pack("Missing named handler."))?;
-        let result = function.call::<mlua::Value>((
+        let arguments = (
             to_lua(lua, event)?,
             to_lua(lua, snapshot)?,
             to_lua(lua, state)?,
-        ))?;
+        );
+        let result = function
+            .call::<mlua::Value>(arguments)
+            .map_err(|cause| lua_failure(LuaFailureStage::Execution, cause))?;
         let mut budget = OutputBudget {
             items: 0,
             bytes: 0,
@@ -245,18 +248,7 @@ fn invoke<T>(
                 original_assert.call::<mlua::MultiValue>(arguments)
             })?;
             globals.raw_set("assert", assertion)?;
-            let module = lua
-                .load(source)
-                .set_name("mission")
-                .set_mode(ChunkMode::Text)
-                .into_function()?
-                .call::<mlua::Value>(())?;
-            let mlua::Value::Table(module) = module else {
-                return Err(mlua::Error::RuntimeError(
-                    "Module must return a handler table.".into(),
-                ));
-            };
-            Ok(call(&lua, module))
+            Ok(load_module(&lua, source).and_then(|module| call(&lua, module)))
         })
         .map_err(Error::from)
         .and_then(|result| result)
@@ -267,6 +259,31 @@ fn invoke<T>(
             allocation_bytes: memory.allocated_bytes(),
         })?;
     Ok((output, instructions.get(), memory))
+}
+
+fn lua_failure(stage: LuaFailureStage, cause: mlua::Error) -> Error {
+    Error::LuaFailure {
+        stage,
+        cause: Box::new(Error::from(cause)),
+    }
+}
+
+fn load_module(lua: &Lua, source: &[u8]) -> Result<Table, Error> {
+    let compiled = lua
+        .load(source)
+        .set_name("mission")
+        .set_mode(ChunkMode::Text)
+        .into_function()
+        .map_err(|cause| lua_failure(LuaFailureStage::Compilation, cause))?;
+    let module = compiled
+        .call::<mlua::Value>(())
+        .map_err(|cause| lua_failure(LuaFailureStage::Execution, cause))?;
+    match module {
+        mlua::Value::Table(module) => Ok(module),
+        _ => Err(Error::from(mlua::Error::RuntimeError(
+            "Module must return a handler table.".into(),
+        ))),
+    }
 }
 
 fn to_lua(lua: &Lua, value: &Value) -> Result<mlua::Value, Error> {

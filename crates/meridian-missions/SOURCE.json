@@ -136,7 +136,8 @@
     "actualWorldControllerAndClosedModuleTests": 7,
     "status": "UNRUN until existing owner execution",
     "publicationPreservation": 5,
-    "total": 152
+    "total": 155,
+    "typedErrorProvenanceRegressions": 3
   },
   "sourceChecks": {
     "rustfmtParsing": "PASS after final formatting; no type-check/compile claimed",
@@ -153,7 +154,7 @@
     "LuaRuntime": "UNRUN",
     "fixtureResults": "UNRUN",
     "coverage": "UNRUN",
-    "required": "Exact composed commit/tree/lock, corpus manifest SHA, compiler/OS/backend, per-case result/errors/metrics/monotonic timings, actual World publish/failure/restore checks; no model scenario counted as native pass"
+    "required": "Exact composed commit/tree/lock, corpus manifest SHA, compiler/OS/backend, per-case result/errors/typedfailurestage/metrics/monotonic timings, actual World publish/failure/restore checks; no model scenario counted as native pass"
   },
   "scope": "Executable Lua evaluator/controller and T01 actual World preparation adapter, bounded ordinary publication serializer and later native T01 transitions retaining original script state; no current core/App/save/economy edits; no second simulation/native authority; no legacy-profile import",
   "remaining": [
@@ -179,5 +180,15 @@
     "evidence": "Metadata-only changed scratch composition; actual Root shared lock/compiler/Lua/native acceptance remains pending.",
     "officialSource": "https://github.com/rust-lang/cargo/blob/ddb37b06aba4dcf791fde56dd9fcf73ae7d05f7f/src/cargo/core/workspace.rs#L2166-L2182",
     "rootFollowup": "Root reports actual joined metadata no-deps four members and offline shared resolution; cargo fmt --all additionally traverses excluded vendored path dependencies and reports upstream formatting. Root reports cargo fmt -- --check passes four project members. These are Root-owned observations, not MC1 compiler or runtime results; gate-command decision and shared-lock notice closure remain with Root/Researcher."
+  },
+  "typedErrorProvenanceDelta": {
+    "parentCommit": "e09871bc8a1b0f7713e5e80e566464774159a942",
+    "finding": "G2P2: category matcher was empty and credited arbitrary errors for four frozen compilation/execution cases.",
+    "implementation": "LuaFailureStage/typed cause assigned at actual text compiler and protected module/handler calls; preflight/setup/host validation/conversion remain unclassified; historical metrics wrapper alone is not execution provenance; diagnostic text unchanged.",
+    "harness": "Assert exact frozen category for binary-chunk-refused/syntax-error compilation and allocation-bound-refusal/recursive-runtime-failure execution; unknown category fails, never accept arbitrary Err or diagnostic-text inference. Emit typed failureStage in bound case records.",
+    "controls": "Three authored regressions: four frozen category fixtures x seven wrong/error-stage controls + matching typed controls; real compiler validator/evaluator and actual module/handler/preflight/validation/conversion boundaries. ALL_UNRUN.",
+    "unaffected": "Frozen139expectations/382payloads/generatedtestentries, existingcontroller/publicationtests, adapter/persistence/pack/value behavior, all vendor/manifests/patch/notices/dependencies/locks and all Root/Core/App paths byte-unchanged.",
+    "criteria": "All existing152entries plus3newtests pass on actual owned execution; each frozen category must originate at its actual expected boundary. Wrong-stage allocator/setup failure remains a failing parity result, not relabelled. Independent G2 review and source/platform binding required.",
+    "execution": "No compiler/VM/newRusthelper execution by MC1. Rust/Lua/Clippy/coverage/native allUNRUN."
   }
 }
