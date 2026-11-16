@@ -1,0 +1,82 @@
+{
+  "sourceHead": "0f393f666981ae80cd78d6aa9d317c18fd9c7c8b",
+  "sourceTree": "de9674582f3c92aaea437f6ae86d174b4ee0521a",
+  "rustTestCounts": [
+    6,
+    6,
+    9,
+    2,
+    0
+  ],
+  "rustTotal": 23,
+  "rawLogSHA256": "624fadb62167db12f99593f5d7e6ad80901ceb33ac9643ea61024621cdde81e6",
+  "cases": [
+    {
+      "fixture": "identity",
+      "oldOperations": 30277,
+      "newOperations": 30792,
+      "oldAttemptedPeak": 6552,
+      "newAttemptedPeak": 6552,
+      "oldRetained": 2016,
+      "newRetained": 2016,
+      "triangles": 12,
+      "exactOutputAndExposedWitnessMatch": true
+    },
+    {
+      "fixture": "overlap",
+      "oldOperations": 108136,
+      "newOperations": 106099,
+      "oldAttemptedPeak": 19368,
+      "newAttemptedPeak": 19368,
+      "oldRetained": 6552,
+      "newRetained": 6552,
+      "triangles": 48,
+      "exactOutputAndExposedWitnessMatch": true
+    },
+    {
+      "fixture": "buried",
+      "oldOperations": 49342,
+      "newOperations": 44726,
+      "oldAttemptedPeak": 9940,
+      "newAttemptedPeak": 7248,
+      "oldRetained": 2724,
+      "newRetained": 2016,
+      "triangles": 12,
+      "exactOutputAndExposedWitnessMatch": true
+    },
+    {
+      "fixture": "shared_face",
+      "oldOperations": 66170,
+      "newOperations": 65981,
+      "oldAttemptedPeak": 12108,
+      "newAttemptedPeak": 11056,
+      "oldRetained": 3636,
+      "newRetained": 3360,
+      "triangles": 20,
+      "exactOutputAndExposedWitnessMatch": true
+    },
+    {
+      "fixture": "four_disconnected",
+      "oldOperations": 163544,
+      "newOperations": 148434,
+      "oldAttemptedPeak": 25824,
+      "newAttemptedPeak": 25824,
+      "oldRetained": 8064,
+      "newRetained": 8064,
+      "triangles": 48,
+      "exactOutputAndExposedWitnessMatch": true
+    },
+    {
+      "fixture": "eight_oblique_disconnected",
+      "oldOperations": 440797,
+      "newOperations": 364298,
+      "oldAttemptedPeak": 51520,
+      "newAttemptedPeak": 51520,
+      "oldRetained": 16128,
+      "newRetained": 16128,
+      "triangles": 96,
+      "exactOutputAndExposedWitnessMatch": true
+    }
+  ],
+  "interpretation": "Frozen complete analytic-solids work charges and retained logical memberships only; all exact output/fields/witness assertions passed. Not measured runtime, physical memory, GPU or original-fleet acceptance."
+}

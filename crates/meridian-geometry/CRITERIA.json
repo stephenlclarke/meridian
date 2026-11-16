@@ -118,6 +118,21 @@
       "file": "src/certificate.rs",
       "name": "certificate::tests::closed_component_bounds_retain_face_edge_and_point_equalities",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/adapter.rs",
+      "name": "adapter::tests::original_style_pool_preserves_exact_text_and_counts_only_shared_allocations",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/adapter.rs",
+      "name": "adapter::tests::equal_unshared_styles_and_shared_clones_have_distinct_storage_ownership",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/pruning.rs",
+      "name": "pruning::complete_style_storage_controls_preserve_all_fields_witnesses_and_refusals",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -259,5 +274,15 @@
     },
     "currentExecution": "UNRUN",
     "compiledControlFreezeSHA256": "f9a4b9177284f4afefc8b8e349dad693d80c4f2d71ef7608665c908f5013125e"
+  },
+  "styleStorageCorrection": {
+    "parentQualifiedJoin": "0f393f666981ae80cd78d6aa9d317c18fd9c7c8b",
+    "causalDeltaSHA256": "2ee3823e10271fff262b89ecda6893d912ab0908db9be49c567ff69c81da69c0",
+    "beforeSUTFreezeSHA256": "6e803aabfa2ab05371537fe580d844a7ddd0fb059e0109d05278775d003e7af7",
+    "currentExecution": "UNRUN",
+    "parentRustPass": 23,
+    "parentHostPass": 9,
+    "parentWholeFive": "5decodePASS/5StorageREFUSED/15dependentUNRUN/0candidate",
+    "inputStorageDeltaOnly": "Source-derived37304..41560removed repeated memberships; no physical allocator/minimum claim"
   }
 }

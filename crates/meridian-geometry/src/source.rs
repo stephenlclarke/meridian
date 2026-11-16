@@ -1,6 +1,7 @@
 use crate::exact::{add, axis, checked, cross, dot, orient, point, project, scale, sub};
 use crate::{Budget, Failure, FailureKind, Point2, Point3, Rational, integer};
 use num_traits::{Signed, Zero};
+use std::sync::Arc;
 
 /// IDs are assigned before applying component transforms and survive every split.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -15,11 +16,31 @@ pub struct Vertex {
     pub uv: Point2,
 }
 
+#[derive(Clone, Debug)]
+enum Style {
+    Owned(String),
+    Shared(Arc<str>),
+}
+impl Style {
+    fn as_str(&self) -> &str {
+        match self {
+            Self::Owned(s) => s,
+            Self::Shared(s) => s,
+        }
+    }
+}
+impl PartialEq for Style {
+    fn eq(&self, other: &Self) -> bool {
+        self.as_str() == other.as_str()
+    }
+}
+impl Eq for Style {}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Facet {
     id: SourceId,
     vertices: [Vertex; 3],
-    style: String,
+    style: Style,
     normal: Point3,
     offset: Rational,
 }
@@ -31,8 +52,24 @@ impl Facet {
         style: String,
         budget: &mut Budget,
     ) -> Result<Self, Failure> {
+        Self::with_style(id, vertices, Style::Owned(style), budget)
+    }
+    pub(crate) fn with_shared_style(
+        id: SourceId,
+        vertices: [Vertex; 3],
+        style: Arc<str>,
+        budget: &mut Budget,
+    ) -> Result<Self, Failure> {
+        Self::with_style(id, vertices, Style::Shared(style), budget)
+    }
+    fn with_style(
+        id: SourceId,
+        vertices: [Vertex; 3],
+        style: Style,
+        budget: &mut Budget,
+    ) -> Result<Self, Failure> {
         budget.at(id);
-        budget.guard(32 + style.len())?;
+        budget.guard(32 + style.as_str().len())?;
         for vertex in &vertices {
             point(&vertex.point, budget)?;
             point(&vertex.uv, budget)?;
@@ -61,7 +98,46 @@ impl Facet {
         &self.vertices
     }
     pub fn style(&self) -> &str {
-        &self.style
+        self.style.as_str()
+    }
+    /// Includes original geometry, identity maps and distinct owned style data.
+    /// Equal text in separate allocations is deliberately counted separately.
+    pub(crate) fn input_memberships(faces: &[Self], b: &mut Budget) -> Result<usize, Failure> {
+        b.guard(faces.len())?;
+        let mut members = 40 * faces.len() + 64;
+        let mut styles: Vec<&Arc<str>> = Vec::new();
+        b.guard(members)?;
+        for face in faces {
+            b.at(face.id());
+            b.step(1)?;
+            let added = match &face.style {
+                Style::Owned(style) => style.len(),
+                Style::Shared(style) => {
+                    let mut shared = false;
+                    for prior in &styles {
+                        b.step(1)?;
+                        if Arc::ptr_eq(prior, style) {
+                            shared = true;
+                            break;
+                        }
+                    }
+                    if shared {
+                        0
+                    } else {
+                        // Two reference-count slots and the immutable text.
+                        b.guard(members + style.len() + 2 + styles.len() + 1)?;
+                        styles.push(style);
+                        style.len() + 2
+                    }
+                }
+            };
+            members = members
+                .checked_add(added)
+                .ok_or_else(|| b.fail(FailureKind::Storage, "original style storage overflow"))?;
+            // The temporary allocation index releases before identity maps.
+            b.guard(members + styles.len())?;
+        }
+        Ok(members)
     }
     pub(crate) fn normal(&self) -> &Point3 {
         &self.normal
@@ -220,7 +296,7 @@ impl AffineTransform {
         if determinant.is_negative() {
             vertices.swap(1, 2);
         }
-        Facet::new(face.id, vertices, face.style.clone(), b)
+        Facet::with_style(face.id, vertices, face.style.clone(), b)
     }
 }
 

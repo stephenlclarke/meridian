@@ -578,8 +578,7 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
         return Err(b.fail(FailureKind::InvalidInput, "missing original components"));
     }
     b.guard(originals.len())?;
-    let input_members =
-        40 * originals.len() + 64 + originals.iter().map(|f| f.style().len()).sum::<usize>();
+    let input_members = Facet::input_memberships(originals, b)?;
     b.retain(input_members)?;
     let mut ids = BTreeSet::new();
     let mut owners = BTreeSet::new();

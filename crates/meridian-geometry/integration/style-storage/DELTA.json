@@ -1,0 +1,344 @@
+{
+  "parentAuthorHead": "fde3b47197ae255ece37163b6cdb86084b74dd53",
+  "qualifiedParentJoin": "0f393f666981ae80cd78d6aa9d317c18fd9c7c8b",
+  "qualifiedParentTree": "de9674582f3c92aaea437f6ae86d174b4ee0521a",
+  "parentHandoffSHA256": "37f87e1cfa79e7583a1422d0959e778040a6877af6fbbfc30c8728771cf71c54",
+  "parentTerminalUTC": "2026-11-16T19:38:52.912480+00:00",
+  "parentActualRows": [
+    {
+      "id": "SH010",
+      "statuses": [
+        {
+          "name": "bound_original_decode",
+          "status": "PASS"
+        },
+        {
+          "name": "original_construction",
+          "status": "REFUSED"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "status": "UNRUN"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "status": "UNRUN"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "status": "UNRUN"
+        }
+      ],
+      "failure": {
+        "kind": "Storage",
+        "source": [
+          0,
+          8
+        ],
+        "operationsAtRefusal": 1087961,
+        "detail": "exact storage budget exhausted"
+      },
+      "operations": 1087961,
+      "attemptedPeak": 100036,
+      "admittedPeak": 99972,
+      "retainedAtTerminal": 89902,
+      "wallSeconds": 138.463252156,
+      "completeCandidate": false,
+      "allChecksPassed": false,
+      "fleetAdmission": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    },
+    {
+      "id": "SH011",
+      "statuses": [
+        {
+          "name": "bound_original_decode",
+          "status": "PASS"
+        },
+        {
+          "name": "original_construction",
+          "status": "REFUSED"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "status": "UNRUN"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "status": "UNRUN"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "status": "UNRUN"
+        }
+      ],
+      "failure": {
+        "kind": "Storage",
+        "source": [
+          0,
+          8
+        ],
+        "operationsAtRefusal": 1085993,
+        "detail": "exact storage budget exhausted"
+      },
+      "operations": 1085993,
+      "attemptedPeak": 100024,
+      "admittedPeak": 99960,
+      "retainedAtTerminal": 89742,
+      "wallSeconds": 133.264396024,
+      "completeCandidate": false,
+      "allChecksPassed": false,
+      "fleetAdmission": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    },
+    {
+      "id": "SH016",
+      "statuses": [
+        {
+          "name": "bound_original_decode",
+          "status": "PASS"
+        },
+        {
+          "name": "original_construction",
+          "status": "REFUSED"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "status": "UNRUN"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "status": "UNRUN"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "status": "UNRUN"
+        }
+      ],
+      "failure": {
+        "kind": "Storage",
+        "source": [
+          0,
+          41
+        ],
+        "operationsAtRefusal": 1227366,
+        "detail": "exact storage budget exhausted"
+      },
+      "operations": 1227366,
+      "attemptedPeak": 100018,
+      "admittedPeak": 99922,
+      "retainedAtTerminal": 97234,
+      "wallSeconds": 43.322793849,
+      "completeCandidate": false,
+      "allChecksPassed": false,
+      "fleetAdmission": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    },
+    {
+      "id": "SH017",
+      "statuses": [
+        {
+          "name": "bound_original_decode",
+          "status": "PASS"
+        },
+        {
+          "name": "original_construction",
+          "status": "REFUSED"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "status": "UNRUN"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "status": "UNRUN"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "status": "UNRUN"
+        }
+      ],
+      "failure": {
+        "kind": "Storage",
+        "source": [
+          0,
+          41
+        ],
+        "operationsAtRefusal": 1256154,
+        "detail": "exact storage budget exhausted"
+      },
+      "operations": 1256154,
+      "attemptedPeak": 100050,
+      "admittedPeak": 99986,
+      "retainedAtTerminal": 97426,
+      "wallSeconds": 51.953861604,
+      "completeCandidate": false,
+      "allChecksPassed": false,
+      "fleetAdmission": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    },
+    {
+      "id": "SH166",
+      "statuses": [
+        {
+          "name": "bound_original_decode",
+          "status": "PASS"
+        },
+        {
+          "name": "original_construction",
+          "status": "REFUSED"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "status": "UNRUN"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "status": "UNRUN"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "status": "UNRUN"
+        }
+      ],
+      "failure": {
+        "kind": "Storage",
+        "source": [
+          0,
+          84
+        ],
+        "operationsAtRefusal": 1681739,
+        "detail": "exact storage budget exhausted"
+      },
+      "operations": 1681739,
+      "attemptedPeak": 100010,
+      "admittedPeak": 99802,
+      "retainedAtTerminal": 98682,
+      "wallSeconds": 85.079328756,
+      "completeCandidate": false,
+      "allChecksPassed": false,
+      "fleetAdmission": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    }
+  ],
+  "parentFocusedWorkSHA256": "32323b88172fb3c934fa3add628d2c84f27e8d2f6db969d08f9e540f1fb2a528",
+  "frozenBeforeSUTControlsSHA256": "6e803aabfa2ab05371537fe580d844a7ddd0fb059e0109d05278775d003e7af7",
+  "causalFinding": "Each authenticated original facet owns its canonical style String. The full source input reservation stays retained throughout collection, noding and the closed hull audit, even when equal style text repeats. Six byte-exact style values occur across every sealed case. Input text sharing removes a real duplicate representation before every later reservation, without removing originals or relaxing guards. The refusal records do not identify a specific inner guard site or prove all later storage/work will fit.",
+  "sourceDerivedInputDelta": [
+    {
+      "id": "SH010",
+      "sourceSHA256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc",
+      "facets": 1012,
+      "distinctCanonicalStyles": 6,
+      "perFacetTextMemberships": 38456,
+      "distinctTextMemberships": 228,
+      "sharedCounterMemberships": 12,
+      "beforeInputReservation": 79000,
+      "afterInputReservation": 40784,
+      "removedRepeatedInputMemberships": 38216
+    },
+    {
+      "id": "SH011",
+      "sourceSHA256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c",
+      "facets": 1012,
+      "distinctCanonicalStyles": 6,
+      "perFacetTextMemberships": 38456,
+      "distinctTextMemberships": 228,
+      "sharedCounterMemberships": 12,
+      "beforeInputReservation": 79000,
+      "afterInputReservation": 40784,
+      "removedRepeatedInputMemberships": 38216
+    },
+    {
+      "id": "SH016",
+      "sourceSHA256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e",
+      "facets": 1100,
+      "distinctCanonicalStyles": 6,
+      "perFacetTextMemberships": 41800,
+      "distinctTextMemberships": 228,
+      "sharedCounterMemberships": 12,
+      "beforeInputReservation": 85864,
+      "afterInputReservation": 44304,
+      "removedRepeatedInputMemberships": 41560
+    },
+    {
+      "id": "SH017",
+      "sourceSHA256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a",
+      "facets": 1100,
+      "distinctCanonicalStyles": 6,
+      "perFacetTextMemberships": 41800,
+      "distinctTextMemberships": 228,
+      "sharedCounterMemberships": 12,
+      "beforeInputReservation": 85864,
+      "afterInputReservation": 44304,
+      "removedRepeatedInputMemberships": 41560
+    },
+    {
+      "id": "SH166",
+      "sourceSHA256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f",
+      "facets": 988,
+      "distinctCanonicalStyles": 6,
+      "perFacetTextMemberships": 37544,
+      "distinctTextMemberships": 228,
+      "sharedCounterMemberships": 12,
+      "beforeInputReservation": 77128,
+      "afterInputReservation": 39824,
+      "removedRepeatedInputMemberships": 37304
+    }
+  ],
+  "correction": [
+    "Decoder-local immutable style pool; charge lookups and admit cumulative original facets, distinct text/counter slots, pool handles and current line scratch before allocation. Drop pool handles on return; facets retain exact shared text.",
+    "Private Owned/Shared style representation. Public constructor and output geometry retain owned String behavior. Style equality remains text equality across ownership variants; affine transforms preserve the ownership form. No global state or platform address ordering.",
+    "Input accounting counts every owned String, and counts each actual shared allocation once using Arc::ptr_eq. Include two shared counter slots per distinct allocation. Charge identity-index comparisons and guard its temporary records before adding references. Release index before original identity maps; retain all source geometry and maps with the existing40-per-facet+64 base."
+  ],
+  "frozenComparisonInterpretation": "The frozen parent certificate retains its exact per-facet String reservation formula. It consumes the same current Facet interface in the complete comparison; the separately frozen parent source/adapter proves the parent owned each String. Thus old/new peaks are charged historical reservation policies, not two measured allocator traces.",
+  "acceptance": [
+    "All five sealed decodes: canonical text independently parsed from pinned bytes equals every returned style; exactly six values/228 text slots plus12 counter slots. No original construction in this focused decoder regression.",
+    "Distinct equal Arc allocations count separately; owned clones count separately; shared clones count once. Exact scratch cap admits, one-short refuses with admitted peak bounded and zero retained scratch.",
+    "Six unchanged complete analytic solids: ordered exact Facets, volume, every witness source/cell/physical/protected/triangle/star/area field, and both public witness verifications match the frozen immediate parent. Require strictly lower attempted storage peaks; retain all work counters without a speed claim. Singular vertex contact still refuses UncertifiedContact.",
+    "Existing original guards, tests, assets, source field values, final candidate topology and512triangle cap unchanged. Existing whole-five helper/harness unchanged, including its conservative per-facet original-text upper bound in dependent checks."
+  ],
+  "unchangedLimits": {
+    "operations": 2000000,
+    "storageMemberships": 100000,
+    "rationalBits": 4096,
+    "triangles": 512
+  },
+  "parentAdverseControl": {
+    "identityOldOperations": 30277,
+    "identityNewOperations": 30792,
+    "interpretation": "Actual prior pruning comparison; unfavorable work increase retained. Not a speed measurement."
+  },
+  "currentCompilerTests": "UNRUN",
+  "currentOriginalFive": "HELD pending bounded review and changed owner run",
+  "newCandidates": 0,
+  "newAdmissions": 0,
+  "physicalRAMClaim": false,
+  "allOriginalShipsRemainInScope": true,
+  "independentHUDAndEquipmentPriorityUnchanged": true
+}

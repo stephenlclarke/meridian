@@ -1,0 +1,24 @@
+{
+  "phase": "BEFORE_STYLE_STORAGE_SUCCESSOR_AUTHORING",
+  "parentAuthorHead": "fde3b47197ae255ece37163b6cdb86084b74dd53",
+  "qualifiedRootJoin": "0f393f666981ae80cd78d6aa9d317c18fd9c7c8b",
+  "reference": "Parent production certificate prefix with trailing whitespace normalized only; full parent source/adapter retained separately. Complete independent analytic solids unchanged.",
+  "files": {
+    "CASES.json": {
+      "bytes": 3170,
+      "sha256": "f7a0e6665cfd9337145c9b9715e26516f164acd0612590dc07093bafe95e4e5d"
+    },
+    "before-adapter.rs": {
+      "bytes": 4916,
+      "sha256": "b0c8078d841b311a81dc54c9369386c2069820295d5a6e54d77e144d0b3ebe13"
+    },
+    "before-certificate.rs": {
+      "bytes": 40137,
+      "sha256": "e9574bc4f17e1e9ae200a6a44c3b474d6aca129f74b4fb838c3bbe55c8d3f83b"
+    },
+    "before-source.rs": {
+      "bytes": 10272,
+      "sha256": "9a8984561b8ab0d33a41c293dd27ff504fcdf3ad20207dbb567fa11d6c49ff79"
+    }
+  }
+}
