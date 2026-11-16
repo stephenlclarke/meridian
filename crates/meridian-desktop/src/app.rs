@@ -6,7 +6,9 @@ use std::{
     time::Instant,
 };
 
-use meridian_core::{FlightInput, FlightMode, MotionRefusal, StepError, World};
+use meridian_core::{
+    FlightInput, FlightMode, MotionRefusal, PulseContact, PulseShot, StepError, World,
+};
 use winit::{
     application::ApplicationHandler,
     event::{ElementState, WindowEvent},
@@ -35,11 +37,21 @@ fn step_frame(
     world: &mut World,
     input: FlightInput,
     ticks: usize,
+    fire_held: bool,
+    pulse: &mut Option<PulseShot>,
 ) -> Result<Option<MotionRefusal>, StepError> {
     let mut refusal = None;
     for _ in 0..ticks {
         world.step(input)?;
-        refusal = world.snapshot().motion_refusal.or(refusal);
+        let state = world.snapshot();
+        refusal = state.motion_refusal.or(refusal);
+        if state.mode != FlightMode::Flight
+            || state.navigation.is_some_and(|nav| nav.travel.is_some())
+        {
+            *pulse = None;
+        } else if fire_held && let Ok(shot) = world.request_fire_front_pulse(state.tick) {
+            *pulse = Some(shot);
+        }
     }
     Ok(refusal)
 }
@@ -57,6 +69,7 @@ struct App {
     clock: FixedClock,
     error: Option<String>,
     notice: Option<String>,
+    pulse: Option<PulseShot>,
 }
 
 impl App {
@@ -75,6 +88,7 @@ impl App {
             clock: FixedClock::default(),
             error: None,
             notice: None,
+            pulse: None,
         })
     }
 
@@ -98,6 +112,7 @@ impl App {
 
     fn reset_input(&mut self) {
         self.keys.clear();
+        self.pulse = None;
         self.last_frame = Instant::now();
         self.clock.reset();
         self.game.session.invalidate();
@@ -234,7 +249,13 @@ impl App {
                 throttle: self.axis(KeyCode::KeyW, KeyCode::KeyS),
                 brake: self.keys.contains(&KeyCode::Space),
             };
-            match step_frame(&mut self.game.world, input, ticks) {
+            match step_frame(
+                &mut self.game.world,
+                input,
+                ticks,
+                self.keys.contains(&KeyCode::KeyZ),
+                &mut self.pulse,
+            ) {
                 Ok(refusal) => frame_refusal = refusal,
                 Err(error) if matches!(error, StepError::Collision | StepError::UnsafeEntry) => {
                     self.notice = Some(error.to_string());
@@ -258,9 +279,20 @@ impl App {
                 .into(),
             );
         }
-        let hud_lines = self.game.lines(active, self.notice.as_deref());
+        let snapshot = self.game.world.snapshot();
+        // The beam is a short-lived view of the committed shot, never saved or re-fired.
+        self.pulse = self.pulse.filter(|shot| {
+            active
+                && snapshot.mode == FlightMode::Flight
+                && snapshot.tick.saturating_sub(shot.tick) < 5
+        });
+        let pulse_notice = self.pulse.map(|shot| match shot.contact {
+            PulseContact::Clear => "Pulse fired",
+            PulseContact::StationBlocked { .. } => "Pulse stopped by station hull",
+        });
+        let notice = pulse_notice.or(self.notice.as_deref());
+        let hud_lines = self.game.lines(active, notice);
         if let Some(renderer) = &mut self.renderer {
-            let snapshot = self.game.world.snapshot();
             let mode = match snapshot.mode {
                 FlightMode::Docked => "DOCKED - L launch",
                 FlightMode::Launching => "LAUNCHING",
@@ -278,11 +310,11 @@ impl App {
                         }
                     });
             renderer.window.set_title(&format!(
-                "Meridian | {mode} | speed {:.1} | tick {} | {} | {} | W/S thrust, arrows pitch, A/D yaw, Q/E roll, Space brake, P pause, F11 fullscreen",
+                "Meridian | {mode} | speed {:.1} | tick {} | {} | {} | W/S thrust, arrows pitch, A/D yaw, Q/E roll, Space brake, Z fire, P pause, F11 fullscreen",
                 snapshot.speed,
                 snapshot.tick,
                 if active { "RUNNING" } else { "PAUSED" },
-                contact_notice.or(self.notice.as_deref())
+                contact_notice.or(notice)
                     .unwrap_or("Click inside to control"),
             ));
             let station =
@@ -294,7 +326,7 @@ impl App {
                         port,
                         docked: snapshot.mode == FlightMode::Docked,
                     });
-            if let Err(error) = renderer.draw(&snapshot, station, &hud_lines) {
+            if let Err(error) = renderer.draw(&snapshot, station, self.pulse.as_ref(), &hud_lines) {
                 self.fail(event_loop, error);
             }
         }
@@ -389,6 +421,48 @@ mod tests {
     use meridian_core::{FIXED_DELTA_SECONDS, FlightStart};
 
     #[test]
+    fn held_fire_uses_advanced_ticks_and_respects_core_cadence() {
+        let mut world = World::new_commander(123).unwrap_or_else(|error| panic!("{error}"));
+        world
+            .request_launch(world.snapshot().tick)
+            .unwrap_or_else(|error| panic!("{error}"));
+        let input = FlightInput::default();
+        let mut pulse = None;
+        step_frame(&mut world, input, 1, false, &mut pulse)
+            .unwrap_or_else(|error| panic!("{error}"));
+        let tick = world.snapshot().tick;
+        step_frame(&mut world, input, 0, true, &mut pulse)
+            .unwrap_or_else(|error| panic!("{error}"));
+        assert_eq!(pulse, None);
+        step_frame(&mut world, input, 1, true, &mut pulse)
+            .unwrap_or_else(|error| panic!("{error}"));
+        let first = pulse.unwrap_or_else(|| panic!("Held trigger did not fire on the next tick"));
+        assert_eq!(first.tick, tick + 1);
+
+        let cooldown = usize::from(meridian_core::PULSE_COOLDOWN_TICKS);
+        step_frame(&mut world, input, cooldown - 1, true, &mut pulse)
+            .unwrap_or_else(|error| panic!("{error}"));
+        assert_eq!(pulse, Some(first));
+        step_frame(&mut world, input, 1, true, &mut pulse)
+            .unwrap_or_else(|error| panic!("{error}"));
+        assert_eq!(
+            pulse.map(|shot| shot.tick),
+            Some(first.tick + cooldown as u64)
+        );
+
+        let second = pulse;
+        step_frame(&mut world, input, cooldown, false, &mut pulse)
+            .unwrap_or_else(|error| panic!("{error}"));
+        assert_eq!(pulse, second);
+        assert_eq!(
+            world
+                .pulse_laser_snapshot()
+                .map(|laser| laser.cooldown_ticks),
+            Some(0)
+        );
+    }
+
+    #[test]
     fn catch_up_frame_keeps_entry_refusal_after_a_later_clear_tick() {
         let mut world = World::in_flight_at_original_station(FlightStart {
             position: [0.0, 0.0, 260.0],
@@ -407,7 +481,7 @@ mod tests {
             assert_eq!(world.snapshot().motion_refusal, None);
         }
         let before = world.snapshot();
-        let notice = step_frame(&mut world, FlightInput::default(), 2)
+        let notice = step_frame(&mut world, FlightInput::default(), 2, false, &mut None)
             .unwrap_or_else(|error| panic!("{error}"));
         let after = world.snapshot();
         assert_eq!(notice, Some(MotionRefusal::EntryConditions));

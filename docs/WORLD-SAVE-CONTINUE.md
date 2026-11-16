@@ -12,7 +12,14 @@ The core has no filesystem, window, GPU, wall-clock, global identity allocator o
 
 ## Format and retained state
 
-The current commodity successor uses magic `MERSAVE1`, explicit version `3`, rules `3`, exact compiled rules/content binding plus a fingerprint of eight actual simulation resource byte streams, fixed-layout typed fields and a final 64-bit corruption checksum. The original version-one format had five resource streams; versions one and two now refuse atomically without migration or reset. See [paid equipment](PAID-EQUIPMENT.md) for the current successor’s source-only validation status. The content binding pins G02 content, the selected station/hull source, the navigation data, Food market data, original seventeen commodity definitions and both full native markets and the SH025 cargo-bay equipment record. Inputs over 65,536 bytes, truncated numbers, invalid tags, extra trailing data, unsupported versions, changed content and mismatched checksums refuse. All arrays have compile-time bounded sizes; input-provided counts cannot allocate an unbounded collection.
+The front Pulse Laser successor uses the `MERSAVE1` envelope, version `4`
+and rules `4`. The eight compiled content streams retain their fingerprint
+binding, including the original SH025 cargo-bay equipment record. The save
+appends five bytes of flight weapon resources after the market block, before
+the corruption checksum. Versions one through three return UnsupportedVersion
+before decoding the candidate. The existing input size, content, encoding and
+checksum checks still apply. See [front Pulse Laser](FRONT-PULSE-LASER.md) for
+the firing rules and verification.
 
 Persisted state includes the actual flight pose, quaternion, speed, tick, mode/refusal; owning commander/ship/drive IDs; current system, visit, admission sequence and initial-versus-physical dock origin; full pending jump destination/source/countdown/fuel/drive binding; the sole account's credits, fuel, owned equipment identities/components/provenance/fittings and actual cargo fields; all sixteen supplier unit identities through allocations, jobs, held/delivered masks and transfer histories; issuer/receiver station facts, completion receipts and first clue; both real station Food stocks and their prices; service/travel accounting totals; session epoch, pause state and existing NPC roster identity.
 
