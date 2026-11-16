@@ -14,7 +14,7 @@ fn trade(world: &mut World, command: Trade) {
 fn equipment(world: &mut World, command: Command) -> Result<Event, MissionError> {
     world.request_equipment(command, world.snapshot().tick)
 }
-fn journey(world: &mut World, target: SystemId) {
+pub(in crate::flight) fn journey(world: &mut World, target: SystemId) {
     world.request_launch(world.snapshot().tick).unwrap();
     world.step(FlightInput::default()).unwrap();
     world.request_jump(target, world.snapshot().tick).unwrap();

@@ -439,6 +439,16 @@ fn actual_missile_hits_nearest_native_station_and_records_ordinary_failure() {
 #[test]
 fn actual_spent_custody_refuses_save_restore_and_preserves_funded_paid_gear() {
     let mut world = crate::flight::equipment::tests::earned_world(1681);
+    // Earned funds finish at Renas. Return through charged public travel before consent.
+    if world.snapshot().navigation.unwrap().fuel_units < 68 {
+        world.request_refuel(world.snapshot().tick).unwrap();
+    }
+    crate::flight::equipment::tests::journey(&mut world, crate::navigation::SystemId::AVENOR);
+    assert_eq!(world.snapshot().mode, crate::FlightMode::Docked);
+    assert_eq!(
+        world.snapshot().navigation.unwrap().system,
+        crate::navigation::SystemId::AVENOR
+    );
     world
         .request_equipment(
             crate::equipment::Command::PurchaseCargoBay,
@@ -530,11 +540,35 @@ fn pure_source_geometry_retains_missile_faces_and_player_surface_without_grantin
     let ray = pose(Vec3::new(0.0, 0.0, -100.0), Vec3::new(0.0, 0.0, 1.0)).unwrap();
     assert!(mesh_distance(shape, ray, 200.0).is_some());
     let data = crate::OriginalStationData::bundled().unwrap();
-    assert!(
+    // The original hull has a centre opening; an offset ray meets its actual rear surface.
+    assert_eq!(
         data.player_beam_distance(shape, ray.position, ray.orientation.z, 200.0)
-            .unwrap()
-            .is_some()
+            .unwrap(),
+        None
     );
+    let local_origin = Vec3::new(0.0, 5.0, -100.0);
+    let expected = 52.30711098924325;
+    let distance = data
+        .player_beam_distance(shape, local_origin, ray.orientation.z, 200.0)
+        .unwrap()
+        .unwrap();
+    assert!((distance - expected).abs() < 1e-9);
+    assert_eq!(
+        data.player_beam_distance(shape, local_origin, ray.orientation.z, 52.0)
+            .unwrap(),
+        None
+    );
+    let moved = pose(Vec3::new(40.0, -30.0, 70.0), Vec3::new(1.0, 0.0, 0.0)).unwrap();
+    let distance = data
+        .player_beam_distance(
+            moved,
+            add(moved.position, moved.orientation.apply(local_origin)),
+            moved.orientation.z,
+            200.0,
+        )
+        .unwrap()
+        .unwrap();
+    assert!((distance - expected).abs() < 1e-9);
     // A pure native-hull ray is not a live player-hit acceptance or mission receipt.
 }
 
