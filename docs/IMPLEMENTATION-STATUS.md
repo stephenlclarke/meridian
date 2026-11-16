@@ -28,6 +28,10 @@ Root audited the sealed native packet and its 19 retained v8 checkpoint files pl
 
 Native v8 station-hit/interception cold journeys were not repeated; their exact core regressions passed. A genuine live player hit and full T02 acceptance remain open. Protected integration, exact-main CI/Sonar, exact-main rebuild/signing and the separate installed v8 delivery have passed. The scoped native candidate evidence retains its original source identity; installation does not broaden those acceptance limits.
 
+## GitHub preview distribution
+
+The human requested tagged GitHub prereleases for produced macOS and Windows previews, signed macOS binaries, automatic Conventional Commit versions and retention of only the newest three previews. The publisher has passed independent source review and nine offline version/retention/download-verification and publication-order regressions. Actual publication remains pending. There were no existing GitHub releases or tags at the first inspection. Platform owners are preparing portable archives; the unresolved hexf-parse notice remains an internal-only distribution blocker. Windows signing identity availability is being checked; no certificate purchase or service enrollment is authorized.
+
 ## Save compatibility
 
 Current source writes version 8, including arm/lock/cooldown, actual consumed pylon items, live/ended projectiles, motion/contact history and practice receipts/quiet state. Exact supported v4-v7 readers retain genuine prior unused missile stock; a used-v7 migration is never invented. Versions 1-3 remain unsupported. Invalid candidates refuse without repair, fallback, re-emission or stock grants.

@@ -1,0 +1,39 @@
+# GitHub preview releases
+
+## Delivery policy
+
+Publish produced, qualified Meridian previews on GitHub Releases for macOS and Windows only. Each preview has both portable platform ZIP archives, actual launch/save instructions, applicable license/provenance notices, SHA256SUMS.txt and preview.json with its exact source SHA and release version. G1 owns macOS packaging/signing; Dell owns Windows packaging. Root publishes and retains the actual GitHub receipt. Preserve installed previews and real profiles.
+
+The macOS archive must contain a Developer ID Application signed app. Verify its extracted bundle with codesign; the publisher repeats that check. State notarization accurately. The current Apple agreement HTTP403 is not authorization to retry or accept terms. Windows code-signing trust is separate from compilation; do not claim an unsigned binary is signed or that build tests establish native gameplay acceptance. No certificate purchase or paid service enrollment is automatic.
+
+Public publication remains blocked until applicable original-input and third-party distribution obligations are satisfied. In particular, the current hexf-parse authoritative notice gap remains unresolved. The release script does not create missing permissions, legal receipts or native acceptance. Release notes must state actual platform validation and remaining limits. No public release exists yet; publisher implementation and offline tests are authored, not an executed publication claim.
+
+## Automatic versions and tags
+
+Use tools/preview_release.py through make preview-plan and make preview-release. It reads Conventional Commit messages between the latest published managed preview's exact source and the selected committed-main SHA. The first preview uses the workspace Cargo version with preview.1, currently v0.1.0-preview.1. Later breaking commits, including a breaking footer or ! marker, increment major; feat increments minor; fix/perf increments patch. Take the largest bump in the batch and reset the preview ordinal to one. Documentation and maintenance-only batches retain the base version and increment the preview ordinal. Release version lives in its tag and preview.json; this tool does not rewrite already signed app bundles or Cargo source versions.
+
+Each release uses an annotated immutable tag such as v0.2.0-preview.1 pointing to the exact qualified committed-main source. Never move a published tag. The publisher verifies remote-main ancestry and successful exact-source checks, including main Sonar, before publication. The first version is a source version, not a percentage or promise of completed gameplay.
+
+Plan without publication:
+
+```sh
+make preview-plan PREVIEW_COMMIT=EXACT_40_CHARACTER_MAIN_SHA
+```
+
+After owner packaging, independent review, qualification and notice resolution:
+
+```sh
+make preview-release PREVIEW_COMMIT=EXACT_40_CHARACTER_MAIN_SHA \
+  PREVIEW_MACOS=/absolute/path/Meridian-macos-arm64.zip \
+  PREVIEW_WINDOWS=/absolute/path/Meridian-windows-x64.zip \
+  PREVIEW_NOTES=/absolute/path/release-notes.md \
+  PREVIEW_RECEIPT=/absolute/path/new-release-receipt.json
+```
+
+Run from the release tooling checkout on macOS with gh authenticated for stephenlclarke/meridian and the source history available locally. No signing keys are uploaded by this script. Use reviewed packages; never upload player profiles or local execution reports. The release source SHA can differ from the publisher's newer documentation/tooling commit; record both in ordinary delivery evidence.
+
+## Publication and three-preview retention
+
+The publisher creates the annotated Git tag and a draft prerelease, uploads the two archives plus checksums and source metadata, downloads every asset and verifies its SHA256, then publishes the prerelease. It verifies downloads again and durably saves the actual receipt before retention cleanup. A failed signature, exact-main check or download verification refuses progression. A failed draft/upload remains an explicit partial publication to inspect and correct; do not silently overwrite or move its tag.
+
+Only the newest three published managed previews are retained, ordered by publication time. After successful new publication and receipt capture, remove older managed preview releases with their matching preview tags. Never delete stable releases, unrelated tags, drafts, active branches or local worktrees through this rule. There were no releases or tags at the initial inspection, so no historical cleanup was needed. This runs within the existing delivery cycle; it adds no scheduler or compiler/graphics job.
