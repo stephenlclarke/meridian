@@ -37,6 +37,10 @@ The [safe-gunnery lifecycle](docs/SAFE-GUNNERY-ATTEMPTS.md) adds F7 reviewed clo
 
 The installed signed app passed title/render/normal-close smoke without creating a commander save. The public downloads and extracted Mac signature were independently verified. This remains a functional preview: full game acceptance, memory qualification, window/focus edges, frame timing/race evidence and commercial acceptance remain open. See [implementation status](docs/IMPLEMENTATION-STATUS.md) for exact scope and retained failures.
 
+## Flight lesson source under development
+
+The [original flight-and-reception lesson](docs/FLIGHT-RECEPTION.md) is authored on a separate candidate. F6 reviews consent or reception, F12 reviews cancellation and C shows lesson details while playing. Keys 0/1/2/3 select front/rear/left/right views. The World measures actual aligned closing flight and a later swept return to the issuing berth; Enter must save before committing consent or reception. The candidate writes v10 and has explicit v4-v9 readers. Its new core and desktop tests, complete joined review, compiler/native qualification and delivery remain pending. The published v9 preview above is unchanged.
+
 ## Play
 
 N starts a commander; C continues. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.

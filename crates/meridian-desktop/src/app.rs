@@ -7,7 +7,7 @@ use std::{
 };
 
 use meridian_core::{
-    FlightInput, FlightMode, MotionRefusal, PulseContact, PulseShot, StepError, World,
+    FlightInput, FlightMode, FlightView, MotionRefusal, PulseContact, PulseShot, StepError, World,
 };
 use winit::{
     application::ApplicationHandler,
@@ -207,6 +207,13 @@ impl App {
 
     fn game_key(&mut self, code: KeyCode) {
         let action = match code {
+            KeyCode::Digit0 => Action::SetFlightView(FlightView::Front),
+            KeyCode::Digit1 => Action::SetFlightView(FlightView::Rear),
+            KeyCode::Digit2 => Action::SetFlightView(FlightView::Left),
+            KeyCode::Digit3 => Action::SetFlightView(FlightView::Right),
+            KeyCode::F6 => Action::ReviewFlightLesson,
+            KeyCode::F12 => Action::CancelFlightLesson,
+            KeyCode::KeyC => Action::FlightLessonDetails,
             KeyCode::F1 => Action::CycleMissileLock,
             KeyCode::F2 => Action::ToggleMissileArm,
             KeyCode::F3 => Action::FireMissile,
@@ -341,6 +348,7 @@ impl App {
                         docked: snapshot.mode == FlightMode::Docked,
                     });
             let practice = self.game.world.practice_snapshot();
+            renderer.set_flight_view(self.game.world.flight_view());
             if let Err(error) = renderer.draw(
                 &snapshot,
                 station,

@@ -1,6 +1,7 @@
 mod app;
 mod clock;
 mod equipment;
+mod flight_lesson;
 mod hud;
 mod market;
 mod mesh;

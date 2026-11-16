@@ -75,6 +75,28 @@ impl Profile {
             return Err("N starts a new commander; C continues the existing save".into());
         }
         if matches!(action, Action::Confirm)
+            && let Some(review) = self.session.pending_flight.take()
+        {
+            let prepared = self
+                .world
+                .prepare_flight_reception(review, self.world.snapshot().tick)
+                .map_err(|e| e.to_string())?;
+            let published = self
+                .store
+                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .map_err(|e| format!("Flight lesson confirmation could not be saved: {e}"))?;
+            prepared.commit();
+            self.has_save = true;
+            return match published {
+                SaveCommit::Published {
+                    directory_sync_error: Some(error),
+                } => Err(format!(
+                    "Flight lesson confirmation was written, but directory synchronization failed: {error}"
+                )),
+                _ => Ok("Flight lesson confirmed and saved. C shows its current state.".into()),
+            };
+        }
+        if matches!(action, Action::Confirm)
             && let Some(selection) = self.session.pending_practice.take()
         {
             let tick = self.world.snapshot().tick;
@@ -860,3 +882,6 @@ mod tests {
         }
     }
 }
+
+#[cfg(test)]
+mod flight_lesson_tests;

@@ -4,12 +4,17 @@ use meridian_core::freight::g02::{Choice, Command, ContactDefinition, Event, Job
 use meridian_core::navigation::SystemId;
 use meridian_core::station_services::{self, CommodityId};
 use meridian_core::{
-    FlightMode, PRACTICE_QUIET_TICKS, PracticeClosureReview, PracticeOutcome,
-    PracticeReceptionReview, PracticeReview, PracticeStatus, World,
+    FlightMode, FlightReceptionAction, FlightReceptionReview, FlightView, PRACTICE_QUIET_TICKS,
+    PracticeClosureReview, PracticeOutcome, PracticeReceptionReview, PracticeReview,
+    PracticeStatus, World,
 };
 
 #[derive(Clone, Copy)]
 pub enum Action {
+    ReviewFlightLesson,
+    CancelFlightLesson,
+    FlightLessonDetails,
+    SetFlightView(FlightView),
     CycleMissileLock,
     ToggleMissileArm,
     FireMissile,
@@ -48,6 +53,8 @@ pub(crate) enum PracticeSelection {
 pub struct Session {
     job: Option<JobId>,
     pending: Option<(Review, Choice)>,
+    pub(crate) pending_flight: Option<FlightReceptionReview>,
+    show_flight_lesson: bool,
     pub(crate) pending_practice: Option<PracticeSelection>,
     show_objective: bool,
     market_open: bool,
@@ -60,6 +67,8 @@ impl Default for Session {
         Self {
             job: None,
             pending: None,
+            pending_flight: None,
+            show_flight_lesson: false,
             pending_practice: None,
             show_objective: false,
             market_open: false,
@@ -79,6 +88,8 @@ impl Session {
     }
 
     pub fn invalidate(&mut self) {
+        self.pending_flight = None;
+        self.show_flight_lesson = false;
         self.pending = None;
         self.pending_practice = None;
         self.show_objective = false;
@@ -168,10 +179,44 @@ impl Session {
     }
 
     pub fn command(&mut self, world: &mut World, action: Action) -> Result<String, String> {
+        if self.pending_flight.take().is_some() && matches!(action, Action::Back) {
+            return Ok("Flight lesson review cancelled.".into());
+        }
         if self.pending_practice.take().is_some() && matches!(action, Action::Back) {
             return Ok("Practice review cancelled.".into());
         }
         match action {
+            Action::ReviewFlightLesson | Action::CancelFlightLesson => {
+                self.invalidate();
+                let kind = if matches!(action, Action::CancelFlightLesson) {
+                    FlightReceptionAction::Cancel
+                } else if world
+                    .flight_reception_snapshot()
+                    .is_some_and(|s| s.active.is_some())
+                {
+                    FlightReceptionAction::Receive
+                } else {
+                    FlightReceptionAction::Accept
+                };
+                self.pending_flight = Some(
+                    world
+                        .review_flight_reception(kind, world.snapshot().tick)
+                        .map_err(|e| e.to_string())?,
+                );
+                Ok("Flight lesson review ready. Enter confirms and saves; B cancels.".into())
+            }
+            Action::FlightLessonDetails => {
+                self.invalidate();
+                self.show_flight_lesson = true;
+                Ok("Flight lesson details. F6 reviews; F12 reviews cancellation.".into())
+            }
+            Action::SetFlightView(view) => {
+                self.invalidate();
+                world
+                    .request_flight_view(view, world.snapshot().tick)
+                    .map_err(|e| e.to_string())?;
+                Ok(format!("{} view", crate::flight_lesson::view_name(view)))
+            }
             Action::CycleMissileLock
             | Action::ToggleMissileArm
             | Action::FireMissile
@@ -381,6 +426,12 @@ impl Session {
     }
 
     fn review_line(&self) -> String {
+        if let Some(review) = self.pending_flight {
+            return format!(
+                "FLIGHT LESSON {:?} | ENTER CONFIRMS AND SAVES | B CANCELS",
+                review.action()
+            );
+        }
         if let Some(selection) = self.pending_practice {
             let title = match selection {
                 PracticeSelection::Consent(_) => "PRACTICE REVIEW",
@@ -452,11 +503,22 @@ impl Session {
                 .to_string(),
         );
         let compact_flight = snapshot.mode == FlightMode::Flight
+            && self.pending_flight.is_none()
+            && !self.show_flight_lesson
             && self.pending_practice.is_none()
             && self.pending.is_none()
             && !self.show_objective
             && !self.equipment_open
             && !self.market_open;
+        if let Some(review) = self.pending_flight {
+            lines.push(review_line);
+            append_paragraph(&mut lines, crate::flight_lesson::terms(review.action()));
+            return lines;
+        }
+        if self.show_flight_lesson {
+            crate::flight_lesson::append_details(world, &mut lines);
+            return lines;
+        }
         if !compact_flight {
             lines.push(review_line);
             lines.push(self.panel_controls().into());
@@ -483,6 +545,7 @@ impl Session {
             }
             return lines;
         }
+        lines.push(crate::flight_lesson::line(world));
         append_missile_panel(world, snapshot.mode, &mut lines);
         if let Some(line) = practice_line(world) {
             lines.push(line);
@@ -676,7 +739,7 @@ fn practice_line(world: &World) -> Option<String> {
 }
 
 /// Original fixed dialogue is word-wrapped before the renderer's column bound.
-fn append_paragraph(lines: &mut Vec<String>, paragraph: &str) {
+pub(crate) fn append_paragraph(lines: &mut Vec<String>, paragraph: &str) {
     let mut line = String::new();
     for word in paragraph.split_whitespace() {
         if !line.is_empty() && line.len() + 1 + word.len() > crate::hud::MAX_COLUMNS {
