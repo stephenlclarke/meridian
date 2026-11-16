@@ -1,5 +1,9 @@
 # Ordinary commodity trading
 
+This records the historical version-two commodity component. The current M2
+[paid-equipment successor](PAID-EQUIPMENT.md) adds actual 92/127-tonne capacity
+and explicitly changes the save boundary to version three.
+
 Status: core source and ten additional Rust tests are authored against main
 `54b6920f8db7d3935c4e3ffe1ed9d1d921d12e12`. Rustfmt and whitespace checks pass.
 Compilation, Rust tests, Clippy, Sonar and actual app acceptance are **UNRUN**

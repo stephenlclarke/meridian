@@ -4,9 +4,9 @@ use crate::save::{MAX_SAVE_BYTES, Reader, SAVE_VERSION, SaveError, Writer, check
 use crate::station_services::{SavedServiceSummary, StationMarkets};
 
 const MAGIC: &[u8; 8] = b"MERSAVE1";
-// Rules and immutable content form the version-two compatibility boundary, not an authenticity key.
+// Rules and immutable content form the version-three compatibility boundary, not an authenticity key.
 const CONTENT: &[u8] = concat!(
-    "meridian-world/rules/2;",
+    "meridian-world/rules/3;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -25,6 +25,7 @@ fn compiled_content_fingerprint() -> u64 {
         include_bytes!("../../../../assets/legacy/g01-food.markets").as_slice(),
         include_bytes!("../../../../assets/legacy/commodities.catalogue").as_slice(),
         include_bytes!("../../../../assets/legacy/g01-commodities.markets").as_slice(),
+        include_bytes!("../../../../assets/legacy/sh025-cargo-bay.equipment").as_slice(),
     ] {
         bytes.extend((part.len() as u64).to_le_bytes());
         bytes.extend(part);
@@ -171,7 +172,11 @@ impl World {
         )?;
         session.validate_save(navigation.dock())?;
         let domain = account.validate_saved_domain(&session.state, nav, session.epoch())?;
-        let services = markets.validate_save(nav.owner)?;
+        let services = markets.validate_save(
+            nav.owner,
+            account.hold_capacity(),
+            account.equipment_state().historical_capacity(),
+        )?;
         validate_accounting(domain, services, nav.jumps, nav.fuel_spent)?;
         if navigation
             .dock()
@@ -204,8 +209,9 @@ fn validate_accounting(
             "unjustified market credit saturation",
         ));
     }
-    if income < u128::from(s.paid)
-        || income - u128::from(s.paid) != u128::from(d.credits)
+    let paid = u128::from(s.paid) + u128::from(d.equipment_paid);
+    if income < paid
+        || income - paid != u128::from(d.credits)
         || fuel < u128::from(fuel_spent)
         || fuel - u128::from(fuel_spent) != u128::from(d.fuel)
         || u64::from(d.food) != s.food
@@ -213,7 +219,10 @@ fn validate_accounting(
         || d.legal & !s.possible_legal_bits != 0
         || (d.legal != 0 && d.launches == 0)
         || u128::from(d.revision)
-            != u128::from(d.freight_revision) + u128::from(s.revision) + u128::from(jumps)
+            != u128::from(d.freight_revision)
+                + u128::from(s.revision)
+                + u128::from(jumps)
+                + u128::from(d.equipment_revision)
     {
         return Err(SaveError::InvalidState(
             "wallet, cargo, fuel or payment chronology",

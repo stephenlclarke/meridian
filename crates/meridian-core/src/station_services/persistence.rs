@@ -77,26 +77,31 @@ impl StationMarkets {
             },
         })
     }
-    pub(crate) fn validate_save(&self, owner: u64) -> Result<SavedServiceSummary, SaveError> {
+    pub(crate) fn validate_save(
+        &self,
+        owner: u64,
+        capacity: u16,
+        historical_capacity: u16,
+    ) -> Result<SavedServiceSummary, SaveError> {
         let invalid = SaveError::InvalidState("market stock or accounting");
         if owner == 0 || self.data.owner != owner {
             return Err(invalid);
         }
-        let food_summary = validate_food_markets(&self.data)?;
+        let food_summary = validate_food_markets(&self.data, capacity)?;
         let food = food_summary.food;
         let mut bought = food_summary.bought;
         let mut sold = food_summary.sold;
         let mut paid = food_summary.paid
             + u128::from(self.data.refilled_units) * u128::from(FUEL_PRICE_TENTHS);
         let mut gross_credit = food_summary.gross_credit;
-        let other = validate_other_markets(&self.data)?;
+        let other = validate_other_markets(&self.data, historical_capacity)?;
         bought += other.bought;
         sold += other.sold;
         paid += other.paid;
         gross_credit += other.gross_credit;
         let other_commodities = other.quantities;
         let possible_legal_bits = other.possible_legal_bits;
-        if commodities::other_tonnes(other_commodities) + food > u128::from(STOCK_HOLD_TONNES) {
+        if commodities::other_tonnes(other_commodities) + food > u128::from(capacity) {
             return Err(invalid);
         }
         if sold > bought
@@ -139,7 +144,10 @@ struct OtherSummary {
     gross_credit: u128,
     possible_legal_bits: u8,
 }
-fn validate_other_markets(data: &MarketData) -> Result<OtherSummary, SaveError> {
+fn validate_other_markets(
+    data: &MarketData,
+    historical_capacity: u16,
+) -> Result<OtherSummary, SaveError> {
     let invalid = SaveError::InvalidState("native commodity stock or accounting");
     let mut other_commodities = [0; 16];
     let mut normal_illegal_bought = 0_u128;
@@ -193,19 +201,23 @@ fn validate_other_markets(data: &MarketData) -> Result<OtherSummary, SaveError> 
         sold,
         paid,
         gross_credit,
-        possible_legal_bits: possible_export_bits(normal_illegal_bought, narcotic_bought),
+        possible_legal_bits: possible_export_bits(
+            normal_illegal_bought,
+            narcotic_bought,
+            historical_capacity,
+        ),
     })
 }
 
 // Conservative history check, not save authentication: an OR bit must be reachable from
 // purchased native illegal tonne goods and this real hull's capacity. Export chronology
 // is not reconstructed or reset on Continue.
-fn possible_export_bits(normal: u128, narcotics: u128) -> u8 {
-    let normal = normal.min(u128::from(STOCK_HOLD_TONNES)) as u16;
-    let narcotics = narcotics.min(u128::from(STOCK_HOLD_TONNES)) as u16;
+fn possible_export_bits(normal: u128, narcotics: u128, capacity: u16) -> u8 {
+    let normal = normal.min(u128::from(capacity)) as u16;
+    let narcotics = narcotics.min(u128::from(capacity)) as u16;
     let mut bits = 0_u8;
     for n in 0..=narcotics {
-        for ordinary in 0..=normal.min(STOCK_HOLD_TONNES - n) {
+        for ordinary in 0..=normal.min(capacity - n) {
             bits |= (ordinary + 2 * n) as u8;
         }
     }
@@ -219,7 +231,7 @@ struct FoodSummary {
     paid: u128,
     gross_credit: u128,
 }
-fn validate_food_markets(data: &MarketData) -> Result<FoodSummary, SaveError> {
+fn validate_food_markets(data: &MarketData, capacity: u16) -> Result<FoodSummary, SaveError> {
     let invalid = SaveError::InvalidState("Food stock or accounting");
     let seeds = read_seeds(SEEDS).map_err(|_| SaveError::ContentMismatch)?;
     let mut bought = 0_u128;
@@ -244,7 +256,7 @@ fn validate_food_markets(data: &MarketData) -> Result<FoodSummary, SaveError> {
         gross_credit += site_sold * u128::from(seed.bid_tenths);
     }
     let food = bought.checked_sub(sold).ok_or(invalid)?;
-    if food > u128::from(STOCK_HOLD_TONNES) {
+    if food > u128::from(capacity) {
         return Err(invalid);
     }
 

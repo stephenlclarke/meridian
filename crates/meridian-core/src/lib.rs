@@ -3,6 +3,7 @@
 #![forbid(unsafe_code)]
 
 pub mod docking;
+pub mod equipment;
 mod flight;
 pub mod freight;
 pub mod navigation;

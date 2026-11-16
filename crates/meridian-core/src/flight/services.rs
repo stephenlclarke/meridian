@@ -11,6 +11,7 @@ pub struct ServiceSnapshot {
     pub food_tonnes: u16,
     pub reserved_food_tonnes: u16,
     pub used_tonnes: u16,
+    pub hold_capacity_tonnes: u16,
     pub current_market: Option<FoodQuote>,
 }
 
@@ -56,6 +57,7 @@ impl World {
             food_tonnes: projection.food_tonnes,
             reserved_food_tonnes: projection.reserved_food_tonnes,
             used_tonnes: projection.used_tonnes,
+            hold_capacity_tonnes: projection.hold_capacity_tonnes,
             current_market: self
                 .station_markets
                 .as_ref()
@@ -71,20 +73,7 @@ impl World {
         command: services::Command,
         expected_tick: u64,
     ) -> Result<services::Event, MissionError> {
-        let session = self.station_command_admission(expected_tick)?;
-        let dock = self.current_dock_context().ok_or(MissionError::NotDocked)?;
-        let site = service_site(dock.system())
-            .ok_or(MissionError::Service(services::Error::UnsupportedStation))?;
-        let facts = ServiceFacts {
-            owner: dock.owner().seed(),
-            hull: dock.ship().ordinal(),
-            site,
-            station_entity: dock.actor_entity(),
-            visit: dock.visit(),
-            dock_sequence: dock.sequence(),
-            epoch: session.epoch(),
-            paused: self.is_paused(),
-        };
+        let facts = self.current_service_facts(expected_tick)?;
         let account = self
             .commander_account
             .as_mut()
@@ -102,6 +91,26 @@ impl World {
             .map_err(MissionError::Service)
     }
 
+    pub(super) fn current_service_facts(
+        &self,
+        expected_tick: u64,
+    ) -> Result<ServiceFacts, MissionError> {
+        let session = self.station_command_admission(expected_tick)?;
+        let dock = self.current_dock_context().ok_or(MissionError::NotDocked)?;
+        let site = service_site(dock.system())
+            .ok_or(MissionError::Service(services::Error::UnsupportedStation))?;
+        Ok(ServiceFacts {
+            owner: dock.owner().seed(),
+            hull: dock.ship().ordinal(),
+            site,
+            station_entity: dock.actor_entity(),
+            visit: dock.visit(),
+            dock_sequence: dock.sequence(),
+            epoch: session.epoch(),
+            paused: self.is_paused(),
+        })
+    }
+
     /// Compatibility entry point; the single shared service rule computes and applies payment.
     pub fn request_refuel(&mut self, expected_tick: u64) -> Result<u32, MissionError> {
         self.request_station_service(services::Command::RefillFuel, expected_tick)
@@ -109,7 +118,7 @@ impl World {
     }
 }
 
-fn service_site(system: SystemId) -> Option<MarketSite> {
+pub(super) fn service_site(system: SystemId) -> Option<MarketSite> {
     match system {
         SystemId::AVENOR => Some(MarketSite::Avenor),
         SystemId::RENAS => Some(MarketSite::Renas),

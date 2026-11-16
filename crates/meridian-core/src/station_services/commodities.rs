@@ -162,7 +162,7 @@ pub(super) fn buy(
     if account.other_commodities[index] >= MAX_MARKET_QUANTITY {
         return Err(Error::QuantityLimit);
     }
-    if id.unit() == CargoUnit::Tonne && account.used_tonnes >= STOCK_HOLD_TONNES {
+    if id.unit() == CargoUnit::Tonne && account.used_tonnes >= account.hold_capacity_tonnes {
         return Err(Error::HoldFull);
     }
     account.credits_tenths = account

@@ -43,6 +43,7 @@ pub enum MissionError {
     SequenceExhausted,
     Freight(g02::Error),
     Service(crate::station_services::Error),
+    Equipment(crate::equipment::Error),
 }
 impl fmt::Display for MissionError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -55,6 +56,7 @@ impl fmt::Display for MissionError {
             Self::SequenceExhausted => f.write_str("station contact sequence exhausted"),
             Self::Freight(error) => write!(f, "freight command refused: {error:?}"),
             Self::Service(error) => write!(f, "station service refused: {error:?}"),
+            Self::Equipment(error) => write!(f, "{error}"),
         }
     }
 }
