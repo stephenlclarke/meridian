@@ -26,7 +26,7 @@ pub struct PracticeTrace {
     pub confirmed_tick: u64,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct PracticeReceptionSnapshot {
     pub quiet_ticks: u16,
     pub ready: bool,
