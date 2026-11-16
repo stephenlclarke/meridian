@@ -386,12 +386,7 @@ impl App {
         });
     }
 
-    fn redraw(&mut self, event_loop: &ActiveEventLoop) {
-        let now = Instant::now();
-        let elapsed = now.duration_since(self.last_frame).as_secs_f64();
-        self.last_frame = now;
-        let active = self.focused && !self.occluded && !self.paused && self.game.playing();
-        let ticks = self.clock.ticks(elapsed, active);
+    fn advance_frame(&mut self, event_loop: &ActiveEventLoop, active: bool, ticks: usize) -> bool {
         let mut frame_refusal = None;
         if active {
             let input = FlightInput {
@@ -414,7 +409,7 @@ impl App {
                 }
                 Err(error) => {
                     self.fail(event_loop, format!("Simulation refused input: {error}"));
-                    return;
+                    return false;
                 }
             }
         }
@@ -433,6 +428,54 @@ impl App {
                 }
                 .into(),
             );
+        }
+        true
+    }
+
+    fn keyboard_input(&mut self, event_loop: &ActiveEventLoop, event: winit::event::KeyEvent) {
+        if let PhysicalKey::Code(code) = event.physical_key {
+            if event.state == ElementState::Released {
+                self.keys.remove(&code);
+            } else if self.focused && !self.occluded {
+                if self.menu_active()
+                    && self.docked.as_ref().is_some_and(Docked::search_active)
+                    && let Some(text) = event
+                        .text
+                        .as_ref()
+                        .filter(|s| s.chars().all(|c| !c.is_control()))
+                {
+                    self.menu_input(ui::Input::Text(text.to_string()));
+                    return;
+                }
+                if event.repeat
+                    && !(self.menu_active()
+                        && matches!(
+                            code,
+                            KeyCode::ArrowUp
+                                | KeyCode::ArrowDown
+                                | KeyCode::PageUp
+                                | KeyCode::PageDown
+                                | KeyCode::Backspace
+                        ))
+                {
+                    return;
+                }
+                if !self.menu_active() {
+                    self.keys.insert(code);
+                }
+                self.key(code, event_loop);
+            }
+        }
+    }
+
+    fn redraw(&mut self, event_loop: &ActiveEventLoop) {
+        let now = Instant::now();
+        let elapsed = now.duration_since(self.last_frame).as_secs_f64();
+        self.last_frame = now;
+        let active = self.focused && !self.occluded && !self.paused && self.game.playing();
+        let ticks = self.clock.ticks(elapsed, active);
+        if !self.advance_frame(event_loop, active, ticks) {
+            return;
         }
         let snapshot = self.game.world.snapshot();
         // The beam is a short-lived view of the committed shot, never saved or re-fired.
@@ -651,41 +694,7 @@ impl ApplicationHandler for App {
                     MouseScrollDelta::PixelDelta(point) => point.y / scale / 20.0,
                 });
             }
-            WindowEvent::KeyboardInput { event, .. } => {
-                if let PhysicalKey::Code(code) = event.physical_key {
-                    if event.state == ElementState::Released {
-                        self.keys.remove(&code);
-                    } else if self.focused && !self.occluded {
-                        if self.menu_active()
-                            && self.docked.as_ref().is_some_and(Docked::search_active)
-                            && let Some(text) = event
-                                .text
-                                .as_ref()
-                                .filter(|s| s.chars().all(|c| !c.is_control()))
-                        {
-                            self.menu_input(ui::Input::Text(text.to_string()));
-                            return;
-                        }
-                        if event.repeat
-                            && !(self.menu_active()
-                                && matches!(
-                                    code,
-                                    KeyCode::ArrowUp
-                                        | KeyCode::ArrowDown
-                                        | KeyCode::PageUp
-                                        | KeyCode::PageDown
-                                        | KeyCode::Backspace
-                                ))
-                        {
-                            return;
-                        }
-                        if !self.menu_active() {
-                            self.keys.insert(code);
-                        }
-                        self.key(code, event_loop);
-                    }
-                }
-            }
+            WindowEvent::KeyboardInput { event, .. } => self.keyboard_input(event_loop, event),
             WindowEvent::RedrawRequested => self.redraw(event_loop),
             _ => {}
         }

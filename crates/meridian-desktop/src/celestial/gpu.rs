@@ -1,4 +1,8 @@
-use super::*;
+use super::{
+    DockedPreview, MAP_SAMPLES, Projection, Scene, SurfaceData, Uniforms, docked_plan, frame_plan,
+};
+use meridian_core::{FlightView, Snapshot};
+use std::sync::Arc;
 
 /// Two fixed body slots, one fixed terrain buffer, no per-frame GPU allocation/readback.
 pub struct Pass {

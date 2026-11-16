@@ -421,6 +421,10 @@ pub fn append(c: &Cockpit, width: u32, height: u32, out: &mut Vec<Vertex>) {
         );
     }
     scanner(out, c, l, size);
+    append_station_navigation(out, c, l, size);
+}
+
+fn append_station_navigation(out: &mut Vec<Vertex>, c: &Cockpit, l: Layout, size: [f32; 2]) {
     if c.flight.mode != FlightMode::Docked
         && let Some((distance, bearing, elevation)) = c.station_navigation()
     {

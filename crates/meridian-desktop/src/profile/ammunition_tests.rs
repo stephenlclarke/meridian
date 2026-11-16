@@ -1,6 +1,6 @@
 //! Durable paid-equipment actions use the same real Profile/Store as the desktop.
 use super::tests::{TestDirectory, action, open};
-use super::*;
+use super::{Action, Profile};
 use meridian_core::AmmunitionAction;
 use std::fs;
 

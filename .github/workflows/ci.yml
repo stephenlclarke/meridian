@@ -101,6 +101,8 @@ jobs:
           path: coverage/
       - name: Install pinned Rust toolchain
         run: rustup toolchain install 1.99.0 --profile minimal
+      - name: Bind coverage paths across Cargo analysis modules
+        run: make coverage-paths
       - name: Verify effective Sonar new-code policy
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -127,3 +129,6 @@ jobs:
             -Dsonar.projectVersion=${{ github.sha }}
             -Dsonar.scm.revision=${{ github.sha }}
             -Dsonar.qualitygate.wait=true
+            -Dsonar.python.coverage.reportPaths=${{ github.workspace }}/coverage/python-sonar.xml
+            -Dsonar.rust.lcov.reportPaths=${{ github.workspace }}/coverage/lcov.info
+            -Dsonar.rust.clippyReport.reportPaths=${{ github.workspace }}/coverage/clippy.json
