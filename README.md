@@ -89,3 +89,5 @@ The cockpit instrument implementation and its current validation limits are desc
 The next playable preview is being developed around a working cockpit HUD, docked galaxy/system/showroom/trading/equipment screens and real modular equipment. The current integration candidate is unqualified; authored source and focused owner tests are not a new playable release. Mining/salvage, EMP, bounty hunting and the other ship systems precede new mission delivery.
 
 In the next-preview development candidate, `/` toggles controls help and ordinary flight uses a compact overlay above the cockpit. This change is not in the published v0.4 binary.
+
+The prepared [planet and sun shading slice](docs/CELESTIAL-SHADING.md) records its World-input dependencies and native acceptance limits.

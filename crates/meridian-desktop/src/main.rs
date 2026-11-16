@@ -1,4 +1,5 @@
 mod app;
+pub mod celestial;
 mod clock;
 mod equipment;
 mod flight_lesson;

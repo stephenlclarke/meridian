@@ -22,8 +22,16 @@ pub struct HudScene<'a> {
     pub cockpit: Option<&'a hud::cockpit::Cockpit>,
 }
 
+pub struct SceneEffects<'a> {
+    pub pulse: Option<&'a PulseShot>,
+    pub missiles: &'a [meridian_core::ProjectileSnapshot],
+    pub practice: Option<&'a [PracticeBeaconSnapshot; 3]>,
+    pub celestial: Option<&'a crate::celestial::Scene>,
+}
+
 pub struct Renderer {
     flight_view: FlightView,
+    celestial: crate::celestial::Pass,
     surface: wgpu::Surface<'static>,
     pub window: Arc<Window>,
     instance: wgpu::Instance,
@@ -85,6 +93,7 @@ impl Renderer {
         if size.width > 0 && size.height > 0 {
             surface.configure(&device, &config);
         }
+        let celestial = crate::celestial::Pass::new(&device, config.format);
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("Meridian flight WGSL"),
             source: wgpu::ShaderSource::Wgsl(include_str!("flight.wgsl").into()),
@@ -200,6 +209,7 @@ impl Renderer {
             surface,
             window,
             flight_view: FlightView::Front,
+            celestial,
             instance,
             device,
             queue,
@@ -271,21 +281,41 @@ impl Renderer {
         &mut self,
         snapshot: &Snapshot,
         station: Option<StationScene<'_>>,
-        pulse: Option<&PulseShot>,
-        missiles: &[meridian_core::ProjectileSnapshot],
-        practice: Option<&[PracticeBeaconSnapshot; 3]>,
+        effects: SceneEffects<'_>,
         hud: HudScene<'_>,
     ) -> Result<(), String> {
-        let HudScene {
-            lines: hud_lines,
-            cockpit,
-        } = hud;
+        let HudScene { lines: hud_lines, cockpit } = hud;
+        let SceneEffects { pulse, missiles, practice, celestial } = effects;
         if self.device_lost.load(Ordering::Acquire) {
             return Err("Graphics device lost; exiting without changing any save".into());
         }
         if self.is_zero_sized() {
             return Ok(());
         }
+        self.celestial
+            .prepare(
+                &self.queue,
+                celestial,
+                *snapshot,
+                self.flight_view,
+                crate::celestial::Projection {
+                    viewport: [self.config.width, self.config.height],
+                    clip: [
+                        0.0,
+                        0.0,
+                        self.config.width as f32,
+                        self.config.height as f32,
+                    ],
+                    center: [
+                        self.config.width as f32 / 2.0,
+                        self.config.height as f32 / 2.0,
+                    ],
+                    focal: self.config.height as f32 * 0.8,
+                    near: 1.0,
+                    far: 20000.0,
+                },
+            )
+            .map_err(str::to_owned)?;
         let (frame, reconfigure) = match self.surface.get_current_texture() {
             wgpu::CurrentSurfaceTexture::Success(frame) => (frame, false),
             wgpu::CurrentSurfaceTexture::Suboptimal(frame) => (frame, true),
@@ -380,10 +410,13 @@ impl Renderer {
                 }),
                 ..Default::default()
             });
+            self.celestial.draw_surfaces(&mut pass);
+            pass.set_scissor_rect(0, 0, self.config.width, self.config.height);
             pass.set_pipeline(&self.pipeline);
             pass.set_bind_group(0, &self.projection_group, &[]);
             pass.set_vertex_buffer(0, self.vertices.slice(..));
             pass.draw(0..self.frame.len() as u32, 0..1);
+            self.celestial.draw_halos(&mut pass);
         }
         {
             let colors = [Some(wgpu::RenderPassColorAttachment {

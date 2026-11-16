@@ -19,7 +19,7 @@ use winit::{
 
 use crate::clock::FixedClock;
 use crate::profile::Profile;
-use crate::renderer::{HudScene, Renderer, StationScene};
+use crate::renderer::{HudScene, Renderer, SceneEffects, StationScene};
 use crate::session::Action;
 
 // Ephemeral profile IDs are allocated by the host, never by the deterministic core.
@@ -370,13 +370,13 @@ impl App {
             if let Err(error) = renderer.draw(
                 &snapshot,
                 station,
-                self.pulse.as_ref(),
-                &self.missile_bodies,
-                practice.as_ref().and_then(|state| state.beacons.as_ref()),
-                HudScene {
-                    lines: &hud_lines,
-                    cockpit: cockpit.as_ref(),
+                SceneEffects {
+                    pulse: self.pulse.as_ref(),
+                    missiles: &self.missile_bodies,
+                    practice: practice.as_ref().and_then(|state| state.beacons.as_ref()),
+                    celestial: None, // Root joins the actual World-owned body snapshot.
                 },
+                HudScene { lines: &hud_lines, cockpit: cockpit.as_ref() },
             ) {
                 self.fail(event_loop, error);
             }
