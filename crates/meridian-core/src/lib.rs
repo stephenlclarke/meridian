@@ -41,3 +41,10 @@ pub use flight::{
     FlightReceptionError, FlightReceptionId, FlightReceptionOutcome, FlightReceptionReview,
     FlightReceptionSnapshot, FlightReceptionTrace, FlightView, PreparedFlightReception,
 };
+
+pub use flight::{
+    NavigationTonneId, NavigationTradeAction, NavigationTradeAttemptSnapshot, NavigationTradeError,
+    NavigationTradeId, NavigationTradeMarketSnapshot, NavigationTradeOutcome,
+    NavigationTradePlanSnapshot, NavigationTradeReview, NavigationTradeSnapshot,
+    NavigationTradeTrace, PreparedNavigationTrade, PreparedStationService,
+};

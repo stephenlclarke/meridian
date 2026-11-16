@@ -6,6 +6,7 @@ use std::{
     fs,
     path::PathBuf,
     process::Command,
+    sync::atomic::{AtomicU64, Ordering},
     time::{SystemTime, UNIX_EPOCH},
 };
 
@@ -15,15 +16,19 @@ fn ok<T, E: core::fmt::Debug>(result: Result<T, E>) -> T {
 fn some<T>(value: Option<T>) -> T {
     value.unwrap_or_else(|| panic!("missing retained state"))
 }
+static NEXT_DIRECTORY: AtomicU64 = AtomicU64::new(0);
+
 struct Directory(PathBuf);
 impl Directory {
     fn new() -> Self {
         let nonce = ok(SystemTime::now().duration_since(UNIX_EPOCH)).as_nanos();
+        let sequence = NEXT_DIRECTORY.fetch_add(1, Ordering::Relaxed);
         let path = std::env::temp_dir().join(format!(
-            "meridian-flight-lesson-{}-{nonce}",
+            "meridian-flight-lesson-{}-{nonce}-{sequence}",
             std::process::id()
         ));
-        ok(fs::create_dir(&path));
+        fs::create_dir(&path)
+            .unwrap_or_else(|error| panic!("Cannot create {}: {error}", path.display()));
         Self(path)
     }
     fn profile(&self) -> Profile {

@@ -94,7 +94,13 @@ pub fn service_message(event: station_services::Event) -> Result<String, String>
             credited_tenths,
             ..
         } => ("Sold", commodity, credited_tenths),
-        station_services::Event::Refuelled { .. } => return Ok("Fuel service complete.".into()),
+        station_services::Event::Refuelled { paid_tenths, .. } => {
+            return Ok(format!(
+                "Paid {}.{} CR for fuel.",
+                paid_tenths / 10,
+                paid_tenths % 10
+            ));
+        }
     };
     let definition = commodity.definition().map_err(content_error)?;
     Ok(format!(
