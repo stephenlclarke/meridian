@@ -1,0 +1,207 @@
+{
+  "head": "6a5df3e9bb4a818ab063633cad229146f44ac449",
+  "tree": "898444e422b9b28bf0669a0d9b3f5e20464ae345",
+  "RustTestCounts": [
+    11,
+    6,
+    9,
+    2,
+    0
+  ],
+  "rawLogSHA256": "79c78e5b73cad07186131e11ee1bb85758c2e11ec38096d2a414af4a44692e2c",
+  "observations": {
+    "BOUNDS_CACHE_COMPLETE": [
+      {
+        "fixture": "identity",
+        "oldOperations": 30815,
+        "newOperations": 30242,
+        "oldAttemptedPeak": 6356,
+        "newAttemptedPeak": 6356,
+        "oldRetained": 2016,
+        "newRetained": 2016,
+        "triangles": 12
+      },
+      {
+        "fixture": "overlap",
+        "oldOperations": 106146,
+        "newOperations": 103189,
+        "oldAttemptedPeak": 18956,
+        "newAttemptedPeak": 18956,
+        "oldRetained": 6552,
+        "newRetained": 6552,
+        "triangles": 48
+      },
+      {
+        "fixture": "buried",
+        "oldOperations": 44773,
+        "newOperations": 41768,
+        "oldAttemptedPeak": 6836,
+        "newAttemptedPeak": 6836,
+        "oldRetained": 2016,
+        "newRetained": 2016,
+        "triangles": 12
+      },
+      {
+        "fixture": "shared_face",
+        "oldOperations": 66028,
+        "newOperations": 63415,
+        "oldAttemptedPeak": 10644,
+        "newAttemptedPeak": 10644,
+        "oldRetained": 3360,
+        "newRetained": 3360,
+        "triangles": 20
+      },
+      {
+        "fixture": "four_disconnected",
+        "oldOperations": 148529,
+        "newOperations": 132836,
+        "oldAttemptedPeak": 24980,
+        "newAttemptedPeak": 24980,
+        "oldRetained": 8064,
+        "newRetained": 8064,
+        "triangles": 48
+      },
+      {
+        "fixture": "eight_oblique_disconnected",
+        "oldOperations": 364489,
+        "newOperations": 296700,
+        "oldAttemptedPeak": 49812,
+        "newAttemptedPeak": 49812,
+        "oldRetained": 16128,
+        "newRetained": 16128,
+        "triangles": 96
+      }
+    ],
+    "EXACT_PRUNING_COMPLETE": [
+      {
+        "fixture": "identity",
+        "oldOperations": 30277,
+        "newOperations": 30231,
+        "oldAttemptedPeak": 6552,
+        "newAttemptedPeak": 6552,
+        "oldRetained": 2016,
+        "newRetained": 2016,
+        "triangles": 12,
+        "exactOutputAndExposedWitnessMatch": true
+      },
+      {
+        "fixture": "overlap",
+        "oldOperations": 108136,
+        "newOperations": 103166,
+        "oldAttemptedPeak": 19368,
+        "newAttemptedPeak": 19368,
+        "oldRetained": 6552,
+        "newRetained": 6552,
+        "triangles": 48,
+        "exactOutputAndExposedWitnessMatch": true
+      },
+      {
+        "fixture": "buried",
+        "oldOperations": 49342,
+        "newOperations": 41745,
+        "oldAttemptedPeak": 9940,
+        "newAttemptedPeak": 7248,
+        "oldRetained": 2724,
+        "newRetained": 2016,
+        "triangles": 12,
+        "exactOutputAndExposedWitnessMatch": true
+      },
+      {
+        "fixture": "shared_face",
+        "oldOperations": 66170,
+        "newOperations": 63392,
+        "oldAttemptedPeak": 12108,
+        "newAttemptedPeak": 11056,
+        "oldRetained": 3636,
+        "newRetained": 3360,
+        "triangles": 20,
+        "exactOutputAndExposedWitnessMatch": true
+      },
+      {
+        "fixture": "four_disconnected",
+        "oldOperations": 163544,
+        "newOperations": 132789,
+        "oldAttemptedPeak": 25824,
+        "newAttemptedPeak": 25824,
+        "oldRetained": 8064,
+        "newRetained": 8064,
+        "triangles": 48,
+        "exactOutputAndExposedWitnessMatch": true
+      },
+      {
+        "fixture": "eight_oblique_disconnected",
+        "oldOperations": 440797,
+        "newOperations": 296605,
+        "oldAttemptedPeak": 51520,
+        "newAttemptedPeak": 51520,
+        "oldRetained": 16128,
+        "newRetained": 16128,
+        "triangles": 96,
+        "exactOutputAndExposedWitnessMatch": true
+      }
+    ],
+    "STYLE_STORAGE_COMPLETE": [
+      {
+        "fixture": "identity",
+        "oldOperations": 30792,
+        "newOperations": 30242,
+        "oldAttemptedPeak": 6552,
+        "newAttemptedPeak": 6356,
+        "oldRetained": 2016,
+        "newRetained": 2016,
+        "triangles": 12
+      },
+      {
+        "fixture": "overlap",
+        "oldOperations": 106099,
+        "newOperations": 103189,
+        "oldAttemptedPeak": 19368,
+        "newAttemptedPeak": 18956,
+        "oldRetained": 6552,
+        "newRetained": 6552,
+        "triangles": 48
+      },
+      {
+        "fixture": "buried",
+        "oldOperations": 44726,
+        "newOperations": 41768,
+        "oldAttemptedPeak": 7248,
+        "newAttemptedPeak": 6836,
+        "oldRetained": 2016,
+        "newRetained": 2016,
+        "triangles": 12
+      },
+      {
+        "fixture": "shared_face",
+        "oldOperations": 65981,
+        "newOperations": 63415,
+        "oldAttemptedPeak": 11056,
+        "newAttemptedPeak": 10644,
+        "oldRetained": 3360,
+        "newRetained": 3360,
+        "triangles": 20
+      },
+      {
+        "fixture": "four_disconnected",
+        "oldOperations": 148434,
+        "newOperations": 132836,
+        "oldAttemptedPeak": 25824,
+        "newAttemptedPeak": 24980,
+        "oldRetained": 8064,
+        "newRetained": 8064,
+        "triangles": 48
+      },
+      {
+        "fixture": "eight_oblique_disconnected",
+        "oldOperations": 364298,
+        "newOperations": 296700,
+        "oldAttemptedPeak": 51520,
+        "newAttemptedPeak": 49812,
+        "oldRetained": 16128,
+        "newRetained": 16128,
+        "triangles": 96
+      }
+    ]
+  },
+  "interpretation": "Passed analytic assertions; logical charged work/storage only, not physical allocation, whole-hull acceptance or speed comparison."
+}

@@ -1,0 +1,340 @@
+{
+  "parentAuthorHead": "1f38197f5b724811a791dc8725d74de19621d1a9",
+  "qualifiedParentJoin": "6a5df3e9bb4a818ab063633cad229146f44ac449",
+  "qualifiedParentTree": "898444e422b9b28bf0669a0d9b3f5e20464ae345",
+  "parentHandoffSHA256": "0266db47c11284626aaa27c059eca6fb83074c79960250ba14275fc8c28f161b",
+  "parentFocusedWorkSHA256": "2542422af39f2d0a22de1d0353a7bcc7e4236278bcef4dd6a79b7af27cb749a6",
+  "parentActualRows": [
+    {
+      "id": "SH010",
+      "statuses": [
+        {
+          "name": "bound_original_decode",
+          "status": "PASS"
+        },
+        {
+          "name": "original_construction",
+          "status": "REFUSED"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "status": "UNRUN"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "status": "UNRUN"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "status": "UNRUN"
+        }
+      ],
+      "failure": {
+        "kind": "Storage",
+        "source": [
+          1,
+          106
+        ],
+        "operationsAtRefusal": 1600505,
+        "detail": "exact storage budget exhausted"
+      },
+      "operationsAtRefusal": 1600505,
+      "attemptedPeak": 100010,
+      "admittedPeak": 99754,
+      "retainedAtTerminal": 96450,
+      "wallSeconds": 266.956835663,
+      "completeCandidate": false,
+      "allChecksPassed": false,
+      "fleetAdmission": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    },
+    {
+      "id": "SH011",
+      "statuses": [
+        {
+          "name": "bound_original_decode",
+          "status": "PASS"
+        },
+        {
+          "name": "original_construction",
+          "status": "REFUSED"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "status": "UNRUN"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "status": "UNRUN"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "status": "UNRUN"
+        }
+      ],
+      "failure": {
+        "kind": "Storage",
+        "source": [
+          1,
+          110
+        ],
+        "operationsAtRefusal": 1592427,
+        "detail": "exact storage budget exhausted"
+      },
+      "operationsAtRefusal": 1592427,
+      "attemptedPeak": 100138,
+      "admittedPeak": 99882,
+      "retainedAtTerminal": 96658,
+      "wallSeconds": 260.248266889,
+      "completeCandidate": false,
+      "allChecksPassed": false,
+      "fleetAdmission": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    },
+    {
+      "id": "SH016",
+      "statuses": [
+        {
+          "name": "bound_original_decode",
+          "status": "PASS"
+        },
+        {
+          "name": "original_construction",
+          "status": "REFUSED"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "status": "UNRUN"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "status": "UNRUN"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "status": "UNRUN"
+        }
+      ],
+      "failure": {
+        "kind": "Storage",
+        "source": [
+          3,
+          6
+        ],
+        "operationsAtRefusal": 1275465,
+        "detail": "exact storage budget exhausted"
+      },
+      "operationsAtRefusal": 1275465,
+      "attemptedPeak": 100046,
+      "admittedPeak": 99838,
+      "retainedAtTerminal": 98102,
+      "wallSeconds": 100.783913824,
+      "completeCandidate": false,
+      "allChecksPassed": false,
+      "fleetAdmission": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    },
+    {
+      "id": "SH017",
+      "statuses": [
+        {
+          "name": "bound_original_decode",
+          "status": "PASS"
+        },
+        {
+          "name": "original_construction",
+          "status": "REFUSED"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "status": "UNRUN"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "status": "UNRUN"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "status": "UNRUN"
+        }
+      ],
+      "failure": {
+        "kind": "Storage",
+        "source": [
+          3,
+          5
+        ],
+        "operationsAtRefusal": 1301814,
+        "detail": "exact storage budget exhausted"
+      },
+      "operationsAtRefusal": 1301814,
+      "attemptedPeak": 100078,
+      "admittedPeak": 99822,
+      "retainedAtTerminal": 98102,
+      "wallSeconds": 122.127439203,
+      "completeCandidate": false,
+      "allChecksPassed": false,
+      "fleetAdmission": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    },
+    {
+      "id": "SH166",
+      "statuses": [
+        {
+          "name": "bound_original_decode",
+          "status": "PASS"
+        },
+        {
+          "name": "original_construction",
+          "status": "REFUSED"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "status": "UNRUN"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "status": "UNRUN"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "status": "UNRUN"
+        }
+      ],
+      "failure": {
+        "kind": "Storage",
+        "source": [
+          5,
+          11
+        ],
+        "operationsAtRefusal": 1301024,
+        "detail": "exact storage budget exhausted"
+      },
+      "operationsAtRefusal": 1301024,
+      "attemptedPeak": 100126,
+      "admittedPeak": 99806,
+      "retainedAtTerminal": 97982,
+      "wallSeconds": 106.80208637,
+      "completeCandidate": false,
+      "allChecksPassed": false,
+      "fleetAdmission": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    }
+  ],
+  "beforeSUTFreezeSHA256": "074d69ee107e4913b50cd86b6ae451d95e7950b237d9b8341d86aec3ce4b49f0",
+  "terminalLedgerDecomposition": [
+    {
+      "id": "SH010",
+      "facets": 1012,
+      "owners": 31,
+      "inputReservation": 40784,
+      "boundsIndexReservation": 11164,
+      "ownerMapReservation": 342,
+      "terminalRetained": 96450,
+      "remainingLedgerConsistentWithCollectedRawRegions": 44160,
+      "remainderModuloParentRegionUnit": 0
+    },
+    {
+      "id": "SH011",
+      "facets": 1012,
+      "owners": 31,
+      "inputReservation": 40784,
+      "boundsIndexReservation": 11164,
+      "ownerMapReservation": 342,
+      "terminalRetained": 96658,
+      "remainingLedgerConsistentWithCollectedRawRegions": 44368,
+      "remainderModuloParentRegionUnit": 0
+    },
+    {
+      "id": "SH016",
+      "facets": 1100,
+      "owners": 33,
+      "inputReservation": 44304,
+      "boundsIndexReservation": 14940,
+      "ownerMapReservation": 362,
+      "terminalRetained": 98102,
+      "remainingLedgerConsistentWithCollectedRawRegions": 38496,
+      "remainderModuloParentRegionUnit": 0
+    },
+    {
+      "id": "SH017",
+      "facets": 1100,
+      "owners": 33,
+      "inputReservation": 44304,
+      "boundsIndexReservation": 14940,
+      "ownerMapReservation": 362,
+      "terminalRetained": 98102,
+      "remainingLedgerConsistentWithCollectedRawRegions": 38496,
+      "remainderModuloParentRegionUnit": 0
+    },
+    {
+      "id": "SH166",
+      "facets": 988,
+      "owners": 29,
+      "inputReservation": 39824,
+      "boundsIndexReservation": 10972,
+      "ownerMapReservation": 322,
+      "terminalRetained": 97982,
+      "remainingLedgerConsistentWithCollectedRawRegions": 46864,
+      "remainderModuloParentRegionUnit": 0
+    }
+  ],
+  "causalFinding": "The source retains every classified Arrangement with independently owned cell/physical/protected point copies until final global topology, then clones its complete cells/physical/protected into final witnesses. Actual retained ledgers are consistent with38496..46864collected raw-region memberships on top of unchanged source/index/owner reservations. This is source-supported needless duplicate representation/lifetime. Terminal records do not name the exact inner storage guard or uniquely prove a phase; no original region counts or compacted whole-hull totals are inferred.",
+  "correction": [
+    "Private PackedRegion owns one exact Point2 pool, cell-corner and physical-segment ordinals, the existing protected BTreeSet and complete ArrangementWork. Stable append-only point ordinals and a temporary sorted ordinal lookup preserve every original cell corner and physical iteration order. Protected tree is moved intact to preserve contact membership and avoid rebuilding it.",
+    "Keep original16*(cellPoints+physicalCount+protectedCount+1) raw admission live while packing. Admit every new header/record/lookup ordinal before allocation; charge actual lookup comparisons, shifted ordinals, record visits and decoded point reads. Drop temporary lookup before releasing its reservation. On packing error drop partial data then roll back only its newly admitted records.",
+    "Keep the full global3D noding pool admitted throughout collection and packing. Provision8memberships before each original single tree insertion; release that record on duplicate, retain it on unique insertion. Preserve the exact original insertion/log-cost sequence, and avoid a second end-of-collection reservation. This strengthens concurrent lifetime accounting during packing; no reduced point price.",
+    "Retain packed records during collection. After the full global point pool exists and index releases, consume one packed region: admit the complete original raw bound before expansion, then release consumed packed records. Geometry remains globally noded against all points.",
+    "Retain the complete final geometry plus aggregate witness before publishing or transferring any data. Move expanded cells/physical and protected-tree points into the final witness, then release expanded ownership before its unchanged admitted verification. No independent source region survives that transfer. Remaining packed regions stay retained until consumed."
+  ],
+  "packedReservationFormula": "16headers/metadata +3*uniquePointCount +cellCount +cellCornerOrdinalCount +3*physicalSegmentCount +3*protectedPointCount. Temporary sorted lookup adds one ordinal per unique point until dropped. Protected points still own their tree data separately from pool points.",
+  "independentFixture": "One triangle with all3boundary segments and3degenerate point-contact segments,3protected points: parent raw208, packed56, transient lookup3, full pack overlap267. Exact overlap cap admits, one-short refuses with rollback. Expanded fields/physical order/protected/work all equal independent input; invalid ordinal refuses InvalidWitness.",
+  "unchangedProofs": [
+    "Qualified complete facet index, owner bounds, closed query order and all index work charges byte exact.",
+    "Original source/decoder/budget/arrangement/exact modules and all assets/field authority unchanged.",
+    "All old tests/assertions and frozen controls retained byte exact. Complete current candidate/facet/contact output must equal frozen immediate parent; no global CSG, field averaging or contact shortcut.",
+    "Full512candidate triangle cap,4096rational bits,2Mcharged operations and100klogical memberships remain unchanged. Original/full global topology and aggregate witness verifiers unchanged."
+  ],
+  "newControlAcceptance": "Six complete frozen analytic solids compare ordered exact Facets, volume and every witness source/cells/physical/protected/output/stars/area field; run public verification in both lanes and retain all charged work/storage counters. Require lower complete attempted storage peak; no new operation saving assertion or speed claim. Existing prior work assertions remain intact. Singular vertex still refuses UncertifiedContact.",
+  "parentQualification": {
+    "RustPass": 28,
+    "hostPass": 9,
+    "check": "PASS",
+    "strictClippy": "PASS",
+    "devBuild": "PASS",
+    "wholeFive": "5decodePASS/5StorageREFUSED/15dependentUNRUN/0candidate"
+  },
+  "priorFailuresAndAdverseWorkPreserved": true,
+  "currentCompilerTests": "UNRUN",
+  "currentWholeFive": "HELD pending one bounded review and changed owner qualification",
+  "newCandidates": 0,
+  "newFleetAdmissions": 0,
+  "physicalRAMOrSpeedClaim": false,
+  "allOriginalShipsRemainInScope": true,
+  "postPreviewPriorityIndependent": true
+}

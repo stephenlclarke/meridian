@@ -1,4 +1,5 @@
 use crate::exact::{add, area, cross, dot, orient, point, project, scale, sub};
+use crate::region::PackedRegion;
 use crate::{
     Arrangement, Budget, Cell, Facet, Failure, FailureKind, Point2, Point3, Rational, SourceId,
     Vertex, integer,
@@ -705,6 +706,7 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
     let owner_bounds = component_bounds(originals, &facet_bounds.facets, b)?;
     let mut regions = Vec::new();
     let mut all_points = BTreeSet::new();
+    let mut point_members = 0;
     let mut held = 0usize;
     for (face, face_bounds) in originals.iter().zip(&facet_bounds.facets) {
         b.at(face.id());
@@ -749,10 +751,12 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
         if arrangement.cells.is_empty() {
             continue;
         }
-        let members = arrangement.cells.iter().map(Vec::len).sum::<usize>();
-        let reserve = 16 * (members + arrangement.protected.len() + arrangement.physical.len() + 1);
+        let reserve = PackedRegion::raw_memberships(
+            &arrangement.cells,
+            arrangement.physical.len(),
+            arrangement.protected.len(),
+        );
         b.retain(reserve)?;
-        held += reserve;
         for p in arrangement
             .cells
             .iter()
@@ -760,21 +764,35 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
             .chain(arrangement.protected.iter())
         {
             let p = face.lift(p, b)?;
-            b.guard(8 * (all_points.len() + 1))?;
+            // The global noding pool stays live during later region packing.
+            // Provision one record before insertion; duplicates release it.
+            b.retain(8)?;
             log_cost(all_points.len(), b)?;
-            all_points.insert(p);
+            if all_points.insert(p) {
+                point_members += 8;
+            } else {
+                b.release(8);
+            }
         }
-        regions.push((face, arrangement));
+        let region = PackedRegion::pack(arrangement, b)?;
+        b.release(reserve);
+        held += region.memberships();
+        regions.push((face, region));
     }
     drop(owner_bounds);
     drop(facet_bounds);
     b.release(bounds_members + facet_bounds_members);
-    let point_members = 8 * all_points.len();
-    b.retain(point_members)?;
     let mut triangles = Vec::new();
     let mut witnesses = Vec::new();
-    for (source, arrangement) in &regions {
+    for (source, region) in regions {
         b.at(source.id());
+        let packed_members = region.memberships();
+        let expanded_members = region.expanded_memberships();
+        b.retain(expanded_members)?;
+        let arrangement = region.expand(b)?;
+        let _work = arrangement.work;
+        b.release(packed_members);
+        held -= packed_members;
         let mut planar = Vec::new();
         let mut expected = integer(0);
         for cell in &arrangement.cells {
@@ -809,8 +827,8 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
             &stars,
             b,
         )?;
-        // Output facets and the complete final witness own separate records.
-        // Arrangement copies stay in `held` until the complete hull audit ends.
+        // Admit final ownership before transferring expanded region records.
+        // Raw expansion remains admitted through the complete move/collection.
         let geometry_members = (32 + source.style().len()) * planar.len();
         b.retain(geometry_members + witness_members)?;
         for triangle in &planar {
@@ -850,13 +868,14 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
         }
         let witness = FacetWitness {
             source: source.id(),
-            classified_cells: arrangement.cells.clone(),
-            physical_segments: arrangement.physical.iter().cloned().collect(),
-            protected_points: arrangement.protected.iter().cloned().collect(),
+            classified_cells: arrangement.cells,
+            physical_segments: arrangement.physical,
+            protected_points: arrangement.protected.into_iter().collect(),
             output_triangles: planar,
             contact_stars: stars,
             twice_area: expected,
         };
+        b.release(expanded_members);
         // The final witness is already retained above. Public standalone verify
         // reserves independently owned input; use the admitted path here.
         witness.verify_admitted(source, b)?;

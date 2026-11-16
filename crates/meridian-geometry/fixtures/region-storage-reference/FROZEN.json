@@ -1,0 +1,16 @@
+{
+  "phase": "BEFORE_REGION_STORAGE_SUCCESSOR_AUTHORING",
+  "parentAuthorHead": "1f38197f5b724811a791dc8725d74de19621d1a9",
+  "qualifiedRootJoin": "6a5df3e9bb4a818ab063633cad229146f44ac449",
+  "reference": "Qualified production certificate prefix, trailing whitespace normalized only. Complete independent solids and all other production modules unchanged.",
+  "files": {
+    "CASES.json": {
+      "bytes": 3170,
+      "sha256": "f7a0e6665cfd9337145c9b9715e26516f164acd0612590dc07093bafe95e4e5d"
+    },
+    "before-certificate.rs": {
+      "bytes": 44062,
+      "sha256": "fd82beb9ced9083d3cee5e49220c1b33d35244bb4c4240364c0c7ac8447d351b"
+    }
+  }
+}

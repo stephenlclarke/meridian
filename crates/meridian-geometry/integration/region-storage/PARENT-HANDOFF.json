@@ -1,0 +1,1394 @@
+{
+  "recordedAtUTC": "2026-11-16T22:20:02.328304+00:00",
+  "status": "TERMINAL_WHOLE_FIVE_STORAGE_REFUSALS_PRESERVED",
+  "head": "6a5df3e9bb4a818ab063633cad229146f44ac449",
+  "tree": "898444e422b9b28bf0669a0d9b3f5e20464ae345",
+  "parent": "311f1fea9a6dac696187f9003ed6bc4d39501e25",
+  "executionPacket": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-6a5df3e/packet/SOURCE.json",
+    "bytes": 45213,
+    "sha256": "8587b7aa1908fe6a76dde3a54ff91df0a67e007234ccc691f54a7be6885b0ab6"
+  },
+  "independentSourceReview": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-6a5df3e/packet/G2-SOURCE-CLEAR.json",
+    "bytes": 5395,
+    "sha256": "142e8dccf4233db55aff55046864876655680b85a3405f45a17203348b5d771e"
+  },
+  "authorRootPacket": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-6a5df3e/packet/ROOT-JOIN.json",
+    "bytes": 48625,
+    "sha256": "f578b47eb439b7e51c63901504c754a3ce7f6de82ea222e81fc6f49c75e0df26"
+  },
+  "sourcePinsVerifiedBeforeAndAfter": 255,
+  "all116CrateFilesExactReviewedAuthor": true,
+  "all139OutsideFilesExactParent": true,
+  "focused": {
+    "status": "PASS",
+    "RustCounts": [
+      11,
+      6,
+      9,
+      2,
+      0
+    ],
+    "RustTotal": 28,
+    "hostTests": 9,
+    "cargoCheck": "PASS",
+    "strictClippy": "PASS",
+    "devHarnessBuild": "PASS",
+    "rawNocaptureWorkEvidence": {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-6a5df3e/focused-work-observations.json",
+      "bytes": 5701,
+      "sha256": "2542422af39f2d0a22de1d0353a7bcc7e4236278bcef4dd6a79b7af27cb749a6"
+    }
+  },
+  "jobs": [
+    {
+      "name": "check",
+      "pid": 551,
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "-p",
+        "meridian-geometry",
+        "--all-targets"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 1.3325300779999996,
+      "finishedUTC": "2026-11-16T22:02:48.890896+00:00",
+      "log": {
+        "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/check.log",
+        "bytes": 184,
+        "sha256": "4a1d0388ec7f547e57b6a192b0c26ad803cc01ce11216d6615fe301e271d13df"
+      }
+    },
+    {
+      "name": "test",
+      "pid": 591,
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "meridian-geometry",
+        "--",
+        "--nocapture"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 25.164818292,
+      "finishedUTC": "2026-11-16T22:03:14.067946+00:00",
+      "log": {
+        "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/test.log",
+        "bytes": 7886,
+        "sha256": "79c78e5b73cad07186131e11ee1bb85758c2e11ec38096d2a414af4a44692e2c"
+      }
+    },
+    {
+      "name": "host-tests",
+      "pid": 1369,
+      "command": [
+        "/home/sclarke/setup-work/smoke/new-python/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "crates/meridian-geometry/tools",
+        "-p",
+        "test_run_original_five.py"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.17678662400000178,
+      "finishedUTC": "2026-11-16T22:03:14.264033+00:00",
+      "log": {
+        "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/host-tests.log",
+        "bytes": 107,
+        "sha256": "25660486d75d5f4b9efa5b4fdd11e9e694dfc634802c6601b239be93e2d13722"
+      }
+    },
+    {
+      "name": "clippy",
+      "pid": 1370,
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "-p",
+        "meridian-geometry",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 1.0297483650000032,
+      "finishedUTC": "2026-11-16T22:03:15.309197+00:00",
+      "log": {
+        "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/clippy.log",
+        "bytes": 184,
+        "sha256": "6cb8858434a65999dbd561f83dc984543e981670a5e3175a4b575972b41ad351"
+      }
+    },
+    {
+      "name": "build",
+      "pid": 1414,
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "-p",
+        "meridian-geometry",
+        "--bin",
+        "original_five"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.0940338159999996,
+      "finishedUTC": "2026-11-16T22:03:15.419487+00:00",
+      "log": {
+        "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/build.log",
+        "bytes": 72,
+        "sha256": "99f71393b9903dca098310bb446022a4bdee195ea9996f351a787195555210a6"
+      }
+    },
+    {
+      "name": "whole-five",
+      "pid": 1437,
+      "command": [
+        "/home/sclarke/setup-work/smoke/new-python/bin/python",
+        "/home/sclarke/github/meridian-geometry-6a5df3e/crates/meridian-geometry/tools/run_original_five.py",
+        "--project",
+        "/home/sclarke/github/meridian-geometry-6a5df3e",
+        "--source-binding",
+        "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/input-packet/ROOT-SOURCE-BINDING.json",
+        "--binary",
+        "/home/sclarke/setup-work/station-linux-target/debug/original_five",
+        "--out",
+        "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five"
+      ],
+      "exit": 1,
+      "elapsedSeconds": 857.252838778,
+      "finishedUTC": "2026-11-16T22:17:33.123220+00:00",
+      "log": {
+        "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five.log",
+        "bytes": 1171,
+        "sha256": "0a9ce0391f85f82c41c112878914508935adb703008fcae464be42526508f113"
+      }
+    }
+  ],
+  "toolchain": {
+    "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0\nLLVM version: 23.1.1\n",
+    "python": {
+      "executable": "/home/sclarke/setup-work/smoke/new-python/bin/python",
+      "version": "3.15.2 (main, Nov 11 2026, 00:19:20) [Clang 23.1.3 ]",
+      "platform": "linux"
+    },
+    "environment": {
+      "PATH": "/home/sclarke/.cargo/bin:/home/sclarke/setup-work/smoke/new-python/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/Go/bin:/mnt/c/Program Files/Warp/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/Git/ucrt64/bin:/mnt/c/Program Files/Git/usr/bin:/mnt/c/Users/steph/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/steph/go/bin:/mnt/c/Users/steph/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/steph/.cargo/bin",
+      "CARGO_TARGET_DIR": "/home/sclarke/setup-work/station-linux-target",
+      "PYTHONDONTWRITEBYTECODE": "1",
+      "MERIDIAN_SOURCE_SHA": "6a5df3e9bb4a818ab063633cad229146f44ac449",
+      "CARGO_BUILD_JOBS": null,
+      "RUSTFLAGS": null,
+      "CARGO_ENCODED_RUSTFLAGS": null,
+      "RUSTC_BOOTSTRAP": null,
+      "RUSTC_LOG": null,
+      "LANG": "C.UTF-8",
+      "LC_ALL": null
+    },
+    "resources": "Default unrestricted; no added job/CPU/RSS/time caps. Geometry guards remain exactly the reviewed original limits.",
+    "cargoBinary": {
+      "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+      "bytes": 36160240,
+      "sha256": "e951141cc55a6cd7b9876d187bd30a3720e6086b99413af95e3b8de1cdd72f14"
+    },
+    "rustcBinary": {
+      "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+      "bytes": 647376,
+      "sha256": "f3834d26669b03f6855fa54bd2381443123e860167bc0c7a8dd137e5cf6e5e4f"
+    },
+    "clippy-driverBinary": {
+      "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/clippy-driver",
+      "bytes": 16256512,
+      "sha256": "ecf6d74d4e13728405acd3749bff486db899e793b5e3cd179ab663f7fe9d6fe6"
+    },
+    "gitBinary": {
+      "path": "/usr/bin/git",
+      "bytes": 4591208,
+      "sha256": "d2682f3a026c10db333f3f05a87f2b79c1ba5750f7c6d512879409fff622a1a5"
+    }
+  },
+  "ownershipPreflight": {
+    "activeBuildProcesses": [],
+    "nativeWindowsBuildProcesses": [],
+    "lease": "/home/sclarke/setup-work/station-linux-target/.meridian-dell-wsl-ci.lock",
+    "utc": "2026-11-16T22:02:46.856746+00:00",
+    "wrapperPID": 372
+  },
+  "actualStart": {
+    "utc": "2026-11-16T22:02:47.562648+00:00",
+    "pid": 551,
+    "parentPid": 372,
+    "wrapperParentPID": 371,
+    "namespace": "WSL Linux",
+    "executable": "/home/sclarke/.cargo/bin/cargo",
+    "command": [
+      "cargo",
+      "check",
+      "--locked",
+      "-p",
+      "meridian-geometry",
+      "--all-targets"
+    ],
+    "cwd": "/home/sclarke/github/meridian-geometry-6a5df3e",
+    "head": "6a5df3e9bb4a818ab063633cad229146f44ac449",
+    "tree": "898444e422b9b28bf0669a0d9b3f5e20464ae345",
+    "manifestSHA256": "8587b7aa1908fe6a76dde3a54ff91df0a67e007234ccc691f54a7be6885b0ab6",
+    "sourcePins": 255,
+    "log": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/check.log",
+    "toolchain": {
+      "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0\nLLVM version: 23.1.1\n",
+      "python": {
+        "executable": "/home/sclarke/setup-work/smoke/new-python/bin/python",
+        "version": "3.15.2 (main, Nov 11 2026, 00:19:20) [Clang 23.1.3 ]",
+        "platform": "linux"
+      },
+      "environment": {
+        "PATH": "/home/sclarke/.cargo/bin:/home/sclarke/setup-work/smoke/new-python/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/Go/bin:/mnt/c/Program Files/Warp/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/Git/ucrt64/bin:/mnt/c/Program Files/Git/usr/bin:/mnt/c/Users/steph/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/steph/go/bin:/mnt/c/Users/steph/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/steph/.cargo/bin",
+        "CARGO_TARGET_DIR": "/home/sclarke/setup-work/station-linux-target",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "MERIDIAN_SOURCE_SHA": "6a5df3e9bb4a818ab063633cad229146f44ac449",
+        "CARGO_BUILD_JOBS": null,
+        "RUSTFLAGS": null,
+        "CARGO_ENCODED_RUSTFLAGS": null,
+        "RUSTC_BOOTSTRAP": null,
+        "RUSTC_LOG": null,
+        "LANG": "C.UTF-8",
+        "LC_ALL": null
+      },
+      "resources": "Default unrestricted; no added job/CPU/RSS/time caps. Geometry guards remain exactly the reviewed original limits.",
+      "cargoBinary": {
+        "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "bytes": 36160240,
+        "sha256": "e951141cc55a6cd7b9876d187bd30a3720e6086b99413af95e3b8de1cdd72f14"
+      },
+      "rustcBinary": {
+        "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "bytes": 647376,
+        "sha256": "f3834d26669b03f6855fa54bd2381443123e860167bc0c7a8dd137e5cf6e5e4f"
+      },
+      "clippy-driverBinary": {
+        "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/clippy-driver",
+        "bytes": 16256512,
+        "sha256": "ecf6d74d4e13728405acd3749bff486db899e793b5e3cd179ab663f7fe9d6fe6"
+      },
+      "gitBinary": {
+        "path": "/usr/bin/git",
+        "bytes": 4591208,
+        "sha256": "d2682f3a026c10db333f3f05a87f2b79c1ba5750f7c6d512879409fff622a1a5"
+      }
+    },
+    "wrapperExecutable": "/home/sclarke/setup-work/smoke/new-python/bin/python",
+    "wrapperCommand": [
+      "/home/sclarke/setup-work/smoke/new-python/bin/python",
+      "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/work/geometry-6a5df3e/run-geometry-qualification.py",
+      "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/work/geometry-6a5df3e/packet",
+      "8587b7aa1908fe6a76dde3a54ff91df0a67e007234ccc691f54a7be6885b0ab6"
+    ],
+    "wrapperFile": {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/work/geometry-6a5df3e/run-geometry-qualification.py",
+      "bytes": 11552,
+      "sha256": "4ae063805a8626f4f05fc0023d7b1f51a1bbf81e3b42275f6c13e8761faf7e23"
+    }
+  },
+  "actualWholeFiveStart": {
+    "utc": "2026-11-16T22:03:15.873806+00:00",
+    "pid": 1437,
+    "parentPid": 372,
+    "wrapperParentPID": 371,
+    "namespace": "WSL Linux",
+    "executable": "/home/sclarke/setup-work/smoke/new-python/bin/python",
+    "command": [
+      "/home/sclarke/setup-work/smoke/new-python/bin/python",
+      "/home/sclarke/github/meridian-geometry-6a5df3e/crates/meridian-geometry/tools/run_original_five.py",
+      "--project",
+      "/home/sclarke/github/meridian-geometry-6a5df3e",
+      "--source-binding",
+      "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/input-packet/ROOT-SOURCE-BINDING.json",
+      "--binary",
+      "/home/sclarke/setup-work/station-linux-target/debug/original_five",
+      "--out",
+      "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five"
+    ],
+    "cwd": "/home/sclarke/github/meridian-geometry-6a5df3e",
+    "head": "6a5df3e9bb4a818ab063633cad229146f44ac449",
+    "tree": "898444e422b9b28bf0669a0d9b3f5e20464ae345",
+    "manifestSHA256": "8587b7aa1908fe6a76dde3a54ff91df0a67e007234ccc691f54a7be6885b0ab6",
+    "sourcePins": 255,
+    "log": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five.log",
+    "toolchain": {
+      "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0\nLLVM version: 23.1.1\n",
+      "python": {
+        "executable": "/home/sclarke/setup-work/smoke/new-python/bin/python",
+        "version": "3.15.2 (main, Nov 11 2026, 00:19:20) [Clang 23.1.3 ]",
+        "platform": "linux"
+      },
+      "environment": {
+        "PATH": "/home/sclarke/.cargo/bin:/home/sclarke/setup-work/smoke/new-python/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/Go/bin:/mnt/c/Program Files/Warp/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/Git/ucrt64/bin:/mnt/c/Program Files/Git/usr/bin:/mnt/c/Users/steph/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/steph/go/bin:/mnt/c/Users/steph/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/steph/.cargo/bin",
+        "CARGO_TARGET_DIR": "/home/sclarke/setup-work/station-linux-target",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "MERIDIAN_SOURCE_SHA": "6a5df3e9bb4a818ab063633cad229146f44ac449",
+        "CARGO_BUILD_JOBS": null,
+        "RUSTFLAGS": null,
+        "CARGO_ENCODED_RUSTFLAGS": null,
+        "RUSTC_BOOTSTRAP": null,
+        "RUSTC_LOG": null,
+        "LANG": "C.UTF-8",
+        "LC_ALL": null
+      },
+      "resources": "Default unrestricted; no added job/CPU/RSS/time caps. Geometry guards remain exactly the reviewed original limits.",
+      "cargoBinary": {
+        "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "bytes": 36160240,
+        "sha256": "e951141cc55a6cd7b9876d187bd30a3720e6086b99413af95e3b8de1cdd72f14"
+      },
+      "rustcBinary": {
+        "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "bytes": 647376,
+        "sha256": "f3834d26669b03f6855fa54bd2381443123e860167bc0c7a8dd137e5cf6e5e4f"
+      },
+      "clippy-driverBinary": {
+        "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/clippy-driver",
+        "bytes": 16256512,
+        "sha256": "ecf6d74d4e13728405acd3749bff486db899e793b5e3cd179ab663f7fe9d6fe6"
+      },
+      "gitBinary": {
+        "path": "/usr/bin/git",
+        "bytes": 4591208,
+        "sha256": "d2682f3a026c10db333f3f05a87f2b79c1ba5750f7c6d512879409fff622a1a5"
+      }
+    },
+    "wrapperExecutable": "/home/sclarke/setup-work/smoke/new-python/bin/python",
+    "wrapperCommand": [
+      "/home/sclarke/setup-work/smoke/new-python/bin/python",
+      "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/work/geometry-6a5df3e/run-geometry-qualification.py",
+      "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/work/geometry-6a5df3e/packet",
+      "8587b7aa1908fe6a76dde3a54ff91df0a67e007234ccc691f54a7be6885b0ab6"
+    ],
+    "wrapperFile": {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/work/geometry-6a5df3e/run-geometry-qualification.py",
+      "bytes": 11552,
+      "sha256": "4ae063805a8626f4f05fc0023d7b1f51a1bbf81e3b42275f6c13e8761faf7e23"
+    }
+  },
+  "terminal": {
+    "wrapperPID": 372,
+    "exit": 1,
+    "focusedExit": 0,
+    "wholeFiveExecuted": true,
+    "finishedUTC": "2026-11-16T22:17:33.203833+00:00",
+    "head": "6a5df3e9bb4a818ab063633cad229146f44ac449",
+    "tree": "898444e422b9b28bf0669a0d9b3f5e20464ae345",
+    "noRetry": true
+  },
+  "wholeFiveOwnerTerminal": {
+    "exitCode": 1,
+    "rustExitCode": 1,
+    "monotonicElapsedNanoseconds": 857023707633,
+    "inputsAndBinaryUnchanged": true,
+    "postflightError": null,
+    "actualRustTerminal": {
+      "status": "ORIGINAL_GEOMETRY_BLOCKERS_RETAINED",
+      "declaredBodies": 25,
+      "bodiesPass": 5,
+      "bodiesRefused": 5,
+      "bodiesFail": 0,
+      "bodiesUnrun": 15,
+      "monotonicNanoseconds": 856989293209,
+      "cases": [
+        {
+          "id": "SH010",
+          "bodies": [
+            {
+              "name": "bound_original_decode",
+              "sourceAsset": "SH010",
+              "sourceInputSHA256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc",
+              "status": "PASS",
+              "chargedOperationDelta": 359198,
+              "peakStorageAtBodyTerminal": 40973,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            },
+            {
+              "name": "original_construction",
+              "sourceAsset": "SH010",
+              "sourceInputSHA256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc",
+              "status": "REFUSED",
+              "chargedOperationDelta": 1241307,
+              "peakStorageAtBodyTerminal": 100010,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            },
+            {
+              "name": "source_and_affine_fields",
+              "sourceAsset": "SH010",
+              "sourceInputSHA256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc",
+              "status": "UNRUN",
+              "chargedOperationDelta": null,
+              "peakStorageAtBodyTerminal": null,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            },
+            {
+              "name": "complete_facet_certificates",
+              "sourceAsset": "SH010",
+              "sourceInputSHA256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc",
+              "status": "UNRUN",
+              "chargedOperationDelta": null,
+              "peakStorageAtBodyTerminal": null,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            },
+            {
+              "name": "closed_topology_and_limits",
+              "sourceAsset": "SH010",
+              "sourceInputSHA256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc",
+              "status": "UNRUN",
+              "chargedOperationDelta": null,
+              "peakStorageAtBodyTerminal": null,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            }
+          ],
+          "failure": {
+            "kind": "Storage",
+            "source": [
+              1,
+              106
+            ],
+            "operationsAtRefusal": 1600505,
+            "detail": "exact storage budget exhausted"
+          },
+          "operations": 1600505,
+          "peakStorageMemberships": 100010,
+          "peakAdmittedReservationMemberships": 99754,
+          "retainedBudgetMembershipsAtTerminal": 96450,
+          "storageAccounting": "logical reservations; attempted peaks include refused admissions, not measured allocated bytes",
+          "monotonicNanoseconds": 266956835663,
+          "completeCandidateReturned": false,
+          "allCandidateChecksPassed": false,
+          "limits": {
+            "operations": 2000000,
+            "storageMemberships": 100000,
+            "rationalBits": 4096,
+            "triangles": 512
+          },
+          "sourceBinding": "EXECUTION-BINDING.json",
+          "inputBindings": "ORIGINAL-BINDINGS.json",
+          "fleetAdmission": false
+        },
+        {
+          "id": "SH011",
+          "bodies": [
+            {
+              "name": "bound_original_decode",
+              "sourceAsset": "SH011",
+              "sourceInputSHA256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c",
+              "status": "PASS",
+              "chargedOperationDelta": 363558,
+              "peakStorageAtBodyTerminal": 40981,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            },
+            {
+              "name": "original_construction",
+              "sourceAsset": "SH011",
+              "sourceInputSHA256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c",
+              "status": "REFUSED",
+              "chargedOperationDelta": 1228869,
+              "peakStorageAtBodyTerminal": 100138,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            },
+            {
+              "name": "source_and_affine_fields",
+              "sourceAsset": "SH011",
+              "sourceInputSHA256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c",
+              "status": "UNRUN",
+              "chargedOperationDelta": null,
+              "peakStorageAtBodyTerminal": null,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            },
+            {
+              "name": "complete_facet_certificates",
+              "sourceAsset": "SH011",
+              "sourceInputSHA256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c",
+              "status": "UNRUN",
+              "chargedOperationDelta": null,
+              "peakStorageAtBodyTerminal": null,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            },
+            {
+              "name": "closed_topology_and_limits",
+              "sourceAsset": "SH011",
+              "sourceInputSHA256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c",
+              "status": "UNRUN",
+              "chargedOperationDelta": null,
+              "peakStorageAtBodyTerminal": null,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            }
+          ],
+          "failure": {
+            "kind": "Storage",
+            "source": [
+              1,
+              110
+            ],
+            "operationsAtRefusal": 1592427,
+            "detail": "exact storage budget exhausted"
+          },
+          "operations": 1592427,
+          "peakStorageMemberships": 100138,
+          "peakAdmittedReservationMemberships": 99882,
+          "retainedBudgetMembershipsAtTerminal": 96658,
+          "storageAccounting": "logical reservations; attempted peaks include refused admissions, not measured allocated bytes",
+          "monotonicNanoseconds": 260248266889,
+          "completeCandidateReturned": false,
+          "allCandidateChecksPassed": false,
+          "limits": {
+            "operations": 2000000,
+            "storageMemberships": 100000,
+            "rationalBits": 4096,
+            "triangles": 512
+          },
+          "sourceBinding": "EXECUTION-BINDING.json",
+          "inputBindings": "ORIGINAL-BINDINGS.json",
+          "fleetAdmission": false
+        },
+        {
+          "id": "SH016",
+          "bodies": [
+            {
+              "name": "bound_original_decode",
+              "sourceAsset": "SH016",
+              "sourceInputSHA256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e",
+              "status": "PASS",
+              "chargedOperationDelta": 365449,
+              "peakStorageAtBodyTerminal": 44470,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            },
+            {
+              "name": "original_construction",
+              "sourceAsset": "SH016",
+              "sourceInputSHA256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e",
+              "status": "REFUSED",
+              "chargedOperationDelta": 910016,
+              "peakStorageAtBodyTerminal": 100046,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            },
+            {
+              "name": "source_and_affine_fields",
+              "sourceAsset": "SH016",
+              "sourceInputSHA256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e",
+              "status": "UNRUN",
+              "chargedOperationDelta": null,
+              "peakStorageAtBodyTerminal": null,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            },
+            {
+              "name": "complete_facet_certificates",
+              "sourceAsset": "SH016",
+              "sourceInputSHA256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e",
+              "status": "UNRUN",
+              "chargedOperationDelta": null,
+              "peakStorageAtBodyTerminal": null,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            },
+            {
+              "name": "closed_topology_and_limits",
+              "sourceAsset": "SH016",
+              "sourceInputSHA256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e",
+              "status": "UNRUN",
+              "chargedOperationDelta": null,
+              "peakStorageAtBodyTerminal": null,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            }
+          ],
+          "failure": {
+            "kind": "Storage",
+            "source": [
+              3,
+              6
+            ],
+            "operationsAtRefusal": 1275465,
+            "detail": "exact storage budget exhausted"
+          },
+          "operations": 1275465,
+          "peakStorageMemberships": 100046,
+          "peakAdmittedReservationMemberships": 99838,
+          "retainedBudgetMembershipsAtTerminal": 98102,
+          "storageAccounting": "logical reservations; attempted peaks include refused admissions, not measured allocated bytes",
+          "monotonicNanoseconds": 100783913824,
+          "completeCandidateReturned": false,
+          "allCandidateChecksPassed": false,
+          "limits": {
+            "operations": 2000000,
+            "storageMemberships": 100000,
+            "rationalBits": 4096,
+            "triangles": 512
+          },
+          "sourceBinding": "EXECUTION-BINDING.json",
+          "inputBindings": "ORIGINAL-BINDINGS.json",
+          "fleetAdmission": false
+        },
+        {
+          "id": "SH017",
+          "bodies": [
+            {
+              "name": "bound_original_decode",
+              "sourceAsset": "SH017",
+              "sourceInputSHA256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a",
+              "status": "PASS",
+              "chargedOperationDelta": 390244,
+              "peakStorageAtBodyTerminal": 44498,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            },
+            {
+              "name": "original_construction",
+              "sourceAsset": "SH017",
+              "sourceInputSHA256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a",
+              "status": "REFUSED",
+              "chargedOperationDelta": 911570,
+              "peakStorageAtBodyTerminal": 100078,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            },
+            {
+              "name": "source_and_affine_fields",
+              "sourceAsset": "SH017",
+              "sourceInputSHA256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a",
+              "status": "UNRUN",
+              "chargedOperationDelta": null,
+              "peakStorageAtBodyTerminal": null,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            },
+            {
+              "name": "complete_facet_certificates",
+              "sourceAsset": "SH017",
+              "sourceInputSHA256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a",
+              "status": "UNRUN",
+              "chargedOperationDelta": null,
+              "peakStorageAtBodyTerminal": null,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            },
+            {
+              "name": "closed_topology_and_limits",
+              "sourceAsset": "SH017",
+              "sourceInputSHA256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a",
+              "status": "UNRUN",
+              "chargedOperationDelta": null,
+              "peakStorageAtBodyTerminal": null,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            }
+          ],
+          "failure": {
+            "kind": "Storage",
+            "source": [
+              3,
+              5
+            ],
+            "operationsAtRefusal": 1301814,
+            "detail": "exact storage budget exhausted"
+          },
+          "operations": 1301814,
+          "peakStorageMemberships": 100078,
+          "peakAdmittedReservationMemberships": 99822,
+          "retainedBudgetMembershipsAtTerminal": 98102,
+          "storageAccounting": "logical reservations; attempted peaks include refused admissions, not measured allocated bytes",
+          "monotonicNanoseconds": 122127439203,
+          "completeCandidateReturned": false,
+          "allCandidateChecksPassed": false,
+          "limits": {
+            "operations": 2000000,
+            "storageMemberships": 100000,
+            "rationalBits": 4096,
+            "triangles": 512
+          },
+          "sourceBinding": "EXECUTION-BINDING.json",
+          "inputBindings": "ORIGINAL-BINDINGS.json",
+          "fleetAdmission": false
+        },
+        {
+          "id": "SH166",
+          "bodies": [
+            {
+              "name": "bound_original_decode",
+              "sourceAsset": "SH166",
+              "sourceInputSHA256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f",
+              "status": "PASS",
+              "chargedOperationDelta": 341473,
+              "peakStorageAtBodyTerminal": 40001,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            },
+            {
+              "name": "original_construction",
+              "sourceAsset": "SH166",
+              "sourceInputSHA256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f",
+              "status": "REFUSED",
+              "chargedOperationDelta": 959551,
+              "peakStorageAtBodyTerminal": 100126,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            },
+            {
+              "name": "source_and_affine_fields",
+              "sourceAsset": "SH166",
+              "sourceInputSHA256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f",
+              "status": "UNRUN",
+              "chargedOperationDelta": null,
+              "peakStorageAtBodyTerminal": null,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            },
+            {
+              "name": "complete_facet_certificates",
+              "sourceAsset": "SH166",
+              "sourceInputSHA256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f",
+              "status": "UNRUN",
+              "chargedOperationDelta": null,
+              "peakStorageAtBodyTerminal": null,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            },
+            {
+              "name": "closed_topology_and_limits",
+              "sourceAsset": "SH166",
+              "sourceInputSHA256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f",
+              "status": "UNRUN",
+              "chargedOperationDelta": null,
+              "peakStorageAtBodyTerminal": null,
+              "criteria": "WHOLE-FIVE-CRITERIA.json"
+            }
+          ],
+          "failure": {
+            "kind": "Storage",
+            "source": [
+              5,
+              11
+            ],
+            "operationsAtRefusal": 1301024,
+            "detail": "exact storage budget exhausted"
+          },
+          "operations": 1301024,
+          "peakStorageMemberships": 100126,
+          "peakAdmittedReservationMemberships": 99806,
+          "retainedBudgetMembershipsAtTerminal": 97982,
+          "storageAccounting": "logical reservations; attempted peaks include refused admissions, not measured allocated bytes",
+          "monotonicNanoseconds": 106802086370,
+          "completeCandidateReturned": false,
+          "allCandidateChecksPassed": false,
+          "limits": {
+            "operations": 2000000,
+            "storageMemberships": 100000,
+            "rationalBits": 4096,
+            "triangles": 512
+          },
+          "sourceBinding": "EXECUTION-BINDING.json",
+          "inputBindings": "ORIGINAL-BINDINGS.json",
+          "fleetAdmission": false
+        }
+      ],
+      "fleetBaseline": {
+        "ships": 23,
+        "shipTotal": 162,
+        "stations": 4,
+        "stationTotal": 6
+      },
+      "all171Accepted": false,
+      "nativeAcceptance": false
+    },
+    "sourceHead": "6a5df3e9bb4a818ab063633cad229146f44ac449",
+    "sourceTree": "898444e422b9b28bf0669a0d9b3f5e20464ae345",
+    "noRetry": true,
+    "all171Accepted": false,
+    "nativeAcceptance": false
+  },
+  "wholeFiveRows": [
+    {
+      "id": "SH010",
+      "statuses": [
+        {
+          "name": "bound_original_decode",
+          "status": "PASS"
+        },
+        {
+          "name": "original_construction",
+          "status": "REFUSED"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "status": "UNRUN"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "status": "UNRUN"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "status": "UNRUN"
+        }
+      ],
+      "failure": {
+        "kind": "Storage",
+        "source": [
+          1,
+          106
+        ],
+        "operationsAtRefusal": 1600505,
+        "detail": "exact storage budget exhausted"
+      },
+      "operationsAtRefusal": 1600505,
+      "attemptedPeak": 100010,
+      "admittedPeak": 99754,
+      "retainedAtTerminal": 96450,
+      "wallSeconds": 266.956835663,
+      "completeCandidate": false,
+      "allChecksPassed": false,
+      "fleetAdmission": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    },
+    {
+      "id": "SH011",
+      "statuses": [
+        {
+          "name": "bound_original_decode",
+          "status": "PASS"
+        },
+        {
+          "name": "original_construction",
+          "status": "REFUSED"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "status": "UNRUN"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "status": "UNRUN"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "status": "UNRUN"
+        }
+      ],
+      "failure": {
+        "kind": "Storage",
+        "source": [
+          1,
+          110
+        ],
+        "operationsAtRefusal": 1592427,
+        "detail": "exact storage budget exhausted"
+      },
+      "operationsAtRefusal": 1592427,
+      "attemptedPeak": 100138,
+      "admittedPeak": 99882,
+      "retainedAtTerminal": 96658,
+      "wallSeconds": 260.248266889,
+      "completeCandidate": false,
+      "allChecksPassed": false,
+      "fleetAdmission": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    },
+    {
+      "id": "SH016",
+      "statuses": [
+        {
+          "name": "bound_original_decode",
+          "status": "PASS"
+        },
+        {
+          "name": "original_construction",
+          "status": "REFUSED"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "status": "UNRUN"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "status": "UNRUN"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "status": "UNRUN"
+        }
+      ],
+      "failure": {
+        "kind": "Storage",
+        "source": [
+          3,
+          6
+        ],
+        "operationsAtRefusal": 1275465,
+        "detail": "exact storage budget exhausted"
+      },
+      "operationsAtRefusal": 1275465,
+      "attemptedPeak": 100046,
+      "admittedPeak": 99838,
+      "retainedAtTerminal": 98102,
+      "wallSeconds": 100.783913824,
+      "completeCandidate": false,
+      "allChecksPassed": false,
+      "fleetAdmission": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    },
+    {
+      "id": "SH017",
+      "statuses": [
+        {
+          "name": "bound_original_decode",
+          "status": "PASS"
+        },
+        {
+          "name": "original_construction",
+          "status": "REFUSED"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "status": "UNRUN"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "status": "UNRUN"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "status": "UNRUN"
+        }
+      ],
+      "failure": {
+        "kind": "Storage",
+        "source": [
+          3,
+          5
+        ],
+        "operationsAtRefusal": 1301814,
+        "detail": "exact storage budget exhausted"
+      },
+      "operationsAtRefusal": 1301814,
+      "attemptedPeak": 100078,
+      "admittedPeak": 99822,
+      "retainedAtTerminal": 98102,
+      "wallSeconds": 122.127439203,
+      "completeCandidate": false,
+      "allChecksPassed": false,
+      "fleetAdmission": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    },
+    {
+      "id": "SH166",
+      "statuses": [
+        {
+          "name": "bound_original_decode",
+          "status": "PASS"
+        },
+        {
+          "name": "original_construction",
+          "status": "REFUSED"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "status": "UNRUN"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "status": "UNRUN"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "status": "UNRUN"
+        }
+      ],
+      "failure": {
+        "kind": "Storage",
+        "source": [
+          5,
+          11
+        ],
+        "operationsAtRefusal": 1301024,
+        "detail": "exact storage budget exhausted"
+      },
+      "operationsAtRefusal": 1301024,
+      "attemptedPeak": 100126,
+      "admittedPeak": 99806,
+      "retainedAtTerminal": 97982,
+      "wallSeconds": 106.80208637,
+      "completeCandidate": false,
+      "allChecksPassed": false,
+      "fleetAdmission": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    }
+  ],
+  "outcomes": {
+    "PASS": 5,
+    "REFUSED": 5,
+    "FAIL": 0,
+    "UNRUN": 15
+  },
+  "physicalAndRetainedBinary": {
+    "head": "6a5df3e9bb4a818ab063633cad229146f44ac449",
+    "tree": "898444e422b9b28bf0669a0d9b3f5e20464ae345",
+    "profile": "dev/debug as assigned; not a release build",
+    "built": {
+      "path": "/home/sclarke/setup-work/station-linux-target/debug/original_five",
+      "bytes": 20783912,
+      "sha256": "69aad62c92134b3e35c6a683ae5e6b6ecdc278190d3c6f541f6044cb81e111f7"
+    },
+    "retained": {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/compiled-original_five",
+      "bytes": 20783912,
+      "sha256": "69aad62c92134b3e35c6a683ae5e6b6ecdc278190d3c6f541f6044cb81e111f7"
+    }
+  },
+  "copiedBinary": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-6a5df3e/evidence/compiled-original_five",
+    "bytes": 20783912,
+    "sha256": "69aad62c92134b3e35c6a683ae5e6b6ecdc278190d3c6f541f6044cb81e111f7"
+  },
+  "artifactVerification": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-6a5df3e/geometry-6a5df3e-artifact-verification.json",
+    "bytes": 15216,
+    "sha256": "365a45b4cca09ca14413baf72c71365c593fdf2f94bf80d1aed382e162573140"
+  },
+  "retainedRawFiles": [
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/START.json",
+      "bytes": 3903,
+      "sha256": "b51df2c8611c8b2794fa68a83a1d08d6d19f3b65cc0f4544a820ee4a7d85e0bf",
+      "relativePath": "START.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/binary.json",
+      "bytes": 616,
+      "sha256": "78f03751f9efe02f30170f147a6c891a413fda292e840a20ee3339f879fed148",
+      "relativePath": "binary.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/build-START.json",
+      "bytes": 3917,
+      "sha256": "e6f3e63b7f38a1697b7d48dd20abc3037437cf12d55dd2c74e6dd4ec359dd006",
+      "relativePath": "build-START.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/build.log",
+      "bytes": 72,
+      "sha256": "99f71393b9903dca098310bb446022a4bdee195ea9996f351a787195555210a6",
+      "relativePath": "build.log"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/check-START.json",
+      "bytes": 3903,
+      "sha256": "b51df2c8611c8b2794fa68a83a1d08d6d19f3b65cc0f4544a820ee4a7d85e0bf",
+      "relativePath": "check-START.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/check.log",
+      "bytes": 184,
+      "sha256": "4a1d0388ec7f547e57b6a192b0c26ad803cc01ce11216d6615fe301e271d13df",
+      "relativePath": "check.log"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/clippy-START.json",
+      "bytes": 3942,
+      "sha256": "8d11b025f19f451f3a0b7ae99e62305dec08eb7e7e2fd5dcd024bf28c7587ba4",
+      "relativePath": "clippy-START.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/clippy.log",
+      "bytes": 184,
+      "sha256": "6cb8858434a65999dbd561f83dc984543e981670a5e3175a4b575972b41ad351",
+      "relativePath": "clippy.log"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/compiled-original_five",
+      "bytes": 20783912,
+      "sha256": "69aad62c92134b3e35c6a683ae5e6b6ecdc278190d3c6f541f6044cb81e111f7",
+      "relativePath": "compiled-original_five"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/focused-terminal.json",
+      "bytes": 190,
+      "sha256": "6136b67158cb802cf2e0ecd7149b9268c739815dee3d6d2e0d0c54339a808959",
+      "relativePath": "focused-terminal.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/host-tests-START.json",
+      "bytes": 4026,
+      "sha256": "f877cd1f13e1189a5df8aa3a66929ae89f919d4f61e59c98bf6a7da61780096e",
+      "relativePath": "host-tests-START.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/host-tests.log",
+      "bytes": 107,
+      "sha256": "25660486d75d5f4b9efa5b4fdd11e9e694dfc634802c6601b239be93e2d13722",
+      "relativePath": "host-tests.log"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/input-packet/ASSIGNMENT.json",
+      "bytes": 565,
+      "sha256": "04c6c76cfb2be78d103b3e264e8705b92422c1c735406b9b80b3a79eddb0f894",
+      "relativePath": "input-packet/ASSIGNMENT.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/input-packet/G2-SOURCE-CLEAR.json",
+      "bytes": 5395,
+      "sha256": "142e8dccf4233db55aff55046864876655680b85a3405f45a17203348b5d771e",
+      "relativePath": "input-packet/G2-SOURCE-CLEAR.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/input-packet/OWNER-EXECUTION.json",
+      "bytes": 1132,
+      "sha256": "427cc6451b1f05fcbafab1df82a151aba8856a2bc9f783887d52c7a81166f6da",
+      "relativePath": "input-packet/OWNER-EXECUTION.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/input-packet/OWNER-SOURCE.json",
+      "bytes": 46388,
+      "sha256": "0e43adca240545aab9eeb626eadc59ec5d3a0c8fcb1112426c38913f91d1734e",
+      "relativePath": "input-packet/OWNER-SOURCE.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/input-packet/RETAINED-PARENT-FOCUSED.json",
+      "bytes": 4043,
+      "sha256": "79a8fb6cc594b3218b27750d67b786cf92e509bbbe44fd6a6d88986c970a9341",
+      "relativePath": "input-packet/RETAINED-PARENT-FOCUSED.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/input-packet/RETAINED-PARENT-HANDOFF.json",
+      "bytes": 57602,
+      "sha256": "1adc7c5350c5174ac32894fc1daee9a2702be8b49ea28684620674ed2af362cc",
+      "relativePath": "input-packet/RETAINED-PARENT-HANDOFF.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/input-packet/ROOT-JOIN.json",
+      "bytes": 48625,
+      "sha256": "f578b47eb439b7e51c63901504c754a3ce7f6de82ea222e81fc6f49c75e0df26",
+      "relativePath": "input-packet/ROOT-JOIN.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/input-packet/ROOT-SOURCE-BINDING.json",
+      "bytes": 44146,
+      "sha256": "21db1b664736cdf8a3066fa1a9e174ececfc495603e1d15075ff26037b333098",
+      "relativePath": "input-packet/ROOT-SOURCE-BINDING.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/input-packet/SOURCE.json",
+      "bytes": 45213,
+      "sha256": "8587b7aa1908fe6a76dde3a54ff91df0a67e007234ccc691f54a7be6885b0ab6",
+      "relativePath": "input-packet/SOURCE.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/input-packet/qualification-helper.py",
+      "bytes": 11552,
+      "sha256": "4ae063805a8626f4f05fc0023d7b1f51a1bbf81e3b42275f6c13e8761faf7e23",
+      "relativePath": "input-packet/qualification-helper.py"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/input-packet/source-full.bundle",
+      "bytes": 1070893,
+      "sha256": "f04ff464bc5d125b5fb6601d4e7eef9f1a47c0b9055c2c18d601b3005f981b65",
+      "relativePath": "input-packet/source-full.bundle"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/ownership-preflight.json",
+      "bytes": 223,
+      "sha256": "507c1ed8340b86d8efbcdedf153ad151555222e0af7626c75ec81f43f5cba792",
+      "relativePath": "ownership-preflight.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/results.json",
+      "bytes": 4207,
+      "sha256": "43be9cedfd2820f51a1d239fa327cdada6c60ba8d1bfe136bb4a75b775230f77",
+      "relativePath": "results.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/run-geometry-qualification.py",
+      "bytes": 11552,
+      "sha256": "4ae063805a8626f4f05fc0023d7b1f51a1bbf81e3b42275f6c13e8761faf7e23",
+      "relativePath": "run-geometry-qualification.py"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/source-binding-after.json",
+      "bytes": 262,
+      "sha256": "1a0abdbe22d359aea19b2da5ad617bc87430150955813b2e6a38758334de1beb",
+      "relativePath": "source-binding-after.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/source-binding-before-whole.json",
+      "bytes": 262,
+      "sha256": "ba7aecc7f52d48dd012f67ec5779939621de01672b547d8e09c7975e8011216b",
+      "relativePath": "source-binding-before-whole.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/source-binding.json",
+      "bytes": 262,
+      "sha256": "ea4180e5495a6f96cd76d13b2e5938e73d9b7e92f6a03f44478edea4a507e6a3",
+      "relativePath": "source-binding.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/test-START.json",
+      "bytes": 3909,
+      "sha256": "7670c23ba0917e7a919c381b96db4c9ff9989c2d99d5c1281f07724f093bd962",
+      "relativePath": "test-START.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/test.log",
+      "bytes": 7886,
+      "sha256": "79c78e5b73cad07186131e11ee1bb85758c2e11ec38096d2a414af4a44692e2c",
+      "relativePath": "test.log"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/toolchain.json",
+      "bytes": 2452,
+      "sha256": "9b83ea4a97aeadb4e479ad5fe2fc14b55a1e7aec5ef1142a947b46f56fc20860",
+      "relativePath": "toolchain.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five/ACTUAL-START.json",
+      "bytes": 976,
+      "sha256": "84475ef5f024c9394f8dec5f9117a1f0698cec4628e1d8d57f23ff5a69d66a6b",
+      "relativePath": "whole-five/ACTUAL-START.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five/ARTIFACTS.json",
+      "bytes": 2142,
+      "sha256": "376e7107bdb604f9722f5ff6ef2ca0eba5fcd6a74f76854beafc78ec6f8cd5f4",
+      "relativePath": "whole-five/ARTIFACTS.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five/EXECUTION-BINDING.json",
+      "bytes": 44083,
+      "sha256": "428cc8cf241ccd7306d62b7d16d06cdec60343bb159216c6513efc6bc4d44a2d",
+      "relativePath": "whole-five/EXECUTION-BINDING.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five/OWNER-TERMINAL.json",
+      "bytes": 15512,
+      "sha256": "c53718ebd1b57280d05780af292f9df22782c8034ed37e6329b34677cb865b56",
+      "relativePath": "whole-five/OWNER-TERMINAL.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five/results/EXECUTION-BINDING.json",
+      "bytes": 44083,
+      "sha256": "428cc8cf241ccd7306d62b7d16d06cdec60343bb159216c6513efc6bc4d44a2d",
+      "relativePath": "whole-five/results/EXECUTION-BINDING.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five/results/ORIGINAL-BINDINGS.json",
+      "bytes": 11618,
+      "sha256": "6115342c17444e3f368f4a72f1ea9cc578b9fff2d1a0f1ca2f19d33b225ebf66",
+      "relativePath": "whole-five/results/ORIGINAL-BINDINGS.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five/results/SH010-CASE.json",
+      "bytes": 2022,
+      "sha256": "0a19185e6c455b9a4a6f3b7ad4f31dab0bb65f1621ecd26e99324ad51d869a0f",
+      "relativePath": "whole-five/results/SH010-CASE.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five/results/SH011-CASE.json",
+      "bytes": 2022,
+      "sha256": "dd65ec495379b43284f9f8de7716f45ddc4963d051a33ec70ecda55db5f169ad",
+      "relativePath": "whole-five/results/SH011-CASE.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five/results/SH016-CASE.json",
+      "bytes": 2019,
+      "sha256": "df6e0dbff55f8652a5d288ed7a2abc7f70d4db140606e44a61ef2e7d60dcea7f",
+      "relativePath": "whole-five/results/SH016-CASE.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five/results/SH017-CASE.json",
+      "bytes": 2019,
+      "sha256": "cc13d4d35d1c2ca9a80dbc8da9799dbd67e425cb5a66b4b40329964055a4fce2",
+      "relativePath": "whole-five/results/SH017-CASE.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five/results/SH166-CASE.json",
+      "bytes": 2020,
+      "sha256": "bc13af4971f829fba1f9d437072500b50c8de53720439747b9e19ec88c49e5d4",
+      "relativePath": "whole-five/results/SH166-CASE.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five/results/TERMINAL.json",
+      "bytes": 10410,
+      "sha256": "72f6c18da1083e1bc1288ba92694e3a93d8825dd0f34b342681a0b3c0d6f408a",
+      "relativePath": "whole-five/results/TERMINAL.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five/results/WHOLE-FIVE-CRITERIA.json",
+      "bytes": 4977,
+      "sha256": "ace9c47feecd0aa7b0507f15492e3a1d01edc00a4e0a489c707f5955701dd9c8",
+      "relativePath": "whole-five/results/WHOLE-FIVE-CRITERIA.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "relativePath": "whole-five/stderr.log"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five/stdout.log",
+      "bytes": 10352,
+      "sha256": "96ec6c9164b0495f45b640334b4bf9bbfabd067cf89ec45451a529591fc05ffc",
+      "relativePath": "whole-five/stdout.log"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five-START.json",
+      "bytes": 4419,
+      "sha256": "2f2ee4c31f126d183dc8e96edd2ced2b44f3aa35b4853a88d035696ed429dd7d",
+      "relativePath": "whole-five-START.json"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/whole-five.log",
+      "bytes": 1171,
+      "sha256": "0a9ce0391f85f82c41c112878914508935adb703008fcae464be42526508f113",
+      "relativePath": "whole-five.log"
+    },
+    {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-6a5df3e/linux/wrapper-exit.json",
+      "bytes": 266,
+      "sha256": "695ca5fa9c8f26c933f99f5fd00df648a1115e94fcac0afb8eacdfb03af1054f",
+      "relativePath": "wrapper-exit.json"
+    }
+  ],
+  "retainedSeal": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-6a5df3e/evidence/whole-five/ARTIFACTS.json",
+    "bytes": 2142,
+    "sha256": "376e7107bdb604f9722f5ff6ef2ca0eba5fcd6a74f76854beafc78ec6f8cd5f4"
+  },
+  "notes": [
+    "Exactly one changed whole-five after focused PASS: five decode PASS, five construction Storage REFUSED, zero semantic FAIL,15dependentUNRUN,zero candidates. Zero failures do not clear the unrun semantics.",
+    "All original2Moperations/100kmemberships/4096rationalbits/512triangles unchanged. Attempted peaks include refused admissions; admitted peaks remain below100k. Logical counters are not physical allocation traces/minima.",
+    "All255sourcepins clean before/after and all50copied raw artifact hashes independently verified;14inner seal files and physical/retained dev binary verified remotely. Earlier three partial cases equal final sealed bytes.",
+    "28Rust and9host passed;all18 analytic work/storage observations retained. Conservative bounds tests preserve exact ordered candidates/contacts and full geometry/field/witness assertions. Not whole-fleet/native acceptance.",
+    "Previous311fiveOperations refusals,24aeeClippy failure,olderStorage failures and adverse identity/work data remain sealed. Newsource reaches Storage on allfive at different frontiers; not a cure, minimum-memory or speed comparison.",
+    "No remaining build/harness processes after normal terminal. Existing Linux lane lease released;no added caps/signals/reset/purge/unchangedretry/Windowsduplicate/Macjob/newworkers/schedulers.",
+    "Windows0515/e470 archive remains immutable on publication hold; newmain823 must not be inferred from that older package. No reseal/publish or main-quality action performed by this geometry run."
+  ],
+  "next": "Root audits exact evidence and routes a changed causal storage correction if appropriate. No guard waiver or unchanged original rerun; all fleet/native acceptance remains open."
+}

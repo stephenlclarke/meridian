@@ -143,6 +143,16 @@
       "file": "src/pruning.rs",
       "name": "pruning::complete_bounds_cache_controls_preserve_fields_witnesses_and_reduce_work",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/region.rs",
+      "name": "region::tests::region_round_trip_preserves_every_record_and_guards_transfer_lifetimes",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/pruning.rs",
+      "name": "pruning::complete_region_storage_controls_preserve_all_fields_and_reduce_peak",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -314,5 +324,16 @@
     "parentWholeFive": "5OperationsREFUSED/15dependentUNRUN/0candidate",
     "currentExecution": "UNRUN",
     "newTestCount": 28
+  },
+  "regionStorageCorrection": {
+    "qualifiedParentJoin": "6a5df3e9bb4a818ab063633cad229146f44ac449",
+    "parentHandoffSHA256": "0266db47c11284626aaa27c059eca6fb83074c79960250ba14275fc8c28f161b",
+    "deltaSHA256": "3f01a486204d1efbd57c6dadeaffdc4b94f0991c38f62fa661300ff043d6a8b2",
+    "beforeSUTFreezeSHA256": "074d69ee107e4913b50cd86b6ae451d95e7950b237d9b8341d86aec3ce4b49f0",
+    "parentRustPass": 28,
+    "parentHostPass": 9,
+    "parentWholeFive": "5StorageREFUSED/15dependentUNRUN/0candidate",
+    "currentExecution": "UNRUN",
+    "newTestCount": 30
   }
 }

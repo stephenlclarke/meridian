@@ -5,6 +5,7 @@ mod arrangement;
 mod budget;
 mod certificate;
 mod exact;
+mod region;
 mod source;
 
 pub use adapter::OriginalAsset;
