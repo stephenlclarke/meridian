@@ -511,6 +511,26 @@ impl App {
         None
     }
 
+    fn build_docked_frame(
+        active: bool,
+        renderer: Option<&Renderer>,
+        menu: Option<&mut Docked>,
+        world: &World,
+        elapsed: f64,
+    ) -> Result<Option<ui::Frame>, String> {
+        if !active {
+            return Ok(None);
+        }
+        let viewport = renderer.and_then(|r| {
+            let [width, height] = r.logical_viewport();
+            ui::Viewport::new(width, height)
+        });
+        match (menu, viewport) {
+            (Some(menu), Some(viewport)) => menu.build_frame(world, viewport, elapsed).map(Some),
+            _ => Ok(None),
+        }
+    }
+
     fn redraw(&mut self, event_loop: &ActiveEventLoop) {
         let now = Instant::now();
         let elapsed = now.duration_since(self.last_frame).as_secs_f64();
@@ -545,25 +565,18 @@ impl App {
         });
         let notice = pulse_notice.or(self.notice.as_deref());
         let hud_lines = self.game.lines(active, notice);
-        let docked_frame = if self.menu_active() {
-            let viewport = self.renderer.as_ref().and_then(|r| {
-                let [width, height] = r.logical_viewport();
-                ui::Viewport::new(width, height)
-            });
-            match (self.docked.as_mut(), viewport) {
-                (Some(menu), Some(viewport)) => {
-                    match menu.build_frame(&self.game.world, viewport, elapsed) {
-                        Ok(frame) => Some(frame),
-                        Err(error) => {
-                            self.fail(event_loop, error);
-                            return;
-                        }
-                    }
-                }
-                _ => None,
+        let docked_frame = match Self::build_docked_frame(
+            self.menu_active(),
+            self.renderer.as_ref(),
+            self.docked.as_mut(),
+            &self.game.world,
+            elapsed,
+        ) {
+            Ok(frame) => frame,
+            Err(error) => {
+                self.fail(event_loop, error);
+                return;
             }
-        } else {
-            None
         };
 
         let traffic = self.game.world.traffic_snapshot();

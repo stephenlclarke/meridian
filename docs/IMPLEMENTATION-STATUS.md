@@ -1,5 +1,13 @@
 # Implementation and validation status
 
+## NPC source-quality correction after main 8b81a77
+
+PR 38 integrated at `8b81a774df46f4a05f6bd4dd294c643378bfb765`, tree `cadcbe60729e4faff46394d653ff7f517bf3145c`, with the six reviewed documentation-only changes against qualified executable source `bd506f9`. All six hosted jobs passed. Exact-version/revision Sonar analysis `2df1e9e3-b375-4991-bf85-9831f678d19d` returned gate OK, 93.7586 percent new coverage (4342 measured lines, 271 uncovered), Previous version baseline `07f1678` and no ignored condition. It also reported **20 new open critical source findings**: fourteen wildcard imports and six cognitive-complexity findings. A green gate is not a claim that those findings are fixed.
+
+Publication is held. The correction replaces wildcard imports with explicit names and extracts existing validation/frame/upload blocks into private helpers. It retains the same comparisons, identity/resource/geometry/persistence guards, error ordering, draw order, tests and limits. No exclusions, suppressions, threshold changes or new-code baseline changes are introduced. Changed-source review, all owning gates and corrected committed-main Sonar remain required. The earlier bounded native journey stays bound to `bd506f9`; no new native execution or source-equivalence acceptance is claimed before review.
+
+Signed Mac and unsigned Windows v0.6 candidate archives under `8b81a77` were prepared and independently extracted, but were not published or relabelled as this correction. Their exact old identities and the public v0.5 release are preserved. Apple notarization remains a separate required-agreement blocker.
+
 ## Current NPC qualification
 
 Exact source `bd506f9f9a8390bceecc4fe76dce5f60ffc6e410`, tree `452c9c4e461c15e8b94f47f3e13f01913bcafb74`, passed whole-source review. Mac, Dell Linux and native Windows each passed 288 core, 169 desktop and three explicit observer tests: **460 top-level Rust cases**, plus 88 Python tests, 40 Markdown files, formatting, all-target compilation, strict Clippy and fresh locked release builds. Nested subprocess summaries are included, not extra cases. All five hosted PR jobs passed at this exact head. Main integration, exact-main Sonar and the next public release are pending.

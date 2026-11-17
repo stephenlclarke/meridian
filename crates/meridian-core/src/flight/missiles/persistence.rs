@@ -1269,25 +1269,7 @@ impl State {
             if distance != d || shot.end != add(shot.origin, scale(shot.direction, d)) {
                 return Err(INVALID);
             }
-            for other in self.projectiles.iter().skip(b.bodies.len()).flatten() {
-                if other.origin.emission < emission
-                    && (other.ended.is_none() || other.last_tick > shot.tick)
-                {
-                    return Err(INVALID);
-                }
-            }
-            for (slot, body) in b.bodies.iter().copied().enumerate() {
-                let expected = self.projectiles[slot].is_some_and(|other| {
-                    other.origin.emission < emission
-                        && (slot == i || other.ended.is_none() || other.last_tick > shot.tick)
-                });
-                if body.is_some() != expected {
-                    return Err(INVALID);
-                }
-                if let Some(body) = body {
-                    self.validate_beam_body(body, slot, i, p.position, ray, (d, id))?;
-                }
-            }
+            self.validate_intercepted_bodies(b, p, i, emission, (ray, d, id))?;
             let station = world
                 .station_data
                 .as_ref()
@@ -1331,6 +1313,36 @@ impl State {
                 && other.contact == Some(MissileContact::Projectile(p.origin.projectile))
         }) {
             return Err(INVALID);
+        }
+        Ok(())
+    }
+    fn validate_intercepted_bodies(
+        &self,
+        b: &Beam,
+        p: ProjectileSnapshot,
+        i: usize,
+        emission: u64,
+        (ray, d, id): (RigidPose, f64, ProjectileId),
+    ) -> Result<(), SaveError> {
+        let shot = b.shot;
+        for other in self.projectiles.iter().skip(b.bodies.len()).flatten() {
+            if other.origin.emission < emission
+                && (other.ended.is_none() || other.last_tick > shot.tick)
+            {
+                return Err(INVALID);
+            }
+        }
+        for (slot, body) in b.bodies.iter().copied().enumerate() {
+            let expected = self.projectiles[slot].is_some_and(|other| {
+                other.origin.emission < emission
+                    && (slot == i || other.ended.is_none() || other.last_tick > shot.tick)
+            });
+            if body.is_some() != expected {
+                return Err(INVALID);
+            }
+            if let Some(body) = body {
+                self.validate_beam_body(body, slot, i, p.position, ray, (d, id))?;
+            }
         }
         Ok(())
     }

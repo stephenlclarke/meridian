@@ -540,6 +540,37 @@ impl World {
         Ok(candidate)
     }
 
+    fn validate_practice_incidents(
+        &self,
+        practice: Option<practice::Practice>,
+        history: &[practice::Practice],
+    ) -> Result<(), SaveError> {
+        for attempt in practice::lifecycle::lessons(practice, history) {
+            if let Some(last) = self.combat_snapshot().and_then(|s| s.last_ordinary_impact)
+                && attempt.accepts_incident(last)
+                && attempt.ordinary_hit.is_none()
+            {
+                return Err(SaveError::InvalidState("ordinary hit was removed from T02"));
+            }
+            if let Some(hit) = attempt.ordinary_hit {
+                hit.validate(self)?;
+                if self
+                    .combat_snapshot()
+                    .and_then(|s| s.last_ordinary_impact)
+                    .is_none_or(|last| {
+                        hit.incident > last.incident
+                            || hit.physical_tick > last.physical_tick
+                            || (hit.incident == last.incident && hit != last)
+                    })
+                {
+                    return Err(SaveError::InvalidState(
+                        "T02 ordinary hit has no accepted incident",
+                    ));
+                }
+            }
+        }
+        Ok(())
+    }
     fn validate_saved_world(
         &self,
         practice: Option<practice::Practice>,
@@ -617,30 +648,7 @@ impl World {
         self.missiles
             .validate(self, practice, history, nav.dock_sequence)?;
         self.combat.validate(self)?;
-        for attempt in practice::lifecycle::lessons(practice, history) {
-            if let Some(last) = self.combat_snapshot().and_then(|s| s.last_ordinary_impact)
-                && attempt.accepts_incident(last)
-                && attempt.ordinary_hit.is_none()
-            {
-                return Err(SaveError::InvalidState("ordinary hit was removed from T02"));
-            }
-            if let Some(hit) = attempt.ordinary_hit {
-                hit.validate(self)?;
-                if self
-                    .combat_snapshot()
-                    .and_then(|s| s.last_ordinary_impact)
-                    .is_none_or(|last| {
-                        hit.incident > last.incident
-                            || hit.physical_tick > last.physical_tick
-                            || (hit.incident == last.incident && hit != last)
-                    })
-                {
-                    return Err(SaveError::InvalidState(
-                        "T02 ordinary hit has no accepted incident",
-                    ));
-                }
-            }
-        }
+        self.validate_practice_incidents(practice, history)?;
         if self.damage.enabled() {
             // The shared replay already required exact shields, energy, heat and cadence.
         } else if self

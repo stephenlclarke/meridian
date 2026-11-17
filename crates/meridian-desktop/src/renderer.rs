@@ -295,6 +295,28 @@ impl Renderer {
         self.flight_view = view;
     }
 
+    fn upload_hud(&mut self, lines: &[String], cockpit: Option<&hud::cockpit::Cockpit>) {
+        if cockpit.is_some() {
+            let logical = self.size.to_logical::<f64>(self.window.scale_factor());
+            hud::vertices_with_cockpit(
+                lines,
+                logical.width.round() as u32,
+                logical.height.round() as u32,
+                cockpit,
+                &mut self.hud_frame,
+            );
+        } else {
+            hud::vertices(
+                lines,
+                self.config.width,
+                self.config.height,
+                &mut self.hud_frame,
+            );
+        }
+        self.queue
+            .write_buffer(&self.hud_vertices, 0, bytemuck::cast_slice(&self.hud_frame));
+    }
+
     pub fn draw(
         &mut self,
         snapshot: &Snapshot,
@@ -422,25 +444,7 @@ impl Renderer {
             }
             self.queue
                 .write_buffer(&self.vertices, 0, bytemuck::cast_slice(&self.frame));
-            if cockpit.is_some() {
-                let logical = self.size.to_logical::<f64>(self.window.scale_factor());
-                hud::vertices_with_cockpit(
-                    hud_lines,
-                    logical.width.round() as u32,
-                    logical.height.round() as u32,
-                    cockpit,
-                    &mut self.hud_frame,
-                );
-            } else {
-                hud::vertices(
-                    hud_lines,
-                    self.config.width,
-                    self.config.height,
-                    &mut self.hud_frame,
-                );
-            }
-            self.queue
-                .write_buffer(&self.hud_vertices, 0, bytemuck::cast_slice(&self.hud_frame));
+            self.upload_hud(hud_lines, cockpit);
         }
 
         let view = frame.texture.create_view(&Default::default());

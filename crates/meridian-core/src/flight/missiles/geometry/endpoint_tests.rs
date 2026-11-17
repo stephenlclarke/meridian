@@ -2,7 +2,7 @@
 //! Reference SHA-256 6f4c32c3d8f822ec4bf6b5b9acde5a46b04d5d942f47e0e4413a744672623e42.
 //! Generated before editing/evaluating the SUT, using exact rational plane intersection
 //! and Gram barycentrics over admitted native triangle0 [11,10,9]. Actual Linux guard unknown.
-use super::*;
+use super::{Basis3, RigidPose, Vec3, add, pose, ray_point, scale};
 fn vector(bits: [u64; 3]) -> Vec3 {
     let [x, y, z] = bits.map(f64::from_bits);
     Vec3::new(x, y, z)

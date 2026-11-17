@@ -1,5 +1,7 @@
 # SH025 traffic presentation
 
+The NPC increment is integrated at main `8b81a77`; publication is held for its 20 open Sonar source findings. See [current implementation status](IMPLEMENTATION-STATUS.md) for the exact correction and qualification boundary. Earlier qualification below remains bound to its actual source.
+
 The joined renderer at `bd506f9` passed whole-source review and all three owned platform suites, including twelve renderer cases. Actual Metal qualification showed the real SH025 hull, scanner contacts, four selected camera views and incoming beam presentation, followed by physical docking and cold Continue. A visible NPC in Left view does not mean the NPC was visible in all four directions or that every occlusion case was observed natively. See [implementation status](IMPLEMENTATION-STATUS.md) for exact identities and limits. The public v0.5 preview remains separate until protected integration and the next verified release.
 
 ## Bodies and scene frame
