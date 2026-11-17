@@ -974,6 +974,16 @@ impl State {
             .filter(|p| p.ended.is_none())
             .count() as u8;
         if lesson.pending_missiles != pending {
+            #[cfg(test)]
+            if super::tracing_paid_beam_wreck_launch() {
+                eprintln!(
+                    "missile save validator State::validate_lesson_receipts pending_missiles: \
+                     retained={} expected={pending} consent_visit={} terminal={}",
+                    lesson.pending_missiles,
+                    lesson.consent_visit(),
+                    lesson.reception_is_terminal(),
+                );
+            }
             return Err(INVALID);
         }
         for (id, receipt) in lesson.missile_receipts() {

@@ -23,6 +23,15 @@ pub const MISSILE_LIFETIME_TICKS: u16 = 1440;
 pub const MISSILE_COOLDOWN_TICKS: u8 = 60;
 pub const MISSILE_MUZZLE_DISTANCE: f64 = 24.0;
 
+#[cfg(test)]
+fn tracing_paid_beam_wreck_launch() -> bool {
+    std::thread::current().name()
+        == Some(concat!(
+            "flight::missiles::npc::tests::wreck::",
+            "mixed_missile_and_rapid_beam_history_keeps_the_actual_fatal_paid_laser_in_custody"
+        ))
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MissileError {
     StaleCommand,
@@ -571,11 +580,22 @@ impl World {
             p.pending_missiles = self.missiles.pending();
             p.observe_discharge(tick);
         }
-        if self.save_bytes().is_err() {
+        if let Err(_staged_error) = self.save_bytes() {
             self.commander_account = old_account;
             self.combat = old_combat;
             self.missiles = old_missiles;
             self.practice = old_practice;
+            #[cfg(test)]
+            if tracing_paid_beam_wreck_launch() {
+                eprintln!(
+                    "staged missile save refusal: ordinal={ordinal} emission={emission} \
+                     tick={tick} physical_tick={} launch_visit={} error={_staged_error:?} \
+                     restored_save={:?}",
+                    origin.physical_tick,
+                    owner.visit,
+                    self.save_bytes().map(|_| ()),
+                );
+            }
             return Err(MissileError::SaveRefused);
         }
         Ok(origin)
