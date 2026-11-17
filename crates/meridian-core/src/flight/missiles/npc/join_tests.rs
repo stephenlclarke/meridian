@@ -140,6 +140,11 @@ fn mixed_real_npc_pulse_owned_missiles_player_pulse_and_berth_replay_cold_once()
             .last_ordinary_impact,
         None
     );
+    // Combat began 600 units beside the launch lane. Translate onto the aperture
+    // centreline in clear exterior space before the final inward half-turn.
+    // Low public lateral speed bounds braking overshoot without installing a pose.
+    fly_axis(&mut saved, 0, 0.0, 1.0);
+    assert!(saved.snapshot().position[0].abs() < 2.0);
     dock(&mut saved);
     assert_eq!(saved.snapshot().mode, FlightMode::Docked);
     let after = same_cold(&saved);
