@@ -1,5 +1,14 @@
 # Implementation and validation status
 
+## Geometry identity lifetime correction: source only
+
+The actual `ddf0658` parent passed 44 Rust cases and nine host cases, all-target checks, strict Clippy and the dev constructor build. Its one original-five batch returned five decode passes, two Storage refusals (SH010/SH011), three Operations refusals (SH016/SH017/SH166), fifteen dependent checks unrun and zero candidates or admissions. Attempted storage endpoints were 100,023 and 100,006; these are charged logical memberships, not allocations or minima. Work endpoints for the three operation cases were 2,000,001, 2,000,001 and 2,000,007. Original caps and exact geometric fidelity remain unchanged.
+
+Author `6c9fcb1` changes actual identity-map lifetime: a private consuming owner physically drops both uniqueness sets before releasing their 3N+2M charged memberships. Initial 40N+64 admission, all fixed padding, facet/field/style ownership, geometric decisions, work path and prices remain unchanged. A frozen independent lifetime regression checks exact initial admission, post-drop scratch capacity and one-short refusal, unchanged work and balanced final release. All 44 older Rust cases and all strict controls remain exact. The combined 45 Rust and nine host cases are authored **UNRUN**; review and owning focused qualification remain required. Source-derived storage reductions are predictions, not measured new peaks or a completion claim.
+
+This correction does not change the three operation-refused paths. Their missing inner-body/callsite and work-by-stage evidence remains the exact blocker. No diagnostic-only or unchanged original rerun, threshold/cap waiver, candidate mesh, new hull or 1337 visual/mechanics acceptance follows. Full fleet baseline remains 23 of 162 ships plus four of six stations, with all 171 expanded fleet acceptances open.
+
+
 ## Joint section return-type correction
 
 Root `3313f17` passed its owning all-target check, all 44 Rust tests and nine host tests. The unchanged strict overlap control passed with 106146 reference operations versus 105378 candidate operations; this does not reconstruct the earlier failed pair. Strict Clippy then stopped on one complex tuple return type in `sections.rs`; dev build and the original-five batch remained unrun.

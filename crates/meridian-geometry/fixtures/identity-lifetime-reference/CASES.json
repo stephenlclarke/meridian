@@ -1,0 +1,33 @@
+{
+  "parentAuthorHead": "dd7451091fdb3636768a3504caf91c9547f94fad",
+  "phase": "Before identity-lifetime source authoring",
+  "contract": "Initial input bound remains 40N+64+actual style memberships. After original identity/topology/sheet audits and owner count use, consume/drop identity sets before releasing exactly 3N+2M record memberships. Keep all 64 header/padding memberships and all original geometry/style data retained. No primitive price/cap/assertion change.",
+  "independentBoundary": {
+    "sourceIds": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ],
+    "owners": [
+      0,
+      1
+    ],
+    "initialReservation": 184,
+    "releasedRecordMemberships": 13,
+    "remainingReservation": 171,
+    "scratch": 19,
+    "exactStorageLimit": 190,
+    "oneShortLimit": 189
+  },
+  "otherBoundary": "Empty maps release zero; duplicate set insertions must not inflate cardinality; the same initial admission still refuses below its bound; final retained total remains unchanged after complete release.",
+  "currentTests": "All 44 prior test bodies and strict 108/120/bounds overlap comparisons remain byte exact. One new lifetime boundary regression; geometry/compiler execution UNRUN."
+}

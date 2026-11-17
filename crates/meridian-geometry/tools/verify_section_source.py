@@ -64,6 +64,24 @@ def verify():
 
     before = original("src/certificate.rs").decode()
     after = (CRATE / "src/certificate.rs").read_text()
+    identity_parent = "dd7451091fdb3636768a3504caf91c9547f94fad"
+    identity_before = subprocess.check_output(["git", "-C", str(REPO), "show", f"{identity_parent}:crates/meridian-geometry/src/certificate.rs"], text=True)
+    assert (CRATE / "fixtures/identity-lifetime-reference/before-certificate.rs").read_text() == identity_before
+    helper_start = after.index("// These records are part of the unchanged 40N+64")
+    helper_end = after.index("/// Direct original-component adapter.", helper_start)
+    after = after[:helper_start] + after[helper_end:]
+    after = after.replace("    let mut input_members = Facet::input_memberships(originals, b)?;", "    let input_members = Facet::input_memberships(originals, b)?;")
+    release = """    // Both authenticated identity sets have reached their last use. Their
+    // original geometry/style records remain admitted for all later phases.
+    input_members -= InputIdentityMaps { ids, owners }.release(b);
+"""
+    assert after.count(release) == 1
+    after = after.replace(release, "")
+    module = '\n#[cfg(test)]\n#[path = "identity_tests.rs"]\nmod identity_tests;\n'
+    assert after.endswith(module)
+    after = after[:-len(module)]
+    assert after == identity_before, "non-identity source or 44 old tests changed"
+
     assert after.startswith('#[path = "sections.rs"]\nmod sections;\n\n')
     after = after.split("\n", 3)[3]
     begin = before.index("        let (barriers, coplanar) = b.with_retained(originals.len()")
@@ -100,7 +118,7 @@ def verify():
     for signature in ["fn meets_outward_plane(", "fn outward_candidates(", "fn limiting_segment(", "pub(super) fn build(", "fn build_admitted(", "pub(super) fn occupied(", "pub(super) fn memberships(", "pub(super) fn fields_visible("]:
         assert body(current, signature) == body(old_sections, signature), signature
     tests = sum(path.read_text().count("#[test]") for top in ["src", "tests"] for path in (CRATE / top).rglob("*.rs"))
-    assert tests == 44, tests
+    assert tests == 45, tests
     print(json.dumps({"status": "PASS_SOURCE_ONLY", "parent": PARENT, "currentRustTests": tests, "compilerOrGeometryExecuted": False}))
 
 

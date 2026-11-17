@@ -1,0 +1,18 @@
+{
+  "phase": "BEFORE_IDENTITY_LIFETIME_AUTHORING",
+  "parentAuthorHead": "dd7451091fdb3636768a3504caf91c9547f94fad",
+  "files": {
+    "before-source.rs": {
+      "bytes": 12810,
+      "sha256": "d09b092bfb0d35a47233d1cd85ffd7615be0267a07277955c977a1961f932ad1"
+    },
+    "CASES.json": {
+      "bytes": 1268,
+      "sha256": "3824b4327673949fe25a62aa3adabb7a2b9097bfa7983095985351598671580c"
+    },
+    "before-certificate.rs": {
+      "bytes": 76803,
+      "sha256": "bc23bda718ae8988c61c5439fd930d4fa8f5b5439d07821b1d4f2e007b3fc824"
+    }
+  }
+}

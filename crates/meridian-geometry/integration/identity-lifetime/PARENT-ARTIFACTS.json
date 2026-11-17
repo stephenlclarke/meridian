@@ -1,0 +1,62 @@
+{
+  "files": {
+    "ACTUAL-START.json": {
+      "sha256": "6bd916090c0ef683ed14b0976db77eae7d455aaee07e56b01058e84e527c9a74",
+      "bytes": 907
+    },
+    "EXECUTION-BINDING.json": {
+      "sha256": "71b87778dc7e755ff4e3651720dc2261075e9419cd06914f6cd2e0110516fe9f",
+      "bytes": 59539
+    },
+    "OWNER-TERMINAL.json": {
+      "sha256": "a0d5e8852d4958cfa6f311003cbd87cdde94dcef542b8ded3101767dc12d9aee",
+      "bytes": 15519
+    },
+    "results/EXECUTION-BINDING.json": {
+      "sha256": "71b87778dc7e755ff4e3651720dc2261075e9419cd06914f6cd2e0110516fe9f",
+      "bytes": 59539
+    },
+    "results/ORIGINAL-BINDINGS.json": {
+      "sha256": "6115342c17444e3f368f4a72f1ea9cc578b9fff2d1a0f1ca2f19d33b225ebf66",
+      "bytes": 11618
+    },
+    "results/SH010-CASE.json": {
+      "sha256": "1dce7ae6554909d7280346988f459bbe7c4f26c997bb726260363ccf7f642c9e",
+      "bytes": 2019
+    },
+    "results/SH011-CASE.json": {
+      "sha256": "3ade34ffe84c74d192a4cf6a91ff555a300de771d67c902703158b696f7a49b2",
+      "bytes": 2019
+    },
+    "results/SH016-CASE.json": {
+      "sha256": "269be54a2c1b212a845dd18bca8496817bca4ff34bf080f44449096af4191c07",
+      "bytes": 2024
+    },
+    "results/SH017-CASE.json": {
+      "sha256": "15075bf3ba0a742f4b10bdcd373b9e764b318d933224f8aa4007e2ed3350441a",
+      "bytes": 2024
+    },
+    "results/SH166-CASE.json": {
+      "sha256": "d3177baec8044083ff236457e5143b511b0994a24cb4025aaa8eab89c12e3196",
+      "bytes": 2023
+    },
+    "results/TERMINAL.json": {
+      "sha256": "0bf08d04bb827be7ae6971ca8d5134b858a542b1e970c2e28a86310cec94a512",
+      "bytes": 10417
+    },
+    "results/WHOLE-FIVE-CRITERIA.json": {
+      "sha256": "ace9c47feecd0aa7b0507f15492e3a1d01edc00a4e0a489c707f5955701dd9c8",
+      "bytes": 4977
+    },
+    "stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stdout.log": {
+      "sha256": "a58b6dd446df84bb64d5a4d1d52d74ea0d1e961e12ff4ec0ad6ad8215467edaf",
+      "bytes": 10359
+    }
+  },
+  "sourceHead": "ddf06586c81c2ffe3c63357bb417fcd439870791",
+  "sourceTree": "82a20cbc47f91433360e0e5072ab1bbb6e350d9c"
+}

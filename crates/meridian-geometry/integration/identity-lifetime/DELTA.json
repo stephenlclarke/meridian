@@ -1,0 +1,194 @@
+{
+  "status": "AUTHORED_UNRUN",
+  "parentAuthorHead": "dd7451091fdb3636768a3504caf91c9547f94fad",
+  "qualifiedRoot": "ddf06586c81c2ffe3c63357bb417fcd439870791",
+  "qualifiedTree": "82a20cbc47f91433360e0e5072ab1bbb6e350d9c",
+  "parentAuthorPinsVerifiedAgainstExecutionBinding": 197,
+  "parentFocused": "44 Rust + 9 host + check + strict Clippy + dev build PASS",
+  "actualParentCounts": {
+    "decodePass": 5,
+    "storageRefused": 2,
+    "operationsRefused": 3,
+    "semanticFail": 0,
+    "dependentUnrun": 15,
+    "candidates": 0,
+    "newAdmissions": 0
+  },
+  "actualOwnerWallSeconds": 129.567703709,
+  "parentHandoffSHA256": "837c9c8169cde6ee3395773652b8a3ed52497219640982bb588602f11b0b7ff7",
+  "parentArtifactManifestSHA256": "b363d9b8686d25a43d303290fa2ff7bd617fb07b2e9583292605231df6c90dea",
+  "parentWrapperTerminalSHA256": "968b4f9907b8e5d969fe8de5762be5534885a1a90db5853354f92aa749ac9d3c",
+  "archives": {
+    "PARENT-WHOLE-FIVE.tar.gz": {
+      "bytes": 45391,
+      "sha256": "5c781425d18ef09ab841e20bfca62abd4e932942df71d5b6864098b38746cb25",
+      "files": {
+        "ACTUAL-START.json": {
+          "bytes": 907,
+          "sha256": "6bd916090c0ef683ed14b0976db77eae7d455aaee07e56b01058e84e527c9a74"
+        },
+        "ARTIFACTS.json": {
+          "bytes": 2142,
+          "sha256": "b363d9b8686d25a43d303290fa2ff7bd617fb07b2e9583292605231df6c90dea"
+        },
+        "EXECUTION-BINDING.json": {
+          "bytes": 59539,
+          "sha256": "71b87778dc7e755ff4e3651720dc2261075e9419cd06914f6cd2e0110516fe9f"
+        },
+        "OWNER-TERMINAL.json": {
+          "bytes": 15519,
+          "sha256": "a0d5e8852d4958cfa6f311003cbd87cdde94dcef542b8ded3101767dc12d9aee"
+        },
+        "results/EXECUTION-BINDING.json": {
+          "bytes": 59539,
+          "sha256": "71b87778dc7e755ff4e3651720dc2261075e9419cd06914f6cd2e0110516fe9f"
+        },
+        "results/ORIGINAL-BINDINGS.json": {
+          "bytes": 11618,
+          "sha256": "6115342c17444e3f368f4a72f1ea9cc578b9fff2d1a0f1ca2f19d33b225ebf66"
+        },
+        "results/SH010-CASE.json": {
+          "bytes": 2019,
+          "sha256": "1dce7ae6554909d7280346988f459bbe7c4f26c997bb726260363ccf7f642c9e"
+        },
+        "results/SH011-CASE.json": {
+          "bytes": 2019,
+          "sha256": "3ade34ffe84c74d192a4cf6a91ff555a300de771d67c902703158b696f7a49b2"
+        },
+        "results/SH016-CASE.json": {
+          "bytes": 2024,
+          "sha256": "269be54a2c1b212a845dd18bca8496817bca4ff34bf080f44449096af4191c07"
+        },
+        "results/SH017-CASE.json": {
+          "bytes": 2024,
+          "sha256": "15075bf3ba0a742f4b10bdcd373b9e764b318d933224f8aa4007e2ed3350441a"
+        },
+        "results/SH166-CASE.json": {
+          "bytes": 2023,
+          "sha256": "d3177baec8044083ff236457e5143b511b0994a24cb4025aaa8eab89c12e3196"
+        },
+        "results/TERMINAL.json": {
+          "bytes": 10417,
+          "sha256": "0bf08d04bb827be7ae6971ca8d5134b858a542b1e970c2e28a86310cec94a512"
+        },
+        "results/WHOLE-FIVE-CRITERIA.json": {
+          "bytes": 4977,
+          "sha256": "ace9c47feecd0aa7b0507f15492e3a1d01edc00a4e0a489c707f5955701dd9c8"
+        },
+        "stderr.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout.log": {
+          "bytes": 10359,
+          "sha256": "a58b6dd446df84bb64d5a4d1d52d74ea0d1e961e12ff4ec0ad6ad8215467edaf"
+        }
+      }
+    },
+    "PARENT-FOCUSED.tar.gz": {
+      "bytes": 5836,
+      "sha256": "320345bd8bab40420dab14c2b26fb7291f4502f685750b259abfda4c0899bdf8",
+      "files": {
+        "BUILD-START.json": {
+          "bytes": 1437,
+          "sha256": "33b41dc961f1de89c8543509be1a0df8a400d26739b1e7a5829e5c961d532d01"
+        },
+        "BUILD-TERMINAL.json": {
+          "bytes": 472,
+          "sha256": "6e5291d013c8d424aee4f318c9a4cd1e3890e2d4850ebe61478b06af1c256f42"
+        },
+        "CHECK-START.json": {
+          "bytes": 1424,
+          "sha256": "87aa47956077239515bece11dae00b118616038e4474f2c8018746923e0b3b85"
+        },
+        "CHECK-TERMINAL.json": {
+          "bytes": 473,
+          "sha256": "313f3fc390fec07cc77028234de3324f1b80dc6ad7e5403c29d9560281131d24"
+        },
+        "CLIPPY-START.json": {
+          "bytes": 1462,
+          "sha256": "21166d70f83a3a116bcad4cc99bb0849b899213806e1f2370ce7da99d1a2a151"
+        },
+        "CLIPPY-TERMINAL.json": {
+          "bytes": 475,
+          "sha256": "02e59aff6fd392a5282741796282970cce5c3f58491e13d0396e192c10726e92"
+        },
+        "FOCUSED-RESULT.json": {
+          "bytes": 1882,
+          "sha256": "97bc3cf8b6928fa9b582fa77aa031f818196552833bddb19474ab944eda00513"
+        },
+        "HOST-START.json": {
+          "bytes": 1492,
+          "sha256": "a8ce85d7da0992d07ef1ebec03ad2852233abe8a4f752cdeb47177a833e83972"
+        },
+        "HOST-TERMINAL.json": {
+          "bytes": 472,
+          "sha256": "e2ae41bf6a72b3d12377fe596a6eece3320b48763e6edd2616d2d4844d680f40"
+        },
+        "TEST-START.json": {
+          "bytes": 1430,
+          "sha256": "14302c56b99d42223de1c49ddce293e5624e773b1a4769754d35f58965d746ff"
+        },
+        "TEST-TERMINAL.json": {
+          "bytes": 473,
+          "sha256": "0031e383862b88381d46086e696bb67c08bc9b4673d26482c57f97a67ab4c287"
+        },
+        "WHOLE-FIVE-WRAPPER-TERMINAL.json": {
+          "bytes": 474,
+          "sha256": "968b4f9907b8e5d969fe8de5762be5534885a1a90db5853354f92aa749ac9d3c"
+        },
+        "build.log": {
+          "bytes": 72,
+          "sha256": "59639588a6f1826f129cbcd121edc07279dab94786f5fa5bde6b3439b2e845cc"
+        },
+        "check.log": {
+          "bytes": 198,
+          "sha256": "23c157b575deed85f4031550fa3139fb672c9918ea9d3c773fd3d4d4f7e668e7"
+        },
+        "clippy.log": {
+          "bytes": 198,
+          "sha256": "b1246e1f9438f47a98e239e1e6525e871c031a3272965ad332ed74669d1b627f"
+        },
+        "host.log": {
+          "bytes": 107,
+          "sha256": "b1e2df9be5b3e954c2d2d25efcf39cb02fe4e10735e67c33a5bb9488485289d7"
+        },
+        "test.log": {
+          "bytes": 13710,
+          "sha256": "f588c90d4b39f7df954b34227b78de632a175170ab8de1e4d7bfef61c8d10e7d"
+        }
+      }
+    }
+  },
+  "parentCaseMatrixSHA256": "735e683c726cbb8ab0ee8b101b1f4ac7a02f5623e14a66eb0eeb032c77293f71",
+  "correction": "Consume/drop the now-dead SourceId and owner ID sets after the original audits and owner-count last use; release only 3N+2M already-admitted record memberships, retain original geometry/styles and all64header/padding slots, balance final input release. Initial40N+64 and primitive prices unchanged.",
+  "scope": "Storage lifetime only. All 44 prior tests and all geometric/non-identity code unchanged. Three Operations cases have unchanged charged work/path and remain a precise blocker; this packet does not request their unchanged rerun.",
+  "phaseGrounding": "Actual markers differ from sorted final input/per-owner audit markers. No at() in sheet/index/plane setup changes that marker; later classification/output does. Thus observed guards follow the identity maps last use, without identifying an inner body/callsite.",
+  "missingWorkEvidence": [
+    "exact classification versus assembly endpoint",
+    "inner guard/callsite or body attribution",
+    "work by inner stage",
+    "active storage inventory and guard scopes at refusal"
+  ],
+  "noInference": "Generic latest source and terminal retained values after unwinding do not locate the dominant operation body, exact storage guard or minimum memory. +32 attempted/admitted difference is not phase proof. No instrumentation-only or unchanged diagnostic request.",
+  "beforeSUTFreezeSHA256": "603f38bd638d90b9ec69837f9ead0d84ffac1e144815c0aa85b324e6ca6ab94f",
+  "algorithmSHA256": "7796e7431b58f26adcc24e266536061d122242867658b515ef266efa8aa0c195",
+  "newTests": [
+    {
+      "file": "src/identity_tests.rs",
+      "name": "completed_identity_audit_releases_only_owned_records_before_later_scratch",
+      "status": "UNRUN"
+    }
+  ],
+  "newTestCount": 45,
+  "hostTestCount": 9,
+  "normalLimits": {
+    "operationsIncludingDecode": 2000000,
+    "storageMemberships": 100000,
+    "rationalBits": 4096,
+    "completeOutputTriangles": 512
+  },
+  "currentExecution": "UNRUN; Root serial join/G2 review before G1; no original retry requested",
+  "newCandidatesAndAdmissions": 0,
+  "authorExecution": "Metadata/identity/style/hash/format/Git only; no compiler, geometry engine, native process or original run."
+}

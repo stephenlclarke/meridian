@@ -946,6 +946,23 @@ fn facet_stars(
     Ok(result)
 }
 
+// These records are part of the unchanged 40N+64 original-input reservation.
+// Source IDs have two scalar fields plus one set membership; owner IDs have
+// one scalar plus one membership. The original 64 header/padding slots stay.
+struct InputIdentityMaps {
+    ids: BTreeSet<SourceId>,
+    owners: BTreeSet<u32>,
+}
+impl InputIdentityMaps {
+    fn release(self, b: &mut Budget) -> usize {
+        let members = 3 * self.ids.len() + 2 * self.owners.len();
+        // Deallocate actual owning sets before releasing their reservation.
+        drop(self);
+        b.release(members);
+        members
+    }
+}
+
 /// Direct original-component adapter. Inputs are transformed original triangles,
 /// including all disconnected sheets of each component. Every output triangle
 /// retains one original facet and its complete affine field.
@@ -954,7 +971,7 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
         return Err(b.fail(FailureKind::InvalidInput, "missing original components"));
     }
     b.guard(originals.len())?;
-    let input_members = Facet::input_memberships(originals, b)?;
+    let mut input_members = Facet::input_memberships(originals, b)?;
     b.retain(input_members)?;
     let mut ids = BTreeSet::new();
     let mut owners = BTreeSet::new();
@@ -975,6 +992,9 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
     // One owner map plus the two transient facet boxes. Source audit maps
     // have already been released, and this map releases before final noding.
     let bounds_members = 11 * owners.len() + 32;
+    // Both authenticated identity sets have reached their last use. Their
+    // original geometry/style records remain admitted for all later phases.
+    input_members -= InputIdentityMaps { ids, owners }.release(b);
     b.retain(bounds_members)?;
     let facet_bounds_members = FacetBoundsIndex::memberships(originals.len());
     b.retain(facet_bounds_members)?;
@@ -2084,3 +2104,7 @@ mod tests {
         Ok(())
     }
 }
+
+#[cfg(test)]
+#[path = "identity_tests.rs"]
+mod identity_tests;
