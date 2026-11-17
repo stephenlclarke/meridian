@@ -129,8 +129,9 @@ fn actual_paid_beam_burst_retains_ready_energy_deficit_exact_heat_and_cold_state
     let digest = crate::save::checksum(&fake_full[..end]);
     fake_full[end..].copy_from_slice(&digest.to_le_bytes());
     let mut still_live = cold(&world);
+    let live_before_restore = ok(still_live.save_bytes());
     assert!(still_live.restore_bytes(&fake_full).is_err());
-    assert_eq!(ok(still_live.save_bytes()), before);
+    assert_eq!(ok(still_live.save_bytes()), live_before_restore);
     // Negative fixture only: replacing the real Beam spend with Pulse must not create
     // a valid alternate history even after both cooldowns could have elapsed.
     let mut bad = ok(World::from_save_bytes(&before));
