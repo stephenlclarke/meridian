@@ -33,7 +33,7 @@ impl State {
             else {
                 continue;
             };
-            let actor = move_actor(actor, &opening, &context, &next.shots)?;
+            let actor = move_actor(actor, &opening, &context, &next.shots, next.clocks[i])?;
             next.actors[index] = Some(actor);
         }
         resolve_peer_paths(
@@ -49,7 +49,14 @@ impl State {
         {
             State::finish_trade(actor, &mut market, world_tick)?;
         }
-        next.fire_npc_beams(system, data, context.player_after, world_tick, beam_clear)?;
+        next.fire_npc_beams(
+            system,
+            data,
+            context.player_after,
+            world_tick,
+            beam_clear,
+            context.player_target,
+        )?;
         Ok((next, market))
     }
 }
@@ -58,6 +65,7 @@ fn move_actor(
     opening: &[Option<Actor>; MAX_TRAFFIC_ACTORS],
     context: &TickContext<'_>,
     shots: &[TrafficBeam],
+    local_tick: u64,
 ) -> Result<Actor, TrafficError> {
     let opening_actor = actor;
     let TickContext {
@@ -69,6 +77,7 @@ fn move_actor(
         ..
     } = *context;
     actor.resources.advance()?;
+    actor.resource_clock = local_tick;
     if actor.id.serial == 1
         && (threat_position(actor, opening, player_after.position, shots).is_some()
             || (actor.phase == NpcPhase::FinalAlign
@@ -76,7 +85,22 @@ fn move_actor(
     {
         actor.phase = NpcPhase::Approach;
     }
-    let (goal, mut speed) = intent(actor, opening, player_after.position, shots);
+    let player_goal = context.player_target.and_then(|target| {
+        State::player_goal_in(actor, opening, player_after.position, target, shots)
+    });
+    let (goal, mut speed) = player_goal.map_or_else(
+        || intent(actor, opening, player_after.position, shots),
+        |goal| {
+            (
+                goal,
+                if length(sub(goal, actor.position)) < 800.0 {
+                    0.0
+                } else {
+                    34.3
+                },
+            )
+        },
+    );
     let delta = sub(goal, actor.position);
     let desired = delta.x.atan2(delta.z);
     let error = (desired - actor.yaw)

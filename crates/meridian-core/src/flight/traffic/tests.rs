@@ -31,12 +31,132 @@ fn cold(w: &World) -> World {
     let bytes = ok(w.save_bytes());
     let loaded = ok(World::from_save_bytes(&bytes));
     assert_eq!(loaded.traffic_snapshot(), w.traffic_snapshot());
+    assert_eq!(loaded.combat_snapshot(), w.combat_snapshot());
+    assert_eq!(
+        loaded.flight_resources_snapshot(),
+        w.flight_resources_snapshot()
+    );
     assert_eq!(loaded.credits_tenths(), w.credits_tenths());
     assert_eq!(
         loaded.mission_snapshot().map(|m| m.freight),
         w.mission_snapshot().map(|m| m.freight)
     );
     loaded
+}
+fn cargo_pilot() -> World {
+    let mut w = ok(World::new_commander(12001));
+    ok(w.request_station_service(crate::station_services::Command::BuyFood, 0));
+    crate::flight::practice::tests::launch(&mut w);
+    crate::flight::missiles::tests::stop(&mut w);
+    crate::flight::missiles::tests::fly_axis(&mut w, 0, -600.0, 10.0);
+    w
+}
+fn first_player_contact(w: &mut World) -> crate::traffic::NpcPlayerHit {
+    for _ in 0..24000 {
+        ok(w.step(FlightInput::default()));
+        if let Some(hit) = some(w.traffic_snapshot()).last_player_hit {
+            return hit;
+        }
+    }
+    panic!("actual cargo pilot never received an admitted native pirate Pulse contact");
+}
+#[test]
+fn actual_cargo_pilot_receives_native_npc_damage_without_player_incident_or_invented_fine() {
+    let mut w = cargo_pilot();
+    let credits = w.credits_tenths();
+    let hit = first_player_contact(&mut w);
+    assert_eq!(hit.attacker.serial(), 2);
+    assert_eq!(hit.attacker.profile(), 12001);
+    assert_eq!(hit.player_hull, 12002);
+    assert_eq!(hit.world_tick, w.snapshot().tick);
+    assert_eq!(
+        hit.player_pose,
+        some(flight_pose(w.snapshot().position, w.snapshot().orientation))
+    );
+    let condition = some(w.combat_snapshot());
+    let shields = [
+        condition.player.front_shield_hundredths,
+        condition.player.rear_shield_hundredths,
+    ];
+    assert_eq!(shields[usize::from(!hit.front)], 28500);
+    assert_eq!(shields[usize::from(hit.front)], 30000);
+    assert_eq!(condition.last_ordinary_impact, None);
+    assert_eq!(w.combat.emissions, 0);
+    assert_eq!(w.combat.incidents, 0);
+    assert_eq!(w.legal_value(), Some(0));
+    assert_eq!(w.credits_tenths(), credits);
+    assert_eq!(
+        w.commodity_quantity(crate::station_services::CommodityId::Food),
+        Some(1)
+    );
+    assert!(
+        some(w.traffic_snapshot())
+            .actors
+            .iter()
+            .all(|a| a.population != Population::Police)
+    );
+    let mut loaded = cold(&w);
+    steps(&mut w, 36);
+    steps(&mut loaded, 36);
+    assert_eq!(w.traffic_snapshot(), loaded.traffic_snapshot());
+    assert_eq!(w.combat_snapshot(), loaded.combat_snapshot());
+}
+#[test]
+fn sustained_actual_npc_pulses_reach_real_hull_energy_and_exact_cold_replay_rejects_extra_damage() {
+    let mut w = cargo_pilot();
+    first_player_contact(&mut w);
+    let mut hull_hit = false;
+    for _ in 0..6000 {
+        ok(w.step(FlightInput::default()));
+        if some(w.flight_resources_snapshot()).energy_hundredths < 38000 {
+            hull_hit = true;
+            break;
+        }
+    }
+    assert!(
+        hull_hit,
+        "real pirate did not deplete a facing shield before the retained proof bound"
+    );
+    let good = ok(w.save_bytes());
+    let mut loaded = cold(&w);
+    steps(&mut w, 18);
+    steps(&mut loaded, 18);
+    assert_eq!(w.combat_snapshot(), loaded.combat_snapshot());
+    let mut bad = ok(World::from_save_bytes(&good));
+    bad.pulse.damage_energy(1);
+    let corrupt = ok(bad.unchecked_test_save());
+    let live_before = ok(w.save_bytes());
+    assert!(w.restore_bytes(&corrupt).is_err());
+    assert_eq!(ok(w.save_bytes()), live_before);
+}
+#[test]
+fn active_t02_retains_player_identity_incident_refusal_and_freezes_incoming_npc_state() {
+    let mut source = clear_lane(12005);
+    steps(&mut source, 500);
+    let id = some(some(source.traffic_snapshot()).actors.first()).id;
+    let mut w = ok(World::new_commander(12005));
+    crate::flight::practice::tests::consent(&mut w);
+    crate::flight::practice::tests::launch(&mut w);
+    steps(&mut w, 2000);
+    assert!(some(w.traffic_snapshot()).actors.is_empty());
+    let before = ok(w.save_bytes());
+    // Descriptive copied NPC identity confers no new incident or damage authority.
+    let shot = PulseShot {
+        tick: w.snapshot().tick,
+        fitted_item_id: 1,
+        origin: Vec3::new(0.0, 0.0, 0.0),
+        direction: Vec3::new(0.0, 0.0, 1.0),
+        end: Vec3::new(0.0, 0.0, 1.0),
+        contact: PulseContact::Npc { id, distance: 1.0 },
+    };
+    assert_eq!(
+        w.prepare_traffic_pulse(shot, 1),
+        Err(FireError::ProtectedTraffic)
+    );
+    assert_eq!(ok(w.save_bytes()), before);
+    assert_eq!(w.combat.incidents, 0);
+    assert_eq!(w.legal_value(), Some(0));
+    let _continued = cold(&w);
 }
 fn market_quote(
     w: &World,

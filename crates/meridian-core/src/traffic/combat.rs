@@ -1,20 +1,20 @@
 use super::*;
 impl Resources {
-    pub(super) fn advance(&mut self) -> Result<(), TrafficError> {
-        let energy = (38_000 - self.energy).min(7);
-        let front = (30_000 - self.front).min(3);
-        let rear = (30_000 - self.rear).min(3);
-        let cool = self.heat.min(1);
-        self.energy += energy;
-        self.front += front;
-        self.rear += rear;
-        self.heat -= cool;
-        self.cooldown = self.cooldown.saturating_sub(1);
+    pub(super) fn advance_many(&mut self, ticks: u64) -> Result<(), TrafficError> {
+        let energy = (38000 - u64::from(self.energy)).min(ticks.saturating_mul(7));
+        let front = (30000 - u64::from(self.front)).min(ticks.saturating_mul(3));
+        let rear = (30000 - u64::from(self.rear)).min(ticks.saturating_mul(3));
+        let cool = u64::from(self.heat).min(ticks);
+        self.energy += energy as u16;
+        self.front += front as u16;
+        self.rear += rear as u16;
+        self.heat -= cool as u16;
+        self.cooldown = u64::from(self.cooldown).saturating_sub(ticks) as u8;
         for (total, delta) in [
-            (&mut self.energy_regen, u64::from(energy)),
-            (&mut self.front_regen, u64::from(front)),
-            (&mut self.rear_regen, u64::from(rear)),
-            (&mut self.heat_cooled, u64::from(cool)),
+            (&mut self.energy_regen, energy),
+            (&mut self.front_regen, front),
+            (&mut self.rear_regen, rear),
+            (&mut self.heat_cooled, cool),
         ] {
             *total = total
                 .checked_add(delta)
@@ -22,7 +22,10 @@ impl Resources {
         }
         Ok(())
     }
-    fn fire(&mut self) -> Result<(), TrafficError> {
+    pub(super) fn advance(&mut self) -> Result<(), TrafficError> {
+        self.advance_many(1)
+    }
+    pub(super) fn fire(&mut self) -> Result<(), TrafficError> {
         if self.energy <= 100 || self.heat > 1150 || self.cooldown != 0 {
             return Err(TrafficError::InvalidState);
         }
@@ -35,7 +38,7 @@ impl Resources {
             .ok_or(TrafficError::SequenceExhausted)?;
         Ok(())
     }
-    fn hit(&mut self, front: bool) -> Result<(), TrafficError> {
+    pub(super) fn hit(&mut self, front: bool) -> Result<(), TrafficError> {
         let shield = if front {
             &mut self.front
         } else {
@@ -106,12 +109,13 @@ impl State {
         player: RigidPose,
         world_tick: u64,
         beam_clear: &dyn Fn(Vec3, Vec3, f64) -> bool,
+        player_target: Option<PlayerTarget>,
     ) -> Result<(), TrafficError> {
         let Some(si) = system_index(system) else {
             return Ok(());
         };
         for index in 0..MAX_TRAFFIC_ACTORS {
-            if self.shots.len() >= MAX_TRAFFIC_SHOTS {
+            if self.receipt_count() >= MAX_TRAFFIC_SHOTS {
                 break;
             }
             let Some(actor) = self.actors[index].filter(|a| {
@@ -124,6 +128,12 @@ impl State {
             }) else {
                 continue;
             };
+            if let Some(target) = player_target
+                && self.player_goal(actor, player.position, target).is_some()
+            {
+                self.fire_at_player(index, actor, data, player, target, world_tick, beam_clear)?;
+                continue;
+            }
             let Some(target) = super::motion::target(actor, &self.actors) else {
                 continue;
             };
@@ -202,7 +212,7 @@ impl State {
         if victim.phase == NpcPhase::Destroyed {
             return Ok(next);
         }
-        if self.shots.len() >= MAX_TRAFFIC_SHOTS {
+        if self.receipt_count() >= MAX_TRAFFIC_SHOTS {
             return Err(TrafficError::ReceiptCapacity);
         }
         if !matches!(source, BeamSource::Player { .. })
@@ -232,7 +242,7 @@ impl State {
         Ok(next)
     }
     fn apply_hit(&mut self, beam: TrafficBeam) -> Result<(), TrafficError> {
-        if self.shots.len() >= MAX_TRAFFIC_SHOTS {
+        if self.receipt_count() >= MAX_TRAFFIC_SHOTS {
             return Err(TrafficError::ReceiptCapacity);
         }
         let index = self

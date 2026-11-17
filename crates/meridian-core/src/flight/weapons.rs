@@ -110,6 +110,17 @@ impl Default for PulseResources {
     }
 }
 impl PulseResources {
+    pub(super) fn replay_advance(&mut self, elapsed: u64) {
+        self.energy = u64::from(self.energy)
+            .saturating_add(elapsed.saturating_mul(7))
+            .min(38000) as u16;
+        self.heat = u64::from(self.heat).saturating_sub(elapsed) as u16;
+        self.cooldown = u64::from(self.cooldown).saturating_sub(elapsed) as u8;
+    }
+    pub(super) fn replay_berth(&mut self) {
+        self.energy = 38000;
+        self.heat = 0;
+    }
     pub(super) fn advance(&mut self, opening: FlightMode, next: FlightMode) {
         if opening == FlightMode::Docked {
             return;
@@ -444,17 +455,21 @@ impl World {
         {
             return Err(FireError::InvalidGeometry);
         }
-        impact.commit(self)?;
-        self.traffic = traffic;
-        self.missiles = missiles;
-        if let (Some(candidate), Some(current)) = (&mut practice, self.practice) {
+        let damage = impact.damage_candidate();
+        let (combat, pulse, impact_practice) = impact.resource_candidates(self.practice);
+        if let (Some(candidate), Some(current)) = (&mut practice, impact_practice) {
             candidate.ordinary_hit = current.ordinary_hit;
             candidate.reception = current.reception;
-            candidate.pending_missiles = self.missiles.pending();
+            candidate.pending_missiles = missiles.pending();
         }
         if let Some(practice) = practice.as_mut() {
             practice.observe_discharge(self.state.tick);
         }
+        self.check_fire_combat_capacity(&traffic, damage, &combat, &pulse, &missiles, practice)
+            .map_err(|_| FireError::SequenceExhausted)?;
+        impact.commit(self)?;
+        self.traffic = traffic;
+        self.missiles = missiles;
         self.practice = practice;
 
         Ok(shot)

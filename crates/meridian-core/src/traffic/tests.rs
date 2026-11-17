@@ -45,6 +45,7 @@ fn tick(
                 protected: false,
                 celestial_clear: &|_, _, _| true,
                 beam_clear: &|_, _, _| true,
+                player_target: None,
             },
             markets,
         )
@@ -112,6 +113,7 @@ fn hull_and_arrival_clearance_or_missing_stock_never_mint_a_ghost_birth_or_payme
             protected: false,
             celestial_clear: &|_, _, _| true,
             beam_clear: &|_, _, _| true,
+            player_target: None,
         },
         &market,
     ));
@@ -136,6 +138,7 @@ fn hull_and_arrival_clearance_or_missing_stock_never_mint_a_ghost_birth_or_payme
             protected: false,
             celestial_clear: &|_, _, _| false,
             beam_clear: &|_, _, _| true,
+            player_target: None,
         },
         &market,
     ));

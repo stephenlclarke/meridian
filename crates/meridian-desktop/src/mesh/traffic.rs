@@ -19,14 +19,25 @@ fn recent_beam(scene: &TrafficSnapshot, tick: u64) -> Option<&meridian_core::tra
         .filter(|beam| tick.checked_sub(beam.world_tick).is_some_and(|age| age < 5))
 }
 
+fn selected_player_hit(
+    scene: &TrafficSnapshot,
+    tick: u64,
+) -> Option<&meridian_core::traffic::NpcPlayerHit> {
+    scene.last_player_hit.as_ref().filter(|hit| {
+        tick.checked_sub(hit.world_tick).is_some_and(|age| age < 5)
+            && recent_beam(scene, tick).is_none_or(|beam| hit.world_tick >= beam.world_tick)
+    })
+}
+
 /// The same committed player discharge can appear in both immutable projections.
 pub fn contains_pulse(scene: &TrafficSnapshot, tick: u64, pulse: &PulseShot) -> bool {
-    recent_beam(scene, tick).is_some_and(|beam| {
-        matches!(beam.source, BeamSource::Player { item, .. } if item == pulse.fitted_item_id)
-            && beam.world_tick == pulse.tick
-            && beam.origin == pulse.origin
-            && beam.point == pulse.end
-    })
+    selected_player_hit(scene, tick).is_none()
+        && recent_beam(scene, tick).is_some_and(|beam| {
+            matches!(beam.source, BeamSource::Player { item, .. } if item == pulse.fitted_item_id)
+                && beam.world_tick == pulse.tick
+                && beam.origin == pulse.origin
+                && beam.point == pulse.end
+        })
 }
 
 /// `ship` is the renderer's existing, decoded SH025 mesh, including its original colors.
@@ -54,10 +65,20 @@ pub fn append(
         }
     }
     let beam = recent_beam(scene, snapshot.tick);
+    let incoming = selected_player_hit(scene, snapshot.tick);
     if beam.is_some_and(|beam| {
         beam.victim.system() != system || !scene.actors.iter().any(|a| a.id == beam.victim)
     }) {
         return Err("Traffic beam has no retained victim in this frame".into());
+    }
+    if incoming.is_some_and(|hit| {
+        hit.attacker.system() != system
+            || snapshot.navigation.is_none_or(|nav| nav.visit != hit.visit)
+            || !scene.actors.iter().any(|actor| actor.id == hit.attacker)
+    }) {
+        return Err(
+            "Incoming traffic beam has no retained attacker/player visit in this frame".into(),
+        );
     }
     let camera = camera_for(snapshot, station)?;
     let opening = output.len();
@@ -67,7 +88,11 @@ pub fn append(
                 append_mesh(ship, actor.pose, &camera, output)?;
             }
         }
-        if let Some(beam) = beam {
+        if let Some(hit) = incoming {
+            // One latest traffic segment: on equal ticks prefer the incoming player hit.
+            // This presentation tie rule changes no simulation receipt or event ordering.
+            append_segment(&camera, hit.source_pose.position, hit.point, output)?;
+        } else if let Some(beam) = beam {
             // The actual contact point is retained at discharge time. Current victim
             // motion, its phase or a UI target never extends or redirects this segment.
             append_segment(&camera, beam.origin, beam.point, output)?;

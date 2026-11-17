@@ -1,4 +1,5 @@
 mod celestial;
+mod damage;
 mod navigation_trade;
 mod traffic;
 pub use navigation_trade::{
@@ -152,6 +153,7 @@ impl std::error::Error for StepError {}
 pub struct World {
     state: Snapshot,
     traffic: crate::traffic::State,
+    damage: damage::State,
     station_data: Option<OriginalStationData>,
     navigation_catalogue: Option<OriginalNavigation>,
     navigation: Option<NavigationState>,
@@ -190,6 +192,7 @@ impl World {
                 navigation: None,
             },
             traffic: crate::traffic::State::default(),
+            damage: damage::State::default(),
             station_data: None,
             navigation_catalogue: None,
             navigation: None,
@@ -244,6 +247,7 @@ impl World {
         let mut world =
             Self::at_original_station().map_err(|_| NavigationError::StationUnavailable)?;
         world.traffic = crate::traffic::State::fresh(seed);
+        world.damage = damage::State::fresh();
         world.navigation_catalogue = Some(OriginalNavigation::bundled()?);
         world.commander_account = Some(account);
         world.navigation = Some(navigation);
@@ -579,10 +583,38 @@ impl World {
                 next.motion_refusal = None;
             }
         }
-        let traffic = self.prepare_traffic_step(next, navigation)?;
-        let prepared = self.prepare_missile_step(next, navigation)?;
+        let mut prepared = self.prepare_missile_step(next, navigation)?;
+        let traffic = self.prepare_traffic_step(next, navigation, &prepared)?;
+        if let Some((traffic, _)) = &traffic {
+            for hit in traffic
+                .player_hits()
+                .iter()
+                .skip(self.traffic.player_hits().len())
+            {
+                prepared
+                    .combat
+                    .apply_bound_player_damage(&mut prepared.pulse, hit.front, 1500);
+            }
+        }
+        let damage =
+            self.damage
+                .step(self.state.mode, next.mode, prepared.combat.physical_tick())?;
         let navigation_trade =
             self.prepare_navigation_trade_step(navigation, planned_debit, next.tick)?;
+        if let (Some(practice), Some(nav), Some(data)) =
+            (&mut prepared.practice, navigation, &self.station_data)
+        {
+            practice.after_step(self.state.mode, next, nav, data);
+        }
+        self.check_step_combat_capacity(
+            next,
+            navigation,
+            &prepared,
+            traffic.as_ref(),
+            &damage,
+            navigation_trade.as_ref(),
+        )
+        .map_err(|_| StepError::TickOverflow)?;
         if let Some(debit) = planned_debit {
             self.commander_account
                 .as_mut()
@@ -601,14 +633,10 @@ impl World {
         self.missiles = prepared.missiles;
         self.combat = prepared.combat;
         self.pulse = prepared.pulse;
+        self.damage = damage;
         self.practice = prepared.practice;
         if let Some(account) = &mut self.commander_account {
             account.apply_ordinary_legal(prepared.legal);
-        }
-        if let (Some(practice), Some(nav), Some(data)) =
-            (&mut self.practice, navigation, &self.station_data)
-        {
-            practice.after_step(self.state.mode, next, nav, data);
         }
         self.state = next;
         self.navigation = navigation;

@@ -7,6 +7,35 @@ use crate::docking::RigidPose;
 use crate::station_services::StationMarkets;
 use crate::traffic::{self, BeamSource, TrafficContact, TrafficSnapshot};
 impl World {
+    pub(super) fn validate_traffic_player_scenes(&self) -> Result<(), crate::save::SaveError> {
+        let invalid = crate::save::SaveError::InvalidState("NPC player scene receipt");
+        for hit in self.traffic.player_hits() {
+            self.missiles.validate_npc_beam_scene(hit)?;
+            let system = self
+                .navigation_catalogue
+                .as_ref()
+                .ok_or(invalid)?
+                .system(hit.attacker.system())
+                .map_err(|_| invalid)?;
+            let anchor = self.state.station.ok_or(invalid)?.pose.position;
+            let scene = crate::celestial::scene(system, hit.visit, hit.world_tick, anchor);
+            let a = hit.source_pose.position;
+            let b = hit.point;
+            if [scene.planet, scene.sun].into_iter().any(|body| {
+                body.blocks_motion(
+                    [a.x as f32, a.y as f32, a.z as f32],
+                    [b.x as f32, b.y as f32, b.z as f32],
+                    0.0,
+                )
+            }) || (hit.world_tick == self.state.tick
+                && super::flight_pose(self.state.position, self.state.orientation)
+                    != Some(hit.player_pose))
+            {
+                return Err(invalid);
+            }
+        }
+        Ok(())
+    }
     pub fn traffic_snapshot(&self) -> Option<TrafficSnapshot> {
         self.traffic.snapshot(self.combat_identity()?.system)
     }
@@ -40,6 +69,7 @@ impl World {
         &self,
         next: Snapshot,
         navigation: Option<NavigationState>,
+        prepared: &super::missiles::PreparedStep,
     ) -> Result<Option<(traffic::State, StationMarkets)>, StepError> {
         let Some(markets) = self.station_markets.as_ref() else {
             return Ok(None);
@@ -101,7 +131,10 @@ impl World {
                         z: direction,
                     },
                 };
-                self.nearest_missile(ray, range).is_none()
+                prepared
+                    .missiles
+                    .nearest_beam_body(current.visit, ray, range)
+                    .is_none()
                     && celestial_clear(
                         origin,
                         crate::docking::Vec3::new(
@@ -112,7 +145,8 @@ impl World {
                         0.0,
                     )
             };
-        self.traffic
+        let (mut traffic, markets) = self
+            .traffic
             .prepare_step(
                 traffic::TickContext {
                     system: current.system,
@@ -123,11 +157,33 @@ impl World {
                     protected,
                     celestial_clear: &celestial_clear,
                     beam_clear: &beam_clear,
+                    player_target: if self.damage.enabled() && prepared.pulse.alive() && !protected
+                    {
+                        Some(traffic::PlayerTarget {
+                            hull: self
+                                .combat_identity()
+                                .ok_or(StepError::NonFiniteState)?
+                                .hull,
+                            visit: current.visit,
+                            physical_tick: prepared.combat.physical_tick(),
+                            cargo: self.reserved_service_projection().is_ok_and(|p| {
+                                p.food_tonnes > 0 || p.other_commodities.iter().any(|n| *n > 0)
+                            }),
+                        })
+                    } else {
+                        None
+                    },
                 },
                 markets,
             )
-            .map(Some)
-            .map_err(|_| StepError::NonFiniteState)
+            .map_err(|_| StepError::NonFiniteState)?;
+        if traffic.player_hits().len() > self.traffic.player_hits().len() {
+            traffic.bind_player_hit_scene(
+                self.traffic.player_hits().len(),
+                prepared.missiles.beam_scene(current.visit),
+            );
+        }
+        Ok(Some((traffic, markets)))
     }
     pub(super) fn prepare_traffic_pulse(
         &self,

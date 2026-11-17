@@ -41,7 +41,7 @@ Full game, fleet, missions, memory, window/focus, frame timing/race, notarizatio
 
 ## Following NPC development
 
-The [finite traffic core](docs/NPC-TRAFFIC.md) is composed on the current preview source for further development. Sixteen core, three host, nine renderer, eight scanner and three read-only observer cases remain authored **UNRUN**. Actual SH025 traders and pirates have finite stock, movement and contact logic; the actual SH025 renderer and scanner contacts are joined in source, while reciprocal ordnance, player damage, legal proof and final profile/observer joins remain required before execution or release. Police, miners, bounty hunters, aliens and AI constructs retain explicit source and controller dependencies. No additional hull or NPC gameplay is accepted by this source composition. Only our verified authored content is eligible; no Elite/Oolite asset is introduced.
+The [finite traffic core](docs/NPC-TRAFFIC.md) is composed on the current preview source for further development. Thirty-two core, three host, twelve renderer, eight scanner and three read-only observer cases remain authored **UNRUN**. Actual SH025 traders and pirates have finite stock, movement and contact logic; the actual SH025 renderer and scanner contacts are joined in source, while the incoming player-damage source and its retained beam projection are composed, while reciprocal ordnance, final legal/codec joins and qualification remain required before release. Police, miners, bounty hunters, aliens and AI constructs retain explicit source and controller dependencies. No additional hull or NPC gameplay is accepted by this source composition. Only our verified authored content is eligible; no Elite/Oolite asset is introduced.
 
 ## Play
 

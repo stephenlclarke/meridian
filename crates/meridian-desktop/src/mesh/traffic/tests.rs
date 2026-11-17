@@ -459,3 +459,197 @@ fn capacity_is_bounded_by_real_hull_size_and_refuses_excess_descriptive_bodies()
     // Actual station asset is unchanged; NPC rendering does not replace it with a fixture.
     assert!(!ok(load_station()).is_empty());
 }
+
+// This contact comes from paid cargo and public flight, never a constructed NpcPlayerHit.
+fn actual_incoming() -> &'static (Snapshot, TrafficSnapshot) {
+    static SCENE: OnceLock<(Snapshot, TrafficSnapshot)> = OnceLock::new();
+    SCENE.get_or_init(|| {
+        let mut world = ok(World::new_commander(12001));
+        ok(world.request_station_service(meridian_core::station_services::Command::BuyFood, 0));
+        ok(world.request_launch(world.snapshot().tick));
+        ok(world.step(FlightInput::default()));
+        for _ in 0..300 {
+            if world.snapshot().speed == 0.0 {
+                break;
+            }
+            ok(world.step(FlightInput {
+                brake: true,
+                ..FlightInput::default()
+            }));
+        }
+        assert_eq!(world.snapshot().speed, 0.0);
+        let angle = -core::f32::consts::FRAC_PI_2;
+        let ticks = (angle.abs() / (0.65 / 60.0)).ceil() as u16;
+        for _ in 0..ticks {
+            ok(world.step(FlightInput {
+                yaw: angle / (0.65 / 60.0) / f32::from(ticks),
+                ..FlightInput::default()
+            }));
+        }
+        for _ in 0..3000 {
+            if world.snapshot().position[0] <= -600.0 {
+                break;
+            }
+            let speed = world.snapshot().speed;
+            ok(world.step(FlightInput {
+                throttle: ((10.0 - speed) / (9.1 / 60.0)).clamp(-1.0, 1.0),
+                ..FlightInput::default()
+            }));
+            assert_eq!(world.snapshot().motion_refusal, None);
+        }
+        assert!(world.snapshot().position[0] <= -600.0);
+        for _ in 0..300 {
+            if world.snapshot().speed == 0.0 {
+                break;
+            }
+            ok(world.step(FlightInput {
+                brake: true,
+                ..FlightInput::default()
+            }));
+        }
+        assert_eq!(world.snapshot().speed, 0.0);
+        for _ in 0..24000 {
+            ok(world.step(FlightInput::default()));
+            let scene = world
+                .traffic_snapshot()
+                .unwrap_or_else(|| panic!("traffic"));
+            if let Some(hit) = &scene.last_player_hit {
+                assert_eq!(hit.world_tick, world.snapshot().tick);
+                assert_eq!(world.credits_tenths(), Some(6974));
+                return (world.snapshot(), scene);
+            }
+        }
+        panic!("public cargo flight did not receive a native pirate contact");
+    })
+}
+
+#[test]
+fn actual_incoming_player_hit_uses_retained_segment_and_expires_without_inventing_npc_victim() {
+    let (snapshot, original) = actual_incoming();
+    let hit = original
+        .last_player_hit
+        .as_ref()
+        .unwrap_or_else(|| panic!("hit"));
+    assert_eq!(hit.attacker.serial(), 2);
+    assert_eq!(hit.player_hull, 12002);
+    let mut scene = original.clone();
+    scene.last_beam = None;
+    for actor in &mut scene.actors {
+        actor.phase = NpcPhase::Complete;
+    }
+    let world = ports();
+    let station = station(
+        snapshot,
+        world.station_port().unwrap_or_else(|| panic!("port")),
+    );
+    let camera = ok(camera_for(snapshot, station));
+    let ship = ok(load_ship());
+    let mut output = Vec::new();
+    ok(append(snapshot, station, &ship, &scene, &mut output));
+    assert_eq!(output.len(), crate::mesh::PULSE_VERTEX_COUNT);
+    for (indices, endpoint) in [([0, 1], hit.source_pose.position), ([2, 5], hit.point)] {
+        let expected = camera.pose.orientation.inverse_coordinates(Vec3::new(
+            endpoint.x - camera.pose.position.x,
+            endpoint.y - camera.pose.position.y,
+            endpoint.z - camera.pose.position.z,
+        ));
+        for axis in 0..3 {
+            close(
+                (output[indices[0]].position[axis] + output[indices[1]].position[axis]) / 2.0,
+                [expected.x, expected.y, expected.z][axis],
+            );
+        }
+    }
+    // Moving current poses cannot retarget an already admitted discharge.
+    for actor in &mut scene.actors {
+        actor.pose.position.x += 4000.0;
+    }
+    let mut moved = Vec::new();
+    ok(append(snapshot, station, &ship, &scene, &mut moved));
+    same(&output, &moved);
+    let mut later = *snapshot;
+    later.tick = hit.world_tick + 5;
+    let mut expired = Vec::new();
+    ok(append(&later, station, &ship, &scene, &mut expired));
+    assert!(expired.is_empty());
+    assert_eq!(original, &actual_incoming().1);
+}
+
+#[test]
+fn incoming_segment_tie_keeps_separate_player_pulse_and_retains_one_traffic_segment() {
+    let (snapshot, original) = actual_incoming();
+    let mut scene = original.clone();
+    let hit = scene
+        .last_player_hit
+        .as_ref()
+        .unwrap_or_else(|| panic!("hit"))
+        .clone();
+    let actor = scene
+        .actors
+        .iter()
+        .find(|a| a.id != hit.attacker)
+        .unwrap_or_else(|| panic!("actual other actor"));
+    scene.last_beam = Some(TrafficBeam {
+        source: BeamSource::Player {
+            owner: 12001,
+            hull: 12002,
+            item: 12003,
+            emission: 1,
+        },
+        victim: actor.id,
+        world_tick: hit.world_tick,
+        local_tick: hit.local_tick,
+        origin: hit.player_pose.position,
+        direction: hit.player_pose.orientation.z,
+        point: actor.pose.position,
+        victim_pose: actor.pose,
+        front: true,
+    });
+    let beam = scene.last_beam.unwrap_or_else(|| panic!("beam"));
+    // This is a labelled presentation-only duplicate fixture, not a World damage grant.
+    let pulse = PulseShot {
+        tick: beam.world_tick,
+        fitted_item_id: 12003,
+        origin: beam.origin,
+        direction: beam.direction,
+        end: beam.point,
+        contact: PulseContact::Npc {
+            id: beam.victim,
+            distance: 1.0,
+        },
+    };
+    assert!(!contains_pulse(&scene, snapshot.tick, &pulse));
+    scene.last_player_hit = None;
+    assert!(contains_pulse(&scene, snapshot.tick, &pulse));
+}
+
+#[test]
+fn malformed_incoming_player_segment_refuses_without_partial_traffic_vertices() {
+    let (snapshot, original) = actual_incoming();
+    let ship = ok(load_ship());
+    let world = ports();
+    let station = station(
+        snapshot,
+        world.station_port().unwrap_or_else(|| panic!("port")),
+    );
+    for bad_visit in [false, true] {
+        let mut scene = original.clone();
+        let hit = scene
+            .last_player_hit
+            .as_mut()
+            .unwrap_or_else(|| panic!("hit"));
+        if bad_visit {
+            hit.visit += 1;
+        } else {
+            hit.point.x = f64::NAN;
+        }
+        let sentinel = Vertex {
+            position: [1.0, 2.0, 3.0],
+            color: [0.2, 0.3, 0.4],
+        };
+        let mut output = vec![sentinel];
+        assert!(append(snapshot, station, &ship, &scene, &mut output).is_err());
+        assert_eq!(output.len(), 1);
+        same(&output, &[sentinel]);
+    }
+}

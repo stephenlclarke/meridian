@@ -39,12 +39,12 @@ fn read_basis(r: &mut Reader<'_>) -> Result<Basis3, SaveError> {
     })
 }
 impl ProjectileId {
-    fn encode(self, w: &mut Writer) {
+    pub(crate) fn encode(self, w: &mut Writer) {
         w.u64(self.owner);
         w.u64(self.visit);
         w.u8(self.ordinal);
     }
-    fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+    pub(crate) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         Ok(Self {
             owner: r.u64()?,
             visit: r.u64()?,
@@ -172,6 +172,60 @@ fn read_projectile(r: &mut Reader<'_>) -> Result<ProjectileSnapshot, SaveError> 
     })
 }
 impl State {
+    /// A frozen historical scene is bound to real launch/end custody. It is not a
+    /// reconstruction of every intervening homing trajectory.
+    pub(in crate::flight) fn validate_npc_beam_scene(
+        &self,
+        hit: &crate::traffic::NpcPlayerHit,
+    ) -> Result<(), SaveError> {
+        let expected: Vec<_> = self
+            .projectiles
+            .iter()
+            .flatten()
+            .filter(|p| {
+                p.origin.owner.visit == hit.visit
+                    && p.origin.owner.system == hit.attacker.system()
+                    && p.origin.launched_tick < hit.world_tick
+                    && (p.ended.is_none()
+                        || p.last_tick > hit.world_tick
+                        || (p.ended == Some(MissileEnd::Intercepted)
+                            && p.last_tick == hit.world_tick))
+            })
+            .collect();
+        if hit.missiles.len() != expected.len() {
+            return Err(INVALID);
+        }
+        let distance = length(sub(hit.point, hit.source_pose.position));
+        for ((id, body), projectile) in hit.missiles.iter().zip(expected) {
+            let elapsed = hit
+                .physical_tick
+                .checked_sub(projectile.origin.physical_tick)
+                .ok_or(INVALID)?;
+            if *id != projectile.origin.projectile
+                || body.orientation != projectile.origin.orientation
+                || ![body.position.x, body.position.y, body.position.z]
+                    .into_iter()
+                    .all(f64::is_finite)
+                || elapsed > u64::from(MISSILE_LIFETIME_TICKS)
+                || length(sub(body.position, projectile.origin.muzzle))
+                    > elapsed as f64 * MISSILE_SPEED / 60.0 + 1e-5
+                || (projectile.last_tick == hit.world_tick && body.position != projectile.position)
+                || mesh_distance(*body, hit.source_pose, distance).is_some()
+            {
+                return Err(INVALID);
+            }
+        }
+        Ok(())
+    }
+    /// Read-only adapter to the one player shield/energy replay. Contacts remain validated here.
+    pub(in crate::flight) fn player_resource_hits(&self) -> Vec<OrdinaryImpact> {
+        self.impacts
+            .iter()
+            .copied()
+            .flatten()
+            .filter(|h| matches!(h.target, OrdinaryTarget::Player { .. }))
+            .collect()
+    }
     pub(in crate::flight) fn encode(&self, w: &mut Writer) {
         self.encode_version(w, 12);
     }
@@ -678,6 +732,9 @@ impl State {
         history: &[super::super::practice::Practice],
         dock_sequence: u64,
     ) -> Result<(), SaveError> {
+        if world.damage.enabled() {
+            return world.damage.validate_resources(world, dock_sequence);
+        }
         // The only admitted shield damage has all of its bounded missile receipts retained.
         // Check the numeric result; loading never applies these effects to the World.
         let mut shields = [30_000_u16; 2];

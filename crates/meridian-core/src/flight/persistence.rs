@@ -106,7 +106,7 @@ const V13_CONTENT: &[u8] = concat!(
 .as_bytes();
 
 const CONTENT: &[u8] = concat!(
-    "meridian-world/rules/14;traffic/local-paid-sh025-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
+    "meridian-world/rules/14;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -157,6 +157,16 @@ impl<'a> Commerce<'a> {
     }
 }
 impl World {
+    pub(super) fn encoded_current_size(&self) -> Result<usize, SaveError> {
+        self.encode_saved_world(
+            self.practice,
+            &self.practice_history,
+            self.practice_trace,
+            &self.flight_reception,
+            &Commerce::current(self),
+        )
+        .map(|b| b.len())
+    }
     /// Return a complete checked memory save. The host must atomically publish these bytes itself.
     pub fn save_bytes(&self) -> Result<Vec<u8>, SaveError> {
         self.save_bytes_with_practice(self.practice)
@@ -350,6 +360,7 @@ impl World {
         });
         self.pulse.encode_save(&mut w);
         self.traffic.encode(&mut w);
+        self.damage.encode(&mut w);
         let digest = checksum(&w.bytes);
         w.u64(digest);
         if w.bytes.len() > MAX_SAVE_BYTES {
@@ -472,6 +483,7 @@ impl World {
         let mut candidate = Self {
             state,
             traffic: crate::traffic::State::default(),
+            damage: super::damage::State::default(),
             station_data: Some(station_data),
             navigation_catalogue: Some(
                 OriginalNavigation::bundled().map_err(|_| SaveError::ContentMismatch)?,
@@ -503,6 +515,7 @@ impl World {
         candidate.pulse = weapons::PulseResources::decode_save(&mut r)?;
         if version >= 14 {
             candidate.traffic = crate::traffic::State::decode(&mut r)?;
+            candidate.damage = super::damage::State::decode(&mut r)?;
         }
         if version < 14 && candidate.state.motion_refusal == Some(MotionRefusal::NpcContact) {
             return Err(SaveError::InvalidEncoding);
@@ -572,6 +585,9 @@ impl World {
             self.state.tick,
             account.fuel_tenths(),
         )?;
+        if !self.damage.enabled() {
+            self.damage.validate_resources(self, nav.dock_sequence)?;
+        }
         // Refuse unbound reducer damage with its established boundary before the
         // missile graph checks the numeric shield result against retained origins.
         self.combat.validate_damage_boundary(self)?;
@@ -620,7 +636,9 @@ impl World {
                 }
             }
         }
-        if self
+        if self.damage.enabled() {
+            // The shared replay already required exact shields, energy, heat and cadence.
+        } else if self
             .missiles
             .has_undocked_player_hit(practice, history, nav.dock_sequence)
         {
@@ -635,6 +653,11 @@ impl World {
         }
         session.validate_save(navigation.dock())?;
         let domain = account.validate_saved_domain(&session.state, nav, session.epoch())?;
+        if !self.damage.enabled() && !self.traffic.player_hits().is_empty() {
+            return Err(SaveError::InvalidState(
+                "NPC player hit has no resource birth provenance",
+            ));
+        }
         self.traffic.validate(
             nav.owner,
             self.state.tick,
@@ -642,6 +665,7 @@ impl World {
             station,
             markets,
         )?;
+        self.validate_traffic_player_scenes()?;
         if self.state.mode != FlightMode::Docked {
             let pose = super::flight_pose(self.state.position, self.state.orientation)
                 .ok_or(SaveError::InvalidState("traffic player pose"))?;
@@ -1016,7 +1040,7 @@ mod paid_missile_format_tests {
         assert_eq!(loaded.ammunition_snapshot(), world.ammunition_snapshot());
         assert_eq!(loaded.credits_tenths(), world.credits_tenths());
         let current = loaded.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
-        assert_eq!(u16::from_le_bytes([current[8], current[9]]), 13);
+        assert_eq!(u16::from_le_bytes([current[8], current[9]]), SAVE_VERSION);
         assert_ne!(old, current);
     }
 }
@@ -1032,6 +1056,7 @@ pub(super) fn v13_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
     let mut traffic = Writer::new();
     world.traffic.encode(&mut traffic);
     let payload_start = 8 + 2 + CONTENT.len() + 8;
+    world.damage.encode(&mut traffic);
     let payload_end = current.len() - 8 - traffic.bytes.len();
     let mut old = Writer::new();
     old.bytes.extend(MAGIC);
