@@ -1080,6 +1080,7 @@ pub(super) fn pulse_save_start(world: &World, bytes: &[u8]) -> usize {
     world.traffic.encode(&mut extension);
     world.damage.encode(&mut extension);
     world.mining.encode(&mut extension);
+    world.jump_journal.encode(&mut extension);
     let extension_end = bytes.len() - 8;
     let extension_start = extension_end - extension.bytes.len();
     assert_eq!(
