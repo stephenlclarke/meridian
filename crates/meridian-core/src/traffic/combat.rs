@@ -148,7 +148,13 @@ impl State {
                 continue;
             };
             let direction = actor.pose().orientation.z;
-            let delta = sub(target.position, actor.position);
+            let Some(point) = data
+                .player_planar_aimpoint(target.pose(), actor.position)
+                .map_err(|_| TrafficError::InvalidState)?
+            else {
+                continue;
+            };
+            let delta = sub(point, actor.position);
             if unit(delta).is_none_or(|aim| aim.dot(direction) < 0.995) {
                 continue;
             }

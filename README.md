@@ -41,7 +41,7 @@ Full game, fleet, missions, memory, window/focus, frame timing/race, notarizatio
 
 ## Following NPC development
 
-The [finite traffic core](docs/NPC-TRAFFIC.md) is composed on the current preview source for further development. Forty-seven core, three host, twelve renderer, eight scanner, three session and three read-only observer cases remain authored **UNRUN**. Actual SH025 traders and pirates have finite stock, movement and contact logic; the actual SH025 renderer and scanner contacts are joined in source, while NPC Pulse damage and player-owned missiles against typed NPC targets share one resource replay and World publication. Actual NPC missile launch producers remain open. The joined source uses private format 15 with the earlier draft 14 refused; whole review and qualification remain required before release. Police, miners, bounty hunters, aliens and AI constructs retain explicit source and controller dependencies. No additional hull or NPC gameplay is accepted by this source composition. Only our verified authored content is eligible; no Elite/Oolite asset is introduced.
+The [finite traffic core](docs/NPC-TRAFFIC.md) remains development/validation pending. The actual `42f599c` Mac core run reported **223 PASS, 53 FAIL out of 276**, exposing traffic route/native-aim, missile contact and retained-source/codec defects. The causal traffic successor preserves native clearance and original assertions, adds station approach yielding and real triangle-derived aim, and authors seven regression cases **UNRUN**. Whole joined review/execution, desktop/native gameplay and release gates remain open. All seven NPC populations retain explicit source/controller dependencies; no additional hull or NPC gameplay is accepted by this correction.
 
 ## Play
 

@@ -20,6 +20,32 @@ fn steps(w: &mut World, n: usize) {
         ok(w.step(FlightInput::default()));
     }
 }
+#[test]
+fn original_public_market_route_keeps_native_clearance_with_live_off_axis_traffic() {
+    let mut w = ok(World::new_commander(12001));
+    ok(w.request_station_service(crate::station_services::Command::BuyFood, 0));
+    // Reuse the baseline public journey unchanged, including every no-contact assertion.
+    crate::flight::equipment::tests::journey(&mut w, crate::navigation::SystemId::RENAS);
+    assert_eq!(w.snapshot().mode, FlightMode::Docked);
+    if some(w.snapshot().navigation).fuel_units < 68 {
+        ok(w.request_refuel(w.snapshot().tick));
+    }
+    crate::flight::equipment::tests::journey(&mut w, crate::navigation::SystemId::AVENOR);
+    assert_eq!(w.snapshot().mode, FlightMode::Docked);
+    assert_eq!(w.snapshot().motion_refusal, None);
+    assert!(w.traffic.enabled());
+    assert!(
+        some(w.traffic_snapshot())
+            .actors
+            .iter()
+            .any(|a| a.population == Population::Pirate)
+    );
+    assert_eq!(
+        w.commodity_quantity(crate::station_services::CommodityId::Food),
+        Some(1)
+    );
+    let _continued = cold(&w);
+}
 fn clear_lane(seed: u64) -> World {
     let mut w = ok(World::new_commander(seed));
     crate::flight::practice::tests::launch(&mut w);

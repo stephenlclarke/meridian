@@ -38,7 +38,10 @@ fn scene() -> (
         .as_mut()
         .unwrap_or_else(|| panic!("missing source pirate"));
     pirate.position = Vec3::new(0.0, 0.0, 6000.0);
-    pirate.yaw = 0.0;
+    let aim = ok(data.player_planar_aimpoint(player, pirate.position))
+        .unwrap_or_else(|| panic!("missing native planar surface"));
+    let delta = sub(aim, pirate.position);
+    pirate.yaw = delta.x.atan2(delta.z);
     pirate.speed = 0.0;
     (
         state,
@@ -139,6 +142,15 @@ fn actual_peer_mesh_occludes_and_missing_peer_or_changed_contact_cannot_load() {
         .position = Vec3::new(0.0, 0.0, 6500.0);
     // Query the bounded native component boundary directly; this is not a public journey.
     let actor = state.actors[1].unwrap_or_else(|| panic!("pirate"));
+    let peer = state.actors[0].unwrap_or_else(|| panic!("trader"));
+    let surface = ok(data.player_planar_aimpoint(peer.pose(), actor.position))
+        .unwrap_or_else(|| panic!("missing native peer surface"));
+    let desired = add(actor.position, scale(actor.pose().orientation.z, 500.0));
+    state.actors[0]
+        .as_mut()
+        .unwrap_or_else(|| panic!("trader"))
+        .position = add(peer.position, sub(desired, surface));
+    let actor = state.actors[1].unwrap_or_else(|| panic!("pirate"));
     let before = state.clone();
     ok(state.fire_at_player(
         1,
@@ -184,14 +196,12 @@ fn full_shared_beam_receipt_bound_refuses_npc_emission_without_spending_or_dropp
 #[test]
 fn actual_native_player_hit_admits_pirate_retaliation_without_claiming_player_cargo() {
     let (state, _, data, player, target) = scene();
+    let pirate = state.actors[1].unwrap_or_else(|| panic!("pirate"));
+    let aim = ok(data.player_planar_aimpoint(pirate.pose(), player.position))
+        .unwrap_or_else(|| panic!("missing native pirate surface"));
+    let direction = unit(sub(aim, player.position)).unwrap_or_else(|| panic!("invalid native aim"));
     let contact = state
-        .beam(
-            &data,
-            SystemId::AVENOR,
-            player.position,
-            player.orientation.z,
-            6000.0,
-        )
+        .beam(&data, SystemId::AVENOR, player.position, direction, 6000.0)
         .unwrap_or_else(|| panic!("missing actual pirate surface"));
     assert_eq!(contact.id.serial(), 2);
     let mut state = ok(state.prepare_player_hit(
@@ -205,7 +215,7 @@ fn actual_native_player_hit_admits_pirate_retaliation_without_claiming_player_ca
                 emission: 1,
             },
             origin: player.position,
-            direction: player.orientation.z,
+            direction,
             contact,
             world_tick: 900,
         },
