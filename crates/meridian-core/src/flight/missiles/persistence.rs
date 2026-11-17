@@ -135,6 +135,10 @@ fn contact(w: &mut Writer, c: MissileContact) {
             w.bool(first_hit);
         }
         MissileContact::Station => w.u8(1),
+        MissileContact::Asteroid(id) => {
+            w.u8(6);
+            w.u8(id.ordinal());
+        }
         MissileContact::Player { front } => {
             w.u8(2);
             w.bool(front);
@@ -163,6 +167,7 @@ fn read_contact(r: &mut Reader<'_>) -> Result<MissileContact, SaveError> {
             first_hit: r.bool()?,
         },
         1 => MissileContact::Station,
+        6 => MissileContact::Asteroid(crate::mining::AsteroidId::from_ordinal(r.u8()?)?),
         2 => MissileContact::Player { front: r.bool()? },
         3 => MissileContact::Projectile(ProjectileId::decode(r)?),
         4 => MissileContact::Npc(crate::traffic::NpcId::decode(r)?),
@@ -233,25 +238,45 @@ impl State {
         &self,
         hit: &crate::traffic::NpcPlayerHit,
     ) -> Result<(), SaveError> {
+        self.validate_retained_beam(super::RetainedBeam {
+            system: hit.attacker.system(),
+            visit: hit.visit,
+            world_tick: hit.world_tick,
+            physical_tick: hit.physical_tick,
+            command_emission: None,
+            ray: hit.source_pose,
+            point: hit.point,
+            bodies: &hit.missiles,
+        })
+    }
+    pub(in crate::flight) fn validate_retained_beam(
+        &self,
+        hit: super::RetainedBeam<'_>,
+    ) -> Result<(), SaveError> {
         let expected: Vec<_> = self
             .projectiles
             .iter()
             .flatten()
             .filter(|p| {
                 p.origin.owner.visit == hit.visit
-                    && p.origin.owner.system == hit.attacker.system()
-                    && p.origin.launched_tick < hit.world_tick
+                    && p.origin.owner.system == hit.system
+                    && (p.origin.launched_tick < hit.world_tick
+                        || (p.origin.launched_tick == hit.world_tick
+                            && hit.command_emission.is_some_and(|e| p.origin.emission < e)))
                     && (p.ended.is_none()
                         || p.last_tick > hit.world_tick
                         || (p.ended == Some(MissileEnd::Intercepted)
-                            && p.last_tick == hit.world_tick))
+                            && p.last_tick == hit.world_tick
+                            && hit
+                                .command_emission
+                                .is_none_or(|e| p.intercepting_emission.is_some_and(|i| i > e))))
             })
             .collect();
-        if hit.missiles.len() != expected.len() {
+        if hit.bodies.len() != expected.len() {
             return Err(INVALID);
         }
-        let distance = length(sub(hit.point, hit.source_pose.position));
-        for ((id, body), projectile) in hit.missiles.iter().zip(expected) {
+        let distance = length(sub(hit.point, hit.ray.position));
+        for ((id, body), projectile) in hit.bodies.iter().zip(expected) {
             let elapsed = hit
                 .physical_tick
                 .checked_sub(projectile.origin.physical_tick)
@@ -265,7 +290,7 @@ impl State {
                 || length(sub(body.position, projectile.origin.muzzle))
                     > elapsed as f64 * MISSILE_SPEED / 60.0 + 1e-5
                 || (projectile.last_tick == hit.world_tick && body.position != projectile.position)
-                || mesh_distance(*body, hit.source_pose, distance).is_some()
+                || mesh_distance(*body, hit.ray, distance).is_some()
             {
                 return Err(INVALID);
             }
@@ -1275,7 +1300,7 @@ impl State {
             let PulseContact::Projectile { id, distance } = shot.contact else {
                 return Err(INVALID);
             };
-            self.validate_beam_identity(b, p, emission, id)?;
+            self.validate_beam_identity(world, b, p, emission, id)?;
             let mut ray = pose(shot.origin, shot.direction).ok_or(INVALID)?;
             // Pulse uses the exact quaternion-derived forward column without normalization.
             ray.orientation.z = shot.direction;
@@ -1370,6 +1395,7 @@ impl State {
     }
     fn validate_beam_identity(
         &self,
+        world: &World,
         b: &Beam,
         p: ProjectileSnapshot,
         emission: u64,
@@ -1387,7 +1413,9 @@ impl State {
         if b.emission != emission
             || emission <= p.origin.emission
             || shot.tick != p.last_tick
-            || shot.fitted_item_id != p.origin.owner.owner.checked_add(7).ok_or(INVALID)?
+            || world
+                .front_weapon_at_tick(shot.fitted_item_id, shot.tick)
+                .is_none()
             || id != p.origin.projectile
             || !valid_vector(shot.origin)
             || !valid_vector(shot.direction)

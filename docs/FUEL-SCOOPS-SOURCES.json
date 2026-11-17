@@ -1,0 +1,248 @@
+{
+  "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "tree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "method": "Fixed git show/grep/ls-tree only. Human WIP never read or imported. No original Swift/Rust helper executed.",
+  "scope": "Fuel Scoops original catalogue/paid fitting/manual intake/actor custody trace; qualified original ore/cargo mesh is not supplied by this trace. Generic Geometry.hull cargo fallback is documented as ineligible under the assignment, not imported or promoted.",
+  "catalogue": {
+    "id": "fuel-scoops",
+    "name": "Fuel Scoops",
+    "priceCR": 1900.0,
+    "technology": 4
+  },
+  "facts": [
+    {
+      "path": "Sources/L337Core/EquipmentRuntimeCatalog.swift",
+      "lines": [
+        10,
+        30,
+        111,
+        121,
+        125,
+        176
+      ],
+      "fact": "Utility family utility-fuelScoops, key Fuel Scoops, unique shop graph, utility fuelScoops location, original supported slots and fitting limits. Ownership and fitted capability remain separate."
+    },
+    {
+      "path": "Sources/L337Core/EquipmentTransactions.swift",
+      "lines": [
+        96,
+        138,
+        198,
+        210,
+        233,
+        269,
+        283
+      ],
+      "fact": "Actual paid quote/candidate validates authoritative price/technology, current shop, funds/history/item and fit; install/store must retain original same item and fit revisions, not mirror a capability flag."
+    },
+    {
+      "path": "Sources/L337Core/OriginalFleetR3Data.swift",
+      "lines": [
+        1036,
+        1063
+      ],
+      "fact": "SH025 supports cargoScoop, has24 equipment units and3 utility mounts; role kit is recommended and explicitly not included."
+    },
+    {
+      "path": "Sources/L337Core/OriginalFleetR3Fitting.swift",
+      "lines": [
+        65,
+        108
+      ],
+      "fact": "Installed real utility occupies a mount; Fuel Scoops requires original cargoScoop compatibility."
+    },
+    {
+      "path": "Sources/L337Core/CargoScooping.swift",
+      "lines": [
+        4,
+        6,
+        17,
+        91,
+        103
+      ],
+      "fact": "Manual native scoop: not docked, actual fitted mirror, live cargo/nonhostile thargon, energy>0, native local z>0/y<0/length<85, protection exclusions and actual ore actor/system/visit bound to payload. Automatic guidance/braking additionally checks relative speed/shape; do not invent that gate for manual pickup."
+    },
+    {
+      "path": "Sources/L337Core/TypedCargoPayload.swift",
+      "lines": [
+        30,
+        37,
+        45
+      ],
+      "fact": "Typed ordinary collector refuses mission/salvage/protected payloads, no scoop, invalid approach/cargo or insufficient native-tonne capacity before cargo increment. Kilograms consume no tonnes."
+    },
+    {
+      "path": "Sources/L337Core/MiningLedger.swift",
+      "lines": [
+        465,
+        534,
+        553,
+        583,
+        608,
+        636,
+        645,
+        672
+      ],
+      "fact": "Pending finite ore offers use mining producer/cargo population, real allocated actor acknowledgment, canonical world motion and once-only collection. Culling releases bindings only; cold rebuilding rebinds; actual departure expires ordinary pending without restoring depletion. Birth grid derives spacing from actual cargo mesh radius."
+    },
+    {
+      "path": "Sources/L337Core/GameplayAdmission.swift",
+      "lines": [
+        91,
+        96,
+        104,
+        141,
+        169
+      ],
+      "fact": "Physical construction allocates a distinct actor, preserves source request/payload/spawn/motion, suppresses display-only spin for native ore, captures persistence and publishes actual body before acknowledging."
+    },
+    {
+      "path": "Sources/L337Core/Geometry.swift",
+      "lines": [
+        78,
+        80,
+        82,
+        85,
+        90
+      ],
+      "fact": "Cargo geometry first queries native catalogue, then shares generic octahedron branch with asteroid. This is the only reached cargo shape in this immutable source and is not an authenticated original cargo asset."
+    },
+    {
+      "path": "Sources/L337Core/ShipCatalogue.swift",
+      "lines": [
+        162,
+        164,
+        173,
+        338,
+        352
+      ],
+      "fact": "Native mesh map comes from actual nativeHull resources/retained activations; no inspected cargo nativeHull record exists."
+    },
+    {
+      "path": "Sources/L337Core/WorkTargetRuntime.swift",
+      "lines": [
+        248,
+        254,
+        258,
+        269
+      ],
+      "fact": "Automatic shape compatibility requires the same actual cargo vertices/faces and a real bound ore actor/pending amount, not pending description alone."
+    }
+  ],
+  "missingDependency": {
+    "id": "qualified-original-ore-cargo-geometry",
+    "consumer": "Sources/L337Core/Geometry.swift Mesh.hull(.cargo) -> ShipCatalogue.nativeMesh(.cargo), consumed by GameplayWeapons.swift and WorkTargetRuntime.swift",
+    "finding": "No authenticated cargo nativeHull resource in inspected Ships catalogue; generic fallback is excluded by this assignment. Current Meridian assets have no cargo/ore physical geometry import.",
+    "required": "An immutable eligible original cargo/ore geometry definition with provenance/notice, scale/axes/winding, real render/collision representation and intended physical pickup binding. Root serial owner must supply/select that concrete source before positive paid collection/sale implementation can be admitted.",
+    "notClaimed": [
+      "No claim later source or MBA output lacks an asset",
+      "No permission or legal approval inferred",
+      "No free equipment, placeholder mesh, cargo alias, remote receipt or fallback-preservation implementation",
+      "NoScoop remains a refusal, not full mining/cargo parity"
+    ]
+  },
+  "files": [
+    {
+      "path": "Sources/L337Core/Resources/OriginalWorlds/authoring.toml",
+      "gitBlob": "0373b5cb3e2a18ef4d4f372c7a64952b2964a456",
+      "bytes": 6664,
+      "sha256": "47d83caae5a9b22a4a932f19c55f79c5cb5435b962826a0969ece096b11f80eb"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentRuntimeCatalog.swift",
+      "gitBlob": "4f9bf9ec70d239e9c099f00a9c63a80d4648833d",
+      "bytes": 8337,
+      "sha256": "ccf1ee2a940175f0d1a26a65aaa7b62ca7cf61d0eb33906f8b8feb6664210e27"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentTransactions.swift",
+      "gitBlob": "3d51889a6dd1900faadfc172bbdab072995f1a21",
+      "bytes": 15785,
+      "sha256": "21a44066185ea17c8e3b262988c193cdef98bf88f80294d7a216767d93ad4f36"
+    },
+    {
+      "path": "Sources/L337Core/OriginalFleetR3Data.swift",
+      "gitBlob": "50ee232a826932f9248f2e5aa070f7e099fa70a5",
+      "bytes": 285755,
+      "sha256": "ceba81e0702526ed3ff0e6e7f28868bae4ab508ae9ac6bfa9f18d63d78d7946a"
+    },
+    {
+      "path": "Sources/L337Core/OriginalFleetR3Fitting.swift",
+      "gitBlob": "920e1d802e63ab9038e7885974618f4e9b402257",
+      "bytes": 4922,
+      "sha256": "5a50e94cb510d7ce51da194cc3570159a28f1b7bd126e140a948192412d913ee"
+    },
+    {
+      "path": "Sources/L337Core/CargoScooping.swift",
+      "gitBlob": "1fe6b4d9a97b76608697af5ff4b154df478b1b65",
+      "bytes": 5616,
+      "sha256": "6dae2421062621fee0f992d2648f501403c87cb87f77138127175eab6390ced7"
+    },
+    {
+      "path": "Sources/L337Core/TypedCargoPayload.swift",
+      "gitBlob": "c39d519d379222988e6dd7904eca1a387f4dfc4b",
+      "bytes": 2601,
+      "sha256": "8b56ea4b7e514ad3ff9199bc1ef626d7ac1ff263d2fd744030aad6e1480f336a"
+    },
+    {
+      "path": "Sources/L337Core/MiningLedger.swift",
+      "gitBlob": "c3d9602caecc56d15ee8f74442ab2cbab365c6e9",
+      "bytes": 37858,
+      "sha256": "a9f4dcb955fe49db47ced2a138d0f1ea13b84aa71e2fc91c99142c7f25e5390f"
+    },
+    {
+      "path": "Sources/L337Core/GameplayAdmission.swift",
+      "gitBlob": "5881033fad9a7ea619479d50682d15031ab93106",
+      "bytes": 50222,
+      "sha256": "6b1f00f1e457ad3f707ac4d922d175924941b9d31d8c0503c16675520cd30283"
+    },
+    {
+      "path": "Sources/L337Core/GameplayWeapons.swift",
+      "gitBlob": "582560d2f5dcdb3ee27804ba0cedd5ecdced1f0b",
+      "bytes": 19711,
+      "sha256": "b0e3fa858afcc6fd646e0db51e02260e63e38394cde8a8aeeed783db058011c8"
+    },
+    {
+      "path": "Sources/L337Core/Geometry.swift",
+      "gitBlob": "3810ff536ce81e344e058a2448e5fbe5f29fa3d8",
+      "bytes": 7438,
+      "sha256": "b9751c66c3f6e86f4a0ae541a7dcbcdec2fef526f9570107d7a4cef3da7380bb"
+    },
+    {
+      "path": "Sources/L337Core/ShipCatalogue.swift",
+      "gitBlob": "397dada10f448cc62040943d81e8a8a1026b1e97",
+      "bytes": 16533,
+      "sha256": "c432109fa323bee519114596af6269f59d8604853e231a616ffad2e9644d8ea5"
+    },
+    {
+      "path": "Sources/L337Core/OriginalPlayerHullActivation.swift",
+      "gitBlob": "5ef75418377fd6ecf18ed6e8cdc5d9cef8616338",
+      "bytes": 10627,
+      "sha256": "92e258070c4dc5d646490b7b6838791392c595b46c78de96de75ce766e1f6031"
+    },
+    {
+      "path": "Sources/L337Core/OriginalBisonActivation.swift",
+      "gitBlob": "3ce65af71709b658e19f439c955af459965828d9",
+      "bytes": 14500,
+      "sha256": "958ab8cfc1e8637ae57944d681d723aedaf6423105594a9a828c6eccb457ae77"
+    },
+    {
+      "path": "Sources/L337Core/ScoopApproachController.swift",
+      "gitBlob": "51342b355e3f543146e88a19e4ca05322fa2e89a",
+      "bytes": 15461,
+      "sha256": "59ae908bfcd52758c6a9195497a5414c0d75b4e26317ae1ba9408628603b5f9d"
+    },
+    {
+      "path": "Sources/L337Core/WorkTargetRuntime.swift",
+      "gitBlob": "7f5063f86cdacd63fe063c7ec851e0d775563fda",
+      "bytes": 13926,
+      "sha256": "a4072efc794e3d0c0aec9eaa41d215a2ccb9a19b5634614e08a8f55aca4140e4"
+    },
+    {
+      "path": "LICENSE",
+      "gitBlob": "b27f022cea044295412849dec93512dad638f08e",
+      "bytes": 1071,
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+    }
+  ]
+}

@@ -164,6 +164,9 @@ pub(super) fn choose_scene(
         .station_data
         .as_ref()
         .ok_or(StepError::NonFiniteState)?;
+    if let Some(c) = world.mining_step_contact(scene.system, scene.world_tick, ray, travel) {
+        choose(best, c.distance, MissileContact::Asteroid(c.asteroid));
+    }
     if let Some(c) = scene.contact(data, ray.position, ray.orientation.z, travel) {
         choose(best, c.distance, MissileContact::Npc(c.id));
     }

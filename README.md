@@ -45,6 +45,10 @@ The twelve new preparation/query/replay tests address the actual coverage and du
 
 Successful player Pulse contact, an NPC kill and more than three actual projectiles were not observed in the bounded native journey. Other populations, NPC-owned missile launch producers, additional hull admissions, full equipment, memory, window/focus edges and measured frame timing/race remain open. Full original **1337 visual and gameplay parity** is required; source tests and renderer screenshots do not establish complete game acceptance. Private save format 15 refuses draft 14 and retains explicit qualified older readers.
 
+## Following paid mining development
+
+The [mining source](docs/ASTEROID-MINING.md) joins genuine paid Mining Laser work to the actual World: 50-damage native strokes, finite partial energy, terminal pending ore, shared ship resources, retained contact history and cold continuation. Fifteen new Rust cases are authored **UNRUN**. No cargo or cash is credited by mining. The original requires Fuel Scoops; collection refuses without a fitted scoop or without an eligible ore body, and ordinary sale has no mined cargo. The current source candidate shares one resource journal and save format with the expanded laser and energy equipment. The paid Fuel Scoops now share the module ledger in the staged source. The typed utility menu and flight renderer are wired to the same candidate. Owning validation remains pending. The authored Avenor segment is not complete original orbital/presence parity or a delivered mining preview.
+
 ## Play
 
 N starts a commander; C continues. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.

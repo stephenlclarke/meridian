@@ -88,8 +88,14 @@ impl Profile {
                 meridian_core::ModuleAction::PurchaseMiningLaser => {
                     "Mining Laser purchased and fitted."
                 }
-                meridian_core::ModuleAction::Store { .. } => "Owned laser stored.",
-                meridian_core::ModuleAction::Install { .. } => "Owned laser fitted.",
+                meridian_core::ModuleAction::PurchaseFuelScoops => {
+                    "Fuel Scoops purchased and fitted. Physical ore collection remains unavailable."
+                }
+                meridian_core::ModuleAction::Purchase { .. } => {
+                    "Owned module purchased and fitted."
+                }
+                meridian_core::ModuleAction::Store { .. } => "Owned module stored.",
+                meridian_core::ModuleAction::Install { .. } => "Owned module fitted.",
             };
             let published = self
                 .store

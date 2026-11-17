@@ -118,6 +118,13 @@ fn camera_for(snapshot: &Snapshot, station: StationRender<'_>) -> Result<Camera,
     })
 }
 
+pub(crate) fn scene_camera_pose(
+    snapshot: &Snapshot,
+    station: StationRender<'_>,
+) -> Result<RigidPose, String> {
+    Ok(camera_for(snapshot, station)?.pose)
+}
+
 fn append_mesh(
     vertices: &[Vertex],
     model: RigidPose,

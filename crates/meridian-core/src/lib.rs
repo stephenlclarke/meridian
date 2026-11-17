@@ -7,6 +7,7 @@ pub mod docking;
 pub mod equipment;
 mod flight;
 pub mod freight;
+pub mod mining;
 pub mod navigation;
 pub mod save;
 pub mod station;
@@ -58,10 +59,11 @@ pub use flight::{
 };
 
 pub use flight::{
-    FittedMiningTool, ModularEquipmentSnapshot, ModuleAction, ModuleError, ModuleKind, ModuleOffer,
-    ModuleProvenance, ModuleReview, ModuleSlot, OwnedModule, PreparedModule,
+    FittedFuelScoops, FittedMiningTool, FuelScoopsSnapshot, ModularEquipmentSnapshot, ModuleAction,
+    ModuleError, ModuleKind, ModuleOffer, ModuleProvenance, ModuleReview, ModuleSlot, OwnedModule,
+    PreparedModule,
 };
 
-pub use flight::FlightResourcesSnapshot;
+pub use flight::{FlightResourcesSnapshot, FrontLaserSnapshot};
 
 pub use flight::{EquipmentPreparationError, PreparedEquipment};
