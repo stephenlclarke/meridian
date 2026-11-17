@@ -420,7 +420,7 @@ impl State {
     ) -> bool {
         self.projectiles.iter().flatten().any(|p| {
             matches!(p.contact, Some(MissileContact::Player { .. }))
-                && !self.docked_since(p, practice, history, dock_sequence)
+                && !self.docked_since(*p, practice, history, dock_sequence)
         })
     }
     pub(in crate::flight) fn validate_ordinary(

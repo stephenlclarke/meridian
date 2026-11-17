@@ -1,8 +1,8 @@
 //! Real World command tests; compilation/execution remain assigned to the existing owner lane.
 use super::*;
+use crate::FlightInput;
 use crate::docking::Vec3;
 use crate::traffic::{BeamSource, NpcPhase, Population};
-use crate::{FlightInput, MotionRefusal};
 fn ok<T, E: core::fmt::Debug>(v: Result<T, E>) -> T {
     match v {
         Ok(v) => v,
