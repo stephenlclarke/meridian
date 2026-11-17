@@ -23,6 +23,7 @@ pub struct HudScene<'a> {
 }
 
 pub struct SceneEffects<'a> {
+    pub traffic: Option<&'a meridian_core::traffic::TrafficSnapshot>,
     pub pulse: Option<&'a PulseShot>,
     pub missiles: &'a [meridian_core::ProjectileSnapshot],
     pub practice: Option<&'a [PracticeBeaconSnapshot; 3]>,
@@ -207,7 +208,9 @@ impl Renderer {
             + 3 * 32 * 6
             + mesh::PULSE_VERTEX_COUNT
             + mesh::PRACTICE_VERTEX_COUNT
-            + mesh::MISSILE_VERTEX_COUNT;
+            + mesh::MISSILE_VERTEX_COUNT
+            + mesh::traffic::vertex_capacity(ship.len())
+                .ok_or("Traffic vertex capacity overflow")?;
         let vertices = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("Reused frame vertices"),
             size: (vertex_capacity * std::mem::size_of::<Vertex>()) as u64,
@@ -305,6 +308,7 @@ impl Renderer {
         } = hud;
 
         let SceneEffects {
+            traffic,
             pulse,
             missiles,
             practice,
@@ -403,7 +407,13 @@ impl Renderer {
             if let Some(station) = station {
                 mesh::append_missiles(snapshot, station, missiles, &mut self.frame)?;
             }
-            if let (Some(station), Some(shot)) = (station, pulse) {
+            if let (Some(station), Some(traffic)) = (station, traffic) {
+                mesh::traffic::append(snapshot, station, &self.ship, traffic, &mut self.frame)?;
+            }
+            if let (Some(station), Some(shot)) = (station, pulse)
+                && !traffic
+                    .is_some_and(|scene| mesh::traffic::contains_pulse(scene, snapshot.tick, shot))
+            {
                 mesh::append_pulse(snapshot, station, shot, &mut self.frame)?;
             }
             mesh::apply_flight_view(self.flight_view, &mut self.frame);

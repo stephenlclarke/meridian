@@ -11,6 +11,7 @@ pub mod navigation;
 pub mod save;
 pub mod station;
 pub mod station_services;
+pub mod traffic;
 
 pub use flight::{
     ENERGY_CAPACITY_HUNDREDTHS, FIXED_DELTA_SECONDS, FireError, FlightInput, MAX_SPEED,
@@ -35,7 +36,7 @@ pub use flight::{
 pub use flight::{
     MISSILE_COOLDOWN_TICKS, MISSILE_FACES, MISSILE_LIFETIME_TICKS, MISSILE_MUZZLE_DISTANCE,
     MISSILE_RANGE, MISSILE_SPEED, MISSILE_VERTICES, MissileContact, MissileEnd, MissileError,
-    MissileOrigin, MissileRound, MissileSnapshot, ProjectileId, ProjectileSnapshot,
+    MissileOrigin, MissileRound, MissileSnapshot, MissileTarget, ProjectileId, ProjectileSnapshot,
 };
 
 pub use flight::{

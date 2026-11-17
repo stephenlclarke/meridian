@@ -7,6 +7,7 @@
 mod commodities;
 pub use commodities::{CargoUnit, CommodityDefinition, CommodityId, CommodityQuote};
 mod persistence;
+mod traffic;
 pub(crate) use persistence::SavedServiceSummary;
 
 const SEEDS: &[u8] = include_bytes!("../../../assets/legacy/g01-food.markets");

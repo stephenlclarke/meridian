@@ -27,25 +27,25 @@
 
 Meridian is a Rust reimplementation of the original L337 project, with direct wgpu graphics, one authoritative World and traceable original content. New code is [proprietary/source-visible](LICENSE); imported original content retains its own notices. Original Elite/Oolite assets are excluded.
 
-## Modular mining-tool source awaiting execution
-
-The [modular equipment increment](docs/MODULAR-EQUIPMENT.md) authors genuine paid front Mining Laser fitting, same-item Pulse storage/refit, shared resource preparation and a ship-resource readout that remains valid without Pulse fitted. Thirteen standalone and two Root-join cases are **UNRUN**. Actual mining/screen/profile/fleet composition and the full remaining modular catalogue are open. Published previews and profiles are unchanged.
-
-## Paid missile source awaiting execution
-
-The [paid standard missile core increment](docs/PAID-MISSILES.md) authors actual 180 CR purchase, nine-position SH025 fitting, same-item storage/refit and retained later launches with explicit current-format saves. Its new tests and runtime qualification are **UNRUN**. It is the first increment toward the required full modular equipment system; that broader system, docked screen integration and all-hull compatibility remain open. Published previews and their profiles remain unchanged.
-
 ## Current delivery
 
-The signed local **Meridian Trade Lesson Preview** is published as [v0.4.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.4.0-preview.1), from qualified main `8da5d64` ([PR 33](https://github.com/stephenlclarke/meridian/pull/33)). It adds the [navigation and trade lesson](docs/NAVIGATION-TRADE.md): actual commodity purchase, fuel-debited journeys, destination sale, physical return and separate zero-cash reception. It retains flight, physical docking, seventeen-commodity trading, original G02 freight, cargo equipment, Pulse fire, finite missiles and the [flight lesson](docs/FLIGHT-RECEPTION.md). Published saves use v11 with explicit v4-v10 readers.
+[Meridian Cockpit Services Preview v0.5.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.5.0-preview.1) is published for macOS arm64 and Windows x64 from protected main `07f1678` ([PR 37](https://github.com/stephenlclarke/meridian/pull/37)). It adds the flight HUD, galaxy, system, showroom, trading and equipment pages, keyboard and mouse navigation, presented transaction reviews, same-item modular storage/refitting and paid standard missiles. It retains the earlier flight, docking, finite markets, freight and lessons. This is the initial modular equipment increment; the full equipment catalogue and all-hull fitting remain open.
 
-Start the installed app with `~/Applications/Launch Meridian Trade Lesson Preview.command`. It uses its separate `Library/Application Support/Meridian Trade Lesson Preview/saves-v11` directory. Downloaded packages use the adjacent `saves-v11` directory. Keep the app, launcher, notices and save folder together, and keep earlier previews and profiles separate. The macOS app is Developer ID signed but not notarized. After a blocked first launch, use **System Settings → Privacy & Security → Open Anyway**, as described in [Apple's instructions](https://support.apple.com/en-us/102445).
+Start the installed Mac preview with `~/Applications/Meridian Cockpit Services Preview - 07f1678/Launch Meridian.command`. Downloaded packages use the adjacent launcher and isolated `saves-v13` directory. Keep the app, launcher, notices and save folder together. Keep earlier previews and profiles separate. The extracted Mac app is Developer ID signed but not notarized. After a blocked first launch, use **System Settings → Privacy & Security → Open Anyway**, as described in [Apple's instructions](https://support.apple.com/en-us/102445).
 
-The qualified Food journey bought at 22.6 CR, sold at 19.6 CR and paid 6.8 CR for fuel: a real loss of 9.8 CR, with no tutorial payment. The complete journey belongs to compiled source `bb5862b`; the later `c3a71e9` correction separately passed the current invalidated-plan hint smoke. Three held/sold/completed cold Save/Quit/Continue pairs and four real writer refusals were audited. Current corrected Mac and native Windows qualification passed 254 Rust tests, 74 Python tests, strict Clippy and release builds. The earlier Linux full-journey source passed the same test counts; no corrected-source Linux run is implied.
+Mac, Dell Linux and native Windows each passed 372 top-level Rust tests and 88 Python tests, strict workspace Clippy and fresh locked release builds. Actual Mac qualification covered all five docked pages, keyboard/mouse, trade and modular reviews, refusal paths, nine missile indicators, flight views, failed-save preservation and Save/Quit/cold Continue. Main CI and exact-main Sonar passed with zero open findings. Compiled `beab907` and tagged main share 194 identical tracked files; two Markdown files differ. This is not a main rebuild or a repeated full journey.
 
-Tagged main `8da5d64` has 145 of its 148 tracked code/test/dependency/asset files byte-identical to compiled `c3a71e9`; only three Markdown files differ. Exact-main CI and Sonar passed with zero open issues. The separate installed title/render/normal-close smoke passed without creating a commander. Both public downloads, full payload inventories, the extracted Mac signature and annotated tag were independently verified. Only the newest three previews are retained.
+All four public assets were downloaded anonymously and checked. The complete extracted Mac and Windows inventories and Mac signature were verified. The immutable annotated tag and release receipt are retained. The newest three previews are v0.5, v0.4 and v0.3. Windows is unsigned, requires the Visual C++ x64 runtime, and has no observed native interactive gameplay qualification.
 
-This is a functional preview. The next HUD/menu/modular-equipment candidate is still under development and is not part of this published binary. Full game, fleet, missions, memory, window/focus, frame timing/race, notarization and commercial acceptance remain open. Windows is unsigned and requires the Visual C++ x64 runtime; native interactive Windows gameplay is unobserved. See [implementation status](docs/IMPLEMENTATION-STATUS.md).
+Full game, fleet, missions, memory, window/focus, frame timing/race, notarization and commercial acceptance remain open. See [implementation status](docs/IMPLEMENTATION-STATUS.md).
+
+## Qualified NPC development
+
+The [finite traffic increment](docs/NPC-TRAFFIC.md) at `bd506f9` has passed independent source review, all three owned platform qualifications and a bounded native Metal journey. Each platform passed 460 top-level Rust tests (288 core, 169 desktop and three explicit observer cases), 88 Python tests, strict Clippy and a fresh release build. All five hosted PR checks passed on that exact source.
+
+Actual Mac play showed SH025 traders and pirates, scanner contacts and four selected camera views, two paid player-owned missile impacts, incoming NPC Pulse damage, safe/unlock controls, physical docking and normal Save/Quit/fresh-process Continue. Cash, Food and finite ammunition persisted; the complete 18-line public state projection matched across cold Continue. This candidate is awaiting protected integration, exact-main quality checks and a new verified release; v0.5 remains the public preview.
+
+Successful player Pulse contact, an NPC kill and more than three actual projectiles were not observed in this native journey. Police, miners, bounty hunters, aliens, AI constructs and NPC-owned missile launch producers remain open, as do full original 1337 visual/gameplay parity and additional hull acceptance. Private save format 15 refuses draft 14 and retains explicit published readers; earlier previews and real commander profiles stay separate.
 
 ## Play
 
@@ -58,7 +58,7 @@ N starts a commander; C continues. A second N confirms replacing the current com
 | M; [ / ]; G/H | Market; commodity selection; buy/sell one native unit |
 | O; K; U; Y | Equipment panel; buy/fit cargo bay; store; refit |
 | I; V; X | Mission details; review all held freight deliveries; review abandonment |
-| F1; F2; F3; F4 | Next practice lock; arm/safe; launch one missile; safe/unlock |
+| F1; F2; F3; F4 | Next ship/practice lock; arm/safe; launch one missile; safe/unlock |
 | F7; F8; F10 | Review attempt closure; reception; fresh consent |
 | F6; F12; C; 0/1/2/3 | Flight lesson consent/reception; cancellation; details; view direction |
 | P; F11; F5; F9 | Pause; fullscreen; save; reload (published lesson history in v11) |
@@ -97,3 +97,43 @@ In the next-preview development candidate, `/` toggles controls help and ordinar
 The [planet and sun implementation](docs/CELESTIAL-SHADING.md) binds core-owned bodies and procedural surfaces, with swept flight safety and explicit native acceptance limits.
 
 See [docked preview qualification](docs/DOCKED-PREVIEW.md) for controls, actual tests and native results, release gates and explicit limits. XYZZY/Commander Clarke is a separate following feature.
+
+The current traffic correction yields the native station approach to an aligned inbound player and selects actual hull-surface aim points for NPC beams and player-owned missiles. It retains the player collision checks and original native first-contact geometry. The combined correction has 86 additional authored cases, all **UNRUN**; the last tested source remains `42f599c` with 223 core passes and 53 failures. Owning validation must establish the correction before another playable preview.
+
+Latest NPC qualification on `2b7b350` reached 282 core passes and four failures. The four-case follow-up changes public test piloting and format-specific fixtures while preserving collision, contact and save-history assertions; it is unrun and awaiting review. The delivered public preview remains unchanged.
+
+The next NPC core run on `4e83640` reported **284 passed, two failed**. The remaining source-only fixture work speed-matches the trader before launch and plans the return around current live NPCs and retained wrecks. The capacity and legacy cases passed in that run. Production guidance, collisions and limits remain unchanged; corrected execution is still pending.
+
+### NPC qualification: strict Clippy correction
+
+Exact `3a53949719267cd1717da71a9b8c001a13b49fdf` Mac qualification passed
+286 core and 169 desktop tests (455 top-level cases), including both previously
+failing pilot journeys. Nested cold-process summaries are not additional cases.
+The 88 Python tests, 40 Markdown files, formatting and all-target check passed.
+Strict Clippy then stopped qualification with six unique diagnostics.
+
+The following source correction only collapses four nested conditions into
+short-circuit let chains, replaces an unsigned modulo predicate with
+`is_multiple_of(4)`, and moves an unchanged test module after the existing v13
+fixture helper. No assertion, collision rule, resource or save behavior, lint
+setting or gate is weakened. The corrected source is uncompiled and untested
+until independent delta review and owning execution. Three observer example
+cases, release build, coverage, signing and native gameplay remain unrun.
+There is no new qualified preview or full 1337 parity claim.
+
+Mac qualification passed all 455 workspace Rust cases on the current NPC source, while Linux retained one checked-save failure in the seven-round case. A source-consistency correction now unifies new NPC movement and receipts on the exact native ray endpoint, with two authored unrun regressions and an independently frozen native-geometry arithmetic reference. The actual Linux failed guard and values remain unknown; this is not a verified Linux cure.
+
+### Combined endpoint and renderer correction
+
+Root composes the canonical NPC ray correction with the equivalent renderer
+let-chain fix from the actual Mac `75a88c0` Clippy failure. That Mac run passed
+455 workspace Rust tests and 88 Python tests, then failed desktop Clippy;
+observer, release and native acceptance remained unrun. Both Dell platforms
+failed the earlier seven-round cold checked-save case after 285 passing core
+tests. The actual rejecting guard and values remain unknown.
+
+The independent endpoint counterexample proves a source consistency defect,
+not the missing Dell state or a tested cure. All composed tests, compiler,
+Clippy, release and native validation remain pending on this exact correction.
+Qualified previews follow actual validation; full original 1337 visual and
+gameplay parity remains an explicit requirement.

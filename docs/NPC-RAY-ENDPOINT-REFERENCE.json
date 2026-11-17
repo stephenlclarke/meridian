@@ -1,0 +1,41 @@
+{
+  "kind": "Independent rational plane+Gram barycentric native first contact; no SUT evaluated",
+  "parentSHA256": "fb08891a8e39b6366fea412a23376fb6cd32c6047b21923e2ce66b6f931f38b5",
+  "assetSHA256": "b43418aee89564759a5db789f8efa604222a392c69a2024c7a9ed2156eff434d",
+  "nativeTriangleIndex": 0,
+  "nativeVertexIndices": [
+    11,
+    10,
+    9
+  ],
+  "originBits": [
+    "c03aafc3ba01e4c1",
+    "4008dd4589f803dc",
+    "c05021f315c5d5b8"
+  ],
+  "onceDirectionBits": [
+    "3fc0aa07bd7b7488",
+    "bfed298d8b980bee",
+    "3fd8ff0b9c392ecc"
+  ],
+  "rayDirectionBits": [
+    "3fc0aa07bd7b7489",
+    "bfed298d8b980bf0",
+    "3fd8ff0b9c392ece"
+  ],
+  "distanceBits": "4029fffffffffff7",
+  "oldPointBits": [
+    "c038fe7ef0c35aec",
+    "c0217a719eed88b2",
+    "c04db9fefdaddcb0"
+  ],
+  "nativeRayPointBits": [
+    "c038fe7ef0c35aec",
+    "c0217a719eed88b4",
+    "c04db9fefdaddcb0"
+  ],
+  "exactDistanceRational": "45732861016518656/3517912385886055",
+  "exactBarycentricU": "94276745516065628678809991621514050935952219/282830236548207919766279199717227892523179700",
+  "exactBarycentricV": "1414151182741063635371747594992830278912545343/4242453548223118796494187995758418387847695500",
+  "limits": "Math/native geometry component fixture only, not a World injection or actual Linux values. Linux failed guard/value UNKNOWN."
+}

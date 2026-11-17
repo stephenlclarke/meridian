@@ -74,7 +74,9 @@ fn refuses(world: &mut World, command: Command, error: EquipmentError) {
 // Funds come entirely from genuine original finite markets and charged public travel.
 // The independent expected cash sequence is deliberately not computed from the implementation.
 pub(in crate::flight) fn earned_world(seed: u64) -> World {
-    let mut world = World::new_commander(seed).unwrap();
+    earned_from(World::new_commander(seed).unwrap())
+}
+fn earned_from(mut world: World) -> World {
     for (quantity, expected) in [(29, 11434), (47, 18296), (75, 29042)] {
         if world.snapshot().navigation.unwrap().system != SystemId::AVENOR {
             if world.snapshot().navigation.unwrap().fuel_units < 68 {
@@ -447,8 +449,43 @@ fn original_v4_paid_and_hot_world_loads_with_no_t02_authority() {
     world
         .request_fire_front_pulse(world.snapshot().tick)
         .unwrap();
+    // The complete current scenario above really has physical NPC history. It
+    // must continue in the current format, never silently lose actors in a v4 export.
+    let current = world.save_bytes().unwrap();
+    assert_eq!(
+        crate::flight::persistence::v4_test_fixture(&world),
+        Err(crate::save::SaveError::InvalidState(
+            "physical traffic requires current format"
+        ))
+    );
+    assert_eq!(world.save_bytes().unwrap(), current);
+    let continued = World::from_save_bytes(&current).unwrap();
+    assert_eq!(continued.traffic_snapshot(), world.traffic_snapshot());
+    assert_eq!(continued.equipment_snapshot(), world.equipment_snapshot());
+    assert_eq!(
+        continued.pulse_laser_snapshot(),
+        world.pulse_laser_snapshot()
+    );
+
+    // Separately exercise the qualified v4 reader from a genuine v4 opening.
+    // This is current code executing the same paid public route with the format's
+    // real absence semantics, not old source or a discarded live NPC history.
+    let opening = World::new_commander(2411).unwrap();
+    let old_opening = crate::flight::persistence::v4_test_fixture(&opening).unwrap();
+    assert_eq!(u16::from_le_bytes([old_opening[8], old_opening[9]]), 4);
+    let legacy = World::from_save_bytes(&old_opening).unwrap();
+    assert_eq!(legacy.traffic_snapshot(), None);
+    let mut world = earned_from(legacy);
+    let _paid = purchase(&mut world);
+    world.request_launch(world.snapshot().tick).unwrap();
+    world.step(FlightInput::default()).unwrap();
+    world
+        .request_fire_front_pulse(world.snapshot().tick)
+        .unwrap();
+    assert_eq!(world.traffic_snapshot(), None);
     let v4 = crate::flight::persistence::v4_test_fixture(&world).unwrap();
     let restored = World::from_save_bytes(&v4).unwrap();
+    assert_eq!(restored.traffic_snapshot(), None);
     assert_eq!(restored.snapshot(), world.snapshot());
     assert_eq!(restored.credits_tenths(), world.credits_tenths());
     assert_eq!(restored.equipment_snapshot(), world.equipment_snapshot());

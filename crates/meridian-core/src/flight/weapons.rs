@@ -25,6 +25,7 @@ pub enum FireError {
     Overheated,
     InsufficientEnergy,
     InvalidGeometry,
+    ProtectedTraffic,
     SequenceExhausted,
 }
 impl fmt::Display for FireError {
@@ -40,6 +41,7 @@ impl fmt::Display for FireError {
             Self::Overheated => "Pulse Laser is overheated",
             Self::InsufficientEnergy => "Pulse Laser has insufficient energy",
             Self::SequenceExhausted => "Combat identity sequence exhausted",
+            Self::ProtectedTraffic => "NPC firing is outside the active lesson admission",
             Self::InvalidGeometry => "Pulse Laser could not query the physical scene",
         })
     }
@@ -48,6 +50,10 @@ impl std::error::Error for FireError {}
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum PulseContact {
+    Npc {
+        id: crate::traffic::NpcId,
+        distance: f64,
+    },
     Projectile {
         id: super::ProjectileId,
         distance: f64,
@@ -104,6 +110,17 @@ impl Default for PulseResources {
     }
 }
 impl PulseResources {
+    pub(super) fn replay_advance(&mut self, elapsed: u64) {
+        self.energy = u64::from(self.energy)
+            .saturating_add(elapsed.saturating_mul(7))
+            .min(38000) as u16;
+        self.heat = u64::from(self.heat).saturating_sub(elapsed) as u16;
+        self.cooldown = u64::from(self.cooldown).saturating_sub(elapsed) as u8;
+    }
+    pub(super) fn replay_berth(&mut self) {
+        self.energy = 38000;
+        self.heat = 0;
+    }
     pub(super) fn advance(&mut self, opening: FlightMode, next: FlightMode) {
         if opening == FlightMode::Docked {
             return;
@@ -304,14 +321,18 @@ impl World {
             .ok_or(FireError::InvalidGeometry)?
             .beam_block_distance(station, pose.position, pose.orientation.z, PULSE_RANGE)
             .map_err(|_| FireError::InvalidGeometry)?;
+        let npc = self
+            .traffic_beam_contact(pose, PULSE_RANGE)
+            .filter(|contact| distance.is_none_or(|station| contact.distance < station));
+        let solid = npc.map(|contact| contact.distance).or(distance);
         let projectile = self
-            .nearest_missile(pose, distance.unwrap_or(PULSE_RANGE))
-            .filter(|(_, d)| distance.is_none_or(|station| *d < station));
+            .nearest_missile(pose, solid.unwrap_or(PULSE_RANGE))
+            .filter(|(_, d)| solid.is_none_or(|wall| *d < wall));
         let cap = projectile.map_or(PULSE_RANGE, |(_, d)| d);
         let mut practice = self.practice;
         let hit = practice
             .as_mut()
-            .and_then(|p| p.contact_limited(self.state, pose, cap, distance));
+            .and_then(|p| p.contact_limited(self.state, pose, cap, solid));
         if let Some((id, distance, first_hit)) = hit {
             return Ok((
                 practice,
@@ -328,6 +349,25 @@ impl World {
                 practice,
                 PulseContact::Projectile { id, distance },
                 distance,
+            ));
+        }
+        if let Some(contact) = npc {
+            // Refuse before publishing a beam/resource spend through a physical celestial body.
+            if !self.traffic_beam_celestial_clear(
+                contact.id.system(),
+                self.state.tick,
+                pose.position,
+                contact.point,
+            ) {
+                return Err(FireError::InvalidGeometry);
+            }
+            return Ok((
+                practice,
+                PulseContact::Npc {
+                    id: contact.id,
+                    distance: contact.distance,
+                },
+                contact.distance,
             ));
         }
         Ok((
@@ -417,22 +457,39 @@ impl World {
             contact,
         };
         let impact = self.prepare_pulse_impact(shot)?;
+        let traffic = self.prepare_traffic_pulse(shot, impact.emission())?;
         let mut missiles = self.missiles.clone();
         if let PulseContact::Projectile { id, .. } = contact
-            && !missiles.intercept(id, self.state.tick, impact.emission(), shot)
+            && !missiles.intercept(
+                id,
+                self.state.tick,
+                impact.emission(),
+                shot,
+                self.traffic.missile_scene(
+                    self.combat_identity().ok_or(FireError::NoCommander)?.system,
+                    self.state.tick,
+                    crate::traffic::SceneStage::Command(impact.emission() - 1),
+                ),
+            )
         {
             return Err(FireError::InvalidGeometry);
         }
-        impact.commit(self)?;
-        self.missiles = missiles;
-        if let (Some(candidate), Some(current)) = (&mut practice, self.practice) {
+        let damage = impact.damage_candidate();
+        let (combat, pulse, impact_practice) = impact.resource_candidates(self.practice);
+        self.clear_missing_missile_lock(&mut missiles, &traffic, practice, pulse.alive());
+        if let (Some(candidate), Some(current)) = (&mut practice, impact_practice) {
             candidate.ordinary_hit = current.ordinary_hit;
             candidate.reception = current.reception;
-            candidate.pending_missiles = self.missiles.pending();
+            candidate.pending_missiles = missiles.pending();
         }
         if let Some(practice) = practice.as_mut() {
             practice.observe_discharge(self.state.tick);
         }
+        self.check_fire_combat_capacity(&traffic, damage, &combat, &pulse, &missiles, practice)
+            .map_err(|_| FireError::SequenceExhausted)?;
+        impact.commit(self)?;
+        self.traffic = traffic;
+        self.missiles = missiles;
         self.practice = practice;
 
         Ok(shot)

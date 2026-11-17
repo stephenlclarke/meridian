@@ -296,9 +296,7 @@ fn resealed_range_authority_and_hit_pose_changes_refuse_without_live_replacement
     let practice = world.practice.unwrap();
     let mut encoded = Writer::new();
     practice.encode(&mut encoded);
-    let start = live.len()
-        - 8
-        - 5
+    let start = crate::flight::persistence::pulse_save_start(&world, &live)
         - crate::flight::persistence::combat_save_len(&world)
         - encoded.bytes.len();
     assert_eq!(&live[start..start + encoded.bytes.len()], encoded.bytes);
@@ -346,8 +344,8 @@ fn assert_resealed_refusal(world: &mut World, live: &[u8], mut changed: Vec<u8>)
     assert_eq!(world.save_bytes().unwrap().as_slice(), live);
 }
 
-fn clear_pulse_tail(bytes: &mut [u8]) {
-    let start = bytes.len() - 13;
+fn clear_pulse_tail(world: &World, bytes: &mut [u8]) {
+    let start = crate::flight::persistence::pulse_save_start(world, bytes);
     bytes[start..start + 2].copy_from_slice(&38_000_u16.to_le_bytes());
     bytes[start + 2..start + 5].fill(0);
 }
@@ -361,7 +359,7 @@ fn practice_receipt_requires_committed_pulse_and_exact_same_tick_flight_pose() {
     shoot(&mut world);
     let live = world.save_bytes().unwrap();
     let mut tail_only = live.clone();
-    clear_pulse_tail(&mut tail_only);
+    clear_pulse_tail(&world, &mut tail_only);
     assert_resealed_refusal(&mut world, &live, tail_only);
 
     let practice = world.practice.unwrap();
@@ -377,7 +375,8 @@ fn practice_receipt_requires_committed_pulse_and_exact_same_tick_flight_pose() {
     for mutated in [mutated_opening, mutated_hit] {
         let mut bytes = Writer::new();
         mutated.encode(&mut bytes);
-        let end = live.len() - 13 - crate::flight::persistence::combat_save_len(&world);
+        let end = crate::flight::persistence::pulse_save_start(&world, &live)
+            - crate::flight::persistence::combat_save_len(&world);
         let mut inconsistent = live.clone();
         inconsistent[end - bytes.bytes.len()..end].copy_from_slice(&bytes.bytes);
         assert_resealed_refusal(&mut world, &live, inconsistent);
@@ -427,7 +426,7 @@ fn practice_hit_keeps_cooldown_floor_after_actual_hyperspace_retirement() {
     assert_eq!(world.pulse_laser_snapshot().unwrap().cooldown_ticks, 17);
     let live = world.save_bytes().unwrap();
     let mut contradiction = live.clone();
-    clear_pulse_tail(&mut contradiction);
+    clear_pulse_tail(&world, &mut contradiction);
     assert_resealed_refusal(&mut world, &live, contradiction);
     let mut continued = World::from_save_bytes(&live).unwrap();
     assert_eq!(continued.practice_snapshot(), world.practice_snapshot());

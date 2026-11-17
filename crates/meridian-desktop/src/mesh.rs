@@ -1,6 +1,8 @@
 use meridian_core::docking::{Basis3, DockingPort, RigidPose, StationPose, Vec3};
 use meridian_core::{PRACTICE_HALF_SIDE, PracticeBeaconSnapshot, PulseShot, Snapshot};
 
+pub mod traffic;
+
 #[repr(C)]
 #[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct Vertex {
@@ -237,14 +239,23 @@ pub fn append_pulse(
     output: &mut Vec<Vertex>,
 ) -> Result<(), String> {
     let camera = camera_for(snapshot, station)?;
+    append_segment(&camera, shot.origin, shot.end, output)
+}
+
+fn append_segment(
+    camera: &Camera,
+    origin: Vec3,
+    endpoint: Vec3,
+    output: &mut Vec<Vertex>,
+) -> Result<(), String> {
     let view = |world| {
         camera
             .pose
             .orientation
             .inverse_coordinates(difference(world, camera.pose.position))
     };
-    let start = view(shot.origin);
-    let end = view(shot.end);
+    let start = view(origin);
+    let end = view(endpoint);
     let extent = difference(end, start);
     let length = extent.dot(extent).sqrt();
     if !length.is_finite() {

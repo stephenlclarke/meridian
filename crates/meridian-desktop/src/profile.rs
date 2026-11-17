@@ -363,7 +363,11 @@ pub fn directory_from_args(args: impl Iterator<Item = std::ffi::OsString>) -> io
 #[cfg(target_os = "windows")]
 fn default_directory() -> io::Result<PathBuf> {
     std::env::var_os("LOCALAPPDATA")
-        .map(|p| PathBuf::from(p).join("Meridian").join("saves"))
+        .map(|p| {
+            PathBuf::from(p)
+                .join("Meridian Traffic Development")
+                .join("saves")
+        })
         .ok_or_else(|| {
             io::Error::new(
                 io::ErrorKind::NotFound,
@@ -374,7 +378,9 @@ fn default_directory() -> io::Result<PathBuf> {
 #[cfg(target_os = "macos")]
 fn default_directory() -> io::Result<PathBuf> {
     std::env::var_os("HOME")
-        .map(|p| PathBuf::from(p).join("Library/Application Support/Meridian/saves"))
+        .map(|p| {
+            PathBuf::from(p).join("Library/Application Support/Meridian Traffic Development/saves")
+        })
         .ok_or_else(|| {
             io::Error::new(
                 io::ErrorKind::NotFound,
@@ -387,11 +393,11 @@ fn default_directory() -> io::Result<PathBuf> {
     if let Some(path) = std::env::var_os("XDG_DATA_HOME").filter(|p| !p.is_empty()) {
         let path = PathBuf::from(path);
         if path.is_absolute() {
-            return Ok(path.join("meridian/saves"));
+            return Ok(path.join("meridian-traffic-development/saves"));
         }
     }
     std::env::var_os("HOME")
-        .map(|p| PathBuf::from(p).join(".local/share/meridian/saves"))
+        .map(|p| PathBuf::from(p).join(".local/share/meridian-traffic-development/saves"))
         .ok_or_else(|| {
             io::Error::new(
                 io::ErrorKind::NotFound,
@@ -1052,3 +1058,7 @@ mod trade_lesson_tests;
 #[cfg(test)]
 #[path = "profile/ammunition_tests.rs"]
 mod ammunition_tests;
+
+#[cfg(test)]
+#[path = "profile/traffic_tests.rs"]
+mod traffic_tests;

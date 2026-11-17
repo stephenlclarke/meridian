@@ -445,6 +445,7 @@ impl App {
                     MotionRefusal::CelestialContact => {
                         "Celestial contact: stopped before the physical surface"
                     }
+                    MotionRefusal::NpcContact => "NPC hull contact: stopped at last clear position",
                     MotionRefusal::StationContact => {
                         "Station contact: stopped at last clear position"
                     }
@@ -531,6 +532,7 @@ impl App {
                 && snapshot.tick.saturating_sub(shot.tick) < 5
         });
         let pulse_notice = self.pulse.map(|shot| match shot.contact {
+            PulseContact::Npc { .. } => "NPC hull struck",
             PulseContact::Clear => "Pulse fired",
             PulseContact::Projectile { .. } => "Pulse intercepted missile",
             PulseContact::StationBlocked { .. } => "Station struck | legal incident recorded",
@@ -564,10 +566,18 @@ impl App {
             None
         };
 
-        let cockpit = self
-            .game
-            .playing()
-            .then(|| crate::hud::cockpit::Cockpit::capture(&self.game.world, snapshot));
+        let traffic = self.game.world.traffic_snapshot();
+        let cockpit = if self.game.playing() {
+            match crate::hud::cockpit::Cockpit::capture(&self.game.world, snapshot) {
+                Ok(cockpit) => Some(cockpit),
+                Err(error) => {
+                    self.fail(event_loop, error);
+                    return;
+                }
+            }
+        } else {
+            None
+        };
         self.missile_bodies.clear();
         self.missile_bodies.extend(
             self.game
@@ -614,6 +624,9 @@ impl App {
                         MotionRefusal::CelestialContact => {
                             "Celestial contact: stopped before the physical surface"
                         }
+                        MotionRefusal::NpcContact => {
+                            "NPC hull contact: stopped at last clear position"
+                        }
                         MotionRefusal::StationContact => {
                             "Station contact: stopped at last clear position"
                         }
@@ -644,6 +657,7 @@ impl App {
                 &snapshot,
                 station,
                 SceneEffects {
+                    traffic: traffic.as_ref(),
                     pulse: self.pulse.as_ref(),
                     missiles: &self.missile_bodies,
                     practice: practice.as_ref().and_then(|state| state.beacons.as_ref()),
