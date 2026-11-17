@@ -39,6 +39,39 @@ fn trader(w: &World) -> crate::traffic::NpcSnapshot {
         .find(|a| a.population == Population::Trader)
         .unwrap()
 }
+fn trader_pilot(w: &World) -> crate::FlightInput {
+    let actor = trader(w);
+    let state = w.snapshot();
+    let player = crate::flight::flight_pose(state.position, state.orientation).unwrap();
+    let delta = sub(actor.pose.position, player.position);
+    let distance = length(delta);
+    // Lead the observed velocity when cutting a turn, rather than following its wake.
+    let lead_seconds = (distance / (2.0 * f64::from(crate::flight::MAX_SPEED) * 18.0)).min(1.0);
+    let goal = add(
+        actor.pose.position,
+        scale(
+            actor.pose.orientation.z,
+            actor.speed_units * 18.0 * lead_seconds,
+        ),
+    );
+    let aim = sub(goal, player.position);
+    let desired = aim.x.atan2(aim.z);
+    let yaw = player.orientation.z.x.atan2(player.orientation.z.z);
+    let error = (desired - yaw).sin().atan2((desired - yaw).cos());
+    // Match the real target speed near a 600-unit stand-off, leaving room to turn
+    // without driving into the NPC envelope and losing all pursuit speed.
+    let speed = if error.abs() > 0.3 {
+        0.0
+    } else {
+        (actor.speed_units + (distance - 600.0) / 36.0)
+            .clamp(0.0, f64::from(crate::flight::MAX_SPEED)) as f32
+    };
+    crate::FlightInput {
+        yaw: (error / (0.65 / 60.0)).clamp(-1.0, 1.0) as f32,
+        throttle: ((speed - state.speed) / (9.1 / 60.0)).clamp(-1.0, 1.0),
+        ..crate::FlightInput::default()
+    }
+}
 fn fire_npc(w: &mut World) -> MissileOrigin {
     // Follow the genuine moving actor through public controls; no position, aim ray,
     // stock or NPC state is installed. Fire within the finite homing catch-up range.
@@ -51,22 +84,18 @@ fn fire_npc(w: &mut World) -> MissileOrigin {
         let p = w.snapshot();
         let pose = crate::flight::flight_pose(p.position, p.orientation).unwrap();
         let delta = sub(actor.pose.position, pose.position);
-        let yaw = pose.orientation.z.x.atan2(pose.orientation.z.z);
-        let desired = delta.x.atan2(delta.z);
-        let error = (desired - yaw).sin().atan2((desired - yaw).cos());
-        // Face the victim before discharge. The ship must not coast across the
-        // newly guided missile's path while it turns away from the launch heading.
-        if length(delta) < 900.0 && unit(delta).unwrap().dot(pose.orientation.z) > 0.995 {
+        // Face and speed-match the observed victim before discharge. Starting
+        // below a fleeing equal-speed ship loses range that pursuit cannot recover.
+        if length(delta) < 900.0
+            && unit(delta).unwrap().dot(pose.orientation.z) > 0.995
+            && p.speed >= actor.speed_units as f32
+        {
             w.request_npc_missile_lock(Some(actor.id), p.tick).unwrap();
             w.request_missile_arm(true, p.tick).unwrap();
             return w.request_fire_missile(p.tick).unwrap();
         }
-        w.step(crate::FlightInput {
-            yaw: (error / (0.65 / 60.0)).clamp(-1.0, 1.0) as f32,
-            throttle: if error.abs() < 0.3 { 1.0 } else { -1.0 },
-            ..crate::FlightInput::default()
-        })
-        .unwrap();
+        let input = trader_pilot(w);
+        w.step(input).unwrap();
     }
     panic!("ordinary pursuit did not admit finite homing range");
 }
@@ -95,19 +124,8 @@ fn finish_npc(w: &mut World, id: ProjectileId) -> ProjectileSnapshot {
         }
         // Keep tracking the actual moving victim rather than coasting across a
         // later homing path. Real player contact still ends the missile normally.
-        let target = trader(w);
-        let state = w.snapshot();
-        let player = crate::flight::flight_pose(state.position, state.orientation).unwrap();
-        let delta = sub(target.pose.position, player.position);
-        let desired = delta.x.atan2(delta.z);
-        let yaw = player.orientation.z.x.atan2(player.orientation.z.z);
-        let error = (desired - yaw).sin().atan2((desired - yaw).cos());
-        w.step(crate::FlightInput {
-            yaw: (error / (0.65 / 60.0)).clamp(-1.0, 1.0) as f32,
-            throttle: if error.abs() < 0.3 { 1.0 } else { -1.0 },
-            ..crate::FlightInput::default()
-        })
-        .unwrap();
+        let input = trader_pilot(w);
+        w.step(input).unwrap();
     }
     panic!("finite actual projectile did not end");
 }

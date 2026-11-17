@@ -39,6 +39,215 @@ fn finish_projectile(world: &mut World, id: ProjectileId) -> ProjectileSnapshot 
     }
     panic!("finite actual projectile did not end");
 }
+// Read-only route planning for this public-control fixture. Native World admission
+// still runs on every actual step; a physical refusal fails immediately.
+fn return_segment_clear(world: &World, a: Vec3, b: Vec3) -> bool {
+    if a.z.min(b.z) < 300.0 {
+        return false;
+    }
+    let radius = world
+        .station_data
+        .as_ref()
+        .unwrap_or_else(|| panic!("native hull"))
+        .player_clearance_radius();
+    let physical = radius * 2.0 + 1.0;
+    let planning = physical + 128.0;
+    let delta = sub(b, a);
+    let squared = delta.dot(delta);
+    for actor in world
+        .traffic_snapshot()
+        .unwrap_or_else(|| panic!("traffic"))
+        .actors
+    {
+        if actor.phase == NpcPhase::Complete {
+            continue;
+        }
+        let offset = sub(actor.pose.position, a);
+        let t = if squared > 0.0 {
+            (offset.dot(delta) / squared).clamp(0.0, 1.0)
+        } else {
+            0.0
+        };
+        let closest = length(sub(add(a, scale(delta, t)), actor.pose.position));
+        let opening = length(offset);
+        if opening < planning {
+            // Escape an existing planning margin only along a separating segment.
+            if closest <= physical || sub(a, actor.pose.position).dot(delta) < 0.0 {
+                return false;
+            }
+        } else if closest <= planning {
+            return false;
+        }
+    }
+    world.celestial_snapshot().is_none_or(|scene| {
+        [scene.planet, scene.sun].into_iter().all(|body| {
+            !body.blocks_motion(
+                [a.x as f32, a.y as f32, a.z as f32],
+                [b.x as f32, b.y as f32, b.z as f32],
+                radius,
+            )
+        })
+    })
+}
+fn return_waypoint(world: &World) -> Vec3 {
+    let p = world.snapshot().position.map(f64::from);
+    let start = Vec3::new(p[0], p[1], p[2]);
+    let goal = Vec3::new(0.0, 0.0, 350.0);
+    let mut xs = vec![start.x, goal.x, start.x - 1200.0, start.x + 1200.0];
+    let mut zs = vec![start.z, goal.z, start.z + 1200.0];
+    let clearance = world
+        .station_data
+        .as_ref()
+        .unwrap_or_else(|| panic!("native hull"))
+        .player_clearance_radius()
+        * 2.0
+        + 256.0;
+    for body in world
+        .traffic_snapshot()
+        .unwrap_or_else(|| panic!("traffic"))
+        .actors
+    {
+        if body.phase != NpcPhase::Complete {
+            xs.extend([
+                body.pose.position.x - clearance,
+                body.pose.position.x + clearance,
+            ]);
+            zs.extend([
+                body.pose.position.z - clearance,
+                body.pose.position.z + clearance,
+            ]);
+        }
+    }
+    zs.retain(|z| *z >= 350.0 || *z == start.z);
+    xs.sort_by(f64::total_cmp);
+    xs.dedup();
+    zs.sort_by(f64::total_cmp);
+    zs.dedup();
+    let nodes: Vec<_> = xs
+        .iter()
+        .flat_map(|x| zs.iter().map(move |z| Vec3::new(*x, 0.0, *z)))
+        .collect();
+    let begin = nodes
+        .iter()
+        .position(|p| *p == start)
+        .unwrap_or_else(|| panic!("actual planar start"));
+    let end = nodes
+        .iter()
+        .position(|p| *p == goal)
+        .unwrap_or_else(|| panic!("aperture staging point"));
+    let mut distance = vec![f64::INFINITY; nodes.len()];
+    let mut previous = vec![None; nodes.len()];
+    let mut visited = vec![false; nodes.len()];
+    distance[begin] = 0.0;
+    for _ in 0..nodes.len() {
+        let Some(i) = (0..nodes.len())
+            .filter(|i| !visited[*i] && distance[*i].is_finite())
+            .min_by(|a, b| distance[*a].total_cmp(&distance[*b]))
+        else {
+            break;
+        };
+        if i == end {
+            let mut next = end;
+            while previous[next] != Some(begin) {
+                next = previous[next].unwrap_or_else(|| panic!("broken physical route"));
+            }
+            return nodes[next];
+        }
+        visited[i] = true;
+        for (j, node) in nodes.iter().enumerate() {
+            if i == j || visited[j] {
+                continue;
+            }
+            let candidate = distance[i] + length(sub(*node, nodes[i]));
+            if candidate < distance[j] && return_segment_clear(world, nodes[i], *node) {
+                distance[j] = candidate;
+                previous[j] = Some(i);
+            }
+        }
+    }
+    panic!("no clear physical return route around retained traffic");
+}
+fn return_step(world: &mut World, input: FlightInput, remaining: &mut usize) {
+    assert!(
+        *remaining > 0,
+        "public return route exceeded the existing 30000-step axis bound"
+    );
+    *remaining -= 1;
+    ok(world.step(input));
+    assert_eq!(world.snapshot().motion_refusal, None);
+}
+fn stop_return(world: &mut World, remaining: &mut usize) {
+    while world.snapshot().speed > 0.0 {
+        return_step(
+            world,
+            FlightInput {
+                brake: true,
+                ..FlightInput::default()
+            },
+            remaining,
+        );
+    }
+}
+fn return_to_aperture(world: &mut World) {
+    // The old axis helper allowed 30000 steps for each leg. Bound the whole planned
+    // return by that same limit, including turns, braking and replans.
+    let mut remaining = 30000usize;
+    stop_return(world, &mut remaining);
+    loop {
+        let p = world.snapshot().position;
+        if p[0].abs() < 2.0 && (p[2] - 350.0).abs() < 2.0 {
+            return;
+        }
+        let goal = return_waypoint(world);
+        loop {
+            let s = world.snapshot();
+            let pose = super::super::super::flight_pose(s.position, s.orientation)
+                .unwrap_or_else(|| panic!("player pose"));
+            let delta = sub(goal, pose.position);
+            let desired = delta.x.atan2(delta.z);
+            let yaw = pose.orientation.z.x.atan2(pose.orientation.z.z);
+            let error = (desired - yaw).sin().atan2((desired - yaw).cos());
+            if error.abs() < 1e-6 {
+                break;
+            }
+            return_step(
+                world,
+                FlightInput {
+                    yaw: (error / (0.65 / 60.0)).clamp(-1.0, 1.0) as f32,
+                    ..FlightInput::default()
+                },
+                &mut remaining,
+            );
+        }
+        let opening = world.snapshot().position.map(f64::from);
+        let axis = if (goal.x - opening[0]).abs() > (goal.z - opening[2]).abs() {
+            0
+        } else {
+            2
+        };
+        let target = if axis == 0 { goal.x } else { goal.z };
+        let sign = (target - opening[axis]).signum();
+        loop {
+            let s = world.snapshot();
+            if sign * (f64::from(s.position[axis]) - target) >= 0.0 {
+                break;
+            }
+            let a = Vec3::new(f64::from(s.position[0]), 0.0, f64::from(s.position[2]));
+            if !return_segment_clear(world, a, goal) {
+                break;
+            }
+            return_step(
+                world,
+                FlightInput {
+                    throttle: ((1.0 - s.speed) / (9.1 / 60.0)).clamp(-1.0, 1.0),
+                    ..FlightInput::default()
+                },
+                &mut remaining,
+            );
+        }
+        stop_return(world, &mut remaining);
+    }
+}
 fn fire_pirate(world: &mut World) -> MissileOrigin {
     for _ in 0..1200 {
         let target = world
@@ -140,10 +349,9 @@ fn mixed_real_npc_pulse_owned_missiles_player_pulse_and_berth_replay_cold_once()
             .last_ordinary_impact,
         None
     );
-    // Combat began 600 units beside the launch lane. Translate onto the aperture
-    // centreline in clear exterior space before the final inward half-turn.
-    // Low public lateral speed bounds braking overshoot without installing a pose.
-    fly_axis(&mut saved, 0, 0.0, 1.0);
+    // Retained wrecks cannot yield. Plan actual exterior waypoints around all current
+    // bodies before the unchanged physical docking approach.
+    return_to_aperture(&mut saved);
     assert!(saved.snapshot().position[0].abs() < 2.0);
     dock(&mut saved);
     assert_eq!(saved.snapshot().mode, FlightMode::Docked);
