@@ -6,8 +6,9 @@ use super::{
     MissileOrigin, MissileRound, MissileTarget, Motion, PracticeBeaconId, ProjectileId,
     ProjectileSnapshot, State, World, choose,
 };
-use crate::docking::{Basis3, RigidPose, Vec3};
+use crate::docking::{Basis3, RigidPose, StationPose, Vec3};
 use crate::flight::practice::lifecycle::{lesson_for_target as legacy_lesson_for_target, lessons};
+use crate::station::OriginalStationData;
 fn lesson_for_target(
     p: Option<super::super::practice::Practice>,
     h: &[super::super::practice::Practice],
@@ -20,6 +21,32 @@ use crate::flight::{OrdinaryImpact, OrdinaryTarget, OrdinaryWeapon, PulseContact
 use crate::navigation::SystemId;
 use crate::save::{Reader, SaveError, Writer};
 const INVALID: SaveError = SaveError::InvalidState("missile custody, motion or contact evidence");
+type SolidContact = (Option<f64>, Option<(f64, MissileContact)>, Option<f64>);
+
+/// Both retained homing paths query station first, then the eligible native player mesh.
+/// A tie keeps the station; the caller retains its own exact save refusal boundary.
+pub(super) fn retained_solid_contact(
+    data: &OriginalStationData,
+    station_pose: StationPose,
+    ray: RigidPose,
+    travel: f64,
+    player: RigidPose,
+    (cleared, player_alive): (bool, bool),
+    invalid: SaveError,
+) -> Result<SolidContact, SaveError> {
+    let station = data
+        .beam_block_distance(station_pose, ray.position, ray.orientation.z, travel)
+        .map_err(|_| invalid)?;
+    let best = station.map(|distance| (distance, MissileContact::Station));
+    let player_contact = if cleared && player_alive {
+        data.player_beam_distance(player, ray.position, ray.orientation.z, travel)
+            .map_err(|_| invalid)?
+    } else {
+        None
+    };
+    Ok((station, best, player_contact))
+}
+
 fn scalar(w: &mut Writer, x: f64) {
     w.u64(x.to_bits());
 }
@@ -997,21 +1024,16 @@ impl State {
             || length(sub(m.position, player.position)) > data.player_clearance_radius() + 1e-6;
         let travel = (MISSILE_SPEED / 60.0).min((MISSILE_RANGE - m.travel).max(0.0));
         let ray = pose(m.position, direction).ok_or(INVALID)?;
-        let station = data
-            .beam_block_distance(
-                world.state.station.ok_or(INVALID)?,
-                ray.position,
-                ray.orientation.z,
-                travel,
-            )
-            .map_err(|_| INVALID)?;
-        let mut best = station.map(|d| (d, MissileContact::Station));
-        if cleared
-            && m.player_alive
-            && let Some(d) = data
-                .player_beam_distance(player, ray.position, ray.orientation.z, travel)
-                .map_err(|_| INVALID)?
-        {
+        let (station, mut best, player_contact) = retained_solid_contact(
+            data,
+            world.state.station.ok_or(INVALID)?,
+            ray,
+            travel,
+            player,
+            (cleared, m.player_alive),
+            INVALID,
+        )?;
+        if let Some(d) = player_contact {
             choose(
                 &mut best,
                 d,
@@ -1502,3 +1524,6 @@ impl State {
         }
     }
 }
+
+#[cfg(test)]
+mod solid_contact_tests;

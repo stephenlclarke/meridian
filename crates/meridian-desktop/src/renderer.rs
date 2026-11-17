@@ -295,24 +295,40 @@ impl Renderer {
         self.flight_view = view;
     }
 
-    fn upload_hud(&mut self, lines: &[String], cockpit: Option<&hud::cockpit::Cockpit>) {
+    fn prepare_hud_frame(
+        lines: &[String],
+        cockpit: Option<&hud::cockpit::Cockpit>,
+        logical_viewport: impl FnOnce() -> [f64; 2],
+        physical_viewport: [u32; 2],
+        output: &mut Vec<Vertex>,
+    ) {
         if cockpit.is_some() {
-            let logical = self.size.to_logical::<f64>(self.window.scale_factor());
+            let [width, height] = logical_viewport();
             hud::vertices_with_cockpit(
                 lines,
-                logical.width.round() as u32,
-                logical.height.round() as u32,
+                width.round() as u32,
+                height.round() as u32,
                 cockpit,
-                &mut self.hud_frame,
+                output,
             );
         } else {
-            hud::vertices(
-                lines,
-                self.config.width,
-                self.config.height,
-                &mut self.hud_frame,
-            );
+            hud::vertices(lines, physical_viewport[0], physical_viewport[1], output);
         }
+    }
+
+    fn upload_hud(&mut self, lines: &[String], cockpit: Option<&hud::cockpit::Cockpit>) {
+        let size = self.size;
+        let window = &self.window;
+        Self::prepare_hud_frame(
+            lines,
+            cockpit,
+            || {
+                let logical = size.to_logical::<f64>(window.scale_factor());
+                [logical.width, logical.height]
+            },
+            [self.config.width, self.config.height],
+            &mut self.hud_frame,
+        );
         self.queue
             .write_buffer(&self.hud_vertices, 0, bytemuck::cast_slice(&self.hud_frame));
     }
@@ -522,3 +538,6 @@ impl Renderer {
         Ok(Presentation::Presented)
     }
 }
+
+#[cfg(test)]
+mod preparation_tests;

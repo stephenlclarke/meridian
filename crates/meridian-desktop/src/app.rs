@@ -513,7 +513,7 @@ impl App {
 
     fn build_docked_frame(
         active: bool,
-        renderer: Option<&Renderer>,
+        viewport: impl FnOnce() -> Option<[f64; 2]>,
         menu: Option<&mut Docked>,
         world: &World,
         elapsed: f64,
@@ -521,14 +521,26 @@ impl App {
         if !active {
             return Ok(None);
         }
-        let viewport = renderer.and_then(|r| {
-            let [width, height] = r.logical_viewport();
-            ui::Viewport::new(width, height)
-        });
+        let viewport = viewport().and_then(|[width, height]| ui::Viewport::new(width, height));
         match (menu, viewport) {
             (Some(menu), Some(viewport)) => menu.build_frame(world, viewport, elapsed).map(Some),
             _ => Ok(None),
         }
+    }
+
+    fn docked_frame(
+        &mut self,
+        elapsed: f64,
+        viewport: impl FnOnce(Option<&Renderer>) -> Option<[f64; 2]>,
+    ) -> Result<Option<ui::Frame>, String> {
+        let renderer = self.renderer.as_ref();
+        Self::build_docked_frame(
+            self.menu_active(),
+            || viewport(renderer),
+            self.docked.as_mut(),
+            &self.game.world,
+            elapsed,
+        )
     }
 
     fn redraw(&mut self, event_loop: &ActiveEventLoop) {
@@ -563,21 +575,17 @@ impl App {
                 first_hit: false, ..
             } => "Practice beacon already counted",
         });
-        let notice = pulse_notice.or(self.notice.as_deref());
-        let hud_lines = self.game.lines(active, notice);
-        let docked_frame = match Self::build_docked_frame(
-            self.menu_active(),
-            self.renderer.as_ref(),
-            self.docked.as_mut(),
-            &self.game.world,
-            elapsed,
-        ) {
+        let hud_lines = self
+            .game
+            .lines(active, pulse_notice.or(self.notice.as_deref()));
+        let docked_frame = match self.docked_frame(elapsed, |r| r.map(Renderer::logical_viewport)) {
             Ok(frame) => frame,
             Err(error) => {
                 self.fail(event_loop, error);
                 return;
             }
         };
+        let notice = pulse_notice.or(self.notice.as_deref());
 
         let traffic = self.game.world.traffic_snapshot();
         let cockpit = if self.game.playing() {

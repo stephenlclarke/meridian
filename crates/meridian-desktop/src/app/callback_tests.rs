@@ -56,6 +56,100 @@ fn paint(app: &mut App) -> Vec<String> {
 }
 
 #[test]
+fn inactive_and_unusable_menu_viewports_do_not_advance_a_frame_or_the_world() {
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    let before = ok(app.game.world.save_bytes());
+    assert!(ok(app.docked_frame(0.5, |_| panic!("inactive viewport queried"))).is_none());
+    let mut menu = ok(crate::docked::Docked::new(&app.game.world));
+    ok(menu.open(&app.game.world, ui::Screen::Trading));
+    app.docked = Some(menu);
+    for viewport in [
+        None,
+        Some([319.0, 240.0]),
+        Some([640.0, 239.0]),
+        Some([f64::NAN, 720.0]),
+        Some([640.0, f64::INFINITY]),
+    ] {
+        assert!(
+            ok(app.docked_frame(0.5, |renderer| {
+                assert!(renderer.is_none());
+                viewport
+            }))
+            .is_none()
+        );
+    }
+    let frame = ok(app.docked_frame(0.0, |_| Some([640.0, 360.0])))
+        .unwrap_or_else(|| panic!("valid frame absent"));
+    assert_eq!(frame.stamp.revision, 1);
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+    assert!(
+        ok(App::build_docked_frame(
+            true,
+            || Some([640.0, 360.0]),
+            None,
+            &app.game.world,
+            0.0
+        ))
+        .is_none()
+    );
+}
+
+#[test]
+fn app_menu_preparation_builds_the_same_actual_frame_without_committing_a_command() {
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    ok(app.game.save());
+    let before = ok(app.game.world.save_bytes());
+    let disk = ok(std::fs::read(directory.0.join("commander.meridian")));
+    let mut menu = ok(crate::docked::Docked::new(&app.game.world));
+    let mut reference = ok(crate::docked::Docked::new(&app.game.world));
+    ok(menu.open(&app.game.world, ui::Screen::System));
+    ok(reference.open(&app.game.world, ui::Screen::System));
+    app.docked = Some(menu);
+    let viewport = ui::Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));
+    let expected = ok(reference.build_frame(&app.game.world, viewport, 1.25));
+    let actual = ok(app.docked_frame(1.25, |_| Some([1280.0, 720.0])))
+        .unwrap_or_else(|| panic!("active frame absent"));
+    assert_eq!(actual, expected);
+    assert!(!actual.labels.is_empty());
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+    assert_eq!(
+        ok(std::fs::read(directory.0.join("commander.meridian"))),
+        disk
+    );
+}
+
+#[test]
+fn actual_menu_build_failure_is_returned_without_a_frame_or_world_mutation() {
+    let directory = TestDirectory::new();
+    let app = app(&directory);
+    let mut menu = ok(crate::docked::Docked::new(&app.game.world));
+    ok(menu.open(&app.game.world, ui::Screen::Equipment));
+    let unowned = World::new();
+    let before = unowned.snapshot();
+    let failure = App::build_docked_frame(
+        true,
+        || Some([1280.0, 720.0]),
+        Some(&mut menu),
+        &unowned,
+        0.25,
+    );
+    assert_eq!(failure, Err("No equipment account".into()));
+    assert_eq!(unowned.snapshot(), before);
+    assert!(unowned.equipment_snapshot().is_none());
+    let recovered = ok(App::build_docked_frame(
+        true,
+        || Some([1280.0, 720.0]),
+        Some(&mut menu),
+        &app.game.world,
+        0.0,
+    ))
+    .unwrap_or_else(|| panic!("valid frame absent"));
+    assert_eq!(recovered.stamp.revision, 2);
+}
+
+#[test]
 fn active_callback_uses_held_axes_and_fire_on_actual_advanced_ticks() {
     let directory = TestDirectory::new();
     let mut app = app(&directory);

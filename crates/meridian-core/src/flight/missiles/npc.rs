@@ -388,21 +388,16 @@ impl State {
             super::super::flight_pose(m.flight.position, m.flight.orientation).ok_or(INVALID)?;
         let cleared = m.cleared
             || length(sub(m.position, player.position)) > data.player_clearance_radius() + 1e-6;
-        let station = data
-            .beam_block_distance(
-                world.state.station.ok_or(INVALID)?,
-                ray.position,
-                ray.orientation.z,
-                travel,
-            )
-            .map_err(|_| INVALID)?;
-        let mut best = station.map(|d| (d, MissileContact::Station));
-        if cleared
-            && m.player_alive
-            && let Some(d) = data
-                .player_beam_distance(player, ray.position, ray.orientation.z, travel)
-                .map_err(|_| INVALID)?
-        {
+        let (_, mut best, player_contact) = super::persistence::retained_solid_contact(
+            data,
+            world.state.station.ok_or(INVALID)?,
+            ray,
+            travel,
+            player,
+            (cleared, m.player_alive),
+            INVALID,
+        )?;
+        if let Some(d) = player_contact {
             choose(
                 &mut best,
                 d,
