@@ -60,9 +60,6 @@ impl Range {
 }
 
 impl Practice {
-    pub(in crate::flight) fn upgrade_legacy_terminal(&mut self) {
-        self.settlement = self.completed_tick().map(|_| PracticeOutcome::Complete);
-    }
     pub(in crate::flight) fn completed_tick(self) -> Option<u64> {
         self.reception.completion.map(|c| c.tick)
     }

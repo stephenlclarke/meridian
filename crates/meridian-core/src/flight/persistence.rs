@@ -607,26 +607,12 @@ fn read_practice(
     r: &mut Reader<'_>,
     version: u16,
 ) -> Result<Option<practice::Practice>, SaveError> {
-    if version == 4 {
-        return Ok(None);
-    }
-    let reception = if version >= 6 {
-        r.option(practice::reception::Reception::decode)?
-    } else {
-        None
-    };
+    let reception = r.option(practice::reception::Reception::decode)?;
     let mut practice = r.option(|r| practice::Practice::decode(r, version))?;
-    if version >= 6 {
-        match (practice.as_mut(), reception) {
-            (Some(practice), Some(reception)) => practice.reception = reception,
-            (None, None) => {}
-            _ => return Err(SaveError::InvalidEncoding),
-        }
-    }
-    if version <= 8
-        && let Some(p) = &mut practice
-    {
-        p.upgrade_legacy_terminal();
+    match (practice.as_mut(), reception) {
+        (Some(practice), Some(reception)) => practice.reception = reception,
+        (None, None) => {}
+        _ => return Err(SaveError::InvalidEncoding),
     }
     Ok(practice)
 }
