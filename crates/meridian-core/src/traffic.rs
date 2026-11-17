@@ -553,6 +553,6 @@ impl State {
 #[cfg(test)]
 impl State {
     pub(crate) fn corrupt_beams(&mut self, corrupt: impl FnOnce(&mut [TrafficBeam])) {
-        corrupt(Arc::make_mut(&mut self.shots));
+        corrupt(Arc::make_mut(&mut self.shots).as_mut_slice());
     }
 }

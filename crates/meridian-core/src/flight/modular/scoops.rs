@@ -96,6 +96,9 @@ impl World {
             .and_then(|dock| super::super::services::service_site(dock.system()))
             .map(|site| ModuleOffer {
                 kind: ModuleKind::FuelScoops,
+                slot: ModuleKind::FuelScoops.slot(),
+                equipment_units: ModuleKind::FuelScoops.equipment_units(),
+                prerequisite: ModuleKind::FuelScoops.prerequisite(),
                 price_tenths: PRICE_TENTHS,
                 required_technology: REQUIRED_TL,
                 technology: definition.offer(site).technology,
