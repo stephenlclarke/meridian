@@ -39,9 +39,13 @@ All four public assets were downloaded anonymously and checked. The complete ext
 
 Full game, fleet, missions, memory, window/focus, frame timing/race, notarization and commercial acceptance remain open. See [implementation status](docs/IMPLEMENTATION-STATUS.md).
 
-## Following NPC development
+## Qualified NPC development
 
-The [finite traffic core](docs/NPC-TRAFFIC.md) is composed on the current preview source for further development. Fifty-seven core, three host, twelve renderer, eight scanner, three session and three read-only observer cases remain authored **UNRUN**. Actual SH025 traders and pirates have finite stock, movement and contact logic; the actual SH025 renderer and scanner contacts are joined in source, while NPC Pulse damage and player-owned missiles against typed NPC targets share one resource replay and World publication. Actual NPC missile launch producers remain open. The joined source uses private format 15 with the earlier draft 14 refused; whole review and qualification remain required before release. Police, miners, bounty hunters, aliens and AI constructs retain explicit source and controller dependencies. No additional hull or NPC gameplay is accepted by this source composition. Only our verified authored content is eligible; no Elite/Oolite asset is introduced.
+The [finite traffic increment](docs/NPC-TRAFFIC.md) at `bd506f9` has passed independent source review, all three owned platform qualifications and a bounded native Metal journey. Each platform passed 460 top-level Rust tests (288 core, 169 desktop and three explicit observer cases), 88 Python tests, strict Clippy and a fresh release build. All five hosted PR checks passed on that exact source.
+
+Actual Mac play showed SH025 traders and pirates, scanner contacts and four selected camera views, two paid player-owned missile impacts, incoming NPC Pulse damage, safe/unlock controls, physical docking and normal Save/Quit/fresh-process Continue. Cash, Food and finite ammunition persisted; the complete 18-line public state projection matched across cold Continue. This candidate is awaiting protected integration, exact-main quality checks and a new verified release; v0.5 remains the public preview.
+
+Successful player Pulse contact, an NPC kill and more than three actual projectiles were not observed in this native journey. Police, miners, bounty hunters, aliens, AI constructs and NPC-owned missile launch producers remain open, as do full original 1337 visual/gameplay parity and additional hull acceptance. Private save format 15 refuses draft 14 and retains explicit published readers; earlier previews and real commander profiles stay separate.
 
 ## Play
 

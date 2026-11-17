@@ -1,6 +1,6 @@
 # Reciprocal NPC missile source
 
-This began as G3 `9cae3a8` author source from exact composed base `27b212f86350ef5040c12b2456851c62064b4306`. It is uncompiled, unreviewed and unqualified. Twelve new tests are authored **UNRUN**. No compiler, Cargo, Clippy, native, GPU or app job was started. Prior rapid-laser, XYZZY, mining and energy author branches remain separate.
+The complete `bd506f9` composition passed source review, 460 top-level Rust tests on each of Mac/Linux/native Windows, strict Clippy, release builds and bounded actual Metal missile/damage/docking/cold Continue qualification. The current source and native limits are recorded in [implementation status](IMPLEMENTATION-STATUS.md). Protected integration, exact-main Sonar and the next public release remain pending. These are player-owned missiles against actual NPCs; NPC-fired missile producers remain open.
 
 ## Behavior
 
@@ -16,17 +16,17 @@ Active T01/T04/T02 or held freight retains its existing protection. A stale, pau
 
 Launch, final motion, target-loss and interception retain typed native scenes. Load checks real identities and scene membership, local/world clock bounds, planar native poses and reachability envelopes, phase/liveness, actual nearest native contact, exact item/origin/contact matching and one-to-one reciprocal damage. The NPC pools replay from generated fresh resources across all retained source fires, Pulse contacts and missile contacts, including exact capped recharge, heat/cooldown, shield absorption, hull damage and overkill. A separate scalar damage allowance cannot replace that chronology.
 
-A retained native scene is not a reconstruction of every historical NPC/player/homing movement input. Base 27b does not retain that complete input stream. Coherent rewriting of an entire historical scene and all related fields is not authenticated by a checksum. Historical player liveness must use the single shared player journal; this branch only adds the current live-player/same-berth refusal to its NPC segment checks. Do not claim complete trajectory provenance, arbitrary-save tamper resistance, public NPC gameplay or seven-population acceptance.
+A retained native scene is not a reconstruction of every historical NPC/player/homing movement input. Base 27b does not retain that complete input stream. Coherent rewriting of an entire historical scene and all related fields is not authenticated by a checksum. Historical player liveness must use the single shared player journal; this branch only adds the current live-player/same-berth refusal to its NPC segment checks. Do not claim complete trajectory provenance, arbitrary-save tamper resistance or seven-population acceptance. The observed native journey has the explicit bounded scope recorded above.
 
-The author proposes format 15 with explicit typed target/scene/receipt fields. Private draft 14 is refused, not migrated. The qualified version 4-11 and 13 readers keep their exact content boundaries and absent traffic. The v13 fixture uses its original field encoders instead of slicing a newer incompatible payload. Only the current-writer assertion changes; historical v13 assertions remain 13. Root chooses the final combined content boundary/profile/observer mapping.
+The current writer uses private format 15 with explicit typed target/scene/receipt fields. Private draft 14 is refused, not migrated. The qualified version 4-11 and 13 readers keep their exact content boundaries and absent traffic. The v13 fixture uses its original field encoders instead of slicing a newer incompatible payload. Only the current-writer assertion changes; historical v13 assertions remain 13. Profile and the read-only observer use that same combined boundary.
 
 ## Current Root composition
 
-Root has joined this packet with MC1 `159c576`, the real HUD/scanner/renderer/host and read-only observer. One NPC replay uses local/world/phase/sequence ordering, including actual NPC-to-player source fires and 16000 missile hits. The one player journal consumes all genuine retained missile impacts, with actual berth resets. `resource_clock` supplies the end state; there is no duplicate standalone completion clock. One receipt count includes actor beams, player hits and missile hits. Session/App and HUD use actual typed lock/arm/fire state; missing targets clear before publication. The final current writer/content boundary is private15; draft14 refuses and the explicit published4-11/13 readers stay unchanged. The implementation and all joined tests remain **UNRUN**, pending one whole review and owning qualification. The table below retains the source contracts used for the serial join.
+Root has joined this packet with MC1 `159c576`, the real HUD/scanner/renderer/host and read-only observer. One NPC replay uses local/world/phase/sequence ordering, including actual NPC-to-player source fires and 16000 missile hits. The one player journal consumes all genuine retained missile impacts, with actual berth resets. `resource_clock` supplies the end state; there is no duplicate standalone completion clock. One receipt count includes actor beams, player hits and missile hits. Session/App and HUD use actual typed lock/arm/fire state; missing targets clear before publication. The final current writer/content boundary is private15; draft14 refuses and the explicit published4-11/13 readers stay unchanged. The joined implementation and tests passed the exact-source qualification recorded above. The table below retains the combined source contracts.
 
 ## Exact serial join with MC1
 
-Read MC1 frozen `159c5761573ea02d263d9a4f36585b321057ac4a`, tree `a0e6286af0423320c3d98e0d829005d8d5ea28e5`, packet SHA-256 `0790410a0628822febdd057ae2ce045ef2ee809c76514d9b5a354f9b23adf643`. This is an actual implementation, not an invitation to rebuild its journal. Root owns these shared hunks and retains current renderer/scanner/host/observer changes. Apply the exact author delta surgically; do not replace shared files wholesale.
+The integration retains MC1 frozen `159c5761573ea02d263d9a4f36585b321057ac4a`, tree `a0e6286af0423320c3d98e0d829005d8d5ea28e5`, packet SHA-256 `0790410a0628822febdd057ae2ce045ef2ee809c76514d9b5a354f9b23adf643`. Root joined these shared hunks while retaining renderer/scanner/host/observer changes; this provenance is not authority to overlay older files.
 
 | Shared source | Required combined behavior |
 | --- | --- |
@@ -41,9 +41,9 @@ Read MC1 frozen `159c5761573ea02d263d9a4f36585b321057ac4a`, tree `a0e6286af04233
 
 T02 remains ProtectedTraffic. MC1's actual NPC attacker never becomes an ordinary station incident or a synthetic practice beacon. Real police deployment and the other population gates remain unchanged.
 
-## Authored cases and execution preparation
+## Automated acceptance cases
 
-All twelve following cases are **UNRUN**, including their cold/restore checks. Public positive fixtures use actual new commanders, paid station ammunition, real launch/flight/pursuit, actual generated trader identity and ordinary commands. No positive installs NPCs, player poses, credits or inventory. Geometry/resource component cases are labelled as such; the capacity-negative fixture deliberately duplicates an actual receipt and is not called a loadable gameplay history.
+The following cases are included in the passing core suites, including their cold/restore checks. They are automated observations, distinct from native gameplay. Public positive fixtures use actual new commanders, paid station ammunition, real launch/flight/pursuit, actual generated trader identity and ordinary commands. No positive installs NPCs, player poses, credits or inventory. Geometry/resource component cases are labelled as such; the capacity-negative fixture deliberately duplicates an actual receipt and is not called a loadable gameplay history.
 
 | Case | Required observation |
 | --- | --- |
@@ -60,44 +60,11 @@ All twelve following cases are **UNRUN**, including their cold/restore checks. P
 | Native scene codec | Stage, identities and exact native poses round-trip; missing/duplicate/tilted scene data refuses. |
 | Decoder/cap constants | Combined proof count includes missile hits, over-budget decode refuses, and 128/65536 limits remain exact. |
 
-Existing executor owners must compile this exact composed source, run the affected core suites and required checks, and preserve real failures without unchanged retries. Two additional whole-join criteria are mandatory: mixed missile/NPC-Pulse/player-Pulse/berth chronology agrees with the one journal across cold Continue, and a valid near-full composed save refuses the next growing scene/contact atomically. Root must exercise these actual combined criteria; standalone arithmetic or malformed-history cases do not prove them. Existing practice missile, ammunition custody, ordinary impact, traffic economics, T01/T04 and historical-reader assertions remain required.
+The complete suites also exercise the mixed missile/NPC-Pulse/player-Pulse/berth journal and a semantically valid near-full save refusing the next growing scene atomically. Existing practice missiles, ammunition custody, ordinary impact, traffic economics, T01/T04 and explicit historical-reader assertions remain required. Public positive fixtures use real commands and geometry; component and negative fixtures do not become gameplay witnesses.
 
-After one independent whole-source review and exact committed-source qualification, the existing platform owners qualify real rendered NPC locks, fire/contact/damage, destruction, ordinary pause/dock behavior and process-level Save/Quit/Continue. Source parsing and test declarations do not grant native, protected-merge, release or gameplay acceptance.
+Actual Metal play separately observed two purchased missile impacts, incoming NPC Pulse damage, F4 safe/unlock, physical docking and identical cold continuation. Successful native player Pulse contact, NPC destruction and more than three actual projectiles remain unobserved. No kill award, salvage or NPC-fired missile producer is claimed. Full original 1337 visual/gameplay parity remains required.
 
-The first whole review of `003a906` was **NOT CLEAR**. The corrected source removes a duplicate incoming-missile adapter, completes the two test contexts, distinguishes retained destroyed freight from usable cargo without inventing loot, and rejects celestial-obstructed NPC Pulse commands before beam/resource publication. Retained traffic beams use the same real planet/sun guard on load. One additional actual-scene component regression is authored **UNRUN**; it is not an actual flight witness. The complete source now has 76 additional authored cases, all **UNRUN**, pending delta review and owning qualification. Real NPC missile launch/emission producers remain open: the implemented missiles are player-owned, including genuine self-hit replay, and NPC attacks use Pulse beams.
-
-The actual SH025 geometry has an open fore/aft model-origin ray. The correction guides player-owned missiles toward a verified native triangle instead; runtime guidance and retained projectile validation call the same `player_missile_aimpoint` method. MC1's generalized implementation is selected once, with a planar wrapper for NPC Pulse aim. Native first-contact geometry, competitors, speed, lifetime, travel limit, damage and reciprocal receipt assertions remain unchanged. The mandatory mixed test now observes every owned projectile through the public iterator rather than an older first-three projection, retaining the same 500-step bound and all contact/destruction/cash/cargo/berth assertions. G3's three new regressions and the complete correction remain **UNRUN**. NPC-fired missile launch producers remain open.
-
-Four-case follow-up: the actual `2b7b350` core result was 282 PASS / 4 FAIL. The missile fixtures now require a closer public firing alignment, track the actual trader through public yaw/throttle while a missile is active, and translate onto the docking centreline before approaching the native aperture. A real self-hit or station contact still fails the unchanged assertion. The capacity-negative fixture queries a real native surface before testing proof exhaustion. The same 500-step projectile bound and all contact/damage/accounting/berth assertions remain; these changes are **UNRUN** pending combined review and owning qualification.
-
-## Interception and obstacle-aware return after 4e83640
-
-The next actual run of `4e83640999fb890de6af27d2081a7fde298818b6` reported 284 passing and two failing core cases out of 286 in 29.56 seconds. The 50465-byte raw log has SHA-256 `33df65c56b10c18eed0c8fa159b3ff1ab2dc8a297fb941a3a21950e239472004`. The capacity negative and legacy-reader regression passed. The seven-round pilot failed its original 12000-tick range admission, and the mixed return hit an actual NPC body during the straight lateral transfer. These failures remain evidence; this new correction is not a tested cure.
-
-The source gives the speed mismatch directly: both the player and a fleeing trader top out at 34.3 speed units. A launch from a slower pursuit state can leave a gap that direct pursuit cannot recover while the trader flees. The fixture now waits until the player matches the observed target speed before launch, with the original 900-unit distance and 0.995 alignment gates. Its public yaw/throttle controller leads the actual observed velocity through turns and matches speed near a 600-unit stand-off, rather than driving into the NPC clearance envelope and losing pursuit speed. Runtime player/NPC speed, missile guidance/speed/range/lifetime and all original damage/custody/contact requirements are unchanged. Pursuit remains 12000 ticks and projectile completion remains 500 ticks.
-
-The return source previously assumed a clear straight path to X=0. The fixture now builds a small finite waypoint graph from the current traffic poses, including every retained wreck, and the actual hull-derived separation. It chooses clear planar segments in the station exterior and avoids the real planet/sun spheres. A planning-only margin allows low-speed braking and replanning if live traffic enters a leg. That margin does not change any World collision volume. If the start lies inside that planning margin, only a physically clear separating segment is admitted. Completed/berthed identities follow the existing native solid-state rule; destroyed actors always remain obstacles. No actor, collision, resource history or receiving fact is inserted, removed or rewritten.
-
-Every actual route frame uses public yaw/throttle/brake and asserts `motion_refusal == None`, including turning and braking. A native refusal still fails the fixture immediately. The entire return, including replans, has the same 30000-tick limit previously allowed for each axis leg. Exterior staging is X=0/Z=350, with the original lateral-error assertion and original 9000-step docking helper. Actual station aperture, self-hit, player/NPC contact, all original cash/cargo/destruction/berth/cold assertions and the passing near-full journal case remain unchanged.
-
-Only the two fixture files and documentation change. No cases are added or skipped, no original assertion is relaxed, and all production/shared aim/traffic geometry/journal/codec/assets/dependencies/caps stay byte-exact against tested 4e83640. Prior 343f761, b4f3279 and failed snapshots remain frozen. Root must join these exact fixture afterimages without overwriting newer geometry review work, complete one whole-delta review and schedule the designated changed executor. Compiler/tests/probes/Clippy/native/app execution remains **UNRUN** for this correction.
-
-### NPC qualification: strict Clippy correction
-
-Exact `3a53949719267cd1717da71a9b8c001a13b49fdf` Mac qualification passed
-286 core and 169 desktop tests (455 top-level cases), including both previously
-failing pilot journeys. Nested cold-process summaries are not additional cases.
-The 88 Python tests, 40 Markdown files, formatting and all-target check passed.
-Strict Clippy then stopped qualification with six unique diagnostics.
-
-The following source correction only collapses four nested conditions into
-short-circuit let chains, replaces an unsigned modulo predicate with
-`is_multiple_of(4)`, and moves an unchanged test module after the existing v13
-fixture helper. No assertion, collision rule, resource or save behavior, lint
-setting or gate is weakened. The corrected source is uncompiled and untested
-until independent delta review and owning execution. Three observer example
-cases, release build, coverage, signing and native gameplay remain unrun.
-There is no new qualified preview or full 1337 parity claim.
+Earlier failed qualifications and their exact limits are retained in [implementation status](IMPLEMENTATION-STATUS.md) and immutable external raw evidence. Changed fixture pilots pursue using real controls and avoid actual hull/celestial obstacles; original assertions, 12000-tick pursuit, 500-step projectile bound, native aperture and collision rules remain unchanged. No failure is cleared retroactively by a later pass.
 
 ## Canonical native ray endpoint consistency
 
@@ -107,23 +74,8 @@ The source nevertheless contains a concrete arithmetic inconsistency. `advance_p
 
 The independent [frozen reference](NPC-RAY-ENDPOINT-REFERENCE.json) was generated before SUT evaluation from the admitted binary mesh, exact rational plane intersection and Gram-matrix barycentrics, plus explicit binary64 rounding. It identifies native triangle 0 `[11,10,9]`, a positive interior first contact within 13.2, and two distinct endpoint bit patterns. The original external freeze SHA-256 is `6f4c32c3d8f822ec4bf6b5b9acde5a46b04d5d942f47e0e4413a744672623e42`. This is a mathematical/native geometry component witness, not a World pose/history injection or the unrecovered Linux failure values. Reference scripts and the earlier generic-step reference are retained in the source packet.
 
-New NPC-target motion and any actual NPC contact now derive their endpoint from the exact ray used for native query. Native NPC replay uses that same ray for obstruction, player facing and endpoint, while reciprocal point equality, first-contact ordering, item identity and damage/resource conservation stay exact. The qualified practice graph retains its original endpoint expression when no NPC contact occurs; public older readers have absent traffic and no typed NPC target. The private format-15 rules marker becomes `npc-missiles/canonical-native-ray-v3`; no payload field, qualified 4-11/13 marker, synthetic baseline or draft migration is added. Root must preserve the marker hunk while joining its separate renderer let-chain fix.
+New NPC-target motion and any actual NPC contact now derive their endpoint from the exact ray used for native query. Native NPC replay uses that same ray for obstruction, player facing and endpoint, while reciprocal point equality, first-contact ordering, item identity and damage/resource conservation stay exact. The qualified practice graph retains its original endpoint expression when no NPC contact occurs; public older readers have absent traffic and no typed NPC target. The private format-15 rules marker becomes `npc-missiles/canonical-native-ray-v3`; no payload field, qualified 4-11/13 marker, synthetic baseline or draft migration is added. The composition retains that marker and the separate equivalent renderer let-chain correction.
 
-One new regression uses frozen binary64 bits and independently derived native geometry to demonstrate the old endpoint difference and the canonical endpoint. Its mathematical native-raycast accuracy comparison has a test-only tolerance; runtime receipt/point equality gains no tolerance. A second new public-command regression produces a genuinely paid native NPC hit, compares its actual stored point with native query and receipt, and checks cold save/continue equality. The original seven-round case also compares each real native endpoint before its existing cold step. No positive installs a World pose, NPC, item, resource history or accepted receipt. All prior assertions remain, and the new source tests are **UNRUN**.
+One new regression uses frozen binary64 bits and independently derived native geometry to demonstrate the old endpoint difference and the canonical endpoint. Its mathematical native-raycast accuracy comparison has a test-only tolerance; runtime receipt/point equality gains no tolerance. A second new public-command regression produces a genuinely paid native NPC hit, compares its actual stored point with native query and receipt, and checks cold save/continue equality. The original seven-round case also compares each real native endpoint before its existing cold step. No positive installs a World pose, NPC, item, resource history or accepted receipt. All prior assertions remain; both new regressions passed on all three owned platforms.
 
-This correction is based on exact `75a88c06809fdd96d5dacd03645f1cb5dc1dae5a`, preserving the core Clippy changes. No renderer, dependency, asset, control pilot, source lifetime/range/speed, shield/hull rule, 128-proof bound or 64 KiB cap changes. No compiler/test/probe/native job is authorized for this author. Root bundles one whole-delta review, then designated changed qualification must establish actual platform outcomes. If Linux still fails, the minimal missing evidence is the exact validator guard, projectile/tick/end-state and relevant floating bit patterns; do not infer a cure from Mac passes.
-
-### Combined endpoint and renderer correction
-
-Root composes the canonical NPC ray correction with the equivalent renderer
-let-chain fix from the actual Mac `75a88c0` Clippy failure. That Mac run passed
-455 workspace Rust tests and 88 Python tests, then failed desktop Clippy;
-observer, release and native acceptance remained unrun. Both Dell platforms
-failed the earlier seven-round cold checked-save case after 285 passing core
-tests. The actual rejecting guard and values remain unknown.
-
-The independent endpoint counterexample proves a source consistency defect,
-not the missing Dell state or a tested cure. All composed tests, compiler,
-Clippy, release and native validation remain pending on this exact correction.
-Qualified previews follow actual validation; full original 1337 visual and
-gameplay parity remains an explicit requirement.
+The correction is based on exact `75a88c06809fdd96d5dacd03645f1cb5dc1dae5a`, preserving the core Clippy changes. No dependency, asset, control pilot, lifetime/range/speed, shield/hull rule, 128-proof bound or 64 KiB cap changes. The composed `bd506f9` adds the equivalent renderer let-chain fix and passed the qualification recorded above. The earlier Dell failed validator guard and values remain unknown; the source proof and current pass do not reconstruct them.
