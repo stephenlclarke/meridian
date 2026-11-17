@@ -1,0 +1,141 @@
+{
+  "status": "AUTHORED_UNRUN",
+  "parentAuthorHead": "6c9fcb1cf5fa929d0f5d3fe32e8a98331af55235",
+  "qualifiedFocusedParentRoot": "a6a5a010ee058a3f490d2b57f575484e950b7deb",
+  "qualifiedFocusedParentTree": "ef7d8d2b2471c0de2facf29a425ee02961514981",
+  "qualifiedFocusedParent": {
+    "Rust": 45,
+    "host": 9,
+    "check": "PASS",
+    "strictClippy": "PASS",
+    "devBuild": "PASS",
+    "wholeFive": "UNRUN;NOT_AUTHORIZED_FOR_THIS_CHANGE"
+  },
+  "parentAuthorPinsVerified": 209,
+  "actualOriginalParentRoot": "ddf06586c81c2ffe3c63357bb417fcd439870791",
+  "actualOriginalParentTree": "82a20cbc47f91433360e0e5072ab1bbb6e350d9c",
+  "actualOriginalCounts": {
+    "decodePass": 5,
+    "storageRefused": 2,
+    "operationsRefused": 3,
+    "dependentUnrun": 15,
+    "candidates": 0,
+    "admissions": 0
+  },
+  "actualParentFocusedHandoffSHA256": "497397cc88e559bbc6844210ac1e4917596fa67aca6230d0f54333e8b72d1d54",
+  "focusedArchive": {
+    "sha256": "279782f953ceb6205262f81f5ce3b5b7c9d9e4cd026a9d1ac799cbcbb6ab3880",
+    "bytes": 55647,
+    "files": {
+      "BUILD-START.json": {
+        "sha256": "e07f19d7c2b42ecdb6f9fbcdf17bcdeae1d128cf71165318d776bd985b9d0e23",
+        "bytes": 1439
+      },
+      "BUILD-TERMINAL.json": {
+        "sha256": "c68874749135c1a057e44f35fc6d433b0387a070ac3872fe0c27ab66aaa7c937",
+        "bytes": 473
+      },
+      "CARGO-TOOLS.json": {
+        "sha256": "350acebee37308bd8958f99e09490b6b758dcc882f623004314146bfef23e3c8",
+        "bytes": 522
+      },
+      "CHECK-START.json": {
+        "sha256": "3ed7fc54efb37d794cf6ca209f92afc51597833c5a2468bd84a8a79a047348e9",
+        "bytes": 1426
+      },
+      "CHECK-TERMINAL.json": {
+        "sha256": "8bf2f85ffc22c57bb69c803d670563b4c61a185a11c17394330b636756d3b338",
+        "bytes": 473
+      },
+      "CLIPPY-START.json": {
+        "sha256": "d51ef90a9a70240b64644a6d81702a2a7091ceebfbeee04ca373c529b4ba976e",
+        "bytes": 1464
+      },
+      "CLIPPY-TERMINAL.json": {
+        "sha256": "2a180458b7c69edf130e713fc95fd245484650e665e3ba7f519d6672d71b4fc0",
+        "bytes": 475
+      },
+      "FOCUSED-RESULT.json": {
+        "sha256": "94b7c494453dd2ffa99012f6e9213f16ebbb85a021fbe1dafc987887dc0162e1",
+        "bytes": 1990
+      },
+      "GEOMETRY-FOCUSED-HANDOFF.json": {
+        "sha256": "497397cc88e559bbc6844210ac1e4917596fa67aca6230d0f54333e8b72d1d54",
+        "bytes": 5292
+      },
+      "HOST-START.json": {
+        "sha256": "d1fddcb0fbdea1072b2f329b44e2375a90439ac7ba922ee0aa288eab3c3298d3",
+        "bytes": 1494
+      },
+      "HOST-TERMINAL.json": {
+        "sha256": "5007117cc487d1e735ef6e51c0fbc996c63cab1211b3449ad2466af85850aceb",
+        "bytes": 471
+      },
+      "ROOT-SOURCE.json": {
+        "sha256": "5e7a26168ce5e893fb3ccd0fcacf6fecd0ec301b3e49685308e3aae09cc75054",
+        "bytes": 89810
+      },
+      "RUSTC-TOOLS.json": {
+        "sha256": "cc0a1022479e988049d892b85c503c72825fecf1bad7c6e0b0ffb047c0a561f5",
+        "bytes": 410
+      },
+      "SOURCE.json": {
+        "sha256": "6b6804046e0d88d4b1d7dfe25d507d59c49ceb139860b79bb95fe3902fe87c24",
+        "bytes": 63710
+      },
+      "TEST-START.json": {
+        "sha256": "d33518e3b329efdfb6331d2a0861198cf71ddd7e413af73ac1873ea835a32083",
+        "bytes": 1432
+      },
+      "TEST-TERMINAL.json": {
+        "sha256": "13a0aeb3f4d4e62eeaf70640aafd9f8d660c5afeabb378be218b8da4a40d404b",
+        "bytes": 472
+      },
+      "build.log": {
+        "sha256": "59639588a6f1826f129cbcd121edc07279dab94786f5fa5bde6b3439b2e845cc",
+        "bytes": 72
+      },
+      "check.log": {
+        "sha256": "1f1c95fb0967e0f0124dfb930ed6f94f51b993f8f93ed9150d57af1e8d33c9da",
+        "bytes": 198
+      },
+      "clippy.log": {
+        "sha256": "583637a1fbd744db1958b03ae42dcf17f433007a0bea5ce17c65602330a92e78",
+        "bytes": 198
+      },
+      "host.log": {
+        "sha256": "15f6dc6580ba907260e8900ada5bd0cb38044dfc7c956968f3af599fcf0ebd12",
+        "bytes": 107
+      },
+      "test.log": {
+        "sha256": "421f55ec96ad3b58d02443c75aacab01cb44f5a2173d49cacfefe38bc8ae328f",
+        "bytes": 13825
+      }
+    }
+  },
+  "lastActualOriginalEvidence": "../identity-lifetime/PARENT-WHOLE-FIVE.tar.gz; immutable retained evidence and timings",
+  "lastActualOriginalMatrixSHA256": "735e683c726cbb8ab0ee8b101b1f4ac7a02f5623e14a66eb0eeb032c77293f71",
+  "sourceCaseMatrixSHA256": "7c14bd55cdecfc3a22057ea38b5cc1bd852af5a60d428849248dcd51a535d9bb",
+  "beforeSUTFreezeSHA256": "b6ba008ed4ca8ab72305a85dd1904e83f7ca4cfcb5c910bcf22680ec971443cf",
+  "algorithmSHA256": "d90ea45601f0d267eaa7a08864f6698ddf4bfc2985aff29671ab0c36954aa53c",
+  "sourceCorrection": "Verify ascending owner runs once and audit unchanged borrowed slices in the same exact order; fall back to the prior stream on inversion before any owner audit. Replaces two exact charged full-list scans per owner. Unchanged original semantics, inputs, strict work/storage assertions and caps.",
+  "storageAccounting": "M+8 scoped run endpoints; no copied facet refs on ordered path; endpoint reservation drops before identity map release and later geometry. Exact/one-short tested in new unrun fixture.",
+  "knownBeforeAllActualCutoffs": "Old 2MN topology collector scan charges occurred before observed refusal source markers; new N+M charges remove 71467/71467/56287 for the three Operations cases. Source-derived prefix only; inner refusal callsite/stage/inventory still unreported.",
+  "unchanged": "Full old per-owner collector and per-owner/global audit bodies; all 45 prior tests and frozen assertions; all 2M/100k/4096/512 caps and original geometry/source data.",
+  "newTests": [
+    {
+      "file": "src/owner_range_tests.rs",
+      "name": "sorted_owner_ranges_preserve_closed_audits_and_eliminate_full_input_scans",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/owner_range_tests.rs",
+      "name": "owner_order_fallback_keeps_original_semantic_refusal_and_source",
+      "status": "UNRUN"
+    }
+  ],
+  "newTestCount": 47,
+  "hostTestCount": 9,
+  "currentExecution": "UNRUN; Root serial join and G2 same-slice review before G1; no author compiler, original or diagnostic execution",
+  "fleetAdmission": "No complete candidate or new admission; full fleet still open."
+}

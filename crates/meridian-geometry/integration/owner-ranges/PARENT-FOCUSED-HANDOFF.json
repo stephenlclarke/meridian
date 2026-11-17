@@ -1,0 +1,125 @@
+{
+  "recordedUTC": "2026-11-17T10:52:09.657177+00:00",
+  "source": "a6a5a010ee058a3f490d2b57f575484e950b7deb",
+  "tree": "ef7d8d2b2471c0de2facf29a425ee02961514981",
+  "status": "FOCUSED_ONLY_CHECK_45RUST_9HOST_STRICT_CLIPPY_DEVBUILD_PASS",
+  "results": {
+    "Rust": 45,
+    "host": 9,
+    "check": "PASS",
+    "strictClippy": "PASS",
+    "devBuild": "PASS",
+    "wholeFive": "UNRUN;NOT_AUTHORIZED_FOR_THIS_CHANGE"
+  },
+  "sourceFiles": 348,
+  "sourceUnchanged": true,
+  "binary": {
+    "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/original_five",
+    "bytes": 5829728,
+    "sha256": "1205a1afa8d26e6a679c9fc912e445de34167139bfbed7d8901add9977cc5aa6"
+  },
+  "focusedResult": {
+    "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/evidence/FOCUSED-RESULT.json",
+    "bytes": 1990,
+    "sha256": "94b7c494453dd2ffa99012f6e9213f16ebbb85a021fbe1dafc987887dc0162e1"
+  },
+  "receiptPins": [
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/evidence/BUILD-START.json",
+      "bytes": 1439,
+      "sha256": "e07f19d7c2b42ecdb6f9fbcdf17bcdeae1d128cf71165318d776bd985b9d0e23"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/evidence/CHECK-START.json",
+      "bytes": 1426,
+      "sha256": "3ed7fc54efb37d794cf6ca209f92afc51597833c5a2468bd84a8a79a047348e9"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/evidence/CLIPPY-START.json",
+      "bytes": 1464,
+      "sha256": "d51ef90a9a70240b64644a6d81702a2a7091ceebfbeee04ca373c529b4ba976e"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/evidence/HOST-START.json",
+      "bytes": 1494,
+      "sha256": "d1fddcb0fbdea1072b2f329b44e2375a90439ac7ba922ee0aa288eab3c3298d3"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/evidence/TEST-START.json",
+      "bytes": 1432,
+      "sha256": "d33518e3b329efdfb6331d2a0861198cf71ddd7e413af73ac1873ea835a32083"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/evidence/BUILD-TERMINAL.json",
+      "bytes": 473,
+      "sha256": "c68874749135c1a057e44f35fc6d433b0387a070ac3872fe0c27ab66aaa7c937"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/evidence/CHECK-TERMINAL.json",
+      "bytes": 473,
+      "sha256": "8bf2f85ffc22c57bb69c803d670563b4c61a185a11c17394330b636756d3b338"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/evidence/CLIPPY-TERMINAL.json",
+      "bytes": 475,
+      "sha256": "2a180458b7c69edf130e713fc95fd245484650e665e3ba7f519d6672d71b4fc0"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/evidence/HOST-TERMINAL.json",
+      "bytes": 471,
+      "sha256": "5007117cc487d1e735ef6e51c0fbc996c63cab1211b3449ad2466af85850aceb"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/evidence/TEST-TERMINAL.json",
+      "bytes": 472,
+      "sha256": "13a0aeb3f4d4e62eeaf70640aafd9f8d660c5afeabb378be218b8da4a40d404b"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/evidence/check.log",
+      "bytes": 198,
+      "sha256": "1f1c95fb0967e0f0124dfb930ed6f94f51b993f8f93ed9150d57af1e8d33c9da"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/evidence/test.log",
+      "bytes": 13825,
+      "sha256": "421f55ec96ad3b58d02443c75aacab01cb44f5a2173d49cacfefe38bc8ae328f"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/evidence/host.log",
+      "bytes": 107,
+      "sha256": "15f6dc6580ba907260e8900ada5bd0cb38044dfc7c956968f3af599fcf0ebd12"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/evidence/clippy.log",
+      "bytes": 198,
+      "sha256": "583637a1fbd744db1958b03ae42dcf17f433007a0bea5ce17c65602330a92e78"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/evidence/build.log",
+      "bytes": 72,
+      "sha256": "59639588a6f1826f129cbcd121edc07279dab94786f5fa5bde6b3439b2e845cc"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/evidence/CARGO-TOOLS.json",
+      "bytes": 522,
+      "sha256": "350acebee37308bd8958f99e09490b6b758dcc882f623004314146bfef23e3c8"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/evidence/RUSTC-TOOLS.json",
+      "bytes": 410,
+      "sha256": "cc0a1022479e988049d892b85c503c72825fecf1bad7c6e0b0ffb047c0a561f5"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/evidence/ROOT-SOURCE.json",
+      "bytes": 89810,
+      "sha256": "5e7a26168ce5e893fb3ccd0fcacf6fecd0ec301b3e49685308e3aae09cc75054"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.a6a5a01/evidence/SOURCE.json",
+      "bytes": 63710,
+      "sha256": "6b6804046e0d88d4b1d7dfe25d507d59c49ceb139860b79bb95fe3902fe87c24"
+    }
+  ],
+  "scope": "Identity lifetime focused qualification only. No currentoriginalreconstructionrun orfleetadmission. Prior2Storage/3Operationsrefusalsandmissinginnerworkcallsite/stageevidence remainblockers.",
+  "preservation": "No original/diagnosticrerun/capwaiver/native/profile/archivechange;no competingjob;shortstagesDELAYEDnotLIVEclaim."
+}

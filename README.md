@@ -1,5 +1,11 @@
 # Meridian
 
+## Fleet geometry owner-range correction
+
+The fleet constructor now indexes contiguous original-facet owner ranges so it can borrow each range for topology checks. Unsorted owners use the existing collector. The full contact witnesses and original operation, storage, precision and face limits still apply.
+
+The previous correction passed 45 Rust and nine host tests, all-target check, strict Clippy and dev build. The new source adds two regression cases. Its 47 Rust and nine host cases and the five original constructor inputs await owning execution.
+
 ## Joint section return-type correction
 
 Root `3313f17` passed its owning all-target check, all 44 Rust tests and nine host tests. The unchanged strict overlap control passed with 106146 reference operations versus 105378 candidate operations; this does not reconstruct the earlier failed pair. Strict Clippy then stopped on one complex tuple return type in `sections.rs`; dev build and the original-five batch remained unrun.

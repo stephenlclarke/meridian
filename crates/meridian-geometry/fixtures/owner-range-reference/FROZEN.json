@@ -1,0 +1,14 @@
+{
+  "phase": "BEFORE_OWNER_RANGE_SOURCE_AUTHORING",
+  "parentAuthorHead": "6c9fcb1cf5fa929d0f5d3fe32e8a98331af55235",
+  "files": {
+    "CASES.json": {
+      "bytes": 1296,
+      "sha256": "726aa7cac884b58810e5485e3178cfea6157b065d99b6b7442a5ecbd0998d55d"
+    },
+    "before-certificate.rs": {
+      "bytes": 77697,
+      "sha256": "c0d7afcdc69ecb797c8a561733cc922cde89c5dba84d871430f462f2174be3a5"
+    }
+  }
+}

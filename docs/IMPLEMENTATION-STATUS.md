@@ -1,5 +1,13 @@
 # Implementation and validation status
 
+## Fleet geometry owner ranges
+
+The owning qualification of the identity-lifetime correction at `a6a5a01` passed all-target check, 45 Rust and nine host cases, strict Clippy and the dev constructor build.
+
+Author `41aae99` replaces repeated full facet scans with charged, borrowed owner ranges when the original owner IDs are ordered. An inversion releases the temporary range storage before calling the existing collector. Two frozen-reference regressions cover exact accounting, one-short refusal and malformed witness behavior. All 45 prior Rust cases and strict assertions are retained.
+
+The new 47 Rust and nine host cases and the changed original-five batch are unrun. The expected operation savings are calculated from source inputs. The previous five constructor refusals and fifteen dependent unrun checks remain the last measured original-input outcome.
+
 ## Geometry identity lifetime correction: source only
 
 The actual `ddf0658` parent passed 44 Rust cases and nine host cases, all-target checks, strict Clippy and the dev constructor build. Its one original-five batch returned five decode passes, two Storage refusals (SH010/SH011), three Operations refusals (SH016/SH017/SH166), fifteen dependent checks unrun and zero candidates or admissions. Attempted storage endpoints were 100,023 and 100,006; these are charged logical memberships, not allocations or minima. Work endpoints for the three operation cases were 2,000,001, 2,000,001 and 2,000,007. Original caps and exact geometric fidelity remain unchanged.

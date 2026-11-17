@@ -64,6 +64,19 @@ def verify():
 
     before = original("src/certificate.rs").decode()
     after = (CRATE / "src/certificate.rs").read_text()
+    owner_range_parent = "6c9fcb1cf5fa929d0f5d3fe32e8a98331af55235"
+    owner_range_before = subprocess.check_output(["git", "-C", str(REPO), "show", f"{owner_range_parent}:crates/meridian-geometry/src/certificate.rs"], text=True)
+    assert (CRATE / "fixtures/owner-range-reference/before-certificate.rs").read_text() == owner_range_before
+    owner_range_start = after.index("// The caller already authenticated the owner set")
+    owner_range_end = after.index("fn connected_link<const N: usize>", owner_range_start)
+    after = after[:owner_range_start] + after[owner_range_end:]
+    call = "    audit_original_owner_ranges(originals, &owners, b)?;"
+    assert after.count(call) == 1
+    after = after.replace(call, "    audit_original_components(originals, &owners, b)?;")
+    owner_range_module = '\n#[cfg(test)]\n#[path = "owner_range_tests.rs"]\nmod owner_range_tests;\n'
+    assert after.endswith(owner_range_module)
+    after = after[:-len(owner_range_module)]
+    assert after == owner_range_before, "non-owner-range source or 45 old tests changed"
     identity_parent = "dd7451091fdb3636768a3504caf91c9547f94fad"
     identity_before = subprocess.check_output(["git", "-C", str(REPO), "show", f"{identity_parent}:crates/meridian-geometry/src/certificate.rs"], text=True)
     assert (CRATE / "fixtures/identity-lifetime-reference/before-certificate.rs").read_text() == identity_before
@@ -118,7 +131,7 @@ def verify():
     for signature in ["fn meets_outward_plane(", "fn outward_candidates(", "fn limiting_segment(", "pub(super) fn build(", "fn build_admitted(", "pub(super) fn occupied(", "pub(super) fn memberships(", "pub(super) fn fields_visible("]:
         assert body(current, signature) == body(old_sections, signature), signature
     tests = sum(path.read_text().count("#[test]") for top in ["src", "tests"] for path in (CRATE / top).rglob("*.rs"))
-    assert tests == 45, tests
+    assert tests == 47, tests
     print(json.dumps({"status": "PASS_SOURCE_ONLY", "parent": PARENT, "currentRustTests": tests, "compilerOrGeometryExecuted": False}))
 
 

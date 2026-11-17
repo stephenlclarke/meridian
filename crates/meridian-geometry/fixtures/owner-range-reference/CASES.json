@@ -1,0 +1,39 @@
+{
+  "phase": "BEFORE_OWNER_RANGE_SOURCE_AUTHORING",
+  "parentAuthorHead": "6c9fcb1cf5fa929d0f5d3fe32e8a98331af55235",
+  "contract": "Preserve old streaming owner audit and its exact per-owner audit_closed call semantics. Use only verified ascending contiguous owner runs; fall back on any inversion before invoking that audit. Exact input/owner metadata and actual ddf0658 failure evidence support bounded eliminated charged prefix work. No unchanged original execution.",
+  "cases": [
+    {
+      "owners": [
+        2,
+        5,
+        9
+      ],
+      "tetrahedronFacetsEach": 4,
+      "sortedWorkDelta": 57,
+      "order": "same as frozen stream"
+    },
+    {
+      "owners": [
+        2
+      ],
+      "tetrahedronFacetsEach": 4,
+      "sortedWorkDelta": 7
+    },
+    {
+      "owners": [
+        2,
+        5,
+        9
+      ],
+      "derived": "rotate right one to invert first adjacent pair; remove one facet from owner5 and compare semantic refusal and source in both orders"
+    },
+    {
+      "owners": [
+        2
+      ],
+      "mixedSheets": "two tetrahedra share only vertex; opposite ray octants, reject disconnected link"
+    }
+  ],
+  "guard": "Run endpoint scratch is admitted during slice collection and audit; exact/one-short lifetime and unchanged final retained count."
+}

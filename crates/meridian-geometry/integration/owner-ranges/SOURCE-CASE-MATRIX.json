@@ -1,0 +1,322 @@
+[
+  {
+    "id": "SH010",
+    "inputSHA256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc",
+    "facets": 1012,
+    "owners": 31,
+    "maxFacetsPerOwner": 116,
+    "orderedOwners": true,
+    "preLoopMarker": [
+      30,
+      11
+    ],
+    "actualRefusalMarker": [
+      6,
+      8
+    ],
+    "oldChargedGrouping": 62744,
+    "newChargedGrouping": 1043,
+    "removedChargedPrefix": 61701,
+    "sourceDerivedOldOperationEndpointAfterReduction": null,
+    "derivedEarlyTopologyStorageUpperBound": 52023,
+    "actualOriginalCase": {
+      "id": "SH010",
+      "inputSHA256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc",
+      "failure": {
+        "kind": "Storage",
+        "source": [
+          6,
+          8
+        ],
+        "operationsAtRefusal": 1761362,
+        "detail": "exact storage budget exhausted"
+      },
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ],
+      "operations": 1761362,
+      "attemptedPeakMemberships": 100023,
+      "admittedPeakMemberships": 99991,
+      "retainedMembershipsAtTerminal": 76942,
+      "seconds": 27.941245083,
+      "parent5489Seconds": 99.519869509,
+      "cutoffWallRatio": 0.2807604674408577,
+      "parent5489Failure": {
+        "kind": "Operations",
+        "source": [
+          1,
+          88
+        ],
+        "operationsAtRefusal": 2000002,
+        "detail": "exact operation budget exhausted"
+      },
+      "completeCandidateReturned": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    }
+  },
+  {
+    "id": "SH011",
+    "inputSHA256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c",
+    "facets": 1012,
+    "owners": 31,
+    "maxFacetsPerOwner": 116,
+    "orderedOwners": true,
+    "preLoopMarker": [
+      30,
+      11
+    ],
+    "actualRefusalMarker": [
+      6,
+      8
+    ],
+    "oldChargedGrouping": 62744,
+    "newChargedGrouping": 1043,
+    "removedChargedPrefix": 61701,
+    "sourceDerivedOldOperationEndpointAfterReduction": null,
+    "derivedEarlyTopologyStorageUpperBound": 52023,
+    "actualOriginalCase": {
+      "id": "SH011",
+      "inputSHA256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c",
+      "failure": {
+        "kind": "Storage",
+        "source": [
+          6,
+          8
+        ],
+        "operationsAtRefusal": 1754311,
+        "detail": "exact storage budget exhausted"
+      },
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ],
+      "operations": 1754311,
+      "attemptedPeakMemberships": 100006,
+      "admittedPeakMemberships": 99974,
+      "retainedMembershipsAtTerminal": 76503,
+      "seconds": 27.896073208,
+      "parent5489Seconds": 99.297297868,
+      "cutoffWallRatio": 0.2809348673826291,
+      "parent5489Failure": {
+        "kind": "Operations",
+        "source": [
+          1,
+          105
+        ],
+        "operationsAtRefusal": 2000004,
+        "detail": "exact operation budget exhausted"
+      },
+      "completeCandidateReturned": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    }
+  },
+  {
+    "id": "SH016",
+    "inputSHA256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e",
+    "facets": 1100,
+    "owners": 33,
+    "maxFacetsPerOwner": 116,
+    "orderedOwners": true,
+    "preLoopMarker": [
+      32,
+      43
+    ],
+    "actualRefusalMarker": [
+      11,
+      15
+    ],
+    "oldChargedGrouping": 72600,
+    "newChargedGrouping": 1133,
+    "removedChargedPrefix": 71467,
+    "sourceDerivedOldOperationEndpointAfterReduction": 1928534,
+    "derivedEarlyTopologyStorageUpperBound": 55545,
+    "actualOriginalCase": {
+      "id": "SH016",
+      "inputSHA256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          11,
+          15
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ],
+      "operations": 2000001,
+      "attemptedPeakMemberships": 94181,
+      "admittedPeakMemberships": 94181,
+      "retainedMembershipsAtTerminal": 90548,
+      "seconds": 22.912222584,
+      "parent5489Seconds": 49.966139312,
+      "cutoffWallRatio": 0.458554991429913,
+      "parent5489Failure": {
+        "kind": "Operations",
+        "source": [
+          5,
+          10
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "completeCandidateReturned": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    }
+  },
+  {
+    "id": "SH017",
+    "inputSHA256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a",
+    "facets": 1100,
+    "owners": 33,
+    "maxFacetsPerOwner": 116,
+    "orderedOwners": true,
+    "preLoopMarker": [
+      32,
+      43
+    ],
+    "actualRefusalMarker": [
+      11,
+      10
+    ],
+    "oldChargedGrouping": 72600,
+    "newChargedGrouping": 1133,
+    "removedChargedPrefix": 71467,
+    "sourceDerivedOldOperationEndpointAfterReduction": 1928534,
+    "derivedEarlyTopologyStorageUpperBound": 55545,
+    "actualOriginalCase": {
+      "id": "SH017",
+      "inputSHA256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          11,
+          10
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ],
+      "operations": 2000001,
+      "attemptedPeakMemberships": 94066,
+      "admittedPeakMemberships": 94066,
+      "retainedMembershipsAtTerminal": 90256,
+      "seconds": 25.492044209,
+      "parent5489Seconds": 56.222438132,
+      "cutoffWallRatio": 0.45341406484630464,
+      "parent5489Failure": {
+        "kind": "Operations",
+        "source": [
+          5,
+          7
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "completeCandidateReturned": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    }
+  },
+  {
+    "id": "SH166",
+    "inputSHA256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f",
+    "facets": 988,
+    "owners": 29,
+    "maxFacetsPerOwner": 116,
+    "orderedOwners": true,
+    "preLoopMarker": [
+      28,
+      43
+    ],
+    "actualRefusalMarker": [
+      10,
+      3
+    ],
+    "oldChargedGrouping": 57304,
+    "newChargedGrouping": 1017,
+    "removedChargedPrefix": 56287,
+    "sourceDerivedOldOperationEndpointAfterReduction": 1943720,
+    "derivedEarlyTopologyStorageUpperBound": 51061,
+    "actualOriginalCase": {
+      "id": "SH166",
+      "inputSHA256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          10,
+          3
+        ],
+        "operationsAtRefusal": 2000007,
+        "detail": "exact operation budget exhausted"
+      },
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ],
+      "operations": 2000007,
+      "attemptedPeakMemberships": 89417,
+      "admittedPeakMemberships": 89417,
+      "retainedMembershipsAtTerminal": 83662,
+      "seconds": 24.738256208,
+      "parent5489Seconds": 51.075637626,
+      "cutoffWallRatio": 0.48434551887820226,
+      "parent5489Failure": {
+        "kind": "Operations",
+        "source": [
+          5,
+          72
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "completeCandidateReturned": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      }
+    }
+  }
+]

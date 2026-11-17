@@ -228,6 +228,16 @@
       "file": "src/identity_tests.rs",
       "name": "completed_identity_audit_releases_only_owned_records_before_later_scratch",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/owner_range_tests.rs",
+      "name": "sorted_owner_ranges_preserve_closed_audits_and_eliminate_full_input_scans",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/owner_range_tests.rs",
+      "name": "owner_order_fallback_keeps_original_semantic_refusal_and_source",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -543,5 +553,23 @@
     "newTestCount": 45,
     "currentExecution": "UNRUN",
     "threeOperationsCases": "UNCHANGED WORK BLOCKER; no unchanged retry requested"
+  },
+  "verifiedOwnerRangeCorrection": {
+    "qualifiedFocusedParentRoot": "a6a5a010ee058a3f490d2b57f575484e950b7deb",
+    "qualifiedFocusedParentTree": "ef7d8d2b2471c0de2facf29a425ee02961514981",
+    "parentRustPass": 45,
+    "parentHostPass": 9,
+    "parentCheckClippyDevBuild": "PASS",
+    "parentWholeFive": "UNRUN; last actual ddf all-five refusal retained",
+    "all45PriorTestsAndOriginalSemanticsUnchanged": true,
+    "deltaSHA256": "28fe279c06baf43d8722b64faef3ffc7cb5d6c7cb9743d6e97e5275b82b39312",
+    "beforeSUTFreezeSHA256": "b6ba008ed4ca8ab72305a85dd1904e83f7ca4cfcb5c910bcf22680ec971443cf",
+    "workPrefixSavings": [
+      71467,
+      71467,
+      56287
+    ],
+    "newTestCount": 47,
+    "currentExecution": "UNRUN"
   }
 }

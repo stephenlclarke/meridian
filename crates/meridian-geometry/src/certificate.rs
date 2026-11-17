@@ -165,6 +165,47 @@ fn audit_original_components(
     Ok(())
 }
 
+// The caller already authenticated the owner set against the same input.
+// Verify ascending runs before auditing: an inversion must use the original
+// owner-first order, including when a later owner has a semantic defect.
+fn audit_original_owner_ranges(
+    originals: &[Facet],
+    owners: &BTreeSet<u32>,
+    b: &mut Budget,
+) -> Result<(), Failure> {
+    b.step(1)?;
+    if owners.len() == 1 {
+        return audit_closed(originals.iter(), true, b);
+    }
+    let ordered = b.with_retained(owners.len() + 8, |b| {
+        let mut ends = Vec::with_capacity(owners.len());
+        for (offset, pair) in originals.windows(2).enumerate() {
+            b.step(1)?;
+            let left = pair[0].id().component;
+            let right = pair[1].id().component;
+            if left > right {
+                return Ok(false);
+            }
+            if left < right {
+                ends.push(offset + 1);
+            }
+        }
+        ends.push(originals.len());
+        let mut start = 0;
+        for end in ends {
+            b.step(1)?;
+            audit_closed(originals[start..end].iter(), true, b)?;
+            start = end;
+        }
+        Ok(true)
+    })?;
+    if ordered {
+        Ok(())
+    } else {
+        audit_original_components(originals, owners, b)
+    }
+}
+
 fn connected_link<const N: usize>(
     sectors: &[[[Rational; N]; 2]],
     cycle: bool,
@@ -987,7 +1028,7 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
         }
         owners.insert(face.id().component);
     }
-    audit_original_components(originals, &owners, b)?;
+    audit_original_owner_ranges(originals, &owners, b)?;
     audit_original_sheets(originals, b)?;
     // One owner map plus the two transient facet boxes. Source audit maps
     // have already been released, and this map releases before final noding.
@@ -2108,3 +2149,7 @@ mod tests {
 #[cfg(test)]
 #[path = "identity_tests.rs"]
 mod identity_tests;
+
+#[cfg(test)]
+#[path = "owner_range_tests.rs"]
+mod owner_range_tests;
