@@ -1,5 +1,8 @@
 //! Explicit component scenes; these fixtures are not public/native journey acceptance.
-use super::*;
+use super::{
+    Arc, BeamSource, MAX_TRAFFIC_SHOTS, OriginalStationData, PlayerBeamInput, PlayerTarget,
+    RigidPose, State, StationMarkets, SystemId, TickContext, Vec3, add, pose, scale, sub, unit,
+};
 fn ok<T, E: core::fmt::Debug>(value: Result<T, E>) -> T {
     value.unwrap_or_else(|e| panic!("unexpected refusal: {e:?}"))
 }

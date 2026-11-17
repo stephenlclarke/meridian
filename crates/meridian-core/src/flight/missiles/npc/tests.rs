@@ -1,5 +1,6 @@
 //! Actual public-command positives; direct mutation is restricted to labelled corrupt saves.
 #![allow(clippy::unwrap_used)]
+use super::super::{MissileOrigin, ProjectileId, add, scale};
 use super::*;
 use crate::AmmunitionAction;
 use crate::flight::missiles::tests::{fly_axis, stop};

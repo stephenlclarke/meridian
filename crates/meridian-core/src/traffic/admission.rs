@@ -1,5 +1,5 @@
 //! Native station approach has right of way; traffic must yield before collision admission.
-use super::*;
+use super::{Actor, TickContext, Vec3, length, segment_distance};
 const YIELD_OFFSET: f64 = 1200.0;
 #[cfg(test)]
 mod tests;

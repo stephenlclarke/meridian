@@ -1,5 +1,9 @@
 //! Actual NPC surfaces and distinct retained player-missile damage; no award path.
-use super::*;
+use super::{
+    Actor, Arc, Basis3, BeamSource, INVALID, MAX_TRAFFIC_ACTORS, MAX_TRAFFIC_SHOTS, NpcId,
+    NpcPhase, OriginalStationData, Resources, RigidPose, SaveError, State, SystemId,
+    TrafficContact, TrafficError, Vec3, add, finite, length, pose, scale, sub, system_index,
+};
 use crate::flight::MissileOrigin;
 use crate::save::{Reader, Writer};
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -140,6 +144,13 @@ impl NpcMissileHit {
         })
     }
 }
+enum ResourceAction {
+    Fire,
+    Pulse(bool),
+    Missile(bool),
+}
+type ResourceEvent = (u64, u64, i32, usize, ResourceAction);
+
 impl State {
     pub(crate) fn combat_proof_count(&self) -> usize {
         self.receipt_count()
@@ -329,19 +340,14 @@ impl State {
         }
         Ok(())
     }
-    pub(super) fn resources_at(
+    fn beam_resource_actions(
         &self,
         a: Actor,
         clock: u64,
         world: u64,
         stage: SceneStage,
-    ) -> Result<Resources, SaveError> {
-        enum Action {
-            Fire,
-            Pulse(bool),
-            Missile(bool),
-        }
-        let mut actions = Vec::new();
+        actions: &mut Vec<ResourceEvent>,
+    ) {
         for (i, b) in self.shots.iter().enumerate() {
             if b.local_tick > clock || b.world_tick > world {
                 continue;
@@ -361,19 +367,35 @@ impl State {
                 continue;
             }
             if b.source == BeamSource::Npc(a.id) {
-                actions.push((b.local_tick, b.world_tick, order, i, Action::Fire));
+                actions.push((b.local_tick, b.world_tick, order, i, ResourceAction::Fire));
             }
             if b.victim == a.id {
-                actions.push((b.local_tick, b.world_tick, order, i, Action::Pulse(b.front)));
+                actions.push((
+                    b.local_tick,
+                    b.world_tick,
+                    order,
+                    i,
+                    ResourceAction::Pulse(b.front),
+                ));
             }
         }
+    }
+    pub(super) fn resources_at(
+        &self,
+        a: Actor,
+        clock: u64,
+        world: u64,
+        stage: SceneStage,
+    ) -> Result<Resources, SaveError> {
+        let mut actions = Vec::new();
+        self.beam_resource_actions(a, clock, world, stage, &mut actions);
         for (i, h) in self.player_hits.iter().enumerate() {
             if h.attacker == a.id
                 && h.local_tick <= clock
                 && (h.world_tick < world
                     || (h.world_tick == world && matches!(stage, SceneStage::Command(_))))
             {
-                actions.push((h.local_tick, h.world_tick, 0, i, Action::Fire));
+                actions.push((h.local_tick, h.world_tick, 0, i, ResourceAction::Fire));
             }
         }
         for (i, h) in self.missile_hits.iter().enumerate() {
@@ -383,7 +405,13 @@ impl State {
                     SceneStage::Step(index) => h.origin.projectile.ordinal() < index,
                 };
             if h.victim == a.id && h.local_tick <= clock && h.world_tick <= world && included {
-                actions.push((h.local_tick, h.world_tick, 1, i, Action::Missile(h.front)));
+                actions.push((
+                    h.local_tick,
+                    h.world_tick,
+                    1,
+                    i,
+                    ResourceAction::Missile(h.front),
+                ));
             }
         }
         actions.sort_by_key(|(t, w, order, i, _)| (*t, *w, *order, *i));
@@ -396,9 +424,9 @@ impl State {
             }
             resources.advance_exact(n)?;
             match action {
-                Action::Fire => resources.fire(),
-                Action::Pulse(front) => resources.hit(front),
-                Action::Missile(front) => resources.hit_missile(front),
+                ResourceAction::Fire => resources.fire(),
+                ResourceAction::Pulse(front) => resources.hit(front),
+                ResourceAction::Missile(front) => resources.hit_missile(front),
             }
             .map_err(|_| INVALID)?;
             cursor = tick;

@@ -1,5 +1,7 @@
 # Reciprocal NPC missile source
 
+The NPC increment is integrated at main `8b81a77`; publication is held for its 20 open Sonar source findings. See [current implementation status](IMPLEMENTATION-STATUS.md) for the exact correction and qualification boundary. Earlier qualification below remains bound to its actual source.
+
 The complete `bd506f9` composition passed source review, 460 top-level Rust tests on each of Mac/Linux/native Windows, strict Clippy, release builds and bounded actual Metal missile/damage/docking/cold Continue qualification. The current source and native limits are recorded in [implementation status](IMPLEMENTATION-STATUS.md). Protected integration, exact-main Sonar and the next public release remain pending. These are player-owned missiles against actual NPCs; NPC-fired missile producers remain open.
 
 ## Behavior

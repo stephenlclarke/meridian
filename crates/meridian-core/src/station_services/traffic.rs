@@ -1,5 +1,5 @@
 //! Actual traffic owner stages stock transfers; player custody/payment counters stay separate.
-use super::*;
+use super::{CommodityId, Error, MAX_MARKET_QUANTITY, MarketSite, StationMarkets};
 impl StationMarkets {
     pub(crate) fn traffic_candidate(&self) -> Self {
         Self { data: self.data }

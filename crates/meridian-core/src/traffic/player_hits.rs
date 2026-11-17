@@ -1,5 +1,9 @@
 //! Separate NPC -> player identity, native contact and retained scene evidence.
-use super::*;
+use super::{
+    Actor, Arc, BeamSource, INVALID, MAX_TRAFFIC_ACTORS, NpcPhase, NpcPlayerHit,
+    OriginalStationData, PlayerTarget, RigidPose, SaveError, SceneStage, State, TrafficBeam,
+    TrafficError, Vec3, add, finite, length, scale, sub, system_index, unit,
+};
 pub(super) struct PlayerEmission<'a> {
     pub(super) data: &'a OriginalStationData,
     pub(super) player: RigidPose,

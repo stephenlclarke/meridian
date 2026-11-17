@@ -1,4 +1,5 @@
 //! Native geometry/resource component cases, not claimed as public gameplay witnesses.
+use super::super::{StationMarkets, TickContext, unit};
 use super::*;
 fn ok<T, E: core::fmt::Debug>(v: Result<T, E>) -> T {
     v.unwrap_or_else(|e| panic!("{e:?}"))

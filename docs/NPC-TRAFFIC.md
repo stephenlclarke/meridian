@@ -1,5 +1,7 @@
 # Finite NPC traffic
 
+The NPC increment is integrated at main `8b81a77`; publication is held for its 20 open Sonar source findings. See [current implementation status](IMPLEMENTATION-STATUS.md) for the exact correction and qualification boundary. Earlier qualification below remains bound to its actual source.
+
 The composed `bd506f9` source passed independent review, 460 top-level Rust tests on each owned platform, strict Clippy and fresh release builds. A separately audited actual Metal journey showed SH025 traders/pirates, paid finite cargo, missile impacts and incoming damage, safe/unlock, physical docking and exact cold Continue. Protected integration, exact-main Sonar and a verified new release remain pending. See [implementation status](IMPLEMENTATION-STATUS.md) for exact scope, retained failures and limitations.
 
 ## Populations and actual sources
