@@ -1,8 +1,14 @@
 # Implementation and validation status
 
-## Context help and XYZZY: Mac qualified, bounded native checks passed
+## Preview 7 source quality correction
 
-Current compiled source `c98fc86` passed 603 top-level Rust tests: 378 core, two one-case compatibility integrations, 220 desktop and three explicit observer cases. All 94 Python tests, 48 Markdown files, formatting, all-target checks, strict Clippy and locked release passed. All 283 tracked source files stayed unchanged through qualification. Nested child-process summaries are not extra cases. Earlier compile and field-location/HUD assertion failures remain tied to their earlier source; corrections retained refusal, mutation and geometry coverage.
+The Help and XYZZY composition merged through PR 47 at `de7d6bb`. All six main CI jobs passed and exact-main Sonar passed its quality gate with 94.1% new coverage, but nine unresolved maintainability findings held publication. Source `076639d` addresses all nine with four helper extractions and five explicit test imports. Independent review reconstructed all four original production files and verified unchanged test bodies, assertions, save formats and native coverage boundaries.
+
+The new Mac build passed 603 Rust tests, 99 Python tests, 48 Markdown checks, formatting, all-target checks, strict Clippy and locked release. All 283 tracked files stayed unchanged through qualification. A separately installed Developer ID signed Quality Preview passed title/System Help, blocked input behind Help, explicit XYZZY activation, normal quit and intentional cold Continue. The final real save decoded through the new qualified core and retained CLARKE, the once-only 1,000,000 CR grant, supported outfit and finite ammunition. Only this bounded native scope belongs to the new binary; the broader native journey below retains its original identity. Dell qualification, final-head coverage, protected integration and exact-main Sonar closure remain pending. No GitHub preview containing Help and XYZZY has been published.
+
+## Context help and XYZZY: earlier complete native journey
+
+Earlier compiled source `c98fc86` passed 603 top-level Rust tests: 378 core, two one-case compatibility integrations, 220 desktop and three explicit observer cases. All 94 Python tests, 48 Markdown files, formatting, all-target checks, strict Clippy and locked release passed. All 283 tracked source files stayed unchanged through qualification. Nested child-process summaries are not extra cases. Earlier compile and field-location/HUD assertion failures remain tied to their earlier source; corrections retained refusal, mutation and geometry coverage.
 
 The installed Developer ID signed app is `/Users/sclarke/Applications/Meridian Help XYZZY Preview/Meridian Help XYZZY Preview.app`. It uses a new, separate `Meridian Help XYZZY Preview/saves-current-v17` profile. Root independently checked all 450 installed files and the strict signature before operating it with supported native controls. Title Help blocked new-game input. All five station cards showed their controls and cross-screen shortcuts. Hidden Galaxy query H survived a testing review, nested Help and cancellation. Normal saved bytes stayed unchanged before explicit testing activation.
 
