@@ -1,5 +1,9 @@
 # Meridian
 
+## Following exact plane-section geometry candidate
+
+The `ce98ec9` author packet is now composed on the qualified `5489c3e` geometry branch. It replaces ordinary per-cell ray classification with one-sided complete-owner sections on each original source facet, retaining the exact boundary fallback, complete witnesses, field provenance and global audits. Seven new tests bring the candidate to 42 Rust and nine host cases, all **UNRUN**. All 35 prior tests and strict 108/120 work assertions remain unchanged. Independent whole review is required before owning qualification and one changed whole-five batch. The parent still has five Operations constructor refusals, fifteen dependent bodies unrun and zero candidates; 2M operations, 100k memberships, 4096 bits and 512 triangles remain unchanged. No new hull, fit or performance acceptance is claimed.
+
 [![CI](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=alert_status)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=coverage)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)

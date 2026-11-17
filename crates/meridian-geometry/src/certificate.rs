@@ -1,3 +1,6 @@
+#[path = "sections.rs"]
+mod sections;
+
 use crate::exact::{add, area, cross, dot, orient, point, project, scale, sub};
 use crate::planes::{CachedRay, PlaneGroups, RayCaches};
 use crate::region::PackedRegion;
@@ -1018,21 +1021,45 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
             }
             Ok((barriers, coplanar))
         })?;
-        let arrangement = b.with_retained(coplanar.len(), |budget| {
-            let result = Arrangement::build(&domain, &barriers, budget, |sample, local| {
-                visible(
-                    face,
-                    sample,
-                    originals,
-                    &owner_bounds,
-                    &mut occupancy_index,
-                    &coplanar,
-                    local,
-                )
-            });
+        // Whole-owner one-sided sections are built once for this original
+        // facet. They classify only its existing atomic regions; they never
+        // generate output geometry or replace physical intersection records.
+        let sections = b.with_retained(8 * barriers.len() + coplanar.len(), |local| {
+            sections::Frame::build(
+                face,
+                face_bounds,
+                originals,
+                &owner_bounds,
+                &facet_bounds,
+                local,
+            )
+        })?;
+        let section_members = sections.memberships();
+        let arrangement_result = b.with_retained(coplanar.len(), |budget| {
+            let result =
+                Arrangement::build_accounted(&domain, &barriers, budget, |sample, local| {
+                    match sections.occupied(sample, local)? {
+                        Some(true) => Ok(false),
+                        Some(false) => sections::fields_visible(face, sample, &coplanar, local),
+                        // Keep the independent generic ray policy for a boundary
+                        // sample. The accounted callback admits its live scratch.
+                        None => visible(
+                            face,
+                            sample,
+                            originals,
+                            &owner_bounds,
+                            &mut occupancy_index,
+                            &coplanar,
+                            local,
+                        ),
+                    }
+                });
             drop(coplanar);
             result
-        })?;
+        });
+        drop(sections);
+        b.release(section_members);
+        let arrangement = arrangement_result?;
         drop(barriers);
         // The original witness publisher retains no record for an invisible
         // facet. Its authenticated original triangle remains in `originals`.

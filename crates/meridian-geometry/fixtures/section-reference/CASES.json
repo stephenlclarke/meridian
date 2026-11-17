@@ -1,0 +1,171 @@
+{
+  "parentAuthorHead": "44bb43552432ceb66d8c175e08dc6380ed017273",
+  "qualifiedRootJoin": "5489c3eb0c319a2518cd2e22ca790c127abcec24",
+  "contract": "Frozen before section SUT. Ordered exact facets, volume, every witness field and public witness verification must match the unchanged parent ray reference. Existing 35 tests and all independent historical controls remain unchanged. New tests UNRUN. No original execution authorized by this fixture contract.",
+  "cases": [
+    {
+      "id": "L_prism",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          6,
+          0
+        ],
+        [
+          6,
+          2
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          0,
+          6
+        ]
+      ],
+      "z": [
+        0,
+        4
+      ],
+      "capTriangles": [
+        [
+          0,
+          1,
+          3
+        ],
+        [
+          1,
+          2,
+          3
+        ],
+        [
+          0,
+          3,
+          5
+        ],
+        [
+          3,
+          4,
+          5
+        ]
+      ],
+      "volume": 80
+    },
+    {
+      "id": "L_prism_overlap",
+      "addCube": [
+        1,
+        1,
+        1,
+        4,
+        4,
+        3
+      ],
+      "intersectionVolume": 10,
+      "volume": 88
+    },
+    {
+      "id": "cavity",
+      "outerCube": [
+        0,
+        0,
+        0,
+        6,
+        6,
+        6
+      ],
+      "reverseInnerCube": [
+        2,
+        2,
+        2,
+        4,
+        4,
+        4
+      ],
+      "sameOwner": true,
+      "volume": 208
+    },
+    {
+      "id": "cavity_fill",
+      "addCube": [
+        1,
+        1,
+        1,
+        5,
+        5,
+        5
+      ],
+      "volume": 216
+    }
+  ],
+  "transforms": [
+    {
+      "id": "identity",
+      "linear": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "shear_mirror",
+      "linear": [
+        [
+          -1,
+          1,
+          1
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      "translation": [
+        7,
+        -3,
+        2
+      ]
+    }
+  ],
+  "adversaries": [
+    "two zero vertices plus positive produces one limiting edge",
+    "two zero vertices plus negative produces none",
+    "one zero vertex plus two positive preserves degenerate segment",
+    "duplicate tangent section edges cancel without deduplication",
+    "coplanar co-oriented surface is outside; opposite contact is occupied",
+    "owner enclosing entire facet keeps remote section loop",
+    "point and edge contact may refuse globally but must match reference failure kind"
+  ],
+  "requiredWorkReduction": "Preserve strict existing 108/120 full-construction controls; no new original fit claim."
+}

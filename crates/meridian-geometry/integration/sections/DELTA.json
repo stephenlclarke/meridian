@@ -1,0 +1,229 @@
+{
+  "status": "AUTHORED_UNRUN",
+  "parentAuthorHead": "44bb43552432ceb66d8c175e08dc6380ed017273",
+  "qualifiedParentJoin": "5489c3eb0c319a2518cd2e22ca790c127abcec24",
+  "qualifiedParentTree": "f1f0b4c8d22be048b937034cdac641a597d31234",
+  "parentEvidence": {
+    "PARENT-HANDOFF.json": {
+      "sha256": "ec73704111fc769fd0714634e106e6eadcdc323ec7d2983d76781ccdd79a3a54",
+      "bytes": 49895
+    },
+    "PARENT-MATRIX.json": {
+      "sha256": "b65175f38d82f1130a1d26957ed8c1c51c33eec8176a2267c734cdf0cca3b060",
+      "bytes": 3764
+    },
+    "PARENT-AUDIT.json": {
+      "sha256": "9f34c022b43a703e3aa626bd9de4bb9c96a721bc2e0641dbed473eeba95fc17a",
+      "bytes": 6083
+    }
+  },
+  "parentRustPass": 35,
+  "parentHostPass": 9,
+  "parentCases": [
+    {
+      "id": "SH010",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          1,
+          88
+        ],
+        "operationsAtRefusal": 2000002,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000002,
+      "decodeOperations": 359198,
+      "constructionOperations": 1640804,
+      "wallNanoseconds": 99519869509,
+      "wallSeconds": 99.519869509,
+      "attemptedPeakMemberships": 75218,
+      "admittedPeakMemberships": 75218,
+      "retainedMembershipsAtTerminal": 66008,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ]
+    },
+    {
+      "id": "SH011",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          1,
+          105
+        ],
+        "operationsAtRefusal": 2000004,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000004,
+      "decodeOperations": 363558,
+      "constructionOperations": 1636446,
+      "wallNanoseconds": 99297297868,
+      "wallSeconds": 99.297297868,
+      "attemptedPeakMemberships": 74364,
+      "admittedPeakMemberships": 74364,
+      "retainedMembershipsAtTerminal": 66970,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ]
+    },
+    {
+      "id": "SH016",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          5,
+          10
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "decodeOperations": 365449,
+      "constructionOperations": 1634552,
+      "wallNanoseconds": 49966139312,
+      "wallSeconds": 49.966139312,
+      "attemptedPeakMemberships": 83246,
+      "admittedPeakMemberships": 83246,
+      "retainedMembershipsAtTerminal": 77954,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ]
+    },
+    {
+      "id": "SH017",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          5,
+          7
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "decodeOperations": 390244,
+      "constructionOperations": 1609757,
+      "wallNanoseconds": 56222438132,
+      "wallSeconds": 56.222438132,
+      "attemptedPeakMemberships": 83465,
+      "admittedPeakMemberships": 83465,
+      "retainedMembershipsAtTerminal": 77494,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ]
+    },
+    {
+      "id": "SH166",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          5,
+          72
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "decodeOperations": 341473,
+      "constructionOperations": 1658528,
+      "wallNanoseconds": 51075637626,
+      "wallSeconds": 51.075637626,
+      "attemptedPeakMemberships": 74984,
+      "admittedPeakMemberships": 74984,
+      "retainedMembershipsAtTerminal": 72240,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ]
+    }
+  ],
+  "parentOutcomes": {
+    "PASS": 5,
+    "REFUSED": 5,
+    "FAIL": 0,
+    "UNRUN": 15
+  },
+  "parentCompleteCandidates": 0,
+  "noHotspotInference": "Latest source marker is reused in several phases; unchanged refusal source and +8 memberships cannot locate cost or prove cache use. No unchanged diagnostic or instrumentation batch requested.",
+  "materialAlgorithm": "Per-original-facet one-sided complete-owner planar sections with multiplicity and half-open crossing parity; existing ray policy for exact boundary ambiguity. Original physical constraints/output fields/global audit stay authoritative.",
+  "beforeSUTFreezeSHA256": "a09c6b22370fa896e158f92ba94177f177882dd9e4e236877d0cda1bf95aec5a",
+  "algorithmSHA256": "f3a0d42d927f0465875517ea63933ceb39b01e8cc33f5473b7e1b6ffa68a3716",
+  "sourceValidator": "tools/verify_section_source.py; Python stdlib source/identity only",
+  "strictOldControls": "All 35 previous test source bodies, original fixtures and 108/120 strict full-work comparisons are byte exact. All current 42 tests UNRUN.",
+  "newTests": [
+    {
+      "file": "src/section_tests.rs",
+      "name": "one_sided_sections_preserve_complete_nonconvex_cavity_and_oblique_hulls",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/section_tests.rs",
+      "name": "one_sided_sections_preserve_original_contact_and_field_refusals",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/sections.rs",
+      "name": "limiting_sections_match_hand_derived_zero_sign_and_tangent_cases",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/sections.rs",
+      "name": "half_open_parity_preserves_cavity_multiplicity_and_boundary_ambiguity",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/sections.rs",
+      "name": "whole_plane_query_matches_independent_box_corner_support_and_storage_boundary",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/sections.rs",
+      "name": "section_frame_reserves_complete_ownership_and_releases_failed_build",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/sections.rs",
+      "name": "accounted_callback_preserves_arrangement_and_adds_live_classifier_storage",
+      "status": "UNRUN"
+    }
+  ],
+  "normalLimits": {
+    "operationsIncludingDecode": 2000000,
+    "storageMemberships": 100000,
+    "rationalBits": 4096,
+    "completeOutputTriangles": 512
+  },
+  "newWork": "Every owner/tree/leaf/candidate/section/segment visit and map lookup charged; constructed section points use original coordinate guards; unchanged complete field and fallback charges.",
+  "newStorage": "Frame 16 + 6/owner + 7/segment, N query ordinals, original bounded tree stack, 64 triangle scratch, 32 parity scratch, 48 field scratch. Original physical/coplanar ownership admitted during frame construction. Live arrangement bound retained during callbacks.",
+  "newLifetime": "One frame per original facet; failed build rolls back frame reservation; all frame records drop/release after arrangement. No ray values or frame data reused across source facets.",
+  "geometryExecution": "UNRUN",
+  "compilerExecution": "UNRUN",
+  "wholeFive": "HELD pending Root/G2 whole-source review and owner coordination",
+  "fleetBaseline": {
+    "shipsAccepted": 23,
+    "shipsTotal": 162,
+    "stationsAccepted": 4,
+    "stationsTotal": 6,
+    "newRustHullsAccepted": 0
+  },
+  "claimedPerformance": "None; strict old work requirements retained. New full differential comparisons emit work/storage and same-fixture monotonic timing; >=10x timing regression fails."
+}

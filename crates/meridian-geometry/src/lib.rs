@@ -7,6 +7,7 @@ mod certificate;
 mod exact;
 mod planes;
 mod region;
+mod section_arrangement;
 mod source;
 
 pub use adapter::OriginalAsset;
@@ -18,3 +19,6 @@ pub use source::{AffineTransform, Facet, SourceId, Vertex};
 
 #[cfg(test)]
 mod pruning;
+
+#[cfg(test)]
+mod section_tests;

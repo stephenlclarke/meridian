@@ -1,0 +1,201 @@
+{
+  "observedAt": "2026-11-17T04:06:25.906005+00:00",
+  "head": "5489c3eb0c319a2518cd2e22ca790c127abcec24",
+  "tree": "f1f0b4c8d22be048b937034cdac641a597d31234",
+  "method": "Root independent post-terminal local copied artifact SHA256/length and immutable source tar versus committed Git bytes. DELAYED after actual START; no Root live observation or rerun. Executor physical-source and live /proc claims remain owner evidence, not Root independently observed.",
+  "artifactsVerified": 52,
+  "inputsVerified": 9,
+  "sourceGitTarPinsVerified": 292,
+  "handoff": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-5489c3e/GEOMETRY-5489C3E-FOCUSED-AND-ORIGINAL-HANDOFF.json",
+  "handoffSHA256": "ec73704111fc769fd0714634e106e6eadcdc323ec7d2983d76781ccdd79a3a54",
+  "focused": {
+    "rustTests": 35,
+    "rustSummaryCounts": [
+      18,
+      6,
+      9,
+      2,
+      0
+    ],
+    "hostTests": 9,
+    "check": "PASS",
+    "strictClippy": "PASS",
+    "devConstructorBuild": "PASS",
+    "proof": {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-5489c3e/remote-result/linux/FOCUSED-PROOF.json",
+      "bytes": 5365,
+      "sha256": "4addc77b8153aea9a57ab957d0b997bb391a7bb15cccad03ad60ba2db73fb281"
+    },
+    "focusedResultsSnapshot": {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-5489c3e/remote-result/linux/FOCUSED-RESULTS-SNAPSHOT.json",
+      "bytes": 3136,
+      "sha256": "1f0fe3e0da1d655b253a617a35d02e3083c28d620fe6693ef538b8d7cce93d04"
+    },
+    "measuredStrictControls": [
+      "FORWARD_RAY_COMPLETE {\"fixture\":\"subdivided_identity\",\"oldOperations\":440444,\"newOperations\":431467,\"oldAttemptedPeak\":35352,\"newAttemptedPeak\":35352,\"oldRetained\":18144,\"newRetained\":18144,\"triangles\":108}",
+      "FORWARD_RAY_COMPLETE {\"fixture\":\"subdivided_buried\",\"oldOperations\":457447,\"newOperations\":446827,\"oldAttemptedPeak\":36048,\"newAttemptedPeak\":36048,\"oldRetained\":18144,\"newRetained\":18144,\"triangles\":108}"
+    ]
+  },
+  "terminal": {
+    "wrapperPID": 600,
+    "exit": 1,
+    "focusedExit": 0,
+    "wholeFiveExecuted": true,
+    "finishedUTC": "2026-11-17T04:05:25.639966+00:00",
+    "head": "5489c3eb0c319a2518cd2e22ca790c127abcec24",
+    "tree": "f1f0b4c8d22be048b937034cdac641a597d31234",
+    "noRetry": true
+  },
+  "cases": [
+    {
+      "id": "SH010",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          1,
+          88
+        ],
+        "operationsAtRefusal": 2000002,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000002,
+      "decodeOperations": 359198,
+      "constructionOperations": 1640804,
+      "wallNanoseconds": 99519869509,
+      "wallSeconds": 99.519869509,
+      "attemptedPeakMemberships": 75218,
+      "admittedPeakMemberships": 75218,
+      "retainedMembershipsAtTerminal": 66008,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ]
+    },
+    {
+      "id": "SH011",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          1,
+          105
+        ],
+        "operationsAtRefusal": 2000004,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000004,
+      "decodeOperations": 363558,
+      "constructionOperations": 1636446,
+      "wallNanoseconds": 99297297868,
+      "wallSeconds": 99.297297868,
+      "attemptedPeakMemberships": 74364,
+      "admittedPeakMemberships": 74364,
+      "retainedMembershipsAtTerminal": 66970,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ]
+    },
+    {
+      "id": "SH016",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          5,
+          10
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "decodeOperations": 365449,
+      "constructionOperations": 1634552,
+      "wallNanoseconds": 49966139312,
+      "wallSeconds": 49.966139312,
+      "attemptedPeakMemberships": 83246,
+      "admittedPeakMemberships": 83246,
+      "retainedMembershipsAtTerminal": 77954,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ]
+    },
+    {
+      "id": "SH017",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          5,
+          7
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "decodeOperations": 390244,
+      "constructionOperations": 1609757,
+      "wallNanoseconds": 56222438132,
+      "wallSeconds": 56.222438132,
+      "attemptedPeakMemberships": 83465,
+      "admittedPeakMemberships": 83465,
+      "retainedMembershipsAtTerminal": 77494,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ]
+    },
+    {
+      "id": "SH166",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          5,
+          72
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "decodeOperations": 341473,
+      "constructionOperations": 1658528,
+      "wallNanoseconds": 51075637626,
+      "wallSeconds": 51.075637626,
+      "attemptedPeakMemberships": 74984,
+      "admittedPeakMemberships": 74984,
+      "retainedMembershipsAtTerminal": 72240,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ]
+    }
+  ],
+  "outcomes": {
+    "PASS": 5,
+    "REFUSED": 5,
+    "FAIL": 0,
+    "UNRUN": 15
+  },
+  "completeCandidates": 0,
+  "fleetAdmissions": 0,
+  "guards": {
+    "operations": 2000000,
+    "storageMemberships": 100000,
+    "rationalBits": 4096,
+    "triangles": 512
+  },
+  "next": "Existing G4 causal assessment of exact failure and changed implementation only; no unchanged retry or cap waiver."
+}

@@ -178,6 +178,41 @@
       "file": "src/planes.rs",
       "name": "planes::tests::reusable_storage_invalidates_hits_and_retains_guards_between_attempts",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/section_tests.rs",
+      "name": "one_sided_sections_preserve_complete_nonconvex_cavity_and_oblique_hulls",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/section_tests.rs",
+      "name": "one_sided_sections_preserve_original_contact_and_field_refusals",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/sections.rs",
+      "name": "limiting_sections_match_hand_derived_zero_sign_and_tangent_cases",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/sections.rs",
+      "name": "half_open_parity_preserves_cavity_multiplicity_and_boundary_ambiguity",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/sections.rs",
+      "name": "whole_plane_query_matches_independent_box_corner_support_and_storage_boundary",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/sections.rs",
+      "name": "section_frame_reserves_complete_ownership_and_releases_failed_build",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/sections.rs",
+      "name": "accounted_callback_preserves_arrangement_and_adds_live_classifier_storage",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -415,5 +450,17 @@
     "all34TestsAndStrictControlsByteExact": true,
     "currentExecution": "UNRUN",
     "newTestCount": 35
+  },
+  "oneSidedSectionCorrection": {
+    "qualifiedParentJoin": "5489c3eb0c319a2518cd2e22ca790c127abcec24",
+    "parentHandoffSHA256": "ec73704111fc769fd0714634e106e6eadcdc323ec7d2983d76781ccdd79a3a54",
+    "deltaSHA256": "f2410f3e836fcd7500193ca72b28bada463ae290398797821215d6f640566de7",
+    "beforeSUTFreezeSHA256": "a09c6b22370fa896e158f92ba94177f177882dd9e4e236877d0cda1bf95aec5a",
+    "parentRustPass": 35,
+    "parentHostPass": 9,
+    "parentWholeFive": "5OperationsREFUSED/15dependentUNRUN/0candidate",
+    "all35TestsAndStrictControlsByteExact": true,
+    "currentExecution": "UNRUN",
+    "newTestCount": 42
   }
 }

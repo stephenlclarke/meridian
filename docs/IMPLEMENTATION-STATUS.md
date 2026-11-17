@@ -1,5 +1,9 @@
 # Implementation and validation status
 
+## Following exact plane-section geometry candidate
+
+The `ce98ec9` author packet is now composed on the qualified `5489c3e` geometry branch. It replaces ordinary per-cell ray classification with one-sided complete-owner sections on each original source facet, retaining the exact boundary fallback, complete witnesses, field provenance and global audits. Seven new tests bring the candidate to 42 Rust and nine host cases, all **UNRUN**. All 35 prior tests and strict 108/120 work assertions remain unchanged. Independent whole review is required before owning qualification and one changed whole-five batch. The parent still has five Operations constructor refusals, fifteen dependent bodies unrun and zero candidates; 2M operations, 100k memberships, 4096 bits and 512 triangles remain unchanged. No new hull, fit or performance acceptance is claimed.
+
 ## Current reusable ray storage correction
 
 Actual `a5b00c9` focused qualification passed 34 Rust tests, nine host tests, all-target check, strict Clippy and the dev constructor build. The subsequent single original batch decoded all five inputs, then all five constructions reached the unchanged Operations limit; 15 dependent checks were unrun and no complete candidate returned. Root verified 284 source pins, the actual running constructor binary, then 50 copied artifacts and 14 inner seals. Those are refused attempts, not full-construction timing, storage-fit or minimum proofs.

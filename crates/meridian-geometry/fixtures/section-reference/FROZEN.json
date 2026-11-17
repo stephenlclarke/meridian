@@ -1,0 +1,21 @@
+{
+  "phase": "BEFORE_ONE_SIDED_SECTION_SOURCE_AUTHORING",
+  "parentAuthorHead": "44bb43552432ceb66d8c175e08dc6380ed017273",
+  "files": {
+    "CASES.json": {
+      "bytes": 3024,
+      "sha256": "9d7dfb0ee506347aeb92b2779fed6da581b1d7273770a80d21bfe7a75527d000"
+    },
+    "before-certificate.rs": {
+      "bytes": 54557,
+      "sha256": "dd9eba6c7f74dfc6c3daa3729f5a598c15c64d30bf8a9df304a43503df9ac626"
+    }
+  },
+  "unchangedSharedAuthority": [
+    "src/arrangement.rs",
+    "src/source.rs",
+    "src/exact.rs",
+    "src/planes.rs",
+    "src/budget.rs"
+  ]
+}
