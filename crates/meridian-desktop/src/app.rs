@@ -566,6 +566,7 @@ impl App {
             None
         };
 
+        let traffic = self.game.world.traffic_snapshot();
         let cockpit = self
             .game
             .playing()
@@ -649,6 +650,7 @@ impl App {
                 &snapshot,
                 station,
                 SceneEffects {
+                    traffic: traffic.as_ref(),
                     pulse: self.pulse.as_ref(),
                     missiles: &self.missile_bodies,
                     practice: practice.as_ref().and_then(|state| state.beacons.as_ref()),
