@@ -31,6 +31,8 @@ Preview publication runs asynchronously in the existing release session. G1 and 
 
 Coverage artifacts retain their original measurements. `make coverage-paths` creates `coverage/python-sonar.xml` from the raw Python report and binds filenames to the current checkout across Cargo analysis modules. CI uses absolute workspace report paths for module sensors. Verify actual per-file coverage attribution and open findings as well as the overall gate result; an ignored small-change coverage condition does not demonstrate a missing import is fixed. Preserve Previous version and exact-main SHA analysis settings.
 
+The Linux coverage job also launches the instrumented desktop under Xvfb with Mesa software Vulkan. It drives the normal title, new commander, System, Trading, Back to HUD, and quit controls through X11. The job requires the expected presented frames, a valid isolated starter save, a clean exit, and native coverage hits in the viewport, scale, and GPU upload adapters. The coverage artifact contains the captures, backend and process receipt, and the app-only LLVM report alongside the merged unit and native report used by SonarQube.
+
 ## Repository maintenance
 
 Update README, implementation status and affected guides in the same change as behavior or acceptance. Keep a single current status page; identify historical contracts as historical. Replace stale pending/UNRUN wording when exact evidence exists, while preserving unresolved limits and failures. Keep PR descriptions aligned with their final scope and validation.

@@ -56,8 +56,11 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Install Linux window dependencies
-        run: sudo apt-get update && sudo apt-get install -y libxkbcommon-dev libx11-dev libwayland-dev pkg-config
+      - name: Install Linux window and software Vulkan dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxkbcommon-dev libx11-dev libwayland-dev pkg-config \
+            xvfb xauth xdotool imagemagick libvulkan1 mesa-vulkan-drivers
       - name: Install pinned Rust toolchain
         run: rustup toolchain install 1.99.0 --profile minimal --component llvm-tools-preview --component clippy
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
@@ -66,10 +69,34 @@ jobs:
       - uses: taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519 # v2
         with:
           tool: cargo-llvm-cov@0.9.1
-      - name: Rust coverage and Clippy report
+      - name: Rust unit and native window coverage
         run: |
           mkdir -p coverage
-          cargo llvm-cov --workspace --locked --lcov --output-path coverage/lcov.info
+          coverage_env=$(cargo llvm-cov show-env --sh)
+          eval "$coverage_env"
+          cargo llvm-cov clean --workspace
+          cargo test --workspace --locked
+          cargo build --locked -p meridian-desktop --bin meridian-desktop --example inspect_commander
+          target_dir="$CARGO_LLVM_COV_TARGET_DIR"
+          mapfile -t lavapipe < <(dpkg -L mesa-vulkan-drivers | grep -E '/lvp_icd(\.[^.]+)?\.json$')
+          test "${#lavapipe[@]}" -eq 1
+          test -f "${lavapipe[0]}"
+          VK_DRIVER_FILES="${lavapipe[0]}" VK_ICD_FILENAMES="${lavapipe[0]}" WINIT_X11_SCALE_FACTOR=1 \
+            xvfb-run --auto-servernum --server-args="-screen 0 1600x900x24 -dpi 96 -nolisten tcp" \
+            python3 -B .github/scripts/native_coverage_smoke.py \
+              --binary "$target_dir/debug/meridian-desktop" \
+              --observer "$target_dir/debug/examples/inspect_commander" \
+              --output coverage/native
+          llvm_bin="$(rustc --print target-libdir)/../bin"
+          "$llvm_bin/llvm-profdata" merge -sparse coverage/native/desktop-*.profraw \
+            -o coverage/native/desktop.profdata
+          "$llvm_bin/llvm-cov" export "$target_dir/debug/meridian-desktop" \
+            -instr-profile=coverage/native/desktop.profdata -format=lcov > coverage/native/desktop.lcov
+          python3 -B .github/scripts/check_native_coverage.py coverage/native/desktop.lcov
+          cp coverage/native/desktop-*.profraw "$(dirname "$LLVM_PROFILE_FILE")/"
+          cargo llvm-cov report --workspace --lcov --output-path coverage/lcov.info
+      - name: Clippy report
+        run: |
           cargo clippy --workspace --all-targets --locked --message-format=json -- -D warnings > coverage/clippy.json
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
@@ -80,6 +107,7 @@ jobs:
           python -m coverage run -m unittest discover -s tools -p 'test_*.py' -v
           python -m coverage xml -o coverage/python.xml
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
         with:
           name: coverage-reports
           path: coverage/
