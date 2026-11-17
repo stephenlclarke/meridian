@@ -38,13 +38,21 @@ impl Resources {
             .ok_or(TrafficError::SequenceExhausted)?;
         Ok(())
     }
+    #[cfg(test)]
     pub(super) fn hit(&mut self, front: bool) -> Result<(), TrafficError> {
+        self.hit_damage(front, 1500)
+    }
+    pub(super) fn hit_damage(
+        &mut self,
+        front: bool,
+        incoming_damage: u16,
+    ) -> Result<(), TrafficError> {
         let shield = if front {
             &mut self.front
         } else {
             &mut self.rear
         };
-        let absorbed = (*shield).min(1500);
+        let absorbed = (*shield).min(incoming_damage);
         *shield -= absorbed;
         let total = if front {
             &mut self.absorbed_front
@@ -54,7 +62,7 @@ impl Resources {
         *total = total
             .checked_add(u64::from(absorbed))
             .ok_or(TrafficError::SequenceExhausted)?;
-        let remainder = 1500 - absorbed;
+        let remainder = incoming_damage - absorbed;
         let damage = self.energy.min(remainder);
         self.energy -= damage;
         self.hull_damage = self
@@ -71,7 +79,17 @@ impl Resources {
             .ok_or(TrafficError::SequenceExhausted)?;
         Ok(())
     }
+    #[cfg(test)]
     pub(super) fn validate(self, age: u64, shots: usize, incoming: usize) -> Result<(), SaveError> {
+        self.validate_with_damage(age, shots, incoming, incoming as u64 * 1500)
+    }
+    pub(super) fn validate_with_damage(
+        self,
+        age: u64,
+        shots: usize,
+        incoming: usize,
+        beam_damage: u64,
+    ) -> Result<(), SaveError> {
         if self.energy > 38_000
             || self.front > 30_000
             || self.rear > 30_000
@@ -90,7 +108,7 @@ impl Resources {
                 + u128::from(self.absorbed_rear)
                 + u128::from(self.hull_damage)
                 + u128::from(self.overkill)
-                != u128::from(self.incoming) * 1500 + u128::from(self.incoming_missiles) * 16000
+                != u128::from(beam_damage) + u128::from(self.incoming_missiles) * 16000
             || u128::from(self.energy_regen) > u128::from(age) * 7
             || u128::from(self.front_regen) > u128::from(age) * 3
             || u128::from(self.rear_regen) > u128::from(age) * 3
@@ -190,6 +208,7 @@ impl State {
                 .dot(sub(actor.position, target.position))
                 >= 0.0;
             let beam = TrafficBeam {
+                weapon: crate::flight::OrdinaryWeapon::FrontPulseLaser,
                 source: BeamSource::Npc(actor.id),
                 victim: target.id,
                 world_tick,
@@ -213,6 +232,7 @@ impl State {
         input: PlayerBeamInput,
     ) -> Result<Self, TrafficError> {
         let PlayerBeamInput {
+            weapon,
             system,
             source,
             origin,
@@ -231,7 +251,8 @@ impl State {
         if self.receipt_count() >= MAX_TRAFFIC_SHOTS {
             return Err(TrafficError::ReceiptCapacity);
         }
-        if !matches!(source, BeamSource::Player { .. })
+        if !weapon.is_laser()
+            || !matches!(source, BeamSource::Player { .. })
             || contact.id.system != system
             || self.beam(data, system, origin, direction, 6000.0) != Some(contact)
         {
@@ -245,6 +266,7 @@ impl State {
             .dot(sub(origin, victim.position))
             >= 0.0;
         next.apply_hit(TrafficBeam {
+            weapon,
             source,
             victim: contact.id,
             world_tick,
@@ -268,7 +290,9 @@ impl State {
         if !actor.airborne() {
             return Err(TrafficError::InvalidState);
         }
-        actor.resources.hit(beam.front)?;
+        actor
+            .resources
+            .hit_damage(beam.front, beam.weapon.damage_hundredths())?;
         if let BeamSource::Npc(id) = beam.source {
             actor.aggressor = Some(id);
         }
@@ -279,5 +303,51 @@ impl State {
         self.actors[index] = Some(actor);
         Arc::make_mut(&mut self.shots).push(beam);
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod weapon_tests {
+    use super::super::Resources;
+    use crate::OrdinaryWeapon;
+    fn ok<T, E: core::fmt::Debug>(value: Result<T, E>) -> T {
+        value.unwrap_or_else(|error| panic!("{error:?}"))
+    }
+    #[test]
+    fn source_laser_profiles_debit_real_facing_shields_and_conserve_different_incoming_damage() {
+        // Reducer component vectors only; this grants no Military/Naval ownership or contact.
+        for (weapon, shield) in [
+            (OrdinaryWeapon::FrontPulseLaser, 28500),
+            (OrdinaryWeapon::FrontMiningLaser, 25000),
+            (OrdinaryWeapon::FrontBeamLaser, 28500),
+            (OrdinaryWeapon::FrontMilitaryLaser, 27700),
+            (OrdinaryWeapon::FrontNavalLaser, 23600),
+        ] {
+            let mut resources = Resources::fresh();
+            ok(resources.hit_damage(true, weapon.damage_hundredths()));
+            assert_eq!(
+                (resources.front, resources.rear, resources.energy),
+                (shield, 30000, 38000)
+            );
+            ok(resources.validate_with_damage(0, 0, 1, u64::from(weapon.damage_hundredths())));
+        }
+        let mut resources = Resources::fresh();
+        for _ in 0..8 {
+            ok(resources.hit_damage(true, 6400));
+        }
+        assert_eq!(
+            (resources.front, resources.rear, resources.energy),
+            (0, 30000, 16800)
+        );
+        assert_eq!(
+            (
+                resources.incoming,
+                resources.hull_damage,
+                resources.overkill
+            ),
+            (8, 21200, 0)
+        );
+        ok(resources.validate_with_damage(0, 0, 8, 51200));
+        assert!(resources.validate_with_damage(0, 0, 8, 12000).is_err());
     }
 }

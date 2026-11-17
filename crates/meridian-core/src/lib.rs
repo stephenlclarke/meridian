@@ -62,6 +62,6 @@ pub use flight::{
     ModuleProvenance, ModuleReview, ModuleSlot, OwnedModule, PreparedModule,
 };
 
-pub use flight::FlightResourcesSnapshot;
+pub use flight::{FlightResourcesSnapshot, FrontLaserSnapshot};
 
 pub use flight::{EquipmentPreparationError, PreparedEquipment};

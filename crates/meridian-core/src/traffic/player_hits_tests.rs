@@ -207,6 +207,7 @@ fn actual_native_player_hit_admits_pirate_retaliation_without_claiming_player_ca
     let mut state = ok(state.prepare_player_hit(
         &data,
         PlayerBeamInput {
+            weapon: crate::OrdinaryWeapon::FrontPulseLaser,
             system: SystemId::AVENOR,
             source: BeamSource::Player {
                 owner: 12001,

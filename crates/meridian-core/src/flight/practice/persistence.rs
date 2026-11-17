@@ -3,7 +3,6 @@ use super::{
     PracticeOutcome, Range, RecordedPose, Retirement, RigidPose, Snapshot, SystemId, geometry,
     lifecycle, reception,
 };
-use crate::flight::weapons::PulseResources;
 use crate::navigation::SavedNavigationSummary;
 use crate::save::{Reader, SaveError, Writer};
 const INVALID: SaveError = SaveError::InvalidState("T02 practice consent, visit or receipts");
@@ -112,8 +111,9 @@ impl Practice {
         navigation: NavigationState,
         flight: Snapshot,
         data: &OriginalStationData,
-        pulse: PulseResources,
+        world: &super::super::World,
     ) -> Result<(), SaveError> {
+        let pulse = world.pulse;
         self.validate_closure(nav, flight.tick)?;
         let sortie = self.sortie().ok_or(INVALID)?;
         self.validate_consent(nav, flight.tick)?;
@@ -123,7 +123,7 @@ impl Practice {
             if range.opened_tick <= self.confirmed_tick || range.opened_tick > last_active_tick {
                 return Err(INVALID);
             }
-            range.validate(last_active_tick, flight, data)?;
+            range.validate(last_active_tick, flight, data, world)?;
             if let Some(latest_hit) = range
                 .hits
                 .iter()
@@ -136,13 +136,14 @@ impl Practice {
                 // advances the weapon clock; docking and arrival retain cooldown.
                 // A later discharge can only raise the remainder of this floor.
                 let elapsed = flight.tick - latest_hit;
-                let minimum = u64::from(crate::PULSE_COOLDOWN_TICKS).saturating_sub(elapsed);
+                let minimum = u64::from(world.front_cadence_at_tick(latest_hit).ok_or(INVALID)?)
+                    .saturating_sub(elapsed);
                 if u64::from(pulse.remaining_cooldown()) < minimum {
                     return Err(INVALID);
                 }
             }
         }
-        self.validate_reception(nav, flight, pulse, navigation.dock())
+        self.validate_reception(nav, flight, world, navigation.dock())
     }
     fn validate_consent(self, nav: SavedNavigationSummary, tick: u64) -> Result<(), SaveError> {
         use crate::navigation::DockOrigin;
@@ -217,6 +218,7 @@ impl Range {
         last_active_tick: u64,
         flight: Snapshot,
         data: &OriginalStationData,
+        world: &super::super::World,
     ) -> Result<(), SaveError> {
         let station = flight.station.ok_or(INVALID)?;
         let opening = self.opening.checked_pose_at(self.opened_tick, flight)?;
@@ -254,7 +256,7 @@ impl Range {
         let mut hits = ticks.into_iter().filter(|tick| *tick != 0);
         if let Some(mut prior) = hits.next() {
             for tick in hits {
-                if tick - prior < u64::from(crate::PULSE_COOLDOWN_TICKS) {
+                if tick - prior < u64::from(world.front_cadence_at_tick(prior).ok_or(INVALID)?) {
                     return Err(INVALID);
                 }
                 prior = tick;

@@ -207,7 +207,16 @@ impl State {
             .checked_sub(a.birth_clock)
             .and_then(|v| v.checked_add(1))
             .ok_or(INVALID)?;
-        a.resources.validate(age, outgoing, incoming)?;
+        a.resources.validate_with_damage(
+            age,
+            outgoing,
+            incoming,
+            self.shots
+                .iter()
+                .filter(|shot| shot.victim == a.id)
+                .map(|shot| u64::from(shot.weapon.damage_hundredths()))
+                .sum(),
+        )?;
         if usize::from(a.resources.incoming_missiles)
             != self
                 .missile_hits
@@ -270,6 +279,12 @@ impl State {
         let mut prior_world = 0;
         let mut last_npc = [None; MAX_TRAFFIC_ACTORS];
         for shot in self.shots.iter() {
+            if !shot.weapon.is_laser()
+                || (matches!(shot.source, BeamSource::Npc(_))
+                    && shot.weapon != crate::flight::OrdinaryWeapon::FrontPulseLaser)
+            {
+                return Err(INVALID);
+            }
             let si = system_index(shot.victim.system).ok_or(INVALID)?;
             let victim = self.actor_index(shot.victim).ok_or(INVALID)?;
             if shot.world_tick == 0
@@ -374,7 +389,11 @@ impl State {
             hit.encode(w);
         }
     }
+    #[cfg(test)]
     pub(crate) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+        Self::decode_version(r, crate::save::SAVE_VERSION)
+    }
+    pub(crate) fn decode_version(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
         let enabled = r.bool()?;
         let seed = r.u64()?;
         let clocks = [r.u64()?, r.u64()?];
@@ -385,7 +404,7 @@ impl State {
         }
         let mut shots = Vec::with_capacity(count);
         for _ in 0..count {
-            shots.push(TrafficBeam::decode(r)?);
+            shots.push(TrafficBeam::decode(r, version)?);
         }
         let hits = usize::from(r.u16()?);
         if hits + count > MAX_TRAFFIC_SHOTS {
@@ -612,8 +631,9 @@ impl TrafficBeam {
         point(w, self.point);
         rigid(w, self.victim_pose);
         w.bool(self.front);
+        w.u8(self.weapon.tag());
     }
-    fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+    fn decode(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
         Ok(Self {
             source: match r.u8()? {
                 0 => BeamSource::Npc(NpcId::decode(r)?),
@@ -633,6 +653,11 @@ impl TrafficBeam {
             point: read_point(r)?,
             victim_pose: read_rigid(r)?,
             front: r.bool()?,
+            weapon: if version >= 16 {
+                crate::flight::OrdinaryWeapon::from_tag(r.u8()?)?
+            } else {
+                crate::flight::OrdinaryWeapon::FrontPulseLaser
+            },
         })
     }
 }

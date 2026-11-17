@@ -338,7 +338,7 @@ impl State {
     ) -> Result<Resources, SaveError> {
         enum Action {
             Fire,
-            Pulse(bool),
+            Pulse(bool, u16),
             Missile(bool),
         }
         let mut actions = Vec::new();
@@ -364,7 +364,13 @@ impl State {
                 actions.push((b.local_tick, b.world_tick, order, i, Action::Fire));
             }
             if b.victim == a.id {
-                actions.push((b.local_tick, b.world_tick, order, i, Action::Pulse(b.front)));
+                actions.push((
+                    b.local_tick,
+                    b.world_tick,
+                    order,
+                    i,
+                    Action::Pulse(b.front, b.weapon.damage_hundredths()),
+                ));
             }
         }
         for (i, h) in self.player_hits.iter().enumerate() {
@@ -397,7 +403,7 @@ impl State {
             resources.advance_exact(n)?;
             match action {
                 Action::Fire => resources.fire(),
-                Action::Pulse(front) => resources.hit(front),
+                Action::Pulse(front, damage) => resources.hit_damage(front, damage),
                 Action::Missile(front) => resources.hit_missile(front),
             }
             .map_err(|_| INVALID)?;

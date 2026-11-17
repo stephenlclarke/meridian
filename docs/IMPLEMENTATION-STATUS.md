@@ -1,5 +1,9 @@
 # Implementation and validation status
 
+## Front laser and energy source awaiting integration
+
+The isolated `bd506f9`-based implementation adds paid Beam firing, original Military/Naval and energy profiles, same-item Basic Energy custody, separate energy/front equipment views and selected held firing. It extends the accepted one nine-byte player resource journal and exact paid fitting ledger; it does not import an old standalone pool/history or a successful missing-work adapter. New tests are authored and unrun. The current accepted Root NPC/replay corrections, real physical mining/Scoops and explicit XYZZY backend/UI must be composed and reviewed before owning execution or new compatibility/native claims. The format16 fingerprint is provisional for that shared join; the accepted literal15 and qualified4-11/13 readers are retained. See [front laser and energy scope](FAST-LASERS.md) for values, exact guard/cap preservation, acquisition limits, binding and qualification criteria.
+
 ## Current NPC qualification
 
 The latest tested source is `2b7b350`: all-target compilation passed, then the Mac core run finished **282 PASS / 4 FAIL**. Desktop, observer-example, Clippy, release and native gates were not reached. The four-case correction retains the actual missile self-hit and station collision checks: public pilots face the target more closely, pursue the actual trader through yaw/throttle during missile flight and align with the real docking aperture. The capacity-negative contact fixture uses the shared native hull-surface aim. The legacy case preserves current NPC history and separately exercises a genuine v4 opening through current public commands. All original final contact, damage, cash, cargo, cold-continuation and 500-step assertions remain. This corrected source is **UNRUN** and needs combined delta review before owning qualification.

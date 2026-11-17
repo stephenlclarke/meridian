@@ -1,7 +1,6 @@
 //! Fixed-tick front Pulse Laser resources and World-bound discharge.
 use super::{FlightMode, World, flight_pose};
 use crate::docking::Vec3;
-use crate::freight::g02::StarterComponent;
 use crate::save::{Reader, SaveError, Writer};
 use core::fmt;
 
@@ -9,7 +8,7 @@ pub const PULSE_RANGE: f64 = 6000.0;
 pub const PULSE_COOLDOWN_TICKS: u8 = 18;
 pub const ENERGY_CAPACITY_HUNDREDTHS: u16 = 38_000;
 const ENERGY_COST_HUNDREDTHS: u16 = 100;
-const ENERGY_RECHARGE_HUNDREDTHS: u16 = 7;
+pub(super) const ENERGY_RECHARGE_HUNDREDTHS: u16 = 7;
 const HEAT_LIMIT_FIFTHS: u16 = 1200;
 const HEAT_COST_FIFTHS: u16 = 50;
 
@@ -20,6 +19,7 @@ pub enum FireError {
     NoCommander,
     NotInFlight,
     NoFittedFrontPulseLaser,
+    NoFittedFrontLaser,
     NoCompatibleMiningTool,
     CoolingDown,
     Overheated,
@@ -35,6 +35,7 @@ impl fmt::Display for FireError {
             Self::Paused => "World is paused",
             Self::NoCommander => "An owned commander profile is required",
             Self::NotInFlight => "The front Pulse Laser requires active flight",
+            Self::NoFittedFrontLaser => "No owned compatible front laser is fitted",
             Self::NoCompatibleMiningTool => "Fit a paid compatible mining laser",
             Self::NoFittedFrontPulseLaser => "No owned front Pulse Laser is fitted",
             Self::CoolingDown => "Pulse Laser is cooling down",
@@ -87,9 +88,20 @@ pub struct PulseLaserSnapshot {
     pub cooldown_ticks: u8,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct FrontLaserSnapshot {
+    pub fitted_item_id: u64,
+    pub weapon: super::OrdinaryWeapon,
+    pub damage_hundredths: u16,
+    pub range: u16,
+    pub cooldown_ticks_per_shot: u8,
+}
+
 /// Shared electrical/weapon condition remains readable when a particular laser is stored.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct FlightResourcesSnapshot {
+    pub energy_capacity_hundredths: u16,
+    pub energy_recharge_hundredths_per_tick: u16,
     pub energy_hundredths: u16,
     pub heat_fifths: u16,
     pub cooldown_ticks: u8,
@@ -110,9 +122,13 @@ impl Default for PulseResources {
     }
 }
 impl PulseResources {
+    #[cfg(test)]
     pub(super) fn replay_advance(&mut self, elapsed: u64) {
+        self.replay_advance_with_rate(elapsed, 7);
+    }
+    pub(super) fn replay_advance_with_rate(&mut self, elapsed: u64, recharge: u16) {
         self.energy = u64::from(self.energy)
-            .saturating_add(elapsed.saturating_mul(7))
+            .saturating_add(elapsed.saturating_mul(u64::from(recharge)))
             .min(38000) as u16;
         self.heat = u64::from(self.heat).saturating_sub(elapsed) as u16;
         self.cooldown = u64::from(self.cooldown).saturating_sub(elapsed) as u8;
@@ -121,7 +137,7 @@ impl PulseResources {
         self.energy = 38000;
         self.heat = 0;
     }
-    pub(super) fn advance(&mut self, opening: FlightMode, next: FlightMode) {
+    pub(super) fn advance(&mut self, opening: FlightMode, next: FlightMode, recharge: u16) {
         if opening == FlightMode::Docked {
             return;
         }
@@ -131,8 +147,7 @@ impl PulseResources {
             self.energy = ENERGY_CAPACITY_HUNDREDTHS;
             self.heat = 0;
         } else {
-            self.energy =
-                (self.energy + ENERGY_RECHARGE_HUNDREDTHS).min(ENERGY_CAPACITY_HUNDREDTHS);
+            self.energy = (self.energy + recharge).min(ENERGY_CAPACITY_HUNDREDTHS);
             self.heat = self.heat.saturating_sub(1);
         }
     }
@@ -379,37 +394,37 @@ impl World {
         ))
     }
     pub(super) fn fitted_front_pulse(&self) -> Option<u64> {
-        if self
-            .modular_front()
-            .is_none_or(|i| i.kind != super::modular::ModuleKind::PulseLaser)
-        {
-            return None;
-        }
-        let nav = self.navigation?;
-        let owner = nav.owner().seed();
-        let hull = nav.ship().ordinal();
-        self.commander_account
-            .as_ref()?
-            .starter_items()?
-            .iter()
-            .find(|item| {
-                item.component() == StarterComponent::FrontPulseLaser
-                    && item.owner() == owner
-                    && item.id() == owner + 7
-                    && item.fitted_hull() == Some(hull)
-                    && item.is_standard_birth()
-            })
-            .map(crate::freight::g02::OwnedStarterItem::id)
+        self.fitted_front_laser()
+            .filter(|(_, weapon)| *weapon == super::OrdinaryWeapon::FrontPulseLaser)
+            .map(|(item, _)| item)
     }
 
     pub fn flight_resources_snapshot(&self) -> Option<FlightResourcesSnapshot> {
         self.commander_account.as_ref()?;
         Some(FlightResourcesSnapshot {
+            energy_capacity_hundredths: ENERGY_CAPACITY_HUNDREDTHS,
+            energy_recharge_hundredths_per_tick: self.energy_recharge_hundredths(),
             energy_hundredths: self.pulse.energy,
             heat_fifths: self.pulse.heat,
             cooldown_ticks: self.pulse.cooldown,
         })
     }
+    pub(super) fn fitted_front_laser(&self) -> Option<(u64, super::OrdinaryWeapon)> {
+        let item = self.modular_front()?;
+        let weapon = super::OrdinaryWeapon::from_module(item.kind)?;
+        Some((item.id, weapon))
+    }
+    pub fn front_laser_snapshot(&self) -> Option<FrontLaserSnapshot> {
+        let (fitted_item_id, weapon) = self.fitted_front_laser()?;
+        Some(FrontLaserSnapshot {
+            fitted_item_id,
+            weapon,
+            damage_hundredths: weapon.damage_hundredths(),
+            range: 6000,
+            cooldown_ticks_per_shot: weapon.cooldown_ticks(),
+        })
+    }
+
     pub fn pulse_laser_snapshot(&self) -> Option<PulseLaserSnapshot> {
         Some(PulseLaserSnapshot {
             fitted_item_id: self.fitted_front_pulse()?,
@@ -422,6 +437,16 @@ impl World {
     /// Attempt one front discharge from the current owned flight pose and fitted item.
     /// The caller supplies no ray, target, mount, damage, or physical step.
     pub fn request_fire_front_pulse(&mut self, expected_tick: u64) -> Result<PulseShot, FireError> {
+        self.request_front_discharge(expected_tick, true)
+    }
+    pub fn request_fire_front_laser(&mut self, expected_tick: u64) -> Result<PulseShot, FireError> {
+        self.request_front_discharge(expected_tick, false)
+    }
+    fn request_front_discharge(
+        &mut self,
+        expected_tick: u64,
+        pulse_only: bool,
+    ) -> Result<PulseShot, FireError> {
         if expected_tick != self.state.tick {
             return Err(FireError::StaleCommand);
         }
@@ -434,10 +459,15 @@ impl World {
         if self.state.mode != FlightMode::Flight {
             return Err(FireError::NotInFlight);
         }
-        let fitted_item_id = self
-            .fitted_front_pulse()
-            .ok_or(FireError::NoFittedFrontPulseLaser)?;
-        self.pulse.prepare_discharge()?;
+        let (fitted_item_id, weapon) = self.fitted_front_laser().ok_or(if pulse_only {
+            FireError::NoFittedFrontPulseLaser
+        } else {
+            FireError::NoFittedFrontLaser
+        })?;
+        if pulse_only && weapon != super::OrdinaryWeapon::FrontPulseLaser {
+            return Err(FireError::NoFittedFrontPulseLaser);
+        }
+        self.pulse.prepare_laser_discharge(weapon)?;
         let pose = flight_pose(self.state.position, self.state.orientation)
             .ok_or(FireError::InvalidGeometry)?;
         let origin = pose.position;
@@ -498,3 +528,31 @@ impl World {
 
 #[cfg(test)]
 mod tests;
+
+impl PulseResources {
+    pub(super) fn prepare_laser_discharge(
+        self,
+        weapon: super::OrdinaryWeapon,
+    ) -> Result<Self, FireError> {
+        if !weapon.is_laser() {
+            return Err(FireError::NoFittedFrontLaser);
+        }
+        if weapon.cooldown_ticks() == PULSE_COOLDOWN_TICKS {
+            return self.prepare_discharge();
+        }
+        if self.cooldown != 0 {
+            return Err(FireError::CoolingDown);
+        }
+        if self.heat >= HEAT_LIMIT_FIFTHS {
+            return Err(FireError::Overheated);
+        }
+        if self.energy <= ENERGY_COST_HUNDREDTHS {
+            return Err(FireError::InsufficientEnergy);
+        }
+        Ok(Self {
+            energy: self.energy - ENERGY_COST_HUNDREDTHS,
+            heat: self.heat + HEAT_COST_FIFTHS,
+            cooldown: weapon.cooldown_ticks(),
+        })
+    }
+}

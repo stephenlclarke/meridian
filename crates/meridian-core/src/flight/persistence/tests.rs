@@ -681,3 +681,66 @@ fn forged_launch_admission_counts_and_wide_overflow_values_refuse_atomically() {
         assert_eq!(world.save_bytes().unwrap(), valid);
     }
 }
+
+#[test]
+fn qualified_v15_opening_layout_keeps_real_birth_provenance_and_accepts_a_real_new_discharge() {
+    // Opening codec fixture only. At actual tick zero there are no module events or traffic
+    // shots, so the qualified15 body is byte-identical; only its frozen header differs.
+    let world = World::new_commander(15001).unwrap();
+    let current = world.save_bytes().unwrap();
+    let body = 10 + CONTENT.len() + 8;
+    let mut legacy = Writer::new();
+    legacy.bytes.extend(MAGIC);
+    legacy.u16(15);
+    legacy.bytes.extend(V15_CONTENT);
+    legacy.u64(compiled_content_fingerprint(V15_CONTENT));
+    legacy.bytes.extend(&current[body..current.len() - 8]);
+    legacy.u64(checksum(&legacy.bytes));
+    let mut loaded = World::from_save_bytes(&legacy.bytes).unwrap();
+    assert_eq!(loaded.snapshot(), world.snapshot());
+    assert_eq!(
+        loaded.modular_equipment_snapshot(),
+        world.modular_equipment_snapshot()
+    );
+    assert_eq!(loaded.credits_tenths(), Some(7200));
+    assert!(loaded.damage.enabled());
+    crate::flight::practice::tests::launch(&mut loaded);
+    loaded
+        .request_fire_front_pulse(loaded.snapshot().tick)
+        .unwrap();
+    assert_eq!(
+        loaded
+            .flight_resources_snapshot()
+            .unwrap()
+            .energy_hundredths,
+        37900
+    );
+    let bytes = loaded.save_bytes().unwrap();
+    let cold = World::from_save_bytes(&bytes).unwrap();
+    assert_eq!(
+        cold.flight_resources_snapshot(),
+        loaded.flight_resources_snapshot()
+    );
+    assert_eq!(
+        cold.modular_equipment_snapshot(),
+        loaded.modular_equipment_snapshot()
+    );
+}
+#[test]
+fn qualified_v13_absence_does_not_mint_resource_birth_history_for_fast_or_energy_modules() {
+    let world = World::new_commander(15002).unwrap();
+    let bytes = v13_test_fixture(&world).unwrap();
+    let loaded = World::from_save_bytes(&bytes).unwrap();
+    assert!(!loaded.damage.enabled());
+    let before = loaded.save_bytes().unwrap();
+    for kind in [
+        crate::ModuleKind::BeamLaser,
+        crate::ModuleKind::ExtraEnergyUnit,
+    ] {
+        assert!(matches!(
+            loaded.review_module(crate::ModuleAction::Purchase { kind }, 0),
+            Err(crate::ModuleError::Save(_))
+        ));
+    }
+    assert_eq!(loaded.save_bytes().unwrap(), before);
+}

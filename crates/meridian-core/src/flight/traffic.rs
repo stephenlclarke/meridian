@@ -10,6 +10,17 @@ impl World {
     pub(super) fn validate_traffic_player_scenes(&self) -> Result<(), crate::save::SaveError> {
         let invalid = crate::save::SaveError::InvalidState("NPC player scene receipt");
         for shot in self.traffic.beam_receipts() {
+            match shot.source {
+                BeamSource::Npc(_) if shot.weapon != super::OrdinaryWeapon::FrontPulseLaser => {
+                    return Err(invalid);
+                }
+                BeamSource::Player { item, .. }
+                    if self.front_weapon_at_tick(item, shot.world_tick) != Some(shot.weapon) =>
+                {
+                    return Err(invalid);
+                }
+                _ => {}
+            }
             if !self.traffic_beam_celestial_clear(
                 shot.victim.system(),
                 shot.world_tick,
@@ -251,6 +262,10 @@ impl World {
                     .as_ref()
                     .ok_or(FireError::InvalidGeometry)?,
                 traffic::PlayerBeamInput {
+                    weapon: self
+                        .fitted_front_laser()
+                        .ok_or(FireError::NoFittedFrontLaser)?
+                        .1,
                     system: owner.system,
                     source: BeamSource::Player {
                         owner: owner.owner,

@@ -50,7 +50,7 @@ fn step_frame(
             || state.navigation.is_some_and(|nav| nav.travel.is_some())
         {
             *pulse = None;
-        } else if fire_held && let Ok(shot) = world.request_fire_front_pulse(state.tick) {
+        } else if fire_held && let Ok(shot) = world.request_fire_front_laser(state.tick) {
             *pulse = Some(shot);
         }
     }

@@ -76,7 +76,7 @@ fn refuses(world: &mut World, command: Command, error: EquipmentError) {
 pub(in crate::flight) fn earned_world(seed: u64) -> World {
     earned_from(World::new_commander(seed).unwrap())
 }
-fn earned_from(mut world: World) -> World {
+pub(in crate::flight) fn earned_from(mut world: World) -> World {
     for (quantity, expected) in [(29, 11434), (47, 18296), (75, 29042)] {
         if world.snapshot().navigation.unwrap().system != SystemId::AVENOR {
             if world.snapshot().navigation.unwrap().fuel_units < 68 {

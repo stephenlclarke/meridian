@@ -59,8 +59,17 @@ fn paid_mining_laser_uses_original_3300cr_tl6_and_stores_the_same_born_pulse() {
     assert_eq!(item, 109112);
     assert_eq!(w.credits_tenths(), Some(cash - 33_000));
     let after = snap(&w);
-    assert_eq!(after.items.len(), 2);
+    assert_eq!(after.items.len(), 3);
     assert_eq!(after.fit_revision, 1);
+    assert_eq!(
+        after.items[1],
+        OwnedModule {
+            id: 9106,
+            kind: ModuleKind::BasicEnergySystem,
+            slot: Some(ModuleSlot::Energy),
+            provenance: ModuleProvenance::StandardBirth,
+        }
+    );
     assert_eq!(
         after.items[0],
         OwnedModule {
@@ -68,10 +77,10 @@ fn paid_mining_laser_uses_original_3300cr_tl6_and_stores_the_same_born_pulse() {
             ..pulse
         }
     );
-    assert_eq!(after.items[1].slot, Some(ModuleSlot::FrontLaser));
-    assert_eq!(after.items[1].kind, ModuleKind::MiningLaser);
+    assert_eq!(after.items[2].slot, Some(ModuleSlot::FrontLaser));
+    assert_eq!(after.items[2].kind, ModuleKind::MiningLaser);
     assert!(
-        matches!(after.items[1].provenance, ModuleProvenance::Paid { transaction: 1, dock, paid_tenths: 33_000, .. } if dock == berth)
+        matches!(after.items[2].provenance, ModuleProvenance::Paid { transaction: 1, dock, paid_tenths: 33_000, .. } if dock == berth)
     );
     assert_eq!(w.flight_resources_snapshot(), resources);
     assert_eq!(w.ammunition_snapshot(), ammo);
@@ -161,13 +170,13 @@ fn removing_and_reinstalling_exact_items_never_refunds_duplicates_or_resets_reso
     assert_eq!(w.fitted_mining_tool().unwrap().item, item);
     assert_eq!(w.credits_tenths(), cash);
     assert_eq!(w.flight_resources_snapshot(), resources);
-    assert_eq!(snap(&w).items.len(), 2);
+    assert_eq!(snap(&w).items.len(), 3);
     assert_eq!(
         snap(&w).items[0].provenance,
         ModuleProvenance::StandardBirth
     );
     assert!(matches!(
-        snap(&w).items[1].provenance,
+        snap(&w).items[2].provenance,
         ModuleProvenance::Paid {
             transaction: 1,
             paid_tenths: 33_000,
@@ -453,4 +462,58 @@ fn bounded_real_module_history_refuses_next_action_without_touching_wallet_fit_o
         }
     }
     panic!("module history escaped the complete-save byte bound");
+}
+
+#[test]
+fn repeatable_beam_and_military_policy_counts_stored_examples_toward_the_four_item_limit() {
+    // Pure ledger policy fixture, not a funded purchase or technology admission.
+    let world = World::new_commander(14901).unwrap();
+    let dock = world.current_dock_context().unwrap();
+    for kind in [ModuleKind::BeamLaser, ModuleKind::MilitaryLaser] {
+        let mut ledger = Ledger::default();
+        for transaction in 1..=4 {
+            ledger
+                .apply(
+                    Event {
+                        action: ModuleAction::Purchase { kind },
+                        item: u64::from(transaction),
+                        dock,
+                        tick: 0,
+                        revision: u64::from(transaction),
+                    },
+                    transaction,
+                )
+                .unwrap();
+            if transaction == 1 {
+                ledger
+                    .apply(
+                        Event {
+                            action: ModuleAction::Store { item: 1 },
+                            item: 1,
+                            dock,
+                            tick: 0,
+                            revision: 1,
+                        },
+                        transaction,
+                    )
+                    .unwrap();
+            }
+        }
+        assert_eq!(ledger.items.len(), 4);
+        assert_eq!(ledger.items[0].slot, None);
+        assert_eq!(
+            ledger.apply(
+                Event {
+                    action: ModuleAction::Purchase { kind },
+                    item: 5,
+                    dock,
+                    tick: 0,
+                    revision: 5
+                },
+                5
+            ),
+            Err(ModuleError::Capacity)
+        );
+        assert_eq!(ledger.items.len(), 4);
+    }
 }

@@ -33,7 +33,12 @@ fn incoming_missile_then_pulse_share_facing_shields_and_actual_energy_once() {
                 damage: 1500,
             },
         ),
-        (1, 3, 0, Effect::Pulse),
+        (
+            1,
+            3,
+            0,
+            Effect::Laser(crate::OrdinaryWeapon::FrontPulseLaser),
+        ),
     ];
     let actual = ok(replay(&events, 1));
     let mut expected = PulseResources::default();
@@ -72,7 +77,12 @@ fn rear_damage_and_true_berth_reset_are_exact_with_retained_weapon_cooldown() {
                 damage: 1500,
             },
         ),
-        (1, 3, 0, Effect::Pulse),
+        (
+            1,
+            3,
+            0,
+            Effect::Laser(crate::OrdinaryWeapon::FrontPulseLaser),
+        ),
         (2, 0, 0, Effect::Berth),
     ];
     let actual = ok(replay(&events, 2));
@@ -112,12 +122,30 @@ fn hull_overkill_is_saturating_and_npc_cannot_emit_a_new_hit_on_dead_player() {
 }
 #[test]
 fn huge_elapsed_clock_is_saturating_without_per_tick_replay_and_bad_cadence_refuses() {
-    let events = [(1, 3, 0, Effect::Pulse)];
+    let events = [(
+        1,
+        3,
+        0,
+        Effect::Laser(crate::OrdinaryWeapon::FrontPulseLaser),
+    )];
     assert_eq!(
         ok(replay(&events, u64::MAX)).pulse,
         PulseResources::default()
     );
-    let bad = [(1, 3, 0, Effect::Pulse), (18, 3, 0, Effect::Pulse)];
+    let bad = [
+        (
+            1,
+            3,
+            0,
+            Effect::Laser(crate::OrdinaryWeapon::FrontPulseLaser),
+        ),
+        (
+            18,
+            3,
+            0,
+            Effect::Laser(crate::OrdinaryWeapon::FrontPulseLaser),
+        ),
+    ];
     assert!(replay(&bad, 18).is_err());
     assert!(replay(&events, 0).is_err());
 }

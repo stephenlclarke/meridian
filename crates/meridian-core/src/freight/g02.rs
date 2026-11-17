@@ -286,7 +286,12 @@ impl CommanderAccount {
     pub(crate) fn modular_revision(&self) -> u64 {
         self.data.modular_revision
     }
-    pub(crate) fn prepare_module(&self, paid: u32, pulse_fitted: bool) -> Result<Self, Error> {
+    pub(crate) fn prepare_module(
+        &self,
+        paid: u32,
+        pulse_fitted: bool,
+        energy_fitted: bool,
+    ) -> Result<Self, Error> {
         let mut data = self.data;
         data.credits = data
             .credits
@@ -306,6 +311,12 @@ impl CommanderAccount {
             .and_then(|fit| fit.items[4].as_mut())
             .ok_or(Error::MissingEquipment)?;
         pulse.fitted_hull = pulse_fitted.then_some(data.hull);
+        let energy = data
+            .fit
+            .as_mut()
+            .and_then(|fit| fit.items[2].as_mut())
+            .ok_or(Error::MissingEquipment)?;
+        energy.fitted_hull = energy_fitted.then_some(data.hull);
         Ok(Self { data })
     }
     pub(crate) fn ammunition_revision(&self) -> u64 {
@@ -1187,7 +1198,9 @@ fn validate_cargo_and_utility(
         && fit.items.iter().enumerate().any(|(index, item)| {
             item.is_some_and(|item| {
                 item.fitted_hull != Some(account.hull)
-                    && !(index == 4 && account.modular_revision > 0 && item.fitted_hull.is_none())
+                    && !(matches!(index, 2 | 4)
+                        && account.modular_revision > 0
+                        && item.fitted_hull.is_none())
             })
         })
     {

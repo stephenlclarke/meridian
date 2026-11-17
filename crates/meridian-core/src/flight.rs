@@ -52,8 +52,8 @@ mod weapons;
 pub use mission::{MissionError, MissionSnapshot, StationNpc};
 pub use services::ServiceSnapshot;
 pub use weapons::{
-    ENERGY_CAPACITY_HUNDREDTHS, FireError, FlightResourcesSnapshot, PULSE_COOLDOWN_TICKS,
-    PULSE_RANGE, PulseContact, PulseLaserSnapshot, PulseShot,
+    ENERGY_CAPACITY_HUNDREDTHS, FireError, FlightResourcesSnapshot, FrontLaserSnapshot,
+    PULSE_COOLDOWN_TICKS, PULSE_RANGE, PulseContact, PulseLaserSnapshot, PulseShot,
 };
 
 use crate::docking::StationPose;

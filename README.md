@@ -27,6 +27,10 @@
 
 Meridian is a Rust reimplementation of the original L337 project, with direct wgpu graphics, one authoritative World and traceable original content. New code is [proprietary/source-visible](LICENSE); imported original content retains its own notices. Original Elite/Oolite assets are excluded.
 
+## Front laser and energy development
+
+A separate [authored front laser and energy implementation](docs/FAST-LASERS.md) adds paid Beam firing and actual energy fitting, with original advanced profiles and exact shared resource replay. Its tests are unrun and its shared mining/secret-activation join is pending. This is not a new qualified preview or full 1337 acceptance.
+
 ## Current delivery
 
 [Meridian Cockpit Services Preview v0.5.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.5.0-preview.1) is published for macOS arm64 and Windows x64 from protected main `07f1678` ([PR 37](https://github.com/stephenlclarke/meridian/pull/37)). It adds the flight HUD, galaxy, system, showroom, trading and equipment pages, keyboard and mouse navigation, presented transaction reviews, same-item modular storage/refitting and paid standard missiles. It retains the earlier flight, docking, finite markets, freight and lessons. This is the initial modular equipment increment; the full equipment catalogue and all-hull fitting remain open.
