@@ -681,3 +681,55 @@ fn forged_launch_admission_counts_and_wide_overflow_values_refuse_atomically() {
         assert_eq!(world.save_bytes().unwrap(), valid);
     }
 }
+
+#[test]
+fn another_real_public_branch_cannot_supply_a_practice_incident_this_world_never_emitted() {
+    use crate::flight::missiles::tests::stop;
+    use crate::flight::practice::tests::{aim_at, consent, launch, shoot, step};
+    let mut world = World::new_commander(14701).unwrap();
+    consent(&mut world);
+    launch(&mut world);
+    stop(&mut world);
+    aim_at(&mut world, crate::docking::Vec3::new(70.0, 0.0, 136.32));
+    assert!(matches!(
+        shoot(&mut world).contact,
+        crate::PulseContact::StationBlocked { .. }
+    ));
+    let opening = world.save_bytes().unwrap();
+    let mut other_branch = World::from_save_bytes(&opening).unwrap();
+    step(&mut world, 18);
+    step(&mut other_branch, 18);
+    assert!(matches!(
+        shoot(&mut other_branch).contact,
+        crate::PulseContact::StationBlocked { .. }
+    ));
+    let other_receipt = other_branch
+        .combat_snapshot()
+        .unwrap()
+        .last_ordinary_impact
+        .unwrap();
+    assert_eq!(other_receipt.incident, 2);
+    assert_eq!(
+        world
+            .combat_snapshot()
+            .unwrap()
+            .last_ordinary_impact
+            .unwrap()
+            .incident,
+        1
+    );
+    // Both poses and ticks came from the same actual public history. Only the other
+    // branch emitted this second incident. Its otherwise real receipt is not authority here.
+    assert_eq!(world.snapshot(), other_branch.snapshot());
+    let bytes = world.save_bytes().unwrap();
+    let mut bad = World::from_save_bytes(&bytes).unwrap();
+    bad.practice.as_mut().unwrap().ordinary_hit = Some(other_receipt);
+    let poisoned = bad.unchecked_test_save().unwrap();
+    let expected = SaveError::InvalidState("T02 ordinary hit has no accepted incident");
+    assert_eq!(
+        bad.validate_practice_incidents(bad.practice, &bad.practice_history),
+        Err(expected)
+    );
+    assert_eq!(world.restore_bytes(&poisoned), Err(expected));
+    assert_eq!(world.save_bytes().unwrap(), bytes);
+}

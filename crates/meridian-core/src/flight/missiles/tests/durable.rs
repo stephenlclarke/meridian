@@ -554,3 +554,27 @@ fn current_launch_binding_preserves_later_same_tick_pulse_and_historical_origins
     );
     let _historical_live = cold(&continued);
 }
+
+#[test]
+fn actual_two_owned_missiles_require_every_live_peer_in_the_intercepting_beam_scene() {
+    let (mut world, first) = active(2761);
+    step(&mut world, 60);
+    assert_eq!(projectile(&world, first.projectile).ended, None);
+    let target = world.practice_snapshot().unwrap().beacons.unwrap()[1].id;
+    let second = fire(&mut world, target);
+    assert!(
+        matches!(shoot(&mut world).contact, PulseContact::Projectile { id, .. } if id == second.projectile)
+    );
+    let slot = usize::from(second.projectile.ordinal());
+    assert!(world.missiles.beams[slot].as_ref().unwrap().bodies[0].is_some());
+    let _valid = cold(&world);
+    // An omitted tail must not remove an earlier still-live physical projectile.
+    corrupted(&mut world, |bad| {
+        bad.missiles.beams[slot].as_mut().unwrap().bodies.clear();
+    });
+    // Keeping the vector length while removing the peer has the same refusal requirement.
+    corrupted(&mut world, |bad| {
+        bad.missiles.beams[slot].as_mut().unwrap().bodies[0] = None;
+    });
+    let _still_valid = cold(&world);
+}
