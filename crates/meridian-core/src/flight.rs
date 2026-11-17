@@ -17,8 +17,9 @@ pub use flight_reception::{
 };
 mod modular;
 pub use modular::{
-    FittedMiningTool, ModularEquipmentSnapshot, ModuleAction, ModuleError, ModuleKind, ModuleOffer,
-    ModuleProvenance, ModuleReview, ModuleSlot, OwnedModule, PreparedModule,
+    FittedFuelScoops, FittedMiningTool, FuelScoopsSnapshot, ModularEquipmentSnapshot, ModuleAction,
+    ModuleError, ModuleKind, ModuleOffer, ModuleProvenance, ModuleReview, ModuleSlot, OwnedModule,
+    PreparedModule,
 };
 mod ammunition;
 mod missiles;

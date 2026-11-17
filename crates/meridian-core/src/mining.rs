@@ -200,6 +200,7 @@ pub enum MiningError {
     NotInFlight,
     NoCompatibleFittedTool,
     NoScoops,
+    NoEligibleOreBody,
     ProtectedActivity,
     ProofCapacity,
     NoTarget,

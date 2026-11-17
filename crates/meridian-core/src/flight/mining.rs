@@ -265,8 +265,8 @@ impl World {
             tick,
         })
     }
-    /// Current public equipment exposes no genuine Fuel Scoops installation. Keep the
-    /// source requirement explicit; a cargo bay or mining laser cannot impersonate it.
+    /// Paid fitted equipment alone cannot replace an eligible original physical ore actor.
+    /// Pending descriptions never confer collection authority or cargo ownership.
     pub fn request_collect_mined_ore(&mut self, tick: u64) -> Result<(), MiningError> {
         if tick != self.state.tick {
             return Err(MiningError::StaleCommand);
@@ -277,7 +277,11 @@ impl World {
         if self.state.mode != FlightMode::Flight {
             return Err(MiningError::NotInFlight);
         }
-        Err(MiningError::NoScoops)
+        if self.fitted_fuel_scoops().is_none() {
+            Err(MiningError::NoScoops)
+        } else {
+            Err(MiningError::NoEligibleOreBody)
+        }
     }
 }
 #[cfg(test)]

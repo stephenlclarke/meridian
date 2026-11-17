@@ -59,8 +59,9 @@ pub use flight::{
 };
 
 pub use flight::{
-    FittedMiningTool, ModularEquipmentSnapshot, ModuleAction, ModuleError, ModuleKind, ModuleOffer,
-    ModuleProvenance, ModuleReview, ModuleSlot, OwnedModule, PreparedModule,
+    FittedFuelScoops, FittedMiningTool, FuelScoopsSnapshot, ModularEquipmentSnapshot, ModuleAction,
+    ModuleError, ModuleKind, ModuleOffer, ModuleProvenance, ModuleReview, ModuleSlot, OwnedModule,
+    PreparedModule,
 };
 
 pub use flight::FlightResourcesSnapshot;

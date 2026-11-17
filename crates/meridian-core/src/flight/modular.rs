@@ -1,4 +1,4 @@
-//! Paid modular laser custody. Effects live in the actual weapon/work owners, not menu rows.
+//! Paid modular equipment custody. Effects live in the actual weapon/work owners, not menu rows.
 use super::{FlightMode, World};
 use crate::{
     freight::g02::CommanderAccount,
@@ -6,6 +6,8 @@ use crate::{
     save::{Reader, SaveError, Writer},
 };
 use core::fmt;
+mod scoops;
+pub use scoops::{FittedFuelScoops, FuelScoopsSnapshot};
 pub const MINING_LASER_PRICE_TENTHS: u32 = 33_000;
 pub const MINING_LASER_REQUIRED_TL: u8 = 6;
 const INVALID: SaveError = SaveError::InvalidState("modular equipment ownership or fitting");
@@ -13,10 +15,20 @@ const INVALID: SaveError = SaveError::InvalidState("modular equipment ownership 
 pub enum ModuleKind {
     PulseLaser,
     MiningLaser,
+    FuelScoops,
 }
 impl ModuleKind {
     pub fn family(self) -> &'static str {
-        "laser"
+        match self {
+            Self::PulseLaser | Self::MiningLaser => "laser",
+            Self::FuelScoops => "utility-fuelScoops",
+        }
+    }
+    pub fn slot(self) -> ModuleSlot {
+        match self {
+            Self::PulseLaser | Self::MiningLaser => ModuleSlot::FrontLaser,
+            Self::FuelScoops => ModuleSlot::UtilityFuelScoops,
+        }
     }
     pub fn node(self) -> &'static str {
         self.name()
@@ -25,12 +37,14 @@ impl ModuleKind {
         match self {
             Self::PulseLaser => "Pulse Laser",
             Self::MiningLaser => "Mining Laser",
+            Self::FuelScoops => "Fuel Scoops",
         }
     }
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleSlot {
     FrontLaser,
+    UtilityFuelScoops,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleProvenance {
@@ -67,8 +81,41 @@ pub struct ModuleOffer {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleAction {
     PurchaseMiningLaser,
+    PurchaseFuelScoops,
     Store { item: u64 },
     Install { item: u64, replacing: Option<u64> },
+}
+impl ModuleAction {
+    fn purchase(self) -> Option<(ModuleKind, u32, u8)> {
+        match self {
+            Self::PurchaseMiningLaser => Some((
+                ModuleKind::MiningLaser,
+                MINING_LASER_PRICE_TENTHS,
+                MINING_LASER_REQUIRED_TL,
+            )),
+            Self::PurchaseFuelScoops => Some((
+                ModuleKind::FuelScoops,
+                scoops::PRICE_TENTHS,
+                scoops::REQUIRED_TL,
+            )),
+            Self::Store { .. } | Self::Install { .. } => None,
+        }
+    }
+}
+fn validate_purchase(
+    action: ModuleAction,
+    technology: u8,
+    credits: u32,
+) -> Result<(), ModuleError> {
+    if let Some((_, price, required_tl)) = action.purchase() {
+        if technology < required_tl {
+            return Err(ModuleError::BerthRequired);
+        }
+        if credits < price {
+            return Err(ModuleError::InsufficientCredits);
+        }
+    }
+    Ok(())
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleError {
@@ -164,35 +211,33 @@ impl Ledger {
     }
     fn apply(&mut self, event: Event, transaction: u32) -> Result<(), ModuleError> {
         match event.action {
-            ModuleAction::PurchaseMiningLaser => {
-                // Original per-node repeatable ownership bound, including stored examples.
-                if self
-                    .items
-                    .iter()
-                    .filter(|i| i.kind == ModuleKind::MiningLaser)
-                    .count()
-                    >= 5
-                {
+            action @ (ModuleAction::PurchaseMiningLaser | ModuleAction::PurchaseFuelScoops) => {
+                let (kind, price, _) = action.purchase().ok_or(ModuleError::MissingItem)?;
+                let maximum = if kind == ModuleKind::FuelScoops { 1 } else { 5 };
+                // The original unique scoop shop node also counts stored owned devices.
+                if self.items.iter().filter(|i| i.kind == kind).count() >= maximum {
                     return Err(ModuleError::Capacity);
                 }
                 for i in &mut self.items {
-                    i.slot = None;
+                    if i.slot == Some(kind.slot()) {
+                        i.slot = None;
+                    }
                 }
                 self.items.push(OwnedModule {
                     id: event.item,
-                    kind: ModuleKind::MiningLaser,
-                    slot: Some(ModuleSlot::FrontLaser),
+                    kind,
+                    slot: Some(kind.slot()),
                     provenance: ModuleProvenance::Paid {
                         transaction,
                         dock: event.dock,
                         tick: event.tick,
                         account_revision: event.revision,
-                        paid_tenths: MINING_LASER_PRICE_TENTHS,
+                        paid_tenths: price,
                     },
                 });
                 self.paid = self
                     .paid
-                    .checked_add(MINING_LASER_PRICE_TENTHS)
+                    .checked_add(price)
                     .ok_or(ModuleError::SequenceExhausted)?;
             }
             ModuleAction::Store { item } => {
@@ -215,13 +260,22 @@ impl Ledger {
                 if self.items[i].slot.is_some() {
                     return Err(ModuleError::NoChange);
                 }
-                if self.front().map(|i| i.id) != replacing {
+                let destination = self.items[i].kind.slot();
+                if self
+                    .items
+                    .iter()
+                    .find(|i| i.slot == Some(destination))
+                    .map(|i| i.id)
+                    != replacing
+                {
                     return Err(ModuleError::StaleOccupant);
                 }
                 for i in &mut self.items {
-                    i.slot = None;
+                    if i.slot == Some(destination) {
+                        i.slot = None;
+                    }
                 }
-                self.items[i].slot = Some(ModuleSlot::FrontLaser);
+                self.items[i].slot = Some(destination);
             }
         }
         self.revision += 1;
@@ -252,7 +306,7 @@ impl State {
             {
                 return false;
             }
-            if e.action == ModuleAction::PurchaseMiningLaser {
+            if e.action.purchase().is_some() {
                 transaction += 1;
             }
             if ledger.apply(*e, transaction).is_err() {
@@ -268,7 +322,7 @@ impl State {
     pub(super) fn paid_count(&self) -> usize {
         self.events
             .iter()
-            .filter(|e| e.action == ModuleAction::PurchaseMiningLaser)
+            .filter(|e| e.action.purchase().is_some())
             .count()
     }
     pub(super) fn ledger(
@@ -297,7 +351,7 @@ impl State {
                 e.revision,
                 previous.map(|p| (p.dock.sequence(), p.tick, p.revision)),
             )?;
-            if e.action == ModuleAction::PurchaseMiningLaser {
+            if e.action.purchase().is_some() {
                 transaction = transaction.checked_add(1).ok_or(INVALID)?;
                 // Ammo owns the preceding 100000 paid identity positions. This domain never
                 // aliases a born item or a finite missile receipt on the same owner.
@@ -331,6 +385,7 @@ impl State {
         if pulse.fitted_hull() != fitted.then_some(world.combat_identity().ok_or(INVALID)?.hull) {
             return Err(INVALID);
         }
+        scoops::validate_fit(&ledger.items, account).map_err(|_| INVALID)?;
         if ledger.revision != account.modular_revision() {
             return Err(INVALID);
         }
@@ -341,6 +396,7 @@ impl State {
         for e in &self.events {
             match e.action {
                 ModuleAction::PurchaseMiningLaser => w.u8(0),
+                ModuleAction::PurchaseFuelScoops => w.u8(16),
                 ModuleAction::Store { .. } => w.u8(1),
                 ModuleAction::Install { replacing, .. } => {
                     w.u8(2);
@@ -354,6 +410,13 @@ impl State {
         }
     }
     pub(super) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+        Self::decode_version(r, 15)
+    }
+    /// Tag16 is confined to exact provisional16. Root selects the final combined schema.
+    pub(super) fn decode_version(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
+        if !matches!(version, 13 | 15 | 16) {
+            return Err(SaveError::UnsupportedVersion);
+        }
         let count = r.u32()? as usize;
         if count > crate::save::MAX_SAVE_BYTES / 64 {
             return Err(SaveError::TooLarge);
@@ -372,6 +435,7 @@ impl State {
             let revision = r.u64()?;
             let action = match tag {
                 0 => ModuleAction::PurchaseMiningLaser,
+                16 if version == 16 => ModuleAction::PurchaseFuelScoops,
                 1 => ModuleAction::Store { item },
                 2 => ModuleAction::Install { item, replacing },
                 _ => return Err(SaveError::InvalidEncoding),
@@ -496,19 +560,14 @@ impl World {
         {
             return Err(ModuleError::BerthRequired);
         }
-        if action == ModuleAction::PurchaseMiningLaser {
-            if crate::equipment::definition()
+        validate_purchase(
+            action,
+            crate::equipment::definition()
                 .map_err(|_| ModuleError::BerthRequired)?
                 .offer(facts.site)
-                .technology
-                < MINING_LASER_REQUIRED_TL
-            {
-                return Err(ModuleError::BerthRequired);
-            }
-            if account.credits_tenths() < MINING_LASER_PRICE_TENTHS {
-                return Err(ModuleError::InsufficientCredits);
-            }
-        }
+                .technology,
+            account.credits_tenths(),
+        )?;
         let mut ledger = self
             .modular
             .ledger(self, account)
@@ -523,6 +582,7 @@ impl World {
             },
             0,
         )?;
+        scoops::validate_fit(&ledger.items, account)?;
         let ammo = self
             .ammunition
             .ledger(self, account)
@@ -561,7 +621,7 @@ impl World {
             .as_ref()
             .ok_or(ModuleError::NoCommander)?;
         let item = match review.action {
-            ModuleAction::PurchaseMiningLaser => review
+            ModuleAction::PurchaseMiningLaser | ModuleAction::PurchaseFuelScoops => review
                 .dock
                 .owner()
                 .seed()
@@ -569,12 +629,27 @@ impl World {
                 .ok_or(ModuleError::SequenceExhausted)?,
             ModuleAction::Store { item } | ModuleAction::Install { item, .. } => item,
         };
-        let paid = if review.action == ModuleAction::PurchaseMiningLaser {
-            MINING_LASER_PRICE_TENTHS
-        } else {
-            0
-        };
-        let pulse_fitted = matches!(review.action, ModuleAction::Install { item, .. } if item == review.dock.owner().seed() + 7);
+        let paid = review.action.purchase().map_or(0, |(_, price, _)| price);
+        let mut candidate = self
+            .modular
+            .ledger(self, current)
+            .map_err(ModuleError::Save)?;
+        candidate.apply(
+            Event {
+                action: review.action,
+                item,
+                dock: review.dock,
+                tick,
+                revision: current
+                    .revision()
+                    .checked_add(1)
+                    .ok_or(ModuleError::SequenceExhausted)?,
+            },
+            self.modular.paid_count() as u32 + u32::from(review.action.purchase().is_some()),
+        )?;
+        let pulse_fitted = candidate
+            .front()
+            .is_some_and(|i| i.kind == ModuleKind::PulseLaser);
         let account = current
             .prepare_module(paid, pulse_fitted)
             .map_err(|_| ModuleError::SequenceExhausted)?;

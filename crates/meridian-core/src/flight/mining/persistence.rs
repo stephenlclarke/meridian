@@ -118,7 +118,7 @@ impl World {
                     bodies: &hit.missiles,
                 })?;
         }
-        // With no admitted Fuel Scoops producer, there is deliberately no ore cargo credit,
+        // Without an eligible original ore-body/intake producer, there is no cargo credit,
         // market/revision adjustment or collected receipt to synthesize during load.
         if self.state.mode != FlightMode::Docked
             && !self.mining_motion_clear(
