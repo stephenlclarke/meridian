@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-import sys
+from coverage_workspace import workspace_path
 
 
 SOURCE = Path("crates/meridian-desktop/src")
@@ -15,11 +15,11 @@ REQUIRED = {
 }
 
 
-def read_hits(lcov, paths):
-    known = {str(path): path for path in paths}
+def read_hits(lines, paths):
+    known = {path.as_posix(): path for path in paths}
     hits = {path: {} for path in paths}
     current = None
-    for line in lcov.read_text().splitlines():
+    for line in lines:
         if line.startswith("SF:"):
             name = line.removeprefix("SF:").replace("\\", "/")
             current = next((path for suffix, path in known.items()
@@ -33,11 +33,12 @@ def read_hits(lcov, paths):
     return hits
 
 
-def main(lcov):
-    hits = read_hits(lcov, REQUIRED)
+def main():
+    lcov = workspace_path("coverage/native/desktop.lcov")
+    hits = read_hits(lcov.read_text().splitlines(), REQUIRED)
     measurements = {}
     for path, markers in REQUIRED.items():
-        lines = path.read_text().splitlines()
+        lines = workspace_path(path).read_text().splitlines()
         rows = {}
         for marker in markers:
             matches = [n for n, source in enumerate(lines, 1) if source.strip() == marker]
@@ -49,4 +50,4 @@ def main(lcov):
 
 
 if __name__ == "__main__":
-    main(Path(sys.argv[1]))
+    main()

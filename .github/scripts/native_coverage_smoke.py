@@ -1,6 +1,5 @@
 """Exercise the instrumented desktop through X11 and inspect presented pixels."""
 
-import argparse
 import hashlib
 import json
 import os
@@ -9,6 +8,8 @@ import re
 import subprocess
 import tempfile
 import time
+
+from coverage_workspace import ROOT, workspace_path
 
 
 WIDTH = 1280
@@ -246,24 +247,39 @@ def run_app(argv, env, output, save, receipt):
                     receipt["forced_cleanup"] = True
                 app.wait(timeout=10)
             receipt["exit"] = app.returncode
-            receipt["exit_status"] = (
-                "forced cleanup" if receipt["forced_cleanup"] else
-                "normal quit" if receipt["normal_quit_sent"] and app.returncode == 0 else
-                "unexpected exit"
-            )
+            receipt["exit_status"] = exit_status(receipt)
+
+
+def exit_status(receipt):
+    if receipt["forced_cleanup"]:
+        return "forced cleanup"
+    if receipt["normal_quit_sent"] and receipt["exit"] == 0:
+        return "normal quit"
+    return "unexpected exit"
+
+
+def at_stage(receipt, label, operation, *args):
+    receipt["stage"] = label
+    return operation(*args)
+
+
+def native_profile_for(output, pid):
+    path = output / f"desktop-{pid}.profraw"
+    if not path.is_file() or path.stat().st_size == 0:
+        raise RuntimeError("Normal exit produced no native LLVM coverage data")
+    return path
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--binary", type=Path, required=True)
-    parser.add_argument("--observer", type=Path, required=True)
-    parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
-    args.output.mkdir(parents=True)
-    argv_binary = args.binary.resolve(strict=True)
+    output = workspace_path("coverage/native")
+    argv_binary = workspace_path("target/debug/meridian-desktop")
+    observer = workspace_path("target/debug/examples/inspect_commander")
+    if not argv_binary.is_file() or not observer.is_file():
+        raise RuntimeError("The instrumented desktop and observer must be built under target/debug")
+    output.mkdir(parents=True)
     started = time.monotonic()
     receipt = {
-        "commit": run("git", "rev-parse", "HEAD").decode().strip(),
+        "commit": run("git", "-C", str(ROOT), "rev-parse", "HEAD").decode().strip(),
         "binary_sha256": sha256(argv_binary), "viewport": RECTANGLE, "pid": None,
         "exit": None, "normal_quit_sent": False, "forced_cleanup": False, "phases": [],
     }
@@ -272,27 +288,27 @@ def main():
         save.mkdir(mode=0o700)
         runtime = Path(temp) / "runtime"
         runtime.mkdir(mode=0o700)
-        profile = args.output.resolve() / "desktop-%p.profraw"
+        profile = output / "desktop-%p.profraw"
         argv = [str(argv_binary), "--save-dir", str(save)]
         env = dict(os.environ, XDG_RUNTIME_DIR=str(runtime), LLVM_PROFILE_FILE=str(profile))
         env.pop("WAYLAND_DISPLAY", None)
         receipt.update(argv=argv, stage="launch")
         try:
-            run_app(argv, env, args.output, save, receipt)
-            receipt["stage"] = "backend and desktop log"
-            receipt["adapter"] = verify_log(args.output / "desktop.log")
-            receipt["stage"] = "native LLVM profile"
-            native_profile = args.output / f"desktop-{receipt['pid']}.profraw"
-            if not native_profile.is_file() or native_profile.stat().st_size == 0:
-                raise RuntimeError("Normal exit produced no native LLVM coverage data")
+            run_app(argv, env, output, save, receipt)
+            receipt["adapter"] = at_stage(
+                receipt, "backend and desktop log", verify_log, output / "desktop.log",
+            )
+            native_profile = at_stage(
+                receipt, "native LLVM profile", native_profile_for, output, receipt["pid"],
+            )
             receipt.update(profraw=native_profile.name, profraw_sha256=sha256(native_profile))
-            receipt["stage"] = "save and observer"
-            receipt["save_sha256"] = verify_save(args.observer.resolve(strict=True), save,
-                                                 args.output, receipt)
+            receipt["save_sha256"] = at_stage(
+                receipt, "save and observer", verify_save, observer, save, output, receipt,
+            )
         except Exception as error:
             receipt.update(status="failed", failure={"type": type(error).__name__, "message": str(error)})
             try:
-                receipt["failed_save"] = retain_failed_save(save, args.output)
+                receipt["failed_save"] = retain_failed_save(save, output)
             except OSError as retention_error:
                 receipt["failed_save_retention_error"] = str(retention_error)
             raise
@@ -300,7 +316,7 @@ def main():
             receipt.update(status="passed", stage="complete")
         finally:
             receipt["seconds"] = round(time.monotonic() - started, 3)
-            (args.output / "native-smoke.json").write_text(json.dumps(receipt, indent=2) + "\n")
+            (output / "native-smoke.json").write_text(json.dumps(receipt, indent=2) + "\n")
             print(json.dumps(receipt), flush=True)
 
 
