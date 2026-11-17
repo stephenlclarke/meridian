@@ -107,6 +107,17 @@ fn exact_range_closed_native_mesh_and_legacy_absence_never_make_a_mining_capabil
     let contact = some(state.beam(origin, Vec3::new(0.0, 0.0, 1.0), MINING_RANGE));
     assert_eq!(contact.distance, MINING_RANGE);
     assert_eq!(contact.asteroid, body.id);
+    assert_eq!(contact.point, point);
+    let direction = Vec3::new(0.0, 0.0, 1.0);
+    assert!(
+        state
+            .beam(origin, direction, MINING_RANGE.next_down())
+            .is_none()
+    );
+    // This shift is smaller than one ULP at 6000. The rounded distance by itself
+    // cannot distinguish it from the exact endpoint.
+    let beyond = Vec3::new(origin.x, origin.y, origin.z.next_down());
+    assert!(state.beam(beyond, direction, MINING_RANGE).is_none());
     assert!(
         state
             .beam(origin, Vec3::new(0.0, 0.0, 1.0), MINING_RANGE - 0.001)
