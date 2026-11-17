@@ -1,6 +1,6 @@
 //! Coherent negative grant-relabel fixtures; positives use the actual explicit secret command.
 #![allow(clippy::unwrap_used)]
-use super::*;
+use super::{ModuleAction, ModuleKind, World};
 fn active(seed: u64) -> World {
     let mut w = World::new_commander(seed).unwrap();
     let review = w.review_xyzzy(crate::XyzzyAction::Enter, 0).unwrap();

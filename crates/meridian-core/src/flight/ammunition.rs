@@ -226,6 +226,47 @@ impl Ledger {
         Ok(())
     }
 }
+fn validate_ammunition_identity(
+    e: &Event,
+    world: &World,
+    owner: u64,
+    mut purchases: u32,
+    mut grants: u32,
+) -> Result<(u32, u32), SaveError> {
+    if e.xyzzy {
+        if e.action != AmmunitionAction::Purchase
+            || !world.xyzzy.authorizes(e.dock, e.tick, e.revision)
+        {
+            return Err(INVALID);
+        }
+        grants = grants.checked_add(1).ok_or(INVALID)?;
+        if grants > 100000
+            || e.item
+                != owner
+                    .checked_add(300010 + u64::from(grants))
+                    .ok_or(INVALID)?
+        {
+            return Err(INVALID);
+        }
+    } else if e.action == AmmunitionAction::Purchase {
+        purchases = purchases.checked_add(1).ok_or(INVALID)?;
+        if purchases > 100000
+            || e.item
+                != owner
+                    .checked_add(10 + u64::from(purchases))
+                    .ok_or(INVALID)?
+        {
+            return Err(INVALID);
+        }
+    } else if match e.action {
+        AmmunitionAction::Store { item } | AmmunitionAction::Refit { item, .. } => item != e.item,
+        _ => false,
+    } {
+        return Err(INVALID);
+    }
+    Ok((purchases, grants))
+}
+
 impl State {
     pub(super) fn account_events(&self) -> Vec<super::AccountEvent> {
         self.events
@@ -289,39 +330,7 @@ impl State {
                 }
                 ledger.launch(o)?;
             }
-            if e.xyzzy {
-                if e.action != AmmunitionAction::Purchase
-                    || !world.xyzzy.authorizes(e.dock, e.tick, e.revision)
-                {
-                    return Err(INVALID);
-                }
-                grants = grants.checked_add(1).ok_or(INVALID)?;
-                if grants > 100000
-                    || e.item
-                        != owner
-                            .checked_add(300010 + u64::from(grants))
-                            .ok_or(INVALID)?
-                {
-                    return Err(INVALID);
-                }
-            } else if e.action == AmmunitionAction::Purchase {
-                purchases = purchases.checked_add(1).ok_or(INVALID)?;
-                if purchases > 100000
-                    || e.item
-                        != owner
-                            .checked_add(10 + u64::from(purchases))
-                            .ok_or(INVALID)?
-                {
-                    return Err(INVALID);
-                }
-            } else if match e.action {
-                AmmunitionAction::Store { item } | AmmunitionAction::Refit { item, .. } => {
-                    item != e.item
-                }
-                _ => false,
-            } {
-                return Err(INVALID);
-            }
+            (purchases, grants) = validate_ammunition_identity(e, world, owner, purchases, grants)?;
             let paid_before = ledger.paid;
             ledger
                 .apply(e.action, e.item, purchases)

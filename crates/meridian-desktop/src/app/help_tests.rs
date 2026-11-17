@@ -1,5 +1,7 @@
 //! Actual host routing and core snapshots, without a synthetic gameplay input loop.
-use super::*;
+use super::{
+    Action, App, Docked, ElementState, FlightInput, FrameAdvance, KeyCode, PhysicalKey, ui,
+};
 use crate::profile::tests::{TestDirectory, open};
 
 fn ok<T, E: std::fmt::Debug>(value: Result<T, E>) -> T {
