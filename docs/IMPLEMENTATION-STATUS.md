@@ -1,5 +1,11 @@
 # Implementation and validation status
 
+## Lareria navigation provider source
+
+The candidate from joined `48cdcabf` admits the original Lareria G01-S091 main orbital as one additional destination and ordinary service site. Its 9.931291094314 LY leg from Avenor costs 99 fuel units and requires the paid navigation range. Actual physical berthing enables the original charged refill. Filling from 31 to 130 costs 198 credit tenths and supports the return. Exact original market and equipment rows are imported for the selected site. The previous source's minimum 172 fuel for a route between only Avenor and Renas is retained as the reason a third evidenced provider was needed.
+
+The existing SH028 mesh, physics, port, per-leg grade/debit journal, V17-only boundary, account and profile custody are preserved. The new public journey and desktop refusal cases are authored. Thirty-three Python importer cases pass. Rust compilation, tests, owning qualification and native Lareria acceptance remain pending. Prior completed navigation UI qualification retains its own source identity.
+
 ## Following navigation and custody: qualified bounded candidate
 
 Compiled source `991fd913b2322a9df2c0835fd1085284b750a081`, tree `48beee8dfc27e1185533721ea5db4f45d876d7c0`, combines reviewed navigation and destroyed-trader custody. All three owning platforms passed 348 core, two literal V15/V16 refusal integration cases, 198 desktop and three explicit observer tests: 551 top-level Rust cases each, 94 Python tests, 47 Markdown checks, formatting, locked all-target checks, strict Clippy and locked release builds. Four controlled-output Python smoke-verifier cases per Dell platform are separate. Nested subprocess summaries are not additional tests.

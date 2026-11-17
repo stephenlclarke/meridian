@@ -61,6 +61,7 @@ impl StationMarkets {
                         site: match r.u8()? {
                             0 => MarketSite::Avenor,
                             1 => MarketSite::Renas,
+                            2 => MarketSite::Lareria,
                             _ => return Err(SaveError::InvalidEncoding),
                         },
                         ask_tenths: r.u32()?,
@@ -143,7 +144,7 @@ impl StationMarkets {
     }
 }
 
-fn decode_other_stocks(r: &mut Reader<'_>) -> Result<[[CommodityQuote; 16]; 2], SaveError> {
+fn decode_other_stocks(r: &mut Reader<'_>) -> Result<[[CommodityQuote; 16]; 3], SaveError> {
     let mut quotes = commodities::read_market_seeds().map_err(|_| SaveError::ContentMismatch)?;
     for site in &mut quotes {
         for quote in site {

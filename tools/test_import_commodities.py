@@ -32,6 +32,7 @@ EXPECTED_QUOTES = {
           (593, 541, 135, 130), (4269, 3901, 19, 23), (1102, 1006, 38, 41),
           (425, 387, 47, 60), (6192, 5658, 14, 16), (9032, 8254, 8, 9),
           (1455, 1329, 32, 40), (37041, 33849, 0, 0)],
+    91: [(202, 184, 138, 148), (356, 326, 120, 124), (4582, 4208, 13, 13), (3047, 2797, 5, 5), (858, 788, 51, 70), (7008, 6436, 13, 14), (4493, 4125, 10, 12), (3288, 3018, 24, 23), (1294, 1188, 41, 51), (662, 608, 79, 103), (3094, 2840, 20, 18), (1024, 940, 42, 43), (359, 329, 99, 99), (4972, 4566, 22, 27), (8568, 7868, 13, 14), (1062, 974, 72, 65), (40226, 36946, 0, 0)],
 }
 
 
@@ -46,7 +47,7 @@ def schema_inputs():
     ordered = [manifest['definitions'][identifier] for identifier in manifest['displayOrder']]
     authoring = {'version': 'l337-world-1', 'commodities': copy.deepcopy(ordered)}
     states = [{'key': f"G01-S{state['system']:03}", **copy.deepcopy(state)} for state in manifest['markets']]
-    states.extend({'galaxy': 7, 'system': 255} for _ in range(2046))
+    states.extend({'galaxy': 7, 'system': 255} for _ in range(2045))
     return authoring, {'version': 'l337-world-1', 'markets': states}
 
 
@@ -105,12 +106,12 @@ class CommodityImportTests(unittest.TestCase):
         self.assertEqual(manifest['nativeIdentityCases'][10], 'firearms')
         self.assertEqual(manifest['nativeIdentityCases'][15], 'gemstones')
 
-    def test_all34_actual_quotes_stock_target_and_epoch_are_exact_by_native_id(self):
+    def test_all51_actual_quotes_stock_target_and_epoch_are_exact_by_native_id(self):
         raw = (ROOT / 'assets/legacy/g01-commodities.markets').read_bytes()
-        self.assertEqual(len(raw), 1138)
-        self.assertEqual(struct.unpack_from('<8sHH', raw), (b'MMKT0002', 2, 17))
+        self.assertEqual(len(raw), 1701)
+        self.assertEqual(struct.unpack_from('<8sHH', raw), (b'MMKT0002', 3, 17))
         offset = 12
-        for system in [7, 185]:
+        for system in [7, 185, 91]:
             self.assertEqual(struct.unpack_from('<H', raw, offset)[0], system)
             offset += 2
             for identifier, expected in enumerate(EXPECTED_QUOTES[system]):
@@ -131,7 +132,8 @@ class CommodityImportTests(unittest.TestCase):
             raw = (ROOT / 'assets/legacy' / name).read_bytes()
             self.assertEqual((len(raw), hashlib.sha256(raw).hexdigest()), (expected['bytes'], expected['sha256']))
         food = (ROOT / 'assets/legacy/g01-food.markets').read_bytes()
-        self.assertEqual(hashlib.sha256(food).hexdigest(), 'fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa')
+        self.assertEqual(struct.unpack_from('<8sH', food), (b'MMKT0001', 3))
+        self.assertEqual(struct.unpack_from('<HIIQ', food, 46), (91, 202, 184, 138))
         self.assertEqual(struct.unpack_from('<HIIQ', food, 10), (7, 226, 208, 128))
         self.assertEqual(struct.unpack_from('<HIIQ', food, 28), (185, 216, 196, 112))
         self.assertTrue((ROOT / manifest['notice']).is_file())

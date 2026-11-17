@@ -220,3 +220,91 @@ fn advanced_navigation_requires_the_owned_intermediate_grade() {
     assert_eq!(ledger.paid, 120_000);
     assert_eq!(ledger.fitted_units(), 0);
 }
+
+#[test]
+fn paid_range_opens_lareria_with_physical_berth_refuel_and_a_funded_return() {
+    use crate::station_services::{Command as Trade, CommodityId};
+
+    let mut world = earned_world(15804);
+    world.request_refuel(world.snapshot().tick).unwrap();
+    journey(&mut world, SystemId::AVENOR);
+    world.request_refuel(world.snapshot().tick).unwrap();
+    let stock = world.save_bytes().unwrap();
+    let mut stock = World::from_save_bytes(&stock).unwrap();
+    launch(&mut stock);
+    let before = stock.save_bytes().unwrap();
+    assert_eq!(
+        stock.request_jump(SystemId::LARERIA, stock.snapshot().tick),
+        Err(NavigationError::OutOfRange),
+    );
+    assert_eq!(stock.save_bytes().unwrap(), before);
+
+    let cash = world.credits_tenths().unwrap();
+    let item = transact(
+        &mut world,
+        ModuleAction::Purchase {
+            kind: ModuleKind::IntermediateNavigation,
+        },
+    );
+    assert_eq!(world.credits_tenths(), Some(cash - 30_000));
+    let leaving = world.credits_tenths().unwrap();
+    let catalogue = crate::navigation::OriginalNavigation::bundled().unwrap();
+    let distance = catalogue
+        .distance_ly(SystemId::AVENOR, SystemId::LARERIA)
+        .unwrap();
+    assert!((distance - 9.931291094313973).abs() < 1e-12);
+    assert_eq!(crate::navigation::stock_jump_fuel_cost(distance), Ok(99));
+    let mut airborne = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    launch(&mut airborne);
+    let before_refusal = airborne.save_bytes().unwrap();
+    assert!(airborne.request_refuel(airborne.snapshot().tick).is_err());
+    assert_eq!(airborne.save_bytes().unwrap(), before_refusal);
+    journey(&mut world, SystemId::LARERIA);
+    assert_eq!(world.snapshot().navigation.unwrap().fuel_units, 31);
+    let berth = world.current_dock_context().unwrap();
+    assert_eq!(berth.system(), SystemId::LARERIA);
+    assert_eq!(berth.origin(), crate::navigation::DockOrigin::PhysicalEntry);
+    assert!(world.station_contacts().is_empty());
+    let food = world.commodity_quote(CommodityId::Food).unwrap();
+    assert_eq!(
+        (food.ask_tenths, food.bid_tenths, food.stock),
+        (202, 184, 138)
+    );
+    let ammo = world.ammunition_snapshot();
+    let resources = world.flight_resources_snapshot();
+    let before_refuel = world.save_bytes().unwrap();
+    let mut cold = World::from_save_bytes(&before_refuel).unwrap();
+    assert_eq!(cold.current_dock_context(), Some(berth));
+    assert_eq!(cold.credits_tenths(), Some(leaving));
+    assert_eq!(cold.request_refuel(cold.snapshot().tick), Ok(198));
+    assert_eq!(cold.snapshot().navigation.unwrap().fuel_units, 130);
+    assert_eq!(cold.credits_tenths(), Some(leaving - 198));
+    assert_eq!(cold.ammunition_snapshot(), ammo);
+    assert_eq!(cold.flight_resources_snapshot(), resources);
+    assert_eq!(
+        cold.modular_equipment_snapshot()
+            .unwrap()
+            .items
+            .iter()
+            .find(|owned| owned.id == item)
+            .unwrap()
+            .slot,
+        Some(ModuleSlot::Navigation)
+    );
+    let mut cold = World::from_save_bytes(&cold.save_bytes().unwrap()).unwrap();
+    assert_eq!(cold.snapshot().navigation.unwrap().fuel_units, 130);
+    // Lareria uses its original finite market as well as the paid refill.
+    cold.request_station_service(Trade::BuyFood, cold.snapshot().tick)
+        .unwrap();
+    assert_eq!(cold.credits_tenths(), Some(leaving - 198 - 202));
+    assert_eq!(cold.commodity_quote(CommodityId::Food).unwrap().stock, 137);
+    journey(&mut cold, SystemId::AVENOR);
+    assert_eq!(cold.snapshot().navigation.unwrap().fuel_units, 31);
+    let arrived = World::from_save_bytes(&cold.save_bytes().unwrap()).unwrap();
+    assert_eq!(
+        arrived.current_dock_context().unwrap().system(),
+        SystemId::AVENOR
+    );
+    assert_eq!(arrived.snapshot(), cold.snapshot());
+    assert_eq!(arrived.credits_tenths(), Some(leaving - 400));
+}

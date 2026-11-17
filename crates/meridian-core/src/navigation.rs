@@ -20,6 +20,11 @@ pub struct SystemId {
     pub system: u16,
 }
 impl SystemId {
+    pub const LARERIA: Self = Self {
+        galaxy: 0,
+        system: 91,
+    };
+
     pub const AVENOR: Self = Self {
         galaxy: 0,
         system: 7,

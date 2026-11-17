@@ -38,8 +38,9 @@ def schema_inputs():
           'fitting': {'roleKitIncludedInBareHull': False, 'utilityMounts': 3, 'equipmentBudgetUnits': 24}}
     worlds = {'version': 'l337-world-1', 'systems': [
         {'key': 'G01-S007', 'galaxy': 0, 'system': 7, 'name': 'Avenor', 'technology': 12},
-        {'key': 'G01-S185', 'galaxy': 0, 'system': 185, 'name': 'Renas', 'technology': 13}]}
-    worlds['systems'].extend({'key': 'unselected'} for _ in range(2046))
+        {'key': 'G01-S185', 'galaxy': 0, 'system': 185, 'name': 'Renas', 'technology': 13},
+        {'key': 'G01-S091', 'galaxy': 0, 'system': 91, 'name': 'Lareria', 'technology': 14}]}
+    worlds['systems'].extend({'key': 'unselected'} for _ in range(2045))
     return authoring, ship, r3, worlds
 
 
@@ -71,8 +72,10 @@ def schema_blobs():
 class EquipmentImportTests(unittest.TestCase):
     def test_independent_binary_decoder_checks_every_field_actual_site_and_exact_end(self):
         raw = (ROOT / 'assets/legacy/sh025-cargo-bay.equipment').read_bytes()
-        self.assertEqual(len(raw), 107)
-        self.assertEqual(hashlib.sha256(raw).hexdigest(), '2e99546d65fec686e65275599c0ac529a17551655678fd65e4b794e74104b83d')
+        self.assertEqual(len(raw), 110)
+        previous = bytearray(raw[:-3])
+        previous[-7] = 2
+        self.assertEqual(hashlib.sha256(previous).hexdigest(), '2e99546d65fec686e65275599c0ac529a17551655678fd65e4b794e74104b83d')
         self.assertEqual(struct.unpack_from('<8sIBHHBHBB', raw),
                          (b'MEQP0001', 28000, 4, 92, 35, 3, 24, 1, 1))
         offset = 22
@@ -81,9 +84,9 @@ class EquipmentImportTests(unittest.TestCase):
             offset += 1
             self.assertEqual(raw[offset:offset + length].decode(), expected)
             offset += length
-        self.assertEqual(raw[offset], 2)
+        self.assertEqual(raw[offset], 3)
         offset += 1
-        for expected in [(7, 12), (185, 13)]:
+        for expected in [(7, 12), (185, 13), (91, 14)]:
             self.assertEqual(struct.unpack_from('<HB', raw, offset), expected)
             offset += 3
         self.assertEqual(offset, len(raw))
@@ -178,7 +181,7 @@ class EquipmentImportTests(unittest.TestCase):
 
     def test_real_station_selection_refuses_missing_duplicate_foreign_or_boolean_id(self):
         _, _, _, worlds = schema_inputs()
-        self.assertEqual([(s['system'], s['technology']) for s in IMPORTER.selected_sites(worlds)], [(7, 12), (185, 13)])
+        self.assertEqual([(s['system'], s['technology']) for s in IMPORTER.selected_sites(worlds)], [(7, 12), (185, 13), (91, 14)])
         for field, value in [('key', 'G02-S007'), ('galaxy', False), ('system', True),
                              ('name', 'Foreign station'), ('technology', True), ('technology', 0)]:
             broken = copy.deepcopy(worlds)

@@ -270,6 +270,7 @@ impl State {
                     site: match r.u16()? {
                         7 => MarketSite::Avenor,
                         185 => MarketSite::Renas,
+                        91 => MarketSite::Lareria,
                         _ => return Err(SaveError::InvalidEncoding),
                     },
                     paid: r.u32()?,

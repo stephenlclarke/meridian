@@ -6,7 +6,7 @@ use meridian_core::{
     station_services::{self, CommodityId},
 };
 
-const ROUTES: [SystemId; 2] = [SystemId::AVENOR, SystemId::RENAS];
+const ROUTES: [SystemId; 3] = [SystemId::AVENOR, SystemId::RENAS, SystemId::LARERIA];
 pub const BINDINGS: &[ui::BindingHint<'static>] = &[
     ui::BindingHint {
         key: ui::Key::Previous,
@@ -973,6 +973,20 @@ mod tests {
             assert_eq!(ok(profile.world.save_bytes()), before);
         }
     }
+    #[test]
+    fn lareria_is_an_admitted_route_but_the_stock_fit_refuses_its_distance() {
+        let (_directory, mut profile, mut menu) = start();
+        assert!(ROUTES.contains(&SystemId::LARERIA));
+        let before = ok(profile.world.save_bytes());
+        let refusal = menu
+            .request(&mut profile, ui::Request::ReviewRoute(SystemId::LARERIA))
+            .err()
+            .unwrap_or_else(|| panic!("stock navigation admitted Lareria"));
+        assert!(refusal.contains("exceeds available range"));
+        assert!(menu.pending.is_none());
+        assert_eq!(ok(profile.world.save_bytes()), before);
+    }
+
     #[test]
     fn real_market_review_confirm_publishes_one_native_tonne_once() {
         let (directory, mut profile, mut menu) = start();

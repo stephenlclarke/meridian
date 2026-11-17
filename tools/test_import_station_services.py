@@ -18,13 +18,13 @@ SPEC.loader.exec_module(IMPORTER)
 def schema_markets():
     # Synthetic parsed-schema inputs, not original provenance or playable content.
     states = []
-    for system, ask, bid, stock in [(7, 226, 208, 128), (185, 216, 196, 112)]:
+    for system, ask, bid, stock in [(7, 226, 208, 128), (185, 216, 196, 112), (91, 202, 184, 138)]:
         food = {'index': 0, 'name': 'Food', 'unit': 't', 'epoch': 0,
                 'system': system, 'worldVersion': 'l337-world-1',
                 'askTenthsCR': ask, 'bidTenthsCR': bid, 'stock': stock}
         states.append({'galaxy': 0, 'system': system,
                        'quotes': [food] + [{'index': index} for index in range(1, 17)]})
-    states.extend({'galaxy': 1, 'system': index, 'quotes': []} for index in range(2046))
+    states.extend({'galaxy': 1, 'system': index, 'quotes': []} for index in range(2045))
     return {'version': 'l337-world-1', 'markets': states}
 
 
@@ -42,15 +42,15 @@ def convert_schema(markets, manifest_overrides=None):
 
 
 class ServiceImportTests(unittest.TestCase):
-    def test_schema_conversion_encodes_both_sites_without_changing_inputs(self):
+    def test_schema_conversion_encodes_three_sites_without_changing_inputs(self):
         markets = schema_markets()
         original = copy.deepcopy(markets)
         raw, metadata = convert_schema(markets)
-        self.assertEqual(raw, struct.pack('<8sHHIIQHIIQ', b'MMKT0001', 2,
-                                         7, 226, 208, 128, 185, 216, 196, 112))
+        self.assertEqual(raw, struct.pack('<8sHHIIQHIIQHIIQ', b'MMKT0001', 3,
+                                         7, 226, 208, 128, 185, 216, 196, 112, 91, 202, 184, 138))
         decoded = json.loads(metadata)
         self.assertEqual(decoded['outputSHA256'], hashlib.sha256(raw).hexdigest())
-        self.assertEqual([quote['system'] for quote in decoded['selectedQuotes']], [7, 185])
+        self.assertEqual([quote['system'] for quote in decoded['selectedQuotes']], [7, 185, 91])
         self.assertEqual(markets, original)
 
     def test_schema_conversion_refuses_manifest_and_world_binding_changes(self):
@@ -156,12 +156,12 @@ class ServiceImportTests(unittest.TestCase):
         self.assertEqual(manifest['sourceRevision'], IMPORTER.REVISION)
         self.assertEqual(manifest['outputSHA256'], hashlib.sha256(raw).hexdigest())
         self.assertEqual(manifest['outputBytes'], len(raw))
-        self.assertEqual(len(raw), 46)
-        self.assertEqual(struct.unpack_from('<8sH', raw), (b'MMKT0001', 2))
+        self.assertEqual(len(raw), 64)
+        self.assertEqual(struct.unpack_from('<8sH', raw), (b'MMKT0001', 3))
         self.assertEqual(struct.unpack_from('<HIIQ', raw, 10), (7, 226, 208, 128))
         self.assertEqual(struct.unpack_from('<HIIQ', raw, 28), (185, 216, 196, 112))
-        self.assertEqual([q['index'] for q in manifest['selectedQuotes']], [0, 0])
-        self.assertEqual([q['unit'] for q in manifest['selectedQuotes']], ['t', 't'])
+        self.assertEqual([q['index'] for q in manifest['selectedQuotes']], [0, 0, 0])
+        self.assertEqual([q['unit'] for q in manifest['selectedQuotes']], ['t', 't', 't'])
         self.assertTrue((ROOT / manifest['notice']).is_file())
         self.assertTrue(all('not installed' in value.lower()
                             for value in manifest['sourceDescriptiveStatuses'].values()))
