@@ -53,7 +53,7 @@ impl Panel {
                 |weapon| format!("Z Fire fitted {weapon}"),
             ),
         );
-        panel.review(review);
+        panel.review(review, "After help: B cancels; Escape saves and quits");
         panel
     }
 
@@ -69,7 +69,7 @@ impl Panel {
             ],
         );
         panel.navigation();
-        panel.review(review);
+        panel.review(review, "After help: B cancels; Escape saves and quits");
         panel
     }
 
@@ -97,7 +97,7 @@ impl Panel {
                 "Ship showroom",
                 &[
                     "Up / Down Select ship | C Compare | Shift+B Pin baseline",
-                    "V Current ship | D Details | O Options",
+                    "V Current ship | Enter / D Details | / Search ships",
                     "R / Space Pause rotation | A Change rotation axis",
                     "Left / Right Turn | Home Reset view",
                     "Drag Rotate | Shift+drag Roll",
@@ -108,7 +108,7 @@ impl Panel {
                 "Market",
                 &[
                     "Up / Down Select goods | Page Up / Down Scroll",
-                    "G Buy | Shift+G Sell | Enter Review purchase",
+                    "G Buy | Shift+G Sell | Enter Review current trade mode",
                     "Trade confirmation uses the current price and native unit",
                 ],
             ),
@@ -134,7 +134,12 @@ impl Panel {
                 .lines
                 .push("Details/options stay open; Up/Down navigate after help".into());
         }
-        panel.review(review);
+        panel.review(review, "After help: Escape / B cancels the review");
+        if review.is_some() {
+            panel
+                .lines
+                .push("Finish or cancel a review before changing station screens".into());
+        }
         panel
     }
 
@@ -146,15 +151,12 @@ impl Panel {
         ]);
     }
 
-    fn review(&mut self, review: Option<&str>) {
+    fn review(&mut self, review: Option<&str>, cancel_hint: &str) {
         if let Some(title) = review {
             self.title = format!("{} - {}", self.title, title);
             self.lines
                 .push("Review retained: Enter confirms only after help closes".into());
-            self.lines
-                .push("After help: Escape / B cancels the review".into());
-            self.lines
-                .push("Finish or cancel a review before changing station screens".into());
+            self.lines.push(cancel_hint.into());
         }
     }
 }

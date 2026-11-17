@@ -348,7 +348,8 @@ impl Renderer {
         cockpit: Option<&hud::cockpit::Cockpit>,
         help: Option<&crate::help::Panel>,
     ) {
-        let logical = self.size.to_logical::<f64>(self.window.scale_factor());
+        let scale = self.window.scale_factor();
+        let logical = self.size.to_logical::<f64>(scale);
         if let Some(panel) = help {
             let width = logical.width.round() as u32;
             let height = logical.height.round() as u32;
@@ -362,7 +363,7 @@ impl Renderer {
                 cockpit,
                 self.size,
                 [self.config.width, self.config.height],
-                || [logical.width, logical.height],
+                || scale,
                 &mut self.hud_frame,
                 |bytes| self.queue.write_buffer(&self.hud_vertices, 0, bytes),
             );

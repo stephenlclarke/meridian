@@ -88,6 +88,16 @@ fn help_above_a_real_purchase_review_cannot_confirm_cancel_save_or_spend() {
         .unwrap_or_else(|| panic!("menu"))
         .help_panel();
     assert!(panel.title.to_ascii_lowercase().contains("buy"));
+    assert!(
+        panel
+            .lines
+            .iter()
+            .any(|line| line == "After help: Escape / B cancels the review")
+    );
+    assert_eq!(
+        crate::docked::key(KeyCode::Escape, false, ui::Screen::Trading),
+        Some(ui::Key::Back)
+    );
     let world = ok(app.game.world.save_bytes());
     let disk = std::fs::read(directory.0.join("commander.meridian")).ok();
     press(&mut app, KeyCode::KeyH, Some("h"));
@@ -200,4 +210,46 @@ fn title_help_intercepts_new_continue_quit_and_repeated_toggle_without_a_profile
         press(&mut app, KeyCode::KeyN, Some("n")),
         Some(KeyCode::KeyN)
     );
+}
+
+#[test]
+fn session_review_help_uses_b_cancel_and_escape_first_only_dismisses_help() {
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    assert!(!app.menu_active());
+    ok(app.game.command(Action::ReviewTradeLesson));
+    let pending = app
+        .game
+        .session
+        .pending_trade
+        .unwrap_or_else(|| panic!("real trade review"));
+    let before = ok(app.game.world.save_bytes());
+    press(&mut app, KeyCode::KeyH, Some("h"));
+    let panel = app.help.as_ref().unwrap_or_else(|| panic!("help"));
+    assert!(panel.title.contains("Trade lesson review"));
+    assert!(
+        panel
+            .lines
+            .iter()
+            .any(|line| line == "After help: B cancels; Escape saves and quits")
+    );
+    assert!(
+        !panel
+            .lines
+            .iter()
+            .any(|line| line.contains("Escape / B cancels"))
+    );
+    assert_eq!(press(&mut app, KeyCode::Enter, None), None);
+    assert_eq!(press(&mut app, KeyCode::Escape, None), None);
+    assert!(app.help.is_none());
+    assert_eq!(app.game.session.pending_trade, Some(pending));
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+    // The real non-menu App handler maps B to Session cancellation after help closes.
+    assert_eq!(
+        press(&mut app, KeyCode::KeyB, Some("b")),
+        Some(KeyCode::KeyB)
+    );
+    app.game_key(KeyCode::KeyB);
+    assert!(app.game.session.pending_trade.is_none());
+    assert_eq!(ok(app.game.world.save_bytes()), before);
 }
