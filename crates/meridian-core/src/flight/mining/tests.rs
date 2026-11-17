@@ -312,10 +312,10 @@ fn explicit_old_fifteen_save_refuses_before_mining_state_changes() {
         &fresh, 15,
     ));
     assert_eq!(u16::from_le_bytes([old[8], old[9]]), 15);
-    assert_eq!(
-        World::from_save_bytes(&old).unwrap_err(),
-        crate::save::SaveError::UnsupportedVersion
-    );
+    assert!(matches!(
+        World::from_save_bytes(&old),
+        Err(crate::save::SaveError::UnsupportedVersion)
+    ));
     let before = ok(fresh.save_bytes());
     assert_eq!(
         fresh.restore_bytes(&old),

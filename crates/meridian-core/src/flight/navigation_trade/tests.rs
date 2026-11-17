@@ -692,10 +692,10 @@ fn current_continue_retains_completed_t01_and_refuses_v10() {
         &w, 10,
     ));
     assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 10);
-    assert_eq!(
-        World::from_save_bytes(&bytes).unwrap_err(),
-        crate::save::SaveError::UnsupportedVersion
-    );
+    assert!(matches!(
+        World::from_save_bytes(&bytes),
+        Err(crate::save::SaveError::UnsupportedVersion)
+    ));
     let mut loaded = ok(World::from_save_bytes(&ok(w.save_bytes())));
     assert_eq!(some(loaded.flight_reception_snapshot()), t01);
     assert!(snap(&loaded).attempts.is_empty());
@@ -711,10 +711,10 @@ fn current_continue_retains_completed_t01_and_refuses_v10() {
     let labelled = ok(crate::flight::persistence::unsupported_version_test_input(
         &w, 10,
     ));
-    assert_eq!(
-        World::from_save_bytes(&labelled).unwrap_err(),
-        crate::save::SaveError::UnsupportedVersion
-    );
+    assert!(matches!(
+        World::from_save_bytes(&labelled),
+        Err(crate::save::SaveError::UnsupportedVersion)
+    ));
 }
 
 #[test]

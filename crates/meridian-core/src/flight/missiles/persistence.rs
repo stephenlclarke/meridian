@@ -1567,10 +1567,10 @@ mod legacy_motion_tests {
             env!("CARGO_MANIFEST_DIR"),
             "/tests/fixtures/qualified-v15-npc-flight.bin"
         ));
-        assert_eq!(
-            World::from_save_bytes(V15).unwrap_err(),
-            SaveError::UnsupportedVersion
-        );
+        assert!(matches!(
+            World::from_save_bytes(V15),
+            Err(SaveError::UnsupportedVersion)
+        ));
         let mut live = World::new_commander(15920).unwrap_or_else(|error| panic!("{error:?}"));
         let before = live
             .save_bytes()

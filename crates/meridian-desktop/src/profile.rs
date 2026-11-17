@@ -774,7 +774,10 @@ pub(crate) mod tests {
             fs::write(&destination, bytes).unwrap_or_else(|e| panic!("{e}"));
             let mut profile = open(&directory.0);
             let opening = profile.world.snapshot();
-            let error = profile.continue_saved().unwrap_err();
+            let error = profile
+                .continue_saved()
+                .err()
+                .unwrap_or_else(|| panic!("an unsupported save was accepted"));
             assert!(error.contains("Unsupported commander save format"));
             assert!(error.contains("format 17"));
             assert!(!profile.playing());
@@ -800,7 +803,13 @@ pub(crate) mod tests {
                     .unwrap_or_else(|e| panic!("{e}"))
             );
             let before = profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
-            assert!(profile.continue_saved().unwrap_err().contains("format 17"));
+            assert!(
+                profile
+                    .continue_saved()
+                    .err()
+                    .unwrap_or_else(|| panic!("an unsupported save was accepted"))
+                    .contains("format 17")
+            );
             assert!(profile.playing());
             assert_eq!(
                 profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}")),

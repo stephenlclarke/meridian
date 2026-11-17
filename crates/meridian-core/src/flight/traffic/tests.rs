@@ -391,10 +391,10 @@ fn old_v13_and_corrupt_current_traffic_refuse_without_replacing_live_bytes() {
         &initial, 13,
     ));
     assert_eq!(u16::from_le_bytes([old[8], old[9]]), 13);
-    assert_eq!(
-        World::from_save_bytes(&old).unwrap_err(),
-        crate::save::SaveError::UnsupportedVersion
-    );
+    assert!(matches!(
+        World::from_save_bytes(&old),
+        Err(crate::save::SaveError::UnsupportedVersion)
+    ));
     let mut live = clear_lane(12005);
     steps(&mut live, 500);
     let valid = ok(live.save_bytes());

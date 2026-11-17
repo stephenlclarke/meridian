@@ -72,10 +72,10 @@ fn old_fifteen_bytes_and_new_utility_relabelling_refuse_atomically() {
     let old = ok(crate::flight::persistence::unsupported_version_test_input(
         &w, 15,
     ));
-    assert_eq!(
-        World::from_save_bytes(&old).unwrap_err(),
-        crate::save::SaveError::UnsupportedVersion
-    );
+    assert!(matches!(
+        World::from_save_bytes(&old),
+        Err(crate::save::SaveError::UnsupportedVersion)
+    ));
     let older = ok(World::from_save_bytes(&ok(w.save_bytes())));
     assert_eq!(older.credits_tenths(), w.credits_tenths());
     assert_eq!(
@@ -89,10 +89,10 @@ fn old_fifteen_bytes_and_new_utility_relabelling_refuse_atomically() {
     let forged_old = ok(crate::flight::persistence::unsupported_version_test_input(
         &w, 15,
     ));
-    assert_eq!(
-        World::from_save_bytes(&forged_old).unwrap_err(),
-        crate::save::SaveError::UnsupportedVersion
-    );
+    assert!(matches!(
+        World::from_save_bytes(&forged_old),
+        Err(crate::save::SaveError::UnsupportedVersion)
+    ));
     let before = ok(loaded.save_bytes());
     assert_eq!(
         loaded.restore_bytes(&forged_old),

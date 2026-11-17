@@ -799,10 +799,10 @@ mod paid_missile_format_tests {
         let world = World::new_commander(8401).unwrap_or_else(|e| panic!("{e:?}"));
         let old = unsupported_version_test_input(&world, 11).unwrap_or_else(|e| panic!("{e:?}"));
         assert_eq!(u16::from_le_bytes([old[8], old[9]]), 11);
-        assert_eq!(
-            World::from_save_bytes(&old).unwrap_err(),
-            SaveError::UnsupportedVersion
-        );
+        assert!(matches!(
+            World::from_save_bytes(&old),
+            Err(SaveError::UnsupportedVersion)
+        ));
         let before = world.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
         let mut world = world;
         assert_eq!(

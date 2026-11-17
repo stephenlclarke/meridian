@@ -8,10 +8,10 @@ const HISTORICAL: &[u8] = include_bytes!("fixtures/qualified-v15-npc-flight.bin"
 #[test]
 fn literal_v15_refuses_without_replacing_current_world() {
     assert_eq!(u16::from_le_bytes([HISTORICAL[8], HISTORICAL[9]]), 15);
-    assert_eq!(
-        World::from_save_bytes(HISTORICAL).unwrap_err(),
-        SaveError::UnsupportedVersion
-    );
+    assert!(matches!(
+        World::from_save_bytes(HISTORICAL),
+        Err(SaveError::UnsupportedVersion)
+    ));
     let mut world = World::new_commander(15900 + 15).unwrap_or_else(|e| panic!("{e}"));
     let before = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(u16::from_le_bytes([before[8], before[9]]), SAVE_VERSION);

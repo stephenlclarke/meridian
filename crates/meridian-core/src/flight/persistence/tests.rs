@@ -333,7 +333,7 @@ pub(in crate::flight) fn assert_resealed_enlirin_fuel_refusal(world: &mut World)
         }
         reseal(&mut forged);
         assert!(matches!(World::from_save_bytes(&forged), Err(error) if error == refused));
-        assert_eq!(world.restore_bytes(&forged), Err(refused.clone()));
+        assert_eq!(world.restore_bytes(&forged), Err(refused));
         assert_eq!(world.save_bytes().unwrap(), valid);
     }
     let mut wrong_grade = valid.clone();
