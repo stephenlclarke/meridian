@@ -272,7 +272,7 @@ impl World {
             .map(CommanderAccount::credits_tenths)
     }
 
-    fn has_bound_navigation_fit(navigation: NavigationState, account: &CommanderAccount) -> bool {
+    fn has_bound_drive(navigation: NavigationState, account: &CommanderAccount) -> bool {
         let Some(items) = account.starter_items() else {
             return false;
         };
@@ -283,10 +283,20 @@ impl World {
         items.iter().filter(owned).any(|item| {
             item.component() == StarterComponent::BasicDrive
                 && item.id() == navigation.drive_item_id()
-        }) && items
-            .iter()
-            .filter(owned)
-            .any(|item| item.component() == StarterComponent::BasicNavigation)
+        })
+    }
+
+    /// Fitted range before the current fuel limit, from the active hull's owned equipment.
+    pub fn jump_reach_ly(&self) -> Option<f64> {
+        let account = self.commander_account.as_ref()?;
+        let navigation = self.navigation?;
+        if !Self::has_bound_drive(navigation, account) {
+            return None;
+        }
+        self.modular
+            .ledger(self, account)
+            .ok()
+            .map(|ledger| ledger.jump_reach_ly())
     }
 
     pub fn commander_id(&self) -> Option<CommanderId> {
@@ -343,10 +353,8 @@ impl World {
             .commander_account
             .as_ref()
             .ok_or(NavigationError::WrongMode)?;
-        if !Self::has_bound_navigation_fit(navigation, account) {
-            return Err(NavigationError::WrongMode);
-        }
-        navigation.begin_jump(catalogue, target, distance, account.fuel_tenths())?;
+        let reach = self.jump_reach_ly().ok_or(NavigationError::WrongMode)?;
+        navigation.begin_jump(catalogue, target, distance, account.fuel_tenths(), reach)?;
         self.navigation = Some(navigation);
         Ok(())
     }
@@ -573,7 +581,7 @@ impl World {
                 .commander_account
                 .as_mut()
                 .ok_or(StepError::NonFiniteState)?;
-            if !Self::has_bound_navigation_fit(*state, account) {
+            if !Self::has_bound_drive(*state, account) {
                 return Err(StepError::NonFiniteState);
             }
             let arrival_debit = state

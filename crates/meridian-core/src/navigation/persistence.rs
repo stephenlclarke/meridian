@@ -2,8 +2,7 @@
 use super::NavigationError;
 use super::{
     BASIC_SPOOL_TICKS, CommanderId, DockContext, DockOrigin, NavigationState, OriginalNavigation,
-    PendingJump, PlayerShipId, STOCK_JUMP_REACH_LY, StarterBasicDrive, SystemId,
-    stock_jump_fuel_cost,
+    PendingJump, PlayerShipId, StarterBasicDrive, SystemId, stock_jump_fuel_cost,
 };
 use crate::save::{Reader, SaveError, Writer};
 use crate::station::FlightMode;
@@ -133,6 +132,28 @@ impl NavigationState {
             fuel_spent: r.u64()?,
         })
     }
+    pub(crate) fn validate_fitted_reach(
+        &self,
+        catalogue: &OriginalNavigation,
+        fitted_reach_ly: f64,
+        max_fuel_spent: u128,
+    ) -> Result<(), SaveError> {
+        if u128::from(self.fuel_spent) > max_fuel_spent {
+            return Err(SaveError::InvalidState("navigation identity or chronology"));
+        }
+        if let Some(pending) = self.pending {
+            let invalid = SaveError::InvalidState("pending jump");
+            if catalogue
+                .distance_ly(pending.source, pending.destination)
+                .map_err(|_| invalid)?
+                > fitted_reach_ly
+            {
+                return Err(invalid);
+            }
+        }
+        Ok(())
+    }
+
     pub(crate) fn validate_save(
         &self,
         catalogue: &OriginalNavigation,
@@ -162,7 +183,7 @@ impl NavigationState {
                 && (self.fuel_spent != 0 || self.system != SystemId::AVENOR)
             || self.completed_jumps > 0 && self.fuel_spent < self.completed_jumps
             || self.launches == 0 && mode != FlightMode::Docked
-            || u128::from(self.fuel_spent) > u128::from(self.completed_jumps) * 90
+            || u128::from(self.fuel_spent) > u128::from(self.completed_jumps) * u128::from(super::FUEL_CAPACITY)
         {
             return Err(invalid);
         }
@@ -203,7 +224,6 @@ impl NavigationState {
                 || p.remaining_ticks == 0
                 || p.remaining_ticks > BASIC_SPOOL_TICKS
                 || distance <= 0.0
-                || distance > STOCK_JUMP_REACH_LY
                 || distance > f64::from(fuel) / 10.0
                 || stock_jump_fuel_cost(distance).map_err(|_| invalid)? != p.fuel_debit
             {

@@ -115,8 +115,18 @@ const V15_CONTENT: &[u8] = concat!(
 )
 .as_bytes();
 
-const CONTENT: &[u8] = concat!(
+const V16_CONTENT: &[u8] = concat!(
     "meridian-world/rules/16;rapid-lasers-energy/shared-nine-byte-resources-v1/a11fe169;mining/native-work-pending-v2;fuel-scoops/paid-utility-v1;npc-missiles/canonical-native-ray-v3;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
+    "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
+    "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
+    "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
+    "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823;",
+    "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa"
+)
+.as_bytes();
+
+const CONTENT: &[u8] = concat!(
+    "meridian-world/rules/17;navigation-computer/range-v1/a11fe169;rapid-lasers-energy/shared-nine-byte-resources-v1/a11fe169;mining/native-work-pending-v2;fuel-scoops/paid-utility-v1;npc-missiles/canonical-native-ray-v3;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -140,10 +150,10 @@ fn compiled_content_fingerprint(content: &[u8]) -> u64 {
         bytes.extend((part.len() as u64).to_le_bytes());
         bytes.extend(part);
     }
-    if content == CONTENT || content == V15_CONTENT {
+    if content == CONTENT || content == V16_CONTENT || content == V15_CONTENT {
         bytes.extend(crate::traffic::CONTENT_RULES);
     }
-    if content == CONTENT {
+    if content == CONTENT || content == V16_CONTENT {
         bytes.extend(crate::mining::content_bytes());
     }
     checksum(&bytes)
@@ -448,8 +458,9 @@ impl World {
             11 if r.fixed::<{ V11_CONTENT.len() }>()?.as_slice() == V11_CONTENT => V11_CONTENT,
             13 if r.fixed::<{ V13_CONTENT.len() }>()?.as_slice() == V13_CONTENT => V13_CONTENT,
             15 if r.fixed::<{ V15_CONTENT.len() }>()?.as_slice() == V15_CONTENT => V15_CONTENT,
+            16 if r.fixed::<{ V16_CONTENT.len() }>()?.as_slice() == V16_CONTENT => V16_CONTENT,
             SAVE_VERSION if r.fixed::<{ CONTENT.len() }>()?.as_slice() == CONTENT => CONTENT,
-            4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 13 | 15 | SAVE_VERSION => {
+            4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 13 | 15 | 16 | SAVE_VERSION => {
                 return Err(SaveError::ContentMismatch);
             }
             _ => return Err(SaveError::UnsupportedVersion),
@@ -663,6 +674,11 @@ impl World {
             ),
         )?;
         let modular = commerce.modular.ledger(self, account)?;
+        navigation.validate_fitted_reach(
+            catalogue,
+            modular.jump_reach_ly(),
+            modular.max_jump_fuel_spent(),
+        )?;
         let ammunition = commerce.ammunition.ledger_with_module_count(
             self,
             account,
@@ -868,7 +884,7 @@ pub(super) fn read_flight(r: &mut Reader<'_>, version: u16) -> Result<Snapshot, 
         2 => Some(MotionRefusal::EntryConditions),
         3 => Some(MotionRefusal::CelestialContact),
         4 if version >= 15 => Some(MotionRefusal::NpcContact),
-        5 if version == SAVE_VERSION => Some(MotionRefusal::AsteroidContact),
+        5 if version >= 16 => Some(MotionRefusal::AsteroidContact),
         _ => return Err(SaveError::InvalidEncoding),
     };
     Ok(Snapshot {

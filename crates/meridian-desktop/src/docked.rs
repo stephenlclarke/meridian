@@ -2,7 +2,7 @@
 use crate::{docked_screens as ui, profile::Profile, session::Action};
 use meridian_core::{
     AmmunitionAction, ModuleAction, ModuleKind, ModuleSlot, World, equipment,
-    navigation::{DockContext, STOCK_JUMP_REACH_LY, SystemId},
+    navigation::{DockContext, FUEL_CAPACITY, SystemId},
     station_services::{self, CommodityId},
 };
 
@@ -80,6 +80,7 @@ fn context<'a>(
     selected: SystemId,
 ) -> ui::Context<'a> {
     let navigation = world.snapshot().navigation;
+    let reach = world.jump_reach_ly();
     ui::Context {
         world,
         catalogue,
@@ -87,8 +88,9 @@ fn context<'a>(
         current_hull: panel_hull(world),
         paused: paused(world),
         current_reach_ly: navigation
-            .map(|n| (f64::from(n.fuel_units) / 10.0).min(STOCK_JUMP_REACH_LY)),
-        full_reach_ly: Some(STOCK_JUMP_REACH_LY),
+            .zip(reach)
+            .map(|(n, reach)| (f64::from(n.fuel_units) / 10.0).min(reach)),
+        full_reach_ly: reach.map(|reach| reach.min(f64::from(FUEL_CAPACITY) / 10.0)),
         route_targets: &ROUTES,
         models: &crate::docked_render::MODELS,
         planet_previews: navigation.is_some_and(|n| n.system == selected)
@@ -319,7 +321,8 @@ impl Docked {
                     .map_err(|e| e.to_string())?;
                 let fuel = meridian_core::navigation::stock_jump_fuel_cost(distance)
                     .map_err(|e| e.to_string())?;
-                if distance > STOCK_JUMP_REACH_LY || fuel > current.fuel_units || paused(world) {
+                let reach = world.jump_reach_ly().ok_or("No fitted drive")?;
+                if distance > reach.min(f64::from(current.fuel_units) / 10.0) || paused(world) {
                     return Err("Destination exceeds available range or game is paused".into());
                 }
                 self.review(
@@ -587,10 +590,11 @@ fn module_rows(
     slot: ModuleSlot,
     tick: u64,
 ) -> Vec<ui::EquipmentRow> {
-    let label = if slot == ModuleSlot::FrontLaser {
-        "Front laser"
-    } else {
-        "Energy system"
+    let label = match slot {
+        ModuleSlot::FrontLaser => "Front laser",
+        ModuleSlot::Energy => "Energy system",
+        ModuleSlot::Navigation => "Navigation computer",
+        ModuleSlot::UtilityFuelScoops => "Fuel Scoops",
     };
     let fitted = modules.items.iter().find(|item| item.slot == Some(slot));
     let mut rows = Vec::new();
@@ -599,7 +603,13 @@ fn module_rows(
         row.instance = Some(item.id);
         row.owned = 1;
         row.fitted = u32::from(item.slot.is_some());
-        row.compatibility = "Owned SH025 module; fitting preserves shared energy and heat".into();
+        if let Some(reach) = item.kind.navigation_reach_ly() {
+            row.compatibility = "Owned SH025 navigation module".into();
+            row.readout.push(format!("Module jump limit {reach} LY"));
+        } else {
+            row.compatibility =
+                "Owned SH025 module; fitting preserves shared energy and heat".into();
+        }
         if let Some(profile) = item.kind.laser_profile() {
             row.readout.push(format!(
                 "Damage {} | Range 6000 | Fire interval {:.1}s",
@@ -698,6 +708,17 @@ fn equipment_panel(
             .into(),
         available: true,
     });
+    slots.push(ui::EquipmentSlot {
+        id: "navigation".into(),
+        label: "Navigation computer".into(),
+        fitted: modules
+            .items
+            .iter()
+            .find(|item| item.slot == Some(ModuleSlot::Navigation))
+            .map_or("Empty", |item| item.kind.name())
+            .into(),
+        available: true,
+    });
     slots.push(ui::fuel_scoops::slot(world)?);
     for pylon in 0..ammo.capacity {
         let occupied = ammo
@@ -712,12 +733,13 @@ fn equipment_panel(
         });
     }
     let mut rows = Vec::new();
-    if selected == "front-laser" || selected == "energy" {
-        let slot = if selected == "front-laser" {
-            ModuleSlot::FrontLaser
-        } else {
-            ModuleSlot::Energy
-        };
+    let module_slot = match selected {
+        "front-laser" => Some(ModuleSlot::FrontLaser),
+        "energy" => Some(ModuleSlot::Energy),
+        "navigation" => Some(ModuleSlot::Navigation),
+        _ => None,
+    };
+    if let Some(slot) = module_slot {
         rows = module_rows(world, &modules, slot, tick);
     } else if selected == ui::fuel_scoops::SLOT {
         rows = ui::fuel_scoops::rows(world)?;
@@ -1010,10 +1032,40 @@ mod tests {
         assert_eq!(ok(profile.world.save_bytes()), after_external_purchase);
     }
     #[test]
+    fn navigation_computer_panel_uses_owned_slot_and_source_prices() {
+        let (_directory, profile, _menu) = start();
+        let panel = ok(equipment_panel(&profile.world, "navigation", ""));
+        let slot = panel
+            .slots
+            .iter()
+            .find(|slot| slot.id == "navigation")
+            .unwrap_or_else(|| panic!("Navigation computer slot"));
+        assert_eq!(slot.fitted, "Basic Navigation Computer");
+        assert_eq!(profile.world.jump_reach_ly(), Some(9.0));
+        assert!(
+            panel
+                .rows
+                .iter()
+                .any(|row| row.node == ModuleKind::BasicNavigation.node()
+                    && row.instance.is_some()
+                    && row.fitted == 1
+                    && row.price_tenths.is_none())
+        );
+        for (kind, price_tenths) in [
+            (ModuleKind::IntermediateNavigation, 30_000),
+            (ModuleKind::AdvancedNavigation, 90_000),
+        ] {
+            assert!(panel.rows.iter().any(|row| row.node == kind.node()
+                && row.price_tenths == Some(price_tenths)
+                && !row.can_buy));
+        }
+    }
+
+    #[test]
     fn front_module_rows_and_pylon_slots_use_real_owned_instances_and_admission() {
         let (_directory, profile, _menu) = start();
         let panel = ok(equipment_panel(&profile.world, "front-laser", ""));
-        assert_eq!(panel.slots.len(), 13);
+        assert_eq!(panel.slots.len(), 14);
         let utility = panel
             .slots
             .iter()

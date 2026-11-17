@@ -1,7 +1,7 @@
 //! Exact shared player pools. World alone seals spends, berth resets and incoming hits.
 use super::weapons::PulseResources;
 use super::{FireError, FlightMode, OrdinaryTarget, StepError, World};
-use crate::save::{MAX_SAVE_BYTES, Reader, SAVE_VERSION, SaveError, Writer};
+use crate::save::{MAX_SAVE_BYTES, Reader, SaveError, Writer};
 use std::{collections::BTreeMap, sync::Arc};
 mod capacity;
 const INVALID: SaveError = SaveError::InvalidState("player resource replay");
@@ -147,7 +147,7 @@ impl State {
                 tag @ 3..=6 if version >= 16 => {
                     Kind::Laser(super::OrdinaryWeapon::from_tag(tag - 1)?)
                 }
-                tag @ 32..=43 if version == SAVE_VERSION => Kind::Mining(tag - 32),
+                tag @ 32..=43 if version >= 16 => Kind::Mining(tag - 32),
                 _ => return Err(INVALID),
             };
             events.push(Event { clock, kind });
