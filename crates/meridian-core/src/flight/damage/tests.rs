@@ -329,3 +329,35 @@ fn exact_pool_replay_refuses_a_journal_spend_shifted_before_its_actual_impact() 
     assert_eq!(world.restore_bytes(&bytes), Err(INVALID));
     assert_eq!(ok(world.save_bytes()), good);
 }
+
+#[test]
+fn one_real_station_discharge_accepts_an_identical_mirror_and_refuses_npc_ownership() {
+    let mut world = ok(World::new_commander(1471));
+    crate::flight::practice::tests::launch(&mut world);
+    crate::flight::missiles::tests::stop(&mut world);
+    crate::flight::practice::tests::aim_at(
+        &mut world,
+        crate::docking::Vec3::new(70.0, 0.0, 136.32),
+    );
+    ok(world.request_fire_front_pulse(world.snapshot().tick));
+    let hit = world
+        .combat
+        .last_impact()
+        .unwrap_or_else(|| panic!("missing real station hit"));
+    assert_eq!(hit.target, OrdinaryTarget::MainStation);
+    assert_eq!(
+        validate_exclusive_laser_targets([hit, hit], [hit.emission + 1]),
+        Ok(())
+    );
+    assert_eq!(
+        validate_exclusive_laser_targets([hit, hit], [hit.emission]),
+        Err(INVALID)
+    );
+
+    let mut different = hit;
+    different.incident += 1;
+    assert_eq!(
+        validate_exclusive_laser_targets([hit, different], []),
+        Err(INVALID)
+    );
+}

@@ -2,7 +2,7 @@
 use super::weapons::PulseResources;
 use super::{FireError, FlightMode, OrdinaryTarget, StepError, World};
 use crate::save::{MAX_SAVE_BYTES, Reader, SAVE_VERSION, SaveError, Writer};
-use std::sync::Arc;
+use std::{collections::BTreeMap, sync::Arc};
 mod capacity;
 const INVALID: SaveError = SaveError::InvalidState("player resource replay");
 // Nine encoded bytes per event, admitted against the existing whole-save budget.
@@ -325,13 +325,25 @@ fn validate_laser_receipts(
             .and_then(|index| lasers.get(index))
             .ok_or(INVALID)
     };
-    for hit in world.combat.last_impact().into_iter().chain(
+    let ordinary = world.combat.last_impact().into_iter().chain(
         world
             .practice
             .iter()
             .chain(world.practice_history.iter())
             .filter_map(|practice| practice.ordinary_hit),
-    ) {
+    );
+    let player_beams = world.traffic.beam_receipts().iter().filter_map(|beam| {
+        if let crate::traffic::BeamSource::Player { item, emission, .. } = beam.source {
+            Some((beam, item, emission))
+        } else {
+            None
+        }
+    });
+    validate_exclusive_laser_targets(
+        ordinary.clone(),
+        player_beams.clone().map(|(_, _, emission)| emission),
+    )?;
+    for hit in ordinary {
         if hit.weapon.is_laser() {
             let shot = spend(hit.emission)?;
             if (shot.clock, shot.weapon, shot.item) != (hit.physical_tick, hit.weapon, hit.item) {
@@ -339,22 +351,44 @@ fn validate_laser_receipts(
             }
         }
     }
-    for beam in world.traffic.beam_receipts() {
-        if let crate::traffic::BeamSource::Player { item, emission, .. } = beam.source {
-            let shot = spend(emission)?;
-            let elapsed = world
-                .state
-                .tick
-                .checked_sub(beam.world_tick)
-                .ok_or(INVALID)?;
-            let since_shot = end.checked_sub(shot.clock).ok_or(INVALID)?;
-            if (shot.weapon, shot.item) != (beam.weapon, item)
-                || shot.clock > beam.world_tick
-                || since_shot > elapsed
-            {
-                return Err(INVALID);
-            }
+    for (beam, item, emission) in player_beams {
+        let shot = spend(emission)?;
+        let elapsed = world
+            .state
+            .tick
+            .checked_sub(beam.world_tick)
+            .ok_or(INVALID)?;
+        let since_shot = end.checked_sub(shot.clock).ok_or(INVALID)?;
+        if (shot.weapon, shot.item) != (beam.weapon, item)
+            || shot.clock > beam.world_tick
+            || since_shot > elapsed
+        {
+            return Err(INVALID);
         }
+    }
+    Ok(())
+}
+
+// The active combat slot and a practice record may mirror the same station impact.
+// A single discharge cannot also produce a player-to-NPC hit.
+fn validate_exclusive_laser_targets(
+    ordinary: impl IntoIterator<Item = super::OrdinaryImpact>,
+    npc_emissions: impl IntoIterator<Item = u64>,
+) -> Result<(), SaveError> {
+    let mut station = BTreeMap::new();
+    for hit in ordinary.into_iter().filter(|hit| hit.weapon.is_laser()) {
+        if station
+            .insert(hit.emission, hit)
+            .is_some_and(|record| record != hit)
+        {
+            return Err(INVALID);
+        }
+    }
+    if npc_emissions
+        .into_iter()
+        .any(|emission| station.contains_key(&emission))
+    {
+        return Err(INVALID);
     }
     Ok(())
 }
