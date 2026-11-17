@@ -4,7 +4,8 @@ pub mod cockpit;
 
 pub const MAX_LINES: usize = 14;
 pub const MAX_COLUMNS: usize = 96;
-pub const MAX_VERTICES: usize = cockpit::MAX_VERTICES + 6 + MAX_LINES * MAX_COLUMNS * 35 * 6;
+pub const MAX_VERTICES: usize =
+    cockpit::MAX_VERTICES + 6 + MAX_LINES * MAX_COLUMNS * 35 * 6 + crate::help::MAX_VERTICES;
 
 pub(crate) fn glyph(character: char) -> [u8; 7] {
     match character.to_ascii_uppercase() {
@@ -196,6 +197,79 @@ mod tests {
             session
                 .command(&mut world, crate::session::Action::NextCommodity)
                 .unwrap_or_else(|e| panic!("{e}"));
+        }
+    }
+}
+
+/// Draw a centered help card after the normal station/cockpit pass.
+pub fn append_help(panel: &crate::help::Panel, width: u32, height: u32, output: &mut Vec<Vertex>) {
+    if width < 48 || height < 48 {
+        return;
+    }
+    let size = [width as f32, height as f32];
+    let scale = (size[0] / 600.0).floor().clamp(1.0, 2.0);
+    let columns = (((size[0] - 48.0) / (6.0 * scale)) as usize).min(crate::help::MAX_COLUMNS);
+    let rows = (((size[1] - 48.0) / (9.0 * scale)) as usize).min(crate::help::MAX_LINES);
+    let lines = std::iter::once(panel.title.as_str())
+        .chain(panel.lines.iter().map(String::as_str))
+        .chain(std::iter::once("Escape / H / ? Close help"))
+        .collect::<Vec<_>>();
+    let count = lines.len().min(rows);
+    let card_width = (columns as f32 * 6.0 + 16.0) * scale;
+    let card_height = (count as f32 * 9.0 + 16.0) * scale;
+    let left = (size[0] - card_width) / 2.0;
+    let top = (size[1] - card_height) / 2.0;
+    quad(
+        output,
+        [left, top, left + card_width, top + card_height],
+        [0.015, 0.045, 0.065],
+        size,
+    );
+    for (row, line) in lines.into_iter().take(count).enumerate() {
+        for (column, character) in line.chars().take(columns).enumerate() {
+            for (y, bits) in glyph(character).into_iter().enumerate() {
+                for x in 0..5 {
+                    if bits & (1 << (4 - x)) == 0 {
+                        continue;
+                    }
+                    let px = left + (8 + column * 6 + x) as f32 * scale;
+                    let py = top + (8 + row * 9 + y) as f32 * scale;
+                    quad(
+                        output,
+                        [px, py, px + scale, py + scale],
+                        [0.75, 0.94, 0.96],
+                        size,
+                    );
+                }
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod help_tests {
+    use super::*;
+    #[test]
+    fn modal_card_stays_finite_and_bounded_across_compact_retina_and_tiny_views() {
+        for screen in crate::docked_screens::Screen::ALL {
+            let panel = crate::help::Panel::station(screen, Some("Review"), true, true);
+            for [width, height] in [
+                [0, 0],
+                [20, 20],
+                [48, 48],
+                [640, 360],
+                [1280, 720],
+                [2560, 1600],
+            ] {
+                let mut vertices = Vec::with_capacity(crate::help::MAX_VERTICES);
+                append_help(&panel, width, height, &mut vertices);
+                assert!(vertices.len() <= crate::help::MAX_VERTICES);
+                for vertex in vertices {
+                    assert!(vertex.position.iter().all(|value| value.is_finite()));
+                    assert!((-1.0..=1.0).contains(&vertex.position[0]));
+                    assert!((-1.0..=1.0).contains(&vertex.position[1]));
+                }
+            }
         }
     }
 }

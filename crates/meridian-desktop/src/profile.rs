@@ -325,7 +325,7 @@ impl Profile {
         }
         vec![
             "MERIDIAN".into(),
-            "C CONTINUE SAVED COMMANDER | N NEW COMMANDER | ESC QUIT".into(),
+            "C CONTINUE | N NEW COMMANDER | H / ? HELP".into(),
             if self.has_save {
                 "AN EXISTING SAVE IS RETAINED UNTIL AN EXPLICIT NEW GAME IS SAVED".into()
             } else {
@@ -336,9 +336,7 @@ impl Profile {
             } else {
                 "CLICK INSIDE THE WINDOW TO FOCUS THE CONTROLS".into()
             },
-            notice
-                .unwrap_or("F5 SAVES IN GAME; ESC SAVES AND QUITS; F9 RELOADS THE CURRENT SAVE")
-                .into(),
+            notice.unwrap_or("H / ? OPENS CONTEXT HELP").into(),
         ]
     }
 }

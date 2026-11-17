@@ -7,6 +7,7 @@ mod docked_render;
 pub mod docked_screens;
 mod equipment;
 mod flight_lesson;
+mod help;
 mod hud;
 mod market;
 mod mesh;

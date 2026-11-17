@@ -15,7 +15,6 @@ pub enum Action {
     Module(meridian_core::ModuleAction),
     CargoEquipment(meridian_core::equipment::Command),
     StationService(meridian_core::station_services::Command),
-    ToggleControls,
     Ammunition(meridian_core::AmmunitionAction),
     ReviewTradeLesson,
     PlanTradeLesson,
@@ -61,7 +60,6 @@ pub(crate) enum PracticeSelection {
 }
 
 pub struct Session {
-    show_controls: bool,
     job: Option<JobId>,
     pending: Option<(Review, Choice)>,
     pub(crate) pending_trade: Option<NavigationTradeReview>,
@@ -78,7 +76,6 @@ pub struct Session {
 impl Default for Session {
     fn default() -> Self {
         Self {
-            show_controls: false,
             job: None,
             pending: None,
             pending_trade: None,
@@ -104,7 +101,6 @@ impl Session {
     }
 
     pub fn invalidate(&mut self) {
-        self.show_controls = false;
         self.pending_trade = None;
         self.show_trade_lesson = false;
         self.pending_flight = None;
@@ -286,27 +282,16 @@ impl Session {
     }
 
     pub fn command(&mut self, world: &mut World, action: Action) -> Result<String, String> {
-        if !matches!(action, Action::ToggleControls) {
-            if self.pending_trade.take().is_some() && matches!(action, Action::Back) {
-                return Ok("Trade lesson review cancelled.".into());
-            }
-            if self.pending_flight.take().is_some() && matches!(action, Action::Back) {
-                return Ok("Flight lesson review cancelled.".into());
-            }
-            if self.pending_practice.take().is_some() && matches!(action, Action::Back) {
-                return Ok("Practice review cancelled.".into());
-            }
+        if self.pending_trade.take().is_some() && matches!(action, Action::Back) {
+            return Ok("Trade lesson review cancelled.".into());
+        }
+        if self.pending_flight.take().is_some() && matches!(action, Action::Back) {
+            return Ok("Flight lesson review cancelled.".into());
+        }
+        if self.pending_practice.take().is_some() && matches!(action, Action::Back) {
+            return Ok("Practice review cancelled.".into());
         }
         match action {
-            Action::ToggleControls => {
-                self.show_controls = !self.show_controls;
-                Ok(if self.show_controls {
-                    "Controls shown; / closes help"
-                } else {
-                    "Controls hidden"
-                }
-                .into())
-            }
             Action::Ammunition(_)
             | Action::Module(_)
             | Action::CargoEquipment(_)
@@ -424,7 +409,7 @@ impl Session {
                 self.invalidate();
                 self.market_open = open;
                 Ok(if open {
-                    "Market: [ and ] select; G buys one native unit; H sells one native unit."
+                    "Market: [ and ] select; G buys one native unit; Shift+G sells one native unit."
                 } else {
                     "Market closed."
                 }
@@ -444,7 +429,10 @@ impl Session {
                 };
                 self.selected_commodity = order[(index + offset) % order.len()];
                 self.market_open = true;
-                Ok("Commodity selected; G buys one native unit, H sells one native unit.".into())
+                Ok(
+                    "Commodity selected; G buys one native unit, Shift+G sells one native unit."
+                        .into(),
+                )
             }
             Action::BuySelected | Action::SellSelected => {
                 self.invalidate();
@@ -599,7 +587,7 @@ impl Session {
         if self.equipment_open {
             "K BUY AND FIT | U STORE OWNED BAY | Y REFIT OWNED BAY | O CLOSE | 7 TRADE LESSON"
         } else if self.market_open {
-            "[ PREVIOUS | ] NEXT | G BUY 1 UNIT | H SELL 1 UNIT | M CLOSE MARKET | F REFUEL | 5 PLAN"
+            "[ PREVIOUS | ] NEXT | G BUY 1 UNIT | SHIFT+G SELL 1 UNIT | M CLOSE MARKET | F REFUEL | 5 PLAN"
         } else {
             "L LAUNCH | J JUMP | T CONTACT | R REVIEW | V RECEIVE ALL | X ABANDON | ENTER CONFIRM | 7 TRADE"
         }
@@ -620,11 +608,7 @@ impl Session {
                 travel.remaining_ticks as f32 / 60.0
             ));
         }
-        lines.push(
-            "Z FIRE FRONT PULSE | SPACE BRAKE | P PAUSE | F5 SAVE | ESC SAVE AND QUIT | / HELP"
-                .into(),
-        );
-        lines.push(CRITICAL_CONTROLS.into());
+        lines.push("H / ? HELP".into());
     }
 
     fn append_flight_status(
@@ -650,10 +634,6 @@ impl Session {
                 ));
             }
         }
-        lines.push(format!(
-            "POSITION {:.0} {:.0} {:.0} | DOCK: ALIGN WITH ENTRANCE, APPROACH AT SPEED 4",
-            snapshot.position[0], snapshot.position[1], snapshot.position[2]
-        ));
         if let Some(mission) = world.mission_snapshot() {
             lines.push(format!(
                 "FREIGHT HELD {} TONNES | COMPLETED {} | TRUSTED CLUE {}",
@@ -706,11 +686,22 @@ impl Session {
                 resources.cooldown_ticks
             ));
         }
-        lines.push("W/S THRUST | ARROWS PITCH | A/D YAW | Q/E ROLL | SPACE BRAKE | J JUMP".into());
-        lines.push(
-            "O EQUIPMENT | M MARKET | G BUY | H SELL | F REFUEL | P PAUSE | F11 FULLSCREEN".into(),
-        );
+
         lines.push(CRITICAL_CONTROLS.into());
+    }
+
+    pub fn help_review(&self) -> Option<&'static str> {
+        if self.pending_trade.is_some() {
+            Some("Trade lesson review")
+        } else if self.pending_flight.is_some() {
+            Some("Flight lesson review")
+        } else if self.pending_practice.is_some() {
+            Some("Practice review")
+        } else if self.pending.is_some() {
+            Some("Freight review")
+        } else {
+            None
+        }
     }
 
     pub fn lines(&self, world: &World, active: bool, notice: Option<&str>) -> Vec<String> {
@@ -720,6 +711,7 @@ impl Session {
             .map(|n| match n.system {
                 SystemId::AVENOR => "AVENOR",
                 SystemId::RENAS => "RENAS",
+                SystemId::LARERIA => "LARERIA",
                 _ => "UNKNOWN SYSTEM",
             })
             .unwrap_or("NO COMMANDER");
@@ -757,23 +749,6 @@ impl Session {
             && !self.show_objective
             && !self.equipment_open
             && !self.market_open;
-        if self.show_controls
-            && self.pending_practice.is_none()
-            && self.pending.is_none()
-            && !self.show_objective
-        {
-            lines.extend([
-                "FLIGHT: W/S THRUST | ARROWS PITCH | A/D YAW | Q/E ROLL | SPACE BRAKE | J JUMP",
-                "WEAPONS: Z FIRE FRONT PULSE | F1 NEXT LOCK | F2 ARM/SAFE | F3 MISSILE | F4 SAFE",
-                "VIEWS: 0 FRONT | 1 REAR | 2 LEFT | 3 RIGHT",
-                "DOCKED: L LAUNCH | M MARKET | O EQUIPMENT | F REFUEL",
-                "MARKET: [ / ] SELECT | G BUY ONE UNIT | H SELL ONE UNIT",
-                "FLIGHT LESSON: F6 REVIEW | F12 CANCEL | C DETAILS",
-                "TRADE LESSON: 4 REVIEW | 5 PLAN | 6 CANCEL | 7 DETAILS",
-                "F5 SAVE | F9 RELOAD | P PAUSE | F11 FULLSCREEN | ESC SAVE AND QUIT | / CLOSE HELP",
-            ].into_iter().map(str::to_owned));
-            return lines;
-        }
         if compact_flight {
             Self::append_compact_flight(world, snapshot, &mut lines);
             return lines;
@@ -813,8 +788,7 @@ impl Session {
     }
 }
 
-const CRITICAL_CONTROLS: &str =
-    "I MISSION DETAILS | C LESSON | F6/F12 REVIEW | F5 SAVE | F9 RELOAD SAVE | ESC SAVE AND QUIT";
+const CRITICAL_CONTROLS: &str = "H / ? HELP";
 
 fn append_missile_panel(world: &World, mode: FlightMode, lines: &mut Vec<String>) {
     if let Some(missiles) = world.missile_snapshot() {
@@ -840,9 +814,7 @@ fn append_missile_panel(world: &World, mode: FlightMode, lines: &mut Vec<String>
                 if missiles.armed { "ARMED" } else { "SAFE" },
                 missiles.cooldown_ticks
             ));
-            lines.push("F1 NEXT LOCK | F2 ARM/SAFE | F3 LAUNCH | F4 SAFE AND UNLOCK".into());
         }
-        lines.push("F5 SAVES COMPLETE MISSILE SESSION | F9 CONTINUES SAVED STATE".into());
     }
 }
 
@@ -1093,7 +1065,7 @@ mod tests {
     }
 
     #[test]
-    fn default_flight_overlay_keeps_warning_and_critical_controls_without_debug_rows() {
+    fn default_flight_overlay_keeps_warning_and_help_without_debug_rows() {
         let mut world = World::new_commander(84801).unwrap_or_else(|e| panic!("{e}"));
         world.request_launch(0).unwrap_or_else(|e| panic!("{e}"));
         world
@@ -1105,41 +1077,11 @@ mod tests {
         assert!(lines.len() <= 8, "{} overlay lines", lines.len());
         assert!(lines[1].contains("ENTRY REFUSED"));
         let text = lines.join(" ");
-        for required in [
-            "MISSILES",
-            "F5 SAVE",
-            "ESC SAVE AND QUIT",
-            "/ HELP",
-            "SPACE BRAKE",
-        ] {
+        for required in ["MISSILES", "H / ? HELP"] {
             assert!(text.contains(required), "{required}");
         }
         assert!(!text.contains("POSITION "));
         assert!(!text.contains("THRUST"));
-        assert_eq!(world.save_bytes().unwrap_or_else(|e| panic!("{e}")), before);
-    }
-    #[test]
-    fn controls_toggle_preserves_live_world_and_pending_trade_review() {
-        let mut world = World::new_commander(84802).unwrap_or_else(|e| panic!("{e}"));
-        let mut ui = Session::default();
-        ui.command(&mut world, Action::ReviewTradeLesson)
-            .unwrap_or_else(|e| panic!("{e}"));
-        let pending = ui.pending_trade.unwrap_or_else(|| panic!("review"));
-        let before = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
-        for _ in 0..2 {
-            ui.command(&mut world, Action::ToggleControls)
-                .unwrap_or_else(|e| panic!("{e}"));
-        }
-        assert_eq!(ui.pending_trade, Some(pending));
-        assert_eq!(world.save_bytes().unwrap_or_else(|e| panic!("{e}")), before);
-        ui.command(&mut world, Action::Back)
-            .unwrap_or_else(|e| panic!("{e}"));
-        assert!(ui.pending_trade.is_none());
-        ui.command(&mut world, Action::ToggleControls)
-            .unwrap_or_else(|e| panic!("{e}"));
-        let help = ui.lines(&world, false, None).join(" ");
-        assert!(help.contains("W/S THRUST"));
-        assert!(help.contains("/ CLOSE HELP"));
         assert_eq!(world.save_bytes().unwrap_or_else(|e| panic!("{e}")), before);
     }
     #[test]
@@ -1157,15 +1099,7 @@ mod tests {
                 .take(budget)
                 .collect::<Vec<_>>()
                 .join("\n");
-            for required in [
-                "MISSILES",
-                "PRACTICE BEACONS",
-                warning,
-                "Z FIRE FRONT PULSE",
-                "SPACE BRAKE",
-                "F5 SAVE",
-                "ESC SAVE AND QUIT",
-            ] {
+            for required in ["MISSILES", "PRACTICE BEACONS", warning, "H / ? HELP"] {
                 assert!(
                     visible.contains(required),
                     "Visible flight HUD omitted {required}"
@@ -1187,7 +1121,7 @@ mod tests {
             .step(meridian_core::FlightInput::default())
             .unwrap_or_else(|error| panic!("{error}"));
         let mut session = Session::from_world(&world);
-        assert_visible(&session, &world, "F5 SAVES COMPLETE MISSILE SESSION");
+        assert_visible(&session, &world, "H / ? HELP");
         let before = world
             .missile_snapshot()
             .unwrap_or_else(|| panic!("Expected missile_snapshot"));
@@ -1220,7 +1154,7 @@ mod tests {
             .command(&mut world, Action::ToggleMissileArm)
             .unwrap_or_else(|error| panic!("{error}"));
         assert!(world.save_bytes().is_ok());
-        assert_visible(&session, &world, "F5 SAVES COMPLETE MISSILE SESSION");
+        assert_visible(&session, &world, "H / ? HELP");
         session
             .command(&mut world, Action::ClearMissile)
             .unwrap_or_else(|error| panic!("{error}"));
@@ -1234,7 +1168,7 @@ mod tests {
         session
             .command(&mut world, Action::FireMissile)
             .unwrap_or_else(|error| panic!("{error}"));
-        assert_visible(&session, &world, "F5 SAVES COMPLETE MISSILE SESSION");
+        assert_visible(&session, &world, "H / ? HELP");
         let after = world
             .missile_snapshot()
             .unwrap_or_else(|| panic!("Expected missile_snapshot"));
@@ -1260,7 +1194,7 @@ mod tests {
             session
                 .lines(&world, true, None)
                 .iter()
-                .any(|s| s.contains("F5 SAVES COMPLETE MISSILE SESSION"))
+                .any(|s| s.contains("H / ? HELP"))
         );
         session
             .command(&mut world, Action::ClearMissile)
@@ -1325,7 +1259,7 @@ mod tests {
             world.credits_tenths(),
         );
         let lines = ui.lines(&world, false, None);
-        assert!(lines.iter().any(|l| l.contains("F5 SAVE")));
+        assert!(lines.iter().any(|l| l.contains("H / ? HELP")));
         assert_eq!(
             before,
             (

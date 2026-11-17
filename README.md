@@ -57,12 +57,15 @@ A separate explicitly prepared public-core setup supplied four nonfatal contacts
 
 N starts a commander; C continues a current-format V17 save. Earlier formats refuse without changing the file. Use a separate profile for this candidate. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.
 
+H or ? opens a dismissible help popup for the current screen, including station details and transaction reviews. Every station popup lists 1 Galaxy, 2 System, 3 Showroom, 4 Market, 5 Equipment, Tab/Shift+Tab and Escape/back. Escape, H or ? closes help and retains the screen, selection, search and review. Gameplay and underlying actions wait while help is open. During galaxy text search, H remains a typed letter and ? opens help.
+
 | Controls | Action |
 | --- | --- |
+| H / ? | Context help; Escape, H or ? dismisses |
 | 1 / 2 / 3 / 4 / 5 when docked | Galaxy / System / Ships / Market / Equipment |
 | L; W/S; arrows; A/D; Q/E; Space | Launch; thrust; pitch; yaw; roll; brake |
 | J; T; R; Enter; B; F | Travel; select contact; review; confirm; cancel; buy fuel |
-| M; [ / ]; G/H | Market; commodity selection; buy/sell one native unit |
+| M; [ / ]; G / Shift+G | Market; commodity selection; buy/sell one native unit |
 | O; K; U; Y | Equipment panel; buy/fit cargo bay; store; refit |
 | I; V; X | Mission details; review all held freight deliveries; review abandonment |
 | F1; F2; F3; F4 | Next ship/practice lock; arm/safe; launch one missile; safe/unlock |

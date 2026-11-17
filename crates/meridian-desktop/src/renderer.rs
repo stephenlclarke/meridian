@@ -20,6 +20,7 @@ pub struct StationScene<'a> {
 pub struct HudScene<'a> {
     pub lines: &'a [String],
     pub cockpit: Option<&'a hud::cockpit::Cockpit>,
+    pub help: Option<&'a crate::help::Panel>,
 }
 
 pub struct SceneEffects<'a> {
@@ -341,19 +342,31 @@ impl Renderer {
         submit(bytemuck::cast_slice(output.as_slice()));
     }
 
-    fn upload_hud(&mut self, lines: &[String], cockpit: Option<&hud::cockpit::Cockpit>) {
-        let window = &self.window;
-        let queue = &self.queue;
-        let vertices = &self.hud_vertices;
-        Self::prepare_and_submit_hud(
-            lines,
-            cockpit,
-            self.size,
-            [self.config.width, self.config.height],
-            || window.scale_factor(),
-            &mut self.hud_frame,
-            |bytes| queue.write_buffer(vertices, 0, bytes),
-        );
+    fn upload_hud(
+        &mut self,
+        lines: &[String],
+        cockpit: Option<&hud::cockpit::Cockpit>,
+        help: Option<&crate::help::Panel>,
+    ) {
+        let logical = self.size.to_logical::<f64>(self.window.scale_factor());
+        if let Some(panel) = help {
+            let width = logical.width.round() as u32;
+            let height = logical.height.round() as u32;
+            hud::vertices_with_cockpit(lines, width, height, cockpit, &mut self.hud_frame);
+            hud::append_help(panel, width, height, &mut self.hud_frame);
+            self.queue
+                .write_buffer(&self.hud_vertices, 0, bytemuck::cast_slice(&self.hud_frame));
+        } else {
+            Self::prepare_and_submit_hud(
+                lines,
+                cockpit,
+                self.size,
+                [self.config.width, self.config.height],
+                || [logical.width, logical.height],
+                &mut self.hud_frame,
+                |bytes| self.queue.write_buffer(&self.hud_vertices, 0, bytes),
+            );
+        }
     }
 
     pub fn draw(
@@ -366,6 +379,7 @@ impl Renderer {
         let HudScene {
             lines: hud_lines,
             cockpit,
+            help,
         } = hud;
 
         let SceneEffects {
@@ -488,7 +502,11 @@ impl Renderer {
             }
             self.queue
                 .write_buffer(&self.vertices, 0, bytemuck::cast_slice(&self.frame));
-            self.upload_hud(hud_lines, cockpit);
+        }
+        if docked.is_none() {
+            self.upload_hud(hud_lines, cockpit, help);
+        } else if help.is_some() {
+            self.upload_hud(&[], None, help);
         }
 
         let view = frame.texture.create_view(&Default::default());
@@ -551,7 +569,8 @@ impl Renderer {
             });
             if docked.is_some() {
                 self.docked.draw_overlay(&mut pass);
-            } else {
+            }
+            if docked.is_none() || help.is_some() {
                 pass.set_pipeline(&self.hud_pipeline);
                 pass.set_vertex_buffer(0, self.hud_vertices.slice(..));
                 pass.draw(0..self.hud_frame.len() as u32, 0..1);

@@ -1,10 +1,14 @@
 # Implementation and validation status
 
+## Context help source
+
+The following source adds H/? modal help on title, station HUD, flight, all five station pages and current reviews/details. Every station card includes screen navigation. Escape/H/? restores the existing view, query, selection and review. Held input and clock accumulation clear without changing manual pause or saved gameplay state. Shift+G sells alongside G buy; X retains its mission/showroom role. The ordinary HUD and title omit the permanent control list. Authored routing, pause/focus, real purchase-review, search, all-page text/binding and compact geometry regressions await independent source review and owning execution.
+
 ## Lareria navigation provider source
 
 The candidate from joined `48cdcabf` admits the original Lareria G01-S091 main orbital as one additional destination and ordinary service site. Its 9.931291094314 LY leg from Avenor costs 99 fuel units and requires the paid navigation range. Actual physical berthing enables the original charged refill. Filling from 31 to 130 costs 198 credit tenths and supports the return. Exact original market and equipment rows are imported for the selected site. The previous source's minimum 172 fuel for a route between only Avenor and Renas is retained as the reason a third evidenced provider was needed.
 
-The existing SH028 mesh, physics, port, per-leg grade/debit journal, V17-only boundary, account and profile custody are preserved. The new public journey and desktop refusal cases are authored. Thirty-three Python importer cases pass. Rust compilation, tests, owning qualification and native Lareria acceptance remain pending. Prior completed navigation UI qualification retains its own source identity.
+The existing SH028 mesh, physics, port, per-leg grade/debit journal, V17-only boundary, account and profile custody are preserved. The new public journey and desktop refusal cases are authored. Thirty-three Python importer cases pass. Exact Mac source e1cc86b passed 351 core, two literal old-format refusal integrations, 199 desktop and three observer tests (555 Rust), 94 Python checks, 47 Markdown checks, formatting, locked all-target compilation, strict Clippy and release build. Native Lareria acceptance remains pending; its live purchase review was cancelled before this help improvement. Prior completed navigation UI qualification retains its own source identity.
 
 ## Following navigation and custody: qualified bounded candidate
 

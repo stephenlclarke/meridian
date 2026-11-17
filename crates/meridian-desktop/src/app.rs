@@ -88,6 +88,7 @@ struct App {
     renderer: Option<Renderer>,
     keys: HashSet<KeyCode>,
     paused: bool,
+    help: Option<crate::help::Panel>,
     focused: bool,
     docked: Option<Docked>,
     modifiers: ModifiersState,
@@ -120,6 +121,7 @@ impl App {
             renderer: None,
             keys: HashSet::new(),
             paused: false,
+            help: None,
             focused: true,
             docked: None,
             modifiers: ModifiersState::empty(),
@@ -149,22 +151,81 @@ impl App {
             - f32::from(u8::from(self.keys.contains(&negative)))
     }
 
+    fn simulation_active(&self) -> bool {
+        self.focused && !self.occluded && !self.paused && self.help.is_none() && self.game.playing()
+    }
+
     fn request_redraw(&self) {
         if let Some(renderer) = &self.renderer {
             renderer.window.request_redraw();
         }
     }
 
-    fn reset_input(&mut self) {
+    fn clear_held_input(&mut self) {
         self.keys.clear();
         self.dragging = false;
-        if let Some(menu) = &mut self.docked {
-            menu.focus_lost();
-        }
+        self.wheel = 0.0;
         self.pulse = None;
         self.mining = None;
         self.last_frame = Instant::now();
         self.clock.reset();
+    }
+
+    fn help_panel(&self) -> crate::help::Panel {
+        if !self.game.playing() {
+            return crate::help::Panel::title();
+        }
+        if self.menu_active()
+            && let Some(menu) = &self.docked
+        {
+            return menu.help_panel();
+        }
+        let review = self.game.session.help_review();
+        if self.game.world.snapshot().mode == FlightMode::Docked {
+            crate::help::Panel::docked(review)
+        } else {
+            let weapon = self
+                .game
+                .world
+                .front_laser_snapshot()
+                .map(|laser| laser.weapon.label());
+            crate::help::Panel::flight(weapon, review)
+        }
+    }
+
+    fn route_help(&mut self, code: KeyCode, repeat: bool, text: Option<&str>) -> bool {
+        let searching =
+            self.menu_active() && self.docked.as_ref().is_some_and(Docked::search_active);
+        let question = text == Some("?") || (code == KeyCode::Slash && self.modifiers.shift_key());
+        let toggle = question || (code == KeyCode::KeyH && !searching);
+        if self.help.is_some() {
+            if !repeat && (toggle || code == KeyCode::KeyH || code == KeyCode::Escape) {
+                self.help = None;
+                self.clear_held_input();
+                self.request_redraw();
+            }
+            return true;
+        }
+        if toggle {
+            if !repeat {
+                self.help = Some(self.help_panel());
+                self.clear_held_input();
+                self.request_redraw();
+            }
+            return true;
+        }
+        false
+    }
+
+    fn reset_input(&mut self) {
+        self.clear_held_input();
+        if self.help.is_some() {
+            self.request_redraw();
+            return;
+        }
+        if let Some(menu) = &mut self.docked {
+            menu.focus_lost();
+        }
         self.game.session.invalidate();
         if self.game.playing()
             && let Err(error) = self.game.world.request_pause(
@@ -303,6 +364,9 @@ impl App {
             .is_some_and(|menu| menu.active(&self.game.world))
     }
     fn menu_input(&mut self, input: ui::Input) {
+        if self.help.is_some() {
+            return;
+        }
         if let Some(menu) = &mut self.docked
             && let Err(error) = menu.input(&mut self.game, input)
         {
@@ -348,6 +412,9 @@ impl App {
     fn pointer(&mut self, point: [f64; 2]) {
         let previous = self.cursor;
         self.cursor = point;
+        if self.help.is_some() {
+            return;
+        }
         if self.menu_active() {
             let input = if self.dragging {
                 ui::Input::Drag {
@@ -362,7 +429,7 @@ impl App {
         }
     }
     fn scroll(&mut self, amount: f64) {
-        if !self.menu_active() || !amount.is_finite() {
+        if self.help.is_some() || !self.menu_active() || !amount.is_finite() {
             return;
         }
         self.wheel -= amount;
@@ -378,7 +445,6 @@ impl App {
 
     fn game_key(&mut self, code: KeyCode) {
         let action = match code {
-            KeyCode::Slash => Action::ToggleControls,
             KeyCode::Digit0 => Action::SetFlightView(FlightView::Front),
             KeyCode::Digit1 => Action::SetFlightView(FlightView::Rear),
             KeyCode::Digit2 => Action::SetFlightView(FlightView::Left),
@@ -411,8 +477,8 @@ impl App {
             KeyCode::Enter => Action::Confirm,
             KeyCode::KeyB => Action::Back,
             KeyCode::KeyF => Action::Refuel,
+            KeyCode::KeyG if self.modifiers.shift_key() => Action::SellSelected,
             KeyCode::KeyG => Action::BuySelected,
-            KeyCode::KeyH => Action::SellSelected,
             KeyCode::KeyM => Action::ToggleMarket,
             KeyCode::KeyO => Action::ToggleEquipment,
             KeyCode::KeyK => Action::PurchaseCargoBay,
@@ -429,7 +495,7 @@ impl App {
     }
 
     fn advance_frame(&mut self, active: bool, ticks: usize) -> FrameAdvance {
-        let result = if active {
+        let result = if active && self.help.is_none() {
             let input = FlightInput {
                 pitch: self.axis(KeyCode::ArrowUp, KeyCode::ArrowDown),
                 yaw: self.axis(KeyCode::KeyD, KeyCode::KeyA),
@@ -506,6 +572,9 @@ impl App {
             if state == ElementState::Released {
                 self.keys.remove(&code);
             } else if self.focused && !self.occluded {
+                if self.route_help(code, repeat, text) {
+                    return None;
+                }
                 if self.menu_active()
                     && self.docked.as_ref().is_some_and(Docked::search_active)
                     && let Some(text) = text.filter(|s| s.chars().all(|c| !c.is_control()))
@@ -577,7 +646,8 @@ impl App {
         let hud_lines = self
             .game
             .lines(active, pulse_notice.or(self.notice.as_deref()));
-        let docked_frame = self.docked_frame(elapsed, viewport)?;
+        let docked_frame =
+            self.docked_frame(if self.help.is_some() { 0.0 } else { elapsed }, viewport)?;
         Ok(PreparedPresentation {
             hud_lines,
             docked_frame,
@@ -601,7 +671,7 @@ impl App {
         let now = Instant::now();
         let elapsed = now.duration_since(self.last_frame).as_secs_f64();
         self.last_frame = now;
-        let active = self.focused && !self.occluded && !self.paused && self.game.playing();
+        let active = self.simulation_active();
         let ticks = self.clock.ticks(elapsed, active);
         let frame_refusal = match self.advance_frame(active, ticks) {
             FrameAdvance::Continue(refusal) => refusal,
@@ -656,7 +726,6 @@ impl App {
             }
         }
 
-        let notice = pulse_notice.or(self.notice.as_deref());
         let traffic = self.game.world.traffic_snapshot();
         let cockpit = if self.game.playing() {
             match crate::hud::cockpit::Cockpit::capture(&self.game.world, snapshot) {
@@ -704,9 +773,9 @@ impl App {
             };
         if let Some(renderer) = &mut self.renderer {
             let mode = match snapshot.mode {
-                FlightMode::Docked => "DOCKED - L launch",
+                FlightMode::Docked => "DOCKED",
                 FlightMode::Launching => "LAUNCHING",
-                FlightMode::Flight => "FLIGHT - align with the station entrance to dock",
+                FlightMode::Flight => "FLIGHT",
             };
             let contact_notice =
                 frame_refusal
@@ -728,13 +797,18 @@ impl App {
                             "Entry refused: align with the entrance and slow down"
                         }
                     });
+            if let Some(message) = contact_notice {
+                hud_lines.insert(hud_lines.len().min(1), message.into());
+            }
             renderer.window.set_title(&format!(
-                "Meridian | {mode} | speed {:.1} | tick {} | {} | {} | W/S thrust, arrows pitch, A/D yaw, Q/E roll, Space brake, Z fire, P pause, F11 fullscreen",
-                snapshot.speed,
-                snapshot.tick,
-                if active { "RUNNING" } else { "PAUSED" },
-                contact_notice.or(notice)
-                    .unwrap_or("Click inside to control"),
+                "Meridian | {mode} | {} | H / ? Help",
+                if self.help.is_some() {
+                    "HELP"
+                } else if active {
+                    "RUNNING"
+                } else {
+                    "PAUSED"
+                },
             ));
             let station =
                 snapshot
@@ -766,6 +840,7 @@ impl App {
                 HudScene {
                     lines: &hud_lines,
                     cockpit: cockpit.as_ref(),
+                    help: self.help.as_ref(),
                 },
             );
             match presented {
@@ -774,7 +849,11 @@ impl App {
                         menu.presented(frame);
                     }
                 }
-                Ok(Presentation::Skipped) => {}
+                Ok(Presentation::Skipped) => {
+                    if self.help.is_some() && !renderer.is_zero_sized() {
+                        renderer.window.request_redraw();
+                    }
+                }
                 Err(error) => self.fail(event_loop, error),
             }
         }
@@ -806,7 +885,7 @@ impl ApplicationHandler for App {
             return;
         }
         match event {
-            WindowEvent::CloseRequested => self.request_quit(event_loop),
+            WindowEvent::CloseRequested if self.help.is_none() => self.request_quit(event_loop),
             WindowEvent::Resized(size) => {
                 if let Some(menu) = &mut self.docked {
                     menu.discard_frame();
@@ -835,6 +914,9 @@ impl ApplicationHandler for App {
                 button: MouseButton::Left,
                 ..
             } if self.focused && !self.occluded => {
+                if self.help.is_some() {
+                    return;
+                }
                 self.dragging = state == ElementState::Pressed;
                 if self.dragging && self.menu_active() {
                     self.menu_input(ui::Input::Click(self.cursor));
@@ -858,12 +940,7 @@ impl ApplicationHandler for App {
 
     fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
         if let Some(renderer) = &self.renderer {
-            if self.occluded
-                || !self.focused
-                || self.paused
-                || !self.game.playing()
-                || renderer.is_zero_sized()
-            {
+            if !self.simulation_active() || renderer.is_zero_sized() {
                 event_loop.set_control_flow(ControlFlow::Wait);
             } else {
                 event_loop.set_control_flow(ControlFlow::Poll);
@@ -970,3 +1047,6 @@ mod tests {
 
 #[cfg(test)]
 mod callback_tests;
+
+#[cfg(test)]
+mod help_tests;

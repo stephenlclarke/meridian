@@ -38,7 +38,7 @@ pub const BINDINGS: &[ui::BindingHint<'static>] = &[
     },
     ui::BindingHint {
         key: ui::Key::Sell,
-        label: "H",
+        label: "Shift+G",
     },
     ui::BindingHint {
         key: ui::Key::Fit,
@@ -207,6 +207,16 @@ impl Docked {
     pub fn screen(&self) -> ui::Screen {
         self.screens.screen()
     }
+    pub fn help_panel(&self) -> crate::help::Panel {
+        crate::help::Panel::station(
+            self.screen(),
+            self.pending
+                .as_ref()
+                .map(|pending| pending.view.title.as_str()),
+            self.search_active(),
+            self.screens.details_open(),
+        )
+    }
     pub fn feedback(&mut self, message: String) {
         self.feedback = message;
     }
@@ -214,7 +224,7 @@ impl Docked {
         self.painted = None;
     }
     pub fn search_active(&self) -> bool {
-        self.painted.as_ref().is_some_and(|f| f.search_active)
+        self.screens.search_active()
     }
     pub fn build_frame(
         &mut self,
@@ -853,8 +863,8 @@ pub fn key(code: winit::keyboard::KeyCode, shift: bool, screen: ui::Screen) -> O
         C::Slash => K::Search,
         C::Backspace => K::Erase,
         C::Delete => K::ClearSearch,
+        C::KeyG if shift => K::Sell,
         C::KeyG => K::Buy,
-        C::KeyH => K::Sell,
         C::KeyY => K::Fit,
         C::KeyU => K::Store,
         C::KeyO => K::Options,

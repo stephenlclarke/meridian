@@ -65,6 +65,14 @@ impl DockedScreens {
             ui_revision: 0,
         }
     }
+    pub fn search_active(&self) -> bool {
+        self.searching
+    }
+
+    pub fn details_open(&self) -> bool {
+        self.detail || self.options
+    }
+
     pub fn screen(&self) -> Screen {
         self.screen
     }

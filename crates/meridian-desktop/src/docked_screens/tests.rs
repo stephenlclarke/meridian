@@ -776,7 +776,7 @@ fn visible_shortcuts_are_from_the_supplied_binding_map() {
     assert!(
         f.labels
             .iter()
-            .any(|l| l.text.contains("Enter: review | Esc: back"))
+            .any(|l| l.text.contains("Esc: back BACK | H / ? HELP"))
     );
 }
 
