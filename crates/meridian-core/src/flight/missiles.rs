@@ -1,4 +1,5 @@
 //! Finite owned starter rounds and World-derived original practice ordnance.
+use super::practice::Practice;
 use super::{CombatIdentity, FlightMode, PracticeBeaconId, Snapshot, StepError, World};
 use crate::docking::Vec3;
 use core::fmt;
@@ -319,11 +320,11 @@ impl State {
         self.lock = None;
         self.cooldown = 0;
     }
-    pub(super) fn pending(&self) -> u8 {
+    pub(super) fn pending_for_lesson(&self, lesson: Practice) -> u8 {
         self.projectiles
             .iter()
             .flatten()
-            .filter(|p| p.ended.is_none())
+            .filter(|p| p.ended.is_none() && lesson.missile_owner_matches(p.origin.owner))
             .count() as u8
     }
 }
@@ -556,7 +557,7 @@ impl World {
         self.missiles.armed = false;
         self.missiles.cooldown = MISSILE_COOLDOWN_TICKS;
         if let Some(p) = &mut self.practice {
-            p.pending_missiles = self.missiles.pending();
+            p.pending_missiles = self.missiles.pending_for_lesson(*p);
             p.observe_discharge(tick);
         }
         if self.save_bytes().is_err() {
@@ -673,7 +674,7 @@ impl World {
             prepared.pulse.alive(),
         );
         if let Some(p) = &mut prepared.practice {
-            p.pending_missiles = prepared.missiles.pending();
+            p.pending_missiles = prepared.missiles.pending_for_lesson(*p);
         }
         Ok(prepared)
     }

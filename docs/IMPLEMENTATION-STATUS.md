@@ -2,7 +2,7 @@
 
 ## Following navigation composition: source only
 
-Root is composing reviewed navigation source `c90f1a9` with the Preview 6 documentation head. Navigation alone passed Dell Linux and native Windows with 547 Rust tests, 94 Python tests, 46 Markdown checks, strict Clippy and locked release builds. This composition is unreviewed and unrun; those results are not attributed to it. The candidate reads and writes V17 only, retains V15/V16 fixtures as refusal evidence, and has exact per-leg fuel and fitted-grade history. No backward compatibility is required.
+Root composes reviewed navigation source `c90f1a9` and destroyed-trader custody source `c922fe9` on the Preview 6 documentation head. Navigation alone passed Dell Linux and native Windows with 547 Rust tests, 94 Python tests, 46 Markdown checks, strict Clippy and locked release builds. This composition is unreviewed and unrun; those results are not attributed to it. The custody source separately passed 541 Rust tests per Dell platform. The composed missile custody test uses current V17 cold saves and preserves the same manifest, traffic, cash and departure assertions; obsolete V15 success coverage is superseded by the retained literal V15/V16 refusal fixtures. No production rule is relaxed. The candidate reads and writes V17 only, retains V15/V16 fixtures as refusal evidence, and has exact per-leg fuel and fitted-grade history. No backward compatibility is required.
 
 Desktop routes and services remain Avenor and Renas. The minimum cumulative fuel for a service-to-service route including a leg beyond 9 LY is 172 against tank capacity 130; a playable paid-range use remains open. Preview 6 acceptance below retains its exact compiled V16 source identity.
 
@@ -19,6 +19,12 @@ Screenshots and native input are recorded in Root's supported-CUA conversation; 
 Both internal platform archives are available. Mac extraction verified the existing Developer ID signed app without rebuilding or re-signing. Windows extraction and Vulkan backend initialization passed, but interactive Windows title/input/quit remain unobserved. Apple accepted one fresh notarization upload; subsequent status queries returned HTTP401 after seven In Progress responses. The account owner reports no outstanding agreements, and the final Apple decision and stapling remain unconfirmed. Notarization is separate from internal preview delivery.
 
 Protected PR integration, exact committed-main CI/Sonar and verified GitHub publication remain open. Subsequent V17-only navigation and destroyed-trader custody candidates are separate and do not delay Preview 6. Development has no backward-compatibility requirement. The history below retains earlier exact-source results and failures rather than assigning them to this candidate.
+
+## Destroyed trader manifest custody awaiting review
+
+The successor to `050b04e` uses PR 44 head `a1ee1358` as its base. The staged fatal actor transition and save validation bind the paid manifest to the same typed laser or missile event, ordered by the existing NPC resource replay. The missile case checks the qualified v15 layout with real paid missile and actor history before continuing under v16. Physical cargo issuance still requires eligible original geometry and a bound actor producer. See the [wreck manifest guide](WRECK-MANIFEST.md).
+
+The Dell trace on `1e8e3b7` confirmed that a later-visit ordinary missile was counted against a closed practice sortie. Launch, flight steps, laser publication and save validation now count only live missiles from the retained practice attempt’s own sortie. The four custody cases await the owning run on the corrected source, including a v16 cold Continue with a live later-visit missile before the fatal fitted Beam contact.
 
 ## Actual main 80a0b16 coverage failure and changed adapter correction
 

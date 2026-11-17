@@ -1,7 +1,7 @@
 //! Actual NPC surfaces and distinct retained player-missile damage; no award path.
 use super::{
     Actor, Arc, Basis3, BeamSource, INVALID, MAX_TRAFFIC_ACTORS, MAX_TRAFFIC_SHOTS, NpcId,
-    NpcPhase, OriginalStationData, Resources, RigidPose, SaveError, State, SystemId,
+    NpcPhase, OriginalStationData, Resources, RigidPose, SaveError, State, SystemId, TrafficBeam,
     TrafficContact, TrafficError, Vec3, add, finite, length, pose, scale, sub, system_index,
 };
 use crate::flight::MissileOrigin;
@@ -146,10 +146,29 @@ impl NpcMissileHit {
 }
 enum ResourceAction {
     Fire,
-    Pulse(bool, u16),
+    Laser(bool, u16),
     Missile(bool),
 }
-type ResourceEvent = (u64, u64, i32, usize, ResourceAction);
+pub(super) type ResourceOrder = (u64, u64, u8, usize);
+type ResourceEvent = (ResourceOrder, ResourceAction);
+const NPC_BEAM_PHASE: u8 = 0;
+const MISSILE_PHASE: u8 = 1;
+const PLAYER_BEAM_PHASE: u8 = 2;
+
+impl TrafficBeam {
+    pub(super) fn resource_order(&self, index: usize) -> ResourceOrder {
+        let phase = match self.source {
+            BeamSource::Npc(_) => NPC_BEAM_PHASE,
+            BeamSource::Player { .. } => PLAYER_BEAM_PHASE,
+        };
+        (self.local_tick, self.world_tick, phase, index)
+    }
+}
+impl NpcMissileHit {
+    pub(super) fn resource_order(&self, index: usize) -> ResourceOrder {
+        (self.local_tick, self.world_tick, MISSILE_PHASE, index)
+    }
+}
 
 impl State {
     pub(crate) fn combat_proof_count(&self) -> usize {
@@ -305,6 +324,8 @@ impl State {
         }
         next.actors[index] = Some(a);
         Arc::make_mut(&mut next.missile_hits).push(hit);
+        next.validate_terminal_manifest(a)
+            .map_err(|_| TrafficError::InvalidState)?;
         Ok(next)
     }
     pub(crate) fn missile_hits(&self) -> &[NpcMissileHit] {
@@ -352,11 +373,6 @@ impl State {
             if b.local_tick > clock || b.world_tick > world {
                 continue;
             }
-            let order = if matches!(b.source, BeamSource::Npc(_)) {
-                0
-            } else {
-                2
-            };
             let included = b.world_tick < world
                 || match (stage, b.source) {
                     (SceneStage::Command(_), BeamSource::Npc(_)) => true,
@@ -367,15 +383,12 @@ impl State {
                 continue;
             }
             if b.source == BeamSource::Npc(a.id) {
-                actions.push((b.local_tick, b.world_tick, order, i, ResourceAction::Fire));
+                actions.push((b.resource_order(i), ResourceAction::Fire));
             }
             if b.victim == a.id {
                 actions.push((
-                    b.local_tick,
-                    b.world_tick,
-                    order,
-                    i,
-                    ResourceAction::Pulse(b.front, b.weapon.damage_hundredths()),
+                    b.resource_order(i),
+                    ResourceAction::Laser(b.front, b.weapon.damage_hundredths()),
                 ));
             }
         }
@@ -395,7 +408,10 @@ impl State {
                 && (h.world_tick < world
                     || (h.world_tick == world && matches!(stage, SceneStage::Command(_))))
             {
-                actions.push((h.local_tick, h.world_tick, 0, i, ResourceAction::Fire));
+                actions.push((
+                    (h.local_tick, h.world_tick, NPC_BEAM_PHASE, i),
+                    ResourceAction::Fire,
+                ));
             }
         }
         for (i, h) in self.missile_hits.iter().enumerate() {
@@ -405,19 +421,13 @@ impl State {
                     SceneStage::Step(index) => h.origin.projectile.ordinal() < index,
                 };
             if h.victim == a.id && h.local_tick <= clock && h.world_tick <= world && included {
-                actions.push((
-                    h.local_tick,
-                    h.world_tick,
-                    1,
-                    i,
-                    ResourceAction::Missile(h.front),
-                ));
+                actions.push((h.resource_order(i), ResourceAction::Missile(h.front)));
             }
         }
-        actions.sort_by_key(|(t, w, order, i, _)| (*t, *w, *order, *i));
+        actions.sort_by_key(|(order, _)| *order);
         let mut resources = Resources::fresh();
         let mut cursor = a.birth_clock.checked_sub(1).ok_or(INVALID)?;
-        for (tick, _, _, _, action) in actions {
+        for ((tick, _, _, _), action) in actions {
             let n = tick.checked_sub(cursor).ok_or(INVALID)?;
             if resources.energy == 0 {
                 return Err(INVALID);
@@ -425,7 +435,7 @@ impl State {
             resources.advance_exact(n)?;
             match action {
                 ResourceAction::Fire => resources.fire(),
-                ResourceAction::Pulse(front, damage) => resources.hit_damage(front, damage),
+                ResourceAction::Laser(front, damage) => resources.hit_damage(front, damage),
                 ResourceAction::Missile(front) => resources.hit_missile(front),
             }
             .map_err(|_| INVALID)?;

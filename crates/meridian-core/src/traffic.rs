@@ -9,6 +9,8 @@ pub(crate) use economy::Flows;
 mod motion;
 mod persistence;
 mod player_hits;
+mod wreck;
+pub use wreck::{WreckDamageSource, WreckManifest, WreckManifestError};
 #[cfg(test)]
 mod player_hits_tests;
 
@@ -284,7 +286,7 @@ impl Actor {
             heat_fifths: self.resources.heat,
             cooldown_ticks: self.resources.cooldown,
             cash_tenths: self.wallet,
-            cargo: (self.id.serial == 1 && !self.sold && self.phase != NpcPhase::Destroyed)
+            cargo: matches!(self.manifest_custody(), wreck::ManifestCustody::Aboard)
                 .then_some((self.manifest, self.units)),
             wanted: if self.id.serial == 2 { 16 } else { 0 },
         }

@@ -42,6 +42,7 @@ impl State {
             self.validate_identity(*a, index, seed, world_tick, data)?;
             Self::validate_economy(*a, seed, world_tick, markets)?;
             self.validate_resources(*a)?;
+            self.validate_terminal_manifest(*a)?;
         }
         self.validate_separation(data)?;
         self.validate_shots(world_tick, player_emissions, data)?;

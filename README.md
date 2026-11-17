@@ -49,6 +49,10 @@ See [implementation status](docs/IMPLEMENTATION-STATUS.md), [mining scope](docs/
 
 The next isolated candidate reads and writes only V17, refusing earlier saves without changing their files. It adds paid navigation range and exact per-leg travel history. The individual navigation source passed Dell Linux and native Windows qualification; this combined source is unreviewed and unrun. A playable route benefiting from the paid range remains open with only Avenor and Renas services.
 
+## Destroyed trader manifest custody
+
+An actual fatal fitted laser or missile contact now ties the SH025 trader’s paid goods to the existing combat history. The wreck receipt records the retained laser or missile identity. A retained practice attempt counts only live missiles from its own sortie. Four Rust tests await the owning run, including the mixed missile and Beam case that saves and cold-continues with a live later-visit missile. Physical recovery, section cutting and boarding require their own original producers. See the [wreck manifest guide](docs/WRECK-MANIFEST.md).
+
 ## Play
 
 N starts a commander; C continues a current-format V17 save. Earlier formats refuse without changing the file. Use a separate profile for this candidate. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.

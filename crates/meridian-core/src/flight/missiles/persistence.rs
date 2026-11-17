@@ -963,19 +963,14 @@ impl State {
         &self,
         lesson: super::super::practice::Practice,
     ) -> Result<(), SaveError> {
+        if lesson.pending_missiles != self.pending_for_lesson(lesson) {
+            return Err(INVALID);
+        }
         let projectiles = self
             .projectiles
             .iter()
             .map(|p| p.filter(|p| lesson.missile_owner_matches(p.origin.owner)))
             .collect::<Vec<_>>();
-        let pending = projectiles
-            .iter()
-            .flatten()
-            .filter(|p| p.ended.is_none())
-            .count() as u8;
-        if lesson.pending_missiles != pending {
-            return Err(INVALID);
-        }
         for (id, receipt) in lesson.missile_receipts() {
             if let Some((tick, origin)) = receipt {
                 let p = self.find(origin.projectile).ok_or(INVALID)?;
