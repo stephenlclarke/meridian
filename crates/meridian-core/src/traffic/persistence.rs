@@ -14,6 +14,7 @@ impl State {
                 && self.clocks == [0; 2]
                 && self.actors == [None; MAX_TRAFFIC_ACTORS]
                 && self.shots.is_empty()
+                && self.missile_hits.is_empty()
             {
                 Ok(())
             } else {
@@ -23,7 +24,7 @@ impl State {
         if self.seed != seed
             || seed == 0
             || u128::from(self.clocks[0]) + u128::from(self.clocks[1]) > u128::from(world_tick)
-            || self.shots.len() > MAX_TRAFFIC_SHOTS
+            || self.combat_proof_count() > MAX_TRAFFIC_SHOTS
         {
             return Err(INVALID);
         }
@@ -36,7 +37,9 @@ impl State {
             self.validate_resources(*a)?;
         }
         self.validate_separation(data)?;
-        self.validate_shots(world_tick, player_emissions, data)
+        self.validate_shots(world_tick, player_emissions, data)?;
+        self.validate_missile_resource_replay()?;
+        Ok(())
     }
     fn validate_identity(
         &self,
@@ -75,7 +78,11 @@ impl State {
         {
             return Err(INVALID);
         }
-        if a.sold != a.berth.is_some() {
+        if a.sold != a.berth.is_some()
+            || a.sold != a.completed_clock.is_some()
+            || a.completed_clock
+                .is_some_and(|c| c < a.birth_clock || c > self.clocks[si])
+        {
             return Err(INVALID);
         }
         if let Some(receipt) = a.berth {
@@ -177,11 +184,19 @@ impl State {
             .shots
             .iter()
             .rfind(|s| s.victim == a.id)
-            .map(|s| s.local_tick);
+            .map(|s| s.local_tick)
+            .into_iter()
+            .chain(
+                self.missile_hits
+                    .iter()
+                    .filter(|h| h.victim == a.id)
+                    .map(|h| h.local_tick),
+            )
+            .max();
         let end = if a.phase == NpcPhase::Destroyed {
             last_hit.ok_or(INVALID)?
         } else {
-            self.clocks[si]
+            a.completed_clock.unwrap_or(self.clocks[si])
         };
         let age = end
             .checked_sub(a.birth_clock)
@@ -321,6 +336,10 @@ impl State {
         for s in self.shots.iter() {
             s.encode(w);
         }
+        w.u16(self.missile_hits.len() as u16);
+        for hit in self.missile_hits.iter() {
+            hit.encode(w);
+        }
     }
     pub(crate) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         let enabled = r.bool()?;
@@ -335,27 +354,38 @@ impl State {
         for _ in 0..count {
             shots.push(TrafficBeam::decode(r)?);
         }
+        let n = usize::from(r.u16()?);
+        if n + count > MAX_TRAFFIC_SHOTS {
+            return Err(INVALID);
+        }
+        let mut hits = Vec::new();
+        for _ in 0..n {
+            hits.push(NpcMissileHit::decode(r)?);
+        }
         Ok(Self {
             enabled,
             seed,
             clocks,
             actors,
             shots: Arc::new(shots),
+            missile_hits: Arc::new(hits),
         })
     }
     #[cfg(test)]
     pub(crate) fn legacy_empty(&self) -> bool {
-        self.actors.iter().all(Option::is_none) && self.shots.is_empty()
+        self.actors.iter().all(Option::is_none)
+            && self.shots.is_empty()
+            && self.missile_hits.is_empty()
     }
 }
 impl NpcId {
-    fn encode(self, w: &mut Writer) {
+    pub(crate) fn encode(self, w: &mut Writer) {
         w.u64(self.profile);
         w.u8(self.system.galaxy);
         w.u16(self.system.system);
         w.u8(self.serial);
     }
-    fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+    pub(crate) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         Ok(Self {
             profile: r.u64()?,
             system: SystemId {
@@ -415,6 +445,7 @@ impl Actor {
         w.u64(self.birth_clock);
         w.u64(self.born_world_tick);
         w.option(self.sold_world_tick.as_ref(), |w, t| w.u64(*t));
+        w.option(self.completed_clock.as_ref(), |w, t| w.u64(*t));
         w.u8(self.manifest as u8);
         w.u8(self.units);
         w.u32(self.wallet);
@@ -450,6 +481,7 @@ impl Actor {
             birth_clock: r.u64()?,
             born_world_tick: r.u64()?,
             sold_world_tick: r.option(|r| r.u64())?,
+            completed_clock: r.option(|r| r.u64())?,
             manifest: CommodityId::from_index(usize::from(r.u8()?)).ok_or(INVALID)?,
             units: r.u8()?,
             wallet: r.u32()?,
@@ -475,6 +507,7 @@ impl Resources {
         w.u8(self.cooldown);
         w.u16(self.shots);
         w.u16(self.incoming);
+        w.u16(self.incoming_missiles);
         for n in [
             self.energy_regen,
             self.front_regen,
@@ -497,6 +530,7 @@ impl Resources {
             cooldown: r.u8()?,
             shots: r.u16()?,
             incoming: r.u16()?,
+            incoming_missiles: r.u16()?,
             energy_regen: r.u64()?,
             front_regen: r.u64()?,
             rear_regen: r.u64()?,

@@ -93,3 +93,5 @@ In the next-preview development candidate, `/` toggles controls help and ordinar
 The [planet and sun implementation](docs/CELESTIAL-SHADING.md) binds core-owned bodies and procedural surfaces, with swept flight safety and explicit native acceptance limits.
 
 See [docked preview qualification](docs/DOCKED-PREVIEW.md) for controls, actual tests and native results, release gates and explicit limits. XYZZY/Commander Clarke is a separate following feature.
+
+The isolated NPC missile source adds typed actual NPC locks, nearest native SH025 contact, distinct 160-unit shield/hull damage receipts and fresh NPC resource replay. Its twelve new tests are authored **UNRUN**. The combined NPC/player resource journal, full historical actor-motion lineage, independent review, compiler/native validation and host input/presentation joins remain pending; see [NPC missile integration](docs/NPC-MISSILES.md).

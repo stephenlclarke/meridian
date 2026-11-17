@@ -40,6 +40,7 @@ impl World {
         &self,
         next: Snapshot,
         navigation: Option<NavigationState>,
+        candidate: &traffic::State,
     ) -> Result<Option<(traffic::State, StationMarkets)>, StepError> {
         let Some(markets) = self.station_markets.as_ref() else {
             return Ok(None);
@@ -61,7 +62,7 @@ impl World {
             || current.travel.is_some()
             || future.travel.is_some()
         {
-            return Ok(Some((self.traffic.clone(), markets.traffic_candidate())));
+            return Ok(Some((candidate.clone(), markets.traffic_candidate())));
         }
         let data = self
             .station_data
@@ -112,7 +113,7 @@ impl World {
                         0.0,
                     )
             };
-        self.traffic
+        candidate
             .prepare_step(
                 traffic::TickContext {
                     system: current.system,

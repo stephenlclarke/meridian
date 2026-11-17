@@ -402,6 +402,13 @@ impl World {
     /// Attempt one front discharge from the current owned flight pose and fitted item.
     /// The caller supplies no ray, target, mount, damage, or physical step.
     pub fn request_fire_front_pulse(&mut self, expected_tick: u64) -> Result<PulseShot, FireError> {
+        self.fire_front_pulse_checked(expected_tick, true)
+    }
+    fn fire_front_pulse_checked(
+        &mut self,
+        expected_tick: u64,
+        check_growth: bool,
+    ) -> Result<PulseShot, FireError> {
         if expected_tick != self.state.tick {
             return Err(FireError::StaleCommand);
         }
@@ -440,9 +447,33 @@ impl World {
         let traffic = self.prepare_traffic_pulse(shot, impact.emission())?;
         let mut missiles = self.missiles.clone();
         if let PulseContact::Projectile { id, .. } = contact
-            && !missiles.intercept(id, self.state.tick, impact.emission(), shot)
+            && !missiles.intercept(
+                id,
+                self.state.tick,
+                impact.emission(),
+                shot,
+                self.traffic.missile_scene(
+                    self.combat_identity().ok_or(FireError::NoCommander)?.system,
+                    self.state.tick,
+                    crate::traffic::SceneStage::Command(impact.emission() - 1),
+                ),
+            )
         {
             return Err(FireError::InvalidGeometry);
+        }
+        if check_growth
+            && matches!(
+                contact,
+                PulseContact::Npc { .. } | PulseContact::Projectile { .. }
+            )
+        {
+            let bytes = self.save_bytes().map_err(|_| FireError::InvalidGeometry)?;
+            let mut candidate =
+                Self::decode_saved_world(&bytes).map_err(|_| FireError::InvalidGeometry)?;
+            candidate.fire_front_pulse_checked(expected_tick, false)?;
+            candidate
+                .save_bytes()
+                .map_err(|_| FireError::InvalidGeometry)?;
         }
         impact.commit(self)?;
         self.traffic = traffic;

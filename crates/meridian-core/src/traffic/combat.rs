@@ -22,7 +22,7 @@ impl Resources {
         }
         Ok(())
     }
-    fn fire(&mut self) -> Result<(), TrafficError> {
+    pub(super) fn fire(&mut self) -> Result<(), TrafficError> {
         if self.energy <= 100 || self.heat > 1150 || self.cooldown != 0 {
             return Err(TrafficError::InvalidState);
         }
@@ -35,7 +35,7 @@ impl Resources {
             .ok_or(TrafficError::SequenceExhausted)?;
         Ok(())
     }
-    fn hit(&mut self, front: bool) -> Result<(), TrafficError> {
+    pub(super) fn hit(&mut self, front: bool) -> Result<(), TrafficError> {
         let shield = if front {
             &mut self.front
         } else {
@@ -87,7 +87,7 @@ impl Resources {
                 + u128::from(self.absorbed_rear)
                 + u128::from(self.hull_damage)
                 + u128::from(self.overkill)
-                != u128::from(self.incoming) * 1500
+                != u128::from(self.incoming) * 1500 + u128::from(self.incoming_missiles) * 16000
             || u128::from(self.energy_regen) > u128::from(age) * 7
             || u128::from(self.front_regen) > u128::from(age) * 3
             || u128::from(self.rear_regen) > u128::from(age) * 3
@@ -111,7 +111,7 @@ impl State {
             return Ok(());
         };
         for index in 0..MAX_TRAFFIC_ACTORS {
-            if self.shots.len() >= MAX_TRAFFIC_SHOTS {
+            if self.combat_proof_count() >= MAX_TRAFFIC_SHOTS {
                 break;
             }
             let Some(actor) = self.actors[index].filter(|a| {
@@ -202,7 +202,7 @@ impl State {
         if victim.phase == NpcPhase::Destroyed {
             return Ok(next);
         }
-        if self.shots.len() >= MAX_TRAFFIC_SHOTS {
+        if self.combat_proof_count() >= MAX_TRAFFIC_SHOTS {
             return Err(TrafficError::ReceiptCapacity);
         }
         if !matches!(source, BeamSource::Player { .. })
@@ -232,7 +232,7 @@ impl State {
         Ok(next)
     }
     fn apply_hit(&mut self, beam: TrafficBeam) -> Result<(), TrafficError> {
-        if self.shots.len() >= MAX_TRAFFIC_SHOTS {
+        if self.combat_proof_count() >= MAX_TRAFFIC_SHOTS {
             return Err(TrafficError::ReceiptCapacity);
         }
         let index = self

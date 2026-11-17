@@ -33,7 +33,8 @@ impl State {
             else {
                 continue;
             };
-            let actor = move_actor(actor, &opening, &context, &next.shots)?;
+            let missile_aggression = next.missile_hits.iter().any(|h| h.victim == actor.id);
+            let actor = move_actor(actor, &opening, &context, &next.shots, missile_aggression)?;
             next.actors[index] = Some(actor);
         }
         resolve_peer_paths(
@@ -48,6 +49,7 @@ impl State {
             })
         {
             State::finish_trade(actor, &mut market, world_tick)?;
+            actor.completed_clock = Some(next.clocks[i]);
         }
         next.fire_npc_beams(system, data, context.player_after, world_tick, beam_clear)?;
         Ok((next, market))
@@ -58,6 +60,7 @@ fn move_actor(
     opening: &[Option<Actor>; MAX_TRAFFIC_ACTORS],
     context: &TickContext<'_>,
     shots: &[TrafficBeam],
+    missile_aggression: bool,
 ) -> Result<Actor, TrafficError> {
     let opening_actor = actor;
     let TickContext {
@@ -70,13 +73,26 @@ fn move_actor(
     } = *context;
     actor.resources.advance()?;
     if actor.id.serial == 1
-        && (threat_position(actor, opening, player_after.position, shots).is_some()
+        && (threat_position(
+            actor,
+            opening,
+            player_after.position,
+            shots,
+            missile_aggression,
+        )
+        .is_some()
             || (actor.phase == NpcPhase::FinalAlign
                 && length(sub(actor.position, Vec3::new(0.0, 0.0, 3500.0))) > 1.0))
     {
         actor.phase = NpcPhase::Approach;
     }
-    let (goal, mut speed) = intent(actor, opening, player_after.position, shots);
+    let (goal, mut speed) = intent(
+        actor,
+        opening,
+        player_after.position,
+        shots,
+        missile_aggression,
+    );
     let delta = sub(goal, actor.position);
     let desired = delta.x.atan2(delta.z);
     let error = (desired - actor.yaw)
@@ -201,9 +217,10 @@ fn intent(
     actors: &[Option<Actor>; MAX_TRAFFIC_ACTORS],
     player: Vec3,
     shots: &[TrafficBeam],
+    missile_aggression: bool,
 ) -> (Vec3, f64) {
     if a.id.serial == 1 {
-        if let Some(threat) = threat_position(a, actors, player, shots) {
+        if let Some(threat) = threat_position(a, actors, player, shots, missile_aggression) {
             let away = unit(Vec3::new(
                 a.position.x - threat.x,
                 0.0,
@@ -260,6 +277,7 @@ fn threat_position(
     actors: &[Option<Actor>; MAX_TRAFFIC_ACTORS],
     player: Vec3,
     shots: &[TrafficBeam],
+    missile_aggression: bool,
 ) -> Option<Vec3> {
     if let Some(threat) = a.aggressor.and_then(|id| {
         actors
@@ -268,6 +286,9 @@ fn threat_position(
             .find(|b| b.id == id && b.airborne() && length(sub(b.position, a.position)) <= 6000.0)
     }) {
         return Some(threat.position);
+    }
+    if missile_aggression && length(sub(player, a.position)) <= 6000.0 {
+        return Some(player);
     }
     shots
         .iter()

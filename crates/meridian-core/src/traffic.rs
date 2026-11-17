@@ -1,6 +1,8 @@
 //! Finite, deterministic local traffic. Only World owns this mutable actor/economy state.
 //! SH025 is the actual admitted hull; unadmitted populations receive no substitute body.
 mod combat;
+mod missiles;
+pub(crate) use missiles::{MissileScene, NpcMissileHit, SceneStage};
 mod economy;
 pub(crate) use economy::Flows;
 mod motion;
@@ -183,6 +185,7 @@ struct Resources {
     cooldown: u8,
     shots: u16,
     incoming: u16,
+    incoming_missiles: u16,
     energy_regen: u64,
     front_regen: u64,
     rear_regen: u64,
@@ -219,6 +222,7 @@ struct Actor {
     birth_clock: u64,
     born_world_tick: u64,
     sold_world_tick: Option<u64>,
+    completed_clock: Option<u64>,
     manifest: CommodityId,
     units: u8,
     wallet: u32,
@@ -291,6 +295,7 @@ pub(crate) struct State {
     clocks: [u64; 2],
     actors: [Option<Actor>; MAX_TRAFFIC_ACTORS],
     shots: Arc<Vec<TrafficBeam>>,
+    missile_hits: Arc<Vec<NpcMissileHit>>,
 }
 impl Default for State {
     fn default() -> Self {
@@ -300,6 +305,7 @@ impl Default for State {
             clocks: [0; 2],
             actors: [None; MAX_TRAFFIC_ACTORS],
             shots: Arc::new(Vec::new()),
+            missile_hits: Arc::new(Vec::new()),
         }
     }
 }
@@ -331,12 +337,23 @@ impl State {
                 .last()
                 .copied()
                 .filter(|s| s.victim.system == system),
-            verified_crimes: self.shots.iter().filter(|s| s.victim.serial == 1).count() as u16,
+            verified_crimes: (self.shots.iter().filter(|s| s.victim.serial == 1).count()
+                + self
+                    .missile_hits
+                    .iter()
+                    .filter(|h| h.victim.serial == 1)
+                    .count()) as u16,
             police_required_hull: self
                 .shots
                 .iter()
                 .any(|s| s.victim.serial == 1 && s.victim.system == system)
-                .then_some("SH031"),
+                .then_some("SH031")
+                .or_else(|| {
+                    self.missile_hits
+                        .iter()
+                        .any(|h| h.victim.serial == 1 && h.victim.system == system)
+                        .then_some("SH031")
+                }),
             populations: POPULATIONS,
         })
     }

@@ -27,7 +27,7 @@ pub use ammunition::{
 pub use missiles::{
     MISSILE_COOLDOWN_TICKS, MISSILE_FACES, MISSILE_LIFETIME_TICKS, MISSILE_MUZZLE_DISTANCE,
     MISSILE_RANGE, MISSILE_SPEED, MISSILE_VERTICES, MissileContact, MissileEnd, MissileError,
-    MissileOrigin, MissileRound, MissileSnapshot, ProjectileId, ProjectileSnapshot,
+    MissileOrigin, MissileRound, MissileSnapshot, MissileTarget, ProjectileId, ProjectileSnapshot,
 };
 mod combat;
 pub use combat::{
@@ -544,7 +544,16 @@ impl World {
         self.publish_step(next)
     }
 
-    fn publish_step(&mut self, mut next: Snapshot) -> Result<(), StepError> {
+    fn publish_step(&mut self, next: Snapshot) -> Result<(), StepError> {
+        self.publish_step_checked(next, true)
+    }
+
+    fn publish_step_checked(
+        &mut self,
+        mut next: Snapshot,
+        check_growth: bool,
+    ) -> Result<(), StepError> {
+        let requested_next = next;
         let flight_reception_start = self.flight_reception_start();
         let mut navigation = self.navigation;
         let mut mission_epoch = None;
@@ -579,10 +588,35 @@ impl World {
                 next.motion_refusal = None;
             }
         }
-        let traffic = self.prepare_traffic_step(next, navigation)?;
-        let prepared = self.prepare_missile_step(next, navigation)?;
+        // Match the shared player journal: missiles resolve before NPC movement/fire.
+        // Traffic advances the already damaged candidate, never the old live state.
+        let mut prepared = self.prepare_missile_step(next, navigation, &self.traffic)?;
+        let traffic = self.prepare_traffic_step(next, navigation, &prepared.traffic)?;
+        if let Some((traffic, _)) = &traffic {
+            prepared.traffic = traffic.clone();
+        }
         let navigation_trade =
             self.prepare_navigation_trade_step(navigation, planned_debit, next.tick)?;
+        // A newly retained scene/contact must fit the complete checked save before live
+        // fuel, market, NPC or projectile publication. Reuse the same publication path
+        // on a validation-only decoded World, without Continue invalidation.
+        if check_growth && self.commander_account.is_some() {
+            let mut opening = crate::save::Writer::new();
+            self.missiles.encode(&mut opening);
+            self.traffic.encode(&mut opening);
+            let mut staged = crate::save::Writer::new();
+            prepared.missiles.encode(&mut staged);
+            prepared.traffic.encode(&mut staged);
+            if staged.bytes.len() > opening.bytes.len() {
+                let bytes = self.save_bytes().map_err(|_| StepError::NonFiniteState)?;
+                let mut candidate =
+                    Self::decode_saved_world(&bytes).map_err(|_| StepError::NonFiniteState)?;
+                candidate.publish_step_checked(requested_next, false)?;
+                candidate
+                    .save_bytes()
+                    .map_err(|_| StepError::NonFiniteState)?;
+            }
+        }
         if let Some(debit) = planned_debit {
             self.commander_account
                 .as_mut()
@@ -591,13 +625,13 @@ impl World {
                 .map_err(|_| StepError::NonFiniteState)?;
         }
         // No fallible operation follows the first account mutation.
-        if let Some((traffic, markets)) = traffic {
-            self.traffic = traffic;
+        if let Some((_, markets)) = traffic {
             self.station_markets = Some(markets);
         }
         if let Some(navigation_trade) = navigation_trade {
             self.navigation_trade = navigation_trade;
         }
+        self.traffic = prepared.traffic;
         self.missiles = prepared.missiles;
         self.combat = prepared.combat;
         self.pulse = prepared.pulse;
