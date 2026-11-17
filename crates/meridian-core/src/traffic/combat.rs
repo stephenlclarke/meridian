@@ -1,7 +1,7 @@
 use super::{
-    Arc, BeamSource, INVALID, MAX_TRAFFIC_SHOTS, NpcPhase, OriginalStationData, PlayerBeamInput,
-    PlayerTarget, Resources, RigidPose, SaveError, State, SystemId, TrafficBeam, TrafficError,
-    Vec3, sub, system_index, unit,
+    Arc, BeamSource, INVALID, MAX_TRAFFIC_ACTORS, MAX_TRAFFIC_SHOTS, NpcPhase, OriginalStationData,
+    PlayerBeamInput, PlayerTarget, Resources, RigidPose, SaveError, State, SystemId, TrafficBeam,
+    TrafficError, Vec3, sub, system_index, unit,
 };
 impl Resources {
     pub(super) fn advance_many(&mut self, ticks: u64) -> Result<(), TrafficError> {

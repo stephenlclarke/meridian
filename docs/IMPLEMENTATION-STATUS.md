@@ -6,6 +6,8 @@ PR 38 integrated at `8b81a774df46f4a05f6bd4dd294c643378bfb765`, tree `cadcbe6072
 
 Publication is held. The correction replaces wildcard imports with explicit names and extracts existing validation/frame/upload blocks into private helpers. It retains the same comparisons, identity/resource/geometry/persistence guards, error ordering, draw order, tests and limits. No exclusions, suppressions, threshold changes or new-code baseline changes are introduced. Changed-source review, all owning gates and corrected committed-main Sonar remain required. The earlier bounded native journey stays bound to `bd506f9`; no new native execution or source-equivalence acceptance is claimed before review.
 
+The first hosted correction head `b184e47` failed compilation on all three hosted platforms: `traffic/combat.rs` still uses `MAX_TRAFFIC_ACTORS`, which was missing from its new explicit import list. Coverage compilation failed for the same reason; documentation passed. The follow-up adds only that existing constant to the import list, without changing its value, loop bound or any guard. The failed logs remain retained. No owning qualification ran on the failed source; corrected compilation and all later gates remain unrun until their actual results.
+
 Signed Mac and unsigned Windows v0.6 candidate archives under `8b81a77` were prepared and independently extracted, but were not published or relabelled as this correction. Their exact old identities and the public v0.5 release are preserved. Apple notarization remains a separate required-agreement blocker.
 
 ## Current NPC qualification
