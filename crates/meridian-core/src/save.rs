@@ -20,6 +20,10 @@ pub enum SaveError {
 impl fmt::Display for SaveError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Self::UnsupportedVersion => write!(
+                f,
+                "Unsupported commander save format. This build opens format {SAVE_VERSION}."
+            ),
             Self::UnsupportedMissiles => {
                 f.write_str("Legacy save format cannot represent missile sessions")
             }

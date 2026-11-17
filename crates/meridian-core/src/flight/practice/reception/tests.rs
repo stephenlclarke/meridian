@@ -223,42 +223,34 @@ fn premature_actual_avenor_entry_freezes_quiet_progress_and_refuses_reception() 
 }
 
 #[test]
-fn v5_active_and_retired_hits_do_not_mint_an_unobserved_interval_or_trace() {
+fn current_active_and_retired_hits_keep_their_reception_and_v5_refuses() {
     let mut world = three_hits(1231);
     step(&mut world, 180);
     assert!(world.practice_reception_snapshot().unwrap().ready);
     let bytes = crate::flight::persistence::v5_test_fixture(&world).unwrap();
-    let mut active = World::from_save_bytes(&bytes).unwrap();
+    assert_eq!(
+        World::from_save_bytes(&bytes).unwrap_err(),
+        crate::save::SaveError::UnsupportedVersion
+    );
+    let active = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
     assert_eq!(active.practice_snapshot(), world.practice_snapshot());
     assert_eq!(active.pulse_laser_snapshot(), world.pulse_laser_snapshot());
     assert_eq!(
-        active.practice_reception_snapshot().unwrap(),
-        PracticeReceptionSnapshot {
-            ordinary_hit: None,
-            quiet_ticks: 0,
-            ready: false,
-            trace: None
-        }
+        active.practice_reception_snapshot(),
+        world.practice_reception_snapshot()
     );
-    step(&mut active, 180);
-    assert!(!active.practice_reception_snapshot().unwrap().ready);
-    step(&mut active, 1);
-    assert!(active.practice_reception_snapshot().unwrap().ready);
     jump_and_dock(&mut world, SystemId::RENAS);
     let old_retired = crate::flight::persistence::v5_test_fixture(&world).unwrap();
-    let mut retired = World::from_save_bytes(&old_retired).unwrap();
+    assert_eq!(
+        World::from_save_bytes(&old_retired).unwrap_err(),
+        crate::save::SaveError::UnsupportedVersion
+    );
+    let retired = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
     assert_eq!(retired.practice_snapshot(), world.practice_snapshot());
     assert_eq!(
-        retired.practice_reception_snapshot().unwrap(),
-        PracticeReceptionSnapshot {
-            ordinary_hit: None,
-            quiet_ticks: 0,
-            ready: false,
-            trace: None
-        }
+        retired.practice_reception_snapshot(),
+        world.practice_reception_snapshot()
     );
-    step(&mut retired, 180);
-    assert!(!retired.practice_reception_snapshot().unwrap().ready);
 }
 
 fn assert_resealed_wrong_terminal_refused(world: &mut World, live: &[u8]) {

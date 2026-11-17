@@ -1,4 +1,4 @@
-//! Completed hyperspace legs and the aggregate-only checkpoint from older saves.
+//! Exact completed hyperspace legs from the initial commander state.
 use super::{
     BASIC_SPOOL_TICKS, DockContext, FUEL_CAPACITY, NavigationState, OriginalNavigation,
     STOCK_JUMP_REACH_LY, SystemId,
@@ -8,7 +8,6 @@ use super::{
 use crate::save::{MAX_SAVE_BYTES, Reader, SaveError, Writer};
 
 const INVALID: SaveError = SaveError::InvalidState("completed jump journal");
-const LEGACY_STOCK_FUEL_LIMIT: u128 = 90;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum NavigationGrade {
@@ -104,35 +103,13 @@ impl CompletedJump {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
-struct LegacyCheckpoint {
-    jumps: u64,
-    fuel_spent: u64,
-    system: SystemId,
-    visit: u64,
-    tick: u64,
-}
-
 #[derive(Debug, Default)]
 pub(crate) struct JumpJournal {
-    legacy: Option<LegacyCheckpoint>,
     legs: Vec<CompletedJump>,
 }
 impl JumpJournal {
     const MAX_LEGS: usize = MAX_SAVE_BYTES / CompletedJump::ENCODED_SIZE;
 
-    pub(crate) fn from_legacy(navigation: NavigationState, tick: u64) -> Self {
-        Self {
-            legacy: (navigation.completed_jumps > 0).then_some(LegacyCheckpoint {
-                jumps: navigation.completed_jumps,
-                fuel_spent: navigation.fuel_spent,
-                system: navigation.system,
-                visit: navigation.visit,
-                tick,
-            }),
-            ..Self::default()
-        }
-    }
     pub(crate) fn has_room(&self) -> bool {
         self.legs.len() < Self::MAX_LEGS
     }
@@ -140,28 +117,12 @@ impl JumpJournal {
         self.legs.push(leg);
     }
     pub(crate) fn encode(&self, w: &mut Writer) {
-        w.option(self.legacy.as_ref(), |w, prefix| {
-            w.u64(prefix.jumps);
-            w.u64(prefix.fuel_spent);
-            write_system(w, prefix.system);
-            w.u64(prefix.visit);
-            w.u64(prefix.tick);
-        });
         w.u16(self.legs.len() as u16);
         for leg in &self.legs {
             leg.encode(w);
         }
     }
     pub(crate) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
-        let legacy = r.option(|r| {
-            Ok(LegacyCheckpoint {
-                jumps: r.u64()?,
-                fuel_spent: r.u64()?,
-                system: read_system(r)?,
-                visit: r.u64()?,
-                tick: r.u64()?,
-            })
-        })?;
         let count = usize::from(r.u16()?);
         if count > Self::MAX_LEGS {
             return Err(SaveError::TooLarge);
@@ -169,7 +130,7 @@ impl JumpJournal {
         let legs = (0..count)
             .map(|_| CompletedJump::decode(r))
             .collect::<Result<Vec<_>, _>>()?;
-        Ok(Self { legacy, legs })
+        Ok(Self { legs })
     }
 
     pub(crate) fn validate(
@@ -179,30 +140,6 @@ impl JumpJournal {
         tick: u64,
         changes: &[NavigationFitChange],
     ) -> Result<(), SaveError> {
-        let legacy = self.legacy.unwrap_or(LegacyCheckpoint {
-            jumps: 0,
-            fuel_spent: 0,
-            system: SystemId::AVENOR,
-            visit: 1,
-            tick: 0,
-        });
-        if self.legacy.is_some()
-            && (legacy.jumps == 0
-                || legacy.jumps > legacy.tick
-                || legacy
-                    .jumps
-                    .checked_add(2)
-                    .is_none_or(|visit| visit > legacy.visit)
-                || legacy.tick > tick
-                || legacy.visit > nav.visit
-                || legacy.fuel_spent < legacy.jumps
-                || u128::from(legacy.fuel_spent)
-                    > u128::from(legacy.jumps) * LEGACY_STOCK_FUEL_LIMIT
-                || catalogue.system(legacy.system).is_err())
-        {
-            return Err(INVALID);
-        }
-
         let spool = u64::from(BASIC_SPOOL_TICKS);
         let pending_departure = nav
             .pending
@@ -216,11 +153,11 @@ impl JumpJournal {
                 ))
             })
             .transpose()?;
-        let mut system = legacy.system;
-        let mut spent = legacy.fuel_spent;
-        let mut jumps = legacy.jumps;
-        let mut earliest_visit = legacy.visit;
-        let mut earliest_tick = legacy.tick;
+        let mut system = SystemId::AVENOR;
+        let mut spent = 0_u64;
+        let mut jumps = 0_u64;
+        let mut earliest_visit = 1;
+        let mut earliest_tick = 0;
         let mut grade = NavigationGrade::Basic;
         let mut changes = changes.iter().peekable();
 
@@ -238,9 +175,7 @@ impl JumpJournal {
                 )),
                 None => pending_departure,
             };
-            if (index > 0 || self.legacy.is_none())
-                && departure.is_some_and(|(_, start)| start < earliest_tick)
-            {
+            if departure.is_some_and(|(_, start)| start < earliest_tick) {
                 return Err(INVALID);
             }
             while let Some(change) = changes.peek().copied() {
@@ -337,7 +272,6 @@ mod tests {
             grade: NavigationGrade::Intermediate,
         };
         let journal = JumpJournal {
-            legacy: None,
             legs: vec![
                 CompletedJump {
                     source: SystemId::AVENOR,

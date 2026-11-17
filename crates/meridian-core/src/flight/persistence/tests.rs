@@ -336,6 +336,13 @@ pub(in crate::flight) fn assert_resealed_enlirin_fuel_refusal(world: &mut World)
         assert_eq!(world.restore_bytes(&forged), Err(refused.clone()));
         assert_eq!(world.save_bytes().unwrap(), valid);
     }
+    let mut wrong_grade = valid.clone();
+    let grade = wrong_grade.len() - 9;
+    assert_eq!(wrong_grade[grade], 2);
+    wrong_grade[grade] = 1;
+    reseal(&mut wrong_grade);
+    assert_eq!(World::from_save_bytes(&wrong_grade).unwrap_err(), refused);
+    assert_refused_unchanged(world, &wrong_grade);
 }
 fn domain_start(world: &World) -> usize {
     let mut w = Writer::new();
@@ -766,12 +773,16 @@ fn another_real_public_branch_cannot_supply_a_practice_incident_this_world_never
 }
 
 #[test]
-fn qualified_v15_opening_layout_keeps_real_birth_provenance_and_accepts_a_real_new_discharge() {
+fn qualified_v15_opening_refuses_and_current_birth_keeps_its_real_discharge() {
     // At opening there are no module events or traffic shots. Use the exact
     // prior header and omit the mining state and jump journal from the current body.
     let world = World::new_commander(15001).unwrap();
     let legacy = v15_test_fixture(&world).unwrap();
-    let mut loaded = World::from_save_bytes(&legacy).unwrap();
+    assert_eq!(
+        World::from_save_bytes(&legacy).unwrap_err(),
+        crate::save::SaveError::UnsupportedVersion
+    );
+    let mut loaded = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
     assert_eq!(loaded.snapshot(), world.snapshot());
     assert_eq!(
         loaded.modular_equipment_snapshot(),
@@ -802,26 +813,23 @@ fn qualified_v15_opening_layout_keeps_real_birth_provenance_and_accepts_a_real_n
     );
 }
 #[test]
-fn qualified_v13_absence_does_not_mint_resource_birth_history_for_fast_or_energy_modules() {
-    let world = World::new_commander(15002).unwrap();
+fn qualified_v13_does_not_replace_a_live_commander() {
+    let mut world = World::new_commander(15002).unwrap();
     let bytes = v13_test_fixture(&world).unwrap();
-    let loaded = World::from_save_bytes(&bytes).unwrap();
-    assert!(!loaded.damage.enabled());
-    let before = loaded.save_bytes().unwrap();
-    for kind in [
-        crate::ModuleKind::BeamLaser,
-        crate::ModuleKind::ExtraEnergyUnit,
-    ] {
-        assert!(matches!(
-            loaded.review_module(crate::ModuleAction::Purchase { kind }, 0),
-            Err(crate::ModuleError::Save(_))
-        ));
-    }
-    assert_eq!(loaded.save_bytes().unwrap(), before);
+    assert_eq!(
+        World::from_save_bytes(&bytes).unwrap_err(),
+        crate::save::SaveError::UnsupportedVersion
+    );
+    let before = world.save_bytes().unwrap();
+    assert_eq!(
+        world.restore_bytes(&bytes),
+        Err(SaveError::UnsupportedVersion)
+    );
+    assert_eq!(world.save_bytes().unwrap(), before);
 }
 
 #[test]
-fn a_legacy_aggregate_resumes_its_pending_jump_with_an_exact_receipt() {
+fn current_journal_resumes_its_pending_jump_and_older_input_refuses() {
     let mut legacy_source = World::new_commander(15902).unwrap();
     launch(&mut legacy_source);
     legacy_source
@@ -837,7 +845,11 @@ fn a_legacy_aggregate_resumes_its_pending_jump_with_an_exact_receipt() {
         legacy_source.step(FlightInput::default()).unwrap();
     }
     let legacy = v15_test_fixture(&legacy_source).unwrap();
-    let mut continued = World::from_save_bytes(&legacy).unwrap();
+    assert_eq!(
+        World::from_save_bytes(&legacy).unwrap_err(),
+        SaveError::UnsupportedVersion
+    );
+    let mut continued = World::from_save_bytes(&legacy_source.save_bytes().unwrap()).unwrap();
     assert_eq!(
         continued.snapshot().navigation,
         legacy_source.snapshot().navigation
@@ -847,11 +859,12 @@ fn a_legacy_aggregate_resumes_its_pending_jump_with_an_exact_receipt() {
     }
     let migrated = continued.save_bytes().unwrap();
     assert_eq!(u16::from_le_bytes(migrated[8..10].try_into().unwrap()), 17);
-    // The journal is an optional legacy checkpoint, a count, and one exact leg.
+    // The journal retains both real legs from the initial state.
     let leg = migrated.len() - 8 - crate::navigation::CompletedJump::ENCODED_SIZE;
+    let count = leg - crate::navigation::CompletedJump::ENCODED_SIZE - 2;
     assert_eq!(
-        u16::from_le_bytes(migrated[leg - 2..leg].try_into().unwrap()),
-        1
+        u16::from_le_bytes(migrated[count..count + 2].try_into().unwrap()),
+        2
     );
     assert_eq!(&migrated[leg..leg + 8], &[0, 185, 0, 0, 7, 0, 34, 0]);
     let loaded = World::from_save_bytes(&migrated).unwrap();
@@ -859,4 +872,76 @@ fn a_legacy_aggregate_resumes_its_pending_jump_with_an_exact_receipt() {
     assert_eq!(result.system, SystemId::AVENOR);
     assert_eq!(result.fuel_units, 62);
     assert!(result.travel.is_none());
+}
+
+#[test]
+fn current_journal_refuses_a_resealed_removed_leg_and_old_prefix_substitution() {
+    let mut world = World::new_commander(15903).unwrap();
+    launch(&mut world);
+    world
+        .request_jump(SystemId::RENAS, world.snapshot().tick)
+        .unwrap();
+    for _ in 0..BASIC_SPOOL_TICKS {
+        world.step(FlightInput::default()).unwrap();
+    }
+    let valid = world.save_bytes().unwrap();
+    let nav = world.snapshot().navigation.unwrap();
+    assert_eq!(
+        (nav.system, nav.visit, nav.fuel_units),
+        (SystemId::RENAS, 3, 96)
+    );
+    let trailer = valid.len() - 8 - 2 - crate::navigation::CompletedJump::ENCODED_SIZE;
+    assert_eq!(&valid[trailer..trailer + 2], &[1, 0]);
+    assert_eq!(
+        &valid[trailer + 2..trailer + 10],
+        &[0, 7, 0, 0, 185, 0, 34, 0]
+    );
+    let mut removed = valid[..trailer].to_vec();
+    removed.extend_from_slice(&[0, 0]);
+    removed.extend_from_slice(&0_u64.to_le_bytes());
+    reseal(&mut removed);
+    assert_eq!(
+        World::from_save_bytes(&removed).unwrap_err(),
+        SaveError::InvalidState("completed jump journal")
+    );
+    assert_refused_unchanged(&mut world, &removed);
+
+    // A 34-unit hop meets the former stock aggregate cap. The old trailer
+    // attempted to replace it with a caller-declared checkpoint and no legs.
+    let mut prefix = Writer::new();
+    prefix.bytes.extend_from_slice(&valid[..trailer]);
+    prefix.bool(true);
+    prefix.u64(1);
+    prefix.u64(34);
+    prefix.u8(nav.system.galaxy);
+    prefix.u16(nav.system.system);
+    prefix.u64(nav.visit);
+    prefix.u64(world.snapshot().tick);
+    prefix.u16(0);
+    prefix.u64(0);
+    reseal(&mut prefix.bytes);
+    assert!(World::from_save_bytes(&prefix.bytes).is_err());
+    assert_refused_unchanged(&mut world, &prefix.bytes);
+    let cold = World::from_save_bytes(&valid).unwrap();
+    assert_eq!(cold.snapshot(), world.snapshot());
+}
+
+#[test]
+fn every_noncurrent_version_refuses_before_live_replacement() {
+    let mut world = World::new_commander(15930).unwrap();
+    let current = world.save_bytes().unwrap();
+    for version in (0..crate::save::SAVE_VERSION).chain([crate::save::SAVE_VERSION + 1, u16::MAX]) {
+        let mut older = current.clone();
+        older[8..10].copy_from_slice(&version.to_le_bytes());
+        reseal(&mut older);
+        assert_eq!(
+            World::from_save_bytes(&older).unwrap_err(),
+            SaveError::UnsupportedVersion
+        );
+        assert_eq!(
+            world.restore_bytes(&older),
+            Err(SaveError::UnsupportedVersion)
+        );
+        assert_eq!(world.save_bytes().unwrap(), current);
+    }
 }

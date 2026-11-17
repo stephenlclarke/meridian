@@ -670,7 +670,7 @@ fn checked_receipts_plan_marker_and_chronology_tamper_never_replace_live_cold_st
     });
 }
 #[test]
-fn exact_v10_reader_retains_completed_t01_without_inventing_t04_plan_or_tonne() {
+fn current_continue_retains_completed_t01_and_refuses_v10() {
     let mut w = commander(7301);
     let review = ok(w.review_flight_reception(FlightReceptionAction::Accept, 0));
     ok(w.prepare_flight_reception(review, 0)).commit();
@@ -690,11 +690,15 @@ fn exact_v10_reader_retains_completed_t01_without_inventing_t04_plan_or_tonne() 
     let t01 = some(w.flight_reception_snapshot());
     let bytes = ok(crate::flight::persistence::v10_test_fixture(&w));
     assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 10);
-    let mut loaded = ok(World::from_save_bytes(&bytes));
+    assert_eq!(
+        World::from_save_bytes(&bytes).unwrap_err(),
+        crate::save::SaveError::UnsupportedVersion
+    );
+    let mut loaded = ok(World::from_save_bytes(&ok(w.save_bytes())));
     assert_eq!(some(loaded.flight_reception_snapshot()), t01);
     assert!(snap(&loaded).attempts.is_empty());
     assert_eq!(snap(&loaded).trace, None);
-    let _upgraded = cold(&loaded);
+    let _continued = cold(&loaded);
     complete(&mut loaded, Id::Minerals);
     assert_eq!(some(loaded.flight_reception_snapshot()).trace, t01.trace);
     assert_eq!(

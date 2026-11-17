@@ -385,18 +385,14 @@ fn actual_player_pulse_uses_first_npc_mesh_and_bound_weapon_resources_and_retain
     let _continued = cold(&w);
 }
 #[test]
-fn original_v13_continue_has_absent_traffic_and_corrupt_current_restore_preserves_live_bytes() {
+fn old_v13_and_corrupt_current_traffic_refuse_without_replacing_live_bytes() {
     let initial = ok(World::new_commander(12005));
     let old = ok(crate::flight::persistence::v13_test_fixture(&initial));
     assert_eq!(u16::from_le_bytes([old[8], old[9]]), 13);
-    let mut older = ok(World::from_save_bytes(&old));
-    assert!(older.traffic_snapshot().is_none());
-    crate::flight::practice::tests::launch(&mut older);
-    steps(&mut older, 1500);
-    assert!(older.traffic_snapshot().is_none());
-    assert_eq!(older.credits_tenths(), Some(7200));
-    let loaded = cold(&older);
-    assert!(loaded.traffic_snapshot().is_none());
+    assert_eq!(
+        World::from_save_bytes(&old).unwrap_err(),
+        crate::save::SaveError::UnsupportedVersion
+    );
     let mut live = clear_lane(12005);
     steps(&mut live, 500);
     let valid = ok(live.save_bytes());

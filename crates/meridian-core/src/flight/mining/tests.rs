@@ -305,18 +305,21 @@ fn all_provider_rock_envelopes_clear_the_actual_celestial_scene() {
     }
 }
 #[test]
-fn explicit_old_fifteen_continue_preserves_absent_ore_provider_and_never_synthesizes_work() {
+fn explicit_old_fifteen_save_refuses_before_mining_state_changes() {
     // Codec compatibility fixture only; no gameplay yield, item, pose or money is injected.
-    let fresh = ok(World::new_commander(12005));
+    let mut fresh = ok(World::new_commander(12005));
     let old = ok(crate::flight::persistence::v15_test_fixture(&fresh));
     assert_eq!(u16::from_le_bytes([old[8], old[9]]), 15);
-    let older = ok(World::from_save_bytes(&old));
-    assert!(older.mining_belt_snapshot().is_none());
-    assert!(older.mining_destination(SystemId::AVENOR).is_none());
-    assert_eq!(older.credits_tenths(), fresh.credits_tenths());
-    assert_eq!(older.service_snapshot(), fresh.service_snapshot());
-    assert_eq!(older.mining.work_count(), 0);
-    assert!(cold(&older).mining_belt_snapshot().is_none());
+    assert_eq!(
+        World::from_save_bytes(&old).unwrap_err(),
+        crate::save::SaveError::UnsupportedVersion
+    );
+    let before = ok(fresh.save_bytes());
+    assert_eq!(
+        fresh.restore_bytes(&old),
+        Err(crate::save::SaveError::UnsupportedVersion)
+    );
+    assert_eq!(ok(fresh.save_bytes()), before);
 }
 #[test]
 fn original_work_has_no_invented_slow_speed_gate_and_never_changes_player_motion() {

@@ -420,7 +420,7 @@ fn actual_range_expiry_and_hyperspace_cull_keep_endpoints_and_cadence() {
 }
 
 #[test]
-fn original_readers_keep_owned_stock_and_refuse_a_fake_used_v7_migration() {
+fn current_reader_keeps_owned_stock_and_refuses_older_payloads() {
     let untouched = World::new_commander(2701).unwrap();
     for bytes in [
         crate::flight::persistence::v4_test_fixture(&untouched).unwrap(),
@@ -428,7 +428,13 @@ fn original_readers_keep_owned_stock_and_refuse_a_fake_used_v7_migration() {
         crate::flight::persistence::v6_test_fixture(&untouched).unwrap(),
         crate::flight::persistence::v7_test_fixture(&untouched).unwrap(),
     ] {
-        let loaded = World::from_save_bytes(&bytes).unwrap();
+        assert_eq!(
+            World::from_save_bytes(&bytes).unwrap_err(),
+            crate::save::SaveError::UnsupportedVersion
+        );
+    }
+    {
+        let loaded = World::from_save_bytes(&untouched.save_bytes().unwrap()).unwrap();
         same(&untouched, &loaded);
         assert_eq!(
             loaded

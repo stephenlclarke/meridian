@@ -661,7 +661,7 @@ impl State {
         }
     }
     pub(super) fn decode(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
-        if !matches!(version, 13 | 15 | 16 | crate::save::SAVE_VERSION) {
+        if version != crate::save::SAVE_VERSION {
             return Err(SaveError::UnsupportedVersion);
         }
         let count = r.u32()? as usize;

@@ -485,7 +485,7 @@ fn epoch_overflow_during_continue_is_an_atomic_refusal_after_valid_history_decod
 }
 
 #[test]
-fn exact_v8_live_and_completed_states_upgrade_without_restock_or_invented_closure() {
+fn current_live_and_completed_states_keep_custody_and_refuse_v8() {
     let mut world = World::new_commander(3701).unwrap();
     consent(&mut world);
     launch(&mut world);
@@ -493,7 +493,11 @@ fn exact_v8_live_and_completed_states_upgrade_without_restock_or_invented_closur
     let target = world.practice_snapshot().unwrap().beacons.unwrap()[1].id;
     let origin = fire(&mut world, target);
     let old = crate::flight::persistence::v8_test_fixture(&world).unwrap();
-    let loaded = World::from_save_bytes(&old).unwrap();
+    assert_eq!(
+        World::from_save_bytes(&old).unwrap_err(),
+        crate::save::SaveError::UnsupportedVersion
+    );
+    let loaded = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
     assert_eq!(loaded.missile_snapshot(), world.missile_snapshot());
     assert_eq!(
         loaded.practice_ledger_snapshot().unwrap().attempts[0].outcome,
@@ -507,7 +511,11 @@ fn exact_v8_live_and_completed_states_upgrade_without_restock_or_invented_closur
     receive(&mut world);
     let trace = world.practice_reception_snapshot().unwrap().trace;
     let old = crate::flight::persistence::v8_test_fixture(&world).unwrap();
-    let mut loaded = World::from_save_bytes(&old).unwrap();
+    assert_eq!(
+        World::from_save_bytes(&old).unwrap_err(),
+        crate::save::SaveError::UnsupportedVersion
+    );
+    let mut loaded = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
     assert_eq!(loaded.practice_reception_snapshot().unwrap().trace, trace);
     assert_eq!(
         loaded.practice_ledger_snapshot().unwrap().attempts[0].outcome,

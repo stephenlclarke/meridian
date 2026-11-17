@@ -43,7 +43,7 @@ Exact main `80a0b16` cleared duplication to 0.0 percent and retained zero open s
 
 The twelve new preparation/query/replay tests address the actual coverage and duplication failure on main `a43e8b9`. The original 223-line failed coverage set is retained and remeasured against actual current-source LCOV, with 204 of the original 223 lines covered (91.48 percent), unknown mappings uncovered and no helper-only credit for NPC-specific contact paths. Exact committed-main quality gates, independent archive/signature checks and verified public downloads remain required before publication. See [implementation status](docs/IMPLEMENTATION-STATUS.md) for actual source identities, measurements and retained failures.
 
-Successful player Pulse contact, an NPC kill and more than three actual projectiles were not observed in the bounded native journey. Other populations, NPC-owned missile launch producers, additional hull admissions, full equipment, memory, window/focus edges and measured frame timing/race remain open. Full original **1337 visual and gameplay parity** is required; source tests and renderer screenshots do not establish complete game acceptance. Private save format 15 refuses draft 14 and retains explicit qualified older readers.
+Successful player Pulse contact, an NPC kill and more than three actual projectiles were not observed in the bounded native journey. Other populations, NPC-owned missile launch producers, additional hull admissions, full equipment, memory, window/focus edges and measured frame timing/race remain open. Full original **1337 visual and gameplay parity** is required; source tests and renderer screenshots do not establish complete game acceptance. The SH025 navigation source candidate reads and writes private save format 17. Every earlier format receives a visible refusal. Qualification for this source candidate is pending.
 
 ## Following paid mining development
 
@@ -51,7 +51,7 @@ The [mining source](docs/ASTEROID-MINING.md) joins genuine paid Mining Laser wor
 
 ## Play
 
-N starts a commander; C continues. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.
+N starts a commander and C continues a current-format save. A second N confirms replacing the current commander. Opening an older save reports an unsupported-format error and preserves the file. Keep each earlier preview binary with its own profile folder. Use a fresh folder for this format-17 candidate. A confirmed new commander writes the selected slot only on an explicit save, a saved equipment action or normal saved quit. Click the window for keyboard focus.
 
 | Controls | Action |
 | --- | --- |

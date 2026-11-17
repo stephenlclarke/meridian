@@ -391,11 +391,15 @@ fn save_validation_refuses_removed_failure_forged_contact_and_unearned_legal_bit
 }
 
 #[test]
-fn actual_v6_hot_practice_continues_without_inventing_impact_or_discarding_hits() {
+fn current_hot_practice_keeps_hits_and_refuses_v6_and_v7() {
     let world = three_hits(1461);
     let legacy = crate::flight::persistence::v6_test_fixture(&world).unwrap();
     assert_eq!(u16::from_le_bytes([legacy[8], legacy[9]]), 6);
-    let mut continued = World::from_save_bytes(&legacy).unwrap();
+    assert_eq!(
+        World::from_save_bytes(&legacy).unwrap_err(),
+        crate::save::SaveError::UnsupportedVersion
+    );
+    let mut continued = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
     assert_eq!(continued.practice_snapshot(), world.practice_snapshot());
     assert_eq!(
         continued.practice_reception_snapshot(),
@@ -423,7 +427,11 @@ fn actual_v6_hot_practice_continues_without_inventing_impact_or_discarding_hits(
     let v7 = crate::flight::persistence::v7_test_fixture(&continued).unwrap();
     assert_eq!(u16::from_le_bytes([v7[8], v7[9]]), 7);
     assert_eq!(
-        World::from_save_bytes(&v7)
+        World::from_save_bytes(&v7).unwrap_err(),
+        crate::save::SaveError::UnsupportedVersion
+    );
+    assert_eq!(
+        World::from_save_bytes(&continued.save_bytes().unwrap())
             .unwrap()
             .practice_reception_snapshot(),
         continued.practice_reception_snapshot()
