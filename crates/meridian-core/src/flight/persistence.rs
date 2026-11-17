@@ -106,7 +106,7 @@ const V13_CONTENT: &[u8] = concat!(
 .as_bytes();
 
 const CONTENT: &[u8] = concat!(
-    "meridian-world/rules/14;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
+    "meridian-world/rules/15;npc-missiles/native-first-contact-v1;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -408,7 +408,7 @@ impl World {
         Ok(())
     }
 
-    fn decode_saved_world(bytes: &[u8]) -> Result<Self, SaveError> {
+    pub(super) fn decode_saved_world(bytes: &[u8]) -> Result<Self, SaveError> {
         if bytes.len() > MAX_SAVE_BYTES {
             return Err(SaveError::TooLarge);
         }
@@ -513,11 +513,11 @@ impl World {
             }
         }
         candidate.pulse = weapons::PulseResources::decode_save(&mut r)?;
-        if version >= 14 {
+        if version >= 15 {
             candidate.traffic = crate::traffic::State::decode(&mut r)?;
             candidate.damage = super::damage::State::decode(&mut r)?;
         }
-        if version < 14 && candidate.state.motion_refusal == Some(MotionRefusal::NpcContact) {
+        if version < 15 && candidate.state.motion_refusal == Some(MotionRefusal::NpcContact) {
             return Err(SaveError::InvalidEncoding);
         }
         if !r.finished() {
@@ -666,6 +666,7 @@ impl World {
             markets,
         )?;
         self.validate_traffic_player_scenes()?;
+        self.validate_npc_missile_receipts()?;
         if self.state.mode != FlightMode::Docked {
             let pose = super::flight_pose(self.state.position, self.state.orientation)
                 .ok_or(SaveError::InvalidState("traffic player pose"))?;
@@ -1052,18 +1053,46 @@ pub(super) fn v13_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
             "physical traffic requires current format",
         ));
     }
-    let current = world.save_bytes()?;
-    let mut traffic = Writer::new();
-    world.traffic.encode(&mut traffic);
-    let payload_start = 8 + 2 + CONTENT.len() + 8;
-    world.damage.encode(&mut traffic);
-    let payload_end = current.len() - 8 - traffic.bytes.len();
+    world.save_bytes()?;
     let mut old = Writer::new();
     old.bytes.extend(MAGIC);
     old.u16(13);
     old.bytes.extend(V13_CONTENT);
     old.u64(compiled_content_fingerprint(V13_CONTENT));
-    old.bytes.extend(&current[payload_start..payload_end]);
+    write_flight(&mut old, &world.state);
+    world
+        .navigation
+        .ok_or(SaveError::NoCommander)?
+        .encode_save(&mut old);
+    world
+        .commander_account
+        .as_ref()
+        .ok_or(SaveError::NoCommander)?
+        .encode_save(&mut old);
+    world
+        .freight_session
+        .as_ref()
+        .ok_or(SaveError::NoCommander)?
+        .encode_save(&mut old);
+    world
+        .station_markets
+        .as_ref()
+        .ok_or(SaveError::NoCommander)?
+        .encode_save(&mut old);
+    world.modular.encode(&mut old);
+    world.ammunition.encode(&mut old);
+    world.navigation_trade.encode(&mut old);
+    world.flight_reception.encode_version(&mut old, 13);
+    world.missiles.encode_version(&mut old, 13);
+    practice::lifecycle::encode_history(&mut old, &world.practice_history, world.practice_trace);
+    old.option(world.practice.as_ref(), |w, p| p.encode_reception(w));
+    old.option(world.practice.as_ref(), |w, p| p.encode(w));
+    world.combat.encode(&mut old);
+    old.option(
+        world.practice.and_then(|p| p.ordinary_hit).as_ref(),
+        |w, h| h.encode(w),
+    );
+    world.pulse.encode_save(&mut old);
     let digest = checksum(&old.bytes);
     old.u64(digest);
     Ok(old.bytes)

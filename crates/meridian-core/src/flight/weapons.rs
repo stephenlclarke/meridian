@@ -451,12 +451,23 @@ impl World {
         let traffic = self.prepare_traffic_pulse(shot, impact.emission())?;
         let mut missiles = self.missiles.clone();
         if let PulseContact::Projectile { id, .. } = contact
-            && !missiles.intercept(id, self.state.tick, impact.emission(), shot)
+            && !missiles.intercept(
+                id,
+                self.state.tick,
+                impact.emission(),
+                shot,
+                self.traffic.missile_scene(
+                    self.combat_identity().ok_or(FireError::NoCommander)?.system,
+                    self.state.tick,
+                    crate::traffic::SceneStage::Command(impact.emission() - 1),
+                ),
+            )
         {
             return Err(FireError::InvalidGeometry);
         }
         let damage = impact.damage_candidate();
         let (combat, pulse, impact_practice) = impact.resource_candidates(self.practice);
+        self.clear_missing_missile_lock(&mut missiles, &traffic, practice, pulse.alive());
         if let (Some(candidate), Some(current)) = (&mut practice, impact_practice) {
             candidate.ordinary_hit = current.ordinary_hit;
             candidate.reception = current.reception;

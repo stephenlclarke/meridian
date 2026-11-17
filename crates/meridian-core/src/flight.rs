@@ -28,7 +28,7 @@ pub use ammunition::{
 pub use missiles::{
     MISSILE_COOLDOWN_TICKS, MISSILE_FACES, MISSILE_LIFETIME_TICKS, MISSILE_MUZZLE_DISTANCE,
     MISSILE_RANGE, MISSILE_SPEED, MISSILE_VERTICES, MissileContact, MissileEnd, MissileError,
-    MissileOrigin, MissileRound, MissileSnapshot, ProjectileId, ProjectileSnapshot,
+    MissileOrigin, MissileRound, MissileSnapshot, MissileTarget, ProjectileId, ProjectileSnapshot,
 };
 mod combat;
 pub use combat::{
@@ -583,8 +583,11 @@ impl World {
                 next.motion_refusal = None;
             }
         }
-        let mut prepared = self.prepare_missile_step(next, navigation)?;
+        let mut prepared = self.prepare_missile_step(next, navigation, &self.traffic)?;
         let traffic = self.prepare_traffic_step(next, navigation, &prepared)?;
+        if let Some((traffic, _)) = &traffic {
+            prepared.traffic = traffic.clone();
+        }
         if let Some((traffic, _)) = &traffic {
             for hit in traffic
                 .player_hits()
@@ -596,6 +599,12 @@ impl World {
                     .apply_bound_player_damage(&mut prepared.pulse, hit.front, 1500);
             }
         }
+        self.clear_missing_missile_lock(
+            &mut prepared.missiles,
+            &prepared.traffic,
+            prepared.practice,
+            prepared.pulse.alive(),
+        );
         let damage =
             self.damage
                 .step(self.state.mode, next.mode, prepared.combat.physical_tick())?;
@@ -623,13 +632,13 @@ impl World {
                 .map_err(|_| StepError::NonFiniteState)?;
         }
         // No fallible operation follows the first account mutation.
-        if let Some((traffic, markets)) = traffic {
-            self.traffic = traffic;
+        if let Some((_, markets)) = traffic {
             self.station_markets = Some(markets);
         }
         if let Some(navigation_trade) = navigation_trade {
             self.navigation_trade = navigation_trade;
         }
+        self.traffic = prepared.traffic;
         self.missiles = prepared.missiles;
         self.combat = prepared.combat;
         self.pulse = prepared.pulse;

@@ -140,7 +140,17 @@ fn actual_peer_mesh_occludes_and_missing_peer_or_changed_contact_cannot_load() {
     // Query the bounded native component boundary directly; this is not a public journey.
     let actor = state.actors[1].unwrap_or_else(|| panic!("pirate"));
     let before = state.clone();
-    ok(state.fire_at_player(1, actor, &data, player, target, 900, &|_, _, _| true));
+    ok(state.fire_at_player(
+        1,
+        actor,
+        super::player_hits::PlayerEmission {
+            data: &data,
+            player,
+            target,
+            world_tick: 900,
+            beam_clear: &|_, _, _| true,
+        },
+    ));
     assert_eq!(state, before);
     state.actors[0]
         .as_mut()

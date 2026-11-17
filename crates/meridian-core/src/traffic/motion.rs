@@ -33,7 +33,14 @@ impl State {
             else {
                 continue;
             };
-            let actor = move_actor(actor, &opening, &context, &next.shots, next.clocks[i])?;
+            let actor = move_actor(
+                actor,
+                &opening,
+                &context,
+                &next.shots,
+                next.clocks[i],
+                next.missile_hits.iter().any(|h| h.victim == actor.id),
+            )?;
             next.actors[index] = Some(actor);
         }
         resolve_peer_paths(
@@ -66,6 +73,7 @@ fn move_actor(
     context: &TickContext<'_>,
     shots: &[TrafficBeam],
     local_tick: u64,
+    missile_aggression: bool,
 ) -> Result<Actor, TrafficError> {
     let opening_actor = actor;
     let TickContext {
@@ -79,17 +87,39 @@ fn move_actor(
     actor.resources.advance()?;
     actor.resource_clock = local_tick;
     if actor.id.serial == 1
-        && (threat_position(actor, opening, player_after.position, shots).is_some()
+        && (threat_position(
+            actor,
+            opening,
+            player_after.position,
+            shots,
+            missile_aggression,
+        )
+        .is_some()
             || (actor.phase == NpcPhase::FinalAlign
                 && length(sub(actor.position, Vec3::new(0.0, 0.0, 3500.0))) > 1.0))
     {
         actor.phase = NpcPhase::Approach;
     }
     let player_goal = context.player_target.and_then(|target| {
-        State::player_goal_in(actor, opening, player_after.position, target, shots)
+        State::player_goal_in(
+            actor,
+            opening,
+            player_after.position,
+            target,
+            shots,
+            missile_aggression,
+        )
     });
     let (goal, mut speed) = player_goal.map_or_else(
-        || intent(actor, opening, player_after.position, shots),
+        || {
+            intent(
+                actor,
+                opening,
+                player_after.position,
+                shots,
+                missile_aggression,
+            )
+        },
         |goal| {
             (
                 goal,
@@ -225,9 +255,10 @@ fn intent(
     actors: &[Option<Actor>; MAX_TRAFFIC_ACTORS],
     player: Vec3,
     shots: &[TrafficBeam],
+    missile_aggression: bool,
 ) -> (Vec3, f64) {
     if a.id.serial == 1 {
-        if let Some(threat) = threat_position(a, actors, player, shots) {
+        if let Some(threat) = threat_position(a, actors, player, shots, missile_aggression) {
             let away = unit(Vec3::new(
                 a.position.x - threat.x,
                 0.0,
@@ -284,6 +315,7 @@ fn threat_position(
     actors: &[Option<Actor>; MAX_TRAFFIC_ACTORS],
     player: Vec3,
     shots: &[TrafficBeam],
+    missile_aggression: bool,
 ) -> Option<Vec3> {
     if let Some(threat) = a.aggressor.and_then(|id| {
         actors
@@ -292,6 +324,9 @@ fn threat_position(
             .find(|b| b.id == id && b.airborne() && length(sub(b.position, a.position)) <= 6000.0)
     }) {
         return Some(threat.position);
+    }
+    if missile_aggression && length(sub(player, a.position)) <= 6000.0 {
+        return Some(player);
     }
     shots
         .iter()

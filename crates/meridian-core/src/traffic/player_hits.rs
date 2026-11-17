@@ -1,49 +1,22 @@
 //! Separate NPC -> player identity, native contact and retained scene evidence.
 use super::*;
+pub(super) struct PlayerEmission<'a> {
+    pub(super) data: &'a OriginalStationData,
+    pub(super) player: RigidPose,
+    pub(super) target: PlayerTarget,
+    pub(super) world_tick: u64,
+    pub(super) beam_clear: &'a dyn Fn(Vec3, Vec3, f64) -> bool,
+}
+
 impl State {
     pub(super) fn validate_resource_replay(&self, actor: Actor) -> Result<(), SaveError> {
-        let mut events = Vec::new();
-        for (index, shot) in self.shots.iter().enumerate() {
-            let phase = u8::from(matches!(shot.source, BeamSource::Player { .. }));
-            if shot.source == BeamSource::Npc(actor.id) {
-                events.push((shot.local_tick, phase, index, None));
-            }
-            if shot.victim == actor.id {
-                events.push((shot.local_tick, phase, index, Some(shot.front)));
-            }
-        }
-        for (index, hit) in self
-            .player_hits
-            .iter()
-            .enumerate()
-            .filter(|(_, h)| h.attacker == actor.id)
-        {
-            events.push((hit.local_tick, 0, index, None));
-        }
-        events.sort_by_key(|&(clock, phase, index, _)| (clock, phase, index));
-        let mut resources = Resources::fresh();
-        let mut clock = actor.birth_clock.checked_sub(1).ok_or(INVALID)?;
-        for (at, _, _, incoming) in events {
-            if resources.energy == 0 {
-                return Err(INVALID);
-            }
-            resources
-                .advance_many(at.checked_sub(clock).ok_or(INVALID)?)
-                .map_err(|_| INVALID)?;
-            if let Some(front) = incoming {
-                resources.hit(front)
-            } else {
-                resources.fire()
-            }
-            .map_err(|_| INVALID)?;
-            clock = at;
-        }
-        let elapsed = actor.resource_clock.checked_sub(clock).ok_or(INVALID)?;
-        if resources.energy == 0 && elapsed != 0 {
-            return Err(INVALID);
-        }
-        resources.advance_many(elapsed).map_err(|_| INVALID)?;
-        if resources != actor.resources {
+        let expected = self.resources_at(
+            actor,
+            actor.resource_clock,
+            u64::MAX,
+            SceneStage::Command(u64::MAX),
+        )?;
+        if expected != actor.resources {
             return Err(INVALID);
         }
         Ok(())
@@ -65,7 +38,7 @@ impl State {
         }
     }
     pub(crate) fn receipt_count(&self) -> usize {
-        self.shots.len() + self.player_hits.len()
+        self.shots.len() + self.player_hits.len() + self.missile_hits.len()
     }
     pub(crate) fn proof_grows_from(&self, old: &Self) -> bool {
         self.receipt_count() > old.receipt_count()
@@ -80,7 +53,16 @@ impl State {
         player: Vec3,
         target: PlayerTarget,
     ) -> Option<Vec3> {
-        Self::player_goal_in(actor, &self.actors, player, target, &self.shots)
+        Self::player_goal_in(
+            actor,
+            &self.actors,
+            player,
+            target,
+            &self.shots,
+            self.missile_hits
+                .iter()
+                .any(|h| h.victim == actor.id && h.origin.owner.hull == target.hull),
+        )
     }
     pub(super) fn player_goal_in(
         actor: Actor,
@@ -88,6 +70,7 @@ impl State {
         player: Vec3,
         target: PlayerTarget,
         shots: &[TrafficBeam],
+        missile_aggression: bool,
     ) -> Option<Vec3> {
         if actor.id.serial != 2
             || actor.phase != NpcPhase::Hunting
@@ -96,26 +79,29 @@ impl State {
         {
             return None;
         }
-        let retaliating = shots.iter().any(|s| {
-            s.victim == actor.id
-                && matches!(s.source, BeamSource::Player { hull, .. } if hull == target.hull)
-        });
+        let retaliating = missile_aggression
+            || shots.iter().any(|s| {
+                s.victim == actor.id
+                    && matches!(s.source, BeamSource::Player { hull, .. } if hull == target.hull)
+            });
         let closer = super::motion::target(actor, actors).is_none_or(|trader| {
             length(sub(player, actor.position)) < length(sub(trader.position, actor.position))
         });
         (retaliating || (target.cargo && closer)).then_some(player)
     }
-    #[allow(clippy::too_many_arguments)]
     pub(super) fn fire_at_player(
         &mut self,
         index: usize,
         mut actor: Actor,
-        data: &OriginalStationData,
-        player: RigidPose,
-        target: PlayerTarget,
-        world_tick: u64,
-        beam_clear: &dyn Fn(Vec3, Vec3, f64) -> bool,
+        emission: PlayerEmission<'_>,
     ) -> Result<(), TrafficError> {
+        let PlayerEmission {
+            data,
+            player,
+            target,
+            world_tick,
+            beam_clear,
+        } = emission;
         let ray = actor.pose();
         if unit(sub(player.position, ray.position))
             .is_none_or(|aim| aim.dot(ray.orientation.z) < 0.995)

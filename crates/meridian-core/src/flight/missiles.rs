@@ -3,6 +3,7 @@ use super::{CombatIdentity, FlightMode, PracticeBeaconId, Snapshot, StepError, W
 use crate::docking::Vec3;
 use core::fmt;
 mod geometry;
+mod npc;
 mod persistence;
 pub use geometry::{MISSILE_FACES, MISSILE_VERTICES};
 use geometry::{add, length, mesh_distance, pose, scale, sub, unit};
@@ -26,6 +27,7 @@ pub enum MissileError {
     InvalidGeometry,
     SequenceExhausted,
     SaveRefused,
+    ProtectedTraffic,
 }
 impl fmt::Display for MissileError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -35,7 +37,10 @@ impl fmt::Display for MissileError {
             Self::NoCommander => "An owned commander is required",
             Self::NotInFlight => "Missiles require active flight",
             Self::NoAmmunition => "No owned compatible pylon round remains",
-            Self::NoLiveLock => "Lock an actual current practice beacon",
+            Self::NoLiveLock => "Lock an actual live target",
+            Self::ProtectedTraffic => {
+                "Traffic combat is unavailable during an active protected service"
+            }
             Self::TargetBehind => "The locked target is behind the craft",
             Self::NotArmed => "Missile is not armed",
             Self::CoolingDown => "Missile launcher is cooling down",
@@ -53,6 +58,9 @@ pub struct ProjectileId {
     ordinal: u8,
 }
 impl ProjectileId {
+    pub(crate) fn ordinal(self) -> u8 {
+        self.ordinal
+    }
     pub fn entity(self) -> u64 {
         5 + u64::from(self.ordinal)
     }
@@ -96,11 +104,39 @@ pub enum MissileContact {
         front: bool,
     },
     Projectile(ProjectileId),
+    Npc(crate::traffic::NpcId),
+    Celestial(crate::celestial::BodyId),
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MissileTarget {
+    Practice(PracticeBeaconId),
+    Npc(crate::traffic::NpcId),
+}
+impl MissileTarget {
+    pub fn practice(self) -> Option<PracticeBeaconId> {
+        if let Self::Practice(id) = self {
+            Some(id)
+        } else {
+            None
+        }
+    }
+    pub fn npc(self) -> Option<crate::traffic::NpcId> {
+        if let Self::Npc(id) = self {
+            Some(id)
+        } else {
+            None
+        }
+    }
+}
+impl From<PracticeBeaconId> for MissileTarget {
+    fn from(id: PracticeBeaconId) -> Self {
+        Self::Practice(id)
+    }
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct ProjectileSnapshot {
     pub origin: MissileOrigin,
-    pub target: PracticeBeaconId,
+    pub target: MissileTarget,
     pub position: Vec3,
     pub direction: Vec3,
     pub propulsion_travel: f64,
@@ -122,18 +158,20 @@ pub struct MissileSnapshot {
     pub rounds: [Option<MissileRound>; 3],
     pub armed: bool,
     pub lock: Option<PracticeBeaconId>,
+    pub npc_lock: Option<crate::traffic::NpcId>,
     pub cooldown_ticks: u8,
     pub projectiles: [Option<ProjectileSnapshot>; 3],
 }
 #[derive(Debug, Clone, PartialEq)]
 pub(super) struct State {
     armed: bool,
-    lock: Option<PracticeBeaconId>,
+    lock: Option<MissileTarget>,
     cooldown: u8,
     pub(super) projectiles: Vec<Option<ProjectileSnapshot>>,
     motions: Vec<Option<Motion>>,
     impacts: Vec<Option<super::OrdinaryImpact>>,
     beams: Vec<Option<Beam>>,
+    npc_launches: Vec<Option<npc::NpcLaunch>>,
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
 struct Body {
@@ -149,11 +187,13 @@ struct Motion {
     flight: Snapshot,
     player_alive: bool,
     bodies: Vec<Option<Body>>,
+    npc_scene: Option<crate::traffic::MissileScene>,
 }
 #[derive(Debug, Clone, PartialEq)]
 struct Beam {
     shot: super::PulseShot,
     emission: u64,
+    npc_scene: Option<crate::traffic::MissileScene>,
     bodies: Vec<Option<Body>>,
 }
 impl Default for State {
@@ -166,6 +206,7 @@ impl Default for State {
             motions: vec![None; 3],
             impacts: vec![None; 3],
             beams: vec![None; 3],
+            npc_launches: vec![None; 3],
         }
     }
 }
@@ -226,6 +267,7 @@ impl State {
             self.motions.push(None);
             self.impacts.push(None);
             self.beams.push(None);
+            self.npc_launches.push(None);
         }
     }
 }
@@ -240,6 +282,7 @@ impl State {
         tick: u64,
         emission: u64,
         shot: super::PulseShot,
+        npc_scene: crate::traffic::MissileScene,
     ) -> bool {
         let bodies = self.bodies();
         for p in self.projectiles.iter_mut().flatten() {
@@ -251,6 +294,7 @@ impl State {
                     shot,
                     emission,
                     bodies,
+                    npc_scene: Some(npc_scene),
                 });
                 return true;
             }
@@ -276,6 +320,7 @@ pub(super) struct PreparedStep {
     pub(super) pulse: super::weapons::PulseResources,
     pub(super) practice: Option<super::practice::Practice>,
     pub(super) legal: u8,
+    pub(super) traffic: crate::traffic::State,
 }
 impl World {
     /// Historical T01 sight reuses the exact native missile mesh and retained launch orientation.
@@ -347,7 +392,8 @@ impl World {
         Some(MissileSnapshot {
             rounds: core::array::from_fn(|i| rounds[i]),
             armed: self.missiles.armed,
-            lock: self.missiles.lock,
+            lock: self.missiles.lock.and_then(MissileTarget::practice),
+            npc_lock: self.missiles.lock.and_then(MissileTarget::npc),
             cooldown_ticks: self.missiles.cooldown,
             projectiles: core::array::from_fn(|i| self.missiles.projectiles[i]),
             additional_rounds: core::array::from_fn(|i| rounds[3 + i]),
@@ -364,7 +410,7 @@ impl World {
         {
             return Err(MissileError::NoLiveLock);
         }
-        self.missiles.lock = target;
+        self.missiles.lock = target.map(MissileTarget::Practice);
         Ok(())
     }
     pub fn request_missile_arm(&mut self, armed: bool, tick: u64) -> Result<(), MissileError> {
@@ -390,13 +436,15 @@ impl World {
             return Err(MissileError::CoolingDown);
         }
         let target = self.missiles.lock.ok_or(MissileError::NoLiveLock)?;
-        let target_pose = self
-            .practice
-            .and_then(|p| p.missile_target(target))
+        if matches!(target, MissileTarget::Npc(_)) && self.npc_missile_protected() {
+            return Err(MissileError::ProtectedTraffic);
+        }
+        let target_position = self
+            .resolve_missile_target(target, &self.traffic, self.practice)
             .ok_or(MissileError::NoLiveLock)?;
         let player = super::flight_pose(self.state.position, self.state.orientation)
             .ok_or(MissileError::InvalidGeometry)?;
-        if sub(target_pose.position, player.position).dot(player.orientation.z) <= 0.0 {
+        if sub(target_position, player.position).dot(player.orientation.z) <= 0.0 {
             return Err(MissileError::TargetBehind);
         }
         let round = self
@@ -456,6 +504,34 @@ impl World {
             last_tick: tick,
             intercepting_emission: None,
         };
+        let npc_launch = if matches!(target, MissileTarget::Npc(_)) {
+            Some(npc::NpcLaunch {
+                scene: self.traffic.missile_scene(
+                    owner.system,
+                    tick,
+                    crate::traffic::SceneStage::Command(emission - 1),
+                ),
+                dock_sequence: self
+                    .navigation
+                    .ok_or(MissileError::NoCommander)?
+                    .validate_save(
+                        self.navigation_catalogue
+                            .as_ref()
+                            .ok_or(MissileError::NoCommander)?,
+                        self.state.mode,
+                        self.state.tick,
+                        self.commander_account
+                            .as_ref()
+                            .ok_or(MissileError::NoCommander)?
+                            .fuel_tenths(),
+                    )
+                    .map_err(|_| MissileError::InvalidGeometry)?
+                    .dock_sequence,
+                loss: None,
+            })
+        } else {
+            None
+        };
         let old_account = self.commander_account.replace(account);
         let old_combat = self.combat;
         let old_missiles = self.missiles.clone();
@@ -463,6 +539,7 @@ impl World {
         self.combat = combat;
         self.missiles.extend_for_launch(index);
         self.missiles.projectiles[index] = Some(projectile);
+        self.missiles.npc_launches[index] = npc_launch;
         self.missiles.armed = false;
         self.missiles.cooldown = MISSILE_COOLDOWN_TICKS;
         if let Some(p) = &mut self.practice {
@@ -478,11 +555,28 @@ impl World {
         }
         Ok(origin)
     }
+    pub(super) fn clear_missing_missile_lock(
+        &self,
+        missiles: &mut State,
+        traffic: &crate::traffic::State,
+        practice: Option<super::practice::Practice>,
+        alive: bool,
+    ) {
+        if !alive
+            || missiles
+                .lock
+                .is_some_and(|id| self.resolve_missile_target(id, traffic, practice).is_none())
+        {
+            missiles.lock = None;
+            missiles.armed = false;
+        }
+    }
     /// All fallible scene/counter work precedes the outer arrival fuel debit.
     pub(super) fn prepare_missile_step(
         &self,
         next: Snapshot,
         navigation: Option<super::NavigationState>,
+        traffic: &crate::traffic::State,
     ) -> Result<PreparedStep, StepError> {
         let mut prepared = PreparedStep {
             missiles: self.missiles.clone(),
@@ -490,6 +584,7 @@ impl World {
             pulse: self.pulse,
             practice: self.practice,
             legal: self.legal_value().unwrap_or(0),
+            traffic: traffic.clone(),
         };
         prepared.combat.advance(self.state.mode, next.mode);
         prepared.pulse.advance(self.state.mode, next.mode);
@@ -507,9 +602,8 @@ impl World {
             if next.mode == FlightMode::Docked || visit != Some(projectile.origin.owner.visit) {
                 projectile.ended = Some(MissileEnd::Culled);
                 projectile.last_tick = next.tick;
-            } else if let Some(target) = prepared
-                .practice
-                .and_then(|p| p.missile_target(projectile.target))
+            } else if let Some(target) =
+                self.resolve_missile_target(projectile.target, &prepared.traffic, prepared.practice)
             {
                 prepared.missiles.motions[index] = Some(Motion {
                     position: projectile.position,
@@ -519,18 +613,23 @@ impl World {
                     flight: next,
                     player_alive: prepared.pulse.alive(),
                     bodies: prepared.missiles.bodies(),
+                    npc_scene: Some(prepared.traffic.missile_scene(
+                        projectile.origin.owner.system,
+                        next.tick,
+                        crate::traffic::SceneStage::Step(index as u8),
+                    )),
                 });
-                advance_projectile(
-                    self,
-                    &mut prepared,
-                    &mut projectile,
-                    index,
-                    target.position,
-                    next,
-                )?;
+                advance_projectile(self, &mut prepared, &mut projectile, index, target, next)?;
             } else {
                 projectile.ended = Some(MissileEnd::TargetLost);
                 projectile.last_tick = next.tick;
+                if let Some(e) = prepared.missiles.npc_launches[index].as_mut() {
+                    e.loss = Some(prepared.traffic.missile_scene(
+                        projectile.origin.owner.system,
+                        next.tick,
+                        crate::traffic::SceneStage::Step(index as u8),
+                    ));
+                }
             }
             prepared.missiles.projectiles[index] = Some(projectile);
             if projectile.ended.is_some()
@@ -547,15 +646,12 @@ impl World {
             prepared.missiles.armed = false;
             prepared.missiles.lock = None;
         }
-        if prepared.missiles.lock.is_some_and(|id| {
-            prepared
-                .practice
-                .and_then(|p| p.missile_target(id))
-                .is_none()
-        }) {
-            prepared.missiles.lock = None;
-            prepared.missiles.armed = false;
-        }
+        self.clear_missing_missile_lock(
+            &mut prepared.missiles,
+            &prepared.traffic,
+            prepared.practice,
+            prepared.pulse.alive(),
+        );
         if let Some(p) = &mut prepared.practice {
             p.pending_missiles = prepared.missiles.pending();
         }
@@ -610,8 +706,8 @@ fn advance_projectile(
     p.propulsion_travel += used;
     p.age_ticks = p.age_ticks.saturating_add(1);
     p.last_tick = next.tick;
-    if let Some((_, mut contact)) = best {
-        contact = apply_contact(prepared, p, next, contact)?;
+    if let Some((distance, mut contact)) = best {
+        contact = apply_contact(world, prepared, p, next, contact, distance)?;
         p.contact = Some(contact);
         p.ended = Some(MissileEnd::Impact);
     } else {
@@ -700,14 +796,22 @@ fn query_contact(
             },
         );
     }
+    if let Some(scene) = prepared.missiles.motions[index]
+        .as_ref()
+        .and_then(|m| m.npc_scene.as_ref())
+    {
+        npc::choose_scene(world, p, scene, ray, travel, &mut best)?;
+    }
     Ok(best)
 }
 
 fn apply_contact(
+    world: &World,
     prepared: &mut PreparedStep,
     p: &ProjectileSnapshot,
     next: Snapshot,
     mut contact: MissileContact,
+    distance: f64,
 ) -> Result<MissileContact, StepError> {
     match contact {
         MissileContact::Practice { id, .. } => {
@@ -736,6 +840,31 @@ fn apply_contact(
                 practice.observe_ordinary_hit(hit);
             }
         }
+        MissileContact::Npc(id) => {
+            if world.npc_missile_protected() {
+                return Err(StepError::InvalidMode);
+            }
+            let m = prepared.missiles.motions[usize::from(p.origin.projectile.ordinal)]
+                .as_ref()
+                .ok_or(StepError::NonFiniteState)?;
+            let scene = m.npc_scene.as_ref().ok_or(StepError::NonFiniteState)?;
+            let ray = pose(m.position, p.direction).ok_or(StepError::NonFiniteState)?;
+            prepared.traffic = prepared
+                .traffic
+                .prepare_missile_contact(
+                    world
+                        .station_data
+                        .as_ref()
+                        .ok_or(StepError::NonFiniteState)?,
+                    scene,
+                    p.origin,
+                    ray,
+                    distance,
+                    id,
+                )
+                .map_err(|_| StepError::NonFiniteState)?;
+        }
+        MissileContact::Celestial(_) => {}
         MissileContact::Projectile(id) => {
             for other in prepared.missiles.projectiles.iter_mut().flatten() {
                 if other.origin.projectile == id && other.ended.is_none() {
@@ -756,6 +885,8 @@ fn choose(best: &mut Option<(f64, MissileContact)>, distance: f64, contact: Miss
             MissileContact::Practice { id, .. } => (1, u64::from(id.ordinal())),
             MissileContact::Projectile(id) => (2, id.entity()),
             MissileContact::Player { .. } => (3, 0),
+            MissileContact::Celestial(id) => (0, id.entity),
+            MissileContact::Npc(id) => (4, u64::from(id.serial())),
         }
     }
     if best.is_none_or(|(old, previous)| {

@@ -15,6 +15,7 @@ impl State {
                 && self.actors == [None; MAX_TRAFFIC_ACTORS]
                 && self.shots.is_empty()
                 && self.player_hits.is_empty()
+                && self.missile_hits.is_empty()
             {
                 Ok(())
             } else {
@@ -38,7 +39,8 @@ impl State {
         }
         self.validate_separation(data)?;
         self.validate_shots(world_tick, player_emissions, data)?;
-        self.validate_player_hits(world_tick, data)
+        self.validate_player_hits(world_tick, data)?;
+        self.validate_missile_resource_replay()
     }
     fn validate_identity(
         &self,
@@ -184,7 +186,15 @@ impl State {
             .shots
             .iter()
             .rfind(|s| s.victim == a.id)
-            .map(|s| s.local_tick);
+            .map(|s| s.local_tick)
+            .into_iter()
+            .chain(
+                self.missile_hits
+                    .iter()
+                    .filter(|h| h.victim == a.id)
+                    .map(|h| h.local_tick),
+            )
+            .max();
         let end = a.resource_clock;
         if end < a.birth_clock
             || end > self.clocks[si]
@@ -198,6 +208,15 @@ impl State {
             .and_then(|v| v.checked_add(1))
             .ok_or(INVALID)?;
         a.resources.validate(age, outgoing, incoming)?;
+        if usize::from(a.resources.incoming_missiles)
+            != self
+                .missile_hits
+                .iter()
+                .filter(|h| h.victim == a.id)
+                .count()
+        {
+            return Err(INVALID);
+        }
         let mut outgoing_ticks: Vec<_> = self
             .shots
             .iter()
@@ -220,7 +239,6 @@ impl State {
         let expected = outgoing_ticks.last().map_or(0, |tick| {
             18_u64.saturating_sub(end.saturating_sub(*tick)) as u8
         });
-        self.validate_resource_replay(a)?;
         if a.resources.cooldown != expected {
             return Err(INVALID);
         }
@@ -351,6 +369,10 @@ impl State {
         for hit in self.player_hits.iter() {
             hit.encode(w);
         }
+        w.u16(self.missile_hits.len() as u16);
+        for hit in self.missile_hits.iter() {
+            hit.encode(w);
+        }
     }
     pub(crate) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         let enabled = r.bool()?;
@@ -373,6 +395,14 @@ impl State {
         for _ in 0..hits {
             player_hits.push(NpcPlayerHit::decode(r)?);
         }
+        let missile_count = usize::from(r.u16()?);
+        if count + hits + missile_count > MAX_TRAFFIC_SHOTS {
+            return Err(INVALID);
+        }
+        let mut missile_hits = Vec::with_capacity(missile_count);
+        for _ in 0..missile_count {
+            missile_hits.push(NpcMissileHit::decode(r)?);
+        }
         Ok(Self {
             enabled,
             seed,
@@ -380,6 +410,7 @@ impl State {
             actors,
             shots: Arc::new(shots),
             player_hits: Arc::new(player_hits),
+            missile_hits: Arc::new(missile_hits),
         })
     }
     #[cfg(test)]
@@ -387,17 +418,17 @@ impl State {
         self.actors.iter().all(Option::is_none)
             && self.shots.is_empty()
             && self.player_hits.is_empty()
-            && self.player_hits.is_empty()
+            && self.missile_hits.is_empty()
     }
 }
 impl NpcId {
-    fn encode(self, w: &mut Writer) {
+    pub(crate) fn encode(self, w: &mut Writer) {
         w.u64(self.profile);
         w.u8(self.system.galaxy);
         w.u16(self.system.system);
         w.u8(self.serial);
     }
-    fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+    pub(crate) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         Ok(Self {
             profile: r.u64()?,
             system: SystemId {
@@ -519,6 +550,7 @@ impl Resources {
         w.u8(self.cooldown);
         w.u16(self.shots);
         w.u16(self.incoming);
+        w.u16(self.incoming_missiles);
         for n in [
             self.energy_regen,
             self.front_regen,
@@ -541,6 +573,7 @@ impl Resources {
             cooldown: r.u8()?,
             shots: r.u16()?,
             incoming: r.u16()?,
+            incoming_missiles: r.u16()?,
             energy_regen: r.u64()?,
             front_regen: r.u64()?,
             rear_regen: r.u64()?,

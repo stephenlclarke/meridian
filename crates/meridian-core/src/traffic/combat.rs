@@ -90,7 +90,7 @@ impl Resources {
                 + u128::from(self.absorbed_rear)
                 + u128::from(self.hull_damage)
                 + u128::from(self.overkill)
-                != u128::from(self.incoming) * 1500
+                != u128::from(self.incoming) * 1500 + u128::from(self.incoming_missiles) * 16000
             || u128::from(self.energy_regen) > u128::from(age) * 7
             || u128::from(self.front_regen) > u128::from(age) * 3
             || u128::from(self.rear_regen) > u128::from(age) * 3
@@ -131,7 +131,17 @@ impl State {
             if let Some(target) = player_target
                 && self.player_goal(actor, player.position, target).is_some()
             {
-                self.fire_at_player(index, actor, data, player, target, world_tick, beam_clear)?;
+                self.fire_at_player(
+                    index,
+                    actor,
+                    super::player_hits::PlayerEmission {
+                        data,
+                        player,
+                        target,
+                        world_tick,
+                        beam_clear,
+                    },
+                )?;
                 continue;
             }
             let Some(target) = super::motion::target(actor, &self.actors) else {

@@ -41,7 +41,7 @@ Full game, fleet, missions, memory, window/focus, frame timing/race, notarizatio
 
 ## Following NPC development
 
-The [finite traffic core](docs/NPC-TRAFFIC.md) is composed on the current preview source for further development. Thirty-two core, three host, twelve renderer, eight scanner and three read-only observer cases remain authored **UNRUN**. Actual SH025 traders and pirates have finite stock, movement and contact logic; the actual SH025 renderer and scanner contacts are joined in source, while the incoming player-damage source and its retained beam projection are composed, while reciprocal ordnance, final legal/codec joins and qualification remain required before release. Police, miners, bounty hunters, aliens and AI constructs retain explicit source and controller dependencies. No additional hull or NPC gameplay is accepted by this source composition. Only our verified authored content is eligible; no Elite/Oolite asset is introduced.
+The [finite traffic core](docs/NPC-TRAFFIC.md) is composed on the current preview source for further development. Forty-six core, three host, twelve renderer, eight scanner, three session and three read-only observer cases remain authored **UNRUN**. Actual SH025 traders and pirates have finite stock, movement and contact logic; the actual SH025 renderer and scanner contacts are joined in source, while incoming player damage and reciprocal typed NPC missiles share one resource replay and World publication. The joined source uses private format 15 with the earlier draft 14 refused; whole review and qualification remain required before release. Police, miners, bounty hunters, aliens and AI constructs retain explicit source and controller dependencies. No additional hull or NPC gameplay is accepted by this source composition. Only our verified authored content is eligible; no Elite/Oolite asset is introduced.
 
 ## Play
 
@@ -54,7 +54,7 @@ N starts a commander; C continues. A second N confirms replacing the current com
 | M; [ / ]; G/H | Market; commodity selection; buy/sell one native unit |
 | O; K; U; Y | Equipment panel; buy/fit cargo bay; store; refit |
 | I; V; X | Mission details; review all held freight deliveries; review abandonment |
-| F1; F2; F3; F4 | Next practice lock; arm/safe; launch one missile; safe/unlock |
+| F1; F2; F3; F4 | Next ship/practice lock; arm/safe; launch one missile; safe/unlock |
 | F7; F8; F10 | Review attempt closure; reception; fresh consent |
 | F6; F12; C; 0/1/2/3 | Flight lesson consent/reception; cancellation; details; view direction |
 | P; F11; F5; F9 | Pause; fullscreen; save; reload (published lesson history in v11) |

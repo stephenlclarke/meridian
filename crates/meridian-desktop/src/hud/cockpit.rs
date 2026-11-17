@@ -81,7 +81,7 @@ impl Cockpit {
                 .missile_rounds()
                 .map_or(0, |rounds| rounds.iter().flatten().count()),
             armed: missile.is_some_and(|m| m.armed),
-            locked: missile.is_some_and(|m| m.lock.is_some()),
+            locked: missile.is_some_and(|m| m.lock.is_some() || m.npc_lock.is_some()),
             destroyed: combat.is_some_and(|c| c.player.destroyed),
             contacts,
             station,

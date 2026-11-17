@@ -91,7 +91,10 @@ impl World {
             || current.travel.is_some()
             || future.travel.is_some()
         {
-            return Ok(Some((self.traffic.clone(), markets.traffic_candidate())));
+            return Ok(Some((
+                prepared.traffic.clone(),
+                markets.traffic_candidate(),
+            )));
         }
         let data = self
             .station_data
@@ -145,7 +148,7 @@ impl World {
                         0.0,
                     )
             };
-        let (mut traffic, markets) = self
+        let (mut traffic, markets) = prepared
             .traffic
             .prepare_step(
                 traffic::TickContext {

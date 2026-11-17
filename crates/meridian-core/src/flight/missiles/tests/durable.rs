@@ -307,7 +307,7 @@ fn contradictory_custody_origin_target_motion_and_pending_payloads_are_atomic_re
     });
     let foreign = practice(9991).practice_snapshot().unwrap().beacons.unwrap()[1].id;
     corrupted(&mut world, |w| {
-        w.missiles.projectiles[0].as_mut().unwrap().target = foreign
+        w.missiles.projectiles[0].as_mut().unwrap().target = foreign.into()
     });
     corrupted(&mut world, |w| {
         w.missiles.projectiles[0].as_mut().unwrap().position.x = f64::NAN
@@ -350,7 +350,10 @@ fn contradictory_custody_origin_target_motion_and_pending_payloads_are_atomic_re
     });
 }
 fn origin_target(world: &World, origin: MissileOrigin) -> PracticeBeaconId {
-    projectile(world, origin.projectile).target
+    projectile(world, origin.projectile)
+        .target
+        .practice()
+        .unwrap()
 }
 
 #[test]
@@ -498,7 +501,7 @@ fn same_tick_coordinated_launch_pose_clock_and_behind_target_are_atomic_refusals
     let origin = fire(&mut front, beacons[2].id);
     assert!(sub(beacons[0].pose.position, origin.launch_position).dot(origin.orientation.z) < 0.0);
     corrupted(&mut front, |w| {
-        w.missiles.projectiles[0].as_mut().unwrap().target = beacons[0].id
+        w.missiles.projectiles[0].as_mut().unwrap().target = beacons[0].id.into()
     });
     let _valid = cold(&front);
 }

@@ -823,9 +823,14 @@ fn append_missile_panel(world: &World, mode: FlightMode, lines: &mut Vec<String>
             .missile_projectiles()
             .filter(|p| p.ended.is_none())
             .count();
-        let lock = missiles.lock.map_or_else(
-            || "NONE".into(),
-            |id| format!("BEACON {}", id.ordinal() + 1),
+        let lock = missiles.npc_lock.map_or_else(
+            || {
+                missiles.lock.map_or_else(
+                    || "NONE".into(),
+                    |id| format!("BEACON {}", id.ordinal() + 1),
+                )
+            },
+            |id| format!("SHIP {}", id.serial()),
         );
         if mode == FlightMode::Flight {
             lines.push(format!(
@@ -939,6 +944,32 @@ pub(crate) fn append_paragraph(lines: &mut Vec<String>, paragraph: &str) {
     }
 }
 
+fn cycle_npc_missile_lock(
+    world: &mut World,
+    current: Option<meridian_core::traffic::NpcId>,
+    tick: u64,
+) -> Result<String, String> {
+    use meridian_core::traffic::NpcPhase;
+    let contacts: Vec<_> = world
+        .traffic_snapshot()
+        .into_iter()
+        .flat_map(|s| s.actors)
+        .filter(|a| !matches!(a.phase, NpcPhase::Complete | NpcPhase::Destroyed))
+        .map(|a| a.id)
+        .collect();
+    let next = match current.and_then(|id| contacts.iter().position(|c| *c == id)) {
+        Some(index) => contacts.get(index + 1).copied(),
+        None => Some(*contacts.first().ok_or("No live ship contacts to lock")?),
+    };
+    world
+        .request_npc_missile_lock(next, tick)
+        .map_err(|e| e.to_string())?;
+    Ok(next.map_or_else(
+        || "Missile lock cleared".into(),
+        |id| format!("Missile locked on ship {}", id.serial()),
+    ))
+}
+
 fn missile_command(world: &mut World, action: Action) -> Result<String, String> {
     let state = world
         .missile_snapshot()
@@ -946,6 +977,9 @@ fn missile_command(world: &mut World, action: Action) -> Result<String, String> 
     let tick = world.snapshot().tick;
     match action {
         Action::CycleMissileLock => {
+            if world.practice_snapshot().and_then(|p| p.beacons).is_none() {
+                return cycle_npc_missile_lock(world, state.npc_lock, tick);
+            }
             let beacons = world
                 .practice_snapshot()
                 .and_then(|p| p.beacons)
@@ -1723,3 +1757,7 @@ mod tests {
         );
     }
 }
+
+#[cfg(test)]
+#[path = "session/npc_tests.rs"]
+mod npc_tests;

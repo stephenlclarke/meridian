@@ -1,0 +1,65 @@
+# Reciprocal NPC missile source
+
+This began as G3 `9cae3a8` author source from exact composed base `27b212f86350ef5040c12b2456851c62064b4306`. It is uncompiled, unreviewed and unqualified. Twelve new tests are authored **UNRUN**. No compiler, Cargo, Clippy, native, GPU or app job was started. Prior rapid-laser, XYZZY, mining and energy author branches remain separate.
+
+## Behavior
+
+`request_npc_missile_lock` accepts an actual typed `NpcId`, never a position, raw damage or practice beacon alias. The lock belongs to the actual commander/system and a live admitted actor. The existing practice API retains its real practice IDs. `MissileTarget` makes the distinction explicit; the old snapshot lock remains the practice projection and `npc_lock` exposes the NPC identity.
+
+Fire removes the real highest occupied pylon once, including a genuinely purchased round, through the existing ammunition graph. All fallible launch scene/navigation work precedes mutation. Failed whole-save admission rolls back the account, combat, launcher and practice together. Speed 792, finite range 6000, muzzle 24, cooldown 60, native missile mesh and existing station/player/projectile/practice ordering remain. Celestial spheres and actual SH025 surfaces now participate in the same nearest-contact query. Station/celestial and older body kinds win equal-distance ties before an NPC surface; actual NPC identities break peer ties. No enclosing sphere stands in for an NPC collision mesh.
+
+Each step resolves missiles against the pre-NPC-movement scene. NPC movement and fire then advance that already damaged traffic candidate. A live NPC contact retains a distinct `NpcMissileHit` with the actual item, emission, projectile, victim, world/local ticks, native surface point, victim pose and struck facing. Standard missile damage is 16000 hundredths through that shield and then hull energy. A wreck remains a native blocker but cannot receive another live-hit receipt. Destroyed identities and lost cargo stay retained; there is no payment, bounty, mission result, loot, refill or respawn. Actual missile aggression informs the existing civilian threat response. A clean trader hit contributes only to the existing verified-incident/SH031-unavailable projection.
+
+Active T01/T04/T02 or held freight retains its existing protection. A stale, paused, foreign, dead, protected or behind-target command cannot spend a round or change the checked save. A new receipt cannot exceed 128 total NPC combat proofs. The complete prospective save must fit 65536 bytes before coupled publication. Proof is never truncated to make room. Root now uses the one combined journal/capacity hook: the prospective envelope includes retained missile scene growth even without a new hit, and no duplicate standalone validation publication runs.
+
+## Retained validation and honest limits
+
+Launch, final motion, target-loss and interception retain typed native scenes. Load checks real identities and scene membership, local/world clock bounds, planar native poses and reachability envelopes, phase/liveness, actual nearest native contact, exact item/origin/contact matching and one-to-one reciprocal damage. The NPC pools replay from generated fresh resources across all retained source fires, Pulse contacts and missile contacts, including exact capped recharge, heat/cooldown, shield absorption, hull damage and overkill. A separate scalar damage allowance cannot replace that chronology.
+
+A retained native scene is not a reconstruction of every historical NPC/player/homing movement input. Base 27b does not retain that complete input stream. Coherent rewriting of an entire historical scene and all related fields is not authenticated by a checksum. Historical player liveness must use the single shared player journal; this branch only adds the current live-player/same-berth refusal to its NPC segment checks. Do not claim complete trajectory provenance, arbitrary-save tamper resistance, public NPC gameplay or seven-population acceptance.
+
+The author proposes format 15 with explicit typed target/scene/receipt fields. Private draft 14 is refused, not migrated. The qualified version 4-11 and 13 readers keep their exact content boundaries and absent traffic. The v13 fixture uses its original field encoders instead of slicing a newer incompatible payload. Only the current-writer assertion changes; historical v13 assertions remain 13. Root chooses the final combined content boundary/profile/observer mapping.
+
+## Current Root composition
+
+Root has joined this packet with MC1 `159c576`, the real HUD/scanner/renderer/host and read-only observer. One NPC replay uses local/world/phase/sequence ordering, including actual NPC-to-player source fires and 16000 missile hits. The one player journal consumes all genuine retained missile impacts, with actual berth resets. `resource_clock` supplies the end state; there is no duplicate standalone completion clock. One receipt count includes actor beams, player hits and missile hits. Session/App and HUD use actual typed lock/arm/fire state; missing targets clear before publication. The final current writer/content boundary is private15; draft14 refuses and the explicit published4-11/13 readers stay unchanged. The implementation and all joined tests remain **UNRUN**, pending one whole review and owning qualification. The table below retains the source contracts used for the serial join.
+
+## Exact serial join with MC1
+
+Read MC1 frozen `159c5761573ea02d263d9a4f36585b321057ac4a`, tree `a0e6286af0423320c3d98e0d829005d8d5ea28e5`, packet SHA-256 `0790410a0628822febdd057ae2ce045ef2ee809c76514d9b5a354f9b23adf643`. This is an actual implementation, not an invitation to rebuild its journal. Root owns these shared hunks and retains current renderer/scanner/host/observer changes. Apply the exact author delta surgically; do not replace shared files wholesale.
+
+| Shared source | Required combined behavior |
+| --- | --- |
+| `flight.rs` and `flight/traffic.rs` | Prepare missiles first against the old actual traffic; pass `prepared.traffic` to MC1 traffic movement/fire, including early-return paths. Apply only newly retained NPC player hits to candidate pools once. Publish the final traffic candidate once, with markets and all other prepared state. Never overwrite missile damage with `self.traffic`. |
+| `traffic.rs` / persistence | Keep MC1 `player_hits`, real scenes and `resource_clock`. Add actual `missile_hits` and `incoming_missiles`. Use MC1 `resource_clock` for final replay, including death/berth freeze; the standalone `completed_clock` need not become a duplicate combined clock. Add receipt codec fields under the final new content boundary only. |
+| `traffic/player_hits.rs` resource replay | Extend the existing one NPC replay with distinct Fire/Pulse/Missile actions; include outgoing NPC-to-player fires. Sort by **local tick, world tick, phase, actual sequence**. A player command at local clock N must precede a missile at the next world tick but still local clock N; NPC recharge/movement/fire then occurs at N+1. Apply actual 16000 damage, not a forged Pulse. |
+| `traffic/missiles.rs` scene replay | Reuse that same combined resource chronology for `resources_at`; include MC1 outgoing `player_hits` fire costs. Step scenes are before movement/fire and exclude same-step later effects; Command scenes follow movement/fire and precede their own emission. Births occur after Step scenes, and same-tick completed traders were still solid before movement. Keep exact reciprocal projectile/receipt validation. |
+| `flight/damage.rs` | Keep MC1 nine-byte real Pulse-spend/berth events and ONE full player shield/energy replay. `player_resource_hits()` returns ALL real retained incoming missile impacts for this birth-to-current journal, including hits before later berths; actual berth events reset pools. `retained_player_missile_hits(practice, history, dock_sequence)` is only the old since-last-berth fallback. Do not filter old hits out of MC1's full journal or apply impacts twice. |
+| Missile validation | Preserve MC1 `beam_scene`, `nearest_beam_body`, `validate_npc_beam_scene` and genuine historical launch/end checks. Add typed NPC targets and launch dock lineage, native scene codecs/replay and `validate_npc_missile_receipts`. Keep all existing practice geometry and receipt predicates. |
+| Capacity | One shared count is old beams + actual `NpcPlayerHit` + actual `NpcMissileHit`, at most 128. Extend every producer/decode guard and `proof_grows_from` consistently. MC1 `check_step_combat_capacity` must also detect new missile launch/motion/loss/interception scene bytes even if its journal and NPC proof count are unchanged. Count all new fields in the complete 64 KiB envelope before any live debit/publication. Keep MC1 shared fire/capacity transaction rather than a second journal. |
+| Codec and host | Combine the new payload once; refuse draft 14 and retain 4-11/13. Join final save/profile/observer mapping and actual NPC lock/arm/fire commands through Session/App. Show the real NPC lock and effects from World snapshots, never renderer authority. |
+
+T02 remains ProtectedTraffic. MC1's actual NPC attacker never becomes an ordinary station incident or a synthetic practice beacon. Real police deployment and the other population gates remain unchanged.
+
+## Authored cases and execution preparation
+
+All twelve following cases are **UNRUN**, including their cold/restore checks. Public positive fixtures use actual new commanders, paid station ammunition, real launch/flight/pursuit, actual generated trader identity and ordinary commands. No positive installs NPCs, player poses, credits or inventory. Geometry/resource component cases are labelled as such; the capacity-negative fixture deliberately duplicates an actual receipt and is not called a loadable gameplay history.
+
+| Case | Required observation |
+| --- | --- |
+| Paid native contact/cold | Real purchased pylon item is spent once; the same actual projectile continues cold, hits native NPC and retains damage/custody without money. |
+| Seven finite rounds | Real born/paid seven-round limit can destroy the NPC through shield/hull, retaining manifest and identity without award/refill/respawn; dead lock refuses. |
+| Invalid commands | Stale/paused/foreign/behind requests preserve checked bytes and ammunition. |
+| Protected lesson | Actual consented T02 refuses NPC lock without beacon alias or state change. |
+| Reciprocal receipt corruption | Missing/duplicate receipt, changed facing, item or native victim pose refuses restore and preserves live bytes. |
+| Projectile/scene corruption | Changed contact/endpoint, missing motion scene, empty launch scene, forged berth lineage or current liveness refuses restore. |
+| Save version boundary | Public v13 remains absent-traffic and private draft 14 refuses with a correct checksum. |
+| Full proof refusal | A capacity-negative collection at 128 refuses another actual native contact before changing traffic. |
+| Native nearest surface | Real born actor meshes choose the nearest actor independently of vector order. |
+| Mixed damage arithmetic | Pulse and missiles hit their actual facing, then hull, with exact recharge and overkill; forged missile count refuses. |
+| Native scene codec | Stage, identities and exact native poses round-trip; missing/duplicate/tilted scene data refuses. |
+| Decoder/cap constants | Combined proof count includes missile hits, over-budget decode refuses, and 128/65536 limits remain exact. |
+
+Existing executor owners must compile this exact composed source, run the affected core suites and required checks, and preserve real failures without unchanged retries. Two additional whole-join criteria are mandatory: mixed missile/NPC-Pulse/player-Pulse/berth chronology agrees with the one journal across cold Continue, and a valid near-full composed save refuses the next growing scene/contact atomically. Root must exercise these actual combined criteria; standalone arithmetic or malformed-history cases do not prove them. Existing practice missile, ammunition custody, ordinary impact, traffic economics, T01/T04 and historical-reader assertions remain required.
+
+After one independent whole-source review and exact committed-source qualification, the existing platform owners qualify real rendered NPC locks, fire/contact/damage, destruction, ordinary pause/dock behavior and process-level Save/Quit/Continue. Source parsing and test declarations do not grant native, protected-merge, release or gameplay acceptance.

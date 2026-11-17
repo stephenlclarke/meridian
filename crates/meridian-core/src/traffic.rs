@@ -1,6 +1,8 @@
 //! Finite, deterministic local traffic. Only World owns this mutable actor/economy state.
 //! SH025 is the actual admitted hull; unadmitted populations receive no substitute body.
 mod combat;
+mod missiles;
+pub(crate) use missiles::{MissileScene, NpcMissileHit, SceneStage};
 mod economy;
 pub(crate) use economy::Flows;
 mod motion;
@@ -19,7 +21,7 @@ use std::sync::Arc;
 pub const MAX_TRAFFIC_ACTORS: usize = 4;
 pub const MAX_TRAFFIC_SHOTS: usize = 128;
 const CAPITAL: u32 = 120_000;
-pub(crate) const CONTENT_RULES:&[u8]=b"local-traffic-v1;SH025-trader-pirate;no-SH031-substitution;finite-capital120000;manifest-native1to12;local-birth480-pirate900;2systems2actors;maxshots128;pulse15-energy1-heat10-cool18;SH025-energy380-shield300;speed34.3-accel9.1-yaw.65;NPC-bank-and-player-custody-separate;historical-flow-world-ticks;waypoints-3500-2400x9000-0x9000-0x3500-doorMinus300;final-align;native-entry-before-after-receipt;no-respawn;npc-player-native-contact;exact-resource-events;source-resource-clock;";
+pub(crate) const CONTENT_RULES:&[u8]=b"local-traffic-v3;SH025-trader-pirate;no-SH031-substitution;finite-capital120000;manifest-native1to12;local-birth480-pirate900;2systems2actors;maxshots128;pulse15-energy1-heat10-cool18;SH025-energy380-shield300;speed34.3-accel9.1-yaw.65;NPC-bank-and-player-custody-separate;historical-flow-world-ticks;waypoints-3500-2400x9000-0x9000-0x3500-doorMinus300;final-align;native-entry-before-after-receipt;no-respawn;npc-player-native-contact;exact-resource-events;source-resource-clock;npc-missile-native16000;combined-128beam-player-missile-proof;one-player-resource-replay;step-missiles-before-npc;local-world-phase-sequence;";
 const INVALID: SaveError = SaveError::InvalidState("traffic identity, resources or finite custody");
 const SH025_ID: &str = "SH025";
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -203,6 +205,7 @@ struct Resources {
     cooldown: u8,
     shots: u16,
     incoming: u16,
+    incoming_missiles: u16,
     energy_regen: u64,
     front_regen: u64,
     rear_regen: u64,
@@ -321,6 +324,7 @@ pub(crate) struct State {
     actors: [Option<Actor>; MAX_TRAFFIC_ACTORS],
     shots: Arc<Vec<TrafficBeam>>,
     player_hits: Arc<Vec<NpcPlayerHit>>,
+    missile_hits: Arc<Vec<NpcMissileHit>>,
 }
 impl Default for State {
     fn default() -> Self {
@@ -331,6 +335,7 @@ impl Default for State {
             actors: [None; MAX_TRAFFIC_ACTORS],
             shots: Arc::new(Vec::new()),
             player_hits: Arc::new(Vec::new()),
+            missile_hits: Arc::new(Vec::new()),
         }
     }
 }
@@ -367,12 +372,23 @@ impl State {
                 .last()
                 .cloned()
                 .filter(|h| h.attacker.system == system),
-            verified_crimes: self.shots.iter().filter(|s| s.victim.serial == 1).count() as u16,
+            verified_crimes: (self.shots.iter().filter(|s| s.victim.serial == 1).count()
+                + self
+                    .missile_hits
+                    .iter()
+                    .filter(|h| h.victim.serial == 1)
+                    .count()) as u16,
             police_required_hull: self
                 .shots
                 .iter()
                 .any(|s| s.victim.serial == 1 && s.victim.system == system)
-                .then_some("SH031"),
+                .then_some("SH031")
+                .or_else(|| {
+                    self.missile_hits
+                        .iter()
+                        .any(|h| h.victim.serial == 1 && h.victim.system == system)
+                        .then_some("SH031")
+                }),
             populations: POPULATIONS,
         })
     }

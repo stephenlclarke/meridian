@@ -3,11 +3,19 @@ use super::geometry::{add, length, mesh_distance, pose, scale, sub, unit};
 use super::{
     Beam, Body, CombatIdentity, FlightMode, MISSILE_COOLDOWN_TICKS, MISSILE_LIFETIME_TICKS,
     MISSILE_MUZZLE_DISTANCE, MISSILE_RANGE, MISSILE_SPEED, MissileContact, MissileEnd,
-    MissileOrigin, MissileRound, Motion, PracticeBeaconId, ProjectileId, ProjectileSnapshot, State,
-    World, choose,
+    MissileOrigin, MissileRound, MissileTarget, Motion, PracticeBeaconId, ProjectileId,
+    ProjectileSnapshot, State, World, choose,
 };
 use crate::docking::{Basis3, RigidPose, Vec3};
-use crate::flight::practice::lifecycle::{lesson_for_target, lessons};
+use crate::flight::practice::lifecycle::{lesson_for_target as legacy_lesson_for_target, lessons};
+fn lesson_for_target(
+    p: Option<super::super::practice::Practice>,
+    h: &[super::super::practice::Practice],
+    t: MissileTarget,
+) -> Option<super::super::practice::Practice> {
+    t.practice()
+        .and_then(|id| legacy_lesson_for_target(p, h, id))
+}
 use crate::flight::{OrdinaryImpact, OrdinaryTarget, OrdinaryWeapon, PulseContact, PulseShot};
 use crate::navigation::SystemId;
 use crate::save::{Reader, SaveError, Writer};
@@ -53,7 +61,7 @@ impl ProjectileId {
     }
 }
 impl MissileOrigin {
-    pub(in crate::flight) fn encode(self, w: &mut Writer) {
+    pub(crate) fn encode(self, w: &mut Writer) {
         self.projectile.encode(w);
         w.u64(self.owner.owner);
         w.u64(self.owner.hull);
@@ -69,7 +77,7 @@ impl MissileOrigin {
         vector(w, self.muzzle);
         basis(w, self.orientation);
     }
-    pub(in crate::flight) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+    pub(crate) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         Ok(Self {
             projectile: ProjectileId::decode(r)?,
             owner: CombatIdentity {
@@ -108,6 +116,17 @@ fn contact(w: &mut Writer, c: MissileContact) {
             w.u8(3);
             id.encode(w);
         }
+        MissileContact::Npc(id) => {
+            w.u8(4);
+            id.encode(w);
+        }
+        MissileContact::Celestial(id) => {
+            w.u8(5);
+            w.u8(id.system.galaxy);
+            w.u16(id.system.system);
+            w.u64(id.visit);
+            w.u64(id.entity);
+        }
     }
 }
 fn read_contact(r: &mut Reader<'_>) -> Result<MissileContact, SaveError> {
@@ -119,6 +138,15 @@ fn read_contact(r: &mut Reader<'_>) -> Result<MissileContact, SaveError> {
         1 => MissileContact::Station,
         2 => MissileContact::Player { front: r.bool()? },
         3 => MissileContact::Projectile(ProjectileId::decode(r)?),
+        4 => MissileContact::Npc(crate::traffic::NpcId::decode(r)?),
+        5 => MissileContact::Celestial(crate::celestial::BodyId {
+            system: SystemId {
+                galaxy: r.u8()?,
+                system: r.u16()?,
+            },
+            visit: r.u64()?,
+            entity: r.u64()?,
+        }),
         _ => return Err(SaveError::InvalidEncoding),
     })
 }
@@ -143,9 +171,9 @@ fn read_end(r: &mut Reader<'_>) -> Result<MissileEnd, SaveError> {
         _ => return Err(SaveError::InvalidEncoding),
     })
 }
-fn projectile(w: &mut Writer, p: &ProjectileSnapshot) {
+fn projectile(w: &mut Writer, p: &ProjectileSnapshot, version: u16) {
     p.origin.encode(w);
-    p.target.encode(w);
+    write_target(w, p.target, version);
     vector(w, p.position);
     vector(w, p.direction);
     scalar(w, p.propulsion_travel);
@@ -156,10 +184,10 @@ fn projectile(w: &mut Writer, p: &ProjectileSnapshot) {
     w.u64(p.last_tick);
     w.option(p.intercepting_emission.as_ref(), |w, e| w.u64(*e));
 }
-fn read_projectile(r: &mut Reader<'_>) -> Result<ProjectileSnapshot, SaveError> {
+fn read_projectile(r: &mut Reader<'_>, version: u16) -> Result<ProjectileSnapshot, SaveError> {
     Ok(ProjectileSnapshot {
         origin: MissileOrigin::decode(r)?,
-        target: PracticeBeaconId::decode(r)?,
+        target: read_target(r, version)?,
         position: read_vector(r)?,
         direction: read_vector(r)?,
         propulsion_travel: number(r)?,
@@ -227,17 +255,19 @@ impl State {
             .collect()
     }
     pub(in crate::flight) fn encode(&self, w: &mut Writer) {
-        self.encode_version(w, 12);
+        self.encode_version(w, 15);
     }
     pub(in crate::flight) fn encode_version(&self, w: &mut Writer, version: u16) {
         if version >= 12 {
             w.u16(self.projectiles.len() as u16);
         }
         w.bool(self.armed);
-        w.option(self.lock.as_ref(), |w, id| id.encode(w));
+        w.option(self.lock.as_ref(), |w, id| write_target(w, *id, version));
         w.u8(self.cooldown);
         for i in 0..self.projectiles.len() {
-            w.option(self.projectiles[i].as_ref(), projectile);
+            w.option(self.projectiles[i].as_ref(), |w, p| {
+                projectile(w, p, version)
+            });
             w.option(self.motions[i].as_ref(), |w, m| {
                 vector(w, m.position);
                 scalar(w, m.travel);
@@ -253,6 +283,9 @@ impl State {
                         b.id.encode(w);
                         vector(w, b.position);
                     });
+                }
+                if version >= 15 {
+                    w.option(m.npc_scene.as_ref(), |w, s| s.encode(w));
                 }
             });
             w.option(self.impacts[i].as_ref(), |w, h| h.encode(w));
@@ -277,7 +310,13 @@ impl State {
                     id.encode(w);
                     scalar(w, distance);
                 }
+                if version >= 15 {
+                    w.option(b.npc_scene.as_ref(), |w, s| s.encode(w));
+                }
             });
+            if version >= 15 {
+                w.option(self.npc_launches[i].as_ref(), |w, e| e.encode(w));
+            }
         }
     }
     pub(in crate::flight) fn decode(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
@@ -291,7 +330,7 @@ impl State {
         }
         let mut state = Self {
             armed: r.bool()?,
-            lock: r.option(PracticeBeaconId::decode)?,
+            lock: r.option(|r| read_target(r, version))?,
             cooldown: r.u8()?,
             ..Self::default()
         };
@@ -299,8 +338,9 @@ impl State {
         state.motions.resize(count, None);
         state.impacts.resize(count, None);
         state.beams.resize(count, None);
+        state.npc_launches.resize(count, None);
         for i in 0..count {
-            state.projectiles[i] = r.option(read_projectile)?;
+            state.projectiles[i] = r.option(|r| read_projectile(r, version))?;
             state.motions[i] = r.option(|r| {
                 Ok(Motion {
                     position: read_vector(r)?,
@@ -310,6 +350,11 @@ impl State {
                     flight: super::super::persistence::read_flight(r)?,
                     player_alive: r.bool()?,
                     bodies: read_bodies(r, version, count)?,
+                    npc_scene: if version >= 15 {
+                        r.option(crate::traffic::MissileScene::decode)?
+                    } else {
+                        None
+                    },
                 })
             })?;
             state.impacts[i] = r.option(OrdinaryImpact::decode)?;
@@ -321,22 +366,32 @@ impl State {
                 let direction = read_vector(r)?;
                 let end = read_vector(r)?;
                 let bodies = read_bodies(r, version, count)?;
+                let shot = PulseShot {
+                    tick,
+                    fitted_item_id,
+                    origin,
+                    direction,
+                    end,
+                    contact: PulseContact::Projectile {
+                        id: ProjectileId::decode(r)?,
+                        distance: number(r)?,
+                    },
+                };
+                let npc_scene = if version >= 15 {
+                    r.option(crate::traffic::MissileScene::decode)?
+                } else {
+                    None
+                };
                 Ok(Beam {
                     bodies,
                     emission,
-                    shot: PulseShot {
-                        tick,
-                        fitted_item_id,
-                        origin,
-                        direction,
-                        end,
-                        contact: PulseContact::Projectile {
-                            id: ProjectileId::decode(r)?,
-                            distance: number(r)?,
-                        },
-                    },
+                    shot,
+                    npc_scene,
                 })
             })?;
+            if version >= 15 {
+                state.npc_launches[i] = r.option(super::npc::NpcLaunch::decode)?;
+            }
         }
         Ok(state)
     }
@@ -364,8 +419,7 @@ impl State {
     ) -> bool {
         self.projectiles.iter().flatten().any(|p| {
             matches!(p.contact, Some(MissileContact::Player { .. }))
-                && lesson_for_target(practice, history, p.target)
-                    .is_some_and(|p| !p.missile_docked_since_consent(dock_sequence))
+                && !self.docked_since(p, practice, history, dock_sequence)
         })
     }
     pub(in crate::flight) fn validate_ordinary(
@@ -425,6 +479,7 @@ impl State {
             || self.motions.len() != self.projectiles.len()
             || self.impacts.len() != self.projectiles.len()
             || self.beams.len() != self.projectiles.len()
+            || self.npc_launches.len() != self.projectiles.len()
             || self
                 .motions
                 .iter()
@@ -463,15 +518,35 @@ impl State {
                     || self.motions[i].is_some()
                     || self.impacts[i].is_some()
                     || self.beams[i].is_some()
+                    || self.npc_launches[i].is_some()
                 {
                     return Err(INVALID);
                 }
                 continue;
             };
+            if world.traffic.enabled()
+                && (self.motions[i]
+                    .as_ref()
+                    .is_some_and(|m| m.npc_scene.is_none())
+                    || self.beams[i]
+                        .as_ref()
+                        .is_some_and(|b| b.npc_scene.is_none()))
+            {
+                return Err(INVALID);
+            }
             let o = p.origin;
             Self::validate_projectile_identity(world, owner, p, o, i, used)?;
             Self::validate_launch_order(o, prior)?;
             prior = Some(o);
+            if let MissileTarget::Npc(id) = p.target {
+                self.validate_npc_projectile(world, p, i, id)?;
+                self.validate_contact_receipts(world, p, i)?;
+                self.validate_unique_receipts(i)?;
+                continue;
+            }
+            if self.npc_launches[i].is_some() {
+                return Err(INVALID);
+            }
             let lesson = lesson_for_target(practice, history, p.target).ok_or(INVALID)?;
             Self::validate_launch_context(world, owner, lesson, p)?;
             self.validate_motion(world, lesson, p, i)?;
@@ -498,10 +573,19 @@ impl State {
         {
             return Err(INVALID);
         }
-        if self
-            .lock
-            .is_some_and(|id| practice.and_then(|p| p.missile_target(id)).is_none())
-            || ((self.armed || self.lock.is_some()) && world.state.mode != FlightMode::Flight)
+        if self.lock.is_some_and(|id| match id {
+            MissileTarget::Practice(id) => practice.and_then(|p| p.missile_target(id)).is_none(),
+            MissileTarget::Npc(id) => world
+                .traffic
+                .missile_scene(
+                    id.system(),
+                    world.state.tick,
+                    crate::traffic::SceneStage::Command(world.combat.emissions),
+                )
+                .bodies
+                .iter()
+                .all(|b| b.id != id),
+        }) || ((self.armed || self.lock.is_some()) && world.state.mode != FlightMode::Flight)
         {
             return Err(INVALID);
         }
@@ -529,7 +613,8 @@ impl State {
                 })
             || o.owner.owner != owner.owner
             || o.owner.hull != owner.hull
-            || o.owner.system != SystemId::AVENOR
+            || (matches!(p.target, MissileTarget::Practice(_))
+                && o.owner.system != SystemId::AVENOR)
             || o.owner.visit < 2
             || o.owner.visit > owner.visit
             || (o.owner.visit == owner.visit && o.owner.system != owner.system)
@@ -593,7 +678,9 @@ impl State {
     ) -> Result<(), SaveError> {
         let o = p.origin;
         if !lesson.missile_owner_matches(o.owner)
-            || lesson.retained_missile_target(p.target).is_none()
+            || lesson
+                .retained_missile_target(p.target.practice().ok_or(INVALID)?)
+                .is_none()
             || !lesson.missile_provider_interval(
                 o.launched_tick,
                 o.launched_tick
@@ -603,7 +690,9 @@ impl State {
         {
             return Err(INVALID);
         }
-        let target = lesson.retained_missile_target(p.target).ok_or(INVALID)?;
+        let target = lesson
+            .retained_missile_target(p.target.practice().ok_or(INVALID)?)
+            .ok_or(INVALID)?;
         if sub(target.position, o.launch_position).dot(o.orientation.z) <= 0.0 {
             return Err(INVALID);
         }
@@ -638,7 +727,9 @@ impl State {
                 if p.last_tick != world.state.tick
                     || p.origin.owner != owner
                     || world.state.mode != FlightMode::Flight
-                    || lesson.missile_target(p.target).is_none()
+                    || lesson
+                        .missile_target(p.target.practice().ok_or(INVALID)?)
+                        .is_none()
                 {
                     return Err(INVALID);
                 }
@@ -663,7 +754,9 @@ impl State {
                 }
             }
             Some(MissileEnd::Impact) => {}
-            Some(MissileEnd::Intercepted) => self.validate_interception(world, lesson, p, i)?,
+            Some(MissileEnd::Intercepted) => {
+                self.validate_interception(world, Some(lesson), p, i)?
+            }
         }
 
         Ok(())
@@ -739,23 +832,10 @@ impl State {
         // Check the numeric result; loading never applies these effects to the World.
         let mut shields = [30_000_u16; 2];
         {
-            let mut hits: Vec<_> = self
-                .impacts
-                .iter()
-                .map(|hit| {
-                    hit.filter(|hit| {
-                        self.projectiles
-                            .iter()
-                            .flatten()
-                            .find(|p| p.origin.emission == hit.emission)
-                            .and_then(|p| lesson_for_target(practice, history, p.target))
-                            .is_some_and(|p| !p.missile_docked_since_consent(dock_sequence))
-                    })
-                })
-                .collect();
-            hits.sort_by_key(|h| h.map_or(u64::MAX, |h| h.incident));
+            let mut hits = self.retained_player_missile_hits(practice, history, dock_sequence);
+            hits.sort_by_key(|h| h.incident);
             let mut clock = 0;
-            for hit in hits.into_iter().flatten() {
+            for hit in hits {
                 if let OrdinaryTarget::Player { front } = hit.target {
                     if hit.physical_tick < clock {
                         return Err(INVALID);
@@ -808,8 +888,7 @@ impl State {
                 .iter()
                 .rev()
                 .find_map(|p| *p)
-                .and_then(|p| lesson_for_target(practice, history, p.target))
-                .is_some_and(|p| p.missile_docked_since_consent(dock_sequence))
+                .is_some_and(|p| self.docked_since(p, practice, history, dock_sequence))
         {
             0
         } else {
@@ -903,7 +982,9 @@ impl State {
         }
         let m = self.motions[i].as_ref().ok_or(INVALID)?;
         self.validate_motion_record(world, lesson, p, i, m, motion_tick)?;
-        let target = lesson.retained_missile_target(p.target).ok_or(INVALID)?;
+        let target = lesson
+            .retained_missile_target(p.target.practice().ok_or(INVALID)?)
+            .ok_or(INVALID)?;
         let direction = unit(sub(target.position, m.position)).ok_or(INVALID)?;
         if direction != p.direction {
             return Err(INVALID);
@@ -960,6 +1041,19 @@ impl State {
                 },
             );
         }
+        if let Some(scene) = &m.npc_scene {
+            if scene.world_tick != m.flight.tick
+                || scene.stage != crate::traffic::SceneStage::Step(i as u8)
+                || scene.system != p.origin.owner.system
+            {
+                return Err(INVALID);
+            }
+            world
+                .traffic
+                .validate_missile_scene(scene, world.state.tick, data)?;
+            super::npc::choose_scene(world, &p, scene, ray, travel, &mut best)
+                .map_err(|_| INVALID)?;
+        }
         let used = best.map_or(travel, |(d, _)| d);
         if p.position != add(m.position, scale(direction, used))
             || p.propulsion_travel != m.travel + used
@@ -998,7 +1092,11 @@ impl State {
         Ok(())
     }
 
-    fn validate_newborn_motion(&self, p: ProjectileSnapshot, i: usize) -> Result<(), SaveError> {
+    pub(super) fn validate_newborn_motion(
+        &self,
+        p: ProjectileSnapshot,
+        i: usize,
+    ) -> Result<(), SaveError> {
         let o = p.origin;
         if self.motions[i].is_some()
             || p.position != o.muzzle
@@ -1075,7 +1173,7 @@ impl State {
         })
     }
 
-    fn validate_motion_bodies(
+    pub(super) fn validate_motion_bodies(
         &self,
         p: ProjectileSnapshot,
         i: usize,
@@ -1134,10 +1232,10 @@ impl State {
         Ok(())
     }
 
-    fn validate_interception(
+    pub(super) fn validate_interception(
         &self,
         world: &World,
-        lesson: super::super::practice::Practice,
+        lesson: Option<super::super::practice::Practice>,
         p: ProjectileSnapshot,
         i: usize,
     ) -> Result<(), SaveError> {
@@ -1200,9 +1298,28 @@ impl State {
                     super::super::PULSE_RANGE,
                 )
                 .map_err(|_| INVALID)?;
+            if let Some(scene) = &b.npc_scene {
+                if scene.world_tick != shot.tick
+                    || scene.system != p.origin.owner.system
+                    || scene.stage != crate::traffic::SceneStage::Command(emission - 1)
+                {
+                    return Err(INVALID);
+                }
+                world.traffic.validate_missile_scene(
+                    scene,
+                    world.state.tick,
+                    world.station_data.as_ref().ok_or(INVALID)?,
+                )?;
+                let mut blocker = None;
+                super::npc::choose_scene(world, &p, scene, ray, d, &mut blocker)
+                    .map_err(|_| INVALID)?;
+                if blocker.is_some() {
+                    return Err(INVALID);
+                }
+            }
             if station.is_some_and(|s| s <= d)
                 || lesson
-                    .retained_missile_contact(ray, d, station)
+                    .and_then(|lesson| lesson.retained_missile_contact(ray, d, station))
                     .is_some_and(|(_, s)| s <= d)
             {
                 return Err(INVALID);
@@ -1327,4 +1444,48 @@ fn read_bodies(
             })
         })
         .collect()
+}
+
+fn write_target(w: &mut Writer, target: MissileTarget, version: u16) {
+    match target {
+        MissileTarget::Practice(id) => {
+            if version >= 15 {
+                w.u8(0);
+            }
+            id.encode(w);
+        }
+        MissileTarget::Npc(id) => {
+            w.u8(1);
+            id.encode(w);
+        }
+    }
+}
+fn read_target(r: &mut Reader<'_>, version: u16) -> Result<MissileTarget, SaveError> {
+    if version < 15 {
+        return Ok(MissileTarget::Practice(PracticeBeaconId::decode(r)?));
+    }
+    match r.u8()? {
+        0 => Ok(MissileTarget::Practice(PracticeBeaconId::decode(r)?)),
+        1 => Ok(MissileTarget::Npc(crate::traffic::NpcId::decode(r)?)),
+        _ => Err(INVALID),
+    }
+}
+impl State {
+    pub(super) fn docked_since(
+        &self,
+        p: ProjectileSnapshot,
+        practice: Option<super::super::practice::Practice>,
+        history: &[super::super::practice::Practice],
+        sequence: u64,
+    ) -> bool {
+        match p.target {
+            MissileTarget::Practice(_) => lesson_for_target(practice, history, p.target)
+                .is_some_and(|l| l.missile_docked_since_consent(sequence)),
+            MissileTarget::Npc(_) => self
+                .npc_launches
+                .get(usize::from(p.origin.projectile.ordinal))
+                .and_then(|e| e.as_ref())
+                .is_some_and(|e| sequence > e.dock_sequence),
+        }
+    }
 }

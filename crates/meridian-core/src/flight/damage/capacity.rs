@@ -8,7 +8,6 @@ fn size(encode: impl FnOnce(&mut Writer)) -> usize {
     encode(&mut w);
     w.bytes.len()
 }
-#[allow(clippy::too_many_arguments)]
 fn parts(
     traffic: &traffic::State,
     damage: &State,
@@ -31,7 +30,6 @@ fn parts(
     })
 }
 impl World {
-    #[allow(clippy::too_many_arguments)]
     pub(in crate::flight) fn check_fire_combat_capacity(
         &self,
         traffic: &traffic::State,
@@ -79,9 +77,11 @@ impl World {
             .map_or((&self.traffic, self.station_markets.as_ref()), |(t, m)| {
                 (t, Some(m))
             });
-        // Resource recharge and fixed-width motion do not grow saves. Only inspect the whole
-        // envelope when an event, retained beam, actor birth or physical berth can add bytes.
-        if *damage == self.damage && !traffic.proof_grows_from(&self.traffic) {
+        // Retained missile motion/loss/interception scenes can grow without another hit.
+        // Compare their encoded size as well as domain events before skipping the envelope.
+        let missile_growth =
+            size(|w| prepared.missiles.encode(w)) > size(|w| self.missiles.encode(w));
+        if *damage == self.damage && !traffic.proof_grows_from(&self.traffic) && !missile_growth {
             return Ok(());
         }
         let old = parts(
