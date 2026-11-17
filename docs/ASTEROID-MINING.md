@@ -1,5 +1,7 @@
 # Paid asteroid work and pending ore
 
+The asteroid ray checks the signed distance at the end of its finite range on the selected native face. An exact endpoint hit remains eligible and the next representable shorter range refuses. The corrected implementation awaits owning validation.
+
 This is development source against NPC candidate `bd506f9`, with **15 authored Rust tests UNRUN**. No compiler, game, helper executable or native qualification was run by this author. The source replaces the old `0add15f` direct-cargo simplification with the original partial-damage and terminal-pending-ore model. It is not a mining preview or acceptance of physical collection, market sale, original field placement or full 1337 parity.
 
 ## Original mechanics and authored field

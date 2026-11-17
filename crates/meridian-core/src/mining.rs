@@ -366,12 +366,10 @@ impl State {
                 ASTEROID_FACES
                     .into_iter()
                     .filter_map(|face| {
-                        crate::station::beam::triangle_distance(
+                        crate::station::beam::asteroid_triangle_distance(
                             origin,
                             direction,
-                            body.vertices[face[0]],
-                            body.vertices[face[1]],
-                            body.vertices[face[2]],
+                            face.map(|index| body.vertices[index]),
                             range,
                         )
                     })

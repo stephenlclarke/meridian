@@ -82,6 +82,7 @@ fn actual_paid_beam_burst_retains_ready_energy_deficit_exact_heat_and_cold_state
         OrdinaryWeapon::FrontBeamLaser
     );
     launch(&mut world);
+    crate::flight::missiles::tests::stop(&mut world);
     aim_at(&mut world, crate::docking::Vec3::new(0.0, 20000.0, 20000.0));
     for (index, expected) in [(37900, 50, 6), (37842, 94, 6), (37784, 138, 6)]
         .into_iter()

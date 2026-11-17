@@ -563,7 +563,7 @@ impl World {
         Ok(candidate)
     }
 
-    fn validate_practice_incidents(
+    pub(super) fn validate_practice_incidents(
         &self,
         practice: Option<practice::Practice>,
         history: &[practice::Practice],
@@ -671,18 +671,18 @@ impl World {
         self.missiles
             .validate(self, practice, history, nav.dock_sequence)?;
         self.combat.validate(self)?;
-        self.validate_practice_incidents(practice, history)?;
-        if self.damage.enabled() {
-            // The shared replay already required exact shields, energy, heat and cadence.
-        } else if self
-            .missiles
-            .has_undocked_player_hit(practice, history, nav.dock_sequence)
-        {
-            self.pulse
-                .validate_damaged_save(self.state.tick, self.state.mode, nav.launches)?;
-        } else {
-            self.pulse
-                .validate_save(self.state.tick, self.state.mode, nav.launches)?;
+        if !self.damage.enabled() {
+            self.validate_practice_incidents(practice, history)?;
+            if self
+                .missiles
+                .has_undocked_player_hit(practice, history, nav.dock_sequence)
+            {
+                self.pulse
+                    .validate_damaged_save(self.state.tick, self.state.mode, nav.launches)?;
+            } else {
+                self.pulse
+                    .validate_save(self.state.tick, self.state.mode, nav.launches)?;
+            }
         }
         session.validate_save(navigation.dock())?;
         let domain = account.validate_saved_domain(&session.state, nav, session.epoch())?;
@@ -1054,6 +1054,7 @@ pub(super) fn pulse_save_start(world: &World, bytes: &[u8]) -> usize {
     let mut extension = Writer::new();
     world.traffic.encode(&mut extension);
     world.damage.encode(&mut extension);
+    world.mining.encode(&mut extension);
     let extension_end = bytes.len() - 8;
     let extension_start = extension_end - extension.bytes.len();
     assert_eq!(

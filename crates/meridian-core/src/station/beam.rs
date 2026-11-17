@@ -152,6 +152,54 @@ pub(crate) fn triangle_distance(
     (distance.is_finite() && (0.0..=limit).contains(&distance)).then_some(distance)
 }
 
+/// An asteroid ray includes the exact endpoint of its finite range. Adjacent faces can
+/// round the same boundary hit differently when measured from a distant ray origin.
+pub(crate) fn asteroid_triangle_distance(
+    origin: Vec3,
+    direction: Vec3,
+    face: [Vec3; 3],
+    range: f64,
+) -> Option<f64> {
+    let [a, b, c] = face;
+    let distance = triangle_distance(origin, direction, a, b, c, f64::MAX)?;
+    let endpoint = add(origin, scale(direction, range));
+    let anchor = face.into_iter().min_by(|a, b| {
+        let a = sub(*a, endpoint);
+        let b = sub(*b, endpoint);
+        a.dot(a).total_cmp(&b.dot(b))
+    })?;
+    let offset = Vec3::new(
+        endpoint_offset(origin.x, direction.x, range, anchor.x),
+        endpoint_offset(origin.y, direction.y, range, anchor.y),
+        endpoint_offset(origin.z, direction.z, range, anchor.z),
+    );
+    let normal = cross(sub(b, a), sub(c, a));
+    let remaining = offset.dot(normal) / direction.dot(normal);
+    if !remaining.is_finite() || remaining < 0.0 {
+        return None;
+    }
+    // The signed plane test determines admission. Only near that endpoint do we
+    // replace the existing origin-based distance with the endpoint-local calculation.
+    let roundoff = 8.0 * f64::EPSILON * distance.max(range);
+    let corrected = if remaining <= roundoff || distance > range {
+        range - remaining
+    } else {
+        distance
+    };
+    (0.0..=range).contains(&corrected).then_some(corrected)
+}
+
+// Preserve the low bits of origin + direction*range before subtracting the nearby vertex.
+// A ray short of the vertex can otherwise round its world-space endpoint onto that vertex.
+fn endpoint_offset(origin: f64, direction: f64, range: f64, vertex: f64) -> f64 {
+    let travel = direction * range;
+    let endpoint = origin + travel;
+    let added = endpoint - origin;
+    let addition_error = (origin - (endpoint - added)) + (travel - added);
+    let product_error = direction.mul_add(range, -travel);
+    (endpoint - vertex) + (addition_error + product_error)
+}
+
 impl OriginalStationData {
     pub(crate) fn player_beam_distance(
         &self,

@@ -879,6 +879,7 @@ impl State {
         dock_sequence: u64,
     ) -> Result<(), SaveError> {
         if world.damage.enabled() {
+            world.validate_practice_incidents(practice, history)?;
             return world.damage.validate_resources(world, dock_sequence);
         }
         // The only admitted shield damage has all of its bounded missile receipts retained.

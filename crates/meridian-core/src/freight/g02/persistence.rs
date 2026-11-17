@@ -246,9 +246,7 @@ impl CommanderAccount {
                     || item.is_some_and(|item| {
                         item.id != nav.owner + 3 + i as u64
                             || (item.fitted_hull != Some(nav.hull)
-                                && !(i == 4
-                                    && self.data.modular_revision > 0
-                                    && item.fitted_hull.is_none()))
+                                && !self.data.allows_stored_starter(i, item))
                     })
             })
         {

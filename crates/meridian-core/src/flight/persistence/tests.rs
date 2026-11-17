@@ -736,19 +736,11 @@ fn another_real_public_branch_cannot_supply_a_practice_incident_this_world_never
 
 #[test]
 fn qualified_v15_opening_layout_keeps_real_birth_provenance_and_accepts_a_real_new_discharge() {
-    // Opening codec fixture only. At actual tick zero there are no module events or traffic
-    // shots, so the qualified15 body is byte-identical; only its frozen header differs.
+    // At opening there are no module events or traffic shots. Use the exact
+    // prior header and omit the appended mining state from the current body.
     let world = World::new_commander(15001).unwrap();
-    let current = world.save_bytes().unwrap();
-    let body = 10 + CONTENT.len() + 8;
-    let mut legacy = Writer::new();
-    legacy.bytes.extend(MAGIC);
-    legacy.u16(15);
-    legacy.bytes.extend(V15_CONTENT);
-    legacy.u64(compiled_content_fingerprint(V15_CONTENT));
-    legacy.bytes.extend(&current[body..current.len() - 8]);
-    legacy.u64(checksum(&legacy.bytes));
-    let mut loaded = World::from_save_bytes(&legacy.bytes).unwrap();
+    let legacy = v15_test_fixture(&world).unwrap();
+    let mut loaded = World::from_save_bytes(&legacy).unwrap();
     assert_eq!(loaded.snapshot(), world.snapshot());
     assert_eq!(
         loaded.modular_equipment_snapshot(),
