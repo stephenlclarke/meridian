@@ -28,6 +28,27 @@ fn encode_current(world: &World) -> Vec<u8> {
     bytes
 }
 
+fn assert_one_continue_apart(before: &[u8], after: &[u8]) {
+    // In the current encoding of this fixed fixture, these two freight counters
+    // precede the rest of the session record. Firing leaves the preceding fields'
+    // encoded lengths unchanged. Continue advances both and reseals the checksum.
+    const EPOCH: usize = 1701;
+    const REVIEW_SEQUENCE: usize = EPOCH + 8;
+    const SESSION_BODY: usize = REVIEW_SEQUENCE + 8;
+    assert_eq!(before.len(), after.len());
+    assert_eq!(&before[..EPOCH], &after[..EPOCH]);
+    for offset in [EPOCH, REVIEW_SEQUENCE] {
+        let previous = u64::from_le_bytes(ok(before[offset..offset + 8].try_into()));
+        let current = u64::from_le_bytes(ok(after[offset..offset + 8].try_into()));
+        assert_eq!(Some(current), previous.checked_add(1));
+    }
+    let checksum = before.len() - 8;
+    assert_eq!(
+        &before[SESSION_BODY..checksum],
+        &after[SESSION_BODY..checksum]
+    );
+}
+
 fn assert_same_projection(opening: &World, continued: &World) {
     assert_eq!(continued.snapshot(), opening.snapshot());
     assert_eq!(continued.mission_snapshot(), opening.mission_snapshot());
@@ -179,15 +200,16 @@ fn qualified_airborne_v15_retains_paid_npc_impacts_and_admits_next_selected_disc
     // Exercise the new writer before any post-load command as well as after firing.
     let mut upgraded = ok(World::from_save_bytes(&before));
     assert_same_projection(&legacy, &upgraded);
-    assert_eq!(encode_current(&upgraded), before);
+    assert_one_continue_apart(&before, &encode_current(&upgraded));
 
     let retained_projectiles: Vec<_> = legacy.missile_projectiles().collect();
     let retained_incoming = some(legacy.traffic_snapshot()).last_player_hit;
     let retained_ammunition = legacy.ammunition_snapshot();
     let mut shot_from_legacy = None;
     for world in [&mut legacy, &mut upgraded] {
+        let paused = encode_current(world);
         assert_eq!(world.request_fire_front_laser(TICK), Err(FireError::Paused));
-        assert_eq!(encode_current(world), before);
+        assert_eq!(encode_current(world), paused);
         ok(world.request_pause(false, TICK));
         let shot = ok(world.request_fire_front_laser(TICK));
         assert_eq!((shot.tick, shot.fitted_item_id), (TICK, PULSE));
@@ -224,8 +246,8 @@ fn qualified_airborne_v15_retains_paid_npc_impacts_and_admits_next_selected_disc
         assert_eq!(encode_current(world), after);
         let cold = ok(World::from_save_bytes(&after));
         assert_same_projection(world, &cold);
-        assert_eq!(encode_current(&cold), after);
+        assert_one_continue_apart(&after, &encode_current(&cold));
     }
     assert_same_projection(&legacy, &upgraded);
-    assert_eq!(encode_current(&legacy), encode_current(&upgraded));
+    assert_one_continue_apart(&encode_current(&legacy), &encode_current(&upgraded));
 }
