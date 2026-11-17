@@ -8,7 +8,6 @@ Author `6c9fcb1` changes actual identity-map lifetime: a private consuming owner
 
 This correction does not change the three operation-refused paths. Their missing inner-body/callsite and work-by-stage evidence remains the exact blocker. No diagnostic-only or unchanged original rerun, threshold/cap waiver, candidate mesh, new hull or 1337 visual/mechanics acceptance follows. Full fleet baseline remains 23 of 162 ships plus four of six stations, with all 171 expanded fleet acceptances open.
 
-
 ## Joint section return-type correction
 
 Root `3313f17` passed its owning all-target check, all 44 Rust tests and nine host tests. The unchanged strict overlap control passed with 106146 reference operations versus 105378 candidate operations; this does not reconstruct the earlier failed pair. Strict Clippy then stopped on one complex tuple return type in `sections.rs`; dev build and the original-five batch remained unrun.
