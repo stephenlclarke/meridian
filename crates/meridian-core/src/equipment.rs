@@ -59,6 +59,8 @@ pub struct OwnedCargoBay {
     pub fitted: bool,
     pub paid_tenths: u32,
     pub purchase_site: MarketSite,
+    /// True for an explicit secret grant, never a paid purchase. Site is its acquisition berth.
+    pub xyzzy: bool,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Snapshot {
@@ -94,6 +96,7 @@ struct Receipt {
     account_revision: u64,
     site: MarketSite,
     paid: u32,
+    xyzzy: bool,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub(crate) struct State {
@@ -102,6 +105,52 @@ pub(crate) struct State {
     fitted: bool,
 }
 impl State {
+    pub(crate) fn is_xyzzy(self) -> bool {
+        self.purchase.is_some_and(|p| p.xyzzy)
+    }
+    pub(crate) fn xyzzy_acquisition_revision(self) -> Option<u64> {
+        self.purchase
+            .filter(|p| p.xyzzy)
+            .map(|p| p.account_revision)
+    }
+    pub(crate) fn grant_xyzzy(
+        self,
+        owner: u64,
+        hull: u64,
+        revision: u64,
+        site: MarketSite,
+    ) -> Result<Self, Error> {
+        self.validate(owner, hull, revision)?;
+        if let Some(item) = self.owned() {
+            if item.fitted {
+                return Ok(self);
+            }
+            return self
+                .prepare(
+                    owner,
+                    hull,
+                    revision,
+                    0,
+                    site,
+                    Command::FitCargoBay(item.id),
+                )
+                .map(|(s, _)| s);
+        }
+        Ok(Self {
+            revision: 1,
+            fitted: true,
+            purchase: Some(Receipt {
+                item: ItemId { owner, serial: 1 },
+                owner,
+                hull,
+                transaction: 1,
+                account_revision: revision.checked_add(1).ok_or(Error::SequenceExhausted)?,
+                site,
+                paid: 0,
+                xyzzy: true,
+            }),
+        })
+    }
     pub(crate) fn revision(self) -> u64 {
         self.revision
     }
@@ -133,6 +182,7 @@ impl State {
             fitted: self.fitted,
             paid_tenths: p.paid,
             purchase_site: p.site,
+            xyzzy: p.xyzzy,
         })
     }
     pub(crate) fn validate(
@@ -155,7 +205,7 @@ impl State {
             || p.transaction != 1
             || p.account_revision == 0
             || p.account_revision > account_revision
-            || p.paid != declared.price_tenths
+            || p.paid != if p.xyzzy { 0 } else { declared.price_tenths }
             || !declared.offer(p.site).purchase_available
             || self.revision == 0
             || self.fitted != (self.revision % 2 == 1)
@@ -204,6 +254,7 @@ impl State {
                         .ok_or(Error::SequenceExhausted)?,
                     site,
                     paid: declared.price_tenths,
+                    xyzzy: false,
                 });
                 next.fitted = true;
                 Event::Purchased {
@@ -240,7 +291,7 @@ impl State {
         }
         Ok(())
     }
-    pub(crate) fn encode(self, w: &mut Writer) {
+    pub(crate) fn encode(self, w: &mut Writer, version: u16) {
         w.u64(self.revision);
         w.option(self.purchase.as_ref(), |w, p| {
             w.u64(p.item.owner);
@@ -251,10 +302,13 @@ impl State {
             w.u64(p.account_revision);
             w.u16(p.site.system());
             w.u32(p.paid);
+            if version >= 16 {
+                w.bool(p.xyzzy);
+            }
         });
         w.bool(self.fitted);
     }
-    pub(crate) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+    pub(crate) fn decode(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
         Ok(Self {
             revision: r.u64()?,
             purchase: r.option(|r| {
@@ -274,6 +328,7 @@ impl State {
                         _ => return Err(SaveError::InvalidEncoding),
                     },
                     paid: r.u32()?,
+                    xyzzy: version >= 16 && r.bool()?,
                 })
             })?,
             fitted: r.bool()?,
@@ -284,6 +339,25 @@ impl State {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn secret_cargo_receipt_stays_distinct_from_paid_receipt() {
+        // Lower-level receipt fixture only; actual activation/journal admission is covered in World tests.
+        let mut grant = State::default()
+            .grant_xyzzy(21, 22, 1, MarketSite::Avenor)
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(grant.paid(), 0);
+        assert!(grant.owned().is_some_and(|i| i.xyzzy));
+        assert_eq!(grant.validate(21, 22, 2), Ok(()));
+        if let Some(p) = &mut grant.purchase {
+            p.xyzzy = false;
+        }
+        assert_eq!(grant.validate(21, 22, 2), Err(Error::InvalidState));
+        if let Some(p) = &mut grant.purchase {
+            p.xyzzy = true;
+            p.paid = 28000;
+        }
+        assert_eq!(grant.validate(21, 22, 2), Err(Error::InvalidState));
+    }
     #[test]
     fn authentic_paid_state_keeps_hull_identity_and_usage_through_reversible_fit() {
         let (paid, event) = State::default()

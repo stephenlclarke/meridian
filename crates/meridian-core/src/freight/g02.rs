@@ -218,6 +218,8 @@ struct AccountData {
     equipment: crate::equipment::State,
     ammunition_revision: u64,
     modular_revision: u64,
+    xyzzy_active: bool,
+    xyzzy_unlimited_fuel: bool,
 }
 
 impl AccountData {
@@ -263,6 +265,8 @@ impl CommanderAccount {
                 equipment: crate::equipment::State::default(),
                 ammunition_revision: 0,
                 modular_revision: 0,
+                xyzzy_active: false,
+                xyzzy_unlimited_fuel: false,
                 fit: Some(StarterFit {
                     owner: ids.owner,
                     hull: ids.hull,
@@ -370,6 +374,48 @@ impl CommanderAccount {
             .ammunition_revision
             .checked_add(1)
             .ok_or(Error::SequenceExhausted)?;
+        Ok(Self { data })
+    }
+    pub(crate) fn xyzzy_flags(&self) -> (bool, bool) {
+        (self.data.xyzzy_active, self.data.xyzzy_unlimited_fuel)
+    }
+    pub(crate) fn prepare_xyzzy(
+        &self,
+        first: bool,
+        refill: bool,
+        unlimited_fuel: bool,
+    ) -> Result<Self, Error> {
+        let mut data = self.data;
+        data.revision = data
+            .revision
+            .checked_add(1)
+            .ok_or(Error::SequenceExhausted)?;
+        if first {
+            data.credits = crate::flight::STARTING_CREDITS_TENTHS;
+        }
+        if refill {
+            data.fuel_tenths = crate::navigation::FUEL_CAPACITY;
+        }
+        data.xyzzy_active = true;
+        data.xyzzy_unlimited_fuel = unlimited_fuel;
+        Ok(Self { data })
+    }
+    pub(crate) fn grant_xyzzy_cargo_bay(&self, site: services::MarketSite) -> Result<Self, Error> {
+        if !self.data.xyzzy_active {
+            return Err(Error::InvalidFit);
+        }
+        let mut data = self.data;
+        let next = data
+            .equipment
+            .grant_xyzzy(data.owner, data.hull, data.revision, site)
+            .map_err(|_| Error::InvalidFit)?;
+        if next != data.equipment {
+            data.revision = data
+                .revision
+                .checked_add(1)
+                .ok_or(Error::SequenceExhausted)?;
+            data.equipment = next;
+        }
         Ok(Self { data })
     }
     pub(crate) fn credits_tenths(&self) -> u32 {
@@ -568,7 +614,10 @@ impl CommanderAccount {
             .revision
             .checked_add(1)
             .ok_or(Error::SequenceExhausted)?;
-        self.data.fuel_tenths = fuel;
+        // Explicit XYZZY supply preserves owned tank fuel. Navigation still records real debit.
+        if !self.data.xyzzy_unlimited_fuel {
+            self.data.fuel_tenths = fuel;
+        }
         self.data.revision = revision;
         Ok(())
     }
@@ -1221,7 +1270,10 @@ fn validate_cargo_and_utility(
         .equipment
         .validate(account.owner, account.hull, account.revision)
         .map_err(|_| Error::InvalidFit)?;
-    if account.fuel_tenths > 130 {
+    if (account.xyzzy_unlimited_fuel && !account.xyzzy_active)
+        || (account.equipment.is_xyzzy() && !account.xyzzy_active)
+        || account.fuel_tenths > 130
+    {
         return Err(Error::InvalidFit);
     }
     if !services::valid_native_quantities(account.other_commodities, account.reserved_commodities)

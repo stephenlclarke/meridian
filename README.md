@@ -96,3 +96,7 @@ These are the source-grounded M2 and M3 boundaries; completed entries below desc
 | Not yet implemented or accepted | EMP, positive salvage and bounty/legal consequences; remaining equipment and population gameplay acceptance. | Rust crew/passenger/rescue, investigation and Wayfarer family journeys, then their individual consent/failure/reward/cold-Continue acceptance. All 64 expanded runtime acceptances remain open. |
 
 Fleet construction is a separate M4 lane. Its current changed original-five run returned no candidate meshes; no new hull admission follows from focused tests. Original mesh/material/colour fidelity and 1337 visual/mechanics parity remain requirements across these milestones. See the [source-grounded roadmap](docs/LEGACY-MILESTONES.md).
+
+## XYZZY core author packet (unqualified)
+
+The [explicit XYZZY core](docs/XYZZY.md) adds Commander CLARKE, once-only finite cash, current supported hardware with secret provenance, and accounted unlimited fuel on exact e1cc86b. Twenty new Rust cases are authored and unrun; host HELP/XYZZY composition, independent review and compiler/native execution remain required before preview delivery. The [36-action inventory](docs/XYZZY-ACTIONS.json) records actual coverage and missing owners; full legacy parity is incomplete.

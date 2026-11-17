@@ -291,6 +291,7 @@ fn source_canonical_repeatable_mining_node_refuses_sixth_owned_example() {
         ledger
             .apply(
                 Event {
+                    xyzzy: false,
                     action: ModuleAction::PurchaseMiningLaser,
                     item: 110000 + u64::from(transaction),
                     dock,
@@ -306,6 +307,7 @@ fn source_canonical_repeatable_mining_node_refuses_sixth_owned_example() {
     assert_eq!(
         ledger.apply(
             Event {
+                xyzzy: false,
                 action: ModuleAction::PurchaseMiningLaser,
                 item: 110006,
                 dock,
@@ -475,6 +477,7 @@ fn repeatable_beam_and_military_policy_counts_stored_examples_toward_the_four_it
             ledger
                 .apply(
                     Event {
+                        xyzzy: false,
                         action: ModuleAction::Purchase { kind },
                         item: u64::from(transaction),
                         dock,
@@ -488,6 +491,7 @@ fn repeatable_beam_and_military_policy_counts_stored_examples_toward_the_four_it
                 ledger
                     .apply(
                         Event {
+                            xyzzy: false,
                             action: ModuleAction::Store { item: 1 },
                             item: 1,
                             dock,
@@ -504,6 +508,7 @@ fn repeatable_beam_and_military_policy_counts_stored_examples_toward_the_four_it
         assert_eq!(
             ledger.apply(
                 Event {
+                    xyzzy: false,
                     action: ModuleAction::Purchase { kind },
                     item: 5,
                     dock,

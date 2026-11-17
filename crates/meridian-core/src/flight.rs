@@ -1,6 +1,9 @@
 mod celestial;
 mod damage;
 mod mining;
+mod xyzzy;
+pub(crate) use xyzzy::STARTING_CREDITS_TENTHS;
+pub use xyzzy::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
 mod navigation_trade;
 mod traffic;
 pub use navigation_trade::{
@@ -170,6 +173,7 @@ pub struct World {
     missiles: missiles::State,
     ammunition: ammunition::State,
     modular: modular::State,
+    xyzzy: xyzzy::State,
     navigation_trade: navigation_trade::State,
     flight_reception: flight_reception::State,
     practice: Option<practice::Practice>,
@@ -212,6 +216,7 @@ impl World {
             missiles: missiles::State::default(),
             ammunition: ammunition::State::default(),
             modular: modular::State::default(),
+            xyzzy: xyzzy::State::default(),
             navigation_trade: navigation_trade::State::default(),
             flight_reception: flight_reception::State::default(),
             practice: None,
