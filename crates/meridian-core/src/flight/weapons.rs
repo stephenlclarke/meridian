@@ -25,6 +25,7 @@ pub enum FireError {
     Overheated,
     InsufficientEnergy,
     InvalidGeometry,
+    ProtectedTraffic,
     SequenceExhausted,
 }
 impl fmt::Display for FireError {
@@ -40,6 +41,7 @@ impl fmt::Display for FireError {
             Self::Overheated => "Pulse Laser is overheated",
             Self::InsufficientEnergy => "Pulse Laser has insufficient energy",
             Self::SequenceExhausted => "Combat identity sequence exhausted",
+            Self::ProtectedTraffic => "NPC firing is outside the active lesson admission",
             Self::InvalidGeometry => "Pulse Laser could not query the physical scene",
         })
     }
@@ -48,6 +50,10 @@ impl std::error::Error for FireError {}
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum PulseContact {
+    Npc {
+        id: crate::traffic::NpcId,
+        distance: f64,
+    },
     Projectile {
         id: super::ProjectileId,
         distance: f64,
@@ -304,14 +310,18 @@ impl World {
             .ok_or(FireError::InvalidGeometry)?
             .beam_block_distance(station, pose.position, pose.orientation.z, PULSE_RANGE)
             .map_err(|_| FireError::InvalidGeometry)?;
+        let npc = self
+            .traffic_beam_contact(pose, PULSE_RANGE)
+            .filter(|contact| distance.is_none_or(|station| contact.distance < station));
+        let solid = npc.map(|contact| contact.distance).or(distance);
         let projectile = self
-            .nearest_missile(pose, distance.unwrap_or(PULSE_RANGE))
-            .filter(|(_, d)| distance.is_none_or(|station| *d < station));
+            .nearest_missile(pose, solid.unwrap_or(PULSE_RANGE))
+            .filter(|(_, d)| solid.is_none_or(|wall| *d < wall));
         let cap = projectile.map_or(PULSE_RANGE, |(_, d)| d);
         let mut practice = self.practice;
         let hit = practice
             .as_mut()
-            .and_then(|p| p.contact_limited(self.state, pose, cap, distance));
+            .and_then(|p| p.contact_limited(self.state, pose, cap, solid));
         if let Some((id, distance, first_hit)) = hit {
             return Ok((
                 practice,
@@ -328,6 +338,16 @@ impl World {
                 practice,
                 PulseContact::Projectile { id, distance },
                 distance,
+            ));
+        }
+        if let Some(contact) = npc {
+            return Ok((
+                practice,
+                PulseContact::Npc {
+                    id: contact.id,
+                    distance: contact.distance,
+                },
+                contact.distance,
             ));
         }
         Ok((
@@ -417,6 +437,7 @@ impl World {
             contact,
         };
         let impact = self.prepare_pulse_impact(shot)?;
+        let traffic = self.prepare_traffic_pulse(shot, impact.emission())?;
         let mut missiles = self.missiles.clone();
         if let PulseContact::Projectile { id, .. } = contact
             && !missiles.intercept(id, self.state.tick, impact.emission(), shot)
@@ -424,6 +445,7 @@ impl World {
             return Err(FireError::InvalidGeometry);
         }
         impact.commit(self)?;
+        self.traffic = traffic;
         self.missiles = missiles;
         if let (Some(candidate), Some(current)) = (&mut practice, self.practice) {
             candidate.ordinary_hit = current.ordinary_hit;

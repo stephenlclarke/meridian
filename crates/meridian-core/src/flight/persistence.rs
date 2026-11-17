@@ -95,8 +95,18 @@ const V11_CONTENT: &[u8] = concat!(
 )
 .as_bytes();
 
-const CONTENT: &[u8] = concat!(
+const V13_CONTENT: &[u8] = concat!(
     "meridian-world/rules/13;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
+    "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
+    "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
+    "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
+    "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823;",
+    "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa"
+)
+.as_bytes();
+
+const CONTENT: &[u8] = concat!(
+    "meridian-world/rules/14;traffic/local-paid-sh025-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -119,6 +129,9 @@ fn compiled_content_fingerprint(content: &[u8]) -> u64 {
     ] {
         bytes.extend((part.len() as u64).to_le_bytes());
         bytes.extend(part);
+    }
+    if content == CONTENT {
+        bytes.extend(crate::traffic::CONTENT_RULES);
     }
     checksum(&bytes)
 }
@@ -336,6 +349,7 @@ impl World {
             hit.encode(w)
         });
         self.pulse.encode_save(&mut w);
+        self.traffic.encode(&mut w);
         let digest = checksum(&w.bytes);
         w.u64(digest);
         if w.bytes.len() > MAX_SAVE_BYTES {
@@ -407,8 +421,9 @@ impl World {
             9 if r.fixed::<{ V9_CONTENT.len() }>()?.as_slice() == V9_CONTENT => V9_CONTENT,
             10 if r.fixed::<{ V10_CONTENT.len() }>()?.as_slice() == V10_CONTENT => V10_CONTENT,
             11 if r.fixed::<{ V11_CONTENT.len() }>()?.as_slice() == V11_CONTENT => V11_CONTENT,
+            13 if r.fixed::<{ V13_CONTENT.len() }>()?.as_slice() == V13_CONTENT => V13_CONTENT,
             SAVE_VERSION if r.fixed::<{ CONTENT.len() }>()?.as_slice() == CONTENT => CONTENT,
-            4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | SAVE_VERSION => {
+            4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 13 | SAVE_VERSION => {
                 return Err(SaveError::ContentMismatch);
             }
             _ => return Err(SaveError::UnsupportedVersion),
@@ -456,6 +471,7 @@ impl World {
         };
         let mut candidate = Self {
             state,
+            traffic: crate::traffic::State::default(),
             station_data: Some(station_data),
             navigation_catalogue: Some(
                 OriginalNavigation::bundled().map_err(|_| SaveError::ContentMismatch)?,
@@ -485,6 +501,12 @@ impl World {
             }
         }
         candidate.pulse = weapons::PulseResources::decode_save(&mut r)?;
+        if version >= 14 {
+            candidate.traffic = crate::traffic::State::decode(&mut r)?;
+        }
+        if version < 14 && candidate.state.motion_refusal == Some(MotionRefusal::NpcContact) {
+            return Err(SaveError::InvalidEncoding);
+        }
         if !r.finished() {
             return Err(SaveError::InvalidEncoding);
         }
@@ -613,11 +635,36 @@ impl World {
         }
         session.validate_save(navigation.dock())?;
         let domain = account.validate_saved_domain(&session.state, nav, session.epoch())?;
-        let services = markets.validate_save(
+        self.traffic.validate(
             nav.owner,
-            account.hold_capacity(),
-            account.equipment_state().historical_capacity(),
+            self.state.tick,
+            self.combat.emissions,
+            station,
+            markets,
         )?;
+        if self.state.mode != FlightMode::Docked {
+            let pose = super::flight_pose(self.state.position, self.state.orientation)
+                .ok_or(SaveError::InvalidState("traffic player pose"))?;
+            if !self.traffic_motion_clear(pose, pose) {
+                return Err(SaveError::InvalidState(
+                    "saved player hull intersects traffic",
+                ));
+            }
+        }
+        let services = if self.traffic.enabled() {
+            markets.validate_save_with_traffic(
+                nav.owner,
+                account.hold_capacity(),
+                account.equipment_state().historical_capacity(),
+                self.traffic.flows(),
+            )?
+        } else {
+            markets.validate_save(
+                nav.owner,
+                account.hold_capacity(),
+                account.equipment_state().historical_capacity(),
+            )?
+        };
         validate_accounting(
             domain,
             services,
@@ -741,6 +788,7 @@ pub(super) fn write_flight(w: &mut Writer, s: &Snapshot) {
         Some(MotionRefusal::StationContact) => 1,
         Some(MotionRefusal::EntryConditions) => 2,
         Some(MotionRefusal::CelestialContact) => 3,
+        Some(MotionRefusal::NpcContact) => 4,
     });
 }
 pub(super) fn read_flight(r: &mut Reader<'_>) -> Result<Snapshot, SaveError> {
@@ -759,6 +807,7 @@ pub(super) fn read_flight(r: &mut Reader<'_>) -> Result<Snapshot, SaveError> {
         1 => Some(MotionRefusal::StationContact),
         2 => Some(MotionRefusal::EntryConditions),
         3 => Some(MotionRefusal::CelestialContact),
+        4 => Some(MotionRefusal::NpcContact),
         _ => return Err(SaveError::InvalidEncoding),
     };
     Ok(Snapshot {
@@ -793,6 +842,11 @@ pub(super) fn validate_flight(s: &Snapshot) -> Result<(), SaveError> {
 
 #[cfg(test)]
 fn legacy_test_fixture(world: &World, version: u16) -> Result<Vec<u8>, SaveError> {
+    if !world.traffic.legacy_empty() {
+        return Err(SaveError::InvalidState(
+            "physical traffic requires current format",
+        ));
+    }
     if version < 8 && !world.missiles.save_supported() {
         return Err(SaveError::UnsupportedMissiles);
     }
@@ -965,4 +1019,27 @@ mod paid_missile_format_tests {
         assert_eq!(u16::from_le_bytes([current[8], current[9]]), 13);
         assert_ne!(old, current);
     }
+}
+
+#[cfg(test)]
+pub(super) fn v13_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
+    if !world.traffic.legacy_empty() {
+        return Err(SaveError::InvalidState(
+            "physical traffic requires current format",
+        ));
+    }
+    let current = world.save_bytes()?;
+    let mut traffic = Writer::new();
+    world.traffic.encode(&mut traffic);
+    let payload_start = 8 + 2 + CONTENT.len() + 8;
+    let payload_end = current.len() - 8 - traffic.bytes.len();
+    let mut old = Writer::new();
+    old.bytes.extend(MAGIC);
+    old.u16(13);
+    old.bytes.extend(V13_CONTENT);
+    old.u64(compiled_content_fingerprint(V13_CONTENT));
+    old.bytes.extend(&current[payload_start..payload_end]);
+    let digest = checksum(&old.bytes);
+    old.u64(digest);
+    Ok(old.bytes)
 }

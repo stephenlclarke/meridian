@@ -30,6 +30,7 @@ pub enum MotionRefusal {
     StationContact,
     EntryConditions,
     CelestialContact,
+    NpcContact,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

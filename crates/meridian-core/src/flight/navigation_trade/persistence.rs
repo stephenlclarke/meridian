@@ -494,7 +494,15 @@ impl Plan {
             || self.market_revision > markets.transaction_revision()
             || self.bought.saturating_add(self.sold) > self.market_revision
             || self.price != markets.commodity_quote(train, self.commodity).ask_tenths
-            || stock_at(markets, train, self.commodity, self.bought, self.sold) != Some(self.stock)
+            || stock_at(
+                markets,
+                &c.world.traffic,
+                self.confirmed_tick,
+                train,
+                self.commodity,
+                self.bought,
+                self.sold,
+            ) != Some(self.stock)
         {
             return Err(INVALID);
         }
@@ -543,6 +551,8 @@ impl Plan {
 }
 fn stock_at(
     markets: &StationMarkets,
+    traffic: &crate::traffic::State,
+    tick: u64,
     site: crate::station_services::MarketSite,
     id: CommodityId,
     bought: u64,
@@ -552,12 +562,22 @@ fn stock_at(
     if bought > now_bought || sold > now_sold {
         return None;
     }
+    let si = match site {
+        crate::station_services::MarketSite::Avenor => 0,
+        crate::station_services::MarketSite::Renas => 1,
+    };
+    let now = traffic.flows();
+    let past = traffic.flows_at(tick);
     let seed = u128::from(markets.commodity_quote(site, id).stock)
         .checked_add(u128::from(now_bought))?
-        .checked_sub(u128::from(now_sold))?;
+        .checked_add(u128::from(now.bought[si][id.index()]))?
+        .checked_sub(u128::from(now_sold))?
+        .checked_sub(u128::from(now.sold[si][id.index()]))?;
     u64::try_from(
         seed.checked_add(u128::from(sold))?
-            .checked_sub(u128::from(bought))?,
+            .checked_add(u128::from(past.sold[si][id.index()]))?
+            .checked_sub(u128::from(bought))?
+            .checked_sub(u128::from(past.bought[si][id.index()]))?,
     )
     .ok()
 }
@@ -584,6 +604,8 @@ impl Trade {
             || self.after.bought.saturating_add(self.after.sold) > self.transaction
             || stock_at(
                 markets,
+                &c.world.traffic,
+                self.tick,
                 site,
                 plan.commodity,
                 self.before.bought,
@@ -591,6 +613,8 @@ impl Trade {
             ) != Some(self.before.stock)
             || stock_at(
                 markets,
+                &c.world.traffic,
+                self.tick,
                 site,
                 plan.commodity,
                 self.after.bought,
