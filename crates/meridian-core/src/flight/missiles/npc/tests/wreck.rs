@@ -102,7 +102,8 @@ fn actual_fatal_missile_settles_one_paid_manifest_and_cold_readout_never_issues_
     assert_eq!(current.wreck_manifest(wreck.source), Ok(wreck));
     assert_eq!(current.traffic_snapshot(), w.traffic_snapshot());
     assert_eq!(current.credits_tenths(), w.credits_tenths());
-    assert!(current.mining_belt_snapshot().is_none());
+    assert!(w.mining_belt_snapshot().is_some());
+    assert_eq!(current.mining_belt_snapshot(), w.mining_belt_snapshot());
     assert_eq!(cold(&current).wreck_manifest(wreck.source), Ok(wreck));
     // A real jump removes the local source from the current World query. There was never a pod.
     let tick = loaded.snapshot().tick;

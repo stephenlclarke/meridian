@@ -20,11 +20,11 @@ Both internal platform archives are available. Mac extraction verified the exist
 
 Protected PR integration, exact committed-main CI/Sonar and verified GitHub publication remain open. Subsequent V17-only navigation and destroyed-trader custody candidates are separate and do not delay Preview 6. Development has no backward-compatibility requirement. The history below retains earlier exact-source results and failures rather than assigning them to this candidate.
 
-## Destroyed trader manifest custody awaiting review
+## Destroyed trader custody: component history and current boundary
 
-The successor to `050b04e` uses PR 44 head `a1ee1358` as its base. The staged fatal actor transition and save validation bind the paid manifest to the same typed laser or missile event, ordered by the existing NPC resource replay. The missile case checks the qualified v15 layout with real paid missile and actor history before continuing under v16. Physical cargo issuance still requires eligible original geometry and a bound actor producer. See the [wreck manifest guide](WRECK-MANIFEST.md).
+The isolated custody component `c922fe9` used PR 44 head `a1ee1358` as its base and passed the owning Dell Linux and native Windows runs with 541 Rust cases. Its staged fatal actor transition and save validation bind the paid manifest to the same typed laser or missile event, ordered by existing NPC resource replay. That historical component checked a generated qualified V15 layout and V16 continuation. Those reader guarantees are not part of the current V17-only composition. The current missile case instead compares the complete preserved mining snapshot and retains all manifest, traffic, cash, repeated cold-save and departure assertions. Literal V15/V16 files remain refusal evidence.
 
-The Dell trace on `1e8e3b7` confirmed that a later-visit ordinary missile was counted against a closed practice sortie. Launch, flight steps, laser publication and save validation now count only live missiles from the retained practice attempt’s own sortie. The four custody cases await the owning run on the corrected source, including a v16 cold Continue with a live later-visit missile before the fatal fitted Beam contact.
+The earlier Dell trace on `1e8e3b7` confirmed that a later-visit ordinary missile was counted against a closed practice sortie. Launch, flight steps, laser publication and save validation now count only live missiles from that practice attempt's own sortie. The current combined source retains all four custody cases, including current-format cold Continue with a live later-visit missile before the fatal fitted Beam contact. Its own qualification remains unrun. Physical cargo issuance still requires eligible original geometry and a bound actor producer. See the [wreck manifest guide](WRECK-MANIFEST.md).
 
 ## Actual main 80a0b16 coverage failure and changed adapter correction
 
