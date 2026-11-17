@@ -388,7 +388,7 @@ impl State {
             super::super::flight_pose(m.flight.position, m.flight.orientation).ok_or(INVALID)?;
         let cleared = m.cleared
             || length(sub(m.position, player.position)) > data.player_clearance_radius() + 1e-6;
-        let (_, mut best) = super::persistence::retained_solid_contact(
+        let (_, mut best, player_contact) = super::persistence::retained_solid_contact(
             data,
             world.state.station.ok_or(INVALID)?,
             ray,
@@ -397,6 +397,15 @@ impl State {
             (cleared, m.player_alive),
             INVALID,
         )?;
+        if let Some(d) = player_contact {
+            choose(
+                &mut best,
+                d,
+                MissileContact::Player {
+                    front: sub(ray_point(ray, d), player.position).dot(player.orientation.z) >= 0.0,
+                },
+            );
+        }
         self.validate_motion_bodies(p, i, m, ray, travel, &mut best)?;
         choose_scene(world, &p, scene, ray, travel, &mut best).map_err(|_| INVALID)?;
         let used = best.map_or(travel, |(d, _)| d);

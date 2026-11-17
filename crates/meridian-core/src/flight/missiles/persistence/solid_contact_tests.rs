@@ -13,7 +13,7 @@ fn vector(bits: [u64; 3]) -> Vec3 {
     Vec3::new(x, y, z)
 }
 #[test]
-fn frozen_native_plane_contact_keeps_rear_facing_and_both_player_eligibility_guards() {
+fn frozen_native_plane_distance_keeps_both_player_eligibility_guards() {
     // Same independently frozen rational/IEEE triangle0 reference as endpoint_tests.
     // Reference SHA256 6f4c32c3d8f822ec4bf6b5b9acde5a46b04d5d942f47e0e4413a744672623e42.
     let data = ok(OriginalStationData::bundled());
@@ -29,7 +29,7 @@ fn frozen_native_plane_contact_keeps_rear_facing_and_both_player_eligibility_gua
     )
     .ok_or("frozen finite ray"));
     let invalid = SaveError::InvalidState("fixture NPC boundary");
-    let (wall, contact) = ok(retained_solid_contact(
+    let (wall, best, contact) = ok(retained_solid_contact(
         &data,
         station,
         ray,
@@ -39,11 +39,11 @@ fn frozen_native_plane_contact_keeps_rear_facing_and_both_player_eligibility_gua
         invalid,
     ));
     assert_eq!(wall, None);
-    let Some((distance, kind)) = contact else {
+    assert_eq!(best, None);
+    let Some(distance) = contact else {
         panic!("independently proven native surface missed");
     };
     assert!((distance - f64::from_bits(0x4029fffffffffff7)).abs() < 1e-10);
-    assert_eq!(kind, MissileContact::Player { front: false });
     for eligibility in [(false, true), (true, false), (false, false)] {
         assert_eq!(
             ok(retained_solid_contact(
@@ -55,7 +55,7 @@ fn frozen_native_plane_contact_keeps_rear_facing_and_both_player_eligibility_gua
                 eligibility,
                 invalid
             )),
-            (None, None)
+            (None, None, None)
         );
     }
 }
@@ -76,7 +76,7 @@ fn native_station_boundary_and_geometry_errors_keep_the_callers_exact_refusal() 
         orientation: Basis3::IDENTITY,
     };
     let invalid = SaveError::InvalidState("fixture practice boundary");
-    let (wall, contact) = ok(retained_solid_contact(
+    let (wall, contact, player_contact) = ok(retained_solid_contact(
         &data,
         station,
         ray,
@@ -90,6 +90,7 @@ fn native_station_boundary_and_geometry_errors_keep_the_callers_exact_refusal() 
     };
     assert!((distance - 363.68).abs() < 1e-9);
     assert_eq!(contact, Some((distance, MissileContact::Station)));
+    assert_eq!(player_contact, None);
     assert_eq!(
         ok(retained_solid_contact(
             &data,
@@ -100,7 +101,7 @@ fn native_station_boundary_and_geometry_errors_keep_the_callers_exact_refusal() 
             (true, true),
             invalid
         )),
-        (wall, contact)
+        (wall, contact, player_contact)
     );
     let mut invalid_ray = ray;
     invalid_ray.orientation.z = Vec3::new(0.0, 0.0, 0.0);
