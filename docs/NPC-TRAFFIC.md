@@ -46,6 +46,12 @@ The player's real fitted front Pulse can hit the actual nearest NPC surface thro
 
 Hits on a clean trader are retained as verified security incidents. The security projection names **SH031 required/unavailable**; it does not mint a police body, police damage, an unwitnessed fine or an invisible interceptor. The first bounded NPC-AI combat path is pirate versus trader. NPC-to-player shield damage, complete NPC missile/projectile hit replay/targeting, original NPC/T02 incident/legal integration, real police deployment, bounties, salvage and the remaining controllers are still open. Missile occlusion of NPC beams does not establish the reciprocal NPC collision/damage/replay path for flying missiles. These joins are required before broader NPC gameplay acceptance.
 
+## Host continuity under development
+
+The development host uses a separate `Meridian Traffic Development/saves` default on macOS and Windows, and `meridian-traffic-development/saves` on Linux. An explicit `--save-dir PATH` remains exact. No existing preview/default profile is searched, copied or migrated. The final packaged namespace will be bound to the qualified combined source before release.
+
+Three additional authored host cases remain **UNRUN**: a genuine Profile launch/flight/paid trader birth followed by Save/Quit and a fresh child-process Continue, its isolated child check, and a real writer refusal preserving the live traffic, market and previous save. They use only temporary test slots and public flight commands. They do not supply actor poses, cargo, damage or stock and do not establish native gameplay acceptance. The child compares continued deterministic traffic/market evolution against the same public saved World loader, while separately checking the existing slot is unchanged until explicit quit.
+
 ## Persistence and qualification
 
 The isolated source writes private format **14**, appending the complete bounded traffic state and a traffic rules/content boundary. This is not a reservation of a final combined version. Root must choose the actual combined equipment/mining/NPC layout and observer/profile mapping. Prior explicit readers for versions 4 through 11 and 13 keep their existing content boundary and absent traffic state; the previously unsupported private version 12 is not invented as a compatible reader. An older Continue never manufactures fresh NPCs, cargo, cash or a new encounter. No owned player profile was read or migrated here.
