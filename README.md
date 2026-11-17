@@ -95,3 +95,5 @@ The [planet and sun implementation](docs/CELESTIAL-SHADING.md) binds core-owned 
 See [docked preview qualification](docs/DOCKED-PREVIEW.md) for controls, actual tests and native results, release gates and explicit limits. XYZZY/Commander Clarke is a separate following feature.
 
 The current traffic correction yields the native station approach to an aligned inbound player and selects actual hull-surface aim points for NPC beams and player-owned missiles. It retains the player collision checks and original native first-contact geometry. The combined correction has 86 additional authored cases, all **UNRUN**; the last tested source remains `42f599c` with 223 core passes and 53 failures. Owning validation must establish the correction before another playable preview.
+
+Latest NPC qualification on `2b7b350` reached 282 core passes and four failures. The four-case follow-up changes public test piloting and format-specific fixtures while preserving collision, contact and save-history assertions; it is unrun and awaiting review. The delivered public preview remains unchanged.

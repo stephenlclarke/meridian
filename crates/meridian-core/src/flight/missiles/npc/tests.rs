@@ -54,7 +54,9 @@ fn fire_npc(w: &mut World) -> MissileOrigin {
         let yaw = pose.orientation.z.x.atan2(pose.orientation.z.z);
         let desired = delta.x.atan2(delta.z);
         let error = (desired - yaw).sin().atan2((desired - yaw).cos());
-        if length(delta) < 900.0 && unit(delta).unwrap().dot(pose.orientation.z) > 0.8 {
+        // Face the victim before discharge. The ship must not coast across the
+        // newly guided missile's path while it turns away from the launch heading.
+        if length(delta) < 900.0 && unit(delta).unwrap().dot(pose.orientation.z) > 0.995 {
             w.request_npc_missile_lock(Some(actor.id), p.tick).unwrap();
             w.request_missile_arm(true, p.tick).unwrap();
             return w.request_fire_missile(p.tick).unwrap();
@@ -91,7 +93,13 @@ fn finish_npc(w: &mut World, id: ProjectileId) -> ProjectileSnapshot {
         if p.ended.is_some() {
             return p;
         }
-        step(w, 1);
+        // Release pursuit throttle and brake through the actual public controls.
+        // A valid self-hit still ends this projectile and fails the NPC-contact assertion.
+        w.step(crate::FlightInput {
+            brake: true,
+            ..crate::FlightInput::default()
+        })
+        .unwrap();
     }
     panic!("finite actual projectile did not end");
 }
@@ -351,11 +359,13 @@ fn full_combined_proof_budget_refuses_another_native_contact_before_mutating_tra
         SceneStage::Step(origin.projectile.ordinal()),
     );
     let position = add(actor.pose.position, Vec3::new(0.0, 0.0, -500.0));
-    let ray = pose(position, Vec3::new(0.0, 0.0, 1.0)).unwrap();
     let data = w.station_data.as_ref().unwrap();
+    let point = data.player_missile_aimpoint(actor.pose, position).unwrap();
+    let ray = pose(position, unit(sub(point, position)).unwrap()).unwrap();
     let contact = scene
         .contact(data, position, ray.orientation.z, 1000.0)
         .unwrap();
+    assert_eq!(contact.id, actor.id);
     let before = w.traffic.clone();
     assert_eq!(
         w.traffic
