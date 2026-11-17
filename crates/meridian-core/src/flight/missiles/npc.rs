@@ -383,16 +383,6 @@ impl State {
         }
         Ok(())
     }
-    /// Complete retained incoming missile history for MC1's born-resource journal.
-    /// That replay includes real berth resets, so historical hits must stay present.
-    pub(in crate::flight) fn player_resource_hits(&self) -> Vec<super::super::OrdinaryImpact> {
-        self.impacts
-            .iter()
-            .flatten()
-            .copied()
-            .filter(|h| matches!(h.target, super::super::OrdinaryTarget::Player { .. }))
-            .collect()
-    }
     /// Read-only adapter for the legacy, since-last-berth shield fallback.
     /// All returned hits already belong to actual retained player-owned missiles; no new reducer.
     pub(in crate::flight) fn retained_player_missile_hits(

@@ -446,3 +446,41 @@ fn later_real_npc_market_purchase_preserves_original_completed_t04_stock_receipt
     let loaded = cold(&w);
     assert_eq!(loaded.navigation_trade_snapshot(), Some(receipt));
 }
+
+#[test]
+fn actual_celestial_geometry_blocks_npc_beam_segments_before_damage() {
+    // Component geometry, not a claimed public World flight to these coordinates.
+    let w = ok(World::new_commander(12001));
+    let catalogue = some(w.navigation_catalogue.as_ref());
+    let system = ok(catalogue.system(crate::navigation::SystemId::RENAS));
+    let scene = crate::celestial::scene(system, 0, 1, Vec3::new(0.0, 0.0, 0.0));
+    assert_eq!(scene.planet.position, Vec3::new(6000.0, -1800.0, 9500.0));
+    assert_eq!(scene.planet.radius, 2200.0);
+    let origin = Vec3::new(8000.0, 0.0, 9500.0);
+    let target = Vec3::new(2400.0, 0.0, 9000.0);
+    // Independent closest-point scalar reference for the review's concrete obstruction.
+    let delta = Vec3::new(-5600.0, 0.0, -500.0);
+    let offset = Vec3::new(-2000.0, -1800.0, 0.0);
+    let t = offset.dot(delta) / delta.dot(delta);
+    let nearest = Vec3::new(origin.x + t * delta.x, 0.0, origin.z + t * delta.z);
+    let from_center = Vec3::new(nearest.x - 6000.0, 1800.0, nearest.z - 9500.0);
+    assert!(delta.dot(delta).sqrt() < super::super::weapons::PULSE_RANGE);
+    assert!(from_center.dot(from_center).sqrt() < scene.planet.radius);
+    assert!(!w.traffic_beam_celestial_clear(system.id, 1, origin, target));
+    for body in [scene.planet, scene.sun] {
+        let left = Vec3::new(
+            body.position.x - body.radius - 100.0,
+            body.position.y,
+            body.position.z,
+        );
+        let right = Vec3::new(
+            body.position.x + body.radius + 100.0,
+            body.position.y,
+            body.position.z,
+        );
+        assert!(!w.traffic_beam_celestial_clear(system.id, 1, left, right));
+        let outside = Vec3::new(left.x, left.y + body.radius * 2.0, left.z);
+        let nearby = Vec3::new(outside.x - 1.0, outside.y, outside.z);
+        assert!(w.traffic_beam_celestial_clear(system.id, 1, outside, nearby));
+    }
+}

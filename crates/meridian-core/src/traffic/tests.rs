@@ -332,6 +332,7 @@ fn actual_npc_beam_visibility_refusal_spends_no_laser_or_damage_receipt() {
                     protected: false,
                     celestial_clear: &|_, _, _| true,
                     beam_clear: &|_, _, _| false,
+                    player_target: None,
                 },
                 &market,
             ));

@@ -245,7 +245,8 @@ impl State {
         }
         Ok(())
     }
-    /// Read-only adapter to the one player shield/energy replay. Contacts remain validated here.
+    /// All retained player contacts for the one born-resource journal, including hits before berth.
+    /// Legacy since-berth filtering is a separate adapter; contact validation stays here.
     pub(in crate::flight) fn player_resource_hits(&self) -> Vec<OrdinaryImpact> {
         self.impacts
             .iter()

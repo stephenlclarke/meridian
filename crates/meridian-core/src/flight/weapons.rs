@@ -352,6 +352,15 @@ impl World {
             ));
         }
         if let Some(contact) = npc {
+            // Refuse before publishing a beam/resource spend through a physical celestial body.
+            if !self.traffic_beam_celestial_clear(
+                contact.id.system(),
+                self.state.tick,
+                pose.position,
+                contact.point,
+            ) {
+                return Err(FireError::InvalidGeometry);
+            }
             return Ok((
                 practice,
                 PulseContact::Npc {

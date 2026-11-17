@@ -534,3 +534,15 @@ fn segment_distance(a: Vec3, b: Vec3, p: Vec3) -> f64 {
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+impl State {
+    /// Conservation-only inspection; never offers destroyed freight to a player.
+    pub(crate) fn retained_manifest(&self, id: NpcId) -> Option<(CommodityId, u8, bool)> {
+        self.actors
+            .iter()
+            .flatten()
+            .find(|a| a.id == id)
+            .map(|a| (a.manifest, a.units, a.sold))
+    }
+}

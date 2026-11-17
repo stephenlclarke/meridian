@@ -21,6 +21,9 @@ impl State {
         }
         Ok(())
     }
+    pub(crate) fn beam_receipts(&self) -> &[TrafficBeam] {
+        &self.shots
+    }
     pub(crate) fn player_hits(&self) -> &[NpcPlayerHit] {
         &self.player_hits
     }

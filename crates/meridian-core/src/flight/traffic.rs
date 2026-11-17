@@ -9,6 +9,16 @@ use crate::traffic::{self, BeamSource, TrafficContact, TrafficSnapshot};
 impl World {
     pub(super) fn validate_traffic_player_scenes(&self) -> Result<(), crate::save::SaveError> {
         let invalid = crate::save::SaveError::InvalidState("NPC player scene receipt");
+        for shot in self.traffic.beam_receipts() {
+            if !self.traffic_beam_celestial_clear(
+                shot.victim.system(),
+                shot.world_tick,
+                shot.origin,
+                shot.point,
+            ) {
+                return Err(invalid);
+            }
+        }
         for hit in self.traffic.player_hits() {
             self.missiles.validate_npc_beam_scene(hit)?;
             let system = self
@@ -35,6 +45,33 @@ impl World {
             }
         }
         Ok(())
+    }
+    /// The same real planet/sun segment guard at command and retained-receipt boundaries.
+    /// Scene positions are immutable station-local geometry; visit affects identity only.
+    pub(super) fn traffic_beam_celestial_clear(
+        &self,
+        system: crate::navigation::SystemId,
+        tick: u64,
+        origin: crate::docking::Vec3,
+        point: crate::docking::Vec3,
+    ) -> bool {
+        let Some(catalogue) = self.navigation_catalogue.as_ref() else {
+            return false;
+        };
+        let Ok(system) = catalogue.system(system) else {
+            return false;
+        };
+        let Some(data) = self.station_data.as_ref() else {
+            return false;
+        };
+        let scene = crate::celestial::scene(system, 0, tick, data.station_pose().pose.position);
+        [scene.planet, scene.sun].into_iter().all(|body| {
+            !body.blocks_motion(
+                [origin.x as f32, origin.y as f32, origin.z as f32],
+                [point.x as f32, point.y as f32, point.z as f32],
+                0.0,
+            )
+        })
     }
     pub fn traffic_snapshot(&self) -> Option<TrafficSnapshot> {
         self.traffic.snapshot(self.combat_identity()?.system)
@@ -196,6 +233,9 @@ impl World {
         let PulseContact::Npc { id, distance } = shot.contact else {
             return Ok(self.traffic.clone());
         };
+        if !self.traffic_beam_celestial_clear(id.system(), shot.tick, shot.origin, shot.end) {
+            return Err(FireError::InvalidGeometry);
+        }
         if self.practice.is_some_and(|p| !p.reception_is_terminal()) {
             return Err(FireError::ProtectedTraffic);
         }

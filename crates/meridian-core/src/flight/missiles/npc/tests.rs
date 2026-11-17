@@ -152,7 +152,7 @@ fn genuine_paid_missile_locks_actual_npc_and_retains_native_contact_damage_cold(
 fn actual_finite_seven_rounds_can_destroy_npc_without_award_loot_refill_or_respawn() {
     let mut w = ready(4);
     assert_eq!(w.credits_tenths(), Some(0));
-    let cargo = trader(&w).cargo;
+    let cargo = trader(&w).cargo.unwrap();
     let id = trader(&w).id;
     let mut fired = 0;
     while fired < 7 && trader(&w).phase != NpcPhase::Destroyed {
@@ -167,7 +167,10 @@ fn actual_finite_seven_rounds_can_destroy_npc_without_award_loot_refill_or_respa
     }
     assert_eq!(trader(&w).phase, NpcPhase::Destroyed);
     assert_eq!(trader(&w).energy_hundredths, 0);
-    assert_eq!(trader(&w).cargo, cargo);
+    assert_eq!(trader(&w).cargo, None, "destroyed cargo is not usable loot");
+    let retained = w.traffic.retained_manifest(id).unwrap();
+    assert_eq!((retained.0, retained.1), cargo);
+    assert!(!retained.2, "destroyed manifest cannot earn a berth sale");
     assert_eq!(w.credits_tenths(), Some(0));
     assert!(w.mission_snapshot().unwrap().freight.held_tonnes == 0);
     let before = w.save_bytes().unwrap();
@@ -180,6 +183,10 @@ fn actual_finite_seven_rounds_can_destroy_npc_without_award_loot_refill_or_respa
     step(&mut loaded, 1000);
     assert_eq!(trader(&loaded).id, id);
     assert_eq!(trader(&loaded).phase, NpcPhase::Destroyed);
+    assert_eq!(trader(&loaded).cargo, None);
+    let retained = loaded.traffic.retained_manifest(id).unwrap();
+    assert_eq!((retained.0, retained.1), cargo);
+    assert!(!retained.2);
     assert_eq!(loaded.ammunition_snapshot(), w.ammunition_snapshot());
 }
 #[test]

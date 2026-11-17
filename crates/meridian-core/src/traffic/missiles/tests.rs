@@ -19,6 +19,7 @@ fn born() -> (State, OriginalStationData) {
                 protected: false,
                 celestial_clear: &|_, _, _| true,
                 beam_clear: &|_, _, _| true,
+                player_target: None,
             },
             &market,
         ));
