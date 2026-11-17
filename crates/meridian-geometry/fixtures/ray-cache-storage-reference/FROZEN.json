@@ -1,0 +1,20 @@
+{
+  "phase": "BEFORE_REUSABLE_RAY_CACHE_STORAGE_AUTHORING",
+  "parentAuthorHead": "5aa2f4768d2d5a9de079bd9c10159d9cc4378de1",
+  "qualifiedRootJoin": "a5b00c9",
+  "reference": "Complete current planes.rs and production certificate prefix, final whitespace normalized only. Original full-scan references/controls unchanged.",
+  "files": {
+    "CASES.json": {
+      "bytes": 808,
+      "sha256": "b73e020ddd289000d1cb858a5c565161319bd949231273613416d5a055b3724e"
+    },
+    "before-certificate.rs": {
+      "bytes": 53881,
+      "sha256": "38a23ea4afe94eb7b1ce7a193a22e48fa3944bf4efdc80b7b81f7a709f9ba2b8"
+    },
+    "before-planes.rs": {
+      "bytes": 11098,
+      "sha256": "3951d2ca2363eb9b6fba7095866433567b41e35c22939d66a8601a62e8af132a"
+    }
+  }
+}

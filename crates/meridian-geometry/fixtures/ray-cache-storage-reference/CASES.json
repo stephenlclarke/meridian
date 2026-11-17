@@ -1,0 +1,15 @@
+{
+  "scope": "Storage reuse only. All34existing tests/frozen108/120strict controls immutable.",
+  "invariants": [
+    "hit values never reused across different generations/origins/directions",
+    "slot initialization charged once, generation and owner lookup charged every reused attempt",
+    "newly computed hit must pass unchanged coordinate guard before generation publication",
+    "old scoped cache retained when lookup+generation costs cannot beat slot initialization"
+  ],
+  "tests": [
+    "changed origin gives different parity",
+    "changed direction and coplanar/edge cases preserve original ambiguity",
+    "oversized computed coordinate refuses despite a previously cached valid point",
+    "exact61andone-short60storage admission for19plane metadata+8cache root+26owner slots+8scratch"
+  ]
+}

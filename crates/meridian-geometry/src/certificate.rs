@@ -1,5 +1,5 @@
 use crate::exact::{add, area, cross, dot, orient, point, project, scale, sub};
-use crate::planes::PlaneGroups;
+use crate::planes::{CachedRay, PlaneGroups, RayCaches};
 use crate::region::PackedRegion;
 use crate::{
     Arrangement, Budget, Cell, Facet, Failure, FailureKind, Point2, Point3, Rational, SourceId,
@@ -536,6 +536,7 @@ fn component_bounds(
 struct OccupancyIndex<'a> {
     spatial: &'a FacetBoundsIndex,
     planes: Option<&'a PlaneGroups>,
+    caches: &'a mut RayCaches,
 }
 fn build_plane_groups(
     originals: &[Facet],
@@ -608,7 +609,7 @@ fn occupied(
     normal: &Point3,
     originals: &[Facet],
     owners: &BTreeMap<u32, ComponentBounds>,
-    index: &OccupancyIndex<'_>,
+    index: &mut OccupancyIndex<'_>,
     b: &mut Budget,
 ) -> Result<bool, Failure> {
     for (owner, group) in owners {
@@ -654,16 +655,25 @@ fn occupied(
                     None => None,
                 };
                 if let Some((planes, count)) = repeated {
-                    let result = planes.parity(
-                        count,
-                        originals
-                            .iter()
-                            .enumerate()
-                            .filter(|(_, face)| face.id().component == *owner),
-                        p,
-                        &direction,
-                        b,
-                    )?;
+                    let faces = originals
+                        .iter()
+                        .enumerate()
+                        .filter(|(_, face)| face.id().component == *owner);
+                    let result = if index.caches.can_reuse(planes, count) {
+                        index.caches.parity(
+                            CachedRay {
+                                groups: planes,
+                                owner: *owner,
+                                count,
+                                origin: p,
+                                direction: &direction,
+                            },
+                            faces,
+                            b,
+                        )?
+                    } else {
+                        planes.parity(count, faces, p, &direction, b)?
+                    };
                     match result {
                         None => continue,
                         Some(true) => return Ok(true),
@@ -701,7 +711,7 @@ fn visible(
     sample: &Point2,
     originals: &[Facet],
     owners: &BTreeMap<u32, ComponentBounds>,
-    index: &OccupancyIndex<'_>,
+    index: &mut OccupancyIndex<'_>,
     coplanar: &[&Facet],
     b: &mut Budget,
 ) -> Result<bool, Failure> {
@@ -968,9 +978,11 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
     let owner_bounds = component_bounds(originals, &facet_bounds.facets, b)?;
     let plane_groups = build_plane_groups(originals, &owner_bounds, b)?;
     let plane_members = plane_groups.as_ref().map_or(0, PlaneGroups::memberships);
-    let occupancy_index = OccupancyIndex {
+    let mut ray_caches = RayCaches::new(b)?;
+    let mut occupancy_index = OccupancyIndex {
         spatial: &facet_bounds,
         planes: plane_groups.as_ref(),
+        caches: &mut ray_caches,
     };
     let mut regions = Vec::new();
     let mut all_points = BTreeSet::new();
@@ -1013,7 +1025,7 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
                     sample,
                     originals,
                     &owner_bounds,
-                    &occupancy_index,
+                    &mut occupancy_index,
                     &coplanar,
                     local,
                 )
@@ -1058,7 +1070,9 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
     drop(owner_bounds);
     drop(facet_bounds);
     drop(plane_groups);
-    b.release(bounds_members + facet_bounds_members + plane_members);
+    let ray_members = ray_caches.memberships();
+    drop(ray_caches);
+    b.release(bounds_members + facet_bounds_members + plane_members + ray_members);
     let mut triangles = Vec::new();
     let mut witnesses = Vec::new();
     for (source, region) in regions {

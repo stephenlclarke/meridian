@@ -1,0 +1,225 @@
+{
+  "parentAuthorHead": "5aa2f4768d2d5a9de079bd9c10159d9cc4378de1",
+  "qualifiedParentJoin": "a5b00c952e2f96445adffb2b240e957cadc3c312",
+  "qualifiedParentTree": "410cd990ae5048b42313ccd4d9e6a74a67bdbbc3",
+  "parentHandoffSHA256": "b30d5eefd058516f7d6d6723ab23b4222a9019d85351c947ab9513ddcdf5a0f7",
+  "parentMatrixSHA256": "8798ccbc9b6de1348cbd226f9716643073f4f0b5d7aba213100183309dc5af7b",
+  "parentAuditSHA256": "20a7e5af39bad8cdf86ba5d81eb9170df88318f1c752a131a302e36a9d2d0df2",
+  "parentActualCases": [
+    {
+      "id": "SH010",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          1,
+          88
+        ],
+        "operationsAtRefusal": 2000002,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000002,
+      "decodeOperations": 359198,
+      "constructionOperations": 1640804,
+      "wallNanoseconds": 98753680244,
+      "wallSeconds": 98.753680244,
+      "attemptedPeakMemberships": 75210,
+      "admittedPeakMemberships": 75210,
+      "retainedMembershipsAtTerminal": 66000,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ]
+    },
+    {
+      "id": "SH011",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          1,
+          105
+        ],
+        "operationsAtRefusal": 2000004,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000004,
+      "decodeOperations": 363558,
+      "constructionOperations": 1636446,
+      "wallNanoseconds": 101323288896,
+      "wallSeconds": 101.323288896,
+      "attemptedPeakMemberships": 74356,
+      "admittedPeakMemberships": 74356,
+      "retainedMembershipsAtTerminal": 66962,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ]
+    },
+    {
+      "id": "SH016",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          5,
+          10
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "decodeOperations": 365449,
+      "constructionOperations": 1634552,
+      "wallNanoseconds": 51501310852,
+      "wallSeconds": 51.501310852,
+      "attemptedPeakMemberships": 83238,
+      "admittedPeakMemberships": 83238,
+      "retainedMembershipsAtTerminal": 77946,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ]
+    },
+    {
+      "id": "SH017",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          5,
+          7
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "decodeOperations": 390244,
+      "constructionOperations": 1609757,
+      "wallNanoseconds": 60267489756,
+      "wallSeconds": 60.267489756,
+      "attemptedPeakMemberships": 83457,
+      "admittedPeakMemberships": 83457,
+      "retainedMembershipsAtTerminal": 77486,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ]
+    },
+    {
+      "id": "SH166",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          5,
+          72
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "decodeOperations": 341473,
+      "constructionOperations": 1658528,
+      "wallNanoseconds": 51949967549,
+      "wallSeconds": 51.949967549,
+      "attemptedPeakMemberships": 74976,
+      "admittedPeakMemberships": 74976,
+      "retainedMembershipsAtTerminal": 72232,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ]
+    }
+  ],
+  "parentFocused": {
+    "rustTests": 34,
+    "rustSummaryCounts": [
+      17,
+      6,
+      9,
+      2,
+      0
+    ],
+    "hostTests": 9,
+    "check": "PASS",
+    "strictClippy": "PASS",
+    "devConstructorBuild": "PASS",
+    "proof": {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-a5b00c9/remote-result/linux/FOCUSED-PROOF.json",
+      "bytes": 5331,
+      "sha256": "bbbc2568c62c74d525af389903cb6ede1c22227868f9beb6623f143d671c96b2"
+    },
+    "focusedResultsSnapshot": {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-a5b00c9/whole-start-bindings/FOCUSED-RESULTS-SNAPSHOT.json",
+      "bytes": 3136,
+      "sha256": "e4537c6454a2ac81c340a9fbb58b0a75a9275631348af0cda0ef33381d2490a9"
+    },
+    "snapshotCustody": {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-a5b00c9/FOCUSED-RESULTS-CUSTODY.json",
+      "bytes": 514,
+      "sha256": "c13bf54047a609569b651da56f2c815433971df727e279667f0da950e15d88c7"
+    },
+    "rawObservations": {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-a5b00c9/FOCUSED-RAW-OBSERVATIONS.json",
+      "bytes": 6322,
+      "sha256": "9d8cb990cf2747f84ae8f1297021e7dd417f85fd9c7abbd3f46ba730d7911c3f"
+    },
+    "measuredStrictControls": [
+      "FORWARD_RAY_COMPLETE {\"fixture\":\"subdivided_identity\",\"oldOperations\":440444,\"newOperations\":431785,\"oldAttemptedPeak\":35352,\"newAttemptedPeak\":35352,\"oldRetained\":18144,\"newRetained\":18144,\"triangles\":108}",
+      "FORWARD_RAY_COMPLETE {\"fixture\":\"subdivided_buried\",\"oldOperations\":457447,\"newOperations\":447181,\"oldAttemptedPeak\":36048,\"newAttemptedPeak\":36048,\"oldRetained\":18144,\"newRetained\":18144,\"triangles\":108}"
+    ]
+  },
+  "beforeSUTFreezeSHA256": "bd2d3fe39d1190f007293c4ef387937b1da251d6b89233700fe3cca089423031",
+  "causalFinding": "All five actual constructors still exhaust charged work. The qualified source allocates and initializes Gcache slots on EVERY owner ray attempt, even though equation IDs/counts stay fixed through classification. This repeated initialization/allocation is source-proven removable work. No actual per-owner G/ray-count trace or measured dominant stage is inferred from refusal source IDs.",
+  "correction": [
+    "Keep guarded owner cache tables until classification ends. Each slot adds one generation record to the original8slot budget; global map header8, owner entry/header8,9records per slot. Admit all table records before allocating; charge every actual slot initialization once.",
+    "Charge every owner lookup and one generation update per reused ray. Start a new generation on every origin/direction/attempt, including retries after ambiguity. Stale results never count as hits; recompute the original exact plane result and run every coordinate guard before publishing that slot generation.",
+    "Preserve original per-facet visit, individual containment/edge ambiguity/parity and exact order. Shared compute_hit only extracts unchanged existing arithmetic/guard calls; no ray value is reused across generations.",
+    "Retain8scratch records per attempt for newly computed point/parameters while an old point remains owned. Release attempt scratch on success/error; roll back a newly reserved owner table if initialization work refuses. Drop all persistent tables before releasing their ledger and before final noding.",
+    "Keep the existing scoped attempt cache when initializing its slots costs no more than the worst-case owner lookup plus generation update. This compares actual existing prices, does not change the32facet or amortization selection, caps, strict conditions or controls."
+  ],
+  "guardedDataBound": "Only eligible repeated-plane owners allocate tables, lazily on first use. Original planning2G+lookup<3(F-G) already implies5G<3F, so generation-tagged slots add fewer than5.4Fmemberships per selected owner plus headers. This is a source-derived reservation bound, not measured physical memory or full construction fit.",
+  "regression": "All34previous tests and frozen strict108/120controls byte exact. New test compares first/repeated attempt work, changes origin/direction and tests edge/coplanar ambiguity, preserves per-owner IDs, forces a newly computed coordinate beyond4096bits after a valid cached hit, and recovers with a fresh valid attempt. Exact61/one-short60table admission checks scratch release/no partially published owner table. A tightened work budget refuses slot initialization after successful memory admission and verifies rollback/no published owner table.",
+  "unchanged": [
+    "All guard functions/prices, source/decoder/region/budget/arrangement/exact/harness, fields/protected contacts/aggregate witnesses/global proof.",
+    "Spatial index, exact interval query and original flat parity implementation.",
+    "2Moperations/100kmemberships/4096source-outputbits/512completefaces. No source fixture, threshold waiver, numeric cap change, contact shortcut or diagnostic/original retry."
+  ],
+  "parentQualification": {
+    "RustPass": 34,
+    "hostPass": 9,
+    "check": "PASS",
+    "strictClippy": "PASS",
+    "devBuild": "PASS",
+    "strictIdentityWork": [
+      440444,
+      431785
+    ],
+    "wholeFive": "5decodePASS/5OperationsREFUSED/15dependentUNRUN/0candidate"
+  },
+  "localEvidenceVerification": {
+    "listedHandoffArtifactsHashed": 50,
+    "RootReportedRawLeaves": 45,
+    "RootEarlierLiveSourcePins": 284,
+    "scope": "Root actual live1455binary and terminal audits retained; source IDs alone do not identify hotspot."
+  },
+  "currentCompilerTests": "UNRUN",
+  "currentOriginalFive": "HELD pending one complete delta review and changed owner qualification",
+  "newCandidates": 0,
+  "newFleetAdmissions": 0,
+  "wholeOriginalSavingOrStorageFitOrMinimumClaim": false,
+  "priorFailuresAndAdverseWorkPreserved": true,
+  "allOriginalShipsRemainInScope": true,
+  "previewIndependent": true
+}

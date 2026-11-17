@@ -1,5 +1,11 @@
 # Implementation and validation status
 
+## Current reusable ray storage correction
+
+Actual `a5b00c9` focused qualification passed 34 Rust tests, nine host tests, all-target check, strict Clippy and the dev constructor build. The subsequent single original batch decoded all five inputs, then all five constructions reached the unchanged Operations limit; 15 dependent checks were unrun and no complete candidate returned. Root verified 284 source pins, the actual running constructor binary, then 50 copied artifacts and 14 inner seals. Those are refused attempts, not full-construction timing, storage-fit or minimum proofs.
+
+The changed source from author `44bb435` reuses guarded owner cache tables and slot initialization through classification. A generation per slot distinguishes attempts; stale ray results are recomputed and coordinate-checked before publishing the new generation. Every lookup, generation update and actual initialization stays charged. All per-facet containment, ambiguity, parity, order, original point guards and 2M/100k/4096/512 limits remain. Tables and reservations drop before noding; nonamortizable owners keep the scoped path. All 34 existing tests and strict frozen controls remain byte exact. The new total of 35 Rust and nine host cases is authored **UNRUN**; review and owning qualification must establish any cure.
+
 Reviewed against actual delivery evidence on 17 November 2026. This document distinguishes installed gameplay from source awaiting execution. Update it with every delivery or material acceptance change; test counts belong to their exact source.
 
 ## Current public preview and separate geometry branch

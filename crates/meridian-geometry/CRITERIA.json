@@ -173,6 +173,11 @@
       "file": "src/planes.rs",
       "name": "planes::tests::exact_plane_cache_preserves_individual_contacts_and_guarded_lifetimes",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/planes.rs",
+      "name": "planes::tests::reusable_storage_invalidates_hits_and_retains_guards_between_attempts",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -398,5 +403,17 @@
     "strictConditionAndAll33TestsByteExact": true,
     "currentExecution": "UNRUN",
     "newTestCount": 34
+  },
+  "reusableRayStorageCorrection": {
+    "qualifiedParentJoin": "a5b00c952e2f96445adffb2b240e957cadc3c312",
+    "parentHandoffSHA256": "b30d5eefd058516f7d6d6723ab23b4222a9019d85351c947ab9513ddcdf5a0f7",
+    "deltaSHA256": "cdc7259e309e37eca937c943f2c54e9df3792f4ec35dffc8360aa163bb2ae74c",
+    "beforeSUTFreezeSHA256": "bd2d3fe39d1190f007293c4ef387937b1da251d6b89233700fe3cca089423031",
+    "parentRustPass": 34,
+    "parentHostPass": 9,
+    "parentWholeFive": "5OperationsREFUSED/15dependentUNRUN/0candidate",
+    "all34TestsAndStrictControlsByteExact": true,
+    "currentExecution": "UNRUN",
+    "newTestCount": 35
   }
 }

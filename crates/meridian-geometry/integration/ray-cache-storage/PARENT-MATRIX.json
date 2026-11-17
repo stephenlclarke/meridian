@@ -1,0 +1,148 @@
+{
+  "head": "a5b00c952e2f96445adffb2b240e957cadc3c312",
+  "tree": "410cd990ae5048b42313ccd4d9e6a74a67bdbbc3",
+  "cases": [
+    {
+      "id": "SH010",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          1,
+          88
+        ],
+        "operationsAtRefusal": 2000002,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000002,
+      "decodeOperations": 359198,
+      "constructionOperations": 1640804,
+      "wallNanoseconds": 98753680244,
+      "wallSeconds": 98.753680244,
+      "attemptedPeakMemberships": 75210,
+      "admittedPeakMemberships": 75210,
+      "retainedMembershipsAtTerminal": 66000,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ]
+    },
+    {
+      "id": "SH011",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          1,
+          105
+        ],
+        "operationsAtRefusal": 2000004,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000004,
+      "decodeOperations": 363558,
+      "constructionOperations": 1636446,
+      "wallNanoseconds": 101323288896,
+      "wallSeconds": 101.323288896,
+      "attemptedPeakMemberships": 74356,
+      "admittedPeakMemberships": 74356,
+      "retainedMembershipsAtTerminal": 66962,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ]
+    },
+    {
+      "id": "SH016",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          5,
+          10
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "decodeOperations": 365449,
+      "constructionOperations": 1634552,
+      "wallNanoseconds": 51501310852,
+      "wallSeconds": 51.501310852,
+      "attemptedPeakMemberships": 83238,
+      "admittedPeakMemberships": 83238,
+      "retainedMembershipsAtTerminal": 77946,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ]
+    },
+    {
+      "id": "SH017",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          5,
+          7
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "decodeOperations": 390244,
+      "constructionOperations": 1609757,
+      "wallNanoseconds": 60267489756,
+      "wallSeconds": 60.267489756,
+      "attemptedPeakMemberships": 83457,
+      "admittedPeakMemberships": 83457,
+      "retainedMembershipsAtTerminal": 77486,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ]
+    },
+    {
+      "id": "SH166",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          5,
+          72
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "decodeOperations": 341473,
+      "constructionOperations": 1658528,
+      "wallNanoseconds": 51949967549,
+      "wallSeconds": 51.949967549,
+      "attemptedPeakMemberships": 74976,
+      "admittedPeakMemberships": 74976,
+      "retainedMembershipsAtTerminal": 72232,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ]
+    }
+  ],
+  "guards": {
+    "operations": 2000000,
+    "storageMemberships": 100000,
+    "rationalBits": 4096,
+    "triangles": 512
+  },
+  "scope": "Actual timings and logical counters up to operation refusal. No full construction speed, complete storage-fit, minimumRAM or newhull acceptance inferred."
+}

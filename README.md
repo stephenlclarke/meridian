@@ -82,3 +82,5 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Finite missile behavior and save boundary](docs/FINITE-STARTER-MISSILES.md)
 
 GitHub Actions validates Linux, Windows and macOS. Protected main requires pull requests, current required checks, linear history and resolved conversations; force pushes and deletion are blocked, including for administrators. SonarQube runs after merge from committed main with the exact commit SHA and Previous version policy. Historical change descriptions live in merged GitHub PRs and Git history rather than duplicate issue/PR Markdown files.
+
+The exact-plane candidate `a5b00c9` passed 34 Rust tests, nine host tests, compiler checks and strict Clippy, then its single original five-hull batch again reached Operations refusals for all five inputs, with 15 dependent checks unrun and zero candidates. The next source reuses guarded ray-cache storage across attempts while recomputing every stale ray result and retaining every original geometric decision and guard. Its 35 Rust and nine host cases are **UNRUN**; focused proof is not full-hull acceptance.

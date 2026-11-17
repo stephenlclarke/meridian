@@ -16,6 +16,34 @@ enum PlaneHit {
     Coplanar,
     Hit(Point3),
 }
+fn compute_hit(
+    face: &Facet,
+    origin: &Point3,
+    direction: &Point3,
+    b: &mut Budget,
+) -> Result<PlaneHit, Failure> {
+    b.step(1)?;
+    let denominator = dot(face.normal(), direction);
+    let numerator = face.offset() - dot(face.normal(), origin);
+    let hit = if denominator.is_zero() {
+        if numerator.is_zero() {
+            PlaneHit::Coplanar
+        } else {
+            PlaneHit::Miss
+        }
+    } else {
+        let t = numerator / denominator;
+        if t <= integer(0) {
+            PlaneHit::Miss
+        } else {
+            let hit = add(origin, &scale(direction, &t));
+            point(&hit, b)?;
+            PlaneHit::Hit(hit)
+        }
+    };
+    Ok(hit)
+}
+
 impl PlaneGroups {
     pub fn memberships(&self) -> usize {
         8 + self.ordinals.len() + 3 * self.counts.len()
@@ -120,25 +148,7 @@ impl PlaneGroups {
                 let hit = match entry {
                     Some(hit) => hit,
                     None => {
-                        b.step(1)?;
-                        let denominator = dot(face.normal(), direction);
-                        let numerator = face.offset() - dot(face.normal(), origin);
-                        let hit = if denominator.is_zero() {
-                            if numerator.is_zero() {
-                                PlaneHit::Coplanar
-                            } else {
-                                PlaneHit::Miss
-                            }
-                        } else {
-                            let t = numerator / denominator;
-                            if t <= integer(0) {
-                                PlaneHit::Miss
-                            } else {
-                                let hit = add(origin, &scale(direction, &t));
-                                point(&hit, b)?;
-                                PlaneHit::Hit(hit)
-                            }
-                        };
+                        let hit = compute_hit(face, origin, direction, b)?;
                         entry.insert(hit)
                     }
                 };
@@ -146,6 +156,122 @@ impl PlaneGroups {
                     PlaneHit::Miss => {}
                     PlaneHit::Coplanar => {
                         if face.contains(origin, b)?.0 {
+                            return Ok(None);
+                        }
+                    }
+                    PlaneHit::Hit(hit) => {
+                        let (inside, edge) = face.contains(hit, b)?;
+                        if !inside {
+                            continue;
+                        }
+                        if edge {
+                            return Ok(None);
+                        }
+                        parity = !parity;
+                    }
+                }
+            }
+            Ok(Some(parity))
+        })
+    }
+}
+
+pub(crate) struct CachedRay<'a> {
+    pub groups: &'a PlaneGroups,
+    pub owner: u32,
+    pub count: usize,
+    pub origin: &'a Point3,
+    pub direction: &'a Point3,
+}
+struct CacheSlot {
+    generation: u64,
+    hit: PlaneHit,
+}
+struct OwnerCache {
+    generation: u64,
+    slots: Vec<CacheSlot>,
+}
+pub(crate) struct RayCaches {
+    owners: BTreeMap<u32, OwnerCache>,
+    retained: usize,
+}
+impl RayCaches {
+    pub fn new(b: &mut Budget) -> Result<Self, Failure> {
+        b.retain(8)?;
+        Ok(Self {
+            owners: BTreeMap::new(),
+            retained: 8,
+        })
+    }
+    pub fn memberships(&self) -> usize {
+        self.retained
+    }
+    pub fn can_reuse(&self, groups: &PlaneGroups, count: usize) -> bool {
+        // Bound the lookup by all possible owner tables, plus the generation
+        // update. Keep the original scoped implementation when it is cheaper.
+        let lookup = groups.counts.len().saturating_add(1).ilog2() as usize + 1;
+        lookup + 1 < count
+    }
+    pub fn parity<'a>(
+        &mut self,
+        ray: CachedRay<'_>,
+        faces: impl Iterator<Item = (usize, &'a Facet)>,
+        b: &mut Budget,
+    ) -> Result<Option<bool>, Failure> {
+        // Covers new endpoint/hit scratch while a stale validated point remains
+        // owned by its slot. Persistent slots include their generation record.
+        b.with_retained(8, |b| {
+            tree_work(self.owners.len(), b)?;
+            let owner = match self.owners.entry(ray.owner) {
+                Entry::Occupied(entry) => entry.into_mut(),
+                Entry::Vacant(entry) => {
+                    b.step(1)?;
+                    let members = PlaneGroups::cache_memberships(ray.count) + ray.count;
+                    b.retain(members)?;
+                    if let Err(error) = b.step(ray.count as u64) {
+                        b.release(members);
+                        return Err(error);
+                    }
+                    let slots = std::iter::repeat_with(|| CacheSlot {
+                        generation: 0,
+                        hit: PlaneHit::Miss,
+                    })
+                    .take(ray.count)
+                    .collect();
+                    self.retained += members;
+                    entry.insert(OwnerCache {
+                        generation: 0,
+                        slots,
+                    })
+                }
+            };
+            if owner.slots.len() != ray.count {
+                return Err(b.fail(FailureKind::InvalidWitness, "changed plane cache owner"));
+            }
+            b.step(1)?;
+            let generation = owner.generation.checked_add(1).ok_or_else(|| {
+                b.fail(FailureKind::Operations, "plane cache generation overflow")
+            })?;
+            owner.generation = generation;
+            let mut parity = false;
+            for (ordinal, face) in faces {
+                b.step(1)?;
+                let local = *ray.groups.ordinals.get(ordinal).ok_or_else(|| {
+                    b.fail(FailureKind::InvalidWitness, "missing source plane ordinal")
+                })?;
+                let slot = owner.slots.get_mut(local).ok_or_else(|| {
+                    b.fail(FailureKind::InvalidWitness, "invalid source plane ordinal")
+                })?;
+                if slot.generation != generation {
+                    // Publish this generation only after fresh computation and
+                    // every original coordinate guard have succeeded.
+                    slot.hit = compute_hit(face, ray.origin, ray.direction, b)?;
+                    slot.generation = generation;
+                }
+                match &slot.hit {
+                    PlaneHit::Miss => {}
+                    PlaneHit::Coplanar => {
+                        if face.contains(ray.origin, b)?.0 {
                             return Ok(None);
                         }
                     }
@@ -297,6 +423,188 @@ mod tests {
             Some(FailureKind::Storage)
         );
         assert_eq!(short.retained_memberships(), 0);
+        Ok(())
+    }
+    #[test]
+    fn reusable_storage_invalidates_hits_and_retains_guards_between_attempts() -> Result<(), Failure>
+    {
+        let mut b = Budget::new(Limits::default())?;
+        let faces = faces(&mut b)?;
+        let owners = [0, 1].into_iter().collect::<BTreeSet<_>>();
+        let groups = PlaneGroups::build(&faces, &owners, &mut b)?;
+        let mut caches = RayCaches::new(&mut b)?;
+        let quarter = fraction("1", "4", &mut b)?;
+        let half = fraction("1", "2", &mut b)?;
+        let origin = [quarter.clone(), quarter.clone(), integer(0)];
+        let forward = [0, 0, 1].map(integer);
+        let run = |caches: &mut RayCaches, origin: &Point3, direction: &Point3, b: &mut Budget| {
+            caches.parity(
+                CachedRay {
+                    groups: &groups,
+                    owner: 0,
+                    count: 2,
+                    origin,
+                    direction,
+                },
+                faces
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, f)| f.id().component == 0),
+                b,
+            )
+        };
+        let start = b.operations();
+        assert_eq!(run(&mut caches, &origin, &forward, &mut b)?, Some(true));
+        let first = b.operations() - start;
+        let retained = b.retained_memberships();
+        let start = b.operations();
+        assert_eq!(run(&mut caches, &origin, &forward, &mut b)?, Some(true));
+        let second = b.operations() - start;
+        assert!(second < first, "first={first} second={second}");
+        assert_eq!(b.retained_memberships(), retained);
+        assert_eq!(caches.owners.get(&0).map(|o| o.generation), Some(2));
+        for (origin, direction, expected) in [
+            (
+                [integer(10), integer(10), integer(0)],
+                [0, 0, 1],
+                Some(false),
+            ),
+            (
+                [quarter.clone(), quarter.clone(), integer(0)],
+                [0, 0, -1],
+                Some(false),
+            ),
+            (
+                [quarter.clone(), quarter.clone(), integer(1)],
+                [1, 0, 0],
+                None,
+            ),
+            ([half.clone(), half, integer(0)], [0, 0, 1], None),
+        ] {
+            assert_eq!(
+                run(&mut caches, &origin, &direction.map(integer), &mut b)?,
+                expected
+            );
+            assert_eq!(b.retained_memberships(), retained);
+        }
+        // A fresh generation must revalidate its new hit, even though this
+        // plane previously held a valid point for another ray.
+        let bound = num_bigint::BigInt::from(1) << 4095usize;
+        let huge = fraction(&bound.to_string(), "1", &mut b)?;
+        let result = run(
+            &mut caches,
+            &origin,
+            &[huge, integer(0), integer(1)],
+            &mut b,
+        );
+        assert_eq!(result.err().map(|e| e.kind), Some(FailureKind::Rational));
+        assert_eq!(b.retained_memberships(), retained);
+        assert_eq!(run(&mut caches, &origin, &forward, &mut b)?, Some(true));
+        assert_eq!(
+            caches.parity(
+                CachedRay {
+                    groups: &groups,
+                    owner: 1,
+                    count: 1,
+                    origin: &origin,
+                    direction: &forward
+                },
+                faces
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, f)| f.id().component == 1),
+                &mut b
+            )?,
+            Some(true)
+        );
+        assert_eq!(caches.memberships(), 51);
+        let cache_members = caches.memberships();
+        drop(caches);
+        b.release(cache_members);
+        let group_members = groups.memberships();
+        drop(groups);
+        b.release(group_members);
+        assert_eq!(b.retained_memberships(), 0);
+
+        for (limit, success) in [(61, true), (60, false)] {
+            let mut tight = Budget::new(Limits {
+                storage_memberships: limit,
+                ..Limits::default()
+            })?;
+            let groups = PlaneGroups::build(&faces, &owners, &mut tight)?;
+            let mut caches = RayCaches::new(&mut tight)?;
+            let result = caches.parity(
+                CachedRay {
+                    groups: &groups,
+                    owner: 0,
+                    count: 2,
+                    origin: &origin,
+                    direction: &forward,
+                },
+                faces
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, f)| f.id().component == 0),
+                &mut tight,
+            );
+            if success {
+                assert_eq!(result?, Some(true));
+                assert_eq!(tight.peak_admitted_memberships(), 61);
+            } else {
+                assert_eq!(result.err().map(|e| e.kind), Some(FailureKind::Storage));
+                assert_eq!(caches.memberships(), 8);
+            }
+            let cache_members = caches.memberships();
+            drop(caches);
+            tight.release(cache_members);
+            let group_members = groups.memberships();
+            drop(groups);
+            tight.release(group_members);
+            assert_eq!(tight.retained_memberships(), 0);
+            assert!(tight.peak_admitted_memberships() <= limit);
+        }
+        // Refusing the one-time slot-initialization charge must also undo
+        // its successful memory admission, before any owner table publishes.
+        let mut measure = Budget::new(Limits::default())?;
+        let groups = PlaneGroups::build(&faces, &owners, &mut measure)?;
+        let caches = RayCaches::new(&mut measure)?;
+        let spent = measure.operations();
+        let cache_members = caches.memberships();
+        drop(caches);
+        measure.release(cache_members);
+        let group_members = groups.memberships();
+        drop(groups);
+        measure.release(group_members);
+        let mut work_short = Budget::new(Limits {
+            operations: spent + 3,
+            ..Limits::default()
+        })?;
+        let groups = PlaneGroups::build(&faces, &owners, &mut work_short)?;
+        let mut caches = RayCaches::new(&mut work_short)?;
+        let result = caches.parity(
+            CachedRay {
+                groups: &groups,
+                owner: 0,
+                count: 2,
+                origin: &origin,
+                direction: &forward,
+            },
+            faces
+                .iter()
+                .enumerate()
+                .filter(|(_, f)| f.id().component == 0),
+            &mut work_short,
+        );
+        assert_eq!(result.err().map(|e| e.kind), Some(FailureKind::Operations));
+        assert!(caches.owners.is_empty());
+        assert_eq!(caches.memberships(), 8);
+        let cache_members = caches.memberships();
+        drop(caches);
+        work_short.release(cache_members);
+        let group_members = groups.memberships();
+        drop(groups);
+        work_short.release(group_members);
+        assert_eq!(work_short.retained_memberships(), 0);
         Ok(())
     }
 }

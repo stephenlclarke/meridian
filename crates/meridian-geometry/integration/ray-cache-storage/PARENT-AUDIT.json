@@ -1,0 +1,129 @@
+{
+  "recordedAt": "2026-11-17T02:28:25.727041+00:00",
+  "head": "a5b00c952e2f96445adffb2b240e957cadc3c312",
+  "tree": "410cd990ae5048b42313ccd4d9e6a74a67bdbbc3",
+  "rootTerminalObservedAt": "2026-11-17T02:27:41.412732+00:00",
+  "raw": "evidence/MERIDIAN-A5B00C9-WHOLE-FIVE-TERMINAL-ROOT-RAW.json",
+  "rawArtifacts": 45,
+  "innerSealsVerified": 14,
+  "root284SourceAudit": "evidence/MERIDIAN-A5B00C9-FOCUSED-AFTER-START-ROOT-RAW.json",
+  "rootLiveProcessBinaryAudit": "evidence/MERIDIAN-A5B00C9-WHOLE-FIVE-AFTER-START-ROOT-RAW.json",
+  "status": "ACTUAL34RUST9HOST_FOCUSED_PASS;ONE_ORIGINAL_BATCH5OPERATIONS_REFUSALS15UNRUN0CANDIDATES",
+  "wrapper": {
+    "wrapperPID": 373,
+    "exit": 1,
+    "focusedExit": 0,
+    "wholeFiveExecuted": true,
+    "finishedUTC": "2026-11-17T02:26:49.581074+00:00",
+    "head": "a5b00c952e2f96445adffb2b240e957cadc3c312",
+    "tree": "410cd990ae5048b42313ccd4d9e6a74a67bdbbc3",
+    "noRetry": true
+  },
+  "caseResults": [
+    {
+      "id": "SH010",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          1,
+          88
+        ],
+        "operationsAtRefusal": 2000002,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000002,
+      "peakStorageMemberships": 75210,
+      "peakAdmittedReservationMemberships": 75210,
+      "retainedBudgetMembershipsAtTerminal": 66000,
+      "monotonicNanoseconds": 98753680244,
+      "completeCandidateReturned": false,
+      "fleetAdmission": false
+    },
+    {
+      "id": "SH011",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          1,
+          105
+        ],
+        "operationsAtRefusal": 2000004,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000004,
+      "peakStorageMemberships": 74356,
+      "peakAdmittedReservationMemberships": 74356,
+      "retainedBudgetMembershipsAtTerminal": 66962,
+      "monotonicNanoseconds": 101323288896,
+      "completeCandidateReturned": false,
+      "fleetAdmission": false
+    },
+    {
+      "id": "SH016",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          5,
+          10
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "peakStorageMemberships": 83238,
+      "peakAdmittedReservationMemberships": 83238,
+      "retainedBudgetMembershipsAtTerminal": 77946,
+      "monotonicNanoseconds": 51501310852,
+      "completeCandidateReturned": false,
+      "fleetAdmission": false
+    },
+    {
+      "id": "SH017",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          5,
+          7
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "peakStorageMemberships": 83457,
+      "peakAdmittedReservationMemberships": 83457,
+      "retainedBudgetMembershipsAtTerminal": 77486,
+      "monotonicNanoseconds": 60267489756,
+      "completeCandidateReturned": false,
+      "fleetAdmission": false
+    },
+    {
+      "id": "SH166",
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          5,
+          72
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "peakStorageMemberships": 74976,
+      "peakAdmittedReservationMemberships": 74976,
+      "retainedBudgetMembershipsAtTerminal": 72232,
+      "monotonicNanoseconds": 51949967549,
+      "completeCandidateReturned": false,
+      "fleetAdmission": false
+    }
+  ],
+  "totalBatchMonotonicNanoseconds": 363835271306,
+  "scope": "Originalguardsunchanged;multiunitattemptedworkmayexceed2Mby2or4beforetypedrefusal;peaklogicalreservationsnotallocatedRAM/fullfit;timedrefusedattemptsnotcompleteconstruction/minimum/speedacceptance;allpriorfailurespreserved;no unchangedretry",
+  "sealedFinalHandoff": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-a5b00c9/GEOMETRY-A5B00C9-FOCUSED-AND-ORIGINAL-HANDOFF.json",
+    "bytes": 52789,
+    "sha256": "b30d5eefd058516f7d6d6723ab23b4222a9019d85351c947ab9513ddcdf5a0f7",
+    "listedLocalLeavesIndependentlyVerified": 50,
+    "matrixSHA256": "8798ccbc9b6de1348cbd226f9716643073f4f0b5d7aba213100183309dc5af7b",
+    "scope": "FullfocusedPASS+oneoriginalFAILstagesdistinct;focusedresults5-stagesnapshotnotrewrittenas6stage"
+  }
+}
