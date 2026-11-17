@@ -348,7 +348,7 @@ impl Sample {
     }
     fn decode(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
         Ok(Self {
-            flight: read_flight(r)?,
+            flight: read_flight(r, version)?,
             visit: r.u64()?,
             physical_tick: r.u64()?,
             bodies: {

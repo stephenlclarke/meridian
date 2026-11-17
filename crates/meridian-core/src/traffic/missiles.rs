@@ -146,7 +146,7 @@ impl NpcMissileHit {
 }
 enum ResourceAction {
     Fire,
-    Pulse(bool),
+    Pulse(bool, u16),
     Missile(bool),
 }
 type ResourceEvent = (u64, u64, i32, usize, ResourceAction);
@@ -375,7 +375,7 @@ impl State {
                     b.world_tick,
                     order,
                     i,
-                    ResourceAction::Pulse(b.front),
+                    ResourceAction::Pulse(b.front, b.weapon.damage_hundredths()),
                 ));
             }
         }
@@ -425,7 +425,7 @@ impl State {
             resources.advance_exact(n)?;
             match action {
                 ResourceAction::Fire => resources.fire(),
-                ResourceAction::Pulse(front) => resources.hit(front),
+                ResourceAction::Pulse(front, damage) => resources.hit_damage(front, damage),
                 ResourceAction::Missile(front) => resources.hit_missile(front),
             }
             .map_err(|_| INVALID)?;

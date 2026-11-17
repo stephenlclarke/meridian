@@ -21,7 +21,7 @@ use crate::clock::FixedClock;
 use crate::profile::Profile;
 use crate::renderer::{HudScene, Presentation, Renderer, SceneEffects, StationScene};
 use crate::session::Action;
-use crate::{docked::Docked, docked_screens as ui};
+use crate::{asteroid_render, docked::Docked, docked_screens as ui};
 
 // Ephemeral profile IDs are allocated by the host, never by the deterministic core.
 fn fresh_profile_seed() -> u64 {
@@ -40,6 +40,7 @@ fn step_frame(
     ticks: usize,
     fire_held: bool,
     pulse: &mut Option<PulseShot>,
+    mining: &mut Option<asteroid_render::MiningVisual>,
 ) -> Result<Option<MotionRefusal>, StepError> {
     let mut refusal = None;
     for _ in 0..ticks {
@@ -50,8 +51,18 @@ fn step_frame(
             || state.navigation.is_some_and(|nav| nav.travel.is_some())
         {
             *pulse = None;
-        } else if fire_held && let Ok(shot) = world.request_fire_front_pulse(state.tick) {
-            *pulse = Some(shot);
+            *mining = None;
+        } else if fire_held {
+            if let Ok(tool) = world.mining_tool_authority() {
+                if let Ok(shot) = world.request_mining(tool, state.tick) {
+                    *mining = Some(asteroid_render::MiningVisual {
+                        opening: state,
+                        shot,
+                    });
+                }
+            } else if let Ok(shot) = world.request_fire_front_laser(state.tick) {
+                *pulse = Some(shot);
+            }
         }
     }
     Ok(refusal)
@@ -89,6 +100,7 @@ struct App {
     error: Option<String>,
     notice: Option<String>,
     pulse: Option<PulseShot>,
+    mining: Option<asteroid_render::MiningVisual>,
     missile_bodies: Vec<meridian_core::ProjectileSnapshot>,
 }
 
@@ -120,6 +132,7 @@ impl App {
             error: None,
             notice: None,
             pulse: None,
+            mining: None,
             missile_bodies: Vec::with_capacity(crate::mesh::MAX_MISSILE_PROJECTILES),
         }
     }
@@ -149,6 +162,7 @@ impl App {
             menu.focus_lost();
         }
         self.pulse = None;
+        self.mining = None;
         self.last_frame = Instant::now();
         self.clock.reset();
         self.game.session.invalidate();
@@ -321,6 +335,7 @@ impl App {
         }
         self.keys.clear();
         self.pulse = None;
+        self.mining = None;
         self.wheel = 0.0;
         if let Some(menu) = &mut self.docked
             && let Err(error) = menu.open(&self.game.world, screen)
@@ -428,6 +443,7 @@ impl App {
                 ticks,
                 self.keys.contains(&KeyCode::KeyZ),
                 &mut self.pulse,
+                &mut self.mining,
             )
         } else {
             Ok(None)
@@ -449,6 +465,9 @@ impl App {
                 match refusal {
                     MotionRefusal::CelestialContact => {
                         "Celestial contact: stopped before the physical surface"
+                    }
+                    MotionRefusal::AsteroidContact => {
+                        "Asteroid hull contact: stopped at last clear position"
                     }
                     MotionRefusal::NpcContact => "NPC hull contact: stopped at last clear position",
                     MotionRefusal::StationContact => {
@@ -599,6 +618,7 @@ impl App {
                 && snapshot.tick.saturating_sub(shot.tick) < 5
         });
         let pulse_notice = self.pulse.map(|shot| match shot.contact {
+            PulseContact::AsteroidBlocked { .. } => "Rock obstructs Pulse: no ore yielded",
             PulseContact::Npc { .. } => "NPC hull struck",
             PulseContact::Clear => "Pulse fired",
             PulseContact::Projectile { .. } => "Pulse intercepted missile",
@@ -614,14 +634,29 @@ impl App {
             r.map(Renderer::logical_viewport)
         });
         let Some(PreparedPresentation {
-            hud_lines,
+            mut hud_lines,
             docked_frame,
         }) = Self::route_presentation(prepared, |error| self.fail(event_loop, error))
         else {
             return;
         };
-        let notice = pulse_notice.or(self.notice.as_deref());
+        let belt = if snapshot.mode == FlightMode::Flight {
+            self.game.world.mining_belt_snapshot()
+        } else {
+            None
+        };
+        if let Some(belt) = &belt {
+            match asteroid_render::hud_line(snapshot, belt, None) {
+                Ok(Some(line)) => hud_lines.insert(hud_lines.len().min(2), line),
+                Ok(None) => {}
+                Err(error) => {
+                    self.fail(event_loop, error);
+                    return;
+                }
+            }
+        }
 
+        let notice = pulse_notice.or(self.notice.as_deref());
         let traffic = self.game.world.traffic_snapshot();
         let cockpit = if self.game.playing() {
             match crate::hud::cockpit::Cockpit::capture(&self.game.world, snapshot) {
@@ -680,6 +715,9 @@ impl App {
                         MotionRefusal::CelestialContact => {
                             "Celestial contact: stopped before the physical surface"
                         }
+                        MotionRefusal::AsteroidContact => {
+                            "Asteroid hull contact: stopped at last clear position"
+                        }
                         MotionRefusal::NpcContact => {
                             "NPC hull contact: stopped at last clear position"
                         }
@@ -715,6 +753,10 @@ impl App {
                 SceneEffects {
                     traffic: traffic.as_ref(),
                     pulse: self.pulse.as_ref(),
+                    mining: belt.as_ref().map(|belt| asteroid_render::Scene {
+                        belt,
+                        visual: self.mining,
+                    }),
                     missiles: &self.missile_bodies,
                     practice: practice.as_ref().and_then(|state| state.beacons.as_ref()),
                     celestial: celestial_scene.as_ref(),
@@ -854,22 +896,22 @@ mod tests {
             .unwrap_or_else(|error| panic!("{error}"));
         let input = FlightInput::default();
         let mut pulse = None;
-        step_frame(&mut world, input, 1, false, &mut pulse)
+        step_frame(&mut world, input, 1, false, &mut pulse, &mut None)
             .unwrap_or_else(|error| panic!("{error}"));
         let tick = world.snapshot().tick;
-        step_frame(&mut world, input, 0, true, &mut pulse)
+        step_frame(&mut world, input, 0, true, &mut pulse, &mut None)
             .unwrap_or_else(|error| panic!("{error}"));
         assert_eq!(pulse, None);
-        step_frame(&mut world, input, 1, true, &mut pulse)
+        step_frame(&mut world, input, 1, true, &mut pulse, &mut None)
             .unwrap_or_else(|error| panic!("{error}"));
         let first = pulse.unwrap_or_else(|| panic!("Held trigger did not fire on the next tick"));
         assert_eq!(first.tick, tick + 1);
 
         let cooldown = usize::from(meridian_core::PULSE_COOLDOWN_TICKS);
-        step_frame(&mut world, input, cooldown - 1, true, &mut pulse)
+        step_frame(&mut world, input, cooldown - 1, true, &mut pulse, &mut None)
             .unwrap_or_else(|error| panic!("{error}"));
         assert_eq!(pulse, Some(first));
-        step_frame(&mut world, input, 1, true, &mut pulse)
+        step_frame(&mut world, input, 1, true, &mut pulse, &mut None)
             .unwrap_or_else(|error| panic!("{error}"));
         assert_eq!(
             pulse.map(|shot| shot.tick),
@@ -877,7 +919,7 @@ mod tests {
         );
 
         let second = pulse;
-        step_frame(&mut world, input, cooldown, false, &mut pulse)
+        step_frame(&mut world, input, cooldown, false, &mut pulse, &mut None)
             .unwrap_or_else(|error| panic!("{error}"));
         assert_eq!(pulse, second);
         assert_eq!(
@@ -907,8 +949,15 @@ mod tests {
             assert_eq!(world.snapshot().motion_refusal, None);
         }
         let before = world.snapshot();
-        let notice = step_frame(&mut world, FlightInput::default(), 2, false, &mut None)
-            .unwrap_or_else(|error| panic!("{error}"));
+        let notice = step_frame(
+            &mut world,
+            FlightInput::default(),
+            2,
+            false,
+            &mut None,
+            &mut None,
+        )
+        .unwrap_or_else(|error| panic!("{error}"));
         let after = world.snapshot();
         assert_eq!(notice, Some(MotionRefusal::EntryConditions));
         assert_eq!(after.motion_refusal, None);

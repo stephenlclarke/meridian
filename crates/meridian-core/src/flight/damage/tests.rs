@@ -33,7 +33,12 @@ fn incoming_missile_then_pulse_share_facing_shields_and_actual_energy_once() {
                 damage: 1500,
             },
         ),
-        (1, 3, 0, Effect::Pulse),
+        (
+            1,
+            3,
+            0,
+            Effect::Laser(crate::OrdinaryWeapon::FrontPulseLaser),
+        ),
     ];
     let actual = ok(replay(&events, 1));
     let mut expected = PulseResources::default();
@@ -72,7 +77,12 @@ fn rear_damage_and_true_berth_reset_are_exact_with_retained_weapon_cooldown() {
                 damage: 1500,
             },
         ),
-        (1, 3, 0, Effect::Pulse),
+        (
+            1,
+            3,
+            0,
+            Effect::Laser(crate::OrdinaryWeapon::FrontPulseLaser),
+        ),
         (2, 0, 0, Effect::Berth),
     ];
     let actual = ok(replay(&events, 2));
@@ -112,12 +122,30 @@ fn hull_overkill_is_saturating_and_npc_cannot_emit_a_new_hit_on_dead_player() {
 }
 #[test]
 fn huge_elapsed_clock_is_saturating_without_per_tick_replay_and_bad_cadence_refuses() {
-    let events = [(1, 3, 0, Effect::Pulse)];
+    let events = [(
+        1,
+        3,
+        0,
+        Effect::Laser(crate::OrdinaryWeapon::FrontPulseLaser),
+    )];
     assert_eq!(
         ok(replay(&events, u64::MAX)).pulse,
         PulseResources::default()
     );
-    let bad = [(1, 3, 0, Effect::Pulse), (18, 3, 0, Effect::Pulse)];
+    let bad = [
+        (
+            1,
+            3,
+            0,
+            Effect::Laser(crate::OrdinaryWeapon::FrontPulseLaser),
+        ),
+        (
+            18,
+            3,
+            0,
+            Effect::Laser(crate::OrdinaryWeapon::FrontPulseLaser),
+        ),
+    ];
     assert!(replay(&bad, 18).is_err());
     assert!(replay(&events, 0).is_err());
 }
@@ -254,5 +282,82 @@ fn byte_capacity_failed_native_npc_step_keeps_player_attacker_market_tick_and_re
     assert!(
         refused,
         "next native NPC beam did not reach the pre-publication byte gate"
+    );
+}
+
+#[test]
+fn exact_pool_replay_refuses_a_journal_spend_shifted_before_its_actual_impact() {
+    let mut world = ok(World::new_commander(1471));
+    crate::flight::practice::tests::launch(&mut world);
+    crate::flight::missiles::tests::stop(&mut world);
+    crate::flight::practice::tests::aim_at(
+        &mut world,
+        crate::docking::Vec3::new(70.0, 0.0, 136.32),
+    );
+    ok(world.request_fire_front_pulse(world.snapshot().tick));
+    let hit = world
+        .combat
+        .last_impact()
+        .unwrap_or_else(|| panic!("missing real station hit"));
+    assert_eq!(hit.target, OrdinaryTarget::MainStation);
+    assert_eq!(hit.physical_tick, world.combat.physical_tick());
+    let good = ok(world.save_bytes());
+    let mut forged = ok(World::from_save_bytes(&good));
+    let events = Arc::make_mut(&mut forged.damage.events);
+    assert_eq!(events.len(), 1);
+    assert_eq!(
+        events[0],
+        Event {
+            clock: hit.physical_tick,
+            kind: Kind::Pulse
+        }
+    );
+    events[0].clock -= 1;
+    forged.pulse.replay_advance(1);
+    let resources = forged
+        .flight_resources_snapshot()
+        .unwrap_or_else(|| panic!("missing resource pools"));
+    assert_eq!(
+        (
+            resources.energy_hundredths,
+            resources.heat_fifths,
+            resources.cooldown_ticks
+        ),
+        (37907, 49, 17)
+    );
+    let bytes = ok(forged.unchecked_test_save());
+    assert_eq!(world.restore_bytes(&bytes), Err(INVALID));
+    assert_eq!(ok(world.save_bytes()), good);
+}
+
+#[test]
+fn one_real_station_discharge_accepts_an_identical_mirror_and_refuses_npc_ownership() {
+    let mut world = ok(World::new_commander(1471));
+    crate::flight::practice::tests::launch(&mut world);
+    crate::flight::missiles::tests::stop(&mut world);
+    crate::flight::practice::tests::aim_at(
+        &mut world,
+        crate::docking::Vec3::new(70.0, 0.0, 136.32),
+    );
+    ok(world.request_fire_front_pulse(world.snapshot().tick));
+    let hit = world
+        .combat
+        .last_impact()
+        .unwrap_or_else(|| panic!("missing real station hit"));
+    assert_eq!(hit.target, OrdinaryTarget::MainStation);
+    assert_eq!(
+        validate_exclusive_laser_targets([hit, hit], [hit.emission + 1]),
+        Ok(())
+    );
+    assert_eq!(
+        validate_exclusive_laser_targets([hit, hit], [hit.emission]),
+        Err(INVALID)
+    );
+
+    let mut different = hit;
+    different.incident += 1;
+    assert_eq!(
+        validate_exclusive_laser_targets([hit, different], []),
+        Err(INVALID)
     );
 }

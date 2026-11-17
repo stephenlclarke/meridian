@@ -733,3 +733,58 @@ fn another_real_public_branch_cannot_supply_a_practice_incident_this_world_never
     assert_eq!(world.restore_bytes(&poisoned), Err(expected));
     assert_eq!(world.save_bytes().unwrap(), bytes);
 }
+
+#[test]
+fn qualified_v15_opening_layout_keeps_real_birth_provenance_and_accepts_a_real_new_discharge() {
+    // At opening there are no module events or traffic shots. Use the exact
+    // prior header and omit the appended mining state from the current body.
+    let world = World::new_commander(15001).unwrap();
+    let legacy = v15_test_fixture(&world).unwrap();
+    let mut loaded = World::from_save_bytes(&legacy).unwrap();
+    assert_eq!(loaded.snapshot(), world.snapshot());
+    assert_eq!(
+        loaded.modular_equipment_snapshot(),
+        world.modular_equipment_snapshot()
+    );
+    assert_eq!(loaded.credits_tenths(), Some(7200));
+    assert!(loaded.damage.enabled());
+    crate::flight::practice::tests::launch(&mut loaded);
+    loaded
+        .request_fire_front_pulse(loaded.snapshot().tick)
+        .unwrap();
+    assert_eq!(
+        loaded
+            .flight_resources_snapshot()
+            .unwrap()
+            .energy_hundredths,
+        37900
+    );
+    let bytes = loaded.save_bytes().unwrap();
+    let cold = World::from_save_bytes(&bytes).unwrap();
+    assert_eq!(
+        cold.flight_resources_snapshot(),
+        loaded.flight_resources_snapshot()
+    );
+    assert_eq!(
+        cold.modular_equipment_snapshot(),
+        loaded.modular_equipment_snapshot()
+    );
+}
+#[test]
+fn qualified_v13_absence_does_not_mint_resource_birth_history_for_fast_or_energy_modules() {
+    let world = World::new_commander(15002).unwrap();
+    let bytes = v13_test_fixture(&world).unwrap();
+    let loaded = World::from_save_bytes(&bytes).unwrap();
+    assert!(!loaded.damage.enabled());
+    let before = loaded.save_bytes().unwrap();
+    for kind in [
+        crate::ModuleKind::BeamLaser,
+        crate::ModuleKind::ExtraEnergyUnit,
+    ] {
+        assert!(matches!(
+            loaded.review_module(crate::ModuleAction::Purchase { kind }, 0),
+            Err(crate::ModuleError::Save(_))
+        ));
+    }
+    assert_eq!(loaded.save_bytes().unwrap(), before);
+}

@@ -693,15 +693,17 @@ impl Session {
         }
         if snapshot.mode == FlightMode::Flight
             && snapshot.navigation.is_some_and(|nav| nav.travel.is_none())
-            && let Some(laser) = world.pulse_laser_snapshot()
+            && let Some(laser) = world.front_laser_snapshot()
+            && let Some(resources) = world.flight_resources_snapshot()
         {
             lines.push(format!(
-                "Z FIRE FRONT PULSE | ENERGY {}.{:02} | HEAT {}.{} | COOLDOWN {} TICKS",
-                laser.energy_hundredths / 100,
-                laser.energy_hundredths % 100,
-                laser.heat_fifths / 5,
-                (laser.heat_fifths % 5) * 2,
-                laser.cooldown_ticks
+                "Z FIRE FRONT {} | ENERGY {}.{:02} | HEAT {}.{} | COOLDOWN {} TICKS",
+                laser.weapon.label(),
+                resources.energy_hundredths / 100,
+                resources.energy_hundredths % 100,
+                resources.heat_fifths / 5,
+                (resources.heat_fifths % 5) * 2,
+                resources.cooldown_ticks
             ));
         }
         lines.push("W/S THRUST | ARROWS PITCH | A/D YAW | Q/E ROLL | SPACE BRAKE | J JUMP".into());

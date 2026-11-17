@@ -103,7 +103,10 @@ fn fire_npc(w: &mut World) -> MissileOrigin {
 fn cold(w: &World) -> World {
     let bytes = w.save_bytes().unwrap();
     assert!(bytes.len() <= crate::save::MAX_SAVE_BYTES);
-    assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 15);
+    assert_eq!(
+        u16::from_le_bytes([bytes[8], bytes[9]]),
+        crate::save::SAVE_VERSION
+    );
     let loaded = World::from_save_bytes(&bytes).unwrap();
     assert_eq!(loaded.traffic_snapshot(), w.traffic_snapshot());
     assert_eq!(

@@ -208,7 +208,7 @@ def verify_save(observer, directory, output, receipt):
         if code:
             raise subprocess.CalledProcessError(code, attempt["argv"])
     evidence = stdout.read_text()
-    required = ("saved_format=15\n", "mode: Docked", "credits_tenths=Some(7200)\n",
+    required = ("saved_format=16\n", "mode: Docked", "credits_tenths=Some(7200)\n",
                 "used_tonnes: 0", "fuel_units: 130")
     if not all(item in evidence for item in required) or before != sha256(save):
         raise RuntimeError("Save decoder did not confirm the untouched starter commander")
