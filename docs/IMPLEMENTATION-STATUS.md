@@ -8,7 +8,9 @@ The review correction binds retained laser impacts to the resource journal, repl
 
 ## Destroyed trader manifest custody awaiting review
 
-The successor to `050b04e` uses PR 44 head `a1ee1358` as its base. The staged fatal actor transition and save validation bind the paid manifest to the same typed laser or missile event, ordered by the existing NPC resource replay. The three original custody cases and one fitted Beam regression await the owning run. The missile case now also checks the qualified v15 layout with real paid missile and actor history before continuing under v16. Physical cargo issuance still requires eligible original geometry and a bound actor producer. See the [wreck manifest guide](WRECK-MANIFEST.md).
+The successor to `050b04e` uses PR 44 head `a1ee1358` as its base. The staged fatal actor transition and save validation bind the paid manifest to the same typed laser or missile event, ordered by the existing NPC resource replay. The missile case checks the qualified v15 layout with real paid missile and actor history before continuing under v16. Physical cargo issuance still requires eligible original geometry and a bound actor producer. See the [wreck manifest guide](WRECK-MANIFEST.md).
+
+The Dell trace on `1e8e3b7` confirmed that a later-visit ordinary missile was counted against a closed practice sortie. Launch, flight steps, laser publication and save validation now count only live missiles from the retained practice attempt’s own sortie. The four custody cases await the owning run on the corrected source, including a v16 cold Continue with a live later-visit missile before the fatal fitted Beam contact.
 
 ## Actual main 80a0b16 coverage failure and changed adapter correction
 

@@ -51,7 +51,7 @@ The [mining source](docs/ASTEROID-MINING.md) joins genuine paid Mining Laser wor
 
 ## Destroyed trader manifest custody
 
-An actual fatal fitted laser or missile contact now ties the SH025 trader’s paid goods to the existing combat history. The wreck receipt records the retained laser or missile identity. Four Rust tests on this successor await the owning run. Physical recovery, section cutting and boarding require their own original producers. See the [wreck manifest guide](docs/WRECK-MANIFEST.md).
+An actual fatal fitted laser or missile contact now ties the SH025 trader’s paid goods to the existing combat history. The wreck receipt records the retained laser or missile identity. A retained practice attempt counts only live missiles from its own sortie. Four Rust tests await the owning run, including the mixed missile and Beam case that saves and cold-continues with a live later-visit missile. Physical recovery, section cutting and boarding require their own original producers. See the [wreck manifest guide](docs/WRECK-MANIFEST.md).
 
 ## Play
 
