@@ -387,7 +387,9 @@ fn actual_player_pulse_uses_first_npc_mesh_and_bound_weapon_resources_and_retain
 #[test]
 fn old_v13_and_corrupt_current_traffic_refuse_without_replacing_live_bytes() {
     let initial = ok(World::new_commander(12005));
-    let old = ok(crate::flight::persistence::v13_test_fixture(&initial));
+    let old = ok(crate::flight::persistence::unsupported_version_test_input(
+        &initial, 13,
+    ));
     assert_eq!(u16::from_le_bytes([old[8], old[9]]), 13);
     assert_eq!(
         World::from_save_bytes(&old).unwrap_err(),

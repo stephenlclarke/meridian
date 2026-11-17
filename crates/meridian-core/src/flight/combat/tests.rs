@@ -393,7 +393,7 @@ fn save_validation_refuses_removed_failure_forged_contact_and_unearned_legal_bit
 #[test]
 fn current_hot_practice_keeps_hits_and_refuses_v6_and_v7() {
     let world = three_hits(1461);
-    let legacy = crate::flight::persistence::v6_test_fixture(&world).unwrap();
+    let legacy = crate::flight::persistence::unsupported_version_test_input(&world, 6).unwrap();
     assert_eq!(u16::from_le_bytes([legacy[8], legacy[9]]), 6);
     assert_eq!(
         World::from_save_bytes(&legacy).unwrap_err(),
@@ -424,7 +424,7 @@ fn current_hot_practice_keeps_hits_and_refuses_v6_and_v7() {
         continued.practice_snapshot().unwrap().status,
         PracticeStatus::Failed
     );
-    let v7 = crate::flight::persistence::v7_test_fixture(&continued).unwrap();
+    let v7 = crate::flight::persistence::unsupported_version_test_input(&continued, 7).unwrap();
     assert_eq!(u16::from_le_bytes([v7[8], v7[9]]), 7);
     assert_eq!(
         World::from_save_bytes(&v7).unwrap_err(),

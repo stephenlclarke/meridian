@@ -449,14 +449,12 @@ fn current_paid_and_hot_world_continues_without_t02_and_refuses_an_original_v4_o
     world
         .request_fire_front_pulse(world.snapshot().tick)
         .unwrap();
-    // The complete current scenario above really has physical NPC history. It
-    // must continue in the current format, never silently lose actors in a v4 export.
+    // The current scenario has real physical NPC history and retains it on Continue.
     let current = world.save_bytes().unwrap();
+    let labelled = crate::flight::persistence::unsupported_version_test_input(&world, 4).unwrap();
     assert_eq!(
-        crate::flight::persistence::v4_test_fixture(&world),
-        Err(crate::save::SaveError::InvalidState(
-            "physical traffic requires current format"
-        ))
+        World::from_save_bytes(&labelled).unwrap_err(),
+        crate::save::SaveError::UnsupportedVersion
     );
     assert_eq!(world.save_bytes().unwrap(), current);
     let continued = World::from_save_bytes(&current).unwrap();
@@ -468,7 +466,8 @@ fn current_paid_and_hot_world_continues_without_t02_and_refuses_an_original_v4_o
     );
 
     let opening = World::new_commander(2411).unwrap();
-    let old_opening = crate::flight::persistence::v4_test_fixture(&opening).unwrap();
+    let old_opening =
+        crate::flight::persistence::unsupported_version_test_input(&opening, 4).unwrap();
     assert_eq!(u16::from_le_bytes([old_opening[8], old_opening[9]]), 4);
     assert_eq!(
         World::from_save_bytes(&old_opening).unwrap_err(),

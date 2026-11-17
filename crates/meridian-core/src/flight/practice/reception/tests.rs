@@ -227,7 +227,7 @@ fn current_active_and_retired_hits_keep_their_reception_and_v5_refuses() {
     let mut world = three_hits(1231);
     step(&mut world, 180);
     assert!(world.practice_reception_snapshot().unwrap().ready);
-    let bytes = crate::flight::persistence::v5_test_fixture(&world).unwrap();
+    let bytes = crate::flight::persistence::unsupported_version_test_input(&world, 5).unwrap();
     assert_eq!(
         World::from_save_bytes(&bytes).unwrap_err(),
         crate::save::SaveError::UnsupportedVersion
@@ -240,7 +240,8 @@ fn current_active_and_retired_hits_keep_their_reception_and_v5_refuses() {
         world.practice_reception_snapshot()
     );
     jump_and_dock(&mut world, SystemId::RENAS);
-    let old_retired = crate::flight::persistence::v5_test_fixture(&world).unwrap();
+    let old_retired =
+        crate::flight::persistence::unsupported_version_test_input(&world, 5).unwrap();
     assert_eq!(
         World::from_save_bytes(&old_retired).unwrap_err(),
         crate::save::SaveError::UnsupportedVersion

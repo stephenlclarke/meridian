@@ -69,7 +69,9 @@ fn root_join_cold_continue_preserves_paid_same_item_and_typed_store_refit_withou
 #[test]
 fn old_fifteen_bytes_and_new_utility_relabelling_refuse_atomically() {
     let mut w = funded();
-    let old = ok(crate::flight::persistence::v15_test_fixture(&w));
+    let old = ok(crate::flight::persistence::unsupported_version_test_input(
+        &w, 15,
+    ));
     assert_eq!(
         World::from_save_bytes(&old).unwrap_err(),
         crate::save::SaveError::UnsupportedVersion
@@ -84,7 +86,9 @@ fn old_fifteen_bytes_and_new_utility_relabelling_refuse_atomically() {
     let item = apply(&mut w, ModuleAction::PurchaseFuelScoops);
     let mut loaded = continued(&w);
     // Negative codec fixture only: no gear, pose, cargo or success is supplied to gameplay.
-    let forged_old = ok(crate::flight::persistence::v15_test_fixture(&w));
+    let forged_old = ok(crate::flight::persistence::unsupported_version_test_input(
+        &w, 15,
+    ));
     assert_eq!(
         World::from_save_bytes(&forged_old).unwrap_err(),
         crate::save::SaveError::UnsupportedVersion

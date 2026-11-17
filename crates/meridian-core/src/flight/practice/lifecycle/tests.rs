@@ -492,7 +492,7 @@ fn current_live_and_completed_states_keep_custody_and_refuse_v8() {
     stop(&mut world);
     let target = world.practice_snapshot().unwrap().beacons.unwrap()[1].id;
     let origin = fire(&mut world, target);
-    let old = crate::flight::persistence::v8_test_fixture(&world).unwrap();
+    let old = crate::flight::persistence::unsupported_version_test_input(&world, 8).unwrap();
     assert_eq!(
         World::from_save_bytes(&old).unwrap_err(),
         crate::save::SaveError::UnsupportedVersion
@@ -510,7 +510,7 @@ fn current_live_and_completed_states_keep_custody_and_refuse_v8() {
     three_hits(&mut world);
     receive(&mut world);
     let trace = world.practice_reception_snapshot().unwrap().trace;
-    let old = crate::flight::persistence::v8_test_fixture(&world).unwrap();
+    let old = crate::flight::persistence::unsupported_version_test_input(&world, 8).unwrap();
     assert_eq!(
         World::from_save_bytes(&old).unwrap_err(),
         crate::save::SaveError::UnsupportedVersion

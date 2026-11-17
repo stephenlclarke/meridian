@@ -297,10 +297,6 @@ impl State {
     }
 }
 impl State {
-    #[cfg(test)]
-    pub(super) fn save_supported(&self) -> bool {
-        !self.armed && self.lock.is_none() && self.projectiles.iter().all(Option::is_none)
-    }
     pub(super) fn intercept(
         &mut self,
         id: ProjectileId,

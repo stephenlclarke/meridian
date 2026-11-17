@@ -688,7 +688,9 @@ fn current_continue_retains_completed_t01_and_refuses_v10() {
     let review = ok(w.review_flight_reception(FlightReceptionAction::Receive, tick));
     ok(w.prepare_flight_reception(review, tick)).commit();
     let t01 = some(w.flight_reception_snapshot());
-    let bytes = ok(crate::flight::persistence::v10_test_fixture(&w));
+    let bytes = ok(crate::flight::persistence::unsupported_version_test_input(
+        &w, 10,
+    ));
     assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 10);
     assert_eq!(
         World::from_save_bytes(&bytes).unwrap_err(),
@@ -706,7 +708,13 @@ fn current_continue_retains_completed_t01_and_refuses_v10() {
         t01.attempts
     );
     confirm(&mut w, Action::Accept);
-    assert!(crate::flight::persistence::v10_test_fixture(&w).is_err());
+    let labelled = ok(crate::flight::persistence::unsupported_version_test_input(
+        &w, 10,
+    ));
+    assert_eq!(
+        World::from_save_bytes(&labelled).unwrap_err(),
+        crate::save::SaveError::UnsupportedVersion
+    );
 }
 
 #[test]

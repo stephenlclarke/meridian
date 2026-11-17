@@ -308,7 +308,9 @@ fn all_provider_rock_envelopes_clear_the_actual_celestial_scene() {
 fn explicit_old_fifteen_save_refuses_before_mining_state_changes() {
     // Codec compatibility fixture only; no gameplay yield, item, pose or money is injected.
     let mut fresh = ok(World::new_commander(12005));
-    let old = ok(crate::flight::persistence::v15_test_fixture(&fresh));
+    let old = ok(crate::flight::persistence::unsupported_version_test_input(
+        &fresh, 15,
+    ));
     assert_eq!(u16::from_le_bytes([old[8], old[9]]), 15);
     assert_eq!(
         World::from_save_bytes(&old).unwrap_err(),

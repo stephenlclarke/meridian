@@ -438,13 +438,6 @@ impl State {
             missile_hits: Arc::new(missile_hits),
         })
     }
-    #[cfg(test)]
-    pub(crate) fn legacy_empty(&self) -> bool {
-        self.actors.iter().all(Option::is_none)
-            && self.shots.is_empty()
-            && self.player_hits.is_empty()
-            && self.missile_hits.is_empty()
-    }
 }
 impl NpcId {
     pub(crate) fn encode(self, w: &mut Writer) {

@@ -469,7 +469,9 @@ fn current_continue_keeps_cancelled_gunnery_history_and_refuses_v9() {
     ok(world.prepare_practice_closure(review, 0)).commit();
     consent(&mut world);
     let before = some(world.practice_ledger_snapshot());
-    let bytes = ok(crate::flight::persistence::v9_test_fixture(&world));
+    let bytes = ok(crate::flight::persistence::unsupported_version_test_input(
+        &world, 9,
+    ));
     assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 9);
     assert_eq!(
         World::from_save_bytes(&bytes).unwrap_err(),
@@ -481,12 +483,13 @@ fn current_continue_keeps_cancelled_gunnery_history_and_refuses_v9() {
     assert_eq!(snapshot(&loaded).trace, None);
     assert_eq!(loaded.missile_snapshot(), world.missile_snapshot());
     let _continued = cold(&loaded);
-    assert!(
-        crate::flight::persistence::v9_test_fixture(&{
-            confirm(&mut world, Action::Accept);
-            world
-        })
-        .is_err()
+    confirm(&mut world, Action::Accept);
+    let labelled = ok(crate::flight::persistence::unsupported_version_test_input(
+        &world, 9,
+    ));
+    assert_eq!(
+        World::from_save_bytes(&labelled).unwrap_err(),
+        crate::save::SaveError::UnsupportedVersion
     );
 }
 

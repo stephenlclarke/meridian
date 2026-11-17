@@ -386,7 +386,7 @@ fn coherent_scene_and_projectile_endpoint_poison_cannot_remove_actual_damage_rec
 #[test]
 fn draft14_and_public13_both_refuse_on_current_reader() {
     let w = World::new_commander(12005).unwrap();
-    let bytes = crate::flight::persistence::v13_test_fixture(&w).unwrap();
+    let bytes = crate::flight::persistence::unsupported_version_test_input(&w, 13).unwrap();
     assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 13);
     assert_eq!(
         World::from_save_bytes(&bytes).unwrap_err(),

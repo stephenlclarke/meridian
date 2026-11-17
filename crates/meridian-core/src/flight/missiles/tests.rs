@@ -583,10 +583,10 @@ fn untouched_current_controller_keeps_owned_rounds_and_refuses_v4_through_v7() {
     let world = World::new_commander(1691).unwrap();
     let expected = world.missile_snapshot().unwrap();
     let saves = [
-        crate::flight::persistence::v4_test_fixture(&world).unwrap(),
-        crate::flight::persistence::v5_test_fixture(&world).unwrap(),
-        crate::flight::persistence::v6_test_fixture(&world).unwrap(),
-        crate::flight::persistence::v7_test_fixture(&world).unwrap(),
+        crate::flight::persistence::unsupported_version_test_input(&world, 4).unwrap(),
+        crate::flight::persistence::unsupported_version_test_input(&world, 5).unwrap(),
+        crate::flight::persistence::unsupported_version_test_input(&world, 6).unwrap(),
+        crate::flight::persistence::unsupported_version_test_input(&world, 7).unwrap(),
     ];
     for bytes in saves {
         assert_eq!(

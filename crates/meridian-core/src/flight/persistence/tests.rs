@@ -773,11 +773,11 @@ fn another_real_public_branch_cannot_supply_a_practice_incident_this_world_never
 }
 
 #[test]
-fn qualified_v15_opening_refuses_and_current_birth_keeps_its_real_discharge() {
-    // At opening there are no module events or traffic shots. Use the exact
-    // prior header and omit the mining state and jump journal from the current body.
+fn unsupported_v15_label_refuses_and_current_birth_keeps_its_real_discharge() {
+    // This current payload has a resealed unsupported version label.
+    // The literal historical fixture is retained in the separate integration target.
     let world = World::new_commander(15001).unwrap();
-    let legacy = v15_test_fixture(&world).unwrap();
+    let legacy = unsupported_version_test_input(&world, 15).unwrap();
     assert_eq!(
         World::from_save_bytes(&legacy).unwrap_err(),
         crate::save::SaveError::UnsupportedVersion
@@ -813,9 +813,9 @@ fn qualified_v15_opening_refuses_and_current_birth_keeps_its_real_discharge() {
     );
 }
 #[test]
-fn qualified_v13_does_not_replace_a_live_commander() {
+fn unsupported_v13_label_does_not_replace_a_live_commander() {
     let mut world = World::new_commander(15002).unwrap();
-    let bytes = v13_test_fixture(&world).unwrap();
+    let bytes = unsupported_version_test_input(&world, 13).unwrap();
     assert_eq!(
         World::from_save_bytes(&bytes).unwrap_err(),
         crate::save::SaveError::UnsupportedVersion
@@ -844,7 +844,7 @@ fn current_journal_resumes_its_pending_jump_and_older_input_refuses() {
     for _ in 0..100 {
         legacy_source.step(FlightInput::default()).unwrap();
     }
-    let legacy = v15_test_fixture(&legacy_source).unwrap();
+    let legacy = unsupported_version_test_input(&legacy_source, 15).unwrap();
     assert_eq!(
         World::from_save_bytes(&legacy).unwrap_err(),
         SaveError::UnsupportedVersion

@@ -11,14 +11,6 @@ impl Practice {
     pub(in crate::flight) fn encode(self, w: &mut Writer) {
         self.encode_version(w, 9);
     }
-    #[cfg(test)]
-    pub(in crate::flight) fn encode_v7(self, w: &mut Writer) {
-        self.encode_version(w, 7);
-    }
-    #[cfg(test)]
-    pub(in crate::flight) fn encode_v8(self, w: &mut Writer) {
-        self.encode_version(w, 8);
-    }
     fn encode_version(self, w: &mut Writer, version: u16) {
         self.consent.encode_save(w);
         w.u64(self.confirmed_tick);
