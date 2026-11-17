@@ -18,7 +18,26 @@ fn same_cold(world: &World) -> World {
     );
     assert_eq!(loaded.missile_snapshot(), world.missile_snapshot());
     assert_eq!(loaded.credits_tenths(), world.credits_tenths());
+    assert_eq!(
+        loaded.missile_projectiles().collect::<Vec<_>>(),
+        world.missile_projectiles().collect::<Vec<_>>()
+    );
     loaded
+}
+fn finish_projectile(world: &mut World, id: ProjectileId) -> ProjectileSnapshot {
+    // All five genuinely owned rounds participate; the legacy snapshot projects only three.
+    // Keep the same finite 500-step bound as the original fixture helper.
+    for _ in 0..500 {
+        let projectile = world
+            .missile_projectiles()
+            .find(|p| p.origin.projectile == id)
+            .unwrap_or_else(|| panic!("missing actual projectile"));
+        if projectile.ended.is_some() {
+            return projectile;
+        }
+        step(world, 1);
+    }
+    panic!("finite actual projectile did not end");
 }
 fn fire_pirate(world: &mut World) -> MissileOrigin {
     for _ in 0..1200 {
@@ -88,7 +107,7 @@ fn mixed_real_npc_pulse_owned_missiles_player_pulse_and_berth_replay_cold_once()
     let mut saved = same_cold(&world);
     for _ in 0..5 {
         let origin = fire_pirate(&mut saved);
-        let end = crate::flight::missiles::tests::finish(&mut saved, origin.projectile);
+        let end = finish_projectile(&mut saved, origin.projectile);
         assert!(
             matches!(end.contact, Some(MissileContact::Npc(_))),
             "actual projectile did not reach native pirate"

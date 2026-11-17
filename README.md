@@ -93,3 +93,5 @@ In the next-preview development candidate, `/` toggles controls help and ordinar
 The [planet and sun implementation](docs/CELESTIAL-SHADING.md) binds core-owned bodies and procedural surfaces, with swept flight safety and explicit native acceptance limits.
 
 See [docked preview qualification](docs/DOCKED-PREVIEW.md) for controls, actual tests and native results, release gates and explicit limits. XYZZY/Commander Clarke is a separate following feature.
+
+The composed NPC candidate `42f599c` compiled but failed its first core execution: 223 passed and 53 failed. The current source correction replaces NPC missile guidance toward an empty model origin with a verified native triangle point and fixes the mixed test's complete-projectile iterator. It adds three unrun regressions; no corrected execution or gameplay acceptance is claimed. See [NPC missile correction](docs/NPC-MISSILES.md#native-surface-guidance-correction).
