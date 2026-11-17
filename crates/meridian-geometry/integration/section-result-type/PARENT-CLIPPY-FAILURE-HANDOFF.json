@@ -1,0 +1,80 @@
+{
+  "source": "3313f1763086be780ff55c7cacf92f360be4ae1a",
+  "tree": "06a49b6e58a66778fceaeadb401b48947d096355",
+  "status": "CHECK_44RUST_9HOST_PASS_STRICT_CLIPPY_FAIL_STOPPED",
+  "reporting": "DELAYED;shortstagesalreadyexitedatpoll;no retryforvisibility",
+  "rustTests": {
+    "library": 27,
+    "binary": 6,
+    "adapter": 9,
+    "originalInputs": 2,
+    "total": 44
+  },
+  "hostTests": 9,
+  "currentStrictOverlapControl": {
+    "oldOperations": 106146,
+    "newOperations": 105378,
+    "source": "ActualBOUNDS_CACHE_COMPLETEoverlaprow;doesnotretroactivelysupplyd368failedpaircounts"
+  },
+  "clippyFinding": {
+    "file": "crates/meridian-geometry/src/sections.rs",
+    "line": 334,
+    "rule": "clippy::type_complexity",
+    "type": "Result<(Vec<[crate::Point3; 2]>, bool, Option<Segment>), Failure>",
+    "findingCount": 1,
+    "libAndLibTestBothReportSameFinding": true
+  },
+  "receipts": [
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.3313f17/evidence/CHECK-TERMINAL.json",
+      "bytes": 473,
+      "sha256": "435546a992ef452c0def825217e8ef7c2fdf670074dc3c3a154c5e0cdc3693d3"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.3313f17/evidence/TEST-TERMINAL.json",
+      "bytes": 473,
+      "sha256": "1828aa84dc99fa2a87b46a44109a1da7113de2d75cda8e5717eb22b73f0e83ad"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.3313f17/evidence/HOST-TERMINAL.json",
+      "bytes": 472,
+      "sha256": "8e7869daaec46a36086f5730f4bb91b94bc5b03e71ccaa90a07c481f850fc66e"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.3313f17/evidence/CLIPPY-START.json",
+      "bytes": 1462,
+      "sha256": "8c16daafa1677ae9b43818043353dfc676e60f45443ac7fd262229d67e3026ad"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.3313f17/evidence/CLIPPY-TERMINAL.json",
+      "bytes": 477,
+      "sha256": "bf396cf485da201b75927241fd526a19ac86b2e2525cd2d1e2cc3c34e7d09d57"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.3313f17/evidence/FOCUSED-RESULT.json",
+      "bytes": 1399,
+      "sha256": "49fed400870009ccc702385e6aca3f6da9546902b10d21177c6634ca4c1db566"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.3313f17/evidence/test.log",
+      "bytes": 13710,
+      "sha256": "86b54bd469aaa6b8c49a2fccf3b50dc73091dbdb7418bde05b2897ebed6339aa"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.3313f17/evidence/host.log",
+      "bytes": 107,
+      "sha256": "542478c5e228cffe15731b293460e1c4bc97eab58d811a31f3775a96f09a3ee3"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.3313f17/evidence/clippy.log",
+      "bytes": 908,
+      "sha256": "e5dd0111c09e36a63e3864c4796f802e82c733941a6ff5718c9bfa45a5893469"
+    }
+  ],
+  "unrun": [
+    "devbuild",
+    "wholefive"
+  ],
+  "sourceUnchanged": true,
+  "noSuppressionCapChangeOrRetry": true
+}

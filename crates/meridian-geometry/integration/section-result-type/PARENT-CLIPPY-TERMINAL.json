@@ -1,0 +1,14 @@
+{
+  "start": {
+    "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.3313f17/evidence/CLIPPY-START.json",
+    "bytes": 1462,
+    "sha256": "8c16daafa1677ae9b43818043353dfc676e60f45443ac7fd262229d67e3026ad"
+  },
+  "exitCode": 101,
+  "wallSeconds": 0.8656024159863591,
+  "log": {
+    "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.3313f17/evidence/clippy.log",
+    "bytes": 908,
+    "sha256": "e5dd0111c09e36a63e3864c4796f802e82c733941a6ff5718c9bfa45a5893469"
+  }
+}

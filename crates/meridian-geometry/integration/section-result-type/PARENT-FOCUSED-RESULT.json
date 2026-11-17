@@ -1,0 +1,44 @@
+{
+  "source": "3313f1763086be780ff55c7cacf92f360be4ae1a",
+  "tree": "06a49b6e58a66778fceaeadb401b48947d096355",
+  "results": [
+    {
+      "stage": "check",
+      "exitCode": 0,
+      "terminal": {
+        "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.3313f17/evidence/CHECK-TERMINAL.json",
+        "bytes": 473,
+        "sha256": "435546a992ef452c0def825217e8ef7c2fdf670074dc3c3a154c5e0cdc3693d3"
+      }
+    },
+    {
+      "stage": "test",
+      "exitCode": 0,
+      "terminal": {
+        "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.3313f17/evidence/TEST-TERMINAL.json",
+        "bytes": 473,
+        "sha256": "1828aa84dc99fa2a87b46a44109a1da7113de2d75cda8e5717eb22b73f0e83ad"
+      }
+    },
+    {
+      "stage": "host",
+      "exitCode": 0,
+      "terminal": {
+        "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.3313f17/evidence/HOST-TERMINAL.json",
+        "bytes": 472,
+        "sha256": "8e7869daaec46a36086f5730f4bb91b94bc5b03e71ccaa90a07c481f850fc66e"
+      }
+    },
+    {
+      "stage": "clippy",
+      "exitCode": 101,
+      "terminal": {
+        "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.3313f17/evidence/CLIPPY-TERMINAL.json",
+        "bytes": 477,
+        "sha256": "bf396cf485da201b75927241fd526a19ac86b2e2525cd2d1e2cc3c34e7d09d57"
+      }
+    }
+  ],
+  "exitCode": 101,
+  "wholeFive": "UNRUN;stopactualfocusedfailure;no unchanged retry"
+}

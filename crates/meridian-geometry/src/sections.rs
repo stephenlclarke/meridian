@@ -322,6 +322,8 @@ impl FacetBoundsIndex {
     }
 }
 
+type JointSection = (Vec<[crate::Point3; 2]>, bool, Option<Segment>);
+
 // Caller retains 96 scratch memberships through construction and publication.
 // Distances, edge visits and nonzero-edge hit coordinates are shared only when
 // both representations require that exact same original-triangle calculation.
@@ -331,7 +333,7 @@ fn joint_section(
     physical: bool,
     outward: bool,
     b: &mut Budget,
-) -> Result<(Vec<[crate::Point3; 2]>, bool, Option<Segment>), Failure> {
+) -> Result<JointSection, Failure> {
     if physical && !outward {
         let (segments, coplanar) = face.section(other, b)?;
         return Ok((segments, coplanar, None));

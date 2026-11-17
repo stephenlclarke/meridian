@@ -1,0 +1,92 @@
+{
+  "status": "AUTHORED_UNRUN",
+  "parentAuthorHead": "4c7b51ef9aa9bdbd20318a17fe80358ca0b1166d",
+  "qualifiedFocusedParentRoot": "3313f1763086be780ff55c7cacf92f360be4ae1a",
+  "qualifiedFocusedParentTree": "06a49b6e58a66778fceaeadb401b48947d096355",
+  "parentCheck": "PASS",
+  "parentRustPass": 44,
+  "parentHostPass": 9,
+  "parentClippy": "FAIL; one type_complexity finding reported by lib and lib-test",
+  "parentDevBuildWholeFive": "UNRUN",
+  "currentOverlapPass": {
+    "referenceOperations": 106146,
+    "candidateOperations": 105378,
+    "scope": "Actual 3313 BOUNDS_CACHE_COMPLETE overlap row only; d368 failed pair remains unknown."
+  },
+  "correction": "Private JointSection alias names the identical tuple used by joint_section Result. Return expressions, tuple destructuring, caller and all non-type source bytes are identical to the parent. No newtype, allocation, field, layout, guard, price, threshold, assertion or test changes.",
+  "proof": "Remove the exact alias declaration and expand only its return-type use; the complete sections.rs bytes equal the parent Git blob.",
+  "parentAndRestoredSectionsSHA256": "a2534fa8818b06bd2dcee80e7cb63e97cba8e59eebd28602cc799ad7887ea403",
+  "newSectionsSHA256": "40e48871e16b50d49a5eba5c8900827fa4dd85a055b6acb6b845a3a96c688c13",
+  "all44TestBodiesByteExact": true,
+  "newTestCount": 44,
+  "hostTestCount": 9,
+  "parentEvidence": {
+    "PARENT-CHECK-START.json": {
+      "bytes": 1424,
+      "sha256": "01aa83de1e8950dad1cd917f0fe23b2c75de9b5fa0874c3203b80b8ed88df9b0"
+    },
+    "PARENT-CHECK-TERMINAL.json": {
+      "bytes": 473,
+      "sha256": "435546a992ef452c0def825217e8ef7c2fdf670074dc3c3a154c5e0cdc3693d3"
+    },
+    "PARENT-CLIPPY-FAILURE-HANDOFF.json": {
+      "bytes": 2933,
+      "sha256": "145b8b897b746cdee02fb0c4c032eddc2d88d9f0fc01c37976bc4e95cb77af07"
+    },
+    "PARENT-CLIPPY-START.json": {
+      "bytes": 1462,
+      "sha256": "8c16daafa1677ae9b43818043353dfc676e60f45443ac7fd262229d67e3026ad"
+    },
+    "PARENT-CLIPPY-TERMINAL.json": {
+      "bytes": 477,
+      "sha256": "bf396cf485da201b75927241fd526a19ac86b2e2525cd2d1e2cc3c34e7d09d57"
+    },
+    "PARENT-FOCUSED-RESULT.json": {
+      "bytes": 1399,
+      "sha256": "49fed400870009ccc702385e6aca3f6da9546902b10d21177c6634ca4c1db566"
+    },
+    "PARENT-HOST-START.json": {
+      "bytes": 1492,
+      "sha256": "29707709427217ccdbd2c2c7dbe01d7bf0d097314954aadb567f3c86c860b613"
+    },
+    "PARENT-HOST-TERMINAL.json": {
+      "bytes": 472,
+      "sha256": "8e7869daaec46a36086f5730f4bb91b94bc5b03e71ccaa90a07c481f850fc66e"
+    },
+    "PARENT-SOURCE.json": {
+      "bytes": 58708,
+      "sha256": "ca810605c150d21f49b4da9658d319375f752b0cb8d6ee254965111201521152"
+    },
+    "PARENT-TEST-START.json": {
+      "bytes": 1430,
+      "sha256": "cfdd46007082e797910ad121b7d8b111287eadf066b97eeb30daeb060965a15f"
+    },
+    "PARENT-TEST-TERMINAL.json": {
+      "bytes": 473,
+      "sha256": "1828aa84dc99fa2a87b46a44109a1da7113de2d75cda8e5717eb22b73f0e83ad"
+    },
+    "PARENT-check.log": {
+      "bytes": 198,
+      "sha256": "577e6bbf95574bc52315fa33a5d5ebfc40bb39b19b804d5d345147f6f84e72fc"
+    },
+    "PARENT-clippy.log": {
+      "bytes": 908,
+      "sha256": "e5dd0111c09e36a63e3864c4796f802e82c733941a6ff5718c9bfa45a5893469"
+    },
+    "PARENT-host.log": {
+      "bytes": 107,
+      "sha256": "542478c5e228cffe15731b293460e1c4bc97eab58d811a31f3775a96f09a3ee3"
+    },
+    "PARENT-test.log.gz": {
+      "bytes": 3337,
+      "sha256": "5d9bf23dbf541658bdf6102e9beec76a6b9a710db60dd44848cd8cda0b72969e",
+      "compression": "gzip; deterministic mtime 0; original raw bytes preserved",
+      "uncompressedBytes": 13710,
+      "uncompressedSHA256": "86b54bd469aaa6b8c49a2fccf3b50dc73091dbdb7418bde05b2897ebed6339aa"
+    }
+  },
+  "normalLimits": "Unchanged 2M operations including decode; 100k logical memberships; 4096 coordinate bits; 512 complete faces. All strict controls/frozen references preserved.",
+  "currentCompilerClippyTestsDevOriginal": "UNRUN; held for Root serial joined-source binding and G2 bounded same-slice review before owning execution",
+  "latestOriginalResult": "5489 all-five Operations refusal; fifteen dependent bodies UNRUN; no complete original candidates or new hulls. Focused passes do not prove fleet fit or minimum memory.",
+  "authorChecks": "Source/type-only substitution identity, rustfmt, Markdown, metadata, Git and sealing only. No compiler/native/geometry probe, suppression, gate waiver or unchanged retry."
+}

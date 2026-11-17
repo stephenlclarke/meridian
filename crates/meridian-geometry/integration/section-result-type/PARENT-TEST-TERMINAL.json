@@ -1,0 +1,14 @@
+{
+  "start": {
+    "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.3313f17/evidence/TEST-START.json",
+    "bytes": 1430,
+    "sha256": "cfdd46007082e797910ad121b7d8b111287eadf066b97eeb30daeb060965a15f"
+  },
+  "exitCode": 0,
+  "wallSeconds": 18.019721999997273,
+  "log": {
+    "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.3313f17/evidence/test.log",
+    "bytes": 13710,
+    "sha256": "86b54bd469aaa6b8c49a2fccf3b50dc73091dbdb7418bde05b2897ebed6339aa"
+  }
+}

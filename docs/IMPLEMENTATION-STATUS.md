@@ -1,5 +1,11 @@
 # Implementation and validation status
 
+## Joint section return-type correction
+
+Root `3313f17` passed its owning all-target check, all 44 Rust tests and nine host tests. The unchanged strict overlap control passed with 106146 reference operations versus 105378 candidate operations; this does not reconstruct the earlier failed pair. Strict Clippy then stopped on one complex tuple return type in `sections.rs`; dev build and the original-five batch remained unrun.
+
+The `dd74510` correction names that exact tuple with a private type alias. Expanding the alias restores the full prior Rust file byte for byte; all bodies, callers, 44 test bodies, strict assertions and frozen references remain unchanged. Current-source checks, Clippy, build and the original-five batch remain **UNRUN**, pending bounded delta review and changed owning qualification. No suppression, cap change, whole-fleet fit, minima or new-hull claim is introduced.
+
 ## Joint plane-section collection correction
 
 The actual `d368581` check passed, then its library run finished 24 PASS and one FAIL at the unchanged overlap pruning control requiring strictly less charged work. Seventeen remaining Rust cases, nine host cases, Clippy, build and the original-five batch were unrun. The failing old/new operation counts remain unknown.
