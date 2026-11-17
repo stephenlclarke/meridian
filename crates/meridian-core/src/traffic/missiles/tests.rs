@@ -33,7 +33,8 @@ fn same_native_mesh_selects_nearest_actor_independently_of_scene_vector_order() 
     assert_eq!(scene.bodies.len(), 2);
     let target = scene.bodies[0];
     let origin = add(target.pose.position, Vec3::new(0.0, 0.0, -500.0));
-    let direction = Vec3::new(0.0, 0.0, 1.0);
+    let point = ok(data.player_missile_aimpoint(target.pose, origin));
+    let direction = unit(sub(point, origin)).unwrap_or_else(|| panic!("invalid native aim"));
     let first = scene
         .contact(&data, origin, direction, 6000.0)
         .unwrap_or_else(|| panic!("native mesh was missed"));

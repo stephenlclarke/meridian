@@ -158,7 +158,8 @@ fn exact_native_ray_and_conservative_sweep_use_the_existing_sh025_physical_mesh(
     }
     let actor = some(state.actors[0]);
     let origin = add(actor.position, Vec3::new(0.0, 0.0, -1000.0));
-    let direction = Vec3::new(0.0, 0.0, 1.0);
+    let point = some(ok(data.player_planar_aimpoint(actor.pose(), origin)));
+    let direction = some(unit(sub(point, origin)));
     let contact = some(state.beam(&data, SystemId::AVENOR, origin, direction, 2000.0));
     let exact = some(ok(data.player_beam_distance(
         actor.pose(),

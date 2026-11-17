@@ -364,3 +364,51 @@ fn full_combined_proof_budget_refuses_another_native_contact_before_mutating_tra
     );
     assert_eq!(w.traffic, before);
 }
+
+#[test]
+fn actual_surface_guidance_continues_cold_and_rejects_coherent_origin_guidance_rewrite() {
+    let mut w = ready(1);
+    let origin = fire_npc(&mut w);
+    step(&mut w, 1);
+    let p = w
+        .missile_projectiles()
+        .find(|p| p.origin == origin)
+        .unwrap();
+    assert_eq!(p.ended, None);
+    let motion = w.missiles.motions[usize::from(origin.projectile.ordinal())]
+        .as_ref()
+        .unwrap();
+    let target = motion
+        .npc_scene
+        .as_ref()
+        .unwrap()
+        .target(trader(&w).id)
+        .unwrap();
+    let aim = w
+        .station_data
+        .as_ref()
+        .unwrap()
+        .player_missile_aimpoint(target.pose, motion.position)
+        .unwrap();
+    assert_eq!(p.direction, unit(sub(aim, motion.position)).unwrap());
+    let origin_direction = unit(sub(target.pose.position, motion.position)).unwrap();
+    assert_ne!(
+        p.direction, origin_direction,
+        "source hollow origin is not the native surface aim"
+    );
+    refuses(&w, |bad| {
+        let motion = bad.missiles.motions[0].as_ref().unwrap();
+        let start = motion.position;
+        let travel = motion.travel;
+        let p = bad.missiles.projectiles[0].as_mut().unwrap();
+        p.direction = origin_direction;
+        p.position = add(start, scale(origin_direction, MISSILE_SPEED / 60.0));
+        p.propulsion_travel = travel + MISSILE_SPEED / 60.0;
+    });
+    let mut loaded = cold(&w);
+    let actual = finish_npc(&mut w, origin.projectile);
+    let continued = finish_npc(&mut loaded, origin.projectile);
+    assert_eq!(actual, continued);
+    assert_eq!(actual.contact, Some(MissileContact::Npc(trader(&w).id)));
+    cold(&w);
+}

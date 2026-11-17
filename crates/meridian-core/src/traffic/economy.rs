@@ -42,7 +42,10 @@ impl State {
         };
         let clock = self.clocks[i];
         let radius = data.player_clearance_radius();
-        if clock >= 480 && self.actors[i * 2].is_none() {
+        if clock >= 480
+            && self.actors[i * 2].is_none()
+            && !super::admission::player_approaching(context)
+        {
             let launch = data
                 .launch_start()
                 .map_err(|_| TrafficError::InvalidState)?;

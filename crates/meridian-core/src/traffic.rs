@@ -1,5 +1,6 @@
 //! Finite, deterministic local traffic. Only World owns this mutable actor/economy state.
 //! SH025 is the actual admitted hull; unadmitted populations receive no substitute body.
+mod admission;
 mod combat;
 mod missiles;
 pub(crate) use missiles::{MissileScene, NpcMissileHit, SceneStage};
@@ -21,7 +22,7 @@ use std::sync::Arc;
 pub const MAX_TRAFFIC_ACTORS: usize = 4;
 pub const MAX_TRAFFIC_SHOTS: usize = 128;
 const CAPITAL: u32 = 120_000;
-pub(crate) const CONTENT_RULES:&[u8]=b"local-traffic-v3;SH025-trader-pirate;no-SH031-substitution;finite-capital120000;manifest-native1to12;local-birth480-pirate900;2systems2actors;maxshots128;pulse15-energy1-heat10-cool18;SH025-energy380-shield300;speed34.3-accel9.1-yaw.65;NPC-bank-and-player-custody-separate;historical-flow-world-ticks;waypoints-3500-2400x9000-0x9000-0x3500-doorMinus300;final-align;native-entry-before-after-receipt;no-respawn;npc-player-native-contact;exact-resource-events;source-resource-clock;npc-missile-native16000;combined-128beam-player-missile-proof;one-player-resource-replay;step-missiles-before-npc;local-world-phase-sequence;";
+pub(crate) const CONTENT_RULES:&[u8]=b"local-traffic-v4;SH025-trader-pirate;no-SH031-substitution;finite-capital120000;manifest-native1to12;local-birth480-pirate900;2systems2actors;maxshots128;pulse15-energy1-heat10-cool18;SH025-energy380-shield300;speed34.3-accel9.1-yaw.65;NPC-bank-and-player-custody-separate;historical-flow-world-ticks;waypoints-3500-2400x9000-0x9000-0x3500-doorMinus300;final-align;native-entry-before-after-receipt;no-respawn;npc-player-native-contact;exact-resource-events;source-resource-clock;npc-missile-native16000;combined-128beam-player-missile-proof;one-player-resource-replay;step-missiles-before-npc;local-world-phase-sequence;native-triangle-aim;station-approach-right-of-way;physical-lateral-yield1200;";
 const INVALID: SaveError = SaveError::InvalidState("traffic identity, resources or finite custody");
 const SH025_ID: &str = "SH025";
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

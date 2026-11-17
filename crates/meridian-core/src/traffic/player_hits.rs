@@ -106,9 +106,13 @@ impl State {
             beam_clear,
         } = emission;
         let ray = actor.pose();
-        if unit(sub(player.position, ray.position))
-            .is_none_or(|aim| aim.dot(ray.orientation.z) < 0.995)
-        {
+        let Some(point) = data
+            .player_planar_aimpoint(player, ray.position)
+            .map_err(|_| TrafficError::InvalidState)?
+        else {
+            return Ok(());
+        };
+        if unit(sub(point, ray.position)).is_none_or(|aim| aim.dot(ray.orientation.z) < 0.995) {
             return Ok(());
         }
         let Some(distance) = data
@@ -188,7 +192,10 @@ impl State {
                 || !finite(ray.position)
                 || !finite(hit.player_pose.position)
                 || !finite(hit.point)
-                || unit(sub(hit.player_pose.position, ray.position))
+                || data
+                    .player_planar_aimpoint(hit.player_pose, ray.position)
+                    .map_err(|_| INVALID)?
+                    .and_then(|point| unit(sub(point, ray.position)))
                     .is_none_or(|aim| aim.dot(ray.orientation.z) < 0.995)
             {
                 return Err(INVALID);

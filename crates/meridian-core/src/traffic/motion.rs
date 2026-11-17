@@ -110,7 +110,7 @@ fn move_actor(
             missile_aggression,
         )
     });
-    let (goal, mut speed) = player_goal.map_or_else(
+    let (mut goal, mut speed) = player_goal.map_or_else(
         || {
             intent(
                 actor,
@@ -131,6 +131,24 @@ fn move_actor(
             )
         },
     );
+    let yielding = super::admission::yield_goal(actor, goal, context);
+    if let Some(detour) = yielding {
+        goal = detour;
+        speed = speed.min(length(sub(goal, actor.position)) * 0.65 / (18.0 * 4.0));
+    } else if actor.id.serial == 2 && actor.resources.energy >= 9500 {
+        let target_pose = if player_goal.is_some() {
+            Some(player_after)
+        } else {
+            target(actor, opening).map(Actor::pose)
+        };
+        if let Some(target_pose) = target_pose
+            && let Some(point) = data
+                .player_planar_aimpoint(target_pose, actor.position)
+                .map_err(|_| TrafficError::InvalidState)?
+        {
+            goal = point;
+        }
+    }
     let delta = sub(goal, actor.position);
     let desired = delta.x.atan2(delta.z);
     let error = (desired - actor.yaw)
@@ -187,6 +205,7 @@ fn move_actor(
     if peers_clear
         && relative_clear
         && arrival_clear
+        && super::admission::lane_clear(before.position, after.position, context)
         && station_clear
         && celestial_clear(before.position, after.position, radius)
     {

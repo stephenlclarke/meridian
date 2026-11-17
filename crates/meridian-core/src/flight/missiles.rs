@@ -602,9 +602,12 @@ impl World {
             if next.mode == FlightMode::Docked || visit != Some(projectile.origin.owner.visit) {
                 projectile.ended = Some(MissileEnd::Culled);
                 projectile.last_tick = next.tick;
-            } else if let Some(target) =
-                self.resolve_missile_target(projectile.target, &prepared.traffic, prepared.practice)
-            {
+            } else if let Some(target) = self.resolve_missile_guidance(
+                projectile.target,
+                projectile.position,
+                &prepared.traffic,
+                prepared.practice,
+            )? {
                 prepared.missiles.motions[index] = Some(Motion {
                     position: projectile.position,
                     travel: projectile.propulsion_travel,

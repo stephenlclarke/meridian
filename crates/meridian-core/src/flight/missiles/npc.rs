@@ -53,6 +53,32 @@ impl World {
                 .map(|b| b.pose.position),
         }
     }
+    pub(super) fn resolve_missile_guidance(
+        &self,
+        target: MissileTarget,
+        origin: Vec3,
+        traffic: &crate::traffic::State,
+        practice: Option<super::super::practice::Practice>,
+    ) -> Result<Option<Vec3>, StepError> {
+        let MissileTarget::Npc(id) = target else {
+            return Ok(self.resolve_missile_target(target, traffic, practice));
+        };
+        let scene = traffic.missile_scene(
+            id.system(),
+            self.state.tick,
+            SceneStage::Command(self.combat.emissions),
+        );
+        let Some(body) = scene.target(id) else {
+            return Ok(None);
+        };
+        self.station_data
+            .as_ref()
+            .ok_or(StepError::NonFiniteState)?
+            .player_missile_aimpoint(body.pose, origin)
+            .map(Some)
+            .map_err(|_| StepError::NonFiniteState)
+    }
+
     pub fn request_npc_missile_lock(
         &mut self,
         target: Option<NpcId>,
@@ -276,7 +302,10 @@ impl State {
                 .traffic
                 .validate_missile_scene(scene, world.state.tick, data)?;
             let target = scene.target(id).ok_or(INVALID)?;
-            let direction = unit(sub(target.pose.position, m.position)).ok_or(INVALID)?;
+            let aimpoint = data
+                .player_missile_aimpoint(target.pose, m.position)
+                .map_err(|_| INVALID)?;
+            let direction = unit(sub(aimpoint, m.position)).ok_or(INVALID)?;
             if direction != p.direction {
                 return Err(INVALID);
             }
