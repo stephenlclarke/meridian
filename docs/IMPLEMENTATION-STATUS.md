@@ -1,5 +1,9 @@
 # Implementation and validation status
 
+## Destroyed trader manifest custody awaiting review
+
+MC1's separate M02 slice follows NPC candidate `9931ffd`. The already admitted original SH025 trader's real paid ordinary cargo moves from aboard to destroyed-source custody only with its actual terminal Pulse/missile contact; the existing finite actor/receipt history remains the owner. Three new tests are authored UNRUN. No pod, cargo/cash/market award, cutter/EMP/boarding role, codec or asset is added. Physical issuance, pickup, sale and original abandoned/crew producers are separate open dependencies. See [the wreck source and exact limits](WRECK-MANIFEST.md).
+
 ## Actual main 80a0b16 coverage failure and changed adapter correction
 
 PR 40 merged as `80a0b16b2eff84fbd8a71b1a5fa1e081767f208f`, tree `4076fa71a2e948ec1fb6fd11417818dddcf98224`. All five final-head checks and all five pre-Sonar main jobs passed. Exact-version/revision Sonar analysis `4929046e-890e-4400-94dd-34cae914106d` reported zero open source findings and 0.0 percent duplication, but its gate failed on 77.9 percent new-code coverage against the unchanged 80 percent threshold. Previous version is `a43e8b9`, with no ignored condition. Its failed set is frozen before this change: 77 coverable lines, 60 covered and seventeen uncovered. The earlier independent 204/223 result remains valid for the original a43 set; it does not override this newer gate failure.

@@ -73,6 +73,24 @@ impl World {
             )
         })
     }
+    /// Inspect actual local destroyed ordinary trade custody. No owned cargo, pod or salvage
+    /// permission can be returned by this read-only boundary.
+    pub fn wreck_manifest(
+        &self,
+        source: traffic::NpcId,
+    ) -> Result<traffic::WreckManifest, traffic::WreckManifestError> {
+        use traffic::WreckManifestError;
+        let owner = self
+            .combat_identity()
+            .ok_or(WreckManifestError::NoCommander)?;
+        if source.profile() != owner.owner {
+            return Err(WreckManifestError::ForeignActor);
+        }
+        if source.system() != owner.system {
+            return Err(WreckManifestError::OutsideSystem);
+        }
+        self.traffic.wreck_manifest(source)
+    }
     pub fn traffic_snapshot(&self) -> Option<TrafficSnapshot> {
         self.traffic.snapshot(self.combat_identity()?.system)
     }

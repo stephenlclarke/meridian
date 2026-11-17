@@ -510,3 +510,5 @@ fn actual_npc_missile_motion_refuses_a_changed_scene_clock_before_restore() {
             .world_tick += 1;
     });
 }
+
+mod wreck;

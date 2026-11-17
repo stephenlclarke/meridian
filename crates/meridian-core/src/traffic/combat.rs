@@ -282,6 +282,9 @@ impl State {
         }
         self.actors[index] = Some(actor);
         Arc::make_mut(&mut self.shots).push(beam);
-        Ok(())
+        // This is still the staged traffic turn; a death with paid goods needs its own
+        // matching terminal contact before the outer World can publish it.
+        self.validate_terminal_manifest(actor)
+            .map_err(|_| TrafficError::InvalidState)
     }
 }

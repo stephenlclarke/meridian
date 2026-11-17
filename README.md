@@ -45,6 +45,10 @@ The twelve new preparation/query/replay tests address the actual coverage and du
 
 Successful player Pulse contact, an NPC kill and more than three actual projectiles were not observed in the bounded native journey. Other populations, NPC-owned missile launch producers, additional hull admissions, full equipment, memory, window/focus edges and measured frame timing/race remain open. Full original **1337 visual and gameplay parity** is required; source tests and renderer screenshots do not establish complete game acceptance. Private save format 15 refuses draft 14 and retains explicit qualified older readers.
 
+## Following wreck manifest development
+
+The [M02 wreck source slice](docs/WRECK-MANIFEST.md) binds an actual destroyed SH025 trader's already paid goods to its native terminal contact in the existing World. Three authored tests remain UNRUN. It retains the historical receipt and does not issue physical pods, move any cargo to the player or grant a sale. Physical recovery, section cutting and boarding retain separate original dependencies.
+
 ## Play
 
 N starts a commander; C continues. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.

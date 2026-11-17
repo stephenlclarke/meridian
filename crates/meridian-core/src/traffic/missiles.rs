@@ -305,6 +305,8 @@ impl State {
         }
         next.actors[index] = Some(a);
         Arc::make_mut(&mut next.missile_hits).push(hit);
+        next.validate_terminal_manifest(a)
+            .map_err(|_| TrafficError::InvalidState)?;
         Ok(next)
     }
     pub(crate) fn missile_hits(&self) -> &[NpcMissileHit] {
