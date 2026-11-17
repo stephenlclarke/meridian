@@ -312,7 +312,7 @@ pub(in crate::flight) fn assert_resealed_enlirin_fuel_refusal(world: &mut World)
     let spent = account - 8;
     // Owner, hull, revision, credits and three cargo counters precede account fuel.
     let fuel = account + 3 * 8 + 4 + 3 * 2;
-    // The final 25-byte journal receipt precedes the outer eight-byte checksum.
+    // The final journal receipt precedes the outer eight-byte checksum.
     let debit = valid.len() - 8 - crate::navigation::CompletedJump::ENCODED_SIZE + 2 * 3;
     let original_spent = u64::from_le_bytes(valid[spent..account].try_into().unwrap());
     assert_eq!(
@@ -337,7 +337,8 @@ pub(in crate::flight) fn assert_resealed_enlirin_fuel_refusal(world: &mut World)
         assert_eq!(world.save_bytes().unwrap(), valid);
     }
     let mut wrong_grade = valid.clone();
-    let grade = wrong_grade.len() - 9;
+    // The grade precedes the account revision and outer checksum, both eight bytes.
+    let grade = wrong_grade.len() - 8 - 8 - 1;
     assert_eq!(wrong_grade[grade], 2);
     wrong_grade[grade] = 1;
     reseal(&mut wrong_grade);

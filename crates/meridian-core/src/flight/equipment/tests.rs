@@ -396,7 +396,7 @@ fn assert_paid_save_guards(world: &mut World) {
         (42, u64::MAX.to_le_bytes().to_vec()), // future purchase revision
         (50, 999_u16.to_le_bytes().to_vec()), // unsupported purchase site
         (52, 0_u32.to_le_bytes().to_vec()), // unpaid fitted module
-        (56, vec![0]),                     // fit flag inconsistent with transaction history
+        (57, vec![0]),                     // fitted flag follows the XYZZY provenance byte
     ] {
         let mut bad = valid.clone();
         assert_ne!(
