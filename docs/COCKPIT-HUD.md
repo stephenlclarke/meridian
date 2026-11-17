@@ -4,6 +4,10 @@ The cockpit adds separate shield, fuel, laser heat, speed and four-bank energy i
 
 The layout uses the frozen L337 cockpit as a style reference: a yellow separator, left resource gauges, central green scanner and right flight/energy instruments. Labels use logical points; Retina backing resolution does not change cockpit proportions. The original outline geometry is retained for the missile icons. Existing independently drawn Meridian glyphs remain; this change imports no L337 bitmap-font table or Elite/Oolite art. [The reference manifest](../assets/legacy/hud-reference-manifest.json) records the immutable source hashes and provenance limits. Source presence does not establish authorship or permission for unrelated historical content.
 
+## Published scope
+
+[Preview 7 v0.7.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.7.0-preview.1) includes the joined HUD, nine-pylon feed, NPC scanner and contextual Help. All three owned platforms passed 603 Rust tests and 99 Python tests on compiled `076639d`; final-head/main coverage and exact-main zero-issue Sonar passed before publication. The new signed Mac binary passed bounded title/System Help and cold Continue; earlier `c98fc86` native checks cover all five station cards, fitted flight Help and manual pause. These are separate immutable runs. The sections below retain the original authoring context; their old UNRUN and integration-pending statements do not describe the published source. Native compact resizing, precise ticks, original screenshot comparison, FPS/race and leak cure remain unobserved or unresolved.
+
 ## State and controls
 
 Shields, energy, laser heat, fuel, missiles, lock state, speed, station and beacon/projectile contacts come from current World snapshots. Gauge capacities come from the same read-only constants used by the simulation. Laser heat follows the source's heat/255 display scale. Scanner contacts use front ship coordinates, independent of the selected camera; station bearing and elevation use the selected camera. Destroyed and docked states take precedence over other flight labels. The HUD does not claim Safe or Hostile without an active hostile-body model.
@@ -24,7 +28,7 @@ The next-preview candidate now captures all nine fitted missile positions and ev
 
 ## Flight overlay and controls
 
-The next-preview candidate uses a compact default flight overlay for current status, notices, missile safety, practice state and jump countdown. Instrument gauges carry the numeric ship readings. `/` opens the keyboard help; toggling help preserves pending reviews and does not issue a gameplay command. Confirmation panels retain priority. Two new regression tests cover warning/control visibility and unchanged World/review state. These composed changes remain uncompiled and unqualified until the complete menu/equipment join is reviewed.
+The next-preview candidate uses a compact default flight overlay for current status, notices, missile safety, practice state and jump countdown. Instrument gauges carry the numeric ship readings. H or ? opens contextual help; toggling help preserves pending reviews and does not issue a gameplay command. Confirmation panels retain priority. Two new regression tests cover warning/control visibility and unchanged World/review state. These composed changes remain uncompiled and unqualified until the complete menu/equipment join is reviewed.
 
 ## NPC scanner source awaiting integration
 
