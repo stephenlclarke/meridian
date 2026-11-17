@@ -5,6 +5,16 @@ use core::fmt;
 mod geometry;
 mod npc;
 mod persistence;
+pub(super) struct RetainedBeam<'a> {
+    pub(super) system: crate::navigation::SystemId,
+    pub(super) visit: u64,
+    pub(super) world_tick: u64,
+    pub(super) physical_tick: u64,
+    pub(super) command_emission: Option<u64>,
+    pub(super) ray: crate::docking::RigidPose,
+    pub(super) point: Vec3,
+    pub(super) bodies: &'a [(ProjectileId, crate::docking::RigidPose)],
+}
 pub use geometry::{MISSILE_FACES, MISSILE_VERTICES};
 use geometry::{add, length, mesh_distance, pose, ray_point, scale, sub, unit};
 pub const MISSILE_SPEED: f64 = 792.0;
@@ -95,6 +105,7 @@ pub enum MissileEnd {
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum MissileContact {
+    Asteroid(crate::mining::AsteroidId),
     Practice {
         id: PracticeBeaconId,
         first_hit: bool,
@@ -211,6 +222,20 @@ impl Default for State {
     }
 }
 impl State {
+    #[cfg(test)]
+    pub(in crate::flight) fn has_asteroid_contact(&self) -> bool {
+        self.projectiles
+            .iter()
+            .flatten()
+            .any(|p| matches!(p.contact, Some(MissileContact::Asteroid(_))))
+    }
+
+    pub(super) fn resource_emissions(&self) -> impl Iterator<Item = (u64, u64)> + '_ {
+        self.projectiles
+            .iter()
+            .flatten()
+            .map(|p| (p.origin.emission, p.origin.physical_tick))
+    }
     pub(super) fn beam_scene(&self, visit: u64) -> Vec<(ProjectileId, crate::docking::RigidPose)> {
         self.projectiles
             .iter()
@@ -733,7 +758,11 @@ fn projectile_point(
     distance: f64,
     contact: Option<MissileContact>,
 ) -> Vec3 {
-    if matches!(p.target, MissileTarget::Npc(_)) || matches!(contact, Some(MissileContact::Npc(_)))
+    if matches!(p.target, MissileTarget::Npc(_))
+        || matches!(
+            contact,
+            Some(MissileContact::Npc(_) | MissileContact::Asteroid(_))
+        )
     {
         ray_point(ray, distance)
     } else {
@@ -883,7 +912,7 @@ fn apply_contact(
                 )
                 .map_err(|_| StepError::NonFiniteState)?;
         }
-        MissileContact::Celestial(_) => {}
+        MissileContact::Celestial(_) | MissileContact::Asteroid(_) => {}
         MissileContact::Projectile(id) => {
             for other in prepared.missiles.projectiles.iter_mut().flatten() {
                 if other.origin.projectile == id && other.ended.is_none() {
@@ -906,6 +935,7 @@ fn choose(best: &mut Option<(f64, MissileContact)>, distance: f64, contact: Miss
             MissileContact::Player { .. } => (3, 0),
             MissileContact::Celestial(id) => (0, id.entity),
             MissileContact::Npc(id) => (4, u64::from(id.serial())),
+            MissileContact::Asteroid(id) => (0, 10 + u64::from(id.ordinal())),
         }
     }
     if best.is_none_or(|(old, previous)| {

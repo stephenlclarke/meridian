@@ -67,9 +67,10 @@ impl World {
         navigation: Option<NavigationState>,
         prepared: &missiles::PreparedStep,
         traffic: Option<&(traffic::State, StationMarkets)>,
-        damage: &State,
+        resources: (&State, &crate::mining::State),
         trade: Option<&navigation_trade::State>,
     ) -> Result<(), SaveError> {
+        let (damage, mining) = resources;
         if self.commander_account.is_none() {
             return Ok(());
         }
@@ -81,7 +82,11 @@ impl World {
         // Compare their encoded size as well as domain events before skipping the envelope.
         let missile_growth =
             size(|w| prepared.missiles.encode(w)) > size(|w| self.missiles.encode(w));
-        if *damage == self.damage && !traffic.proof_grows_from(&self.traffic) && !missile_growth {
+        if *damage == self.damage
+            && mining.unchanged_since(&self.mining)
+            && !traffic.proof_grows_from(&self.traffic)
+            && !missile_growth
+        {
             return Ok(());
         }
         let old = parts(
@@ -100,10 +105,14 @@ impl World {
             &prepared.missiles,
             prepared.practice,
         );
+        let old_mining = size(|w| self.mining.encode(w));
+        let new_mining = size(|w| mining.encode(w));
         let mut total = self
             .encoded_current_size()?
             .checked_sub(old)
             .and_then(|n| n.checked_add(new))
+            .and_then(|n| n.checked_sub(old_mining))
+            .and_then(|n| n.checked_add(new_mining))
             .ok_or(SaveError::TooLarge)?;
         let old = size(|w| {
             if let Some(n) = self.navigation {

@@ -50,6 +50,10 @@ impl std::error::Error for FireError {}
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum PulseContact {
+    AsteroidBlocked {
+        id: crate::mining::AsteroidId,
+        distance: f64,
+    },
     Npc {
         id: crate::traffic::NpcId,
         distance: f64,
@@ -324,7 +328,11 @@ impl World {
         let npc = self
             .traffic_beam_contact(pose, PULSE_RANGE)
             .filter(|contact| distance.is_none_or(|station| contact.distance < station));
-        let solid = npc.map(|contact| contact.distance).or(distance);
+        let first = npc.map(|contact| contact.distance).or(distance);
+        let rock = self
+            .mining_beam_contact(pose, PULSE_RANGE)
+            .filter(|c| first.is_none_or(|d| c.distance < d));
+        let solid = rock.map(|c| c.distance).or(first);
         let projectile = self
             .nearest_missile(pose, solid.unwrap_or(PULSE_RANGE))
             .filter(|(_, d)| solid.is_none_or(|wall| *d < wall));
@@ -349,6 +357,24 @@ impl World {
                 practice,
                 PulseContact::Projectile { id, distance },
                 distance,
+            ));
+        }
+        if let Some(contact) = rock {
+            if !self.traffic_beam_celestial_clear(
+                contact.asteroid.system(),
+                self.state.tick,
+                pose.position,
+                contact.point,
+            ) {
+                return Err(FireError::InvalidGeometry);
+            }
+            return Ok((
+                practice,
+                PulseContact::AsteroidBlocked {
+                    id: contact.asteroid,
+                    distance: contact.distance,
+                },
+                contact.distance,
             ));
         }
         if let Some(contact) = npc {

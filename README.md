@@ -43,6 +43,10 @@ Full game, fleet, missions, memory, window/focus, frame timing/race, notarizatio
 
 The [finite traffic core](docs/NPC-TRAFFIC.md) is composed on the current preview source for further development. Fifty-seven core, three host, twelve renderer, eight scanner, three session and three read-only observer cases remain authored **UNRUN**. Actual SH025 traders and pirates have finite stock, movement and contact logic; the actual SH025 renderer and scanner contacts are joined in source, while NPC Pulse damage and player-owned missiles against typed NPC targets share one resource replay and World publication. Actual NPC missile launch producers remain open. The joined source uses private format 15 with the earlier draft 14 refused; whole review and qualification remain required before release. Police, miners, bounty hunters, aliens and AI constructs retain explicit source and controller dependencies. No additional hull or NPC gameplay is accepted by this source composition. Only our verified authored content is eligible; no Elite/Oolite asset is introduced.
 
+## Following paid mining development
+
+The [mining source](docs/ASTEROID-MINING.md) joins genuine paid Mining Laser work to the actual World: 50-damage native strokes, finite partial energy, terminal pending ore, shared ship resources, retained contact history and cold continuation. Fifteen new Rust cases are authored **UNRUN**. No cargo or cash is credited by mining. The original requires Fuel Scoops; this base has no genuine installation/intake, so collection explicitly refuses `NoScoops` and ordinary sale has no mined cargo. Root must compose the actual scoop provider, G1 renderer/UI, G3 expanded equipment and final codec/Profile boundary before qualification. The authored Avenor segment is not complete original orbital/presence parity or a delivered mining preview.
+
 ## Play
 
 N starts a commander; C continues. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.

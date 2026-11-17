@@ -103,6 +103,14 @@ pub(super) struct PreparedPulseImpact {
     hit: Option<OrdinaryImpact>,
 }
 impl State {
+    pub(super) fn reserve_mining_emission(self) -> Result<(Self, u64), FireError> {
+        let mut next = self;
+        next.emissions = next
+            .emissions
+            .checked_add(1)
+            .ok_or(FireError::SequenceExhausted)?;
+        Ok((next, next.emissions))
+    }
     pub(super) fn shields(self) -> [u16; 2] {
         [self.front, self.rear]
     }

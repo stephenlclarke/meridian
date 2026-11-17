@@ -1,5 +1,6 @@
 mod celestial;
 mod damage;
+mod mining;
 mod navigation_trade;
 mod traffic;
 pub use navigation_trade::{
@@ -153,6 +154,8 @@ impl std::error::Error for StepError {}
 pub struct World {
     state: Snapshot,
     traffic: crate::traffic::State,
+    mining: crate::mining::State,
+    mining_scope: std::sync::Arc<()>,
     damage: damage::State,
     station_data: Option<OriginalStationData>,
     navigation_catalogue: Option<OriginalNavigation>,
@@ -192,6 +195,8 @@ impl World {
                 navigation: None,
             },
             traffic: crate::traffic::State::default(),
+            mining: crate::mining::State::legacy_absent(),
+            mining_scope: std::sync::Arc::new(()),
             damage: damage::State::default(),
             station_data: None,
             navigation_catalogue: None,
@@ -247,6 +252,7 @@ impl World {
         let mut world =
             Self::at_original_station().map_err(|_| NavigationError::StationUnavailable)?;
         world.traffic = crate::traffic::State::fresh(seed);
+        world.mining = crate::mining::State::default();
         world.damage = damage::State::fresh();
         world.navigation_catalogue = Some(OriginalNavigation::bundled()?);
         world.commander_account = Some(account);
@@ -516,6 +522,13 @@ impl World {
                 stopped.motion_refusal = Some(MotionRefusal::NpcContact);
                 return self.publish_step(stopped);
             }
+            if !self.mining_motion_clear(before, after, angular_travel) {
+                let mut stopped = self.state;
+                stopped.tick = next.tick;
+                stopped.speed = 0.0;
+                stopped.motion_refusal = Some(MotionRefusal::AsteroidContact);
+                return self.publish_step(stopped);
+            }
             if data.crosses_aperture(before, after) {
                 if !data.entry_clear(
                     before,
@@ -583,6 +596,13 @@ impl World {
                 next.motion_refusal = None;
             }
         }
+        let mining = match (self.combat_identity(), navigation) {
+            (Some(source), Some(nav)) => {
+                self.mining
+                    .prepare_departure(source, nav.snapshot(0).system, next.tick)
+            }
+            _ => self.mining.clone(),
+        };
         let mut prepared = self.prepare_missile_step(next, navigation, &self.traffic)?;
         let traffic = self.prepare_traffic_step(next, navigation, &prepared)?;
         if let Some((traffic, _)) = &traffic {
@@ -620,7 +640,7 @@ impl World {
             navigation,
             &prepared,
             traffic.as_ref(),
-            &damage,
+            (&damage, &mining),
             navigation_trade.as_ref(),
         )
         .map_err(|_| StepError::TickOverflow)?;
@@ -643,6 +663,7 @@ impl World {
         self.combat = prepared.combat;
         self.pulse = prepared.pulse;
         self.damage = damage;
+        self.mining = mining;
         self.practice = prepared.practice;
         if let Some(account) = &mut self.commander_account {
             account.apply_ordinary_legal(prepared.legal);

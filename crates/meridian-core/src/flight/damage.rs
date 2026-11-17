@@ -11,6 +11,7 @@ const MAX_EVENTS: usize = MAX_SAVE_BYTES / 9;
 enum Kind {
     Berth,
     Pulse,
+    Mining(u8),
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct Event {
@@ -47,6 +48,13 @@ impl State {
         self.append(clock, Kind::Pulse)
             .map_err(|()| FireError::SequenceExhausted)
     }
+    pub(super) fn mining(&self, clock: u64, body: u8) -> Result<Self, FireError> {
+        if usize::from(body) >= crate::mining::BELT_BODY_COUNT || !self.enabled {
+            return Err(FireError::InvalidGeometry);
+        }
+        self.append(clock, Kind::Mining(body))
+            .map_err(|()| FireError::SequenceExhausted)
+    }
     pub(super) fn step(
         &self,
         opening: FlightMode,
@@ -68,6 +76,7 @@ impl State {
             w.u8(match event.kind {
                 Kind::Berth => 0,
                 Kind::Pulse => 1,
+                Kind::Mining(body) => 32 + body,
             });
         }
     }
@@ -83,6 +92,7 @@ impl State {
             let kind = match r.u8()? {
                 0 => Kind::Berth,
                 1 => Kind::Pulse,
+                tag @ 32..=43 => Kind::Mining(tag - 32),
                 _ => return Err(INVALID),
             };
             events.push(Event { clock, kind });
@@ -99,7 +109,10 @@ impl State {
         dock_sequence: u64,
     ) -> Result<(), SaveError> {
         if !self.enabled {
-            return if self.events.is_empty() && world.traffic.player_hits().is_empty() {
+            return if self.events.is_empty()
+                && world.traffic.player_hits().is_empty()
+                && world.mining.strokes().is_empty()
+            {
                 Ok(())
             } else {
                 Err(INVALID)
@@ -108,6 +121,7 @@ impl State {
         let end = world.combat.physical_tick();
         let mut prior = 0;
         let mut pulse_count = 0_u64;
+        let mut mining_count = 0_usize;
         let mut berths = 1_u64;
         let mut events = Vec::with_capacity(self.events.len() + 128);
         for event in self.events.iter() {
@@ -124,10 +138,34 @@ impl State {
                     pulse_count += 1;
                     (3, Effect::Pulse)
                 }
+                Kind::Mining(body) => {
+                    let hit = world.mining.strokes().get(mining_count).ok_or(INVALID)?;
+                    if hit.physical_tick != event.clock || hit.contact.asteroid.ordinal() != body {
+                        return Err(INVALID);
+                    }
+                    let prior_missiles = world
+                        .missiles
+                        .resource_emissions()
+                        .filter(|(e, _)| *e < hit.emission)
+                        .count() as u64;
+                    if hit.emission != pulse_count + 1 + prior_missiles
+                        || world.missiles.resource_emissions().any(|(e, clock)| {
+                            e == hit.emission
+                                || (e < hit.emission && clock > event.clock)
+                                || (e > hit.emission && clock < event.clock)
+                        })
+                    {
+                        return Err(INVALID);
+                    }
+                    mining_count += 1;
+                    pulse_count += 1;
+                    (3, Effect::Mining)
+                }
             };
             events.push((event.clock, phase, 0, effect));
         }
-        if berths != dock_sequence
+        if mining_count != world.mining.strokes().len()
+            || berths != dock_sequence
             || pulse_count.checked_add(world.missiles.used() as u64) != Some(world.combat.emissions)
         {
             return Err(INVALID);
@@ -176,6 +214,7 @@ impl State {
 enum Effect {
     Berth,
     Pulse,
+    Mining,
     Hit { front: bool, damage: u16 },
 }
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
@@ -198,6 +237,12 @@ fn replay(events: &[(u64, u8, u64, Effect)], end: u64) -> Result<Pools, SaveErro
             }
             Effect::Pulse => {
                 pools.pulse = pools.pulse.prepare_discharge().map_err(|_| INVALID)?;
+            }
+            Effect::Mining => {
+                pools.pulse = pools
+                    .pulse
+                    .prepare_mining_discharge()
+                    .map_err(|_| INVALID)?;
             }
             Effect::Hit { front, damage } => {
                 if phase == 2 && !pools.pulse.alive() {

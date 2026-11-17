@@ -229,6 +229,42 @@ impl Ledger {
     }
 }
 impl State {
+    /// Read-only historical actual item/fit proof for a retained work emission.
+    pub(super) fn mining_was_fitted(&self, hit: &crate::mining::MiningStroke) -> bool {
+        let mut ledger = Ledger {
+            items: vec![OwnedModule {
+                id: match hit.owner.owner.checked_add(7) {
+                    Some(id) => id,
+                    None => return false,
+                },
+                kind: ModuleKind::PulseLaser,
+                slot: Some(ModuleSlot::FrontLaser),
+                provenance: ModuleProvenance::StandardBirth,
+            }],
+            ..Ledger::default()
+        };
+        let mut transaction = 0_u32;
+        for e in self.events.iter().filter(|e| e.tick <= hit.world_tick) {
+            if e.dock.owner().seed() != hit.owner.owner
+                || e.dock.ship().ordinal() != hit.owner.hull
+                || e.dock.visit() >= hit.owner.visit
+                || e.revision > hit.account_revision
+            {
+                return false;
+            }
+            if e.action == ModuleAction::PurchaseMiningLaser {
+                transaction += 1;
+            }
+            if ledger.apply(*e, transaction).is_err() {
+                return false;
+            }
+        }
+        ledger.front().is_some_and(|i| {
+            i.id == hit.item
+                && i.kind == ModuleKind::MiningLaser
+                && matches!(i.provenance, ModuleProvenance::Paid { .. })
+        })
+    }
     pub(super) fn paid_count(&self) -> usize {
         self.events
             .iter()
