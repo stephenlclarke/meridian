@@ -2,7 +2,7 @@
 use super::{FlightMode, World};
 use crate::{
     freight::g02::CommanderAccount,
-    navigation::DockContext,
+    navigation::{DockContext, NavigationFitChange, NavigationGrade},
     save::{Reader, SaveError, Writer},
 };
 use core::fmt;
@@ -23,6 +23,9 @@ pub enum ModuleKind {
     NavalEnergyUnit,
     EliteEnergyUnit,
     FuelScoops,
+    BasicNavigation,
+    IntermediateNavigation,
+    AdvancedNavigation,
 }
 impl ModuleKind {
     pub fn family(self) -> &'static str {
@@ -33,11 +36,19 @@ impl ModuleKind {
             | Self::MilitaryLaser
             | Self::NavalLaser => "laser",
             Self::FuelScoops => "utility-fuelScoops",
+            Self::BasicNavigation | Self::IntermediateNavigation | Self::AdvancedNavigation => {
+                "navigation"
+            }
             _ => "energy",
         }
     }
     pub fn node(self) -> &'static str {
-        self.name()
+        match self {
+            Self::BasicNavigation => "Navigation: Basic",
+            Self::IntermediateNavigation => "Navigation: Advanced",
+            Self::AdvancedNavigation => "Navigation: Military",
+            _ => self.name(),
+        }
     }
     pub fn name(self) -> &'static str {
         match self {
@@ -51,6 +62,9 @@ impl ModuleKind {
             Self::ExtraEnergyUnit => "Extra Energy Unit",
             Self::NavalEnergyUnit => "Naval Energy Unit",
             Self::EliteEnergyUnit => "Elite Energy Unit",
+            Self::BasicNavigation => "Basic Navigation Computer",
+            Self::IntermediateNavigation => "Intermediate Navigation Module",
+            Self::AdvancedNavigation => "Advanced Navigation Module",
         }
     }
     pub fn laser_profile(self) -> Option<super::OrdinaryWeapon> {
@@ -64,6 +78,9 @@ impl ModuleKind {
             | Self::MilitaryLaser
             | Self::NavalLaser => ModuleSlot::FrontLaser,
             Self::FuelScoops => ModuleSlot::UtilityFuelScoops,
+            Self::BasicNavigation | Self::IntermediateNavigation | Self::AdvancedNavigation => {
+                ModuleSlot::Navigation
+            }
             _ => ModuleSlot::Energy,
         }
     }
@@ -75,6 +92,18 @@ impl ModuleKind {
             Self::EliteEnergyUnit => Some(4),
             _ => None,
         }
+    }
+    fn navigation_grade(self) -> Option<NavigationGrade> {
+        match self {
+            Self::BasicNavigation => Some(NavigationGrade::Basic),
+            Self::IntermediateNavigation => Some(NavigationGrade::Intermediate),
+            Self::AdvancedNavigation => Some(NavigationGrade::Advanced),
+            _ => None,
+        }
+    }
+    pub fn navigation_reach_ly(self) -> Option<u8> {
+        self.navigation_grade()
+            .and_then(NavigationGrade::module_reach_ly)
     }
     pub fn equipment_units(self) -> u16 {
         match self {
@@ -95,7 +124,9 @@ impl ModuleKind {
             Self::ExtraEnergyUnit => Some((72000, 9)),
             Self::NavalEnergyUnit => Some((196000, 17)),
             Self::EliteEnergyUnit => Some((135000, 14)),
-            Self::BasicEnergySystem => None,
+            Self::BasicEnergySystem | Self::BasicNavigation => None,
+            Self::IntermediateNavigation => Some((30_000, 8)),
+            Self::AdvancedNavigation => Some((90_000, 11)),
         }
     }
     fn prerequisite(self) -> Option<Self> {
@@ -103,6 +134,8 @@ impl ModuleKind {
             Self::ExtraEnergyUnit => Some(Self::BasicEnergySystem),
             Self::NavalEnergyUnit => Some(Self::ExtraEnergyUnit),
             Self::EliteEnergyUnit => Some(Self::NavalEnergyUnit),
+            Self::IntermediateNavigation => Some(Self::BasicNavigation),
+            Self::AdvancedNavigation => Some(Self::IntermediateNavigation),
             _ => None,
         }
     }
@@ -125,6 +158,9 @@ impl ModuleKind {
             Self::MilitaryLaser => 7,
             Self::NavalLaser => 8,
             Self::FuelScoops => 9,
+            Self::BasicNavigation => 10,
+            Self::IntermediateNavigation => 11,
+            Self::AdvancedNavigation => 12,
         }
     }
     fn from_tag(tag: u8) -> Result<Self, SaveError> {
@@ -139,6 +175,9 @@ impl ModuleKind {
             7 => Ok(Self::MilitaryLaser),
             8 => Ok(Self::NavalLaser),
             9 => Ok(Self::FuelScoops),
+            10 => Ok(Self::BasicNavigation),
+            11 => Ok(Self::IntermediateNavigation),
+            12 => Ok(Self::AdvancedNavigation),
             _ => Err(SaveError::InvalidEncoding),
         }
     }
@@ -148,6 +187,7 @@ pub enum ModuleSlot {
     FrontLaser,
     Energy,
     UtilityFuelScoops,
+    Navigation,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleProvenance {
@@ -309,6 +349,7 @@ pub(super) struct Ledger {
     pub(super) items: Vec<OwnedModule>,
     pub(super) paid: u32,
     pub(super) revision: u64,
+    pub(super) navigation_changes: Vec<NavigationFitChange>,
 }
 impl Ledger {
     fn born(owner: u64) -> Result<Self, SaveError> {
@@ -326,6 +367,12 @@ impl Ledger {
                     slot: Some(ModuleSlot::Energy),
                     provenance: ModuleProvenance::StandardBirth,
                 },
+                OwnedModule {
+                    id: owner.checked_add(4).ok_or(INVALID)?,
+                    kind: ModuleKind::BasicNavigation,
+                    slot: Some(ModuleSlot::Navigation),
+                    provenance: ModuleProvenance::StandardBirth,
+                },
             ],
             ..Self::default()
         })
@@ -335,6 +382,14 @@ impl Ledger {
     }
     fn front(&self) -> Option<OwnedModule> {
         self.fitted(ModuleSlot::FrontLaser)
+    }
+    pub(super) fn navigation_grade(&self) -> NavigationGrade {
+        self.fitted(ModuleSlot::Navigation)
+            .and_then(|item| item.kind.navigation_grade())
+            .unwrap_or(NavigationGrade::Empty)
+    }
+    pub(super) fn jump_reach_ly(&self) -> f64 {
+        self.navigation_grade().reach_ly()
     }
     fn fitted_units(&self) -> u16 {
         self.items
@@ -510,7 +565,16 @@ impl State {
             } {
                 return Err(INVALID);
             }
+            let previous_grade = ledger.navigation_grade();
             ledger.apply(*e, transaction).map_err(|_| INVALID)?;
+            let grade = ledger.navigation_grade();
+            if grade != previous_grade {
+                ledger.navigation_changes.push(NavigationFitChange {
+                    dock: e.dock,
+                    tick: e.tick,
+                    grade,
+                });
+            }
             previous = Some(*e);
         }
         for (offset, slot, component) in [
@@ -520,6 +584,11 @@ impl State {
                 super::StarterComponent::FrontPulseLaser,
             ),
             (5, ModuleSlot::Energy, super::StarterComponent::BasicEnergy),
+            (
+                4,
+                ModuleSlot::Navigation,
+                super::StarterComponent::BasicNavigation,
+            ),
         ] {
             let born = account
                 .starter_items()
@@ -592,7 +661,7 @@ impl State {
         }
     }
     pub(super) fn decode(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
-        if !matches!(version, 13 | 15 | crate::save::SAVE_VERSION) {
+        if version != crate::save::SAVE_VERSION {
             return Err(SaveError::UnsupportedVersion);
         }
         let count = r.u32()? as usize;
@@ -603,7 +672,11 @@ impl State {
         for _ in 0..count {
             let tag = r.u8()?;
             let kind = if tag == 3 && version >= 16 {
-                Some(ModuleKind::from_tag(r.u8()?)?)
+                let kind = ModuleKind::from_tag(r.u8()?)?;
+                if version < 17 && kind.navigation_reach_ly().is_some() {
+                    return Err(SaveError::InvalidEncoding);
+                }
+                Some(kind)
             } else {
                 None
             };
@@ -616,9 +689,15 @@ impl State {
             let dock = DockContext::decode_save(r)?;
             let tick = r.u64()?;
             let revision = r.u64()?;
+            if version < 17
+                && matches!(tag, 1 | 2)
+                && dock.owner().seed().checked_add(4) == Some(item)
+            {
+                return Err(SaveError::InvalidEncoding);
+            }
             let action = match tag {
                 0 => ModuleAction::PurchaseMiningLaser,
-                16 if version == crate::save::SAVE_VERSION => ModuleAction::PurchaseFuelScoops,
+                16 if version >= 16 => ModuleAction::PurchaseFuelScoops,
                 1 => ModuleAction::Store { item },
                 2 => ModuleAction::Install { item, replacing },
                 3 if version >= 16 => ModuleAction::Purchase {
@@ -677,6 +756,8 @@ impl World {
             ModuleKind::ExtraEnergyUnit,
             ModuleKind::NavalEnergyUnit,
             ModuleKind::EliteEnergyUnit,
+            ModuleKind::IntermediateNavigation,
+            ModuleKind::AdvancedNavigation,
         ]
         .into_iter()
         .filter_map(|kind| {
@@ -865,8 +946,11 @@ impl World {
         if ammo.items.iter().filter(|i| !i.consumed).count()
             + 4
             + usize::from(account.equipment_state().owned().is_some())
-            + ledger.items.len()
-            - 2
+            + ledger
+                .items
+                .iter()
+                .filter(|item| matches!(item.provenance, ModuleProvenance::Paid { .. }))
+                .count()
             > 256
         {
             return Err(ModuleError::Capacity);
@@ -945,8 +1029,11 @@ impl World {
         let energy_fitted = ledger
             .fitted(ModuleSlot::Energy)
             .is_some_and(|i| i.id == owner + 5);
+        let navigation_fitted = ledger
+            .fitted(ModuleSlot::Navigation)
+            .is_some_and(|item| item.id == owner + 4);
         let account = current
-            .prepare_module(paid, pulse_fitted, energy_fitted)
+            .prepare_module(paid, pulse_fitted, energy_fitted, navigation_fitted)
             .map_err(|_| ModuleError::SequenceExhausted)?;
         let mut state = self.modular.clone();
         state.events.push(event);
@@ -963,6 +1050,8 @@ impl World {
     }
 }
 
+#[cfg(test)]
+mod navigation_tests;
 #[cfg(test)]
 mod tests;
 

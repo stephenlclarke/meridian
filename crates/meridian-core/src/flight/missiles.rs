@@ -222,14 +222,6 @@ impl Default for State {
     }
 }
 impl State {
-    #[cfg(test)]
-    pub(in crate::flight) fn has_asteroid_contact(&self) -> bool {
-        self.projectiles
-            .iter()
-            .flatten()
-            .any(|p| matches!(p.contact, Some(MissileContact::Asteroid(_))))
-    }
-
     pub(super) fn resource_emissions(&self) -> impl Iterator<Item = (u64, u64)> + '_ {
         self.projectiles
             .iter()
@@ -297,10 +289,6 @@ impl State {
     }
 }
 impl State {
-    #[cfg(test)]
-    pub(super) fn save_supported(&self) -> bool {
-        !self.armed && self.lock.is_none() && self.projectiles.iter().all(Option::is_none)
-    }
     pub(super) fn intercept(
         &mut self,
         id: ProjectileId,

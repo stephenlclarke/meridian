@@ -136,10 +136,6 @@ impl CommanderAccount {
     pub(crate) fn encode_save(&self, w: &mut Writer) {
         self.encode_version(w, 13);
     }
-    #[cfg(test)]
-    pub(crate) fn encode_legacy_version(&self, w: &mut Writer, version: u16) {
-        self.encode_version(w, version);
-    }
     fn encode_version(&self, w: &mut Writer, version: u16) {
         let d = self.data;
         w.u64(d.owner);

@@ -199,8 +199,4 @@ impl State {
             })
             .flatten()
     }
-    #[cfg(test)]
-    pub(crate) fn has_history(&self) -> bool {
-        !self.strokes.is_empty()
-    }
 }

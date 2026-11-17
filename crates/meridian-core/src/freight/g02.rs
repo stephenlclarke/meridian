@@ -223,7 +223,7 @@ struct AccountData {
 impl AccountData {
     fn allows_stored_starter(&self, index: usize, item: OwnedStarterItem) -> bool {
         // The World separately requires the fit to match its retained modular ledger.
-        matches!(index, 2 | 4) && self.modular_revision > 0 && item.fitted_hull.is_none()
+        matches!(index, 1 | 2 | 4) && self.modular_revision > 0 && item.fitted_hull.is_none()
     }
 }
 
@@ -298,6 +298,7 @@ impl CommanderAccount {
         paid: u32,
         pulse_fitted: bool,
         energy_fitted: bool,
+        navigation_fitted: bool,
     ) -> Result<Self, Error> {
         let mut data = self.data;
         data.credits = data
@@ -324,6 +325,12 @@ impl CommanderAccount {
             .and_then(|fit| fit.items[2].as_mut())
             .ok_or(Error::MissingEquipment)?;
         energy.fitted_hull = energy_fitted.then_some(data.hull);
+        let navigation = data
+            .fit
+            .as_mut()
+            .and_then(|fit| fit.items[1].as_mut())
+            .ok_or(Error::MissingEquipment)?;
+        navigation.fitted_hull = navigation_fitted.then_some(data.hull);
         Ok(Self { data })
     }
     pub(crate) fn ammunition_revision(&self) -> u64 {

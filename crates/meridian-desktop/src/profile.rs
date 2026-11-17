@@ -763,6 +763,66 @@ pub(crate) mod tests {
         );
     }
     #[test]
+    fn older_formats_refuse_from_title_and_live_reload_without_disk_replacement() {
+        let fixtures: [&[u8]; 2] = [
+            include_bytes!("../../meridian-core/tests/fixtures/qualified-v15-npc-flight.bin"),
+            include_bytes!("../../meridian-core/tests/fixtures/pr44-v16-m02-purchases.bin"),
+        ];
+        for bytes in fixtures {
+            let directory = TestDirectory::new();
+            let destination = directory.0.join("commander.meridian");
+            fs::write(&destination, bytes).unwrap_or_else(|e| panic!("{e}"));
+            let mut profile = open(&directory.0);
+            let opening = profile.world.snapshot();
+            let error = profile
+                .continue_saved()
+                .err()
+                .unwrap_or_else(|| panic!("an unsupported save was accepted"));
+            assert!(error.contains("Unsupported commander save format"));
+            assert!(error.contains("format 17"));
+            assert!(!profile.playing());
+            assert_eq!(profile.world.snapshot(), opening);
+            assert_eq!(
+                fs::read(&destination).unwrap_or_else(|e| panic!("{e}")),
+                bytes
+            );
+            profile.prepare_quit().unwrap_or_else(|e| panic!("{e}"));
+            assert_eq!(
+                fs::read(&destination).unwrap_or_else(|e| panic!("{e}")),
+                bytes
+            );
+
+            assert!(
+                !profile
+                    .new_commander(15910)
+                    .unwrap_or_else(|e| panic!("{e}"))
+            );
+            assert!(
+                profile
+                    .new_commander(15910)
+                    .unwrap_or_else(|e| panic!("{e}"))
+            );
+            let before = profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+            assert!(
+                profile
+                    .continue_saved()
+                    .err()
+                    .unwrap_or_else(|| panic!("an unsupported save was accepted"))
+                    .contains("format 17")
+            );
+            assert!(profile.playing());
+            assert_eq!(
+                profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}")),
+                before
+            );
+            assert_eq!(
+                fs::read(&destination).unwrap_or_else(|e| panic!("{e}")),
+                bytes
+            );
+        }
+    }
+
+    #[test]
     fn failed_quit_save_cannot_claim_exit_ready_or_change_the_live_world() {
         let directory = TestDirectory::new();
         let mut profile = open(&directory.0);

@@ -67,11 +67,16 @@ fn root_join_cold_continue_preserves_paid_same_item_and_typed_store_refit_withou
     let _again = continued(&w);
 }
 #[test]
-fn root_join_keeps_real_old_fifteen_bytes_accepted_and_rejects_new_utility_relabelling_atomically()
-{
+fn old_fifteen_bytes_and_new_utility_relabelling_refuse_atomically() {
     let mut w = funded();
-    let old = ok(crate::flight::persistence::v15_test_fixture(&w));
-    let older = ok(World::from_save_bytes(&old));
+    let old = ok(crate::flight::persistence::unsupported_version_test_input(
+        &w, 15,
+    ));
+    assert!(matches!(
+        World::from_save_bytes(&old),
+        Err(crate::save::SaveError::UnsupportedVersion)
+    ));
+    let older = ok(World::from_save_bytes(&ok(w.save_bytes())));
     assert_eq!(older.credits_tenths(), w.credits_tenths());
     assert_eq!(
         older.modular_equipment_snapshot(),
@@ -81,10 +86,18 @@ fn root_join_keeps_real_old_fifteen_bytes_accepted_and_rejects_new_utility_relab
     let item = apply(&mut w, ModuleAction::PurchaseFuelScoops);
     let mut loaded = continued(&w);
     // Negative codec fixture only: no gear, pose, cargo or success is supplied to gameplay.
-    let forged_old = ok(crate::flight::persistence::v15_test_fixture(&w));
-    assert!(World::from_save_bytes(&forged_old).is_err());
+    let forged_old = ok(crate::flight::persistence::unsupported_version_test_input(
+        &w, 15,
+    ));
+    assert!(matches!(
+        World::from_save_bytes(&forged_old),
+        Err(crate::save::SaveError::UnsupportedVersion)
+    ));
     let before = ok(loaded.save_bytes());
-    assert!(loaded.restore_bytes(&forged_old).is_err());
+    assert_eq!(
+        loaded.restore_bytes(&forged_old),
+        Err(crate::save::SaveError::UnsupportedVersion)
+    );
     assert_eq!(ok(loaded.save_bytes()), before);
     assert_eq!(some(loaded.fitted_fuel_scoops()).item, item);
 }

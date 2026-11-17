@@ -1,5 +1,11 @@
 # Implementation and validation status
 
+## Following navigation composition: source only
+
+Root is composing reviewed navigation source `c90f1a9` with the Preview 6 documentation head. Navigation alone passed Dell Linux and native Windows with 547 Rust tests, 94 Python tests, 46 Markdown checks, strict Clippy and locked release builds. This composition is unreviewed and unrun; those results are not attributed to it. The candidate reads and writes V17 only, retains V15/V16 fixtures as refusal evidence, and has exact per-leg fuel and fitted-grade history. No backward compatibility is required.
+
+Desktop routes and services remain Avenor and Renas. The minimum cumulative fuel for a service-to-service route including a leg beyond 9 LY is 172 against tank capacity 130; a playable paid-range use remains open. Preview 6 acceptance below retains its exact compiled V16 source identity.
+
 ## Preview 6 paid mining and equipment qualification
 
 Compiled source `a1ee1358c4f8bdb91dad2e6c4d0e299b00c63ab3`, tree `6685f513d6b25ac5ee0bad021a69673cad9e76c5`, passed owned Mac qualification: 337 core tests, one captured-v15 integration test and 196 desktop tests (534 workspace cases), 94 Python tests, 46 Markdown checks, formatting, all-target checks, strict Clippy and locked release build. Dell Linux and native Windows additionally ran three explicit observer cases, giving 537 Rust cases each. All five hosted head checks passed. The historical compiler, fixture and resource-replay failures remain retained evidence; they are not current failures of this candidate.

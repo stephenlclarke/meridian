@@ -579,30 +579,33 @@ fn pure_source_geometry_retains_missile_faces_and_player_surface_without_grantin
 }
 
 #[test]
-fn untouched_controller_preserves_exact_v4_through_v8_owned_rounds_without_a_grant() {
+fn untouched_current_controller_keeps_owned_rounds_and_refuses_v4_through_v7() {
     let world = World::new_commander(1691).unwrap();
     let expected = world.missile_snapshot().unwrap();
     let saves = [
-        crate::flight::persistence::v4_test_fixture(&world).unwrap(),
-        crate::flight::persistence::v5_test_fixture(&world).unwrap(),
-        crate::flight::persistence::v6_test_fixture(&world).unwrap(),
-        crate::flight::persistence::v7_test_fixture(&world).unwrap(),
-        world.save_bytes().unwrap(),
+        crate::flight::persistence::unsupported_version_test_input(&world, 4).unwrap(),
+        crate::flight::persistence::unsupported_version_test_input(&world, 5).unwrap(),
+        crate::flight::persistence::unsupported_version_test_input(&world, 6).unwrap(),
+        crate::flight::persistence::unsupported_version_test_input(&world, 7).unwrap(),
     ];
     for bytes in saves {
-        let loaded = World::from_save_bytes(&bytes).unwrap();
-        assert_eq!(loaded.missile_snapshot(), Some(expected));
-        assert_eq!(loaded.credits_tenths(), world.credits_tenths());
-        assert_eq!(loaded.equipment_snapshot(), world.equipment_snapshot());
         assert_eq!(
-            loaded
-                .missile_snapshot()
-                .unwrap()
-                .rounds
-                .map(|r| r.unwrap().item),
-            [1699, 1700, 1701]
+            World::from_save_bytes(&bytes).unwrap_err(),
+            crate::save::SaveError::UnsupportedVersion
         );
     }
+    let loaded = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    assert_eq!(loaded.missile_snapshot(), Some(expected));
+    assert_eq!(loaded.credits_tenths(), world.credits_tenths());
+    assert_eq!(loaded.equipment_snapshot(), world.equipment_snapshot());
+    assert_eq!(
+        loaded
+            .missile_snapshot()
+            .unwrap()
+            .rounds
+            .map(|r| r.unwrap().item),
+        [1699, 1700, 1701]
+    );
 }
 
 mod durable;

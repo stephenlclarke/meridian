@@ -12,111 +12,8 @@ use crate::save::{MAX_SAVE_BYTES, Reader, SAVE_VERSION, SaveError, Writer, check
 use crate::station_services::{SavedServiceSummary, StationMarkets};
 
 const MAGIC: &[u8; 8] = b"MERSAVE1";
-// Rules and immutable content form the version-four compatibility boundary, not an authenticity key.
-const V4_CONTENT: &[u8] = concat!(
-    "meridian-world/rules/4;",
-    "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
-    "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
-    "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
-    "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823;",
-    "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa"
-)
-.as_bytes();
-
-// Rules and immutable content form the version-five compatibility boundary, not an authenticity key.
-const V5_CONTENT: &[u8] = concat!(
-    "meridian-world/rules/5;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
-    "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
-    "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
-    "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
-    "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823;",
-    "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa"
-)
-.as_bytes();
-
-// Rules and immutable content form the version-six compatibility boundary, not an authenticity key.
-const V6_CONTENT: &[u8] = concat!(
-    "meridian-world/rules/6;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
-    "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
-    "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
-    "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
-    "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823;",
-    "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa"
-)
-.as_bytes();
-
-const V7_CONTENT: &[u8] = concat!(
-    "meridian-world/rules/7;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
-    "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
-    "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
-    "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
-    "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823;",
-    "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa"
-)
-.as_bytes();
-
-const V8_CONTENT: &[u8] = concat!(
-    "meridian-world/rules/8;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
-    "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
-    "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
-    "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
-    "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823;",
-    "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa"
-)
-.as_bytes();
-
-const V9_CONTENT: &[u8] = concat!(
-    "meridian-world/rules/9;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
-    "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
-    "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
-    "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
-    "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823;",
-    "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa"
-)
-.as_bytes();
-
-const V10_CONTENT: &[u8] = concat!(
-    "meridian-world/rules/10;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
-    "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
-    "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
-    "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
-    "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823;",
-    "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa"
-)
-.as_bytes();
-
-const V11_CONTENT: &[u8] = concat!(
-    "meridian-world/rules/11;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
-    "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
-    "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
-    "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
-    "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823;",
-    "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa"
-)
-.as_bytes();
-
-const V13_CONTENT: &[u8] = concat!(
-    "meridian-world/rules/13;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
-    "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
-    "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
-    "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
-    "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823;",
-    "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa"
-)
-.as_bytes();
-
-const V15_CONTENT: &[u8] = concat!(
-    "meridian-world/rules/15;npc-missiles/canonical-native-ray-v3;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
-    "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
-    "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
-    "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
-    "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823;",
-    "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa"
-)
-.as_bytes();
-
 const CONTENT: &[u8] = concat!(
-    "meridian-world/rules/16;rapid-lasers-energy/shared-nine-byte-resources-v1/a11fe169;mining/native-work-pending-v2;fuel-scoops/paid-utility-v1;npc-missiles/canonical-native-ray-v3;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
+    "meridian-world/rules/17;navigation-computer/exact-route-journal/a11fe169;rapid-lasers-energy/shared-nine-byte-resources-v1/a11fe169;mining/native-work-pending-v2;fuel-scoops/paid-utility-v1;npc-missiles/canonical-native-ray-v3;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -140,10 +37,8 @@ fn compiled_content_fingerprint(content: &[u8]) -> u64 {
         bytes.extend((part.len() as u64).to_le_bytes());
         bytes.extend(part);
     }
-    if content == CONTENT || content == V15_CONTENT {
-        bytes.extend(crate::traffic::CONTENT_RULES);
-    }
     if content == CONTENT {
+        bytes.extend(crate::traffic::CONTENT_RULES);
         bytes.extend(crate::mining::content_bytes());
     }
     checksum(&bytes)
@@ -375,6 +270,7 @@ impl World {
         self.traffic.encode(&mut w);
         self.damage.encode(&mut w);
         self.mining.encode(&mut w);
+        self.jump_journal.encode(&mut w);
         let digest = checksum(&w.bytes);
         w.u64(digest);
         if w.bytes.len() > MAX_SAVE_BYTES {
@@ -437,24 +333,12 @@ impl World {
             return Err(SaveError::InvalidEncoding);
         }
         let version = r.u16()?;
-        let content = match version {
-            4 if r.fixed::<{ V4_CONTENT.len() }>()?.as_slice() == V4_CONTENT => V4_CONTENT,
-            5 if r.fixed::<{ V5_CONTENT.len() }>()?.as_slice() == V5_CONTENT => V5_CONTENT,
-            6 if r.fixed::<{ V6_CONTENT.len() }>()?.as_slice() == V6_CONTENT => V6_CONTENT,
-            7 if r.fixed::<{ V7_CONTENT.len() }>()?.as_slice() == V7_CONTENT => V7_CONTENT,
-            8 if r.fixed::<{ V8_CONTENT.len() }>()?.as_slice() == V8_CONTENT => V8_CONTENT,
-            9 if r.fixed::<{ V9_CONTENT.len() }>()?.as_slice() == V9_CONTENT => V9_CONTENT,
-            10 if r.fixed::<{ V10_CONTENT.len() }>()?.as_slice() == V10_CONTENT => V10_CONTENT,
-            11 if r.fixed::<{ V11_CONTENT.len() }>()?.as_slice() == V11_CONTENT => V11_CONTENT,
-            13 if r.fixed::<{ V13_CONTENT.len() }>()?.as_slice() == V13_CONTENT => V13_CONTENT,
-            15 if r.fixed::<{ V15_CONTENT.len() }>()?.as_slice() == V15_CONTENT => V15_CONTENT,
-            SAVE_VERSION if r.fixed::<{ CONTENT.len() }>()?.as_slice() == CONTENT => CONTENT,
-            4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 13 | 15 | SAVE_VERSION => {
-                return Err(SaveError::ContentMismatch);
-            }
-            _ => return Err(SaveError::UnsupportedVersion),
-        };
-        if r.u64()? != compiled_content_fingerprint(content) {
+        if version != SAVE_VERSION {
+            return Err(SaveError::UnsupportedVersion);
+        }
+        if r.fixed::<{ CONTENT.len() }>()?.as_slice() != CONTENT
+            || r.u64()? != compiled_content_fingerprint(CONTENT)
+        {
             return Err(SaveError::ContentMismatch);
         }
         let station_data =
@@ -465,36 +349,13 @@ impl World {
         let commander_account = CommanderAccount::decode_save(&mut r, version)?;
         let freight_session = mission::FreightSession::decode_save(&mut r)?;
         let station_markets = StationMarkets::decode_save(&mut r)?;
-        let modular = if version >= 13 {
-            super::modular::State::decode(&mut r, version)?
-        } else {
-            super::modular::State::default()
-        };
-        let ammunition = if version >= 12 {
-            super::ammunition::State::decode(&mut r)?
-        } else {
-            super::ammunition::State::default()
-        };
-        let navigation_trade = if version >= 11 {
-            navigation_trade::State::decode(&mut r)?
-        } else {
-            navigation_trade::State::default()
-        };
-        let flight_reception = if version >= 10 {
-            flight_reception::State::decode(&mut r, version)?
-        } else {
-            flight_reception::State::default()
-        };
-        let missiles = if version >= 8 {
-            missiles::State::decode(&mut r, version)?
-        } else {
-            missiles::State::default()
-        };
-        let (practice_history, practice_trace) = if version >= 9 {
-            practice::lifecycle::decode_history(&mut r, version)?
-        } else {
-            (Vec::new(), None)
-        };
+        let modular = super::modular::State::decode(&mut r, version)?;
+        let ammunition = super::ammunition::State::decode(&mut r)?;
+        let navigation_trade = navigation_trade::State::decode(&mut r)?;
+        let flight_reception = flight_reception::State::decode(&mut r, version)?;
+        let missiles = missiles::State::decode(&mut r, version)?;
+        let (practice_history, practice_trace) =
+            practice::lifecycle::decode_history(&mut r, version)?;
         let mut candidate = Self {
             state,
             traffic: crate::traffic::State::default(),
@@ -506,6 +367,7 @@ impl World {
                 OriginalNavigation::bundled().map_err(|_| SaveError::ContentMismatch)?,
             ),
             navigation: Some(navigation),
+            jump_journal: crate::navigation::JumpJournal::default(),
             commander_account: Some(commander_account),
             freight_session: Some(freight_session),
             station_markets: Some(station_markets),
@@ -520,38 +382,20 @@ impl World {
             pulse: weapons::PulseResources::default(),
             combat: combat::State::default(),
         };
-        if version >= 7 {
-            candidate.combat = combat::State::decode(&mut r, version)?;
-            let ordinary_hit = r.option(|r| combat::OrdinaryImpact::decode_version(r, version))?;
-            match (candidate.practice.as_mut(), ordinary_hit) {
-                (Some(practice), hit) => practice.ordinary_hit = hit,
-                (None, None) => {}
-                _ => return Err(SaveError::InvalidEncoding),
-            }
+        candidate.combat = combat::State::decode(&mut r, version)?;
+        let ordinary_hit = r.option(|r| combat::OrdinaryImpact::decode_version(r, version))?;
+        match (candidate.practice.as_mut(), ordinary_hit) {
+            (Some(practice), hit) => practice.ordinary_hit = hit,
+            (None, None) => {}
+            _ => return Err(SaveError::InvalidEncoding),
         }
         candidate.pulse = weapons::PulseResources::decode_save(&mut r)?;
-        if version >= 15 {
-            candidate.traffic = crate::traffic::State::decode_version(&mut r, version)?;
-            candidate.damage = super::damage::State::decode(&mut r, version)?;
-        }
-        if version >= 16 {
-            candidate.mining = crate::mining::State::decode(&mut r)?;
-        }
-        if version < 16 && candidate.state.motion_refusal == Some(MotionRefusal::AsteroidContact) {
-            return Err(SaveError::InvalidEncoding);
-        }
-        if version < 15 && candidate.state.motion_refusal == Some(MotionRefusal::NpcContact) {
-            return Err(SaveError::InvalidEncoding);
-        }
+        candidate.traffic = crate::traffic::State::decode_version(&mut r, version)?;
+        candidate.damage = super::damage::State::decode(&mut r, version)?;
+        candidate.mining = crate::mining::State::decode(&mut r)?;
+        candidate.jump_journal = crate::navigation::JumpJournal::decode(&mut r)?;
         if !r.finished() {
             return Err(SaveError::InvalidEncoding);
-        }
-        if version <= 8 {
-            // Earlier supported completion already carried the trusted trace proof.
-            candidate.practice_trace = candidate
-                .practice
-                .filter(|p| p.completed_tick().is_some())
-                .map(|p| p.attempt_id());
         }
         candidate.validate_saved_world(
             candidate.practice,
@@ -663,6 +507,13 @@ impl World {
             ),
         )?;
         let modular = commerce.modular.ledger(self, account)?;
+        navigation.validate_pending_reach(catalogue, modular.jump_reach_ly())?;
+        self.jump_journal.validate(
+            navigation,
+            catalogue,
+            self.state.tick,
+            &modular.navigation_changes,
+        )?;
         let ammunition = commerce.ammunition.ledger_with_module_count(
             self,
             account,
@@ -756,26 +607,12 @@ fn read_practice(
     r: &mut Reader<'_>,
     version: u16,
 ) -> Result<Option<practice::Practice>, SaveError> {
-    if version == 4 {
-        return Ok(None);
-    }
-    let reception = if version >= 6 {
-        r.option(practice::reception::Reception::decode)?
-    } else {
-        None
-    };
+    let reception = r.option(practice::reception::Reception::decode)?;
     let mut practice = r.option(|r| practice::Practice::decode(r, version))?;
-    if version >= 6 {
-        match (practice.as_mut(), reception) {
-            (Some(practice), Some(reception)) => practice.reception = reception,
-            (None, None) => {}
-            _ => return Err(SaveError::InvalidEncoding),
-        }
-    }
-    if version <= 8
-        && let Some(p) = &mut practice
-    {
-        p.upgrade_legacy_terminal();
+    match (practice.as_mut(), reception) {
+        (Some(practice), Some(reception)) => practice.reception = reception,
+        (None, None) => {}
+        _ => return Err(SaveError::InvalidEncoding),
     }
     Ok(practice)
 }
@@ -868,7 +705,7 @@ pub(super) fn read_flight(r: &mut Reader<'_>, version: u16) -> Result<Snapshot, 
         2 => Some(MotionRefusal::EntryConditions),
         3 => Some(MotionRefusal::CelestialContact),
         4 if version >= 15 => Some(MotionRefusal::NpcContact),
-        5 if version == SAVE_VERSION => Some(MotionRefusal::AsteroidContact),
+        5 if version >= 16 => Some(MotionRefusal::AsteroidContact),
         _ => return Err(SaveError::InvalidEncoding),
     };
     Ok(Snapshot {
@@ -901,150 +738,19 @@ pub(super) fn validate_flight(s: &Snapshot) -> Result<(), SaveError> {
     Ok(())
 }
 
+/// Build an unsupported-version refusal input with the current payload and checksum.
 #[cfg(test)]
-fn legacy_test_fixture(world: &World, version: u16) -> Result<Vec<u8>, SaveError> {
-    if world.mining.has_history()
-        || world.missiles.has_asteroid_contact()
-        || world.state.motion_refusal == Some(MotionRefusal::AsteroidContact)
-    {
-        return Err(SaveError::UnsupportedVersion);
-    }
-    if !world.traffic.legacy_empty() {
-        return Err(SaveError::InvalidState(
-            "physical traffic requires current format",
-        ));
-    }
-    if version < 8 && !world.missiles.save_supported() {
-        return Err(SaveError::UnsupportedMissiles);
-    }
-    world.validate_saved_world(
-        world.practice,
-        &world.practice_history,
-        world.practice_trace,
-        &world.flight_reception,
-        &Commerce::current(world),
-    )?;
-    if world.modular != super::modular::State::default() {
-        return Err(SaveError::UnsupportedVersion);
-    }
-    if world.ammunition != super::ammunition::State::default() || world.missiles.used() > 3 {
-        return Err(SaveError::UnsupportedMissiles);
-    }
-    if version < 11 && world.navigation_trade != navigation_trade::State::default() {
-        return Err(SaveError::InvalidState("T04 requires v11"));
-    }
-    if version < 10 && world.flight_reception != flight_reception::State::default() {
-        return Err(SaveError::InvalidState("T01 requires v10"));
-    }
-    if version < 9
-        && (!world.practice_history.is_empty()
-            || world
-                .practice
-                .is_some_and(|p| p.is_cancelled() || p.attempt_id().ordinal() != 0))
-    {
-        return Err(SaveError::InvalidState("attempts require v9"));
-    }
-    let content = match version {
-        4 => V4_CONTENT,
-        5 => V5_CONTENT,
-        6 => V6_CONTENT,
-        7 => V7_CONTENT,
-        8 => V8_CONTENT,
-        9 => V9_CONTENT,
-        10 => V10_CONTENT,
-        11 => V11_CONTENT,
-        _ => return Err(SaveError::UnsupportedVersion),
-    };
-    let mut w = Writer::new();
-    w.bytes.extend(MAGIC);
-    w.u16(version);
-    w.bytes.extend(content);
-    w.u64(compiled_content_fingerprint(content));
-    write_flight(&mut w, &world.state);
-    world
-        .navigation
-        .ok_or(SaveError::NoCommander)?
-        .encode_save(&mut w);
-    world
-        .commander_account
-        .as_ref()
-        .ok_or(SaveError::NoCommander)?
-        .encode_legacy_version(&mut w, version);
-    world
-        .freight_session
-        .as_ref()
-        .ok_or(SaveError::NoCommander)?
-        .encode_save(&mut w);
-    world
-        .station_markets
-        .as_ref()
-        .ok_or(SaveError::NoCommander)?
-        .encode_save(&mut w);
-    if version >= 11 {
-        world.navigation_trade.encode(&mut w);
-    }
-    if version >= 10 {
-        world.flight_reception.encode_version(&mut w, version);
-    }
-    if version >= 8 {
-        world.missiles.encode_version(&mut w, version);
-    }
-    if version >= 9 {
-        practice::lifecycle::encode_history(&mut w, &world.practice_history, world.practice_trace);
-    }
-    if version >= 6 {
-        w.option(world.practice.as_ref(), |w, p| p.encode_reception(w));
-    }
-    if version >= 5 {
-        w.option(world.practice.as_ref(), |w, p| {
-            if version >= 9 {
-                p.encode(w)
-            } else if version >= 8 {
-                p.encode_v8(w)
-            } else {
-                p.encode_v7(w)
-            }
-        });
-    }
-    if version >= 7 {
-        world.combat.encode_legacy_version(&mut w, version);
-        w.option(
-            world.practice.and_then(|p| p.ordinary_hit).as_ref(),
-            |w, h| h.encode_version(w, version),
-        );
-    }
-    world.pulse.encode_save(&mut w);
-    let digest = checksum(&w.bytes);
-    w.u64(digest);
-    Ok(w.bytes)
-}
-#[cfg(test)]
-pub(super) fn v4_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
-    assert!(world.practice.is_none());
-    legacy_test_fixture(world, 4)
-}
-#[cfg(test)]
-pub(super) fn v5_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
-    legacy_test_fixture(world, 5)
-}
-#[cfg(test)]
-pub(super) fn v6_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
-    assert!(
-        world
-            .combat_snapshot()
-            .and_then(|s| s.last_ordinary_impact)
-            .is_none()
-    );
-    legacy_test_fixture(world, 6)
-}
-#[cfg(test)]
-pub(super) fn v7_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
-    legacy_test_fixture(world, 7)
-}
-
-#[cfg(test)]
-pub(super) fn v8_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
-    legacy_test_fixture(world, 8)
+pub(in crate::flight) fn unsupported_version_test_input(
+    world: &World,
+    version: u16,
+) -> Result<Vec<u8>, SaveError> {
+    assert_ne!(version, SAVE_VERSION);
+    let mut bytes = world.save_bytes()?;
+    bytes[8..10].copy_from_slice(&version.to_le_bytes());
+    let end = bytes.len() - 8;
+    let digest = checksum(&bytes[..end]);
+    bytes[end..].copy_from_slice(&digest.to_le_bytes());
+    Ok(bytes)
 }
 
 /// Locate the current pulse field for semantic corruption tests without assuming
@@ -1055,6 +761,7 @@ pub(super) fn pulse_save_start(world: &World, bytes: &[u8]) -> usize {
     world.traffic.encode(&mut extension);
     world.damage.encode(&mut extension);
     world.mining.encode(&mut extension);
+    world.jump_journal.encode(&mut extension);
     let extension_end = bytes.len() - 8;
     let extension_start = extension_end - extension.bytes.len();
     assert_eq!(
@@ -1080,112 +787,31 @@ pub(super) fn combat_save_len(world: &World) -> usize {
 }
 
 #[cfg(test)]
+pub(super) use tests::assert_resealed_enlirin_fuel_refusal;
+#[cfg(test)]
 mod tests;
-
-#[cfg(test)]
-pub(super) fn v9_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
-    legacy_test_fixture(world, 9)
-}
-
-#[cfg(test)]
-pub(super) fn v10_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
-    legacy_test_fixture(world, 10)
-}
-
-#[cfg(test)]
-pub(super) fn v13_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
-    if world.mining.has_history()
-        || world.missiles.has_asteroid_contact()
-        || world.state.motion_refusal == Some(MotionRefusal::AsteroidContact)
-    {
-        return Err(SaveError::UnsupportedVersion);
-    }
-    if !world.traffic.legacy_empty() {
-        return Err(SaveError::InvalidState(
-            "physical traffic requires current format",
-        ));
-    }
-    world.save_bytes()?;
-    let mut old = Writer::new();
-    old.bytes.extend(MAGIC);
-    old.u16(13);
-    old.bytes.extend(V13_CONTENT);
-    old.u64(compiled_content_fingerprint(V13_CONTENT));
-    write_flight(&mut old, &world.state);
-    world
-        .navigation
-        .ok_or(SaveError::NoCommander)?
-        .encode_save(&mut old);
-    world
-        .commander_account
-        .as_ref()
-        .ok_or(SaveError::NoCommander)?
-        .encode_save(&mut old);
-    world
-        .freight_session
-        .as_ref()
-        .ok_or(SaveError::NoCommander)?
-        .encode_save(&mut old);
-    world
-        .station_markets
-        .as_ref()
-        .ok_or(SaveError::NoCommander)?
-        .encode_save(&mut old);
-    world.modular.encode(&mut old);
-    world.ammunition.encode(&mut old);
-    world.navigation_trade.encode(&mut old);
-    world.flight_reception.encode_version(&mut old, 13);
-    world.missiles.encode_version(&mut old, 13);
-    practice::lifecycle::encode_history(&mut old, &world.practice_history, world.practice_trace);
-    old.option(world.practice.as_ref(), |w, p| p.encode_reception(w));
-    old.option(world.practice.as_ref(), |w, p| p.encode(w));
-    world.combat.encode(&mut old);
-    old.option(
-        world.practice.and_then(|p| p.ordinary_hit).as_ref(),
-        |w, h| h.encode(w),
-    );
-    world.pulse.encode_save(&mut old);
-    let digest = checksum(&old.bytes);
-    old.u64(digest);
-    Ok(old.bytes)
-}
-
-#[cfg(test)]
-pub(in crate::flight) fn v15_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
-    if world.mining.has_history()
-        || world.missiles.has_asteroid_contact()
-        || world.state.motion_refusal == Some(MotionRefusal::AsteroidContact)
-    {
-        return Err(SaveError::UnsupportedVersion);
-    }
-    let current = world.save_bytes()?;
-    let mut suffix = Writer::new();
-    world.mining.encode(&mut suffix);
-    let start = 8 + 2 + CONTENT.len() + 8;
-    let end = current.len() - 8 - suffix.bytes.len();
-    let mut old = Writer::new();
-    old.bytes.extend(MAGIC);
-    old.u16(15);
-    old.bytes.extend(V15_CONTENT);
-    old.u64(compiled_content_fingerprint(V15_CONTENT));
-    old.bytes.extend(&current[start..end]);
-    old.u64(checksum(&old.bytes));
-    Ok(old.bytes)
-}
 
 #[cfg(test)]
 mod paid_missile_format_tests {
     use super::*;
     #[test]
-    fn explicit_qualified_v11_is_read_without_relabelling_it_as_v12() {
+    fn unsupported_v11_label_refuses_without_replacing_current_state() {
         let world = World::new_commander(8401).unwrap_or_else(|e| panic!("{e:?}"));
-        let old = legacy_test_fixture(&world, 11).unwrap_or_else(|e| panic!("{e:?}"));
+        let old = unsupported_version_test_input(&world, 11).unwrap_or_else(|e| panic!("{e:?}"));
         assert_eq!(u16::from_le_bytes([old[8], old[9]]), 11);
-        let loaded = World::from_save_bytes(&old).unwrap_or_else(|e| panic!("{e:?}"));
-        assert_eq!(loaded.ammunition_snapshot(), world.ammunition_snapshot());
-        assert_eq!(loaded.credits_tenths(), world.credits_tenths());
-        let current = loaded.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
-        assert_eq!(u16::from_le_bytes([current[8], current[9]]), SAVE_VERSION);
-        assert_ne!(old, current);
+        assert!(matches!(
+            World::from_save_bytes(&old),
+            Err(SaveError::UnsupportedVersion)
+        ));
+        let before = world.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
+        let mut world = world;
+        assert_eq!(
+            world.restore_bytes(&old),
+            Err(SaveError::UnsupportedVersion)
+        );
+        assert_eq!(
+            world.save_bytes().unwrap_or_else(|e| panic!("{e:?}")),
+            before
+        );
     }
 }

@@ -45,9 +45,13 @@ Earlier qualified previews retain their own native flight, physical docking, tra
 
 See [implementation status](docs/IMPLEMENTATION-STATUS.md), [mining scope](docs/ASTEROID-MINING.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md).
 
+## Following navigation source
+
+The next isolated candidate reads and writes only V17, refusing earlier saves without changing their files. It adds paid navigation range and exact per-leg travel history. The individual navigation source passed Dell Linux and native Windows qualification; this combined source is unreviewed and unrun. A playable route benefiting from the paid range remains open with only Avenor and Renas services.
+
 ## Play
 
-N starts a commander; C continues. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.
+N starts a commander; C continues a current-format V17 save. Earlier formats refuse without changing the file. Use a separate profile for this candidate. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.
 
 | Controls | Action |
 | --- | --- |

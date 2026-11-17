@@ -1562,47 +1562,24 @@ mod legacy_motion_tests {
     use super::*;
 
     #[test]
-    fn real_v15_rejects_resealed_v16_asteroid_tag_in_retained_missile_motion() {
+    fn literal_v15_missile_history_refuses_before_candidate_replacement() {
         const V15: &[u8] = include_bytes!(concat!(
             env!("CARGO_MANIFEST_DIR"),
             "/tests/fixtures/qualified-v15-npc-flight.bin"
         ));
-        let mut live = World::from_save_bytes(V15).unwrap_or_else(|error| panic!("{error:?}"));
-        let accepted = live
+        assert!(matches!(
+            World::from_save_bytes(V15),
+            Err(SaveError::UnsupportedVersion)
+        ));
+        let mut live = World::new_commander(15920).unwrap_or_else(|error| panic!("{error:?}"));
+        let before = live
             .save_bytes()
             .unwrap_or_else(|error| panic!("{error:?}"));
-        let mut offsets = live.missiles.motions.iter().flatten().filter_map(|motion| {
-            let mut writer = Writer::new();
-            vector(&mut writer, motion.position);
-            scalar(&mut writer, motion.travel);
-            writer.u16(motion.age);
-            writer.bool(motion.cleared);
-            super::super::super::persistence::write_flight(&mut writer, &motion.flight);
-            let sample = writer.bytes;
-            let mut matches = V15
-                .windows(sample.len())
-                .enumerate()
-                .filter(|(_, bytes)| *bytes == sample.as_slice());
-            let (start, _) = matches.next()?;
-            matches.next().is_none().then_some(start + sample.len() - 1)
-        });
-        let offset = offsets
-            .next()
-            .unwrap_or_else(|| panic!("no unique original motion"));
-        assert_ne!(V15[offset], 5);
-        let mut corrupt = V15.to_vec();
-        corrupt[offset] = 5;
-        let trailer = corrupt.len() - 8;
-        let digest = crate::save::checksum(&corrupt[..trailer]);
-        corrupt[trailer..].copy_from_slice(&digest.to_le_bytes());
-        assert_eq!(
-            live.restore_bytes(&corrupt),
-            Err(SaveError::InvalidEncoding)
-        );
+        assert_eq!(live.restore_bytes(V15), Err(SaveError::UnsupportedVersion));
         assert_eq!(
             live.save_bytes()
                 .unwrap_or_else(|error| panic!("{error:?}")),
-            accepted
+            before
         );
     }
 }
