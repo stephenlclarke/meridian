@@ -99,6 +99,7 @@ fn inactive_and_unusable_menu_viewports_do_not_advance_a_frame_or_the_world() {
 fn app_menu_preparation_builds_the_same_actual_frame_without_committing_a_command() {
     let directory = TestDirectory::new();
     let mut app = app(&directory);
+    ok(app.game.save());
     let before = ok(app.game.world.save_bytes());
     let disk = ok(std::fs::read(directory.0.join("commander.meridian")));
     let mut menu = ok(crate::docked::Docked::new(&app.game.world));
