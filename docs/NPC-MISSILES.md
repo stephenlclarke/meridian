@@ -1,6 +1,6 @@
 # Reciprocal NPC missile source
 
-This began as G3 `9cae3a8` author source from exact composed base `27b212f86350ef5040c12b2456851c62064b4306`. It is uncompiled, unreviewed and unqualified. Twelve new tests are authored **UNRUN**. No compiler, Cargo, Clippy, native, GPU or app job was started. Prior rapid-laser, XYZZY, mining and energy author branches remain separate.
+The initial G3 `9cae3a8` source from composed base `27b212f86350ef5040c12b2456851c62064b4306` submitted twelve unrun cases. The first actual combined `42f599c` execution subsequently compiled and failed; its retained results and the current source-only correction are recorded in [native surface guidance correction](#native-surface-guidance-correction). The correction remains uncompiled and unqualified. Prior rapid-laser, XYZZY, mining and energy author branches remain separate.
 
 ## Behavior
 
