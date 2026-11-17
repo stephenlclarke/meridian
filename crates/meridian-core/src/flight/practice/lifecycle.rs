@@ -141,11 +141,15 @@ impl Practice {
         self.encode(w);
         w.option(self.ordinary_hit.as_ref(), |w, h| h.encode(w));
     }
-    pub(in crate::flight) fn decode_full(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+    pub(in crate::flight) fn decode_full(
+        r: &mut Reader<'_>,
+        version: u16,
+    ) -> Result<Self, SaveError> {
         let reception = reception::Reception::decode(r)?;
         let mut p = Self::decode(r, 9)?;
         p.reception = reception;
-        p.ordinary_hit = r.option(super::super::combat::OrdinaryImpact::decode)?;
+        p.ordinary_hit =
+            r.option(|r| super::super::combat::OrdinaryImpact::decode_version(r, version))?;
         Ok(p)
     }
     pub(in crate::flight) fn validate_closure(
@@ -228,6 +232,7 @@ pub(in crate::flight) fn encode_history(
 }
 pub(in crate::flight) fn decode_history(
     r: &mut Reader<'_>,
+    version: u16,
 ) -> Result<(Vec<Practice>, Option<PracticeAttemptId>), SaveError> {
     let count = usize::from(r.u8()?);
     if count >= PRACTICE_MAX_OFFERS {
@@ -235,7 +240,7 @@ pub(in crate::flight) fn decode_history(
     }
     let mut history = Vec::with_capacity(count);
     for _ in 0..count {
-        history.push(Practice::decode_full(r)?);
+        history.push(Practice::decode_full(r, version)?);
     }
     Ok((history, r.option(PracticeAttemptId::decode)?))
 }

@@ -459,7 +459,7 @@ impl World {
         }
         let station_data =
             OriginalStationData::bundled().map_err(|_| SaveError::ContentMismatch)?;
-        let mut state = read_flight(&mut r)?;
+        let mut state = read_flight(&mut r, version)?;
         state.station = Some(station_data.station_pose());
         let navigation = NavigationState::decode_save(&mut r)?;
         let commander_account = CommanderAccount::decode_save(&mut r, version)?;
@@ -491,7 +491,7 @@ impl World {
             missiles::State::default()
         };
         let (practice_history, practice_trace) = if version >= 9 {
-            practice::lifecycle::decode_history(&mut r)?
+            practice::lifecycle::decode_history(&mut r, version)?
         } else {
             (Vec::new(), None)
         };
@@ -851,7 +851,7 @@ pub(super) fn write_flight(w: &mut Writer, s: &Snapshot) {
         Some(MotionRefusal::AsteroidContact) => 5,
     });
 }
-pub(super) fn read_flight(r: &mut Reader<'_>) -> Result<Snapshot, SaveError> {
+pub(super) fn read_flight(r: &mut Reader<'_>, version: u16) -> Result<Snapshot, SaveError> {
     let position = r.array(|r| r.f32())?;
     let orientation = r.array(|r| r.f32())?;
     let speed = r.f32()?;
@@ -867,8 +867,8 @@ pub(super) fn read_flight(r: &mut Reader<'_>) -> Result<Snapshot, SaveError> {
         1 => Some(MotionRefusal::StationContact),
         2 => Some(MotionRefusal::EntryConditions),
         3 => Some(MotionRefusal::CelestialContact),
-        4 => Some(MotionRefusal::NpcContact),
-        5 => Some(MotionRefusal::AsteroidContact),
+        4 if version >= 15 => Some(MotionRefusal::NpcContact),
+        5 if version == SAVE_VERSION => Some(MotionRefusal::AsteroidContact),
         _ => return Err(SaveError::InvalidEncoding),
     };
     Ok(Snapshot {

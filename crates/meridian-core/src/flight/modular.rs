@@ -435,17 +435,8 @@ impl State {
 
     /// Read-only historical actual item/fit proof for a retained work emission.
     pub(super) fn mining_was_fitted(&self, hit: &crate::mining::MiningStroke) -> bool {
-        let mut ledger = Ledger {
-            items: vec![OwnedModule {
-                id: match hit.owner.owner.checked_add(7) {
-                    Some(id) => id,
-                    None => return false,
-                },
-                kind: ModuleKind::PulseLaser,
-                slot: Some(ModuleSlot::FrontLaser),
-                provenance: ModuleProvenance::StandardBirth,
-            }],
-            ..Ledger::default()
+        let Ok(mut ledger) = Ledger::born(hit.owner.owner) else {
+            return false;
         };
         let mut transaction = 0_u32;
         for e in self.events.iter().filter(|e| e.tick <= hit.world_tick) {

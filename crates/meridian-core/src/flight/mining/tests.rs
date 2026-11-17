@@ -335,3 +335,26 @@ fn original_work_has_no_invented_slow_speed_gate_and_never_changes_player_motion
     assert_eq!(w.snapshot(), motion);
     let _continued = cold(&w);
 }
+
+#[test]
+fn paid_mining_round_trips_after_a_public_change_to_born_energy_fit() {
+    let (mut world, tool) = paid(12005);
+    let inventory = some(world.modular_equipment_snapshot());
+    let energy = inventory
+        .items
+        .iter()
+        .find(|item| item.kind == crate::ModuleKind::BasicEnergySystem)
+        .unwrap_or_else(|| panic!("missing born energy system"));
+    let energy = energy.id;
+    assert_eq!(
+        module(&mut world, ModuleAction::Store { item: energy }),
+        energy
+    );
+    approach(&mut world);
+    assert_eq!(work(&mut world).item_id, tool);
+    let loaded = cold(&world);
+    assert_eq!(
+        loaded.modular_equipment_snapshot(),
+        world.modular_equipment_snapshot()
+    );
+}

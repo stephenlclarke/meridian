@@ -24,6 +24,13 @@ pub(super) struct State {
     enabled: bool,
     events: Arc<Vec<Event>>,
 }
+struct LaserSpend {
+    emission: u64,
+    clock: u64,
+    weapon: super::OrdinaryWeapon,
+    item: u64,
+}
+
 impl State {
     pub(super) fn fresh() -> Self {
         Self {
@@ -156,33 +163,59 @@ impl State {
         dock_sequence: u64,
         end: u64,
     ) -> Result<Vec<ResourceEvent>, SaveError> {
+        let mut missile_spends: Vec<_> = world.missiles.resource_emissions().collect();
+        missile_spends.sort_unstable_by_key(|&(emission, _)| emission);
+        let mut missiles = missile_spends.into_iter().peekable();
+        let mut next_emission = 1;
         let mut prior = 0;
-        let mut pulse_count = 0_u64;
         let mut mining_count = 0_usize;
         let mut berths = 1_u64;
         let mut events = Vec::with_capacity(self.events.len() + 128);
+        let mut lasers = Vec::new();
         for event in self.events.iter() {
-            if event.clock == 0 || event.clock < prior || event.clock > end {
+            if event.clock <= prior || event.clock > end {
                 return Err(INVALID);
             }
             prior = event.clock;
-            let (phase, effect) = match event.kind {
-                Kind::Berth => {
-                    berths += 1;
-                    (0, Effect::Berth)
+            if event.kind == Kind::Berth {
+                berths += 1;
+                events.push((event.clock, 0, 0, Effect::Berth));
+                continue;
+            }
+            while let Some(&(emission, clock)) = missiles.peek() {
+                if emission < next_emission {
+                    return Err(INVALID);
                 }
-                Kind::Pulse => {
-                    let fitted = world
-                        .modular
-                        .front_at_physical(world, event.clock)
-                        .ok_or(INVALID)?;
-                    if fitted.kind != super::ModuleKind::PulseLaser {
+                if emission != next_emission {
+                    if clock < event.clock {
                         return Err(INVALID);
                     }
-                    pulse_count += 1;
-                    (3, Effect::Laser(super::OrdinaryWeapon::FrontPulseLaser))
+                    break;
                 }
-                Kind::Laser(weapon) => {
+                if clock > event.clock {
+                    return Err(INVALID);
+                }
+                let _ = missiles.next();
+                next_emission += 1;
+            }
+            let effect = match event.kind {
+                Kind::Mining(body) => {
+                    let hit = world.mining.strokes().get(mining_count).ok_or(INVALID)?;
+                    if hit.physical_tick != event.clock
+                        || hit.contact.asteroid.ordinal() != body
+                        || hit.emission != next_emission
+                    {
+                        return Err(INVALID);
+                    }
+                    mining_count += 1;
+                    Effect::Mining
+                }
+                kind => {
+                    let weapon = match kind {
+                        Kind::Pulse => super::OrdinaryWeapon::FrontPulseLaser,
+                        Kind::Laser(weapon) => weapon,
+                        _ => return Err(INVALID),
+                    };
                     let fitted = world
                         .modular
                         .front_at_physical(world, event.clock)
@@ -190,44 +223,31 @@ impl State {
                     if super::OrdinaryWeapon::from_module(fitted.kind) != Some(weapon) {
                         return Err(INVALID);
                     }
-                    pulse_count += 1;
-                    (3, Effect::Laser(weapon))
-                }
-                Kind::Mining(body) => {
-                    let hit = world.mining.strokes().get(mining_count).ok_or(INVALID)?;
-                    if hit.physical_tick != event.clock || hit.contact.asteroid.ordinal() != body {
-                        return Err(INVALID);
-                    }
-                    let prior_missiles = world
-                        .missiles
-                        .resource_emissions()
-                        .filter(|(e, _)| *e < hit.emission)
-                        .count() as u64;
-                    if hit.emission != pulse_count + 1 + prior_missiles
-                        || world.missiles.resource_emissions().any(|(e, clock)| {
-                            e == hit.emission
-                                || (e < hit.emission && clock > event.clock)
-                                || (e > hit.emission && clock < event.clock)
-                        })
-                    {
-                        return Err(INVALID);
-                    }
-                    mining_count += 1;
-                    pulse_count += 1;
-                    (3, Effect::Mining)
+                    lasers.push(LaserSpend {
+                        emission: next_emission,
+                        clock: event.clock,
+                        weapon,
+                        item: fitted.id,
+                    });
+                    Effect::Laser(weapon)
                 }
             };
-            events.push((event.clock, phase, 0, effect));
+            next_emission += 1;
+            events.push((event.clock, 3, 0, effect));
+        }
+        for (emission, _) in missiles {
+            if emission != next_emission {
+                return Err(INVALID);
+            }
+            next_emission += 1;
         }
         if mining_count != world.mining.strokes().len()
             || berths != dock_sequence
-            || pulse_count.checked_add(world.missiles.used() as u64) != Some(world.combat.emissions)
+            || next_emission - 1 != world.combat.emissions
         {
             return Err(INVALID);
         }
-        if self.events.windows(2).any(|w| w[0].clock == w[1].clock) {
-            return Err(INVALID);
-        }
+        validate_laser_receipts(world, end, &lasers)?;
         Ok(events)
     }
     /// Called once by the missile validator, after its genuine impact graph is checked.
@@ -293,6 +313,52 @@ impl State {
         Ok(())
     }
 }
+fn validate_laser_receipts(
+    world: &World,
+    end: u64,
+    lasers: &[LaserSpend],
+) -> Result<(), SaveError> {
+    let spend = |emission| {
+        lasers
+            .binary_search_by_key(&emission, |shot| shot.emission)
+            .ok()
+            .and_then(|index| lasers.get(index))
+            .ok_or(INVALID)
+    };
+    for hit in world.combat.last_impact().into_iter().chain(
+        world
+            .practice
+            .iter()
+            .chain(world.practice_history.iter())
+            .filter_map(|practice| practice.ordinary_hit),
+    ) {
+        if hit.weapon.is_laser() {
+            let shot = spend(hit.emission)?;
+            if (shot.clock, shot.weapon, shot.item) != (hit.physical_tick, hit.weapon, hit.item) {
+                return Err(INVALID);
+            }
+        }
+    }
+    for beam in world.traffic.beam_receipts() {
+        if let crate::traffic::BeamSource::Player { item, emission, .. } = beam.source {
+            let shot = spend(emission)?;
+            let elapsed = world
+                .state
+                .tick
+                .checked_sub(beam.world_tick)
+                .ok_or(INVALID)?;
+            let since_shot = end.checked_sub(shot.clock).ok_or(INVALID)?;
+            if (shot.weapon, shot.item) != (beam.weapon, item)
+                || shot.clock > beam.world_tick
+                || since_shot > elapsed
+            {
+                return Err(INVALID);
+            }
+        }
+    }
+    Ok(())
+}
+
 #[derive(Debug, Clone, Copy)]
 enum Effect {
     Berth,

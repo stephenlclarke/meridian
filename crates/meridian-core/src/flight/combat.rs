@@ -199,6 +199,9 @@ impl State {
         *shield -= absorbed;
         pulse.damage_energy(damage - absorbed);
     }
+    pub(super) fn last_impact(self) -> Option<OrdinaryImpact> {
+        self.last
+    }
     pub(super) fn physical_tick(self) -> u64 {
         self.physical_tick
     }
@@ -361,10 +364,11 @@ impl State {
         let invalid = SaveError::InvalidState("ordinary combat identity or resources");
         let identity = world.combat_identity().ok_or(invalid)?;
         self.validate_damage_boundary(world)?;
+        let shortest_cooldown = if world.damage.enabled() { 6 } else { 18 };
         let maximum_emissions = if world.state.tick == 0 {
             0
         } else {
-            1 + (world.state.tick - 1) / 18
+            1 + (world.state.tick - 1) / shortest_cooldown
         };
         if self.physical_tick > world.state.tick
             || self.emissions > maximum_emissions.saturating_add(world.missiles.used() as u64)
@@ -640,9 +644,6 @@ impl OrdinaryImpact {
             });
         }
     }
-    pub(super) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
-        Self::decode_version(r, crate::save::SAVE_VERSION)
-    }
     pub(super) fn decode_version(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
         let victim_entity = r.u64()?;
         let mut hit = Self {
@@ -724,6 +725,13 @@ impl OrdinaryImpact {
             || self.incident == 0
             || self.emission < self.incident
             || self.physical_tick > self.tick
+            || !world.mining_segment_at_step(
+                self.attacker.system,
+                self.tick,
+                pose.position,
+                self.point,
+                0.0,
+            )
             || self.point != add_scaled(pose.position, pose.orientation.z, distance)
             || (self.tick == world.state.tick
                 && (self.position != world.state.position
