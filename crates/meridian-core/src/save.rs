@@ -1,7 +1,7 @@
 //! Bounded, versioned memory representation. The host owns atomic disk publication.
 use core::fmt;
 
-pub const SAVE_VERSION: u16 = 16;
+pub const SAVE_VERSION: u16 = 17;
 pub const MAX_SAVE_BYTES: usize = 65_536;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -20,6 +20,10 @@ pub enum SaveError {
 impl fmt::Display for SaveError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Self::UnsupportedVersion => write!(
+                f,
+                "Unsupported commander save format. This build opens format {SAVE_VERSION}."
+            ),
             Self::UnsupportedMissiles => {
                 f.write_str("Legacy save format cannot represent missile sessions")
             }

@@ -8,7 +8,7 @@ The Profile publishes complete prepared saves before committing ammunition, modu
 
 ## Controls
 
-While docked, 1 through 5 select galaxy, system, showroom, trading and equipment. M opens trading and O opens equipment. Arrow keys, Tab/Shift+Tab, Enter and Escape navigate; / opens search. G/H buy and sell, Y/U fit and store, and ] changes equipment slot. The page displays the available bindings. Mouse clicks, wheel scrolling and chart/model dragging use logical coordinates. Only admitted world routes can be selected for the subsequent J jump. Unavailable ships cannot be exchanged. In flight, / toggles the extended controls overlay above the compact cockpit.
+While docked, 1 through 5 select galaxy, system, showroom, trading and equipment. M opens trading and O opens equipment. Arrow keys, Tab/Shift+Tab, Enter and Escape navigate; / opens search. G and Shift+G buy and sell, Y/U fit and store, and ] changes equipment slot. H or ? opens a popup with the actual page controls and all station screen shortcuts. Mouse clicks, wheel scrolling and chart/model dragging use logical coordinates. Only admitted world routes can be selected for the subsequent J jump. Unavailable ships cannot be exchanged. In flight, H or ? opens the fitted-weapon and flight controls popup. Unshifted / remains galaxy search.
 
 ## Actual Mac qualification
 
@@ -23,3 +23,5 @@ The raw evidence retains 102 supported CUA calls, 306 raw records and 87 origina
 Protected merge, exact-main CI/Sonar, canonical signed Mac packaging, Windows portable packaging and downloaded-archive verification remain release gates. Signing is separate from notarization; the Apple agreement blocker remains. Previous installed previews and real profiles are preserved.
 
 This candidate does not implement the complete equipment catalogue, ship exchange, all ships, mining work, bounties or new missions. Catalogued ships are separate from admitted models and ship-exchange authority. Purchasing the Mining Laser does not establish mineable-belt acceptance. After this preview is delivered, further authored hulls and NPC traders, pirates, police, miners, bounty hunters, aliens and AI constructs are priorities. XYZZY/Commander Clarke is a separate following feature; new missions remain behind core gameplay work.
+
+Help is modal over Galaxy, System, Showroom, Market, Equipment and every current purchase, sale, route, exchange, details or confirmation view. Escape/H/? dismisses help before any underlying back, cancellation or quit action. The popup retains query, selection and review, blocks keys and pointer transactions, and suspends simulation and showroom rotation. Manual pause survives dismissal. Each station card includes 1/2/3/4/5, Tab/Shift+Tab and the current Escape/back sequence. Review help explains that a review must be confirmed or cancelled before changing screens. During a literal search H types into the retained query and ? opens help.

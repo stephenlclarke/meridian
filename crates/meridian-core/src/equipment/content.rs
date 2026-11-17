@@ -1,4 +1,4 @@
-//! Exact original SH025 cargo utility and two real main-station offers; no ownership authority.
+//! Exact original SH025 cargo utility and three original main-station offers; no ownership authority.
 use super::{EXPANDED_HOLD_TONNES, Error, STANDARD_HOLD_TONNES};
 use crate::save::Reader;
 use crate::station_services::MarketSite;
@@ -20,7 +20,7 @@ pub struct Definition {
     pub equipment_units_capacity: u16,
     pub item_utility_mount_cost: u8,
     pub item_equipment_unit_cost: u8,
-    pub stations: [StationOffer; 2],
+    pub stations: [StationOffer; 3],
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct StationOffer {
@@ -35,6 +35,7 @@ impl Definition {
         self.stations[match site {
             MarketSite::Avenor => 0,
             MarketSite::Renas => 1,
+            MarketSite::Lareria => 2,
         }]
     }
 }
@@ -98,11 +99,15 @@ fn decode(bytes: &[u8]) -> Result<Definition, crate::save::SaveError> {
     ] {
         text(&mut r, expected)?;
     }
-    if r.u8()? != 2 {
+    if r.u8()? != 3 {
         return Err(invalid);
     }
-    let mut stations = Vec::with_capacity(2);
-    for (site, technology) in [(MarketSite::Avenor, 12), (MarketSite::Renas, 13)] {
+    let mut stations = Vec::with_capacity(3);
+    for (site, technology) in [
+        (MarketSite::Avenor, 12),
+        (MarketSite::Renas, 13),
+        (MarketSite::Lareria, 14),
+    ] {
         if r.u16()? != site.system() || r.u8()? != technology {
             return Err(invalid);
         }

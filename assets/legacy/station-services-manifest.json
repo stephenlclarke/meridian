@@ -34,11 +34,23 @@
       "targetStock": 143,
       "unit": "t",
       "worldVersion": "l337-world-1"
+    },
+    {
+      "askTenthsCR": 202,
+      "bidTenthsCR": 184,
+      "epoch": 0,
+      "index": 0,
+      "name": "Food",
+      "stock": 138,
+      "system": 91,
+      "targetStock": 148,
+      "unit": "t",
+      "worldVersion": "l337-world-1"
     }
   ],
   "output": "assets/legacy/g01-food.markets",
-  "outputSHA256": "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa",
-  "outputBytes": 46,
+  "outputSHA256": "31b8273c6e8fb8afd4f43b4ec029857445fffb722c3870703707fe6d4fc98dff",
+  "outputBytes": 64,
   "format": "MMKT0001 + LEu16 count; rows LEu16 system, LEu32 ask/bid credit tenths, LEu64 initial stock",
   "sourceDescriptiveStatuses": {
     "markets-01.toml": "Private proposal only; not installed",

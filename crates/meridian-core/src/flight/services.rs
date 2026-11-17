@@ -100,6 +100,7 @@ pub(super) fn service_site(system: SystemId) -> Option<MarketSite> {
     match system {
         SystemId::AVENOR => Some(MarketSite::Avenor),
         SystemId::RENAS => Some(MarketSite::Renas),
+        SystemId::LARERIA => Some(MarketSite::Lareria),
         _ => None,
     }
 }

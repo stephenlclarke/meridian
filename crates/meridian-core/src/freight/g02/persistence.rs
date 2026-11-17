@@ -75,6 +75,7 @@ fn read_job_id(r: &mut Reader<'_>) -> Result<JobId, SaveError> {
     })
 }
 fn write_completion(w: &mut Writer, c: &CompletionReceipt) {
+    w.u64(c.account_revision);
     write_job_id(w, c.job);
     w.u64(c.sequence);
     write_actor(w, c.receiver);
@@ -82,6 +83,7 @@ fn write_completion(w: &mut Writer, c: &CompletionReceipt) {
 }
 fn read_completion(r: &mut Reader<'_>) -> Result<CompletionReceipt, SaveError> {
     Ok(CompletionReceipt {
+        account_revision: r.u64()?,
         job: read_job_id(r)?,
         sequence: r.u64()?,
         receiver: read_actor(r)?,
@@ -134,11 +136,7 @@ fn read_item(r: &mut Reader<'_>) -> Result<OwnedStarterItem, SaveError> {
 }
 impl CommanderAccount {
     pub(crate) fn encode_save(&self, w: &mut Writer) {
-        self.encode_version(w, 13);
-    }
-    #[cfg(test)]
-    pub(crate) fn encode_legacy_version(&self, w: &mut Writer, version: u16) {
-        self.encode_version(w, version);
+        self.encode_version(w, crate::save::SAVE_VERSION);
     }
     fn encode_version(&self, w: &mut Writer, version: u16) {
         let d = self.data;
@@ -169,12 +167,16 @@ impl CommanderAccount {
             w.u64(quantity);
         }
         w.u8(d.legal);
-        d.equipment.encode(w);
+        d.equipment.encode(w, version);
         if version >= 12 {
             w.u64(d.ammunition_revision);
         }
         if version >= 13 {
             w.u64(d.modular_revision);
+        }
+        if version >= 16 {
+            w.bool(d.xyzzy_active);
+            w.bool(d.xyzzy_unlimited_fuel);
         }
     }
     pub(crate) fn decode_save(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
@@ -205,9 +207,11 @@ impl CommanderAccount {
                 other_commodities: r.array(|r| r.u64())?,
                 reserved_commodities: r.array(|r| r.u64())?,
                 legal: r.u8()?,
-                equipment: crate::equipment::State::decode(r)?,
+                equipment: crate::equipment::State::decode(r, version)?,
                 ammunition_revision: if version >= 12 { r.u64()? } else { 0 },
                 modular_revision: if version >= 13 { r.u64()? } else { 0 },
+                xyzzy_active: version >= 16 && r.bool()?,
+                xyzzy_unlimited_fuel: version >= 16 && r.bool()?,
             },
         };
         if version < 12 {
@@ -252,6 +256,18 @@ impl CommanderAccount {
         {
             return Err(SaveError::InvalidState("starter identity or fitting"));
         }
+        if state
+            .data
+            .jobs
+            .iter()
+            .flatten()
+            .flat_map(|j| j.transfers.iter().flatten())
+            .any(|t| t.account_revision == 0 || t.account_revision > self.data.revision)
+        {
+            return Err(SaveError::InvalidState(
+                "freight account transaction prefix",
+            ));
+        }
         state.validate_saved(nav, epoch)?;
         Ok(SavedDomainSummary {
             revision: self.data.revision,
@@ -287,6 +303,7 @@ fn write_job(w: &mut Writer, j: &Job) {
     w.u8(j.transfer_count);
     for t in &j.transfers {
         w.option(t.as_ref(), |w, t| {
+            w.u64(t.account_revision);
             w.u64(t.sequence);
             w.u8(t.mask);
             write_actor(w, t.receiver);
@@ -323,6 +340,7 @@ fn read_job(r: &mut Reader<'_>) -> Result<Job, SaveError> {
         transfers: r.array(|r| {
             r.option(|r| {
                 Ok(Transfer {
+                    account_revision: r.u64()?,
                     sequence: r.u64()?,
                     mask: r.u8()?,
                     receiver: read_actor(r)?,
@@ -493,7 +511,8 @@ fn validate_job(
             return Err(invalid);
         }
         if let Some(previous) = last
-            && (t.dock.arrival_sequence < previous.dock.arrival_sequence
+            && (t.account_revision <= previous.account_revision
+                || t.dock.arrival_sequence < previous.dock.arrival_sequence
                 || t.receiver.generation < previous.receiver.generation)
         {
             return Err(invalid);
@@ -514,6 +533,7 @@ fn validate_job(
             let t = last.ok_or(invalid)?;
             if j.completion
                 != Some(CompletionReceipt {
+                    account_revision: t.account_revision,
                     job: j.id,
                     sequence: t.sequence,
                     receiver: t.receiver,

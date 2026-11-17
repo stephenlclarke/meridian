@@ -6,8 +6,8 @@ use super::{
 /// Only the actor owner derives this from actual paid births and actual completed docking.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub(crate) struct Flows {
-    pub(crate) bought: [[u64; 17]; 2],
-    pub(crate) sold: [[u64; 17]; 2],
+    pub(crate) bought: [[u64; 17]; 3],
+    pub(crate) sold: [[u64; 17]; 3],
 }
 impl State {
     pub(crate) fn flows(&self) -> Flows {

@@ -565,6 +565,7 @@ fn stock_at(
     let si = match site {
         crate::station_services::MarketSite::Avenor => 0,
         crate::station_services::MarketSite::Renas => 1,
+        crate::station_services::MarketSite::Lareria => 2,
     };
     let now = traffic.flows();
     let past = traffic.flows_at(tick);

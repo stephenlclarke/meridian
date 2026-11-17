@@ -33,6 +33,35 @@ impl Profile {
         self.playing
     }
 
+    /// Publish the exact prospective secret transaction before replacing the live commander.
+    pub fn xyzzy(&mut self, action: meridian_core::XyzzyAction) -> Result<String, String> {
+        if !self.playing {
+            return Err("Start or continue a commander before opening XYZZY".into());
+        }
+        let tick = self.world.snapshot().tick;
+        let review = self
+            .world
+            .review_xyzzy(action, tick)
+            .map_err(|e| e.to_string())?;
+        let prepared = self
+            .world
+            .prepare_xyzzy(review, tick)
+            .map_err(|e| e.to_string())?;
+        let published = self
+            .store
+            .save(prepared.bytes(), MAX_SAVE_BYTES)
+            .map_err(|e| format!("XYZZY change could not be saved: {e}"))?;
+        prepared.commit();
+        self.has_save = true;
+        self.session = Session::from_world(&self.world);
+        // A directory-sync warning follows publication, so the host must refresh its authorities.
+        Ok(publication_message(
+            published,
+            "XYZZY change saved. Supported outfit only; finite missiles and cargo.".into(),
+        )
+        .unwrap_or_else(|warning| warning))
+    }
+
     pub fn new_commander(&mut self, seed: u64) -> Result<bool, String> {
         if self.playing {
             return Err("Start a new commander from the title screen".into());
@@ -321,11 +350,25 @@ impl Profile {
 
     pub fn lines(&self, active: bool, notice: Option<&str>) -> Vec<String> {
         if self.playing {
-            return self.session.lines(&self.world, active, notice);
+            let mut lines = self.session.lines(&self.world, active, notice);
+            if let Some(secret) = self.world.xyzzy_snapshot().filter(|state| state.active) {
+                lines.insert(
+                    0,
+                    format!(
+                        "CLARKE | XYZZY | FUEL {}",
+                        if secret.unlimited_fuel {
+                            "UNLIMITED"
+                        } else {
+                            "NORMAL"
+                        }
+                    ),
+                );
+            }
+            return lines;
         }
         vec![
             "MERIDIAN".into(),
-            "C CONTINUE SAVED COMMANDER | N NEW COMMANDER | ESC QUIT".into(),
+            "C CONTINUE | N NEW COMMANDER | H / ? HELP".into(),
             if self.has_save {
                 "AN EXISTING SAVE IS RETAINED UNTIL AN EXPLICIT NEW GAME IS SAVED".into()
             } else {
@@ -336,9 +379,7 @@ impl Profile {
             } else {
                 "CLICK INSIDE THE WINDOW TO FOCUS THE CONTROLS".into()
             },
-            notice
-                .unwrap_or("F5 SAVES IN GAME; ESC SAVES AND QUITS; F9 RELOADS THE CURRENT SAVE")
-                .into(),
+            notice.unwrap_or("H / ? OPENS CONTEXT HELP").into(),
         ]
     }
 }
@@ -762,6 +803,66 @@ pub(crate) mod tests {
             b"damaged replacement"
         );
     }
+    #[test]
+    fn older_formats_refuse_from_title_and_live_reload_without_disk_replacement() {
+        let fixtures: [&[u8]; 2] = [
+            include_bytes!("../../meridian-core/tests/fixtures/qualified-v15-npc-flight.bin"),
+            include_bytes!("../../meridian-core/tests/fixtures/pr44-v16-m02-purchases.bin"),
+        ];
+        for bytes in fixtures {
+            let directory = TestDirectory::new();
+            let destination = directory.0.join("commander.meridian");
+            fs::write(&destination, bytes).unwrap_or_else(|e| panic!("{e}"));
+            let mut profile = open(&directory.0);
+            let opening = profile.world.snapshot();
+            let error = profile
+                .continue_saved()
+                .err()
+                .unwrap_or_else(|| panic!("an unsupported save was accepted"));
+            assert!(error.contains("Unsupported commander save format"));
+            assert!(error.contains("format 17"));
+            assert!(!profile.playing());
+            assert_eq!(profile.world.snapshot(), opening);
+            assert_eq!(
+                fs::read(&destination).unwrap_or_else(|e| panic!("{e}")),
+                bytes
+            );
+            profile.prepare_quit().unwrap_or_else(|e| panic!("{e}"));
+            assert_eq!(
+                fs::read(&destination).unwrap_or_else(|e| panic!("{e}")),
+                bytes
+            );
+
+            assert!(
+                !profile
+                    .new_commander(15910)
+                    .unwrap_or_else(|e| panic!("{e}"))
+            );
+            assert!(
+                profile
+                    .new_commander(15910)
+                    .unwrap_or_else(|e| panic!("{e}"))
+            );
+            let before = profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+            assert!(
+                profile
+                    .continue_saved()
+                    .err()
+                    .unwrap_or_else(|| panic!("an unsupported save was accepted"))
+                    .contains("format 17")
+            );
+            assert!(profile.playing());
+            assert_eq!(
+                profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}")),
+                before
+            );
+            assert_eq!(
+                fs::read(&destination).unwrap_or_else(|e| panic!("{e}")),
+                bytes
+            );
+        }
+    }
+
     #[test]
     fn failed_quit_save_cannot_claim_exit_ready_or_change_the_live_world() {
         let directory = TestDirectory::new();

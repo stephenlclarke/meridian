@@ -135,7 +135,8 @@ fn actual_paid_purchase_preserves_born_pulse_shared_resources_cargo_and_emission
     w.damage.encode(&mut retained);
     assert_eq!(retained.bytes, journal);
     // Actual module cold-codec boundary. Full World Continue requires Root's pinned loader join.
-    let ledger = ok(decoded(&w.modular, 16).ledger(&w, some(w.commander_account.as_ref())));
+    let ledger = ok(decoded(&w.modular, crate::save::SAVE_VERSION)
+        .ledger(&w, some(w.commander_account.as_ref())));
     assert_eq!(ledger.items, some(w.modular_equipment_snapshot()).items);
     apply(&mut w, ModuleAction::Store { item });
     let before = ok(w.save_bytes());
@@ -198,7 +199,9 @@ fn typed_store_and_refit_preserve_actual_cargo_bay_and_mining_laser() {
     assert_eq!(w.equipment_snapshot(), bay);
     assert_eq!(w.flight_resources_snapshot(), pools);
     assert_eq!(
-        ok(decoded(&w.modular, 16).ledger(&w, some(w.commander_account.as_ref()))).paid,
+        ok(decoded(&w.modular, crate::save::SAVE_VERSION)
+            .ledger(&w, some(w.commander_account.as_ref())))
+        .paid,
         52000
     );
     assert_eq!(w.modular.paid_count(), 2);
@@ -241,7 +244,12 @@ fn refused_atomic_writer_discards_real_candidate_payment_item_and_fit_together()
     let review = ok(w.review_module(ModuleAction::PurchaseFuelScoops, t));
     let prepared = ok(w.prepare_module(review, t));
     assert_eq!(prepared.account.credits_tenths(), cash - 19000);
-    assert_eq!(decoded(&prepared.state, 16).events.len(), 1);
+    assert_eq!(
+        decoded(&prepared.state, crate::save::SAVE_VERSION)
+            .events
+            .len(),
+        1
+    );
     assert_eq!(
         prepared.publish_with(|candidate| {
             assert!(!candidate.is_empty());
@@ -299,34 +307,35 @@ fn stale_pause_foreign_pre_continue_and_changed_account_reviews_never_publish() 
     );
 }
 #[test]
-fn actual_decoder_preserves_old_bytes_and_refuses_new_utility_in_thirteen_and_fifteen() {
+fn actual_decoder_refuses_old_versions_and_preserves_current_scoops_bytes() {
     let mut w = funded();
     apply(&mut w, ModuleAction::PurchaseMiningLaser);
     let old = encoded(&w.modular);
-    for version in [13, 15, 16] {
-        assert_eq!(encoded(&decoded(&w.modular, version)), old);
-    }
-    let mut r = Reader::new(&old);
-    assert_eq!(ok(State::decode(&mut r, 15)), w.modular);
-    assert!(r.finished());
-    apply(&mut w, ModuleAction::PurchaseFuelScoops);
-    let current = encoded(&w.modular);
-    for version in [13, 15] {
-        assert!(State::decode(&mut Reader::new(&current), version).is_err());
-    }
-    for version in [12, 14, 17, u16::MAX] {
+    for version in [12, 13, 14, 15, 16, u16::MAX] {
         assert_eq!(
-            State::decode(&mut Reader::new(&current), version),
+            State::decode(&mut Reader::new(&old), version),
             Err(SaveError::UnsupportedVersion)
         );
     }
-    assert!(State::decode(&mut Reader::new(&current), 15).is_err());
-    decoded(&w.modular, 16);
-    assert!(State::decode(&mut Reader::new(&current[..current.len() - 1]), 16).is_err());
+    assert_eq!(
+        encoded(&decoded(&w.modular, crate::save::SAVE_VERSION)),
+        old
+    );
+    apply(&mut w, ModuleAction::PurchaseFuelScoops);
+    let current = encoded(&w.modular);
+    decoded(&w.modular, crate::save::SAVE_VERSION);
+    assert!(
+        State::decode(
+            &mut Reader::new(&current[..current.len() - 1]),
+            crate::save::SAVE_VERSION,
+        )
+        .is_err()
+    );
     let mut corrupt = current;
     corrupt[4] = 250;
-    assert!(State::decode(&mut Reader::new(&corrupt), 16).is_err());
+    assert!(State::decode(&mut Reader::new(&corrupt), crate::save::SAVE_VERSION).is_err());
 }
+
 #[test]
 fn genuine_fitted_scoops_still_refuse_missing_eligible_body_without_cargo_or_cash_grant() {
     let mut w = funded();

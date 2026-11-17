@@ -62,7 +62,7 @@ pub fn append_review(review: NavigationTradeReview, lines: &mut Vec<String>) {
 pub fn append_details(world: &World, lines: &mut Vec<String>) {
     lines
         .push("TRADE LESSON | 4 CONSENT / RECEIVE | 5 PLAN SELECTED | 6 CANCEL | 7 DETAILS".into());
-    lines.push("[ / ] SELECT COMMODITY | G BUY | H SELL | J DIRECT TRAVEL | F REFUEL".into());
+    lines.push("[ / ] SELECT COMMODITY | G BUY | SHIFT+G SELL | J DIRECT TRAVEL | F REFUEL".into());
     let Some(state) = world.navigation_trade_snapshot() else {
         return;
     };

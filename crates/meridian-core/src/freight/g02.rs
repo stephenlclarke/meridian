@@ -218,12 +218,14 @@ struct AccountData {
     equipment: crate::equipment::State,
     ammunition_revision: u64,
     modular_revision: u64,
+    xyzzy_active: bool,
+    xyzzy_unlimited_fuel: bool,
 }
 
 impl AccountData {
     fn allows_stored_starter(&self, index: usize, item: OwnedStarterItem) -> bool {
         // The World separately requires the fit to match its retained modular ledger.
-        matches!(index, 2 | 4) && self.modular_revision > 0 && item.fitted_hull.is_none()
+        matches!(index, 1 | 2 | 4) && self.modular_revision > 0 && item.fitted_hull.is_none()
     }
 }
 
@@ -263,6 +265,8 @@ impl CommanderAccount {
                 equipment: crate::equipment::State::default(),
                 ammunition_revision: 0,
                 modular_revision: 0,
+                xyzzy_active: false,
+                xyzzy_unlimited_fuel: false,
                 fit: Some(StarterFit {
                     owner: ids.owner,
                     hull: ids.hull,
@@ -298,6 +302,7 @@ impl CommanderAccount {
         paid: u32,
         pulse_fitted: bool,
         energy_fitted: bool,
+        navigation_fitted: bool,
     ) -> Result<Self, Error> {
         let mut data = self.data;
         data.credits = data
@@ -324,6 +329,12 @@ impl CommanderAccount {
             .and_then(|fit| fit.items[2].as_mut())
             .ok_or(Error::MissingEquipment)?;
         energy.fitted_hull = energy_fitted.then_some(data.hull);
+        let navigation = data
+            .fit
+            .as_mut()
+            .and_then(|fit| fit.items[1].as_mut())
+            .ok_or(Error::MissingEquipment)?;
+        navigation.fitted_hull = navigation_fitted.then_some(data.hull);
         Ok(Self { data })
     }
     pub(crate) fn ammunition_revision(&self) -> u64 {
@@ -363,6 +374,48 @@ impl CommanderAccount {
             .ammunition_revision
             .checked_add(1)
             .ok_or(Error::SequenceExhausted)?;
+        Ok(Self { data })
+    }
+    pub(crate) fn xyzzy_flags(&self) -> (bool, bool) {
+        (self.data.xyzzy_active, self.data.xyzzy_unlimited_fuel)
+    }
+    pub(crate) fn prepare_xyzzy(
+        &self,
+        first: bool,
+        refill: bool,
+        unlimited_fuel: bool,
+    ) -> Result<Self, Error> {
+        let mut data = self.data;
+        data.revision = data
+            .revision
+            .checked_add(1)
+            .ok_or(Error::SequenceExhausted)?;
+        if first {
+            data.credits = crate::flight::STARTING_CREDITS_TENTHS;
+        }
+        if refill {
+            data.fuel_tenths = crate::navigation::FUEL_CAPACITY;
+        }
+        data.xyzzy_active = true;
+        data.xyzzy_unlimited_fuel = unlimited_fuel;
+        Ok(Self { data })
+    }
+    pub(crate) fn grant_xyzzy_cargo_bay(&self, site: services::MarketSite) -> Result<Self, Error> {
+        if !self.data.xyzzy_active {
+            return Err(Error::InvalidFit);
+        }
+        let mut data = self.data;
+        let next = data
+            .equipment
+            .grant_xyzzy(data.owner, data.hull, data.revision, site)
+            .map_err(|_| Error::InvalidFit)?;
+        if next != data.equipment {
+            data.revision = data
+                .revision
+                .checked_add(1)
+                .ok_or(Error::SequenceExhausted)?;
+            data.equipment = next;
+        }
         Ok(Self { data })
     }
     pub(crate) fn credits_tenths(&self) -> u32 {
@@ -561,7 +614,10 @@ impl CommanderAccount {
             .revision
             .checked_add(1)
             .ok_or(Error::SequenceExhausted)?;
-        self.data.fuel_tenths = fuel;
+        // Explicit XYZZY supply preserves owned tank fuel. Navigation still records real debit.
+        if !self.data.xyzzy_unlimited_fuel {
+            self.data.fuel_tenths = fuel;
+        }
         self.data.revision = revision;
         Ok(())
     }
@@ -655,6 +711,7 @@ pub enum Command {
 /// Created only by committing the last original-unit transfer; never accepted as command authority.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CompletionReceipt {
+    account_revision: u64,
     job: JobId,
     sequence: u64,
     receiver: ActorId,
@@ -710,6 +767,7 @@ pub enum Event {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct Transfer {
+    account_revision: u64,
     sequence: u64,
     mask: u8,
     receiver: ActorId,
@@ -774,6 +832,19 @@ pub(crate) struct Prepared {
 }
 
 impl State {
+    pub(crate) fn account_events(&self) -> Vec<crate::flight::AccountEvent> {
+        self.data
+            .jobs
+            .iter()
+            .flatten()
+            .filter_map(|j| j.completion)
+            .map(|c| crate::flight::AccountEvent {
+                revision: c.account_revision,
+                effect: crate::flight::AccountEffect::Reward(REWARD_TENTHS),
+            })
+            .collect()
+    }
+
     pub(crate) fn new_commander(owner: u64) -> Self {
         Self {
             data: Data {
@@ -1044,6 +1115,7 @@ impl State {
                 .checked_add(REWARD_TENTHS)
                 .ok_or(Error::CreditOverflow)?;
             Some(CompletionReceipt {
+                account_revision: plan.next_account.revision,
                 job: id,
                 sequence: plan.next.sequence,
                 receiver,
@@ -1056,6 +1128,7 @@ impl State {
         updated.held = remaining;
         updated.delivered |= mask;
         updated.transfers[updated.transfer_count as usize] = Some(Transfer {
+            account_revision: plan.next_account.revision,
             sequence: plan.next.sequence,
             mask,
             receiver,
@@ -1214,7 +1287,10 @@ fn validate_cargo_and_utility(
         .equipment
         .validate(account.owner, account.hull, account.revision)
         .map_err(|_| Error::InvalidFit)?;
-    if account.fuel_tenths > 130 {
+    if (account.xyzzy_unlimited_fuel && !account.xyzzy_active)
+        || (account.equipment.is_xyzzy() && !account.xyzzy_active)
+        || account.fuel_tenths > 130
+    {
         return Err(Error::InvalidFit);
     }
     if !services::valid_native_quantities(account.other_commodities, account.reserved_commodities)

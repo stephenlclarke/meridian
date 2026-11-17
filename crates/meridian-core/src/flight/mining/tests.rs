@@ -305,18 +305,23 @@ fn all_provider_rock_envelopes_clear_the_actual_celestial_scene() {
     }
 }
 #[test]
-fn explicit_old_fifteen_continue_preserves_absent_ore_provider_and_never_synthesizes_work() {
+fn explicit_old_fifteen_save_refuses_before_mining_state_changes() {
     // Codec compatibility fixture only; no gameplay yield, item, pose or money is injected.
-    let fresh = ok(World::new_commander(12005));
-    let old = ok(crate::flight::persistence::v15_test_fixture(&fresh));
+    let mut fresh = ok(World::new_commander(12005));
+    let old = ok(crate::flight::persistence::unsupported_version_test_input(
+        &fresh, 15,
+    ));
     assert_eq!(u16::from_le_bytes([old[8], old[9]]), 15);
-    let older = ok(World::from_save_bytes(&old));
-    assert!(older.mining_belt_snapshot().is_none());
-    assert!(older.mining_destination(SystemId::AVENOR).is_none());
-    assert_eq!(older.credits_tenths(), fresh.credits_tenths());
-    assert_eq!(older.service_snapshot(), fresh.service_snapshot());
-    assert_eq!(older.mining.work_count(), 0);
-    assert!(cold(&older).mining_belt_snapshot().is_none());
+    assert!(matches!(
+        World::from_save_bytes(&old),
+        Err(crate::save::SaveError::UnsupportedVersion)
+    ));
+    let before = ok(fresh.save_bytes());
+    assert_eq!(
+        fresh.restore_bytes(&old),
+        Err(crate::save::SaveError::UnsupportedVersion)
+    );
+    assert_eq!(ok(fresh.save_bytes()), before);
 }
 #[test]
 fn original_work_has_no_invented_slow_speed_gate_and_never_changes_player_motion() {
@@ -357,4 +362,37 @@ fn paid_mining_round_trips_after_a_public_change_to_born_energy_fit() {
         loaded.modular_equipment_snapshot(),
         world.modular_equipment_snapshot()
     );
+}
+
+#[test]
+fn secret_outfit_preserves_paid_mining_work_custody_and_refuses_inflight_reactivation() {
+    let (mut w, item) = paid(15603);
+    let tick = w.snapshot().tick;
+    let review = ok(w.review_xyzzy(crate::XyzzyAction::Enter, tick));
+    ok(w.prepare_xyzzy(review, tick)).commit();
+    let naval = some(w.front_laser_snapshot()).fitted_item_id;
+    module(
+        &mut w,
+        ModuleAction::Install {
+            item,
+            replacing: Some(naval),
+        },
+    );
+    approach(&mut w);
+    work(&mut w);
+    steps(&mut w, 18);
+    assert_eq!(work(&mut w).extracted_units, 1);
+    let before = ok(w.save_bytes());
+    let belt = w.mining_belt_snapshot();
+    let cargo = w.service_snapshot();
+    assert_eq!(
+        w.review_xyzzy(crate::XyzzyAction::Enter, w.snapshot().tick),
+        Err(crate::XyzzyError::BerthRequired)
+    );
+    assert_eq!(ok(w.save_bytes()), before);
+    let continued = cold(&w);
+    assert_eq!(continued.mining_belt_snapshot(), belt);
+    assert_eq!(continued.service_snapshot(), cargo);
+    assert_eq!(some(continued.fitted_mining_tool()).item, item);
+    assert_eq!(some(continued.mining_belt_snapshot()).pending_ore.len(), 1);
 }

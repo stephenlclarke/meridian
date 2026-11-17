@@ -384,12 +384,14 @@ fn coherent_scene_and_projectile_endpoint_poison_cannot_remove_actual_damage_rec
     });
 }
 #[test]
-fn unsupported_draft14_and_public13_absence_keep_distinct_format_boundaries() {
+fn draft14_and_public13_both_refuse_on_current_reader() {
     let w = World::new_commander(12005).unwrap();
-    let bytes = crate::flight::persistence::v13_test_fixture(&w).unwrap();
+    let bytes = crate::flight::persistence::unsupported_version_test_input(&w, 13).unwrap();
     assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 13);
-    let loaded = World::from_save_bytes(&bytes).unwrap();
-    assert!(loaded.traffic_snapshot().is_none());
+    assert_eq!(
+        World::from_save_bytes(&bytes).unwrap_err(),
+        crate::save::SaveError::UnsupportedVersion
+    );
     let mut bad = w.save_bytes().unwrap();
     bad[8..10].copy_from_slice(&14u16.to_le_bytes());
     let n = bad.len() - 8;
@@ -513,3 +515,5 @@ fn actual_npc_missile_motion_refuses_a_changed_scene_clock_before_restore() {
             .world_tick += 1;
     });
 }
+
+mod wreck;

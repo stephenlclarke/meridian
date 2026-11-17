@@ -35,26 +35,40 @@ Mac apps are Developer ID signed and independently verified after archive extrac
 
 ## Current Rust checkpoint
 
+[Preview 6 v0.6.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.6.0-preview.1) is published for macOS arm64 and Windows x64 from main `07bb22c`, compiled `72dcc28`. All three owned platforms passed 539 Rust and 94 Python tests; exact-main CI and Sonar passed with zero open issues. All four public downloads, archive contents, Mac signature and annotated tag were verified before retention. The updated Mac build passed title/render/Escape-close smoke without a commander. Its earlier bounded mining journey retains the separate `a1ee135` source identity. Windows interactive gameplay and normal exit remain unobserved. This release includes neither the help/XYZZY candidate nor Lareria.
+
 Preview 6 candidate `a1ee135` adds paid Beam and Mining Lasers, Extra Energy System and Fuel Scoops, shared resource accounting, physical asteroid work and persistent pending ore. Mac qualification passed 534 workspace Rust tests; Dell Linux and native Windows passed those tests plus three explicit observer cases, or 537 each. All passed 94 Python tests, 46 Markdown checks, formatting, all-target checks, strict Clippy and locked release builds. Hosted PR checks passed. Nested subprocess summaries are not extra cases.
 
 The installed Developer ID signed Mac preview was operated through the supported computer-use adapter. An explicitly funded headless setup was continued in its isolated profile; native purchases fitted the Mining Laser for 3300 CR and Fuel Scoops for 1900 CR, leaving 3314.5 CR. Two real front-contact strokes reduced one asteroid from 100 to 50 work and then exhausted it, producing exactly one pending Alloys unit. Both partial work and terminal pending identity survived Save/Quit and Continue in new processes. Cash and cargo stayed unchanged. This validates the bounded mining and persistence path; funding was setup, not player-earned native acceptance.
 
-Physical ore pickup and sale remain unavailable without eligible original body geometry. Fitted scoops do not grant cargo or income. The current scope does not include XYZZY, the subsequent navigation-computer candidate or destroyed-trader custody work. Both Preview 6 internal archives are prepared. PR 44 merged as `582405b`; its CI and Sonar gate passed with six open source findings. The staged cleanup extracts the existing missile sequence merge and replaces five wildcard imports. The corrected source `72dcc28` passed 539 top-level Rust tests, 94 Python tests, 46 Markdown checks, formatting, locked all-target checks, strict Clippy and locked release builds on Mac, Linux and native Windows. Native Windows Python ran independently of WSL Python. The two new emission-ordering/refusal cases passed; all original assertions remain unchanged. Final PR checks, the subsequent committed-main analysis and updated signed packages remain pending before publication.
+Physical ore pickup and sale remain unavailable without eligible original body geometry. Fitted scoops do not grant cargo or income. The current scope does not include XYZZY, the subsequent navigation-computer candidate or destroyed-trader custody work. Both Preview 6 internal archives are prepared; protected integration, exact-main CI/Sonar and verified GitHub publication remain separate stages.
 
 Earlier qualified previews retain their own native flight, physical docking, trading, finite missiles, freight deliveries, once-only 730 CR reward and trusted-clue evidence. Those journeys are not relabelled as execution of this binary. Native Windows interactive gameplay, remaining populations and equipment, memory qualification, window/focus edges and measured frame timing/race remain open. Full original **1337 visual and gameplay parity** and the expanded mission/fleet acceptance remain open. The candidate writes private save v16; future development has no backward-compatibility guarantee.
 
 See [implementation status](docs/IMPLEMENTATION-STATUS.md), [mining scope](docs/ASTEROID-MINING.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md).
 
+## Following navigation and custody candidate
+
+Compiled candidate `991fd91` passed owned Mac, Linux and native Windows qualification: 551 Rust tests each, 94 Python tests, 47 Markdown checks, strict Clippy and locked release builds. It reads and writes only V17 and refuses earlier formats without changing the file. In the signed isolated Mac app, supported native input purchased an Intermediate Navigation module for 3000 CR, stored and refitted the same paid item, and retained it across a new-process Continue. Module reach was 14 LY; stored reach fell to the SH025 floor of 9 LY. The chart correctly showed the actual 9.6 LY fuel limit. No serviced flight benefiting from a leg beyond 9 LY is accepted: only Avenor and Renas services exist, and the required cumulative fuel exceeds tank capacity.
+
+The next source increment adds the original Lareria G01-S091 main orbital. The paid Intermediate grade enables the 9.93 LY Avenor–Lareria leg, costing 99 fuel units. Actual berthing provides paid refill for a return journey. Exact Lareria market data is imported, and the desktop admits this one additional destination. That exact Lareria-only source passed 555 top-level Rust and 94 Python tests on Mac, Linux and native Windows, with strict Clippy and locked release. Native Lareria acceptance remains pending. These results do not qualify the following changed help/XYZZY layout.
+
+A separate explicitly prepared public-core setup supplied four nonfatal contacts and a live trader. One supported native final shot from a paid missile produced the exact terminal SH025 Food manifest, preserving its native endpoint and source pose across Save/Quit and new-process Continue. Cargo and cash stayed unchanged; the retained hull stopped the player on physical contact. Setup funding, piloting and earlier damage are not native journey credit. Physical pods, pickup, sale and salvage income remain unavailable. Independent audit cleared these bounded observations; integration and publication remain open. Preview 6 keeps its separate source and release evidence.
+
 ## Play
 
-N starts a commander; C continues. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.
+N starts a commander; C continues a current-format V17 save. Earlier formats refuse without changing the file. Use a separate profile for this candidate. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.
+
+H or ? opens a dismissible help popup for the current screen, including station details and transaction reviews. Every station popup lists 1 Galaxy, 2 System, 3 Showroom, 4 Market, 5 Equipment, Tab/Shift+Tab and Escape/back. Escape, H or ? closes help and retains the screen, selection, search and review. Gameplay and underlying actions wait while help is open. During galaxy text search, H remains a typed letter and ? opens help.
 
 | Controls | Action |
 | --- | --- |
+| H / ? | Context help; Escape, H or ? dismisses |
+| Ctrl+Shift+X when docked | Explicit XYZZY testing menu; Enter reviews then confirms |
 | 1 / 2 / 3 / 4 / 5 when docked | Galaxy / System / Ships / Market / Equipment |
 | L; W/S; arrows; A/D; Q/E; Space | Launch; thrust; pitch; yaw; roll; brake |
 | J; T; R; Enter; B; F | Travel; select contact; review; confirm; cancel; buy fuel |
-| M; [ / ]; G/H | Market; commodity selection; buy/sell one native unit |
+| M; [ / ]; G / Shift+G | Market; commodity selection; buy/sell one native unit |
 | O; K; U; Y | Equipment panel; buy/fit cargo bay; store; refit |
 | I; V; X | Mission details; review all held freight deliveries; review abandonment |
 | F1; F2; F3; F4 | Next ship/practice lock; arm/safe; launch one missile; safe/unlock |
@@ -88,3 +102,11 @@ These are the source-grounded M2 and M3 boundaries; completed entries below desc
 | Not yet implemented or accepted | EMP, positive salvage and bounty/legal consequences; remaining equipment and population gameplay acceptance. | Rust crew/passenger/rescue, investigation and Wayfarer family journeys, then their individual consent/failure/reward/cold-Continue acceptance. All 64 expanded runtime acceptances remain open. |
 
 Fleet construction is a separate M4 lane. Its current changed original-five run returned no candidate meshes; no new hull admission follows from focused tests. Original mesh/material/colour fidelity and 1337 visual/mechanics parity remain requirements across these milestones. See the [source-grounded roadmap](docs/LEGACY-MILESTONES.md).
+
+## Context help and XYZZY testing candidate
+
+The following candidate combines screen-specific H/? help with explicit [XYZZY testing](docs/XYZZY.md). Every station help popup explains how to reach Galaxy, System, Showroom, Market and Equipment. Help pauses host stepping and preserves the current screen, selection, search and review. The large permanent control list is removed from the flight HUD.
+
+At a station berth, **Ctrl+Shift+X** opens the labelled XYZZY testing menu. Use Up/Down to choose, Enter to review, then Enter again to confirm and save; Escape/B cancels the review or closes the menu. H/? opens help above the menu. First activation changes the current commander to CLARKE and sets cash to 1,000,000 CR once. It grants/refits the supported SH025 outfit with explicit secret provenance; missiles and cargo stay finite. The menu shows actual cash, current jump reach, unlimited-fuel state and missing-system limits. Reading or closing it grants nothing. Other profiles are unchanged.
+
+Help source review cleared after corrections. The current core and host composition, including twenty-five core and ten host XYZZY tests, is authored but has not been compiled, tested or accepted in the native app. The [36-action inventory](docs/XYZZY-ACTIONS.json) retains every unsupported or partial original action. Full legacy parity and a published preview containing these features remain pending.

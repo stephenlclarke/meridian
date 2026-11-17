@@ -229,7 +229,7 @@ def selected_sites(worlds: dict[str, Any]) -> list[dict[str, Any]]:
     if worlds['version'] != 'l337-world-1' or len(worlds['systems']) != 2048:
         raise ValueError('Original equipment worlds differ')
     sites = []
-    for system, name in [(7, 'Avenor'), (185, 'Renas')]:
+    for system, name in [(7, 'Avenor'), (185, 'Renas'), (91, 'Lareria')]:
         row = unique(worlds['systems'], 'key', f'G01-S{system:03}')
         integer(row['galaxy'], 0, 'site galaxy')
         integer(row['system'], 255, 'site system')
@@ -286,7 +286,7 @@ def convert(raw: dict[str, bytes]) -> dict[str, bytes]:
         'semantics': {'purchase': 'Actual ordinary main-station service and minimum TL4, authoritative28000 debit, unique paid item auto-fitted to active hull; refuse duplicate even when stored',
                       'fit': 'Exact actual paid hull-bound item at utility.cargoExpansion; storage retains item/provenance/boundHull; no repeated payment, refund or new device',
                       'capacity': '92t without fitted bay;127t with fitted bay; unfit refuses if actual occupied hold exceeds92t, including identified mission property',
-                      'station': 'Source purchase requires actual main station; source fit/store requires docked; this joined slice supports the two original main orbitals only',
+                      'station': 'Source purchase requires actual main station; source fit/store requires docked; this joined slice supports the original Avenor, Renas and Lareria main orbitals',
                       'nonAuthority': 'No role-kit grant, geometry change, crew, people consent, hull acquisition, free stock, migration or playable acceptance'},
         'origin': {'equipmentBudgetsAudit': 'assets/legacy/original-economy-origin.json',
                    'equipmentBudgetsAuditSHA256': 'a3a829192e7147ce5840924b1d0d8dbee419d8411f41057937ac26bdd1e557a8',

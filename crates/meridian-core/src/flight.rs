@@ -1,6 +1,9 @@
 mod celestial;
 mod damage;
 mod mining;
+mod xyzzy;
+pub(crate) use xyzzy::{AccountEffect, AccountEvent, STARTING_CREDITS_TENTHS};
+pub use xyzzy::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
 mod navigation_trade;
 mod traffic;
 pub use navigation_trade::{
@@ -161,6 +164,7 @@ pub struct World {
     station_data: Option<OriginalStationData>,
     navigation_catalogue: Option<OriginalNavigation>,
     navigation: Option<NavigationState>,
+    jump_journal: crate::navigation::JumpJournal,
     commander_account: Option<CommanderAccount>,
     freight_session: Option<mission::FreightSession>,
     station_markets: Option<crate::station_services::StationMarkets>,
@@ -169,6 +173,7 @@ pub struct World {
     missiles: missiles::State,
     ammunition: ammunition::State,
     modular: modular::State,
+    xyzzy: xyzzy::State,
     navigation_trade: navigation_trade::State,
     flight_reception: flight_reception::State,
     practice: Option<practice::Practice>,
@@ -202,6 +207,7 @@ impl World {
             station_data: None,
             navigation_catalogue: None,
             navigation: None,
+            jump_journal: crate::navigation::JumpJournal::default(),
             commander_account: None,
             freight_session: None,
             station_markets: None,
@@ -210,6 +216,7 @@ impl World {
             missiles: missiles::State::default(),
             ammunition: ammunition::State::default(),
             modular: modular::State::default(),
+            xyzzy: xyzzy::State::default(),
             navigation_trade: navigation_trade::State::default(),
             flight_reception: flight_reception::State::default(),
             practice: None,
@@ -272,7 +279,7 @@ impl World {
             .map(CommanderAccount::credits_tenths)
     }
 
-    fn has_bound_navigation_fit(navigation: NavigationState, account: &CommanderAccount) -> bool {
+    fn has_bound_drive(navigation: NavigationState, account: &CommanderAccount) -> bool {
         let Some(items) = account.starter_items() else {
             return false;
         };
@@ -283,10 +290,20 @@ impl World {
         items.iter().filter(owned).any(|item| {
             item.component() == StarterComponent::BasicDrive
                 && item.id() == navigation.drive_item_id()
-        }) && items
-            .iter()
-            .filter(owned)
-            .any(|item| item.component() == StarterComponent::BasicNavigation)
+        })
+    }
+
+    /// Fitted range before the current fuel limit, from the active hull's owned equipment.
+    pub fn jump_reach_ly(&self) -> Option<f64> {
+        let account = self.commander_account.as_ref()?;
+        let navigation = self.navigation?;
+        if !Self::has_bound_drive(navigation, account) {
+            return None;
+        }
+        self.modular
+            .ledger(self, account)
+            .ok()
+            .map(|ledger| ledger.jump_reach_ly())
     }
 
     pub fn commander_id(&self) -> Option<CommanderId> {
@@ -343,10 +360,11 @@ impl World {
             .commander_account
             .as_ref()
             .ok_or(NavigationError::WrongMode)?;
-        if !Self::has_bound_navigation_fit(navigation, account) {
-            return Err(NavigationError::WrongMode);
+        let reach = self.jump_reach_ly().ok_or(NavigationError::WrongMode)?;
+        navigation.begin_jump(catalogue, target, distance, account.fuel_tenths(), reach)?;
+        if !self.jump_journal.has_room() {
+            return Err(NavigationError::SequenceExhausted);
         }
-        navigation.begin_jump(catalogue, target, distance, account.fuel_tenths())?;
         self.navigation = Some(navigation);
         Ok(())
     }
@@ -567,13 +585,14 @@ impl World {
         let mut navigation = self.navigation;
         let mut mission_epoch = None;
         let mut planned_debit = None;
+        let mut completed_leg = None;
         if let Some(state) = &mut navigation {
             let entry = next.mode == FlightMode::Docked && self.state.mode != FlightMode::Docked;
             let account = self
                 .commander_account
                 .as_mut()
                 .ok_or(StepError::NonFiniteState)?;
-            if !Self::has_bound_navigation_fit(*state, account) {
+            if !Self::has_bound_drive(*state, account) {
                 return Err(StepError::NonFiniteState);
             }
             let arrival_debit = state
@@ -588,6 +607,30 @@ impl World {
                     .map_err(|_| StepError::TickOverflow)?;
             }
             if let Some(debit) = arrival_debit {
+                let account = self
+                    .commander_account
+                    .as_ref()
+                    .ok_or(StepError::NonFiniteState)?;
+                let source = self.navigation.ok_or(StepError::NonFiniteState)?;
+                let grade = self
+                    .modular
+                    .ledger(self, account)
+                    .map_err(|_| StepError::NonFiniteState)?
+                    .navigation_grade();
+                if !self.jump_journal.has_room() {
+                    return Err(StepError::TickOverflow);
+                }
+                completed_leg = Some(crate::navigation::CompletedJump::arrived(
+                    source,
+                    *state,
+                    debit,
+                    next.tick,
+                    grade,
+                    account
+                        .revision()
+                        .checked_add(1)
+                        .ok_or(StepError::TickOverflow)?,
+                ));
                 planned_debit = Some(debit);
                 // Source arrival places the station16000 ahead. This is its equivalent
                 // station-local frame, not an earned dock or a proximity teleport.
@@ -651,6 +694,10 @@ impl World {
                 .ok_or(StepError::NonFiniteState)?
                 .debit_fuel(debit)
                 .map_err(|_| StepError::NonFiniteState)?;
+        }
+        // The receipt and the existing navigation, dock and wallet changes publish together.
+        if let Some(leg) = completed_leg {
+            self.jump_journal.append(leg);
         }
         // No fallible operation follows the first account mutation.
         if let Some((_, markets)) = traffic {
