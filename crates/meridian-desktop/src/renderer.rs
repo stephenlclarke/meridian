@@ -316,21 +316,41 @@ impl Renderer {
         }
     }
 
-    fn upload_hud(&mut self, lines: &[String], cockpit: Option<&hud::cockpit::Cockpit>) {
-        let size = self.size;
-        let window = &self.window;
+    fn prepare_and_submit_hud(
+        lines: &[String],
+        cockpit: Option<&hud::cockpit::Cockpit>,
+        size: PhysicalSize<u32>,
+        physical_viewport: [u32; 2],
+        scale_factor: impl FnOnce() -> f64,
+        output: &mut Vec<Vertex>,
+        submit: impl FnOnce(&[u8]),
+    ) {
         Self::prepare_hud_frame(
             lines,
             cockpit,
             || {
-                let logical = size.to_logical::<f64>(window.scale_factor());
+                let logical = size.to_logical::<f64>(scale_factor());
                 [logical.width, logical.height]
             },
-            [self.config.width, self.config.height],
-            &mut self.hud_frame,
+            physical_viewport,
+            output,
         );
-        self.queue
-            .write_buffer(&self.hud_vertices, 0, bytemuck::cast_slice(&self.hud_frame));
+        submit(bytemuck::cast_slice(output.as_slice()));
+    }
+
+    fn upload_hud(&mut self, lines: &[String], cockpit: Option<&hud::cockpit::Cockpit>) {
+        let window = &self.window;
+        let queue = &self.queue;
+        let vertices = &self.hud_vertices;
+        Self::prepare_and_submit_hud(
+            lines,
+            cockpit,
+            self.size,
+            [self.config.width, self.config.height],
+            || window.scale_factor(),
+            &mut self.hud_frame,
+            |bytes| queue.write_buffer(vertices, 0, bytes),
+        );
     }
 
     pub fn draw(

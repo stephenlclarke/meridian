@@ -25,6 +25,82 @@ fn cockpit() -> hud::cockpit::Cockpit {
 }
 
 #[test]
+fn hud_adapter_submits_actual_cockpit_bytes_after_one_scale_query() {
+    let cockpit = cockpit();
+    let lines = vec!["DOCKED".into()];
+    let events = std::cell::RefCell::new(Vec::new());
+    let mut actual = stale_buffer();
+    let mut submitted = Vec::new();
+    Renderer::prepare_and_submit_hud(
+        &lines,
+        Some(&cockpit),
+        winit::dpi::PhysicalSize::new(1280, 720),
+        [1280, 720],
+        || {
+            events.borrow_mut().push("scale");
+            2.0
+        },
+        &mut actual,
+        |bytes| {
+            events.borrow_mut().push("submit");
+            submitted.extend_from_slice(bytes);
+        },
+    );
+    assert_eq!(*events.borrow(), ["scale", "submit"]);
+    let mut expected = Vec::new();
+    hud::vertices_with_cockpit(&lines, 640, 360, Some(&cockpit), &mut expected);
+    same_vertices(&actual, &expected);
+    assert_eq!(submitted, bytemuck::cast_slice::<Vertex, u8>(&expected));
+    assert!(actual.iter().all(|v| v.color != [99.0; 3]));
+}
+
+#[test]
+fn hud_adapter_submits_configured_text_viewport_without_querying_scale() {
+    let lines = vec!["NO SAVED COMMANDER".into()];
+    let mut actual = stale_buffer();
+    let mut calls = 0;
+    let mut submitted = Vec::new();
+    Renderer::prepare_and_submit_hud(
+        &lines,
+        None,
+        winit::dpi::PhysicalSize::new(1920, 1080),
+        [640, 360],
+        || panic!("text upload queried the window scale"),
+        &mut actual,
+        |bytes| {
+            calls += 1;
+            submitted.extend_from_slice(bytes);
+        },
+    );
+    assert_eq!(calls, 1);
+    let mut expected = Vec::new();
+    hud::vertices(&lines, 640, 360, &mut expected);
+    same_vertices(&actual, &expected);
+    assert_eq!(submitted, bytemuck::cast_slice::<Vertex, u8>(&expected));
+}
+
+#[test]
+fn hud_adapter_submits_empty_bytes_once_after_clearing_a_zero_viewport() {
+    let lines = vec!["DOCKED".into()];
+    let mut actual = stale_buffer();
+    let mut calls = 0;
+    Renderer::prepare_and_submit_hud(
+        &lines,
+        None,
+        winit::dpi::PhysicalSize::new(1280, 720),
+        [0, 360],
+        || panic!("text upload queried the window scale"),
+        &mut actual,
+        |bytes| {
+            calls += 1;
+            assert!(bytes.is_empty());
+        },
+    );
+    assert_eq!(calls, 1);
+    assert!(actual.is_empty());
+}
+
+#[test]
 fn text_hud_uses_physical_viewport_without_querying_the_window() {
     let lines = vec!["NO SAVED COMMANDER".into(), "N NEW COMMANDER".into()];
     let mut actual = stale_buffer();
