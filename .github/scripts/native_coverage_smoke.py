@@ -15,6 +15,7 @@ WIDTH = 1280
 HEIGHT = 720
 RECTANGLE = (WIDTH, HEIGHT)
 SAVE_NAME = "commander.meridian"
+MAX_SAVE_BYTES = 65_536
 
 
 def run(*argv, env=None):
@@ -134,27 +135,35 @@ def press(key):
     run("xdotool", "key", "--delay", "120", key)
 
 
-def exercise(app, output, save):
+def exercise(app, output, save, receipt):
+    receipt["stage"] = "map and focus"
     window = await_result(app, "visible X11 window", lambda: mapped_window(app))
+    receipt["x11_window"] = window
     focus(window)
-    phases = [capture_phase(app, window, output, "title", title_frame)]
+    phases = receipt["phases"]
+    receipt["stage"] = "title"
+    phases.append(capture_phase(app, window, output, "title", title_frame))
     if (save / SAVE_NAME).exists():
         raise RuntimeError("Fresh title unexpectedly created a save")
+    receipt["stage"] = "system"
     press("n")
     phases.append(capture_phase(app, window, output, "system", system_frame))
     if "New commander ready" not in phases[-1]["title"]:
         raise RuntimeError("System frame did not follow ordinary commander creation")
+    receipt["stage"] = "trading"
     press("4")
     phases.append(capture_phase(app, window, output, "trading", trading_frame))
     if phases[-1]["sha256"] == phases[-2]["sha256"]:
         raise RuntimeError("Market did not present a distinct frame")
+    receipt["stage"] = "hud"
     press("Escape")
     phases.append(capture_phase(app, window, output, "hud", cockpit_frame))
+    receipt["stage"] = "normal quit"
     press("Escape")
+    receipt["normal_quit_sent"] = True
     code = app.wait(timeout=20)
     if code:
         raise RuntimeError(f"Desktop normal quit exited {code}")
-    return window, phases
 
 
 def verify_log(log):
@@ -170,19 +179,78 @@ def verify_log(log):
     return adapter
 
 
-def verify_save(observer, directory, output):
+def verify_save(observer, directory, output, receipt):
     save = directory / SAVE_NAME
     if sorted(p.name for p in directory.iterdir()) != [SAVE_NAME, "session.lock"]:
         raise RuntimeError("Normal quit did not produce exactly one isolated commander save")
     before = sha256(save)
     env = dict(os.environ, LLVM_PROFILE_FILE=str(directory.parent / "observer.profraw"))
-    evidence = run(observer, save, env=env).decode()
+    stdout = output / "commander-observed.txt"
+    stderr = output / "observer.stderr"
+    attempt = {"argv": [str(observer), str(save)], "exit_code": None, "status": "starting",
+               "stdout": stdout.name, "stderr": stderr.name}
+    receipt["observer"] = attempt
+    with stdout.open("xb") as out, stderr.open("xb") as err:
+        try:
+            process = subprocess.Popen(attempt["argv"], env=env, stdout=out, stderr=err)
+        except OSError:
+            attempt["status"] = "launch failed"
+            raise
+        attempt["pid"] = process.pid
+        try:
+            code = process.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            attempt.update(exit_code=process.wait(timeout=10), status="timed out and reaped")
+            raise
+        attempt.update(exit_code=code, status="exited")
+        if code:
+            raise subprocess.CalledProcessError(code, attempt["argv"])
+    evidence = stdout.read_text()
     required = ("saved_format=15\n", "mode: Docked", "credits_tenths=Some(7200)\n",
                 "used_tonnes: 0", "fuel_units: 130")
     if not all(item in evidence for item in required) or before != sha256(save):
         raise RuntimeError("Save decoder did not confirm the untouched starter commander")
-    (output / "commander-observed.txt").write_text(evidence)
     return before
+
+
+def retain_failed_save(directory, output):
+    save = directory / SAVE_NAME
+    entries = sorted(p.name for p in directory.iterdir())
+    if save.is_symlink() or not save.is_file():
+        return {"slot_entries": entries, "regular_commander": False}
+    with save.open("rb") as stream:
+        prefix = stream.read(MAX_SAVE_BYTES + 1)
+    truncated = len(prefix) > MAX_SAVE_BYTES
+    retained = prefix[:MAX_SAVE_BYTES]
+    name = "commander.failed.prefix" if truncated else "commander.failed.meridian"
+    (output / name).write_bytes(retained)
+    return {"slot_entries": entries, "regular_commander": True, "artifact": name,
+            "file_bytes": save.stat().st_size, "truncated": truncated,
+            "retained_sha256": hashlib.sha256(retained).hexdigest()}
+
+
+def run_app(argv, env, output, save, receipt):
+    with (output / "desktop.log").open("xb") as stream:
+        app = subprocess.Popen(argv, env=env, stdout=stream, stderr=subprocess.STDOUT)
+        receipt["pid"] = app.pid
+        try:
+            exercise(app, output, save, receipt)
+        finally:
+            if app.poll() is None:
+                try:
+                    app.kill()
+                except ProcessLookupError:
+                    pass
+                else:
+                    receipt["forced_cleanup"] = True
+                app.wait(timeout=10)
+            receipt["exit"] = app.returncode
+            receipt["exit_status"] = (
+                "forced cleanup" if receipt["forced_cleanup"] else
+                "normal quit" if receipt["normal_quit_sent"] and app.returncode == 0 else
+                "unexpected exit"
+            )
 
 
 def main():
@@ -193,8 +261,12 @@ def main():
     args = parser.parse_args()
     args.output.mkdir(parents=True)
     argv_binary = args.binary.resolve(strict=True)
-    log = args.output / "desktop.log"
     started = time.monotonic()
+    receipt = {
+        "commit": run("git", "rev-parse", "HEAD").decode().strip(),
+        "binary_sha256": sha256(argv_binary), "viewport": RECTANGLE, "pid": None,
+        "exit": None, "normal_quit_sent": False, "forced_cleanup": False, "phases": [],
+    }
     with tempfile.TemporaryDirectory(prefix="meridian-x11-smoke-") as temp:
         save = Path(temp) / "save"
         save.mkdir(mode=0o700)
@@ -204,30 +276,32 @@ def main():
         argv = [str(argv_binary), "--save-dir", str(save)]
         env = dict(os.environ, XDG_RUNTIME_DIR=str(runtime), LLVM_PROFILE_FILE=str(profile))
         env.pop("WAYLAND_DISPLAY", None)
-        with log.open("xb") as stream:
-            app = subprocess.Popen(argv, env=env, stdout=stream, stderr=subprocess.STDOUT)
+        receipt.update(argv=argv, stage="launch")
+        try:
+            run_app(argv, env, args.output, save, receipt)
+            receipt["stage"] = "backend and desktop log"
+            receipt["adapter"] = verify_log(args.output / "desktop.log")
+            receipt["stage"] = "native LLVM profile"
+            native_profile = args.output / f"desktop-{receipt['pid']}.profraw"
+            if not native_profile.is_file() or native_profile.stat().st_size == 0:
+                raise RuntimeError("Normal exit produced no native LLVM coverage data")
+            receipt.update(profraw=native_profile.name, profraw_sha256=sha256(native_profile))
+            receipt["stage"] = "save and observer"
+            receipt["save_sha256"] = verify_save(args.observer.resolve(strict=True), save,
+                                                 args.output, receipt)
+        except Exception as error:
+            receipt.update(status="failed", failure={"type": type(error).__name__, "message": str(error)})
             try:
-                window, phases = exercise(app, args.output, save)
-            finally:
-                if app.poll() is None:
-                    app.kill()
-                    app.wait(timeout=10)
-        adapter = verify_log(log)
-        native_profile = args.output / f"desktop-{app.pid}.profraw"
-        if not native_profile.is_file() or native_profile.stat().st_size == 0:
-            raise RuntimeError("Normal exit produced no native LLVM coverage data")
-        saved_sha = verify_save(args.observer.resolve(strict=True), save, args.output)
-
-    receipt = {
-        "commit": run("git", "rev-parse", "HEAD").decode().strip(),
-        "binary_sha256": sha256(argv_binary), "pid": app.pid, "x11_window": window,
-        "viewport": RECTANGLE, "argv": argv, "exit": app.returncode, "adapter": adapter,
-        "phases": phases, "save_sha256": saved_sha,
-        "profraw": native_profile.name, "profraw_sha256": sha256(native_profile),
-        "seconds": round(time.monotonic() - started, 3),
-    }
-    (args.output / "native-smoke.json").write_text(json.dumps(receipt, indent=2) + "\n")
-    print(json.dumps(receipt))
+                receipt["failed_save"] = retain_failed_save(save, args.output)
+            except OSError as retention_error:
+                receipt["failed_save_retention_error"] = str(retention_error)
+            raise
+        else:
+            receipt.update(status="passed", stage="complete")
+        finally:
+            receipt["seconds"] = round(time.monotonic() - started, 3)
+            (args.output / "native-smoke.json").write_text(json.dumps(receipt, indent=2) + "\n")
+            print(json.dumps(receipt), flush=True)
 
 
 if __name__ == "__main__":
