@@ -43,6 +43,7 @@ impl Panel {
                 "F3 Launch one missile | F4 Safe and clear target",
                 "J Jump to selected route | P Pause / resume",
                 "F6 Flight lesson | F12 Cancel | C Lesson details",
+                "I Mission details",
                 "F7 Close attempt | F8 Reception | F10 Practice review",
                 "4 Trade review | 5 Plan | 6 Cancel | 7 Details",
                 "F5 Save | F9 Reload | F11 Fullscreen | Escape Save/Quit",
@@ -73,6 +74,7 @@ impl Panel {
                 "T Select crew | R Review interaction | I Mission details",
                 "V Review deliveries | X Review abandonment",
                 "Enter Confirm review | B Cancel review",
+                "F6 Flight lesson | F12 Cancel | C Lesson details",
                 "F5 Save | F9 Reload | P Pause | Escape Save/Quit",
             ],
         );

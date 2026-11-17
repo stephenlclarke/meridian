@@ -330,3 +330,5 @@ gameplay parity remains an explicit requirement.
 ## XYZZY core author packet (unqualified)
 
 The [explicit XYZZY core](XYZZY.md) is authored on exact e1cc86b. Twenty-five new Rust cases remain unrun. It adds actual front Naval, Advanced Navigation, Elite Energy, Fuel Scoops fitting, cargo bay, finite missiles and accounted fuel supply with distinct secret provenance. Host composition and exact joined review/compiler/native acceptance are outstanding; no published-preview claim follows from this source packet. See the [36-action inventory](XYZZY-ACTIONS.json) for remaining dependencies.
+
+The Help candidate now lists mission details and flight-lesson review/cancel/details in both the station HUD and flight popups. Its retained minimum-window regression checks the concise HUD hint, all those popup controls, complete card text, bounded rendering and unchanged saved state through docked, launch and all four flight views. This changed regression and help content are authored; qualification remains pending.
