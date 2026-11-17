@@ -1,13 +1,14 @@
 //! Explicit legacy/current retained contact evidence. Decode never emits gameplay events.
-use super::geometry::{add, length, mesh_distance, pose, scale, sub, unit};
+use super::geometry::{add, length, mesh_distance, pose, ray_point, scale, sub, unit};
 use super::{
     Beam, Body, CombatIdentity, FlightMode, MISSILE_COOLDOWN_TICKS, MISSILE_LIFETIME_TICKS,
     MISSILE_MUZZLE_DISTANCE, MISSILE_RANGE, MISSILE_SPEED, MissileContact, MissileEnd,
     MissileOrigin, MissileRound, MissileTarget, Motion, PracticeBeaconId, ProjectileId,
     ProjectileSnapshot, State, World, choose,
 };
-use crate::docking::{Basis3, RigidPose, Vec3};
+use crate::docking::{Basis3, RigidPose, StationPose, Vec3};
 use crate::flight::practice::lifecycle::{lesson_for_target as legacy_lesson_for_target, lessons};
+use crate::station::OriginalStationData;
 fn lesson_for_target(
     p: Option<super::super::practice::Practice>,
     h: &[super::super::practice::Practice],
@@ -20,6 +21,41 @@ use crate::flight::{OrdinaryImpact, OrdinaryTarget, OrdinaryWeapon, PulseContact
 use crate::navigation::SystemId;
 use crate::save::{Reader, SaveError, Writer};
 const INVALID: SaveError = SaveError::InvalidState("missile custody, motion or contact evidence");
+type SolidContact = (Option<f64>, Option<(f64, MissileContact)>);
+
+/// Both retained homing paths query station first, then the eligible native player mesh.
+/// A tie keeps the station; the caller retains its own exact save refusal boundary.
+pub(super) fn retained_solid_contact(
+    data: &OriginalStationData,
+    station_pose: StationPose,
+    ray: RigidPose,
+    travel: f64,
+    player: RigidPose,
+    (cleared, player_alive): (bool, bool),
+    invalid: SaveError,
+) -> Result<SolidContact, SaveError> {
+    let station = data
+        .beam_block_distance(station_pose, ray.position, ray.orientation.z, travel)
+        .map_err(|_| invalid)?;
+    let mut best = station.map(|distance| (distance, MissileContact::Station));
+    if cleared
+        && player_alive
+        && let Some(distance) = data
+            .player_beam_distance(player, ray.position, ray.orientation.z, travel)
+            .map_err(|_| invalid)?
+    {
+        choose(
+            &mut best,
+            distance,
+            MissileContact::Player {
+                front: sub(ray_point(ray, distance), player.position).dot(player.orientation.z)
+                    >= 0.0,
+            },
+        );
+    }
+    Ok((station, best))
+}
+
 fn scalar(w: &mut Writer, x: f64) {
     w.u64(x.to_bits());
 }
@@ -997,34 +1033,15 @@ impl State {
             || length(sub(m.position, player.position)) > data.player_clearance_radius() + 1e-6;
         let travel = (MISSILE_SPEED / 60.0).min((MISSILE_RANGE - m.travel).max(0.0));
         let ray = pose(m.position, direction).ok_or(INVALID)?;
-        let station = data
-            .beam_block_distance(
-                world.state.station.ok_or(INVALID)?,
-                ray.position,
-                ray.orientation.z,
-                travel,
-            )
-            .map_err(|_| INVALID)?;
-        let mut best = station.map(|d| (d, MissileContact::Station));
-        if cleared
-            && m.player_alive
-            && let Some(d) = data
-                .player_beam_distance(player, ray.position, ray.orientation.z, travel)
-                .map_err(|_| INVALID)?
-        {
-            choose(
-                &mut best,
-                d,
-                MissileContact::Player {
-                    front: sub(
-                        add(ray.position, scale(ray.orientation.z, d)),
-                        player.position,
-                    )
-                    .dot(player.orientation.z)
-                        >= 0.0,
-                },
-            );
-        }
+        let (station, mut best) = retained_solid_contact(
+            data,
+            world.state.station.ok_or(INVALID)?,
+            ray,
+            travel,
+            player,
+            (cleared, m.player_alive),
+            INVALID,
+        )?;
         self.validate_motion_bodies(p, i, m, ray, travel, &mut best)?;
         if let Some((id, d)) = lesson.retained_missile_contact(
             ray,
@@ -1502,3 +1519,6 @@ impl State {
         }
     }
 }
+
+#[cfg(test)]
+mod solid_contact_tests;

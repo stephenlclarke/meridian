@@ -495,3 +495,18 @@ fn actual_paid_npc_hit_keeps_exact_native_endpoint_and_checked_save_cold() {
     assert_eq!(retained, projectile);
     assert_native_endpoint(&continued, retained);
 }
+
+#[test]
+fn actual_npc_missile_motion_refuses_a_changed_scene_clock_before_restore() {
+    let world = impacted();
+    // Negative fixture only: the genuine launch, motion, target and contact remain retained.
+    refuses(&world, |bad| {
+        bad.missiles.motions[0]
+            .as_mut()
+            .unwrap()
+            .npc_scene
+            .as_mut()
+            .unwrap()
+            .world_tick += 1;
+    });
+}

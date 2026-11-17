@@ -10,6 +10,10 @@ The first hosted correction head `b184e47` failed compilation on all three hoste
 
 Signed Mac and unsigned Windows v0.6 candidate archives under `8b81a77` were prepared and independently extracted, but were not published or relabelled as this correction. Their exact old identities and the public v0.5 release are preserved. Apple notarization remains a separate required-agreement blocker.
 
+## Shared missile replay correction awaiting qualification
+
+Exact main `a43e8b9` cleared the twenty reported source findings, but its Sonar quality gate failed at 70.9 percent new-code coverage and 6.4 percent new-code duplication. The retained duplicate is the station-first/player-second native contact query shared by NPC and practice missile replay. The correction extracts that query without changing geometry, eligibility, tie ordering or either caller's refusal boundary. Five new tests target native player contact, station/error boundaries, a changed NPC scene clock, omitted live interception peers and a missing accepted practice incident. These are authored and unrun. The original seventeen uncovered core lines and forty-eight uncovered desktop lines remain pending actual coverage remeasurement against the frozen failing line set; moving source does not close them.
+
 ## Current NPC qualification
 
 Exact source `bd506f9f9a8390bceecc4fe76dce5f60ffc6e410`, tree `452c9c4e461c15e8b94f47f3e13f01913bcafb74`, passed whole-source review. Mac, Dell Linux and native Windows each passed 288 core, 169 desktop and three explicit observer tests: **460 top-level Rust cases**, plus 88 Python tests, 40 Markdown files, formatting, all-target compilation, strict Clippy and fresh locked release builds. Nested subprocess summaries are included, not extra cases. All five hosted PR jobs passed at this exact head. Main integration, exact-main Sonar and the next public release are pending.
