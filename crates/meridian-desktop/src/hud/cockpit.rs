@@ -2,6 +2,7 @@
 //! Only World snapshots supply readings. Missing simulations have no invented needle.
 use super::{glyph, quad};
 use crate::mesh::{Vertex, rotate_inverse};
+use meridian_core::traffic::{MAX_TRAFFIC_ACTORS, NpcPhase, Population, TrafficSnapshot};
 use meridian_core::{FlightMode, FlightView, Snapshot, World};
 
 const YELLOW: [f32; 3] = [1.0, 1.0, 0.0];
@@ -10,8 +11,9 @@ const BLUE: [f32; 3] = [68.0 / 255.0, 136.0 / 255.0, 1.0];
 const RED: [f32; 3] = [1.0, 0.0, 0.0];
 const CYAN: [f32; 3] = [0.0, 1.0, 1.0];
 // Projectile IDs use a checked u8 ordinal. Include every possible retained launch,
-// plus the station and three practice bodies, without allocating contacts each frame.
-pub const MAX_CONTACTS: usize = 4 + crate::mesh::MAX_MISSILE_PROJECTILES;
+// plus the station and three practice bodies. NPCs have their own disjoint suffix.
+const NPC_CONTACT_START: usize = 4 + crate::mesh::MAX_MISSILE_PROJECTILES;
+pub const MAX_CONTACTS: usize = NPC_CONTACT_START + MAX_TRAFFIC_ACTORS;
 // Two line quads per additional scanner contact; eight edges per added pylon icon.
 pub const MAX_VERTICES: usize = 30_000 + (MAX_CONTACTS - 7) * 12 + (9 - 3) * 8 * 6;
 
@@ -33,7 +35,7 @@ pub struct Cockpit {
 }
 impl Cockpit {
     /// Capture once on the simulation-owning event loop; drawing has no World reference.
-    pub fn capture(world: &World, flight: Snapshot) -> Self {
+    pub fn capture(world: &World, flight: Snapshot) -> Result<Self, String> {
         let combat = world.combat_snapshot();
         let resources = world.flight_resources_snapshot();
         let missile = world.missile_snapshot();
@@ -45,13 +47,16 @@ impl Cockpit {
                 contacts[i + 1] = Some((relative(flight, b.pose.position), CYAN));
             }
         }
-        for (contact, projectile) in contacts[4..]
+        for (contact, projectile) in contacts[4..NPC_CONTACT_START]
             .iter_mut()
             .zip(world.missile_projectiles().filter(|p| p.ended.is_none()))
         {
             *contact = Some((relative(flight, projectile.position), RED));
         }
-        Self {
+        if let Some(traffic) = world.traffic_snapshot() {
+            fill_traffic_contacts(flight, &traffic, &mut contacts)?;
+        }
+        Ok(Self {
             flight,
             view: world.flight_view(),
             shield: [
@@ -80,7 +85,7 @@ impl Cockpit {
             destroyed: combat.is_some_and(|c| c.player.destroyed),
             contacts,
             station,
-        }
+        })
     }
     pub fn status(&self) -> &'static str {
         if self.destroyed {
@@ -102,6 +107,48 @@ impl Cockpit {
             y.atan2(x.hypot(z)).to_degrees(),
         ))
     }
+}
+
+fn fill_traffic_contacts(
+    flight: Snapshot,
+    traffic: &TrafficSnapshot,
+    contacts: &mut [Option<([f32; 3], [f32; 3])>; MAX_CONTACTS],
+) -> Result<(), String> {
+    if traffic.actors.len() > MAX_TRAFFIC_ACTORS {
+        return Err("Scanner traffic exceeds the admitted body bound".into());
+    }
+    let system = flight
+        .navigation
+        .ok_or("Scanner traffic requires its actual navigation frame")?
+        .system;
+    let mut captured = [None; MAX_TRAFFIC_ACTORS];
+    for (index, actor) in traffic.actors.iter().enumerate() {
+        if actor.id.system() != system
+            || actor.hull_id != "SH025"
+            || !matches!(actor.population, Population::Trader | Population::Pirate)
+        {
+            return Err("Scanner traffic has no admitted hull in this frame".into());
+        }
+        if actor.phase == NpcPhase::Complete {
+            continue;
+        }
+        let position = relative(flight, actor.pose.position);
+        if position.iter().any(|value| !value.is_finite()) {
+            return Err("Scanner traffic produced a non-finite contact".into());
+        }
+        // Color is descriptive: a retained destroyed body, positive wanted level,
+        // or an ordinary live contact. It grants no hostile/target/lock authority.
+        let color = if actor.phase == NpcPhase::Destroyed {
+            BLUE
+        } else if actor.wanted > 0 {
+            RED
+        } else {
+            YELLOW
+        };
+        captured[index] = Some((position, color));
+    }
+    contacts[NPC_CONTACT_START..].copy_from_slice(&captured);
+    Ok(())
 }
 fn relative(s: Snapshot, p: meridian_core::docking::Vec3) -> [f32; 3] {
     rotate_inverse(
@@ -517,7 +564,7 @@ mod tests {
                 .count(),
             3
         );
-        let cockpit = Cockpit::capture(&world, world.snapshot());
+        let cockpit = Cockpit::capture(&world, world.snapshot()).unwrap_or_else(|e| panic!("{e}"));
         assert_eq!(cockpit.missiles, 4);
         let mut vertices = Vec::with_capacity(super::super::MAX_VERTICES);
         append(&cockpit, 640, 360, &mut vertices);
@@ -531,7 +578,7 @@ mod tests {
     fn fresh_instruments_are_world_owned_and_rendering_cannot_change_save() {
         let world = world();
         let before = world.save_bytes().unwrap_or_else(|error| panic!("{error}"));
-        let c = Cockpit::capture(&world, world.snapshot());
+        let c = Cockpit::capture(&world, world.snapshot()).unwrap_or_else(|e| panic!("{e}"));
         assert_eq!(c.shield, [Some(1.0); 2]);
         assert_eq!(c.energy, Some(1.0));
         assert_eq!(c.fuel, Some(1.0));
@@ -571,11 +618,11 @@ mod tests {
                 ..FlightInput::default()
             })
             .unwrap_or_else(|error| panic!("{error}"));
-        let before = Cockpit::capture(&world, world.snapshot());
+        let before = Cockpit::capture(&world, world.snapshot()).unwrap_or_else(|e| panic!("{e}"));
         world
             .request_fire_front_pulse(world.snapshot().tick)
             .unwrap_or_else(|error| panic!("{error}"));
-        let after = Cockpit::capture(&world, world.snapshot());
+        let after = Cockpit::capture(&world, world.snapshot()).unwrap_or_else(|e| panic!("{e}"));
         assert!(after.flight.speed > 0.0);
         assert!(after.energy < before.energy);
         assert!(after.heat > before.heat);
@@ -586,7 +633,7 @@ mod tests {
     #[test]
     fn original_scanner_axes_and_view_bearings_do_not_confuse_rear_with_front() {
         let world = world();
-        let mut c = Cockpit::capture(&world, world.snapshot());
+        let mut c = Cockpit::capture(&world, world.snapshot()).unwrap_or_else(|e| panic!("{e}"));
         c.station = Some([0.0, 0.0, 100.0]);
         assert_eq!(c.station_navigation(), Some((100.0, 0.0, 0.0)));
         c.view = FlightView::Rear;
@@ -657,7 +704,7 @@ mod tests {
     fn cockpit_and_all_fourteen_control_rows_fit_compact_and_large_views_without_allocation_growth()
     {
         let world = world();
-        let c = Cockpit::capture(&world, world.snapshot());
+        let c = Cockpit::capture(&world, world.snapshot()).unwrap_or_else(|e| panic!("{e}"));
         let lines = vec!["W".repeat(super::super::MAX_COLUMNS); super::super::MAX_LINES];
         let mut out = Vec::with_capacity(super::super::MAX_VERTICES);
         let capacity = out.capacity();
@@ -718,10 +765,13 @@ mod tests {
     #[test]
     fn title_world_has_unknown_resources_instead_of_full_fake_needles() {
         let world = World::at_original_station().unwrap_or_else(|error| panic!("{error}"));
-        let c = Cockpit::capture(&world, world.snapshot());
+        let c = Cockpit::capture(&world, world.snapshot()).unwrap_or_else(|e| panic!("{e}"));
         assert_eq!(c.shield, [None; 2]);
         assert_eq!(c.energy, None);
         assert_eq!(c.fuel, None);
         assert_eq!(c.heat, None);
     }
 }
+
+#[cfg(test)]
+mod traffic_tests;

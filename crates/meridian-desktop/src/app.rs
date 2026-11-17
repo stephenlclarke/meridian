@@ -567,10 +567,17 @@ impl App {
         };
 
         let traffic = self.game.world.traffic_snapshot();
-        let cockpit = self
-            .game
-            .playing()
-            .then(|| crate::hud::cockpit::Cockpit::capture(&self.game.world, snapshot));
+        let cockpit = if self.game.playing() {
+            match crate::hud::cockpit::Cockpit::capture(&self.game.world, snapshot) {
+                Ok(cockpit) => Some(cockpit),
+                Err(error) => {
+                    self.fail(event_loop, error);
+                    return;
+                }
+            }
+        } else {
+            None
+        };
         self.missile_bodies.clear();
         self.missile_bodies.extend(
             self.game
