@@ -395,6 +395,7 @@ impl FacetBoundsIndex {
         Ok(node)
     }
     // The caller retains up to one candidate ordinal per original facet.
+    #[cfg(test)]
     fn candidates(&self, query: &Bounds, b: &mut Budget) -> Result<Vec<usize>, Failure> {
         b.with_retained(Self::stack_members(self.facets.len()), |b| {
             let mut pending = vec![self.root];
@@ -997,35 +998,8 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
         if area(&domain, b)?.is_negative() {
             domain.reverse();
         }
-        let (barriers, coplanar) = b.with_retained(originals.len(), |b| {
-            let candidates = facet_bounds.candidates(face_bounds, b)?;
-            let mut barriers = Vec::new();
-            let mut coplanar = Vec::new();
-            for ordinal in candidates {
-                b.step(1)?;
-                let other = &originals[ordinal];
-                if face.id() == other.id() {
-                    continue;
-                }
-                let (segments, same_plane) = face.section(other, b)?;
-                b.guard(8 * (barriers.len() + segments.len() + 1) + coplanar.len() + 1)?;
-                barriers.extend(
-                    segments
-                        .into_iter()
-                        .map(|[a, c]| [project(&a, face.axis()), project(&c, face.axis())]),
-                );
-                if same_plane && dot(face.normal(), other.normal()) > integer(0) {
-                    b.step(1)?;
-                    coplanar.push(other);
-                }
-            }
-            Ok((barriers, coplanar))
-        })?;
-        // Whole-owner one-sided sections are built once for this original
-        // facet. They classify only its existing atomic regions; they never
-        // generate output geometry or replace physical intersection records.
-        let sections = b.with_retained(8 * barriers.len() + coplanar.len(), |local| {
-            sections::Frame::build(
+        let (barriers, coplanar, sections) = b.with_retained(16, |local| {
+            sections::Frame::collect(
                 face,
                 face_bounds,
                 originals,
@@ -1034,6 +1008,9 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
                 local,
             )
         })?;
+        // Transfer barrier ownership to the arrangement's existing input bound.
+        // Its coplanar scope below admits those references for classification.
+        b.release(8 * barriers.len() + coplanar.len());
         let section_members = sections.memberships();
         let arrangement_result = b.with_retained(coplanar.len(), |budget| {
             let result =

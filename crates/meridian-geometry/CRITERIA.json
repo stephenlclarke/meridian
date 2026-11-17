@@ -213,6 +213,16 @@
       "file": "src/sections.rs",
       "name": "accounted_callback_preserves_arrangement_and_adds_live_classifier_storage",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/sections.rs",
+      "name": "joint_sections_match_both_separate_oracles_for_all_signed_zero_triples",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/sections.rs",
+      "name": "joint_collection_preserves_order_remote_loops_and_complete_admission",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -474,5 +484,19 @@
     "fourteenTestCallsOnly": true,
     "currentCompilerAndAllTests": "UNRUN",
     "newTestCount": 42
+  },
+  "jointSectionCollectionCorrection": {
+    "failedParentJoin": "d3685819e2133f760d2f5a122a82e34be25b4bd5",
+    "failedParentTree": "8fa4d723671605422277d680b70c9e47c7c26639",
+    "parentLibraryPass": 24,
+    "parentLibraryFail": 1,
+    "parentRemainingRustUnrun": 17,
+    "failedOverlapPairCounts": "UNKNOWN",
+    "strictWholeCaseAssertionsPreserved": true,
+    "all42PriorTestBodiesByteExact": true,
+    "deltaSHA256": "e7202efd48a9c320b765d2b0256bb870fb694e047cadec927d0b89d5958f122a",
+    "beforeSUTFreezeSHA256": "193d991952ff3500a94a3046734849e72994aa17cf1414090c1d2944ef9db363",
+    "currentExecution": "UNRUN",
+    "newTestCount": 44
   }
 }

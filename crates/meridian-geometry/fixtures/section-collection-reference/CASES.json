@@ -1,0 +1,9 @@
+{
+  "parentAuthorHead": "9a9f13c9758ab3523f7dde5968daa4f957eacac1",
+  "failedRootJoin": "d368581",
+  "contract": "Before joint collector authoring. Preserve exact physical section segments/coplanar records in source ordinal order and complete outward section owners/segments with multiplicity. Independently compare against unchanged Facet.section and the parent Frame.build. All previous 42 tests and strict work assertions remain authority.",
+  "localCases": "All 27 vertex-distance signs in {-1,0,1}; finite and remote source boxes; both normal signs; degenerates/tangent multiplicity; exact/one-short storage and failure rollback.",
+  "workGrounding": "Both current collectors invoke per-triangle plane distance and edge intersection independently. Share one exact calculation in their proven intersection; do not change primitive charges or infer failing full-case counts.",
+  "unchanged": "Exact/source/budget/arrangement/section_arrangement/planes/pruning/section_tests and every previous fixture remain byte exact.",
+  "currentValidation": "New author source UNRUN; no compiler or geometry probe."
+}

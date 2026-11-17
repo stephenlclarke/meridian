@@ -66,11 +66,12 @@ def verify():
     after = (CRATE / "src/certificate.rs").read_text()
     assert after.startswith('#[path = "sections.rs"]\nmod sections;\n\n')
     after = after.split("\n", 3)[3]
-    begin = before.index("        let arrangement = b.with_retained(coplanar.len()")
+    begin = before.index("        let (barriers, coplanar) = b.with_retained(originals.len()")
     end = before.index("        drop(barriers);", begin)
-    new_begin = after.index("        // Whole-owner one-sided sections")
+    new_begin = after.index("        let (barriers, coplanar, sections) = b.with_retained(16,")
     new_end = after.index("        drop(barriers);", new_begin)
     restored = after[:new_begin] + before[begin:end] + after[new_end:]
+    restored = restored.replace("    #[cfg(test)]\n    fn candidates(", "    fn candidates(")
     assert restored == before, "certificate outside section collection changed"
     # Both paths retain the exact complete field and source-tie clauses.
     clause = before[before.index("    let mut winner = face.id();") :]
@@ -78,8 +79,28 @@ def verify():
     current = (CRATE / "src/sections.rs").read_text()
     start = current.index("    let mut winner = face.id();")
     assert normalized(current[start : current.index("\n}\n", start) + 2]) == normalized(clause)
+    collection_parent = "9a9f13c9758ab3523f7dde5968daa4f957eacac1"
+    old_sections = subprocess.check_output(["git", "-C", str(REPO), "show", f"{collection_parent}:crates/meridian-geometry/src/sections.rs"], text=True)
+    assert (CRATE / "fixtures/section-collection-reference/before-sections.rs").read_text() == old_sections.split("#[cfg(test)]")[0].rstrip() + "\n"
+    old_tests = old_sections.split("#[cfg(test)]\nmod tests", 1)[1]
+    new_tests = current.split("#[cfg(test)]\nmod tests", 1)[1]
+    assert new_tests.startswith(old_tests[:old_tests.rfind("}")]), "42 prior tests changed"
+    for relative in ["src/section_tests.rs", "src/section_arrangement.rs"]:
+        assert (CRATE / relative).read_bytes() == subprocess.check_output(["git", "-C", str(REPO), "show", f"{collection_parent}:crates/meridian-geometry/{relative}"])
+    def body(source, signature):
+        start = source.index(signature)
+        brace = source.index("{", start)
+        depth = 0
+        for i in range(brace, len(source)):
+            if source[i] == "{": depth += 1
+            elif source[i] == "}":
+                depth -= 1
+                if depth == 0: return source[start:i+1]
+        raise AssertionError(signature)
+    for signature in ["fn meets_outward_plane(", "fn outward_candidates(", "fn limiting_segment(", "pub(super) fn build(", "fn build_admitted(", "pub(super) fn occupied(", "pub(super) fn memberships(", "pub(super) fn fields_visible("]:
+        assert body(current, signature) == body(old_sections, signature), signature
     tests = sum(path.read_text().count("#[test]") for top in ["src", "tests"] for path in (CRATE / top).rglob("*.rs"))
-    assert tests == 42, tests
+    assert tests == 44, tests
     print(json.dumps({"status": "PASS_SOURCE_ONLY", "parent": PARENT, "currentRustTests": tests, "compilerOrGeometryExecuted": False}))
 
 

@@ -1,0 +1,78 @@
+   Compiling meridian-geometry v0.1.0 (/Volumes/SSD/offload/meridian-g1-mbp-geometry.d368581/source/crates/meridian-geometry)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.02s
+     Running unittests src/lib.rs (/Volumes/SSD/offload/meridian-g1-mbp-geometry.7ef4df7/target/debug/deps/meridian_geometry-6b3f7f65e6433e53)
+
+running 25 tests
+test certificate::sections::tests::half_open_parity_preserves_cavity_multiplicity_and_boundary_ambiguity ... ok
+test certificate::tests::closed_component_bounds_retain_face_edge_and_point_equalities ... ok
+test certificate::sections::tests::limiting_sections_match_hand_derived_zero_sign_and_tangent_cases ... ok
+test certificate::tests::protected_overlap_facet_keeps_each_regular_local_boundary_path ... ok
+test certificate::sections::tests::section_frame_reserves_complete_ownership_and_releases_failed_build ... ok
+test planes::tests::exact_plane_cache_preserves_individual_contacts_and_guarded_lifetimes ... ok
+test certificate::tests::owner_streaming_keeps_all_sheets_of_one_component_in_one_link_audit ... ok
+test region::tests::region_round_trip_preserves_every_record_and_guards_transfer_lifetimes ... ok
+test planes::tests::reusable_storage_invalidates_hits_and_retains_guards_between_attempts ... ok
+test certificate::sections::tests::accounted_callback_preserves_arrangement_and_adds_live_classifier_storage ... ok
+test source::tests::exact_sections_match_independent_signed_contact_enumeration ... ok
+test certificate::sections::tests::whole_plane_query_matches_independent_box_corner_support_and_storage_boundary ... ok
+test certificate::tests::original_topology_streams_owner_maps_under_the_same_storage_guard ... ok
+test certificate::tests::facet_bounds_index_matches_independent_closed_pairs_and_guards_scratch ... ok
+test certificate::tests::forward_ray_candidates_keep_boundary_ambiguities_and_source_order ... ok
+test certificate::tests::closed_ray_intervals_reject_skew_boxes_and_preserve_ordered_exact_parity ... ok
+BOUNDS_CACHE_COMPLETE {"fixture":"identity","oldOperations":30815,"newOperations":30515,"oldAttemptedPeak":6356,"newAttemptedPeak":3860,"oldRetained":2016,"newRetained":2016,"triangles":12}
+STYLE_STORAGE_COMPLETE {"fixture":"identity","oldOperations":30792,"newOperations":30515,"oldAttemptedPeak":6552,"newAttemptedPeak":3860,"oldRetained":2016,"newRetained":2016,"triangles":12}
+REGION_STORAGE_COMPLETE {"fixture":"identity","oldOperations":30242,"newOperations":30515,"oldAttemptedPeak":6356,"newAttemptedPeak":3860,"oldRetained":2016,"newRetained":2016,"triangles":12}
+EXACT_PRUNING_COMPLETE {"fixture":"identity","oldOperations":30277,"newOperations":30504,"oldAttemptedPeak":6552,"newAttemptedPeak":4056,"oldRetained":2016,"newRetained":2016,"triangles":12,"exactOutputAndExposedWitnessMatch":true}
+test adapter::tests::equal_unshared_styles_and_shared_clones_have_distinct_storage_ownership ... ok
+STYLE_INPUT_STORAGE {"fixture":"SH010","before":79000,"after":40784,"operations":362960}
+sectionDifferential id=L_prism oldOperations=60759 newOperations=60743 oldPeak=7432 newPeak=7432 oldAdmitted=7432 newAdmitted=7432 oldRetained=3728 newRetained=3728 oldWallNanoseconds=140246379 newWallNanoseconds=120457790
+STYLE_INPUT_STORAGE {"fixture":"SH011","before":79000,"after":40784,"operations":367320}
+
+thread 'pruning::complete_bounds_cache_controls_preserve_fields_witnesses_and_reduce_work' (160523731) panicked at crates/meridian-geometry/src/pruning.rs:449:9:
+overlap
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test pruning::complete_bounds_cache_controls_preserve_fields_witnesses_and_reduce_work ... FAILED
+STYLE_STORAGE_COMPLETE {"fixture":"overlap","oldOperations":106099,"newOperations":106218,"oldAttemptedPeak":19368,"newAttemptedPeak":12492,"oldRetained":6552,"newRetained":6552,"triangles":48}
+REGION_STORAGE_COMPLETE {"fixture":"overlap","oldOperations":103189,"newOperations":106218,"oldAttemptedPeak":18956,"newAttemptedPeak":12492,"oldRetained":6552,"newRetained":6552,"triangles":48}
+STYLE_INPUT_STORAGE {"fixture":"SH016","before":85864,"after":44304,"operations":370135}
+EXACT_PRUNING_COMPLETE {"fixture":"overlap","oldOperations":108136,"newOperations":106195,"oldAttemptedPeak":19368,"newAttemptedPeak":12904,"oldRetained":6552,"newRetained":6552,"triangles":48,"exactOutputAndExposedWitnessMatch":true}
+sectionDifferential id=L_prism_shear_mirror oldOperations=62785 newOperations=64518 oldPeak=7432 newPeak=7432 oldAdmitted=7432 newAdmitted=7432 oldRetained=3728 newRetained=3728 oldWallNanoseconds=179975165 newWallNanoseconds=167883627
+sectionDifferential id=face oldOperations=64338 newOperations=64171 oldPeak=6896 newPeak=6896 oldAdmitted=6896 newAdmitted=6896 oldRetained=3360 newRetained=3360 oldWallNanoseconds=98816210 newWallNanoseconds=86715750
+test section_tests::one_sided_sections_preserve_original_contact_and_field_refusals ... ok
+REGION_STORAGE_COMPLETE {"fixture":"buried","oldOperations":41768,"newOperations":44462,"oldAttemptedPeak":6836,"newAttemptedPeak":4340,"oldRetained":2016,"newRetained":2016,"triangles":12}
+STYLE_STORAGE_COMPLETE {"fixture":"buried","oldOperations":44726,"newOperations":44462,"oldAttemptedPeak":7248,"newAttemptedPeak":4340,"oldRetained":2016,"newRetained":2016,"triangles":12}
+STYLE_INPUT_STORAGE {"fixture":"SH017","before":85864,"after":44304,"operations":394930}
+EXACT_PRUNING_COMPLETE {"fixture":"buried","oldOperations":49342,"newOperations":44439,"oldAttemptedPeak":9940,"newAttemptedPeak":4752,"oldRetained":2724,"newRetained":2016,"triangles":12,"exactOutputAndExposedWitnessMatch":true}
+STYLE_INPUT_STORAGE {"fixture":"SH166","before":77128,"after":39824,"operations":344631}
+test adapter::tests::original_style_pool_preserves_exact_text_and_counts_only_shared_allocations ... ok
+REGION_STORAGE_COMPLETE {"fixture":"shared_face","oldOperations":63415,"newOperations":64194,"oldAttemptedPeak":10644,"newAttemptedPeak":6484,"oldRetained":3360,"newRetained":3360,"triangles":20}
+STYLE_STORAGE_COMPLETE {"fixture":"shared_face","oldOperations":65981,"newOperations":64194,"oldAttemptedPeak":11056,"newAttemptedPeak":6484,"oldRetained":3360,"newRetained":3360,"triangles":20}
+EXACT_PRUNING_COMPLETE {"fixture":"shared_face","oldOperations":66170,"newOperations":64171,"oldAttemptedPeak":12108,"newAttemptedPeak":6896,"oldRetained":3636,"newRetained":3360,"triangles":20,"exactOutputAndExposedWitnessMatch":true}
+REGION_STORAGE_COMPLETE {"fixture":"four_disconnected","oldOperations":132836,"newOperations":134272,"oldAttemptedPeak":24980,"newAttemptedPeak":14996,"oldRetained":8064,"newRetained":8064,"triangles":48}
+STYLE_STORAGE_COMPLETE {"fixture":"four_disconnected","oldOperations":148434,"newOperations":134272,"oldAttemptedPeak":25824,"newAttemptedPeak":14996,"oldRetained":8064,"newRetained":8064,"triangles":48}
+EXACT_PRUNING_COMPLETE {"fixture":"four_disconnected","oldOperations":163544,"newOperations":134225,"oldAttemptedPeak":25824,"newAttemptedPeak":15840,"oldRetained":8064,"newRetained":8064,"triangles":48,"exactOutputAndExposedWitnessMatch":true}
+sectionDifferential id=L_overlap oldOperations=177382 newOperations=177466 oldPeak=19488 newPeak=19488 oldAdmitted=19488 newAdmitted=19488 oldRetained=9640 newRetained=9640 oldWallNanoseconds=476011505 newWallNanoseconds=419452502
+REGION_STORAGE_COMPLETE {"fixture":"eight_oblique_disconnected","oldOperations":296700,"newOperations":304636,"oldAttemptedPeak":49812,"newAttemptedPeak":29844,"oldRetained":16128,"newRetained":16128,"triangles":96}
+STYLE_STORAGE_COMPLETE {"fixture":"eight_oblique_disconnected","oldOperations":364298,"newOperations":304636,"oldAttemptedPeak":51520,"newAttemptedPeak":29844,"oldRetained":16128,"newRetained":16128,"triangles":96}
+test pruning::complete_region_storage_controls_preserve_all_fields_and_reduce_peak ... ok
+test pruning::complete_style_storage_controls_preserve_all_fields_witnesses_and_refusals ... ok
+sectionDifferential id=L_overlap_shear_mirror oldOperations=151129 newOperations=154446 oldPeak=16032 newPeak=16032 oldAdmitted=16032 newAdmitted=16032 oldRetained=7984 newRetained=7984 oldWallNanoseconds=497668834 newWallNanoseconds=411389000
+sectionDifferential id=cavity oldOperations=65186 newOperations=69003 oldPeak=7984 newPeak=7984 oldAdmitted=7984 newAdmitted=7984 oldRetained=4032 newRetained=4032 oldWallNanoseconds=148542541 newWallNanoseconds=140446333
+FORWARD_RAY_COMPLETE {"fixture":"subdivided_identity","oldOperations":440444,"newOperations":411973,"oldAttemptedPeak":35352,"newAttemptedPeak":35352,"oldRetained":18144,"newRetained":18144,"triangles":108}
+EXACT_PRUNING_COMPLETE {"fixture":"eight_oblique_disconnected","oldOperations":440797,"newOperations":304541,"oldAttemptedPeak":51520,"newAttemptedPeak":31552,"oldRetained":16128,"newRetained":16128,"triangles":96,"exactOutputAndExposedWitnessMatch":true}
+sectionDifferential id=cavity_shear_mirror oldOperations=68481 newOperations=74175 oldPeak=7984 newPeak=7984 oldAdmitted=7984 newAdmitted=7984 oldRetained=4032 newRetained=4032 oldWallNanoseconds=201020290 newWallNanoseconds=192774086
+test pruning::complete_frozen_solids_preserve_all_exposed_fields_witnesses_and_charged_work ... ok
+sectionDifferential id=cavity_filled oldOperations=56656 newOperations=65430 oldPeak=5448 newPeak=5448 oldAdmitted=5448 newAdmitted=5448 oldRetained=2016 newRetained=2016 oldWallNanoseconds=137002624 newWallNanoseconds=129457706
+sectionDifferential id=cavity_filled_shear_mirror oldOperations=64857 newOperations=79174 oldPeak=5448 newPeak=5448 oldAdmitted=5448 newAdmitted=5448 oldRetained=2016 newRetained=2016 oldWallNanoseconds=214892876 newWallNanoseconds=206914085
+test section_tests::one_sided_sections_preserve_complete_nonconvex_cavity_and_oblique_hulls ... ok
+FORWARD_RAY_COMPLETE {"fixture":"subdivided_buried","oldOperations":457447,"newOperations":437723,"oldAttemptedPeak":36048,"newAttemptedPeak":36048,"oldRetained":18144,"newRetained":18144,"triangles":108}
+test pruning::complete_forward_ray_controls_preserve_all_fields_witnesses_and_charged_work ... ok
+
+failures:
+
+failures:
+    pruning::complete_bounds_cache_controls_preserve_fields_witnesses_and_reduce_work
+
+test result: FAILED. 24 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.58s
+
+error: test failed, to rerun pass `-p meridian-geometry --lib`

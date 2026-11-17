@@ -1,0 +1,14 @@
+{
+  "phase": "BEFORE_JOINT_SECTION_COLLECTION_AUTHORING",
+  "parentAuthorHead": "9a9f13c9758ab3523f7dde5968daa4f957eacac1",
+  "files": {
+    "before-sections.rs": {
+      "bytes": 8934,
+      "sha256": "7bacc88173a4c92bf9382c2f9e800db2b802cea608eb1d82fe22b3ef564fc10e"
+    },
+    "CASES.json": {
+      "bytes": 1108,
+      "sha256": "8fd0f678da277c037818351d0db87714cabf4c9b2b1f86c79fe043551d551988"
+    }
+  }
+}

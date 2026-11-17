@@ -1,0 +1,92 @@
+{
+  "status": "AUTHORED_UNRUN",
+  "parentAuthorHead": "9a9f13c9758ab3523f7dde5968daa4f957eacac1",
+  "failedRootJoin": "d3685819e2133f760d2f5a122a82e34be25b4bd5",
+  "failedRootTree": "8fa4d723671605422277d680b70c9e47c7c26639",
+  "parentCheck": "PASS",
+  "parentLibrary": {
+    "PASS": 24,
+    "FAIL": 1
+  },
+  "parentRemainingRustUnrun": 17,
+  "parentHostClippyDevBuildWholeFive": "UNRUN",
+  "failedTest": "pruning::complete_bounds_cache_controls_preserve_fields_witnesses_and_reduce_work",
+  "failedFixture": "overlap",
+  "failedAssertion": "new.operations() < old.operations()",
+  "failedPairCounts": null,
+  "noCountInference": "Other similarly named fixture counters use other baselines/input ownership and are not the failing pair. No unchanged diagnostic or instrumentation run requested.",
+  "parentPassedStrictControls": [
+    {
+      "fixture": "subdivided_identity",
+      "sourceFacets": 108,
+      "referenceOperations": 440444,
+      "candidateOperations": 411973
+    },
+    {
+      "fixture": "subdivided_buried",
+      "sourceFacets": 120,
+      "referenceOperations": 457447,
+      "candidateOperations": 437723
+    }
+  ],
+  "sourceGrounding": "Parent physical and outward builders independently traverse the tree and compute source-plane distances/edge intersections for the same eligible triangle. Joint union traversal computes shared geometry once, preserving both representations. Not a measured whole-case hotspot or guaranteed savings claim.",
+  "sourceChanges": "certificate collection call/ownership transfer; test-only cfg for superseded private physical query; joint collector/calculation; test-only cfg for unchanged separate outward oracle routines; two new tests. All 42 prior test bodies and shared geometry/budget source remain byte exact.",
+  "normalLimits": {
+    "operationsIncludingDecode": 2000000,
+    "storageMemberships": 100000,
+    "rationalBits": 4096,
+    "completeOutputTriangles": 512
+  },
+  "newStorage": "3N ordinal/eligibility slots, existing tree stack, 96 scoped construction/publication scratch, 24 frame/collection header records + 6/owner + 7/outward segment + 8/physical segment + 1/coplanar reference; caller retains 16 domain memberships. Exact rollback and ownership transfer, no storage-fit claim.",
+  "sharedWork": "Original 3 distance visits, 3 edge visits, physical hit enumeration and constructed-point guards; shared exact calculations execute once. No primitive price changes. Existing strict whole-case assertions required.",
+  "beforeSUTFreezeSHA256": "193d991952ff3500a94a3046734849e72994aa17cf1414090c1d2944ef9db363",
+  "algorithmSHA256": "fd297e7bef2571b8fd74bf7c595463738dc0dfc7c5b34553cf6e41a85151a550",
+  "parentEvidence": {
+    "PARENT-CHECK-START.json": {
+      "bytes": 1424,
+      "sha256": "d5840467e1b129ea142174dd31354bc24ca5e4ac2bedb9d688ed7ee7cea0366c"
+    },
+    "PARENT-CHECK-TERMINAL.json": {
+      "bytes": 473,
+      "sha256": "c5cc416e7e307905f2fd0e2412dc2aac8e751d50d577fc52796ee33c8a2d6b51"
+    },
+    "PARENT-SOURCE.json": {
+      "bytes": 56792,
+      "sha256": "5d40e70c5c2833d925100b0131a52bde8d983e9831c9082b742e85017d103674"
+    },
+    "PARENT-TEST-START.json": {
+      "bytes": 1430,
+      "sha256": "e157f4658b5ffaf38e171f2d58dc4fe5a91e57915a77270722ddc7374158ca28"
+    },
+    "PARENT-TEST-TERMINAL.json": {
+      "bytes": 474,
+      "sha256": "ea6ba54b032efc19d6f1669c34a659fe1f11fa4987880f6f526b6dd8c2291895"
+    },
+    "PARENT-check.log": {
+      "bytes": 198,
+      "sha256": "5e00d3141440e996ff059d7cbd25df2ac47535c06025023ab0c47821df602d92"
+    },
+    "PARENT-test.log": {
+      "bytes": 10336,
+      "sha256": "81395bf4431510148db50dd980a23b7c49ab3bfd34578a8bf3a7d4b6e7e4076b"
+    }
+  },
+  "newTests": [
+    {
+      "file": "src/sections.rs",
+      "name": "joint_sections_match_both_separate_oracles_for_all_signed_zero_triples",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/sections.rs",
+      "name": "joint_collection_preserves_order_remote_loops_and_complete_admission",
+      "status": "UNRUN"
+    }
+  ],
+  "newTestCount": 44,
+  "hostTestCount": 9,
+  "currentCompilerAndTests": "UNRUN",
+  "wholeFive": "HELD for Root/G2 joined-source review and owning focused gates; last 5489 batch five Operations refusals, fifteen dependent UNRUN, zero candidates",
+  "newHullsAccepted": 0,
+  "authorValidation": "Formatting, source/hash/metadata only; no compiler, geometry engine, native process or original run."
+}

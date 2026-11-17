@@ -1,5 +1,11 @@
 # Implementation and validation status
 
+## Joint plane-section collection correction
+
+The actual `d368581` check passed, then its library run finished 24 PASS and one FAIL at the unchanged overlap pruning control requiring strictly less charged work. Seventeen remaining Rust cases, nine host cases, Clippy, build and the original-five batch were unrun. The failing old/new operation counts remain unknown.
+
+The `4c7b51e` source correction jointly collects physical and outward owner sections, sharing only identical current-triangle index, distance and edge calculations. Query eligibility, complete ordered sections, owner provenance, multiplicity, boundary fallback and all 42 prior test bodies and strict work assertions remain unchanged. Two independently frozen reference/control tests bring the candidate to 44 Rust and nine host cases, all **UNRUN**. Whole joined source review and changed owning qualification must establish whether this correction helps. The original-five refusals and all 2M-operation/100k-storage/4096-bit/512-face limits remain open and unchanged. No new hull or performance acceptance is claimed.
+
 ## Section fixture API correction
 
 Root `101d1f8` stopped at its first owning compiler check: fourteen new parity-fixture calls used two integer arguments where the unchanged exact fraction API requires numerator/denominator strings, a mutable Budget and Result propagation. The resulting array-type mismatch was also retained. Tests, Clippy, build and the original batch did not run. The `9a9f13c` correction changes only those fourteen test calls and formatting; its production prefix, sample values, expected results, frozen references, all old tests and physical/resource limits remain exact. Corrected checks and 42 Rust/nine host cases are **UNRUN**, pending same-slice delta review and changed owning execution. The earlier original-five Operations refusals remain unresolved.
