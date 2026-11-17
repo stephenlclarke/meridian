@@ -371,7 +371,7 @@ fn assert_paid_save_guards(world: &mut World) {
         .as_ref()
         .unwrap()
         .equipment_state()
-        .encode(&mut equipment);
+        .encode(&mut equipment, crate::save::SAVE_VERSION);
     // Paid ammunition and modular revisions follow equipment in the current account codec.
     // Locate the actual encoded component, rather than treating it as the account suffix.
     let equipment_offsets: Vec<_> = account
