@@ -1,5 +1,5 @@
 //! Finite released ore identities. No cargo credit or scoop installation is inferred.
-use super::*;
+use super::{AsteroidId, CommodityId, State, Vec3, add, scale};
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct OreId {
     asteroid: AsteroidId,

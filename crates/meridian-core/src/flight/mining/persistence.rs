@@ -1,5 +1,5 @@
 //! Closed work/source/resource boundary. Loading never mines or collects anything.
-use super::*;
+use super::{FlightMode, MINING_RANGE, RigidPose, World, flight_pose};
 use crate::save::{MAX_SAVE_BYTES, SaveError, Writer};
 impl World {
     pub(super) fn check_mining_capacity(
