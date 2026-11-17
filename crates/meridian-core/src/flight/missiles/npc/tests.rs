@@ -180,7 +180,9 @@ fn actual_finite_seven_rounds_can_destroy_npc_without_award_loot_refill_or_respa
     );
     assert_eq!(w.save_bytes().unwrap(), before);
     let mut loaded = cold(&w);
-    step(&mut loaded, 1000);
+    for _ in 0..1000 {
+        step(&mut loaded, 1);
+    }
     assert_eq!(trader(&loaded).id, id);
     assert_eq!(trader(&loaded).phase, NpcPhase::Destroyed);
     assert_eq!(trader(&loaded).cargo, None);

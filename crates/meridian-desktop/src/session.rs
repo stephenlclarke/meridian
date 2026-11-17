@@ -1250,7 +1250,10 @@ mod tests {
                 .unwrap_or_else(|| panic!("Expected rounds[2]"))
                 .item
         );
-        assert_eq!(projectile.target, beacons[0].id);
+        assert_eq!(
+            projectile.target,
+            meridian_core::MissileTarget::Practice(beacons[0].id)
+        );
         assert!(
             session
                 .lines(&world, true, None)
