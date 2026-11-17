@@ -319,7 +319,7 @@ impl State {
                 .beam_block_distance(
                     world.state.station.ok_or(INVALID)?,
                     ray.position,
-                    direction,
+                    ray.orientation.z,
                     travel,
                 )
                 .map_err(|_| INVALID)?;
@@ -327,15 +327,14 @@ impl State {
             if cleared
                 && m.player_alive
                 && let Some(d) = data
-                    .player_beam_distance(player, ray.position, direction, travel)
+                    .player_beam_distance(player, ray.position, ray.orientation.z, travel)
                     .map_err(|_| INVALID)?
             {
                 choose(
                     &mut best,
                     d,
                     MissileContact::Player {
-                        front: sub(add(ray.position, scale(direction, d)), player.position)
-                            .dot(player.orientation.z)
+                        front: sub(ray_point(ray, d), player.position).dot(player.orientation.z)
                             >= 0.0,
                     },
                 );
@@ -343,7 +342,7 @@ impl State {
             self.validate_motion_bodies(p, i, m, ray, travel, &mut best)?;
             choose_scene(world, &p, scene, ray, travel, &mut best).map_err(|_| INVALID)?;
             let used = best.map_or(travel, |(d, _)| d);
-            if p.position != add(m.position, scale(direction, used))
+            if p.position != ray_point(ray, used)
                 || p.propulsion_travel != m.travel + used
                 || p.contact != best.map(|(_, c)| c)
                 || p.muzzle_cleared

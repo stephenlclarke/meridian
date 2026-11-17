@@ -116,3 +116,5 @@ setting or gate is weakened. The corrected source is uncompiled and untested
 until independent delta review and owning execution. Three observer example
 cases, release build, coverage, signing and native gameplay remain unrun.
 There is no new qualified preview or full 1337 parity claim.
+
+Mac qualification passed all 455 workspace Rust cases on the current NPC source, while Linux retained one checked-save failure in the seven-round case. A source-consistency correction now unifies new NPC movement and receipts on the exact native ray endpoint, with two authored unrun regressions and an independently frozen native-geometry arithmetic reference. The actual Linux failed guard and values remain unknown; this is not a verified Linux cure.

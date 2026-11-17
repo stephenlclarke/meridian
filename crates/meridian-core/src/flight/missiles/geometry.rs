@@ -56,6 +56,11 @@ pub(super) fn pose(position: Vec3, direction: Vec3) -> Option<RigidPose> {
         orientation: Basis3 { x, y, z },
     })
 }
+/// Endpoint of the exact ray used for native contact. Never normalize it again.
+pub(super) fn ray_point(ray: RigidPose, distance: f64) -> Vec3 {
+    add(ray.position, scale(ray.orientation.z, distance))
+}
+
 pub(super) fn mesh_distance(projectile: RigidPose, ray: RigidPose, range: f64) -> Option<f64> {
     let v = MISSILE_VERTICES.map(|v| add(projectile.position, projectile.orientation.apply(v)));
     let mut best = None;
@@ -75,3 +80,6 @@ pub(super) fn mesh_distance(projectile: RigidPose, ray: RigidPose, range: f64) -
     }
     best
 }
+
+#[cfg(test)]
+mod endpoint_tests;
