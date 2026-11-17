@@ -612,3 +612,180 @@ fn unsupported_damage_boundary_precedes_missile_graph_on_save_and_atomic_restore
     assert_eq!(live.restore_bytes(&unsupported), Err(expected));
     assert_eq!(live.save_bytes().unwrap(), before);
 }
+
+fn funded_lareria_station_flight(seed: u64) -> World {
+    use crate::flight::equipment::tests::{earned_world, journey};
+    let mut world = earned_world(seed);
+    world.request_refuel(world.snapshot().tick).unwrap();
+    journey(&mut world, SystemId::AVENOR);
+    world.request_refuel(world.snapshot().tick).unwrap();
+    let tick = world.snapshot().tick;
+    let review = world
+        .review_module(
+            crate::ModuleAction::Purchase {
+                kind: crate::ModuleKind::IntermediateNavigation,
+            },
+            tick,
+        )
+        .unwrap();
+    world.prepare_module(review, tick).unwrap().commit();
+    journey(&mut world, SystemId::LARERIA);
+    launch(&mut world);
+    aim_station(&mut world);
+    world
+}
+
+#[test]
+fn real_lareria_station_pulse_uses_exact_pools_crime_window_and_cold_receipt() {
+    let mut world = funded_lareria_station_flight(15941);
+    assert_eq!(
+        world.snapshot().navigation.unwrap().system,
+        SystemId::LARERIA
+    );
+    assert_eq!(world.legal_value(), Some(0));
+    assert_eq!(world.combat.windows, [None; 3]);
+    let pools = world.flight_resources_snapshot().unwrap();
+    assert_eq!(
+        (
+            pools.energy_hundredths,
+            pools.heat_fifths,
+            pools.cooldown_ticks
+        ),
+        (38_000, 0, 0)
+    );
+    let credits = world.credits_tenths();
+    let ammo = world.ammunition_snapshot();
+    let shot = world
+        .request_fire_front_pulse(world.snapshot().tick)
+        .unwrap();
+    assert!(matches!(shot.contact, PulseContact::StationBlocked { .. }));
+    let after = world.flight_resources_snapshot().unwrap();
+    assert_eq!(
+        (
+            after.energy_hundredths,
+            after.heat_fifths,
+            after.cooldown_ticks
+        ),
+        (37_900, 50, 18)
+    );
+    assert_eq!(world.credits_tenths(), credits);
+    assert_eq!(world.ammunition_snapshot(), ammo);
+    assert_eq!(world.legal_value(), Some(64));
+    let hit = world
+        .combat_snapshot()
+        .unwrap()
+        .last_ordinary_impact
+        .unwrap();
+    assert_eq!(hit.attacker.system, SystemId::LARERIA);
+    assert_eq!(hit.target, OrdinaryTarget::MainStation);
+    assert_eq!(hit.victim_entity, 1);
+    assert_eq!(hit.weapon, OrdinaryWeapon::FrontPulseLaser);
+    assert_eq!(hit.item, 15948);
+    assert_eq!(hit.point, shot.end);
+    assert_eq!(&world.combat.windows[..2], &[None; 2]);
+    assert_eq!(
+        world.combat.windows[2],
+        Some(AttackWindow {
+            visit: hit.attacker.visit,
+            physical_tick: hit.physical_tick,
+        })
+    );
+    let bytes = world.save_bytes().unwrap();
+    let mut cold = World::from_save_bytes(&bytes).unwrap();
+    assert_eq!(cold.combat, world.combat);
+    assert_eq!(
+        cold.flight_resources_snapshot(),
+        world.flight_resources_snapshot()
+    );
+    assert_eq!(cold.legal_value(), Some(64));
+
+    // Negative save fixture must not redirect Lareria's receipt to another station's window.
+    let window = cold.combat.windows[2].take();
+    cold.combat.windows[0] = window;
+    let forged = cold.unchecked_test_save().unwrap();
+    assert!(world.restore_bytes(&forged).is_err());
+    assert_eq!(world.save_bytes().unwrap(), bytes);
+    let mut cold = World::from_save_bytes(&bytes).unwrap();
+    for _ in 0..ATTACK_WINDOW {
+        cold.step(FlightInput::default()).unwrap();
+    }
+    let inclusive = cold.request_fire_front_pulse(cold.snapshot().tick).unwrap();
+    assert!(matches!(
+        inclusive.contact,
+        PulseContact::StationBlocked { .. }
+    ));
+    assert_eq!(cold.legal_value(), Some(64));
+    let mut cold = World::from_save_bytes(&cold.save_bytes().unwrap()).unwrap();
+    for _ in 0..=ATTACK_WINDOW {
+        cold.step(FlightInput::default()).unwrap();
+    }
+    let later = cold.request_fire_front_pulse(cold.snapshot().tick).unwrap();
+    assert!(matches!(later.contact, PulseContact::StationBlocked { .. }));
+    assert_eq!(cold.legal_value(), Some(128));
+    let loaded = World::from_save_bytes(&cold.save_bytes().unwrap()).unwrap();
+    assert_eq!(loaded.combat, cold.combat);
+    assert_eq!(
+        loaded.flight_resources_snapshot(),
+        cold.flight_resources_snapshot()
+    );
+    assert_eq!(loaded.legal_value(), Some(128));
+}
+
+#[test]
+fn missile_station_reducer_and_codec_keep_three_independent_attack_windows() {
+    // Component mapping/codec proof. Successful World contact is exercised by the
+    // real laser above and the existing public missile station journeys.
+    let mut source = World::new_commander(15942).unwrap();
+    consent(&mut source);
+    launch(&mut source);
+    let target = source.practice_snapshot().unwrap().beacons.unwrap()[1].id;
+    let tick = source.snapshot().tick;
+    source.request_missile_lock(Some(target), tick).unwrap();
+    source.request_missile_arm(true, tick).unwrap();
+    let origin = source.request_fire_missile(tick).unwrap();
+    let mut combat = State::default();
+    let mut pulse = super::super::weapons::PulseResources::default();
+    for (index, system) in [SystemId::AVENOR, SystemId::RENAS, SystemId::LARERIA]
+        .into_iter()
+        .enumerate()
+    {
+        assert_eq!(station_index(system), Some(index));
+        let (reserved, emission) = combat.reserve_missile_emission().unwrap();
+        combat = reserved;
+        let mut fixture = origin;
+        fixture.owner.system = system;
+        fixture.owner.visit = 2 + index as u64;
+        fixture.emission = emission;
+        let (impact, penalty) = combat
+            .record_missile_impact(
+                &mut pulse,
+                fixture,
+                source.snapshot(),
+                origin.muzzle,
+                OrdinaryTarget::MainStation,
+            )
+            .unwrap();
+        assert_eq!(penalty, 64);
+        assert_eq!(impact.attacker.system, system);
+        assert_eq!(impact.weapon, OrdinaryWeapon::StandardMissile);
+        assert_eq!(impact.victim_entity, 1);
+        assert_eq!(
+            combat.windows[index],
+            Some(AttackWindow {
+                visit: fixture.owner.visit,
+                physical_tick: 0,
+            })
+        );
+    }
+    assert_eq!(combat.penalties, 3);
+    let mut writer = crate::save::Writer::new();
+    combat.encode(&mut writer);
+    let mut reader = crate::save::Reader::new(&writer.bytes);
+    let decoded = State::decode(&mut reader, crate::save::SAVE_VERSION).unwrap();
+    assert!(reader.finished());
+    assert_eq!(decoded, combat);
+    assert_eq!(
+        decoded.windows.map(|window| window.unwrap().visit),
+        [2, 3, 4]
+    );
+}

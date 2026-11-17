@@ -134,7 +134,7 @@ pub(super) struct State {
     physical_tick: u64,
     front: u16,
     rear: u16,
-    windows: [Option<AttackWindow>; 2],
+    windows: [Option<AttackWindow>; 3],
     penalties: u8,
     unbound_player_impact: bool,
     last: Option<OrdinaryImpact>,
@@ -147,7 +147,7 @@ impl Default for State {
             physical_tick: 0,
             front: SHIELD_CAPACITY,
             rear: SHIELD_CAPACITY,
-            windows: [None; 2],
+            windows: [None; 3],
             penalties: 0,
             unbound_player_impact: false,
             last: None,
@@ -743,6 +743,7 @@ fn station_index(system: SystemId) -> Option<usize> {
     match system {
         SystemId::AVENOR => Some(0),
         SystemId::RENAS => Some(1),
+        SystemId::LARERIA => Some(2),
         _ => None,
     }
 }
