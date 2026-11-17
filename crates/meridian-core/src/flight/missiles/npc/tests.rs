@@ -93,10 +93,18 @@ fn finish_npc(w: &mut World, id: ProjectileId) -> ProjectileSnapshot {
         if p.ended.is_some() {
             return p;
         }
-        // Release pursuit throttle and brake through the actual public controls.
-        // A valid self-hit still ends this projectile and fails the NPC-contact assertion.
+        // Keep tracking the actual moving victim rather than coasting across a
+        // later homing path. Real player contact still ends the missile normally.
+        let target = trader(w);
+        let state = w.snapshot();
+        let player = crate::flight::flight_pose(state.position, state.orientation).unwrap();
+        let delta = sub(target.pose.position, player.position);
+        let desired = delta.x.atan2(delta.z);
+        let yaw = player.orientation.z.x.atan2(player.orientation.z.z);
+        let error = (desired - yaw).sin().atan2((desired - yaw).cos());
         w.step(crate::FlightInput {
-            brake: true,
+            yaw: (error / (0.65 / 60.0)).clamp(-1.0, 1.0) as f32,
+            throttle: if error.abs() < 0.3 { 1.0 } else { -1.0 },
             ..crate::FlightInput::default()
         })
         .unwrap();
