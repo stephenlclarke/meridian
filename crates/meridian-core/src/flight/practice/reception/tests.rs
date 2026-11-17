@@ -266,8 +266,7 @@ fn assert_resealed_wrong_terminal_refused(world: &mut World, live: &[u8]) {
     let practice = world.practice.unwrap();
     let mut original = Writer::new();
     practice.encode(&mut original);
-    let end = live.len()
-        - 13
+    let end = crate::flight::persistence::pulse_save_start(world, live)
         - crate::flight::persistence::combat_save_len(world)
         - 1
         - original.bytes.len();
@@ -324,8 +323,7 @@ fn v6_active_quiet_anchor_cannot_predate_a_recent_cooldown_zero_warm_pulse() {
     let practice = world.practice.unwrap();
     let mut encoded = Writer::new();
     practice.encode(&mut encoded);
-    let reception_end = live.len()
-        - 13
+    let reception_end = crate::flight::persistence::pulse_save_start(&world, &live)
         - crate::flight::persistence::combat_save_len(&world)
         - 1
         - encoded.bytes.len();

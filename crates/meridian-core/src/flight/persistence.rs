@@ -592,6 +592,11 @@ impl World {
         // missile graph checks the numeric shield result against retained origins.
         self.combat.validate_damage_boundary(self)?;
         self.validate_practice_ledger(practice, history, trace, nav)?;
+        // Preserve the established lesson-specific refusal before the newly exact
+        // shared player-pool replay checks the same altered weapon resources.
+        for attempt in practice::lifecycle::lessons(practice, history) {
+            attempt.validate(nav, navigation, self.state, station, self.pulse)?;
+        }
         lesson.validate(self, nav, practice, history)?;
         commerce.lesson.validate(
             self,
@@ -647,9 +652,6 @@ impl World {
         } else {
             self.pulse
                 .validate_save(self.state.tick, self.state.mode, nav.launches)?;
-        }
-        for attempt in practice::lifecycle::lessons(practice, history) {
-            attempt.validate(nav, navigation, self.state, station, self.pulse)?;
         }
         session.validate_save(navigation.dock())?;
         let domain = account.validate_saved_domain(&session.state, nav, session.epoch())?;
@@ -1003,6 +1005,26 @@ pub(super) fn v7_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
 #[cfg(test)]
 pub(super) fn v8_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
     legacy_test_fixture(world, 8)
+}
+
+/// Locate the current pulse field for semantic corruption tests without assuming
+/// that the private NPC/resource extensions are absent. Verify both actual bytes.
+#[cfg(test)]
+pub(super) fn pulse_save_start(world: &World, bytes: &[u8]) -> usize {
+    let mut extension = Writer::new();
+    world.traffic.encode(&mut extension);
+    world.damage.encode(&mut extension);
+    let extension_end = bytes.len() - 8;
+    let extension_start = extension_end - extension.bytes.len();
+    assert_eq!(
+        &bytes[extension_start..extension_end],
+        extension.bytes.as_slice()
+    );
+    let mut pulse = Writer::new();
+    world.pulse.encode_save(&mut pulse);
+    let start = extension_start - pulse.bytes.len();
+    assert_eq!(&bytes[start..extension_start], pulse.bytes.as_slice());
+    start
 }
 
 #[cfg(test)]

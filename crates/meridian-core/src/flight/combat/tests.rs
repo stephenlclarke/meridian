@@ -367,7 +367,8 @@ fn save_validation_refuses_removed_failure_forged_contact_and_unearned_legal_bit
     failure.option(world.practice.unwrap().ordinary_hit.as_ref(), |w, hit| {
         hit.encode(w)
     });
-    let failure_start = live.len() - 13 - failure.bytes.len();
+    let failure_start =
+        crate::flight::persistence::pulse_save_start(&world, &live) - failure.bytes.len();
     let mut removed = live[..live.len() - 8].to_vec();
     removed.splice(failure_start..failure_start + failure.bytes.len(), [0]);
     let digest = crate::save::checksum(&removed);
@@ -457,7 +458,7 @@ fn resealed_station_receipt_requires_owned_pulse_resources_without_practice_anch
     let laser = world.pulse_laser_snapshot().unwrap();
     assert_eq!(laser.cooldown_ticks, 18);
     let live = world.save_bytes().unwrap();
-    let pulse_start = live.len() - 13;
+    let pulse_start = crate::flight::persistence::pulse_save_start(&world, &live);
     let mut reset = live.clone();
     reset[pulse_start..pulse_start + 2].copy_from_slice(&38_000_u16.to_le_bytes());
     reset[pulse_start + 2..pulse_start + 5].fill(0);
@@ -531,7 +532,8 @@ fn resealed_last_station_window_cannot_be_refreshed_without_a_new_incident() {
     step(&mut world, 1);
     assert_eq!(world.combat.physical_tick - hit.physical_tick, 601);
     let live = world.save_bytes().unwrap();
-    let combat_start = live.len() - 13 - crate::flight::persistence::combat_save_len(&world);
+    let combat_start = crate::flight::persistence::pulse_save_start(&world, &live)
+        - crate::flight::persistence::combat_save_len(&world);
     let window = world.combat.windows[0].unwrap();
     assert_eq!(window.physical_tick, hit.physical_tick);
     assert_eq!(window.visit, hit.attacker.visit);
