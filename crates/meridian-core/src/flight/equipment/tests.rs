@@ -454,7 +454,7 @@ fn original_v4_paid_and_hot_world_loads_with_no_t02_authority() {
     let current = world.save_bytes().unwrap();
     assert_eq!(
         crate::flight::persistence::v4_test_fixture(&world),
-        Err(SaveError::InvalidState(
+        Err(crate::save::SaveError::InvalidState(
             "physical traffic requires current format"
         ))
     );
