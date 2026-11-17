@@ -51,24 +51,92 @@ class NativeCoverageHarnessTests(unittest.TestCase):
             smoke.main()
         self.assertEqual(list(outside.iterdir()), [])
 
-    def test_fixed_report_requires_positive_hits_for_every_native_adapter(self):
+    def native_boundary_report(self):
+        # Copy real Rust source. Only the four OS/GPU boundary rows receive fixture hits.
+        required = {
+            Path("crates/meridian-desktop/src/app.rs"): ("r.map(Renderer::logical_viewport)",),
+            Path("crates/meridian-desktop/src/renderer.rs"): (
+                "let scale = self.window.scale_factor();",
+                "|bytes| self.queue.write_buffer(&self.hud_vertices, 0, bytes),",
+            ),
+        }
         records = []
-        for path, markers in checker.REQUIRED.items():
-            self.write(path, "\n".join(markers))
+        boundaries = []
+        for path, markers in required.items():
+            source = (SCRIPTS.parents[1] / path).read_text()
+            self.write(path, source)
             records.append(f"SF:{self.root / path}")
-            for line, _ in enumerate(markers, 1):
-                records.extend([f"DA:{line},0", f"DA:{line},3"])
+            for line, text in enumerate(source.splitlines(), 1):
+                if text.strip() in markers:
+                    boundaries.append((path, line, text.strip()))
+                    records.extend([f"DA:{line},0", f"DA:{line},3"])
             records.append("end_of_record")
         report = self.write("coverage/native/desktop.lcov", "\n".join(records))
+        self.assertEqual(len(boundaries), 4)
+        return report, boundaries
+
+    def test_fixed_report_requires_positive_hits_for_every_native_adapter(self):
+        report, boundaries = self.native_boundary_report()
         output = io.StringIO()
         with contextlib.redirect_stdout(output):
             checker.main()
         measurements = json.loads(output.getvalue())
         self.assertEqual(sum(len(rows) for rows in measurements.values()), 3)
-        self.assertTrue(all(row["hits"] == 3 for rows in measurements.values() for row in rows.values()))
-        report.write_text(report.read_text().replace("DA:2,3", "DA:2,0"))
+        observed = [row for markers in measurements.values() for rows in markers.values() for row in rows]
+        self.assertEqual(len(observed), 4)
+        self.assertTrue(all(row["hits"] == 3 for row in observed))
+        queue_line = next(line for _, line, marker in boundaries if "queue.write_buffer" in marker)
+        report.write_text(report.read_text().replace(f"DA:{queue_line},3", f"DA:{queue_line},0"))
         with self.assertRaisesRegex(SystemExit, "queue.write_buffer"):
             checker.main()
+
+    def test_zero_or_missing_hits_at_either_os_scale_read_or_other_native_boundary_refuse(self):
+        report, boundaries = self.native_boundary_report()
+        original = report.read_text()
+        for _, line, marker in boundaries:
+            for count in ("zero", "missing"):
+                with self.subTest(marker=marker, line=line, count=count):
+                    replacement = f"DA:{line},0" if count == "zero" else ""
+                    changed = original.replace(f"DA:{line},3", replacement)
+                    if count == "missing":
+                        changed = changed.replace(f"DA:{line},0", "")
+                    report.write_text(changed)
+                    with self.assertRaises(SystemExit):
+                        checker.main()
+
+    def test_missing_or_duplicate_source_occurrences_refuse_despite_positive_fixture_hits(self):
+        for occurrence_count in ("missing", "duplicate"):
+            for marker in (
+                "r.map(Renderer::logical_viewport)",
+                "let scale = self.window.scale_factor();",
+                "|bytes| self.queue.write_buffer(&self.hud_vertices, 0, bytes),",
+            ):
+                with self.subTest(marker=marker, occurrence_count=occurrence_count):
+                    _, boundaries = self.native_boundary_report()
+                    path = next(path for path, _, text in boundaries if text == marker)
+                    source = self.root / path
+                    text = source.read_text()
+                    changed = (text.replace(marker, "", 1) if occurrence_count == "missing"
+                               else text + "\n" + marker + "\n")
+                    source.write_text(changed)
+                    with self.assertRaises(SystemExit):
+                        checker.main()
+
+    def test_helper_scale_and_other_queue_hits_cannot_replace_the_native_boundary_hits(self):
+        report, boundaries = self.native_boundary_report()
+        renderer = Path("crates/meridian-desktop/src/renderer.rs")
+        source = (self.root / renderer).read_text().splitlines()
+        helper = next(n for n, text in enumerate(source, 1) if "to_logical::<f64>(scale_factor())" in text)
+        other_queue = next(n for n, text in enumerate(source, 1) if text.strip() == "self.queue.write_buffer(")
+        records = [f"SF:{self.root / renderer}", f"DA:{helper},9", f"DA:{other_queue},9", "end_of_record"]
+        for _, line, marker in boundaries:
+            if "scale_factor" not in marker and "queue.write_buffer" not in marker:
+                continue
+            with self.subTest(marker=marker, line=line):
+                original, _ = self.native_boundary_report()
+                report.write_text(original.read_text().replace(f"DA:{line},3", "") + "\n" + "\n".join(records))
+                with self.assertRaises(SystemExit):
+                    checker.main()
 
     def test_smoke_rejects_missing_instrumented_binaries_before_creating_output(self):
         with self.assertRaisesRegex(RuntimeError, "must be built under target/debug"):
