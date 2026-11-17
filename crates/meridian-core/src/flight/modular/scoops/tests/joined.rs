@@ -76,7 +76,7 @@ fn old_fifteen_bytes_and_new_utility_relabelling_refuse_atomically() {
         World::from_save_bytes(&old).unwrap_err(),
         crate::save::SaveError::UnsupportedVersion
     );
-    let older = continued(&w);
+    let older = ok(World::from_save_bytes(&ok(w.save_bytes())));
     assert_eq!(older.credits_tenths(), w.credits_tenths());
     assert_eq!(
         older.modular_equipment_snapshot(),
