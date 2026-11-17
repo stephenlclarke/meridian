@@ -16,7 +16,75 @@ pub enum OrdinaryTarget {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OrdinaryWeapon {
     FrontPulseLaser,
+    FrontMiningLaser,
+    FrontBeamLaser,
+    FrontMilitaryLaser,
+    FrontNavalLaser,
     StandardMissile,
+}
+
+impl OrdinaryWeapon {
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::FrontPulseLaser => "PULSE",
+            Self::FrontMiningLaser => "MINING",
+            Self::FrontBeamLaser => "BEAM",
+            Self::FrontMilitaryLaser => "MILITARY",
+            Self::FrontNavalLaser => "NAVAL",
+            Self::StandardMissile => "MISSILE",
+        }
+    }
+    pub fn damage_hundredths(self) -> u16 {
+        match self {
+            Self::FrontPulseLaser => 1500,
+            Self::FrontMiningLaser => 5000,
+            Self::FrontBeamLaser => 1500,
+            Self::FrontMilitaryLaser => 2300,
+            Self::FrontNavalLaser => 6400,
+            Self::StandardMissile => 16_000,
+        }
+    }
+    pub(super) fn from_module(kind: super::modular::ModuleKind) -> Option<Self> {
+        match kind {
+            super::modular::ModuleKind::PulseLaser => Some(Self::FrontPulseLaser),
+            super::modular::ModuleKind::MiningLaser => Some(Self::FrontMiningLaser),
+            super::modular::ModuleKind::BeamLaser => Some(Self::FrontBeamLaser),
+            super::modular::ModuleKind::MilitaryLaser => Some(Self::FrontMilitaryLaser),
+            super::modular::ModuleKind::NavalLaser => Some(Self::FrontNavalLaser),
+            _ => None,
+        }
+    }
+    pub(crate) fn is_laser(self) -> bool {
+        self != Self::StandardMissile
+    }
+    pub fn cooldown_ticks(self) -> u8 {
+        match self {
+            Self::FrontBeamLaser | Self::FrontMilitaryLaser | Self::FrontNavalLaser => 6,
+            Self::StandardMissile => 0,
+            _ => 18,
+        }
+    }
+    pub(crate) fn tag(self) -> u8 {
+        match self {
+            Self::FrontPulseLaser => 0,
+            Self::StandardMissile => 1,
+            Self::FrontMiningLaser => 2,
+            Self::FrontBeamLaser => 3,
+            Self::FrontMilitaryLaser => 4,
+            Self::FrontNavalLaser => 5,
+        }
+    }
+    pub(crate) fn from_tag(tag: u8) -> Result<Self, SaveError> {
+        match tag {
+            0 => Ok(Self::FrontPulseLaser),
+            1 => Ok(Self::StandardMissile),
+            2 => Ok(Self::FrontMiningLaser),
+            3 => Ok(Self::FrontBeamLaser),
+            4 => Ok(Self::FrontMilitaryLaser),
+            5 => Ok(Self::FrontNavalLaser),
+            _ => Err(SaveError::InvalidEncoding),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -93,6 +161,7 @@ pub(super) struct PreparedPulseImpact {
     identity: CombatIdentity,
     opening_legal: u8,
     item: u64,
+    weapon: OrdinaryWeapon,
     opening_pulse: super::weapons::PulseResources,
     opening_damage: super::damage::State,
     damage: super::damage::State,
@@ -103,6 +172,14 @@ pub(super) struct PreparedPulseImpact {
     hit: Option<OrdinaryImpact>,
 }
 impl State {
+    pub(super) fn reserve_mining_emission(self) -> Result<(Self, u64), FireError> {
+        let mut next = self;
+        next.emissions = next
+            .emissions
+            .checked_add(1)
+            .ok_or(FireError::SequenceExhausted)?;
+        Ok((next, next.emissions))
+    }
     pub(super) fn shields(self) -> [u16; 2] {
         [self.front, self.rear]
     }
@@ -121,6 +198,9 @@ impl State {
         let absorbed = (*shield).min(damage);
         *shield -= absorbed;
         pulse.damage_energy(damage - absorbed);
+    }
+    pub(super) fn last_impact(self) -> Option<OrdinaryImpact> {
+        self.last
     }
     pub(super) fn physical_tick(self) -> u64 {
         self.physical_tick
@@ -217,10 +297,7 @@ impl State {
     ) {
         if let OrdinaryTarget::Player { front } = target {
             self.unbound_player_impact = true;
-            let damage: u16 = match weapon {
-                OrdinaryWeapon::FrontPulseLaser => 1500,
-                OrdinaryWeapon::StandardMissile => 16_000,
-            };
+            let damage = weapon.damage_hundredths();
             self.apply_bound_player_damage(pulse, front, damage);
         }
         // The supported original-main actor has no authored nativeStationIdentity:
@@ -287,10 +364,11 @@ impl State {
         let invalid = SaveError::InvalidState("ordinary combat identity or resources");
         let identity = world.combat_identity().ok_or(invalid)?;
         self.validate_damage_boundary(world)?;
+        let shortest_cooldown = if world.damage.enabled() { 6 } else { 18 };
         let maximum_emissions = if world.state.tick == 0 {
             0
         } else {
-            1 + (world.state.tick - 1) / 18
+            1 + (world.state.tick - 1) / shortest_cooldown
         };
         if self.physical_tick > world.state.tick
             || self.emissions > maximum_emissions.saturating_add(world.missiles.used() as u64)
@@ -328,6 +406,7 @@ impl State {
             if elapsed_physical > elapsed_global
                 || (elapsed_global == 0 && !uninterrupted)
                 || (hit.weapon == OrdinaryWeapon::FrontPulseLaser
+                    && !world.damage.enabled()
                     && !world.pulse.fits_ordinary_hit(
                         elapsed_physical,
                         uninterrupted,
@@ -378,6 +457,9 @@ impl World {
         shot: PulseShot,
     ) -> Result<PreparedPulseImpact, FireError> {
         let identity = self.combat_identity().ok_or(FireError::NoCommander)?;
+        let fitted = self
+            .fitted_front_laser()
+            .ok_or(FireError::NoFittedFrontLaser)?;
         let legal = self.legal_value().ok_or(FireError::NoCommander)?;
         let pose = flight_pose(self.state.position, self.state.orientation)
             .ok_or(FireError::InvalidGeometry)?;
@@ -386,7 +468,7 @@ impl World {
             || self.is_paused()
             || shot.origin != pose.position
             || shot.direction != pose.orientation.z
-            || self.fitted_front_pulse() != Some(shot.fitted_item_id)
+            || fitted.0 != shot.fitted_item_id
         {
             return Err(FireError::StaleCommand);
         }
@@ -395,7 +477,7 @@ impl World {
         {
             return Err(FireError::InvalidGeometry);
         }
-        let mut pulse = self.pulse.prepare_discharge()?;
+        let mut pulse = self.pulse.prepare_laser_discharge(fitted.1)?;
         let mut next = self.combat;
         next.emissions = next
             .emissions
@@ -425,7 +507,7 @@ impl World {
                 emission: next.emissions,
                 incident: next.incidents,
                 item: shot.fitted_item_id,
-                weapon: OrdinaryWeapon::FrontPulseLaser,
+                weapon: fitted.1,
                 target: OrdinaryTarget::MainStation,
                 victim_entity: 1,
                 tick: shot.tick,
@@ -434,11 +516,7 @@ impl World {
                 position: self.state.position,
                 orientation: self.state.orientation,
             };
-            next.resolve_impact(
-                &mut pulse,
-                OrdinaryTarget::MainStation,
-                OrdinaryWeapon::FrontPulseLaser,
-            );
+            next.resolve_impact(&mut pulse, OrdinaryTarget::MainStation, fitted.1);
             next.last = Some(receipt);
             hit = Some(receipt);
         }
@@ -448,9 +526,10 @@ impl World {
             identity,
             opening_legal: legal,
             item: shot.fitted_item_id,
+            weapon: fitted.1,
             opening_pulse: self.pulse,
             opening_damage: self.damage.clone(),
-            damage: self.damage.pulse(self.combat.physical_tick())?,
+            damage: self.damage.laser(self.combat.physical_tick(), fitted.1)?,
             pulse,
             epoch: self
                 .freight_session
@@ -495,7 +574,7 @@ impl PreparedPulseImpact {
             || world.damage != self.opening_damage
             || world.combat_identity() != Some(self.identity)
             || world.legal_value() != Some(self.opening_legal)
-            || world.fitted_front_pulse() != Some(self.item)
+            || world.fitted_front_laser() != Some((self.item, self.weapon))
         {
             return Err(FireError::StaleCommand);
         }
@@ -557,19 +636,13 @@ impl OrdinaryImpact {
             w.f32(n);
         }
         if version >= 8 {
-            w.u8(match self.weapon {
-                OrdinaryWeapon::FrontPulseLaser => 0,
-                OrdinaryWeapon::StandardMissile => 1,
-            });
+            w.u8(self.weapon.tag());
             w.u8(match self.target {
                 OrdinaryTarget::MainStation => 0,
                 OrdinaryTarget::Player { front: true } => 1,
                 OrdinaryTarget::Player { front: false } => 2,
             });
         }
-    }
-    pub(super) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
-        Self::decode_version(r, 8)
     }
     pub(super) fn decode_version(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
         let victim_entity = r.u64()?;
@@ -600,11 +673,11 @@ impl OrdinaryImpact {
             orientation: r.array(|r| r.f32())?,
         };
         if version >= 8 {
-            hit.weapon = match r.u8()? {
-                0 => OrdinaryWeapon::FrontPulseLaser,
-                1 => OrdinaryWeapon::StandardMissile,
-                _ => return Err(SaveError::InvalidEncoding),
-            };
+            let tag = r.u8()?;
+            if version < 16 && tag > 1 {
+                return Err(SaveError::InvalidEncoding);
+            }
+            hit.weapon = OrdinaryWeapon::from_tag(tag)?;
             hit.target = match r.u8()? {
                 0 => OrdinaryTarget::MainStation,
                 1 => OrdinaryTarget::Player { front: true },
@@ -634,9 +707,7 @@ impl OrdinaryImpact {
             )
             .map_err(|_| invalid)?
             .ok_or(invalid)?;
-        if self.weapon != OrdinaryWeapon::FrontPulseLaser
-            || self.target != OrdinaryTarget::MainStation
-        {
+        if !self.weapon.is_laser() || self.target != OrdinaryTarget::MainStation {
             return Err(SaveError::InvalidState(
                 "unsupported missile impact save boundary",
             ));
@@ -644,7 +715,7 @@ impl OrdinaryImpact {
         if self.victim_entity != 1
             || self.attacker.owner != current.owner
             || self.attacker.hull != current.hull
-            || self.item != current.owner.checked_add(7).ok_or(invalid)?
+            || world.owned_front_laser_at(self.item, self.tick, self.attacker) != Some(self.weapon)
             || station_index(self.attacker.system).is_none()
             || self.attacker.visit < 2
             || self.attacker.visit > current.visit
@@ -654,6 +725,13 @@ impl OrdinaryImpact {
             || self.incident == 0
             || self.emission < self.incident
             || self.physical_tick > self.tick
+            || !world.mining_segment_at_step(
+                self.attacker.system,
+                self.tick,
+                pose.position,
+                self.point,
+                0.0,
+            )
             || self.point != add_scaled(pose.position, pose.orientation.z, distance)
             || (self.tick == world.state.tick
                 && (self.position != world.state.position

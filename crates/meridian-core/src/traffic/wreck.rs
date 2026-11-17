@@ -1,6 +1,6 @@
 //! Ordinary manifest settlement stops before eligible cargo geometry and actor issuance.
 use super::{Actor, BeamSource, CommodityId, NpcId, NpcPhase, RigidPose, State, Vec3};
-use crate::{ProjectileId, station_services::CargoUnit};
+use crate::{OrdinaryWeapon, ProjectileId, station_services::CargoUnit};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WreckManifestError {
@@ -16,7 +16,10 @@ pub enum WreckManifestError {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WreckDamageSource {
-    Pulse(BeamSource),
+    Laser {
+        weapon: OrdinaryWeapon,
+        source: BeamSource,
+    },
     Missile(ProjectileId),
 }
 
@@ -129,17 +132,15 @@ impl State {
             .enumerate()
             .filter(|(_, h)| h.victim == actor.id)
             .map(|(index, h)| {
-                let phase = if matches!(h.source, BeamSource::Npc(_)) {
-                    0
-                } else {
-                    2
-                };
                 (
-                    (h.local_tick, h.world_tick, phase, index),
+                    h.resource_order(index),
                     TerminalContact {
                         world: h.world_tick,
                         local: h.local_tick,
-                        cause: WreckDamageSource::Pulse(h.source),
+                        cause: WreckDamageSource::Laser {
+                            weapon: h.weapon,
+                            source: h.source,
+                        },
                         pose: h.victim_pose,
                         point: h.point,
                     },
@@ -152,7 +153,7 @@ impl State {
             .filter(|(_, h)| h.victim == actor.id)
             .map(|(index, h)| {
                 (
-                    (h.local_tick, h.world_tick, 1, index),
+                    h.resource_order(index),
                     TerminalContact {
                         world: h.world_tick,
                         local: h.local_tick,

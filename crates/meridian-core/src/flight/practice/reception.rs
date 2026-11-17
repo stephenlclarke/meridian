@@ -4,7 +4,6 @@ use super::{
 };
 #[cfg(test)]
 use super::{FlightMode, Vec3};
-use crate::flight::weapons::PulseResources;
 use crate::navigation::DockOrigin;
 use crate::save::{Reader, SaveError, Writer};
 
@@ -193,9 +192,10 @@ impl Practice {
         self,
         nav: crate::navigation::SavedNavigationSummary,
         flight: Snapshot,
-        pulse: PulseResources,
+        world: &World,
         current_dock: Option<DockContext>,
     ) -> Result<(), SaveError> {
+        let pulse = world.pulse;
         let invalid = SaveError::InvalidState("T02 ceasefire or reception");
         if self
             .terminal_tick()
@@ -246,7 +246,14 @@ impl Practice {
             return Ok(());
         }
         if (ready && !self.reception_is_terminal() && pulse.remaining_cooldown() != 0)
-            || (self.retired.is_none() && !pulse.fits_quiet_anchor(flight.tick, anchor))
+            || (self.retired.is_none()
+                && !(if world.damage.has_rapid_spend() {
+                    world
+                        .damage
+                        .quiet_since(flight.tick, anchor, world.combat.physical_tick())
+                } else {
+                    pulse.fits_quiet_anchor(flight.tick, anchor)
+                }))
         {
             return Err(invalid);
         }

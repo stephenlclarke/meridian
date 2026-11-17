@@ -145,6 +145,7 @@ pub enum BeamSource {
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct TrafficBeam {
+    pub weapon: crate::flight::OrdinaryWeapon,
     pub source: BeamSource,
     pub victim: NpcId,
     pub world_tick: u64,
@@ -311,6 +312,7 @@ pub(crate) struct PlayerTarget {
     pub(crate) cargo: bool,
 }
 pub(crate) struct PlayerBeamInput {
+    pub(crate) weapon: crate::flight::OrdinaryWeapon,
     pub(crate) system: SystemId,
     pub(crate) source: BeamSource,
     pub(crate) origin: Vec3,
@@ -547,5 +549,12 @@ impl State {
             .flatten()
             .find(|a| a.id == id)
             .map(|a| (a.manifest, a.units, a.sold))
+    }
+}
+
+#[cfg(test)]
+impl State {
+    pub(crate) fn corrupt_beams(&mut self, corrupt: impl FnOnce(&mut [TrafficBeam])) {
+        corrupt(Arc::make_mut(&mut self.shots).as_mut_slice());
     }
 }

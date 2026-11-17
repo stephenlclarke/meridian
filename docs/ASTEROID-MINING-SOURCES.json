@@ -1,0 +1,44 @@
+{
+  "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "tree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "method": "fixed-object git show/ls-tree only; no original program execution",
+  "scope": "Native Mining Laser work, terminal pending ore, chunk energy/material/units, source scoop requirement; authored bounded Avenor placement and octahedra remain Meridian content. No original meshes or legacy player data copied. See ASTEROID-MINING.md and existing MODULAR-EQUIPMENT-SOURCES.json for paid installation facts.",
+  "files": [
+    {
+      "path": "Sources/L337Core/MiningWorkTool.swift",
+      "gitBlob": "50b8bda198d30637df9f34eeffc235efc484fbcc",
+      "bytes": 5278,
+      "sha256": "dd4f900b13f1c7cbaa0d34f44070d20e007ad138a0d393be9a02b2ddaa31e717"
+    },
+    {
+      "path": "Sources/L337Core/MiningLedger.swift",
+      "gitBlob": "c3d9602caecc56d15ee8f74442ab2cbab365c6e9",
+      "bytes": 37858,
+      "sha256": "a9f4dcb955fe49db47ced2a138d0f1ea13b84aa71e2fc91c99142c7f25e5390f"
+    },
+    {
+      "path": "Sources/L337Core/AsteroidBeltDefinition.swift",
+      "gitBlob": "fc7c599ce1301509dde7353c849f53d77c164df7",
+      "bytes": 3761,
+      "sha256": "c8316429564153dd812347b6cdaf10191e958f3bbd95c36d3b054e1943bf1924"
+    },
+    {
+      "path": "Sources/L337Core/MiningFields.swift",
+      "gitBlob": "3472842b05446a98ff18d203501274c196eebe8d",
+      "bytes": 7550,
+      "sha256": "7afa28c42f052dab2d790868e6cac15d10f5a603463105624e9dfccd8f468ac3"
+    },
+    {
+      "path": "Sources/L337Core/CargoScooping.swift",
+      "gitBlob": "1fe6b4d9a97b76608697af5ff4b154df478b1b65",
+      "bytes": 5616,
+      "sha256": "6dae2421062621fee0f992d2648f501403c87cb87f77138127175eab6390ced7"
+    },
+    {
+      "path": "Sources/L337Core/Geometry.swift",
+      "gitBlob": "3810ff536ce81e344e058a2448e5fbe5f29fa3d8",
+      "bytes": 7438,
+      "sha256": "b9751c66c3f6e86f4a0ae541a7dcbcdec2fef526f9570107d7a4cef3da7380bb"
+    }
+  ]
+}

@@ -10,7 +10,24 @@ impl World {
     pub(super) fn validate_traffic_player_scenes(&self) -> Result<(), crate::save::SaveError> {
         let invalid = crate::save::SaveError::InvalidState("NPC player scene receipt");
         for shot in self.traffic.beam_receipts() {
-            if !self.traffic_beam_celestial_clear(
+            match shot.source {
+                BeamSource::Npc(_) if shot.weapon != super::OrdinaryWeapon::FrontPulseLaser => {
+                    return Err(invalid);
+                }
+                BeamSource::Player { item, .. }
+                    if self.front_weapon_at_tick(item, shot.world_tick) != Some(shot.weapon) =>
+                {
+                    return Err(invalid);
+                }
+                _ => {}
+            }
+            if !self.mining_segment_at_step(
+                shot.victim.system(),
+                shot.world_tick,
+                shot.origin,
+                shot.point,
+                0.0,
+            ) || !self.traffic_beam_celestial_clear(
                 shot.victim.system(),
                 shot.world_tick,
                 shot.origin,
@@ -31,15 +48,17 @@ impl World {
             let scene = crate::celestial::scene(system, hit.visit, hit.world_tick, anchor);
             let a = hit.source_pose.position;
             let b = hit.point;
-            if [scene.planet, scene.sun].into_iter().any(|body| {
-                body.blocks_motion(
-                    [a.x as f32, a.y as f32, a.z as f32],
-                    [b.x as f32, b.y as f32, b.z as f32],
-                    0.0,
-                )
-            }) || (hit.world_tick == self.state.tick
-                && super::flight_pose(self.state.position, self.state.orientation)
-                    != Some(hit.player_pose))
+            if !self.mining_segment_at_step(hit.attacker.system(), hit.world_tick, a, b, 0.0)
+                || [scene.planet, scene.sun].into_iter().any(|body| {
+                    body.blocks_motion(
+                        [a.x as f32, a.y as f32, a.z as f32],
+                        [b.x as f32, b.y as f32, b.z as f32],
+                        0.0,
+                    )
+                })
+                || (hit.world_tick == self.state.tick
+                    && super::flight_pose(self.state.position, self.state.orientation)
+                        != Some(hit.player_pose))
             {
                 return Err(invalid);
             }
@@ -167,15 +186,16 @@ impl World {
                 .is_some_and(|s| s.freight.held_tonnes > 0);
         let celestial = self.celestial_snapshot();
         let celestial_clear = |a: crate::docking::Vec3, b: crate::docking::Vec3, radius: f64| {
-            celestial.is_none_or(|scene| {
-                [scene.planet, scene.sun].into_iter().all(|body| {
-                    !body.blocks_motion(
-                        [a.x as f32, a.y as f32, a.z as f32],
-                        [b.x as f32, b.y as f32, b.z as f32],
-                        radius,
-                    )
+            self.mining_segment_at_step(current.system, next.tick, a, b, radius)
+                && celestial.is_none_or(|scene| {
+                    [scene.planet, scene.sun].into_iter().all(|body| {
+                        !body.blocks_motion(
+                            [a.x as f32, a.y as f32, a.z as f32],
+                            [b.x as f32, b.y as f32, b.z as f32],
+                            radius,
+                        )
+                    })
                 })
-            })
         };
         let beam_clear =
             |origin: crate::docking::Vec3, direction: crate::docking::Vec3, range: f64| {
@@ -269,6 +289,10 @@ impl World {
                     .as_ref()
                     .ok_or(FireError::InvalidGeometry)?,
                 traffic::PlayerBeamInput {
+                    weapon: self
+                        .fitted_front_laser()
+                        .ok_or(FireError::NoFittedFrontLaser)?
+                        .1,
                     system: owner.system,
                     source: BeamSource::Player {
                         owner: owner.owner,

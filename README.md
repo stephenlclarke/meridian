@@ -45,9 +45,13 @@ The twelve new preparation/query/replay tests address the actual coverage and du
 
 Successful player Pulse contact, an NPC kill and more than three actual projectiles were not observed in the bounded native journey. Other populations, NPC-owned missile launch producers, additional hull admissions, full equipment, memory, window/focus edges and measured frame timing/race remain open. Full original **1337 visual and gameplay parity** is required; source tests and renderer screenshots do not establish complete game acceptance. Private save format 15 refuses draft 14 and retains explicit qualified older readers.
 
-## Following wreck manifest development
+## Following paid mining development
 
-The [M02 wreck source slice](docs/WRECK-MANIFEST.md) binds an actual destroyed SH025 trader's already paid goods to its native terminal contact in the existing World. Three authored tests remain UNRUN. It retains the historical receipt and does not issue physical pods, move any cargo to the player or grant a sale. Physical recovery, section cutting and boarding retain separate original dependencies.
+The [mining source](docs/ASTEROID-MINING.md) joins genuine paid Mining Laser work to the actual World: 50-damage native strokes, finite partial energy, terminal pending ore, shared ship resources, retained contact history and cold continuation. Fifteen new Rust cases are authored **UNRUN**. No cargo or cash is credited by mining. The original requires Fuel Scoops; collection refuses without a fitted scoop or without an eligible ore body, and ordinary sale has no mined cargo. The current source candidate shares one resource journal and save format with the expanded laser and energy equipment. The paid Fuel Scoops now share the module ledger in the staged source. The typed utility menu and flight renderer are wired to the same candidate. Owning validation remains pending. The authored Avenor segment is not complete original orbital/presence parity or a delivered mining preview.
+
+## Destroyed trader manifest custody
+
+An actual fatal fitted laser or missile contact now ties the SH025 trader’s paid goods to the existing combat history. The wreck receipt records the retained laser or missile identity. Four Rust tests on this successor await the owning run. Physical recovery, section cutting and boarding require their own original producers. See the [wreck manifest guide](docs/WRECK-MANIFEST.md).
 
 ## Play
 

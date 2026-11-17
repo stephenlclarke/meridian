@@ -1,6 +1,7 @@
 //! Pure docked presentation. Root owns input bindings, World transactions and durable commit.
 mod catalogue;
 mod controller;
+pub(crate) mod fuel_scoops;
 mod layout;
 mod presentation;
 #[cfg(test)]
