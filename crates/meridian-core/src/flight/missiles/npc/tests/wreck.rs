@@ -265,6 +265,22 @@ fn weaken_trader_with_missiles(world: &mut World, source: NpcId) {
             break;
         }
         let origin = fire_npc(world);
+        if missile_hits == 0 {
+            let lesson = world.practice.unwrap();
+            assert!(lesson.reception_is_terminal());
+            assert!(!lesson.missile_owner_matches(origin.owner));
+            assert_eq!(lesson.pending_missiles, 0);
+
+            // Apply the same first homing step as finish_npc and save while the missile is live.
+            world.step(trader_pilot(world)).unwrap();
+            assert!(
+                world
+                    .missile_projectiles()
+                    .any(|p| { p.origin.projectile == origin.projectile && p.ended.is_none() })
+            );
+            assert_eq!(world.practice.unwrap().pending_missiles, 0);
+            cold(world);
+        }
         let impact = finish_npc(world, origin.projectile);
         assert_eq!(impact.contact, Some(MissileContact::Npc(source)));
         assert_native_endpoint(world, impact);

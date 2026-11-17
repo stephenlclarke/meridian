@@ -1,4 +1,5 @@
 //! Finite owned starter rounds and World-derived original practice ordnance.
+use super::practice::Practice;
 use super::{CombatIdentity, FlightMode, PracticeBeaconId, Snapshot, StepError, World};
 use crate::docking::Vec3;
 use core::fmt;
@@ -22,15 +23,6 @@ pub const MISSILE_RANGE: f64 = 6000.0;
 pub const MISSILE_LIFETIME_TICKS: u16 = 1440;
 pub const MISSILE_COOLDOWN_TICKS: u8 = 60;
 pub const MISSILE_MUZZLE_DISTANCE: f64 = 24.0;
-
-#[cfg(test)]
-fn tracing_paid_beam_wreck_launch() -> bool {
-    std::thread::current().name()
-        == Some(concat!(
-            "flight::missiles::npc::tests::wreck::",
-            "mixed_missile_and_rapid_beam_history_keeps_the_actual_fatal_paid_laser_in_custody"
-        ))
-}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MissileError {
@@ -340,11 +332,11 @@ impl State {
         self.lock = None;
         self.cooldown = 0;
     }
-    pub(super) fn pending(&self) -> u8 {
+    pub(super) fn pending_for_lesson(&self, lesson: Practice) -> u8 {
         self.projectiles
             .iter()
             .flatten()
-            .filter(|p| p.ended.is_none())
+            .filter(|p| p.ended.is_none() && lesson.missile_owner_matches(p.origin.owner))
             .count() as u8
     }
 }
@@ -577,25 +569,14 @@ impl World {
         self.missiles.armed = false;
         self.missiles.cooldown = MISSILE_COOLDOWN_TICKS;
         if let Some(p) = &mut self.practice {
-            p.pending_missiles = self.missiles.pending();
+            p.pending_missiles = self.missiles.pending_for_lesson(*p);
             p.observe_discharge(tick);
         }
-        if let Err(_staged_error) = self.save_bytes() {
+        if self.save_bytes().is_err() {
             self.commander_account = old_account;
             self.combat = old_combat;
             self.missiles = old_missiles;
             self.practice = old_practice;
-            #[cfg(test)]
-            if tracing_paid_beam_wreck_launch() {
-                eprintln!(
-                    "staged missile save refusal: ordinal={ordinal} emission={emission} \
-                     tick={tick} physical_tick={} launch_visit={} error={_staged_error:?} \
-                     restored_save={:?}",
-                    origin.physical_tick,
-                    owner.visit,
-                    self.save_bytes().map(|_| ()),
-                );
-            }
             return Err(MissileError::SaveRefused);
         }
         Ok(origin)
@@ -705,7 +686,7 @@ impl World {
             prepared.pulse.alive(),
         );
         if let Some(p) = &mut prepared.practice {
-            p.pending_missiles = prepared.missiles.pending();
+            p.pending_missiles = prepared.missiles.pending_for_lesson(*p);
         }
         Ok(prepared)
     }
