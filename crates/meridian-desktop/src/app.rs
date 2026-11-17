@@ -89,6 +89,7 @@ struct App {
     keys: HashSet<KeyCode>,
     paused: bool,
     help: Option<crate::help::Panel>,
+    xyzzy: Option<crate::xyzzy::Menu>,
     focused: bool,
     docked: Option<Docked>,
     modifiers: ModifiersState,
@@ -122,6 +123,7 @@ impl App {
             keys: HashSet::new(),
             paused: false,
             help: None,
+            xyzzy: None,
             focused: true,
             docked: None,
             modifiers: ModifiersState::empty(),
@@ -152,7 +154,11 @@ impl App {
     }
 
     fn simulation_active(&self) -> bool {
-        self.focused && !self.occluded && !self.paused && self.help.is_none() && self.game.playing()
+        self.focused && !self.occluded && !self.paused && !self.modal_open() && self.game.playing()
+    }
+
+    fn modal_open(&self) -> bool {
+        self.help.is_some() || self.xyzzy.is_some()
     }
 
     fn request_redraw(&self) {
@@ -172,6 +178,9 @@ impl App {
     }
 
     fn help_panel(&self) -> crate::help::Panel {
+        if let Some(menu) = &self.xyzzy {
+            return menu.help();
+        }
         if !self.game.playing() {
             return crate::help::Panel::title();
         }
@@ -187,8 +196,14 @@ impl App {
             let weapon = self
                 .game
                 .world
-                .front_laser_snapshot()
-                .map(|laser| laser.weapon.label());
+                .modular_equipment_snapshot()
+                .and_then(|modules| {
+                    modules
+                        .items
+                        .into_iter()
+                        .find(|item| item.slot == Some(meridian_core::ModuleSlot::FrontLaser))
+                })
+                .map(|item| item.kind.name());
             crate::help::Panel::flight(weapon, review)
         }
     }
@@ -217,9 +232,70 @@ impl App {
         false
     }
 
+    fn route_xyzzy(&mut self, code: KeyCode, repeat: bool) -> bool {
+        let open =
+            code == KeyCode::KeyX && self.modifiers.control_key() && self.modifiers.shift_key();
+        if self.xyzzy.is_none() {
+            if !open {
+                return false;
+            }
+            if !repeat {
+                if self.game.playing() && self.game.world.current_dock_context().is_some() {
+                    self.xyzzy = Some(crate::xyzzy::Menu::default());
+                    self.clear_held_input();
+                } else {
+                    self.notice = Some(
+                        "XYZZY testing requires a commander at an actual station berth".into(),
+                    );
+                }
+                self.request_redraw();
+            }
+            return true;
+        }
+        if repeat {
+            return true;
+        }
+        match code {
+            KeyCode::Escape | KeyCode::KeyB => {
+                if self.xyzzy.as_mut().is_some_and(crate::xyzzy::Menu::back) {
+                    self.xyzzy = None;
+                    self.clear_held_input();
+                }
+            }
+            KeyCode::ArrowUp | KeyCode::ArrowDown => {
+                if let Some(menu) = &mut self.xyzzy {
+                    menu.select(code == KeyCode::ArrowDown);
+                }
+            }
+            KeyCode::Enter => self.confirm_xyzzy(),
+            _ => {}
+        }
+        self.request_redraw();
+        true
+    }
+
+    fn confirm_xyzzy(&mut self) {
+        let Some(menu) = &mut self.xyzzy else {
+            return;
+        };
+        if !menu.reviewing {
+            menu.reviewing = true;
+            return;
+        }
+        let action = menu.action();
+        match self.game.xyzzy(action) {
+            Ok(message) => {
+                self.notice = Some(message);
+                self.xyzzy = None;
+                self.sync_profile_controls();
+            }
+            Err(message) => self.notice = Some(message),
+        }
+    }
+
     fn reset_input(&mut self) {
         self.clear_held_input();
-        if self.help.is_some() {
+        if self.modal_open() {
             self.request_redraw();
             return;
         }
@@ -346,6 +422,9 @@ impl App {
     }
 
     fn request_quit(&mut self, event_loop: &ActiveEventLoop) {
+        if self.modal_open() {
+            return;
+        }
         match self.game.prepare_quit() {
             Ok(()) => event_loop.exit(),
             Err(error) => {
@@ -364,7 +443,7 @@ impl App {
             .is_some_and(|menu| menu.active(&self.game.world))
     }
     fn menu_input(&mut self, input: ui::Input) {
-        if self.help.is_some() {
+        if self.modal_open() {
             return;
         }
         if let Some(menu) = &mut self.docked
@@ -412,7 +491,7 @@ impl App {
     fn pointer(&mut self, point: [f64; 2]) {
         let previous = self.cursor;
         self.cursor = point;
-        if self.help.is_some() {
+        if self.modal_open() {
             return;
         }
         if self.menu_active() {
@@ -429,7 +508,7 @@ impl App {
         }
     }
     fn scroll(&mut self, amount: f64) {
-        if self.help.is_some() || !self.menu_active() || !amount.is_finite() {
+        if self.modal_open() || !self.menu_active() || !amount.is_finite() {
             return;
         }
         self.wheel -= amount;
@@ -495,7 +574,7 @@ impl App {
     }
 
     fn advance_frame(&mut self, active: bool, ticks: usize) -> FrameAdvance {
-        let result = if active && self.help.is_none() {
+        let result = if active && !self.modal_open() {
             let input = FlightInput {
                 pitch: self.axis(KeyCode::ArrowUp, KeyCode::ArrowDown),
                 yaw: self.axis(KeyCode::KeyD, KeyCode::KeyA),
@@ -575,6 +654,9 @@ impl App {
                 if self.route_help(code, repeat, text) {
                     return None;
                 }
+                if self.route_xyzzy(code, repeat) {
+                    return None;
+                }
                 if self.menu_active()
                     && self.docked.as_ref().is_some_and(Docked::search_active)
                     && let Some(text) = text.filter(|s| s.chars().all(|c| !c.is_control()))
@@ -616,7 +698,16 @@ impl App {
         }
         let viewport = viewport().and_then(|[width, height]| ui::Viewport::new(width, height));
         match (menu, viewport) {
-            (Some(menu), Some(viewport)) => menu.build_frame(world, viewport, elapsed).map(Some),
+            (Some(menu), Some(viewport)) => {
+                menu.build_frame(world, viewport, elapsed).map(|mut frame| {
+                    if world.xyzzy_snapshot().is_some_and(|state| state.active)
+                        && let Some(title) = frame.labels.first_mut()
+                    {
+                        title.text = format!("CLARKE / XYZZY | {}", title.text);
+                    }
+                    Some(frame)
+                })
+            }
             _ => Ok(None),
         }
     }
@@ -647,7 +738,7 @@ impl App {
             .game
             .lines(active, pulse_notice.or(self.notice.as_deref()));
         let docked_frame =
-            self.docked_frame(if self.help.is_some() { 0.0 } else { elapsed }, viewport)?;
+            self.docked_frame(if self.modal_open() { 0.0 } else { elapsed }, viewport)?;
         Ok(PreparedPresentation {
             hud_lines,
             docked_frame,
@@ -771,6 +862,21 @@ impl App {
             } else {
                 None
             };
+        let xyzzy_panel = self
+            .xyzzy
+            .as_ref()
+            .map(|menu| menu.panel(&self.game.world, self.notice.as_deref()));
+        let modal_open = self.modal_open();
+        let commander = if self
+            .game
+            .world
+            .xyzzy_snapshot()
+            .is_some_and(|state| state.active)
+        {
+            "CLARKE / XYZZY"
+        } else {
+            "Meridian"
+        };
         if let Some(renderer) = &mut self.renderer {
             let mode = match snapshot.mode {
                 FlightMode::Docked => "DOCKED",
@@ -801,9 +907,9 @@ impl App {
                 hud_lines.insert(hud_lines.len().min(1), message.into());
             }
             renderer.window.set_title(&format!(
-                "Meridian | {mode} | {} | H / ? Help",
-                if self.help.is_some() {
-                    "HELP"
+                "{commander} | {mode} | {} | H / ? Help",
+                if modal_open {
+                    "MENU"
                 } else if active {
                     "RUNNING"
                 } else {
@@ -840,7 +946,7 @@ impl App {
                 HudScene {
                     lines: &hud_lines,
                     cockpit: cockpit.as_ref(),
-                    help: self.help.as_ref(),
+                    help: self.help.as_ref().or(xyzzy_panel.as_ref()),
                 },
             );
             match presented {
@@ -850,7 +956,7 @@ impl App {
                     }
                 }
                 Ok(Presentation::Skipped) => {
-                    if self.help.is_some() && !renderer.is_zero_sized() {
+                    if (self.help.is_some() || self.xyzzy.is_some()) && !renderer.is_zero_sized() {
                         renderer.window.request_redraw();
                     }
                 }
@@ -885,7 +991,7 @@ impl ApplicationHandler for App {
             return;
         }
         match event {
-            WindowEvent::CloseRequested if self.help.is_none() => self.request_quit(event_loop),
+            WindowEvent::CloseRequested if !self.modal_open() => self.request_quit(event_loop),
             WindowEvent::Resized(size) => {
                 if let Some(menu) = &mut self.docked {
                     menu.discard_frame();
@@ -914,7 +1020,7 @@ impl ApplicationHandler for App {
                 button: MouseButton::Left,
                 ..
             } if self.focused && !self.occluded => {
-                if self.help.is_some() {
+                if self.modal_open() {
                     return;
                 }
                 self.dragging = state == ElementState::Pressed;
@@ -1050,3 +1156,6 @@ mod callback_tests;
 
 #[cfg(test)]
 mod help_tests;
+
+#[cfg(test)]
+mod xyzzy_tests;

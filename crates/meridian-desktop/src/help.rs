@@ -9,6 +9,7 @@ pub const MAX_VERTICES: usize = 6 + MAX_LINES * MAX_COLUMNS * 35 * 6;
 pub struct Panel {
     pub title: String,
     pub lines: Vec<String>,
+    pub footer: &'static str,
 }
 
 impl Panel {
@@ -16,6 +17,7 @@ impl Panel {
         Self {
             title: title.into(),
             lines: controls.iter().map(|line| (*line).into()).collect(),
+            footer: "Escape / H / ? Close help",
         }
     }
 
@@ -50,10 +52,16 @@ impl Panel {
             2,
             weapon.map_or_else(
                 || "Z unavailable: no fitted front laser".into(),
-                |weapon| format!("Z Fire fitted {weapon}"),
+                |weapon| {
+                    if weapon == "Mining Laser" {
+                        "Z Mine eligible rock with fitted Mining Laser; no automatic pickup".into()
+                    } else {
+                        format!("Z Fire fitted {weapon}")
+                    }
+                },
             ),
         );
-        panel.review(review);
+        panel.review(review, "After help: B cancels; Escape saves and quits");
         panel
     }
 
@@ -69,7 +77,7 @@ impl Panel {
             ],
         );
         panel.navigation();
-        panel.review(review);
+        panel.review(review, "After help: B cancels; Escape saves and quits");
         panel
     }
 
@@ -97,7 +105,7 @@ impl Panel {
                 "Ship showroom",
                 &[
                     "Up / Down Select ship | C Compare | Shift+B Pin baseline",
-                    "V Current ship | D Details | O Options",
+                    "V Current ship | Enter / D Details | / Search ships",
                     "R / Space Pause rotation | A Change rotation axis",
                     "Left / Right Turn | Home Reset view",
                     "Drag Rotate | Shift+drag Roll",
@@ -108,7 +116,7 @@ impl Panel {
                 "Market",
                 &[
                     "Up / Down Select goods | Page Up / Down Scroll",
-                    "G Buy | Shift+G Sell | Enter Review purchase",
+                    "G Buy | Shift+G Sell | Enter Review current trade mode",
                     "Trade confirmation uses the current price and native unit",
                 ],
             ),
@@ -134,7 +142,12 @@ impl Panel {
                 .lines
                 .push("Details/options stay open; Up/Down navigate after help".into());
         }
-        panel.review(review);
+        panel.review(review, "After help: Escape / B cancels the review");
+        if review.is_some() {
+            panel
+                .lines
+                .push("Finish or cancel a review before changing station screens".into());
+        }
         panel
     }
 
@@ -143,18 +156,16 @@ impl Panel {
             "1 Galaxy | 2 System | 3 Showroom | 4 Market | 5 Equipment".into(),
             "Tab / Shift+Tab Next / previous station screen".into(),
             "Escape Back: leave search/details/options, then the HUD".into(),
+            "Ctrl+Shift+X XYZZY testing menu (docked commander only)".into(),
         ]);
     }
 
-    fn review(&mut self, review: Option<&str>) {
+    fn review(&mut self, review: Option<&str>, cancel_hint: &str) {
         if let Some(title) = review {
             self.title = format!("{} - {}", self.title, title);
             self.lines
                 .push("Review retained: Enter confirms only after help closes".into());
-            self.lines
-                .push("After help: Escape / B cancels the review".into());
-            self.lines
-                .push("Finish or cancel a review before changing station screens".into());
+            self.lines.push(cancel_hint.into());
         }
     }
 }

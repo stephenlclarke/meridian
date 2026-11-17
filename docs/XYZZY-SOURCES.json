@@ -1,0 +1,161 @@
+{
+  "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "files": [
+    {
+      "path": "Sources/L337Core/EffectiveEquipmentValidation.swift",
+      "bytes": 2270,
+      "sha256": "acbe2de75c6acf4ac48bc55c9f1dcb6e74f92b860b3230cabe41fbb01a4fb68d",
+      "gitBlob": "8a39f0cc83dfb64f7a54972c927e0503547f253e"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentModuleTemplates.swift",
+      "bytes": 6099,
+      "sha256": "387f5623bc0a390864b29ca5f2662c52bd091c54b024f8761bf8b098610a566f",
+      "gitBlob": "46574e607c0d12f275588f891e94780dde498ff9"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentMutations.swift",
+      "bytes": 16275,
+      "sha256": "a1d0bece73e7d6370f4cab8fc952d2e25a3d20dfceb89ce8fab189c4b65941d5",
+      "gitBlob": "42d78044954801d6d06b46434489d40485a66b69"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentPurchaseProgression.swift",
+      "bytes": 24305,
+      "sha256": "770618fcbb38330f568dbb862fc471762552cc17b55edfd407a1eb7462b0460c",
+      "gitBlob": "91e79ba4e50fc1f12236e8b4a25d16a3b26d84d4"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentRuntimeCatalog.swift",
+      "bytes": 8337,
+      "sha256": "ccf1ee2a940175f0d1a26a65aaa7b62ca7cf61d0eb33906f8b8feb6664210e27",
+      "gitBlob": "4f9bf9ec70d239e9c099f00a9c63a80d4648833d"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentTransactions.swift",
+      "bytes": 15785,
+      "sha256": "21a44066185ea17c8e3b262988c193cdef98bf88f80294d7a216767d93ad4f36",
+      "gitBlob": "3d51889a6dd1900faadfc172bbdab072995f1a21"
+    },
+    {
+      "path": "Sources/L337Core/FuelStorage.swift",
+      "bytes": 1087,
+      "sha256": "b78beb5454d505217b71770d1c9daf7afb8be13fe81ab4b9d8c7725514c0c2fc",
+      "gitBlob": "c25e23dfdf6971f2d0b12d7c2c2c5816c3e4591d"
+    },
+    {
+      "path": "Sources/L337Core/Game.swift",
+      "bytes": 313817,
+      "sha256": "e5b4e30c835d460aa7ca6f77364db0aaeaf877bb9d73bacc162e9111b26e2e17",
+      "gitBlob": "0f94ff0c7bf46d47e65e077cc3c5db37694bd706"
+    },
+    {
+      "path": "Sources/L337Core/GameplayOrdnanceRuntime.swift",
+      "bytes": 11500,
+      "sha256": "009f10af6ac4dfaa47dfff16288d6bf0f17eb63e1ec995293451ac19ce7ec999",
+      "gitBlob": "1ac2f0203714ce2d1474de5eacf153eb9513c9b7"
+    },
+    {
+      "path": "Sources/L337Core/GameplayWeapons.swift",
+      "bytes": 19711,
+      "sha256": "b0e3fa858afcc6fd646e0db51e02260e63e38394cde8a8aeeed783db058011c8",
+      "gitBlob": "582560d2f5dcdb3ee27804ba0cedd5ecdced1f0b"
+    },
+    {
+      "path": "Sources/L337Core/LaserSpecification.swift",
+      "bytes": 2653,
+      "sha256": "7ef4750ec3c25ad224131dc52a145baa901fb1dac6b5b33a17c15d8cb00043e3",
+      "gitBlob": "d8da97cbc4e28bb8b7078d2a3e01abe3c62afd75"
+    },
+    {
+      "path": "Sources/L337Core/NavalMissions.swift",
+      "bytes": 8076,
+      "sha256": "207eb8e4ba0e4428e89ddebdcbd1c438aa44808ee9b36095a649a484d8a19bb0",
+      "gitBlob": "9244ec4440994f19edd7f5a2a00e8e5b5f04dde0"
+    },
+    {
+      "path": "Sources/L337Core/NewCommanderDefaults.swift",
+      "bytes": 1804,
+      "sha256": "9957e8391db78638e83f754c3262fde5992c7db5a6b8010eeac5c39c4d4d4a72",
+      "gitBlob": "fba931ec64a03aa442e40147c9f7512046965d3c"
+    },
+    {
+      "path": "Sources/L337Core/OriginalFleetR3Fitting.swift",
+      "bytes": 4922,
+      "sha256": "5a50e94cb510d7ce51da194cc3570159a28f1b7bd126e140a948192412d913ee",
+      "gitBlob": "920e1d802e63ab9038e7885974618f4e9b402257"
+    },
+    {
+      "path": "Sources/L337Core/OwnedEquipment.swift",
+      "bytes": 3837,
+      "sha256": "c8a9e6eb6d859d917f8621cf9146b518521ea7708a5ad6ac68334efe9f9607cf",
+      "gitBlob": "b0b5e5ea4f8bfdcf5077b62ef576526c1bc8e9c2"
+    },
+    {
+      "path": "Sources/L337Core/OwnedEquipmentInventory.swift",
+      "bytes": 23031,
+      "sha256": "83009fdd488c170fff421cff398858acc77836d6668308ae69a743e8a1a7544f",
+      "gitBlob": "bf17b9ec76686ce9e830472f45cb0db64f242663"
+    },
+    {
+      "path": "Sources/L337Core/PassengerCustody.swift",
+      "bytes": 15804,
+      "sha256": "9bb1f6239ce2b77c2bd6c7ce11f75a18d639c86ed5e74ad112be659cf6f88db1",
+      "gitBlob": "4257a3dab5a3ca5ab18368cd7458983b0ce1400f"
+    },
+    {
+      "path": "Sources/L337Core/Plugh.swift",
+      "bytes": 4508,
+      "sha256": "2c43ae0738fa93375eb51a4859e11bc33e7bf9e7496ff432f140e813baa6b8eb",
+      "gitBlob": "faf40ce4d170b33d26dc14f185d08acb30130a3a"
+    },
+    {
+      "path": "Sources/L337Core/Resources/Ships/SH025.toml",
+      "bytes": 690857,
+      "sha256": "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883",
+      "gitBlob": "ec62ccae9acfc05b92c3c4591f079fc7ba4bf1cf"
+    },
+    {
+      "path": "Sources/L337Core/ScreenNavigation.swift",
+      "bytes": 9176,
+      "sha256": "120a37debfbf069408ad9322238193aed347176513ef1a893a10f0848d49a32b",
+      "gitBlob": "8375ff0fe65961870bdcd11aac952234ec037147"
+    },
+    {
+      "path": "Sources/L337Core/SecretChoices.swift",
+      "bytes": 1104,
+      "sha256": "c2958e8b5df8e18028950e02c288c9a292b93c153118eb31988433280975726e",
+      "gitBlob": "87b3d52e2059d6f6413bf0bba98156ac67a344af"
+    },
+    {
+      "path": "Sources/L337Core/SecretMenu.swift",
+      "bytes": 1078,
+      "sha256": "184d1c19e255fa95abf3fc4d60e590e1b237d1fdadf343f7dd62cffc1a8e67b3",
+      "gitBlob": "97c38288580c52bf4d913d621a4b74ccb89e3745"
+    },
+    {
+      "path": "Sources/L337Core/StandardAmmunitionTransactions.swift",
+      "bytes": 7258,
+      "sha256": "8341e2730e7abe909e0c0addfac4b5b8f16a00cdc107ee15ec54588fdf9522b5",
+      "gitBlob": "9dd64ee594c884146f9308e628179be33876687d"
+    },
+    {
+      "path": "Sources/L337Core/XYZzyPolicy.swift",
+      "bytes": 1070,
+      "sha256": "48644d21bd5fd81d87daa45a3f94887ed384c864eafa014d93e6b133acac54f8",
+      "gitBlob": "6164d9acf92b3ed87276222fc50672d903c4bb44"
+    },
+    {
+      "path": "Tests/L337CoreTests/OriginalEquipmentStockValuesTests.swift",
+      "bytes": 8817,
+      "sha256": "62a91840327bb68896ff04db312f644bc8f6916b2889fa7ce5457133e2c04c89",
+      "gitBlob": "19f5a3e1009fd2f04f3e3de1c02500651e2ba231"
+    },
+    {
+      "path": "Tests/L337CoreTests/OwnedEquipmentMountSaveTests.swift",
+      "bytes": 3043,
+      "sha256": "d3e8dba5eb50edc4103823e238cecc03a5077830ee536bfc1e71ab175954340a",
+      "gitBlob": "6e8a6aecf88e652236e3b8aa202281ac9501c272"
+    }
+  ]
+}

@@ -613,6 +613,8 @@ fn module_rows(
         row.instance = Some(item.id);
         row.owned = 1;
         row.fitted = u32::from(item.slot.is_some());
+        row.readout
+            .push(crate::xyzzy::provenance(item.provenance).into());
         if let Some(reach) = item.kind.navigation_reach_ly() {
             row.compatibility = "Owned SH025 navigation module".into();
             row.readout.push(format!("Module jump limit {reach} LY"));
@@ -762,6 +764,16 @@ fn equipment_panel(
         row.instance = equipment.owned.map(|i| u64::from(i.id.serial()));
         row.owned = u32::from(equipment.owned.is_some());
         row.fitted = u32::from(equipment.owned.is_some_and(|i| i.fitted));
+        if let Some(item) = equipment.owned {
+            row.readout.push(
+                if item.xyzzy {
+                    "XYZZY grant; no paid purchase"
+                } else {
+                    "Paid cargo bay; original receipt retained"
+                }
+                .into(),
+            );
+        }
         row.price_tenths = equipment
             .owned
             .is_none()
@@ -800,6 +812,16 @@ fn equipment_panel(
             row.owned = 1;
             row.fitted = u32::from(item.pylon.is_some());
             row.compatibility = format!("Owned missile | Pylon {}", pylon + 1);
+            row.readout.push(
+                if item.xyzzy {
+                    "XYZZY finite missile; no paid purchase"
+                } else if item.purchase.is_some() {
+                    "Paid finite missile; original receipt retained"
+                } else {
+                    "Born finite missile"
+                }
+                .into(),
+            );
             row.can_store = world
                 .review_ammunition(AmmunitionAction::Store { item: item.item }, tick)
                 .is_ok();
@@ -845,6 +867,65 @@ fn equipment_panel(
         required_crew: None,
         feedback: feedback.into(),
     })
+}
+
+#[cfg(test)]
+mod secret_ui_tests {
+    use super::*;
+    use crate::profile::tests::{TestDirectory, open};
+    fn ok<T, E: std::fmt::Debug>(result: Result<T, E>) -> T {
+        result.unwrap_or_else(|error| panic!("{error:?}"))
+    }
+    #[test]
+    fn actual_equipment_panels_keep_born_paid_and_xyzzy_provenance_distinct() {
+        let directory = TestDirectory::new();
+        let mut profile = open(&directory.0);
+        assert!(ok(profile.new_commander(99036)));
+        ok(profile.xyzzy(meridian_core::XyzzyAction::Enter));
+        for slot in [
+            "front-laser",
+            "energy",
+            "navigation",
+            "utility-fuelScoops",
+            "cargo-expansion",
+            "pylon-8",
+        ] {
+            let panel = ok(equipment_panel(&profile.world, slot, ""));
+            assert!(
+                panel
+                    .rows
+                    .iter()
+                    .any(|row| row.owned == 1
+                        && row.readout.iter().any(|line| line.contains("XYZZY"))),
+                "{slot}"
+            );
+        }
+        ok(profile.command(crate::session::Action::Module(
+            ModuleAction::PurchaseMiningLaser,
+        )));
+        let front = ok(equipment_panel(&profile.world, "front-laser", ""));
+        assert!(
+            front
+                .rows
+                .iter()
+                .any(|row| row.node == ModuleKind::MiningLaser.node()
+                    && row.readout.iter().any(|line| line.contains("Paid module")))
+        );
+        assert!(
+            front
+                .rows
+                .iter()
+                .any(|row| row.node == ModuleKind::PulseLaser.node()
+                    && row.readout.iter().any(|line| line.contains("Born module")))
+        );
+        assert!(
+            front
+                .rows
+                .iter()
+                .any(|row| row.node == ModuleKind::NavalLaser.node()
+                    && row.readout.iter().any(|line| line.contains("XYZZY grant")))
+        );
+    }
 }
 
 /// Menu shortcuts are scoped to the current screen and never become flight commands.

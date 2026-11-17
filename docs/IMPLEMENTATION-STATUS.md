@@ -1,8 +1,8 @@
 # Implementation and validation status
 
-## Context help source
+## Context help and XYZZY composition: authored, unqualified
 
-The following source adds H/? modal help on title, station HUD, flight, all five station pages and current reviews/details. Every station card includes screen navigation. Escape/H/? restores the existing view, query, selection and review. Held input and clock accumulation clear without changing manual pause or saved gameplay state. Shift+G sells alongside G buy; X retains its mission/showroom role. The ordinary HUD and title omit the permanent control list. Authored routing, pause/focus, real purchase-review, search, all-page text/binding and compact geometry regressions await independent source review and owning execution.
+The following source adds H/? modal help on title, station HUD, flight, all five station pages and current reviews/details. Every station card includes screen navigation. Escape/H/? restores the existing view, query, selection and review. Held input and clock accumulation clear without changing manual pause or saved gameplay state. Shift+G sells alongside G buy; X retains its mission/showroom role. The ordinary HUD and title omit the permanent control list. The corrected help-only source d06c963 cleared independent delta review after fixing the scalar renderer closure and misleading review/showroom/market hints. Its actual input, help cards and rendering have not run yet. Root composes this with current-core XYZZY 5a4e431 and a real host testing menu, exact atomic profile publication, current-commander/secret labels and provenance readouts. Nine new host cases cover confirmation/cancellation, actual save and cold load, blocked publication, nested help, repeated refit/cash, fuel toggle, focus/manual pause and title/flight refusal. The twenty authored core cases and all retained assertions remain required. The combined source is uncompiled and unexecuted; no new native or published-preview acceptance is claimed.
 
 ## Lareria navigation provider source
 
@@ -326,3 +326,7 @@ not the missing Dell state or a tested cure. All composed tests, compiler,
 Clippy, release and native validation remain pending on this exact correction.
 Qualified previews follow actual validation; full original 1337 visual and
 gameplay parity remains an explicit requirement.
+
+## XYZZY core author packet (unqualified)
+
+The [explicit XYZZY core](XYZZY.md) is authored on exact e1cc86b. Twenty new Rust cases remain unrun. It adds actual front Naval, Advanced Navigation, Elite Energy, Fuel Scoops fitting, cargo bay, finite missiles and accounted fuel supply with distinct secret provenance. Host composition and exact joined review/compiler/native acceptance are outstanding; no published-preview claim follows from this source packet. See the [36-action inventory](XYZZY-ACTIONS.json) for remaining dependencies.

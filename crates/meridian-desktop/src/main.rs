@@ -16,6 +16,7 @@ mod renderer;
 mod session;
 mod storage;
 mod trade_lesson;
+mod xyzzy;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     app::run()

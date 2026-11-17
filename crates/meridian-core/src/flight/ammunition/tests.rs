@@ -55,6 +55,7 @@ fn actual_paid_round_uses_first_free_of_nine_without_six_free_rounds() {
     assert_eq!(
         after.items[3],
         AmmunitionItem {
+            xyzzy: false,
             item,
             pylon: Some(3),
             purchase: Some(1),

@@ -201,6 +201,7 @@ fn advanced_navigation_requires_the_owned_intermediate_grade() {
     let dock = world.current_dock_context().unwrap();
     let mut ledger = Ledger::born(dock.owner().seed()).unwrap();
     let purchase = |kind, item, revision| Event {
+        xyzzy: false,
         action: ModuleAction::Purchase { kind },
         item,
         dock,

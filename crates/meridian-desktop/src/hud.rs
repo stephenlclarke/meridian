@@ -212,7 +212,7 @@ pub fn append_help(panel: &crate::help::Panel, width: u32, height: u32, output: 
     let rows = (((size[1] - 48.0) / (9.0 * scale)) as usize).min(crate::help::MAX_LINES);
     let lines = std::iter::once(panel.title.as_str())
         .chain(panel.lines.iter().map(String::as_str))
-        .chain(std::iter::once("Escape / H / ? Close help"))
+        .chain(std::iter::once(panel.footer))
         .collect::<Vec<_>>();
     let count = lines.len().min(rows);
     let card_width = (columns as f32 * 6.0 + 16.0) * scale;

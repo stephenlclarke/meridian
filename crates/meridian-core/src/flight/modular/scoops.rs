@@ -1,8 +1,15 @@
-//! Original paid Fuel Scoops utility. A fitted readout never grants physical ore custody.
-use super::*;
+//! Original Fuel Scoops utility with paid or explicit secret acquisition. A fitted readout never grants physical ore custody.
+use super::{
+    CommanderAccount, ModuleAction, ModuleError, ModuleKind, ModuleOffer, ModuleProvenance,
+    ModuleSlot, OwnedModule, World,
+};
+#[cfg(test)]
+use super::{State, validate_purchase};
+#[cfg(test)]
+use crate::save::SaveError;
 pub(super) const PRICE_TENTHS: u32 = 19_000;
 pub(super) const REQUIRED_TL: u8 = 4;
-/// Descriptive current paid fit. No work/collection API accepts a caller-constructed readout.
+/// Descriptive current validated fit. No work/collection API accepts a caller-constructed readout.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct FittedFuelScoops {
     pub owner: u64,
@@ -81,7 +88,10 @@ impl World {
         let fitted = owned
             .filter(|i| {
                 i.slot == Some(ModuleSlot::UtilityFuelScoops)
-                    && matches!(i.provenance, ModuleProvenance::Paid { .. })
+                    && matches!(
+                        i.provenance,
+                        ModuleProvenance::Paid { .. } | ModuleProvenance::XYZzy { .. }
+                    )
             })
             .map(|item| FittedFuelScoops {
                 owner: owner.owner,

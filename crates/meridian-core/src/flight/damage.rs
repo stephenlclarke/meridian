@@ -182,22 +182,7 @@ impl State {
                 events.push((event.clock, 0, 0, Effect::Berth));
                 continue;
             }
-            while let Some(&(emission, clock)) = missiles.peek() {
-                if emission < next_emission {
-                    return Err(INVALID);
-                }
-                if emission != next_emission {
-                    if clock < event.clock {
-                        return Err(INVALID);
-                    }
-                    break;
-                }
-                if clock > event.clock {
-                    return Err(INVALID);
-                }
-                let _ = missiles.next();
-                next_emission += 1;
-            }
+            next_emission = merge_missile_emissions(&mut missiles, next_emission, event.clock)?;
             let effect = match event.kind {
                 Kind::Mining(body) => {
                     let hit = world.mining.strokes().get(mining_count).ok_or(INVALID)?;
@@ -313,6 +298,30 @@ impl State {
         Ok(())
     }
 }
+fn merge_missile_emissions(
+    missiles: &mut std::iter::Peekable<impl Iterator<Item = (u64, u64)>>,
+    mut next_emission: u64,
+    event_clock: u64,
+) -> Result<u64, SaveError> {
+    while let Some(&(emission, clock)) = missiles.peek() {
+        if emission < next_emission {
+            return Err(INVALID);
+        }
+        if emission != next_emission {
+            if clock < event_clock {
+                return Err(INVALID);
+            }
+            break;
+        }
+        if clock > event_clock {
+            return Err(INVALID);
+        }
+        let _ = missiles.next();
+        next_emission += 1;
+    }
+    Ok(next_emission)
+}
+
 fn validate_laser_receipts(
     world: &World,
     end: u64,

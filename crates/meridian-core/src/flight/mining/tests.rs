@@ -363,3 +363,36 @@ fn paid_mining_round_trips_after_a_public_change_to_born_energy_fit() {
         world.modular_equipment_snapshot()
     );
 }
+
+#[test]
+fn secret_outfit_preserves_paid_mining_work_custody_and_refuses_inflight_reactivation() {
+    let (mut w, item) = paid(15603);
+    let tick = w.snapshot().tick;
+    let review = ok(w.review_xyzzy(crate::XyzzyAction::Enter, tick));
+    ok(w.prepare_xyzzy(review, tick)).commit();
+    let naval = some(w.front_laser_snapshot()).fitted_item_id;
+    module(
+        &mut w,
+        ModuleAction::Install {
+            item,
+            replacing: Some(naval),
+        },
+    );
+    approach(&mut w);
+    work(&mut w);
+    steps(&mut w, 18);
+    assert_eq!(work(&mut w).extracted_units, 1);
+    let before = ok(w.save_bytes());
+    let belt = w.mining_belt_snapshot();
+    let cargo = w.service_snapshot();
+    assert_eq!(
+        w.review_xyzzy(crate::XyzzyAction::Enter, w.snapshot().tick),
+        Err(crate::XyzzyError::BerthRequired)
+    );
+    assert_eq!(ok(w.save_bytes()), before);
+    let continued = cold(&w);
+    assert_eq!(continued.mining_belt_snapshot(), belt);
+    assert_eq!(continued.service_snapshot(), cargo);
+    assert_eq!(some(continued.fitted_mining_tool()).item, item);
+    assert_eq!(some(continued.mining_belt_snapshot()).pending_ore.len(), 1);
+}

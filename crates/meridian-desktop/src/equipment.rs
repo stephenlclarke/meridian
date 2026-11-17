@@ -56,10 +56,20 @@ pub fn append_panel(world: &World, lines: &mut Vec<String>) -> Result<(), String
         equipment.definition.price_tenths % 10
     ));
     lines.push(match equipment.owned {
-        Some(item) if item.fitted => "OWNED AND FITTED | U STORES THE SAME PAID ITEM".into(),
-        Some(_) => "OWNED AND STORED | Y REFITS THE SAME PAID ITEM".into(),
+        Some(item) if item.fitted => "OWNED AND FITTED | U STORES THE SAME ITEM".into(),
+        Some(_) => "OWNED AND STORED | Y REFITS THE SAME ITEM".into(),
         None => "NOT OWNED | K PURCHASES AND FITS ONE CARGO BAY".into(),
     });
+    if let Some(item) = equipment.owned {
+        lines.push(
+            if item.xyzzy {
+                "XYZZY GRANT | NO PAID PURCHASE"
+            } else {
+                "PAID CARGO BAY | ORIGINAL RECEIPT RETAINED"
+            }
+            .into(),
+        );
+    }
     lines.push(format!(
         "UTILITY MOUNTS {}/3 | EQUIPMENT UNITS {}/24",
         equipment.utility_mounts_used, equipment.equipment_units_used

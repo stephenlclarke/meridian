@@ -1,5 +1,8 @@
 //! Actual accepted work, separate from ore cargo ownership.
-use super::*;
+use super::{
+    Arc, BELT_BODY_COUNT, INVALID, MAX_PENDING_ORE, MINING_DAMAGE, MINING_RANGE, MiningContact,
+    MiningError, RigidPose, SaveError, State, SystemId, finite,
+};
 const MAX_STROKES: usize = BELT_BODY_COUNT * 8;
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct MiningStroke {

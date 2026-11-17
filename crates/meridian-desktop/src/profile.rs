@@ -33,6 +33,35 @@ impl Profile {
         self.playing
     }
 
+    /// Publish the exact prospective secret transaction before replacing the live commander.
+    pub fn xyzzy(&mut self, action: meridian_core::XyzzyAction) -> Result<String, String> {
+        if !self.playing {
+            return Err("Start or continue a commander before opening XYZZY".into());
+        }
+        let tick = self.world.snapshot().tick;
+        let review = self
+            .world
+            .review_xyzzy(action, tick)
+            .map_err(|e| e.to_string())?;
+        let prepared = self
+            .world
+            .prepare_xyzzy(review, tick)
+            .map_err(|e| e.to_string())?;
+        let published = self
+            .store
+            .save(prepared.bytes(), MAX_SAVE_BYTES)
+            .map_err(|e| format!("XYZZY change could not be saved: {e}"))?;
+        prepared.commit();
+        self.has_save = true;
+        self.session = Session::from_world(&self.world);
+        // A directory-sync warning follows publication, so the host must refresh its authorities.
+        Ok(publication_message(
+            published,
+            "XYZZY change saved. Supported outfit only; finite missiles and cargo.".into(),
+        )
+        .unwrap_or_else(|warning| warning))
+    }
+
     pub fn new_commander(&mut self, seed: u64) -> Result<bool, String> {
         if self.playing {
             return Err("Start a new commander from the title screen".into());
@@ -321,7 +350,21 @@ impl Profile {
 
     pub fn lines(&self, active: bool, notice: Option<&str>) -> Vec<String> {
         if self.playing {
-            return self.session.lines(&self.world, active, notice);
+            let mut lines = self.session.lines(&self.world, active, notice);
+            if let Some(secret) = self.world.xyzzy_snapshot().filter(|state| state.active) {
+                lines.insert(
+                    0,
+                    format!(
+                        "CLARKE | XYZZY | FUEL {}",
+                        if secret.unlimited_fuel {
+                            "UNLIMITED"
+                        } else {
+                            "NORMAL"
+                        }
+                    ),
+                );
+            }
+            return lines;
         }
         vec![
             "MERIDIAN".into(),

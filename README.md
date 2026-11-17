@@ -62,6 +62,7 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | Controls | Action |
 | --- | --- |
 | H / ? | Context help; Escape, H or ? dismisses |
+| Ctrl+Shift+X when docked | Explicit XYZZY testing menu; Enter reviews then confirms |
 | 1 / 2 / 3 / 4 / 5 when docked | Galaxy / System / Ships / Market / Equipment |
 | L; W/S; arrows; A/D; Q/E; Space | Launch; thrust; pitch; yaw; roll; brake |
 | J; T; R; Enter; B; F | Travel; select contact; review; confirm; cancel; buy fuel |
@@ -99,3 +100,11 @@ These are the source-grounded M2 and M3 boundaries; completed entries below desc
 | Not yet implemented or accepted | EMP, positive salvage and bounty/legal consequences; remaining equipment and population gameplay acceptance. | Rust crew/passenger/rescue, investigation and Wayfarer family journeys, then their individual consent/failure/reward/cold-Continue acceptance. All 64 expanded runtime acceptances remain open. |
 
 Fleet construction is a separate M4 lane. Its current changed original-five run returned no candidate meshes; no new hull admission follows from focused tests. Original mesh/material/colour fidelity and 1337 visual/mechanics parity remain requirements across these milestones. See the [source-grounded roadmap](docs/LEGACY-MILESTONES.md).
+
+## Context help and XYZZY testing candidate
+
+The following candidate combines screen-specific H/? help with explicit [XYZZY testing](docs/XYZZY.md). Every station help popup explains how to reach Galaxy, System, Showroom, Market and Equipment. Help pauses host stepping and preserves the current screen, selection, search and review. The large permanent control list is removed from the flight HUD.
+
+At a station berth, **Ctrl+Shift+X** opens the labelled XYZZY testing menu. Use Up/Down to choose, Enter to review, then Enter again to confirm and save; Escape/B cancels the review or closes the menu. H/? opens help above the menu. First activation changes the current commander to CLARKE and sets cash to 1,000,000 CR once. It grants/refits the supported SH025 outfit with explicit secret provenance; missiles and cargo stay finite. The menu shows actual cash, current jump reach, unlimited-fuel state and missing-system limits. Reading or closing it grants nothing. Other profiles are unchanged.
+
+Help source review cleared after corrections. The current core and host composition, including twenty core and nine host XYZZY tests, is authored but has not been compiled, tested or accepted in the native app. The [36-action inventory](docs/XYZZY-ACTIONS.json) retains every unsupported or partial original action. Full legacy parity and a published preview containing these features remain pending.

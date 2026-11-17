@@ -134,7 +134,7 @@ fn read_item(r: &mut Reader<'_>) -> Result<OwnedStarterItem, SaveError> {
 }
 impl CommanderAccount {
     pub(crate) fn encode_save(&self, w: &mut Writer) {
-        self.encode_version(w, 13);
+        self.encode_version(w, crate::save::SAVE_VERSION);
     }
     fn encode_version(&self, w: &mut Writer, version: u16) {
         let d = self.data;
@@ -165,12 +165,16 @@ impl CommanderAccount {
             w.u64(quantity);
         }
         w.u8(d.legal);
-        d.equipment.encode(w);
+        d.equipment.encode(w, version);
         if version >= 12 {
             w.u64(d.ammunition_revision);
         }
         if version >= 13 {
             w.u64(d.modular_revision);
+        }
+        if version >= 16 {
+            w.bool(d.xyzzy_active);
+            w.bool(d.xyzzy_unlimited_fuel);
         }
     }
     pub(crate) fn decode_save(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
@@ -201,9 +205,11 @@ impl CommanderAccount {
                 other_commodities: r.array(|r| r.u64())?,
                 reserved_commodities: r.array(|r| r.u64())?,
                 legal: r.u8()?,
-                equipment: crate::equipment::State::decode(r)?,
+                equipment: crate::equipment::State::decode(r, version)?,
                 ammunition_revision: if version >= 12 { r.u64()? } else { 0 },
                 modular_revision: if version >= 13 { r.u64()? } else { 0 },
+                xyzzy_active: version >= 16 && r.bool()?,
+                xyzzy_unlimited_fuel: version >= 16 && r.bool()?,
             },
         };
         if version < 12 {
