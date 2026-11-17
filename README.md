@@ -45,13 +45,11 @@ Earlier qualified previews retain their own native flight, physical docking, tra
 
 See [implementation status](docs/IMPLEMENTATION-STATUS.md), [mining scope](docs/ASTEROID-MINING.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md).
 
-## Following navigation source
+## Following navigation and custody candidate
 
-The next isolated candidate reads and writes only V17, refusing earlier saves without changing their files. It adds paid navigation range and exact per-leg travel history. The individual navigation source passed Dell Linux and native Windows qualification; this combined source is unreviewed and unrun. A playable route benefiting from the paid range remains open with only Avenor and Renas services.
+Compiled candidate `991fd91` passed owned Mac, Linux and native Windows qualification: 551 Rust tests each, 94 Python tests, 47 Markdown checks, strict Clippy and locked release builds. It reads and writes only V17 and refuses earlier formats without changing the file. In the signed isolated Mac app, supported native input purchased an Intermediate Navigation module for 3000 CR, stored and refitted the same paid item, and retained it across a new-process Continue. Module reach was 14 LY; stored reach fell to the SH025 floor of 9 LY. The chart correctly showed the actual 9.6 LY fuel limit. No serviced flight benefiting from a leg beyond 9 LY is accepted: only Avenor and Renas services exist, and the required cumulative fuel exceeds tank capacity.
 
-## Destroyed trader manifest custody
-
-An actual fatal fitted laser or missile contact now ties the SH025 trader’s paid goods to the existing combat history. The wreck receipt records the retained laser or missile identity. A retained practice attempt counts only live missiles from its own sortie. Four Rust tests await the owning run, including the mixed missile and Beam case that saves and cold-continues with a live later-visit missile. Physical recovery, section cutting and boarding require their own original producers. See the [wreck manifest guide](docs/WRECK-MANIFEST.md).
+A separate explicitly prepared public-core setup supplied four nonfatal contacts and a live trader. One supported native final shot from a paid missile produced the exact terminal SH025 Food manifest, preserving its native endpoint and source pose across Save/Quit and new-process Continue. Cargo and cash stayed unchanged; the retained hull stopped the player on physical contact. Setup funding, piloting and earlier damage are not native journey credit. Physical pods, pickup, sale and salvage income remain unavailable. Independent audit cleared these bounded observations; integration and publication remain open. Preview 6 keeps its separate source and release evidence.
 
 ## Play
 
