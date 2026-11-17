@@ -1,0 +1,16 @@
+{
+  "phase": "BEFORE_CAUSAL_RAY_INTERVAL_CORRECTION_AUTHORING",
+  "parentAuthorHead": "d9a0b42df62e2318bfed06bc40b08cc3345ff9a2",
+  "failedRootJoin": "879786449370b20dfebbd8a34f853026408790cf",
+  "reference": "Failed complete immediate parent production prefix, trailing whitespace normalized only. Original108/120controls and original full-scan reference remain immutable.",
+  "files": {
+    "CASES.json": {
+      "bytes": 1685,
+      "sha256": "2631dcc474000bcf0529bd948668dc95356dfc37084c81f711503e5c8dc4b4b9"
+    },
+    "before-certificate.rs": {
+      "bytes": 48175,
+      "sha256": "c63cb8f055c5d92523f97640f3319b074def13e73d035ed1fd799f58018c76c5"
+    }
+  }
+}

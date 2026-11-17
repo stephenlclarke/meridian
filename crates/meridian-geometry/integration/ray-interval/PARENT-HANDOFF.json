@@ -1,0 +1,452 @@
+{
+  "recordedAtUTC": "2026-11-17T01:05:12.508768+00:00",
+  "status": "FOCUSED_TEST_FAILURE_RETAINED;CONDITIONAL_ORIGINAL_WHOLE_FIVE_UNRUN",
+  "head": "879786449370b20dfebbd8a34f853026408790cf",
+  "tree": "4cfcdb08c60468172f7964676eda9ead1c5d336c",
+  "parent": "3e066906f93db3067ce0c978f01abaf7c5d2ac0b",
+  "sourcePins": 269,
+  "changedPaths": 13,
+  "unchangedParentPaths": 256,
+  "G2SourceClear": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/input-packet/G2-SOURCE-CLEAR.json",
+    "bytes": 4443,
+    "sha256": "7d981216b101404b077469c2e94e24f39b3eb8b38449804fca1479120d7b9a10"
+  },
+  "RootExecutionAssignment": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/input-packet/EXECUTION-ASSIGNMENT.json",
+    "bytes": 2406,
+    "sha256": "bfb3ffa2c20bd8469be46a7edfae11eb7e58dd2af96da182465f987f654c85c0"
+  },
+  "executionManifest": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/input-packet/SOURCE.json",
+    "bytes": 47852,
+    "sha256": "8691d2dfd8448aa4569bf1b80634e62f64c6873ce722d9bfd4222a57e5dca8a7"
+  },
+  "actualStarts": [
+    {
+      "utc": "2026-11-17T00:55:47.114153+00:00",
+      "pid": 545,
+      "parentPid": 368,
+      "wrapperParentPID": 367,
+      "namespace": "WSL Linux",
+      "executable": "/home/sclarke/.cargo/bin/cargo",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "-p",
+        "meridian-geometry",
+        "--all-targets"
+      ],
+      "cwd": "/home/sclarke/github/meridian-geometry-8797864",
+      "head": "879786449370b20dfebbd8a34f853026408790cf",
+      "tree": "4cfcdb08c60468172f7964676eda9ead1c5d336c",
+      "manifestSHA256": "8691d2dfd8448aa4569bf1b80634e62f64c6873ce722d9bfd4222a57e5dca8a7",
+      "sourcePins": 269,
+      "log": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-8797864/linux/check.log",
+      "toolchain": {
+        "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0\nLLVM version: 23.1.1\n",
+        "python": {
+          "executable": "/home/sclarke/setup-work/smoke/new-python/bin/python",
+          "version": "3.15.2 (main, Nov 11 2026, 00:19:20) [Clang 23.1.3 ]",
+          "platform": "linux"
+        },
+        "environment": {
+          "PATH": "/home/sclarke/.cargo/bin:/home/sclarke/setup-work/smoke/new-python/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/Go/bin:/mnt/c/Program Files/Warp/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/Git/ucrt64/bin:/mnt/c/Program Files/Git/usr/bin:/mnt/c/Users/steph/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/steph/go/bin:/mnt/c/Users/steph/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/steph/.cargo/bin",
+          "CARGO_TARGET_DIR": "/home/sclarke/setup-work/station-linux-target",
+          "PYTHONDONTWRITEBYTECODE": "1",
+          "MERIDIAN_SOURCE_SHA": "879786449370b20dfebbd8a34f853026408790cf",
+          "CARGO_BUILD_JOBS": null,
+          "RUSTFLAGS": null,
+          "CARGO_ENCODED_RUSTFLAGS": null,
+          "RUSTC_BOOTSTRAP": null,
+          "RUSTC_LOG": null,
+          "LANG": "C.UTF-8",
+          "LC_ALL": null
+        },
+        "resources": "Default unrestricted; no added job/CPU/RSS/time caps. Geometry guards remain exactly the reviewed original limits.",
+        "cargoBinary": {
+          "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+          "bytes": 36160240,
+          "sha256": "e951141cc55a6cd7b9876d187bd30a3720e6086b99413af95e3b8de1cdd72f14"
+        },
+        "rustcBinary": {
+          "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+          "bytes": 647376,
+          "sha256": "f3834d26669b03f6855fa54bd2381443123e860167bc0c7a8dd137e5cf6e5e4f"
+        },
+        "clippy-driverBinary": {
+          "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/clippy-driver",
+          "bytes": 16256512,
+          "sha256": "ecf6d74d4e13728405acd3749bff486db899e793b5e3cd179ab663f7fe9d6fe6"
+        },
+        "gitBinary": {
+          "path": "/usr/bin/git",
+          "bytes": 4591208,
+          "sha256": "d2682f3a026c10db333f3f05a87f2b79c1ba5750f7c6d512879409fff622a1a5"
+        }
+      },
+      "wrapperExecutable": "/home/sclarke/setup-work/smoke/new-python/bin/python",
+      "wrapperCommand": [
+        "/home/sclarke/setup-work/smoke/new-python/bin/python",
+        "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/work/geometry-8797864/run-geometry-qualification.py",
+        "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/work/geometry-8797864/packet",
+        "8691d2dfd8448aa4569bf1b80634e62f64c6873ce722d9bfd4222a57e5dca8a7"
+      ],
+      "wrapperFile": {
+        "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/work/geometry-8797864/run-geometry-qualification.py",
+        "bytes": 13280,
+        "sha256": "b089f86d57c0094a81df8cc2c16db2d29e5270b0af4c9fe39159ac923f2b3d4a"
+      }
+    },
+    {
+      "utc": "2026-11-17T00:55:48.892250+00:00",
+      "pid": 643,
+      "parentPid": 368,
+      "wrapperParentPID": 367,
+      "namespace": "WSL Linux",
+      "executable": "/home/sclarke/.cargo/bin/cargo",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "meridian-geometry",
+        "--",
+        "--nocapture"
+      ],
+      "cwd": "/home/sclarke/github/meridian-geometry-8797864",
+      "head": "879786449370b20dfebbd8a34f853026408790cf",
+      "tree": "4cfcdb08c60468172f7964676eda9ead1c5d336c",
+      "manifestSHA256": "8691d2dfd8448aa4569bf1b80634e62f64c6873ce722d9bfd4222a57e5dca8a7",
+      "sourcePins": 269,
+      "log": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-8797864/linux/test.log",
+      "toolchain": {
+        "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0\nLLVM version: 23.1.1\n",
+        "python": {
+          "executable": "/home/sclarke/setup-work/smoke/new-python/bin/python",
+          "version": "3.15.2 (main, Nov 11 2026, 00:19:20) [Clang 23.1.3 ]",
+          "platform": "linux"
+        },
+        "environment": {
+          "PATH": "/home/sclarke/.cargo/bin:/home/sclarke/setup-work/smoke/new-python/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/Go/bin:/mnt/c/Program Files/Warp/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/Git/ucrt64/bin:/mnt/c/Program Files/Git/usr/bin:/mnt/c/Users/steph/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/steph/go/bin:/mnt/c/Users/steph/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/steph/.cargo/bin",
+          "CARGO_TARGET_DIR": "/home/sclarke/setup-work/station-linux-target",
+          "PYTHONDONTWRITEBYTECODE": "1",
+          "MERIDIAN_SOURCE_SHA": "879786449370b20dfebbd8a34f853026408790cf",
+          "CARGO_BUILD_JOBS": null,
+          "RUSTFLAGS": null,
+          "CARGO_ENCODED_RUSTFLAGS": null,
+          "RUSTC_BOOTSTRAP": null,
+          "RUSTC_LOG": null,
+          "LANG": "C.UTF-8",
+          "LC_ALL": null
+        },
+        "resources": "Default unrestricted; no added job/CPU/RSS/time caps. Geometry guards remain exactly the reviewed original limits.",
+        "cargoBinary": {
+          "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+          "bytes": 36160240,
+          "sha256": "e951141cc55a6cd7b9876d187bd30a3720e6086b99413af95e3b8de1cdd72f14"
+        },
+        "rustcBinary": {
+          "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+          "bytes": 647376,
+          "sha256": "f3834d26669b03f6855fa54bd2381443123e860167bc0c7a8dd137e5cf6e5e4f"
+        },
+        "clippy-driverBinary": {
+          "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/clippy-driver",
+          "bytes": 16256512,
+          "sha256": "ecf6d74d4e13728405acd3749bff486db899e793b5e3cd179ab663f7fe9d6fe6"
+        },
+        "gitBinary": {
+          "path": "/usr/bin/git",
+          "bytes": 4591208,
+          "sha256": "d2682f3a026c10db333f3f05a87f2b79c1ba5750f7c6d512879409fff622a1a5"
+        }
+      },
+      "wrapperExecutable": "/home/sclarke/setup-work/smoke/new-python/bin/python",
+      "wrapperCommand": [
+        "/home/sclarke/setup-work/smoke/new-python/bin/python",
+        "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/work/geometry-8797864/run-geometry-qualification.py",
+        "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/work/geometry-8797864/packet",
+        "8691d2dfd8448aa4569bf1b80634e62f64c6873ce722d9bfd4222a57e5dca8a7"
+      ],
+      "wrapperFile": {
+        "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/work/geometry-8797864/run-geometry-qualification.py",
+        "bytes": 13280,
+        "sha256": "b089f86d57c0094a81df8cc2c16db2d29e5270b0af4c9fe39159ac923f2b3d4a"
+      }
+    }
+  ],
+  "actualTerminal": {
+    "wrapperPID": 368,
+    "exit": 101,
+    "focusedExit": 101,
+    "wholeFiveExecuted": false,
+    "finishedUTC": "2026-11-17T00:56:04.142517+00:00",
+    "head": "879786449370b20dfebbd8a34f853026408790cf",
+    "tree": "4cfcdb08c60468172f7964676eda9ead1c5d336c",
+    "noRetry": true
+  },
+  "stageResults": [
+    {
+      "name": "check",
+      "pid": 545,
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "-p",
+        "meridian-geometry",
+        "--all-targets"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 1.764115641,
+      "finishedUTC": "2026-11-17T00:55:48.874465+00:00",
+      "log": {
+        "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-8797864/linux/check.log",
+        "bytes": 184,
+        "sha256": "bf29be6bc38c43df0509f7de6d4288cf66d5f269ae14fb1d22c36c85a225f270"
+      }
+    },
+    {
+      "name": "test",
+      "pid": 643,
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "meridian-geometry",
+        "--",
+        "--nocapture"
+      ],
+      "exit": 101,
+      "elapsedSeconds": 15.162510512999999,
+      "finishedUTC": "2026-11-17T00:56:04.050073+00:00",
+      "log": {
+        "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-8797864/linux/test.log",
+        "bytes": 7769,
+        "sha256": "b9a7cd57c5db63f92502d29cb6771ab6aa2de53f82138055b180298fc6cf714f"
+      }
+    }
+  ],
+  "actualLibTests": {
+    "passed": 14,
+    "failed": 1,
+    "ignored": 0,
+    "filtered": 0,
+    "wallSeconds": 11.77
+  },
+  "failure": {
+    "test": "pruning::complete_forward_ray_controls_preserve_all_fields_witnesses_and_charged_work",
+    "file": "crates/meridian-geometry/src/pruning.rs",
+    "line": 694,
+    "column": 9,
+    "fixture": "subdivided_identity",
+    "assertion": "new.operations() < old.operations()",
+    "operationValues": "UNREPORTED; logger follows failing assertion; no diagnostic rerun"
+  },
+  "failureContext": "Failing work-reduction assertion is after triangle/exact-volume/all exposed witness-field comparisons and both public witness verification loops. No old/new operation values emitted for this fixture because logging is later. No strict work-saving, remaining fixture, original geometry or fleet acceptance inferred.",
+  "unrun": [
+    "Remaining Rust test binaries",
+    "9 host tests",
+    "strict Clippy",
+    "dev original_five build",
+    "original whole-five"
+  ],
+  "newQualifiedOriginalBinary": "UNRUN; dev original_five build was not reached, no old binary relabel",
+  "failedUnitRuntime": [
+    {
+      "actualCargoLogPath": "/home/sclarke/setup-work/station-linux-target/debug/deps/meridian_geometry-11342b9e8901f50d",
+      "currentPostflight": {
+        "path": "/home/sclarke/setup-work/station-linux-target/debug/deps/meridian_geometry-11342b9e8901f50d",
+        "bytes": 30334440,
+        "sha256": "b74f3f1fae1e7c76e4da4b46110abd0cce2263adeb3723a3c0b3d85dff713204"
+      },
+      "retained": {
+        "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-8797864/linux/failed-unit-meridian_geometry-11342b9e8901f50d",
+        "bytes": 30334440,
+        "sha256": "b74f3f1fae1e7c76e4da4b46110abd0cce2263adeb3723a3c0b3d85dff713204"
+      },
+      "scope": "Captured after actual terminal; not a pre-START hash or LIVE claim. No test executable was invoked again."
+    }
+  ],
+  "localRetainedFailedUnitRuntime": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/failed-unit-meridian_geometry-11342b9e8901f50d",
+    "bytes": 30334440,
+    "sha256": "b74f3f1fae1e7c76e4da4b46110abd0cce2263adeb3723a3c0b3d85dff713204"
+  },
+  "rawFocusedObservations": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/FOCUSED-RAW-OBSERVATIONS.json",
+    "bytes": 5848,
+    "sha256": "dd711862d51a945c930afb0a03d4131b3efb0487afd544dd3afb8b9e821dee8a"
+  },
+  "nativeFailureVerification": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/geometry-8797864-failure-verification.json",
+    "bytes": 15788,
+    "sha256": "752c2ef263bf45eafb622fadba408b39297e844e2b6e184fc60eb28b8e367897"
+  },
+  "independentLocalVerification": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/LOCAL-COPY-VERIFICATION.json",
+    "bytes": 819,
+    "sha256": "712add068ec3560d60dc43813c3630d222830715777593359d3d7c2b3ed1dea9"
+  },
+  "copiedArtifactsVerified": 23,
+  "sourceBeforeAfterClean": true,
+  "originalGuards": {
+    "operations": 2000000,
+    "storageMemberships": 100000,
+    "rationalBits": 4096,
+    "triangles": 512
+  },
+  "prior3e0FailurePreserved": {
+    "receipt": {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/GEOMETRY-3E06690-ORIGINAL-FIVE-HANDOFF.json",
+      "bytes": 26902,
+      "sha256": "b0423e9d6d3d4eec874acb1b023060e86893b928c0a73f1514cd97183a9cf710"
+    },
+    "outcomes": "Five Operations refusals, fifteen dependent UNRUN, zero candidates, unchanged original guards"
+  },
+  "executionScope": "Existing Dell Linux owner only; stopped at first actual test failure. No unchanged compiler/test/Clippy/whole-five retry, diagnostic invocation, source/test/guard change, cache/reset/reboot/signal/global cap, Windows/Mac job or new worker. Failed test binary retained and hashed only postflight. All owned execution processes are terminal and Linux lease released.",
+  "acceptance": "14 library tests passed and1 failed; other Rust binaries,9host,Clippy,dev build and whole-five UNRUN. No candidate/fleet/native/full-storage-fit/minimum claim.",
+  "artifacts": [
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/START.json",
+      "bytes": 3903,
+      "sha256": "15cceb6b5d9f83188921f61c24985451143f06220ef9d3d7b7ecb14b804793d0",
+      "relativePath": "START.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/check-START.json",
+      "bytes": 3903,
+      "sha256": "15cceb6b5d9f83188921f61c24985451143f06220ef9d3d7b7ecb14b804793d0",
+      "relativePath": "check-START.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/check.log",
+      "bytes": 184,
+      "sha256": "bf29be6bc38c43df0509f7de6d4288cf66d5f269ae14fb1d22c36c85a225f270",
+      "relativePath": "check.log"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/failed-unit-meridian_geometry-11342b9e8901f50d",
+      "bytes": 30334440,
+      "sha256": "b74f3f1fae1e7c76e4da4b46110abd0cce2263adeb3723a3c0b3d85dff713204",
+      "relativePath": "failed-unit-meridian_geometry-11342b9e8901f50d"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/focused-terminal.json",
+      "bytes": 1363,
+      "sha256": "ac542f1cd72aa06bf815f3ea4cb72bc6447a1717cfa75981dcdb3ced42f45744",
+      "relativePath": "focused-terminal.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/input-packet/EXECUTION-ASSIGNMENT.json",
+      "bytes": 2406,
+      "sha256": "bfb3ffa2c20bd8469be46a7edfae11eb7e58dd2af96da182465f987f654c85c0",
+      "relativePath": "input-packet/EXECUTION-ASSIGNMENT.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/input-packet/G2-SOURCE-CLEAR.json",
+      "bytes": 4443,
+      "sha256": "7d981216b101404b077469c2e94e24f39b3eb8b38449804fca1479120d7b9a10",
+      "relativePath": "input-packet/G2-SOURCE-CLEAR.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/input-packet/RETAINED-3E0-HANDOFF.json",
+      "bytes": 26902,
+      "sha256": "b0423e9d6d3d4eec874acb1b023060e86893b928c0a73f1514cd97183a9cf710",
+      "relativePath": "input-packet/RETAINED-3E0-HANDOFF.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/input-packet/ROOT-SOURCE-BINDING.json",
+      "bytes": 46839,
+      "sha256": "6e8382480ab5887022191f84c25d82d53de16181d3fd52bc39963d524c9a68d2",
+      "relativePath": "input-packet/ROOT-SOURCE-BINDING.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/input-packet/ROOT-SOURCE.json",
+      "bytes": 68657,
+      "sha256": "cef84f191f1a2eaa0928e3fa5cc10dab36b82823a03aedcb92f41f5b7a42d7ac",
+      "relativePath": "input-packet/ROOT-SOURCE.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/input-packet/SOURCE.json",
+      "bytes": 47852,
+      "sha256": "8691d2dfd8448aa4569bf1b80634e62f64c6873ce722d9bfd4222a57e5dca8a7",
+      "relativePath": "input-packet/SOURCE.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/input-packet/qualification-helper.py",
+      "bytes": 13280,
+      "sha256": "b089f86d57c0094a81df8cc2c16db2d29e5270b0af4c9fe39159ac923f2b3d4a",
+      "relativePath": "input-packet/qualification-helper.py"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/input-packet/source.bundle",
+      "bytes": 36741,
+      "sha256": "00f6d19918ef1551599dded115210d520d00c2e2a4a54b7db003759eccc660a2",
+      "relativePath": "input-packet/source.bundle"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/input-packet/source.tar",
+      "bytes": 5396480,
+      "sha256": "ff2748904e1d1be5df4153bdb43816430f670a1e39eaeb46ef181dd8e51c1d10",
+      "relativePath": "input-packet/source.tar"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/ownership-preflight.json",
+      "bytes": 223,
+      "sha256": "3241d95f3f83983900c9e0bd2e91e0c7ef53b44bb1e152e281f9478ac957b00d",
+      "relativePath": "ownership-preflight.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/results.json",
+      "bytes": 1273,
+      "sha256": "81d17a98c2bc9882b3e66d2ba9684bb5df75b5b47e99cded728d72e1e7a5f8a9",
+      "relativePath": "results.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/run-geometry-qualification.py",
+      "bytes": 13280,
+      "sha256": "b089f86d57c0094a81df8cc2c16db2d29e5270b0af4c9fe39159ac923f2b3d4a",
+      "relativePath": "run-geometry-qualification.py"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/source-binding-after.json",
+      "bytes": 262,
+      "sha256": "40db4acdedd5c22cfbe9d8e180cd8ecbb5012ab77e8362c2374eab90845c00aa",
+      "relativePath": "source-binding-after.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/source-binding.json",
+      "bytes": 262,
+      "sha256": "86097ef74085f9ef9fe156aafc117f6878975b6caf3d30cc544d455cdaabb8eb",
+      "relativePath": "source-binding.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/test-START.json",
+      "bytes": 3909,
+      "sha256": "f43d816d955d03f425f70421910a85991a3877ce030fb37f9adf9d4b0a227007",
+      "relativePath": "test-START.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/test.log",
+      "bytes": 7769,
+      "sha256": "b9a7cd57c5db63f92502d29cb6771ab6aa2de53f82138055b180298fc6cf714f",
+      "relativePath": "test.log"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/toolchain.json",
+      "bytes": 2452,
+      "sha256": "6a7cce26ee438ade8408e7952ac7219dedfbfa1ce7cd2914440825cde2ddc26c",
+      "relativePath": "toolchain.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-8797864/linux-result/wrapper-exit.json",
+      "bytes": 271,
+      "sha256": "742d566607afc064cf63c11f4e1a63eb76a9e8acb7a0342bec9d06b1db910f55",
+      "relativePath": "wrapper-exit.json"
+    }
+  ]
+}

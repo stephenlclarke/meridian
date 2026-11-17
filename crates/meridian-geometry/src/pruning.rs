@@ -691,7 +691,12 @@ fn complete_forward_ray_controls_preserve_all_fields_witnesses_and_charged_work(
             e.verify(source, &mut old)?;
             a.verify(source, &mut new)?;
         }
-        assert!(new.operations() < old.operations(), "{id}");
+        assert!(
+            new.operations() < old.operations(),
+            "{id}: oldOperations={} newOperations={}",
+            old.operations(),
+            new.operations()
+        );
         assert_eq!(new.retained_memberships(), old.retained_memberships());
         eprintln!(
             "FORWARD_RAY_COMPLETE {{\"fixture\":\"{id}\",\"oldOperations\":{},\"newOperations\":{},\"oldAttemptedPeak\":{},\"newAttemptedPeak\":{},\"oldRetained\":{},\"newRetained\":{},\"triangles\":{}}}",

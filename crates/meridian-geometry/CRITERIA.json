@@ -163,6 +163,11 @@
       "file": "src/pruning.rs",
       "name": "pruning::complete_forward_ray_controls_preserve_all_fields_witnesses_and_charged_work",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/certificate.rs",
+      "name": "certificate::tests::closed_ray_intervals_reject_skew_boxes_and_preserve_ordered_exact_parity",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -357,5 +362,19 @@
     "parentWholeFive": "5OperationsREFUSED/15dependentUNRUN/0candidate",
     "currentExecution": "UNRUN",
     "newTestCount": 32
+  },
+  "rayIntervalCorrection": {
+    "failedParentJoin": "879786449370b20dfebbd8a34f853026408790cf",
+    "parentHandoffSHA256": "8036ddf8794fe2da7206f6ebc1eaf5c75a220a5709e68c158de0c86b3f0b514a",
+    "parentTestLogSHA256": "b9a7cd57c5db63f92502d29cb6771ab6aa2de53f82138055b180298fc6cf714f",
+    "deltaSHA256": "5198c99654722b8ddf3ac82863b5e9cef6dd004777f59ff78920a0dd36f8d918",
+    "beforeSUTFreezeSHA256": "77cdefdce165bd1ddde598974d6732ff1a7fe4521062163eff63da4069192fc3",
+    "parentLibPass": 14,
+    "parentLibFail": 1,
+    "parentRemainingRustUnrun": 17,
+    "parentHostClippyBuildOriginal": "UNRUN",
+    "strictWorkAssertionPreserved": true,
+    "currentExecution": "UNRUN",
+    "newTestCount": 33
   }
 }

@@ -274,6 +274,45 @@ impl Bounds {
         }
         Ok(true)
     }
+    // Intersect one shared closed parameter interval, including t=0. These
+    // exact ray parameters use the same arithmetic as the existing hit test.
+    fn ray_intersects(
+        &self,
+        origin: &Point3,
+        direction: &Point3,
+        b: &mut Budget,
+    ) -> Result<bool, Failure> {
+        let mut near = integer(0);
+        let mut far: Option<Rational> = None;
+        for k in 0..3 {
+            b.step(1)?;
+            if direction[k].is_zero() {
+                if origin[k] < self.lower[k] || origin[k] > self.upper[k] {
+                    return Ok(false);
+                }
+                continue;
+            }
+            // Two newly computed exact endpoint parameters, in addition to
+            // the original axis visit. No coordinate or guard price changes.
+            b.step(2)?;
+            let first = (&self.lower[k] - &origin[k]) / &direction[k];
+            let second = (&self.upper[k] - &origin[k]) / &direction[k];
+            let (entry, exit) = if direction[k].is_positive() {
+                (first, second)
+            } else {
+                (second, first)
+            };
+            near = near.max(entry);
+            far = Some(match far {
+                Some(old) => old.min(exit),
+                None => exit,
+            });
+            if far.as_ref().is_some_and(|exit| &near > exit) {
+                return Ok(false);
+            }
+        }
+        Ok(true)
+    }
 }
 // Contiguous ranges preserve original source order without a sort or tie rule.
 struct BoundsNode {
@@ -287,6 +326,14 @@ struct FacetBoundsIndex {
     nodes: Vec<BoundsNode>,
     root: usize,
 }
+struct RayQuery<'a> {
+    origin: &'a Point3,
+    direction: &'a Point3,
+    originals: &'a [Facet],
+    owner: u32,
+    owner_bounds: &'a Bounds,
+}
+
 impl FacetBoundsIndex {
     const LEAF_SIZE: usize = 8;
     fn node_limit(count: usize) -> usize {
@@ -369,7 +416,7 @@ impl FacetBoundsIndex {
             Ok(candidates)
         })
     }
-    // The caller admits up to N returned ordinals. Existing tree storage is reused.
+    // Retained for the exact axis-aligned specialization and frozen tests.
     fn ray_candidates(
         &self,
         origin: &Point3,
@@ -379,14 +426,60 @@ impl FacetBoundsIndex {
         owner_bounds: &Bounds,
         b: &mut Budget,
     ) -> Result<Vec<usize>, Failure> {
+        self.query_ray(
+            RayQuery {
+                origin,
+                direction,
+                originals,
+                owner,
+                owner_bounds,
+            },
+            Bounds::ray_may_meet,
+            b,
+        )
+    }
+    fn ray_intersections(
+        &self,
+        origin: &Point3,
+        direction: &Point3,
+        originals: &[Facet],
+        owner: u32,
+        owner_bounds: &Bounds,
+        b: &mut Budget,
+    ) -> Result<Vec<usize>, Failure> {
+        b.step(3)?;
+        if direction.iter().filter(|v| !v.is_zero()).count() <= 1 {
+            // For one nonzero axis, the original half-line predicate is exact.
+            return self.ray_candidates(origin, direction, originals, owner, owner_bounds, b);
+        }
+        self.query_ray(
+            RayQuery {
+                origin,
+                direction,
+                originals,
+                owner,
+                owner_bounds,
+            },
+            Bounds::ray_intersects,
+            b,
+        )
+    }
+    // The caller admits N returned ordinals. The existing stack bound includes
+    // query references and the shared near/far endpoint scratch.
+    fn query_ray(
+        &self,
+        query: RayQuery<'_>,
+        possible: fn(&Bounds, &Point3, &Point3, &mut Budget) -> Result<bool, Failure>,
+        b: &mut Budget,
+    ) -> Result<Vec<usize>, Failure> {
         b.with_retained(Self::stack_members(self.facets.len()), |b| {
             let mut pending = vec![self.root];
             let mut candidates = Vec::new();
             while let Some(index) = pending.pop() {
                 b.step(1)?;
                 let node = &self.nodes[index];
-                if !owner_bounds.meets(&node.bounds, b)?
-                    || !node.bounds.ray_may_meet(origin, direction, b)?
+                if !query.owner_bounds.meets(&node.bounds, b)?
+                    || !possible(&node.bounds, query.origin, query.direction, b)?
                 {
                     continue;
                 }
@@ -397,8 +490,8 @@ impl FacetBoundsIndex {
                     for (offset, bounds) in self.facets[node.start..node.end].iter().enumerate() {
                         b.step(1)?;
                         let ordinal = node.start + offset;
-                        if originals[ordinal].id().component == owner
-                            && bounds.ray_may_meet(origin, direction, b)?
+                        if query.originals[ordinal].id().component == query.owner
+                            && possible(bounds, query.origin, query.direction, b)?
                         {
                             candidates.push(ordinal);
                         }
@@ -514,8 +607,14 @@ fn occupied(
                 )?
             } else {
                 b.with_retained(originals.len(), |b| {
-                    let candidates =
-                        index.ray_candidates(p, &direction, originals, *owner, &group.bounds, b)?;
+                    let candidates = index.ray_intersections(
+                        p,
+                        &direction,
+                        originals,
+                        *owner,
+                        &group.bounds,
+                        b,
+                    )?;
                     ray_parity(
                         candidates.into_iter().map(|ordinal| &originals[ordinal]),
                         p,
@@ -1725,6 +1824,164 @@ mod tests {
                 index.ray_candidates(
                     &[integer(0), integer(0), integer(0)],
                     &[integer(1), integer(2), integer(3)],
+                    &faces,
+                    0,
+                    &group.bounds,
+                    b,
+                )
+            })
+        });
+        assert_eq!(result.err().map(|e| e.kind), Some(FailureKind::Storage));
+        assert_eq!(short.retained_memberships(), 0);
+        assert!(short.peak_admitted_memberships() <= short.limits().storage_memberships);
+        Ok(())
+    }
+    fn independent_closed_ray_box(face: &Facet, origin: &Point3, direction: &Point3) -> bool {
+        let mut entries = Vec::new();
+        let mut exits = Vec::new();
+        for k in 0..3 {
+            let mut lower = face.vertices()[0].point[k].clone();
+            let mut upper = lower.clone();
+            for vertex in &face.vertices()[1..] {
+                lower = lower.min(vertex.point[k].clone());
+                upper = upper.max(vertex.point[k].clone());
+            }
+            if direction[k].is_zero() {
+                if origin[k] < lower || origin[k] > upper {
+                    return false;
+                }
+            } else {
+                let a = (lower - &origin[k]) / &direction[k];
+                let c = (upper - &origin[k]) / &direction[k];
+                let (entry, exit) = if direction[k].is_positive() {
+                    (a, c)
+                } else {
+                    (c, a)
+                };
+                if exit < integer(0) {
+                    return false;
+                }
+                entries.push(entry);
+                exits.push(exit);
+            }
+        }
+        // Independent all-pairs interval theorem, rather than the production
+        // running max/min clipping or any cached node/leaf extrema.
+        entries
+            .iter()
+            .all(|entry| exits.iter().all(|exit| entry <= exit))
+    }
+    #[test]
+    fn closed_ray_intervals_reject_skew_boxes_and_preserve_ordered_exact_parity()
+    -> Result<(), Failure> {
+        let origin = [integer(0), integer(0), integer(0)];
+        let mut b = Budget::new(crate::Limits::default())?;
+        for (direction, lower, upper, expected) in [
+            ([1, 1, 1], [1, 3, 1], [2, 4, 2], false),
+            ([1, 1, 1], [1, 2, 1], [2, 3, 2], true),
+            ([-1, -1, -1], [-2, -3, -2], [-1, -2, -1], true),
+            ([1, 0, 1], [1, 0, 1], [2, 0, 2], true),
+            ([1, 0, 1], [1, 1, 1], [2, 2, 2], false),
+        ] {
+            let bounds = Bounds {
+                lower: lower.map(integer),
+                upper: upper.map(integer),
+            };
+            let direction = direction.map(integer);
+            assert_eq!(
+                b.with_retained(32, |b| bounds.ray_intersects(&origin, &direction, b))?,
+                expected
+            );
+        }
+        let skew = Bounds {
+            lower: [1, 3, 1].map(integer),
+            upper: [2, 4, 2].map(integer),
+        };
+        assert!(skew.ray_may_meet(&origin, &[1, 1, 1].map(integer), &mut b)?);
+        assert!(!skew.ray_intersects(&origin, &[1, 1, 1].map(integer), &mut b)?);
+        let mut faces = Vec::new();
+        for ordinal in 0..65 {
+            let base = [ordinal % 17 - 8, (ordinal / 17) % 3, ordinal % 5 - 2];
+            let vertices = [[0, 0, 0], [1, 0, 0], [0, 1, 1]].map(|offset| Vertex {
+                point: std::array::from_fn(|k| integer(base[k] + offset[k])),
+                uv: [integer(0), integer(0)],
+            });
+            faces.push(Facet::new(
+                SourceId {
+                    component: ordinal as u32 % 3,
+                    facet: ordinal as u32,
+                },
+                vertices,
+                String::new(),
+                &mut b,
+            )?);
+        }
+        let members = FacetBoundsIndex::memberships(faces.len()) + 11 * 3 + 32;
+        b.with_retained(members, |b| {
+            let index = FacetBoundsIndex::build(&faces, b)?;
+            let owners = component_bounds(&faces, &index.facets, b)?;
+            for origin in [[0, 0, 0], [3, 1, 2], [-8, 0, -2]] {
+                for direction in [[1, 2, 3], [-1, -2, -3], [1, 0, -1], [0, 1, 0], [0, 0, 0]] {
+                    let origin = origin.map(integer);
+                    let direction = direction.map(integer);
+                    for (owner, group) in &owners {
+                        let actual = b.with_retained(faces.len(), |b| {
+                            index.ray_intersections(
+                                &origin,
+                                &direction,
+                                &faces,
+                                *owner,
+                                &group.bounds,
+                                b,
+                            )
+                        })?;
+                        let expected = faces
+                            .iter()
+                            .enumerate()
+                            .filter_map(|(i, f)| {
+                                (f.id().component == *owner
+                                    && independent_closed_ray_box(f, &origin, &direction))
+                                .then_some(i)
+                            })
+                            .collect::<Vec<_>>();
+                        assert_eq!(actual, expected);
+                        let mut flat = Budget::new(crate::Limits::default())?;
+                        let old = ray_parity(
+                            faces.iter().filter(|f| f.id().component == *owner),
+                            &origin,
+                            &direction,
+                            &mut flat,
+                        )?;
+                        let new = ray_parity(
+                            actual.into_iter().map(|i| &faces[i]),
+                            &origin,
+                            &direction,
+                            b,
+                        )?;
+                        assert_eq!(new, old);
+                    }
+                }
+            }
+            Ok(())
+        })?;
+        assert_eq!(b.retained_memberships(), 0);
+        let mut short = Budget::new(crate::Limits {
+            storage_memberships: members
+                + faces.len()
+                + FacetBoundsIndex::stack_members(faces.len())
+                - 1,
+            ..crate::Limits::default()
+        })?;
+        let result = short.with_retained(members, |b| {
+            let index = FacetBoundsIndex::build(&faces, b)?;
+            let owners = component_bounds(&faces, &index.facets, b)?;
+            let group = owners.get(&0).ok_or_else(|| {
+                b.fail(FailureKind::InvalidWitness, "missing interval oracle owner")
+            })?;
+            b.with_retained(faces.len(), |b| {
+                index.ray_intersections(
+                    &[0, 0, 0].map(integer),
+                    &[1, 2, 3].map(integer),
                     &faces,
                     0,
                     &group.bounds,

@@ -1,0 +1,65 @@
+{
+  "parentAuthorHead": "d9a0b42df62e2318bfed06bc40b08cc3345ff9a2",
+  "failedRootJoin": "879786449370b20dfebbd8a34f853026408790cf",
+  "failedRootTree": "4cfcdb08c60468172f7964676eda9ead1c5d336c",
+  "parentHandoffSHA256": "8036ddf8794fe2da7206f6ebc1eaf5c75a220a5709e68c158de0c86b3f0b514a",
+  "parentAuditSHA256": "a161338926eb0886eced3df2bd3c31c8234e8dc90524eafa6298526aaebbace2",
+  "parentTestLogSHA256": "b9a7cd57c5db63f92502d29cb6771ab6aa2de53f82138055b180298fc6cf714f",
+  "parentActualLibTests": {
+    "passed": 14,
+    "failed": 1,
+    "ignored": 0,
+    "filtered": 0,
+    "wallSeconds": 11.77
+  },
+  "parentFailure": {
+    "test": "pruning::complete_forward_ray_controls_preserve_all_fields_witnesses_and_charged_work",
+    "file": "crates/meridian-geometry/src/pruning.rs",
+    "line": 694,
+    "column": 9,
+    "fixture": "subdivided_identity",
+    "assertion": "new.operations() < old.operations()",
+    "operationValues": "UNREPORTED; logger follows failing assertion; no diagnostic rerun"
+  },
+  "unrun": [
+    "Remaining Rust test binaries",
+    "9 host tests",
+    "strict Clippy",
+    "dev original_five build",
+    "original whole-five"
+  ],
+  "actualOldNewOperationCounts": "UNREPORTED by actual failed test; no inference or diagnostic rerun",
+  "failureScope": "Geometry108/volume64/all witness fields and both public verification loops precede the failed strict work assertion. This proves only those completed assertions on the first fixture; neither full control nor following buried case passed.",
+  "beforeSUTFreezeSHA256": "77cdefdce165bd1ddde598974d6732ff1a7fe4521062163eff63da4069192fc3",
+  "causalFinding": "The previous forward-axis predicate tests3independent half-lines, not one shared ray parameter. It admits boxes whose valid coordinate times are disjoint, causing avoidable traversal/leaf tests. Subdivided-cube outward rays reach the source plane at t=0; separate axis checks retain side boxes even though the positive hit time on a side conflicts with the source-plane exit time. The actual strict complete-work failure establishes insufficient savings, not its numeric size or measured dominant stage.",
+  "correction": [
+    "Intersect one exact closed parameter interval starting at t>=0. For each nonzero direction, compute entry/exit parameters in signed order, update maximum entry/minimum exit, reject only entry>exit. Zero axes require closed coordinate containment. Retain t=0 and single-time face/edge/point equality.",
+    "Charge the existing axis visit plus two additional endpoint-parameter computations per nonzero axis; unchanged node/owner-box/leaf/full-candidate prices remain. Ray-direction classification costs3charged visits. No budget credit, counter discount, altered cap or fixture strategy.",
+    "Axis-aligned or zero rays keep the original necessary-axis predicate, which is exact for that mathematical case. Retain the unchanged loose candidate method for this production specialization and all existing tests. Share the same source-order traversal/storage scopes between predicates.",
+    "Use interval pruning in occupancy before leaf traversal, then run the same exact plane/hit/contains/parity/ambiguity/retry code. Existing32facet small-owner cutoff and8facet tree leaves unchanged.",
+    "Preserve original108/120controls and strict lower complete-work condition. Add actual old/new totals only to its failure message, bundled with this causal code change. No unchanged rerun to obtain prior values."
+  ],
+  "soundnessProof": "For every actual forward hit, one t>=0 lies inside every coordinate slab. Running max/min therefore cannot reject that hit or any ancestor box containing its facet box. Coplanar-origin ambiguity has t=0 within all closed slabs and remains eligible. Exact arithmetic and strict entry>exit rejection preserve equality, source-order ambiguity decisions and parity contributions.",
+  "newRegression": "Frozen skew-time box rejects despite passing all old half-line tests; a singleton t=2 contact remains; negative and zero directions checked. Independent all-pairs interval theorem derives extrema from original triangle corners, checks complete ordered candidates for interleaved owners, and compares full flat/indexed exact parity. One-short scratch admission/release retained.",
+  "unchanged": [
+    "Original32tests and conditions, frozen108/120source data, full-scan reference; only requested failure-message counters added.",
+    "Facet-index build/ordinary query/owner-count bookkeeping, packed-region/global-point lifetimes and all other modules/assets.",
+    "Original2Moperations/100kmemberships/4096source/outputrationalbits/512completefaces and all existing guard calls. Endpoint parameters use the same exact BigRational ray-parameter arithmetic as the unchanged hit test. No coordinates are materialized by pruning.",
+    "Full affine fields, physical/protected contacts, aggregate witness validation and complete global topology. No new dependency, globalCSG, averaging or contact shortcut."
+  ],
+  "storage": "Existing scoped traversal bound includes32shared scratch records for query references and near/far/endpoint parameters; candidateNand all persistent records unchanged. No unguarded new variable-length structure.",
+  "parentEvidenceVerification": {
+    "retainedArtifactPinsVerifiedLocally": 23,
+    "unitBinaryBytes": 30334440,
+    "unitBinarySHA256": "b74f3f1fae1e7c76e4da4b46110abd0cce2263adeb3723a3c0b3d85dff713204",
+    "observation": "Root after-START audit occurred after jobs ended; DELAYED, not live."
+  },
+  "currentCompilerTests": "UNRUN",
+  "currentOriginalFive": "HELD for oneG2delta review and changed owner qualification",
+  "priorOriginalRefusalsPreserved": true,
+  "newCandidates": 0,
+  "newFleetAdmissions": 0,
+  "speedOrMinimumClaim": false,
+  "allOriginalShipsRemainInScope": true,
+  "previewIndependent": true
+}
