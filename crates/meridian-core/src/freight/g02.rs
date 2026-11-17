@@ -220,6 +220,13 @@ struct AccountData {
     modular_revision: u64,
 }
 
+impl AccountData {
+    fn allows_stored_starter(&self, index: usize, item: OwnedStarterItem) -> bool {
+        // The World separately requires the fit to match its retained modular ledger.
+        matches!(index, 2 | 4) && self.modular_revision > 0 && item.fitted_hull.is_none()
+    }
+}
+
 /// One World-owned account, not a second mission wallet or an authority actor.
 #[derive(Debug, PartialEq, Eq)]
 pub(crate) struct CommanderAccount {
@@ -1191,16 +1198,13 @@ fn validate_cargo_and_utility(
     account: &AccountData,
     fit: &StarterFit,
 ) -> Result<(), Error> {
-    // Remaining birth items stay fitted except an explicitly recorded modular Pulse store.
-    // Consumed pylon rounds are absent;
-    // no held item receives an invented intrinsic/weapon budget exemption.
+    // The modular ledger can store the born Basic Energy or front Pulse. Consumed
+    // pylon rounds are absent. Other retained birth items must stay fitted.
     if account.equipment.owned().is_some()
         && fit.items.iter().enumerate().any(|(index, item)| {
             item.is_some_and(|item| {
                 item.fitted_hull != Some(account.hull)
-                    && !(matches!(index, 2 | 4)
-                        && account.modular_revision > 0
-                        && item.fitted_hull.is_none())
+                    && !account.allows_stored_starter(index, item)
             })
         })
     {
