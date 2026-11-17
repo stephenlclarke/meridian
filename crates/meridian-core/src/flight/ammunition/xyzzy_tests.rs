@@ -1,5 +1,5 @@
 #![allow(clippy::unwrap_used)]
-use super::*;
+use super::World;
 #[test]
 fn actual_secret_missile_cannot_be_relabelled_as_a_paid_purchase_or_paid_identity() {
     let mut w = World::new_commander(15401).unwrap();

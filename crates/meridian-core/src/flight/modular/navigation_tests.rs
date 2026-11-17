@@ -1,6 +1,9 @@
 #![allow(clippy::unwrap_used)]
 
-use super::*;
+use super::{
+    Event, Ledger, ModuleAction, ModuleError, ModuleKind, ModuleProvenance, ModuleSlot, World,
+    validate_purchase,
+};
 use crate::FlightInput;
 use crate::flight::equipment::tests::{earned_world, journey};
 use crate::flight::practice::tests::launch;

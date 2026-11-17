@@ -516,6 +516,40 @@ impl Ledger {
     }
 }
 
+fn validate_module_purchase(e: &Event, owner: u64, mut transaction: u32) -> Result<u32, SaveError> {
+    if let Some(kind) = e.action.purchase_kind() {
+        if !e.xyzzy {
+            let (_, required) = kind.shop().ok_or(INVALID)?;
+            let site = super::services::service_site(e.dock.system()).ok_or(INVALID)?;
+            if crate::equipment::definition()
+                .map_err(|_| INVALID)?
+                .offer(site)
+                .technology
+                < required
+            {
+                return Err(INVALID);
+            }
+            transaction = transaction.checked_add(1).ok_or(INVALID)?;
+            // Ammo owns the preceding 100000 paid identity positions. This domain never
+            // aliases a born item or a finite missile receipt on the same owner.
+            if transaction > 100000
+                || e.item
+                    != owner
+                        .checked_add(100010 + u64::from(transaction))
+                        .ok_or(INVALID)?
+            {
+                return Err(INVALID);
+            }
+        }
+    } else if match e.action {
+        ModuleAction::Store { item } | ModuleAction::Install { item, .. } => item != e.item,
+        _ => false,
+    } {
+        return Err(INVALID);
+    }
+    Ok(transaction)
+}
+
 impl State {
     pub(super) fn account_events(&self) -> Vec<super::AccountEvent> {
         self.events
@@ -617,36 +651,7 @@ impl State {
             } else {
                 transaction
             };
-            if let Some(kind) = e.action.purchase_kind() {
-                if !e.xyzzy {
-                    let (_, required) = kind.shop().ok_or(INVALID)?;
-                    let site = super::services::service_site(e.dock.system()).ok_or(INVALID)?;
-                    if crate::equipment::definition()
-                        .map_err(|_| INVALID)?
-                        .offer(site)
-                        .technology
-                        < required
-                    {
-                        return Err(INVALID);
-                    }
-                    transaction = transaction.checked_add(1).ok_or(INVALID)?;
-                    // Ammo owns the preceding 100000 paid identity positions. This domain never
-                    // aliases a born item or a finite missile receipt on the same owner.
-                    if transaction > 100000
-                        || e.item
-                            != owner
-                                .checked_add(100010 + u64::from(transaction))
-                                .ok_or(INVALID)?
-                    {
-                        return Err(INVALID);
-                    }
-                }
-            } else if match e.action {
-                ModuleAction::Store { item } | ModuleAction::Install { item, .. } => item != e.item,
-                _ => false,
-            } {
-                return Err(INVALID);
-            }
+            transaction = validate_module_purchase(e, owner, transaction)?;
             let previous_grade = ledger.navigation_grade();
             ledger
                 .apply(*e, if e.xyzzy { serial } else { transaction })

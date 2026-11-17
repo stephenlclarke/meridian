@@ -759,6 +759,30 @@ impl App {
         }
     }
 
+    fn complete_presentation(
+        presented: Result<Presentation, String>,
+        docked: &mut Option<Docked>,
+        docked_frame: Option<ui::Frame>,
+        renderer: &Renderer,
+        help: &Option<crate::help::Panel>,
+        xyzzy: &Option<crate::xyzzy::Menu>,
+    ) -> Result<(), String> {
+        match presented {
+            Ok(Presentation::Presented) => {
+                if let (Some(menu), Some(frame)) = (docked, docked_frame) {
+                    menu.presented(frame);
+                }
+            }
+            Ok(Presentation::Skipped) => {
+                if (help.is_some() || xyzzy.is_some()) && !renderer.is_zero_sized() {
+                    renderer.window.request_redraw();
+                }
+            }
+            Err(error) => return Err(error),
+        }
+        Ok(())
+    }
+
     fn redraw(&mut self, event_loop: &ActiveEventLoop) {
         let now = Instant::now();
         let elapsed = now.duration_since(self.last_frame).as_secs_f64();
@@ -950,18 +974,15 @@ impl App {
                     help: self.help.as_ref().or(xyzzy_panel.as_ref()),
                 },
             );
-            match presented {
-                Ok(Presentation::Presented) => {
-                    if let (Some(menu), Some(frame)) = (&mut self.docked, docked_frame) {
-                        menu.presented(frame);
-                    }
-                }
-                Ok(Presentation::Skipped) => {
-                    if (self.help.is_some() || self.xyzzy.is_some()) && !renderer.is_zero_sized() {
-                        renderer.window.request_redraw();
-                    }
-                }
-                Err(error) => self.fail(event_loop, error),
+            if let Err(error) = Self::complete_presentation(
+                presented,
+                &mut self.docked,
+                docked_frame,
+                renderer,
+                &self.help,
+                &self.xyzzy,
+            ) {
+                self.fail(event_loop, error);
             }
         }
     }

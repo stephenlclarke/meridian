@@ -370,6 +370,36 @@ impl Renderer {
         }
     }
 
+    fn draw_overlay(
+        &self,
+        encoder: &mut wgpu::CommandEncoder,
+        view: &wgpu::TextureView,
+        docked: Option<&crate::docked_screens::Frame>,
+        help: Option<&crate::help::Panel>,
+    ) {
+        let colors = [Some(wgpu::RenderPassColorAttachment {
+            view,
+            depth_slice: None,
+            resolve_target: None,
+            ops: wgpu::Operations {
+                load: wgpu::LoadOp::Load,
+                store: wgpu::StoreOp::Store,
+            },
+        })];
+        let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+            color_attachments: &colors,
+            ..Default::default()
+        });
+        if docked.is_some() {
+            self.docked.draw_overlay(&mut pass);
+        }
+        if docked.is_none() || help.is_some() {
+            pass.set_pipeline(&self.hud_pipeline);
+            pass.set_vertex_buffer(0, self.hud_vertices.slice(..));
+            pass.draw(0..self.hud_frame.len() as u32, 0..1);
+        }
+    }
+
     pub fn draw(
         &mut self,
         snapshot: &Snapshot,
@@ -554,29 +584,7 @@ impl Renderer {
                 self.celestial.draw_halos(&mut pass);
             }
         }
-        {
-            let colors = [Some(wgpu::RenderPassColorAttachment {
-                view: &view,
-                depth_slice: None,
-                resolve_target: None,
-                ops: wgpu::Operations {
-                    load: wgpu::LoadOp::Load,
-                    store: wgpu::StoreOp::Store,
-                },
-            })];
-            let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-                color_attachments: &colors,
-                ..Default::default()
-            });
-            if docked.is_some() {
-                self.docked.draw_overlay(&mut pass);
-            }
-            if docked.is_none() || help.is_some() {
-                pass.set_pipeline(&self.hud_pipeline);
-                pass.set_vertex_buffer(0, self.hud_vertices.slice(..));
-                pass.draw(0..self.hud_frame.len() as u32, 0..1);
-            }
-        }
+        self.draw_overlay(&mut encoder, &view, docked, help);
         self.queue.submit([encoder.finish()]);
         self.window.pre_present_notify();
         frame.present();
