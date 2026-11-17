@@ -227,6 +227,18 @@ impl Ledger {
     }
 }
 impl State {
+    pub(super) fn account_events(&self) -> Vec<super::AccountEvent> {
+        self.events
+            .iter()
+            .filter_map(|e| {
+                (e.action == AmmunitionAction::Purchase).then_some(super::AccountEvent {
+                    revision: e.revision,
+                    effect: super::AccountEffect::Debit(if e.xyzzy { 0 } else { PRICE_TENTHS }),
+                })
+            })
+            .collect()
+    }
+
     pub(super) fn ledger(
         &self,
         world: &World,

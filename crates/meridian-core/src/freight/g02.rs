@@ -711,6 +711,7 @@ pub enum Command {
 /// Created only by committing the last original-unit transfer; never accepted as command authority.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CompletionReceipt {
+    account_revision: u64,
     job: JobId,
     sequence: u64,
     receiver: ActorId,
@@ -766,6 +767,7 @@ pub enum Event {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct Transfer {
+    account_revision: u64,
     sequence: u64,
     mask: u8,
     receiver: ActorId,
@@ -830,6 +832,19 @@ pub(crate) struct Prepared {
 }
 
 impl State {
+    pub(crate) fn account_events(&self) -> Vec<crate::flight::AccountEvent> {
+        self.data
+            .jobs
+            .iter()
+            .flatten()
+            .filter_map(|j| j.completion)
+            .map(|c| crate::flight::AccountEvent {
+                revision: c.account_revision,
+                effect: crate::flight::AccountEffect::Reward(REWARD_TENTHS),
+            })
+            .collect()
+    }
+
     pub(crate) fn new_commander(owner: u64) -> Self {
         Self {
             data: Data {
@@ -1100,6 +1115,7 @@ impl State {
                 .checked_add(REWARD_TENTHS)
                 .ok_or(Error::CreditOverflow)?;
             Some(CompletionReceipt {
+                account_revision: plan.next_account.revision,
                 job: id,
                 sequence: plan.next.sequence,
                 receiver,
@@ -1112,6 +1128,7 @@ impl State {
         updated.held = remaining;
         updated.delivered |= mask;
         updated.transfers[updated.transfer_count as usize] = Some(Transfer {
+            account_revision: plan.next_account.revision,
             sequence: plan.next.sequence,
             mask,
             receiver,

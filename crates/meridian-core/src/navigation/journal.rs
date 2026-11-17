@@ -63,9 +63,10 @@ pub(crate) struct CompletedJump {
     source_visit: u64,
     arrival_tick: u64,
     grade: NavigationGrade,
+    account_revision: u64,
 }
 impl CompletedJump {
-    pub(crate) const ENCODED_SIZE: usize = 25;
+    pub(crate) const ENCODED_SIZE: usize = 33;
 
     pub(crate) fn arrived(
         source: NavigationState,
@@ -73,6 +74,7 @@ impl CompletedJump {
         debit: u16,
         tick: u64,
         grade: NavigationGrade,
+        account_revision: u64,
     ) -> Self {
         Self {
             source: source.system,
@@ -81,6 +83,7 @@ impl CompletedJump {
             source_visit: source.visit,
             arrival_tick: tick,
             grade,
+            account_revision,
         }
     }
     fn encode(self, w: &mut Writer) {
@@ -90,6 +93,7 @@ impl CompletedJump {
         w.u64(self.source_visit);
         w.u64(self.arrival_tick);
         w.u8(self.grade.tag());
+        w.u64(self.account_revision);
     }
     fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         Ok(Self {
@@ -99,6 +103,7 @@ impl CompletedJump {
             source_visit: r.u64()?,
             arrival_tick: r.u64()?,
             grade: NavigationGrade::decode(r)?,
+            account_revision: r.u64()?,
         })
     }
 }
@@ -133,6 +138,45 @@ impl JumpJournal {
         Ok(Self { legs })
     }
 
+    pub(crate) fn account_events(&self) -> Vec<crate::flight::AccountEvent> {
+        self.legs
+            .iter()
+            .map(|leg| crate::flight::AccountEvent {
+                revision: leg.account_revision,
+                effect: crate::flight::AccountEffect::Jump(leg.debit),
+            })
+            .collect()
+    }
+
+    /// Exact completed prefix at this physical berth, independent of secret annotations.
+    pub(crate) fn spent_at(&self, dock: DockContext, tick: u64) -> Result<u64, SaveError> {
+        let count = usize::try_from(dock.visit().checked_sub(dock.sequence()).ok_or(INVALID)?)
+            .map_err(|_| INVALID)?;
+        if count > self.legs.len() {
+            return Err(INVALID);
+        }
+        let mut spent = 0_u64;
+        for leg in &self.legs[..count] {
+            if leg.arrival_tick >= dock.tick()
+                || leg.arrival_tick > tick
+                || leg.source_visit >= dock.visit()
+            {
+                return Err(INVALID);
+            }
+            spent = spent.checked_add(u64::from(leg.debit)).ok_or(INVALID)?;
+        }
+        if self.legs.get(count).is_some_and(|leg| {
+            dock.visit() >= leg.source_visit
+                || leg
+                    .arrival_tick
+                    .checked_sub(u64::from(BASIC_SPOOL_TICKS))
+                    .is_none_or(|departure| tick > departure)
+        }) {
+            return Err(INVALID);
+        }
+        Ok(spent)
+    }
+
     pub(crate) fn validate(
         &self,
         nav: NavigationState,
@@ -153,6 +197,7 @@ impl JumpJournal {
                 ))
             })
             .transpose()?;
+        let mut previous_account_revision = 0;
         let mut system = SystemId::AVENOR;
         let mut spent = 0_u64;
         let mut jumps = 0_u64;
@@ -208,7 +253,8 @@ impl JumpJournal {
             let distance = catalogue
                 .distance_ly(leg.source, leg.destination)
                 .map_err(|_| INVALID)?;
-            if leg.source != system
+            if leg.account_revision <= previous_account_revision
+                || leg.source != system
                 || leg.source == leg.destination
                 || leg.grade != grade
                 || distance <= 0.0
@@ -223,6 +269,7 @@ impl JumpJournal {
             {
                 return Err(INVALID);
             }
+            previous_account_revision = leg.account_revision;
             spent = spent.checked_add(u64::from(leg.debit)).ok_or(INVALID)?;
             jumps = jumps.checked_add(1).ok_or(INVALID)?;
             earliest_visit = leg.source_visit.checked_add(1).ok_or(INVALID)?;
@@ -278,6 +325,7 @@ mod tests {
                     destination: LARERIA,
                     debit: 99,
                     source_visit: 2,
+                    account_revision: 1,
                     arrival_tick: 601,
                     grade: NavigationGrade::Basic,
                 },
@@ -286,6 +334,7 @@ mod tests {
                     destination: SystemId::RENAS,
                     debit: 73,
                     source_visit: 3,
+                    account_revision: 2,
                     arrival_tick: 1201,
                     grade: NavigationGrade::Basic,
                 },
@@ -294,6 +343,7 @@ mod tests {
                     destination: SystemId::AVENOR,
                     debit: 34,
                     source_visit: 5,
+                    account_revision: 4,
                     arrival_tick: 1901,
                     grade: NavigationGrade::Intermediate,
                 },

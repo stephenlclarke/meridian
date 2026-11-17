@@ -517,6 +517,22 @@ impl Ledger {
 }
 
 impl State {
+    pub(super) fn account_events(&self) -> Vec<super::AccountEvent> {
+        self.events
+            .iter()
+            .filter_map(|e| {
+                e.action.purchase_kind().map(|kind| super::AccountEvent {
+                    revision: e.revision,
+                    effect: super::AccountEffect::Debit(if e.xyzzy {
+                        0
+                    } else {
+                        kind.shop().map_or(0, |s| s.0)
+                    }),
+                })
+            })
+            .collect()
+    }
+
     fn purchase_count(&self) -> usize {
         self.events
             .iter()

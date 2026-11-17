@@ -2,7 +2,7 @@ mod celestial;
 mod damage;
 mod mining;
 mod xyzzy;
-pub(crate) use xyzzy::STARTING_CREDITS_TENTHS;
+pub(crate) use xyzzy::{AccountEffect, AccountEvent, STARTING_CREDITS_TENTHS};
 pub use xyzzy::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
 mod navigation_trade;
 mod traffic;
@@ -621,7 +621,15 @@ impl World {
                     return Err(StepError::TickOverflow);
                 }
                 completed_leg = Some(crate::navigation::CompletedJump::arrived(
-                    source, *state, debit, next.tick, grade,
+                    source,
+                    *state,
+                    debit,
+                    next.tick,
+                    grade,
+                    account
+                        .revision()
+                        .checked_add(1)
+                        .ok_or(StepError::TickOverflow)?,
                 ));
                 planned_debit = Some(debit);
                 // Source arrival places the station16000 ahead. This is its equivalent

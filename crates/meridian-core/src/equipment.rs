@@ -105,6 +105,12 @@ pub(crate) struct State {
     fitted: bool,
 }
 impl State {
+    pub(crate) fn account_event(self) -> Option<crate::flight::AccountEvent> {
+        self.purchase.map(|p| crate::flight::AccountEvent {
+            revision: p.account_revision,
+            effect: crate::flight::AccountEffect::Debit(p.paid),
+        })
+    }
     pub(crate) fn is_xyzzy(self) -> bool {
         self.purchase.is_some_and(|p| p.xyzzy)
     }

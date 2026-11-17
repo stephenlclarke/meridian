@@ -2,7 +2,10 @@
 use super::{CommodityId, Error, MAX_MARKET_QUANTITY, MarketSite, StationMarkets};
 impl StationMarkets {
     pub(crate) fn traffic_candidate(&self) -> Self {
-        Self { data: self.data }
+        Self {
+            data: self.data,
+            receipts: self.receipts.clone(),
+        }
     }
     pub(crate) fn prepare_traffic_stock(
         &self,

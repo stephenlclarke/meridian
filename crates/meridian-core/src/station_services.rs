@@ -6,6 +6,7 @@
 
 mod commodities;
 pub use commodities::{CargoUnit, CommodityDefinition, CommodityId, CommodityQuote};
+mod history;
 mod persistence;
 mod traffic;
 pub(crate) use persistence::SavedServiceSummary;
@@ -13,7 +14,7 @@ pub(crate) use persistence::SavedServiceSummary;
 const SEEDS: &[u8] = include_bytes!("../../../assets/legacy/g01-food.markets");
 
 const STOCK_FUEL_TENTHS: u16 = 130;
-const FUEL_PRICE_TENTHS: u32 = 2;
+pub(crate) const FUEL_PRICE_TENTHS: u32 = 2;
 // Swift's supported 64-bit Int.max/17 quantity bound, not the immutable initial stock.
 pub(crate) const MAX_MARKET_QUANTITY: u64 = i64::MAX as u64 / 17;
 
@@ -194,6 +195,7 @@ struct MarketData {
 #[derive(Debug)]
 pub struct StationMarkets {
     data: MarketData,
+    receipts: std::sync::Arc<Vec<history::Receipt>>,
 }
 
 /// Single-use prospective change. Dropping it changes neither stock nor the actual account.
@@ -223,6 +225,7 @@ impl StationMarkets {
             return Err(Error::WrongOwner);
         }
         Ok(Self {
+            receipts: std::sync::Arc::new(Vec::new()),
             data: MarketData {
                 owner,
                 revision: 0,
@@ -267,6 +270,9 @@ impl StationMarkets {
         facts: Option<ServiceFacts>,
         command: Command,
     ) -> Result<Prepared, Error> {
+        if self.receipts.len() >= history::MAX_RECEIPTS {
+            return Err(Error::SequenceExhausted);
+        }
         validate_account(account)?;
         let facts = validate_service(self.data.owner, account, facts)?;
         let mut next = self.data;
@@ -455,8 +461,16 @@ impl Prepared {
         if market.data != self.before || account != self.account || facts != Some(self.facts) {
             return Err(Error::StalePublication);
         }
+        let mut receipts = market.receipts.clone();
+        std::sync::Arc::make_mut(&mut receipts).push(history::Receipt {
+            revision: self.next_account.revision,
+            event: self.event,
+        });
         Ok(Change {
-            market: StationMarkets { data: self.next },
+            market: StationMarkets {
+                data: self.next,
+                receipts,
+            },
             account_after: self.next_account,
             event: self.event,
         })

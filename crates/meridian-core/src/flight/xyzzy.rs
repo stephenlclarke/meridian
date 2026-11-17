@@ -1,7 +1,9 @@
 //! Explicit secret transactions. No getter, normal purchase or save decoder grants property.
+mod history;
 use super::{FlightMode, World};
 use crate::navigation::DockContext;
 use crate::save::{Reader, SaveError, Writer};
+pub(crate) use history::{AccountEffect, AccountEvent};
 
 pub const STARTING_CREDITS_TENTHS: u32 = 10_000_000;
 pub const COMMANDER_NAME: &str = "CLARKE";
@@ -116,6 +118,7 @@ impl State {
         &self,
         world: &World,
         account: &crate::freight::g02::CommanderAccount,
+        commerce: &super::persistence::Commerce<'_>,
     ) -> Result<Terms, SaveError> {
         if account.xyzzy_flags() != (self.active(), self.unlimited_fuel()) {
             return Err(INVALID);
@@ -180,6 +183,7 @@ impl State {
                 return Err(INVALID);
             }
         }
+        self.validate_account_prefix(world, account, commerce)?;
         Ok(terms)
     }
     pub(super) fn encode(&self, w: &mut Writer) {

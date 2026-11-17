@@ -75,6 +75,7 @@ fn read_job_id(r: &mut Reader<'_>) -> Result<JobId, SaveError> {
     })
 }
 fn write_completion(w: &mut Writer, c: &CompletionReceipt) {
+    w.u64(c.account_revision);
     write_job_id(w, c.job);
     w.u64(c.sequence);
     write_actor(w, c.receiver);
@@ -82,6 +83,7 @@ fn write_completion(w: &mut Writer, c: &CompletionReceipt) {
 }
 fn read_completion(r: &mut Reader<'_>) -> Result<CompletionReceipt, SaveError> {
     Ok(CompletionReceipt {
+        account_revision: r.u64()?,
         job: read_job_id(r)?,
         sequence: r.u64()?,
         receiver: read_actor(r)?,
@@ -254,6 +256,18 @@ impl CommanderAccount {
         {
             return Err(SaveError::InvalidState("starter identity or fitting"));
         }
+        if state
+            .data
+            .jobs
+            .iter()
+            .flatten()
+            .flat_map(|j| j.transfers.iter().flatten())
+            .any(|t| t.account_revision == 0 || t.account_revision > self.data.revision)
+        {
+            return Err(SaveError::InvalidState(
+                "freight account transaction prefix",
+            ));
+        }
         state.validate_saved(nav, epoch)?;
         Ok(SavedDomainSummary {
             revision: self.data.revision,
@@ -289,6 +303,7 @@ fn write_job(w: &mut Writer, j: &Job) {
     w.u8(j.transfer_count);
     for t in &j.transfers {
         w.option(t.as_ref(), |w, t| {
+            w.u64(t.account_revision);
             w.u64(t.sequence);
             w.u8(t.mask);
             write_actor(w, t.receiver);
@@ -325,6 +340,7 @@ fn read_job(r: &mut Reader<'_>) -> Result<Job, SaveError> {
         transfers: r.array(|r| {
             r.option(|r| {
                 Ok(Transfer {
+                    account_revision: r.u64()?,
                     sequence: r.u64()?,
                     mask: r.u8()?,
                     receiver: read_actor(r)?,
@@ -495,7 +511,8 @@ fn validate_job(
             return Err(invalid);
         }
         if let Some(previous) = last
-            && (t.dock.arrival_sequence < previous.dock.arrival_sequence
+            && (t.account_revision <= previous.account_revision
+                || t.dock.arrival_sequence < previous.dock.arrival_sequence
                 || t.receiver.generation < previous.receiver.generation)
         {
             return Err(invalid);
@@ -516,6 +533,7 @@ fn validate_job(
             let t = last.ok_or(invalid)?;
             if j.completion
                 != Some(CompletionReceipt {
+                    account_revision: t.account_revision,
                     job: j.id,
                     sequence: t.sequence,
                     receiver: t.receiver,

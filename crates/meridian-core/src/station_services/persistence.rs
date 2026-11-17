@@ -50,6 +50,7 @@ impl StationMarkets {
                 w.u64(count);
             }
         }
+        self.encode_receipts(w);
     }
     pub(crate) fn decode_save(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         Ok(Self {
@@ -79,6 +80,7 @@ impl StationMarkets {
                 other_bought: r.array(|r| r.array(|r| r.u64()))?,
                 other_sold: r.array(|r| r.array(|r| r.u64()))?,
             },
+            receipts: std::sync::Arc::new(Self::decode_receipts(r)?),
         })
     }
     pub(crate) fn validate_save(
@@ -105,6 +107,7 @@ impl StationMarkets {
         if owner == 0 || self.data.owner != owner {
             return Err(invalid);
         }
+        self.validate_receipts()?;
         let food_summary = validate_food_markets(&self.data, capacity, traffic)?;
         let food = food_summary.food;
         let mut bought = food_summary.bought;

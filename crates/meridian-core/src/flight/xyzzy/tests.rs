@@ -643,3 +643,120 @@ fn secret_navigation_travels_real_lareria_route_and_fuel_off_still_requires_paid
     assert_eq!(w.xyzzy_snapshot().unwrap().jump_limit_ly, 13.0);
     cold(&w);
 }
+
+// Negative-only component edit: decode does not confer World accounting validity.
+fn corrupt_cash(w: &mut World, cash: u32) {
+    let mut encoded = crate::save::Writer { bytes: Vec::new() };
+    w.commander_account
+        .as_ref()
+        .unwrap()
+        .encode_save(&mut encoded);
+    encoded.bytes[24..28].copy_from_slice(&cash.to_le_bytes());
+    w.commander_account = Some(
+        crate::freight::g02::CommanderAccount::decode_save(
+            &mut crate::save::Reader::new(&encoded.bytes),
+            crate::save::SAVE_VERSION,
+        )
+        .unwrap(),
+    );
+}
+
+#[test]
+fn coordinated_reset_and_wallet_edit_cannot_mint_one_tenth_against_the_real_birth_prefix() {
+    let mut w = World::new_commander(15604).unwrap();
+    apply(&mut w, XyzzyAction::Enter);
+    let valid = w.save_bytes().unwrap();
+    let mut live = World::from_save_bytes(&valid).unwrap();
+    let before = live.save_bytes().unwrap();
+    w.xyzzy.records[0].cash_before_reset = Some(7199);
+    corrupt_cash(&mut w, 10_000_001);
+    // This preserved the old final aggregate: the fabricated adjustment and balance both rise1.
+    poison_refuses(&w, &mut live, &before);
+    assert!(World::from_save_bytes(&w.unchecked_test_save().unwrap()).is_err());
+}
+
+#[test]
+fn coordinated_initial_spend_and_refill_cannot_move_a_real_later_leg_before_activation() {
+    let mut w = World::new_commander(15605).unwrap();
+    apply(&mut w, XyzzyAction::Enter);
+    journey(&mut w, SystemId::RENAS);
+    assert_eq!(w.navigation.unwrap().fuel_spent(), 34);
+    assert_eq!(w.snapshot().navigation.unwrap().fuel_units, 130);
+    let valid = w.save_bytes().unwrap();
+    let mut live = World::from_save_bytes(&valid).unwrap();
+    let before = live.save_bytes().unwrap();
+    w.xyzzy.records[0].fuel_spent = 1;
+    w.xyzzy.records[0].fuel_added = 1;
+    // Old aggregate supply stayed34: 1 + (34 - 1).
+    poison_refuses(&w, &mut live, &before);
+    assert!(World::from_save_bytes(&w.unchecked_test_save().unwrap()).is_err());
+}
+
+#[test]
+fn coordinated_on_off_boundary_and_refill_shift_refuses_with_unchanged_final_fuel() {
+    let mut w = World::new_commander(15606).unwrap();
+    apply(&mut w, XyzzyAction::Enter);
+    journey(&mut w, SystemId::RENAS);
+    apply(&mut w, XyzzyAction::ToggleUnlimitedFuel);
+    journey(&mut w, SystemId::AVENOR);
+    apply(&mut w, XyzzyAction::ToggleUnlimitedFuel);
+    journey(&mut w, SystemId::RENAS);
+    assert_eq!(w.navigation.unwrap().fuel_spent(), 102);
+    assert_eq!(w.snapshot().navigation.unwrap().fuel_units, 130);
+    assert_eq!(w.xyzzy.records[1].fuel_spent, 34);
+    assert_eq!(w.xyzzy.records[2].fuel_added, 34);
+    let valid = w.save_bytes().unwrap();
+    let mut live = World::from_save_bytes(&valid).unwrap();
+    let before = live.save_bytes().unwrap();
+    w.xyzzy.records[1].fuel_spent = 35;
+    w.xyzzy.records[2].fuel_added = 33;
+    // Old aggregate supply stayed102: 35 + 33 + (102 - 68).
+    poison_refuses(&w, &mut live, &before);
+    assert!(World::from_save_bytes(&w.unchecked_test_save().unwrap()).is_err());
+}
+
+#[test]
+fn coordinated_refill_and_final_tank_edit_cannot_hide_an_incorrect_reset_quantity() {
+    let mut w = World::new_commander(15607).unwrap();
+    apply(&mut w, XyzzyAction::Enter);
+    apply(&mut w, XyzzyAction::ToggleUnlimitedFuel);
+    journey(&mut w, SystemId::RENAS);
+    apply(&mut w, XyzzyAction::ToggleUnlimitedFuel);
+    assert_eq!(w.xyzzy.records[2].fuel_added, 34);
+    let valid = w.save_bytes().unwrap();
+    let mut live = World::from_save_bytes(&valid).unwrap();
+    let before = live.save_bytes().unwrap();
+    w.xyzzy.records[2].fuel_added = 33;
+    let mut encoded = crate::save::Writer { bytes: Vec::new() };
+    w.commander_account
+        .as_ref()
+        .unwrap()
+        .encode_save(&mut encoded);
+    encoded.bytes[34..36].copy_from_slice(&129_u16.to_le_bytes());
+    w.commander_account = Some(
+        crate::freight::g02::CommanderAccount::decode_save(
+            &mut crate::save::Reader::new(&encoded.bytes),
+            crate::save::SAVE_VERSION,
+        )
+        .unwrap(),
+    );
+    poison_refuses(&w, &mut live, &before);
+    assert!(World::from_save_bytes(&w.unchecked_test_save().unwrap()).is_err());
+}
+
+#[test]
+fn same_tick_paid_service_before_reset_and_sale_after_reset_replay_in_account_order() {
+    let mut w = World::new_commander(15608).unwrap();
+    w.request_station_service(crate::station_services::Command::BuyFood, 0)
+        .unwrap();
+    assert_eq!(w.credits_tenths(), Some(6974));
+    apply(&mut w, XyzzyAction::Enter);
+    assert_eq!(w.xyzzy.records[0].cash_before_reset, Some(6974));
+    w.request_station_service(crate::station_services::Command::SellFood, 0)
+        .unwrap();
+    assert_eq!(w.credits_tenths(), Some(10_000_208));
+    let mut w = cold(&w);
+    apply(&mut w, XyzzyAction::MaximumSupportedHardware);
+    assert_eq!(w.credits_tenths(), Some(10_000_208));
+    cold(&w);
+}
