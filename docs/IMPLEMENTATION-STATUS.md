@@ -200,3 +200,21 @@ The `db457aa` Mac qualification stopped during all-target compiler check with `E
 Exact `4e83640999fb890de6af27d2081a7fde298818b6`, tree `9978a442b6b5ab19ee2854511e3bc4d5bb0eb322`, reported **284 core cases passed and two failed** out of 286 in 29.56 seconds. All-target compilation, 40 Markdown files, formatting and 88 Python cases passed; desktop/example tests, Clippy, release and native gameplay remained unrun. The retained 50465-byte raw log has SHA-256 `33df65c56b10c18eed0c8fa159b3ff1ab2dc8a297fb941a3a21950e239472004`. The full-proof negative and Root's legacy-reader case now passed. The remaining failures were the seven-round pilot exhausting its 12000-tick pursuit and the mixed return actually meeting an NPC body on its lateral path.
 
 The current fixture source waits for real speed matching before launch, leads the observed trader velocity through turns and regulates a 600-unit stand-off. It retains the 900-unit launch distance, 0.995 bearing alignment, 12000 pursuit and 500 finish bounds. The return pilot plans planar waypoints around actual live and destroyed bodies, checks each leg as traffic moves, and uses ordinary yaw/throttle/brake commands with a no-refusal assertion on every physical step. It stages at X=0/Z=350, then retains the original physical docking helper. A single 30000-step route budget is bounded by the old per-axis helper limit. No actor is removed and no production code or collision/resource/save rule changes. No tests are added or skipped; all original regression assertions remain. This source is uncompiled and unrun pending Root's exact join, whole-delta review and changed execution.
+
+### NPC qualification: strict Clippy correction
+
+Exact `3a53949719267cd1717da71a9b8c001a13b49fdf` Mac qualification passed
+286 core and 169 desktop tests (455 top-level cases), including both previously
+failing pilot journeys. Nested cold-process summaries are not additional cases.
+The 88 Python tests, 40 Markdown files, formatting and all-target check passed.
+Strict Clippy then stopped qualification with six unique diagnostics.
+
+The following source correction only collapses four nested conditions into
+short-circuit let chains, replaces an unsigned modulo predicate with
+`is_multiple_of(4)`, and moves an unchanged test module after the existing v13
+fixture helper. No assertion, collision rule, resource or save behavior, lint
+setting or gate is weakened. The corrected source is uncompiled and untested
+until independent delta review and owning execution. Three observer example
+cases, release build, coverage, signing and native gameplay remain unrun.
+There is no new qualified preview or full 1337 parity claim.
+

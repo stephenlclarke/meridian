@@ -491,7 +491,7 @@ fn manifest(seed: u64, system: SystemId) -> (CommodityId, u8) {
     )
 }
 fn pirate_present(seed: u64, system: SystemId) -> bool {
-    mix(seed ^ u64::from(system.system) ^ 0x5049_5241_5445) % 4 == 0
+    mix(seed ^ u64::from(system.system) ^ 0x5049_5241_5445).is_multiple_of(4)
 }
 fn pose(position: Vec3, yaw: f64) -> RigidPose {
     let (s, c) = yaw.sin_cos();

@@ -120,18 +120,18 @@ impl World {
             if hit.len() != usize::from(live) {
                 return Err(INVALID);
             }
-            if let Some(h) = hit.first() {
-                if h.origin != p.origin
+            if let Some(h) = hit.first()
+                && (h.origin != p.origin
                     || h.victim != id
                     || h.point != p.position
                     || h.world_tick != p.last_tick
                     || h.local_tick != scene.local_tick
                     || h.victim_pose != body.pose
                     || h.front
-                        != (sub(p.position, body.pose.position).dot(body.pose.orientation.z) >= 0.0)
-                {
-                    return Err(INVALID);
-                }
+                        != (sub(p.position, body.pose.position).dot(body.pose.orientation.z)
+                            >= 0.0))
+            {
+                return Err(INVALID);
             }
         }
         for h in self.traffic.missile_hits() {

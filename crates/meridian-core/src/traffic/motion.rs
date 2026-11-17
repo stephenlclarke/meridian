@@ -237,34 +237,32 @@ fn resolve_peer_paths(
         for b in a + 1..MAX_TRAFFIC_ACTORS {
             if let (Some(oa), Some(ob), Some(na), Some(nb)) =
                 (opening[a], opening[b], actors[a], actors[b])
+                && oa.id.system == system
+                && ob.id.system == system
+                && oa.airborne()
+                && ob.airborne()
+                && na.airborne()
+                && nb.airborne()
+                && segment_distance(
+                    sub(oa.position, ob.position),
+                    sub(na.position, nb.position),
+                    Vec3::new(0.0, 0.0, 0.0),
+                ) <= radius * 2.0 + 1.0
             {
-                if oa.id.system == system
-                    && ob.id.system == system
-                    && oa.airborne()
-                    && ob.airborne()
-                    && na.airborne()
-                    && nb.airborne()
-                    && segment_distance(
-                        sub(oa.position, ob.position),
-                        sub(na.position, nb.position),
-                        Vec3::new(0.0, 0.0, 0.0),
-                    ) <= radius * 2.0 + 1.0
-                {
-                    let mut na = na;
-                    let mut nb = nb;
-                    na.phase = oa.phase;
-                    na.berth = oa.berth;
-                    na.position = oa.position;
-                    na.yaw = oa.yaw;
-                    na.speed = 0.0;
-                    nb.phase = ob.phase;
-                    nb.berth = ob.berth;
-                    nb.position = ob.position;
-                    nb.yaw = ob.yaw;
-                    nb.speed = 0.0;
-                    actors[a] = Some(na);
-                    actors[b] = Some(nb);
-                }
+                let mut na = na;
+                let mut nb = nb;
+                na.phase = oa.phase;
+                na.berth = oa.berth;
+                na.position = oa.position;
+                na.yaw = oa.yaw;
+                na.speed = 0.0;
+                nb.phase = ob.phase;
+                nb.berth = ob.berth;
+                nb.position = ob.position;
+                nb.yaw = ob.yaw;
+                nb.speed = 0.0;
+                actors[a] = Some(na);
+                actors[b] = Some(nb);
             }
         }
     }

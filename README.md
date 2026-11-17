@@ -99,3 +99,21 @@ The current traffic correction yields the native station approach to an aligned 
 Latest NPC qualification on `2b7b350` reached 282 core passes and four failures. The four-case follow-up changes public test piloting and format-specific fixtures while preserving collision, contact and save-history assertions; it is unrun and awaiting review. The delivered public preview remains unchanged.
 
 The next NPC core run on `4e83640` reported **284 passed, two failed**. The remaining source-only fixture work speed-matches the trader before launch and plans the return around current live NPCs and retained wrecks. The capacity and legacy cases passed in that run. Production guidance, collisions and limits remain unchanged; corrected execution is still pending.
+
+### NPC qualification: strict Clippy correction
+
+Exact `3a53949719267cd1717da71a9b8c001a13b49fdf` Mac qualification passed
+286 core and 169 desktop tests (455 top-level cases), including both previously
+failing pilot journeys. Nested cold-process summaries are not additional cases.
+The 88 Python tests, 40 Markdown files, formatting and all-target check passed.
+Strict Clippy then stopped qualification with six unique diagnostics.
+
+The following source correction only collapses four nested conditions into
+short-circuit let chains, replaces an unsigned modulo predicate with
+`is_multiple_of(4)`, and moves an unchanged test module after the existing v13
+fixture helper. No assertion, collision rule, resource or save behavior, lint
+setting or gate is weakened. The corrected source is uncompiled and untested
+until independent delta review and owning execution. Three observer example
+cases, release build, coverage, signing and native gameplay remain unrun.
+There is no new qualified preview or full 1337 parity claim.
+

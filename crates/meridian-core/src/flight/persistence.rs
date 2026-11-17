@@ -1052,23 +1052,6 @@ pub(super) fn v10_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
 }
 
 #[cfg(test)]
-mod paid_missile_format_tests {
-    use super::*;
-    #[test]
-    fn explicit_qualified_v11_is_read_without_relabelling_it_as_v12() {
-        let world = World::new_commander(8401).unwrap_or_else(|e| panic!("{e:?}"));
-        let old = legacy_test_fixture(&world, 11).unwrap_or_else(|e| panic!("{e:?}"));
-        assert_eq!(u16::from_le_bytes([old[8], old[9]]), 11);
-        let loaded = World::from_save_bytes(&old).unwrap_or_else(|e| panic!("{e:?}"));
-        assert_eq!(loaded.ammunition_snapshot(), world.ammunition_snapshot());
-        assert_eq!(loaded.credits_tenths(), world.credits_tenths());
-        let current = loaded.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
-        assert_eq!(u16::from_le_bytes([current[8], current[9]]), SAVE_VERSION);
-        assert_ne!(old, current);
-    }
-}
-
-#[cfg(test)]
 pub(super) fn v13_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
     if !world.traffic.legacy_empty() {
         return Err(SaveError::InvalidState(
@@ -1118,4 +1101,21 @@ pub(super) fn v13_test_fixture(world: &World) -> Result<Vec<u8>, SaveError> {
     let digest = checksum(&old.bytes);
     old.u64(digest);
     Ok(old.bytes)
+}
+
+#[cfg(test)]
+mod paid_missile_format_tests {
+    use super::*;
+    #[test]
+    fn explicit_qualified_v11_is_read_without_relabelling_it_as_v12() {
+        let world = World::new_commander(8401).unwrap_or_else(|e| panic!("{e:?}"));
+        let old = legacy_test_fixture(&world, 11).unwrap_or_else(|e| panic!("{e:?}"));
+        assert_eq!(u16::from_le_bytes([old[8], old[9]]), 11);
+        let loaded = World::from_save_bytes(&old).unwrap_or_else(|e| panic!("{e:?}"));
+        assert_eq!(loaded.ammunition_snapshot(), world.ammunition_snapshot());
+        assert_eq!(loaded.credits_tenths(), world.credits_tenths());
+        let current = loaded.save_bytes().unwrap_or_else(|e| panic!("{e:?}"));
+        assert_eq!(u16::from_le_bytes([current[8], current[9]]), SAVE_VERSION);
+        assert_ne!(old, current);
+    }
 }

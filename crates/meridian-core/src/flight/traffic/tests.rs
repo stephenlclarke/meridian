@@ -302,20 +302,20 @@ fn genuine_pirate_contact_damages_actual_trader_and_queues_only_unavailable_poli
     for _ in 0..12000 {
         ok(w.step(FlightInput::default()));
         let scene = some(w.traffic_snapshot());
-        if let Some(beam) = scene.last_beam {
-            if matches!(beam.source, BeamSource::Npc(_)) {
-                assert_eq!(beam.victim.serial(), 1);
-                assert!(scene.verified_crimes > 0);
-                assert_eq!(scene.police_required_hull, Some("SH031"));
-                let trader = some(scene.actors.iter().find(|a| a.id == beam.victim));
-                assert!(
-                    trader.front_shield_hundredths < 30000
-                        || trader.rear_shield_hundredths < 30000
-                        || trader.energy_hundredths < 38000
-                );
-                contacted = true;
-                break;
-            }
+        if let Some(beam) = scene.last_beam
+            && matches!(beam.source, BeamSource::Npc(_))
+        {
+            assert_eq!(beam.victim.serial(), 1);
+            assert!(scene.verified_crimes > 0);
+            assert_eq!(scene.police_required_hull, Some("SH031"));
+            let trader = some(scene.actors.iter().find(|a| a.id == beam.victim));
+            assert!(
+                trader.front_shield_hundredths < 30000
+                    || trader.rear_shield_hundredths < 30000
+                    || trader.energy_hundredths < 38000
+            );
+            contacted = true;
+            break;
         }
     }
     assert!(
@@ -335,46 +335,45 @@ fn actual_player_pulse_uses_first_npc_mesh_and_bound_weapon_resources_and_retain
     let mut w = clear_lane(12005);
     let mut hit = None;
     for _ in 0..1500 {
-        if let Some(scene) = w.traffic_snapshot() {
-            if let Some(target) = scene
+        if let Some(scene) = w.traffic_snapshot()
+            && let Some(target) = scene
                 .actors
                 .iter()
                 .find(|a| a.population == Population::Trader && a.phase != NpcPhase::Complete)
-            {
-                let p = w.snapshot();
-                let delta = Vec3::new(
-                    target.pose.position.x - f64::from(p.position[0]),
-                    0.0,
-                    target.pose.position.z - f64::from(p.position[2]),
+        {
+            let p = w.snapshot();
+            let delta = Vec3::new(
+                target.pose.position.x - f64::from(p.position[0]),
+                0.0,
+                target.pose.position.z - f64::from(p.position[2]),
+            );
+            let desired = delta.x.atan2(delta.z);
+            let pose = some(flight_pose(p.position, p.orientation));
+            let yaw = pose.orientation.z.x.atan2(pose.orientation.z.z);
+            let error = (desired - yaw).sin().atan2((desired - yaw).cos());
+            let turn = (error / (0.65 / 60.0)).clamp(-1.0, 1.0) as f32;
+            if matches!(w.pulse_scene(pose), Ok((_, PulseContact::Npc { .. }, _))) {
+                let before = some(w.flight_resources_snapshot());
+                let shot = ok(w.request_fire_front_pulse(p.tick));
+                let PulseContact::Npc { id, .. } = shot.contact else {
+                    panic!("lost admitted NPC contact");
+                };
+                let after = some(w.flight_resources_snapshot());
+                assert_eq!(after.energy_hundredths, before.energy_hundredths - 100);
+                let scene = some(w.traffic_snapshot());
+                let beam = some(scene.last_beam);
+                assert_eq!(beam.victim, id);
+                assert!(
+                    matches!(beam.source,BeamSource::Player{owner:12005,item,..} if item==shot.fitted_item_id)
                 );
-                let desired = delta.x.atan2(delta.z);
-                let pose = some(flight_pose(p.position, p.orientation));
-                let yaw = pose.orientation.z.x.atan2(pose.orientation.z.z);
-                let error = (desired - yaw).sin().atan2((desired - yaw).cos());
-                let turn = (error / (0.65 / 60.0)).clamp(-1.0, 1.0) as f32;
-                if matches!(w.pulse_scene(pose), Ok((_, PulseContact::Npc { .. }, _))) {
-                    let before = some(w.flight_resources_snapshot());
-                    let shot = ok(w.request_fire_front_pulse(p.tick));
-                    let PulseContact::Npc { id, .. } = shot.contact else {
-                        panic!("lost admitted NPC contact");
-                    };
-                    let after = some(w.flight_resources_snapshot());
-                    assert_eq!(after.energy_hundredths, before.energy_hundredths - 100);
-                    let scene = some(w.traffic_snapshot());
-                    let beam = some(scene.last_beam);
-                    assert_eq!(beam.victim, id);
-                    assert!(
-                        matches!(beam.source,BeamSource::Player{owner:12005,item,..} if item==shot.fitted_item_id)
-                    );
-                    hit = Some(id);
-                    break;
-                }
-                ok(w.step(FlightInput {
-                    yaw: turn,
-                    ..FlightInput::default()
-                }));
-                continue;
+                hit = Some(id);
+                break;
             }
+            ok(w.step(FlightInput {
+                yaw: turn,
+                ..FlightInput::default()
+            }));
+            continue;
         }
         ok(w.step(FlightInput::default()));
     }

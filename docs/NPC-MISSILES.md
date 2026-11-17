@@ -81,3 +81,21 @@ The return source previously assumed a clear straight path to X=0. The fixture n
 Every actual route frame uses public yaw/throttle/brake and asserts `motion_refusal == None`, including turning and braking. A native refusal still fails the fixture immediately. The entire return, including replans, has the same 30000-tick limit previously allowed for each axis leg. Exterior staging is X=0/Z=350, with the original lateral-error assertion and original 9000-step docking helper. Actual station aperture, self-hit, player/NPC contact, all original cash/cargo/destruction/berth/cold assertions and the passing near-full journal case remain unchanged.
 
 Only the two fixture files and documentation change. No cases are added or skipped, no original assertion is relaxed, and all production/shared aim/traffic geometry/journal/codec/assets/dependencies/caps stay byte-exact against tested 4e83640. Prior 343f761, b4f3279 and failed snapshots remain frozen. Root must join these exact fixture afterimages without overwriting newer geometry review work, complete one whole-delta review and schedule the designated changed executor. Compiler/tests/probes/Clippy/native/app execution remains **UNRUN** for this correction.
+
+### NPC qualification: strict Clippy correction
+
+Exact `3a53949719267cd1717da71a9b8c001a13b49fdf` Mac qualification passed
+286 core and 169 desktop tests (455 top-level cases), including both previously
+failing pilot journeys. Nested cold-process summaries are not additional cases.
+The 88 Python tests, 40 Markdown files, formatting and all-target check passed.
+Strict Clippy then stopped qualification with six unique diagnostics.
+
+The following source correction only collapses four nested conditions into
+short-circuit let chains, replaces an unsigned modulo predicate with
+`is_multiple_of(4)`, and moves an unchanged test module after the existing v13
+fixture helper. No assertion, collision rule, resource or save behavior, lint
+setting or gate is weakened. The corrected source is uncompiled and untested
+until independent delta review and owning execution. Three observer example
+cases, release build, coverage, signing and native gameplay remain unrun.
+There is no new qualified preview or full 1337 parity claim.
+
