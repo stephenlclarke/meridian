@@ -149,7 +149,7 @@ def exercise(app, output, save, receipt):
     receipt["stage"] = "system"
     press("n")
     phases.append(capture_phase(app, window, output, "system", system_frame))
-    if "New commander ready" not in phases[-1]["title"]:
+    if phases[-1]["title"] != "Meridian | DOCKED | RUNNING | H / ? Help":
         raise RuntimeError("System frame did not follow ordinary commander creation")
     receipt["stage"] = "trading"
     press("4")
