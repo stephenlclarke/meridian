@@ -1,5 +1,9 @@
 # Implementation and validation status
 
+## Fuel Scoops physical source dependency
+
+The following MC1 trace pins the original Fuel Scoops catalogue (base1,900 CR/TL4), paid fitting and actual manual/automatic pickup/actor-custody rules. The inspected immutable `a11fe169` catalogue has 171 ship TOMLs and no cargo nativeHull declaration; ordinary ore reaches Geometry's generic asteroid/cargo octahedron fallback. The assignment excludes placeholder geometry/fallback preservation. Positive paid physical collection and sale therefore remain blocked on an eligible immutable original cargo/ore mesh with provenance, physical representation and actual actor binding. No replacement body, cargo credit, paid-scoop implementation or positive gameplay test was invented. Frozen `03682dd` source and all15 UNRUN cases remain unchanged. See [the exact source/dependency trace](FUEL-SCOOPS.md).
+
 ## Paid mining source awaiting serial composition
 
 MC1's new source is based exactly on NPC candidate `bd506f9`. It replaces the frozen `0add15f` direct-cargo/one-unit/800-range/speed-two simplification with actual paid Mining Laser 50-damage/6000-range partial work and finite terminal pending ore from original `a11fe169`. One World, account and nine-byte ship-resource journal remain authoritative. Native rock ray/collision, source-prefix replay, retained paid item/emission/clocks/scenes, actual departure expiry, whole-save admission and explicit old-format absence are authored. No ore cargo or cash is granted, and the missing genuine Fuel Scoops provider produces explicit `NoScoops`; a positive intake or sale is not accepted. The field remains an authored bounded station-frame segment rather than full original ring/presence parity.

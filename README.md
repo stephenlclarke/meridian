@@ -47,6 +47,8 @@ The [finite traffic core](docs/NPC-TRAFFIC.md) is composed on the current previe
 
 The [mining source](docs/ASTEROID-MINING.md) joins genuine paid Mining Laser work to the actual World: 50-damage native strokes, finite partial energy, terminal pending ore, shared ship resources, retained contact history and cold continuation. Fifteen new Rust cases are authored **UNRUN**. No cargo or cash is credited by mining. The original requires Fuel Scoops; this base has no genuine installation/intake, so collection explicitly refuses `NoScoops` and ordinary sale has no mined cargo. Root must compose the actual scoop provider, G1 renderer/UI, G3 expanded equipment and final codec/Profile boundary before qualification. The authored Avenor segment is not complete original orbital/presence parity or a delivered mining preview.
 
+The [Fuel Scoops source trace](docs/FUEL-SCOOPS.md) identifies its real paid utility and pickup rules. Physical ore collection still needs an eligible original cargo mesh: the inspected source reaches a generic fallback, which this assignment excludes. No replacement geometry, cargo credit or collection/sale acceptance is claimed.
+
 ## Play
 
 N starts a commander; C continues. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.
