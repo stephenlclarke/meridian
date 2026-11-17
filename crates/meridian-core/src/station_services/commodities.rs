@@ -136,7 +136,7 @@ impl StationMarkets {
 // These two immutable values are read from the same validated full source; never stock authority.
 fn food_seed(site: MarketSite) -> (u64, u64) {
     let row = 14 + site.index() * 563;
-    // StationMarkets construction and save decoding validate this immutable 1138-byte layout.
+    // StationMarkets construction and save decoding validate this immutable 1701-byte layout.
     // There is no fallback quote or restock if content is incompatible.
     let bytes = &MARKETS[row + 17..row + 33];
     let target = u64::from_le_bytes(core::array::from_fn(|index| bytes[index]));
@@ -302,7 +302,7 @@ fn read_catalogue() -> Result<([CommodityDefinition; 17], [CommodityId; 17]), Er
         order,
     ))
 }
-pub(super) fn read_market_seeds() -> Result<[[CommodityQuote; 16]; 2], Error> {
+pub(super) fn read_market_seeds() -> Result<[[CommodityQuote; 16]; 3], Error> {
     read_catalogue()?;
     decode_markets(MARKETS).map_err(|_| Error::InvalidContent)
 }
@@ -332,15 +332,15 @@ fn read_quote(
     }
     Ok(quote)
 }
-fn decode_markets(bytes: &[u8]) -> Result<[[CommodityQuote; 16]; 2], SaveError> {
+fn decode_markets(bytes: &[u8]) -> Result<[[CommodityQuote; 16]; 3], SaveError> {
     let invalid = SaveError::ContentMismatch;
     let mut r = Reader::new(bytes);
-    if r.fixed::<12>()? != *b"MMKT0002\x02\x00\x11\x00" {
+    if r.fixed::<12>()? != *b"MMKT0002\x03\x00\x11\x00" {
         return Err(invalid);
     }
     let foods = read_seeds(SEEDS).map_err(|_| invalid)?;
-    let mut result = Vec::with_capacity(2);
-    for site in [MarketSite::Avenor, MarketSite::Renas] {
+    let mut result = Vec::with_capacity(3);
+    for site in [MarketSite::Avenor, MarketSite::Renas, MarketSite::Lareria] {
         if r.u16()? != site.system() {
             return Err(invalid);
         }

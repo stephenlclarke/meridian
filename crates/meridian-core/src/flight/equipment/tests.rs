@@ -371,7 +371,7 @@ fn assert_paid_save_guards(world: &mut World) {
         .as_ref()
         .unwrap()
         .equipment_state()
-        .encode(&mut equipment);
+        .encode(&mut equipment, crate::save::SAVE_VERSION);
     // Paid ammunition and modular revisions follow equipment in the current account codec.
     // Locate the actual encoded component, rather than treating it as the account suffix.
     let equipment_offsets: Vec<_> = account
@@ -396,7 +396,7 @@ fn assert_paid_save_guards(world: &mut World) {
         (42, u64::MAX.to_le_bytes().to_vec()), // future purchase revision
         (50, 999_u16.to_le_bytes().to_vec()), // unsupported purchase site
         (52, 0_u32.to_le_bytes().to_vec()), // unpaid fitted module
-        (56, vec![0]),                     // fit flag inconsistent with transaction history
+        (57, vec![0]),                     // fitted flag follows the XYZZY provenance byte
     ] {
         let mut bad = valid.clone();
         assert_ne!(
@@ -440,7 +440,7 @@ fn assert_paid_save_guards(world: &mut World) {
 }
 
 #[test]
-fn original_v4_paid_and_hot_world_loads_with_no_t02_authority() {
+fn current_paid_and_hot_world_continues_without_t02_and_refuses_an_original_v4_opening() {
     use crate::PracticeStatus;
     let mut world = earned_world(2411);
     let _paid = purchase(&mut world);
@@ -449,14 +449,12 @@ fn original_v4_paid_and_hot_world_loads_with_no_t02_authority() {
     world
         .request_fire_front_pulse(world.snapshot().tick)
         .unwrap();
-    // The complete current scenario above really has physical NPC history. It
-    // must continue in the current format, never silently lose actors in a v4 export.
+    // The current scenario has real physical NPC history and retains it on Continue.
     let current = world.save_bytes().unwrap();
+    let labelled = crate::flight::persistence::unsupported_version_test_input(&world, 4).unwrap();
     assert_eq!(
-        crate::flight::persistence::v4_test_fixture(&world),
-        Err(crate::save::SaveError::InvalidState(
-            "physical traffic requires current format"
-        ))
+        World::from_save_bytes(&labelled).unwrap_err(),
+        crate::save::SaveError::UnsupportedVersion
     );
     assert_eq!(world.save_bytes().unwrap(), current);
     let continued = World::from_save_bytes(&current).unwrap();
@@ -467,38 +465,22 @@ fn original_v4_paid_and_hot_world_loads_with_no_t02_authority() {
         world.pulse_laser_snapshot()
     );
 
-    // Separately exercise the qualified v4 reader from a genuine v4 opening.
-    // This is current code executing the same paid public route with the format's
-    // real absence semantics, not old source or a discarded live NPC history.
     let opening = World::new_commander(2411).unwrap();
-    let old_opening = crate::flight::persistence::v4_test_fixture(&opening).unwrap();
+    let old_opening =
+        crate::flight::persistence::unsupported_version_test_input(&opening, 4).unwrap();
     assert_eq!(u16::from_le_bytes([old_opening[8], old_opening[9]]), 4);
-    let legacy = World::from_save_bytes(&old_opening).unwrap();
-    assert_eq!(legacy.traffic_snapshot(), None);
-    let mut world = earned_from(legacy);
-    let _paid = purchase(&mut world);
-    world.request_launch(world.snapshot().tick).unwrap();
-    world.step(FlightInput::default()).unwrap();
-    world
-        .request_fire_front_pulse(world.snapshot().tick)
-        .unwrap();
-    assert_eq!(world.traffic_snapshot(), None);
-    let v4 = crate::flight::persistence::v4_test_fixture(&world).unwrap();
-    let restored = World::from_save_bytes(&v4).unwrap();
-    assert_eq!(restored.traffic_snapshot(), None);
-    assert_eq!(restored.snapshot(), world.snapshot());
-    assert_eq!(restored.credits_tenths(), world.credits_tenths());
-    assert_eq!(restored.equipment_snapshot(), world.equipment_snapshot());
     assert_eq!(
-        restored.pulse_laser_snapshot(),
-        world.pulse_laser_snapshot()
+        World::from_save_bytes(&old_opening).unwrap_err(),
+        crate::save::SaveError::UnsupportedVersion
     );
+    assert_eq!(continued.snapshot(), world.snapshot());
+    assert_eq!(continued.credits_tenths(), world.credits_tenths());
     assert_eq!(
-        restored.practice_snapshot().unwrap().status,
+        continued.practice_snapshot().unwrap().status,
         PracticeStatus::Unaccepted
     );
     assert_eq!(
-        &restored.save_bytes().unwrap()[8..10],
+        &continued.save_bytes().unwrap()[8..10],
         &crate::save::SAVE_VERSION.to_le_bytes()
     );
 }

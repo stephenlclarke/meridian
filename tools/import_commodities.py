@@ -1,4 +1,4 @@
-"""Extract exact original definitions and Avenor/Renas initial quotes from pinned Git blobs."""
+"""Extract exact original definitions and Avenor/Renas/Lareria initial quotes from pinned Git blobs."""
 import argparse
 import hashlib
 import json
@@ -36,7 +36,7 @@ SOURCES = {
                      '52043ac3d4208fa2b5cf8b914cd0beddc9a43bdbd0387b9a46fa4f536070f5f2'),
 }
 UNITS = {'t': 0, 'kg': 1, 'g': 2}
-SYSTEMS = [7, 185]
+SYSTEMS = [7, 185, 91]
 COUNT = 17
 MAX_QUANTITY = (2 ** 63 - 1) // COUNT
 DEFINITION_FIELDS = {'index', 'name', 'unit', 'sector', 'basePriceCR', 'targetStock', 'technology', 'volatility'}
@@ -218,7 +218,7 @@ def convert(raw: dict[str, bytes]) -> dict[str, bytes]:
         'nativeUnits': UNITS, 'departureLegalWeights': weights, 'markets': selected,
         'outputs': {name: {'sha256': hashlib.sha256(data).hexdigest(), 'bytes': len(data)} for name, data in outputs.items()},
         'catalogueFormat': 'MCOM0001 + LEu16 count17; rows u8 ID/unitTag/departureLegalWeight/nameBytes, UTF8name, u8 sectorBytes, UTF8sector, LEf64 basePriceCR, LEu64 targetStock, LEu16 technology, LEf64 volatility; final17u8 display-order IDs',
-        'marketFormat': 'MMKT0002 + LEu16 marketCount2/commodityCount17; each LEu16 system then17rows u8 ID, LEu32 ask/bid credit tenths, LEu64 stock/targetStock/epoch',
+        'marketFormat': 'MMKT0002 + LEu16 marketCount3/commodityCount17; each LEu16 system then17rows u8 ID, LEu32 ask/bid credit tenths, LEu64 stock/targetStock/epoch',
         'semantics': {
             'ordinaryCommodityTonnes': 'quantity for unit t; zero for kg/g, not fractional SI hold conversion',
             'quantityBound': MAX_QUANTITY,
@@ -239,7 +239,7 @@ def convert(raw: dict[str, bytes]) -> dict[str, bytes]:
         },
         'sourceDescriptiveStatuses': original_manifest['sourceDescriptiveStatuses'],
         'notice': 'assets/legacy/Elite-L337-MIT.txt',
-        'scope': 'Exact17definitions and34initialquotes only; live stock/transactions/save/legality application remain World-owned; not playable or commercial clearance',
+        'scope': 'Exact17definitions and51initialquotes only; live stock/transactions/save/legality application remain World-owned; not playable or commercial clearance',
     }
     outputs['commodity-content-manifest.json'] = (json.dumps(manifest, indent=2) + '\n').encode()
     return outputs
@@ -258,7 +258,7 @@ def main() -> None:
                 raise ValueError('Committed commodity import mismatch: ' + name)
         else:
             path.write_bytes(value)
-    print('Original17commodity definitions and34quotes ' + ('match' if args.check else 'imported'))
+    print('Original17commodity definitions and51quotes ' + ('match' if args.check else 'imported'))
 
 
 if __name__ == '__main__':

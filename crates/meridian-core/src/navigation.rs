@@ -1,7 +1,9 @@
 //! Original G01 coordinates and stock SH025/Basic-drive travel rules from immutable a11.
 //! Descriptive catalogue/route values never constitute docking or mission authority.
+mod journal;
 mod persistence;
 use core::fmt;
+pub(crate) use journal::{CompletedJump, JumpJournal, NavigationFitChange, NavigationGrade};
 pub(crate) use persistence::SavedNavigationSummary;
 use std::collections::VecDeque;
 
@@ -18,6 +20,11 @@ pub struct SystemId {
     pub system: u16,
 }
 impl SystemId {
+    pub const LARERIA: Self = Self {
+        galaxy: 0,
+        system: 91,
+    };
+
     pub const AVENOR: Self = Self {
         galaxy: 0,
         system: 7,
@@ -68,7 +75,7 @@ impl fmt::Display for NavigationError {
             Self::StaleCommand => "travel command does not match the current tick",
             Self::AlreadyTravelling => "a jump is already spooling",
             Self::MassLocked => "actual station geometry is within mass-lock distance",
-            Self::OutOfRange => "target exceeds the stock fitted drive/navigation reach",
+            Self::OutOfRange => "target exceeds the fitted navigation reach",
             Self::InsufficientFuel => "the current tank cannot fund this journey",
             Self::SequenceExhausted => "travel or actor sequence exhausted",
             Self::StationUnavailable => "original station content is unavailable",
@@ -407,6 +414,9 @@ impl NavigationState {
     pub(crate) fn ship(self) -> PlayerShipId {
         self.ship
     }
+    pub(crate) fn fuel_spent(self) -> u64 {
+        self.fuel_spent
+    }
     pub(crate) fn jump_sequence(self) -> u64 {
         self.completed_jumps
     }
@@ -434,6 +444,7 @@ impl NavigationState {
         target: SystemId,
         station_distance: f64,
         fuel: u16,
+        fitted_reach_ly: f64,
     ) -> Result<(), NavigationError> {
         if self.pending.is_some() {
             return Err(NavigationError::AlreadyTravelling);
@@ -448,7 +459,7 @@ impl NavigationState {
         if !station_distance.is_finite() || station_distance < BASIC_MASS_LOCK_DISTANCE {
             return Err(NavigationError::MassLocked);
         }
-        if distance > STOCK_JUMP_REACH_LY {
+        if distance > fitted_reach_ly {
             return Err(NavigationError::OutOfRange);
         }
         // Source admission uses unrounded current-fuel reach as well as rounded debit.
@@ -901,7 +912,7 @@ mod tests {
         state.launch().unwrap();
         let before = state;
         assert_eq!(
-            state.begin_jump(&catalogue, SystemId::RENAS, 700.0, 33),
+            state.begin_jump(&catalogue, SystemId::RENAS, 700.0, 33, STOCK_JUMP_REACH_LY),
             Err(NavigationError::InsufficientFuel)
         );
         assert_eq!(state, before);

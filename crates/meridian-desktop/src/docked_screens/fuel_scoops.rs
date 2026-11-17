@@ -55,6 +55,8 @@ pub(crate) fn rows(world: &World) -> Result<Vec<EquipmentRow>, String> {
         r.instance = Some(owned.id);
         r.owned = 1;
         r.fitted = u32::from(snapshot.fitted.is_some());
+        r.readout
+            .push(crate::xyzzy::provenance(owned.provenance).into());
         r.readout.push(
             if r.fitted == 1 {
                 "Owned and fitted"

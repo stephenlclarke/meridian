@@ -1,4 +1,4 @@
-"""Import original Avenor/Renas Food seeds; quantities are initial, never current stock."""
+"""Import original Avenor/Renas/Lareria Food seeds; quantities are initial, never current stock."""
 import argparse
 import hashlib
 import json
@@ -61,9 +61,9 @@ def convert(raw_manifest, raw_markets):
             or markets['version'] != 'l337-world-1'
             or len(markets['markets']) != 2048):
         raise ValueError('Original market manifest binding differs')
-    output = bytearray(struct.pack('<8sH', b'MMKT0001', 2))
+    output = bytearray(struct.pack('<8sH', b'MMKT0001', 3))
     selected = []
-    for system in [7, 185]:
+    for system in [7, 185, 91]:
         quote = food_quote(markets, system)
         output.extend(struct.pack('<HIIQ', system, quote['askTenthsCR'], quote['bidTenthsCR'], quote['stock']))
         selected.append(quote)

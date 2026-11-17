@@ -1,0 +1,129 @@
+{
+  "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "tree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "method": "fixed-object Git read only; no source runtime executed or human WIP consulted",
+  "scope": "Ordinary NPC death settlement before physical cargo issuance; dependency trace for sources that cannot substitute in this Meridian slice",
+  "rules": [
+    {
+      "path": "Sources/L337Core/GameplayCargo.swift",
+      "line": 10,
+      "fact": "Only actual destroyed target NPCs with ordinary cargo qualify, excluding protected source/mission actor."
+    },
+    {
+      "path": "Sources/L337Core/CargoDebrisLedger.swift",
+      "line": 157,
+      "fact": "Register a unique terminal event, actual manifest and valid source motion before independent offer/acknowledgment."
+    },
+    {
+      "path": "Sources/L337Core/CargoDebrisLedger.swift",
+      "line": 320,
+      "fact": "Dock/load rebind, cull releases bindings, true departure abandons pending lots; terminal source must never issue twice."
+    },
+    {
+      "path": "Sources/L337Core/CargoDebrisLedger.swift",
+      "line": 444,
+      "fact": "Native lot batch limits:5 tonnes,1000 kilograms,1000000 grams."
+    },
+    {
+      "path": "Sources/L337Core/Geometry.swift",
+      "line": 78,
+      "fact": "Cargo mesh lookup reaches the generic shared octahedron in this pinned input; no eligible original pod is introduced."
+    },
+    {
+      "path": "Sources/L337Core/EMPSalvage.swift",
+      "line": 18,
+      "fact": "Section cutting requires an actual abandoned, unclaimed, non-NPC and unprotected actor. The EMP route requires native disabled state and real complete crew accounting."
+    },
+    {
+      "path": "Sources/L337Core/NativeOriginalRescueJourneyBoard.swift",
+      "line": 521,
+      "fact": "Original rescue boarding is consent/candidate/person/berth custody at the real dock, not capturing an ordinary SH025 at zero energy."
+    }
+  ],
+  "files": [
+    {
+      "path": "Sources/L337Core/GameplayCargo.swift",
+      "gitBlob": "7423e86c3924d3e008201deed36c3f3bef3363b0",
+      "bytes": 6371,
+      "sha256": "f0a22d05a253f5db208dc097908d014a533e98d51bba5cc0e27b94c9a1c97407"
+    },
+    {
+      "path": "Sources/L337Core/CargoDebrisLedger.swift",
+      "gitBlob": "6fed8b7c3e90a6240f3ab095cd1982d66b7c0faa",
+      "bytes": 19548,
+      "sha256": "716cb4b4caee6b9873341722a84de9bd4740df9681cb817742f9086ca7e43f81"
+    },
+    {
+      "path": "Sources/L337Core/CargoScooping.swift",
+      "gitBlob": "1fe6b4d9a97b76608697af5ff4b154df478b1b65",
+      "bytes": 5616,
+      "sha256": "6dae2421062621fee0f992d2648f501403c87cb87f77138127175eab6390ced7"
+    },
+    {
+      "path": "Sources/L337Core/Geometry.swift",
+      "gitBlob": "3810ff536ce81e344e058a2448e5fbe5f29fa3d8",
+      "bytes": 7438,
+      "sha256": "b9751c66c3f6e86f4a0ae541a7dcbcdec2fef526f9570107d7a4cef3da7380bb"
+    },
+    {
+      "path": "Sources/L337Core/ShipCatalogue.swift",
+      "gitBlob": "397dada10f448cc62040943d81e8a8a1026b1e97",
+      "bytes": 16533,
+      "sha256": "c432109fa323bee519114596af6269f59d8604853e231a616ffad2e9644d8ea5"
+    },
+    {
+      "path": "Sources/L337Core/SalvageWorldRuntime.swift",
+      "gitBlob": "13a826999abfd8397fd0dab980378d5d256ebe3a",
+      "bytes": 6965,
+      "sha256": "c0ec21a54c912ad538d9e5ab56809333f7bda123248cb7b7f54b2f9e51a59eb5"
+    },
+    {
+      "path": "Sources/L337Core/SalvageCatalogue.swift",
+      "gitBlob": "812b245952eb29498c4485f3a7ae58ff71ce2721",
+      "bytes": 11295,
+      "sha256": "a95de8e3fbe018b125523a23426ea8949b4bfc6ee7357705735c2d1e1e7c0ebe"
+    },
+    {
+      "path": "Sources/L337Core/SalvageSites.swift",
+      "gitBlob": "e0bff2c729fb82713ff3d0d9ecf9bc0894f76b80",
+      "bytes": 5439,
+      "sha256": "d89ccf0dd92799cc0357f047f21d9d3a3cc5b785b5b54c909045f5ccae5da79e"
+    },
+    {
+      "path": "Sources/L337Core/EMPSalvage.swift",
+      "gitBlob": "de6985e4a0734113df602c606fc23bb7eb592387",
+      "bytes": 1524,
+      "sha256": "dd0ca7d2e03c1c80b012c81e05d172b605e35393a915209e663a4244b783830b"
+    },
+    {
+      "path": "Sources/L337Core/NativeSalvageWorkRuntime.swift",
+      "gitBlob": "c9e38643d3f3c1397923452aae8fa6a44deea16a",
+      "bytes": 11022,
+      "sha256": "4859ece313e80fe011a838c5fcf15a710354d9f7f445fdd0853d3224a15c4239"
+    },
+    {
+      "path": "Sources/L337Core/NativeIdentifiedSalvageRecovery.swift",
+      "gitBlob": "bb25f435c1cab822011281939d587548a306284a",
+      "bytes": 27018,
+      "sha256": "642884422343d59010c0ebd5c8a72082ca78b02a5f8994b71f8671abcba1edb0"
+    },
+    {
+      "path": "Sources/L337Core/NativeOriginalRescueJourneyBoard.swift",
+      "gitBlob": "793fb79f8b49fbd7d1fba60f2717574b515bd2d4",
+      "bytes": 32663,
+      "sha256": "48b0d5b8cb6a218c8fd830166968feb7e70a1ca031a29e0a7e9467c6fcdf3fd2"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-identified-salvage/manifest.toml",
+      "gitBlob": "72c3f1d0327a76a1d9a3cbb2fc98397393866340",
+      "bytes": 3200,
+      "sha256": "5078140248d3b65b6edc85d6d9fb37b77ebf305933e644b7315c9d81eae25a74"
+    },
+    {
+      "path": "docs/meridian/missions/gameplay/G09-IDENTIFIED-SALVAGE.md",
+      "gitBlob": "dc7d2788f6b379d0f70b050bdbbc0ce617b76f17",
+      "bytes": 8007,
+      "sha256": "a8e2155be9e82dada1645a4a44248e5178791def52a62d5a374fedf2fa090afd"
+    }
+  ]
+}

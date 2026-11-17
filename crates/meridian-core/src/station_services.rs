@@ -6,6 +6,7 @@
 
 mod commodities;
 pub use commodities::{CargoUnit, CommodityDefinition, CommodityId, CommodityQuote};
+mod history;
 mod persistence;
 mod traffic;
 pub(crate) use persistence::SavedServiceSummary;
@@ -13,7 +14,7 @@ pub(crate) use persistence::SavedServiceSummary;
 const SEEDS: &[u8] = include_bytes!("../../../assets/legacy/g01-food.markets");
 
 const STOCK_FUEL_TENTHS: u16 = 130;
-const FUEL_PRICE_TENTHS: u32 = 2;
+pub(crate) const FUEL_PRICE_TENTHS: u32 = 2;
 // Swift's supported 64-bit Int.max/17 quantity bound, not the immutable initial stock.
 pub(crate) const MAX_MARKET_QUANTITY: u64 = i64::MAX as u64 / 17;
 
@@ -22,18 +23,21 @@ pub(crate) const MAX_MARKET_QUANTITY: u64 = i64::MAX as u64 / 17;
 pub enum MarketSite {
     Avenor,
     Renas,
+    Lareria,
 }
 impl MarketSite {
     fn index(self) -> usize {
         match self {
             Self::Avenor => 0,
             Self::Renas => 1,
+            Self::Lareria => 2,
         }
     }
     pub fn system(self) -> u16 {
         match self {
             Self::Avenor => 7,
             Self::Renas => 185,
+            Self::Lareria => 91,
         }
     }
 }
@@ -175,22 +179,23 @@ impl Event {
 struct MarketData {
     owner: u64,
     revision: u64,
-    quotes: [FoodQuote; 2],
-    bought: [u64; 2],
-    sold: [u64; 2],
+    quotes: [FoodQuote; 3],
+    bought: [u64; 3],
+    sold: [u64; 3],
     refills: u64,
     refilled_units: u64,
     paid_tenths: u64,
     credited_tenths: u64,
-    other_quotes: [[CommodityQuote; 16]; 2],
-    other_bought: [[u64; 16]; 2],
-    other_sold: [[u64; 16]; 2],
+    other_quotes: [[CommodityQuote; 16]; 3],
+    other_bought: [[u64; 16]; 3],
+    other_sold: [[u64; 16]; 3],
 }
 
 /// Only market stock is owned here. The actual account owns all credits, fuel and cargo.
 #[derive(Debug)]
 pub struct StationMarkets {
     data: MarketData,
+    receipts: std::sync::Arc<Vec<history::Receipt>>,
 }
 
 /// Single-use prospective change. Dropping it changes neither stock nor the actual account.
@@ -220,19 +225,20 @@ impl StationMarkets {
             return Err(Error::WrongOwner);
         }
         Ok(Self {
+            receipts: std::sync::Arc::new(Vec::new()),
             data: MarketData {
                 owner,
                 revision: 0,
                 quotes: read_seeds(SEEDS)?,
-                bought: [0; 2],
-                sold: [0; 2],
+                bought: [0; 3],
+                sold: [0; 3],
                 refills: 0,
                 refilled_units: 0,
                 paid_tenths: 0,
                 credited_tenths: 0,
                 other_quotes: commodities::read_market_seeds()?,
-                other_bought: [[0; 16]; 2],
-                other_sold: [[0; 16]; 2],
+                other_bought: [[0; 16]; 3],
+                other_sold: [[0; 16]; 3],
             },
         })
     }
@@ -264,6 +270,9 @@ impl StationMarkets {
         facts: Option<ServiceFacts>,
         command: Command,
     ) -> Result<Prepared, Error> {
+        if self.receipts.len() >= history::MAX_RECEIPTS {
+            return Err(Error::SequenceExhausted);
+        }
         validate_account(account)?;
         let facts = validate_service(self.data.owner, account, facts)?;
         let mut next = self.data;
@@ -452,8 +461,16 @@ impl Prepared {
         if market.data != self.before || account != self.account || facts != Some(self.facts) {
             return Err(Error::StalePublication);
         }
+        let mut receipts = market.receipts.clone();
+        std::sync::Arc::make_mut(&mut receipts).push(history::Receipt {
+            revision: self.next_account.revision,
+            event: self.event,
+        });
         Ok(Change {
-            market: StationMarkets { data: self.next },
+            market: StationMarkets {
+                data: self.next,
+                receipts,
+            },
             account_after: self.next_account,
             event: self.event,
         })
@@ -489,8 +506,8 @@ fn validate_account(account: AccountProjection) -> Result<(), Error> {
     Ok(())
 }
 
-fn read_seeds(bytes: &[u8]) -> Result<[FoodQuote; 2], Error> {
-    if bytes.len() != 46 || bytes.get(..10) != Some(b"MMKT0001\x02\x00".as_slice()) {
+fn read_seeds(bytes: &[u8]) -> Result<[FoodQuote; 3], Error> {
+    if bytes.len() != 64 || bytes.get(..10) != Some(b"MMKT0001\x03\x00".as_slice()) {
         return Err(Error::InvalidContent);
     }
     let mut quotes = [FoodQuote {
@@ -498,8 +515,8 @@ fn read_seeds(bytes: &[u8]) -> Result<[FoodQuote; 2], Error> {
         ask_tenths: 0,
         bid_tenths: 0,
         stock: 0,
-    }; 2];
-    for (index, site) in [MarketSite::Avenor, MarketSite::Renas]
+    }; 3];
+    for (index, site) in [MarketSite::Avenor, MarketSite::Renas, MarketSite::Lareria]
         .into_iter()
         .enumerate()
     {

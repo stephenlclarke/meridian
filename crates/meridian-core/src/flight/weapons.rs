@@ -536,7 +536,7 @@ impl World {
         if let (Some(candidate), Some(current)) = (&mut practice, impact_practice) {
             candidate.ordinary_hit = current.ordinary_hit;
             candidate.reception = current.reception;
-            candidate.pending_missiles = missiles.pending();
+            candidate.pending_missiles = missiles.pending_for_lesson(*candidate);
         }
         if let Some(practice) = practice.as_mut() {
             practice.observe_discharge(self.state.tick);

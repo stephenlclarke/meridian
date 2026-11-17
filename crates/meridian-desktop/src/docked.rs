@@ -2,11 +2,11 @@
 use crate::{docked_screens as ui, profile::Profile, session::Action};
 use meridian_core::{
     AmmunitionAction, ModuleAction, ModuleKind, ModuleSlot, World, equipment,
-    navigation::{DockContext, STOCK_JUMP_REACH_LY, SystemId},
+    navigation::{DockContext, FUEL_CAPACITY, SystemId},
     station_services::{self, CommodityId},
 };
 
-const ROUTES: [SystemId; 2] = [SystemId::AVENOR, SystemId::RENAS];
+const ROUTES: [SystemId; 3] = [SystemId::AVENOR, SystemId::RENAS, SystemId::LARERIA];
 pub const BINDINGS: &[ui::BindingHint<'static>] = &[
     ui::BindingHint {
         key: ui::Key::Previous,
@@ -38,7 +38,7 @@ pub const BINDINGS: &[ui::BindingHint<'static>] = &[
     },
     ui::BindingHint {
         key: ui::Key::Sell,
-        label: "H",
+        label: "Shift+G",
     },
     ui::BindingHint {
         key: ui::Key::Fit,
@@ -80,6 +80,7 @@ fn context<'a>(
     selected: SystemId,
 ) -> ui::Context<'a> {
     let navigation = world.snapshot().navigation;
+    let reach = world.jump_reach_ly();
     ui::Context {
         world,
         catalogue,
@@ -87,8 +88,9 @@ fn context<'a>(
         current_hull: panel_hull(world),
         paused: paused(world),
         current_reach_ly: navigation
-            .map(|n| (f64::from(n.fuel_units) / 10.0).min(STOCK_JUMP_REACH_LY)),
-        full_reach_ly: Some(STOCK_JUMP_REACH_LY),
+            .zip(reach)
+            .map(|(n, reach)| (f64::from(n.fuel_units) / 10.0).min(reach)),
+        full_reach_ly: reach.map(|reach| reach.min(f64::from(FUEL_CAPACITY) / 10.0)),
         route_targets: &ROUTES,
         models: &crate::docked_render::MODELS,
         planet_previews: navigation.is_some_and(|n| n.system == selected)
@@ -205,6 +207,16 @@ impl Docked {
     pub fn screen(&self) -> ui::Screen {
         self.screens.screen()
     }
+    pub fn help_panel(&self) -> crate::help::Panel {
+        crate::help::Panel::station(
+            self.screen(),
+            self.pending
+                .as_ref()
+                .map(|pending| pending.view.title.as_str()),
+            self.search_active(),
+            self.screens.details_open(),
+        )
+    }
     pub fn feedback(&mut self, message: String) {
         self.feedback = message;
     }
@@ -212,7 +224,7 @@ impl Docked {
         self.painted = None;
     }
     pub fn search_active(&self) -> bool {
-        self.painted.as_ref().is_some_and(|f| f.search_active)
+        self.screens.search_active()
     }
     pub fn build_frame(
         &mut self,
@@ -319,7 +331,8 @@ impl Docked {
                     .map_err(|e| e.to_string())?;
                 let fuel = meridian_core::navigation::stock_jump_fuel_cost(distance)
                     .map_err(|e| e.to_string())?;
-                if distance > STOCK_JUMP_REACH_LY || fuel > current.fuel_units || paused(world) {
+                let reach = world.jump_reach_ly().ok_or("No fitted drive")?;
+                if distance > reach.min(f64::from(current.fuel_units) / 10.0) || paused(world) {
                     return Err("Destination exceeds available range or game is paused".into());
                 }
                 self.review(
@@ -587,10 +600,11 @@ fn module_rows(
     slot: ModuleSlot,
     tick: u64,
 ) -> Vec<ui::EquipmentRow> {
-    let label = if slot == ModuleSlot::FrontLaser {
-        "Front laser"
-    } else {
-        "Energy system"
+    let label = match slot {
+        ModuleSlot::FrontLaser => "Front laser",
+        ModuleSlot::Energy => "Energy system",
+        ModuleSlot::Navigation => "Navigation computer",
+        ModuleSlot::UtilityFuelScoops => "Fuel Scoops",
     };
     let fitted = modules.items.iter().find(|item| item.slot == Some(slot));
     let mut rows = Vec::new();
@@ -599,7 +613,15 @@ fn module_rows(
         row.instance = Some(item.id);
         row.owned = 1;
         row.fitted = u32::from(item.slot.is_some());
-        row.compatibility = "Owned SH025 module; fitting preserves shared energy and heat".into();
+        row.readout
+            .push(crate::xyzzy::provenance(item.provenance).into());
+        if let Some(reach) = item.kind.navigation_reach_ly() {
+            row.compatibility = "Owned SH025 navigation module".into();
+            row.readout.push(format!("Module jump limit {reach} LY"));
+        } else {
+            row.compatibility =
+                "Owned SH025 module; fitting preserves shared energy and heat".into();
+        }
         if let Some(profile) = item.kind.laser_profile() {
             row.readout.push(format!(
                 "Damage {} | Range 6000 | Fire interval {:.1}s",
@@ -698,6 +720,17 @@ fn equipment_panel(
             .into(),
         available: true,
     });
+    slots.push(ui::EquipmentSlot {
+        id: "navigation".into(),
+        label: "Navigation computer".into(),
+        fitted: modules
+            .items
+            .iter()
+            .find(|item| item.slot == Some(ModuleSlot::Navigation))
+            .map_or("Empty", |item| item.kind.name())
+            .into(),
+        available: true,
+    });
     slots.push(ui::fuel_scoops::slot(world)?);
     for pylon in 0..ammo.capacity {
         let occupied = ammo
@@ -712,12 +745,13 @@ fn equipment_panel(
         });
     }
     let mut rows = Vec::new();
-    if selected == "front-laser" || selected == "energy" {
-        let slot = if selected == "front-laser" {
-            ModuleSlot::FrontLaser
-        } else {
-            ModuleSlot::Energy
-        };
+    let module_slot = match selected {
+        "front-laser" => Some(ModuleSlot::FrontLaser),
+        "energy" => Some(ModuleSlot::Energy),
+        "navigation" => Some(ModuleSlot::Navigation),
+        _ => None,
+    };
+    if let Some(slot) = module_slot {
         rows = module_rows(world, &modules, slot, tick);
     } else if selected == ui::fuel_scoops::SLOT {
         rows = ui::fuel_scoops::rows(world)?;
@@ -730,6 +764,16 @@ fn equipment_panel(
         row.instance = equipment.owned.map(|i| u64::from(i.id.serial()));
         row.owned = u32::from(equipment.owned.is_some());
         row.fitted = u32::from(equipment.owned.is_some_and(|i| i.fitted));
+        if let Some(item) = equipment.owned {
+            row.readout.push(
+                if item.xyzzy {
+                    "XYZZY grant; no paid purchase"
+                } else {
+                    "Paid cargo bay; original receipt retained"
+                }
+                .into(),
+            );
+        }
         row.price_tenths = equipment
             .owned
             .is_none()
@@ -768,6 +812,16 @@ fn equipment_panel(
             row.owned = 1;
             row.fitted = u32::from(item.pylon.is_some());
             row.compatibility = format!("Owned missile | Pylon {}", pylon + 1);
+            row.readout.push(
+                if item.xyzzy {
+                    "XYZZY finite missile; no paid purchase"
+                } else if item.purchase.is_some() {
+                    "Paid finite missile; original receipt retained"
+                } else {
+                    "Born finite missile"
+                }
+                .into(),
+            );
             row.can_store = world
                 .review_ammunition(AmmunitionAction::Store { item: item.item }, tick)
                 .is_ok();
@@ -815,6 +869,65 @@ fn equipment_panel(
     })
 }
 
+#[cfg(test)]
+mod secret_ui_tests {
+    use super::*;
+    use crate::profile::tests::{TestDirectory, open};
+    fn ok<T, E: std::fmt::Debug>(result: Result<T, E>) -> T {
+        result.unwrap_or_else(|error| panic!("{error:?}"))
+    }
+    #[test]
+    fn actual_equipment_panels_keep_born_paid_and_xyzzy_provenance_distinct() {
+        let directory = TestDirectory::new();
+        let mut profile = open(&directory.0);
+        assert!(ok(profile.new_commander(99036)));
+        ok(profile.xyzzy(meridian_core::XyzzyAction::Enter));
+        for slot in [
+            "front-laser",
+            "energy",
+            "navigation",
+            "utility-fuelScoops",
+            "cargo-expansion",
+            "pylon-8",
+        ] {
+            let panel = ok(equipment_panel(&profile.world, slot, ""));
+            assert!(
+                panel
+                    .rows
+                    .iter()
+                    .any(|row| row.owned == 1
+                        && row.readout.iter().any(|line| line.contains("XYZZY"))),
+                "{slot}"
+            );
+        }
+        ok(profile.command(crate::session::Action::Module(
+            ModuleAction::PurchaseMiningLaser,
+        )));
+        let front = ok(equipment_panel(&profile.world, "front-laser", ""));
+        assert!(
+            front
+                .rows
+                .iter()
+                .any(|row| row.node == ModuleKind::MiningLaser.node()
+                    && row.readout.iter().any(|line| line.contains("Paid module")))
+        );
+        assert!(
+            front
+                .rows
+                .iter()
+                .any(|row| row.node == ModuleKind::PulseLaser.node()
+                    && row.readout.iter().any(|line| line.contains("Born module")))
+        );
+        assert!(
+            front
+                .rows
+                .iter()
+                .any(|row| row.node == ModuleKind::NavalLaser.node()
+                    && row.readout.iter().any(|line| line.contains("XYZZY grant")))
+        );
+    }
+}
+
 /// Menu shortcuts are scoped to the current screen and never become flight commands.
 pub fn key(code: winit::keyboard::KeyCode, shift: bool, screen: ui::Screen) -> Option<ui::Key> {
     use ui::Key as K;
@@ -831,8 +944,8 @@ pub fn key(code: winit::keyboard::KeyCode, shift: bool, screen: ui::Screen) -> O
         C::Slash => K::Search,
         C::Backspace => K::Erase,
         C::Delete => K::ClearSearch,
+        C::KeyG if shift => K::Sell,
         C::KeyG => K::Buy,
-        C::KeyH => K::Sell,
         C::KeyY => K::Fit,
         C::KeyU => K::Store,
         C::KeyO => K::Options,
@@ -952,6 +1065,20 @@ mod tests {
         }
     }
     #[test]
+    fn lareria_is_an_admitted_route_but_the_stock_fit_refuses_its_distance() {
+        let (_directory, mut profile, mut menu) = start();
+        assert!(ROUTES.contains(&SystemId::LARERIA));
+        let before = ok(profile.world.save_bytes());
+        let refusal = menu
+            .request(&mut profile, ui::Request::ReviewRoute(SystemId::LARERIA))
+            .err()
+            .unwrap_or_else(|| panic!("stock navigation admitted Lareria"));
+        assert!(refusal.contains("exceeds available range"));
+        assert!(menu.pending.is_none());
+        assert_eq!(ok(profile.world.save_bytes()), before);
+    }
+
+    #[test]
     fn real_market_review_confirm_publishes_one_native_tonne_once() {
         let (directory, mut profile, mut menu) = start();
         present(&mut menu, &profile);
@@ -1010,10 +1137,40 @@ mod tests {
         assert_eq!(ok(profile.world.save_bytes()), after_external_purchase);
     }
     #[test]
+    fn navigation_computer_panel_uses_owned_slot_and_source_prices() {
+        let (_directory, profile, _menu) = start();
+        let panel = ok(equipment_panel(&profile.world, "navigation", ""));
+        let slot = panel
+            .slots
+            .iter()
+            .find(|slot| slot.id == "navigation")
+            .unwrap_or_else(|| panic!("Navigation computer slot"));
+        assert_eq!(slot.fitted, "Basic Navigation Computer");
+        assert_eq!(profile.world.jump_reach_ly(), Some(9.0));
+        assert!(
+            panel
+                .rows
+                .iter()
+                .any(|row| row.node == ModuleKind::BasicNavigation.node()
+                    && row.instance.is_some()
+                    && row.fitted == 1
+                    && row.price_tenths.is_none())
+        );
+        for (kind, price_tenths) in [
+            (ModuleKind::IntermediateNavigation, 30_000),
+            (ModuleKind::AdvancedNavigation, 90_000),
+        ] {
+            assert!(panel.rows.iter().any(|row| row.node == kind.node()
+                && row.price_tenths == Some(price_tenths)
+                && !row.can_buy));
+        }
+    }
+
+    #[test]
     fn front_module_rows_and_pylon_slots_use_real_owned_instances_and_admission() {
         let (_directory, profile, _menu) = start();
         let panel = ok(equipment_panel(&profile.world, "front-laser", ""));
-        assert_eq!(panel.slots.len(), 13);
+        assert_eq!(panel.slots.len(), 14);
         let utility = panel
             .slots
             .iter()

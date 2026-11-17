@@ -42,6 +42,7 @@ impl State {
             self.validate_identity(*a, index, seed, world_tick, data)?;
             Self::validate_economy(*a, seed, world_tick, markets)?;
             self.validate_resources(*a)?;
+            self.validate_terminal_manifest(*a)?;
         }
         self.validate_separation(data)?;
         self.validate_shots(world_tick, player_emissions, data)?;
@@ -437,13 +438,6 @@ impl State {
             player_hits: Arc::new(player_hits),
             missile_hits: Arc::new(missile_hits),
         })
-    }
-    #[cfg(test)]
-    pub(crate) fn legacy_empty(&self) -> bool {
-        self.actors.iter().all(Option::is_none)
-            && self.shots.is_empty()
-            && self.player_hits.is_empty()
-            && self.missile_hits.is_empty()
     }
 }
 impl NpcId {

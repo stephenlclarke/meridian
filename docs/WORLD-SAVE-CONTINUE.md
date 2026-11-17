@@ -1,10 +1,10 @@
 # World save and continue
 
-Historical feature contract and author-stage notes. For current delivered behavior, exact validation and open limits, read [implementation status](IMPLEMENTATION-STATUS.md). Earlier UNRUN statements below apply to the original handoff, not the latest delivered source.
+The SH025 navigation source candidate reads and writes private format **17**. Qualification on the final combined source remains pending. The current reader requires exact completed-jump receipts from the initial commander state and rejects every previous format before replacing World.
 
-Historical save-core source status: version-one encoding, decoding, semantic validation and six round-trip/tamper tests were authored on paid-services base `5531b8407fd690ca5a5f4155014574a6838c4de1`. Rustfmt parsing/formatting passes. Compilation, Rust tests, Clippy, remote quality checks and native UI acceptance are UNRUN on this exact successor. No filesystem operation or actual process quit/Continue has been performed by this implementation.
+Continue reports an unsupported-format message for an earlier save. Title-screen Continue and live reload leave the save file and live state intact. Keep earlier binaries and their profile folders together. Run this candidate with a fresh save folder through its launcher or `--save-dir`. Confirming a new commander is an explicit player action. Saving or performing a saved equipment transaction can then publish that commander to the selected slot.
 
-Current source writes [complete version 8 missile sessions](DURABLE-MISSILE-SESSIONS.md), with exact supported v4-v7 readers. Scoped actual cold continuation is qualified on candidate `58f45c8`; the separate Durable Missiles Preview is delivered from main `ab238c3`. [Implementation status](IMPLEMENTATION-STATUS.md) preserves both source identities and their actual evidence. The older format descriptions below remain historical contracts.
+The current format has no migration checkpoint. All completed jumps carry ordered origin, destination, departure visit, arrival tick, fitted grade and exact catalogue fuel debit. Cold Continue validates the whole sequence from Avenor before publishing it. The literal V15 NPC and PR #44 V16 diagnostic files remain retained as historical evidence and refusal inputs. Their producing binaries and prior execution results retain their original identities.
 
 ## Public memory API
 
@@ -16,25 +16,7 @@ The core has no filesystem, window, GPU, wall-clock, global identity allocator o
 
 ## Format and retained state
 
-[Avenor practice reception](PRACTICE-BEACONS.md) writes version 6 and rules
-6. Its optional quiet-time anchor and terminal receipt are saved with the
-practice owner and physical berth history. A genuine v5 practice save loads
-without inferred quiet time or completion.
-
-The practice-beacon predecessor wrote version 5 and rules 5. Save v5 adds the original practice consent, opening pose and tick,
-bound hit receipts and retirement facts. A genuine v4 envelope loads with
-the same prior paid equipment and weapon resources and no practice consent.
-Continue changes the live World only after whole-candidate validation.
-The original v4 file remains in place until the player publishes a save.
-
-The front Pulse Laser predecessor used the `MERSAVE1` envelope, version `4`
-and rules `4`. The eight compiled content streams retain their fingerprint
-binding, including the original SH025 cargo-bay equipment record. The save
-appends five bytes of flight weapon resources after the market block, before
-the corruption checksum. Versions one through three return UnsupportedVersion
-before decoding the candidate. The existing input size, content, encoding and
-checksum checks still apply. See [front Pulse Laser](FRONT-PULSE-LASER.md) for
-the firing rules and verification.
+The envelope carries the current version and exact compiled content identity. Any different version returns `UnsupportedVersion`. The bounded input, checksum, content and semantic validation still apply. The suffix stores traffic, damage, mining and the exact jump journal before its final checksum.
 
 Persisted state includes the actual flight pose, quaternion, speed, tick, mode/refusal; owning commander/ship/drive IDs; current system, visit, admission sequence and initial-versus-physical dock origin; full pending jump destination/source/countdown/fuel/drive binding; the sole account's credits, fuel, owned equipment identities/components/provenance/fittings and actual cargo fields; all sixteen supplier unit identities through allocations, jobs, held/delivered masks and transfer histories; issuer/receiver station facts, completion receipts and first clue; both real station Food stocks and their prices; service/travel accounting totals; session epoch, pause state and existing NPC roster identity.
 

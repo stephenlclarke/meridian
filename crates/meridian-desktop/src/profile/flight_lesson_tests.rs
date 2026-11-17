@@ -310,20 +310,53 @@ fn normal_docked_launch_and_all_flight_views_keep_critical_rows_visible_at_minim
                 .take(budget)
                 .collect::<Vec<_>>()
                 .join("\n");
+            assert!(rendered.contains("H / ? HELP"), "Clipped help hint");
+            assert!(rendered.contains(crate::flight_lesson::view_name(p.world.flight_view())));
+
+            let before = ok(p.world.save_bytes());
+            let panel = if p.world.snapshot().mode == FlightMode::Docked {
+                crate::help::Panel::docked(p.session.help_review())
+            } else {
+                crate::help::Panel::flight(None, p.session.help_review())
+            };
+            let text = panel.lines.join("\n");
             for control in [
-                "I MISSION DETAILS",
-                "C LESSON",
-                "F6/F12 REVIEW",
-                "F5 SAVE",
-                "F9 RELOAD SAVE",
-                "ESC SAVE AND QUIT",
+                "I Mission details",
+                "C Lesson details",
+                "F6 Flight lesson",
+                "F12 Cancel",
+                "F5 Save",
+                "F9 Reload",
+                "Escape Save/Quit",
             ] {
+                assert!(text.contains(control), "Missing help control {control}");
+            }
+            // At the minimum viewport every title/body/footer row and character
+            // must fit the real help renderer; bounded vertices alone miss clipping.
+            assert!(panel.lines.len() + 2 <= crate::help::MAX_LINES);
+            assert!(
+                panel
+                    .lines
+                    .iter()
+                    .all(|line| line.len() <= crate::help::MAX_COLUMNS)
+            );
+            assert!(panel.title.len() <= crate::help::MAX_COLUMNS);
+            assert!(panel.footer.len() <= crate::help::MAX_COLUMNS);
+            let mut vertices = Vec::new();
+            crate::hud::append_help(&panel, 640, 360, &mut vertices);
+            assert!(!vertices.is_empty());
+            assert!(vertices.len() <= crate::help::MAX_VERTICES);
+            for vertex in vertices {
+                assert!(vertex.position.iter().all(|value| value.is_finite()));
                 assert!(
-                    rendered.contains(control),
-                    "Clipped critical control {control}"
+                    vertex
+                        .position
+                        .iter()
+                        .take(2)
+                        .all(|value| (-1.0..=1.0).contains(value))
                 );
             }
-            assert!(rendered.contains(crate::flight_lesson::view_name(p.world.flight_view())));
+            assert_eq!(ok(p.world.save_bytes()), before);
         }
     }
     let directory = Directory::new();

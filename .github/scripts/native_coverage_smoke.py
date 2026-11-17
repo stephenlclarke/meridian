@@ -149,7 +149,7 @@ def exercise(app, output, save, receipt):
     receipt["stage"] = "system"
     press("n")
     phases.append(capture_phase(app, window, output, "system", system_frame))
-    if "New commander ready" not in phases[-1]["title"]:
+    if phases[-1]["title"] != "Meridian | DOCKED | RUNNING | H / ? Help":
         raise RuntimeError("System frame did not follow ordinary commander creation")
     receipt["stage"] = "trading"
     press("4")
@@ -208,7 +208,7 @@ def verify_save(observer, directory, output, receipt):
         if code:
             raise subprocess.CalledProcessError(code, attempt["argv"])
     evidence = stdout.read_text()
-    required = ("saved_format=16\n", "mode: Docked", "credits_tenths=Some(7200)\n",
+    required = ("saved_format=17\n", "mode: Docked", "credits_tenths=Some(7200)\n",
                 "used_tonnes: 0", "fuel_units: 130")
     if not all(item in evidence for item in required) or before != sha256(save):
         raise RuntimeError("Save decoder did not confirm the untouched starter commander")

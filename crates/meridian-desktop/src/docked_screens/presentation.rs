@@ -155,20 +155,18 @@ pub(super) fn project(s: &DockedScreens, c: &Context<'_>, v: Viewport) -> Frame 
         Screen::Equipment => equipment(s, c, &mut f),
     }
     let footer = Rect::new(16.0, v.height - 28.0, v.width - 110.0, 24.0);
-    let hints = c
-        .bindings
-        .iter()
-        .map(|b| b.label)
-        .collect::<Vec<_>>()
-        .join(" | ");
     label(
         &mut f,
         if let Some(panel) = c.equipment.filter(|panel| !panel.feedback.is_empty()) {
-            panel.feedback.clone()
-        } else if hints.is_empty() {
-            "Use pointer controls; keyboard bindings unavailable".into()
+            format!("H / ? HELP | {}", panel.feedback)
         } else {
-            hints
+            c.bindings
+                .iter()
+                .find(|binding| binding.key == Key::Back)
+                .map_or_else(
+                    || "H / ? HELP".into(),
+                    |binding| format!("{} BACK | H / ? HELP", binding.label),
+                )
         },
         footer.x,
         footer.y + 5.0,

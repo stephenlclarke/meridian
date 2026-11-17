@@ -462,28 +462,35 @@ fn checked_reading_and_terminal_chronology_tamper_never_replace_live_save() {
 }
 
 #[test]
-fn exact_v9_reader_upgrades_real_cancelled_gunnery_history_without_invented_t01() {
+fn current_continue_keeps_cancelled_gunnery_history_and_refuses_v9() {
     let mut world = commander(4801);
     consent(&mut world);
     let review = ok(world.review_practice_closure(0));
     ok(world.prepare_practice_closure(review, 0)).commit();
     consent(&mut world);
     let before = some(world.practice_ledger_snapshot());
-    let bytes = ok(crate::flight::persistence::v9_test_fixture(&world));
+    let bytes = ok(crate::flight::persistence::unsupported_version_test_input(
+        &world, 9,
+    ));
     assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 9);
-    let loaded = ok(World::from_save_bytes(&bytes));
+    assert!(matches!(
+        World::from_save_bytes(&bytes),
+        Err(crate::save::SaveError::UnsupportedVersion)
+    ));
+    let loaded = ok(World::from_save_bytes(&ok(world.save_bytes())));
     assert_eq!(some(loaded.practice_ledger_snapshot()), before);
     assert!(snapshot(&loaded).attempts.is_empty());
     assert_eq!(snapshot(&loaded).trace, None);
     assert_eq!(loaded.missile_snapshot(), world.missile_snapshot());
-    let _upgraded = cold(&loaded);
-    assert!(
-        crate::flight::persistence::v9_test_fixture(&{
-            confirm(&mut world, Action::Accept);
-            world
-        })
-        .is_err()
-    );
+    let _continued = cold(&loaded);
+    confirm(&mut world, Action::Accept);
+    let labelled = ok(crate::flight::persistence::unsupported_version_test_input(
+        &world, 9,
+    ));
+    assert!(matches!(
+        World::from_save_bytes(&labelled),
+        Err(crate::save::SaveError::UnsupportedVersion)
+    ));
 }
 
 #[test]

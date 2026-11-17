@@ -145,6 +145,12 @@
       "system": 185,
       "name": "Renas",
       "technology": 13
+    },
+    {
+      "galaxy": 0,
+      "system": 91,
+      "name": "Lareria",
+      "technology": 14
     }
   ],
   "sourceWitnesses": {
@@ -402,8 +408,8 @@
     ]
   },
   "output": "assets/legacy/sh025-cargo-bay.equipment",
-  "outputBytes": 107,
-  "outputSHA256": "2e99546d65fec686e65275599c0ac529a17551655678fd65e4b794e74104b83d",
+  "outputBytes": 110,
+  "outputSHA256": "ed5d31b92dcee285be743e94ad7c95d686709b6a3388feb0ae79b4630ca48753",
   "format": "MEQP0001 + LEu32 priceTenthsCR, u8 requiredTL, LEu16 base/extraHoldTonnes, u8 utilityMounts, LEu16 equipmentBudgetUnits, u8 itemUtilityMountCost/itemEquipmentUnitCost; five u8-length-prefixed UTF8 id/name/family/slot/hull; u8 siteCount then LEu16 system/u8 technology at galaxy0; no trailing bytes",
   "starterAdmission": {
     "source": "Current edaa starter fit matched to original source standard/provenance/slot rules",
@@ -435,7 +441,7 @@
     "purchase": "Actual ordinary main-station service and minimum TL4, authoritative28000 debit, unique paid item auto-fitted to active hull; refuse duplicate even when stored",
     "fit": "Exact actual paid hull-bound item at utility.cargoExpansion; storage retains item/provenance/boundHull; no repeated payment, refund or new device",
     "capacity": "92t without fitted bay;127t with fitted bay; unfit refuses if actual occupied hold exceeds92t, including identified mission property",
-    "station": "Source purchase requires actual main station; source fit/store requires docked; this joined slice supports the two original main orbitals only",
+    "station": "Source purchase requires actual main station; source fit/store requires docked; this joined slice supports the original Avenor, Renas and Lareria main orbitals",
     "nonAuthority": "No role-kit grant, geometry change, crew, people consent, hull acquisition, free stock, migration or playable acceptance"
   },
   "origin": {

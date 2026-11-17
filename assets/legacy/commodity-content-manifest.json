@@ -707,6 +707,216 @@
           "worldVersion": "l337-world-1"
         }
       ]
+    },
+    {
+      "galaxy": 0,
+      "system": 91,
+      "quotes": [
+        {
+          "askTenthsCR": 202,
+          "bidTenthsCR": 184,
+          "epoch": 0,
+          "index": 0,
+          "name": "Food",
+          "stock": 138,
+          "system": 91,
+          "targetStock": 148,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 356,
+          "bidTenthsCR": 326,
+          "epoch": 0,
+          "index": 1,
+          "name": "Textiles",
+          "stock": 120,
+          "system": 91,
+          "targetStock": 124,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 4582,
+          "bidTenthsCR": 4208,
+          "epoch": 0,
+          "index": 2,
+          "name": "Radioactives",
+          "stock": 13,
+          "system": 91,
+          "targetStock": 13,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 3047,
+          "bidTenthsCR": 2797,
+          "epoch": 0,
+          "index": 3,
+          "name": "Slaves",
+          "stock": 5,
+          "system": 91,
+          "targetStock": 5,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 858,
+          "bidTenthsCR": 788,
+          "epoch": 0,
+          "index": 4,
+          "name": "Liquor",
+          "stock": 51,
+          "system": 91,
+          "targetStock": 70,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 7008,
+          "bidTenthsCR": 6436,
+          "epoch": 0,
+          "index": 5,
+          "name": "Luxuries",
+          "stock": 13,
+          "system": 91,
+          "targetStock": 14,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 4493,
+          "bidTenthsCR": 4125,
+          "epoch": 0,
+          "index": 6,
+          "name": "Narcotics",
+          "stock": 10,
+          "system": 91,
+          "targetStock": 12,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 3288,
+          "bidTenthsCR": 3018,
+          "epoch": 0,
+          "index": 7,
+          "name": "Computers",
+          "stock": 24,
+          "system": 91,
+          "targetStock": 23,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 1294,
+          "bidTenthsCR": 1188,
+          "epoch": 0,
+          "index": 8,
+          "name": "Machinery",
+          "stock": 41,
+          "system": 91,
+          "targetStock": 51,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 662,
+          "bidTenthsCR": 608,
+          "epoch": 0,
+          "index": 9,
+          "name": "Alloys",
+          "stock": 79,
+          "system": 91,
+          "targetStock": 103,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 3094,
+          "bidTenthsCR": 2840,
+          "epoch": 0,
+          "index": 10,
+          "name": "Weapons",
+          "stock": 20,
+          "system": 91,
+          "targetStock": 18,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 1024,
+          "bidTenthsCR": 940,
+          "epoch": 0,
+          "index": 11,
+          "name": "Furs",
+          "stock": 42,
+          "system": 91,
+          "targetStock": 43,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 359,
+          "bidTenthsCR": 329,
+          "epoch": 0,
+          "index": 12,
+          "name": "Minerals",
+          "stock": 99,
+          "system": 91,
+          "targetStock": 99,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 4972,
+          "bidTenthsCR": 4566,
+          "epoch": 0,
+          "index": 13,
+          "name": "Gold",
+          "stock": 22,
+          "system": 91,
+          "targetStock": 27,
+          "unit": "kg",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 8568,
+          "bidTenthsCR": 7868,
+          "epoch": 0,
+          "index": 14,
+          "name": "Platinum",
+          "stock": 13,
+          "system": 91,
+          "targetStock": 14,
+          "unit": "kg",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 1062,
+          "bidTenthsCR": 974,
+          "epoch": 0,
+          "index": 15,
+          "name": "Gem-Stones",
+          "stock": 72,
+          "system": 91,
+          "targetStock": 65,
+          "unit": "g",
+          "worldVersion": "l337-world-1"
+        },
+        {
+          "askTenthsCR": 40226,
+          "bidTenthsCR": 36946,
+          "epoch": 0,
+          "index": 16,
+          "name": "Alien Items",
+          "stock": 0,
+          "system": 91,
+          "targetStock": 0,
+          "unit": "t",
+          "worldVersion": "l337-world-1"
+        }
+      ]
     }
   ],
   "outputs": {
@@ -715,12 +925,12 @@
       "bytes": 847
     },
     "g01-commodities.markets": {
-      "sha256": "8f9ec17f63a8e99a700ec5c01273ca67a8ec1cef42730edc10a8d778f0f1b253",
-      "bytes": 1138
+      "sha256": "571a46f88e03747732c91f94f1c98ac1aeeeda6c42fb62f45aaa8daae36885ac",
+      "bytes": 1701
     }
   },
   "catalogueFormat": "MCOM0001 + LEu16 count17; rows u8 ID/unitTag/departureLegalWeight/nameBytes, UTF8name, u8 sectorBytes, UTF8sector, LEf64 basePriceCR, LEu64 targetStock, LEu16 technology, LEf64 volatility; final17u8 display-order IDs",
-  "marketFormat": "MMKT0002 + LEu16 marketCount2/commodityCount17; each LEu16 system then17rows u8 ID, LEu32 ask/bid credit tenths, LEu64 stock/targetStock/epoch",
+  "marketFormat": "MMKT0002 + LEu16 marketCount3/commodityCount17; each LEu16 system then17rows u8 ID, LEu32 ask/bid credit tenths, LEu64 stock/targetStock/epoch",
   "semantics": {
     "ordinaryCommodityTonnes": "quantity for unit t; zero for kg/g, not fractional SI hold conversion",
     "quantityBound": 542551296285575047,
@@ -750,5 +960,5 @@
     "markets-08.toml": "Private proposal only; not installed"
   },
   "notice": "assets/legacy/Elite-L337-MIT.txt",
-  "scope": "Exact17definitions and34initialquotes only; live stock/transactions/save/legality application remain World-owned; not playable or commercial clearance"
+  "scope": "Exact17definitions and51initialquotes only; live stock/transactions/save/legality application remain World-owned; not playable or commercial clearance"
 }

@@ -776,7 +776,7 @@ fn visible_shortcuts_are_from_the_supplied_binding_map() {
     assert!(
         f.labels
             .iter()
-            .any(|l| l.text.contains("Enter: review | Esc: back"))
+            .any(|l| l.text.contains("Esc: back BACK | H / ? HELP"))
     );
 }
 
@@ -807,4 +807,59 @@ fn planet_preview_is_a_provider_request_for_the_selected_real_world_only() {
     let frame = ui.frame(&ctx, view());
     assert_eq!(frame.planets.len(), 1);
     assert_eq!(frame.planets[0].system, SystemId::AVENOR);
+}
+
+#[test]
+fn showroom_help_matches_actual_search_and_ignored_options_dispatch() {
+    let catalogue = catalogue();
+    let world = world();
+    let context = context(&world, &catalogue);
+    let mut screens = DockedScreens::new(SystemId::AVENOR, "SH025");
+    screens.open(Screen::Showroom);
+    let before = world.save_bytes().unwrap_or_else(|error| panic!("{error}"));
+    assert_eq!(key(&mut screens, &context, Key::Options), Outcome::Ignored);
+    let card = crate::help::Panel::station(Screen::Showroom, None, false, false);
+    assert!(!card.lines.iter().any(|line| line.contains("O Options")));
+    assert!(
+        card.lines
+            .iter()
+            .any(|line| line.contains("/ Search ships"))
+    );
+    assert_eq!(key(&mut screens, &context, Key::Search), Outcome::Updated);
+    assert!(screens.frame(&context, view()).search_active);
+    assert_eq!(
+        world.save_bytes().unwrap_or_else(|error| panic!("{error}")),
+        before
+    );
+}
+
+#[test]
+fn market_help_describes_enter_in_both_real_trade_modes() {
+    let catalogue = catalogue();
+    let world = world();
+    let context = context(&world, &catalogue);
+    let mut screens = DockedScreens::new(SystemId::AVENOR, "SH025");
+    screens.open(Screen::Trading);
+    let card = crate::help::Panel::station(Screen::Trading, None, false, false);
+    assert!(
+        card.lines
+            .iter()
+            .any(|line| line.contains("Enter Review current trade mode"))
+    );
+    assert!(
+        !card
+            .lines
+            .iter()
+            .any(|line| line.contains("Enter Review purchase"))
+    );
+    for (mode, buy) in [(Key::BuyMode, true), (Key::SellMode, false)] {
+        assert_eq!(key(&mut screens, &context, mode), Outcome::Updated);
+        assert_eq!(
+            key(&mut screens, &context, Key::Confirm),
+            Outcome::Request(Request::ReviewCommodity {
+                commodity: CommodityId::Food,
+                buy
+            })
+        );
+    }
 }
