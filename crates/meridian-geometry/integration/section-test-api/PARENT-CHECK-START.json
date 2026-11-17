@@ -1,0 +1,40 @@
+{
+  "source": "101d1f87f883f0fff716d7ca8ade54c30008c3a8",
+  "tree": "9fe054aefc48db6edc697d33ad2022ee1d0cfc3a",
+  "argv": [
+    "/opt/homebrew/bin/cargo",
+    "check",
+    "--locked",
+    "-p",
+    "meridian-geometry",
+    "--all-targets"
+  ],
+  "cwd": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.101d1f8/source",
+  "pid": 96787,
+  "ownerPID": 96722,
+  "startedUTC": "2026-11-17T08:41:05.521016+00:00",
+  "target": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.7ef4df7/target",
+  "manifest": {
+    "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.101d1f8/evidence/SOURCE.json",
+    "bytes": 56938,
+    "sha256": "9bcefd8320b7139f90d2612cb4371cd1e61b58546808f5278570b798ffe5ea13"
+  },
+  "helper": {
+    "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.101d1f8/run-gates.py",
+    "bytes": 4221,
+    "sha256": "fddc2ea4abf1bbc67589d0ecdfac0126b7c62db8bab61a2272439a272a094509"
+  },
+  "tools": [
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.101d1f8/evidence/CARGO-TOOLS.json",
+      "bytes": 522,
+      "sha256": "350acebee37308bd8958f99e09490b6b758dcc882f623004314146bfef23e3c8"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.101d1f8/evidence/RUSTC-TOOLS.json",
+      "bytes": 410,
+      "sha256": "cc0a1022479e988049d892b85c503c72825fecf1bad7c6e0b0ffb047c0a561f5"
+    }
+  ],
+  "log": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.101d1f8/evidence/check.log"
+}

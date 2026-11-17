@@ -1,0 +1,35 @@
+{
+  "status": "AUTHORED_UNRUN",
+  "parentAuthorHead": "ce98ec9785411aa8174399f9242598165cf91ba1",
+  "failedRootJoin": "101d1f87f883f0fff716d7ca8ade54c30008c3a8",
+  "failedRootTree": "9fe054aefc48db6edc697d33ad2022ee1d0cfc3a",
+  "actualCompilerExit": 101,
+  "actualCompilerWallSeconds": 1.1181110830511898,
+  "failure": "Fourteen E0061 calls use integer numerator/denominator and omit the required budget; their Result values cause the consequent E0308 Point2 mismatch.",
+  "correction": "Only those fourteen test fixture calls change to fraction(string numerator, string denominator, &mut b)?; rustfmt formats the new argument lists. All seven sample values, expected booleans, assertions, loops and exact geometry remain identical.",
+  "sourceProof": "Corrected source equals rustfmt of the exact parent with only the fourteen call substitutions. Production prefix before cfg(test) is byte exact. No function signature, primitive price, cap, algorithm, assertion, fixture/reference or test count changes.",
+  "productionPrefixSHA256": "925d23597942af197dde8cc1cd24b74a0184c92ab00c7f9912fae064a6ab0ef8",
+  "parentEvidence": {
+    "PARENT-CHECK-START.json": {
+      "bytes": 1424,
+      "sha256": "aa0d901464e6e41ba4cd02c291286ad175c72afac96ada1cee293b2c3814b38e"
+    },
+    "PARENT-CHECK-TERMINAL.json": {
+      "bytes": 477,
+      "sha256": "649d494729cad8caa1481b8b21eee449e222f70249b94807fb0f1e7c97325b91"
+    },
+    "PARENT-CHECK.log": {
+      "bytes": 15453,
+      "sha256": "416720f3e3ab816f7675b0ce013a1ccf873d07f7edf84a6d52fb5e436dbcc698"
+    }
+  },
+  "newTestCount": 42,
+  "hostTestCount": 9,
+  "currentCompiler": "UNRUN",
+  "currentRustTests": "42 UNRUN",
+  "currentHostTests": "9 UNRUN",
+  "clippyDevBuildWholeFive": "UNRUN; HELD for Root/G2 binding and owning compiler gates",
+  "latestOriginalResult": "5489: five Operations refusals, fifteen dependent bodies UNRUN, zero candidates. Failed 101d1f8 check did not run any geometry test or original batch.",
+  "authorChecks": "Source substitution and production-prefix equality only, rustfmt syntax/format, Markdown lint, metadata/hash and Git checks. No compiler/native/geometry probe.",
+  "rootOwnership": "Root serial shared join plus exact delta/unaffected binding; G2 same-slice review; G1 sole owning compiler/execution. No unchanged retry or new authorization workflow."
+}

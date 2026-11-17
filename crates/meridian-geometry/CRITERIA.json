@@ -462,5 +462,17 @@
     "all35TestsAndStrictControlsByteExact": true,
     "currentExecution": "UNRUN",
     "newTestCount": 42
+  },
+  "sectionFractionTestApiCorrection": {
+    "failedParentJoin": "101d1f87f883f0fff716d7ca8ade54c30008c3a8",
+    "failedParentTree": "9fe054aefc48db6edc697d33ad2022ee1d0cfc3a",
+    "parentAuthorHead": "ce98ec9785411aa8174399f9242598165cf91ba1",
+    "parentCheckExitCode": 101,
+    "parentCheckLogSHA256": "416720f3e3ab816f7675b0ce013a1ccf873d07f7edf84a6d52fb5e436dbcc698",
+    "deltaSHA256": "4e2563c8e28d68a49313177b730a1c5ec4446055cabdeb7efa2f15d01ed667f4",
+    "productionUnchanged": true,
+    "fourteenTestCallsOnly": true,
+    "currentCompilerAndAllTests": "UNRUN",
+    "newTestCount": 42
   }
 }

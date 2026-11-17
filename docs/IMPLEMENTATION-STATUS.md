@@ -1,5 +1,9 @@
 # Implementation and validation status
 
+## Section fixture API correction
+
+Root `101d1f8` stopped at its first owning compiler check: fourteen new parity-fixture calls used two integer arguments where the unchanged exact fraction API requires numerator/denominator strings, a mutable Budget and Result propagation. The resulting array-type mismatch was also retained. Tests, Clippy, build and the original batch did not run. The `9a9f13c` correction changes only those fourteen test calls and formatting; its production prefix, sample values, expected results, frozen references, all old tests and physical/resource limits remain exact. Corrected checks and 42 Rust/nine host cases are **UNRUN**, pending same-slice delta review and changed owning execution. The earlier original-five Operations refusals remain unresolved.
+
 ## Following exact plane-section geometry candidate
 
 The `ce98ec9` author packet is now composed on the qualified `5489c3e` geometry branch. It replaces ordinary per-cell ray classification with one-sided complete-owner sections on each original source facet, retaining the exact boundary fallback, complete witnesses, field provenance and global audits. Seven new tests bring the candidate to 42 Rust and nine host cases, all **UNRUN**. All 35 prior tests and strict 108/120 work assertions remain unchanged. Independent whole review is required before owning qualification and one changed whole-five batch. The parent still has five Operations constructor refusals, fifteen dependent bodies unrun and zero candidates; 2M operations, 100k memberships, 4096 bits and 512 triangles remain unchanged. No new hull, fit or performance acceptance is claimed.

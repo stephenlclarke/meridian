@@ -1,0 +1,401 @@
+    Checking meridian-geometry v0.1.0 (/Volumes/SSD/offload/meridian-g1-mbp-geometry.101d1f8/source/crates/meridian-geometry)
+error[E0061]: this function takes 3 arguments but 2 arguments were supplied
+   --> crates/meridian-geometry/src/sections.rs:345:15
+    |
+345 |             ([fraction(0, 1), fraction(0, 1)], Some(false)),
+    |               ^^^^^^^^------
+    |                       ||  |
+    |                       ||  expected `&str`, found integer
+    |                       |expected `&str`, found integer
+    |                       argument #3 of type `&mut budget::Budget` is missing
+    |
+note: function defined here
+   --> crates/meridian-geometry/src/exact.rs:13:8
+    |
+ 13 | pub fn fraction(
+    |        ^^^^^^^^
+ 14 |     numerator: &str,
+    |     ---------------
+ 15 |     denominator: &str,
+    |     -----------------
+ 16 |     budget: &mut Budget,
+    |     -------------------
+help: provide the argument
+    |
+345 -             ([fraction(0, 1), fraction(0, 1)], Some(false)),
+345 +             ([fraction(/* &str */, /* &str */, /* &mut Budget */), fraction(0, 1)], Some(false)),
+    |
+
+error[E0061]: this function takes 3 arguments but 2 arguments were supplied
+   --> crates/meridian-geometry/src/sections.rs:345:31
+    |
+345 |             ([fraction(0, 1), fraction(0, 1)], Some(false)),
+    |                               ^^^^^^^^------
+    |                                       ||  |
+    |                                       ||  expected `&str`, found integer
+    |                                       |expected `&str`, found integer
+    |                                       argument #3 of type `&mut budget::Budget` is missing
+    |
+note: function defined here
+   --> crates/meridian-geometry/src/exact.rs:13:8
+    |
+ 13 | pub fn fraction(
+    |        ^^^^^^^^
+ 14 |     numerator: &str,
+    |     ---------------
+ 15 |     denominator: &str,
+    |     -----------------
+ 16 |     budget: &mut Budget,
+    |     -------------------
+help: provide the argument
+    |
+345 -             ([fraction(0, 1), fraction(0, 1)], Some(false)),
+345 +             ([fraction(0, 1), fraction(/* &str */, /* &str */, /* &mut Budget */)], Some(false)),
+    |
+
+error[E0061]: this function takes 3 arguments but 2 arguments were supplied
+   --> crates/meridian-geometry/src/sections.rs:346:15
+    |
+346 |             ([fraction(3, 2), fraction(0, 1)], Some(true)),
+    |               ^^^^^^^^------
+    |                       ||  |
+    |                       ||  expected `&str`, found integer
+    |                       |expected `&str`, found integer
+    |                       argument #3 of type `&mut budget::Budget` is missing
+    |
+note: function defined here
+   --> crates/meridian-geometry/src/exact.rs:13:8
+    |
+ 13 | pub fn fraction(
+    |        ^^^^^^^^
+ 14 |     numerator: &str,
+    |     ---------------
+ 15 |     denominator: &str,
+    |     -----------------
+ 16 |     budget: &mut Budget,
+    |     -------------------
+help: provide the argument
+    |
+346 -             ([fraction(3, 2), fraction(0, 1)], Some(true)),
+346 +             ([fraction(/* &str */, /* &str */, /* &mut Budget */), fraction(0, 1)], Some(true)),
+    |
+
+error[E0061]: this function takes 3 arguments but 2 arguments were supplied
+   --> crates/meridian-geometry/src/sections.rs:346:31
+    |
+346 |             ([fraction(3, 2), fraction(0, 1)], Some(true)),
+    |                               ^^^^^^^^------
+    |                                       ||  |
+    |                                       ||  expected `&str`, found integer
+    |                                       |expected `&str`, found integer
+    |                                       argument #3 of type `&mut budget::Budget` is missing
+    |
+note: function defined here
+   --> crates/meridian-geometry/src/exact.rs:13:8
+    |
+ 13 | pub fn fraction(
+    |        ^^^^^^^^
+ 14 |     numerator: &str,
+    |     ---------------
+ 15 |     denominator: &str,
+    |     -----------------
+ 16 |     budget: &mut Budget,
+    |     -------------------
+help: provide the argument
+    |
+346 -             ([fraction(3, 2), fraction(0, 1)], Some(true)),
+346 +             ([fraction(3, 2), fraction(/* &str */, /* &str */, /* &mut Budget */)], Some(true)),
+    |
+
+error[E0061]: this function takes 3 arguments but 2 arguments were supplied
+   --> crates/meridian-geometry/src/sections.rs:347:15
+    |
+347 |             ([fraction(3, 1), fraction(0, 1)], Some(false)),
+    |               ^^^^^^^^------
+    |                       ||  |
+    |                       ||  expected `&str`, found integer
+    |                       |expected `&str`, found integer
+    |                       argument #3 of type `&mut budget::Budget` is missing
+    |
+note: function defined here
+   --> crates/meridian-geometry/src/exact.rs:13:8
+    |
+ 13 | pub fn fraction(
+    |        ^^^^^^^^
+ 14 |     numerator: &str,
+    |     ---------------
+ 15 |     denominator: &str,
+    |     -----------------
+ 16 |     budget: &mut Budget,
+    |     -------------------
+help: provide the argument
+    |
+347 -             ([fraction(3, 1), fraction(0, 1)], Some(false)),
+347 +             ([fraction(/* &str */, /* &str */, /* &mut Budget */), fraction(0, 1)], Some(false)),
+    |
+
+error[E0061]: this function takes 3 arguments but 2 arguments were supplied
+   --> crates/meridian-geometry/src/sections.rs:347:31
+    |
+347 |             ([fraction(3, 1), fraction(0, 1)], Some(false)),
+    |                               ^^^^^^^^------
+    |                                       ||  |
+    |                                       ||  expected `&str`, found integer
+    |                                       |expected `&str`, found integer
+    |                                       argument #3 of type `&mut budget::Budget` is missing
+    |
+note: function defined here
+   --> crates/meridian-geometry/src/exact.rs:13:8
+    |
+ 13 | pub fn fraction(
+    |        ^^^^^^^^
+ 14 |     numerator: &str,
+    |     ---------------
+ 15 |     denominator: &str,
+    |     -----------------
+ 16 |     budget: &mut Budget,
+    |     -------------------
+help: provide the argument
+    |
+347 -             ([fraction(3, 1), fraction(0, 1)], Some(false)),
+347 +             ([fraction(3, 1), fraction(/* &str */, /* &str */, /* &mut Budget */)], Some(false)),
+    |
+
+error[E0061]: this function takes 3 arguments but 2 arguments were supplied
+   --> crates/meridian-geometry/src/sections.rs:348:15
+    |
+348 |             ([fraction(3, 2), fraction(1, 1)], Some(true)),
+    |               ^^^^^^^^------
+    |                       ||  |
+    |                       ||  expected `&str`, found integer
+    |                       |expected `&str`, found integer
+    |                       argument #3 of type `&mut budget::Budget` is missing
+    |
+note: function defined here
+   --> crates/meridian-geometry/src/exact.rs:13:8
+    |
+ 13 | pub fn fraction(
+    |        ^^^^^^^^
+ 14 |     numerator: &str,
+    |     ---------------
+ 15 |     denominator: &str,
+    |     -----------------
+ 16 |     budget: &mut Budget,
+    |     -------------------
+help: provide the argument
+    |
+348 -             ([fraction(3, 2), fraction(1, 1)], Some(true)),
+348 +             ([fraction(/* &str */, /* &str */, /* &mut Budget */), fraction(1, 1)], Some(true)),
+    |
+
+error[E0061]: this function takes 3 arguments but 2 arguments were supplied
+   --> crates/meridian-geometry/src/sections.rs:348:31
+    |
+348 |             ([fraction(3, 2), fraction(1, 1)], Some(true)),
+    |                               ^^^^^^^^------
+    |                                       ||  |
+    |                                       ||  expected `&str`, found integer
+    |                                       |expected `&str`, found integer
+    |                                       argument #3 of type `&mut budget::Budget` is missing
+    |
+note: function defined here
+   --> crates/meridian-geometry/src/exact.rs:13:8
+    |
+ 13 | pub fn fraction(
+    |        ^^^^^^^^
+ 14 |     numerator: &str,
+    |     ---------------
+ 15 |     denominator: &str,
+    |     -----------------
+ 16 |     budget: &mut Budget,
+    |     -------------------
+help: provide the argument
+    |
+348 -             ([fraction(3, 2), fraction(1, 1)], Some(true)),
+348 +             ([fraction(3, 2), fraction(/* &str */, /* &str */, /* &mut Budget */)], Some(true)),
+    |
+
+error[E0061]: this function takes 3 arguments but 2 arguments were supplied
+   --> crates/meridian-geometry/src/sections.rs:349:15
+    |
+349 |             ([fraction(1, 1), fraction(0, 1)], None),
+    |               ^^^^^^^^------
+    |                       ||  |
+    |                       ||  expected `&str`, found integer
+    |                       |expected `&str`, found integer
+    |                       argument #3 of type `&mut budget::Budget` is missing
+    |
+note: function defined here
+   --> crates/meridian-geometry/src/exact.rs:13:8
+    |
+ 13 | pub fn fraction(
+    |        ^^^^^^^^
+ 14 |     numerator: &str,
+    |     ---------------
+ 15 |     denominator: &str,
+    |     -----------------
+ 16 |     budget: &mut Budget,
+    |     -------------------
+help: provide the argument
+    |
+349 -             ([fraction(1, 1), fraction(0, 1)], None),
+349 +             ([fraction(/* &str */, /* &str */, /* &mut Budget */), fraction(0, 1)], None),
+    |
+
+error[E0061]: this function takes 3 arguments but 2 arguments were supplied
+   --> crates/meridian-geometry/src/sections.rs:349:31
+    |
+349 |             ([fraction(1, 1), fraction(0, 1)], None),
+    |                               ^^^^^^^^------
+    |                                       ||  |
+    |                                       ||  expected `&str`, found integer
+    |                                       |expected `&str`, found integer
+    |                                       argument #3 of type `&mut budget::Budget` is missing
+    |
+note: function defined here
+   --> crates/meridian-geometry/src/exact.rs:13:8
+    |
+ 13 | pub fn fraction(
+    |        ^^^^^^^^
+ 14 |     numerator: &str,
+    |     ---------------
+ 15 |     denominator: &str,
+    |     -----------------
+ 16 |     budget: &mut Budget,
+    |     -------------------
+help: provide the argument
+    |
+349 -             ([fraction(1, 1), fraction(0, 1)], None),
+349 +             ([fraction(1, 1), fraction(/* &str */, /* &str */, /* &mut Budget */)], None),
+    |
+
+error[E0061]: this function takes 3 arguments but 2 arguments were supplied
+   --> crates/meridian-geometry/src/sections.rs:350:15
+    |
+350 |             ([fraction(2, 1), fraction(2, 1)], None),
+    |               ^^^^^^^^------
+    |                       ||  |
+    |                       ||  expected `&str`, found integer
+    |                       |expected `&str`, found integer
+    |                       argument #3 of type `&mut budget::Budget` is missing
+    |
+note: function defined here
+   --> crates/meridian-geometry/src/exact.rs:13:8
+    |
+ 13 | pub fn fraction(
+    |        ^^^^^^^^
+ 14 |     numerator: &str,
+    |     ---------------
+ 15 |     denominator: &str,
+    |     -----------------
+ 16 |     budget: &mut Budget,
+    |     -------------------
+help: provide the argument
+    |
+350 -             ([fraction(2, 1), fraction(2, 1)], None),
+350 +             ([fraction(/* &str */, /* &str */, /* &mut Budget */), fraction(2, 1)], None),
+    |
+
+error[E0061]: this function takes 3 arguments but 2 arguments were supplied
+   --> crates/meridian-geometry/src/sections.rs:350:31
+    |
+350 |             ([fraction(2, 1), fraction(2, 1)], None),
+    |                               ^^^^^^^^------
+    |                                       ||  |
+    |                                       ||  expected `&str`, found integer
+    |                                       |expected `&str`, found integer
+    |                                       argument #3 of type `&mut budget::Budget` is missing
+    |
+note: function defined here
+   --> crates/meridian-geometry/src/exact.rs:13:8
+    |
+ 13 | pub fn fraction(
+    |        ^^^^^^^^
+ 14 |     numerator: &str,
+    |     ---------------
+ 15 |     denominator: &str,
+    |     -----------------
+ 16 |     budget: &mut Budget,
+    |     -------------------
+help: provide the argument
+    |
+350 -             ([fraction(2, 1), fraction(2, 1)], None),
+350 +             ([fraction(2, 1), fraction(/* &str */, /* &str */, /* &mut Budget */)], None),
+    |
+
+error[E0061]: this function takes 3 arguments but 2 arguments were supplied
+   --> crates/meridian-geometry/src/sections.rs:351:15
+    |
+351 |             ([fraction(0, 1), fraction(-2, 1)], None),
+    |               ^^^^^^^^------
+    |                       ||  |
+    |                       ||  expected `&str`, found integer
+    |                       |expected `&str`, found integer
+    |                       argument #3 of type `&mut budget::Budget` is missing
+    |
+note: function defined here
+   --> crates/meridian-geometry/src/exact.rs:13:8
+    |
+ 13 | pub fn fraction(
+    |        ^^^^^^^^
+ 14 |     numerator: &str,
+    |     ---------------
+ 15 |     denominator: &str,
+    |     -----------------
+ 16 |     budget: &mut Budget,
+    |     -------------------
+help: provide the argument
+    |
+351 -             ([fraction(0, 1), fraction(-2, 1)], None),
+351 +             ([fraction(/* &str */, /* &str */, /* &mut Budget */), fraction(-2, 1)], None),
+    |
+
+error[E0061]: this function takes 3 arguments but 2 arguments were supplied
+   --> crates/meridian-geometry/src/sections.rs:351:31
+    |
+351 |             ([fraction(0, 1), fraction(-2, 1)], None),
+    |                               ^^^^^^^^-------
+    |                                       ||   |
+    |                                       ||   expected `&str`, found integer
+    |                                       |expected `&str`, found integer
+    |                                       argument #3 of type `&mut budget::Budget` is missing
+    |
+note: function defined here
+   --> crates/meridian-geometry/src/exact.rs:13:8
+    |
+ 13 | pub fn fraction(
+    |        ^^^^^^^^
+ 14 |     numerator: &str,
+    |     ---------------
+ 15 |     denominator: &str,
+    |     -----------------
+ 16 |     budget: &mut Budget,
+    |     -------------------
+help: provide the argument
+    |
+351 -             ([fraction(0, 1), fraction(-2, 1)], None),
+351 +             ([fraction(0, 1), fraction(/* &str */, /* &str */, /* &mut Budget */)], None),
+    |
+
+error[E0308]: mismatched types
+   --> crates/meridian-geometry/src/sections.rs:353:39
+    |
+353 |             assert_eq!(frame.occupied(&p, &mut b)?, expected, "{p:?}");
+    |                              -------- ^^ expected `&[Ratio<BigInt>; 2]`, found `&[Result<Ratio<BigInt>, Failure>; 2]`
+    |                              |
+    |                              arguments to this method are incorrect
+    |
+    = note: expected reference `&[Ratio<BigInt>; 2]`
+               found reference `&[Result<Ratio<BigInt>, budget::Failure>; 2]`
+note: method defined here
+   --> crates/meridian-geometry/src/sections.rs:184:19
+    |
+184 |     pub(super) fn occupied(
+    |                   ^^^^^^^^
+185 |         &self,
+186 |         sample: &Point2,
+    |         ---------------
+
+Some errors have detailed explanations: E0061, E0308.
+For more information about an error, try `rustc --explain E0061`.
+error: could not compile `meridian-geometry` (lib test) due to 15 previous errors

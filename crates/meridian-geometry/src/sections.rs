@@ -342,13 +342,34 @@ mod tests {
         };
         let mut b = Budget::new(Limits::default())?;
         for (p, expected) in [
-            ([fraction(0, 1), fraction(0, 1)], Some(false)),
-            ([fraction(3, 2), fraction(0, 1)], Some(true)),
-            ([fraction(3, 1), fraction(0, 1)], Some(false)),
-            ([fraction(3, 2), fraction(1, 1)], Some(true)),
-            ([fraction(1, 1), fraction(0, 1)], None),
-            ([fraction(2, 1), fraction(2, 1)], None),
-            ([fraction(0, 1), fraction(-2, 1)], None),
+            (
+                [fraction("0", "1", &mut b)?, fraction("0", "1", &mut b)?],
+                Some(false),
+            ),
+            (
+                [fraction("3", "2", &mut b)?, fraction("0", "1", &mut b)?],
+                Some(true),
+            ),
+            (
+                [fraction("3", "1", &mut b)?, fraction("0", "1", &mut b)?],
+                Some(false),
+            ),
+            (
+                [fraction("3", "2", &mut b)?, fraction("1", "1", &mut b)?],
+                Some(true),
+            ),
+            (
+                [fraction("1", "1", &mut b)?, fraction("0", "1", &mut b)?],
+                None,
+            ),
+            (
+                [fraction("2", "1", &mut b)?, fraction("2", "1", &mut b)?],
+                None,
+            ),
+            (
+                [fraction("0", "1", &mut b)?, fraction("-2", "1", &mut b)?],
+                None,
+            ),
         ] {
             assert_eq!(frame.occupied(&p, &mut b)?, expected, "{p:?}");
         }
