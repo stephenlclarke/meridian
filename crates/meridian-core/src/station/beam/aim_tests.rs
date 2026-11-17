@@ -1,5 +1,5 @@
 //! Native mesh regressions. Authored source; execution belongs to the existing owner lane.
-use super::*;
+use super::{OriginalStationData, StationError, Vec3, scale, sub};
 use crate::docking::{Basis3, RigidPose};
 fn ok<T, E: core::fmt::Debug>(v: Result<T, E>) -> T {
     v.unwrap_or_else(|e| panic!("{e:?}"))

@@ -1,5 +1,8 @@
 //! Combined public histories, not synthetic journal padding or substituted contact receipts.
-use super::*;
+use super::super::{
+    FlightMode, MissileContact, MissileOrigin, ProjectileId, ProjectileSnapshot, StepError, Vec3,
+    World, add, length, scale, sub, unit,
+};
 use crate::FlightInput;
 use crate::flight::missiles::tests::{dock, fly_axis, stop};
 use crate::flight::practice::tests::{aim_at, consent, launch, step};

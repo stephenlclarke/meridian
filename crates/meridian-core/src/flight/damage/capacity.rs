@@ -1,5 +1,5 @@
 //! Preflight the existing whole-save byte limit before coupled combat publication.
-use super::*;
+use super::{FlightMode, MAX_SAVE_BYTES, PulseResources, SaveError, State, World, Writer};
 use crate::flight::{NavigationState, Snapshot, combat, missiles, navigation_trade, practice};
 use crate::station_services::StationMarkets;
 use crate::traffic;

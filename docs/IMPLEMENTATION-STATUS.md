@@ -1,5 +1,9 @@
 # Implementation and validation status
 
+## Core maintainability correction awaiting qualification
+
+Protected main `8b81a77` has 18 critical core source findings: fourteen wildcard imports and four functions above the cognitive-complexity limit. The correction replaces those imports and extracts the existing native-motion, interception-body, practice-incident and ordered-beam replay blocks into private helpers. Existing assertions, numerical limits, serialization, source identities and validation order remain unchanged. Nested tests import their actual defining module explicitly where they previously relied on a parent's wildcard import. This is authored source; compiler, test, Clippy and exact-main Sonar acceptance of the correction remain pending with the designated execution owners. The two desktop findings are a separate owner change.
+
 ## Current NPC qualification
 
 Exact source `bd506f9f9a8390bceecc4fe76dce5f60ffc6e410`, tree `452c9c4e461c15e8b94f47f3e13f01913bcafb74`, passed whole-source review. Mac, Dell Linux and native Windows each passed 288 core, 169 desktop and three explicit observer tests: **460 top-level Rust cases**, plus 88 Python tests, 40 Markdown files, formatting, all-target compilation, strict Clippy and fresh locked release builds. Nested subprocess summaries are included, not extra cases. All five hosted PR jobs passed at this exact head. Main integration, exact-main Sonar and the next public release are pending.

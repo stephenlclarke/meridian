@@ -1,5 +1,8 @@
 //! Native approach reservation components. No source test was executed by the author.
-use super::*;
+use super::super::{
+    CAPITAL, CommodityId, MarketSite, OriginalStationData, Population, RigidPose, State,
+    StationMarkets, SystemId, TickContext, Vec3, add, length, pose, sub,
+};
 fn ok<T, E: core::fmt::Debug>(v: Result<T, E>) -> T {
     v.unwrap_or_else(|e| panic!("{e:?}"))
 }

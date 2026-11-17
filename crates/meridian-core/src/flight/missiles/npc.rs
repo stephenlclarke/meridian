@@ -1,5 +1,9 @@
 //! Typed NPC targeting and retained native final-segment replay, never a practice proxy.
-use super::*;
+use super::{
+    FlightMode, MISSILE_RANGE, MISSILE_SPEED, MissileContact, MissileEnd, MissileError,
+    MissileTarget, ProjectileSnapshot, State, StepError, Vec3, World, choose, length, pose,
+    ray_point, sub, unit,
+};
 use crate::save::{Reader, SaveError, Writer};
 use crate::traffic::{MissileScene, NpcId, SceneStage};
 const INVALID: SaveError =
@@ -275,84 +279,7 @@ impl State {
         if p.age_ticks == 0 {
             self.validate_newborn_motion(p, i)?;
         } else {
-            let m = self.motions[i].as_ref().ok_or(INVALID)?;
-            super::super::persistence::validate_flight(&m.flight)?;
-            if m.flight.tick != motion_tick
-                || m.flight.mode != FlightMode::Flight
-                || m.age.checked_add(1) != Some(p.age_ticks)
-                || !m.travel.is_finite()
-                || (m.travel - f64::from(m.age) * (MISSILE_SPEED / 60.0)).abs() > 1e-7
-                || !finite(m.position)
-                || (nav.dock_sequence == e.dock_sequence && world.pulse.alive() && !m.player_alive)
-                || length(sub(m.position, p.origin.muzzle)) > m.travel + 1e-7
-                || (m.flight.tick == world.state.tick
-                    && (m.flight.position != world.state.position
-                        || m.flight.orientation != world.state.orientation))
-            {
-                return Err(INVALID);
-            }
-            let scene = m.npc_scene.as_ref().ok_or(INVALID)?;
-            if scene.world_tick != motion_tick
-                || scene.system != p.origin.owner.system
-                || scene.stage != SceneStage::Step(i as u8)
-            {
-                return Err(INVALID);
-            }
-            world
-                .traffic
-                .validate_missile_scene(scene, world.state.tick, data)?;
-            let target = scene.target(id).ok_or(INVALID)?;
-            let aimpoint = data
-                .player_missile_aimpoint(target.pose, m.position)
-                .map_err(|_| INVALID)?;
-            let direction = unit(sub(aimpoint, m.position)).ok_or(INVALID)?;
-            if direction != p.direction {
-                return Err(INVALID);
-            }
-            let ray = pose(m.position, direction).ok_or(INVALID)?;
-            let travel = (MISSILE_SPEED / 60.0).min((MISSILE_RANGE - m.travel).max(0.0));
-            let player = super::super::flight_pose(m.flight.position, m.flight.orientation)
-                .ok_or(INVALID)?;
-            let cleared = m.cleared
-                || length(sub(m.position, player.position)) > data.player_clearance_radius() + 1e-6;
-            let station = data
-                .beam_block_distance(
-                    world.state.station.ok_or(INVALID)?,
-                    ray.position,
-                    ray.orientation.z,
-                    travel,
-                )
-                .map_err(|_| INVALID)?;
-            let mut best = station.map(|d| (d, MissileContact::Station));
-            if cleared
-                && m.player_alive
-                && let Some(d) = data
-                    .player_beam_distance(player, ray.position, ray.orientation.z, travel)
-                    .map_err(|_| INVALID)?
-            {
-                choose(
-                    &mut best,
-                    d,
-                    MissileContact::Player {
-                        front: sub(ray_point(ray, d), player.position).dot(player.orientation.z)
-                            >= 0.0,
-                    },
-                );
-            }
-            self.validate_motion_bodies(p, i, m, ray, travel, &mut best)?;
-            choose_scene(world, &p, scene, ray, travel, &mut best).map_err(|_| INVALID)?;
-            let used = best.map_or(travel, |(d, _)| d);
-            if p.position != ray_point(ray, used)
-                || p.propulsion_travel != m.travel + used
-                || p.contact != best.map(|(_, c)| c)
-                || p.muzzle_cleared
-                    != (cleared
-                        || (best.is_none()
-                            && length(sub(p.position, player.position))
-                                > data.player_clearance_radius() + 1e-6))
-            {
-                return Err(INVALID);
-            }
+            self.validate_npc_motion(world, p, (i, id), e, nav.dock_sequence, motion_tick)?;
         }
         match p.ended {
             None => {
@@ -406,6 +333,95 @@ impl State {
         }
         if (p.ended == Some(MissileEnd::Impact)) != p.contact.is_some()
             || e.loss.is_some() != (p.ended == Some(MissileEnd::TargetLost))
+        {
+            return Err(INVALID);
+        }
+        Ok(())
+    }
+    fn validate_npc_motion(
+        &self,
+        world: &World,
+        p: ProjectileSnapshot,
+        (i, id): (usize, NpcId),
+        e: &NpcLaunch,
+        dock_sequence: u64,
+        motion_tick: u64,
+    ) -> Result<(), SaveError> {
+        let data = world.station_data.as_ref().ok_or(INVALID)?;
+        let m = self.motions[i].as_ref().ok_or(INVALID)?;
+        super::super::persistence::validate_flight(&m.flight)?;
+        if m.flight.tick != motion_tick
+            || m.flight.mode != FlightMode::Flight
+            || m.age.checked_add(1) != Some(p.age_ticks)
+            || !m.travel.is_finite()
+            || (m.travel - f64::from(m.age) * (MISSILE_SPEED / 60.0)).abs() > 1e-7
+            || !finite(m.position)
+            || (dock_sequence == e.dock_sequence && world.pulse.alive() && !m.player_alive)
+            || length(sub(m.position, p.origin.muzzle)) > m.travel + 1e-7
+            || (m.flight.tick == world.state.tick
+                && (m.flight.position != world.state.position
+                    || m.flight.orientation != world.state.orientation))
+        {
+            return Err(INVALID);
+        }
+        let scene = m.npc_scene.as_ref().ok_or(INVALID)?;
+        if scene.world_tick != motion_tick
+            || scene.system != p.origin.owner.system
+            || scene.stage != SceneStage::Step(i as u8)
+        {
+            return Err(INVALID);
+        }
+        world
+            .traffic
+            .validate_missile_scene(scene, world.state.tick, data)?;
+        let target = scene.target(id).ok_or(INVALID)?;
+        let aimpoint = data
+            .player_missile_aimpoint(target.pose, m.position)
+            .map_err(|_| INVALID)?;
+        let direction = unit(sub(aimpoint, m.position)).ok_or(INVALID)?;
+        if direction != p.direction {
+            return Err(INVALID);
+        }
+        let ray = pose(m.position, direction).ok_or(INVALID)?;
+        let travel = (MISSILE_SPEED / 60.0).min((MISSILE_RANGE - m.travel).max(0.0));
+        let player =
+            super::super::flight_pose(m.flight.position, m.flight.orientation).ok_or(INVALID)?;
+        let cleared = m.cleared
+            || length(sub(m.position, player.position)) > data.player_clearance_radius() + 1e-6;
+        let station = data
+            .beam_block_distance(
+                world.state.station.ok_or(INVALID)?,
+                ray.position,
+                ray.orientation.z,
+                travel,
+            )
+            .map_err(|_| INVALID)?;
+        let mut best = station.map(|d| (d, MissileContact::Station));
+        if cleared
+            && m.player_alive
+            && let Some(d) = data
+                .player_beam_distance(player, ray.position, ray.orientation.z, travel)
+                .map_err(|_| INVALID)?
+        {
+            choose(
+                &mut best,
+                d,
+                MissileContact::Player {
+                    front: sub(ray_point(ray, d), player.position).dot(player.orientation.z) >= 0.0,
+                },
+            );
+        }
+        self.validate_motion_bodies(p, i, m, ray, travel, &mut best)?;
+        choose_scene(world, &p, scene, ray, travel, &mut best).map_err(|_| INVALID)?;
+        let used = best.map_or(travel, |(d, _)| d);
+        if p.position != ray_point(ray, used)
+            || p.propulsion_travel != m.travel + used
+            || p.contact != best.map(|(_, c)| c)
+            || p.muzzle_cleared
+                != (cleared
+                    || (best.is_none()
+                        && length(sub(p.position, player.position))
+                            > data.player_clearance_radius() + 1e-6))
         {
             return Err(INVALID);
         }
