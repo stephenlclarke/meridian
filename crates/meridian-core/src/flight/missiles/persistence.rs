@@ -1056,7 +1056,7 @@ impl State {
                 .map_err(|_| INVALID)?;
         }
         let used = best.map_or(travel, |(d, _)| d);
-        if p.position != add(m.position, scale(direction, used))
+        if p.position != super::projectile_point(p, ray, used, best.map(|(_, contact)| contact))
             || p.propulsion_travel != m.travel + used
             || p.contact != best.map(|(_, c)| c)
             || p.muzzle_cleared

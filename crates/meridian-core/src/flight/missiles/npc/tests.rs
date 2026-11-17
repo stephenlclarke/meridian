@@ -129,6 +129,34 @@ fn finish_npc(w: &mut World, id: ProjectileId) -> ProjectileSnapshot {
     }
     panic!("finite actual projectile did not end");
 }
+fn assert_native_endpoint(w: &World, projectile: ProjectileSnapshot) {
+    let motion = w.missiles.motions[usize::from(projectile.origin.projectile.ordinal())]
+        .as_ref()
+        .unwrap();
+    let ray = pose(motion.position, projectile.direction).unwrap();
+    let range = (MISSILE_SPEED / 60.0).min((MISSILE_RANGE - motion.travel).max(0.0));
+    let native = motion
+        .npc_scene
+        .as_ref()
+        .unwrap()
+        .contact(
+            w.station_data.as_ref().unwrap(),
+            ray.position,
+            ray.orientation.z,
+            range,
+        )
+        .unwrap();
+    let hit = w
+        .traffic
+        .missile_hits()
+        .iter()
+        .find(|h| h.origin.projectile == projectile.origin.projectile)
+        .unwrap();
+    assert_eq!(projectile.contact, Some(MissileContact::Npc(native.id)));
+    assert_eq!(projectile.position, native.point);
+    assert_eq!(native.point, ray_point(ray, native.distance));
+    assert_eq!(hit.point, projectile.position);
+}
 fn impacted() -> World {
     let mut w = ready(1);
     let origin = fire_npc(&mut w);
@@ -193,6 +221,7 @@ fn actual_finite_seven_rounds_can_destroy_npc_without_award_loot_refill_or_respa
         let origin = fire_npc(&mut w);
         let ended = finish_npc(&mut w, origin.projectile);
         assert_eq!(ended.contact, Some(MissileContact::Npc(id)));
+        assert_native_endpoint(&w, ended);
         fired += 1;
         while w.missile_snapshot().unwrap().cooldown_ticks > 0 {
             step(&mut w, 1);
@@ -447,4 +476,21 @@ fn actual_surface_guidance_continues_cold_and_rejects_coherent_origin_guidance_r
     assert_eq!(actual, continued);
     assert_eq!(actual.contact, Some(MissileContact::Npc(trader(&w).id)));
     cold(&w);
+}
+
+#[test]
+fn actual_paid_npc_hit_keeps_exact_native_endpoint_and_checked_save_cold() {
+    let w = impacted();
+    let projectile = w
+        .missile_projectiles()
+        .find(|p| matches!(p.contact, Some(MissileContact::Npc(_))))
+        .unwrap();
+    assert_native_endpoint(&w, projectile);
+    let continued = cold(&w);
+    let retained = continued
+        .missile_projectiles()
+        .find(|p| p.origin == projectile.origin)
+        .unwrap();
+    assert_eq!(retained, projectile);
+    assert_native_endpoint(&continued, retained);
 }

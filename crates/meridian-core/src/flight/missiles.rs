@@ -6,7 +6,7 @@ mod geometry;
 mod npc;
 mod persistence;
 pub use geometry::{MISSILE_FACES, MISSILE_VERTICES};
-use geometry::{add, length, mesh_distance, pose, scale, sub, unit};
+use geometry::{add, length, mesh_distance, pose, ray_point, scale, sub, unit};
 pub const MISSILE_SPEED: f64 = 792.0;
 pub const MISSILE_RANGE: f64 = 6000.0;
 pub const MISSILE_LIFETIME_TICKS: u16 = 1440;
@@ -705,7 +705,7 @@ fn advance_projectile(
     let ray = pose(p.position, p.direction).ok_or(StepError::NonFiniteState)?;
     let best = query_contact(world, prepared, p, index, ray, travel, next)?;
     let used = best.map_or(travel, |(distance, _)| distance);
-    p.position = add(p.position, scale(p.direction, used));
+    p.position = projectile_point(*p, ray, used, best.map(|(_, contact)| contact));
     p.propulsion_travel += used;
     p.age_ticks = p.age_ticks.saturating_add(1);
     p.last_tick = next.tick;
@@ -725,6 +725,22 @@ fn advance_projectile(
     }
     Ok(())
 }
+/// NPC motion and actual NPC contacts use the same native ray as their receipts.
+/// Qualified practice histories retain their original endpoint calculation.
+fn projectile_point(
+    p: ProjectileSnapshot,
+    ray: crate::docking::RigidPose,
+    distance: f64,
+    contact: Option<MissileContact>,
+) -> Vec3 {
+    if matches!(p.target, MissileTarget::Npc(_)) || matches!(contact, Some(MissileContact::Npc(_)))
+    {
+        ray_point(ray, distance)
+    } else {
+        add(ray.position, scale(p.direction, distance))
+    }
+}
+
 fn query_contact(
     world: &World,
     prepared: &PreparedStep,

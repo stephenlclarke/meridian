@@ -116,3 +116,20 @@ setting or gate is weakened. The corrected source is uncompiled and untested
 until independent delta review and owning execution. Three observer example
 cases, release build, coverage, signing and native gameplay remain unrun.
 There is no new qualified preview or full 1337 parity claim.
+
+Mac qualification passed all 455 workspace Rust cases on the current NPC source, while Linux retained one checked-save failure in the seven-round case. A source-consistency correction now unifies new NPC movement and receipts on the exact native ray endpoint, with two authored unrun regressions and an independently frozen native-geometry arithmetic reference. The actual Linux failed guard and values remain unknown; this is not a verified Linux cure.
+
+### Combined endpoint and renderer correction
+
+Root composes the canonical NPC ray correction with the equivalent renderer
+let-chain fix from the actual Mac `75a88c0` Clippy failure. That Mac run passed
+455 workspace Rust tests and 88 Python tests, then failed desktop Clippy;
+observer, release and native acceptance remained unrun. Both Dell platforms
+failed the earlier seven-round cold checked-save case after 285 passing core
+tests. The actual rejecting guard and values remain unknown.
+
+The independent endpoint counterexample proves a source consistency defect,
+not the missing Dell state or a tested cure. All composed tests, compiler,
+Clippy, release and native validation remain pending on this exact correction.
+Qualified previews follow actual validation; full original 1337 visual and
+gameplay parity remains an explicit requirement.

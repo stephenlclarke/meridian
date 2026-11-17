@@ -410,12 +410,11 @@ impl Renderer {
             if let (Some(station), Some(traffic)) = (station, traffic) {
                 mesh::traffic::append(snapshot, station, &self.ship, traffic, &mut self.frame)?;
             }
-            if let (Some(station), Some(shot)) = (station, pulse) {
-                if !traffic
+            if let (Some(station), Some(shot)) = (station, pulse)
+                && !traffic
                     .is_some_and(|scene| mesh::traffic::contains_pulse(scene, snapshot.tick, shot))
-                {
-                    mesh::append_pulse(snapshot, station, shot, &mut self.frame)?;
-                }
+            {
+                mesh::append_pulse(snapshot, station, shot, &mut self.frame)?;
             }
             mesh::apply_flight_view(self.flight_view, &mut self.frame);
             if self.frame.len() > self.vertex_capacity {

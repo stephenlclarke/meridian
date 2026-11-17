@@ -98,3 +98,32 @@ setting or gate is weakened. The corrected source is uncompiled and untested
 until independent delta review and owning execution. Three observer example
 cases, release build, coverage, signing and native gameplay remain unrun.
 There is no new qualified preview or full 1337 parity claim.
+
+## Canonical native ray endpoint consistency
+
+The actual Linux `3a53949` failure was at `npc/tests.rs:103`, `cold()` calling `save_bytes()`. The launch call is line 95 and maps invalid candidate saves to a different error type. The retained 50189-byte log has SHA-256 `b6e3851d39beede87e4c00e575ebaac235b96fe7ab0cdca5ecb16867d56538dd`; it reports 285 passing and one failing core case in 113.85 seconds. Mac passed all 455 workspace Rust cases on `3a53949` and again on `75a88c0`. The Linux log merges several exact NPC validators under one reason and retains no failed guard/value tuple. The exact Linux rejection cause remains **UNKNOWN**, and this change is not declared its cure.
+
+The source nevertheless contains a concrete arithmetic inconsistency. `advance_projectile` normalizes the guidance direction once, builds a ray that normalizes again, queries native contact with the latter ray, then formerly calculated its movement endpoint with the former direction. The NPC hit receipt used the latter ray point. Normalization is not bit-idempotent, so the two legitimate points can differ even though `h.point == p.position` must hold exactly. This is an expression/dataflow defect, not evidence for a platform epsilon.
+
+The independent [frozen reference](NPC-RAY-ENDPOINT-REFERENCE.json) was generated before SUT evaluation from the admitted binary mesh, exact rational plane intersection and Gram-matrix barycentrics, plus explicit binary64 rounding. It identifies native triangle 0 `[11,10,9]`, a positive interior first contact within 13.2, and two distinct endpoint bit patterns. The original external freeze SHA-256 is `6f4c32c3d8f822ec4bf6b5b9acde5a46b04d5d942f47e0e4413a744672623e42`. This is a mathematical/native geometry component witness, not a World pose/history injection or the unrecovered Linux failure values. Reference scripts and the earlier generic-step reference are retained in the source packet.
+
+New NPC-target motion and any actual NPC contact now derive their endpoint from the exact ray used for native query. Native NPC replay uses that same ray for obstruction, player facing and endpoint, while reciprocal point equality, first-contact ordering, item identity and damage/resource conservation stay exact. The qualified practice graph retains its original endpoint expression when no NPC contact occurs; public older readers have absent traffic and no typed NPC target. The private format-15 rules marker becomes `npc-missiles/canonical-native-ray-v3`; no payload field, qualified 4-11/13 marker, synthetic baseline or draft migration is added. Root must preserve the marker hunk while joining its separate renderer let-chain fix.
+
+One new regression uses frozen binary64 bits and independently derived native geometry to demonstrate the old endpoint difference and the canonical endpoint. Its mathematical native-raycast accuracy comparison has a test-only tolerance; runtime receipt/point equality gains no tolerance. A second new public-command regression produces a genuinely paid native NPC hit, compares its actual stored point with native query and receipt, and checks cold save/continue equality. The original seven-round case also compares each real native endpoint before its existing cold step. No positive installs a World pose, NPC, item, resource history or accepted receipt. All prior assertions remain, and the new source tests are **UNRUN**.
+
+This correction is based on exact `75a88c06809fdd96d5dacd03645f1cb5dc1dae5a`, preserving the core Clippy changes. No renderer, dependency, asset, control pilot, source lifetime/range/speed, shield/hull rule, 128-proof bound or 64 KiB cap changes. No compiler/test/probe/native job is authorized for this author. Root bundles one whole-delta review, then designated changed qualification must establish actual platform outcomes. If Linux still fails, the minimal missing evidence is the exact validator guard, projectile/tick/end-state and relevant floating bit patterns; do not infer a cure from Mac passes.
+
+### Combined endpoint and renderer correction
+
+Root composes the canonical NPC ray correction with the equivalent renderer
+let-chain fix from the actual Mac `75a88c0` Clippy failure. That Mac run passed
+455 workspace Rust tests and 88 Python tests, then failed desktop Clippy;
+observer, release and native acceptance remained unrun. Both Dell platforms
+failed the earlier seven-round cold checked-save case after 285 passing core
+tests. The actual rejecting guard and values remain unknown.
+
+The independent endpoint counterexample proves a source consistency defect,
+not the missing Dell state or a tested cure. All composed tests, compiler,
+Clippy, release and native validation remain pending on this exact correction.
+Qualified previews follow actual validation; full original 1337 visual and
+gameplay parity remains an explicit requirement.

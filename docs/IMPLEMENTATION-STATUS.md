@@ -217,3 +217,24 @@ setting or gate is weakened. The corrected source is uncompiled and untested
 until independent delta review and owning execution. Three observer example
 cases, release build, coverage, signing and native gameplay remain unrun.
 There is no new qualified preview or full 1337 parity claim.
+
+## Exact native ray endpoint consistency
+
+The `3a53949` Mac run passed 286 core and 169 desktop Rust cases; current `75a88c0` repeated those 455 passes and cleared the six core Clippy findings before a separately owned desktop renderer finding. Linux `3a53949` reported 285 core passes and one failure in 113.85 seconds. The retained 50189-byte raw Linux log has SHA-256 `b6e3851d39beede87e4c00e575ebaac235b96fe7ab0cdca5ecb16867d56538dd`. Exact `npc/tests.rs:103` is the cold helper's `save_bytes`, not the launch API. Its shared error string does not identify the failed NPC validation guard, projectile, tick or floating values. That actual Linux cause remains **UNKNOWN**.
+
+Independent source arithmetic established a concrete separate consistency defect: movement used a once-normalized direction, but native contact normalized it again and stored a point from that second ray. Those endpoints need not be bit-identical. A frozen rational native-triangle/IEEE binary64 example records different endpoint bits before SUT evaluation. The current source uses the same native ray endpoint for new NPC motion, native receipts and replay; NPC replay also uses that same ray for station/player obstruction and struck facing. Exact receipt/endpoint comparisons remain. Qualified practice histories retain their original calculation and qualified 4-11/13 content boundaries. The private format-15 NPC rules marker changes without payload fields or migration. Two new regressions are authored **UNRUN**, and the original seven-round case now checks native endpoint/receipt equality before each cold save. No source tolerance, physical volume, resource, capacity or pilot assertion is weakened. Root owns the renderer-only let-chain correction; this branch does not edit it. Corrected compiler/tests/Clippy/native/platform results remain unmeasured.
+
+### Combined endpoint and renderer correction
+
+Root composes the canonical NPC ray correction with the equivalent renderer
+let-chain fix from the actual Mac `75a88c0` Clippy failure. That Mac run passed
+455 workspace Rust tests and 88 Python tests, then failed desktop Clippy;
+observer, release and native acceptance remained unrun. Both Dell platforms
+failed the earlier seven-round cold checked-save case after 285 passing core
+tests. The actual rejecting guard and values remain unknown.
+
+The independent endpoint counterexample proves a source consistency defect,
+not the missing Dell state or a tested cure. All composed tests, compiler,
+Clippy, release and native validation remain pending on this exact correction.
+Qualified previews follow actual validation; full original 1337 visual and
+gameplay parity remains an explicit requirement.
