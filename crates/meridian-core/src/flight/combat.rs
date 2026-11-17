@@ -94,6 +94,8 @@ pub(super) struct PreparedPulseImpact {
     opening_legal: u8,
     item: u64,
     opening_pulse: super::weapons::PulseResources,
+    opening_damage: super::damage::State,
+    damage: super::damage::State,
     pulse: super::weapons::PulseResources,
     epoch: u64,
     next: State,
@@ -101,6 +103,25 @@ pub(super) struct PreparedPulseImpact {
     hit: Option<OrdinaryImpact>,
 }
 impl State {
+    pub(super) fn shields(self) -> [u16; 2] {
+        [self.front, self.rear]
+    }
+    /// Only sealed World producers call this; it never creates a player/station incident.
+    pub(super) fn apply_bound_player_damage(
+        &mut self,
+        pulse: &mut super::weapons::PulseResources,
+        front: bool,
+        damage: u16,
+    ) {
+        let shield = if front {
+            &mut self.front
+        } else {
+            &mut self.rear
+        };
+        let absorbed = (*shield).min(damage);
+        *shield -= absorbed;
+        pulse.damage_energy(damage - absorbed);
+    }
     pub(super) fn physical_tick(self) -> u64 {
         self.physical_tick
     }
@@ -200,13 +221,7 @@ impl State {
                 OrdinaryWeapon::FrontPulseLaser => 1500,
                 OrdinaryWeapon::StandardMissile => 16_000,
             };
-            let shield = if front {
-                &mut self.front
-            } else {
-                &mut self.rear
-            };
-            pulse.damage_energy(damage.saturating_sub(*shield));
-            *shield = shield.saturating_sub(damage);
+            self.apply_bound_player_damage(pulse, front, damage);
         }
         // The supported original-main actor has no authored nativeStationIdentity:
         // the original station susceptibility guard admits no hull damage.
@@ -259,7 +274,8 @@ impl State {
             || self.front > SHIELD_CAPACITY
             || self.rear > SHIELD_CAPACITY
             || ((self.front != SHIELD_CAPACITY || self.rear != SHIELD_CAPACITY)
-                && !world.missiles.has_player_hit())
+                && !world.missiles.has_player_hit()
+                && world.traffic.player_hits().is_empty())
         {
             return Err(SaveError::InvalidState(
                 "unsupported ordnance damage boundary",
@@ -315,7 +331,7 @@ impl State {
                     && !world.pulse.fits_ordinary_hit(
                         elapsed_physical,
                         uninterrupted,
-                        world.missiles.has_player_hit(),
+                        world.missiles.has_player_hit() || !world.traffic.player_hits().is_empty(),
                     ))
             {
                 return Err(invalid);
@@ -433,6 +449,8 @@ impl World {
             opening_legal: legal,
             item: shot.fitted_item_id,
             opening_pulse: self.pulse,
+            opening_damage: self.damage.clone(),
+            damage: self.damage.pulse(self.combat.physical_tick())?,
             pulse,
             epoch: self
                 .freight_session
@@ -446,6 +464,22 @@ impl World {
     }
 }
 impl PreparedPulseImpact {
+    pub(super) fn damage_candidate(&self) -> &super::damage::State {
+        &self.damage
+    }
+    pub(super) fn resource_candidates(
+        &self,
+        mut practice: Option<super::practice::Practice>,
+    ) -> (
+        State,
+        super::weapons::PulseResources,
+        Option<super::practice::Practice>,
+    ) {
+        if let (Some(p), Some(hit)) = (&mut practice, self.hit) {
+            p.observe_ordinary_hit(hit);
+        }
+        (self.next, self.pulse, practice)
+    }
     pub(super) fn emission(&self) -> u64 {
         self.next.emissions
     }
@@ -458,12 +492,24 @@ impl PreparedPulseImpact {
             || world.state != self.flight
             || world.combat != self.opening
             || world.pulse != self.opening_pulse
+            || world.damage != self.opening_damage
             || world.combat_identity() != Some(self.identity)
             || world.legal_value() != Some(self.opening_legal)
             || world.fitted_front_pulse() != Some(self.item)
         {
             return Err(FireError::StaleCommand);
         }
+        let (_, _, practice) = self.resource_candidates(world.practice);
+        world
+            .check_fire_combat_capacity(
+                &world.traffic,
+                &self.damage,
+                &self.next,
+                &self.pulse,
+                &world.missiles,
+                practice,
+            )
+            .map_err(|_| FireError::SequenceExhausted)?;
         world
             .commander_account
             .as_mut()
@@ -471,6 +517,7 @@ impl PreparedPulseImpact {
             .apply_ordinary_legal(self.legal);
         world.combat = self.next;
         world.pulse = self.pulse;
+        world.damage = self.damage;
         if let (Some(practice), Some(hit)) = (&mut world.practice, self.hit) {
             practice.observe_ordinary_hit(hit);
         }

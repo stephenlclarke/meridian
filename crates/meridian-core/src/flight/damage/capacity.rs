@@ -1,0 +1,145 @@
+//! Preflight the existing whole-save byte limit before coupled combat publication.
+use super::*;
+use crate::flight::{NavigationState, Snapshot, combat, missiles, navigation_trade, practice};
+use crate::station_services::StationMarkets;
+use crate::traffic;
+fn size(encode: impl FnOnce(&mut Writer)) -> usize {
+    let mut w = Writer::new();
+    encode(&mut w);
+    w.bytes.len()
+}
+#[allow(clippy::too_many_arguments)]
+fn parts(
+    traffic: &traffic::State,
+    damage: &State,
+    combat: &combat::State,
+    pulse: &PulseResources,
+    missiles: &missiles::State,
+    practice: Option<practice::Practice>,
+) -> usize {
+    size(|w| {
+        traffic.encode(w);
+        damage.encode(w);
+        combat.encode(w);
+        pulse.encode_save(w);
+        missiles.encode(w);
+        w.option(practice.as_ref(), |w, p| p.encode_reception(w));
+        w.option(practice.as_ref(), |w, p| p.encode(w));
+        w.option(practice.and_then(|p| p.ordinary_hit).as_ref(), |w, h| {
+            h.encode(w)
+        });
+    })
+}
+impl World {
+    #[allow(clippy::too_many_arguments)]
+    pub(in crate::flight) fn check_fire_combat_capacity(
+        &self,
+        traffic: &traffic::State,
+        damage: &State,
+        combat: &combat::State,
+        pulse: &PulseResources,
+        missiles: &missiles::State,
+        practice: Option<practice::Practice>,
+    ) -> Result<(), SaveError> {
+        if self.commander_account.is_none() {
+            return Ok(());
+        }
+        let old = parts(
+            &self.traffic,
+            &self.damage,
+            &self.combat,
+            &self.pulse,
+            &self.missiles,
+            self.practice,
+        );
+        let new = parts(traffic, damage, combat, pulse, missiles, practice);
+        let total = self
+            .encoded_current_size()?
+            .checked_sub(old)
+            .and_then(|n| n.checked_add(new))
+            .ok_or(SaveError::TooLarge)?;
+        if total > MAX_SAVE_BYTES {
+            return Err(SaveError::TooLarge);
+        }
+        Ok(())
+    }
+    pub(in crate::flight) fn check_step_combat_capacity(
+        &self,
+        next: Snapshot,
+        navigation: Option<NavigationState>,
+        prepared: &missiles::PreparedStep,
+        traffic: Option<&(traffic::State, StationMarkets)>,
+        damage: &State,
+        trade: Option<&navigation_trade::State>,
+    ) -> Result<(), SaveError> {
+        if self.commander_account.is_none() {
+            return Ok(());
+        }
+        let (traffic, markets) = traffic
+            .map_or((&self.traffic, self.station_markets.as_ref()), |(t, m)| {
+                (t, Some(m))
+            });
+        // Resource recharge and fixed-width motion do not grow saves. Only inspect the whole
+        // envelope when an event, retained beam, actor birth or physical berth can add bytes.
+        if *damage == self.damage && !traffic.proof_grows_from(&self.traffic) {
+            return Ok(());
+        }
+        let old = parts(
+            &self.traffic,
+            &self.damage,
+            &self.combat,
+            &self.pulse,
+            &self.missiles,
+            self.practice,
+        );
+        let new = parts(
+            traffic,
+            damage,
+            &prepared.combat,
+            &prepared.pulse,
+            &prepared.missiles,
+            prepared.practice,
+        );
+        let mut total = self
+            .encoded_current_size()?
+            .checked_sub(old)
+            .and_then(|n| n.checked_add(new))
+            .ok_or(SaveError::TooLarge)?;
+        let old = size(|w| {
+            if let Some(n) = self.navigation {
+                n.encode_save(w);
+            }
+            if let Some(m) = &self.station_markets {
+                m.encode_save(w);
+            }
+            self.navigation_trade.encode(w);
+        });
+        let new = size(|w| {
+            if let Some(n) = navigation {
+                n.encode_save(w);
+            }
+            if let Some(m) = markets {
+                m.encode_save(w);
+            }
+            trade.unwrap_or(&self.navigation_trade).encode(w);
+        });
+        total = total
+            .checked_sub(old)
+            .and_then(|n| n.checked_add(new))
+            .ok_or(SaveError::TooLarge)?;
+        // A physical entry adds the actual supported main-station roster. The existing
+        // airborne roster is absent. Rebinding changes no freight state or variable ID size.
+        if self.state.mode != FlightMode::Docked
+            && next.mode == FlightMode::Docked
+            && let Some(dock) = navigation.and_then(NavigationState::dock)
+        {
+            total = total
+                .checked_add(size(|w| dock.encode_save(w)) + 8 + 8 + 1 + 8)
+                .ok_or(SaveError::TooLarge)?;
+        }
+        if total > MAX_SAVE_BYTES {
+            return Err(SaveError::TooLarge);
+        }
+        Ok(())
+    }
+}

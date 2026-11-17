@@ -5,6 +5,9 @@ mod economy;
 pub(crate) use economy::Flows;
 mod motion;
 mod persistence;
+mod player_hits;
+#[cfg(test)]
+mod player_hits_tests;
 
 use crate::docking::{Basis3, RigidPose, Vec3};
 use crate::navigation::SystemId;
@@ -16,7 +19,7 @@ use std::sync::Arc;
 pub const MAX_TRAFFIC_ACTORS: usize = 4;
 pub const MAX_TRAFFIC_SHOTS: usize = 128;
 const CAPITAL: u32 = 120_000;
-pub(crate) const CONTENT_RULES:&[u8]=b"local-traffic-v1;SH025-trader-pirate;no-SH031-substitution;finite-capital120000;manifest-native1to12;local-birth480-pirate900;2systems2actors;maxshots128;pulse15-energy1-heat10-cool18;SH025-energy380-shield300;speed34.3-accel9.1-yaw.65;NPC-bank-and-player-custody-separate;historical-flow-world-ticks;waypoints-3500-2400x9000-0x9000-0x3500-doorMinus300;final-align;native-entry-before-after-receipt;no-respawn;";
+pub(crate) const CONTENT_RULES:&[u8]=b"local-traffic-v1;SH025-trader-pirate;no-SH031-substitution;finite-capital120000;manifest-native1to12;local-birth480-pirate900;2systems2actors;maxshots128;pulse15-energy1-heat10-cool18;SH025-energy380-shield300;speed34.3-accel9.1-yaw.65;NPC-bank-and-player-custody-separate;historical-flow-world-ticks;waypoints-3500-2400x9000-0x9000-0x3500-doorMinus300;final-align;native-entry-before-after-receipt;no-respawn;npc-player-native-contact;exact-resource-events;source-resource-clock;";
 const INVALID: SaveError = SaveError::InvalidState("traffic identity, resources or finite custody");
 const SH025_ID: &str = "SH025";
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -147,6 +150,22 @@ pub struct TrafficBeam {
     pub victim_pose: RigidPose,
     pub front: bool,
 }
+/// A real NPC Pulse contact with the owned player hull. Descriptive, never command authority.
+#[derive(Debug, Clone, PartialEq)]
+pub struct NpcPlayerHit {
+    pub attacker: NpcId,
+    pub player_hull: u64,
+    pub visit: u64,
+    pub world_tick: u64,
+    pub physical_tick: u64,
+    pub local_tick: u64,
+    pub source_pose: RigidPose,
+    pub player_pose: RigidPose,
+    pub point: Vec3,
+    pub front: bool,
+    peers: [Option<(NpcId, RigidPose)>; MAX_TRAFFIC_ACTORS],
+    pub(crate) missiles: Arc<Vec<(crate::ProjectileId, RigidPose)>>,
+}
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct TrafficContact {
     pub id: NpcId,
@@ -157,6 +176,7 @@ pub struct TrafficContact {
 pub struct TrafficSnapshot {
     pub actors: Vec<NpcSnapshot>,
     pub last_beam: Option<TrafficBeam>,
+    pub last_player_hit: Option<NpcPlayerHit>,
     pub verified_crimes: u16,
     pub police_required_hull: Option<&'static str>,
     pub populations: [PopulationScope; 7],
@@ -224,6 +244,7 @@ struct Actor {
     wallet: u32,
     sold: bool,
     resources: Resources,
+    resource_clock: u64,
     aggressor: Option<NpcId>,
     berth: Option<BerthReceipt>,
 }
@@ -274,6 +295,14 @@ pub(crate) struct TickContext<'a> {
     pub(crate) protected: bool,
     pub(crate) celestial_clear: &'a dyn Fn(Vec3, Vec3, f64) -> bool,
     pub(crate) beam_clear: &'a dyn Fn(Vec3, Vec3, f64) -> bool,
+    pub(crate) player_target: Option<PlayerTarget>,
+}
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct PlayerTarget {
+    pub(crate) hull: u64,
+    pub(crate) visit: u64,
+    pub(crate) physical_tick: u64,
+    pub(crate) cargo: bool,
 }
 pub(crate) struct PlayerBeamInput {
     pub(crate) system: SystemId,
@@ -291,6 +320,7 @@ pub(crate) struct State {
     clocks: [u64; 2],
     actors: [Option<Actor>; MAX_TRAFFIC_ACTORS],
     shots: Arc<Vec<TrafficBeam>>,
+    player_hits: Arc<Vec<NpcPlayerHit>>,
 }
 impl Default for State {
     fn default() -> Self {
@@ -300,6 +330,7 @@ impl Default for State {
             clocks: [0; 2],
             actors: [None; MAX_TRAFFIC_ACTORS],
             shots: Arc::new(Vec::new()),
+            player_hits: Arc::new(Vec::new()),
         }
     }
 }
@@ -331,6 +362,11 @@ impl State {
                 .last()
                 .copied()
                 .filter(|s| s.victim.system == system),
+            last_player_hit: self
+                .player_hits
+                .last()
+                .cloned()
+                .filter(|h| h.attacker.system == system),
             verified_crimes: self.shots.iter().filter(|s| s.victim.serial == 1).count() as u16,
             police_required_hull: self
                 .shots

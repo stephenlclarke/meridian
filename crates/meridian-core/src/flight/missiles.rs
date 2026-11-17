@@ -170,6 +170,45 @@ impl Default for State {
     }
 }
 impl State {
+    pub(super) fn beam_scene(&self, visit: u64) -> Vec<(ProjectileId, crate::docking::RigidPose)> {
+        self.projectiles
+            .iter()
+            .flatten()
+            .filter(|p| p.ended.is_none() && p.origin.owner.visit == visit)
+            .map(|p| {
+                (
+                    p.origin.projectile,
+                    crate::docking::RigidPose {
+                        position: p.position,
+                        orientation: p.origin.orientation,
+                    },
+                )
+            })
+            .collect()
+    }
+    pub(super) fn nearest_beam_body(
+        &self,
+        visit: u64,
+        ray: crate::docking::RigidPose,
+        limit: f64,
+    ) -> Option<(ProjectileId, f64)> {
+        self.projectiles
+            .iter()
+            .flatten()
+            .filter(|p| p.ended.is_none() && p.origin.owner.visit == visit)
+            .filter_map(|p| {
+                mesh_distance(
+                    crate::docking::RigidPose {
+                        position: p.position,
+                        orientation: p.origin.orientation,
+                    },
+                    ray,
+                    limit,
+                )
+                .map(|d| (p.origin.projectile, d))
+            })
+            .min_by(|a, b| a.1.total_cmp(&b.1))
+    }
     fn bodies(&self) -> Vec<Option<Body>> {
         self.projectiles
             .iter()

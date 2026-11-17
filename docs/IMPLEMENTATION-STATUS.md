@@ -2,6 +2,12 @@
 
 Reviewed against actual delivery evidence on 17 November 2026. This document distinguishes installed gameplay from source awaiting execution. Update it with every delivery or material acceptance change; test counts belong to their exact source.
 
+## Following NPC player damage source
+
+The isolated MC1 successor starts at Root composition `27b212f86350ef5040c12b2456851c62064b4306`. It adds actual NPC Pulse contacts against the owned player's facing shields and hull reserve, a distinct retained NPC hit/scene receipt and one exact replay for genuine incoming missiles, NPC hits, real Pulse spends and physical berth resets. Sixteen additional core cases are authored **UNRUN**; the inherited sixteen NPC cases are also **UNRUN**. Source formatting, whitespace and documentation checks are separate evidence. No compiler, native process, test executable, independent review or release acceptance is claimed by this authoring lane.
+
+The existing 64 KiB save limit and combined 128 NPC beam limit remain. Resource events use nine encoded bytes each; candidate admission checks the existing whole-save envelope before coupled combat/market/resource publication. No receipt is dropped, save bound increased, historical full trajectory reconstructed or draft-format migration manufactured. Published versions 4 through 11 and 13 retain absent NPC state/provenance. Active T02 NPC firing remains refused because the current ordinary incident codec proves a consenting player attacker, not an NPC; SH031 deployment, fines and bounty settlement remain unavailable. Root must serially join G3's real missile adapter and G1's actual incoming beam presentation, select the combined schema/profile/observer boundary and schedule the existing review/execution lanes. See [finite NPC traffic](NPC-TRAFFIC.md) for scope and limits.
+
 ## Cockpit Services Preview v0.5 delivered
 
 Compiled source `beab907` passed independent correction review. Mac, Dell Linux and native Windows each passed 372 top-level Rust tests (229 core plus 143 desktop), 88 Python tests, 37 Markdown files, formatting, all-target check, strict workspace Clippy and fresh locked release builds. All five required hosted checks passed on that source. Nested subprocess summaries are not additional cases. The correction adds eleven App callback tests and three equipment-review tests, retaining every original assertion and the unchanged core, Profile, Session, renderer, assets, dependencies and save format.

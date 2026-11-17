@@ -80,6 +80,7 @@ impl State {
                         wallet: CAPITAL - paid,
                         sold: false,
                         resources: Resources::fresh(),
+                        resource_clock: clock - 1,
                         aggressor: None,
                         berth: None,
                     });
@@ -112,6 +113,7 @@ impl State {
                     wallet: 0,
                     sold: false,
                     resources: Resources::fresh(),
+                    resource_clock: clock - 1,
                     aggressor: None,
                     berth: None,
                 });

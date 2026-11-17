@@ -14,6 +14,7 @@ impl State {
                 && self.clocks == [0; 2]
                 && self.actors == [None; MAX_TRAFFIC_ACTORS]
                 && self.shots.is_empty()
+                && self.player_hits.is_empty()
             {
                 Ok(())
             } else {
@@ -23,7 +24,7 @@ impl State {
         if self.seed != seed
             || seed == 0
             || u128::from(self.clocks[0]) + u128::from(self.clocks[1]) > u128::from(world_tick)
-            || self.shots.len() > MAX_TRAFFIC_SHOTS
+            || self.receipt_count() > MAX_TRAFFIC_SHOTS
         {
             return Err(INVALID);
         }
@@ -36,7 +37,8 @@ impl State {
             self.validate_resources(*a)?;
         }
         self.validate_separation(data)?;
-        self.validate_shots(world_tick, player_emissions, data)
+        self.validate_shots(world_tick, player_emissions, data)?;
+        self.validate_player_hits(world_tick, data)
     }
     fn validate_identity(
         &self,
@@ -172,29 +174,53 @@ impl State {
             .shots
             .iter()
             .filter(|s| s.source == BeamSource::Npc(a.id))
-            .count();
+            .count()
+            + self
+                .player_hits
+                .iter()
+                .filter(|h| h.attacker == a.id)
+                .count();
         let last_hit = self
             .shots
             .iter()
             .rfind(|s| s.victim == a.id)
             .map(|s| s.local_tick);
-        let end = if a.phase == NpcPhase::Destroyed {
-            last_hit.ok_or(INVALID)?
-        } else {
-            self.clocks[si]
-        };
+        let end = a.resource_clock;
+        if end < a.birth_clock
+            || end > self.clocks[si]
+            || (a.airborne() && end != self.clocks[si])
+            || (a.phase == NpcPhase::Destroyed && Some(end) != last_hit)
+        {
+            return Err(INVALID);
+        }
         let age = end
             .checked_sub(a.birth_clock)
             .and_then(|v| v.checked_add(1))
             .ok_or(INVALID)?;
         a.resources.validate(age, outgoing, incoming)?;
-        let last = self
+        let mut outgoing_ticks: Vec<_> = self
             .shots
             .iter()
-            .rfind(|s| s.source == BeamSource::Npc(a.id));
-        let expected = last.map_or(0, |s| {
-            18_u64.saturating_sub(end.saturating_sub(s.local_tick)) as u8
+            .filter(|s| s.source == BeamSource::Npc(a.id))
+            .map(|s| s.local_tick)
+            .chain(
+                self.player_hits
+                    .iter()
+                    .filter(|h| h.attacker == a.id)
+                    .map(|h| h.local_tick),
+            )
+            .collect();
+        outgoing_ticks.sort_unstable();
+        if outgoing_ticks
+            .windows(2)
+            .any(|w| w[0].checked_add(18).is_none_or(|ready| w[1] < ready))
+        {
+            return Err(INVALID);
+        }
+        let expected = outgoing_ticks.last().map_or(0, |tick| {
+            18_u64.saturating_sub(end.saturating_sub(*tick)) as u8
         });
+        self.validate_resource_replay(a)?;
         if a.resources.cooldown != expected {
             return Err(INVALID);
         }
@@ -321,6 +347,10 @@ impl State {
         for s in self.shots.iter() {
             s.encode(w);
         }
+        w.u16(self.player_hits.len() as u16);
+        for hit in self.player_hits.iter() {
+            hit.encode(w);
+        }
     }
     pub(crate) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         let enabled = r.bool()?;
@@ -335,17 +365,29 @@ impl State {
         for _ in 0..count {
             shots.push(TrafficBeam::decode(r)?);
         }
+        let hits = usize::from(r.u16()?);
+        if hits + count > MAX_TRAFFIC_SHOTS {
+            return Err(INVALID);
+        }
+        let mut player_hits = Vec::with_capacity(hits);
+        for _ in 0..hits {
+            player_hits.push(NpcPlayerHit::decode(r)?);
+        }
         Ok(Self {
             enabled,
             seed,
             clocks,
             actors,
             shots: Arc::new(shots),
+            player_hits: Arc::new(player_hits),
         })
     }
     #[cfg(test)]
     pub(crate) fn legacy_empty(&self) -> bool {
-        self.actors.iter().all(Option::is_none) && self.shots.is_empty()
+        self.actors.iter().all(Option::is_none)
+            && self.shots.is_empty()
+            && self.player_hits.is_empty()
+            && self.player_hits.is_empty()
     }
 }
 impl NpcId {
@@ -420,6 +462,7 @@ impl Actor {
         w.u32(self.wallet);
         w.bool(self.sold);
         self.resources.encode(w);
+        w.u64(self.resource_clock);
         w.option(self.aggressor.as_ref(), |w, id| id.encode(w));
         w.option(self.berth.as_ref(), |w, receipt| {
             point(w, receipt.before);
@@ -455,6 +498,7 @@ impl Actor {
             wallet: r.u32()?,
             sold: r.bool()?,
             resources: Resources::decode(r)?,
+            resource_clock: r.u64()?,
             aggressor: r.option(NpcId::decode)?,
             berth: r.option(|r| {
                 Ok(BerthReceipt {
@@ -557,5 +601,61 @@ impl TrafficBeam {
             victim_pose: read_rigid(r)?,
             front: r.bool()?,
         })
+    }
+}
+
+impl NpcPlayerHit {
+    fn encode(&self, w: &mut Writer) {
+        self.attacker.encode(w);
+        for n in [
+            self.player_hull,
+            self.visit,
+            self.world_tick,
+            self.physical_tick,
+            self.local_tick,
+        ] {
+            w.u64(n);
+        }
+        rigid(w, self.source_pose);
+        rigid(w, self.player_pose);
+        point(w, self.point);
+        w.bool(self.front);
+        for peer in &self.peers {
+            w.option(peer.as_ref(), |w, (id, pose)| {
+                id.encode(w);
+                rigid(w, *pose);
+            });
+        }
+        w.u16(self.missiles.len() as u16);
+        for (id, pose) in self.missiles.iter() {
+            id.encode(w);
+            rigid(w, *pose);
+        }
+    }
+    fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+        let mut hit = Self {
+            attacker: NpcId::decode(r)?,
+            player_hull: r.u64()?,
+            visit: r.u64()?,
+            world_tick: r.u64()?,
+            physical_tick: r.u64()?,
+            local_tick: r.u64()?,
+            source_pose: read_rigid(r)?,
+            player_pose: read_rigid(r)?,
+            point: read_point(r)?,
+            front: r.bool()?,
+            peers: r.array(|r| r.option(|r| Ok((NpcId::decode(r)?, read_rigid(r)?))))?,
+            missiles: Arc::new(Vec::new()),
+        };
+        let count = usize::from(r.u16()?);
+        if count > 256 {
+            return Err(INVALID);
+        }
+        let mut missiles = Vec::with_capacity(count);
+        for _ in 0..count {
+            missiles.push((crate::ProjectileId::decode(r)?, read_rigid(r)?));
+        }
+        hit.missiles = Arc::new(missiles);
+        Ok(hit)
     }
 }
