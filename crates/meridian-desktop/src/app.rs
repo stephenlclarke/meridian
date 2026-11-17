@@ -57,6 +57,11 @@ fn step_frame(
     Ok(refusal)
 }
 
+struct PreparedPresentation {
+    hud_lines: Vec<String>,
+    docked_frame: Option<ui::Frame>,
+}
+
 // This shell owns the World synchronously. No gameplay mutation occurs in renderer code.
 // Retain the frame-wide contact even when a later catch-up tick is clear.
 #[derive(Debug, PartialEq, Eq)]
@@ -543,6 +548,36 @@ impl App {
         )
     }
 
+    fn prepare_presentation(
+        &mut self,
+        active: bool,
+        pulse_notice: Option<&str>,
+        elapsed: f64,
+        viewport: impl FnOnce(Option<&Renderer>) -> Option<[f64; 2]>,
+    ) -> Result<PreparedPresentation, String> {
+        let hud_lines = self
+            .game
+            .lines(active, pulse_notice.or(self.notice.as_deref()));
+        let docked_frame = self.docked_frame(elapsed, viewport)?;
+        Ok(PreparedPresentation {
+            hud_lines,
+            docked_frame,
+        })
+    }
+
+    fn route_presentation(
+        prepared: Result<PreparedPresentation, String>,
+        fail: impl FnOnce(String),
+    ) -> Option<PreparedPresentation> {
+        match prepared {
+            Ok(frame) => Some(frame),
+            Err(error) => {
+                fail(error);
+                None
+            }
+        }
+    }
+
     fn redraw(&mut self, event_loop: &ActiveEventLoop) {
         let now = Instant::now();
         let elapsed = now.duration_since(self.last_frame).as_secs_f64();
@@ -575,15 +610,15 @@ impl App {
                 first_hit: false, ..
             } => "Practice beacon already counted",
         });
-        let hud_lines = self
-            .game
-            .lines(active, pulse_notice.or(self.notice.as_deref()));
-        let docked_frame = match self.docked_frame(elapsed, |r| r.map(Renderer::logical_viewport)) {
-            Ok(frame) => frame,
-            Err(error) => {
-                self.fail(event_loop, error);
-                return;
-            }
+        let prepared = self.prepare_presentation(active, pulse_notice, elapsed, |r| {
+            r.map(Renderer::logical_viewport)
+        });
+        let Some(PreparedPresentation {
+            hud_lines,
+            docked_frame,
+        }) = Self::route_presentation(prepared, |error| self.fail(event_loop, error))
+        else {
+            return;
         };
         let notice = pulse_notice.or(self.notice.as_deref());
 

@@ -56,6 +56,81 @@ fn paint(app: &mut App) -> Vec<String> {
 }
 
 #[test]
+fn redraw_preparation_routes_actual_hud_menu_and_inactive_frames_without_committing() {
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    ok(app.game.save());
+    let before = ok(app.game.world.save_bytes());
+    let disk = ok(std::fs::read(directory.0.join("commander.meridian")));
+    app.notice = Some("Fallback notice".into());
+    let mut menu = ok(crate::docked::Docked::new(&app.game.world));
+    let mut reference = ok(crate::docked::Docked::new(&app.game.world));
+    ok(menu.open(&app.game.world, ui::Screen::System));
+    ok(reference.open(&app.game.world, ui::Screen::System));
+    app.docked = Some(menu);
+    let expected_hud = app.game.lines(true, Some("Pulse fired"));
+    let viewport = ui::Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));
+    let expected_menu = ok(reference.build_frame(&app.game.world, viewport, 1.25));
+    let result = app.prepare_presentation(true, Some("Pulse fired"), 1.25, |renderer| {
+        assert!(renderer.is_none());
+        Some([1280.0, 720.0])
+    });
+    let prepared = App::route_presentation(result, |error| panic!("unexpected failure: {error}"))
+        .unwrap_or_else(|| panic!("ready frame discarded"));
+    assert_eq!(prepared.hud_lines, expected_hud);
+    assert_eq!(prepared.docked_frame, Some(expected_menu));
+    assert_eq!(app.notice.as_deref(), Some("Fallback notice"));
+    app.docked
+        .as_mut()
+        .unwrap_or_else(|| panic!("menu"))
+        .close();
+    let expected_hud = app.game.lines(false, Some("Fallback notice"));
+    let result =
+        app.prepare_presentation(false, None, 0.5, |_| panic!("inactive viewport queried"));
+    let prepared =
+        App::route_presentation(result, |error| panic!("inactive frame failed: {error}"))
+            .unwrap_or_else(|| panic!("inactive frame treated as fatal"));
+    assert_eq!(prepared.hud_lines, expected_hud);
+    assert!(prepared.docked_frame.is_none());
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+    assert_eq!(
+        ok(std::fs::read(directory.0.join("commander.meridian"))),
+        disk
+    );
+}
+
+#[test]
+fn redraw_error_router_reports_actual_menu_failure_once_without_forwarding_a_frame() {
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    ok(app.game.save());
+    let before = ok(app.game.world.save_bytes());
+    let disk = ok(std::fs::read(directory.0.join("commander.meridian")));
+    let mut menu = ok(crate::docked::Docked::new(&app.game.world));
+    ok(menu.open(&app.game.world, ui::Screen::Trading));
+    let failure = App::build_docked_frame(
+        true,
+        || Some([640.0, 360.0]),
+        Some(&mut menu),
+        &World::new(),
+        0.0,
+    );
+    let prepared = failure.map(|docked_frame| super::PreparedPresentation {
+        hud_lines: Vec::new(),
+        docked_frame,
+    });
+    let mut reported = Vec::new();
+    let ready = App::route_presentation(prepared, |error| reported.push(error));
+    assert!(ready.is_none());
+    assert_eq!(reported, vec![String::from("No equipment account")]);
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+    assert_eq!(
+        ok(std::fs::read(directory.0.join("commander.meridian"))),
+        disk
+    );
+}
+
+#[test]
 fn inactive_and_unusable_menu_viewports_do_not_advance_a_frame_or_the_world() {
     let directory = TestDirectory::new();
     let mut app = app(&directory);
