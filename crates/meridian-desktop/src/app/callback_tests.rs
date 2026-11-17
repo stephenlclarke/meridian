@@ -257,6 +257,7 @@ fn active_callback_uses_held_axes_and_fire_on_actual_advanced_ticks() {
         2,
         true,
         &mut expected_pulse,
+        &mut None,
     ));
     assert_eq!(
         app.advance_frame(true, 2),
