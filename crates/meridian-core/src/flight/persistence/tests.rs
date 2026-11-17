@@ -306,6 +306,37 @@ fn account_start(world: &World) -> usize {
     world.navigation.unwrap().encode_save(&mut w);
     18 + CONTENT.len() + w.bytes.len()
 }
+pub(in crate::flight) fn assert_resealed_enlirin_fuel_refusal(world: &mut World) {
+    let valid = world.save_bytes().unwrap();
+    let account = account_start(world);
+    let spent = account - 8;
+    // Owner, hull, revision, credits and three cargo counters precede account fuel.
+    let fuel = account + 3 * 8 + 4 + 3 * 2;
+    // The final 25-byte journal receipt precedes the outer eight-byte checksum.
+    let debit = valid.len() - 8 - crate::navigation::CompletedJump::ENCODED_SIZE + 2 * 3;
+    let original_spent = u64::from_le_bytes(valid[spent..account].try_into().unwrap());
+    assert_eq!(
+        u16::from_le_bytes(valid[fuel..fuel + 2].try_into().unwrap()),
+        32
+    );
+    assert_eq!(
+        u16::from_le_bytes(valid[debit..debit + 2].try_into().unwrap()),
+        98
+    );
+    let refused = SaveError::InvalidState("completed jump journal");
+    for change_receipt in [false, true] {
+        let mut forged = valid.clone();
+        forged[spent..account].copy_from_slice(&(original_spent - 1).to_le_bytes());
+        forged[fuel..fuel + 2].copy_from_slice(&33_u16.to_le_bytes());
+        if change_receipt {
+            forged[debit..debit + 2].copy_from_slice(&97_u16.to_le_bytes());
+        }
+        reseal(&mut forged);
+        assert!(matches!(World::from_save_bytes(&forged), Err(error) if error == refused));
+        assert_eq!(world.restore_bytes(&forged), Err(refused.clone()));
+        assert_eq!(world.save_bytes().unwrap(), valid);
+    }
+}
 fn domain_start(world: &World) -> usize {
     let mut w = Writer::new();
     world
@@ -737,7 +768,7 @@ fn another_real_public_branch_cannot_supply_a_practice_incident_this_world_never
 #[test]
 fn qualified_v15_opening_layout_keeps_real_birth_provenance_and_accepts_a_real_new_discharge() {
     // At opening there are no module events or traffic shots. Use the exact
-    // prior header and omit the appended mining state from the current body.
+    // prior header and omit the mining state and jump journal from the current body.
     let world = World::new_commander(15001).unwrap();
     let legacy = v15_test_fixture(&world).unwrap();
     let mut loaded = World::from_save_bytes(&legacy).unwrap();
@@ -787,4 +818,45 @@ fn qualified_v13_absence_does_not_mint_resource_birth_history_for_fast_or_energy
         ));
     }
     assert_eq!(loaded.save_bytes().unwrap(), before);
+}
+
+#[test]
+fn a_legacy_aggregate_resumes_its_pending_jump_with_an_exact_receipt() {
+    let mut legacy_source = World::new_commander(15902).unwrap();
+    launch(&mut legacy_source);
+    legacy_source
+        .request_jump(SystemId::RENAS, legacy_source.snapshot().tick)
+        .unwrap();
+    for _ in 0..BASIC_SPOOL_TICKS {
+        legacy_source.step(FlightInput::default()).unwrap();
+    }
+    legacy_source
+        .request_jump(SystemId::AVENOR, legacy_source.snapshot().tick)
+        .unwrap();
+    for _ in 0..100 {
+        legacy_source.step(FlightInput::default()).unwrap();
+    }
+    let legacy = v15_test_fixture(&legacy_source).unwrap();
+    let mut continued = World::from_save_bytes(&legacy).unwrap();
+    assert_eq!(
+        continued.snapshot().navigation,
+        legacy_source.snapshot().navigation
+    );
+    for _ in 0..BASIC_SPOOL_TICKS - 100 {
+        continued.step(FlightInput::default()).unwrap();
+    }
+    let migrated = continued.save_bytes().unwrap();
+    assert_eq!(u16::from_le_bytes(migrated[8..10].try_into().unwrap()), 17);
+    // The journal is an optional legacy checkpoint, a count, and one exact leg.
+    let leg = migrated.len() - 8 - crate::navigation::CompletedJump::ENCODED_SIZE;
+    assert_eq!(
+        u16::from_le_bytes(migrated[leg - 2..leg].try_into().unwrap()),
+        1
+    );
+    assert_eq!(&migrated[leg..leg + 8], &[0, 185, 0, 0, 7, 0, 34, 0]);
+    let loaded = World::from_save_bytes(&migrated).unwrap();
+    let result = loaded.snapshot().navigation.unwrap();
+    assert_eq!(result.system, SystemId::AVENOR);
+    assert_eq!(result.fuel_units, 62);
+    assert!(result.travel.is_none());
 }

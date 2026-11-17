@@ -19,11 +19,11 @@ pub(crate) struct SavedNavigationSummary {
     pub(crate) fuel_spent: u64,
 }
 
-fn write_system(w: &mut Writer, s: SystemId) {
+pub(super) fn write_system(w: &mut Writer, s: SystemId) {
     w.u8(s.galaxy);
     w.u16(s.system);
 }
-fn read_system(r: &mut Reader<'_>) -> Result<SystemId, SaveError> {
+pub(super) fn read_system(r: &mut Reader<'_>) -> Result<SystemId, SaveError> {
     Ok(SystemId {
         galaxy: r.u8()?,
         system: r.u16()?,
@@ -132,15 +132,11 @@ impl NavigationState {
             fuel_spent: r.u64()?,
         })
     }
-    pub(crate) fn validate_fitted_reach(
+    pub(crate) fn validate_pending_reach(
         &self,
         catalogue: &OriginalNavigation,
         fitted_reach_ly: f64,
-        max_fuel_spent: u128,
     ) -> Result<(), SaveError> {
-        if u128::from(self.fuel_spent) > max_fuel_spent {
-            return Err(SaveError::InvalidState("navigation identity or chronology"));
-        }
         if let Some(pending) = self.pending {
             let invalid = SaveError::InvalidState("pending jump");
             if catalogue

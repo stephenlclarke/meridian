@@ -32,7 +32,7 @@ fn assert_one_continue_apart(before: &[u8], after: &[u8]) {
     // In the current encoding of this fixed fixture, these two freight counters
     // precede the rest of the session record. Firing leaves the preceding fields'
     // encoded lengths unchanged. Continue advances both and reseals the checksum.
-    const EPOCH: usize = 1701 + b"navigation-computer/range-v1/a11fe169;".len();
+    const EPOCH: usize = 1701 + b"navigation-computer/route-journal-v1/a11fe169;".len();
     const REVIEW_SEQUENCE: usize = EPOCH + 8;
     const SESSION_BODY: usize = REVIEW_SEQUENCE + 8;
     assert_eq!(before.len(), after.len());

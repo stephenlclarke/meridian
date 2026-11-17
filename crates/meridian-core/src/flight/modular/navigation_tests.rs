@@ -189,6 +189,7 @@ fn paid_intermediate_fit_extends_real_travel_and_cold_pending_save_charges_once(
         (ENLIRIN, 32, None)
     );
     assert!(world.current_dock_context().is_none());
+    crate::flight::persistence::assert_resealed_enlirin_fuel_refusal(&mut world);
     let mut continued = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
     continued.step(FlightInput::default()).unwrap();
     assert_eq!(continued.snapshot().navigation, Some(after));
@@ -218,42 +219,4 @@ fn advanced_navigation_requires_the_owned_intermediate_grade() {
     assert_eq!(ledger.jump_reach_ly(), 21.0);
     assert_eq!(ledger.paid, 120_000);
     assert_eq!(ledger.fitted_units(), 0);
-}
-
-#[test]
-fn saved_fuel_bound_only_extends_for_jumps_during_the_paid_fit() {
-    let world = World::new_commander(15803).unwrap();
-    let dock = world.current_dock_context().unwrap();
-    let mut ledger = Ledger::born(dock.owner().seed()).unwrap();
-    ledger.record_navigation_interval(2).unwrap();
-    ledger
-        .apply(
-            Event {
-                action: ModuleAction::Purchase {
-                    kind: ModuleKind::IntermediateNavigation,
-                },
-                item: 200003,
-                dock,
-                tick: 0,
-                revision: 1,
-            },
-            1,
-        )
-        .unwrap();
-    ledger.record_navigation_interval(3).unwrap();
-    ledger
-        .apply(
-            Event {
-                action: ModuleAction::Store { item: 200003 },
-                item: 200003,
-                dock,
-                tick: 0,
-                revision: 2,
-            },
-            1,
-        )
-        .unwrap();
-    ledger.record_navigation_interval(5).unwrap();
-    assert_eq!(ledger.max_jump_fuel_spent(), 4 * 90 + 130);
-    assert_eq!(ledger.record_navigation_interval(4), Err(INVALID));
 }

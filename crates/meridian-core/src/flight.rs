@@ -161,6 +161,7 @@ pub struct World {
     station_data: Option<OriginalStationData>,
     navigation_catalogue: Option<OriginalNavigation>,
     navigation: Option<NavigationState>,
+    jump_journal: crate::navigation::JumpJournal,
     commander_account: Option<CommanderAccount>,
     freight_session: Option<mission::FreightSession>,
     station_markets: Option<crate::station_services::StationMarkets>,
@@ -202,6 +203,7 @@ impl World {
             station_data: None,
             navigation_catalogue: None,
             navigation: None,
+            jump_journal: crate::navigation::JumpJournal::default(),
             commander_account: None,
             freight_session: None,
             station_markets: None,
@@ -355,6 +357,9 @@ impl World {
             .ok_or(NavigationError::WrongMode)?;
         let reach = self.jump_reach_ly().ok_or(NavigationError::WrongMode)?;
         navigation.begin_jump(catalogue, target, distance, account.fuel_tenths(), reach)?;
+        if !self.jump_journal.has_room() {
+            return Err(NavigationError::SequenceExhausted);
+        }
         self.navigation = Some(navigation);
         Ok(())
     }
@@ -575,6 +580,7 @@ impl World {
         let mut navigation = self.navigation;
         let mut mission_epoch = None;
         let mut planned_debit = None;
+        let mut completed_leg = None;
         if let Some(state) = &mut navigation {
             let entry = next.mode == FlightMode::Docked && self.state.mode != FlightMode::Docked;
             let account = self
@@ -596,6 +602,22 @@ impl World {
                     .map_err(|_| StepError::TickOverflow)?;
             }
             if let Some(debit) = arrival_debit {
+                let account = self
+                    .commander_account
+                    .as_ref()
+                    .ok_or(StepError::NonFiniteState)?;
+                let source = self.navigation.ok_or(StepError::NonFiniteState)?;
+                let grade = self
+                    .modular
+                    .ledger(self, account)
+                    .map_err(|_| StepError::NonFiniteState)?
+                    .navigation_grade();
+                if !self.jump_journal.has_room() {
+                    return Err(StepError::TickOverflow);
+                }
+                completed_leg = Some(crate::navigation::CompletedJump::arrived(
+                    source, *state, debit, next.tick, grade,
+                ));
                 planned_debit = Some(debit);
                 // Source arrival places the station16000 ahead. This is its equivalent
                 // station-local frame, not an earned dock or a proximity teleport.
@@ -659,6 +681,10 @@ impl World {
                 .ok_or(StepError::NonFiniteState)?
                 .debit_fuel(debit)
                 .map_err(|_| StepError::NonFiniteState)?;
+        }
+        // The receipt and the existing navigation, dock and wallet changes publish together.
+        if let Some(leg) = completed_leg {
+            self.jump_journal.append(leg);
         }
         // No fallible operation follows the first account mutation.
         if let Some((_, markets)) = traffic {

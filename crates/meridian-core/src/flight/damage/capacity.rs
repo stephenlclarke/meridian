@@ -82,10 +82,13 @@ impl World {
         // Compare their encoded size as well as domain events before skipping the envelope.
         let missile_growth =
             size(|w| prepared.missiles.encode(w)) > size(|w| self.missiles.encode(w));
+        let journal_grows = navigation.map(NavigationState::jump_sequence)
+            != self.navigation.map(NavigationState::jump_sequence);
         if *damage == self.damage
             && mining.unchanged_since(&self.mining)
             && !traffic.proof_grows_from(&self.traffic)
             && !missile_growth
+            && !journal_grows
         {
             return Ok(());
         }
@@ -144,6 +147,11 @@ impl World {
         {
             total = total
                 .checked_add(size(|w| dock.encode_save(w)) + 8 + 8 + 1 + 8)
+                .ok_or(SaveError::TooLarge)?;
+        }
+        if journal_grows {
+            total = total
+                .checked_add(crate::navigation::CompletedJump::ENCODED_SIZE)
                 .ok_or(SaveError::TooLarge)?;
         }
         if total > MAX_SAVE_BYTES {

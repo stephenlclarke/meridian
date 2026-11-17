@@ -126,7 +126,7 @@ const V16_CONTENT: &[u8] = concat!(
 .as_bytes();
 
 const CONTENT: &[u8] = concat!(
-    "meridian-world/rules/17;navigation-computer/range-v1/a11fe169;rapid-lasers-energy/shared-nine-byte-resources-v1/a11fe169;mining/native-work-pending-v2;fuel-scoops/paid-utility-v1;npc-missiles/canonical-native-ray-v3;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
+    "meridian-world/rules/17;navigation-computer/route-journal-v1/a11fe169;rapid-lasers-energy/shared-nine-byte-resources-v1/a11fe169;mining/native-work-pending-v2;fuel-scoops/paid-utility-v1;npc-missiles/canonical-native-ray-v3;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -385,6 +385,7 @@ impl World {
         self.traffic.encode(&mut w);
         self.damage.encode(&mut w);
         self.mining.encode(&mut w);
+        self.jump_journal.encode(&mut w);
         let digest = checksum(&w.bytes);
         w.u64(digest);
         if w.bytes.len() > MAX_SAVE_BYTES {
@@ -517,6 +518,7 @@ impl World {
                 OriginalNavigation::bundled().map_err(|_| SaveError::ContentMismatch)?,
             ),
             navigation: Some(navigation),
+            jump_journal: crate::navigation::JumpJournal::default(),
             commander_account: Some(commander_account),
             freight_session: Some(freight_session),
             station_markets: Some(station_markets),
@@ -548,6 +550,11 @@ impl World {
         if version >= 16 {
             candidate.mining = crate::mining::State::decode(&mut r)?;
         }
+        candidate.jump_journal = if version >= 17 {
+            crate::navigation::JumpJournal::decode(&mut r)?
+        } else {
+            crate::navigation::JumpJournal::from_legacy(navigation, candidate.state.tick)
+        };
         if version < 16 && candidate.state.motion_refusal == Some(MotionRefusal::AsteroidContact) {
             return Err(SaveError::InvalidEncoding);
         }
@@ -674,10 +681,12 @@ impl World {
             ),
         )?;
         let modular = commerce.modular.ledger(self, account)?;
-        navigation.validate_fitted_reach(
+        navigation.validate_pending_reach(catalogue, modular.jump_reach_ly())?;
+        self.jump_journal.validate(
+            navigation,
             catalogue,
-            modular.jump_reach_ly(),
-            modular.max_jump_fuel_spent(),
+            self.state.tick,
+            &modular.navigation_changes,
         )?;
         let ammunition = commerce.ammunition.ledger_with_module_count(
             self,
@@ -1096,6 +1105,8 @@ pub(super) fn combat_save_len(world: &World) -> usize {
 }
 
 #[cfg(test)]
+pub(super) use tests::assert_resealed_enlirin_fuel_refusal;
+#[cfg(test)]
 mod tests;
 
 #[cfg(test)]
@@ -1177,6 +1188,7 @@ pub(in crate::flight) fn v15_test_fixture(world: &World) -> Result<Vec<u8>, Save
     let current = world.save_bytes()?;
     let mut suffix = Writer::new();
     world.mining.encode(&mut suffix);
+    world.jump_journal.encode(&mut suffix);
     let start = 8 + 2 + CONTENT.len() + 8;
     let end = current.len() - 8 - suffix.bytes.len();
     let mut old = Writer::new();

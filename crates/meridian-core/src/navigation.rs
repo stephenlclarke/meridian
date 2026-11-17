@@ -1,7 +1,9 @@
 //! Original G01 coordinates and stock SH025/Basic-drive travel rules from immutable a11.
 //! Descriptive catalogue/route values never constitute docking or mission authority.
+mod journal;
 mod persistence;
 use core::fmt;
+pub(crate) use journal::{CompletedJump, JumpJournal, NavigationFitChange, NavigationGrade};
 pub(crate) use persistence::SavedNavigationSummary;
 use std::collections::VecDeque;
 

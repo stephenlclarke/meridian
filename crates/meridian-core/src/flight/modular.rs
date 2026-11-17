@@ -2,7 +2,7 @@
 use super::{FlightMode, World};
 use crate::{
     freight::g02::CommanderAccount,
-    navigation::DockContext,
+    navigation::{DockContext, NavigationFitChange, NavigationGrade},
     save::{Reader, SaveError, Writer},
 };
 use core::fmt;
@@ -93,13 +93,17 @@ impl ModuleKind {
             _ => None,
         }
     }
-    pub fn navigation_reach_ly(self) -> Option<u8> {
+    fn navigation_grade(self) -> Option<NavigationGrade> {
         match self {
-            Self::BasicNavigation => Some(7),
-            Self::IntermediateNavigation => Some(14),
-            Self::AdvancedNavigation => Some(21),
+            Self::BasicNavigation => Some(NavigationGrade::Basic),
+            Self::IntermediateNavigation => Some(NavigationGrade::Intermediate),
+            Self::AdvancedNavigation => Some(NavigationGrade::Advanced),
             _ => None,
         }
+    }
+    pub fn navigation_reach_ly(self) -> Option<u8> {
+        self.navigation_grade()
+            .and_then(NavigationGrade::module_reach_ly)
     }
     pub fn equipment_units(self) -> u16 {
         match self {
@@ -345,9 +349,7 @@ pub(super) struct Ledger {
     pub(super) items: Vec<OwnedModule>,
     pub(super) paid: u32,
     pub(super) revision: u64,
-    // Dock visit minus dock sequence counts completed jumps before fittings at that berth.
-    extended_jumps: u64,
-    last_event_jump: u64,
+    pub(super) navigation_changes: Vec<NavigationFitChange>,
 }
 impl Ledger {
     fn born(owner: u64) -> Result<Self, SaveError> {
@@ -381,24 +383,13 @@ impl Ledger {
     fn front(&self) -> Option<OwnedModule> {
         self.fitted(ModuleSlot::FrontLaser)
     }
-    pub(super) fn jump_reach_ly(&self) -> f64 {
-        let native = crate::navigation::STOCK_JUMP_REACH_LY;
+    pub(super) fn navigation_grade(&self) -> NavigationGrade {
         self.fitted(ModuleSlot::Navigation)
-            .and_then(|item| item.kind.navigation_reach_ly())
-            .map_or(native, |reach| f64::from(reach).max(native))
+            .and_then(|item| item.kind.navigation_grade())
+            .unwrap_or(NavigationGrade::Empty)
     }
-    fn record_navigation_interval(&mut self, jumps: u64) -> Result<(), SaveError> {
-        let interval = jumps.checked_sub(self.last_event_jump).ok_or(INVALID)?;
-        if self.jump_reach_ly() > crate::navigation::STOCK_JUMP_REACH_LY {
-            self.extended_jumps += interval;
-        }
-        self.last_event_jump = jumps;
-        Ok(())
-    }
-    pub(super) fn max_jump_fuel_spent(&self) -> u128 {
-        let extended = u128::from(self.extended_jumps);
-        let stock = u128::from(self.last_event_jump) - extended;
-        stock * 90 + extended * u128::from(crate::navigation::FUEL_CAPACITY)
+    pub(super) fn jump_reach_ly(&self) -> f64 {
+        self.navigation_grade().reach_ly()
     }
     fn fitted_units(&self) -> u16 {
         self.items
@@ -536,7 +527,6 @@ impl State {
         account: &CommanderAccount,
     ) -> Result<Ledger, SaveError> {
         let owner = world.combat_identity().ok_or(INVALID)?.owner;
-        let jumps = world.navigation.ok_or(INVALID)?.jump_sequence();
         let mut ledger = Ledger::born(owner)?;
         let mut transaction = 0_u32;
         let mut previous: Option<Event> = None;
@@ -575,15 +565,18 @@ impl State {
             } {
                 return Err(INVALID);
             }
-            let prior_jumps = e.dock.visit() - e.dock.sequence();
-            if prior_jumps > jumps {
-                return Err(INVALID);
-            }
-            ledger.record_navigation_interval(prior_jumps)?;
+            let previous_grade = ledger.navigation_grade();
             ledger.apply(*e, transaction).map_err(|_| INVALID)?;
+            let grade = ledger.navigation_grade();
+            if grade != previous_grade {
+                ledger.navigation_changes.push(NavigationFitChange {
+                    dock: e.dock,
+                    tick: e.tick,
+                    grade,
+                });
+            }
             previous = Some(*e);
         }
-        ledger.record_navigation_interval(jumps)?;
         for (offset, slot, component) in [
             (
                 7,
