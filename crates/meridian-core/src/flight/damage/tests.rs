@@ -4,6 +4,30 @@ fn ok<T, E: core::fmt::Debug>(value: Result<T, E>) -> T {
     value.unwrap_or_else(|e| panic!("unexpected refusal: {e:?}"))
 }
 #[test]
+fn interleaved_missile_emissions_leave_each_weapon_slot_and_later_missile_pending() {
+    // Component sequence only. No World receipt or successful launch is synthesized.
+    let mut missiles = [(1, 5), (3, 7), (4, 7), (6, 11)].into_iter().peekable();
+    assert_eq!(merge_missile_emissions(&mut missiles, 1, 5), Ok(2));
+    assert_eq!(missiles.peek(), Some(&(3, 7)));
+    assert_eq!(merge_missile_emissions(&mut missiles, 3, 7), Ok(5));
+    assert_eq!(missiles.peek(), Some(&(6, 11)));
+    assert_eq!(merge_missile_emissions(&mut missiles, 6, 11), Ok(7));
+    assert_eq!(missiles.next(), None);
+    assert_eq!(merge_missile_emissions(&mut missiles, 8, 12), Ok(8));
+}
+#[test]
+fn duplicate_missing_and_future_missile_emissions_refuse_before_consuming_the_bad_receipt() {
+    for (receipts, rejected) in [
+        (vec![(1, 9), (1, 9)], (1, 9)),
+        (vec![(2, 9)], (2, 9)),
+        (vec![(1, 11)], (1, 11)),
+    ] {
+        let mut missiles = receipts.into_iter().peekable();
+        assert_eq!(merge_missile_emissions(&mut missiles, 1, 10), Err(INVALID));
+        assert_eq!(missiles.peek(), Some(&rejected));
+    }
+}
+#[test]
 fn incoming_missile_then_pulse_share_facing_shields_and_actual_energy_once() {
     let events = [
         (
