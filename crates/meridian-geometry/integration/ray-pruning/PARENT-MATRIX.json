@@ -1,0 +1,138 @@
+{
+  "head": "3e066906f93db3067ce0c978f01abaf7c5d2ac0b",
+  "tree": "a38b4ab6baa2d5dfd8a15d71e164dd43c34fc1d0",
+  "cases": [
+    {
+      "id": "SH010",
+      "status": "REFUSED",
+      "kind": "Operations",
+      "source": [
+        6,
+        5
+      ],
+      "operations": 2000001,
+      "decodeChargedOperations": 359198,
+      "constructionChargedOperations": 1640803,
+      "wallNanoseconds": 335954455606,
+      "wallSeconds": 335.954455606,
+      "attemptedPeakMemberships": 85579,
+      "admittedPeakMemberships": 85579,
+      "retainedMembershipsAtTerminal": 74279,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ],
+      "completeCandidate": false
+    },
+    {
+      "id": "SH011",
+      "status": "REFUSED",
+      "kind": "Operations",
+      "source": [
+        6,
+        6
+      ],
+      "operations": 2000001,
+      "decodeChargedOperations": 363558,
+      "constructionChargedOperations": 1636443,
+      "wallNanoseconds": 331809585738,
+      "wallSeconds": 331.809585738,
+      "attemptedPeakMemberships": 86262,
+      "admittedPeakMemberships": 86262,
+      "retainedMembershipsAtTerminal": 74685,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ],
+      "completeCandidate": false
+    },
+    {
+      "id": "SH016",
+      "status": "REFUSED",
+      "kind": "Operations",
+      "source": [
+        8,
+        2
+      ],
+      "operations": 2000001,
+      "decodeChargedOperations": 365449,
+      "constructionChargedOperations": 1634552,
+      "wallNanoseconds": 208223219847,
+      "wallSeconds": 208.223219847,
+      "attemptedPeakMemberships": 89843,
+      "admittedPeakMemberships": 89843,
+      "retainedMembershipsAtTerminal": 84100,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ],
+      "completeCandidate": false
+    },
+    {
+      "id": "SH017",
+      "status": "REFUSED",
+      "kind": "Operations",
+      "source": [
+        8,
+        0
+      ],
+      "operations": 2000001,
+      "decodeChargedOperations": 390244,
+      "constructionChargedOperations": 1609757,
+      "wallNanoseconds": 247957171028,
+      "wallSeconds": 247.957171028,
+      "attemptedPeakMemberships": 90048,
+      "admittedPeakMemberships": 90048,
+      "retainedMembershipsAtTerminal": 83793,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ],
+      "completeCandidate": false
+    },
+    {
+      "id": "SH166",
+      "status": "REFUSED",
+      "kind": "Operations",
+      "source": [
+        11,
+        0
+      ],
+      "operations": 2000001,
+      "decodeChargedOperations": 341473,
+      "constructionChargedOperations": 1658528,
+      "wallNanoseconds": 204704085476,
+      "wallSeconds": 204.704085476,
+      "attemptedPeakMemberships": 88082,
+      "admittedPeakMemberships": 88082,
+      "retainedMembershipsAtTerminal": 82095,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ],
+      "completeCandidate": false
+    }
+  ],
+  "limits": {
+    "operations": 2000000,
+    "storageMemberships": 100000,
+    "rationalBits": 4096,
+    "candidateTriangles": 512
+  },
+  "scope": "Exact logical work/membership counters and monotonic case durations. Storage measured only up to operation refusal; no minimum RAM, complete storage-fit or fleet/native claim."
+}

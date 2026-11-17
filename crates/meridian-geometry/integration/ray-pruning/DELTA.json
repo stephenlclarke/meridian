@@ -1,0 +1,436 @@
+{
+  "parentAuthorHead": "0ca5d4567429c35bba3a8d0c900be0fa835b116f",
+  "qualifiedParentJoin": "3e066906f93db3067ce0c978f01abaf7c5d2ac0b",
+  "qualifiedParentTree": "a38b4ab6baa2d5dfd8a15d71e164dd43c34fc1d0",
+  "parentHandoffSHA256": "b0423e9d6d3d4eec874acb1b023060e86893b928c0a73f1514cd97183a9cf710",
+  "parentMatrixSHA256": "949bf0923a3f9159063473382736a801c6542c55da34ad4efb98c21a91123cbb",
+  "parentFocusedHandoffSHA256": "3cd2317f40e8553fdd04d1078caafc7400539707c063f5698304e623e7233104",
+  "parentActualCases": [
+    {
+      "id": "SH010",
+      "bodies": [
+        {
+          "name": "bound_original_decode",
+          "sourceAsset": "SH010",
+          "sourceInputSHA256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc",
+          "status": "PASS",
+          "chargedOperationDelta": 359198,
+          "peakStorageAtBodyTerminal": 40973,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        },
+        {
+          "name": "original_construction",
+          "sourceAsset": "SH010",
+          "sourceInputSHA256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc",
+          "status": "REFUSED",
+          "chargedOperationDelta": 1640803,
+          "peakStorageAtBodyTerminal": 85579,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "sourceAsset": "SH010",
+          "sourceInputSHA256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc",
+          "status": "UNRUN",
+          "chargedOperationDelta": null,
+          "peakStorageAtBodyTerminal": null,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "sourceAsset": "SH010",
+          "sourceInputSHA256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc",
+          "status": "UNRUN",
+          "chargedOperationDelta": null,
+          "peakStorageAtBodyTerminal": null,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "sourceAsset": "SH010",
+          "sourceInputSHA256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc",
+          "status": "UNRUN",
+          "chargedOperationDelta": null,
+          "peakStorageAtBodyTerminal": null,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        }
+      ],
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          6,
+          5
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "peakStorageMemberships": 85579,
+      "peakAdmittedReservationMemberships": 85579,
+      "retainedBudgetMembershipsAtTerminal": 74279,
+      "storageAccounting": "logical reservations; attempted peaks include refused admissions, not measured allocated bytes",
+      "monotonicNanoseconds": 335954455606,
+      "completeCandidateReturned": false,
+      "allCandidateChecksPassed": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      },
+      "sourceBinding": "EXECUTION-BINDING.json",
+      "inputBindings": "ORIGINAL-BINDINGS.json",
+      "fleetAdmission": false
+    },
+    {
+      "id": "SH011",
+      "bodies": [
+        {
+          "name": "bound_original_decode",
+          "sourceAsset": "SH011",
+          "sourceInputSHA256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c",
+          "status": "PASS",
+          "chargedOperationDelta": 363558,
+          "peakStorageAtBodyTerminal": 40981,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        },
+        {
+          "name": "original_construction",
+          "sourceAsset": "SH011",
+          "sourceInputSHA256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c",
+          "status": "REFUSED",
+          "chargedOperationDelta": 1636443,
+          "peakStorageAtBodyTerminal": 86262,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "sourceAsset": "SH011",
+          "sourceInputSHA256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c",
+          "status": "UNRUN",
+          "chargedOperationDelta": null,
+          "peakStorageAtBodyTerminal": null,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "sourceAsset": "SH011",
+          "sourceInputSHA256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c",
+          "status": "UNRUN",
+          "chargedOperationDelta": null,
+          "peakStorageAtBodyTerminal": null,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "sourceAsset": "SH011",
+          "sourceInputSHA256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c",
+          "status": "UNRUN",
+          "chargedOperationDelta": null,
+          "peakStorageAtBodyTerminal": null,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        }
+      ],
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          6,
+          6
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "peakStorageMemberships": 86262,
+      "peakAdmittedReservationMemberships": 86262,
+      "retainedBudgetMembershipsAtTerminal": 74685,
+      "storageAccounting": "logical reservations; attempted peaks include refused admissions, not measured allocated bytes",
+      "monotonicNanoseconds": 331809585738,
+      "completeCandidateReturned": false,
+      "allCandidateChecksPassed": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      },
+      "sourceBinding": "EXECUTION-BINDING.json",
+      "inputBindings": "ORIGINAL-BINDINGS.json",
+      "fleetAdmission": false
+    },
+    {
+      "id": "SH016",
+      "bodies": [
+        {
+          "name": "bound_original_decode",
+          "sourceAsset": "SH016",
+          "sourceInputSHA256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e",
+          "status": "PASS",
+          "chargedOperationDelta": 365449,
+          "peakStorageAtBodyTerminal": 44470,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        },
+        {
+          "name": "original_construction",
+          "sourceAsset": "SH016",
+          "sourceInputSHA256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e",
+          "status": "REFUSED",
+          "chargedOperationDelta": 1634552,
+          "peakStorageAtBodyTerminal": 89843,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "sourceAsset": "SH016",
+          "sourceInputSHA256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e",
+          "status": "UNRUN",
+          "chargedOperationDelta": null,
+          "peakStorageAtBodyTerminal": null,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "sourceAsset": "SH016",
+          "sourceInputSHA256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e",
+          "status": "UNRUN",
+          "chargedOperationDelta": null,
+          "peakStorageAtBodyTerminal": null,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "sourceAsset": "SH016",
+          "sourceInputSHA256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e",
+          "status": "UNRUN",
+          "chargedOperationDelta": null,
+          "peakStorageAtBodyTerminal": null,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        }
+      ],
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          8,
+          2
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "peakStorageMemberships": 89843,
+      "peakAdmittedReservationMemberships": 89843,
+      "retainedBudgetMembershipsAtTerminal": 84100,
+      "storageAccounting": "logical reservations; attempted peaks include refused admissions, not measured allocated bytes",
+      "monotonicNanoseconds": 208223219847,
+      "completeCandidateReturned": false,
+      "allCandidateChecksPassed": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      },
+      "sourceBinding": "EXECUTION-BINDING.json",
+      "inputBindings": "ORIGINAL-BINDINGS.json",
+      "fleetAdmission": false
+    },
+    {
+      "id": "SH017",
+      "bodies": [
+        {
+          "name": "bound_original_decode",
+          "sourceAsset": "SH017",
+          "sourceInputSHA256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a",
+          "status": "PASS",
+          "chargedOperationDelta": 390244,
+          "peakStorageAtBodyTerminal": 44498,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        },
+        {
+          "name": "original_construction",
+          "sourceAsset": "SH017",
+          "sourceInputSHA256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a",
+          "status": "REFUSED",
+          "chargedOperationDelta": 1609757,
+          "peakStorageAtBodyTerminal": 90048,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "sourceAsset": "SH017",
+          "sourceInputSHA256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a",
+          "status": "UNRUN",
+          "chargedOperationDelta": null,
+          "peakStorageAtBodyTerminal": null,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "sourceAsset": "SH017",
+          "sourceInputSHA256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a",
+          "status": "UNRUN",
+          "chargedOperationDelta": null,
+          "peakStorageAtBodyTerminal": null,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "sourceAsset": "SH017",
+          "sourceInputSHA256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a",
+          "status": "UNRUN",
+          "chargedOperationDelta": null,
+          "peakStorageAtBodyTerminal": null,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        }
+      ],
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          8,
+          0
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "peakStorageMemberships": 90048,
+      "peakAdmittedReservationMemberships": 90048,
+      "retainedBudgetMembershipsAtTerminal": 83793,
+      "storageAccounting": "logical reservations; attempted peaks include refused admissions, not measured allocated bytes",
+      "monotonicNanoseconds": 247957171028,
+      "completeCandidateReturned": false,
+      "allCandidateChecksPassed": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      },
+      "sourceBinding": "EXECUTION-BINDING.json",
+      "inputBindings": "ORIGINAL-BINDINGS.json",
+      "fleetAdmission": false
+    },
+    {
+      "id": "SH166",
+      "bodies": [
+        {
+          "name": "bound_original_decode",
+          "sourceAsset": "SH166",
+          "sourceInputSHA256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f",
+          "status": "PASS",
+          "chargedOperationDelta": 341473,
+          "peakStorageAtBodyTerminal": 40001,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        },
+        {
+          "name": "original_construction",
+          "sourceAsset": "SH166",
+          "sourceInputSHA256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f",
+          "status": "REFUSED",
+          "chargedOperationDelta": 1658528,
+          "peakStorageAtBodyTerminal": 88082,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        },
+        {
+          "name": "source_and_affine_fields",
+          "sourceAsset": "SH166",
+          "sourceInputSHA256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f",
+          "status": "UNRUN",
+          "chargedOperationDelta": null,
+          "peakStorageAtBodyTerminal": null,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        },
+        {
+          "name": "complete_facet_certificates",
+          "sourceAsset": "SH166",
+          "sourceInputSHA256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f",
+          "status": "UNRUN",
+          "chargedOperationDelta": null,
+          "peakStorageAtBodyTerminal": null,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        },
+        {
+          "name": "closed_topology_and_limits",
+          "sourceAsset": "SH166",
+          "sourceInputSHA256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f",
+          "status": "UNRUN",
+          "chargedOperationDelta": null,
+          "peakStorageAtBodyTerminal": null,
+          "criteria": "WHOLE-FIVE-CRITERIA.json"
+        }
+      ],
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          11,
+          0
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "peakStorageMemberships": 88082,
+      "peakAdmittedReservationMemberships": 88082,
+      "retainedBudgetMembershipsAtTerminal": 82095,
+      "storageAccounting": "logical reservations; attempted peaks include refused admissions, not measured allocated bytes",
+      "monotonicNanoseconds": 204704085476,
+      "completeCandidateReturned": false,
+      "allCandidateChecksPassed": false,
+      "limits": {
+        "operations": 2000000,
+        "storageMemberships": 100000,
+        "rationalBits": 4096,
+        "triangles": 512
+      },
+      "sourceBinding": "EXECUTION-BINDING.json",
+      "inputBindings": "ORIGINAL-BINDINGS.json",
+      "fleetAdmission": false
+    }
+  ],
+  "beforeSUTFreezeSHA256": "c67e65e32dc253834b9ee88618552c80c887e3406e914d80a1a2d605fd625aaa",
+  "causalFinding": "All five actual constructors exhaust2Mcharged operations, at classifier source IDs6:5/6:6/8:2/8:0/11:0, while recorded storage peaks are below100k. The source scans every original facet of each possible owner on every occupancy ray attempt, including facets wholly behind the origin on a ray coordinate. Existing facet boxes/tree can exclude those impossible hits. Raw traces have no inner-stage work split: no measured dominance, eventual completion or full-storage-fit claim.",
+  "correction": [
+    "A conservative ray-box predicate rejects only a strict forward-axis separation. Positive direction rejects box.upper<origin; negative rejects box.lower>origin; zero direction rejects origin strictly outside the closed interval. Equality remains eligible. Comparisons use existing exact coordinates; no new rational arithmetic, precision guard or approximate ray computation.",
+    "Reuse the existing retained facet tree. Prune a node only when its closed box misses the owner box or fails the necessary ray predicate; visit left before right, test eligible leaf facets and filter the exact owner ID. Output ordinals retain the original source order, without assuming owner contiguity.",
+    "Extract the unchanged exact plane/hit/contains parity loop into one helper shared by flat/indexed visits. Keep zero/negative-hit exclusion, coplanar-origin ambiguity, edge ambiguity, parity, normal-facing direction and retry sequence. Every returned candidate uses that full original test.",
+    "Owners with at most4existing8-facet leaves keep the original flat scan to avoid small-query overhead. Cache one facet-count record per owner: reserve11members/owner instead of10 and add one charged count update per original facet, keeping all six prior coordinate charges. The execution choice never changes geometric eligibility.",
+    "Charge every visited node, owner-box meet, forward-axis comparison, leaf visit and exact candidate test. Admit up toNreturned ordinals plus the existing stack bound in scopes, releasing on success/error. No saved work is credited unless the corresponding traversal or full ray test is actually omitted."
+  ],
+  "soundnessProof": [
+    "If a forward ray hits a facet at t>=0, every coordinate hit is in that facet box and on the signed half-line from the origin. Thus no axis can satisfy the strict rejection. Every ancestor contains the facet box, so ancestor rejection is also impossible.",
+    "For the denominator-zero coplanar ambiguity, contains(origin) implies origin lies inside the facet box. It cannot be rejected for any signed or zero direction. All equality contacts remain candidates.",
+    "A node containing an owner facet necessarily overlaps that owner union box. Left-first contiguous traversal and the owner ID filter return the same order as the full scan after removing impossible facets. Therefore all ambiguity/retry decisions and parity contributions remain unchanged."
+  ],
+  "newTests": [
+    "Independent corner-based necessary predicate matches exact ordered candidates across interleaved owners, positive/negative/zero-axis directions and boundary origins. Flat and indexed exact parity/ambiguity match. Cached owner counts, one-short query scratch refusal, admitted peak and release are checked.",
+    "Complete independent3xsubdivided cube108facets and buried120-source case, analytic volume64/output108facets. Compare ordered Facets, every witness source/cells/physical/protected/output/stars/area field and both public witness verifications. Require lower complete charged work on both large-owner cases; record all peaks/retained counters.",
+    "All original six controls, adverse small-work observations, tests/assertions and frozen references retained unchanged. Small owners incur the explicit new count bookkeeping; no claim of universal savings."
+  ],
+  "unchanged": [
+    "Source/decoder/region/budget/arrangement/exact modules, input assets, affine fields, contact topology rules, aggregate witness and final global output proofs.",
+    "Existing facet-index build and ordinary closed-box query logic/prices; existing packed region and global-point lifetimes.",
+    "Original2Moperations/100kmemberships/4096bits/512completecandidatefaces. No globalCSG, field averaging, contact substitution, new dependency or fixture entitlement."
+  ],
+  "parentQualification": {
+    "RustPass": 30,
+    "hostPass": 9,
+    "check": "PASS",
+    "strictClippy": "PASS",
+    "devBuild": "PASS",
+    "wholeFive": "5decodePASS/5OperationsREFUSED/15dependentUNRUN/0candidate"
+  },
+  "localRawEvidenceVerification": {
+    "rawLeafPins": 33,
+    "handoffAndMatrixPins": "MATCH",
+    "rootSourceCrateMatchesAuthorParent": true,
+    "rootTerminalAudit": "User/orchestrator reported complete independent audit; retained handoff pins exact raw scope."
+  },
+  "currentCompilerTests": "UNRUN",
+  "currentOriginalFive": "HELD pending one bounded whole review and changed owner qualification",
+  "newCandidates": 0,
+  "newFleetAdmissions": 0,
+  "physicalMinimumOrSpeedClaim": false,
+  "priorFailuresAndAdverseWorkPreserved": true,
+  "allOriginalShipsRemainInScope": true,
+  "previewIndependent": true
+}

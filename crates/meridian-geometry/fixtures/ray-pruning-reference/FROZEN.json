@@ -1,0 +1,16 @@
+{
+  "phase": "BEFORE_FORWARD_RAY_PRUNING_SUCCESSOR_AUTHORING",
+  "parentAuthorHead": "0ca5d4567429c35bba3a8d0c900be0fa835b116f",
+  "qualifiedRootJoin": "3e066906f93db3067ce0c978f01abaf7c5d2ac0b",
+  "reference": "Current qualified certificate production prefix; unchanged private region/source/budget/arrangement modules. Only final whitespace normalized.",
+  "files": {
+    "CASES.json": {
+      "bytes": 3965,
+      "sha256": "2ef9163afb013ffecee1be5bef597489960b694130d2f76e94201aae0add9e13"
+    },
+    "before-certificate.rs": {
+      "bytes": 44671,
+      "sha256": "76eeb932cec5b2541ed989ccd59222c9c6e590210537234c2084a4f51b121bba"
+    }
+  }
+}

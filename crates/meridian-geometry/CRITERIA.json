@@ -153,6 +153,16 @@
       "file": "src/pruning.rs",
       "name": "pruning::complete_region_storage_controls_preserve_all_fields_and_reduce_peak",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/certificate.rs",
+      "name": "certificate::tests::forward_ray_candidates_keep_boundary_ambiguities_and_source_order",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/pruning.rs",
+      "name": "pruning::complete_forward_ray_controls_preserve_all_fields_witnesses_and_charged_work",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -335,5 +345,17 @@
     "parentWholeFive": "5StorageREFUSED/15dependentUNRUN/0candidate",
     "currentExecution": "UNRUN",
     "newTestCount": 30
+  },
+  "rayPruningCorrection": {
+    "qualifiedParentJoin": "3e066906f93db3067ce0c978f01abaf7c5d2ac0b",
+    "parentHandoffSHA256": "b0423e9d6d3d4eec874acb1b023060e86893b928c0a73f1514cd97183a9cf710",
+    "parentMatrixSHA256": "949bf0923a3f9159063473382736a801c6542c55da34ad4efb98c21a91123cbb",
+    "deltaSHA256": "8e02a8204fd0b60812f0606b47a331b97b84445829e7210f1ea8a7d5d797b9de",
+    "beforeSUTFreezeSHA256": "c67e65e32dc253834b9ee88618552c80c887e3406e914d80a1a2d605fd625aaa",
+    "parentRustPass": 30,
+    "parentHostPass": 9,
+    "parentWholeFive": "5OperationsREFUSED/15dependentUNRUN/0candidate",
+    "currentExecution": "UNRUN",
+    "newTestCount": 32
   }
 }

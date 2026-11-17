@@ -1,8 +1,14 @@
 # Implementation and validation status
 
-Reviewed against actual delivery evidence on 16 November 2026. This document distinguishes installed gameplay from source awaiting execution. Update it with every delivery or material acceptance change; test counts belong to their exact source.
+Reviewed against actual delivery evidence on 17 November 2026. This document distinguishes installed gameplay from source awaiting execution. Update it with every delivery or material acceptance change; test counts belong to their exact source.
 
-## Latest installed and published preview
+## Current public preview and separate geometry branch
+
+[Cockpit Services Preview v0.5.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.5.0-preview.1) is delivered from protected main `07f1678`, with compiled runtime `beab907` and only two differing Markdown files. Mac, Linux and native Windows each passed 372 Rust and 88 Python tests. Bounded Mac HUD/five-screen/modular-equipment/flight/Save-Quit-cold-Continue qualification passed. All four anonymous downloads, complete payload inventories, extracted Developer ID signature, immutable annotated tag and durable release receipt were verified. Main CI and exact-main Sonar passed with zero issues. The newest three managed previews are v0.5/v0.4/v0.3; the earlier v0.2 release and matching tag were removed after the new receipt. Memory, performance, full-game/fleet and notarization acceptance remain open.
+
+This branch is a separate geometry qualification source on an older runtime base; it is not the public preview source or an updated playable delivery. The actual `3e06690` batch completed once: five decode PASS, five construction Operations refusals, fifteen dependent UNRUN and zero candidates. Root verified 262 source pins, 33 raw artifacts and 14 inner seals. Logical storage reservations reached 85,579 through 90,048 at operation refusal; this does not prove full construction storage fit. The next causal forward-ray pruning source reuses the existing facet index, retains exact hit/parity/ambiguity decisions and original guards, and adds frozen independent large-owner controls. Its 32 Rust and nine host cases remain **UNRUN**. Review, compiler/Clippy and changed original-five qualification remain pending. No new hull or station is accepted.
+
+## Historical installed Gunnery Attempts preview
 
 [Gunnery Attempts Preview v0.2.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.2.0-preview.1) is published for macOS arm64 and Windows x64. Its annotated tag resolves to qualified main `16d6ddbc8779ee827d5b0d055dc5c5d874bd9eb8`, tree `d5cf84d867b719c9c97d9d3114f2ffba73da27a9`. The compiled runtime is `8d035a8ab7a56f59e909ee7b520b83a4ff538529`; all 131 tracked blobs match that main tree. Mac, Linux and native Windows each passed 159 core plus 49 desktop tests (208 top-level Rust cases), 74 Python tests (54 importer plus 20 publisher), formatting, strict Clippy and release builds. Nested subprocess summaries are excluded. [Exact-main CI 43875793280](https://github.com/stephenlclarke/meridian/actions/runs/43875793280) passed all six jobs, including exact-SHA Sonar with Previous version policy and zero open findings.
 

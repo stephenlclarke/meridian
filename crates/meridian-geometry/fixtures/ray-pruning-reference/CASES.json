@@ -1,0 +1,263 @@
+{
+  "scope": "Complete independent solids; same original six controls plus exact subdivided source surfaces frozen before ray successor.",
+  "cases": [
+    {
+      "id": "identity",
+      "boxes": [
+        [
+          0,
+          0,
+          0,
+          1,
+          1,
+          1
+        ]
+      ],
+      "volume": 1,
+      "criterion": "retain_unfavorable_complete_work"
+    },
+    {
+      "id": "overlap",
+      "boxes": [
+        [
+          0,
+          0,
+          0,
+          2,
+          2,
+          2
+        ],
+        [
+          1,
+          1,
+          1,
+          3,
+          3,
+          3
+        ]
+      ],
+      "volume": 15,
+      "criterion": "complete_output_and_work"
+    },
+    {
+      "id": "buried",
+      "boxes": [
+        [
+          0,
+          0,
+          0,
+          3,
+          3,
+          3
+        ],
+        [
+          1,
+          1,
+          1,
+          2,
+          2,
+          2
+        ]
+      ],
+      "volume": 27,
+      "criterion": "empty_region_lifetime"
+    },
+    {
+      "id": "shared_face",
+      "boxes": [
+        [
+          0,
+          0,
+          0,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          0,
+          0,
+          2,
+          1,
+          1
+        ]
+      ],
+      "volume": 2,
+      "criterion": "closed_contact"
+    },
+    {
+      "id": "four_disconnected",
+      "boxes": [
+        [
+          0,
+          0,
+          0,
+          1,
+          1,
+          1
+        ],
+        [
+          3,
+          0,
+          0,
+          4,
+          1,
+          1
+        ],
+        [
+          6,
+          0,
+          0,
+          7,
+          1,
+          1
+        ],
+        [
+          9,
+          0,
+          0,
+          10,
+          1,
+          1
+        ]
+      ],
+      "volume": 4,
+      "criterion": "strict_complete_work_saving"
+    },
+    {
+      "id": "eight_oblique_disconnected",
+      "boxes": [
+        [
+          0,
+          0,
+          0,
+          1,
+          1,
+          1
+        ],
+        [
+          3,
+          0,
+          0,
+          4,
+          1,
+          1
+        ],
+        [
+          6,
+          0,
+          0,
+          7,
+          1,
+          1
+        ],
+        [
+          9,
+          0,
+          0,
+          10,
+          1,
+          1
+        ],
+        [
+          12,
+          0,
+          0,
+          13,
+          1,
+          1
+        ],
+        [
+          15,
+          0,
+          0,
+          16,
+          1,
+          1
+        ],
+        [
+          18,
+          0,
+          0,
+          19,
+          1,
+          1
+        ],
+        [
+          21,
+          0,
+          0,
+          22,
+          1,
+          1
+        ]
+      ],
+      "volume": 8,
+      "shear": true,
+      "criterion": "strict_complete_work_saving"
+    },
+    {
+      "id": "vertex_contact",
+      "boxes": [
+        [
+          0,
+          0,
+          0,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          2,
+          2,
+          2
+        ]
+      ],
+      "expected": "UncertifiedContact",
+      "criterion": "same_semantic_refusal"
+    }
+  ],
+  "rayCases": [
+    {
+      "id": "subdivided_identity",
+      "cubeBounds": [
+        0,
+        0,
+        0,
+        4,
+        4,
+        4
+      ],
+      "triangleSubdivisions": 3,
+      "sourceFacets": 108,
+      "volume": 64,
+      "criterion": "complete lower charged work; exact ordered geometry/all witness fields/public verification"
+    },
+    {
+      "id": "subdivided_buried",
+      "cubeBounds": [
+        0,
+        0,
+        0,
+        4,
+        4,
+        4
+      ],
+      "triangleSubdivisions": 3,
+      "innerCubeBounds": [
+        1,
+        1,
+        1,
+        2,
+        2,
+        2
+      ],
+      "sourceFacets": 120,
+      "volume": 64,
+      "criterion": "same exact output and charged work criterion; hidden source remains audited"
+    }
+  ]
+}

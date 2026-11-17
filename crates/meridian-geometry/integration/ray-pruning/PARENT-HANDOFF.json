@@ -1,0 +1,561 @@
+{
+  "recordedAtUTC": "2026-11-17T00:26:30.261359+00:00",
+  "status": "ONE_CHANGED_ORIGINAL_FIVE_COMPLETED;FIVE_OPERATIONS_REFUSALS_RETAINED",
+  "head": "3e066906f93db3067ce0c978f01abaf7c5d2ac0b",
+  "tree": "a38b4ab6baa2d5dfd8a15d71e164dd43c34fc1d0",
+  "sourcePins": 262,
+  "sourceBeforeAfterClean": true,
+  "priorFocusedQualification": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690/geometry-3e06690-focused-handoff.json",
+    "bytes": 16758,
+    "sha256": "3cd2317f40e8553fdd04d1078caafc7400539707c063f5698304e623e7233104"
+  },
+  "focusedTestsRerun": false,
+  "compilerRerun": false,
+  "actualHostStart": {
+    "utc": "2026-11-17T00:01:04.392379+00:00",
+    "pid": 488,
+    "parentPID": 367,
+    "wrapperParentPID": 366,
+    "argv": [
+      "/home/sclarke/setup-work/smoke/new-python/bin/python",
+      "-B",
+      "/home/sclarke/github/meridian-geometry-3e06690/crates/meridian-geometry/tools/run_original_five.py",
+      "--project",
+      "/home/sclarke/github/meridian-geometry-3e06690",
+      "--source-binding",
+      "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/work/geometry-3e06690-whole-five/packet/ROOT-SOURCE-BINDING.json",
+      "--binary",
+      "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-3e06690/linux/compiled-original_five",
+      "--out",
+      "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-3e06690-whole-five/whole-five"
+    ],
+    "cwd": "/home/sclarke/github/meridian-geometry-3e06690",
+    "head": "3e066906f93db3067ce0c978f01abaf7c5d2ac0b",
+    "tree": "a38b4ab6baa2d5dfd8a15d71e164dd43c34fc1d0",
+    "sourcePins": 262,
+    "inputManifest": {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/work/geometry-3e06690-whole-five/packet/INPUTS.json",
+      "bytes": 3389,
+      "sha256": "6b526db068e2993606889dd676cff60406e0ef958ed48ad615bc48f48ed27e72"
+    },
+    "binary": {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-3e06690/linux/compiled-original_five",
+      "bytes": 20869024,
+      "sha256": "958682dd97329717e3c0a91b13b66b3f52a7af3ffaa8b7ec62fde55e7bb3c049"
+    },
+    "toolchainAndRuntime": {
+      "qualificationToolchain": {
+        "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0\nLLVM version: 23.1.1\n",
+        "python": {
+          "executable": "/home/sclarke/setup-work/smoke/new-python/bin/python",
+          "version": "3.15.2 (main, Nov 11 2026, 00:19:20) [Clang 23.1.3 ]",
+          "platform": "linux"
+        },
+        "environment": {
+          "PATH": "/home/sclarke/.cargo/bin:/home/sclarke/setup-work/smoke/new-python/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/Go/bin:/mnt/c/Program Files/Warp/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/Git/ucrt64/bin:/mnt/c/Program Files/Git/usr/bin:/mnt/c/Users/steph/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/steph/go/bin:/mnt/c/Users/steph/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/steph/.cargo/bin",
+          "CARGO_TARGET_DIR": "/home/sclarke/setup-work/station-linux-target",
+          "PYTHONDONTWRITEBYTECODE": "1",
+          "MERIDIAN_SOURCE_SHA": "3e066906f93db3067ce0c978f01abaf7c5d2ac0b",
+          "CARGO_BUILD_JOBS": null,
+          "RUSTFLAGS": null,
+          "CARGO_ENCODED_RUSTFLAGS": null,
+          "RUSTC_BOOTSTRAP": null,
+          "RUSTC_LOG": null,
+          "LANG": "C.UTF-8",
+          "LC_ALL": null
+        },
+        "resources": "Default unrestricted; no added job/CPU/RSS/time caps. Geometry guards remain exactly the reviewed original limits.",
+        "cargoBinary": {
+          "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+          "bytes": 36160240,
+          "sha256": "e951141cc55a6cd7b9876d187bd30a3720e6086b99413af95e3b8de1cdd72f14"
+        },
+        "rustcBinary": {
+          "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+          "bytes": 647376,
+          "sha256": "f3834d26669b03f6855fa54bd2381443123e860167bc0c7a8dd137e5cf6e5e4f"
+        },
+        "clippy-driverBinary": {
+          "path": "/home/sclarke/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/clippy-driver",
+          "bytes": 16256512,
+          "sha256": "ecf6d74d4e13728405acd3749bff486db899e793b5e3cd179ab663f7fe9d6fe6"
+        },
+        "gitBinary": {
+          "path": "/usr/bin/git",
+          "bytes": 4591208,
+          "sha256": "d2682f3a026c10db333f3f05a87f2b79c1ba5750f7c6d512879409fff622a1a5"
+        }
+      },
+      "runtimePython": {
+        "executable": "/home/sclarke/setup-work/smoke/new-python/bin/python",
+        "version": "3.15.2 (main, Nov 11 2026, 00:19:20) [Clang 23.1.3 ]",
+        "platform": "linux",
+        "binary": {
+          "path": "/home/sclarke/.local/share/uv/python/cpython-3.15.2-linux-x86_64-gnu/bin/python3.15",
+          "bytes": 33989216,
+          "sha256": "26e2d181de783ce64ffddfe6c3bedc276aa001547f2e20d5164d113210b2dae5"
+        }
+      },
+      "runtimeBinary": {
+        "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-3e06690/linux/compiled-original_five",
+        "bytes": 20869024,
+        "sha256": "958682dd97329717e3c0a91b13b66b3f52a7af3ffaa8b7ec62fde55e7bb3c049"
+      },
+      "environment": {
+        "MERIDIAN_SOURCE_SHA": "3e066906f93db3067ce0c978f01abaf7c5d2ac0b",
+        "CARGO_TARGET_DIR": "/home/sclarke/setup-work/station-linux-target",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PATH": "/home/sclarke/.cargo/bin:/home/sclarke/setup-work/smoke/new-python/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/Go/bin:/mnt/c/Program Files/Warp/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/Git/ucrt64/bin:/mnt/c/Program Files/Git/usr/bin:/mnt/c/Users/steph/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/steph/go/bin:/mnt/c/Users/steph/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/steph/.cargo/bin",
+        "CARGO_BUILD_JOBS": null,
+        "RUSTFLAGS": null,
+        "CARGO_ENCODED_RUSTFLAGS": null
+      },
+      "resources": "Original guards and normal defaults; no added resource/time caps. No compiler invoked; original qualified toolchain bytes rechecked."
+    },
+    "wrapperExecutable": "/home/sclarke/setup-work/smoke/new-python/bin/python",
+    "wrapperArgv": [
+      "/home/sclarke/setup-work/smoke/new-python/bin/python",
+      "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/work/geometry-3e06690-whole-five/run-original-acceptance.py",
+      "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/work/geometry-3e06690-whole-five/packet",
+      "6b526db068e2993606889dd676cff60406e0ef958ed48ad615bc48f48ed27e72"
+    ]
+  },
+  "actualRustStart": {
+    "event": "ACTUAL_RUST_ORIGINAL_FIVE_START",
+    "pid": 489,
+    "parentPID": 488,
+    "argv": [
+      "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-3e06690/linux/compiled-original_five",
+      "--out",
+      "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-3e06690-whole-five/whole-five/results",
+      "--binding",
+      "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-3e06690-whole-five/whole-five/EXECUTION-BINDING.json"
+    ],
+    "monotonicStartedNanoseconds": 4915696702,
+    "sourceHead": "3e066906f93db3067ce0c978f01abaf7c5d2ac0b",
+    "sourceTree": "a38b4ab6baa2d5dfd8a15d71e164dd43c34fc1d0",
+    "sourceManifestSHA256": "cca8c9fcebd5ae40c274fbbf61e940acb14eb807adf157b93389d0215af127ae",
+    "binarySHA256": "958682dd97329717e3c0a91b13b66b3f52a7af3ffaa8b7ec62fde55e7bb3c049",
+    "executionBindingSHA256": "be1bfaff9fa352e4368c69b1c6b53c246816b7ead74a7e9d3dd3754f6c6a179b",
+    "out": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-3e06690-whole-five/whole-five"
+  },
+  "actualTerminal": {
+    "utc": "2026-11-17T00:23:13.817041+00:00",
+    "exit": 1,
+    "pid": 488,
+    "wrapperPID": 367,
+    "elapsedSeconds": 1329.428715004,
+    "head": "3e066906f93db3067ce0c978f01abaf7c5d2ac0b",
+    "tree": "a38b4ab6baa2d5dfd8a15d71e164dd43c34fc1d0",
+    "noRetry": true,
+    "compilerOrFocusedTestsRun": false,
+    "log": {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-3e06690-whole-five/host-wrapper.log",
+      "bytes": 1220,
+      "sha256": "de8cdb085f6ba30c9f6c6f77625ce68cb1a3bfaabe92e3d9cdc36dcab5caab07"
+    },
+    "runtimeBinary": {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-3e06690/linux/compiled-original_five",
+      "bytes": 20869024,
+      "sha256": "958682dd97329717e3c0a91b13b66b3f52a7af3ffaa8b7ec62fde55e7bb3c049"
+    }
+  },
+  "rawOwnerTerminal": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/whole-five/OWNER-TERMINAL.json",
+    "bytes": 15528,
+    "sha256": "53d003578865744681c8d003c8a27bbe9886ab1328c0adf8a664cf230ff81ae4"
+  },
+  "rawRustTerminal": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/whole-five/results/TERMINAL.json",
+    "bytes": 10425,
+    "sha256": "126c1685689a4ff9464d03cb678ae44f8ff28aecc72426f1aba6a077982b3418"
+  },
+  "artifactSeal": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/whole-five/ARTIFACTS.json",
+    "bytes": 2143,
+    "sha256": "39ddd889efaf408fb266996a8a0527dd9c2f80e36e73906c0139374be14201a3"
+  },
+  "nativeReadOnlyVerification": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/geometry-3e06690-original-five-verification.json",
+    "bytes": 25835,
+    "sha256": "8a1755cb50282b16b6063b3d3859b7e8ab314198aca0aa5eb5e314800c9b22e6"
+  },
+  "independentLocalVerification": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/LOCAL-COPY-VERIFICATION.json",
+    "bytes": 1260,
+    "sha256": "6ce25c91c654aaee7bd552759891349faa3a2c3cf8862af0bf845b5fecb35623"
+  },
+  "caseMatrix": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/ORIGINAL-CASE-MATRIX.json",
+    "bytes": 3495,
+    "sha256": "949bf0923a3f9159063473382736a801c6542c55da34ad4efb98c21a91123cbb"
+  },
+  "cases": [
+    {
+      "id": "SH010",
+      "status": "REFUSED",
+      "kind": "Operations",
+      "source": [
+        6,
+        5
+      ],
+      "operations": 2000001,
+      "decodeChargedOperations": 359198,
+      "constructionChargedOperations": 1640803,
+      "wallNanoseconds": 335954455606,
+      "wallSeconds": 335.954455606,
+      "attemptedPeakMemberships": 85579,
+      "admittedPeakMemberships": 85579,
+      "retainedMembershipsAtTerminal": 74279,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ],
+      "completeCandidate": false
+    },
+    {
+      "id": "SH011",
+      "status": "REFUSED",
+      "kind": "Operations",
+      "source": [
+        6,
+        6
+      ],
+      "operations": 2000001,
+      "decodeChargedOperations": 363558,
+      "constructionChargedOperations": 1636443,
+      "wallNanoseconds": 331809585738,
+      "wallSeconds": 331.809585738,
+      "attemptedPeakMemberships": 86262,
+      "admittedPeakMemberships": 86262,
+      "retainedMembershipsAtTerminal": 74685,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ],
+      "completeCandidate": false
+    },
+    {
+      "id": "SH016",
+      "status": "REFUSED",
+      "kind": "Operations",
+      "source": [
+        8,
+        2
+      ],
+      "operations": 2000001,
+      "decodeChargedOperations": 365449,
+      "constructionChargedOperations": 1634552,
+      "wallNanoseconds": 208223219847,
+      "wallSeconds": 208.223219847,
+      "attemptedPeakMemberships": 89843,
+      "admittedPeakMemberships": 89843,
+      "retainedMembershipsAtTerminal": 84100,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ],
+      "completeCandidate": false
+    },
+    {
+      "id": "SH017",
+      "status": "REFUSED",
+      "kind": "Operations",
+      "source": [
+        8,
+        0
+      ],
+      "operations": 2000001,
+      "decodeChargedOperations": 390244,
+      "constructionChargedOperations": 1609757,
+      "wallNanoseconds": 247957171028,
+      "wallSeconds": 247.957171028,
+      "attemptedPeakMemberships": 90048,
+      "admittedPeakMemberships": 90048,
+      "retainedMembershipsAtTerminal": 83793,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ],
+      "completeCandidate": false
+    },
+    {
+      "id": "SH166",
+      "status": "REFUSED",
+      "kind": "Operations",
+      "source": [
+        11,
+        0
+      ],
+      "operations": 2000001,
+      "decodeChargedOperations": 341473,
+      "constructionChargedOperations": 1658528,
+      "wallNanoseconds": 204704085476,
+      "wallSeconds": 204.704085476,
+      "attemptedPeakMemberships": 88082,
+      "admittedPeakMemberships": 88082,
+      "retainedMembershipsAtTerminal": 82095,
+      "bodyStatuses": [
+        "PASS",
+        "REFUSED",
+        "UNRUN",
+        "UNRUN",
+        "UNRUN"
+      ],
+      "completeCandidate": false
+    }
+  ],
+  "outcomes": {
+    "PASS": 5,
+    "REFUSED": 5,
+    "FAIL": 0,
+    "UNRUN": 15
+  },
+  "completeCandidates": 0,
+  "fleetAdmissions": 0,
+  "nativeAcceptance": false,
+  "originalGuards": {
+    "operations": 2000000,
+    "storageMemberships": 100000,
+    "rationalBits": 4096,
+    "candidateTriangles": 512
+  },
+  "runtimeBinary": {
+    "qualifiedLocalRetained": {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690/remote-result/linux/compiled-original_five",
+      "bytes": 20869024,
+      "sha256": "958682dd97329717e3c0a91b13b66b3f52a7af3ffaa8b7ec62fde55e7bb3c049"
+    },
+    "actualExecuted": {
+      "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-3e06690/linux/compiled-original_five",
+      "bytes": 20869024,
+      "sha256": "958682dd97329717e3c0a91b13b66b3f52a7af3ffaa8b7ec62fde55e7bb3c049"
+    }
+  },
+  "rawCopiedFilesVerified": 33,
+  "innerSealedFilesVerified": 14,
+  "sourceArchivePinsVerified": 262,
+  "prior6a5FailurePreserved": {
+    "receipt": {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-6a5df3e/geometry-6a5df3e-terminal-handoff.json",
+      "bytes": 57569,
+      "sha256": "0266db47c11284626aaa27c059eca6fb83074c79960250ba14275fc8c28f161b"
+    },
+    "outcome": "Five Storage refusals, fifteen dependent UNRUN, zero complete candidates; historical raw evidence unchanged"
+  },
+  "interpretation": "All five original decodes passed. Each construction hit the unchanged operation guard at2,000,001; fifteen dependent semantic/certificate/topology bodies remain UNRUN. No semantic failures observed because those checks were not reached; this is not semantic or completed geometry acceptance. No storage refusal occurred before work refusal; full storage-fit is unresolved. Logical membership counts are not minimum physical RAM.",
+  "executionScope": "Exactly one newly authorized changed original batch using the previously qualified retained dev binary after Windows release handoff. No compiler/focused retry, cap change, signal, waiver, diagnostic-only original rerun, Mac/Windows job or fleet/native delivery claim. Host/Rust processes ended normally, Linux lease released.",
+  "copiedArtifacts": [
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/START.json",
+      "bytes": 6424,
+      "sha256": "67f5f87df1d37f8b37fdfba37a3796f326626f61fe42ec511768e03a753b3774",
+      "relativePath": "START.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/host-wrapper.log",
+      "bytes": 1220,
+      "sha256": "de8cdb085f6ba30c9f6c6f77625ce68cb1a3bfaabe92e3d9cdc36dcab5caab07",
+      "relativePath": "host-wrapper.log"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/input-packet/ASSIGNMENT.json",
+      "bytes": 1282,
+      "sha256": "68136943aa0a6ce69a3c49972d13808ffa4a7a73313580354b9d81d73855009d",
+      "relativePath": "input-packet/ASSIGNMENT.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/input-packet/FOCUSED-BINARY.json",
+      "bytes": 616,
+      "sha256": "a5fe043c3416b1c665955fcf9d473c1dd06793b6517e49240d85306c648e009b",
+      "relativePath": "input-packet/FOCUSED-BINARY.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/input-packet/FOCUSED-HANDOFF.json",
+      "bytes": 16758,
+      "sha256": "3cd2317f40e8553fdd04d1078caafc7400539707c063f5698304e623e7233104",
+      "relativePath": "input-packet/FOCUSED-HANDOFF.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/input-packet/FOCUSED-TOOLCHAIN.json",
+      "bytes": 2452,
+      "sha256": "28f2ccf88a95072cabaca5e0bdfe5e957c115bde0066c17188d90de95224879e",
+      "relativePath": "input-packet/FOCUSED-TOOLCHAIN.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/input-packet/G2-SOURCE-CLEAR.json",
+      "bytes": 3484,
+      "sha256": "58461f9b7257336f3dc7ac3e09612ce24ee9d3be1b337b07aea30483946e21e3",
+      "relativePath": "input-packet/G2-SOURCE-CLEAR.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/input-packet/INPUTS.json",
+      "bytes": 3389,
+      "sha256": "6b526db068e2993606889dd676cff60406e0ef958ed48ad615bc48f48ed27e72",
+      "relativePath": "input-packet/INPUTS.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/input-packet/ROOT-SOURCE-BINDING.json",
+      "bytes": 45534,
+      "sha256": "cca8c9fcebd5ae40c274fbbf61e940acb14eb807adf157b93389d0215af127ae",
+      "relativePath": "input-packet/ROOT-SOURCE-BINDING.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/input-packet/SOURCE.json",
+      "bytes": 46146,
+      "sha256": "c6cba78be3a92ae10a61d1902d994e9ecffc8968a5ef1aff0b4abdef64b6f106",
+      "relativePath": "input-packet/SOURCE.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/input-packet/WINDOWS-COMPLETE.json",
+      "bytes": 22373,
+      "sha256": "26de41ead7ef4e63f2f786cfc3b16e81e8ea94663174a04f93fb2ee40768d01d",
+      "relativePath": "input-packet/WINDOWS-COMPLETE.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/input-packet/WINDOWS-COPY-VERIFIED.json",
+      "bytes": 2870,
+      "sha256": "c2b12b5ad356ee47a90dc1258f1fa47ba1b3b219e9d0cbeef425a5ed6aef4f22",
+      "relativePath": "input-packet/WINDOWS-COPY-VERIFIED.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/ownership-preflight.json",
+      "bytes": 218,
+      "sha256": "e59d8e23f39155db589e3c06da7a628e7399b5f16697091c9434a54b394671e4",
+      "relativePath": "ownership-preflight.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/run-original-acceptance.py",
+      "bytes": 9327,
+      "sha256": "e397ae2ea6305465352d495b4bdc7ca2e3f9486177c7d7ca1540758dfe73ee56",
+      "relativePath": "run-original-acceptance.py"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/source-binding-after.json",
+      "bytes": 262,
+      "sha256": "c6e394dd5810869e1955161d8fcbae639409f81d2bd6b5893fa7896879ee64bd",
+      "relativePath": "source-binding-after.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/source-binding-before.json",
+      "bytes": 262,
+      "sha256": "5129a8272eef8ef7ee677fb02be6b0cc20f5ad96bde2bbe92121e8461933d33c",
+      "relativePath": "source-binding-before.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/toolchain-and-runtime.json",
+      "bytes": 4386,
+      "sha256": "2e744ab7d740848e8ed01461d3896669962a9109e3106480f5b11ebe34ec7693",
+      "relativePath": "toolchain-and-runtime.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/whole-five/ACTUAL-START.json",
+      "bytes": 1025,
+      "sha256": "8d8eaa6a9bd5df5779d48a4ba6d401834d92026baa24efaa804c2cdd5e43cd4c",
+      "relativePath": "whole-five/ACTUAL-START.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/whole-five/ARTIFACTS.json",
+      "bytes": 2143,
+      "sha256": "39ddd889efaf408fb266996a8a0527dd9c2f80e36e73906c0139374be14201a3",
+      "relativePath": "whole-five/ARTIFACTS.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/whole-five/EXECUTION-BINDING.json",
+      "bytes": 45430,
+      "sha256": "be1bfaff9fa352e4368c69b1c6b53c246816b7ead74a7e9d3dd3754f6c6a179b",
+      "relativePath": "whole-five/EXECUTION-BINDING.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/whole-five/OWNER-TERMINAL.json",
+      "bytes": 15528,
+      "sha256": "53d003578865744681c8d003c8a27bbe9886ab1328c0adf8a664cf230ff81ae4",
+      "relativePath": "whole-five/OWNER-TERMINAL.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/whole-five/results/EXECUTION-BINDING.json",
+      "bytes": 45430,
+      "sha256": "be1bfaff9fa352e4368c69b1c6b53c246816b7ead74a7e9d3dd3754f6c6a179b",
+      "relativePath": "whole-five/results/EXECUTION-BINDING.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/whole-five/results/ORIGINAL-BINDINGS.json",
+      "bytes": 11618,
+      "sha256": "6115342c17444e3f368f4a72f1ea9cc578b9fff2d1a0f1ca2f19d33b225ebf66",
+      "relativePath": "whole-five/results/ORIGINAL-BINDINGS.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/whole-five/results/SH010-CASE.json",
+      "bytes": 2023,
+      "sha256": "2019783eed500d3c37aad5f21c87857ce914d329a714ae1eff9ee8a3bb467bdb",
+      "relativePath": "whole-five/results/SH010-CASE.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/whole-five/results/SH011-CASE.json",
+      "bytes": 2023,
+      "sha256": "6e22fbe60d8a7baf307437054eb10fa70e5e10da4c7a65eebc69196cb2391e86",
+      "relativePath": "whole-five/results/SH011-CASE.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/whole-five/results/SH016-CASE.json",
+      "bytes": 2023,
+      "sha256": "6e9a77d6dfadf7a96dc2eed85c16e92ecce2ff6182cebc7011beb9c2fce92658",
+      "relativePath": "whole-five/results/SH016-CASE.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/whole-five/results/SH017-CASE.json",
+      "bytes": 2023,
+      "sha256": "dfc2c72b3d57281293bcfbbfc962370689847126e45ac31a1bb258bcfb7f9d6a",
+      "relativePath": "whole-five/results/SH017-CASE.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/whole-five/results/SH166-CASE.json",
+      "bytes": 2024,
+      "sha256": "9d11329769a0bed93cd1a37999af9960230e5cfb5d894c543ad91302a5aa65df",
+      "relativePath": "whole-five/results/SH166-CASE.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/whole-five/results/TERMINAL.json",
+      "bytes": 10425,
+      "sha256": "126c1685689a4ff9464d03cb678ae44f8ff28aecc72426f1aba6a077982b3418",
+      "relativePath": "whole-five/results/TERMINAL.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/whole-five/results/WHOLE-FIVE-CRITERIA.json",
+      "bytes": 4977,
+      "sha256": "ace9c47feecd0aa7b0507f15492e3a1d01edc00a4e0a489c707f5955701dd9c8",
+      "relativePath": "whole-five/results/WHOLE-FIVE-CRITERIA.json"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/whole-five/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "relativePath": "whole-five/stderr.log"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/whole-five/stdout.log",
+      "bytes": 10366,
+      "sha256": "2c875c1a343cecabaf4cd9edfefe0f76cbac05b2b3d320414935de40afba9969",
+      "relativePath": "whole-five/stdout.log"
+    },
+    {
+      "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-3e06690-whole-five/remote-result/wrapper-exit.json",
+      "bytes": 778,
+      "sha256": "90e2e399b0a8f03c88bc55e646b46fcafec9473b4169a3f284297c9cc1b1c259",
+      "relativePath": "wrapper-exit.json"
+    }
+  ]
+}

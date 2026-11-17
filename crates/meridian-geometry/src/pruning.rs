@@ -602,3 +602,107 @@ fn complete_region_storage_controls_preserve_all_fields_and_reduce_peak() -> Res
     );
     Ok(())
 }
+
+mod before_ray_pruning {
+    include!("../fixtures/ray-pruning-reference/before-certificate.rs");
+}
+
+fn subdivided_cube() -> Result<Vec<Facet>, Failure> {
+    let mut b = Budget::new(Limits::default())?;
+    let mut result = Vec::new();
+    for original in cube([0, 0, 0, 4, 4, 4], 0)? {
+        let corners = original.vertices();
+        let at = |i: i64, j: i64| -> Vertex {
+            let point = std::array::from_fn(|k| {
+                &corners[0].point[k]
+                    + (&corners[1].point[k] - &corners[0].point[k]) * integer(i) / integer(3)
+                    + (&corners[2].point[k] - &corners[0].point[k]) * integer(j) / integer(3)
+            });
+            Vertex {
+                uv: [&point[0] + integer(2) * &point[1], &point[2] - &point[1]],
+                point,
+            }
+        };
+        for i in 0..3 {
+            for j in 0..3 - i {
+                let mut triangles = vec![[at(i, j), at(i + 1, j), at(i, j + 1)]];
+                if i + j < 2 {
+                    triangles.push([at(i + 1, j), at(i + 1, j + 1), at(i, j + 1)]);
+                }
+                for vertices in triangles {
+                    result.push(Facet::new(
+                        SourceId {
+                            component: 0,
+                            facet: result.len() as u32,
+                        },
+                        vertices,
+                        original.style().to_owned(),
+                        &mut b,
+                    )?);
+                }
+            }
+        }
+    }
+    assert_eq!(result.len(), 108);
+    Ok(result)
+}
+
+#[test]
+fn complete_forward_ray_controls_preserve_all_fields_witnesses_and_charged_work()
+-> Result<(), Failure> {
+    for buried in [false, true] {
+        let mut originals = subdivided_cube()?;
+        if buried {
+            originals.extend(cube([1, 1, 1, 2, 2, 2], 1)?);
+        }
+        let id = if buried {
+            "subdivided_buried"
+        } else {
+            "subdivided_identity"
+        };
+        let mut old = Budget::new(Limits::default())?;
+        let expected = before_ray_pruning::reconstruct(&originals, &mut old)?;
+        let mut new = Budget::new(Limits::default())?;
+        let actual = crate::reconstruct(&originals, &mut new)?;
+        assert_eq!(expected.exact_volume(), &integer(64));
+        assert_eq!(expected.triangles().len(), 108);
+        assert_eq!(actual.triangles(), expected.triangles());
+        assert_eq!(actual.exact_volume(), expected.exact_volume());
+        assert_eq!(actual.witnesses().len(), expected.witnesses().len());
+        for (a, e) in actual.witnesses().iter().zip(expected.witnesses()) {
+            assert_eq!(a.source, e.source);
+            assert_eq!(a.classified_cells, e.classified_cells);
+            assert_eq!(a.physical_segments, e.physical_segments);
+            assert_eq!(a.protected_points, e.protected_points);
+            assert_eq!(a.output_triangles, e.output_triangles);
+            assert_eq!(a.twice_area, e.twice_area);
+            let stars = e
+                .contact_stars
+                .iter()
+                .map(|s| (s.point.clone(), s.sectors.clone(), s.boundary_path))
+                .collect::<Vec<_>>();
+            assert_eq!(current_stars(&a.contact_stars), stars);
+            let source = originals
+                .iter()
+                .find(|f| f.id() == a.source)
+                .ok_or_else(|| {
+                    new.fail(FailureKind::InvalidWitness, "missing ray control source")
+                })?;
+            e.verify(source, &mut old)?;
+            a.verify(source, &mut new)?;
+        }
+        assert!(new.operations() < old.operations(), "{id}");
+        assert_eq!(new.retained_memberships(), old.retained_memberships());
+        eprintln!(
+            "FORWARD_RAY_COMPLETE {{\"fixture\":\"{id}\",\"oldOperations\":{},\"newOperations\":{},\"oldAttemptedPeak\":{},\"newAttemptedPeak\":{},\"oldRetained\":{},\"newRetained\":{},\"triangles\":{}}}",
+            old.operations(),
+            new.operations(),
+            old.peak_memberships(),
+            new.peak_memberships(),
+            old.retained_memberships(),
+            new.retained_memberships(),
+            actual.triangles().len()
+        );
+    }
+    Ok(())
+}

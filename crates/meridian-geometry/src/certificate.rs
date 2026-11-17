@@ -254,6 +254,26 @@ impl Bounds {
         b.step(1)?;
         Ok((0..3).all(|k| self.lower[k] <= point[k] && point[k] <= self.upper[k]))
     }
+    // Necessary forward-ray conditions only. Equality remains eligible;
+    // the exact triangle test still decides every hit and ambiguity.
+    fn ray_may_meet(
+        &self,
+        origin: &Point3,
+        direction: &Point3,
+        b: &mut Budget,
+    ) -> Result<bool, Failure> {
+        for k in 0..3 {
+            b.step(1)?;
+            if direction[k].is_positive() && self.upper[k] < origin[k]
+                || direction[k].is_negative() && self.lower[k] > origin[k]
+                || direction[k].is_zero()
+                    && (origin[k] < self.lower[k] || origin[k] > self.upper[k])
+            {
+                return Ok(false);
+            }
+        }
+        Ok(true)
+    }
 }
 // Contiguous ranges preserve original source order without a sort or tie rule.
 struct BoundsNode {
@@ -349,35 +369,122 @@ impl FacetBoundsIndex {
             Ok(candidates)
         })
     }
+    // The caller admits up to N returned ordinals. Existing tree storage is reused.
+    fn ray_candidates(
+        &self,
+        origin: &Point3,
+        direction: &Point3,
+        originals: &[Facet],
+        owner: u32,
+        owner_bounds: &Bounds,
+        b: &mut Budget,
+    ) -> Result<Vec<usize>, Failure> {
+        b.with_retained(Self::stack_members(self.facets.len()), |b| {
+            let mut pending = vec![self.root];
+            let mut candidates = Vec::new();
+            while let Some(index) = pending.pop() {
+                b.step(1)?;
+                let node = &self.nodes[index];
+                if !owner_bounds.meets(&node.bounds, b)?
+                    || !node.bounds.ray_may_meet(origin, direction, b)?
+                {
+                    continue;
+                }
+                if let Some([left, right]) = node.children {
+                    pending.push(right);
+                    pending.push(left);
+                } else {
+                    for (offset, bounds) in self.facets[node.start..node.end].iter().enumerate() {
+                        b.step(1)?;
+                        let ordinal = node.start + offset;
+                        if originals[ordinal].id().component == owner
+                            && bounds.ray_may_meet(origin, direction, b)?
+                        {
+                            candidates.push(ordinal);
+                        }
+                    }
+                }
+            }
+            Ok(candidates)
+        })
+    }
+}
+
+struct ComponentBounds {
+    bounds: Bounds,
+    facets: usize,
 }
 
 fn component_bounds(
     originals: &[Facet],
     facet_bounds: &[Bounds],
     b: &mut Budget,
-) -> Result<BTreeMap<u32, Bounds>, Failure> {
-    let mut result: BTreeMap<u32, Bounds> = BTreeMap::new();
+) -> Result<BTreeMap<u32, ComponentBounds>, Failure> {
+    let mut result: BTreeMap<u32, ComponentBounds> = BTreeMap::new();
     for (face, bounds) in originals.iter().zip(facet_bounds) {
-        b.step(6)?;
+        // Six bound coordinates plus one cached owner-count update.
+        b.step(7)?;
         log_cost(result.len(), b)?;
         result
             .entry(face.id().component)
-            .and_modify(|old| old.include(bounds))
-            .or_insert_with(|| bounds.clone());
+            .and_modify(|old| {
+                old.bounds.include(bounds);
+                old.facets += 1;
+            })
+            .or_insert_with(|| ComponentBounds {
+                bounds: bounds.clone(),
+                facets: 1,
+            });
     }
     Ok(result)
+}
+
+fn ray_parity<'a>(
+    faces: impl Iterator<Item = &'a Facet>,
+    p: &Point3,
+    direction: &Point3,
+    b: &mut Budget,
+) -> Result<Option<bool>, Failure> {
+    let mut parity = false;
+    for face in faces {
+        b.step(1)?;
+        let denominator = dot(face.normal(), direction);
+        let numerator = face.offset() - dot(face.normal(), p);
+        if denominator.is_zero() {
+            if numerator.is_zero() && face.contains(p, b)?.0 {
+                return Ok(None);
+            }
+            continue;
+        }
+        let t = numerator / denominator;
+        if t <= integer(0) {
+            continue;
+        }
+        let hit = add(p, &scale(direction, &t));
+        point(&hit, b)?;
+        let (inside, edge) = face.contains(&hit, b)?;
+        if !inside {
+            continue;
+        }
+        if edge {
+            return Ok(None);
+        }
+        parity = !parity;
+    }
+    Ok(Some(parity))
 }
 
 fn occupied(
     p: &Point3,
     normal: &Point3,
     originals: &[Facet],
-    owners: &BTreeMap<u32, Bounds>,
+    owners: &BTreeMap<u32, ComponentBounds>,
+    index: &FacetBoundsIndex,
     b: &mut Budget,
 ) -> Result<bool, Failure> {
-    for (owner, bounds) in owners {
+    for (owner, group) in owners {
         // Strict exclusion only. Equality keeps all face/edge/point contacts.
-        if !bounds.contains(p, b)? {
+        if !group.bounds.contains(p, b)? {
             continue;
         }
         let mut attempt = 0u64;
@@ -395,42 +502,33 @@ fn occupied(
             if facing.is_negative() {
                 direction = scale(&direction, &integer(-1));
             }
-            let mut parity = false;
-            let mut ambiguous = false;
-            for face in originals.iter().filter(|v| v.id().component == *owner) {
-                b.step(1)?;
-                let denominator = dot(face.normal(), &direction);
-                let numerator = face.offset() - dot(face.normal(), p);
-                if denominator.is_zero() {
-                    if numerator.is_zero() && face.contains(p, b)?.0 {
-                        ambiguous = true;
-                        break;
-                    }
-                    continue;
-                }
-                let t = numerator / denominator;
-                if t <= integer(0) {
-                    continue;
-                }
-                let hit = add(p, &scale(&direction, &t));
-                point(&hit, b)?;
-                let (inside, edge) = face.contains(&hit, b)?;
-                if !inside {
-                    continue;
-                }
-                if edge {
-                    ambiguous = true;
-                    break;
-                }
-                parity = !parity;
+            let result = if group.facets <= 4 * FacetBoundsIndex::LEAF_SIZE {
+                // A flat scan avoids tree overhead for small original owners.
+                ray_parity(
+                    originals
+                        .iter()
+                        .filter(|face| face.id().component == *owner),
+                    p,
+                    &direction,
+                    b,
+                )?
+            } else {
+                b.with_retained(originals.len(), |b| {
+                    let candidates =
+                        index.ray_candidates(p, &direction, originals, *owner, &group.bounds, b)?;
+                    ray_parity(
+                        candidates.into_iter().map(|ordinal| &originals[ordinal]),
+                        p,
+                        &direction,
+                        b,
+                    )
+                })?
+            };
+            match result {
+                None => continue,
+                Some(true) => return Ok(true),
+                Some(false) => break,
             }
-            if ambiguous {
-                continue;
-            }
-            if parity {
-                return Ok(true);
-            }
-            break;
         }
     }
     Ok(false)
@@ -439,12 +537,13 @@ fn visible(
     face: &Facet,
     sample: &Point2,
     originals: &[Facet],
-    owners: &BTreeMap<u32, Bounds>,
+    owners: &BTreeMap<u32, ComponentBounds>,
+    index: &FacetBoundsIndex,
     coplanar: &[&Facet],
     b: &mut Budget,
 ) -> Result<bool, Failure> {
     let p = face.lift(sample, b)?;
-    if occupied(&p, face.normal(), originals, owners, b)? {
+    if occupied(&p, face.normal(), originals, owners, index, b)? {
         return Ok(false);
     }
     let mut winner = face.id();
@@ -698,7 +797,7 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
     audit_original_sheets(originals, b)?;
     // One owner map plus the two transient facet boxes. Source audit maps
     // have already been released, and this map releases before final noding.
-    let bounds_members = 10 * owners.len() + 32;
+    let bounds_members = 11 * owners.len() + 32;
     b.retain(bounds_members)?;
     let facet_bounds_members = FacetBoundsIndex::memberships(originals.len());
     b.retain(facet_bounds_members)?;
@@ -740,7 +839,15 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
         })?;
         let arrangement = b.with_retained(coplanar.len(), |budget| {
             let result = Arrangement::build(&domain, &barriers, budget, |sample, local| {
-                visible(face, sample, originals, &owner_bounds, &coplanar, local)
+                visible(
+                    face,
+                    sample,
+                    originals,
+                    &owner_bounds,
+                    &facet_bounds,
+                    &coplanar,
+                    local,
+                )
             });
             drop(coplanar);
             result
@@ -1505,6 +1612,125 @@ mod tests {
         let result = short.with_retained(members, |b| {
             let index = FacetBoundsIndex::build(&faces, b)?;
             b.with_retained(count, |b| index.candidates(&index.facets[0], b))
+        });
+        assert_eq!(result.err().map(|e| e.kind), Some(FailureKind::Storage));
+        assert_eq!(short.retained_memberships(), 0);
+        assert!(short.peak_admitted_memberships() <= short.limits().storage_memberships);
+        Ok(())
+    }
+    #[test]
+    fn forward_ray_candidates_keep_boundary_ambiguities_and_source_order() -> Result<(), Failure> {
+        let mut setup = Budget::new(crate::Limits::default())?;
+        let mut faces = Vec::new();
+        for ordinal in 0..65 {
+            let base = [ordinal % 17 - 8, (ordinal / 17) % 3, ordinal % 5 - 2];
+            let vertices = [[0, 0, 0], [1, 0, 0], [0, 1, 1]].map(|offset| Vertex {
+                point: std::array::from_fn(|k| integer(base[k] + offset[k])),
+                uv: [integer(0), integer(0)],
+            });
+            faces.push(Facet::new(
+                SourceId {
+                    component: ordinal as u32 % 3,
+                    facet: ordinal as u32,
+                },
+                vertices,
+                String::new(),
+                &mut setup,
+            )?);
+        }
+        let members = FacetBoundsIndex::memberships(faces.len()) + 11 * 3 + 32;
+        let mut b = Budget::new(crate::Limits::default())?;
+        b.with_retained(members, |b| {
+            let index = FacetBoundsIndex::build(&faces, b)?;
+            let owners = component_bounds(&faces, &index.facets, b)?;
+            for origin in [[0, 0, 0], [3, 1, 2], [-8, 0, -2]] {
+                for direction in [[1, 2, 3], [-1, -2, -3], [1, 0, -1], [0, 1, 0]] {
+                    let origin = origin.map(integer);
+                    let direction = direction.map(integer);
+                    for (owner, group) in &owners {
+                        assert_eq!(
+                            group.facets,
+                            faces.iter().filter(|f| f.id().component == *owner).count()
+                        );
+                        let actual = b.with_retained(faces.len(), |b| {
+                            index.ray_candidates(
+                                &origin,
+                                &direction,
+                                &faces,
+                                *owner,
+                                &group.bounds,
+                                b,
+                            )
+                        })?;
+                        // Independent corner predicate: every vertex must be behind
+                        // the origin on one ray axis before that facet can disappear.
+                        let expected = faces
+                            .iter()
+                            .enumerate()
+                            .filter_map(|(i, face)| {
+                                if face.id().component != *owner {
+                                    return None;
+                                }
+                                let impossible = (0..3).any(|k| {
+                                    let below =
+                                        face.vertices().iter().all(|v| v.point[k] < origin[k]);
+                                    let above =
+                                        face.vertices().iter().all(|v| v.point[k] > origin[k]);
+                                    if direction[k].is_positive() {
+                                        below
+                                    } else if direction[k].is_negative() {
+                                        above
+                                    } else {
+                                        below || above
+                                    }
+                                });
+                                (!impossible).then_some(i)
+                            })
+                            .collect::<Vec<_>>();
+                        assert_eq!(actual, expected);
+                        let mut flat = Budget::new(crate::Limits::default())?;
+                        let expected_parity = ray_parity(
+                            faces.iter().filter(|f| f.id().component == *owner),
+                            &origin,
+                            &direction,
+                            &mut flat,
+                        )?;
+                        let actual_parity = ray_parity(
+                            actual.into_iter().map(|i| &faces[i]),
+                            &origin,
+                            &direction,
+                            b,
+                        )?;
+                        assert_eq!(actual_parity, expected_parity);
+                    }
+                }
+            }
+            Ok(())
+        })?;
+        assert_eq!(b.retained_memberships(), 0);
+        let mut short = Budget::new(crate::Limits {
+            storage_memberships: members
+                + faces.len()
+                + FacetBoundsIndex::stack_members(faces.len())
+                - 1,
+            ..crate::Limits::default()
+        })?;
+        let result = short.with_retained(members, |b| {
+            let index = FacetBoundsIndex::build(&faces, b)?;
+            let owners = component_bounds(&faces, &index.facets, b)?;
+            let group = owners
+                .get(&0)
+                .ok_or_else(|| b.fail(FailureKind::InvalidWitness, "missing ray oracle owner"))?;
+            b.with_retained(faces.len(), |b| {
+                index.ray_candidates(
+                    &[integer(0), integer(0), integer(0)],
+                    &[integer(1), integer(2), integer(3)],
+                    &faces,
+                    0,
+                    &group.bounds,
+                    b,
+                )
+            })
         });
         assert_eq!(result.err().map(|e| e.kind), Some(FailureKind::Storage));
         assert_eq!(short.retained_memberships(), 0);
