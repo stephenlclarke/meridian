@@ -1,0 +1,20 @@
+{
+  "scope": "Exact raw-plane sharing frozen before correction. Original108/120controls/strictcondition immutable.",
+  "planeKey": "owner ID + exact raw normal vector + exact offset; no normalization/field grouping",
+  "controlEvidence": {
+    "subdivided_identity": {
+      "originalFacets": 108,
+      "rawEquations": 6,
+      "trianglesPerEquation": 18,
+      "source": "existing frozen cube subdivision at n=3"
+    }
+  },
+  "unitCases": [
+    "interleaved owners with equal raw equations remain owner-local",
+    "coplanar triangles with different raw normal/offset are not merged",
+    "positive hit reuses validated point but tests every facet",
+    "shared-edge hit and coplanar-origin ambiguity remain ambiguous",
+    "backward ray remains empty",
+    "exact cache admission, one-short refusal and build rollback"
+  ]
+}

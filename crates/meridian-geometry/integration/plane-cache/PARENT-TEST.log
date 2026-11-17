@@ -1,0 +1,63 @@
+   Compiling meridian-geometry v0.1.0 (/home/sclarke/github/meridian-geometry-1e25a44/crates/meridian-geometry)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.54s
+     Running unittests src/lib.rs (/home/sclarke/setup-work/station-linux-target/debug/deps/meridian_geometry-11342b9e8901f50d)
+
+running 16 tests
+test certificate::tests::closed_component_bounds_retain_face_edge_and_point_equalities ... ok
+test certificate::tests::protected_overlap_facet_keeps_each_regular_local_boundary_path ... ok
+test certificate::tests::owner_streaming_keeps_all_sheets_of_one_component_in_one_link_audit ... ok
+test certificate::tests::original_topology_streams_owner_maps_under_the_same_storage_guard ... ok
+test certificate::tests::facet_bounds_index_matches_independent_closed_pairs_and_guards_scratch ... ok
+test certificate::tests::forward_ray_candidates_keep_boundary_ambiguities_and_source_order ... ok
+test certificate::tests::closed_ray_intervals_reject_skew_boxes_and_preserve_ordered_exact_parity ... ok
+test region::tests::region_round_trip_preserves_every_record_and_guards_transfer_lifetimes ... ok
+test source::tests::exact_sections_match_independent_signed_contact_enumeration ... ok
+BOUNDS_CACHE_COMPLETE {"fixture":"identity","oldOperations":30815,"newOperations":30806,"oldAttemptedPeak":6356,"newAttemptedPeak":3860,"oldRetained":2016,"newRetained":2016,"triangles":12}
+EXACT_PRUNING_COMPLETE {"fixture":"identity","oldOperations":30277,"newOperations":30795,"oldAttemptedPeak":6552,"newAttemptedPeak":4056,"oldRetained":2016,"newRetained":2016,"triangles":12,"exactOutputAndExposedWitnessMatch":true}
+REGION_STORAGE_COMPLETE {"fixture":"identity","oldOperations":30242,"newOperations":30806,"oldAttemptedPeak":6356,"newAttemptedPeak":3860,"oldRetained":2016,"newRetained":2016,"triangles":12}
+STYLE_STORAGE_COMPLETE {"fixture":"identity","oldOperations":30792,"newOperations":30806,"oldAttemptedPeak":6552,"newAttemptedPeak":3860,"oldRetained":2016,"newRetained":2016,"triangles":12}
+test adapter::tests::equal_unshared_styles_and_shared_clones_have_distinct_storage_ownership ... ok
+STYLE_INPUT_STORAGE {"fixture":"SH010","before":79000,"after":40784,"operations":362960}
+STYLE_INPUT_STORAGE {"fixture":"SH011","before":79000,"after":40784,"operations":367320}
+STYLE_INPUT_STORAGE {"fixture":"SH016","before":85864,"after":44304,"operations":370135}
+REGION_STORAGE_COMPLETE {"fixture":"overlap","oldOperations":103189,"newOperations":104816,"oldAttemptedPeak":18956,"newAttemptedPeak":12492,"oldRetained":6552,"newRetained":6552,"triangles":48}
+BOUNDS_CACHE_COMPLETE {"fixture":"overlap","oldOperations":106146,"newOperations":104816,"oldAttemptedPeak":18956,"newAttemptedPeak":12492,"oldRetained":6552,"newRetained":6552,"triangles":48}
+STYLE_STORAGE_COMPLETE {"fixture":"overlap","oldOperations":106099,"newOperations":104816,"oldAttemptedPeak":19368,"newAttemptedPeak":12492,"oldRetained":6552,"newRetained":6552,"triangles":48}
+EXACT_PRUNING_COMPLETE {"fixture":"overlap","oldOperations":108136,"newOperations":104793,"oldAttemptedPeak":19368,"newAttemptedPeak":12904,"oldRetained":6552,"newRetained":6552,"triangles":48,"exactOutputAndExposedWitnessMatch":true}
+STYLE_INPUT_STORAGE {"fixture":"SH017","before":85864,"after":44304,"operations":394930}
+STYLE_STORAGE_COMPLETE {"fixture":"buried","oldOperations":44726,"newOperations":42344,"oldAttemptedPeak":7248,"newAttemptedPeak":4340,"oldRetained":2016,"newRetained":2016,"triangles":12}
+REGION_STORAGE_COMPLETE {"fixture":"buried","oldOperations":41768,"newOperations":42344,"oldAttemptedPeak":6836,"newAttemptedPeak":4340,"oldRetained":2016,"newRetained":2016,"triangles":12}
+BOUNDS_CACHE_COMPLETE {"fixture":"buried","oldOperations":44773,"newOperations":42344,"oldAttemptedPeak":6836,"newAttemptedPeak":4340,"oldRetained":2016,"newRetained":2016,"triangles":12}
+EXACT_PRUNING_COMPLETE {"fixture":"buried","oldOperations":49342,"newOperations":42321,"oldAttemptedPeak":9940,"newAttemptedPeak":4752,"oldRetained":2724,"newRetained":2016,"triangles":12,"exactOutputAndExposedWitnessMatch":true}
+STYLE_INPUT_STORAGE {"fixture":"SH166","before":77128,"after":39824,"operations":344631}
+test adapter::tests::original_style_pool_preserves_exact_text_and_counts_only_shared_allocations ... ok
+STYLE_STORAGE_COMPLETE {"fixture":"shared_face","oldOperations":65981,"newOperations":64359,"oldAttemptedPeak":11056,"newAttemptedPeak":6484,"oldRetained":3360,"newRetained":3360,"triangles":20}
+BOUNDS_CACHE_COMPLETE {"fixture":"shared_face","oldOperations":66028,"newOperations":64359,"oldAttemptedPeak":10644,"newAttemptedPeak":6484,"oldRetained":3360,"newRetained":3360,"triangles":20}
+REGION_STORAGE_COMPLETE {"fixture":"shared_face","oldOperations":63415,"newOperations":64359,"oldAttemptedPeak":10644,"newAttemptedPeak":6484,"oldRetained":3360,"newRetained":3360,"triangles":20}
+EXACT_PRUNING_COMPLETE {"fixture":"shared_face","oldOperations":66170,"newOperations":64336,"oldAttemptedPeak":12108,"newAttemptedPeak":6896,"oldRetained":3636,"newRetained":3360,"triangles":20,"exactOutputAndExposedWitnessMatch":true}
+BOUNDS_CACHE_COMPLETE {"fixture":"four_disconnected","oldOperations":148529,"newOperations":135092,"oldAttemptedPeak":24980,"newAttemptedPeak":14996,"oldRetained":8064,"newRetained":8064,"triangles":48}
+STYLE_STORAGE_COMPLETE {"fixture":"four_disconnected","oldOperations":148434,"newOperations":135092,"oldAttemptedPeak":25824,"newAttemptedPeak":14996,"oldRetained":8064,"newRetained":8064,"triangles":48}
+REGION_STORAGE_COMPLETE {"fixture":"four_disconnected","oldOperations":132836,"newOperations":135092,"oldAttemptedPeak":24980,"newAttemptedPeak":14996,"oldRetained":8064,"newRetained":8064,"triangles":48}
+EXACT_PRUNING_COMPLETE {"fixture":"four_disconnected","oldOperations":163544,"newOperations":135045,"oldAttemptedPeak":25824,"newAttemptedPeak":15840,"oldRetained":8064,"newRetained":8064,"triangles":48,"exactOutputAndExposedWitnessMatch":true}
+BOUNDS_CACHE_COMPLETE {"fixture":"eight_oblique_disconnected","oldOperations":364489,"newOperations":301212,"oldAttemptedPeak":49812,"newAttemptedPeak":29844,"oldRetained":16128,"newRetained":16128,"triangles":96}
+REGION_STORAGE_COMPLETE {"fixture":"eight_oblique_disconnected","oldOperations":296700,"newOperations":301212,"oldAttemptedPeak":49812,"newAttemptedPeak":29844,"oldRetained":16128,"newRetained":16128,"triangles":96}
+STYLE_STORAGE_COMPLETE {"fixture":"eight_oblique_disconnected","oldOperations":364298,"newOperations":301212,"oldAttemptedPeak":51520,"newAttemptedPeak":29844,"oldRetained":16128,"newRetained":16128,"triangles":96}
+test pruning::complete_bounds_cache_controls_preserve_fields_witnesses_and_reduce_work ... ok
+test pruning::complete_region_storage_controls_preserve_all_fields_and_reduce_peak ... ok
+test pruning::complete_style_storage_controls_preserve_all_fields_witnesses_and_refusals ... ok
+
+thread 'pruning::complete_forward_ray_controls_preserve_all_fields_witnesses_and_charged_work' (1349) panicked at crates/meridian-geometry/src/pruning.rs:694:9:
+subdivided_identity: oldOperations=440444 newOperations=461042
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test pruning::complete_forward_ray_controls_preserve_all_fields_witnesses_and_charged_work ... FAILED
+EXACT_PRUNING_COMPLETE {"fixture":"eight_oblique_disconnected","oldOperations":440797,"newOperations":301117,"oldAttemptedPeak":51520,"newAttemptedPeak":31552,"oldRetained":16128,"newRetained":16128,"triangles":96,"exactOutputAndExposedWitnessMatch":true}
+test pruning::complete_frozen_solids_preserve_all_exposed_fields_witnesses_and_charged_work ... ok
+
+failures:
+
+failures:
+    pruning::complete_forward_ray_controls_preserve_all_fields_witnesses_and_charged_work
+
+test result: FAILED. 15 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.65s
+
+error: test failed, to rerun pass `-p meridian-geometry --lib`

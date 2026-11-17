@@ -1,0 +1,83 @@
+{
+  "observedAt": "2026-11-17T01:36:02.378443+00:00",
+  "head": "1e25a4433a2d54265219c902d9c99e5cc10579a6",
+  "tree": "d26acfba4949f4156217b3ef6af21aed34fd6004",
+  "sourcePinsVerified": 276,
+  "status": "TERMINAL_FAIL;ROOT_AFTER_START_DELAYED_AUDIT_NOT_LIVE",
+  "processesObserved": [],
+  "binary": [
+    {
+      "path": "/home/sclarke/setup-work/station-linux-target/debug/deps/meridian_geometry-11342b9e8901f50d",
+      "bytes": 30524872,
+      "sha256": "9ee746b1b240d3e3c0870d0bd9e924ef0bcb49d52a96d71d50cbe94a66ea620c"
+    }
+  ],
+  "raw": "evidence/MERIDIAN-1E25A44-FOCUSED-AFTER-START-ROOT-RAW.json",
+  "result": "checkPASS;15libPASS1strictworkFAIL;17remainingRust9hostClippydevbuildwholefiveUNRUN",
+  "failure": {
+    "test": "pruning::complete_forward_ray_controls_preserve_all_fields_witnesses_and_charged_work",
+    "fixture": "subdivided_identity",
+    "oldOperations": 440444,
+    "newOperations": 461042,
+    "location": "pruning.rs:694:9"
+  },
+  "terminal": {
+    "exit": 101,
+    "head": "1e25a4433a2d54265219c902d9c99e5cc10579a6",
+    "tree": "d26acfba4949f4156217b3ef6af21aed34fd6004",
+    "utc": "2026-11-17T01:34:30.939086+00:00",
+    "wrapperPID": 367,
+    "measured": {},
+    "prerequisiteJobs": [
+      {
+        "name": "check",
+        "pid": 545,
+        "command": [
+          "cargo",
+          "check",
+          "--locked",
+          "-p",
+          "meridian-geometry",
+          "--all-targets"
+        ],
+        "exit": 0,
+        "elapsedSeconds": 1.6856028680000001,
+        "finishedUTC": "2026-11-17T01:34:15.664064+00:00",
+        "log": {
+          "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-1e25a44/linux/check.log",
+          "bytes": 184,
+          "sha256": "669832affdbc804a134bb09cf2c1b69bc7ed514e16d87a2d4b7c14cb42c9c0f6"
+        }
+      },
+      {
+        "name": "test",
+        "pid": 598,
+        "command": [
+          "cargo",
+          "test",
+          "--locked",
+          "-p",
+          "meridian-geometry",
+          "--",
+          "--nocapture"
+        ],
+        "exit": 101,
+        "elapsedSeconds": 15.239628393999999,
+        "finishedUTC": "2026-11-17T01:34:30.923895+00:00",
+        "log": {
+          "path": "/mnt/c/Users/steph/Documents/Codex/2026-11-16/th/outputs/geometry-1e25a44/linux/test.log",
+          "bytes": 7917,
+          "sha256": "e60e400b93f85bd671b5acd13904feecb0d7979c24cc1cc2113235bbc8e44feb"
+        }
+      }
+    ]
+  },
+  "limitation": "One read-only remote audit transport failed due oversized inline command; changed compressed audit succeeded. No test rerun. Actual processes ended before Root observation; no inventedLIVE or cure/candidate/admission.",
+  "sealedHandoff": {
+    "path": "/Users/sclarke/.local/share/development-resources/latitude7420/geometry-1e25a44/GEOMETRY-1E25A44-FOCUSED-FAILURE-HANDOFF.json",
+    "bytes": 22786,
+    "sha256": "9ee397cd7e4bb5f31a21489631d17d5002c64aef1ab5903033b1399bf763a033",
+    "listedLeavesIndependentlyVerified": 24,
+    "scope": "Actualcopiedrawfailureartifacts;notcompilerororiginalbatchrerun"
+  }
+}

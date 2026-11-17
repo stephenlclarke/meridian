@@ -1,0 +1,16 @@
+{
+  "phase": "BEFORE_MEASURED_PLANE_CACHE_CORRECTION_AUTHORING",
+  "parentAuthorHead": "b5a4c1cd3c85ec2de19b27d8db8078000eede86e",
+  "failedRootJoin": "1e25a44",
+  "reference": "Parent certificate production prefix, trailing whitespace normalized only; original full controls and all references unchanged.",
+  "files": {
+    "CASES.json": {
+      "bytes": 828,
+      "sha256": "7c6ee9ce3aa3b2117b6e554aec81118076b691ebe4bad2d25d34c92f98543aff"
+    },
+    "before-certificate.rs": {
+      "bytes": 51317,
+      "sha256": "e6f2f8452a4af3634b0ecf7fd28706aa5c0fb5e63dd026fb84e268382eb00dc2"
+    }
+  }
+}

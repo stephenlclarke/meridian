@@ -1,0 +1,73 @@
+{
+  "parentAuthorHead": "b5a4c1cd3c85ec2de19b27d8db8078000eede86e",
+  "failedParentJoin": "1e25a4433a2d54265219c902d9c99e5cc10579a6",
+  "failedParentTree": "d26acfba4949f4156217b3ef6af21aed34fd6004",
+  "parentHandoffSHA256": "9ee397cd7e4bb5f31a21489631d17d5002c64aef1ab5903033b1399bf763a033",
+  "parentAuditSHA256": "444b00664d65e6b01d0b1940114be0d6fe08e0f4877526b057bd55912bf3f468",
+  "parentTestLogSHA256": "e60e400b93f85bd671b5acd13904feecb0d7979c24cc1cc2113235bbc8e44feb",
+  "parentActualLibTests": {
+    "passed": 15,
+    "failed": 1,
+    "ignored": 0,
+    "filtered": 0,
+    "wallSeconds": 11.65
+  },
+  "parentFailure": {
+    "test": "pruning::complete_forward_ray_controls_preserve_all_fields_witnesses_and_charged_work",
+    "file": "crates/meridian-geometry/src/pruning.rs",
+    "line": 694,
+    "column": 9,
+    "fixture": "subdivided_identity",
+    "assertion": "new.operations() < old.operations()",
+    "operationValues": {
+      "oldOperations": 440444,
+      "newOperations": 461042,
+      "scope": "Current1e25 actual failure message only; prior879 counts remain UNREPORTED"
+    }
+  },
+  "measuredWork": {
+    "fixture": "subdivided_identity",
+    "old": 440444,
+    "new": 461042,
+    "excess": 20598,
+    "interpretation": "Actual strict work assertion failed after geometry/volume/witness/public verification. Not a passing control; buried fixture and remaining targets unrun."
+  },
+  "unrun": [
+    "Remaining Rust test binaries",
+    "9 host tests",
+    "strict Clippy",
+    "dev original_five build",
+    "original whole-five"
+  ],
+  "beforeSUTFreezeSHA256": "e58d9bcbb9ef05adac1148a6ea6f66e691bce3c5cd61b9236c98f59885acb6c8",
+  "causalFinding": "The shared interval still failed the fixed complete control by20598charged operations. That108facet cube has six repeated exact raw plane equations,18facets per equation. Both flat and indexed implementations recompute identical plane parameters/hit coordinates and repeat the same coordinate guard for every such facet. Retain each facet test, but share the already-computed, validated immutable plane result within one ray attempt. This removes actual duplicate arithmetic/validation rather than changing their prices. No measured whole-original hotspot or cure is inferred.",
+  "correction": [
+    "Build owner-local exact coefficient IDs only when a large owner exists, after all original source audits. Key includes owner ID, the unnormalized normal vector and exact offset; no proportional-plane normalization, geometry merging or field substitution. Temporary map borrows immutable source coefficients and drops before its reservation releases.",
+    "Guard persistent Nordinal records, three records per owner count and8headers. Guard temporary borrowed-key entries5each plus8builder scratch, and the temporary large-owner selector2each plus8scratch. Charge source visits, ordinal initialization, all tree lookups and count updates. Drop/roll back newly created records on error. Release persistent plane metadata with the spatial index before final noding.",
+    "For a repeated-equation owner, scan its facets in the original order with the original per-facet visit price. On the first local plane use in that attempt, add one plane-computation charge, compute exact Miss/Coplanar/Hit using original arithmetic and run all original hit-coordinate bit checks before storing. Reuse the immutable validated result on later equal equations.",
+    "Every facet still performs its individual contains(origin) for coplanar ambiguity or contains(hit) for hit/edge/parity. No facet contact is aggregated, counted once per plane or skipped. Return/retry immediately on the same first ambiguous facet. Fresh scoped cache for every owner/sample/direction attempt, no cross-attempt state.",
+    "Guard8records per plane slot plus8cache headers, charge all slot initialization. The unchanged32facet cutoff keeps small owners flat. Owners without enough repeated equations retain the exact interval path. Cache planning compares2G+actual owner-lookup price against maximum3(F-G)saved coordinate checks; this is an execution cost bound, not a resource/test threshold change or a promise that every ray saves work."
+  ],
+  "proof": "Equal owner/raw normal/offset keys yield identical denominator, numerator, ray parameter and hit for one immutable origin/direction. A hit already passed the original coordinate guard before reuse. Individual triangle containment and ambiguity/parity execute unchanged and in the same order. Different raw scales or owners get separate local IDs/cache frames. Thus reuse cannot merge contacts, alter fields or remove a parity contribution.",
+  "newRegression": "Interleaved owners, two triangles sharing one equation, separate raw-scaled equation, positive/backward hits, shared-edge ambiguity and coplanar-origin ambiguity. Explicit stable local IDs/counts. Builder owns19records, guarded temporary peak42, two-plane ray owns24: exact43cap admits;42refuses cache admission and releases;41refuses builder and rolls back. Full existing108/120strict controls are byte exact.",
+  "unchanged": [
+    "All33existing tests and strict lower complete-work assertion including counter message, entire108/120input construction and frozen references.",
+    "Spatial index build/ordinary query, interval predicates/traversal and exact flat parity helper.",
+    "Source/decoder/budget/region/arrangement/exact modules, all assets, source fields, protected contacts, aggregate witnesses and global proof.",
+    "2Moperations/100kmemberships/4096source-outputbits/512completecandidatefaces; all existing guard calls and prices. No retry, cap change, counter discount, threshold waiver, contact shortcut or new dependency."
+  ],
+  "currentCompilerTests": "UNRUN",
+  "currentOriginalFive": "HELD pending oneG2delta review and changed owner qualification",
+  "parentEvidenceVerification": {
+    "listedArtifactsVerifiedLocally": 23,
+    "unitBytes": 30524872,
+    "unitSHA256": "9ee746b1b240d3e3c0870d0bd9e924ef0bcb49d52a96d71d50cbe94a66ea620c",
+    "RootObservation": "After actual START but processes ended; DELAYED."
+  },
+  "newCandidates": 0,
+  "newFleetAdmissions": 0,
+  "workSavingOrMinimumClaim": false,
+  "allOriginalShipsRemainInScope": true,
+  "priorFailuresAndAdverseWorkPreserved": true,
+  "previewIndependent": true
+}

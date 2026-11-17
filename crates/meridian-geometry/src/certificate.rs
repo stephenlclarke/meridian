@@ -1,4 +1,5 @@
 use crate::exact::{add, area, cross, dot, orient, point, project, scale, sub};
+use crate::planes::PlaneGroups;
 use crate::region::PackedRegion;
 use crate::{
     Arrangement, Budget, Cell, Facet, Failure, FailureKind, Point2, Point3, Rational, SourceId,
@@ -532,6 +533,41 @@ fn component_bounds(
     Ok(result)
 }
 
+struct OccupancyIndex<'a> {
+    spatial: &'a FacetBoundsIndex,
+    planes: Option<&'a PlaneGroups>,
+}
+fn build_plane_groups(
+    originals: &[Facet],
+    owners: &BTreeMap<u32, ComponentBounds>,
+    b: &mut Budget,
+) -> Result<Option<PlaneGroups>, Failure> {
+    let entry = b.retained_memberships();
+    let result = b.with_retained(8, |b| {
+        let mut large = BTreeSet::new();
+        for (owner, group) in owners {
+            b.step(1)?;
+            if group.facets > 4 * FacetBoundsIndex::LEAF_SIZE {
+                log_cost(large.len(), b)?;
+                b.retain(2)?;
+                large.insert(*owner);
+            }
+        }
+        if large.is_empty() {
+            return Ok(None);
+        }
+        let result = PlaneGroups::build(originals, &large, b);
+        let members = 2 * large.len();
+        drop(large);
+        b.release(members);
+        result.map(Some)
+    });
+    if result.is_err() {
+        b.release(b.retained_memberships() - entry);
+    }
+    result
+}
+
 fn ray_parity<'a>(
     faces: impl Iterator<Item = &'a Facet>,
     p: &Point3,
@@ -572,7 +608,7 @@ fn occupied(
     normal: &Point3,
     originals: &[Facet],
     owners: &BTreeMap<u32, ComponentBounds>,
-    index: &FacetBoundsIndex,
+    index: &OccupancyIndex<'_>,
     b: &mut Budget,
 ) -> Result<bool, Failure> {
     for (owner, group) in owners {
@@ -606,8 +642,36 @@ fn occupied(
                     b,
                 )?
             } else {
+                let repeated = match index.planes {
+                    Some(planes) => {
+                        let count = planes.count(*owner, b)?;
+                        // Count initialization, one computation per equation and
+                        // this lookup against the maximum saved coordinate checks.
+                        planes
+                            .can_amortize(group.facets, count)
+                            .then_some((planes, count))
+                    }
+                    None => None,
+                };
+                if let Some((planes, count)) = repeated {
+                    let result = planes.parity(
+                        count,
+                        originals
+                            .iter()
+                            .enumerate()
+                            .filter(|(_, face)| face.id().component == *owner),
+                        p,
+                        &direction,
+                        b,
+                    )?;
+                    match result {
+                        None => continue,
+                        Some(true) => return Ok(true),
+                        Some(false) => break,
+                    }
+                }
                 b.with_retained(originals.len(), |b| {
-                    let candidates = index.ray_intersections(
+                    let candidates = index.spatial.ray_intersections(
                         p,
                         &direction,
                         originals,
@@ -637,7 +701,7 @@ fn visible(
     sample: &Point2,
     originals: &[Facet],
     owners: &BTreeMap<u32, ComponentBounds>,
-    index: &FacetBoundsIndex,
+    index: &OccupancyIndex<'_>,
     coplanar: &[&Facet],
     b: &mut Budget,
 ) -> Result<bool, Failure> {
@@ -902,6 +966,12 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
     b.retain(facet_bounds_members)?;
     let facet_bounds = FacetBoundsIndex::build(originals, b)?;
     let owner_bounds = component_bounds(originals, &facet_bounds.facets, b)?;
+    let plane_groups = build_plane_groups(originals, &owner_bounds, b)?;
+    let plane_members = plane_groups.as_ref().map_or(0, PlaneGroups::memberships);
+    let occupancy_index = OccupancyIndex {
+        spatial: &facet_bounds,
+        planes: plane_groups.as_ref(),
+    };
     let mut regions = Vec::new();
     let mut all_points = BTreeSet::new();
     let mut point_members = 0;
@@ -943,7 +1013,7 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
                     sample,
                     originals,
                     &owner_bounds,
-                    &facet_bounds,
+                    &occupancy_index,
                     &coplanar,
                     local,
                 )
@@ -987,7 +1057,8 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
     }
     drop(owner_bounds);
     drop(facet_bounds);
-    b.release(bounds_members + facet_bounds_members);
+    drop(plane_groups);
+    b.release(bounds_members + facet_bounds_members + plane_members);
     let mut triangles = Vec::new();
     let mut witnesses = Vec::new();
     for (source, region) in regions {

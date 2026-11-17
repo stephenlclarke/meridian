@@ -168,6 +168,11 @@
       "file": "src/certificate.rs",
       "name": "certificate::tests::closed_ray_intervals_reject_skew_boxes_and_preserve_ordered_exact_parity",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/planes.rs",
+      "name": "planes::tests::exact_plane_cache_preserves_individual_contacts_and_guarded_lifetimes",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -376,5 +381,22 @@
     "strictWorkAssertionPreserved": true,
     "currentExecution": "UNRUN",
     "newTestCount": 33
+  },
+  "planeCacheCorrection": {
+    "failedParentJoin": "1e25a4433a2d54265219c902d9c99e5cc10579a6",
+    "parentHandoffSHA256": "9ee397cd7e4bb5f31a21489631d17d5002c64aef1ab5903033b1399bf763a033",
+    "deltaSHA256": "3835c20443c848df0086599f9bda4c4a9536235dd54f9998a6d44131b1c4e241",
+    "beforeSUTFreezeSHA256": "e58d9bcbb9ef05adac1148a6ea6f66e691bce3c5cd61b9236c98f59885acb6c8",
+    "parentLibPass": 15,
+    "parentLibFail": 1,
+    "parentRemainingRustUnrun": 17,
+    "parentHostClippyBuildOriginal": "UNRUN",
+    "measuredWork": [
+      440444,
+      461042
+    ],
+    "strictConditionAndAll33TestsByteExact": true,
+    "currentExecution": "UNRUN",
+    "newTestCount": 34
   }
 }
