@@ -68,14 +68,90 @@ fn clip(domain: &[Point2], segment: &Segment, b: &mut Budget) -> Result<Option<S
     Ok(Some(key(result)))
 }
 
+fn clip_reusing_endpoints(
+    domain: &[Point2],
+    segment: &Segment,
+    b: &mut Budget,
+) -> Result<Option<Segment>, Failure> {
+    let [first, second] = segment;
+    point(first, b)?;
+    point(second, b)?;
+    let (mut low, mut high) = (integer(0), integer(1));
+    let mut changed = [false; 2];
+    for i in 0..domain.len() {
+        let a = &domain[i];
+        let c = &domain[(i + 1) % domain.len()];
+        let x = orient(a, c, first, b)?;
+        let y = orient(a, c, second, b)?;
+        if x.is_negative() && y.is_negative() {
+            return Ok(None);
+        }
+        if x.is_negative() {
+            changed[0] = true;
+            low = low.max(&x / (&x - &y));
+        } else if y.is_negative() {
+            changed[1] = true;
+            high = high.min(&x / (&x - &y));
+        }
+    }
+    if low > high {
+        return Ok(None);
+    }
+    if !changed[0] && !changed[1] {
+        return Ok(Some(key(segment.clone())));
+    }
+    let delta = sub(second, first);
+    let a = if changed[0] {
+        let p = add(first, &scale(&delta, &low));
+        point(&p, b)?;
+        p
+    } else {
+        first.clone()
+    };
+    let c = if changed[1] {
+        let p = add(first, &scale(&delta, &high));
+        point(&p, b)?;
+        p
+    } else {
+        second.clone()
+    };
+    Ok(Some(key([a, c])))
+}
+
 impl Arrangement {
     /// Finite clipped constraints and exact sampling, ported from PlanarArrangement.
     /// `visible` receives a strict interior sample of one fully noded atomic region.
+    #[cfg(test)]
     pub(crate) fn build_accounted<F>(
         domain: &[Point2],
         barriers: &[Segment],
         b: &mut Budget,
+        visible: F,
+    ) -> Result<Self, Failure>
+    where
+        F: FnMut(&Point2, &mut Budget) -> Result<bool, Failure>,
+    {
+        Self::build_mode(domain, barriers, b, visible, false)
+    }
+
+    pub(crate) fn build_source<F>(
+        domain: &[Point2],
+        barriers: &[Segment],
+        b: &mut Budget,
+        visible: F,
+    ) -> Result<Self, Failure>
+    where
+        F: FnMut(&Point2, &mut Budget) -> Result<bool, Failure>,
+    {
+        Self::build_mode(domain, barriers, b, visible, true)
+    }
+
+    fn build_mode<F>(
+        domain: &[Point2],
+        barriers: &[Segment],
+        b: &mut Budget,
         mut visible: F,
+        reuse: bool,
     ) -> Result<Self, Failure>
     where
         F: FnMut(&Point2, &mut Budget) -> Result<bool, Failure>,
@@ -122,11 +198,22 @@ impl Arrangement {
         let mut events = BTreeSet::new();
         let mut work = ArrangementWork::default();
         let mut base = domain.len() * 4 + barriers.len() * 6 + 64;
-        for segment in (0..domain.len())
+        for (ordinal, segment) in (0..domain.len())
             .map(|i| [domain[i].clone(), domain[(i + 1) % domain.len()].clone()])
             .chain(barriers.iter().cloned())
+            .enumerate()
         {
-            if let Some(value) = clip(domain, &segment, b)? {
+            let clipped = if reuse && ordinal < domain.len() {
+                // Domain validation already proved both original corners and
+                // every domain edge lies in this closed convex domain.
+                b.step(1)?;
+                Some(key(segment))
+            } else if reuse {
+                clip_reusing_endpoints(domain, &segment, b)?
+            } else {
+                clip(domain, &segment, b)?
+            };
+            if let Some(value) = clipped {
                 b.state([
                     base,
                     segments.len(),

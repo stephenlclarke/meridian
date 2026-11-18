@@ -1,0 +1,27 @@
+# Exact source work removal
+
+## Contract
+
+Keep every original audit, physical cut, contact, source field, parity multiplicity, publication check and cap. Retain all 67 existing test bodies, frozen controls and complete-work assertions. This source is authored and UNRUN. G1 owns compiler and geometry execution; Root owns the serial workspace join; G2 reviews the whole source and relevant delta before execution.
+
+## Causal changes
+
+A certified original owner has every vertex on or below every borrowed outward support plane. On that owner's own exact support equation, an infinitesimal outward displacement has no triangle intersection with the owner. The fresh lookup checks the owner ID and exact normal/offset pair. Only oblique collection queries use this proof, because axis-aligned owner bounds already imply the same exclusion. It removes own-owner outward eligibility in the traversal. It preserves physical eligibility independently, even for the same owner, and preserves all other owners, empty parity rows, source ordering, coplanar field ties and original input triangles. No sampled value survives a query or ray.
+
+The immutable sorted certificate list already exists after closed, positive and embedded source audits. No new geometry index or membership is retained. Each owner or support equation binary-search comparison costs one operation. Query scratch retains 32 slots until lookup exits. The new collection wrapper restores its entry reservation on error. Nonconvex owners and unmatched equations retain the existing path.
+
+The source arrangement first validates every domain point, duplicate corner, convex half-plane and positive area. Each domain boundary edge is consequently already clipped. The new path visits it once and retains its exact endpoints without repeating endpoint checks, half-plane clipping, interpolation or output checks. Arbitrary barriers still check both original endpoints and every domain half-plane. Two Boolean flags record whether the existing negative-side decisions changed each clipping bound. Unchanged endpoints are reused. Only changed endpoints are interpolated and checked again. No rational predicate, performed geometry operation or price is silently removed. Existing workspace guards cover the smaller temporary state; every newly generated point still receives its coordinate guard.
+
+All physical constraints, protected points, slab events, cells, sampling callbacks, live corner reservations, packing, noding, triangulation, stars, source fields, witnesses, topology and publication limits remain. This is not a cheaper budget mode. The retained test control still performs the original clipping work and pays the original charges.
+
+## Independent controls and tests
+
+The before publisher, all four affected source files and their hashes were frozen from committed parent c0e1b4b before modification. The compiled publisher differs only in its function name. The original clip function is byte exact. Mechanical reconstruction proves the common false arrangement mode has the exact old body, guards and charges. The historical public arrangement implementation is unchanged and supplies a second independent oracle. Source inversions restore every changed production file to its complete frozen parent. The source proof compares each old test body against Git, including the 322, 108 and 120 complete-cost assertions.
+
+Four additional authored tests compare all arrangement cells, physical constraints, protected points and work records against both controls; all oblique sections, foreign physical cuts and parity results including proof construction; and complete publisher triangles, fields, witnesses and volume. They cover unmatched same-owner equations, invalid/reversed/duplicate domains, oversize original barrier coordinates, exact and one-short live storage, callback failure and collection/lookup rollback. Paired monotonic fixture durations are printed as machine-readable labelled records; a candidate at least ten times its matching reference fails. G1 must retain those raw records in its evidence and comparison matrix. The four tests remain UNRUN here.
+
+## Source-bound execution and limits
+
+Prior actual Root 463dccc passed 67 Rust and nine host tests, locked all-target check, strict Clippy and the development build. Its one changed original-five run passed all five decodes, refused every constructor on Operations, left 15 dependent bodies UNRUN and returned zero candidates. The retained prefix attribution identifies substantial sections and arrangement setup work. Prefix totals are not whole-case requirements and do not prove this change fits. Complete binding and terminal hashes are in CUSTODY.json. Existing raw artifacts remain untouched.
+
+The next sequence is one complete Root join, G2 whole-source and relevant delta review, then G1 focused 71 Rust and nine host tests, check, strict Clippy and build. Only if all pass, G1 runs one changed original-five batch with all 25 bodies and exact source, binary, lock, inputs, precleanup context and paired monotonic duration binding. No diagnostic, unchanged or duplicate execution. The separate 202-case matrix stays separate. The 2,000,000 operations including decode, 100,000 memberships, 4096-bit rational and 512 complete-triangle caps do not change. Fleet remains 23/162 ships and 4/6 stations with zero new admissions. No claim of current speed, complete fit, minimum work or native acceptance is made.

@@ -1,5 +1,13 @@
 # Meridian
 
+## Original section and arrangement work: source only
+
+The actual `463dccc` run passed 67 Rust tests, nine host tests, all-target check, strict Clippy and dev build. Its one original-five run still returned five Operations constructor refusals, fifteen dependent checks unrun and zero candidates. All original caps remain. The measured section and arrangement prefixes identify the next work to remove; they do not establish minimum total work or complete fit.
+
+The changed source uses existing audited convex-owner support equations to omit proved-empty own-owner outward sections on oblique queries while retaining physical cuts and every foreign query. Arrangement setup retains validated domain edges directly and reuses checked endpoints only when their clipping bounds never changed. Arbitrary barriers keep their original checks. Every performed comparison, lookup and visit remains charged; no sampled values, approximation or field averaging is introduced.
+
+All 67 prior test bodies and strict 322/108/120 assertions remain unchanged. Four new cases compare complete sections, arrangements, triangles, fields, witnesses and volume against frozen independent controls, including guards and one-short rollback. Current 71 Rust and nine host tests and the changed original-five run are **UNRUN**, pending source review and owning execution. No new hull, full-fit or measured speed claim is made.
+
 ## Strict-interior facet proof: source only
 
 Whole-source review found two missing accounting charges. The bounded correction adds the existing tree cost before actual owner-group inserts, one step per consumed group and one separate whole-box operation before a foreign strict containment test. The mathematical predicates, allocation lifetimes and all 66 prior tests are unchanged. A new focused guard checks insertion, consumed-group and outside-box budget refusals with exact cleanup. Current execution remains unrun.

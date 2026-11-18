@@ -1,0 +1,124 @@
+{
+  "certificate.rs": [
+    {
+      "afterStart": 1164,
+      "afterEnd": 1175,
+      "before": "            b.with_retained(16, |local| {\n                sections::Frame::collect(\n",
+      "after": "            b.with_retained(16, |local| match &interior {\n                Some(certificates) => sections::Frame::collect_certified(\n                    face,\n                    face_bounds,\n                    originals,\n                    &owner_bounds,\n                    &facet_bounds,\n                    certificates,\n                    local,\n                ),\n                None => sections::Frame::collect(\n"
+    },
+    {
+      "afterStart": 1181,
+      "afterEnd": 1182,
+      "before": "                )\n",
+      "after": "                ),\n"
+    },
+    {
+      "afterStart": 1193,
+      "afterEnd": 1194,
+      "before": "                    Arrangement::build_accounted(&domain, &barriers, budget, |sample, local| {\n",
+      "after": "                    Arrangement::build_source(&domain, &barriers, budget, |sample, local| {\n"
+    },
+    {
+      "afterStart": 2351,
+      "afterEnd": 2355,
+      "before": "",
+      "after": "\n#[cfg(test)]\n#[path = \"source_work_tests.rs\"]\nmod source_work_tests;\n"
+    }
+  ],
+  "sections.rs": [
+    {
+      "afterStart": 328,
+      "afterEnd": 340,
+      "before": "",
+      "after": "        self.collection_with_support(face, finite, owners, originals, None, b)\n    }\n\n    fn collection_with_support(\n        &self,\n        face: &Facet,\n        finite: &Bounds,\n        owners: &BTreeMap<u32, Vec<Segment>>,\n        originals: &[Facet],\n        certificates: Option<&super::strict_interior::InteriorCertificates<'_>>,\n        b: &mut Budget,\n    ) -> Result<Vec<(usize, bool, bool)>, Failure> {\n"
+    },
+    {
+      "afterStart": 342,
+      "afterEnd": 350,
+      "before": "",
+      "after": "            // Axis-aligned supporting planes are already exact for their owner\n            // boxes; only oblique planes can add a useful source-support proof.\n            let empty_own = match certificates {\n                Some(certificates) if plane.count > 1 => {\n                    certificates.source_outward_empty(face, b)?\n                }\n                _ => false,\n            };\n"
+    },
+    {
+      "afterStart": 365,
+      "afterEnd": 371,
+      "before": "                        log_cost(owners.len(), b)?;\n                        owners.contains_key(&owner)\n",
+      "after": "                        if empty_own && owner == face.id().component {\n                            false\n                        } else {\n                            log_cost(owners.len(), b)?;\n                            owners.contains_key(&owner)\n                        }\n"
+    },
+    {
+      "afterStart": 392,
+      "afterEnd": 396,
+      "before": "                        let outward = if outward_possible {\n",
+      "after": "                        let outward = if outward_possible\n                            && !(empty_own\n                                && originals[ordinal].id().component == face.id().component)\n                        {\n"
+    },
+    {
+      "afterStart": 515,
+      "afterEnd": 541,
+      "before": "        let result = Self::collect_admitted(face, finite, originals, owners, index, b);\n",
+      "after": "        let result = Self::collect_admitted(face, finite, originals, owners, index, None, b);\n        if result.is_err() {\n            b.release(b.retained_memberships() - entry);\n        }\n        result\n    }\n\n    pub(super) fn collect_certified<'a>(\n        face: &Facet,\n        finite: &Bounds,\n        originals: &'a [Facet],\n        owners: &BTreeMap<u32, ComponentBounds>,\n        index: &FacetBoundsIndex,\n        certificates: &super::strict_interior::InteriorCertificates<'_>,\n        b: &mut Budget,\n    ) -> Result<(Vec<Segment>, Vec<&'a Facet>, Self), Failure> {\n        let entry = b.retained_memberships();\n        let result = Self::collect_admitted(\n            face,\n            finite,\n            originals,\n            owners,\n            index,\n            Some(certificates),\n            b,\n        );\n"
+    },
+    {
+      "afterStart": 553,
+      "afterEnd": 554,
+      "before": "",
+      "after": "        certificates: Option<&super::strict_interior::InteriorCertificates<'_>>,\n"
+    },
+    {
+      "afterStart": 583,
+      "afterEnd": 594,
+      "before": "            let candidates =\n                index.collection_candidates(face, finite, &frame.owners, originals, b)?;\n",
+      "after": "            let candidates = match certificates {\n                Some(certificates) => index.collection_with_support(\n                    face,\n                    finite,\n                    &frame.owners,\n                    originals,\n                    Some(certificates),\n                    b,\n                )?,\n                None => index.collection_candidates(face, finite, &frame.owners, originals, b)?,\n            };\n"
+    }
+  ],
+  "section_arrangement.rs": [
+    {
+      "afterStart": 70,
+      "afterEnd": 120,
+      "before": "",
+      "after": "fn clip_reusing_endpoints(\n    domain: &[Point2],\n    segment: &Segment,\n    b: &mut Budget,\n) -> Result<Option<Segment>, Failure> {\n    let [first, second] = segment;\n    point(first, b)?;\n    point(second, b)?;\n    let (mut low, mut high) = (integer(0), integer(1));\n    let mut changed = [false; 2];\n    for i in 0..domain.len() {\n        let a = &domain[i];\n        let c = &domain[(i + 1) % domain.len()];\n        let x = orient(a, c, first, b)?;\n        let y = orient(a, c, second, b)?;\n        if x.is_negative() && y.is_negative() {\n            return Ok(None);\n        }\n        if x.is_negative() {\n            changed[0] = true;\n            low = low.max(&x / (&x - &y));\n        } else if y.is_negative() {\n            changed[1] = true;\n            high = high.min(&x / (&x - &y));\n        }\n    }\n    if low > high {\n        return Ok(None);\n    }\n    if !changed[0] && !changed[1] {\n        return Ok(Some(key(segment.clone())));\n    }\n    let delta = sub(second, first);\n    let a = if changed[0] {\n        let p = add(first, &scale(&delta, &low));\n        point(&p, b)?;\n        p\n    } else {\n        first.clone()\n    };\n    let c = if changed[1] {\n        let p = add(first, &scale(&delta, &high));\n        point(&p, b)?;\n        p\n    } else {\n        second.clone()\n    };\n    Ok(Some(key([a, c])))\n}\n\n"
+    },
+    {
+      "afterStart": 123,
+      "afterEnd": 124,
+      "before": "",
+      "after": "    #[cfg(test)]\n"
+    },
+    {
+      "afterStart": 128,
+      "afterEnd": 152,
+      "before": "",
+      "after": "        visible: F,\n    ) -> Result<Self, Failure>\n    where\n        F: FnMut(&Point2, &mut Budget) -> Result<bool, Failure>,\n    {\n        Self::build_mode(domain, barriers, b, visible, false)\n    }\n\n    pub(crate) fn build_source<F>(\n        domain: &[Point2],\n        barriers: &[Segment],\n        b: &mut Budget,\n        visible: F,\n    ) -> Result<Self, Failure>\n    where\n        F: FnMut(&Point2, &mut Budget) -> Result<bool, Failure>,\n    {\n        Self::build_mode(domain, barriers, b, visible, true)\n    }\n\n    fn build_mode<F>(\n        domain: &[Point2],\n        barriers: &[Segment],\n        b: &mut Budget,\n"
+    },
+    {
+      "afterStart": 153,
+      "afterEnd": 154,
+      "before": "",
+      "after": "        reuse: bool,\n"
+    },
+    {
+      "afterStart": 200,
+      "afterEnd": 201,
+      "before": "        for segment in (0..domain.len())\n",
+      "after": "        for (ordinal, segment) in (0..domain.len())\n"
+    },
+    {
+      "afterStart": 203,
+      "afterEnd": 204,
+      "before": "",
+      "after": "            .enumerate()\n"
+    },
+    {
+      "afterStart": 205,
+      "afterEnd": 216,
+      "before": "            if let Some(value) = clip(domain, &segment, b)? {\n",
+      "after": "            let clipped = if reuse && ordinal < domain.len() {\n                // Domain validation already proved both original corners and\n                // every domain edge lies in this closed convex domain.\n                b.step(1)?;\n                Some(key(segment))\n            } else if reuse {\n                clip_reusing_endpoints(domain, &segment, b)?\n            } else {\n                clip(domain, &segment, b)?\n            };\n            if let Some(value) = clipped {\n"
+    }
+  ],
+  "strict_interior.rs": [
+    {
+      "afterStart": 145,
+      "afterEnd": 182,
+      "before": "",
+      "after": "    // Query the exact coefficient pair, not merely a matching owner ID.\n    // Original support references remain sorted by their equation-map keys.\n    pub(super) fn source_outward_empty(\n        &self,\n        face: &Facet,\n        b: &mut Budget,\n    ) -> Result<bool, Failure> {\n        b.with_retained(32, |b| {\n            let (mut low, mut high) = (0, self.owners.len());\n            while low < high {\n                b.step(1)?;\n                let middle = low + (high - low) / 2;\n                let owner = &self.owners[middle];\n                match owner.id.cmp(&face.id().component) {\n                    std::cmp::Ordering::Less => low = middle + 1,\n                    std::cmp::Ordering::Greater => high = middle,\n                    std::cmp::Ordering::Equal => {\n                        let (mut first, mut end) = (0, owner.planes.len());\n                        while first < end {\n                            b.step(1)?;\n                            let at = first + (end - first) / 2;\n                            let source = owner.planes[at];\n                            match (source.normal(), source.offset())\n                                .cmp(&(face.normal(), face.offset()))\n                            {\n                                std::cmp::Ordering::Less => first = at + 1,\n                                std::cmp::Ordering::Greater => end = at,\n                                std::cmp::Ordering::Equal => return Ok(true),\n                            }\n                        }\n                        return Ok(false);\n                    }\n                }\n            }\n            Ok(false)\n        })\n    }\n"
+    }
+  ]
+}

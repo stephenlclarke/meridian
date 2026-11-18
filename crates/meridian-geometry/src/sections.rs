@@ -326,8 +326,28 @@ impl FacetBoundsIndex {
         originals: &[Facet],
         b: &mut Budget,
     ) -> Result<Vec<(usize, bool, bool)>, Failure> {
+        self.collection_with_support(face, finite, owners, originals, None, b)
+    }
+
+    fn collection_with_support(
+        &self,
+        face: &Facet,
+        finite: &Bounds,
+        owners: &BTreeMap<u32, Vec<Segment>>,
+        originals: &[Facet],
+        certificates: Option<&super::strict_interior::InteriorCertificates<'_>>,
+        b: &mut Budget,
+    ) -> Result<Vec<(usize, bool, bool)>, Failure> {
         b.with_retained(Self::stack_members(self.facets.len()) + 8, |b| {
             let plane = OutwardPlane::new(face, b)?;
+            // Axis-aligned supporting planes are already exact for their owner
+            // boxes; only oblique planes can add a useful source-support proof.
+            let empty_own = match certificates {
+                Some(certificates) if plane.count > 1 => {
+                    certificates.source_outward_empty(face, b)?
+                }
+                _ => false,
+            };
             // Four fields per pending node fit the existing eight-membership
             // per-depth bound. Carry both exclusions to the descendants.
             let mut pending = vec![(self.root, true, true, false)];
@@ -343,8 +363,12 @@ impl FacetBoundsIndex {
                 // outward section; physical cuts remain independently eligible.
                 let owner_allowed = if outward_possible && !owner_known {
                     if let Some(owner) = node.owner {
-                        log_cost(owners.len(), b)?;
-                        owners.contains_key(&owner)
+                        if empty_own && owner == face.id().component {
+                            false
+                        } else {
+                            log_cost(owners.len(), b)?;
+                            owners.contains_key(&owner)
+                        }
                     } else {
                         true
                     }
@@ -366,7 +390,10 @@ impl FacetBoundsIndex {
                         let ordinal = self.source_ordinal(position);
                         let bounds = &self.facets[ordinal];
                         let physical = physical_possible && finite.meets(bounds, b)?;
-                        let outward = if outward_possible {
+                        let outward = if outward_possible
+                            && !(empty_own
+                                && originals[ordinal].id().component == face.id().component)
+                        {
                             let owner_allowed = if node.owner.is_some() {
                                 true
                             } else {
@@ -486,7 +513,32 @@ impl Frame {
         b: &mut Budget,
     ) -> Result<(Vec<Segment>, Vec<&'a Facet>, Self), Failure> {
         let entry = b.retained_memberships();
-        let result = Self::collect_admitted(face, finite, originals, owners, index, b);
+        let result = Self::collect_admitted(face, finite, originals, owners, index, None, b);
+        if result.is_err() {
+            b.release(b.retained_memberships() - entry);
+        }
+        result
+    }
+
+    pub(super) fn collect_certified<'a>(
+        face: &Facet,
+        finite: &Bounds,
+        originals: &'a [Facet],
+        owners: &BTreeMap<u32, ComponentBounds>,
+        index: &FacetBoundsIndex,
+        certificates: &super::strict_interior::InteriorCertificates<'_>,
+        b: &mut Budget,
+    ) -> Result<(Vec<Segment>, Vec<&'a Facet>, Self), Failure> {
+        let entry = b.retained_memberships();
+        let result = Self::collect_admitted(
+            face,
+            finite,
+            originals,
+            owners,
+            index,
+            Some(certificates),
+            b,
+        );
         if result.is_err() {
             b.release(b.retained_memberships() - entry);
         }
@@ -499,6 +551,7 @@ impl Frame {
         originals: &'a [Facet],
         owners: &BTreeMap<u32, ComponentBounds>,
         index: &FacetBoundsIndex,
+        certificates: Option<&super::strict_interior::InteriorCertificates<'_>>,
         b: &mut Budget,
     ) -> Result<(Vec<Segment>, Vec<&'a Facet>, Self), Failure> {
         b.retain(24)?;
@@ -528,8 +581,17 @@ impl Frame {
             0,
         ]);
         b.with_retained(3 * originals.len(), |b| {
-            let candidates =
-                index.collection_candidates(face, finite, &frame.owners, originals, b)?;
+            let candidates = match certificates {
+                Some(certificates) => index.collection_with_support(
+                    face,
+                    finite,
+                    &frame.owners,
+                    originals,
+                    Some(certificates),
+                    b,
+                )?,
+                None => index.collection_candidates(face, finite, &frame.owners, originals, b)?,
+            };
             for (ordinal, physical, outward) in candidates {
                 b.state([
                     frame.members,

@@ -1162,15 +1162,24 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
             domain.reverse();
         }
         let (mut barriers, coplanar, sections) = b.with_phase(BudgetPhase::Sections, |b| {
-            b.with_retained(16, |local| {
-                sections::Frame::collect(
+            b.with_retained(16, |local| match &interior {
+                Some(certificates) => sections::Frame::collect_certified(
+                    face,
+                    face_bounds,
+                    originals,
+                    &owner_bounds,
+                    &facet_bounds,
+                    certificates,
+                    local,
+                ),
+                None => sections::Frame::collect(
                     face,
                     face_bounds,
                     originals,
                     &owner_bounds,
                     &facet_bounds,
                     local,
-                )
+                ),
             })
         })?;
         prune_impossible_barriers(face, face_bounds, &mut barriers, b)?;
@@ -1182,7 +1191,7 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
         let arrangement_result = b.with_phase(BudgetPhase::ArrangementSetup, |b| {
             b.with_retained(coplanar.len(), |budget| {
                 let result =
-                    Arrangement::build_accounted(&domain, &barriers, budget, |sample, local| {
+                    Arrangement::build_source(&domain, &barriers, budget, |sample, local| {
                         match local.with_phase_state(
                             BudgetPhase::Occupancy,
                             local.state_values(),
@@ -2340,3 +2349,7 @@ mod spatial_index;
 
 #[path = "strict_interior.rs"]
 mod strict_interior;
+
+#[cfg(test)]
+#[path = "source_work_tests.rs"]
+mod source_work_tests;

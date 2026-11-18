@@ -5,6 +5,7 @@ import re
 import subprocess
 from pathlib import Path
 from strip_budget_context import body
+from restore_source_work import restore_source_work
 
 CRATE = Path(__file__).resolve().parents[1]
 REPO = CRATE.parents[1]
@@ -24,7 +25,7 @@ def verify():
             signature = 'fn ' + match[1] + '('
             assert body(current, signature) == body(old, signature), signature
     old = (f / 'before-strict_interior.rs').read_text()
-    current = (CRATE / 'src/strict_interior.rs').read_text()
+    current = restore_source_work('strict_interior.rs', (CRATE / 'src/strict_interior.rs').read_text())
     changes = [
         ('                b.retain(6)?;\n                log_cost(groups.len(), b)?;\n                groups.insert', '                b.retain(6)?;\n                groups.insert'),
         ('        for (id, (bounds, faces)) in groups {\n            b.step(1)?;\n            let group_members', '        for (id, (bounds, faces)) in groups {\n            let group_members'),

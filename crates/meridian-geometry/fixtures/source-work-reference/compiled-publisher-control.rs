@@ -1,0 +1,361 @@
+fn reference_source_work_publisher(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure> {
+    if originals.is_empty() {
+        return Err(b.fail(FailureKind::InvalidInput, "missing original components"));
+    }
+    b.guard(originals.len())?;
+    let mut input_members = Facet::input_memberships(originals, b)?;
+    b.retain(input_members)?;
+    let mut ids = BTreeSet::new();
+    let mut owners = BTreeSet::new();
+    for face in originals {
+        b.at(face.id());
+        b.step(1)?;
+        log_cost(ids.len(), b)?;
+        if !ids.insert(face.id()) {
+            return Err(b.fail(
+                FailureKind::InvalidInput,
+                "duplicate original facet identity",
+            ));
+        }
+        owners.insert(face.id().component);
+    }
+    b.with_phase(BudgetPhase::InputAudit, |b| {
+        audit_original_owner_ranges(originals, &owners, b)
+    })?;
+    b.with_phase(BudgetPhase::InputAudit, |b| {
+        audit_original_sheets(originals, b)
+    })?;
+    // One owner map plus the two transient facet boxes. Source audit maps
+    // have already been released, and this map releases before final noding.
+    let bounds_members = 11 * owners.len() + 32;
+    // Both authenticated identity sets have reached their last use. Their
+    // original geometry/style records remain admitted for all later phases.
+    input_members -= InputIdentityMaps { ids, owners }.release(b);
+    b.phase(BudgetPhase::Index);
+    b.state([
+        input_members,
+        bounds_members,
+        originals.len(),
+        0,
+        0,
+        0,
+        0,
+        0,
+    ]);
+    b.retain(bounds_members)?;
+    let facet_bounds_members = FacetBoundsIndex::memberships(originals.len());
+    b.retain(facet_bounds_members)?;
+    let facet_bounds = b.with_phase(BudgetPhase::Index, |b| {
+        FacetBoundsIndex::build(originals, b)
+    })?;
+    let owner_bounds = b.with_phase(BudgetPhase::Index, |b| {
+        component_bounds(originals, &facet_bounds.facets, b)
+    })?;
+    let interior = b.with_phase(BudgetPhase::InputAudit, |b| {
+        strict_interior::InteriorCertificates::build(originals, &owner_bounds, b)
+    })?;
+    let plane_groups = b.with_phase(BudgetPhase::Index, |b| {
+        build_plane_groups(originals, &owner_bounds, b)
+    })?;
+    let plane_members = plane_groups.as_ref().map_or(0, PlaneGroups::memberships);
+    let mut ray_caches = RayCaches::new(b)?;
+    let mut occupancy_index = OccupancyIndex {
+        spatial: &facet_bounds,
+        planes: plane_groups.as_ref(),
+        caches: &mut ray_caches,
+    };
+    let mut regions = Vec::new();
+    let mut all_points = BTreeSet::new();
+    let mut point_members = 0;
+    let mut held = 0usize;
+    for (face, face_bounds) in originals.iter().zip(&facet_bounds.facets) {
+        b.phase(BudgetPhase::Sections);
+        b.state([input_members, point_members, held, 0, 0, 0, 0, 0]);
+        b.at(face.id());
+        if let Some(certificates) = &interior
+            && certificates.strictly_covers(face, face_bounds, b)?
+        {
+            // Keep the authenticated source in every other facet's queries.
+            // Only this wholly interior facet's own empty publication is omitted.
+            continue;
+        }
+        let mut domain = face.domain().to_vec();
+        if area(&domain, b)?.is_negative() {
+            domain.reverse();
+        }
+        let (mut barriers, coplanar, sections) = b.with_phase(BudgetPhase::Sections, |b| {
+            b.with_retained(16, |local| {
+                sections::Frame::collect(
+                    face,
+                    face_bounds,
+                    originals,
+                    &owner_bounds,
+                    &facet_bounds,
+                    local,
+                )
+            })
+        })?;
+        prune_impossible_barriers(face, face_bounds, &mut barriers, b)?;
+        let parity_index = sections::ParityIndex::build(&sections, b)?;
+        // Transfer barrier ownership to the arrangement's existing input bound.
+        // Its coplanar scope below admits those references for classification.
+        b.release(8 * barriers.len() + coplanar.len());
+        let section_members = sections.memberships();
+        let arrangement_result = b.with_phase(BudgetPhase::ArrangementSetup, |b| {
+            b.with_retained(coplanar.len(), |budget| {
+                let result =
+                    Arrangement::build_accounted(&domain, &barriers, budget, |sample, local| {
+                        match local.with_phase_state(
+                            BudgetPhase::Occupancy,
+                            local.state_values(),
+                            |b| match &parity_index {
+                                Some(index) => index.occupied(sample, b),
+                                None => sections.occupied(sample, b),
+                            },
+                        )? {
+                            Some(true) => Ok(false),
+                            Some(false) => local.with_phase_state(
+                                BudgetPhase::Fields,
+                                local.state_values(),
+                                |b| sections::fields_visible(face, sample, &coplanar, b),
+                            ),
+                            // Keep the independent generic ray policy for a boundary
+                            // sample. The accounted callback admits its live scratch.
+                            None => local.with_phase_state(
+                                BudgetPhase::Occupancy,
+                                local.state_values(),
+                                |local| {
+                                    visible(
+                                        face,
+                                        sample,
+                                        originals,
+                                        &owner_bounds,
+                                        &mut occupancy_index,
+                                        &coplanar,
+                                        local,
+                                    )
+                                },
+                            ),
+                        }
+                    });
+                drop(coplanar);
+                result
+            })
+        });
+        let parity_members = parity_index.as_ref().map_or(0, |index| index.memberships());
+        drop(parity_index);
+        b.release(parity_members);
+        drop(sections);
+        b.release(section_members);
+        let arrangement = arrangement_result?;
+        drop(barriers);
+        // The original witness publisher retains no record for an invisible
+        // facet. Its authenticated original triangle remains in `originals`.
+        if arrangement.cells.is_empty() {
+            continue;
+        }
+        b.phase(BudgetPhase::GlobalPoints);
+        b.state([
+            point_members,
+            held,
+            arrangement.cells.len(),
+            arrangement.physical.len(),
+            arrangement.protected.len(),
+            0,
+            0,
+            0,
+        ]);
+        let reserve = PackedRegion::raw_memberships(
+            &arrangement.cells,
+            arrangement.physical.len(),
+            arrangement.protected.len(),
+        );
+        b.retain(reserve)?;
+        let region = b.with_phase(BudgetPhase::Packing, |b| PackedRegion::pack(arrangement, b))?;
+        b.release(reserve);
+        held += region.memberships();
+        regions.push((face, region));
+    }
+    let interior_members = interior
+        .as_ref()
+        .map_or(0, |certificates| certificates.memberships());
+    drop(interior);
+    b.release(interior_members);
+    drop(owner_bounds);
+    drop(facet_bounds);
+    drop(plane_groups);
+    let ray_members = ray_caches.memberships();
+    drop(ray_caches);
+    b.release(bounds_members + facet_bounds_members + plane_members + ray_members);
+    // The complete noding pool is needed only after all source-plane sections
+    // and indexes are dropped. Read precisely the packed cells/protected set;
+    // physical-only points do not enlarge the old pool.
+    for (face, region) in &regions {
+        b.at(face.id());
+        b.phase(BudgetPhase::GlobalPoints);
+        region.visit_noding_points(b, |p, b| {
+            let p = face.lift(p, b)?;
+            b.state([point_members, held, all_points.len(), 0, 0, 0, 0, 0]);
+            b.retain(8)?;
+            log_cost(all_points.len(), b)?;
+            if all_points.insert(p) {
+                point_members += 8;
+            } else {
+                b.release(8);
+            }
+            Ok(())
+        })?;
+    }
+    let mut triangles = Vec::new();
+    let mut witnesses = Vec::new();
+    for (source, region) in regions {
+        b.phase(BudgetPhase::Noding);
+        b.state([
+            input_members,
+            point_members,
+            held,
+            region.memberships(),
+            region.expanded_memberships(),
+            0,
+            0,
+            0,
+        ]);
+        b.at(source.id());
+        let packed_members = region.memberships();
+        let expanded_members = region.expanded_memberships();
+        b.retain(expanded_members)?;
+        let arrangement = region.expand(b)?;
+        let _work = arrangement.work;
+        b.release(packed_members);
+        held -= packed_members;
+        let mut planar = Vec::new();
+        let mut expected = integer(0);
+        for cell in &arrangement.cells {
+            expected += area(cell, b)?;
+            let noded = b.with_phase(BudgetPhase::Noding, |b| {
+                node_cell(source, cell, &all_points, b)
+            })?;
+            let new = b.with_phase(BudgetPhase::Triangulation, |b| triangulate(noded, b))?;
+            b.guard(32 * (planar.len() + new.len() + 1))?;
+            planar.extend(new);
+        }
+        let stars = b.with_phase(BudgetPhase::ContactStars, |b| {
+            facet_stars(&planar, &arrangement.protected, b)
+        })?;
+        // Every exposed protected point must survive in the actual output mesh.
+        for p in &arrangement.protected {
+            let mut in_region = false;
+            for cell in &arrangement.cells {
+                if contains_convex(cell, p, b)? {
+                    in_region = true;
+                    break;
+                }
+            }
+            if in_region && !planar.iter().flatten().any(|q| q == p) {
+                return Err(b.fail(
+                    FailureKind::InvalidWitness,
+                    "lost physical contact endpoint",
+                ));
+            }
+        }
+        b.phase(BudgetPhase::Witness);
+        b.state([
+            expanded_members,
+            planar.len(),
+            stars.len(),
+            arrangement.cells.len(),
+            arrangement.physical.len(),
+            arrangement.protected.len(),
+            0,
+            0,
+        ]);
+        let witness_members = incoming_witness_memberships(
+            &arrangement.cells,
+            arrangement.physical.len(),
+            arrangement.protected.len(),
+            planar.len(),
+            &stars,
+            b,
+        )?;
+        // Admit final ownership before transferring expanded region records.
+        // Raw expansion remains admitted through the complete move/collection.
+        let geometry_members = (32 + source.style().len()) * planar.len();
+        b.retain(geometry_members + witness_members)?;
+        for triangle in &planar {
+            if triangles.len() >= b.limits().triangles {
+                return Err(b.fail(
+                    FailureKind::TriangleLimit,
+                    "complete candidate exceeds original triangle cap",
+                ));
+            }
+            let make = |p: &Point2, b: &mut Budget| -> Result<Vertex, Failure> {
+                let p = source.lift(p, b)?;
+                let uv = source.uv_at(&p, b)?;
+                Ok(Vertex { point: p, uv })
+            };
+            let mut vertices = [
+                make(&triangle[0], b)?,
+                make(&triangle[1], b)?,
+                make(&triangle[2], b)?,
+            ];
+            if dot(
+                &cross(
+                    &sub(&vertices[1].point, &vertices[0].point),
+                    &sub(&vertices[2].point, &vertices[0].point),
+                ),
+                source.normal(),
+            )
+            .is_negative()
+            {
+                vertices.swap(1, 2);
+            }
+            triangles.push(Facet::new(
+                source.id(),
+                vertices,
+                source.style().to_owned(),
+                b,
+            )?);
+        }
+        let witness = FacetWitness {
+            source: source.id(),
+            classified_cells: arrangement.cells,
+            physical_segments: arrangement.physical,
+            protected_points: arrangement.protected.into_iter().collect(),
+            output_triangles: planar,
+            contact_stars: stars,
+            twice_area: expected,
+        };
+        b.release(expanded_members);
+        // The final witness is already retained above. Public standalone verify
+        // reserves independently owned input; use the admitted path here.
+        b.with_phase(BudgetPhase::Witness, |b| witness.verify_admitted(source, b))?;
+        witnesses.push(witness);
+    }
+    if triangles.is_empty() {
+        return Err(b.fail(FailureKind::InvalidWitness, "lost entire original exterior"));
+    }
+    b.with_phase(BudgetPhase::Topology, |b| {
+        audit_closed(triangles.iter(), false, b)
+    })?;
+    let mut volume = integer(0);
+    for face in &triangles {
+        b.at(face.id());
+        b.step(1)?;
+        volume += dot(
+            &face.vertices()[0].point,
+            &cross(&face.vertices()[1].point, &face.vertices()[2].point),
+        ) / integer(6);
+    }
+    if volume <= integer(0) {
+        return Err(b.fail(
+            FailureKind::NonManifold,
+            "candidate has nonpositive signed volume",
+        ));
+    }
+    b.release(held + point_members + input_members);
+    Ok(Hull {
+        triangles,
+        witnesses,
+        volume,
+    })
+}

@@ -338,6 +338,26 @@
       "file": "src/strict_interior_tests.rs",
       "name": "proof_group_and_foreign_box_work_is_charged_before_execution_and_refusal",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/source_work_tests.rs",
+      "name": "certified_source_support_keeps_foreign_physical_contacts_and_full_section_parity",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/source_work_tests.rs",
+      "name": "source_arrangement_matches_independent_complete_oracle_with_less_actual_endpoint_work",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/source_work_tests.rs",
+      "name": "source_arrangement_keeps_invalid_input_rational_and_exact_live_callback_guards",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/source_work_tests.rs",
+      "name": "source_work_complete_publisher_matches_frozen_output_fields_contacts_and_volume",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -802,5 +822,62 @@
     "frozenSHA256": "50120291a6457cd3ae2daee69e3ff81da34a95f4f93ac5bfb21e1546fe7b4ed0",
     "currentRustCount": 67,
     "hostCount": 9
+  },
+  "sourceWorkRemoval": {
+    "status": "AUTHORED_UNRUN_GENUINE_SOURCE_WORK_REMOVAL",
+    "parentAuthor": "c0e1b4b62bc0a64f35fe5a7ab9a061ecde869f27",
+    "actualParentRoot": "463dccc6e610def60ced2e715b44e8e18200947a",
+    "all67OldTestBodiesUnchanged": true,
+    "currentRustCount": 71,
+    "hostCount": 9,
+    "productionFiles": [
+      "src/certificate.rs",
+      "src/sections.rs",
+      "src/section_arrangement.rs",
+      "src/strict_interior.rs"
+    ],
+    "causes": [
+      "Remove provably empty own-owner outward-section work on certified exact oblique supports; physical and other-owner queries unchanged.",
+      "Remove redundant clipping of validated domain boundary edges; reuse already checked barrier endpoints when existing clipping branches left them unchanged."
+    ],
+    "unitPrices": "Unchanged for all performed geometry work; support binary-search comparisons cost1 each; validated domain edge visit costs1.",
+    "storage": "No new retained geometry; existing certificate borrowed,32slot lookup scratch, existing arrangement workspace bounds retained",
+    "controls": "Frozen c0 publisher; original clip; exact common false body; unchanged historical public arrangement",
+    "newTests": [
+      {
+        "file": "src/source_work_tests.rs",
+        "name": "certified_source_support_keeps_foreign_physical_contacts_and_full_section_parity",
+        "status": "UNRUN"
+      },
+      {
+        "file": "src/source_work_tests.rs",
+        "name": "source_arrangement_matches_independent_complete_oracle_with_less_actual_endpoint_work",
+        "status": "UNRUN"
+      },
+      {
+        "file": "src/source_work_tests.rs",
+        "name": "source_arrangement_keeps_invalid_input_rational_and_exact_live_callback_guards",
+        "status": "UNRUN"
+      },
+      {
+        "file": "src/source_work_tests.rs",
+        "name": "source_work_complete_publisher_matches_frozen_output_fields_contacts_and_volume",
+        "status": "UNRUN"
+      }
+    ],
+    "inverseSHA256": "92d9f05c0b4cd4d95683d71b6ce26cccfb8d9bbeb0329b56c9ece5dad8879ecc",
+    "contractSHA256": "8064163931a154dd1e8e1947e64a3362108bd587c9299550d230d9e59f53c306",
+    "custodySHA256": "2f0659cb5ad3eae6fb896df76c5bab17fd50da35d869ecc26a218fafdc555eaa",
+    "freezeSHA256": "ecfcf066fb84c8f21d7467fd851d3008455c90f4f25e057fb9044d0992337c53",
+    "currentExecution": "ALL UNRUN; no compiler or geometry execution on author lane",
+    "limits": {
+      "operationsIncludingDecode": 2000000,
+      "storageMemberships": 100000,
+      "rationalBits": 4096,
+      "completeOutputTriangles": 512
+    },
+    "fleetAdmissions": 0,
+    "qualification": "Root serial join; G2 whole/relevant delta; G1 focused allPASS thenONEchangedwholefive",
+    "deltaSHA256": "69e06e6671bf4d7be6fedd5ea3c5576b162b2a7e5a84c282a118c8f88808ff3e"
   }
 }

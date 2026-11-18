@@ -1,11 +1,13 @@
 """Restore strict-interior integration and spatial withdrawal for prior proofs."""
 import json
 from pathlib import Path
+from restore_source_work import restore_source_work
 
 CRATE = Path(__file__).resolve().parents[1]
 
 
 def restore_interior(name, source):
+    source = restore_source_work(name, source)
     edits = json.loads((CRATE / 'integration/strict-interior/INVERSE-EDITS.json').read_text())
     if name not in edits:
         return source

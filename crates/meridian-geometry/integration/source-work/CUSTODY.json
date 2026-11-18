@@ -1,0 +1,245 @@
+{
+  "parentAuthor": "c0e1b4b62bc0a64f35fe5a7ab9a061ecde869f27",
+  "actualExecutedRoot": "463dccc6e610def60ced2e715b44e8e18200947a",
+  "actualTree": "39d39e1b2adcbe76db1e408c93bcbf967eb5ac56",
+  "all371ParentCratePinsMatchExecutedRoot": true,
+  "rootPinInventory": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-interior-accounting.463dccc/evidence/ROOT-ALL-SOURCE-PINS.json",
+    "bytes": 133514,
+    "sha256": "49741b9035ea526fe6e6aa3be490cc2dbc7fb55066c845f6a0c22ca075f7371d"
+  },
+  "terminalHandoff": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-interior-accounting.463dccc/evidence/EXECUTION-TERMINAL-HANDOFF.json",
+    "bytes": 26106,
+    "sha256": "f9d9f6294862fcddda19b686c45b3f5e27eea3f5ad39b59a09f430fde29a95c0"
+  },
+  "rawPacket": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-interior-accounting.463dccc/RAW-PACKET.tar.gz",
+    "bytes": 21007700,
+    "sha256": "e0cee59caf4dbb0178a50abbe4970a78197d17c933135de8f6d79b7f43975e4b"
+  },
+  "focused": {
+    "rustTests": 67,
+    "library": 49,
+    "binary": 7,
+    "adapter": 9,
+    "originalControls": 2,
+    "hostTests": 9,
+    "lockedAllTargetCheck": "PASS",
+    "strictClippy": "PASS",
+    "devBuild": "PASS",
+    "originalAssertions": "322/108/120 unchanged and passing",
+    "terminal": {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-interior-accounting.463dccc/evidence/FOCUSED-TERMINAL.json",
+      "bytes": 3143,
+      "sha256": "6ee35a8d57d484c2060ac4adb401244149e4feba214e6d57ea7ece9663a055b0"
+    }
+  },
+  "wholeFive": {
+    "bodies": {
+      "declaredBodies": 25,
+      "bodiesPass": 5,
+      "bodiesRefused": 5,
+      "bodiesFail": 0,
+      "bodiesUnrun": 15
+    },
+    "cases": [
+      {
+        "id": "SH010",
+        "failure": {
+          "kind": "Operations",
+          "source": [
+            9,
+            2
+          ],
+          "operationsAtRefusal": 2000001,
+          "detail": "exact operation budget exhausted"
+        },
+        "phase": "arrangement_slabs",
+        "caller": {
+          "file": "crates/meridian-geometry/src/exact.rs",
+          "line": 88,
+          "column": 12
+        },
+        "prefixPhaseOperations": {
+          "other": 0,
+          "decode": 320970,
+          "input_audit": 268218,
+          "index": 39928,
+          "sections": 595908,
+          "arrangement_setup": 250251,
+          "arrangement_pairs": 55613,
+          "arrangement_slabs": 150061,
+          "occupancy": 258452,
+          "fields": 26422,
+          "global_points": 0,
+          "packing": 34178,
+          "noding": 0,
+          "triangulation": 0,
+          "contact_stars": 0,
+          "witness": 0,
+          "topology": 0,
+          "dependent_checks": 0
+        },
+        "candidateReturned": false
+      },
+      {
+        "id": "SH011",
+        "failure": {
+          "kind": "Operations",
+          "source": [
+            9,
+            4
+          ],
+          "operationsAtRefusal": 2000003,
+          "detail": "exact operation budget exhausted"
+        },
+        "phase": "arrangement_setup",
+        "caller": {
+          "file": "crates/meridian-geometry/src/section_arrangement.rs",
+          "line": 27,
+          "column": 7
+        },
+        "prefixPhaseOperations": {
+          "other": 0,
+          "decode": 325330,
+          "input_audit": 268218,
+          "index": 39928,
+          "sections": 599455,
+          "arrangement_setup": 250251,
+          "arrangement_pairs": 55064,
+          "arrangement_slabs": 148121,
+          "occupancy": 253784,
+          "fields": 26327,
+          "global_points": 0,
+          "packing": 33525,
+          "noding": 0,
+          "triangulation": 0,
+          "contact_stars": 0,
+          "witness": 0,
+          "topology": 0,
+          "dependent_checks": 0
+        },
+        "candidateReturned": false
+      },
+      {
+        "id": "SH016",
+        "failure": {
+          "kind": "Operations",
+          "source": [
+            13,
+            7
+          ],
+          "operationsAtRefusal": 2000001,
+          "detail": "exact operation budget exhausted"
+        },
+        "phase": "arrangement_setup",
+        "caller": {
+          "file": "crates/meridian-geometry/src/section_arrangement.rs",
+          "line": 27,
+          "column": 7
+        },
+        "prefixPhaseOperations": {
+          "other": 0,
+          "decode": 323877,
+          "input_audit": 291633,
+          "index": 44986,
+          "sections": 721980,
+          "arrangement_setup": 288855,
+          "arrangement_pairs": 60832,
+          "arrangement_slabs": 96134,
+          "occupancy": 108475,
+          "fields": 34793,
+          "global_points": 0,
+          "packing": 28436,
+          "noding": 0,
+          "triangulation": 0,
+          "contact_stars": 0,
+          "witness": 0,
+          "topology": 0,
+          "dependent_checks": 0
+        },
+        "candidateReturned": false
+      },
+      {
+        "id": "SH017",
+        "failure": {
+          "kind": "Operations",
+          "source": [
+            12,
+            19
+          ],
+          "operationsAtRefusal": 2000001,
+          "detail": "exact operation budget exhausted"
+        },
+        "phase": "sections",
+        "caller": {
+          "file": "crates/meridian-geometry/src/sections.rs",
+          "line": 430,
+          "column": 11
+        },
+        "prefixPhaseOperations": {
+          "other": 0,
+          "decode": 348672,
+          "input_audit": 291519,
+          "index": 44986,
+          "sections": 704471,
+          "arrangement_setup": 283699,
+          "arrangement_pairs": 60283,
+          "arrangement_slabs": 95466,
+          "occupancy": 108193,
+          "fields": 34148,
+          "global_points": 0,
+          "packing": 28564,
+          "noding": 0,
+          "triangulation": 0,
+          "contact_stars": 0,
+          "witness": 0,
+          "topology": 0,
+          "dependent_checks": 0
+        },
+        "candidateReturned": false
+      },
+      {
+        "id": "SH166",
+        "failure": {
+          "kind": "Operations",
+          "source": [
+            16,
+            39
+          ],
+          "operationsAtRefusal": 2000001,
+          "detail": "exact operation budget exhausted"
+        },
+        "phase": "sections",
+        "caller": {
+          "file": "crates/meridian-geometry/src/sections.rs",
+          "line": 365,
+          "column": 27
+        },
+        "prefixPhaseOperations": {
+          "other": 0,
+          "decode": 304157,
+          "input_audit": 263464,
+          "index": 39059,
+          "sections": 757518,
+          "arrangement_setup": 338775,
+          "arrangement_pairs": 59499,
+          "arrangement_slabs": 90369,
+          "occupancy": 83071,
+          "fields": 35612,
+          "global_points": 0,
+          "packing": 28477,
+          "noding": 0,
+          "triangulation": 0,
+          "contact_stars": 0,
+          "witness": 0,
+          "topology": 0,
+          "dependent_checks": 0
+        },
+        "candidateReturned": false
+      }
+    ]
+  },
+  "interpretation": "Actual prior failed prefixes only; not whole-work minima, not current performance, not candidate/admission evidence. New source compiler/geometry/native UNRUN."
+}

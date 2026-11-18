@@ -10,7 +10,7 @@ The previous five-hull execution at `0c2677b5` exhausted operations on every ori
 
 ## Validation
 
-The current exact-pruning correction and its two new Rust regressions are **UNRUN**. Parent joined source `1287511` passed locked check, all 21 Rust tests, nine host tests, strict Clippy and executable build on Dell Linux. The actual original-five run returned three operation refusals and two storage refusals after all five decodes passed. All 15 dependent bodies remained UNRUN and zero candidates returned. The author lane used rustfmt to parse and format the authored source. G1 owns actual compiler execution on the committed packet. The first compiler run should apply `integration/workspace-and-lock.patch` in the joined workspace and run the following checks.
+The current source work removal and four additional Rust regressions are **UNRUN**. Parent joined source `463dccc` passed all 67 Rust tests, nine host tests, locked all-target check, strict Clippy and development build. Its one changed original-five run passed all five decodes and refused all five constructors on Operations; 15 dependent bodies stayed UNRUN and zero candidates returned. The new source retains every prior test body and adds four comparisons for 71 Rust tests. The author lane checks syntax, formatting and exact source preservation only. G2 whole-source and relevant delta review precedes G1's focused checks and one changed original-five run. See [the contract](integration/source-work/CONTRACT.md) and [the source-bound prior results](integration/source-work/CUSTODY.json).
 
 ```sh
 cargo check --locked -p meridian-geometry --all-targets
@@ -213,3 +213,7 @@ Three independent full-output/proof/ownership tests bring this source to 66 Rust
 ## Strict-interior accounting review
 
 The whole source review accepted the geometric proof and lifetimes, then found missing owner-map insertion, consumed-group and foreign-box charges. Those three actual operations now use the existing tree/visit/whole-box prices. A focused refusal test brings this source to 67 Rust tests and nine host tests, all UNRUN. All 66 prior test bodies, strict comparisons and caps remain unchanged. [The bounded correction](integration/interior-accounting/CONTRACT.md) carries the exact review and source binding; original execution remains gated on qualification.
+
+## Exact source work removal
+
+Certified convex source supports exclude only their own owner's provably empty outward sections. Physical cuts, other owners and every original field remain eligible. The source arrangement retains validated domain edges directly and reuses checked barrier endpoints when clipping did not change them. This removes actual arithmetic and duplicate validation. It preserves all guards on inputs and generated coordinates, constraints, contact stars, witnesses and publication limits. Frozen complete publisher and arrangement controls retain the prior work and prices. Current compiler, test, original-five and native results remain UNRUN; the fleet baseline is unchanged. See [the contract](integration/source-work/CONTRACT.md).

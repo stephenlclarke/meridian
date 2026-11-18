@@ -143,6 +143,43 @@ impl<'a> InteriorCertificates<'a> {
             Ok(result)
         })
     }
+    // Query the exact coefficient pair, not merely a matching owner ID.
+    // Original support references remain sorted by their equation-map keys.
+    pub(super) fn source_outward_empty(
+        &self,
+        face: &Facet,
+        b: &mut Budget,
+    ) -> Result<bool, Failure> {
+        b.with_retained(32, |b| {
+            let (mut low, mut high) = (0, self.owners.len());
+            while low < high {
+                b.step(1)?;
+                let middle = low + (high - low) / 2;
+                let owner = &self.owners[middle];
+                match owner.id.cmp(&face.id().component) {
+                    std::cmp::Ordering::Less => low = middle + 1,
+                    std::cmp::Ordering::Greater => high = middle,
+                    std::cmp::Ordering::Equal => {
+                        let (mut first, mut end) = (0, owner.planes.len());
+                        while first < end {
+                            b.step(1)?;
+                            let at = first + (end - first) / 2;
+                            let source = owner.planes[at];
+                            match (source.normal(), source.offset())
+                                .cmp(&(face.normal(), face.offset()))
+                            {
+                                std::cmp::Ordering::Less => first = at + 1,
+                                std::cmp::Ordering::Greater => end = at,
+                                std::cmp::Ordering::Equal => return Ok(true),
+                            }
+                        }
+                        return Ok(false);
+                    }
+                }
+            }
+            Ok(false)
+        })
+    }
     pub(super) fn memberships(&self) -> usize {
         self.members
     }
