@@ -318,6 +318,21 @@
       "file": "src/spatial_index_tests.rs",
       "name": "spatial_sort_nodes_and_source_order_restore_admit_then_rollback_exactly",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/strict_interior_tests.rs",
+      "name": "strict_whole_facet_occlusion_matches_frozen_complete_output_and_keeps_equality_contacts",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/strict_interior_tests.rs",
+      "name": "convex_certificate_checks_all_vertices_and_oblique_planes_and_rejects_nonconvex_owners",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/strict_interior_tests.rs",
+      "name": "convex_proof_tables_and_strict_query_scratch_admit_and_roll_back_at_exact_boundaries",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -750,6 +765,21 @@
     "contractSHA256": "909f17d0f9f42454b73b1f97d9476cf4ea818dec287c6f822412b6abc53ece82",
     "frozenSHA256": "f571526849501b5fd17a9828babdb45d12cdc837e8a6bdcf856fd69c48a0ff68",
     "currentRustCount": 63,
+    "hostCount": 9
+  },
+  "strictInteriorCorrection": {
+    "qualifiedRoot": "6abd2e1f6f099b37256a54614c5789fb20b07ec8",
+    "parentAuthor": "cd0a0c3364881462c76f249bf0d15b99c1c074c2",
+    "parentFocusedRustPass": 63,
+    "parentHostPass": 9,
+    "parentOriginal": "5Operationsrefusals15unrun0candidates",
+    "old63TestsPreserved": true,
+    "spatialProduction": "WITHDRAWN; test-only prototype retained",
+    "currentExecution": "UNRUN",
+    "deltaSHA256": "f5e24ab6b8ba65bbc324af96390fef0bad212bd72d37327a490f314ab2e43557",
+    "contractSHA256": "71faaf800023c8113f59560d32cac7988c8b7f6048dff77d59addf69498eb911",
+    "frozenSHA256": "da87b685f91f4178baefe1f5bf61443adc299803f9c73ea1e11171cf622f2e77",
+    "currentRustCount": 66,
     "hostCount": 9
   }
 }

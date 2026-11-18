@@ -1,12 +1,19 @@
 //! Spatial node grouping changes only necessary-condition query work.
-use super::{Bounds, BoundsNode, FacetBoundsIndex, log_cost};
-use crate::{Budget, Facet, Failure};
+#[cfg(test)]
+use super::{Bounds, BoundsNode};
+use super::{FacetBoundsIndex, log_cost};
+#[cfg(test)]
+use crate::Facet;
+use crate::{Budget, Failure};
+#[cfg(test)]
 use std::cmp::Ordering;
 use std::collections::BTreeMap;
 
+#[cfg(test)]
 const SPATIAL_MIN: usize = 32 * FacetBoundsIndex::LEAF_SIZE;
 
 impl FacetBoundsIndex {
+    #[cfg(test)]
     pub(super) fn spatial_memberships(count: usize) -> usize {
         Self::memberships(count) + if count >= SPATIAL_MIN { count + 8 } else { 0 }
     }
@@ -15,6 +22,7 @@ impl FacetBoundsIndex {
             .as_ref()
             .map_or(position, |order| order[position])
     }
+    #[cfg(test)]
     pub(super) fn build_spatial(originals: &[Facet], b: &mut Budget) -> Result<Self, Failure> {
         if originals.len() < SPATIAL_MIN {
             return Self::build(originals, b);
@@ -40,6 +48,7 @@ impl FacetBoundsIndex {
         )?;
         Ok(index)
     }
+    #[cfg(test)]
     fn spatial_range(
         &mut self,
         originals: &[Facet],
@@ -108,6 +117,7 @@ impl FacetBoundsIndex {
         });
         Ok(ordinal)
     }
+    #[cfg(test)]
     fn sort_range(
         &mut self,
         start: usize,

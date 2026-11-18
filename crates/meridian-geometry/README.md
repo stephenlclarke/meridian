@@ -200,6 +200,12 @@ All 58 prior test bodies and caps stay unchanged. Two new independent parity/wor
 
 ## Spatial grouping with source-order results
 
-The interval revision passed 60 Rust tests, nine host tests, check, strict Clippy and build. Its changed whole-five still refused every constructor on work. Large facet indexes now group exact original bounds spatially, then restore all physical/plane/ray candidate payloads to original ordinal order. The original builder remains the small-input/control path. Sorting, permutation state and ordered restoration are charged and admitted in full.
+The interval revision passed 60 Rust tests, nine host tests, check, strict Clippy and build. Its changed whole-five still refused every constructor on work. The spatial experiment groups exact original bounds and restores physical/plane/ray candidates to original order; it is now retained only for tests after the original profiles did not justify production use. The original builder remains the small-input/control path. Sorting, permutation state and ordered restoration are charged and admitted in full.
 
 Three new independent bound/candidate/section/ownership comparisons bring this source to 63 Rust tests plus nine host tests, all UNRUN. [The source-order proof and qualification contract](integration/spatial-index/CONTRACT.md) preserve every prior test and cap. No full-fit or fleet-admission claim is made.
+
+## Audited strict-interior proof
+
+The spatial revision passed 63 Rust tests and nine host tests, but its original run still refused every constructor and its index overhead was not justified. Production returns to the original index. A new audited convex-owner certificate can skip only a facet proved wholly and strictly interior to another original owner. Every source facet remains present in other facets' geometry, field and contact queries; all equality cases keep the full path.
+
+Three independent full-output/proof/ownership tests bring this source to 66 Rust tests plus nine host tests, all UNRUN. [The strict one-sided proof, costs and source-bound outcomes](integration/strict-interior/CONTRACT.md) preserve all 63 old assertions, controls and caps. No full-fit or fleet-admission claim is made.

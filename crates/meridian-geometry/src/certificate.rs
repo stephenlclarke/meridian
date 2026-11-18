@@ -1121,13 +1121,16 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
         0,
     ]);
     b.retain(bounds_members)?;
-    let facet_bounds_members = FacetBoundsIndex::spatial_memberships(originals.len());
+    let facet_bounds_members = FacetBoundsIndex::memberships(originals.len());
     b.retain(facet_bounds_members)?;
     let facet_bounds = b.with_phase(BudgetPhase::Index, |b| {
-        FacetBoundsIndex::build_spatial(originals, b)
+        FacetBoundsIndex::build(originals, b)
     })?;
     let owner_bounds = b.with_phase(BudgetPhase::Index, |b| {
         component_bounds(originals, &facet_bounds.facets, b)
+    })?;
+    let interior = b.with_phase(BudgetPhase::InputAudit, |b| {
+        strict_interior::InteriorCertificates::build(originals, &owner_bounds, b)
     })?;
     let plane_groups = b.with_phase(BudgetPhase::Index, |b| {
         build_plane_groups(originals, &owner_bounds, b)
@@ -1147,6 +1150,13 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
         b.phase(BudgetPhase::Sections);
         b.state([input_members, point_members, held, 0, 0, 0, 0, 0]);
         b.at(face.id());
+        if let Some(certificates) = &interior
+            && certificates.strictly_covers(face, face_bounds, b)?
+        {
+            // Keep the authenticated source in every other facet's queries.
+            // Only this wholly interior facet's own empty publication is omitted.
+            continue;
+        }
         let mut domain = face.domain().to_vec();
         if area(&domain, b)?.is_negative() {
             domain.reverse();
@@ -1244,6 +1254,11 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
         held += region.memberships();
         regions.push((face, region));
     }
+    let interior_members = interior
+        .as_ref()
+        .map_or(0, |certificates| certificates.memberships());
+    drop(interior);
+    b.release(interior_members);
     drop(owner_bounds);
     drop(facet_bounds);
     drop(plane_groups);
@@ -2322,3 +2337,6 @@ mod proved_visit_tests;
 
 #[path = "spatial_index.rs"]
 mod spatial_index;
+
+#[path = "strict_interior.rs"]
+mod strict_interior;

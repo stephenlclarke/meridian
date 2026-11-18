@@ -1,0 +1,78 @@
+{
+  "certificate.rs": [
+    {
+      "afterStart": 1123,
+      "afterEnd": 1124,
+      "before": "    let facet_bounds_members = FacetBoundsIndex::spatial_memberships(originals.len());\n",
+      "after": "    let facet_bounds_members = FacetBoundsIndex::memberships(originals.len());\n"
+    },
+    {
+      "afterStart": 1126,
+      "afterEnd": 1127,
+      "before": "        FacetBoundsIndex::build_spatial(originals, b)\n",
+      "after": "        FacetBoundsIndex::build(originals, b)\n"
+    },
+    {
+      "afterStart": 1130,
+      "afterEnd": 1133,
+      "before": "",
+      "after": "    })?;\n    let interior = b.with_phase(BudgetPhase::InputAudit, |b| {\n        strict_interior::InteriorCertificates::build(originals, &owner_bounds, b)\n"
+    },
+    {
+      "afterStart": 1152,
+      "afterEnd": 1159,
+      "before": "",
+      "after": "        if let Some(certificates) = &interior\n            && certificates.strictly_covers(face, face_bounds, b)?\n        {\n            // Keep the authenticated source in every other facet's queries.\n            // Only this wholly interior facet's own empty publication is omitted.\n            continue;\n        }\n"
+    },
+    {
+      "afterStart": 1256,
+      "afterEnd": 1261,
+      "before": "",
+      "after": "    let interior_members = interior\n        .as_ref()\n        .map_or(0, |certificates| certificates.memberships());\n    drop(interior);\n    b.release(interior_members);\n"
+    },
+    {
+      "afterStart": 2339,
+      "afterEnd": 2342,
+      "before": "",
+      "after": "\n#[path = \"strict_interior.rs\"]\nmod strict_interior;\n"
+    }
+  ],
+  "spatial_index.rs": [
+    {
+      "afterStart": 1,
+      "afterEnd": 8,
+      "before": "use super::{Bounds, BoundsNode, FacetBoundsIndex, log_cost};\nuse crate::{Budget, Facet, Failure};\n",
+      "after": "#[cfg(test)]\nuse super::{Bounds, BoundsNode};\nuse super::{FacetBoundsIndex, log_cost};\n#[cfg(test)]\nuse crate::Facet;\nuse crate::{Budget, Failure};\n#[cfg(test)]\n"
+    },
+    {
+      "afterStart": 11,
+      "afterEnd": 12,
+      "before": "",
+      "after": "#[cfg(test)]\n"
+    },
+    {
+      "afterStart": 15,
+      "afterEnd": 16,
+      "before": "",
+      "after": "    #[cfg(test)]\n"
+    },
+    {
+      "afterStart": 24,
+      "afterEnd": 25,
+      "before": "",
+      "after": "    #[cfg(test)]\n"
+    },
+    {
+      "afterStart": 50,
+      "afterEnd": 51,
+      "before": "",
+      "after": "    #[cfg(test)]\n"
+    },
+    {
+      "afterStart": 119,
+      "afterEnd": 120,
+      "before": "",
+      "after": "    #[cfg(test)]\n"
+    }
+  ]
+}

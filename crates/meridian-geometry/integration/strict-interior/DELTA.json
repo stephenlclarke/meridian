@@ -1,0 +1,37 @@
+{
+  "status": "AUTHORED_UNRUN",
+  "parentAuthor": "cd0a0c3364881462c76f249bf0d15b99c1c074c2",
+  "qualifiedRoot": "6abd2e1f6f099b37256a54614c5789fb20b07ec8",
+  "qualifiedTree": "6db6b40ab896f1bc95cc1ca80055f5bccd716079",
+  "parentFocused": "63Rust9host/check/Clippy/buildPASS",
+  "actualParentWholeFive": "5decodePASS5OperationsREFUSED15dependentUNRUN0semanticFAIL0candidates0admissions",
+  "correction": "Withdraw unevidenced spatial path to test-only; production original index. Audited supporting-plane convex proof skips only entire original facets strictly inside another source owner; all originals stay in all other queries.",
+  "work": "Grouping/lookups/vertex-plane distances/proof outputs and each candidate distance charged; no original retained price or contact predicate discounted.",
+  "storage": "Borrowed groups6M+N; pointset2U/planemap4P; persistent16+sum(16+P); builderheaders16/ownerproof32/queryscratch32; drops before release, exact failure rollback.",
+  "old63AssertionsPreserved": true,
+  "newTests": [
+    {
+      "file": "src/strict_interior_tests.rs",
+      "name": "strict_whole_facet_occlusion_matches_frozen_complete_output_and_keeps_equality_contacts",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/strict_interior_tests.rs",
+      "name": "convex_certificate_checks_all_vertices_and_oblique_planes_and_rejects_nonconvex_owners",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/strict_interior_tests.rs",
+      "name": "convex_proof_tables_and_strict_query_scratch_admit_and_roll_back_at_exact_boundaries",
+      "status": "UNRUN"
+    }
+  ],
+  "currentRustCount": 66,
+  "hostCount": 9,
+  "contractSHA256": "71faaf800023c8113f59560d32cac7988c8b7f6048dff77d59addf69498eb911",
+  "frozenSHA256": "da87b685f91f4178baefe1f5bf61443adc299803f9c73ea1e11171cf622f2e77",
+  "inverseSHA256": "997d7c9322d2982078547f77b0b1291af4b5d505cfd5be8810ccec25f465f85e",
+  "parentHandoffSHA256": "865673784285bf03759b1c44ce227d8cb178b62f33fcdae62300d1825b2024bd",
+  "externalRawSHA256": "4144d58f1ab0545e4f33b900ded6eef1cc54317841fc17d7b63b21484253acd7",
+  "qualification": "Rootwholejoin/G2review/G1focused thenONEchangedwholefive; no diagnostic or unchanged retry"
+}

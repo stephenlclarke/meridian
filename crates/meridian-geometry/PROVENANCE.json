@@ -180,5 +180,12 @@
     "externalRawSHA256": "c16871ec4fe800520d4665edf5bf29fc3ec3083633a78f557037856c369c623e",
     "currentExecution": "UNRUN",
     "sourceFidelity": "Conservative spatial boxes over exact original facets; all candidate tuples restored to original order; no averaged fields/output geometry or cached ray values; no admissions changed"
+  },
+  "strictInteriorCorrection": {
+    "qualifiedRoot": "6abd2e1f6f099b37256a54614c5789fb20b07ec8",
+    "parentHandoffSHA256": "865673784285bf03759b1c44ce227d8cb178b62f33fcdae62300d1825b2024bd",
+    "externalRawSHA256": "4144d58f1ab0545e4f33b900ded6eef1cc54317841fc17d7b63b21484253acd7",
+    "currentExecution": "UNRUN",
+    "sourceFidelity": "All-original audited support-plane proof, strict whole-facet occlusion only; all source geometry remains in every other contact/field query; equality/full star audits unchanged; spatial experiment withdrawn from production"
   }
 }

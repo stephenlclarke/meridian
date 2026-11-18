@@ -1,11 +1,13 @@
 """Restore spatial integration before the unchanged earlier geometry proofs."""
 import json
 from pathlib import Path
+from restore_strict_interior import restore_interior
 
 CRATE = Path(__file__).resolve().parents[1]
 
 
 def restore_spatial(name, source):
+    source = restore_interior(name, source)
     edits = json.loads((CRATE / 'integration/spatial-index/INVERSE-EDITS.json').read_text())
     if name not in edits:
         return source
