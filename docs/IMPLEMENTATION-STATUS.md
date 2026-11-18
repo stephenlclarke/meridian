@@ -1,5 +1,9 @@
 # Implementation and validation status
 
+## Internal Mule entry: authored, unrun
+
+The [explicit internal desktop route](MULE-VALIDATION-LAUNCH.md) now selects the real World-owned Mule scenario for native validation, starting paused with source-derived front, rear, far or side/contact observer presets. It opens no profile store, resolves no save directory and grants no commander; save/load/equipment and movement input refuse. P and single-step advance only the actual World reducer. Seven new lifecycle/refusal tests are authored **UNRUN**. Ordinary startup remains the normal commander path. Compiler, shader/GPU and actual game-view acceptance remain with the owning lane; no new native result is claimed.
+
 ## Mule envelope core qualified; World and renderer authored
 
 Mule has a distinct conservative gameplay envelope made from sixteen rounded source-component supports with a proposed 2 cm directional stand-off. The detailed source geometry, engineering mass/centre/inertia and provenance remain separate and unchanged. This implements the human's smooth, close-fitting collision direction; it does not clear the unresolved exact-original importer or its limits.

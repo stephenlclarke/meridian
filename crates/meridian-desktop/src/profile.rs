@@ -9,7 +9,7 @@ use std::{io, path::PathBuf};
 pub struct Profile {
     pub world: World,
     pub session: Session,
-    store: Store,
+    store: Option<Store>,
     playing: bool,
     has_save: bool,
     new_armed: bool,
@@ -23,11 +23,45 @@ impl Profile {
         Ok(Self {
             world: World::at_original_station()?,
             session: Session::default(),
-            store,
+            store: Some(store),
             playing: false,
             has_save,
             new_armed: false,
         })
+    }
+    /// A fresh World-owned source scenario has no Store, directory resolution or profile lease.
+    pub(crate) fn mule_validation(world: World) -> Result<Self, String> {
+        let frame = world
+            .mule_actor_snapshot()
+            .ok_or("Missing actual Mule World scenario")?;
+        if world.mule_observer_pose(&frame).is_none()
+            || world.commander_id().is_some()
+            || world.player_ship_id().is_some()
+            || world.traffic_snapshot().is_some()
+            || world.save_bytes().is_ok()
+        {
+            return Err("Internal Mule scenario must have no commander, ordinary population or save authority".into());
+        }
+        Ok(Self {
+            world,
+            session: Session::default(),
+            store: None,
+            playing: true,
+            has_save: false,
+            new_armed: false,
+        })
+    }
+    pub(crate) fn is_internal_validation(&self) -> bool {
+        self.store.is_none()
+    }
+    fn require_profile(&self) -> Result<(), String> {
+        if self.is_internal_validation() {
+            return Err(
+                "Internal Mule validation has no commander/profile/save or gameplay commands"
+                    .into(),
+            );
+        }
+        Ok(())
     }
     pub fn playing(&self) -> bool {
         self.playing
@@ -35,6 +69,7 @@ impl Profile {
 
     /// Publish the exact prospective secret transaction before replacing the live commander.
     pub fn xyzzy(&mut self, action: meridian_core::XyzzyAction) -> Result<String, String> {
+        self.require_profile()?;
         if !self.playing {
             return Err("Start or continue a commander before opening XYZZY".into());
         }
@@ -49,6 +84,8 @@ impl Profile {
             .map_err(|e| e.to_string())?;
         let published = self
             .store
+            .as_ref()
+            .ok_or("Internal validation has no profile storage")?
             .save(prepared.bytes(), MAX_SAVE_BYTES)
             .map_err(|e| format!("XYZZY change could not be saved: {e}"))?;
         prepared.commit();
@@ -77,6 +114,8 @@ impl Profile {
             .map_err(|e| e.to_string())?;
         let published = self
             .store
+            .as_ref()
+            .ok_or("Internal validation has no profile storage")?
             .save(prepared.bytes(), MAX_SAVE_BYTES)
             .map_err(|e| format!("EMP change could not be saved: {e}"))?;
         prepared.commit();
@@ -96,6 +135,8 @@ impl Profile {
             .map_err(crate::docked_screens::ecm::refusal)?;
         let published = self
             .store
+            .as_ref()
+            .ok_or("Internal validation has no profile storage")?
             .save(prepared.bytes(), MAX_SAVE_BYTES)
             .map_err(|error| format!("ECM was not activated; save failed: {error}"))?;
         prepared.commit();
@@ -108,6 +149,7 @@ impl Profile {
     }
 
     pub fn new_commander(&mut self, seed: u64) -> Result<bool, String> {
+        self.require_profile()?;
         if self.playing {
             return Err("Start a new commander from the title screen".into());
         }
@@ -124,8 +166,11 @@ impl Profile {
     }
 
     pub fn continue_saved(&mut self) -> Result<(), String> {
+        self.require_profile()?;
         let bytes = self
             .store
+            .as_ref()
+            .ok_or("Internal validation has no profile storage")?
             .load(MAX_SAVE_BYTES)
             .map_err(|e| e.to_string())?
             .ok_or("No saved commander exists in this save slot")?;
@@ -145,6 +190,7 @@ impl Profile {
     }
 
     pub fn command(&mut self, action: Action) -> Result<String, String> {
+        self.require_profile()?;
         if !self.playing {
             return Err("N starts a new commander; C continues the existing save".into());
         }
@@ -181,6 +227,8 @@ impl Profile {
             };
             let published = self
                 .store
+                .as_ref()
+                .ok_or("Internal validation has no profile storage")?
                 .save(prepared.bytes(), MAX_SAVE_BYTES)
                 .map_err(|e| format!("Module change could not be saved: {e}"))?;
             prepared.commit();
@@ -215,6 +263,8 @@ impl Profile {
             let event = prepared.event();
             let published = self
                 .store
+                .as_ref()
+                .ok_or("Internal validation has no profile storage")?
                 .save(prepared.bytes(), MAX_SAVE_BYTES)
                 .map_err(|e| format!("Cargo equipment change could not be saved: {e}"))?;
             prepared.commit();
@@ -246,6 +296,8 @@ impl Profile {
             let message = crate::market::service_message(prepared.event())?;
             let published = self
                 .store
+                .as_ref()
+                .ok_or("Internal validation has no profile storage")?
                 .save(prepared.bytes(), MAX_SAVE_BYTES)
                 .map_err(|e| format!("Market change could not be saved: {e}"))?;
             prepared.commit();
@@ -270,6 +322,8 @@ impl Profile {
             };
             let published = self
                 .store
+                .as_ref()
+                .ok_or("Internal validation has no profile storage")?
                 .save(prepared.bytes(), MAX_SAVE_BYTES)
                 .map_err(|e| format!("Missile equipment change could not be saved: {e}"))?;
             prepared.commit();
@@ -286,6 +340,8 @@ impl Profile {
             let message = crate::market::service_message(prepared.event())?;
             let published = self
                 .store
+                .as_ref()
+                .ok_or("Internal validation has no profile storage")?
                 .save(prepared.bytes(), MAX_SAVE_BYTES)
                 .map_err(|e| format!("Market transaction could not be saved: {e}"))?;
             prepared.commit();
@@ -302,6 +358,8 @@ impl Profile {
                 .map_err(|e| e.to_string())?;
             let published = self
                 .store
+                .as_ref()
+                .ok_or("Internal validation has no profile storage")?
                 .save(prepared.bytes(), MAX_SAVE_BYTES)
                 .map_err(|e| format!("Trade lesson confirmation could not be saved: {e}"))?;
             prepared.commit();
@@ -320,6 +378,8 @@ impl Profile {
                 .map_err(|e| e.to_string())?;
             let published = self
                 .store
+                .as_ref()
+                .ok_or("Internal validation has no profile storage")?
                 .save(prepared.bytes(), MAX_SAVE_BYTES)
                 .map_err(|e| format!("Flight lesson confirmation could not be saved: {e}"))?;
             prepared.commit();
@@ -354,6 +414,8 @@ impl Profile {
             let prepared = prepared.map_err(|error| error.to_string())?;
             let published = self
                 .store
+                .as_ref()
+                .ok_or("Internal validation has no profile storage")?
                 .save(prepared.bytes(), MAX_SAVE_BYTES)
                 .map_err(|error| format!("Practice confirmation could not be saved: {error}"))?;
             prepared.commit();
@@ -371,12 +433,15 @@ impl Profile {
     }
 
     pub fn save(&mut self) -> Result<String, String> {
+        self.require_profile()?;
         if !self.playing {
             return Err("No active commander to save".into());
         }
         let bytes = self.world.save_bytes().map_err(|e| e.to_string())?;
         let committed = self
             .store
+            .as_ref()
+            .ok_or("Internal validation has no profile storage")?
             .save(&bytes, MAX_SAVE_BYTES)
             .map_err(|e| format!("Save failed; previous file retained: {e}"))?;
         self.has_save = true;
@@ -395,6 +460,9 @@ impl Profile {
     }
 
     pub fn prepare_quit(&mut self) -> Result<(), String> {
+        if self.is_internal_validation() {
+            return Ok(());
+        }
         if self.playing {
             self.save()?;
         }
@@ -402,6 +470,27 @@ impl Profile {
     }
 
     pub fn lines(&self, active: bool, notice: Option<&str>) -> Vec<String> {
+        if self.is_internal_validation() {
+            let mut lines = vec![
+                "INTERNAL MULE VALIDATION | NO COMMANDER / NO SAVE".into(),
+                "P RUN / PAUSE | . ONE WORLD TICK WHEN PAUSED | ESC / Q QUIT".into(),
+            ];
+            if let Some(frame) = self.world.mule_actor_snapshot() {
+                lines.push(format!(
+                    "SH001 | WORLD TICK {} | GENERATION {} | {}",
+                    frame.world_tick(),
+                    frame.generation(),
+                    if active { "RUNNING" } else { "PAUSED" }
+                ));
+                if let Some(refusal) = frame.motion_refusal() {
+                    lines.push(format!("WORLD MOTION REFUSED: {refusal:?}"));
+                }
+            }
+            if let Some(notice) = notice {
+                lines.push(notice.into());
+            }
+            return lines;
+        }
         if self.playing {
             let mut lines = self.session.lines(&self.world, active, notice);
             if let Some(secret) = self.world.xyzzy_snapshot().filter(|state| state.active) {
