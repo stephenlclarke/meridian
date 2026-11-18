@@ -134,4 +134,5 @@ pub(crate) fn assert_actual_frame_record(frame: &Frame, identity: ReviewId) {
             && lines[2].contains("ReviewCancel")
             && lines[2].contains("enabled: true")
     );
+    super::audit::tests::assert_actual_ack_record(frame, identity);
 }

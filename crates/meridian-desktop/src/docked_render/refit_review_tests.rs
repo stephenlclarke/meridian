@@ -72,7 +72,7 @@ fn physical_berth(world: &mut World) {
 fn paint(menu: &mut Docked, profile: &Profile, viewport: ui::Viewport) -> Frame {
     let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
     // CPU harness acknowledgement only; this does not claim native presentation.
-    menu.presented(frame.clone());
+    assert!(menu.presented(frame.clone()));
     frame
 }
 fn assert_review(frame: &Frame, model: &Model) {
@@ -302,7 +302,7 @@ fn actual_paid_beam_store_then_immediate_fit_keeps_visible_review_controls_and_c
         ok(std::fs::read(directory.0.join("commander.meridian"))),
         stored
     );
-    menu.presented(candidate);
+    assert!(menu.presented(candidate));
     for (viewport, store) in views.into_iter().zip(&stored_reviews) {
         let fit = paint(&mut menu, &profile, viewport);
         assert_review(&fit, &model);

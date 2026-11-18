@@ -334,6 +334,17 @@ impl App {
     }
 
     fn key(&mut self, code: KeyCode, event_loop: &ActiveEventLoop) {
+        if code == KeyCode::F8
+            && let Some(renderer) = self.renderer.as_ref()
+            && renderer.request_review_observation(
+                self.docked
+                    .as_ref()
+                    .and_then(Docked::review_capture_identity),
+            )
+        {
+            self.request_redraw();
+            return;
+        }
         let global = matches!(
             code,
             KeyCode::F5 | KeyCode::F9 | KeyCode::F11 | KeyCode::KeyP
@@ -782,7 +793,13 @@ impl App {
         match presented {
             Ok(Presentation::Presented) => {
                 if let (Some(menu), Some(frame)) = (docked, docked_frame) {
-                    menu.presented(frame);
+                    let expected = (frame.stamp, frame.ui_revision);
+                    let accepted = menu.presented(frame);
+                    renderer.acknowledge_review(
+                        expected,
+                        menu.captured_painted_identity(),
+                        accepted,
+                    );
                 }
             }
             Ok(Presentation::Skipped) => {

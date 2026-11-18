@@ -10,6 +10,9 @@ const MAX_TRANSITIONS: u8 = 8;
 const MAX_RECORDS: u8 = 20;
 const MAX_LINE: usize = 4096;
 const MAX_ASYNC_ERRORS: u8 = 2;
+pub(crate) mod audit;
+pub(crate) mod pixels;
+pub(crate) use audit::Tag;
 type Sink = Arc<dyn Fn(&str) + Send + Sync>;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -39,6 +42,7 @@ struct State {
     last: Option<ReviewId>,
     transitions: u8,
     async_errors: u8,
+    audit: audit::State,
 }
 struct Shared {
     state: Mutex<State>,
@@ -51,6 +55,9 @@ pub(crate) struct Attempt {
     id: ReviewId,
     sequence: u8,
     records: std::cell::Cell<u8>,
+    emit_first: bool,
+    audit: Option<audit::Frame>,
+    stamp: std::cell::Cell<Option<(crate::docked_screens::Stamp, u64)>>,
 }
 
 // Limit UTF-8 by bytes, preserving character boundaries and escaping newlines through Debug.
@@ -104,6 +111,7 @@ impl Capture {
                     last: None,
                     transitions: 0,
                     async_errors: 0,
+                    audit: audit::State::default(),
                 }),
                 sink,
             })
@@ -126,7 +134,85 @@ impl Capture {
             id: id?,
             sequence: state.transitions,
             records: std::cell::Cell::new(0),
+            emit_first: true,
+            audit: None,
+            stamp: std::cell::Cell::new(None),
         })
+    }
+    pub fn enabled(&self) -> bool {
+        self.0.is_some()
+    }
+    pub fn begin_draw(&self, id: Option<ReviewId>) -> Option<Attempt> {
+        let first = self.begin(id);
+        let shared = self.0.as_ref()?;
+        let mut state = shared.state.lock().ok()?;
+        let admitted = id.is_some() && state.last == id && state.transitions > 0;
+        let frame = state.audit.enter(&shared.sink, id, admitted)?;
+        let review = frame.review;
+        let mut trace = first.unwrap_or_else(|| Attempt {
+            shared: shared.clone(),
+            id: review,
+            sequence: state.transitions,
+            records: std::cell::Cell::new(0),
+            emit_first: false,
+            audit: None,
+            stamp: std::cell::Cell::new(None),
+        });
+        trace.audit = Some(frame);
+        Some(trace)
+    }
+    pub fn finish_draw(&self, trace: &Attempt, failed: bool) {
+        if let (Some(shared), Some(frame)) = (&self.0, &trace.audit)
+            && let Ok(mut state) = shared.state.lock()
+        {
+            state.audit.finish(frame, trace.stamp.get());
+            if frame.request.is_some() {
+                state.audit.emit_observation_frame(&shared.sink, frame.id);
+            }
+            if failed {
+                state.audit.flush(&shared.sink, "draw_error");
+            }
+        }
+    }
+    pub fn acknowledge(
+        &self,
+        expected: (crate::docked_screens::Stamp, u64),
+        actual: Option<(crate::docked_screens::Stamp, u64)>,
+        accepted: bool,
+    ) {
+        if let Some(shared) = &self.0
+            && let Ok(mut state) = shared.state.lock()
+        {
+            state
+                .audit
+                .acknowledge(&shared.sink, expected, actual, accepted);
+        }
+    }
+    pub fn request_observation(&self, id: Option<ReviewId>) -> bool {
+        let (Some(shared), Some(id)) = (&self.0, id) else {
+            return false;
+        };
+        let Ok(mut state) = shared.state.lock() else {
+            return false;
+        };
+        if state.last != Some(id) {
+            return false;
+        }
+        state.audit.request(&shared.sink, id)
+    }
+    pub fn event(&self, stage: &'static str, data: impl fmt::Debug) {
+        if let Some(shared) = &self.0
+            && let Ok(mut state) = shared.state.lock()
+        {
+            state.audit.emit(&shared.sink, stage, data);
+        }
+    }
+    pub fn exit(&self) {
+        if let Some(shared) = &self.0
+            && let Ok(mut state) = shared.state.lock()
+        {
+            state.audit.exit(&shared.sink);
+        }
     }
     // Callback timing cannot identify the originating GPU frame. Correlation is explicitly latest-only.
     pub fn asynchronous_error(&self, error: impl fmt::Debug) {
@@ -155,16 +241,31 @@ impl Attempt {
             return;
         }
         self.records.set(count + 1);
-        (self.shared.sink)(&line(format_args!(
+        let record = line(format_args!(
             "MERIDIAN_REVIEW_CAPTURE v1 transition={} review={:?} stage={stage} data={data:?}",
             self.sequence, self.id
-        )));
+        ));
+        if self.emit_first {
+            (self.shared.sink)(&record);
+        }
+        if let Some(frame) = &self.audit {
+            frame.lines.borrow_mut().push(record);
+        }
+    }
+    pub fn pixel_request(&self) -> Option<Tag> {
+        let frame = self.audit.as_ref()?;
+        Some(Tag {
+            request: frame.request?,
+            frame: frame.id,
+            review: frame.review,
+        })
     }
     pub fn frame(&self, frame: Option<&Frame>) {
         let Some(f) = frame else {
             self.record("cpu_frame", "MISSING");
             return;
         };
+        self.stamp.set(Some((f.stamp, f.ui_revision)));
         self.record(
             "cpu_frame",
             (
