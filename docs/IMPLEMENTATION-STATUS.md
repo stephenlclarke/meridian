@@ -4,6 +4,19 @@
 
 The owner branch adds paid TL-5 E.C.M. System hardware at 2100 CR, one shared utility mount and a manual 22-energy, 32-tick standard-missile field. It terminates genuine current-visit player missiles, preserves motion/round identity and cancels EMP warmup without an EMP release or reward. Cold Continue retains the timer and historical effects while clearing live field authority, as the original restore requires. Automatic ECM and hostile missile production remain missing. The isolated desktop successor adds an actual paid equipment slot/store/refit review, N manual flight input, field/cooldown HUD, H/? Help and Profile atomic save publication through a prepared core command. Nine host tests and one additional prepared-core test are authored, including real missile endings, file-write rollback, time-only cold control and real EMP warmup cancellation. All new Rust tests and all compiler, coverage and native acceptance checks are UNRUN. Root owns final serial composition with the separate four-facing owner and one complete independent review before existing compiler owners execute. See [scope, provenance, cold semantics and acceptance](ECM.md).
 
+## Four laser facings author candidate
+
+The [four-facing laser core](LASER-FACINGS.md) starts at `65717da` and admits
+only the already qualified original SH025 front/left/right/rear mounts. It adds
+paid mount-specific purchase, actual-item store/move/refit, selected-view fire,
+shared resource replay and current-save historical facing checks. Nine meaningful
+new core regressions are authored, **UNRUN** (409 core source attributes against
+the 400-case baseline). Direct formatting and static source checks are separate
+from compiler, Clippy, tests and gameplay qualification, all pending for this delta.
+Root owns the desktop and concurrent ECM join, then whole-source Root/G2 review
+before Dell/G1 execution. Existing qualified EMP evidence keeps its own source
+identity; this author candidate is not a new qualified preview.
+
 ## Distinct EMP source candidate
 
 The source candidate adds an owned EMP utility to the single World, with paid purchase/fit/store/grade transactions, a separate initially empty bank and electrical pool, exact 80-percent transfer, a 600-tick held charge and shared heat/cooldown cost. It queries the actual native SH025 collision scene and drains the facing shield then independent electrical reserve. It preserves fatal hull energy, actor identity, cargo and the one source crew member. Zero electrical power blocks engines/weapons, keeps physical coasting and recovers strictly after 1800 accepted physical ticks. No capsule, bounty or reward is fabricated.

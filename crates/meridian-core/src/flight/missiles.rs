@@ -960,5 +960,14 @@ fn choose(best: &mut Option<(f64, MissileContact)>, distance: f64, contact: Miss
     }
 }
 
+impl State {
+    pub(in crate::flight) fn has_laser_interception(&self, emission: u64) -> bool {
+        self.beams
+            .iter()
+            .flatten()
+            .any(|beam| beam.emission == emission)
+    }
+}
+
 #[cfg(test)]
 pub(super) mod tests;

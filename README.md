@@ -31,6 +31,8 @@ The current [EMP electrical weapon candidate](docs/EMP.md) has passed Mac, Linux
 
 The [paid manual ECM candidate](docs/ECM.md) is source-authored and unrun. It adds real paid hardware, a charged 32-tick standard-missile field and time-only cold restoration, with an actual equipment slot, N flight control, HUD/Help and atomic durable activation. Final serial integration, independent review and owner execution remain pending; automatic ECM and hostile missile production remain separate work.
 
+The [four-facing laser core](docs/LASER-FACINGS.md) is authored with nine new regression cases, all unrun. Paid left/right/rear fitting, selected-view fire and current-save replay await Root's desktop join, whole-source review and owned platform qualification.
+
 ## Previews and validation
 
 Download qualified macOS arm64 and Windows x64 prereleases from [GitHub Releases](https://github.com/stephenlclarke/meridian/releases). Use the launcher and Read Me included with your download. Keep its app, notices and versioned save folder together; preserve earlier previews and profiles separately. Releases use Conventional Commit versions and immutable annotated tags, and retain the newest three published previews after verified downloads and a durable receipt.
