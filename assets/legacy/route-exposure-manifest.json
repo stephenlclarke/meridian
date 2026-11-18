@@ -1,0 +1,14 @@
+{
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourcePath": "Sources/L337Core/Resources/OriginalWorlds/catalogue.json",
+  "sourceSHA256": "120543eedc02a705cce0e37d026125bf926ec22651cff9337ca5d943f2ffd99d",
+  "sourceBytes": 1660913,
+  "sourceVersion": "l337-world-1",
+  "output": "assets/legacy/g01.route-exposure",
+  "outputSHA256": "9e447ffc4530268d4e43f44c76d6bb52cd60d533edcb23df62810e298e3462fd",
+  "outputBytes": 2570,
+  "systems": 256,
+  "format": "MRISK001 + LEu16 count; per row LEu16 system and LEf64 hostileFraction",
+  "notice": "assets/legacy/Elite-L337-MIT.txt",
+  "scope": "Immutable original G01 arrival exposure for read-only route scoring; no actor, encounter, market, refuel or travel authority"
+}

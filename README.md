@@ -29,6 +29,8 @@ Meridian is a Rust reimplementation of the original L337 project, with direct wg
 
 The current [EMP electrical weapon candidate](docs/EMP.md) has passed Mac, Linux and native Windows qualification: 631 Rust tests, 99 Python tests, 49 Markdown checks, strict Clippy and locked release builds per platform. The signed Mac candidate has also passed bounded native paid purchase, store/refit, first grades and cold Continue checks, plus early charge cancellation, one pulse release and an insufficient-bank refusal. A separately labelled XYZZY-supported setup also passed two native pulses, player and target electrical disablement, blocked controls/travel, cold disabled persistence and unheld recovery over 2326 accepted World ticks. The target was stationary; moving coast and the precise native recovery boundary remain unobserved. EMP is not part of the published Preview 7.
 
+The [visible-scope route alternatives prerequisite](docs/ROUTE-ALTERNATIVES.md) adds read-only Fewest/Safer planning from original exposure data. Eight Rust cases are authored, unrun; current route UI and travel authority remain separate.
+
 ## Previews and validation
 
 Download qualified macOS arm64 and Windows x64 prereleases from [GitHub Releases](https://github.com/stephenlclarke/meridian/releases). Use the launcher and Read Me included with your download. Keep its app, notices and versioned save folder together; preserve earlier previews and profiles separately. Releases use Conventional Commit versions and immutable annotated tags, and retain the newest three published previews after verified downloads and a durable receipt.

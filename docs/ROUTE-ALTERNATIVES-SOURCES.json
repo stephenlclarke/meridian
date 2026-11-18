@@ -1,0 +1,55 @@
+{
+  "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "tree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "scope": "Read-only original G01 visible-scope route alternatives prerequisite; existing notices retained; source availability does not establish new rights or gameplay authority.",
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1071,
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766",
+      "gitBlob": "b27f022cea044295412849dec93512dad638f08e"
+    },
+    {
+      "path": "NOTICE.md",
+      "bytes": 7601,
+      "sha256": "406570037626edd737b25da0a8cc13cdd57a3223086788715a315d84033a2aaa",
+      "gitBlob": "dfac99b5ecdd21cd5c38c12182b0fdd13a1fef82"
+    },
+    {
+      "path": "Sources/L337Core/OriginalWorldNavigation.swift",
+      "bytes": 4830,
+      "sha256": "f242940b370776120dc68f6b1507f1f37fe6fd5b4abc30618472a61f39a63a03",
+      "gitBlob": "cf8a759939beeb5c830f0b5b4965493cf9d6e3b1"
+    },
+    {
+      "path": "Sources/L337Core/NavigationRouteSearch.swift",
+      "bytes": 2541,
+      "sha256": "314bf6597464f7405f2311b4831f8ab597fce9627265f7da2ab3c0d922557f1a",
+      "gitBlob": "b28e377bd73a9d0148e546d606df1f41bb45ebfb"
+    },
+    {
+      "path": "Sources/L337Core/NavigationComputer.swift",
+      "bytes": 15307,
+      "sha256": "5768f91e2bfaa198df6ba8db58bbe9b64e40b0d4b8fb7eec5deb4d62a8fd86bb",
+      "gitBlob": "5fa946a51940f2beb45882469d7cc9fc1cd856c1"
+    },
+    {
+      "path": "Sources/L337Core/Resources/OriginalWorlds/catalogue.json",
+      "bytes": 1660913,
+      "sha256": "120543eedc02a705cce0e37d026125bf926ec22651cff9337ca5d943f2ffd99d",
+      "gitBlob": "c5afdd829efe53e5f74d048dd065faefbae142f0"
+    },
+    {
+      "path": "Sources/L337CatalogueData/OriginalWorldRecord.swift",
+      "bytes": 5164,
+      "sha256": "16569740df7e2f43b8bc07e2f52306a0d39daa6e85d2df2896cfab54cccd8def",
+      "gitBlob": "de2f2ba869d5545a8c0df704b8180b9b87cc717a"
+    },
+    {
+      "path": "Sources/L337CatalogueData/OriginalWorldCatalogue.swift",
+      "bytes": 9296,
+      "sha256": "f2bc25d8244c7cf67963c72b3669530a3c95d6fadf2a96ea9ad7557c3128c3d8",
+      "gitBlob": "1b58468bc4c3dc455e0a776d8096fcecb11aece1"
+    }
+  ]
+}

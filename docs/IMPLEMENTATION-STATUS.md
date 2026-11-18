@@ -1,5 +1,16 @@
 # Implementation and validation status
 
+## Read-only original route alternatives prerequisite
+
+The [M2 route-planning prerequisite](ROUTE-ALTERNATIVES.md) adds actual original
+visible-scope Fewest/Safer calculations and the missing pinned G01 arrival-exposure
+data, independently of current laser/ECM composition. It changes no flight, fitting,
+combat, save, App or desktop owner. Eight new Rust cases are authored **UNRUN**,
+408 core source attributes from 400. The three Python source-import cases pass
+in 0.002s; direct formatting, 50 Markdown files, exact pinned re-import and static
+source-preservation checks pass. Compilation, Clippy, current UI binding, native and gameplay
+acceptance remain pending. Planning cannot grant visibility, fuel, refuel or arrival.
+
 ## Distinct EMP source candidate
 
 The source candidate adds an owned EMP utility to the single World, with paid purchase/fit/store/grade transactions, a separate initially empty bank and electrical pool, exact 80-percent transfer, a 600-tick held charge and shared heat/cooldown cost. It queries the actual native SH025 collision scene and drains the facing shield then independent electrical reserve. It preserves fatal hull energy, actor identity, cargo and the one source crew member. Zero electrical power blocks engines/weapons, keeps physical coasting and recovers strictly after 1800 accepted physical ticks. No capsule, bounty or reward is fabricated.
