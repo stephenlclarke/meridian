@@ -1,0 +1,108 @@
+   Compiling num-traits v0.2.19
+   Compiling num-integer v0.1.46
+   Compiling num-bigint v0.4.8
+   Compiling num-rational v0.4.2
+   Compiling meridian-geometry v0.1.0 (/Volumes/SSD/offload/meridian-g1-fleet-live-runs.7368068/source/crates/meridian-geometry)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.03s
+     Running unittests src/lib.rs (/Volumes/SSD/offload/meridian-g1-fleet-live-runs.7368068/target/debug/deps/meridian_geometry-6b3f7f65e6433e53)
+
+running 37 tests
+test certificate::tests::closed_component_bounds_retain_face_edge_and_point_equalities ... ok
+test adapter_context_tests::rejected_budget_snapshot_survives_scope_cleanup_with_exact_stage_charges ... ok
+test certificate::sections::tests::limiting_sections_match_hand_derived_zero_sign_and_tangent_cases ... ok
+test certificate::identity_tests::completed_identity_audit_releases_only_owned_records_before_later_scratch ... ok
+test certificate::sections::tests::half_open_parity_preserves_cavity_multiplicity_and_boundary_ambiguity ... ok
+test certificate::sections::tests::section_frame_reserves_complete_ownership_and_releases_failed_build ... ok
+test certificate::sections::plane_support_tests::zero_axis_support_matches_full_dot_for_oblique_reversed_and_boundary_boxes ... ok
+test certificate::tests::owner_streaming_keeps_all_sheets_of_one_component_in_one_link_audit ... ok
+
+thread 'certificate::sections::tests::accounted_callback_preserves_arrangement_and_adds_live_classifier_storage' (170817940) panicked at crates/meridian-geometry/src/sections.rs:862:9:
+assertion `left == right` failed
+  left: 325
+ right: 322
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test certificate::tests::protected_overlap_facet_keeps_each_regular_local_boundary_path ... ok
+test planes::tests::exact_plane_cache_preserves_individual_contacts_and_guarded_lifetimes ... ok
+test certificate::owner_range_tests::owner_order_fallback_keeps_original_semantic_refusal_and_source ... ok
+test certificate::sections::tests::accounted_callback_preserves_arrangement_and_adds_live_classifier_storage ... FAILED
+test certificate::owner_range_tests::sorted_owner_ranges_preserve_closed_audits_and_eliminate_full_input_scans ... ok
+test region::live_overlap_tests::deferred_noding_visits_exact_old_point_set_once_and_excludes_physical_only_points ... ok
+test region::tests::region_round_trip_preserves_every_record_and_guards_transfer_lifetimes ... ok
+jointCollection normal=[Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 16, denom: 1 }] separateOperations=932 jointOperations=646 separatePeak=277 jointPeak=578 retained=392
+test planes::tests::reusable_storage_invalidates_hits_and_retains_guards_between_attempts ... ok
+test certificate::sections::tests::whole_plane_query_matches_independent_box_corner_support_and_storage_boundary ... ok
+test certificate::tests::original_topology_streams_owner_maps_under_the_same_storage_guard ... ok
+test certificate::sections::tests::joint_sections_match_both_separate_oracles_for_all_signed_zero_triples ... ok
+jointCollection normal=[Ratio { numer: 4, denom: 1 }, Ratio { numer: -4, denom: 1 }, Ratio { numer: 4, denom: 1 }] separateOperations=1161 jointOperations=809 separatePeak=333 jointPeak=625 retained=439
+test source::tests::exact_sections_match_independent_signed_contact_enumeration ... ok
+test certificate::sections::tests::joint_collection_preserves_order_remote_loops_and_complete_admission ... ok
+test certificate::tests::facet_bounds_index_matches_independent_closed_pairs_and_guards_scratch ... ok
+test certificate::sections::live_overlap_tests::owner_pruning_matches_frozen_candidates_for_uniform_mixed_and_unordered_ranges ... ok
+test certificate::tests::forward_ray_candidates_keep_boundary_ambiguities_and_source_order ... ok
+test certificate::tests::closed_ray_intervals_reject_skew_boxes_and_preserve_ordered_exact_parity ... ok
+BOUNDS_CACHE_COMPLETE {"fixture":"identity","oldOperations":30815,"newOperations":30401,"oldAttemptedPeak":6356,"newAttemptedPeak":3822,"oldRetained":2016,"newRetained":2016,"triangles":12}
+REGION_STORAGE_COMPLETE {"fixture":"identity","oldOperations":30242,"newOperations":30401,"oldAttemptedPeak":6356,"newAttemptedPeak":3822,"oldRetained":2016,"newRetained":2016,"triangles":12}
+EXACT_PRUNING_COMPLETE {"fixture":"identity","oldOperations":30277,"newOperations":30390,"oldAttemptedPeak":6552,"newAttemptedPeak":4018,"oldRetained":2016,"newRetained":2016,"triangles":12,"exactOutputAndExposedWitnessMatch":true}
+STYLE_STORAGE_COMPLETE {"fixture":"identity","oldOperations":30792,"newOperations":30401,"oldAttemptedPeak":6552,"newAttemptedPeak":3822,"oldRetained":2016,"newRetained":2016,"triangles":12}
+test section_arrangement::live_run_tests::actual_run_lifetimes_keep_exact_admission_and_refusal_cleanup ... ok
+test adapter::tests::equal_unshared_styles_and_shared_clones_have_distinct_storage_ownership ... ok
+STYLE_INPUT_STORAGE {"fixture":"SH010","before":79000,"after":40784,"operations":324732}
+test section_arrangement::live_run_tests::live_corners_match_frozen_complete_arrangements_with_protected_run_extensions ... ok
+sectionDifferential id=L_prism oldOperations=60759 newOperations=59967 oldPeak=7432 newPeak=7370 oldAdmitted=7432 newAdmitted=7370 oldRetained=3728 newRetained=3728 oldWallNanoseconds=133029333 newWallNanoseconds=121298290
+STYLE_INPUT_STORAGE {"fixture":"SH011","before":79000,"after":40784,"operations":329092}
+adapterStyles id=SH010 referenceOperations=359198 candidateOperations=320970 referencePeak=40973 candidatePeak=40991 referenceWallNs=180236875 candidateWallNs=169003000
+REGION_STORAGE_COMPLETE {"fixture":"overlap","oldOperations":103189,"newOperations":104353,"oldAttemptedPeak":18956,"newAttemptedPeak":12416,"oldRetained":6552,"newRetained":6552,"triangles":48}
+BOUNDS_CACHE_COMPLETE {"fixture":"overlap","oldOperations":106146,"newOperations":104353,"oldAttemptedPeak":18956,"newAttemptedPeak":12416,"oldRetained":6552,"newRetained":6552,"triangles":48}
+STYLE_STORAGE_COMPLETE {"fixture":"overlap","oldOperations":106099,"newOperations":104353,"oldAttemptedPeak":19368,"newAttemptedPeak":12416,"oldRetained":6552,"newRetained":6552,"triangles":48}
+STYLE_INPUT_STORAGE {"fixture":"SH016","before":85864,"after":44304,"operations":328563}
+EXACT_PRUNING_COMPLETE {"fixture":"overlap","oldOperations":108136,"newOperations":104330,"oldAttemptedPeak":19368,"newAttemptedPeak":12828,"oldRetained":6552,"newRetained":6552,"triangles":48,"exactOutputAndExposedWitnessMatch":true}
+sectionDifferential id=L_prism_shear_mirror oldOperations=62785 newOperations=62308 oldPeak=7432 newPeak=7370 oldAdmitted=7432 newAdmitted=7370 oldRetained=3728 newRetained=3728 oldWallNanoseconds=181205375 newWallNanoseconds=164011542
+sectionDifferential id=face oldOperations=64338 newOperations=63430 oldPeak=6896 newPeak=6820 oldAdmitted=6896 newAdmitted=6820 oldRetained=3360 newRetained=3360 oldWallNanoseconds=99874212 newWallNanoseconds=88009126
+test section_tests::one_sided_sections_preserve_original_contact_and_field_refusals ... ok
+REGION_STORAGE_COMPLETE {"fixture":"buried","oldOperations":41768,"newOperations":43521,"oldAttemptedPeak":6836,"newAttemptedPeak":4264,"oldRetained":2016,"newRetained":2016,"triangles":12}
+BOUNDS_CACHE_COMPLETE {"fixture":"buried","oldOperations":44773,"newOperations":43521,"oldAttemptedPeak":6836,"newAttemptedPeak":4264,"oldRetained":2016,"newRetained":2016,"triangles":12}
+STYLE_STORAGE_COMPLETE {"fixture":"buried","oldOperations":44726,"newOperations":43521,"oldAttemptedPeak":7248,"newAttemptedPeak":4264,"oldRetained":2016,"newRetained":2016,"triangles":12}
+adapterStyles id=SH011 referenceOperations=363558 candidateOperations=325330 referencePeak=40981 candidatePeak=40999 referenceWallNs=172141375 candidateWallNs=170393125
+STYLE_INPUT_STORAGE {"fixture":"SH017","before":85864,"after":44304,"operations":353358}
+EXACT_PRUNING_COMPLETE {"fixture":"buried","oldOperations":49342,"newOperations":43498,"oldAttemptedPeak":9940,"newAttemptedPeak":4676,"oldRetained":2724,"newRetained":2016,"triangles":12,"exactOutputAndExposedWitnessMatch":true}
+STYLE_INPUT_STORAGE {"fixture":"SH166","before":77128,"after":39824,"operations":307315}
+test adapter::tests::original_style_pool_preserves_exact_text_and_counts_only_shared_allocations ... ok
+REGION_STORAGE_COMPLETE {"fixture":"shared_face","oldOperations":63415,"newOperations":63453,"oldAttemptedPeak":10644,"newAttemptedPeak":6408,"oldRetained":3360,"newRetained":3360,"triangles":20}
+BOUNDS_CACHE_COMPLETE {"fixture":"shared_face","oldOperations":66028,"newOperations":63453,"oldAttemptedPeak":10644,"newAttemptedPeak":6408,"oldRetained":3360,"newRetained":3360,"triangles":20}
+STYLE_STORAGE_COMPLETE {"fixture":"shared_face","oldOperations":65981,"newOperations":63453,"oldAttemptedPeak":11056,"newAttemptedPeak":6408,"oldRetained":3360,"newRetained":3360,"triangles":20}
+EXACT_PRUNING_COMPLETE {"fixture":"shared_face","oldOperations":66170,"newOperations":63430,"oldAttemptedPeak":12108,"newAttemptedPeak":6820,"oldRetained":3636,"newRetained":3360,"triangles":20,"exactOutputAndExposedWitnessMatch":true}
+adapterStyles id=SH016 referenceOperations=365449 candidateOperations=323877 referencePeak=44470 candidatePeak=44488 referenceWallNs=164958750 candidateWallNs=163487709
+REGION_STORAGE_COMPLETE {"fixture":"four_disconnected","oldOperations":132836,"newOperations":133229,"oldAttemptedPeak":24980,"newAttemptedPeak":14844,"oldRetained":8064,"newRetained":8064,"triangles":48}
+BOUNDS_CACHE_COMPLETE {"fixture":"four_disconnected","oldOperations":148529,"newOperations":133229,"oldAttemptedPeak":24980,"newAttemptedPeak":14844,"oldRetained":8064,"newRetained":8064,"triangles":48}
+STYLE_STORAGE_COMPLETE {"fixture":"four_disconnected","oldOperations":148434,"newOperations":133229,"oldAttemptedPeak":25824,"newAttemptedPeak":14844,"oldRetained":8064,"newRetained":8064,"triangles":48}
+adapterStyles id=SH017 referenceOperations=390244 candidateOperations=348672 referencePeak=44498 candidatePeak=44516 referenceWallNs=180857959 candidateWallNs=179584542
+EXACT_PRUNING_COMPLETE {"fixture":"four_disconnected","oldOperations":163544,"newOperations":133182,"oldAttemptedPeak":25824,"newAttemptedPeak":15688,"oldRetained":8064,"newRetained":8064,"triangles":48,"exactOutputAndExposedWitnessMatch":true}
+sectionDifferential id=L_overlap oldOperations=177382 newOperations=174013 oldPeak=19488 newPeak=19388 oldAdmitted=19488 newAdmitted=19388 oldRetained=9640 newRetained=9640 oldWallNanoseconds=484410171 newWallNanoseconds=421416417
+adapterStyles id=SH166 referenceOperations=341473 candidateOperations=304157 referencePeak=40001 candidatePeak=40019 referenceWallNs=158609375 candidateWallNs=155806791
+test adapter_context_tests::authenticated_encoded_styles_match_frozen_decoding_and_remove_only_repeated_hex_work ... ok
+REGION_STORAGE_COMPLETE {"fixture":"eight_oblique_disconnected","oldOperations":296700,"newOperations":298839,"oldAttemptedPeak":49812,"newAttemptedPeak":29540,"oldRetained":16128,"newRetained":16128,"triangles":96}
+BOUNDS_CACHE_COMPLETE {"fixture":"eight_oblique_disconnected","oldOperations":364489,"newOperations":298839,"oldAttemptedPeak":49812,"newAttemptedPeak":29540,"oldRetained":16128,"newRetained":16128,"triangles":96}
+STYLE_STORAGE_COMPLETE {"fixture":"eight_oblique_disconnected","oldOperations":364298,"newOperations":298839,"oldAttemptedPeak":51520,"newAttemptedPeak":29540,"oldRetained":16128,"newRetained":16128,"triangles":96}
+test pruning::complete_region_storage_controls_preserve_all_fields_and_reduce_peak ... ok
+sectionDifferential id=L_overlap_shear_mirror oldOperations=151129 newOperations=147904 oldPeak=16032 newPeak=15932 oldAdmitted=16032 newAdmitted=15932 oldRetained=7984 newRetained=7984 oldWallNanoseconds=505756749 newWallNanoseconds=404048251
+test pruning::complete_bounds_cache_controls_preserve_fields_witnesses_and_reduce_work ... ok
+test pruning::complete_style_storage_controls_preserve_all_fields_witnesses_and_refusals ... ok
+sectionDifferential id=cavity oldOperations=65186 newOperations=66555 oldPeak=7984 newPeak=7910 oldAdmitted=7984 newAdmitted=7910 oldRetained=4032 newRetained=4032 oldWallNanoseconds=150214333 newWallNanoseconds=138148790
+FORWARD_RAY_COMPLETE {"fixture":"subdivided_identity","oldOperations":440444,"newOperations":410395,"oldAttemptedPeak":35352,"newAttemptedPeak":35026,"oldRetained":18144,"newRetained":18144,"triangles":108}
+EXACT_PRUNING_COMPLETE {"fixture":"eight_oblique_disconnected","oldOperations":440797,"newOperations":298744,"oldAttemptedPeak":51520,"newAttemptedPeak":31248,"oldRetained":16128,"newRetained":16128,"triangles":96,"exactOutputAndExposedWitnessMatch":true}
+sectionDifferential id=cavity_shear_mirror oldOperations=68481 newOperations=69957 oldPeak=7984 newPeak=7910 oldAdmitted=7984 newAdmitted=7910 oldRetained=4032 newRetained=4032 oldWallNanoseconds=201243665 newWallNanoseconds=186615791
+test pruning::complete_frozen_solids_preserve_all_exposed_fields_witnesses_and_charged_work ... ok
+sectionDifferential id=cavity_filled oldOperations=56656 newOperations=61381 oldPeak=5448 newPeak=5336 oldAdmitted=5448 newAdmitted=5336 oldRetained=2016 newRetained=2016 oldWallNanoseconds=137573584 newWallNanoseconds=122801958
+sectionDifferential id=cavity_filled_shear_mirror oldOperations=64857 newOperations=69837 oldPeak=5448 newPeak=5336 oldAdmitted=5448 newAdmitted=5336 oldRetained=2016 newRetained=2016 oldWallNanoseconds=213234210 newWallNanoseconds=187194584
+test section_tests::one_sided_sections_preserve_complete_nonconvex_cavity_and_oblique_hulls ... ok
+FORWARD_RAY_COMPLETE {"fixture":"subdivided_buried","oldOperations":457447,"newOperations":431362,"oldAttemptedPeak":36048,"newAttemptedPeak":35684,"oldRetained":18144,"newRetained":18144,"triangles":108}
+test pruning::complete_forward_ray_controls_preserve_all_fields_witnesses_and_charged_work ... ok
+
+failures:
+
+failures:
+    certificate::sections::tests::accounted_callback_preserves_arrangement_and_adds_live_classifier_storage
+
+test result: FAILED. 36 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.65s
+
+error: test failed, to rerun pass `-p meridian-geometry --lib`

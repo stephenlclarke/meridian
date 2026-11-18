@@ -374,14 +374,20 @@ impl Arrangement {
                 }
                 let mut run = match run {
                     Some(mut old) => {
-                        let previous = old.lower.len() + old.upper.len();
-                        extend(&mut old.lower, lo_right.clone(), &protected, b)?;
-                        extend(&mut old.upper, hi_right.clone(), &protected, b)?;
-                        // extend has already dropped any removed collinear
-                        // records. Count the surviving chains, including all
-                        // protected points, without a historical-strip total.
-                        b.step(1)?;
-                        members = members - previous + old.lower.len() + old.upper.len();
+                        extend(
+                            &mut old.lower,
+                            lo_right.clone(),
+                            &protected,
+                            &mut members,
+                            b,
+                        )?;
+                        extend(
+                            &mut old.upper,
+                            hi_right.clone(),
+                            &protected,
+                            &mut members,
+                            b,
+                        )?;
                         work.strips_extended += 1;
                         old
                     }
@@ -454,6 +460,7 @@ fn extend(
     chain: &mut Cell,
     p: Point2,
     protected: &BTreeSet<Point2>,
+    members: &mut usize,
     b: &mut Budget,
 ) -> Result<(), Failure> {
     while chain.len() >= 2 {
@@ -464,10 +471,14 @@ fn extend(
         {
             break;
         }
+        // The charged collinearity/protection visit already identified this
+        // exact retiring record. Debit it after its owning point is dropped.
         chain.pop();
+        *members -= 1;
     }
     b.step(1)?;
     chain.push(p);
+    *members += 1;
     Ok(())
 }
 fn finish(
@@ -478,20 +489,24 @@ fn finish(
     b: &mut Budget,
 ) -> Result<(), Failure> {
     b.step((run.lower.len() + run.upper.len()) as u64)?;
-    let incoming = run.lower.len() + run.upper.len();
     let mut result = run.lower;
     result.extend(run.upper.into_iter().rev());
-    result.dedup();
+    // The original charged incoming-record traversal covers this dedup pass.
+    // Record each retired duplicate during that visit, without a new recount.
+    result.dedup_by(|a, c| {
+        let duplicate = a == c;
+        if duplicate {
+            *members -= 1;
+        }
+        duplicate
+    });
     if result.len() > 1 && result.first() == result.last() {
         result.pop();
+        *members -= 1;
     }
     if result.len() < 3 || area(&result, b)? <= integer(0) {
         return Err(b.fail(FailureKind::Degenerate, "strip lost positive area"));
     }
-    // dedup/pop have dropped the duplicate owning point records. Moving the
-    // remaining points into cells does not allocate a second point set.
-    b.step(1)?;
-    *members -= incoming - result.len();
     cells.push(result);
     work.retained_cells += 1;
     Ok(())

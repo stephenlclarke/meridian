@@ -1,11 +1,13 @@
 """Restore explicit actual-run/sparse-support edits for independent old proofs."""
 import json
 from pathlib import Path
+from restore_incremental_run import restore_incremental
 
 CRATE = Path(__file__).resolve().parents[1]
 
 
 def restore_runs(name, source):
+    source = restore_incremental(name, source)
     edits = json.loads((CRATE / 'integration/live-runs/INVERSE-EDITS.json').read_text())
     if name not in edits:
         return source

@@ -179,3 +179,9 @@ The noding point pool now builds after classification and index cleanup from the
 The deferred-pool revision passed 52 Rust tests, nine host tests, check, strict Clippy and build. Its one changed whole-five still refused all constructors. The private arrangement counter now retires only corners already dropped by run extension or cell deduplication, keeps the existing 16-membership price and guards transfer scratch before allocation. Current-facet outward support also skips exactly zero coefficients after one charged normal scan.
 
 All 52 prior test bodies and immutable controls are preserved. Three new independent comparisons bring the current total to 55 Rust tests plus nine host tests, all UNRUN. Full fit remains unproved. [The causal evidence, accounting and qualification contract](integration/live-runs/CONTRACT.md) retain every old outcome and the strict unchanged caps.
+
+## Incremental membership bookkeeping
+
+The live-run qualification passed check and 36 library tests, then failed the unchanged exact work comparison at 325 versus 322. The remaining 18 Rust tests, nine host tests, Clippy, build and original-five stayed UNRUN. The separate run/cell recount operations are now eliminated: membership follows the existing charged point push, pop and dedup visits. Original geometry charges, the 322 assertion, transfer guard, all 55 old test bodies and caps remain unchanged.
+
+One new lifetime regression brings this source to 56 Rust tests and nine host tests, all UNRUN. [The causal delta and source-bound failure](integration/incremental-run/CONTRACT.md) retain the complete actual failure and unaffected-source proof. No new original result or full-fit claim is made.

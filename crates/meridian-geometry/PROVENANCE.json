@@ -151,5 +151,13 @@
     "source": "Exact previously qualified geometry; no new source assets or admission",
     "currentExecution": "UNRUN",
     "fidelity": "Actual owning-chain lifetime accounting at unchanged16/unit; sparse current-facet support with original exact sign/endpoints"
+  },
+  "incrementalRunCorrection": {
+    "failedRoot": "7368068067eec056fea258bbf8d7f832ce188ded",
+    "parentFailureSHA256": "116698efc8170866f528eb64144a77e7c01adc899ff69fab13ef78020020d7c4",
+    "rawSHA256": "83b17e08ae5a63badf95ff18e3c13559f341afb4c556cf93ae4274c7cdc0d547",
+    "actualOriginal736": "UNRUN",
+    "currentExecution": "UNRUN",
+    "sourceFidelity": "Same exact geometry; metadata updates fuse into original charged point visits; no source input, cap or hull admission change"
   }
 }

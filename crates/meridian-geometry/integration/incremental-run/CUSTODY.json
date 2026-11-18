@@ -1,0 +1,54 @@
+{
+  "verifiedDirectPins": [
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-live-runs.7368068/evidence/FOCUSED-TERMINAL.json",
+      "bytes": 2091,
+      "sha256": "f1ef37cdd7e5bb21ccb7b9e879a350aac67c223421bccf74fd74218235d0ef0b"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-live-runs.7368068/evidence/TEST-START.json",
+      "bytes": 1708,
+      "sha256": "8cce1d576ec89d316c3af15e9e84a80f183ee7ecdb757e5ee2f8976fff89bdc1"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-live-runs.7368068/evidence/TEST-TERMINAL.json",
+      "bytes": 1990,
+      "sha256": "9e61aa91c34dac4d16c9fc7191c37b3edfa71049adaa51031a49ebca9d647a9d"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-live-runs.7368068/evidence/test.log",
+      "bytes": 14225,
+      "sha256": "cf13545b27946993bf24b9b5d0f6f1c3422ce182663935cc57e251ebd99c8e0b"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-live-runs.7368068/target/debug/deps/meridian_geometry-6b3f7f65e6433e53",
+      "bytes": 12363360,
+      "sha256": "af455548cff64cf8d8a5477e092437b4c647c288b03eb4b8ebda0ae1547fbc9e"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-live-runs.7368068/evidence/REVIEW.json",
+      "bytes": 2410,
+      "sha256": "2b841b0754ff2f8e61da3f7abc6b08a5328ee91143ca32f2a254052e5f0904de"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-live-runs.7368068/evidence/RETAINED-WHOLE-REVIEW.json",
+      "bytes": 5817,
+      "sha256": "8aa1da87e461fb087845c3886f0b3873ed35f1b76a9a7fd4ff357e1b649f91ce"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-live-runs.7368068/evidence/ROOT-ALL-SOURCE-PINS.json",
+      "bytes": 102766,
+      "sha256": "f969af763e8109ddb0821140af57557d078943262712677e51a3504ef74716bc"
+    }
+  ],
+  "verifiedDirectCount": 8,
+  "parent276CratePaths": "Each authorfefGitfile mode-independent byte/hash matches actual736source inventory",
+  "source": "7368068067eec056fea258bbf8d7f832ce188ded",
+  "tree": "9da046e4a5966e753084319fedf394bba5f028c0",
+  "failureSHA256": "116698efc8170866f528eb64144a77e7c01adc899ff69fab13ef78020020d7c4",
+  "rawSHA256": "83b17e08ae5a63badf95ff18e3c13559f341afb4c556cf93ae4274c7cdc0d547",
+  "actualPass": "all-target check;36librarytests",
+  "actualFail": "1librarytest 325vs322 equality",
+  "unrun": "18remainingRust,9host,Clippy,build,wholefive",
+  "priorD0FiveConstructors": "Historical source only; not736outcomes"
+}

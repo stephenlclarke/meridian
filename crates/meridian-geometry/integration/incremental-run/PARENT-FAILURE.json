@@ -1,0 +1,77 @@
+{
+  "utc": "2026-11-18T08:14:44.940576+00:00",
+  "result": "FLEET7368068_FOCUSED_TEST_FAIL_STOPPED_NO_ORIGINAL_BATCH",
+  "source": "7368068067eec056fea258bbf8d7f832ce188ded",
+  "tree": "9da046e4a5966e753084319fedf394bba5f028c0",
+  "focusedTerminal": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-live-runs.7368068/evidence/FOCUSED-TERMINAL.json",
+    "bytes": 2091,
+    "sha256": "f1ef37cdd7e5bb21ccb7b9e879a350aac67c223421bccf74fd74218235d0ef0b"
+  },
+  "testStart": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-live-runs.7368068/evidence/TEST-START.json",
+    "bytes": 1708,
+    "sha256": "8cce1d576ec89d316c3af15e9e84a80f183ee7ecdb757e5ee2f8976fff89bdc1"
+  },
+  "testTerminal": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-live-runs.7368068/evidence/TEST-TERMINAL.json",
+    "bytes": 1990,
+    "sha256": "9e61aa91c34dac4d16c9fc7191c37b3edfa71049adaa51031a49ebca9d647a9d"
+  },
+  "rawTestLog": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-live-runs.7368068/evidence/test.log",
+    "bytes": 14225,
+    "sha256": "cf13545b27946993bf24b9b5d0f6f1c3422ce182663935cc57e251ebd99c8e0b"
+  },
+  "testExecutable": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-live-runs.7368068/target/debug/deps/meridian_geometry-6b3f7f65e6433e53",
+    "bytes": 12363360,
+    "sha256": "af455548cff64cf8d8a5477e092437b4c647c288b03eb4b8ebda0ae1547fbc9e"
+  },
+  "review": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-live-runs.7368068/evidence/REVIEW.json",
+    "bytes": 2410,
+    "sha256": "2b841b0754ff2f8e61da3f7abc6b08a5328ee91143ca32f2a254052e5f0904de"
+  },
+  "retainedWholeReview": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-live-runs.7368068/evidence/RETAINED-WHOLE-REVIEW.json",
+    "bytes": 5817,
+    "sha256": "8aa1da87e461fb087845c3886f0b3873ed35f1b76a9a7fd4ff357e1b649f91ce"
+  },
+  "sourceInventory": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-live-runs.7368068/evidence/ROOT-ALL-SOURCE-PINS.json",
+    "bytes": 102766,
+    "sha256": "f969af763e8109ddb0821140af57557d078943262712677e51a3504ef74716bc"
+  },
+  "all415SourceModeBytesSHAUnchanged": true,
+  "actualPass": {
+    "lockedAllTargetCheck": "PASS",
+    "libraryRust": 36
+  },
+  "actualFailure": {
+    "libraryRust": 1,
+    "test": "certificate::sections::tests::accounted_callback_preserves_arrangement_and_adds_live_classifier_storage",
+    "location": "crates/meridian-geometry/src/sections.rs:862:9",
+    "assertion": "assert_eq left325 right322",
+    "cargoTestExit": 101,
+    "focusedOwnerExit": 101
+  },
+  "unrun": [
+    "remaining18Rust targetcases (55notpassed)",
+    "9host tests",
+    "strictClippy",
+    "original_five devbuild",
+    "ONEchangedwholefive:UNRUNbecausefocusedfailed"
+  ],
+  "preservedControls": "108/120 and otherstrictcontrols retain their actualpassing scope/rawnumbers; they do not override thisfailedlibraryassertion",
+  "previousMeasuredD0": {
+    "source": "d0e3ef43f4fd554778d0eaa2be2088846da8c225",
+    "Rust": 52,
+    "host": 9,
+    "wholeFive": "5decodePASS/5constructorREFUSED/15dependentUNRUN/0admissions; remainoldsourcebound"
+  },
+  "noUnchangedRetry": true,
+  "noThresholdCapOrAssertionChange": true,
+  "noNativeProfileGameSignNotary": true,
+  "next": "Root/G4causalaccountingcorrectionandG2exactdelta beforechangedqualification; no blind325thresholdsubstitutionorunchangeddiagnostic."
+}

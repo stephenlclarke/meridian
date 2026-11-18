@@ -1,0 +1,2492 @@
+{
+  ".coveragerc": {
+    "mode": "100644",
+    "blob": "15d42ac31267e446b29c446e57e359fd18b356bf",
+    "bytes": 96,
+    "sha256": "773c2d6c936999a2c5430c057a3b33a2d23b3c496b8dc5ace91f90a41d85a3a8"
+  },
+  ".gitattributes": {
+    "mode": "100644",
+    "blob": "01229d033cbdd7d6ebfa290a3dbc9d0021783937",
+    "bytes": 93,
+    "sha256": "0f6c3bb1bae2da142e730d3fbceeb153020fa864ed5abd0a3cd138e1518c8b7b"
+  },
+  ".github/workflows/ci.yml": {
+    "mode": "100644",
+    "blob": "009d100309d99bfad7bf332e57cc46e1040837df",
+    "bytes": 5448,
+    "sha256": "c4d0069201358777e1869fabdd2f9f43a5b02cfe3846a21b873157dfe7f9be8d"
+  },
+  ".gitignore": {
+    "mode": "100644",
+    "blob": "b24521f45b5ddb140e1acea59be62d5c6a6004ae",
+    "bytes": 214,
+    "sha256": "5dc49e15a7519f8f4413e6f1cca0c65d56818a6dc8e1ceba62ffb0ff1293f5b7"
+  },
+  ".markdownlint.json": {
+    "mode": "100644",
+    "blob": "c44ef7ca27bc23fb6dff29ea07eaaac834df8b82",
+    "bytes": 39,
+    "sha256": "c0dbf05e4436e578d364d97521eacf5ef426b05a14edb3770ad36324e37452d1"
+  },
+  "AGENTS.md": {
+    "mode": "100644",
+    "blob": "5040b5fbccc669afac99830392c75b4450ededde",
+    "bytes": 2518,
+    "sha256": "658e85a6896805d409a846c3826b9729a7a17955fd83c0ac674ea13446c825df"
+  },
+  "Cargo.lock": {
+    "mode": "100644",
+    "blob": "588f920e55ded0dcdfe5a54c57d1b42a5cf0d09e",
+    "bytes": 65336,
+    "sha256": "d2afa020fd62f66a9f3f5863f75a11216debb1d04cc6a74f2afbacfcf5393dbf"
+  },
+  "Cargo.toml": {
+    "mode": "100644",
+    "blob": "b68ab24439746965fdba887e95facf189bc40794",
+    "bytes": 351,
+    "sha256": "082c12ebc1f9aaab8dd3c962acc06cc6e85bf8bcf6cc9a29c2c36cdfd91d9bec"
+  },
+  "LICENSE": {
+    "mode": "100644",
+    "blob": "f990f15f0bfe968de7a3b8bf802250376312588e",
+    "bytes": 1057,
+    "sha256": "5227ddcd399e3e1b85f213cd72d8639af986b9ea18fd87e3f188ef5c5f1291d0"
+  },
+  "Makefile": {
+    "mode": "100644",
+    "blob": "fb8e7f15baee1f4ce1d677c46f8c440c11e478ad",
+    "bytes": 830,
+    "sha256": "9fde2ec685e616f7885589a4395cd6fc6ecba5031165c4de4c5b5c80cb7b352e"
+  },
+  "README.md": {
+    "mode": "100644",
+    "blob": "c9cddaef0cd85a4ac19c65ed73657bae0bb281fa",
+    "bytes": 16722,
+    "sha256": "c45fa0e01a32a10fb968b84deb460247b2de2a967755ddd976f0232a5f47e8e0"
+  },
+  "assets/legacy/Elite-L337-MIT.txt": {
+    "mode": "100644",
+    "blob": "b27f022cea044295412849dec93512dad638f08e",
+    "bytes": 1071,
+    "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+  },
+  "assets/legacy/commodities.catalogue": {
+    "mode": "100644",
+    "blob": "8a940200f94f82590d4ca8ee0d2f43efc476385f",
+    "bytes": 847,
+    "sha256": "2dbfb9e0abc0a6c2bad3dbabd9a44942f41a86d55c5c44e885ea3dd2bfbca451"
+  },
+  "assets/legacy/commodity-content-manifest.json": {
+    "mode": "100644",
+    "blob": "6f5afdab8782c2ea4bf64fc256515e75066d7e90",
+    "bytes": 19408,
+    "sha256": "bae0ffa93332935d5a300f7a4eba21ba740159fe8b7ba8b9b0f01bb45df95da8"
+  },
+  "assets/legacy/equipment-content-manifest.json": {
+    "mode": "100644",
+    "blob": "4307249bd4efe3fd191c8e71647b179b3cfbeb5c",
+    "bytes": 14610,
+    "sha256": "70799baf071c8e83a848ec164fbc9b644a51bd4a6c0af2df59b833247ec9bde4"
+  },
+  "assets/legacy/g01-commodities.markets": {
+    "mode": "100644",
+    "blob": "21ee7b700fc0c7a9b79a2372f7a01d0375e26a42",
+    "bytes": 1138,
+    "sha256": "8f9ec17f63a8e99a700ec5c01273ca67a8ec1cef42730edc10a8d778f0f1b253"
+  },
+  "assets/legacy/g01-food.markets": {
+    "mode": "100644",
+    "blob": "280e8b49b671ca89d37b68b580c7ec7632add7c8",
+    "bytes": 46,
+    "sha256": "fb9dea9e2c03f4cdcd74ed1e0409706bf2cdd0ed9fb37ca2c56934005deb72fa"
+  },
+  "assets/legacy/g01.navigation": {
+    "mode": "100644",
+    "blob": "2954aa531e5a84e00f3de4bccef9bb55e3527915",
+    "bytes": 6510,
+    "sha256": "e1e97b33550c426db1a7e90a4dcea6fe05dbd09268a964189793ba2bab96d823"
+  },
+  "assets/legacy/manifest.json": {
+    "mode": "100644",
+    "blob": "760fdd10a2aa4ecdce20854b230bea85ce8e9638",
+    "bytes": 949,
+    "sha256": "a9f8c378e88deadb09001f730457097c5c4e2fa92527e1682e4b67e78cbecc8b"
+  },
+  "assets/legacy/navigation-manifest.json": {
+    "mode": "100644",
+    "blob": "5c15ad6fa3ca03c2a96efdb7e8e867f2ec590339",
+    "bytes": 806,
+    "sha256": "7f430671fd5f7f8a295ca65263f4d8d28d23e6447160a541ad4409c7757f89fe"
+  },
+  "assets/legacy/original-economy-origin.json": {
+    "mode": "100644",
+    "blob": "2260dd7cd06023067e1231486c20dcb42f253378",
+    "bytes": 7628,
+    "sha256": "a3a829192e7147ce5840924b1d0d8dbee419d8411f41057937ac26bdd1e557a8"
+  },
+  "assets/legacy/sh025-cargo-bay.equipment": {
+    "mode": "100644",
+    "blob": "6543a6cecf00f9e39fe217349e62766efb076a48",
+    "bytes": 107,
+    "sha256": "2e99546d65fec686e65275599c0ac529a17551655678fd65e4b794e74104b83d"
+  },
+  "assets/legacy/sh025.mesh": {
+    "mode": "100644",
+    "blob": "b6354d4a809bcab45bfc256a31f7bc8d7a82ef30",
+    "bytes": 250848,
+    "sha256": "b85d726da742da00a68643429fc109b28343e164601aa013abb9aa045717c6d7"
+  },
+  "assets/legacy/sh025.physics": {
+    "mode": "100644",
+    "blob": "fa792ed1949d92711c30a06f84ec3fd0802c1556",
+    "bytes": 24448,
+    "sha256": "b43418aee89564759a5db789f8efa604222a392c69a2024c7a9ed2156eff434d"
+  },
+  "assets/legacy/sh028.mesh": {
+    "mode": "100644",
+    "blob": "f50eb0aa0b1f399b7d666ba1e933fe34ba25c6ef",
+    "bytes": 724032,
+    "sha256": "123a63ff56db7965baba2f54d3ed4b5feab62c47115aef0a5d9a2970b6cb897e"
+  },
+  "assets/legacy/sh028.physics": {
+    "mode": "100644",
+    "blob": "3c94dab5835923f17a805de2d40a61946137fac6",
+    "bytes": 12400,
+    "sha256": "cd54d30cab638f6b33feacf1fa78c9136f8ce346e8cc6133259bfc0472c259d5"
+  },
+  "assets/legacy/sh028.port": {
+    "mode": "100644",
+    "blob": "35a47c662e3cf61f6f843869137da21f9cf1bd8c",
+    "bytes": 188,
+    "sha256": "31a7ed33803e78ebbe7bb87c0658e47a786e8bba9107d513b2e534ccd30cf71f"
+  },
+  "assets/legacy/station-manifest.json": {
+    "mode": "100644",
+    "blob": "c8c5b29de644d40b64d9b9112945bed02b4af133",
+    "bytes": 4073,
+    "sha256": "b96802bf73b78eb2ab33f4311b8a810c508f9cc19c399bf000affacf09518ea2"
+  },
+  "assets/legacy/station-services-manifest.json": {
+    "mode": "100644",
+    "blob": "523fc89c0d8cc6e27896e6d66ee7b9d817ce1592",
+    "bytes": 1941,
+    "sha256": "5ff1dbcae5938aeea0e65e7838692f59a586bb7bed7968e949e908f983cb6a60"
+  },
+  "crates/meridian-core/Cargo.toml": {
+    "mode": "100644",
+    "blob": "64aa868b4a726ccc123a08a1aff602d3419010c9",
+    "bytes": 210,
+    "sha256": "29607c4a931299648228b9063ce2cebc9ee52df1490d8b89ee77920d38e3f025"
+  },
+  "crates/meridian-core/README.md": {
+    "mode": "100644",
+    "blob": "58e79623f2b47e6aa3b54b50e04b61b65ae092d6",
+    "bytes": 1807,
+    "sha256": "c3995a249e1cfd937f38e28c7a8570e49ea221c725f3eff734317551a49202dd"
+  },
+  "crates/meridian-core/src/docking.rs": {
+    "mode": "100644",
+    "blob": "af95e9de6e0e6e01fdec77c2b063740978902dfc",
+    "bytes": 40069,
+    "sha256": "2e052808d92789b2d329c4c87d21a41ce5f1241b2af403f73b751d2143e17619"
+  },
+  "crates/meridian-core/src/equipment.rs": {
+    "mode": "100644",
+    "blob": "b6dbf8fe8af3da33eeaa1314592fd9f96d635c51",
+    "bytes": 11801,
+    "sha256": "0ac2daf01bd82dec7118273eed720352c8c5f120b2bdbb5d018243d98c74badf"
+  },
+  "crates/meridian-core/src/equipment/content.rs": {
+    "mode": "100644",
+    "blob": "5c0163902df2d4da0a9d7206364b5661f6388123",
+    "bytes": 5445,
+    "sha256": "d0c4f2cc083fd0d1eddb4108d5bdec89e97156778128c9c88717fa5df91db2bf"
+  },
+  "crates/meridian-core/src/flight.rs": {
+    "mode": "100644",
+    "blob": "8e8a610d518d7521cc0994f06aeeb96bd20bf50a",
+    "bytes": 30037,
+    "sha256": "4d9212d41922d1b8ccd37e88ee21bae25b563511d1aaab417f15950a65497f3a"
+  },
+  "crates/meridian-core/src/flight/combat.rs": {
+    "mode": "100644",
+    "blob": "ee1933716f81340897aeccf2fb1868111178b125",
+    "bytes": 24042,
+    "sha256": "c626eeae1970235cc3cbf76961c80580a0c33976a08696c76c1b37342276ec72"
+  },
+  "crates/meridian-core/src/flight/combat/tests.rs": {
+    "mode": "100644",
+    "blob": "ac722587a4565a94ed0127f8e066c2320a4d549b",
+    "bytes": 22249,
+    "sha256": "3ea52031e4822c8ba2245dbbe01c412c46dc43a6e4e68f83299488f451d2521d"
+  },
+  "crates/meridian-core/src/flight/equipment.rs": {
+    "mode": "100644",
+    "blob": "6deee7e43751ccbd585564bb0083d829e89f3caa",
+    "bytes": 1766,
+    "sha256": "e6d374a7201dc82da9f657e49ae86fbe4a339b465e8610317b29f28777b64662"
+  },
+  "crates/meridian-core/src/flight/equipment/tests.rs": {
+    "mode": "100644",
+    "blob": "944e13f8067f415639c1e553cb55031e4b1d4eb5",
+    "bytes": 16901,
+    "sha256": "9057c9bcdd73c101684d7da7937677ea041e5313077752f0de7c838fa15f9dec"
+  },
+  "crates/meridian-core/src/flight/flight_reception.rs": {
+    "mode": "100644",
+    "blob": "f678d197c8dbd9e0bf866bcb477b16f62071e890",
+    "bytes": 19620,
+    "sha256": "a6c4c82a3b031739989cc2e90216b54900d5fc03907ea98e24ce2db496e7c9ea"
+  },
+  "crates/meridian-core/src/flight/flight_reception/persistence.rs": {
+    "mode": "100644",
+    "blob": "bdeebeaba8ce0dec9e07bda9f8a073da87db828d",
+    "bytes": 12746,
+    "sha256": "1f7c931fb285b48609a3d7e22cfb62e52dc0646dae594aa5aec80d08532f7be6"
+  },
+  "crates/meridian-core/src/flight/flight_reception/sight.rs": {
+    "mode": "100644",
+    "blob": "3578fe6f2d1becc0b632633542170e23bcd3c174",
+    "bytes": 4375,
+    "sha256": "9fbaabf45a24c9e71f80d6c919720f16f930edd8bf286ae71b1050ef126634ca"
+  },
+  "crates/meridian-core/src/flight/flight_reception/tests.rs": {
+    "mode": "100644",
+    "blob": "19d3358ce8b60fcb262b2230bd78beb18bdabf40",
+    "bytes": 29814,
+    "sha256": "e559262155f9aa5388fd98837af6c9908e60dbc8d446efa639495808acf5aa07"
+  },
+  "crates/meridian-core/src/flight/missiles.rs": {
+    "mode": "100644",
+    "blob": "3064ff99ad8766676d6e7b1be4bfbf2cb597530b",
+    "bytes": 23904,
+    "sha256": "e7378aa9823ed5f34f95d4a21df1d67d7e62aa475b91dff5311d10725cd72a3b"
+  },
+  "crates/meridian-core/src/flight/missiles/geometry.rs": {
+    "mode": "100644",
+    "blob": "206f491e6ee894f0da74e872cd9fce421d4f1ace",
+    "bytes": 2218,
+    "sha256": "ecf9e9e2841808af5b5f07466af160e3ea0cf7f34825a1dda44a175173f8ae45"
+  },
+  "crates/meridian-core/src/flight/missiles/persistence.rs": {
+    "mode": "100644",
+    "blob": "3f9c9de4f8d98730522db1b24e1d6317bdd65c77",
+    "bytes": 42160,
+    "sha256": "e76c9c42b2eec484e846017dd80ccd22c3813d3326ba828e45a6d3cb2de9012b"
+  },
+  "crates/meridian-core/src/flight/missiles/tests.rs": {
+    "mode": "100644",
+    "blob": "6eca96e90a9ebbec3ba6a824c4c9a94bd73c4104",
+    "bytes": 21494,
+    "sha256": "d4aba321f45aa57107565ec23725c2476123955ef0ac58dc7dab5f1fcd296c32"
+  },
+  "crates/meridian-core/src/flight/missiles/tests/durable.rs": {
+    "mode": "100644",
+    "blob": "c7b4ba7504e8be7bb6a772d317fda98d0f2a1e5e",
+    "bytes": 19523,
+    "sha256": "233a3e04d9239facd7d8b2749a08f899c8849da87f0b313206c9bcbbdf38240b"
+  },
+  "crates/meridian-core/src/flight/mission.rs": {
+    "mode": "100644",
+    "blob": "3cb3c38516475e270506a857f7e33a1957b76c7a",
+    "bytes": 23953,
+    "sha256": "3e796f41a4f473595108f2fe67e2fccf5daf3a4299272937531fdffb15d1fde1"
+  },
+  "crates/meridian-core/src/flight/mission/persistence.rs": {
+    "mode": "100644",
+    "blob": "141098f2a4194e47b7ce99ca00d75e4f4da7d40c",
+    "bytes": 3251,
+    "sha256": "f5d1fad1a7a8a3cbd2c1e4f5b75a3cabb8c604f86f0488ec79e7ad12bf2c108f"
+  },
+  "crates/meridian-core/src/flight/persistence.rs": {
+    "mode": "100644",
+    "blob": "935bb6b9e43f4951f0d88bd906c0f03d31446eb2",
+    "bytes": 28027,
+    "sha256": "235ae24712cc96925dad804f1f257e9b8343f978b3e637d22c12366d04df7fc9"
+  },
+  "crates/meridian-core/src/flight/persistence/tests.rs": {
+    "mode": "100644",
+    "blob": "f4c23c64509a119214ad998dabe438ebba89d213",
+    "bytes": 25271,
+    "sha256": "f3acf4d313bd6a9ba1495f8f0e65bcfde8dd2b5142941ca06a8661f6207320aa"
+  },
+  "crates/meridian-core/src/flight/practice.rs": {
+    "mode": "100644",
+    "blob": "cdcfe16d4eb40d96f567203041bf0cc2312e3b07",
+    "bytes": 18081,
+    "sha256": "17cc020bba555468a8fb1e80f2e448f168a2536c135d410d6a091a888aa8d663"
+  },
+  "crates/meridian-core/src/flight/practice/geometry.rs": {
+    "mode": "100644",
+    "blob": "2d7e02b20db714cf0e0b4393bf434e8d3d46b2c5",
+    "bytes": 3335,
+    "sha256": "947cd63fa62530ec31bbeeb85f4fc2567056b22a391454d0b7f6a48e30bb8e77"
+  },
+  "crates/meridian-core/src/flight/practice/lifecycle.rs": {
+    "mode": "100644",
+    "blob": "d9026939228cd10596cd6bf12569f345406c12a3",
+    "bytes": 17190,
+    "sha256": "43af3639dba369c4c8bfff5ec3c0f29d638fb33df5ba5df49f98e3dc1fda9baa"
+  },
+  "crates/meridian-core/src/flight/practice/lifecycle/tests.rs": {
+    "mode": "100644",
+    "blob": "cac85cb4db1ed96a3667908018e028f21421a20b",
+    "bytes": 25630,
+    "sha256": "a749e2d0da05cdef5b26b4e04657a5f5322224a889c77d268b156e20488fa10b"
+  },
+  "crates/meridian-core/src/flight/practice/persistence.rs": {
+    "mode": "100644",
+    "blob": "fd8ff8faebf127adfbd78d94ddba9a92348092d3",
+    "bytes": 11368,
+    "sha256": "5b5085298518a15f9666ddf73feca0779ee40f542d1483b4ca0bebaf4040d5dd"
+  },
+  "crates/meridian-core/src/flight/practice/reception.rs": {
+    "mode": "100644",
+    "blob": "a311645cdb05b22e9593e5046586896508446e7f",
+    "bytes": 12772,
+    "sha256": "a8a95814aeea2d2279bbc5ea56b0b4fc1af027bad5b9d175f40dbe666a1a7895"
+  },
+  "crates/meridian-core/src/flight/practice/reception/tests.rs": {
+    "mode": "100644",
+    "blob": "164f28fcd9ca1c1476569a9ec1bcfd09cfdc5f26",
+    "bytes": 13763,
+    "sha256": "9451ee0d72d301fb0c630a08950a42f7f821b12e07ad73e723cd5ccc5210991b"
+  },
+  "crates/meridian-core/src/flight/practice/tests.rs": {
+    "mode": "100644",
+    "blob": "a9fe5f2aa75b9812584d398baaa826ce6691f712",
+    "bytes": 15196,
+    "sha256": "19c131d20894f3f61fc814727a8aed64077ad71f3aafec38ebe6917fd8248fea"
+  },
+  "crates/meridian-core/src/flight/services.rs": {
+    "mode": "100644",
+    "blob": "6dde333cd8be415347aa8b11348212a325169f3e",
+    "bytes": 23441,
+    "sha256": "cc4a46a159d7045864a7f550111dc004cd9ae3610fc5bb4eef03e89d4f5394a2"
+  },
+  "crates/meridian-core/src/flight/weapons.rs": {
+    "mode": "100644",
+    "blob": "cb90431dd4ef0c5aeedfbe30f066378e39d1407c",
+    "bytes": 15649,
+    "sha256": "ede8931154c1438f11818632886543096e1881ed250291f5dcaf08a3a3d66cf0"
+  },
+  "crates/meridian-core/src/flight/weapons/tests.rs": {
+    "mode": "100644",
+    "blob": "c974ade53e7d5d6d03d4bd2026ef2ddb311884de",
+    "bytes": 10391,
+    "sha256": "3bcc9fa574b115b09e0dd815e3f11005ad17b53b9ac08b7a350df64c56038d94"
+  },
+  "crates/meridian-core/src/freight.rs": {
+    "mode": "100644",
+    "blob": "0e38659e501544380be8f07576cfbdf23d316da2",
+    "bytes": 6790,
+    "sha256": "fe7044bf3c2aca5304f1e22ce91b6839fd1af7a0d1807f9e33d0486fbf0b6766"
+  },
+  "crates/meridian-core/src/freight/g02.rs": {
+    "mode": "100644",
+    "blob": "bb381b6d40932f9294143016026ab8dd79a83307",
+    "bytes": 61430,
+    "sha256": "e7fb2dacb52717df42cf60448cc5c621d00732dbcf90c3f735a6c34ba17813cd"
+  },
+  "crates/meridian-core/src/freight/g02/persistence.rs": {
+    "mode": "100644",
+    "blob": "33d9a5778dd7ad00b3598752379da0309d139527",
+    "bytes": 17099,
+    "sha256": "821e417c36ec28e614ada22a168b64632cd9eacf9359f3b75474c39ca5125592"
+  },
+  "crates/meridian-core/src/freight/g02/presentation.rs": {
+    "mode": "100644",
+    "blob": "22c242506a99a624c043c7229e4bc5b3a99d633c",
+    "bytes": 18067,
+    "sha256": "a6979244e8dd497ab01b050b49451c4b9c67be7ff26b05b8e249dae93783d865"
+  },
+  "crates/meridian-core/src/lib.rs": {
+    "mode": "100644",
+    "blob": "6fe56338734fdf8dee68726a5c35f8b790e70d7f",
+    "bytes": 1732,
+    "sha256": "67dfc22e1261990a4bef171219cbe9c81cf884b885244284593f3071f583d3b1"
+  },
+  "crates/meridian-core/src/navigation.rs": {
+    "mode": "100644",
+    "blob": "3c424a202c1365c608fdb0d45e522b2883c300b6",
+    "bytes": 31295,
+    "sha256": "f172b5a0abfdba44d0dea8ef3a285f18af5c7ef91344db2d26bb7b79289c5c8d"
+  },
+  "crates/meridian-core/src/navigation/persistence.rs": {
+    "mode": "100644",
+    "blob": "667ec0a97bacd6e10da96ce78d3498caee4ccdea",
+    "bytes": 9726,
+    "sha256": "48d1fe5ed431b35010ec35a17fac99fdceb582eae4fd88a0dc826f3cc3c84766"
+  },
+  "crates/meridian-core/src/save.rs": {
+    "mode": "100644",
+    "blob": "c66b241f8d4af99bada173ba6c0102ffc1693e17",
+    "bytes": 3874,
+    "sha256": "94fd559abd088f6404d9fc7a1a2136158e88bd5d1235855bc1fdba4d9f6d8ce3"
+  },
+  "crates/meridian-core/src/station.rs": {
+    "mode": "100644",
+    "blob": "0b4fe8444106faf8b312cc5dc785d97f8208e778",
+    "bytes": 32466,
+    "sha256": "de39536d26a62d3020da6a1f30f25f0584ecdf2a45c827f212df6ed3a64bf055"
+  },
+  "crates/meridian-core/src/station/beam.rs": {
+    "mode": "100644",
+    "blob": "4ae746e4e06231ebca1c34d344390bb42c813a89",
+    "bytes": 6843,
+    "sha256": "af4611c48cfd50675f0a1d5a50d437ff9e0373ad17e200f84cca2e1397820216"
+  },
+  "crates/meridian-core/src/station_services.rs": {
+    "mode": "100644",
+    "blob": "bb9d5eb23fc725ecc7d01d2ec5e8746698d51d88",
+    "bytes": 28601,
+    "sha256": "92a53aae8b77c65eb05141a85d7746ae39afd958862e0a3d872ba69bd34b26a9"
+  },
+  "crates/meridian-core/src/station_services/commodities.rs": {
+    "mode": "100644",
+    "blob": "28a04db1ef4c88d2919b6f678c3ca57cc8efe553",
+    "bytes": 11433,
+    "sha256": "1a679a2c633f1eb7da28898c974a093100dfdcbf8f895f5b9f0be77853286c34"
+  },
+  "crates/meridian-core/src/station_services/commodity_tests.rs": {
+    "mode": "100644",
+    "blob": "71c3812ca0321a741ffc38ecf4a3d11f3e69f022",
+    "bytes": 8762,
+    "sha256": "ef02cb8373da6a515e78bda8e29d9d47c4ce807bf81d385817fcdc05f28c493d"
+  },
+  "crates/meridian-core/src/station_services/persistence.rs": {
+    "mode": "100644",
+    "blob": "366b640472cd0fa9e2ca2100013d06391d72a1e9",
+    "bytes": 9614,
+    "sha256": "77ec310e30e2f3a57388018997025c171a7b07f99f61712820c6be18379ec1ed"
+  },
+  "crates/meridian-desktop/Cargo.toml": {
+    "mode": "100644",
+    "blob": "484440ef89ab6900ac8f15a78a0b71076965e7de",
+    "bytes": 373,
+    "sha256": "8c6d3c72c5932bfac52dbce83ef4ab6d8bcef90c21d8dab0e3afa0aaf8c7fab3"
+  },
+  "crates/meridian-desktop/src/app.rs": {
+    "mode": "100644",
+    "blob": "4cbad4aa614bf67fc19081bd2bc6bfc03567c33b",
+    "bytes": 19971,
+    "sha256": "fa30327bb1c3c45854eb59201622a38a6f9f563157da177e514c0f1939ccfa69"
+  },
+  "crates/meridian-desktop/src/clock.rs": {
+    "mode": "100644",
+    "blob": "ddfb600a2796206fe780fc6e90e8ff9995b77c34",
+    "bytes": 1866,
+    "sha256": "3d91dec5c6286a82ed88a862f4ade5a2fbec59c1ff8e40dbefa60eb453e3c2f4"
+  },
+  "crates/meridian-desktop/src/equipment.rs": {
+    "mode": "100644",
+    "blob": "b799973f1b022bcb0a444db171934ac56ecea2f7",
+    "bytes": 3095,
+    "sha256": "bba95630ac6e57337eccf56b315891057d5c66c729e0ac438df0eabcf049092d"
+  },
+  "crates/meridian-desktop/src/flight.wgsl": {
+    "mode": "100644",
+    "blob": "68f69eb4e09ed92bb8fdec6f5b50157357ba3e4a",
+    "bytes": 874,
+    "sha256": "7a8540ad51fa9019f2bfef2b338a144f50ff99b4c1c6c24c3332b05d936560f2"
+  },
+  "crates/meridian-desktop/src/flight_lesson.rs": {
+    "mode": "100644",
+    "blob": "52c01887de8783824e4fce5c112203d5d48d3806",
+    "bytes": 4376,
+    "sha256": "a411deffea2bad7081a5efd976a0ffb306f7270e78323e9166d1fd11e45b3df6"
+  },
+  "crates/meridian-desktop/src/hud.rs": {
+    "mode": "100644",
+    "blob": "00e9e2a292b6546c3eb756bf37582e02f832dea2",
+    "bytes": 6948,
+    "sha256": "8dd9bf9c1cce8a483cba5acb8e964322fd71689a29a8482d0a11779abace42e1"
+  },
+  "crates/meridian-desktop/src/hud.wgsl": {
+    "mode": "100644",
+    "blob": "799e652e31db74ce0e61e6439ec2265a2b3ebae8",
+    "bytes": 428,
+    "sha256": "e7793188f9991a13e04c82442394fb6ea200528a95ee7ba86fb990c193c4cd35"
+  },
+  "crates/meridian-desktop/src/main.rs": {
+    "mode": "100644",
+    "blob": "e49ad4c1b27c269c17517cfe93751f205bece2a5",
+    "bytes": 210,
+    "sha256": "f578c0f2ac5931c24d45461b0c998ba8fd80698e95c080b44ed6664e131b1526"
+  },
+  "crates/meridian-desktop/src/market.rs": {
+    "mode": "100644",
+    "blob": "2fd461c4d566f00893df2e140e8ea203b34ac4e2",
+    "bytes": 4001,
+    "sha256": "d28ea6e5151d8f555f5c324b9b8f30719fa4c4671c1c6f4bb995be64ca0abd2b"
+  },
+  "crates/meridian-desktop/src/mesh.rs": {
+    "mode": "100644",
+    "blob": "78be0179c113087196443037d7bd3c6c32d3acb1",
+    "bytes": 25696,
+    "sha256": "95defc18171da2e0d2fbda459db3c781e7bbd1c5a05aa37f225e6f8a7ffa9cd0"
+  },
+  "crates/meridian-desktop/src/profile.rs": {
+    "mode": "100644",
+    "blob": "2f44c804124b6c61d37425d1229f760bc96cd5bf",
+    "bytes": 34378,
+    "sha256": "fa2d24b5b07e93a9794f94879faed37e62577c7eb26fed7da42707a0e4cce847"
+  },
+  "crates/meridian-desktop/src/profile/flight_lesson_tests.rs": {
+    "mode": "100644",
+    "blob": "38e2bedd76336eb10184f6f434cc2113b82a55a1",
+    "bytes": 11936,
+    "sha256": "b86629c09dd942e55089a077424fc00fda03232e06a20a45a36d0de544bf6f52"
+  },
+  "crates/meridian-desktop/src/renderer.rs": {
+    "mode": "100644",
+    "blob": "258a2452583e84b8fdeebb66470dd4cddde29d60",
+    "bytes": 15519,
+    "sha256": "44496349b0068d1df2850d65f4b788f935a8a8d3b2a056f7b15ea96879166a2a"
+  },
+  "crates/meridian-desktop/src/session.rs": {
+    "mode": "100644",
+    "blob": "e9598a2024c6895a7f93c16c0120fae2680deeba",
+    "bytes": 60002,
+    "sha256": "df071c5f0d0849b8233bf29635d9e5325d8a8ad0fac8b6b9fcffab58fb504f6f"
+  },
+  "crates/meridian-desktop/src/storage.rs": {
+    "mode": "100644",
+    "blob": "4e3724cde3f86dae35073cde430c254f05a9ea8d",
+    "bytes": 9554,
+    "sha256": "acad3b60abbec343f3d6fa49716396737b372d7db8e8ab375043d5c3b4a7eda3"
+  },
+  "crates/meridian-geometry/CRITERIA.json": {
+    "mode": "100644",
+    "blob": "4f4731ddcbe57a67553335bb1a107f3f60dcaac6",
+    "bytes": 25888,
+    "sha256": "05368202f14ef4569f56c323a36061f6ba19f1cdd551d7678417ac64febb793a"
+  },
+  "crates/meridian-geometry/Cargo.toml": {
+    "mode": "100644",
+    "blob": "54b019c7457c65cf7c13dea47730adfd951b51d1",
+    "bytes": 283,
+    "sha256": "3e3b274b968c3de62d9b6715e1aaed32b52632141583f22c7b9143b5134f67dd"
+  },
+  "crates/meridian-geometry/PROVENANCE.json": {
+    "mode": "100644",
+    "blob": "67679aa6f9e7d896a2d18ed32514c320a5029176",
+    "bytes": 7139,
+    "sha256": "4c5a02f8c1530e5f3f57a49c0f81bf04d5eecd15d81c11c5867dd57139d0c78a"
+  },
+  "crates/meridian-geometry/README.md": {
+    "mode": "100644",
+    "blob": "8d98daffcf4a870ea073b2991a3c059a4022c281",
+    "bytes": 34639,
+    "sha256": "04d68c539707aea1302aacf6777fc3d233962d0fa47bcc2a11ba0257610fffc5"
+  },
+  "crates/meridian-geometry/fixtures/FROZEN.json": {
+    "mode": "100644",
+    "blob": "c794f9e558bf24008c925a9d382536fb75e36d23",
+    "bytes": 4055,
+    "sha256": "8d67a8073ba241d2a84caa9117b37def9803404fb624282a0b1738e1828c8600"
+  },
+  "crates/meridian-geometry/fixtures/ORIGINAL-BINDINGS.json": {
+    "mode": "100644",
+    "blob": "4faba8818a672ea225a753e123d7897a62fd8608",
+    "bytes": 11618,
+    "sha256": "6115342c17444e3f368f4a72f1ea9cc578b9fff2d1a0f1ca2f19d33b225ebf66"
+  },
+  "crates/meridian-geometry/fixtures/SH010.facets": {
+    "mode": "100644",
+    "blob": "99d1f1cf3aa8ddc3c38e704218516fe480bddce5",
+    "bytes": 271440,
+    "sha256": "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc"
+  },
+  "crates/meridian-geometry/fixtures/SH011.facets": {
+    "mode": "100644",
+    "blob": "18d337d56c68d333ee480972fd043aea2dc0b8e6",
+    "bytes": 275800,
+    "sha256": "9df2a67302da6d07c46ae56dd2cfcdf6d03eebf6773bc260c9f12699e8ea393c"
+  },
+  "crates/meridian-geometry/fixtures/SH016.facets": {
+    "mode": "100644",
+    "blob": "6404d379ebf7eaea45dd8d1f413250d9c1812030",
+    "bytes": 269463,
+    "sha256": "72b8aa1bc9b194f0007e884047a4a8bc27a2ec7aaa14ea7eee1abf4cf00f173e"
+  },
+  "crates/meridian-geometry/fixtures/SH017.facets": {
+    "mode": "100644",
+    "blob": "70211b063694dc91f166816abf31a1ac79b0721c",
+    "bytes": 294258,
+    "sha256": "6ca509057ad2412df95d66ad55d4b8ea7fb09bbc8b1abb3811a63239eb14cb3a"
+  },
+  "crates/meridian-geometry/fixtures/SH166.facets": {
+    "mode": "100644",
+    "blob": "a31014e9e779e27da598c4ca1afe4b78fafa8c55",
+    "bytes": 256311,
+    "sha256": "0e12a2c1cbb548ee6fdd0bb351a7f2bce460214ae1cce122d8d073b537b51a8f"
+  },
+  "crates/meridian-geometry/fixtures/adapter-context-reference/CASES.json": {
+    "mode": "100644",
+    "blob": "cfc74eaea2b2b79dbcf1a65282e4ecede57285c5",
+    "bytes": 1882,
+    "sha256": "67f34c0813fdd73ffce44801ef667eb91f2b4f5dc9896ac0d5dae2ac663f244d"
+  },
+  "crates/meridian-geometry/fixtures/adapter-context-reference/FROZEN.json": {
+    "mode": "100644",
+    "blob": "a02fa81cf1fa2d3741c65704ff88f9255dfab2e1",
+    "bytes": 1414,
+    "sha256": "4d8a6c1e3eeb6594b3a31c277ba1ced68d412beee43578a021c0874b066027a2"
+  },
+  "crates/meridian-geometry/fixtures/adapter-context-reference/before-adapter.rs": {
+    "mode": "100644",
+    "blob": "9693b90034e1e97d48518e6380774e920a4ec014",
+    "bytes": 10791,
+    "sha256": "5ba59921621975a568de7d98223ebbb5eaadc27ed8826f3ceafedf46d19cb2cb"
+  },
+  "crates/meridian-geometry/fixtures/adapter-context-reference/before-bin-original_five.rs": {
+    "mode": "100644",
+    "blob": "87ffaec07e9956a08fbb4c3301281122edc00012",
+    "bytes": 29070,
+    "sha256": "847c620967c351661d80eb72877bc5bcda05e4c47e5069a831f9bb3afdbeb1ce"
+  },
+  "crates/meridian-geometry/fixtures/adapter-context-reference/before-budget.rs": {
+    "mode": "100644",
+    "blob": "82c5e1f46837735e8c1c9b1e6e0b8580024b7db0",
+    "bytes": 4303,
+    "sha256": "9d575d308b4c1bdba503c7fd1152f6577e73dbfb9ded1e9e50e5602713dbc3a6"
+  },
+  "crates/meridian-geometry/fixtures/adapter-context-reference/before-certificate.rs": {
+    "mode": "100644",
+    "blob": "09621b2ab8402ebd8755678af0fa269aeec3fd87",
+    "bytes": 79051,
+    "sha256": "7ec52d0f0a9a9945016ea25b3769c3cb442906e234396b7e47d01ac11a17e71d"
+  },
+  "crates/meridian-geometry/fixtures/adapter-context-reference/before-region.rs": {
+    "mode": "100644",
+    "blob": "45d7e43db4f149dd827d6d4abf3bbf1305e93e01",
+    "bytes": 8601,
+    "sha256": "5439b49e450781261168187b7b52cf447087864979ab21e5f746b14ec1775a61"
+  },
+  "crates/meridian-geometry/fixtures/adapter-context-reference/before-section_arrangement.rs": {
+    "mode": "100644",
+    "blob": "12422016d9b0664e64eb16ef7b2d3eb999886d8d",
+    "bytes": 14710,
+    "sha256": "28218a210d66b67310129d90dbc057a11eb2a432df670fcd8aad6bf63c8b2ba3"
+  },
+  "crates/meridian-geometry/fixtures/adapter-context-reference/before-sections.rs": {
+    "mode": "100644",
+    "blob": "052dffdfc6cddd4823bf9cd32662bef36f2b3af5",
+    "bytes": 37466,
+    "sha256": "40e48871e16b50d49a5eba5c8900827fa4dd85a055b6acb6b845a3a96c688c13"
+  },
+  "crates/meridian-geometry/fixtures/adapter-context-reference/compiled-before-adapter.rs.gz": {
+    "mode": "100644",
+    "blob": "351b96ee1955f493762db7a2722c1aeaef952ef7",
+    "bytes": 1927,
+    "sha256": "2b6169f33423fceeea25ba72734b5e8593bd9d7992ccd34e749e56fdd89bcec4"
+  },
+  "crates/meridian-geometry/fixtures/adapter-context-reference/normalized-before-adapter.rs": {
+    "mode": "100644",
+    "blob": "b7b44cdc9e30180103b5ee9b4169a9a97334206b",
+    "bytes": 6372,
+    "sha256": "759dda3f8221f7971b66f4366c29daa4f81524330ce92122c389062924b45d58"
+  },
+  "crates/meridian-geometry/fixtures/bounds-cache-reference/CASES.json": {
+    "mode": "100644",
+    "blob": "4c2658a93dcceb8650f2f7fe39e86910389a8bf7",
+    "bytes": 3170,
+    "sha256": "f7a0e6665cfd9337145c9b9715e26516f164acd0612590dc07093bafe95e4e5d"
+  },
+  "crates/meridian-geometry/fixtures/bounds-cache-reference/FROZEN.json": {
+    "mode": "100644",
+    "blob": "0a63919ffbde70024ae5c9a926f31525c01bc3e9",
+    "bytes": 694,
+    "sha256": "cee0f10152dec44a25d9fed1fdef0ab35aa5a20c705bb0195d502a522445cbac"
+  },
+  "crates/meridian-geometry/fixtures/bounds-cache-reference/before-certificate.rs": {
+    "mode": "100644",
+    "blob": "a5c7fc16a0010b613bc896d4db17384786973053",
+    "bytes": 40084,
+    "sha256": "e1f98cf5c20fbbe65c09920597d9ed0c7a76344bd8e711df30c6679cf5d7ca5a"
+  },
+  "crates/meridian-geometry/fixtures/exact-pruning-reference/CASES.json": {
+    "mode": "100644",
+    "blob": "4c2658a93dcceb8650f2f7fe39e86910389a8bf7",
+    "bytes": 3170,
+    "sha256": "f7a0e6665cfd9337145c9b9715e26516f164acd0612590dc07093bafe95e4e5d"
+  },
+  "crates/meridian-geometry/fixtures/exact-pruning-reference/FROZEN.json": {
+    "mode": "100644",
+    "blob": "e82be7c1b25fee279bb29340d154390d37f2b986",
+    "bytes": 1083,
+    "sha256": "f9a4b9177284f4afefc8b8e349dad693d80c4f2d71ef7608665c908f5013125e"
+  },
+  "crates/meridian-geometry/fixtures/exact-pruning-reference/INITIAL-FROZEN.json": {
+    "mode": "100644",
+    "blob": "96810458dc889ac679c029dc92dbbb265bc52e61",
+    "bytes": 590,
+    "sha256": "f3faec8f887fe4b1b306a7d6016559b46ff66066878ba98cac861089e4c27839"
+  },
+  "crates/meridian-geometry/fixtures/exact-pruning-reference/before-certificate.rs": {
+    "mode": "100644",
+    "blob": "8f095c7ba5d1e1c714e0c817e649f67f7bd5e2b6",
+    "bytes": 37231,
+    "sha256": "7ad155fc8254bac5f9240a9144112c87304a5db393a5bf38ded3f94bddd192c1"
+  },
+  "crates/meridian-geometry/fixtures/failures/210-CHARGE-BOUNDS.json": {
+    "mode": "100644",
+    "blob": "65d96ff6d4c9d61d1bbd91343e25d1e0240fd72b",
+    "bytes": 9630,
+    "sha256": "dc1573413a846c29f8c60dd0d3344c0686885cc10be36625aec4a5de8ce23d9d"
+  },
+  "crates/meridian-geometry/fixtures/failures/ACTUAL-FIVE-RESULTS.json": {
+    "mode": "100644",
+    "blob": "d2e38f292d5ce5dbef698d686d13b4ae8a7560ee",
+    "bytes": 14729,
+    "sha256": "4bf4173b076a4790d9cf188e2d4d0b079f1558384d22fad79aba6acb7f030e7d"
+  },
+  "crates/meridian-geometry/fixtures/failures/DECISION.json": {
+    "mode": "100644",
+    "blob": "18c33feec1105f6230a4955c8c026e899a5aa178",
+    "bytes": 10210,
+    "sha256": "765add0390b9b057c57c98851074c9edae967c792c3da95cbb40ecfdeea2eb83"
+  },
+  "crates/meridian-geometry/fixtures/failures/DELIVERY.json": {
+    "mode": "100644",
+    "blob": "537f69eb1ec8a79d679c350dbdd8eda5ae94ffac",
+    "bytes": 999,
+    "sha256": "f3ff66073d4bb324f874513318e897869d4289a9dd0eaa0d60eebd743d6a191d"
+  },
+  "crates/meridian-geometry/fixtures/identity-lifetime-reference/CASES.json": {
+    "mode": "100644",
+    "blob": "2846c3d7d426b9e33decb15ad7531942e23f1235",
+    "bytes": 1268,
+    "sha256": "3824b4327673949fe25a62aa3adabb7a2b9097bfa7983095985351598671580c"
+  },
+  "crates/meridian-geometry/fixtures/identity-lifetime-reference/FROZEN.json": {
+    "mode": "100644",
+    "blob": "6504758744252e91fbbc2a952a2a125e01fc0519",
+    "bytes": 547,
+    "sha256": "603f38bd638d90b9ec69837f9ead0d84ffac1e144815c0aa85b324e6ca6ab94f"
+  },
+  "crates/meridian-geometry/fixtures/identity-lifetime-reference/before-certificate.rs": {
+    "mode": "100644",
+    "blob": "49e0e2d16b6548f22d5154fee89be81487aa6da4",
+    "bytes": 76803,
+    "sha256": "bc23bda718ae8988c61c5439fd930d4fa8f5b5439d07821b1d4f2e007b3fc824"
+  },
+  "crates/meridian-geometry/fixtures/identity-lifetime-reference/before-source.rs": {
+    "mode": "100644",
+    "blob": "4c453d298c096dcb23f1d92a83ce94731961371b",
+    "bytes": 12810,
+    "sha256": "d09b092bfb0d35a47233d1cd85ffd7615be0267a07277955c977a1961f932ad1"
+  },
+  "crates/meridian-geometry/fixtures/live-overlap-reference/FROZEN.json": {
+    "mode": "100644",
+    "blob": "9e460f2f71eb398432b3b8038b92a40b1bb94402",
+    "bytes": 793,
+    "sha256": "ce8982b0fc61160b4d5f0d2dc897e5d9ca482193386df3db46b674b959decd80"
+  },
+  "crates/meridian-geometry/fixtures/live-overlap-reference/before-certificate.rs": {
+    "mode": "100644",
+    "blob": "68428209ca6ee626530dc6535e0024892688dd0f",
+    "bytes": 82657,
+    "sha256": "59a35b20e23a6b9dd4920b1fe6d0cf8fb4ac31069f96706de0b3a7b067606c9f"
+  },
+  "crates/meridian-geometry/fixtures/live-overlap-reference/before-region.rs": {
+    "mode": "100644",
+    "blob": "81586244a50ce9a1e98ca748595b60099195a183",
+    "bytes": 9093,
+    "sha256": "e38f0021ce88336d2de8bb17a97bb66e9390b7f874f163183ddf57560da31c7c"
+  },
+  "crates/meridian-geometry/fixtures/live-overlap-reference/before-sections.rs": {
+    "mode": "100644",
+    "blob": "929824d46cfce027b66ffdaa549a15deaa832e18",
+    "bytes": 37991,
+    "sha256": "b290c9d7f257dbd408b21100a2686121019a8c030d708cd02cf2b2ac6c8e80f7"
+  },
+  "crates/meridian-geometry/fixtures/live-overlap-reference/collection-control.rs.txt": {
+    "mode": "100644",
+    "blob": "2479dc61aee5b5803a3d21c7856189b5680756f7",
+    "bytes": 2216,
+    "sha256": "ae43a9e1def5df1660a342cc2222ed0fdec1f3fdf089b742f0998be3491b5d19"
+  },
+  "crates/meridian-geometry/fixtures/live-overlap-reference/compiled-collection-control.rs": {
+    "mode": "100644",
+    "blob": "f91dc9096dfcf0ae04cf3a7a7385c23985243aa7",
+    "bytes": 2223,
+    "sha256": "b65427a565d78969304ad1db8adc3a5f5216d2ae7236e1edc88969cecb9caaac"
+  },
+  "crates/meridian-geometry/fixtures/live-runs-reference/FROZEN.json": {
+    "mode": "100644",
+    "blob": "923f68f7fd766b65781affd8827c5993b1ecd3c5",
+    "bytes": 520,
+    "sha256": "c5aa7db775e61f21f57b8793608db0f9ff63d338b700a7b75fbebcfc0da98864"
+  },
+  "crates/meridian-geometry/fixtures/live-runs-reference/before-section_arrangement.rs": {
+    "mode": "100644",
+    "blob": "580088f46167f378f26ac76a536e646521afd582",
+    "bytes": 17234,
+    "sha256": "a695dd7e3f3aa8e6ea1465f25dec2d8b4e9ab77dec8a78f91abb34a5b82a77f3"
+  },
+  "crates/meridian-geometry/fixtures/live-runs-reference/before-sections.rs": {
+    "mode": "100644",
+    "blob": "8e783c73050df4d942477494e1ee78576b14d04f",
+    "bytes": 42893,
+    "sha256": "eab190b18eb59515fa4b46bb66f9b0f4649f0abadf36c8a959af96e5ab7248dd"
+  },
+  "crates/meridian-geometry/fixtures/live-runs-reference/compiled-arrangement-control.rs": {
+    "mode": "100644",
+    "blob": "a6caa67d7fa1b9d7bbc47bfe75bfc3d2b2d39215",
+    "bytes": 16944,
+    "sha256": "fc4a1905c7503f46da97f0908a47e472879c091fb6e84c62bd7ce050ecca5cbf"
+  },
+  "crates/meridian-geometry/fixtures/owner-range-reference/CASES.json": {
+    "mode": "100644",
+    "blob": "2ec3cbcee69f2b6bb48888380c30c289b1b794ec",
+    "bytes": 1296,
+    "sha256": "726aa7cac884b58810e5485e3178cfea6157b065d99b6b7442a5ecbd0998d55d"
+  },
+  "crates/meridian-geometry/fixtures/owner-range-reference/FROZEN.json": {
+    "mode": "100644",
+    "blob": "535ce923b631c5f1e7ff81114826404f30837cba",
+    "bytes": 410,
+    "sha256": "b6ba008ed4ca8ab72305a85dd1904e83f7ca4cfcb5c910bcf22680ec971443cf"
+  },
+  "crates/meridian-geometry/fixtures/owner-range-reference/before-certificate.rs": {
+    "mode": "100644",
+    "blob": "6ece54f6b640757143650747b86f0a2c40b89577",
+    "bytes": 77697,
+    "sha256": "c0d7afcdc69ecb797c8a561733cc922cde89c5dba84d871430f462f2174be3a5"
+  },
+  "crates/meridian-geometry/fixtures/plane-cache-reference/CASES.json": {
+    "mode": "100644",
+    "blob": "6583335d30249516aaa50cfbdee6fa8160470f09",
+    "bytes": 828,
+    "sha256": "7c6ee9ce3aa3b2117b6e554aec81118076b691ebe4bad2d25d34c92f98543aff"
+  },
+  "crates/meridian-geometry/fixtures/plane-cache-reference/FROZEN.json": {
+    "mode": "100644",
+    "blob": "b512deb32f5bf33b43d857ff17f1d6f93ca972cb",
+    "bytes": 599,
+    "sha256": "e58d9bcbb9ef05adac1148a6ea6f66e691bce3c5cd61b9236c98f59885acb6c8"
+  },
+  "crates/meridian-geometry/fixtures/plane-cache-reference/before-certificate.rs": {
+    "mode": "100644",
+    "blob": "3997392df9c2b518ccd164eb2ef5c43ddb3cdb58",
+    "bytes": 51317,
+    "sha256": "e6f2f8452a4af3634b0ecf7fd28706aa5c0fb5e63dd026fb84e268382eb00dc2"
+  },
+  "crates/meridian-geometry/fixtures/ray-cache-storage-reference/CASES.json": {
+    "mode": "100644",
+    "blob": "e641366e3a18bb2214d262001283d78d11618be2",
+    "bytes": 808,
+    "sha256": "b73e020ddd289000d1cb858a5c565161319bd949231273613416d5a055b3724e"
+  },
+  "crates/meridian-geometry/fixtures/ray-cache-storage-reference/FROZEN.json": {
+    "mode": "100644",
+    "blob": "f4482ac9c50d2204954597042708f214e251e42b",
+    "bytes": 753,
+    "sha256": "bd2d3fe39d1190f007293c4ef387937b1da251d6b89233700fe3cca089423031"
+  },
+  "crates/meridian-geometry/fixtures/ray-cache-storage-reference/before-certificate.rs": {
+    "mode": "100644",
+    "blob": "cdba9b3c225f6d6b01e5c57b0c2977d665a9ee01",
+    "bytes": 53881,
+    "sha256": "38a23ea4afe94eb7b1ce7a193a22e48fa3944bf4efdc80b7b81f7a709f9ba2b8"
+  },
+  "crates/meridian-geometry/fixtures/ray-cache-storage-reference/before-planes.rs": {
+    "mode": "100644",
+    "blob": "2accd0b28fd4a4bad3a5a5750f786da601dc5ab6",
+    "bytes": 11098,
+    "sha256": "3951d2ca2363eb9b6fba7095866433567b41e35c22939d66a8601a62e8af132a"
+  },
+  "crates/meridian-geometry/fixtures/ray-interval-reference/CASES.json": {
+    "mode": "100644",
+    "blob": "095f476e8bb241b159b51b0c0fa05def3c5ddeb7",
+    "bytes": 1685,
+    "sha256": "2631dcc474000bcf0529bd948668dc95356dfc37084c81f711503e5c8dc4b4b9"
+  },
+  "crates/meridian-geometry/fixtures/ray-interval-reference/FROZEN.json": {
+    "mode": "100644",
+    "blob": "0c7ad803a80ed3fddb69f2efd0ce9a1046c60e72",
+    "bytes": 668,
+    "sha256": "77cdefdce165bd1ddde598974d6732ff1a7fe4521062163eff63da4069192fc3"
+  },
+  "crates/meridian-geometry/fixtures/ray-interval-reference/before-certificate.rs": {
+    "mode": "100644",
+    "blob": "dd965cd55539e972a7ca822d845c7d6d98f2716d",
+    "bytes": 48175,
+    "sha256": "c63cb8f055c5d92523f97640f3319b074def13e73d035ed1fd799f58018c76c5"
+  },
+  "crates/meridian-geometry/fixtures/ray-pruning-reference/CASES.json": {
+    "mode": "100644",
+    "blob": "ff7faf26ef5b0cbc6de44ed56b43484ed7f0ae78",
+    "bytes": 3965,
+    "sha256": "2ef9163afb013ffecee1be5bef597489960b694130d2f76e94201aae0add9e13"
+  },
+  "crates/meridian-geometry/fixtures/ray-pruning-reference/FROZEN.json": {
+    "mode": "100644",
+    "blob": "8c97097d6a933efa3363e7fec6867d02b180b352",
+    "bytes": 649,
+    "sha256": "c67e65e32dc253834b9ee88618552c80c887e3406e914d80a1a2d605fd625aaa"
+  },
+  "crates/meridian-geometry/fixtures/ray-pruning-reference/before-certificate.rs": {
+    "mode": "100644",
+    "blob": "a21cd102bead192fe28e3cda4be37f4976289da7",
+    "bytes": 44671,
+    "sha256": "76eeb932cec5b2541ed989ccd59222c9c6e590210537234c2084a4f51b121bba"
+  },
+  "crates/meridian-geometry/fixtures/reference/CASES.json": {
+    "mode": "100644",
+    "blob": "29478f6ae60fbfd6ea99cb7e79272e0fcef91847",
+    "bytes": 9177,
+    "sha256": "bfba51b92d0a08c3ec31de41643ca6d8976409dcd6ac5392ddc803443bedbc88"
+  },
+  "crates/meridian-geometry/fixtures/reference/LICENSE": {
+    "mode": "100644",
+    "blob": "b27f022cea044295412849dec93512dad638f08e",
+    "bytes": 1071,
+    "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+  },
+  "crates/meridian-geometry/fixtures/reference/OriginalCamelRescuePhysicalSource.swift": {
+    "mode": "100644",
+    "blob": "4c48bb81964e4f07defa75000debb16c49243cdd",
+    "bytes": 6757,
+    "sha256": "1a85d443679c0d2243c8ea99b3b68bd2c4a6cd928bd8336b9af52675560c16ee"
+  },
+  "crates/meridian-geometry/fixtures/reference/OriginalFleetCurrentHullSource.swift": {
+    "mode": "100644",
+    "blob": "f02f88b9ebed7c02f07d73bf9d86d378269e472d",
+    "bytes": 3209,
+    "sha256": "ab952998810a3f514679acc60460bcc0d5a9a2fa041450d1eff43813578cec62"
+  },
+  "crates/meridian-geometry/fixtures/reference/OriginalFleetShowroomModels.swift": {
+    "mode": "100644",
+    "blob": "2a4da270218af4dc90f66ee0d933c65ed3890196",
+    "bytes": 5661,
+    "sha256": "eef47b8e21bdd3bd8ea7019c02d1ccb4a3fac2b8117f5727530bf76378f070cc"
+  },
+  "crates/meridian-geometry/fixtures/reference/exact-source-arrangement.py": {
+    "mode": "100644",
+    "blob": "adf21a3f51ecaeec2385b6f47b2917325e3938f8",
+    "bytes": 79474,
+    "sha256": "aa400698c0094b0f4dd16aa7094c68879072f85a35858ac3501d8fda60488a80"
+  },
+  "crates/meridian-geometry/fixtures/reference/independent_planar_reference.py": {
+    "mode": "100644",
+    "blob": "3b006269f13cb90ae3bb2aa7230aa2991d875e83",
+    "bytes": 1633,
+    "sha256": "b3191dc38fbabc2d1d23dd91bd19401679e1a53ec850fb3394fb2a5ce7490e0d"
+  },
+  "crates/meridian-geometry/fixtures/reference/planar-cases.json": {
+    "mode": "100644",
+    "blob": "e8f38c128bc3ba231842ffb76005158ef3dab6bf",
+    "bytes": 5982,
+    "sha256": "6803cccb5180c85107c5bd8791b26fdd677fa7267f8b6c29182967d9484bb052"
+  },
+  "crates/meridian-geometry/fixtures/reference/test_source_arrangement_corridor_walk.py": {
+    "mode": "100644",
+    "blob": "b1f213d7e6c034f90ef43bf618d1d75c334d369d",
+    "bytes": 5699,
+    "sha256": "daf8387e70722d42b10fa906975c4a285783144e8dea05e45a1a23f6822500bc"
+  },
+  "crates/meridian-geometry/fixtures/reference/test_source_arrangement_incidence.py": {
+    "mode": "100644",
+    "blob": "ae5f3f38d4366b2cf57d8300166b2b7d5bbe4436",
+    "bytes": 13891,
+    "sha256": "865e444c24c873501d1e85e14eef3cbceaa644886e3a565290a5afe023fce400"
+  },
+  "crates/meridian-geometry/fixtures/reference/test_source_arrangement_pruning.py": {
+    "mode": "100644",
+    "blob": "94c93b787ca6b6f958ef6c8f4ea32b1e1de520ad",
+    "bytes": 8603,
+    "sha256": "6123a1d319715626172cd15cdd5c43b7ad3e9df3ee7615d80e134b24d56f20f9"
+  },
+  "crates/meridian-geometry/fixtures/reference/test_source_arrangement_recovery.py": {
+    "mode": "100644",
+    "blob": "5c3f55d5f76bf48021dc8fe984f6f3860309036f",
+    "bytes": 14562,
+    "sha256": "e8271802471ae8a60650472ce2875167c547d2b38c51e2e370193af9e5af00c2"
+  },
+  "crates/meridian-geometry/fixtures/reference/test_source_arrangement_regions.py": {
+    "mode": "100644",
+    "blob": "b1913e981061fc566fbcd1449f78641de1fb0d1b",
+    "bytes": 17033,
+    "sha256": "b5970cf837e6f2e3235f6b7792e3d3fd65869dd9be4787058a238318effb87a1"
+  },
+  "crates/meridian-geometry/fixtures/reference/test_source_arrangement_schema_work.py": {
+    "mode": "100644",
+    "blob": "a8573a399c1fbe0fc9c8c2d011b31e5875494d7f",
+    "bytes": 8158,
+    "sha256": "379926857e002b83d06e1e8856a9664b368ebba73c2dca205f53b4acd8eec9cd"
+  },
+  "crates/meridian-geometry/fixtures/reference/test_source_arrangement_section_sign.py": {
+    "mode": "100644",
+    "blob": "381f935d6def6b2903b14c202b64b5bbeb51e69d",
+    "bytes": 7953,
+    "sha256": "90bbe29eb59c655b29953de73ab9efd2acab4a5207b8f9ea323674be29dee56d"
+  },
+  "crates/meridian-geometry/fixtures/reference/test_source_arrangement_strips.py": {
+    "mode": "100644",
+    "blob": "bc2f8f72253fc8e004156dfe0bfe9eff029c2d02",
+    "bytes": 16148,
+    "sha256": "90ad98bf0e3dd20361639b4fb6fe012c1e72bc052d90b8268d87f1d0abe1828e"
+  },
+  "crates/meridian-geometry/fixtures/region-storage-reference/CASES.json": {
+    "mode": "100644",
+    "blob": "4c2658a93dcceb8650f2f7fe39e86910389a8bf7",
+    "bytes": 3170,
+    "sha256": "f7a0e6665cfd9337145c9b9715e26516f164acd0612590dc07093bafe95e4e5d"
+  },
+  "crates/meridian-geometry/fixtures/region-storage-reference/FROZEN.json": {
+    "mode": "100644",
+    "blob": "f00e8ca343e3421888bebbc30b6dcaba6f0a454f",
+    "bytes": 651,
+    "sha256": "074d69ee107e4913b50cd86b6ae451d95e7950b237d9b8341d86aec3ce4b49f0"
+  },
+  "crates/meridian-geometry/fixtures/region-storage-reference/before-certificate.rs": {
+    "mode": "100644",
+    "blob": "2ee0c9e975594f0e212f1b957267831f5081038d",
+    "bytes": 44062,
+    "sha256": "fd82beb9ced9083d3cee5e49220c1b33d35244bb4c4240364c0c7ac8447d351b"
+  },
+  "crates/meridian-geometry/fixtures/section-collection-reference/CASES.json": {
+    "mode": "100644",
+    "blob": "f3f817748e064b704ba6921b2122e1c953760bbc",
+    "bytes": 1108,
+    "sha256": "8fd0f678da277c037818351d0db87714cabf4c9b2b1f86c79fe043551d551988"
+  },
+  "crates/meridian-geometry/fixtures/section-collection-reference/FROZEN.json": {
+    "mode": "100644",
+    "blob": "8822fe9f681c5d46f01937f6384432192d5bd740",
+    "bytes": 412,
+    "sha256": "193d991952ff3500a94a3046734849e72994aa17cf1414090c1d2944ef9db363"
+  },
+  "crates/meridian-geometry/fixtures/section-collection-reference/before-sections.rs": {
+    "mode": "100644",
+    "blob": "4fedfc2772a49f523274357501dff457bf49267e",
+    "bytes": 8934,
+    "sha256": "7bacc88173a4c92bf9382c2f9e800db2b802cea608eb1d82fe22b3ef564fc10e"
+  },
+  "crates/meridian-geometry/fixtures/section-reference/CASES.json": {
+    "mode": "100644",
+    "blob": "b465432c704c9d7e79b7d04003e5ba4d060c3079",
+    "bytes": 3024,
+    "sha256": "9d7dfb0ee506347aeb92b2779fed6da581b1d7273770a80d21bfe7a75527d000"
+  },
+  "crates/meridian-geometry/fixtures/section-reference/FROZEN.json": {
+    "mode": "100644",
+    "blob": "a1124ca5c7ae4ed55bbcbcc90aebd9c05ef69b12",
+    "bytes": 561,
+    "sha256": "a09c6b22370fa896e158f92ba94177f177882dd9e4e236877d0cda1bf95aec5a"
+  },
+  "crates/meridian-geometry/fixtures/section-reference/before-certificate.rs": {
+    "mode": "100644",
+    "blob": "e52838b82cd9aa750f9e87d51e2b3cc08f7ab034",
+    "bytes": 54557,
+    "sha256": "dd9eba6c7f74dfc6c3daa3729f5a598c15c64d30bf8a9df304a43503df9ac626"
+  },
+  "crates/meridian-geometry/fixtures/style-storage-reference/CASES.json": {
+    "mode": "100644",
+    "blob": "4c2658a93dcceb8650f2f7fe39e86910389a8bf7",
+    "bytes": 3170,
+    "sha256": "f7a0e6665cfd9337145c9b9715e26516f164acd0612590dc07093bafe95e4e5d"
+  },
+  "crates/meridian-geometry/fixtures/style-storage-reference/FROZEN.json": {
+    "mode": "100644",
+    "blob": "44d97c061d8c762a64c2d95d423db8b6d9e35d32",
+    "bytes": 951,
+    "sha256": "6e803aabfa2ab05371537fe580d844a7ddd0fb059e0109d05278775d003e7af7"
+  },
+  "crates/meridian-geometry/fixtures/style-storage-reference/before-adapter.rs": {
+    "mode": "100644",
+    "blob": "b3274ede18b1bc05739744f78f820d79ea92a41f",
+    "bytes": 4916,
+    "sha256": "b0c8078d841b311a81dc54c9369386c2069820295d5a6e54d77e144d0b3ebe13"
+  },
+  "crates/meridian-geometry/fixtures/style-storage-reference/before-certificate.rs": {
+    "mode": "100644",
+    "blob": "b1f4d0222e8dc7ebb9c87187ff1fc1b4b1df5529",
+    "bytes": 40137,
+    "sha256": "e9574bc4f17e1e9ae200a6a44c3b474d6aca129f74b4fb838c3bbe55c8d3f83b"
+  },
+  "crates/meridian-geometry/fixtures/style-storage-reference/before-source.rs": {
+    "mode": "100644",
+    "blob": "49f5fa756f12780b23bb5631a7c87a667962ed9f",
+    "bytes": 10272,
+    "sha256": "9a8984561b8ab0d33a41c293dd27ff504fcdf3ad20207dbb567fa11d6c49ff79"
+  },
+  "crates/meridian-geometry/integration/DELTA.json": {
+    "mode": "100644",
+    "blob": "f9ed6659704882bfb42be9001932cc23082b3ed8",
+    "bytes": 770,
+    "sha256": "c3c2075c164781e26016ad1317ded7f2d666e49989cd5dcfc113f070361c6e40"
+  },
+  "crates/meridian-geometry/integration/FAILURE-CLASSIFICATION-DELTA.json": {
+    "mode": "100644",
+    "blob": "0ddd36a332ebda5fd6bba3bb9ee3146980641ca8",
+    "bytes": 1861,
+    "sha256": "9fe641c09cf03b7315a3f012b144f27b3aa7222144bbc0b04cf8fc0675d29692"
+  },
+  "crates/meridian-geometry/integration/WHOLE-FIVE-CRITERIA.json": {
+    "mode": "100644",
+    "blob": "35061693bcd1ba2611aa40f1f5a2218a65c888d4",
+    "bytes": 4977,
+    "sha256": "ace9c47feecd0aa7b0507f15492e3a1d01edc00a4e0a489c707f5955701dd9c8"
+  },
+  "crates/meridian-geometry/integration/WHOLE-FIVE-DELTA.json": {
+    "mode": "100644",
+    "blob": "2648c1cf850eee27502425b729c457da799fadc0",
+    "bytes": 1480,
+    "sha256": "3fd47a7e8b29fde4a28a3df8fb3f4f5c3d17f984640caab5b73f1efbe5f14167"
+  },
+  "crates/meridian-geometry/integration/WITNESS-CORRECTION.json": {
+    "mode": "100644",
+    "blob": "1cce7b2d6455eaa323cd999c2a6ffa97c5e2e9de",
+    "bytes": 1051,
+    "sha256": "766ad5686d09e0456b080d2ff67b914f906bd537a62dcb3d006596e9715aba13"
+  },
+  "crates/meridian-geometry/integration/adapter-context/CONTRACT.md": {
+    "mode": "100644",
+    "blob": "2b9278e4b3a67cf0fbebfeafe3573d44a4911279",
+    "bytes": 8574,
+    "sha256": "714e519a8b3a26d4c5341f229c16e0a04d626bbc4a91f3d50efbe1e21bed972a"
+  },
+  "crates/meridian-geometry/integration/adapter-context/DELTA.json": {
+    "mode": "100644",
+    "blob": "418dddf9078d2ee27d8271ec6a982fbb9bb8cf6a",
+    "bytes": 9959,
+    "sha256": "c4b50ddd17db944ec324f42aa6a26109e43bbb848ef747b6fd451617625b96e4"
+  },
+  "crates/meridian-geometry/integration/adapter-context/PARENT-FOCUSED.tar.gz": {
+    "mode": "100644",
+    "blob": "4ecf5d12693eb768ac4de847e5d073ad4a9ed010",
+    "bytes": 33085,
+    "sha256": "8b75aea494db55b253a8abdc69491c756caf0fd9e89f041570d2ccfb57383ca0"
+  },
+  "crates/meridian-geometry/integration/adapter-context/PARENT-HANDOFF.json": {
+    "mode": "100644",
+    "blob": "84cbc56fafda548b1354a744301c57455619f2f2",
+    "bytes": 23175,
+    "sha256": "025bcd5ec2264af478dbb8de783bcb98c94250cb40b07edb27bba53694285c00"
+  },
+  "crates/meridian-geometry/integration/adapter-context/PARENT-ROOT-TERMINAL.json": {
+    "mode": "100644",
+    "blob": "48cfe3dd17cef0f202f9f16ea33c78b1977f08d3",
+    "bytes": 3812,
+    "sha256": "5534e36a84b14d30ea9a2316d9449aa3812aaf77c014762c2a3e63b738bfd59b"
+  },
+  "crates/meridian-geometry/integration/adapter-context/PARENT-WHOLE-FIVE.tar.gz": {
+    "mode": "100644",
+    "blob": "786477cf9e6e0ab6e1d2c3e80b194283be0b5f77",
+    "bytes": 47707,
+    "sha256": "9571ebd7adf27343b9ecbcec8f12cb9aedc8ce0161a31f7ce17c3a979750d30c"
+  },
+  "crates/meridian-geometry/integration/adapter-context/SOURCE-STYLE-MATRIX.json": {
+    "mode": "100644",
+    "blob": "67ba63446af47396f9a02fc4fa8930ec7d2ad5f2",
+    "bytes": 16151,
+    "sha256": "c6ae8996a39dfe18aa0e26b41bc8415cb41f52c2a2d84c4b29911f9065af4246"
+  },
+  "crates/meridian-geometry/integration/bounds-index/DELTA.json": {
+    "mode": "100644",
+    "blob": "51b6bd0b72c0bb88f103710681a60101197ced71",
+    "bytes": 12505,
+    "sha256": "e317c10afc46c6ffcf24037788c1650320bb36fc67c74f2088c62eb76055b4b3"
+  },
+  "crates/meridian-geometry/integration/bounds-index/PARENT-FOCUSED.json": {
+    "mode": "100644",
+    "blob": "005775c61250c06d6f906126469dbeb73663cd19",
+    "bytes": 4043,
+    "sha256": "79a8fb6cc594b3218b27750d67b786cf92e509bbbe44fd6a6d88986c970a9341"
+  },
+  "crates/meridian-geometry/integration/bounds-index/PARENT-HANDOFF.json": {
+    "mode": "100644",
+    "blob": "9b632b1544ded0712c42127473373858194d754c",
+    "bytes": 57602,
+    "sha256": "1adc7c5350c5174ac32894fc1daee9a2702be8b49ea28684620674ed2af362cc"
+  },
+  "crates/meridian-geometry/integration/clippy/DELTA.json": {
+    "mode": "100644",
+    "blob": "405efacef4a107914ae738d030f919e9b1326e2b",
+    "bytes": 1278,
+    "sha256": "09b55608912d170c7d4efa0ad63c51c796e64cfe7c2cb374a77cccbaf3358c9e"
+  },
+  "crates/meridian-geometry/integration/clippy/GEOMETRY-QUALIFICATION-RESULT.json": {
+    "mode": "100644",
+    "blob": "8103e10efa45bf55b3b141d616fed839f9eac8c0",
+    "bytes": 4119,
+    "sha256": "88cd403e61f93e0e2c5085d96893b70822eb7ce12765ddc206af7d1068e10770"
+  },
+  "crates/meridian-geometry/integration/clippy/check.log": {
+    "mode": "100644",
+    "blob": "4c4b36587d790400f1c5a3f653d5c0baf96a26f9",
+    "bytes": 355,
+    "sha256": "920dfd406fdd12ec5173cce3931f89c90b83cba36a20eaad1d99d7e1eb6381a0"
+  },
+  "crates/meridian-geometry/integration/clippy/clippy.log": {
+    "mode": "100644",
+    "blob": "79ffa2d849a2e5264224ec704be1d86c0b623638",
+    "bytes": 1862,
+    "sha256": "fbe09f8942043690dadb42b87dbd5dc950384e2c2e0d94bfc0707c250a644ed8"
+  },
+  "crates/meridian-geometry/integration/clippy/test.log": {
+    "mode": "100644",
+    "blob": "8837834f5c873080216273001806d35f1527b64c",
+    "bytes": 2232,
+    "sha256": "d98d0696c4fe5b5cbcbb4f349180b0efa03c051a099cc7fd96ad2df2dea37edd"
+  },
+  "crates/meridian-geometry/integration/component-audit/CAUSAL.json": {
+    "mode": "100644",
+    "blob": "2e8951aa021f6787a4628327d75a8689cf9cf6d0",
+    "bytes": 8098,
+    "sha256": "1d0a375824b4a751eebb968466aa49f05db7c2883cf8cd3edb531dbbfeac5b5a"
+  },
+  "crates/meridian-geometry/integration/component-audit/binary.json": {
+    "mode": "100644",
+    "blob": "37cd06594c821e75d42697a49da4f9f4189615be",
+    "bytes": 616,
+    "sha256": "3aed883af5111b8de7035ca6072f74f970ad3dd75e561f48d5fe0643bb0ce651"
+  },
+  "crates/meridian-geometry/integration/component-audit/focused-terminal.json": {
+    "mode": "100644",
+    "blob": "7a0cab6dd9f15e819e06c401d2c2c20a6420dcd6",
+    "bytes": 190,
+    "sha256": "d7e55d26f93ff9dc0339c5527a8a680b57236b1e096ce371a9468ef13faeda8a"
+  },
+  "crates/meridian-geometry/integration/component-audit/toolchain.json": {
+    "mode": "100644",
+    "blob": "6a7e5757807d71d5f9668d23471821c4718a2dd4",
+    "bytes": 2381,
+    "sha256": "2159d1013dfdef569d4592a4c33da254d0fa9c497e2b74f43b2853d86bd8a849"
+  },
+  "crates/meridian-geometry/integration/component-audit/whole-five__OWNER-TERMINAL.json": {
+    "mode": "100644",
+    "blob": "55fbda1acd261a64df6a4e4b7d054886ae437bb6",
+    "bytes": 14310,
+    "sha256": "3d59d790e97a0f0253f82047aba3f447eda35cc7b99503ef59bc036e81ec823d"
+  },
+  "crates/meridian-geometry/integration/component-audit/whole-five__results__SH010-CASE.json": {
+    "mode": "100644",
+    "blob": "f64cef4de22e4696d8500de64d8da83622927098",
+    "bytes": 1811,
+    "sha256": "8b87eb1b6cf8fdc4ae02322c347371fb7449749ff34783f1a354d7b938f18e31"
+  },
+  "crates/meridian-geometry/integration/component-audit/whole-five__results__SH011-CASE.json": {
+    "mode": "100644",
+    "blob": "cf5bdb91156aff3784d6792e9c17444e514c31c0",
+    "bytes": 1811,
+    "sha256": "4de049705da3f37df327ab886a59122f529c5876e8e123aacacc65830d7c40c0"
+  },
+  "crates/meridian-geometry/integration/component-audit/whole-five__results__SH016-CASE.json": {
+    "mode": "100644",
+    "blob": "8cabdb757560028670109e50cddba6a67d55d96f",
+    "bytes": 1811,
+    "sha256": "8640aad517ca9bebe2b1ad497686f4f34e7b73c04e7f9b0c700d24e263495cb2"
+  },
+  "crates/meridian-geometry/integration/component-audit/whole-five__results__SH017-CASE.json": {
+    "mode": "100644",
+    "blob": "2c6cb6026270035e780522d9dfd3ac9e127bf658",
+    "bytes": 1811,
+    "sha256": "483d65507e07724edb3cf69d7c2a3df2f7205a08873d36abf3b674f402265cd7"
+  },
+  "crates/meridian-geometry/integration/component-audit/whole-five__results__SH166-CASE.json": {
+    "mode": "100644",
+    "blob": "14165be8fa575af5fd389d6c4c16e67affbaaef5",
+    "bytes": 1810,
+    "sha256": "d4373781feb40024e8354b18c5e20206d0c67683b64d217b97c4d0a939c23f5c"
+  },
+  "crates/meridian-geometry/integration/component-audit/whole-five__results__TERMINAL.json": {
+    "mode": "100644",
+    "blob": "6ea403fff615ea8bf0f31ebfccff08700c405f11",
+    "bytes": 9360,
+    "sha256": "6299bf745e4f559c2d4bf535c3a64c1b52d36cdb17d38e4da22d12c10e51d166"
+  },
+  "crates/meridian-geometry/integration/contact-star/CAUSAL.json": {
+    "mode": "100644",
+    "blob": "3671d0a67a8b4a0207ed4da4b36ab7fde74601e5",
+    "bytes": 3472,
+    "sha256": "e20184b76ed41ba62a4529729fff77716a8ec1748daf9789ee43294fbbe3133b"
+  },
+  "crates/meridian-geometry/integration/contact-star/GEOMETRY-QUALIFICATION-RESULT.json": {
+    "mode": "100644",
+    "blob": "9a0cb4ab452fb381c1f252dac3c27ce3673c9058",
+    "bytes": 6263,
+    "sha256": "ae54fbbc1600c28d2e74a2d4bd5bc30ee20bc8b11f83ff88f147ca72cf273dbc"
+  },
+  "crates/meridian-geometry/integration/contact-star/test.log": {
+    "mode": "100644",
+    "blob": "8b8a0d82a2d823c9712dae0cc5cf8e0c9dc25b23",
+    "bytes": 2020,
+    "sha256": "e26ce883e0fb6a694a0aae2a0d08d17be5b928c60d10dbd7115539e80cf29b95"
+  },
+  "crates/meridian-geometry/integration/exact-pruning/DELTA.json": {
+    "mode": "100644",
+    "blob": "5e5816ad1f368c5b6e3c789131cd7e37b81d56d6",
+    "bytes": 4000,
+    "sha256": "9496021282d0b9b935e79bf0f1943ac9e80fdd4071b38a3878339741b54e24fa"
+  },
+  "crates/meridian-geometry/integration/exact-pruning/SH010-CASE.json": {
+    "mode": "100644",
+    "blob": "757b3a7a0593a6943cd4c7cecdf2bb3c407efec0",
+    "bytes": 2023,
+    "sha256": "836d1c9b57b92aaf53ff2dff7b55593b7270e4a48d7c6f8628546327fe2337e1"
+  },
+  "crates/meridian-geometry/integration/exact-pruning/SH011-CASE.json": {
+    "mode": "100644",
+    "blob": "d72b8c7778ab1f25d6dc779fd23bf60adbe00fdb",
+    "bytes": 2023,
+    "sha256": "5367cc10398a6fb46accf83302778520836b256feefd8a9839b050e87542bba8"
+  },
+  "crates/meridian-geometry/integration/exact-pruning/SH016-CASE.json": {
+    "mode": "100644",
+    "blob": "ea82e13b51cd7cd38b8cead961d1ac41afa25cca",
+    "bytes": 2021,
+    "sha256": "ea8e1eb020d266424b3a61a24bda9c088af406fc1ab1f5c776aae7823b151829"
+  },
+  "crates/meridian-geometry/integration/exact-pruning/SH017-CASE.json": {
+    "mode": "100644",
+    "blob": "73a86d561b80baf25f328738e21c9735631e51ae",
+    "bytes": 2021,
+    "sha256": "54e39d0bcf741b0a905efaf7c77ef4e6e33de5790214b71bec3a48ad282a54f4"
+  },
+  "crates/meridian-geometry/integration/exact-pruning/SH166-CASE.json": {
+    "mode": "100644",
+    "blob": "792325abc3eac9d574cd8a44d03eff3f9f8d18d1",
+    "bytes": 2024,
+    "sha256": "269bb278fb78dd26f1c6c80abd279d2c15fdd8765d5e548167bf21d1f68af700"
+  },
+  "crates/meridian-geometry/integration/exact-pruning/TERMINAL.json": {
+    "mode": "100644",
+    "blob": "d6b76efd5a67018f6dc2c8fa5f0198c1d1711b0e",
+    "bytes": 10421,
+    "sha256": "fb1a4fe418ff9d56ba660e5138e088a5d97c682027dc05aa39b2c055ebd3d97f"
+  },
+  "crates/meridian-geometry/integration/identity-lifetime/ALGORITHM.md": {
+    "mode": "100644",
+    "blob": "47d82088e4be4c16f5c4df3969e0ea0399874e68",
+    "bytes": 7204,
+    "sha256": "7796e7431b58f26adcc24e266536061d122242867658b515ef266efa8aa0c195"
+  },
+  "crates/meridian-geometry/integration/identity-lifetime/DELTA.json": {
+    "mode": "100644",
+    "blob": "4ce70ed5f5c3b919a37bd92cc88de39d6a2ce48d",
+    "bytes": 8502,
+    "sha256": "bd0c86cac0942610a2598c45c7618a4ab29b0ddb4127c2aa41c3d078973bebce"
+  },
+  "crates/meridian-geometry/integration/identity-lifetime/PARENT-ARTIFACTS.json": {
+    "mode": "100644",
+    "blob": "d9f7b169f01d7b0f633f993289032d6de6e986ad",
+    "bytes": 2142,
+    "sha256": "b363d9b8686d25a43d303290fa2ff7bd617fb07b2e9583292605231df6c90dea"
+  },
+  "crates/meridian-geometry/integration/identity-lifetime/PARENT-CASE-MATRIX.json": {
+    "mode": "100644",
+    "blob": "91ce314e18ab278fe50b1201e9a5deacbb798461",
+    "bytes": 7792,
+    "sha256": "735e683c726cbb8ab0ee8b101b1f4ac7a02f5623e14a66eb0eeb032c77293f71"
+  },
+  "crates/meridian-geometry/integration/identity-lifetime/PARENT-FOCUSED.tar.gz": {
+    "mode": "100644",
+    "blob": "737251f02d57deec375a1bdbbf736499ebb7865c",
+    "bytes": 5836,
+    "sha256": "320345bd8bab40420dab14c2b26fb7291f4502f685750b259abfda4c0899bdf8"
+  },
+  "crates/meridian-geometry/integration/identity-lifetime/PARENT-HANDOFF.json": {
+    "mode": "100644",
+    "blob": "8b9b87fa06b0bd80d9b77f9e9107eb97b8e5543c",
+    "bytes": 8724,
+    "sha256": "837c9c8169cde6ee3395773652b8a3ed52497219640982bb588602f11b0b7ff7"
+  },
+  "crates/meridian-geometry/integration/identity-lifetime/PARENT-WHOLE-FIVE.tar.gz": {
+    "mode": "100644",
+    "blob": "48c1f211111c30e5305d34ac6cdda50076a6113f",
+    "bytes": 45391,
+    "sha256": "5c781425d18ef09ab841e20bfca62abd4e932942df71d5b6864098b38746cb25"
+  },
+  "crates/meridian-geometry/integration/live-overlap/CONTRACT.md": {
+    "mode": "100644",
+    "blob": "be0faa40dd9b727e22d09bca625c72b92fb67c07",
+    "bytes": 3974,
+    "sha256": "5631b8b0683ffe30ed6695dcc8b1cfa07031dd6868595a106320364593cd873c"
+  },
+  "crates/meridian-geometry/integration/live-overlap/CUSTODY.json": {
+    "mode": "100644",
+    "blob": "870bb5f87bdab6f0d2dd45009bc50c15187bbc7e",
+    "bytes": 9829,
+    "sha256": "7fce7dbd77db3b8164485000e12ed1dd45d1c5f2f9f666f53ccec8ff50b283e8"
+  },
+  "crates/meridian-geometry/integration/live-overlap/DELTA.json": {
+    "mode": "100644",
+    "blob": "439f1217ee6e9ea1b1a20eee857206d5a3706a9f",
+    "bytes": 1824,
+    "sha256": "26637d61e4714e61182e676678456a52e553de33977a047eb4934b1aeff9ed0f"
+  },
+  "crates/meridian-geometry/integration/live-overlap/INVERSE-EDITS.json": {
+    "mode": "100644",
+    "blob": "6baf281575d7ac457ec5a2d6c40e35de682f8689",
+    "bytes": 14468,
+    "sha256": "990eab5ad39ee502830a4dee97b6bcbe4c57351401e4327262a97d95c2aacd36"
+  },
+  "crates/meridian-geometry/integration/live-overlap/PARENT-HANDOFF.json": {
+    "mode": "100644",
+    "blob": "1e2d36aa95fbd2e307f873fc1af4d674b13480dc",
+    "bytes": 24645,
+    "sha256": "efab4173aa6bdc5107c1ff7ded3841c4bc5461fd7b0dfbae961658de2dc5a2f9"
+  },
+  "crates/meridian-geometry/integration/live-overlap/PARENT-RAW-PACKET.tar.gz": {
+    "mode": "100644",
+    "blob": "bcecb90a786134ce256eeb7b48b942084a8960cf",
+    "bytes": 2596865,
+    "sha256": "d98b6ad67976185177081feb5db163d464058e6747fbb1a04cba71275c490c27"
+  },
+  "crates/meridian-geometry/integration/live-overlap/SH010-CASE.json": {
+    "mode": "100644",
+    "blob": "9ad4fa14983b698cc1ef4e0a9cb71f9af3a7bef3",
+    "bytes": 2894,
+    "sha256": "e72f4e1473ba83793e42bfe34f2817f30b2a6812dae641b9b05faaa60cde5e5e"
+  },
+  "crates/meridian-geometry/integration/live-overlap/SH011-CASE.json": {
+    "mode": "100644",
+    "blob": "d5ed7e2ecb6d14d42c24566e00db3042c525139a",
+    "bytes": 2894,
+    "sha256": "9b671eb218f7401643fb751cce76c4fea9a3d9b937e1834f0fdea26c1e4d662c"
+  },
+  "crates/meridian-geometry/integration/live-overlap/SH016-CASE.json": {
+    "mode": "100644",
+    "blob": "18acf1401001d0172f3864099f71112cb901db8a",
+    "bytes": 2891,
+    "sha256": "c007c671fdb0b5789d9429064a020814a909d3dc13580f75fa978e0a6010dca3"
+  },
+  "crates/meridian-geometry/integration/live-overlap/SH017-CASE.json": {
+    "mode": "100644",
+    "blob": "cb438c05ba6882d498151a9d6238397ee3fe4730",
+    "bytes": 2895,
+    "sha256": "72401b51e12d9e96edb7c8421544c3933c5cfb9439d7c0f2f05149b66b9ee1dc"
+  },
+  "crates/meridian-geometry/integration/live-overlap/SH166-CASE.json": {
+    "mode": "100644",
+    "blob": "a17a27f56adf66d19262fa01d0cf96c64ea3a809",
+    "bytes": 2889,
+    "sha256": "ee3ea9ee67594393f372e0e99bf618349f8de93b3e6a56a68856a44b367952fd"
+  },
+  "crates/meridian-geometry/integration/live-runs/CONTRACT.md": {
+    "mode": "100644",
+    "blob": "a51afbeef764f3049ca6e30bf271291024f23784",
+    "bytes": 4519,
+    "sha256": "d829df9a2fd229da39bc4dc6c9226ef7e434b2955269143eb4387d31a0d8e3ec"
+  },
+  "crates/meridian-geometry/integration/live-runs/CUSTODY.json": {
+    "mode": "100644",
+    "blob": "d6d09c14a68c9554deaa47db6e9e5e92a33adfe6",
+    "bytes": 9614,
+    "sha256": "084a04711c87e8f9f5851adf864254832ddbec4f2a0a67d801346e026c145a15"
+  },
+  "crates/meridian-geometry/integration/live-runs/DELTA.json": {
+    "mode": "100644",
+    "blob": "e01081a41c3d7aeb5845352bb681879cdcae6a4d",
+    "bytes": 2067,
+    "sha256": "1b912e43288e6fcf180bd13e700cbd85ecd439f9d296659ab1da302b49b164f3"
+  },
+  "crates/meridian-geometry/integration/live-runs/INVERSE-EDITS.json": {
+    "mode": "100644",
+    "blob": "0b6d3f85f97dba08f22a574a0bf8c8485172b81c",
+    "bytes": 8569,
+    "sha256": "2d02f669b3182d8f5d1b40cce37780c72005828a926175d0d9daab2ef87d6326"
+  },
+  "crates/meridian-geometry/integration/live-runs/PARENT-HANDOFF.json": {
+    "mode": "100644",
+    "blob": "b93f9b4b87817f7b4f63544aa5510075000ce2d1",
+    "bytes": 25434,
+    "sha256": "3c16a404253785d7ea7f9957901221f3f23c57819236d5d5b3ce4c286fdb6ef7"
+  },
+  "crates/meridian-geometry/integration/live-runs/PARENT-RAW-PACKET.tar.gz": {
+    "mode": "100644",
+    "blob": "ed9946903df1eca16efdb4303d6a3bb62e5a2ae1",
+    "bytes": 5192170,
+    "sha256": "cf4106a4eca3414801381127c1b640a0cdcca9d04b954e7582d87066a3d535ef"
+  },
+  "crates/meridian-geometry/integration/live-runs/SH010-CASE.json": {
+    "mode": "100644",
+    "blob": "baed2f4c38896679cca282949dedd6538671f015",
+    "bytes": 2889,
+    "sha256": "5b9057b3be271870bb93b92643331ec9cccc7682656f2dd09470eed063483449"
+  },
+  "crates/meridian-geometry/integration/live-runs/SH011-CASE.json": {
+    "mode": "100644",
+    "blob": "4f346b8e913e1bf1e8218ba1b4729dd8679cbf45",
+    "bytes": 2889,
+    "sha256": "2a3c230887d6b7e8ffcab77aef5a3ced090f07f12eee04bf0eb5707c3f13b3da"
+  },
+  "crates/meridian-geometry/integration/live-runs/SH016-CASE.json": {
+    "mode": "100644",
+    "blob": "630c58d99831fb4a3d5e834943d10c1d6428f092",
+    "bytes": 2888,
+    "sha256": "c35f302dc755df67834b03181c609410df282da954778496047aa1489c1bfb9c"
+  },
+  "crates/meridian-geometry/integration/live-runs/SH017-CASE.json": {
+    "mode": "100644",
+    "blob": "e0826646ac0408bc988a086267fed06e7d232974",
+    "bytes": 2891,
+    "sha256": "dd0c2e5f62eb3ed631a7177de8bb30062904b628096452bebed7310a45d4adec"
+  },
+  "crates/meridian-geometry/integration/live-runs/SH166-CASE.json": {
+    "mode": "100644",
+    "blob": "921df4d77210686ddbda5d94f132134d570cf6ce",
+    "bytes": 2880,
+    "sha256": "b51abd729c208a30d2732d2974ff3060a7d860f990652beb9412d81b64a42fb0"
+  },
+  "crates/meridian-geometry/integration/owner-ranges/ALGORITHM.md": {
+    "mode": "100644",
+    "blob": "2dac1239edef4c82e91a9749f66eee7ada2afbb7",
+    "bytes": 4996,
+    "sha256": "d90ea45601f0d267eaa7a08864f6698ddf4bfc2985aff29671ab0c36954aa53c"
+  },
+  "crates/meridian-geometry/integration/owner-ranges/DELTA.json": {
+    "mode": "100644",
+    "blob": "de34e8cf429e40f1ff80f0253bffba0984cbebd6",
+    "bytes": 6203,
+    "sha256": "28fe279c06baf43d8722b64faef3ffc7cb5d6c7cb9743d6e97e5275b82b39312"
+  },
+  "crates/meridian-geometry/integration/owner-ranges/PARENT-FOCUSED-HANDOFF.json": {
+    "mode": "100644",
+    "blob": "e8db908d32ed03b42f2483f8ce7d24446812d539",
+    "bytes": 5292,
+    "sha256": "497397cc88e559bbc6844210ac1e4917596fa67aca6230d0f54333e8b72d1d54"
+  },
+  "crates/meridian-geometry/integration/owner-ranges/PARENT-FOCUSED.tar.gz": {
+    "mode": "100644",
+    "blob": "67c525254731949ff2ff393dade1e0033700de05",
+    "bytes": 55647,
+    "sha256": "279782f953ceb6205262f81f5ce3b5b7c9d9e4cd026a9d1ac799cbcbb6ab3880"
+  },
+  "crates/meridian-geometry/integration/owner-ranges/SOURCE-CASE-MATRIX.json": {
+    "mode": "100644",
+    "blob": "d429c4f9fc465e64d2ba1e3e8ba5fc328b10eb78",
+    "bytes": 8399,
+    "sha256": "7c14bd55cdecfc3a22057ea38b5cc1bd852af5a60d428849248dcd51a535d9bb"
+  },
+  "crates/meridian-geometry/integration/plane-cache/DELTA.json": {
+    "mode": "100644",
+    "blob": "9072f7207e32d6e8991179821232a74fc3359d3b",
+    "bytes": 6308,
+    "sha256": "3835c20443c848df0086599f9bda4c4a9536235dd54f9998a6d44131b1c4e241"
+  },
+  "crates/meridian-geometry/integration/plane-cache/PARENT-AUDIT.json": {
+    "mode": "100644",
+    "blob": "df33c082a9e8253931eeb381d1830243a3c06b6f",
+    "bytes": 3074,
+    "sha256": "444b00664d65e6b01d0b1940114be0d6fe08e0f4877526b057bd55912bf3f468"
+  },
+  "crates/meridian-geometry/integration/plane-cache/PARENT-HANDOFF.json": {
+    "mode": "100644",
+    "blob": "c7c66e7afcb7054cf57355bcf00dc308ac9a789a",
+    "bytes": 22786,
+    "sha256": "9ee397cd7e4bb5f31a21489631d17d5002c64aef1ab5903033b1399bf763a033"
+  },
+  "crates/meridian-geometry/integration/plane-cache/PARENT-TEST.log": {
+    "mode": "100644",
+    "blob": "19c1f0c2a6656e319dd0d2f23af2b8fa568c2c2b",
+    "bytes": 7917,
+    "sha256": "e60e400b93f85bd671b5acd13904feecb0d7979c24cc1cc2113235bbc8e44feb"
+  },
+  "crates/meridian-geometry/integration/qualified-parent/GEOMETRY-QUALIFICATION-RESULT.json": {
+    "mode": "100644",
+    "blob": "9b26318f22e05736a93e6bf8b68e367f80dc976e",
+    "bytes": 4748,
+    "sha256": "cb4fb43c62d8a7153bf5513217dbfda532ed1d5508fcbae133ee4a16ce37d3d5"
+  },
+  "crates/meridian-geometry/integration/qualified-parent/check.log": {
+    "mode": "100644",
+    "blob": "3cedc7d63058d1113b0ea01dff3ba10371606231",
+    "bytes": 355,
+    "sha256": "67dc8f59737dbd9ea6778a5b7244390e07d5fb5afc096313d1b492913b58a822"
+  },
+  "crates/meridian-geometry/integration/qualified-parent/clippy.log": {
+    "mode": "100644",
+    "blob": "c0d53e9791d948530f208a44b2dc43aea51cac34",
+    "bytes": 198,
+    "sha256": "e0677ca5fdc78267221e11a73d9fd490f1c9462be3acdf109fa59803ad6ef1d1"
+  },
+  "crates/meridian-geometry/integration/qualified-parent/test.log": {
+    "mode": "100644",
+    "blob": "deaaf7736bc7f3bb96f09777298d3b85ddf5d825",
+    "bytes": 2232,
+    "sha256": "d3098231073656cda5598d81e64b9dbd55e17a786980863f2d5bda39fc92a86a"
+  },
+  "crates/meridian-geometry/integration/ray-cache-storage/DELTA.json": {
+    "mode": "100644",
+    "blob": "86c128cebdb63da3e2cbd264ede6a347a9d86c24",
+    "bytes": 9813,
+    "sha256": "cdc7259e309e37eca937c943f2c54e9df3792f4ec35dffc8360aa163bb2ae74c"
+  },
+  "crates/meridian-geometry/integration/ray-cache-storage/PARENT-AUDIT.json": {
+    "mode": "100644",
+    "blob": "9a0639537be9a56a3f072b77bf90918c0f9125d3",
+    "bytes": 4432,
+    "sha256": "20a7e5af39bad8cdf86ba5d81eb9170df88318f1c752a131a302e36a9d2d0df2"
+  },
+  "crates/meridian-geometry/integration/ray-cache-storage/PARENT-HANDOFF.json": {
+    "mode": "100644",
+    "blob": "269ca6fde3beb530a246388c8b104aba382a45d7",
+    "bytes": 52789,
+    "sha256": "b30d5eefd058516f7d6d6723ab23b4222a9019d85351c947ab9513ddcdf5a0f7"
+  },
+  "crates/meridian-geometry/integration/ray-cache-storage/PARENT-MATRIX.json": {
+    "mode": "100644",
+    "blob": "4c195bb780ab2a97af8772f95a569858e00c698c",
+    "bytes": 3740,
+    "sha256": "8798ccbc9b6de1348cbd226f9716643073f4f0b5d7aba213100183309dc5af7b"
+  },
+  "crates/meridian-geometry/integration/ray-interval/DELTA.json": {
+    "mode": "100644",
+    "blob": "70e2921f398f36cace47c194cb54c9f13b3d9c6d",
+    "bytes": 5849,
+    "sha256": "5198c99654722b8ddf3ac82863b5e9cef6dd004777f59ff78920a0dd36f8d918"
+  },
+  "crates/meridian-geometry/integration/ray-interval/PARENT-AUDIT.json": {
+    "mode": "100644",
+    "blob": "0489832e3e8f4564719c973beb212fe4caf1223b",
+    "bytes": 31360,
+    "sha256": "a161338926eb0886eced3df2bd3c31c8234e8dc90524eafa6298526aaebbace2"
+  },
+  "crates/meridian-geometry/integration/ray-interval/PARENT-HANDOFF.json": {
+    "mode": "100644",
+    "blob": "6395d33aff58912d8d1b249a722a3ec32010ee8c",
+    "bytes": 22325,
+    "sha256": "8036ddf8794fe2da7206f6ebc1eaf5c75a220a5709e68c158de0c86b3f0b514a"
+  },
+  "crates/meridian-geometry/integration/ray-interval/PARENT-TEST.log": {
+    "mode": "100644",
+    "blob": "99e4c2988d0a549a779739b6ff84e82b8ec09cb9",
+    "bytes": 7769,
+    "sha256": "b9a7cd57c5db63f92502d29cb6771ab6aa2de53f82138055b180298fc6cf714f"
+  },
+  "crates/meridian-geometry/integration/ray-pruning/DELTA.json": {
+    "mode": "100644",
+    "blob": "bdd12d26250d0b7499a1b27bd49ba728c7cd77cb",
+    "bytes": 19761,
+    "sha256": "8e02a8204fd0b60812f0606b47a331b97b84445829e7210f1ea8a7d5d797b9de"
+  },
+  "crates/meridian-geometry/integration/ray-pruning/PARENT-FOCUSED.json": {
+    "mode": "100644",
+    "blob": "2b44a0ff5f6020f47d537e4f002757508ac154ad",
+    "bytes": 16758,
+    "sha256": "3cd2317f40e8553fdd04d1078caafc7400539707c063f5698304e623e7233104"
+  },
+  "crates/meridian-geometry/integration/ray-pruning/PARENT-HANDOFF.json": {
+    "mode": "100644",
+    "blob": "4b641ca922ca5857edf0646dffdb7b9ed65ba1e2",
+    "bytes": 26902,
+    "sha256": "b0423e9d6d3d4eec874acb1b023060e86893b928c0a73f1514cd97183a9cf710"
+  },
+  "crates/meridian-geometry/integration/ray-pruning/PARENT-MATRIX.json": {
+    "mode": "100644",
+    "blob": "a169666cfa8f08db0abc78277b75ad26982e4b45",
+    "bytes": 3495,
+    "sha256": "949bf0923a3f9159063473382736a801c6542c55da34ad4efb98c21a91123cbb"
+  },
+  "crates/meridian-geometry/integration/region-storage/DELTA.json": {
+    "mode": "100644",
+    "blob": "71e1489909855f0f10421cfa8f353cc63e89af26",
+    "bytes": 12744,
+    "sha256": "3f01a486204d1efbd57c6dadeaffdc4b94f0991c38f62fa661300ff043d6a8b2"
+  },
+  "crates/meridian-geometry/integration/region-storage/PARENT-FOCUSED.json": {
+    "mode": "100644",
+    "blob": "af12c1434315010112212465d7ca5ffed67b83c6",
+    "bytes": 5701,
+    "sha256": "2542422af39f2d0a22de1d0353a7bcc7e4236278bcef4dd6a79b7af27cb749a6"
+  },
+  "crates/meridian-geometry/integration/region-storage/PARENT-HANDOFF.json": {
+    "mode": "100644",
+    "blob": "f081fcf2da8406c81788e4f0a46013eb1d896064",
+    "bytes": 57569,
+    "sha256": "0266db47c11284626aaa27c059eca6fb83074c79960250ba14275fc8c28f161b"
+  },
+  "crates/meridian-geometry/integration/review/g2-meridian-e7c2fc6-geometry-whole-checks.json": {
+    "mode": "100644",
+    "blob": "9d5469eba6e7e4912365d328278fc846852a52ea",
+    "bytes": 1790,
+    "sha256": "ddee63fa21319aca6249c6c398fdec7697d6eea999974fb7fafd937169f814d8"
+  },
+  "crates/meridian-geometry/integration/review/g2-meridian-e7c2fc6-geometry-whole-source-findings.json": {
+    "mode": "100644",
+    "blob": "e188137d996014b215001703a8b1ac7d71d42d73",
+    "bytes": 4548,
+    "sha256": "942ed071a6d8d3f90c1361869698b46f8df80a5cede6c33e99280bb194f64db1"
+  },
+  "crates/meridian-geometry/integration/section-collection/ALGORITHM.md": {
+    "mode": "100644",
+    "blob": "3b3c46f75854a4eecfe80c15566eb441ee60bf50",
+    "bytes": 7965,
+    "sha256": "fd297e7bef2571b8fd74bf7c595463738dc0dfc7c5b34553cf6e41a85151a550"
+  },
+  "crates/meridian-geometry/integration/section-collection/DELTA.json": {
+    "mode": "100644",
+    "blob": "07164f68d862d7faff0a5ab3b0d0eab389cec735",
+    "bytes": 4425,
+    "sha256": "e7202efd48a9c320b765d2b0256bb870fb694e047cadec927d0b89d5958f122a"
+  },
+  "crates/meridian-geometry/integration/section-collection/PARENT-CHECK-START.json": {
+    "mode": "100644",
+    "blob": "387d3d7afd9829a299debab9f0e5e0473e2a99f8",
+    "bytes": 1424,
+    "sha256": "d5840467e1b129ea142174dd31354bc24ca5e4ac2bedb9d688ed7ee7cea0366c"
+  },
+  "crates/meridian-geometry/integration/section-collection/PARENT-CHECK-TERMINAL.json": {
+    "mode": "100644",
+    "blob": "6834a76b27f17b0df7f4c15aca5a2177fc14ec19",
+    "bytes": 473,
+    "sha256": "c5cc416e7e307905f2fd0e2412dc2aac8e751d50d577fc52796ee33c8a2d6b51"
+  },
+  "crates/meridian-geometry/integration/section-collection/PARENT-SOURCE.json": {
+    "mode": "100644",
+    "blob": "e22019ebaadb254dd37d5978223a9d02237d141c",
+    "bytes": 56792,
+    "sha256": "5d40e70c5c2833d925100b0131a52bde8d983e9831c9082b742e85017d103674"
+  },
+  "crates/meridian-geometry/integration/section-collection/PARENT-TEST-START.json": {
+    "mode": "100644",
+    "blob": "462bbc7790dbed9c2914d8387982b620fb3c0644",
+    "bytes": 1430,
+    "sha256": "e157f4658b5ffaf38e171f2d58dc4fe5a91e57915a77270722ddc7374158ca28"
+  },
+  "crates/meridian-geometry/integration/section-collection/PARENT-TEST-TERMINAL.json": {
+    "mode": "100644",
+    "blob": "2b6ea77013fe6c1bd34751bd683648cd0363364e",
+    "bytes": 474,
+    "sha256": "ea6ba54b032efc19d6f1669c34a659fe1f11fa4987880f6f526b6dd8c2291895"
+  },
+  "crates/meridian-geometry/integration/section-collection/PARENT-check.log": {
+    "mode": "100644",
+    "blob": "a5211c0495269d995f755a2123add49f2200aba1",
+    "bytes": 198,
+    "sha256": "5e00d3141440e996ff059d7cbd25df2ac47535c06025023ab0c47821df602d92"
+  },
+  "crates/meridian-geometry/integration/section-collection/PARENT-test.log": {
+    "mode": "100644",
+    "blob": "636542429aa1f264f20ba88e96674f608431ea17",
+    "bytes": 10336,
+    "sha256": "81395bf4431510148db50dd980a23b7c49ab3bfd34578a8bf3a7d4b6e7e4076b"
+  },
+  "crates/meridian-geometry/integration/section-result-type/DELTA.json": {
+    "mode": "100644",
+    "blob": "34b235a2f86f30364ecafd2ff47aceda20994147",
+    "bytes": 4475,
+    "sha256": "371aad8e396762ba6fb348c71f8aa97f0a498677708d096aa8ae9baa1bf3d713"
+  },
+  "crates/meridian-geometry/integration/section-result-type/PARENT-CHECK-START.json": {
+    "mode": "100644",
+    "blob": "8af8e02afd1902c136fe9c50b8509895a52d92e0",
+    "bytes": 1424,
+    "sha256": "01aa83de1e8950dad1cd917f0fe23b2c75de9b5fa0874c3203b80b8ed88df9b0"
+  },
+  "crates/meridian-geometry/integration/section-result-type/PARENT-CHECK-TERMINAL.json": {
+    "mode": "100644",
+    "blob": "6b7672b7528c88b287ff6e760476cc80c127739f",
+    "bytes": 473,
+    "sha256": "435546a992ef452c0def825217e8ef7c2fdf670074dc3c3a154c5e0cdc3693d3"
+  },
+  "crates/meridian-geometry/integration/section-result-type/PARENT-CLIPPY-FAILURE-HANDOFF.json": {
+    "mode": "100644",
+    "blob": "993a0b3690a259b080f4cf3deb1c991833507af0",
+    "bytes": 2933,
+    "sha256": "145b8b897b746cdee02fb0c4c032eddc2d88d9f0fc01c37976bc4e95cb77af07"
+  },
+  "crates/meridian-geometry/integration/section-result-type/PARENT-CLIPPY-START.json": {
+    "mode": "100644",
+    "blob": "4ac1e31653a72415bee9479eda8d132d7735310c",
+    "bytes": 1462,
+    "sha256": "8c16daafa1677ae9b43818043353dfc676e60f45443ac7fd262229d67e3026ad"
+  },
+  "crates/meridian-geometry/integration/section-result-type/PARENT-CLIPPY-TERMINAL.json": {
+    "mode": "100644",
+    "blob": "184a8f2a0fc114c97718176deeea29bd84416c73",
+    "bytes": 477,
+    "sha256": "bf396cf485da201b75927241fd526a19ac86b2e2525cd2d1e2cc3c34e7d09d57"
+  },
+  "crates/meridian-geometry/integration/section-result-type/PARENT-FOCUSED-RESULT.json": {
+    "mode": "100644",
+    "blob": "e9bf14d38780cea6d6fdd3c151de5190b8003977",
+    "bytes": 1399,
+    "sha256": "49fed400870009ccc702385e6aca3f6da9546902b10d21177c6634ca4c1db566"
+  },
+  "crates/meridian-geometry/integration/section-result-type/PARENT-HOST-START.json": {
+    "mode": "100644",
+    "blob": "8e86daaed1f273b197c7807566e3f420bf8b7be7",
+    "bytes": 1492,
+    "sha256": "29707709427217ccdbd2c2c7dbe01d7bf0d097314954aadb567f3c86c860b613"
+  },
+  "crates/meridian-geometry/integration/section-result-type/PARENT-HOST-TERMINAL.json": {
+    "mode": "100644",
+    "blob": "de0652b2abbedfc5e0c407d01ffb1c0eb73310ce",
+    "bytes": 472,
+    "sha256": "8e7869daaec46a36086f5730f4bb91b94bc5b03e71ccaa90a07c481f850fc66e"
+  },
+  "crates/meridian-geometry/integration/section-result-type/PARENT-SOURCE.json": {
+    "mode": "100644",
+    "blob": "4d9a6b0491a607b48007d53b924b9d00f11f1d66",
+    "bytes": 58708,
+    "sha256": "ca810605c150d21f49b4da9658d319375f752b0cb8d6ee254965111201521152"
+  },
+  "crates/meridian-geometry/integration/section-result-type/PARENT-TEST-START.json": {
+    "mode": "100644",
+    "blob": "513bdb96d10f9fb7ac2483f0fb3311aa2cd9af69",
+    "bytes": 1430,
+    "sha256": "cfdd46007082e797910ad121b7d8b111287eadf066b97eeb30daeb060965a15f"
+  },
+  "crates/meridian-geometry/integration/section-result-type/PARENT-TEST-TERMINAL.json": {
+    "mode": "100644",
+    "blob": "61d1f522cc91166f42f2cf8d6822ff6ff45ea723",
+    "bytes": 473,
+    "sha256": "1828aa84dc99fa2a87b46a44109a1da7113de2d75cda8e5717eb22b73f0e83ad"
+  },
+  "crates/meridian-geometry/integration/section-result-type/PARENT-check.log": {
+    "mode": "100644",
+    "blob": "72613057a226e97737229c8230e2c2fb68c223fc",
+    "bytes": 198,
+    "sha256": "577e6bbf95574bc52315fa33a5d5ebfc40bb39b19b804d5d345147f6f84e72fc"
+  },
+  "crates/meridian-geometry/integration/section-result-type/PARENT-clippy.log": {
+    "mode": "100644",
+    "blob": "753c2bda4c4b1a4ac510e9be4b058e6fa099c7ad",
+    "bytes": 908,
+    "sha256": "e5dd0111c09e36a63e3864c4796f802e82c733941a6ff5718c9bfa45a5893469"
+  },
+  "crates/meridian-geometry/integration/section-result-type/PARENT-host.log": {
+    "mode": "100644",
+    "blob": "104488e4d69653e7cf21cacab87293116c4d7c27",
+    "bytes": 107,
+    "sha256": "542478c5e228cffe15731b293460e1c4bc97eab58d811a31f3775a96f09a3ee3"
+  },
+  "crates/meridian-geometry/integration/section-result-type/PARENT-test.log.gz": {
+    "mode": "100644",
+    "blob": "7b344054181f53014d52bbc17e9a895531620485",
+    "bytes": 3337,
+    "sha256": "5d9bf23dbf541658bdf6102e9beec76a6b9a710db60dd44848cd8cda0b72969e"
+  },
+  "crates/meridian-geometry/integration/section-test-api/DELTA.json": {
+    "mode": "100644",
+    "blob": "ae72bc19f1555969cb268bbd6ef52154c08f7a58",
+    "bytes": 2341,
+    "sha256": "4e2563c8e28d68a49313177b730a1c5ec4446055cabdeb7efa2f15d01ed667f4"
+  },
+  "crates/meridian-geometry/integration/section-test-api/PARENT-CHECK-START.json": {
+    "mode": "100644",
+    "blob": "8d32d5291557eb6b0b28cd1d48714badf0640a52",
+    "bytes": 1424,
+    "sha256": "aa0d901464e6e41ba4cd02c291286ad175c72afac96ada1cee293b2c3814b38e"
+  },
+  "crates/meridian-geometry/integration/section-test-api/PARENT-CHECK-TERMINAL.json": {
+    "mode": "100644",
+    "blob": "051d393bb14e5a0a1d3317ffa450941a564eb992",
+    "bytes": 477,
+    "sha256": "649d494729cad8caa1481b8b21eee449e222f70249b94807fb0f1e7c97325b91"
+  },
+  "crates/meridian-geometry/integration/section-test-api/PARENT-CHECK.log": {
+    "mode": "100644",
+    "blob": "6666114e2c894031d672c37e1a01cb04df2be887",
+    "bytes": 15453,
+    "sha256": "416720f3e3ab816f7675b0ce013a1ccf873d07f7edf84a6d52fb5e436dbcc698"
+  },
+  "crates/meridian-geometry/integration/sections/ALGORITHM.md": {
+    "mode": "100644",
+    "blob": "99d69841b52362f87245f5b74c76b93026118056",
+    "bytes": 11600,
+    "sha256": "f3a0d42d927f0465875517ea63933ceb39b01e8cc33f5473b7e1b6ffa68a3716"
+  },
+  "crates/meridian-geometry/integration/sections/DELTA.json": {
+    "mode": "100644",
+    "blob": "6479012fcfd782ea86e81c298472645eade587fb",
+    "bytes": 7574,
+    "sha256": "f2410f3e836fcd7500193ca72b28bada463ae290398797821215d6f640566de7"
+  },
+  "crates/meridian-geometry/integration/sections/PARENT-AUDIT.json": {
+    "mode": "100644",
+    "blob": "63c91fc3ae47268265a9cc403c6d00bb3fa21858",
+    "bytes": 6083,
+    "sha256": "9f34c022b43a703e3aa626bd9de4bb9c96a721bc2e0641dbed473eeba95fc17a"
+  },
+  "crates/meridian-geometry/integration/sections/PARENT-HANDOFF.json": {
+    "mode": "100644",
+    "blob": "956f100bc01ce4831bee1fd8c2f11408bdc89ee3",
+    "bytes": 49895,
+    "sha256": "ec73704111fc769fd0714634e106e6eadcdc323ec7d2983d76781ccdd79a3a54"
+  },
+  "crates/meridian-geometry/integration/sections/PARENT-MATRIX.json": {
+    "mode": "100644",
+    "blob": "4a54a61bc222c6b94149410c6ad169ab567e03fc",
+    "bytes": 3764,
+    "sha256": "b65175f38d82f1130a1d26957ed8c1c51c33eec8176a2267c734cdf0cca3b060"
+  },
+  "crates/meridian-geometry/integration/style-storage/CLIPPY-DELTA.json": {
+    "mode": "100644",
+    "blob": "396e2cbc064de743eb105df82bd1019e7523896e",
+    "bytes": 7601,
+    "sha256": "3b42bf7dd930bd3d144cf8695508ee77b203e72647e172bf474060bb02341b76"
+  },
+  "crates/meridian-geometry/integration/style-storage/DELTA.json": {
+    "mode": "100644",
+    "blob": "508aef83422b7f1ad5190112914bc84cd58e3093",
+    "bytes": 12037,
+    "sha256": "2ee3823e10271fff262b89ecda6893d912ab0908db9be49c567ff69c81da69c0"
+  },
+  "crates/meridian-geometry/integration/style-storage/PARENT-FOCUSED.json": {
+    "mode": "100644",
+    "blob": "1b69e334b9e62bfb2ddb9ff26e620a05e8bb38fc",
+    "bytes": 2326,
+    "sha256": "32323b88172fb3c934fa3add628d2c84f27e8d2f6db969d08f9e540f1fb2a528"
+  },
+  "crates/meridian-geometry/integration/style-storage/PARENT-HANDOFF.json": {
+    "mode": "100644",
+    "blob": "e59ac09f1fd1de127400997722655009ee6dd0da",
+    "bytes": 56684,
+    "sha256": "37f87e1cfa79e7583a1422d0959e778040a6877af6fbbfc30c8728771cf71c54"
+  },
+  "crates/meridian-geometry/integration/workspace-and-lock.patch": {
+    "mode": "100644",
+    "blob": "b2dcb08ab1cc0163bb756969d6eb0dcde9ffbba8",
+    "bytes": 1173,
+    "sha256": "ab17c40481e541d93849859005902d478561f7c98efca7751fb8b6f2edb3e8d8"
+  },
+  "crates/meridian-geometry/src/adapter.rs": {
+    "mode": "100644",
+    "blob": "6bbe462f39047f9d1c9469562466bcc6596ad581",
+    "bytes": 11601,
+    "sha256": "9f89e7576391b4c16581c4b7047819279871a14a307103f80a097bb2489e6b68"
+  },
+  "crates/meridian-geometry/src/adapter_context_tests.rs": {
+    "mode": "100644",
+    "blob": "3d70236c16e6ffd3c16ea9ba4496fe9a1effa371",
+    "bytes": 6106,
+    "sha256": "bffe731c1f8fc7748d3a53d02717a96b614cec364ab93c53f62e6773d8eb8222"
+  },
+  "crates/meridian-geometry/src/arrangement.rs": {
+    "mode": "100644",
+    "blob": "8cfc977a9363c2500356a5460789b9b557c8d13d",
+    "bytes": 14684,
+    "sha256": "3ef52d23959b3b039cd0ca1a228830854b13c0373bdb46fa646536a6bc63cd30"
+  },
+  "crates/meridian-geometry/src/bin/original_five.rs": {
+    "mode": "100644",
+    "blob": "79ac04c7cea94abf63abad1630c8083350e86281",
+    "bytes": 33752,
+    "sha256": "cebd23434a14b1af7a62846fd55265dadae46706aa26d1587d258f60b5a6d743"
+  },
+  "crates/meridian-geometry/src/budget.rs": {
+    "mode": "100644",
+    "blob": "ca3995e518dd01399f1f6917b14f4ed007d58dc8",
+    "bytes": 10369,
+    "sha256": "67123967833fdb77a558e75058516cb005cb05095d3eafeea68f79fcf56e3d18"
+  },
+  "crates/meridian-geometry/src/certificate.rs": {
+    "mode": "100644",
+    "blob": "9da61aba1df2d52bb952832b1f0636f02ed2b5a3",
+    "bytes": 83357,
+    "sha256": "aba757615b905478715bbbb0510138d06a7f2947521ff4d92d559ae18abc01a4"
+  },
+  "crates/meridian-geometry/src/exact.rs": {
+    "mode": "100644",
+    "blob": "34e6b2cb50f590815e39649453ad050b9bbd42e3",
+    "bytes": 3426,
+    "sha256": "becc68a02e65b2b63e138318805b3a090a91349ec1861ee38b635550c3df8443"
+  },
+  "crates/meridian-geometry/src/identity_tests.rs": {
+    "mode": "100644",
+    "blob": "5d54dad6ceca92ab95745ccd7b77e23cbb12029c",
+    "bytes": 2823,
+    "sha256": "6ad19cdd13e1d9882cee5e764c8f83d7f9b19d8ab07301730d48e02e45a45974"
+  },
+  "crates/meridian-geometry/src/lib.rs": {
+    "mode": "100644",
+    "blob": "cf30c482de1ccf4d9daed1d2ce74a88101347bde",
+    "bytes": 773,
+    "sha256": "29fb9e944fafb468eebe95988623dab44f0cff163a6c57a4e857db94f60a4f20"
+  },
+  "crates/meridian-geometry/src/live_run_tests.rs": {
+    "mode": "100644",
+    "blob": "206e550d09f6fdc50301185eff198c560c1af164",
+    "bytes": 3696,
+    "sha256": "3340522dd4ed277be433c23885112857c809a4a353411d3699902f548ec8a5ba"
+  },
+  "crates/meridian-geometry/src/owner_range_tests.rs": {
+    "mode": "100644",
+    "blob": "37b7e594f5dc623a32c41a08c56d1cb9eade3fe8",
+    "bytes": 4383,
+    "sha256": "b6350af5f57665d3216b2ee5bcccc6e1ec1d70c5a200156205efc989d2c63c97"
+  },
+  "crates/meridian-geometry/src/planes.rs": {
+    "mode": "100644",
+    "blob": "8871454ab9f8d33036b808d24886ddfcbd1cd36c",
+    "bytes": 22393,
+    "sha256": "4547ca91efd61415fc45dfedac98ba9ab05624b58a8e29dc334afdfc637af56a"
+  },
+  "crates/meridian-geometry/src/pruning.rs": {
+    "mode": "100644",
+    "blob": "7d45921f1b4fd57113b05fceb2b841a14a2aaa88",
+    "bytes": 26707,
+    "sha256": "09d64f4c44fd14e53c93eb68f2bab5c5ad5f944fd7b8ea7280dd43d11e0da2e5"
+  },
+  "crates/meridian-geometry/src/region.rs": {
+    "mode": "100644",
+    "blob": "a41e96eca5d7963433a3443deb4326dac21dd903",
+    "bytes": 13049,
+    "sha256": "781ae2519d7dbc241aca6485c6539d31a4b32e36276a47e99c14cdc36471413b"
+  },
+  "crates/meridian-geometry/src/section_arrangement.rs": {
+    "mode": "100644",
+    "blob": "ec5c5c993f095df95c45cc79711f045b7b3c044a",
+    "bytes": 18397,
+    "sha256": "78c987fbf1981be59ec861cd00f1e7024d73623e557f7976025099a8d9551389"
+  },
+  "crates/meridian-geometry/src/section_tests.rs": {
+    "mode": "100644",
+    "blob": "26af4a52f02a96470e1b19a759489940248898d9",
+    "bytes": 8499,
+    "sha256": "d44001eb7ec58211fd01477bd96ffea0aa12a5b46c213fd4732f238a020fafcb"
+  },
+  "crates/meridian-geometry/src/sections.rs": {
+    "mode": "100644",
+    "blob": "11ecfdbc36349bc156a64d17997e9fe15e57bd0a",
+    "bytes": 46246,
+    "sha256": "589bc28032896e9c228450950a7e85146080dc20e87d3772128438e2f3b1f945"
+  },
+  "crates/meridian-geometry/src/source.rs": {
+    "mode": "100644",
+    "blob": "4c453d298c096dcb23f1d92a83ce94731961371b",
+    "bytes": 12810,
+    "sha256": "d09b092bfb0d35a47233d1cd85ffd7615be0267a07277955c977a1961f932ad1"
+  },
+  "crates/meridian-geometry/tests/adapter.rs": {
+    "mode": "100644",
+    "blob": "5e5b8a244d7daa097c693de10917b1a2030a6fa3",
+    "bytes": 14957,
+    "sha256": "af6e833513572c7ddad1a65d1880400a2291a2608d32e67e3535cbf86ebe9c91"
+  },
+  "crates/meridian-geometry/tests/original_inputs.rs": {
+    "mode": "100644",
+    "blob": "b9f3ea0db3e100de190c410355a543385b361777",
+    "bytes": 1701,
+    "sha256": "a7ed14743ec35eae18f73db11abf927dda42652060f28c97e9f36b0b55149dea"
+  },
+  "crates/meridian-geometry/third-party/DEPENDENCIES.json": {
+    "mode": "100644",
+    "blob": "7d856b6ac99970c99d1c1fe15419705b92f50b02",
+    "bytes": 820,
+    "sha256": "0cc3505fbaa449f392d8db886094af30d4e8d090b7842bd211a7a2f8cb88f3a2"
+  },
+  "crates/meridian-geometry/third-party/PRIMARY-SOURCES.json": {
+    "mode": "100644",
+    "blob": "cdb2830bd21a1ae4bc59e3494af783c6a5031b7d",
+    "bytes": 1476,
+    "sha256": "1a00faef19d488a40b148501ec301bb6b7fa60fab84767072285be411603e8ee"
+  },
+  "crates/meridian-geometry/third-party/num-bigint-0.4.8-Cargo.toml.orig": {
+    "mode": "100644",
+    "blob": "0d4b00958da0860f59dccc5827385a64c147f7c5",
+    "bytes": 1510,
+    "sha256": "62010089fd0c2ef0106c006dfe18bc07d01152a0d761b026de2a3b409308c831"
+  },
+  "crates/meridian-geometry/third-party/num-bigint-0.4.8-LICENSE-APACHE": {
+    "mode": "100644",
+    "blob": "16fe87b06e802f094b3fbb0894b137bca2b16ef1",
+    "bytes": 10847,
+    "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  "crates/meridian-geometry/third-party/num-bigint-0.4.8-LICENSE-MIT": {
+    "mode": "100644",
+    "blob": "39d4bdb5acd313c1a92dbeaa1c379aaf0596a315",
+    "bytes": 1071,
+    "sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+  },
+  "crates/meridian-geometry/third-party/num-integer-0.1.46-Cargo.toml.orig": {
+    "mode": "100644",
+    "blob": "8c5fc92efd8f18dfd55867b8d32d0e6e98d036ca",
+    "bytes": 750,
+    "sha256": "efe6398cc01575661501931c7c30d58f50dc3d11d891d14ac44d5fecc4e3bac2"
+  },
+  "crates/meridian-geometry/third-party/num-integer-0.1.46-LICENSE-APACHE": {
+    "mode": "100644",
+    "blob": "16fe87b06e802f094b3fbb0894b137bca2b16ef1",
+    "bytes": 10847,
+    "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  "crates/meridian-geometry/third-party/num-integer-0.1.46-LICENSE-MIT": {
+    "mode": "100644",
+    "blob": "39d4bdb5acd313c1a92dbeaa1c379aaf0596a315",
+    "bytes": 1071,
+    "sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+  },
+  "crates/meridian-geometry/third-party/num-rational-0.4.2-Cargo.toml.orig": {
+    "mode": "100644",
+    "blob": "3e9b539e6fe22a600e6179ded39e9e27a2c1703e",
+    "bytes": 1187,
+    "sha256": "7973a947de62839e3b16448af97df861e3479f0835221f30bb3591c79cf18774"
+  },
+  "crates/meridian-geometry/third-party/num-rational-0.4.2-LICENSE-APACHE": {
+    "mode": "100644",
+    "blob": "16fe87b06e802f094b3fbb0894b137bca2b16ef1",
+    "bytes": 10847,
+    "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  "crates/meridian-geometry/third-party/num-rational-0.4.2-LICENSE-MIT": {
+    "mode": "100644",
+    "blob": "39d4bdb5acd313c1a92dbeaa1c379aaf0596a315",
+    "bytes": 1071,
+    "sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+  },
+  "crates/meridian-geometry/third-party/num-traits-0.2.19-Cargo.toml.orig": {
+    "mode": "100644",
+    "blob": "226d4164cebe9f52662c48fcc6019b497b9bdd70",
+    "bytes": 835,
+    "sha256": "172863fc77ccbdd76c7d65660c1030e553cc3629931808f18f4cd4cc73a08c53"
+  },
+  "crates/meridian-geometry/third-party/num-traits-0.2.19-LICENSE-APACHE": {
+    "mode": "100644",
+    "blob": "16fe87b06e802f094b3fbb0894b137bca2b16ef1",
+    "bytes": 10847,
+    "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  "crates/meridian-geometry/third-party/num-traits-0.2.19-LICENSE-MIT": {
+    "mode": "100644",
+    "blob": "39d4bdb5acd313c1a92dbeaa1c379aaf0596a315",
+    "bytes": 1071,
+    "sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+  },
+  "crates/meridian-geometry/tools/export_bound_originals.py": {
+    "mode": "100644",
+    "blob": "5493b4113c960609d245ca41dcefc8c67398b086",
+    "bytes": 4239,
+    "sha256": "67ed556823fd1bb6d18857c8bcdd0bc980b82afa22a4865ec3f508b62b5c6f5f"
+  },
+  "crates/meridian-geometry/tools/restore_live_overlap.py": {
+    "mode": "100644",
+    "blob": "545ef1859861dc73a011191b00dfe72325022210",
+    "bytes": 832,
+    "sha256": "83e9313301ebeba2d67681620b19007209f076ffbfed12435966721585a3ce3d"
+  },
+  "crates/meridian-geometry/tools/restore_live_runs.py": {
+    "mode": "100644",
+    "blob": "39ef712da6f366b55a948e3cd2d7f480d7e89e8c",
+    "bytes": 748,
+    "sha256": "6085f06a10278d46bff180d17473a9d4ca519a636c8cb85efe2d9dabc3f83b50"
+  },
+  "crates/meridian-geometry/tools/run_original_five.py": {
+    "mode": "100644",
+    "blob": "a2c738e54f89ad06d50bebd7049794c653e50ef8",
+    "bytes": 11493,
+    "sha256": "6d4ddc31141cf3deae2cd269b0384a142c662d0a2838945f5d55046bd9ca4e38"
+  },
+  "crates/meridian-geometry/tools/strip_budget_context.py": {
+    "mode": "100644",
+    "blob": "e98b83bf3933acd5c7cdf7cfe16964ec180fe8a1",
+    "bytes": 2121,
+    "sha256": "582d97bdef24ead8a384a383e2c6b197e2609e1adf86e72671305b3c7934971c"
+  },
+  "crates/meridian-geometry/tools/test_run_original_five.py": {
+    "mode": "100644",
+    "blob": "1c5d74e1c540e242bdd26358592ec182933362af",
+    "bytes": 7987,
+    "sha256": "e798e06c41cc6d8804931c19145ff6bbb24ed5c7e5e70f88f67c1e1f55addfde"
+  },
+  "crates/meridian-geometry/tools/verify_adapter_context_source.py": {
+    "mode": "100644",
+    "blob": "712d8e7a09f79ddf068d14c8180834d9f356d838",
+    "bytes": 5203,
+    "sha256": "93b43b95679868ef135ec38c2dd8d972578b6902ee0b80a9b69f8ca26a098e87"
+  },
+  "crates/meridian-geometry/tools/verify_live_overlap_source.py": {
+    "mode": "100644",
+    "blob": "63a3022af4bf26a215e11c243887f455828117a7",
+    "bytes": 1940,
+    "sha256": "246bfb9f1d8d00b9e35dbccf5d99835857f76cd85cabf5ab4ecf03d000b884b0"
+  },
+  "crates/meridian-geometry/tools/verify_live_runs_source.py": {
+    "mode": "100644",
+    "blob": "8c6bafbe1f012332d3b63abe006cdf5d2a376fe5",
+    "bytes": 1715,
+    "sha256": "4c9559cc9234082276849f8ea4123f79ee644a3946234f10e6c215bbe30f89b7"
+  },
+  "crates/meridian-geometry/tools/verify_section_source.py": {
+    "mode": "100644",
+    "blob": "9afb59f388f6e2e064dca9f42a44e053ee9bd0e4",
+    "bytes": 9624,
+    "sha256": "d4f8859da49d4575c48c58c966fad770025ab7b012307161ad2e62f761f9f460"
+  },
+  "docs/ARCHITECTURE.md": {
+    "mode": "100644",
+    "blob": "50600d527c1740b05ae45f38e2546eea3d6573ac",
+    "bytes": 9061,
+    "sha256": "eb73fa75fa1a5569e96da424161f3c31e65787e1c49c8faaaf217563ce4fced1"
+  },
+  "docs/COMMODITY-CONTENT.md": {
+    "mode": "100644",
+    "blob": "9ce87cf91b2b1ce54fd9ff6801341702a996234c",
+    "bytes": 8994,
+    "sha256": "67f0d463f948cac748221229c50582bf40ae554ff2620367e325a2eafe8c4c7d"
+  },
+  "docs/COMMODITY-TRADING.md": {
+    "mode": "100644",
+    "blob": "1e3528143f0b61d45a7ccc7532a37e2772b44749",
+    "bytes": 6072,
+    "sha256": "ddae094089b77bf62e53225f70d1f40e753489bb0d0266b8ee2d0d1ab661e15f"
+  },
+  "docs/DEVELOPMENT.md": {
+    "mode": "100644",
+    "blob": "eccd7f784443f18f68f5d3d6d6dc509f47822bab",
+    "bytes": 5380,
+    "sha256": "a63f589463b8f25c767733a4c963c9082e27e4bffc6f2800fd40e5ef962cd494"
+  },
+  "docs/DURABLE-MISSILE-SESSIONS.md": {
+    "mode": "100644",
+    "blob": "ac4a125ba88962843734e722bd9f4a14be900795",
+    "bytes": 7742,
+    "sha256": "dec834d5312d0fd1a6e7cb0191cd4a4411e88e257b675d6877cc49e6747fd658"
+  },
+  "docs/FINITE-STARTER-MISSILES.md": {
+    "mode": "100644",
+    "blob": "6d9f61dab42b20358e43196947957d7b7bff690f",
+    "bytes": 10646,
+    "sha256": "4e578a28f2e772036119e2d05871cbc1219432629b11811e89ff6fbdf82c093c"
+  },
+  "docs/FIRST-PLAYABLE.md": {
+    "mode": "100644",
+    "blob": "06cf2acb74151a31808f29b1ff5c8c4f1f41949c",
+    "bytes": 6251,
+    "sha256": "7246935e1f0e9b90b17c158d604c3242aca54bcba10a4f084beb75976d0e5e4a"
+  },
+  "docs/FLIGHT-RECEPTION-SOURCES.json": {
+    "mode": "100644",
+    "blob": "194ae6e52866a6bdcd25206680742d4124ebd401",
+    "bytes": 2772,
+    "sha256": "f32ca93f972a2cb45d8f3609f3af0a311e9cb798963fc4f9c3534478c22ae393"
+  },
+  "docs/FLIGHT-RECEPTION.md": {
+    "mode": "100644",
+    "blob": "82cfa92a6882996c650b4ddb2f15b967fcc4564d",
+    "bytes": 14202,
+    "sha256": "dc0c6d4031dc6fb55d38cbef6e5662511ed1e8cef05ff0ee61d90030bea5a73c"
+  },
+  "docs/FRONT-PULSE-LASER.md": {
+    "mode": "100644",
+    "blob": "d907474ca750792002b988a6bfc8666053c07add",
+    "bytes": 6327,
+    "sha256": "d64b4b45831675270178eb5fd343bef01d732f76d1e35d395fcafd3440ecf82a"
+  },
+  "docs/G02-CONNECTED.md": {
+    "mode": "100644",
+    "blob": "346f89467afe37a1c61ec0b0fb82adbf2a6eaef2",
+    "bytes": 8520,
+    "sha256": "c8f78c9964692e1fc3de237aa371cb1dd2a28c5f215841dc9ea593502e8d2bf6"
+  },
+  "docs/G02-PRESENTATION-SOURCES.json": {
+    "mode": "100644",
+    "blob": "cdf9f2a268398504caceffd22078714f0cd5e043",
+    "bytes": 5349,
+    "sha256": "2f00a0e97176fac30bd5c1fffd7986ede145ebc43add77120dac9986879850b1"
+  },
+  "docs/G02-PRESENTATION.md": {
+    "mode": "100644",
+    "blob": "03bf7ffd8a3acb581eb4ec712512bde5b12b50d5",
+    "bytes": 7825,
+    "sha256": "de47ef47a3904738b082b8284875c195e381b8292bfda2949a4954d0c997002e"
+  },
+  "docs/IMMEDIATE-LAUNCH-SAVE.md": {
+    "mode": "100644",
+    "blob": "9ab12287eca1cc63b97a3c2bf34571f50f8d8f65",
+    "bytes": 4558,
+    "sha256": "db46189cedf63f5769c462c071de26ec0cfe371a03aad518523250f223cd977a"
+  },
+  "docs/IMPLEMENTATION-STATUS.md": {
+    "mode": "100644",
+    "blob": "efac99a87d0c94f89d36c8e42625cac783f44a62",
+    "bytes": 33563,
+    "sha256": "04c596a48f9de3e45f84d42b0d827de317976b7da6f85d83b039856577ddd044"
+  },
+  "docs/LEGACY-MILESTONES.md": {
+    "mode": "100644",
+    "blob": "2250424e6e70759bfff17eb9e224e2899a207f37",
+    "bytes": 22532,
+    "sha256": "66e3307431ecfc535bd53df32c70f47e6163b454c96c897e05f3632e40e19e25"
+  },
+  "docs/LEGACY-REUSE.md": {
+    "mode": "100644",
+    "blob": "c39be5e619cf2554d80619b064b18da879afc7f6",
+    "bytes": 5246,
+    "sha256": "a28798e2001b4b4d048a88f869363f146a94cf0b16e4d043e1f3ef6d53ececfd"
+  },
+  "docs/ORDINARY-IMPACTS.md": {
+    "mode": "100644",
+    "blob": "46fe026bb50777904533b0ef245258be2914cc74",
+    "bytes": 7502,
+    "sha256": "fa248ff7ee275940b6d8a6ba84cfedee79870f39bdd57159568e1feaee83615c"
+  },
+  "docs/PAID-CARGO-BAY-CONTENT.md": {
+    "mode": "100644",
+    "blob": "3a791ba7e53fe98a1acd1bb5a3c961a78d6a87f6",
+    "bytes": 8383,
+    "sha256": "7fc3feaaf665dbf90438cce59af66ae5138c5f05e7df228c5f494b120f510229"
+  },
+  "docs/PAID-EQUIPMENT.md": {
+    "mode": "100644",
+    "blob": "061dbff98c2871611e748f7f627de230a7643eec",
+    "bytes": 8732,
+    "sha256": "ffdcaa53087a517d35fe21347bec6adc676717f004d9da69e3078aa082b62049"
+  },
+  "docs/PAID-STATION-SERVICES.md": {
+    "mode": "100644",
+    "blob": "5ab156d5381ee19aefabf96781f3af58d11cf975",
+    "bytes": 12010,
+    "sha256": "8e29002a807671f7b39cc94a2dfb88c6e9a8a9108b97e64dce7198942102d7b9"
+  },
+  "docs/PRACTICE-BEACONS.md": {
+    "mode": "100644",
+    "blob": "c2093649c281d97c52eb63623299b07f130cad0b",
+    "bytes": 3432,
+    "sha256": "efe2dba86488cb596656138525d523ca10968a139d725cc184c2aa789da7ebb8"
+  },
+  "docs/PREVIEW-RELEASES.md": {
+    "mode": "100644",
+    "blob": "b19806d8ed6457440c1074385c81c07e25ac1387",
+    "bytes": 6430,
+    "sha256": "35b5de1b9fbc55156522114eefe451443e2c044a6a14523355b1dccaae538441"
+  },
+  "docs/SAFE-GUNNERY-ATTEMPTS.md": {
+    "mode": "100644",
+    "blob": "1e25a3c61967832a02501c73b04ea1a775582eb1",
+    "bytes": 10384,
+    "sha256": "7acd71b05490f33f610e76e317057163212ad4adbe11e85cb45fef7db344643a"
+  },
+  "docs/WORLD-G02.md": {
+    "mode": "100644",
+    "blob": "f3b500e86cc4a1f5ad0988b72bdec0989cd05464",
+    "bytes": 8117,
+    "sha256": "f2ae9010adc01f001bf02c9c3189e36e25bcc2993820e6b8bf852cad486f0c23"
+  },
+  "docs/WORLD-NAVIGATION.md": {
+    "mode": "100644",
+    "blob": "f14ed77cfdf1f8fb708afe85632c7b95d77fabdd",
+    "bytes": 6850,
+    "sha256": "16cd79f1830336ca3d15ee654e58cce0c2507eee73a0af15885a21d0e903c9c8"
+  },
+  "docs/WORLD-SAVE-CONTINUE.md": {
+    "mode": "100644",
+    "blob": "3ff62240000d2250b4b05e830926ec9fa1e25fd5",
+    "bytes": 9580,
+    "sha256": "df6c8922643977a60505ccee6c1b2920366674ae9021217fc3e22befbb10acd1"
+  },
+  "docs/decisions/0001-rust-wgpu-ownership.md": {
+    "mode": "100644",
+    "blob": "90cdb727e3e8d13a8e4606c45315ec2a0c680165",
+    "bytes": 2606,
+    "sha256": "7a7b6befabd0ab59aec3db5b377439f73885ee3db644242a80d79d67478653ec"
+  },
+  "rust-toolchain.toml": {
+    "mode": "100644",
+    "blob": "099ed62f9ef3d54c94cc2eed21d6665780ca5434",
+    "bytes": 66,
+    "sha256": "10c67ce85265f8fc5b1a52b416af1a553e56ad96ca9843da6579e2854741e084"
+  },
+  "sonar-project.properties": {
+    "mode": "100644",
+    "blob": "da6b78d7e425c566670ee1e0e4c12e5c525c55b3",
+    "bytes": 440,
+    "sha256": "0912cc6aab3a23e1e8b807b5b2bf3f1e2d0e6433752b681c66f65d2f0d683de0"
+  },
+  "tools/fixtures/sh025-cargo-bay.reference.json": {
+    "mode": "100644",
+    "blob": "647c8fb9d40268bdbb396682668af38bd012bcc4",
+    "bytes": 6623,
+    "sha256": "53f403a27d1045f0f61b243cf2c1137f60f152e0f4692d73705d19446a1c2f9b"
+  },
+  "tools/import_commodities.py": {
+    "mode": "100644",
+    "blob": "8e6603c28860341cbee1aaacb7d1072546a46e38",
+    "bytes": 14727,
+    "sha256": "5b6ebb8e98319bc3798417ee551ed72d49f3400337014e5b22f662bf4873a2ed"
+  },
+  "tools/import_equipment.py": {
+    "mode": "100644",
+    "blob": "91972f52eff4f12362cdb077f75aed6244fc0b79",
+    "bytes": 20141,
+    "sha256": "69702d73f557d98fbbe5399bac866e71e88a58c0be1a8e2c90c437d558fc72e3"
+  },
+  "tools/import_navigation.py": {
+    "mode": "100644",
+    "blob": "c66f588d3e7e272eb52b76db553112c0b28a1678",
+    "bytes": 3294,
+    "sha256": "b0e83cea8c72ae64d823a8142246d8a2bed95c09d6987eecbe455dd68ba27f0b"
+  },
+  "tools/import_ship.py": {
+    "mode": "100644",
+    "blob": "0c2efe15c978b4a176938fefca90b57c6757724b",
+    "bytes": 4447,
+    "sha256": "c7fc9b0b0cf73b7740f883acbb81c53c621986570a8b8e73e9ba8cc4299826a1"
+  },
+  "tools/import_station.py": {
+    "mode": "100644",
+    "blob": "f860206cab2ef55ac9ebb4fd08a553b9d5a35f69",
+    "bytes": 6666,
+    "sha256": "63b5d17232b0d9ec080346cb830bbe7787929906857550370b780faf34c25470"
+  },
+  "tools/import_station_services.py": {
+    "mode": "100644",
+    "blob": "6806ac8953ebc8f9ab1d14391553448c199a7ba5",
+    "bytes": 4629,
+    "sha256": "c33e690e506782e32a04dbd1737e80f3a7a92b7dde9bced3ced5fe14e311d625"
+  },
+  "tools/preview_release.py": {
+    "mode": "100644",
+    "blob": "6fe74c9a597088c75111afa4b1afff3be1b8b907",
+    "bytes": 10157,
+    "sha256": "4a711620d89f0079813398facf89051083594c2dc43320caddd10093784740b6"
+  },
+  "tools/test_import_commodities.py": {
+    "mode": "100644",
+    "blob": "3753d6f2e66b7c018a8583f1c3a92852e9b88650",
+    "bytes": 16024,
+    "sha256": "5caedb34a6efb5d19f0f690850c0417f58dd9f0b3249f4bd5835e176efb0b922"
+  },
+  "tools/test_import_contracts.py": {
+    "mode": "100644",
+    "blob": "15c53c973e18009ab48143cae76ac462032980a9",
+    "bytes": 7340,
+    "sha256": "dc74f3f0f3616f61f12f798b56512323dff42d26123cf985e746d1e92a6b7489"
+  },
+  "tools/test_import_equipment.py": {
+    "mode": "100644",
+    "blob": "67ecf7343cfe352b5a62cb6705bdd8ee6759f5de",
+    "bytes": 16105,
+    "sha256": "c85197cf42d73bd486205ae5b0c2c18287d22a0098bb44007b62fb0800c90b35"
+  },
+  "tools/test_import_navigation.py": {
+    "mode": "100644",
+    "blob": "3b49c9b2df85584d223e752c5e6e9e9e1828809a",
+    "bytes": 3125,
+    "sha256": "e521ba3186d55cb67ebd5dde1c58ac994f5f089b255c317dba422e0b8b6b0e63"
+  },
+  "tools/test_import_ship.py": {
+    "mode": "100644",
+    "blob": "f93a627ccceba5175a04c89f22564147cb4164f2",
+    "bytes": 1486,
+    "sha256": "290afd8448463ae9a42f39184032da3b0ed3b84092fad57c27f3c420c84a9661"
+  },
+  "tools/test_import_station.py": {
+    "mode": "100644",
+    "blob": "75a57967dfa318fb17fb68f764cfde830a03f937",
+    "bytes": 4401,
+    "sha256": "c741c93fedf7c5c6c84bf3e1a6022af4d448f36e7236fb240a69761b9eb787b4"
+  },
+  "tools/test_import_station_services.py": {
+    "mode": "100644",
+    "blob": "f3f1db5228f8ccf60fc99fffcafbd652b95b03d6",
+    "bytes": 8925,
+    "sha256": "eaf20d9122c79649c2cfe988948db3fec7c9c00a34d904c7e1a9188c4f3b95be"
+  },
+  "tools/test_preview_release.py": {
+    "mode": "100644",
+    "blob": "de2432c5d691a85796e285a6e5d934b6a1f1b133",
+    "bytes": 16514,
+    "sha256": "4eac6f7b7b9faa79a5f86f0c506fc5427f5ddc75f65f1ed97c462191056cde63"
+  }
+}

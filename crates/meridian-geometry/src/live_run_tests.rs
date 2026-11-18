@@ -114,3 +114,78 @@ fn actual_run_lifetimes_keep_exact_admission_and_refusal_cleanup() -> Result<(),
     assert_eq!(refused.retained_memberships(), 2000);
     Ok(())
 }
+
+#[test]
+fn incremental_memberships_follow_each_protected_collinear_and_duplicate_lifetime()
+-> Result<(), Failure> {
+    let p = |x, y| [integer(x), integer(y)];
+    let mut b = Budget::new(Limits::default())?;
+    let mut members = 4;
+    let mut lower = vec![p(0, 0), p(1, 0)];
+    let mut upper = vec![p(0, 2), p(1, 2)];
+    let protected = BTreeSet::from([p(2, 0)]);
+    extend(&mut lower, p(2, 0), &protected, &mut members, &mut b)?;
+    assert_eq!(lower, vec![p(0, 0), p(2, 0)]);
+    assert_eq!(members, 4);
+    extend(&mut upper, p(2, 2), &protected, &mut members, &mut b)?;
+    assert_eq!(members, 4);
+    extend(&mut lower, p(3, 0), &protected, &mut members, &mut b)?;
+    assert_eq!(lower, vec![p(0, 0), p(2, 0), p(3, 0)]);
+    assert_eq!(members, 5);
+    extend(&mut upper, p(3, 2), &protected, &mut members, &mut b)?;
+    assert_eq!(members, 5);
+    let mut cells = Vec::new();
+    let mut work = ArrangementWork::default();
+    finish(
+        Run { lower, upper },
+        &mut cells,
+        &mut members,
+        &mut work,
+        &mut b,
+    )?;
+    assert_eq!(members, 5);
+    // Right apex: adjacent duplicate removed by the original dedup visit.
+    members += 4;
+    finish(
+        Run {
+            lower: vec![p(4, 0), p(6, 0)],
+            upper: vec![p(4, 2), p(6, 0)],
+        },
+        &mut cells,
+        &mut members,
+        &mut work,
+        &mut b,
+    )?;
+    assert_eq!(members, 8);
+    // Left apex: the final closing duplicate is dropped after dedup.
+    members += 4;
+    finish(
+        Run {
+            lower: vec![p(8, 0), p(10, 0)],
+            upper: vec![p(8, 0), p(10, 2)],
+        },
+        &mut cells,
+        &mut members,
+        &mut work,
+        &mut b,
+    )?;
+    assert_eq!(members, 11);
+    // A separate adjacent duplicate has the same owning-record lifetime.
+    members += 5;
+    finish(
+        Run {
+            lower: vec![p(12, 0), p(13, 0), p(13, 0)],
+            upper: vec![p(12, 2), p(13, 2)],
+        },
+        &mut cells,
+        &mut members,
+        &mut work,
+        &mut b,
+    )?;
+    assert_eq!(members, 15);
+    assert_eq!(members, cells.iter().map(Vec::len).sum::<usize>());
+    assert!(cells[0].contains(&p(2, 0)));
+    assert_eq!(work.retained_cells, 4);
+    assert_eq!(b.retained_memberships(), 0);
+    Ok(())
+}

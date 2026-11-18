@@ -1,0 +1,23 @@
+{
+  "status": "AUTHORED_UNRUN",
+  "parentAuthor": "fef66ce291b2f1ea5c063cf329e143774e8870e1",
+  "actualFailedRoot": "7368068067eec056fea258bbf8d7f832ce188ded",
+  "actualFailedTree": "9da046e4a5966e753084319fedf394bba5f028c0",
+  "actualFocused": "checkPASS36libraryPASS1FAIL;18Rust9hostClippybuildwholefiveUNRUN",
+  "cause": "One separate extension recount plus two separate finish recounts caused325vs322. Eliminate those separate operations; perform membership bookkeeping during existing charged owning-point visits.",
+  "originalCharges": "All original geometry helper bodies/charged visits restore exactly after membership metadata removal; no unit price reduction.",
+  "old55AssertionsPreserved": true,
+  "newTest": {
+    "file": "src/live_run_tests.rs",
+    "name": "incremental_memberships_follow_each_protected_collinear_and_duplicate_lifetime",
+    "status": "UNRUN"
+  },
+  "currentRustCount": 56,
+  "hostCount": 9,
+  "contractSHA256": "30e93856a4343891e833f88068b3466148c705c02f3f79f16a5cac6fe0d30e3c",
+  "frozenSHA256": "12b14303c6b7c29935302beb6be9653bb219341f44eec674b5400996748d20f1",
+  "inverseSHA256": "812382f36936aec8056a3fdf5c8ee1c3db081260350d3c15b2251a109f26c396",
+  "failureSHA256": "116698efc8170866f528eb64144a77e7c01adc899ff69fab13ef78020020d7c4",
+  "rawSHA256": "83b17e08ae5a63badf95ff18e3c13559f341afb4c556cf93ae4274c7cdc0d547",
+  "qualification": "Rootserialjoin/G2exactdelta-unaffectedproof/owningfocused;wholefiveHELDforfocusedpass"
+}

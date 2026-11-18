@@ -1,0 +1,66 @@
+{
+  "section_arrangement.rs": [
+    {
+      "afterStart": 376,
+      "afterEnd": 390,
+      "before": "                        let previous = old.lower.len() + old.upper.len();\n                        extend(&mut old.lower, lo_right.clone(), &protected, b)?;\n                        extend(&mut old.upper, hi_right.clone(), &protected, b)?;\n                        // extend has already dropped any removed collinear\n                        // records. Count the surviving chains, including all\n                        // protected points, without a historical-strip total.\n                        b.step(1)?;\n                        members = members - previous + old.lower.len() + old.upper.len();\n",
+      "after": "                        extend(\n                            &mut old.lower,\n                            lo_right.clone(),\n                            &protected,\n                            &mut members,\n                            b,\n                        )?;\n                        extend(\n                            &mut old.upper,\n                            hi_right.clone(),\n                            &protected,\n                            &mut members,\n                            b,\n                        )?;\n"
+    },
+    {
+      "afterStart": 462,
+      "afterEnd": 463,
+      "before": "",
+      "after": "    members: &mut usize,\n"
+    },
+    {
+      "afterStart": 473,
+      "afterEnd": 475,
+      "before": "",
+      "after": "        // The charged collinearity/protection visit already identified this\n        // exact retiring record. Debit it after its owning point is dropped.\n"
+    },
+    {
+      "afterStart": 476,
+      "afterEnd": 477,
+      "before": "",
+      "after": "        *members -= 1;\n"
+    },
+    {
+      "afterStart": 480,
+      "afterEnd": 481,
+      "before": "",
+      "after": "    *members += 1;\n"
+    },
+    {
+      "afterStart": 491,
+      "afterEnd": 491,
+      "before": "    let incoming = run.lower.len() + run.upper.len();\n",
+      "after": ""
+    },
+    {
+      "afterStart": 493,
+      "afterEnd": 502,
+      "before": "    result.dedup();\n",
+      "after": "    // The original charged incoming-record traversal covers this dedup pass.\n    // Record each retired duplicate during that visit, without a new recount.\n    result.dedup_by(|a, c| {\n        let duplicate = a == c;\n        if duplicate {\n            *members -= 1;\n        }\n        duplicate\n    });\n"
+    },
+    {
+      "afterStart": 504,
+      "afterEnd": 505,
+      "before": "",
+      "after": "        *members -= 1;\n"
+    },
+    {
+      "afterStart": 509,
+      "afterEnd": 509,
+      "before": "    // dedup/pop have dropped the duplicate owning point records. Moving the\n    // remaining points into cells does not allocate a second point set.\n    b.step(1)?;\n    *members -= incoming - result.len();\n",
+      "after": ""
+    }
+  ],
+  "live_run_tests.rs": [
+    {
+      "afterStart": 116,
+      "afterEnd": 191,
+      "before": "",
+      "after": "\n#[test]\nfn incremental_memberships_follow_each_protected_collinear_and_duplicate_lifetime()\n-> Result<(), Failure> {\n    let p = |x, y| [integer(x), integer(y)];\n    let mut b = Budget::new(Limits::default())?;\n    let mut members = 4;\n    let mut lower = vec![p(0, 0), p(1, 0)];\n    let mut upper = vec![p(0, 2), p(1, 2)];\n    let protected = BTreeSet::from([p(2, 0)]);\n    extend(&mut lower, p(2, 0), &protected, &mut members, &mut b)?;\n    assert_eq!(lower, vec![p(0, 0), p(2, 0)]);\n    assert_eq!(members, 4);\n    extend(&mut upper, p(2, 2), &protected, &mut members, &mut b)?;\n    assert_eq!(members, 4);\n    extend(&mut lower, p(3, 0), &protected, &mut members, &mut b)?;\n    assert_eq!(lower, vec![p(0, 0), p(2, 0), p(3, 0)]);\n    assert_eq!(members, 5);\n    extend(&mut upper, p(3, 2), &protected, &mut members, &mut b)?;\n    assert_eq!(members, 5);\n    let mut cells = Vec::new();\n    let mut work = ArrangementWork::default();\n    finish(\n        Run { lower, upper },\n        &mut cells,\n        &mut members,\n        &mut work,\n        &mut b,\n    )?;\n    assert_eq!(members, 5);\n    // Right apex: adjacent duplicate removed by the original dedup visit.\n    members += 4;\n    finish(\n        Run {\n            lower: vec![p(4, 0), p(6, 0)],\n            upper: vec![p(4, 2), p(6, 0)],\n        },\n        &mut cells,\n        &mut members,\n        &mut work,\n        &mut b,\n    )?;\n    assert_eq!(members, 8);\n    // Left apex: the final closing duplicate is dropped after dedup.\n    members += 4;\n    finish(\n        Run {\n            lower: vec![p(8, 0), p(10, 0)],\n            upper: vec![p(8, 0), p(10, 2)],\n        },\n        &mut cells,\n        &mut members,\n        &mut work,\n        &mut b,\n    )?;\n    assert_eq!(members, 11);\n    // A separate adjacent duplicate has the same owning-record lifetime.\n    members += 5;\n    finish(\n        Run {\n            lower: vec![p(12, 0), p(13, 0), p(13, 0)],\n            upper: vec![p(12, 2), p(13, 2)],\n        },\n        &mut cells,\n        &mut members,\n        &mut work,\n        &mut b,\n    )?;\n    assert_eq!(members, 15);\n    assert_eq!(members, cells.iter().map(Vec::len).sum::<usize>());\n    assert!(cells[0].contains(&p(2, 0)));\n    assert_eq!(work.retained_cells, 4);\n    assert_eq!(b.retained_memberships(), 0);\n    Ok(())\n}\n"
+    }
+  ]
+}
