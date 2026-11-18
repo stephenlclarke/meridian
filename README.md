@@ -1,9 +1,6 @@
 # Meridian
 
-The joined laser/ECM Mac run now reports 428/431 core passes after compilation.
-The [geometry pilot correction](docs/LASER-FACINGS.md#source-derived-geometry-pilot-correction)
-retains the three failed assertions and fixes their source-proven setup mistakes.
-Corrected execution and the native setup helper remain unrun.
+The internal laser/ECM candidate physically docked at Avenor and stored its paid Beam, but opening Fit produced a persistent black client. Escape recovered Equipment with the paid item and cash intact. The cause remains undetermined. A new [public-control and CPU-geometry regression](docs/LASER-FACINGS.md#stored-beam-fit-review-investigation) is authored and **UNRUN**; it is not a native cure. Dependent practice, positive-hit and missile-termination checks remain blocked.
 
 [![CI](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=alert_status)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)

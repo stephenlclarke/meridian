@@ -2,6 +2,14 @@
 
 Current candidate work and the delivered release are recorded separately below. Earlier source-specific sections retain their original observations and limits; their historical pending states do not override the current checkpoint.
 
+## Stored Beam Fit review remains a native blocker
+
+The qualified internal composition `4d02e5123659a818f3bc8d5f8c735ba7ad1bb2f7` physically docked at Avenor. Store reviewed and committed the paid Beam; immediate Y opened a persistently black client twice. Escape recovered Equipment. The retained save has all 12 module identities, all five paid provenances, 9,888,500 cash tenths and all nine finite missiles unchanged; only the Beam moved FrontLaser to stored, fit revision 10 to 11. No refit was confirmed. Normal process exit was zero. Practice, positive-hit and live missile-termination acceptance remain unrun after this blocker.
+
+Store and Fit feed identical title/details into the same modal and CPU composer; their different pending commands are not renderer inputs. No source defect has established a cause. There is no durable failed Frame, geometry/upload/draw receipt or screenshot artifact available to this investigation. The retained save cannot recover those transient values. The [new regression](LASER-FACINGS.md#stored-beam-fit-review-investigation) covers public paid setup, physical berth, U/Enter/immediate Y, four CPU viewports, modal controls, glyph atlas samples, cancellation, visible-button refit and cold Continue. It is **UNRUN**, not a reproduction, causal fix or native cure. All existing tests and production code remain unchanged.
+
+The preceding `4d02e51` qualification credits 279 fresh cases plus 433 eligible carried cases per platform, covering 712; it is not 712 fresh passes. This added desktop case brings the authored source catalogue to 713, with no new runtime pass claim. The historical HUD and earlier raw failure sections below retain their original source scope. This investigation does not authorize an unchanged native retry.
+
 ## Compact selected-weapon HUD correction
 
 Actual Mac `2de5f2d7155fa4fef54386264a5e0227c38e5dfa`, tree
