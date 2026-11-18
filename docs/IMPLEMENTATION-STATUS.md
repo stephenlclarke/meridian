@@ -1,5 +1,9 @@
 # Implementation and validation status
 
+## Rust reference importer source refresh
+
+The offline `meridian-import` proposal is refreshed against source `65717da`. Its independent original source/output fixtures remain unchanged. A new integration test will run the actual CLI and feed its physical outputs into the current public core loader; negative CLI checks now cover all five binaries. These tests are authored, not executed. Whole-source review, compilation, actual CLI qualification and integration remain pending. Existing game test results do not qualify this new crate.
+
 ## Distinct EMP source candidate
 
 The source candidate adds an owned EMP utility to the single World, with paid purchase/fit/store/grade transactions, a separate initially empty bank and electrical pool, exact 80-percent transfer, a 600-tick held charge and shared heat/cooldown cost. It queries the actual native SH025 collision scene and drains the facing shield then independent electrical reserve. It preserves fatal hull energy, actor identity, cargo and the one source crew member. Zero electrical power blocks engines/weapons, keeps physical coasting and recovers strictly after 1800 accepted physical ticks. No capsule, bounty or reward is fabricated.

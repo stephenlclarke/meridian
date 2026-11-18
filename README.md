@@ -124,3 +124,7 @@ PR 47 merged the composition at `de7d6bb`; main CI and the Sonar quality gate pa
 The Help candidate now lists mission details and flight-lesson review/cancel/details in both the station HUD and flight popups. Its retained minimum-window regression checks the concise HUD hint, all those popup controls, complete card text, bounded rendering and unchanged saved state through docked, launch and all four flight views. The regression passed on the qualified Mac source; minimum-size native resizing remains unobserved.
 
 The next EMP source candidate includes an authored paid Equipment utility slot, held-U flight control and contextual Help/readouts. Fifteen core and six host regressions are authored, not run. It is not part of published Preview 7; see [EMP scope and acceptance](docs/EMP.md).
+
+## Offline reference importer candidate
+
+The proposed [Rust reference importer](crates/meridian-import/README.md) converts only the pinned original SH025/SH028 source into the five existing binary fixtures. It preserves original notices and emits its own Rust producer receipt. Its source was refreshed against the current game APIs; compiler, CLI and test execution remain pending whole-source review and designated qualification. It does not add ships or change gameplay.

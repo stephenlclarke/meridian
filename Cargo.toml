@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/meridian-core", "crates/meridian-desktop"]
+members = ["crates/meridian-core", "crates/meridian-desktop", "crates/meridian-import"]
 resolver = "3"
 
 [workspace.package]
