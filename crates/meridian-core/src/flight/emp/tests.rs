@@ -4,8 +4,9 @@ use super::{
     Arc, EmpAxis, EmpChargePhase, EmpEquipmentAction, EmpError, EmpGrades, EmpProvenance, World,
     meter, scene,
 };
-use crate::flight::equipment::tests::earned_world;
+use crate::flight::equipment::tests::{earned_from, earned_world};
 use crate::flight::practice::tests::launch;
+use crate::freight::g02;
 use crate::navigation::SystemId;
 use crate::{FlightInput, XyzzyAction};
 fn equipment(w: &mut World, action: EmpEquipmentAction) {
@@ -18,7 +19,77 @@ fn equipment(w: &mut World, action: EmpEquipmentAction) {
     assert_eq!(w.credits_tenths(), candidate.credits_tenths());
 }
 fn paid() -> World {
-    let mut w = earned_world(16101);
+    let mut w = World::new_commander(16101).unwrap();
+    let issuer = w.station_contacts()[0];
+    w.request_contact(issuer, w.snapshot().tick).unwrap();
+    let offer = w
+        .request_freight(
+            g02::Command::ReviewOffer {
+                actor: issuer.actor(),
+            },
+            w.snapshot().tick,
+        )
+        .unwrap();
+    let g02::Event::Reviewed(review) = offer else {
+        panic!("actual freight offer missing");
+    };
+    let accepted = w
+        .request_freight(
+            g02::Command::Confirm {
+                review,
+                choice: g02::Choice::Accept,
+            },
+            w.snapshot().tick,
+        )
+        .unwrap();
+    let g02::Event::Accepted { job, units } = accepted else {
+        panic!("actual freight not accepted");
+    };
+    assert_eq!(units.len(), 8);
+    assert_eq!(w.mission_snapshot().unwrap().freight.held_tonnes, 8);
+    // The real protected contract freezes local traffic during these real paid market routes.
+    // Keep every existing independent earned_from cash checkpoint and capacity refusal intact.
+    let mut w = earned_from(w);
+    assert_eq!(w.traffic.emp_clock(SystemId::AVENOR), Some(0));
+    assert_eq!(w.traffic.emp_clock(SystemId::RENAS), Some(0));
+    assert!(w.traffic.beam_receipts().is_empty());
+    assert!(w.traffic.player_hits().is_empty());
+    let receiver = w.station_contacts()[0];
+    w.request_contact(receiver, w.snapshot().tick).unwrap();
+    let receiving = w
+        .request_freight(
+            g02::Command::ReviewReceiving {
+                actor: receiver.actor(),
+                job,
+            },
+            w.snapshot().tick,
+        )
+        .unwrap();
+    let g02::Event::Reviewed(review) = receiving else {
+        panic!("actual receiving review missing");
+    };
+    let cash = w.credits_tenths().unwrap();
+    let received = w
+        .request_freight(
+            g02::Command::Confirm {
+                review,
+                choice: g02::Choice::ReceiveAll,
+            },
+            w.snapshot().tick,
+        )
+        .unwrap();
+    assert!(matches!(
+        received,
+        g02::Event::Received {
+            remaining: 0,
+            completion: Some(_),
+            clue_awarded: true,
+            ..
+        }
+    ));
+    assert_eq!(w.credits_tenths(), Some(cash + 7300));
+    assert_eq!(w.mission_snapshot().unwrap().freight.held_tonnes, 0);
+    assert!(!w.npc_missile_protected());
     equipment(&mut w, EmpEquipmentAction::Purchase);
     w
 }
@@ -293,8 +364,14 @@ fn aim_input(w: &World, target: crate::traffic::NpcId) -> FlightInput {
         .find(|a| a.id == target)
         .unwrap();
     let pose = super::super::flight_pose(p.position, p.orientation).unwrap();
-    let desired = (body.pose.position.x - f64::from(p.position[0]))
-        .atan2(body.pose.position.z - f64::from(p.position[2]));
+    let point = w
+        .station_data
+        .as_ref()
+        .unwrap()
+        .player_planar_aimpoint(body.pose, pose.position)
+        .unwrap()
+        .unwrap_or_else(|| panic!("real target has no native planar surface"));
+    let desired = (point.x - f64::from(p.position[0])).atan2(point.z - f64::from(p.position[2]));
     let yaw = pose.orientation.z.x.atan2(pose.orientation.z.z);
     let error = (desired - yaw).sin().atan2((desired - yaw).cos());
     FlightInput {
@@ -307,7 +384,10 @@ fn defender(mut w: World) -> (World, crate::traffic::NpcId) {
         .unwrap();
     launch(&mut w);
     crate::flight::missiles::tests::stop(&mut w);
-    crate::flight::missiles::tests::fly_axis(&mut w, 0, -600.0, 10.0);
+    // Lure the real pirate away from the ordinary trader/station. Collateral civilians
+    // remain protected; no role, position, contact, resource or receipt is injected.
+    crate::flight::missiles::tests::fly_axis(&mut w, 0, -4500.0, 34.3);
+    assert!(w.snapshot().position[0] <= -4500.0);
     for _ in 0..24000 {
         w.step(FlightInput::default()).unwrap();
         if let Some(hit) = w.traffic_snapshot().unwrap().last_player_hit
@@ -317,10 +397,79 @@ fn defender(mut w: World) -> (World, crate::traffic::NpcId) {
             return (w, hit.attacker);
         }
     }
-    panic!("no actual recent native attacker; no substitute aggression receipt permitted");
+    panic!(
+        "no actual recent native attacker; no substitute aggression receipt permitted; owner {:?}; ordinary proof {}; actual traffic {:?}",
+        w.combat_identity(),
+        w.traffic.receipt_count(),
+        w.traffic_snapshot()
+    );
+}
+fn admitted_emp_scene(
+    w: &World,
+    target: crate::traffic::NpcId,
+) -> Result<Vec<scene::Contact>, EmpError> {
+    let item = w.owned_emp().ok_or(EmpError::MissingItem)?;
+    let owner = w.combat_identity().ok_or(EmpError::NoCommander)?;
+    let p = w.snapshot();
+    let player =
+        super::super::flight_pose(p.position, p.orientation).ok_or(EmpError::InvalidContact)?;
+    let profile = item.grades.profile(super::State::energy_stage(w)?)?;
+    let native = scene::Scene::capture(
+        &w.traffic,
+        &w.missiles,
+        w.combat.emissions,
+        owner,
+        player,
+        p.tick,
+        w.combat.physical_tick(),
+    )?;
+    let contacts = native.contacts(w, profile, target)?;
+    if contacts.iter().any(|c| {
+        matches!(c.victim, scene::Victim::Npc(id)
+        if !super::State::recent_attack(&w.traffic, owner, id, p.tick))
+    }) {
+        return Err(EmpError::ProtectedTarget);
+    }
+    Ok(contacts)
+}
+fn target_settled(
+    w: &World,
+    target: crate::traffic::NpcId,
+    previous: &mut Option<crate::docking::RigidPose>,
+    quiet: &mut usize,
+) -> bool {
+    let body = w
+        .traffic_snapshot()
+        .unwrap()
+        .actors
+        .into_iter()
+        .find(|a| a.id == target)
+        .unwrap();
+    let steady = body.speed_units == 0.0
+        && previous.is_some_and(|old| {
+            let turn = crate::docking::Vec3::new(
+                body.pose.orientation.z.x - old.orientation.z.x,
+                body.pose.orientation.z.y - old.orientation.z.y,
+                body.pose.orientation.z.z - old.orientation.z.z,
+            );
+            body.pose.position == old.position && turn.dot(turn) < 1e-12
+        });
+    *quiet = if steady { *quiet + 1 } else { 0 };
+    *previous = Some(body.pose);
+    *quiet >= 30
 }
 fn start_charge(w: &mut World, target: crate::traffic::NpcId) {
+    let mut previous = None;
+    let mut quiet = 0;
     for _ in 0..1200 {
+        // The exact-600-tick positive case needs an actually settled native target;
+        // a start admission does not promise that a later moving surface stays on the ray.
+        if !target_settled(w, target, &mut previous, &mut quiet)
+            || admitted_emp_scene(w, target).is_err()
+        {
+            w.step(aim_input(w, target)).unwrap();
+            continue;
+        }
         match w.request_emp_trigger(true, w.snapshot().tick) {
             Ok(()) => {
                 assert_eq!(w.emp.charge.as_ref().unwrap().target, target);
@@ -353,13 +502,27 @@ fn actual_secret_base_release_spends_once_drains_shield_and_preserves_hull_cargo
     let start = w.emp.charge.as_ref().unwrap().start.physical_tick;
     hold(&mut w, target, 599);
     assert!(w.emp.pulses.is_empty());
-    let before = w.traffic.emp_resources(target).unwrap();
+    // Compare the same accepted native step without an EMP release. Ordinary NPC
+    // firing/recharge can change hull energy on this frame; only EMP damage must be zero.
+    let mut native_control = w.clone();
+    native_control
+        .request_emp_trigger(false, native_control.snapshot().tick)
+        .unwrap();
+    native_control.step(aim_input(&w, target)).unwrap();
+    let before = native_control.traffic.emp_resources(target).unwrap();
     let cash = w.credits_tenths();
     let cargo = w.commodity_quantity(crate::station_services::CommodityId::Food);
     let emissions = w.combat.emissions;
     let spent = w.emp.meter.bank_spent;
     hold(&mut w, target, 1);
-    assert_eq!(w.emp.pulses.len(), 1);
+    assert_eq!(
+        w.emp.pulses.len(),
+        1,
+        "terminal {:?}; current native contact admission {:?}; actual traffic {:?}",
+        w.emp_snapshot(),
+        admitted_emp_scene(&w, target),
+        w.traffic_snapshot()
+    );
     assert_eq!(w.combat.physical_tick() - start, 600);
     assert_eq!(w.emp.meter.bank_spent - spent, 8 * 3000);
     assert_eq!(w.combat.emissions, emissions);
@@ -507,6 +670,12 @@ fn actual_paid_upgraded_emp_disables_native_attacker_then_recovers_without_loot_
 #[test]
 fn real_arrival_posts_main_but_leaves_bank_gap_until_a_following_qualified_interval() {
     let mut w = paid();
+    assert!(!w.xyzzy_snapshot().unwrap().unlimited_fuel);
+    let cash = w.credits_tenths().unwrap();
+    let fuel_paid = w.request_refuel(w.snapshot().tick).unwrap();
+    assert!(fuel_paid > 0);
+    assert_eq!(w.credits_tenths(), Some(cash - fuel_paid));
+    assert_eq!(w.snapshot().navigation.unwrap().fuel_units, 130);
     let physical = w.combat.physical_tick();
     w.request_launch(w.snapshot().tick).unwrap();
     steps(&mut w, 1);
@@ -516,6 +685,7 @@ fn real_arrival_posts_main_but_leaves_bank_gap_until_a_following_qualified_inter
         usize::try_from(crate::navigation::BASIC_SPOOL_TICKS).unwrap(),
     );
     assert_eq!(w.combat.physical_tick(), physical + 601);
+    assert_eq!(w.snapshot().navigation.unwrap().fuel_units, 96);
     assert_eq!(w.emp.meter.bank, 600 * 20);
     assert_eq!(w.emp.bank_clock, physical + 600);
     cold(&w);
@@ -752,7 +922,16 @@ fn track_real_target(w: &World, target: crate::traffic::NpcId) -> FlightInput {
         .into_iter()
         .find(|a| a.id == target)
         .unwrap();
-    steer_to_real_point(w, body.pose.position)
+    let p = w.snapshot();
+    let player = super::super::flight_pose(p.position, p.orientation).unwrap();
+    // This existing selector is geometry-only; it issues no missile or EMP authority.
+    let point = w
+        .station_data
+        .as_ref()
+        .unwrap()
+        .player_missile_aimpoint(body.pose, player.position)
+        .unwrap();
+    steer_to_real_point(w, point)
 }
 fn leave_native_npc_beam_plane(w: &mut World) {
     // Real NPC rays are planar. Normal pitch/throttle raises the actual player clear of
@@ -781,6 +960,10 @@ fn leave_native_npc_beam_plane(w: &mut World) {
 }
 fn start_real_3d_charge(w: &mut World, target: crate::traffic::NpcId) {
     for _ in 0..300 {
+        if admitted_emp_scene(w, target).is_err() {
+            w.step(track_real_target(w, target)).unwrap();
+            continue;
+        }
         match w.request_emp_trigger(true, w.snapshot().tick) {
             Ok(()) => {
                 assert_eq!(w.emp.charge.as_ref().unwrap().target, target);

@@ -337,9 +337,16 @@ pub(in crate::flight) fn assert_resealed_enlirin_fuel_refusal(world: &mut World)
         assert_eq!(world.save_bytes().unwrap(), valid);
     }
     let mut wrong_grade = valid.clone();
-    // The grade precedes the account revision and outer checksum, both eight bytes.
-    let grade = wrong_grade.len() - 8 - 8 - 1;
+    // The current grade precedes account revision, physical tick and outer checksum,
+    // each eight bytes. Target the actual grade, not a byte of account revision.
+    let grade = wrong_grade.len() - 8 - 8 - 8 - 1;
     assert_eq!(wrong_grade[grade], 2);
+    let physical = u64::from_le_bytes(
+        wrong_grade[wrong_grade.len() - 16..wrong_grade.len() - 8]
+            .try_into()
+            .unwrap(),
+    );
+    assert_eq!(physical, world.combat.physical_tick());
     wrong_grade[grade] = 1;
     reseal(&mut wrong_grade);
     assert_eq!(World::from_save_bytes(&wrong_grade).unwrap_err(), refused);
