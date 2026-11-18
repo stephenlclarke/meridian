@@ -864,13 +864,76 @@ impl App {
         let prepared = self.prepare_presentation(active, pulse_notice, elapsed, |r| {
             r.map(Renderer::logical_viewport)
         });
-        let Some(PreparedPresentation {
-            mut hud_lines,
-            docked_frame,
-        }) = Self::route_presentation(prepared, |error| self.fail(event_loop, error))
+        let Some(prepared) =
+            Self::route_presentation(prepared, |error| self.fail(event_loop, error))
         else {
             return;
         };
+        self.draw_prepared_frame(event_loop, active, snapshot, frame_refusal, prepared);
+    }
+
+    fn frame_title(&self, active: bool, mode: FlightMode) -> String {
+        let modal_open = self.modal_open();
+        let commander = if self.game.is_internal_validation() {
+            "Meridian INTERNAL MULE VALIDATION / NO SAVE"
+        } else if self
+            .game
+            .world
+            .xyzzy_snapshot()
+            .is_some_and(|state| state.active)
+        {
+            "CLARKE / XYZZY"
+        } else {
+            "Meridian"
+        };
+        let mode = match mode {
+            FlightMode::Docked => "DOCKED",
+            FlightMode::Launching => "LAUNCHING",
+            FlightMode::Flight => "FLIGHT",
+        };
+        format!(
+            "{commander} | {mode} | {} | H / ? Help",
+            if modal_open {
+                "MENU"
+            } else if active {
+                "RUNNING"
+            } else {
+                "PAUSED"
+            },
+        )
+    }
+
+    fn append_contact_notice(hud_lines: &mut Vec<String>, refusal: Option<MotionRefusal>) {
+        let contact_notice = refusal.map(|refusal| match refusal {
+            MotionRefusal::CelestialContact => {
+                "Celestial contact: stopped before the physical surface"
+            }
+            MotionRefusal::AsteroidContact => {
+                "Asteroid hull contact: stopped at last clear position"
+            }
+            MotionRefusal::NpcContact => "NPC hull contact: stopped at last clear position",
+            MotionRefusal::StationContact => "Station contact: stopped at last clear position",
+            MotionRefusal::EntryConditions => {
+                "Entry refused: align with the entrance and slow down"
+            }
+        });
+        if let Some(message) = contact_notice {
+            hud_lines.insert(hud_lines.len().min(1), message.into());
+        }
+    }
+
+    fn draw_prepared_frame(
+        &mut self,
+        event_loop: &ActiveEventLoop,
+        active: bool,
+        snapshot: meridian_core::Snapshot,
+        frame_refusal: Option<MotionRefusal>,
+        prepared: PreparedPresentation,
+    ) {
+        let PreparedPresentation {
+            mut hud_lines,
+            docked_frame,
+        } = prepared;
         let belt = if snapshot.mode == FlightMode::Flight {
             self.game.world.mining_belt_snapshot()
         } else {
@@ -936,58 +999,10 @@ impl App {
             .xyzzy
             .as_ref()
             .map(|menu| menu.panel(&self.game.world, self.notice.as_deref()));
-        let modal_open = self.modal_open();
-        let commander = if self.game.is_internal_validation() {
-            "Meridian INTERNAL MULE VALIDATION / NO SAVE"
-        } else if self
-            .game
-            .world
-            .xyzzy_snapshot()
-            .is_some_and(|state| state.active)
-        {
-            "CLARKE / XYZZY"
-        } else {
-            "Meridian"
-        };
+        let title = self.frame_title(active, snapshot.mode);
+        Self::append_contact_notice(&mut hud_lines, frame_refusal.or(snapshot.motion_refusal));
         if let Some(renderer) = &mut self.renderer {
-            let mode = match snapshot.mode {
-                FlightMode::Docked => "DOCKED",
-                FlightMode::Launching => "LAUNCHING",
-                FlightMode::Flight => "FLIGHT",
-            };
-            let contact_notice =
-                frame_refusal
-                    .or(snapshot.motion_refusal)
-                    .map(|refusal| match refusal {
-                        MotionRefusal::CelestialContact => {
-                            "Celestial contact: stopped before the physical surface"
-                        }
-                        MotionRefusal::AsteroidContact => {
-                            "Asteroid hull contact: stopped at last clear position"
-                        }
-                        MotionRefusal::NpcContact => {
-                            "NPC hull contact: stopped at last clear position"
-                        }
-                        MotionRefusal::StationContact => {
-                            "Station contact: stopped at last clear position"
-                        }
-                        MotionRefusal::EntryConditions => {
-                            "Entry refused: align with the entrance and slow down"
-                        }
-                    });
-            if let Some(message) = contact_notice {
-                hud_lines.insert(hud_lines.len().min(1), message.into());
-            }
-            renderer.window.set_title(&format!(
-                "{commander} | {mode} | {} | H / ? Help",
-                if modal_open {
-                    "MENU"
-                } else if active {
-                    "RUNNING"
-                } else {
-                    "PAUSED"
-                },
-            ));
+            renderer.window.set_title(&title);
             let station =
                 snapshot
                     .station
