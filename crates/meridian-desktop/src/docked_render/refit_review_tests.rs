@@ -113,6 +113,23 @@ fn assert_review(frame: &Frame, model: &Model) {
             .iter()
             .all(|v| { v.position.into_iter().chain(v.color).all(f32::is_finite) })
     );
+    let (vertices, bytes, fingerprint) = geometry.capture_evidence();
+    assert_eq!(
+        vertices,
+        [
+            geometry.shapes.len(),
+            geometry.text.len(),
+            geometry.models.len()
+        ]
+    );
+    let buffers: [&[u8]; 3] = [
+        bytemuck::cast_slice(&geometry.shapes),
+        bytemuck::cast_slice(&geometry.text),
+        bytemuck::cast_slice(&geometry.models),
+    ];
+    assert_eq!(bytes, buffers.map(|b| b.len()));
+    assert_eq!(fingerprint, crate::review_capture::digest(&buffers));
+    assert!(bytes[0] > 0 && bytes[1] > 0 && bytes[2] == 0);
     let atlas = atlas();
     let mut visible = 0;
     for glyph in geometry.text.chunks_exact(6) {
@@ -229,6 +246,10 @@ fn actual_paid_beam_store_then_immediate_fit_keeps_visible_review_controls_and_c
     for viewport in views {
         let frame = paint(&mut menu, &profile, viewport);
         assert_review(&frame, &model);
+        let identity = some(menu.review_capture_identity());
+        assert_eq!(identity.operation, "Store");
+        assert_eq!(identity.item, beam);
+        crate::review_capture::tests::assert_actual_frame_record(&frame, identity);
         stored_reviews.push(frame);
     }
     assert_eq!(ok(profile.world.save_bytes()), before);
@@ -265,6 +286,11 @@ fn actual_paid_beam_store_then_immediate_fit_keeps_visible_review_controls_and_c
     for (viewport, store) in views.into_iter().zip(&stored_reviews) {
         let fit = paint(&mut menu, &profile, viewport);
         assert_review(&fit, &model);
+        let identity = some(menu.review_capture_identity());
+        assert_eq!(identity.operation, "Fit");
+        assert_eq!(identity.item, beam);
+        assert_eq!(identity.facing, Some(LaserFacing::Front));
+        crate::review_capture::tests::assert_actual_frame_record(&fit, identity);
         assert_eq!(fit.labels, store.labels);
         assert_eq!(fit.lines, store.lines);
         assert_eq!(fit.hits, store.hits);
