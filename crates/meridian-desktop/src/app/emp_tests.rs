@@ -237,6 +237,7 @@ fn emp_input_is_physical_tick_bound_and_help_focus_pause_never_replay_a_held_key
     assert_eq!(a.game.world.emp_snapshot().map(|s| s.releases), Some(0));
     assert!(
         a.notice
+            .text
             .as_deref()
             .is_some_and(|n| n.contains("EMP refused"))
     );

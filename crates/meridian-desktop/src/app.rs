@@ -392,18 +392,17 @@ impl App {
             KeyCode::Escape => self.request_quit(event_loop),
             KeyCode::KeyQ if self.quit_failed => event_loop.exit(),
             KeyCode::KeyN if !self.game.playing() => {
-                self.notice
-                    .set(match self.game.new_commander(fresh_profile_seed()) {
-                        Ok(true) => {
-                            self.sync_profile_controls();
-                            "New commander ready".into()
-                        }
-                        Ok(false) => {
-                            "Press N again to confirm new game; existing save is not changed yet"
-                                .into()
-                        }
-                        Err(error) => error,
-                    });
+                let message = match self.game.new_commander(fresh_profile_seed()) {
+                    Ok(true) => {
+                        self.sync_profile_controls();
+                        "New commander ready".into()
+                    }
+                    Ok(false) => {
+                        "Press N again to confirm new game; existing save is not changed yet".into()
+                    }
+                    Err(error) => error,
+                };
+                self.notice.set(message);
             }
             KeyCode::KeyC if !self.game.playing() => self.load_profile(),
             KeyCode::F9 if self.game.playing() => self.load_profile(),
