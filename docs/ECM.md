@@ -2,7 +2,7 @@
 
 ## Current scope and validation
 
-This is a source-authored core candidate. Its Rust tests, compiler checks, Clippy, coverage and actual application acceptance are UNRUN. Earlier qualified EMP and preview results do not cover this delta. The isolated desktop successor implements the actual controls, equipment slot, HUD/Help and durable Profile path. Root owns final serial composition with the separate four-facing owner and one complete independent review; the existing Mac and Dell owners retain execution.
+This is a source-authored core candidate. Its Rust tests, compiler checks, Clippy, coverage and actual application acceptance are UNRUN. Earlier qualified EMP and preview results do not cover this delta. The isolated desktop successor implements the actual controls, equipment slot, HUD/Help and durable Profile path. Root has composed the separate four-facing implementation and retains responsibility for whole-source review; the existing Mac and Dell owners retain execution.
 
 The ordinary SH025 can buy one E.C.M. System for 2100 CR at technology level 5 or above, store that exact paid item and refit it. It uses one of the original three utility mounts alongside the actual cargo expansion, Fuel Scoops and distinct EMP. It does not consume a laser slot or silently grant hardware through XYZZY. All transactions use the existing paid module review, staged save and writer publication boundary.
 
@@ -20,7 +20,7 @@ Press N once in flight to activate the fitted system. N remains New Commander on
 
 The HUD shows ECM property, live FIELD or time-only COOLDOWN, the actual shared 22-energy cost and terminated missile count within the existing visible line budget. Stored hardware, insufficient energy and electrical disablement receive distinct readouts/refusals. ECM has no invented bank; the existing EMP bank remains separate. Equipment readouts and contextual Help explain that manual activation is supported and automatic ECM is unavailable.
 
-The desktop successor authors nine host tests plus one additional prepared-core test. They use actual presented reviews and physical input routing, real market-earned funding and a real Save baseline, genuine owned practice missiles, synced Profile files and induced filesystem publication failure. The EMP cancellation case explicitly labels secret funding/kit, pays for ECM after storing a real scoop to free its mount, and pursues an actual recent attacker; failed publication is checked before successful cancellation. These are unexecuted headless host tests, not native rendering or piloting evidence.
+The desktop successor authors nine host tests plus one additional prepared-core test. They use actual presented reviews and physical input routing, real market-earned funding and a real Save baseline, genuine owned practice missiles, synced Profile files and induced filesystem publication failure. The EMP cancellation case explicitly labels secret funding/kit, pays for ECM after storing a real scoop to free its mount, and pursues an actual recent attacker; failed publication is checked before successful cancellation. The Root composition also authors a joint same-tick side-laser/ECM resource and cold replay regression, including a refused writer before either command. These are unexecuted headless tests; native rendering and piloting remain unobserved for this source.
 
 ## Cold continuation
 

@@ -95,7 +95,7 @@ fragments for Root's final shared-source composition:
 | `app.rs::help_panel` | Inspect the actual item fitted on the persisted selected facing, preserving original module names and the front Mining Laser work hint. |
 | `session.rs` | Display the selected facing, actual weapon and one shared energy/heat/cooldown readout. An empty mount explicitly reports no fitted laser and does not fall back to front. |
 | Existing digit controls | `0` Front, `1` Rear, `2` Left and `3` Right still submit `SetFlightView` to the sole persisted core selection. F1-F4 retain missile controls. |
-| `docked.rs::LASER_SLOTS` and `equipment_panel` | Expose front/left/right/rear slots, actual fitted kind and selected-slot rows. The starter panel has 18 slots including the nine existing pylons; the EMP slot moves from index 5 to 8. |
+| `docked.rs::LASER_SLOTS` and `equipment_panel` | Expose front/left/right/rear slots, actual fitted kind and selected-slot rows. The combined ECM panel has 19 slots including its utility and the nine existing pylons; the EMP slot moves from index 5 to 8. |
 | `docked.rs::module_rows` | Show all eligible owned lasers as movable. Fitted status means this exact slot; Store is available only at the actual fitted slot. Readout names the current mount. Offers and prices come from `World::laser_offers`. |
 | `docked.rs::module_node` and `equipment_action` | Facing-specific nonfront node IDs plus actual item IDs distinguish every row and offer. Cross-slot node/kind mismatch refuses. Buy uses the selected facing; fit resolves the selected occupant and uses `InstallLaser` even when moving back to Front. |
 | `profile.rs::command` | Exhaustive purchase/install messages include both facing actions. Prepared bytes still publish through the actual Store before committing the candidate or invalidating the session. |
@@ -104,7 +104,7 @@ fragments for Root's final shared-source composition:
 Front default purchase actions remain the existing public front actions; all laser
 fit actions use the facing-aware core capability. No host row/cache creates an
 item or grants fitting authority. Old assertions remain except the explicit
-starter slot count increases from 15 to 18; the existing EMP keyboard test pilot
+combined starter slot count increases from 15 to 19; the existing EMP keyboard test pilot
 advances eight slots instead of five to reach the same real EMP slot. Its earned
 public-market helper is shared only within host tests without changing its body.
 
@@ -112,15 +112,14 @@ Root's separately verified Sonar extraction
 `2d5f4a57ae05db68ec7f233f9b695f3ecc4b2f75`, tree
 `16391c8e179353703b32ddb8d65e69f361f51dcd`, has parent `652b9c9` and changes
 only core flight stepping, traffic movement and the desktop pylon helper. That
-source is not merged here. Root must retain all three changes while serially
+source is retained by the Root composition, which is serially
 composing this successor; a whole-file replacement of `docked.rs` would lose the
 newer pylon extraction. No qualifier or release state is inferred from those
 source identities.
 
 MC1 independently owns ECM. Root must serially join the shared modular action/tag,
 resource replay, missile and save fingerprint hunks, assigning noncolliding tags
-and including both rules markers. This branch does not merge MC1 source or claim
-ECM behavior or tests. Recheck the complete joined source and its exact identity.
+and including both rules markers. The Root composition includes the separate MC1 implementation and both rules markers. Its combined-source tests remain unrun; no ECM behavior is qualified by the earlier laser author packet. Review the complete joined source and its exact identity.
 
 ## Meaningful authored cases and acceptance
 

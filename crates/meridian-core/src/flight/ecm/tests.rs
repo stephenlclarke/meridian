@@ -647,3 +647,66 @@ fn prepared_ecm_drop_and_failed_writer_preserve_all_live_command_state() {
     assert_eq!(missile(&world, 0).ended, Some(MissileEnd::Ecm));
     cold(&world);
 }
+
+#[test]
+fn paid_side_laser_and_ecm_share_resources_and_replay_both_same_tick_orders() {
+    for ecm_first in [false, true] {
+        let mut world = paid();
+        let laser_item = apply(
+            &mut world,
+            ModuleAction::PurchaseLaser {
+                kind: ModuleKind::PulseLaser,
+                facing: crate::LaserFacing::Left,
+            },
+        );
+        if world.snapshot().navigation.unwrap().fuel_units < 68 {
+            world.request_refuel(world.snapshot().tick).unwrap();
+        }
+        journey(&mut world, SystemId::AVENOR);
+        consent(&mut world);
+        launch(&mut world);
+        stop(&mut world);
+        launch_missile(&mut world);
+        step(&mut world, 1);
+        world
+            .request_flight_view(crate::FlightView::Left, world.snapshot().tick)
+            .unwrap();
+        let before = world.flight_resources_snapshot().unwrap();
+        let cash = world.credits_tenths();
+        let cargo = world.service_snapshot();
+        let rounds = world.missile_snapshot().unwrap().rounds;
+        let bytes = world.save_bytes().unwrap();
+        let tick = world.snapshot().tick;
+        let prepared = world.prepare_ecm(tick).unwrap();
+        assert_eq!(
+            prepared.publish_with(|_| Err::<(), _>("combined writer refused")),
+            Err("combined writer refused")
+        );
+        assert_eq!(world.save_bytes().unwrap(), bytes);
+        if ecm_first {
+            world.request_ecm(tick).unwrap();
+        }
+        let shot = world.request_fire_selected_laser(tick).unwrap();
+        assert_eq!(shot.fitted_item_id, laser_item);
+        assert_eq!(world.flight_view(), crate::FlightView::Left);
+        if !ecm_first {
+            world.request_ecm(tick).unwrap();
+        }
+        let after = world.flight_resources_snapshot().unwrap();
+        assert_eq!(after.energy_hundredths, before.energy_hundredths - 2300);
+        assert_eq!(after.heat_fifths, before.heat_fifths + 50);
+        assert_eq!(after.cooldown_ticks, 18);
+        assert_eq!(missile(&world, 0).ended, Some(MissileEnd::Ecm));
+        assert_eq!(world.missile_snapshot().unwrap().rounds, rounds);
+        assert_eq!(world.credits_tenths(), cash);
+        assert_eq!(world.service_snapshot(), cargo);
+        assert_eq!(world.ecm_snapshot().unwrap().activations, 1);
+        let loaded = cold(&world);
+        assert_eq!(loaded.flight_view(), crate::FlightView::Left);
+        assert_eq!(
+            loaded.selected_laser_snapshot().unwrap().fitted_item_id,
+            laser_item
+        );
+        assert_eq!(loaded.flight_resources_snapshot().unwrap(), after);
+    }
+}

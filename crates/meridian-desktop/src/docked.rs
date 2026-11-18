@@ -1285,7 +1285,7 @@ mod tests {
     fn front_module_rows_and_pylon_slots_use_real_owned_instances_and_admission() {
         let (_directory, profile, _menu) = start();
         let panel = ok(equipment_panel(&profile.world, "front-laser", ""));
-        assert_eq!(panel.slots.len(), 18);
+        assert_eq!(panel.slots.len(), 19);
         let emp = panel
             .slots
             .iter()
