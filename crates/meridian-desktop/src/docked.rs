@@ -1178,7 +1178,13 @@ mod tests {
     fn front_module_rows_and_pylon_slots_use_real_owned_instances_and_admission() {
         let (_directory, profile, _menu) = start();
         let panel = ok(equipment_panel(&profile.world, "front-laser", ""));
-        assert_eq!(panel.slots.len(), 14);
+        assert_eq!(panel.slots.len(), 15);
+        let emp = panel
+            .slots
+            .iter()
+            .find(|slot| slot.id == ui::emp::SLOT)
+            .unwrap_or_else(|| panic!("EMP utility slot"));
+        assert_eq!(emp.fitted, "Empty");
         let utility = panel
             .slots
             .iter()
