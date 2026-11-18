@@ -53,6 +53,47 @@ fn launch(a: &mut App) {
     assert_eq!(a.advance_frame(true, 1), FrameAdvance::Continue(None));
 }
 
+fn assert_compact_selected_hud(a: &App, expected: &str) {
+    let before = ok(a.game.world.save_bytes());
+    let lines = a.game.lines(true, None);
+    let top = crate::hud::cockpit::Layout::new(640, 360).top;
+    let budget = crate::hud::line_budget(640, top as u32);
+    assert!(
+        lines.len() <= budget,
+        "actual compact HUD exceeds cockpit budget{budget}: {lines:?}"
+    );
+    let columns = crate::hud::MAX_COLUMNS;
+    assert!(
+        lines.iter().all(|line| line.chars().count() <= columns),
+        "actual compact HUD rows: {lines:?}"
+    );
+    assert!(
+        lines
+            .iter()
+            .take(budget)
+            .any(|line| line.contains(expected)),
+        "actual selected-mount HUD omitted {expected}: {lines:?}"
+    );
+    assert!(
+        lines.iter().take(budget).any(|line| line == "H / ? HELP"),
+        "actual compact HUD lost Help: {lines:?}"
+    );
+    assert!(
+        !lines.iter().any(|line| line.contains("W / S")
+            || line.contains("Arrows Pitch")
+            || line.contains("THRUST")),
+        "full control guide belongs in Help: {lines:?}"
+    );
+    let cockpit = ok(crate::hud::cockpit::Cockpit::capture(
+        &a.game.world,
+        a.game.world.snapshot(),
+    ));
+    let mut vertices = Vec::new();
+    crate::hud::vertices_with_cockpit(&lines, 640, 360, Some(&cockpit), &mut vertices);
+    assert!(!vertices.is_empty() && vertices.len() <= crate::hud::MAX_VERTICES);
+    assert_eq!(ok(a.game.world.save_bytes()), before);
+}
+
 #[test]
 fn actual_digit_view_binding_drives_each_fitted_body_axis_and_fresh_profile_keeps_selection_and_spend()
  {
@@ -121,7 +162,16 @@ fn actual_digit_view_binding_drives_each_fitted_body_axis_and_fresh_profile_keep
                 .any(|line| line.contains(&format!(
                     "Z FIRE {} PULSE",
                     format!("{facing:?}").to_ascii_uppercase()
-                )))
+                ))),
+            "actual selected-mount HUD: {:?}",
+            a.game.lines(true, None)
+        );
+        assert_compact_selected_hud(
+            &a,
+            &format!(
+                "Z FIRE {} PULSE",
+                format!("{facing:?}").to_ascii_uppercase()
+            ),
         );
         ok(a.game.prepare_quit());
         let bytes = ok(a.game.world.save_bytes());
@@ -162,8 +212,11 @@ fn selected_empty_mount_does_not_fall_back_to_front_and_help_hud_explain_the_ref
         a.game
             .lines(true, None)
             .iter()
-            .any(|line| line.contains("RIGHT UNAVAILABLE: NO FITTED LASER"))
+            .any(|line| line.contains("RIGHT UNAVAILABLE: NO FITTED LASER")),
+        "actual empty-mount HUD: {:?}",
+        a.game.lines(true, None)
     );
+    assert_compact_selected_hud(&a, "RIGHT UNAVAILABLE: NO FITTED LASER");
     assert!(
         a.help_panel()
             .lines

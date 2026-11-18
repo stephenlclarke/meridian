@@ -36,6 +36,11 @@ The current [Preview 8 EMP utility](docs/EMP.md) is published for macOS arm64 an
 
 The [paid manual ECM candidate](docs/ECM.md) is source-authored and unrun. It adds real paid hardware, a charged 32-tick standard-missile field and time-only cold restoration, with an actual equipment slot, N flight control, HUD/Help and atomic durable activation. The source is joined with four laser facings; independent review and owner execution remain pending; automatic ECM and hostile missile production remain separate work.
 
+Exact `2de5f2d` Mac execution passed 431 core and two compatibility cases, then
+242/244 desktop cases. A [compact selected-weapon HUD correction](docs/LASER-FACINGS.md#compact-selected-weapon-hud-correction)
+restores one missing status row without the full control guide. Its corrected
+execution and native acceptance remain unrun; this is not a 712-case pass.
+
 The [four-facing laser core and desktop wiring](docs/LASER-FACINGS.md) are authored with nine new core and nine host regression cases, all unrun. Paid left/right/rear fitting, selected-view fire, Help, shared resources and cold replay are joined with paid manual ECM and await whole-source review and owned platform qualification.
 
 The [mounted laser receipt correction](docs/LASER-FACINGS.md#targeted-mounted-ray-receipt-correction) binds nonfront NPC hits and interceptions to actual body pose, facing and shared spend. Two coordinated-relabel regressions are authored, unrun; Root owns the separate EMP control-fork correction and final review/qualification.

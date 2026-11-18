@@ -2,6 +2,26 @@
 
 Current candidate work and the delivered release are recorded separately below. Earlier source-specific sections retain their original observations and limits; their historical pending states do not override the current checkpoint.
 
+## Compact selected-weapon HUD correction
+
+Actual Mac `2de5f2d7155fa4fef54386264a5e0227c38e5dfa`, tree
+`e2b069905133009bb648978c196623c3b792f803`, passed all 431 core and two
+compatibility cases, including every earlier failed core case and the new rear
+archive regression. Desktop ran 244 cases: 242 passed and two selected-weapon HUD
+assertions failed. That is 675 passes and two failures among 677 executed Rust
+cases. The 32 importer and three observer cases, Clippy, releases, setup helper
+and native acceptance remained unrun; no 712-pass result is claimed.
+
+The [source correction](LASER-FACINGS.md#compact-selected-weapon-hud-correction)
+adds one short selected-mount status row to the compact flight path, which had
+returned before the existing expanded status formatter. It shares that formatter
+without restoring the full control guide. Both original host assertions, all
+view/fire/resource/cold/Help expectations and compact HUD limits remain. Added
+checks retain visibility above the real cockpit at 640x360, CPU vertex bounds,
+read-only saved state and the short Help hint. No cases or core code change.
+Corrected compiler/tests/Clippy/native results are **UNRUN** pending Root/G2 review
+and changed owner execution. Navigation/trade and native setup packets stay sealed.
+
 ## Current importer main and method-reference correction
 
 PR 52 merged at `22715d60604acc57ac6acad99e3be54a6085a618` on 18 November 2026 at 08:05:11 UTC. All six main CI jobs passed. Sonar analysis `f8a537d8-bfc3-4d91-a59a-f13f7129d286` uses that exact revision and project version; its quality gate passed, with one unresolved `rust:S1612` finding in the CLI subcommand parser. The candidate replaces the one closure with the same `OsStr::to_str` method reference. All existing code and test assertions otherwise remain unchanged. The changed-source designated compile, strict Clippy, 32 importer cases and actual CLI qualification are pending; the original current-main result and earlier failure evidence remain attributed to their exact sources. This does not change the published Preview 8.
