@@ -154,7 +154,10 @@ pub(super) type ResourceOrder = (u64, u64, u8, usize);
 type ResourceEvent = (ResourceOrder, ResourceAction);
 const NPC_BEAM_PHASE: u8 = 0;
 const MISSILE_PHASE: u8 = 1;
-const PLAYER_BEAM_PHASE: u8 = 2;
+// EMP release/recovery belongs to the completed physical step. Commands accepted after
+// that step must see its electrical state and cannot be replayed ahead of recovery.
+const EMP_STEP_PHASE: u8 = 2;
+const PLAYER_BEAM_PHASE: u8 = 3;
 
 impl TrafficBeam {
     pub(super) fn resource_order(&self, index: usize) -> ResourceOrder {
@@ -430,7 +433,7 @@ impl State {
                 || (event.world_tick == world && matches!(stage, SceneStage::Command(_)));
             if event.victim == a.id && event.local_tick <= clock && included {
                 actions.push((
-                    (event.local_tick, event.world_tick, 3, index),
+                    (event.local_tick, event.world_tick, EMP_STEP_PHASE, index),
                     ResourceAction::Emp(event.action),
                 ));
             }

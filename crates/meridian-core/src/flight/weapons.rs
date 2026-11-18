@@ -461,9 +461,6 @@ impl World {
         Some((item.id, weapon))
     }
     pub fn front_laser_snapshot(&self) -> Option<FrontLaserSnapshot> {
-        if self.emp.input_blocked() {
-            return Err(FireError::InsufficientEnergy);
-        }
         let (fitted_item_id, weapon) = self.fitted_front_laser()?;
         Some(FrontLaserSnapshot {
             fitted_item_id,
@@ -507,6 +504,9 @@ impl World {
         }
         if self.state.mode != FlightMode::Flight {
             return Err(FireError::NotInFlight);
+        }
+        if self.emp.input_blocked() {
+            return Err(FireError::InsufficientEnergy);
         }
         let (fitted_item_id, weapon) = self.fitted_front_laser().ok_or(if pulse_only {
             FireError::NoFittedFrontPulseLaser
