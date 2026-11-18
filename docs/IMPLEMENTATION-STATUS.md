@@ -2,7 +2,7 @@
 
 ## Internal Mule docking validation
 
-Two controlled docking modes run the original SH001 Mule against the original SH028 station. On development revision `4288969`, the MacBook Pro showed an aligned crossing at tick 104 and stopped the obstructed approach at the front lip at tick 11. The 95th-percentile simulation step was 1.57–2.17 ms across five release-mode cases. The isolated integration onto `792f448` awaits its own qualification. Mule is available only in the internal validation scene. [Controls and test scope](MULE-VALIDATION-LAUNCH.md)
+Mac build `ffb7112` passed 702 Rust tests, 102 Python tests, strict Clippy, and the release build. In the native scene the aligned Mule crossed at tick 104 and the obstructed Mule stopped for station contact at tick 11. Linux and native Windows each passed 705 Rust tests including three observer tests, 102 Python tests, strict Clippy, and both release builds. One Metal fixture was excluded from the ordinary test counts on each platform. These results qualify the internal docking scene. Ordinary encounters and player acquisition remain open. [Controls and test scope](MULE-VALIDATION-LAUNCH.md)
 
 The first section records the current delivered release. Earlier source-specific sections retain their original observations and limits; their historical pending states do not override the current checkpoint.
 
