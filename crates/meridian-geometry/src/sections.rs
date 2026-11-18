@@ -1069,7 +1069,12 @@ mod live_overlap_tests {
                     .iter()
                     .map(|f| f.id().component)
                     .collect();
-                assert_eq!(node.owner, (ids.len() == 1).then(|| *ids.first().unwrap()));
+                let expected = if ids.len() == 1 {
+                    ids.first().copied()
+                } else {
+                    None
+                };
+                assert_eq!(node.owner, expected);
             }
             for owners in [
                 BTreeMap::new(),
