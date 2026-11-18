@@ -22,6 +22,21 @@ class GoshawkVisualSource(unittest.TestCase):
         for path, source in manifest["sharedOriginalTextures"].items():
             self.assertEqual(hashlib.sha256((ROOT / path).read_bytes()).hexdigest(), source["sha256"])
 
+    def test_original_geometry_assets_and_station_witness_match_their_pinned_bytes(self):
+        manifest = json.loads((self.directory / "MANIFEST.json").read_text())
+        for name, pin in manifest["files"].items():
+            with self.subTest(asset=name):
+                data = (self.directory / name).read_bytes()
+                self.assertEqual(len(data), pin["bytes"])
+                self.assertEqual(hashlib.sha256(data).hexdigest(), pin["sha256"])
+
+        integration = ROOT / "integration/sh008-goshawk"
+        criteria = json.loads((integration / "CRITERIA.json").read_text())
+        witness = (integration / "SH028-LIP-WITNESS.json").read_bytes()
+        self.assertEqual(
+            hashlib.sha256(witness).hexdigest(), criteria["stationSlice"]["witnessSha256"]
+        )
+
     def test_changed_detailed_positions_or_winding_refuse_render_encoding(self):
         def flipped(data, index):
             return data[:index] + bytes([data[index] ^ 1]) + data[index + 1:]
