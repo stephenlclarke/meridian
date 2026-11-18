@@ -202,7 +202,15 @@ impl Scene {
                 }
             }
         }
-        if let Some(direction) = unit(sub(self.player.position, primary.1))
+        // The model centre can be the native fore/aft opening. Select a real hull
+        // triangle, then retain the same nearest-surface, range and occlusion query.
+        let player_surface = world
+            .station_data
+            .as_ref()
+            .ok_or(EmpError::InvalidContact)?
+            .player_missile_aimpoint(self.player, primary.1)
+            .map_err(|_| EmpError::InvalidContact)?;
+        if let Some(direction) = unit(sub(player_surface, primary.1))
             && let Some((Victim::Player, point, distance)) = self.nearest(
                 world,
                 primary.1,
