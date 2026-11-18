@@ -713,6 +713,27 @@ fn actual_paid_upgraded_emp_disables_native_attacker_then_recovers_without_loot_
     let (mut w, target) = defender(w);
     let cargo = w.commodity_quantity(crate::station_services::CommodityId::Food);
     let cash = w.credits_tenths();
+    // Real facing-shield preparation keeps the finite EMP sequence viable under its
+    // own splash. It does not mint an attack receipt or refill the player's electricity.
+    let mut shield_shots = 0;
+    for _ in 0..300 {
+        if native_facing_budget(&w, target).is_some()
+            && w.flight_resources_snapshot().unwrap().cooldown_ticks == 0
+        {
+            let shot = w.request_fire_front_laser(w.snapshot().tick).unwrap();
+            assert!(matches!(shot.contact, crate::PulseContact::Npc { id, .. } if id == target));
+            assert!(w.traffic.emp_resources(target).unwrap().0 > 9500);
+            shield_shots += 1;
+            if shield_shots == 5 {
+                break;
+            }
+        }
+        w.step(aim_input(&w, target)).unwrap();
+    }
+    assert_eq!(
+        shield_shots, 5,
+        "actual facing-shield preparation must complete without killing/fleeing"
+    );
     for _ in 0..4 {
         start_charge(&mut w, target);
         hold(&mut w, target, 600);
@@ -748,6 +769,16 @@ fn actual_paid_upgraded_emp_disables_native_attacker_then_recovers_without_loot_
     );
     assert_eq!(w.save_bytes().unwrap(), before);
     let episode = *w.emp.episodes.last().unwrap();
+    assert!(w.emp.pulses.iter().any(|pulse| {
+        pulse
+            .contacts
+            .iter()
+            .any(|contact| contact.victim == scene::Victim::Player && contact.power_hundredths > 0)
+    }));
+    let player_disabled_at = w.emp.meter.disabled_at;
+    if let Some(at) = player_disabled_at {
+        assert_eq!(at, episode.disabled_at);
+    }
     let shots = w.traffic.beam_receipts().len();
     let mut loaded = cold(&w);
     for _ in 0..1800 {
@@ -761,9 +792,17 @@ fn actual_paid_upgraded_emp_disables_native_attacker_then_recovers_without_loot_
     assert_eq!(w.combat.physical_tick(), episode.disabled_at + 1800);
     assert!(w.traffic.emp_resources(target).unwrap().3.unwrap().disabled);
     assert_eq!(w.traffic.beam_receipts().len(), shots);
+    if player_disabled_at.is_some() {
+        assert!(w.emp.electrical_disabled());
+        assert_eq!(w.emp.meter.main, 0);
+    }
     steps(&mut w, 1);
     steps(&mut loaded, 1);
     assert!(!w.traffic.emp_resources(target).unwrap().3.unwrap().disabled);
+    if player_disabled_at.is_some() {
+        assert!(!w.emp.electrical_disabled());
+        assert!(w.emp.meter.main > 0);
+    }
     assert_eq!(w.traffic.emp_resources(target).unwrap().0, hull);
     assert_eq!(
         w.traffic
