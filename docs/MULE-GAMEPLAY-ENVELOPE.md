@@ -26,7 +26,7 @@ The mutable actor identity, pose, generation, current equipment and effect capab
 
 `MulePresentation` shares immutable `Arc` surface data with collision. The existing renderer owner must draw that same rounded-support union. Maximum single-surface opacity is 0.018, with fourth-power grazing fade, full close fade through 32 metres and zero by 64 metres. Front/rear strength uses the existing local +Z bank split. Internal piece surfaces must be discarded and overlapping pieces must not accumulate into a bright halo. The detailed original model remains the visible hull; the envelope is a very slight close-up edge shimmer.
 
-G1's normal owned qualification prints each actual piece's source bounds, point count, offset and support-gap parameters. G3 then implements the actual renderer dependency and G1 captures close, far, depleted, contact and rotating-dock views. Authoring source alone does not establish visual acceptance.
+The [authored desktop pass](MULE-RENDERER.md) preserves all original visible faces/materials/UVs and the three exact original diffuse maps. A certified source-convex boundary plus analytic two-centimetre face/edge/corner rounding draws one union entry with one alpha application. App supplies no Mule until the actual World route is joined. Three offline encoding/pixel-binding checks pass; renderer Rust/shader/GPU tests and native close, far, depleted, contact and rotating-dock views remain UNRUN. Authoring source alone does not establish visual acceptance.
 
 ## Integration and remaining acceptance
 

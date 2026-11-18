@@ -125,6 +125,49 @@ pub(crate) fn scene_camera_pose(
     Ok(camera_for(snapshot, station)?.pose)
 }
 
+/// Controlled World-owned observer: draw the actual station in its first-person frame.
+/// The observing pilot's own hull is omitted; this does not change player ownership.
+pub(crate) fn station_from_observer(
+    station: StationRender<'_>,
+    observer: RigidPose,
+    output: &mut Vec<Vertex>,
+) -> Result<(), String> {
+    output.clear();
+    append_mesh(
+        station.vertices,
+        station.pose.model_pose().map_err(|e| e.to_string())?,
+        &Camera {
+            pose: observer,
+            draw_ship: false,
+        },
+        output,
+    )
+}
+/// Reframe actual scene vertices emitted by the normal camera, without moving actors.
+pub(crate) fn reframe_observer(
+    vertices: &mut [Vertex],
+    from: RigidPose,
+    to: RigidPose,
+) -> Result<(), String> {
+    for vertex in vertices {
+        let world = from.orientation.apply(point(vertex.position));
+        let world = Vec3::new(
+            world.x + from.position.x,
+            world.y + from.position.y,
+            world.z + from.position.z,
+        );
+        let view = to
+            .orientation
+            .inverse_coordinates(difference(world, to.position));
+        let position = [view.x as f32, view.y as f32, view.z as f32];
+        if position.iter().any(|v| !v.is_finite()) {
+            return Err("Observer transform produced a non-finite vertex".into());
+        }
+        vertex.position = position;
+    }
+    Ok(())
+}
+
 fn append_mesh(
     vertices: &[Vertex],
     model: RigidPose,

@@ -1000,6 +1000,8 @@ impl App {
                 &snapshot,
                 station,
                 SceneEffects {
+                    // The owning World SH001 route supplies this after admission; never a preview actor.
+                    mule: None,
                     traffic: traffic.as_ref(),
                     pulse: self.pulse.as_ref(),
                     mining: belt.as_ref().map(|belt| asteroid_render::Scene {
