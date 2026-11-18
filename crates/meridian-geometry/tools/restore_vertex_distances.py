@@ -1,11 +1,13 @@
 """Restore per-plane vertex-distance integration before historical proofs."""
 import json
 from pathlib import Path
+from restore_vertex_dispatch import restore_vertex_dispatch
 
 CRATE = Path(__file__).resolve().parents[1]
 
 
 def restore_vertex_distances(name, source):
+    source = restore_vertex_dispatch(name, source)
     edits = json.loads((CRATE / 'integration/vertex-distances/INVERSE-EDITS.json').read_text())
     if name not in edits:
         return source

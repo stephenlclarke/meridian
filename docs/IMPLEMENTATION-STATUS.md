@@ -8,6 +8,8 @@ The successor reuses exact distances at shared original XYZ vertices within one 
 
 All 84 prior test bodies and independent publisher controls remain unchanged. Four new cases cover complete repeated plane batches and charged setup, generation and coordinate refusal, exact/one-short resources and rollback, and complete 256-facet multi-owner geometry, witnesses, affine fields and analytic volume. Current 88 Rust tests, nine host tests, compiler checks and changed original-five execution are **UNRUN**, pending independent review and owning validation. No new admission, original-input benefit, cap fit, minimum or speed claim is made.
 
+Independent whole-source review cleared the new algorithm and accounting but found two original collector helpers still gated to tests despite production callers. The bounded correction removes only those two `cfg(test)` attributes. A whole-file inverse confirms both helper bodies, the cached collector and all 88 test bodies are unchanged. Compiler and runtime validation remain unrun.
+
 The following sections retain earlier source-stage context. The current execution status is stated above.
 
 ## Strict-interior facet proof: source only

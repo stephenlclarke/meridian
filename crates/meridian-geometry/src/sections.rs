@@ -318,7 +318,6 @@ impl<'a> OutwardPlane<'a> {
 }
 
 impl FacetBoundsIndex {
-    #[cfg(test)]
     fn collection_candidates(
         &self,
         face: &Facet,
@@ -330,7 +329,6 @@ impl FacetBoundsIndex {
         self.collection_with_support(face, finite, owners, originals, None, b)
     }
 
-    #[cfg(test)]
     fn collection_with_support(
         &self,
         face: &Facet,

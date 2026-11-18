@@ -1,0 +1,106 @@
+{
+  "reviewedAtUTC": "2026-11-18T15:42:20.731739+00:00",
+  "verdict": "CHANGES_REQUIRED_ONE_PRODUCTION_DISPATCH_CFG_COMPILE_FINDING;WHOLE_DISTANCE_ALGORITHM_OTHERWISE_SOURCE_CLEAR",
+  "head": "c05156ffa53d166a1bcd0ab5f6b1ba9c9bd3f4b6",
+  "tree": "2b514753b52a7385c9cdbe2bfec36e36b9412f02",
+  "immediateParent": "93e8151dd3f8277d5d0758cd05ccc44dc52a8724",
+  "packet": {
+    "path": "/private/tmp/meridian-root-vertex-distances-review/SOURCE.json",
+    "bytes": 5561,
+    "sha256": "68d47e4379013bc87e83302246c5397fe1e6b0735b87c64c7f4b75661a455f9f"
+  },
+  "findings": [
+    {
+      "id": "G2-GEOMETRY-VERTEX-DISTANCES-1",
+      "priority": "P1",
+      "file": "crates/meridian-geometry/src/sections.rs",
+      "line": 955,
+      "relatedLines": [
+        321,
+        322,
+        330,
+        333,
+        334
+      ],
+      "title": "Restore both joint-candidate helpers to production compilation",
+      "body": "The new non-test Frame::collect_cached_admitted invokes index.collection_candidates at955. That sole method definition at322 still has cfg(test) at321; its collection_with_support delegate at334 also still has cfg(test) at333. Both are therefore absent in a normal library build. The cached collector is production code, so method lookup fails even if a particular runtime input would take the all-certified physical-only branch. Unit-test cfg enables the helpers and would not expose this non-test target error. Certificate::candidates and original Rows methods were ungated for this large path, but the two joint dispatch helpers were missed.",
+      "requestedChange": "Remove only the two cfg(test) attributes on collection_candidates and collection_with_support so the retained original joint traversal is available to production. Preserve both complete method bodies, prices, eligibility/owner/source-order logic and all old controls/tests. Do not bypass the uncertified-owner branch, force physical-only dispatch or add suppressions. Update the bounded source inverse metadata accordingly; carry the completed whole algorithm review to that small correction.",
+      "execution": "Source-established missing-method compile defect only; G2 ran no compiler or tests."
+    }
+  ],
+  "independentChecks": {
+    "cleanExactHeadTreeImmediateParent": true,
+    "rootGitWorkingSourceTarBytesModes": 621,
+    "changedPaths": 28,
+    "unchangedPaths": 593,
+    "authorCratePinsAndSourceArchive": 482,
+    "all465AuthorParentCrateFilesExactActual93": true,
+    "authorManifestPayloadHashes": 7,
+    "completeArchiveMembers": 8,
+    "canonicalRootDeltaVerified": true,
+    "threeCompleteProductionFileInverses": true,
+    "fiveFrozenReferencesHashed": true,
+    "fullPublisherControlExactExceptFunctionName": true,
+    "borrowedDistanceKernelRestoresExactOriginalAfterInputSubstitution": true,
+    "cachedCollectorRestoresExactOriginalAfterContextAndKernelDispatchSubstitution": true,
+    "eightPriorKernelCollectorParityFieldBodiesByteExact": true,
+    "all84OldTestBodiesByteExact": true,
+    "currentTestAttributes": 88,
+    "actualParentCustodyTerminalPinsHashed": 53,
+    "actualParentRawArtifactPinsAndExactArchiveMatches": [
+      46,
+      46
+    ]
+  },
+  "wholeSemanticReview": [
+    "Cache thresholdN>=256 is structural32*leaf8, not asset identity. Small path returnsNone before any cache charge/allocation and retains the qualified separating rows/collector/facet occupancy. Large path uses unchanged original rows, physical/joint collector logic and arbitrary-sample row classifier with exact scalar distance reuse. Contiguous facet index and test-only cell implementation remain. Reintroducing unpruned physical constraints on large inputs restores original work, never removes contact/field obligations.",
+    "Transient BTreeMap keys borrow exact immutable original Point3 coordinates. Equal XYZ may share one scalar ID irrespective of source ordinal,owner,winding,style or UV, because current-plane distance depends only on XYZ. Those identities/fields remain on every original Facet and collector record. Three21-bit IDs pack without overlap into63bits; overflow is checked, and the input/storage caps are stricter in practice. Original vertices/fields are not deduplicated or replaced.",
+    "Exclusive Plane view holds mutable cache borrow plus immutable actual source facet. Each creation uses a checked fresh generation and charges before publishing it. No second plane generation can coexist with that borrow. Per-word generation mismatch resets bits and epoch only after the2operation charge; each missing point computes the exact current face.distance before setting its valid bit. Zero distances are separately marked valid. Equal plane sets with different offset/scaling/winding still receive a fresh generation. No ray/sample/occupancy/intersection output is cached.",
+    "Packed IDs and immutable original ordinal map select the original matching coordinates. Distances are borrowed only after all current values are initialized, and cache values cannot mutate during the joint call. Partial operation failure cannot mark an uncomputed value valid. Kernel coordinate/rational failure may retain correct current-plane scalar values, but a later source plane logically invalidates them; no stale permission or geometry result is published.",
+    "New kernel equals the complete qualified source kernel after replacing only three locally computed exact distances with three borrowed exact distances and equivalent reference arithmetic. Coplanar/allzero, strictsign/zero endpoint, outward multiplicity, physical min/max, exact interpolation, every generated-coordinate point check and incomplete-section refusal are unchanged. Distance scalars are internal unchecked plane intermediates just as the original local distances were, not emitted coordinate/UV rationals. No coordinate/UV guard is cached or elided.",
+    "Cached collector equals the original row collector after only context wiring, exclusive plane creation and joint call substitution. Original finite/joint candidate order, independent physical/outward flags, uncertified owner eligibility, coplanar source IDs/fields, barriers, parity multiplicity and publication bounds remain. Rows and geometry still belong to exact originals. Packing/noding/triangulation,full affine UV/style assignment,stars,witnesses,topology and positivevolume remain unchanged.",
+    "Construction pays Npackedword initialization,actual facet visits,logarithmic lookup for each original XYZ field,every new scalar initialization,each packed field/finalword write and2Wbit/epoch initialization. Each exclusive source generation costs1;actual lazy word reset2;actual scalar distance evaluation retains1. Three fixed ID unpack/range/epoch/bit metadata fields are read under the already charged collector facet visit, consistent with bounded per-record metadata access rather than a variable geometry scan. Hits perform no dot/distance evaluation; miss arithmetic and every residual geometric operation keep their original prices. This accepts the stated fixed-record pricing, not an unbounded free traversal or cached occupancy answer.",
+    "Persistent reservation32+N+U+2ceil(U/64) covers packed IDs,scalar slots,validity/epoch words andheaders. Each unique insertion reserves4 for scalar+borrowed point-map key/ID/membership; map drop releases3U, retaining Uscalars. Additional32constructor control scratch overlaps all live map/result data; every initialization/admission precedes mutation. Extra16collector context holds cache/source references; original96joint+8sign scope also covers fresh scalar/previous scalar and lookup temporaries before borrowing. Build/collection entry rollback releases only their own new reservations after owned temporaries drop. Valid cache reservation survives collection failure; publisher explicitly drops/releases cache before interior/owner indexes and global packing. Original global failed-prefix cleanup accounting remains unchanged.",
+    "Four authored cases cover complete charged setup plus32exclusive-source batches on shared XYZ with distinct owners/UVs;generation changes including normal scale/winding/offset and invalid ordinals;retained coordinate Rational refusals in reference/cache lanes;threshold255,no-allocation fallback,exact/one-short construction and operation rollback;full256-facet4owner closed publisher with full triangles/nonzero affine fields/all witnesses,retained equality and analytic volume16/3. Work improvement assertion includes setup on repeated-point batch only; complete publisher assumes semantic equality,not speed/work gain. Paired monotonic10x bounds remain authored andUNRUN. All84prior bodies/322/108/120 guards/independent controls are unchanged.",
+    "No second semantic/accounting/source-control defect found. Whole review may carry unchanged through removal of the two erroneous cfg gates, with exact body preservation proof. Current compile/test acceptance is still absent and no original-ship benefit is inferred."
+  ],
+  "actualParentEvidence": {
+    "source": "93e8151dd3f8277d5d0758cd05ccc44dc52a8724",
+    "tree": "57bde2341d6605ed6d3ee6f66b884aaac7660b25",
+    "rawFocusedRustCounts": [
+      66,
+      7,
+      9,
+      2
+    ],
+    "rustPassed": 84,
+    "hostPassed": 9,
+    "lockedCheck": "PASS",
+    "strictClippy": "PASS",
+    "devBuild": "PASS",
+    "rawPacket": {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-section-control.93e8151/RAW-PACKET.tar.gz",
+      "bytes": 21296162,
+      "sha256": "6fafb2140a61f52e2f3053f0849b519ee83f8652445cefddfaa2aa3a31b03214"
+    },
+    "wholeFiveBodies": {
+      "declared": 25,
+      "decodePass": 5,
+      "constructorOperationsRefusals": 5,
+      "failed": 0,
+      "dependentUnrun": 15
+    },
+    "completeCandidates": 0,
+    "admissions": 0,
+    "wholeElapsedSeconds": 154.158334,
+    "allFiveActualFailuresFullGuardContextsAndPerCaseSecondsExactCustody": true,
+    "scope": "All results bind to93 only. Failed-prefix phase totals and timings are not complete costs,minimal caps,current fit or completed-original speed."
+  },
+  "executionDecision": "First remove the two erroneous test-only dispatch gates and return one bounded source closure carrying this whole review. ExistingG1 prepares only until actual currentclosure. Then exact-source88Rust9host/locked all-target check/strictClippy/devbuild when soleMac lane free;ONEchangedwholefive25bodies ONLYallfocusedPASS with original2Moperations includingdecode/100kstorage/4096-bit coordinateUV/512completefaces and exactsource-lock-binary/input/precleanup-context/monotonic pins. No broad new review or routineACK gate;naturalfirstfailureSTOP,no unchanged or diagnostic run.",
+  "limits": [
+    "No compiler,Cargo,Clippy,tests,SUT,geometry/probe/native,suppliedverifier,reviewbot or integrationtesting executed byG2.",
+    "No humanWIP edit,newchat/agent,merge orpublication.",
+    "Current88Rust9host/compiler/build/wholefive remainUNRUN. No current originalbenefit,fit,minima,speed,admission,native/full-game acceptance claim.",
+    "Separate202matrix,171fleet scope and legacy23/162ships+4/6stations remain separate."
+  ]
+}

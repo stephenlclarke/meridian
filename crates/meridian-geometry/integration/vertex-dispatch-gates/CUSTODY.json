@@ -1,0 +1,36 @@
+{
+  "parentAuthor": "da8c31603b1377ca6b5a22928c1d8c7dcae61766",
+  "wholeReviewedRoot": "c05156ffa53d166a1bcd0ab5f6b1ba9c9bd3f4b6",
+  "wholeReviewedTree": "2b514753b52a7385c9cdbe2bfec36e36b9412f02",
+  "wholeReviewVerdict": "CHANGES_REQUIRED_ONE_PRODUCTION_DISPATCH_CFG_COMPILE_FINDING;WHOLE_DISTANCE_ALGORITHM_OTHERWISE_SOURCE_CLEAR",
+  "reviewFile": {
+    "path": "/tmp/meridian-g4-exact-facet/crates/meridian-geometry/integration/vertex-dispatch-gates/PARENT-REVIEW.json",
+    "bytes": 11104,
+    "sha256": "85567fbba7b2706c3ffb396d74b0bc963360730954b0242c3ac3bc35fd4568fb"
+  },
+  "rootReviewSource": {
+    "path": "/private/tmp/meridian-root-vertex-distances-review/SOURCE.json",
+    "bytes": 5561,
+    "sha256": "68d47e4379013bc87e83302246c5397fe1e6b0735b87c64c7f4b75661a455f9f"
+  },
+  "verifiedRootPayloads": [
+    {
+      "path": "/private/tmp/meridian-root-vertex-distances-review/ALL-SOURCE-PINS.json",
+      "bytes": 156430,
+      "sha256": "a7018fd2c93732167209b6c60ca25ca7ec0422b62e3562d07d46852d445eb9e4"
+    },
+    {
+      "path": "/private/tmp/meridian-root-vertex-distances-review/SOURCE.tar",
+      "bytes": 29409280,
+      "sha256": "220d0d3bfca1401914547b29d8b49cfbe34108a9532c3153b7162eab60306360"
+    },
+    {
+      "path": "/private/tmp/meridian-root-vertex-distances-review/DELTA.patch",
+      "bytes": 324556,
+      "sha256": "e69c2f0fb1b60bcb5379580da1341870ceebbd0d542c8d9c4c1a304be1866321"
+    }
+  ],
+  "all482ParentCrateFilesMatchWholeReviewedRoot": true,
+  "findingAddressed": "G2-GEOMETRY-VERTEX-DISTANCES-1",
+  "carryWholeReview": "Completed whole distance algorithm/math/pricing/admission/lifetime/control review otherwise source clear. Carry that review to one bounded two-cfg correction and unchanged files; current execution still UNRUN."
+}

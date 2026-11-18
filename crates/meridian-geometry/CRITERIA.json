@@ -1246,5 +1246,24 @@
     "parentReviewSHA256": "405c58ec270a1e56226563a3c221ef2010eda895f73fc2d3a412c9c6c8090280",
     "qualification": "Root successor since 692d only; one G2 whole/relevant delta review; existing G1 changed 88/9/check/strict Clippy/build, then one changed whole-five only after ALL PASS and sole lane available. No unchanged diagnostic batch.",
     "deltaSHA256": "c11d5951798953b0fc62bccc4a21de9801181fa4e0ea80b3db8d183f68004622"
+  },
+  "vertexDispatchGates": {
+    "status": "AUTHORED_UNRUN_BOUNDED_PRODUCTION_DISPATCH_CFG_FIX",
+    "parentAuthor": "da8c31603b1377ca6b5a22928c1d8c7dcae61766",
+    "wholeReviewedRoot": "c05156ffa53d166a1bcd0ab5f6b1ba9c9bd3f4b6",
+    "wholeReviewedTree": "2b514753b52a7385c9cdbe2bfec36e36b9412f02",
+    "findingAddressed": "G2-GEOMETRY-VERTEX-DISTANCES-1",
+    "changes": "Remove only cfg(test) on collection_candidates and collection_with_support; complete method bodies and cached collector unchanged.",
+    "preservation": "Complete sections.rs two-attribute inverse, all88testbodies/every other source and test byte exact; whole algorithm review otherwise clear.",
+    "currentRustCount": 88,
+    "hostCount": 9,
+    "newTests": 0,
+    "currentExecution": "UNRUN; source-established compile defect, not executed compiler failure",
+    "contractSHA256": "743454d1aa7e3682e71662a2dc2e0013880d71dcd905aa869052af765f28fc61",
+    "custodySHA256": "82a3d62ad331d4ee1ca594e1936dab9d585416b554042201f238a3a06644c0a7",
+    "freezeSHA256": "442251b9b629208d829efc8d486978f9f04130f1d1b2e8aaa7efe73f7993624d",
+    "parentReviewSHA256": "85567fbba7b2706c3ffb396d74b0bc963360730954b0242c3ac3bc35fd4568fb",
+    "qualification": "Root successor since da8c only; one G2 bounded delta/unaffected closure carrying whole clear; existing G1 changed88/9/check/strictClippy/build, then one changed whole-five only after ALL PASS and sole lane available.",
+    "deltaSHA256": "8a92a667d61a82aeaf86e254d04bb92287cd832b5ffb812d5de826e9667de83b"
   }
 }

@@ -26,6 +26,7 @@ def normalized(value):
 
 
 def verify():
+    subprocess.run(["python3", "-B", str(CRATE / "tools/verify_vertex_dispatch_source.py")], check=True)
     subprocess.run(["python3", "-B", str(CRATE / "tools/verify_vertex_distances_source.py")], check=True)
     subprocess.run(["python3", "-B", str(CRATE / "tools/verify_section_control_source.py")], check=True)
     subprocess.run(["python3", "-B", str(CRATE / "tools/verify_separated_sections_source.py")], check=True)
