@@ -75,3 +75,46 @@ fn rotated_native_surface_aim_is_deterministic_and_never_accepts_invalid_pose() 
         Err(StationError::InvalidPose)
     );
 }
+
+#[test]
+fn retained_emp_release_axial_miss_selects_a_native_player_surface_without_filling_the_gap() {
+    // Exact retained 1a5fc9d geometry only; no World, attacker or effect is fabricated.
+    let data = ok(OriginalStationData::bundled());
+    let player = RigidPose {
+        position: Vec3::new(-5659.5107421875, 0.0, 1261.367919921875),
+        orientation: Basis3 {
+            x: Vec3::new(-0.9959530185475471, 0.0, 0.089875385095304),
+            y: Vec3::new(0.0, 1.0, 0.0),
+            z: Vec3::new(-0.089875385095304, 0.0, -0.9959530185475471),
+        },
+    };
+    let primary = Vec3::new(-5667.164627312388, 0.0, 1176.5514822992216);
+    let centre_delta = sub(player.position, primary);
+    let centre_distance = centre_delta.dot(centre_delta).sqrt();
+    assert!(centre_distance < 2500.0);
+    assert_eq!(
+        ok(data.player_beam_distance(
+            player,
+            primary,
+            scale(centre_delta, centre_distance.recip()),
+            7500.0,
+        )),
+        None,
+        "the observed native centre-ray miss must remain a miss"
+    );
+    let surface = ok(data.player_missile_aimpoint(player, primary));
+    assert_ne!(surface, player.position);
+    let delta = sub(surface, primary);
+    let distance = delta.dot(delta).sqrt();
+    let direction = scale(delta, distance.recip());
+    let hit = some(ok(
+        data.player_beam_distance(player, primary, direction, 2500.0)
+    ));
+    assert!(hit > 0.0 && hit < 2500.0);
+    assert_eq!(
+        ok(data.player_beam_distance(player, primary, direction, hit - 1e-4)),
+        None,
+        "native first contact and strict range remain authoritative"
+    );
+    check(&data, player, primary, surface);
+}
