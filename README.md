@@ -27,7 +27,7 @@
 
 Meridian is a Rust reimplementation of the original L337 project, with direct wgpu graphics, one authoritative World and traceable original content. New code is [proprietary/source-visible](LICENSE); imported original content retains its own notices. Original Elite/Oolite assets are excluded.
 
-The current source candidate adds a distinct owned [EMP electrical weapon](docs/EMP.md), including bank transfer, ten-second held release, native shield/electrical effects and retained Save/Continue history. This addition is uncompiled/unrun and awaits desktop controls and owner qualification; it is not part of the published Preview 7 acceptance.
+The current [EMP electrical weapon candidate](docs/EMP.md) has passed Mac, Linux and native Windows qualification: 631 Rust tests, 99 Python tests, 49 Markdown checks, strict Clippy and locked release builds per platform. The signed Mac candidate has also passed bounded native paid purchase, store/refit, first grades and cold Continue checks, plus early charge cancellation, one pulse release and an insufficient-bank refusal. A separately labelled XYZZY-supported setup also passed two native pulses, player and target electrical disablement, blocked controls/travel, cold disabled persistence and unheld recovery over 2326 accepted World ticks. The target was stationary; moving coast and the precise native recovery boundary remain unobserved. EMP is not part of the published Preview 7.
 
 ## Previews and validation
 
