@@ -95,7 +95,9 @@ impl Panel {
                 "V Review deliveries | X Review abandonment",
                 "Enter Confirm review | B Cancel review",
                 "F6 Flight lesson | F12 Cancel | C Lesson details",
-                "F5 Save | F9 Reload | P Pause | Escape Save/Quit",
+                "F7 Close practice | F8 Reception | F10 Practice review",
+                "6 Cancel trade lesson | 7 Trade lesson details",
+                "F5 Save | F9 Reload | P Pause | F11 Fullscreen | Escape Save/Quit",
             ],
         );
         panel.navigation();

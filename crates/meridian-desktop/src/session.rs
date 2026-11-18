@@ -574,10 +574,10 @@ impl Session {
                     review.remaining_units()
                 ),
                 Choice::Abandon => {
-                    "REVIEW: ABANDON FREIGHT | NO REWARD OR RESTOCK | ENTER / B".into()
+                    "REVIEW: ABANDON FREIGHT | NO REWARD OR RESTOCK | ENTER ABANDONS | B CANCELS".into()
                 }
                 Choice::Accept => {
-                    "REVIEW: ACCEPT EIGHT TONNES FOR RENAS | 730 CR ON COMPLETION | ENTER / B"
+                    "REVIEW: ACCEPT EIGHT TONNES FOR RENAS | 730 CR ON COMPLETION | ENTER ACCEPTS | B CANCELS"
                         .into()
                 }
             }
@@ -704,17 +704,23 @@ impl Session {
         }
     }
 
+    pub(crate) fn hud_panel_open(&self) -> bool {
+        self.help_review().is_some()
+            || self.show_trade_lesson
+            || self.show_flight_lesson
+            || self.show_objective
+            || self.equipment_open
+            || self.market_open
+    }
+
     pub fn lines(&self, world: &World, active: bool, notice: Option<&str>) -> Vec<String> {
         let snapshot = world.snapshot();
-        if snapshot.mode == FlightMode::Flight
-            && self.help_review().is_none()
-            && !self.show_trade_lesson
-            && !self.show_flight_lesson
-            && !self.show_objective
-            && !self.equipment_open
-            && !self.market_open
-        {
-            return Self::flight_alerts(world, notice);
+        if !self.hud_panel_open() {
+            match snapshot.mode {
+                FlightMode::Docked => return notice.into_iter().map(str::to_owned).collect(),
+                FlightMode::Flight => return Self::flight_alerts(world, notice),
+                FlightMode::Launching => {}
+            }
         }
         let name = snapshot
             .navigation

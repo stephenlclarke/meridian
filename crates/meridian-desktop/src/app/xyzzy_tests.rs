@@ -90,7 +90,11 @@ fn actual_secret_menu_publishes_clarke_real_outfit_and_visible_provenance_then_c
         9
     );
     assert!(ammo.purchases.is_empty());
-    assert!(app.game.lines(true, None)[0].contains("CLARKE | XYZZY"));
+    assert!(app.game.lines(true, None).is_empty());
+    assert!(
+        app.frame_title(true, FlightMode::Docked)
+            .starts_with("CLARKE / XYZZY")
+    );
     let viewport = ui::Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));
     for screen in ui::Screen::ALL {
         let mut docked = ok(Docked::new(&app.game.world));

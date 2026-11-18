@@ -214,6 +214,22 @@ impl App {
             && self.game.playing()
     }
 
+    fn timed_hud_notices(&self) -> bool {
+        self.game.playing()
+            && matches!(
+                self.game.world.snapshot().mode,
+                FlightMode::Docked | FlightMode::Flight
+            )
+            && !self.game.is_internal_validation()
+            && !self.commander_open
+            && !self.modal_open()
+            && !self.quit_failed
+    }
+
+    fn expire_hud_notice(&mut self, now: Instant) -> bool {
+        self.timed_hud_notices() && self.notice.expire(now)
+    }
+
     fn modal_open(&self) -> bool {
         self.help.is_some() || self.xyzzy.is_some()
     }
@@ -1296,21 +1312,15 @@ impl ApplicationHandler for App {
     }
 
     fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
+        if self.expire_hud_notice(Instant::now()) {
+            self.request_redraw();
+        }
         if let Some(renderer) = &self.renderer {
-            let flight = self.game.playing()
-                && self.game.world.snapshot().mode == FlightMode::Flight
-                && !self.game.is_internal_validation()
-                && !self.commander_open
-                && !self.modal_open()
-                && !self.quit_failed;
-            if flight && self.notice.expire(Instant::now()) {
-                renderer.window.request_redraw();
-            }
             if !self.simulation_active() || renderer.is_zero_sized() {
                 let until = self
                     .notice
                     .expires
-                    .filter(|_| flight && !renderer.is_zero_sized());
+                    .filter(|_| self.timed_hud_notices() && !renderer.is_zero_sized());
                 event_loop
                     .set_control_flow(until.map_or(ControlFlow::Wait, ControlFlow::WaitUntil));
             } else {

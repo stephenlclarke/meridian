@@ -3,7 +3,7 @@ use crate::{
     session::{Action, PracticeSelection, Session},
     storage::{SaveCommit, Store},
 };
-use meridian_core::{World, save::MAX_SAVE_BYTES};
+use meridian_core::{FlightMode, World, save::MAX_SAVE_BYTES};
 use std::{io, path::PathBuf};
 
 pub struct Profile {
@@ -496,6 +496,9 @@ impl Profile {
         }
         if self.playing {
             let mut lines = self.session.lines(&self.world, active, notice);
+            if self.world.snapshot().mode == FlightMode::Docked && !self.session.hud_panel_open() {
+                return lines;
+            }
             if let Some(secret) = self.world.xyzzy_snapshot().filter(|state| state.active) {
                 lines.insert(
                     0,

@@ -445,7 +445,7 @@ fn paused_contact_warning_expires_while_world_retains_the_refusal() {
         .notice
         .expires
         .unwrap_or_else(|| panic!("missing notice deadline"));
-    assert!(app.notice.expire(deadline));
+    assert!(app.expire_hud_notice(deadline));
     assert_eq!(app.advance_frame(false, 0), FrameAdvance::Continue(None));
     let frame = ok(app.prepare_presentation(false, None, 0.0, |_| None));
     assert!(frame.hud_lines.is_empty());
@@ -792,6 +792,141 @@ fn accepted_commander_launch_resumes_paused_world_and_saves_the_departure() {
             .mission_snapshot()
             .is_some_and(|mission| !mission.paused)
     );
+}
+
+fn docked_exterior(directory: &TestDirectory) -> App {
+    let mut app = startup(directory);
+    assert!(app.commander_key(KeyCode::Digit2));
+    paint(&mut app);
+    app.menu_input(ui::Input::Key(ui::Key::Back));
+    assert!(app.has_berth() && !app.commander_open && !app.menu_active());
+    app
+}
+
+#[test]
+fn ordinary_docked_exterior_clears_timed_feedback_above_the_instruments() {
+    let directory = TestDirectory::new();
+    let mut app = docked_exterior(&directory);
+    let idle = ok(app.prepare_presentation(true, None, 0.0, |_| None));
+    assert!(idle.hud_lines.is_empty());
+    assert!(idle.docked_frame.is_none());
+    assert!(app.timed_hud_notices());
+
+    app.game_key(KeyCode::KeyT);
+    let deadline = app
+        .notice
+        .expires
+        .unwrap_or_else(|| panic!("notice deadline"));
+    let feedback = ok(app.prepare_presentation(true, None, 0.0, |_| None));
+    assert_eq!(feedback.hud_lines.len(), 1);
+    assert!(feedback.hud_lines[0].starts_with("Speaking with"));
+    assert!(feedback.hud_lines[0].contains("R reviews freight terms"));
+    assert!(!app.expire_hud_notice(deadline - std::time::Duration::from_millis(1)));
+
+    app.paused = true;
+    app.reset_input();
+    assert!(!app.simulation_active());
+    let before_expiry = ok(app.game.world.save_bytes());
+    assert!(app.expire_hud_notice(deadline));
+    let expired = ok(app.prepare_presentation(false, None, 0.0, |_| None));
+    assert!(expired.hud_lines.is_empty());
+    assert!(expired.docked_frame.is_none());
+    assert_eq!(ok(app.game.world.save_bytes()), before_expiry);
+
+    let cockpit = ok(crate::hud::cockpit::Cockpit::capture(
+        &app.game.world,
+        app.game.world.snapshot(),
+    ));
+    let draw = |lines: &[String]| {
+        let mut vertices = Vec::new();
+        crate::hud::vertices_with_cockpit(lines, 1280, 720, Some(&cockpit), &mut vertices);
+        vertices.len()
+    };
+    assert!(draw(&expired.hud_lines) > 0);
+    assert!(draw(&feedback.hud_lines) > draw(&expired.hud_lines));
+}
+
+#[test]
+fn docked_freight_review_stays_accessible_after_feedback_expires_and_help_closes() {
+    let directory = TestDirectory::new();
+    let mut app = docked_exterior(&directory);
+    app.game_key(KeyCode::KeyT);
+    app.game_key(KeyCode::KeyR);
+    let deadline = app
+        .notice
+        .expires
+        .unwrap_or_else(|| panic!("notice deadline"));
+    assert!(app.expire_hud_notice(deadline));
+    let review = ok(app.prepare_presentation(true, None, 0.0, |_| None));
+    let content = review.hud_lines.join(" ");
+    assert!(content.contains("730 CR ON COMPLETION | ENTER ACCEPTS | B CANCELS"));
+    assert!(content.contains(meridian_core::freight::g02::presentation::OFFER_BRIEFING));
+    assert_eq!(
+        app.game
+            .world
+            .mission_snapshot()
+            .map(|m| m.freight.held_tonnes),
+        Some(0)
+    );
+
+    assert_eq!(
+        key(&mut app, KeyCode::KeyH, ElementState::Pressed, false, None),
+        None
+    );
+    let help = app
+        .help
+        .as_ref()
+        .unwrap_or_else(|| panic!("missing review help"));
+    let controls = help.lines.join(" ");
+    assert!(help.title.contains("Freight review"));
+    for control in [
+        "0 Commander",
+        "1 Galaxy",
+        "4 Market",
+        "5 Equipment",
+        "B cancels",
+    ] {
+        assert!(controls.contains(control), "{control}: {controls}");
+    }
+    assert_eq!(
+        key(&mut app, KeyCode::Enter, ElementState::Pressed, false, None),
+        None
+    );
+    assert_eq!(
+        app.game
+            .world
+            .mission_snapshot()
+            .map(|m| m.freight.held_tonnes),
+        Some(0)
+    );
+    assert_eq!(
+        key(
+            &mut app,
+            KeyCode::Escape,
+            ElementState::Pressed,
+            false,
+            None
+        ),
+        None
+    );
+    assert!(app.help.is_none());
+    assert_eq!(
+        ok(app.prepare_presentation(true, None, 0.0, |_| None)).hud_lines,
+        review.hud_lines
+    );
+    assert_eq!(
+        key(&mut app, KeyCode::Enter, ElementState::Pressed, false, None),
+        Some(KeyCode::Enter)
+    );
+    app.game_key(KeyCode::Enter);
+    assert_eq!(
+        app.game
+            .world
+            .mission_snapshot()
+            .map(|m| m.freight.held_tonnes),
+        Some(8)
+    );
+    assert!(app.game.session.help_review().is_none());
 }
 
 #[test]
