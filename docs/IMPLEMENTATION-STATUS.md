@@ -1,5 +1,9 @@
 # Implementation and validation status
 
+## Constant-size glyph chunk lint correction
+
+Actual `80eb3c8` passed 250 desktop, 32 importer and three observer tests, plus 99 Python checks, 52 Markdown checks, formatting and all-target compilation. Strict Clippy then stopped at `refit_review_tests.rs:135` on `chunks_exact_to_as_chunks`. The changed test iterator uses `as_chunks::<6>().0`, preserving the same complete six-vertex groups, ignored remainder and every assertion. No production code changes. Current Clippy and both release builds are **UNRUN**; prior passes remain bound to their actual source. Native capture has not run and the original black-client cause remains undetermined.
+
 Current candidate work and the delivered release are recorded separately below. Earlier source-specific sections retain their original observations and limits; their historical pending states do not override the current checkpoint.
 
 ## Cold Continue byte-contract correction

@@ -1,6 +1,6 @@
 # Meridian
 
-The original native black Fit review remains unexplained. The latest desktop run passed the Store-to-Fit revision checks, then exposed an incorrect cold-save byte expectation in the new regression. Continue deliberately advances review-permission counters. The [independent byte-oracle correction](docs/LASER-FACINGS.md#cold-continue-byte-contract) preserves anti-replay and full disk/state checks; changed execution is **UNRUN**. Dependent native acceptance remains blocked.
+The changed candidate passed all 285 fresh Rust tests, including the paid refit and complete cold-Continue checks. Strict Clippy then rejected a constant-size chunk iterator in that new test. The iterator now uses the suggested fixed-array API; its assertions and all production bytes are unchanged. Current Clippy and release builds remain **UNRUN**. The original native black Fit review remains unexplained.
 
 The joined laser/ECM Mac run now reports 428/431 core passes after compilation.
 The [geometry pilot correction](docs/LASER-FACINGS.md#source-derived-geometry-pilot-correction)
