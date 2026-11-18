@@ -262,7 +262,7 @@ fn actual_help_and_bad_arguments_do_not_need_or_create_a_source() -> TestResult 
             "missing",
         ],
     ] {
-        let values: Vec<&std::ffi::OsStr> = args.iter().map(|s| std::ffi::OsStr::new(s)).collect();
+        let values: Vec<&std::ffi::OsStr> = args.iter().map(std::ffi::OsStr::new).collect();
         assert!(!cli(&values)?.status.success());
     }
     Ok(())
