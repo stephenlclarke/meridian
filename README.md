@@ -1,11 +1,8 @@
 # Meridian
 
-The signed internal candidate reproduced the black Fit review despite identical first-attempt CPU/API records. A [bounded cross-frame and pixel capture](docs/LASER-FACINGS.md#opt-in-cross-frame-and-pixel-capture-v2) is now authored to observe later frames and supported actual-target copies. It is **UNRUN**, collects causal evidence and does not claim a renderer cure. The native blocker and dependent gameplay acceptance remain open.
+The current native run produced three identical nonblack GPU target copies while the paired Fit appeared black through CUA. A [bounded read-only independent window observer](docs/LASER-FACINGS.md#independent-macos-window-observer-preparation) is prepared to resolve the actual WindowServer capture identity. Thirteen offline policy fixtures pass; the Swift provider is uncompiled and no UI API has run. Execution requires the explicit human exception for alternate UI technology. No renderer cure or native acceptance is claimed.
 
-The joined laser/ECM Mac run now reports 428/431 core passes after compilation.
-The [geometry pilot correction](docs/LASER-FACINGS.md#source-derived-geometry-pilot-correction)
-retains the three failed assertions and fixes their source-proven setup mistakes.
-Corrected execution and the native setup helper remain unrun.
+The underlying ad5 game runtime passed Mac, Linux and native Windows qualification: 295 fresh Rust cases plus 433 reviewed unchanged Core/compatibility cases per platform, with current compiler, strict Clippy and release-build checks. This helper-only change leaves that runtime unchanged. The current native Fit-screen failure and dependent gameplay acceptance remain open.
 
 [![CI](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=alert_status)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)
