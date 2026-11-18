@@ -1,10 +1,20 @@
 # Implementation and validation status
 
-The first ordinary Renas Mule encounter is authored. It is tied to the genuine eighth G02 handover and the next successful launch from that berth. The current v17 save reconstructs the same actor during the first sortie. If an older save places the player inside its berth, the encounter waits for clearance. The pre-change build produced and reloaded a regression fixture at the reported overlapping pose. Replay on the corrected build is pending. The protected-main join, runtime journey and native ordinary-camera check remain pending.
+## Commander startup and flight cockpit
+
+Ordinary startup opens Commander details with the current ship, location and credits. A fresh commander starts at Avenor. A saved flight opens its summary and waits for Enter to resume. An unreadable slot opens recovery. Native first-frame and save checks are pending.
+
+The desktop source clears the text area above the instruments in idle flight and in the idle docked exterior. Command feedback expires after four seconds in either view, including when paused. Requested details, review terms and action-specific confirmations remain accessible. For controls and station navigation, press H or ?. Active flight practice, jump countdowns and contact warnings remain visible. Preview 8 still uses the older display. Native visual qualification for this change is pending.
+
+The Lion Citadel exterior now uses blue-grey plating, darker structural steel and amber light strips in the desktop source. Subtle face shading gives adjacent panels depth. The renderer applies this finish at load time to the original material assignments. Four short strips join the rim to the upper and lower crosspieces. On a CPU projection of the reported view, the strips cover all 184 sampled gaps and nine sightlines through the port stay clear. A visual check in the Mac build is pending.
+
+## First Renas Mule encounter
+
+A fresh commander delivered all eight G02 freight units at Renas, received 730 CR and the trusted clue, and saw the Mule on the next launch. Cold Continue restored the same SH001 identity and pose in the ordinary Mac cockpit. A regression using a genuine older v17 save verifies that a player already inside the encounter berth can move clear. World tests cover retirement and later launches. Close-range shimmer still needs visual confirmation. Preview 8 predates this encounter.
 
 ## Internal Mule docking validation
 
-Mac build `ffb7112` passed 702 Rust tests, 102 Python tests, strict Clippy, and the release build. In the native scene the aligned Mule crossed at tick 104 and the obstructed Mule stopped for station contact at tick 11. Linux and native Windows each passed 705 Rust tests including three observer tests, 102 Python tests, strict Clippy, and both release builds. One Metal fixture was excluded from the ordinary test counts on each platform. These results qualify the internal docking scene. Ordinary encounters and player acquisition remain open. [Controls and test scope](MULE-VALIDATION-LAUNCH.md)
+Mac build `ffb7112` passed 702 Rust tests, 102 Python tests, strict Clippy, and the release build. In the native scene the aligned Mule crossed at tick 104 and the obstructed Mule stopped for station contact at tick 11. Linux and native Windows each passed 705 Rust tests including three observer tests, 102 Python tests, strict Clippy, and both release builds. One Metal fixture was excluded from the ordinary test counts on each platform. These results qualify the internal docking scene. At that checkpoint, ordinary encounters and player acquisition were still open. [Controls and test scope](MULE-VALIDATION-LAUNCH.md)
 
 After PR 54 merged, the three hosted Rust checks, documentation and coverage-report generation passed on `9fb7783`. Sonar measured 72.8% new-code coverage against an 80% requirement and failed the new-code security rating. The analysis reported 31 unresolved findings. These results apply to the internal docking integration. [Main workflow](https://github.com/stephenlclarke/meridian/actions/runs/44397835463)
 

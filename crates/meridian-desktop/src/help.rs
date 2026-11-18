@@ -32,6 +32,25 @@ impl Panel {
         )
     }
 
+    pub fn commander(has_berth: bool) -> Self {
+        let mut panel = Self::new(
+            "Commander details",
+            &["F5 Save | F9 Reload | F11 Fullscreen | Escape Save/Quit"],
+        );
+        if has_berth {
+            panel
+                .lines
+                .insert(0, "L Launch | 0 Commander details".into());
+            panel.lines.insert(
+                1,
+                "1 Galaxy | 2 System | 3 Showroom | 4 Market | 5 Equipment".into(),
+            );
+        } else {
+            panel.lines.insert(0, "Enter Resume flight".into());
+        }
+        panel
+    }
+
     pub fn flight(weapon: Option<&str>, review: Option<&str>) -> Self {
         let mut panel = Self::new(
             "Flight controls",
@@ -43,9 +62,9 @@ impl Panel {
                 "F3 Launch one missile | F4 Safe and clear target",
                 "J Jump to selected route | P Pause / resume",
                 "F6 Flight lesson | F12 Cancel | C Lesson details",
-                "I Mission details",
+                "I Mission details and missile status",
                 "Hold U 10 seconds: EMP | Release U cancels unfinished charge",
-                "F7 Close attempt | F8 Reception | F10 Practice review",
+                "F7 Close attempt | F8 Reception | F10 Practice review at Avenor berth",
                 "4 Trade review | 5 Plan | 6 Cancel | 7 Details",
                 "F5 Save | F9 Reload | F11 Fullscreen | Escape Save/Quit",
             ],
@@ -76,7 +95,9 @@ impl Panel {
                 "V Review deliveries | X Review abandonment",
                 "Enter Confirm review | B Cancel review",
                 "F6 Flight lesson | F12 Cancel | C Lesson details",
-                "F5 Save | F9 Reload | P Pause | Escape Save/Quit",
+                "F7 Close practice | F8 Reception | F10 Practice review",
+                "6 Cancel trade lesson | 7 Trade lesson details",
+                "F5 Save | F9 Reload | P Pause | F11 Fullscreen | Escape Save/Quit",
             ],
         );
         panel.navigation();
@@ -157,7 +178,7 @@ impl Panel {
 
     fn navigation(&mut self) {
         self.lines.extend([
-            "1 Galaxy | 2 System | 3 Showroom | 4 Market | 5 Equipment".into(),
+            "0 Commander | 1 Galaxy | 2 System | 3 Showroom | 4 Market | 5 Equipment".into(),
             "Tab / Shift+Tab Next / previous station screen".into(),
             "Escape Back: leave search/details/options, then the HUD".into(),
             "Ctrl+Shift+X XYZZY testing menu (docked commander only)".into(),

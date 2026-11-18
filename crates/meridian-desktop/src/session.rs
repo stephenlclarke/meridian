@@ -501,6 +501,7 @@ impl Session {
         if self.show_objective
             && let Some(objective) = presentation::objective(world)
         {
+            append_missile_panel(world, world.snapshot().mode, lines);
             append_paragraph(lines, objective.description);
             if matches!(
                 objective.kind,
@@ -573,10 +574,10 @@ impl Session {
                     review.remaining_units()
                 ),
                 Choice::Abandon => {
-                    "REVIEW: ABANDON FREIGHT | NO REWARD OR RESTOCK | ENTER / B".into()
+                    "REVIEW: ABANDON FREIGHT | NO REWARD OR RESTOCK | ENTER ABANDONS | B CANCELS".into()
                 }
                 Choice::Accept => {
-                    "REVIEW: ACCEPT EIGHT TONNES FOR RENAS | 730 CR ON COMPLETION | ENTER / B"
+                    "REVIEW: ACCEPT EIGHT TONNES FOR RENAS | 730 CR ON COMPLETION | ENTER ACCEPTS | B CANCELS"
                         .into()
                 }
             }
@@ -595,28 +596,27 @@ impl Session {
         }
     }
 
-    fn append_compact_flight(
-        world: &World,
-        snapshot: meridian_core::Snapshot,
-        lines: &mut Vec<String>,
-    ) {
-        append_missile_panel(world, snapshot.mode, lines);
-        if let Some(line) = practice_line(world) {
+    fn flight_alerts(world: &World, notice: Option<&str>) -> Vec<String> {
+        let mut lines: Vec<String> = notice.into_iter().map(str::to_owned).collect();
+        if world
+            .practice_snapshot()
+            .is_some_and(|practice| practice.status == PracticeStatus::Active)
+            && let Some(line) = practice_line(world)
+        {
             lines.push(line);
         }
-        if let Some(travel) = snapshot.navigation.and_then(|nav| nav.travel) {
+        if let Some(travel) = world.snapshot().navigation.and_then(|nav| nav.travel) {
             lines.push(format!(
                 "JUMP COUNTDOWN: {:.1} SECONDS",
                 travel.remaining_ticks as f32 / 60.0
             ));
         }
-        lines.push("H / ? HELP".into());
+        lines
     }
 
     fn append_flight_status(
         world: &World,
         snapshot: meridian_core::Snapshot,
-        compact_flight: bool,
         lines: &mut Vec<String>,
     ) {
         let credit = world.credits_tenths().unwrap_or(0);
@@ -647,14 +647,12 @@ impl Session {
                     "NONE"
                 }
             ));
-            if !compact_flight {
-                lines.push(match mission.contact {
-                    Some(npc) => format!("CONTACT: {}", npc.name()),
-                    None => "T: CONTACT THE CURRENT STATION CREW WHEN DOCKED".into(),
-                });
-            }
+            lines.push(match mission.contact {
+                Some(npc) => format!("CONTACT: {}", npc.name()),
+                None => "T: CONTACT THE CURRENT STATION CREW WHEN DOCKED".into(),
+            });
         }
-        if !compact_flight && let Some(service) = world.service_snapshot() {
+        if let Some(service) = world.service_snapshot() {
             let market = service
                 .current_market
                 .map(|quote| {
@@ -706,8 +704,24 @@ impl Session {
         }
     }
 
+    pub(crate) fn hud_panel_open(&self) -> bool {
+        self.help_review().is_some()
+            || self.show_trade_lesson
+            || self.show_flight_lesson
+            || self.show_objective
+            || self.equipment_open
+            || self.market_open
+    }
+
     pub fn lines(&self, world: &World, active: bool, notice: Option<&str>) -> Vec<String> {
         let snapshot = world.snapshot();
+        if !self.hud_panel_open() {
+            match snapshot.mode {
+                FlightMode::Docked => return notice.into_iter().map(str::to_owned).collect(),
+                FlightMode::Flight => return Self::flight_alerts(world, notice),
+                FlightMode::Launching => {}
+            }
+        }
         let name = snapshot
             .navigation
             .map(|n| match n.system {
@@ -745,20 +759,8 @@ impl Session {
         if self.append_flight_lesson_panel(world, &mut lines) {
             return lines;
         }
-        let compact_flight = snapshot.mode == FlightMode::Flight
-            && self.pending_practice.is_none()
-            && self.pending.is_none()
-            && !self.show_objective
-            && !self.equipment_open
-            && !self.market_open;
-        if compact_flight {
-            Self::append_compact_flight(world, snapshot, &mut lines);
-            return lines;
-        }
-        if !compact_flight {
-            lines.push(review_line);
-            lines.push(self.panel_controls().into());
-        }
+        lines.push(review_line);
+        lines.push(self.panel_controls().into());
         if let Some(selection) = self.pending_practice {
             let terms = practice_terms(selection);
             append_paragraph(&mut lines, terms);
@@ -785,7 +787,7 @@ impl Session {
         if let Some(line) = practice_line(world) {
             lines.push(line);
         }
-        Self::append_flight_status(world, snapshot, compact_flight, &mut lines);
+        Self::append_flight_status(world, snapshot, &mut lines);
         lines
     }
 }
@@ -1016,12 +1018,11 @@ mod tests {
             .prepare_practice_confirmation(review, 0)
             .unwrap_or_else(|e| panic!("{e}"))
             .commit();
-        assert!(
-            session
-                .lines(&world, true, None)
-                .join("\n")
-                .contains("F7 REVIEW CLOSURE")
-        );
+        assert!(session.lines(&world, true, None).is_empty());
+        let original = world
+            .practice_ledger_snapshot()
+            .and_then(|ledger| ledger.active)
+            .unwrap_or_else(|| panic!("missing consented attempt"));
         session
             .command(&mut world, Action::ReviewPracticeClosure)
             .unwrap_or_else(|e| panic!("{e}"));
@@ -1046,28 +1047,55 @@ mod tests {
             .prepare_practice_closure(review, 0)
             .unwrap_or_else(|e| panic!("{e}"))
             .commit();
-        let closed = session.lines(&world, true, None).join("\n");
-        assert!(closed.contains("PRACTICE ABANDONED | F10 REVIEW NEW ATTEMPT"));
+        assert!(session.lines(&world, true, None).is_empty());
+        let closed = world
+            .practice_ledger_snapshot()
+            .unwrap_or_else(|| panic!("missing practice history"));
+        assert_eq!(closed.active, None);
+        assert_eq!(closed.attempts.len(), 1);
+        assert_eq!(closed.attempts[0].id, original);
+        assert_eq!(closed.attempts[0].outcome, Some(PracticeOutcome::Abandoned));
+        assert_eq!(closed.trace, None);
         session
             .command(&mut world, Action::MissionDetails)
             .unwrap_or_else(|e| panic!("{e}"));
         let history = session.lines(&world, true, None).join("\n");
         assert!(history.contains("ABANDONED 1"));
         assert!(history.contains("TRACE NOT YET RECORDED"));
-        session.invalidate();
-        let review = world.review_practice(0).unwrap_or_else(|e| panic!("{e}"));
+        session
+            .command(&mut world, Action::ReviewPractice)
+            .unwrap_or_else(|e| panic!("{e}"));
+        let fresh_review = session.lines(&world, true, None).join(" ");
+        assert!(fresh_review.contains("PRACTICE REVIEW | ENTER CONFIRMS AND SAVES | B CANCELS"));
+        assert!(fresh_review.contains("Hit the three uncrewed beacons"));
+        let Some(PracticeSelection::Consent(review)) = session.pending_practice.take() else {
+            panic!("fresh practice consent review missing");
+        };
         world
             .prepare_practice_confirmation(review, 0)
             .unwrap_or_else(|e| panic!("{e}"))
             .commit();
-        let fresh = session.lines(&world, true, None).join("\n");
-        assert!(fresh.contains("PRACTICE ACCEPTED | L LAUNCH"));
-        assert!(!fresh.contains("PRACTICE ABANDONED"));
-        assert!(!fresh.contains("F8 REVIEW"));
+        assert_eq!(
+            world.practice_snapshot().map(|practice| practice.status),
+            Some(PracticeStatus::Consented)
+        );
+        let fresh = world
+            .practice_ledger_snapshot()
+            .unwrap_or_else(|| panic!("missing new attempt"));
+        assert_eq!(fresh.attempts.len(), 2);
+        assert_eq!(fresh.attempts[0], closed.attempts[0]);
+        assert_eq!(fresh.active, Some(fresh.attempts[1].id));
+        assert_ne!(fresh.active, Some(original));
+        assert!(
+            session
+                .command(&mut world, Action::ReviewPracticeReception)
+                .is_err()
+        );
+        assert!(session.lines(&world, true, None).is_empty());
     }
 
     #[test]
-    fn default_flight_overlay_keeps_warning_and_help_without_debug_rows() {
+    fn ordinary_flight_only_draws_current_alerts_even_when_unfocused() {
         let mut world = World::new_commander(84801).unwrap_or_else(|e| panic!("{e}"));
         world.request_launch(0).unwrap_or_else(|e| panic!("{e}"));
         world
@@ -1076,19 +1104,15 @@ mod tests {
         let ui = Session::default();
         let before = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
         let lines = ui.lines(&world, true, Some("ENTRY REFUSED: SLOW DOWN"));
-        assert!(lines.len() <= 8, "{} overlay lines", lines.len());
-        assert!(lines[1].contains("ENTRY REFUSED"));
-        let text = lines.join(" ");
-        for required in ["MISSILES", "H / ? HELP"] {
-            assert!(text.contains(required), "{required}");
+        assert_eq!(lines, ["ENTRY REFUSED: SLOW DOWN"]);
+        for active in [true, false] {
+            assert!(ui.lines(&world, active, None).is_empty());
         }
-        assert!(!text.contains("POSITION "));
-        assert!(!text.contains("THRUST"));
         assert_eq!(world.save_bytes().unwrap_or_else(|e| panic!("{e}")), before);
     }
     #[test]
     fn missile_controls_cycle_actual_locks_consume_a_round_and_continue_state() {
-        fn assert_visible(session: &Session, world: &World, warning: &str) {
+        fn assert_visible(session: &Session, world: &World) {
             let lines = session.lines(world, true, None);
             let budget = crate::hud::line_budget(640, 360);
             assert!(
@@ -1101,12 +1125,26 @@ mod tests {
                 .take(budget)
                 .collect::<Vec<_>>()
                 .join("\n");
-            for required in ["MISSILES", "PRACTICE BEACONS", warning, "H / ? HELP"] {
-                assert!(
-                    visible.contains(required),
-                    "Visible flight HUD omitted {required}"
-                );
-            }
+            assert!(visible.contains("PRACTICE BEACONS"));
+            let cockpit = crate::hud::cockpit::Cockpit::capture(world, world.snapshot())
+                .unwrap_or_else(|e| panic!("{e}"));
+            let state = world
+                .missile_snapshot()
+                .unwrap_or_else(|| panic!("missile status"));
+            assert_eq!(cockpit.armed, state.armed);
+            assert_eq!(
+                cockpit.locked,
+                state.lock.is_some() || state.npc_lock.is_some()
+            );
+            assert_eq!(
+                cockpit.missiles,
+                world
+                    .missile_rounds()
+                    .unwrap_or_else(|| panic!("missile rack"))
+                    .iter()
+                    .flatten()
+                    .count()
+            );
         }
         let mut world = World::new_commander(991).unwrap_or_else(|error| panic!("{error}"));
         let review = world
@@ -1123,7 +1161,7 @@ mod tests {
             .step(meridian_core::FlightInput::default())
             .unwrap_or_else(|error| panic!("{error}"));
         let mut session = Session::from_world(&world);
-        assert_visible(&session, &world, "H / ? HELP");
+        assert_visible(&session, &world);
         let before = world
             .missile_snapshot()
             .unwrap_or_else(|| panic!("Expected missile_snapshot"));
@@ -1156,7 +1194,7 @@ mod tests {
             .command(&mut world, Action::ToggleMissileArm)
             .unwrap_or_else(|error| panic!("{error}"));
         assert!(world.save_bytes().is_ok());
-        assert_visible(&session, &world, "H / ? HELP");
+        assert_visible(&session, &world);
         session
             .command(&mut world, Action::ClearMissile)
             .unwrap_or_else(|error| panic!("{error}"));
@@ -1170,7 +1208,7 @@ mod tests {
         session
             .command(&mut world, Action::FireMissile)
             .unwrap_or_else(|error| panic!("{error}"));
-        assert_visible(&session, &world, "H / ? HELP");
+        assert_visible(&session, &world);
         let after = world
             .missile_snapshot()
             .unwrap_or_else(|| panic!("Expected missile_snapshot"));
@@ -1192,12 +1230,7 @@ mod tests {
             projectile.target,
             meridian_core::MissileTarget::Practice(beacons[0].id)
         );
-        assert!(
-            session
-                .lines(&world, true, None)
-                .iter()
-                .any(|s| s.contains("H / ? HELP"))
-        );
+        assert_visible(&session, &world);
         session
             .command(&mut world, Action::ClearMissile)
             .unwrap_or_else(|error| panic!("{error}"));
@@ -1260,8 +1293,11 @@ mod tests {
             world.mission_snapshot(),
             world.credits_tenths(),
         );
-        let lines = ui.lines(&world, false, None);
-        assert!(lines.iter().any(|l| l.contains("H / ? HELP")));
+        assert!(ui.lines(&world, false, None).is_empty());
+        assert!(ui.help_review().is_none());
+        let help = crate::help::Panel::docked(ui.help_review());
+        assert_eq!(help.title, "Station controls");
+        assert!(help.lines.iter().any(|line| line.contains("P Pause")));
         assert_eq!(
             before,
             (

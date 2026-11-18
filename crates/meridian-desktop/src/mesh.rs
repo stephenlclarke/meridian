@@ -1,6 +1,8 @@
 use meridian_core::docking::{Basis3, DockingPort, RigidPose, StationPose, Vec3};
 use meridian_core::{PRACTICE_HALF_SIDE, PracticeBeaconSnapshot, PulseShot, Snapshot};
 
+mod station_finish;
+mod station_seams;
 pub mod traffic;
 
 #[repr(C)]
@@ -15,7 +17,10 @@ pub fn load_ship() -> Result<Vec<Vertex>, String> {
 }
 
 pub fn load_station() -> Result<Vec<Vertex>, String> {
-    decode_mesh(include_bytes!("../../../assets/legacy/sh028.mesh"))
+    let mut mesh = decode_mesh(include_bytes!("../../../assets/legacy/sh028.mesh"))?;
+    station_seams::append(&mut mesh)?;
+    station_finish::apply(&mut mesh);
+    Ok(mesh)
 }
 
 /// Presentation borrows content and the authoritative station frame; it grants no admission.

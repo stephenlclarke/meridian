@@ -86,6 +86,27 @@ enum FrameAdvance {
 
 const DEFAULT_FLIGHT_WINDOW: [u32; 2] = [1280, 720];
 
+#[derive(Clone, Default, Debug, PartialEq, Eq)]
+struct Notice {
+    text: Option<String>,
+    expires: Option<Instant>,
+}
+
+impl Notice {
+    fn set(&mut self, message: String) {
+        self.text = Some(message);
+        self.expires = Some(Instant::now() + std::time::Duration::from_secs(4));
+    }
+
+    fn expire(&mut self, now: Instant) -> bool {
+        if self.expires.is_some_and(|deadline| deadline <= now) {
+            *self = Self::default();
+            return true;
+        }
+        false
+    }
+}
+
 struct App {
     game: Profile,
     validation_view: FlightView,
@@ -99,6 +120,7 @@ struct App {
     xyzzy: Option<crate::xyzzy::Menu>,
     focused: bool,
     docked: Option<Docked>,
+    commander_open: bool,
     modifiers: ModifiersState,
     cursor: [f64; 2],
     dragging: bool,
@@ -107,7 +129,7 @@ struct App {
     last_frame: Instant,
     clock: FixedClock,
     error: Option<String>,
-    notice: Option<String>,
+    notice: Notice,
     pulse: Option<PulseShot>,
     mining: Option<asteroid_render::MiningVisual>,
     missile_bodies: Vec<meridian_core::ProjectileSnapshot>,
@@ -119,7 +141,23 @@ impl App {
     }
     fn from_launch(launch: mule_validation::Launch) -> Result<Self, Box<dyn Error>> {
         let view = launch.camera_view();
-        let mut app = Self::with_profile(launch.open()?);
+        let mut app = match launch {
+            mule_validation::Launch::Profile(directory) => {
+                let (game, notice) = Profile::open_startup(directory, fresh_profile_seed())?;
+                let mut app = Self::with_profile(game);
+                app.commander_open = true;
+                app.paused = app
+                    .game
+                    .world
+                    .mission_snapshot()
+                    .is_some_and(|mission| mission.paused);
+                if let Some(notice) = notice {
+                    app.notice.set(notice);
+                }
+                app
+            }
+            launch => Self::with_profile(launch.open()?),
+        };
         app.validation_view = view;
         Ok(app)
     }
@@ -139,6 +177,7 @@ impl App {
             xyzzy: None,
             focused: true,
             docked: None,
+            commander_open: false,
             modifiers: ModifiersState::empty(),
             cursor: [0.0; 2],
             dragging: false,
@@ -147,7 +186,7 @@ impl App {
             last_frame: Instant::now(),
             clock: FixedClock::default(),
             error: None,
-            notice: None,
+            notice: Notice::default(),
             pulse: None,
             mining: None,
             missile_bodies: Vec::with_capacity(crate::mesh::MAX_MISSILE_PROJECTILES),
@@ -167,7 +206,28 @@ impl App {
     }
 
     fn simulation_active(&self) -> bool {
-        self.focused && !self.occluded && !self.paused && !self.modal_open() && self.game.playing()
+        self.focused
+            && !self.occluded
+            && !self.paused
+            && !self.commander_open
+            && !self.modal_open()
+            && self.game.playing()
+    }
+
+    fn timed_hud_notices(&self) -> bool {
+        self.game.playing()
+            && matches!(
+                self.game.world.snapshot().mode,
+                FlightMode::Docked | FlightMode::Flight
+            )
+            && !self.game.is_internal_validation()
+            && !self.commander_open
+            && !self.modal_open()
+            && !self.quit_failed
+    }
+
+    fn expire_hud_notice(&mut self, now: Instant) -> bool {
+        self.timed_hud_notices() && self.notice.expire(now)
     }
 
     fn modal_open(&self) -> bool {
@@ -194,6 +254,9 @@ impl App {
     fn help_panel(&self) -> crate::help::Panel {
         if let Some(menu) = &self.xyzzy {
             return menu.help();
+        }
+        if self.commander_open && self.game.playing() {
+            return crate::help::Panel::commander(self.has_berth());
         }
         if !self.game.playing() {
             return crate::help::Panel::title();
@@ -259,7 +322,7 @@ impl App {
                     self.xyzzy = Some(crate::xyzzy::Menu::default());
                     self.clear_held_input();
                 } else {
-                    self.notice = Some(
+                    self.notice.set(
                         "XYZZY testing requires a commander at an actual station berth".into(),
                     );
                 }
@@ -300,11 +363,11 @@ impl App {
         let action = menu.action();
         match self.game.xyzzy(action) {
             Ok(message) => {
-                self.notice = Some(message);
+                self.notice.set(message);
                 self.xyzzy = None;
                 self.sync_profile_controls();
             }
-            Err(message) => self.notice = Some(message),
+            Err(message) => self.notice.set(message),
         }
     }
 
@@ -319,13 +382,14 @@ impl App {
         }
         self.game.session.invalidate();
         if self.game.playing()
+            && !self.commander_open
             && !self.game.is_internal_validation()
             && let Err(error) = self.game.world.request_pause(
                 self.paused || !self.focused || self.occluded,
                 self.game.world.snapshot().tick,
             )
         {
-            self.notice = Some(error.to_string());
+            self.notice.set(error.to_string());
         }
         self.request_redraw();
     }
@@ -350,6 +414,15 @@ impl App {
             }
             return;
         }
+        if code == KeyCode::Digit0 && !self.commander_open && self.has_berth() {
+            self.show_station_commander();
+            self.request_redraw();
+            return;
+        }
+        if self.commander_open && self.commander_key(code) {
+            self.request_redraw();
+            return;
+        }
         let global = matches!(
             code,
             KeyCode::F5 | KeyCode::F9 | KeyCode::F11 | KeyCode::KeyP
@@ -372,7 +445,7 @@ impl App {
             KeyCode::Escape => self.request_quit(event_loop),
             KeyCode::KeyQ if self.quit_failed => event_loop.exit(),
             KeyCode::KeyN if !self.game.playing() => {
-                self.notice = Some(match self.game.new_commander(fresh_profile_seed()) {
+                let message = match self.game.new_commander(fresh_profile_seed()) {
                     Ok(true) => {
                         self.sync_profile_controls();
                         "New commander ready".into()
@@ -381,16 +454,12 @@ impl App {
                         "Press N again to confirm new game; existing save is not changed yet".into()
                     }
                     Err(error) => error,
-                });
+                };
+                self.notice.set(message);
             }
             KeyCode::KeyC if !self.game.playing() => self.load_profile(),
             KeyCode::F9 if self.game.playing() => self.load_profile(),
-            KeyCode::F5 if self.game.playing() => {
-                self.notice = Some(match self.game.save() {
-                    Ok(message) => message,
-                    Err(error) => error,
-                });
-            }
+            KeyCode::F5 if self.game.playing() => self.save_profile(),
             KeyCode::KeyP if self.game.playing() => {
                 self.quit_failed = false;
                 self.paused = !self.paused;
@@ -411,21 +480,99 @@ impl App {
         self.request_redraw();
     }
 
+    fn has_berth(&self) -> bool {
+        self.game.playing() && self.game.world.current_dock_context().is_some()
+    }
+
+    fn show_station_commander(&mut self) {
+        if self.menu_active()
+            && let Some(menu) = &mut self.docked
+            && menu.review_pending()
+        {
+            menu.feedback("Confirm or cancel the current review first".into());
+            return;
+        }
+        self.commander_open = true;
+        self.notice = Notice::default();
+        self.clear_held_input();
+    }
+
+    fn leave_commander(&mut self) {
+        self.commander_open = false;
+        self.quit_failed = false;
+        self.reset_input();
+    }
+
+    // Returns false for shared profile and window shortcuts handled by key().
+    fn commander_key(&mut self, code: KeyCode) -> bool {
+        match code {
+            KeyCode::Escape | KeyCode::F11 => return false,
+            KeyCode::KeyN | KeyCode::KeyC if !self.game.playing() => return false,
+            KeyCode::KeyP | KeyCode::KeyQ if self.quit_failed => return false,
+            KeyCode::F5 | KeyCode::F9 if self.game.playing() => return false,
+            KeyCode::Digit1
+            | KeyCode::Digit2
+            | KeyCode::Digit3
+            | KeyCode::Digit4
+            | KeyCode::Digit5 => {
+                if self.open_menu_key(code)
+                    && self
+                        .docked
+                        .as_ref()
+                        .is_some_and(|menu| menu.active(&self.game.world))
+                {
+                    self.leave_commander();
+                }
+            }
+            KeyCode::KeyL if self.has_berth() => self.launch_from_commander(),
+            KeyCode::Enter if self.game.playing() && !self.has_berth() => {
+                self.paused = false;
+                self.leave_commander();
+            }
+            _ => {}
+        }
+        true
+    }
+
+    fn launch_from_commander(&mut self) {
+        let tick = self.game.world.snapshot().tick;
+        match self.game.world.request_launch_from_commander(tick) {
+            Ok(()) => {
+                self.paused = false;
+                self.leave_commander();
+                self.notice
+                    .set("Launch admitted. Follow the exit corridor.".into());
+            }
+            Err(error) => self.notice.set(error.to_string()),
+        }
+    }
+
+    fn save_profile(&mut self) {
+        self.notice.set(match self.game.save() {
+            Ok(message) => message,
+            Err(error) => error,
+        });
+    }
+
     fn sync_profile_controls(&mut self) {
         self.paused = self.game.world.mission_snapshot().is_some_and(|m| m.paused);
         self.quit_failed = false;
         self.reset_input();
+        if self.commander_open {
+            self.docked = None;
+            return;
+        }
         self.docked = match Docked::new(&self.game.world) {
             Ok(mut menu) => {
                 if self.game.world.current_dock_context().is_some()
                     && let Err(error) = menu.open(&self.game.world, ui::Screen::System)
                 {
-                    self.notice = Some(error);
+                    self.notice.set(error);
                 }
                 Some(menu)
             }
             Err(error) => {
-                self.notice = Some(error);
+                self.notice.set(error);
                 None
             }
         };
@@ -435,14 +582,15 @@ impl App {
         match self.game.continue_saved() {
             Ok(()) => {
                 self.sync_profile_controls();
-                self.notice =
-                    Some("Commander continued; select the actual current crew with T".into());
+                self.notice.set(if self.commander_open {
+                    "Commander loaded".into()
+                } else {
+                    "Commander continued; select the actual current crew with T".into()
+                });
             }
-            Err(error) => {
-                self.notice = Some(format!(
-                    "Continue refused; save and current game retained: {error}"
-                ))
-            }
+            Err(error) => self.notice.set(format!(
+                "Continue refused; save and current game retained: {error}"
+            )),
         }
     }
 
@@ -461,16 +609,19 @@ impl App {
                 self.paused = true;
                 self.reset_input();
                 self.quit_failed = true;
-                self.notice = Some(format!("P resumes; Q quits without saving again. {error}"));
+                self.notice
+                    .set(format!("P resumes; Q quits without saving again. {error}"));
                 self.request_redraw();
             }
         }
     }
 
     fn menu_active(&self) -> bool {
-        self.docked
-            .as_ref()
-            .is_some_and(|menu| menu.active(&self.game.world))
+        !self.commander_open
+            && self
+                .docked
+                .as_ref()
+                .is_some_and(|menu| menu.active(&self.game.world))
     }
     fn menu_input(&mut self, input: ui::Input) {
         if self.modal_open() {
@@ -484,7 +635,7 @@ impl App {
         self.request_redraw();
     }
     fn open_menu_key(&mut self, code: KeyCode) -> bool {
-        if !self.game.playing() || self.game.world.current_dock_context().is_none() {
+        if !self.has_berth() {
             return false;
         }
         let screen = match code {
@@ -501,7 +652,7 @@ impl App {
             match Docked::new(&self.game.world) {
                 Ok(menu) => self.docked = Some(menu),
                 Err(error) => {
-                    self.notice = Some(error);
+                    self.notice.set(error);
                     return true;
                 }
             }
@@ -554,7 +705,7 @@ impl App {
 
     fn game_key(&mut self, code: KeyCode) {
         if code == KeyCode::KeyU && self.game.world.snapshot().mode == FlightMode::Flight {
-            self.notice = Some("EMP: hold U for ten seconds; release to cancel. Recent-attacker self-defence only.".into());
+            self.notice.set("EMP: hold U for ten seconds; release to cancel. Recent-attacker self-defence only.".into());
             return;
         }
         let action = match code {
@@ -601,7 +752,7 @@ impl App {
             KeyCode::BracketRight => Action::NextCommodity,
             _ => return,
         };
-        self.notice = Some(match self.game.command(action) {
+        self.notice.set(match self.game.command(action) {
             Ok(message) => message,
             Err(error) => error,
         });
@@ -631,13 +782,13 @@ impl App {
         let frame_refusal = match result {
             Ok(refusal) => refusal,
             Err(error) if matches!(error, StepError::Collision | StepError::UnsafeEntry) => {
-                self.notice = Some(error.to_string());
+                self.notice.set(error.to_string());
                 None
             }
             Err(error) => return FrameAdvance::Fatal(error),
         };
         if let Some(refusal) = frame_refusal {
-            self.notice = Some(
+            self.notice.set(
                 match refusal {
                     MotionRefusal::CelestialContact => {
                         "Celestial contact: stopped before the physical surface"
@@ -703,6 +854,9 @@ impl App {
                 if self.route_xyzzy(code, repeat) {
                     return None;
                 }
+                if self.commander_open {
+                    return (!repeat).then_some(code);
+                }
                 if self.menu_active()
                     && self.docked.as_ref().is_some_and(Docked::search_active)
                     && let Some(text) = text.filter(|s| s.chars().all(|c| !c.is_control()))
@@ -764,6 +918,13 @@ impl App {
         viewport: impl FnOnce(Option<&Renderer>) -> Option<[f64; 2]>,
     ) -> Result<Option<ui::Frame>, String> {
         let renderer = self.renderer.as_ref();
+        if self.commander_open {
+            return Ok(viewport(renderer)
+                .and_then(|[width, height]| ui::Viewport::new(width, height))
+                .map(|viewport| {
+                    ui::commander_frame(&self.game, viewport, self.notice.text.as_deref())
+                }));
+        }
         Self::build_docked_frame(
             self.menu_active(),
             || viewport(renderer),
@@ -782,7 +943,7 @@ impl App {
     ) -> Result<PreparedPresentation, String> {
         let hud_lines = self
             .game
-            .lines(active, pulse_notice.or(self.notice.as_deref()));
+            .lines(active, pulse_notice.or(self.notice.text.as_deref()));
         let docked_frame =
             self.docked_frame(if self.modal_open() { 0.0 } else { elapsed }, viewport)?;
         Ok(PreparedPresentation {
@@ -814,12 +975,20 @@ impl App {
     ) -> Result<(), String> {
         match presented {
             Ok(Presentation::Presented) => {
-                if let (Some(menu), Some(frame)) = (docked, docked_frame) {
+                if let (Some(menu), Some(frame)) = (docked, docked_frame)
+                    && frame.screen.is_some()
+                {
                     menu.presented(frame);
                 }
             }
             Ok(Presentation::Skipped) => {
-                if (help.is_some() || xyzzy.is_some()) && !renderer.is_zero_sized() {
+                if (help.is_some()
+                    || xyzzy.is_some()
+                    || docked_frame
+                        .as_ref()
+                        .is_some_and(|frame| frame.screen.is_none()))
+                    && !renderer.is_zero_sized()
+                {
                     renderer.window.request_redraw();
                 }
             }
@@ -849,19 +1018,25 @@ impl App {
                 && snapshot.mode == FlightMode::Flight
                 && snapshot.tick.saturating_sub(shot.tick) < 5
         });
-        let pulse_notice = self.pulse.map(|shot| match shot.contact {
-            PulseContact::AsteroidBlocked { .. } => "Rock obstructs Pulse: no ore yielded",
-            PulseContact::Npc { .. } => "NPC hull struck",
-            PulseContact::Clear => "Pulse fired",
-            PulseContact::Projectile { .. } => "Pulse intercepted missile",
-            PulseContact::StationBlocked { .. } => "Station struck | legal incident recorded",
-            PulseContact::PracticeBeacon {
-                first_hit: true, ..
-            } => "Practice beacon hit",
-            PulseContact::PracticeBeacon {
-                first_hit: false, ..
-            } => "Practice beacon already counted",
-        });
+        // A contact recorded during this catch-up frame takes precedence over beam feedback.
+        let pulse_notice =
+            self.pulse
+                .filter(|_| frame_refusal.is_none())
+                .map(|shot| match shot.contact {
+                    PulseContact::AsteroidBlocked { .. } => "Rock obstructs Pulse: no ore yielded",
+                    PulseContact::Npc { .. } => "NPC hull struck",
+                    PulseContact::Clear => "Pulse fired",
+                    PulseContact::Projectile { .. } => "Pulse intercepted missile",
+                    PulseContact::StationBlocked { .. } => {
+                        "Station struck | legal incident recorded"
+                    }
+                    PulseContact::PracticeBeacon {
+                        first_hit: true, ..
+                    } => "Practice beacon hit",
+                    PulseContact::PracticeBeacon {
+                        first_hit: false, ..
+                    } => "Practice beacon already counted",
+                });
         let prepared = self.prepare_presentation(active, pulse_notice, elapsed, |r| {
             r.map(Renderer::logical_viewport)
         });
@@ -870,7 +1045,7 @@ impl App {
         else {
             return;
         };
-        self.draw_prepared_frame(event_loop, active, snapshot, frame_refusal, prepared);
+        self.draw_prepared_frame(event_loop, active, snapshot, prepared);
     }
 
     fn frame_title(&self, active: bool, mode: FlightMode) -> String {
@@ -887,15 +1062,21 @@ impl App {
         } else {
             "Meridian"
         };
-        let mode = match mode {
-            FlightMode::Docked => "DOCKED",
-            FlightMode::Launching => "LAUNCHING",
-            FlightMode::Flight => "FLIGHT",
+        let mode = if self.commander_open && !self.game.playing() {
+            "SAVE RECOVERY"
+        } else {
+            match mode {
+                FlightMode::Docked => "DOCKED",
+                FlightMode::Launching => "LAUNCHING",
+                FlightMode::Flight => "FLIGHT",
+            }
         };
         format!(
             "{commander} | {mode} | {} | H / ? Help",
             if modal_open {
                 "MENU"
+            } else if self.commander_open {
+                "COMMANDER"
             } else if active {
                 "RUNNING"
             } else {
@@ -904,31 +1085,11 @@ impl App {
         )
     }
 
-    fn append_contact_notice(hud_lines: &mut Vec<String>, refusal: Option<MotionRefusal>) {
-        let contact_notice = refusal.map(|refusal| match refusal {
-            MotionRefusal::CelestialContact => {
-                "Celestial contact: stopped before the physical surface"
-            }
-            MotionRefusal::AsteroidContact => {
-                "Asteroid hull contact: stopped at last clear position"
-            }
-            MotionRefusal::NpcContact => "NPC hull contact: stopped at last clear position",
-            MotionRefusal::StationContact => "Station contact: stopped at last clear position",
-            MotionRefusal::EntryConditions => {
-                "Entry refused: align with the entrance and slow down"
-            }
-        });
-        if let Some(message) = contact_notice {
-            hud_lines.insert(hud_lines.len().min(1), message.into());
-        }
-    }
-
     fn draw_prepared_frame(
         &mut self,
         event_loop: &ActiveEventLoop,
         active: bool,
         snapshot: meridian_core::Snapshot,
-        frame_refusal: Option<MotionRefusal>,
         prepared: PreparedPresentation,
     ) {
         let PreparedPresentation {
@@ -952,17 +1113,18 @@ impl App {
         }
 
         let traffic = self.game.world.traffic_snapshot();
-        let cockpit = if self.game.playing() && !self.game.is_internal_validation() {
-            match crate::hud::cockpit::Cockpit::capture(&self.game.world, snapshot) {
-                Ok(cockpit) => Some(cockpit),
-                Err(error) => {
-                    self.fail(event_loop, error);
-                    return;
+        let cockpit =
+            if self.game.playing() && !self.commander_open && !self.game.is_internal_validation() {
+                match crate::hud::cockpit::Cockpit::capture(&self.game.world, snapshot) {
+                    Ok(cockpit) => Some(cockpit),
+                    Err(error) => {
+                        self.fail(event_loop, error);
+                        return;
+                    }
                 }
-            }
-        } else {
-            None
-        };
+            } else {
+                None
+            };
         self.missile_bodies.clear();
         self.missile_bodies.extend(
             self.game
@@ -999,9 +1161,8 @@ impl App {
         let xyzzy_panel = self
             .xyzzy
             .as_ref()
-            .map(|menu| menu.panel(&self.game.world, self.notice.as_deref()));
+            .map(|menu| menu.panel(&self.game.world, self.notice.text.as_deref()));
         let title = self.frame_title(active, snapshot.mode);
-        Self::append_contact_notice(&mut hud_lines, frame_refusal.or(snapshot.motion_refusal));
         if let Some(renderer) = &mut self.renderer {
             renderer.window.set_title(&title);
             let station =
@@ -1087,6 +1248,9 @@ impl ApplicationHandler for App {
             Err(error) => self.fail(event_loop, error),
         }
         self.last_frame = Instant::now();
+        if self.commander_open {
+            self.request_redraw();
+        }
     }
 
     fn window_event(&mut self, event_loop: &ActiveEventLoop, id: WindowId, event: WindowEvent) {
@@ -1148,9 +1312,17 @@ impl ApplicationHandler for App {
     }
 
     fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
+        if self.expire_hud_notice(Instant::now()) {
+            self.request_redraw();
+        }
         if let Some(renderer) = &self.renderer {
             if !self.simulation_active() || renderer.is_zero_sized() {
-                event_loop.set_control_flow(ControlFlow::Wait);
+                let until = self
+                    .notice
+                    .expires
+                    .filter(|_| self.timed_hud_notices() && !renderer.is_zero_sized());
+                event_loop
+                    .set_control_flow(until.map_or(ControlFlow::Wait, ControlFlow::WaitUntil));
             } else {
                 event_loop.set_control_flow(ControlFlow::Poll);
                 renderer.window.request_redraw();

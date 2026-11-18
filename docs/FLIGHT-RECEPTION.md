@@ -1,5 +1,7 @@
 # Original T01 flight and reception
 
+In ordinary flight, press **H** or **?** for controls and **C** for flight lesson details. The cockpit instruments show missile readiness. **I** opens mission details and the missile readout.
+
 The [Flight Lesson Preview v0.3.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.3.0-preview.1) is installed and published from protected main `a583b61e4e4536003414ee9f5448131744f62eb2`. Compiled source `152ac26` passed independent whole-source review, 231 top-level Rust tests and 74 Python tests on Mac, Linux and native Windows, strict Clippy and release builds. Main retains 136 of 139 tracked blobs; only README, implementation status and this guide differ. Its distinct tree passed exact-main CI/Sonar with zero open findings. The signed Mac app completed the scoped actual lesson and two cold-continuation pairs recorded in [implementation status](IMPLEMENTATION-STATUS.md). Public downloads and the extracted Mac Developer ID signature were verified. Use the dedicated Flight Lesson launcher/profile or the portable empty saves-v10 directory. Earlier previews and their profiles remain separate. macOS is not notarized; Windows is unsigned, requires the VC++ x64 runtime and has no native interactive acceptance.
 
 ## Immutable source and independent expectations

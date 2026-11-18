@@ -11,6 +11,7 @@ pub use catalogue::{Catalogue, ObjectRecord, Specification, WorldRecord};
 pub use controller::DockedScreens;
 pub use layout::{ChartLayout, Rect, Viewport};
 use meridian_core::{World, navigation::SystemId, station_services::CommodityId};
+pub(crate) use presentation::commander_frame;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Screen {
@@ -372,7 +373,7 @@ pub(super) struct Hit {
 pub struct Frame {
     pub stamp: Stamp,
     pub ui_revision: u64,
-    pub screen: Screen,
+    pub screen: Option<Screen>,
     pub viewport: Viewport,
     pub labels: Vec<Label>,
     pub lines: Vec<Line>,

@@ -119,12 +119,14 @@ pub fn vertices_with_cockpit(
     };
     let count = lines.len().min(line_budget(width, bottom as u32));
     let top = (bottom - count as f32 * 9.0 * scale - 16.0).max(0.0);
-    quad(
-        output,
-        [0.0, top, size[0], bottom],
-        [0.006, 0.012, 0.025],
-        size,
-    );
+    if count > 0 {
+        quad(
+            output,
+            [0.0, top, size[0], bottom],
+            [0.006, 0.012, 0.025],
+            size,
+        );
+    }
     let columns = MAX_COLUMNS.min(((size[0] - 16.0).max(0.0) / (6.0 * scale)) as usize);
     for (line_index, line) in lines.iter().take(count).enumerate() {
         for (column, character) in line.chars().take(columns).enumerate() {
@@ -148,6 +150,15 @@ pub fn vertices_with_cockpit(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn empty_flight_text_draws_no_background_strip() {
+        let mut output = Vec::new();
+        vertices(&["ENTRY REFUSED".into()], 640, 360, &mut output);
+        assert!(!output.is_empty());
+        vertices(&[], 640, 360, &mut output);
+        assert!(output.is_empty());
+    }
+
     #[test]
     fn clipped_tiny_and_zero_views_are_finite_bounded_and_reuse_storage() {
         let lines = vec!["W".repeat(MAX_COLUMNS + 100); MAX_LINES + 20];

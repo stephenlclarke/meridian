@@ -82,10 +82,16 @@ def green(r, g, b):
     return g > 165 and max(r, b) < 90
 
 
-def title_frame(rgb):
+COMMANDER_TITLE = "Meridian | DOCKED | COMMANDER | H / ? Help"
+
+
+def commander_frame(rgb):
+    # Credential rows are white station text under a yellow Commander header.
+    rows = [count_pixels(rgb, (16, y, 410, y + 14), bright) for y in (67, 87, 107, 127)]
     return (
-        count_pixels(rgb, (450, 220, 830, 465), bright, step=4) > 100
-        and count_pixels(rgb, (0, 650, 450, 720), bright) > 40
+        all(hits > 18 for hits in rows)
+        and count_pixels(rgb, (16, 10, 180, 24), lambda r, g, b: min(r, g) > 165 and b < 145) > 18
+        and count_pixels(rgb, (450, 220, 830, 465), bright, step=4) == 0
     )
 
 
@@ -145,15 +151,15 @@ def exercise(app, output, save, receipt):
     receipt["x11_window"] = window
     focus(window)
     phases = receipt["phases"]
-    receipt["stage"] = "title"
-    phases.append(capture_phase(app, window, output, "title", title_frame))
-    if (save / SAVE_NAME).exists():
-        raise RuntimeError("Fresh title unexpectedly created a save")
+    receipt["stage"] = "commander"
+    phases.append(capture_phase(app, window, output, "commander", commander_frame))
+    if phases[-1]["title"] != COMMANDER_TITLE or (save / SAVE_NAME).exists():
+        raise RuntimeError("An empty slot must open Commander details before creating a save")
     receipt["stage"] = "system"
-    press("n")
+    press("2")
     phases.append(capture_phase(app, window, output, "system", system_frame))
     if phases[-1]["title"] != "Meridian | DOCKED | RUNNING | H / ? Help":
-        raise RuntimeError("System frame did not follow ordinary commander creation")
+        raise RuntimeError("System frame did not follow ordinary Commander details")
     receipt["stage"] = "trading"
     press("4")
     phases.append(capture_phase(app, window, output, "trading", trading_frame))
@@ -168,6 +174,27 @@ def exercise(app, output, save, receipt):
     code = app.wait(timeout=20)
     if code:
         raise RuntimeError(f"Desktop normal quit exited {code}")
+
+
+def cold_commander(app, output, save, receipt):
+    receipt["stage"] = "cold map and focus"
+    window = await_result(app, "visible cold X11 window", lambda: mapped_window(app))
+    receipt["x11_window"] = window
+    focus(window)
+    receipt["stage"] = "cold commander first frame"
+    frame = capture_phase(app, window, output, "cold-commander", commander_frame)
+    receipt["phases"].append(frame)
+    receipt["save_sha256_at_first_frame"] = sha256(save / SAVE_NAME)
+    if (frame["title"] != COMMANDER_TITLE
+            or frame["sha256"] != receipt["fresh_commander_frame_sha256"]
+            or receipt["save_sha256_at_first_frame"] != receipt["save_sha256_before_start"]):
+        raise RuntimeError("Cold startup must present the same commander without rewriting its save")
+    receipt["stage"] = "cold normal quit"
+    press("Escape")
+    receipt["normal_quit_sent"] = True
+    code = app.wait(timeout=20)
+    if code:
+        raise RuntimeError(f"Cold desktop normal quit exited {code}")
 
 
 def mule_opening_frame(rgb):
@@ -432,6 +459,18 @@ def main():
             receipt["save_sha256"] = at_stage(
                 receipt, "save and observer", verify_save, observer, save, output, receipt,
             )
+            cold = {
+                "stage": "cold launch", "pid": None, "exit": None, "phases": [],
+                "normal_quit_sent": False, "forced_cleanup": False,
+                "save_sha256_before_start": receipt["save_sha256"],
+                "fresh_commander_frame_sha256": receipt["phases"][0]["sha256"],
+            }
+            receipt["cold"] = cold
+            receipt["stage"] = "cold Commander startup"
+            run_app(argv, env, output, save, cold, journey=cold_commander, log_name="cold-desktop.log")
+            cold["adapter"] = at_stage(cold, "cold backend and desktop log", verify_log, output / "cold-desktop.log")
+            cold_profile = at_stage(cold, "cold native LLVM profile", native_profile_for, output, cold["pid"])
+            cold.update(profraw=cold_profile.name, profraw_sha256=sha256(cold_profile), stage="complete")
         except Exception as error:
             receipt.update(status="failed", failure={"type": type(error).__name__, "message": str(error)})
             try:

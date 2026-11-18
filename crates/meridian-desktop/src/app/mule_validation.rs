@@ -258,7 +258,7 @@ impl super::App {
             _ => return false,
         };
         self.paused = true;
-        self.notice = Some(reason.into());
+        self.notice.set(reason.into());
         true
     }
 

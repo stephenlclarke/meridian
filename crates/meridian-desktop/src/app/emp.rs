@@ -23,7 +23,7 @@ impl App {
                 if let Err(error) = self.game.world.request_emp_trigger(held, tick)
                     && held
                 {
-                    self.notice = Some(error.to_string());
+                    self.notice.set(error.to_string());
                 }
             }
             refusal = step_frame(
@@ -58,6 +58,6 @@ impl App {
             }
             None => return,
         };
-        self.notice = Some(message.into());
+        self.notice.set(message.into());
     }
 }

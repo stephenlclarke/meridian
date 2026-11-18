@@ -1,6 +1,6 @@
 use super::{
     ChartLayout, Context, Control, Frame, Hit, Ink, Key, Label, Line, Marker, ModelPreview,
-    ObjectRecord, OfferQuantity, PlanetPreview, RangeRing, Rect, Review, Screen, Viewport,
+    ObjectRecord, OfferQuantity, PlanetPreview, RangeRing, Rect, Review, Screen, Stamp, Viewport,
     controller::DockedScreens, money,
 };
 use meridian_core::station_services::CommodityId;
@@ -86,12 +86,17 @@ fn start(selected: usize, count: usize, length: usize) -> usize {
         .saturating_sub(count.saturating_sub(1))
         .min(length.saturating_sub(count))
 }
-pub(super) fn project(s: &DockedScreens, c: &Context<'_>, v: Viewport) -> Frame {
-    let mut f = Frame {
-        stamp: c.stamp,
-        ui_revision: s.ui_revision,
-        screen: s.screen,
-        viewport: v,
+fn empty_frame(
+    viewport: Viewport,
+    screen: Option<Screen>,
+    stamp: Stamp,
+    ui_revision: u64,
+) -> Frame {
+    Frame {
+        stamp,
+        ui_revision,
+        screen,
+        viewport,
         labels: Vec::new(),
         lines: Vec::new(),
         markers: Vec::new(),
@@ -99,11 +104,166 @@ pub(super) fn project(s: &DockedScreens, c: &Context<'_>, v: Viewport) -> Frame 
         navigation_cues: Vec::new(),
         models: Vec::new(),
         planets: Vec::new(),
-        hovered: s.hovered,
-        search_active: s.searching,
+        hovered: None,
+        search_active: false,
         hits: Vec::new(),
         model_bounds: None,
+    }
+}
+
+pub(crate) fn commander_frame(
+    profile: &crate::profile::Profile,
+    v: Viewport,
+    notice: Option<&str>,
+) -> Frame {
+    use meridian_core::{FlightMode, navigation::OriginalNavigation};
+
+    let mut f = empty_frame(
+        v,
+        None,
+        Stamp {
+            session: 0,
+            revision: 0,
+        },
+        0,
+    );
+    let canvas = v.canvas();
+    label(&mut f, "COMMANDER DETAILS", 16.0, 10.0, Ink::Yellow, canvas);
+    f.lines.push(Line {
+        from: [16.0, 45.0],
+        to: [v.width - 16.0, 45.0],
+        ink: Ink::Cyan,
+        clip: canvas,
+    });
+    let controls = if !profile.playing() {
+        label(
+            &mut f,
+            "SAVE SLOT RECOVERY",
+            16.0,
+            67.0,
+            Ink::Orange,
+            canvas,
+        );
+        label(
+            &mut f,
+            "C Retry loading the existing commander",
+            16.0,
+            87.0,
+            Ink::White,
+            canvas,
+        );
+        "N New commander | Press N twice to confirm replacement"
+    } else {
+        let world = &profile.world;
+        let snapshot = world.snapshot();
+        let berth = world.current_dock_context();
+        let system = berth
+            .map(|b| b.system())
+            .or(snapshot.navigation.map(|nav| nav.system));
+        let location = system.map_or_else(
+            || "Unknown system".into(),
+            |id| {
+                OriginalNavigation::bundled()
+                    .and_then(|catalogue| catalogue.system(id))
+                    .map_or_else(
+                        |_| format!("Galaxy {} / System {}", id.galaxy, id.system),
+                        |entry| entry.name.to_owned(),
+                    )
+            },
+        );
+        let status = match (berth, snapshot.mode) {
+            (Some(_), _) => "Docked at main station",
+            (None, FlightMode::Launching) => "Launching",
+            (None, FlightMode::Flight)
+                if snapshot.navigation.is_some_and(|nav| nav.travel.is_some()) =>
+            {
+                "In transit"
+            }
+            (None, FlightMode::Flight) => "In flight",
+            (None, FlightMode::Docked) => "Station berth unavailable",
+        };
+        let commander = world
+            .commander_id()
+            .map_or_else(|| "Unavailable".into(), |id| format!("{:016X}", id.seed()));
+        let hull = world
+            .equipment_snapshot()
+            .map_or("Unavailable", |equipment| equipment.definition.hull);
+        let ship = world.player_ship_id().map_or_else(
+            || hull.to_owned(),
+            |id| format!("{hull} / Ship {}", id.ordinal()),
+        );
+        let credits = world.credits_tenths().map_or_else(
+            || "Unavailable".into(),
+            |total| format!("{} CR", money(u64::from(total))),
+        );
+        for (index, row) in [
+            format!("Commander ID  {commander}"),
+            format!("Ship          {ship}"),
+            format!("Location      {location} / {status}"),
+            format!("Credits       {credits}"),
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            label(
+                &mut f,
+                row,
+                16.0,
+                67.0 + 20.0 * index as f64,
+                Ink::White,
+                canvas,
+            );
+        }
+        if berth.is_some() {
+            label(
+                &mut f,
+                "1 Galaxy | 2 System | 3 Showroom | 4 Market | 5 Equipment",
+                16.0,
+                155.0,
+                Ink::Cyan,
+                canvas,
+            );
+            "L Launch | F5 Save | F9 Reload"
+        } else {
+            "Enter Resume flight | F5 Save | F9 Reload"
+        }
     };
+    label(&mut f, controls, 16.0, 175.0, Ink::Cyan, canvas);
+    if let Some(notice) = notice {
+        let area = Rect::new(16.0, 199.0, v.width - 32.0, v.height - 231.0);
+        for (index, row) in wrapped(notice, (area.width / 7.5) as usize)
+            .into_iter()
+            .enumerate()
+        {
+            label(
+                &mut f,
+                row,
+                area.x,
+                area.y + 16.0 * index as f64,
+                Ink::Orange,
+                area,
+            );
+        }
+    }
+    label(
+        &mut f,
+        if profile.playing() {
+            "H / ? HELP | ESC SAVE / QUIT"
+        } else {
+            "H / ? HELP | ESC QUIT"
+        },
+        16.0,
+        v.height - 23.0,
+        Ink::Cyan,
+        canvas,
+    );
+    f
+}
+
+pub(super) fn project(s: &DockedScreens, c: &Context<'_>, v: Viewport) -> Frame {
+    let mut f = empty_frame(v, Some(s.screen), c.stamp, s.ui_revision);
+    f.hovered = s.hovered;
+    f.search_active = s.searching;
     let canvas = v.canvas();
     label(
         &mut f,
@@ -158,14 +318,14 @@ pub(super) fn project(s: &DockedScreens, c: &Context<'_>, v: Viewport) -> Frame 
     label(
         &mut f,
         if let Some(panel) = c.equipment.filter(|panel| !panel.feedback.is_empty()) {
-            format!("H / ? HELP | {}", panel.feedback)
+            format!("0 COMMANDER | H / ? HELP | {}", panel.feedback)
         } else {
             c.bindings
                 .iter()
                 .find(|binding| binding.key == Key::Back)
                 .map_or_else(
-                    || "H / ? HELP".into(),
-                    |binding| format!("{} BACK | H / ? HELP", binding.label),
+                    || "0 COMMANDER | H / ? HELP".into(),
+                    |binding| format!("0 COMMANDER | {} BACK | H / ? HELP", binding.label),
                 )
         },
         footer.x,
