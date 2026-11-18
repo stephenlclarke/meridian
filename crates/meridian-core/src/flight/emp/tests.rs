@@ -505,6 +505,44 @@ fn hold(w: &mut World, target: crate::traffic::NpcId, ticks: usize) {
         w.step(aim_input(w, target)).unwrap();
     }
 }
+fn self_splash_failure_evidence(w: &World, target: crate::traffic::NpcId) -> String {
+    let pulse = &w.emp.pulses[0];
+    let release = &pulse.release;
+    let profile = w
+        .owned_emp()
+        .unwrap()
+        .grades
+        .profile(super::State::energy_stage(w).unwrap())
+        .unwrap();
+    let primary = pulse.contacts[0].point;
+    let delta = crate::docking::Vec3::new(
+        release.player.position.x - primary.x,
+        release.player.position.y - primary.y,
+        release.player.position.z - primary.z,
+    );
+    let length = delta.dot(delta).sqrt();
+    let surface = (length.is_finite() && length > 1e-9).then(|| {
+        let scale = 1.0 / length;
+        let direction =
+            crate::docking::Vec3::new(delta.x * scale, delta.y * scale, delta.z * scale);
+        w.station_data.as_ref().unwrap().player_beam_distance(
+            release.player,
+            primary,
+            direction,
+            profile.range,
+        )
+    });
+    let attenuation = match &surface {
+        Some(Ok(Some(distance))) => Some(profile.splash(*distance)),
+        _ => None,
+    };
+    format!(
+        "release_profile={profile:?}; splash_range={}; primary_to_player_centre={length}; native_player_surface_within_full_range={surface:?}; native_surface_splash_power={attenuation:?}; replayed_contacts={:?}; retained_pulse={pulse:#?}; player_resources={:?}",
+        profile.range / 3.0,
+        release.contacts(w, profile, target),
+        w.flight_resources_snapshot(),
+    )
+}
 #[test]
 fn actual_secret_base_release_spends_once_drains_shield_and_preserves_hull_cargo_and_cash_cold() {
     let mut w = World::new_commander(12001).unwrap();
@@ -580,7 +618,8 @@ fn actual_secret_base_release_spends_once_drains_shield_and_preserves_hull_cargo
             .contacts
             .iter()
             .any(|c| c.victim == scene::Victim::Player),
-        "actual target-centred splash must include the nearby firing hull"
+        "actual target-centred splash must include the nearby firing hull; {}",
+        self_splash_failure_evidence(&w, target)
     );
     let after = w.traffic.emp_resources(target).unwrap();
     assert_eq!(after.0, before.0, "EMP must not be fatal hull damage");
