@@ -3,12 +3,16 @@ use crate::profile::Profile;
 use meridian_core::{FlightStart, OriginalStationData, World, mule::MuleHullSource};
 use std::{ffi::OsString, io, path::PathBuf};
 
+const DOCKING_TICK_LIMIT: u64 = 160;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) enum View {
     Front,
     Rear,
     Far,
     Side,
+    Dock,
+    DockObstructed,
 }
 #[derive(Debug, PartialEq, Eq)]
 pub(super) enum Launch {
@@ -27,10 +31,12 @@ impl Launch {
                 Some("rear") => View::Rear,
                 Some("far") => View::Far,
                 Some("side") => View::Side,
+                Some("dock") => View::Dock,
+                Some("dock-obstructed") => View::DockObstructed,
                 _ => {
                     return Err(io::Error::new(
                         io::ErrorKind::InvalidInput,
-                        "Expected --internal-mule-validation front|rear|far|side; no profile/save arguments",
+                        "Expected --internal-mule-validation front|rear|far|side|dock|dock-obstructed; no profile/save arguments",
                     ));
                 }
             };
@@ -55,7 +61,14 @@ impl Launch {
         match self {
             Self::Profile(directory) => Profile::open(directory),
             Self::Mule(view) => {
-                let world = World::mule_validation_scenario(0x4d55_4c45, observer(view)?)?;
+                const SEED: u64 = 0x4d55_4c45;
+                let world = match view {
+                    View::Dock | View::DockObstructed => {
+                        let (observer, approach) = docking_starts(view == View::DockObstructed)?;
+                        World::mule_docking_validation_scenario(SEED, observer, approach)?
+                    }
+                    _ => World::mule_validation_scenario(SEED, observer(view)?)?,
+                };
                 Profile::mule_validation(world).map_err(|e| io::Error::other(e).into())
             }
         }
@@ -103,6 +116,49 @@ fn observer_source() -> Result<(f64, f64), Box<dyn std::error::Error>> {
         return Err(io::Error::other("Invalid observer radius").into());
     }
     Ok((radius, left))
+}
+
+/// Place the physical observer outside the station front and the inbound hull's lateral sweep.
+fn docking_starts(
+    obstructed: bool,
+) -> Result<(FlightStart, FlightStart), Box<dyn std::error::Error>> {
+    let station = OriginalStationData::bundled()?;
+    let port = station.port().center();
+    let source = MuleHullSource::bundled()?;
+    let (observer_radius, _) = observer_source()?;
+    let reserve = observer_radius * 1.001 + 2.0;
+    let approach_x = port.x + if obstructed { 100.0 } else { 0.0 };
+    let approach = FlightStart {
+        position: [approach_x as f32, port.y as f32, 260.0],
+        orientation: [0.0, 1.0, 0.0, 0.0],
+        speed: if obstructed { 33.2 } else { 4.0 },
+    };
+    let observer_position = [
+        (f64::from(approach.position[0]) - source.maximum_origin_radius() - reserve) as f32,
+        approach.position[1],
+        (port.z + reserve) as f32,
+    ];
+    let (target_x, target_z) = if obstructed {
+        let forward = meridian_core::docking::Vec3::new(0.0, 0.0, 1.0);
+        let nose = source
+            .pieces()
+            .iter()
+            .try_fold(f64::NEG_INFINITY, |extent, piece| {
+                piece.support_bound(forward).map(|value| extent.max(value))
+            })?;
+        (approach_x, port.z + nose)
+    } else {
+        (port.x, port.z)
+    };
+    let yaw = (target_x - f64::from(observer_position[0]))
+        .atan2(target_z - f64::from(observer_position[2]));
+    let (sine, cosine) = (yaw * 0.5).sin_cos();
+    let observer = FlightStart {
+        position: observer_position,
+        orientation: [0.0, sine as f32, 0.0, cosine as f32],
+        speed: 0.0,
+    };
+    Ok((observer, approach))
 }
 
 /// The existing World constructor alone validates station/observer clearance and owns the actor.
@@ -158,6 +214,43 @@ pub(super) enum Control {
     Ignored,
 }
 impl super::App {
+    fn docking_hold(&mut self) -> bool {
+        use meridian_core::traffic::NpcPhase;
+        let Some(frame) = self.game.world.mule_actor_snapshot() else {
+            return false;
+        };
+        let actor = frame.actor();
+        let reason = match actor.phase {
+            NpcPhase::Complete => "CROSSING ACCEPTED",
+            NpcPhase::Approach if frame.motion_refusal().is_some() => "MULE STOPPED",
+            NpcPhase::Approach if frame.world_tick() >= DOCKING_TICK_LIMIT => {
+                "VALIDATION TICK LIMIT REACHED"
+            }
+            _ => return false,
+        };
+        self.paused = true;
+        self.notice = Some(reason.into());
+        true
+    }
+
+    pub(super) fn advance_validation(
+        &mut self,
+        ticks: usize,
+    ) -> Result<Option<meridian_core::MotionRefusal>, meridian_core::StepError> {
+        for _ in 0..ticks {
+            if self.docking_hold() {
+                break;
+            }
+            self.game
+                .world
+                .step(meridian_core::FlightInput::default())?;
+            if self.docking_hold() {
+                break;
+            }
+        }
+        Ok(None)
+    }
+
     /// Host controls only. Every accepted step still calls the real World reducer.
     pub(super) fn validation_control(
         &mut self,
@@ -169,15 +262,17 @@ impl super::App {
         }
         match code {
             KeyCode::Escape | KeyCode::KeyQ => Ok(Control::Quit),
-            KeyCode::KeyP => {
+            KeyCode::KeyP if !self.docking_hold() => {
                 self.paused = !self.paused;
                 self.reset_input();
                 Ok(Control::Updated)
             }
-            KeyCode::Period if self.paused => match self.advance_frame(true, 1) {
-                super::FrameAdvance::Fatal(error) => Err(error),
-                super::FrameAdvance::Continue(_) => Ok(Control::Updated),
-            },
+            KeyCode::Period if self.paused && !self.docking_hold() => {
+                match self.advance_frame(true, 1) {
+                    super::FrameAdvance::Fatal(error) => Err(error),
+                    super::FrameAdvance::Continue(_) => Ok(Control::Updated),
+                }
+            }
             _ => Ok(Control::Ignored),
         }
     }

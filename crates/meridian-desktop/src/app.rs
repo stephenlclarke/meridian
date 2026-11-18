@@ -622,14 +622,7 @@ impl App {
         let result = if active && !self.modal_open() && self.game.is_internal_validation() {
             self.pulse = None;
             self.mining = None;
-            step_frame(
-                &mut self.game.world,
-                FlightInput::default(),
-                ticks,
-                false,
-                &mut self.pulse,
-                &mut self.mining,
-            )
+            self.advance_validation(ticks)
         } else if active && !self.modal_open() {
             let input = FlightInput {
                 pitch: self.axis(KeyCode::ArrowUp, KeyCode::ArrowDown),
@@ -865,6 +858,7 @@ impl App {
                 return;
             }
         };
+        let active = self.simulation_active();
         let snapshot = self.game.world.snapshot();
         // The beam is a short-lived view of the committed shot, never saved or re-fired.
         self.pulse = self.pulse.filter(|shot| {

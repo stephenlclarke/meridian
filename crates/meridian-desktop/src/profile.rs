@@ -482,6 +482,11 @@ impl Profile {
                     frame.generation(),
                     if active { "RUNNING" } else { "PAUSED" }
                 ));
+                lines.push(format!(
+                    "MULE PHASE {:?} | SPEED {:.2}",
+                    frame.actor().phase,
+                    frame.actor().speed_units
+                ));
                 if let Some(refusal) = frame.motion_refusal() {
                     lines.push(format!("WORLD MOTION REFUSED: {refusal:?}"));
                 }

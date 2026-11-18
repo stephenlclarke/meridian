@@ -18,12 +18,14 @@ fn profile(view: View) -> Profile {
 }
 
 #[test]
-fn opt_in_parser_accepts_only_four_exact_internal_forms_and_keeps_normal_save_slot() {
+fn opt_in_parser_accepts_only_six_exact_internal_forms_and_keeps_normal_save_slot() {
     for (name, view) in [
         ("front", View::Front),
         ("rear", View::Rear),
         ("far", View::Far),
         ("side", View::Side),
+        ("dock", View::Dock),
+        ("dock-obstructed", View::DockObstructed),
     ] {
         assert_eq!(
             ok(Launch::parse(args(&["--internal-mule-validation", name]))),
@@ -42,6 +44,7 @@ fn opt_in_parser_accepts_only_four_exact_internal_forms_and_keeps_normal_save_sl
         vec!["--internal-mule-validation", "front", "--save-dir", "slot"],
         vec!["--save-dir", "slot", "--internal-mule-validation", "front"],
         vec!["--internal-mule-validation", "front", "rear"],
+        vec!["--internal-mule-validation", "dock", "--save-dir", "slot"],
         vec![
             "--internal-mule-validation",
             "front",
@@ -328,4 +331,89 @@ fn side_entry_uses_real_pilot_with_read_only_left_view_and_keeps_world_view_unch
         ((observer.position.x - frame.actor().pose.position.x) + left - right + 0.5).abs() < 0.001
     );
     assert!(app.game.world.save_bytes().is_err());
+}
+
+#[test]
+fn docking_modes_hold_the_real_terminal_frame_and_display_its_outcome() {
+    use meridian_core::traffic::{MuleValidationRefusal, NpcPhase};
+
+    for (name, phase, refusal, notice) in [
+        ("dock", NpcPhase::Complete, None, "CROSSING ACCEPTED"),
+        (
+            "dock-obstructed",
+            NpcPhase::Approach,
+            Some(MuleValidationRefusal::StationContact),
+            "MULE STOPPED",
+        ),
+    ] {
+        let mut app = ok(App::from_launch(ok(Launch::parse(args(&[
+            "--internal-mule-validation",
+            name,
+        ])))));
+        let opening = app
+            .game
+            .world
+            .mule_actor_snapshot()
+            .unwrap_or_else(|| panic!("opening frame"));
+        let observer = app
+            .game
+            .world
+            .mule_observer_pose(&opening)
+            .unwrap_or_else(|| panic!("actual observer"));
+        assert_eq!(opening.actor().phase, NpcPhase::Approach);
+        assert!(app.paused && app.game.is_internal_validation());
+        for _ in 0..DOCKING_TICK_LIMIT.div_ceil(6) {
+            assert!(matches!(
+                app.advance_frame(true, 6),
+                FrameAdvance::Continue(None)
+            ));
+            if app.notice.is_some() {
+                break;
+            }
+        }
+        let terminal = app
+            .game
+            .world
+            .mule_actor_snapshot()
+            .unwrap_or_else(|| panic!("terminal frame"));
+        assert_eq!(terminal.actor().phase, phase);
+        assert_eq!(terminal.motion_refusal(), refusal);
+        assert_eq!(terminal.actor().speed_units, 0.0);
+        assert_eq!(terminal.actor().id, opening.actor().id);
+        assert_eq!(app.game.world.mule_observer_pose(&terminal), Some(observer));
+        let port = app
+            .game
+            .world
+            .station_port()
+            .unwrap_or_else(|| panic!("actual port"));
+        assert_eq!(
+            terminal.actor().pose.position.z <= port.center().z,
+            refusal.is_none()
+        );
+        assert!((1..=DOCKING_TICK_LIMIT).contains(&terminal.world_tick()));
+        assert!(app.game.world.current_dock_context().is_none());
+        assert!(app.game.world.save_bytes().is_err());
+        assert_eq!(app.notice.as_deref(), Some(notice));
+        let lines = app.game.lines(false, app.notice.as_deref());
+        assert!(lines.iter().any(|line| line == notice));
+        assert!(
+            lines
+                .iter()
+                .any(|line| line == &format!("MULE PHASE {phase:?} | SPEED 0.00"))
+        );
+        if let Some(refusal) = refusal {
+            assert!(
+                lines
+                    .iter()
+                    .any(|line| line == &format!("WORLD MOTION REFUSED: {refusal:?}"))
+            );
+        }
+        assert_eq!(
+            ok(app.validation_control(KeyCode::Period)),
+            Control::Ignored
+        );
+        assert_eq!(ok(app.validation_control(KeyCode::KeyP)), Control::Ignored);
+        assert!(app.game.world.mule_snapshot_is_current(&terminal));
+        assert_eq!(ok(app.validation_control(KeyCode::Escape)), Control::Quit);
+    }
 }
