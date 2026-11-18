@@ -13,6 +13,7 @@ pub(super) struct Frame {
 impl Bounds {
     // Support interval of n.x-offset. The positive endpoint is strict because
     // the query plane is n.x=offset+epsilon, epsilon>0, in the limiting sense.
+    #[cfg(test)]
     fn meets_outward_plane(&self, face: &Facet, b: &mut Budget) -> Result<bool, Failure> {
         let mut low = -face.offset();
         let mut high = low.clone();
