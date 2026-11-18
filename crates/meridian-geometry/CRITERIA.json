@@ -283,6 +283,16 @@
       "file": "src/live_run_tests.rs",
       "name": "incremental_memberships_follow_each_protected_collinear_and_duplicate_lifetime",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/sections.rs",
+      "name": "inherited_owner_proof_preserves_all_candidates_and_removes_repeat_lookups",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/proved_visit_tests.rs",
+      "name": "strict_box_pruning_matches_frozen_clip_preserves_contacts_and_admits_before_mutation",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -673,6 +683,20 @@
     "contractSHA256": "30e93856a4343891e833f88068b3466148c705c02f3f79f16a5cac6fe0d30e3c",
     "frozenSHA256": "12b14303c6b7c29935302beb6be9653bb219341f44eec674b5400996748d20f1",
     "currentRustCount": 56,
+    "hostCount": 9
+  },
+  "provedVisitCorrection": {
+    "qualifiedRoot": "8d149b01231471899150a5177130e1b7b3090a53",
+    "parentAuthor": "98470c1d4a6d926c4ff51215b28d93ae339f5d20",
+    "parentFocusedRustPass": 56,
+    "parentHostPass": 9,
+    "parentOriginal": "5Operationsrefusals15unrun0candidates",
+    "old56TestsPreserved": true,
+    "currentExecution": "UNRUN",
+    "deltaSHA256": "7c3c7970ec6db5515b775b6bc851e22c5f3439cdbddbadca33a922d2c4ad06ef",
+    "contractSHA256": "a9f7a3bafe846dda6dfc4d475629305c4955081359ff6a28ec043839af8f2b93",
+    "frozenSHA256": "bc4c960a649f3ce24031b0e825c8163968aaa882c2a6293b759cbb3a80a78d9e",
+    "currentRustCount": 58,
     "hostCount": 9
   }
 }

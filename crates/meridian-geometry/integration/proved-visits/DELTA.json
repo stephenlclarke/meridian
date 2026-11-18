@@ -1,0 +1,31 @@
+{
+  "status": "AUTHORED_UNRUN",
+  "parentAuthor": "98470c1d4a6d926c4ff51215b28d93ae339f5d20",
+  "qualifiedRoot": "8d149b01231471899150a5177130e1b7b3090a53",
+  "qualifiedTree": "e2a051207b27ef935d4fc01fb196ff5aab983188",
+  "parentFocused": "56Rust9host/check/Clippy/buildPASS",
+  "actualParentWholeFive": "5decodePASS5OperationsREFUSED15dependentUNRUN0semanticFAIL0candidates0admissions",
+  "correction": "Inherit exact eligible uniform-owner proof instead of repeated descendant map visits; strictly separated barrier box proves original facet clipNone before stable in-place drop.",
+  "charges": "All real visits/arithmetic charged; two coordinate visits per barrier upfront,16scratch; same8/barrier until actualdrop. Four stackfields remain insideold8/depth. No price/cap discount.",
+  "old56AssertionsPreserved": true,
+  "newTests": [
+    {
+      "file": "src/sections.rs",
+      "name": "inherited_owner_proof_preserves_all_candidates_and_removes_repeat_lookups",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/proved_visit_tests.rs",
+      "name": "strict_box_pruning_matches_frozen_clip_preserves_contacts_and_admits_before_mutation",
+      "status": "UNRUN"
+    }
+  ],
+  "currentRustCount": 58,
+  "hostCount": 9,
+  "contractSHA256": "a9f7a3bafe846dda6dfc4d475629305c4955081359ff6a28ec043839af8f2b93",
+  "frozenSHA256": "bc4c960a649f3ce24031b0e825c8163968aaa882c2a6293b759cbb3a80a78d9e",
+  "inverseSHA256": "018059ce39c5651a6619855eafd367102e972bc8dc9b5347d3413c76e4fcc6f8",
+  "parentHandoffSHA256": "3cf918dd84aa98f595a488a98b7465d2580dda235ed288fb485baeb81e804408",
+  "externalRawSHA256": "e65e83c5dca22c9aa0b89afeaa7becabf7a6eaa3cd07fca4bebcb8ffeb0f47c3",
+  "qualification": "Rootwholejoin/G2review/G1focused thenONEchangedwholefive; no diagnostic or unchanged retry"
+}

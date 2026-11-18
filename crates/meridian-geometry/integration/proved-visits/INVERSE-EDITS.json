@@ -1,0 +1,78 @@
+{
+  "certificate.rs": [
+    {
+      "afterStart": 1039,
+      "afterEnd": 1065,
+      "before": "",
+      "after": "// Strict projected-box separation proves that the original convex-domain\n// clip returns None. Equality remains eligible for every contact obligation.\n// The input segment reservations remain live until retain has dropped records.\nfn prune_impossible_barriers(\n    face: &Facet,\n    bounds: &Bounds,\n    barriers: &mut Vec<crate::Segment>,\n    b: &mut Budget,\n) -> Result<(), Failure> {\n    b.with_retained(16, |b| {\n        let lower = project(&bounds.lower, face.axis());\n        let upper = project(&bounds.upper, face.axis());\n        let before = barriers.len();\n        // Both coordinate visits execute for every segment; admission precedes\n        // mutation so an operation refusal preserves the original vector.\n        b.step((2 * before) as u64)?;\n        barriers.retain(|[a, c]| {\n            let x = a[0] < lower[0] && c[0] < lower[0] || a[0] > upper[0] && c[0] > upper[0];\n            let y = a[1] < lower[1] && c[1] < lower[1] || a[1] > upper[1] && c[1] > upper[1];\n            !x && !y\n        });\n        b.release(8 * (before - barriers.len()));\n        Ok(())\n    })\n}\n\n"
+    },
+    {
+      "afterStart": 1148,
+      "afterEnd": 1149,
+      "before": "        let (barriers, coplanar, sections) = b.with_phase(BudgetPhase::Sections, |b| {\n",
+      "after": "        let (mut barriers, coplanar, sections) = b.with_phase(BudgetPhase::Sections, |b| {\n"
+    },
+    {
+      "afterStart": 1160,
+      "afterEnd": 1161,
+      "before": "",
+      "after": "        prune_impossible_barriers(face, face_bounds, &mut barriers, b)?;\n"
+    },
+    {
+      "afterStart": 2305,
+      "afterEnd": 2309,
+      "before": "",
+      "after": "\n#[cfg(test)]\n#[path = \"proved_visit_tests.rs\"]\nmod proved_visit_tests;\n"
+    }
+  ],
+  "sections.rs": [
+    {
+      "afterStart": 329,
+      "afterEnd": 330,
+      "before": "            // Three fields per pending node fit the existing eight-membership\n",
+      "after": "            // Four fields per pending node fit the existing eight-membership\n"
+    },
+    {
+      "afterStart": 331,
+      "afterEnd": 332,
+      "before": "            let mut pending = vec![(self.root, true, true)];\n",
+      "after": "            let mut pending = vec![(self.root, true, true, false)];\n"
+    },
+    {
+      "afterStart": 333,
+      "afterEnd": 336,
+      "before": "            while let Some((index, physical_possible, outward_possible)) = pending.pop() {\n",
+      "after": "            while let Some((index, physical_possible, outward_possible, owner_known)) =\n                pending.pop()\n            {\n"
+    },
+    {
+      "afterStart": 342,
+      "afterEnd": 343,
+      "before": "                let owner_allowed = if outward_possible {\n",
+      "after": "                let owner_allowed = if outward_possible && !owner_known {\n"
+    },
+    {
+      "afterStart": 350,
+      "afterEnd": 351,
+      "before": "                    false\n",
+      "after": "                    outward_possible\n"
+    },
+    {
+      "afterStart": 352,
+      "afterEnd": 353,
+      "before": "",
+      "after": "                let owner_known = owner_known || node.owner.is_some();\n"
+    },
+    {
+      "afterStart": 359,
+      "afterEnd": 361,
+      "before": "                    pending.push((right, physical_possible, outward_possible));\n                    pending.push((left, physical_possible, outward_possible));\n",
+      "after": "                    pending.push((right, physical_possible, outward_possible, owner_known));\n                    pending.push((left, physical_possible, outward_possible, owner_known));\n"
+    },
+    {
+      "afterStart": 1225,
+      "afterEnd": 1324,
+      "before": "",
+      "after": "\n#[cfg(test)]\nmod owner_inheritance_tests {\n    use super::*;\n    use crate::{Limits, SourceId, Vertex};\n    include!(concat!(\n        env!(\"CARGO_MANIFEST_DIR\"),\n        \"/fixtures/proved-visits-reference/compiled-collection-control.rs\"\n    ));\n\n    #[test]\n    fn inherited_owner_proof_preserves_all_candidates_and_removes_repeat_lookups()\n    -> Result<(), Failure> {\n        let mut setup = Budget::new(Limits::default())?;\n        let make = |owner, facet, b: &mut Budget| {\n            Facet::new(\n                SourceId {\n                    component: owner,\n                    facet,\n                },\n                [[-2, -2, -1], [2, -2, 1], [0, 2, 1]].map(|p| Vertex {\n                    point: p.map(integer),\n                    uv: [integer(0), integer(0)],\n                }),\n                \"test\".into(),\n                b,\n            )\n        };\n        let face = Facet::new(\n            SourceId {\n                component: 9,\n                facet: 0,\n            },\n            [[0, 0, 0], [1, 0, 0], [0, 1, 0]].map(|p| Vertex {\n                point: p.map(integer),\n                uv: [integer(0), integer(0)],\n            }),\n            \"test\".into(),\n            &mut setup,\n        )?;\n        let far = Bounds {\n            lower: [integer(10), integer(10), integer(10)],\n            upper: [integer(11), integer(11), integer(11)],\n        };\n        for mode in 0..3 {\n            let mut originals = Vec::new();\n            for i in 0..128 {\n                let owner = match mode {\n                    0 => 1,\n                    1 => 1 + i / 64,\n                    _ => 1 + i % 2,\n                };\n                originals.push(make(owner, i, &mut setup)?);\n            }\n            let index = FacetBoundsIndex::build(&originals, &mut setup)?;\n            for node in &index.nodes {\n                if let (Some(owner), Some([left, right])) = (node.owner, node.children) {\n                    assert_eq!(index.nodes[left].owner, Some(owner));\n                    assert_eq!(index.nodes[right].owner, Some(owner));\n                }\n            }\n            for owners in [\n                BTreeMap::new(),\n                BTreeMap::from([(1, Vec::new())]),\n                BTreeMap::from([(1, Vec::new()), (2, Vec::new())]),\n            ] {\n                for bounds in [&far, &index.facets[0]] {\n                    let mut old = Budget::new(Limits::default())?;\n                    let mut new = Budget::new(Limits::default())?;\n                    let expected = index.owner_inheritance_reference(\n                        &face, bounds, &owners, &originals, &mut old,\n                    )?;\n                    let found = index\n                        .collection_candidates(&face, bounds, &owners, &originals, &mut new)?;\n                    assert_eq!(found, expected);\n                    assert!(new.operations() <= old.operations());\n                    if mode < 2 && owners.contains_key(&1) {\n                        assert!(new.operations() < old.operations());\n                    }\n                    assert_eq!(new.retained_memberships(), 0);\n                    let mut tight = Budget::new(Limits {\n                        storage_memberships: FacetBoundsIndex::stack_members(originals.len()) + 8\n                            - 1,\n                        ..Limits::default()\n                    })?;\n                    assert_eq!(\n                        index\n                            .collection_candidates(&face, bounds, &owners, &originals, &mut tight)\n                            .err()\n                            .map(|e| e.kind),\n                        Some(FailureKind::Storage)\n                    );\n                    assert_eq!(tight.retained_memberships(), 0);\n                }\n            }\n        }\n        Ok(())\n    }\n}\n"
+    }
+  ]
+}

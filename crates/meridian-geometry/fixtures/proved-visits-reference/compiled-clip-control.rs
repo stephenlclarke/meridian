@@ -1,0 +1,38 @@
+fn frozen_key(mut segment: Segment) -> Segment {
+    if segment[1] < segment[0] {
+        segment.swap(0, 1);
+    }
+    segment
+}
+fn frozen_clip(domain: &[Point2], segment: &Segment, b: &mut Budget) -> Result<Option<Segment>, Failure> {
+    let [first, second] = segment;
+    point(first, b)?;
+    point(second, b)?;
+    let (mut low, mut high) = (integer(0), integer(1));
+    for i in 0..domain.len() {
+        let a = &domain[i];
+        let c = &domain[(i + 1) % domain.len()];
+        let x = orient(a, c, first, b)?;
+        let y = orient(a, c, second, b)?;
+        if x.is_negative() && y.is_negative() {
+            return Ok(None);
+        }
+        if x.is_negative() {
+            low = low.max(&x / (&x - &y));
+        } else if y.is_negative() {
+            high = high.min(&x / (&x - &y));
+        }
+    }
+    if low > high {
+        return Ok(None);
+    }
+    let delta = sub(second, first);
+    let result = [
+        add(first, &scale(&delta, &low)),
+        add(first, &scale(&delta, &high)),
+    ];
+    for p in &result {
+        point(p, b)?;
+    }
+    Ok(Some(frozen_key(result)))
+}

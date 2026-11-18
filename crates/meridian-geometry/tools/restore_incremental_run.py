@@ -1,11 +1,13 @@
 """Restore the explicit incremental bookkeeping delta for prior source proofs."""
 import json
 from pathlib import Path
+from restore_proved_visits import restore_proved
 
 CRATE = Path(__file__).resolve().parents[1]
 
 
 def restore_incremental(name, source):
+    source = restore_proved(name, source)
     edits = json.loads((CRATE / 'integration/incremental-run/INVERSE-EDITS.json').read_text())
     if name not in edits:
         return source

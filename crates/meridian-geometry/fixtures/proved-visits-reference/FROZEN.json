@@ -1,0 +1,33 @@
+{
+  "parent": "98470c1d4a6d926c4ff51215b28d93ae339f5d20",
+  "files": {
+    "before-section_arrangement.rs": {
+      "bytes": 18594,
+      "sha256": "f38b42ff3662c384fd2968d1007cbca9e0e32fd55dbd402818dff83f301b9bc0"
+    },
+    "clip-control.rs.txt": {
+      "bytes": 1083,
+      "sha256": "cc4659e8705baab09324be4d86b8ed7d0533bd9e272be8185a16c72f06fc8ab4"
+    },
+    "before-sections.rs": {
+      "bytes": 46246,
+      "sha256": "589bc28032896e9c228450950a7e85146080dc20e87d3772128438e2f3b1f945"
+    },
+    "compiled-collection-control.rs": {
+      "bytes": 3073,
+      "sha256": "52e877a178c610d43fa35a19fb288da73d168d2cc9e9dd53ba285acc59edb8f8"
+    },
+    "collection-control.rs.txt": {
+      "bytes": 3067,
+      "sha256": "d0ead885a8e44c342f19fb8ab6ee18fd532d11c7d111895f1432ab476f3b351c"
+    },
+    "compiled-clip-control.rs": {
+      "bytes": 1104,
+      "sha256": "618a86f0b2cc7c38354df1d2dc8568432c0b7dd9a1308df3300700d20ccad3e1"
+    },
+    "before-certificate.rs": {
+      "bytes": 83357,
+      "sha256": "aba757615b905478715bbbb0510138d06a7f2947521ff4d92d559ae18abc01a4"
+    }
+  }
+}

@@ -159,5 +159,12 @@
     "actualOriginal736": "UNRUN",
     "currentExecution": "UNRUN",
     "sourceFidelity": "Same exact geometry; metadata updates fuse into original charged point visits; no source input, cap or hull admission change"
+  },
+  "provedVisitCorrection": {
+    "qualifiedRoot": "8d149b01231471899150a5177130e1b7b3090a53",
+    "parentHandoffSHA256": "3cf918dd84aa98f595a488a98b7465d2580dda235ed288fb485baeb81e804408",
+    "externalRawSHA256": "e65e83c5dca22c9aa0b89afeaa7becabf7a6eaa3cd07fca4bebcb8ffeb0f47c3",
+    "currentExecution": "UNRUN",
+    "sourceFidelity": "Original facet closedbox clipNone proof; index uniform owner inherited proof; no source inputs, fields, star audits or admissions changed"
   }
 }

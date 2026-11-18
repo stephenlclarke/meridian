@@ -1037,6 +1037,32 @@ impl InputIdentityMaps {
     }
 }
 
+// Strict projected-box separation proves that the original convex-domain
+// clip returns None. Equality remains eligible for every contact obligation.
+// The input segment reservations remain live until retain has dropped records.
+fn prune_impossible_barriers(
+    face: &Facet,
+    bounds: &Bounds,
+    barriers: &mut Vec<crate::Segment>,
+    b: &mut Budget,
+) -> Result<(), Failure> {
+    b.with_retained(16, |b| {
+        let lower = project(&bounds.lower, face.axis());
+        let upper = project(&bounds.upper, face.axis());
+        let before = barriers.len();
+        // Both coordinate visits execute for every segment; admission precedes
+        // mutation so an operation refusal preserves the original vector.
+        b.step((2 * before) as u64)?;
+        barriers.retain(|[a, c]| {
+            let x = a[0] < lower[0] && c[0] < lower[0] || a[0] > upper[0] && c[0] > upper[0];
+            let y = a[1] < lower[1] && c[1] < lower[1] || a[1] > upper[1] && c[1] > upper[1];
+            !x && !y
+        });
+        b.release(8 * (before - barriers.len()));
+        Ok(())
+    })
+}
+
 /// Direct original-component adapter. Inputs are transformed original triangles,
 /// including all disconnected sheets of each component. Every output triangle
 /// retains one original facet and its complete affine field.
@@ -1120,7 +1146,7 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
         if area(&domain, b)?.is_negative() {
             domain.reverse();
         }
-        let (barriers, coplanar, sections) = b.with_phase(BudgetPhase::Sections, |b| {
+        let (mut barriers, coplanar, sections) = b.with_phase(BudgetPhase::Sections, |b| {
             b.with_retained(16, |local| {
                 sections::Frame::collect(
                     face,
@@ -1132,6 +1158,7 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
                 )
             })
         })?;
+        prune_impossible_barriers(face, face_bounds, &mut barriers, b)?;
         // Transfer barrier ownership to the arrangement's existing input bound.
         // Its coplanar scope below admits those references for classification.
         b.release(8 * barriers.len() + coplanar.len());
@@ -2276,3 +2303,7 @@ mod identity_tests;
 #[cfg(test)]
 #[path = "owner_range_tests.rs"]
 mod owner_range_tests;
+
+#[cfg(test)]
+#[path = "proved_visit_tests.rs"]
+mod proved_visit_tests;

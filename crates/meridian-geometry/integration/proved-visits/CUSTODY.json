@@ -1,0 +1,229 @@
+{
+  "verifiedDirectPins": [
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/BUILD-START.json",
+      "bytes": 1727,
+      "sha256": "b9039b4d3ab8842f024f1abee8abfd93caa8e1af667611cf8b0e0d4254d1cad5"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/BUILD-TERMINAL.json",
+      "bytes": 2007,
+      "sha256": "99bc3325becaa1304dc96ae6f92803c67da0f52083b66f2c282e8ec59dcc5c46"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/CASES.csv",
+      "bytes": 1008,
+      "sha256": "43aa32596073051a83629c9d34adc1a11b566018539e63d226ee552b529b3790"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/CHECK-START.json",
+      "bytes": 1714,
+      "sha256": "1eff265c2ee0f7b68763caeb844f82b21ebd4d3d5603785285f5282e29e151be"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/CHECK-TERMINAL.json",
+      "bytes": 1995,
+      "sha256": "bd72e58bc6cd675903b14068342dc3b716d3948edbe192717a561c6ea58f4a03"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/CLIPPY-START.json",
+      "bytes": 1752,
+      "sha256": "df920bdc8b60d91f3eddbd11635ee28165a259aa7ef22fb86a430d57e5ed18d4"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/CLIPPY-TERMINAL.json",
+      "bytes": 2034,
+      "sha256": "57e34bceb86b558ddc269bff60995dab8ac5017e9f4471f894b169c433567cc7"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/FOCUSED-OWNER.json",
+      "bytes": 1494,
+      "sha256": "79cf4ac136ebb13a1ae32d58c2e967abb93a685de886cf3eac1c8531e3e46f0a"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/FOCUSED-TERMINAL.json",
+      "bytes": 3047,
+      "sha256": "acf1b26c6e168fbe76643ead4cf6c7b08bca710f99c4b51fc35b23e0202a0153"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/HOST-START.json",
+      "bytes": 1807,
+      "sha256": "7c1f20d44917e9e587c6696de400c308cde38feb7965c668b49d6745dcf1a649"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/HOST-TERMINAL.json",
+      "bytes": 2088,
+      "sha256": "9de9e2e1fd2fa234c693a72cb0cbc433506589eae25b233b0d7084088c48a908"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/PREPARED.json",
+      "bytes": 1244,
+      "sha256": "404de841890d5c8770bee149dc564f28cb04c7f157df69db33c98d77b36c1943"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/RETAINED-WHOLE-GATE-CLEAR.json",
+      "bytes": 2410,
+      "sha256": "2b841b0754ff2f8e61da3f7abc6b08a5328ee91143ca32f2a254052e5f0904de"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/REVIEW.json",
+      "bytes": 4402,
+      "sha256": "0b3c05ccb5deb16ca4f5bb56b5e2be9c6e403423abd75c76455b52307a383b95"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/ROOT-ALL-SOURCE-PINS.json",
+      "bytes": 106180,
+      "sha256": "b65dff0c0bf55f70b09b9d3db29804c743ee0d85dfac46c28977e129f37f9516"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/ROOT-SOURCE.json",
+      "bytes": 2887,
+      "sha256": "8de5ac89c1660d3738e608951f6e81b4aaf2d32d6e516838d16b22f5a7356f3b"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/SOURCE-BINDING.json",
+      "bytes": 111441,
+      "sha256": "f553d6bcd19d7abee08ddf4aa20bbc4a23ff31852f1c92ce3fd4c240ce1cf544"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/TEST-START.json",
+      "bytes": 1720,
+      "sha256": "a5368000daeafc3523f58761e7fa2b514a42857fc70e9b4f27652423e91b83ad"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/TEST-TERMINAL.json",
+      "bytes": 2002,
+      "sha256": "2b118fc32fe4daf687b9c4b8e8f43f4434a6af6703b05254a36ee0e5c8877175"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/build.log",
+      "bytes": 72,
+      "sha256": "a5f4c585ee974ca44916ac30a98bbc189e067a7e0a6bc6d2e8d6bc525be724af"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/check.log",
+      "bytes": 360,
+      "sha256": "0103a2294f25d73b1b87ae6fc38156c1cf266602ef388872d784cc287508e535"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/clippy.log",
+      "bytes": 203,
+      "sha256": "82a81f004e6a6244c9bf4b743c19d07b6939467daabdfa622ee081c110228430"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/host.log",
+      "bytes": 1473,
+      "sha256": "6a0f003876a776e1e389ab35ac16bca9d311bea4ee2de7708b9ec136847e1e3f"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/evidence/test.log",
+      "bytes": 16118,
+      "sha256": "096d6aaccc965e76f412a31ef1bb9f34732cbd4315dd49e6d69b04d56049ed11"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/whole-five/ACTUAL-START.json",
+      "bytes": 940,
+      "sha256": "7824f63d91bda205d6ec9bf983516afd3bc0e930257d04b65d9490e463345ec5"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/whole-five/ARTIFACTS.json",
+      "bytes": 2144,
+      "sha256": "89095ecfecc5a0b6dbcd53c8a902bde9279e0dc50cd82a1025393f2511ced3f6"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/whole-five/EXECUTION-BINDING.json",
+      "bytes": 112207,
+      "sha256": "d78c67fdaead6fc19d89b293663bd136c62d4139b252ef4735368281f52a59d9"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/whole-five/OWNER-TERMINAL.json",
+      "bytes": 23584,
+      "sha256": "1d83b6af7696ac61be0bcdf752b524a40a4387da6ebbff18099bc18e84ef58ee"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/whole-five/results/EXECUTION-BINDING.json",
+      "bytes": 112207,
+      "sha256": "d78c67fdaead6fc19d89b293663bd136c62d4139b252ef4735368281f52a59d9"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/whole-five/results/ORIGINAL-BINDINGS.json",
+      "bytes": 11618,
+      "sha256": "6115342c17444e3f368f4a72f1ea9cc578b9fff2d1a0f1ca2f19d33b225ebf66"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/whole-five/results/SH010-CASE.json",
+      "bytes": 2891,
+      "sha256": "ba3abbce211141cd5121a947357eaa189b414f6c2b5feb57de09588423e94216"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/whole-five/results/SH011-CASE.json",
+      "bytes": 2888,
+      "sha256": "7e008e1b7dfd092bc686d13398eafd5f88e20bcb3fe414492f872dc3cf07763a"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/whole-five/results/SH016-CASE.json",
+      "bytes": 2889,
+      "sha256": "ac9b7fb937487a78748d5a4f417341c7f39dbcee0431bbd0dd3df3a03aec241c"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/whole-five/results/SH017-CASE.json",
+      "bytes": 2889,
+      "sha256": "e68482fe249187bd2c1474b1497fa371a73a849318b913387cf454381bf5dd25"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/whole-five/results/SH166-CASE.json",
+      "bytes": 2887,
+      "sha256": "e7b23d8d16ce8fda9d6281b6b03bd9b525376370ce482bb66d4388cf332544be"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/whole-five/results/TERMINAL.json",
+      "bytes": 14752,
+      "sha256": "b27917d71d6e5f1efedeaf6efb985358c106556b7ae3cd3b08678750d2914c3e"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/whole-five/results/WHOLE-FIVE-CRITERIA.json",
+      "bytes": 4977,
+      "sha256": "ace9c47feecd0aa7b0507f15492e3a1d01edc00a4e0a489c707f5955701dd9c8"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/whole-five/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/whole-five/stdout.log",
+      "bytes": 14694,
+      "sha256": "23ab3dd3ac84d77aae4e71d1390876286f081afcba5998df00bdba077b2cc0a3"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/SOURCE.tar",
+      "bytes": 26869760,
+      "sha256": "c2739f0cee800b340951b6169114746c7c36a2d22b09546b3c6c5072fb4c11b1"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/target/debug/original_five",
+      "bytes": 5952880,
+      "sha256": "cab9e2c2a3bccc28111f635a1dc80db4552384b3f1496926879be27da6c42630"
+    }
+  ],
+  "verifiedDirectCount": 41,
+  "source": "8d149b01231471899150a5177130e1b7b3090a53",
+  "tree": "e2a051207b27ef935d4fc01fb196ff5aab983188",
+  "all289AuthorParentPinsMatchExecutedRoot": true,
+  "handoffSHA256": "3cf918dd84aa98f595a488a98b7465d2580dda235ed288fb485baeb81e804408",
+  "preservedExternalRawArchive": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-incremental.8d149b0/RAW-PACKET.tar.gz",
+    "bytes": 21808439,
+    "sha256": "e65e83c5dca22c9aa0b89afeaa7becabf7a6eaa3cd07fca4bebcb8ffeb0f47c3"
+  },
+  "rawArchiveHandling": "Verified and preserved at immutable owner location; direct actual case/handoff bytes copied here. Do not recursively embed the complete source-containing raw archive in future source archives. Existing earlier sealed raw files remain unchanged.",
+  "actualFocused": "56Rust9host/check/strictClippy/buildPASS",
+  "actualWholeFive": "5decodePASS5OperationsREFUSED15dependentUNRUN0semanticFAIL0candidates0admissions",
+  "partialPeaksOnly": [
+    83736,
+    83581,
+    93041,
+    92781,
+    88925
+  ]
+}

@@ -185,3 +185,9 @@ All 52 prior test bodies and immutable controls are preserved. Three new indepen
 The live-run qualification passed check and 36 library tests, then failed the unchanged exact work comparison at 325 versus 322. The remaining 18 Rust tests, nine host tests, Clippy, build and original-five stayed UNRUN. The separate run/cell recount operations are now eliminated: membership follows the existing charged point push, pop and dedup visits. Original geometry charges, the 322 assertion, transfer guard, all 55 old test bodies and caps remain unchanged.
 
 One new lifetime regression brings this source to 56 Rust tests and nine host tests, all UNRUN. [The causal delta and source-bound failure](integration/incremental-run/CONTRACT.md) retain the complete actual failure and unaffected-source proof. No new original result or full-fit claim is made.
+
+## Proved redundant visits
+
+The incremental revision passed 56 Rust tests, nine host tests, check, strict Clippy and build. Its changed whole-five still refused all constructors on work, with no candidates. The publisher now inherits proven uniform-owner eligibility inside each query and drops only barriers strictly outside the original facet coordinate box before clipping. Boundary equality, coplanar fields and contact-star audits remain intact; all actual visits and arithmetic keep their charges.
+
+Two independent frozen comparisons bring the source to 58 Rust tests and nine host tests, all UNRUN. [The proof, ownership and source-bound outcomes](integration/proved-visits/CONTRACT.md) preserve every old assertion and cap. Full fit and broader fleet acceptance remain unproved.
