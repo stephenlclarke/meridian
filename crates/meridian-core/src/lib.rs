@@ -80,4 +80,4 @@ pub use flight::{
     EcmError, EcmOrigin, EcmSnapshot, EcmTermination, PreparedEcm,
 };
 
-pub use flight::{FittedLaserSnapshot, LaserFacing};
+pub use flight::{FittedLaserSnapshot, LaserFacing, MountedLaserEmission};

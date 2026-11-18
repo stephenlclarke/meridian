@@ -14,10 +14,15 @@ impl World {
                 BeamSource::Npc(_) if shot.weapon != super::OrdinaryWeapon::FrontPulseLaser => {
                     return Err(invalid);
                 }
-                BeamSource::Player { item, .. }
-                    if self.laser_weapon_at_tick(item, shot.world_tick) != Some(shot.weapon) =>
-                {
-                    return Err(invalid);
+                BeamSource::Player { item, .. } => {
+                    self.validate_mounted_laser_emission(
+                        shot.mounted_emission.ok_or(invalid)?,
+                        item,
+                        shot.weapon,
+                        shot.world_tick,
+                        shot.origin,
+                        shot.direction,
+                    )?;
                 }
                 _ => {}
             }
@@ -289,6 +294,11 @@ impl World {
                     .as_ref()
                     .ok_or(FireError::InvalidGeometry)?,
                 traffic::PlayerBeamInput {
+                    mounted_emission: self.mounted_laser_emission(
+                        self.fitted_laser_item(shot.fitted_item_id)
+                            .ok_or(FireError::StaleCommand)?
+                            .0,
+                    )?,
                     weapon: self
                         .fitted_laser_item(shot.fitted_item_id)
                         .ok_or(FireError::NoFittedFrontLaser)?

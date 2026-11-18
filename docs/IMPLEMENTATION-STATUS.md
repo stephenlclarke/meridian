@@ -1,5 +1,17 @@
 # Implementation and validation status
 
+## Targeted laser mounted-ray custody correction
+
+The [P2 receipt correction](LASER-FACINGS.md#targeted-mounted-ray-receipt-correction)
+starts at combined Root `b5150cae`. Actual body pose, selected facing and physical
+clock now bind NPC-hit and interception receipts to their historical fitted item
+and exact shared spend; native rays derive from retained body/facing. The current
+content fingerprint changes and old content refuses without migration. Two real
+paid two-mount NPC/interception regressions with coordinated corruption controls
+are authored **UNRUN**. Existing collision/resource/emission rules remain. Root
+separately fixes P1's missing live ECM clone in the EMP control fork; whole-source
+compiler/tests/Clippy/native acceptance remain pending for the changed composition.
+
 ## Joined four-facing laser and manual ECM source candidate
 
 Root has joined the isolated core and desktop implementations on the separately qualified `2d5f4a5` quality correction. The current source preserves the celestial-motion, traffic-goal and pylon-slot helpers. Equipment has exactly 19 slots: four laser mounts, cargo, energy, navigation, scoops, EMP, ECM and nine pylons. EMP remains at index 8. Both content rules markers are retained; incompatible old fingerprints still refuse without migration.

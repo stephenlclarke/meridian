@@ -29,7 +29,7 @@ pub use flight_reception::{
     FlightReceptionSnapshot, FlightReceptionTrace, FlightView, PreparedFlightReception,
 };
 mod laser_facings;
-pub use laser_facings::{FittedLaserSnapshot, LaserFacing};
+pub use laser_facings::{FittedLaserSnapshot, LaserFacing, MountedLaserEmission};
 mod modular;
 pub use modular::{
     FittedFuelScoops, FittedMiningTool, FuelScoopsSnapshot, ModularEquipmentSnapshot, ModuleAction,

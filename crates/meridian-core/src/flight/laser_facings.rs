@@ -56,6 +56,66 @@ impl LaserFacing {
     }
 }
 
+/// Immutable command-time body/facing/clock evidence, never accepted as firing authority.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct MountedLaserEmission {
+    pub body_pose: RigidPose,
+    pub facing: LaserFacing,
+    pub physical_tick: u64,
+}
+impl MountedLaserEmission {
+    pub(crate) fn matches_ray(self, origin: Vec3, direction: Vec3) -> bool {
+        self.body_pose.orientation.is_valid_rotation()
+            && [
+                self.body_pose.position.x,
+                self.body_pose.position.y,
+                self.body_pose.position.z,
+            ]
+            .into_iter()
+            .all(f64::is_finite)
+            && origin == self.body_pose.position
+            && direction == self.facing.ray(self.body_pose).orientation.z
+    }
+    pub(crate) fn encode(self, w: &mut crate::save::Writer) {
+        w.u64(self.physical_tick);
+        w.u8(self.facing.tag());
+        for v in [
+            self.body_pose.position,
+            self.body_pose.orientation.x,
+            self.body_pose.orientation.y,
+            self.body_pose.orientation.z,
+        ] {
+            w.u64(v.x.to_bits());
+            w.u64(v.y.to_bits());
+            w.u64(v.z.to_bits());
+        }
+    }
+    pub(crate) fn decode(r: &mut crate::save::Reader<'_>) -> Result<Self, SaveError> {
+        let physical_tick = r.u64()?;
+        let facing = LaserFacing::from_tag(r.u8()?)?;
+        let vectors = r.array(|r| {
+            Ok(Vec3::new(
+                f64::from_bits(r.u64()?),
+                f64::from_bits(r.u64()?),
+                f64::from_bits(r.u64()?),
+            ))
+        })?;
+        let [position, x, y, z]: [Vec3; 4] = vectors;
+        let result = Self {
+            physical_tick,
+            facing,
+            body_pose: RigidPose {
+                position,
+                orientation: Basis3 { x, y, z },
+            },
+        };
+        if !result.matches_ray(position, facing.ray(result.body_pose).orientation.z) {
+            return Err(SaveError::InvalidState("mounted laser body pose"));
+        }
+        Ok(result)
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct FittedLaserSnapshot {
     pub facing: LaserFacing,
@@ -66,6 +126,40 @@ pub struct FittedLaserSnapshot {
     pub cooldown_ticks_per_shot: u8,
 }
 impl World {
+    pub(super) fn mounted_laser_emission(
+        &self,
+        facing: LaserFacing,
+    ) -> Result<MountedLaserEmission, super::FireError> {
+        Ok(MountedLaserEmission {
+            body_pose: super::flight_pose(self.state.position, self.state.orientation)
+                .ok_or(super::FireError::InvalidGeometry)?,
+            facing,
+            physical_tick: self.combat.physical_tick(),
+        })
+    }
+    pub(super) fn validate_mounted_laser_emission(
+        &self,
+        emission: MountedLaserEmission,
+        item: u64,
+        weapon: OrdinaryWeapon,
+        tick: u64,
+        origin: Vec3,
+        direction: Vec3,
+    ) -> Result<(), SaveError> {
+        if !emission.matches_ray(origin, direction)
+            || self.laser_profile_at_tick(item, tick, emission.facing) != Some(weapon)
+            || emission.physical_tick > self.combat.physical_tick()
+            || emission.physical_tick > tick
+            || tick > self.state.tick
+            || (tick == self.state.tick
+                && (super::flight_pose(self.state.position, self.state.orientation)
+                    != Some(emission.body_pose)
+                    || emission.physical_tick != self.combat.physical_tick()))
+        {
+            return Err(SaveError::InvalidState("mounted laser emission custody"));
+        }
+        Ok(())
+    }
     pub fn selected_laser_facing(&self) -> LaserFacing {
         match self.flight_view() {
             super::FlightView::Front => LaserFacing::Front,

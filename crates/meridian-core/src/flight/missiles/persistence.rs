@@ -341,6 +341,7 @@ impl State {
             w.option(self.impacts[i].as_ref(), |w, h| h.encode(w));
             w.option(self.beams[i].as_ref(), |w, b| {
                 let s = b.shot;
+                b.mounted_emission.encode(w);
                 w.u64(b.emission);
                 w.u64(s.tick);
                 w.u64(s.fitted_item_id);
@@ -409,6 +410,7 @@ impl State {
             })?;
             state.impacts[i] = r.option(|r| OrdinaryImpact::decode_version(r, version))?;
             state.beams[i] = r.option(|r| {
+                let mounted_emission = super::super::MountedLaserEmission::decode(r)?;
                 let emission = r.u64()?;
                 let tick = r.u64()?;
                 let fitted_item_id = r.u64()?;
@@ -433,6 +435,7 @@ impl State {
                     None
                 };
                 Ok(Beam {
+                    mounted_emission,
                     bodies,
                     emission,
                     shot,
@@ -1297,9 +1300,7 @@ impl State {
                 return Err(INVALID);
             };
             self.validate_beam_identity(world, b, p, emission, id)?;
-            let mut ray = pose(shot.origin, shot.direction).ok_or(INVALID)?;
-            // Pulse uses the exact quaternion-derived forward column without normalization.
-            ray.orientation.z = shot.direction;
+            let ray = b.mounted_emission.facing.ray(b.mounted_emission.body_pose);
             let d = mesh_distance(
                 RigidPose {
                     position: p.position,
@@ -1397,6 +1398,17 @@ impl State {
         id: ProjectileId,
     ) -> Result<(), SaveError> {
         let shot = b.shot;
+        let weapon = world
+            .laser_profile_at_tick(shot.fitted_item_id, shot.tick, b.mounted_emission.facing)
+            .ok_or(INVALID)?;
+        world.validate_mounted_laser_emission(
+            b.mounted_emission,
+            shot.fitted_item_id,
+            weapon,
+            shot.tick,
+            shot.origin,
+            shot.direction,
+        )?;
         if self
             .projectiles
             .iter()
@@ -1409,7 +1421,7 @@ impl State {
             || emission <= p.origin.emission
             || shot.tick != p.last_tick
             || world
-                .laser_weapon_at_tick(shot.fitted_item_id, shot.tick)
+                .laser_profile_at_tick(shot.fitted_item_id, shot.tick, b.mounted_emission.facing)
                 .is_none()
             || id != p.origin.projectile
             || !valid_vector(shot.origin)
