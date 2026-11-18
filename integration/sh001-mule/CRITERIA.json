@@ -1,0 +1,131 @@
+{
+  "targetHull": "SH001",
+  "name": "Mule",
+  "status": "SOURCE_AND_GEOMETRY_PROTOTYPE_AUTHORED_UNRUN;NO_ACTOR_ADMISSION",
+  "immediateAuthorParent": "8e2e5d3a3ef5f6caffd0323ca4b2540e1e57981b",
+  "currentGameplayAuthority": "ad5b9f9da259c85389cd662af2473e543e26ab11",
+  "newCoreTests": [
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "mule_authenticates_source_and_encloses_all_components_and_triangle_interiors",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "mule_directional_gap_is_two_centimetres_and_engineering_is_preserved",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "rounded_piece_keeps_real_contacts_without_box_corner_false_blocks",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "rounded_piece_sweeps_translation_and_rotation_without_tunnelling",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "mule_actual_inter_pannier_gap_stays_clear_in_the_compound_surface",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "mule_analytic_port_fit_is_strict_rotated_and_covers_all_outer_protrusions",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "mule_shield_depletion_hides_the_subtle_shimmer_without_retracting_collision",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "mule_launch_uses_its_surface_without_relabelling_sh025_or_granting_arrival",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "rounded_ray_contacts_require_an_inside_witness_and_leave_tangency_uncertain",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "rounded_support_invalid_geometry_never_grants_clearance_or_a_contact",
+      "status": "UNRUN"
+    }
+  ],
+  "existingGeometryTests": {
+    "count": 92,
+    "source": "unchanged519geometryfiles;prioractualRoota92qualificationnotrebound",
+    "currentRun": "NOT_REQUESTED;nooriginalretry"
+  },
+  "shape": {
+    "pieces": 16,
+    "type": "convex_hull_authenticated_assigned_source_vertices_plus_closed_ball",
+    "standOffMetres": 0.02,
+    "directionalSupportGapMetres": 0.02,
+    "sourceVertices": 5344,
+    "sourceTriangles": 9008,
+    "coordinateScaleExact": "40000/3411",
+    "note": "Directional bound is against source convex support; not a Hausdorff distance claim to concave detailed surfaces."
+  },
+  "shimmer": {
+    "maximumOpacity": 0.018,
+    "grazingExponent": 4,
+    "fadeMetres": [
+      32,
+      64
+    ],
+    "collisionRetractionAtZeroShield": false,
+    "internalSurfaces": "discard;unionopacitydoesnotaccumulate"
+  },
+  "limitsContract": {
+    "originalExactGeometry": [
+      2000000,
+      100000,
+      4096,
+      512
+    ],
+    "newEnvelope": "separate authorized approximate gameplay contract;notexactoriginalunionorcapwaiver",
+    "boundedQueries": "16sourcepieces;48supportiterations,64rayadvances;uncertainmeansblockednotpermission"
+  },
+  "currentChecks": {
+    "compiler": "UNRUN",
+    "cargoTests": "UNRUN",
+    "strictClippy": "UNRUN",
+    "native": "UNRUN",
+    "renderer": "UNIMPLEMENTED;existingG3handoff",
+    "MuleWorldActorAndGenerationBinding": "UNIMPLEMENTED",
+    "MulePaidAcquisitionCrewEquipmentPersistence": "UNIMPLEMENTED",
+    "existingPaidEMPAndDamageReducers": "UNCHANGED;currentad5authority",
+    "fleetAdmission": false
+  },
+  "ownerCommands": [
+    "cargo check --locked --workspace --all-targets",
+    "cargo test --locked -p meridian-core",
+    "cargo clippy --locked --workspace --all-targets -- -D warnings",
+    "make ci (owned current-project checks; no author execution)"
+  ],
+  "executionOwner": "existingG1only;Rootreview/serialjoin;G3rendererdependency",
+  "sourceOnlyCommands": [
+    "python3 -B tools/verify_mule_envelope_source.py",
+    "rustfmt --edition 2024 --check on changed Rust files",
+    "markdownlint on affected Markdown",
+    "PythonAST/JSON/sourcehash/patchchecks"
+  ],
+  "originalExecution": "No unchanged or diagnostic original-five run;nooriginalSH001unionconstructororprobefromauthor",
+  "acceptanceNext": [
+    "G2whole/relevantreviewofnewapproximation/sourcebinding/current-gameplayminimaladaptation",
+    "G1ownedchangedcoretests/check/strictClippy/currentgameplayregressionsandactualparametercapture",
+    "G3same-surfaceveryslightshimmerusingimmutabledata;G1actualrender/contact/dockingviews",
+    "CompleteWorldMuleidentity/generation/currentcontact/EMP/saveandpaidacquisition/crew/fittingroutes",
+    "ActualMuleordinarygameacceptance,requiredPRreview/checks,andRootprotectedmainmergebeforeSH008"
+  ],
+  "baseline": {
+    "ships": "23/162",
+    "stations": "4/6",
+    "newAdmissions": 0
+  }
+}

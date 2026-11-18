@@ -1,6 +1,14 @@
 # Meridian
 
-The current native run produced three identical nonblack GPU target copies while the paired Fit appeared black through CUA. A [bounded read-only independent window observer](docs/LASER-FACINGS.md#independent-macos-window-observer-preparation) is prepared to resolve the actual WindowServer capture identity. Thirteen offline policy fixtures pass; the Swift provider is uncompiled and no UI API has run. Execution requires the explicit human exception for alternate UI technology. No renderer cure or native acceptance is claimed.
+## Mule smooth gameplay envelope: authored, unrun
+
+Mule has a distinct conservative gameplay envelope made from sixteen rounded source-component supports with a proposed 2 cm directional stand-off. The detailed source geometry, engineering mass/centre/inertia and provenance remain separate and unchanged. This implements the human's smooth, close-fitting collision direction; it does not clear the unresolved exact-original importer or its limits.
+
+The new core helpers cover source containment, continuous contact, station clearance, ray uncertainty and immutable low-opacity shimmer parameters. Ten new tests are authored and **UNRUN**. There is no admitted Mule actor, acquisition, crew, fitting/save route, renderer, actual game acceptance or new accepted hull count yet. The existing paid EMP, ECM, combat, economy and persistence source is preserved. Actual shimmer rendering and native evidence remain required before preview delivery.
+
+The current native run produced three identical nonblack GPU target copies while the paired Fit appeared black through CUA. A [bounded read-only independent window observer](docs/LASER-FACINGS.md#independent-macos-window-observer-preparation) is prepared to resolve the actual WindowServer capture identity. Sixteen offline policy fixtures pass; the Swift provider is uncompiled and no UI API has run. Execution requires the explicit human exception for alternate UI technology. No renderer cure or native acceptance is claimed.
+
+The underlying ad5 game runtime passed Mac, Linux and native Windows qualification: 295 fresh Rust cases plus 433 reviewed unchanged Core/compatibility cases per platform, with current compiler, strict Clippy and release-build checks. This helper-only change leaves that runtime unchanged. The current native Fit-screen failure and dependent gameplay acceptance remain open.
 
 [![CI](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=alert_status)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)
@@ -150,4 +158,4 @@ Preview 8 includes the paid Equipment EMP utility slot, held-U flight control an
 
 ## Offline reference importer
 
-The [Rust reference importer](crates/meridian-import/README.md) converts only the pinned original SH025/SH028 source into the five existing binary fixtures. It preserves original notices and emits its own Rust producer receipt. The current source has passed designated Mac, Linux and native Windows qualification, including actual CLI conversion and the current core loader. PR 52 merged at `22715d6`; all six exact-main CI jobs and the Sonar quality gate passed. One reported method-reference maintainability finding is being corrected; the correction has not yet been qualified. The importer does not add ships or change gameplay, and is not included in Preview 8.
+The [Rust reference importer](crates/meridian-import/README.md) converts only the pinned original SH025/SH028 source into the five existing binary fixtures. It preserves original notices and emits its own Rust producer receipt. The current source has passed designated Mac, Linux and native Windows qualification, including actual CLI conversion and the current core loader. PR 52 merged at `22715d6`; all six exact-main CI jobs and the Sonar quality gate passed. PR 53 corrected that finding at `792f448`, after bounded 32-case importer qualification passed on Mac, Linux and native Windows. Its new exact-main CI and analysis are pending. The importer does not add ships or change gameplay, and is not included in Preview 8.

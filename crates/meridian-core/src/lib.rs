@@ -8,6 +8,7 @@ pub mod equipment;
 mod flight;
 pub mod freight;
 pub mod mining;
+pub mod mule;
 pub mod navigation;
 pub mod save;
 pub mod station;
