@@ -844,6 +844,25 @@ fn ordinary_docked_exterior_clears_timed_feedback_above_the_instruments() {
     };
     assert!(draw(&expired.hud_lines) > 0);
     assert!(draw(&feedback.hud_lines) > draw(&expired.hud_lines));
+
+    assert_eq!(
+        key(&mut app, KeyCode::KeyH, ElementState::Pressed, false, None),
+        None
+    );
+    let help = app
+        .help
+        .as_ref()
+        .unwrap_or_else(|| panic!("missing docked Help"));
+    let controls = help.lines.join(" ");
+    for control in [
+        "F7 Close practice",
+        "F8 Reception",
+        "F10 Practice review",
+        "L Launch",
+    ] {
+        assert!(controls.contains(control), "{control}: {controls}");
+    }
+    assert_eq!(ok(app.game.world.save_bytes()), before_expiry);
 }
 
 #[test]

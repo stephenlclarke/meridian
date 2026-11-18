@@ -1018,12 +1018,11 @@ mod tests {
             .prepare_practice_confirmation(review, 0)
             .unwrap_or_else(|e| panic!("{e}"))
             .commit();
-        assert!(
-            session
-                .lines(&world, true, None)
-                .join("\n")
-                .contains("F7 REVIEW CLOSURE")
-        );
+        assert!(session.lines(&world, true, None).is_empty());
+        let original = world
+            .practice_ledger_snapshot()
+            .and_then(|ledger| ledger.active)
+            .unwrap_or_else(|| panic!("missing consented attempt"));
         session
             .command(&mut world, Action::ReviewPracticeClosure)
             .unwrap_or_else(|e| panic!("{e}"));
@@ -1048,24 +1047,51 @@ mod tests {
             .prepare_practice_closure(review, 0)
             .unwrap_or_else(|e| panic!("{e}"))
             .commit();
-        let closed = session.lines(&world, true, None).join("\n");
-        assert!(closed.contains("PRACTICE ABANDONED | F10 REVIEW NEW ATTEMPT"));
+        assert!(session.lines(&world, true, None).is_empty());
+        let closed = world
+            .practice_ledger_snapshot()
+            .unwrap_or_else(|| panic!("missing practice history"));
+        assert_eq!(closed.active, None);
+        assert_eq!(closed.attempts.len(), 1);
+        assert_eq!(closed.attempts[0].id, original);
+        assert_eq!(closed.attempts[0].outcome, Some(PracticeOutcome::Abandoned));
+        assert_eq!(closed.trace, None);
         session
             .command(&mut world, Action::MissionDetails)
             .unwrap_or_else(|e| panic!("{e}"));
         let history = session.lines(&world, true, None).join("\n");
         assert!(history.contains("ABANDONED 1"));
         assert!(history.contains("TRACE NOT YET RECORDED"));
-        session.invalidate();
-        let review = world.review_practice(0).unwrap_or_else(|e| panic!("{e}"));
+        session
+            .command(&mut world, Action::ReviewPractice)
+            .unwrap_or_else(|e| panic!("{e}"));
+        let fresh_review = session.lines(&world, true, None).join(" ");
+        assert!(fresh_review.contains("PRACTICE REVIEW | ENTER CONFIRMS AND SAVES | B CANCELS"));
+        assert!(fresh_review.contains("Hit the three uncrewed beacons"));
+        let Some(PracticeSelection::Consent(review)) = session.pending_practice.take() else {
+            panic!("fresh practice consent review missing");
+        };
         world
             .prepare_practice_confirmation(review, 0)
             .unwrap_or_else(|e| panic!("{e}"))
             .commit();
-        let fresh = session.lines(&world, true, None).join("\n");
-        assert!(fresh.contains("PRACTICE ACCEPTED | L LAUNCH"));
-        assert!(!fresh.contains("PRACTICE ABANDONED"));
-        assert!(!fresh.contains("F8 REVIEW"));
+        assert_eq!(
+            world.practice_snapshot().map(|practice| practice.status),
+            Some(PracticeStatus::Consented)
+        );
+        let fresh = world
+            .practice_ledger_snapshot()
+            .unwrap_or_else(|| panic!("missing new attempt"));
+        assert_eq!(fresh.attempts.len(), 2);
+        assert_eq!(fresh.attempts[0], closed.attempts[0]);
+        assert_eq!(fresh.active, Some(fresh.attempts[1].id));
+        assert_ne!(fresh.active, Some(original));
+        assert!(
+            session
+                .command(&mut world, Action::ReviewPracticeReception)
+                .is_err()
+        );
+        assert!(session.lines(&world, true, None).is_empty());
     }
 
     #[test]
@@ -1267,8 +1293,11 @@ mod tests {
             world.mission_snapshot(),
             world.credits_tenths(),
         );
-        let lines = ui.lines(&world, false, None);
-        assert!(lines.iter().any(|l| l.contains("H / ? HELP")));
+        assert!(ui.lines(&world, false, None).is_empty());
+        assert!(ui.help_review().is_none());
+        let help = crate::help::Panel::docked(ui.help_review());
+        assert_eq!(help.title, "Station controls");
+        assert!(help.lines.iter().any(|line| line.contains("P Pause")));
         assert_eq!(
             before,
             (
