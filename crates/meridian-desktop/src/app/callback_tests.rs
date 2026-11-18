@@ -62,7 +62,7 @@ fn redraw_preparation_routes_actual_hud_menu_and_inactive_frames_without_committ
     ok(app.game.save());
     let before = ok(app.game.world.save_bytes());
     let disk = ok(std::fs::read(directory.0.join("commander.meridian")));
-    app.notice = Some("Fallback notice".into());
+    app.notice.set("Fallback notice".into());
     let mut menu = ok(crate::docked::Docked::new(&app.game.world));
     let mut reference = ok(crate::docked::Docked::new(&app.game.world));
     ok(menu.open(&app.game.world, ui::Screen::System));
@@ -79,7 +79,7 @@ fn redraw_preparation_routes_actual_hud_menu_and_inactive_frames_without_committ
         .unwrap_or_else(|| panic!("ready frame discarded"));
     assert_eq!(prepared.hud_lines, expected_hud);
     assert_eq!(prepared.docked_frame, Some(expected_menu));
-    assert_eq!(app.notice.as_deref(), Some("Fallback notice"));
+    assert_eq!(app.notice.text.as_deref(), Some("Fallback notice"));
     app.docked
         .as_mut()
         .unwrap_or_else(|| panic!("menu"))
@@ -314,12 +314,12 @@ fn inactive_and_zero_tick_callbacks_do_not_step_or_repeat_a_discharge() {
     assert_eq!(app.advance_frame(true, 1), FrameAdvance::Continue(None));
     let pulse = app.pulse;
     let before = ok(app.game.world.save_bytes());
-    app.notice = Some("keep existing notice".into());
+    app.notice.set("keep existing notice".into());
     assert_eq!(app.advance_frame(false, 600), FrameAdvance::Continue(None));
     assert_eq!(app.advance_frame(true, 0), FrameAdvance::Continue(None));
     assert_eq!(ok(app.game.world.save_bytes()), before);
     assert_eq!(app.pulse, pulse);
-    assert_eq!(app.notice.as_deref(), Some("keep existing notice"));
+    assert_eq!(app.notice.text.as_deref(), Some("keep existing notice"));
 }
 
 #[test]
@@ -363,12 +363,12 @@ fn frame_feedback_preserves_contact_precedence_and_error_classification() {
             app.frame_feedback(Ok(Some(contact))),
             FrameAdvance::Continue(Some(contact))
         );
-        assert_eq!(app.notice.as_deref(), Some(message));
+        assert_eq!(app.notice.text.as_deref(), Some(message));
     }
     // Typed step-result fixtures exercise the shared callback classification, not a fabricated World.
     for error in [StepError::Collision, StepError::UnsafeEntry] {
         assert_eq!(app.frame_feedback(Err(error)), FrameAdvance::Continue(None));
-        assert_eq!(app.notice, Some(error.to_string()));
+        assert_eq!(app.notice.text, Some(error.to_string()));
     }
     let previous = app.notice.clone();
     for error in [
@@ -414,7 +414,7 @@ fn app_callback_retains_real_entry_contact_when_the_last_catchup_tick_is_clear()
     assert_eq!(after.speed, 0.0);
     assert_eq!(after.tick, before.tick + 2);
     assert_eq!(
-        app.notice.as_deref(),
+        app.notice.text.as_deref(),
         Some("Entry refused: align with entrance and slow down")
     );
 }
@@ -624,4 +624,19 @@ fn focus_loss_discards_presented_search_authority_without_changing_wallet_or_fit
     );
     assert_eq!(app.game.world.credits_tenths(), credits);
     assert_eq!(app.game.world.modular_equipment_snapshot(), modules);
+}
+
+#[test]
+fn flight_feedback_expires_once_at_its_deadline_and_repeated_input_renews_it() {
+    let mut notice = super::Notice::default();
+    notice.set("Entry refused".into());
+    let first = notice.expires.unwrap_or_else(|| panic!("notice deadline"));
+    assert!(!notice.expire(first - std::time::Duration::from_millis(1)));
+    notice.set("Entry refused".into());
+    let renewed = notice.expires.unwrap_or_else(|| panic!("renewed deadline"));
+    assert!(renewed >= first);
+    assert_eq!(notice.text.as_deref(), Some("Entry refused"));
+    assert!(notice.expire(renewed));
+    assert!(notice.text.is_none());
+    assert!(!notice.expire(renewed));
 }

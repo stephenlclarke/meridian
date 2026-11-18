@@ -1,12 +1,6 @@
 # SH001 Mule renderer
 
-The internal validation scene renders a World-owned SH001 actor. The desktop pairs its immutable geometry with the stationary observer after checking source identity, World scope, generation and tick. The ordinary Renas encounter uses a separate publication from the same World API. The development build passed controlled entry and station-lip contact on Metal. The protected-main integration has its own qualification. See [internal launch modes and results](MULE-VALIDATION-LAUNCH.md).
-
-## First Renas sortie presentation
-
-The ordinary desktop route consumes the current World publication on the first launch after the eight G02 freight deliveries at Renas. It adds the SH001 mesh and accepted shield envelope using the same chase or pilot camera as the player, station and ordinary traffic. The regular cockpit and HUD keep their normal paths. The internal validation route continues to use its stationary World observer for the whole scene.
-
-The desktop drops absent or stale publications. World owns the encounter identity, placement, crew and lifetime. The accepted 34-piece envelope and subtle shield rendering use the existing GPU pass. The public-route desktop regression completes G02, flies from the real Renas berth and compares the ordinary player, station and traffic mesh bytes with the Mule present. Native review should start through the normal profile route, observe the identifiable Mule on that first sortie, and check lifecycle, the existing flight controls and HUD. The isolated validation coverage remains a separate check.
+The internal validation scene renders a World-owned SH001 actor. The desktop pairs its immutable geometry with the stationary observer after checking source identity, World scope, generation and tick. Ordinary startup has no Mule actor. The development build passed controlled entry and station-lip contact on Metal. The protected-main integration has its own qualification. See [internal launch modes and results](MULE-VALIDATION-LAUNCH.md).
 
 ## Original visible hull
 
