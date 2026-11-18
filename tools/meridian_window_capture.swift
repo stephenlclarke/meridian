@@ -1,6 +1,7 @@
 // Execution pending an explicit human exception for alternate UI capture technology.
 // Read-only, one exact test window. No input, activation, picker, permission request or fallback.
 import Foundation
+import Dispatch
 @preconcurrency import AppKit
 @preconcurrency import ScreenCaptureKit
 import CoreGraphics
