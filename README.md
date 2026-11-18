@@ -1,6 +1,6 @@
 # Meridian
 
-The internal laser/ECM candidate's original black Fit review remains unexplained. The new desktop regression exposed a separate stale-input refusal between Store confirmation and immediate Y. A [narrow deferred review handoff](docs/LASER-FACINGS.md#immediate-store-to-fit-revision-handoff) is authored, with the stale-confirmation safeguard retained; changed execution is **UNRUN**. All four capture guard cases passed on the preceding source. Dependent native practice, positive-hit and missile-termination acceptance remain blocked.
+The original native black Fit review remains unexplained. The latest desktop run passed the Store-to-Fit revision checks, then exposed an incorrect cold-save byte expectation in the new regression. Continue deliberately advances review-permission counters. The [independent byte-oracle correction](docs/LASER-FACINGS.md#cold-continue-byte-contract) preserves anti-replay and full disk/state checks; changed execution is **UNRUN**. Dependent native acceptance remains blocked.
 
 The joined laser/ECM Mac run now reports 428/431 core passes after compilation.
 The [geometry pilot correction](docs/LASER-FACINGS.md#source-derived-geometry-pilot-correction)
