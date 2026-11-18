@@ -31,7 +31,7 @@ The current [EMP electrical weapon candidate](docs/EMP.md) has passed Mac, Linux
 
 The [paid manual ECM candidate](docs/ECM.md) is source-authored and unrun. It adds real paid hardware, a charged 32-tick standard-missile field and time-only cold restoration, with an actual equipment slot, N flight control, HUD/Help and atomic durable activation. Final serial integration, independent review and owner execution remain pending; automatic ECM and hostile missile production remain separate work.
 
-The [four-facing laser core](docs/LASER-FACINGS.md) is authored with nine new regression cases, all unrun. Paid left/right/rear fitting, selected-view fire and current-save replay await Root's desktop join, whole-source review and owned platform qualification.
+The [four-facing laser core and desktop wiring](docs/LASER-FACINGS.md) are authored with nine new core and nine host regression cases, all unrun. Paid left/right/rear fitting, selected-view fire, Help, shared resources and cold replay await Root's final current-App/ECM composition, whole-source review and owned platform qualification.
 
 ## Previews and validation
 

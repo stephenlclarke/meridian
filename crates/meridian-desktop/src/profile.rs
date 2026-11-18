@@ -171,11 +171,13 @@ impl Profile {
                 meridian_core::ModuleAction::PurchaseFuelScoops => {
                     "Fuel Scoops purchased and fitted. Physical ore collection remains unavailable."
                 }
-                meridian_core::ModuleAction::Purchase { .. } => {
+                meridian_core::ModuleAction::Purchase { .. }
+                | meridian_core::ModuleAction::PurchaseLaser { .. } => {
                     "Owned module purchased and fitted."
                 }
                 meridian_core::ModuleAction::Store { .. } => "Owned module stored.",
-                meridian_core::ModuleAction::Install { .. } => "Owned module fitted.",
+                meridian_core::ModuleAction::Install { .. }
+                | meridian_core::ModuleAction::InstallLaser { .. } => "Owned module fitted.",
             };
             let published = self
                 .store

@@ -68,6 +68,21 @@ impl Panel {
         panel
     }
 
+    pub fn flight_selected(
+        facing: meridian_core::LaserFacing,
+        weapon: Option<&str>,
+        review: Option<&str>,
+    ) -> Self {
+        let mut panel = Self::flight(weapon, review);
+        if facing != meridian_core::LaserFacing::Front {
+            panel.lines[2] = weapon.map_or_else(
+                || format!("Z unavailable: no fitted {facing:?} laser"),
+                |weapon| format!("Z Fire {facing:?} {weapon}; shared energy, heat and cooldown"),
+            );
+        }
+        panel
+    }
+
     pub fn docked(review: Option<&str>) -> Self {
         let mut panel = Self::new(
             "Station controls",
@@ -130,6 +145,7 @@ impl Panel {
                     "] Next slot | Up / Down Select owned item or offer",
                     "G / Enter Review purchase | Y Review fit | U Review store",
                     "D Details | O Options",
+                    "Front / left / right / rear: fit one owned laser per mount",
                     "EMP slot: G reviews base/grade; Y fits; U stores; no free charge",
                     "ECM slot: G buys; Y fits; U stores; N activates in flight",
                     "An unavailable offer explains its current refusal",

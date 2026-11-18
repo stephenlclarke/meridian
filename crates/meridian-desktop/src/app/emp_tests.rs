@@ -35,7 +35,7 @@ fn shop(a: &mut App) {
     ok(m.open(&a.game.world, ui::Screen::Equipment));
     a.docked = Some(m);
     paint(a);
-    for _ in 0..5 {
+    for _ in 0..8 {
         menu_key(a, ui::Key::NextSlot);
     }
 }
