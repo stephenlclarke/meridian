@@ -71,9 +71,48 @@ impl World {
         Ok(())
     }
 
+    fn renas_restored_player_clear(&self, actor: &State) -> bool {
+        super::flight_pose(self.state.position, self.state.orientation).is_some_and(|pose| {
+            self.station_data.as_ref().is_some_and(|station| {
+                station.mule_ordinary_player_clear(actor.source(), actor.pose(), pose, pose, 0.0)
+            })
+        })
+    }
+
+    pub(super) fn restore_renas_mule(&mut self) -> Result<(), StationError> {
+        let mut actor = self.prepare_renas_mule(self.state.mode, self.navigation)?;
+        if let Some(actor) = &mut actor {
+            // Older v17 saves had no collider at the berth. Preserve an
+            // intersecting saved pose and let ordinary flight clear it first.
+            actor.defer_renas(!self.renas_restored_player_clear(actor));
+        }
+        self.mule_renas = actor;
+        Ok(())
+    }
+
+    pub(super) fn refresh_deferred_renas_mule(&mut self) {
+        let Some(actor) = self
+            .mule_renas
+            .as_ref()
+            .filter(|actor| actor.renas_is_deferred())
+        else {
+            return;
+        };
+        if self
+            .renas_departure(self.state.mode, self.navigation)
+            .is_some()
+            && self.renas_restored_player_clear(actor)
+            && let Some(actor) = self.mule_renas.as_mut()
+        {
+            actor.defer_renas(false);
+        }
+    }
+
     pub(super) fn active_renas_mule(&self) -> Option<&State> {
         self.renas_departure(self.state.mode, self.navigation)?;
-        self.mule_renas.as_ref()
+        self.mule_renas
+            .as_ref()
+            .filter(|actor| !actor.renas_is_deferred())
     }
 
     pub(super) fn traffic_and_renas_mule_motion_clear(
@@ -96,3 +135,6 @@ impl World {
             })
     }
 }
+
+#[cfg(test)]
+mod tests;

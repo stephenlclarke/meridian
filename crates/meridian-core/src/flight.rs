@@ -774,6 +774,7 @@ impl World {
         }
         self.state = next;
         self.navigation = navigation;
+        self.refresh_deferred_renas_mule();
         self.observe_flight_reception(flight_reception_start);
         if let Some((session, epoch)) = self.freight_session.as_mut().zip(mission_epoch) {
             session.rebind_dock(navigation.and_then(NavigationState::dock), epoch);

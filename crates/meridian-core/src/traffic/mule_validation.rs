@@ -66,6 +66,7 @@ pub(crate) struct State {
     tick: u64,
     generation: u64,
     scope: Arc<()>,
+    renas_deferred: bool,
     refusal: Option<MuleValidationRefusal>,
 }
 impl State {
@@ -121,6 +122,7 @@ impl State {
             tick: 0,
             generation: 1,
             scope: Arc::new(()),
+            renas_deferred: false,
             refusal: None,
         })
     }
@@ -136,6 +138,12 @@ impl State {
         state.actor.phase = NpcPhase::Outbound;
         state.generation = generation;
         Ok(state)
+    }
+    pub(crate) fn renas_is_deferred(&self) -> bool {
+        self.renas_deferred
+    }
+    pub(crate) fn defer_renas(&mut self, deferred: bool) {
+        self.renas_deferred = deferred;
     }
     pub(crate) fn renas_publication(&self, tick: u64) -> MuleActorSnapshot {
         let mut frame = self.snapshot();

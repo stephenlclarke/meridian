@@ -52,6 +52,8 @@ The controlled inbound World constructor validates an exterior SH001 start and a
 
 The human authorized one identifiable, two-crew SH001 near Renas Main Orbital. The actual eighth G02 handover and the next successful departure from that berth open the encounter. The Mule holds at a station-relative exterior position clear of the launch corridor. The usual player flight path checks against the same rounded hull that the renderer presents.
 
+A valid pre-encounter v17 save can place the player in the new berth. Continue keeps that saved pose and holds the Mule back while the player occupies its envelope. The first committed clear movement exposes the same actor at its original berth. Saving during the overlap and continuing again uses the same clearance rule.
+
 The original receipt stores the owner, hull, system, berth sequence and visit. Current save v17 already retains the receipt and navigation visit and berth sequence. Continue reconstructs the same pose and identity during that first sortie. Redocking or arriving in another system ends the encounter, and subsequent launches do not recreate it. The normal G02 payment and clue retain their original transaction.
 
 The ordinary frame exposes physical crew count and the same source identity and shield surface as the controlled Mule. Crew work and player ownership require their own authority. Native render and the complete G02 journey on the joined revision await qualification.

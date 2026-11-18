@@ -88,11 +88,12 @@ def undo_renas_encounter(relative, data):
             (b'            mule_renas: None,\n', b''),
             (b'        let mule_renas = self\n            .prepare_renas_mule(next.mode, navigation)\n            .map_err(|_| StepError::UnsafeLaunch)?;\n        if let Some(actor) = &mule_renas {\n            self.validate_renas_mule_launch(actor, launch_pose)?;\n        }\n', b''),
             (b'        self.mule_renas = mule_renas;\n', b''),
+            (b'        self.refresh_deferred_renas_mule();\n', b''),
             (b'            if !self.traffic_and_renas_mule_motion_clear(before, after, angular_travel) {\n', b'            if !self.traffic_motion_clear(before, after) {\n'),
         ],
         'flight/persistence.rs': [
             (b'            mule_renas: None,\n', b''),
-            (b'        candidate.mule_renas = candidate\n            .prepare_renas_mule(candidate.state.mode, candidate.navigation)\n            .map_err(|_| SaveError::ContentMismatch)?;\n', b''),
+            (b'        candidate\n            .restore_renas_mule()\n            .map_err(|_| SaveError::ContentMismatch)?;\n', b''),
         ],
         'flight/mission.rs': [
             (b'    fn renas_mule_is_the_same_actor_on_the_first_completed_freight_sortie_after_continue() {\n        let mut world = World::new_commander(501).unwrap();\n', b'    fn public_contact_back_pause_tick_and_owner_changes_do_not_manufacture_consent() {\n        let mut world = World::new_commander(51).unwrap();\n', '02ae2146927ff0e3d37b1c4605c72614c585399f2a46e1134c101e7c48183c8e'),
@@ -167,6 +168,7 @@ def verify_test_registry(criteria):
         'worldCoreTests': ('flight/mule_validation/tests.rs', 6),
         'tightnessCoreTests': ('mule/tightness_tests.rs', 5),
         'geometryCoreTests': ('mule/geometry.rs', 1),
+        'restoreCoreTests': ('flight/mule_renas/tests.rs', 1),
     }
     counts = {}
     for group, (module, expected) in files.items():
@@ -204,6 +206,11 @@ def verify_historical_bindings(folder, groups):
     assert sha(world_patch) == world_binding['canonicalPatch']['sha256']
     assert len(world_binding['currentRootCoreFiles']) == 135
     assert len(world_binding['modifiedCurrentFiles']) == 3
+    fixture = criteria['prePrRenasRestoreFixture']
+    fixture_bytes = (ROOT / fixture['path']).read_bytes()
+    assert len(fixture_bytes) == fixture['bytes']
+    assert fixture_bytes[:10] == b'MERSAVE1\x11\x00'
+    assert sha(fixture_bytes) == fixture['sha256']
     return verify_test_registry(criteria)
 
 

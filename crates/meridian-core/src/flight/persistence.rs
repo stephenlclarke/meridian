@@ -445,8 +445,8 @@ impl World {
             &candidate.flight_reception,
             &Commerce::current(&candidate),
         )?;
-        candidate.mule_renas = candidate
-            .prepare_renas_mule(candidate.state.mode, candidate.navigation)
+        candidate
+            .restore_renas_mule()
             .map_err(|_| SaveError::ContentMismatch)?;
         Ok(candidate)
     }

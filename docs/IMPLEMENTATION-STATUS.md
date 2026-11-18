@@ -1,6 +1,6 @@
 # Implementation and validation status
 
-The first ordinary Renas Mule encounter is authored. It is tied to the genuine eighth G02 handover and the next successful launch from that berth. The current v17 save reconstructs the same actor during the first sortie. The protected-main join, runtime journey and native ordinary-camera check remain pending.
+The first ordinary Renas Mule encounter is authored. It is tied to the genuine eighth G02 handover and the next successful launch from that berth. The current v17 save reconstructs the same actor during the first sortie. If an older save places the player inside its berth, the encounter waits for clearance. The pre-change build produced and reloaded a regression fixture at the reported overlapping pose. Replay on the corrected build is pending. The protected-main join, runtime journey and native ordinary-camera check remain pending.
 
 ## Internal Mule docking validation
 
