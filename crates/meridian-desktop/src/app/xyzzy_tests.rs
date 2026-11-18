@@ -138,6 +138,7 @@ fn failed_actual_profile_publication_retains_world_saved_bytes_and_secret_review
     press(&mut app, KeyCode::Enter);
     assert!(
         app.notice
+            .text
             .as_deref()
             .is_some_and(|message| message.contains("could not be saved"))
     );

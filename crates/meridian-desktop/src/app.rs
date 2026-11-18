@@ -85,6 +85,27 @@ enum FrameAdvance {
 
 const DEFAULT_FLIGHT_WINDOW: [u32; 2] = [1280, 720];
 
+#[derive(Clone, Default, Debug, PartialEq, Eq)]
+struct Notice {
+    text: Option<String>,
+    expires: Option<Instant>,
+}
+
+impl Notice {
+    fn set(&mut self, message: String) {
+        self.text = Some(message);
+        self.expires = Some(Instant::now() + std::time::Duration::from_secs(4));
+    }
+
+    fn expire(&mut self, now: Instant) -> bool {
+        if self.expires.is_some_and(|deadline| deadline <= now) {
+            *self = Self::default();
+            return true;
+        }
+        false
+    }
+}
+
 struct App {
     game: Profile,
     validation_view: FlightView,
@@ -106,7 +127,7 @@ struct App {
     last_frame: Instant,
     clock: FixedClock,
     error: Option<String>,
-    notice: Option<String>,
+    notice: Notice,
     pulse: Option<PulseShot>,
     mining: Option<asteroid_render::MiningVisual>,
     missile_bodies: Vec<meridian_core::ProjectileSnapshot>,
@@ -146,7 +167,7 @@ impl App {
             last_frame: Instant::now(),
             clock: FixedClock::default(),
             error: None,
-            notice: None,
+            notice: Notice::default(),
             pulse: None,
             mining: None,
             missile_bodies: Vec::with_capacity(crate::mesh::MAX_MISSILE_PROJECTILES),
@@ -258,7 +279,7 @@ impl App {
                     self.xyzzy = Some(crate::xyzzy::Menu::default());
                     self.clear_held_input();
                 } else {
-                    self.notice = Some(
+                    self.notice.set(
                         "XYZZY testing requires a commander at an actual station berth".into(),
                     );
                 }
@@ -299,11 +320,11 @@ impl App {
         let action = menu.action();
         match self.game.xyzzy(action) {
             Ok(message) => {
-                self.notice = Some(message);
+                self.notice.set(message);
                 self.xyzzy = None;
                 self.sync_profile_controls();
             }
-            Err(message) => self.notice = Some(message),
+            Err(message) => self.notice.set(message),
         }
     }
 
@@ -324,7 +345,7 @@ impl App {
                 self.game.world.snapshot().tick,
             )
         {
-            self.notice = Some(error.to_string());
+            self.notice.set(error.to_string());
         }
         self.request_redraw();
     }
@@ -371,21 +392,23 @@ impl App {
             KeyCode::Escape => self.request_quit(event_loop),
             KeyCode::KeyQ if self.quit_failed => event_loop.exit(),
             KeyCode::KeyN if !self.game.playing() => {
-                self.notice = Some(match self.game.new_commander(fresh_profile_seed()) {
-                    Ok(true) => {
-                        self.sync_profile_controls();
-                        "New commander ready".into()
-                    }
-                    Ok(false) => {
-                        "Press N again to confirm new game; existing save is not changed yet".into()
-                    }
-                    Err(error) => error,
-                });
+                self.notice
+                    .set(match self.game.new_commander(fresh_profile_seed()) {
+                        Ok(true) => {
+                            self.sync_profile_controls();
+                            "New commander ready".into()
+                        }
+                        Ok(false) => {
+                            "Press N again to confirm new game; existing save is not changed yet"
+                                .into()
+                        }
+                        Err(error) => error,
+                    });
             }
             KeyCode::KeyC if !self.game.playing() => self.load_profile(),
             KeyCode::F9 if self.game.playing() => self.load_profile(),
             KeyCode::F5 if self.game.playing() => {
-                self.notice = Some(match self.game.save() {
+                self.notice.set(match self.game.save() {
                     Ok(message) => message,
                     Err(error) => error,
                 });
@@ -419,12 +442,12 @@ impl App {
                 if self.game.world.current_dock_context().is_some()
                     && let Err(error) = menu.open(&self.game.world, ui::Screen::System)
                 {
-                    self.notice = Some(error);
+                    self.notice.set(error);
                 }
                 Some(menu)
             }
             Err(error) => {
-                self.notice = Some(error);
+                self.notice.set(error);
                 None
             }
         };
@@ -434,14 +457,12 @@ impl App {
         match self.game.continue_saved() {
             Ok(()) => {
                 self.sync_profile_controls();
-                self.notice =
-                    Some("Commander continued; select the actual current crew with T".into());
+                self.notice
+                    .set("Commander continued; select the actual current crew with T".into());
             }
-            Err(error) => {
-                self.notice = Some(format!(
-                    "Continue refused; save and current game retained: {error}"
-                ))
-            }
+            Err(error) => self.notice.set(format!(
+                "Continue refused; save and current game retained: {error}"
+            )),
         }
     }
 
@@ -460,7 +481,8 @@ impl App {
                 self.paused = true;
                 self.reset_input();
                 self.quit_failed = true;
-                self.notice = Some(format!("P resumes; Q quits without saving again. {error}"));
+                self.notice
+                    .set(format!("P resumes; Q quits without saving again. {error}"));
                 self.request_redraw();
             }
         }
@@ -500,7 +522,7 @@ impl App {
             match Docked::new(&self.game.world) {
                 Ok(menu) => self.docked = Some(menu),
                 Err(error) => {
-                    self.notice = Some(error);
+                    self.notice.set(error);
                     return true;
                 }
             }
@@ -553,7 +575,7 @@ impl App {
 
     fn game_key(&mut self, code: KeyCode) {
         if code == KeyCode::KeyU && self.game.world.snapshot().mode == FlightMode::Flight {
-            self.notice = Some("EMP: hold U for ten seconds; release to cancel. Recent-attacker self-defence only.".into());
+            self.notice.set("EMP: hold U for ten seconds; release to cancel. Recent-attacker self-defence only.".into());
             return;
         }
         let action = match code {
@@ -600,7 +622,7 @@ impl App {
             KeyCode::BracketRight => Action::NextCommodity,
             _ => return,
         };
-        self.notice = Some(match self.game.command(action) {
+        self.notice.set(match self.game.command(action) {
             Ok(message) => message,
             Err(error) => error,
         });
@@ -630,13 +652,13 @@ impl App {
         let frame_refusal = match result {
             Ok(refusal) => refusal,
             Err(error) if matches!(error, StepError::Collision | StepError::UnsafeEntry) => {
-                self.notice = Some(error.to_string());
+                self.notice.set(error.to_string());
                 None
             }
             Err(error) => return FrameAdvance::Fatal(error),
         };
         if let Some(refusal) = frame_refusal {
-            self.notice = Some(
+            self.notice.set(
                 match refusal {
                     MotionRefusal::CelestialContact => {
                         "Celestial contact: stopped before the physical surface"
@@ -781,7 +803,7 @@ impl App {
     ) -> Result<PreparedPresentation, String> {
         let hud_lines = self
             .game
-            .lines(active, pulse_notice.or(self.notice.as_deref()));
+            .lines(active, pulse_notice.or(self.notice.text.as_deref()));
         let docked_frame =
             self.docked_frame(if self.modal_open() { 0.0 } else { elapsed }, viewport)?;
         Ok(PreparedPresentation {
@@ -998,7 +1020,7 @@ impl App {
         let xyzzy_panel = self
             .xyzzy
             .as_ref()
-            .map(|menu| menu.panel(&self.game.world, self.notice.as_deref()));
+            .map(|menu| menu.panel(&self.game.world, self.notice.text.as_deref()));
         let title = self.frame_title(active, snapshot.mode);
         Self::append_contact_notice(&mut hud_lines, frame_refusal.or(snapshot.motion_refusal));
         if let Some(renderer) = &mut self.renderer {
@@ -1162,8 +1184,21 @@ impl ApplicationHandler for App {
 
     fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
         if let Some(renderer) = &self.renderer {
+            let flight = self.game.playing()
+                && self.game.world.snapshot().mode == FlightMode::Flight
+                && !self.game.is_internal_validation()
+                && !self.modal_open()
+                && !self.quit_failed;
+            if flight && self.notice.expire(Instant::now()) {
+                renderer.window.request_redraw();
+            }
             if !self.simulation_active() || renderer.is_zero_sized() {
-                event_loop.set_control_flow(ControlFlow::Wait);
+                let until = self
+                    .notice
+                    .expires
+                    .filter(|_| flight && !renderer.is_zero_sized());
+                event_loop
+                    .set_control_flow(until.map_or(ControlFlow::Wait, ControlFlow::WaitUntil));
             } else {
                 event_loop.set_control_flow(ControlFlow::Poll);
                 renderer.window.request_redraw();
