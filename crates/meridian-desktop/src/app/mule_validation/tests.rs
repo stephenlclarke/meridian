@@ -360,6 +360,29 @@ fn docking_modes_hold_the_real_terminal_frame_and_display_its_outcome() {
             .world
             .mule_observer_pose(&opening)
             .unwrap_or_else(|| panic!("actual observer"));
+        let [width, height] = crate::app::DEFAULT_FLIGHT_WINDOW;
+        let projection = crate::renderer::flight_projection(width, height);
+        let flight = app.validation_view;
+        let check_framing = |frame: &meridian_core::traffic::MuleActorSnapshot| {
+            assert!(
+                ok(crate::mule_render::detailed_hull_fits_view(
+                    crate::mule_render::Scene {
+                        actor: frame.actor(),
+                        envelope: frame.presentation().as_ref(),
+                        observer,
+                    },
+                    crate::mule_render::View {
+                        camera: observer,
+                        flight,
+                        projection,
+                        tick: frame.world_tick(),
+                    },
+                )),
+                "{name} detailed hull clipped at tick {}",
+                frame.world_tick()
+            );
+        };
+        check_framing(&opening);
         assert_eq!(opening.actor().phase, NpcPhase::Approach);
         assert!(app.paused && app.game.is_internal_validation());
         for _ in 0..DOCKING_TICK_LIMIT.div_ceil(6) {
@@ -367,6 +390,12 @@ fn docking_modes_hold_the_real_terminal_frame_and_display_its_outcome() {
                 app.advance_frame(true, 6),
                 FrameAdvance::Continue(None)
             ));
+            let frame = app
+                .game
+                .world
+                .mule_actor_snapshot()
+                .unwrap_or_else(|| panic!("approach frame"));
+            check_framing(&frame);
             if app.notice.is_some() {
                 break;
             }

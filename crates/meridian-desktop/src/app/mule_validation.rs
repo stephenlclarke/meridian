@@ -174,20 +174,11 @@ fn docking_starts(
         approach.position[1],
         (port.z + reserve) as f32,
     ];
-    let (target_x, target_z) = if obstructed {
-        let forward = meridian_core::docking::Vec3::new(0.0, 0.0, 1.0);
-        let nose = source
-            .pieces()
-            .iter()
-            .try_fold(f64::NEG_INFINITY, |extent, piece| {
-                piece.support_bound(forward).map(|value| extent.max(value))
-            })?;
-        (approach_x, port.z + nose)
-    } else {
-        (port.x, port.z)
-    };
-    let yaw = (target_x - f64::from(observer_position[0]))
-        .atan2(target_z - f64::from(observer_position[2]));
+    // Frame the full inbound lane from the opening pose to the port plane. An aim
+    // fixed on the port alone can crop the entire hull at the start of the approach.
+    let lateral = approach_x - f64::from(observer_position[0]);
+    let bearing = |z: f64| lateral.atan2(z - f64::from(observer_position[2]));
+    let yaw = (bearing(f64::from(approach.position[2])) + bearing(port.z)) * 0.5;
     let (sine, cosine) = (yaw * 0.5).sin_cos();
     let observer = FlightStart {
         position: observer_position,

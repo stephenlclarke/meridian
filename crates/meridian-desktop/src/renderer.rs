@@ -11,6 +11,10 @@ use winit::{dpi::PhysicalSize, event_loop::OwnedDisplayHandle, window::Window};
 use crate::mesh::{self, Vertex};
 use crate::{asteroid_render, hud};
 
+pub(crate) fn flight_projection(width: u32, height: u32) -> [f32; 4] {
+    [width as f32 / height as f32, 1.6, 1.0, 20000.0]
+}
+
 pub struct StationScene<'a> {
     pub pose: StationPose,
     pub port: &'a DockingPort,
@@ -205,12 +209,7 @@ impl Renderer {
         });
         let projection = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Projection"),
-            contents: bytemuck::cast_slice(&[
-                config.width as f32 / config.height as f32,
-                1.6,
-                1.0,
-                20000.0,
-            ]),
+            contents: bytemuck::cast_slice(&flight_projection(config.width, config.height)),
             usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
         });
         let projection_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
@@ -313,7 +312,7 @@ impl Renderer {
         self.queue.write_buffer(
             &self.projection,
             0,
-            bytemuck::cast_slice(&[size.width as f32 / size.height as f32, 1.6, 1.0, 20000.0]),
+            bytemuck::cast_slice(&flight_projection(size.width, size.height)),
         );
     }
 
@@ -644,12 +643,7 @@ impl Renderer {
                         crate::mule_render::View {
                             camera,
                             flight: self.flight_view,
-                            projection: [
-                                self.config.width as f32 / self.config.height as f32,
-                                1.6,
-                                1.0,
-                                20000.0,
-                            ],
+                            projection: flight_projection(self.config.width, self.config.height),
                             tick: snapshot.tick,
                         },
                     )?;

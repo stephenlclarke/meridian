@@ -90,6 +90,8 @@ enum FrameAdvance {
     Fatal(StepError),
 }
 
+const DEFAULT_FLIGHT_WINDOW: [u32; 2] = [1280, 720];
+
 struct App {
     game: Profile,
     validation_view: FlightView,
@@ -1111,7 +1113,10 @@ impl ApplicationHandler for App {
         }
         let attributes = Window::default_attributes()
             .with_title("Meridian - initializing graphics")
-            .with_inner_size(winit::dpi::LogicalSize::new(1280.0, 720.0))
+            .with_inner_size(winit::dpi::LogicalSize::new(
+                DEFAULT_FLIGHT_WINDOW[0],
+                DEFAULT_FLIGHT_WINDOW[1],
+            ))
             .with_min_inner_size(winit::dpi::LogicalSize::new(640.0, 360.0));
         let window = match event_loop.create_window(attributes) {
             Ok(window) => Arc::new(window),
