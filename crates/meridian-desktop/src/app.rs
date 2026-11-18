@@ -8,7 +8,8 @@ use std::{
 };
 
 use meridian_core::{
-    FlightInput, FlightMode, FlightView, MotionRefusal, PulseContact, PulseShot, StepError, World,
+    FlightInput, FlightMode, FlightView, LaserFacing, MotionRefusal, PulseContact, PulseShot,
+    StepError, World,
 };
 use winit::{
     application::ApplicationHandler,
@@ -54,15 +55,20 @@ fn step_frame(
             *pulse = None;
             *mining = None;
         } else if fire_held {
-            if let Ok(tool) = world.mining_tool_authority() {
+            if world.selected_laser_facing() == LaserFacing::Front
+                && let Ok(tool) = world.mining_tool_authority()
+            {
                 if let Ok(shot) = world.request_mining(tool, state.tick) {
                     *mining = Some(asteroid_render::MiningVisual {
                         opening: state,
                         shot,
                     });
                 }
-            } else if let Ok(shot) = world.request_fire_front_laser(state.tick) {
-                *pulse = Some(shot);
+            } else {
+                *mining = None;
+                if let Ok(shot) = world.request_fire_selected_laser(state.tick) {
+                    *pulse = Some(shot);
+                }
             }
         }
     }
@@ -195,18 +201,17 @@ impl App {
         if self.game.world.snapshot().mode == FlightMode::Docked {
             crate::help::Panel::docked(review)
         } else {
-            let weapon = self
-                .game
-                .world
+            let world = &self.game.world;
+            let weapon = world
                 .modular_equipment_snapshot()
                 .and_then(|modules| {
                     modules
                         .items
                         .into_iter()
-                        .find(|item| item.slot == Some(meridian_core::ModuleSlot::FrontLaser))
+                        .find(|item| item.slot == Some(world.selected_laser_facing().slot()))
                 })
                 .map(|item| item.kind.name());
-            crate::help::Panel::flight(weapon, review)
+            crate::help::Panel::flight_selected(world.selected_laser_facing(), weapon, review)
         }
     }
 
@@ -1186,3 +1191,6 @@ mod xyzzy_tests;
 
 #[cfg(test)]
 mod emp_tests;
+
+#[cfg(test)]
+mod laser_tests;

@@ -6,10 +6,13 @@ The [four-facing laser core](LASER-FACINGS.md) starts at `65717da` and admits
 only the already qualified original SH025 front/left/right/rear mounts. It adds
 paid mount-specific purchase, actual-item store/move/refit, selected-view fire,
 shared resource replay and current-save historical facing checks. Nine meaningful
-new core regressions are authored, **UNRUN** (409 core source attributes against
-the 400-case baseline). Direct formatting and static source checks are separate
-from compiler, Clippy, tests and gameplay qualification, all pending for this delta.
-Root owns the desktop and concurrent ECM join, then whole-source Root/G2 review
+new core regressions and nine host cases are authored, **UNRUN** (409 core and
+235 desktop source attributes against baselines of 400 and 226). The successor
+now includes actual isolated desktop view/fire, four Equipment slots, selected
+occupant fitting, Help/HUD and durable profile publication wiring; the sealed
+`f16cbc6` core bytes remain unchanged. Direct formatting and static source checks
+are separate from compiler, Clippy, tests and gameplay qualification, all pending.
+Root owns final current-App/Sonar/ECM composition, then whole-source Root/G2 review
 before Dell/G1 execution. Existing qualified EMP evidence keeps its own source
 identity; this author candidate is not a new qualified preview.
 

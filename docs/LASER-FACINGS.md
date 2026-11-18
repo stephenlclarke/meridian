@@ -2,18 +2,22 @@
 
 ## Author status
 
-Core source and nine new regression cases are authored, **UNRUN**. This increment
-starts at `65717daef31477389f1be6bb88b3b904bf31da4c`. Its qualified compiled
+Core and isolated desktop wiring are authored with nine new core and nine new
+host regression cases, all **UNRUN**. The sealed core packet remains at
+`f16cbc64bde7d36044c03e6b829c7137c8801361`; the host successor uses the same
+branch without changing those core bytes. This increment starts at
+`65717daef31477389f1be6bb88b3b904bf31da4c`. Its qualified compiled
 ancestor is `5e3e98a41a2ce3edaf824fdc25b5b6f98253573d`; only README, EMP guide
 and implementation-status Markdown differ between those two commits. The ancestor's
-631 Rust passes do not qualify this changed source. Root owns the desktop join,
-then Root/G2 review the complete joined source before Dell/G1 execution. No new
+631 Rust passes do not qualify this changed source. Root owns final composition with current App, service, ECM and codec source, then
+Root/G2 review the complete joined source before Dell/G1 execution. No new
 compiler, Clippy, Rust test, native or GPU result is claimed here.
 
-Author static checks pass: direct rustfmt, all 50 Markdown files, ten immutable
-source pins, independent axis/wire-tag/wallet arithmetic and existing test-source
-preservation. The delta leaves 285 baseline files byte-identical. These checks
-do not execute the Rust implementation.
+The sealed core author packet passed direct rustfmt, all 50 Markdown files, ten
+immutable source pins, independent axis/wire-tag/wallet arithmetic and existing
+core test-source preservation, with 285 baseline files byte-identical. The host
+successor has its own static checks and unaffected-file catalog. These checks do
+not execute the Rust implementation.
 
 ## Reference and admitted scope
 
@@ -79,31 +83,43 @@ the same practice emission refuse. NPC and missile receipts use the historical
 owned laser rather than an assumed front item. Corrupt restoration preserves the
 prior World. Actual persistence execution remains pending.
 
-## Desktop composition owned by Root
+## Authored desktop wiring and Root composition
 
-This branch deliberately does not edit desktop source. The new public enums need
-exhaustive desktop match arms before all-target compilation. Root's complete join
-must implement the following bindings against its current App source:
+The isolated successor implements the actual App/session/docked/profile bindings;
+it has not been compiled, tested or run natively. It supplies these complete
+fragments for Root's final shared-source composition:
 
-| Owner and anchor at base | Required binding |
+| Owner | Authored behavior |
 | --- | --- |
-| `app.rs::step_frame`, ordinary fire near line 64 | Use `request_fire_selected_laser(state.tick)`. Retain front mining work only when `selected_laser_facing() == LaserFacing::Front`; otherwise use the selected ordinary laser. Publish its actual `PulseShot` through existing render/audio state. |
-| `app.rs`, front-fit gate near line 206 | Inspect selected laser snapshot for ordinary combat. Preserve any explicitly front-only mining authority. |
-| `session.rs`, HUD near line 678 | Read `selected_laser_snapshot()` and selected facing; label fire and fitted kind for that facing. Keep one shared resource readout. |
-| Existing F1-F4 view commands | Keep `request_flight_view(view, tick)` as the sole persisted selection; core already maps all four views. |
-| `docked.rs::module_rows`, match near line 609 | Add Left/Right/Rear slot labels. Laser eligibility is `kind.laser_profile().is_some()`, while fitted status is `item.slot == Some(selected_slot)`. A laser fitted elsewhere must remain movable, not appear fitted here. |
-| `docked.rs`, offers and review near lines 643-674 | Use `laser_offers(facing)` and `PurchaseLaser { kind, facing }`; use `InstallLaser { item, facing, replacing: actual_selected_occupant }` for fitting. Retain other families' existing actions. |
-| `docked.rs::equipment_action`, near lines 553-569 | Translate the selected laser slot to `LaserFacing` for both buy and install. Resolve actual item and current selected-slot occupant afresh through existing review/prepare flow. Store uses actual item ID. |
-| `docked.rs`, equipment tree near line 697 and slot parser near line 755 | Add `left-laser`, `right-laser`, `rear-laser` beside `front-laser`. Include facing in row identity so a movable item appearing under multiple mount choices has unique UI nodes. |
-| `profile.rs`, action result match near lines 146-156 | Include `PurchaseLaser` with paid purchase messaging and `InstallLaser` with fit messaging. Retain prepared bytes, durable store publication and commit ordering. |
+| `app.rs::step_frame` | Held Z calls `request_fire_selected_laser` for ordinary combat. Front mining authority applies only in Front view; nonfront fire clears the mining visual and uses the selected actual laser. Existing shot publication and catch-up cadence remain. |
+| `app.rs::help_panel` | Inspect the actual item fitted on the persisted selected facing, preserving original module names and the front Mining Laser work hint. |
+| `session.rs` | Display the selected facing, actual weapon and one shared energy/heat/cooldown readout. An empty mount explicitly reports no fitted laser and does not fall back to front. |
+| Existing digit controls | `0` Front, `1` Rear, `2` Left and `3` Right still submit `SetFlightView` to the sole persisted core selection. F1-F4 retain missile controls. |
+| `docked.rs::LASER_SLOTS` and `equipment_panel` | Expose front/left/right/rear slots, actual fitted kind and selected-slot rows. The starter panel has 18 slots including the nine existing pylons; the EMP slot moves from index 5 to 8. |
+| `docked.rs::module_rows` | Show all eligible owned lasers as movable. Fitted status means this exact slot; Store is available only at the actual fitted slot. Readout names the current mount. Offers and prices come from `World::laser_offers`. |
+| `docked.rs::module_node` and `equipment_action` | Facing-specific nonfront node IDs plus actual item IDs distinguish every row and offer. Cross-slot node/kind mismatch refuses. Buy uses the selected facing; fit resolves the selected occupant and uses `InstallLaser` even when moving back to Front. |
+| `profile.rs::command` | Exhaustive purchase/install messages include both facing actions. Prepared bytes still publish through the actual Store before committing the candidate or invalidating the session. |
+| `help.rs::flight_selected` and station Help | Nonfront controls name the selected weapon and shared pools, or explain the empty mount. Side Mining Laser means ordinary fire; front work alone advertises mining. Equipment Help names all four mounts and retains station navigation and modal bounds. |
 
-No host cache may mint a fitted item or bypass core review. Retained front-specific
-host tests stay explicit front cases; new host cases must cover all selected views,
-paid and stored item movement, refusal messaging, and actual atomic save publication.
+Front default purchase actions remain the existing public front actions; all laser
+fit actions use the facing-aware core capability. No host row/cache creates an
+item or grants fitting authority. Old assertions remain except the explicit
+starter slot count increases from 15 to 18; the existing EMP keyboard test pilot
+advances eight slots instead of five to reach the same real EMP slot. Its earned
+public-market helper is shared only within host tests without changing its body.
+
+Root's separately verified Sonar extraction
+`2d5f4a57ae05db68ec7f233f9b695f3ecc4b2f75`, tree
+`16391c8e179353703b32ddb8d65e69f361f51dcd`, has parent `652b9c9` and changes
+only core flight stepping, traffic movement and the desktop pylon helper. That
+source is not merged here. Root must retain all three changes while serially
+composing this successor; a whole-file replacement of `docked.rs` would lose the
+newer pylon extraction. No qualifier or release state is inferred from those
+source identities.
 
 MC1 independently owns ECM. Root must serially join the shared modular action/tag,
 resource replay, missile and save fingerprint hunks, assigning noncolliding tags
-and including both rules markers. This branch neither merges MC1 source nor claims
+and including both rules markers. This branch does not merge MC1 source or claim
 ECM behavior or tests. Recheck the complete joined source and its exact identity.
 
 ## Meaningful authored cases and acceptance
@@ -124,9 +140,30 @@ Eight cases in `flight/laser_facings/tests.rs` and one appended modular case cov
 9. Changing saved paid mount after a real right station discharge invalidates checked
    save and atomically refuses forged cold restoration.
 
-The 400-case baseline core therefore has 409 source test attributes after this
-increment. This is a source count, not a pass count. Existing assertions remain.
-After the complete desktop/ECM join and independent review, Dell/G1 run the pinned
+Nine additional desktop cases are authored in `app/laser_tests.rs` and
+`docked/laser_tests.rs`:
+
+1. Each actual digit view binding fires the matching fitted body axis, spends
+   shared resources and retains selection/item/resources through a fresh Profile reader.
+2. An empty selected mount never fires the front item; HUD and Help explain the refusal.
+3. The existing genuine finite-market pilot earns 33650 tenths, then presented
+   Left and Rear purchases each pay 14500, leaving 4650; Right refuses and cold custody matches.
+4. Front mining authority cannot steal side Pulse fire; a paid side Mining Laser
+   fires as an ordinary selected weapon and has the correct Help text.
+5. Every station Help retains navigation; selected flight Help blocks view,
+   held fire and publication, retains saved state and respects text bounds.
+6. Four mount panels expose unique slot/node/item/offer identities and reject
+   wrong-slot or foreign node selection without changing saved state.
+7. Actual selected occupant replacement stores that item, preserves the born item,
+   allows movement back to Front and cold-loads unchanged custody/wallet.
+8. Actual fit and paid purchase writer failures preserve live World, wallet,
+   items and the prior file. This case uses explicitly labelled XYZZY setup.
+9. A stale reviewed mount/occupant cannot publish after another genuine fitting change.
+
+The 400-case baseline core has 409 source test attributes and the 226-case desktop
+baseline has 235, plus two unchanged compatibility cases and three retained observer
+cases. These are source counts, not passing results. After the complete current
+App/ECM join and independent review, Dell/G1 run the pinned
 `make ci`, explicit observer cases and locked release qualification in owned lanes,
 retaining exact head/tree, commands, raw output, pass/fail counts and durations.
 Any failure needs a causal changed delta; no unchanged retry or weakened gate.

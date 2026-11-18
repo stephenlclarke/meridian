@@ -1,7 +1,7 @@
 //! Host menu state is ephemeral. Only Profile's prepared commands can change the game.
 use crate::{docked_screens as ui, profile::Profile, session::Action};
 use meridian_core::{
-    AmmunitionAction, ModuleAction, ModuleKind, ModuleSlot, World, equipment,
+    AmmunitionAction, LaserFacing, ModuleAction, ModuleKind, ModuleSlot, World, equipment,
     navigation::{DockContext, FUEL_CAPACITY, SystemId},
     station_services::{self, CommodityId},
 };
@@ -493,6 +493,62 @@ impl Docked {
     }
 }
 
+const LASER_SLOTS: [(LaserFacing, &str, &str); 4] = [
+    (LaserFacing::Front, "front-laser", "Front laser"),
+    (LaserFacing::Left, "left-laser", "Left laser"),
+    (LaserFacing::Right, "right-laser", "Right laser"),
+    (LaserFacing::Rear, "rear-laser", "Rear laser"),
+];
+fn laser_facing(slot: &str) -> Option<LaserFacing> {
+    LASER_SLOTS
+        .iter()
+        .find(|(_, id, _)| *id == slot)
+        .map(|(facing, _, _)| *facing)
+}
+fn slot_facing(slot: ModuleSlot) -> Option<LaserFacing> {
+    LASER_SLOTS
+        .iter()
+        .find(|(facing, _, _)| facing.slot() == slot)
+        .map(|(facing, _, _)| *facing)
+}
+fn module_node(kind: ModuleKind, slot: ModuleSlot) -> String {
+    if let Some((_, id, _)) = LASER_SLOTS
+        .iter()
+        .find(|(facing, _, _)| facing.slot() == slot)
+        && slot != ModuleSlot::FrontLaser
+    {
+        format!("{id}/{}", kind.node())
+    } else {
+        kind.node().into()
+    }
+}
+fn module_fits(kind: ModuleKind, slot: ModuleSlot) -> bool {
+    if slot_facing(slot).is_some() {
+        kind.laser_profile().is_some()
+    } else {
+        kind.slot() == slot
+    }
+}
+fn install_action(item: u64, slot: ModuleSlot, replacing: Option<u64>) -> ModuleAction {
+    match slot_facing(slot) {
+        Some(facing) => ModuleAction::InstallLaser {
+            item,
+            facing,
+            replacing,
+        },
+        _ => ModuleAction::Install { item, replacing },
+    }
+}
+fn purchase_action(kind: ModuleKind, slot: ModuleSlot) -> ModuleAction {
+    match slot_facing(slot) {
+        Some(facing) if facing != LaserFacing::Front => {
+            ModuleAction::PurchaseLaser { kind, facing }
+        }
+        _ if kind == ModuleKind::MiningLaser => ModuleAction::PurchaseMiningLaser,
+        _ => ModuleAction::Purchase { kind },
+    }
+}
+
 fn equipment_action(
     world: &World,
     node: &str,
@@ -542,38 +598,59 @@ fn equipment_action(
     let modules = world
         .modular_equipment_snapshot()
         .ok_or("No modular equipment")?;
+    let target = laser_facing(slot)
+        .map(LaserFacing::slot)
+        .or(match slot {
+            "energy" => Some(ModuleSlot::Energy),
+            "navigation" => Some(ModuleSlot::Navigation),
+            _ => None,
+        })
+        .ok_or("Select a compatible module slot")?;
     let action = match operation {
         Buy => {
+            if instance.is_some() {
+                return Err("Select the purchase offer, not an owned item".into());
+            }
             let offer = modules
                 .offers
                 .iter()
-                .find(|offer| offer.kind.node() == node)
+                .find(|offer| {
+                    module_fits(offer.kind, target) && module_node(offer.kind, target) == node
+                })
                 .ok_or("No ordinary offer for this module")?;
-            if offer.kind == ModuleKind::MiningLaser {
-                ModuleAction::PurchaseMiningLaser
-            } else {
-                ModuleAction::Purchase { kind: offer.kind }
-            }
+            purchase_action(offer.kind, target)
         }
-        Store => ModuleAction::Store {
-            item: instance.ok_or("Select an owned module")?,
-        },
+        Store => {
+            let item = instance.ok_or("Select an owned module")?;
+            if !modules.items.iter().any(|owned| {
+                owned.id == item
+                    && owned.slot == Some(target)
+                    && module_node(owned.kind, target) == node
+            }) {
+                return Err("Owned module is not fitted in the selected slot".into());
+            }
+            ModuleAction::Store { item }
+        }
         Fit => {
             let item = instance.ok_or("Select an owned module")?;
-            let kind = modules
+            modules
                 .items
                 .iter()
-                .find(|owned| owned.id == item && owned.kind.node() == node)
-                .ok_or("Owned module selection changed")?
-                .kind;
-            ModuleAction::Install {
+                .find(|owned| {
+                    owned.id == item
+                        && module_fits(owned.kind, target)
+                        && module_node(owned.kind, target) == node
+                })
+                .ok_or("Owned module selection changed")?;
+            install_action(
                 item,
-                replacing: modules
+                target,
+                modules
                     .items
                     .iter()
-                    .find(|owned| owned.slot == Some(kind.slot()))
+                    .find(|owned| owned.slot == Some(target))
                     .map(|owned| owned.id),
-            }
+            )
         }
         _ => return Err("Unsupported module operation".into()),
     };
@@ -607,17 +684,24 @@ fn module_rows(
 ) -> Vec<ui::EquipmentRow> {
     let label = match slot {
         ModuleSlot::FrontLaser => "Front laser",
+        ModuleSlot::LeftLaser => "Left laser",
+        ModuleSlot::RightLaser => "Right laser",
+        ModuleSlot::RearLaser => "Rear laser",
         ModuleSlot::Energy => "Energy system",
         ModuleSlot::Navigation => "Navigation computer",
         ModuleSlot::UtilityFuelScoops => "Fuel Scoops",
     };
     let fitted = modules.items.iter().find(|item| item.slot == Some(slot));
     let mut rows = Vec::new();
-    for item in modules.items.iter().filter(|item| item.kind.slot() == slot) {
-        let mut row = base_row(item.kind.node(), item.kind.name(), label);
+    for item in modules
+        .items
+        .iter()
+        .filter(|item| module_fits(item.kind, slot))
+    {
+        let mut row = base_row(&module_node(item.kind, slot), item.kind.name(), label);
         row.instance = Some(item.id);
         row.owned = 1;
-        row.fitted = u32::from(item.slot.is_some());
+        row.fitted = u32::from(item.slot == Some(slot));
         row.readout
             .push(crate::xyzzy::provenance(item.provenance).into());
         if let Some(reach) = item.kind.navigation_reach_ly() {
@@ -639,23 +723,29 @@ fn module_rows(
                 "Recharge {multiplier}x basic | Energy capacity 380"
             ));
         }
-        row.can_store = world
-            .review_module(ModuleAction::Store { item: item.id }, tick)
-            .is_ok();
+        if let Some(facing) = item.slot.and_then(slot_facing) {
+            row.readout
+                .push(format!("Currently fitted: {facing:?} laser"));
+        }
+        row.can_store = item.slot == Some(slot)
+            && world
+                .review_module(ModuleAction::Store { item: item.id }, tick)
+                .is_ok();
         row.can_fit = world
             .review_module(
-                ModuleAction::Install {
-                    item: item.id,
-                    replacing: fitted.map(|item| item.id),
-                },
+                install_action(item.id, slot, fitted.map(|item| item.id)),
                 tick,
             )
             .is_ok();
         rows.push(row);
     }
-    for offer in modules.offers.iter().filter(|offer| offer.slot == slot) {
+    let offers = slot_facing(slot).map_or_else(
+        || modules.offers.clone(),
+        |facing| world.laser_offers(facing),
+    );
+    for offer in offers.iter().filter(|offer| offer.slot == slot) {
         let mut row = base_row(
-            offer.kind.node(),
+            &module_node(offer.kind, slot),
             &format!("{} (purchase)", offer.kind.name()),
             label,
         );
@@ -668,11 +758,7 @@ fn module_rows(
             row.readout
                 .push(format!("Requires owned {}", required.name()));
         }
-        let action = if offer.kind == ModuleKind::MiningLaser {
-            ModuleAction::PurchaseMiningLaser
-        } else {
-            ModuleAction::Purchase { kind: offer.kind }
-        };
+        let action = purchase_action(offer.kind, slot);
         let admission = world.review_module(action, tick);
         row.can_buy = admission.is_ok();
         row.refusal = admission.err().map(|error| error.to_string());
@@ -691,29 +777,31 @@ fn equipment_panel(
         .ok_or("No module inventory")?;
     let ammo = world.ammunition_snapshot().ok_or("No missile inventory")?;
     let tick = world.snapshot().tick;
-    let front = modules
-        .items
+    let mut slots: Vec<_> = LASER_SLOTS
         .iter()
-        .find(|i| i.slot == Some(ModuleSlot::FrontLaser));
-    let mut slots = vec![
-        ui::EquipmentSlot {
-            id: "front-laser".into(),
-            label: "Front laser".into(),
-            fitted: front.map_or("Empty", |i| i.kind.name()).into(),
+        .map(|(facing, id, label)| ui::EquipmentSlot {
+            id: (*id).into(),
+            label: (*label).into(),
+            fitted: modules
+                .items
+                .iter()
+                .find(|item| item.slot == Some(facing.slot()))
+                .map_or("Empty", |item| item.kind.name())
+                .into(),
             available: true,
-        },
-        ui::EquipmentSlot {
-            id: "cargo-expansion".into(),
-            label: "Cargo expansion".into(),
-            fitted: if equipment.owned.is_some_and(|i| i.fitted) {
-                equipment.definition.name
-            } else {
-                "Empty"
-            }
-            .into(),
-            available: true,
-        },
-    ];
+        })
+        .collect();
+    slots.push(ui::EquipmentSlot {
+        id: "cargo-expansion".into(),
+        label: "Cargo expansion".into(),
+        fitted: if equipment.owned.is_some_and(|i| i.fitted) {
+            equipment.definition.name
+        } else {
+            "Empty"
+        }
+        .into(),
+        available: true,
+    });
     slots.push(ui::EquipmentSlot {
         id: "energy".into(),
         label: "Energy system".into(),
@@ -751,12 +839,13 @@ fn equipment_panel(
         });
     }
     let mut rows = Vec::new();
-    let module_slot = match selected {
-        "front-laser" => Some(ModuleSlot::FrontLaser),
-        "energy" => Some(ModuleSlot::Energy),
-        "navigation" => Some(ModuleSlot::Navigation),
-        _ => None,
-    };
+    let module_slot = laser_facing(selected)
+        .map(LaserFacing::slot)
+        .or(match selected {
+            "energy" => Some(ModuleSlot::Energy),
+            "navigation" => Some(ModuleSlot::Navigation),
+            _ => None,
+        });
     if let Some(slot) = module_slot {
         rows = module_rows(world, &modules, slot, tick);
     } else if selected == ui::emp::SLOT {
@@ -1178,7 +1267,7 @@ mod tests {
     fn front_module_rows_and_pylon_slots_use_real_owned_instances_and_admission() {
         let (_directory, profile, _menu) = start();
         let panel = ok(equipment_panel(&profile.world, "front-laser", ""));
-        assert_eq!(panel.slots.len(), 15);
+        assert_eq!(panel.slots.len(), 18);
         let emp = panel
             .slots
             .iter()
@@ -1543,3 +1632,6 @@ mod tests {
         assert_eq!(ok(profile.world.save_bytes()), before);
     }
 }
+
+#[cfg(test)]
+mod laser_tests;

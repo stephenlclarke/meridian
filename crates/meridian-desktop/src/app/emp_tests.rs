@@ -35,7 +35,7 @@ fn shop(a: &mut App) {
     ok(m.open(&a.game.world, ui::Screen::Equipment));
     a.docked = Some(m);
     paint(a);
-    for _ in 0..5 {
+    for _ in 0..8 {
         menu_key(a, ui::Key::NextSlot);
     }
 }
@@ -73,7 +73,7 @@ fn trade(w: &mut World, id: CommodityId, n: usize, buy: bool) {
         ));
     }
 }
-fn earned(a: &mut App) {
+pub(super) fn earned(a: &mut App) {
     let w = &mut a.game.world;
     for (quantity, cash) in [(29, 11434), (47, 18296), (75, 29042)] {
         if w.snapshot()

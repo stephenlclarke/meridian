@@ -675,12 +675,15 @@ impl Session {
         }
         if snapshot.mode == FlightMode::Flight
             && snapshot.navigation.is_some_and(|nav| nav.travel.is_none())
-            && let Some(laser) = world.front_laser_snapshot()
             && let Some(resources) = world.flight_resources_snapshot()
         {
+            let facing = format!("{:?}", world.selected_laser_facing()).to_ascii_uppercase();
+            let fire = world.selected_laser_snapshot().map_or_else(
+                || format!("{facing} UNAVAILABLE: NO FITTED LASER"),
+                |laser| format!("FIRE {facing} {}", laser.weapon.label()),
+            );
             lines.push(format!(
-                "Z FIRE FRONT {} | ENERGY {}.{:02} | HEAT {}.{} | COOLDOWN {} TICKS",
-                laser.weapon.label(),
+                "Z {fire} | ENERGY {}.{:02} | HEAT {}.{} | COOLDOWN {} TICKS",
                 resources.energy_hundredths / 100,
                 resources.energy_hundredths % 100,
                 resources.heat_fifths / 5,
