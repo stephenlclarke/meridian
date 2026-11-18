@@ -829,61 +829,64 @@ impl App {
         repeat: bool,
         text: Option<&str>,
     ) -> Option<KeyCode> {
-        if let PhysicalKey::Code(code) = physical_key {
-            if self.game.is_internal_validation() {
-                self.keys.clear();
-                return (state == ElementState::Pressed
-                    && self.focused
-                    && !self.occluded
-                    && !repeat
-                    && matches!(
-                        code,
-                        KeyCode::Escape | KeyCode::KeyQ | KeyCode::KeyP | KeyCode::Period
-                    ))
-                .then_some(code);
-            }
-            if state == ElementState::Released {
-                self.keys.remove(&code);
-                if code == KeyCode::KeyU {
-                    self.cancel_emp_input();
-                }
-            } else if self.focused && !self.occluded {
-                if self.route_help(code, repeat, text) {
-                    return None;
-                }
-                if self.route_xyzzy(code, repeat) {
-                    return None;
-                }
-                if self.commander_open {
-                    return (!repeat).then_some(code);
-                }
-                if self.menu_active()
-                    && self.docked.as_ref().is_some_and(Docked::search_active)
-                    && let Some(text) = text.filter(|s| s.chars().all(|c| !c.is_control()))
-                {
-                    self.menu_input(ui::Input::Text(text.to_string()));
-                    return None;
-                }
-                if repeat
-                    && !(self.menu_active()
-                        && matches!(
-                            code,
-                            KeyCode::ArrowUp
-                                | KeyCode::ArrowDown
-                                | KeyCode::PageUp
-                                | KeyCode::PageDown
-                                | KeyCode::Backspace
-                        ))
-                {
-                    return None;
-                }
-                if !self.menu_active() {
-                    self.keys.insert(code);
-                }
-                return Some(code);
-            }
+        let PhysicalKey::Code(code) = physical_key else {
+            return None;
+        };
+        if self.game.is_internal_validation() {
+            self.keys.clear();
+            return (state == ElementState::Pressed
+                && self.focused
+                && !self.occluded
+                && !repeat
+                && matches!(
+                    code,
+                    KeyCode::Escape | KeyCode::KeyQ | KeyCode::KeyP | KeyCode::Period
+                ))
+            .then_some(code);
         }
-        None
+        if state == ElementState::Released {
+            self.keys.remove(&code);
+            if code == KeyCode::KeyU {
+                self.cancel_emp_input();
+            }
+            return None;
+        }
+        if !self.focused || self.occluded {
+            return None;
+        }
+        if self.route_help(code, repeat, text) {
+            return None;
+        }
+        if self.route_xyzzy(code, repeat) {
+            return None;
+        }
+        if self.commander_open {
+            return (!repeat).then_some(code);
+        }
+        if self.menu_active()
+            && self.docked.as_ref().is_some_and(Docked::search_active)
+            && let Some(text) = text.filter(|s| s.chars().all(|c| !c.is_control()))
+        {
+            self.menu_input(ui::Input::Text(text.to_string()));
+            return None;
+        }
+        if repeat
+            && !(self.menu_active()
+                && matches!(
+                    code,
+                    KeyCode::ArrowUp
+                        | KeyCode::ArrowDown
+                        | KeyCode::PageUp
+                        | KeyCode::PageDown
+                        | KeyCode::Backspace
+                ))
+        {
+            return None;
+        }
+        if !self.menu_active() {
+            self.keys.insert(code);
+        }
+        Some(code)
     }
 
     fn build_docked_frame(
