@@ -597,11 +597,25 @@ impl Session {
         }
     }
 
+    /// Selected owned weapon status only; the complete control guide stays in Help.
+    fn selected_laser_status(world: &World) -> String {
+        let facing = format!("{:?}", world.selected_laser_facing()).to_ascii_uppercase();
+        world.selected_laser_snapshot().map_or_else(
+            || format!("{facing} UNAVAILABLE: NO FITTED LASER"),
+            |laser| format!("FIRE {facing} {}", laser.weapon.label()),
+        )
+    }
+
     fn append_compact_flight(
         world: &World,
         snapshot: meridian_core::Snapshot,
         lines: &mut Vec<String>,
     ) {
+        if snapshot.navigation.is_some_and(|nav| nav.travel.is_none())
+            && world.flight_resources_snapshot().is_some()
+        {
+            lines.push(format!("Z {}", Self::selected_laser_status(world)));
+        }
         append_missile_panel(world, snapshot.mode, lines);
         if let Some(line) = practice_line(world) {
             lines.push(line);
@@ -679,11 +693,7 @@ impl Session {
             && snapshot.navigation.is_some_and(|nav| nav.travel.is_none())
             && let Some(resources) = world.flight_resources_snapshot()
         {
-            let facing = format!("{:?}", world.selected_laser_facing()).to_ascii_uppercase();
-            let fire = world.selected_laser_snapshot().map_or_else(
-                || format!("{facing} UNAVAILABLE: NO FITTED LASER"),
-                |laser| format!("FIRE {facing} {}", laser.weapon.label()),
-            );
+            let fire = Self::selected_laser_status(world);
             lines.push(format!(
                 "Z {fire} | ENERGY {}.{:02} | HEAT {}.{} | COOLDOWN {} TICKS",
                 resources.energy_hundredths / 100,

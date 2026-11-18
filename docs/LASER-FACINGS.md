@@ -378,3 +378,49 @@ setup example remains uncompiled/unrun, for G1 only after changed compilation
 passes and complete Root/G2 source review. Navigation/trade progress is preserved
 separately and does not enter this delta. No compiler, Cargo, Clippy, Rust/helper,
 native/GPU or bot is run by this author.
+
+## Compact selected-weapon HUD correction
+
+Exact Mac `2de5f2d7155fa4fef54386264a5e0227c38e5dfa`, tree
+`e2b069905133009bb648978c196623c3b792f803`, reports all 431 core and two
+compatibility cases passed, then 242 desktop passes and two failures. All earlier
+15 core failures, the three later geometry/finite-flight conditions and the new
+rear-hit archive/cold case pass on that source. Its actual total is 675 passes
+and two failures among 677 executed top-level Rust cases. The remaining 32
+importer and three observer cases, strict Clippy, releases, headless setup and
+native acceptance are unrun. The original raw desktop failures contain no actual
+HUD line dump; no truncation, content or resource value is invented from them.
+
+The causal source path is explicit. `Session::lines` identifies default flight
+as compact, calls `append_compact_flight` and returns. That builder emits missile,
+practice/countdown and Help rows, while the selected-mount label exists only in
+`append_flight_status`, which the compact path never reaches. The failed host
+cases use default flight and no modal panels. They already pass actual view,
+body-axis shot, owned-item and resource assertions before checking the omitted
+HUD label. Profile's wrapper only adds its existing labelled status rows; no
+later frame publication or renderer truncation is needed to explain the missing
+line at the Session source boundary.
+
+`selected_laser_status` now supplies the existing exact selected-facing/weapon or
+empty-mount label to both builders. Compact flight appends exactly one short
+`Z FIRE {FACING} {WEAPON}` or `Z {FACING} UNAVAILABLE: NO FITTED LASER` status row
+when not spooling and with actual resource state. Expanded status retains its
+existing energy/heat/cooldown row unchanged. The compact overlay does not call
+the expanded status/control builder or reintroduce the movement/control block;
+resources retain the actual cockpit owner and H/? retains the full guide.
+Missile, practice, countdown, notice/review priority and Help behavior remain.
+No core state, selected-view command, firing/mining admission, ECM control,
+geometry, resource, save, asset, lock or profile publication code changes.
+
+Both original failing predicates remain with actual HUD lines added only to
+meaningful failure diagnostics. The same two existing cases additionally require
+the exact selected label and H/? to fit above the real cockpit at 640x360, remain
+within columns, exclude the full control block, produce bounded CPU HUD/cockpit
+vertices and leave save bytes identical. The first case retains all four actual
+digit/view/fire paths and actual Save/Quit/fresh leased Profile continuation;
+the second retains actual empty-mount refusal/no fallback and selected Right Help
+context. All other test bodies and every 431-case core source byte remain.
+No case is added, dropped, skipped or weakened. These new checks are authored
+**UNRUN**, not native rendering evidence. Corrected source needs one complete
+Root/G2 delta review and fresh existing G1/Dell qualification before native work.
+The sealed same-source setup helper and navigation/trade packets remain untouched.
