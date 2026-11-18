@@ -340,10 +340,10 @@ fn recent_attacker(a: &mut App) -> meridian_core::traffic::NpcId {
     stop(w);
     for _ in 0..24000 {
         ok(w.step(FlightInput::default()));
-        if let Some(hit) = w.traffic_snapshot().and_then(|t| t.last_player_hit) {
-            if hit.world_tick == w.snapshot().tick {
-                return hit.attacker;
-            }
+        if let Some(hit) = w.traffic_snapshot().and_then(|t| t.last_player_hit)
+            && hit.world_tick == w.snapshot().tick
+        {
+            return hit.attacker;
         }
     }
     panic!("no genuine attacker; never fabricate aggression");

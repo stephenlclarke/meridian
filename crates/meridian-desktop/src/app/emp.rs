@@ -20,10 +20,10 @@ impl App {
             let held = self.keys.contains(&KeyCode::KeyU);
             if held || self.game.world.emp_snapshot().is_some() {
                 let tick = self.game.world.snapshot().tick;
-                if let Err(error) = self.game.world.request_emp_trigger(held, tick) {
-                    if held {
-                        self.notice = Some(error.to_string());
-                    }
+                if let Err(error) = self.game.world.request_emp_trigger(held, tick)
+                    && held
+                {
+                    self.notice = Some(error.to_string());
                 }
             }
             refusal = step_frame(
