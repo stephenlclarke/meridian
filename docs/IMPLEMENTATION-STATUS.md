@@ -4,6 +4,8 @@
 
 The desktop source hides the routine flight summary, idle lesson and practice prompts, and repeated missile and Help text above the instruments. Command feedback expires after four seconds in ordinary flight, including when paused. Active practice, jump countdowns and contact warnings remain visible. Preview 8 still uses the older display. Native visual qualification for this change is pending.
 
+The Lion Citadel exterior now uses blue-grey plating, darker structural steel and amber light strips in the desktop source. Subtle face shading gives adjacent panels depth. The renderer applies this finish at load time to the original material assignments. Native appearance checks and the reported gaps above and below the entrance remain open.
+
 ## Internal Mule docking validation
 
 Mac build `ffb7112` passed 702 Rust tests, 102 Python tests, strict Clippy, and the release build. In the native scene the aligned Mule crossed at tick 104 and the obstructed Mule stopped for station contact at tick 11. Linux and native Windows each passed 705 Rust tests including three observer tests, 102 Python tests, strict Clippy, and both release builds. One Metal fixture was excluded from the ordinary test counts on each platform. These results qualify the internal docking scene. Ordinary encounters and player acquisition remain open. [Controls and test scope](MULE-VALIDATION-LAUNCH.md)
