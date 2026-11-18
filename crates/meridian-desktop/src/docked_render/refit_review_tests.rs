@@ -355,6 +355,11 @@ fn actual_paid_beam_store_then_immediate_fit_keeps_visible_review_controls_and_c
         ok(std::fs::read(directory.0.join("commander.meridian"))),
         bytes
     );
+    let owner = some(profile.world.commander_id()).seed();
+    let expected_continue = super::continue_oracle::Expected::from_original(&bytes, owner);
+    // Crosscheck public loader against the independent format/counter/checksum oracle.
+    let public_continue = ok(ok(World::from_save_bytes(&bytes)).save_bytes());
+    assert_eq!(public_continue, expected_continue.bytes);
     drop(profile);
     let mut cold = open(&directory.0);
     ok(cold.continue_saved());
@@ -362,5 +367,13 @@ fn actual_paid_beam_store_then_immediate_fit_keeps_visible_review_controls_and_c
     assert_eq!(cold.world.flight_view(), FlightView::Front);
     assert_eq!(cold.world.credits_tenths(), Some(9888500));
     assert_eq!(cold.world.flight_resources_snapshot(), resources);
-    assert_eq!(ok(cold.world.save_bytes()), bytes);
+    // Continue revokes old review permissions. The original raw-file equality predicate
+    // and its actual failure remain in the sealed 7661 evidence, not as a false invariant.
+    let continued_bytes = ok(cold.world.save_bytes());
+    expected_continue.assert_actual(&bytes, &continued_bytes);
+    assert_eq!(continued_bytes, expected_continue.bytes);
+    assert_eq!(
+        ok(std::fs::read(directory.0.join("commander.meridian"))),
+        bytes
+    );
 }

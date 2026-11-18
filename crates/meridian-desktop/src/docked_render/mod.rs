@@ -610,3 +610,6 @@ mod tests;
 
 #[cfg(test)]
 mod refit_review_tests;
+
+#[cfg(test)]
+mod continue_oracle;
