@@ -207,8 +207,8 @@ fn metal_union_overlaps_do_not_brighten_and_depletion_distance_depth_hide() {
         bytes
     };
     let overlap = render(&u, 1.0);
-    assert!(overlap.as_chunks::<4>().0.any(|p| p[3] > 0));
-    assert!(overlap.as_chunks::<4>().0.all(|p| p[3] <= 5));
+    assert!(overlap.as_chunks::<4>().0.iter().any(|p| p[3] > 0));
+    assert!(overlap.as_chunks::<4>().0.iter().all(|p| p[3] <= 5));
     for item in &mut u.pieces[1..] {
         item.range = [0; 4];
         item.low = [100.0, 100.0, 100.0, 0.02];

@@ -52,7 +52,8 @@ fn visual() -> Result<Vec<VisualVertex>, &'static str> {
     let result: Vec<VisualVertex> = VISUAL[16..]
         .as_chunks::<56>()
         .0
-        .map(bytemuck::pod_read_unaligned)
+        .iter()
+        .map(|record| bytemuck::pod_read_unaligned(record.as_slice()))
         .collect();
     if result.iter().any(|v| {
         v.position
