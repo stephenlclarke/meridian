@@ -100,6 +100,16 @@ impl FreightSession {
             .checked_add(1)
             .ok_or(MissionError::SequenceExhausted)
     }
+    pub(super) fn launch_epoch(&self) -> Result<u64, MissionError> {
+        // Resuming and departing each invalidate the prior review authority.
+        self.epoch
+            .checked_add(1 + u64::from(self.paused))
+            .ok_or(MissionError::SequenceExhausted)
+    }
+    pub(super) fn publish_launch(&mut self, epoch: u64) {
+        self.paused = false;
+        self.rebind_dock(None, epoch);
+    }
     pub(super) fn epoch(&self) -> u64 {
         self.epoch
     }

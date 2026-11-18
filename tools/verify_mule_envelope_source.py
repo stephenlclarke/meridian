@@ -15,6 +15,48 @@ def sha(data):
     return hashlib.sha256(data).hexdigest()
 
 
+def undo_commander_launch(relative, data):
+    replacements = {
+        'flight.rs': [
+            (
+                b'        self.launch(expected_tick, false)\n'
+                b'    }\n\n'
+                b'    /// Resume and depart from the current commander berth as one World transaction.\n'
+                b'    /// A refused departure also preserves the original pause and review sequence.\n'
+                b'    pub fn request_launch_from_commander(&mut self, expected_tick: u64) -> Result<(), StepError> {\n'
+                b'        self.launch(expected_tick, true)\n'
+                b'    }\n\n'
+                b'    fn launch(&mut self, expected_tick: u64, from_commander: bool) -> Result<(), StepError> {\n',
+                b'',
+            ),
+            (b'        if self.is_paused() && !from_commander {\n', b'        if self.is_paused() {\n'),
+            (b'            || (from_commander && self.current_dock_context().is_none())\n', b''),
+            (b'            .map(mission::FreightSession::launch_epoch)\n',
+             b'            .map(|session| session.next_epoch())\n'),
+            (b'            session.publish_launch(epoch);\n', b'            session.rebind_dock(None, epoch);\n'),
+        ],
+        'flight/mission.rs': [
+            (
+                b'    pub(super) fn launch_epoch(&self) -> Result<u64, MissionError> {\n'
+                b'        // Resuming and departing each invalidate the prior review authority.\n'
+                b'        self.epoch\n'
+                b'            .checked_add(1 + u64::from(self.paused))\n'
+                b'            .ok_or(MissionError::SequenceExhausted)\n'
+                b'    }\n'
+                b'    pub(super) fn publish_launch(&mut self, epoch: u64) {\n'
+                b'        self.paused = false;\n'
+                b'        self.rebind_dock(None, epoch);\n'
+                b'    }\n',
+                b'',
+            ),
+        ],
+    }
+    for current, original in replacements.get(relative, []):
+        assert data.count(current) == 1, relative
+        data = data.replace(current, original, 1)
+    return data
+
+
 def verify_inputs(folder):
     manifest = json.loads((folder / 'MANIFEST.json').read_text())
     for name, pin in manifest['files'].items():
@@ -109,6 +151,7 @@ def verify_protected_core(root):
         for addition in additions.get(relative, []):
             assert data.count(addition) == 1, relative
             data = data.replace(addition, b'', 1)
+        data = undo_commander_launch(relative, data)
         if relative == 'flight.rs':
             speed_line = b'        if !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
             original_line = b'        if !self.state.speed.is_finite() || !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
@@ -172,7 +215,18 @@ def verify():
     groups = verify_geometry(folder)
     checked, hooks = verify_protected_core(ROOT)
     counts = verify_historical_bindings(folder, groups)
-    return {'status': 'PASS_SOURCE_ONLY', 'protectedGameplayCoreFilesUnchanged': checked - hooks, 'protectedCoreFilesWithMuleHooks': hooks, 'protectedCoreFilesChecked': checked, **counts, 'vertexEncoding': 5344, 'triangleEncoding': 9008, 'constructorsOrContactOrContainmentOrCompilerExecuted': False}
+    return {
+        'status': 'PASS_SOURCE_ONLY',
+        # flight.rs is shared by the two changes, and flight/mission.rs is additional.
+        'protectedGameplayCoreFilesUnchanged': checked - hooks - 1,
+        'protectedCoreFilesWithCommanderLaunch': 2,
+        'protectedCoreFilesWithMuleHooks': hooks,
+        'protectedCoreFilesChecked': checked,
+        **counts,
+        'vertexEncoding': 5344,
+        'triangleEncoding': 9008,
+        'constructorsOrContactOrContainmentOrCompilerExecuted': False,
+    }
 
 
 if __name__ == '__main__':
