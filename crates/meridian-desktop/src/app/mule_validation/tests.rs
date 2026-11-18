@@ -337,10 +337,11 @@ fn side_entry_uses_real_pilot_with_read_only_left_view_and_keeps_world_view_unch
 fn docking_modes_hold_the_real_terminal_frame_and_display_its_outcome() {
     use meridian_core::traffic::{MuleValidationRefusal, NpcPhase};
 
-    for (name, phase, refusal, notice) in [
-        ("dock", NpcPhase::Complete, None, "CROSSING ACCEPTED"),
+    for (name, x_offset, phase, refusal, notice) in [
+        ("dock", 0.0, NpcPhase::Complete, None, "CROSSING ACCEPTED"),
         (
             "dock-obstructed",
+            69.0,
             NpcPhase::Approach,
             Some(MuleValidationRefusal::StationContact),
             "MULE STOPPED",
@@ -382,6 +383,13 @@ fn docking_modes_hold_the_real_terminal_frame_and_display_its_outcome() {
                 frame.world_tick()
             );
         };
+        let port_center = app
+            .game
+            .world
+            .station_port()
+            .unwrap_or_else(|| panic!("actual port"))
+            .center();
+        assert_eq!(opening.actor().pose.position.x, port_center.x + x_offset);
         check_framing(&opening);
         assert_eq!(opening.actor().phase, NpcPhase::Approach);
         assert!(app.paused && app.game.is_internal_validation());
@@ -410,13 +418,8 @@ fn docking_modes_hold_the_real_terminal_frame_and_display_its_outcome() {
         assert_eq!(terminal.actor().speed_units, 0.0);
         assert_eq!(terminal.actor().id, opening.actor().id);
         assert_eq!(app.game.world.mule_observer_pose(&terminal), Some(observer));
-        let port = app
-            .game
-            .world
-            .station_port()
-            .unwrap_or_else(|| panic!("actual port"));
         assert_eq!(
-            terminal.actor().pose.position.z <= port.center().z,
+            terminal.actor().pose.position.z <= port_center.z,
             refusal.is_none()
         );
         assert!((1..=DOCKING_TICK_LIMIT).contains(&terminal.world_tick()));

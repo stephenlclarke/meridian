@@ -163,7 +163,9 @@ fn docking_starts(
     let source = MuleHullSource::bundled()?;
     let (observer_radius, _) = observer_source()?;
     let reserve = observer_radius * 1.001 + 2.0;
-    let approach_x = port.x + if obstructed { 100.0 } else { 0.0 };
+    // The +69 m lane meets the original SH028 front lip. The +100 m lane
+    // clears the wall and is only an entry-conditions refusal.
+    let approach_x = port.x + if obstructed { 69.0 } else { 0.0 };
     let approach = FlightStart {
         position: [approach_x as f32, port.y as f32, 260.0],
         orientation: [0.0, 1.0, 0.0, 0.0],
