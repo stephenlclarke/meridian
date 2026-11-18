@@ -63,3 +63,15 @@ Eleven new core tests cover all source vertices/triangle interiors, directional 
 The ordinary save fixture now preserves raw byte equality at checked decode. Public Continue must independently change only the existing saved review sequence and session epoch by one, plus the checksum; it must still grant no validation Mule. Those anti-replay changes are deliberate current behavior and remain untouched. [The causal record](../integration/sh001-mule/CAUSAL-CORRECTION.json) binds the source and immutable first-failure evidence.
 
 SH001 remains unadmitted. Current World actor selection, real per-ID equipment/crew/paid blueprint acquisition, current-save ownership, existing contact/EMP binding, renderer evidence, native docking/gameplay qualification and protected main integration are still required. Root retains merge ownership. The accepted baseline stays 23/162 ships and 4/6 stations. Do not advance to SH008 or apply blanket fleet admission until Mule's actual one-by-one acceptance is complete.
+
+## Reproducing the packaged source
+
+Set `MERIDIAN_MULE_SOURCE_ROOT` to the approved directory containing the read-only snapshot, proposal and R3 ZIP. The selector paths are relative to that root or absolute canonical paths within it. The importer rejects redirected paths and verifies the full ZIP before parsing its pinned SH001 member. Stage sources in a dedicated operator-controlled directory.
+
+```sh
+MERIDIAN_MULE_SOURCE_ROOT=/path/to/approved-mule-sources \
+  python3 tools/import_mule_envelope_source.py \
+  --snapshot snapshot --proposal proposal --archive fleet-design-r3.zip --check
+```
+
+`--check` compares the original copies, encodings and manifest with the packaged files without writing. Omit the flag to regenerate those files.
