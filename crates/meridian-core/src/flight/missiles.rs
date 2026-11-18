@@ -103,7 +103,6 @@ pub enum MissileEnd {
     TargetLost,
     Culled,
     Intercepted,
-    Ecm,
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum MissileContact {
@@ -159,7 +158,6 @@ pub struct ProjectileSnapshot {
     pub contact: Option<MissileContact>,
     pub last_tick: u64,
     pub intercepting_emission: Option<u64>,
-    pub ecm: Option<super::ecm::EcmTermination>,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MissileRound {
@@ -205,7 +203,6 @@ struct Motion {
 }
 #[derive(Debug, Clone, PartialEq)]
 struct Beam {
-    mounted_emission: super::MountedLaserEmission,
     shot: super::PulseShot,
     emission: u64,
     npc_scene: Option<crate::traffic::MissileScene>,
@@ -300,11 +297,7 @@ impl State {
         emission: u64,
         shot: super::PulseShot,
         npc_scene: crate::traffic::MissileScene,
-        mounted_emission: super::MountedLaserEmission,
     ) -> bool {
-        if !mounted_emission.matches_ray(shot.origin, shot.direction) {
-            return false;
-        }
         let bodies = self.bodies();
         for p in self.projectiles.iter_mut().flatten() {
             if p.origin.projectile == id && p.ended.is_none() {
@@ -312,7 +305,6 @@ impl State {
                 p.last_tick = tick;
                 p.intercepting_emission = Some(emission);
                 self.beams[usize::from(id.ordinal)] = Some(Beam {
-                    mounted_emission,
                     shot,
                     emission,
                     bodies,
@@ -537,7 +529,6 @@ impl World {
             contact: None,
             last_tick: tick,
             intercepting_emission: None,
-            ecm: None,
         };
         let npc_launch = if matches!(target, MissileTarget::Npc(_)) {
             Some(npc::NpcLaunch {
@@ -577,13 +568,6 @@ impl World {
         self.missiles.npc_launches[index] = npc_launch;
         self.missiles.armed = false;
         self.missiles.cooldown = MISSILE_COOLDOWN_TICKS;
-        self.ecm.terminate_live(
-            &mut self.missiles,
-            owner,
-            tick,
-            self.combat.physical_tick(),
-            emission,
-        );
         if let Some(p) = &mut self.practice {
             p.pending_missiles = self.missiles.pending_for_lesson(*p);
             p.observe_discharge(tick);
@@ -963,51 +947,6 @@ fn choose(best: &mut Option<(f64, MissileContact)>, distance: f64, contact: Miss
         distance < old || (distance == old && order(contact) < order(previous))
     }) {
         *best = Some((distance, contact));
-    }
-}
-
-impl State {
-    pub(in crate::flight) fn has_laser_interception(&self, emission: u64) -> bool {
-        self.beams
-            .iter()
-            .flatten()
-            .any(|beam| beam.emission == emission)
-    }
-}
-
-impl State {
-    pub(in crate::flight) fn laser_interception_emissions(
-        &self,
-    ) -> impl Iterator<Item = (u64, u64, u64, super::MountedLaserEmission)> + '_ {
-        self.beams.iter().flatten().map(|beam| {
-            (
-                beam.emission,
-                beam.shot.tick,
-                beam.shot.fitted_item_id,
-                beam.mounted_emission,
-            )
-        })
-    }
-}
-
-#[cfg(test)]
-impl State {
-    /// Negative control only: changes an already emitted interception, never creates one.
-    pub(in crate::flight) fn corrupt_intercepting_laser(
-        &mut self,
-        emission: u64,
-        corrupt: impl FnOnce(&mut super::PulseShot, &mut super::MountedLaserEmission),
-    ) -> bool {
-        let Some(beam) = self
-            .beams
-            .iter_mut()
-            .flatten()
-            .find(|beam| beam.emission == emission)
-        else {
-            return false;
-        };
-        corrupt(&mut beam.shot, &mut beam.mounted_emission);
-        true
     }
 }
 

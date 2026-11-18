@@ -333,7 +333,6 @@ impl State {
                 }
             }
             Some(MissileEnd::Intercepted) => self.validate_interception(world, None, p, i)?,
-            Some(MissileEnd::Ecm) => world.ecm.validate_terminal(world, p)?,
         }
         if (p.ended == Some(MissileEnd::Impact)) != p.contact.is_some()
             || e.loss.is_some() != (p.ended == Some(MissileEnd::TargetLost))

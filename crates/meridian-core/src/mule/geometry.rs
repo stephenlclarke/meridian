@@ -158,6 +158,15 @@ impl SmoothPiece {
     pub fn contains(&self, p: Vec3) -> bool {
         finite(p) && self.distance_bracket(p).lower <= self.radius
     }
+    /// Test evidence only: strict lower distance bound for a neighbourhood.
+    #[cfg(test)]
+    pub(super) fn excludes_neighbourhood(&self, point: Vec3, radius: f64) -> bool {
+        finite(point)
+            && radius.is_finite()
+            && radius >= 0.0
+            && self.distance_bracket(point).lower - self.radius > radius
+    }
+
     fn distance_bracket(&self, p: Vec3) -> DistanceBracket {
         let error = 2048.0 * f64::EPSILON * (1.0 + length(p) + self.origin_radius);
         let mut simplex = vec![sub(self.points[0], p)];

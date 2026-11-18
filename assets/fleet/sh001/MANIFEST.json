@@ -54,16 +54,16 @@
     },
     "source-piece-membership.bin": {
       "bytes": 5344,
-      "sha256": "c3b9ff6d1cdaec8d4c9cc57b468637d9996338540ceae08df6b6264593b18fad"
+      "sha256": "91a814db76c631601b99d3957ea8548134531e5f6883b17a3310ad131863139a"
     },
     "COMPONENT-PIECES.json": {
-      "bytes": 95339,
-      "sha256": "e9a879e72ed66b1b4aad60dba3a9a875edd79db06366efaa36ea7a81422faa68"
+      "bytes": 95393,
+      "sha256": "ac6f80985d065c5712743bcda758098c6e8db92ab9154be15f5922b971bc7c74"
     }
   },
   "transform": "Verbatim source files and source-order XYZ encoding only; no envelope/hull/contact/containment/union algorithm executed",
-  "gameplayEnvelope": "Sixteen separate source-convex-support pieces with a2cm spherical offset; distinct conservative approximation, not exact source union or native512-face qualification",
-  "pieceGrouping": "Original body, six separate supports, six panniers, cockpit and two engines; every triangle stays in one original component/piece",
+  "gameplayEnvelope": "Thirty-four separate source-convex-support pieces with a2cm spherical offset; distinct conservative approximation, not exact source union or native512-face qualification",
+  "pieceGrouping": "Primary body; twelve detailed and four native body well assemblies; two longitudinal service struts; six supports; six panniers; cockpit; two engines. Each whole creator component stays in one piece.",
   "exactGeometryQualification": "UNRESOLVED; original source and all prior exact-geometry caps/results retained",
   "admission": "UNQUALIFIED; source binding grants no actor, shield, crew, equipment, blueprint, purchase or salvage authority"
 }

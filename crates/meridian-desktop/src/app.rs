@@ -1,4 +1,3 @@
-mod ecm;
 mod emp;
 mod mule_validation;
 use std::{
@@ -10,8 +9,7 @@ use std::{
 };
 
 use meridian_core::{
-    FlightInput, FlightMode, FlightView, LaserFacing, MotionRefusal, PulseContact, PulseShot,
-    StepError, World,
+    FlightInput, FlightMode, FlightView, MotionRefusal, PulseContact, PulseShot, StepError, World,
 };
 use winit::{
     application::ApplicationHandler,
@@ -57,20 +55,15 @@ fn step_frame(
             *pulse = None;
             *mining = None;
         } else if fire_held {
-            if world.selected_laser_facing() == LaserFacing::Front
-                && let Ok(tool) = world.mining_tool_authority()
-            {
+            if let Ok(tool) = world.mining_tool_authority() {
                 if let Ok(shot) = world.request_mining(tool, state.tick) {
                     *mining = Some(asteroid_render::MiningVisual {
                         opening: state,
                         shot,
                     });
                 }
-            } else {
-                *mining = None;
-                if let Ok(shot) = world.request_fire_selected_laser(state.tick) {
-                    *pulse = Some(shot);
-                }
+            } else if let Ok(shot) = world.request_fire_front_laser(state.tick) {
+                *pulse = Some(shot);
             }
         }
     }
@@ -213,17 +206,18 @@ impl App {
         if self.game.world.snapshot().mode == FlightMode::Docked {
             crate::help::Panel::docked(review)
         } else {
-            let world = &self.game.world;
-            let weapon = world
+            let weapon = self
+                .game
+                .world
                 .modular_equipment_snapshot()
                 .and_then(|modules| {
                     modules
                         .items
                         .into_iter()
-                        .find(|item| item.slot == Some(world.selected_laser_facing().slot()))
+                        .find(|item| item.slot == Some(meridian_core::ModuleSlot::FrontLaser))
                 })
                 .map(|item| item.kind.name());
-            crate::help::Panel::flight_selected(world.selected_laser_facing(), weapon, review)
+            crate::help::Panel::flight(weapon, review)
         }
     }
 
@@ -353,17 +347,6 @@ impl App {
                 Ok(mule_validation::Control::Ignored) => {}
                 Err(error) => self.fail(event_loop, error),
             }
-            return;
-        }
-        if code == KeyCode::F8
-            && let Some(renderer) = self.renderer.as_ref()
-            && renderer.request_review_observation(
-                self.docked
-                    .as_ref()
-                    .and_then(Docked::review_capture_identity),
-            )
-        {
-            self.request_redraw();
             return;
         }
         let global = matches!(
@@ -569,10 +552,6 @@ impl App {
     }
 
     fn game_key(&mut self, code: KeyCode) {
-        if code == KeyCode::KeyN {
-            self.activate_ecm();
-            return;
-        }
         if code == KeyCode::KeyU && self.game.world.snapshot().mode == FlightMode::Flight {
             self.notice = Some("EMP: hold U for ten seconds; release to cancel. Recent-attacker self-defence only.".into());
             return;
@@ -835,13 +814,7 @@ impl App {
         match presented {
             Ok(Presentation::Presented) => {
                 if let (Some(menu), Some(frame)) = (docked, docked_frame) {
-                    let expected = (frame.stamp, frame.ui_revision);
-                    let accepted = menu.presented(frame);
-                    renderer.acknowledge_review(
-                        expected,
-                        menu.captured_painted_identity(),
-                        accepted,
-                    );
+                    menu.presented(frame);
                 }
             }
             Ok(Presentation::Skipped) => {
@@ -891,16 +864,6 @@ impl App {
         let prepared = self.prepare_presentation(active, pulse_notice, elapsed, |r| {
             r.map(Renderer::logical_viewport)
         });
-        if let Err(error) = &prepared
-            && let Some(renderer) = self.renderer.as_ref()
-        {
-            renderer.capture_review_preparation_failure(
-                self.docked
-                    .as_ref()
-                    .and_then(Docked::review_capture_identity),
-                error,
-            );
-        }
         let Some(PreparedPresentation {
             mut hud_lines,
             docked_frame,
@@ -1060,11 +1023,6 @@ impl App {
             } else {
                 self.game.world.flight_view()
             });
-            renderer.set_review_capture_identity(
-                self.docked
-                    .as_ref()
-                    .and_then(Docked::review_capture_identity),
-            );
             let draw_started = self.validation_timing.is_some().then(Instant::now);
             let presented = renderer.draw(
                 &snapshot,
@@ -1305,9 +1263,3 @@ mod xyzzy_tests;
 
 #[cfg(test)]
 mod emp_tests;
-
-#[cfg(test)]
-mod ecm_tests;
-
-#[cfg(test)]
-mod laser_tests;

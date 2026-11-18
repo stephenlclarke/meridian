@@ -399,18 +399,6 @@ struct Geometry {
     unavailable_models: usize,
 }
 impl Geometry {
-    fn capture_evidence(&self) -> ([usize; 3], [usize; 3], u64) {
-        let parts: [&[u8]; 3] = [
-            bytemuck::cast_slice(&self.shapes),
-            bytemuck::cast_slice(&self.text),
-            bytemuck::cast_slice(&self.models),
-        ];
-        (
-            [self.shapes.len(), self.text.len(), self.models.len()],
-            parts.map(|p| p.len()),
-            crate::review_capture::digest(&parts),
-        )
-    }
     fn with_capacity() -> Self {
         Self {
             shapes: Vec::with_capacity(MAX_GEOMETRY),
@@ -607,9 +595,3 @@ fn append_model(
 }
 #[cfg(test)]
 mod tests;
-
-#[cfg(test)]
-mod refit_review_tests;
-
-#[cfg(test)]
-mod continue_oracle;

@@ -12,7 +12,6 @@ enum Kind {
     Berth,
     Pulse,
     Laser(super::OrdinaryWeapon),
-    FacedLaser(super::OrdinaryWeapon, super::LaserFacing),
     Mining(u8),
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -30,7 +29,6 @@ struct LaserSpend {
     clock: u64,
     weapon: super::OrdinaryWeapon,
     item: u64,
-    facing: super::LaserFacing,
 }
 
 impl State {
@@ -72,25 +70,10 @@ impl State {
         self.append(clock, Kind::Laser(weapon))
             .map_err(|()| FireError::SequenceExhausted)
     }
-    pub(super) fn laser_facing(
-        &self,
-        clock: u64,
-        weapon: super::OrdinaryWeapon,
-        facing: super::LaserFacing,
-    ) -> Result<Self, FireError> {
-        if facing == super::LaserFacing::Front {
-            return self.laser(clock, weapon);
-        }
-        if !self.enabled || !weapon.is_laser() {
-            return Err(FireError::NoFittedLaser(facing));
-        }
-        self.append(clock, Kind::FacedLaser(weapon, facing))
-            .map_err(|()| FireError::SequenceExhausted)
-    }
     pub(super) fn has_rapid_spend(&self) -> bool {
         self.events
             .iter()
-            .any(|event| matches!(event.kind, Kind::Laser(weapon) | Kind::FacedLaser(weapon, _) if weapon.cooldown_ticks() == 6))
+            .any(|event| matches!(event.kind, Kind::Laser(weapon) if weapon.cooldown_ticks() == 6))
     }
     pub(super) fn quiet_since(&self, tick: u64, anchor: u64, physical: u64) -> bool {
         let Some(elapsed) = tick.checked_sub(anchor) else {
@@ -145,7 +128,6 @@ impl State {
                 Kind::Berth => 0,
                 Kind::Pulse => 1,
                 Kind::Laser(weapon) => weapon.tag() + 1,
-                Kind::FacedLaser(weapon, facing) => 64 + facing.tag() * 8 + weapon.tag(),
                 Kind::Mining(body) => 32 + body,
             });
         }
@@ -166,14 +148,6 @@ impl State {
                     Kind::Laser(super::OrdinaryWeapon::from_tag(tag - 1)?)
                 }
                 tag @ 32..=43 if version >= 16 => Kind::Mining(tag - 32),
-                tag @ 72..=93 => {
-                    let facing = super::LaserFacing::from_tag((tag - 64) / 8)?;
-                    let weapon = super::OrdinaryWeapon::from_tag((tag - 64) % 8)?;
-                    if !weapon.is_laser() {
-                        return Err(INVALID);
-                    }
-                    Kind::FacedLaser(weapon, facing)
-                }
                 _ => return Err(INVALID),
             };
             events.push(Event { clock, kind });
@@ -224,19 +198,13 @@ impl State {
                 kind => {
                     let weapon = match kind {
                         Kind::Pulse => super::OrdinaryWeapon::FrontPulseLaser,
-                        Kind::Laser(weapon) | Kind::FacedLaser(weapon, _) => weapon,
+                        Kind::Laser(weapon) => weapon,
                         _ => return Err(INVALID),
                     };
-                    let facing = match kind {
-                        Kind::FacedLaser(_, facing) => facing,
-                        _ => super::LaserFacing::Front,
-                    };
-                    let fitted = if facing == super::LaserFacing::Front {
-                        world.modular.front_at_physical(world, event.clock)
-                    } else {
-                        world.modular.laser_at_physical(world, event.clock, facing)
-                    }
-                    .ok_or(INVALID)?;
+                    let fitted = world
+                        .modular
+                        .front_at_physical(world, event.clock)
+                        .ok_or(INVALID)?;
                     if super::OrdinaryWeapon::from_module(fitted.kind) != Some(weapon) {
                         return Err(INVALID);
                     }
@@ -245,12 +213,10 @@ impl State {
                         clock: event.clock,
                         weapon,
                         item: fitted.id,
-                        facing,
                     });
                     Effect::Laser(weapon)
                 }
             };
-            world.ecm.validate_emission(event.clock, next_emission)?;
             next_emission += 1;
             events.push((event.clock, 3, 0, effect));
         }
@@ -342,14 +308,6 @@ impl State {
             }
             events.push((clock, 3, sequence as u64, Effect::Emp { contact }));
         }
-        for (ordinal, clock) in world.ecm.activation_clocks().enumerate() {
-            if clock > end {
-                return Err(INVALID);
-            }
-            // An ECM spend commutes with same-tick laser spends: both require positive
-            // energy afterward and ECM changes neither heat nor the weapon cooldown.
-            events.push((clock, 4, ordinal as u64, Effect::Ecm));
-        }
         events.sort_by_key(|&(clock, phase, sequence, _)| (clock, phase, sequence));
         Ok(events)
     }
@@ -364,7 +322,6 @@ impl State {
                 && world.traffic.player_hits().is_empty()
                 && world.mining.strokes().is_empty()
                 && world.emp.resource_effects().is_empty()
-                && world.ecm.activation_clocks().next().is_none()
             {
                 Ok(())
             } else {
@@ -434,34 +391,6 @@ fn validate_laser_receipts(
         ordinary.clone(),
         player_beams.clone().map(|(_, _, emission)| emission),
     )?;
-    let mut beacons = BTreeMap::new();
-    for practice in world.practice.iter().chain(world.practice_history.iter()) {
-        for hit in practice.laser_hits() {
-            let shot = spend(hit.emission)?;
-            if (shot.item, shot.facing) != (hit.item, hit.facing)
-                || world
-                    .state
-                    .tick
-                    .checked_sub(hit.tick)
-                    .is_none_or(|elapsed| {
-                        end.checked_sub(shot.clock)
-                            .is_none_or(|since| since > elapsed)
-                    })
-                || beacons
-                    .insert(hit.emission, hit)
-                    .is_some_and(|prior| prior != hit)
-                || ordinary
-                    .clone()
-                    .any(|ordinary| ordinary.emission == hit.emission)
-                || player_beams
-                    .clone()
-                    .any(|(_, _, emission)| emission == hit.emission)
-                || world.missiles.has_laser_interception(hit.emission)
-            {
-                return Err(INVALID);
-            }
-        }
-    }
     for hit in ordinary {
         if hit.weapon.is_laser() {
             let shot = spend(hit.emission)?;
@@ -478,19 +407,9 @@ fn validate_laser_receipts(
             .checked_sub(beam.world_tick)
             .ok_or(INVALID)?;
         let since_shot = end.checked_sub(shot.clock).ok_or(INVALID)?;
-        let mounted = beam.mounted_emission.ok_or(INVALID)?;
-        if (shot.weapon, shot.item, shot.clock, shot.facing)
-            != (beam.weapon, item, mounted.physical_tick, mounted.facing)
+        if (shot.weapon, shot.item) != (beam.weapon, item)
             || shot.clock > beam.world_tick
             || since_shot > elapsed
-        {
-            return Err(INVALID);
-        }
-    }
-    for (emission, tick, item, mounted) in world.missiles.laser_interception_emissions() {
-        let shot = spend(emission)?;
-        if (shot.item, shot.facing, shot.clock) != (item, mounted.facing, mounted.physical_tick)
-            || world.laser_profile_at_tick(item, tick, mounted.facing) != Some(shot.weapon)
         {
             return Err(INVALID);
         }
@@ -530,7 +449,6 @@ enum Effect {
     Mining,
     Hit { front: bool, damage: u16 },
     Emp { contact: Option<(bool, u16, u16)> },
-    Ecm,
 }
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 struct Pools {
@@ -564,9 +482,6 @@ fn replay(events: &[ResourceEvent], end: u64) -> Result<Pools, SaveError> {
                     .pulse
                     .prepare_mining_discharge()
                     .map_err(|_| INVALID)?;
-            }
-            Effect::Ecm => {
-                pools.pulse = pools.pulse.prepare_ecm_discharge().map_err(|_| INVALID)?
             }
             Effect::Emp { contact } => {
                 pools.pulse = pools.pulse.prepare_emp_discharge().map_err(|_| INVALID)?;
@@ -613,6 +528,3 @@ fn advance(pools: &mut Pools, elapsed: u64) {
 
 #[cfg(test)]
 mod rapid_energy_tests;
-
-#[cfg(test)]
-mod mounted_ray_tests;

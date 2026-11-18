@@ -8,7 +8,8 @@ use std::sync::Arc;
 
 const VERTICES: &[u8] = include_bytes!("../../../assets/fleet/sh001/all-source.vertices");
 const MEMBERSHIP: &[u8] = include_bytes!("../../../assets/fleet/sh001/source-piece-membership.bin");
-pub const MULE_PIECES: usize = 16;
+pub const MULE_PIECES: usize = 34;
+pub const MULE_PRESENTATION_REVISION: u32 = 2;
 pub const MULE_RESOURCE_SHA256: &str =
     "1c8cce7fb8130c12780fb522592249805cb06e6b22fcffb169ae651556f47c82";
 pub const MULE_CONTRACT_SHA256: &str =
@@ -16,6 +17,8 @@ pub const MULE_CONTRACT_SHA256: &str =
 pub const MULE_DETAILED_VERTICES: usize = 4360;
 pub const MULE_NATIVE_VERTICES: usize = 984;
 pub const MULE_CLEARANCE_METRES: f64 = 0.02;
+/// The bundled SH001 contract's performance.maxSpeed, in FlightStart speed units.
+pub(crate) const MULE_MAX_SPEED_UNITS: f32 = 33.2;
 pub const MULE_MAX_SHIMMER_OPACITY: f32 = 0.018;
 pub const MULE_SHIMMER_NEAR_METRES: f32 = 32.0;
 pub const MULE_SHIMMER_FAR_METRES: f32 = 64.0;
@@ -188,7 +191,7 @@ impl MuleHullSource {
             rear_shield_fraction: f32::from(rear) / f32::from(capacity),
             maximum_opacity: MULE_MAX_SHIMMER_OPACITY,
             close_fade_metres: [MULE_SHIMMER_NEAR_METRES, MULE_SHIMMER_FAR_METRES],
-            revision: 1,
+            revision: MULE_PRESENTATION_REVISION,
         })
     }
     /// Strict analytic support against every aperture edge; no bounding-box fit substitution.

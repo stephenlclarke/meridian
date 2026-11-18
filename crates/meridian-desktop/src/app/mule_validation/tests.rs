@@ -137,7 +137,7 @@ fn no_profile_storage_or_command_can_change_the_scenario_or_existing_save() {
     assert!(internal.xyzzy(XyzzyAction::Enter).is_err());
     for action in [
         crate::session::Action::Launch,
-        crate::session::Action::ActivateEcm,
+        crate::session::Action::Emp(meridian_core::EmpEquipmentAction::Purchase),
         crate::session::Action::FireMissile,
         crate::session::Action::SetFlightView(meridian_core::FlightView::Rear),
     ] {

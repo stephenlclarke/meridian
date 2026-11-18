@@ -314,4 +314,4 @@ impl State {
 }
 
 #[cfg(test)]
-pub(in crate::flight) mod tests;
+mod tests;

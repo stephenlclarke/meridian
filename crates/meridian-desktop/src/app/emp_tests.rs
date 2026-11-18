@@ -35,7 +35,7 @@ fn shop(a: &mut App) {
     ok(m.open(&a.game.world, ui::Screen::Equipment));
     a.docked = Some(m);
     paint(a);
-    for _ in 0..8 {
+    for _ in 0..5 {
         menu_key(a, ui::Key::NextSlot);
     }
 }
@@ -73,7 +73,7 @@ fn trade(w: &mut World, id: CommodityId, n: usize, buy: bool) {
         ));
     }
 }
-pub(super) fn earned(a: &mut App) {
+fn earned(a: &mut App) {
     let w = &mut a.game.world;
     for (quantity, cash) in [(29, 11434), (47, 18296), (75, 29042)] {
         if w.snapshot()
@@ -287,7 +287,7 @@ fn emp_equipment_help_retains_station_navigation_and_bounded_modal_text() {
     assert_eq!(ok(a.game.world.save_bytes()), before);
 }
 
-pub(super) fn yaw_to(w: &World, x: f64, z: f64) -> FlightInput {
+fn yaw_to(w: &World, x: f64, z: f64) -> FlightInput {
     let s = w.snapshot();
     let [qx, qy, qz, qw] = s.orientation.map(f64::from);
     let yaw = (2.0 * (qx * qz + qw * qy)).atan2(1.0 - 2.0 * (qx * qx + qy * qy));
@@ -314,9 +314,6 @@ fn stop(w: &mut World) {
 // acceptance case. This is explicitly headless setup, never native piloting evidence.
 fn recent_attacker(a: &mut App) -> meridian_core::traffic::NpcId {
     ok(a.game.xyzzy(XyzzyAction::Enter));
-    pursue_recent_attacker(a)
-}
-pub(super) fn pursue_recent_attacker(a: &mut App) -> meridian_core::traffic::NpcId {
     let w = &mut a.game.world;
     ok(w.request_station_service(Command::BuyFood, w.snapshot().tick));
     ok(w.request_launch(w.snapshot().tick));

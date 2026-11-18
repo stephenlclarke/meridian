@@ -55,9 +55,11 @@ def encode_vertices(resource, original, ownership):
 
 
 def component_groups(ownership):
-    """Assign original named structural operations to sixteen bounded smooth pieces."""
+    """Assign original named structural operations to source-bound smooth pieces."""
     result = {}
     point_groups = bytearray()
+    # Keep differently positioned detailed and native body wells separate.
+    body_wells = {}
     for model in ['design', 'nativeDesign']:
         current = 0
         pannier = 0
@@ -75,13 +77,23 @@ def component_groups(ownership):
                 current = 14
             elif name.startswith('engine_pair/positive side/'):
                 current = 15
-            rows.append({'component': part['index'], 'name': name, 'piece': current,
+            group = current
+            if name.startswith('body primary pressure envelope/service-well-'):
+                root = name.split('/', 2)[1]
+                group = body_wells.setdefault((model, root), 16 + len(body_wells))
+            elif name == 'body primary pressure envelope/longitudinal-service-strut-0':
+                group = 32
+            elif name == 'body primary pressure envelope/longitudinal-service-strut-1':
+                group = 33
+            rows.append({'component': part['index'], 'name': name, 'piece': group,
                          'vertexStart': part['vertexStart'], 'vertexCount': part['vertexCount'],
                          'faceStart': part['faceStart'], 'faceCount': part['faceCount']})
-            point_groups.extend(bytes([current]) * part['vertexCount'])
+            point_groups.extend(bytes([group]) * part['vertexCount'])
         if pannier != 6:
             raise ValueError('Changed original pannier operation count')
         result[model] = rows
+    if len(body_wells) != 16:
+        raise ValueError('Changed original body well assembly count')
     return result, bytes(point_groups)
 
 
@@ -128,8 +140,8 @@ def import_source(snapshot, proposal, archive, check=False):
         'sourceComponents': {'detailed': 371, 'native': 49},
         'files': {name: {'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()} for name, data in outputs.items()},
         'transform': 'Verbatim source files and source-order XYZ encoding only; no envelope/hull/contact/containment/union algorithm executed',
-        'gameplayEnvelope': 'Sixteen separate source-convex-support pieces with a2cm spherical offset; distinct conservative approximation, not exact source union or native512-face qualification',
-        'pieceGrouping': 'Original body, six separate supports, six panniers, cockpit and two engines; every triangle stays in one original component/piece',
+        'gameplayEnvelope': 'Thirty-four separate source-convex-support pieces with a2cm spherical offset; distinct conservative approximation, not exact source union or native512-face qualification',
+        'pieceGrouping': 'Primary body; twelve detailed and four native body well assemblies; two longitudinal service struts; six supports; six panniers; cockpit; two engines. Each whole creator component stays in one piece.',
         'exactGeometryQualification': 'UNRESOLVED; original source and all prior exact-geometry caps/results retained',
         'admission': 'UNQUALIFIED; source binding grants no actor, shield, crew, equipment, blueprint, purchase or salvage authority',
     }

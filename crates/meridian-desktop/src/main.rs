@@ -14,7 +14,6 @@ mod mesh;
 mod mule_render;
 mod profile;
 mod renderer;
-mod review_capture;
 mod session;
 mod storage;
 mod trade_lesson;

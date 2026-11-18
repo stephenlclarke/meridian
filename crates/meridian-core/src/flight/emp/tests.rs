@@ -18,7 +18,7 @@ fn equipment(w: &mut World, action: EmpEquipmentAction) {
     assert_eq!(w.emp_snapshot(), candidate.emp_snapshot());
     assert_eq!(w.credits_tenths(), candidate.credits_tenths());
 }
-pub(in crate::flight) fn paid() -> World {
+fn paid() -> World {
     let mut w = World::new_commander(16101).unwrap();
     let issuer = w.station_contacts()[0];
     w.request_contact(issuer, w.snapshot().tick).unwrap();
@@ -379,7 +379,7 @@ fn aim_input(w: &World, target: crate::traffic::NpcId) -> FlightInput {
         ..FlightInput::default()
     }
 }
-pub(in crate::flight) fn defender(mut w: World) -> (World, crate::traffic::NpcId) {
+fn defender(mut w: World) -> (World, crate::traffic::NpcId) {
     w.request_station_service(crate::station_services::Command::BuyFood, w.snapshot().tick)
         .unwrap();
     launch(&mut w);
@@ -615,7 +615,6 @@ fn actual_secret_base_release_spends_once_drains_shield_and_preserves_hull_cargo
         modular: w.modular.clone(),
         xyzzy: w.xyzzy.clone(),
         emp: w.emp.clone(),
-        ecm: w.ecm.clone(),
         navigation_trade: w.navigation_trade.clone(),
         flight_reception: w.flight_reception.clone(),
         practice: w.practice,
@@ -1364,69 +1363,4 @@ fn native_death_before_recovery_stays_dead_and_refuses_recovery_without_resource
     assert_eq!(loaded.traffic.emp_resources(target).unwrap().0, 0);
     assert!(loaded.emp.episodes.last().unwrap().recovered_at.is_none());
     cold(&loaded);
-}
-
-#[test]
-fn genuine_paid_ecm_cancels_actual_emp_warmup_without_a_pulse_or_bank_spend() {
-    let mut w = World::new_commander(12001).unwrap();
-    // Explicit secret funding/kit fixture. ECM itself is a real paid acquisition, never a grant.
-    secret(&mut w);
-    let scoop = w.fuel_scoops_snapshot().unwrap().owned.unwrap().id;
-    for action in [
-        crate::ModuleAction::Store { item: scoop },
-        crate::ModuleAction::Purchase {
-            kind: crate::ModuleKind::EcmSystem,
-        },
-    ] {
-        let tick = w.snapshot().tick;
-        let review = w.review_module(action, tick).unwrap();
-        w.prepare_module(review, tick).unwrap().commit();
-    }
-    let (mut w, target) = defender(w);
-    start_charge(&mut w, target);
-    let bank = w.emp.meter.bank;
-    let spent = w.emp.meter.bank_spent;
-    let cash = w.credits_tenths();
-    let cargo = w.service_snapshot();
-    let energy = w.flight_resources_snapshot().unwrap().energy_hundredths;
-    let emissions = w.combat.emissions;
-    w.request_ecm(w.snapshot().tick).unwrap();
-    assert_eq!(
-        w.emp.charge.as_ref().unwrap().phase,
-        EmpChargePhase::Cancelled
-    );
-    assert!(w.emp.pulses.is_empty());
-    assert_eq!(w.emp.meter.bank, bank);
-    assert_eq!(w.emp.meter.bank_spent, spent);
-    assert_eq!(w.combat.emissions, emissions);
-    assert_eq!(
-        w.flight_resources_snapshot().unwrap().energy_hundredths,
-        energy - 2200
-    );
-    assert_eq!(w.credits_tenths(), cash);
-    assert_eq!(w.service_snapshot(), cargo);
-    cold(&w);
-    steps(&mut w, 1);
-    assert!(w.emp.pulses.is_empty());
-    cold(&w);
-}
-
-#[test]
-fn ecm_electrical_disable_guard_preserves_an_isolated_negative_drain_fixture() {
-    let mut w = World::new_commander(16105).unwrap();
-    secret(&mut w);
-    launch(&mut w);
-    // Guard component only: the real kernel has no fabricated encounter provenance.
-    // Ordinary save validation must continue to reject this deliberately incomplete history.
-    let main = w.emp.meter.main;
-    w.emp.meter.drain(main, w.combat.physical_tick()).unwrap();
-    assert!(w.emp.electrical_disabled());
-    assert!(w.save_bytes().is_err());
-    let before = w.unchecked_test_save().unwrap();
-    assert_eq!(
-        w.request_ecm(w.snapshot().tick),
-        Err(crate::EcmError::ElectricalDisabled)
-    );
-    assert_eq!(w.unchecked_test_save().unwrap(), before);
-    assert!(w.save_bytes().is_err());
 }

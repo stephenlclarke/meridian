@@ -69,6 +69,26 @@ impl OriginalStationData {
         roll_rate: f64,
         angular_travel: f64,
     ) -> bool {
+        self.mule_entry_conditions(
+            source,
+            start,
+            end,
+            physical_speed,
+            roll_rate,
+            angular_travel,
+        ) && self.mule_motion_clear(source, start, end, angular_travel)
+    }
+
+    /// Entry policy and aperture fit, independent of station mesh clearance.
+    pub(crate) fn mule_entry_conditions(
+        &self,
+        source: &MuleHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        physical_speed: f64,
+        roll_rate: f64,
+        angular_travel: f64,
+    ) -> bool {
         let old = self.depth(start);
         let depth = self.depth(end);
         if !(old > 0.0 && depth <= 0.0 && depth > -self.port.tunnel_depth())
@@ -101,7 +121,6 @@ impl OriginalStationData {
         margin.is_finite()
             && source.fits_port(&self.port, start, station, margin) == Ok(true)
             && source.fits_port(&self.port, end, station, margin) == Ok(true)
-            && self.mule_motion_clear(source, start, end, angular_travel)
     }
 }
 

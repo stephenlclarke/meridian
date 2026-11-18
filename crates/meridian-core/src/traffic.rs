@@ -152,7 +152,6 @@ pub enum BeamSource {
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct TrafficBeam {
-    pub mounted_emission: Option<crate::MountedLaserEmission>,
     pub weapon: crate::flight::OrdinaryWeapon,
     pub source: BeamSource,
     pub victim: NpcId,
@@ -327,7 +326,6 @@ pub(crate) struct PlayerTarget {
     pub(crate) cargo: bool,
 }
 pub(crate) struct PlayerBeamInput {
-    pub(crate) mounted_emission: crate::MountedLaserEmission,
     pub(crate) weapon: crate::flight::OrdinaryWeapon,
     pub(crate) system: SystemId,
     pub(crate) source: BeamSource,

@@ -45,7 +45,6 @@ impl Panel {
                 "F6 Flight lesson | F12 Cancel | C Lesson details",
                 "I Mission details",
                 "Hold U 10 seconds: EMP | Release U cancels unfinished charge",
-                "N Manual ECM: 22 energy | 0.53s field; Continue keeps only cooldown",
                 "F7 Close attempt | F8 Reception | F10 Practice review",
                 "4 Trade review | 5 Plan | 6 Cancel | 7 Details",
                 "F5 Save | F9 Reload | F11 Fullscreen | Escape Save/Quit",
@@ -65,21 +64,6 @@ impl Panel {
             ),
         );
         panel.review(review, "After help: B cancels; Escape saves and quits");
-        panel
-    }
-
-    pub fn flight_selected(
-        facing: meridian_core::LaserFacing,
-        weapon: Option<&str>,
-        review: Option<&str>,
-    ) -> Self {
-        let mut panel = Self::flight(weapon, review);
-        if facing != meridian_core::LaserFacing::Front {
-            panel.lines[2] = weapon.map_or_else(
-                || format!("Z unavailable: no fitted {facing:?} laser"),
-                |weapon| format!("Z Fire {facing:?} {weapon}; shared energy, heat and cooldown"),
-            );
-        }
         panel
     }
 
@@ -145,9 +129,7 @@ impl Panel {
                     "] Next slot | Up / Down Select owned item or offer",
                     "G / Enter Review purchase | Y Review fit | U Review store",
                     "D Details | O Options",
-                    "Front / left / right / rear: fit one owned laser per mount",
                     "EMP slot: G reviews base/grade; Y fits; U stores; no free charge",
-                    "ECM slot: G buys; Y fits; U stores; N activates in flight",
                     "An unavailable offer explains its current refusal",
                 ],
             ),

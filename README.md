@@ -1,18 +1,8 @@
 # Meridian
 
-## Internal Mule entry: authored, unrun
+## Internal Mule docking validation
 
-The [explicit internal desktop route](docs/MULE-VALIDATION-LAUNCH.md) now selects the real World-owned Mule scenario for native validation, starting paused with source-derived front, rear, far or side/contact observer presets. It opens no profile store, resolves no save directory and grants no commander; save/load/equipment and movement input refuse. P and single-step advance only the actual World reducer. Seven new lifecycle/refusal tests are authored **UNRUN**. Ordinary startup remains the normal commander path. Compiler, shader/GPU and actual game-view acceptance remain with the owning lane; no new native result is claimed.
-
-## Mule envelope core qualified; World and renderer authored
-
-Mule has a distinct conservative gameplay envelope made from sixteen rounded source-component supports with a proposed 2 cm directional stand-off. The detailed source geometry, engineering mass/centre/inertia and provenance remain separate and unchanged. This implements the human's smooth, close-fitting collision direction; it does not clear the unresolved exact-original importer or its limits.
-
-The envelope core passed 444 fresh Mac tests, including all eleven Mule cases, locked compilation checks and strict Clippy on the committed lint correction. The combined current source adds an explicit World-owned Mule validation scenario and the [original-hull and subtle-shimmer renderer](docs/MULE-RENDERER.md). Six new World/tightness tests, eleven ordinary renderer tests and one explicit Metal test are authored and **UNRUN**. Three offline renderer source-field/pixel checks passed on the author packet. The App adapter consumes only a matching current World-owned actor, generation, tick, surface and stationary observer. Ordinary constructors and loads supply no Mule. There is no ordinary Mule population, acquisition, crew, fitting/save entitlement, visual acceptance, preview delivery or increase in accepted hull count. Detailed concavity-distance samples and named-gap tests must still run; a 2 cm component support offset is not a maximum distance from every concave hull surface. Actual close/far/depleted/contact/docking views and performance remain unobserved.
-
-The current native run produced three identical nonblack GPU target copies while the paired Fit appeared black through CUA. A [bounded read-only independent window observer](docs/LASER-FACINGS.md#independent-macos-window-observer-preparation) is prepared to resolve the actual WindowServer capture identity. Sixteen offline policy fixtures and the Swift provider compile passed; the provider has not run and no UI API has run. Execution requires the explicit human exception for alternate UI technology. No renderer cure or native acceptance is claimed.
-
-The underlying ad5 game runtime passed Mac, Linux and native Windows qualification: 295 fresh Rust cases plus 433 reviewed unchanged Core/compatibility cases per platform, with current compiler, strict Clippy and release-build checks. The helper-only revisions left that qualified runtime unchanged; the new Mule World and renderer integration remains unqualified. The current native Fit-screen failure and dependent gameplay acceptance remain open.
+The internal SH001 Mule scene uses the original SH028 station. On Mac build `ffb7112`, Mule entered the clear opening at tick 104. On the obstructed approach it stopped at the station lip at tick 11. Ordinary play still has no Mule encounter. Build and test results are in the launch guide. [Controls and test scope](docs/MULE-VALIDATION-LAUNCH.md)
 
 [![CI](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=alert_status)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)
@@ -42,17 +32,6 @@ The underlying ad5 game runtime passed Mac, Linux and native Windows qualificati
 Meridian is a Rust reimplementation of the original L337 project, with direct wgpu graphics, one authoritative World and traceable original content. New code is [proprietary/source-visible](LICENSE); imported original content retains its own notices. Original Elite/Oolite assets are excluded.
 
 The current [Preview 8 EMP utility](docs/EMP.md) is published for macOS arm64 and Windows x64. It adds paid purchase, fitting, storage and power/capacity/recharge upgrades, a held-U pulse and electrical disablement that preserves hull, crew and cargo custody. Mac, Linux and native Windows qualification passed 631 Rust tests, 99 Python tests and 49 Markdown checks per platform, strict Clippy and locked release builds. The release uses corrected source `2d5f4a5`; the full earlier EMP native journey retains its separate `5e3e98a` identity. See [implementation status](docs/IMPLEMENTATION-STATUS.md) for the exact evidence and open limits.
-
-The [paid manual ECM candidate](docs/ECM.md) is source-authored and unrun. It adds real paid hardware, a charged 32-tick standard-missile field and time-only cold restoration, with an actual equipment slot, N flight control, HUD/Help and atomic durable activation. The source is joined with four laser facings; independent review and owner execution remain pending; automatic ECM and hostile missile production remain separate work.
-
-Exact `2de5f2d` Mac execution passed 431 core and two compatibility cases, then
-242/244 desktop cases. A [compact selected-weapon HUD correction](docs/LASER-FACINGS.md#compact-selected-weapon-hud-correction)
-restores one missing status row without the full control guide. Its corrected
-execution and native acceptance remain unrun; this is not a 712-case pass.
-
-The [four-facing laser core and desktop wiring](docs/LASER-FACINGS.md) are authored with nine new core and nine host regression cases, all unrun. Paid left/right/rear fitting, selected-view fire, Help, shared resources and cold replay are joined with paid manual ECM and await whole-source review and owned platform qualification.
-
-The [mounted laser receipt correction](docs/LASER-FACINGS.md#targeted-mounted-ray-receipt-correction) binds nonfront NPC hits and interceptions to actual body pose, facing and shared spend. Two coordinated-relabel regressions are authored, unrun; Root owns the separate EMP control-fork correction and final review/qualification.
 
 ## Previews and validation
 
@@ -114,7 +93,6 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | Hold U in active flight | Charge the fitted EMP for 600 accepted ticks; early release cancels |
 | I; V; X | Mission details; review all held freight deliveries; review abandonment |
 | F1; F2; F3; F4 | Next ship/practice lock; arm/safe; launch one missile; safe/unlock |
-| N in flight (ECM candidate, UNRUN) | Activate fitted manual ECM; costs 22 energy and uses a 0.53-second field/cooldown |
 | F7; F8; F10 | Review attempt closure; reception; fresh consent |
 | F6; F12; C; 0/1/2/3 | Flight lesson consent/reception; cancellation; details; view direction |
 | P; F11; F5; F9 | Pause; fullscreen; save; reload the current qualified save |
@@ -162,16 +140,4 @@ Preview 8 includes the paid Equipment EMP utility slot, held-U flight control an
 
 ## Offline reference importer
 
-The [Rust reference importer](crates/meridian-import/README.md) converts only the pinned original SH025/SH028 source into the five existing binary fixtures. It preserves original notices and emits its own Rust producer receipt. The current source has passed designated Mac, Linux and native Windows qualification, including actual CLI conversion and the current core loader. PR 52 merged at `22715d6`; all six exact-main CI jobs and the Sonar quality gate passed. PR 53 corrected that finding at `792f448`, after bounded 32-case importer qualification passed on Mac, Linux and native Windows. Its new exact-main CI and analysis are pending. The importer does not add ships or change gameplay, and is not included in Preview 8.
-
-Mule core qualification on the angular correction passed all 444 tests (442 library and two compatibility cases), including eleven Mule cases. Strict Clippy then stopped on three style/import diagnostics. The bounded correction moves the test-only import, collapses the equivalent conditional and uses fixed-size triangle chunks. Corrected-source qualification and native hull acceptance remain pending.
-
-The explicit World-owned Mule validation scenario and six additional World/tightness cases are authored and unrun. A scope-checked publication supplies the actual SH001 NPC, immutable surface, generation, tick and exact frozen pilot observer pose. Current ordinary population, paid acquisition/effects, crew and save entitlement remain pending. Sampled detailed-triangle excess-gap/extent records and six named pannier/cockpit/engine openings must be checked with actual render/contact/docking evidence before tight-fit acceptance or fleet reuse.
-
-The subsequent corrected Mule core qualification passed all 444 tests and strict Clippy without warnings. The earlier lint failure remains preserved. These results apply to the envelope prerequisite; the newly combined World and renderer source still requires its own qualification.
-
-Independent review of the combined Mule World and renderer source found strict-lint blockers: one unused preparation binding and seven constant-size chunk iterators. The bounded correction preserves the station-presence gate, exact-length guards, ordered records and every test assertion. Current combined compilation, tests, Metal and native acceptance remain pending.
-
-The first combined-source compile check stopped before running tests because an existing EMP test constructed `World` without the new optional Mule field. The test control now explicitly uses `mule_validation: None`; all its assertions and saved-state comparisons remain unchanged. The source-preservation verifier reverses only this exact initializer line when comparing the original qualified test. Changed-source compilation, ordinary tests, Metal and native checks remain pending.
-
-The next combined-source compile check passed the repaired EMP initializer and reached two renderer depth-state type mismatches. The production pipeline and explicit Metal test now use `Some(LessEqual)` for the locked wgpu optional depth comparison field. Tests, strict Clippy, release, Metal and native qualification remain unrun.
+The [Rust reference importer](crates/meridian-import/README.md) converts only the pinned original SH025/SH028 source into the five existing binary fixtures. It preserves original notices and emits its own Rust producer receipt. The current source has passed designated Mac, Linux and native Windows qualification, including actual CLI conversion and the current core loader. PR 52 merged at `22715d6`; all six exact-main CI jobs and the Sonar quality gate passed. One reported method-reference maintainability finding is being corrected; the correction has not yet been qualified. The importer does not add ships or change gameplay, and is not included in Preview 8.

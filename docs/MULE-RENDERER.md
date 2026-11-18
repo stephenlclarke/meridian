@@ -1,6 +1,6 @@
-# Mule renderer: authored, uncompiled and unrun
+# SH001 Mule renderer
 
-This change prepares the real desktop render pass for one World-owned SH001 Mule actor. It does not spawn one, relabel SH025, change the player hull or make the pending-fabrication catalogue available for purchase. `SceneEffects.mule` borrows `NpcSnapshot` and its matching immutable `MulePresentation`, plus the validated stationary `observer` pose. The exact adapter uses `World::mule_actor_snapshot()` and `World::mule_observer_pose(&frame)` to check private scope, generation and tick; `frame.world_tick()` must match the current snapshot. The app currently supplies `None`; the owning World scenario route must replace that with its actual identity, generation, scope and current-state checks. Core contact, EMP/ECM, paid resources, saves and ownership are unchanged.
+The internal validation scene renders a World-owned SH001 actor. The desktop pairs its immutable geometry with the stationary observer after checking source identity, World scope, generation and tick. Ordinary startup has no Mule actor. The development build passed controlled entry and station-lip contact on Metal. The protected-main integration has its own qualification. See [internal launch modes and results](MULE-VALIDATION-LAUNCH.md).
 
 ## Original visible hull
 
@@ -24,10 +24,6 @@ Opacity is capped at 0.018, with fourth-power grazing fade, full close strength 
 
 Pipeline, texture and geometry allocations are lazy and retained for this one surface. There are no per-frame GPU allocations, readbacks, waits or diagnostic output. Facet/work bounds and invisible refusal do not demonstrate acceptable frame rate. Memory, first preparation cost, close-view GPU time and native appearance remain unobserved.
 
-## Validation and owning execution
+## Validation
 
-Three offline Python checks pass: complete face/material/UV encoding, immutable original RGBA/notice binding, and changed-resource refusal. Direct rustfmt and Markdown/diff checks pass. The author ran no Cargo, Rust test, geometry constructor, shader compiler, GPU, native app or UI API.
-
-Eleven new ordinary Rust tests and one explicitly ignored Metal test are authored and **UNRUN**. Ordinary cases cover complete detailed source corner order, all 34 source boundaries and render tightness, closed cube boundary and invalid inputs, unchanged depleted contact data, all four camera views, f32 camera residual, linear-light opaque mips, encoded facet normals, actual WGSL parsing and host uniform layout, rejection of genuine World SH025 contacts without changing their save, and actual station/scene reframing into the controlled observer without an extra observer hull. The Metal test uses the actual production union shader with a labelled cube fixture, never a fake World actor. It checks identical one-versus-34 overlap pixels, including a final-slot-only check, nonzero bounded alpha, rear depletion, opaque occlusion and distance fade. Its bounded offscreen readback is test-only, not a screenshot or a runtime capture feature.
-
-Root carries the current core angular correction and G4 World route separately, then requests one complete source review. G1 owns locked compilation, ordinary Rust tests, actual shader validation, strict Clippy and build. After that source is cleared, G1 explicitly runs the ignored Metal test in its sole GPU lane. Actual World-controlled Mule close/far/front/rear/depleted/inter-pannier/contact/rotating-dock views and measured performance are still required for acceptance. No screenshot, visual pass, hull admission, other-hull rollout or performance result is claimed here. The separate window observer stays sealed; its human UI exception remains ungranted.
+The encoder tests check face order, material and UV encoding, original texture and notice identity, and rejection of a changed resource. Renderer tests cover source boundaries, tightness, camera views, opaque mips, shader parsing and uniform layout. A separate Metal test uses the production shader with a labelled cube to check overlap, alpha, occlusion and distance fade. The controlled World docking checks exercise the original Mule mesh and the actual station. Their timings measure CPU work. GPU frame rate remains unmeasured.

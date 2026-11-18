@@ -203,9 +203,6 @@ fn actual_native_player_hit_admits_pirate_retaliation_without_claiming_player_ca
     let aim = ok(data.player_planar_aimpoint(pirate.pose(), player.position))
         .unwrap_or_else(|| panic!("missing native pirate surface"));
     let direction = unit(sub(aim, player.position)).unwrap_or_else(|| panic!("invalid native aim"));
-    // Explicit body for this traffic-only fixture; production captures World's body.
-    let firing_body = pose(player.position, direction.x.atan2(direction.z));
-    let direction = firing_body.orientation.z;
     let contact = state
         .beam(&data, SystemId::AVENOR, player.position, direction, 6000.0)
         .unwrap_or_else(|| panic!("missing actual pirate surface"));
@@ -213,11 +210,6 @@ fn actual_native_player_hit_admits_pirate_retaliation_without_claiming_player_ca
     let mut state = ok(state.prepare_player_hit(
         &data,
         PlayerBeamInput {
-            mounted_emission: crate::MountedLaserEmission {
-                body_pose: firing_body,
-                facing: crate::LaserFacing::Front,
-                physical_tick: 900,
-            },
             weapon: crate::OrdinaryWeapon::FrontPulseLaser,
             system: SystemId::AVENOR,
             source: BeamSource::Player {

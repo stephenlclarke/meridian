@@ -190,7 +190,6 @@ fn end_tag(e: MissileEnd) -> u8 {
         MissileEnd::TargetLost => 3,
         MissileEnd::Culled => 4,
         MissileEnd::Intercepted => 5,
-        MissileEnd::Ecm => 6,
     }
 }
 fn read_end(r: &mut Reader<'_>) -> Result<MissileEnd, SaveError> {
@@ -201,7 +200,6 @@ fn read_end(r: &mut Reader<'_>) -> Result<MissileEnd, SaveError> {
         3 => MissileEnd::TargetLost,
         4 => MissileEnd::Culled,
         5 => MissileEnd::Intercepted,
-        6 => MissileEnd::Ecm,
         _ => return Err(SaveError::InvalidEncoding),
     })
 }
@@ -217,9 +215,6 @@ fn projectile(w: &mut Writer, p: &ProjectileSnapshot, version: u16) {
     w.option(p.contact.as_ref(), |w, c| contact(w, *c));
     w.u64(p.last_tick);
     w.option(p.intercepting_emission.as_ref(), |w, e| w.u64(*e));
-    if version >= 17 {
-        w.option(p.ecm.as_ref(), |w, end| end.encode(w));
-    }
 }
 fn read_projectile(r: &mut Reader<'_>, version: u16) -> Result<ProjectileSnapshot, SaveError> {
     Ok(ProjectileSnapshot {
@@ -234,11 +229,6 @@ fn read_projectile(r: &mut Reader<'_>, version: u16) -> Result<ProjectileSnapsho
         contact: r.option(read_contact)?,
         last_tick: r.u64()?,
         intercepting_emission: r.option(|r| r.u64())?,
-        ecm: if version >= 17 {
-            r.option(super::super::ecm::EcmTermination::decode)?
-        } else {
-            None
-        },
     })
 }
 impl State {
@@ -267,7 +257,20 @@ impl State {
             .projectiles
             .iter()
             .flatten()
-            .filter(|projectile| retained_beam_body(**projectile, &hit))
+            .filter(|p| {
+                p.origin.owner.visit == hit.visit
+                    && p.origin.owner.system == hit.system
+                    && (p.origin.launched_tick < hit.world_tick
+                        || (p.origin.launched_tick == hit.world_tick
+                            && hit.command_emission.is_some_and(|e| p.origin.emission < e)))
+                    && (p.ended.is_none()
+                        || p.last_tick > hit.world_tick
+                        || (p.ended == Some(MissileEnd::Intercepted)
+                            && p.last_tick == hit.world_tick
+                            && hit
+                                .command_emission
+                                .is_none_or(|e| p.intercepting_emission.is_some_and(|i| i > e))))
+            })
             .collect();
         if hit.bodies.len() != expected.len() {
             return Err(INVALID);
@@ -305,7 +308,7 @@ impl State {
             .collect()
     }
     pub(in crate::flight) fn encode(&self, w: &mut Writer) {
-        self.encode_version(w, crate::save::SAVE_VERSION);
+        self.encode_version(w, 15);
     }
     pub(in crate::flight) fn encode_version(&self, w: &mut Writer, version: u16) {
         if version >= 12 {
@@ -341,7 +344,6 @@ impl State {
             w.option(self.impacts[i].as_ref(), |w, h| h.encode(w));
             w.option(self.beams[i].as_ref(), |w, b| {
                 let s = b.shot;
-                b.mounted_emission.encode(w);
                 w.u64(b.emission);
                 w.u64(s.tick);
                 w.u64(s.fitted_item_id);
@@ -410,7 +412,6 @@ impl State {
             })?;
             state.impacts[i] = r.option(|r| OrdinaryImpact::decode_version(r, version))?;
             state.beams[i] = r.option(|r| {
-                let mounted_emission = super::super::MountedLaserEmission::decode(r)?;
                 let emission = r.u64()?;
                 let tick = r.u64()?;
                 let fitted_item_id = r.u64()?;
@@ -435,7 +436,6 @@ impl State {
                     None
                 };
                 Ok(Beam {
-                    mounted_emission,
                     bodies,
                     emission,
                     shot,
@@ -587,7 +587,6 @@ impl State {
             {
                 return Err(INVALID);
             }
-            world.ecm.validate_terminal(world, p)?;
             let o = p.origin;
             Self::validate_projectile_identity(world, owner, p, o, i, used)?;
             Self::validate_launch_order(o, prior)?;
@@ -808,7 +807,6 @@ impl State {
                 }
             }
             Some(MissileEnd::Impact) => {}
-            Some(MissileEnd::Ecm) => world.ecm.validate_terminal(world, p)?,
             Some(MissileEnd::Intercepted) => {
                 self.validate_interception(world, Some(lesson), p, i)?
             }
@@ -1204,7 +1202,6 @@ impl State {
                 None => true,
                 Some(_) if other.last_tick > m.flight.tick => true,
                 Some(_) if other.last_tick < m.flight.tick => false,
-                Some(MissileEnd::Ecm) => true,
                 Some(MissileEnd::Intercepted) => {
                     if self.beams[slot].is_some() {
                         return true;
@@ -1300,7 +1297,9 @@ impl State {
                 return Err(INVALID);
             };
             self.validate_beam_identity(world, b, p, emission, id)?;
-            let ray = b.mounted_emission.facing.ray(b.mounted_emission.body_pose);
+            let mut ray = pose(shot.origin, shot.direction).ok_or(INVALID)?;
+            // Pulse uses the exact quaternion-derived forward column without normalization.
+            ray.orientation.z = shot.direction;
             let d = mesh_distance(
                 RigidPose {
                     position: p.position,
@@ -1370,7 +1369,8 @@ impl State {
     ) -> Result<(), SaveError> {
         let shot = b.shot;
         for other in self.projectiles.iter().skip(b.bodies.len()).flatten() {
-            if other.origin.emission < emission && beam_body_before_ecm(*other, shot.tick, emission)
+            if other.origin.emission < emission
+                && (other.ended.is_none() || other.last_tick > shot.tick)
             {
                 return Err(INVALID);
             }
@@ -1378,7 +1378,7 @@ impl State {
         for (slot, body) in b.bodies.iter().copied().enumerate() {
             let expected = self.projectiles[slot].is_some_and(|other| {
                 other.origin.emission < emission
-                    && (slot == i || beam_body_before_ecm(other, shot.tick, emission))
+                    && (slot == i || other.ended.is_none() || other.last_tick > shot.tick)
             });
             if body.is_some() != expected {
                 return Err(INVALID);
@@ -1398,17 +1398,6 @@ impl State {
         id: ProjectileId,
     ) -> Result<(), SaveError> {
         let shot = b.shot;
-        let weapon = world
-            .laser_profile_at_tick(shot.fitted_item_id, shot.tick, b.mounted_emission.facing)
-            .ok_or(INVALID)?;
-        world.validate_mounted_laser_emission(
-            b.mounted_emission,
-            shot.fitted_item_id,
-            weapon,
-            shot.tick,
-            shot.origin,
-            shot.direction,
-        )?;
         if self
             .projectiles
             .iter()
@@ -1421,7 +1410,7 @@ impl State {
             || emission <= p.origin.emission
             || shot.tick != p.last_tick
             || world
-                .laser_profile_at_tick(shot.fitted_item_id, shot.tick, b.mounted_emission.facing)
+                .front_weapon_at_tick(shot.fitted_item_id, shot.tick)
                 .is_none()
             || id != p.origin.projectile
             || !valid_vector(shot.origin)
@@ -1558,45 +1547,6 @@ impl State {
                 .is_some_and(|e| sequence > e.dock_sequence),
         }
     }
-}
-
-fn retained_beam_body(projectile: ProjectileSnapshot, hit: &super::RetainedBeam<'_>) -> bool {
-    if projectile.origin.owner.visit != hit.visit || projectile.origin.owner.system != hit.system {
-        return false;
-    }
-    let born = projectile.origin.launched_tick < hit.world_tick
-        || (projectile.origin.launched_tick == hit.world_tick
-            && hit
-                .command_emission
-                .is_some_and(|emission| projectile.origin.emission < emission));
-    let live = projectile.ended.is_none()
-        || projectile.last_tick > hit.world_tick
-        || (projectile.ended == Some(MissileEnd::Ecm)
-            && projectile.last_tick == hit.world_tick
-            && hit.command_emission.is_none_or(|emission| {
-                projectile
-                    .ecm
-                    .is_some_and(|end| end.after_emission >= emission)
-            }))
-        || (projectile.ended == Some(MissileEnd::Intercepted)
-            && projectile.last_tick == hit.world_tick
-            && hit.command_emission.is_none_or(|emission| {
-                projectile
-                    .intercepting_emission
-                    .is_some_and(|end| end > emission)
-            }));
-    born && live
-}
-
-/// A manual ECM command follows the already accepted attack emissions at that tick.
-fn beam_body_before_ecm(projectile: ProjectileSnapshot, tick: u64, emission: u64) -> bool {
-    projectile.ended.is_none()
-        || projectile.last_tick > tick
-        || (projectile.ended == Some(MissileEnd::Ecm)
-            && projectile.last_tick == tick
-            && projectile
-                .ecm
-                .is_some_and(|end| end.after_emission >= emission))
 }
 
 #[cfg(test)]

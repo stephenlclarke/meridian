@@ -2,7 +2,6 @@
 //! not a claim that the separate mining scene has been joined or executed.
 #![allow(clippy::unwrap_used)]
 use super::*;
-use crate::PulseContact;
 use crate::flight::practice::tests::launch;
 use crate::save::Writer;
 
@@ -522,48 +521,4 @@ fn repeatable_beam_and_military_policy_counts_stored_examples_toward_the_four_it
         );
         assert_eq!(ledger.items.len(), 4);
     }
-}
-
-#[test]
-fn changed_saved_facing_or_foreign_slot_cannot_relabel_an_actual_nonfront_spend_or_restore() {
-    fn checked<T, E: core::fmt::Debug>(value: Result<T, E>) -> T {
-        value.unwrap_or_else(|error| panic!("unexpected public refusal: {error:?}"))
-    }
-    fn present<T>(value: Option<T>) -> T {
-        value.unwrap_or_else(|| panic!("actual item absent"))
-    }
-    let mut w = funded(2101);
-    apply(
-        &mut w,
-        ModuleAction::PurchaseLaser {
-            kind: ModuleKind::PulseLaser,
-            facing: LaserFacing::Right,
-        },
-    );
-    launch(&mut w);
-    crate::flight::missiles::tests::fly_axis(&mut w, 0, 70.0, 1.0);
-    let p = w.snapshot().position.map(f64::from);
-    crate::flight::practice::tests::aim_at(
-        &mut w,
-        crate::docking::Vec3::new(p[0] + 10000.0, p[1], p[2]),
-    );
-    let shot = checked(w.request_fire_laser(LaserFacing::Right, w.snapshot().tick));
-    assert!(matches!(shot.contact, PulseContact::StationBlocked { .. }));
-    let before = checked(w.save_bytes());
-    let mut altered = checked(World::from_save_bytes(&before));
-    let event = present(altered.modular.events.last_mut());
-    event.action = ModuleAction::PurchaseLaser {
-        kind: ModuleKind::PulseLaser,
-        facing: LaserFacing::Left,
-    };
-    assert!(altered.save_bytes().is_err());
-    assert!(
-        w.restore_bytes(&checked(altered.unchecked_test_save()))
-            .is_err()
-    );
-    assert_eq!(checked(w.save_bytes()), before);
-    assert_eq!(
-        present(w.laser_snapshot(LaserFacing::Right)).fitted_item_id,
-        shot.fitted_item_id
-    );
 }

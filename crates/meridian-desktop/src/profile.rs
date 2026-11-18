@@ -127,27 +127,6 @@ impl Profile {
         )
     }
 
-    fn activate_ecm(&mut self) -> Result<String, String> {
-        let tick = self.world.snapshot().tick;
-        let prepared = self
-            .world
-            .prepare_ecm(tick)
-            .map_err(crate::docked_screens::ecm::refusal)?;
-        let published = self
-            .store
-            .as_ref()
-            .ok_or("Internal validation has no profile storage")?
-            .save(prepared.bytes(), MAX_SAVE_BYTES)
-            .map_err(|error| format!("ECM was not activated; save failed: {error}"))?;
-        prepared.commit();
-        self.has_save = true;
-        self.session.invalidate();
-        publication_message(
-            published,
-            "ECM activated: 22 energy spent; manual field lasts 0.53 seconds. Change saved.".into(),
-        )
-    }
-
     pub fn new_commander(&mut self, seed: u64) -> Result<bool, String> {
         self.require_profile()?;
         if self.playing {
@@ -194,9 +173,6 @@ impl Profile {
         if !self.playing {
             return Err("N starts a new commander; C continues the existing save".into());
         }
-        if matches!(action, Action::ActivateEcm) {
-            return self.activate_ecm();
-        }
         if let Action::Emp(command) = action {
             return self.emp_equipment(command);
         }
@@ -217,13 +193,11 @@ impl Profile {
                 meridian_core::ModuleAction::PurchaseFuelScoops => {
                     "Fuel Scoops purchased and fitted. Physical ore collection remains unavailable."
                 }
-                meridian_core::ModuleAction::Purchase { .. }
-                | meridian_core::ModuleAction::PurchaseLaser { .. } => {
+                meridian_core::ModuleAction::Purchase { .. } => {
                     "Owned module purchased and fitted."
                 }
                 meridian_core::ModuleAction::Store { .. } => "Owned module stored.",
-                meridian_core::ModuleAction::Install { .. }
-                | meridian_core::ModuleAction::InstallLaser { .. } => "Owned module fitted.",
+                meridian_core::ModuleAction::Install { .. } => "Owned module fitted.",
             };
             let published = self
                 .store
@@ -513,9 +487,6 @@ impl Profile {
             }
             if let Some(emp) = crate::docked_screens::emp::status(&self.world) {
                 lines.push(emp);
-            }
-            if let Some(ecm) = crate::docked_screens::ecm::status(&self.world) {
-                lines.insert(lines.len().min(3), ecm);
             }
             return lines;
         }

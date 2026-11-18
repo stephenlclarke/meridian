@@ -28,11 +28,11 @@ pub struct FuelScoopsSnapshot {
     pub owned: Option<OwnedModule>,
     pub fitted: Option<FittedFuelScoops>,
     pub current_offer: Option<ModuleOffer>,
-    /// Actual fitted cargo expansion, Fuel Scoops, ECM and distinct EMP mounts.
+    /// Actual implemented cargo-expansion and scoop mounts; other utility families are absent.
     pub utility_mounts_used: u16,
     pub utility_mounts_capacity: u16,
 }
-pub(super) fn validate_slots(
+fn validate_slots(
     definition: crate::equipment::Definition,
     items: &[OwnedModule],
     cargo_mounts: u16,
@@ -40,21 +40,16 @@ pub(super) fn validate_slots(
     if definition.hull != "SH025"
         || items
             .iter()
-            .any(|i| i.slot.is_some_and(|slot| !i.kind.accepts_slot(slot)))
+            .any(|i| i.slot.is_some_and(|slot| slot != i.kind.slot()))
     {
         return Err(ModuleError::StaleOccupant);
     }
-    let utilities = items
+    let scoops = items
         .iter()
-        .filter(|i| {
-            matches!(
-                i.slot,
-                Some(ModuleSlot::UtilityFuelScoops | ModuleSlot::UtilityEcm)
-            )
-        })
+        .filter(|i| i.slot == Some(ModuleSlot::UtilityFuelScoops))
         .count();
     let used = cargo_mounts
-        .checked_add(u16::try_from(utilities).map_err(|_| ModuleError::Capacity)?)
+        .checked_add(u16::try_from(scoops).map_err(|_| ModuleError::Capacity)?)
         .ok_or(ModuleError::Capacity)?;
     if used > definition.utility_mounts_capacity {
         return Err(ModuleError::Capacity);

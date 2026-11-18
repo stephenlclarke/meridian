@@ -1,0 +1,107 @@
+{
+  "status": "AUTHORED_UNRUN_CAUSAL_FIXTURES;TIGHT_FIT_ACCEPTANCE_BLOCKED",
+  "authorParent": "62c73cd453504ae2f81f77e59e2955f073fbfcf9",
+  "currentRoot": "316f831a21c212648b951e67866ce9199d6fca10",
+  "actualFailure": {
+    "path": "/Volumes/SSD/offload/meridian-g1-mule-depth-option.ccd89b2/evidence/FAILURE-TERMINAL-HANDOFF.json",
+    "bytes": 16798,
+    "sha256": "333a8e415a97d0d99eccf38c951ab5b264962eb07c395816684d4d63c13a33de"
+  },
+  "actualRun": {
+    "head": "ccd89b2af0c75786e8915bf91a554a7f2c549cb5",
+    "check": "PASS",
+    "coreLibrary": {
+      "passed": 446,
+      "failed": 2,
+      "total": 448,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 56.96
+    },
+    "compatibilityDesktopImporterStrictClippyReleaseMetal": "UNRUN",
+    "newSourceRun": "UNRUN;no prior result rebound"
+  },
+  "saveFailure": {
+    "cause": "New fixture incorrectly required byte identity across public Continue, which deliberately increments saved UI review sequence and session epoch, clears contact and recomputes checksum. No current production bug established.",
+    "source": "World::from_save_bytes -> FreightSession::invalidate_after_continue((0,0)) -> g02::State::invalidate_saved_review; encode writes review_sequence last in g02 state, then epoch in enclosing session.",
+    "offlineSealedBytes": {
+      "length": 3726,
+      "beforeSHA256": "7c2de1149790382ca948a7712f35956c6061eeaf634196515940e6ae2021cfe3",
+      "afterSHA256": "a8b58f685beaa0cee6b29124d51045cc9f8083d81b25c08523af1ec5952fcd75",
+      "reviewSequence": {
+        "offset": 2102,
+        "before": 0,
+        "after": 1
+      },
+      "sessionEpoch": {
+        "offset": 2110,
+        "before": 1,
+        "after": 2
+      },
+      "otherBodyBytes": "Exact;seven changed checksum bytes at3718..3724",
+      "uniqueSourceFormatPrefixOffset": 2074,
+      "method": "Offline literal source-declared field layout and parsed existing panic arrays only;no codec/SUT retry"
+    },
+    "replacement": "Retain raw byte equality after checked decode. Independently patch exactly two +1 counters in original bytes plus checksum to expect public Continue output;assert identical pilot snapshot/no Mule and exact new anti-replay floor. No invalidator/normalizer applied to actual result."
+  },
+  "samplingFailure": {
+    "cause": "Wrong new fixture assumed every member of a union has a visible sampled boundary and shot every ray through one member source-box centre. A compound can fully conceal a member; the source rear support also overlaps the body,pannier and engine assembly. The actual run established zero confirmed visible samples,not a proof that the component has no boundary or that its uncertain rays may become contacts.",
+    "preserved": "All original rays/analytic-distance assertions,physical gap/contact checks and production uncertainty behavior remain. Visible coverage remains an explicit per-piece acceptance gate;zero visible samples never become accepted/complete metrics.",
+    "replacement": "Independently certify each piece boundary with convex-combination/raw-point radius witnesses and support-plane deficits,including eighths along support faces. Require nonempty certified boundary coverage for each piece and actual visible union samples overall. Report per-piece visible coverage separately;zero visibility remains unresolved unless actual full concealment is independently proved.",
+    "independentReplacement": "New nested sphere/unit-octahedron union regression analytically proves |x|+|y|+|z|<1 hides all inner samples while outer samples are visible. This establishes why the old per-member visible>0 assertion was invalid;it does not claim any actual Mule member fully concealed.",
+    "newStatus": "AUTHORED_UNRUN;full16piece records/currentRootcorequalification pending;no mask/skip/contactpermission or tight-fit waiver",
+    "missingValueContract": "No visible samples => optional distance/point/face/excess fields are null,not zero/false;new nested regression checks the actual empty measurement accumulator returns None."
+  },
+  "tightnessBlocker": {
+    "status": "UNRESOLVED_ACTUAL_SOURCE_CONVEX_BRIDGING;NO_HULL_ACCEPTANCE",
+    "measuredPiece": 0,
+    "largestCompletedPieceSampleMetres": 0.6596408669309312,
+    "pointMetres": [
+      -1.9652283480888286,
+      1.5538569641363296,
+      1.9641025785197854
+    ],
+    "pointSourceUnits": [
+      -0.16758484738327487,
+      0.13250515261672552,
+      0.16748884738327469
+    ],
+    "nearestDetailedFace": 98,
+    "nearestFaceSourceIndices": [
+      38,
+      39,
+      63
+    ],
+    "faceOwner": "body primary pressure envelope;original detailed component0",
+    "convexBridgeSource": "Body piece0 combines separate raised service-well columns and primary pressure body. Logged z0.16749 is between low-left well column1 ending-0.06328 and column2 starting0.40368;convex grouping fills the space between their raised rims.",
+    "originalLowLeftWellColumn1": {
+      "component": 29,
+      "vertexStart": 372,
+      "outerZ": [
+        -0.41328,
+        -0.06328
+      ]
+    },
+    "originalLowLeftWellColumn2": {
+      "component": 33,
+      "vertexStart": 408,
+      "outerZ": [
+        0.40368,
+        0.75368
+      ]
+    },
+    "nativeDetailedPlacementDifference": "Native low-left well component3 uses outerZ[-0.99196,-0.64196],while detailed component25 starts[-1.26428,-0.91428]. Repartition must retain all authenticated native and detailed geometry,not discard unmatched protrusions.",
+    "notEstablished": [
+      "global maximum",
+      "complete16piece sampled result",
+      "2cm maximum distance to detailed concavity",
+      "tight contact/docking acceptance",
+      "native rendered result"
+    ],
+    "remainingImplementation": "A genuinely source-derived finer partition/shape must remove excessive empty-space bridging while preserving all source triangles/fields and coherent renderer/contact/docking. Sixteen is implementation choice,not human cap. Corrected sampling qualification must retain complete piece records and known observed blocker;this packet does not claim geometry correction.",
+    "admissionGate": "BLOCKED even if corrected fixture tests pass;Root/G1/G3 actual shape/tightness work remains."
+  },
+  "sourceExecution": "Source reading/hash/byte-layout/AST/JSON/rustfmt/Markdownlint/patch/sealing only. No author constructor/contact/containment/probe/compiler/native/GPU.",
+  "newTestCount": 18,
+  "totalNewFixtureCorrectionCases": 1
+}

@@ -43,5 +43,15 @@
     "patchSHA256": "37f05f3ea5b698d87cba78a0cfb08316317e6eacd5fdd86823a3caab63fbcb51",
     "preservation": "Old author core not rewired. Current135corepins bound;minimal3currentfilepatch;no current ordinary reducer/test bodies modified. Prior11envelope test bodies exact. All source assets and519geometry files unchanged. New tightness test module appended;84well-rim sample index pairs copied from original creator metadata,without geometric computation.",
     "execution": "Source encoding/hash/AST/JSON/rustfmt/Markdownlint/patch checks only;no compiler/constructor/runtime/native/GPU"
+  },
+  "currentCausalCorrection": {
+    "authorParent": "62c73cd453504ae2f81f77e59e2955f073fbfcf9",
+    "currentRoot": "316f831a21c212648b951e67866ce9199d6fca10",
+    "sourceBindingSHA256": "0949f940fda8d4f1814593340f74cf4b748e77455ae9bbe830068e22cbb0dec6",
+    "causalRecordSHA256": "a70f4247677501c504f6216128e0d92497185525ebc4a8cf534cb383969b5efc",
+    "scope": "Only two new fixture test files/test-only helper plus source-only checker registry/docs/metadata. All production source/geometry/World/EMP/anti-replay/App/Profile/shader current bytes preserved.",
+    "actualFailure": "ccd89checkPASS/library446PASS2FAIL;downstreamUNRUN;sealed evidence pinned",
+    "tightFit": "BLOCKED_ACTUAL66cm_CONVEX_BRIDGING;no current correction/acceptance claim",
+    "authorExecution": "No compiler/SUT/geometry constructor/contact/containment/probe/native/GPU"
   }
 }

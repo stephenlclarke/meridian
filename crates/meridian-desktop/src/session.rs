@@ -14,7 +14,6 @@ pub enum Action {
     JumpTo(SystemId),
     Module(meridian_core::ModuleAction),
     Emp(meridian_core::EmpEquipmentAction),
-    ActivateEcm,
     CargoEquipment(meridian_core::equipment::Command),
     StationService(meridian_core::station_services::Command),
     Ammunition(meridian_core::AmmunitionAction),
@@ -294,8 +293,7 @@ impl Session {
             return Ok("Practice review cancelled.".into());
         }
         match action {
-            Action::ActivateEcm
-            | Action::Emp(_)
+            Action::Emp(_)
             | Action::Ammunition(_)
             | Action::Module(_)
             | Action::CargoEquipment(_)
@@ -597,25 +595,11 @@ impl Session {
         }
     }
 
-    /// Selected owned weapon status only; the complete control guide stays in Help.
-    fn selected_laser_status(world: &World) -> String {
-        let facing = format!("{:?}", world.selected_laser_facing()).to_ascii_uppercase();
-        world.selected_laser_snapshot().map_or_else(
-            || format!("{facing} UNAVAILABLE: NO FITTED LASER"),
-            |laser| format!("FIRE {facing} {}", laser.weapon.label()),
-        )
-    }
-
     fn append_compact_flight(
         world: &World,
         snapshot: meridian_core::Snapshot,
         lines: &mut Vec<String>,
     ) {
-        if snapshot.navigation.is_some_and(|nav| nav.travel.is_none())
-            && world.flight_resources_snapshot().is_some()
-        {
-            lines.push(format!("Z {}", Self::selected_laser_status(world)));
-        }
         append_missile_panel(world, snapshot.mode, lines);
         if let Some(line) = practice_line(world) {
             lines.push(line);
@@ -691,11 +675,12 @@ impl Session {
         }
         if snapshot.mode == FlightMode::Flight
             && snapshot.navigation.is_some_and(|nav| nav.travel.is_none())
+            && let Some(laser) = world.front_laser_snapshot()
             && let Some(resources) = world.flight_resources_snapshot()
         {
-            let fire = Self::selected_laser_status(world);
             lines.push(format!(
-                "Z {fire} | ENERGY {}.{:02} | HEAT {}.{} | COOLDOWN {} TICKS",
+                "Z FIRE FRONT {} | ENERGY {}.{:02} | HEAT {}.{} | COOLDOWN {} TICKS",
+                laser.weapon.label(),
                 resources.energy_hundredths / 100,
                 resources.energy_hundredths % 100,
                 resources.heat_fifths / 5,

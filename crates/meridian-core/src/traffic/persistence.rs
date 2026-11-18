@@ -334,13 +334,6 @@ impl State {
             {
                 return Err(INVALID);
             }
-            match (shot.source, shot.mounted_emission) {
-                (BeamSource::Player { .. }, Some(emission))
-                    if emission.matches_ray(shot.origin, shot.direction)
-                        && emission.physical_tick <= shot.world_tick => {}
-                (BeamSource::Npc(_), None) => {}
-                _ => return Err(INVALID),
-            }
             let si = system_index(shot.victim.system).ok_or(INVALID)?;
             let victim = self.actor_index(shot.victim).ok_or(INVALID)?;
             if shot.world_tick == 0
@@ -698,9 +691,6 @@ impl TrafficBeam {
         rigid(w, self.victim_pose);
         w.bool(self.front);
         w.u8(self.weapon.tag());
-        w.option(self.mounted_emission.as_ref(), |w, emission| {
-            emission.encode(w)
-        });
     }
     fn decode(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
         Ok(Self {
@@ -727,7 +717,6 @@ impl TrafficBeam {
             } else {
                 crate::flight::OrdinaryWeapon::FrontPulseLaser
             },
-            mounted_emission: r.option(crate::MountedLaserEmission::decode)?,
         })
     }
 }

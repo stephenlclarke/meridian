@@ -218,7 +218,6 @@ impl State {
                 .dot(sub(actor.position, target.position))
                 >= 0.0;
             let beam = TrafficBeam {
-                mounted_emission: None,
                 weapon: crate::flight::OrdinaryWeapon::FrontPulseLaser,
                 source: BeamSource::Npc(actor.id),
                 victim: target.id,
@@ -243,7 +242,6 @@ impl State {
         input: PlayerBeamInput,
     ) -> Result<Self, TrafficError> {
         let PlayerBeamInput {
-            mounted_emission,
             weapon,
             system,
             source,
@@ -263,8 +261,7 @@ impl State {
         if self.receipt_count() >= MAX_TRAFFIC_SHOTS {
             return Err(TrafficError::ReceiptCapacity);
         }
-        if !mounted_emission.matches_ray(origin, direction)
-            || !weapon.is_laser()
+        if !weapon.is_laser()
             || !matches!(source, BeamSource::Player { .. })
             || contact.id.system != system
             || self.beam(data, system, origin, direction, 6000.0) != Some(contact)
@@ -279,7 +276,6 @@ impl State {
             .dot(sub(origin, victim.position))
             >= 0.0;
         next.apply_hit(TrafficBeam {
-            mounted_emission: Some(mounted_emission),
             weapon,
             source,
             victim: contact.id,

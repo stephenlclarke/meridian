@@ -146,9 +146,7 @@ impl Practice {
         version: u16,
     ) -> Result<Self, SaveError> {
         let reception = reception::Reception::decode(r)?;
-        // Historical attempts use the same current FirstHit fields as the live one.
-        // The caller already admitted the whole save's strict content/version boundary.
-        let mut p = Self::decode(r, version)?;
+        let mut p = Self::decode(r, 9)?;
         p.reception = reception;
         p.ordinary_hit =
             r.option(|r| super::super::combat::OrdinaryImpact::decode_version(r, version))?;
