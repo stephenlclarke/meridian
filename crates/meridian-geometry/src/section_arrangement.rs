@@ -1,6 +1,6 @@
-//! Accounted callback entry point for the unchanged planar decomposition.
-//! This mechanically matched copy keeps the historical public `build` oracle
-//! byte exact. Only callback lifetime admission and the entry name differ;
+//! Accounted callback entry point for the original planar decomposition.
+//! Live corner counts follow actual retained chains and finished cells.
+//! The historical public `build` oracle stays byte exact;
 //! sealing checks the normalized source against the immutable parent.
 use crate::BudgetPhase;
 use crate::exact::{add, area, cross2, orient, point, scale, sub};
@@ -328,6 +328,9 @@ impl Arrangement {
                 if !exposed {
                     continue;
                 }
+                // Admit four prospective corner records before constructing
+                // or transferring them; the callback's scratch is gone here.
+                b.guard(base + 16 * (members + levels.len() + following.len() + active.len() + 5))?;
                 let lo_left = [left.clone(), &lower[0] * left + &lower[1]];
                 let lo_right = [right.clone(), &lower[0] * right + &lower[1]];
                 let hi_left = [left.clone(), &upper[0] * left + &upper[1]];
@@ -366,22 +369,30 @@ impl Arrangement {
                     if (blocked || !convex)
                         && let Some(done) = run.take()
                     {
-                        finish(done, &mut cells, &mut work, b)?;
+                        finish(done, &mut cells, &mut members, &mut work, b)?;
                     }
                 }
                 let mut run = match run {
                     Some(mut old) => {
+                        let previous = old.lower.len() + old.upper.len();
                         extend(&mut old.lower, lo_right.clone(), &protected, b)?;
                         extend(&mut old.upper, hi_right.clone(), &protected, b)?;
+                        // extend has already dropped any removed collinear
+                        // records. Count the surviving chains, including all
+                        // protected points, without a historical-strip total.
+                        b.step(1)?;
+                        members = members - previous + old.lower.len() + old.upper.len();
                         work.strips_extended += 1;
                         old
                     }
-                    None => Run {
-                        lower: vec![lo_left, lo_right.clone()],
-                        upper: vec![hi_left, hi_right.clone()],
-                    },
+                    None => {
+                        members += 4;
+                        Run {
+                            lower: vec![lo_left, lo_right.clone()],
+                            upper: vec![hi_left, hi_right.clone()],
+                        }
+                    }
                 };
-                members += 4;
                 b.state([
                     base,
                     ordered.len(),
@@ -417,18 +428,19 @@ impl Arrangement {
                             },
                         ),
                         &mut cells,
+                        &mut members,
                         &mut work,
                         b,
                     )?;
                 }
             }
             for run in active.into_values() {
-                finish(run, &mut cells, &mut work, b)?;
+                finish(run, &mut cells, &mut members, &mut work, b)?;
             }
             active = following;
         }
         for run in active.into_values() {
-            finish(run, &mut cells, &mut work, b)?;
+            finish(run, &mut cells, &mut members, &mut work, b)?;
         }
         Ok(Self {
             cells,
@@ -461,10 +473,12 @@ fn extend(
 fn finish(
     run: Run,
     cells: &mut Vec<Cell>,
+    members: &mut usize,
     work: &mut ArrangementWork,
     b: &mut Budget,
 ) -> Result<(), Failure> {
     b.step((run.lower.len() + run.upper.len()) as u64)?;
+    let incoming = run.lower.len() + run.upper.len();
     let mut result = run.lower;
     result.extend(run.upper.into_iter().rev());
     result.dedup();
@@ -474,7 +488,15 @@ fn finish(
     if result.len() < 3 || area(&result, b)? <= integer(0) {
         return Err(b.fail(FailureKind::Degenerate, "strip lost positive area"));
     }
+    // dedup/pop have dropped the duplicate owning point records. Moving the
+    // remaining points into cells does not allocate a second point set.
+    b.step(1)?;
+    *members -= incoming - result.len();
     cells.push(result);
     work.retained_cells += 1;
     Ok(())
 }
+
+#[cfg(test)]
+#[path = "live_run_tests.rs"]
+mod live_run_tests;

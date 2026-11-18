@@ -263,6 +263,21 @@
       "file": "src/region.rs",
       "name": "deferred_noding_visits_exact_old_point_set_once_and_excludes_physical_only_points",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/sections.rs",
+      "name": "zero_axis_support_matches_full_dot_for_oblique_reversed_and_boundary_boxes",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/live_run_tests.rs",
+      "name": "live_corners_match_frozen_complete_arrangements_with_protected_run_extensions",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/live_run_tests.rs",
+      "name": "actual_run_lifetimes_keep_exact_admission_and_refusal_cleanup",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -630,5 +645,17 @@
     "deltaSHA256": "26637d61e4714e61182e676678456a52e553de33977a047eb4934b1aeff9ed0f",
     "frozenSHA256": "ce8982b0fc61160b4d5f0d2dc897e5d9ca482193386df3db46b674b959decd80",
     "wholeFive": "ONE changed whole-five after Root serial join, G2 complete review and owning focused gates; no unchanged retry"
+  },
+  "liveRunCorrection": {
+    "parentAuthor": "a52c225749a78996702f5691eaeb74284369ac5a",
+    "qualifiedRoot": "d0e3ef43f4fd554778d0eaa2be2088846da8c225",
+    "old52TestsPreserved": true,
+    "currentExecution": "UNRUN",
+    "deltaSHA256": "1b912e43288e6fcf180bd13e700cbd85ecd439f9d296659ab1da302b49b164f3",
+    "contractSHA256": "d829df9a2fd229da39bc4dc6c9226ef7e434b2955269143eb4387d31a0d8e3ec",
+    "frozenSHA256": "c5aa7db775e61f21f57b8793608db0f9ff63d338b700a7b75fbebcfc0da98864",
+    "currentRustCount": 55,
+    "hostCount": 9,
+    "wholeFive": "ONE changed after Root/G2/focused; no diagnostic or unchanged retry"
   }
 }

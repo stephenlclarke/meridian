@@ -173,3 +173,9 @@ Budget also retains its first rejected charge with the caller, active phase, sta
 The style/context revision passed 50 Rust tests, nine host tests, check, strict Clippy and build. The changed whole-five still returned five constructor refusals and no candidates. The exact new contexts identify occupancy scratch with retained global points for SH010/011 and charged section/field work for SH016/017/166.
 
 The noding point pool now builds after classification and index cleanup from the same packed cell/protected records. Each region visits repeated local references once. Proven uniform-owner nodes also exclude ineligible outward sections while physical cuts remain independent. All 50 existing test bodies, frozen controls and limits stay unchanged. The current 52 Rust tests and nine host tests are UNRUN; full fit remains unproved. [The complete causal correction and ownership contract](integration/live-overlap/CONTRACT.md) includes the exact prior receipts and new validation criteria.
+
+## Actual run lifetimes and sparse support
+
+The deferred-pool revision passed 52 Rust tests, nine host tests, check, strict Clippy and build. Its one changed whole-five still refused all constructors. The private arrangement counter now retires only corners already dropped by run extension or cell deduplication, keeps the existing 16-membership price and guards transfer scratch before allocation. Current-facet outward support also skips exactly zero coefficients after one charged normal scan.
+
+All 52 prior test bodies and immutable controls are preserved. Three new independent comparisons bring the current total to 55 Rust tests plus nine host tests, all UNRUN. Full fit remains unproved. [The causal evidence, accounting and qualification contract](integration/live-runs/CONTRACT.md) retain every old outcome and the strict unchanged caps.

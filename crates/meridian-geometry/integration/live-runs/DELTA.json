@@ -1,0 +1,39 @@
+{
+  "status": "AUTHORED_UNRUN",
+  "parentAuthor": "a52c225749a78996702f5691eaeb74284369ac5a",
+  "qualifiedRoot": "d0e3ef43f4fd554778d0eaa2be2088846da8c225",
+  "qualifiedTree": "1af0c453804f1008c63eb9e5cdb4a914e082e33a",
+  "parentRustPass": 52,
+  "parentHostPass": 9,
+  "parentCheckClippyBuild": "PASS",
+  "parentWholeFive": "5decodePASS5constructorREFUSED15dependentUNRUN0semanticFAIL0candidates0admissions",
+  "actualFirstRefusals": "SH010/011 occupancy32 at99995/99994; SH016/017 section work;SH166 packing work",
+  "causality": "Count actual chain/cell lifetimes instead of four per historical strip; guard transfer before allocation at unchanged16/unit. Elide exactly zero support products within a single source facet. No full fit inference.",
+  "guardChanges": "New pre-transfer guard adds4 prospective point records to old+1 slack; actual members retires only already dropped points; sparse support adds8 scratch. No primitive unit price/cap reduction.",
+  "oldAssertionsPreserved": 52,
+  "newTests": [
+    {
+      "file": "src/sections.rs",
+      "name": "zero_axis_support_matches_full_dot_for_oblique_reversed_and_boundary_boxes",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/live_run_tests.rs",
+      "name": "live_corners_match_frozen_complete_arrangements_with_protected_run_extensions",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/live_run_tests.rs",
+      "name": "actual_run_lifetimes_keep_exact_admission_and_refusal_cleanup",
+      "status": "UNRUN"
+    }
+  ],
+  "currentRustCount": 55,
+  "hostCount": 9,
+  "contractSHA256": "d829df9a2fd229da39bc4dc6c9226ef7e434b2955269143eb4387d31a0d8e3ec",
+  "frozenSHA256": "c5aa7db775e61f21f57b8793608db0f9ff63d338b700a7b75fbebcfc0da98864",
+  "inverseSHA256": "34cc06c182ce3f9b6176dc19ffee3bf5bd9d9ead221410dcdfe518d99b3e325a",
+  "parentHandoffSHA256": "3c16a404253785d7ea7f9957901221f3f23c57819236d5d5b3ce4c286fdb6ef7",
+  "parentRawSHA256": "cf4106a4eca3414801381127c1b640a0cdcca9d04b954e7582d87066a3d535ef",
+  "allExecution": "UNRUN; Root/G2/owner gates before one changed wholefive"
+}

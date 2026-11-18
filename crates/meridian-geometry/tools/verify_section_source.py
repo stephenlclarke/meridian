@@ -5,6 +5,7 @@ import json
 import re
 import subprocess
 from strip_budget_context import strip_context
+from restore_live_runs import restore_runs
 from pathlib import Path
 
 CRATE = Path(__file__).resolve().parents[1]
@@ -23,6 +24,7 @@ def normalized(value):
 
 
 def verify():
+    subprocess.run(["python3", "-B", str(CRATE / "tools/verify_live_runs_source.py")], check=True)
     subprocess.run(["python3", "-B", str(CRATE / "tools/verify_live_overlap_source.py")], check=True)
     subprocess.run(["python3", "-B", str(CRATE / "tools/verify_adapter_context_source.py")], check=True)
     context_parent = "41aae99bb2c0e76c21870502349e2bd894aace8f"
@@ -70,7 +72,7 @@ def verify():
                 }"""
     assert expected.count(old_callback) == 1
     expected = expected.replace(old_callback, new_callback)
-    actual = strip_context((CRATE / "src/section_arrangement.rs").read_text())
+    actual = strip_context(restore_runs("section_arrangement.rs", (CRATE / "src/section_arrangement.rs").read_text()))
     actual = actual[actual.index("use crate::exact") :]
     assert normalized(actual) == normalized(expected), "accounted arrangement derivation"
 
@@ -132,7 +134,7 @@ def verify():
     for relative in ["src/section_tests.rs", "src/section_arrangement.rs"]:
         reference = subprocess.check_output(["git", "-C", str(REPO), "show", f"{collection_parent}:crates/meridian-geometry/{relative}"])
         if relative.endswith("section_arrangement.rs"):
-            assert normalized(strip_context((CRATE / relative).read_text())) == normalized(reference.decode())
+            assert normalized(strip_context(restore_runs(Path(relative).name, (CRATE / relative).read_text()))) == normalized(reference.decode())
         else:
             assert (CRATE / relative).read_bytes() == reference
     def body(source, signature):
@@ -148,7 +150,7 @@ def verify():
     for signature in ["fn meets_outward_plane(", "fn outward_candidates(", "fn limiting_segment(", "pub(super) fn build(", "fn build_admitted(", "pub(super) fn occupied(", "pub(super) fn memberships(", "pub(super) fn fields_visible("]:
         assert body(current, signature) == body(old_sections, signature), signature
     tests = sum(path.read_text().count("#[test]") for top in ["src", "tests"] for path in (CRATE / top).rglob("*.rs"))
-    assert tests == 52, tests
+    assert tests == 55, tests
     print(json.dumps({"status": "PASS_SOURCE_ONLY", "parent": PARENT, "currentRustTests": tests, "compilerOrGeometryExecuted": False}))
 
 

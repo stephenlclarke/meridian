@@ -143,5 +143,13 @@
     "rawPacketSHA256": "d98b6ad67976185177081feb5db163d464058e6747fbb1a04cba71275c490c27",
     "currentExecution": "UNRUN",
     "sourceFidelity": "Exact local cells/protected pool and uniform source-owner metadata; no source-field or hull admission changes"
+  },
+  "liveRunCorrection": {
+    "qualifiedParent": "d0e3ef43f4fd554778d0eaa2be2088846da8c225",
+    "parentHandoffSHA256": "3c16a404253785d7ea7f9957901221f3f23c57819236d5d5b3ce4c286fdb6ef7",
+    "parentRawSHA256": "cf4106a4eca3414801381127c1b640a0cdcca9d04b954e7582d87066a3d535ef",
+    "source": "Exact previously qualified geometry; no new source assets or admission",
+    "currentExecution": "UNRUN",
+    "fidelity": "Actual owning-chain lifetime accounting at unchanged16/unit; sparse current-facet support with original exact sign/endpoints"
   }
 }

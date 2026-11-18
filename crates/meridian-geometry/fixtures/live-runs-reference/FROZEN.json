@@ -1,0 +1,17 @@
+{
+  "parent": "a52c225749a78996702f5691eaeb74284369ac5a",
+  "files": {
+    "before-section_arrangement.rs": {
+      "bytes": 17234,
+      "sha256": "a695dd7e3f3aa8e6ea1465f25dec2d8b4e9ab77dec8a78f91abb34a5b82a77f3"
+    },
+    "before-sections.rs": {
+      "bytes": 42893,
+      "sha256": "eab190b18eb59515fa4b46bb66f9b0f4649f0abadf36c8a959af96e5ab7248dd"
+    },
+    "compiled-arrangement-control.rs": {
+      "bytes": 16944,
+      "sha256": "fc4a1905c7503f46da97f0908a47e472879c091fb6e84c62bd7ce050ecca5cbf"
+    }
+  }
+}

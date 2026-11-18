@@ -1,0 +1,120 @@
+{
+  "sections.rs": [
+    {
+      "afterStart": 275,
+      "afterEnd": 317,
+      "before": "",
+      "after": "// One source-facet query only: omitted axes have exactly zero coefficient.\n// No support value, intersection, ray or occupancy result is cached.\nstruct OutwardPlane<'a> {\n    face: &'a Facet,\n    axes: [usize; 3],\n    count: usize,\n}\nimpl<'a> OutwardPlane<'a> {\n    fn new(face: &'a Facet, b: &mut Budget) -> Result<Self, Failure> {\n        let mut result = Self {\n            face,\n            axes: [0; 3],\n            count: 0,\n        };\n        for (axis, coefficient) in face.normal().iter().enumerate() {\n            b.step(1)?;\n            if !coefficient.is_zero() {\n                result.axes[result.count] = axis;\n                result.count += 1;\n            }\n        }\n        Ok(result)\n    }\n    fn meets(&self, bounds: &Bounds, b: &mut Budget) -> Result<bool, Failure> {\n        let mut low = -self.face.offset();\n        let mut high = low.clone();\n        for axis in &self.axes[..self.count] {\n            b.step(1)?;\n            let n = &self.face.normal()[*axis];\n            let (a, c) = if n.is_negative() {\n                (&bounds.upper[*axis], &bounds.lower[*axis])\n            } else {\n                (&bounds.lower[*axis], &bounds.upper[*axis])\n            };\n            low += n * a;\n            high += n * c;\n        }\n        b.step(1)?;\n        Ok(low <= integer(0) && high > integer(0))\n    }\n}\n\n"
+    },
+    {
+      "afterStart": 326,
+      "afterEnd": 328,
+      "before": "        b.with_retained(Self::stack_members(self.facets.len()), |b| {\n",
+      "after": "        b.with_retained(Self::stack_members(self.facets.len()) + 8, |b| {\n            let plane = OutwardPlane::new(face, b)?;\n"
+    },
+    {
+      "afterStart": 349,
+      "afterEnd": 351,
+      "before": "                let outward_possible = outward_possible\n                    && owner_allowed\n                    && node.bounds.meets_outward_plane(face, b)?;\n",
+      "after": "                let outward_possible =\n                    outward_possible && owner_allowed && plane.meets(&node.bounds, b)?;\n"
+    },
+    {
+      "afterStart": 369,
+      "afterEnd": 370,
+      "before": "                            owner_allowed && bounds.meets_outward_plane(face, b)?\n",
+      "after": "                            owner_allowed && plane.meets(bounds, b)?\n"
+    },
+    {
+      "afterStart": 1161,
+      "afterEnd": 1221,
+      "before": "",
+      "after": "\n#[cfg(test)]\nmod plane_support_tests {\n    use super::*;\n    use crate::{Limits, SourceId, Vertex};\n\n    #[test]\n    fn zero_axis_support_matches_full_dot_for_oblique_reversed_and_boundary_boxes()\n    -> Result<(), Failure> {\n        let mut setup = Budget::new(Limits::default())?;\n        for points in [\n            [[0, 0, 0], [2, 0, 0], [0, 2, 0]],\n            [[0, 0, 0], [0, 2, 0], [2, 0, 0]],\n            [[0, 0, 0], [0, 2, 0], [0, 0, 2]],\n            [[0, 0, 0], [1, 1, 0], [0, 1, 1]],\n            [[0, 0, 0], [0, 1, 1], [1, 1, 0]],\n        ] {\n            let face = Facet::new(\n                SourceId {\n                    component: 0,\n                    facet: 0,\n                },\n                points.map(|p| Vertex {\n                    point: p.map(integer),\n                    uv: [integer(0), integer(0)],\n                }),\n                \"test\".into(),\n                &mut setup,\n            )?;\n            let mut old = Budget::new(Limits::default())?;\n            let mut new = Budget::new(Limits::default())?;\n            let plane = OutwardPlane::new(&face, &mut new)?;\n            for lower in [\n                [-2, -2, -2],\n                [0, 0, 0],\n                [1, 1, 1],\n                [-1, -1, 0],\n                [-1, -1, -1],\n            ] {\n                for width in [0, 1, 4] {\n                    let bounds = Bounds {\n                        lower: lower.map(integer),\n                        upper: lower.map(|n| integer(n + width)),\n                    };\n                    assert_eq!(\n                        plane.meets(&bounds, &mut new)?,\n                        bounds.meets_outward_plane(&face, &mut old)?\n                    );\n                }\n            }\n            if plane.count == 1 {\n                assert!(new.operations() < old.operations());\n            }\n            if plane.count == 3 {\n                assert_eq!(new.operations(), old.operations() + 3);\n            }\n        }\n        Ok(())\n    }\n}\n"
+    }
+  ],
+  "section_arrangement.rs": [
+    {
+      "afterStart": 0,
+      "afterEnd": 3,
+      "before": "//! Accounted callback entry point for the unchanged planar decomposition.\n//! This mechanically matched copy keeps the historical public `build` oracle\n//! byte exact. Only callback lifetime admission and the entry name differ;\n",
+      "after": "//! Accounted callback entry point for the original planar decomposition.\n//! Live corner counts follow actual retained chains and finished cells.\n//! The historical public `build` oracle stays byte exact;\n"
+    },
+    {
+      "afterStart": 330,
+      "afterEnd": 333,
+      "before": "",
+      "after": "                // Admit four prospective corner records before constructing\n                // or transferring them; the callback's scratch is gone here.\n                b.guard(base + 16 * (members + levels.len() + following.len() + active.len() + 5))?;\n"
+    },
+    {
+      "afterStart": 371,
+      "afterEnd": 372,
+      "before": "                        finish(done, &mut cells, &mut work, b)?;\n",
+      "after": "                        finish(done, &mut cells, &mut members, &mut work, b)?;\n"
+    },
+    {
+      "afterStart": 376,
+      "afterEnd": 377,
+      "before": "",
+      "after": "                        let previous = old.lower.len() + old.upper.len();\n"
+    },
+    {
+      "afterStart": 379,
+      "afterEnd": 384,
+      "before": "",
+      "after": "                        // extend has already dropped any removed collinear\n                        // records. Count the surviving chains, including all\n                        // protected points, without a historical-strip total.\n                        b.step(1)?;\n                        members = members - previous + old.lower.len() + old.upper.len();\n"
+    },
+    {
+      "afterStart": 387,
+      "afterEnd": 394,
+      "before": "                    None => Run {\n                        lower: vec![lo_left, lo_right.clone()],\n                        upper: vec![hi_left, hi_right.clone()],\n                    },\n",
+      "after": "                    None => {\n                        members += 4;\n                        Run {\n                            lower: vec![lo_left, lo_right.clone()],\n                            upper: vec![hi_left, hi_right.clone()],\n                        }\n                    }\n"
+    },
+    {
+      "afterStart": 395,
+      "afterEnd": 395,
+      "before": "                members += 4;\n",
+      "after": ""
+    },
+    {
+      "afterStart": 430,
+      "afterEnd": 431,
+      "before": "",
+      "after": "                        &mut members,\n"
+    },
+    {
+      "afterStart": 437,
+      "afterEnd": 438,
+      "before": "                finish(run, &mut cells, &mut work, b)?;\n",
+      "after": "                finish(run, &mut cells, &mut members, &mut work, b)?;\n"
+    },
+    {
+      "afterStart": 442,
+      "afterEnd": 443,
+      "before": "            finish(run, &mut cells, &mut work, b)?;\n",
+      "after": "            finish(run, &mut cells, &mut members, &mut work, b)?;\n"
+    },
+    {
+      "afterStart": 475,
+      "afterEnd": 476,
+      "before": "",
+      "after": "    members: &mut usize,\n"
+    },
+    {
+      "afterStart": 480,
+      "afterEnd": 481,
+      "before": "",
+      "after": "    let incoming = run.lower.len() + run.upper.len();\n"
+    },
+    {
+      "afterStart": 490,
+      "afterEnd": 494,
+      "before": "",
+      "after": "    // dedup/pop have dropped the duplicate owning point records. Moving the\n    // remaining points into cells does not allocate a second point set.\n    b.step(1)?;\n    *members -= incoming - result.len();\n"
+    },
+    {
+      "afterStart": 498,
+      "afterEnd": 502,
+      "before": "",
+      "after": "\n#[cfg(test)]\n#[path = \"live_run_tests.rs\"]\nmod live_run_tests;\n"
+    }
+  ]
+}

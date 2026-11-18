@@ -273,6 +273,48 @@ pub(super) fn fields_visible(
 
 // A single source-ordered traversal supplies finite physical constraints and
 // whole-owner outward sections. Three logical fields are admitted per result.
+// One source-facet query only: omitted axes have exactly zero coefficient.
+// No support value, intersection, ray or occupancy result is cached.
+struct OutwardPlane<'a> {
+    face: &'a Facet,
+    axes: [usize; 3],
+    count: usize,
+}
+impl<'a> OutwardPlane<'a> {
+    fn new(face: &'a Facet, b: &mut Budget) -> Result<Self, Failure> {
+        let mut result = Self {
+            face,
+            axes: [0; 3],
+            count: 0,
+        };
+        for (axis, coefficient) in face.normal().iter().enumerate() {
+            b.step(1)?;
+            if !coefficient.is_zero() {
+                result.axes[result.count] = axis;
+                result.count += 1;
+            }
+        }
+        Ok(result)
+    }
+    fn meets(&self, bounds: &Bounds, b: &mut Budget) -> Result<bool, Failure> {
+        let mut low = -self.face.offset();
+        let mut high = low.clone();
+        for axis in &self.axes[..self.count] {
+            b.step(1)?;
+            let n = &self.face.normal()[*axis];
+            let (a, c) = if n.is_negative() {
+                (&bounds.upper[*axis], &bounds.lower[*axis])
+            } else {
+                (&bounds.lower[*axis], &bounds.upper[*axis])
+            };
+            low += n * a;
+            high += n * c;
+        }
+        b.step(1)?;
+        Ok(low <= integer(0) && high > integer(0))
+    }
+}
+
 impl FacetBoundsIndex {
     fn collection_candidates(
         &self,
@@ -282,7 +324,8 @@ impl FacetBoundsIndex {
         originals: &[Facet],
         b: &mut Budget,
     ) -> Result<Vec<(usize, bool, bool)>, Failure> {
-        b.with_retained(Self::stack_members(self.facets.len()), |b| {
+        b.with_retained(Self::stack_members(self.facets.len()) + 8, |b| {
+            let plane = OutwardPlane::new(face, b)?;
             // Three fields per pending node fit the existing eight-membership
             // per-depth bound. Carry both exclusions to the descendants.
             let mut pending = vec![(self.root, true, true)];
@@ -304,9 +347,8 @@ impl FacetBoundsIndex {
                 } else {
                     false
                 };
-                let outward_possible = outward_possible
-                    && owner_allowed
-                    && node.bounds.meets_outward_plane(face, b)?;
+                let outward_possible =
+                    outward_possible && owner_allowed && plane.meets(&node.bounds, b)?;
                 if !physical_possible && !outward_possible {
                     continue;
                 }
@@ -325,7 +367,7 @@ impl FacetBoundsIndex {
                                 log_cost(owners.len(), b)?;
                                 owners.contains_key(&originals[ordinal].id().component)
                             };
-                            owner_allowed && bounds.meets_outward_plane(face, b)?
+                            owner_allowed && plane.meets(bounds, b)?
                         } else {
                             false
                         };
@@ -1112,6 +1154,66 @@ mod live_overlap_tests {
                     );
                     assert_eq!(tight.retained_memberships(), 0);
                 }
+            }
+        }
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod plane_support_tests {
+    use super::*;
+    use crate::{Limits, SourceId, Vertex};
+
+    #[test]
+    fn zero_axis_support_matches_full_dot_for_oblique_reversed_and_boundary_boxes()
+    -> Result<(), Failure> {
+        let mut setup = Budget::new(Limits::default())?;
+        for points in [
+            [[0, 0, 0], [2, 0, 0], [0, 2, 0]],
+            [[0, 0, 0], [0, 2, 0], [2, 0, 0]],
+            [[0, 0, 0], [0, 2, 0], [0, 0, 2]],
+            [[0, 0, 0], [1, 1, 0], [0, 1, 1]],
+            [[0, 0, 0], [0, 1, 1], [1, 1, 0]],
+        ] {
+            let face = Facet::new(
+                SourceId {
+                    component: 0,
+                    facet: 0,
+                },
+                points.map(|p| Vertex {
+                    point: p.map(integer),
+                    uv: [integer(0), integer(0)],
+                }),
+                "test".into(),
+                &mut setup,
+            )?;
+            let mut old = Budget::new(Limits::default())?;
+            let mut new = Budget::new(Limits::default())?;
+            let plane = OutwardPlane::new(&face, &mut new)?;
+            for lower in [
+                [-2, -2, -2],
+                [0, 0, 0],
+                [1, 1, 1],
+                [-1, -1, 0],
+                [-1, -1, -1],
+            ] {
+                for width in [0, 1, 4] {
+                    let bounds = Bounds {
+                        lower: lower.map(integer),
+                        upper: lower.map(|n| integer(n + width)),
+                    };
+                    assert_eq!(
+                        plane.meets(&bounds, &mut new)?,
+                        bounds.meets_outward_plane(&face, &mut old)?
+                    );
+                }
+            }
+            if plane.count == 1 {
+                assert!(new.operations() < old.operations());
+            }
+            if plane.count == 3 {
+                assert_eq!(new.operations(), old.operations() + 3);
             }
         }
         Ok(())
