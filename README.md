@@ -1,18 +1,14 @@
 # Meridian
 
-## Internal Mule entry: authored, unrun
+## Internal Mule validation
 
-The [explicit internal desktop route](docs/MULE-VALIDATION-LAUNCH.md) now selects the real World-owned Mule scenario for native validation, starting paused with source-derived front, rear, far or side/contact observer presets. It opens no profile store, resolves no save directory and grants no commander; save/load/equipment and movement input refuse. P and single-step advance only the actual World reducer. Seven new lifecycle/refusal tests are authored **UNRUN**. Ordinary startup remains the normal commander path. Compiler, shader/GPU and actual game-view acceptance remain with the owning lane; no new native result is claimed.
+The internal desktop build renders the original Mule in a World-owned station scene. On the MacBook Pro, the close broadside view showed the pods, narrow supports and open gaps without a prominent halo. The validation scene starts paused and runs without a commander or save file. [Internal launch controls](docs/MULE-VALIDATION-LAUNCH.md)
 
-## Mule shield geometry in development
-
-The Mule uses 34 rounded collision pieces. The primary shell, twelve detailed wells, four native wells and two longitudinal struts each have their own support. Collision and the renderer share the same revision of the surface. Each support has 2 cm of outward rounding. The close-up edge shimmer has a maximum opacity of 1.8%.
-
-The earlier 16-piece build passed 446 of 448 core library tests. It measured a 0.660 m gap at one point where the shield bridged a recess. The revised tests check clearance against a small obstacle at that point, measure the whole union separately and require clearance from overlapping pieces before counting a surface sample as exposed. All 20 Mule core cases and seven isolated launch cases await execution on the new shape. Docking clearance, the visible shimmer and rendering cost still need verification on the Mac. [Mule geometry and test criteria](docs/MULE-GAMEPLAY-ENVELOPE.md)
+The collision surface uses 34 rounded pieces. All six tested openings remained clear, including the pannier gaps. At four wells, the original low-detail rims extend beyond the detailed surface. The approved Mule collision shape encloses both originals there. The largest sampled separation was 0.765 m. Physical docking, blocked entry and collision cost still need validation before Mule joins the playable fleet. [Geometry and test evidence](docs/MULE-GAMEPLAY-ENVELOPE.md)
 
 The current native run produced three identical nonblack GPU target copies while the paired Fit appeared black through CUA. A [bounded read-only independent window observer](docs/LASER-FACINGS.md#independent-macos-window-observer-preparation) is prepared to resolve the actual WindowServer capture identity. Sixteen offline policy fixtures and the Swift provider compile passed; the provider has not run and no UI API has run. Execution requires the explicit human exception for alternate UI technology. No renderer cure or native acceptance is claimed.
 
-The underlying ad5 game runtime passed Mac, Linux and native Windows qualification: 295 fresh Rust cases plus 433 reviewed unchanged Core/compatibility cases per platform, with current compiler, strict Clippy and release-build checks. The helper-only revisions left that qualified runtime unchanged; the new Mule World and renderer integration remains unqualified. The current native Fit-screen failure and dependent gameplay acceptance remain open.
+The underlying ad5 game runtime passed Mac, Linux and native Windows qualification: 295 fresh Rust cases plus 433 reviewed unchanged Core/compatibility cases per platform, with current compiler, strict Clippy and release-build checks. The current native Fit-screen failure and dependent gameplay acceptance remain open.
 
 [![CI](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=alert_status)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)
