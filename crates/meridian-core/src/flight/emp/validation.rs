@@ -1,5 +1,8 @@
 //! Independent provenance and effect joins. Decoded descriptors never authorize a producer.
-use super::*;
+use super::{
+    Arc, EmpChargePhase, EmpOrigin, FlightMode, INVALID, MAX_PULSES, OwnedEmp, SaveError, State,
+    World, policy, runtime, scene,
+};
 use crate::traffic::{EmpResourceAction, EmpResourceEvent};
 impl State {
     fn item_at(&self, world: &World, scene: &scene::Scene) -> Result<OwnedEmp, SaveError> {
@@ -89,6 +92,66 @@ impl State {
         }
         Ok(())
     }
+    fn append_pulse_events(
+        world: &World,
+        pulse: &runtime::Pulse,
+        expected: Vec<scene::Contact>,
+        ordinal: u16,
+        events: &mut Vec<EmpResourceEvent>,
+        episodes: &mut Vec<runtime::Episode>,
+    ) -> Result<(), SaveError> {
+        let r = &pulse.release;
+        let mut player = false;
+        for contact in expected {
+            match contact.victim {
+                scene::Victim::Npc(id) => {
+                    if !State::recent_attack(&world.traffic, r.owner, id, r.world_tick) {
+                        return Err(INVALID);
+                    }
+                    let (hull, front, rear, pool) =
+                        world
+                            .traffic
+                            .emp_before(id, r.local_tick, r.world_tick, ordinal)?;
+                    if hull == 0 || pool.is_some_and(|p| p.disabled) {
+                        return Err(INVALID);
+                    }
+                    let shield = if contact.front { front } else { rear };
+                    let overflow = u32::from(contact.power_hundredths.saturating_sub(shield))
+                        * (policy::SCALE / 100);
+                    let electrical = pool.map_or(policy::MAIN_CAPACITY, |p| p.remaining);
+                    if overflow >= electrical {
+                        episodes.push(runtime::Episode {
+                            origin: pulse.origin,
+                            victim: id,
+                            disabled_at: r.physical_tick,
+                            recovered_at: None,
+                        });
+                    }
+                    events.push(EmpResourceEvent {
+                        origin: pulse.origin,
+                        victim: id,
+                        local_tick: r.local_tick,
+                        world_tick: r.world_tick,
+                        physical_tick: r.physical_tick,
+                        action: EmpResourceAction::Drain {
+                            front: contact.front,
+                            power_hundredths: contact.power_hundredths,
+                        },
+                    });
+                }
+                scene::Victim::Player => {
+                    if player || pulse.player_shield_absorbed > contact.power_hundredths {
+                        return Err(INVALID);
+                    }
+                    player = true;
+                }
+            }
+        }
+        if !player && (pulse.player_shield_absorbed != 0 || pulse.player_electrical_drained != 0) {
+            return Err(INVALID);
+        }
+        Ok(())
+    }
     fn pulse_events(
         &self,
         world: &World,
@@ -127,60 +190,37 @@ impl State {
             {
                 return Err(INVALID);
             }
-            let mut player = false;
-            for contact in expected {
-                match contact.victim {
-                    scene::Victim::Npc(id) => {
-                        if !State::recent_attack(&world.traffic, r.owner, id, r.world_tick) {
-                            return Err(INVALID);
-                        }
-                        let (hull, front, rear, pool) =
-                            world
-                                .traffic
-                                .emp_before(id, r.local_tick, r.world_tick, ordinal)?;
-                        if hull == 0 || pool.is_some_and(|p| p.disabled) {
-                            return Err(INVALID);
-                        }
-                        let shield = if contact.front { front } else { rear };
-                        let overflow = u32::from(contact.power_hundredths.saturating_sub(shield))
-                            * (policy::SCALE / 100);
-                        let electrical = pool.map_or(policy::MAIN_CAPACITY, |p| p.remaining);
-                        if overflow >= electrical {
-                            episodes.push(runtime::Episode {
-                                origin: pulse.origin,
-                                victim: id,
-                                disabled_at: r.physical_tick,
-                                recovered_at: None,
-                            });
-                        }
-                        events.push(EmpResourceEvent {
-                            origin: pulse.origin,
-                            victim: id,
-                            local_tick: r.local_tick,
-                            world_tick: r.world_tick,
-                            physical_tick: r.physical_tick,
-                            action: EmpResourceAction::Drain {
-                                front: contact.front,
-                                power_hundredths: contact.power_hundredths,
-                            },
-                        });
-                    }
-                    scene::Victim::Player => {
-                        if player || pulse.player_shield_absorbed > contact.power_hundredths {
-                            return Err(INVALID);
-                        }
-                        player = true;
-                    }
-                }
-            }
-            if !player
-                && (pulse.player_shield_absorbed != 0 || pulse.player_electrical_drained != 0)
-            {
-                return Err(INVALID);
-            }
+            Self::append_pulse_events(world, pulse, expected, ordinal, &mut events, &mut episodes)?;
             last_release = Some(r.physical_tick);
         }
         Ok((events, episodes))
+    }
+    fn validate_episode_travel(
+        world: &World,
+        stored: &runtime::Episode,
+        derived: &runtime::Episode,
+        r: &scene::Scene,
+    ) -> Result<(), SaveError> {
+        // Local custody cannot leave while a surviving victim remains electrically disabled.
+        if world
+            .jump_journal
+            .emp_arrival_clocks()
+            .into_iter()
+            .any(|arrival| {
+                arrival > derived.disabled_at
+                    && !world.traffic.emp_dead_by(
+                        derived.victim,
+                        r.local_tick.saturating_add(arrival - derived.disabled_at),
+                    )
+                    && arrival
+                        <= stored
+                            .recovered_at
+                            .map_or(world.combat.physical_tick(), |(clock, _)| clock)
+            })
+        {
+            return Err(INVALID);
+        }
+        Ok(())
     }
     fn validate_episodes(
         &self,
@@ -242,24 +282,55 @@ impl State {
             if stored != derived {
                 return Err(INVALID);
             }
-            // Local custody cannot leave while a surviving victim remains electrically disabled.
-            if world
-                .jump_journal
-                .emp_arrival_clocks()
-                .into_iter()
-                .any(|arrival| {
-                    arrival > derived.disabled_at
-                        && !world.traffic.emp_dead_by(
-                            derived.victim,
-                            r.local_tick.saturating_add(arrival - derived.disabled_at),
-                        )
-                        && arrival
-                            <= stored
-                                .recovered_at
-                                .map_or(world.combat.physical_tick(), |(clock, _)| clock)
-                })
-            {
+            Self::validate_episode_travel(world, stored, derived, r)?;
+        }
+        Ok(())
+    }
+    fn validate_charge(
+        &self,
+        world: &World,
+        modular: &super::super::modular::State,
+    ) -> Result<(), SaveError> {
+        if let Some(c) = &self.charge {
+            if world.state.mode == FlightMode::Docked {
                 return Err(INVALID);
+            }
+            if let Some(ordinal) = c.pulse {
+                if self
+                    .pulses
+                    .last()
+                    .is_none_or(|p| p.origin.pulse != ordinal || &p.charge != c)
+                {
+                    return Err(INVALID);
+                }
+            } else {
+                self.validate_start(world, modular, c, self.pulses.len() as u16 + 1)?;
+                if self
+                    .pulses
+                    .last()
+                    .is_some_and(|p| c.start.physical_tick <= p.release.physical_tick)
+                {
+                    return Err(INVALID);
+                }
+                let elapsed = c
+                    .ended_at
+                    .unwrap_or(self.meter_clock)
+                    .checked_sub(c.start.physical_tick)
+                    .ok_or(INVALID)?;
+                match c.phase {
+                    EmpChargePhase::Charging
+                        if c.ended_at.is_none()
+                            && elapsed < policy::WARMUP_TICKS
+                            && c.start.owner == world.combat_identity().ok_or(INVALID)? => {}
+                    EmpChargePhase::Cancelled
+                        if c.ended_at.is_some() && elapsed <= policy::WARMUP_TICKS => {}
+                    EmpChargePhase::Released
+                        if c.ended_at.is_some() && elapsed == policy::WARMUP_TICKS => {}
+                    _ => return Err(INVALID),
+                }
+                if c.ended_at.is_some_and(|end| end > self.meter_clock) {
+                    return Err(INVALID);
+                }
             }
         }
         Ok(())
@@ -327,48 +398,7 @@ impl State {
         if events != world.traffic.emp_events() {
             return Err(INVALID);
         }
-        if let Some(c) = &self.charge {
-            if world.state.mode == FlightMode::Docked {
-                return Err(INVALID);
-            }
-            if let Some(ordinal) = c.pulse {
-                if self
-                    .pulses
-                    .last()
-                    .is_none_or(|p| p.origin.pulse != ordinal || &p.charge != c)
-                {
-                    return Err(INVALID);
-                }
-            } else {
-                self.validate_start(world, modular, c, self.pulses.len() as u16 + 1)?;
-                if self
-                    .pulses
-                    .last()
-                    .is_some_and(|p| c.start.physical_tick <= p.release.physical_tick)
-                {
-                    return Err(INVALID);
-                }
-                let elapsed = c
-                    .ended_at
-                    .unwrap_or(self.meter_clock)
-                    .checked_sub(c.start.physical_tick)
-                    .ok_or(INVALID)?;
-                match c.phase {
-                    EmpChargePhase::Charging
-                        if c.ended_at.is_none()
-                            && elapsed < policy::WARMUP_TICKS
-                            && c.start.owner == world.combat_identity().ok_or(INVALID)? => {}
-                    EmpChargePhase::Cancelled
-                        if c.ended_at.is_some() && elapsed <= policy::WARMUP_TICKS => {}
-                    EmpChargePhase::Released
-                        if c.ended_at.is_some() && elapsed == policy::WARMUP_TICKS => {}
-                    _ => return Err(INVALID),
-                }
-                if c.ended_at.is_some_and(|end| end > self.meter_clock) {
-                    return Err(INVALID);
-                }
-            }
-        }
+        self.validate_charge(world, modular)?;
         Ok(terms)
     }
 }

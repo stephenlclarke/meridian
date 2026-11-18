@@ -1,5 +1,5 @@
 //! Actual held input and finite electrical publication under the sole World owner.
-use super::*;
+use super::{Arc, EmpError, EmpOrigin, FlightMode, MAX_PULSES, State, World, policy, scene};
 use crate::docking::RigidPose;
 use crate::traffic::{EmpResourceAction, NpcId};
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -46,6 +46,38 @@ pub(in crate::flight) struct Stage {
     pub(in crate::flight) traffic: crate::traffic::State,
     pub(in crate::flight) pulse: super::super::weapons::PulseResources,
     pub(in crate::flight) combat: super::super::combat::State,
+}
+impl Stage {
+    fn recover(&mut self, tick: u64, clock: u64) -> Result<(), super::super::StepError> {
+        // Only current, admitted local custody is supported. Departure is refused while a live
+        // victim is disabled; no unqualified off-system archive or occupied capsule is fabricated.
+        for index in 0..self.state.episodes.len() {
+            let episode = self.state.episodes[index];
+            if episode.recovered_at.is_none()
+                && clock
+                    > episode
+                        .disabled_at
+                        .checked_add(policy::RECOVERY_TICKS)
+                        .ok_or(super::super::StepError::TickOverflow)?
+                && self
+                    .traffic
+                    .emp_resources(episode.victim)
+                    .is_some_and(|(h, _, _, p)| h > 0 && p.is_some_and(|p| p.disabled))
+            {
+                self.traffic
+                    .emp_event(
+                        episode.origin,
+                        episode.victim,
+                        tick,
+                        clock,
+                        EmpResourceAction::Recover,
+                    )
+                    .map_err(|_| super::super::StepError::TickOverflow)?;
+                Arc::make_mut(&mut self.state.episodes)[index].recovered_at = Some((clock, tick));
+            }
+        }
+        Ok(())
+    }
 }
 impl State {
     pub(in crate::flight) fn input_blocked(&self) -> bool {
@@ -222,35 +254,7 @@ impl State {
         {
             stage.state.charge = None;
         }
-        // Only current, admitted local custody is supported. Departure is refused while a live
-        // victim is disabled; no unqualified off-system archive or occupied capsule is fabricated.
-        for index in 0..stage.state.episodes.len() {
-            let episode = stage.state.episodes[index];
-            if episode.recovered_at.is_none()
-                && clock
-                    > episode
-                        .disabled_at
-                        .checked_add(policy::RECOVERY_TICKS)
-                        .ok_or(super::super::StepError::TickOverflow)?
-                && stage
-                    .traffic
-                    .emp_resources(episode.victim)
-                    .is_some_and(|(h, _, _, p)| h > 0 && p.is_some_and(|p| p.disabled))
-            {
-                stage
-                    .traffic
-                    .emp_event(
-                        episode.origin,
-                        episode.victim,
-                        next.tick,
-                        clock,
-                        EmpResourceAction::Recover,
-                    )
-                    .map_err(|_| super::super::StepError::TickOverflow)?;
-                Arc::make_mut(&mut stage.state.episodes)[index].recovered_at =
-                    Some((clock, next.tick));
-            }
-        }
+        stage.recover(next.tick, clock)?;
         Ok(stage)
     }
     fn release(
