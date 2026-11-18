@@ -176,3 +176,104 @@ Root/G2 source review, existing G1/Dell owners run their pinned compiler, tests,
 strict Clippy and platform gates, then actual input/journey/cold-Continue checks.
 Retain exact joined head/tree, commands, raw failures, counts and timings. No new
 review wake, compiler helper, preview or publication follows from this packet.
+
+## Informational trade and profit successor
+
+This source starts after sealed navigation host `2563b8e4e95ac1556503879ea9035f428abf7b02`,
+tree `34e721e569794d13ffcbc3058a649eb422c3541d`. All earlier pure planner and
+route custody/provider/refusal tests remain byte-identical. This successor adds
+six core and three desktop cases, authored **UNRUN**. Its isolated inventory is
+419 core, two compatibility, 233 desktop and three observer source attributes.
+That does not establish compiled or passing results. Root's current-main
+laser/ECM/importer composition and geometry corrections retain separate evidence;
+none is blindly merged into this author branch.
+
+The immutable original contracts are concrete. `NavigationComputer.swift` scores
+Trade Opportunities as `max(0.25, 1 + arrivalRisk*0.2 - trade/10000)`. Its trade
+term is the best positive commodity spread times at most 63 native units of
+current stock; tonne loads additionally obey trade room excluding reserved
+payloads. Each leg is estimated independently; it is not a cash-feasible purchase
+sequence. Fewest uses `1 + distance*0.0001`; Safer uses `1 + arrivalRisk`. Best
+Cargo Sale considers a feasible unique-path waypoint with better initial-bid
+sale value for the actual sellable cargo than the destination. In this admitted
+three-site domain there is only one possible distinct waypoint.
+
+`ProfitScan.swift` and `Game.swift::profitableExports` define a separate direct
+scan: compare sellable carried cargo with selling it here, then greedily allocate
+current cash and free tonne room to positive spreads, sorted by per-unit spread
+and original commodity ID ties. Gold and Platinum remain kilograms, Gem-Stones
+remain grams; each non-tonne commodity has a preview storage cap of
+`max(0,63-currentNativeQuantity)`, without consuming tonne space. This is a
+preview rule, not a new custody cap or trading command. Exact signed i128 sums
+retain cancellation and rank positive destinations by full value, then system
+ID; at most five are returned (at most two exist here). Quote prices are tenths
+of CR per actual native unit. Cash spent in a speculative allocation never
+recycles hypothetical future sale proceeds.
+
+`Plugh.swift::minimumPrices` resolves original `OriginalLiveMarkets.initial`
+bid prices, not a future arrival observation. Existing imported commodity/Food
+bytes already supply those exact initial bids for Avenor/Renas/Lareria. A new
+read-only projection validates those same bytes without constructing a market
+owner. `World::navigation_trade_preview` reads all current quotes from its sole
+actual StationMarkets and current reserved service projection, including real
+T04/mission restrictions. It first reuses the unchanged route review admission
+for tick, pause, physical berth, known ordinary charts, fitted computer, planning
+radius, current first-leg fuel and admitted target. It enumerates only the
+simple paths among those three actual stations and reuses the existing stable
+weighted kernel and original exposure provider. The kernel body and pure API
+semantics are unchanged; only crate-private visibility enables reuse.
+
+The returned `NavigationTradePreview` is descriptive. It retains the as-of tick,
+current quotes and their stock/epoch, benchmark bids, actual ordinary/reserved
+quantities, cash, used/capacity tonnes and fuel/reach so scope and drift can be
+inspected. None of it is accepted as purchase, consent, install, price, fuel or
+arrival authority. No save field, codec, content marker, migration, market seed,
+new world/provider or asset is added. The existing actual trading and route
+commands still own execution. Trade-scored route installation is not claimed.
+Original initial price benchmarks do not guarantee future stock, arrival,
+services, credited proceeds, saturation behavior or refuelling. Gross estimates
+exclude fuel, fees and credit caps; independent leg opportunities must not be
+presented as forecast cash or net journey profit.
+
+Galaxy/System G opens informational pages for the selected admitted destination.
+PgUp/PgDn pages through scope, source-weighted alternatives, direct rankings and
+exports and each best leg opportunity showing native quantities, actual asks
+and initial bid benchmarks.
+Enter/B closes; it never installs or buys. O/R retain the separate actual route
+review. Both a current presented frame and no active search/review are required.
+A retained information card blocks purchase, route, mode and clear keys; Help
+retains it. Reopening recomputes from actual owners. Enter compares a fresh
+preview/anchor and reports changed estimates rather than silently confirming
+old data. Resize only reflows retained text; no per-frame world planning occurs.
+The pages fit even the 320x240 UI viewport, with visible page controls in the
+title. Native rendering/input acceptance is still unobserved.
+
+Independent pinned-byte arithmetic freezes the stock Avenor-to-Renas direct
+estimate at 2618 tenths: 1 kg Gold at ask 4345/initial bid 5658 contributes 1313,
+then 3 g Gem-Stones at 894/1329 contributes 1305, leaving 173 actual-input cash
+unallocated. It supplies no cargo or profit. The stock Avenor/Renas/Lareria
+route's independent leg opportunity total is 61711+945=62656 tenths, which is
+explicitly not that cash-limited scan. A real Gem-Stone purchase changes actual
+cash to 6306, stock to 105 and carried quantity to 1 g; recomputation yields
+carried delta 505 and total estimate 2688. A labelled accounted-fuel public
+XYZZY journey physically reaches Renas; at its advanced fitted reach the
+original trade score can favor Renas/Avenor/Lareria over the direct Fewest path.
+It does not demonstrate native earnings or guarantee fuel at the intermediate
+stop. A real Food tutorial reservation remains excluded from carried sale and
+reserves capacity. Other cases preserve invalid navigation refusals, exact large
+signed cancellation, native 63-unit caps, file/route invariance, quote drift,
+minimum-viewport paging, modal suppression and Help bounds.
+
+Root bindings are deliberately narrow: new module/exports, static initial-bid
+projection, crate-private existing kernel access, Docked's informational intent,
+G/paging dispatch and chart Help. Preserve all later laser/ECM/core/host owners.
+This trade delta does not touch App or flight N. The sealed older route host's N
+clear binding conflicts with Root's later manual N ECM; Root must resolve that
+pre-existing integration explicitly, retaining manual ECM and the route-clear
+behavior/assertion meaning through a nonconflicting control. The existing chart
+C clear remains available. Do not blindly copy the older App/Help files over
+current Root. After complete joined review, existing G1/Dell owners run pinned
+full qualification and actual native input/quote/route/Save-Quit-Continue checks,
+retaining exact joined SHA/tree and raw results. Hidden PLUGH, other galaxies,
+additional market/arrival providers, executable trade itineraries and full
+navigation parity remain concrete unfinished scope, not inferred providers.

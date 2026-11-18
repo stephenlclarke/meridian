@@ -1,7 +1,7 @@
 {
   "revision": "a11fe16924d87d06021816f9037952afcbac08db",
   "tree": "68fec574df12ddf74acb14747e0dd6839f478642",
-  "scope": "Original visible-scope route search, ordinary chart knowledge and bounded current-hull installation; existing notices retained; source availability establishes neither new rights nor unadmitted arrival services.",
+  "scope": "Original route search, ordinary chart knowledge, bounded current-hull installation and informational trade/profit scoring over three admitted providers; source availability grants no new rights or future stock/cash/travel authority.",
   "files": [
     {
       "path": "LICENSE",
@@ -56,6 +56,66 @@
       "bytes": 4508,
       "sha256": "2c43ae0738fa93375eb51a4859e11bc33e7bf9e7496ff432f140e813baa6b8eb",
       "gitBlob": "faf40ce4d170b33d26dc14f185d08acb30130a3a"
+    },
+    {
+      "path": "Sources/L337Core/ProfitScan.swift",
+      "bytes": 3677,
+      "sha256": "3dd8cb0e3aef03e453e25fe6cc6a517037993c8ad451cc077f5c20869d862e0b",
+      "gitBlob": "a156fa159391ad38d0ba89750bb1363a2932490e"
+    },
+    {
+      "path": "Sources/L337Core/Game.swift",
+      "bytes": 313817,
+      "sha256": "e5b4e30c835d460aa7ca6f77364db0aaeaf877bb9d73bacc162e9111b26e2e17",
+      "gitBlob": "0f94ff0c7bf46d47e65e077cc3c5db37694bd706"
+    },
+    {
+      "path": "Sources/L337Core/OriginalLiveMarkets.swift",
+      "bytes": 4813,
+      "sha256": "d385ce4e9a4b621a5196d39853a68179e0836751afda4f561e34cd24487d5742",
+      "gitBlob": "60cc87e3f8a69addc7ec4a7bb5bf9c20f99e4fb7"
+    },
+    {
+      "path": "Sources/L337Core/BlackjackMission.swift",
+      "bytes": 3211,
+      "sha256": "b741355ac86300a8e791dde90ca6a318ae749009d76b0042cc0e768951be88d1",
+      "gitBlob": "095db2f543f8c9226ee0c75d5152805d81d7c9b9"
+    },
+    {
+      "path": "Sources/L337Core/FuelStorage.swift",
+      "bytes": 1087,
+      "sha256": "b78beb5454d505217b71770d1c9daf7afb8be13fe81ab4b9d8c7725514c0c2fc",
+      "gitBlob": "c25e23dfdf6971f2d0b12d7c2c2c5816c3e4591d"
+    },
+    {
+      "path": "Sources/L337Core/Resources/OriginalWorlds/authoring.toml",
+      "bytes": 6664,
+      "sha256": "47d83caae5a9b22a4a932f19c55f79c5cb5435b962826a0969ece096b11f80eb",
+      "gitBlob": "0373b5cb3e2a18ef4d4f372c7a64952b2964a456"
+    },
+    {
+      "path": "Sources/L337Core/Resources/OriginalMarkets/manifest.json",
+      "bytes": 3854,
+      "sha256": "fcc9180da8b415bb2ac0666acae197dc30f5862dac79d613fb6c6e6dfdb8e5c3",
+      "gitBlob": "ebaa989da79733380a980c45605a96b127085361"
+    },
+    {
+      "path": "Sources/L337Core/Resources/OriginalMarkets/markets.json",
+      "bytes": 5642852,
+      "sha256": "4f7e7c9235f13f8151f2d53051828078f6c7d701ffd119c15031dd9137176c5d",
+      "gitBlob": "8dbd91cc8ce1f465bacbcd35526b5678a9a49abd"
+    },
+    {
+      "path": "Sources/L337Core/GameplayContracts.swift",
+      "bytes": 9854,
+      "sha256": "365ba38c3ed2dc3312eae0dfee677a3c8dec676fa0b9f925a53f1764a3e5496a",
+      "gitBlob": "7694d987c6d7aab31b602abe2d2a891120d4925a"
+    },
+    {
+      "path": "Sources/L337Core/CommanderCargoValidation.swift",
+      "bytes": 9113,
+      "sha256": "05c5c1a872560370159c4db0f1701996c65f7a1142a9f8dcfd53e731b2397f32",
+      "gitBlob": "5355fb6b22e21f87b94cae5daa71adb00a0dd474"
     }
   ]
 }

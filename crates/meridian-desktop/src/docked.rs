@@ -141,6 +141,7 @@ impl Anchor {
 enum Intent {
     Change(Action),
     Route(meridian_core::NavigationRouteReview),
+    TradeInformation(Box<trade_preview::Information>),
 }
 struct Pending {
     view: ui::Review,
@@ -240,6 +241,7 @@ impl Docked {
             .checked_add(1)
             .ok_or("Screen revision exhausted")?;
         self.screens.advance(seconds);
+        self.reflow_trade_information(viewport);
         let panel = equipment_panel(world, &self.slot, &self.feedback)?;
         let stamp = ui::Stamp {
             session: 1,
@@ -269,17 +271,26 @@ impl Docked {
         result
     }
     fn input_inner(&mut self, profile: &mut Profile, input: ui::Input) -> Result<(), String> {
+        if self.trade_information_page(&input)? {
+            return Ok(());
+        }
         if matches!(self.screen(), ui::Screen::Galaxy | ui::Screen::System)
             && self.pending.is_none()
             && !self.search_active()
         {
-            if matches!(input, ui::Input::Key(ui::Key::Options | ui::Key::Compare))
-                && self
-                    .painted
-                    .as_ref()
-                    .is_none_or(|frame| frame.stamp.revision != self.serial)
+            if matches!(
+                input,
+                ui::Input::Key(ui::Key::Options | ui::Key::Compare | ui::Key::Buy)
+            ) && self
+                .painted
+                .as_ref()
+                .is_none_or(|frame| frame.stamp.revision != self.serial)
             {
                 return Err("Wait for the current screen to draw".into());
+            }
+            if matches!(input, ui::Input::Key(ui::Key::Buy)) {
+                self.open_trade_information(&profile.world)?;
+                return Ok(());
             }
             if matches!(input, ui::Input::Key(ui::Key::Options)) {
                 use meridian_core::navigation::RouteKind;
@@ -340,7 +351,11 @@ impl Docked {
             ui::Request::ConfirmReview(token) => {
                 let pending = self.pending.take().ok_or("No current review")?;
                 if pending.view.token != token || pending.anchor != Anchor::capture(world)? {
-                    self.feedback = "Values changed; open a fresh review".into();
+                    self.feedback = if matches!(&pending.intent, Intent::TradeInformation(_)) {
+                        "Estimates changed; press G for fresh information".into()
+                    } else {
+                        "Values changed; open a fresh review".into()
+                    };
                     return Ok(());
                 }
                 match pending.intent {
@@ -350,6 +365,17 @@ impl Docked {
                             .world
                             .navigation_route_snapshot()
                             .and_then(|route| route.next);
+                    }
+                    Intent::TradeInformation(info) => {
+                        let current = world.navigation_trade_preview(
+                            info.preview.destination,
+                            world.snapshot().tick,
+                        );
+                        self.feedback = if current.as_ref() == Ok(&info.preview) {
+                            "Trade information closed; route, stock, fuel and cash unchanged".into()
+                        } else {
+                            "Estimates changed; press G for fresh information".into()
+                        };
                     }
                     Intent::Change(action) => self.feedback = profile.command(action)?,
                 }
@@ -1629,3 +1655,5 @@ mod tests {
 
 #[cfg(test)]
 mod navigation_route_tests;
+
+mod trade_preview;

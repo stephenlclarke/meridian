@@ -1,6 +1,7 @@
 //! Original G01 coordinates and stock SH025/Basic-drive travel rules from immutable a11.
 //! Descriptive catalogue/route values never constitute docking or mission authority.
 mod alternatives;
+pub(crate) use alternatives::shortest_path as scored_route_path;
 pub use alternatives::{RouteAlternative, RouteError, RouteKind};
 mod journal;
 mod persistence;

@@ -9,6 +9,11 @@ mod mining;
 mod xyzzy;
 pub(crate) use xyzzy::{AccountEffect, AccountEvent, STARTING_CREDITS_TENTHS};
 pub use xyzzy::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
+mod trade_planning;
+pub use trade_planning::{
+    NavigationTradePreview, TradeExportEstimate, TradeLegEstimate, TradePathEstimate,
+    TradePlanningError, TradeProfitEstimate,
+};
 mod route_plan;
 pub use route_plan::{
     NavigationRouteError, NavigationRoutePhase, NavigationRouteReview, NavigationRouteSnapshot,

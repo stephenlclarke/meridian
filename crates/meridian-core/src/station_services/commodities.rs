@@ -133,6 +133,22 @@ impl StationMarkets {
         }
     }
 }
+/// Original initial bid benchmarks for the three already-admitted providers, not future quotes.
+/// No mutable market or stock owner is constructed by this read-only projection.
+pub(crate) fn navigation_bid_benchmarks() -> Result<[[u32; 17]; 3], Error> {
+    let food = read_seeds(SEEDS)?;
+    let other = read_market_seeds()?;
+    Ok(core::array::from_fn(|site| {
+        core::array::from_fn(|id| {
+            if id == 0 {
+                food[site].bid_tenths
+            } else {
+                other[site][id - 1].bid_tenths
+            }
+        })
+    }))
+}
+
 // These two immutable values are read from the same validated full source; never stock authority.
 fn food_seed(site: MarketSite) -> (u64, u64) {
     let row = 14 + site.index() * 563;

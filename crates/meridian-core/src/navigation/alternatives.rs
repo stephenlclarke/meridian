@@ -199,7 +199,7 @@ fn decode_exposure(bytes: &[u8]) -> Result<[f64; MAX_VISIBLE], RouteError> {
 // Original NavigationRouteSearch's stable lowest-system-ID Dijkstra policy. All
 // eligible scores are validated before an early destination exit, including hidden
 // expensive/unreachable branches. This scoped kernel accepts at most 256 worlds.
-fn shortest_path(
+pub(crate) fn shortest_path(
     weights: &[Vec<Option<f64>>],
     source: usize,
     target: usize,

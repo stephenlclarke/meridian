@@ -79,3 +79,8 @@ pub use flight::{
     NavigationRouteError, NavigationRoutePhase, NavigationRouteReview, NavigationRouteSnapshot,
     PreparedNavigationRoute,
 };
+
+pub use flight::{
+    NavigationTradePreview, TradeExportEstimate, TradeLegEstimate, TradePathEstimate,
+    TradePlanningError, TradeProfitEstimate,
+};

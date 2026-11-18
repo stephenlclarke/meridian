@@ -389,3 +389,21 @@ are preparation only. Compiler, tests, Clippy, native gameplay, final laser/ECM
 composition and publication remain pending with the existing owners. Current
 installation is station-only; trade/profit planning and full original navigation
 parity remain incomplete. See the guide for exact boundary and review criteria.
+
+## Informational navigation trade successor
+
+The [trade/profit candidate](ROUTE-ALTERNATIVES.md#informational-trade-and-profit-successor)
+starts after sealed navigation `2563b8e`. It traces original NavigationComputer,
+ProfitScan and profitableExports, using only the three existing market providers,
+current World cargo/cash/fuel/fit and immutable original initial bid benchmarks.
+G opens read-only paged information; Enter/B closes without a transaction. No
+trade estimate grants a purchase, route install, future stock/refuel, cash or
+arrival. Reserved cargo and native t/kg/g quantities retain their actual owners.
+
+Six core and three desktop cases are authored **UNRUN**. This isolated branch has
+419 core, two compatibility, 233 desktop and three observer source attributes,
+not passing results. Original route/codec/provider/assertion bodies remain. No
+compiler, Cargo, Clippy, Rust/helper, native/GPU or review bot runs here. Root's
+laser/ECM/current-main corrections remain independent, with their actual raw
+qualification and pending review identities. Serial Root composition, independent
+source review and owning execution are required; no new preview is claimed.

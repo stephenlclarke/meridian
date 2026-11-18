@@ -5,6 +5,7 @@
 #![forbid(unsafe_code)]
 
 mod commodities;
+pub(crate) use commodities::navigation_bid_benchmarks;
 pub use commodities::{CargoUnit, CommodityDefinition, CommodityId, CommodityQuote};
 mod history;
 mod persistence;

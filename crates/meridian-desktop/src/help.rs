@@ -95,6 +95,7 @@ impl Panel {
                     "H types into an active search; ? opens help",
                     "R Review route | L Local chart | Home Current location",
                     "O Direct / Fewest / Safer planning | C Clear installed route",
+                    "G Trade/profit information | PgUp/PgDn Pages | Enter/B Close",
                     "[ / ] Previous / next galaxy | Drag Pan | Wheel Zoom",
                 ],
             ),
@@ -103,6 +104,7 @@ impl Panel {
                 &[
                     "Up / Down Select route | Enter / R Review route",
                     "O Direct / Fewest / Safer planning | C Clear installed route",
+                    "G Trade/profit information | PgUp/PgDn Pages | Enter/B Close",
                     "Physical-body chart routing is unavailable",
                     "Home Current location | Wheel Scroll",
                 ],
