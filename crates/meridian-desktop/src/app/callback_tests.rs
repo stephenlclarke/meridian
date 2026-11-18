@@ -661,6 +661,106 @@ fn commander_labels(app: &mut App) -> Vec<String> {
     .collect()
 }
 
+// Keep the real paused berth and all other save fields. Set the review epoch one
+// below its limit after startup so a resume alone fits but resume plus launch refuses.
+fn near_exhausted_paused_dock_save() -> Vec<u8> {
+    let mut world = ok(World::new_commander(98013));
+    ok(world.request_pause(true, world.snapshot().tick));
+    let before = ok(world.save_bytes());
+    ok(world.request_pause(true, world.snapshot().tick));
+    let mut bytes = ok(world.save_bytes());
+    let body_len = bytes.len() - size_of::<u64>();
+    let mut changed = before[..body_len]
+        .iter()
+        .zip(&bytes[..body_len])
+        .enumerate()
+        .filter_map(|(index, (old, new))| (old != new).then_some(index));
+    let epoch = changed
+        .next()
+        .unwrap_or_else(|| panic!("missing pause epoch"));
+    assert_eq!(changed.next(), None);
+    assert_eq!(&bytes[epoch..epoch + 8], &3_u64.to_le_bytes());
+    bytes[epoch..epoch + 8].copy_from_slice(&(u64::MAX - 2).to_le_bytes());
+    let checksum = bytes[..body_len]
+        .iter()
+        .fold(0xcbf2_9ce4_8422_2325_u64, |hash, byte| {
+            (hash ^ u64::from(*byte)).wrapping_mul(0x100_0000_01b3)
+        });
+    bytes[body_len..].copy_from_slice(&checksum.to_le_bytes());
+    bytes
+}
+
+#[test]
+fn refused_commander_launch_keeps_real_docked_pause_through_immediate_save() {
+    let directory = TestDirectory::new();
+    let path = directory.0.join("commander.meridian");
+    let opening_save = near_exhausted_paused_dock_save();
+    ok(std::fs::write(&path, &opening_save));
+    let mut app = startup(&directory);
+    assert!(app.commander_open && app.paused && app.has_berth());
+    let berth = app.game.world.current_dock_context();
+    let snapshot = app.game.world.snapshot();
+    let paused_before_launch = ok(app.game.world.save_bytes());
+
+    // The genuine World check reaches launch preparation and refuses the exhausted sequence.
+    assert!(app.commander_key(KeyCode::KeyL));
+    let refusal = StepError::TickOverflow.to_string();
+    assert_eq!(app.notice.text.as_deref(), Some(refusal.as_str()));
+    assert!(app.commander_open && app.paused && !app.simulation_active());
+    assert_eq!(app.game.world.current_dock_context(), berth);
+    assert_eq!(app.game.world.snapshot(), snapshot);
+    assert_eq!(ok(app.game.world.save_bytes()), paused_before_launch);
+    assert_eq!(ok(std::fs::read(&path)), opening_save);
+
+    assert!(!app.commander_key(KeyCode::F5));
+    app.save_profile();
+    let saved = ok(std::fs::read(&path));
+    assert_eq!(saved, paused_before_launch);
+    let continued = ok(World::from_save_bytes(&saved));
+    assert!(
+        continued
+            .mission_snapshot()
+            .is_some_and(|mission| mission.paused)
+    );
+    assert_eq!(continued.snapshot(), snapshot);
+    assert_eq!(continued.current_dock_context(), berth);
+}
+
+#[test]
+fn accepted_commander_launch_resumes_paused_world_and_saves_the_departure() {
+    let directory = TestDirectory::new();
+    let path = directory.0.join("commander.meridian");
+    let mut world = ok(World::new_commander(98014));
+    ok(world.request_pause(true, world.snapshot().tick));
+    ok(std::fs::write(&path, ok(world.save_bytes())));
+    let mut app = startup(&directory);
+    assert!(app.commander_open && app.paused && app.has_berth());
+    let tick = app.game.world.snapshot().tick;
+    assert_eq!(app.game.world.request_launch(tick), Err(StepError::Paused));
+
+    assert!(app.commander_key(KeyCode::KeyL));
+    assert!(!app.commander_open && !app.paused && app.simulation_active());
+    let snapshot = app.game.world.snapshot();
+    assert_eq!(snapshot.mode, FlightMode::Launching);
+    assert_eq!(snapshot.tick, tick);
+    assert_eq!(app.game.world.current_dock_context(), None);
+    assert!(
+        app.game
+            .world
+            .mission_snapshot()
+            .is_some_and(|mission| !mission.paused)
+    );
+
+    app.save_profile();
+    let continued = ok(World::from_save_bytes(&ok(std::fs::read(&path))));
+    assert_eq!(continued.snapshot(), snapshot);
+    assert!(
+        continued
+            .mission_snapshot()
+            .is_some_and(|mission| !mission.paused)
+    );
+}
+
 #[test]
 fn ordinary_start_opens_fresh_commander_with_live_station_bindings_and_without_a_save() {
     let directory = TestDirectory::new();

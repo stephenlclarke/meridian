@@ -442,12 +442,7 @@ impl App {
             }
             KeyCode::KeyC if !self.game.playing() => self.load_profile(),
             KeyCode::F9 if self.game.playing() => self.load_profile(),
-            KeyCode::F5 if self.game.playing() => {
-                self.notice.set(match self.game.save() {
-                    Ok(message) => message,
-                    Err(error) => error,
-                });
-            }
+            KeyCode::F5 if self.game.playing() => self.save_profile(),
             KeyCode::KeyP if self.game.playing() => {
                 self.quit_failed = false;
                 self.paused = !self.paused;
@@ -523,26 +518,23 @@ impl App {
     }
 
     fn launch_from_commander(&mut self) {
-        if self
-            .game
-            .world
-            .mission_snapshot()
-            .is_some_and(|mission| mission.paused)
-        {
-            let tick = self.game.world.snapshot().tick;
-            if let Err(error) = self.game.world.request_pause(false, tick) {
-                self.notice.set(error.to_string());
-                return;
-            }
-        }
-        match self.game.command(Action::Launch) {
-            Ok(message) => {
+        let tick = self.game.world.snapshot().tick;
+        match self.game.world.request_launch_from_commander(tick) {
+            Ok(()) => {
                 self.paused = false;
                 self.leave_commander();
-                self.notice.set(message);
+                self.notice
+                    .set("Launch admitted. Follow the exit corridor.".into());
             }
-            Err(error) => self.notice.set(error),
+            Err(error) => self.notice.set(error.to_string()),
         }
+    }
+
+    fn save_profile(&mut self) {
+        self.notice.set(match self.game.save() {
+            Ok(message) => message,
+            Err(error) => error,
+        });
     }
 
     fn sync_profile_controls(&mut self) {

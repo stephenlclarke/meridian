@@ -423,13 +423,24 @@ impl World {
     /// Stage the source-derived safe exterior spawn, then normal ticks finish launch.
     /// Rejected, duplicate and stale commands leave the complete state unchanged.
     pub fn request_launch(&mut self, expected_tick: u64) -> Result<(), StepError> {
+        self.launch(expected_tick, false)
+    }
+
+    /// Resume and depart from the current commander berth as one World transaction.
+    /// A refused departure also preserves the original pause and review sequence.
+    pub fn request_launch_from_commander(&mut self, expected_tick: u64) -> Result<(), StepError> {
+        self.launch(expected_tick, true)
+    }
+
+    fn launch(&mut self, expected_tick: u64, from_commander: bool) -> Result<(), StepError> {
         if expected_tick != self.state.tick {
             return Err(StepError::StaleCommand);
         }
-        if self.is_paused() {
+        if self.is_paused() && !from_commander {
             return Err(StepError::Paused);
         }
         if self.state.mode != FlightMode::Docked
+            || (from_commander && self.current_dock_context().is_none())
             || self.combat_snapshot().is_some_and(|s| s.player.destroyed)
         {
             return Err(StepError::InvalidMode);
@@ -454,7 +465,7 @@ impl World {
         let mission_epoch = self
             .freight_session
             .as_ref()
-            .map(|session| session.next_epoch())
+            .map(mission::FreightSession::launch_epoch)
             .transpose()
             .map_err(|_| StepError::TickOverflow)?;
         if let Some(account) = &mut self.commander_account {
@@ -464,7 +475,7 @@ impl World {
         self.navigation = navigation;
         self.missiles.berth();
         if let Some((session, epoch)) = self.freight_session.as_mut().zip(mission_epoch) {
-            session.rebind_dock(None, epoch);
+            session.publish_launch(epoch);
         }
         Ok(())
     }
