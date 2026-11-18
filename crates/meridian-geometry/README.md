@@ -217,3 +217,7 @@ The whole source review accepted the geometric proof and lifetimes, then found m
 ## Exact source work removal
 
 Certified convex source supports exclude only their own owner's provably empty outward sections. Physical cuts, other owners and every original field remain eligible. The source arrangement retains validated domain edges directly and reuses checked barrier endpoints when clipping did not change them. This removes actual arithmetic and duplicate validation. It preserves all guards on inputs and generated coordinates, constraints, contact stars, witnesses and publication limits. Frozen complete publisher and arrangement controls retain the prior work and prices. Current compiler, test, original-five and native results remain UNRUN; the fleet baseline is unchanged. See [the contract](integration/source-work/CONTRACT.md).
+
+## Checked refusal assertions
+
+G2's whole-source review found one test-only static compiler/lint issue in seven new refusal assertions. The bounded correction uses a private generic helper that returns each expected Failure and fails on every unexpected success without a Debug bound. The complete review, exact test-token preservation proof and successor contract are in [the correction handoff](integration/source-work-refusal/CONTRACT.md). All 67 prior test bodies, four new case names, geometry, guards and strict comparisons remain. Current 71 Rust and nine host tests, compiler, strict Clippy, build and whole-five remain UNRUN pending the bounded review closure and G1's lane.

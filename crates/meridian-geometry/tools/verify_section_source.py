@@ -25,6 +25,7 @@ def normalized(value):
 
 
 def verify():
+    subprocess.run(["python3", "-B", str(CRATE / "tools/verify_source_work_refusal_source.py")], check=True)
     subprocess.run(["python3", "-B", str(CRATE / "tools/verify_source_work_source.py")], check=True)
     subprocess.run(["python3", "-B", str(CRATE / "tools/verify_interior_accounting_source.py")], check=True)
     subprocess.run(["python3", "-B", str(CRATE / "tools/verify_strict_interior_source.py")], check=True)

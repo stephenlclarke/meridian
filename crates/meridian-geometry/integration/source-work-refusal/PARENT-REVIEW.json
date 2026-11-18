@@ -1,0 +1,80 @@
+{
+  "reviewedAtUTC": "2026-11-18T11:55:56.250684+00:00",
+  "verdict": "CHANGES_REQUIRED_ONE_NEW_REFUSAL_EXTRACTION_COMPILE_AND_LINT_FINDING",
+  "head": "c451a394c32aaf8fc65f351b31e4a716588c2990",
+  "tree": "81db2750979b4eee419fb3ae28ad8fdb83f3e93f",
+  "soleParent": "463dccc6e610def60ced2e715b44e8e18200947a",
+  "authorHead": "e2341aa5dac054524ebae9175d8498ee1f3450cc",
+  "packet": {
+    "path": "/private/tmp/meridian-root-source-work-review/SOURCE.json",
+    "bytes": 5047,
+    "sha256": "6a640e7902f1f7c5eedb9a84796193162bc02a3269ae675aabd337093e136c9c"
+  },
+  "findings": [
+    {
+      "id": "G2-GEOMETRY-SOURCE-WORK-1",
+      "priority": "P1",
+      "file": "crates/meridian-geometry/src/source_work_tests.rs",
+      "line": 256,
+      "otherLines": [
+        236,
+        329,
+        332,
+        345,
+        378,
+        389
+      ],
+      "title": "Use checked error extraction for all seven new refusal assertions",
+      "description": "Result::unwrap_err requires its success type to implement Debug. At256 the collect_certified success tuple contains sections::Frame,which has no Debug derive or implementation,so the new test cannot compile. All7new unwrap_err calls also fall under Rust1.99Clippy unwrap_used,which this workspace denies. No test exemption is configured. This is a source-established required-gate issue;G2 ran no compiler or Clippy.",
+      "requestedCorrection": "Replace all7new unwrap_err uses with an explicit Err match or a private checked helper that fails on every unexpected Ok,without needing T:Debug. Keep every refusal kind and old/new comparison requirement. In particular,do not weaken the paired invalid-domain errors into a comparison that could accept None==None. Do not add production Debug solely for the test,lint suppression,expect_err or a waiver. All67oldbodies and four new case names/geometry must remain. A bounded test-only correction review suffices.",
+      "primaryLintSource": "https://raw.githubusercontent.com/rust-lang/rust-clippy/rust-1.99.0/clippy_lints/src/methods/unwrap_expect_used.rs"
+    }
+  ],
+  "independentChecks": {
+    "rootGitWorkingArchiveBytesHashesModes": 526,
+    "authorCrateGitArchiveRootExact": 387,
+    "authorParentCrateExactExecuted463": 371,
+    "changedPaths": 27,
+    "unchangedPaths": 499,
+    "crateUnchanged": 362,
+    "outsideCrateUnchanged": 137,
+    "outsideDocsChanged": 2,
+    "manifestPayloadPins": 7,
+    "completeOuterArchiveMembersMatched": 8,
+    "canonicalRootAuthorBinaryDiffsExact": true,
+    "ownFourFileInversionsToExecutedParent": [
+      "certificate.rs",
+      "sections.rs",
+      "section_arrangement.rs",
+      "strict_interior.rs"
+    ],
+    "oldTestBodiesComparedByteExact": 67,
+    "currentSourceTestCount": 71,
+    "originalClipBodyAndFalseCommonModeExact": true,
+    "frozenWholePublisher": "Complete body exact except function name.",
+    "actualParentReferencedRawPinsVerified": 49,
+    "rawArchiveMatchingMembers": 45,
+    "externalRawArchiveBytes": 21007700,
+    "workingTreeClean": true
+  },
+  "wholeSemanticReview": {
+    "supportLookup": "Certified owners remain sorted by ID and their support refs by exact normal/offset map key. Both binary searches charge each actual key comparison under32scratch. Owner ID alone cannot certify:the queried exact source equation must match. Axis-aligned queries retain old owner-box path. No result/sample cache or extra retained geometry.",
+    "emptyOwnSectionProof": "Prior audited convex-owner support proves all its original vertices have nonpositive distance to a matched outward plane,so none of its edges crosses the positive side needed for an outward limiting section. Own outward candidate work is therefore empty. The query still preserves physical eligibility independently,foreign-owner outward sections,mixed-node checks,original ordinal order,empty owner parity rows and coplanar field ties. All original facets remain available.",
+    "directDomainEdges": "The unchanged prepass checks every domain point,adjacent duplicate,all edge/vertex halfplanes and positive area. By convexity every domain edge already lies in the closed domain. Source mode charges a real edge visit and retains exact endpoint values instead of repeating clipping/interpolation/coordinate checks. Protected points,events and physical constraints use unchanged insertion path.",
+    "endpointReuse": "Arbitrary barriers retain both original endpoint coordinate guards and every old halfplane/orientation check. A negative first-side visit yields final low>0;negative second-side visit yields high<1,so the two flags identify exactly the nondefault bounds. Unchanged bounds return original checked endpoints;changed bounds interpolate and coordinate-check new points. Early both-negative and low>high refusals,key ordering,closed contacts and rational validity remain. No performed old operation is discounted.",
+    "commonLifetime": "Original base/temporary bounds cover the smaller state;no original guard price/cap reduced. Common cell/sweep/callback/packing/noding/field/star/witness/topology code and cleanup are byte identical in false-mode reconstruction. Certified collection restores retained entry on error;lookup scratch is scoped. Prior interior support-vector lifetimes unchanged.",
+    "testsAndEvidence": "Four new cases meaningfully compare full arrangements against oldfalse and unchangedpublic oracles,oblique/foreign physical/parity output including proof cost,invaliddomain/rational/exactStorage/callback/lookup rollback,and full publisher triangles,witness fields,volume/retained ledger. Paired fixture monotonic times and10x bound remain. Source test refusal extraction must be fixed before execution. Actual46367Rust9host/check/Clippy/buildPASS and5Operationsrefusals15UNRUN0candidates remain source-bound;prefixes do not establish fit,minima,hotspot or speed.",
+    "otherFindings": "No other actionable source issue identified in complete implementation/tests/criteria/bindings. Carry this whole semantic and unaffected review to bounded refusal-extraction correction."
+  },
+  "carriedPriorWholeClear": {
+    "path": "/private/tmp/g2-meridian-463dccc6-interior-accounting-delta-source-clear.json",
+    "bytes": 3386,
+    "sha256": "711efffa0ecc8828db451387e399e831c50368fbd40f94057ff8e22606b83c2c"
+  },
+  "executionDecision": "HOLD current source until G2-GEOMETRY-SOURCE-WORK-1 closes. Retain complete whole review;no broad unchanged rereview required. After bounded source closure,existingG1 focused71Rust9host/check/strictClippy/devbuild thenONEchangedwholefive ONLYafterALLPASS and soleMaclane availability. Preserve2M100k4096bit512face/322/108/120;broader202separate,no native/hull/fullfit/minima/speed claim.",
+  "limits": [
+    "G2 ran no compiler,Cargo,Clippy,tests,supplied source verifier,SUT,helper,native,leak scan or integration tests.",
+    "Official pinned Rust1.99Clippy source and local installed default test-exemption documentation were read only;no lint executable ran.",
+    "Static required-gate finding is not an actual executed compiler/lint failure."
+  ]
+}

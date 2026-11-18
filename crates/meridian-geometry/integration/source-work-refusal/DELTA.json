@@ -1,0 +1,18 @@
+{
+  "status": "AUTHORED_UNRUN_BOUNDED_REFUSAL_EXTRACTION_FIX",
+  "parentAuthor": "e2341aa5dac054524ebae9175d8498ee1f3450cc",
+  "wholeReviewedRoot": "c451a394c32aaf8fc65f351b31e4a716588c2990",
+  "wholeReviewedTree": "81db2750979b4eee419fb3ae28ad8fdb83f3e93f",
+  "findingAddressed": "G2-GEOMETRY-SOURCE-WORK-1",
+  "productionChanges": 0,
+  "testChange": "One private generic checked_failure<T>(Result<T,Failure>)->Failure; Err preserves failure, every Ok panics; seven wrappers replace unwrap_err. No T:Debug, suppression, expect_err or None comparison.",
+  "unchangedProof": "Remove helper and invert seven wrappers: complete parent test tokens exactly restored after whitespace normalization. Every other source/test file byte exact. All67oldbodies and four new case names/predicates unchanged.",
+  "currentRustCount": 71,
+  "hostCount": 9,
+  "currentExecution": "UNRUN; static finding was not an executed failure",
+  "contractSHA256": "0c65560dd4fa46b1b0c2c819e0e3e68fcab8aa0aafa1974850052c484d98d564",
+  "freezeSHA256": "55dc8953224d6184f9a80d19ea7ec0c7cb1de7effd1357fb1b4ad7126ccea2a2",
+  "custodySHA256": "e2b7171db5e6a7b0e729e93005a159ea95cdd5058c76b8dd6660bb3ec21999b3",
+  "parentReviewSHA256": "6e51e2e1bbc86295d718d0da30cef48aea5f4ab3f895dbd2ce8dce6cb18fd004",
+  "qualification": "Root successor delta sincee234 only, preserveRootdocs/G3 work; ONE G2 bounded closure carryingwhole review thenexisting G1 focused/ONEchangedwholefive afterallPASS"
+}

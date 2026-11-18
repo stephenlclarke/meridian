@@ -1,0 +1,24 @@
+{
+  "parentAuthor": "e2341aa5dac054524ebae9175d8498ee1f3450cc",
+  "wholeReviewedRoot": "c451a394c32aaf8fc65f351b31e4a716588c2990",
+  "wholeReviewedTree": "81db2750979b4eee419fb3ae28ad8fdb83f3e93f",
+  "reviewFile": {
+    "path": "integration/source-work-refusal/PARENT-REVIEW.json",
+    "bytes": 7062,
+    "sha256": "6e51e2e1bbc86295d718d0da30cef48aea5f4ab3f895dbd2ce8dce6cb18fd004"
+  },
+  "reviewVerdict": "CHANGES_REQUIRED_ONE_NEW_REFUSAL_EXTRACTION_COMPILE_AND_LINT_FINDING",
+  "reviewedRootSource": {
+    "path": "/private/tmp/meridian-root-source-work-review/SOURCE.json",
+    "bytes": 5047,
+    "sha256": "6a640e7902f1f7c5eedb9a84796193162bc02a3269ae675aabd337093e136c9c"
+  },
+  "all387ParentCratePinsMatchReviewedRoot": true,
+  "wholeReviewedRootPins": {
+    "path": "/private/tmp/meridian-root-source-work-review/ALL-SOURCE-PINS.json",
+    "bytes": 137858,
+    "sha256": "60b57e330ae4afbc92dd2f87f81937e1e3bce4610772b507b6603e6ab78f3595"
+  },
+  "wholeReviewCarried": "All math/work/refs/all67oldbodies otherwise clear; no other actionable finding. Carry whole semantic/unaffected review to bounded seven-expression test-only correction.",
+  "reviewExecution": "Static finding only; no compiler or lint run. Whole source/current71Rust9host/checkClippyBuild/wholefive UNRUN. Actual463 execution remains separate in prior custody."
+}

@@ -8,6 +8,13 @@ include!(concat!(
     "/fixtures/source-work-reference/compiled-publisher-control.rs"
 ));
 
+fn checked_failure<T>(result: Result<T, Failure>) -> Failure {
+    match result {
+        Err(failure) => failure,
+        Ok(_) => panic!("unexpected success in refusal assertion"),
+    }
+}
+
 fn mesh(
     points: &[[i64; 3]],
     triangles: &[[usize; 3]],
@@ -231,10 +238,7 @@ fn certified_source_support_keeps_foreign_physical_contacts_and_full_section_par
     })?;
     query_tight.retain(baseline)?;
     assert_eq!(
-        certificates
-            .source_outward_empty(&originals[48], &mut query_tight)
-            .unwrap_err()
-            .kind,
+        checked_failure(certificates.source_outward_empty(&originals[48], &mut query_tight)).kind,
         FailureKind::Storage
     );
     assert_eq!(query_tight.retained_memberships(), baseline);
@@ -244,7 +248,7 @@ fn certified_source_support_keeps_foreign_physical_contacts_and_full_section_par
     })?;
     visit_tight.retain(baseline)?;
     assert_eq!(
-        sections::Frame::collect_certified(
+        checked_failure(sections::Frame::collect_certified(
             &originals[48],
             &index.facets[48],
             &originals,
@@ -252,8 +256,7 @@ fn certified_source_support_keeps_foreign_physical_contacts_and_full_section_par
             &index,
             &certificates,
             &mut visit_tight
-        )
-        .unwrap_err()
+        ))
         .kind,
         FailureKind::Operations
     );
@@ -325,24 +328,28 @@ fn source_arrangement_keeps_invalid_input_rational_and_exact_live_callback_guard
         let mut a = Budget::new(Limits::default())?;
         let mut c = Budget::new(Limits::default())?;
         assert_eq!(
-            Arrangement::build_source(&invalid, &[], &mut a, |_, _| Ok(true))
-                .unwrap_err()
-                .kind,
-            Arrangement::build_accounted(&invalid, &[], &mut c, |_, _| Ok(true))
-                .unwrap_err()
-                .kind
+            checked_failure(Arrangement::build_source(&invalid, &[], &mut a, |_, _| Ok(
+                true
+            )))
+            .kind,
+            checked_failure(Arrangement::build_accounted(
+                &invalid,
+                &[],
+                &mut c,
+                |_, _| Ok(true)
+            ))
+            .kind
         );
     }
     let huge = Rational::from_integer(num_bigint::BigInt::from(1) << 4096usize);
     let mut b = Budget::new(Limits::default())?;
     assert_eq!(
-        Arrangement::build_source(
+        checked_failure(Arrangement::build_source(
             &domain,
             &[[[huge, integer(1)], p(2, 2)]],
             &mut b,
             |_, _| Ok(true)
-        )
-        .unwrap_err()
+        ))
         .kind,
         FailureKind::Rational
     );
@@ -371,11 +378,15 @@ fn source_arrangement_keeps_invalid_input_rational_and_exact_live_callback_guard
     })?;
     tight.retain(2000)?;
     assert_eq!(
-        Arrangement::build_source(&domain, &barriers, &mut tight, |_, b| {
-            b.guard(31)?;
-            Ok(true)
-        })
-        .unwrap_err()
+        checked_failure(Arrangement::build_source(
+            &domain,
+            &barriers,
+            &mut tight,
+            |_, b| {
+                b.guard(31)?;
+                Ok(true)
+            }
+        ))
         .kind,
         FailureKind::Storage
     );
@@ -383,10 +394,12 @@ fn source_arrangement_keeps_invalid_input_rational_and_exact_live_callback_guard
     let mut refused = Budget::new(Limits::default())?;
     refused.retain(2000)?;
     assert_eq!(
-        Arrangement::build_source(&domain, &barriers, &mut refused, |_, b| Err(
-            b.fail(FailureKind::InvalidWitness, "test callback refusal")
+        checked_failure(Arrangement::build_source(
+            &domain,
+            &barriers,
+            &mut refused,
+            |_, b| Err(b.fail(FailureKind::InvalidWitness, "test callback refusal"))
         ))
-        .unwrap_err()
         .kind,
         FailureKind::InvalidWitness
     );

@@ -1,5 +1,7 @@
 # Implementation and validation status
 
+The whole-source review found one test-only compiler-bound and lint problem in seven new refusal assertions. The bounded correction now extracts each `Err` through an exhaustive helper that fails every unexpected `Ok`, without requiring the success type to implement `Debug`. Production geometry, all four new case names, refusal kinds and all other test tokens remain unchanged. The corrected 71 Rust and nine host tests are still **UNRUN**; bounded review closure and owning execution remain required.
+
 ## Original section and arrangement work: source only
 
 The actual `463dccc` run passed 67 Rust tests, nine host tests, all-target check, strict Clippy and dev build. Its one original-five run still returned five Operations constructor refusals, fifteen dependent checks unrun and zero candidates. All original caps remain. The measured section and arrangement prefixes identify the next work to remove; they do not establish minimum total work or complete fit.
