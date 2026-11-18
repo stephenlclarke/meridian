@@ -152,10 +152,7 @@ fn selected_occupied_mount_replaces_that_actual_item_and_moves_the_born_item_bac
     drop(profile); // Release the exclusive Store lease before fresh Continue.
     let mut cold = open(&directory.0);
     ok(cold.continue_saved());
-    assert_eq!(
-        cold.world.modular_equipment_snapshot(),
-        expected_modules
-    );
+    assert_eq!(cold.world.modular_equipment_snapshot(), expected_modules);
 }
 
 #[test]

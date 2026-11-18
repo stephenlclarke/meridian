@@ -139,10 +139,7 @@ fn actual_digit_view_binding_drives_each_fitted_body_axis_and_fresh_profile_keep
             item
         );
         assert_eq!(cold.world.flight_resources_snapshot(), Some(resources));
-        assert_eq!(
-            cold.world.modular_equipment_snapshot(),
-            expected_modules
-        );
+        assert_eq!(cold.world.modular_equipment_snapshot(), expected_modules);
     }
 }
 
@@ -250,10 +247,7 @@ fn presented_paid_left_and_rear_purchase_charge_once_then_right_offer_refuses_an
     drop(a); // The preceding App still owns the same profile's lease.
     let mut cold = open(&directory.0);
     ok(cold.continue_saved());
-    assert_eq!(
-        cold.world.modular_equipment_snapshot(),
-        expected_modules
-    );
+    assert_eq!(cold.world.modular_equipment_snapshot(), expected_modules);
     assert_eq!(cold.world.credits_tenths(), Some(4650));
 }
 
