@@ -67,10 +67,10 @@ impl World {
         navigation: Option<NavigationState>,
         prepared: &missiles::PreparedStep,
         traffic: Option<&(traffic::State, StationMarkets)>,
-        resources: (&State, &crate::mining::State),
+        resources: (&State, &crate::mining::State, &crate::flight::emp::State),
         trade: Option<&navigation_trade::State>,
     ) -> Result<(), SaveError> {
-        let (damage, mining) = resources;
+        let (damage, mining, emp) = resources;
         if self.commander_account.is_none() {
             return Ok(());
         }
@@ -89,6 +89,7 @@ impl World {
             && !traffic.proof_grows_from(&self.traffic)
             && !missile_growth
             && !journal_grows
+            && !emp.proof_grows_from(&self.emp)
         {
             return Ok(());
         }
@@ -116,6 +117,8 @@ impl World {
             .and_then(|n| n.checked_add(new))
             .and_then(|n| n.checked_sub(old_mining))
             .and_then(|n| n.checked_add(new_mining))
+            .and_then(|n| n.checked_sub(size(|w| self.emp.encode(w))))
+            .and_then(|n| n.checked_add(size(|w| emp.encode(w))))
             .ok_or(SaveError::TooLarge)?;
         let old = size(|w| {
             if let Some(n) = self.navigation {

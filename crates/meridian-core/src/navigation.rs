@@ -405,6 +405,12 @@ impl NavigationState {
             }),
         }
     }
+    pub(crate) fn launches(self) -> u64 {
+        self.launches
+    }
+    pub(crate) fn dock_sequence(self) -> u64 {
+        self.dock_sequence
+    }
     pub(crate) fn dock(self) -> Option<DockContext> {
         self.dock
     }

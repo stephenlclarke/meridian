@@ -58,6 +58,7 @@ impl State {
     ) -> Result<(), SaveError> {
         let mut events = commerce.markets.ok_or(INVALID)?.account_events();
         events.extend(commerce.modular.account_events());
+        events.extend(commerce.emp.account_events()?);
         events.extend(commerce.ammunition.account_events());
         events.extend(account.equipment_state().account_event());
         events.extend(

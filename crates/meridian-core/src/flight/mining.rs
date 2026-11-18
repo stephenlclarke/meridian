@@ -163,6 +163,9 @@ impl World {
         if self.state.mode != FlightMode::Flight || !self.pulse.alive() {
             return Err(MiningError::NotInFlight);
         }
+        if self.emp.input_blocked() {
+            return Err(MiningError::Resources);
+        }
         let owner = self.combat_identity().ok_or(MiningError::NoCommander)?;
         let actual = self
             .fitted_mining_tool()

@@ -90,7 +90,8 @@ fn move_actor(
     } = *context;
     actor.resources.advance()?;
     actor.resource_clock = local_tick;
-    if actor.id.serial == 1
+    if !actor.resources.emp_disabled()
+        && actor.id.serial == 1
         && (threat_position(
             actor,
             opening,
@@ -114,32 +115,46 @@ fn move_actor(
             missile_aggression,
         )
     });
-    let (mut goal, mut speed) = player_goal.map_or_else(
-        || {
-            intent(
-                actor,
-                opening,
-                player_after.position,
-                shots,
-                missile_aggression,
-            )
-        },
-        |goal| {
-            (
-                goal,
-                if length(sub(goal, actor.position)) < 800.0 {
-                    0.0
-                } else {
-                    34.3
-                },
-            )
-        },
-    );
-    let yielding = super::admission::yield_goal(actor, goal, context);
+    let (mut goal, mut speed) = if actor.resources.emp_disabled() {
+        (
+            add(actor.position, scale(actor.pose().orientation.z, 100000.0)),
+            actor.speed,
+        )
+    } else {
+        player_goal.map_or_else(
+            || {
+                intent(
+                    actor,
+                    opening,
+                    player_after.position,
+                    shots,
+                    missile_aggression,
+                )
+            },
+            |goal| {
+                (
+                    goal,
+                    if length(sub(goal, actor.position)) < 800.0 {
+                        0.0
+                    } else {
+                        34.3
+                    },
+                )
+            },
+        );
+    };
+    let yielding = if actor.resources.emp_disabled() {
+        None
+    } else {
+        super::admission::yield_goal(actor, goal, context)
+    };
     if let Some(detour) = yielding {
         goal = detour;
         speed = speed.min(length(sub(goal, actor.position)) * 0.65 / (18.0 * 4.0));
-    } else if actor.id.serial == 2 && actor.resources.energy >= 9500 {
+    } else if !actor.resources.emp_disabled()
+        && actor.id.serial == 2
+        && actor.resources.energy >= 9500
+    {
         let target_pose = if player_goal.is_some() {
             Some(player_after)
         } else {
@@ -161,14 +176,22 @@ fn move_actor(
     if error.abs() > 0.25 {
         speed = speed.min(8.0);
     }
-    if actor.id.serial == 1 && actor.phase != NpcPhase::Inbound {
+    if !actor.resources.emp_disabled() && actor.id.serial == 1 && actor.phase != NpcPhase::Inbound {
         speed = speed.min(length(delta) * 0.65 / (18.0 * 4.0));
     }
-    let turn = error.clamp(-0.65 / 60.0, 0.65 / 60.0);
+    let turn = if actor.resources.emp_disabled() {
+        0.0
+    } else {
+        error.clamp(-0.65 / 60.0, 0.65 / 60.0)
+    };
     let yaw = actor.yaw + turn;
     let yaw = yaw.sin().atan2(yaw.cos());
     let rate = 9.1 / 60.0;
-    let velocity = (actor.speed + (speed - actor.speed).clamp(-rate, rate)).clamp(0.0, 34.3);
+    let velocity = if actor.resources.emp_disabled() {
+        actor.speed
+    } else {
+        (actor.speed + (speed - actor.speed).clamp(-rate, rate)).clamp(0.0, 34.3)
+    };
     let after = pose(
         add(
             actor.position,
@@ -227,7 +250,9 @@ fn move_actor(
     } else {
         actor.speed = 0.0;
     }
-    advance_route(&mut actor);
+    if !actor.resources.emp_disabled() {
+        advance_route(&mut actor);
+    }
     Ok(actor)
 }
 fn resolve_peer_paths(
@@ -339,10 +364,12 @@ fn threat_position(
     missile_aggression: bool,
 ) -> Option<Vec3> {
     if let Some(threat) = a.aggressor.and_then(|id| {
-        actors
-            .iter()
-            .flatten()
-            .find(|b| b.id == id && b.airborne() && length(sub(b.position, a.position)) <= 6000.0)
+        actors.iter().flatten().find(|b| {
+            b.id == id
+                && b.airborne()
+                && !b.resources.emp_disabled()
+                && length(sub(b.position, a.position)) <= 6000.0
+        })
     }) {
         return Some(threat.position);
     }
@@ -393,6 +420,7 @@ pub(super) fn target(a: Actor, actors: &[Option<Actor>; MAX_TRAFFIC_ACTORS]) -> 
                 && b.id.system == a.id.system
                 && b.id.serial == 1
                 && b.airborne()
+                && !b.resources.emp_disabled()
                 && !b.sold
                 && b.units > 0
                 && length(sub(b.position, a.position)) <= 12000.0

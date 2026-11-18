@@ -49,6 +49,7 @@ impl State {
     }
     pub(crate) fn proof_grows_from(&self, old: &Self) -> bool {
         self.receipt_count() > old.receipt_count()
+            || self.emp_events.len() > old.emp_events.len()
             || self.actors.iter().zip(&old.actors).any(|(a, b)| {
                 (a.is_some() && b.is_none())
                     || a.is_some_and(|a| a.berth.is_some()) && b.is_some_and(|b| b.berth.is_none())
@@ -81,6 +82,7 @@ impl State {
     ) -> Option<Vec3> {
         if actor.id.serial != 2
             || actor.phase != NpcPhase::Hunting
+            || actor.resources.emp_disabled()
             || actor.resources.energy < 9500
             || length(sub(player, actor.position)) > 12000.0
         {

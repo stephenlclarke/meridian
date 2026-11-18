@@ -1,0 +1,276 @@
+{
+  "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "tree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1071,
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766",
+      "gitBlob": "b27f022cea044295412849dec93512dad638f08e"
+    },
+    {
+      "path": "NOTICE.md",
+      "bytes": 7601,
+      "sha256": "406570037626edd737b25da0a8cc13cdd57a3223086788715a315d84033a2aaa",
+      "gitBlob": "dfac99b5ecdd21cd5c38c12182b0fdd13a1fef82"
+    },
+    {
+      "path": "Sources/L337Core/EMPBankState.swift",
+      "bytes": 6236,
+      "sha256": "68437ab3f18a2927f6641985ca257bfad932eb3b4a206132825666dc4092fcec",
+      "gitBlob": "4269ac04b40748ffd084e76fa237aed23f75960d"
+    },
+    {
+      "path": "Sources/L337Core/EMPBankTransfer.swift",
+      "bytes": 7799,
+      "sha256": "b2ae327aa3a91cc64b7d41f4c1d0c2742d8d0b1bc8b4fbc1ab71e302e45901d8",
+      "gitBlob": "155db5c2af0b49861605f9a798dbb7bfb89e2685"
+    },
+    {
+      "path": "Sources/L337Core/EMPCrewEpisodes.swift",
+      "bytes": 12089,
+      "sha256": "7980eca3973843c517fd94a8883790ea45658b03204cfac19436508fd81974dd",
+      "gitBlob": "f60b769a650b0fbc1e849ef0ddb5a1c8f7b5c41c"
+    },
+    {
+      "path": "Sources/L337Core/EMPElectricalDisplay.swift",
+      "bytes": 1004,
+      "sha256": "b3ee04093a2ce079db5b84b6cb6ec64b2a0b70ea815f5b7790133f68c1cc4f73",
+      "gitBlob": "967e8dfa474cf7837ec7f4bcbf381383a0047839"
+    },
+    {
+      "path": "Sources/L337Core/EMPElectricalRuntime.swift",
+      "bytes": 30779,
+      "sha256": "fd7dae3dae7a4cb51ccc8ec259f024d3b5996b8358f243ee74f4fcb1a720cac2",
+      "gitBlob": "32fd36bfd70fc67e7aea7eb8697caea9e6f0ab9c"
+    },
+    {
+      "path": "Sources/L337Core/EMPModuleGrades.swift",
+      "bytes": 8620,
+      "sha256": "11e19ac590798228b0aaaa2a841861ad3b4303ae95db9addbc019f4d483f51fc",
+      "gitBlob": "fe2a0cce45911e94dff5ff7f386930d3ac6eb753"
+    },
+    {
+      "path": "Sources/L337Core/EMPModulePurchases.swift",
+      "bytes": 10152,
+      "sha256": "ba08e8a62653e80f2a2b40e7cde988698bcc75636ee1313d9f43c7c8ffc5e8b1",
+      "gitBlob": "05714f4f4eb8a0e86853302a24046bc20c43c049"
+    },
+    {
+      "path": "Sources/L337Core/EMPModuleUpgradePresentation.swift",
+      "bytes": 11266,
+      "sha256": "bb595f59fb98dfc7f0485a3739f0e809292997a135ba5bbb785086e863b22c43",
+      "gitBlob": "ff212e00b0faad710a470ecd76441676d20b26a5"
+    },
+    {
+      "path": "Sources/L337Core/EMPNPCJump.swift",
+      "bytes": 1879,
+      "sha256": "b15566156f88c5b02d19ad095dbc07c15c6444bcd81ccc0172d5a1d7bbb04514",
+      "gitBlob": "34be9c7213b155515e9714cb13d0d19602918272"
+    },
+    {
+      "path": "Sources/L337Core/EMPPersistenceRuntime.swift",
+      "bytes": 22086,
+      "sha256": "44a2da98fb2a510abdecec853b859044b432e5cd4149e3cfa65dff152b886d4d",
+      "gitBlob": "4eea6172bdc779fb66c79e09a81c6cb53faacc74"
+    },
+    {
+      "path": "Sources/L337Core/EMPPirateBlasterRuntime.swift",
+      "bytes": 1972,
+      "sha256": "61cbda71269d6b343d6e73fbd7a52647e89080779a249a3902c5fe2d5575c0e2",
+      "gitBlob": "01daac7adefaecebacf61b01c8b26903f4082b6b"
+    },
+    {
+      "path": "Sources/L337Core/EMPPlayerElectricalPosting.swift",
+      "bytes": 10211,
+      "sha256": "e551671cefdf4f08b8e3c48c9611048ea0477c860ddac04d403f9d715f268470",
+      "gitBlob": "85641424b94ea39526aaf229ad67b82613f8e7cf"
+    },
+    {
+      "path": "Sources/L337Core/EMPPulseProfile.swift",
+      "bytes": 2922,
+      "sha256": "a311398486e968b1289a611ea5951d44b9452fb9843f8771224b5be4b92b36a2",
+      "gitBlob": "10770f2337a3965bf75d526fe144f4ffa9761846"
+    },
+    {
+      "path": "Sources/L337Core/EMPRecoveryRuntime.swift",
+      "bytes": 13233,
+      "sha256": "8a46c2c6627deff16d57e2286c1571eac65161b867611575bb451ef08edb143d",
+      "gitBlob": "6745509e07d4989f1f519075e8b28bc92884c1b8"
+    },
+    {
+      "path": "Sources/L337Core/EMPSalvage.swift",
+      "bytes": 1524,
+      "sha256": "dd0ca7d2e03c1c80b012c81e05d172b605e35393a915209e663a4244b783830b",
+      "gitBlob": "de6985e4a0734113df602c606fc23bb7eb592387"
+    },
+    {
+      "path": "Sources/L337Core/EMPSourceCustody.swift",
+      "bytes": 6052,
+      "sha256": "1eeb85c79c5161a4e409eb8b340d46be9093fa343b99b4ceb47fc4eef544fbe6",
+      "gitBlob": "84815e301d1082027e8531ff021102a3ba023f66"
+    },
+    {
+      "path": "Sources/L337Core/EMPState.swift",
+      "bytes": 32062,
+      "sha256": "fda1b3b7a42a432faedd3a1dcfa2ca5dbeaa30d524eb762a4b677325d392d3cd",
+      "gitBlob": "99c88c2fc76ebde591040e731fccda60aa6322a8"
+    },
+    {
+      "path": "Sources/L337Core/EMPVersionedSave.swift",
+      "bytes": 5039,
+      "sha256": "e856c3c5c2b9bdc65e9074266657e5d0efae921b25b8342af4eaa4d2938a3874",
+      "gitBlob": "cb6812761bd2b7fa78ab7ad80b524fc3f23e8c4c"
+    },
+    {
+      "path": "Sources/L337Core/ElectricalReserve.swift",
+      "bytes": 7364,
+      "sha256": "21841d830488be4b8e4963abae134d866b4f85d15c574a2ae76a46a73d3fafc5",
+      "gitBlob": "173801f79710a7f2ad5293aead1c452e7056b491"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentModuleTemplates.swift",
+      "bytes": 6099,
+      "sha256": "387f5623bc0a390864b29ca5f2662c52bd091c54b024f8761bf8b098610a566f",
+      "gitBlob": "46574e607c0d12f275588f891e94780dde498ff9"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentMutations.swift",
+      "bytes": 16275,
+      "sha256": "a1d0bece73e7d6370f4cab8fc952d2e25a3d20dfceb89ce8fab189c4b65941d5",
+      "gitBlob": "42d78044954801d6d06b46434489d40485a66b69"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentRuntimeCatalog.swift",
+      "bytes": 8337,
+      "sha256": "ccf1ee2a940175f0d1a26a65aaa7b62ca7cf61d0eb33906f8b8feb6664210e27",
+      "gitBlob": "4f9bf9ec70d239e9c099f00a9c63a80d4648833d"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentTransactions.swift",
+      "bytes": 15785,
+      "sha256": "21a44066185ea17c8e3b262988c193cdef98bf88f80294d7a216767d93ad4f36",
+      "gitBlob": "3d51889a6dd1900faadfc172bbdab072995f1a21"
+    },
+    {
+      "path": "Sources/L337Core/Game.swift",
+      "bytes": 313817,
+      "sha256": "e5b4e30c835d460aa7ca6f77364db0aaeaf877bb9d73bacc162e9111b26e2e17",
+      "gitBlob": "0f94ff0c7bf46d47e65e077cc3c5db37694bd706"
+    },
+    {
+      "path": "Sources/L337Core/Geometry.swift",
+      "bytes": 7438,
+      "sha256": "b9751c66c3f6e86f4a0ae541a7dcbcdec2fef526f9570107d7a4cef3da7380bb",
+      "gitBlob": "3810ff536ce81e344e058a2448e5fbe5f29fa3d8"
+    },
+    {
+      "path": "Sources/L337Core/NPCPersistenceLedger.swift",
+      "bytes": 38818,
+      "sha256": "b1da0923d3221dbbef2732385ca73c79e26f14b3af7f729b5f2d9acac5093a62",
+      "gitBlob": "d35b1635031234fcaa1d3b78813f4665b8c1586f"
+    },
+    {
+      "path": "Sources/L337Core/NPCPersistenceRuntime.swift",
+      "bytes": 15656,
+      "sha256": "13ed5acae78714a403f982c628b58cba06a6d152a205db16135b50ac57197397",
+      "gitBlob": "2fc04a7ed7f725bd167ef85c965947fe12e33a6a"
+    },
+    {
+      "path": "Sources/L337Core/NPCResourceRuntime.swift",
+      "bytes": 3738,
+      "sha256": "474c704ce1e3acc13385f09d54cf6aa941ceb95d8c5c66eb6cad0ac9ed156af5",
+      "gitBlob": "0a28fea4cf9f1446c96294a30b9932fa71e21410"
+    },
+    {
+      "path": "Sources/L337Core/NPCResources.swift",
+      "bytes": 6985,
+      "sha256": "d829716c2742e9a3d748a6e04bdd40225be602468ec776b79b131f77b8795dee",
+      "gitBlob": "66371b88e264f5a603f792fe9f7f391b45098a63"
+    },
+    {
+      "path": "Sources/L337Core/NativePeopleGallery.swift",
+      "bytes": 8765,
+      "sha256": "3cddca1ec70e4357b9b53de1f81704fb396a821eb0d48d415c3343df8e281be4",
+      "gitBlob": "a25c00175660ca6be986e7c5086c867c975a158b"
+    },
+    {
+      "path": "Sources/L337Core/OriginalFleetR3Data.swift",
+      "bytes": 285755,
+      "sha256": "ceba81e0702526ed3ff0e6e7f28868bae4ab508ae9ac6bfa9f18d63d78d7946a",
+      "gitBlob": "50ee232a826932f9248f2e5aa070f7e099fa70a5"
+    },
+    {
+      "path": "Sources/L337Core/OriginalFleetR3Fitting.swift",
+      "bytes": 4922,
+      "sha256": "5a50e94cb510d7ce51da194cc3570159a28f1b7bd126e140a948192412d913ee",
+      "gitBlob": "920e1d802e63ab9038e7885974618f4e9b402257"
+    },
+    {
+      "path": "Sources/L337Core/OriginalFleetRuntimeHullSource.swift",
+      "bytes": 5990,
+      "sha256": "8b4f61ac57ea0a45cae20055b244c6863cef534dd0c6fd244ba1523a04e255ce",
+      "gitBlob": "9a7521ba8f79fa78b6568a6c059277a8b683f553"
+    },
+    {
+      "path": "Sources/L337Core/Resources/Ships/SH025.toml",
+      "bytes": 690857,
+      "sha256": "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883",
+      "gitBlob": "ec62ccae9acfc05b92c3c4591f079fc7ba4bf1cf"
+    },
+    {
+      "path": "Sources/L337Core/SalvageCatalogue.swift",
+      "bytes": 11295,
+      "sha256": "a95de8e3fbe018b125523a23426ea8949b4bfc6ee7357705735c2d1e1e7c0ebe",
+      "gitBlob": "812b245952eb29498c4485f3a7ae58ff71ce2721"
+    },
+    {
+      "path": "Sources/L337Core/ShipCatalogue.swift",
+      "bytes": 16533,
+      "sha256": "c432109fa323bee519114596af6269f59d8604853e231a616ffad2e9644d8ea5",
+      "gitBlob": "397dada10f448cc62040943d81e8a8a1026b1e97"
+    },
+    {
+      "path": "Sources/L337Core/GameplayAdmission.swift",
+      "bytes": 50222,
+      "sha256": "6b1f00f1e457ad3f707ac4d922d175924941b9d31d8c0503c16675520cd30283",
+      "gitBlob": "5881033fad9a7ea619479d50682d15031ab93106"
+    },
+    {
+      "path": "Sources/L337Core/NativePeopleRuntime.swift",
+      "bytes": 17785,
+      "sha256": "bb5bb05c65d302895c5991fcd145ac440d036a5ed7a49983fbb3ed111807aab8",
+      "gitBlob": "0cf5017f9819d1033251759ea5630866a9ec7345"
+    },
+    {
+      "path": "Sources/L337Core/CurrentNewtKitRelease.swift",
+      "bytes": 8594,
+      "sha256": "4051be7e3ffd4b1a291093b8d12263d7475ef8ae2e42fe419362af82eba148dc",
+      "gitBlob": "c4f48ed2809ac981e1d9929a3db759a3e833f2de"
+    },
+    {
+      "path": "Sources/L337Core/CurrentNewtKitSource.swift",
+      "bytes": 32975,
+      "sha256": "d3ec0593782860bbac9e4a199c131f3176adabc5eac8ea961b69980c5cf74d57",
+      "gitBlob": "c1275a1a026a7fe3ad61a7544bf611306d8952a7"
+    },
+    {
+      "path": "Sources/L337Core/GameplayCombat.swift",
+      "bytes": 35662,
+      "sha256": "3e2123cf8e278d6caea2ba95abc4376a3d5a2d3c17b00d7ab19cead4955d1cd5",
+      "gitBlob": "b609322106447a97667d89a5652957c0be5c67d5"
+    },
+    {
+      "path": "Sources/L337Core/CrimeLedger.swift",
+      "bytes": 34260,
+      "sha256": "bcda35b9adc39802d61795353a211a3b0142b2bc393f14dc1a1994c533210c50",
+      "gitBlob": "104a3ca048243ddf608e2e11dca736957f4252e2"
+    },
+    {
+      "path": "Sources/L337Core/EncounterDirector.swift",
+      "bytes": 11954,
+      "sha256": "4caebad4a88e88ef461622ac65338821f748a27a208e2a3b5d6658758a5998c4",
+      "gitBlob": "0da2f48d92bf460eb8bfeb23a4a5b329776717e7"
+    }
+  ]
+}

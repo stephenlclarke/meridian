@@ -201,8 +201,8 @@
     {
       "key": "max/EMP Pirate Blaster",
       "legacyBehavior": "EMP utility.",
-      "state": "DEPENDENCY",
-      "dependency": "Actual distinct EMP grade/bank/charge/debit/disabling effect; no ECM alias."
+      "state": "PARTIAL_CORE",
+      "dependency": "Distinct source-only EMP item with empty bank, grades, held charge, finite transfer/debit, native self-defence drain and local disable/recovery. Paid base keeps identity/provenance; secret base does not unlock paid grades. Desktop controls and owner qualification pending; civilian law, qualified occupied Newt release and off-system disabled custody remain unavailable."
     },
     {
       "key": "max/mining-utility",

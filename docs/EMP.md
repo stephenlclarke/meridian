@@ -1,0 +1,47 @@
+# Distinct EMP electrical weapon
+
+## Scope and qualification
+
+This is a source candidate for the actual SH025 utility. Compilation, Rust tests, coverage, strict Clippy and native gameplay are UNRUN in the author lane. Root owns desktop composition; existing G1 and Dell owners execute. Published Preview 7 remains qualified only for its original source. There is no ECM alias or ordinary laser/missile origin issued for EMP.
+
+The [45-file source manifest](EMP-SOURCES.json) pins original revision `a11fe16924d87d06021816f9037952afcbac08db`, tree `68fec574df12ddf74acb14747e0dd6839f478642`, with byte lengths, SHA-256 and Git blobs. Original LICENSE and NOTICE are included in those pins and retained by the project provenance. Module grades are the original project's explicitly adopted balance estimates; they are not recovered historical designer data. This Rust representation is not bit-identical Swift floating-point parity.
+
+## Hardware and payment
+
+The base costs 3000 CR at TL9, occupies one actual utility mount, has grades zero, an eight-unit bank and zero initial charge. It has one owner/hull/item identity. Store/refit preserves the same property and charge. A new paid purchase, each fit/store, and each grade enters the actual account revision and independent prefix replay; there is no second wallet. Review/prepare binds the real admitted berth, tick, epoch and account revision. Failed atomic profile writes leave everything unchanged.
+
+Power, capacity and recharge each have three upgrades. Required technology is TL10, TL12 and TL14. Power costs 3000/6000/12000 CR and multiplies power by 2/4/8. Capacity and recharge each cost 1500/3000/6000 CR. Capacities are 8/16/32/64 and recharge rates 0.4/0.8/1.6/3.2 units per second. Upgrades preserve remaining charge and advance the bank cursor without credit. Only a paid base allows paid grade upgrades. Explicit XYZZY maximum grants or refits the real empty base and reuses existing paid identity/provenance; a secret base does not become a paid base.
+
+The original module mass is 100 kg. The current fixed SH025 flight model has no dynamic equipment-mass effects; this candidate does not claim that part of original handling parity. Utility capacity and the existing 256-item bound remain enforced.
+
+## Electrical and held input
+
+The item bank and main electrical reserve are separate from fatal hull energy. Main electrical starts at zero when its first eligible fitted flight interval posts. NPC electrical is lazily initialized to the source SH025 capacity of 380 only by an actual admitted EMP victim event. Reading or decoding never grants a pool, charges an item or fits hardware. The first accepted NPC event also binds its original one crew member aboard; later disables reuse that custody. No qualified Newt kit is installed on these actors, so no escape pod or salvage entitlement is created.
+
+Amounts use 1/3000 energy units at 60 Hz. Every bank gain is paid from the main reserve at exactly 80-percent efficiency: gain plus loss equals the actual debit. The reserve stays positive during transfer. Main recharge follows the actual fitted Basic/Extra/Naval/Elite energy system, at 4.2/8.4/12.6/16.8 units per second. Docked and paused time earns nothing. Stored time never charges the bank. A stale refit skips the first interval to repair its cursor; an upgrade explicitly advances it without energy. Arrival or docking posts the final main interval but leaves a bank gap, so the next eligible interval repairs the cursor. A successful pulse receives no bank transfer in its release frame.
+
+The caller submits `request_emp_trigger(held, current_tick)` for each actual held frame. Charging starts only in active, unpaused flight with a real fitted item, compatible energy system, positive enabled main reserve, eight bank units, thermal headroom and cooldown clearance. The target must be the nearest actual eligible NPC surface and an actual recent attacker of this hull in this visit. Holding for 600 accepted physical ticks attempts one release. Key-up cancels an unfinished charge. A terminal charge does not automatically rearm while held. Cold Continue restores charge state but never held input; a fresh physical tick is required before starting another charge.
+
+The release rechecks item, profile, geometry, target and every effect owner. It spends eight bank units, adds 18 heat below the strict 240 limit, and starts 90 ticks of shared cooldown. Basic/Extra/Naval/Elite energy gives power 32/48/64/80 and range 3000/4500/6000/7500, multiplied by actual power grade for power only. Target-centred splash extends one third of range with linear attenuation. Existing shield precision is hundredths, so geometric drain rounds down conservatively to that precision before clipping. Shield absorbs first; overflow drains electrical. EMP never spends fatal hull energy as a damage surrogate.
+
+Actual native meshes, other bodies, station, celestial and mining geometry and retained player missiles occlude the query. Splash can include the firing player. Every affected NPC must independently have a real recent attack receipt. Otherwise the complete release is refused: no partial victim set, debit or heat. A failed terminal release is consumed and cannot retry on the next held frame.
+
+## Disablement and local custody
+
+Electrical zero disables actual engines and weapons. The actor retains its current heading, speed, hull, cargo and one crew member; it coasts under existing collision safe stops. It receives no new steering, throttle, route advance or fire. Strictly after thirty accepted physical seconds, a surviving occupied target receives its first actual recharge tick and can recover. Fatal ordinary damage remains separate and never resurrects a target.
+
+The initial scope supports proved self-defence. Role or displayed wanted value is not treated as law authority. Civilian attack/witness consequences, qualified occupied Newt releases, non-SH025 eligibility, automatic EMP and off-system disabled custody remain missing. Jump start is refused during charging, player electrical disablement or live target disablement; EMP start also refuses an existing spool. Docking does not reset the independent electrical reserve. Launch remains allowed, with disabled controls coasting until recovery. This local travel hold is an explicit Rust slice boundary, not an assertion that the original game had that travel rule.
+
+## Save and conservation
+
+The current content fingerprint changes; unsupported old content is rejected without migration. Hardware chronology, native prices, paid or secret acquisition, main generation/clipping/debits, bank transfers/spends, charge scenes, release contacts, typed traffic drains and disable/recovery episodes are retained. Histories remain finite: 128 equipment events, sixteen pulses and a separate 128 EMP traffic-effect bound. The existing combined 128 ordinary beam/player/missile bound is unchanged. Whole-save byte capacity is preflighted before coupled publication.
+
+Validation independently reconstructs energy fit, equipment and accepted physical intervals, including berth/arrival bank gaps. It checks exact integer totals, then native historical scene membership/geometry and every pulse-to-effect join. Each disabled episode must come from actual electrical depletion; a surviving target requires the strictly timed recovery. Orphan, duplicate, foreign or altered effects refuse. Restore leaves the live World unchanged on refusal.
+
+## Root desktop and execution preparation
+
+Root must compose the actual paid EMP shop, property/grade review and atomic profile writer through `review_emp_equipment`, `prepare_emp_equipment`, `bytes`, `publish_with` or commit-after-exact-write. Use `emp_equipment_offers` for native prices, technology and current refusal from the real review policy, and `emp_snapshot` for immutable bank/main/charge/target/disable readouts. Present typed refusals without granting a replacement item. Keep paid and secret provenance visible in testing controls.
+
+Bind an explicit held EMP control to `request_emp_trigger` before each accepted World step, and send key-up on normal release/focus or modal interruption. Do not infer held input from a loaded charge. Show 600-tick warmup, bank and actual terminal/refusal state. A Released charge with no `charge_release` consumed a refused attempt; a typed origin identifies a successful current charge. Fire/mining are refused during charging or electrical disablement; piloting during charging remains available. Root owns all App/renderer changes and current Help updates.
+
+After whole-source review, the existing owners must run changed workspace check/tests, strict Clippy, Python/importer and Markdown checks, coverage and release gates against the exact committed composition. Preserve failures and make a changed correction before retry. Native acceptance needs an isolated profile with actual purchase/refit/store/grade payment and rollback, a real recent attacker, ten-second held release, release cancellation and failed geometry, shield/electrical and self-splash effects, actual coast/no-fire, strict thirty-second recovery, no loot/cash/cargo gain and cold Save/Quit/Continue. A high-grade test that uses explicit XYZZY funds/Elite energy must retain that label. Full ordinary progression, general civilian law and missing kit/off-system systems remain separate acceptance.

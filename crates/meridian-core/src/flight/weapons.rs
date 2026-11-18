@@ -155,6 +155,26 @@ impl PulseResources {
             self.heat = self.heat.saturating_sub(1);
         }
     }
+    pub(super) fn prepare_emp_discharge(self) -> Result<Self, FireError> {
+        if self.cooldown != 0 {
+            return Err(FireError::CoolingDown);
+        }
+        if self
+            .heat
+            .checked_add(super::emp::EMP_HEAT_FIFTHS)
+            .is_none_or(|heat| heat >= HEAT_LIMIT_FIFTHS)
+        {
+            return Err(FireError::Overheated);
+        }
+        if !self.alive() {
+            return Err(FireError::InsufficientEnergy);
+        }
+        Ok(Self {
+            energy: self.energy,
+            heat: self.heat + super::emp::EMP_HEAT_FIFTHS,
+            cooldown: super::emp::EMP_COOLDOWN_TICKS,
+        })
+    }
     pub(super) fn prepare_discharge(self) -> Result<Self, FireError> {
         if self.cooldown != 0 {
             return Err(FireError::CoolingDown);
@@ -441,6 +461,9 @@ impl World {
         Some((item.id, weapon))
     }
     pub fn front_laser_snapshot(&self) -> Option<FrontLaserSnapshot> {
+        if self.emp.input_blocked() {
+            return Err(FireError::InsufficientEnergy);
+        }
         let (fitted_item_id, weapon) = self.fitted_front_laser()?;
         Some(FrontLaserSnapshot {
             fitted_item_id,

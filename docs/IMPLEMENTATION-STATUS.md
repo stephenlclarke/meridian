@@ -1,5 +1,13 @@
 # Implementation and validation status
 
+## Distinct EMP source candidate
+
+The source candidate adds an owned EMP utility to the single World, with paid purchase/fit/store/grade transactions, a separate initially empty bank and electrical pool, exact 80-percent transfer, a 600-tick held charge and shared heat/cooldown cost. It queries the actual native SH025 collision scene and drains the facing shield then independent electrical reserve. It preserves fatal hull energy, actor identity, cargo and the one source crew member. Zero electrical power blocks engines/weapons, keeps physical coasting and recovers strictly after 1800 accepted physical ticks. No capsule, bounty or reward is fabricated.
+
+Scope is self-defence against an actual recent native attacker. Every unqualified secondary NPC contact refuses the entire release. Live local disablement holds departure; civilian law and off-system disabled custody are not implemented. The original occupied Newt release requires a qualified installed kit that these actors do not own. Paid grades require a genuinely paid base; XYZZY may grant/refit a separate real base with zero charge.
+
+The author added meaningful commerce, clock, held-input, native-effect, cold-continuation and corruption cases. Rust compilation/tests, coverage, strict Clippy and native graphics/gameplay are **UNRUN** here. Direct rustfmt only establishes parse/format acceptance, not type checking. Root still owns desktop controls/shop/presentation composition; existing G1/Dell owners retain execution. The immutable Preview 7 evidence is unchanged. [EMP guide and acceptance preparation](EMP.md) defines the exact boundary and remaining work.
+
 ## Published Preview 7
 
 [Preview 7 v0.7.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.7.0-preview.1) was published on 17 November at 22:54:55 UTC from main `a05c69e`, compiled `076639d`. It includes all five station Help cards, flight Help, cross-screen navigation guidance and explicit XYZZY testing. Mac, Linux and native Windows each passed 603 Rust tests, 99 Python tests and 48 Markdown checks, formatting, all-target checks, strict Clippy and locked release. The final two-file Markdown delta preserves all 281 other tracked files and modes, including game code, assets, dependencies, tests and coverage helpers.
@@ -7,6 +15,7 @@
 All six exact-main CI jobs passed. Sonar analysis `1220b9ac-9afc-490d-8090-c33543d8b3c0` uses the exact main revision as projectVersion, Previous version policy, zero unresolved findings, 91.8% new coverage, zero new duplication and 100% hotspot review. All four anonymous public downloads returned HTTP 200 with exact hashes. The extracted 452-file Mac wrapper and 325-file Windows package matched their qualified payloads and modes; the Mac app, game and launcher retained Developer ID signatures. The annotated tag and source identities passed verification. The actual release receipt was saved and flushed before deleting only managed v0.4 and its tag; v0.7/v0.6/v0.5 remain. Original notices and unresolved acceptance evidence remain intact.
 
 The new binary's bounded Mac run used two launches, two observed normal quits and one intentional cold Continue. Title/System Help blocked underlying actions; explicit confirmation activated CLARKE with once-only cash and the supported finite outfit. The genuine save decoded through the newly qualified public World library. The broader native five-card/flight/paid Food/repeated activation/fuel-toggle checks below remain `c98fc86` evidence through independently reviewed semantic equivalence. Native Windows gameplay, OS exit codes, precise tick freeze, full 36-action parity, Lareria docking/refill, leak cure, FPS/race and window/focus edges remain unaccepted. Signing is not notarization; the new Mac artifact was not submitted for notarization.
+
 
 ## Preview 7 source quality correction
 
