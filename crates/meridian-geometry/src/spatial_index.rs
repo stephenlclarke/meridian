@@ -191,6 +191,7 @@ impl FacetBoundsIndex {
     ) -> Result<Vec<T>, Failure> {
         // Cell ordering appends one admitted mode marker after all N source
         // ordinals. Legacy/contiguous builders and their exact prices stay intact.
+        #[cfg(test)]
         if self
             .order
             .as_ref()

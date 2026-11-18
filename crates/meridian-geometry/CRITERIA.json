@@ -403,6 +403,26 @@
       "file": "src/cell_index_tests.rs",
       "name": "cell_builder_keeps_exact_storage_operation_and_degenerate_extent_guards",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/separated_section_tests.rs",
+      "name": "source_joint_sections_match_all_signed_patterns_and_keep_endpoint_coordinate_guards",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/separated_section_tests.rs",
+      "name": "strict_owner_support_separation_keeps_complete_clipped_constraints_and_equality_contacts",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/separated_section_tests.rs",
+      "name": "separated_original_owners_preserve_complete_publisher_fields_witnesses_and_analytic_volume",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/separated_section_tests.rs",
+      "name": "separated_rows_and_source_section_scratch_keep_exact_refusals_and_cleanup",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -1085,5 +1105,57 @@
     "qualification": "Rootsuccessorsince4fonly; G2whole/relevantdelta; existingG1changedfocused80/9/checkstrictClippyBuild thenONEchangedwholefiveonlyafterALLPASS/solelaneavailable",
     "baselineTradeoff": "Versus actualcontiguous index: addonegroupingpass/queryorderwork,intendfewerbroadnode/leafvisits; noprioractualgainclaim. Avoidrecursivesorts/maps versuswithdrawnprototypeonly. Completeindexplusqueriesincludesalladdedcost.",
     "deltaSHA256": "24ad4bf77454ef766c77097e084706864e4a2b2c2e72cec4d08d8971eab94c92"
+  },
+  "separatedSourceSections": {
+    "status": "AUTHORED_UNRUN_STRICT_FINITE_SEPARATION_AND_SHARED_SECTIONS",
+    "parentAuthor": "c776846ed1a7969a8a69f430869f413882cbd1de",
+    "actualParentRoot": "69e10cb13de0dc793646dbddebffeef29bf1e06c",
+    "all80OldBodiesUnchanged": true,
+    "currentRustCount": 84,
+    "hostCount": 9,
+    "productionChanges": [
+      "Withdraw cell grouping/rank restoration from production; preserve unchanged full implementation and80cases testable. Restore contiguous constructor/admission.",
+      "Strict original support with allthreeoriginalfacetvertices positive, or positiveparallelconstant, proves all owner physical constraints have empty finite clips. Zero/equality keeps physical contacts. Add only this necessary-condition filter and facet-scoped occupancy skip.",
+      "Shared source section kernel: one charged uniformsign proof omits exact empty edgewalks; reuse zero endpoints without interpolation but retain allthree coordinate guards; integrate physical-only work with96+8scratch and no secondcallee."
+    ],
+    "charging": "All original own/group/projection/lookup/predicate prices retained. Extra supportvertex1, actualnewlookups same treeprice, triangle signclassification1, all remainingedges/pointguards/hitvisits unchanged. New8scratch beyondold96; no capwaiver.",
+    "controls": "Complete frozen c776 publisher; old rows/collector/joint/physical helpers independent undercfg(test); cell code/all80bodies unchanged; fourfileinverse and complete historicalchain.",
+    "newTests": [
+      {
+        "file": "src/separated_section_tests.rs",
+        "name": "source_joint_sections_match_all_signed_patterns_and_keep_endpoint_coordinate_guards",
+        "status": "UNRUN"
+      },
+      {
+        "file": "src/separated_section_tests.rs",
+        "name": "strict_owner_support_separation_keeps_complete_clipped_constraints_and_equality_contacts",
+        "status": "UNRUN"
+      },
+      {
+        "file": "src/separated_section_tests.rs",
+        "name": "separated_original_owners_preserve_complete_publisher_fields_witnesses_and_analytic_volume",
+        "status": "UNRUN"
+      },
+      {
+        "file": "src/separated_section_tests.rs",
+        "name": "separated_rows_and_source_section_scratch_keep_exact_refusals_and_cleanup",
+        "status": "UNRUN"
+      }
+    ],
+    "contractSHA256": "e90d89692e2a940d6ad5043f128ace4152d4bbef33b4d33c153b7d7de9b2d130",
+    "custodySHA256": "bee9cedbc1f2ef8ae4ffdd593c2fa5a8e712c730a96bbb2cff678896f3f20691",
+    "inverseSHA256": "48f73892a9ba4593cf6aecec1d6d6838927c42c4acccc255d981ad706423ab1d",
+    "freezeSHA256": "fb534394cca37ee662d4e9a25e814c4a5f3abd01f3cd52c64fbe23484d7a497e",
+    "parentReviewSHA256": "3097f6e940e8edd69ceaddc08dc7ed07d458a6940fbe868cad5a8c1eceb6348b",
+    "currentExecution": "UNRUN; noauthorcompiler/probe/SUT/geometry/native",
+    "limits": {
+      "operationsIncludingDecode": 2000000,
+      "storageMemberships": 100000,
+      "rationalBits": 4096,
+      "completeOutputTriangles": 512
+    },
+    "admissions": 0,
+    "qualification": "Rootsuccessorsincec776only; ONEG2whole/relevantdelta; existingG1changed84Rust9host/checkstrictClippyBuild thenONEchangedwholefiveonlyafterALLPASS/solelaneavailable",
+    "deltaSHA256": "354962836801f784bb42697c3e7a12edc201d26e3ef15253bc652e05876c08cd"
   }
 }

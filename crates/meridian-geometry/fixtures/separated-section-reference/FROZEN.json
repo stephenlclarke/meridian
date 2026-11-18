@@ -1,0 +1,29 @@
+{
+  "parent": "c776846ed1a7969a8a69f430869f413882cbd1de",
+  "files": {
+    "before-certificate.rs": {
+      "bytes": 86691,
+      "sha256": "e37397a99084816115ce11510699106bb65f93453f185abb8c3e15cef464915e"
+    },
+    "before-spatial_index.rs": {
+      "bytes": 7937,
+      "sha256": "64ae0dadf59aa4ed09b8cd04ff942954ef5466ce65c7705f79b5c510bb65c3fc"
+    },
+    "before-sections.rs": {
+      "bytes": 57409,
+      "sha256": "022793949818beeeee995dbf5ba94c39701df256f287a2fc7b4b381e6df8afa5"
+    },
+    "before-convex_sections.rs": {
+      "bytes": 6854,
+      "sha256": "19e466285d51f8fac30a817daa249a35fe907410ad4deb4fdb36769b0b53bca1"
+    },
+    "publisher-control.rs.txt": {
+      "bytes": 14405,
+      "sha256": "cff93b3d92904210daac49b5d2048003fd0a4d0649d8cafda24a342ce7df3e74"
+    },
+    "compiled-publisher-control.rs": {
+      "bytes": 14423,
+      "sha256": "b8c56d330a5e3f2a80ed12ed89b248b89d89bd59166f0a50debc5009340e54ec"
+    }
+  }
+}

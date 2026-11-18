@@ -1,0 +1,154 @@
+{
+  "certificate.rs": [
+    {
+      "afterStart": 460,
+      "afterEnd": 461,
+      "before": "",
+      "after": "    #[cfg(test)]\n"
+    },
+    {
+      "afterStart": 1123,
+      "afterEnd": 1124,
+      "before": "    let facet_bounds_members = FacetBoundsIndex::cell_memberships(originals.len());\n",
+      "after": "    let facet_bounds_members = FacetBoundsIndex::memberships(originals.len());\n"
+    },
+    {
+      "afterStart": 1126,
+      "afterEnd": 1127,
+      "before": "        FacetBoundsIndex::build_cells(originals, b)\n",
+      "after": "        FacetBoundsIndex::build(originals, b)\n"
+    },
+    {
+      "afterStart": 1163,
+      "afterEnd": 1165,
+      "before": "        let rows = convex_sections::Rows::build(face, face_bounds, interior.as_ref(), b)?;\n",
+      "after": "        let rows =\n            convex_sections::Rows::build_separating(face, face_bounds, interior.as_ref(), b)?;\n"
+    },
+    {
+      "afterStart": 1167,
+      "afterEnd": 1168,
+      "before": "                sections::Frame::collect_rows(\n",
+      "after": "                sections::Frame::collect_separating(\n"
+    },
+    {
+      "afterStart": 1191,
+      "afterEnd": 1192,
+      "before": "                            |b| match rows.occupied(sample, b)? {\n",
+      "after": "                            |b| match rows.occupied_facet(sample, b)? {\n"
+    },
+    {
+      "afterStart": 2363,
+      "afterEnd": 2364,
+      "before": "",
+      "after": "#[cfg(test)]\n"
+    },
+    {
+      "afterStart": 2370,
+      "afterEnd": 2374,
+      "before": "",
+      "after": "\n#[cfg(test)]\n#[path = \"separated_section_tests.rs\"]\nmod separated_section_tests;\n"
+    }
+  ],
+  "spatial_index.rs": [
+    {
+      "afterStart": 193,
+      "afterEnd": 194,
+      "before": "",
+      "after": "        #[cfg(test)]\n"
+    }
+  ],
+  "sections.rs": [
+    {
+      "afterStart": 320,
+      "afterEnd": 321,
+      "before": "",
+      "after": "    #[cfg(test)]\n"
+    },
+    {
+      "afterStart": 332,
+      "afterEnd": 333,
+      "before": "",
+      "after": "    #[cfg(test)]\n"
+    },
+    {
+      "afterStart": 419,
+      "afterEnd": 420,
+      "before": "type JointSection = (Vec<[crate::Point3; 2]>, bool, Option<Segment>);\n",
+      "after": "pub(super) type JointSection = (Vec<[crate::Point3; 2]>, bool, Option<Segment>);\n"
+    },
+    {
+      "afterStart": 424,
+      "afterEnd": 426,
+      "before": "fn joint_section(\n",
+      "after": "#[cfg(test)]\npub(super) fn joint_section(\n"
+    },
+    {
+      "afterStart": 508,
+      "afterEnd": 615,
+      "before": "",
+      "after": "pub(super) fn joint_section_source(\n    face: &Facet,\n    other: &Facet,\n    physical: bool,\n    outward: bool,\n    b: &mut Budget,\n) -> Result<JointSection, Failure> {\n    b.with_retained(8, |b| {\n        joint_section_source_admitted(face, other, physical, outward, b)\n    })\n}\nfn joint_section_source_admitted(\n    face: &Facet,\n    other: &Facet,\n    physical: bool,\n    outward: bool,\n    b: &mut Budget,\n) -> Result<JointSection, Failure> {\n    let mut distances = Vec::with_capacity(3);\n    for vertex in other.vertices() {\n        b.step(1)?;\n        distances.push(face.distance(&vertex.point));\n    }\n    if distances.iter().all(Zero::is_zero) {\n        let edges = if physical {\n            (0..3)\n                .map(|i| {\n                    [\n                        other.vertices()[i].point.clone(),\n                        other.vertices()[(i + 1) % 3].point.clone(),\n                    ]\n                })\n                .collect()\n        } else {\n            Vec::new()\n        };\n        return Ok((edges, true, None));\n    }\n    b.step(1)?;\n    let signs: [(bool, bool); 3] =\n        std::array::from_fn(|i| (distances[i].is_positive(), distances[i].is_zero()));\n    let uniform = if physical {\n        signs.iter().all(|(positive, _)| *positive)\n            || signs.iter().all(|(positive, zero)| !positive && !zero)\n    } else {\n        signs.iter().all(|(positive, _)| *positive) || signs.iter().all(|(positive, _)| !positive)\n    };\n    if uniform {\n        return Ok((Vec::new(), false, None));\n    }\n    let mut hits = std::collections::BTreeSet::new();\n    let mut limiting = Vec::with_capacity(2);\n    for i in 0..3 {\n        b.step(1)?;\n        let j = (i + 1) % 3;\n        if physical && signs[i].1 {\n            hits.insert(other.vertices()[i].point.clone());\n        }\n        let original_crossing = physical && !signs[i].1 && !signs[j].1 && signs[i].0 != signs[j].0;\n        let outward_crossing = outward && signs[i].0 != signs[j].0;\n        if !original_crossing && !outward_crossing {\n            continue;\n        }\n        let hit = if signs[i].1 {\n            other.vertices()[i].point.clone()\n        } else if signs[j].1 {\n            other.vertices()[j].point.clone()\n        } else {\n            let t = &distances[i] / (&distances[i] - &distances[j]);\n            add(\n                &other.vertices()[i].point,\n                &scale(\n                    &sub(&other.vertices()[j].point, &other.vertices()[i].point),\n                    &t,\n                ),\n            )\n        };\n        point(&hit, b)?;\n        if original_crossing {\n            hits.insert(hit.clone());\n        }\n        if outward_crossing {\n            limiting.push(project(&hit, face.axis()));\n        }\n    }\n    let physical = if physical {\n        b.step(hits.len() as u64)?;\n        match (hits.first(), hits.last()) {\n            (Some(a), Some(c)) => vec![[a.clone(), c.clone()]],\n            _ => Vec::new(),\n        }\n    } else {\n        Vec::new()\n    };\n    let limiting = match limiting.as_slice() {\n        [] => None,\n        [a, c] => Some([a.clone(), c.clone()]),\n        _ => {\n            return Err(b.fail(\n                FailureKind::UncertifiedContact,\n                \"one-sided triangle has incomplete section\",\n            ));\n        }\n    };\n    Ok((physical, false, limiting))\n}\n\n"
+    },
+    {
+      "afterStart": 659,
+      "afterEnd": 660,
+      "before": "",
+      "after": "    #[cfg(test)]\n"
+    },
+    {
+      "afterStart": 677,
+      "afterEnd": 678,
+      "before": "",
+      "after": "    #[cfg(test)]\n"
+    },
+    {
+      "afterStart": 783,
+      "afterEnd": 904,
+      "before": "",
+      "after": "    pub(super) fn collect_separating<'a>(\n        face: &Facet,\n        finite: &Bounds,\n        originals: &'a [Facet],\n        owners: &BTreeMap<u32, ComponentBounds>,\n        index: &FacetBoundsIndex,\n        rows: &super::convex_sections::Rows,\n        b: &mut Budget,\n    ) -> Result<(Vec<Segment>, Vec<&'a Facet>, Self), Failure> {\n        let entry = b.retained_memberships();\n        let result =\n            Self::collect_separating_admitted(face, finite, originals, owners, index, rows, b);\n        if result.is_err() {\n            b.release(b.retained_memberships() - entry);\n        }\n        result\n    }\n    fn collect_separating_admitted<'a>(\n        face: &Facet,\n        finite: &Bounds,\n        originals: &'a [Facet],\n        owners: &BTreeMap<u32, ComponentBounds>,\n        index: &FacetBoundsIndex,\n        rows: &super::convex_sections::Rows,\n        b: &mut Budget,\n    ) -> Result<(Vec<Segment>, Vec<&'a Facet>, Self), Failure> {\n        b.retain(24)?;\n        let mut frame = Self {\n            owners: BTreeMap::new(),\n            members: 24,\n        };\n        for (owner, group) in owners {\n            b.step(1)?;\n            if finite.meets(&group.bounds, b)? && !rows.contains(*owner, b)? {\n                log_cost(frame.owners.len(), b)?;\n                b.retain(6)?;\n                frame.members += 6;\n                frame.owners.insert(*owner, Vec::new());\n            }\n        }\n        let mut barriers = Vec::new();\n        let mut coplanar = Vec::new();\n        b.state([\n            frame.members,\n            frame.owners.len(),\n            barriers.len(),\n            coplanar.len(),\n            originals.len(),\n            0,\n            0,\n            0,\n        ]);\n        b.with_retained(3 * originals.len(), |b| {\n            let candidates = if frame.owners.is_empty() {\n                // No owner needs an outward section. Use the unchanged finite\n                // traversal, retaining its ordinal vector through conversion.\n                b.with_retained(originals.len(), |b| {\n                    index\n                        .physical_separating(finite, originals, rows, b)?\n                        .into_iter()\n                        .map(|ordinal| {\n                            b.step(1)?;\n                            Ok((ordinal, true, false))\n                        })\n                        .collect::<Result<Vec<_>, Failure>>()\n                })?\n            } else {\n                index.collection_separating(face, finite, &frame.owners, originals, rows, b)?\n            };\n            for (ordinal, physical, outward) in candidates {\n                b.state([\n                    frame.members,\n                    frame.owners.len(),\n                    barriers.len(),\n                    coplanar.len(),\n                    originals.len(),\n                    ordinal,\n                    96,\n                    0,\n                ]);\n                b.step(1)?;\n                let other = &originals[ordinal];\n                // This exact triangle is entirely on its own source plane and\n                // contributes neither a physical cut nor an outward section.\n                if face.id() == other.id() {\n                    continue;\n                }\n                b.with_retained(96, |b| {\n                    let (segments, same_plane, limiting) =\n                        joint_section_source(face, other, physical, outward, b)?;\n                    b.retain(8 * segments.len())?;\n                    barriers.extend(\n                        segments\n                            .into_iter()\n                            .map(|[a, c]| [project(&a, face.axis()), project(&c, face.axis())]),\n                    );\n                    if physical\n                        && same_plane\n                        && crate::exact::dot(face.normal(), other.normal()) > integer(0)\n                    {\n                        b.step(1)?;\n                        b.retain(1)?;\n                        coplanar.push(other);\n                    }\n                    if let Some(segment) = limiting {\n                        log_cost(frame.owners.len(), b)?;\n                        let edges =\n                            frame.owners.get_mut(&other.id().component).ok_or_else(|| {\n                                b.fail(FailureKind::UncertifiedContact, \"section owner missing\")\n                            })?;\n                        b.retain(7)?;\n                        frame.members += 7;\n                        edges.push(segment);\n                    }\n                    Ok(())\n                })?;\n            }\n            Ok(())\n        })?;\n        Ok((barriers, coplanar, frame))\n    }\n"
+    },
+    {
+      "afterStart": 1750,
+      "afterEnd": 1753,
+      "before": "",
+      "after": "\n#[path = \"section_filters.rs\"]\nmod section_filters;\n"
+    }
+  ],
+  "convex_sections.rs": [
+    {
+      "afterStart": 14,
+      "afterEnd": 15,
+      "before": "",
+      "after": "    separated: bool,\n"
+    },
+    {
+      "afterStart": 21,
+      "afterEnd": 22,
+      "before": "",
+      "after": "    #[cfg(test)]\n"
+    },
+    {
+      "afterStart": 35,
+      "afterEnd": 36,
+      "before": "",
+      "after": "    #[cfg(test)]\n"
+    },
+    {
+      "afterStart": 83,
+      "afterEnd": 84,
+      "before": "",
+      "after": "                separated: false,\n"
+    },
+    {
+      "afterStart": 139,
+      "afterEnd": 343,
+      "before": "",
+      "after": "    pub(super) fn build_separating(\n        face: &Facet,\n        finite: &Bounds,\n        certificates: Option<&InteriorCertificates<'_>>,\n        b: &mut Budget,\n    ) -> Result<Self, Failure> {\n        let entry = b.retained_memberships();\n        let result = b.with_retained(32, |b| {\n            Self::build_separating_admitted(face, finite, certificates, b)\n        });\n        if result.is_err() {\n            b.release(b.retained_memberships() - entry);\n        }\n        result\n    }\n    fn build_separating_admitted(\n        face: &Facet,\n        finite: &Bounds,\n        certificates: Option<&InteriorCertificates<'_>>,\n        b: &mut Budget,\n    ) -> Result<Self, Failure> {\n        b.retain(16)?;\n        let mut result = Self {\n            owners: BTreeMap::new(),\n            members: 16,\n        };\n        let Some(certificates) = certificates else {\n            return Ok(result);\n        };\n        // The reviewed exact own-support proof also avoids constructing a\n        // plane row whose outward section is already known to be empty.\n        let empty_own = certificates.source_outward_empty(face, b)?;\n        // The dominant-axis choice performs two magnitude comparisons.\n        b.step(2)?;\n        let axis = face.axis();\n        let axes: [usize; 2] = match axis {\n            0 => [1, 2],\n            1 => [0, 2],\n            _ => [0, 1],\n        };\n        let source = &face.normal()[axis];\n        for (owner, bounds, planes) in certificates.section_owners() {\n            b.state([\n                result.members,\n                result.owners.len(),\n                planes.len(),\n                0,\n                axis,\n                0,\n                0,\n                0,\n            ]);\n            b.step(1)?;\n            if !finite.meets(bounds, b)? {\n                continue;\n            }\n            log_cost(result.owners.len(), b)?;\n            b.retain(16)?;\n            result.members += 16;\n            let mut row = Row {\n                equations: Vec::new(),\n                outside: false,\n                separated: false,\n            };\n            if empty_own && owner == face.id().component {\n                row.outside = true;\n                result.owners.insert(owner, row);\n                continue;\n            }\n            for (ordinal, plane) in planes.iter().enumerate() {\n                b.state([\n                    result.members,\n                    result.owners.len(),\n                    planes.len(),\n                    ordinal,\n                    axis,\n                    row.equations.len(),\n                    32,\n                    0,\n                ]);\n                // One exact plane projection and one parallel-plane predicate.\n                b.step(2)?;\n                let mut normal = axes.map(|k| {\n                    &plane.normal()[k] * source - &plane.normal()[axis] * &face.normal()[k]\n                });\n                let mut constant = &plane.normal()[axis] * face.offset() - plane.offset() * source;\n                if source.is_negative() {\n                    normal = normal.map(|n| -n);\n                    constant = -constant;\n                }\n                if normal.iter().all(Zero::is_zero) {\n                    b.step(1)?;\n                    // A coincident parallel support is satisfied strictly on\n                    // the outward side only when its normal opposes the source.\n                    if constant.is_positive()\n                        || constant.is_zero()\n                            && plane.normal()[axis].is_positive() == source.is_positive()\n                    {\n                        row.outside = true;\n                        row.separated |= constant.is_positive();\n                        break;\n                    }\n                    continue;\n                }\n                if !row.separated {\n                    let mut separated = true;\n                    for (vertex, point) in face.vertices().iter().enumerate() {\n                        b.state([\n                            result.members,\n                            result.owners.len(),\n                            planes.len(),\n                            ordinal,\n                            vertex,\n                            row.equations.len(),\n                            32,\n                            0,\n                        ]);\n                        b.step(1)?;\n                        let distance = &normal[0] * &point.point[axes[0]]\n                            + &normal[1] * &point.point[axes[1]]\n                            + &constant;\n                        if !distance.is_positive() {\n                            separated = false;\n                            break;\n                        }\n                    }\n                    row.separated = separated;\n                }\n                b.step(1)?;\n                b.retain(8)?;\n                result.members += 8;\n                row.equations.push(Equation { normal, constant });\n            }\n            if row.outside {\n                let transient = 8 * row.equations.len();\n                drop(std::mem::take(&mut row.equations));\n                b.release(transient);\n                result.members -= transient;\n            }\n            result.owners.insert(owner, row);\n        }\n        Ok(result)\n    }\n    pub(super) fn occupied_facet(\n        &self,\n        sample: &Point2,\n        b: &mut Budget,\n    ) -> Result<Option<bool>, Failure> {\n        b.with_retained(32, |b| {\n            for (owner, row) in self.owners.values().enumerate() {\n                b.state([\n                    self.members,\n                    self.owners.len(),\n                    row.equations.len(),\n                    owner,\n                    0,\n                    32,\n                    0,\n                    0,\n                ]);\n                b.step(1)?;\n                if row.outside || row.separated {\n                    continue;\n                }\n                let mut boundary = false;\n                let mut outside = false;\n                for (ordinal, equation) in row.equations.iter().enumerate() {\n                    b.state([\n                        self.members,\n                        self.owners.len(),\n                        row.equations.len(),\n                        owner,\n                        ordinal,\n                        32,\n                        0,\n                        0,\n                    ]);\n                    b.step(1)?;\n                    let distance = &equation.normal[0] * &sample[0]\n                        + &equation.normal[1] * &sample[1]\n                        + &equation.constant;\n                    if distance.is_positive() {\n                        outside = true;\n                        break;\n                    }\n                    boundary |= distance.is_zero();\n                }\n                if !outside {\n                    if boundary {\n                        return Ok(None);\n                    }\n                    return Ok(Some(true));\n                }\n            }\n            Ok(Some(false))\n        })\n    }\n    pub(super) fn separated(&self, owner: u32, b: &mut Budget) -> Result<bool, Failure> {\n        if self.owners.is_empty() {\n            return Ok(false);\n        }\n        log_cost(self.owners.len(), b)?;\n        Ok(self.owners.get(&owner).is_some_and(|row| row.separated))\n    }\n"
+    },
+    {
+      "afterStart": 352,
+      "afterEnd": 353,
+      "before": "",
+      "after": "    #[cfg(test)]\n"
+    }
+  ]
+}

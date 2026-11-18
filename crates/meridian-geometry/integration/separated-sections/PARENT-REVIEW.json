@@ -1,0 +1,89 @@
+{
+  "reviewedAtUTC": "2026-11-18T13:40:24.350292+00:00",
+  "verdict": "SOURCE_CLEAR_WHOLE_EXACT_CELL_GROUPING_AND_COMPLETE_SOURCE_ORDER_RESTORATION;CURRENT_EXECUTION_UNRUN",
+  "head": "69e10cb13de0dc793646dbddebffeef29bf1e06c",
+  "tree": "ab3714670816016f8838e5c2fafd21e0ea510573",
+  "immediateParent": "5ded816d0449dfd3f43f19fca02e87f62851dbf0",
+  "packet": {
+    "path": "/private/tmp/meridian-root-cell-index-review/SOURCE.json",
+    "bytes": 5199,
+    "sha256": "e4576d669d185772a63b7ae07a3b33709177d64ebd44ddea5a5095c20d047644"
+  },
+  "findings": [],
+  "independentChecks": {
+    "cleanExactHeadTreeImmediateParent": true,
+    "rootGitWorkingSourceTarBytesModes": 578,
+    "deltaPaths": 27,
+    "unchangedPaths": 551,
+    "authorCratePinsAndSourceArchive": 439,
+    "all423AuthorParentCrateFilesExactActual5ded": true,
+    "authorManifestPayloadHashes": 7,
+    "completeArchiveMembers": 8,
+    "canonicalRootDeltaVerified": true,
+    "twoCompleteProductionFileInverses": true,
+    "fourFrozenReferencesHashed": true,
+    "completePublisherControlExactExceptFunctionName": true,
+    "productionPublisherRestoresEntireBodyWithTwoIndexNameChanges": true,
+    "all76OldTestBodiesByteExact": true,
+    "currentTestAttributes": 80,
+    "newCases": 4,
+    "sixOriginalConstructorBoundsQueryBodiesUnchanged": true,
+    "cellNodeBuilderDerivation": "Independently extracted complete frozen spatial_range; removed only scratch parameter, recursive sort call and renamed recursive calls. Exact equality to cell_range, including original leaf/node bounds, owner proof, ranges, node count and charges.",
+    "parentActualCustodyTerminalPinsHashed": 51,
+    "parentCurrentRawArtifactPinsAndExactArchiveRelativeMatches": [
+      46,
+      46
+    ]
+  },
+  "wholeSemanticReview": [
+    "For N<256, cell_memberships adds nothing and build_cells delegates to the entire byte-exact contiguous constructor. Its original source-order return and prices remain after the new inactive mode-dispatch check. No withdrawn prototype ordering is silently enabled for small inputs.",
+    "For larger inputs, every original facet bound remains at its original ordinal. The exact world union contains every lower/upper coordinate. For nonzero width, lower+upper-2*worldLower lies in[0,2*width], hence exact scaled center4*relative/width lies in[0,8]. Nonnegative integer truncation is floor, clamp7 handles the endpoint and zero extent maps to0 without division. Three 3-bit digits interleave to a key in[0,511]. These rational calculations affect grouping only, never source geometry or query acceptance.",
+    "Counting each input once, initialized512bins, exclusive prefix offsets and source-order stable scatter fill exactly N distinct positions with each ordinal[0,N) once. The extra order[N]=N mode marker is outside every recursive node range; all traversals access source_ordinal only at positions start<=p<end<=N. LengthN+1 dispatch distinguishes the cell mode from None/lengthN frozen prototype modes; it does not emit the marker as an ordinal.",
+    "Balanced count-median nodes partition the permutation without gaps/duplicates. Leaf bounds union the actual original facet boxes; parent bounds union actual child bounds. Leaf owner proof compares every mapped original owner; internal Some owner requires equal child Some values. A mixed range cannot be treated as uniform. Physical-box, outward-plane, ray-slab and owner tests are unchanged necessary conditions, so regrouping cannot discard a valid facet. Poor grouping can only increase candidate visits.",
+    "Fresh per-query bitset first checks every candidate ordinal range and duplicate before indexing/insertion. Prefix population counts give each unique selected ordinal a distinct ascending rank in[0,K). In-place cycle swaps move the COMPLETE Copy record, including all physical/outward flags and payload fields, to its fixed rank. Every swap fixes its target; it cannot displace a previously fixed distinct record, so at most K-1 swaps terminate the process. The remaining positions are already fixed. Empty vectors return unchanged and singleton keys are still range-checked. No parity/occupancy/intersection value is recomputed, merged, cached or carried across queries.",
+    "All source_order production callers use pure actual ordinal keys and reserve returned records through ordering. Original physical/joint/ray traversal leaves partition the input, producing at most one record per ordinal. Restored ascending original-vector order preserves ordered section/coplanar records, ray ambiguity order, owner multiplicity and downstream fields. Generic ray generation, section geometry, clipping, contacts/protected sets, affine fields, stars, witnesses, topology and final volume remain unchanged.",
+    "Work accounting retains all performed original box/node/query/predicate prices. Added charges cover world clones/unions and extents, every facet/axis/nonzero conversion, all9bit copies per key, key/count/scatter transfers,512bin initialization/prefix visits,N+1order initialization and marker write; rank restoration charges both word initializations, three per checked insertion, every prefix word, rank lookup and two moved records per swap. The structural mode dispatch follows existing uncharged mode-choice conventions. No performed geometric operation is discounted.",
+    "Persistent cell reservation adds N+16 for orderN+1/header. N+512+48 construction scratch holds keysN,512cursors, world/extents/rational intermediates and headers while returned order is separately admitted. Node recursion retains the original independent stack bound. Query scratch2*ceil(N/64)+2*fields+16 holds freshly initialized bit/rank words and full swap payload; original caller admission still owns returned records. Scoped scratch releases after actual last use on success and every error; partial rank permutations are dropped on failure, never published. Constructor errors preserve caller-owned index/input reservation, matching the old constructor policy.",
+    "Current actual parent is CONTIGUOUS. Recursive sorting and payload-map work avoided by this design belong to a withdrawn test-only prototype, not costs removed from the current production baseline. Index+query tests compare against the real contiguous constructor and include added grouping/order work. No completed-original work reduction, speed, fit, minimum or admission is established by source review.",
+    "Four authored cases cover threshold255/256/257/512, exact full permutation, original-box containment/uniform-owner tags, every finite query and representative axis/oblique rays, complete ordered section/coplanar/parity outputs, full flag payload rank cycles across64-bit words, duplicate/range rejection, exact/one-short storage and Operations refusal, and zero extent/same-cell coverage. A complete264-facet22-separated-box publisher comparison checks every triangle with nonzero world-affine UV, all witnesses, retained accounting and independent analytic volume176. Full index-plus-query operations and paired monotonic10x ceilings are assertions, not current passes. Full publisher does not assume a performance win. All prior full-face/corner-negative controls and322/108/120 guards remain."
+  ],
+  "actualParentEvidence": {
+    "source": "5ded816d0449dfd3f43f19fca02e87f62851dbf0",
+    "tree": "abbc4bd3de3cc0f38476d1d15b3f80c8233893ed",
+    "rawFocusedRustCounts": [
+      58,
+      7,
+      9,
+      2
+    ],
+    "rustPassed": 76,
+    "hostPassed": 9,
+    "lockedAllTargetCheck": "PASS",
+    "strictClippy": "PASS",
+    "developmentBuild": "PASS",
+    "rawPacket": {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-face-contact.5ded816/RAW-PACKET.tar.gz",
+      "bytes": 21168768,
+      "sha256": "b07e6c2d1c7c311944de82b100ae6b62fb691dfd235656e2d659555fdb0cc7f9"
+    },
+    "wholeFiveBodies": {
+      "declared": 25,
+      "decodePass": 5,
+      "constructorOperationsRefusals": 5,
+      "failed": 0,
+      "dependentUnrun": 15
+    },
+    "completeCandidates": 0,
+    "admissions": 0,
+    "wholeElapsedSeconds": 157.592282667,
+    "allFiveFailuresFullGuardContextsAndMonotonicSecondsExactCustody": true,
+    "limits": "Actual failed prefixes, not full-work minima, successful fit, current speed or current result."
+  },
+  "executionDecision": "Sourceclear for existing designatedG1 exact-source lockedcheck,80Rust9host,strictClippy and development original_five build when soleMac lane free. Only after ALL focused gatesPASS may the ONEalready-scoped changed whole-five25body workload run with original2Moperations includingdecode/100kstorage/4096-bit coordinateUV/512complete-outputfaces, exact source-lock-binary/input pins, actual monotonic durations and full first-guard contexts. No new review ACK gate. Stop on natural first failure; no unchanged or diagnostic repeat.",
+  "limits": [
+    "Current80Rust9host/compiler/Clippy/build/wholefive remainUNRUN. Source clear is not executed acceptance.",
+    "No compiler,Cargo,tests,SUT,geometry/native,suppliedverifier,reviewbot or integrationtesting executed byG2.",
+    "No humanWIP edits,newchat/agent,merge orpublication.",
+    "Separate202matrix,171fleet scope and legacy23/162ships+4/6stations remain separate. No current fit,speed,minimal-work or admission claim."
+  ]
+}

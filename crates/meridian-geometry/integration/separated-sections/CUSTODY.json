@@ -1,0 +1,512 @@
+{
+  "parentAuthor": "c776846ed1a7969a8a69f430869f413882cbd1de",
+  "actualExecutedRoot": "69e10cb13de0dc793646dbddebffeef29bf1e06c",
+  "actualTree": "ab3714670816016f8838e5c2fafd21e0ea510573",
+  "all439ParentCratePinsMatchActualRoot": true,
+  "rootPinInventory": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-cell-index.69e10cb/evidence/ROOT-ALL-SOURCE-PINS.json",
+    "bytes": 145125,
+    "sha256": "28a9a4c6918762689bba127dcf5f7ae58723e4c2b8702e2e36fd7168849ce9f5"
+  },
+  "terminalHandoff": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-cell-index.69e10cb/evidence/EXECUTION-TERMINAL-HANDOFF.json",
+    "bytes": 25909,
+    "sha256": "2964a8a8b293b04adcd5e033f07bc2e268922051d0f8de7f904e33e0df4d54fe"
+  },
+  "rawPacket": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-cell-index.69e10cb/RAW-PACKET.tar.gz",
+    "bytes": 21209288,
+    "sha256": "190cfcc7edbc33b73733fe2fb5719580b788759990db6deb2c01c57d0f552466"
+  },
+  "parentReview": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-cell-index.69e10cb/evidence/REVIEW.json",
+    "bytes": 9269,
+    "sha256": "3097f6e940e8edd69ceaddc08dc7ed07d458a6940fbe868cad5a8c1eceb6348b"
+  },
+  "focused": {
+    "rustTests": 80,
+    "library": 62,
+    "binary": 7,
+    "adapter": 9,
+    "originalControls": 2,
+    "hostTests": 9,
+    "lockedAllTargetCheck": "PASS",
+    "strictClippy": "PASS",
+    "devBuild": "PASS",
+    "originalAssertions": "322/108/120 unchanged and passing",
+    "terminal": {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-cell-index.69e10cb/evidence/FOCUSED-TERMINAL.json",
+      "bytes": 3128,
+      "sha256": "8ca5430ac9599b2125a645efe77e78031ce178e4881579f39eb8265d44687ad5"
+    }
+  },
+  "wholeFive": {
+    "bodies": {
+      "declaredBodies": 25,
+      "bodiesPass": 5,
+      "bodiesRefused": 5,
+      "bodiesFail": 0,
+      "bodiesUnrun": 15
+    },
+    "cases": [
+      {
+        "id": "SH010",
+        "failure": {
+          "kind": "Operations",
+          "source": [
+            7,
+            72
+          ],
+          "operationsAtRefusal": 2000001,
+          "detail": "exact operation budget exhausted"
+        },
+        "budgetRejection": {
+          "kind": "Operations",
+          "source": [
+            7,
+            72
+          ],
+          "phase": "sections",
+          "caller": {
+            "file": "crates/meridian-geometry/src/certificate.rs",
+            "line": 296,
+            "column": 11
+          },
+          "operationBase": 0,
+          "storageBase": 0,
+          "operationsBefore": 2000000,
+          "operationsAfter": 2000001,
+          "attemptedOperations": 1,
+          "retainedBeforeCleanup": 80595,
+          "attemptedScratch": 0,
+          "requiredMemberships": null,
+          "phaseOperations": {
+            "other": 0,
+            "decode": 320970,
+            "input_audit": 280501,
+            "index": 68281,
+            "sections": 698774,
+            "arrangement_setup": 168729,
+            "arrangement_pairs": 47681,
+            "arrangement_slabs": 138949,
+            "occupancy": 220993,
+            "fields": 23959,
+            "global_points": 0,
+            "packing": 31164,
+            "noding": 0,
+            "triangulation": 0,
+            "contact_stars": 0,
+            "witness": 0,
+            "topology": 0,
+            "dependent_checks": 0
+          },
+          "stageCounters": [
+            30,
+            1,
+            0,
+            0,
+            1012,
+            0,
+            0,
+            0
+          ],
+          "stageCountersAtOperations": 1998286,
+          "activeLimits": {
+            "operations": 2000000,
+            "storageMemberships": 100000,
+            "rationalBits": 4096,
+            "triangles": 512
+          }
+        },
+        "completeCandidateReturned": false,
+        "indexPhase69": 68281,
+        "indexPhase5ded": 39928,
+        "additionalIndexPhaseCharged": 28353,
+        "firstGuard69": {
+          "source": [
+            7,
+            72
+          ],
+          "phase": "sections"
+        },
+        "firstGuard5ded": {
+          "source": [
+            11,
+            5
+          ],
+          "phase": "sections"
+        },
+        "interpretation": "Actual source-bound first refusals/phase charges only; not whole-work minimum, completed speed or fit."
+      },
+      {
+        "id": "SH011",
+        "failure": {
+          "kind": "Operations",
+          "source": [
+            7,
+            74
+          ],
+          "operationsAtRefusal": 2000001,
+          "detail": "exact operation budget exhausted"
+        },
+        "budgetRejection": {
+          "kind": "Operations",
+          "source": [
+            7,
+            74
+          ],
+          "phase": "sections",
+          "caller": {
+            "file": "crates/meridian-geometry/src/certificate.rs",
+            "line": 75,
+            "column": 7
+          },
+          "operationBase": 0,
+          "storageBase": 0,
+          "operationsBefore": 1999999,
+          "operationsAfter": 2000001,
+          "attemptedOperations": 2,
+          "retainedBeforeCleanup": 80352,
+          "attemptedScratch": 0,
+          "requiredMemberships": null,
+          "phaseOperations": {
+            "other": 0,
+            "decode": 325330,
+            "input_audit": 280501,
+            "index": 68281,
+            "sections": 704214,
+            "arrangement_setup": 168789,
+            "arrangement_pairs": 46965,
+            "arrangement_slabs": 136388,
+            "occupancy": 215505,
+            "fields": 23723,
+            "global_points": 0,
+            "packing": 30305,
+            "noding": 0,
+            "triangulation": 0,
+            "contact_stars": 0,
+            "witness": 0,
+            "topology": 0,
+            "dependent_checks": 0
+          },
+          "stageCounters": [
+            30,
+            1,
+            0,
+            0,
+            1012,
+            0,
+            0,
+            0
+          ],
+          "stageCountersAtOperations": 1998629,
+          "activeLimits": {
+            "operations": 2000000,
+            "storageMemberships": 100000,
+            "rationalBits": 4096,
+            "triangles": 512
+          }
+        },
+        "completeCandidateReturned": false,
+        "indexPhase69": 68281,
+        "indexPhase5ded": 39928,
+        "additionalIndexPhaseCharged": 28353,
+        "firstGuard69": {
+          "source": [
+            7,
+            74
+          ],
+          "phase": "sections"
+        },
+        "firstGuard5ded": {
+          "source": [
+            11,
+            8
+          ],
+          "phase": "sections"
+        },
+        "interpretation": "Actual source-bound first refusals/phase charges only; not whole-work minimum, completed speed or fit."
+      },
+      {
+        "id": "SH016",
+        "failure": {
+          "kind": "Operations",
+          "source": [
+            11,
+            78
+          ],
+          "operationsAtRefusal": 2000001,
+          "detail": "exact operation budget exhausted"
+        },
+        "budgetRejection": {
+          "kind": "Operations",
+          "source": [
+            11,
+            78
+          ],
+          "phase": "occupancy",
+          "caller": {
+            "file": "crates/meridian-geometry/src/convex_sections.rs",
+            "line": 179,
+            "column": 23
+          },
+          "operationBase": 0,
+          "storageBase": 0,
+          "operationsBefore": 2000000,
+          "operationsAfter": 2000001,
+          "attemptedOperations": 1,
+          "retainedBeforeCleanup": 89387,
+          "attemptedScratch": 0,
+          "requiredMemberships": null,
+          "phaseOperations": {
+            "other": 0,
+            "decode": 323877,
+            "input_audit": 304466,
+            "index": 75715,
+            "sections": 820656,
+            "arrangement_setup": 202120,
+            "arrangement_pairs": 52681,
+            "arrangement_slabs": 86593,
+            "occupancy": 73336,
+            "fields": 34257,
+            "global_points": 0,
+            "packing": 26300,
+            "noding": 0,
+            "triangulation": 0,
+            "contact_stars": 0,
+            "witness": 0,
+            "topology": 0,
+            "dependent_checks": 0
+          },
+          "stageCounters": [
+            80,
+            1,
+            6,
+            0,
+            4,
+            32,
+            0,
+            0
+          ],
+          "stageCountersAtOperations": 2000000,
+          "activeLimits": {
+            "operations": 2000000,
+            "storageMemberships": 100000,
+            "rationalBits": 4096,
+            "triangles": 512
+          }
+        },
+        "completeCandidateReturned": false,
+        "indexPhase69": 75715,
+        "indexPhase5ded": 44986,
+        "additionalIndexPhaseCharged": 30729,
+        "firstGuard69": {
+          "source": [
+            11,
+            78
+          ],
+          "phase": "occupancy"
+        },
+        "firstGuard5ded": {
+          "source": [
+            16,
+            12
+          ],
+          "phase": "arrangement_setup"
+        },
+        "interpretation": "Actual source-bound first refusals/phase charges only; not whole-work minimum, completed speed or fit."
+      },
+      {
+        "id": "SH017",
+        "failure": {
+          "kind": "Operations",
+          "source": [
+            11,
+            74
+          ],
+          "operationsAtRefusal": 2000001,
+          "detail": "exact operation budget exhausted"
+        },
+        "budgetRejection": {
+          "kind": "Operations",
+          "source": [
+            11,
+            74
+          ],
+          "phase": "sections",
+          "caller": {
+            "file": "crates/meridian-geometry/src/sections.rs",
+            "line": 457,
+            "column": 11
+          },
+          "operationBase": 0,
+          "storageBase": 0,
+          "operationsBefore": 2000000,
+          "operationsAfter": 2000001,
+          "attemptedOperations": 1,
+          "retainedBeforeCleanup": 90963,
+          "attemptedScratch": 0,
+          "requiredMemberships": null,
+          "phaseOperations": {
+            "other": 0,
+            "decode": 348672,
+            "input_audit": 304352,
+            "index": 75715,
+            "sections": 801067,
+            "arrangement_setup": 198548,
+            "arrangement_pairs": 52262,
+            "arrangement_slabs": 85863,
+            "occupancy": 73432,
+            "fields": 33661,
+            "global_points": 0,
+            "packing": 26429,
+            "noding": 0,
+            "triangulation": 0,
+            "contact_stars": 0,
+            "witness": 0,
+            "topology": 0,
+            "dependent_checks": 0
+          },
+          "stageCounters": [
+            30,
+            1,
+            14,
+            0,
+            1100,
+            338,
+            96,
+            0
+          ],
+          "stageCountersAtOperations": 1999995,
+          "activeLimits": {
+            "operations": 2000000,
+            "storageMemberships": 100000,
+            "rationalBits": 4096,
+            "triangles": 512
+          }
+        },
+        "completeCandidateReturned": false,
+        "indexPhase69": 75715,
+        "indexPhase5ded": 44986,
+        "additionalIndexPhaseCharged": 30729,
+        "firstGuard69": {
+          "source": [
+            11,
+            74
+          ],
+          "phase": "sections"
+        },
+        "firstGuard5ded": {
+          "source": [
+            16,
+            5
+          ],
+          "phase": "sections"
+        },
+        "interpretation": "Actual source-bound first refusals/phase charges only; not whole-work minimum, completed speed or fit."
+      },
+      {
+        "id": "SH166",
+        "failure": {
+          "kind": "Operations",
+          "source": [
+            10,
+            10
+          ],
+          "operationsAtRefusal": 2000001,
+          "detail": "exact operation budget exhausted"
+        },
+        "budgetRejection": {
+          "kind": "Operations",
+          "source": [
+            10,
+            10
+          ],
+          "phase": "occupancy",
+          "caller": {
+            "file": "crates/meridian-geometry/src/exact.rs",
+            "line": 88,
+            "column": 12
+          },
+          "operationBase": 0,
+          "storageBase": 0,
+          "operationsBefore": 2000000,
+          "operationsAfter": 2000001,
+          "attemptedOperations": 1,
+          "retainedBeforeCleanup": 79910,
+          "attemptedScratch": 0,
+          "requiredMemberships": null,
+          "phaseOperations": {
+            "other": 0,
+            "decode": 304157,
+            "input_audit": 275175,
+            "index": 66764,
+            "sections": 977567,
+            "arrangement_setup": 220060,
+            "arrangement_pairs": 34048,
+            "arrangement_slabs": 54483,
+            "occupancy": 37096,
+            "fields": 12860,
+            "global_points": 0,
+            "packing": 17791,
+            "noding": 0,
+            "triangulation": 0,
+            "contact_stars": 0,
+            "witness": 0,
+            "topology": 0,
+            "dependent_checks": 0
+          },
+          "stageCounters": [
+            64,
+            3,
+            0,
+            2,
+            0,
+            32,
+            0,
+            0
+          ],
+          "stageCountersAtOperations": 1999981,
+          "activeLimits": {
+            "operations": 2000000,
+            "storageMemberships": 100000,
+            "rationalBits": 4096,
+            "triangles": 512
+          }
+        },
+        "completeCandidateReturned": false,
+        "indexPhase69": 66764,
+        "indexPhase5ded": 39059,
+        "additionalIndexPhaseCharged": 27705,
+        "firstGuard69": {
+          "source": [
+            10,
+            10
+          ],
+          "phase": "occupancy"
+        },
+        "firstGuard5ded": {
+          "source": [
+            16,
+            74
+          ],
+          "phase": "sections"
+        },
+        "interpretation": "Actual source-bound first refusals/phase charges only; not whole-work minimum, completed speed or fit."
+      }
+    ]
+  },
+  "prior5dedHandoff": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-face-contact.5ded816/evidence/EXECUTION-TERMINAL-HANDOFF.json",
+    "bytes": 26166,
+    "sha256": "bb262d04e5777062ba48973ac7060e154a61e32a401db3280bf79b99be81369e"
+  },
+  "metadataOnlySealingScopeCorrection": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-cell-index.69e10cb/evidence/SEALING-SCOPE-CORRECTION.json",
+    "bytes": 402,
+    "sha256": "b8d431bd482de37ca1ae3ddda7bc5e0b07c44168bef00b536353afaf7ead122a"
+  },
+  "sealingScope": "Original owner sealer/raw and correction note remain untouched; no SUT retry for metadata correction.",
+  "productionIndexDecision": "Withdraw cell grouping and its per-query rank restoration from production. Preserve all cell implementation/test bodies under cfg(test). Restore original contiguous constructor/admission. Actual cell setup charged about28k-31k more and exhausted at earlier source IDs in fixed-order processing; this establishes no useful original optimization/admission.",
+  "interpretation": "69passed80Rust9host/checkClippyBuild; all5Operationsrefusals15dependentUNRUN0candidates. 871wholefiveUNRUN; prior5ded/849 separate. New84Rust9host/compiler/native/wholefiveUNRUN. No partial/minimum/fullfit/completed-original speed claim."
+}

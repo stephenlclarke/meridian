@@ -6,6 +6,7 @@ import subprocess
 from pathlib import Path
 from restore_cell_index import restore_cell_index
 from strip_budget_context import body
+from restore_separated_sections import restore_separated
 
 CRATE = Path(__file__).resolve().parents[1]
 REPO = CRATE.parents[1]
@@ -25,7 +26,7 @@ def verify():
     raw = body(before, 'fn reconstruct_records(') + '\n'
     assert (f / 'publisher-control.rs.txt').read_text() == raw
     assert (f / 'compiled-publisher-control.rs').read_text() == raw.replace('fn reconstruct_records(', 'fn reference_cell_index_publisher(', 1)
-    current = (CRATE / 'src/certificate.rs').read_text()
+    current = restore_separated('certificate.rs', (CRATE / 'src/certificate.rs').read_text())
     main = body(current, 'fn reconstruct_records(')
     restored = main.replace('FacetBoundsIndex::cell_memberships(originals.len())', 'FacetBoundsIndex::memberships(originals.len())', 1).replace('FacetBoundsIndex::build_cells(originals, b)', 'FacetBoundsIndex::build(originals, b)', 1)
     assert restored == body(before, 'fn reconstruct_records('), 'main changed beyond index constructor/admission'
@@ -46,7 +47,7 @@ def verify():
             assert body(after, signature) == body(original, signature), (path, signature)
             count += 1
         if Path(path).name not in ['certificate.rs', 'spatial_index.rs']:
-            assert after == original, path
+            assert restore_separated(Path(path).name, after) == original, path
     assert count == 76, count
     print('PASS_SOURCE_ONLY: all76 old bodies byte exact; complete main restores by two index-name edits; original bounds/query/owner/geometry bodies unchanged; node builder exact without recursive sorts; two-file inverse; complete frozen4f publisher; no compiler or geometry executed')
 

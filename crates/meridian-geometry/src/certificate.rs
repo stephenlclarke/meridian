@@ -458,6 +458,7 @@ impl FacetBoundsIndex {
         Ok(node)
     }
     // The caller retains up to one candidate ordinal per original facet.
+    #[cfg(test)]
     fn candidates(&self, query: &Bounds, b: &mut Budget) -> Result<Vec<usize>, Failure> {
         b.with_retained(Self::stack_members(self.facets.len()), |b| {
             let mut pending = vec![self.root];
@@ -1120,10 +1121,10 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
         0,
     ]);
     b.retain(bounds_members)?;
-    let facet_bounds_members = FacetBoundsIndex::cell_memberships(originals.len());
+    let facet_bounds_members = FacetBoundsIndex::memberships(originals.len());
     b.retain(facet_bounds_members)?;
     let facet_bounds = b.with_phase(BudgetPhase::Index, |b| {
-        FacetBoundsIndex::build_cells(originals, b)
+        FacetBoundsIndex::build(originals, b)
     })?;
     let owner_bounds = b.with_phase(BudgetPhase::Index, |b| {
         component_bounds(originals, &facet_bounds.facets, b)
@@ -1160,10 +1161,11 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
         if area(&domain, b)?.is_negative() {
             domain.reverse();
         }
-        let rows = convex_sections::Rows::build(face, face_bounds, interior.as_ref(), b)?;
+        let rows =
+            convex_sections::Rows::build_separating(face, face_bounds, interior.as_ref(), b)?;
         let (mut barriers, coplanar, sections) = b.with_phase(BudgetPhase::Sections, |b| {
             b.with_retained(16, |local| {
-                sections::Frame::collect_rows(
+                sections::Frame::collect_separating(
                     face,
                     face_bounds,
                     originals,
@@ -1187,7 +1189,7 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
                         match local.with_phase_state(
                             BudgetPhase::Occupancy,
                             local.state_values(),
-                            |b| match rows.occupied(sample, b)? {
+                            |b| match rows.occupied_facet(sample, b)? {
                                 Some(false) => match &parity_index {
                                     Some(index) => index.occupied(sample, b),
                                     None => sections.occupied(sample, b),
@@ -2359,9 +2361,14 @@ mod convex_sections;
 #[path = "convex_section_tests.rs"]
 mod convex_section_tests;
 
+#[cfg(test)]
 #[path = "cell_index.rs"]
 mod cell_index;
 
 #[cfg(test)]
 #[path = "cell_index_tests.rs"]
 mod cell_index_tests;
+
+#[cfg(test)]
+#[path = "separated_section_tests.rs"]
+mod separated_section_tests;

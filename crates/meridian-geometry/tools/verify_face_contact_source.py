@@ -6,6 +6,7 @@ import subprocess
 from pathlib import Path
 from strip_budget_context import body, end_delimiter
 from restore_cell_index import restore_cell_index
+from restore_separated_sections import restore_separated
 
 CRATE = Path(__file__).resolve().parents[1]
 REPO = CRATE.parents[1]
@@ -34,14 +35,14 @@ def verify():
         relative = 'crates/meridian-geometry/src/' + name.removeprefix('before-')
         assert data == subprocess.check_output(['git', '-C', str(REPO), 'show', pins['parent'] + ':' + relative])
     for name, edits in inverse.items():
-        lines = (CRATE / 'src' / name).read_text().splitlines(True)
+        lines = restore_separated(name, (CRATE / 'src' / name).read_text()).splitlines(True)
         for edit in reversed(edits):
             a, z = edit['afterStart'], edit['afterEnd']
             assert ''.join(lines[a:z]) == edit['after']
             lines[a:z] = edit['before'].splitlines(True)
         assert ''.join(lines) == (f / ('before-' + name)).read_text()
     old_math = (f / 'before-convex_sections.rs').read_text()
-    math = (CRATE / 'src/convex_sections.rs').read_text()
+    math = restore_separated('convex_sections.rs', (CRATE / 'src/convex_sections.rs').read_text())
     assert old_math.count('integer') == 1
     assert old_math.replace('Rational, integer', 'Rational', 1) == math, 'production math or guards changed'
     before = (f / 'before-convex_section_tests.rs').read_text()
