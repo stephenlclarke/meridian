@@ -12,6 +12,24 @@ impl World {
         seed: u64,
         observer: FlightStart,
     ) -> Result<Self, StationError> {
+        Self::mule_scenario(seed, observer, None)
+    }
+
+    /// Controlled inbound flight through the original station's physical entry gate.
+    /// The actor completes its approach without creating a commander dock receipt.
+    pub fn mule_docking_validation_scenario(
+        seed: u64,
+        observer: FlightStart,
+        approach: FlightStart,
+    ) -> Result<Self, StationError> {
+        Self::mule_scenario(seed, observer, Some(approach))
+    }
+
+    fn mule_scenario(
+        seed: u64,
+        observer: FlightStart,
+        approach: Option<FlightStart>,
+    ) -> Result<Self, StationError> {
         if seed == 0 || observer.speed != 0.0 {
             return Err(StationError::InvalidPose);
         }
@@ -21,9 +39,27 @@ impl World {
             .as_ref()
             .ok_or(StationError::InvalidPose)?;
         let source = MuleHullSource::bundled().map_err(|_| StationError::InvalidMesh)?;
-        let start = data.mule_launch_start(&source)?;
+        let start = match approach {
+            Some(start) => start,
+            None => data.mule_launch_start(&source)?,
+        };
         let pose =
             flight_pose(start.position, start.orientation).ok_or(StationError::InvalidPose)?;
+        if approach.is_some() {
+            let norm = start.orientation.iter().map(|v| v * v).sum::<f32>();
+            // Keep the entire inbound hull outside the opening plane initially.
+            // Maximum origin radius bounds rearward extent under any valid rotation.
+            if !(0.0..=33.2).contains(&start.speed)
+                || start.speed <= 0.0
+                || !norm.is_finite()
+                || (norm - 1.0).abs() > 1e-5
+                || pose.orientation.z.z >= 0.0
+                || data.depth(pose) <= source.maximum_origin_radius() * 1.001
+                || !data.mule_motion_clear(&source, pose, pose, 0.0)
+            {
+                return Err(StationError::InvalidPose);
+            }
+        }
         let observer = flight_pose(world.state.position, world.state.orientation)
             .ok_or(StationError::InvalidPose)?;
         // Initial disjoint enclosing spheres rule out starting wholly inside either body.
@@ -40,7 +76,13 @@ impl World {
         {
             return Err(StationError::InvalidPose);
         }
-        world.mule_validation = Some(State::new(seed, source, pose, f64::from(start.speed))?);
+        world.mule_validation = Some(State::new(
+            seed,
+            source,
+            pose,
+            f64::from(start.speed),
+            approach.is_some(),
+        )?);
         Ok(world)
     }
     /// One coherent immutable actor/surface publication; renderer cannot manufacture its scope.

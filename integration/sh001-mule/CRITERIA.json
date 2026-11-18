@@ -1,7 +1,7 @@
 {
   "targetHull": "SH001",
   "name": "Mule",
-  "status": "PRESSURE_BODY_PARTITION_AUTHORED_UNRUN;TIGHT_FIT_AWAITS_MEASUREMENT_AND_NATIVE_EVIDENCE",
+  "status": "SH001_FOUR_WELL_EXCEPTION_ACCEPTED;CONTROLLED_DOCKING_COST_AUTHORED_UNRUN",
   "immediateAuthorParent": "8e2e5d3a3ef5f6caffd0323ca4b2540e1e57981b",
   "currentGameplayAuthority": "ad5b9f9da259c85389cd662af2473e543e26ab11",
   "newCoreTests": [
@@ -161,9 +161,14 @@
       "file": "crates/meridian-core/src/flight/mule_validation/tests.rs",
       "name": "ordinary_world_and_current_save_do_not_acquire_a_validation_mule",
       "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/flight/mule_validation/tests.rs",
+      "name": "mule_world_docking_accepts_aligned_crossing_and_refuses_speed_and_wall_contact",
+      "status": "UNRUN"
     }
   ],
-  "totalMuleCoreTests": 20,
+  "totalMuleCoreTests": 21,
   "controlledWorldScenario": {
     "status": "AUTHORED_UNRUN;NOT_ORDINARY_HULL_ADMISSION",
     "base": "af97ee6bbba60b2d492216ad12035a90e9dde34e",
@@ -256,5 +261,45 @@
       "reviewSHA256": "9738140a52a13a78b75e1e31a1cbe32cf4a038963be13f371e2a63ee1661a45b",
       "coverage": "Count a support witness only if the closed neighbourhood containing the nearby member boundary is certified clear from every other piece. Report ray inside witnesses separately without giving them boundary exposure credit. Missing metrics remain null."
     }
+  },
+  "sh001OnlyNativeWellStandOff": {
+    "authority": "Human chose dual original source preservation and accepted these four measured local differences.",
+    "hull": "SH001",
+    "sourceRevision": "25130c7bda302c6fa151695a96f39a6d764c7532",
+    "scope": "Only the four body native well rim discrepancies at slots 28\u201331. Both source models and the common 2 cm spherical offset remain required.",
+    "evidenceSHA256": "80b3bd591e8f03b5baa0d5cd7e49569c2e3ad91d0136ea05e6f2eb0da1e0ea3b",
+    "wells": [
+      {
+        "slot": 28,
+        "nativeVertex": 63,
+        "measuredSampleMetres": "0.7644109260836986",
+        "mandatoryVertexLowerBoundMetres": "0.744409"
+      },
+      {
+        "slot": 29,
+        "nativeVertex": 74,
+        "measuredSampleMetres": "0.7645563918663092",
+        "mandatoryVertexLowerBoundMetres": "0.744555"
+      },
+      {
+        "slot": 30,
+        "nativeVertex": 87,
+        "measuredSampleMetres": "0.7647230423069084",
+        "mandatoryVertexLowerBoundMetres": "0.744722"
+      },
+      {
+        "slot": 31,
+        "nativeVertex": 98,
+        "measuredSampleMetres": "0.7641993333319775",
+        "mandatoryVertexLowerBoundMetres": "0.744198"
+      }
+    ]
+  },
+  "worldDockingAcceptance": {
+    "status": "AUTHORED_UNRUN",
+    "authority": "Controlled fixed SH028 station, one World-owned inbound SH001 with exact same SmoothPiece data as its scope-bound render snapshot. Test follows real fixed World ticks through approach, physical entry, fast rejection and sidewall stop.",
+    "cost": "Measure agreed Mac release configuration. Keep all MULE_WORLD_DOCK_COST rows for actual step durations including each terminal. Compare p95 against the existing 60 Hz simulation frame interval, report terminal cost independently. Keep native renderer frame timing with the same source and camera setting as a separate measurement.",
+    "scope": "Physical crossing gate and terminal controlled NPC state. No actual station rotation in bundled source. Ordinary population, player purchase, effects and current save remain outside this controlled scenario.",
+    "native": "Root/G1 owns native and compiler execution. Coordinate with existing G3 adapter for inbound capture."
   }
 }

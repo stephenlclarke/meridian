@@ -12,6 +12,7 @@ const SHIELD_CAPACITY: u16 = 24000;
 pub enum MuleValidationRefusal {
     StationContact,
     ObserverContact,
+    EntryConditions,
 }
 
 /// Read-only World publication. Descriptive actor IDs and source hashes grant no effects.
@@ -62,6 +63,7 @@ impl State {
         source: MuleHullSource,
         pose: RigidPose,
         speed_units: f64,
+        approaching: bool,
     ) -> Result<Self, crate::station::StationError> {
         if seed == 0 || !speed_units.is_finite() || !(0.0..=33.2).contains(&speed_units) {
             return Err(crate::station::StationError::InvalidPose);
@@ -84,7 +86,11 @@ impl State {
                 hull_id: "SH001",
                 pose,
                 speed_units,
-                phase: NpcPhase::Departing,
+                phase: if approaching {
+                    NpcPhase::Approach
+                } else {
+                    NpcPhase::Departing
+                },
                 energy_hundredths: 29000,
                 electrical_remaining: None,
                 electrical_disabled: false,
@@ -138,6 +144,11 @@ impl State {
             .checked_add(1)
             .ok_or(crate::StepError::TickOverflow)?;
         next.tick = next_tick;
+        if self.actor.phase == NpcPhase::Complete
+            || (self.actor.phase == NpcPhase::Approach && self.actor.speed_units == 0.0)
+        {
+            return Ok(next);
+        }
         let before = self.actor.pose;
         let distance = self.actor.speed_units
             * f64::from(DISTANCE_PER_SPEED_UNIT)
@@ -151,7 +162,24 @@ impl State {
             ),
             orientation: before.orientation,
         };
-        next.refusal = if !data.mule_motion_clear(&self.source, before, after, 0.0) {
+        let approaching = self.actor.phase == NpcPhase::Approach;
+        let crosses_entry = approaching && data.depth(before) > 0.0 && data.depth(after) <= 0.0;
+        next.refusal = if crosses_entry {
+            if !data.mule_entry_clear(
+                &self.source,
+                before,
+                after,
+                self.actor.speed_units * f64::from(DISTANCE_PER_SPEED_UNIT),
+                0.0,
+                0.0,
+            ) {
+                Some(MuleValidationRefusal::EntryConditions)
+            } else if !data.mule_observer_clear(&self.source, before, after, observer) {
+                Some(MuleValidationRefusal::ObserverContact)
+            } else {
+                None
+            }
+        } else if !data.mule_motion_clear(&self.source, before, after, 0.0) {
             Some(MuleValidationRefusal::StationContact)
         } else if !data.mule_observer_clear(&self.source, before, after, observer) {
             Some(MuleValidationRefusal::ObserverContact)
@@ -162,7 +190,12 @@ impl State {
             next.actor.speed_units = 0.0;
         } else {
             next.actor.pose = after;
-            next.actor.phase = NpcPhase::Outbound;
+            if crosses_entry {
+                next.actor.phase = NpcPhase::Complete;
+                next.actor.speed_units = 0.0;
+            } else if !approaching {
+                next.actor.phase = NpcPhase::Outbound;
+            }
         }
         Ok(next)
     }

@@ -202,3 +202,100 @@ fn ordinary_world_and_current_save_do_not_acquire_a_validation_mule()
     assert_eq!(continued.save_bytes()?, expected);
     Ok(())
 }
+
+fn inbound(x: f32, speed: f32) -> FlightStart {
+    FlightStart {
+        position: [x, 0.0, 260.0],
+        orientation: [0.0, 1.0, 0.0, 0.0],
+        speed,
+    }
+}
+
+#[test]
+fn mule_world_docking_accepts_aligned_crossing_and_refuses_speed_and_wall_contact()
+-> Result<(), Box<dyn std::error::Error>> {
+    use crate::traffic::NpcPhase;
+    use std::time::Instant;
+
+    let mut inside = inbound(0.0, 4.0);
+    inside.position[2] = 136.0;
+    assert!(World::mule_docking_validation_scenario(733, observer(), inside).is_err());
+
+    for (case, start, expected_refusal) in [
+        ("aligned", inbound(0.0, 4.0), None),
+        (
+            "overspeed",
+            inbound(0.0, 9.0),
+            Some(MuleValidationRefusal::EntryConditions),
+        ),
+        (
+            "sidewall",
+            inbound(100.0, 33.2),
+            Some(MuleValidationRefusal::StationContact),
+        ),
+    ] {
+        let mut world = World::mule_docking_validation_scenario(733, observer(), start)?;
+        let port_z = world
+            .station_port()
+            .ok_or(StepError::InvalidMode)?
+            .center()
+            .z;
+        let original = world.mule_actor_snapshot().ok_or(StepError::InvalidMode)?;
+        let mut durations = Vec::new();
+        let mut terminal = None;
+        let mut terminal_nanos = 0;
+        for _ in 0..160 {
+            let before = world.mule_actor_snapshot().ok_or(StepError::InvalidMode)?;
+            assert_eq!(before.actor().phase, NpcPhase::Approach);
+            assert!(before.actor().pose.position.z > port_z);
+            let clock = Instant::now();
+            world.step(FlightInput::default())?;
+            let elapsed = clock.elapsed().as_nanos();
+            let after = world.mule_actor_snapshot().ok_or(StepError::InvalidMode)?;
+            if after.actor().phase == NpcPhase::Complete || after.motion_refusal().is_some() {
+                assert_eq!(after.motion_refusal(), expected_refusal);
+                assert_eq!(after.actor().speed_units, 0.0);
+                if expected_refusal.is_some() {
+                    assert_eq!(after.actor().phase, NpcPhase::Approach);
+                    assert_eq!(after.actor().pose, before.actor().pose);
+                } else {
+                    assert_eq!(after.actor().phase, NpcPhase::Complete);
+                    assert!(after.actor().pose.position.z <= port_z);
+                    assert_eq!(
+                        after.actor().pose.orientation,
+                        before.actor().pose.orientation
+                    );
+                }
+                assert_eq!(after.actor().id, original.actor().id);
+                assert!(Arc::ptr_eq(after.presentation(), original.presentation()));
+                assert!(world.mule_snapshot_is_current(&after));
+                assert!(!world.mule_snapshot_is_current(&before));
+                assert!(world.current_dock_context().is_none());
+                assert_eq!(world.save_bytes(), Err(crate::save::SaveError::NoCommander));
+                terminal = Some(after);
+                terminal_nanos = elapsed;
+                break;
+            }
+            durations.push(elapsed);
+            assert!(after.actor().pose.position.z < before.actor().pose.position.z);
+        }
+        let terminal = terminal.ok_or(StepError::InvalidMode)?;
+        assert!(!durations.is_empty());
+        world.step(FlightInput::default())?;
+        let held = world.mule_actor_snapshot().ok_or(StepError::InvalidMode)?;
+        assert_eq!(held.actor().pose, terminal.actor().pose);
+        assert_eq!(held.actor().phase, terminal.actor().phase);
+        assert_eq!(held.motion_refusal(), terminal.motion_refusal());
+        assert!(!world.mule_snapshot_is_current(&terminal));
+        durations.sort_unstable();
+        let p95_index = (durations.len() * 95).div_ceil(100) - 1;
+        eprintln!(
+            "MULE_WORLD_DOCK_COST {{\"case\":\"{case}\",\"approachTicks\":{},\"medianNanoseconds\":{},\"p95Nanoseconds\":{},\"maxNanoseconds\":{},\"terminalNanoseconds\":{terminal_nanos}}}",
+            durations.len(),
+            durations[durations.len() / 2],
+            durations[p95_index],
+            durations[durations.len() - 1],
+        );
+    }
+    Ok(())
+}
