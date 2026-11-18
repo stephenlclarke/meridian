@@ -166,5 +166,12 @@
     "externalRawSHA256": "e65e83c5dca22c9aa0b89afeaa7becabf7a6eaa3cd07fca4bebcb8ffeb0f47c3",
     "currentExecution": "UNRUN",
     "sourceFidelity": "Original facet closedbox clipNone proof; index uniform owner inherited proof; no source inputs, fields, star audits or admissions changed"
+  },
+  "parityIndexCorrection": {
+    "qualifiedRoot": "27c9550492fac66f0a4b7432f77797bb1de15ba2",
+    "parentHandoffSHA256": "db5ca4d058b1772f1c8b902f632c8089cd0325391beffc5f2a9bfc7a79ccb6f8",
+    "externalRawSHA256": "31426f1d1d0daa2176a092938410a914441fd22994a320ab5639d6c968e881e5",
+    "currentExecution": "UNRUN",
+    "sourceFidelity": "Borrowed current-facet section geometry intervals; same exact crossings/multiplicity/ownerorder, no cached ray/parity values, no source fields or admissions changed"
   }
 }

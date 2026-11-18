@@ -1322,3 +1322,7 @@ mod owner_inheritance_tests {
         Ok(())
     }
 }
+
+#[path = "parity_index.rs"]
+mod parity_index;
+pub(super) use parity_index::ParityIndex;

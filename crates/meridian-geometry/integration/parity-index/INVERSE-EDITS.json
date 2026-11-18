@@ -1,0 +1,30 @@
+{
+  "certificate.rs": [
+    {
+      "afterStart": 1161,
+      "afterEnd": 1162,
+      "before": "",
+      "after": "        let parity_index = sections::ParityIndex::build(&sections, b)?;\n"
+    },
+    {
+      "afterStart": 1173,
+      "afterEnd": 1177,
+      "before": "                            |b| sections.occupied(sample, b),\n",
+      "after": "                            |b| match &parity_index {\n                                Some(index) => index.occupied(sample, b),\n                                None => sections.occupied(sample, b),\n                            },\n"
+    },
+    {
+      "afterStart": 1207,
+      "afterEnd": 1210,
+      "before": "",
+      "after": "        let parity_members = parity_index.as_ref().map_or(0, |index| index.memberships());\n        drop(parity_index);\n        b.release(parity_members);\n"
+    }
+  ],
+  "sections.rs": [
+    {
+      "afterStart": 1324,
+      "afterEnd": 1328,
+      "before": "",
+      "after": "\n#[path = \"parity_index.rs\"]\nmod parity_index;\npub(super) use parity_index::ParityIndex;\n"
+    }
+  ]
+}

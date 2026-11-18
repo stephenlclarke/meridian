@@ -293,6 +293,16 @@
       "file": "src/proved_visit_tests.rs",
       "name": "strict_box_pruning_matches_frozen_clip_preserves_contacts_and_admits_before_mutation",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/parity_index_tests.rs",
+      "name": "closed_interval_index_preserves_boundary_multiplicity_owner_order_and_total_charged_work",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/parity_index_tests.rs",
+      "name": "interval_index_admits_sort_nodes_and_query_stack_and_rolls_back_each_refusal",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -697,6 +707,20 @@
     "contractSHA256": "a9f7a3bafe846dda6dfc4d475629305c4955081359ff6a28ec043839af8f2b93",
     "frozenSHA256": "bc4c960a649f3ce24031b0e825c8163968aaa882c2a6293b759cbb3a80a78d9e",
     "currentRustCount": 58,
+    "hostCount": 9
+  },
+  "parityIndexCorrection": {
+    "qualifiedRoot": "27c9550492fac66f0a4b7432f77797bb1de15ba2",
+    "parentAuthor": "5602aee7fe4074eb75acd8ef92e618e6229f7b80",
+    "parentFocusedRustPass": 58,
+    "parentHostPass": 9,
+    "parentOriginal": "5Operationsrefusals15unrun0candidates",
+    "old58TestsPreserved": true,
+    "currentExecution": "UNRUN",
+    "deltaSHA256": "eb0ad1053f4dcee6de063702af672ada91ba9e08e24c8a9753fddbc00c0f5365",
+    "contractSHA256": "ce9fc29fa76788583aa5c4aaf520bf1b2abe2b9ee8999c76fca99ab002f908c8",
+    "frozenSHA256": "862ecf86f1ad1140da70cdaec29947baaa00a65dddbfa3ac72ec2c48d6784258",
+    "currentRustCount": 60,
     "hostCount": 9
   }
 }

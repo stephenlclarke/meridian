@@ -191,3 +191,9 @@ One new lifetime regression brings this source to 56 Rust tests and nine host te
 The incremental revision passed 56 Rust tests, nine host tests, check, strict Clippy and build. Its changed whole-five still refused all constructors on work, with no candidates. The publisher now inherits proven uniform-owner eligibility inside each query and drops only barriers strictly outside the original facet coordinate box before clipping. Boundary equality, coplanar fields and contact-star audits remain intact; all actual visits and arithmetic keep their charges.
 
 Two independent frozen comparisons bring the source to 58 Rust tests and nine host tests, all UNRUN. [The proof, ownership and source-bound outcomes](integration/proved-visits/CONTRACT.md) preserve every old assertion and cap. Full fit and broader fleet acceptance remain unproved.
+
+## Current-facet interval parity
+
+The proved-visit revision passed 58 Rust tests, nine host tests, check, strict Clippy and build. Its changed whole-five still refused all constructors on work. Large section-edge lists now use a per-facet closed interval hierarchy to exclude impossible y crossings; every eligible edge still runs the original exact crossing and ambiguity tests. Small lists retain the original scan. Sorting, metadata, queries and concurrent crossing scratch are explicitly admitted and charged.
+
+All 58 prior test bodies and caps stay unchanged. Two new independent parity/work/ownership tests bring the source to 60 Rust tests and nine host tests, all UNRUN. [The exact pruning and lifetime contract](integration/parity-index/CONTRACT.md) preserves actual prior outcomes and required gates. Full fit and broader fleet acceptance remain unproved.

@@ -1159,6 +1159,7 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
             })
         })?;
         prune_impossible_barriers(face, face_bounds, &mut barriers, b)?;
+        let parity_index = sections::ParityIndex::build(&sections, b)?;
         // Transfer barrier ownership to the arrangement's existing input bound.
         // Its coplanar scope below admits those references for classification.
         b.release(8 * barriers.len() + coplanar.len());
@@ -1170,7 +1171,10 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
                         match local.with_phase_state(
                             BudgetPhase::Occupancy,
                             local.state_values(),
-                            |b| sections.occupied(sample, b),
+                            |b| match &parity_index {
+                                Some(index) => index.occupied(sample, b),
+                                None => sections.occupied(sample, b),
+                            },
                         )? {
                             Some(true) => Ok(false),
                             Some(false) => local.with_phase_state(
@@ -1201,6 +1205,9 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
                 result
             })
         });
+        let parity_members = parity_index.as_ref().map_or(0, |index| index.memberships());
+        drop(parity_index);
+        b.release(parity_members);
         drop(sections);
         b.release(section_members);
         let arrangement = arrangement_result?;

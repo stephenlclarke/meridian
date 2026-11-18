@@ -1,11 +1,13 @@
 """Restore only the proved-visit correction before earlier source proofs."""
 import json
 from pathlib import Path
+from restore_parity_index import restore_parity
 
 CRATE = Path(__file__).resolve().parents[1]
 
 
 def restore_proved(name, source):
+    source = restore_parity(name, source)
     edits = json.loads((CRATE / 'integration/proved-visits/INVERSE-EDITS.json').read_text())
     if name not in edits:
         return source

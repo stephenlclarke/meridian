@@ -1,0 +1,31 @@
+{
+  "status": "AUTHORED_UNRUN",
+  "parentAuthor": "5602aee7fe4074eb75acd8ef92e618e6229f7b80",
+  "qualifiedRoot": "27c9550492fac66f0a4b7432f77797bb1de15ba2",
+  "qualifiedTree": "d4c0831dc33e6f6d43d749e651446feb28b7b5f1",
+  "parentFocused": "58Rust9host/check/Clippy/buildPASS",
+  "actualParentWholeFive": "5decodePASS5OperationsREFUSED15dependentUNRUN0semanticFAIL0candidates0admissions",
+  "correction": "Current-facet per-owner closed interval hierarchy skips geometrically ineligible edge visits; stable charged sort, exact unchanged survivingcrosses, multiplicity and ownerorder preserved. Small owners keep oldscan; no query-value cache.",
+  "storage": "Permanent16+16M+4E+8nodes; sortE+16; buildstack8depth+32; querystack addsoriginal32scratch; alladmitted/droppedbefore release.",
+  "old58AssertionsPreserved": true,
+  "newTests": [
+    {
+      "file": "src/parity_index_tests.rs",
+      "name": "closed_interval_index_preserves_boundary_multiplicity_owner_order_and_total_charged_work",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/parity_index_tests.rs",
+      "name": "interval_index_admits_sort_nodes_and_query_stack_and_rolls_back_each_refusal",
+      "status": "UNRUN"
+    }
+  ],
+  "currentRustCount": 60,
+  "hostCount": 9,
+  "contractSHA256": "ce9fc29fa76788583aa5c4aaf520bf1b2abe2b9ee8999c76fca99ab002f908c8",
+  "frozenSHA256": "862ecf86f1ad1140da70cdaec29947baaa00a65dddbfa3ac72ec2c48d6784258",
+  "inverseSHA256": "cf877540c358a008ca1c225ad3836f1af3b4348b90ccfcbb2625f7b67aeff9b6",
+  "parentHandoffSHA256": "db5ca4d058b1772f1c8b902f632c8089cd0325391beffc5f2a9bfc7a79ccb6f8",
+  "externalRawSHA256": "31426f1d1d0daa2176a092938410a914441fd22994a320ab5639d6c968e881e5",
+  "qualification": "Rootwholejoin/G2review/G1focused thenONEchangedwholefive; no diagnostic or unchanged retry"
+}
