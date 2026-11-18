@@ -1,0 +1,55 @@
+{
+  "reviewedAtUTC": "2026-11-18T14:47:35.762159+00:00",
+  "verdict": "SOURCE_CLEAR_BOUNDED_SECTION_CONTROL_CFG_IMPORT_DELTA;FINDING_CLOSED;WHOLE_GEOMETRY_REVIEW_CARRIED",
+  "head": "93e8151dd3f8277d5d0758cd05ccc44dc52a8724",
+  "tree": "57bde2341d6605ed6d3ee6f66b884aaac7660b25",
+  "immediateParent": "391795d32cdabff629b60256e268e9008a552885",
+  "packet": {
+    "path": "/private/tmp/meridian-root-section-control-review/SOURCE.json",
+    "bytes": 4096,
+    "sha256": "564a04cbdf820d66986c1b3452af5eb0f80c7c206378c1c2b34aa519f68d6372"
+  },
+  "parentWholeReview": {
+    "path": "/private/tmp/g2-meridian-391795d3-separated-sections-whole-source-findings.json",
+    "bytes": 11141,
+    "sha256": "38b47cffd44ad074abab79b068cc4a02b22d8cbe9dd4b0559b8ea7f4fdebff04"
+  },
+  "findings": [],
+  "independentChecks": {
+    "cleanExactHeadTreeImmediateParent": true,
+    "rootGitWorkingSourceTarBytesModes": 604,
+    "changedPaths": 16,
+    "unchangedPaths": 588,
+    "authorCratePinsAndSourceArchive": 465,
+    "all457AuthorParentCrateFilesExactWholeReviewedRoot391": true,
+    "authorManifestPayloadHashes": 7,
+    "completeArchiveMembers": 8,
+    "canonicalRootDeltaVerified": true,
+    "entireSourceFileCfgImportInverseExactBothParentAndFrozenFile": true,
+    "exactPhysicalSectionMethodBodyIncluding48GuardAndAllCharges": true,
+    "otherExistingSrcTestFilesByteExact": 33,
+    "all84OldTestBodiesByteExact": true,
+    "newTestCases": 0,
+    "lintSuppressions": 0
+  },
+  "closure": {
+    "id": "G2-GEOMETRY-SEPARATED-SECTIONS-1",
+    "status": "CLOSED_FROM_SOURCE",
+    "change": "Facet::section has cfg(test); its method-only add/scale imports have the same cfg(test) in a separate import. sub and all other production imports stay in the normal module. Normal library no longer compiles the unreachable method or those unused imports. Test builds retain the exact independent method and bindings.",
+    "preservation": "Independently removed the two cfg gates/import partition and restored the original import line; complete source.rs is byte-identical to whole-reviewed391 and frozen5aa parent. Exact section body,48scratch guard,all operations/coordinate/rational checks and every original test body are preserved. No allow/expect suppression or production mathematical change.",
+    "proofChain": "Read the bounded restore/verify helper and registration changes. Historical source comparisons invert only exact cfg/import metadata before earlier whole-file checks, still require exact frozen parent and old bodies, and do not bypass geometry predicates or assertion checks. Supplied verifier was not executed byG2."
+  },
+  "wholeReviewCarry": {
+    "eligible": true,
+    "scope": "Carry all otherwise clear whole391 separation/kernel/index-withdrawal mathematical,accounting,lifetime,control and prior-actual-evidence review. Only now-test-only control compilation scope/import partition changes; all other compiled Rust sources byte exact. No new whole review required.",
+    "geometry": "Strict certified support positive at all3originalsourcevertices/parallelpositivegap;zero/equality/ownphysical/uncertified eligibility preserved;facet-domain-only occupancy skip;physical/outward independent necessary traversals and source order;exact sign/zero endpoint kernel with all3coordinate checks;96+8actualscratch/performedcosts/rollback;allcontacts,affinefields,stars,witnesses,topology and caps unchanged.",
+    "tests": "All84oldtestbodies including4separated cases,cell prototype,full-facepositive,cornernegative and322/108/120 controls remain byte exact. Current cases remainUNRUN; this is source eligibility,not runtime acceptance."
+  },
+  "executionDecision": "Current source review is CLEAR for existing designatedG1 exact-source lockedcheck,84Rust9host,strictClippy and development original_five build when soleMac lane free. After ALL focused gatesPASS,ONEalready-scoped changed whole-five25body workload under original2Moperations includingdecode/100kstorage/4096-bit coordinateUV/512complete-outputfaces with exact source-lock-binary/input/precleanup-context/monotonic pins. No extra routineACK or broad review gate. Stop on natural first failure/refusal;no unchanged/diagnostic retry.",
+  "limits": [
+    "Compiler,84Rust9host,Clippy/build and currentwholefive remainUNRUN; G2 ran no compiler,Cargo,tests,SUT,geometry/native,suppliedverifier,reviewbot or integrationtesting.",
+    "Actual69focused80/9gatesPASS andfiveOperationsrefusals15dependentUNRUN0candidates remain bound to69,not current93.",
+    "No current fit,speed,minimal-work,admission,native/full-game acceptance claim. Separate202matrix and fleet scope unchanged.",
+    "No humanWIP edits,newchat/agent,merge orpublication."
+  ]
+}

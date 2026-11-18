@@ -6,6 +6,7 @@ import subprocess
 from pathlib import Path
 from restore_section_control import restore_section_control
 from strip_budget_context import body
+from restore_vertex_distances import restore_vertex_distances
 
 CRATE = Path(__file__).resolve().parents[1]
 REPO = CRATE.parents[1]
@@ -35,7 +36,7 @@ def verify():
         if path.endswith('/source.rs'):
             assert restore_section_control('source.rs', after) == original
         else:
-            assert after == original, path
+            assert restore_vertex_distances(Path(path).name, after) == original, path
         for match in re.finditer(r'#\[test\]\s*fn\s+(\w+)\(', original):
             signature = 'fn ' + match[1] + '('
             assert body(after, signature) == body(original, signature), (path, signature)

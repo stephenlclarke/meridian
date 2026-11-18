@@ -1,10 +1,12 @@
 """Restore only the bounded cfg/import metadata on the physical test control."""
 from pathlib import Path
+from restore_vertex_distances import restore_vertex_distances
 
 CRATE = Path(__file__).resolve().parents[1]
 
 
 def restore_section_control(name, source):
+    source = restore_vertex_distances(name, source)
     if name != 'source.rs':
         return source
     test_import = '#[cfg(test)]\nuse crate::exact::{add, scale};\n'

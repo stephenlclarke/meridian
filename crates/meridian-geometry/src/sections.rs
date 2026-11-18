@@ -613,6 +613,110 @@ fn joint_section_source_admitted(
     Ok((physical, false, limiting))
 }
 
+fn joint_section_distances(
+    face: &Facet,
+    other: &Facet,
+    physical: bool,
+    outward: bool,
+    distances: [&crate::Rational; 3],
+    b: &mut Budget,
+) -> Result<JointSection, Failure> {
+    b.with_retained(8, |b| {
+        joint_section_distances_admitted(face, other, physical, outward, distances, b)
+    })
+}
+fn joint_section_distances_admitted(
+    face: &Facet,
+    other: &Facet,
+    physical: bool,
+    outward: bool,
+    distances: [&crate::Rational; 3],
+    b: &mut Budget,
+) -> Result<JointSection, Failure> {
+    if distances.iter().all(|v| v.is_zero()) {
+        let edges = if physical {
+            (0..3)
+                .map(|i| {
+                    [
+                        other.vertices()[i].point.clone(),
+                        other.vertices()[(i + 1) % 3].point.clone(),
+                    ]
+                })
+                .collect()
+        } else {
+            Vec::new()
+        };
+        return Ok((edges, true, None));
+    }
+    b.step(1)?;
+    let signs: [(bool, bool); 3] =
+        std::array::from_fn(|i| (distances[i].is_positive(), distances[i].is_zero()));
+    let uniform = if physical {
+        signs.iter().all(|(positive, _)| *positive)
+            || signs.iter().all(|(positive, zero)| !positive && !zero)
+    } else {
+        signs.iter().all(|(positive, _)| *positive) || signs.iter().all(|(positive, _)| !positive)
+    };
+    if uniform {
+        return Ok((Vec::new(), false, None));
+    }
+    let mut hits = std::collections::BTreeSet::new();
+    let mut limiting = Vec::with_capacity(2);
+    for i in 0..3 {
+        b.step(1)?;
+        let j = (i + 1) % 3;
+        if physical && signs[i].1 {
+            hits.insert(other.vertices()[i].point.clone());
+        }
+        let original_crossing = physical && !signs[i].1 && !signs[j].1 && signs[i].0 != signs[j].0;
+        let outward_crossing = outward && signs[i].0 != signs[j].0;
+        if !original_crossing && !outward_crossing {
+            continue;
+        }
+        let hit = if signs[i].1 {
+            other.vertices()[i].point.clone()
+        } else if signs[j].1 {
+            other.vertices()[j].point.clone()
+        } else {
+            let t = distances[i] / (distances[i] - distances[j]);
+            add(
+                &other.vertices()[i].point,
+                &scale(
+                    &sub(&other.vertices()[j].point, &other.vertices()[i].point),
+                    &t,
+                ),
+            )
+        };
+        point(&hit, b)?;
+        if original_crossing {
+            hits.insert(hit.clone());
+        }
+        if outward_crossing {
+            limiting.push(project(&hit, face.axis()));
+        }
+    }
+    let physical = if physical {
+        b.step(hits.len() as u64)?;
+        match (hits.first(), hits.last()) {
+            (Some(a), Some(c)) => vec![[a.clone(), c.clone()]],
+            _ => Vec::new(),
+        }
+    } else {
+        Vec::new()
+    };
+    let limiting = match limiting.as_slice() {
+        [] => None,
+        [a, c] => Some([a.clone(), c.clone()]),
+        _ => {
+            return Err(b.fail(
+                FailureKind::UncertifiedContact,
+                "one-sided triangle has incomplete section",
+            ));
+        }
+    };
+    Ok((physical, false, limiting))
+}
+
 impl Frame {
     #[cfg(test)]
     pub(super) fn collect<'a>(
@@ -781,6 +885,127 @@ impl Frame {
         Ok((barriers, coplanar, frame))
     }
 
+    pub(super) fn collect_cached<'a>(
+        face: &Facet,
+        finite: &Bounds,
+        source: CachedCollection<'a, '_>,
+        b: &mut Budget,
+    ) -> Result<(Vec<Segment>, Vec<&'a Facet>, Self), Failure> {
+        let entry = b.retained_memberships();
+        let result = b.with_retained(16, |b| {
+            Self::collect_cached_admitted(face, finite, source, b)
+        });
+        if result.is_err() {
+            b.release(b.retained_memberships() - entry);
+        }
+        result
+    }
+    fn collect_cached_admitted<'a>(
+        face: &Facet,
+        finite: &Bounds,
+        source: CachedCollection<'a, '_>,
+        b: &mut Budget,
+    ) -> Result<(Vec<Segment>, Vec<&'a Facet>, Self), Failure> {
+        let originals = source.distances.originals();
+        let owners = source.owners;
+        let index = source.index;
+        let rows = source.rows;
+        let mut plane = source.distances.plane(face, b)?;
+        b.retain(24)?;
+        let mut frame = Self {
+            owners: BTreeMap::new(),
+            members: 24,
+        };
+        for (owner, group) in owners {
+            b.step(1)?;
+            if finite.meets(&group.bounds, b)? && !rows.contains(*owner, b)? {
+                log_cost(frame.owners.len(), b)?;
+                b.retain(6)?;
+                frame.members += 6;
+                frame.owners.insert(*owner, Vec::new());
+            }
+        }
+        let mut barriers = Vec::new();
+        let mut coplanar = Vec::new();
+        b.state([
+            frame.members,
+            frame.owners.len(),
+            barriers.len(),
+            coplanar.len(),
+            originals.len(),
+            0,
+            0,
+            0,
+        ]);
+        b.with_retained(3 * originals.len(), |b| {
+            let candidates = if frame.owners.is_empty() {
+                // No owner needs an outward section. Use the unchanged finite
+                // traversal, retaining its ordinal vector through conversion.
+                b.with_retained(originals.len(), |b| {
+                    index
+                        .candidates(finite, b)?
+                        .into_iter()
+                        .map(|ordinal| {
+                            b.step(1)?;
+                            Ok((ordinal, true, false))
+                        })
+                        .collect::<Result<Vec<_>, Failure>>()
+                })?
+            } else {
+                index.collection_candidates(face, finite, &frame.owners, originals, b)?
+            };
+            for (ordinal, physical, outward) in candidates {
+                b.state([
+                    frame.members,
+                    frame.owners.len(),
+                    barriers.len(),
+                    coplanar.len(),
+                    originals.len(),
+                    ordinal,
+                    96,
+                    0,
+                ]);
+                b.step(1)?;
+                let other = &originals[ordinal];
+                // This exact triangle is entirely on its own source plane and
+                // contributes neither a physical cut nor an outward section.
+                if face.id() == other.id() {
+                    continue;
+                }
+                b.with_retained(96, |b| {
+                    let (segments, same_plane, limiting) =
+                        plane.section(ordinal, physical, outward, b)?;
+                    b.retain(8 * segments.len())?;
+                    barriers.extend(
+                        segments
+                            .into_iter()
+                            .map(|[a, c]| [project(&a, face.axis()), project(&c, face.axis())]),
+                    );
+                    if physical
+                        && same_plane
+                        && crate::exact::dot(face.normal(), other.normal()) > integer(0)
+                    {
+                        b.step(1)?;
+                        b.retain(1)?;
+                        coplanar.push(other);
+                    }
+                    if let Some(segment) = limiting {
+                        log_cost(frame.owners.len(), b)?;
+                        let edges =
+                            frame.owners.get_mut(&other.id().component).ok_or_else(|| {
+                                b.fail(FailureKind::UncertifiedContact, "section owner missing")
+                            })?;
+                        b.retain(7)?;
+                        frame.members += 7;
+                        edges.push(segment);
+                    }
+                    Ok(())
+                })?;
+            }
+            Ok(())
+        })?;
+        Ok((barriers, coplanar, frame))
+    }
     pub(super) fn collect_separating<'a>(
         face: &Facet,
         finite: &Bounds,
@@ -1751,3 +1976,14 @@ pub(super) use parity_index::ParityIndex;
 
 #[path = "section_filters.rs"]
 mod section_filters;
+
+#[path = "vertex_distances.rs"]
+mod vertex_distances;
+pub(super) use vertex_distances::VertexDistances;
+
+pub(super) struct CachedCollection<'a, 'b> {
+    pub owners: &'b BTreeMap<u32, ComponentBounds>,
+    pub index: &'b FacetBoundsIndex,
+    pub rows: &'b super::convex_sections::Rows,
+    pub distances: &'b mut VertexDistances<'a>,
+}

@@ -1,0 +1,49 @@
+{
+  "status": "AUTHORED_UNRUN_EXACT_PER_SOURCE_PLANE_VERTEX_DISTANCES",
+  "parentAuthor": "692d43dc5c513df07d619d574a4db5efaafe8e2e",
+  "actualParentRoot": "93e8151dd3f8277d5d0758cd05ccc44dc52a8724",
+  "all84OldBodiesUnchanged": true,
+  "currentRustCount": 88,
+  "hostCount": 9,
+  "changes": [
+    "At N >= 256, reuse distances at exact original points within one exclusive original-source-plane generation; retain original rows/collector semantics instead of finite-gap owner support pass.",
+    "Below 256, keep qualified finite-gap path; keep contiguous index, interior certificate and all independent controls.",
+    "Admit and charge map construction, point IDs, value slots, lazy generation resets, misses and context scratch. Drop cache before global point packing."
+  ],
+  "newTests": [
+    {
+      "file": "src/vertex_distance_tests.rs",
+      "name": "vertex_distance_cache_matches_complete_section_queries_and_charges_build_and_generations",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/vertex_distance_tests.rs",
+      "name": "vertex_distance_frames_never_reuse_other_plane_answers_and_keep_coordinate_refusals",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/vertex_distance_tests.rs",
+      "name": "vertex_distance_constructor_and_plane_queries_keep_exact_storage_and_operation_rollback",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/vertex_distance_tests.rs",
+      "name": "cached_original_vertex_distances_preserve_full_publisher_fields_witnesses_and_volume",
+      "status": "UNRUN"
+    }
+  ],
+  "currentExecution": "UNRUN; no author compiler/geometry/probe/native",
+  "limits": {
+    "operationsIncludingDecode": 2000000,
+    "storageMemberships": 100000,
+    "rationalBits": 4096,
+    "completeOutputTriangles": 512
+  },
+  "newAdmissions": 0,
+  "contractSHA256": "4c961b905affc243e49ba739040eb50b6468630e55990b23e73d8205a84e2223",
+  "custodySHA256": "13b5b56151e982b10bb3e43e691c2327c069916e5041b7366bed1ed28dbc6312",
+  "freezeSHA256": "82e65485214fe88c3c8c43e522ccb7de7f809b603b6955214b60275ad3324786",
+  "inverseSHA256": "44a25169a286677d79fa3f81209ea7f4deb43fd2df571b2d42953ce307694091",
+  "parentReviewSHA256": "405c58ec270a1e56226563a3c221ef2010eda895f73fc2d3a412c9c6c8090280",
+  "qualification": "Root successor since 692d only; one G2 whole/relevant delta review; existing G1 changed 88/9/check/strict Clippy/build, then one changed whole-five only after ALL PASS and sole lane available. No unchanged diagnostic batch."
+}

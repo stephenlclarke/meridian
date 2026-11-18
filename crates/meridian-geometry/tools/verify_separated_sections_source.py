@@ -7,6 +7,7 @@ from pathlib import Path
 from restore_separated_sections import restore_separated
 from strip_budget_context import body
 from restore_section_control import restore_section_control
+from restore_vertex_distances import restore_vertex_distances
 
 CRATE = Path(__file__).resolve().parents[1]
 REPO = CRATE.parents[1]
@@ -30,7 +31,7 @@ def verify():
     raw = body(before, 'fn reconstruct_records(') + '\n'
     assert (f / 'publisher-control.rs.txt').read_text() == raw
     assert (f / 'compiled-publisher-control.rs').read_text() == raw.replace('fn reconstruct_records(', 'fn reference_separated_section_publisher(', 1)
-    current = (CRATE / 'src/certificate.rs').read_text()
+    current = restore_vertex_distances('certificate.rs', (CRATE / 'src/certificate.rs').read_text())
     main = body(current, 'fn reconstruct_records(')
     assert 'build_cells(' not in main and 'cell_memberships(' not in main
     expected = body(before, 'fn reconstruct_records(').replace('FacetBoundsIndex::cell_memberships(', 'FacetBoundsIndex::memberships(', 1).replace('FacetBoundsIndex::build_cells(', 'FacetBoundsIndex::build(', 1)

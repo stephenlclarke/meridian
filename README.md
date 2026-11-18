@@ -1,14 +1,12 @@
 # Meridian
 
-## Finite section separation: source only
+## Exact vertex-distance reuse: source only
 
-The actual `69e10cb` candidate passed 80 Rust tests, nine host tests, all-target check, strict Clippy and development build. Its one changed original-five run still returned five Operations constructor refusals, fifteen dependent checks unrun and zero candidates. The cell grouping added work and reached earlier source guards; it is withdrawn from production. Its complete implementation and all 80 prior test bodies remain available as test controls.
+The actual `93e8151` candidate passed 84 Rust tests, nine host tests, all-target check, strict Clippy and development build. Its one changed original-five run returned five Operations constructor refusals, fifteen dependent checks unrun and zero candidates. No useful original-model improvement was established by the finite-gap pass. All original limits remain; failed prefixes do not establish minimum work, complete fit or completed-original speed.
 
-The successor restores the contiguous index. It skips foreign finite sections only when an original certified support proves strict separation across all three original source vertices. Equality, contacts and uncertified owners retain the applicable original path. A joint section kernel avoids empty edge walks, rational sign products and interpolation at an existing endpoint while preserving every coordinate check. All new proof, lookup, classification and scratch costs are charged. Original independent collectors, arbitrary-sample occupancy, publisher references and all limits remain.
+The successor reuses exact distances at shared original XYZ vertices within one active original-source-plane generation for meshes with at least 256 facets. Each new source facet invalidates older values. Original source ordinals, winding, style, UVs and emitted fields remain separate. It caches no ray, sample or occupancy answers. The large path uses the original row and physical collector with distance-context wiring; smaller inputs retain the qualified finite-gap path. Cell grouping stays test-only. Map construction, lookup, invalidation, scalar storage, scratch and misses are charged.
 
-Four new cases cover signed section patterns, finite separation and equality contacts, complete publisher geometry and witnesses with affine fields and analytic volume, and exact/one-short work, storage and rational guards. Current 84 Rust tests, nine host tests, compiler checks and changed original-five execution are **UNRUN**, pending independent review and owning validation. No new admission, minimum work, complete fit or measured original-model improvement is claimed.
-
-Whole-source review cleared the geometry and accounting but found an old test control still compiled in production. The bounded correction puts the unchanged `Facet::section` method and its method-only imports under `cfg(test)`. A whole-file inverse and all 84 unchanged test bodies provide source preservation evidence; compiler and runtime validation remain unrun.
+All 84 prior test bodies and independent publisher controls remain unchanged. Four new cases cover complete repeated plane batches and charged setup, generation and coordinate refusal, exact/one-short resources and rollback, and complete 256-facet multi-owner geometry, witnesses, affine fields and analytic volume. Current 88 Rust tests, nine host tests, compiler checks and changed original-five execution are **UNRUN**, pending independent review and owning validation. No new admission, original-input benefit, cap fit, minimum or speed claim is made.
 
 The following sections retain earlier source-stage context. The current execution status is stated above.
 

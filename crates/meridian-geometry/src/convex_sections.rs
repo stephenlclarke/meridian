@@ -19,7 +19,6 @@ pub(super) struct Rows {
     members: usize,
 }
 impl Rows {
-    #[cfg(test)]
     pub(super) fn build(
         face: &Facet,
         finite: &Bounds,
@@ -33,7 +32,6 @@ impl Rows {
         }
         result
     }
-    #[cfg(test)]
     fn build_admitted(
         face: &Facet,
         finite: &Bounds,
@@ -350,7 +348,6 @@ impl Rows {
     }
     // Every value is computed for this sample. Only exact source-plane geometry
     // is retained; no occupancy, intersection or ray answer is cached.
-    #[cfg(test)]
     pub(super) fn occupied(
         &self,
         sample: &Point2,

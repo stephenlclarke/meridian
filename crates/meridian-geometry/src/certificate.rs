@@ -458,7 +458,6 @@ impl FacetBoundsIndex {
         Ok(node)
     }
     // The caller retains up to one candidate ordinal per original facet.
-    #[cfg(test)]
     fn candidates(&self, query: &Bounds, b: &mut Budget) -> Result<Vec<usize>, Failure> {
         b.with_retained(Self::stack_members(self.facets.len()), |b| {
             let mut pending = vec![self.root];
@@ -1136,6 +1135,10 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
         build_plane_groups(originals, &owner_bounds, b)
     })?;
     let plane_members = plane_groups.as_ref().map_or(0, PlaneGroups::memberships);
+    let mut vertex_distances = b.with_phase(BudgetPhase::Index, |b| {
+        sections::VertexDistances::build(originals, b)
+    })?;
+    let reuse_vertices = vertex_distances.is_some();
     let mut ray_caches = RayCaches::new(b)?;
     let mut occupancy_index = OccupancyIndex {
         spatial: &facet_bounds,
@@ -1161,11 +1164,25 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
         if area(&domain, b)?.is_negative() {
             domain.reverse();
         }
-        let rows =
-            convex_sections::Rows::build_separating(face, face_bounds, interior.as_ref(), b)?;
+        let rows = if reuse_vertices {
+            convex_sections::Rows::build(face, face_bounds, interior.as_ref(), b)?
+        } else {
+            convex_sections::Rows::build_separating(face, face_bounds, interior.as_ref(), b)?
+        };
         let (mut barriers, coplanar, sections) = b.with_phase(BudgetPhase::Sections, |b| {
-            b.with_retained(16, |local| {
-                sections::Frame::collect_separating(
+            b.with_retained(16, |local| match vertex_distances.as_mut() {
+                Some(distances) => sections::Frame::collect_cached(
+                    face,
+                    face_bounds,
+                    sections::CachedCollection {
+                        owners: &owner_bounds,
+                        index: &facet_bounds,
+                        rows: &rows,
+                        distances,
+                    },
+                    local,
+                ),
+                None => sections::Frame::collect_separating(
                     face,
                     face_bounds,
                     originals,
@@ -1173,7 +1190,7 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
                     &facet_bounds,
                     &rows,
                     local,
-                )
+                ),
             })
         })?;
         prune_impossible_barriers(face, face_bounds, &mut barriers, b)?;
@@ -1189,7 +1206,11 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
                         match local.with_phase_state(
                             BudgetPhase::Occupancy,
                             local.state_values(),
-                            |b| match rows.occupied_facet(sample, b)? {
+                            |b| match if reuse_vertices {
+                                rows.occupied(sample, b)?
+                            } else {
+                                rows.occupied_facet(sample, b)?
+                            } {
                                 Some(false) => match &parity_index {
                                     Some(index) => index.occupied(sample, b),
                                     None => sections.occupied(sample, b),
@@ -1263,6 +1284,11 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
         held += region.memberships();
         regions.push((face, region));
     }
+    let vertex_members = vertex_distances
+        .as_ref()
+        .map_or(0, |cache| cache.memberships());
+    drop(vertex_distances);
+    b.release(vertex_members);
     let interior_members = interior
         .as_ref()
         .map_or(0, |certificates| certificates.memberships());
@@ -2372,3 +2398,7 @@ mod cell_index_tests;
 #[cfg(test)]
 #[path = "separated_section_tests.rs"]
 mod separated_section_tests;
+
+#[cfg(test)]
+#[path = "vertex_distance_tests.rs"]
+mod vertex_distance_tests;
