@@ -22,9 +22,15 @@ read-only saved state and the short Help hint. No cases or core code change.
 Corrected compiler/tests/Clippy/native results are **UNRUN** pending Root/G2 review
 and changed owner execution. Navigation/trade and native setup packets stay sealed.
 
+## Latest current-main and compact-HUD binding
+
+PR 53 merged the importer method-reference correction at `792f4485372ae37d0c1d583ae11229e85932ce2f` at 08:41:08 UTC after all required final-head checks passed. The Mac ran 32 fresh importer cases in release mode; Linux and native Windows each ran 32 fresh cases plus one separately counted release consumer repeat. Current checks, strict Clippy, importer releases and actual CLI/reference verification passed on all three. Its exact-main CI and Sonar analysis remain pending at this observation. This is independent of the game failures below.
+
+The compact-HUD correction changes only Session presentation and host checks since `2de5f2d`. The complete 431-case core and two compatibility cases are byte-unchanged from their actual passing runs on all three machines. Proposed qualification carries only those 433 passed cases with exact source proof, then freshly executes all 244 desktop cases (including both failures), 32 importer cases and three observer cases: 279 fresh plus 433 carried equals 712 covered cases, not a fresh full 712-case run. Current formatting, 52 Markdown files, Python tools, all-target check, strict Clippy and game/CLI builds remain required. Native work remains pending until these gates pass. No failed desktop case is carried from old source.
+
 ## Current importer main and method-reference correction
 
-PR 52 merged at `22715d60604acc57ac6acad99e3be54a6085a618` on 18 November 2026 at 08:05:11 UTC. All six main CI jobs passed. Sonar analysis `f8a537d8-bfc3-4d91-a59a-f13f7129d286` uses that exact revision and project version; its quality gate passed, with one unresolved `rust:S1612` finding in the CLI subcommand parser. The candidate replaces the one closure with the same `OsStr::to_str` method reference. All existing code and test assertions otherwise remain unchanged. The changed-source designated compile, strict Clippy, 32 importer cases and actual CLI qualification are pending; the original current-main result and earlier failure evidence remain attributed to their exact sources. This does not change the published Preview 8.
+PR 52 merged at `22715d60604acc57ac6acad99e3be54a6085a618` on 18 November 2026 at 08:05:11 UTC. All six main CI jobs passed. Sonar analysis `f8a537d8-bfc3-4d91-a59a-f13f7129d286` uses that exact revision and project version; its quality gate passed, with one unresolved `rust:S1612` finding in the CLI subcommand parser. The candidate replaces the one closure with the same `OsStr::to_str` method reference. All existing code and test assertions otherwise remain unchanged. The separate changed-source designated compile, strict Clippy, 32 importer cases and actual CLI qualification have since passed as recorded above; the original main result and earlier failure evidence remain attributed to their exact sources. This does not change the published Preview 8.
 
 ## Current-main composition for the corrected laser/ECM candidate
 
