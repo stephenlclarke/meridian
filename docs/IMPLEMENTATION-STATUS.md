@@ -1,5 +1,25 @@
 # Implementation and validation status
 
+## Source-derived laser geometry pilot correction
+
+Actual Mac `ba8dc70bb6d7d0ddb8070869f4594d8bdb8b2174`, tree
+`1ed634e72c30937d00880492c1fd3591f34bee86`, passed compilation, formatting,
+99 Python cases and 52 Markdown files, then reported 428/431 core passes.
+All 15 earlier cases executed: 12 now pass and three reach later geometry/flight
+assertions. No StaleOccupant or InvalidEncoding remains in that report. The new
+rear-hit archived retry/cold case passes. Compatibility, desktop, importer,
+observer, Clippy, releases, helper and native acceptance remain unrun there.
+
+The [three-pilot correction](LASER-FACINGS.md#source-derived-geometry-pilot-correction)
+changes only the failed setups: controlled braking inside a source trim strip,
+a ray through a genuine source back-wall edge, and a wrapped bounded quarter-turn
+while a real finite missile stays in flight. Independent original mesh arithmetic
+pins the geometry; every original contact, endpoint tolerance, shield, custody,
+finite-missile and P2 corruption assertion remains. Production/asset/content/lock
+and native helper bytes stay unchanged. Corrected Rust/native execution remains
+**UNRUN**, with 431 core attributes unchanged. Root owns complete changed-source
+review and existing platform owners own qualification; no new pass/preview claim.
+
 ## Joined laser/ECM runtime correction candidate
 
 Exact Mac `3553ea5b5f99ca261ed472513c8b79afe28d1dcf`, tree

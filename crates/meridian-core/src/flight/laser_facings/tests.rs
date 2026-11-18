@@ -238,7 +238,9 @@ fn all_three_nonfront_commands_hit_original_station_wall_and_cold_replay_keeps_b
         paid(&mut w, facing);
     }
     launch(&mut w);
-    crate::flight::missiles::tests::fly_axis(&mut w, 0, 70.0, 1.0);
+    // Center of original SH028 native trim quad 482/483, not the braking waypoint.
+    // At speed1 the old threshold pilot coasted ~0.8445m while braking, beyond x70.12.
+    crate::flight::missiles::tests::fly_axis(&mut w, 0, (68.12 + 70.12) / 2.0, 0.25);
     for (facing, x, z) in [
         (LaserFacing::Left, -10000.0, 0.0),
         (LaserFacing::Right, 10000.0, 0.0),
@@ -246,12 +248,25 @@ fn all_three_nonfront_commands_hit_original_station_wall_and_cold_replay_keeps_b
     ] {
         turn(&mut w, x, z);
         let body = w.snapshot();
+        let ray = facing.ray(some(crate::flight::flight_pose(
+            body.position,
+            body.orientation,
+        )));
+        // Independent source quad: x68.12..70.12, y+-48.384, z136.32.
+        let distance = (136.32 - ray.position.z) / ray.orientation.z.z;
+        let wall_x = ray.position.x + distance * ray.orientation.z.x;
+        let wall_y = ray.position.y + distance * ray.orientation.z.y;
+        assert!(distance > 0.0 && distance < crate::PULSE_RANGE);
+        assert!(
+            (68.12..70.12).contains(&wall_x) && wall_y.abs() < 48.384,
+            "real ray must cross the independently pinned native front trim: {ray:?}"
+        );
         let shot = ok(w.request_fire_laser(facing, body.tick));
         assert!(matches!(shot.contact, PulseContact::StationBlocked { .. }));
         assert!(shot.direction.z < -0.999999);
         assert!(
             (shot.end.z - 136.32).abs() < 1e-6,
-            "independent original SH028 wall plane"
+            "independent original SH028 wall plane; ray={ray:?} shot={shot:?}"
         );
         let hit = some(some(w.combat_snapshot()).last_ordinary_impact);
         assert_eq!(hit.item, some(w.laser_snapshot(facing)).fitted_item_id);
@@ -287,14 +302,40 @@ fn rear_station_occlusion_does_not_award_the_real_practice_target_behind_the_wal
     let target = some(some(w.practice_snapshot()).beacons)[2].pose.position;
     crate::flight::missiles::tests::fly_axis(&mut w, 0, 1000.0, 4.0);
     crate::flight::missiles::tests::fly_axis(&mut w, 2, -1000.0, 4.0);
-    crate::flight::missiles::tests::fly_axis(&mut w, 0, 90.0, 4.0);
+    // Source faces384/387 share y0 edge (105.632,0,-112)..(96.8,0,-76.16).
+    // Aim through its midpoint; the old speed4 brake overshot x90 by ~15m into a real opening.
+    let wall = Vec3::new((105.632 + 96.8) / 2.0, 0.0, (-112.0 - 76.16) / 2.0);
+    let z = f64::from(w.snapshot().position[2]);
+    let x = wall.x + (target.x - wall.x) * (z - wall.z) / (target.z - wall.z);
+    crate::flight::missiles::tests::fly_axis(&mut w, 0, x, 0.25);
     let p = w.snapshot().position.map(f64::from);
     crate::flight::practice::tests::aim_at(
         &mut w,
         Vec3::new(2.0 * p[0] - target.x, p[1], 2.0 * p[2] - target.z),
     );
-    let shot = ok(w.request_fire_laser(LaserFacing::Rear, w.snapshot().tick));
-    assert!(matches!(shot.contact, PulseContact::StationBlocked { .. }));
+    let snapshot = w.snapshot();
+    let ray = LaserFacing::Rear.ray(some(crate::flight::flight_pose(
+        snapshot.position,
+        snapshot.orientation,
+    )));
+    // Independent plane through that source edge: 35.84(x-105.632)+8.832(z+112)=0.
+    let d = ray.orientation.z;
+    let wall_distance = -(35.84 * (ray.position.x - 105.632) + 8.832 * (ray.position.z + 112.0))
+        / (35.84 * d.x + 8.832 * d.z);
+    let wall_z = ray.position.z + wall_distance * d.z;
+    assert!(
+        wall_distance > 0.0 && (-112.0..-76.16).contains(&wall_z),
+        "source back-wall crossing: {ray:?}"
+    );
+    let target_distance = (target.z - ray.position.z) / d.z;
+    assert!(wall_distance < target_distance && target_distance < crate::PULSE_RANGE);
+    assert!((ray.position.x + target_distance * d.x - target.x).abs() < crate::PRACTICE_HALF_SIDE);
+    assert!((ray.position.y + target_distance * d.y - target.y).abs() < crate::PRACTICE_HALF_SIDE);
+    let shot = ok(w.request_fire_laser(LaserFacing::Rear, snapshot.tick));
+    assert!(
+        matches!(shot.contact, PulseContact::StationBlocked { .. }),
+        "source back wall must occlude actual beacon: {shot:?}"
+    );
     assert_eq!(some(w.practice_snapshot()).first_hits, 0);
     cold(&w);
 }
