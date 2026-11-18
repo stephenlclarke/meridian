@@ -1,7 +1,10 @@
 //! Controlled SH001 source scenario. This is not an ambient actor or acquisition path.
 use super::{NpcId, NpcPhase, NpcSnapshot, Population};
 use crate::docking::{RigidPose, Vec3};
-use crate::mule::{MULE_CONTRACT_SHA256, MULE_RESOURCE_SHA256, MuleHullSource, MulePresentation};
+use crate::mule::{
+    MULE_CONTRACT_SHA256, MULE_MAX_SPEED_UNITS, MULE_RESOURCE_SHA256, MuleHullSource,
+    MulePresentation,
+};
 use crate::navigation::SystemId;
 use crate::station::{DISTANCE_PER_SPEED_UNIT, OriginalStationData};
 use std::sync::{Arc, Weak};
@@ -62,10 +65,10 @@ impl State {
         seed: u64,
         source: MuleHullSource,
         pose: RigidPose,
-        speed_units: f64,
+        speed_units: f32,
         approaching: bool,
     ) -> Result<Self, crate::station::StationError> {
-        if seed == 0 || !speed_units.is_finite() || !(0.0..=33.2).contains(&speed_units) {
+        if seed == 0 || !(0.0..=MULE_MAX_SPEED_UNITS).contains(&speed_units) {
             return Err(crate::station::StationError::InvalidPose);
         }
         let presentation = Arc::new(
@@ -85,7 +88,8 @@ impl State {
                 population: Population::Trader,
                 hull_id: "SH001",
                 pose,
-                speed_units,
+                // Widen only after validating the source-domain value.
+                speed_units: f64::from(speed_units),
                 phase: if approaching {
                     NpcPhase::Approach
                 } else {

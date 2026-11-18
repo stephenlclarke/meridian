@@ -101,11 +101,15 @@ def verify():
     plus = [line for line in patch.decode().splitlines() if line.startswith('+') and not line.startswith('+++')]
     assert plus == ['+pub mod mule;', '+mod mule;']
     criteria = json.loads((ROOT / 'integration/sh001-mule/CRITERIA.json').read_text())
+    speed_contract = tomllib.loads((folder / 'contract.toml').read_text())['performance']['maxSpeed']
+    speed_source = (ROOT / 'crates/meridian-core/src/mule.rs').read_text()
+    speed_constant = re.search(r'const MULE_MAX_SPEED_UNITS: f32 = ([0-9.]+);', speed_source)
+    assert speed_constant and float(speed_constant[1]) == speed_contract
     names = re.findall(r'#\[test\]\s*fn\s+(\w+)\(', (ROOT / 'crates/meridian-core/src/mule/tests.rs').read_text())
     assert len(names) == 11 and names == [test['name'] for test in criteria['newCoreTests']]
     assert all(test['status'] == 'UNRUN' for test in criteria['newCoreTests'])
     world_names = re.findall(r'#\[test\]\s*fn\s+(\w+)\(', (ROOT / 'crates/meridian-core/src/flight/mule_validation/tests.rs').read_text())
-    assert len(world_names) == 5 and world_names == [test['name'] for test in criteria['worldCoreTests']]
+    assert len(world_names) == 6 and world_names == [test['name'] for test in criteria['worldCoreTests']]
     assert all(test['status'] == 'UNRUN' for test in criteria['worldCoreTests'])
     tightness = (ROOT / 'crates/meridian-core/src/mule/tightness_tests.rs').read_text()
     tightness_names = re.findall(r'#\[test\]\s*fn\s+(\w+)\(', tightness)
@@ -121,7 +125,7 @@ def verify():
     assert sha(world_patch) == world_binding['canonicalPatch']['sha256']
     assert len(world_binding['currentRootCoreFiles']) == 135
     assert len(world_binding['modifiedCurrentFiles']) == 3
-    print(json.dumps({'status': 'PASS_SOURCE_ONLY', 'existingGameplayCoreFilesUnchanged': 127, 'ordinaryWorldTestInitializerAdapted': 1, 'minimalWorldAdaptedCoreFiles': 3, 'currentGameplayCorePins': 131, 'newCoreTests': 11, 'worldCoreTests': 5, 'tightnessCoreTests': 5, 'totalMuleCoreTests': 21, 'vertexEncoding': 5344, 'triangleEncoding': 9008, 'constructorsOrContactOrContainmentOrCompilerExecuted': False}))
+    print(json.dumps({'status': 'PASS_SOURCE_ONLY', 'existingGameplayCoreFilesUnchanged': 127, 'ordinaryWorldTestInitializerAdapted': 1, 'minimalWorldAdaptedCoreFiles': 3, 'currentGameplayCorePins': 131, 'newCoreTests': 11, 'worldCoreTests': 6, 'tightnessCoreTests': 5, 'totalMuleCoreTests': 22, 'vertexEncoding': 5344, 'triangleEncoding': 9008, 'constructorsOrContactOrContainmentOrCompilerExecuted': False}))
 
 
 if __name__ == '__main__':

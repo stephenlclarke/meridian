@@ -164,11 +164,16 @@
     },
     {
       "file": "crates/meridian-core/src/flight/mule_validation/tests.rs",
+      "name": "mule_docking_accepts_the_source_speed_cap_and_rejects_the_next_f32",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/flight/mule_validation/tests.rs",
       "name": "mule_world_docking_accepts_aligned_crossing_and_refuses_speed_and_wall_contact",
       "status": "UNRUN"
     }
   ],
-  "totalMuleCoreTests": 21,
+  "totalMuleCoreTests": 22,
   "controlledWorldScenario": {
     "status": "AUTHORED_UNRUN;NOT_ORDINARY_HULL_ADMISSION",
     "base": "af97ee6bbba60b2d492216ad12035a90e9dde34e",
@@ -300,6 +305,14 @@
     "authority": "Controlled fixed SH028 station, one World-owned inbound SH001 with exact same SmoothPiece data as its scope-bound render snapshot. Test follows real fixed World ticks through approach, physical entry, fast rejection and sidewall stop.",
     "cost": "Measure agreed Mac release configuration. Keep all MULE_WORLD_DOCK_COST rows for actual step durations including each terminal. Compare p95 against the existing 60 Hz simulation frame interval, report terminal cost independently. Keep native renderer frame timing with the same source and camera setting as a separate measurement.",
     "scope": "Physical crossing gate and terminal controlled NPC state. No actual station rotation in bundled source. Ordinary population, player purchase, effects and current save remain outside this controlled scenario.",
-    "native": "Root/G1 owns native and compiler execution. Coordinate with existing G3 adapter for inbound capture."
+    "native": "Root/G1 owns native and compiler execution. Coordinate with existing G3 adapter for inbound capture.",
+    "launchSpeedBoundaryCorrection": {
+      "actualFailure": "5075d94 Mac core 451 passed / 1 failed. Aligned and overspeed cases emitted costs. The sidewall constructor failed before its first tick.",
+      "cause": "The immutable cap is 33.2 FlightStart speed units. It is representable at the f32 boundary as 33.20000076293945 when widened. State rejected that value against a distinct f64 literal.",
+      "change": "Validate both constructor stages against the same source-derived f32 cap. Widen to f64 after validation for snapshots and motion arithmetic. The physical docking gate remains strictly below 144 m/s.",
+      "test": "The original 33.2 sidewall case remains. The separate targeted test requires exact widened storage at advertised f32 cap and InvalidPose for the immediate successor with identical placement.",
+      "actualHandoffSHA256": "5b3720bb89b26617b3a8abdf1b23756b2d2ad166f24c6c0005eefa24bf01a636",
+      "status": "SOURCE_ONLY_UNRUN"
+    }
   }
 }

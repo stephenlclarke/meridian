@@ -212,6 +212,28 @@ fn inbound(x: f32, speed: f32) -> FlightStart {
 }
 
 #[test]
+fn mule_docking_accepts_the_source_speed_cap_and_rejects_the_next_f32()
+-> Result<(), Box<dyn std::error::Error>> {
+    // Literal from the immutable SH001 performance contract, held independent of
+    // the production constant so a cap change cannot move this boundary fixture.
+    let advertised_cap = 33.2_f32;
+    let approach = inbound(0.0, advertised_cap);
+    let world = World::mule_docking_validation_scenario(733, observer(), approach)?;
+    let frame = world.mule_actor_snapshot().ok_or(StepError::InvalidMode)?;
+    assert_eq!(frame.actor().speed_units, f64::from(advertised_cap));
+
+    let too_fast = FlightStart {
+        speed: advertised_cap.next_up(),
+        ..approach
+    };
+    assert!(matches!(
+        World::mule_docking_validation_scenario(733, observer(), too_fast),
+        Err(StationError::InvalidPose)
+    ));
+    Ok(())
+}
+
+#[test]
 fn mule_world_docking_accepts_aligned_crossing_and_refuses_speed_and_wall_contact()
 -> Result<(), Box<dyn std::error::Error>> {
     use crate::traffic::NpcPhase;

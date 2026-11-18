@@ -17,6 +17,8 @@ pub const MULE_CONTRACT_SHA256: &str =
 pub const MULE_DETAILED_VERTICES: usize = 4360;
 pub const MULE_NATIVE_VERTICES: usize = 984;
 pub const MULE_CLEARANCE_METRES: f64 = 0.02;
+/// The bundled SH001 contract's performance.maxSpeed, in FlightStart speed units.
+pub(crate) const MULE_MAX_SPEED_UNITS: f32 = 33.2;
 pub const MULE_MAX_SHIMMER_OPACITY: f32 = 0.018;
 pub const MULE_SHIMMER_NEAR_METRES: f32 = 32.0;
 pub const MULE_SHIMMER_FAR_METRES: f32 = 64.0;

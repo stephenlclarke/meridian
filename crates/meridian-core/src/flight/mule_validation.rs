@@ -1,6 +1,6 @@
 //! Explicit source validation World; no normal population, commander or save entitlement.
 use super::{FlightInput, FlightStart, StepError, World, flight_pose};
-use crate::mule::MuleHullSource;
+use crate::mule::{MULE_MAX_SPEED_UNITS, MuleHullSource};
 use crate::station::StationError;
 use crate::traffic::{MuleActorSnapshot, mule_validation::State};
 
@@ -49,7 +49,7 @@ impl World {
             let norm = start.orientation.iter().map(|v| v * v).sum::<f32>();
             // Keep the entire inbound hull outside the opening plane initially.
             // Maximum origin radius bounds rearward extent under any valid rotation.
-            if !(0.0..=33.2).contains(&start.speed)
+            if !(0.0..=MULE_MAX_SPEED_UNITS).contains(&start.speed)
                 || start.speed <= 0.0
                 || !norm.is_finite()
                 || (norm - 1.0).abs() > 1e-5
@@ -80,7 +80,7 @@ impl World {
             seed,
             source,
             pose,
-            f64::from(start.speed),
+            start.speed,
             approach.is_some(),
         )?);
         Ok(world)
