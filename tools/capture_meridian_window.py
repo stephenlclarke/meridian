@@ -62,9 +62,10 @@ def select_window(windows: object, scope: dict) -> dict:
         require(isinstance(window, dict), "invalid window metadata")
         require(window.get("pid") == scope["pid"] and window.get("bundle_id") == BUNDLE, "window owner mismatch")
         require(integer(window.get("window_id"), 1, 2**32 - 1), "invalid CGWindowID; pointer IDs forbidden")
-    candidates = [w for w in windows if w.get("on_screen") is True and w.get("active") is True and type(w.get("window_layer")) is int and w["window_layer"] == 0]
+    candidates = [w for w in windows if w.get("on_screen") is True and type(w.get("window_layer")) is int and w["window_layer"] == 0]
     require(len(candidates) == 1, "missing or ambiguous visible normal target window")
     chosen = candidates[0]
+    require(chosen.get("active") is True, "sole visible normal target window is inactive")
     require(same_bounds(chosen.get("bounds"), scope["bounds"]), "reviewed window bounds mismatch")
     require(chosen.get("fully_on_one_display") is True and chosen.get("covers_display") is False, "offscreen/fullscreen window rejected")
     return chosen

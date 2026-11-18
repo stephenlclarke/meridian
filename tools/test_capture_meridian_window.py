@@ -67,7 +67,9 @@ class PolicyFixtures(unittest.TestCase):
         self.assertEqual(capture.select_window([other, window()], self.scope)["window_id"], 91)
 
     def test_ambiguous_missing_foreign_hidden_minimized_or_fullscreen_reject(self):
-        cases = [[], [window(),window()]]
+        inactive_second = window()
+        inactive_second["active"] = False
+        cases = [[], [window(),window()], [window(),inactive_second]]
         for key, value in [("pid",12346),("bundle_id","other.app"),("on_screen",False),("active",False),("window_layer",1),("fully_on_one_display",False),("covers_display",True)]:
             candidate=window();candidate[key]=value;cases.append([candidate])
         for entries in cases:

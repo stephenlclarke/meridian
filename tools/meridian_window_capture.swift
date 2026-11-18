@@ -103,10 +103,10 @@ private struct NativeProvider {
     }
     @MainActor
     static func choose(_ entries: [(SCWindow, WindowRecord)], _ scope: Scope) throws -> (SCWindow, WindowRecord) {
-        let normal = entries.filter { $0.1.window_layer == 0 && $0.1.on_screen && $0.1.active }
+        let normal = entries.filter { $0.1.window_layer == 0 && $0.1.on_screen }
         try require(normal.count == 1, "missing_or_ambiguous_visible_normal_window")
         let chosen = normal[0]
-        try require(chosen.1.window_id != 0 && chosen.1.bounds.matches(scope.bounds)
+        try require(chosen.1.active && chosen.1.window_id != 0 && chosen.1.bounds.matches(scope.bounds)
                     && chosen.1.fully_on_one_display && !chosen.1.covers_display, "window_bounds_visibility_or_fullscreen_mismatch")
         return chosen
     }
