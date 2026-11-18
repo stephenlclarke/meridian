@@ -337,3 +337,29 @@ fn mip(bytes: &[u8], side: usize) -> Vec<u8> {
     }
     result
 }
+
+/// Projects the actual packed hull using the production uniforms and the WGSL
+/// solid vertex clip transform. This CPU check does not measure occlusion.
+#[cfg(test)]
+pub(crate) fn detailed_hull_fits_view(scene: Scene<'_>, view: View) -> Result<bool, &'static str> {
+    let blank = Piece {
+        range: [0; 4],
+        low: [0.0; 4],
+        high: [0.0; 4],
+    };
+    let u = uniforms(scene, view, true, [blank; MULE_PIECES])?;
+    let [aspect, focal, near, far] = u.projection;
+    Ok(visual()?.into_iter().all(|vertex| {
+        let [x, y, z]: [f32; 3] = core::array::from_fn(|axis| {
+            u.origin[axis]
+                + u.x[axis] * vertex.position[0]
+                + u.y[axis] * vertex.position[1]
+                + u.z[axis] * vertex.position[2]
+        });
+        let clip_z = z * far / (far - near) - near * far / (far - near);
+        z > 0.0
+            && (0.0..=z).contains(&clip_z)
+            && (x * focal / aspect).abs() <= 0.95 * z
+            && (y * focal).abs() <= 0.95 * z
+    }))
+}
