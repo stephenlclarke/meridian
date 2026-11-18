@@ -1,0 +1,23 @@
+# Exact-leaf validation correction
+
+## Findings and bounded changes
+
+G2's complete Root `aaeade86` review found two P2 validation gaps in new tests. Production mathematics, accounting, lifetime, guards and compilation dispatch were otherwise source clear and the completed whole review explicitly carries through these bounded corrections. No production Rust source is changed here.
+
+The work reference previously used an uncached joint kernel even though the qualified parent already had exact vertex-distance reuse. The corrected timed/charged reference compiles an independent cache directly from frozen parent `82a7909` source. It includes input admission, index and cache construction, every per-query finite bound and source-plane generation, old box-based collection and source ordering, cached joint calls, candidate-vector lifetime admission, and cache/index cleanup. The candidate includes the matching full scope using exact-leaf collection. Both preserve strict total charged-work comparison, payload and flag assertions, matching monotonic durations and the ten-times timing threshold. Candidate vectors remain admitted until consumed. The uncached kernel remains a separate semantic oracle, excluded from both measured lanes.
+
+The original convex publisher fixture remains byte exact. A fourth test adds a genuine closed cavity owner: outward cube [0,8]^3 and inward cube [2,6]^3, plus four disjoint convex subdivided tetrahedra. This has 280 original facets and analytic volume 448 + 16/3 = 1360/3. The source audits are asserted, support certification explicitly includes owners 1 through 4 and declines cavity owner 0, the chosen original facet box meets owner 0, and its rows do not contain that owner. These are precisely the production conditions that make the collector's owner map nonempty and require the changed joint-collection branch. No production telemetry or branch-forcing hook is introduced.
+
+The new complete publisher fixture compares all triangles, all witnesses, full exact volume and final retained memberships against the existing independent full parent collector/publisher. Affine UVs are nonzero and equal global XY on every emitted vertex, asserted directly. The existing convex fixture, all 88 prior test bodies, and the sign/resource test remain exact. The strict batch work assertion is retained. Current results are authored and UNRUN; fixture geometry and preconditions are source-grounded obligations, not executed coverage claims.
+
+## Source proof and review custody
+
+The complete parent test file is frozen and hashed. An exact test-only inverse restores it. Every other source/test file is byte exact, including all production, current independent collector/publisher controls and frozen references. The source checker proves 90 unchanged old test bodies and identifies the one corrected new batch; one new cavity case brings the total to 92. The parent cache is compiled from the unchanged frozen complete cache file, with its exact byte identity checked against Git.
+
+Custody retains the full 10,974-byte G2 review, Root source identity and three hashed payloads. All 508 parent crate files match the whole-reviewed Root inventory. The two addressed findings are `G2-GEOMETRY-EXACT-LEAF-1` and `G2-GEOMETRY-EXACT-LEAF-2`. Carry the completed otherwise-clear whole review to one bounded test delta/unaffected-source closure. Do not rebind prior execution or claim that the prior cache/publisher comparison established current acceptance.
+
+## Qualification
+
+Current 92 Rust tests, nine host checks, locked check, strict Clippy, development build and changed original-five are UNRUN. Author checks are source-only: rustfmt, Markdownlint, JSON/Python parsing, inverse/body/hash proofs and packet integrity. No author compiler, Cargo, Clippy, probe, SUT, geometry or native execution occurs.
+
+Root joins only the successor since `ca17759`, preserving Root documentation and G3 work. One G2 bounded delta/unaffected closure carries the whole review. Existing G1 then owns changed 92 Rust/nine host/locked check/strict Clippy/development build. Only all focused PASS and sole-lane availability permit one changed whole-five with the same five inputs, 25 bodies and complete pre-cleanup/source/binary/lock/input/monotonic evidence. Natural first failure stops qualification. No new execution lane, original probe, unchanged/diagnostic batch or ACK gate. Caps remain 2,000,000 operations including decode, 100,000 logical memberships, 4096 coordinate/UV rational bits and 512 complete triangles. Broader 202 matrix remains separate; baseline 23/162 ships and 4/6 stations is unchanged, with zero new admissions or claimed current benefit, fit, minimum or speed.

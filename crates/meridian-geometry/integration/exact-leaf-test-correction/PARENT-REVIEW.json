@@ -1,0 +1,120 @@
+{
+  "reviewedAtUTC": "2026-11-18T16:18:31.138098+00:00",
+  "verdict": "CHANGES_REQUIRED_TWO_BOUNDED_NEW_TEST_VALIDATION_FINDINGS;WHOLE_EXACT_LEAF_ALGORITHM_OTHERWISE_SOURCE_CLEAR",
+  "head": "aaeade86147f7f984c862ce33d6fd51d18da71ed",
+  "tree": "81be3d9a8141b056a5da4f512434ccba56e21e68",
+  "immediateParent": "5416e1014d3e40fe4fe534121a1fcf2e6b6cd03f",
+  "packet": {
+    "path": "/private/tmp/meridian-root-exact-leaf-review/SOURCE.json",
+    "bytes": 5243,
+    "sha256": "36e4c2a94accf51e36505227b083074daeb88c2a0edf1013f9d09c28e0d45b1e"
+  },
+  "findings": [
+    {
+      "id": "G2-GEOMETRY-EXACT-LEAF-1",
+      "priority": "P2",
+      "file": "crates/meridian-geometry/src/exact_leaf_tests.rs",
+      "line": 188,
+      "relatedLines": [
+        154,
+        159,
+        173,
+        189,
+        200
+      ],
+      "title": "Compare complete batch work against the already-cached parent",
+      "body": "The old batch builds only its index and then calls uncached joint_section_source for every record at189. The new batch builds VertexDistances and uses plane.section. The actual qualified5416 parent already built that cache and used plane.section after its box-based collection. Therefore new.operations<old.operations currently mixes the previous distance-cache optimization with the new leaf predicate, rather than measuring this successor against its current parent. The uncached semantic oracle is valid, but its work/timing counters cannot establish the claimed complete parent-versus-exact-leaf improvement.",
+      "requestedChange": "Make the charged/timed reference batch use an independent parent-style distance cache: include its construction/admission, fresh per-plane generation and cached section calls while retaining old box-based candidate collection. Include both lanes full setup,ordering,queries,section work and cleanup; retain exact payload/flag/joint-result assertions and strict total work comparison. Keep uncached joint_source as an additional semantic oracle if desired, separately labelled. No production algorithm change is required."
+    },
+    {
+      "id": "G2-GEOMETRY-EXACT-LEAF-2",
+      "priority": "P2",
+      "file": "crates/meridian-geometry/src/exact_leaf_tests.rs",
+      "line": 319,
+      "relatedLines": [
+        321,
+        324
+      ],
+      "title": "Exercise the new leaf dispatch in the complete publisher comparison",
+      "body": "The full publisher fixture contains only four convex subdivided tetrahedra, each translated into a disjoint x interval. All four owners obtain support certificates. For each original source facet, Rows::build contains its own certified owner; foreign bounds do not meet. collect_cached_admitted therefore has no uncertified owner entries and always takes the frame.owners.is_empty physical-only candidates branch. That bypasses the new index.collection_cached/exact leaf predicate entirely. The full triangles/fields/witness/volume comparison is consequently vacuous for the changed production dispatch, despite useful direct helper tests elsewhere. This conclusion is from fixture geometry and collector source, not an executed coverage claim.",
+      "requestedChange": "Add or extend a complete publisher fixture with at least256 original facets and a genuine closed uncertified owner whose bounds meet a source facet, so the new joint candidate/leaf path is actually required. Assert the fixture precondition explicitly (for example certificate decline/eligible uncertified owner) without new production telemetry. Compare complete triangles,nonzero affine fields,all witnesses,retained ledger and analytic volume against the preserved independent parent collector/publisher. Preserve the existing convex fixture and all88prior bodies. This is focused constructor unit coverage,not a request for an integration run or new execution lane."
+    }
+  ],
+  "independentChecks": {
+    "cleanExactHeadTreeImmediateParent": true,
+    "rootGitWorkingSourceTarBytesModes": 647,
+    "changedPaths": 26,
+    "unchangedPaths": 621,
+    "authorCratePinsAndSourceArchive": 508,
+    "all492AuthorParentCrateFilesExactActual5416": true,
+    "authorManifestPayloadHashes": 7,
+    "completeArchiveMembers": 8,
+    "canonicalRootDeltaVerified": true,
+    "twoCompleteProductionFileInverses": true,
+    "fiveFrozenReferencesHashed": true,
+    "parentPublisherOnlyFunctionNameAndIndependentParentCollectorCallChanged": true,
+    "fullParentCollectorControlBodyExact": true,
+    "fourOldTraversalJointKernelBodiesByteExact": true,
+    "completeNewTraversalExactParentNoneSupportSpecializationExceptLeafPredicateAndScratch": true,
+    "newCollectorOnlyOneDispatchChange": true,
+    "prepareExactOriginalInitializationExtraction": true,
+    "sectionExactAfterPrepareExtraction": true,
+    "cacheBuildAndGenerationBodiesByteExact": true,
+    "all88OldTestBodiesByteExact": true,
+    "currentTestAttributes": 91,
+    "actualParentCustodyTerminalPinsHashed": 53,
+    "actualParentRawArtifactPinsAndExactArchiveMatches": [
+      46,
+      46
+    ]
+  },
+  "wholeSemanticReview": [
+    "Affine source-plane distance on a triangle reaches its minimum/maximum at original vertices. The infinitesimal outward section exists iff max>0 and min<=0. Thus one strictly positive and one nonpositive vertex is exact; allzero/allpositive/allnonpositive have no outward segment. Zeros remain below the positiveepsilon plane. Positive-plus-zero edge/collapsed-vertex limiting contacts stay eligible with unchanged multiplicity.",
+    "Only outward leaf eligibility changes. Physical finite-box flags are byte-equivalent and never narrowed. Node box support remains a necessary condition: any triangle with min<=0<max also has a containing node box satisfying the old support test. Uniform-owner eligibility/mixed leaves,physical/outward independence,node/leaf visit order and full source-order restoration remain. Any removed outward-only record would have yielded no limiting segment and no physical/coplanar field; physical records still enter the full original kernel and every point guard.",
+    "New traversal exactly derives from old collection_with_support specialized to its existing production None certificate argument, with only leaf predicate substitution and stack+8to+16. Complete old candidate methods and complete old cached collector are retained under cfg(test) as independent controls. Production new collector calls available collection_cached directly; no missing cfg-dependent production dispatch found. Small qualified finite-gap path remains unchanged.",
+    "Distance prepare is the complete old ordinal/XYZ ID/generation-word/actual-distance initialization block extracted without changing errors, arithmetic,validity writes or prices. It validates ordinal before the later direct access. Actual Plane view and query face are created from the same source facet at the production call site. New outward predicate borrows initialized values within that exclusive generation; the later section reuses the same values. No occupancy/ray/sample/intersection result is cached and no source fields are merged.",
+    "Leaf predicate is1constant-size sign classification,consistent with existing triangle classification units; actual scalar distance misses retain1,lazy reset2 and source generation1. Old leaf bbox predicate is no longer performed or charged. Every remaining node/bbox/owner/map/source-order/kernel cost is preserved. Each leaf exact lookup has separate96numeric scratch while cache persistent slots and caller3N candidate bound remain live; traversal stack grows by8for additional borrow/context. Joint construction still has96+8. Error scopes release temporary admissions without publishing partial candidate vectors; cache retains only correctly initialized current-generation scalars.",
+    "Original coplanar/sign/zero/interpolation/coordinate and UV guards,physical min/max and limiting multiplicity,parity,affine fields,clipping/protected contacts,stars,witnesses,topology and volume remain unchanged. Empty outward-only exclusion does not elide an emitted-coordinate guard: original kernel returns empty before constructing points for exactly those uniform signs. Retained physical and positive/zero cases keep all numeric checks.",
+    "Three new authored cases provide useful direct oblique query/joint-result and all27signed-pattern checks,zero collapsed-contact preservation,invalid ordinal,reset operation and leaf numeric-scratch rollback. The two findings concern honesty/completeness of the work comparison and full-publisher changed-branch coverage. No production mathematical,accounting,lifetime or compile defect identified. Carry this complete otherwise-clear review through the bounded test corrections;no new whole algorithm review needed."
+  ],
+  "actualParentEvidence": {
+    "source": "5416e1014d3e40fe4fe534121a1fcf2e6b6cd03f",
+    "tree": "9bea766e3e3a5f9e99bba6e90c541df425b811f3",
+    "rawFocusedRustCounts": [
+      70,
+      7,
+      9,
+      2
+    ],
+    "rustPassed": 88,
+    "hostPassed": 9,
+    "lockedCheck": "PASS",
+    "strictClippy": "PASS",
+    "devBuild": "PASS",
+    "rawPacket": {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/RAW-PACKET.tar.gz",
+      "bytes": 21377452,
+      "sha256": "43842e20fcd8c4de2f97c3d1c1cf388d6198dcacfb1291eb00fc855e8a9092e7"
+    },
+    "wholeFiveBodies": {
+      "declared": 25,
+      "decodePass": 5,
+      "constructorOperationsRefusals": 5,
+      "failed": 0,
+      "dependentUnrun": 15
+    },
+    "completeCandidates": 0,
+    "admissions": 0,
+    "wholeElapsedSeconds": 147.061048709,
+    "allFiveActualFailuresFullGuardContextsAndPerCaseSecondsExactCustody": true,
+    "SH016": "Refused at2000002 on2operationcharge; other4at2000001. SH010 also attempted2 but started1999999.",
+    "scope": "Results bind to5416 only;failed-prefix totals/timing do not establish complete-work minima,current benefit,fit or completed-original speed."
+  },
+  "executionDecision": "First correct the two new test validation gaps with exact source evidence,carrying this otherwise complete whole review. G1 prepares only until actual currentsourceclosure. Then current focusedRust9host/lockedcheck/strictClippy/devbuild when soleMac lane free;ONEalready-scoped changed whole-five25body workload ONLYallfocusedPASS under original2Moperations includingdecode/100kstorage/4096-bit coordinateUV/512complete-outputfaces with exactsource-lock-binary/input/precleanup-guard-context/monotonic pins. No new lane,reviewbot,broad unchanged review or routineACK gate.",
+  "limits": [
+    "Current91Rust9host/compiler/build/wholefive remainUNRUN. No claimed originals benefit,fit,minima,speed,admission or native/full-game acceptance.",
+    "G2 ran no compiler,Cargo,Clippy,tests,SUT,geometry/probe/native,suppliedverifier,reviewbot or integrationtesting.",
+    "No humanWIP edit,newchat/agent,merge orpublication.",
+    "Separate202matrix,171fleet scope and legacy23/162ships+4/6stations remain separate."
+  ]
+}

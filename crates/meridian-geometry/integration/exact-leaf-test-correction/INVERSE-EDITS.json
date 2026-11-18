@@ -1,0 +1,110 @@
+[
+  {
+    "afterStart": 9,
+    "afterEnd": 12,
+    "after": "\n#[path = \"../fixtures/exact-leaf-reference/before-vertex_distances.rs\"]\nmod parent_distance_cache;\n",
+    "before": ""
+  },
+  {
+    "afterStart": 151,
+    "afterEnd": 152,
+    "after": "        let index_members = FacetBoundsIndex::memberships(originals.len());\n",
+    "before": "        let baseline = Facet::input_memberships(&originals, &mut setup)?\n            + FacetBoundsIndex::memberships(originals.len())\n            + 512;\n"
+  },
+  {
+    "afterStart": 153,
+    "afterEnd": 154,
+    "after": "        let baseline = Facet::input_memberships(&originals, &mut old)? + index_members + 512;\n",
+    "before": ""
+  },
+  {
+    "afterStart": 156,
+    "afterEnd": 158,
+    "after": "        let mut parent_cache = parent_distance_cache::VertexDistances::build(&originals, &mut old)?\n            .ok_or_else(|| old.fail(FailureKind::InvalidWitness, \"missing parent cache\"))?;\n",
+    "before": ""
+  },
+  {
+    "afterStart": 159,
+    "afterEnd": 160,
+    "after": "        assert_eq!(parent_cache.originals().len(), originals.len());\n",
+    "before": ""
+  },
+  {
+    "afterStart": 161,
+    "afterEnd": 163,
+    "after": "        let new_baseline = Facet::input_memberships(&originals, &mut new)? + index_members + 512;\n        new.retain(new_baseline)?;\n",
+    "before": "        new.retain(baseline)?;\n"
+  },
+  {
+    "afterStart": 167,
+    "afterEnd": 168,
+    "after": "        assert_eq!(new_baseline, baseline);\n",
+    "before": ""
+  },
+  {
+    "afterStart": 171,
+    "afterEnd": 171,
+    "after": "",
+    "before": "            let mut bounds_budget = Budget::new(Limits::default())?;\n            let finite = Bounds::for_facet(&face, &mut bounds_budget)?;\n"
+  },
+  {
+    "afterStart": 172,
+    "afterEnd": 182,
+    "after": "            let old_finite = Bounds::for_facet(&face, &mut old)?;\n            let mut parent_plane = parent_cache.plane(&face, &mut old)?;\n            old.retain(3 * originals.len())?;\n            let expected = old_index.collection_candidates(\n                &face,\n                &old_finite,\n                &owners,\n                &originals,\n                &mut old,\n            )?;\n",
+    "before": "            let expected = old.with_retained(3 * originals.len(), |b| {\n                old_index.collection_candidates(&face, &finite, &owners, &originals, b)\n            })?;\n"
+  },
+  {
+    "afterStart": 184,
+    "afterEnd": 185,
+    "after": "            let finite = Bounds::for_facet(&face, &mut new)?;\n",
+    "before": ""
+  },
+  {
+    "afterStart": 186,
+    "afterEnd": 189,
+    "after": "            new.retain(3 * originals.len())?;\n            let actual = new_index\n                .collection_cached(&face, &finite, &owners, &originals, &mut plane, &mut new)?;\n",
+    "before": "            let actual = new.with_retained(3 * originals.len(), |b| {\n                new_index.collection_cached(&face, &finite, &owners, &originals, &mut plane, b)\n            })?;\n"
+  },
+  {
+    "afterStart": 200,
+    "afterEnd": 202,
+    "after": "                let expected =\n                    old.with_retained(96, |b| parent_plane.section(ordinal, physical, outward, b))?;\n",
+    "before": "                let expected = old.with_retained(96, |b| {\n                    joint_section_source(&face, &originals[ordinal], physical, outward, b)\n                })?;\n"
+  },
+  {
+    "afterStart": 209,
+    "afterEnd": 215,
+    "after": "                // Separate uncached semantic oracle; excluded from both work/timing lanes.\n                let mut oracle = Budget::new(Limits::default())?;\n                let uncached = oracle.with_retained(96, |b| {\n                    joint_section_source(&face, &originals[ordinal], physical, outward, b)\n                })?;\n                assert_eq!(expected, uncached);\n",
+    "before": ""
+  },
+  {
+    "afterStart": 216,
+    "afterEnd": 222,
+    "after": "            let start = Instant::now();\n            old.release(3 * originals.len());\n            old_elapsed += start.elapsed();\n            let start = Instant::now();\n            new.release(3 * originals.len());\n            new_elapsed += start.elapsed();\n",
+    "before": ""
+  },
+  {
+    "afterStart": 223,
+    "afterEnd": 234,
+    "after": "        let start = Instant::now();\n        let parent_members = parent_cache.memberships();\n        drop(parent_cache);\n        drop(old_index);\n        old.release(parent_members + index_members);\n        old_elapsed += start.elapsed();\n        let start = Instant::now();\n        drop_cache(cache, &mut new);\n        drop(new_index);\n        new.release(index_members);\n        new_elapsed += start.elapsed();\n",
+    "before": ""
+  },
+  {
+    "afterStart": 236,
+    "afterEnd": 237,
+    "after": "            \"EXACT_LEAF_COMPLETE_BATCH fixture=oblique-triangle-support reference=independent-frozen-parent-cache scope=input-index-cache-generations-ordering-queries-sections-cleanup oldOperations={} newOperations={} oldPeak={} newPeak={} oldWallNanoseconds={} newWallNanoseconds={}\",\n",
+    "before": "            \"EXACT_LEAF_COMPLETE_BATCH fixture=oblique-triangle-support oldOperations={} newOperations={} oldPeak={} newPeak={} oldWallNanoseconds={} newWallNanoseconds={}\",\n"
+  },
+  {
+    "afterStart": 245,
+    "afterEnd": 247,
+    "after": "        assert_eq!(old.retained_memberships(), baseline - index_members);\n        assert_eq!(new.retained_memberships(), baseline - index_members);\n",
+    "before": "        drop_cache(cache, &mut new);\n        assert_eq!(old.retained_memberships(), baseline);\n        assert_eq!(new.retained_memberships(), baseline);\n"
+  },
+  {
+    "afterStart": 407,
+    "afterEnd": 581,
+    "after": "\nfn shell_cube(lo: i64, hi: i64) -> Result<Vec<Facet>, Failure> {\n    mesh(\n        &[\n            [lo, lo, lo],\n            [hi, lo, lo],\n            [hi, hi, lo],\n            [lo, hi, lo],\n            [lo, lo, hi],\n            [hi, lo, hi],\n            [hi, hi, hi],\n            [lo, hi, hi],\n        ],\n        &[\n            [0, 2, 1],\n            [0, 3, 2],\n            [4, 5, 6],\n            [4, 6, 7],\n            [0, 1, 5],\n            [0, 5, 4],\n            [1, 2, 6],\n            [1, 6, 5],\n            [2, 3, 7],\n            [2, 7, 6],\n            [3, 0, 4],\n            [3, 4, 7],\n        ],\n        0,\n        0,\n    )\n}\n\n#[test]\nfn exact_leaf_uncertified_cavity_publisher_exercises_joint_dispatch_and_preserves_all_outputs()\n-> Result<(), Failure> {\n    labelled(\n        \"closed-cavity-plus-four-convex-owners\",\n        \"case-return\",\n        || {\n            let mut originals = shell_cube(0, 8)?;\n            let mut build = Budget::new(Limits::default())?;\n            for face in shell_cube(2, 6)? {\n                let mut vertices = face.vertices().clone();\n                vertices.swap(1, 2);\n                originals.push(Facet::new(\n                    SourceId {\n                        component: 0,\n                        facet: 12 + face.id().facet,\n                    },\n                    vertices,\n                    \"test\".into(),\n                    &mut build,\n                )?);\n            }\n            for owner in 1..=4u32 {\n                for face in mesh(\n                    &[[0, 0, 0], [2, 0, 0], [0, 2, 0], [0, 0, 2]],\n                    &[[0, 2, 1], [0, 1, 3], [0, 3, 2], [1, 2, 3]],\n                    owner,\n                    2,\n                )? {\n                    let mut vertices = face.vertices().clone();\n                    let shift = integer(i64::from(8 + 4 * owner));\n                    for vertex in &mut vertices {\n                        vertex.point[0] += &shift;\n                        vertex.uv[0] += &shift;\n                    }\n                    originals.push(Facet::new(\n                        face.id(),\n                        vertices,\n                        format!(\"owner-{owner}\"),\n                        &mut build,\n                    )?);\n                }\n            }\n            assert_eq!(originals.len(), 280);\n            assert!(originals.iter().any(|f| {\n                f.vertices()\n                    .iter()\n                    .any(|v| v.uv.iter().any(|q| !q.is_zero()))\n            }));\n            // Establish closed source validity and the exact production branch precondition.\n            let mut precondition = Budget::new(Limits::default())?;\n            let owner_ids = originals\n                .iter()\n                .map(|f| f.id().component)\n                .collect::<BTreeSet<_>>();\n            audit_original_owner_ranges(&originals, &owner_ids, &mut precondition)?;\n            audit_original_sheets(&originals, &mut precondition)?;\n            let index = FacetBoundsIndex::build(&originals, &mut precondition)?;\n            let owners = component_bounds(&originals, &index.facets, &mut precondition)?;\n            let certificates = strict_interior::InteriorCertificates::build_sections(\n                &originals,\n                &owners,\n                &mut precondition,\n            )?;\n            let certificates_ref = certificates.as_ref().ok_or_else(|| {\n                precondition.fail(\n                    FailureKind::InvalidWitness,\n                    \"convex controls did not certify\",\n                )\n            })?;\n            assert_eq!(\n                certificates_ref\n                    .section_owners()\n                    .map(|(owner, _, _)| owner)\n                    .collect::<Vec<_>>(),\n                vec![1, 2, 3, 4]\n            );\n            let face = &originals[0];\n            let finite = &index.facets[0];\n            let rows = convex_sections::Rows::build(\n                face,\n                finite,\n                Some(certificates_ref),\n                &mut precondition,\n            )?;\n            let cavity = owners.get(&0).ok_or_else(|| {\n                precondition.fail(FailureKind::InvalidWitness, \"missing cavity owner\")\n            })?;\n            assert!(finite.meets(&cavity.bounds, &mut precondition)?);\n            assert!(!rows.contains(0, &mut precondition)?);\n            // collect_cached_admitted inserts owner 0 under exactly these conditions;\n            // its owner map is nonempty and the production collection_cached branch is required.\n            let row_members = rows.memberships();\n            drop(rows);\n            precondition.release(row_members);\n            let cert_members = certificates_ref.memberships();\n            drop(certificates);\n            precondition.release(cert_members);\n            assert_eq!(precondition.retained_memberships(), 0);\n            let mut old = Budget::new(Limits::default())?;\n            let mut new = Budget::new(Limits::default())?;\n            let start = Instant::now();\n            let expected = labelled(\n                \"closed-cavity-plus-four-convex-owners\",\n                \"parent-publisher\",\n                || reference_exact_leaf_publisher(&originals, &mut old),\n            )?;\n            let old_elapsed = start.elapsed();\n            let start = Instant::now();\n            let actual = labelled(\n                \"closed-cavity-plus-four-convex-owners\",\n                \"exact-leaf-publisher\",\n                || reconstruct(&originals, &mut new),\n            )?;\n            let new_elapsed = start.elapsed();\n            assert_eq!(actual.triangles(), expected.triangles());\n            assert_eq!(actual.witnesses(), expected.witnesses());\n            assert_eq!(actual.exact_volume(), expected.exact_volume());\n            assert_eq!(actual.exact_volume(), &(integer(1360) / integer(3)));\n            assert_eq!(new.retained_memberships(), old.retained_memberships());\n            for triangle in actual.triangles() {\n                for vertex in triangle.vertices() {\n                    assert_eq!(\n                        vertex.uv,\n                        [vertex.point[0].clone(), vertex.point[1].clone()]\n                    );\n                }\n            }\n            eprintln!(\n                \"EXACT_LEAF_COMPLETE_PUBLISHER fixture=closed-cavity-plus-four-convex-owners branch=uncertified-owner-joint-collection oldOperations={} newOperations={} oldPeak={} newPeak={} oldWallNanoseconds={} newWallNanoseconds={}\",\n                old.operations(),\n                new.operations(),\n                old.peak_memberships(),\n                new.peak_memberships(),\n                old_elapsed.as_nanos(),\n                new_elapsed.as_nanos()\n            );\n            assert!(new_elapsed < old_elapsed.saturating_mul(10));\n            Ok(())\n        },\n    )\n}\n",
+    "before": ""
+  }
+]

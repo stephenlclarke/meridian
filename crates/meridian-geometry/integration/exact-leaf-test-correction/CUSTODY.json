@@ -1,0 +1,39 @@
+{
+  "parentAuthor": "ca17759fccc176f79b594ce99fb2fbb1ed374c0c",
+  "wholeReviewedRoot": "aaeade86147f7f984c862ce33d6fd51d18da71ed",
+  "wholeReviewedTree": "81be3d9a8141b056a5da4f512434ccba56e21e68",
+  "wholeReviewVerdict": "CHANGES_REQUIRED_TWO_BOUNDED_NEW_TEST_VALIDATION_FINDINGS;WHOLE_EXACT_LEAF_ALGORITHM_OTHERWISE_SOURCE_CLEAR",
+  "reviewFile": {
+    "path": "/tmp/meridian-g4-exact-facet/crates/meridian-geometry/integration/exact-leaf-test-correction/PARENT-REVIEW.json",
+    "bytes": 10974,
+    "sha256": "869ac5c6d4b720d1be4d10c82d24a73ec4202e800ab88b0c3d6c19ed95ad9ddd"
+  },
+  "rootReviewSource": {
+    "path": "/private/tmp/meridian-root-exact-leaf-review/SOURCE.json",
+    "bytes": 5243,
+    "sha256": "36e4c2a94accf51e36505227b083074daeb88c2a0edf1013f9d09c28e0d45b1e"
+  },
+  "verifiedRootPayloads": [
+    {
+      "path": "/private/tmp/meridian-root-exact-leaf-review/ALL-SOURCE-PINS.json",
+      "bytes": 163186,
+      "sha256": "7a5bc355b1e68b3b96dca9f23dc1cd36b092202fd431535121b08d747bc96e24"
+    },
+    {
+      "path": "/private/tmp/meridian-root-exact-leaf-review/SOURCE.tar",
+      "bytes": 29818880,
+      "sha256": "45dd6d1be84e9fc2d7f492cef98b636736052173e13198a4129b0f9b2361725d"
+    },
+    {
+      "path": "/private/tmp/meridian-root-exact-leaf-review/DELTA.patch",
+      "bytes": 317166,
+      "sha256": "28401eefa832ad324d67ca5c5a7dc77d1af8e05c62cc1c8c3d437945dba60651"
+    }
+  ],
+  "all508ParentCrateFilesMatchWholeReviewedRoot": true,
+  "findingsAddressed": [
+    "G2-GEOMETRY-EXACT-LEAF-1",
+    "G2-GEOMETRY-EXACT-LEAF-2"
+  ],
+  "carryWholeReview": "Production mathematics/accounting/lifetime/dispatch otherwise source clear. Carry completed whole review to one bounded test delta/unaffected-source closure. Current execution still UNRUN."
+}

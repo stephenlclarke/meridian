@@ -458,6 +458,11 @@
       "file": "src/exact_leaf_tests.rs",
       "name": "exact_leaf_complete_publisher_matches_parent_fields_witnesses_and_volume",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/exact_leaf_tests.rs",
+      "name": "exact_leaf_uncertified_cavity_publisher_exercises_joint_dispatch_and_preserves_all_outputs",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -1325,5 +1330,32 @@
     "parentReviewSHA256": "7dc334f491bb74e334354167e514d88468f8c989bf1164542afc54c069655764",
     "qualification": "Root successor since82a only; one G2 whole/relevant review; existing G1 changed91/9/check/strictClippy/build, then one changed whole-five only ALL PASS and sole lane available. No unchanged diagnostic batch.",
     "deltaSHA256": "67ef1d83065954de6005c5626e3333504fc9489161444f72a3d7d0c3906e1279"
+  },
+  "exactLeafTestCorrection": {
+    "status": "AUTHORED_UNRUN_BOUNDED_EXACT_LEAF_TEST_VALIDATION_FIX",
+    "parentAuthor": "ca17759fccc176f79b594ce99fb2fbb1ed374c0c",
+    "wholeReviewedRoot": "aaeade86147f7f984c862ce33d6fd51d18da71ed",
+    "wholeReviewedTree": "81be3d9a8141b056a5da4f512434ccba56e21e68",
+    "findingsAddressed": [
+      "G2-GEOMETRY-EXACT-LEAF-1",
+      "G2-GEOMETRY-EXACT-LEAF-2"
+    ],
+    "changes": [
+      "Compare complete charged/timed query batch with independent frozen parent cache and old box collection, including both setup/generations/cached joint calls/ordering/candidate lifetime/cleanup. Retain uncached semantic oracle separately.",
+      "Preserve existing convex fixture; add280-facet closed cavity plus four convex owners with explicit certificate-decline/eligible-owner branch preconditions and complete output/UV/witness/ledger/analytic-volume parity."
+    ],
+    "preservation": "All production/other source and tests byte exact. All88prior bodies plus existing sign and convex fixture unchanged. Exact inverse of only modified new test file.",
+    "currentRustCount": 92,
+    "hostCount": 9,
+    "newTests": 1,
+    "modifiedNewTests": 1,
+    "currentExecution": "UNRUN; source-established validation gaps only",
+    "contractSHA256": "4b53c98f0f8db9aef4a2760e456155370af67cef60a20d1cc2dd5376c0c8e008",
+    "custodySHA256": "e943a398b5e14da643c2feaeff74f300829388392c7effb3e50aa457e3009247",
+    "freezeSHA256": "dee6dbd9fa3db5df564c78408f7dfdf74ffd605a8b3f15eaa1e3072342cba312",
+    "inverseSHA256": "274147b820a96139e19c778df1387e1b9de988861c812b60d21f65d5e2537a88",
+    "parentReviewSHA256": "869ac5c6d4b720d1be4d10c82d24a73ec4202e800ab88b0c3d6c19ed95ad9ddd",
+    "qualification": "Root successor sinceca177 only; one G2 bounded delta/unaffected closure carrying otherwise-clear whole review; G1 changed92/9/check/strictClippy/build then one changed whole-five ONLY ALL PASS and sole lane available.",
+    "deltaSHA256": "67343443dd73a2e93a08470f1c9df1aa9752499129762b894801de08499dd601"
   }
 }
