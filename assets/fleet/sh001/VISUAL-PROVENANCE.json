@@ -1,0 +1,33 @@
+{
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourceResourceSHA256": "1c8cce7fb8130c12780fb522592249805cb06e6b22fcffb169ae651556f47c82",
+  "sourceTextureManifestSHA256": "96c4c9699b81f50be5a8aefeeca74a6e4870e0bb981d1cd33a9ff2921cd2bd3c",
+  "files": {
+    "l337-patrol-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "9699517d12b4fbbb28746e00bed9ee65c19a098d14402b1d5160280c6f6bfc54",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-patrol-diffuse.rgba",
+      "license": "MIT"
+    },
+    "l337-service-details.rgba": {
+      "bytes": 4194304,
+      "sha256": "35edd84f6ce527195dd8a9bcc039521a6efc5aa2333452bbbc30217b8372103d",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-service-details.rgba",
+      "license": "MIT"
+    },
+    "l337-strike-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "e56f149228caf90237a652d720ae549768bde1056af3d903dc8a5c243ad26e97",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-strike-diffuse.rgba",
+      "license": "MIT"
+    },
+    "visual.bin": {
+      "bytes": 1215664,
+      "sha256": "348feeb3e3ec092aa68970a38ad89cb2cb2b7663d7ed0d38727e13f2beb93d42",
+      "source": "resource.toml detailed design; tools/encode_mule_visual.py",
+      "transform": "all 7236 original triangles, per-face material/UV/layer/emissive; exact40000/3411 uniform scale then f32; derived flat normals; no simplification"
+    }
+  },
+  "appearance": "Exact three opaque diffuse RGBA maps; repeated UVs and material tint. No auxiliary maps applied; baked relief retained.",
+  "authority": "Source presentation only; no World actor, hull admission, purchase or player ownership."
+}

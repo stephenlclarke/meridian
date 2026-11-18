@@ -1,0 +1,57 @@
+--- a/crates/meridian-core/src/flight.rs
++++ b/crates/meridian-core/src/flight.rs
+@@ -11,6 +11,7 @@
+ mod celestial;
+ mod damage;
+ mod mining;
++mod mule_validation;
+ mod xyzzy;
+ pub(crate) use xyzzy::{AccountEffect, AccountEvent, STARTING_CREDITS_TENTHS};
+ pub use xyzzy::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
+@@ -170,6 +171,7 @@
+ pub struct World {
+     state: Snapshot,
+     traffic: crate::traffic::State,
++    mule_validation: Option<crate::traffic::mule_validation::State>,
+     mining: crate::mining::State,
+     mining_scope: std::sync::Arc<()>,
+     damage: damage::State,
+@@ -215,6 +217,7 @@
+                 navigation: None,
+             },
+             traffic: crate::traffic::State::default(),
++            mule_validation: None,
+             mining: crate::mining::State::legacy_absent(),
+             mining_scope: std::sync::Arc::new(()),
+             damage: damage::State::default(),
+@@ -485,6 +488,9 @@
+             return Err(StepError::Paused);
+         }
+         input.validate()?;
++        if self.mule_validation.is_some() {
++            return self.step_mule_validation(input);
++        }
+         let input = if self.emp.electrical_disabled() {
+             FlightInput::default()
+         } else {
+--- a/crates/meridian-core/src/traffic.rs
++++ b/crates/meridian-core/src/traffic.rs
+@@ -1,6 +1,8 @@
+ //! Finite, deterministic local traffic. Only World owns this mutable actor/economy state.
+ //! SH025 is the actual admitted hull; unadmitted populations receive no substitute body.
+ mod admission;
++pub(crate) mod mule_validation;
++pub use mule_validation::{MuleActorSnapshot, MuleValidationRefusal};
+ mod emp;
+ pub(crate) use emp::{EmpResourceAction, EmpResourceEvent};
+ mod combat;
+--- a/crates/meridian-core/src/flight/persistence.rs
++++ b/crates/meridian-core/src/flight/persistence.rs
+@@ -398,6 +398,7 @@
+         let mut candidate = Self {
+             state,
+             traffic: crate::traffic::State::default(),
++            mule_validation: None,
+             mining: crate::mining::State::legacy_absent(),
+             mining_scope: std::sync::Arc::new(()),
+             damage: super::damage::State::default(),

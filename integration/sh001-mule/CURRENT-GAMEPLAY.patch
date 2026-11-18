@@ -1,0 +1,8 @@
+--- a/crates/meridian-core/src/lib.rs
++++ b/crates/meridian-core/src/lib.rs
+@@ -10,0 +11 @@
++pub mod mule;
+--- a/crates/meridian-core/src/station.rs
++++ b/crates/meridian-core/src/station.rs
+@@ -7,0 +8 @@
++mod mule;

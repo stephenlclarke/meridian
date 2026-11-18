@@ -1,6 +1,8 @@
 //! Finite, deterministic local traffic. Only World owns this mutable actor/economy state.
 //! SH025 is the actual admitted hull; unadmitted populations receive no substitute body.
 mod admission;
+pub(crate) mod mule_validation;
+pub use mule_validation::{MuleActorSnapshot, MuleValidationRefusal};
 mod emp;
 pub(crate) use emp::{EmpResourceAction, EmpResourceEvent};
 mod combat;

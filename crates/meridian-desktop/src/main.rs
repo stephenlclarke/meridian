@@ -11,6 +11,7 @@ mod help;
 mod hud;
 mod market;
 mod mesh;
+mod mule_render;
 mod profile;
 mod renderer;
 mod session;

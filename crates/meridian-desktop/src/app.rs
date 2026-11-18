@@ -1,4 +1,5 @@
 mod emp;
+mod mule_validation;
 use std::{
     collections::{HashSet, hash_map::RandomState},
     error::Error,
@@ -82,8 +83,12 @@ enum FrameAdvance {
     Fatal(StepError),
 }
 
+const DEFAULT_FLIGHT_WINDOW: [u32; 2] = [1280, 720];
+
 struct App {
     game: Profile,
+    validation_view: FlightView,
+    validation_timing: Option<mule_validation::FrameTiming>,
     celestial: crate::celestial::WorldAdapter,
     quit_failed: bool,
     renderer: Option<Renderer>,
@@ -109,20 +114,26 @@ struct App {
 
 impl App {
     fn new() -> Result<Self, Box<dyn Error>> {
-        let game = Profile::open(crate::profile::directory_from_args(
-            std::env::args_os().skip(1),
-        )?)?;
-        Ok(Self::with_profile(game))
+        Self::from_launch(mule_validation::Launch::parse(std::env::args_os().skip(1))?)
+    }
+    fn from_launch(launch: mule_validation::Launch) -> Result<Self, Box<dyn Error>> {
+        let view = launch.camera_view();
+        let mut app = Self::with_profile(launch.open()?);
+        app.validation_view = view;
+        Ok(app)
     }
 
     fn with_profile(game: Profile) -> Self {
+        let internal = game.is_internal_validation();
         Self {
             game,
+            validation_view: FlightView::Front,
+            validation_timing: internal.then(mule_validation::FrameTiming::default),
             quit_failed: false,
             celestial: crate::celestial::WorldAdapter::default(),
             renderer: None,
             keys: HashSet::new(),
-            paused: false,
+            paused: internal,
             help: None,
             xyzzy: None,
             focused: true,
@@ -307,6 +318,7 @@ impl App {
         }
         self.game.session.invalidate();
         if self.game.playing()
+            && !self.game.is_internal_validation()
             && let Err(error) = self.game.world.request_pause(
                 self.paused || !self.focused || self.occluded,
                 self.game.world.snapshot().tick,
@@ -328,6 +340,15 @@ impl App {
     }
 
     fn key(&mut self, code: KeyCode, event_loop: &ActiveEventLoop) {
+        if self.game.is_internal_validation() {
+            match self.validation_control(code) {
+                Ok(mule_validation::Control::Quit) => self.request_quit(event_loop),
+                Ok(mule_validation::Control::Updated) => self.request_redraw(),
+                Ok(mule_validation::Control::Ignored) => {}
+                Err(error) => self.fail(event_loop, error),
+            }
+            return;
+        }
         let global = matches!(
             code,
             KeyCode::F5 | KeyCode::F9 | KeyCode::F11 | KeyCode::KeyP
@@ -429,7 +450,12 @@ impl App {
             return;
         }
         match self.game.prepare_quit() {
-            Ok(()) => event_loop.exit(),
+            Ok(()) => {
+                if let Some(timing) = self.validation_timing.take() {
+                    eprintln!("{}", timing.report());
+                }
+                event_loop.exit();
+            }
             Err(error) => {
                 self.paused = true;
                 self.reset_input();
@@ -581,7 +607,11 @@ impl App {
     }
 
     fn advance_frame(&mut self, active: bool, ticks: usize) -> FrameAdvance {
-        let result = if active && !self.modal_open() {
+        let result = if active && !self.modal_open() && self.game.is_internal_validation() {
+            self.pulse = None;
+            self.mining = None;
+            self.advance_validation(ticks)
+        } else if active && !self.modal_open() {
             let input = FlightInput {
                 pitch: self.axis(KeyCode::ArrowUp, KeyCode::ArrowDown),
                 yaw: self.axis(KeyCode::KeyD, KeyCode::KeyA),
@@ -648,6 +678,18 @@ impl App {
         text: Option<&str>,
     ) -> Option<KeyCode> {
         if let PhysicalKey::Code(code) = physical_key {
+            if self.game.is_internal_validation() {
+                self.keys.clear();
+                return (state == ElementState::Pressed
+                    && self.focused
+                    && !self.occluded
+                    && !repeat
+                    && matches!(
+                        code,
+                        KeyCode::Escape | KeyCode::KeyQ | KeyCode::KeyP | KeyCode::Period
+                    ))
+                .then_some(code);
+            }
             if state == ElementState::Released {
                 self.keys.remove(&code);
                 if code == KeyCode::KeyU {
@@ -798,6 +840,7 @@ impl App {
                 return;
             }
         };
+        let active = self.simulation_active();
         let snapshot = self.game.world.snapshot();
         // The beam is a short-lived view of the committed shot, never saved or re-fired.
         self.pulse = self.pulse.filter(|shot| {
@@ -845,7 +888,7 @@ impl App {
         }
 
         let traffic = self.game.world.traffic_snapshot();
-        let cockpit = if self.game.playing() {
+        let cockpit = if self.game.playing() && !self.game.is_internal_validation() {
             match crate::hud::cockpit::Cockpit::capture(&self.game.world, snapshot) {
                 Ok(cockpit) => Some(cockpit),
                 Err(error) => {
@@ -894,7 +937,9 @@ impl App {
             .as_ref()
             .map(|menu| menu.panel(&self.game.world, self.notice.as_deref()));
         let modal_open = self.modal_open();
-        let commander = if self
+        let commander = if self.game.is_internal_validation() {
+            "Meridian INTERNAL MULE VALIDATION / NO SAVE"
+        } else if self
             .game
             .world
             .xyzzy_snapshot()
@@ -952,12 +997,38 @@ impl App {
                         port,
                         docked: snapshot.mode == FlightMode::Docked,
                     });
+            let mule_frame = self.game.world.mule_actor_snapshot();
+            let mule_observer = mule_frame
+                .as_ref()
+                .and_then(|frame| self.game.world.mule_observer_pose(frame));
+            let mule_scene = mule_frame
+                .as_ref()
+                .zip(mule_observer)
+                .filter(|(frame, _)| {
+                    frame.world_tick() == snapshot.tick
+                        && frame.source_identity()
+                            == (
+                                meridian_core::mule::MULE_RESOURCE_SHA256,
+                                meridian_core::mule::MULE_CONTRACT_SHA256,
+                            )
+                })
+                .map(|(frame, observer)| crate::mule_render::Scene {
+                    actor: frame.actor(),
+                    envelope: frame.presentation().as_ref(),
+                    observer,
+                });
             let practice = self.game.world.practice_snapshot();
-            renderer.set_flight_view(self.game.world.flight_view());
+            renderer.set_flight_view(if self.game.is_internal_validation() {
+                self.validation_view
+            } else {
+                self.game.world.flight_view()
+            });
+            let draw_started = self.validation_timing.is_some().then(Instant::now);
             let presented = renderer.draw(
                 &snapshot,
                 station,
                 SceneEffects {
+                    mule: mule_scene,
                     traffic: traffic.as_ref(),
                     pulse: self.pulse.as_ref(),
                     mining: belt.as_ref().map(|belt| asteroid_render::Scene {
@@ -976,6 +1047,9 @@ impl App {
                     help: self.help.as_ref().or(xyzzy_panel.as_ref()),
                 },
             );
+            if let (Some(started), Some(timing)) = (draw_started, &mut self.validation_timing) {
+                timing.observe(&presented, started.elapsed());
+            }
             if let Err(error) = Self::complete_presentation(
                 presented,
                 &mut self.docked,
@@ -997,7 +1071,10 @@ impl ApplicationHandler for App {
         }
         let attributes = Window::default_attributes()
             .with_title("Meridian - initializing graphics")
-            .with_inner_size(winit::dpi::LogicalSize::new(1280.0, 720.0))
+            .with_inner_size(winit::dpi::LogicalSize::new(
+                DEFAULT_FLIGHT_WINDOW[0],
+                DEFAULT_FLIGHT_WINDOW[1],
+            ))
             .with_min_inner_size(winit::dpi::LogicalSize::new(640.0, 360.0));
         let window = match event_loop.create_window(attributes) {
             Ok(window) => Arc::new(window),
