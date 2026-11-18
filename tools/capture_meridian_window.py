@@ -190,11 +190,11 @@ def capture(scope_path: Path, provider: Path, request: int, frame: int, call=pro
     finally:
         receipt.update(progress)
         receipt["python_monotonic_end_ns"] = time.monotonic_ns()
-        try:
-            create_new(directory / f"window-capture-{request}.json", json_bytes(receipt))
-        finally:
-            if acquired:
-                lock.unlink()  # only this invocation's own transient lock; claims/evidence persist
+        create_new(directory / f"window-capture-{request}.json", json_bytes(receipt))
+        # Release only after complete receipt publication, including flush/fsync/close.
+        # A publication failure retains the owned lock to stop every later slot.
+        if acquired:
+            lock.unlink()  # only this invocation's own transient lock; claims/evidence persist
     return receipt
 
 def main() -> int:

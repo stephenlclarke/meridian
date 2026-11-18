@@ -223,9 +223,19 @@ class PolicyFixtures(unittest.TestCase):
                 self.assertEqual((root / "window-capture-1-frame-10.png").read_bytes(), png())
                 self.assertTrue((root / "window-capture-1.claim.json").exists())
                 self.assertTrue((root / "window-capture-1.json").exists())
+                self.assertTrue((root / "window-capture.inflight").exists())
                 with self.assertRaises(FileExistsError):
                     self.run_capture()
                 self.assertEqual(self.calls, ["enumerate", "capture"])
+                next_slot = self.run_capture(2, 20)
+                self.assertEqual(next_slot["status"], "failed")
+                self.assertFalse(next_slot["native_provider_attempted"])
+                self.assertFalse(next_slot["capture_attempted"])
+                self.assertEqual(self.calls, ["enumerate", "capture"])
+                self.assertTrue((root / "window-capture.inflight").exists())
+                self.assertEqual((root / "window-capture-1-frame-10.png").read_bytes(), png())
+                self.assertTrue((root / "window-capture-1.claim.json").exists())
+                self.assertTrue((root / "window-capture-1.json").exists())
 
     def test_cli_preflight_failure_truthfully_records_no_native_attempt(self):
         self.scope["human_exception_reference"] = "PENDING"
