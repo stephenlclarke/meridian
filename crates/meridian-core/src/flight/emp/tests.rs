@@ -504,7 +504,44 @@ fn actual_secret_base_release_spends_once_drains_shield_and_preserves_hull_cargo
     assert!(w.emp.pulses.is_empty());
     // Compare the same accepted native step without an EMP release. Ordinary NPC
     // firing/recharge can change hull energy on this frame; only EMP damage must be zero.
-    let mut native_control = w.clone();
+    let bytes = w.save_bytes().unwrap();
+    // Use the validated decoder, not Continue: Continue invalidates freight review state.
+    // Decoding clears held_tick/posted_tick and contact, and creates a mining scope.
+    // Fork the live step fields explicitly, including EMP transients and scope identity;
+    // only immutable bundled data and fully encoded non-Clone owners come from decode.
+    let decoded = World::decode_saved_world(&bytes).unwrap();
+    assert_eq!(w.mission_snapshot().unwrap().contact, None);
+    let mut native_control = World {
+        state: w.state,
+        traffic: w.traffic.clone(),
+        mining: w.mining.clone(),
+        mining_scope: Arc::clone(&w.mining_scope),
+        damage: w.damage.clone(),
+        station_data: decoded.station_data,
+        navigation_catalogue: decoded.navigation_catalogue,
+        navigation: w.navigation,
+        jump_journal: decoded.jump_journal,
+        commander_account: decoded.commander_account,
+        freight_session: decoded.freight_session,
+        station_markets: decoded.station_markets,
+        pulse: w.pulse,
+        combat: w.combat,
+        missiles: w.missiles.clone(),
+        ammunition: w.ammunition.clone(),
+        modular: w.modular.clone(),
+        xyzzy: w.xyzzy.clone(),
+        emp: w.emp.clone(),
+        navigation_trade: w.navigation_trade.clone(),
+        flight_reception: w.flight_reception.clone(),
+        practice: w.practice,
+        practice_history: w.practice_history.clone(),
+        practice_trace: w.practice_trace,
+    };
+    assert_eq!(native_control.save_bytes().unwrap(), bytes);
+    assert_eq!(native_control.mission_snapshot(), w.mission_snapshot());
+    assert_eq!(native_control.emp, w.emp);
+    assert_eq!(native_control.state, w.state);
+    assert!(Arc::ptr_eq(&native_control.mining_scope, &w.mining_scope));
     native_control
         .request_emp_trigger(false, native_control.snapshot().tick)
         .unwrap();
