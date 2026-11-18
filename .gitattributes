@@ -1,2 +1,5 @@
 # Asset and provenance hashes identify exact bytes on every platform.
 assets/legacy/** -text
+assets/fleet/sh001/** -text
+assets/fleet/sh001/*.rgba binary
+assets/fleet/sh001/visual.bin binary
