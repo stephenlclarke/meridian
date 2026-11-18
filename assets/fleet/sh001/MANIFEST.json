@@ -1,0 +1,69 @@
+{
+  "id": "SH001",
+  "name": "Mule",
+  "authorityArchiveSHA256": "4392dd6eb5a289145c88e5cef3ec3f83552d7920d9dc3bbb3331b8539c11ec9a",
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "selectedResource": "OriginalFleetRelativePendingSourceRegistrations resource1c8cce7; later than the backlog resource pin",
+  "scaleNumerator": 40000,
+  "scaleDenominator": 3411,
+  "coordinateEncoding": "Unscaled original local XYZ f64 values; detailed then native; source origin/winding/fields unchanged",
+  "vertices": {
+    "detailed": 4360,
+    "native": 984
+  },
+  "faces": {
+    "detailed": 7236,
+    "native": 1772
+  },
+  "sourceComponents": {
+    "detailed": 371,
+    "native": 49
+  },
+  "files": {
+    "resource.toml": {
+      "bytes": 1108065,
+      "sha256": "1c8cce7fb8130c12780fb522592249805cb06e6b22fcffb169ae651556f47c82"
+    },
+    "original-design.toml": {
+      "bytes": 1083972,
+      "sha256": "5a5c99c1ab2c481e0891a90a18f9376b054709f14604c2fa5a45771d4d2817fe"
+    },
+    "ownership.json": {
+      "bytes": 240282,
+      "sha256": "bdb09d57db6e8c5e110ec103cf097a48c3efb33960da8e64e6d450c9dd26503e"
+    },
+    "physical.json": {
+      "bytes": 278066,
+      "sha256": "f7beb62451cb86ab289e25f88f642924df183532c2a944030ac4f7fd2825491d"
+    },
+    "LICENSE": {
+      "bytes": 1071,
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+    },
+    "contract.toml": {
+      "bytes": 3461,
+      "sha256": "27c960f32df859e67b969e2d9a25d9fb15f8a887a253cd20f7cd213a728bf14c"
+    },
+    "all-source.vertices": {
+      "bytes": 128272,
+      "sha256": "50a22c21868b6ed6f9fedbc755fbf08afe0336256af78c035fd77564bbb02a85"
+    },
+    "source-triangles.bin": {
+      "bytes": 108096,
+      "sha256": "55854931bc66b4b4b6c2daa59b58ec8c42c66736831baf86930a6c61968f5827"
+    },
+    "source-piece-membership.bin": {
+      "bytes": 5344,
+      "sha256": "c3b9ff6d1cdaec8d4c9cc57b468637d9996338540ceae08df6b6264593b18fad"
+    },
+    "COMPONENT-PIECES.json": {
+      "bytes": 95339,
+      "sha256": "e9a879e72ed66b1b4aad60dba3a9a875edd79db06366efaa36ea7a81422faa68"
+    }
+  },
+  "transform": "Verbatim source files and source-order XYZ encoding only; no envelope/hull/contact/containment/union algorithm executed",
+  "gameplayEnvelope": "Sixteen separate source-convex-support pieces with a2cm spherical offset; distinct conservative approximation, not exact source union or native512-face qualification",
+  "pieceGrouping": "Original body, six separate supports, six panniers, cockpit and two engines; every triangle stays in one original component/piece",
+  "exactGeometryQualification": "UNRESOLVED; original source and all prior exact-geometry caps/results retained",
+  "admission": "UNQUALIFIED; source binding grants no actor, shield, crew, equipment, blueprint, purchase or salvage authority"
+}

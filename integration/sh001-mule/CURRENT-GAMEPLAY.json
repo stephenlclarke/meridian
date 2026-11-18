@@ -1,0 +1,540 @@
+{
+  "gameplayAuthority": "ad5b9f9da259c85389cd662af2473e543e26ab11",
+  "readOnlyProjectionRootHead": "49bb55b0fdb89b4f64196ba86b58d0992b18d4b9",
+  "coreFiles": {
+    "crates/meridian-core/Cargo.toml": {
+      "bytes": 210,
+      "sha256": "29607c4a931299648228b9063ce2cebc9ee52df1490d8b89ee77920d38e3f025"
+    },
+    "crates/meridian-core/README.md": {
+      "bytes": 1807,
+      "sha256": "c3995a249e1cfd937f38e28c7a8570e49ea221c725f3eff734317551a49202dd"
+    },
+    "crates/meridian-core/examples/prepare_native_laser_ecm.rs": {
+      "bytes": 6535,
+      "sha256": "342f3cb09a08bc8978b8f4a356848837d5a586f1551db784960075d0b0ac9e1d"
+    },
+    "crates/meridian-core/src/celestial.rs": {
+      "bytes": 10723,
+      "sha256": "468102c7fadcccb6d06c572798eef7fa002ede64e01b7c20c2284088a1ffc7cc"
+    },
+    "crates/meridian-core/src/docking.rs": {
+      "bytes": 40069,
+      "sha256": "2e052808d92789b2d329c4c87d21a41ce5f1241b2af403f73b751d2143e17619"
+    },
+    "crates/meridian-core/src/equipment.rs": {
+      "bytes": 14655,
+      "sha256": "1d82d363f03f293e8ef8ba5c3d8916802fa3e5b21ad6d41c9421ea5f70e08ffe"
+    },
+    "crates/meridian-core/src/equipment/content.rs": {
+      "bytes": 5547,
+      "sha256": "bde7c56569f1a6fc9740942b3f2c19589f8ef19a5e46bb770f5aa2797760cd49"
+    },
+    "crates/meridian-core/src/flight.rs": {
+      "bytes": 38995,
+      "sha256": "55323dab131ab774ff49a3db1e145bbd76b81273712206f1682bfd8231314fda"
+    },
+    "crates/meridian-core/src/flight/ammunition.rs": {
+      "bytes": 22629,
+      "sha256": "1badcdb362b210ac2468ccf36bb09e6488264eeec1f41edae6febab9b967eb4e"
+    },
+    "crates/meridian-core/src/flight/ammunition/tests.rs": {
+      "bytes": 15128,
+      "sha256": "cc0da0f94520a17eb031731546e488c1ab1372d13de04980a88908f59612d974"
+    },
+    "crates/meridian-core/src/flight/ammunition/xyzzy_tests.rs": {
+      "bytes": 987,
+      "sha256": "b55c99f3795cdb342424431e7854046dc0bb34c1ccdea374cdb5942758ee2b69"
+    },
+    "crates/meridian-core/src/flight/celestial.rs": {
+      "bytes": 6280,
+      "sha256": "a7ac7078fc7c2d3900eb709c5497ec25d3b36106f8ddeed658244489ab895d3c"
+    },
+    "crates/meridian-core/src/flight/combat.rs": {
+      "bytes": 29085,
+      "sha256": "fbf1ec00e1a745c4fcb94867abe4fd2f1b74531a5cc26bbf23251e04b8b56802"
+    },
+    "crates/meridian-core/src/flight/combat/tests.rs": {
+      "bytes": 29275,
+      "sha256": "4c67a319614b1119828ec414d42a1772c28d2c09bf387a31564c0e6792720d2e"
+    },
+    "crates/meridian-core/src/flight/damage.rs": {
+      "bytes": 21981,
+      "sha256": "6e6a7ae19752361ca3c4e083933cc335ffb2888735d03c2302d7b44bdd7d8a07"
+    },
+    "crates/meridian-core/src/flight/damage/capacity.rs": {
+      "bytes": 5921,
+      "sha256": "775f62199dc0d584d932c7d64d0b13da31008e0500437e25c4ad8ec8466855d2"
+    },
+    "crates/meridian-core/src/flight/damage/mounted_ray_tests.rs": {
+      "bytes": 13195,
+      "sha256": "cd6e74ef29f8a663ca79c9cce48b7fca70510eec8a8394ac9431af31aeeea835"
+    },
+    "crates/meridian-core/src/flight/damage/rapid_energy_tests.rs": {
+      "bytes": 22318,
+      "sha256": "f08fc3300aa91c52d118824c089d8c35b987a46354011b198b1dc4bf15cb7340"
+    },
+    "crates/meridian-core/src/flight/damage/tests.rs": {
+      "bytes": 12543,
+      "sha256": "1272ba18ba22995d12106ce67f8e6c9c2c34bb1ca43a48ce2116609a1f2af316"
+    },
+    "crates/meridian-core/src/flight/ecm.rs": {
+      "bytes": 8025,
+      "sha256": "94c086a17094d29357c820d0277e6aba923b05df77d45259b9e69e0c3390c32a"
+    },
+    "crates/meridian-core/src/flight/ecm/persistence.rs": {
+      "bytes": 3029,
+      "sha256": "5ad884d5d996f3ca50a02e80bda45b0abf28a1c75b7ccc2877143f78ece08067"
+    },
+    "crates/meridian-core/src/flight/ecm/preparation.rs": {
+      "bytes": 2153,
+      "sha256": "0942d1630224da89ddbec3764666ff65ef1fee00289b86e37b3817bf3c738c6b"
+    },
+    "crates/meridian-core/src/flight/ecm/tests.rs": {
+      "bytes": 24928,
+      "sha256": "162bfb94139bce995222894979b91e9a349e4338e2e4eac010000bc1d7a5ae79"
+    },
+    "crates/meridian-core/src/flight/ecm/validation.rs": {
+      "bytes": 8063,
+      "sha256": "6dc6a6fc598df3d82c1644a71c76a4e0f167e636a3cc57f8a8cffb4d750cc24e"
+    },
+    "crates/meridian-core/src/flight/emp.rs": {
+      "bytes": 10671,
+      "sha256": "1c2f125838cb67542708e50fe71a20aba20d111ab78d5a55e03e6f810c9ef362"
+    },
+    "crates/meridian-core/src/flight/emp/equipment.rs": {
+      "bytes": 10873,
+      "sha256": "705e5b47d61718869750d6872dac26a5dfcbd61c571e0b2ccb75811f5fd2c0dd"
+    },
+    "crates/meridian-core/src/flight/emp/meter.rs": {
+      "bytes": 6796,
+      "sha256": "71ba96d01e8fbf0acf4fa00a3e7a2f63ac0c42977a8b11bb38e6c25b9a501cc2"
+    },
+    "crates/meridian-core/src/flight/emp/persistence.rs": {
+      "bytes": 11697,
+      "sha256": "de56cee1bed403a15e71c7d499652d489d5f25b647be9d3b12c19094f9d42829"
+    },
+    "crates/meridian-core/src/flight/emp/policy.rs": {
+      "bytes": 3042,
+      "sha256": "91284bc437a971a9b60b7379b3256dd42fde5965b78a3b362e99086168bd944e"
+    },
+    "crates/meridian-core/src/flight/emp/replay.rs": {
+      "bytes": 7997,
+      "sha256": "5e106980f893ea698136d460c390b8f14185ef90b39729561524ed729a130a76"
+    },
+    "crates/meridian-core/src/flight/emp/runtime.rs": {
+      "bytes": 18361,
+      "sha256": "8392dcdafc03f4ece393c349b3b48e606e99b4f0a9eead6f9ec336a7a4f81e39"
+    },
+    "crates/meridian-core/src/flight/emp/scene.rs": {
+      "bytes": 11228,
+      "sha256": "30744780d865793a36a7a021ec31b1b1737198be462d586939e048e3f9301660"
+    },
+    "crates/meridian-core/src/flight/emp/snapshot.rs": {
+      "bytes": 2552,
+      "sha256": "acfb82643cd48e311260249790cd2e5b939a4c65492c7db4a52037c3cb49674a"
+    },
+    "crates/meridian-core/src/flight/emp/tests.rs": {
+      "bytes": 54791,
+      "sha256": "774cc0bcb219b304ae7cc5bcb9f06148b11a16e6f9077874bdebc844acc5e17c"
+    },
+    "crates/meridian-core/src/flight/emp/validation.rs": {
+      "bytes": 15847,
+      "sha256": "37a9126433098e39fe54586fbe1ea5089297ae048ae2a48dc3315af11e528090"
+    },
+    "crates/meridian-core/src/flight/equipment.rs": {
+      "bytes": 3973,
+      "sha256": "106432e1ab98497ec661eea43f29c215d243efc49596c36a8baa23eb1b203916"
+    },
+    "crates/meridian-core/src/flight/equipment/tests.rs": {
+      "bytes": 19887,
+      "sha256": "4029b4039d385471cd044b5c2d0bfc01b065878209ede0ad07fd261e6e07f3bb"
+    },
+    "crates/meridian-core/src/flight/flight_reception.rs": {
+      "bytes": 19737,
+      "sha256": "da8439d39ef2142c84c998262c8996be84d8ab49278ff7eeb37c39ec3908c501"
+    },
+    "crates/meridian-core/src/flight/flight_reception/persistence.rs": {
+      "bytes": 13439,
+      "sha256": "56280f5795f765306171297fc394e6852319d2ed6b5a0c5038400bcfbdd201c7"
+    },
+    "crates/meridian-core/src/flight/flight_reception/sight.rs": {
+      "bytes": 6745,
+      "sha256": "228048c1762842735644b713e5029f3e7b176fd1f9790612361e7c62ed09f3a2"
+    },
+    "crates/meridian-core/src/flight/flight_reception/tests.rs": {
+      "bytes": 30129,
+      "sha256": "35dfe33890499e236a11163a152b22e368e3e743e6d970feb6ed7a558e50ee7f"
+    },
+    "crates/meridian-core/src/flight/laser_facings.rs": {
+      "bytes": 7264,
+      "sha256": "47bc64b4547f31162928ed53f7a7932aea1fb53b5bd17fd789597c635e05e1ab"
+    },
+    "crates/meridian-core/src/flight/laser_facings/tests.rs": {
+      "bytes": 17535,
+      "sha256": "c2dca7248567c28a08210f1dca43038218a739b229b9ec59057481749763ee0b"
+    },
+    "crates/meridian-core/src/flight/mining.rs": {
+      "bytes": 11138,
+      "sha256": "4a98a804180f35d44577ad99c051fe84c4d0db318f9c9c61f8d6424d155e2459"
+    },
+    "crates/meridian-core/src/flight/mining/persistence.rs": {
+      "bytes": 6084,
+      "sha256": "6d190da318e7fc70ebb5e6220a03674782e1a9c9666fbba24cd5b5d6e444af98"
+    },
+    "crates/meridian-core/src/flight/mining/tests.rs": {
+      "bytes": 13907,
+      "sha256": "9f1eb512ae11cf9f688236e4529e4d48006bb3e5a97609b3aee7ff0c6ea144a8"
+    },
+    "crates/meridian-core/src/flight/missiles.rs": {
+      "bytes": 35340,
+      "sha256": "af6732d11554c5cb793a339b0bc108c97c3d43f962324a358f4b2dcaf6b62d14"
+    },
+    "crates/meridian-core/src/flight/missiles/geometry.rs": {
+      "bytes": 2459,
+      "sha256": "ced3e92cbee98f09c06fcfedc83d8e66278f22d56e761748250d94bdb997e4c5"
+    },
+    "crates/meridian-core/src/flight/missiles/geometry/endpoint_tests.rs": {
+      "bytes": 2347,
+      "sha256": "8c684fdeda5b6496d9f2c73eb6b348a9f4828e59cd2462bb3953748a215fd60f"
+    },
+    "crates/meridian-core/src/flight/missiles/npc.rs": {
+      "bytes": 16996,
+      "sha256": "83f28dfc1319c771aa37a12d36899ce1673c75d783cfb8f8ae653ed555a1ed98"
+    },
+    "crates/meridian-core/src/flight/missiles/npc/join_tests.rs": {
+      "bytes": 15472,
+      "sha256": "18395245c65d112fc5b80f78a44eb38173fbe7be65cde9834732412ed4ce035c"
+    },
+    "crates/meridian-core/src/flight/missiles/npc/tests.rs": {
+      "bytes": 18677,
+      "sha256": "a32d510e20cff413a469ae5f684a456904d2905831f43d116f2e326f7981d584"
+    },
+    "crates/meridian-core/src/flight/missiles/npc/tests/wreck.rs": {
+      "bytes": 14541,
+      "sha256": "ce7882e65ca0a85ad9200e0405f804257f20fbd8a625cc5f89eb0c25732329f3"
+    },
+    "crates/meridian-core/src/flight/missiles/persistence.rs": {
+      "bytes": 57985,
+      "sha256": "87fec6e116160f168d10d94b8c81b9282088a86d97b27e3c71daa62f9626700d"
+    },
+    "crates/meridian-core/src/flight/missiles/persistence/solid_contact_tests.rs": {
+      "bytes": 3976,
+      "sha256": "fad3210990f3a01f942182a43892913eff8fd0ee66964aa5d029814fc99e2772"
+    },
+    "crates/meridian-core/src/flight/missiles/tests.rs": {
+      "bytes": 21640,
+      "sha256": "1609ce38e46ee5acf94ac3ca077ae53bdffb6b904f9098431142630d1d60bea4"
+    },
+    "crates/meridian-core/src/flight/missiles/tests/durable.rs": {
+      "bytes": 20764,
+      "sha256": "0720428944110497ef5ff2fba77e87ddd2d22bb627e9b1c55710ebddbd88756a"
+    },
+    "crates/meridian-core/src/flight/mission.rs": {
+      "bytes": 24538,
+      "sha256": "a5cf306b00be7ab72a7ebf00b585503f0442bb979b383a2f481533007217fc70"
+    },
+    "crates/meridian-core/src/flight/mission/persistence.rs": {
+      "bytes": 3251,
+      "sha256": "f5d1fad1a7a8a3cbd2c1e4f5b75a3cabb8c604f86f0488ec79e7ad12bf2c108f"
+    },
+    "crates/meridian-core/src/flight/modular.rs": {
+      "bytes": 53342,
+      "sha256": "e2e80a51536ea2e99486c8682c5003a164994346d16a6a4d2b9dc86e48146423"
+    },
+    "crates/meridian-core/src/flight/modular/navigation_tests.rs": {
+      "bytes": 11629,
+      "sha256": "43454d060b4eac35cf7fccc6f6aedf08a3b85573b8f39469398f1d4a2d2fc446"
+    },
+    "crates/meridian-core/src/flight/modular/scoops.rs": {
+      "bytes": 5066,
+      "sha256": "6cc8ebd8656a74fa82bb40839a2326db60917fc448a7e4865b171fe86d822f74"
+    },
+    "crates/meridian-core/src/flight/modular/scoops/tests.rs": {
+      "bytes": 12846,
+      "sha256": "809bf045f109591c6865c12ee44ea7f1e62f05e4f1db17458ef4aa9ab36c1072"
+    },
+    "crates/meridian-core/src/flight/modular/scoops/tests/joined.rs": {
+      "bytes": 3586,
+      "sha256": "40b9af67fa5505c0f2cfc4ba0dcc7cd554061b3fffa889f9b37f8469257ee2e4"
+    },
+    "crates/meridian-core/src/flight/modular/tests.rs": {
+      "bytes": 19966,
+      "sha256": "7dcd652aec050b73bff501667e129a598a0c8b57cbed4aa17c0172c3270d7bb1"
+    },
+    "crates/meridian-core/src/flight/modular/xyzzy_tests.rs": {
+      "bytes": 1177,
+      "sha256": "c364ae5f9d8b1259d1e541d62786073609d8ee5b5693e7ef0993866173933e90"
+    },
+    "crates/meridian-core/src/flight/navigation_trade.rs": {
+      "bytes": 12879,
+      "sha256": "6d2458793883e891cf31db0888fc8d0f190b6eb5f609d9b009c8e0610b730070"
+    },
+    "crates/meridian-core/src/flight/navigation_trade/actions.rs": {
+      "bytes": 10969,
+      "sha256": "36ea4de066bfb02a9ae5f0ef664bee5f7e26220c5da7f2f8fca013ffd8a9406b"
+    },
+    "crates/meridian-core/src/flight/navigation_trade/market.rs": {
+      "bytes": 10884,
+      "sha256": "fb508983d8f3a8d99cb2237731c7ea2372ebb646e9ca1420165b482cc097e533"
+    },
+    "crates/meridian-core/src/flight/navigation_trade/persistence.rs": {
+      "bytes": 31244,
+      "sha256": "6255bdd38bd8c58430dd87b5ac65e3692d7f0330aac6a2f1aa646793255a14f2"
+    },
+    "crates/meridian-core/src/flight/navigation_trade/tests.rs": {
+      "bytes": 31019,
+      "sha256": "42a2a9ed3a2fd94180e600a46552f7807f6694c3af6227f1c3393faa680ef915"
+    },
+    "crates/meridian-core/src/flight/persistence.rs": {
+      "bytes": 34575,
+      "sha256": "99745700af17d4c11d508b56779e9b4442df1035ab7af002c48f3b7d47773f9a"
+    },
+    "crates/meridian-core/src/flight/persistence/tests.rs": {
+      "bytes": 35892,
+      "sha256": "13b8fc2735ab05ed4f5a2d30bb21f9f0d665b1ff8326cb799b070262c2ce6d96"
+    },
+    "crates/meridian-core/src/flight/practice.rs": {
+      "bytes": 19165,
+      "sha256": "228878d6b154e6d036d8e38c69871f4ea1455b2717a1f10f5c6f5c75c7e63f2b"
+    },
+    "crates/meridian-core/src/flight/practice/geometry.rs": {
+      "bytes": 3335,
+      "sha256": "947cd63fa62530ec31bbeeb85f4fc2567056b22a391454d0b7f6a48e30bb8e77"
+    },
+    "crates/meridian-core/src/flight/practice/lifecycle.rs": {
+      "bytes": 17695,
+      "sha256": "013ec8210abd42f7a5a1745cc6f40f166b3aa7754717ef56654eb793cf3b2ab4"
+    },
+    "crates/meridian-core/src/flight/practice/lifecycle/tests.rs": {
+      "bytes": 25946,
+      "sha256": "d59798d12a7165bcd7cd9989237b44746149717cb89e2bfc3a08f54b4990fb59"
+    },
+    "crates/meridian-core/src/flight/practice/persistence.rs": {
+      "bytes": 12838,
+      "sha256": "d70153b8ca9c84b33c14c43d51b2d6555925ef47f034b9ee0baf0226d83bdd36"
+    },
+    "crates/meridian-core/src/flight/practice/reception.rs": {
+      "bytes": 12848,
+      "sha256": "c66ffe29e0529a0263f06096da0d39cba4368a49e720c7c5e0d0049f07fe33cb"
+    },
+    "crates/meridian-core/src/flight/practice/reception/tests.rs": {
+      "bytes": 13638,
+      "sha256": "0a59ed0d719f3d5aefd0a6cf30869b335f67f51ea85464b95842bf4cfc1376ad"
+    },
+    "crates/meridian-core/src/flight/practice/tests.rs": {
+      "bytes": 15350,
+      "sha256": "2904824ce814b5748e3b18b503bcf9c5a27da1b7cd1957b22fe135b8e5f8540f"
+    },
+    "crates/meridian-core/src/flight/services.rs": {
+      "bytes": 22679,
+      "sha256": "0f04ca7aa634ea23241daf43902043e66f81f3d39b3f7746d99d6fbaf1b7f876"
+    },
+    "crates/meridian-core/src/flight/traffic.rs": {
+      "bytes": 13040,
+      "sha256": "daeea262d749aad32c6765854c2e7fd0bf7b6f07db5ed8752c5d8a9cbe8ab50f"
+    },
+    "crates/meridian-core/src/flight/traffic/tests.rs": {
+      "bytes": 19367,
+      "sha256": "832a6d12641e1ea1bbcb9090bf58d9caf0cb9dbb139cccfeac79f870caaf898d"
+    },
+    "crates/meridian-core/src/flight/weapons.rs": {
+      "bytes": 24556,
+      "sha256": "cbaba8338ce9535f56fd0bb9706810448da266552d91516f6a683f644939f341"
+    },
+    "crates/meridian-core/src/flight/weapons/tests.rs": {
+      "bytes": 10391,
+      "sha256": "3bcc9fa574b115b09e0dd815e3f11005ad17b53b9ac08b7a350df64c56038d94"
+    },
+    "crates/meridian-core/src/flight/xyzzy.rs": {
+      "bytes": 14052,
+      "sha256": "f68ce06aa0ee3153e850379a220c59c7671afc29f36691088c22ff89245bbc67"
+    },
+    "crates/meridian-core/src/flight/xyzzy/history.rs": {
+      "bytes": 4992,
+      "sha256": "8a9e43df95a53c40715e8d4f8e75ee4e0e2d70b77352fb9d09f1a20f859be473"
+    },
+    "crates/meridian-core/src/flight/xyzzy/tests.rs": {
+      "bytes": 27121,
+      "sha256": "fdbeef17164286a5405a23852a996deb9d0636bcfbc9e64a7996db1e748c6416"
+    },
+    "crates/meridian-core/src/freight.rs": {
+      "bytes": 6790,
+      "sha256": "fe7044bf3c2aca5304f1e22ce91b6839fd1af7a0d1807f9e33d0486fbf0b6766"
+    },
+    "crates/meridian-core/src/freight/g02.rs": {
+      "bytes": 66819,
+      "sha256": "b13debf6b82f5f02cca230711a4780fc7b944a91c6df46e19c534bdd971a7224"
+    },
+    "crates/meridian-core/src/freight/g02/persistence.rs": {
+      "bytes": 18560,
+      "sha256": "d878d77ba04844846ea262d268e146131969a19db1f96250ce8b42568d43b8ab"
+    },
+    "crates/meridian-core/src/freight/g02/presentation.rs": {
+      "bytes": 18067,
+      "sha256": "a6979244e8dd497ab01b050b49451c4b9c67be7ff26b05b8e249dae93783d865"
+    },
+    "crates/meridian-core/src/lib.rs": {
+      "bytes": 3290,
+      "sha256": "d970c7384b9167ab0e8865832089bb537b2919ccb932d3170c118ef1349db6e3"
+    },
+    "crates/meridian-core/src/mining.rs": {
+      "bytes": 13337,
+      "sha256": "6b8278efa71647548b317bedf352b9026eefbcdc1c7e738717f7df6da58ed798"
+    },
+    "crates/meridian-core/src/mining/ledger.rs": {
+      "bytes": 7735,
+      "sha256": "eafb563854a8f89e2a7e12a3dc3a1730896e5178dac51118b003df2846b87f80"
+    },
+    "crates/meridian-core/src/mining/ore.rs": {
+      "bytes": 2856,
+      "sha256": "bfa604ac6206259de6aee39b5c4784bd27e85a63472f02b6fda5cb758aac9704"
+    },
+    "crates/meridian-core/src/mining/persistence.rs": {
+      "bytes": 4201,
+      "sha256": "086e4acc99fda02a148eb9b54058861da504f72c962b4b55756f13f2be6b53d7"
+    },
+    "crates/meridian-core/src/mining/tests.rs": {
+      "bytes": 8522,
+      "sha256": "ec6bed51ec6c10c182bdbd463021e47c8d830bd19b89e3215c53d9a29c39e13a"
+    },
+    "crates/meridian-core/src/navigation.rs": {
+      "bytes": 31825,
+      "sha256": "ede196c4a81114e3ab169744dfc085011bd1457f0d297f614b74540bae085c69"
+    },
+    "crates/meridian-core/src/navigation/journal.rs": {
+      "bytes": 13189,
+      "sha256": "68926ee5115002a09f497886444c266663f190efc3d0c4cc02fd156aaaeec649"
+    },
+    "crates/meridian-core/src/navigation/persistence.rs": {
+      "bytes": 10237,
+      "sha256": "49b162b101168a1a35263e47e584d1c323f178e60d50632db4aec091e0323ee1"
+    },
+    "crates/meridian-core/src/save.rs": {
+      "bytes": 4049,
+      "sha256": "c2a27f055877c49e21be6f7205bc0846a2c8c3dfa86c4b9ad2569acad70b935d"
+    },
+    "crates/meridian-core/src/station.rs": {
+      "bytes": 33935,
+      "sha256": "034287b0932420258bafe980e1b0cd2534bd1b4c15336ecae33900976a4c5fb5"
+    },
+    "crates/meridian-core/src/station/beam.rs": {
+      "bytes": 15586,
+      "sha256": "8e27b10dff9251ded0443fab1afe2e0e15b6cdcc894be5ce5fd392c21a91a609"
+    },
+    "crates/meridian-core/src/station/beam/aim_tests.rs": {
+      "bytes": 4518,
+      "sha256": "06847970b4f0fcc28e599f846bdb85056fb7891ff998fe2306dc122ab1049fcb"
+    },
+    "crates/meridian-core/src/station_services.rs": {
+      "bytes": 30879,
+      "sha256": "06bd7a7db6a9585ddeebe57ab812bb5f0778ee321082daa4e378a255fba8f399"
+    },
+    "crates/meridian-core/src/station_services/commodities.rs": {
+      "bytes": 11454,
+      "sha256": "6ccc5f1f2bb5f6560c3baba03c0b9f847d768ddf18598f1f0b54bc6a72ea89de"
+    },
+    "crates/meridian-core/src/station_services/commodity_tests.rs": {
+      "bytes": 8762,
+      "sha256": "ef02cb8373da6a515e78bda8e29d9d47c4ce807bf81d385817fcdc05f28c493d"
+    },
+    "crates/meridian-core/src/station_services/history.rs": {
+      "bytes": 8973,
+      "sha256": "30de7128095189f2bf7f08d3ef0a71e74b8b1f6980a1d1a0c41167f84c581d59"
+    },
+    "crates/meridian-core/src/station_services/persistence.rs": {
+      "bytes": 10508,
+      "sha256": "14200c4e812a1765a5740343590c13d0b5ea55b3a48a3f70270a90eefb033a57"
+    },
+    "crates/meridian-core/src/station_services/traffic.rs": {
+      "bytes": 1276,
+      "sha256": "944fddb6e6fbab2287a08dc5bac3b63a1853a369b7362467c4cdf110fc9e5867"
+    },
+    "crates/meridian-core/src/traffic.rs": {
+      "bytes": 17734,
+      "sha256": "9d66f106fb9beda7cfe9c8367fb9bc714724832b9d409accb8803c7142b16a2e"
+    },
+    "crates/meridian-core/src/traffic/admission.rs": {
+      "bytes": 1770,
+      "sha256": "0df90ce9b6f64ba8a2e968d281c6b7b6a95145011991cad503c682a5034b797b"
+    },
+    "crates/meridian-core/src/traffic/admission/tests.rs": {
+      "bytes": 5378,
+      "sha256": "2ce08b23c1a6d96965a964ea120d44cea29e6a6bd7232ad8426e8e46e2c8c2cc"
+    },
+    "crates/meridian-core/src/traffic/combat.rs": {
+      "bytes": 13722,
+      "sha256": "98176ddaf15188078dc29d261a2b805c1850950f3863ade01ec264b79059edf2"
+    },
+    "crates/meridian-core/src/traffic/economy.rs": {
+      "bytes": 6906,
+      "sha256": "a54fb1310f9d8a7db0a94eaeedf3f11054221a43c1e52e3a51986107bc71fe97"
+    },
+    "crates/meridian-core/src/traffic/emp.rs": {
+      "bytes": 10122,
+      "sha256": "9ad534a894e0df7dada15596a2956ee7d7b4e9ecfecb3f387ddf63fbf14249ff"
+    },
+    "crates/meridian-core/src/traffic/missiles.rs": {
+      "bytes": 20697,
+      "sha256": "7351a146ca966eefab59143c33217cc230f9aa35c5ee081a036c32fe53be3ec3"
+    },
+    "crates/meridian-core/src/traffic/missiles/tests.rs": {
+      "bytes": 4510,
+      "sha256": "2f26e72803eaf6d3132b242c4063b65f09b520d0d933960b943b341780f18a65"
+    },
+    "crates/meridian-core/src/traffic/motion.rs": {
+      "bytes": 14299,
+      "sha256": "08d0d674120fa64ec0fdef40689e375096b2cff38333b403c5640e55fdcbf0c5"
+    },
+    "crates/meridian-core/src/traffic/persistence.rs": {
+      "bytes": 27612,
+      "sha256": "bba1535a7db71992e1300ca3f74464dfe5cc40f24575b1d72c5cdd582b6958bc"
+    },
+    "crates/meridian-core/src/traffic/player_hits.rs": {
+      "bytes": 10175,
+      "sha256": "c4ee99d2ea56e614063ab814cb5946caf792c0ceb24342e889b7c1ad77c97395"
+    },
+    "crates/meridian-core/src/traffic/player_hits_tests.rs": {
+      "bytes": 9065,
+      "sha256": "320dbfee6a610002c1132e49f7564d718851bc2aaabc77904cddbe281cd2acbb"
+    },
+    "crates/meridian-core/src/traffic/tests.rs": {
+      "bytes": 14949,
+      "sha256": "ca6a1008aa988932fd4143ebe2dbbe915afd872b9a8377a6ded44b2b0c0828e7"
+    },
+    "crates/meridian-core/src/traffic/wreck.rs": {
+      "bytes": 6088,
+      "sha256": "ca4eccbdec74c7c4e2a530c661229b6138af2adc440b4675f8f8119b473139ec"
+    },
+    "crates/meridian-core/tests/fixtures/README.md": {
+      "bytes": 2507,
+      "sha256": "73bea447ff62c4ffdc10536175a9f5657adeafa7c7eb92431c13cf83ee0e92f5"
+    },
+    "crates/meridian-core/tests/fixtures/pr44-v16-m02-purchases.bin": {
+      "bytes": 3102,
+      "sha256": "d2f995aa2826d8e77fc215cbaf7dee950b68c530b20d09a0dfd226d50980ddae"
+    },
+    "crates/meridian-core/tests/fixtures/qualified-v15-npc-flight.bin": {
+      "bytes": 13952,
+      "sha256": "f226c072e95546686cf3bccd99578921bb3a38e8628063fac36c6d31ecd2d989"
+    },
+    "crates/meridian-core/tests/pr44_v16_m02_continue.rs": {
+      "bytes": 1245,
+      "sha256": "9bcf225e3b362d038fddc832b27ce2ec1dd7a4cdc0e9569e274f138283e136f0"
+    },
+    "crates/meridian-core/tests/qualified_v15_npc_continue.rs": {
+      "bytes": 1247,
+      "sha256": "e92e4f28c2140baccb5a833a41b3d7827a54d2f319fa381511fb174c4ebeea0c"
+    }
+  },
+  "all131CoreFilesMatchGameplayAuthority": true,
+  "moduleDeclarationPatchSHA256": "4101826ce6e1890e2d83a2fd7e698ee87468eb793b104efd5cccfa2e2d14af84",
+  "sourceScope": "Root serially adds the new assets/files and this exact two-declaration patch; do not replace current core with the older author branch.",
+  "audit": [
+    "Current flight/emp/runtime.rs and scene.rs implement paid trigger/nearest physical contact/occlusion/shield drain; traffic/emp.rs owns finite NPC electrical state and custody.",
+    "Current flight/combat.rs owns existing shield-then-energy effects; no new reducer or EMP immunity in Mule source.",
+    "Current World/traffic contact, current-save persistence, economy and actor generation remain untouched by this geometry prototype.",
+    "Mule world actor selection, acquisition/crew/fitting/save/EMP contact binding and actual gameplay/render acceptance remain required before hull admission."
+  ],
+  "applyCommand": "git apply --check --unidiff-zero CURRENT-GAMEPLAY.patch; apply only against the bound/current-reconciled core"
+}

@@ -1,5 +1,11 @@
 # Implementation and validation status
 
+## Mule smooth gameplay envelope: authored, unrun
+
+Mule has a distinct conservative gameplay envelope made from sixteen rounded source-component supports with a proposed 2 cm directional stand-off. The detailed source geometry, engineering mass/centre/inertia and provenance remain separate and unchanged. This implements the human's smooth, close-fitting collision direction; it does not clear the unresolved exact-original importer or its limits.
+
+The new core helpers cover source containment, continuous contact, station clearance, ray uncertainty and immutable low-opacity shimmer parameters. Ten new tests are authored and **UNRUN**. There is no admitted Mule actor, acquisition, crew, fitting/save route, renderer, actual game acceptance or new accepted hull count yet. The existing paid EMP, ECM, combat, economy and persistence source is preserved. Actual shimmer rendering and native evidence remain required before preview delivery.
+
 ## Independent single-window observer prepared, execution prohibited pending exception
 
 `tools/capture_meridian_window.py`, `tools/meridian_window_capture.swift` and sixteen offline policy fixtures prepare the necessary independent window observation. The helper is hard-bound to the exact ad5 test bundle/source/signed-executable launch receipt and live PID, a single active/on-screen normal window and reviewed point bounds. It obtains the real CGWindowID from ScreenCaptureKit, never from winit's pointer. Only that desktop-independent window can be captured; display, other-app, child-window and fullscreen/offscreen fallbacks are excluded. Metadata is revalidated before/after capture. Existing F8 request/frame, accepted App decision and actual GPU-map records are required as context, with monotonic brackets rather than a false atomic frame association.
