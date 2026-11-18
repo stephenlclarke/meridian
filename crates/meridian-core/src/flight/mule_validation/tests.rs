@@ -251,8 +251,19 @@ fn mule_world_docking_accepts_aligned_crossing_and_refuses_speed_and_wall_contac
             Some(MuleValidationRefusal::EntryConditions),
         ),
         (
-            "sidewall",
+            "outside-aperture-fast",
             inbound(100.0, 33.2),
+            Some(MuleValidationRefusal::EntryConditions),
+        ),
+        (
+            "outside-aperture-slow",
+            inbound(100.0, 4.0),
+            Some(MuleValidationRefusal::EntryConditions),
+        ),
+        (
+            "sidewall",
+            // The +X lip faces 482/483 occupy x=68.12..70.12 at z=136.32.
+            inbound(69.0, 33.2),
             Some(MuleValidationRefusal::StationContact),
         ),
     ] {

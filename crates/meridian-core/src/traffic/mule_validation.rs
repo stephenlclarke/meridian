@@ -168,23 +168,21 @@ impl State {
         };
         let approaching = self.actor.phase == NpcPhase::Approach;
         let crosses_entry = approaching && data.depth(before) > 0.0 && data.depth(after) <= 0.0;
-        next.refusal = if crosses_entry {
-            if !data.mule_entry_clear(
+        // Classify the physical sweep before the aperture and entry rules.
+        // The independent entry predicate does not sweep the station again.
+        next.refusal = if !data.mule_motion_clear(&self.source, before, after, 0.0) {
+            Some(MuleValidationRefusal::StationContact)
+        } else if crosses_entry
+            && !data.mule_entry_conditions(
                 &self.source,
                 before,
                 after,
                 self.actor.speed_units * f64::from(DISTANCE_PER_SPEED_UNIT),
                 0.0,
                 0.0,
-            ) {
-                Some(MuleValidationRefusal::EntryConditions)
-            } else if !data.mule_observer_clear(&self.source, before, after, observer) {
-                Some(MuleValidationRefusal::ObserverContact)
-            } else {
-                None
-            }
-        } else if !data.mule_motion_clear(&self.source, before, after, 0.0) {
-            Some(MuleValidationRefusal::StationContact)
+            )
+        {
+            Some(MuleValidationRefusal::EntryConditions)
         } else if !data.mule_observer_clear(&self.source, before, after, observer) {
             Some(MuleValidationRefusal::ObserverContact)
         } else {

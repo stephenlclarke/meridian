@@ -313,6 +313,15 @@
       "test": "The original 33.2 sidewall case remains. The separate targeted test requires exact widened storage at advertised f32 cap and InvalidPose for the immediate successor with identical placement.",
       "actualHandoffSHA256": "5b3720bb89b26617b3a8abdf1b23756b2d2ad166f24c6c0005eefa24bf01a636",
       "status": "SOURCE_ONLY_UNRUN"
+    },
+    "classificationCorrection": {
+      "status": "SOURCE_ONLY_UNRUN",
+      "firstFailure": "b6be346 Mac core 452 passed / 1 failed. The speed boundary passed. The x=100 attempt correctly failed entry but had been labeled as a wall fixture.",
+      "actualHandoffSHA256": "0845f7feebb673f5eb5905abfe487f72a1ce3949234861ac4424bd8228551d2f",
+      "sourceWitnessSHA256": "991778b680562f1c750cd6174f619ea7a5103c37c03ac8e16f1edf4b7ac895d4",
+      "classification": "Use exactly one station sweep before evaluating crossing conditions. StationContact means the mesh sweep did not certify clearance. EntryConditions means station sweep was clear and the crossing failed the original gate. Keep existing observer refusal and correct pose hold.",
+      "unchangedPublicContract": "Existing OriginalStationData::mule_entry_clear stays the conjunction of the original condition/fit gate and continuous station sweep. No aperture, speed, orientation, angular, margin, or station asset changes.",
+      "qualify": "Keep aligned/overspeed and original x=100 at cap. Also exercise x=100 at regular entry speed and x=69 at cap. The x=69 lane physically encounters SH028 +X lip triangle 482 before the centre crosses the opening. Retain five cost rows and all terminal pose/source/authority assertions."
     }
   }
 }
