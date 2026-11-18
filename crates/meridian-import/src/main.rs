@@ -66,7 +66,7 @@ fn value(args: &mut impl Iterator<Item = OsString>, flag: &str) -> Result<PathBu
 }
 
 fn options(mut args: impl Iterator<Item = OsString>) -> Result<Options> {
-    let kind = match args.next().as_deref().and_then(|s| s.to_str()) {
+    let kind = match args.next().as_deref().and_then(std::ffi::OsStr::to_str) {
         Some("ship") => Kind::Ship,
         Some("station") => Kind::Station,
         Some("all") => Kind::All,
