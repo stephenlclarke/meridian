@@ -831,6 +831,16 @@ impl App {
         let prepared = self.prepare_presentation(active, pulse_notice, elapsed, |r| {
             r.map(Renderer::logical_viewport)
         });
+        if let Err(error) = &prepared
+            && let Some(renderer) = self.renderer.as_ref()
+        {
+            renderer.capture_review_preparation_failure(
+                self.docked
+                    .as_ref()
+                    .and_then(Docked::review_capture_identity),
+                error,
+            );
+        }
         let Some(PreparedPresentation {
             mut hud_lines,
             docked_frame,
@@ -964,6 +974,11 @@ impl App {
                     });
             let practice = self.game.world.practice_snapshot();
             renderer.set_flight_view(self.game.world.flight_view());
+            renderer.set_review_capture_identity(
+                self.docked
+                    .as_ref()
+                    .and_then(Docked::review_capture_identity),
+            );
             let presented = renderer.draw(
                 &snapshot,
                 station,

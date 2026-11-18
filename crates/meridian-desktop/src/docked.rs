@@ -162,6 +162,20 @@ pub struct Docked {
     pub route: Option<SystemId>,
 }
 impl Docked {
+    /// Read only the genuine pending command; no profile inspection or synthetic review.
+    pub(crate) fn review_capture_identity(&self) -> Option<crate::review_capture::ReviewId> {
+        if !self.open {
+            return None;
+        }
+        let pending = self.pending.as_ref()?;
+        match pending.intent {
+            Intent::Change(Action::Module(action)) => {
+                crate::review_capture::ReviewId::from_action(pending.view.token, action)
+            }
+            _ => None,
+        }
+    }
+
     pub fn new(world: &World) -> Result<Self, String> {
         let current = world
             .snapshot()

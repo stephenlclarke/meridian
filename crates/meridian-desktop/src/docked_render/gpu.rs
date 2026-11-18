@@ -181,24 +181,71 @@ impl Pass {
             srgb: format.is_srgb(),
         })
     }
-    pub fn prepare(
+    pub(crate) fn prepare(
         &mut self,
         queue: &wgpu::Queue,
         frame: &Frame,
         logical_size: [f64; 2],
         planet_system: Option<meridian_core::navigation::SystemId>,
+        trace: Option<&crate::review_capture::Attempt>,
     ) -> Result<(), String> {
         if (frame.viewport.width - logical_size[0]).abs() > 0.01
             || (frame.viewport.height - logical_size[1]).abs() > 0.01
         {
+            if let Some(t) = trace {
+                t.record("viewport_mismatch", (logical_size, frame.viewport));
+            }
             return Err("docked frame viewport no longer matches the window".into());
         }
-        self.frame
-            .compose(frame, &self.model, self.srgb, planet_system)?;
+        let composed = self
+            .frame
+            .compose(frame, &self.model, self.srgb, planet_system);
+        if let Some(t) = trace {
+            t.record("compose_result", &composed);
+        }
+        composed?;
+        if let Some(t) = trace {
+            t.record("cpu_geometry", self.frame.capture_evidence());
+        }
         queue.write_buffer(&self.shapes, 0, bytemuck::cast_slice(&self.frame.shapes));
+        if let Some(t) = trace {
+            t.record(
+                "queue_write_shapes_returned",
+                (
+                    self.frame.shapes.len(),
+                    std::mem::size_of_val(self.frame.shapes.as_slice()),
+                ),
+            );
+        }
         queue.write_buffer(&self.text, 0, bytemuck::cast_slice(&self.frame.text));
+        if let Some(t) = trace {
+            t.record(
+                "queue_write_text_returned",
+                (
+                    self.frame.text.len(),
+                    std::mem::size_of_val(self.frame.text.as_slice()),
+                ),
+            );
+        }
         queue.write_buffer(&self.models, 0, bytemuck::cast_slice(&self.frame.models));
+        if let Some(t) = trace {
+            t.record(
+                "queue_write_models_returned",
+                (
+                    self.frame.models.len(),
+                    std::mem::size_of_val(self.frame.models.as_slice()),
+                    "write_buffer return stages bytes only; completed GPU upload UNOBSERVABLE",
+                ),
+            );
+        }
         Ok(())
+    }
+    pub(crate) fn capture_counts(&self) -> [usize; 3] {
+        [
+            self.frame.models.len(),
+            self.frame.shapes.len(),
+            self.frame.text.len(),
+        ]
     }
     /// The caller supplies a black-cleared colour target and fresh depth attachment for models.
     pub fn draw_models(&self, pass: &mut wgpu::RenderPass<'_>) {

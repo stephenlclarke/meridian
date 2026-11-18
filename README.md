@@ -1,5 +1,7 @@
 # Meridian
 
+The internal laser/ECM candidate physically docked at Avenor and stored its paid Beam, but opening Fit produced a persistent black client. Escape recovered Equipment with the paid item and cash intact. The cause remains undetermined. The [review regression and bounded opt-in host capture](docs/LASER-FACINGS.md#bounded-opt-in-review-boundary-capture) are authored and **UNRUN**. They collect causal evidence; they do not cure the renderer. Dependent practice, positive-hit and missile-termination checks remain blocked.
+
 The joined laser/ECM Mac run now reports 428/431 core passes after compilation.
 The [geometry pilot correction](docs/LASER-FACINGS.md#source-derived-geometry-pilot-correction)
 retains the three failed assertions and fixes their source-proven setup mistakes.

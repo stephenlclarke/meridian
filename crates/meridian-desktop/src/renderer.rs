@@ -41,6 +41,8 @@ pub enum Presentation {
 }
 
 pub struct Renderer {
+    review_capture: crate::review_capture::Capture,
+    review_identity: Option<crate::review_capture::ReviewId>,
     flight_view: FlightView,
     celestial: crate::celestial::Pass,
     docked: crate::docked_render::Pass,
@@ -87,14 +89,19 @@ impl Renderer {
             .request_device(&wgpu::DeviceDescriptor::default())
             .await
             .map_err(|e| e.to_string())?;
+        let review_capture = crate::review_capture::Capture::from_environment();
+        let lost_capture = review_capture.clone();
+        let error_capture = review_capture.clone();
         let device_lost = Arc::new(AtomicBool::new(false));
         let lost = device_lost.clone();
         device.set_device_lost_callback(move |reason, message| {
+            lost_capture.asynchronous_error((&reason, &message));
             eprintln!("Meridian graphics device lost: {reason:?}: {message}");
             lost.store(true, Ordering::Release);
         });
         let failed = device_lost.clone();
         device.on_uncaptured_error(Arc::new(move |error: wgpu::Error| {
+            error_capture.asynchronous_error(&error);
             eprintln!("Meridian GPU error: {error}");
             failed.store(true, Ordering::Release);
         }));
@@ -223,6 +230,8 @@ impl Renderer {
         });
         let depth = Self::depth_texture(&device, &config);
         Ok(Self {
+            review_capture,
+            review_identity: None,
             surface,
             window,
             flight_view: FlightView::Front,
@@ -400,12 +409,56 @@ impl Renderer {
         }
     }
 
+    pub(crate) fn set_review_capture_identity(
+        &mut self,
+        id: Option<crate::review_capture::ReviewId>,
+    ) {
+        self.review_identity = id;
+    }
+    pub(crate) fn capture_review_preparation_failure(
+        &self,
+        id: Option<crate::review_capture::ReviewId>,
+        error: &str,
+    ) {
+        if let Some(trace) = self.review_capture.begin(id) {
+            trace.record("app_prepare_error", error);
+        }
+    }
     pub fn draw(
         &mut self,
         snapshot: &Snapshot,
         station: Option<StationScene<'_>>,
         effects: SceneEffects<'_>,
         hud: HudScene<'_>,
+    ) -> Result<Presentation, String> {
+        let trace = self.review_capture.begin(self.review_identity.take());
+        if let Some(t) = &trace {
+            t.record(
+                "host_surface",
+                (
+                    self.size.width,
+                    self.size.height,
+                    self.window.scale_factor(),
+                    format!("{:?}", self.config),
+                    snapshot.tick,
+                ),
+            );
+            t.frame(effects.docked);
+            t.record("observability", "API calls only; framebuffer readability, GPU completion and compositor display are UNOBSERVABLE; first draw attempt per review transition only");
+        }
+        let result = self.draw_inner(snapshot, station, effects, hud, trace.as_ref());
+        if let Some(t) = trace {
+            t.record("draw_return", &result);
+        }
+        result
+    }
+    fn draw_inner(
+        &mut self,
+        snapshot: &Snapshot,
+        station: Option<StationScene<'_>>,
+        effects: SceneEffects<'_>,
+        hud: HudScene<'_>,
+        trace: Option<&crate::review_capture::Attempt>,
     ) -> Result<Presentation, String> {
         let HudScene {
             lines: hud_lines,
@@ -424,19 +477,29 @@ impl Renderer {
             docked_planet,
         } = effects;
         if self.device_lost.load(Ordering::Acquire) {
+            if let Some(t) = trace {
+                t.record("preflight", "device_lost_or_uncaptured_error_flag");
+            }
             return Err("Graphics device lost; exiting without changing any save".into());
         }
         if self.is_zero_sized() {
+            if let Some(t) = trace {
+                t.record("preflight", "zero_sized_surface_skip");
+            }
             return Ok(Presentation::Skipped);
         }
         if let Some(menu) = docked {
             let scale = self.window.scale_factor();
             let logical = self.size.to_logical::<f64>(scale);
+            if let Some(t) = trace {
+                t.record("logical_window", [logical.width, logical.height]);
+            }
             self.docked.prepare(
                 &self.queue,
                 menu,
                 [logical.width, logical.height],
                 docked_planet.and_then(|s| s.planet.as_ref().map(|p| p.id.system)),
+                trace,
             )?;
             self.celestial
                 .prepare_docked(
@@ -476,7 +539,22 @@ impl Renderer {
                 )
                 .map_err(str::to_owned)?;
         }
-        let (frame, reconfigure) = match self.surface.get_current_texture() {
+        let acquired = self.surface.get_current_texture();
+        if let Some(t) = trace {
+            t.record(
+                "surface_acquire",
+                match &acquired {
+                    wgpu::CurrentSurfaceTexture::Success(_) => "Success",
+                    wgpu::CurrentSurfaceTexture::Suboptimal(_) => "Suboptimal",
+                    wgpu::CurrentSurfaceTexture::Timeout => "Timeout",
+                    wgpu::CurrentSurfaceTexture::Occluded => "Occluded",
+                    wgpu::CurrentSurfaceTexture::Outdated => "Outdated",
+                    wgpu::CurrentSurfaceTexture::Lost => "Lost",
+                    wgpu::CurrentSurfaceTexture::Validation => "Validation",
+                },
+            );
+        }
+        let (frame, reconfigure) = match acquired {
             wgpu::CurrentSurfaceTexture::Success(frame) => (frame, false),
             wgpu::CurrentSurfaceTexture::Suboptimal(frame) => (frame, true),
             wgpu::CurrentSurfaceTexture::Timeout | wgpu::CurrentSurfaceTexture::Occluded => {
@@ -585,11 +663,29 @@ impl Renderer {
             }
         }
         self.draw_overlay(&mut encoder, &view, docked, help);
+        if let Some(t) = trace {
+            t.record("draw_calls_encoded", (docked.map(|_| self.docked.capture_counts()), self.hud_frame.len(), docked.is_none() || help.is_some(), "docked models/shapes/text vertex ranges; HUD vertex count and HUD draw-enabled; zero counts still encode calls; no GPU completion observed"));
+        }
         self.queue.submit([encoder.finish()]);
+        if let Some(t) = trace {
+            t.record("queue_submit", "call returned; GPU completion UNOBSERVABLE");
+        }
         self.window.pre_present_notify();
         frame.present();
+        if let Some(t) = trace {
+            t.record(
+                "surface_present",
+                "call returned (no Result); display/compositor success UNOBSERVABLE",
+            );
+        }
         if reconfigure {
             self.surface.configure(&self.device, &self.config);
+            if let Some(t) = trace {
+                t.record(
+                    "surface_reconfigure",
+                    "call returned after Suboptimal; no completion acknowledgement",
+                );
+            }
         }
         Ok(Presentation::Presented)
     }
