@@ -316,6 +316,35 @@ impl JumpJournal {
     }
 }
 
+/// Read-only original jump evidence for installed-route progress. No receipt constructor.
+pub(crate) struct RouteJourneyLeg {
+    pub(crate) source: SystemId,
+    pub(crate) destination: SystemId,
+    pub(crate) source_visit: u64,
+    pub(crate) departure_tick: u64,
+}
+impl JumpJournal {
+    pub(crate) fn route_legs(&self, start: u64) -> Option<Vec<RouteJourneyLeg>> {
+        let start = usize::try_from(start).ok()?;
+        // Installed routes currently have at most three admitted systems. Three
+        // actual legs already prove completion or off-route cancellation; never
+        // clone the full retained journal into a per-frame route snapshot.
+        self.legs
+            .get(start..)?
+            .iter()
+            .take(3)
+            .map(|leg| {
+                Some(RouteJourneyLeg {
+                    source: leg.source,
+                    destination: leg.destination,
+                    source_visit: leg.source_visit,
+                    departure_tick: leg.arrival_tick.checked_sub(u64::from(BASIC_SPOOL_TICKS))?,
+                })
+            })
+            .collect()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

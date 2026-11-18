@@ -373,3 +373,19 @@ gameplay parity remains an explicit requirement.
 The [explicit XYZZY core](XYZZY.md) is authored on exact e1cc86b. Twenty-five new Rust cases remain unrun. It adds actual front Naval, Advanced Navigation, Elite Energy, Fuel Scoops fitting, cargo bay, finite missiles and accounted fuel supply with distinct secret provenance. Host composition and exact joined review/compiler/native acceptance are outstanding; no published-preview claim follows from this source packet. See the [36-action inventory](XYZZY-ACTIONS.json) for remaining dependencies.
 
 The Help candidate now lists mission details and flight-lesson review/cancel/details in both the station HUD and flight popups. Its retained minimum-window regression checks the concise HUD hint, all those popup controls, complete card text, bounded rendering and unchanged saved state through docked, launch and all four flight views. The regression passed on the qualified Mac source; minimum-size native resizing remains unobserved.
+
+## Navigation installation source candidate
+
+The [navigation host successor](ROUTE-ALTERNATIVES.md#installed-route-host-successor-unqualified)
+retains the pure Fewest/Safer planner and adds World-owned, durable route reviews
+for Avenor/Renas/Lareria. It uses original ordinary chart knowledge, actual fitted
+items, completed jumps, physical berths and paid fuel services. Hidden PLUGH
+requires its missing original synthetic provider and rumour/discovery commands;
+chart knowledge does not grant hidden discovery or additional arrivals.
+
+Five new core and four desktop cases are authored **UNRUN**, alongside the eight
+unchanged pure planner cases. Direct rustfmt and static source/provenance checks
+are preparation only. Compiler, tests, Clippy, native gameplay, final laser/ECM
+composition and publication remain pending with the existing owners. Current
+installation is station-only; trade/profit planning and full original navigation
+parity remain incomplete. See the guide for exact boundary and review criteria.

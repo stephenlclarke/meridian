@@ -13,7 +13,7 @@ use crate::station_services::{SavedServiceSummary, StationMarkets};
 
 const MAGIC: &[u8; 8] = b"MERSAVE1";
 const CONTENT: &[u8] = concat!(
-    "meridian-world/rules/17;explicit-xyzzy/account-prefix-replay-v2/a11fe169;distinct-emp/paid-defensive-local-v1/a11fe169;navigation-computer/exact-route-journal/a11fe169;lareria-main-services/station-combat-three-v1/a11fe169;rapid-lasers-energy/shared-nine-byte-resources-v1/a11fe169;mining/native-work-pending-v2;fuel-scoops/paid-utility-v1;npc-missiles/canonical-native-ray-v3;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
+    "meridian-world/rules/17;installed-route/known-ordinary-native-three-v1/a11fe169;explicit-xyzzy/account-prefix-replay-v2/a11fe169;distinct-emp/paid-defensive-local-v1/a11fe169;navigation-computer/exact-route-journal/a11fe169;lareria-main-services/station-combat-three-v1/a11fe169;rapid-lasers-energy/shared-nine-byte-resources-v1/a11fe169;mining/native-work-pending-v2;fuel-scoops/paid-utility-v1;npc-missiles/canonical-native-ray-v3;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -29,6 +29,7 @@ fn compiled_content_fingerprint(content: &[u8]) -> u64 {
         include_bytes!("../../../../assets/legacy/sh025.physics").as_slice(),
         include_bytes!("../../../../assets/legacy/sh028.port").as_slice(),
         include_bytes!("../../../../assets/legacy/g01.navigation").as_slice(),
+        include_bytes!("../../../../assets/legacy/g01.route-exposure").as_slice(),
         include_bytes!("../../../../assets/legacy/g01-food.markets").as_slice(),
         include_bytes!("../../../../assets/legacy/commodities.catalogue").as_slice(),
         include_bytes!("../../../../assets/legacy/g01-commodities.markets").as_slice(),
@@ -53,6 +54,7 @@ pub(super) struct Commerce<'a> {
     pub(super) ammunition: &'a super::ammunition::State,
     pub(super) modular: &'a super::modular::State,
     pub(super) emp: &'a super::emp::State,
+    pub(super) route: &'a super::route_plan::State,
 }
 impl<'a> Commerce<'a> {
     fn current(world: &'a World) -> Self {
@@ -63,6 +65,7 @@ impl<'a> Commerce<'a> {
             ammunition: &world.ammunition,
             modular: &world.modular,
             emp: &world.emp,
+            route: &world.route_plan,
         }
     }
 }
@@ -155,6 +158,7 @@ impl World {
             ammunition: &self.ammunition,
             modular: &self.modular,
             emp: &self.emp,
+            route: &self.route_plan,
         };
         self.validate_saved_world(
             self.practice,
@@ -183,6 +187,7 @@ impl World {
             ammunition,
             modular: &self.modular,
             emp: &self.emp,
+            route: &self.route_plan,
         };
         self.validate_saved_world(
             self.practice,
@@ -211,6 +216,7 @@ impl World {
             ammunition: &self.ammunition,
             modular: &self.modular,
             emp,
+            route: &self.route_plan,
         };
         self.validate_saved_world(
             self.practice,
@@ -239,6 +245,30 @@ impl World {
             ammunition: &self.ammunition,
             modular,
             emp: &self.emp,
+            route: &self.route_plan,
+        };
+        self.validate_saved_world(
+            self.practice,
+            &self.practice_history,
+            self.practice_trace,
+            &self.flight_reception,
+            &commerce,
+        )?;
+        self.encode_saved_world(
+            self.practice,
+            &self.practice_history,
+            self.practice_trace,
+            &self.flight_reception,
+            &commerce,
+        )
+    }
+    pub(super) fn save_bytes_with_navigation_route(
+        &self,
+        route: &super::route_plan::State,
+    ) -> Result<Vec<u8>, SaveError> {
+        let commerce = Commerce {
+            route,
+            ..Commerce::current(self)
         };
         self.validate_saved_world(
             self.practice,
@@ -305,6 +335,7 @@ impl World {
         self.traffic.encode(&mut w);
         self.damage.encode(&mut w);
         self.mining.encode(&mut w);
+        commerce.route.encode(&mut w);
         self.jump_journal.encode(&mut w);
         let digest = checksum(&w.bytes);
         w.u64(digest);
@@ -405,6 +436,7 @@ impl World {
             ),
             navigation: Some(navigation),
             jump_journal: crate::navigation::JumpJournal::default(),
+            route_plan: super::route_plan::State::default(),
             commander_account: Some(commander_account),
             freight_session: Some(freight_session),
             station_markets: Some(station_markets),
@@ -432,6 +464,7 @@ impl World {
         candidate.traffic = crate::traffic::State::decode_version(&mut r, version)?;
         candidate.damage = super::damage::State::decode(&mut r, version)?;
         candidate.mining = crate::mining::State::decode(&mut r)?;
+        candidate.route_plan = super::route_plan::State::decode(&mut r)?;
         candidate.jump_journal = crate::navigation::JumpJournal::decode(&mut r)?;
         if !r.finished() {
             return Err(SaveError::InvalidEncoding);
@@ -554,6 +587,7 @@ impl World {
             self.combat.physical_tick(),
             &modular.navigation_changes,
         )?;
+        commerce.route.validate(self)?;
         let ammunition = commerce.ammunition.ledger_with_module_count(
             self,
             account,
@@ -820,6 +854,7 @@ pub(super) fn pulse_save_start(world: &World, bytes: &[u8]) -> usize {
     world.traffic.encode(&mut extension);
     world.damage.encode(&mut extension);
     world.mining.encode(&mut extension);
+    world.route_plan.encode(&mut extension);
     world.jump_journal.encode(&mut extension);
     let extension_end = bytes.len() - 8;
     let extension_start = extension_end - extension.bytes.len();

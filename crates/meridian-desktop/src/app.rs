@@ -526,6 +526,26 @@ impl App {
     }
 
     fn game_key(&mut self, code: KeyCode) {
+        if code == KeyCode::KeyJ && self.game.world.navigation_route_snapshot().is_some() {
+            let tick = self.game.world.snapshot().tick;
+            self.notice = Some(match self.game.world.request_navigation_route_jump(tick) {
+                Ok(()) => "Installed route jump started; fuel charged on actual arrival".into(),
+                Err(error) => error.to_string(),
+            });
+            return;
+        }
+        if code == KeyCode::KeyN {
+            self.notice = Some(match self.game.clear_navigation_route() {
+                Ok(message) => {
+                    if let Some(menu) = &mut self.docked {
+                        menu.route = None;
+                    }
+                    message
+                }
+                Err(error) => error,
+            });
+            return;
+        }
         if code == KeyCode::KeyU && self.game.world.snapshot().mode == FlightMode::Flight {
             self.notice = Some("EMP: hold U for ten seconds; release to cancel. Recent-attacker self-defence only.".into());
             return;
@@ -1186,3 +1206,6 @@ mod xyzzy_tests;
 
 #[cfg(test)]
 mod emp_tests;
+
+#[cfg(test)]
+mod navigation_route_tests;

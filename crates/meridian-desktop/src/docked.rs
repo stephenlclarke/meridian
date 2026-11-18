@@ -138,10 +138,9 @@ impl Anchor {
         })
     }
 }
-#[derive(Clone, Copy)]
 enum Intent {
     Change(Action),
-    Route(SystemId),
+    Route(meridian_core::NavigationRouteReview),
 }
 struct Pending {
     view: ui::Review,
@@ -160,6 +159,7 @@ pub struct Docked {
     serial: u64,
     token: u64,
     pub route: Option<SystemId>,
+    planning: Option<meridian_core::navigation::RouteKind>,
 }
 impl Docked {
     pub fn new(world: &World) -> Result<Self, String> {
@@ -179,6 +179,7 @@ impl Docked {
             serial: 0,
             token: 0,
             route: None,
+            planning: None,
         })
     }
     pub fn open(&mut self, world: &World, screen: ui::Screen) -> Result<(), String> {
@@ -268,6 +269,37 @@ impl Docked {
         result
     }
     fn input_inner(&mut self, profile: &mut Profile, input: ui::Input) -> Result<(), String> {
+        if matches!(self.screen(), ui::Screen::Galaxy | ui::Screen::System)
+            && self.pending.is_none()
+            && !self.search_active()
+        {
+            if matches!(input, ui::Input::Key(ui::Key::Options | ui::Key::Compare))
+                && self
+                    .painted
+                    .as_ref()
+                    .is_none_or(|frame| frame.stamp.revision != self.serial)
+            {
+                return Err("Wait for the current screen to draw".into());
+            }
+            if matches!(input, ui::Input::Key(ui::Key::Options)) {
+                use meridian_core::navigation::RouteKind;
+                self.planning = match self.planning {
+                    None => Some(RouteKind::FewestJumps),
+                    Some(RouteKind::FewestJumps) => Some(RouteKind::Safer),
+                    Some(RouteKind::Safer) => None,
+                };
+                self.feedback = format!(
+                    "Planning: {} | R reviews; C clears installed route",
+                    self.planning.map_or("Direct", RouteKind::label)
+                );
+                return Ok(());
+            }
+            if matches!(input, ui::Input::Key(ui::Key::Compare)) {
+                self.feedback = profile.clear_navigation_route()?;
+                self.route = None;
+                return Ok(());
+            }
+        }
         let painted = self
             .painted
             .as_ref()
@@ -312,9 +344,12 @@ impl Docked {
                     return Ok(());
                 }
                 match pending.intent {
-                    Intent::Route(target) => {
-                        self.route = Some(target);
-                        self.feedback = "Destination selected; launch and press J to jump".into();
+                    Intent::Route(review) => {
+                        self.feedback = profile.install_navigation_route(review)?;
+                        self.route = profile
+                            .world
+                            .navigation_route_snapshot()
+                            .and_then(|route| route.next);
                     }
                     Intent::Change(action) => self.feedback = profile.command(action)?,
                 }
@@ -331,24 +366,49 @@ impl Docked {
                 let distance = catalogue
                     .distance_ly(current.system, target)
                     .map_err(|e| e.to_string())?;
-                let fuel = meridian_core::navigation::stock_jump_fuel_cost(distance)
+                meridian_core::navigation::stock_jump_fuel_cost(distance)
                     .map_err(|e| e.to_string())?;
                 let reach = world.jump_reach_ly().ok_or("No fitted drive")?;
-                if distance > reach.min(f64::from(current.fuel_units) / 10.0) || paused(world) {
+                if (self.planning.is_none()
+                    && distance > reach.min(f64::from(current.fuel_units) / 10.0))
+                    || paused(world)
+                {
                     return Err("Destination exceeds available range or game is paused".into());
                 }
-                self.review(
-                    world,
-                    Intent::Route(target),
-                    "Select destination",
-                    vec![
-                        format!(
-                            "Distance {distance:.2} LY | Fuel {:.1}",
-                            f64::from(fuel) / 10.0
-                        ),
-                        "No fuel is spent until the actual jump".into(),
-                    ],
-                )?;
+                let kind = self
+                    .planning
+                    .unwrap_or(meridian_core::navigation::RouteKind::FewestJumps);
+                let route = world
+                    .review_navigation_route(target, kind, world.snapshot().tick)
+                    .map_err(|e| e.to_string())?;
+                let preview = route.preview();
+                let first_fuel =
+                    meridian_core::navigation::stock_jump_fuel_cost(preview.first_leg_distance_ly)
+                        .map_err(|e| e.to_string())?;
+                let details = vec![
+                    format!(
+                        "{} | {} hops | {:.2} LY | Exposure {:.2}",
+                        kind.label(),
+                        preview.systems.len() - 1,
+                        preview.distance_ly,
+                        preview.arrival_hostile_fraction_sum
+                    ),
+                    preview
+                        .systems
+                        .iter()
+                        .map(|id| format!("G{:02}-S{:03}", id.galaxy + 1, id.system))
+                        .collect::<Vec<_>>()
+                        .join(" -> "),
+                    format!(
+                        "First leg fuel {:.1}; current {:.1}",
+                        f64::from(first_fuel) / 10.0,
+                        f64::from(current.fuel_units) / 10.0
+                    ),
+                    preview.refuelling_assumption().into(),
+                    "No fuel is spent until the actual jump".into(),
+                    "Physically dock at each route stop".into(),
+                ];
+                self.review(world, Intent::Route(route), "Select destination", details)?;
             }
             ui::Request::ReviewCommodity { commodity, buy } => {
                 let quote = world
@@ -1066,8 +1126,9 @@ mod tests {
     }
     #[test]
     fn route_selection_instruction_is_visible_on_system_and_galaxy() {
-        let (_directory, mut profile, mut menu) = start();
-        let before = ok(profile.world.save_bytes());
+        let (directory, mut profile, mut menu) = start();
+        let before = profile.world.snapshot();
+        let credits = profile.world.credits_tenths();
         for screen in [ui::Screen::System, ui::Screen::Galaxy] {
             ok(menu.open(&profile.world, screen));
             ok(menu.request(&mut profile, ui::Request::ReviewRoute(SystemId::RENAS)));
@@ -1075,7 +1136,23 @@ mod tests {
             ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm)));
             assert_eq!(menu.route, Some(SystemId::RENAS));
             assert_visible_feedback(&mut menu, &profile, "launch and press J");
-            assert_eq!(ok(profile.world.save_bytes()), before);
+            assert_eq!(profile.world.snapshot(), before);
+            assert_eq!(profile.world.credits_tenths(), credits);
+            let bytes = ok(profile.world.save_bytes());
+            assert_eq!(
+                ok(std::fs::read(directory.0.join("commander.meridian"))),
+                bytes
+            );
+            let cold = ok(World::from_save_bytes(&bytes));
+            assert_eq!(
+                cold.navigation_route_snapshot(),
+                profile.world.navigation_route_snapshot()
+            );
+            assert_eq!(
+                cold.navigation_route_snapshot()
+                    .and_then(|route| route.next),
+                Some(SystemId::RENAS)
+            );
         }
     }
     #[test]
@@ -1549,3 +1626,6 @@ mod tests {
         assert_eq!(ok(profile.world.save_bytes()), before);
     }
 }
+
+#[cfg(test)]
+mod navigation_route_tests;

@@ -88,6 +88,53 @@ impl Profile {
         )
     }
 
+    pub fn install_navigation_route(
+        &mut self,
+        review: meridian_core::NavigationRouteReview,
+    ) -> Result<String, String> {
+        if !self.playing {
+            return Err("Start or continue a commander first".into());
+        }
+        let tick = self.world.snapshot().tick;
+        let prepared = self
+            .world
+            .prepare_navigation_route(review, tick)
+            .map_err(|e| e.to_string())?;
+        let published = self
+            .store
+            .save(prepared.bytes(), MAX_SAVE_BYTES)
+            .map_err(|e| format!("Route change could not be saved: {e}"))?;
+        prepared.commit();
+        self.has_save = true;
+        self.session.invalidate();
+        publication_message(
+            published,
+            "Route saved; launch and press J for its next leg. Physically dock at each stop."
+                .into(),
+        )
+    }
+    pub fn clear_navigation_route(&mut self) -> Result<String, String> {
+        if !self.playing {
+            return Err("No active commander".into());
+        }
+        let tick = self.world.snapshot().tick;
+        let prepared = self
+            .world
+            .prepare_clear_navigation_route(tick)
+            .map_err(|e| e.to_string())?;
+        let published = self
+            .store
+            .save(prepared.bytes(), MAX_SAVE_BYTES)
+            .map_err(|e| format!("Route change could not be saved: {e}"))?;
+        prepared.commit();
+        self.has_save = true;
+        self.session.invalidate();
+        publication_message(
+            published,
+            "Navigation route cleared and saved; fuel unchanged.".into(),
+        )
+    }
+
     pub fn new_commander(&mut self, seed: u64) -> Result<bool, String> {
         if self.playing {
             return Err("Start a new commander from the title screen".into());

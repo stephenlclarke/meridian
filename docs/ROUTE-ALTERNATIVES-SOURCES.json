@@ -1,7 +1,7 @@
 {
   "revision": "a11fe16924d87d06021816f9037952afcbac08db",
   "tree": "68fec574df12ddf74acb14747e0dd6839f478642",
-  "scope": "Read-only original G01 visible-scope route alternatives prerequisite; existing notices retained; source availability does not establish new rights or gameplay authority.",
+  "scope": "Original visible-scope route search, ordinary chart knowledge and bounded current-hull installation; existing notices retained; source availability establishes neither new rights nor unadmitted arrival services.",
   "files": [
     {
       "path": "LICENSE",
@@ -50,6 +50,12 @@
       "bytes": 9296,
       "sha256": "f2bc25d8244c7cf67963c72b3669530a3c95d6fadf2a96ea9ad7557c3128c3d8",
       "gitBlob": "1b58468bc4c3dc455e0a776d8096fcecb11aece1"
+    },
+    {
+      "path": "Sources/L337Core/Plugh.swift",
+      "bytes": 4508,
+      "sha256": "2c43ae0738fa93375eb51a4859e11bc33e7bf9e7496ff432f140e813baa6b8eb",
+      "gitBlob": "faf40ce4d170b33d26dc14f185d08acb30130a3a"
     }
   ]
 }

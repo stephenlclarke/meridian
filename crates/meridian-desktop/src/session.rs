@@ -731,6 +731,28 @@ impl Session {
             },
             crate::flight_lesson::view_name(world.flight_view())
         )];
+        if let Some(route) = world.navigation_route_snapshot() {
+            lines.push(format!(
+                "ROUTE {:?} | STOP {}/{} | {:?}",
+                route.kind,
+                route.stop_index + 1,
+                route.systems.len(),
+                route.phase
+            ));
+            if let Some(next) = route.next {
+                lines.push(format!(
+                    "NEXT G{:02}-S{:03} | FUEL {} | {}",
+                    next.galaxy + 1,
+                    next.system,
+                    route.fuel_required.unwrap_or(0),
+                    if route.refuel_required {
+                        "REFUEL REQUIRED"
+                    } else {
+                        "J TO JUMP AFTER LAUNCH"
+                    }
+                ));
+            }
+        }
         let review_line = self.review_line();
         lines.push(notice.map_or_else(|| crate::flight_lesson::line(world), str::to_string));
         if let Some(review) = self.pending_trade {

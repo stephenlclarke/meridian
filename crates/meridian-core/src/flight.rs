@@ -9,6 +9,11 @@ mod mining;
 mod xyzzy;
 pub(crate) use xyzzy::{AccountEffect, AccountEvent, STARTING_CREDITS_TENTHS};
 pub use xyzzy::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
+mod route_plan;
+pub use route_plan::{
+    NavigationRouteError, NavigationRoutePhase, NavigationRouteReview, NavigationRouteSnapshot,
+    PreparedNavigationRoute,
+};
 mod navigation_trade;
 mod traffic;
 pub use navigation_trade::{
@@ -170,6 +175,7 @@ pub struct World {
     navigation_catalogue: Option<OriginalNavigation>,
     navigation: Option<NavigationState>,
     jump_journal: crate::navigation::JumpJournal,
+    route_plan: route_plan::State,
     commander_account: Option<CommanderAccount>,
     freight_session: Option<mission::FreightSession>,
     station_markets: Option<crate::station_services::StationMarkets>,
@@ -214,6 +220,7 @@ impl World {
             navigation_catalogue: None,
             navigation: None,
             jump_journal: crate::navigation::JumpJournal::default(),
+            route_plan: route_plan::State::default(),
             commander_account: None,
             freight_session: None,
             station_markets: None,
@@ -373,7 +380,11 @@ impl World {
         if !self.jump_journal.has_room() {
             return Err(NavigationError::SequenceExhausted);
         }
+        let expected = self
+            .navigation_route_snapshot()
+            .and_then(|route| route.next);
         self.navigation = Some(navigation);
+        self.route_plan.manual_jump(target, expected);
         Ok(())
     }
 
@@ -756,11 +767,15 @@ impl World {
         if let Some(account) = &mut self.commander_account {
             account.apply_ordinary_legal(prepared.legal);
         }
+        let route_entry = next.mode == FlightMode::Docked && self.state.mode != FlightMode::Docked;
         self.state = next;
         self.navigation = navigation;
         self.observe_flight_reception(flight_reception_start);
         if let Some((session, epoch)) = self.freight_session.as_mut().zip(mission_epoch) {
             session.rebind_dock(navigation.and_then(NavigationState::dock), epoch);
+        }
+        if route_entry {
+            self.observe_navigation_route_dock();
         }
         Ok(())
     }

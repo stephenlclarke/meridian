@@ -1147,6 +1147,26 @@ impl World {
     }
 }
 
+impl State {
+    pub(super) fn route_navigation_item(
+        &self,
+        dock: DockContext,
+        tick: u64,
+        revision: u64,
+    ) -> Option<OwnedModule> {
+        let mut ledger = Ledger::born(dock.owner().seed()).ok()?;
+        let mut counters = [0; 2];
+        for event in self
+            .events
+            .iter()
+            .filter(|event| event.tick <= tick && event.revision <= revision)
+        {
+            ledger.replay(*event, &mut counters).ok()?;
+        }
+        ledger.fitted(ModuleSlot::Navigation)
+    }
+}
+
 #[cfg(test)]
 mod navigation_tests;
 #[cfg(test)]
