@@ -6,7 +6,7 @@ The internal host has no `Store`, directory, save lease or commander. It does no
 
 ## Source-derived observer presets
 
-Every preset starts from the authenticated station's actual Mule launch placement and the same sixteen-piece source. Observer radius and lateral extent are read from the exact bundled SH025 native point data, not a display-mesh substitute. Initial axial separation uses both source radii, the existing observer padding and a one-metre margin. The World constructor independently validates the resulting placement; refusal is terminal rather than a request to move it elsewhere.
+Every preset starts from the authenticated station's actual Mule launch placement and the same revision-2, 34-piece source. Observer radius and lateral extent are read from the exact bundled SH025 native point data, not a display-mesh substitute. Initial axial separation uses both source radii, the existing observer padding and a one-metre margin. The World constructor independently validates the resulting placement; refusal is terminal rather than a request to move it elsewhere.
 
 | Mode | Actual stationary pilot and view |
 | --- | --- |

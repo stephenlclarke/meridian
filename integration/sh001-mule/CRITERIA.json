@@ -1,7 +1,7 @@
 {
   "targetHull": "SH001",
   "name": "Mule",
-  "status": "CAUSAL_FIXTURES_AUTHORED_UNRUN;ACTUAL_TIGHT_FIT_BLOCKED;NO_ACTOR_ADMISSION",
+  "status": "PRESSURE_BODY_PARTITION_AUTHORED_UNRUN;TIGHT_FIT_AWAITS_MEASUREMENT_AND_NATIVE_EVIDENCE",
   "immediateAuthorParent": "8e2e5d3a3ef5f6caffd0323ca4b2540e1e57981b",
   "currentGameplayAuthority": "ad5b9f9da259c85389cd662af2473e543e26ab11",
   "newCoreTests": [
@@ -67,7 +67,7 @@
     "currentRun": "NOT_REQUESTED;nooriginalretry"
   },
   "shape": {
-    "pieces": 16,
+    "pieces": 34,
     "type": "convex_hull_authenticated_assigned_source_vertices_plus_closed_ball",
     "standOffMetres": 0.02,
     "directionalSupportGapMetres": 0.02,
@@ -163,7 +163,7 @@
       "status": "UNRUN"
     }
   ],
-  "totalMuleCoreTests": 18,
+  "totalMuleCoreTests": 20,
   "controlledWorldScenario": {
     "status": "AUTHORED_UNRUN;NOT_ORDINARY_HULL_ADMISSION",
     "base": "af97ee6bbba60b2d492216ad12035a90e9dde34e",
@@ -197,11 +197,21 @@
       "file": "crates/meridian-core/src/mule/tightness_tests.rs",
       "name": "compound_gap_sampling_does_not_invent_visibility_for_an_internal_member",
       "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tightness_tests.rs",
+      "name": "mule_pressure_body_well_partition_clears_the_recorded_convex_bridge",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tightness_tests.rs",
+      "name": "near_boundary_measurement_requires_clearance_across_seam_error",
+      "status": "UNRUN"
     }
   ],
   "tightnessEvidence": {
-    "status": "BLOCKED_ACTUAL_EXCESS;CORRECTED_MEASUREMENT_PROTOCOL_UNRUN",
-    "metrics": "Original26directions+84well-rim rays retained;add bounded certified source-support-plane boundary witnesses and eighth-face interpolants. Each piece needs certified boundary samples. Report visible ray/support-witness counts separately,extent/maxsample point/face,uncertain/possiblyinternal/clear counts,visibleCoverageEstablished flag. All zero-visible records stay unresolved,never accepted.",
+    "status": "REVISED_SHAPE_AND_MEASUREMENT_UNRUN",
+    "metrics": "Keep original rays and report their inside witness and point exclusion counts separately. Measure support witnesses only with certified separation from every other piece throughout the boundary error radius.",
     "flags": "exceedsTwoCentimetres flags sampled distances>0.020001m;this is an evidence flag,not an acceptance budget. Large filled empty space must be assessed/repaired before rollout.",
     "limits": "Not exhaustive;not a maximum/Hausdorff guarantee;no runtime values claimed. Uncertain/internal samples reported,not treated as measured clearance or discarded without disclosure.",
     "namedGaps": [
@@ -211,7 +221,7 @@
     ],
     "gapCheck": "Each named source-coordinate center must stay outside the full union and a2cm extent triangle there must have actual separation certificates.",
     "knownApproximationRisks": "Convex supports fill service wells;engine support/casing and cockpit/crossmember convex grouping can fill concave space. Actual extent is unmeasured.",
-    "acceptance": "BLOCKED despite any corrected-fixture PASS. Actual excessive convex bridge must be corrected;full visible-union coverage/tight fit/contact/docking and G3/G1 evidence still required.",
+    "acceptance": "Require the authored strict-separation and tiny physical obstacle regression at the exact recorded point; measure all 34 pieces and any remaining union coverage or sample gaps including other unchanged concave assemblies; validate rendered shimmer, contact and docking on the same revision 2 surface.",
     "observed": {
       "head": "ccd89b2af0c75786e8915bf91a554a7f2c549cb5",
       "completedPiece0SampleMetres": 0.6596408669309312,
@@ -234,5 +244,17 @@
     "productionGeometryWorldEMPContinueBehavior": "UNCHANGED_CURRENT_ROOT",
     "tightFitStatus": "BLOCKED_ACTUAL_0.6596408669309312m_CONVEX_BRIDGE;INCOMPLETE_VISIBLE_COVERAGE",
     "requiredBeforeAcceptance": "Remove excessive source-convex bridging through genuine tighter source-derived shape/partition retaining all detailed/native vertices and triangle containment;coherent G3renderer and actual G1shape/contact/docking/tightness evidence. No blanket fleet rollout."
+  },
+  "shapeCorrection": {
+    "historicalFailure": "Keep the exact ccd89 measured gap and causal record for the earlier 16-piece geometry.",
+    "candidate": "Preserve slots 1\u201315. Slot 0 keeps only the primary body. Slots 16\u201327 hold separate detailed body well assemblies with their own struts. Slots 28\u201331 hold separate native body well assemblies. Slots 32\u201333 hold the two longitudinal service struts.",
+    "proof": "Whole creator components stay together. Every detailed/native triangle has all three vertices assigned to the same piece, so convex containment covers the whole triangle. Each new support is a subset of the former body support, and the common 2 cm ball preserves this inclusion.",
+    "acceptance": "Require the authored strict-separation and tiny physical obstacle regression at the exact recorded point; measure all 34 pieces and any remaining union coverage or sample gaps including other unchanged concave assemblies; validate rendered shimmer, contact and docking on the same revision 2 surface.",
+    "execution": "AUTHOR UNRUN. G3 matching renderer revision and G1 qualification pending.",
+    "visibilityReview": {
+      "finding": "G2-MULE-CAUSAL-VISIBILITY-1",
+      "reviewSHA256": "9738140a52a13a78b75e1e31a1cbe32cf4a038963be13f371e2a63ee1661a45b",
+      "coverage": "Count a support witness only if the closed neighbourhood containing the nearby member boundary is certified clear from every other piece. Report ray inside witnesses separately without giving them boundary exposure credit. Missing metrics remain null."
+    }
   }
 }

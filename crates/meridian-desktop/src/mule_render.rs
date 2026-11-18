@@ -8,7 +8,9 @@ mod tests;
 pub use gpu::Pass;
 use meridian_core::FlightView;
 use meridian_core::docking::{RigidPose, Vec3};
-use meridian_core::mule::{MULE_PIECES, MuleHullSource, MulePresentation};
+use meridian_core::mule::{
+    MULE_PIECES, MULE_PRESENTATION_REVISION, MuleHullSource, MulePresentation,
+};
 use meridian_core::traffic::NpcSnapshot;
 
 /// Borrow the actual World-owned actor and its matching immutable contact surface.
@@ -140,7 +142,9 @@ fn supports(
     presentation: &MulePresentation,
 ) -> Result<(Vec<Triangle>, [Piece; MULE_PIECES]), &'static str> {
     let source = MuleHullSource::bundled().map_err(|_| "SH001 immutable source unavailable")?;
-    if presentation.pieces.as_ref() != source.pieces() || presentation.revision != 1 {
+    if presentation.pieces.as_ref() != source.pieces()
+        || presentation.revision != MULE_PRESENTATION_REVISION
+    {
         return Err("SH001 presentation/contact source mismatch");
     }
     let mut points = Vec::new();
@@ -226,7 +230,7 @@ fn uniforms(
     // The current SH001 contract has 240.00 units per bank; reject a mismatched snapshot.
     if view.camera != scene.observer
         || actor.hull_id != "SH001"
-        || envelope.revision != 1
+        || envelope.revision != MULE_PRESENTATION_REVISION
         || !valid_pose(actor.pose, 1e-10)
         || envelope.front_shield_fraction != f32::from(actor.front_shield_hundredths) / 24000.0
         || envelope.rear_shield_fraction != f32::from(actor.rear_shield_hundredths) / 24000.0

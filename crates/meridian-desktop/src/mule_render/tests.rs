@@ -17,12 +17,12 @@ fn pose(x: f64, y: f64, z: f64) -> RigidPose {
         orientation: basis(),
     }
 }
-fn blank_pieces() -> [Piece; 16] {
+fn blank_pieces() -> [Piece; MULE_PIECES] {
     [Piece {
         range: [0; 4],
         low: [0.0; 4],
         high: [0.0; 4],
-    }; 16]
+    }; MULE_PIECES]
 }
 fn cross(a: Vec3, b: Vec3) -> Vec3 {
     Vec3::new(
@@ -80,12 +80,24 @@ fn every_detailed_face_keeps_original_index_order_scale_and_finite_uv_materials(
     assert!(emissive > 0);
 }
 #[test]
-fn all_sixteen_boundaries_certify_source_support_and_ten_micrometre_tightness() {
+fn all_boundaries_certify_source_support_and_ten_micrometre_tightness() {
     let source = ok(MuleHullSource::bundled());
     let envelope = ok(source.presentation(24000, 24000, 24000));
     let (triangles, pieces) = ok(supports(&envelope));
     assert!(!triangles.is_empty());
-    assert!(triangles.len() <= 2 * 5344 - 4 * 16);
+    assert_eq!(envelope.revision, MULE_PRESENTATION_REVISION);
+    let mut stale = envelope.clone();
+    stale.revision = 1;
+    assert!(supports(&stale).is_err());
+    assert_eq!(
+        source
+            .pieces()
+            .iter()
+            .map(|piece| piece.source_points().len())
+            .sum::<usize>(),
+        MAX_POINTS
+    );
+    assert!(triangles.len() <= 2 * MAX_POINTS - 4 * MULE_PIECES);
     for (index, piece) in source.pieces().iter().enumerate() {
         let hull = ok(rounded::build(piece.source_points()));
         assert!((0.0..=0.00001).contains(&hull.error_metres));
@@ -240,6 +252,35 @@ fn actual_wgsl_parses_and_validates_all_four_render_entries() {
         wgpu::naga::valid::Capabilities::empty(),
     )
     .validate(&module));
+    // Compare the parsed shader uniform layout with the Rust upload, including the last piece.
+    use wgpu::naga::{ArraySize, TypeInner};
+    let (_, shader_inputs) = module
+        .types
+        .iter()
+        .find(|(_, ty)| ty.name.as_deref() == Some("Inputs"))
+        .unwrap_or_else(|| panic!("missing shader Inputs"));
+    let TypeInner::Struct { members, span } = &shader_inputs.inner else {
+        panic!("shader Inputs is not a struct");
+    };
+    assert_eq!(*span as usize, std::mem::size_of::<Uniforms>());
+    let shader_pieces = members
+        .iter()
+        .find(|member| member.name.as_deref() == Some("pieces"))
+        .unwrap_or_else(|| panic!("missing shader pieces"));
+    assert_eq!(
+        shader_pieces.offset as usize,
+        std::mem::offset_of!(Uniforms, pieces)
+    );
+    let TypeInner::Array {
+        size: ArraySize::Constant(count),
+        stride,
+        ..
+    } = &module.types[shader_pieces.ty].inner
+    else {
+        panic!("shader pieces is not a fixed array");
+    };
+    assert_eq!(count.get() as usize, MULE_PIECES);
+    assert_eq!(*stride as usize, std::mem::size_of::<Piece>());
     assert_eq!(module.entry_points.len(), 4);
     for name in [
         "solid_vertex",

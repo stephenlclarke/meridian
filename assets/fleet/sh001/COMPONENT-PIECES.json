@@ -12,7 +12,7 @@
     {
       "component": 1,
       "name": "body primary pressure envelope/service-well-0-0",
-      "piece": 0,
+      "piece": 16,
       "vertexStart": 120,
       "vertexCount": 12,
       "faceStart": 236,
@@ -21,7 +21,7 @@
     {
       "component": 2,
       "name": "body primary pressure envelope/service-well-0-0/recess-service-strut-0",
-      "piece": 0,
+      "piece": 16,
       "vertexStart": 132,
       "vertexCount": 8,
       "faceStart": 256,
@@ -30,7 +30,7 @@
     {
       "component": 3,
       "name": "body primary pressure envelope/service-well-0-0/recess-service-strut-1",
-      "piece": 0,
+      "piece": 16,
       "vertexStart": 140,
       "vertexCount": 8,
       "faceStart": 268,
@@ -39,7 +39,7 @@
     {
       "component": 4,
       "name": "body primary pressure envelope/service-well-0-0/recess-service-strut-2",
-      "piece": 0,
+      "piece": 16,
       "vertexStart": 148,
       "vertexCount": 8,
       "faceStart": 280,
@@ -48,7 +48,7 @@
     {
       "component": 5,
       "name": "body primary pressure envelope/service-well-0-1",
-      "piece": 0,
+      "piece": 17,
       "vertexStart": 156,
       "vertexCount": 12,
       "faceStart": 292,
@@ -57,7 +57,7 @@
     {
       "component": 6,
       "name": "body primary pressure envelope/service-well-0-1/recess-service-strut-0",
-      "piece": 0,
+      "piece": 17,
       "vertexStart": 168,
       "vertexCount": 8,
       "faceStart": 312,
@@ -66,7 +66,7 @@
     {
       "component": 7,
       "name": "body primary pressure envelope/service-well-0-1/recess-service-strut-1",
-      "piece": 0,
+      "piece": 17,
       "vertexStart": 176,
       "vertexCount": 8,
       "faceStart": 324,
@@ -75,7 +75,7 @@
     {
       "component": 8,
       "name": "body primary pressure envelope/service-well-0-1/recess-service-strut-2",
-      "piece": 0,
+      "piece": 17,
       "vertexStart": 184,
       "vertexCount": 8,
       "faceStart": 336,
@@ -84,7 +84,7 @@
     {
       "component": 9,
       "name": "body primary pressure envelope/service-well-0-2",
-      "piece": 0,
+      "piece": 18,
       "vertexStart": 192,
       "vertexCount": 12,
       "faceStart": 348,
@@ -93,7 +93,7 @@
     {
       "component": 10,
       "name": "body primary pressure envelope/service-well-0-2/recess-service-strut-0",
-      "piece": 0,
+      "piece": 18,
       "vertexStart": 204,
       "vertexCount": 8,
       "faceStart": 368,
@@ -102,7 +102,7 @@
     {
       "component": 11,
       "name": "body primary pressure envelope/service-well-0-2/recess-service-strut-1",
-      "piece": 0,
+      "piece": 18,
       "vertexStart": 212,
       "vertexCount": 8,
       "faceStart": 380,
@@ -111,7 +111,7 @@
     {
       "component": 12,
       "name": "body primary pressure envelope/service-well-0-2/recess-service-strut-2",
-      "piece": 0,
+      "piece": 18,
       "vertexStart": 220,
       "vertexCount": 8,
       "faceStart": 392,
@@ -120,7 +120,7 @@
     {
       "component": 13,
       "name": "body primary pressure envelope/service-well-1-0",
-      "piece": 0,
+      "piece": 19,
       "vertexStart": 228,
       "vertexCount": 12,
       "faceStart": 404,
@@ -129,7 +129,7 @@
     {
       "component": 14,
       "name": "body primary pressure envelope/service-well-1-0/recess-service-strut-0",
-      "piece": 0,
+      "piece": 19,
       "vertexStart": 240,
       "vertexCount": 8,
       "faceStart": 424,
@@ -138,7 +138,7 @@
     {
       "component": 15,
       "name": "body primary pressure envelope/service-well-1-0/recess-service-strut-1",
-      "piece": 0,
+      "piece": 19,
       "vertexStart": 248,
       "vertexCount": 8,
       "faceStart": 436,
@@ -147,7 +147,7 @@
     {
       "component": 16,
       "name": "body primary pressure envelope/service-well-1-0/recess-service-strut-2",
-      "piece": 0,
+      "piece": 19,
       "vertexStart": 256,
       "vertexCount": 8,
       "faceStart": 448,
@@ -156,7 +156,7 @@
     {
       "component": 17,
       "name": "body primary pressure envelope/service-well-1-1",
-      "piece": 0,
+      "piece": 20,
       "vertexStart": 264,
       "vertexCount": 12,
       "faceStart": 460,
@@ -165,7 +165,7 @@
     {
       "component": 18,
       "name": "body primary pressure envelope/service-well-1-1/recess-service-strut-0",
-      "piece": 0,
+      "piece": 20,
       "vertexStart": 276,
       "vertexCount": 8,
       "faceStart": 480,
@@ -174,7 +174,7 @@
     {
       "component": 19,
       "name": "body primary pressure envelope/service-well-1-1/recess-service-strut-1",
-      "piece": 0,
+      "piece": 20,
       "vertexStart": 284,
       "vertexCount": 8,
       "faceStart": 492,
@@ -183,7 +183,7 @@
     {
       "component": 20,
       "name": "body primary pressure envelope/service-well-1-1/recess-service-strut-2",
-      "piece": 0,
+      "piece": 20,
       "vertexStart": 292,
       "vertexCount": 8,
       "faceStart": 504,
@@ -192,7 +192,7 @@
     {
       "component": 21,
       "name": "body primary pressure envelope/service-well-1-2",
-      "piece": 0,
+      "piece": 21,
       "vertexStart": 300,
       "vertexCount": 12,
       "faceStart": 516,
@@ -201,7 +201,7 @@
     {
       "component": 22,
       "name": "body primary pressure envelope/service-well-1-2/recess-service-strut-0",
-      "piece": 0,
+      "piece": 21,
       "vertexStart": 312,
       "vertexCount": 8,
       "faceStart": 536,
@@ -210,7 +210,7 @@
     {
       "component": 23,
       "name": "body primary pressure envelope/service-well-1-2/recess-service-strut-1",
-      "piece": 0,
+      "piece": 21,
       "vertexStart": 320,
       "vertexCount": 8,
       "faceStart": 548,
@@ -219,7 +219,7 @@
     {
       "component": 24,
       "name": "body primary pressure envelope/service-well-1-2/recess-service-strut-2",
-      "piece": 0,
+      "piece": 21,
       "vertexStart": 328,
       "vertexCount": 8,
       "faceStart": 560,
@@ -228,7 +228,7 @@
     {
       "component": 25,
       "name": "body primary pressure envelope/service-well-2-0",
-      "piece": 0,
+      "piece": 22,
       "vertexStart": 336,
       "vertexCount": 12,
       "faceStart": 572,
@@ -237,7 +237,7 @@
     {
       "component": 26,
       "name": "body primary pressure envelope/service-well-2-0/recess-service-strut-0",
-      "piece": 0,
+      "piece": 22,
       "vertexStart": 348,
       "vertexCount": 8,
       "faceStart": 592,
@@ -246,7 +246,7 @@
     {
       "component": 27,
       "name": "body primary pressure envelope/service-well-2-0/recess-service-strut-1",
-      "piece": 0,
+      "piece": 22,
       "vertexStart": 356,
       "vertexCount": 8,
       "faceStart": 604,
@@ -255,7 +255,7 @@
     {
       "component": 28,
       "name": "body primary pressure envelope/service-well-2-0/recess-service-strut-2",
-      "piece": 0,
+      "piece": 22,
       "vertexStart": 364,
       "vertexCount": 8,
       "faceStart": 616,
@@ -264,7 +264,7 @@
     {
       "component": 29,
       "name": "body primary pressure envelope/service-well-2-1",
-      "piece": 0,
+      "piece": 23,
       "vertexStart": 372,
       "vertexCount": 12,
       "faceStart": 628,
@@ -273,7 +273,7 @@
     {
       "component": 30,
       "name": "body primary pressure envelope/service-well-2-1/recess-service-strut-0",
-      "piece": 0,
+      "piece": 23,
       "vertexStart": 384,
       "vertexCount": 8,
       "faceStart": 648,
@@ -282,7 +282,7 @@
     {
       "component": 31,
       "name": "body primary pressure envelope/service-well-2-1/recess-service-strut-1",
-      "piece": 0,
+      "piece": 23,
       "vertexStart": 392,
       "vertexCount": 8,
       "faceStart": 660,
@@ -291,7 +291,7 @@
     {
       "component": 32,
       "name": "body primary pressure envelope/service-well-2-1/recess-service-strut-2",
-      "piece": 0,
+      "piece": 23,
       "vertexStart": 400,
       "vertexCount": 8,
       "faceStart": 672,
@@ -300,7 +300,7 @@
     {
       "component": 33,
       "name": "body primary pressure envelope/service-well-2-2",
-      "piece": 0,
+      "piece": 24,
       "vertexStart": 408,
       "vertexCount": 12,
       "faceStart": 684,
@@ -309,7 +309,7 @@
     {
       "component": 34,
       "name": "body primary pressure envelope/service-well-2-2/recess-service-strut-0",
-      "piece": 0,
+      "piece": 24,
       "vertexStart": 420,
       "vertexCount": 8,
       "faceStart": 704,
@@ -318,7 +318,7 @@
     {
       "component": 35,
       "name": "body primary pressure envelope/service-well-2-2/recess-service-strut-1",
-      "piece": 0,
+      "piece": 24,
       "vertexStart": 428,
       "vertexCount": 8,
       "faceStart": 716,
@@ -327,7 +327,7 @@
     {
       "component": 36,
       "name": "body primary pressure envelope/service-well-2-2/recess-service-strut-2",
-      "piece": 0,
+      "piece": 24,
       "vertexStart": 436,
       "vertexCount": 8,
       "faceStart": 728,
@@ -336,7 +336,7 @@
     {
       "component": 37,
       "name": "body primary pressure envelope/service-well-3-0",
-      "piece": 0,
+      "piece": 25,
       "vertexStart": 444,
       "vertexCount": 12,
       "faceStart": 740,
@@ -345,7 +345,7 @@
     {
       "component": 38,
       "name": "body primary pressure envelope/service-well-3-0/recess-service-strut-0",
-      "piece": 0,
+      "piece": 25,
       "vertexStart": 456,
       "vertexCount": 8,
       "faceStart": 760,
@@ -354,7 +354,7 @@
     {
       "component": 39,
       "name": "body primary pressure envelope/service-well-3-0/recess-service-strut-1",
-      "piece": 0,
+      "piece": 25,
       "vertexStart": 464,
       "vertexCount": 8,
       "faceStart": 772,
@@ -363,7 +363,7 @@
     {
       "component": 40,
       "name": "body primary pressure envelope/service-well-3-0/recess-service-strut-2",
-      "piece": 0,
+      "piece": 25,
       "vertexStart": 472,
       "vertexCount": 8,
       "faceStart": 784,
@@ -372,7 +372,7 @@
     {
       "component": 41,
       "name": "body primary pressure envelope/service-well-3-1",
-      "piece": 0,
+      "piece": 26,
       "vertexStart": 480,
       "vertexCount": 12,
       "faceStart": 796,
@@ -381,7 +381,7 @@
     {
       "component": 42,
       "name": "body primary pressure envelope/service-well-3-1/recess-service-strut-0",
-      "piece": 0,
+      "piece": 26,
       "vertexStart": 492,
       "vertexCount": 8,
       "faceStart": 816,
@@ -390,7 +390,7 @@
     {
       "component": 43,
       "name": "body primary pressure envelope/service-well-3-1/recess-service-strut-1",
-      "piece": 0,
+      "piece": 26,
       "vertexStart": 500,
       "vertexCount": 8,
       "faceStart": 828,
@@ -399,7 +399,7 @@
     {
       "component": 44,
       "name": "body primary pressure envelope/service-well-3-1/recess-service-strut-2",
-      "piece": 0,
+      "piece": 26,
       "vertexStart": 508,
       "vertexCount": 8,
       "faceStart": 840,
@@ -408,7 +408,7 @@
     {
       "component": 45,
       "name": "body primary pressure envelope/service-well-3-2",
-      "piece": 0,
+      "piece": 27,
       "vertexStart": 516,
       "vertexCount": 12,
       "faceStart": 852,
@@ -417,7 +417,7 @@
     {
       "component": 46,
       "name": "body primary pressure envelope/service-well-3-2/recess-service-strut-0",
-      "piece": 0,
+      "piece": 27,
       "vertexStart": 528,
       "vertexCount": 8,
       "faceStart": 872,
@@ -426,7 +426,7 @@
     {
       "component": 47,
       "name": "body primary pressure envelope/service-well-3-2/recess-service-strut-1",
-      "piece": 0,
+      "piece": 27,
       "vertexStart": 536,
       "vertexCount": 8,
       "faceStart": 884,
@@ -435,7 +435,7 @@
     {
       "component": 48,
       "name": "body primary pressure envelope/service-well-3-2/recess-service-strut-2",
-      "piece": 0,
+      "piece": 27,
       "vertexStart": 544,
       "vertexCount": 8,
       "faceStart": 896,
@@ -444,7 +444,7 @@
     {
       "component": 49,
       "name": "body primary pressure envelope/longitudinal-service-strut-0",
-      "piece": 0,
+      "piece": 32,
       "vertexStart": 552,
       "vertexCount": 8,
       "faceStart": 908,
@@ -453,7 +453,7 @@
     {
       "component": 50,
       "name": "body primary pressure envelope/longitudinal-service-strut-1",
-      "piece": 0,
+      "piece": 33,
       "vertexStart": 560,
       "vertexCount": 8,
       "faceStart": 920,
@@ -3353,7 +3353,7 @@
     {
       "component": 1,
       "name": "body primary pressure envelope/service-well-0-0",
-      "piece": 0,
+      "piece": 28,
       "vertexStart": 60,
       "vertexCount": 12,
       "faceStart": 116,
@@ -3362,7 +3362,7 @@
     {
       "component": 2,
       "name": "body primary pressure envelope/service-well-1-0",
-      "piece": 0,
+      "piece": 29,
       "vertexStart": 72,
       "vertexCount": 12,
       "faceStart": 136,
@@ -3371,7 +3371,7 @@
     {
       "component": 3,
       "name": "body primary pressure envelope/service-well-2-0",
-      "piece": 0,
+      "piece": 30,
       "vertexStart": 84,
       "vertexCount": 12,
       "faceStart": 156,
@@ -3380,7 +3380,7 @@
     {
       "component": 4,
       "name": "body primary pressure envelope/service-well-3-0",
-      "piece": 0,
+      "piece": 31,
       "vertexStart": 96,
       "vertexCount": 12,
       "faceStart": 176,

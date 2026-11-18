@@ -112,7 +112,7 @@ fn mule_directional_gap_is_two_centimetres_and_engineering_is_preserved()
         ),
         (40000, 3411)
     );
-    assert_eq!(source.pieces.len(), 16);
+    assert_eq!(source.pieces.len(), 34);
     for (index, piece) in source.pieces.iter().enumerate() {
         assert_eq!(piece.rounding_metres(), 0.02);
         for x in [-1, 0, 1] {

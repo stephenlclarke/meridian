@@ -138,7 +138,7 @@ fn metal_union_overlaps_do_not_brighten_and_depletion_distance_depth_hide() {
         banks: [1.0, 1.0, 0.018, 64.0],
         low: [-1.021; 4],
         high: [1.021; 4],
-        pieces: [piece; 16],
+        pieces: [piece; MULE_PIECES],
     };
     let render = |u: &Uniforms, depth_clear: f32| {
         queue.write_buffer(&uniform, 0, bytemuck::bytes_of(u));
@@ -216,6 +216,9 @@ fn metal_union_overlaps_do_not_brighten_and_depletion_distance_depth_hide() {
     }
     let single = render(&u, 1.0);
     assert_eq!(single, overlap, "identical overlap must not add a layer");
+    // A piece in the final slot must behave just like the same piece in the first slot.
+    u.pieces.swap(0, MULE_PIECES - 1);
+    assert_eq!(render(&u, 1.0), single, "last union slot must render");
     u.banks[1] = 0.0;
     assert!(
         render(&u, 1.0).iter().all(|p| *p == 0),

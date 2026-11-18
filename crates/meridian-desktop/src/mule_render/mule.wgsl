@@ -1,8 +1,10 @@
+// Kept in lockstep with meridian_core::mule::MULE_PIECES by the shader layout test.
+const MULE_PIECES: u32 = 34u;
 struct Piece { range:vec4<u32>, low:vec4<f32>, high:vec4<f32> }
 struct Triangle { a:vec4<f32>, b:vec4<f32>, c:vec4<f32>, normal:vec4<f32> }
 struct Inputs {
     projection:vec4<f32>, origin:vec4<f32>, x:vec4<f32>, y:vec4<f32>, z:vec4<f32>,
-    camera:vec4<f32>, banks:vec4<f32>, low:vec4<f32>, high:vec4<f32>, pieces:array<Piece,16>,
+    camera:vec4<f32>, banks:vec4<f32>, low:vec4<f32>, high:vec4<f32>, pieces:array<Piece,MULE_PIECES>,
 }
 @group(0) @binding(0) var<uniform> input:Inputs;
 @group(0) @binding(1) var<storage,read> triangles:array<Triangle>;
@@ -122,9 +124,9 @@ struct Shimmer { @location(0) color:vec4<f32>, @builtin(frag_depth) depth:f32 }
     if interval.x>interval.y {discard;}
     let begin=input.projection.z/view_ray.z*stretch;
     // Camera/near-plane inside any member cannot show that member's internal exit surface.
-    for(var piece=0u;piece<16u;piece++) {if inside_piece(o+d*begin,input.pieces[piece],false) {discard;}}
+    for(var piece=0u;piece<MULE_PIECES;piece++) {if inside_piece(o+d*begin,input.pieces[piece],false) {discard;}}
     var hit=Hit(64.0,vec3<f32>(0.0));
-    for(var piece=0u;piece<16u;piece++) {
+    for(var piece=0u;piece<MULE_PIECES;piece++) {
         let item=input.pieces[piece];let r=item.low.w;
         let clipped=box_interval(o,d,item.low.xyz-vec3<f32>(r+0.001),item.high.xyz+vec3<f32>(r+0.001),hit.t);
         if clipped.x>clipped.y {continue;}
@@ -133,7 +135,7 @@ struct Shimmer { @location(0) color:vec4<f32>, @builtin(frag_depth) depth:f32 }
     if hit.t>=64.0 {discard;}
     let local=o+d*hit.t;
     // No concealed component surface contributes. There is no second hit/fallback layer.
-    for(var piece=0u;piece<16u;piece++) {if inside_piece(local,input.pieces[piece],true) {discard;}}
+    for(var piece=0u;piece<MULE_PIECES;piece++) {if inside_piece(local,input.pieces[piece],true) {discard;}}
     let normal=normalize(hit.normal);let grazing=pow(1.0-clamp(abs(dot(normal,d)),0.0,1.0),4.0);
     let bank=select(input.banks.y,input.banks.x,local.z>=0.0);
     let fade=clamp((64.0-hit.t)/32.0,0.0,1.0);

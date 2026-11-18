@@ -2,6 +2,7 @@ use super::{
     Piece, Scene, SmoothPieceArray, TEXTURES, Uniforms, VERTEX_COUNT, View, supports, uniforms,
     visual,
 };
+use meridian_core::mule::{MULE_PIECES, MULE_PRESENTATION_REVISION};
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
@@ -12,7 +13,7 @@ pub struct Pass {
     group: wgpu::BindGroup,
     vertices: wgpu::Buffer,
     cached: Arc<SmoothPieceArray>,
-    pieces: [Piece; 16],
+    pieces: [Piece; MULE_PIECES],
     active: bool,
     shimmer_supported: bool,
     srgb: bool,
@@ -25,7 +26,9 @@ impl Pass {
         scene: Scene<'_>,
     ) -> Result<Self, String> {
         let source = meridian_core::mule::MuleHullSource::bundled().map_err(|e| e.to_string())?;
-        if source.pieces() != scene.envelope.pieces.as_ref() || scene.envelope.revision != 1 {
+        if source.pieces() != scene.envelope.pieces.as_ref()
+            || scene.envelope.revision != MULE_PRESENTATION_REVISION
+        {
             return Err("SH001 contact/presentation source mismatch".into());
         }
         let (points, pieces, shimmer_supported) = match supports(scene.envelope) {
@@ -44,7 +47,7 @@ impl Pass {
                         range: [0; 4],
                         low: [0.0; 4],
                         high: [0.0; 4],
-                    }; 16],
+                    }; MULE_PIECES],
                     false,
                 )
             }

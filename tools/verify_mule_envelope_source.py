@@ -32,6 +32,7 @@ def verify():
     vertices = bytearray(b'MSH001V1') + struct.pack('<II', 4360, 984)
     triangles = bytearray()
     membership = bytearray()
+    well_pieces = {}
     for model, offset, counts in [('design', 0, (4360, 7236, 371)), ('nativeDesign', 4360, (984, 1772, 49))]:
         assert resource[model] == original[model]
         assert (len(resource[model]['vertices']), len(resource[model]['faces']), len(owner['models'][model]['parts'])) == counts
@@ -40,6 +41,25 @@ def verify():
             for key in ['vertexStart', 'vertexCount', 'faceStart', 'faceCount']:
                 assert part[key] == assigned[key]
             assert part['index'] == assigned['component'] and part['name'] == assigned['name']
+            name = part['name']
+            piece = assigned['piece']
+            if name.startswith('body primary pressure envelope/service-well-'):
+                key = (model, name.split('/', 2)[1])
+                assert piece == well_pieces.setdefault(key, 16 + len(well_pieces))
+            elif name == 'body primary pressure envelope/longitudinal-service-strut-0':
+                assert piece == 32
+            elif name == 'body primary pressure envelope/longitudinal-service-strut-1':
+                assert piece == 33
+            elif name == 'body primary pressure envelope':
+                assert piece == 0
+            else:
+                assert 1 <= piece < 16
+            first_vertex = part['vertexStart']
+            end_vertex = first_vertex + part['vertexCount']
+            first_face = part['faceStart']
+            end_face = first_face + part['faceCount']
+            for face in resource[model]['faces'][first_face:end_face]:
+                assert len(face) == 3 and all(first_vertex <= i < end_vertex for i in face)
             membership.extend(bytes([assigned['piece']]) * assigned['vertexCount'])
         for point in resource[model]['vertices']:
             vertices.extend(struct.pack('<ddd', *point))
@@ -48,7 +68,8 @@ def verify():
     assert bytes(vertices) == (folder / 'all-source.vertices').read_bytes()
     assert bytes(triangles) == (folder / 'source-triangles.bin').read_bytes()
     assert bytes(membership) == (folder / 'source-piece-membership.bin').read_bytes()
-    assert set(membership) == set(range(16))
+    assert len(well_pieces) == 16
+    assert set(membership) == set(range(34))
     # Bind unchanged current gameplay and the exact minimal World adaptation.
     # The sealed author packet separately preserves its old core and all 519 geometry files.
     binding = json.loads((ROOT / 'integration/sh001-mule/CURRENT-GAMEPLAY.json').read_text())
@@ -88,7 +109,7 @@ def verify():
     assert all(test['status'] == 'UNRUN' for test in criteria['worldCoreTests'])
     tightness = (ROOT / 'crates/meridian-core/src/mule/tightness_tests.rs').read_text()
     tightness_names = re.findall(r'#\[test\]\s*fn\s+(\w+)\(', tightness)
-    assert len(tightness_names) == 3 and tightness_names == [test['name'] for test in criteria['tightnessCoreTests']]
+    assert len(tightness_names) == 5 and tightness_names == [test['name'] for test in criteria['tightnessCoreTests']]
     assert all(test['status'] == 'UNRUN' for test in criteria['tightnessCoreTests'])
     rim_text = tightness.split('const WELL_RIMS:', 1)[1].split('];', 1)[0]
     rim_indices = [(int(piece), int(first)) for piece, first in re.findall(r'\((\d+), (\d+)\)', rim_text)]
@@ -100,7 +121,7 @@ def verify():
     assert sha(world_patch) == world_binding['canonicalPatch']['sha256']
     assert len(world_binding['currentRootCoreFiles']) == 135
     assert len(world_binding['modifiedCurrentFiles']) == 3
-    print(json.dumps({'status': 'PASS_SOURCE_ONLY', 'existingGameplayCoreFilesUnchanged': 127, 'ordinaryWorldTestInitializerAdapted': 1, 'minimalWorldAdaptedCoreFiles': 3, 'currentGameplayCorePins': 131, 'newCoreTests': 11, 'worldCoreTests': 4, 'tightnessCoreTests': 3, 'totalMuleCoreTests': 18, 'vertexEncoding': 5344, 'triangleEncoding': 9008, 'constructorsOrContactOrContainmentOrCompilerExecuted': False}))
+    print(json.dumps({'status': 'PASS_SOURCE_ONLY', 'existingGameplayCoreFilesUnchanged': 127, 'ordinaryWorldTestInitializerAdapted': 1, 'minimalWorldAdaptedCoreFiles': 3, 'currentGameplayCorePins': 131, 'newCoreTests': 11, 'worldCoreTests': 4, 'tightnessCoreTests': 5, 'totalMuleCoreTests': 20, 'vertexEncoding': 5344, 'triangleEncoding': 9008, 'constructorsOrContactOrContainmentOrCompilerExecuted': False}))
 
 
 if __name__ == '__main__':
