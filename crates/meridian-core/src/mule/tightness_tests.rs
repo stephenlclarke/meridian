@@ -144,6 +144,75 @@ fn detailed_triangles() -> Result<Vec<[Vec3; 3]>, EnvelopeError> {
         .collect()
 }
 
+fn largest_detailed_gap(points: &[Vec3], triangles: &[[Vec3; 3]]) -> Option<(f64, Vec3, usize)> {
+    let mut largest: Option<(f64, Vec3, usize)> = None;
+    for point in points {
+        let mut distance = f64::INFINITY;
+        let mut closest_face = 0;
+        for (face_index, triangle) in triangles.iter().enumerate() {
+            let candidate = triangle_distance_squared(*point, *triangle);
+            if candidate < distance {
+                distance = candidate;
+                closest_face = face_index;
+            }
+        }
+        assert!(distance.is_finite() && distance >= 0.0);
+        let distance = distance.sqrt();
+        if largest.is_none_or(|(old, _, _)| distance > old) {
+            largest = Some((distance, *point, closest_face));
+        }
+    }
+    largest
+}
+
+// A convex combination of maximizing source points is an inside witness. Adding
+// almost the ball radius along its support normal also locates it within a tiny
+// explicit support-plane error of the boundary. These are measurement fixtures,
+// never a ray/effect capability or a change to uncertain gameplay ray results.
+fn support_boundary_samples(piece: &SmoothPiece, directions: &[Vec3]) -> Vec<Vec3> {
+    let mut samples = Vec::new();
+    let guard = 2048.0 * f64::EPSILON * (1.0 + piece.origin_radius());
+    for direction in directions {
+        let n = scale(*direction, 1.0 / direction.dot(*direction).sqrt());
+        let support = piece
+            .source_points()
+            .iter()
+            .map(|p| p.dot(n))
+            .fold(f64::NEG_INFINITY, f64::max);
+        let mut face = Vec::new();
+        for point in piece.source_points() {
+            if support - point.dot(n) <= guard && !face.contains(point) {
+                face.push(*point);
+            }
+        }
+        assert!(!face.is_empty());
+        // Four spread source vertices keep the normal qualification bounded.
+        let chosen: Vec<_> = if face.len() <= 4 {
+            face
+        } else {
+            (0..4).map(|i| face[i * (face.len() - 1) / 3]).collect()
+        };
+        let mut witness = |q: Vec3| {
+            let point = add(q, scale(n, piece.rounding_metres() - 4.0 * guard));
+            let displacement = sub(point, q);
+            assert!(displacement.dot(displacement) <= piece.rounding_metres().powi(2));
+            let deficit = support + piece.rounding_metres() - point.dot(n);
+            assert!((-guard..=16.0 * guard).contains(&deficit));
+            samples.push(point);
+        };
+        for (i, a) in chosen.iter().enumerate() {
+            witness(*a);
+            for b in chosen.iter().skip(i + 1) {
+                for step in 1..8 {
+                    let t = f64::from(step) / 8.0;
+                    witness(add(scale(*a, 1.0 - t), scale(*b, t)));
+                }
+            }
+        }
+    }
+    samples
+}
+
 #[test]
 fn mule_sampled_visible_envelope_excess_reports_actual_detailed_surface_gaps()
 -> Result<(), EnvelopeError> {
@@ -175,6 +244,19 @@ fn mule_sampled_visible_envelope_excess_reports_actual_detailed_surface_gaps()
         position: Vec3::new(0.0, 0.0, 0.0),
         orientation: Basis3::IDENTITY,
     };
+    let mut visible_piece_count = 0;
+    // Retain the actual observed detailed-source gap as explicit unresolved evidence.
+    let observed = Vec3::new(-1.9652283480888286, 1.5538569641363296, 1.9641025785197854);
+    let observed_gap = triangles
+        .iter()
+        .map(|t| triangle_distance_squared(observed, *t))
+        .fold(f64::INFINITY, f64::min)
+        .sqrt();
+    assert!((observed_gap - 0.6596408669309312).abs() < 1e-9);
+    eprintln!(
+        "MULE_KNOWN_TIGHTNESS_BLOCKER {{\"observedDistanceMetres\":{observed_gap},\"pointStillEnclosed\":{},\"maximumOrAcceptance\":false}}",
+        source.contains_local(observed)
+    );
     for (index, piece) in source.pieces.iter().enumerate() {
         let mut directions = Vec::new();
         for x in [-1, 0, 1] {
@@ -195,13 +277,18 @@ fn mule_sampled_visible_envelope_excess_reports_actual_detailed_surface_gaps()
                 directions.push(sub(center, piece.center()));
             }
         }
-        let mut samples = 0;
+        let boundary_samples = support_boundary_samples(piece, &directions);
+        let certified_boundary_samples = boundary_samples.len();
+        assert!(
+            certified_boundary_samples > 0,
+            "piece {index} has no independently certified boundary samples"
+        );
+        let mut ray_samples = 0;
+        let mut support_samples = 0;
+        let mut visible_points = Vec::new();
         let mut uncertain = 0;
         let mut internal = 0;
         let mut clear = 0;
-        let mut largest = 0.0_f64;
-        let mut largest_point = Vec3::new(0.0, 0.0, 0.0);
-        let mut nearest_face = 0;
         let range = 8.0 * piece.origin_radius();
         for d in directions {
             let norm = d.dot(d).sqrt();
@@ -219,46 +306,53 @@ fn mule_sampled_visible_envelope_excess_reports_actual_detailed_surface_gaps()
                         internal += 1;
                         continue;
                     }
-                    samples += 1;
-                    let mut distance = f64::INFINITY;
-                    let mut closest_face = 0;
-                    for (face_index, triangle) in triangles.iter().enumerate() {
-                        let candidate = triangle_distance_squared(point, *triangle);
-                        if candidate < distance {
-                            distance = candidate;
-                            closest_face = face_index;
-                        }
-                    }
-                    assert!(distance.is_finite() && distance >= 0.0);
-                    if samples == 1 || distance.sqrt() > largest {
-                        largest = distance.sqrt();
-                        largest_point = point;
-                        nearest_face = closest_face;
-                    }
+                    ray_samples += 1;
+                    visible_points.push(point);
                 }
                 EnvelopeRayContact::Uncertain { .. } => uncertain += 1,
                 EnvelopeRayContact::Clear => clear += 1,
             }
         }
-        assert!(
-            samples > 0,
-            "piece {index} has no confirmed visible tightness samples"
-        );
+        for point in boundary_samples {
+            if source
+                .pieces
+                .iter()
+                .enumerate()
+                .any(|(other, p)| other != index && p.contains(point))
+            {
+                internal += 1;
+                continue;
+            }
+            support_samples += 1;
+            visible_points.push(point);
+        }
+        let samples = visible_points.len();
+        let largest = largest_detailed_gap(&visible_points, &triangles);
+        assert_eq!(largest.is_some(), samples > 0);
+        // A union may conceal a member completely. Do not fabricate a visible
+        // sample or call this coverage complete when all candidates were excluded.
+        let visible_coverage_established = samples > 0;
+        visible_piece_count += usize::from(visible_coverage_established);
         let (low, high) = piece.source_bounds();
+        let distance_json = largest.map_or_else(|| "null".to_string(), |(d, _, _)| d.to_string());
+        let point_json = largest.map_or_else(
+            || "null".to_string(),
+            |(_, p, _)| format!("[{},{},{}]", p.x, p.y, p.z),
+        );
+        let face_json = largest.map_or_else(|| "null".to_string(), |(_, _, f)| f.to_string());
+        let excess_json = largest.map_or_else(
+            || "null".to_string(),
+            |(d, _, _)| (d > 0.020001).to_string(),
+        );
         eprintln!(
-            "MULE_DETAILED_GAP_SAMPLES {{\"piece\":{index},\"confirmedVisibleSamples\":{samples},\"uncertain\":{uncertain},\"internalSkipped\":{internal},\"clearRays\":{clear},\"largestSampledDistanceMetres\":{largest},\"exceedsTwoCentimetres\":{},\"samplePoint\":[{},{},{}],\"nearestDetailedFace\":{nearest_face},\"sourceLow\":[{},{},{}],\"sourceHigh\":[{},{},{}],\"envelopeAxialPaddingMetres\":0.02,\"certifiedMaximumOrAcceptance\":false}}",
-            largest > 0.020001,
-            largest_point.x,
-            largest_point.y,
-            largest_point.z,
-            low.x,
-            low.y,
-            low.z,
-            high.x,
-            high.y,
-            high.z
+            "MULE_DETAILED_GAP_SAMPLES {{\"piece\":{index},\"certifiedPieceBoundarySamples\":{certified_boundary_samples},\"confirmedVisibleSamples\":{samples},\"visibleCoverageEstablished\":{visible_coverage_established},\"confirmedRaySamples\":{ray_samples},\"confirmedSupportWitnessSamples\":{support_samples},\"uncertain\":{uncertain},\"internalSkipped\":{internal},\"clearRays\":{clear},\"largestSampledDistanceMetres\":{distance_json},\"exceedsTwoCentimetres\":{excess_json},\"samplePoint\":{point_json},\"nearestDetailedFace\":{face_json},\"sourceLow\":[{},{},{}],\"sourceHigh\":[{},{},{}],\"envelopeAxialPaddingMetres\":0.02,\"certifiedMaximumOrAcceptance\":false}}",
+            low.x, low.y, low.z, high.x, high.y, high.z
         );
     }
+    assert!(
+        visible_piece_count > 0,
+        "no actual visible union surface was measured"
+    );
     Ok(())
 }
 
@@ -299,5 +393,58 @@ fn mule_preserves_named_pannier_cockpit_and_engine_source_gaps() -> Result<(), E
             point[0], point[1], point[2]
         );
     }
+    Ok(())
+}
+
+#[test]
+fn compound_gap_sampling_does_not_invent_visibility_for_an_internal_member()
+-> Result<(), EnvelopeError> {
+    let inner = SmoothPiece::new(vec![Vec3::new(0.0, 0.0, 0.0)], 0.02)?;
+    let outer = SmoothPiece::new(
+        vec![
+            Vec3::new(-1.0, 0.0, 0.0),
+            Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(0.0, -1.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+            Vec3::new(0.0, 0.0, -1.0),
+            Vec3::new(0.0, 0.0, 1.0),
+        ],
+        0.02,
+    )?;
+    let directions = [
+        Vec3::new(1.0, 0.0, 0.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        Vec3::new(0.0, 0.0, 1.0),
+    ];
+    let inner_samples = support_boundary_samples(&inner, &directions);
+    assert!(!inner_samples.is_empty());
+    // Independent analytic containment in the unrounded unit octahedron:
+    // |x|+|y|+|z|<1. A valid compound can have no exposed inner boundary.
+    for p in &inner_samples {
+        assert!(p.x.abs() + p.y.abs() + p.z.abs() < 1.0);
+        assert!(outer.contains(*p));
+    }
+    let inner_visible = inner_samples
+        .iter()
+        .filter(|p| !outer.contains(**p))
+        .count();
+    assert_eq!(inner_visible, 0);
+    let outer_samples = support_boundary_samples(&outer, &directions);
+    assert!(!outer_samples.is_empty());
+    let outer_visible = outer_samples
+        .iter()
+        .filter(|p| !inner.contains(**p))
+        .count();
+    assert_eq!(outer_visible, outer_samples.len());
+    assert!(outer_visible > 0);
+    let triangle = [[
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(1.0, 0.0, 0.0),
+        Vec3::new(0.0, 1.0, 0.0),
+    ]];
+    assert_eq!(largest_detailed_gap(&[], &triangle), None);
+    assert!(largest_detailed_gap(&outer_samples, &triangle).is_some());
+    // This proves the fixture's scope, not coverage/hiddenness of any actual Mule
+    // member. Real zero-visible records remain explicit unresolved acceptance data.
     Ok(())
 }

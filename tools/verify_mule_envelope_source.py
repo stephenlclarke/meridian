@@ -88,7 +88,7 @@ def verify():
     assert all(test['status'] == 'UNRUN' for test in criteria['worldCoreTests'])
     tightness = (ROOT / 'crates/meridian-core/src/mule/tightness_tests.rs').read_text()
     tightness_names = re.findall(r'#\[test\]\s*fn\s+(\w+)\(', tightness)
-    assert len(tightness_names) == 2 and tightness_names == [test['name'] for test in criteria['tightnessCoreTests']]
+    assert len(tightness_names) == 3 and tightness_names == [test['name'] for test in criteria['tightnessCoreTests']]
     assert all(test['status'] == 'UNRUN' for test in criteria['tightnessCoreTests'])
     rim_text = tightness.split('const WELL_RIMS:', 1)[1].split('];', 1)[0]
     rim_indices = [(int(piece), int(first)) for piece, first in re.findall(r'\((\d+), (\d+)\)', rim_text)]
@@ -100,7 +100,7 @@ def verify():
     assert sha(world_patch) == world_binding['canonicalPatch']['sha256']
     assert len(world_binding['currentRootCoreFiles']) == 135
     assert len(world_binding['modifiedCurrentFiles']) == 3
-    print(json.dumps({'status': 'PASS_SOURCE_ONLY', 'existingGameplayCoreFilesUnchanged': 127, 'ordinaryWorldTestInitializerAdapted': 1, 'minimalWorldAdaptedCoreFiles': 3, 'currentGameplayCorePins': 131, 'newCoreTests': 11, 'worldCoreTests': 4, 'tightnessCoreTests': 2, 'totalMuleCoreTests': 17, 'vertexEncoding': 5344, 'triangleEncoding': 9008, 'constructorsOrContactOrContainmentOrCompilerExecuted': False}))
+    print(json.dumps({'status': 'PASS_SOURCE_ONLY', 'existingGameplayCoreFilesUnchanged': 127, 'ordinaryWorldTestInitializerAdapted': 1, 'minimalWorldAdaptedCoreFiles': 3, 'currentGameplayCorePins': 131, 'newCoreTests': 11, 'worldCoreTests': 4, 'tightnessCoreTests': 3, 'totalMuleCoreTests': 18, 'vertexEncoding': 5344, 'triangleEncoding': 9008, 'constructorsOrContactOrContainmentOrCompilerExecuted': False}))
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 {
   "targetHull": "SH001",
   "name": "Mule",
-  "status": "SOURCE_AND_GEOMETRY_PROTOTYPE_AUTHORED_UNRUN;NO_ACTOR_ADMISSION",
+  "status": "CAUSAL_FIXTURES_AUTHORED_UNRUN;ACTUAL_TIGHT_FIT_BLOCKED;NO_ACTOR_ADMISSION",
   "immediateAuthorParent": "8e2e5d3a3ef5f6caffd0323ca4b2540e1e57981b",
   "currentGameplayAuthority": "ad5b9f9da259c85389cd662af2473e543e26ab11",
   "newCoreTests": [
@@ -163,7 +163,7 @@
       "status": "UNRUN"
     }
   ],
-  "totalMuleCoreTests": 17,
+  "totalMuleCoreTests": 18,
   "controlledWorldScenario": {
     "status": "AUTHORED_UNRUN;NOT_ORDINARY_HULL_ADMISSION",
     "base": "af97ee6bbba60b2d492216ad12035a90e9dde34e",
@@ -192,11 +192,16 @@
       "file": "crates/meridian-core/src/mule/tightness_tests.rs",
       "name": "mule_preserves_named_pannier_cockpit_and_engine_source_gaps",
       "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tightness_tests.rs",
+      "name": "compound_gap_sampling_does_not_invent_visibility_for_an_internal_member",
+      "status": "UNRUN"
     }
   ],
   "tightnessEvidence": {
-    "status": "AUTHORED_UNRUN;actualG1parametersandG3viewsrequired",
-    "metrics": "For all16pieces,26directions plus84authentic detailed well-rim directions overall;only confirmed visible envelope ray contacts sampled;distance to nearest of all7236actual detailed triangles. Report per-piece largest sampled distance/point/nearestface/source low-high/2cm axial padding and counts of confirmed,uncertain,internal,clear samples.",
+    "status": "BLOCKED_ACTUAL_EXCESS;CORRECTED_MEASUREMENT_PROTOCOL_UNRUN",
+    "metrics": "Original26directions+84well-rim rays retained;add bounded certified source-support-plane boundary witnesses and eighth-face interpolants. Each piece needs certified boundary samples. Report visible ray/support-witness counts separately,extent/maxsample point/face,uncertain/possiblyinternal/clear counts,visibleCoverageEstablished flag. All zero-visible records stay unresolved,never accepted.",
     "flags": "exceedsTwoCentimetres flags sampled distances>0.020001m;this is an evidence flag,not an acceptance budget. Large filled empty space must be assessed/repaired before rollout.",
     "limits": "Not exhaustive;not a maximum/Hausdorff guarantee;no runtime values claimed. Uncertain/internal samples reported,not treated as measured clearance or discarded without disclosure.",
     "namedGaps": [
@@ -206,6 +211,28 @@
     ],
     "gapCheck": "Each named source-coordinate center must stay outside the full union and a2cm extent triangle there must have actual separation certificates.",
     "knownApproximationRisks": "Convex supports fill service wells;engine support/casing and cockpit/crossmember convex grouping can fill concave space. Actual extent is unmeasured.",
-    "acceptance": "Actual source-derived excess/extent records, named gap assertions, G3 close-up/full-surface rendering, contact and docking simplicity/tight fit required;2cm directional expansion alone does not qualify Mule or fleet reuse."
+    "acceptance": "BLOCKED despite any corrected-fixture PASS. Actual excessive convex bridge must be corrected;full visible-union coverage/tight fit/contact/docking and G3/G1 evidence still required.",
+    "observed": {
+      "head": "ccd89b2af0c75786e8915bf91a554a7f2c549cb5",
+      "completedPiece0SampleMetres": 0.6596408669309312,
+      "piece0ConfirmedRays": 28,
+      "piece0UncertainRays": 8,
+      "piece0InternalExcluded": 2,
+      "nextPiece1": "No confirmed visible samples;first failure stopped full16 metrics",
+      "namedOpeningChecks": "6PASS",
+      "globalMaximum": "NOT_ESTABLISHED"
+    },
+    "missingValues": "No visible sample yields null distance/point/face/excess,visibleCoverageEstablished=false,never zero-gap/complete/accepted."
+  },
+  "causalCorrection": {
+    "record": "integration/sh001-mule/CAUSAL-CORRECTION.json",
+    "currentRoot": "316f831a21c212648b951e67866ce9199d6fca10",
+    "sourceBinding": "integration/sh001-mule/CAUSAL-BINDING.json",
+    "correctedSourceTests": "UNRUN;no prior pass rebound",
+    "observedPriorQualification": "ccd89CHECKPASS;library446PASS2FAILof448;downstreamcompatibility/desktop/importer/Clippy/release/MetalUNRUN",
+    "cases": "Checked-decode raw equality + exact publicContinue2counter/checksum delta;bounded authenticated support-face measurement fixtures;independent nested-member visibility regression.",
+    "productionGeometryWorldEMPContinueBehavior": "UNCHANGED_CURRENT_ROOT",
+    "tightFitStatus": "BLOCKED_ACTUAL_0.6596408669309312m_CONVEX_BRIDGE;INCOMPLETE_VISIBLE_COVERAGE",
+    "requiredBeforeAcceptance": "Remove excessive source-convex bridging through genuine tighter source-derived shape/partition retaining all detailed/native vertices and triangle containment;coherent G3renderer and actual G1shape/contact/docking/tightness evidence. No blanket fleet rollout."
   }
 }

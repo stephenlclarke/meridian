@@ -144,8 +144,61 @@ fn ordinary_world_and_current_save_do_not_acquire_a_validation_mule()
     let world = World::new_commander(733)?;
     assert!(world.mule_actor_snapshot().is_none());
     let bytes = world.save_bytes()?;
-    let restored = World::from_save_bytes(&bytes)?;
+    // Checked decode preserves the encoded domain. Public Continue deliberately
+    // invalidates old UI reviews/session contact and therefore changes two counters.
+    let restored = World::decode_saved_world(&bytes)?;
     assert!(restored.mule_actor_snapshot().is_none());
     assert_eq!(restored.save_bytes()?, bytes);
+
+    let session = world
+        .freight_session
+        .as_ref()
+        .ok_or(crate::save::SaveError::NoCommander)?;
+    let (epoch, review_sequence) = session.continue_floor();
+    let mut state_record = crate::save::Writer::new();
+    session.state.encode_save(&mut state_record);
+    let mut session_record = crate::save::Writer::new();
+    session.encode_save(&mut session_record);
+    let matches: Vec<_> = bytes
+        .windows(session_record.bytes.len())
+        .enumerate()
+        .filter_map(|(offset, record)| {
+            (record == session_record.bytes.as_slice()).then_some(offset)
+        })
+        .collect();
+    assert_eq!(
+        matches.len(),
+        1,
+        "the complete authored freight session must be unique"
+    );
+    // State writes review_sequence last; the containing session writes epoch next.
+    let review_offset = matches[0] + state_record.bytes.len() - 8;
+    let epoch_offset = review_offset + 8;
+    assert_eq!(
+        &bytes[review_offset..review_offset + 8],
+        &review_sequence.to_le_bytes()
+    );
+    assert_eq!(&bytes[epoch_offset..epoch_offset + 8], &epoch.to_le_bytes());
+    let continued = World::from_save_bytes(&bytes)?;
+    assert!(continued.mule_actor_snapshot().is_none());
+    assert_eq!(continued.snapshot(), world.snapshot());
+    assert_eq!(
+        continued
+            .freight_session
+            .as_ref()
+            .ok_or(crate::save::SaveError::NoCommander)?
+            .continue_floor(),
+        (epoch + 1, review_sequence + 1)
+    );
+    // Independent byte-delta expectation: no other domain/equipment/custody byte
+    // may change. Do not normalize the actual result or call the invalidator here.
+    let mut expected = bytes.clone();
+    expected[review_offset..review_offset + 8]
+        .copy_from_slice(&(review_sequence + 1).to_le_bytes());
+    expected[epoch_offset..epoch_offset + 8].copy_from_slice(&(epoch + 1).to_le_bytes());
+    let checksum_offset = expected.len() - 8;
+    let checksum = crate::save::checksum(&expected[..checksum_offset]);
+    expected[checksum_offset..].copy_from_slice(&checksum.to_le_bytes());
+    assert_eq!(continued.save_bytes()?, expected);
     Ok(())
 }
