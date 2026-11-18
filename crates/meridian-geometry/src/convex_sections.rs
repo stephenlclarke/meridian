@@ -1,7 +1,7 @@
 //! Exact half-plane geometry for one original facet and certified convex owners.
 use super::strict_interior::InteriorCertificates;
 use super::{Bounds, log_cost};
-use crate::{Budget, Facet, Failure, Point2, Rational, integer};
+use crate::{Budget, Facet, Failure, Point2, Rational};
 use num_traits::{Signed, Zero};
 use std::collections::BTreeMap;
 

@@ -1,0 +1,60 @@
+{
+  "parentAuthor": "f501cc296fec087508e12761d5957ad71e49acfc",
+  "actualFailedRoot": "8718b040e72143e0536562b55ce3141f36d0111b",
+  "actualTree": "1f19cd3e95a82b0a93379d59cd91bd14ce314694",
+  "all411ParentCratePinsMatchActualFailedRoot": true,
+  "failureRecord": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/QUALIFICATION-FAILURE.json",
+    "bytes": 6486,
+    "sha256": "e4bbbf1dc9fe55c5f81a532c55c0dd79c805f237f4c716817915a80ee37fd074"
+  },
+  "rawPacket": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/RAW-PACKET.tar.gz",
+    "bytes": 21024007,
+    "sha256": "6707736aa61b2233a50804c680a03103b0c11b0867ef8d328d2adeb7d8e06df1"
+  },
+  "rootPinInventory": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/ROOT-ALL-SOURCE-PINS.json",
+    "bytes": 137833,
+    "sha256": "41a9f7a2a7f7395568229c4532bffb89e5edd4ff282cae21d1fd4cdbe987e52a"
+  },
+  "wholeSourceReview": {
+    "path": "integration/face-contact-correction/PARENT-REVIEW.json",
+    "bytes": 9659,
+    "sha256": "258aee3143143a84fb7fb9f09b3beae40b8bfdcbf02fb36670e5eeab41ada181"
+  },
+  "actualFocused": {
+    "check": "PASS_WITH_UNUSED_IMPORT_WARNING",
+    "library": {
+      "passed": 56,
+      "failed": 1,
+      "declared": 57,
+      "failedCase": "certificate::convex_section_tests::convex_section_rows_preserve_complete_publisher_fields_contacts_and_volume",
+      "actualError": "Error: Failure { kind: UncertifiedContact, source: Some(SourceId { component: 1, facet: 11 }), operations: 51205, detail: \"disconnected contact-star link\" }",
+      "laneAndFixture": "Not explicitly labelled at failure; not inferred or rerun",
+      "raw": {
+        "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/test.log",
+        "bytes": 19143,
+        "sha256": "a0e2f2fd17f525c44819a2491fcee52a24836548e89510f52fdd0d4b518054d6"
+      },
+      "extract": {
+        "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/FIRST-FAILURE-EXTRACT.txt",
+        "bytes": 1334,
+        "sha256": "4ac393b6de925e8e2504ef42b6995c7394e9ece53931ae93173ae72b1b7a4b12"
+      }
+    },
+    "unrun": [
+      "7binaryTests",
+      "9adapterTests",
+      "2originalControlTests",
+      "9hostTests",
+      "strictClippy",
+      "developmentOriginalFiveBuild",
+      "wholeFive25Bodies"
+    ],
+    "originalWholeFiveRunCount": 0
+  },
+  "actualFailureAttribution": "871/f501 failed library case; raw fixture/lane NOT explicitly labelled. Do not infer/rebind which publisher call failed. Printed fixture0/1 completion is retained context, not lane attribution.",
+  "causalSourceFinding": "cube(0,8) andcube(8,16) intersect onlyat[8,8,8],notface. Unchanged final global closed-star contract requires one connected link; corner-only shells give two disjoint cycles. Positivefixture corrected tox-only neighbour; exactoldcorner retained as negative on both existingreference andcandidate. Newassertions are UNRUN.",
+  "newSourceExecution": "UNRUN76Rust9host/checkstrictClippyBuild/wholefive. Prioractual84971pass/5Operationsrefusals remain separate prior custody."
+}

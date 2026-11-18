@@ -1,0 +1,93 @@
+{
+  "reviewedAtUTC": "2026-11-18T12:49:38.222983+00:00",
+  "verdict": "SOURCE_CLEAR_WHOLE_CERTIFIED_CONVEX_LOCAL_OUTWARD_SECTION_REPRESENTATION;CURRENT_EXECUTION_UNRUN",
+  "head": "8718b040e72143e0536562b55ce3141f36d0111b",
+  "tree": "1f19cd3e95a82b0a93379d59cd91bd14ce314694",
+  "immediateParent": "84936cd613c9b32134c09c8469293805449360f1",
+  "packet": {
+    "path": "/private/tmp/meridian-root-convex-sections-review/SOURCE.json",
+    "bytes": 5550,
+    "sha256": "ddf02f979c670fb6c1c3b47517a9a1803ac627703011a6117fa24da1915c22f4"
+  },
+  "findings": [],
+  "independentChecks": {
+    "cleanExactHeadTreeImmediateParent": true,
+    "rootGitWorkingSourceTarBytesModes": 550,
+    "rootDeltaPaths": 29,
+    "unchanged": 521,
+    "authorPayloadsAndCompleteArchiveMembers": [
+      7,
+      8
+    ],
+    "authorCratePinsGitWorkingAndTar": 411,
+    "all394AuthorParentCrateFilesExactActual849": true,
+    "canonicalRootDeltaVerified": true,
+    "threeProductionFullFileInversesExactParent": true,
+    "fiveFrozenReferencesHashed": true,
+    "completePublisherControlExactExceptFunctionName": true,
+    "all71OldTestBodiesByteExact": true,
+    "currentTestAttributes": 75,
+    "collectorRestoration": "Independently extracted new collect_rows_admitted and old collect_admitted. Reversed only method name/parameter, certified-owner exclusion and candidate dispatch: entire body equal except whitespace. Original joint_section, occupied, crosses, fields_visible, collection_with_support and collect_admitted bodies byte-exact. Finite candidates traversal body byte-exact.",
+    "priorActualSourceAndRawPins": {
+      "directCustodyTerminalPinsHashed": 48,
+      "currentRawArtifactPins": 43,
+      "exactCurrentRootRelativeArchiveMatches": 43,
+      "source": "84936cd613c9b32134c09c8469293805449360f1",
+      "rawArchiveBytes": 21073223,
+      "rawArchiveSHA256": "f828279c2702f35c69fb1266077c42381379631c252239e0bd4c54978ff7827a"
+    }
+  },
+  "wholeSemanticReview": [
+    "Certification occurs only after authenticated original-owner ranges and original closed/positive-volume/embedded-sheet audits. Existing large-owner all-vertices/all-original-support proofs remain unchanged. Small-owner grouping pays owner/facet/map/consumed-group costs, calls the same certify function and merges into sorted borrowed Owner records with charged comparisons/shifts/insertion. No plane normalization, averaging, primitive substitution or ownership collapse. A cavity inner orientation causes original outer vertices to violate inner support, declining certification. Disconnected/nonconvex owners cannot gain certification merely by ID.",
+    "Projection algebra is exact: eliminate dominant source axis a from n.x=d, let s=n[a]!=0; sign(s)*(m[k]*s-m[a]*n[k]) and sign(s)*(m[a]*d-e*s) evaluate abs(s)*(m.x-e) at the lifted sample. Dominant-axis two comparisons are charged. Both source signs are handled without division or approximate/sample-coordinate reconstruction.",
+    "For parallel projected normal zero, positive constant excludes the owner, negative constant satisfies that support. At zero constant, equal m[a]/s signs exclude the outward-positive-epsilon side; opposite signs satisfy it. Nonzero validated original normals prohibit zero parallel m[a]. Reviewed exact own-owner ID+equation support lookup may mark only its proven empty outward row.",
+    "Every nonparallel query evaluates fresh exact support distances. Any positive distance excludes that owner; all strictly negative distances establish occupancy for sufficiently small positive outward epsilon. A nonpositive row with any zero returns None and invokes unchanged full generic-ray visibility; no boundary value is guessed or cached. Strict occupancy of one owner suffices for union occupancy. Early ambiguity before another owner can cause conservative full fallback, preserving the generic policy.",
+    "Rows include only certified owners whose closed bounds meet the current finite original facet bounds; a strictly disjoint box cannot contribute at its infinitesimal outward limit. Certified-owner eligibility removes only outward parity-map rows. Physical/coplanar collection is independent and restores exactly to the old collector. Original physical segments, protected point/interval contacts, coplanar affine fields, source order and uncertified owner/multiplicity rows remain. If no uncertified row is eligible, unchanged finite candidates plus charged ordinal conversion retain exactly all original physical candidates; otherwise original joint traversal remains.",
+    "Original source-domain arrangement partition and clipping, physical/protected contacts, full original affine field selection, source packing/noding/triangulation, contact stars, witnesses, closed topology and positive-volume publication paths are unchanged. Rows Some(false) defers to unchanged uncertified parity; None uses full original generic visibility; nonoccupied cells still undergo fields_visible. Strict interior omission now may use newly certified small owners, but relies on the same all-three-vertices strict support and strict-bounds proof.",
+    "Projected coefficients are internal exact plane equations, as original normal/offset and orient/dot intermediates are, rather than coordinate/UV output. No coordinate or UV guard was removed. Eliminated section/interpolation coordinates are no longer constructed; actual newly generated arrangement/output coordinates still follow unchanged4096-bit guards. No source rational approximation, lowered bit price, skipped output validation or virtual cached answer is introduced.",
+    "Added work prices include small-owner proof and map visits, sorted owner comparison/shift/insertion, own-support lookup, two axis comparisons, every owner/whole-box/map operation, exact plane transform plus parallel predicate, branch decision/transfer, every fresh equation evaluation, and finite-ordinal conversion. Existing operations still performed retain old prices. Savings remove actual triangle sections/interpolation/point checking/segment storage/parity setup/crossings for certified owners; no complete-original cost or fit is inferred.",
+    "Rows reserve16 header+16 per owner+8 per owned equation, constructor/query32 scratch with independently scoped existing lookup32. Returned certificate owner/vector storage is admitted by unchanged certify before transfer; sorted merge holds old rows and new vector simultaneously. Finite path retains extraN ordinal slots through conversion, on top of3N returned-record and original index-stack reservations. Parallel-outside temporary equations actually drop before ledger release. Builder/collector failures drop owned local data then restore entry reservations. Rows remain admitted through occupancy and actually drop/release before arrangement error propagation and publication. Existing global failed-prefix accounting policy remains unchanged.",
+    "Four new cases compare full triangles/nonzero affine UVs, all witnesses, volume and retained memberships with independent complete prior publisher on overlapping boxes, oblique subdivided tetrahedron, opposite-facing touching boxes and cavity; test both normal signs, exact inside/outside/boundary/repeated queries, cavity decline and unchanged uncertified collector, exact/one-short storage, Operations refusal and rollback. Paired monotonic measurements and10x ceiling are authored assertions, not measured current speed. The oblique case requires full charged operations below reference. All71prior bodies/322/108/120 guards remain byte exact; existing independent controls remain compiled under test."
+  ],
+  "actualParentEvidence": {
+    "source": "84936cd613c9b32134c09c8469293805449360f1",
+    "tree": "d648116dc51d4c9a9080e222d50a8ca1398e4a75",
+    "rawFocusedCounts": [
+      53,
+      7,
+      9,
+      2
+    ],
+    "rustPassed": 71,
+    "hostPassed": 9,
+    "lockedAllTargetCheck": "PASS",
+    "strictClippy": "PASS",
+    "developmentBuild": "PASS",
+    "wholeFiveBodies": {
+      "declared": 25,
+      "decodePass": 5,
+      "constructorRefusedOperations": 5,
+      "failed": 0,
+      "dependentUnrun": 15
+    },
+    "completeCandidates": 0,
+    "admissions": 0,
+    "wholeElapsedSeconds": 154.24589475,
+    "allFiveFailureAndFullGuardContextsAndMonotonicSecondsExactCustody": true,
+    "sectionOperationsFailedPrefixes": [
+      614190,
+      617536,
+      747131,
+      729175,
+      786527
+    ],
+    "interpretation": "Actual incomplete parent prefixes only; not total-work minima, current fit, successful original publication or current speed."
+  },
+  "executionDecision": "Existing soleG1 Mac geometry owner may run current exact-source locked all-target check,75Rust9host,strictClippy and development original_five build when its serial lane is free. Only after every focused gate PASS,ONEalready-scoped changed whole-five25body workload under original2Moperations includingdecode/100kstorage/4096-bit coordinatesUV/512complete-outputfaces, same originals and source-lock-binary/input pins, actual monotonic durations and precleanup guard contexts. No additional sourceACK gate. Preserve natural first failure/refusal and dependentUNRUN outcomes; no unchanged or diagnostic repeat.",
+  "limits": [
+    "No compiler,Cargo,Clippy,tests,SUT,geometry/native execution,supplied verifier or review bot run by G2.",
+    "No human WIP edits,new chat/agent,merge/publication or integration testing.",
+    "Current75Rust9host/compiler/build/wholefive are UNRUN. Source clear is not an executed pass,admission,complete-fit,minimal-work or speed claim.",
+    "Broader202matrix,171fleet scope and legacy23/162ships+4/6stations remain separate."
+  ]
+}

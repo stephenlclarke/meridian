@@ -1,0 +1,33 @@
+{
+  "status": "AUTHORED_UNRUN_BOUNDED_POSITIVE_FIXTURE_CORRECTION",
+  "parentAuthor": "f501cc296fec087508e12761d5957ad71e49acfc",
+  "actualFailedRoot": "8718b040e72143e0536562b55ce3141f36d0111b",
+  "actualFailedTree": "1f19cd3e95a82b0a93379d59cd91bd14ce314694",
+  "actualFailure": "56/57libraryPASS,1newcomparisonFAIL; checkPASSwithunusedinteger warning;other18Rust9hostClippyBuildWholefiveUNRUN;originalruns0. Failurefixture/laneunlabelled.",
+  "productionChanges": "Onlyremove unusedintegerimport; completeotherrowbytes andallmathematics/guards unchanged.",
+  "fixtureCorrection": "Positivefixture2 changes from corner-only cube(8,16) to x-only neighbour sharingfullface; preservesworldaffineUVs andallpriorassertions. Exactoldcornerpair retainedin independentnegative reference+candidate case.",
+  "errorContext": "Everynewconvexcase returnedFailure loggedwithcase/fixture/lane; publisherlanes explicit; originalFailure preserved; no unchangeddiagnosticrun.",
+  "preservation": "All71oldbodies/all75previouscasenames retained; every assertion tokenfromfourpriorconvextests unchanged andordered; allothersrc/tests byteexact; complete2fileinverse; no guard/lintwaiver.",
+  "currentRustCount": 76,
+  "hostCount": 9,
+  "newTest": {
+    "file": "src/convex_section_tests.rs",
+    "name": "corner_touch_retains_independent_reference_and_candidate_contact_star_refusals",
+    "status": "UNRUN"
+  },
+  "currentExecution": "UNRUN; noauthorcompiler/probe/SUT/native",
+  "contractSHA256": "b3a8ecf59164ade4e14072a653f34e6274d08a9c58c5bf4e9dbf9241d5cb1c41",
+  "custodySHA256": "02a7d66e8f741d923beb11dd6c43c538fb1b68634e145bb80c6421eac64b2d44",
+  "inverseSHA256": "b1f7b41cd15901395f161785ce1ca6ba9ef6bb46c9738a3a3b4e2b5080fb5e28",
+  "freezeSHA256": "24f0b4c1323663b6de29f1993bc019478663825e6dd9dcc0702490076eb1c57d",
+  "parentReviewSHA256": "258aee3143143a84fb7fb9f09b3beae40b8bfdcbf02fb36670e5eeab41ada181",
+  "failedQualificationSHA256": "e4bbbf1dc9fe55c5f81a532c55c0dd79c805f237f4c716817915a80ee37fd074",
+  "limits": {
+    "operationsIncludingDecode": 2000000,
+    "storageMemberships": 100000,
+    "rationalBits": 4096,
+    "completeOutputTriangles": 512
+  },
+  "admissions": 0,
+  "qualification": "Rootserialsuccessordeltasincef501; G2same-slicedelta carryingwholemathreview; existingG1changedfocused76/9/checkClippyBuild thenONEchangedwholefive onlyafterALLPASS/solelaneavailable"
+}

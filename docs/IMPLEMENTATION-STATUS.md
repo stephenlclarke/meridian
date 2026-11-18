@@ -1,12 +1,12 @@
 # Implementation and validation status
 
-## Certified local sections: source only
+## Certified local sections: corrected validation fixture
 
-The actual `84936cd` run passed 71 Rust tests, nine host tests, all-target check, strict Clippy and development build. Its single changed original-five run still returned five Operations constructor refusals, fifteen dependent checks unrun and zero candidates. Original limits remain unchanged. These incomplete prefixes do not establish minimum work, complete fit or completed-original speed improvement.
+The actual `8718b04` qualification passed all-target check, then stopped at one new test failure: 56 library tests passed and one returned `UncertifiedContact` with a disconnected contact-star link. The remaining 18 Rust tests, nine host tests, strict Clippy, build and original-five run were not executed. The raw failure did not label its fixture or publisher lane; no execution attribution is inferred.
 
-The next implementation represents each certified original owner's local outward section with exact projected support inequalities. It keeps original finite physical cuts and coplanar fields in the existing collector. Uncertified owners retain their original outward sections; exact boundary ambiguity uses the unchanged generic-ray policy. Every sample is evaluated afresh, and all performed construction, lookup, query and storage work remains charged. No cross-source mesh output, approximation or field averaging is introduced.
+The new positive fixture had translated a cube along all three axes, producing a corner contact rather than the intended full opposite-face contact. The correction translates only x for the positive case, retaining every triangle, affine-field, witness, volume, storage, work and timing assertion. The exact former corner-touch geometry remains in a separate regression that independently requires the frozen publisher and candidate to return the specified contact-certification refusal. Every unexpected success fails. Failure records now identify fixture and lane while returning the original error unchanged. Production geometry changes only remove the reported unused import.
 
-All 71 previous test bodies and strict 322/108/120 assertions remain byte exact. Four new cases compare complete triangles, affine fields, witnesses and volume against the frozen previous publisher, with oblique and touching geometry, cavity fallback, fresh occupancy queries and exact/one-short work and storage guards. Current 75 Rust tests, nine host tests, compiler checks and changed original-five execution are **UNRUN**, pending independent whole-source review and owning validation. No new hull admission, full-fit or measured speed claim is made.
+All 71 earlier test bodies and the assertions in all four prior convex-section tests remain. The corrected 76 Rust tests, nine host tests and original-five run are **UNRUN**, pending bounded review closure and owning validation. The whole geometry review remains applicable to the unchanged mathematics, charging, storage, lifetime and contact policies. No new hull, full-fit or measured speed claim is made. Original limits remain unchanged.
 
 The following sections retain earlier source-stage context. The current execution status is stated above.
 

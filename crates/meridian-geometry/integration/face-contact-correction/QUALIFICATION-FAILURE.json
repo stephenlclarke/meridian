@@ -1,0 +1,150 @@
+{
+  "result": "FOCUSED_TEST_FAIL_DEPENDENTS_STOPPED",
+  "source": "8718b040e72143e0536562b55ce3141f36d0111b",
+  "tree": "1f19cd3e95a82b0a93379d59cd91bd14ce314694",
+  "utc": "2026-11-18T12:51:53.074729+00:00",
+  "ownerTerminal": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/FOCUSED-TERMINAL.json",
+    "bytes": 2232,
+    "sha256": "e54e36674166d86f242aed95ed0ec5463363c9797be4c07c0f92ddce645f79ff"
+  },
+  "sourceUnchangedFiles": 550,
+  "lockedAllTargetCheck": "PASS_WITH_UNUSED_IMPORT_WARNING",
+  "actualLibrary": {
+    "passed": 56,
+    "failed": 1,
+    "declared": 57,
+    "failedCase": "certificate::convex_section_tests::convex_section_rows_preserve_complete_publisher_fields_contacts_and_volume",
+    "actualError": "Error: Failure { kind: UncertifiedContact, source: Some(SourceId { component: 1, facet: 11 }), operations: 51205, detail: \"disconnected contact-star link\" }",
+    "laneAndFixture": "Not explicitly labelled at failure; not inferred or rerun",
+    "raw": {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/test.log",
+      "bytes": 19143,
+      "sha256": "a0e2f2fd17f525c44819a2491fcee52a24836548e89510f52fdd0d4b518054d6"
+    },
+    "extract": {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/FIRST-FAILURE-EXTRACT.txt",
+      "bytes": 1334,
+      "sha256": "4ac393b6de925e8e2504ef42b6995c7394e9ece53931ae93173ae72b1b7a4b12"
+    }
+  },
+  "warning": {
+    "file": "crates/meridian-geometry/src/convex_sections.rs:4:55",
+    "unusedImport": "integer",
+    "clippy": "UNRUN; no actual lint failure claim"
+  },
+  "unrun": [
+    "7binaryTests",
+    "9adapterTests",
+    "2originalControlTests",
+    "9hostTests",
+    "strictClippy",
+    "developmentOriginalFiveBuild",
+    "wholeFive25Bodies"
+  ],
+  "originalWholeFiveRunCount": 0,
+  "noCurrent75PassClaim": true,
+  "priorActual849ResultPreserved": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/PRIOR-849-ROOT-AUDIT.json",
+    "bytes": 14342,
+    "sha256": "ef851b7d9d668ae2b18e7256b1d5828c64d0c388467372143666b93be3a96bab"
+  },
+  "noUnchangedRerunOrWaiver": true,
+  "rawArtifacts": [
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/AUTHOR-EXECUTION.json",
+      "bytes": 1651,
+      "sha256": "b265a71be3b914f2dde61b01f0ef832dc3e06ec12a706d756c4c20e7e73fd00c"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/CHECK-INTENT.json",
+      "bytes": 1816,
+      "sha256": "fd9eb3418c5a211b18c326a162ea8cddb39deab089db9b97b50ce3ef7d343d12"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/CHECK-START.json",
+      "bytes": 1831,
+      "sha256": "21dd003231c1c0f8832ab9bebf8cfbcfd80a17a865b38c66a1034bebf1a92b81"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/CHECK-TERMINAL.json",
+      "bytes": 2116,
+      "sha256": "5f7edbd1bd4570c54be74df1adb1274f8df4a0e470e468b677d1270749c4517b"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/EXECUTION-CLEAR.json",
+      "bytes": 517,
+      "sha256": "976e02140c0120f633a22b21c5f30bec21e955d59d6e000e7fb9408affe3c115"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/FIRST-FAILURE-EXTRACT.txt",
+      "bytes": 1334,
+      "sha256": "4ac393b6de925e8e2504ef42b6995c7394e9ece53931ae93173ae72b1b7a4b12"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/FOCUSED-OWNER.json",
+      "bytes": 1611,
+      "sha256": "bdcaffce1efe7d2208d9e21a56223eea1823f6e3727c5e67b9621d42a36c9d85"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/FOCUSED-TERMINAL.json",
+      "bytes": 2232,
+      "sha256": "e54e36674166d86f242aed95ed0ec5463363c9797be4c07c0f92ddce645f79ff"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/PREPARED.json",
+      "bytes": 1116,
+      "sha256": "4c899b722aac7cc0c3f9a87e094ff133a6d7b3ee511ad9b2455c82d72d5bf511"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/PRIOR-849-ROOT-AUDIT.json",
+      "bytes": 14342,
+      "sha256": "ef851b7d9d668ae2b18e7256b1d5828c64d0c388467372143666b93be3a96bab"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/REVIEW.json",
+      "bytes": 9659,
+      "sha256": "258aee3143143a84fb7fb9f09b3beae40b8bfdcbf02fb36670e5eeab41ada181"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/ROOT-ALL-SOURCE-PINS.json",
+      "bytes": 137833,
+      "sha256": "41a9f7a2a7f7395568229c4532bffb89e5edd4ff282cae21d1fd4cdbe987e52a"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/ROOT-SOURCE.json",
+      "bytes": 5550,
+      "sha256": "ddf02f979c670fb6c1c3b47517a9a1803ac627703011a6117fa24da1915c22f4"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/SOURCE-BINDING.json",
+      "bytes": 144558,
+      "sha256": "9215a603d105a0e7590c673b60aca9d1967ae88959d49250271d8d3f6c20d852"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/TEST-INTENT.json",
+      "bytes": 1822,
+      "sha256": "b06b726e14b0c930e33d7747270e1cd47cd82637f2669be09069987543379603"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/TEST-START.json",
+      "bytes": 1837,
+      "sha256": "9b3fbc1a562a79e696b941fb41603eacbefd1fb81093ebfa86d79ec985195f98"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/TEST-TERMINAL.json",
+      "bytes": 2125,
+      "sha256": "01fd6dc095d01d7db6a37b76ae3d592130678439d33feb16f1af436802729877"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/check.log",
+      "bytes": 873,
+      "sha256": "17d6ca835a0f4439f35aca08720b3ead5cd2dfd7df11ff433f640836b991d2dd"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-convex-sections.8718b04/evidence/test.log",
+      "bytes": 19143,
+      "sha256": "a0e2f2fd17f525c44819a2491fcee52a24836548e89510f52fdd0d4b518054d6"
+    }
+  ]
+}
