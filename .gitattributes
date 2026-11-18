@@ -8,3 +8,5 @@ assets/fleet/sh001/visual.bin binary
 crates/meridian-core/src/**/*.rs text eol=lf
 integration/sh001-mule/*.json text eol=lf
 integration/sh001-mule/*.patch -text
+
+assets/fleet/sh008/visual.bin binary

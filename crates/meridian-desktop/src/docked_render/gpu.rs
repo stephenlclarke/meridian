@@ -1,5 +1,7 @@
-use super::{Geometry, MAX_GEOMETRY, MAX_GLYPHS, MAX_MODEL_VERTICES, Model, TextVertex, atlas};
-use crate::{docked_screens::Frame, mesh::Vertex};
+use super::{
+    Geometry, MAX_GEOMETRY, MAX_GLYPHS, MAX_MODEL_VERTICES, Model, TextVertex, atlas, intersection,
+};
+use crate::{docked_screens::Frame, mesh::Vertex, mule_render::showroom};
 pub struct Pass {
     shape_pipeline: wgpu::RenderPipeline,
     model_pipeline: wgpu::RenderPipeline,
@@ -11,6 +13,9 @@ pub struct Pass {
     frame: Geometry,
     model: Model,
     srgb: bool,
+    format: wgpu::TextureFormat,
+    goshawk: Vec<showroom::Pass>,
+    goshawk_count: usize,
 }
 impl Pass {
     pub fn new(
@@ -179,13 +184,18 @@ impl Pass {
             frame: Geometry::with_capacity(),
             model,
             srgb: format.is_srgb(),
+            format,
+            goshawk: Vec::new(),
+            goshawk_count: 0,
         })
     }
     pub fn prepare(
         &mut self,
+        device: &wgpu::Device,
         queue: &wgpu::Queue,
         frame: &Frame,
         logical_size: [f64; 2],
+        physical_size: [u32; 2],
         planet_system: Option<meridian_core::navigation::SystemId>,
     ) -> Result<(), String> {
         if (frame.viewport.width - logical_size[0]).abs() > 0.01
@@ -198,6 +208,34 @@ impl Pass {
         queue.write_buffer(&self.shapes, 0, bytemuck::cast_slice(&self.frame.shapes));
         queue.write_buffer(&self.text, 0, bytemuck::cast_slice(&self.frame.text));
         queue.write_buffer(&self.models, 0, bytemuck::cast_slice(&self.frame.models));
+        self.prepare_goshawk(device, queue, frame, logical_size, physical_size)
+    }
+
+    fn prepare_goshawk(
+        &mut self,
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        frame: &Frame,
+        logical_size: [f64; 2],
+        physical_size: [u32; 2],
+    ) -> Result<(), String> {
+        self.goshawk_count = 0;
+        let scale = std::array::from_fn(|axis| f64::from(physical_size[axis]) / logical_size[axis]);
+        for preview in frame
+            .models
+            .iter()
+            .filter(|preview| showroom::matches(preview))
+        {
+            let Some(bounds) = intersection(preview.bounds, frame.viewport.canvas()) else {
+                continue;
+            };
+            if self.goshawk_count == self.goshawk.len() {
+                self.goshawk
+                    .push(showroom::Pass::new(device, queue, self.format)?);
+            }
+            self.goshawk[self.goshawk_count].prepare(queue, preview, bounds, scale, self.srgb)?;
+            self.goshawk_count += 1;
+        }
         Ok(())
     }
     /// The caller supplies a black-cleared colour target and fresh depth attachment for models.
@@ -205,6 +243,9 @@ impl Pass {
         pass.set_pipeline(&self.model_pipeline);
         pass.set_vertex_buffer(0, self.models.slice(..));
         pass.draw(0..self.frame.models.len() as u32, 0..1);
+        for preview in &self.goshawk[..self.goshawk_count] {
+            preview.draw(pass);
+        }
     }
     pub fn draw_overlay(&self, pass: &mut wgpu::RenderPass<'_>) {
         pass.set_pipeline(&self.shape_pipeline);

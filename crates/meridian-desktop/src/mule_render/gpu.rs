@@ -1,6 +1,6 @@
 use super::{
-    Piece, Scene, SmoothPieceArray, TEXTURES, Uniforms, VERTEX_COUNT, View, supports, uniforms,
-    visual,
+    Piece, Scene, SmoothPieceArray, TEXTURES, Triangle, Uniforms, VERTEX_COUNT, View, VisualVertex,
+    supports, uniforms, visual,
 };
 use meridian_core::mule::{MULE_PIECES, MULE_PRESENTATION_REVISION};
 use std::sync::Arc;
@@ -52,23 +52,121 @@ impl Pass {
                 )
             }
         };
+        let Hardware {
+            solid,
+            shimmer,
+            uniform,
+            group,
+            vertices,
+        } = Hardware::new(
+            device,
+            queue,
+            format,
+            Inputs {
+                shader: include_str!("mule.wgsl"),
+                uniform_size: size_of::<Uniforms>() as u64,
+                points: &points,
+                visual: &visual()?,
+            },
+        )?;
+        Ok(Self {
+            solid,
+            shimmer,
+            uniform,
+            group,
+            vertices,
+            cached: scene.envelope.pieces.clone(),
+            pieces,
+            active: false,
+            shimmer_supported,
+            srgb: format.is_srgb(),
+        })
+    }
+    pub fn prepare(
+        &mut self,
+        queue: &wgpu::Queue,
+        scene: Option<Scene<'_>>,
+        view: View,
+    ) -> Result<(), String> {
+        self.active = false;
+        let Some(scene) = scene else {
+            return Ok(());
+        };
+        if !Arc::ptr_eq(&self.cached, &scene.envelope.pieces)
+            && self.cached.as_ref() != scene.envelope.pieces.as_ref()
+        {
+            return Err("SH001 contact/presentation geometry changed".into());
+        }
+        let data = uniforms(scene, view, self.srgb, self.pieces)?;
+        queue.write_buffer(&self.uniform, 0, bytemuck::bytes_of(&data));
+        self.active = true;
+        Ok(())
+    }
+    pub fn hide(&mut self) {
+        self.active = false;
+    }
+    pub fn draw_solid(&self, pass: &mut wgpu::RenderPass<'_>) {
+        if self.active {
+            pass.set_pipeline(&self.solid);
+            pass.set_bind_group(0, &self.group, &[]);
+            pass.set_vertex_buffer(0, self.vertices.slice(..));
+            pass.draw(0..VERTEX_COUNT as u32, 0..1);
+        }
+    }
+    pub fn draw_shimmer(&self, pass: &mut wgpu::RenderPass<'_>) {
+        if self.active && self.shimmer_supported {
+            pass.set_pipeline(&self.shimmer);
+            pass.set_bind_group(0, &self.group, &[]);
+            pass.draw(0..3, 0..1);
+        }
+    }
+}
+
+pub(super) struct Hardware {
+    pub(super) solid: wgpu::RenderPipeline,
+    pub(super) shimmer: wgpu::RenderPipeline,
+    pub(super) uniform: wgpu::Buffer,
+    pub(super) group: wgpu::BindGroup,
+    pub(super) vertices: wgpu::Buffer,
+}
+
+pub(super) struct Inputs<'a> {
+    pub(super) shader: &'a str,
+    pub(super) uniform_size: u64,
+    pub(super) points: &'a [Triangle],
+    pub(super) visual: &'a [VisualVertex],
+}
+
+impl Hardware {
+    pub(super) fn new(
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        format: wgpu::TextureFormat,
+        inputs: Inputs<'_>,
+    ) -> Result<Self, String> {
+        let Inputs {
+            shader: shader_source,
+            uniform_size,
+            points,
+            visual,
+        } = inputs;
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
-            label: Some("Mule detailed material and source-rounded union"),
-            source: wgpu::ShaderSource::Wgsl(include_str!("mule.wgsl").into()),
+            label: Some("Original hull material and source-rounded union"),
+            source: wgpu::ShaderSource::Wgsl(shader_source.into()),
         });
         let uniform = device.create_buffer(&wgpu::BufferDescriptor {
-            label: Some("Actual Mule actor view"),
-            size: std::mem::size_of::<Uniforms>() as u64,
+            label: Some("Source hull view"),
+            size: uniform_size,
             usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
         let points = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("Same immutable Mule contact support points"),
-            contents: bytemuck::cast_slice(&points),
+            label: Some("Immutable hull contact support triangles"),
+            contents: bytemuck::cast_slice(points),
             usage: wgpu::BufferUsages::STORAGE,
         });
         let texture = device.create_texture(&wgpu::TextureDescriptor {
-            label: Some("Three original opaque Mule diffuse maps"),
+            label: Some("Three original opaque hull diffuse maps"),
             size: wgpu::Extent3d {
                 width: 1024,
                 height: 1024,
@@ -131,7 +229,7 @@ impl Pass {
             ..Default::default()
         });
         let layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-            label: Some("Mule immutable presentation inputs"),
+            label: Some("Hull immutable presentation inputs"),
             entries: &[
                 wgpu::BindGroupLayoutEntry {
                     binding: 0,
@@ -139,9 +237,7 @@ impl Pass {
                     ty: wgpu::BindingType::Buffer {
                         ty: wgpu::BufferBindingType::Uniform,
                         has_dynamic_offset: false,
-                        min_binding_size: wgpu::BufferSize::new(
-                            std::mem::size_of::<Uniforms>() as u64
-                        ),
+                        min_binding_size: wgpu::BufferSize::new(uniform_size),
                     },
                     count: None,
                 },
@@ -174,7 +270,7 @@ impl Pass {
             ],
         });
         let group = device.create_bind_group(&wgpu::BindGroupDescriptor {
-            label: Some("Mule actual source binding"),
+            label: Some("Hull source binding"),
             layout: &layout,
             entries: &[
                 wgpu::BindGroupEntry {
@@ -196,7 +292,7 @@ impl Pass {
             ],
         });
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-            label: Some("Mule presentation only"),
+            label: Some("Hull presentation only"),
             bind_group_layouts: &[Some(&layout)],
             immediate_size: 0,
         });
@@ -209,9 +305,9 @@ impl Pass {
         let pipeline = |shimmer| {
             device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
                 label: Some(if shimmer {
-                    "Mule single-union close grazing shimmer"
+                    "Hull single-union close grazing shimmer"
                 } else {
-                    "Mule all original detailed faces"
+                    "All original detailed hull faces"
                 }),
                 layout: Some(&pipeline_layout),
                 vertex: wgpu::VertexState {
@@ -258,8 +354,8 @@ impl Pass {
         let solid = pipeline(false);
         let shimmer = pipeline(true);
         let vertices = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("7236 unchanged Mule triangles/materials/UVs"),
-            contents: bytemuck::cast_slice(&visual()?),
+            label: Some("Original detailed triangles, materials and UVs"),
+            contents: bytemuck::cast_slice(visual),
             usage: wgpu::BufferUsages::VERTEX,
         });
         Ok(Self {
@@ -268,49 +364,6 @@ impl Pass {
             uniform,
             group,
             vertices,
-            cached: scene.envelope.pieces.clone(),
-            pieces,
-            active: false,
-            shimmer_supported,
-            srgb: format.is_srgb(),
         })
-    }
-    pub fn prepare(
-        &mut self,
-        queue: &wgpu::Queue,
-        scene: Option<Scene<'_>>,
-        view: View,
-    ) -> Result<(), String> {
-        self.active = false;
-        let Some(scene) = scene else {
-            return Ok(());
-        };
-        if !Arc::ptr_eq(&self.cached, &scene.envelope.pieces)
-            && self.cached.as_ref() != scene.envelope.pieces.as_ref()
-        {
-            return Err("SH001 contact/presentation geometry changed".into());
-        }
-        let data = uniforms(scene, view, self.srgb, self.pieces)?;
-        queue.write_buffer(&self.uniform, 0, bytemuck::bytes_of(&data));
-        self.active = true;
-        Ok(())
-    }
-    pub fn hide(&mut self) {
-        self.active = false;
-    }
-    pub fn draw_solid(&self, pass: &mut wgpu::RenderPass<'_>) {
-        if self.active {
-            pass.set_pipeline(&self.solid);
-            pass.set_bind_group(0, &self.group, &[]);
-            pass.set_vertex_buffer(0, self.vertices.slice(..));
-            pass.draw(0..VERTEX_COUNT as u32, 0..1);
-        }
-    }
-    pub fn draw_shimmer(&self, pass: &mut wgpu::RenderPass<'_>) {
-        if self.active && self.shimmer_supported {
-            pass.set_pipeline(&self.shimmer);
-            pass.set_bind_group(0, &self.group, &[]);
-            pass.draw(0..3, 0..1);
-        }
     }
 }

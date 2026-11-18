@@ -1,0 +1,38 @@
+{
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "collisionPacketBase": "6422079ccd3936224668641f106afdff12a584d7",
+  "resourceSHA256": "aafcb5dfec2cb5d141316756daae267888bf3541383f4f155c2561a4d7dd0bb7",
+  "sourceVerticesSHA256": "b800dde4cc63355a3aa133c8ecf57a346cf092505134fcbc8dc7b4b8be662b35",
+  "sourceTrianglesSHA256": "1c9cce536f98447a9a5d966e86a8992983b1d341e190b072985357ca0bde706a",
+  "sourcePieceMembershipSHA256": "619e385179e58761a376417a59a3f8af8a071ba6cd4bd76f268e4cad02d8a9ff",
+  "visual": {
+    "path": "assets/fleet/sh008/visual.bin",
+    "bytes": 585328,
+    "sha256": "0dcfeb841df5b67940c36a0aa205f0282037d4eee07e5bceb25a69207e18de7b",
+    "faces": 3484,
+    "vertices": 10452,
+    "encoder": "tools/encode_goshawk_visual.py",
+    "transform": "Staged once-calibrated detailed metre positions and face order. Packed f32 positions, derived flat normals, original per-face RGBA, UV, texture and emissive fields."
+  },
+  "sharedOriginalTextures": {
+    "assets/fleet/sh001/l337-patrol-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "9699517d12b4fbbb28746e00bed9ee65c19a098d14402b1d5160280c6f6bfc54",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-patrol-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-strike-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "e56f149228caf90237a652d720ae549768bde1056af3d903dc8a5c243ad26e97",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-strike-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-service-details.rgba": {
+      "bytes": 4194304,
+      "sha256": "35edd84f6ce527195dd8a9bcc039521a6efc5aa2333452bbbc30217b8372103d",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-service-details.rgba",
+      "license": "MIT"
+    }
+  },
+  "presentation": "Meridian station Showroom. Source-authenticated local 69-piece rounded shimmer. No actor, placement or hull service."
+}

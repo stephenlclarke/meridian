@@ -287,3 +287,44 @@ fn current_system_planet_preview_uses_actual_world_recipe_and_never_a_foreign_wo
             .is_none()
     );
 }
+
+#[test]
+fn selecting_goshawk_routes_the_original_preview_without_granting_exchange() {
+    use crate::docked_screens::{Catalogue, DockedScreens, Input, Key, Outcome, Screen, Viewport};
+    let world = meridian_core::World::new_commander(95006).unwrap_or_else(|e| panic!("{e}"));
+    let save = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+    let catalogue = Catalogue::bundled().unwrap_or_else(|e| panic!("{e}"));
+    let mut ui = DockedScreens::new(meridian_core::navigation::SystemId::AVENOR, "SH025");
+    let ctx = context(&world, &catalogue);
+    let viewport = Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));
+    ui.open(Screen::Showroom);
+    for input in [
+        Input::Key(Key::Search),
+        Input::Text("Goshawk Explorer".into()),
+        Input::Key(Key::Confirm),
+    ] {
+        let frame = ui.frame(&ctx, viewport);
+        assert!(matches!(ui.handle(input, &frame, &ctx), Outcome::Updated));
+    }
+    let frame = ui.frame(&ctx, viewport);
+    assert_eq!(frame.models.len(), 1);
+    assert!(crate::mule_render::showroom::matches(&frame.models[0]));
+    assert!(
+        frame
+            .labels
+            .iter()
+            .any(|label| label.text.contains("Exchange unavailable"))
+    );
+    let mut geometry = Geometry::with_capacity();
+    geometry
+        .compose(
+            &frame,
+            &Model::sh025().unwrap_or_else(|e| panic!("{e}")),
+            true,
+            None,
+        )
+        .unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(geometry.unavailable_models, 0);
+    assert!(geometry.models.is_empty());
+    assert_eq!(world.save_bytes().unwrap_or_else(|e| panic!("{e}")), save);
+}

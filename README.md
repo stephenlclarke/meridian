@@ -1,5 +1,9 @@
 # Meridian
 
+## Goshawk Explorer design preview
+
+The SH008 source candidate adds the original forest-silver model to the station Showroom. It preserves the wishbone opening and uses the local rounded envelope for a subtle close-range shimmer. Native viewing, ordinary placement and physical qualification are pending. [Goshawk source and preview scope](docs/GOSHAWK-GAMEPLAY-ENVELOPE.md)
+
 ## Internal Mule docking validation
 
 The internal SH001 Mule scene uses the original SH028 station. On Mac build `ffb7112`, Mule entered the clear opening at tick 104. On the obstructed approach it stopped at the station lip at tick 11. In the development build, completing all eight G02 freight handovers unlocks a single Mule encounter on the next launch from Renas. A returning pilot whose saved ship overlaps the Mule’s berth can fly clear before the Mule appears. Preview 8 predates this encounter. The reviewed renderer build `1cdac5e` also passed the aligned crossing on Mac and the docking regressions on Linux and native Windows. [Controls and test scope](docs/MULE-VALIDATION-LAUNCH.md)
