@@ -584,3 +584,5 @@ Final receipt publication must complete through write, flush, fsync and close be
 Mule core qualification on the angular correction passed all 444 tests (442 library and two compatibility cases), including eleven Mule cases. Strict Clippy then stopped on three style/import diagnostics. The bounded correction moves the test-only import, collapses the equivalent conditional and uses fixed-size triangle chunks. Corrected-source qualification and native hull acceptance remain pending.
 
 The subsequent corrected Mule core qualification passed all 444 tests and strict Clippy without warnings. The earlier lint failure remains preserved. These results apply to the envelope prerequisite; the newly combined World and renderer source still requires its own qualification.
+
+Independent review of the combined Mule World and renderer source found strict-lint blockers: one unused preparation binding and seven constant-size chunk iterators. The bounded correction preserves the station-presence gate, exact-length guards, ordered records and every test assertion. Current combined compilation, tests, Metal and native acceptance remain pending.

@@ -52,12 +52,18 @@ fn every_detailed_face_keeps_original_index_order_scale_and_finite_uv_materials(
     let mut layers = std::collections::BTreeSet::new();
     let mut emissive = 0;
     for (face, actual) in triangles[..7236 * 12]
-        .chunks_exact(12)
-        .zip(vertices.chunks_exact(3))
+        .as_chunks::<12>()
+        .0
+        .iter()
+        .zip(vertices.as_chunks::<3>().0)
     {
-        for (index, v) in face.chunks_exact(4).zip(actual) {
-            let index =
-                u32::from_le_bytes(index.try_into().unwrap_or_else(|_| panic!("index"))) as usize;
+        for (index, v) in face.as_chunks::<4>().0.iter().zip(actual) {
+            let index = u32::from_le_bytes(
+                index
+                    .as_slice()
+                    .try_into()
+                    .unwrap_or_else(|_| panic!("index")),
+            ) as usize;
             let p = decode_point(&source[16 + index * 24..16 + (index + 1) * 24]);
             for (actual, expected) in v.position.iter().zip([p.x, p.y, p.z]) {
                 assert!((f64::from(*actual) - expected).abs() <= 0.000004);
@@ -208,7 +214,7 @@ fn linear_light_mips_keep_opacity_and_do_not_average_srgb_as_linear() {
     assert_eq!(mip(&checker, 2), vec![188, 188, 188, 255]);
     for map in TEXTURES {
         assert_eq!(map.len(), 1024 * 1024 * 4);
-        assert!(map.chunks_exact(4).all(|p| p[3] == 255));
+        assert!(map.as_chunks::<4>().0.iter().all(|p| p[3] == 255));
     }
 }
 #[test]
