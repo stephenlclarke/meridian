@@ -1,6 +1,6 @@
 # Meridian
 
-The changed candidate passed all 285 fresh Rust tests, including the paid refit and complete cold-Continue checks. Strict Clippy then rejected a constant-size chunk iterator in that new test. The iterator now uses the suggested fixed-array API; its assertions and all production bytes are unchanged. Current Clippy and release builds remain **UNRUN**. The original native black Fit review remains unexplained.
+The signed internal candidate reproduced the black Fit review despite identical first-attempt CPU/API records. A [bounded cross-frame and pixel capture](docs/LASER-FACINGS.md#opt-in-cross-frame-and-pixel-capture-v2) is now authored to observe later frames and supported actual-target copies. It is **UNRUN**, collects causal evidence and does not claim a renderer cure. The native blocker and dependent gameplay acceptance remain open.
 
 The joined laser/ECM Mac run now reports 428/431 core passes after compilation.
 The [geometry pilot correction](docs/LASER-FACINGS.md#source-derived-geometry-pilot-correction)

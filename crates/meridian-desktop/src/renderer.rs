@@ -43,6 +43,7 @@ pub enum Presentation {
 pub struct Renderer {
     review_capture: crate::review_capture::Capture,
     review_identity: Option<crate::review_capture::ReviewId>,
+    review_pixels: crate::review_capture::pixels::Pixels,
     flight_view: FlightView,
     celestial: crate::celestial::Pass,
     docked: crate::docked_render::Pass,
@@ -106,9 +107,17 @@ impl Renderer {
             failed.store(true, Ordering::Release);
         }));
         let size = window.inner_size();
-        let config = surface
+        let mut config = surface
             .get_default_config(&adapter, size.width.max(1), size.height.max(1))
             .ok_or("No supported surface configuration")?;
+        let capture_capabilities = review_capture
+            .enabled()
+            .then(|| surface.get_capabilities(&adapter));
+        let review_pixels = crate::review_capture::pixels::Pixels::new(
+            review_capture.clone(),
+            capture_capabilities.as_ref(),
+            &mut config,
+        );
         if size.width > 0 && size.height > 0 {
             surface.configure(&device, &config);
         }
@@ -232,6 +241,7 @@ impl Renderer {
         Ok(Self {
             review_capture,
             review_identity: None,
+            review_pixels,
             surface,
             window,
             flight_view: FlightView::Front,
@@ -424,6 +434,20 @@ impl Renderer {
             trace.record("app_prepare_error", error);
         }
     }
+    pub(crate) fn request_review_observation(
+        &self,
+        id: Option<crate::review_capture::ReviewId>,
+    ) -> bool {
+        !self.review_pixels.busy() && self.review_capture.request_observation(id)
+    }
+    pub(crate) fn acknowledge_review(
+        &self,
+        expected: (crate::docked_screens::Stamp, u64),
+        actual: Option<(crate::docked_screens::Stamp, u64)>,
+        accepted: bool,
+    ) {
+        self.review_capture.acknowledge(expected, actual, accepted);
+    }
     pub fn draw(
         &mut self,
         snapshot: &Snapshot,
@@ -431,7 +455,8 @@ impl Renderer {
         effects: SceneEffects<'_>,
         hud: HudScene<'_>,
     ) -> Result<Presentation, String> {
-        let trace = self.review_capture.begin(self.review_identity.take());
+        self.review_pixels.service(&self.device);
+        let trace = self.review_capture.begin_draw(self.review_identity.take());
         if let Some(t) = &trace {
             t.record(
                 "host_surface",
@@ -444,11 +469,24 @@ impl Renderer {
                 ),
             );
             t.frame(effects.docked);
-            t.record("observability", "API calls only; framebuffer readability, GPU completion and compositor display are UNOBSERVABLE; first draw attempt per review transition only");
+            t.record("observability", "API calls only; framebuffer readability, GPU completion and compositor display are UNOBSERVABLE; v1 first attempt only; v2 fixed latest ring, App ack and explicit F8 next-frame observation; no per-frame output");
         }
         let result = self.draw_inner(snapshot, station, effects, hud, trace.as_ref());
         if let Some(t) = trace {
+            if let Some(tag) = t.pixel_request()
+                && !matches!(&result, Ok(Presentation::Presented))
+            {
+                self.review_capture.event(
+                    "pixels_unobservable",
+                    (
+                        tag,
+                        "requested draw skipped/failed before target copy",
+                        &result,
+                    ),
+                );
+            }
             t.record("draw_return", &result);
+            self.review_capture.finish_draw(&t, result.is_err());
         }
         result
     }
@@ -666,7 +704,12 @@ impl Renderer {
         if let Some(t) = trace {
             t.record("draw_calls_encoded", (docked.map(|_| self.docked.capture_counts()), self.hud_frame.len(), docked.is_none() || help.is_some(), "docked models/shapes/text vertex ranges; HUD vertex count and HUD draw-enabled; zero counts still encode calls; no GPU completion observed"));
         }
+        if let Some(tag) = trace.and_then(|t| t.pixel_request()) {
+            self.review_pixels
+                .encode(tag, &self.device, &mut encoder, &frame.texture);
+        }
         self.queue.submit([encoder.finish()]);
+        self.review_pixels.submitted();
         if let Some(t) = trace {
             t.record("queue_submit", "call returned; GPU completion UNOBSERVABLE");
         }
@@ -688,6 +731,12 @@ impl Renderer {
             }
         }
         Ok(Presentation::Presented)
+    }
+}
+
+impl Drop for Renderer {
+    fn drop(&mut self) {
+        self.review_capture.exit();
     }
 }
 

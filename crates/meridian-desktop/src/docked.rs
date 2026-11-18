@@ -277,9 +277,15 @@ impl Docked {
         Ok(self.screens.frame(&c, viewport))
     }
     /// Call only after the corresponding GPU frame was actually presented.
-    pub fn presented(&mut self, frame: ui::Frame) {
+    pub(crate) fn captured_painted_identity(&self) -> Option<(ui::Stamp, u64)> {
+        self.painted.as_ref().map(|f| (f.stamp, f.ui_revision))
+    }
+    pub fn presented(&mut self, frame: ui::Frame) -> bool {
         if frame.stamp.revision == self.serial {
             self.painted = Some(frame);
+            true
+        } else {
+            false
         }
     }
     pub fn input(&mut self, profile: &mut Profile, input: ui::Input) -> Result<(), String> {
