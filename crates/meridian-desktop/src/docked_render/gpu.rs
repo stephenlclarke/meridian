@@ -213,7 +213,7 @@ impl Pass {
                 "queue_write_shapes_returned",
                 (
                     self.frame.shapes.len(),
-                    self.frame.shapes.len() * std::mem::size_of::<Vertex>(),
+                    std::mem::size_of_val(self.frame.shapes.as_slice()),
                 ),
             );
         }
@@ -223,7 +223,7 @@ impl Pass {
                 "queue_write_text_returned",
                 (
                     self.frame.text.len(),
-                    self.frame.text.len() * std::mem::size_of::<TextVertex>(),
+                    std::mem::size_of_val(self.frame.text.as_slice()),
                 ),
             );
         }
@@ -233,7 +233,7 @@ impl Pass {
                 "queue_write_models_returned",
                 (
                     self.frame.models.len(),
-                    self.frame.models.len() * std::mem::size_of::<Vertex>(),
+                    std::mem::size_of_val(self.frame.models.as_slice()),
                     "write_buffer return stages bytes only; completed GPU upload UNOBSERVABLE",
                 ),
             );
