@@ -41,6 +41,7 @@ impl<'a> InteriorCertificates<'a> {
             // retain their original classification without certificate overhead.
             if owner.facets > 4 * FacetBoundsIndex::LEAF_SIZE {
                 b.retain(6)?;
+                log_cost(groups.len(), b)?;
                 groups.insert(*id, (&owner.bounds, Vec::new()));
             }
         }
@@ -61,6 +62,7 @@ impl<'a> InteriorCertificates<'a> {
             members: 16,
         };
         for (id, (bounds, faces)) in groups {
+            b.step(1)?;
             let group_members = 6 + faces.len();
             let planes = Self::certify(&faces, b)?;
             drop(faces);
@@ -164,6 +166,7 @@ impl<'a> InteriorCertificates<'a> {
                 continue;
             }
             // Necessary strict box containment; equality cannot be interior.
+            b.step(1)?;
             if !(0..3).all(|k| {
                 owner.bounds.lower[k] < bounds.lower[k] && bounds.upper[k] < owner.bounds.upper[k]
             }) {

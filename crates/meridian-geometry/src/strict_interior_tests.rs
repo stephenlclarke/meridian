@@ -325,3 +325,121 @@ fn convex_proof_tables_and_strict_query_scratch_admit_and_roll_back_at_exact_bou
     assert_eq!(setup.retained_memberships(), 0);
     Ok(())
 }
+
+#[test]
+fn proof_group_and_foreign_box_work_is_charged_before_execution_and_refusal() -> Result<(), Failure>
+{
+    let faces = cube(0, 8, 0, 1)?;
+    audit(&faces)?;
+    let mut setup = Budget::new(Limits::default())?;
+    let index = FacetBoundsIndex::build(&faces, &mut setup)?;
+    let owners = component_bounds(&faces, &index.facets, &mut setup)?;
+    // One owner visit plus the existing empty-map insertion price fills2.
+    // The next actual source-facet visit must refuse before its lookup.
+    let mut insertion = Budget::new(Limits {
+        operations: 2,
+        ..Limits::default()
+    })?;
+    insertion.retain(20_000)?;
+    assert_eq!(
+        InteriorCertificates::build(&faces, &owners, &mut insertion)
+            .err()
+            .map(|f| f.kind),
+        Some(crate::FailureKind::Operations)
+    );
+    assert_eq!(insertion.operations(), 3);
+    let rejected = insertion.rejection().ok_or_else(|| {
+        insertion.fail(
+            crate::FailureKind::InvalidWitness,
+            "missing insertion refusal",
+        )
+    })?;
+    assert_eq!(rejected.attempted_operations, 1);
+    assert_eq!(insertion.retained_memberships(), 20_000);
+    // All actual grouping visits/lookups complete before the consumed-group
+    // step. No owner-proof32 or point/plane record may be allocated yet.
+    let before_group = 2 + 3 * faces.len() as u64;
+    let mut group = Budget::new(Limits {
+        operations: before_group,
+        ..Limits::default()
+    })?;
+    group.retain(20_000)?;
+    assert_eq!(
+        InteriorCertificates::build(&faces, &owners, &mut group)
+            .err()
+            .map(|f| f.kind),
+        Some(crate::FailureKind::Operations)
+    );
+    let rejected = group
+        .rejection()
+        .ok_or_else(|| group.fail(crate::FailureKind::InvalidWitness, "missing group refusal"))?;
+    assert_eq!(rejected.operations_before, before_group);
+    assert_eq!(rejected.attempted_operations, 1);
+    assert_eq!(rejected.retained_before, 20_000 + 16 + 6 + faces.len() + 16);
+    assert_eq!(group.retained_memberships(), 20_000);
+    let certificates =
+        InteriorCertificates::build(&faces, &owners, &mut setup)?.ok_or_else(|| {
+            setup.fail(
+                crate::FailureKind::InvalidWitness,
+                "missing query certificate",
+            )
+        })?;
+    let members = certificates.memberships();
+    let outside = triangle([[10, 10, 10], [11, 10, 10], [10, 11, 10]])?;
+    let bounds = Bounds::for_facet(&outside, &mut setup)?;
+    let base = 20_000 + members;
+    let mut one = Budget::new(Limits {
+        operations: 1,
+        ..Limits::default()
+    })?;
+    one.retain(base)?;
+    one.at(outside.id());
+    assert_eq!(
+        certificates
+            .strictly_covers(&outside, &bounds, &mut one)
+            .err()
+            .map(|f| f.kind),
+        Some(crate::FailureKind::Operations)
+    );
+    let rejected = one
+        .rejection()
+        .ok_or_else(|| one.fail(crate::FailureKind::InvalidWitness, "missing box refusal"))?;
+    assert_eq!(rejected.source, Some(outside.id()));
+    assert_eq!(rejected.operations_before, 1);
+    assert_eq!(rejected.operations_after, 2);
+    assert_eq!(rejected.attempted_operations, 1);
+    assert_eq!(rejected.retained_before, base + 32);
+    assert_eq!(one.retained_memberships(), base);
+    // Two operations perform exactly the foreign visit and whole-box test;
+    // the rejected box must not execute any plane/vertex comparisons.
+    let mut two = Budget::new(Limits {
+        operations: 2,
+        ..Limits::default()
+    })?;
+    two.retain(base)?;
+    assert!(!certificates.strictly_covers(&outside, &bounds, &mut two)?);
+    assert_eq!(two.operations(), 2);
+    assert!(two.rejection().is_none());
+    assert_eq!(two.retained_memberships(), base);
+    let own = Facet::new(
+        SourceId {
+            component: 0,
+            facet: 999,
+        },
+        std::array::from_fn(|k| outside.vertices()[k].clone()),
+        "test".into(),
+        &mut setup,
+    )?;
+    let mut same = Budget::new(Limits {
+        operations: 1,
+        ..Limits::default()
+    })?;
+    same.retain(base)?;
+    assert!(!certificates.strictly_covers(&own, &bounds, &mut same)?);
+    assert_eq!(same.operations(), 1);
+    assert_eq!(same.retained_memberships(), base);
+    drop(certificates);
+    setup.release(members);
+    assert_eq!(setup.retained_memberships(), 0);
+    Ok(())
+}

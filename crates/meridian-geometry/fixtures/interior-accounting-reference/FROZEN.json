@@ -1,0 +1,13 @@
+{
+  "parent": "332a602d572706ab1d2b17df44ec47bb7b60a8d4",
+  "files": {
+    "before-strict_interior_tests.rs": {
+      "bytes": 11009,
+      "sha256": "bf921800bb8ba77d2216b704b9510503195c024878617b4559c908f61588dc22"
+    },
+    "before-strict_interior.rs": {
+      "bytes": 7030,
+      "sha256": "7aba7f648ece1184c5858a933ed062a64ebbdf2e76b4083e26b5d51b01cdd3a0"
+    }
+  }
+}

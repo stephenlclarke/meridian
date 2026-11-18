@@ -333,6 +333,11 @@
       "file": "src/strict_interior_tests.rs",
       "name": "convex_proof_tables_and_strict_query_scratch_admit_and_roll_back_at_exact_boundaries",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/strict_interior_tests.rs",
+      "name": "proof_group_and_foreign_box_work_is_charged_before_execution_and_refusal",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -780,6 +785,22 @@
     "contractSHA256": "71faaf800023c8113f59560d32cac7988c8b7f6048dff77d59addf69498eb911",
     "frozenSHA256": "da87b685f91f4178baefe1f5bf61443adc299803f9c73ea1e11171cf622f2e77",
     "currentRustCount": 66,
+    "hostCount": 9
+  },
+  "strictInteriorAccountingCorrection": {
+    "parentAuthor": "332a602d572706ab1d2b17df44ec47bb7b60a8d4",
+    "wholeReviewedRoot": "5de160910243ccd2b6f26c96646820936cb08a2b",
+    "wholeReviewSHA256": "4613936efc83b9dfb36ea08c98b230d762ee36e07f837dc55091df0f737f23ff",
+    "findingsAddressed": [
+      "G2-GEOMETRY-INTERIOR-1",
+      "G2-GEOMETRY-INTERIOR-2"
+    ],
+    "old66TestsPreserved": true,
+    "currentExecution": "UNRUN",
+    "deltaSHA256": "edb030fd34314bc8837682e90a4f683164ac77e3d272345ebb8a592bf6769578",
+    "contractSHA256": "4361c5327cf95df496c9c91f89e611c3ba83ec05856004cd230d7deb20525762",
+    "frozenSHA256": "50120291a6457cd3ae2daee69e3ff81da34a95f4f93ac5bfb21e1546fe7b4ed0",
+    "currentRustCount": 67,
     "hostCount": 9
   }
 }

@@ -25,6 +25,7 @@ def normalized(value):
 
 
 def verify():
+    subprocess.run(["python3", "-B", str(CRATE / "tools/verify_interior_accounting_source.py")], check=True)
     subprocess.run(["python3", "-B", str(CRATE / "tools/verify_strict_interior_source.py")], check=True)
     subprocess.run(["python3", "-B", str(CRATE / "tools/verify_spatial_index_source.py")], check=True)
     subprocess.run(["python3", "-B", str(CRATE / "tools/verify_parity_index_source.py")], check=True)
@@ -156,7 +157,7 @@ def verify():
     for signature in ["fn meets_outward_plane(", "fn outward_candidates(", "fn limiting_segment(", "pub(super) fn build(", "fn build_admitted(", "pub(super) fn occupied(", "pub(super) fn memberships(", "pub(super) fn fields_visible("]:
         assert body(current, signature) == body(old_sections, signature), signature
     tests = sum(path.read_text().count("#[test]") for top in ["src", "tests"] for path in (CRATE / top).rglob("*.rs"))
-    assert tests == 66, tests
+    assert tests == 67, tests
     print(json.dumps({"status": "PASS_SOURCE_ONLY", "parent": PARENT, "currentRustTests": tests, "compilerOrGeometryExecuted": False}))
 
 

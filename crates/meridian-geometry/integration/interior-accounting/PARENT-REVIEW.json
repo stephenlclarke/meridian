@@ -1,0 +1,80 @@
+{
+  "reviewedAtUTC": "2026-11-18T10:54:44.971861+00:00",
+  "verdict": "CHANGES_REQUIRED_TWO_NEW_PROOF_ACCOUNTING_FINDINGS",
+  "head": "5de160910243ccd2b6f26c96646820936cb08a2b",
+  "tree": "40111f62965c7992a6b2439406a68006c8850daf",
+  "soleParent": "6abd2e1f6f099b37256a54614c5789fb20b07ec8",
+  "authorHead": "332a602d572706ab1d2b17df44ec47bb7b60a8d4",
+  "packet": {
+    "path": "/private/tmp/meridian-root-strict-interior-review/SOURCE.json",
+    "bytes": 5073,
+    "sha256": "0a5cf8c1ab58fdf426715d0f08e0a8e6f2383219d69077aa67cc3adef539a71d"
+  },
+  "findings": [
+    {
+      "id": "G2-GEOMETRY-INTERIOR-1",
+      "priority": "P1",
+      "file": "crates/meridian-geometry/src/strict_interior.rs",
+      "line": 44,
+      "otherLines": [
+        64
+      ],
+      "title": "Charge temporary owner-map insertion and the consumed-group pass",
+      "description": "The initial owner loop charges its owner visit, but groups.insert performs a new ordered-map insertion without the existing log_cost(groups.len(),b) tree-work charge. The later for(id,(bounds,faces)) in groups pass also processes each owner group without a b.step(1) visit. Other new point/plane maps and source grouping get_mut use explicit tree prices. Omitting these actual new visits understates full certificate-construction work under the unchanged operation cap.",
+      "requestedCorrection": "Keep the initial owner visit. Add existing tree-work pricing for each actual groups insertion and one actual consumed-group visit before its certification/transfer work. Do not precharge unexecuted iterations,change unit prices,suppress/refactor away assertions or raise caps. Retain complete-build work comparison with all added charges."
+    },
+    {
+      "id": "G2-GEOMETRY-INTERIOR-2",
+      "priority": "P1",
+      "file": "crates/meridian-geometry/src/strict_interior.rs",
+      "line": 167,
+      "title": "Charge the strict box predicate separately from the owner visit",
+      "description": "strictly_covers_admitted charges one owner-loop visit, then performs a distinct three-dimensional strict containment predicate without charging the existing whole-box operation. Bounds::meets and Bounds::contains each charge one operation for the entire box test,not one per axis. Queries rejected by this new box test currently pay only the owner visit and no plane work,so this real new predicate is omitted from the operation ledger.",
+      "requestedCorrection": "Retain the owner-loop step and admit one separate operation immediately before the foreign-owner strict box predicate,using the existing whole-box price. Preserve strict inequalities and original short-circuit behavior; do not introduce per-axis repricing. Add a focused refusal guard for a foreign facet failing this box test with only the owner-visit budget available,while retaining all old assertions and caps."
+    }
+  ],
+  "independentChecks": {
+    "rootGitWorkingTarBytesHashesModes": 502,
+    "authorCrateGitArchiveRootExact": 363,
+    "authorParentCrateExactExecuted6abd": 344,
+    "rootChangedPaths": 28,
+    "rootUnchangedPaths": 474,
+    "crateUnchanged": 337,
+    "outsideCrateUnchanged": 137,
+    "outsideDocsChanged": 2,
+    "authorManifestPayloadPins": 7,
+    "completeOuterArchiveMembersMatched": 8,
+    "canonicalRootAndAuthorBinaryDiffsExact": true,
+    "ownFullCertificateSpatialInversionsToExecutedParent": true,
+    "oldTestBodiesComparedByteExact": 63,
+    "currentSourceTests": 66,
+    "frozenFullPublisher": "Complete function body byte exact; independently included control differs only function name.",
+    "spatialPrototype": "Every original builder/sort/query body exact; production builder withdrawn and tests retained.",
+    "actualParentDirectRawPins": 46,
+    "rawArchiveMatchingMembers": 44,
+    "externalParentRawArchiveBytes": 20929762,
+    "fiveActualCaseCopiesAndHandoffExact": true,
+    "workingTreeClean": true
+  },
+  "wholeMathematicalReview": {
+    "preconditions": "Certificate build follows identity uniqueness,closed two-sided geometric incidence,connected links,positive signed owner volume and same-owner embedded-sheet audits. Original source boundaries and fields remain immutable and admitted.",
+    "convexity": "Every distinct source vertex is tested against every exact original outward plane representative. All nonpositive supports on an audited closed embedded outward owner establish its convex supporting half-space body. Nonconvex/cavity/disconnected nonconvex boundaries fail support certification and fall back; no hull is fabricated. Exact coefficient-pair dedup shares only equal equations,not normalized or averaged geometry.",
+    "strictInterior": "For a foreign facet,strict box containment is necessary only. Strict negativity of all3 vertices against every certified plane extends by triangle interpolation to all its points. Finite vertices/planes provide a uniform positive margin,so a sufficiently small outward one-sided displacement remains inside that owner. Its own publication is therefore empty. Equality never culls.",
+    "preservedOtherQueries": "Only the proved interior facet own publication is omitted. All original facets remain in original index,owner data,physical/coplanar/outward constraints and every other facet query. Exposed field,contact,star,witness,globalnoding,edge/link and volume audits unchanged. No visibility/ray result cache or general CSG replacement.",
+    "lifetimeAndRollback": "Group/vertex/equation records and persistent support refs are admitted before growth. Completed vertex sets and consumed face vectors drop before release. Support vector/owner admission overlaps equation map until transfer/drop. Outer builder restores exact retained delta after partial local structures drop; query scratch32 is scoped; successful certificates drop before bound tables and before their admission release. Apart from the reported missing charges,no actionable ownership issue found.",
+    "tests": "New full-output control compares complete triangles,witnesses,volume,retained ledger and charged strict-case work;paired monotonic timings retain10x bound. Other cases cover oblique tetrahedral rejection beyond box inclusion,equality fallback,nonconvex and cavity decline,exact/one-short proof/query storage and operation rollback. All63oldbodies/322/108/120 retained;3newcases authoredUNRUN.",
+    "parentEvidence": "Actual6abd focused63Rust9host/check/strictClippy/buildPASS then5Operationsrefusals15dependentUNRUN0candidates retained. Earlier cuts and shorter failed runs are not full costs,minima,hotspot,fit or speed proof.",
+    "otherFindings": "No other actionable source issue identified. Mathematical and unaffected-source review may be carried for a bounded accounting correction."
+  },
+  "carriedPriorWholeAndBorrowClear": {
+    "path": "/private/tmp/g2-meridian-6abd2e1f-spatial-borrow-delta-source-clear.json",
+    "bytes": 2007,
+    "sha256": "7f46162fd2162ee6a3fba29f59ca10aed0cfd009d96a9e930936a837657501f8"
+  },
+  "executionDecision": "HOLD current source for the two accounting corrections. Bounded exact correction review can retain this complete mathematical/semantic review; no broad unchanged rereview required. After source closure,existingG1 focusedcorrectedRust/9host/check/strictClippy/devbuild thenONEchangedwholefive ONLYafterALLPASS,not concurrent with Macgamequalification. Preserve2M100k4096bit512face/322/108/120 and source-bound first refusals;broader202separate/no hull/fullfit/minima/speedclaim.",
+  "limits": [
+    "G2 ran no compiler,Cargo,Clippy,tests,supplied source verifier,SUT,helper,native,leak scan or integration tests.",
+    "Findings are source-established operation-accounting omissions,not actual executed failures.",
+    "Mathematical source review does not imply candidate admission or current execution acceptance."
+  ]
+}

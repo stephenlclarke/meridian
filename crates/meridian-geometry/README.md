@@ -209,3 +209,7 @@ Three new independent bound/candidate/section/ownership comparisons bring this s
 The spatial revision passed 63 Rust tests and nine host tests, but its original run still refused every constructor and its index overhead was not justified. Production returns to the original index. A new audited convex-owner certificate can skip only a facet proved wholly and strictly interior to another original owner. Every source facet remains present in other facets' geometry, field and contact queries; all equality cases keep the full path.
 
 Three independent full-output/proof/ownership tests bring this source to 66 Rust tests plus nine host tests, all UNRUN. [The strict one-sided proof, costs and source-bound outcomes](integration/strict-interior/CONTRACT.md) preserve all 63 old assertions, controls and caps. No full-fit or fleet-admission claim is made.
+
+## Strict-interior accounting review
+
+The whole source review accepted the geometric proof and lifetimes, then found missing owner-map insertion, consumed-group and foreign-box charges. Those three actual operations now use the existing tree/visit/whole-box prices. A focused refusal test brings this source to 67 Rust tests and nine host tests, all UNRUN. All 66 prior test bodies, strict comparisons and caps remain unchanged. [The bounded correction](integration/interior-accounting/CONTRACT.md) carries the exact review and source binding; original execution remains gated on qualification.

@@ -2,11 +2,13 @@
 
 ## Strict-interior facet proof: source only
 
+Whole-source review found two missing accounting charges. The bounded correction adds the existing tree cost before actual owner-group inserts, one step per consumed group and one separate whole-box operation before a foreign strict containment test. The mathematical predicates, allocation lifetimes and all 66 prior tests are unchanged. A new focused guard checks insertion, consumed-group and outside-box budget refusals with exact cleanup. Current execution remains unrun.
+
 The previous spatial-index candidate `6abd2e1` passed 63 Rust and nine host tests, all-target check, strict Clippy and dev build. Its single original-five run still returned five Operations constructor refusals, fifteen dependent checks unrun and zero candidate meshes. Every failure reached an earlier source prefix. The spatial builder is withdrawn from production; its tests remain. Those failed timings do not establish useful original-input speed or complete fit.
 
 The new source restores the contiguous index. After the unchanged source topology and volume audits, it can certify a large original owner as convex by testing every distinct original vertex against all its outward source planes. It omits a facet's own publication only when all three vertices lie strictly inside a different certified owner. Equality and failed proofs keep the full path. Every original facet remains available to all other section, field, contact and witness queries. Proof work and storage are charged; the original 2M work, 100k storage, 4096-bit and 512-face requirements remain.
 
-All 63 prior test bodies and strict 322/108/120 controls remain unchanged. Three new tests compare full geometry and witnesses against a frozen pre-change publisher, with strict and touching boundaries, oblique planes, nonconvex and cavity refusals, and exact/one-short reservations. The current 66 Rust and nine host tests and changed whole-five execution are **UNRUN**, pending independent whole-source review and the existing compiler owner. No new hull admission, minimum, completed fit or measured improvement is claimed.
+All 63 prior test bodies and strict 322/108/120 controls remain unchanged. Three new tests compare full geometry and witnesses against a frozen pre-change publisher, with strict and touching boundaries, oblique planes, nonconvex and cavity refusals, and exact/one-short reservations. The current 67 Rust and nine host tests and changed whole-five execution are **UNRUN**, pending independent whole-source review and the existing compiler owner. No new hull admission, minimum, completed fit or measured improvement is claimed.
 
 ## Fleet geometry owner ranges
 

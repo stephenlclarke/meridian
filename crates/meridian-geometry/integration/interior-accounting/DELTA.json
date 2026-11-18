@@ -1,0 +1,24 @@
+{
+  "status": "AUTHORED_UNRUN_BOUNDED_ACCOUNTING_CORRECTION",
+  "parentAuthor": "332a602d572706ab1d2b17df44ec47bb7b60a8d4",
+  "wholeReviewedRoot": "5de160910243ccd2b6f26c96646820936cb08a2b",
+  "wholeReviewedTree": "40111f62965c7992a6b2439406a68006c8850daf",
+  "wholeReviewSHA256": "4613936efc83b9dfb36ea08c98b230d762ee36e07f837dc55091df0f737f23ff",
+  "findingsAddressed": [
+    "G2-GEOMETRY-INTERIOR-1",
+    "G2-GEOMETRY-INTERIOR-2"
+  ],
+  "productionChanges": "Exactly3addedstatements: log_cost beforeactualeligiblegroups.insert; b.step1 beforeactualconsumedgroupwork; b.step1 beforeforeignwholebox predicate. Existingownerstep unchanged.",
+  "unchanged": "Wholehelper restores exactly by removing those3charges; allmath,inequalities,lifetimes,guards,unitprices,caps,66priorbodies/322/108/120/frozencontrols unchanged",
+  "newTest": {
+    "file": "src/strict_interior_tests.rs",
+    "name": "proof_group_and_foreign_box_work_is_charged_before_execution_and_refusal",
+    "status": "UNRUN"
+  },
+  "currentRustCount": 67,
+  "hostCount": 9,
+  "parentExecution": "66Rust9host/compiler/wholefiveUNRUN",
+  "contractSHA256": "4361c5327cf95df496c9c91f89e611c3ba83ec05856004cd230d7deb20525762",
+  "frozenSHA256": "50120291a6457cd3ae2daee69e3ff81da34a95f4f93ac5bfb21e1546fe7b4ed0",
+  "qualification": "Rootsuccessorjoin/G2boundedDelta with carriedmathreview/G1focused thenONEchangedwholefive onlyafterPASS"
+}

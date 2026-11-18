@@ -1,0 +1,33 @@
+{
+  "parentAuthor": "332a602d572706ab1d2b17df44ec47bb7b60a8d4",
+  "wholeReviewedRoot": "5de160910243ccd2b6f26c96646820936cb08a2b",
+  "wholeReviewedTree": "40111f62965c7992a6b2439406a68006c8850daf",
+  "all363ParentCrateGitPinsMatchWholeReview": true,
+  "wholeReviewSHA256": "4613936efc83b9dfb36ea08c98b230d762ee36e07f837dc55091df0f737f23ff",
+  "wholeReviewVerdict": "CHANGES_REQUIRED_TWO_NEW_PROOF_ACCOUNTING_FINDINGS",
+  "wholeReviewSourcePacket": {
+    "path": "/private/tmp/meridian-root-strict-interior-review/SOURCE.json",
+    "bytes": 5073,
+    "sha256": "0a5cf8c1ab58fdf426715d0f08e0a8e6f2383219d69077aa67cc3adef539a71d"
+  },
+  "verifiedReviewPayloads": [
+    {
+      "path": "/private/tmp/meridian-root-strict-interior-review/ALL-SOURCE-PINS.json",
+      "bytes": 131284,
+      "sha256": "5bb1d19031ef49e073df625bff7520a3f2cb0c23db86db607114b42cd3dd861f"
+    },
+    {
+      "path": "/private/tmp/meridian-root-strict-interior-review/SOURCE.tar",
+      "bytes": 27801600,
+      "sha256": "5d5245c1832db11bb42c574a16d381ee6997f880f525e574bfcce8c391a09c48"
+    },
+    {
+      "path": "/private/tmp/meridian-root-strict-interior-review/DELTA.patch",
+      "bytes": 230392,
+      "sha256": "8e370938f1961b864a8894717c603b89afbe3819d4e6598e3ae0f68422c24c84"
+    }
+  ],
+  "actualExecutionOnWholeReviewedParent": "UNRUN66Rust9host/compiler/wholefive; source review only",
+  "priorActual6abd": "63Rust9host/checkClippybuildPASS;5Operationsconstructorrefusals15dependentUNRUN0candidates remain source-bound in prior strict-interior custody",
+  "noAuthorCompilerSUTNative": true
+}

@@ -187,5 +187,11 @@
     "externalRawSHA256": "4144d58f1ab0545e4f33b900ded6eef1cc54317841fc17d7b63b21484253acd7",
     "currentExecution": "UNRUN",
     "sourceFidelity": "All-original audited support-plane proof, strict whole-facet occlusion only; all source geometry remains in every other contact/field query; equality/full star audits unchanged; spatial experiment withdrawn from production"
+  },
+  "strictInteriorAccountingCorrection": {
+    "wholeReviewedRoot": "5de160910243ccd2b6f26c96646820936cb08a2b",
+    "wholeReviewSHA256": "4613936efc83b9dfb36ea08c98b230d762ee36e07f837dc55091df0f737f23ff",
+    "currentExecution": "UNRUN",
+    "sourceFidelity": "Only3missingactualcharges restored; mathematical/lifetime/fullsource invariants unchanged; no new geometry or admissions"
   }
 }
