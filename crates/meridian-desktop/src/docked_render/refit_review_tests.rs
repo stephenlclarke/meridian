@@ -283,6 +283,26 @@ fn actual_paid_beam_store_then_immediate_fit_keeps_visible_review_controls_and_c
     ));
     assert_eq!(key, ui::Key::Fit);
     ok(menu.input(&mut profile, ui::Input::Key(key)));
+    assert_eq!(ok(profile.world.save_bytes()), stored);
+    // The next normal build opens Fit, without an intervening Equipment frame or acknowledgement.
+    let candidate = ok(menu.build_frame(&profile.world, views[0], 0.0));
+    assert_review(&candidate, &model);
+    // A built-but-unpresented Fit cannot authorize Enter or an old Store Confirm hit.
+    ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm)));
+    let old_confirm = some(stored_reviews.last().and_then(|f| {
+        f.hits
+            .iter()
+            .find(|h| h.control == ui::Control::ReviewConfirm)
+    }))
+    .bounds
+    .centre();
+    ok(menu.input(&mut profile, ui::Input::Click(old_confirm)));
+    assert_eq!(ok(profile.world.save_bytes()), stored);
+    assert_eq!(
+        ok(std::fs::read(directory.0.join("commander.meridian"))),
+        stored
+    );
+    menu.presented(candidate);
     for (viewport, store) in views.into_iter().zip(&stored_reviews) {
         let fit = paint(&mut menu, &profile, viewport);
         assert_review(&fit, &model);

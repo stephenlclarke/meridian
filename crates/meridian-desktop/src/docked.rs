@@ -149,7 +149,10 @@ struct Pending {
     anchor: Anchor,
 }
 
+mod stored_fit;
+
 pub struct Docked {
+    stored_fit: Option<stored_fit::Handoff>,
     catalogue: ui::Catalogue,
     screens: ui::DockedScreens,
     pub open: bool,
@@ -183,6 +186,7 @@ impl Docked {
             .ok_or("No commander navigation")?
             .system;
         Ok(Self {
+            stored_fit: None,
             catalogue: ui::Catalogue::bundled().map_err(str::to_owned)?,
             screens: ui::DockedScreens::new(current, hull(world)?),
             open: false,
@@ -202,6 +206,7 @@ impl Docked {
         if world.current_dock_context().is_none() {
             return Err("Dock at a station to open this screen".into());
         }
+        self.stored_fit = None;
         self.pending = None;
         self.painted = None;
         self.screens.open(screen);
@@ -209,6 +214,7 @@ impl Docked {
         Ok(())
     }
     pub fn close(&mut self) {
+        self.stored_fit = None;
         self.open = false;
         self.pending = None;
         self.painted = None;
@@ -217,6 +223,7 @@ impl Docked {
         self.open && world.current_dock_context().is_some()
     }
     pub fn focus_lost(&mut self) {
+        self.stored_fit = None;
         self.screens.open(self.screens.screen());
         self.painted = None;
     }
@@ -248,6 +255,7 @@ impl Docked {
         viewport: ui::Viewport,
         seconds: f64,
     ) -> Result<ui::Frame, String> {
+        self.prepare_stored_fit(world);
         self.serial = self
             .serial
             .checked_add(1)
@@ -282,6 +290,9 @@ impl Docked {
         result
     }
     fn input_inner(&mut self, profile: &mut Profile, input: ui::Input) -> Result<(), String> {
+        if self.queue_stored_fit(&profile.world, &input) {
+            return Ok(());
+        }
         let painted = self
             .painted
             .as_ref()
@@ -330,7 +341,10 @@ impl Docked {
                         self.route = Some(target);
                         self.feedback = "Destination selected; launch and press J to jump".into();
                     }
-                    Intent::Change(action) => self.feedback = profile.command(action)?,
+                    Intent::Change(action) => {
+                        self.feedback = profile.command(action)?;
+                        self.remember_stored_fit(&profile.world, action);
+                    }
                 }
             }
             ui::Request::ReviewRoute(target) => {
