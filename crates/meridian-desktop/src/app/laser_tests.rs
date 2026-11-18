@@ -129,6 +129,8 @@ fn actual_digit_view_binding_drives_each_fitted_body_axis_and_fresh_profile_keep
             ok(std::fs::read(directory.0.join("commander.meridian"))),
             bytes
         );
+        let expected_modules = a.game.world.modular_equipment_snapshot();
+        drop(a); // Release the exclusive Store lease before fresh Continue.
         let mut cold = open(&directory.0);
         ok(cold.continue_saved());
         assert_eq!(cold.world.flight_view(), view);
@@ -139,7 +141,7 @@ fn actual_digit_view_binding_drives_each_fitted_body_axis_and_fresh_profile_keep
         assert_eq!(cold.world.flight_resources_snapshot(), Some(resources));
         assert_eq!(
             cold.world.modular_equipment_snapshot(),
-            a.game.world.modular_equipment_snapshot()
+            expected_modules
         );
     }
 }
@@ -244,11 +246,13 @@ fn presented_paid_left_and_rear_purchase_charge_once_then_right_offer_refuses_an
     menu_key(&mut a, ui::Key::Confirm);
     assert_eq!(ok(a.game.world.save_bytes()), before);
     assert!(a.game.world.laser_snapshot(LaserFacing::Right).is_none());
+    let expected_modules = a.game.world.modular_equipment_snapshot();
+    drop(a); // The preceding App still owns the same profile's lease.
     let mut cold = open(&directory.0);
     ok(cold.continue_saved());
     assert_eq!(
         cold.world.modular_equipment_snapshot(),
-        a.game.world.modular_equipment_snapshot()
+        expected_modules
     );
     assert_eq!(cold.world.credits_tenths(), Some(4650));
 }
