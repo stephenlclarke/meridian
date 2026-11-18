@@ -7,10 +7,10 @@
     "Authenticate/copy complete selected original design/resource/contract/ownership/engineering/notices;encodeall5344sourceverticesand9008triangleswithoriginal16-pieceassignment.",
     "Add immutable16-piece convexsource-support+2cmoffset geometry, boundedcontinuousstrictseparation, conservative raycontact distinction, strict transformedportfit and source-aware stationlaunch/entry methods.",
     "Share same immutable surface for very slight near/grazing shimmer;depletiondoesnotretractcollision;no mutablehealth/effect/EMP/save/acquisition state added.",
-    "Add10meaningfulcoretestsandcurrent-ad5two-declarationpatch;oldgameplay/source/testbodiesand519geometryfilesexact."
+    "Add11meaningfulcoretestsandcurrent-ad5two-declarationpatch;oldgameplay/source/testbodiesand519geometryfilesexact."
   ],
   "preservation": "Current131corefilesboundtoad5read-only;authoroldcore isnotgameplayauthority. Rootseriallyaddsonlynewfiles/assetsandcanonicaltwomoduledeclarations;preservecurrentEMP/economy/persistence/otherowners.",
-  "newCoreCases": 10,
+  "newCoreCases": 11,
   "execution": "Allnewcoreconstructor/contact/containment/tests/compiler/Clippy/native/render/gameUNRUN;authorSourceOnly",
   "scopeLimits": "Newauthorizedapproximatecontract;notoriginalexposedmesh512facequalificationandnocapwaiver.Original2M/100k/4096/512andfailuresunchanged.",
   "remainingImplementation": [
@@ -21,10 +21,38 @@
   ],
   "noFleetAdmission": true,
   "manifestSHA256": "85d4a90dcdde5bc0f76d344f053d73a4dd220c8edc4bec88144e3f198964fd06",
-  "criteriaSHA256": "59ba1987df6ac76647f9e1c381afbe10c7adbb375baed0e7cd436a9b282b8c3c",
+  "criteriaSHA256": "3b0c8dbb2c1ff6e0d38f937629350c3a5aae681be8412dabb502ec0efb613a9d",
   "currentGameplaySHA256": "2f1517489f3492d570caf00dc97b8d3608b5442dfd4d8045f0f16a1a5caa8934",
   "currentGameplayPatchSHA256": "4101826ce6e1890e2d83a2fd7e698ee87468eb793b104efd5cccfa2e2d14af84",
-  "custodySHA256": "daf4850b8db520af396e4ed4d2985d3f668bd0fd01568dc8def2614e7ce513ac",
-  "contractSHA256": "687a8f22de6b6b8f33e0efcd9fa977d67dc9782d387d92146e70ca4570edda35",
-  "sourceCheckerSHA256": "b79258d1fb259bd19ed4306887d18d2314d9b4b2f557e2bd44d031816ccf04b7"
+  "custodySHA256": "c01d5d9d325796766c89223111ee83bacd34ea204b08502da7bb5e6b82016c47",
+  "contractSHA256": "1cd32d75d5bdfa73f7c4c90ac0a19be37dcf532e426d49d1d0506d34a5f7527e",
+  "sourceCheckerSHA256": "70031f59f162d3fec814480f502681987dcdd165e685479077a6c2ad45b61c6a",
+  "boundedCorrection": {
+    "finding": "G2-MULE-ENVELOPE-1",
+    "parent": "a43ec10965fa1a3075acdd0c358d5d120b8d7935",
+    "changes": [
+      "Replace trace/acos endpoint angle with relative sine/cosine atan2 and1e-8 admitted-basis/arithmetic guard.",
+      "Add1e-9 origin-radius padding for basis residuals.",
+      "Append independent reviewer-contact regression with understated/proper small/proper near-half-turn cases.",
+      "Correct documentation and source registry from10to11tests;old10bodies unchanged."
+    ],
+    "currentAdaptation": "Bounded changed-path delta against Root158a;retain Root adapted verifier except update its2test-count literals10to11;do not import old core.",
+    "execution": "All11casesUNRUN;G2delta then G1owned qualification;no new lane/ACK gate"
+  },
+  "controlledWorldScenario": {
+    "authorParent": "7d1ec7793e3fa47443678203f07eb97854ba6326",
+    "currentBase": "af97ee6bbba60b2d492216ad12035a90e9dde34e",
+    "newWorldTests": 4,
+    "totalMuleCoreCases": 17,
+    "execution": "AUTHORED_UNRUN;not hull admission",
+    "changes": [
+      "Actual World-owned SH001 source scenario and immutable existing NpcSnapshot+Arc presentation publication with private scope/tick/generation.",
+      "Stationary source-validated SH025 observer;continuous actual station/observer mesh sweep;initial noncontainment guard;atomic observer command refusal.",
+      "Minimal current-source module wiring/optional field/default/loadNone/controlled step dispatch;no save schema/ordinary reducers/equipment/acquisition change."
+    ],
+    "bindingSHA256": "94f994a22179e98fc04da5b88c4cbbc9b299f51792f746751194a77256abadf6",
+    "patchSHA256": "37f05f3ea5b698d87cba78a0cfb08316317e6eacd5fdd86823a3caab63fbcb51",
+    "newTightnessTests": 2,
+    "tightness": "Actual detailed triangle sampled-distance/extent evidence plus six named pannier/cockpit/engine clear gaps;AUTHORED_UNRUN,notmax/Hausdorff guarantee or acceptance"
+  }
 }

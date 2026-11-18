@@ -989,6 +989,26 @@ impl App {
                         port,
                         docked: snapshot.mode == FlightMode::Docked,
                     });
+            let mule_frame = self.game.world.mule_actor_snapshot();
+            let mule_observer = mule_frame
+                .as_ref()
+                .and_then(|frame| self.game.world.mule_observer_pose(frame));
+            let mule_scene = mule_frame
+                .as_ref()
+                .zip(mule_observer)
+                .filter(|(frame, _)| {
+                    frame.world_tick() == snapshot.tick
+                        && frame.source_identity()
+                            == (
+                                meridian_core::mule::MULE_RESOURCE_SHA256,
+                                meridian_core::mule::MULE_CONTRACT_SHA256,
+                            )
+                })
+                .map(|(frame, observer)| crate::mule_render::Scene {
+                    actor: frame.actor(),
+                    envelope: frame.presentation().as_ref(),
+                    observer,
+                });
             let practice = self.game.world.practice_snapshot();
             renderer.set_flight_view(self.game.world.flight_view());
             renderer.set_review_capture_identity(
@@ -1000,8 +1020,7 @@ impl App {
                 &snapshot,
                 station,
                 SceneEffects {
-                    // The owning World SH001 route supplies this after admission; never a preview actor.
-                    mule: None,
+                    mule: mule_scene,
                     traffic: traffic.as_ref(),
                     pulse: self.pulse.as_ref(),
                     mining: belt.as_ref().map(|belt| asteroid_render::Scene {

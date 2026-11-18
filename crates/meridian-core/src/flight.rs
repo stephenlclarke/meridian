@@ -11,6 +11,7 @@ pub use emp::{
 mod celestial;
 mod damage;
 mod mining;
+mod mule_validation;
 mod xyzzy;
 pub(crate) use xyzzy::{AccountEffect, AccountEvent, STARTING_CREDITS_TENTHS};
 pub use xyzzy::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
@@ -170,6 +171,7 @@ impl std::error::Error for StepError {}
 pub struct World {
     state: Snapshot,
     traffic: crate::traffic::State,
+    mule_validation: Option<crate::traffic::mule_validation::State>,
     mining: crate::mining::State,
     mining_scope: std::sync::Arc<()>,
     damage: damage::State,
@@ -215,6 +217,7 @@ impl World {
                 navigation: None,
             },
             traffic: crate::traffic::State::default(),
+            mule_validation: None,
             mining: crate::mining::State::legacy_absent(),
             mining_scope: std::sync::Arc::new(()),
             damage: damage::State::default(),
@@ -485,6 +488,9 @@ impl World {
             return Err(StepError::Paused);
         }
         input.validate()?;
+        if self.mule_validation.is_some() {
+            return self.step_mule_validation(input);
+        }
         let input = if self.emp.electrical_disabled() {
             FlightInput::default()
         } else {

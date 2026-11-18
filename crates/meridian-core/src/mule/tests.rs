@@ -1,3 +1,4 @@
+use super::geometry::scale;
 use super::*;
 use crate::docking::GeometryError;
 use crate::station::OriginalStationData;
@@ -57,7 +58,7 @@ fn mule_authenticates_source_and_encloses_all_components_and_triangle_interiors(
     }
     let triangles = include_bytes!("../../../../assets/fleet/sh001/source-triangles.bin");
     assert_eq!(triangles.len(), 12 * (7236 + 1772));
-    for record in triangles.chunks_exact(12) {
+    for record in triangles.as_chunks::<12>().0 {
         let mut indices = [0usize; 3];
         for (axis, index) in indices.iter_mut().enumerate() {
             *index = u32::from_le_bytes(
@@ -446,5 +447,54 @@ fn rounded_support_invalid_geometry_never_grants_clearance_or_a_contact()
         source.sweep_clears_triangles(pose(0.0, 0.0, 0.0), pose(0.0, 0.0, 0.0), 0.0, &[]),
         Err(EnvelopeError::InvalidGeometry)
     );
+    Ok(())
+}
+
+#[test]
+fn rounded_sweep_accounts_for_near_orthogonal_trace_three_endpoint() -> Result<(), EnvelopeError> {
+    let shape = SmoothPiece::new(vec![Vec3::new(20.0, 0.0, 0.0)], 0.02)?;
+    let start = pose(0.0, 0.0, 0.0);
+    let mut end = start;
+    end.orientation = Basis3 {
+        x: Vec3::new(1.0, 0.000005, 0.0),
+        y: Vec3::new(-0.000005, 1.0, 0.0),
+        z: Vec3::new(0.0, 0.0, 1.0),
+    };
+    // Independent witness: the entire triangle lies inside the end source ball.
+    // The previous trace/acos check saw angle zero and its broadphase cleared it.
+    let triangle = [
+        Vec3::new(19.9999, 0.02007, -0.0001),
+        Vec3::new(20.0001, 0.02007, -0.0001),
+        Vec3::new(20.0, 0.02007, 0.0001),
+    ];
+    let center = Vec3::new(20.0, 0.0001, 0.0);
+    for vertex in triangle {
+        let delta = Vec3::new(
+            vertex.x - center.x,
+            vertex.y - center.y,
+            vertex.z - center.z,
+        );
+        assert!(delta.dot(delta) < 0.02 * 0.02);
+    }
+    assert!(geometry::valid_pose(end));
+    assert_eq!(
+        shape.sweep_clears_triangle(start, end, 0.0, triangle),
+        Err(EnvelopeError::UnderstatedRotation)
+    );
+    assert!(!shape.sweep_clears_triangle(start, end, 0.000005, triangle)?);
+
+    // Proper small rotations still admit clearance when their travel is supplied.
+    let (sine, cosine) = 0.000005_f64.sin_cos();
+    end.orientation.x = Vec3::new(cosine, sine, 0.0);
+    end.orientation.y = Vec3::new(-sine, cosine, 0.0);
+    assert!(!shape.sweep_clears_triangle(start, end, 0.000005, triangle)?);
+    let clear_triangle = triangle.map(|p| Vec3::new(p.x, 1.0, p.z));
+    assert!(shape.sweep_clears_triangle(start, end, 0.000005, clear_triangle)?);
+    let angle = std::f64::consts::PI - 0.00001;
+    let (sine, cosine) = angle.sin_cos();
+    end.orientation.x = Vec3::new(cosine, sine, 0.0);
+    end.orientation.y = Vec3::new(-sine, cosine, 0.0);
+    let distant_triangle = triangle.map(|p| Vec3::new(p.x, 100.0, p.z));
+    assert!(shape.sweep_clears_triangle(start, end, angle, distant_triangle)?);
     Ok(())
 }

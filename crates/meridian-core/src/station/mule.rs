@@ -104,3 +104,29 @@ impl OriginalStationData {
             && self.mule_motion_clear(source, start, end, angular_travel)
     }
 }
+
+impl OriginalStationData {
+    /// Controlled validation only: the stationary observer retains its real SH025 mesh.
+    /// Initial noncontainment is established by the World constructor, then every
+    /// continuous Mule step checks the same frozen observer's complete native surface.
+    pub(crate) fn mule_observer_clear(
+        &self,
+        source: &MuleHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        observer: RigidPose,
+    ) -> bool {
+        if !finite(observer.position) || !observer.orientation.is_valid_rotation() {
+            return false;
+        }
+        self.hull.faces.iter().all(|face| {
+            let triangle = [face[0], face[1], face[2]].map(|i| {
+                add(
+                    observer.position,
+                    observer.orientation.apply(self.hull.vertices[i]),
+                )
+            });
+            source.sweep_clears_triangles(start, end, 0.0, &[triangle]) == Ok(true)
+        })
+    }
+}

@@ -398,6 +398,7 @@ impl World {
         let mut candidate = Self {
             state,
             traffic: crate::traffic::State::default(),
+            mule_validation: None,
             mining: crate::mining::State::legacy_absent(),
             mining_scope: std::sync::Arc::new(()),
             damage: super::damage::State::default(),

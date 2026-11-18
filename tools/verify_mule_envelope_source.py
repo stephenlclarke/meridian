@@ -49,9 +49,10 @@ def verify():
     assert bytes(triangles) == (folder / 'source-triangles.bin').read_bytes()
     assert bytes(membership) == (folder / 'source-piece-membership.bin').read_bytes()
     assert set(membership) == set(range(16))
-    # Verify the current gameplay baseline after reversing only the two module declarations.
+    # Bind unchanged current gameplay and the exact minimal World adaptation.
     # The sealed author packet separately preserves its old core and all 519 geometry files.
     binding = json.loads((ROOT / 'integration/sh001-mule/CURRENT-GAMEPLAY.json').read_text())
+    world_binding = json.loads((ROOT / 'integration/sh001-mule/WORLD-BINDING.json').read_text())
     for path, pin in binding['coreFiles'].items():
         before = subprocess.check_output(['git', '-C', str(ROOT), 'show', binding['gameplayAuthority'] + ':' + path])
         after = (ROOT / path).read_bytes()
@@ -62,7 +63,12 @@ def verify():
             assert after.count(b'mod mule;\n') == 1
             after = after.replace(b'mod mule;\n', b'', 1)
         assert len(before) == pin['bytes'] and sha(before) == pin['sha256'], path
-        assert after == before, path
+        if path in world_binding['modifiedCurrentFiles']:
+            bound = world_binding['modifiedCurrentFiles'][path]
+            assert len(before) == bound['before']['bytes'] and sha(before) == bound['before']['sha256'], path
+            assert len(after) == bound['after']['bytes'] and sha(after) == bound['after']['sha256'], path
+        else:
+            assert after == before, path
     assert len(binding['coreFiles']) == 131
     patch = (ROOT / 'integration/sh001-mule/CURRENT-GAMEPLAY.patch').read_bytes()
     assert sha(patch) == binding['moduleDeclarationPatchSHA256']
@@ -70,9 +76,26 @@ def verify():
     assert plus == ['+pub mod mule;', '+mod mule;']
     criteria = json.loads((ROOT / 'integration/sh001-mule/CRITERIA.json').read_text())
     names = re.findall(r'#\[test\]\s*fn\s+(\w+)\(', (ROOT / 'crates/meridian-core/src/mule/tests.rs').read_text())
-    assert len(names) == 10 and names == [test['name'] for test in criteria['newCoreTests']]
+    assert len(names) == 11 and names == [test['name'] for test in criteria['newCoreTests']]
     assert all(test['status'] == 'UNRUN' for test in criteria['newCoreTests'])
-    print(json.dumps({'status': 'PASS_SOURCE_ONLY', 'existingGameplayCoreFilesUnchanged': len(binding['coreFiles']), 'currentGameplayCorePins': 131, 'newCoreTests': 10, 'vertexEncoding': 5344, 'triangleEncoding': 9008, 'constructorsOrContactOrContainmentOrCompilerExecuted': False}))
+    world_names = re.findall(r'#\[test\]\s*fn\s+(\w+)\(', (ROOT / 'crates/meridian-core/src/flight/mule_validation/tests.rs').read_text())
+    assert len(world_names) == 4 and world_names == [test['name'] for test in criteria['worldCoreTests']]
+    assert all(test['status'] == 'UNRUN' for test in criteria['worldCoreTests'])
+    tightness = (ROOT / 'crates/meridian-core/src/mule/tightness_tests.rs').read_text()
+    tightness_names = re.findall(r'#\[test\]\s*fn\s+(\w+)\(', tightness)
+    assert len(tightness_names) == 2 and tightness_names == [test['name'] for test in criteria['tightnessCoreTests']]
+    assert all(test['status'] == 'UNRUN' for test in criteria['tightnessCoreTests'])
+    rim_text = tightness.split('const WELL_RIMS:', 1)[1].split('];', 1)[0]
+    rim_indices = [(int(piece), int(first)) for piece, first in re.findall(r'\((\d+), (\d+)\)', rim_text)]
+    assert rim_indices == [(part['piece'], part['vertexStart']) for part in groups['design'] if '/service-well-' in part['name'] and '/recess-' not in part['name']]
+    assert len(rim_indices) == 84
+    world_binding = json.loads((ROOT / 'integration/sh001-mule/WORLD-BINDING.json').read_text())
+    world_patch = (ROOT / world_binding['canonicalPatch']['path']).read_bytes()
+    assert len(world_patch) == world_binding['canonicalPatch']['bytes']
+    assert sha(world_patch) == world_binding['canonicalPatch']['sha256']
+    assert len(world_binding['currentRootCoreFiles']) == 135
+    assert len(world_binding['modifiedCurrentFiles']) == 3
+    print(json.dumps({'status': 'PASS_SOURCE_ONLY', 'existingGameplayCoreFilesUnchanged': 128, 'minimalWorldAdaptedCoreFiles': 3, 'currentGameplayCorePins': 131, 'newCoreTests': 11, 'worldCoreTests': 4, 'tightnessCoreTests': 2, 'totalMuleCoreTests': 17, 'vertexEncoding': 5344, 'triangleEncoding': 9008, 'constructorsOrContactOrContainmentOrCompilerExecuted': False}))
 
 
 if __name__ == '__main__':

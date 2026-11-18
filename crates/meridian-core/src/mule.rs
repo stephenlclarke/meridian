@@ -3,7 +3,7 @@
 mod geometry;
 use crate::docking::{Basis3, DockingPort, RigidPose, StationPose, Vec3};
 pub use geometry::{EnvelopeRayContact, SmoothPiece};
-use geometry::{add, finite, scale, sub, valid_pose};
+use geometry::{add, finite, sub, valid_pose};
 use std::sync::Arc;
 
 const VERTICES: &[u8] = include_bytes!("../../../assets/fleet/sh001/all-source.vertices");
@@ -255,15 +255,14 @@ impl MuleHullSource {
         let mut nearest = EnvelopeRayContact::Clear;
         for piece in self.pieces.iter() {
             let contact = piece.ray_contact(pose, origin, direction, range)?;
-            if let Some(distance) = contact.lower_bound() {
-                if nearest
+            if let Some(distance) = contact.lower_bound()
+                && (nearest
                     .lower_bound()
                     .is_none_or(|current| distance < current)
                     || (nearest.lower_bound() == Some(distance)
-                        && matches!(contact, EnvelopeRayContact::Uncertain { .. }))
-                {
-                    nearest = contact;
-                }
+                        && matches!(contact, EnvelopeRayContact::Uncertain { .. })))
+            {
+                nearest = contact;
             }
         }
         Ok(nearest)
@@ -310,3 +309,6 @@ fn source_vertex(bytes: &[u8], index: usize) -> Result<Vec3, EnvelopeError> {
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod tightness_tests;
