@@ -1,5 +1,5 @@
 // Kept in lockstep with meridian_core::mule::MULE_PIECES by the shader layout test.
-const MULE_PIECES: u32 = 32u;
+const MULE_PIECES: u32 = 34u;
 struct Piece { range:vec4<u32>, low:vec4<f32>, high:vec4<f32> }
 struct Triangle { a:vec4<f32>, b:vec4<f32>, c:vec4<f32>, normal:vec4<f32> }
 struct Inputs {
