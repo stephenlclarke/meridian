@@ -1,6 +1,6 @@
 # Meridian
 
-The current native run produced three byte-identical, nonblack GPU target copies with accepted App acknowledgements, while the paired Fit still appeared black through CUA. The [presentation/window observation investigation](docs/LASER-FACINGS.md#post-render-presentation-and-window-observation-boundary) found no supported source fix. The remaining boundary is drawable presentation, window/layer identity and compositor/CUA observation; another unchanged render capture would not resolve it. Native acceptance remains blocked.
+The current native run produced three identical nonblack GPU target copies while the paired Fit appeared black through CUA. A [bounded read-only independent window observer](docs/LASER-FACINGS.md#independent-macos-window-observer-preparation) is prepared to resolve the actual WindowServer capture identity. Twelve offline policy fixtures pass; the Swift provider is uncompiled and no UI API has run. Execution requires the explicit human exception for alternate UI technology. No renderer cure or native acceptance is claimed.
 
 [![CI](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=alert_status)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)
