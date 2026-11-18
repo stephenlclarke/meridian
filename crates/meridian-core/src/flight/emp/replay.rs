@@ -1,5 +1,8 @@
 //! Reconstruct charge from accepted physical intervals and actual berth/arrival history.
-use super::*;
+use super::{
+    EmpEquipmentAction, EmpGrades, EquipmentEvent, INVALID, SaveError, State, World, meter, policy,
+    scene,
+};
 #[derive(Clone, Copy)]
 enum Change {
     FinalDeath,
@@ -20,6 +23,35 @@ struct Replay {
     energy: Option<u8>,
 }
 impl Replay {
+    fn apply_pulse(
+        &mut self,
+        pulses: &[super::runtime::Pulse],
+        index: usize,
+        clock: u64,
+    ) -> Result<(), SaveError> {
+        self.admission()?;
+        self.meter.discharge()?;
+        self.bank_clock = clock;
+        let pulse = &pulses[index];
+        let expected = if let Some(contact) = pulse
+            .contacts
+            .iter()
+            .find(|c| c.victim == scene::Victim::Player)
+        {
+            let power = contact
+                .power_hundredths
+                .checked_sub(pulse.player_shield_absorbed)
+                .ok_or(INVALID)?;
+            self.meter
+                .drain(u32::from(power) * (policy::SCALE / 100), clock)?
+        } else {
+            0
+        };
+        if expected != pulse.player_electrical_drained {
+            return Err(INVALID);
+        }
+        Ok(())
+    }
     fn rate(&self) -> u32 {
         210 * (1 + u32::from(self.energy.unwrap_or(0)))
     }
@@ -93,11 +125,11 @@ impl Replay {
     }
 }
 impl State {
-    pub(super) fn replay_meter(
+    fn meter_changes(
         &self,
         world: &World,
         modular: &super::super::modular::State,
-    ) -> Result<(), SaveError> {
+    ) -> Result<Vec<(u64, u8, Change)>, SaveError> {
         let end = world.combat.physical_tick();
         let mut events = Vec::new();
         for clock in world
@@ -133,6 +165,15 @@ impl State {
             events.push((end, 0, Change::FinalDeath));
         }
         events.sort_by_key(|&(clock, phase, _)| (clock, phase));
+        Ok(events)
+    }
+    pub(super) fn replay_meter(
+        &self,
+        world: &World,
+        modular: &super::super::modular::State,
+    ) -> Result<(), SaveError> {
+        let end = world.combat.physical_tick();
+        let events = self.meter_changes(world, modular)?;
         let mut replay = Replay {
             meter: meter::Meter::default(),
             clock: 0,
@@ -160,28 +201,7 @@ impl State {
                         replay.bank_clock = clock;
                     }
                     if let Change::Pulse(index) = change {
-                        replay.admission()?;
-                        replay.meter.discharge()?;
-                        replay.bank_clock = clock;
-                        let pulse = &self.pulses[index];
-                        let expected = if let Some(contact) = pulse
-                            .contacts
-                            .iter()
-                            .find(|c| c.victim == scene::Victim::Player)
-                        {
-                            let power = contact
-                                .power_hundredths
-                                .checked_sub(pulse.player_shield_absorbed)
-                                .ok_or(INVALID)?;
-                            replay
-                                .meter
-                                .drain(u32::from(power) * (policy::SCALE / 100), clock)?
-                        } else {
-                            0
-                        };
-                        if expected != pulse.player_electrical_drained {
-                            return Err(INVALID);
-                        }
+                        replay.apply_pulse(&self.pulses, index, clock)?;
                     }
                 }
                 other => {

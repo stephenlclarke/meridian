@@ -1,5 +1,5 @@
 //! A physical query snapshot. It is never an EMP release capability or an ordinary weapon origin.
-use super::*;
+use super::{EmpError, INVALID, SaveError, World, policy};
 use crate::docking::{RigidPose, Vec3};
 use crate::traffic::{NpcId, NpcPhase};
 #[derive(Debug, Clone, Copy, PartialEq)]

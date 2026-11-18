@@ -1,5 +1,5 @@
 //! Immutable readouts of actual property and electrical state.
-use super::*;
+use super::{EmpChargePhase, EmpOrigin, OwnedEmp, World, policy};
 #[derive(Debug, Clone, PartialEq)]
 pub struct EmpSnapshot {
     pub item: OwnedEmp,

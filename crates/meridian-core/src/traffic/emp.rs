@@ -1,5 +1,8 @@
 //! EMP drains shields then independent electrical power. It never pays fatal hull damage.
-use super::*;
+use super::{
+    Arc, INVALID, MissileScene, NpcId, OriginalStationData, Resources, SaveError, SceneStage,
+    State, SystemId, TrafficError, system_index,
+};
 use crate::flight::emp::{EMP_RESOURCE_SCALE, EmpOrigin};
 use crate::save::{Reader, Writer};
 pub(super) const MAX_EMP_EVENTS: usize = 128;

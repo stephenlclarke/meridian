@@ -1,6 +1,9 @@
 //! Real commerce/flight producers and separate numerical-kernel fixtures. Owner execution pending.
 #![allow(clippy::unwrap_used)]
-use super::*;
+use super::{
+    Arc, EmpAxis, EmpChargePhase, EmpEquipmentAction, EmpError, EmpGrades, EmpProvenance, World,
+    meter, scene,
+};
 use crate::flight::equipment::tests::earned_world;
 use crate::flight::practice::tests::launch;
 use crate::navigation::SystemId;
