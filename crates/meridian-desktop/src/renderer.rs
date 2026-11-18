@@ -402,36 +402,17 @@ impl Renderer {
         }
     }
 
-    pub fn draw(
+    fn prepare_scene_surfaces(
         &mut self,
         snapshot: &Snapshot,
-        station: Option<StationScene<'_>>,
-        effects: SceneEffects<'_>,
-        hud: HudScene<'_>,
-    ) -> Result<Presentation, String> {
-        let HudScene {
-            lines: hud_lines,
-            cockpit,
-            help,
-        } = hud;
-
+        effects: &SceneEffects<'_>,
+    ) -> Result<(), String> {
         let SceneEffects {
-            mule,
-            traffic,
-            pulse,
-            mining,
-            missiles,
-            practice,
-            celestial,
             docked,
+            celestial,
             docked_planet,
-        } = effects;
-        if self.device_lost.load(Ordering::Acquire) {
-            return Err("Graphics device lost; exiting without changing any save".into());
-        }
-        if self.is_zero_sized() {
-            return Ok(Presentation::Skipped);
-        }
+            ..
+        } = *effects;
         if let Some(menu) = docked {
             let scale = self.window.scale_factor();
             let logical = self.size.to_logical::<f64>(scale);
@@ -479,6 +460,172 @@ impl Renderer {
                 )
                 .map_err(str::to_owned)?;
         }
+        Ok(())
+    }
+
+    fn prepare_flight_geometry(
+        &mut self,
+        snapshot: &Snapshot,
+        station: Option<StationScene<'_>>,
+        effects: SceneEffects<'_>,
+    ) -> Result<(), String> {
+        let SceneEffects {
+            mule,
+            traffic,
+            pulse,
+            mining,
+            missiles,
+            practice,
+            celestial,
+            ..
+        } = effects;
+        let station = station.map(|scene| mesh::StationRender {
+            vertices: &self.station,
+            pose: scene.pose,
+            port: scene.port,
+            docked: scene.docked,
+        });
+        if let (Some(scene), Some(_)) = (mule, station) {
+            let camera = scene.observer;
+            if self.mule.is_none() {
+                self.mule = Some(crate::mule_render::Pass::new(
+                    &self.device,
+                    &self.queue,
+                    self.config.format,
+                    scene,
+                )?);
+            }
+            if let Some(pass) = &mut self.mule {
+                pass.prepare(
+                    &self.queue,
+                    Some(scene),
+                    crate::mule_render::View {
+                        camera,
+                        flight: self.flight_view,
+                        projection: flight_projection(self.config.width, self.config.height),
+                        tick: snapshot.tick,
+                    },
+                )?;
+            }
+        } else if let Some(pass) = &mut self.mule {
+            pass.hide();
+        }
+        if let (Some(scene), Some(station)) = (mule, station) {
+            mesh::station_from_observer(station, scene.observer, &mut self.frame)?;
+        } else {
+            mesh::frame_vertices(snapshot, &self.ship, station, &mut self.frame)?;
+        }
+        let additional_start = self.frame.len();
+        if let (Some(station), Some(beacons)) = (station, practice) {
+            mesh::append_practice_beacons(snapshot, station, beacons, &mut self.frame)?;
+        }
+        if let Some(station) = station {
+            mesh::append_missiles(snapshot, station, missiles, &mut self.frame)?;
+        }
+        if let (Some(station), Some(traffic)) = (station, traffic) {
+            mesh::traffic::append(snapshot, station, &self.ship, traffic, &mut self.frame)?;
+        }
+        if let (Some(station), Some(shot)) = (station, pulse)
+            && !traffic
+                .is_some_and(|scene| mesh::traffic::contains_pulse(scene, snapshot.tick, shot))
+        {
+            mesh::append_pulse(snapshot, station, shot, &mut self.frame)?;
+        }
+        if let (Some(station), Some(mining)) = (station, mining) {
+            let sun = celestial.and_then(|scene| scene.sun.map(|sun| sun.position));
+            mining.append(snapshot, station, sun, &mut self.frame)?;
+        }
+        if let (Some(scene), Some(station)) = (mule, station) {
+            mesh::reframe_observer(
+                &mut self.frame[additional_start..],
+                mesh::scene_camera_pose(snapshot, station)?,
+                scene.observer,
+            )?;
+        }
+        mesh::apply_flight_view(self.flight_view, &mut self.frame);
+        if self.frame.len() > self.vertex_capacity {
+            return Err("Frame exceeded its declared vertex capacity".into());
+        }
+        self.queue
+            .write_buffer(&self.vertices, 0, bytemuck::cast_slice(&self.frame));
+        Ok(())
+    }
+
+    fn encode_scene(
+        &self,
+        encoder: &mut wgpu::CommandEncoder,
+        view: &wgpu::TextureView,
+        docked: bool,
+    ) {
+        let colors = [Some(wgpu::RenderPassColorAttachment {
+            view,
+            depth_slice: None,
+            resolve_target: None,
+            ops: wgpu::Operations {
+                load: wgpu::LoadOp::Clear(wgpu::Color {
+                    r: if docked { 0.0 } else { 0.003 },
+                    g: if docked { 0.0 } else { 0.006 },
+                    b: if docked { 0.0 } else { 0.018 },
+                    a: 1.0,
+                }),
+                store: wgpu::StoreOp::Store,
+            },
+        })];
+        let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+            color_attachments: &colors,
+            depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
+                view: &self.depth,
+                depth_ops: Some(wgpu::Operations {
+                    load: wgpu::LoadOp::Clear(1.0),
+                    store: wgpu::StoreOp::Discard,
+                }),
+                stencil_ops: None,
+            }),
+            ..Default::default()
+        });
+        if docked {
+            self.celestial.draw_surfaces(&mut pass);
+            pass.set_scissor_rect(0, 0, self.config.width, self.config.height);
+            self.docked.draw_models(&mut pass);
+            self.celestial.draw_halos(&mut pass);
+        } else {
+            self.celestial.draw_surfaces(&mut pass);
+            pass.set_scissor_rect(0, 0, self.config.width, self.config.height);
+            pass.set_pipeline(&self.pipeline);
+            pass.set_bind_group(0, &self.projection_group, &[]);
+            pass.set_vertex_buffer(0, self.vertices.slice(..));
+            pass.draw(0..self.frame.len() as u32, 0..1);
+            if let Some(mule) = &self.mule {
+                mule.draw_solid(&mut pass);
+            }
+            self.celestial.draw_halos(&mut pass);
+            if let Some(mule) = &self.mule {
+                mule.draw_shimmer(&mut pass);
+            }
+        }
+    }
+
+    pub fn draw(
+        &mut self,
+        snapshot: &Snapshot,
+        station: Option<StationScene<'_>>,
+        effects: SceneEffects<'_>,
+        hud: HudScene<'_>,
+    ) -> Result<Presentation, String> {
+        let HudScene {
+            lines: hud_lines,
+            cockpit,
+            help,
+        } = hud;
+
+        let docked = effects.docked;
+        if self.device_lost.load(Ordering::Acquire) {
+            return Err("Graphics device lost; exiting without changing any save".into());
+        }
+        if self.is_zero_sized() {
+            return Ok(Presentation::Skipped);
+        }
+        self.prepare_scene_surfaces(snapshot, &effects)?;
         let (frame, reconfigure) = match self.surface.get_current_texture() {
             wgpu::CurrentSurfaceTexture::Success(frame) => (frame, false),
             wgpu::CurrentSurfaceTexture::Suboptimal(frame) => (frame, true),
@@ -504,75 +651,7 @@ impl Renderer {
             }
         };
         if docked.is_none() {
-            let station = station.map(|scene| mesh::StationRender {
-                vertices: &self.station,
-                pose: scene.pose,
-                port: scene.port,
-                docked: scene.docked,
-            });
-            if let (Some(scene), Some(_)) = (mule, station) {
-                let camera = scene.observer;
-                if self.mule.is_none() {
-                    self.mule = Some(crate::mule_render::Pass::new(
-                        &self.device,
-                        &self.queue,
-                        self.config.format,
-                        scene,
-                    )?);
-                }
-                if let Some(pass) = &mut self.mule {
-                    pass.prepare(
-                        &self.queue,
-                        Some(scene),
-                        crate::mule_render::View {
-                            camera,
-                            flight: self.flight_view,
-                            projection: flight_projection(self.config.width, self.config.height),
-                            tick: snapshot.tick,
-                        },
-                    )?;
-                }
-            } else if let Some(pass) = &mut self.mule {
-                pass.hide();
-            }
-            if let (Some(scene), Some(station)) = (mule, station) {
-                mesh::station_from_observer(station, scene.observer, &mut self.frame)?;
-            } else {
-                mesh::frame_vertices(snapshot, &self.ship, station, &mut self.frame)?;
-            }
-            let additional_start = self.frame.len();
-            if let (Some(station), Some(beacons)) = (station, practice) {
-                mesh::append_practice_beacons(snapshot, station, beacons, &mut self.frame)?;
-            }
-            if let Some(station) = station {
-                mesh::append_missiles(snapshot, station, missiles, &mut self.frame)?;
-            }
-            if let (Some(station), Some(traffic)) = (station, traffic) {
-                mesh::traffic::append(snapshot, station, &self.ship, traffic, &mut self.frame)?;
-            }
-            if let (Some(station), Some(shot)) = (station, pulse)
-                && !traffic
-                    .is_some_and(|scene| mesh::traffic::contains_pulse(scene, snapshot.tick, shot))
-            {
-                mesh::append_pulse(snapshot, station, shot, &mut self.frame)?;
-            }
-            if let (Some(station), Some(mining)) = (station, mining) {
-                let sun = celestial.and_then(|scene| scene.sun.map(|sun| sun.position));
-                mining.append(snapshot, station, sun, &mut self.frame)?;
-            }
-            if let (Some(scene), Some(station)) = (mule, station) {
-                mesh::reframe_observer(
-                    &mut self.frame[additional_start..],
-                    mesh::scene_camera_pose(snapshot, station)?,
-                    scene.observer,
-                )?;
-            }
-            mesh::apply_flight_view(self.flight_view, &mut self.frame);
-            if self.frame.len() > self.vertex_capacity {
-                return Err("Frame exceeded its declared vertex capacity".into());
-            }
-            self.queue
-                .write_buffer(&self.vertices, 0, bytemuck::cast_slice(&self.frame));
+            self.prepare_flight_geometry(snapshot, station, effects)?;
         }
         if docked.is_none() {
             self.upload_hud(hud_lines, cockpit, help);
@@ -582,54 +661,7 @@ impl Renderer {
 
         let view = frame.texture.create_view(&Default::default());
         let mut encoder = self.device.create_command_encoder(&Default::default());
-        {
-            let colors = [Some(wgpu::RenderPassColorAttachment {
-                view: &view,
-                depth_slice: None,
-                resolve_target: None,
-                ops: wgpu::Operations {
-                    load: wgpu::LoadOp::Clear(wgpu::Color {
-                        r: if docked.is_some() { 0.0 } else { 0.003 },
-                        g: if docked.is_some() { 0.0 } else { 0.006 },
-                        b: if docked.is_some() { 0.0 } else { 0.018 },
-                        a: 1.0,
-                    }),
-                    store: wgpu::StoreOp::Store,
-                },
-            })];
-            let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-                color_attachments: &colors,
-                depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
-                    view: &self.depth,
-                    depth_ops: Some(wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(1.0),
-                        store: wgpu::StoreOp::Discard,
-                    }),
-                    stencil_ops: None,
-                }),
-                ..Default::default()
-            });
-            if docked.is_some() {
-                self.celestial.draw_surfaces(&mut pass);
-                pass.set_scissor_rect(0, 0, self.config.width, self.config.height);
-                self.docked.draw_models(&mut pass);
-                self.celestial.draw_halos(&mut pass);
-            } else {
-                self.celestial.draw_surfaces(&mut pass);
-                pass.set_scissor_rect(0, 0, self.config.width, self.config.height);
-                pass.set_pipeline(&self.pipeline);
-                pass.set_bind_group(0, &self.projection_group, &[]);
-                pass.set_vertex_buffer(0, self.vertices.slice(..));
-                pass.draw(0..self.frame.len() as u32, 0..1);
-                if let Some(mule) = &self.mule {
-                    mule.draw_solid(&mut pass);
-                }
-                self.celestial.draw_halos(&mut pass);
-                if let Some(mule) = &self.mule {
-                    mule.draw_shimmer(&mut pass);
-                }
-            }
-        }
+        self.encode_scene(&mut encoder, &view, docked.is_some());
         self.draw_overlay(&mut encoder, &view, docked, help);
         self.queue.submit([encoder.finish()]);
         self.window.pre_present_notify();

@@ -7,6 +7,7 @@ import re
 import struct
 import tomllib
 
+RUST_TEST_NAME = r'#\[test\]\s*fn\s+(\w+)\('
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -14,8 +15,7 @@ def sha(data):
     return hashlib.sha256(data).hexdigest()
 
 
-def verify():
-    folder = ROOT / 'assets/fleet/sh001'
+def verify_inputs(folder):
     manifest = json.loads((folder / 'MANIFEST.json').read_text())
     for name, pin in manifest['files'].items():
         data = (folder / name).read_bytes()
@@ -24,6 +24,34 @@ def verify():
     pins = next(ast.literal_eval(node.value) for node in tree.body if isinstance(node, ast.Assign) and any(isinstance(target, ast.Name) and target.id == 'PINS' for target in node.targets))
     for name, expected in pins.items():
         assert sha((folder / name).read_bytes()) == expected, name
+
+
+def verify_component(model, part, assigned, faces, well_pieces):
+    for key in ['vertexStart', 'vertexCount', 'faceStart', 'faceCount']:
+        assert part[key] == assigned[key]
+    assert part['index'] == assigned['component'] and part['name'] == assigned['name']
+    name = part['name']
+    piece = assigned['piece']
+    if name.startswith('body primary pressure envelope/service-well-'):
+        key = (model, name.split('/', 2)[1])
+        assert piece == well_pieces.setdefault(key, 16 + len(well_pieces))
+    elif name == 'body primary pressure envelope/longitudinal-service-strut-0':
+        assert piece == 32
+    elif name == 'body primary pressure envelope/longitudinal-service-strut-1':
+        assert piece == 33
+    elif name == 'body primary pressure envelope':
+        assert piece == 0
+    else:
+        assert 1 <= piece < 16
+    first_vertex = part['vertexStart']
+    end_vertex = first_vertex + part['vertexCount']
+    first_face = part['faceStart']
+    end_face = first_face + part['faceCount']
+    for face in faces[first_face:end_face]:
+        assert len(face) == 3 and all(first_vertex <= i < end_vertex for i in face)
+
+
+def verify_geometry(folder):
     resource = tomllib.loads((folder / 'resource.toml').read_text())
     original = tomllib.loads((folder / 'original-design.toml').read_text())
     owner = json.loads((folder / 'ownership.json').read_text())
@@ -37,28 +65,7 @@ def verify():
         assert (len(resource[model]['vertices']), len(resource[model]['faces']), len(owner['models'][model]['parts'])) == counts
         assert len(groups[model]) == counts[2]
         for part, assigned in zip(owner['models'][model]['parts'], groups[model], strict=True):
-            for key in ['vertexStart', 'vertexCount', 'faceStart', 'faceCount']:
-                assert part[key] == assigned[key]
-            assert part['index'] == assigned['component'] and part['name'] == assigned['name']
-            name = part['name']
-            piece = assigned['piece']
-            if name.startswith('body primary pressure envelope/service-well-'):
-                key = (model, name.split('/', 2)[1])
-                assert piece == well_pieces.setdefault(key, 16 + len(well_pieces))
-            elif name == 'body primary pressure envelope/longitudinal-service-strut-0':
-                assert piece == 32
-            elif name == 'body primary pressure envelope/longitudinal-service-strut-1':
-                assert piece == 33
-            elif name == 'body primary pressure envelope':
-                assert piece == 0
-            else:
-                assert 1 <= piece < 16
-            first_vertex = part['vertexStart']
-            end_vertex = first_vertex + part['vertexCount']
-            first_face = part['faceStart']
-            end_face = first_face + part['faceCount']
-            for face in resource[model]['faces'][first_face:end_face]:
-                assert len(face) == 3 and all(first_vertex <= i < end_vertex for i in face)
+            verify_component(model, part, assigned, resource[model]['faces'], well_pieces)
             membership.extend(bytes([assigned['piece']]) * assigned['vertexCount'])
         for point in resource[model]['vertices']:
             vertices.extend(struct.pack('<ddd', *point))
@@ -69,7 +76,11 @@ def verify():
     assert bytes(membership) == (folder / 'source-piece-membership.bin').read_bytes()
     assert len(well_pieces) == 16
     assert set(membership) == set(range(34))
-    # Replay only the reviewed additive Mule hooks against the protected base.
+    return groups
+
+
+def verify_protected_core(root):
+    # Undo the reviewed Mule hooks and the equivalent finite-speed range check.
     # Checking every pre-existing core blob catches unrelated gameplay edits.
     base = '792f4485372ae37d0c1d583ae11229e85932ce2f'
     additions = {
@@ -88,20 +99,48 @@ def verify():
             b'pub use mule_validation::{MuleActorSnapshot, MuleValidationRefusal};\n',
         ],
     }
-    pin_bytes = (ROOT / 'integration/sh001-mule/PROTECTED-CORE.json').read_bytes()
-    assert sha(pin_bytes) == 'a3cc243f3e8993157e98fc0b876375c06ede55dda93a5a4178247108cc0a5f93'
+    pin_bytes = (root / 'integration/sh001-mule/PROTECTED-CORE.json').read_bytes()
+    assert sha(pin_bytes) == '8a2929218820a8e15536aa554c0f8df56a23981944be85ec1b1947778fd48133'
     baseline = json.loads(pin_bytes)
     assert baseline['base'] == base
     checked = set()
-    for relative, blob in baseline['gitBlobs'].items():
-        data = (ROOT / 'crates/meridian-core/src' / relative).read_bytes()
+    for relative, expected in baseline['sha256'].items():
+        data = (root / 'crates/meridian-core/src' / relative).read_bytes()
         for addition in additions.get(relative, []):
             assert data.count(addition) == 1, relative
             data = data.replace(addition, b'', 1)
-        header = b'blob ' + str(len(data)).encode() + b'\0'
-        assert hashlib.sha1(header + data).hexdigest() == blob, relative
+        if relative == 'flight.rs':
+            speed_line = b'        if !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
+            original_line = b'        if !self.state.speed.is_finite() || !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
+            assert data.count(speed_line) == 1, relative
+            data = data.replace(speed_line, original_line, 1)
+        assert sha(data) == expected, relative
         checked.add(relative)
     assert set(additions) <= checked and len(checked) == 115
+    return len(checked), len(additions)
+
+
+def verify_test_registry(criteria):
+    files = {
+        'newCoreTests': ('mule/tests.rs', 11),
+        'worldCoreTests': ('flight/mule_validation/tests.rs', 6),
+        'tightnessCoreTests': ('mule/tightness_tests.rs', 5),
+        'geometryCoreTests': ('mule/geometry.rs', 1),
+    }
+    counts = {}
+    for group, (module, expected) in files.items():
+        path = Path('crates/meridian-core/src') / module
+        names = re.findall(RUST_TEST_NAME, (ROOT / path).read_text())
+        entries = criteria[group]
+        assert len(names) == expected and names == [entry['name'] for entry in entries], group
+        assert all(entry['file'] == path.as_posix() and entry['status'] == 'UNRUN' for entry in entries), group
+        counts[group] = len(names)
+    total = sum(counts.values())
+    assert total == criteria['totalMuleCoreTests']
+    return {**counts, 'totalMuleCoreTests': total}
+
+
+def verify_historical_bindings(folder, groups):
     # Preserve the historical component and World patch identities separately.
     binding = json.loads((ROOT / 'integration/sh001-mule/CURRENT-GAMEPLAY.json').read_text())
     patch = (ROOT / 'integration/sh001-mule/CURRENT-GAMEPLAY.patch').read_bytes()
@@ -113,16 +152,7 @@ def verify():
     speed_source = (ROOT / 'crates/meridian-core/src/mule.rs').read_text()
     speed_constant = re.search(r'const MULE_MAX_SPEED_UNITS: f32 = ([0-9.]+);', speed_source)
     assert speed_constant and float(speed_constant[1]) == speed_contract
-    names = re.findall(r'#\[test\]\s*fn\s+(\w+)\(', (ROOT / 'crates/meridian-core/src/mule/tests.rs').read_text())
-    assert len(names) == 11 and names == [test['name'] for test in criteria['newCoreTests']]
-    assert all(test['status'] == 'UNRUN' for test in criteria['newCoreTests'])
-    world_names = re.findall(r'#\[test\]\s*fn\s+(\w+)\(', (ROOT / 'crates/meridian-core/src/flight/mule_validation/tests.rs').read_text())
-    assert len(world_names) == 6 and world_names == [test['name'] for test in criteria['worldCoreTests']]
-    assert all(test['status'] == 'UNRUN' for test in criteria['worldCoreTests'])
     tightness = (ROOT / 'crates/meridian-core/src/mule/tightness_tests.rs').read_text()
-    tightness_names = re.findall(r'#\[test\]\s*fn\s+(\w+)\(', tightness)
-    assert len(tightness_names) == 5 and tightness_names == [test['name'] for test in criteria['tightnessCoreTests']]
-    assert all(test['status'] == 'UNRUN' for test in criteria['tightnessCoreTests'])
     rim_text = tightness.split('const WELL_RIMS:', 1)[1].split('];', 1)[0]
     rim_indices = [(int(piece), int(first)) for piece, first in re.findall(r'\((\d+), (\d+)\)', rim_text)]
     assert rim_indices == [(part['piece'], part['vertexStart']) for part in groups['design'] if '/service-well-' in part['name'] and '/recess-' not in part['name']]
@@ -133,8 +163,17 @@ def verify():
     assert sha(world_patch) == world_binding['canonicalPatch']['sha256']
     assert len(world_binding['currentRootCoreFiles']) == 135
     assert len(world_binding['modifiedCurrentFiles']) == 3
-    print(json.dumps({'status': 'PASS_SOURCE_ONLY', 'protectedGameplayCoreFilesUnchanged': len(checked) - len(additions), 'protectedCoreFilesWithMuleHooks': len(additions), 'protectedCoreFilesChecked': len(checked), 'newCoreTests': 11, 'worldCoreTests': 6, 'tightnessCoreTests': 5, 'totalMuleCoreTests': 22, 'vertexEncoding': 5344, 'triangleEncoding': 9008, 'constructorsOrContactOrContainmentOrCompilerExecuted': False}))
+    return verify_test_registry(criteria)
+
+
+def verify():
+    folder = ROOT / 'assets/fleet/sh001'
+    verify_inputs(folder)
+    groups = verify_geometry(folder)
+    checked, hooks = verify_protected_core(ROOT)
+    counts = verify_historical_bindings(folder, groups)
+    return {'status': 'PASS_SOURCE_ONLY', 'protectedGameplayCoreFilesUnchanged': checked - hooks, 'protectedCoreFilesWithMuleHooks': hooks, 'protectedCoreFilesChecked': checked, **counts, 'vertexEncoding': 5344, 'triangleEncoding': 9008, 'constructorsOrContactOrContainmentOrCompilerExecuted': False}
 
 
 if __name__ == '__main__':
-    verify()
+    print(json.dumps(verify()))

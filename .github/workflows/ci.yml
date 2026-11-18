@@ -92,11 +92,20 @@ jobs:
             xvfb-run --auto-servernum --server-args="-screen 0 1600x900x24 -dpi 96 -nolisten tcp" \
             python -B -m coverage run --parallel-mode .github/scripts/native_coverage_smoke.py
           llvm_bin="$(rustc --print target-libdir)/../bin"
-          "$llvm_bin/llvm-profdata" merge -sparse coverage/native/desktop-*.profraw \
+          "$llvm_bin/llvm-profdata" merge -sparse coverage/native/desktop-[0-9]*.profraw \
             -o coverage/native/desktop.profdata
           "$llvm_bin/llvm-cov" export "$target_dir/debug/meridian-desktop" \
             -instr-profile=coverage/native/desktop.profdata -format=lcov > coverage/native/desktop.lcov
-          python -B -m coverage run --parallel-mode .github/scripts/check_native_coverage.py
+          mule_profiles=(coverage/native/desktop-mule-*.profraw)
+          test "${#mule_profiles[@]}" -eq 1
+          test -s "${mule_profiles[0]}"
+          "$llvm_bin/llvm-profdata" merge -sparse "${mule_profiles[0]}" \
+            -o coverage/native/mule-desktop.profdata
+          "$llvm_bin/llvm-cov" export "$target_dir/debug/meridian-desktop" \
+            -instr-profile=coverage/native/mule-desktop.profdata -format=lcov > coverage/native/mule-desktop.lcov
+          set -o pipefail
+          python -B -m coverage run --parallel-mode .github/scripts/check_native_coverage.py \
+            | tee coverage/native/native-line-gates.txt
           cp coverage/native/desktop-*.profraw "$(dirname "$LLVM_PROFILE_FILE")/"
           cargo llvm-cov report --workspace --lcov --output-path coverage/lcov.info
       - name: Clippy report

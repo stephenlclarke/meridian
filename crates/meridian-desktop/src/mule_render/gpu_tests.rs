@@ -1,6 +1,7 @@
 //! Explicit G1-only actual-shader fixture. No window, World actor, save or screenshot.
 use super::tests::ok;
-use super::*;
+use super::{Piece, Triangle, Uniforms, rounded, triangle};
+use meridian_core::{docking::Vec3, mule::MULE_PIECES};
 use wgpu::util::DeviceExt;
 
 #[test]

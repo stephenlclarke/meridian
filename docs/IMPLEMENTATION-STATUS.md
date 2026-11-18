@@ -4,6 +4,10 @@
 
 Mac build `ffb7112` passed 702 Rust tests, 102 Python tests, strict Clippy, and the release build. In the native scene the aligned Mule crossed at tick 104 and the obstructed Mule stopped for station contact at tick 11. Linux and native Windows each passed 705 Rust tests including three observer tests, 102 Python tests, strict Clippy, and both release builds. One Metal fixture was excluded from the ordinary test counts on each platform. These results qualify the internal docking scene. Ordinary encounters and player acquisition remain open. [Controls and test scope](MULE-VALIDATION-LAUNCH.md)
 
+After PR 54 merged, the three hosted Rust checks, documentation and coverage-report generation passed on `9fb7783`. Sonar measured 72.8% new-code coverage against an 80% requirement and failed the new-code security rating. The analysis reported 31 unresolved findings. These results apply to the internal docking integration. [Main workflow](https://github.com/stephenlclarke/meridian/actions/runs/44397835463)
+
+On `1cdac5e`, the Mac passed 703 workspace Rust tests and a separately selected offscreen Metal test. In the internal scene the Mule visibly crossed the station entrance and stopped at tick 104, generation 105. Normal quit exited zero. WSL Linux and native Windows each passed the same 703 workspace cases plus three observer cases. Each platform passed 122 Python tests, strict Clippy and locked release builds. The 23 registered Mule core tests include a new regression for a degenerate simplex and a tetrahedron containing the origin. The four approved local well exceptions remain specific to SH001. These results cover the internal scene. [PR 55 and hosted checks](https://github.com/stephenlclarke/meridian/pull/55)
+
 The first section records the current delivered release. Earlier source-specific sections retain their original observations and limits; their historical pending states do not override the current checkpoint.
 
 ## Current importer main and method-reference correction

@@ -1,6 +1,6 @@
 {
   "status": "AUTHORED_UNRUN_SH001_SMOOTH_SUPPORT_PROTOTYPE",
-  "authorParent": "8e2e5d3a3ef5f6caffd0323ca4b2540e1e57981b",
+  "sourceParentCommit": "8e2e5d3a3ef5f6caffd0323ca4b2540e1e57981b",
   "currentGameplayBase": "ad5b9f9da259c85389cd662af2473e543e26ab11",
   "target": "SH001 Mule;firstsourcebacklogship",
   "changes": [
@@ -40,7 +40,7 @@
     "execution": "All11casesUNRUN;G2delta then G1owned qualification;no new lane/ACK gate"
   },
   "controlledWorldScenario": {
-    "authorParent": "7d1ec7793e3fa47443678203f07eb97854ba6326",
+    "sourceParentCommit": "7d1ec7793e3fa47443678203f07eb97854ba6326",
     "currentBase": "af97ee6bbba60b2d492216ad12035a90e9dde34e",
     "newWorldTests": 4,
     "totalMuleCoreCases": 17,
@@ -56,7 +56,7 @@
     "tightness": "Actual detailed triangle sampled-distance/extent evidence plus six named pannier/cockpit/engine clear gaps;AUTHORED_UNRUN,notmax/Hausdorff guarantee or acceptance"
   },
   "currentCausalCorrection": {
-    "authorParent": "62c73cd453504ae2f81f77e59e2955f073fbfcf9",
+    "sourceParentCommit": "62c73cd453504ae2f81f77e59e2955f073fbfcf9",
     "currentRoot": "316f831a21c212648b951e67866ce9199d6fca10",
     "totalMuleCases": 18,
     "status": "AUTHORED_UNRUN;ACTUAL_TIGHT_FIT_BLOCKED",

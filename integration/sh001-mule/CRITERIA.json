@@ -2,7 +2,7 @@
   "targetHull": "SH001",
   "name": "Mule",
   "status": "SH001_FOUR_WELL_EXCEPTION_ACCEPTED;CONTROLLED_DOCKING_COST_AUTHORED_UNRUN",
-  "immediateAuthorParent": "8e2e5d3a3ef5f6caffd0323ca4b2540e1e57981b",
+  "immediateSourceParentCommit": "8e2e5d3a3ef5f6caffd0323ca4b2540e1e57981b",
   "currentGameplayAuthority": "ad5b9f9da259c85389cd662af2473e543e26ab11",
   "newCoreTests": [
     {
@@ -136,7 +136,7 @@
   "boundedCorrection": {
     "finding": "G2-MULE-ENVELOPE-1",
     "reviewedRoot": "158a2d3bc43b9533fa57895f85af34159c693d11",
-    "authorParent": "a43ec10965fa1a3075acdd0c358d5d120b8d7935",
+    "sourceParentCommit": "a43ec10965fa1a3075acdd0c358d5d120b8d7935",
     "behavior": "Reject understated endpoint travel using atan2 sine/cosine plus admitted-basis residual guard; preserve contact blocking and correctly supplied proper rotations, including near half-turn.",
     "newCase": "rounded_sweep_accounts_for_near_orthogonal_trace_three_endpoint",
     "status": "AUTHORED_UNRUN;source-only checks;existing G2 delta/G1 qualification owners"
@@ -173,7 +173,14 @@
       "status": "UNRUN"
     }
   ],
-  "totalMuleCoreTests": 22,
+  "geometryCoreTests": [
+    {
+      "file": "crates/meridian-core/src/mule/geometry.rs",
+      "name": "simplex_uses_a_valid_subface_for_singular_points_and_keeps_a_full_interior",
+      "status": "UNRUN"
+    }
+  ],
+  "totalMuleCoreTests": 23,
   "controlledWorldScenario": {
     "status": "AUTHORED_UNRUN;NOT_ORDINARY_HULL_ADMISSION",
     "base": "af97ee6bbba60b2d492216ad12035a90e9dde34e",
