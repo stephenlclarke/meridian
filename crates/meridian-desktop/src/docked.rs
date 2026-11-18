@@ -114,6 +114,7 @@ struct Anchor {
     equipment: Option<equipment::Snapshot>,
     ammunition: Option<meridian_core::AmmunitionSnapshot>,
     modules: Option<meridian_core::ModularEquipmentSnapshot>,
+    emp: Option<meridian_core::EmpSnapshot>,
     services: Option<meridian_core::ServiceSnapshot>,
     quotes: Vec<Option<station_services::CommodityQuote>>,
     paused: bool,
@@ -127,6 +128,7 @@ impl Anchor {
             equipment: world.equipment_snapshot(),
             ammunition: world.ammunition_snapshot(),
             modules: world.modular_equipment_snapshot(),
+            emp: world.emp_snapshot(),
             services: world.service_snapshot(),
             quotes: ids
                 .into_iter()
@@ -499,6 +501,9 @@ fn equipment_action(
     operation: ui::EquipmentOperation,
 ) -> Result<Action, String> {
     use ui::EquipmentOperation::{Buy, Fit, Store};
+    if slot == ui::emp::SLOT {
+        return ui::emp::action(world, node, instance, operation).map(Action::Emp);
+    }
     if slot == ui::fuel_scoops::SLOT {
         return ui::fuel_scoops::action(world, node, instance, operation).map(Action::Module);
     }
@@ -732,6 +737,7 @@ fn equipment_panel(
         available: true,
     });
     slots.push(ui::fuel_scoops::slot(world)?);
+    slots.push(ui::emp::slot(world));
     for pylon in 0..ammo.capacity {
         let occupied = ammo
             .items
@@ -753,6 +759,8 @@ fn equipment_panel(
     };
     if let Some(slot) = module_slot {
         rows = module_rows(world, &modules, slot, tick);
+    } else if selected == ui::emp::SLOT {
+        rows = ui::emp::rows(world);
     } else if selected == ui::fuel_scoops::SLOT {
         rows = ui::fuel_scoops::rows(world)?;
     } else if selected == "cargo-expansion" {

@@ -62,6 +62,32 @@ impl Profile {
         .unwrap_or_else(|warning| warning))
     }
 
+    fn emp_equipment(
+        &mut self,
+        command: meridian_core::EmpEquipmentAction,
+    ) -> Result<String, String> {
+        let tick = self.world.snapshot().tick;
+        let review = self
+            .world
+            .review_emp_equipment(command, tick)
+            .map_err(|e| e.to_string())?;
+        let prepared = self
+            .world
+            .prepare_emp_equipment(review, tick)
+            .map_err(|e| e.to_string())?;
+        let published = self
+            .store
+            .save(prepared.bytes(), MAX_SAVE_BYTES)
+            .map_err(|e| format!("EMP change could not be saved: {e}"))?;
+        prepared.commit();
+        self.has_save = true;
+        self.session.invalidate();
+        publication_message(
+            published,
+            "EMP property change saved; charge is conserved, not refilled.".into(),
+        )
+    }
+
     pub fn new_commander(&mut self, seed: u64) -> Result<bool, String> {
         if self.playing {
             return Err("Start a new commander from the title screen".into());
@@ -102,6 +128,9 @@ impl Profile {
     pub fn command(&mut self, action: Action) -> Result<String, String> {
         if !self.playing {
             return Err("N starts a new commander; C continues the existing save".into());
+        }
+        if let Action::Emp(command) = action {
+            return self.emp_equipment(command);
         }
         if let Action::Module(command) = action {
             let tick = self.world.snapshot().tick;
@@ -363,6 +392,9 @@ impl Profile {
                         }
                     ),
                 );
+            }
+            if let Some(emp) = crate::docked_screens::emp::status(&self.world) {
+                lines.push(emp);
             }
             return lines;
         }
