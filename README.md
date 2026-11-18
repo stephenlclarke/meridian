@@ -1,6 +1,6 @@
 # Meridian
 
-The current native run produced three identical nonblack GPU target copies while the paired Fit appeared black through CUA. A [bounded read-only independent window observer](docs/LASER-FACINGS.md#independent-macos-window-observer-preparation) is prepared to resolve the actual WindowServer capture identity. Thirteen offline policy fixtures pass; the Swift provider is uncompiled and no UI API has run. Execution requires the explicit human exception for alternate UI technology. No renderer cure or native acceptance is claimed.
+The current native run produced three identical nonblack GPU target copies while the paired Fit appeared black through CUA. A [bounded read-only independent window observer](docs/LASER-FACINGS.md#independent-macos-window-observer-preparation) is prepared to resolve the actual WindowServer capture identity. Sixteen offline policy fixtures pass; the Swift provider is uncompiled and no UI API has run. Execution requires the explicit human exception for alternate UI technology. No renderer cure or native acceptance is claimed.
 
 The underlying ad5 game runtime passed Mac, Linux and native Windows qualification: 295 fresh Rust cases plus 433 reviewed unchanged Core/compatibility cases per platform, with current compiler, strict Clippy and release-build checks. This helper-only change leaves that runtime unchanged. The current native Fit-screen failure and dependent gameplay acceptance remain open.
 

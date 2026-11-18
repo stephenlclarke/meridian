@@ -2,6 +2,8 @@
 import base64
 import copy
 import json
+import io
+from contextlib import redirect_stdout
 from pathlib import Path
 import struct
 import tempfile
@@ -183,6 +185,78 @@ class PolicyFixtures(unittest.TestCase):
                     return reply
                 self.assertEqual(self.run_capture(provider=negative)["status"], "failed")
                 self.assertFalse(list(Path(directory).glob("*.png")))
+
+    def run_cli(self, provider=None):
+        original = capture.capture
+        def offline(*args, **kwargs):
+            return original(*args, call=provider or self.provider, **kwargs)
+        argv = ["capture_meridian_window.py", "--scope", str(self.scope_path),
+                "--provider", "/not-run/offline-fixture-provider", "--request", "1", "--frame", "10"]
+        output = io.StringIO()
+        with patch.object(capture, "capture", side_effect=offline), patch.object(capture.sys, "argv", argv), redirect_stdout(output):
+            status = capture.main()
+        return status, json.loads(output.getvalue())
+
+    def test_cli_final_receipt_fsync_and_cleanup_failures_retain_capture_and_stop(self):
+        original_create, original_unlink = capture.create_new, Path.unlink
+        for failure in ["receipt_fsync", "cleanup"]:
+            with self.subTest(failure=failure), tempfile.TemporaryDirectory() as directory:
+                self.scope["evidence_dir"] = directory
+                self.scope_path.write_bytes(capture.json_bytes(self.scope))
+                def create(path, data):
+                    if failure == "receipt_fsync" and path.name == "window-capture-1.json":
+                        with patch.object(capture.os, "fsync", side_effect=OSError("injected receipt fsync")):
+                            return original_create(path, data)
+                    return original_create(path, data)
+                def unlink(path, *args, **kwargs):
+                    if failure == "cleanup" and path.name == "window-capture.inflight":
+                        raise OSError("injected lock cleanup")
+                    return original_unlink(path, *args, **kwargs)
+                self.calls.clear()
+                with patch.object(capture, "create_new", side_effect=create), patch.object(Path, "unlink", unlink):
+                    status, result = self.run_cli()
+                self.assertEqual(status, 2)
+                self.assertEqual(result["status"], "capture_attempted_outcome_unknown")
+                self.assertTrue(result["native_provider_attempted"])
+                self.assertTrue(result["capture_attempted"])
+                root = Path(directory)
+                self.assertEqual((root / "window-capture-1-frame-10.png").read_bytes(), png())
+                self.assertTrue((root / "window-capture-1.claim.json").exists())
+                self.assertTrue((root / "window-capture-1.json").exists())
+                with self.assertRaises(FileExistsError):
+                    self.run_capture()
+                self.assertEqual(self.calls, ["enumerate", "capture"])
+
+    def test_cli_preflight_failure_truthfully_records_no_native_attempt(self):
+        self.scope["human_exception_reference"] = "PENDING"
+        self.scope_path.write_bytes(capture.json_bytes(self.scope))
+        status, result = self.run_cli()
+        self.assertEqual(status, 2)
+        self.assertEqual(result["status"], "rejected_before_capture")
+        self.assertFalse(result["native_provider_attempted"])
+        self.assertFalse(result["capture_attempted"])
+        self.assertEqual(self.calls, [])
+
+    def test_cli_enumeration_then_receipt_failure_does_not_claim_no_native_work(self):
+        original_create = capture.create_new
+        def create(path, data):
+            if path.name == "window-capture-1.json":
+                raise OSError("injected receipt failure")
+            return original_create(path, data)
+        def fail(*args):
+            self.calls.append("enumerate")
+            raise capture.Rejected("injected enumeration rejection")
+        with patch.object(capture, "create_new", side_effect=create):
+            status, result = self.run_cli(provider=fail)
+        self.assertEqual(status, 2)
+        self.assertEqual(result["status"], "native_provider_attempted_outcome_unknown")
+        self.assertTrue(result["native_provider_attempted"])
+        self.assertFalse(result["capture_attempted"])
+        self.assertEqual(self.calls, ["enumerate"])
+        self.assertTrue((self.directory / "window-capture-1.claim.json").exists())
+        with self.assertRaises(FileExistsError):
+            self.run_capture()
+        self.assertEqual(self.calls, ["enumerate"])
 
     def test_native_source_has_single_window_filter_and_no_input_or_permission_request(self):
         source=Path(__file__).with_name("meridian_window_capture.swift").read_text()
