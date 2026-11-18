@@ -33,6 +33,8 @@ The [paid manual ECM candidate](docs/ECM.md) is source-authored and unrun. It ad
 
 The [four-facing laser core and desktop wiring](docs/LASER-FACINGS.md) are authored with nine new core and nine host regression cases, all unrun. Paid left/right/rear fitting, selected-view fire, Help, shared resources and cold replay are joined with paid manual ECM and await whole-source review and owned platform qualification.
 
+The [mounted laser receipt correction](docs/LASER-FACINGS.md#targeted-mounted-ray-receipt-correction) binds nonfront NPC hits and interceptions to actual body pose, facing and shared spend. Two coordinated-relabel regressions are authored, unrun; Root owns the separate EMP control-fork correction and final review/qualification.
+
 ## Previews and validation
 
 Download qualified macOS arm64 and Windows x64 prereleases from [GitHub Releases](https://github.com/stephenlclarke/meridian/releases). Use the launcher and Read Me included with your download. Keep its app, notices and versioned save folder together; preserve earlier previews and profiles separately. Releases use Conventional Commit versions and immutable annotated tags, and retain the newest three published previews after verified downloads and a durable receipt.

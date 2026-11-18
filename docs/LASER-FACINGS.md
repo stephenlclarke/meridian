@@ -172,3 +172,54 @@ miss, wall occlusion, shared heat/cadence, save/quit/new-process Continue and re
 through the delivered UI. Record source/binary/backend/profile identities and actual
 before/after values. No native execution, full original parity, publication or
 release acceptance follows from this author packet.
+
+## Targeted mounted-ray receipt correction
+
+Whole-source review of Root `b5150cae85868c5768ee4b6757d8bf7352654e7e`, tree
+`71e9163d39ee19039c5ac998fc809fb2d7698baa`, found P2: player-to-NPC and
+missile-interception history could select another genuinely fitted equal-type
+laser after coordinated item/facing relabelling, while retaining the old ray.
+This correction starts at that exact combined laser/ECM source. It retains ECM,
+all three 2d5 extractions and all existing collision/resource/save gates.
+
+`MountedLaserEmission` records the actual command-time rigid body pose, selected
+facing and physical clock. The sole World producer captures it independently of
+the ray. Player-to-NPC `TrafficBeam` has this evidence; NPC-generated traffic beams
+must have none. Interception `Beam` always retains it. The cold reader checks a
+finite valid body basis, exact origin and exact signed facing-derived direction,
+actual historical fitted item/slot/profile, and exact shared damage-event
+physical clock/facing/item/weapon. Same-tick receipts additionally match the live
+World body and clock. Interception native geometry now derives its ray directly
+from retained body/facing rather than reconstructing a body from a stored ray.
+Existing native nearest contact, occlusion, projectile/scene/emission identity,
+weapon resources and whole-save budget remain authoritative and unchanged.
+
+The evidence adds 105 bytes (clock, facing and twelve binary64 body components).
+Traffic's optional field adds its presence byte; interception has mandatory
+evidence. Existing resource events remain nine bytes. The private current-format
+fingerprint changes with a distinct mounted-receipt marker, so old content
+refuses before decoding. There is no migration, fallback or inferred facing.
+
+Two meaningful regressions are authored **UNRUN**. Both buy distinct Left and
+Right Pulse items through actual paid transactions using the existing genuinely
+earned, completed G02/finite-market pilot, with no XYZZY funding or fabricated
+NPC/ammunition producer. One lures and hits a real native attacker with the paid
+Right laser. The other returns to Avenor, consents to real practice, flies beyond
+the beacons, launches a real owned missile, turns through public yaw controls and
+intercepts its still-airborne native body with the paid Right laser.
+
+Each positive receipt advances one real tick and cold-loads before corruption,
+so a current-tick body check alone cannot satisfy the case. Negative controls
+coordinate damage-event facing with the other paid item, then also alter the new
+receipt-facing field, retaining the real body/ray/endpoint/emission evidence.
+They require checked save, cold load and live restore refusal with unchanged
+original bytes. Another control changes the retained physical clock. No test
+creates a positive body, actor, hit, resource spend or incoming NPC missile.
+
+The existing traffic-only unit fixture supplies an explicit rigid body and its
+forward direction for the newly required input. It remains a component fixture,
+not a public journey. Existing EMP paid/defender helper bodies and assertions are
+unchanged; only test visibility is widened for reuse. The existing P1 missing
+`ecm` clone in the EMP control fork remains Root's separately assigned correction.
+This P2 source is not a whole-source compiler-clear claim. No compiler, Cargo,
+Clippy, Rust/helper, native, GPU or review bot was run by this author.

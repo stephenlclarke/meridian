@@ -18,7 +18,7 @@ fn equipment(w: &mut World, action: EmpEquipmentAction) {
     assert_eq!(w.emp_snapshot(), candidate.emp_snapshot());
     assert_eq!(w.credits_tenths(), candidate.credits_tenths());
 }
-fn paid() -> World {
+pub(in crate::flight) fn paid() -> World {
     let mut w = World::new_commander(16101).unwrap();
     let issuer = w.station_contacts()[0];
     w.request_contact(issuer, w.snapshot().tick).unwrap();
@@ -379,7 +379,7 @@ fn aim_input(w: &World, target: crate::traffic::NpcId) -> FlightInput {
         ..FlightInput::default()
     }
 }
-fn defender(mut w: World) -> (World, crate::traffic::NpcId) {
+pub(in crate::flight) fn defender(mut w: World) -> (World, crate::traffic::NpcId) {
     w.request_station_service(crate::station_services::Command::BuyFood, w.snapshot().tick)
         .unwrap();
     launch(&mut w);

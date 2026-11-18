@@ -205,6 +205,7 @@ struct Motion {
 }
 #[derive(Debug, Clone, PartialEq)]
 struct Beam {
+    mounted_emission: super::MountedLaserEmission,
     shot: super::PulseShot,
     emission: u64,
     npc_scene: Option<crate::traffic::MissileScene>,
@@ -299,7 +300,11 @@ impl State {
         emission: u64,
         shot: super::PulseShot,
         npc_scene: crate::traffic::MissileScene,
+        mounted_emission: super::MountedLaserEmission,
     ) -> bool {
+        if !mounted_emission.matches_ray(shot.origin, shot.direction) {
+            return false;
+        }
         let bodies = self.bodies();
         for p in self.projectiles.iter_mut().flatten() {
             if p.origin.projectile == id && p.ended.is_none() {
@@ -307,6 +312,7 @@ impl State {
                 p.last_tick = tick;
                 p.intercepting_emission = Some(emission);
                 self.beams[usize::from(id.ordinal)] = Some(Beam {
+                    mounted_emission,
                     shot,
                     emission,
                     bodies,
@@ -966,6 +972,42 @@ impl State {
             .iter()
             .flatten()
             .any(|beam| beam.emission == emission)
+    }
+}
+
+impl State {
+    pub(in crate::flight) fn laser_interception_emissions(
+        &self,
+    ) -> impl Iterator<Item = (u64, u64, u64, super::MountedLaserEmission)> + '_ {
+        self.beams.iter().flatten().map(|beam| {
+            (
+                beam.emission,
+                beam.shot.tick,
+                beam.shot.fitted_item_id,
+                beam.mounted_emission,
+            )
+        })
+    }
+}
+
+#[cfg(test)]
+impl State {
+    /// Negative control only: changes an already emitted interception, never creates one.
+    pub(in crate::flight) fn corrupt_intercepting_laser(
+        &mut self,
+        emission: u64,
+        corrupt: impl FnOnce(&mut super::PulseShot, &mut super::MountedLaserEmission),
+    ) -> bool {
+        let Some(beam) = self
+            .beams
+            .iter_mut()
+            .flatten()
+            .find(|beam| beam.emission == emission)
+        else {
+            return false;
+        };
+        corrupt(&mut beam.shot, &mut beam.mounted_emission);
+        true
     }
 }
 

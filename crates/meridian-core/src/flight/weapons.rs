@@ -588,6 +588,7 @@ impl World {
                     self.state.tick,
                     crate::traffic::SceneStage::Command(impact.emission() - 1),
                 ),
+                self.mounted_laser_emission(facing)?,
             )
         {
             return Err(FireError::InvalidGeometry);

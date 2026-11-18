@@ -478,9 +478,19 @@ fn validate_laser_receipts(
             .checked_sub(beam.world_tick)
             .ok_or(INVALID)?;
         let since_shot = end.checked_sub(shot.clock).ok_or(INVALID)?;
-        if (shot.weapon, shot.item) != (beam.weapon, item)
+        let mounted = beam.mounted_emission.ok_or(INVALID)?;
+        if (shot.weapon, shot.item, shot.clock, shot.facing)
+            != (beam.weapon, item, mounted.physical_tick, mounted.facing)
             || shot.clock > beam.world_tick
             || since_shot > elapsed
+        {
+            return Err(INVALID);
+        }
+    }
+    for (emission, tick, item, mounted) in world.missiles.laser_interception_emissions() {
+        let shot = spend(emission)?;
+        if (shot.item, shot.facing, shot.clock) != (item, mounted.facing, mounted.physical_tick)
+            || world.laser_profile_at_tick(item, tick, mounted.facing) != Some(shot.weapon)
         {
             return Err(INVALID);
         }
@@ -603,3 +613,6 @@ fn advance(pools: &mut Pools, elapsed: u64) {
 
 #[cfg(test)]
 mod rapid_energy_tests;
+
+#[cfg(test)]
+mod mounted_ray_tests;
