@@ -1,6 +1,7 @@
 #[path = "sections.rs"]
 mod sections;
 
+use crate::BudgetPhase;
 use crate::exact::{add, area, cross, dot, orient, point, project, scale, sub};
 use crate::planes::{CachedRay, PlaneGroups, RayCaches};
 use crate::region::PackedRegion;
@@ -798,10 +799,21 @@ fn node_cell(
 ) -> Result<Cell, Failure> {
     let mut result = Vec::new();
     for i in 0..cell.len() {
+        b.state([cell.len(), all_points.len(), result.len(), 0, i, 0, 0, 0]);
         let a = face.lift(&cell[i], b)?;
         let c = face.lift(&cell[(i + 1) % cell.len()], b)?;
         let mut cuts = BTreeSet::new();
         for p in all_points {
+            b.state([
+                cell.len(),
+                all_points.len(),
+                result.len(),
+                cuts.len(),
+                i,
+                0,
+                0,
+                0,
+            ]);
             if on_segment(&a, &c, p, b)? {
                 b.guard(16 * (result.len() + cuts.len() + cell.len() + 1))?;
                 log_cost(cuts.len(), b)?;
@@ -825,6 +837,7 @@ fn triangulate(mut cell: Cell, b: &mut Budget) -> Result<Vec<[Point2; 3]>, Failu
     let expected = area(&cell, b)?;
     let mut result = Vec::new();
     while cell.len() > 3 {
+        b.state([cell.len(), result.len(), 0, 0, 0, 0, 0, 0]);
         b.guard(16 * (cell.len() + result.len() + 1))?;
         let mut ear = None;
         for i in 0..cell.len() {
@@ -936,6 +949,7 @@ fn facet_stars(
     protected: &BTreeSet<Point2>,
     b: &mut Budget,
 ) -> Result<Vec<ContactStar>, Failure> {
+    b.state([triangles.len(), protected.len(), 0, 0, 0, 0, 0, 0]);
     b.guard(64 * triangles.len() + 64)?;
     let mut stars: BTreeMap<Point2, Vec<[Point2; 2]>> = BTreeMap::new();
     let mut incidence: BTreeMap<[Point2; 2], Vec<bool>> = BTreeMap::new();
@@ -1008,6 +1022,11 @@ impl InputIdentityMaps {
 /// including all disconnected sheets of each component. Every output triangle
 /// retains one original facet and its complete affine field.
 pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure> {
+    b.with_phase(BudgetPhase::InputAudit, |b| {
+        reconstruct_records(originals, b)
+    })
+}
+fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure> {
     if originals.is_empty() {
         return Err(b.fail(FailureKind::InvalidInput, "missing original components"));
     }
@@ -1028,20 +1047,41 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
         }
         owners.insert(face.id().component);
     }
-    audit_original_owner_ranges(originals, &owners, b)?;
-    audit_original_sheets(originals, b)?;
+    b.with_phase(BudgetPhase::InputAudit, |b| {
+        audit_original_owner_ranges(originals, &owners, b)
+    })?;
+    b.with_phase(BudgetPhase::InputAudit, |b| {
+        audit_original_sheets(originals, b)
+    })?;
     // One owner map plus the two transient facet boxes. Source audit maps
     // have already been released, and this map releases before final noding.
     let bounds_members = 11 * owners.len() + 32;
     // Both authenticated identity sets have reached their last use. Their
     // original geometry/style records remain admitted for all later phases.
     input_members -= InputIdentityMaps { ids, owners }.release(b);
+    b.phase(BudgetPhase::Index);
+    b.state([
+        input_members,
+        bounds_members,
+        originals.len(),
+        0,
+        0,
+        0,
+        0,
+        0,
+    ]);
     b.retain(bounds_members)?;
     let facet_bounds_members = FacetBoundsIndex::memberships(originals.len());
     b.retain(facet_bounds_members)?;
-    let facet_bounds = FacetBoundsIndex::build(originals, b)?;
-    let owner_bounds = component_bounds(originals, &facet_bounds.facets, b)?;
-    let plane_groups = build_plane_groups(originals, &owner_bounds, b)?;
+    let facet_bounds = b.with_phase(BudgetPhase::Index, |b| {
+        FacetBoundsIndex::build(originals, b)
+    })?;
+    let owner_bounds = b.with_phase(BudgetPhase::Index, |b| {
+        component_bounds(originals, &facet_bounds.facets, b)
+    })?;
+    let plane_groups = b.with_phase(BudgetPhase::Index, |b| {
+        build_plane_groups(originals, &owner_bounds, b)
+    })?;
     let plane_members = plane_groups.as_ref().map_or(0, PlaneGroups::memberships);
     let mut ray_caches = RayCaches::new(b)?;
     let mut occupancy_index = OccupancyIndex {
@@ -1054,46 +1094,66 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
     let mut point_members = 0;
     let mut held = 0usize;
     for (face, face_bounds) in originals.iter().zip(&facet_bounds.facets) {
+        b.phase(BudgetPhase::Sections);
+        b.state([input_members, point_members, held, 0, 0, 0, 0, 0]);
         b.at(face.id());
         let mut domain = face.domain().to_vec();
         if area(&domain, b)?.is_negative() {
             domain.reverse();
         }
-        let (barriers, coplanar, sections) = b.with_retained(16, |local| {
-            sections::Frame::collect(
-                face,
-                face_bounds,
-                originals,
-                &owner_bounds,
-                &facet_bounds,
-                local,
-            )
+        let (barriers, coplanar, sections) = b.with_phase(BudgetPhase::Sections, |b| {
+            b.with_retained(16, |local| {
+                sections::Frame::collect(
+                    face,
+                    face_bounds,
+                    originals,
+                    &owner_bounds,
+                    &facet_bounds,
+                    local,
+                )
+            })
         })?;
         // Transfer barrier ownership to the arrangement's existing input bound.
         // Its coplanar scope below admits those references for classification.
         b.release(8 * barriers.len() + coplanar.len());
         let section_members = sections.memberships();
-        let arrangement_result = b.with_retained(coplanar.len(), |budget| {
-            let result =
-                Arrangement::build_accounted(&domain, &barriers, budget, |sample, local| {
-                    match sections.occupied(sample, local)? {
-                        Some(true) => Ok(false),
-                        Some(false) => sections::fields_visible(face, sample, &coplanar, local),
-                        // Keep the independent generic ray policy for a boundary
-                        // sample. The accounted callback admits its live scratch.
-                        None => visible(
-                            face,
-                            sample,
-                            originals,
-                            &owner_bounds,
-                            &mut occupancy_index,
-                            &coplanar,
-                            local,
-                        ),
-                    }
-                });
-            drop(coplanar);
-            result
+        let arrangement_result = b.with_phase(BudgetPhase::ArrangementSetup, |b| {
+            b.with_retained(coplanar.len(), |budget| {
+                let result =
+                    Arrangement::build_accounted(&domain, &barriers, budget, |sample, local| {
+                        match local.with_phase_state(
+                            BudgetPhase::Occupancy,
+                            local.state_values(),
+                            |b| sections.occupied(sample, b),
+                        )? {
+                            Some(true) => Ok(false),
+                            Some(false) => local.with_phase_state(
+                                BudgetPhase::Fields,
+                                local.state_values(),
+                                |b| sections::fields_visible(face, sample, &coplanar, b),
+                            ),
+                            // Keep the independent generic ray policy for a boundary
+                            // sample. The accounted callback admits its live scratch.
+                            None => local.with_phase_state(
+                                BudgetPhase::Occupancy,
+                                local.state_values(),
+                                |local| {
+                                    visible(
+                                        face,
+                                        sample,
+                                        originals,
+                                        &owner_bounds,
+                                        &mut occupancy_index,
+                                        &coplanar,
+                                        local,
+                                    )
+                                },
+                            ),
+                        }
+                    });
+                drop(coplanar);
+                result
+            })
         });
         drop(sections);
         b.release(section_members);
@@ -1104,6 +1164,17 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
         if arrangement.cells.is_empty() {
             continue;
         }
+        b.phase(BudgetPhase::GlobalPoints);
+        b.state([
+            point_members,
+            held,
+            arrangement.cells.len(),
+            arrangement.physical.len(),
+            arrangement.protected.len(),
+            0,
+            0,
+            0,
+        ]);
         let reserve = PackedRegion::raw_memberships(
             &arrangement.cells,
             arrangement.physical.len(),
@@ -1119,6 +1190,7 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
             let p = face.lift(p, b)?;
             // The global noding pool stays live during later region packing.
             // Provision one record before insertion; duplicates release it.
+            b.state([point_members, held, all_points.len(), reserve, 0, 0, 0, 0]);
             b.retain(8)?;
             log_cost(all_points.len(), b)?;
             if all_points.insert(p) {
@@ -1127,7 +1199,7 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
                 b.release(8);
             }
         }
-        let region = PackedRegion::pack(arrangement, b)?;
+        let region = b.with_phase(BudgetPhase::Packing, |b| PackedRegion::pack(arrangement, b))?;
         b.release(reserve);
         held += region.memberships();
         regions.push((face, region));
@@ -1141,6 +1213,17 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
     let mut triangles = Vec::new();
     let mut witnesses = Vec::new();
     for (source, region) in regions {
+        b.phase(BudgetPhase::Noding);
+        b.state([
+            input_members,
+            point_members,
+            held,
+            region.memberships(),
+            region.expanded_memberships(),
+            0,
+            0,
+            0,
+        ]);
         b.at(source.id());
         let packed_members = region.memberships();
         let expanded_members = region.expanded_memberships();
@@ -1153,12 +1236,16 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
         let mut expected = integer(0);
         for cell in &arrangement.cells {
             expected += area(cell, b)?;
-            let noded = node_cell(source, cell, &all_points, b)?;
-            let new = triangulate(noded, b)?;
+            let noded = b.with_phase(BudgetPhase::Noding, |b| {
+                node_cell(source, cell, &all_points, b)
+            })?;
+            let new = b.with_phase(BudgetPhase::Triangulation, |b| triangulate(noded, b))?;
             b.guard(32 * (planar.len() + new.len() + 1))?;
             planar.extend(new);
         }
-        let stars = facet_stars(&planar, &arrangement.protected, b)?;
+        let stars = b.with_phase(BudgetPhase::ContactStars, |b| {
+            facet_stars(&planar, &arrangement.protected, b)
+        })?;
         // Every exposed protected point must survive in the actual output mesh.
         for p in &arrangement.protected {
             let mut in_region = false;
@@ -1175,6 +1262,17 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
                 ));
             }
         }
+        b.phase(BudgetPhase::Witness);
+        b.state([
+            expanded_members,
+            planar.len(),
+            stars.len(),
+            arrangement.cells.len(),
+            arrangement.physical.len(),
+            arrangement.protected.len(),
+            0,
+            0,
+        ]);
         let witness_members = incoming_witness_memberships(
             &arrangement.cells,
             arrangement.physical.len(),
@@ -1234,13 +1332,15 @@ pub fn reconstruct(originals: &[Facet], b: &mut Budget) -> Result<Hull, Failure>
         b.release(expanded_members);
         // The final witness is already retained above. Public standalone verify
         // reserves independently owned input; use the admitted path here.
-        witness.verify_admitted(source, b)?;
+        b.with_phase(BudgetPhase::Witness, |b| witness.verify_admitted(source, b))?;
         witnesses.push(witness);
     }
     if triangles.is_empty() {
         return Err(b.fail(FailureKind::InvalidWitness, "lost entire original exterior"));
     }
-    audit_closed(triangles.iter(), false, b)?;
+    b.with_phase(BudgetPhase::Topology, |b| {
+        audit_closed(triangles.iter(), false, b)
+    })?;
     let mut volume = integer(0);
     for face in &triangles {
         b.at(face.id());
@@ -1284,6 +1384,7 @@ fn incoming_witness_memberships(
     // Each point includes its containing membership and both coordinates.
     let mut total = 8usize;
     let mut add = |count: usize, width: usize, budget: &mut Budget| -> Result<(), Failure> {
+        budget.state([total, count, width, 0, 0, 0, 0, 0]);
         budget.step(1)?;
         total = count
             .checked_mul(width)
@@ -1310,16 +1411,18 @@ fn incoming_witness_memberships(
 impl FacetWitness {
     /// Recheck the actual region, contact intervals and vertex links before publication.
     pub fn verify(&self, source: &Facet, b: &mut Budget) -> Result<(), Failure> {
-        b.at(source.id());
-        let members = incoming_witness_memberships(
-            &self.classified_cells,
-            self.physical_segments.len(),
-            self.protected_points.len(),
-            self.output_triangles.len(),
-            &self.contact_stars,
-            b,
-        )?;
-        b.with_retained(members, |budget| self.verify_admitted(source, budget))
+        b.with_phase(BudgetPhase::Witness, |b| {
+            b.at(source.id());
+            let members = incoming_witness_memberships(
+                &self.classified_cells,
+                self.physical_segments.len(),
+                self.protected_points.len(),
+                self.output_triangles.len(),
+                &self.contact_stars,
+                b,
+            )?;
+            b.with_retained(members, |budget| self.verify_admitted(source, budget))
+        })
     }
 
     fn verify_admitted(&self, source: &Facet, b: &mut Budget) -> Result<(), Failure> {

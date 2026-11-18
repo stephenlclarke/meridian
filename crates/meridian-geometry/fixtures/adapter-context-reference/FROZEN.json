@@ -1,0 +1,42 @@
+{
+  "phase": "BEFORE_ADAPTER_CONTEXT_SOURCE_AUTHORING",
+  "parentAuthorHead": "41aae99bb2c0e76c21870502349e2bd894aace8f",
+  "files": {
+    "compiled-before-adapter.rs": {
+      "bytes": 6373,
+      "sha256": "bcde9b9381901bbe2cb55496600facb4aa3eeb19123323863c198c0243c7a107"
+    },
+    "before-section_arrangement.rs": {
+      "bytes": 14710,
+      "sha256": "28218a210d66b67310129d90dbc057a11eb2a432df670fcd8aad6bf63c8b2ba3"
+    },
+    "before-adapter.rs": {
+      "bytes": 10791,
+      "sha256": "5ba59921621975a568de7d98223ebbb5eaadc27ed8826f3ceafedf46d19cb2cb"
+    },
+    "before-sections.rs": {
+      "bytes": 37466,
+      "sha256": "40e48871e16b50d49a5eba5c8900827fa4dd85a055b6acb6b845a3a96c688c13"
+    },
+    "CASES.json": {
+      "bytes": 1882,
+      "sha256": "67f34c0813fdd73ffce44801ef667eb91f2b4f5dc9896ac0d5dae2ac663f244d"
+    },
+    "before-bin-original_five.rs": {
+      "bytes": 29070,
+      "sha256": "847c620967c351661d80eb72877bc5bcda05e4c47e5069a831f9bb3afdbeb1ce"
+    },
+    "before-budget.rs": {
+      "bytes": 4303,
+      "sha256": "9d575d308b4c1bdba503c7fd1152f6577e73dbfb9ded1e9e50e5602713dbc3a6"
+    },
+    "before-region.rs": {
+      "bytes": 8601,
+      "sha256": "5439b49e450781261168187b7b52cf447087864979ab21e5f746b14ec1775a61"
+    },
+    "before-certificate.rs": {
+      "bytes": 79051,
+      "sha256": "7ec52d0f0a9a9945016ea25b3769c3cb442906e234396b7e47d01ac11a17e71d"
+    }
+  }
+}

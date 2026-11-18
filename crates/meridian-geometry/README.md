@@ -161,3 +161,9 @@ The new correction drops the original facet-ID and owner-ID sets immediately aft
 The identity-map lifetime revision passed 45 Rust tests, nine host tests, check, strict Clippy and dev build. Its original-five run stayed UNRUN. The last original batch still has two Storage and three Operations refusals and zero complete candidates.
 
 Original topology auditing now verifies ascending owner runs and audits each borrowed facet slice with the unchanged per-owner checks. Unordered input uses the prior collector. This removes two full input scans per owner from the ordered path and saves 71,467 charged operations before the previous SH016/SH017 refusal points and 56,287 before SH166. These are source-derived prefix reductions only. The 47 Rust tests and nine host tests on this revision are UNRUN. [The derivation and limits](integration/owner-ranges/ALGORITHM.md) preserve the exact old failures and remain separate from any later full-fit result.
+
+## Authenticated style lookup and refusal context
+
+The owner-range revision passed 47 Rust tests and nine host tests. Its original-five run still refused every constructor and returned zero hulls. The adapter now looks up each authenticated canonical style encoding before repeating hexadecimal decoding. This removes 38,228 charged operations for SH010/011, 41,572 for SH016/017 and 37,316 for SH166 before construction.
+
+Budget also retains its first rejected charge with the caller, active phase, stage work totals and exact retained/requested values before cleanup. The actual adapter publishes that snapshot in the case report. The 50 Rust tests and nine host tests for this revision are UNRUN pending review and owner execution. [The source-derived work, schema and independent comparisons](integration/adapter-context/CONTRACT.md) define the validation scope.

@@ -238,6 +238,21 @@
       "file": "src/owner_range_tests.rs",
       "name": "owner_order_fallback_keeps_original_semantic_refusal_and_source",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/adapter_context_tests.rs",
+      "name": "authenticated_encoded_styles_match_frozen_decoding_and_remove_only_repeated_hex_work",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/adapter_context_tests.rs",
+      "name": "rejected_budget_snapshot_survives_scope_cleanup_with_exact_stage_charges",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/bin/original_five.rs",
+      "name": "adapter_serializes_resource_rejection_without_publishing_candidate",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -570,6 +585,30 @@
       56287
     ],
     "newTestCount": 47,
+    "currentExecution": "UNRUN"
+  },
+  "adapterBudgetContextCorrection": {
+    "qualifiedRoot": "09842c9762eb36cc06dc01df55db2a432cb5423b",
+    "qualifiedTree": "914216fe229eecf224483f21691ba353bd70fe48",
+    "parentRustPass": 47,
+    "parentHostPass": 9,
+    "parentOriginalScope25": {
+      "PASS": 5,
+      "REFUSED": 5,
+      "UNRUN": 15
+    },
+    "sourcePrefixSavings": [
+      38228,
+      38228,
+      41572,
+      41572,
+      37316
+    ],
+    "exactFirstRejectionBeforeCleanup": true,
+    "all47PriorTestsPreserved": true,
+    "deltaSHA256": "c4b50ddd17db944ec324f42aa6a26109e43bbb848ef747b6fd451617625b96e4",
+    "beforeSUTFreezeSHA256": "4d8a6c1e3eeb6594b3a31c277ba1ced68d412beee43578a021c0874b066027a2",
+    "newTestCount": 50,
     "currentExecution": "UNRUN"
   }
 }

@@ -2,6 +2,7 @@
 //! This mechanically matched copy keeps the historical public `build` oracle
 //! byte exact. Only callback lifetime admission and the entry name differ;
 //! sealing checks the normalized source against the immutable parent.
+use crate::BudgetPhase;
 use crate::exact::{add, area, cross2, orient, point, scale, sub};
 use crate::{
     Arrangement, ArrangementWork, Budget, Cell, Failure, FailureKind, Point2, Rational, Segment,
@@ -79,6 +80,16 @@ impl Arrangement {
     where
         F: FnMut(&Point2, &mut Budget) -> Result<bool, Failure>,
     {
+        b.state([
+            domain.len() * 4 + barriers.len() * 6 + 64,
+            barriers.len(),
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+        ]);
         b.step(1)?;
         b.guard(domain.len())?;
         b.guard(barriers.len())?;
@@ -116,6 +127,16 @@ impl Arrangement {
             .chain(barriers.iter().cloned())
         {
             if let Some(value) = clip(domain, &segment, b)? {
+                b.state([
+                    base,
+                    segments.len(),
+                    0,
+                    protected.len(),
+                    events.len(),
+                    0,
+                    0,
+                    0,
+                ]);
                 b.guard(base + 32 * (segments.len() + protected.len() + events.len() + 1))?;
                 tree_work(segments.len(), b)?;
                 for p in &value {
@@ -135,6 +156,16 @@ impl Arrangement {
             if a[0] != c[0] {
                 continue;
             }
+            b.state([
+                base,
+                segments.len(),
+                physical.len(),
+                protected.len(),
+                events.len(),
+                0,
+                0,
+                0,
+            ]);
             b.guard(
                 base + 32 * (segments.len() + protected.len() + events.len() + physical.len() + 1),
             )?;
@@ -169,12 +200,43 @@ impl Arrangement {
                 }
             }
         }
+        b.state([
+            base,
+            segments.len(),
+            physical.len(),
+            protected.len(),
+            events.len(),
+            0,
+            0,
+            0,
+        ]);
         b.guard(
             base + 32 * (segments.len() + protected.len() + events.len() + physical.len() + 1),
         )?;
         let ordered: Vec<_> = segments.into_iter().collect();
+        b.phase(BudgetPhase::ArrangementPairs);
+        b.state([
+            base,
+            ordered.len(),
+            physical.len(),
+            protected.len(),
+            events.len(),
+            0,
+            0,
+            0,
+        ]);
         for (i, [a, c]) in ordered.iter().enumerate() {
             for [d, e] in &ordered[i + 1..] {
+                b.state([
+                    base,
+                    ordered.len(),
+                    physical.len(),
+                    protected.len(),
+                    events.len(),
+                    work.segment_pairs as usize,
+                    0,
+                    0,
+                ]);
                 b.step(1)?;
                 work.segment_pairs += 1;
                 let first = sub(c, a);
@@ -210,6 +272,7 @@ impl Arrangement {
         let mut cells = Vec::new();
         let mut active: BTreeMap<[Rational; 3], Run> = BTreeMap::new();
         let mut members = 0;
+        b.phase(BudgetPhase::ArrangementSlabs);
         for event in events.windows(2) {
             b.step(1)?;
             work.slabs += 1;
@@ -223,6 +286,16 @@ impl Arrangement {
                 }
                 let slope = (&c[1] - &a[1]) / (&c[0] - &a[0]);
                 let intercept = &a[1] - &slope * &a[0];
+                b.state([
+                    base,
+                    ordered.len(),
+                    physical.len(),
+                    protected.len(),
+                    events.len(),
+                    members,
+                    levels.len(),
+                    active.len(),
+                ]);
                 b.guard(base + 16 * (members + levels.len() + 1))?;
                 tree_work(levels.len(), b)?;
                 levels.insert(&slope * &middle + &intercept, [slope, intercept]);
@@ -238,6 +311,16 @@ impl Arrangement {
                 }
                 b.step(1)?;
                 work.classified_cells += 1;
+                b.state([
+                    base,
+                    ordered.len(),
+                    physical.len(),
+                    protected.len(),
+                    events.len(),
+                    members,
+                    levels.len(),
+                    following.len() + active.len(),
+                ]);
                 let exposed = b.with_retained(
                     base + 16 * (members + levels.len() + following.len() + active.len() + 1),
                     |local| visible(&sample, local),
@@ -299,6 +382,16 @@ impl Arrangement {
                     },
                 };
                 members += 4;
+                b.state([
+                    base,
+                    ordered.len(),
+                    physical.len(),
+                    protected.len(),
+                    events.len(),
+                    members,
+                    levels.len(),
+                    following.len() + active.len(),
+                ]);
                 b.guard(base + 16 * (members + levels.len() + following.len() + active.len() + 1))?;
                 if lo_right[1] < hi_right[1] {
                     tree_work(following.len(), b)?;

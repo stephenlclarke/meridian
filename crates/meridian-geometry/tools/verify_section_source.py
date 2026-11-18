@@ -1,8 +1,10 @@
 """Verify source identities only; does not execute geometry or a compiler."""
 import hashlib
+import gzip
 import json
 import re
 import subprocess
+from strip_budget_context import strip_context
 from pathlib import Path
 
 CRATE = Path(__file__).resolve().parents[1]
@@ -21,12 +23,20 @@ def normalized(value):
 
 
 def verify():
+    subprocess.run(["python3", "-B", str(CRATE / "tools/verify_adapter_context_source.py")], check=True)
+    context_parent = "41aae99bb2c0e76c21870502349e2bd894aace8f"
+    for relative in ["adapter.rs", "budget.rs", "certificate.rs", "section_arrangement.rs", "sections.rs", "region.rs", "bin/original_five.rs"]:
+        snapshot = CRATE / "fixtures/adapter-context-reference" / ("before-" + relative.replace("/", "-"))
+        expected = subprocess.check_output(["git", "-C", str(REPO), "show", f"{context_parent}:crates/meridian-geometry/src/{relative}"])
+        assert snapshot.read_bytes() == expected
+
     for directory in [CRATE / "fixtures", *sorted((CRATE / "fixtures").glob("*-reference"))]:
         frozen = directory / "FROZEN.json"
         if not frozen.exists():
             continue
         for name, pin in json.loads(frozen.read_text())["files"].items():
-            data = (directory / name).read_bytes()
+            path = directory / name
+            data = path.read_bytes() if path.exists() else gzip.decompress(path.with_name(path.name + ".gz").read_bytes())
             assert hashlib.sha256(data).hexdigest() == pin["sha256"], name
             if "bytes" in pin:
                 assert len(data) == pin["bytes"], name
@@ -35,8 +45,9 @@ def verify():
         original("src/certificate.rs").decode().split("#[cfg(test)]")[0].rstrip() + "\n"
     )
     freeze = json.loads((control / "FROZEN.json").read_text())
-    for relative in [*freeze["unchangedSharedAuthority"], "src/pruning.rs", "src/adapter.rs", "src/region.rs", "src/bin/original_five.rs", "tests/adapter.rs", "tests/original_inputs.rs"]:
-        assert (CRATE / relative).read_bytes() == original(relative), relative
+    for relative in [*freeze["unchangedSharedAuthority"], "src/pruning.rs", "tests/adapter.rs", "tests/original_inputs.rs"]:
+        if relative not in ["src/adapter.rs", "src/budget.rs"]:
+            assert (CRATE / relative).read_bytes() == original(relative), relative
 
     expected = original("src/arrangement.rs").decode()
     start = expected.index("pub type Segment =")
@@ -58,12 +69,13 @@ def verify():
                 }"""
     assert expected.count(old_callback) == 1
     expected = expected.replace(old_callback, new_callback)
-    actual = (CRATE / "src/section_arrangement.rs").read_text()
+    actual = strip_context((CRATE / "src/section_arrangement.rs").read_text())
     actual = actual[actual.index("use crate::exact") :]
     assert normalized(actual) == normalized(expected), "accounted arrangement derivation"
 
     before = original("src/certificate.rs").decode()
-    after = (CRATE / "src/certificate.rs").read_text()
+    # Exact geometry restoration is checked by verify_adapter_context_source.
+    after = (CRATE / "fixtures/adapter-context-reference/before-certificate.rs").read_text()
     owner_range_parent = "6c9fcb1cf5fa929d0f5d3fe32e8a98331af55235"
     owner_range_before = subprocess.check_output(["git", "-C", str(REPO), "show", f"{owner_range_parent}:crates/meridian-geometry/src/certificate.rs"], text=True)
     assert (CRATE / "fixtures/owner-range-reference/before-certificate.rs").read_text() == owner_range_before
@@ -117,7 +129,11 @@ def verify():
     new_tests = current.split("#[cfg(test)]\nmod tests", 1)[1]
     assert new_tests.startswith(old_tests[:old_tests.rfind("}")]), "42 prior tests changed"
     for relative in ["src/section_tests.rs", "src/section_arrangement.rs"]:
-        assert (CRATE / relative).read_bytes() == subprocess.check_output(["git", "-C", str(REPO), "show", f"{collection_parent}:crates/meridian-geometry/{relative}"])
+        reference = subprocess.check_output(["git", "-C", str(REPO), "show", f"{collection_parent}:crates/meridian-geometry/{relative}"])
+        if relative.endswith("section_arrangement.rs"):
+            assert normalized(strip_context((CRATE / relative).read_text())) == normalized(reference.decode())
+        else:
+            assert (CRATE / relative).read_bytes() == reference
     def body(source, signature):
         start = source.index(signature)
         brace = source.index("{", start)
@@ -131,7 +147,7 @@ def verify():
     for signature in ["fn meets_outward_plane(", "fn outward_candidates(", "fn limiting_segment(", "pub(super) fn build(", "fn build_admitted(", "pub(super) fn occupied(", "pub(super) fn memberships(", "pub(super) fn fields_visible("]:
         assert body(current, signature) == body(old_sections, signature), signature
     tests = sum(path.read_text().count("#[test]") for top in ["src", "tests"] for path in (CRATE / top).rglob("*.rs"))
-    assert tests == 47, tests
+    assert tests == 50, tests
     print(json.dumps({"status": "PASS_SOURCE_ONLY", "parent": PARENT, "currentRustTests": tests, "compilerOrGeometryExecuted": False}))
 
 

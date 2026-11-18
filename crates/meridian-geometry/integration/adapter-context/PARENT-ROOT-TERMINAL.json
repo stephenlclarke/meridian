@@ -1,0 +1,117 @@
+{
+  "source": "09842c9762eb36cc06dc01df55db2a432cb5423b",
+  "tree": "914216fe229eecf224483f21691ba353bd70fe48",
+  "terminalFirstObservedAt": "2026-11-17T12:26:44.745135+00:00",
+  "actualTerminalUTC": null,
+  "actualMonotonicNanoseconds": 132319671459,
+  "rootAfterStart": "/Users/sclarke/.codex/visualizations/2026/10/13/01a134a1-be40-77d0-9e11-64a775729232/evidence/MERIDIAN-09842C9-FLEET-OWNER-RANGES/ROOT-AFTER-START.json",
+  "handoff": {
+    "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.09842c9/evidence/GEOMETRY-EXECUTION-HANDOFF.json",
+    "bytes": 23175,
+    "sha256": "025bcd5ec2264af478dbb8de783bcb98c94250cb40b07edb27bba53694285c00"
+  },
+  "wholeFiveArtifacts": {
+    "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.09842c9/whole-five/ARTIFACTS.json",
+    "bytes": 2142,
+    "sha256": "b1c69847814462fc680d7c00a7728a0e7b32cf7b00478ef3f4abfcc616736a8b"
+  },
+  "binary": {
+    "path": "/Volumes/SSD/offload/meridian-g1-mbp-geometry.09842c9/original_five",
+    "bytes": 5832256,
+    "sha256": "c05a3aa6cb9b7e296e546bf20ff15cea45544f4df7ce9c73177033b2dc41d977"
+  },
+  "verifiedWholeFiveFiles": 14,
+  "scope": 25,
+  "counts": {
+    "PASS": 5,
+    "REFUSED": 5,
+    "UNRUN": 15
+  },
+  "semanticFail": 0,
+  "candidates": 0,
+  "fleetAdmissions": 0,
+  "rows": {
+    "SH010": {
+      "failure": {
+        "kind": "Storage",
+        "source": [
+          6,
+          8
+        ],
+        "operationsAtRefusal": 1707938,
+        "detail": "exact storage budget exhausted"
+      },
+      "operations": 1707938,
+      "peakStorageMemberships": 100013,
+      "peakAdmittedReservationMemberships": 99981,
+      "retainedBudgetMembershipsAtTerminal": 73844,
+      "monotonicNanoseconds": 28321270542
+    },
+    "SH011": {
+      "failure": {
+        "kind": "Storage",
+        "source": [
+          6,
+          8
+        ],
+        "operationsAtRefusal": 1700779,
+        "detail": "exact storage budget exhausted"
+      },
+      "operations": 1700779,
+      "peakStorageMemberships": 100028,
+      "peakAdmittedReservationMemberships": 99996,
+      "retainedBudgetMembershipsAtTerminal": 73405,
+      "monotonicNanoseconds": 28207050708
+    },
+    "SH016": {
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          11,
+          36
+        ],
+        "operationsAtRefusal": 2000003,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000003,
+      "peakStorageMemberships": 92504,
+      "peakAdmittedReservationMemberships": 92504,
+      "retainedBudgetMembershipsAtTerminal": 88764,
+      "monotonicNanoseconds": 23767191500
+    },
+    "SH017": {
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          11,
+          31
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "peakStorageMemberships": 92130,
+      "peakAdmittedReservationMemberships": 92130,
+      "retainedBudgetMembershipsAtTerminal": 88566,
+      "monotonicNanoseconds": 26559907250
+    },
+    "SH166": {
+      "failure": {
+        "kind": "Operations",
+        "source": [
+          11,
+          2
+        ],
+        "operationsAtRefusal": 2000001,
+        "detail": "exact operation budget exhausted"
+      },
+      "operations": 2000001,
+      "peakStorageMemberships": 86933,
+      "peakAdmittedReservationMemberships": 86933,
+      "retainedBudgetMembershipsAtTerminal": 80734,
+      "monotonicNanoseconds": 25328089834
+    }
+  },
+  "wider202": "Outside this run, no executable binding.",
+  "conclusion": "All five inputs decoded. All five constructors refused within the unchanged resource policy. Attempts are logical memberships, not bytes or minima. Actual work saved after former refusal prefixes cannot be derived from capped terminal totals."
+}

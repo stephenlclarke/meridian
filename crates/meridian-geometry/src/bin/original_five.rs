@@ -3,6 +3,7 @@ use meridian_geometry::{
     Budget, Facet, Failure, FailureKind, Hull, Limits, OriginalAsset, Point3, Rational, integer,
     reconstruct,
 };
+use meridian_geometry::{BudgetPhase, BudgetRejection};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write as _;
 use std::fs;
@@ -47,6 +48,7 @@ struct CaseReport {
     bodies: [Status; 5],
     body_metrics: [Option<(u64, usize)>; 5],
     failure: Option<Failure>,
+    budget_rejection: Option<(BudgetRejection, u64, usize)>,
     operations: u64,
     peak: usize,
     admitted_peak: usize,
@@ -61,6 +63,7 @@ impl CaseReport {
             bodies: [Status::Unrun; 5],
             body_metrics: [None; 5],
             failure: None,
+            budget_rejection: None,
             operations: 0,
             peak: 0,
             admitted_peak: 0,
@@ -96,10 +99,14 @@ impl CaseReport {
             .as_ref()
             .map_or_else(|| "null".into(), failure_json);
         format!(
-            "{{\"id\":{},\"bodies\":[{}],\"failure\":{},\"operations\":{},\"peakStorageMemberships\":{},\"peakAdmittedReservationMemberships\":{},\"retainedBudgetMembershipsAtTerminal\":{},\"storageAccounting\":\"logical reservations; attempted peaks include refused admissions, not measured allocated bytes\",\"monotonicNanoseconds\":{},\"completeCandidateReturned\":{},\"allCandidateChecksPassed\":{},\"limits\":{{\"operations\":2000000,\"storageMemberships\":100000,\"rationalBits\":4096,\"triangles\":512}},\"sourceBinding\":\"EXECUTION-BINDING.json\",\"inputBindings\":\"ORIGINAL-BINDINGS.json\",\"fleetAdmission\":false}}",
+            "{{\"id\":{},\"bodies\":[{}],\"failure\":{},\"budgetRejection\":{},\"operations\":{},\"peakStorageMemberships\":{},\"peakAdmittedReservationMemberships\":{},\"retainedBudgetMembershipsAtTerminal\":{},\"storageAccounting\":\"logical reservations; attempted peaks include refused admissions, not measured allocated bytes\",\"monotonicNanoseconds\":{},\"completeCandidateReturned\":{},\"allCandidateChecksPassed\":{},\"limits\":{{\"operations\":2000000,\"storageMemberships\":100000,\"rationalBits\":4096,\"triangles\":512}},\"sourceBinding\":\"EXECUTION-BINDING.json\",\"inputBindings\":\"ORIGINAL-BINDINGS.json\",\"fleetAdmission\":false}}",
             quote(self.asset.id()),
             bodies,
             failure,
+            self.budget_rejection.map_or_else(
+                || "null".into(),
+                |(context, base, storage)| budget_rejection_json(context, base, storage)
+            ),
             self.operations,
             self.peak,
             self.admitted_peak,
@@ -141,6 +148,50 @@ fn failure_json(f: &Failure) -> String {
         quote(f.detail)
     )
 }
+fn budget_rejection_json(r: BudgetRejection, operation_base: u64, storage_base: usize) -> String {
+    let ledger = BudgetPhase::ALL
+        .iter()
+        .zip(r.phase_operations)
+        .map(|(phase, count)| format!("{}:{count}", quote(phase.name())))
+        .collect::<Vec<_>>()
+        .join(",");
+    let counters = r
+        .state
+        .iter()
+        .map(usize::to_string)
+        .collect::<Vec<_>>()
+        .join(",");
+    let source = r.source.map_or_else(
+        || "null".into(),
+        |s| format!("[{},{}]", s.component, s.facet),
+    );
+    format!(
+        "{{\"kind\":{},\"source\":{},\"phase\":{},\"caller\":{{\"file\":{},\"line\":{},\"column\":{}}},\"operationBase\":{},\"storageBase\":{},\"operationsBefore\":{},\"operationsAfter\":{},\"attemptedOperations\":{},\"retainedBeforeCleanup\":{},\"attemptedScratch\":{},\"requiredMemberships\":{},\"phaseOperations\":{{{}}},\"stageCounters\":[{}],\"stageCountersAtOperations\":{},\"activeLimits\":{{\"operations\":{},\"storageMemberships\":{},\"rationalBits\":{},\"triangles\":{}}}}}",
+        quote(&format!("{:?}", r.kind)),
+        source,
+        quote(r.phase.name()),
+        quote(r.file),
+        r.line,
+        r.column,
+        operation_base,
+        storage_base,
+        r.operations_before,
+        r.operations_after,
+        r.attempted_operations,
+        r.retained_before,
+        r.attempted_scratch,
+        r.required_memberships
+            .map_or_else(|| "null".into(), |v| v.to_string()),
+        ledger,
+        counters,
+        r.state_at_operations,
+        r.limits.operations,
+        r.limits.storage_memberships,
+        r.limits.rational_bits,
+        r.limits.triangles
+    )
+}
+
 fn input_sha(asset: OriginalAsset) -> &'static str {
     match asset {
         OriginalAsset::Sh010 => "6d12e9ed28b49feb2dbec71bd7deec437ba4cb5f8a2d4e0acbf9a2f76502d6dc",
@@ -454,6 +505,7 @@ fn run_case(asset: OriginalAsset, out: &Path) -> io::Result<CaseReport> {
         }
         Err(error) => {
             report.record_failure(0, error);
+            report.budget_rejection = budget.rejection().map(|r| (r, 0, 0));
             report.body_metrics[0] = Some((budget.operations(), budget.peak_memberships()));
             report.operations = budget.operations();
             report.peak = budget.peak_memberships();
@@ -467,6 +519,7 @@ fn run_case(asset: OriginalAsset, out: &Path) -> io::Result<CaseReport> {
     match reconstruct(&originals, &mut budget) {
         Err(error) => {
             report.record_failure(1, error);
+            report.budget_rejection = budget.rejection().map(|r| (r, 0, 0));
             report.body_metrics[1] = Some((
                 budget.operations() - construction_start,
                 budget.peak_memberships(),
@@ -498,7 +551,9 @@ fn run_case(asset: OriginalAsset, out: &Path) -> io::Result<CaseReport> {
                         [fields, certificates, |h, _, b| topology(h, b)];
                     for (i, check) in stages.into_iter().enumerate() {
                         let entry = checks.operations();
-                        let result = check(&hull, &originals, &mut checks);
+                        let result = checks.with_phase(BudgetPhase::DependentChecks, |b| {
+                            check(&hull, &originals, b)
+                        });
                         report.body_metrics[i + 2] = Some((
                             checks.operations() - entry,
                             held.saturating_add(checks.peak_memberships()),
@@ -507,6 +562,7 @@ fn run_case(asset: OriginalAsset, out: &Path) -> io::Result<CaseReport> {
                             error.operations = spent.saturating_add(error.operations);
                             report.bodies[i + 2] = check_status(&error);
                             report.failure = Some(error);
+                            report.budget_rejection = checks.rejection().map(|r| (r, spent, held));
                             break;
                         }
                         report.bodies[i + 2] = Status::Pass;
@@ -767,6 +823,62 @@ mod tests {
         topology(&hull, &mut b)?;
         assert!(candidate_wire(&hull).starts_with("meridian-exact-facets-v1 4\n"));
         assert!(witness_wire(&hull).contains("\"exactVolume\":\"1/6\""));
+        Ok(())
+    }
+
+    #[test]
+    fn adapter_serializes_resource_rejection_without_publishing_candidate() -> Result<(), Failure> {
+        use meridian_geometry::{SourceId, Vertex};
+        let mut setup = Budget::new(Limits::default())?;
+        let points = [[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]].map(|p| p.map(integer));
+        let originals = [[0, 2, 1], [0, 1, 3], [0, 3, 2], [1, 2, 3]]
+            .into_iter()
+            .enumerate()
+            .map(|(i, face)| {
+                Facet::new(
+                    SourceId {
+                        component: 0,
+                        facet: i as u32,
+                    },
+                    face.map(|j| Vertex {
+                        point: points[j].clone(),
+                        uv: [integer(0), integer(0)],
+                    }),
+                    "fixture".into(),
+                    &mut setup,
+                )
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let mut b = Budget::new(Limits {
+            storage_memberships: 600,
+            ..Limits::default()
+        })?;
+        let error = reconstruct(&originals, &mut b)
+            .err()
+            .ok_or_else(|| failed(&b, "expected adapter fixture rejection"))?;
+        let snapshot = b
+            .rejection()
+            .ok_or_else(|| failed(&b, "missing adapter budget snapshot"))?;
+        assert!(snapshot.retained_before > 0);
+        assert_eq!(snapshot.kind, FailureKind::Storage);
+        let mut report = CaseReport::pending(OriginalAsset::Sh010);
+        report.bodies[0] = Status::Pass;
+        report.record_failure(1, error);
+        report.budget_rejection = Some((snapshot, 0, 0));
+        let json = report.json();
+        assert!(json.contains("\"phase\":\"input_audit\""));
+        assert!(json.contains(&format!(
+            "\"retainedBeforeCleanup\":{}",
+            snapshot.retained_before
+        )));
+        assert!(json.contains(&format!(
+                "\"requiredMemberships\":{}",
+                snapshot
+                    .required_memberships
+                    .ok_or_else(|| failed(&b, "missing requirement"))?
+            )));
+        assert!(json.contains("\"completeCandidateReturned\":false"));
+        assert_eq!(report.bodies[2..], [Status::Unrun; 3]);
         Ok(())
     }
 }

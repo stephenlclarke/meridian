@@ -1,0 +1,45 @@
+{
+  "phase": "BEFORE_ADAPTER_CONTEXT_SOURCE_AUTHORING",
+  "parentAuthorHead": "41aae99bb2c0e76c21870502349e2bd894aace8f",
+  "workCorrection": "Move canonical encoded style equality lookup before repeated hexadecimal decoding. Preserve every logical original facet and exact field. Pool owns decoded text once per distinct canonical input encoding.",
+  "cases": [
+    {
+      "id": "SH010",
+      "facets": 1012,
+      "uniqueCanonicalEncodings": 6,
+      "uniqueDecodedStyleBytes": 228,
+      "removedDecodeSteps": 38228
+    },
+    {
+      "id": "SH011",
+      "facets": 1012,
+      "uniqueCanonicalEncodings": 6,
+      "uniqueDecodedStyleBytes": 228,
+      "removedDecodeSteps": 38228
+    },
+    {
+      "id": "SH016",
+      "facets": 1100,
+      "uniqueCanonicalEncodings": 6,
+      "uniqueDecodedStyleBytes": 228,
+      "removedDecodeSteps": 41572
+    },
+    {
+      "id": "SH017",
+      "facets": 1100,
+      "uniqueCanonicalEncodings": 6,
+      "uniqueDecodedStyleBytes": 228,
+      "removedDecodeSteps": 41572
+    },
+    {
+      "id": "SH166",
+      "facets": 988,
+      "uniqueCanonicalEncodings": 6,
+      "uniqueDecodedStyleBytes": 228,
+      "removedDecodeSteps": 37316
+    }
+  ],
+  "refusalContract": "Capture first rejected Budget step/guard immediate caller, active phase, phase work totals, attempted charge and retained-before/scratch-before unwind. Fixed control metadata only, no dynamic trace, no changed primitive prices/limits. Snapshot carried by actual adapter while current Failure literals and body semantics persist.",
+  "regressions": "Complete facet/UV/style equality and input ownership against frozen adapter; exact original-prefix work reduction; rejected charged bytes still fail; first snapshot before cleanup and stage totals exact; JSON adapter boundary retains snapshot.",
+  "currentExecution": "UNRUN; no author original or compiler execution"
+}

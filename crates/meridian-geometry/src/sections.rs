@@ -451,10 +451,30 @@ impl Frame {
         }
         let mut barriers = Vec::new();
         let mut coplanar = Vec::new();
+        b.state([
+            frame.members,
+            frame.owners.len(),
+            barriers.len(),
+            coplanar.len(),
+            originals.len(),
+            0,
+            0,
+            0,
+        ]);
         b.with_retained(3 * originals.len(), |b| {
             let candidates =
                 index.collection_candidates(face, finite, &frame.owners, originals, b)?;
             for (ordinal, physical, outward) in candidates {
+                b.state([
+                    frame.members,
+                    frame.owners.len(),
+                    barriers.len(),
+                    coplanar.len(),
+                    originals.len(),
+                    ordinal,
+                    96,
+                    0,
+                ]);
                 b.step(1)?;
                 let other = &originals[ordinal];
                 // This exact triangle is entirely on its own source plane and

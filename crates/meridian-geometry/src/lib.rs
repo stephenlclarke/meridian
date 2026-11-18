@@ -12,7 +12,7 @@ mod source;
 
 pub use adapter::OriginalAsset;
 pub use arrangement::{Arrangement, ArrangementWork, Cell, Segment};
-pub use budget::{Budget, Failure, FailureKind, Limits};
+pub use budget::{Budget, BudgetPhase, BudgetRejection, Failure, FailureKind, Limits};
 pub use certificate::{ContactStar, FacetWitness, Hull, reconstruct};
 pub use exact::{Point2, Point3, Rational, fraction, integer};
 pub use source::{AffineTransform, Facet, SourceId, Vertex};
@@ -22,3 +22,6 @@ mod pruning;
 
 #[cfg(test)]
 mod section_tests;
+
+#[cfg(test)]
+mod adapter_context_tests;

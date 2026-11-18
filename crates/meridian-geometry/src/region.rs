@@ -41,6 +41,7 @@ impl PackedRegion {
     ) -> Result<usize, Failure> {
         let (mut low, mut high) = (0, lookup.len());
         while low < high {
+            b.state([points.len(), lookup.len(), low, high, 0, 0, 0, 0]);
             b.step(1)?;
             let middle = low + (high - low) / 2;
             match points[lookup[middle]].cmp(&point) {
@@ -51,6 +52,16 @@ impl PackedRegion {
         }
         // Charge each shifted lookup ordinal and the new record. Existing
         // cell/segment ordinals remain stable because point storage only appends.
+        b.state([
+            points.len(),
+            lookup.len(),
+            low,
+            lookup.len() - low + 1,
+            0,
+            0,
+            0,
+            0,
+        ]);
         b.step((lookup.len() - low + 1) as u64)?;
         b.retain(4)?;
         let ordinal = points.len();
@@ -70,6 +81,16 @@ impl PackedRegion {
     }
     fn pack_records(arrangement: Arrangement, b: &mut Budget) -> Result<Self, Failure> {
         b.step(1)?;
+        b.state([
+            arrangement.cells.len(),
+            arrangement.physical.len(),
+            arrangement.protected.len(),
+            0,
+            0,
+            0,
+            0,
+            0,
+        ]);
         b.retain(16 + 3 * arrangement.protected.len())?;
         let mut result = Self {
             points: Vec::new(),
