@@ -6,6 +6,10 @@ Galaxy, system, showroom, trading and equipment screens share semantic keyboard/
 
 The Profile publishes complete prepared saves before committing ammunition, modular laser, cargo equipment or commodity changes. Mining Laser swaps preserve the born Pulse item and shared energy/heat. The renderer replaces the flight view with the selected docked page and publishes pointer regions only after an actual presentation. Crew counts remain explicitly unavailable until an authoritative crew provider exists.
 
+## SH028 aperture crosspieces
+
+The authored station display repair joins the rear ring rim to the back of the top and bottom crosspieces with four narrow strips. It closes the background gaps on both sides of each central rib. The strips sit outside the rectangular docking opening and use the original crosspiece material. The bundled display source and physical port remain the source of truth. Native visual confirmation awaits the integrated preview.
+
 ## Controls
 
 While docked, 1 through 5 select galaxy, system, showroom, trading and equipment. M opens trading and O opens equipment. Arrow keys, Tab/Shift+Tab, Enter and Escape navigate; / opens search. G and Shift+G buy and sell, Y/U fit and store, and ] changes equipment slot. H or ? opens a popup with the actual page controls and all station screen shortcuts. Mouse clicks, wheel scrolling and chart/model dragging use logical coordinates. Only admitted world routes can be selected for the subsequent J jump. Unavailable ships cannot be exchanged. In flight, H or ? opens the fitted-weapon and flight controls popup. Unshifted / remains galaxy search.
