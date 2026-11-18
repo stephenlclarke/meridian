@@ -62,6 +62,11 @@ def verify():
         if path == 'crates/meridian-core/src/station.rs':
             assert after.count(b'mod mule;\n') == 1
             after = after.replace(b'mod mule;\n', b'', 1)
+        if path == 'crates/meridian-core/src/flight/emp/tests.rs':
+            # The existing ordinary-World control has no internal Mule scenario.
+            added = b'        mule_validation: None,\n'
+            assert after.count(added) == 1
+            after = after.replace(added, b'', 1)
         assert len(before) == pin['bytes'] and sha(before) == pin['sha256'], path
         if path in world_binding['modifiedCurrentFiles']:
             bound = world_binding['modifiedCurrentFiles'][path]
@@ -95,7 +100,7 @@ def verify():
     assert sha(world_patch) == world_binding['canonicalPatch']['sha256']
     assert len(world_binding['currentRootCoreFiles']) == 135
     assert len(world_binding['modifiedCurrentFiles']) == 3
-    print(json.dumps({'status': 'PASS_SOURCE_ONLY', 'existingGameplayCoreFilesUnchanged': 128, 'minimalWorldAdaptedCoreFiles': 3, 'currentGameplayCorePins': 131, 'newCoreTests': 11, 'worldCoreTests': 4, 'tightnessCoreTests': 2, 'totalMuleCoreTests': 17, 'vertexEncoding': 5344, 'triangleEncoding': 9008, 'constructorsOrContactOrContainmentOrCompilerExecuted': False}))
+    print(json.dumps({'status': 'PASS_SOURCE_ONLY', 'existingGameplayCoreFilesUnchanged': 127, 'ordinaryWorldTestInitializerAdapted': 1, 'minimalWorldAdaptedCoreFiles': 3, 'currentGameplayCorePins': 131, 'newCoreTests': 11, 'worldCoreTests': 4, 'tightnessCoreTests': 2, 'totalMuleCoreTests': 17, 'vertexEncoding': 5344, 'triangleEncoding': 9008, 'constructorsOrContactOrContainmentOrCompilerExecuted': False}))
 
 
 if __name__ == '__main__':
