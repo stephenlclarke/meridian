@@ -269,8 +269,10 @@ impl EmpOrigin {
 
 pub(in crate::flight) const EMP_HEAT_FIFTHS: u16 = policy::HEAT_FIFTHS;
 pub(in crate::flight) const EMP_COOLDOWN_TICKS: u8 = policy::COOLDOWN_TICKS;
+// Physical tick plus optional (front facing, incident power hundredths, shield absorbed hundredths).
+type ResourceEffect = (u64, Option<(bool, u16, u16)>);
 impl State {
-    pub(in crate::flight) fn resource_effects(&self) -> Vec<(u64, Option<(bool, u16, u16)>)> {
+    pub(in crate::flight) fn resource_effects(&self) -> Vec<ResourceEffect> {
         self.pulses
             .iter()
             .map(|pulse| {
