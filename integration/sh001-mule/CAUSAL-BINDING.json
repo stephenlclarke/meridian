@@ -3,7 +3,7 @@
   "currentRootTree": "5dfb43fd7969bf3b257a6b9ddf28bd661849087b",
   "failureHead": "ccd89b2af0c75786e8915bf91a554a7f2c549cb5",
   "failureTree": "65d57eaa264558213386023c83de7de6244e087e",
-  "authorParent": "62c73cd453504ae2f81f77e59e2955f073fbfcf9",
+  "sourceParentCommit": "62c73cd453504ae2f81f77e59e2955f073fbfcf9",
   "currentRootCoreFiles": {
     "crates/meridian-core/Cargo.toml": {
       "bytes": 210,

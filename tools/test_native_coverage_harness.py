@@ -307,6 +307,16 @@ class NativeCoverageHarnessTests(unittest.TestCase):
         press.assert_called_once_with("Escape")
         self.assertFalse(profile.exists())
 
+    def test_mule_opening_requires_hull_contrast_inside_the_expected_region(self):
+        sky = bytes((10, 16, 32))
+        image = bytearray(sky * (smoke.WIDTH * smoke.HEIGHT))
+        self.assertFalse(smoke.mule_opening_frame(image))
+        left, top, _, _ = smoke.MULE_REGION
+        for y in range(top + 30, top + 50):
+            start = 3 * (y * smoke.WIDTH + left + 40)
+            image[start:start + 90] = bytes((54, 60, 62)) * 30
+        self.assertTrue(smoke.mule_opening_frame(image))
+
     def test_mule_log_requires_two_presented_draws_and_a_working_shimmer(self):
         log = self.write("mule.log", "")
         adapter = "Meridian adapter: llvmpipe, device_type: Cpu, backend: Vulkan\n"

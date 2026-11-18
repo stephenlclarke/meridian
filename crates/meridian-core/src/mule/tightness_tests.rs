@@ -1,6 +1,9 @@
 //! Sampled detailed-surface gaps, not a maximum-distance/Hausdorff certificate.
-use super::geometry::scale;
-use super::*;
+use super::geometry::{add, scale, sub};
+use super::{
+    EnvelopeError, EnvelopeRayContact, MuleHullSource, SCALE, SmoothPiece, VERTICES, source_vertex,
+};
+use crate::docking::{Basis3, RigidPose, Vec3};
 
 // Original detailed creator-component outer well-rim starts; copied from COMPONENT-PIECES.
 const FORMER_BODY_BRIDGE: Vec3 =
@@ -233,6 +236,29 @@ fn support_boundary_samples(piece: &SmoothPiece, directions: &[Vec3]) -> Vec<Bou
     samples
 }
 
+fn sampling_directions(index: usize, piece: &SmoothPiece) -> Result<Vec<Vec3>, EnvelopeError> {
+    let mut directions = Vec::new();
+    for x in [-1, 0, 1] {
+        for y in [-1, 0, 1] {
+            for z in [-1, 0, 1] {
+                if x != 0 || y != 0 || z != 0 {
+                    directions.push(Vec3::new(f64::from(x), f64::from(y), f64::from(z)));
+                }
+            }
+        }
+    }
+    for &(group, first) in WELL_RIMS {
+        if group == index {
+            let mut center = Vec3::new(0.0, 0.0, 0.0);
+            for vertex in first..first + 4 {
+                center = add(center, scale(source_vertex(VERTICES, vertex)?, 0.25));
+            }
+            directions.push(sub(center, piece.center()));
+        }
+    }
+    Ok(directions)
+}
+
 #[test]
 fn mule_sampled_visible_envelope_excess_reports_actual_detailed_surface_gaps()
 -> Result<(), EnvelopeError> {
@@ -278,25 +304,7 @@ fn mule_sampled_visible_envelope_excess_reports_actual_detailed_surface_gaps()
         source.contains_local(observed)
     );
     for (index, piece) in source.pieces.iter().enumerate() {
-        let mut directions = Vec::new();
-        for x in [-1, 0, 1] {
-            for y in [-1, 0, 1] {
-                for z in [-1, 0, 1] {
-                    if x != 0 || y != 0 || z != 0 {
-                        directions.push(Vec3::new(f64::from(x), f64::from(y), f64::from(z)));
-                    }
-                }
-            }
-        }
-        for &(group, first) in WELL_RIMS {
-            if group == index {
-                let mut center = Vec3::new(0.0, 0.0, 0.0);
-                for vertex in first..first + 4 {
-                    center = add(center, scale(source_vertex(VERTICES, vertex)?, 0.25));
-                }
-                directions.push(sub(center, piece.center()));
-            }
-        }
+        let directions = sampling_directions(index, piece)?;
         let boundary_samples = support_boundary_samples(piece, &directions);
         let certified_boundary_samples = boundary_samples.len();
         assert!(

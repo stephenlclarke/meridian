@@ -170,6 +170,19 @@ def exercise(app, output, save, receipt):
         raise RuntimeError(f"Desktop normal quit exited {code}")
 
 
+def mule_opening_frame(rgb):
+    # Sample open space above the initial hull. Its dark paint is visible by
+    # contrast with space, even when no paint channel reaches text brightness.
+    left, top, _, _ = MULE_REGION
+    index = 3 * (top * WIDTH + left)
+    sky = rgb[index:index + 3]
+
+    def contrasts_with_sky(r, g, b):
+        return max(abs(r - sky[0]), abs(g - sky[1]), abs(b - sky[2])) >= 24
+
+    return count_pixels(rgb, MULE_REGION, contrasts_with_sky, step=2) > 80
+
+
 def mule_changed_pixels(before, after):
     """Count strong RGB changes in the projected opening/approach hull region, outside the HUD."""
     left, top, right, bottom = MULE_REGION
@@ -192,7 +205,7 @@ def exercise_mule(app, output, profile_root, receipt):
     ).decode().strip() == MULE_TITLE)
     opening = capture_phase(
         app, window, output, "mule-opening",
-        lambda rgb: count_pixels(rgb, MULE_REGION, bright, step=2) > 80,
+        mule_opening_frame,
     )
     receipt["phases"].append(opening)
     image = (output / opening["image"]).read_bytes().split(b"\n", 3)[3]
