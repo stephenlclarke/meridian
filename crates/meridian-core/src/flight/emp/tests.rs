@@ -511,7 +511,10 @@ fn real_arrival_posts_main_but_leaves_bank_gap_until_a_following_qualified_inter
     w.request_launch(w.snapshot().tick).unwrap();
     steps(&mut w, 1);
     w.request_jump(SystemId::AVENOR, w.snapshot().tick).unwrap();
-    steps(&mut w, usize::from(crate::navigation::BASIC_SPOOL_TICKS));
+    steps(
+        &mut w,
+        usize::try_from(crate::navigation::BASIC_SPOOL_TICKS).unwrap(),
+    );
     assert_eq!(w.combat.physical_tick(), physical + 601);
     assert_eq!(w.emp.meter.bank, 600 * 20);
     assert_eq!(w.emp.bank_clock, physical + 600);

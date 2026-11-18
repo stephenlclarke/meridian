@@ -207,7 +207,7 @@ impl JumpJournal {
             })
             .transpose()?;
         let mut previous_account_revision = 0;
-        let mut previous_physical_tick = 0;
+        let mut previous_physical_tick: u64 = 0;
         let mut previous_clock_offset = 0;
         let mut system = SystemId::AVENOR;
         let mut spent = 0_u64;

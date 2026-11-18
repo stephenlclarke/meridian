@@ -141,7 +141,7 @@ fn move_actor(
                     },
                 )
             },
-        );
+        )
     };
     let yielding = if actor.resources.emp_disabled() {
         None
