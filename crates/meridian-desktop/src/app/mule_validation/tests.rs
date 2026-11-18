@@ -11,11 +11,7 @@ fn ok<T, E: core::fmt::Debug>(v: Result<T, E>) -> T {
     v.unwrap_or_else(|e| panic!("{e:?}"))
 }
 fn args(values: &[&str]) -> impl Iterator<Item = OsString> {
-    values
-        .iter()
-        .map(|value| OsString::from(*value))
-        .collect::<Vec<_>>()
-        .into_iter()
+    values.iter().map(|value| OsString::from(*value))
 }
 fn profile(view: View) -> Profile {
     ok(Launch::Mule(view).open())
