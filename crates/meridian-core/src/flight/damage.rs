@@ -235,22 +235,34 @@ impl State {
         validate_laser_receipts(world, end, &lasers)?;
         Ok(events)
     }
-    /// Called once by the missile validator, after its genuine impact graph is checked.
-    pub(super) fn validate_resources(
+    pub(super) fn emp_berths(&self) -> Vec<u64> {
+        self.events
+            .iter()
+            .filter(|event| event.kind == Kind::Berth)
+            .map(|event| event.clock)
+            .collect()
+    }
+    pub(super) fn emp_ready_at(&self, world: &World, clock: u64) -> Result<bool, SaveError> {
+        let dock = world.navigation.ok_or(INVALID)?.dock_sequence();
+        let mut events = self.resource_events(world, dock)?;
+        events.retain(|&(at, _, _, _)| at <= clock);
+        Ok(replay(&events, clock)?
+            .pulse
+            .prepare_emp_discharge()
+            .is_ok())
+    }
+    pub(super) fn alive_before_commands(&self, world: &World) -> Result<bool, SaveError> {
+        let dock = world.navigation.ok_or(INVALID)?.dock_sequence();
+        let end = world.combat.physical_tick();
+        let mut events = self.resource_events(world, dock)?;
+        events.retain(|&(clock, phase, _, _)| clock < end || phase < 3);
+        Ok(replay(&events, end)?.pulse.alive())
+    }
+    fn resource_events(
         &self,
         world: &World,
         dock_sequence: u64,
-    ) -> Result<(), SaveError> {
-        if !self.enabled {
-            return if self.events.is_empty()
-                && world.traffic.player_hits().is_empty()
-                && world.mining.strokes().is_empty()
-            {
-                Ok(())
-            } else {
-                Err(INVALID)
-            };
-        }
+    ) -> Result<Vec<ResourceEvent>, SaveError> {
         let end = world.combat.physical_tick();
         let mut events = self.sealed_spends(world, dock_sequence, end)?;
         for hit in world.missiles.player_resource_hits() {
@@ -290,7 +302,34 @@ impl State {
             }
             events.push((clock, 0, sequence as u64 + 1, Effect::Recharge(rate)));
         }
+        for (sequence, (clock, contact)) in world.emp.resource_effects().into_iter().enumerate() {
+            if clock > end {
+                return Err(INVALID);
+            }
+            events.push((clock, 3, sequence as u64, Effect::Emp { contact }));
+        }
         events.sort_by_key(|&(clock, phase, sequence, _)| (clock, phase, sequence));
+        Ok(events)
+    }
+    /// Called once by the missile validator, after its genuine impact graph is checked.
+    pub(super) fn validate_resources(
+        &self,
+        world: &World,
+        dock_sequence: u64,
+    ) -> Result<(), SaveError> {
+        if !self.enabled {
+            return if self.events.is_empty()
+                && world.traffic.player_hits().is_empty()
+                && world.mining.strokes().is_empty()
+                && world.emp.resource_effects().is_empty()
+            {
+                Ok(())
+            } else {
+                Err(INVALID)
+            };
+        }
+        let end = world.combat.physical_tick();
+        let events = self.resource_events(world, dock_sequence)?;
         let pools = replay(&events, end)?;
         if pools.pulse != world.pulse || pools.shields != world.combat.shields() {
             return Err(INVALID);
@@ -409,6 +448,7 @@ enum Effect {
     Recharge(u16),
     Mining,
     Hit { front: bool, damage: u16 },
+    Emp { contact: Option<(bool, u16, u16)> },
 }
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 struct Pools {
@@ -442,6 +482,17 @@ fn replay(events: &[ResourceEvent], end: u64) -> Result<Pools, SaveError> {
                     .pulse
                     .prepare_mining_discharge()
                     .map_err(|_| INVALID)?;
+            }
+            Effect::Emp { contact } => {
+                pools.pulse = pools.pulse.prepare_emp_discharge().map_err(|_| INVALID)?;
+                if let Some((front, power, expected)) = contact {
+                    let shield = &mut pools.shields[usize::from(!front)];
+                    let absorbed = (*shield).min(power);
+                    if absorbed != expected {
+                        return Err(INVALID);
+                    }
+                    *shield -= absorbed;
+                }
             }
             Effect::Hit { front, damage } => {
                 if phase == 2 && !pools.pulse.alive() {

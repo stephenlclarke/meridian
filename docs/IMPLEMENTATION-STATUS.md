@@ -1,5 +1,13 @@
 # Implementation and validation status
 
+## Distinct EMP source candidate
+
+The source candidate adds an owned EMP utility to the single World, with paid purchase/fit/store/grade transactions, a separate initially empty bank and electrical pool, exact 80-percent transfer, a 600-tick held charge and shared heat/cooldown cost. It queries the actual native SH025 collision scene and drains the facing shield then independent electrical reserve. It preserves fatal hull energy, actor identity, cargo and the one source crew member. Zero electrical power blocks engines/weapons, keeps physical coasting and recovers strictly after 1800 accepted physical ticks. No capsule, bounty or reward is fabricated.
+
+Scope is self-defence against an actual recent native attacker. Every unqualified secondary NPC contact refuses the entire release. Live local disablement holds departure; civilian law and off-system disabled custody are not implemented. The original occupied Newt release requires a qualified installed kit that these actors do not own. Paid grades require a genuinely paid base; XYZZY may grant/refit a separate real base with zero charge.
+
+The author added meaningful commerce, clock, held-input, native-effect, cold-continuation and corruption cases. Rust compilation/tests, coverage, strict Clippy and native graphics/gameplay are **UNRUN** here. Direct rustfmt only establishes parse/format acceptance, not type checking. Root still owns desktop controls/shop/presentation composition; existing G1/Dell owners retain execution. The immutable Preview 7 evidence is unchanged. [EMP guide and acceptance preparation](EMP.md) defines the exact boundary and remaining work.
+
 ## Preview 7 source quality correction
 
 The Help and XYZZY composition merged through PR 47 at `de7d6bb`. All six main CI jobs passed and exact-main Sonar passed its quality gate with 94.1% new coverage, but nine unresolved maintainability findings held publication. Source `076639d` addresses all nine with four helper extractions and five explicit test imports. Independent review reconstructed all four original production files and verified unchanged test bodies, assertions, save formats and native coverage boundaries.

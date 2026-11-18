@@ -5,6 +5,9 @@ use super::{
 };
 impl Resources {
     pub(super) fn advance_many(&mut self, ticks: u64) -> Result<(), TrafficError> {
+        if let Some(pool) = &mut self.electrical {
+            pool.advance(ticks);
+        }
         let energy = (38000 - u64::from(self.energy)).min(ticks.saturating_mul(7));
         let front = (30000 - u64::from(self.front)).min(ticks.saturating_mul(3));
         let rear = (30000 - u64::from(self.rear)).min(ticks.saturating_mul(3));
@@ -30,7 +33,7 @@ impl Resources {
         self.advance_many(1)
     }
     pub(super) fn fire(&mut self) -> Result<(), TrafficError> {
-        if self.energy <= 100 || self.heat > 1150 || self.cooldown != 0 {
+        if self.emp_disabled() || self.energy <= 100 || self.heat > 1150 || self.cooldown != 0 {
             return Err(TrafficError::InvalidState);
         }
         self.energy -= 100;
@@ -112,7 +115,9 @@ impl Resources {
                 + u128::from(self.absorbed_rear)
                 + u128::from(self.hull_damage)
                 + u128::from(self.overkill)
-                != u128::from(beam_damage) + u128::from(self.incoming_missiles) * 16000
+                != u128::from(beam_damage)
+                    + u128::from(self.incoming_missiles) * 16000
+                    + u128::from(self.emp_absorbed)
             || u128::from(self.energy_regen) > u128::from(age) * 7
             || u128::from(self.front_regen) > u128::from(age) * 3
             || u128::from(self.rear_regen) > u128::from(age) * 3
@@ -144,6 +149,7 @@ impl State {
                 a.id.system == system
                     && a.id.serial == 2
                     && a.phase == NpcPhase::Hunting
+                    && !a.resources.emp_disabled()
                     && a.resources.cooldown == 0
                     && a.resources.energy > 100
                     && a.resources.heat <= 1150

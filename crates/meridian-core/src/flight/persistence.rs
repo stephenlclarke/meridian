@@ -13,7 +13,7 @@ use crate::station_services::{SavedServiceSummary, StationMarkets};
 
 const MAGIC: &[u8; 8] = b"MERSAVE1";
 const CONTENT: &[u8] = concat!(
-    "meridian-world/rules/17;explicit-xyzzy/account-prefix-replay-v2/a11fe169;navigation-computer/exact-route-journal/a11fe169;lareria-main-services/station-combat-three-v1/a11fe169;rapid-lasers-energy/shared-nine-byte-resources-v1/a11fe169;mining/native-work-pending-v2;fuel-scoops/paid-utility-v1;npc-missiles/canonical-native-ray-v3;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
+    "meridian-world/rules/17;explicit-xyzzy/account-prefix-replay-v2/a11fe169;distinct-emp/paid-defensive-local-v1/a11fe169;navigation-computer/exact-route-journal/a11fe169;lareria-main-services/station-combat-three-v1/a11fe169;rapid-lasers-energy/shared-nine-byte-resources-v1/a11fe169;mining/native-work-pending-v2;fuel-scoops/paid-utility-v1;npc-missiles/canonical-native-ray-v3;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
     "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9;",
     "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883;",
@@ -52,6 +52,7 @@ pub(super) struct Commerce<'a> {
     pub(super) lesson: &'a navigation_trade::State,
     pub(super) ammunition: &'a super::ammunition::State,
     pub(super) modular: &'a super::modular::State,
+    pub(super) emp: &'a super::emp::State,
 }
 impl<'a> Commerce<'a> {
     fn current(world: &'a World) -> Self {
@@ -61,6 +62,7 @@ impl<'a> Commerce<'a> {
             lesson: &world.navigation_trade,
             ammunition: &world.ammunition,
             modular: &world.modular,
+            emp: &world.emp,
         }
     }
 }
@@ -152,6 +154,7 @@ impl World {
             lesson,
             ammunition: &self.ammunition,
             modular: &self.modular,
+            emp: &self.emp,
         };
         self.validate_saved_world(
             self.practice,
@@ -179,6 +182,35 @@ impl World {
             lesson: &self.navigation_trade,
             ammunition,
             modular: &self.modular,
+            emp: &self.emp,
+        };
+        self.validate_saved_world(
+            self.practice,
+            &self.practice_history,
+            self.practice_trace,
+            &self.flight_reception,
+            &commerce,
+        )?;
+        self.encode_saved_world(
+            self.practice,
+            &self.practice_history,
+            self.practice_trace,
+            &self.flight_reception,
+            &commerce,
+        )
+    }
+    pub(super) fn save_bytes_with_emp(
+        &self,
+        account: &CommanderAccount,
+        emp: &super::emp::State,
+    ) -> Result<Vec<u8>, SaveError> {
+        let commerce = Commerce {
+            account: Some(account),
+            markets: self.station_markets.as_ref(),
+            lesson: &self.navigation_trade,
+            ammunition: &self.ammunition,
+            modular: &self.modular,
+            emp,
         };
         self.validate_saved_world(
             self.practice,
@@ -206,6 +238,7 @@ impl World {
             lesson: &self.navigation_trade,
             ammunition: &self.ammunition,
             modular,
+            emp: &self.emp,
         };
         self.validate_saved_world(
             self.practice,
@@ -253,6 +286,7 @@ impl World {
             .ok_or(SaveError::NoCommander)?
             .encode_save(&mut w);
         self.xyzzy.encode(&mut w);
+        commerce.emp.encode(&mut w);
         commerce.modular.encode(&mut w);
         commerce.ammunition.encode(&mut w);
         commerce.lesson.encode(&mut w);
@@ -351,6 +385,7 @@ impl World {
         let freight_session = mission::FreightSession::decode_save(&mut r)?;
         let station_markets = StationMarkets::decode_save(&mut r)?;
         let xyzzy = super::xyzzy::State::decode(&mut r)?;
+        let emp = super::emp::State::decode(&mut r)?;
         let modular = super::modular::State::decode(&mut r, version)?;
         let ammunition = super::ammunition::State::decode(&mut r)?;
         let navigation_trade = navigation_trade::State::decode(&mut r)?;
@@ -377,6 +412,7 @@ impl World {
             ammunition,
             modular,
             xyzzy,
+            emp,
             flight_reception,
             navigation_trade,
             practice_history,
@@ -515,6 +551,7 @@ impl World {
             navigation,
             catalogue,
             self.state.tick,
+            self.combat.physical_tick(),
             &modular.navigation_changes,
         )?;
         let ammunition = commerce.ammunition.ledger_with_module_count(
@@ -578,6 +615,7 @@ impl World {
                 account.equipment_state().historical_capacity(),
             )?
         };
+        let emp = commerce.emp.validate(self, account, commerce.modular)?;
         let secret = self.xyzzy.validate(self, account, commerce)?;
         validate_accounting(
             domain,
@@ -589,10 +627,12 @@ impl World {
                 ammunition
                     .paid
                     .checked_add(modular.paid)
+                    .and_then(|paid| paid.checked_add(emp.0))
                     .ok_or(SaveError::InvalidState("paid equipment overflow"))?,
                 ammunition
                     .extra_revisions
                     .checked_add(modular.revision)
+                    .and_then(|revisions| revisions.checked_add(emp.1))
                     .ok_or(SaveError::SequenceExhausted)?,
             ),
             secret,

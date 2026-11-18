@@ -27,6 +27,8 @@
 
 Meridian is a Rust reimplementation of the original L337 project, with direct wgpu graphics, one authoritative World and traceable original content. New code is [proprietary/source-visible](LICENSE); imported original content retains its own notices. Original Elite/Oolite assets are excluded.
 
+The current source candidate adds a distinct owned [EMP electrical weapon](docs/EMP.md), including bank transfer, ten-second held release, native shield/electrical effects and retained Save/Continue history. This addition is uncompiled/unrun and awaits desktop controls and owner qualification; it is not part of the published Preview 7 acceptance.
+
 ## Previews and validation
 
 Download qualified macOS arm64 and Windows x64 prereleases from [GitHub Releases](https://github.com/stephenlclarke/meridian/releases). Use the launcher and Read Me included with your download. Keep its app, notices and versioned save folder together; preserve earlier previews and profiles separately. Releases use Conventional Commit versions and immutable annotated tags, and retain the newest three published previews after verified downloads and a durable receipt.

@@ -69,3 +69,8 @@ pub use flight::{
 pub use flight::{FlightResourcesSnapshot, FrontLaserSnapshot};
 
 pub use flight::{EquipmentPreparationError, PreparedEquipment};
+
+pub use flight::{
+    EmpAxis, EmpChargePhase, EmpEquipmentAction, EmpEquipmentOffer, EmpEquipmentReview, EmpError,
+    EmpGrades, EmpOrigin, EmpProvenance, EmpSnapshot, OwnedEmp, PreparedEmpEquipment,
+};

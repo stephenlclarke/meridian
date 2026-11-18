@@ -1,9 +1,11 @@
 //! Finite, deterministic local traffic. Only World owns this mutable actor/economy state.
 //! SH025 is the actual admitted hull; unadmitted populations receive no substitute body.
 mod admission;
+mod emp;
+pub(crate) use emp::{EmpResourceAction, EmpResourceEvent};
 mod combat;
 mod missiles;
-pub(crate) use missiles::{MissileScene, NpcMissileHit, SceneStage};
+pub(crate) use missiles::{MissileScene, NpcBody, NpcMissileHit, SceneStage};
 mod economy;
 pub(crate) use economy::Flows;
 mod motion;
@@ -24,7 +26,7 @@ use std::sync::Arc;
 pub const MAX_TRAFFIC_ACTORS: usize = 4;
 pub const MAX_TRAFFIC_SHOTS: usize = 128;
 const CAPITAL: u32 = 120_000;
-pub(crate) const CONTENT_RULES:&[u8]=b"local-traffic-v4;SH025-trader-pirate;no-SH031-substitution;finite-capital120000;manifest-native1to12;local-birth480-pirate900;2systems2actors;maxshots128;pulse15-energy1-heat10-cool18;SH025-energy380-shield300;speed34.3-accel9.1-yaw.65;NPC-bank-and-player-custody-separate;historical-flow-world-ticks;waypoints-3500-2400x9000-0x9000-0x3500-doorMinus300;final-align;native-entry-before-after-receipt;no-respawn;npc-player-native-contact;exact-resource-events;source-resource-clock;npc-missile-native16000;combined-128beam-player-missile-proof;one-player-resource-replay;step-missiles-before-npc;local-world-phase-sequence;native-triangle-aim;station-approach-right-of-way;physical-lateral-yield1200;";
+pub(crate) const CONTENT_RULES:&[u8]=b"local-traffic-v4;SH025-trader-pirate;no-SH031-substitution;finite-capital120000;manifest-native1to12;local-birth480-pirate900;2systems2actors;maxshots128;pulse15-energy1-heat10-cool18;SH025-energy380-shield300;speed34.3-accel9.1-yaw.65;NPC-bank-and-player-custody-separate;historical-flow-world-ticks;waypoints-3500-2400x9000-0x9000-0x3500-doorMinus300;final-align;native-entry-before-after-receipt;no-respawn;npc-player-native-contact;exact-resource-events;source-resource-clock;npc-missile-native16000;combined-128beam-player-missile-proof;one-player-resource-replay;step-missiles-before-npc;local-world-phase-sequence;native-triangle-aim;station-approach-right-of-way;physical-lateral-yield1200;distinct-EMP-electrical-no-hull-damage;separate128EMP-receipts;disabled-coast-preserve-cargo-crew;";
 const INVALID: SaveError = SaveError::InvalidState("traffic identity, resources or finite custody");
 const SH025_ID: &str = "SH025";
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -125,6 +127,9 @@ pub struct NpcSnapshot {
     pub speed_units: f64,
     pub phase: NpcPhase,
     pub energy_hundredths: u16,
+    pub electrical_remaining: Option<f64>,
+    pub electrical_disabled: bool,
+    pub emp_crew_aboard: Option<u8>,
     pub front_shield_hundredths: u16,
     pub rear_shield_hundredths: u16,
     pub heat_fifths: u16,
@@ -218,6 +223,8 @@ struct Resources {
     absorbed_rear: u64,
     hull_damage: u64,
     overkill: u64,
+    electrical: Option<emp::Electrical>,
+    emp_absorbed: u64,
 }
 impl Resources {
     fn fresh() -> Self {
@@ -281,6 +288,11 @@ impl Actor {
             speed_units: self.speed,
             phase: self.phase,
             energy_hundredths: self.resources.energy,
+            electrical_remaining: self.resources.electrical.map(|pool| {
+                f64::from(pool.remaining) / f64::from(crate::flight::emp::EMP_RESOURCE_SCALE)
+            }),
+            electrical_disabled: self.resources.emp_disabled(),
+            emp_crew_aboard: self.resources.electrical.map(|p| p.crew_aboard),
             front_shield_hundredths: self.resources.front,
             rear_shield_hundredths: self.resources.rear,
             heat_fifths: self.resources.heat,
@@ -330,6 +342,7 @@ pub(crate) struct State {
     shots: Arc<Vec<TrafficBeam>>,
     player_hits: Arc<Vec<NpcPlayerHit>>,
     missile_hits: Arc<Vec<NpcMissileHit>>,
+    emp_events: Arc<Vec<EmpResourceEvent>>,
 }
 impl Default for State {
     fn default() -> Self {
@@ -341,6 +354,7 @@ impl Default for State {
             shots: Arc::new(Vec::new()),
             player_hits: Arc::new(Vec::new()),
             missile_hits: Arc::new(Vec::new()),
+            emp_events: Arc::new(Vec::new()),
         }
     }
 }

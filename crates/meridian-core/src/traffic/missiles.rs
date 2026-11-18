@@ -148,6 +148,7 @@ enum ResourceAction {
     Fire,
     Laser(bool, u16),
     Missile(bool),
+    Emp(super::EmpResourceAction),
 }
 pub(super) type ResourceOrder = (u64, u64, u8, usize);
 type ResourceEvent = (ResourceOrder, ResourceAction);
@@ -424,6 +425,16 @@ impl State {
                 actions.push((h.resource_order(i), ResourceAction::Missile(h.front)));
             }
         }
+        for (index, event) in self.emp_events.iter().enumerate() {
+            let included = event.world_tick < world
+                || (event.world_tick == world && matches!(stage, SceneStage::Command(_)));
+            if event.victim == a.id && event.local_tick <= clock && included {
+                actions.push((
+                    (event.local_tick, event.world_tick, 3, index),
+                    ResourceAction::Emp(event.action),
+                ));
+            }
+        }
         actions.sort_by_key(|(order, _)| *order);
         let mut resources = Resources::fresh();
         let mut cursor = a.birth_clock.checked_sub(1).ok_or(INVALID)?;
@@ -437,6 +448,7 @@ impl State {
                 ResourceAction::Fire => resources.fire(),
                 ResourceAction::Laser(front, damage) => resources.hit_damage(front, damage),
                 ResourceAction::Missile(front) => resources.hit_missile(front),
+                ResourceAction::Emp(action) => resources.apply_emp(action),
             }
             .map_err(|_| INVALID)?;
             cursor = tick;

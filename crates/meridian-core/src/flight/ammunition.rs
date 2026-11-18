@@ -359,7 +359,10 @@ impl State {
         if ledger.extra_revisions != account.ammunition_revision() {
             return Err(INVALID);
         }
-        let foundation = 4 + usize::from(account.equipment_state().owned().is_some()) + modules;
+        let foundation = 4
+            + usize::from(account.equipment_state().owned().is_some())
+            + modules
+            + usize::from(world.emp.owned().ok().flatten().is_some());
         // The one reserved stock drive is exempt from the original ordinary-item bound.
         if ledger.items.iter().filter(|i| !i.consumed).count() + foundation > 256 {
             return Err(INVALID);
@@ -503,6 +506,7 @@ impl World {
             + 4
             + usize::from(account.equipment_state().owned().is_some())
             + self.modular.paid_count()
+            + usize::from(self.emp.owned().ok().flatten().is_some())
             > 256
         {
             return Err(AmmunitionError::Full);

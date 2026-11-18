@@ -701,7 +701,8 @@ impl State {
         {
             return Err(INVALID);
         }
-        scoops::validate_fit(&ledger.items, account).map_err(|_| INVALID)?;
+        scoops::validate_fit(&ledger.items, account, world.emp.utility_mounts())
+            .map_err(|_| INVALID)?;
         if ledger.revision != account.modular_revision() {
             return Err(INVALID);
         }
@@ -822,7 +823,7 @@ impl World {
         Some(ModularEquipmentSnapshot {
             equipment_units_used: ledger.fitted_units() + account.equipment_state().units_used(),
             equipment_units_capacity: definition.equipment_units_capacity,
-            utility_mounts_used: account.equipment_state().units_used(),
+            utility_mounts_used: account.equipment_state().units_used() + self.emp.utility_mounts(),
             utility_mounts_capacity: definition.utility_mounts_capacity,
             items: ledger.items,
             fit_revision: ledger.revision,
@@ -1032,7 +1033,7 @@ impl World {
             },
             0,
         )?;
-        scoops::validate_fit(&ledger.items, account)?;
+        scoops::validate_fit(&ledger.items, account, self.emp.utility_mounts())?;
         let ammo = self
             .ammunition
             .ledger(self, account)
@@ -1040,6 +1041,7 @@ impl World {
         if ammo.items.iter().filter(|i| !i.consumed).count()
             + 4
             + usize::from(account.equipment_state().owned().is_some())
+            + usize::from(self.emp.owned().ok().flatten().is_some())
             + ledger
                 .items
                 .iter()
@@ -1290,3 +1292,40 @@ impl World {
 
 #[cfg(test)]
 mod xyzzy_tests;
+
+impl State {
+    pub(super) fn emp_energy_changes(
+        &self,
+        world: &World,
+    ) -> Result<Vec<(u64, Option<u8>)>, SaveError> {
+        let owner = world.combat_identity().ok_or(INVALID)?.owner;
+        let mut ledger = Ledger::born(owner)?;
+        let mut counters = [0; 2];
+        let mut changes = vec![(0, Some(0))];
+        for event in &self.events {
+            ledger.replay(*event, &mut counters).map_err(|_| INVALID)?;
+            let stage = ledger
+                .fitted(ModuleSlot::Energy)
+                .and_then(|item| match item.kind {
+                    ModuleKind::BasicEnergySystem => Some(0),
+                    ModuleKind::ExtraEnergyUnit => Some(1),
+                    ModuleKind::NavalEnergyUnit => Some(2),
+                    ModuleKind::EliteEnergyUnit => Some(3),
+                    _ => None,
+                });
+            if changes
+                .last()
+                .is_none_or(|(_, previous)| *previous != stage)
+            {
+                changes.push((
+                    world
+                        .damage
+                        .berth_clock(event.dock.sequence())
+                        .ok_or(INVALID)?,
+                    stage,
+                ));
+            }
+        }
+        Ok(changes)
+    }
+}
