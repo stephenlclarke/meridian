@@ -38,7 +38,7 @@ class PolicyFixtures(unittest.TestCase):
         self.directory = Path(self.temporary.name)
         launch = self.directory / "launch.json"
         launch.write_bytes(capture.json_bytes({"pid":12345,"source":capture.SOURCE,"binary":{"sha256":capture.BINARY_SHA},"environment":{"MERIDIAN_REVIEW_CAPTURE":"1"}}))
-        self.log = self.directory / "native.log"
+        self.log = self.directory / "native-stderr.log"
         self.log.write_bytes(b"".join(log_marker(i, i * 10) for i in range(1, 4)))
         self.scope = {"schema":1,"pid":12345,"bundle_id":capture.BUNDLE,"source":capture.SOURCE,
                       "bounds":window()["bounds"],"window_mode":"normal","max_captures":3,
@@ -98,6 +98,17 @@ class PolicyFixtures(unittest.TestCase):
         for receipt in [{"pid":12345,"source":capture.SOURCE,"binary":{"sha256":"0"*64}}, {"pid":12345,"source":capture.SOURCE,"binary":{"sha256":capture.BINARY_SHA},"environment":{}}]:
             launch.write_bytes(capture.json_bytes(receipt))
             with self.assertRaises(capture.Rejected):capture.validate_scope(copy.deepcopy(self.scope))
+
+    def test_stale_log_from_another_run_directory_is_rejected_before_provider(self):
+        other = self.directory / "other-run"
+        other.mkdir()
+        wrong = other / "native-stderr.log"
+        wrong.write_bytes(self.log.read_bytes())
+        self.scope["native_stderr"] = str(wrong)
+        self.scope_path.write_bytes(capture.json_bytes(self.scope))
+        with self.assertRaises(capture.Rejected):
+            self.run_capture()
+        self.assertEqual(self.calls, [])
 
     def test_marker_requires_actual_unique_frame_map_and_app_ack(self):
         self.assertEqual(capture.marker(log_marker(),1,10)["frame"],10)

@@ -1,6 +1,6 @@
 # Meridian
 
-The current native run produced three identical nonblack GPU target copies while the paired Fit appeared black through CUA. A [bounded read-only independent window observer](docs/LASER-FACINGS.md#independent-macos-window-observer-preparation) is prepared to resolve the actual WindowServer capture identity. Twelve offline policy fixtures pass; the Swift provider is uncompiled and no UI API has run. Execution requires the explicit human exception for alternate UI technology. No renderer cure or native acceptance is claimed.
+The current native run produced three identical nonblack GPU target copies while the paired Fit appeared black through CUA. A [bounded read-only independent window observer](docs/LASER-FACINGS.md#independent-macos-window-observer-preparation) is prepared to resolve the actual WindowServer capture identity. Thirteen offline policy fixtures pass; the Swift provider is uncompiled and no UI API has run. Execution requires the explicit human exception for alternate UI technology. No renderer cure or native acceptance is claimed.
 
 [![CI](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=alert_status)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)
