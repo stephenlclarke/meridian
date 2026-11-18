@@ -56,9 +56,10 @@ impl FacetBoundsIndex {
                     pending.push(right);
                     pending.push(left);
                 } else {
-                    for (offset, bounds) in self.facets[node.start..node.end].iter().enumerate() {
+                    for position in node.start..node.end {
                         b.step(1)?;
-                        let ordinal = node.start + offset;
+                        let ordinal = self.source_ordinal(position);
+                        let bounds = &self.facets[ordinal];
                         log_cost(owners.len(), b)?;
                         if owners.contains_key(&originals[ordinal].id().component)
                             && bounds.meets_outward_plane(face, b)?
@@ -68,7 +69,7 @@ impl FacetBoundsIndex {
                     }
                 }
             }
-            Ok(candidates)
+            self.source_order(candidates, 1, |ordinal| *ordinal, b)
         })
     }
 }
@@ -360,9 +361,10 @@ impl FacetBoundsIndex {
                     pending.push((right, physical_possible, outward_possible, owner_known));
                     pending.push((left, physical_possible, outward_possible, owner_known));
                 } else {
-                    for (offset, bounds) in self.facets[node.start..node.end].iter().enumerate() {
+                    for position in node.start..node.end {
                         b.step(1)?;
-                        let ordinal = node.start + offset;
+                        let ordinal = self.source_ordinal(position);
+                        let bounds = &self.facets[ordinal];
                         let physical = physical_possible && finite.meets(bounds, b)?;
                         let outward = if outward_possible {
                             let owner_allowed = if node.owner.is_some() {
@@ -381,7 +383,7 @@ impl FacetBoundsIndex {
                     }
                 }
             }
-            Ok(result)
+            self.source_order(result, 3, |record| record.0, b)
         })
     }
 }

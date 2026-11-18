@@ -1,0 +1,114 @@
+{
+  "certificate.rs": [
+    {
+      "afterStart": 374,
+      "afterEnd": 375,
+      "before": "",
+      "after": "    order: Option<Vec<usize>>,\n"
+    },
+    {
+      "afterStart": 406,
+      "afterEnd": 407,
+      "before": "",
+      "after": "            order: None,\n"
+    },
+    {
+      "afterStart": 475,
+      "afterEnd": 476,
+      "before": "                    for (offset, bounds) in self.facets[node.start..node.end].iter().enumerate() {\n",
+      "after": "                    for position in node.start..node.end {\n"
+    },
+    {
+      "afterStart": 477,
+      "afterEnd": 479,
+      "before": "",
+      "after": "                        let ordinal = self.source_ordinal(position);\n                        let bounds = &self.facets[ordinal];\n"
+    },
+    {
+      "afterStart": 480,
+      "afterEnd": 481,
+      "before": "                            candidates.push(node.start + offset);\n",
+      "after": "                            candidates.push(ordinal);\n"
+    },
+    {
+      "afterStart": 485,
+      "afterEnd": 486,
+      "before": "            Ok(candidates)\n",
+      "after": "            self.source_order(candidates, 1, |ordinal| *ordinal, b)\n"
+    },
+    {
+      "afterStart": 559,
+      "afterEnd": 560,
+      "before": "                    for (offset, bounds) in self.facets[node.start..node.end].iter().enumerate() {\n",
+      "after": "                    for position in node.start..node.end {\n"
+    },
+    {
+      "afterStart": 561,
+      "afterEnd": 563,
+      "before": "                        let ordinal = node.start + offset;\n",
+      "after": "                        let ordinal = self.source_ordinal(position);\n                        let bounds = &self.facets[ordinal];\n"
+    },
+    {
+      "afterStart": 571,
+      "afterEnd": 572,
+      "before": "            Ok(candidates)\n",
+      "after": "            self.source_order(candidates, 1, |ordinal| *ordinal, b)\n"
+    },
+    {
+      "afterStart": 1123,
+      "afterEnd": 1124,
+      "before": "    let facet_bounds_members = FacetBoundsIndex::memberships(originals.len());\n",
+      "after": "    let facet_bounds_members = FacetBoundsIndex::spatial_memberships(originals.len());\n"
+    },
+    {
+      "afterStart": 1126,
+      "afterEnd": 1127,
+      "before": "        FacetBoundsIndex::build(originals, b)\n",
+      "after": "        FacetBoundsIndex::build_spatial(originals, b)\n"
+    },
+    {
+      "afterStart": 2321,
+      "afterEnd": 2324,
+      "before": "",
+      "after": "\n#[path = \"spatial_index.rs\"]\nmod spatial_index;\n"
+    }
+  ],
+  "sections.rs": [
+    {
+      "afterStart": 58,
+      "afterEnd": 59,
+      "before": "                    for (offset, bounds) in self.facets[node.start..node.end].iter().enumerate() {\n",
+      "after": "                    for position in node.start..node.end {\n"
+    },
+    {
+      "afterStart": 60,
+      "afterEnd": 62,
+      "before": "                        let ordinal = node.start + offset;\n",
+      "after": "                        let ordinal = self.source_ordinal(position);\n                        let bounds = &self.facets[ordinal];\n"
+    },
+    {
+      "afterStart": 71,
+      "afterEnd": 72,
+      "before": "            Ok(candidates)\n",
+      "after": "            self.source_order(candidates, 1, |ordinal| *ordinal, b)\n"
+    },
+    {
+      "afterStart": 363,
+      "afterEnd": 364,
+      "before": "                    for (offset, bounds) in self.facets[node.start..node.end].iter().enumerate() {\n",
+      "after": "                    for position in node.start..node.end {\n"
+    },
+    {
+      "afterStart": 365,
+      "afterEnd": 367,
+      "before": "                        let ordinal = node.start + offset;\n",
+      "after": "                        let ordinal = self.source_ordinal(position);\n                        let bounds = &self.facets[ordinal];\n"
+    },
+    {
+      "afterStart": 385,
+      "afterEnd": 386,
+      "before": "            Ok(result)\n",
+      "after": "            self.source_order(result, 3, |record| record.0, b)\n"
+    }
+  ]
+}

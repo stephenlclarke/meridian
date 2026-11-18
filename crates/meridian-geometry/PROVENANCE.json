@@ -173,5 +173,12 @@
     "externalRawSHA256": "31426f1d1d0daa2176a092938410a914441fd22994a320ab5639d6c968e881e5",
     "currentExecution": "UNRUN",
     "sourceFidelity": "Borrowed current-facet section geometry intervals; same exact crossings/multiplicity/ownerorder, no cached ray/parity values, no source fields or admissions changed"
+  },
+  "spatialIndexCorrection": {
+    "qualifiedRoot": "7a470a57c4e4780bc17db862b1d56f5efde03351",
+    "parentHandoffSHA256": "42d4d55f4d9aee6e04f523f44ab3f0181a7b7e5f5cdb74129b2fdd1cdf9309a4",
+    "externalRawSHA256": "c16871ec4fe800520d4665edf5bf29fc3ec3083633a78f557037856c369c623e",
+    "currentExecution": "UNRUN",
+    "sourceFidelity": "Conservative spatial boxes over exact original facets; all candidate tuples restored to original order; no averaged fields/output geometry or cached ray values; no admissions changed"
   }
 }

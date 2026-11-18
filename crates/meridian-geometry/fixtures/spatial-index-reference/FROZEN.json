@@ -1,0 +1,13 @@
+{
+  "parent": "a91b9157ba9a539bac92585f9fd1fae36760ce16",
+  "files": {
+    "before-sections.rs": {
+      "bytes": 50322,
+      "sha256": "116bb5cf958ebbe29063a088c7373078ff7d02708ada910a3e4bb9aa78dba760"
+    },
+    "before-certificate.rs": {
+      "bytes": 84992,
+      "sha256": "96d5c46de59e2c2424a4ea8bdc047f21acbca0d6f3b0a866431b0fda7df717f2"
+    }
+  }
+}

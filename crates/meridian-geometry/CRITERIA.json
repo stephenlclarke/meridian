@@ -303,6 +303,21 @@
       "file": "src/parity_index_tests.rs",
       "name": "interval_index_admits_sort_nodes_and_query_stack_and_rolls_back_each_refusal",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/spatial_index_tests.rs",
+      "name": "spatial_bounds_preserve_source_order_owner_proofs_and_charged_total_query_work",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/spatial_index_tests.rs",
+      "name": "spatial_joint_sections_keep_all_ordered_constraints_fields_and_parity",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/spatial_index_tests.rs",
+      "name": "spatial_sort_nodes_and_source_order_restore_admit_then_rollback_exactly",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -721,6 +736,20 @@
     "contractSHA256": "ce9fc29fa76788583aa5c4aaf520bf1b2abe2b9ee8999c76fca99ab002f908c8",
     "frozenSHA256": "862ecf86f1ad1140da70cdaec29947baaa00a65dddbfa3ac72ec2c48d6784258",
     "currentRustCount": 60,
+    "hostCount": 9
+  },
+  "spatialIndexCorrection": {
+    "qualifiedRoot": "7a470a57c4e4780bc17db862b1d56f5efde03351",
+    "parentAuthor": "a91b9157ba9a539bac92585f9fd1fae36760ce16",
+    "parentFocusedRustPass": 60,
+    "parentHostPass": 9,
+    "parentOriginal": "5Operationsrefusals15unrun0candidates",
+    "old60TestsPreserved": true,
+    "currentExecution": "UNRUN",
+    "deltaSHA256": "e368ddaf7e3b6e3fbebaf7d3f2bb117fbb23e3cb4fae2f6a1c62e49db3b00150",
+    "contractSHA256": "909f17d0f9f42454b73b1f97d9476cf4ea818dec287c6f822412b6abc53ece82",
+    "frozenSHA256": "f571526849501b5fd17a9828babdb45d12cdc837e8a6bdcf856fd69c48a0ff68",
+    "currentRustCount": 63,
     "hostCount": 9
   }
 }

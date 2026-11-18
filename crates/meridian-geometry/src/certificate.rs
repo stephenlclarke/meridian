@@ -372,6 +372,7 @@ struct FacetBoundsIndex {
     facets: Vec<Bounds>,
     nodes: Vec<BoundsNode>,
     root: usize,
+    order: Option<Vec<usize>>,
 }
 struct RayQuery<'a> {
     origin: &'a Point3,
@@ -403,6 +404,7 @@ impl FacetBoundsIndex {
                 .collect::<Result<_, _>>()?,
             nodes: Vec::with_capacity(Self::node_limit(originals.len())),
             root: 0,
+            order: None,
         };
         index.root = b.with_retained(Self::stack_members(originals.len()), |b| {
             index.build_range(originals, 0, originals.len(), b)
@@ -471,15 +473,17 @@ impl FacetBoundsIndex {
                     pending.push(right);
                     pending.push(left);
                 } else {
-                    for (offset, bounds) in self.facets[node.start..node.end].iter().enumerate() {
+                    for position in node.start..node.end {
                         b.step(1)?;
+                        let ordinal = self.source_ordinal(position);
+                        let bounds = &self.facets[ordinal];
                         if query.meets(bounds, b)? {
-                            candidates.push(node.start + offset);
+                            candidates.push(ordinal);
                         }
                     }
                 }
             }
-            Ok(candidates)
+            self.source_order(candidates, 1, |ordinal| *ordinal, b)
         })
     }
     // Retained for the exact axis-aligned specialization and frozen tests.
@@ -553,9 +557,10 @@ impl FacetBoundsIndex {
                     pending.push(right);
                     pending.push(left);
                 } else {
-                    for (offset, bounds) in self.facets[node.start..node.end].iter().enumerate() {
+                    for position in node.start..node.end {
                         b.step(1)?;
-                        let ordinal = node.start + offset;
+                        let ordinal = self.source_ordinal(position);
+                        let bounds = &self.facets[ordinal];
                         if query.originals[ordinal].id().component == query.owner
                             && possible(bounds, query.origin, query.direction, b)?
                         {
@@ -564,7 +569,7 @@ impl FacetBoundsIndex {
                     }
                 }
             }
-            Ok(candidates)
+            self.source_order(candidates, 1, |ordinal| *ordinal, b)
         })
     }
 }
@@ -1116,10 +1121,10 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
         0,
     ]);
     b.retain(bounds_members)?;
-    let facet_bounds_members = FacetBoundsIndex::memberships(originals.len());
+    let facet_bounds_members = FacetBoundsIndex::spatial_memberships(originals.len());
     b.retain(facet_bounds_members)?;
     let facet_bounds = b.with_phase(BudgetPhase::Index, |b| {
-        FacetBoundsIndex::build(originals, b)
+        FacetBoundsIndex::build_spatial(originals, b)
     })?;
     let owner_bounds = b.with_phase(BudgetPhase::Index, |b| {
         component_bounds(originals, &facet_bounds.facets, b)
@@ -2314,3 +2319,6 @@ mod owner_range_tests;
 #[cfg(test)]
 #[path = "proved_visit_tests.rs"]
 mod proved_visit_tests;
+
+#[path = "spatial_index.rs"]
+mod spatial_index;

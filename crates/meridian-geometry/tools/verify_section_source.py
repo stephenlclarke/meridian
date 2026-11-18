@@ -6,6 +6,7 @@ import re
 import subprocess
 from strip_budget_context import strip_context
 from restore_live_runs import restore_runs
+from restore_spatial_index import restore_spatial
 from pathlib import Path
 
 CRATE = Path(__file__).resolve().parents[1]
@@ -24,6 +25,7 @@ def normalized(value):
 
 
 def verify():
+    subprocess.run(["python3", "-B", str(CRATE / "tools/verify_spatial_index_source.py")], check=True)
     subprocess.run(["python3", "-B", str(CRATE / "tools/verify_parity_index_source.py")], check=True)
     subprocess.run(["python3", "-B", str(CRATE / "tools/verify_proved_visits_source.py")], check=True)
     subprocess.run(["python3", "-B", str(CRATE / "tools/verify_incremental_run_source.py")], check=True)
@@ -125,7 +127,7 @@ def verify():
     # Both paths retain the exact complete field and source-tie clauses.
     clause = before[before.index("    let mut winner = face.id();") :]
     clause = clause[:clause.index("\n}\n") + 2]
-    current = (CRATE / "src/sections.rs").read_text()
+    current = restore_spatial("sections.rs", (CRATE / "src/sections.rs").read_text())
     start = current.index("    let mut winner = face.id();")
     assert normalized(current[start : current.index("\n}\n", start) + 2]) == normalized(clause)
     collection_parent = "9a9f13c9758ab3523f7dde5968daa4f957eacac1"
@@ -153,7 +155,7 @@ def verify():
     for signature in ["fn meets_outward_plane(", "fn outward_candidates(", "fn limiting_segment(", "pub(super) fn build(", "fn build_admitted(", "pub(super) fn occupied(", "pub(super) fn memberships(", "pub(super) fn fields_visible("]:
         assert body(current, signature) == body(old_sections, signature), signature
     tests = sum(path.read_text().count("#[test]") for top in ["src", "tests"] for path in (CRATE / top).rglob("*.rs"))
-    assert tests == 60, tests
+    assert tests == 63, tests
     print(json.dumps({"status": "PASS_SOURCE_ONLY", "parent": PARENT, "currentRustTests": tests, "compilerOrGeometryExecuted": False}))
 
 

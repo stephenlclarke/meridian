@@ -1,0 +1,36 @@
+{
+  "status": "AUTHORED_UNRUN",
+  "parentAuthor": "a91b9157ba9a539bac92585f9fd1fae36760ce16",
+  "qualifiedRoot": "7a470a57c4e4780bc17db862b1d56f5efde03351",
+  "qualifiedTree": "7f0d92592227428f6c0c4323042d4f2a6fc88a1e",
+  "parentFocused": "60Rust9host/check/Clippy/buildPASS",
+  "actualParentWholeFive": "5decodePASS5OperationsREFUSED15dependentUNRUN0semanticFAIL0candidates0admissions",
+  "correction": "Large-input charged spatial median node groups with bijective original ordinal mapping; every query restores full original source order. All exact predicates, ownerproofs, contacts and fields preserved.",
+  "storage": "Oldindex/nodeprices unchanged; spatial addsN+8; sortN+16+oldrecursionstack; orderedmap16+(fields+2)/entry while originalcandidatecapacity stays live. No earlyrelease or pricewaiver.",
+  "old60AssertionsPreserved": true,
+  "newTests": [
+    {
+      "file": "src/spatial_index_tests.rs",
+      "name": "spatial_bounds_preserve_source_order_owner_proofs_and_charged_total_query_work",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/spatial_index_tests.rs",
+      "name": "spatial_joint_sections_keep_all_ordered_constraints_fields_and_parity",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/spatial_index_tests.rs",
+      "name": "spatial_sort_nodes_and_source_order_restore_admit_then_rollback_exactly",
+      "status": "UNRUN"
+    }
+  ],
+  "currentRustCount": 63,
+  "hostCount": 9,
+  "contractSHA256": "909f17d0f9f42454b73b1f97d9476cf4ea818dec287c6f822412b6abc53ece82",
+  "frozenSHA256": "f571526849501b5fd17a9828babdb45d12cdc837e8a6bdcf856fd69c48a0ff68",
+  "inverseSHA256": "f4bf355c4a553c57cdb673dcf34dfdc25a864d22dfa88018307e6c32db0cc83d",
+  "parentHandoffSHA256": "42d4d55f4d9aee6e04f523f44ab3f0181a7b7e5f5cdb74129b2fdd1cdf9309a4",
+  "externalRawSHA256": "c16871ec4fe800520d4665edf5bf29fc3ec3083633a78f557037856c369c623e",
+  "qualification": "Rootwholejoin/G2review/G1focused thenONEchangedwholefive; no diagnostic or unchanged retry"
+}

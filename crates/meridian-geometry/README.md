@@ -197,3 +197,9 @@ Two independent frozen comparisons bring the source to 58 Rust tests and nine ho
 The proved-visit revision passed 58 Rust tests, nine host tests, check, strict Clippy and build. Its changed whole-five still refused all constructors on work. Large section-edge lists now use a per-facet closed interval hierarchy to exclude impossible y crossings; every eligible edge still runs the original exact crossing and ambiguity tests. Small lists retain the original scan. Sorting, metadata, queries and concurrent crossing scratch are explicitly admitted and charged.
 
 All 58 prior test bodies and caps stay unchanged. Two new independent parity/work/ownership tests bring the source to 60 Rust tests and nine host tests, all UNRUN. [The exact pruning and lifetime contract](integration/parity-index/CONTRACT.md) preserves actual prior outcomes and required gates. Full fit and broader fleet acceptance remain unproved.
+
+## Spatial grouping with source-order results
+
+The interval revision passed 60 Rust tests, nine host tests, check, strict Clippy and build. Its changed whole-five still refused every constructor on work. Large facet indexes now group exact original bounds spatially, then restore all physical/plane/ray candidate payloads to original ordinal order. The original builder remains the small-input/control path. Sorting, permutation state and ordered restoration are charged and admitted in full.
+
+Three new independent bound/candidate/section/ownership comparisons bring this source to 63 Rust tests plus nine host tests, all UNRUN. [The source-order proof and qualification contract](integration/spatial-index/CONTRACT.md) preserve every prior test and cap. No full-fit or fleet-admission claim is made.

@@ -1,11 +1,13 @@
 """Restore parity-index integration before prior source-preservation checks."""
 import json
 from pathlib import Path
+from restore_spatial_index import restore_spatial
 
 CRATE = Path(__file__).resolve().parents[1]
 
 
 def restore_parity(name, source):
+    source = restore_spatial(name, source)
     edits = json.loads((CRATE / 'integration/parity-index/INVERSE-EDITS.json').read_text())
     if name not in edits:
         return source
