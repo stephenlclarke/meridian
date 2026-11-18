@@ -50,7 +50,8 @@ fn visual() -> Result<Vec<VisualVertex>, &'static str> {
     }
     // include_bytes need not have Pod alignment. Read each complete record without unsafe.
     let result: Vec<VisualVertex> = VISUAL[16..]
-        .chunks_exact(56)
+        .as_chunks::<56>()
+        .0
         .map(bytemuck::pod_read_unaligned)
         .collect();
     if result.iter().any(|v| {

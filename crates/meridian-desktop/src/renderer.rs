@@ -627,7 +627,7 @@ impl Renderer {
                 port: scene.port,
                 docked: scene.docked,
             });
-            if let (Some(scene), Some(station)) = (mule, station) {
+            if let (Some(scene), Some(_)) = (mule, station) {
                 let camera = scene.observer;
                 if self.mule.is_none() {
                     self.mule = Some(crate::mule_render::Pass::new(
