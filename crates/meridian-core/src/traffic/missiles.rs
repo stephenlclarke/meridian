@@ -234,7 +234,15 @@ impl State {
                 return Err(INVALID);
             }
             if let Some(b) = body.first() {
-                let resources = self.resources_at(*a, s.local_tick, s.world_tick, s.stage)?;
+                // A retained corpse is still a scene member, but its resource clock froze
+                // at death. Query its terminal state without advancing/recharging it.
+                // Historical scenes before that terminal clock still replay their own tick.
+                let resource_clock = if a.phase == NpcPhase::Destroyed {
+                    s.local_tick.min(a.resource_clock)
+                } else {
+                    s.local_tick
+                };
+                let resources = self.resources_at(*a, resource_clock, s.world_tick, s.stage)?;
                 let yaw = b.pose.orientation.z.x.atan2(b.pose.orientation.z.z);
                 let planar = pose(b.pose.position, yaw);
                 let birth_position = if a.id.serial == 1 {
