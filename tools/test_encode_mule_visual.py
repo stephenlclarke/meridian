@@ -12,7 +12,15 @@ class SourceEncoding(unittest.TestCase):
         folder=encoder.ROOT/'assets/fleet/sh001';source=(folder/'resource.toml').read_bytes()
         actual=(folder/'visual.bin').read_bytes();self.assertEqual(encoder.encode(source),actual)
         model=tomllib.loads(source.decode())['design'];offset=16
+        original=tomllib.loads((folder/'original-design.toml').read_text())['design']
+        self.assertEqual(model, original)
+        self.assertEqual(
+            [texture['asset'] for texture in original['textures']],
+            ['l337-patrol-diffuse', 'l337-strike-diffuse', 'l337-service-details'],
+        )
+        faces_per_layer = [0, 0, 0]
         for face,material_index,texture in zip(model['faces'],model['faceMaterials'],model['faceTextures'],strict=True):
+            faces_per_layer[texture['texture']] += 1
             material=model['materials'][material_index]
             for index,uv in zip(face,texture['uv'],strict=True):
                 values=struct.unpack_from('<12fII',actual,offset);offset+=56
@@ -23,6 +31,7 @@ class SourceEncoding(unittest.TestCase):
                 self.assertEqual(values[10:12],struct.unpack('<2f',struct.pack('<2f',*uv)))
                 self.assertEqual(values[12:],(texture['texture'],int(material['emissive'])))
         self.assertEqual(offset,len(actual));self.assertEqual(offset,16+7236*3*56)
+        self.assertEqual(faces_per_layer, [452, 0, 6784])
 
     def test_three_original_rgba_maps_and_licenses_match_immutable_manifest(self):
         folder=encoder.ROOT/'assets/fleet/sh001';raw=(folder/'TEXTURE-SOURCE.json').read_bytes()
