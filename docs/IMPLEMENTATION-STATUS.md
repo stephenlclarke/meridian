@@ -4,7 +4,7 @@
 
 The desktop source hides the routine flight summary, idle lesson and practice prompts, and repeated missile and Help text above the instruments. Command feedback expires after four seconds in ordinary flight, including when paused. Active practice, jump countdowns and contact warnings remain visible. Preview 8 still uses the older display. Native visual qualification for this change is pending.
 
-The Lion Citadel exterior now uses blue-grey plating, darker structural steel and amber light strips in the desktop source. Subtle face shading gives adjacent panels depth. The renderer applies this finish at load time to the original material assignments. Native appearance checks and the reported gaps above and below the entrance remain open.
+The Lion Citadel exterior now uses blue-grey plating, darker structural steel and amber light strips in the desktop source. Subtle face shading gives adjacent panels depth. The renderer applies this finish at load time to the original material assignments. Four short strips join the rim to the upper and lower crosspieces. On a CPU projection of the reported view, the strips cover all 184 sampled gaps and nine sightlines through the port stay clear. A visual check in the Mac build is pending.
 
 ## Internal Mule docking validation
 
