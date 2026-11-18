@@ -4,7 +4,7 @@
 
 Mule has a distinct conservative gameplay envelope made from sixteen rounded source-component supports with a proposed 2 cm directional stand-off. The detailed source geometry, engineering mass/centre/inertia and provenance remain separate and unchanged. This implements the human's smooth, close-fitting collision direction; it does not clear the unresolved exact-original importer or its limits.
 
-The new core helpers cover source containment, continuous contact, station clearance, ray uncertainty and immutable low-opacity shimmer parameters. Ten new tests are authored and **UNRUN**. There is no admitted Mule actor, acquisition, crew, fitting/save route, renderer, actual game acceptance or new accepted hull count yet. The existing paid EMP, ECM, combat, economy and persistence source is preserved. Actual shimmer rendering and native evidence remain required before preview delivery.
+The new core helpers cover source containment, continuous contact, station clearance, ray uncertainty and immutable low-opacity shimmer parameters. Eleven new tests are authored and **UNRUN**. The bounded rotation correction accounts for admitted basis residuals and adds a regression for the reviewed missed-contact case; the prior ten test bodies are unchanged. There is no admitted Mule actor, acquisition, crew, fitting/save route, renderer, actual game acceptance or new accepted hull count yet. The existing paid EMP, ECM, combat, economy and persistence source is preserved. Actual shimmer rendering and native evidence remain required before preview delivery.
 
 ## Independent single-window observer prepared, execution prohibited pending exception
 

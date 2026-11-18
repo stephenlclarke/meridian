@@ -220,15 +220,30 @@ impl SmoothPiece {
         {
             return Err(EnvelopeError::InvalidGeometry);
         }
-        let trace = start.orientation.x.dot(end.orientation.x)
-            + start.orientation.y.dot(end.orientation.y)
-            + start.orientation.z.dot(end.orientation.z);
-        if ((trace - 1.0) * 0.5).clamp(-1.0, 1.0).acos() > angular_travel + 1e-6 {
+        // Each accepted Gram-matrix entry differs from identity by at most 1e-10.
+        // Its spectral error is <= 3e-10, so the proper polar rotation differs
+        // from the basis by < 3e-10 in Frobenius norm. The relative matrix then
+        // differs by < 1e-9. Its sine/cosine pair has error < 3e-9; a 1e-8
+        // angular guard covers that residual and floating-point arithmetic.
+        // atan2 retains small rotations even when trace/acos rounds to zero,
+        // and stays well-conditioned near a half turn as well.
+        let a = start.orientation;
+        let b = end.orientation;
+        let sine = 0.5
+            * length(Vec3::new(
+                a.y.dot(b.z) - a.z.dot(b.y),
+                a.z.dot(b.x) - a.x.dot(b.z),
+                a.x.dot(b.y) - a.y.dot(b.x),
+            ));
+        let cosine = 0.5 * (a.x.dot(b.x) + a.y.dot(b.y) + a.z.dot(b.z) - 1.0);
+        let endpoint_angle = (sine.atan2(cosine) + 1e-8).min(std::f64::consts::PI);
+        if endpoint_angle > angular_travel + 1e-6 {
             return Err(EnvelopeError::UnderstatedRotation);
         }
         let movement = sub(end.position, start.position);
         let center = add(start.position, start.orientation.apply(self.center()));
-        let rotation_padding = self.origin_radius * 1.001 * (angular_travel + 1e-6).min(2.0);
+        let rotation_padding =
+            self.origin_radius * (1.001 * (angular_travel + 1e-6).min(2.0) + 1e-9);
         let mut low = Vec3::new(f64::INFINITY, f64::INFINITY, f64::INFINITY);
         let mut high = Vec3::new(f64::NEG_INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY);
         for x in [self.low.x, self.high.x] {

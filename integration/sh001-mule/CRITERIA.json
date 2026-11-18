@@ -54,6 +54,11 @@
       "file": "crates/meridian-core/src/mule/tests.rs",
       "name": "rounded_support_invalid_geometry_never_grants_clearance_or_a_contact",
       "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "rounded_sweep_accounts_for_near_orthogonal_trace_three_endpoint",
+      "status": "UNRUN"
     }
   ],
   "existingGeometryTests": {
@@ -127,5 +132,13 @@
     "ships": "23/162",
     "stations": "4/6",
     "newAdmissions": 0
+  },
+  "boundedCorrection": {
+    "finding": "G2-MULE-ENVELOPE-1",
+    "reviewedRoot": "158a2d3bc43b9533fa57895f85af34159c693d11",
+    "authorParent": "a43ec10965fa1a3075acdd0c358d5d120b8d7935",
+    "behavior": "Reject understated endpoint travel using atan2 sine/cosine plus admitted-basis residual guard; preserve contact blocking and correctly supplied proper rotations, including near half-turn.",
+    "newCase": "rounded_sweep_accounts_for_near_orthogonal_trace_three_endpoint",
+    "status": "AUTHORED_UNRUN;source-only checks;existing G2 delta/G1 qualification owners"
   }
 }

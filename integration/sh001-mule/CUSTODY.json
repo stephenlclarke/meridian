@@ -25,5 +25,14 @@
   },
   "sourceScope": "All519 parent geometry files unchanged. Every old core source/test unchanged except two module declarations. All131 current gameplay core files bound byte exact toad5 at read-only inspection.",
   "authorExecution": "Source copy/encoding, source hashes, AST/JSON and rustfmt only. No Mule envelope/containment/contact constructor, compiler, Cargo, Clippy, GPU or native execution.",
-  "currentAdmission": "None;newMulecoreprototypeandall10testsUNRUN;Worldandgameplayactivationexplicitlypending"
+  "currentAdmission": "None;newMulecoreprototypeandall11testsUNRUN;Worldandgameplayactivationexplicitlypending",
+  "boundedCorrection": {
+    "finding": "G2-MULE-ENVELOPE-1",
+    "reviewedRoot": "158a2d3bc43b9533fa57895f85af34159c693d11",
+    "reviewFindingFile": "/private/tmp/g2-meridian-158a2d3b-mule-envelope-whole-source-findings.json",
+    "reviewFindingSHA256": "4bc6b9047d14a7f2f206c2bb2baaa16d67076612f7e857c0fd1244c33e8a69b6",
+    "authorParent": "a43ec10965fa1a3075acdd0c358d5d120b8d7935",
+    "priorTenTestBodies": "Byte exact prefix; new regression appended only",
+    "execution": "No compiler/constructor/contact/test/GPU/native execution"
+  }
 }

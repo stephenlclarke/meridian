@@ -70,9 +70,9 @@ def verify():
     assert plus == ['+pub mod mule;', '+mod mule;']
     criteria = json.loads((ROOT / 'integration/sh001-mule/CRITERIA.json').read_text())
     names = re.findall(r'#\[test\]\s*fn\s+(\w+)\(', (ROOT / 'crates/meridian-core/src/mule/tests.rs').read_text())
-    assert len(names) == 10 and names == [test['name'] for test in criteria['newCoreTests']]
+    assert len(names) == 11 and names == [test['name'] for test in criteria['newCoreTests']]
     assert all(test['status'] == 'UNRUN' for test in criteria['newCoreTests'])
-    print(json.dumps({'status': 'PASS_SOURCE_ONLY', 'existingGameplayCoreFilesUnchanged': len(binding['coreFiles']), 'currentGameplayCorePins': 131, 'newCoreTests': 10, 'vertexEncoding': 5344, 'triangleEncoding': 9008, 'constructorsOrContactOrContainmentOrCompilerExecuted': False}))
+    print(json.dumps({'status': 'PASS_SOURCE_ONLY', 'existingGameplayCoreFilesUnchanged': len(binding['coreFiles']), 'currentGameplayCorePins': 131, 'newCoreTests': 11, 'vertexEncoding': 5344, 'triangleEncoding': 9008, 'constructorsOrContactOrContainmentOrCompilerExecuted': False}))
 
 
 if __name__ == '__main__':
