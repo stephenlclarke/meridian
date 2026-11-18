@@ -1,5 +1,7 @@
 //! Paid ECM hardware and the original finite standard-missile defence field.
 mod persistence;
+mod preparation;
+pub use preparation::PreparedEcm;
 mod validation;
 
 use super::{CombatIdentity, FlightMode, MissileEnd, ModuleKind, ModuleSlot, World};
@@ -169,6 +171,10 @@ impl World {
             .map(|item| item.id)
     }
     pub fn request_ecm(&mut self, tick: u64) -> Result<EcmOrigin, EcmError> {
+        Ok(self.prepare_ecm(tick)?.commit())
+    }
+    /// Prepare the actual command and exact prospective save without publishing live state.
+    pub fn prepare_ecm(&mut self, tick: u64) -> Result<PreparedEcm<'_>, EcmError> {
         if tick != self.state.tick {
             return Err(EcmError::StaleCommand);
         }
@@ -216,22 +222,7 @@ impl World {
         let mut emp = self.emp.clone();
         emp.cancel(clock);
 
-        // Publication uses the existing staged-save rollback boundary. The exact field,
-        // resource debit, missile endings, lesson cache and EMP cancellation move together.
-        let old_ecm = std::mem::replace(&mut self.ecm, ecm);
-        let old_missiles = std::mem::replace(&mut self.missiles, missiles);
-        let old_pulse = std::mem::replace(&mut self.pulse, pulse);
-        let old_practice = std::mem::replace(&mut self.practice, practice);
-        let old_emp = std::mem::replace(&mut self.emp, emp);
-        if let Err(error) = self.save_bytes() {
-            self.ecm = old_ecm;
-            self.missiles = old_missiles;
-            self.pulse = old_pulse;
-            self.practice = old_practice;
-            self.emp = old_emp;
-            return Err(EcmError::Save(error));
-        }
-        Ok(origin)
+        preparation::prepare(self, ecm, missiles, pulse, practice, emp, origin)
     }
 }
 

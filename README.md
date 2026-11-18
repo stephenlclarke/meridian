@@ -29,7 +29,7 @@ Meridian is a Rust reimplementation of the original L337 project, with direct wg
 
 The current [EMP electrical weapon candidate](docs/EMP.md) has passed Mac, Linux and native Windows qualification: 631 Rust tests, 99 Python tests, 49 Markdown checks, strict Clippy and locked release builds per platform. The signed Mac candidate has also passed bounded native paid purchase, store/refit, first grades and cold Continue checks, plus early charge cancellation, one pulse release and an insufficient-bank refusal. A separately labelled XYZZY-supported setup also passed two native pulses, player and target electrical disablement, blocked controls/travel, cold disabled persistence and unheld recovery over 2326 accepted World ticks. The target was stationary; moving coast and the precise native recovery boundary remain unobserved. EMP is not part of the published Preview 7.
 
-The [paid manual ECM core candidate](docs/ECM.md) is source-authored and unrun. It adds real paid hardware, a charged 32-tick standard-missile field and time-only cold restoration. Desktop integration, independent review and owner execution remain pending; automatic ECM and hostile missile production remain separate work.
+The [paid manual ECM candidate](docs/ECM.md) is source-authored and unrun. It adds real paid hardware, a charged 32-tick standard-missile field and time-only cold restoration, with an actual equipment slot, N flight control, HUD/Help and atomic durable activation. Final serial integration, independent review and owner execution remain pending; automatic ECM and hostile missile production remain separate work.
 
 ## Previews and validation
 
@@ -82,6 +82,7 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | O; K; U; Y | Equipment panel; buy/fit cargo bay; store; refit |
 | I; V; X | Mission details; review all held freight deliveries; review abandonment |
 | F1; F2; F3; F4 | Next ship/practice lock; arm/safe; launch one missile; safe/unlock |
+| N in flight (ECM candidate, UNRUN) | Activate fitted manual ECM; costs 22 energy and uses a 0.53-second field/cooldown |
 | F7; F8; F10 | Review attempt closure; reception; fresh consent |
 | F6; F12; C; 0/1/2/3 | Flight lesson consent/reception; cancellation; details; view direction |
 | P; F11; F5; F9 | Pause; fullscreen; save; reload the current qualified save |

@@ -2,13 +2,25 @@
 
 ## Current scope and validation
 
-This is a source-authored core candidate. Its Rust tests, compiler checks, Clippy, coverage and actual application acceptance are UNRUN. Earlier qualified EMP and preview results do not cover this delta. Root owns the desktop controls, service-tree/HUD join, serial integration and independent review; the existing Mac and Dell owners retain execution.
+This is a source-authored core candidate. Its Rust tests, compiler checks, Clippy, coverage and actual application acceptance are UNRUN. Earlier qualified EMP and preview results do not cover this delta. The isolated desktop successor implements the actual controls, equipment slot, HUD/Help and durable Profile path. Root owns final serial composition with the separate four-facing owner and one complete independent review; the existing Mac and Dell owners retain execution.
 
 The ordinary SH025 can buy one E.C.M. System for 2100 CR at technology level 5 or above, store that exact paid item and refit it. It uses one of the original three utility mounts alongside the actual cargo expansion, Fuel Scoops and distinct EMP. It does not consume a laser slot or silently grant hardware through XYZZY. All transactions use the existing paid module review, staged save and writer publication boundary.
 
 `World::request_ecm(tick)` is a manual command. It requires the current tick, an unpaused living flight, fitted paid hardware, a working electrical reserve, strictly more than 22 energy and no remaining field timer. It spends exactly 22 energy and opens one 32-tick field. It changes neither laser heat nor weapon cooldown. It cancels a charging EMP without releasing an EMP pulse or spending its bank. The activation has its own ordinal; it issues no ordinary attack emission, impact, bounty, cargo or refund.
 
 The field ends every actual live standard missile in the emitter's current system and visit, including player-owned missiles. A real standard missile born during the same live field also ends. The original manual player adapter supplies no distance, visibility or ray-occlusion gate; none is invented here. Retained projectile identity, position, motion, birth round and contact history remain authoritative. An ECM ending has no impact or beam interception. Earlier same-tick laser/step scenes retain bodies that were still live when those scenes were captured.
+
+## Desktop controls and durable publication
+
+Select the ECM utility slot in Equipment. G/Enter reviews the actual 2100 CR purchase; Y reviews fitting an owned item and U reviews storing it. The current row and World-issued review must still match at confirmation. A forged node, foreign item, unsupported option, wrong slot, unaffordable offer or stale selection grants no authority. Generic modular transactions retain the paid provenance, utility budget and existing atomic save publisher.
+
+Press N once in flight to activate the fitted system. N remains New Commander on the title screen; existing flight roll, facing/view, ordinary fire, mining, missile, EMP, travel and station bindings are unchanged. Keyboard repeat and a held N never activate a second field automatically. Focus, occlusion, pause and modal H/? Help retain their existing guards. A successfully committed ECM clears held U after cancelling EMP warmup; a failed write preserves the charge and held control.
+
+`PreparedEcm` stages the exact field, resource debit, missile endings, practice cache and EMP cancellation together, validates the whole prospective save, then restores every live value before returning. Profile writes those exact bytes through the existing synced temporary file/atomic rename before committing the candidate. Dropping preparation, a validation failure or a pre-publication filesystem error leaves live state unchanged. No cold decode is used for staging, so preparation cannot silently revoke live field permission or invalidate input. A directory-sync warning after successful publication retains the committed state and reports the warning.
+
+The HUD shows ECM property, live FIELD or time-only COOLDOWN, the actual shared 22-energy cost and terminated missile count within the existing visible line budget. Stored hardware, insufficient energy and electrical disablement receive distinct readouts/refusals. ECM has no invented bank; the existing EMP bank remains separate. Equipment readouts and contextual Help explain that manual activation is supported and automatic ECM is unavailable.
+
+The desktop successor authors nine host tests plus one additional prepared-core test. They use actual presented reviews and physical input routing, real market-earned funding and a real Save baseline, genuine owned practice missiles, synced Profile files and induced filesystem publication failure. The EMP cancellation case explicitly labels secret funding/kit, pays for ECM after storing a real scoop to free its mount, and pursues an actual recent attacker; failed publication is checked before successful cancellation. These are unexecuted headless host tests, not native rendering or piloting evidence.
 
 ## Cold continuation
 

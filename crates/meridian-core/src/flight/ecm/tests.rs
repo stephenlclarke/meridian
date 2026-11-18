@@ -611,3 +611,39 @@ fn all_actual_utility_items_share_the_original_three_mounts() {
     assert_eq!(world.credits_tenths(), cash);
     cold(&world);
 }
+
+#[test]
+fn prepared_ecm_drop_and_failed_writer_preserve_all_live_command_state() {
+    let mut world = ready();
+    launch_missile(&mut world);
+    let before = world.save_bytes().unwrap();
+    let tick = world.snapshot().tick;
+    {
+        let prepared = world.prepare_ecm(tick).unwrap();
+        let staged = World::from_save_bytes(prepared.bytes()).unwrap();
+        assert_eq!(staged.ecm_snapshot().unwrap().activations, 1);
+        assert!(staged.ecm_snapshot().unwrap().field.is_none());
+        assert_eq!(missile(&staged, 0).ended, Some(MissileEnd::Ecm));
+        assert_eq!(prepared.origin().activation, 1);
+        // Dropping a real prepared command intentionally does not publish it.
+    }
+    assert_eq!(world.save_bytes().unwrap(), before);
+    let prepared = world.prepare_ecm(tick).unwrap();
+    assert_eq!(
+        prepared.publish_with(|_| Err::<(), _>("disk refused")),
+        Err("disk refused")
+    );
+    assert_eq!(world.save_bytes().unwrap(), before);
+    assert!(missile(&world, 0).ended.is_none());
+    let origin = world
+        .prepare_ecm(tick)
+        .unwrap()
+        .publish_with(|bytes| {
+            assert!(!bytes.is_empty());
+            Ok::<(), &str>(())
+        })
+        .unwrap();
+    assert_eq!(world.ecm_snapshot().unwrap().field, Some(origin));
+    assert_eq!(missile(&world, 0).ended, Some(MissileEnd::Ecm));
+    cold(&world);
+}

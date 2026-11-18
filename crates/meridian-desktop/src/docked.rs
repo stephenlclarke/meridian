@@ -501,6 +501,12 @@ fn equipment_action(
     operation: ui::EquipmentOperation,
 ) -> Result<Action, String> {
     use ui::EquipmentOperation::{Buy, Fit, Store};
+    if slot == ui::ecm::SLOT {
+        return ui::ecm::action(world, node, instance, operation).map(Action::Module);
+    }
+    if node == ModuleKind::EcmSystem.node() {
+        return Err("Select the ECM utility slot".into());
+    }
     if slot == ui::emp::SLOT {
         return ui::emp::action(world, node, instance, operation).map(Action::Emp);
     }
@@ -756,16 +762,21 @@ fn equipment_panel(
     });
     slots.push(ui::fuel_scoops::slot(world)?);
     slots.push(ui::emp::slot(world));
+    slots.push(ui::ecm::slot(world)?);
     append_pylon_slots(&mut slots, &ammo);
     let mut rows = Vec::new();
     let module_slot = match selected {
         "front-laser" => Some(ModuleSlot::FrontLaser),
         "energy" => Some(ModuleSlot::Energy),
         "navigation" => Some(ModuleSlot::Navigation),
+        ui::ecm::SLOT => Some(ModuleSlot::UtilityEcm),
         _ => None,
     };
     if let Some(slot) = module_slot {
         rows = module_rows(world, &modules, slot, tick);
+        if slot == ModuleSlot::UtilityEcm {
+            ui::ecm::describe(world, &mut rows)?;
+        }
     } else if selected == ui::emp::SLOT {
         rows = ui::emp::rows(world);
     } else if selected == ui::fuel_scoops::SLOT {

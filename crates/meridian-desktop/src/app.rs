@@ -1,3 +1,4 @@
+mod ecm;
 mod emp;
 use std::{
     collections::{HashSet, hash_map::RandomState},
@@ -526,6 +527,10 @@ impl App {
     }
 
     fn game_key(&mut self, code: KeyCode) {
+        if code == KeyCode::KeyN {
+            self.activate_ecm();
+            return;
+        }
         if code == KeyCode::KeyU && self.game.world.snapshot().mode == FlightMode::Flight {
             self.notice = Some("EMP: hold U for ten seconds; release to cancel. Recent-attacker self-defence only.".into());
             return;
@@ -1186,3 +1191,6 @@ mod xyzzy_tests;
 
 #[cfg(test)]
 mod emp_tests;
+
+#[cfg(test)]
+mod ecm_tests;

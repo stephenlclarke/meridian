@@ -88,6 +88,25 @@ impl Profile {
         )
     }
 
+    fn activate_ecm(&mut self) -> Result<String, String> {
+        let tick = self.world.snapshot().tick;
+        let prepared = self
+            .world
+            .prepare_ecm(tick)
+            .map_err(crate::docked_screens::ecm::refusal)?;
+        let published = self
+            .store
+            .save(prepared.bytes(), MAX_SAVE_BYTES)
+            .map_err(|error| format!("ECM was not activated; save failed: {error}"))?;
+        prepared.commit();
+        self.has_save = true;
+        self.session.invalidate();
+        publication_message(
+            published,
+            "ECM activated: 22 energy spent; manual field lasts 0.53 seconds. Change saved.".into(),
+        )
+    }
+
     pub fn new_commander(&mut self, seed: u64) -> Result<bool, String> {
         if self.playing {
             return Err("Start a new commander from the title screen".into());
@@ -128,6 +147,9 @@ impl Profile {
     pub fn command(&mut self, action: Action) -> Result<String, String> {
         if !self.playing {
             return Err("N starts a new commander; C continues the existing save".into());
+        }
+        if matches!(action, Action::ActivateEcm) {
+            return self.activate_ecm();
         }
         if let Action::Emp(command) = action {
             return self.emp_equipment(command);
@@ -395,6 +417,9 @@ impl Profile {
             }
             if let Some(emp) = crate::docked_screens::emp::status(&self.world) {
                 lines.push(emp);
+            }
+            if let Some(ecm) = crate::docked_screens::ecm::status(&self.world) {
+                lines.insert(lines.len().min(3), ecm);
             }
             return lines;
         }
