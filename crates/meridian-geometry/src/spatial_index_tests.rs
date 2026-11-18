@@ -35,8 +35,8 @@ fn spatial_bounds_preserve_source_order_owner_proofs_and_charged_total_query_wor
         let mut new = Budget::new(Limits::default())?;
         old.retain(FacetBoundsIndex::memberships(faces.len()))?;
         new.retain(FacetBoundsIndex::spatial_memberships(faces.len()))?;
-        let contiguous = FacetBoundsIndex::build(&faces, &mut old)?;
-        let spatial = FacetBoundsIndex::build_spatial(&faces, &mut new)?;
+        let contiguous = FacetBoundsIndex::build(faces, &mut old)?;
+        let spatial = FacetBoundsIndex::build_spatial(faces, &mut new)?;
         assert!(spatial.order.is_some());
         let mut permutation: Vec<_> = (0..faces.len())
             .map(|p| spatial.source_ordinal(p))
@@ -77,10 +77,10 @@ fn spatial_bounds_preserve_source_order_owner_proofs_and_charged_total_query_wor
                     upper: [integer(100), integer(100), integer(100)],
                 };
                 let expected = old.with_retained(faces.len(), |b| {
-                    contiguous.ray_intersections(origin, &direction, &faces, owner, &bounds, b)
+                    contiguous.ray_intersections(origin, &direction, faces, owner, &bounds, b)
                 })?;
                 let actual = new.with_retained(faces.len(), |b| {
-                    spatial.ray_intersections(origin, &direction, &faces, owner, &bounds, b)
+                    spatial.ray_intersections(origin, &direction, faces, owner, &bounds, b)
                 })?;
                 assert_eq!(actual, expected);
             }
