@@ -404,7 +404,7 @@ fn native_death_freezes_resources_but_retained_scenes_keep_the_corpse_without_re
         .bodies
         .iter_mut()
         .find(|body| body.id == corpse.id)
-        .unwrap()
+        .unwrap_or_else(|| panic!("retained native corpse missing from resurrection fixture"))
         .phase = NpcPhase::Hunting;
     assert!(
         state

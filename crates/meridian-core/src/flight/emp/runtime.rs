@@ -201,34 +201,33 @@ impl State {
             if next.mode == FlightMode::Docked {
                 stage.state.charge = None;
             }
-        } else if let Some(charge) = self.charge.clone() {
-            if charge.phase == EmpChargePhase::Charging
-                && clock
-                    >= charge
-                        .start
-                        .physical_tick
-                        .saturating_add(policy::WARMUP_TICKS)
-            {
-                let mut released = charge;
-                released.phase = EmpChargePhase::Released;
-                released.ended_at = Some(clock);
-                stage.state.charge = Some(released.clone());
-                // Every candidate, including every splash victim and both resource owners, remains
-                // private until all admissions succeed. A failed release is consumed, never retried.
-                if let Ok(result) = stage.state.release(
-                    world,
-                    Frame {
-                        next,
-                        navigation,
-                        traffic: &stage.traffic,
-                        missiles,
-                        pulse: stage.pulse,
-                        combat: stage.combat,
-                    },
-                    released,
-                ) {
-                    stage = result;
-                }
+        } else if let Some(charge) = self.charge.clone()
+            && charge.phase == EmpChargePhase::Charging
+            && clock
+                >= charge
+                    .start
+                    .physical_tick
+                    .saturating_add(policy::WARMUP_TICKS)
+        {
+            let mut released = charge;
+            released.phase = EmpChargePhase::Released;
+            released.ended_at = Some(clock);
+            stage.state.charge = Some(released.clone());
+            // Every candidate, including every splash victim and both resource owners, remains
+            // private until all admissions succeed. A failed release is consumed, never retried.
+            if let Ok(result) = stage.state.release(
+                world,
+                Frame {
+                    next,
+                    navigation,
+                    traffic: &stage.traffic,
+                    missiles,
+                    pulse: stage.pulse,
+                    combat: stage.combat,
+                },
+                released,
+            ) {
+                stage = result;
             }
         }
         let fired = stage.state.pulses.len() != self.pulses.len();
