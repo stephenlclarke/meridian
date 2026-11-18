@@ -379,6 +379,11 @@ impl CommanderAccount {
     pub(crate) fn xyzzy_flags(&self) -> (bool, bool) {
         (self.data.xyzzy_active, self.data.xyzzy_unlimited_fuel)
     }
+    pub(crate) fn prepare_emp_equipment(&self, paid: u32) -> Result<Self, Error> {
+        let mut candidate = Self { data: self.data };
+        candidate.debit(paid)?;
+        Ok(candidate)
+    }
     pub(crate) fn prepare_xyzzy(
         &self,
         first: bool,

@@ -357,3 +357,66 @@ fn actual_npc_beam_visibility_refusal_spends_no_laser_or_damage_receipt() {
         "no actual NPC contact reached the obstruction boundary"
     );
 }
+
+#[test]
+fn native_death_freezes_resources_but_retained_scenes_keep_the_corpse_without_resurrection() {
+    let data = ok(OriginalStationData::bundled());
+    let mut state = State::fresh(12001);
+    let mut market = ok(StationMarkets::new_commander(12001));
+    let mut death = None;
+    for time in 1..=12000 {
+        let before = state.missile_scene(SystemId::AVENOR, time - 1, SceneStage::Command(u64::MAX));
+        (state, market) = tick(&state, &market, &data, time);
+        if state.actors[0].is_some_and(|actor| actor.phase == NpcPhase::Destroyed) {
+            death = Some((time, before));
+            break;
+        }
+    }
+    let (time, before_death) = some(death);
+    let corpse = some(state.actors[0]);
+    assert_eq!(corpse.resources.energy, 0);
+    assert_eq!(corpse.resource_clock, state.clocks[0]);
+    assert!(state.shots.iter().any(|shot| shot.victim == corpse.id));
+    ok(state.validate(12001, time, 0, &data, &market));
+    (state, market) = tick(&state, &market, &data, time + 1);
+    assert_eq!(some(state.actors[0]), corpse);
+    assert!(state.clocks[0] > corpse.resource_clock);
+    ok(state.validate(12001, time + 1, 0, &data, &market));
+    let scene = state.missile_scene(SystemId::AVENOR, time + 1, SceneStage::Command(u64::MAX));
+    assert!(
+        scene
+            .bodies
+            .iter()
+            .any(|body| body.id == corpse.id && body.phase == NpcPhase::Destroyed)
+    );
+    // The generic resource replay must STILL refuse post-death advancement.
+    assert!(
+        state
+            .resources_at(corpse, scene.local_tick, scene.world_tick, scene.stage)
+            .is_err()
+    );
+    ok(state.validate_missile_scene(&scene, time + 1, &data));
+    // The earlier live scene must use its historical clock, not the later death state.
+    assert!(before_death.local_tick < corpse.resource_clock);
+    ok(state.validate_missile_scene(&before_death, time + 1, &data));
+    let mut resurrected = scene.clone();
+    resurrected
+        .bodies
+        .iter_mut()
+        .find(|body| body.id == corpse.id)
+        .unwrap_or_else(|| panic!("retained native corpse missing from resurrection fixture"))
+        .phase = NpcPhase::Hunting;
+    assert!(
+        state
+            .validate_missile_scene(&resurrected, time + 1, &data)
+            .is_err()
+    );
+    let mut omitted = scene;
+    omitted.bodies.retain(|body| body.id != corpse.id);
+    assert!(
+        state
+            .validate_missile_scene(&omitted, time + 1, &data)
+            .is_err()
+    );
+    assert_eq!(some(state.actors[0]), corpse);
+}

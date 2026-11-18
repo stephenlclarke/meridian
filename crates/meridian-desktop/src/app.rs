@@ -1,3 +1,4 @@
+mod emp;
 use std::{
     collections::{HashSet, hash_map::RandomState},
     error::Error,
@@ -168,6 +169,7 @@ impl App {
     }
 
     fn clear_held_input(&mut self) {
+        self.cancel_emp_input();
         self.keys.clear();
         self.dragging = false;
         self.wheel = 0.0;
@@ -524,6 +526,10 @@ impl App {
     }
 
     fn game_key(&mut self, code: KeyCode) {
+        if code == KeyCode::KeyU && self.game.world.snapshot().mode == FlightMode::Flight {
+            self.notice = Some("EMP: hold U for ten seconds; release to cancel. Recent-attacker self-defence only.".into());
+            return;
+        }
         let action = match code {
             KeyCode::Digit0 => Action::SetFlightView(FlightView::Front),
             KeyCode::Digit1 => Action::SetFlightView(FlightView::Rear),
@@ -583,14 +589,7 @@ impl App {
                 throttle: self.axis(KeyCode::KeyW, KeyCode::KeyS),
                 brake: self.keys.contains(&KeyCode::Space),
             };
-            step_frame(
-                &mut self.game.world,
-                input,
-                ticks,
-                self.keys.contains(&KeyCode::KeyZ),
-                &mut self.pulse,
-                &mut self.mining,
-            )
+            self.step_emp_frame(input, ticks)
         } else {
             Ok(None)
         };
@@ -651,6 +650,9 @@ impl App {
         if let PhysicalKey::Code(code) = physical_key {
             if state == ElementState::Released {
                 self.keys.remove(&code);
+                if code == KeyCode::KeyU {
+                    self.cancel_emp_input();
+                }
             } else if self.focused && !self.occluded {
                 if self.route_help(code, repeat, text) {
                     return None;
@@ -1181,3 +1183,6 @@ mod help_tests;
 
 #[cfg(test)]
 mod xyzzy_tests;
+
+#[cfg(test)]
+mod emp_tests;

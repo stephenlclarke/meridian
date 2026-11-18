@@ -59,11 +59,12 @@ fn validate_slots(
 pub(super) fn validate_fit(
     items: &[OwnedModule],
     account: &CommanderAccount,
+    emp_mounts: u16,
 ) -> Result<(), ModuleError> {
     validate_slots(
         crate::equipment::definition().map_err(|_| ModuleError::BerthRequired)?,
         items,
-        account.equipment_state().units_used(),
+        account.equipment_state().units_used() + emp_mounts,
     )
     .map(|_| ())
 }
@@ -75,7 +76,7 @@ impl World {
         let utility_mounts_used = validate_slots(
             definition,
             &ledger.items,
-            account.equipment_state().units_used(),
+            account.equipment_state().units_used() + self.emp.utility_mounts(),
         )
         .ok()?;
         let owned = ledger

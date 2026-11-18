@@ -371,6 +371,7 @@ impl World {
             ] {
                 self.grant_xyzzy_module(review.dock, review.tick, kind)?;
             }
+            self.grant_xyzzy_emp(review.dock, review.tick)?;
             self.grant_xyzzy_missiles(review.dock, review.tick)?;
             let account = self
                 .commander_account

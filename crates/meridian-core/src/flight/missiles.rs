@@ -337,6 +337,15 @@ pub(super) struct PreparedStep {
     pub(super) traffic: crate::traffic::State,
 }
 impl World {
+    /// Geometry-only native missile occlusion for the separate EMP query owner.
+    pub(super) fn emp_missile_distance(
+        body: crate::docking::RigidPose,
+        origin: Vec3,
+        direction: Vec3,
+        range: f64,
+    ) -> Option<f64> {
+        mesh_distance(body, pose(origin, direction)?, range)
+    }
     /// Historical T01 sight reuses the exact native missile mesh and retained launch orientation.
     pub(super) fn retained_flight_body_distance(
         &self,
@@ -443,6 +452,9 @@ impl World {
     /// No target position, launcher pose, velocity, actor or ammo count is accepted.
     pub fn request_fire_missile(&mut self, tick: u64) -> Result<MissileOrigin, MissileError> {
         let owner = self.missile_command(tick)?;
+        if self.emp.input_blocked() {
+            return Err(MissileError::NotInFlight);
+        }
         if !self.missiles.armed {
             return Err(MissileError::NotArmed);
         }

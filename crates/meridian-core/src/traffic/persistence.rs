@@ -7,6 +7,46 @@ use super::{
 };
 use crate::save::{Reader, Writer};
 impl State {
+    /// Failure-only evidence from the same read-only guards as validate; never repairs state.
+    #[cfg(test)]
+    pub(crate) fn validation_failure_evidence(
+        &self,
+        seed: u64,
+        world_tick: u64,
+        player_emissions: u64,
+        data: &OriginalStationData,
+        markets: &StationMarkets,
+    ) -> String {
+        let actors: Vec<_> = self
+            .actors
+            .iter()
+            .enumerate()
+            .filter_map(|(index, actor)| {
+                let actor = (*actor)?;
+                Some((
+                    index,
+                    self.validate_identity(actor, index, seed, world_tick, data),
+                    Self::validate_economy(actor, seed, world_tick, markets),
+                    self.validate_resources(actor),
+                    self.validate_terminal_manifest(actor),
+                    self.resources_at(
+                        actor,
+                        actor.resource_clock,
+                        u64::MAX,
+                        super::SceneStage::Command(u64::MAX),
+                    ),
+                ))
+            })
+            .collect();
+        format!(
+            "traffic failure evidence: seed={seed} world_tick={world_tick} player_emissions={player_emissions}; whole={:?}; actors (slot, identity, economy, resources, terminal_manifest, replay_expected)={actors:#?}; separation={:?}; shots={:?}; player_hits={:?}; missile_resource_replay={:?}; actual_state={self:#?}",
+            self.validate(seed, world_tick, player_emissions, data, markets),
+            self.validate_separation(data),
+            self.validate_shots(world_tick, player_emissions, data),
+            self.validate_player_hits(world_tick, data),
+            self.validate_missile_resource_replay(),
+        )
+    }
     pub(crate) fn validate(
         &self,
         seed: u64,
@@ -22,6 +62,7 @@ impl State {
                 && self.shots.is_empty()
                 && self.player_hits.is_empty()
                 && self.missile_hits.is_empty()
+                && self.emp_events.is_empty()
             {
                 Ok(())
             } else {
@@ -32,6 +73,7 @@ impl State {
             || seed == 0
             || u128::from(self.clocks[0]) + u128::from(self.clocks[1]) > u128::from(world_tick)
             || self.receipt_count() > MAX_TRAFFIC_SHOTS
+            || self.emp_events.len() > super::emp::MAX_EMP_EVENTS
         {
             return Err(INVALID);
         }
@@ -395,6 +437,10 @@ impl State {
         for hit in self.missile_hits.iter() {
             hit.encode(w);
         }
+        w.u16(self.emp_events.len() as u16);
+        for event in self.emp_events.iter() {
+            event.encode(w);
+        }
     }
     #[cfg(test)]
     pub(crate) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
@@ -429,6 +475,14 @@ impl State {
         for _ in 0..missile_count {
             missile_hits.push(NpcMissileHit::decode(r)?);
         }
+        let emp_count = usize::from(r.u16()?);
+        if emp_count > super::emp::MAX_EMP_EVENTS {
+            return Err(INVALID);
+        }
+        let mut emp_events = Vec::with_capacity(emp_count);
+        for _ in 0..emp_count {
+            emp_events.push(super::EmpResourceEvent::decode(r)?);
+        }
         Ok(Self {
             enabled,
             seed,
@@ -437,6 +491,7 @@ impl State {
             shots: Arc::new(shots),
             player_hits: Arc::new(player_hits),
             missile_hits: Arc::new(missile_hits),
+            emp_events: Arc::new(emp_events),
         })
     }
 }
@@ -582,6 +637,8 @@ impl Resources {
         ] {
             w.u64(n);
         }
+        w.option(self.electrical.as_ref(), |w, pool| pool.encode(w));
+        w.u64(self.emp_absorbed);
     }
     fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         Ok(Self {
@@ -601,6 +658,8 @@ impl Resources {
             absorbed_rear: r.u64()?,
             hull_damage: r.u64()?,
             overkill: r.u64()?,
+            electrical: r.option(super::emp::Electrical::decode)?,
+            emp_absorbed: r.u64()?,
         })
     }
 }

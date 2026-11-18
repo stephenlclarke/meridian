@@ -202,6 +202,16 @@ impl State {
     pub(super) fn last_impact(self) -> Option<OrdinaryImpact> {
         self.last
     }
+    pub(super) fn absorb_emp(&mut self, front: bool, power: u16) -> u16 {
+        let shield = if front {
+            &mut self.front
+        } else {
+            &mut self.rear
+        };
+        let absorbed = (*shield).min(power);
+        *shield -= absorbed;
+        absorbed
+    }
     pub(super) fn physical_tick(self) -> u64 {
         self.physical_tick
     }

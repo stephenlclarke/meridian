@@ -148,12 +148,16 @@ enum ResourceAction {
     Fire,
     Laser(bool, u16),
     Missile(bool),
+    Emp(super::EmpResourceAction),
 }
 pub(super) type ResourceOrder = (u64, u64, u8, usize);
 type ResourceEvent = (ResourceOrder, ResourceAction);
 const NPC_BEAM_PHASE: u8 = 0;
 const MISSILE_PHASE: u8 = 1;
-const PLAYER_BEAM_PHASE: u8 = 2;
+// EMP release/recovery belongs to the completed physical step. Commands accepted after
+// that step must see its electrical state and cannot be replayed ahead of recovery.
+const EMP_STEP_PHASE: u8 = 2;
+const PLAYER_BEAM_PHASE: u8 = 3;
 
 impl TrafficBeam {
     pub(super) fn resource_order(&self, index: usize) -> ResourceOrder {
@@ -230,7 +234,15 @@ impl State {
                 return Err(INVALID);
             }
             if let Some(b) = body.first() {
-                let resources = self.resources_at(*a, s.local_tick, s.world_tick, s.stage)?;
+                // A retained corpse is still a scene member, but its resource clock froze
+                // at death. Query its terminal state without advancing/recharging it.
+                // Historical scenes before that terminal clock still replay their own tick.
+                let resource_clock = if a.phase == NpcPhase::Destroyed {
+                    s.local_tick.min(a.resource_clock)
+                } else {
+                    s.local_tick
+                };
+                let resources = self.resources_at(*a, resource_clock, s.world_tick, s.stage)?;
                 let yaw = b.pose.orientation.z.x.atan2(b.pose.orientation.z.z);
                 let planar = pose(b.pose.position, yaw);
                 let birth_position = if a.id.serial == 1 {
@@ -424,6 +436,16 @@ impl State {
                 actions.push((h.resource_order(i), ResourceAction::Missile(h.front)));
             }
         }
+        for (index, event) in self.emp_events.iter().enumerate() {
+            let included = event.world_tick < world
+                || (event.world_tick == world && matches!(stage, SceneStage::Command(_)));
+            if event.victim == a.id && event.local_tick <= clock && included {
+                actions.push((
+                    (event.local_tick, event.world_tick, EMP_STEP_PHASE, index),
+                    ResourceAction::Emp(event.action),
+                ));
+            }
+        }
         actions.sort_by_key(|(order, _)| *order);
         let mut resources = Resources::fresh();
         let mut cursor = a.birth_clock.checked_sub(1).ok_or(INVALID)?;
@@ -437,6 +459,7 @@ impl State {
                 ResourceAction::Fire => resources.fire(),
                 ResourceAction::Laser(front, damage) => resources.hit_damage(front, damage),
                 ResourceAction::Missile(front) => resources.hit_missile(front),
+                ResourceAction::Emp(action) => resources.apply_emp(action),
             }
             .map_err(|_| INVALID)?;
             cursor = tick;

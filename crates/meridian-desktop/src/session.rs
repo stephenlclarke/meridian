@@ -13,6 +13,7 @@ use meridian_core::{
 pub enum Action {
     JumpTo(SystemId),
     Module(meridian_core::ModuleAction),
+    Emp(meridian_core::EmpEquipmentAction),
     CargoEquipment(meridian_core::equipment::Command),
     StationService(meridian_core::station_services::Command),
     Ammunition(meridian_core::AmmunitionAction),
@@ -292,7 +293,8 @@ impl Session {
             return Ok("Practice review cancelled.".into());
         }
         match action {
-            Action::Ammunition(_)
+            Action::Emp(_)
+            | Action::Ammunition(_)
             | Action::Module(_)
             | Action::CargoEquipment(_)
             | Action::StationService(_) => {

@@ -1,3 +1,8 @@
+pub(crate) mod emp;
+pub use emp::{
+    EmpAxis, EmpChargePhase, EmpEquipmentAction, EmpEquipmentOffer, EmpEquipmentReview, EmpError,
+    EmpGrades, EmpOrigin, EmpProvenance, EmpSnapshot, OwnedEmp, PreparedEmpEquipment,
+};
 mod celestial;
 mod damage;
 mod mining;
@@ -174,6 +179,7 @@ pub struct World {
     ammunition: ammunition::State,
     modular: modular::State,
     xyzzy: xyzzy::State,
+    emp: emp::State,
     navigation_trade: navigation_trade::State,
     flight_reception: flight_reception::State,
     practice: Option<practice::Practice>,
@@ -217,6 +223,7 @@ impl World {
             ammunition: ammunition::State::default(),
             modular: modular::State::default(),
             xyzzy: xyzzy::State::default(),
+            emp: emp::State::default(),
             navigation_trade: navigation_trade::State::default(),
             flight_reception: flight_reception::State::default(),
             practice: None,
@@ -338,6 +345,7 @@ impl World {
             return Err(NavigationError::WrongMode);
         }
         if self.state.mode != FlightMode::Flight
+            || self.emp.travel_blocked(&self.traffic)
             || self.combat_snapshot().is_some_and(|s| s.player.destroyed)
         {
             return Err(NavigationError::WrongMode);
@@ -468,6 +476,11 @@ impl World {
             return Err(StepError::Paused);
         }
         input.validate()?;
+        let input = if self.emp.electrical_disabled() {
+            FlightInput::default()
+        } else {
+            input
+        };
         if self.combat_snapshot().is_some_and(|s| s.player.destroyed) {
             return Err(StepError::InvalidMode);
         }
@@ -630,6 +643,10 @@ impl World {
                         .revision()
                         .checked_add(1)
                         .ok_or(StepError::TickOverflow)?,
+                    self.combat
+                        .physical_tick()
+                        .checked_add(1)
+                        .ok_or(StepError::TickOverflow)?,
                 ));
                 planned_debit = Some(debit);
                 // Source arrival places the station16000 ahead. This is its equivalent
@@ -648,7 +665,7 @@ impl World {
             _ => self.mining.clone(),
         };
         let mut prepared = self.prepare_missile_step(next, navigation, &self.traffic)?;
-        let traffic = self.prepare_traffic_step(next, navigation, &prepared)?;
+        let mut traffic = self.prepare_traffic_step(next, navigation, &prepared)?;
         if let Some((traffic, _)) = &traffic {
             prepared.traffic = traffic.clone();
         }
@@ -672,6 +689,23 @@ impl World {
         let damage =
             self.damage
                 .step(self.state.mode, next.mode, prepared.combat.physical_tick())?;
+        let emp = self.emp.prepare_step(
+            self,
+            emp::Frame {
+                next,
+                navigation,
+                traffic: &prepared.traffic,
+                missiles: &prepared.missiles,
+                pulse: prepared.pulse,
+                combat: prepared.combat,
+            },
+        )?;
+        prepared.traffic = emp.traffic.clone();
+        prepared.pulse = emp.pulse;
+        prepared.combat = emp.combat;
+        if let Some((traffic, _)) = &mut traffic {
+            *traffic = prepared.traffic.clone();
+        }
         let navigation_trade =
             self.prepare_navigation_trade_step(navigation, planned_debit, next.tick)?;
         if let (Some(practice), Some(nav), Some(data)) =
@@ -684,7 +718,7 @@ impl World {
             navigation,
             &prepared,
             traffic.as_ref(),
-            (&damage, &mining),
+            (&damage, &mining, &emp.state),
             navigation_trade.as_ref(),
         )
         .map_err(|_| StepError::TickOverflow)?;
@@ -711,6 +745,7 @@ impl World {
         self.combat = prepared.combat;
         self.pulse = prepared.pulse;
         self.damage = damage;
+        self.emp = emp.state;
         self.mining = mining;
         self.practice = prepared.practice;
         if let Some(account) = &mut self.commander_account {

@@ -64,9 +64,10 @@ pub(crate) struct CompletedJump {
     arrival_tick: u64,
     grade: NavigationGrade,
     account_revision: u64,
+    physical_tick: u64,
 }
 impl CompletedJump {
-    pub(crate) const ENCODED_SIZE: usize = 33;
+    pub(crate) const ENCODED_SIZE: usize = 41;
 
     pub(crate) fn arrived(
         source: NavigationState,
@@ -75,6 +76,7 @@ impl CompletedJump {
         tick: u64,
         grade: NavigationGrade,
         account_revision: u64,
+        physical_tick: u64,
     ) -> Self {
         Self {
             source: source.system,
@@ -84,6 +86,7 @@ impl CompletedJump {
             arrival_tick: tick,
             grade,
             account_revision,
+            physical_tick,
         }
     }
     fn encode(self, w: &mut Writer) {
@@ -94,6 +97,7 @@ impl CompletedJump {
         w.u64(self.arrival_tick);
         w.u8(self.grade.tag());
         w.u64(self.account_revision);
+        w.u64(self.physical_tick);
     }
     fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         Ok(Self {
@@ -104,6 +108,7 @@ impl CompletedJump {
             arrival_tick: r.u64()?,
             grade: NavigationGrade::decode(r)?,
             account_revision: r.u64()?,
+            physical_tick: r.u64()?,
         })
     }
 }
@@ -138,6 +143,9 @@ impl JumpJournal {
         Ok(Self { legs })
     }
 
+    pub(crate) fn emp_arrival_clocks(&self) -> Vec<u64> {
+        self.legs.iter().map(|leg| leg.physical_tick).collect()
+    }
     pub(crate) fn account_events(&self) -> Vec<crate::flight::AccountEvent> {
         self.legs
             .iter()
@@ -182,6 +190,7 @@ impl JumpJournal {
         nav: NavigationState,
         catalogue: &OriginalNavigation,
         tick: u64,
+        physical_end: u64,
         changes: &[NavigationFitChange],
     ) -> Result<(), SaveError> {
         let spool = u64::from(BASIC_SPOOL_TICKS);
@@ -198,6 +207,8 @@ impl JumpJournal {
             })
             .transpose()?;
         let mut previous_account_revision = 0;
+        let mut previous_physical_tick: u64 = 0;
+        let mut previous_clock_offset = 0;
         let mut system = SystemId::AVENOR;
         let mut spent = 0_u64;
         let mut jumps = 0_u64;
@@ -253,7 +264,22 @@ impl JumpJournal {
             let distance = catalogue
                 .distance_ly(leg.source, leg.destination)
                 .map_err(|_| INVALID)?;
-            if leg.account_revision <= previous_account_revision
+            let offset = leg
+                .arrival_tick
+                .checked_sub(leg.physical_tick)
+                .ok_or(INVALID)?;
+            let minimum_physical = previous_physical_tick
+                .checked_add(spool)
+                .and_then(|clock| clock.checked_add(u64::from(index == 0)))
+                .ok_or(INVALID)?;
+            if offset < previous_clock_offset
+                || tick
+                    .checked_sub(physical_end)
+                    .is_none_or(|end_offset| end_offset < offset)
+                || leg.physical_tick < minimum_physical
+                || leg.physical_tick > physical_end
+                || leg.physical_tick > leg.arrival_tick
+                || leg.account_revision <= previous_account_revision
                 || leg.source != system
                 || leg.source == leg.destination
                 || leg.grade != grade
@@ -270,6 +296,8 @@ impl JumpJournal {
                 return Err(INVALID);
             }
             previous_account_revision = leg.account_revision;
+            previous_physical_tick = leg.physical_tick;
+            previous_clock_offset = offset;
             spent = spent.checked_add(u64::from(leg.debit)).ok_or(INVALID)?;
             jumps = jumps.checked_add(1).ok_or(INVALID)?;
             earliest_visit = leg.source_visit.checked_add(1).ok_or(INVALID)?;
@@ -326,6 +354,7 @@ mod tests {
                     debit: 99,
                     source_visit: 2,
                     account_revision: 1,
+                    physical_tick: 601,
                     arrival_tick: 601,
                     grade: NavigationGrade::Basic,
                 },
@@ -335,6 +364,7 @@ mod tests {
                     debit: 73,
                     source_visit: 3,
                     account_revision: 2,
+                    physical_tick: 1201,
                     arrival_tick: 1201,
                     grade: NavigationGrade::Basic,
                 },
@@ -344,13 +374,14 @@ mod tests {
                     debit: 34,
                     source_visit: 5,
                     account_revision: 4,
+                    physical_tick: 1801,
                     arrival_tick: 1901,
                     grade: NavigationGrade::Intermediate,
                 },
             ],
         };
         assert_eq!(
-            journal.validate(nav, &catalogue, 1901, &[change]),
+            journal.validate(nav, &catalogue, 1901, 1801, &[change]),
             Err(INVALID)
         );
     }

@@ -29,7 +29,7 @@ impl NpcLaunch {
     }
 }
 impl World {
-    pub(super) fn npc_missile_protected(&self) -> bool {
+    pub(in crate::flight) fn npc_missile_protected(&self) -> bool {
         self.flight_reception.occupancy().1 > 0
             || self.navigation_trade.occupancy().1 > 0
             || self.practice.is_some_and(|p| !p.reception_is_terminal())
