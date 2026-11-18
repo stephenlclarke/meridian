@@ -1,6 +1,6 @@
 # Meridian
 
-The internal laser/ECM candidate physically docked at Avenor and stored its paid Beam, but opening Fit produced a persistent black client. Escape recovered Equipment with the paid item and cash intact. The cause remains undetermined. The [review regression and bounded opt-in host capture](docs/LASER-FACINGS.md#bounded-opt-in-review-boundary-capture) are authored and **UNRUN**. They collect causal evidence; they do not cure the renderer. Dependent practice, positive-hit and missile-termination checks remain blocked.
+The internal laser/ECM candidate's original black Fit review remains unexplained. The new desktop regression exposed a separate stale-input refusal between Store confirmation and immediate Y. A [narrow deferred review handoff](docs/LASER-FACINGS.md#immediate-store-to-fit-revision-handoff) is authored, with the stale-confirmation safeguard retained; changed execution is **UNRUN**. All four capture guard cases passed on the preceding source. Dependent native practice, positive-hit and missile-termination acceptance remain blocked.
 
 [![CI](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=alert_status)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)
