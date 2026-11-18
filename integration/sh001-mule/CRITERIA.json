@@ -102,14 +102,14 @@
     "strictClippy": "UNRUN",
     "native": "UNRUN",
     "renderer": "UNIMPLEMENTED;existingG3handoff",
-    "MuleWorldActorAndGenerationBinding": "UNIMPLEMENTED",
+    "MuleWorldActorAndGenerationBinding": "CONTROLLED_SOURCE_SCENARIO_AUTHORED_UNRUN;ordinaryactor/contactEMP/savepending",
     "MulePaidAcquisitionCrewEquipmentPersistence": "UNIMPLEMENTED",
     "existingPaidEMPAndDamageReducers": "UNCHANGED;currentad5authority",
     "fleetAdmission": false
   },
   "ownerCommands": [
     "cargo check --locked --workspace --all-targets",
-    "cargo test --locked -p meridian-core",
+    "cargo test --locked -p meridian-core -- --nocapture",
     "cargo clippy --locked --workspace --all-targets -- -D warnings",
     "make ci (owned current-project checks; no author execution)"
   ],
@@ -140,5 +140,72 @@
     "behavior": "Reject understated endpoint travel using atan2 sine/cosine plus admitted-basis residual guard; preserve contact blocking and correctly supplied proper rotations, including near half-turn.",
     "newCase": "rounded_sweep_accounts_for_near_orthogonal_trace_three_endpoint",
     "status": "AUTHORED_UNRUN;source-only checks;existing G2 delta/G1 qualification owners"
+  },
+  "worldCoreTests": [
+    {
+      "file": "crates/meridian-core/src/flight/mule_validation/tests.rs",
+      "name": "mule_world_publication_binds_actual_actor_pose_surface_scope_and_generation",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/flight/mule_validation/tests.rs",
+      "name": "mule_validation_refuses_observer_commands_and_grants_no_profile_or_save",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/flight/mule_validation/tests.rs",
+      "name": "mule_world_sweep_stops_before_the_actual_stationary_observer_mesh",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/flight/mule_validation/tests.rs",
+      "name": "ordinary_world_and_current_save_do_not_acquire_a_validation_mule",
+      "status": "UNRUN"
+    }
+  ],
+  "totalMuleCoreTests": 17,
+  "controlledWorldScenario": {
+    "status": "AUTHORED_UNRUN;NOT_ORDINARY_HULL_ADMISSION",
+    "base": "af97ee6bbba60b2d492216ad12035a90e9dde34e",
+    "scope": "One actual World-owned SH001 validation NPC; immutable coherent NpcSnapshot+Arc presentation+private scope/tick/generation. Stationary source-validated SH025 observer. Fixed World ticks move Mule using real station and observer native meshes.",
+    "refusals": "Invalid observer/overlap/source inputs; non-default observer controls; stale/foreign publications; uncertain contact. No paid current gameplay interaction or save entitlement.",
+    "pendingCatalogue": "PlayerFlyable=false/pendingFabrication/authored encounter; roles/placement/rarity/locations pending. No ambient substitution.",
+    "renderer": "Adapt only a frame for which world.mule_snapshot_is_current(frame) is true; borrow frame.actor() and frame.presentation();never construct IDs in desktop.",
+    "noEntitlements": [
+      "commander",
+      "blueprint",
+      "equipment",
+      "crew",
+      "cargo",
+      "ordinary population",
+      "save",
+      "EMP or damage capability"
+    ]
+  },
+  "tightnessCoreTests": [
+    {
+      "file": "crates/meridian-core/src/mule/tightness_tests.rs",
+      "name": "mule_sampled_visible_envelope_excess_reports_actual_detailed_surface_gaps",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tightness_tests.rs",
+      "name": "mule_preserves_named_pannier_cockpit_and_engine_source_gaps",
+      "status": "UNRUN"
+    }
+  ],
+  "tightnessEvidence": {
+    "status": "AUTHORED_UNRUN;actualG1parametersandG3viewsrequired",
+    "metrics": "For all16pieces,26directions plus84authentic detailed well-rim directions overall;only confirmed visible envelope ray contacts sampled;distance to nearest of all7236actual detailed triangles. Report per-piece largest sampled distance/point/nearestface/source low-high/2cm axial padding and counts of confirmed,uncertain,internal,clear samples.",
+    "flags": "exceedsTwoCentimetres flags sampled distances>0.020001m;this is an evidence flag,not an acceptance budget. Large filled empty space must be assessed/repaired before rollout.",
+    "limits": "Not exhaustive;not a maximum/Hausdorff guarantee;no runtime values claimed. Uncertain/internal samples reported,not treated as measured clearance or discarded without disclosure.",
+    "namedGaps": [
+      "4inter-pannier slots",
+      "forward cockpit/body opening",
+      "rear inter-engine opening"
+    ],
+    "gapCheck": "Each named source-coordinate center must stay outside the full union and a2cm extent triangle there must have actual separation certificates.",
+    "knownApproximationRisks": "Convex supports fill service wells;engine support/casing and cockpit/crossmember convex grouping can fill concave space. Actual extent is unmeasured.",
+    "acceptance": "Actual source-derived excess/extent records, named gap assertions, G3 close-up/full-surface rendering, contact and docking simplicity/tight fit required;2cm directional expansion alone does not qualify Mule or fleet reuse."
   }
 }

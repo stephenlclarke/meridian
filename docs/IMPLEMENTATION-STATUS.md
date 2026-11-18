@@ -1,10 +1,10 @@
 # Implementation and validation status
 
-## Mule smooth gameplay envelope: authored, unrun
+## Mule envelope core qualified; World and renderer authored
 
 Mule has a distinct conservative gameplay envelope made from sixteen rounded source-component supports with a proposed 2 cm directional stand-off. The detailed source geometry, engineering mass/centre/inertia and provenance remain separate and unchanged. This implements the human's smooth, close-fitting collision direction; it does not clear the unresolved exact-original importer or its limits.
 
-The new core helpers cover source containment, continuous contact, station clearance, ray uncertainty and immutable low-opacity shimmer parameters. Eleven new tests are authored and **UNRUN**. The bounded rotation correction accounts for admitted basis residuals and adds a regression for the reviewed missed-contact case; the prior ten test bodies are unchanged. There is no admitted Mule actor, acquisition, crew, fitting/save route, renderer, actual game acceptance or new accepted hull count yet. The existing paid EMP, ECM, combat, economy and persistence source is preserved. Actual shimmer rendering and native evidence remain required before preview delivery.
+The envelope core passed 444 fresh Mac tests, including all eleven Mule cases, locked compilation checks and strict Clippy on the committed lint correction. The combined current source adds an explicit World-owned Mule validation scenario and the [original-hull and subtle-shimmer renderer](MULE-RENDERER.md). Six new World/tightness tests, eleven ordinary renderer tests and one explicit Metal test are authored and **UNRUN**. Three offline renderer source-field/pixel checks passed on the author packet. The App adapter consumes only a matching current World-owned actor, generation, tick, surface and stationary observer. Ordinary constructors and loads supply no Mule. There is no ordinary Mule population, acquisition, crew, fitting/save entitlement, visual acceptance, preview delivery or increase in accepted hull count. Detailed concavity-distance samples and named-gap tests must still run; a 2 cm component support offset is not a maximum distance from every concave hull surface. Actual close/far/depleted/contact/docking views and performance remain unobserved.
 
 ## Independent single-window observer prepared, execution prohibited pending exception
 
@@ -582,3 +582,5 @@ The observer now records provider and capture attempts before invocation. If fin
 Final receipt publication must complete through write, flush, fsync and close before the owned in-flight lock is removed. A publication or cleanup failure retains that lock, claims, PNG and partial receipt, so both the same slot and any later slot stop before another provider call. The offline finalization regression covers both paths; the normal three-capture fixture still requires successful lock release.
 
 Mule core qualification on the angular correction passed all 444 tests (442 library and two compatibility cases), including eleven Mule cases. Strict Clippy then stopped on three style/import diagnostics. The bounded correction moves the test-only import, collapses the equivalent conditional and uses fixed-size triangle chunks. Corrected-source qualification and native hull acceptance remain pending.
+
+The subsequent corrected Mule core qualification passed all 444 tests and strict Clippy without warnings. The earlier lint failure remains preserved. These results apply to the envelope prerequisite; the newly combined World and renderer source still requires its own qualification.

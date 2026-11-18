@@ -309,3 +309,6 @@ fn source_vertex(bytes: &[u8], index: usize) -> Result<Vec3, EnvelopeError> {
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod tightness_tests;

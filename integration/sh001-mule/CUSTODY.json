@@ -34,5 +34,14 @@
     "authorParent": "a43ec10965fa1a3075acdd0c358d5d120b8d7935",
     "priorTenTestBodies": "Byte exact prefix; new regression appended only",
     "execution": "No compiler/constructor/contact/test/GPU/native execution"
+  },
+  "controlledWorldScenario": {
+    "status": "AUTHORED_UNRUN;4newWorld+2tightness cases;17totalMulecases",
+    "authorParent": "7d1ec7793e3fa47443678203f07eb97854ba6326",
+    "currentBase": "af97ee6bbba60b2d492216ad12035a90e9dde34e",
+    "bindingSHA256": "94f994a22179e98fc04da5b88c4cbbc9b299f51792f746751194a77256abadf6",
+    "patchSHA256": "37f05f3ea5b698d87cba78a0cfb08316317e6eacd5fdd86823a3caab63fbcb51",
+    "preservation": "Old author core not rewired. Current135corepins bound;minimal3currentfilepatch;no current ordinary reducer/test bodies modified. Prior11envelope test bodies exact. All source assets and519geometry files unchanged. New tightness test module appended;84well-rim sample index pairs copied from original creator metadata,without geometric computation.",
+    "execution": "Source encoding/hash/AST/JSON/rustfmt/Markdownlint/patch checks only;no compiler/constructor/runtime/native/GPU"
   }
 }
