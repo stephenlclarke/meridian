@@ -208,6 +208,22 @@ impl State {
         world: u64,
         before_pulse: u16,
     ) -> Result<(u16, u16, u16, Option<Electrical>), SaveError> {
+        self.emp_before_at(
+            id,
+            clock,
+            world,
+            before_pulse,
+            SceneStage::Command(u64::MAX),
+        )
+    }
+    fn emp_before_at(
+        &self,
+        id: NpcId,
+        clock: u64,
+        world: u64,
+        before_pulse: u16,
+        stage: SceneStage,
+    ) -> Result<(u16, u16, u16, Option<Electrical>), SaveError> {
         let a = self.actors[self.actor_index(id).ok_or(INVALID)?].ok_or(INVALID)?;
         if a.born_world_tick > world {
             return Err(INVALID);
@@ -225,7 +241,7 @@ impl State {
                 .copied()
                 .collect(),
         );
-        let resources = prefix.resources_at(a, clock, world, SceneStage::Command(u64::MAX))?;
+        let resources = prefix.resources_at(a, clock, world, stage)?;
         Ok((
             resources.energy,
             resources.front,
@@ -275,7 +291,16 @@ impl State {
                 .copied()
                 .collect(),
         );
-        prefix.emp_before(id, clock, tick, origin.pulse.checked_add(1).ok_or(INVALID)?)
+        // Zero is a read-only command watermark, never an allocated shot. It retains all
+        // previous-tick effects and this tick's native NPC/missile effects, while excluding
+        // later player commands. The recovery event itself was removed above.
+        prefix.emp_before_at(
+            id,
+            clock,
+            tick,
+            origin.pulse.checked_add(1).ok_or(INVALID)?,
+            SceneStage::Command(0),
+        )
     }
 }
 

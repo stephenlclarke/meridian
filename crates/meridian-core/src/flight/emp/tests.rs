@@ -597,3 +597,420 @@ fn actual_non_aggressor_hull_cannot_authorize_emp_or_lose_resources() {
     assert!(w.traffic.emp_events().is_empty());
     cold(&w);
 }
+
+type LaserCommand = fn(&mut World, u64) -> Result<crate::PulseShot, crate::FireError>;
+fn assert_laser_commands_refuse_atomically(w: &mut World, expected: crate::FireError, tick: u64) {
+    let commands: [LaserCommand; 2] = [
+        World::request_fire_front_pulse,
+        World::request_fire_front_laser,
+    ];
+    let before = w.save_bytes().unwrap();
+    let resources = w.flight_resources_snapshot();
+    let emp = w.emp_snapshot();
+    let fit = w.front_laser_snapshot().unwrap();
+    let (item, weapon) = w.fitted_front_laser().unwrap();
+    assert_eq!((fit.fitted_item_id, fit.weapon), (item, weapon));
+    for command in commands {
+        assert_eq!(command(w, tick), Err(expected));
+        assert_eq!(w.save_bytes().unwrap(), before);
+        assert_eq!(w.flight_resources_snapshot(), resources);
+        assert_eq!(w.emp_snapshot(), emp);
+        assert_eq!(w.front_laser_snapshot(), Some(fit));
+    }
+}
+fn assert_emp_blocks_both_lasers(w: &mut World) {
+    assert!(w.emp.input_blocked());
+    let tick = w.snapshot().tick;
+    assert_laser_commands_refuse_atomically(w, crate::FireError::InsufficientEnergy, tick);
+    assert_laser_commands_refuse_atomically(w, crate::FireError::StaleCommand, tick + 1);
+    w.request_pause(true, tick).unwrap();
+    assert_laser_commands_refuse_atomically(w, crate::FireError::Paused, tick);
+    w.request_pause(false, tick).unwrap();
+    assert_laser_commands_refuse_atomically(w, crate::FireError::InsufficientEnergy, tick);
+}
+#[test]
+fn both_laser_commands_keep_normal_discharge_and_fitted_property_without_emp() {
+    let mut w = World::new_commander(16104).unwrap();
+    launch(&mut w);
+    let fit = w.front_laser_snapshot().unwrap();
+    assert_eq!(fit.weapon, crate::OrdinaryWeapon::FrontPulseLaser);
+    let commands: [LaserCommand; 2] = [
+        World::request_fire_front_pulse,
+        World::request_fire_front_laser,
+    ];
+    for command in commands {
+        let resources = w.flight_resources_snapshot().unwrap();
+        let tick = w.snapshot().tick;
+        let shot = command(&mut w, tick).unwrap();
+        assert_eq!(shot.fitted_item_id, fit.fitted_item_id);
+        let after = w.flight_resources_snapshot().unwrap();
+        assert_eq!(after.energy_hundredths, resources.energy_hundredths - 100);
+        assert_eq!(after.heat_fifths, resources.heat_fifths + 50);
+        assert_eq!(after.cooldown_ticks, 18);
+        assert_eq!(w.front_laser_snapshot(), Some(fit));
+        cold(&w);
+        steps(&mut w, 18);
+    }
+    assert_eq!(w.combat.emissions, 2);
+    assert!(w.emp_snapshot().is_none());
+}
+#[test]
+fn real_charge_blocks_both_laser_commands_but_preserves_fitted_snapshot_and_cancelled_firing() {
+    let mut w = World::new_commander(12001).unwrap();
+    secret(&mut w);
+    let (mut w, target) = defender(w);
+    let fit = w.front_laser_snapshot().unwrap();
+    start_charge(&mut w, target);
+    assert_eq!(
+        w.emp_snapshot().unwrap().charge_phase,
+        Some(EmpChargePhase::Charging)
+    );
+    assert_eq!(w.front_laser_snapshot(), Some(fit));
+    assert_emp_blocks_both_lasers(&mut w);
+    w.request_emp_trigger(false, w.snapshot().tick).unwrap();
+    w.step(aim_input(&w, target)).unwrap();
+    assert_eq!(
+        w.emp_snapshot().unwrap().charge_phase,
+        Some(EmpChargePhase::Cancelled)
+    );
+    assert_eq!(w.emp.meter.bank_spent, 0);
+    let resources = w.flight_resources_snapshot().unwrap();
+    let tick = w.snapshot().tick;
+    let shot = w.request_fire_front_laser(tick).unwrap();
+    assert_eq!(shot.fitted_item_id, fit.fitted_item_id);
+    assert_eq!(
+        w.flight_resources_snapshot().unwrap().energy_hundredths,
+        resources.energy_hundredths - 100
+    );
+    assert_eq!(w.front_laser_snapshot(), Some(fit));
+    cold(&w);
+}
+#[test]
+fn isolated_electrical_disable_blocks_both_lasers_with_positive_fatal_energy_and_truthful_fit() {
+    let mut w = World::new_commander(16105).unwrap();
+    secret(&mut w);
+    launch(&mut w);
+    assert!(w.emp.charge.is_none());
+    assert!(w.flight_resources_snapshot().unwrap().energy_hundredths > 0);
+    // Isolated admission fixture: exercise the real finite drain kernel without inventing an
+    // encounter receipt. Its absent pulse provenance MUST refuse ordinary save validation.
+    // This is neither a produced World encounter nor a cold-Continue acceptance claim.
+    let main = w.emp.meter.main;
+    let clock = w.combat.physical_tick();
+    assert!(main > 0);
+    w.emp.meter.drain(main, clock).unwrap();
+    assert!(w.emp.meter.validate().is_ok());
+    assert!(w.emp.electrical_disabled());
+    assert!(w.save_bytes().is_err());
+    let before = w.unchecked_test_save().unwrap();
+    let resources = w.flight_resources_snapshot();
+    let emp = w.emp_snapshot();
+    let fit = w.front_laser_snapshot().unwrap();
+    let commands: [LaserCommand; 2] = [
+        World::request_fire_front_pulse,
+        World::request_fire_front_laser,
+    ];
+    for command in commands {
+        let tick = w.snapshot().tick;
+        assert_eq!(
+            command(&mut w, tick),
+            Err(crate::FireError::InsufficientEnergy)
+        );
+        assert_eq!(w.unchecked_test_save().unwrap(), before);
+        assert_eq!(w.flight_resources_snapshot(), resources);
+        assert_eq!(w.emp_snapshot(), emp);
+        assert_eq!(w.front_laser_snapshot(), Some(fit));
+        assert!(w.save_bytes().is_err());
+    }
+}
+
+fn steer_to_real_point(w: &World, target: crate::docking::Vec3) -> FlightInput {
+    let p = w.snapshot();
+    let pose = super::super::flight_pose(p.position, p.orientation).unwrap();
+    let delta = crate::docking::Vec3::new(
+        target.x - pose.position.x,
+        target.y - pose.position.y,
+        target.z - pose.position.z,
+    );
+    let x = delta.dot(pose.orientation.x);
+    let y = delta.dot(pose.orientation.y);
+    let z = delta.dot(pose.orientation.z);
+    FlightInput {
+        yaw: (x.atan2(z) / (0.65 / 60.0)).clamp(-1.0, 1.0) as f32,
+        pitch: (y.atan2(x.hypot(z)) / (0.7 / 60.0)).clamp(-1.0, 1.0) as f32,
+        ..FlightInput::default()
+    }
+}
+fn track_real_target(w: &World, target: crate::traffic::NpcId) -> FlightInput {
+    let body = w
+        .traffic_snapshot()
+        .unwrap()
+        .actors
+        .into_iter()
+        .find(|a| a.id == target)
+        .unwrap();
+    steer_to_real_point(w, body.pose.position)
+}
+fn leave_native_npc_beam_plane(w: &mut World) {
+    // Real NPC rays are planar. Normal pitch/throttle raises the actual player clear of
+    // those rays, conserving finite receipt capacity for the later public fatal shot.
+    for _ in 0..600 {
+        let p = w.snapshot();
+        if p.position[1] >= 300.0 && p.speed == 0.0 {
+            return;
+        }
+        let mut input = steer_to_real_point(
+            w,
+            crate::docking::Vec3::new(
+                f64::from(p.position[0]),
+                f64::from(p.position[1]) + 10000.0,
+                f64::from(p.position[2]),
+            ),
+        );
+        input.brake = p.position[1] >= 300.0;
+        if !input.brake {
+            input.throttle = ((10.0 - p.speed) / (9.1 / 60.0)).clamp(-1.0, 1.0);
+        }
+        w.step(input).unwrap();
+        assert_eq!(w.snapshot().motion_refusal, None);
+    }
+    panic!("ordinary pilot failed to leave the native NPC ray plane");
+}
+fn start_real_3d_charge(w: &mut World, target: crate::traffic::NpcId) {
+    for _ in 0..300 {
+        match w.request_emp_trigger(true, w.snapshot().tick) {
+            Ok(()) => {
+                assert_eq!(w.emp.charge.as_ref().unwrap().target, target);
+                return;
+            }
+            Err(EmpError::NoTarget | EmpError::InvalidContact | EmpError::Resources) => {}
+            other => panic!("real recovery fixture lost recent-attacker admission {other:?}"),
+        }
+        w.step(track_real_target(w, target)).unwrap();
+    }
+    panic!("actual three-dimensional EMP aim never admitted its native attacker");
+}
+fn disabled_native_target() -> (World, crate::traffic::NpcId) {
+    let mut w = paid();
+    // As in the retained World case, the base is paid with earned cash; later funds/Elite
+    // energy are an explicit XYZZY test setup, not an ordinary progression acceptance.
+    secret(&mut w);
+    let item = w.owned_emp().unwrap().item;
+    for axis in [EmpAxis::Power, EmpAxis::Capacity, EmpAxis::Recharge] {
+        for _ in 0..2 {
+            equipment(&mut w, EmpEquipmentAction::Upgrade { item, axis });
+        }
+    }
+    let (mut w, target) = defender(w);
+    leave_native_npc_beam_plane(&mut w);
+    let mut shield_shots = 0;
+    for _ in 0..300 {
+        if native_facing_budget(&w, target).is_some()
+            && w.flight_resources_snapshot().unwrap().cooldown_ticks == 0
+        {
+            let tick = w.snapshot().tick;
+            let shot = w.request_fire_front_laser(tick).unwrap();
+            assert!(matches!(shot.contact, crate::PulseContact::Npc { id, .. } if id == target));
+            assert!(w.traffic.emp_resources(target).unwrap().0 > 9500);
+            shield_shots += 1;
+            if shield_shots == 5 {
+                break;
+            }
+        }
+        w.step(track_real_target(&w, target)).unwrap();
+    }
+    assert_eq!(
+        shield_shots, 5,
+        "real paid laser must strip a facing shield without killing/fleeing"
+    );
+    for _ in 0..2 {
+        start_real_3d_charge(&mut w, target);
+        for _ in 0..600 {
+            w.request_emp_trigger(true, w.snapshot().tick).unwrap();
+            w.step(track_real_target(&w, target)).unwrap();
+        }
+        assert!(w.emp.charge.as_ref().unwrap().pulse.is_some());
+        if w.traffic.emp_resources(target).unwrap().3.unwrap().disabled {
+            assert!(
+                !w.emp.electrical_disabled(),
+                "recovery-order fixture requires a powered player"
+            );
+            let victim = w
+                .traffic_snapshot()
+                .unwrap()
+                .actors
+                .into_iter()
+                .find(|a| a.id == target)
+                .unwrap();
+            assert_eq!(
+                victim.speed_units, 0.0,
+                "retain the real stopped target within the native laser range"
+            );
+            assert_eq!(w.snapshot().speed, 0.0);
+            assert!(native_facing_budget(&w, target).is_some());
+            assert!(
+                w.traffic.receipt_count() < crate::traffic::MAX_TRAFFIC_SHOTS - 7,
+                "retain real ordinary proof capacity for preparation and fatal command"
+            );
+            return (w, target);
+        }
+        w.request_emp_trigger(false, w.snapshot().tick).unwrap();
+        w.step(track_real_target(&w, target)).unwrap();
+    }
+    panic!("actual aimed paid EMP releases did not disable the real recent attacker");
+}
+fn native_facing_budget(w: &World, target: crate::traffic::NpcId) -> Option<u32> {
+    let p = w.snapshot();
+    let pose = super::super::flight_pose(p.position, p.orientation)?;
+    let owner = w.combat_identity()?;
+    let contact = w.traffic.beam(
+        w.station_data.as_ref()?,
+        owner.system,
+        pose.position,
+        pose.orientation.z,
+        6000.0,
+    )?;
+    if contact.id != target {
+        return None;
+    }
+    let victim = w
+        .traffic_snapshot()?
+        .actors
+        .into_iter()
+        .find(|a| a.id == target)?
+        .pose;
+    let facing_front = victim.orientation.z.dot(crate::docking::Vec3::new(
+        pose.position.x - victim.position.x,
+        pose.position.y - victim.position.y,
+        pose.position.z - victim.position.z,
+    )) >= 0.0;
+    let (energy, front, rear, _) = w.traffic.emp_resources(target)?;
+    Some(u32::from(energy) + u32::from(if facing_front { front } else { rear }))
+}
+fn prepare_one_fatal_laser_at_recovery(
+    w: &mut World,
+    target: crate::traffic::NpcId,
+    deadline: u64,
+) {
+    let damage = u32::from(w.front_laser_snapshot().unwrap().damage_hundredths);
+    while w.combat.physical_tick() < deadline - 1 {
+        let remaining = deadline - w.combat.physical_tick();
+        if let Some(budget) = native_facing_budget(w, target) {
+            // Native SH025 earns at most seven hull and three facing-shield hundredths per
+            // tick. This upper bound admits only a genuinely fatal next-boundary public shot.
+            let ready = budget > 0 && u64::from(budget) + remaining * 10 <= u64::from(damage);
+            let cooled = w.flight_resources_snapshot().unwrap().cooldown_ticks == 0;
+            if ready && cooled {
+                return;
+            }
+            if budget > damage && cooled {
+                let tick = w.snapshot().tick;
+                let shot = w.request_fire_front_laser(tick).unwrap();
+                assert!(
+                    matches!(shot.contact, crate::PulseContact::Npc { id, .. } if id == target)
+                );
+                assert!(w.traffic.emp_resources(target).unwrap().0 > 0);
+            }
+        }
+        w.step(track_real_target(w, target)).unwrap();
+    }
+    panic!("public laser preparation did not leave the live disabled hull within one fatal shot");
+}
+fn prepared_recovery_boundary() -> (World, crate::traffic::NpcId, super::runtime::Episode, u64) {
+    let (mut w, target) = disabled_native_target();
+    let episode = *w.emp.episodes.last().unwrap();
+    assert_eq!(episode.victim, target);
+    let deadline = episode.disabled_at + 1801;
+    while w.combat.physical_tick() < deadline - 60 {
+        w.step(track_real_target(&w, target)).unwrap();
+    }
+    prepare_one_fatal_laser_at_recovery(&mut w, target, deadline);
+    while w.combat.physical_tick() < deadline - 1 {
+        w.step(track_real_target(&w, target)).unwrap();
+    }
+    assert!(w.traffic.emp_resources(target).unwrap().3.unwrap().disabled);
+    assert!(w.emp.episodes.last().unwrap().recovered_at.is_none());
+    assert!(native_facing_budget(&w, target).unwrap() > 0);
+    cold(&w);
+    (w, target, episode, deadline)
+}
+#[test]
+fn native_recovery_then_same_tick_fatal_public_laser_saves_and_continues_without_resurrection() {
+    let (mut w, target, episode, deadline) = prepared_recovery_boundary();
+    w.step(track_real_target(&w, target)).unwrap();
+    assert_eq!(w.combat.physical_tick(), deadline);
+    let recovered = w.emp.episodes.last().unwrap().recovered_at.unwrap();
+    assert_eq!(recovered, (deadline, w.snapshot().tick));
+    assert!(!w.traffic.emp_resources(target).unwrap().3.unwrap().disabled);
+    assert!(w.traffic.emp_resources(target).unwrap().0 > 0);
+    cold(&w);
+    let tick = w.snapshot().tick;
+    let shot = w.request_fire_front_laser(tick).unwrap();
+    assert!(matches!(shot.contact, crate::PulseContact::Npc { id, .. } if id == target));
+    assert_eq!(w.traffic.emp_resources(target).unwrap().0, 0);
+    let local = w.traffic.emp_clock(target.system()).unwrap();
+    let before_recovery = w
+        .traffic
+        .emp_before_recovery(target, local, tick, episode.origin)
+        .unwrap();
+    assert!(
+        before_recovery.0 > 0,
+        "later same-tick fatal command leaked into the step boundary"
+    );
+    assert!(before_recovery.3.unwrap().disabled);
+    let mut loaded = cold(&w);
+    assert_eq!(
+        loaded.emp.episodes.last().unwrap().recovered_at,
+        Some(recovered)
+    );
+    steps(&mut loaded, 1);
+    assert_eq!(loaded.traffic.emp_resources(target).unwrap().0, 0);
+    assert!(
+        loaded
+            .traffic_snapshot()
+            .unwrap()
+            .actors
+            .iter()
+            .any(|a| a.id == target && a.phase == crate::traffic::NpcPhase::Destroyed)
+    );
+    cold(&loaded);
+}
+#[test]
+fn native_death_before_recovery_stays_dead_and_refuses_recovery_without_resource_or_save_change() {
+    let (mut w, target, episode, deadline) = prepared_recovery_boundary();
+    let tick = w.snapshot().tick;
+    let shot = w.request_fire_front_laser(tick).unwrap();
+    assert!(matches!(shot.contact, crate::PulseContact::Npc { id, .. } if id == target));
+    assert_eq!(w.traffic.emp_resources(target).unwrap().0, 0);
+    w.step(FlightInput::default()).unwrap();
+    assert_eq!(w.combat.physical_tick(), deadline);
+    assert!(w.emp.episodes.last().unwrap().recovered_at.is_none());
+    assert_eq!(w.traffic.emp_resources(target).unwrap().0, 0);
+    let local = w.traffic.emp_clock(target.system()).unwrap();
+    let before_recovery = w
+        .traffic
+        .emp_before_recovery(target, local, w.snapshot().tick, episode.origin)
+        .unwrap();
+    assert_eq!(
+        before_recovery.0, 0,
+        "prior-tick fatal command must remain in the boundary query"
+    );
+    let before = w.save_bytes().unwrap();
+    let tick = w.snapshot().tick;
+    assert_eq!(
+        w.traffic.emp_event(
+            episode.origin,
+            target,
+            tick,
+            deadline,
+            crate::traffic::EmpResourceAction::Recover
+        ),
+        Err(crate::traffic::TrafficError::InvalidState)
+    );
+    assert_eq!(w.save_bytes().unwrap(), before);
+    let mut loaded = cold(&w);
+    steps(&mut loaded, 1);
+    assert_eq!(loaded.traffic.emp_resources(target).unwrap().0, 0);
+    assert!(loaded.emp.episodes.last().unwrap().recovered_at.is_none());
+    cold(&loaded);
+}
