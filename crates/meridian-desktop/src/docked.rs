@@ -194,6 +194,9 @@ impl Docked {
         self.open = true;
         Ok(())
     }
+    pub(crate) fn review_pending(&self) -> bool {
+        self.pending.is_some()
+    }
     pub fn close(&mut self) {
         self.open = false;
         self.pending = None;

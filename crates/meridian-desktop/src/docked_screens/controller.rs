@@ -139,7 +139,7 @@ impl DockedScreens {
         }
         if context.stamp != painted.stamp
             || painted.ui_revision != self.ui_revision
-            || painted.screen != self.screen
+            || painted.screen != Some(self.screen)
         {
             return Outcome::Refused("Screen changed; review the current values again".into());
         }

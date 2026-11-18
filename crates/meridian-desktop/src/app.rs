@@ -119,6 +119,7 @@ struct App {
     xyzzy: Option<crate::xyzzy::Menu>,
     focused: bool,
     docked: Option<Docked>,
+    commander_open: bool,
     modifiers: ModifiersState,
     cursor: [f64; 2],
     dragging: bool,
@@ -139,7 +140,23 @@ impl App {
     }
     fn from_launch(launch: mule_validation::Launch) -> Result<Self, Box<dyn Error>> {
         let view = launch.camera_view();
-        let mut app = Self::with_profile(launch.open()?);
+        let mut app = match launch {
+            mule_validation::Launch::Profile(directory) => {
+                let (game, notice) = Profile::open_startup(directory, fresh_profile_seed())?;
+                let mut app = Self::with_profile(game);
+                app.commander_open = true;
+                app.paused = app
+                    .game
+                    .world
+                    .mission_snapshot()
+                    .is_some_and(|mission| mission.paused);
+                if let Some(notice) = notice {
+                    app.notice.set(notice);
+                }
+                app
+            }
+            launch => Self::with_profile(launch.open()?),
+        };
         app.validation_view = view;
         Ok(app)
     }
@@ -159,6 +176,7 @@ impl App {
             xyzzy: None,
             focused: true,
             docked: None,
+            commander_open: false,
             modifiers: ModifiersState::empty(),
             cursor: [0.0; 2],
             dragging: false,
@@ -187,7 +205,12 @@ impl App {
     }
 
     fn simulation_active(&self) -> bool {
-        self.focused && !self.occluded && !self.paused && !self.modal_open() && self.game.playing()
+        self.focused
+            && !self.occluded
+            && !self.paused
+            && !self.commander_open
+            && !self.modal_open()
+            && self.game.playing()
     }
 
     fn modal_open(&self) -> bool {
@@ -214,6 +237,9 @@ impl App {
     fn help_panel(&self) -> crate::help::Panel {
         if let Some(menu) = &self.xyzzy {
             return menu.help();
+        }
+        if self.commander_open && self.game.playing() {
+            return crate::help::Panel::commander(self.has_berth());
         }
         if !self.game.playing() {
             return crate::help::Panel::title();
@@ -339,6 +365,7 @@ impl App {
         }
         self.game.session.invalidate();
         if self.game.playing()
+            && !self.commander_open
             && !self.game.is_internal_validation()
             && let Err(error) = self.game.world.request_pause(
                 self.paused || !self.focused || self.occluded,
@@ -368,6 +395,15 @@ impl App {
                 Ok(mule_validation::Control::Ignored) => {}
                 Err(error) => self.fail(event_loop, error),
             }
+            return;
+        }
+        if code == KeyCode::Digit0 && !self.commander_open && self.has_berth() {
+            self.show_station_commander();
+            self.request_redraw();
+            return;
+        }
+        if self.commander_open && self.commander_key(code) {
+            self.request_redraw();
             return;
         }
         let global = matches!(
@@ -433,10 +469,91 @@ impl App {
         self.request_redraw();
     }
 
+    fn has_berth(&self) -> bool {
+        self.game.playing() && self.game.world.current_dock_context().is_some()
+    }
+
+    fn show_station_commander(&mut self) {
+        if self.menu_active()
+            && let Some(menu) = &mut self.docked
+            && menu.review_pending()
+        {
+            menu.feedback("Confirm or cancel the current review first".into());
+            return;
+        }
+        self.commander_open = true;
+        self.notice = Notice::default();
+        self.clear_held_input();
+    }
+
+    fn leave_commander(&mut self) {
+        self.commander_open = false;
+        self.quit_failed = false;
+        self.reset_input();
+    }
+
+    // Returns false for shared profile and window shortcuts handled by key().
+    fn commander_key(&mut self, code: KeyCode) -> bool {
+        match code {
+            KeyCode::Escape | KeyCode::F11 => return false,
+            KeyCode::KeyN | KeyCode::KeyC if !self.game.playing() => return false,
+            KeyCode::KeyP | KeyCode::KeyQ if self.quit_failed => return false,
+            KeyCode::F5 | KeyCode::F9 if self.game.playing() => return false,
+            KeyCode::Digit1
+            | KeyCode::Digit2
+            | KeyCode::Digit3
+            | KeyCode::Digit4
+            | KeyCode::Digit5 => {
+                if self.open_menu_key(code)
+                    && self
+                        .docked
+                        .as_ref()
+                        .is_some_and(|menu| menu.active(&self.game.world))
+                {
+                    self.leave_commander();
+                }
+            }
+            KeyCode::KeyL if self.has_berth() => self.launch_from_commander(),
+            KeyCode::Enter if self.game.playing() && !self.has_berth() => {
+                self.paused = false;
+                self.leave_commander();
+            }
+            _ => {}
+        }
+        true
+    }
+
+    fn launch_from_commander(&mut self) {
+        if self
+            .game
+            .world
+            .mission_snapshot()
+            .is_some_and(|mission| mission.paused)
+        {
+            let tick = self.game.world.snapshot().tick;
+            if let Err(error) = self.game.world.request_pause(false, tick) {
+                self.notice.set(error.to_string());
+                return;
+            }
+        }
+        match self.game.command(Action::Launch) {
+            Ok(message) => {
+                self.paused = false;
+                self.leave_commander();
+                self.notice.set(message);
+            }
+            Err(error) => self.notice.set(error),
+        }
+    }
+
     fn sync_profile_controls(&mut self) {
         self.paused = self.game.world.mission_snapshot().is_some_and(|m| m.paused);
         self.quit_failed = false;
         self.reset_input();
+        if self.commander_open {
+            self.docked = None;
+            return;
+        }
         self.docked = match Docked::new(&self.game.world) {
             Ok(mut menu) => {
                 if self.game.world.current_dock_context().is_some()
@@ -457,8 +574,11 @@ impl App {
         match self.game.continue_saved() {
             Ok(()) => {
                 self.sync_profile_controls();
-                self.notice
-                    .set("Commander continued; select the actual current crew with T".into());
+                self.notice.set(if self.commander_open {
+                    "Commander loaded".into()
+                } else {
+                    "Commander continued; select the actual current crew with T".into()
+                });
             }
             Err(error) => self.notice.set(format!(
                 "Continue refused; save and current game retained: {error}"
@@ -489,9 +609,11 @@ impl App {
     }
 
     fn menu_active(&self) -> bool {
-        self.docked
-            .as_ref()
-            .is_some_and(|menu| menu.active(&self.game.world))
+        !self.commander_open
+            && self
+                .docked
+                .as_ref()
+                .is_some_and(|menu| menu.active(&self.game.world))
     }
     fn menu_input(&mut self, input: ui::Input) {
         if self.modal_open() {
@@ -505,7 +627,7 @@ impl App {
         self.request_redraw();
     }
     fn open_menu_key(&mut self, code: KeyCode) -> bool {
-        if !self.game.playing() || self.game.world.current_dock_context().is_none() {
+        if !self.has_berth() {
             return false;
         }
         let screen = match code {
@@ -724,6 +846,9 @@ impl App {
                 if self.route_xyzzy(code, repeat) {
                     return None;
                 }
+                if self.commander_open {
+                    return (!repeat).then_some(code);
+                }
                 if self.menu_active()
                     && self.docked.as_ref().is_some_and(Docked::search_active)
                     && let Some(text) = text.filter(|s| s.chars().all(|c| !c.is_control()))
@@ -785,6 +910,13 @@ impl App {
         viewport: impl FnOnce(Option<&Renderer>) -> Option<[f64; 2]>,
     ) -> Result<Option<ui::Frame>, String> {
         let renderer = self.renderer.as_ref();
+        if self.commander_open {
+            return Ok(viewport(renderer)
+                .and_then(|[width, height]| ui::Viewport::new(width, height))
+                .map(|viewport| {
+                    ui::commander_frame(&self.game, viewport, self.notice.text.as_deref())
+                }));
+        }
         Self::build_docked_frame(
             self.menu_active(),
             || viewport(renderer),
@@ -835,12 +967,20 @@ impl App {
     ) -> Result<(), String> {
         match presented {
             Ok(Presentation::Presented) => {
-                if let (Some(menu), Some(frame)) = (docked, docked_frame) {
+                if let (Some(menu), Some(frame)) = (docked, docked_frame)
+                    && frame.screen.is_some()
+                {
                     menu.presented(frame);
                 }
             }
             Ok(Presentation::Skipped) => {
-                if (help.is_some() || xyzzy.is_some()) && !renderer.is_zero_sized() {
+                if (help.is_some()
+                    || xyzzy.is_some()
+                    || docked_frame
+                        .as_ref()
+                        .is_some_and(|frame| frame.screen.is_none()))
+                    && !renderer.is_zero_sized()
+                {
                     renderer.window.request_redraw();
                 }
             }
@@ -908,15 +1048,21 @@ impl App {
         } else {
             "Meridian"
         };
-        let mode = match mode {
-            FlightMode::Docked => "DOCKED",
-            FlightMode::Launching => "LAUNCHING",
-            FlightMode::Flight => "FLIGHT",
+        let mode = if self.commander_open && !self.game.playing() {
+            "SAVE RECOVERY"
+        } else {
+            match mode {
+                FlightMode::Docked => "DOCKED",
+                FlightMode::Launching => "LAUNCHING",
+                FlightMode::Flight => "FLIGHT",
+            }
         };
         format!(
             "{commander} | {mode} | {} | H / ? Help",
             if modal_open {
                 "MENU"
+            } else if self.commander_open {
+                "COMMANDER"
             } else if active {
                 "RUNNING"
             } else {
@@ -973,17 +1119,18 @@ impl App {
         }
 
         let traffic = self.game.world.traffic_snapshot();
-        let cockpit = if self.game.playing() && !self.game.is_internal_validation() {
-            match crate::hud::cockpit::Cockpit::capture(&self.game.world, snapshot) {
-                Ok(cockpit) => Some(cockpit),
-                Err(error) => {
-                    self.fail(event_loop, error);
-                    return;
+        let cockpit =
+            if self.game.playing() && !self.commander_open && !self.game.is_internal_validation() {
+                match crate::hud::cockpit::Cockpit::capture(&self.game.world, snapshot) {
+                    Ok(cockpit) => Some(cockpit),
+                    Err(error) => {
+                        self.fail(event_loop, error);
+                        return;
+                    }
                 }
-            }
-        } else {
-            None
-        };
+            } else {
+                None
+            };
         self.missile_bodies.clear();
         self.missile_bodies.extend(
             self.game
@@ -1122,6 +1269,9 @@ impl ApplicationHandler for App {
             Err(error) => self.fail(event_loop, error),
         }
         self.last_frame = Instant::now();
+        if self.commander_open {
+            self.request_redraw();
+        }
     }
 
     fn window_event(&mut self, event_loop: &ActiveEventLoop, id: WindowId, event: WindowEvent) {
@@ -1187,6 +1337,7 @@ impl ApplicationHandler for App {
             let flight = self.game.playing()
                 && self.game.world.snapshot().mode == FlightMode::Flight
                 && !self.game.is_internal_validation()
+                && !self.commander_open
                 && !self.modal_open()
                 && !self.quit_failed;
             if flight && self.notice.expire(Instant::now()) {

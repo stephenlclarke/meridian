@@ -32,6 +32,25 @@ impl Panel {
         )
     }
 
+    pub fn commander(has_berth: bool) -> Self {
+        let mut panel = Self::new(
+            "Commander details",
+            &["F5 Save | F9 Reload | F11 Fullscreen | Escape Save/Quit"],
+        );
+        if has_berth {
+            panel
+                .lines
+                .insert(0, "L Launch | 0 Commander details".into());
+            panel.lines.insert(
+                1,
+                "1 Galaxy | 2 System | 3 Showroom | 4 Market | 5 Equipment".into(),
+            );
+        } else {
+            panel.lines.insert(0, "Enter Resume flight".into());
+        }
+        panel
+    }
+
     pub fn flight(weapon: Option<&str>, review: Option<&str>) -> Self {
         let mut panel = Self::new(
             "Flight controls",
@@ -157,7 +176,7 @@ impl Panel {
 
     fn navigation(&mut self) {
         self.lines.extend([
-            "1 Galaxy | 2 System | 3 Showroom | 4 Market | 5 Equipment".into(),
+            "0 Commander | 1 Galaxy | 2 System | 3 Showroom | 4 Market | 5 Equipment".into(),
             "Tab / Shift+Tab Next / previous station screen".into(),
             "Escape Back: leave search/details/options, then the HUD".into(),
             "Ctrl+Shift+X XYZZY testing menu (docked commander only)".into(),
