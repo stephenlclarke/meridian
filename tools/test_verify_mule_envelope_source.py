@@ -12,6 +12,8 @@ class MuleSourceVerification(unittest.TestCase):
         result = verifier.verify()
         self.assertEqual(result['protectedCoreFilesChecked'], 115)
         self.assertEqual(result['protectedCoreFilesWithMuleHooks'], 6)
+        self.assertEqual(result['geometryCoreTests'], 1)
+        self.assertEqual(result['totalMuleCoreTests'], 23)
         self.assertEqual(result['vertexEncoding'], 4360 + 984)
         self.assertEqual(result['triangleEncoding'], 7236 + 1772)
         self.assertFalse(result['constructorsOrContactOrContainmentOrCompilerExecuted'])

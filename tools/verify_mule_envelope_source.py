@@ -120,6 +120,26 @@ def verify_protected_core(root):
     return len(checked), len(additions)
 
 
+def verify_test_registry(criteria):
+    files = {
+        'newCoreTests': ('mule/tests.rs', 11),
+        'worldCoreTests': ('flight/mule_validation/tests.rs', 6),
+        'tightnessCoreTests': ('mule/tightness_tests.rs', 5),
+        'geometryCoreTests': ('mule/geometry.rs', 1),
+    }
+    counts = {}
+    for group, (module, expected) in files.items():
+        path = Path('crates/meridian-core/src') / module
+        names = re.findall(RUST_TEST_NAME, (ROOT / path).read_text())
+        entries = criteria[group]
+        assert len(names) == expected and names == [entry['name'] for entry in entries], group
+        assert all(entry['file'] == path.as_posix() and entry['status'] == 'UNRUN' for entry in entries), group
+        counts[group] = len(names)
+    total = sum(counts.values())
+    assert total == criteria['totalMuleCoreTests']
+    return {**counts, 'totalMuleCoreTests': total}
+
+
 def verify_historical_bindings(folder, groups):
     # Preserve the historical component and World patch identities separately.
     binding = json.loads((ROOT / 'integration/sh001-mule/CURRENT-GAMEPLAY.json').read_text())
@@ -132,16 +152,7 @@ def verify_historical_bindings(folder, groups):
     speed_source = (ROOT / 'crates/meridian-core/src/mule.rs').read_text()
     speed_constant = re.search(r'const MULE_MAX_SPEED_UNITS: f32 = ([0-9.]+);', speed_source)
     assert speed_constant and float(speed_constant[1]) == speed_contract
-    names = re.findall(RUST_TEST_NAME, (ROOT / 'crates/meridian-core/src/mule/tests.rs').read_text())
-    assert len(names) == 11 and names == [test['name'] for test in criteria['newCoreTests']]
-    assert all(test['status'] == 'UNRUN' for test in criteria['newCoreTests'])
-    world_names = re.findall(RUST_TEST_NAME, (ROOT / 'crates/meridian-core/src/flight/mule_validation/tests.rs').read_text())
-    assert len(world_names) == 6 and world_names == [test['name'] for test in criteria['worldCoreTests']]
-    assert all(test['status'] == 'UNRUN' for test in criteria['worldCoreTests'])
     tightness = (ROOT / 'crates/meridian-core/src/mule/tightness_tests.rs').read_text()
-    tightness_names = re.findall(RUST_TEST_NAME, tightness)
-    assert len(tightness_names) == 5 and tightness_names == [test['name'] for test in criteria['tightnessCoreTests']]
-    assert all(test['status'] == 'UNRUN' for test in criteria['tightnessCoreTests'])
     rim_text = tightness.split('const WELL_RIMS:', 1)[1].split('];', 1)[0]
     rim_indices = [(int(piece), int(first)) for piece, first in re.findall(r'\((\d+), (\d+)\)', rim_text)]
     assert rim_indices == [(part['piece'], part['vertexStart']) for part in groups['design'] if '/service-well-' in part['name'] and '/recess-' not in part['name']]
@@ -152,6 +163,7 @@ def verify_historical_bindings(folder, groups):
     assert sha(world_patch) == world_binding['canonicalPatch']['sha256']
     assert len(world_binding['currentRootCoreFiles']) == 135
     assert len(world_binding['modifiedCurrentFiles']) == 3
+    return verify_test_registry(criteria)
 
 
 def verify():
@@ -159,8 +171,8 @@ def verify():
     verify_inputs(folder)
     groups = verify_geometry(folder)
     checked, hooks = verify_protected_core(ROOT)
-    verify_historical_bindings(folder, groups)
-    return {'status': 'PASS_SOURCE_ONLY', 'protectedGameplayCoreFilesUnchanged': checked - hooks, 'protectedCoreFilesWithMuleHooks': hooks, 'protectedCoreFilesChecked': checked, 'newCoreTests': 11, 'worldCoreTests': 6, 'tightnessCoreTests': 5, 'totalMuleCoreTests': 22, 'vertexEncoding': 5344, 'triangleEncoding': 9008, 'constructorsOrContactOrContainmentOrCompilerExecuted': False}
+    counts = verify_historical_bindings(folder, groups)
+    return {'status': 'PASS_SOURCE_ONLY', 'protectedGameplayCoreFilesUnchanged': checked - hooks, 'protectedCoreFilesWithMuleHooks': hooks, 'protectedCoreFilesChecked': checked, **counts, 'vertexEncoding': 5344, 'triangleEncoding': 9008, 'constructorsOrContactOrContainmentOrCompilerExecuted': False}
 
 
 if __name__ == '__main__':

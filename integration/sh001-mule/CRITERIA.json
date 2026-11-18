@@ -173,7 +173,14 @@
       "status": "UNRUN"
     }
   ],
-  "totalMuleCoreTests": 22,
+  "geometryCoreTests": [
+    {
+      "file": "crates/meridian-core/src/mule/geometry.rs",
+      "name": "simplex_uses_a_valid_subface_for_singular_points_and_keeps_a_full_interior",
+      "status": "UNRUN"
+    }
+  ],
+  "totalMuleCoreTests": 23,
   "controlledWorldScenario": {
     "status": "AUTHORED_UNRUN;NOT_ORDINARY_HULL_ADMISSION",
     "base": "af97ee6bbba60b2d492216ad12035a90e9dde34e",
