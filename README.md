@@ -1,6 +1,6 @@
 # Meridian
 
-The original native black Fit review remains unexplained. The latest desktop run passed the Store-to-Fit revision checks, then exposed an incorrect cold-save byte expectation in the new regression. Continue deliberately advances review-permission counters. The [independent byte-oracle correction](docs/LASER-FACINGS.md#cold-continue-byte-contract) preserves anti-replay and full disk/state checks; changed execution is **UNRUN**. Dependent native acceptance remains blocked.
+The signed internal candidate reproduced the black Fit review after a visible Store. All three captured first attempts had identical valid CPU geometry and returned from submit/present, but later displayed frames and GPU pixels were unobserved. The [cross-frame investigation](docs/LASER-FACINGS.md#cross-frame-native-review-evidence-gap) found no source-supported renderer cure. The blocker remains open; a changed, bounded observation capture is specified before further native qualification.
 
 [![CI](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=alert_status)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)

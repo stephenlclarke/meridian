@@ -132,7 +132,7 @@ fn assert_review(frame: &Frame, model: &Model) {
     assert!(bytes[0] > 0 && bytes[1] > 0 && bytes[2] == 0);
     let atlas = atlas();
     let mut visible = 0;
-    for glyph in geometry.text.chunks_exact(6) {
+    for glyph in geometry.text.as_chunks::<6>().0 {
         assert!(glyph.iter().all(|v| {
             v.position
                 .into_iter()
