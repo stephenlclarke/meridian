@@ -1,0 +1,25 @@
+{
+  "parent": "4fb8005923a04d4a47b6fe2005c093f9f64fdf62",
+  "files": {
+    "before-sections.rs": {
+      "bytes": 37991,
+      "sha256": "b290c9d7f257dbd408b21100a2686121019a8c030d708cd02cf2b2ac6c8e80f7"
+    },
+    "before-region.rs": {
+      "bytes": 9093,
+      "sha256": "e38f0021ce88336d2de8bb17a97bb66e9390b7f874f163183ddf57560da31c7c"
+    },
+    "before-certificate.rs": {
+      "bytes": 82657,
+      "sha256": "59a35b20e23a6b9dd4920b1fe6d0cf8fb4ac31069f96706de0b3a7b067606c9f"
+    },
+    "collection-control.rs.txt": {
+      "bytes": 2216,
+      "sha256": "ae43a9e1def5df1660a342cc2222ed0fdec1f3fdf089b742f0998be3491b5d19"
+    },
+    "compiled-collection-control.rs": {
+      "bytes": 2223,
+      "sha256": "b65427a565d78969304ad1db8adc3a5f5216d2ae7236e1edc88969cecb9caaac"
+    }
+  }
+}

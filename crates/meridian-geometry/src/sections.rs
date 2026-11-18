@@ -291,8 +291,22 @@ impl FacetBoundsIndex {
                 b.step(1)?;
                 let node = &self.nodes[index];
                 let physical_possible = physical_possible && finite.meets(&node.bounds, b)?;
-                let outward_possible =
-                    outward_possible && node.bounds.meets_outward_plane(face, b)?;
+                // A uniform owner is exact metadata about this source range,
+                // including unordered inputs. Excluded owners cannot supply an
+                // outward section; physical cuts remain independently eligible.
+                let owner_allowed = if outward_possible {
+                    if let Some(owner) = node.owner {
+                        log_cost(owners.len(), b)?;
+                        owners.contains_key(&owner)
+                    } else {
+                        true
+                    }
+                } else {
+                    false
+                };
+                let outward_possible = outward_possible
+                    && owner_allowed
+                    && node.bounds.meets_outward_plane(face, b)?;
                 if !physical_possible && !outward_possible {
                     continue;
                 }
@@ -305,9 +319,13 @@ impl FacetBoundsIndex {
                         let ordinal = node.start + offset;
                         let physical = physical_possible && finite.meets(bounds, b)?;
                         let outward = if outward_possible {
-                            log_cost(owners.len(), b)?;
-                            owners.contains_key(&originals[ordinal].id().component)
-                                && bounds.meets_outward_plane(face, b)?
+                            let owner_allowed = if node.owner.is_some() {
+                                true
+                            } else {
+                                log_cost(owners.len(), b)?;
+                                owners.contains_key(&originals[ordinal].id().component)
+                            };
+                            owner_allowed && bounds.meets_outward_plane(face, b)?
                         } else {
                             false
                         };
@@ -990,6 +1008,106 @@ mod tests {
             drop((barriers, coplanar, frame));
             exact.release(members);
             assert_eq!(exact.retained_memberships(), 0);
+        }
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod live_overlap_tests {
+    use super::*;
+    use crate::{Limits, SourceId, Vertex};
+    include!(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/fixtures/live-overlap-reference/compiled-collection-control.rs"
+    ));
+
+    #[test]
+    fn owner_pruning_matches_frozen_candidates_for_uniform_mixed_and_unordered_ranges()
+    -> Result<(), Failure> {
+        let mut setup = Budget::new(Limits::default())?;
+        let make = |i: u32, owner: u32, b: &mut Budget| {
+            Facet::new(
+                SourceId {
+                    component: owner,
+                    facet: i,
+                },
+                [[-10, -10, -1], [10, -10, 1], [0, 10, 1]].map(|p| Vertex {
+                    point: p.map(integer),
+                    uv: [integer(0), integer(0)],
+                }),
+                "test".into(),
+                b,
+            )
+        };
+        let face = Facet::new(
+            SourceId {
+                component: 100,
+                facet: 0,
+            },
+            [[0, 0, 0], [1, 0, 0], [0, 1, 0]].map(|p| Vertex {
+                point: p.map(integer),
+                uv: [integer(0), integer(0)],
+            }),
+            "test".into(),
+            &mut setup,
+        )?;
+        // Every source crosses the plane; finite exclusion isolates outward
+        // owner pruning from the independently preserved physical query.
+        let far = Bounds {
+            lower: [integer(100), integer(100), integer(100)],
+            upper: [integer(101), integer(101), integer(101)],
+        };
+        for unordered in [false, true] {
+            let mut originals = Vec::new();
+            for i in 0..128 {
+                originals.push(make(i, if unordered { i % 3 } else { i / 32 }, &mut setup)?);
+            }
+            let index = FacetBoundsIndex::build(&originals, &mut setup)?;
+            for node in &index.nodes {
+                let ids: std::collections::BTreeSet<_> = originals[node.start..node.end]
+                    .iter()
+                    .map(|f| f.id().component)
+                    .collect();
+                assert_eq!(node.owner, (ids.len() == 1).then(|| *ids.first().unwrap()));
+            }
+            for owners in [
+                BTreeMap::new(),
+                BTreeMap::from([(1, Vec::new())]),
+                BTreeMap::from([
+                    (0, Vec::new()),
+                    (1, Vec::new()),
+                    (2, Vec::new()),
+                    (3, Vec::new()),
+                ]),
+            ] {
+                for bounds in [&far, &index.facets[0]] {
+                    let mut old = Budget::new(Limits::default())?;
+                    let mut new = Budget::new(Limits::default())?;
+                    let expected = index.frozen_collection_candidates(
+                        &face, bounds, &owners, &originals, &mut old,
+                    )?;
+                    let found = index
+                        .collection_candidates(&face, bounds, &owners, &originals, &mut new)?;
+                    assert_eq!(found, expected);
+                    assert_eq!(new.retained_memberships(), 0);
+                    if !unordered && owners.is_empty() {
+                        assert!(new.operations() < old.operations());
+                    }
+                    let mut tight = Budget::new(Limits {
+                        storage_memberships: FacetBoundsIndex::stack_members(originals.len()) - 1,
+                        ..Limits::default()
+                    })?;
+                    assert_eq!(
+                        index
+                            .collection_candidates(&face, bounds, &owners, &originals, &mut tight)
+                            .err()
+                            .map(|e| e.kind),
+                        Some(FailureKind::Storage)
+                    );
+                    assert_eq!(tight.retained_memberships(), 0);
+                }
+            }
         }
         Ok(())
     }

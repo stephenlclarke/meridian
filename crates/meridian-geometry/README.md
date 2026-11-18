@@ -167,3 +167,9 @@ Original topology auditing now verifies ascending owner runs and audits each bor
 The owner-range revision passed 47 Rust tests and nine host tests. Its original-five run still refused every constructor and returned zero hulls. The adapter now looks up each authenticated canonical style encoding before repeating hexadecimal decoding. This removes 38,228 charged operations for SH010/011, 41,572 for SH016/017 and 37,316 for SH166 before construction.
 
 Budget also retains its first rejected charge with the caller, active phase, stage work totals and exact retained/requested values before cleanup. The actual adapter publishes that snapshot in the case report. The 50 Rust tests and nine host tests for this revision are UNRUN pending review and owner execution. [The source-derived work, schema and independent comparisons](integration/adapter-context/CONTRACT.md) define the validation scope.
+
+## Deferred noding pool and owner pruning
+
+The style/context revision passed 50 Rust tests, nine host tests, check, strict Clippy and build. The changed whole-five still returned five constructor refusals and no candidates. The exact new contexts identify occupancy scratch with retained global points for SH010/011 and charged section/field work for SH016/017/166.
+
+The noding point pool now builds after classification and index cleanup from the same packed cell/protected records. Each region visits repeated local references once. Proven uniform-owner nodes also exclude ineligible outward sections while physical cuts remain independent. All 50 existing test bodies, frozen controls and limits stay unchanged. The current 52 Rust tests and nine host tests are UNRUN; full fit remains unproved. [The complete causal correction and ownership contract](integration/live-overlap/CONTRACT.md) includes the exact prior receipts and new validation criteria.

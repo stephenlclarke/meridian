@@ -130,6 +130,33 @@ impl PackedRegion {
         b.release(lookup_members);
         Ok(result)
     }
+    // Protected points seed the prefix in pack_records. Cell ordinals then
+    // identify exactly the other old noding inputs; physical-only endpoints
+    // remain excluded. The bitmap is local to this one source region.
+    pub fn visit_noding_points<F>(&self, b: &mut Budget, mut visit: F) -> Result<(), Failure>
+    where
+        F: FnMut(&Point2, &mut Budget) -> Result<(), Failure>,
+    {
+        b.with_retained(self.points.len() + 8, |b| {
+            b.step(self.points.len() as u64)?;
+            let mut visited = vec![false; self.points.len()];
+            // Keep the old cells-then-protected order of first occurrences.
+            for ordinal in self
+                .cells
+                .iter()
+                .flatten()
+                .copied()
+                .chain(0..self.protected.len())
+            {
+                b.step(1)?;
+                if !visited[ordinal] {
+                    visited[ordinal] = true;
+                    visit(&self.points[ordinal], b)?;
+                }
+            }
+            Ok(())
+        })
+    }
     // The caller admits the complete expanded parent bound before cloning.
     // Consuming self drops all packed records before the caller releases them.
     pub fn expand(self, b: &mut Budget) -> Result<ExpandedRegion, Failure> {
@@ -248,6 +275,90 @@ mod tests {
         );
         b.release(packed);
         assert_eq!(b.retained_memberships(), 0);
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod live_overlap_tests {
+    use super::*;
+    use crate::{Limits, integer};
+
+    #[test]
+    fn deferred_noding_visits_exact_old_point_set_once_and_excludes_physical_only_points()
+    -> Result<(), Failure> {
+        let p = |x, y| [integer(x), integer(y)];
+        let arrangement = Arrangement {
+            cells: vec![
+                vec![p(0, 0), p(2, 0), p(0, 2)],
+                vec![p(0, 0), p(2, 0), p(0, 2)],
+            ],
+            physical: BTreeSet::from([[p(9, 9), p(10, 10)]]),
+            protected: BTreeSet::from([p(0, 0), p(1, 1)]),
+            work: ArrangementWork::default(),
+        };
+        // Independent old publisher input, without packed point ordinals.
+        let expected: BTreeSet<_> = arrangement
+            .cells
+            .iter()
+            .flatten()
+            .chain(arrangement.protected.iter())
+            .cloned()
+            .collect();
+        let mut expected_order = Vec::new();
+        for p in arrangement
+            .cells
+            .iter()
+            .flatten()
+            .chain(arrangement.protected.iter())
+        {
+            if !expected_order.contains(p) {
+                expected_order.push(p.clone());
+            }
+        }
+        let mut setup = Budget::new(Limits::default())?;
+        let region = PackedRegion::pack(arrangement, &mut setup)?;
+        let mut b = Budget::new(Limits::default())?;
+        b.retain(500)?;
+        let mut seen = Vec::new();
+        region.visit_noding_points(&mut b, |p, _| {
+            seen.push(p.clone());
+            Ok(())
+        })?;
+        assert_eq!(seen, expected_order);
+        assert_eq!(seen.len(), expected.len());
+        assert_eq!(seen.into_iter().collect::<BTreeSet<_>>(), expected);
+        assert_eq!(b.retained_memberships(), 500);
+        let cap = 500 + region.points.len() + 8;
+        assert_eq!(b.peak_memberships(), cap);
+        let mut tight = Budget::new(Limits {
+            storage_memberships: cap - 1,
+            ..Limits::default()
+        })?;
+        tight.retain(500)?;
+        let mut called = false;
+        assert_eq!(
+            region
+                .visit_noding_points(&mut tight, |_, _| {
+                    called = true;
+                    Ok(())
+                })
+                .err()
+                .map(|e| e.kind),
+            Some(FailureKind::Storage)
+        );
+        assert!(!called);
+        assert_eq!(tight.retained_memberships(), 500);
+        let mut refused = Budget::new(Limits::default())?;
+        refused.retain(500)?;
+        let result = region.visit_noding_points(&mut refused, |_, b| {
+            Err(b.fail(FailureKind::InvalidWitness, "test callback refusal"))
+        });
+        assert_eq!(
+            result.err().map(|e| e.kind),
+            Some(FailureKind::InvalidWitness)
+        );
+        assert_eq!(refused.retained_memberships(), 500);
         Ok(())
     }
 }

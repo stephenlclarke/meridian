@@ -253,6 +253,16 @@
       "file": "src/bin/original_five.rs",
       "name": "adapter_serializes_resource_rejection_without_publishing_candidate",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/sections.rs",
+      "name": "owner_pruning_matches_frozen_candidates_for_uniform_mixed_and_unordered_ranges",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/region.rs",
+      "name": "deferred_noding_visits_exact_old_point_set_once_and_excludes_physical_only_points",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -610,5 +620,15 @@
     "beforeSUTFreezeSHA256": "4d8a6c1e3eeb6594b3a31c277ba1ced68d412beee43578a021c0874b066027a2",
     "newTestCount": 50,
     "currentExecution": "UNRUN"
+  },
+  "liveOverlapCorrection": {
+    "qualifiedRoot": "c64fc6319b6f58456103faee7597b144b7fca67a",
+    "parent50Pass": true,
+    "oldTestsPreserved": 50,
+    "currentExecution": "UNRUN",
+    "contractSHA256": "5631b8b0683ffe30ed6695dcc8b1cfa07031dd6868595a106320364593cd873c",
+    "deltaSHA256": "26637d61e4714e61182e676678456a52e553de33977a047eb4934b1aeff9ed0f",
+    "frozenSHA256": "ce8982b0fc61160b4d5f0d2dc897e5d9ca482193386df3db46b674b959decd80",
+    "wholeFive": "ONE changed whole-five after Root serial join, G2 complete review and owning focused gates; no unchanged retry"
   }
 }

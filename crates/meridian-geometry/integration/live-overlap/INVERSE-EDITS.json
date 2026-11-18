@@ -1,0 +1,98 @@
+{
+  "certificate.rs": [
+    {
+      "afterStart": 368,
+      "afterEnd": 369,
+      "before": "",
+      "after": "    owner: Option<u32>,\n"
+    },
+    {
+      "afterStart": 390,
+      "afterEnd": 392,
+      "before": "        // child links and record/tag slots; index/vector headers.\n        8 * count + 12 * Self::node_limit(count) + 8\n",
+      "after": "        // child links, record/tag slots and exact uniform-owner tag/value; headers.\n        8 * count + 14 * Self::node_limit(count) + 8\n"
+    },
+    {
+      "afterStart": 407,
+      "afterEnd": 408,
+      "before": "            index.build_range(0, originals.len(), b)\n",
+      "after": "            index.build_range(originals, 0, originals.len(), b)\n"
+    },
+    {
+      "afterStart": 411,
+      "afterEnd": 419,
+      "before": "    fn build_range(&mut self, start: usize, end: usize, b: &mut Budget) -> Result<usize, Failure> {\n        let (bounds, children) = if end - start <= Self::LEAF_SIZE {\n",
+      "after": "    fn build_range(\n        &mut self,\n        originals: &[Facet],\n        start: usize,\n        end: usize,\n        b: &mut Budget,\n    ) -> Result<usize, Failure> {\n        let (bounds, children, owner) = if end - start <= Self::LEAF_SIZE {\n"
+    },
+    {
+      "afterStart": 425,
+      "afterEnd": 433,
+      "before": "            (bounds, None)\n",
+      "after": "            let mut owner = Some(originals[start].id().component);\n            for face in &originals[start + 1..end] {\n                b.step(1)?;\n                if owner != Some(face.id().component) {\n                    owner = None;\n                }\n            }\n            (bounds, None, owner)\n"
+    },
+    {
+      "afterStart": 435,
+      "afterEnd": 437,
+      "before": "            let left = self.build_range(start, middle, b)?;\n            let right = self.build_range(middle, end, b)?;\n",
+      "after": "            let left = self.build_range(originals, start, middle, b)?;\n            let right = self.build_range(originals, middle, end, b)?;\n"
+    },
+    {
+      "afterStart": 440,
+      "afterEnd": 445,
+      "before": "            (bounds, Some([left, right]))\n",
+      "after": "            b.step(1)?;\n            let owner = self.nodes[left]\n                .owner\n                .filter(|owner| Some(*owner) == self.nodes[right].owner);\n            (bounds, Some([left, right]), owner)\n"
+    },
+    {
+      "afterStart": 453,
+      "afterEnd": 454,
+      "before": "",
+      "after": "            owner,\n"
+    },
+    {
+      "afterStart": 1202,
+      "afterEnd": 1202,
+      "before": "        for p in arrangement\n            .cells\n            .iter()\n            .flatten()\n            .chain(arrangement.protected.iter())\n        {\n            let p = face.lift(p, b)?;\n            // The global noding pool stays live during later region packing.\n            // Provision one record before insertion; duplicates release it.\n            b.state([point_members, held, all_points.len(), reserve, 0, 0, 0, 0]);\n            b.retain(8)?;\n            log_cost(all_points.len(), b)?;\n            if all_points.insert(p) {\n                point_members += 8;\n            } else {\n                b.release(8);\n            }\n        }\n",
+      "after": ""
+    },
+    {
+      "afterStart": 1213,
+      "afterEnd": 1232,
+      "before": "",
+      "after": "    // The complete noding pool is needed only after all source-plane sections\n    // and indexes are dropped. Read precisely the packed cells/protected set;\n    // physical-only points do not enlarge the old pool.\n    for (face, region) in &regions {\n        b.at(face.id());\n        b.phase(BudgetPhase::GlobalPoints);\n        region.visit_noding_points(b, |p, b| {\n            let p = face.lift(p, b)?;\n            b.state([point_members, held, all_points.len(), 0, 0, 0, 0, 0]);\n            b.retain(8)?;\n            log_cost(all_points.len(), b)?;\n            if all_points.insert(p) {\n                point_members += 8;\n            } else {\n                b.release(8);\n            }\n            Ok(())\n        })?;\n    }\n"
+    }
+  ],
+  "sections.rs": [
+    {
+      "afterStart": 293,
+      "afterEnd": 309,
+      "before": "                let outward_possible =\n                    outward_possible && node.bounds.meets_outward_plane(face, b)?;\n",
+      "after": "                // A uniform owner is exact metadata about this source range,\n                // including unordered inputs. Excluded owners cannot supply an\n                // outward section; physical cuts remain independently eligible.\n                let owner_allowed = if outward_possible {\n                    if let Some(owner) = node.owner {\n                        log_cost(owners.len(), b)?;\n                        owners.contains_key(&owner)\n                    } else {\n                        true\n                    }\n                } else {\n                    false\n                };\n                let outward_possible = outward_possible\n                    && owner_allowed\n                    && node.bounds.meets_outward_plane(face, b)?;\n"
+    },
+    {
+      "afterStart": 321,
+      "afterEnd": 328,
+      "before": "                            log_cost(owners.len(), b)?;\n                            owners.contains_key(&originals[ordinal].id().component)\n                                && bounds.meets_outward_plane(face, b)?\n",
+      "after": "                            let owner_allowed = if node.owner.is_some() {\n                                true\n                            } else {\n                                log_cost(owners.len(), b)?;\n                                owners.contains_key(&originals[ordinal].id().component)\n                            };\n                            owner_allowed && bounds.meets_outward_plane(face, b)?\n"
+    },
+    {
+      "afterStart": 1014,
+      "afterEnd": 1114,
+      "before": "",
+      "after": "\n#[cfg(test)]\nmod live_overlap_tests {\n    use super::*;\n    use crate::{Limits, SourceId, Vertex};\n    include!(concat!(\n        env!(\"CARGO_MANIFEST_DIR\"),\n        \"/fixtures/live-overlap-reference/compiled-collection-control.rs\"\n    ));\n\n    #[test]\n    fn owner_pruning_matches_frozen_candidates_for_uniform_mixed_and_unordered_ranges()\n    -> Result<(), Failure> {\n        let mut setup = Budget::new(Limits::default())?;\n        let make = |i: u32, owner: u32, b: &mut Budget| {\n            Facet::new(\n                SourceId {\n                    component: owner,\n                    facet: i,\n                },\n                [[-10, -10, -1], [10, -10, 1], [0, 10, 1]].map(|p| Vertex {\n                    point: p.map(integer),\n                    uv: [integer(0), integer(0)],\n                }),\n                \"test\".into(),\n                b,\n            )\n        };\n        let face = Facet::new(\n            SourceId {\n                component: 100,\n                facet: 0,\n            },\n            [[0, 0, 0], [1, 0, 0], [0, 1, 0]].map(|p| Vertex {\n                point: p.map(integer),\n                uv: [integer(0), integer(0)],\n            }),\n            \"test\".into(),\n            &mut setup,\n        )?;\n        // Every source crosses the plane; finite exclusion isolates outward\n        // owner pruning from the independently preserved physical query.\n        let far = Bounds {\n            lower: [integer(100), integer(100), integer(100)],\n            upper: [integer(101), integer(101), integer(101)],\n        };\n        for unordered in [false, true] {\n            let mut originals = Vec::new();\n            for i in 0..128 {\n                originals.push(make(i, if unordered { i % 3 } else { i / 32 }, &mut setup)?);\n            }\n            let index = FacetBoundsIndex::build(&originals, &mut setup)?;\n            for node in &index.nodes {\n                let ids: std::collections::BTreeSet<_> = originals[node.start..node.end]\n                    .iter()\n                    .map(|f| f.id().component)\n                    .collect();\n                assert_eq!(node.owner, (ids.len() == 1).then(|| *ids.first().unwrap()));\n            }\n            for owners in [\n                BTreeMap::new(),\n                BTreeMap::from([(1, Vec::new())]),\n                BTreeMap::from([\n                    (0, Vec::new()),\n                    (1, Vec::new()),\n                    (2, Vec::new()),\n                    (3, Vec::new()),\n                ]),\n            ] {\n                for bounds in [&far, &index.facets[0]] {\n                    let mut old = Budget::new(Limits::default())?;\n                    let mut new = Budget::new(Limits::default())?;\n                    let expected = index.frozen_collection_candidates(\n                        &face, bounds, &owners, &originals, &mut old,\n                    )?;\n                    let found = index\n                        .collection_candidates(&face, bounds, &owners, &originals, &mut new)?;\n                    assert_eq!(found, expected);\n                    assert_eq!(new.retained_memberships(), 0);\n                    if !unordered && owners.is_empty() {\n                        assert!(new.operations() < old.operations());\n                    }\n                    let mut tight = Budget::new(Limits {\n                        storage_memberships: FacetBoundsIndex::stack_members(originals.len()) - 1,\n                        ..Limits::default()\n                    })?;\n                    assert_eq!(\n                        index\n                            .collection_candidates(&face, bounds, &owners, &originals, &mut tight)\n                            .err()\n                            .map(|e| e.kind),\n                        Some(FailureKind::Storage)\n                    );\n                    assert_eq!(tight.retained_memberships(), 0);\n                }\n            }\n        }\n        Ok(())\n    }\n}\n"
+    }
+  ],
+  "region.rs": [
+    {
+      "afterStart": 132,
+      "afterEnd": 159,
+      "before": "",
+      "after": "    // Protected points seed the prefix in pack_records. Cell ordinals then\n    // identify exactly the other old noding inputs; physical-only endpoints\n    // remain excluded. The bitmap is local to this one source region.\n    pub fn visit_noding_points<F>(&self, b: &mut Budget, mut visit: F) -> Result<(), Failure>\n    where\n        F: FnMut(&Point2, &mut Budget) -> Result<(), Failure>,\n    {\n        b.with_retained(self.points.len() + 8, |b| {\n            b.step(self.points.len() as u64)?;\n            let mut visited = vec![false; self.points.len()];\n            // Keep the old cells-then-protected order of first occurrences.\n            for ordinal in self\n                .cells\n                .iter()\n                .flatten()\n                .copied()\n                .chain(0..self.protected.len())\n            {\n                b.step(1)?;\n                if !visited[ordinal] {\n                    visited[ordinal] = true;\n                    visit(&self.points[ordinal], b)?;\n                }\n            }\n            Ok(())\n        })\n    }\n"
+    },
+    {
+      "afterStart": 280,
+      "afterEnd": 364,
+      "before": "",
+      "after": "\n#[cfg(test)]\nmod live_overlap_tests {\n    use super::*;\n    use crate::{Limits, integer};\n\n    #[test]\n    fn deferred_noding_visits_exact_old_point_set_once_and_excludes_physical_only_points()\n    -> Result<(), Failure> {\n        let p = |x, y| [integer(x), integer(y)];\n        let arrangement = Arrangement {\n            cells: vec![\n                vec![p(0, 0), p(2, 0), p(0, 2)],\n                vec![p(0, 0), p(2, 0), p(0, 2)],\n            ],\n            physical: BTreeSet::from([[p(9, 9), p(10, 10)]]),\n            protected: BTreeSet::from([p(0, 0), p(1, 1)]),\n            work: ArrangementWork::default(),\n        };\n        // Independent old publisher input, without packed point ordinals.\n        let expected: BTreeSet<_> = arrangement\n            .cells\n            .iter()\n            .flatten()\n            .chain(arrangement.protected.iter())\n            .cloned()\n            .collect();\n        let mut expected_order = Vec::new();\n        for p in arrangement\n            .cells\n            .iter()\n            .flatten()\n            .chain(arrangement.protected.iter())\n        {\n            if !expected_order.contains(p) {\n                expected_order.push(p.clone());\n            }\n        }\n        let mut setup = Budget::new(Limits::default())?;\n        let region = PackedRegion::pack(arrangement, &mut setup)?;\n        let mut b = Budget::new(Limits::default())?;\n        b.retain(500)?;\n        let mut seen = Vec::new();\n        region.visit_noding_points(&mut b, |p, _| {\n            seen.push(p.clone());\n            Ok(())\n        })?;\n        assert_eq!(seen, expected_order);\n        assert_eq!(seen.len(), expected.len());\n        assert_eq!(seen.into_iter().collect::<BTreeSet<_>>(), expected);\n        assert_eq!(b.retained_memberships(), 500);\n        let cap = 500 + region.points.len() + 8;\n        assert_eq!(b.peak_memberships(), cap);\n        let mut tight = Budget::new(Limits {\n            storage_memberships: cap - 1,\n            ..Limits::default()\n        })?;\n        tight.retain(500)?;\n        let mut called = false;\n        assert_eq!(\n            region\n                .visit_noding_points(&mut tight, |_, _| {\n                    called = true;\n                    Ok(())\n                })\n                .err()\n                .map(|e| e.kind),\n            Some(FailureKind::Storage)\n        );\n        assert!(!called);\n        assert_eq!(tight.retained_memberships(), 500);\n        let mut refused = Budget::new(Limits::default())?;\n        refused.retain(500)?;\n        let result = region.visit_noding_points(&mut refused, |_, b| {\n            Err(b.fail(FailureKind::InvalidWitness, \"test callback refusal\"))\n        });\n        assert_eq!(\n            result.err().map(|e| e.kind),\n            Some(FailureKind::InvalidWitness)\n        );\n        assert_eq!(refused.retained_memberships(), 500);\n        Ok(())\n    }\n}\n"
+    }
+  ]
+}

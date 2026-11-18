@@ -4,6 +4,7 @@ import gzip
 import re
 
 from strip_budget_context import body, remove_statements, strip_context
+from restore_live_overlap import restore
 
 
 def normalized(text):
@@ -15,7 +16,7 @@ def verify():
     reference = crate / "fixtures/adapter-context-reference"
     for name in ["sections.rs", "section_arrangement.rs", "region.rs", "certificate.rs"]:
         old = (reference / ("before-" + name)).read_text()
-        restored = strip_context((crate / "src" / name).read_text())
+        restored = strip_context(restore(name, (crate / "src" / name).read_text()))
         if name == "certificate.rs":
             start = restored.index("pub fn reconstruct(")
             end = restored.index("fn reconstruct_records(", start)

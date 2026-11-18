@@ -135,5 +135,13 @@
     "OriginalFaceIndex.near uses closed facet AABB candidates before plane sections.",
     "reconstruct_face retains same-plane positive-normal candidates once for per-cell field agreement and ownership ties.",
     "_retain_facet_region_witness returns immediately for no classified cells; original input authentication remains retained."
-  ]
+  ],
+  "liveOverlapCorrection": {
+    "source": "Pinned c64fc63 actual pre-cleanup refusals; no new imported asset",
+    "qualifiedRoot": "c64fc6319b6f58456103faee7597b144b7fca67a",
+    "parentHandoffSHA256": "efab4173aa6bdc5107c1ff7ded3841c4bc5461fd7b0dfbae961658de2dc5a2f9",
+    "rawPacketSHA256": "d98b6ad67976185177081feb5db163d464058e6747fbb1a04cba71275c490c27",
+    "currentExecution": "UNRUN",
+    "sourceFidelity": "Exact local cells/protected pool and uniform source-owner metadata; no source-field or hull admission changes"
+  }
 }

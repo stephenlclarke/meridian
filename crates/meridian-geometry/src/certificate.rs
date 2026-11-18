@@ -366,6 +366,7 @@ struct BoundsNode {
     start: usize,
     end: usize,
     children: Option<[usize; 2]>,
+    owner: Option<u32>,
 }
 struct FacetBoundsIndex {
     facets: Vec<Bounds>,
@@ -387,8 +388,8 @@ impl FacetBoundsIndex {
     }
     fn memberships(count: usize) -> usize {
         // Cached six scalar bounds, record/order slots; node bounds, ranges,
-        // child links and record/tag slots; index/vector headers.
-        8 * count + 12 * Self::node_limit(count) + 8
+        // child links, record/tag slots and exact uniform-owner tag/value; headers.
+        8 * count + 14 * Self::node_limit(count) + 8
     }
     fn stack_members(count: usize) -> usize {
         8 * (count.ilog2() as usize + 2) + 32
@@ -404,27 +405,44 @@ impl FacetBoundsIndex {
             root: 0,
         };
         index.root = b.with_retained(Self::stack_members(originals.len()), |b| {
-            index.build_range(0, originals.len(), b)
+            index.build_range(originals, 0, originals.len(), b)
         })?;
         Ok(index)
     }
-    fn build_range(&mut self, start: usize, end: usize, b: &mut Budget) -> Result<usize, Failure> {
-        let (bounds, children) = if end - start <= Self::LEAF_SIZE {
+    fn build_range(
+        &mut self,
+        originals: &[Facet],
+        start: usize,
+        end: usize,
+        b: &mut Budget,
+    ) -> Result<usize, Failure> {
+        let (bounds, children, owner) = if end - start <= Self::LEAF_SIZE {
             b.step(6)?;
             let mut bounds = self.facets[start].clone();
             for other in &self.facets[start + 1..end] {
                 b.step(6)?;
                 bounds.include(other);
             }
-            (bounds, None)
+            let mut owner = Some(originals[start].id().component);
+            for face in &originals[start + 1..end] {
+                b.step(1)?;
+                if owner != Some(face.id().component) {
+                    owner = None;
+                }
+            }
+            (bounds, None, owner)
         } else {
             let middle = start + (end - start) / 2;
-            let left = self.build_range(start, middle, b)?;
-            let right = self.build_range(middle, end, b)?;
+            let left = self.build_range(originals, start, middle, b)?;
+            let right = self.build_range(originals, middle, end, b)?;
             b.step(12)?;
             let mut bounds = self.nodes[left].bounds.clone();
             bounds.include(&self.nodes[right].bounds);
-            (bounds, Some([left, right]))
+            b.step(1)?;
+            let owner = self.nodes[left]
+                .owner
+                .filter(|owner| Some(*owner) == self.nodes[right].owner);
+            (bounds, Some([left, right]), owner)
         };
         b.step(1)?;
         let node = self.nodes.len();
@@ -433,6 +451,7 @@ impl FacetBoundsIndex {
             start,
             end,
             children,
+            owner,
         });
         Ok(node)
     }
@@ -1181,24 +1200,6 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
             arrangement.protected.len(),
         );
         b.retain(reserve)?;
-        for p in arrangement
-            .cells
-            .iter()
-            .flatten()
-            .chain(arrangement.protected.iter())
-        {
-            let p = face.lift(p, b)?;
-            // The global noding pool stays live during later region packing.
-            // Provision one record before insertion; duplicates release it.
-            b.state([point_members, held, all_points.len(), reserve, 0, 0, 0, 0]);
-            b.retain(8)?;
-            log_cost(all_points.len(), b)?;
-            if all_points.insert(p) {
-                point_members += 8;
-            } else {
-                b.release(8);
-            }
-        }
         let region = b.with_phase(BudgetPhase::Packing, |b| PackedRegion::pack(arrangement, b))?;
         b.release(reserve);
         held += region.memberships();
@@ -1210,6 +1211,25 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
     let ray_members = ray_caches.memberships();
     drop(ray_caches);
     b.release(bounds_members + facet_bounds_members + plane_members + ray_members);
+    // The complete noding pool is needed only after all source-plane sections
+    // and indexes are dropped. Read precisely the packed cells/protected set;
+    // physical-only points do not enlarge the old pool.
+    for (face, region) in &regions {
+        b.at(face.id());
+        b.phase(BudgetPhase::GlobalPoints);
+        region.visit_noding_points(b, |p, b| {
+            let p = face.lift(p, b)?;
+            b.state([point_members, held, all_points.len(), 0, 0, 0, 0, 0]);
+            b.retain(8)?;
+            log_cost(all_points.len(), b)?;
+            if all_points.insert(p) {
+                point_members += 8;
+            } else {
+                b.release(8);
+            }
+            Ok(())
+        })?;
+    }
     let mut triangles = Vec::new();
     let mut witnesses = Vec::new();
     for (source, region) in regions {

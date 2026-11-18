@@ -1,0 +1,31 @@
+{
+  "status": "AUTHORED_UNRUN",
+  "parentAuthor": "4fb8005923a04d4a47b6fe2005c093f9f64fdf62",
+  "qualifiedRoot": "c64fc6319b6f58456103faee7597b144b7fca67a",
+  "qualifiedTree": "b67fa46ee269bf176a287c675910ee6da95eebcc",
+  "parentFocusedRustPass": 50,
+  "parentHostPass": 9,
+  "actualParentOriginal": "5decodePASS/5constructorREFUSED/15dependentUNRUN/0candidates",
+  "newTests": [
+    {
+      "file": "src/sections.rs",
+      "name": "owner_pruning_matches_frozen_candidates_for_uniform_mixed_and_unordered_ranges",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/region.rs",
+      "name": "deferred_noding_visits_exact_old_point_set_once_and_excludes_physical_only_points",
+      "status": "UNRUN"
+    }
+  ],
+  "currentRustTests": 52,
+  "currentHostTests": 9,
+  "frozenSHA256": "ce8982b0fc61160b4d5f0d2dc897e5d9ca482193386df3db46b674b959decd80",
+  "contractSHA256": "5631b8b0683ffe30ed6695dcc8b1cfa07031dd6868595a106320364593cd873c",
+  "inverseSHA256": "a999cfbd704bcdcc0311625eac1d4e94724dce29b7e79a2fb3070902cc063e60",
+  "parentHandoffSHA256": "efab4173aa6bdc5107c1ff7ded3841c4bc5461fd7b0dfbae961658de2dc5a2f9",
+  "parentRawSHA256": "d98b6ad67976185177081feb5db163d464058e6747fbb1a04cba71275c490c27",
+  "causality": "Remove global noding pool overlap from sections/arrangement; exclude proved ineligible uniform owners before outward support. Both change real all-five construction paths. No whole fit/cost saving magnitude inferred from first refusal.",
+  "storageChanges": "Indexes add 2 memberships per node; deferred point bitmap adds P+8 locally after indexes drop; global points retain old8/record; no lowered guard or price.",
+  "unchanged": "All 50 old tests/assertions, all frozen historical controls, arrangement, source fields/geometry, primitive Budget, adapter and case serializer, caps/admission."
+}

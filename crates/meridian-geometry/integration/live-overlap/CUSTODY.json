@@ -1,0 +1,219 @@
+{
+  "handoffSHA256": "efab4173aa6bdc5107c1ff7ded3841c4bc5461fd7b0dfbae961658de2dc5a2f9",
+  "verifiedDirectPins": [
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/BUILD-START.json",
+      "bytes": 1738,
+      "sha256": "f21b32b64e5ac2e54e9d57502567298daea562f8f8240c6b9435229dc4666116"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/BUILD-TERMINAL.json",
+      "bytes": 2020,
+      "sha256": "df2c81b23b8f3b72ffa8c0560d663d01cb1e16bd46cb44e8370a4daea68f3687"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/CASES.csv",
+      "bytes": 863,
+      "sha256": "fbe73ce67377e53313f76552bd50fd563a94053550552a3a332dd7d53c50004f"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/CHECK-START.json",
+      "bytes": 1725,
+      "sha256": "825901bc0dc6083d822358c7fdb234b251143eda9c5a71ca85ef1c27ada3e983"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/CHECK-TERMINAL.json",
+      "bytes": 2008,
+      "sha256": "721ffd224367246b99a21545c8d9915a651e58c771ff9222fa1711e1fe0cb0a7"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/CLIPPY-START.json",
+      "bytes": 1763,
+      "sha256": "68d2d70f3eb185423720cfc7a4ceda47cac79a929cc8c3c58a7792e71e771dbf"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/CLIPPY-TERMINAL.json",
+      "bytes": 2047,
+      "sha256": "f4bad287294524387064cb2580f9eb450874eee86b45743a68f6c57238adef7e"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/FOCUSED-OWNER.json",
+      "bytes": 1505,
+      "sha256": "1617e7fca03e609f8704c12c5827439182326bb8024bf56628841d93ed4d87bd"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/FOCUSED-TERMINAL.json",
+      "bytes": 3070,
+      "sha256": "15a5d37954a4532f125aa147cb845d9ed23fcab396f668caea69a2c93ef8758d"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/HOST-START.json",
+      "bytes": 1818,
+      "sha256": "9fcd83933e5ce6612719b7c1e0379508416c68b2c1ed2f8205a5909ea598f5ee"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/HOST-TERMINAL.json",
+      "bytes": 2101,
+      "sha256": "c142177bd07a5fa09acbbf307e16b7d7a1c428f6c0270f10c18707a0700a9ebc"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/OWNER-EXECUTION.json",
+      "bytes": 1589,
+      "sha256": "f581aefe4c16625814bb27b267bf4aa504f27cdd9601b8423874ced013c903b6"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/OWNER-PREFLIGHT-CORRECTION.json",
+      "bytes": 571,
+      "sha256": "3e1c3edea05ea6055a6fe867fdf1ddb0c749326f3c3bff6efa10b13c6955e5fb"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/PREPARED.json",
+      "bytes": 1259,
+      "sha256": "3aaca29170b26ab0b35570cdc245076325c6b7c526cba69216be17561d926d49"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/REVIEW.json",
+      "bytes": 6399,
+      "sha256": "97fccd7b9c8bdd768ae442e0c19a22653a1355a89c536c3e65b9f62928162be7"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/ROOT-ALL-SOURCE-PINS.json",
+      "bytes": 93247,
+      "sha256": "0943fb2ccec045f11e6200dde2cde2afa3ffdcbc58244552817e8171a4ffd26b"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/ROOT-SOURCE.json",
+      "bytes": 4852,
+      "sha256": "8b49671e43a773987e1380b58928a8a4d7bb7725c110df90a546af0d2fb897b3"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/SOURCE-BINDING.json",
+      "bytes": 97908,
+      "sha256": "d28ade8cdf9dda163eca013ddf51f0a7b6da6d1eaac434eecaca12bee8d228a6"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/TEST-START.json",
+      "bytes": 1731,
+      "sha256": "3b586e01779f1d5ed5cb00881065d58030e5b7ca69e184f58240613f733ef23f"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/TEST-TERMINAL.json",
+      "bytes": 2015,
+      "sha256": "f28041f5b5e6639d860572cd3556e282beb8276d7ae1814906240b26f95d327d"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/build.log",
+      "bytes": 72,
+      "sha256": "c92508a29848820f033cd2ea015c85dde0953c88b07cc967ce34b7c08f610549"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/check.log",
+      "bytes": 362,
+      "sha256": "770be20fe3e958b5394be7b111dee69b988a15bf9fbba586696126f5894eb446"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/clippy.log",
+      "bytes": 205,
+      "sha256": "d14ddbf70ecac66bbc5efd57f4922f74f3dbb861d602eb59162c9b546fac8fb9"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/host.log",
+      "bytes": 1473,
+      "sha256": "4c8d614e95593a9a243aad90fd57319b6b17ceb8a1155a0ceed5f81ef6dd58b4"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/evidence/test.log",
+      "bytes": 15375,
+      "sha256": "1336f057ca7574861e29ef7b59eede329dde05295f457aaef60828b94094bf46"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/whole-five/ACTUAL-START.json",
+      "bytes": 948,
+      "sha256": "6c4dfc621d41d353199ac09c8df842c8d8478dd47230bcfece1563320c2805f1"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/whole-five/ARTIFACTS.json",
+      "bytes": 2142,
+      "sha256": "b7f7b1b3dee6d3f428ced365a497c63cf99db9cc246eb505f67a621f3f5131a9"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/whole-five/EXECUTION-BINDING.json",
+      "bytes": 98676,
+      "sha256": "422d1b22b7090110e6e4c839260d23dc6e7ba259f927499506e27dbb2e439d9b"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/whole-five/OWNER-TERMINAL.json",
+      "bytes": 23603,
+      "sha256": "b3a8b971db094e3f0aeb5052d318cb8838146cadaf2c488e0751763addc1e4bc"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/whole-five/results/EXECUTION-BINDING.json",
+      "bytes": 98676,
+      "sha256": "422d1b22b7090110e6e4c839260d23dc6e7ba259f927499506e27dbb2e439d9b"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/whole-five/results/ORIGINAL-BINDINGS.json",
+      "bytes": 11618,
+      "sha256": "6115342c17444e3f368f4a72f1ea9cc578b9fff2d1a0f1ca2f19d33b225ebf66"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/whole-five/results/SH010-CASE.json",
+      "bytes": 2894,
+      "sha256": "e72f4e1473ba83793e42bfe34f2817f30b2a6812dae641b9b05faaa60cde5e5e"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/whole-five/results/SH011-CASE.json",
+      "bytes": 2894,
+      "sha256": "9b671eb218f7401643fb751cce76c4fea9a3d9b937e1834f0fdea26c1e4d662c"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/whole-five/results/SH016-CASE.json",
+      "bytes": 2891,
+      "sha256": "c007c671fdb0b5789d9429064a020814a909d3dc13580f75fa978e0a6010dca3"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/whole-five/results/SH017-CASE.json",
+      "bytes": 2895,
+      "sha256": "72401b51e12d9e96edb7c8421544c3933c5cfb9439d7c0f2f05149b66b9ee1dc"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/whole-five/results/SH166-CASE.json",
+      "bytes": 2889,
+      "sha256": "ee3ea9ee67594393f372e0e99bf618349f8de93b3e6a56a68856a44b367952fd"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/whole-five/results/TERMINAL.json",
+      "bytes": 14771,
+      "sha256": "e592c5c399250b0e93ded4a2cda369636540651b53a52fcad415eafa56fe5bb8"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/whole-five/results/WHOLE-FIVE-CRITERIA.json",
+      "bytes": 4977,
+      "sha256": "ace9c47feecd0aa7b0507f15492e3a1d01edc00a4e0a489c707f5955701dd9c8"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/whole-five/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/whole-five/stdout.log",
+      "bytes": 14713,
+      "sha256": "42b4bc9f6062ef6dbc37a9277627bb926340b9eaf581391c732e9c84844a8d36"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/ROOT-SOURCE.tar",
+      "bytes": 7024640,
+      "sha256": "b51e94512daa21e69723c2bbb4a906e667d9a735718de7f90a0c17e68ded0622"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-style-context.c64fc63/target/debug/original_five",
+      "bytes": 5946800,
+      "sha256": "a8db8ed0f32bf457c8014ce6a3f4e17d313cfe48b7c1eb60aeb1bd3933bc2836"
+    }
+  ],
+  "rawPacketSHA256": "d98b6ad67976185177081feb5db163d464058e6747fbb1a04cba71275c490c27",
+  "originalFive25Bodies": "5decodePASS/5constructorREFUSED/15dependentUNRUN/0semanticFAIL/0candidates/0admissions",
+  "broader202": "Separate matrix",
+  "focused": "50Rust/9host/check/strictClippy/buildPASS on parent c64fc63 only"
+}
