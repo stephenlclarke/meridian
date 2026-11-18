@@ -1,0 +1,54 @@
+{
+  "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "objects": [
+    {
+      "kind": "blob",
+      "sha1": "ec62ccae9acfc05b92c3c4591f079fc7ba4bf1cf",
+      "sha256": "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883",
+      "file": "SH025.toml"
+    },
+    {
+      "kind": "blob",
+      "sha1": "98fe3f3aaa6eb7691ddb6a513e32e788fb2f209b",
+      "sha256": "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9",
+      "file": "SH028.toml"
+    },
+    {
+      "kind": "commit",
+      "sha1": "a11fe16924d87d06021816f9037952afcbac08db",
+      "sha256": "5ea9604bd6a9062cfe3810e1ef10f681a6644e4d063e1fb721671e34436001d6",
+      "file": "git-objects/a11fe16924d87d06021816f9037952afcbac08db.commit"
+    },
+    {
+      "kind": "tree",
+      "sha1": "68fec574df12ddf74acb14747e0dd6839f478642",
+      "sha256": "2d35e17064216a39a8c0dbe7c741eabe06a8d4d7e7fd4a2df3b4a80bcdbb78ab",
+      "file": "git-objects/68fec574df12ddf74acb14747e0dd6839f478642.tree"
+    },
+    {
+      "kind": "tree",
+      "sha1": "d791e1738b36ab03567c322a643be56f2f1d13f1",
+      "sha256": "a14dc36db6c23096d0c736d58e9f73b438501c96ef45fa24cda9b1b9218b76e4",
+      "file": "git-objects/d791e1738b36ab03567c322a643be56f2f1d13f1.tree"
+    },
+    {
+      "kind": "tree",
+      "sha1": "88ec7e2c50b2dc46a7c7fdbc0f3d0c1dc9396864",
+      "sha256": "7e71dfccaf3fd7692166d765c2466cdc40216f0a30e2350e970fc6584364b104",
+      "file": "git-objects/88ec7e2c50b2dc46a7c7fdbc0f3d0c1dc9396864.tree"
+    },
+    {
+      "kind": "tree",
+      "sha1": "3872adee7de509fc5f628165ad2f8d2f1c3fbb09",
+      "sha256": "7250c6b16f86dca4ddaf845514be7a0786ba9c6ba3b6d3c410059a412272b35d",
+      "file": "git-objects/3872adee7de509fc5f628165ad2f8d2f1c3fbb09.tree"
+    },
+    {
+      "kind": "tree",
+      "sha1": "81214e262f5e562239fb63e7aced775c804fb5b0",
+      "sha256": "451562c98fe0f0029ef10fe787883d47d660240a9e8b339dc5ed03d8a1767caa",
+      "file": "git-objects/81214e262f5e562239fb63e7aced775c804fb5b0.tree"
+    }
+  ],
+  "scope": "Exact selected immutable Git objects for fixed SH025/SH028 show lookups, not a full historic repository or new permission grant."
+}
