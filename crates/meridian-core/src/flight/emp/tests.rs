@@ -467,15 +467,43 @@ fn traffic_start_failure_evidence(w: &World) -> String {
         w.station_markets.as_ref().unwrap(),
     )
 }
+fn charge_pilot_evidence(w: &World, target: crate::traffic::NpcId) -> String {
+    let owner = w.combat_identity().unwrap();
+    format!(
+        "world={:?}; physical_tick={}; target={target:?}; recent_attacker={}; emp={:?}; meter={:?}; clocks(meter,bank,held,posted)={:?}; player_resources={:?}; combat={:?}; target_resources={:?}; traffic={:?}; previous_pulse={:#?}",
+        w.snapshot(),
+        w.combat.physical_tick(),
+        super::State::recent_attack(&w.traffic, owner, target, w.snapshot().tick),
+        w.emp_snapshot(),
+        w.emp.meter,
+        (
+            w.emp.meter_clock,
+            w.emp.bank_clock,
+            w.emp.held_tick,
+            w.emp.posted_tick
+        ),
+        w.flight_resources_snapshot(),
+        w.combat_snapshot(),
+        w.traffic.emp_resources(target),
+        w.traffic_snapshot(),
+        w.emp.pulses.last(),
+    )
+}
 fn start_charge(w: &mut World, target: crate::traffic::NpcId) {
+    let initial = charge_pilot_evidence(w, target);
+    let mut attempts = Vec::new();
     let mut previous = None;
     let mut quiet = 0;
-    for _ in 0..1200 {
+    for attempt in 0..1200 {
         // The exact-600-tick positive case needs an actually settled native target;
         // a start admission does not promise that a later moving surface stays on the ray.
-        if !target_settled(w, target, &mut previous, &mut quiet)
-            || admitted_emp_scene(w, target).is_err()
-        {
+        if !target_settled(w, target, &mut previous, &mut quiet) {
+            attempts.push((attempt, "target_unsettled".to_owned()));
+            w.step(aim_input(w, target)).unwrap();
+            continue;
+        }
+        if let Err(error) = admitted_emp_scene(w, target) {
+            attempts.push((attempt, format!("scene_admission {error:?}")));
             w.step(aim_input(w, target)).unwrap();
             continue;
         }
@@ -485,11 +513,13 @@ fn start_charge(w: &mut World, target: crate::traffic::NpcId) {
                 return;
             }
             Err(
-                EmpError::NoTarget
+                error @ (EmpError::NoTarget
                 | EmpError::NoRecentAggressor
                 | EmpError::InvalidContact
-                | EmpError::Resources,
-            ) => {}
+                | EmpError::Resources),
+            ) => {
+                attempts.push((attempt, format!("trigger_refusal {error:?}")));
+            }
             Err(error) => panic!(
                 "unexpected start refusal {error:?}; {}",
                 traffic_start_failure_evidence(w)
@@ -497,7 +527,10 @@ fn start_charge(w: &mut World, target: crate::traffic::NpcId) {
         }
         w.step(aim_input(w, target)).unwrap();
     }
-    panic!("real pilot failed to aim the EMP at its actual recent attacker");
+    panic!(
+        "real pilot failed to aim the EMP at its actual recent attacker; initial={initial}; attempts={attempts:?}; terminal={}",
+        charge_pilot_evidence(w, target)
+    );
 }
 fn hold(w: &mut World, target: crate::traffic::NpcId, ticks: usize) {
     for _ in 0..ticks {
