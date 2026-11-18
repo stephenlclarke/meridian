@@ -213,6 +213,21 @@ impl SmoothPiece {
         }
         result
     }
+    fn placed_source_bounds(&self, start: RigidPose) -> (Vec3, Vec3) {
+        let mut low = Vec3::new(f64::INFINITY, f64::INFINITY, f64::INFINITY);
+        let mut high = Vec3::new(f64::NEG_INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY);
+        for x in [self.low.x, self.high.x] {
+            for y in [self.low.y, self.high.y] {
+                for z in [self.low.z, self.high.z] {
+                    let q = add(start.position, start.orientation.apply(Vec3::new(x, y, z)));
+                    low = Vec3::new(low.x.min(q.x), low.y.min(q.y), low.z.min(q.z));
+                    high = Vec3::new(high.x.max(q.x), high.y.max(q.y), high.z.max(q.z));
+                }
+            }
+        }
+        (low, high)
+    }
+
     /// Continuous swept rounded support. Uncertainty and nonconvergence remain blocked.
     pub fn sweep_clears_triangle(
         &self,
@@ -253,17 +268,7 @@ impl SmoothPiece {
         let center = add(start.position, start.orientation.apply(self.center()));
         let rotation_padding =
             self.origin_radius * (1.001 * (angular_travel + 1e-6).min(2.0) + 1e-9);
-        let mut low = Vec3::new(f64::INFINITY, f64::INFINITY, f64::INFINITY);
-        let mut high = Vec3::new(f64::NEG_INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY);
-        for x in [self.low.x, self.high.x] {
-            for y in [self.low.y, self.high.y] {
-                for z in [self.low.z, self.high.z] {
-                    let q = add(start.position, start.orientation.apply(Vec3::new(x, y, z)));
-                    low = Vec3::new(low.x.min(q.x), low.y.min(q.y), low.z.min(q.z));
-                    high = Vec3::new(high.x.max(q.x), high.y.max(q.y), high.z.max(q.z));
-                }
-            }
-        }
+        let (low, high) = self.placed_source_bounds(start);
         let guard = 4096.0
             * f64::EPSILON
             * (1.0
@@ -421,24 +426,9 @@ impl SmoothPiece {
                 self.radius + guard,
             ),
         ));
-        let (mut begin, mut finish) = (0.0_f64, range);
-        for (axis, (lower, upper)) in low.into_iter().zip(high).enumerate() {
-            let q = coordinates(p)[axis];
-            let d = coordinates(v)[axis];
-            if d.abs() < 1e-300 {
-                if q < lower || q > upper {
-                    return Ok(EnvelopeRayContact::Clear);
-                }
-            } else {
-                let a = (lower - q) / d;
-                let b = (upper - q) / d;
-                begin = begin.max(a.min(b));
-                finish = finish.min(a.max(b));
-            }
-        }
-        if begin > finish {
+        let Some((begin, finish)) = clip_ray_to_bounds(p, v, low, high, range) else {
             return Ok(EnvelopeRayContact::Clear);
-        }
+        };
         let range = finish;
         let tolerance = 1e-6;
         let mut distance = begin;
@@ -489,81 +479,120 @@ impl SmoothPiece {
         })
     }
 }
+fn clip_ray_to_bounds(
+    p: Vec3,
+    v: Vec3,
+    low: [f64; 3],
+    high: [f64; 3],
+    range: f64,
+) -> Option<(f64, f64)> {
+    let (mut begin, mut finish) = (0.0_f64, range);
+    for (axis, (lower, upper)) in low.into_iter().zip(high).enumerate() {
+        let q = coordinates(p)[axis];
+        let d = coordinates(v)[axis];
+        if d.abs() < 1e-300 {
+            if q < lower || q > upper {
+                return None;
+            }
+        } else {
+            let a = (lower - q) / d;
+            let b = (upper - q) / d;
+            begin = begin.max(a.min(b));
+            finish = finish.min(a.max(b));
+        }
+    }
+    if begin > finish {
+        return None;
+    }
+    Some((begin, finish))
+}
+fn simplex_weights(points: &[Vec3], ids: &[usize]) -> Option<[f64; 4]> {
+    let anchor = points[ids[0]];
+    let k = ids.len() - 1;
+    let mut weights = [0.0; 4];
+    if k > 0 {
+        let equations = simplex_equations(points, ids, anchor, k);
+        let equations = solve_simplex_equations(equations, k)?;
+        let mut i = 0;
+        while i < k {
+            weights[i + 1] = equations[i][k];
+            i += 1;
+        }
+    }
+    weights[0] = 1.0 - weights[1..k + 1].iter().sum::<f64>();
+    if weights[..=k].iter().any(|v| !v.is_finite() || *v < 0.0) {
+        return None;
+    }
+    Some(weights)
+}
+
+fn simplex_equations(points: &[Vec3], ids: &[usize], anchor: Vec3, k: usize) -> [[f64; 4]; 3] {
+    let diffs: Vec<Vec3> = ids
+        .iter()
+        .skip(1)
+        .map(|i| sub(points[*i], anchor))
+        .collect();
+    let mut equations = [[0.0; 4]; 3];
+    let mut i = 0;
+    while i < k {
+        let mut j = 0;
+        while j < k {
+            equations[i][j] = diffs[i].dot(diffs[j]);
+            j += 1;
+        }
+        equations[i][k] = -diffs[i].dot(anchor);
+        i += 1;
+    }
+    equations
+}
+
+fn solve_simplex_equations(mut equations: [[f64; 4]; 3], k: usize) -> Option<[[f64; 4]; 3]> {
+    let mut column = 0;
+    while column < k {
+        let mut pivot = column;
+        let mut row = column + 1;
+        while row < k {
+            if equations[row][column].abs() > equations[pivot][column].abs() {
+                pivot = row;
+            }
+            row += 1;
+        }
+        if !equations[pivot][column].is_finite() || equations[pivot][column].abs() < 1e-20 {
+            return None;
+        }
+        equations.swap(column, pivot);
+        let divisor = equations[column][column];
+        let mut j = column;
+        while j <= k {
+            equations[column][j] /= divisor;
+            j += 1;
+        }
+        let mut row = 0;
+        while row < k {
+            if row != column {
+                let ratio = equations[row][column];
+                let mut j = column;
+                while j <= k {
+                    equations[row][j] -= ratio * equations[column][j];
+                    j += 1;
+                }
+            }
+            row += 1;
+        }
+        column += 1;
+    }
+    Some(equations)
+}
+
 fn closest_simplex(points: &[Vec3]) -> Option<(Vec3, Vec<usize>)> {
     let mut best: Option<(f64, Vec3, Vec<usize>)> = None;
     for mask in 1usize..(1usize << points.len()) {
         let ids: Vec<usize> = (0..points.len())
             .filter(|i| mask & (1usize << *i) != 0)
             .collect();
-        let anchor = points[ids[0]];
-        let k = ids.len() - 1;
-        let mut weights = [0.0; 4];
-        if k > 0 {
-            let diffs: Vec<Vec3> = ids
-                .iter()
-                .skip(1)
-                .map(|i| sub(points[*i], anchor))
-                .collect();
-            let mut equations = [[0.0; 4]; 3];
-            let mut i = 0;
-            while i < k {
-                let mut j = 0;
-                while j < k {
-                    equations[i][j] = diffs[i].dot(diffs[j]);
-                    j += 1;
-                }
-                equations[i][k] = -diffs[i].dot(anchor);
-                i += 1;
-            }
-            let mut singular = false;
-            let mut column = 0;
-            while column < k {
-                let mut pivot = column;
-                let mut row = column + 1;
-                while row < k {
-                    if equations[row][column].abs() > equations[pivot][column].abs() {
-                        pivot = row;
-                    }
-                    row += 1;
-                }
-                if !equations[pivot][column].is_finite() || equations[pivot][column].abs() < 1e-20 {
-                    singular = true;
-                    break;
-                }
-                equations.swap(column, pivot);
-                let divisor = equations[column][column];
-                let mut j = column;
-                while j <= k {
-                    equations[column][j] /= divisor;
-                    j += 1;
-                }
-                let mut row = 0;
-                while row < k {
-                    if row != column {
-                        let ratio = equations[row][column];
-                        let mut j = column;
-                        while j <= k {
-                            equations[row][j] -= ratio * equations[column][j];
-                            j += 1;
-                        }
-                    }
-                    row += 1;
-                }
-                column += 1;
-            }
-            if singular {
-                continue;
-            }
-            let mut i = 0;
-            while i < k {
-                weights[i + 1] = equations[i][k];
-                i += 1;
-            }
-        }
-        weights[0] = 1.0 - weights[1..k + 1].iter().sum::<f64>();
-        if weights[..=k].iter().any(|v| !v.is_finite() || *v < 0.0) {
+        let Some(weights) = simplex_weights(points, &ids) else {
             continue;
-        }
+        };
         let mut closest = Vec3::new(0.0, 0.0, 0.0);
         for (i, id) in ids.iter().enumerate() {
             closest = add(closest, scale(points[*id], weights[i]));
@@ -585,4 +614,34 @@ fn closest_simplex(points: &[Vec3]) -> Option<(Vec3, Vec<usize>)> {
         }
     }
     best.map(|(_, point, ids)| (point, ids))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Vec3, closest_simplex, simplex_weights};
+
+    #[test]
+    fn simplex_uses_a_valid_subface_for_singular_points_and_keeps_a_full_interior() {
+        let singular = [
+            Vec3::new(-2.0, 2.0, 0.0),
+            Vec3::new(2.0, 2.0, 0.0),
+            Vec3::new(3.0, 2.0, 0.0),
+        ];
+        assert!(simplex_weights(&singular, &[0, 1, 2]).is_none());
+        let (point, kept) =
+            closest_simplex(&singular).unwrap_or_else(|| panic!("missing valid edge"));
+        assert!(point.x.abs() < 1e-12 && (point.y - 2.0).abs() < 1e-12);
+        assert_eq!(kept.len(), 2);
+
+        let containing = [
+            Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(-1.0, -1.0, -1.0),
+        ];
+        let (point, kept) =
+            closest_simplex(&containing).unwrap_or_else(|| panic!("missing tetrahedral interior"));
+        assert!(point.dot(point) < 1e-24);
+        assert_eq!(kept, [0, 1, 2, 3]);
+    }
 }

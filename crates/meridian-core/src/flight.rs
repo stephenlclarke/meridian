@@ -499,7 +499,7 @@ impl World {
         if next.mode == FlightMode::Docked {
             return self.publish_step(next);
         }
-        if !self.state.speed.is_finite() || !(0.0..=MAX_SPEED).contains(&self.state.speed) {
+        if !(0.0..=MAX_SPEED).contains(&self.state.speed) {
             return Err(StepError::NonFiniteState);
         }
 

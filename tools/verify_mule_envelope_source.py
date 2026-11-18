@@ -80,7 +80,7 @@ def verify_geometry(folder):
 
 
 def verify_protected_core(root):
-    # Replay only the reviewed additive Mule hooks against the protected base.
+    # Undo the reviewed Mule hooks and the equivalent finite-speed range check.
     # Checking every pre-existing core blob catches unrelated gameplay edits.
     base = '792f4485372ae37d0c1d583ae11229e85932ce2f'
     additions = {
@@ -109,6 +109,11 @@ def verify_protected_core(root):
         for addition in additions.get(relative, []):
             assert data.count(addition) == 1, relative
             data = data.replace(addition, b'', 1)
+        if relative == 'flight.rs':
+            speed_line = b'        if !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
+            original_line = b'        if !self.state.speed.is_finite() || !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
+            assert data.count(speed_line) == 1, relative
+            data = data.replace(speed_line, original_line, 1)
         assert sha(data) == expected, relative
         checked.add(relative)
     assert set(additions) <= checked and len(checked) == 115

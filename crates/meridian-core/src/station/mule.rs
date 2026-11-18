@@ -1,6 +1,9 @@
 //! SH001 smooth-envelope queries against the authenticated SH028 station.
 //! These are geometric checks; only World can issue arrival, launch or owned-body commands.
-use super::*;
+use super::{
+    FlightStart, LAUNCH_SPEED, OriginalStationData, StationError, add, finite, flight_pose, sub,
+};
+use crate::docking::{Basis3, RigidPose, Vec3};
 use crate::mule::MuleHullSource;
 
 impl OriginalStationData {
