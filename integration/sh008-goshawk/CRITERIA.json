@@ -1,0 +1,34 @@
+{
+  "target": "SH008 Goshawk Explorer",
+  "status": "SOURCE_BOUND_CANDIDATE;RUNTIME_UNRUN;NO_ADMISSION",
+  "base": "a9bd0cc66c15e4ecfe57a0d86b774b797addc231",
+  "order": "Next unresolved original after SH001; SH009 remains held",
+  "detailedModel": "Authenticated staged asset with original fields and once-applied exact calibration",
+  "nativeModel": "Authenticated original proposal candidate, unpublished as native runtime geometry and unqualified against exact 512-face cap",
+  "coverage": {
+    "pieces": 69,
+    "vertices": 2608,
+    "triangles": 4448,
+    "indexConnectedComponents": 192,
+    "standOffMetres": 0.02,
+    "exception": null
+  },
+  "tests": [
+    {
+      "name": "goshawk_encloses_both_source_triangle_sets_without_redistributing_vertices",
+      "status": "UNRUN"
+    },
+    {
+      "name": "goshawk_forebody_channel_stays_clear_while_a_source_drive_arm_blocks_contact",
+      "status": "UNRUN"
+    }
+  ],
+  "sourceProof": "Every source component and triangle remains assigned to one piece. Independent plane support check across the authored channel obstacle sweep has at least 0.746 m source slack; this is a local static certificate, not runtime qualification.",
+  "nextAcceptance": [
+    "Run the two core tests with current protected source and strict Clippy in the owned lane",
+    "Measure actual detailed-to-envelope gaps with original source evidence and inspect the central channel",
+    "Use the original detailed UVs/materials in a renderer bound to the same 69 pieces and qualify cost and native docking",
+    "Resolve source-supported engineering mass/inertia and authored ordinary placement separately before hull acceptance"
+  ],
+  "counts": "Source packet does not alter full-fleet or public-preview acceptance"
+}

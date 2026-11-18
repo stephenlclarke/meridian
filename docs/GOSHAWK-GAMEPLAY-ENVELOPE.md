@@ -1,0 +1,11 @@
+# SH008 Goshawk Explorer envelope candidate
+
+Goshawk Explorer is the next unresolved original ship in catalogue order after Mule. This slice binds the original SH008 detailed model, original native candidate, and R3 contract. It prepares a hull-specific gameplay envelope for review and qualification. Ordinary placement, engineering mass and inertia, player acquisition, paid effects and crew custody still need their own source authority.
+
+The staged forest-silver display resource keeps its original 3,484 triangles, winding, materials, texture identities and UVs. Its positions use the authorized 30 m detailed length calibration of 10000000/1028273 metres per source unit. The original 964-triangle native candidate uses the same coordinate convention and exact rational calibration. It remains unqualified. The staged resource publishes only a detailed model. Preserve that distinction and the original 512-face exact qualification limit.
+
+The candidate encloses both submitted point sets with 69 local convex supports plus a 2 cm spherical offset. The partition keeps the wishbone rails, drive arms, crossbraces, pressure body, cockpit and engine assemblies distinct. Each pressure well has its own piece, with its local recess struts where present. The broader structures represented in both inputs can share a piece. Each original index-connected component stays in one piece, and each original triangle is enclosed by convexity. This is an approximate gameplay envelope. Native exact geometry and combined surface fit require separate evidence.
+
+The authored clearance test carries a small physical triangle through ten metres of the original forebody channel and requires strict separation. It also checks a real left drive-arm point blocks contact. A source-only scalar check finds at least 0.746 m of separating-plane slack for the channel fixture across all 69 rounded supports. That result applies to the selected fixture. The core tests, detailed distance samples, original appearance, real docking and renderer cost still need owned execution. Mule's local native-well decision applies only to Mule. SH008 has no approved local alterations or stand-off exceptions.
+
+No new full-fleet hull or public-preview count follows from this source packet.

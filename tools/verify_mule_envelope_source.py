@@ -133,7 +133,7 @@ def verify_protected_core(root):
         ],
         'flight/emp/tests.rs': [b'        mule_validation: None,\n'],
         'flight/persistence.rs': [b'            mule_validation: None,\n'],
-        'lib.rs': [b'pub mod mule;\n'],
+        'lib.rs': [b'pub mod mule;\n', b'pub mod goshawk;\n'],
         'station.rs': [b'mod mule;\n'],
         'traffic.rs': [
             b'pub(crate) mod mule_validation;\n',
