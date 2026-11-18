@@ -28,7 +28,7 @@ pub struct HudScene<'a> {
 }
 
 pub struct SceneEffects<'a> {
-    pub mule: Option<crate::mule_render::Scene<'a>>,
+    pub(crate) mule: Option<crate::mule_render::Placement<'a>>,
     pub traffic: Option<&'a meridian_core::traffic::TrafficSnapshot>,
     pub pulse: Option<&'a PulseShot>,
     pub mining: Option<asteroid_render::Scene<'a>>,
@@ -485,7 +485,8 @@ impl Renderer {
             port: scene.port,
             docked: scene.docked,
         });
-        if let (Some(scene), Some(_)) = (mule, station) {
+        if let (Some(placement), Some(station)) = (mule, station) {
+            let scene = placement.for_camera(|| mesh::scene_camera_pose(snapshot, station))?;
             let camera = scene.observer;
             if self.mule.is_none() {
                 self.mule = Some(crate::mule_render::Pass::new(
@@ -510,11 +511,14 @@ impl Renderer {
         } else if let Some(pass) = &mut self.mule {
             pass.hide();
         }
-        if let (Some(scene), Some(station)) = (mule, station) {
-            mesh::station_from_observer(station, scene.observer, &mut self.frame)?;
-        } else {
-            mesh::frame_vertices(snapshot, &self.ship, station, &mut self.frame)?;
-        }
+        let internal_observer = mule.and_then(crate::mule_render::Placement::internal_observer);
+        mesh::frame_vertices_for_observer(
+            snapshot,
+            &self.ship,
+            station,
+            internal_observer,
+            &mut self.frame,
+        )?;
         let additional_start = self.frame.len();
         if let (Some(station), Some(beacons)) = (station, practice) {
             mesh::append_practice_beacons(snapshot, station, beacons, &mut self.frame)?;
@@ -535,11 +539,11 @@ impl Renderer {
             let sun = celestial.and_then(|scene| scene.sun.map(|sun| sun.position));
             mining.append(snapshot, station, sun, &mut self.frame)?;
         }
-        if let (Some(scene), Some(station)) = (mule, station) {
+        if let (Some(observer), Some(station)) = (internal_observer, station) {
             mesh::reframe_observer(
                 &mut self.frame[additional_start..],
                 mesh::scene_camera_pose(snapshot, station)?,
-                scene.observer,
+                observer,
             )?;
         }
         mesh::apply_flight_view(self.flight_view, &mut self.frame);

@@ -22,6 +22,40 @@ pub struct Scene<'a> {
     pub observer: RigidPose,
 }
 
+/// World-validated visual input. Only the isolated validation route changes the
+/// camera for the rest of the scene.
+#[derive(Clone, Copy)]
+pub(crate) enum Placement<'a> {
+    Internal(Scene<'a>),
+    Ordinary {
+        actor: &'a NpcSnapshot,
+        envelope: &'a MulePresentation,
+    },
+}
+impl Placement<'_> {
+    pub(crate) fn internal_observer(self) -> Option<RigidPose> {
+        match self {
+            Self::Internal(scene) => Some(scene.observer),
+            Self::Ordinary { .. } => None,
+        }
+    }
+}
+impl<'a> Placement<'a> {
+    pub(crate) fn for_camera(
+        self,
+        flight_camera: impl FnOnce() -> Result<RigidPose, String>,
+    ) -> Result<Scene<'a>, String> {
+        match self {
+            Self::Internal(scene) => Ok(scene),
+            Self::Ordinary { actor, envelope } => Ok(Scene {
+                actor,
+                envelope,
+                observer: flight_camera()?,
+            }),
+        }
+    }
+}
+
 #[repr(C)]
 #[derive(Clone, Copy, Debug, bytemuck::Pod, bytemuck::Zeroable)]
 struct VisualVertex {
