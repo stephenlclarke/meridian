@@ -1,11 +1,13 @@
 """Restore certified section integration before historical source proofs."""
 import json
 from pathlib import Path
+from restore_cell_index import restore_cell_index
 
 CRATE = Path(__file__).resolve().parents[1]
 
 
 def restore_convex_sections(name, source):
+    source = restore_cell_index(name, source)
     edits = json.loads((CRATE / 'integration/convex-sections/INVERSE-EDITS.json').read_text())
     if name not in edits:
         return source

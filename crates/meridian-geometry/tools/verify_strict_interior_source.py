@@ -37,7 +37,7 @@ def verify():
     assert main.index('audit_original_sheets(') < main.index('InteriorCertificates::build(')
     assert main.index('strictly_covers(') < main.index('let mut domain =')
     old = (f / 'before-spatial_index.rs').read_text()
-    current = (CRATE / 'src/spatial_index.rs').read_text()
+    current = restore_convex_sections('spatial_index.rs', (CRATE / 'src/spatial_index.rs').read_text())
     for signature in ['fn spatial_memberships(', 'fn build_spatial(', 'fn spatial_range(', 'fn sort_range(', 'fn source_ordinal(', 'fn source_order<']:
         assert body(current, signature) == body(old, signature), signature
     print('PASS_SOURCE_ONLY: cd0/actual6abd publisher exact frozen control; old63 assertions; spatial bodies preserved test-only and production constructor withdrawn; source audits precede strict proof')

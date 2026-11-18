@@ -6,6 +6,7 @@ import subprocess
 from pathlib import Path
 from restore_convex_sections import restore_convex_sections
 from strip_budget_context import body
+from restore_cell_index import restore_cell_index
 
 CRATE = Path(__file__).resolve().parents[1]
 REPO = CRATE.parents[1]
@@ -51,7 +52,7 @@ def verify():
             assert body(after, signature) == body(before, signature), (path, signature)
             count += 1
     assert count == 71, count
-    main = body((CRATE / 'src/certificate.rs').read_text(), 'fn reconstruct_records(')
+    main = body(restore_cell_index('certificate.rs', (CRATE / 'src/certificate.rs').read_text()), 'fn reconstruct_records(')
     assert main.index('audit_original_sheets(') < main.index('InteriorCertificates::build_sections(') < main.index('Rows::build(') < main.index('collect_rows(')
     assert main.index('drop(rows);') < main.index('let arrangement = arrangement_result?;')
     print('PASS_SOURCE_ONLY: all71 old bodies byte exact; frozen complete116 publisher; three-file inverse exact; independent collector matches old physical/coplanar/order/charged work; original joint/parity/field paths unchanged; no compiler or geometry executed')

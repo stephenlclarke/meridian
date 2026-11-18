@@ -189,6 +189,15 @@ impl FacetBoundsIndex {
         key: impl Fn(&T) -> usize,
         b: &mut Budget,
     ) -> Result<Vec<T>, Failure> {
+        // Cell ordering appends one admitted mode marker after all N source
+        // ordinals. Legacy/contiguous builders and their exact prices stay intact.
+        if self
+            .order
+            .as_ref()
+            .is_some_and(|order| order.len() == self.facets.len() + 1)
+        {
+            return self.cell_source_order(records, fields, key, b);
+        }
         if self.order.is_none() {
             return Ok(records);
         }

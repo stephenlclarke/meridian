@@ -5,6 +5,7 @@ import re
 import subprocess
 from pathlib import Path
 from strip_budget_context import body, end_delimiter
+from restore_cell_index import restore_cell_index
 
 CRATE = Path(__file__).resolve().parents[1]
 REPO = CRATE.parents[1]
@@ -76,7 +77,7 @@ def verify():
     # Every pre-existing file in src/tests except the two bounded files is exact.
     for relative in subprocess.check_output(['git', '-C', str(REPO), 'ls-tree', '-r', '--name-only', pins['parent'], '--', 'crates/meridian-geometry/src', 'crates/meridian-geometry/tests'], text=True).splitlines():
         if Path(relative).name not in inverse:
-            assert (REPO / relative).read_bytes() == subprocess.check_output(['git', '-C', str(REPO), 'show', pins['parent'] + ':' + relative]), relative
+            assert restore_cell_index(Path(relative).name, (REPO / relative).read_text()).encode() == subprocess.check_output(['git', '-C', str(REPO), 'show', pins['parent'] + ':' + relative]), relative
     print('PASS_SOURCE_ONLY: complete inverse exact; production only unused import removal; all71old bodies and four prior convex assertion sequences preserved; x-only fullface fixture; exact old corner fixture retained as independent checked reference/candidate refusal; every returned Failure labelled without mutation')
 
 

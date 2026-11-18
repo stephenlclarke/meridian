@@ -1,0 +1,30 @@
+{
+  "certificate.rs": [
+    {
+      "afterStart": 1122,
+      "afterEnd": 1123,
+      "before": "    let facet_bounds_members = FacetBoundsIndex::memberships(originals.len());\n",
+      "after": "    let facet_bounds_members = FacetBoundsIndex::cell_memberships(originals.len());\n"
+    },
+    {
+      "afterStart": 1125,
+      "afterEnd": 1126,
+      "before": "        FacetBoundsIndex::build(originals, b)\n",
+      "after": "        FacetBoundsIndex::build_cells(originals, b)\n"
+    },
+    {
+      "afterStart": 2360,
+      "afterEnd": 2367,
+      "before": "",
+      "after": "\n#[path = \"cell_index.rs\"]\nmod cell_index;\n\n#[cfg(test)]\n#[path = \"cell_index_tests.rs\"]\nmod cell_index_tests;\n"
+    }
+  ],
+  "spatial_index.rs": [
+    {
+      "afterStart": 191,
+      "afterEnd": 200,
+      "before": "",
+      "after": "        // Cell ordering appends one admitted mode marker after all N source\n        // ordinals. Legacy/contiguous builders and their exact prices stay intact.\n        if self\n            .order\n            .as_ref()\n            .is_some_and(|order| order.len() == self.facets.len() + 1)\n        {\n            return self.cell_source_order(records, fields, key, b);\n        }\n"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "reviewedAtUTC": "2026-11-18T13:07:09.211937+00:00",
+  "verdict": "SOURCE_CLEAR_BOUNDED_FULL_FACE_FIXTURE_AND_CORNER_REFUSAL_DELTA;WHOLE_GEOMETRY_REVIEW_CARRIED;CURRENT_EXECUTION_UNRUN",
+  "head": "5ded816d0449dfd3f43f19fca02e87f62851dbf0",
+  "tree": "abbc4bd3de3cc0f38476d1d15b3f80c8233893ed",
+  "immediateParent": "8718b040e72143e0536562b55ce3141f36d0111b",
+  "packet": {
+    "path": "/private/tmp/meridian-root-face-contact-review/SOURCE.json",
+    "bytes": 4922,
+    "sha256": "6a2521813db648b7308bcb7dce74bd9070e74821dcb233a89e299beb9f7658b3"
+  },
+  "parentWholeReview": {
+    "path": "/private/tmp/g2-meridian-8718b040-convex-sections-whole-source-clear.json",
+    "bytes": 9659,
+    "sha256": "258aee3143143a84fb7fb9f09b3beae40b8bfdcbf02fb36670e5eeab41ada181"
+  },
+  "findings": [],
+  "independentChecks": {
+    "cleanExactHeadTreeImmediateParent": true,
+    "rootGitWorkingArchiveBytesModes": 562,
+    "deltaPaths": 19,
+    "unchangedPaths": 543,
+    "authorCratePinsAndSourceArchive": 423,
+    "all411AuthorParentCrateFilesExactActualFailed871": true,
+    "authorManifestPayloadHashes": 7,
+    "completeArchiveMembers": 8,
+    "canonicalRootDeltaVerified": true,
+    "twoCompleteFileInverseMatchesBothRootAndAuthorFrozenParents": true,
+    "onlyProductionChange": "Parent convex_sections.rs contains integer exactly once; deleting only that import token yields complete current file byte-for-byte. All other pre-existing production sources unchanged.",
+    "all75PriorTestNamesPreserved": true,
+    "all71OlderTestBodiesByteExact": true,
+    "allFourPriorConvexAssertionSequencesIdenticalAndOrdered": true,
+    "newNegativeCase": 1,
+    "actualPriorFailurePins": {
+      "directRawAndCustodyPinsHashed": 21,
+      "rawArtifactPins": 19,
+      "exactCurrentRelativeArchiveMatches": 19,
+      "archiveBytes": 21024007,
+      "archiveSHA256": "6707736aa61b2233a50804c680a03103b0c11b0867ef8d328d2adeb7d8e06df1"
+    }
+  },
+  "deltaSemanticReview": [
+    "The old cube(0,8,owner0) and cube(8,16,owner1) intersect only at(8,8,8). Under the unchanged final connected-link audit each closed shell contributes a separate cycle, so this corner union has a disconnected contact-star link and is unsuitable as a positive full-face fixture. The correction does not loosen that production rule.",
+    "face_neighbour constructs the same owner1 cube(0,8) and translates x coordinates by8 only. Its bounds are[8,16]x[0,8]x[0,8], sharing precisely the fullx=8 face with the first cube. Translation preserves IDs,winding,style and opposite shared-face normals. UVx is translated by8 too; UVy is unchanged, preserving the same nonzero world-affine UV=(x,y) at the shared face. Facet::new recomputes authenticated plane data. All original positive complete-triangle,witness,volume,retention,strict-operation and10x timing assertions remain in their original ordered sequences.",
+    "The exact old corner pair is retained in a new negative case. It independently executes the unchanged frozen reference publisher and current candidate; corner_refusal<T> has no Debug bound and requires Err for each lane. Every unexpected Ok unconditionally panics. Each lane separately requires UncertifiedContact,Some(SourceId{component:1,facet:11}),and exact disconnected contact-star link detail. No Option/None equality,expect_err,unwrap,allow or swallowed failure. The source context assertion is a tracked audit context, not single-facet causal attribution. Operations51205 is deliberately not required.",
+    "Test-only failure_context invokes each FnOnce exactly once, logs returned Failure with fixture/lane and returns that same Failure unchanged; successful values return unchanged. Four prior cases have case-return labels, complete positive fixtures have distinct fixture labels and separate reference/candidate publisher labels, and cavity calls have separate lane labels. The negative case has separate expected-refusal records. This adds attribution to the changed run rather than inventing prior attribution or scheduling an unchanged diagnostic run.",
+    "The rest of the whitespace-insensitive test diff is the transparent failure-context wrapping and a semantically identical block closure in ok_or_else. No positive assertion or guard is removed, skipped or converted to a success path. The independent frozen publisher/control remains unchanged. Exact inverse snapshots preserve original tests and the unused-import-only production proof.",
+    "Carry the previous whole review of support certification, projection signs/parallel/outward epsilon/boundary fallback, physical and coplanar collector independence, uncertified multiplicity, contacts/affinefields/stars/witnesses/topology, rational guard fidelity and honest cost/storage/lifetime/rollback mathematics. None of those production expressions changes in this delta."
+  ],
+  "actualParentFailure": {
+    "source": "8718b040e72143e0536562b55ce3141f36d0111b",
+    "tree": "1f19cd3e95a82b0a93379d59cd91bd14ce314694",
+    "lockedAllTargetCheck": "PASS_WITH_UNUSED_integer_IMPORT_WARNING",
+    "libraryDeclared": 57,
+    "libraryPassed": 56,
+    "libraryFailed": 1,
+    "failedCase": "certificate::convex_section_tests::convex_section_rows_preserve_complete_publisher_fields_contacts_and_volume",
+    "actualError": {
+      "kind": "UncertifiedContact",
+      "source": [
+        1,
+        11
+      ],
+      "operations": 51205,
+      "detail": "disconnected contact-star link"
+    },
+    "attribution": "Raw error has no explicit fixture/publisher-lane label. Printed completed fixture0/1 and cavity records do not prove the failing lane. No attribution or failed-test carry inferred.",
+    "remainingRustUnrun": 18,
+    "hostUnrun": 9,
+    "strictClippy": "UNRUN",
+    "developmentBuild": "UNRUN",
+    "originalWholeFiveRuns": 0,
+    "warningMeaning": "Compiler warning only; no executed strict-Clippy failure claim."
+  },
+  "executionDecision": "Sourceclear for existing designatedG1 changed exact-source qualification when soleMac lane free:76Rust9host,locked all-target check,strictClippy,development original_five build. No failed oldcase/source carry and no unchanged retry. Only after ALL focused gatesPASS may the ONEalready-scoped changed whole-five25body workload run with original caps/source-lock-binary/input pins/actual monotonic durations and first-guard contexts. No additional sourceACKgate.",
+  "limits": [
+    "Current76Rust9host/compiler/Clippy/build/wholefive remainUNRUN. No compiler,Cargo,tests,SUT,geometry/native,suppliedverifier,reviewbot or integration testing executed byG2.",
+    "Original2Moperations includingdecode/100kstorage/4096-bit coordinateUV/512complete-outputface caps,322/108/120 assertions,independent controls and separate202case matrix unchanged.",
+    "Prior849focused71/9PASS andfiveOperationsrefusals15dependentUNRUN0candidates remain separate actual evidence. No current fit,speed,minimal-work,admission or native acceptance claim.",
+    "No humanWIP edits,newchat/agent,merge orpublication."
+  ]
+}

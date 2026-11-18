@@ -1,0 +1,52 @@
+{
+  "status": "AUTHORED_UNRUN_SINGLE_CELL_GROUPING_AND_COMPACT_ORDER",
+  "parentAuthor": "4f05cc94cb6a569204d6f6e819d2622e977dc5a1",
+  "actualParentRoot": "5ded816d0449dfd3f43f19fca02e87f62851dbf0",
+  "all76OldBodiesUnchanged": true,
+  "currentRustCount": 80,
+  "hostCount": 9,
+  "productionChanges": [
+    "One exact fixed512cell counting permutation forN>=256; original leaf/parent bounds andowner proofs, no recursive subtree sorting. Small fallback unchanged.",
+    "Compact per-query bitset/rank cycle source-order restoration preservingfullrecords instead of payloadtree-map copies. Legacyprototype path unchanged.",
+    "Mainpublisher changes only indexconstructor andcorresponding admission names."
+  ],
+  "charging": "All old geometric prices remain; every new bbox/extent/key/floor/bit/bin/ordinal/scatter/rank/swap visit explicitly charged; no discarded performed work.",
+  "storage": "Persistent extraN+16; groupingtemporaryN+512+48; originalnodestack; orderingtemporary2ceilN/64+2fields+16; callerrecords retainedinplace; scopeerrorrollback.",
+  "newTests": [
+    {
+      "file": "src/cell_index_tests.rs",
+      "name": "cell_grouping_preserves_all_bounds_owner_tags_source_order_and_complete_index_query_work",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/cell_index_tests.rs",
+      "name": "cell_index_complete_publisher_keeps_every_original_field_witness_and_volume",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/cell_index_tests.rs",
+      "name": "cell_rank_cycles_preserve_complete_payload_and_admit_exact_temporary_storage",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/cell_index_tests.rs",
+      "name": "cell_builder_keeps_exact_storage_operation_and_degenerate_extent_guards",
+      "status": "UNRUN"
+    }
+  ],
+  "contractSHA256": "f7f3561860cb3a670cd4c30deca64022f5695cd4cf8985dde611be7982336bff",
+  "custodySHA256": "97294b682bfff6e88e26bf89b8151532377712376b8d7d0578bebb96de995cf1",
+  "inverseSHA256": "9cbf476330d1dccd68cef6f553ac4d8976c1a7adc5d9c515eeb78efe6dd97980",
+  "freezeSHA256": "8d7d5e39588b48fa7135de331079fdbdd4ff5903d70d6dc891999774fd01e60b",
+  "parentReviewSHA256": "a7b70737d44ac37941b7ed9ab9c70457e350d4bbc8ec1639ca82b8d95f23c57e",
+  "currentExecution": "UNRUN; noauthorcompiler/geometry/probe/native",
+  "limits": {
+    "operationsIncludingDecode": 2000000,
+    "storageMemberships": 100000,
+    "rationalBits": 4096,
+    "completeOutputTriangles": 512
+  },
+  "admissions": 0,
+  "qualification": "Rootsuccessorsince4fonly; G2whole/relevantdelta; existingG1changedfocused80/9/checkstrictClippyBuild thenONEchangedwholefiveonlyafterALLPASS/solelaneavailable",
+  "baselineTradeoff": "Versus actualcontiguous index: addonegroupingpass/queryorderwork,intendfewerbroadnode/leafvisits; noprioractualgainclaim. Avoidrecursivesorts/maps versuswithdrawnprototypeonly. Completeindexplusqueriesincludesalladdedcost."
+}

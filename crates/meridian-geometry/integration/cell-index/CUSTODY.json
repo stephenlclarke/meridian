@@ -1,0 +1,415 @@
+{
+  "parentAuthor": "4f05cc94cb6a569204d6f6e819d2622e977dc5a1",
+  "actualExecutedRoot": "5ded816d0449dfd3f43f19fca02e87f62851dbf0",
+  "actualTree": "abbc4bd3de3cc0f38476d1d15b3f80c8233893ed",
+  "all423ParentCratePinsMatchActualRoot": true,
+  "rootPinInventory": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-face-contact.5ded816/evidence/ROOT-ALL-SOURCE-PINS.json",
+    "bytes": 141044,
+    "sha256": "ae717e5401e88b003b28fee3e6d1394e873cbb642e386a4f21869dca219dbe7a"
+  },
+  "terminalHandoff": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-face-contact.5ded816/evidence/EXECUTION-TERMINAL-HANDOFF.json",
+    "bytes": 26166,
+    "sha256": "bb262d04e5777062ba48973ac7060e154a61e32a401db3280bf79b99be81369e"
+  },
+  "rawPacket": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-face-contact.5ded816/RAW-PACKET.tar.gz",
+    "bytes": 21168768,
+    "sha256": "b07e6c2d1c7c311944de82b100ae6b62fb691dfd235656e2d659555fdb0cc7f9"
+  },
+  "parentReview": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-face-contact.5ded816/evidence/REVIEW.json",
+    "bytes": 7000,
+    "sha256": "a7b70737d44ac37941b7ed9ab9c70457e350d4bbc8ec1639ca82b8d95f23c57e"
+  },
+  "focused": {
+    "rustTests": 76,
+    "library": 58,
+    "binary": 7,
+    "adapter": 9,
+    "originalControls": 2,
+    "hostTests": 9,
+    "lockedAllTargetCheck": "PASS",
+    "strictClippy": "PASS",
+    "devBuild": "PASS",
+    "originalAssertions": "322/108/120 unchanged and passing",
+    "terminal": {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-face-contact.5ded816/evidence/FOCUSED-TERMINAL.json",
+      "bytes": 3152,
+      "sha256": "66abdd243f4763714318c96b7a67ebd45c0fb6b3ac9b0eff01a92e5da2859ad2"
+    }
+  },
+  "actualWholeFive": {
+    "bodies": {
+      "declaredBodies": 25,
+      "bodiesPass": 5,
+      "bodiesRefused": 5,
+      "bodiesFail": 0,
+      "bodiesUnrun": 15
+    },
+    "cases": [
+      {
+        "id": "SH010",
+        "failure": {
+          "kind": "Operations",
+          "source": [
+            11,
+            5
+          ],
+          "operationsAtRefusal": 2000001,
+          "detail": "exact operation budget exhausted"
+        },
+        "budgetRejection": {
+          "kind": "Operations",
+          "source": [
+            11,
+            5
+          ],
+          "phase": "sections",
+          "caller": {
+            "file": "crates/meridian-geometry/src/exact.rs",
+            "line": 45,
+            "column": 12
+          },
+          "operationBase": 0,
+          "storageBase": 0,
+          "operationsBefore": 2000000,
+          "operationsAfter": 2000001,
+          "attemptedOperations": 1,
+          "retainedBeforeCleanup": 87361,
+          "attemptedScratch": 0,
+          "requiredMemberships": null,
+          "phaseOperations": {
+            "other": 0,
+            "decode": 320970,
+            "input_audit": 280501,
+            "index": 39928,
+            "sections": 614558,
+            "arrangement_setup": 225913,
+            "arrangement_pairs": 59432,
+            "arrangement_slabs": 158873,
+            "occupancy": 235000,
+            "fields": 27622,
+            "global_points": 0,
+            "packing": 37204,
+            "noding": 0,
+            "triangulation": 0,
+            "contact_stars": 0,
+            "witness": 0,
+            "topology": 0,
+            "dependent_checks": 0
+          },
+          "stageCounters": [
+            211,
+            2,
+            2,
+            0,
+            1012,
+            333,
+            96,
+            0
+          ],
+          "stageCountersAtOperations": 1999995,
+          "activeLimits": {
+            "operations": 2000000,
+            "storageMemberships": 100000,
+            "rationalBits": 4096,
+            "triangles": 512
+          }
+        },
+        "completeCandidateReturned": false,
+        "elapsedSeconds": 37.437343042
+      },
+      {
+        "id": "SH011",
+        "failure": {
+          "kind": "Operations",
+          "source": [
+            11,
+            8
+          ],
+          "operationsAtRefusal": 2000001,
+          "detail": "exact operation budget exhausted"
+        },
+        "budgetRejection": {
+          "kind": "Operations",
+          "source": [
+            11,
+            8
+          ],
+          "phase": "sections",
+          "caller": {
+            "file": "crates/meridian-geometry/src/sections.rs",
+            "line": 305,
+            "column": 15
+          },
+          "operationBase": 0,
+          "storageBase": 0,
+          "operationsBefore": 2000000,
+          "operationsAfter": 2000001,
+          "attemptedOperations": 1,
+          "retainedBeforeCleanup": 87033,
+          "attemptedScratch": 0,
+          "requiredMemberships": null,
+          "phaseOperations": {
+            "other": 0,
+            "decode": 325330,
+            "input_audit": 280501,
+            "index": 39928,
+            "sections": 619138,
+            "arrangement_setup": 226552,
+            "arrangement_pairs": 58791,
+            "arrangement_slabs": 156247,
+            "occupancy": 229637,
+            "fields": 27453,
+            "global_points": 0,
+            "packing": 36424,
+            "noding": 0,
+            "triangulation": 0,
+            "contact_stars": 0,
+            "witness": 0,
+            "topology": 0,
+            "dependent_checks": 0
+          },
+          "stageCounters": [
+            36,
+            2,
+            0,
+            0,
+            1012,
+            0,
+            0,
+            0
+          ],
+          "stageCountersAtOperations": 1999683,
+          "activeLimits": {
+            "operations": 2000000,
+            "storageMemberships": 100000,
+            "rationalBits": 4096,
+            "triangles": 512
+          }
+        },
+        "completeCandidateReturned": false,
+        "elapsedSeconds": 37.353590292
+      },
+      {
+        "id": "SH016",
+        "failure": {
+          "kind": "Operations",
+          "source": [
+            16,
+            12
+          ],
+          "operationsAtRefusal": 2000001,
+          "detail": "exact operation budget exhausted"
+        },
+        "budgetRejection": {
+          "kind": "Operations",
+          "source": [
+            16,
+            12
+          ],
+          "phase": "arrangement_setup",
+          "caller": {
+            "file": "crates/meridian-geometry/src/section_arrangement.rs",
+            "line": 27,
+            "column": 7
+          },
+          "operationBase": 0,
+          "storageBase": 0,
+          "operationsBefore": 2000000,
+          "operationsAfter": 2000001,
+          "attemptedOperations": 1,
+          "retainedBeforeCleanup": 93570,
+          "attemptedScratch": 0,
+          "requiredMemberships": null,
+          "phaseOperations": {
+            "other": 0,
+            "decode": 323877,
+            "input_audit": 304466,
+            "index": 44986,
+            "sections": 752386,
+            "arrangement_setup": 260018,
+            "arrangement_pairs": 61789,
+            "arrangement_slabs": 99766,
+            "occupancy": 85071,
+            "fields": 36685,
+            "global_points": 0,
+            "packing": 30957,
+            "noding": 0,
+            "triangulation": 0,
+            "contact_stars": 0,
+            "witness": 0,
+            "topology": 0,
+            "dependent_checks": 0
+          },
+          "stageCounters": [
+            166,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "stageCountersAtOperations": 1999999,
+          "activeLimits": {
+            "operations": 2000000,
+            "storageMemberships": 100000,
+            "rationalBits": 4096,
+            "triangles": 512
+          }
+        },
+        "completeCandidateReturned": false,
+        "elapsedSeconds": 26.401369
+      },
+      {
+        "id": "SH017",
+        "failure": {
+          "kind": "Operations",
+          "source": [
+            16,
+            5
+          ],
+          "operationsAtRefusal": 2000001,
+          "detail": "exact operation budget exhausted"
+        },
+        "budgetRejection": {
+          "kind": "Operations",
+          "source": [
+            16,
+            5
+          ],
+          "phase": "sections",
+          "caller": {
+            "file": "crates/meridian-geometry/src/sections.rs",
+            "line": 582,
+            "column": 15
+          },
+          "operationBase": 0,
+          "storageBase": 0,
+          "operationsBefore": 2000000,
+          "operationsAfter": 2000001,
+          "attemptedOperations": 1,
+          "retainedBeforeCleanup": 93128,
+          "attemptedScratch": 0,
+          "requiredMemberships": null,
+          "phaseOperations": {
+            "other": 0,
+            "decode": 348672,
+            "input_audit": 304352,
+            "index": 44986,
+            "sections": 738288,
+            "arrangement_setup": 253692,
+            "arrangement_pairs": 61125,
+            "arrangement_slabs": 98581,
+            "occupancy": 83849,
+            "fields": 35481,
+            "global_points": 0,
+            "packing": 30975,
+            "noding": 0,
+            "triangulation": 0,
+            "contact_stars": 0,
+            "witness": 0,
+            "topology": 0,
+            "dependent_checks": 0
+          },
+          "stageCounters": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "stageCountersAtOperations": 1999976,
+          "activeLimits": {
+            "operations": 2000000,
+            "storageMemberships": 100000,
+            "rationalBits": 4096,
+            "triangles": 512
+          }
+        },
+        "completeCandidateReturned": false,
+        "elapsedSeconds": 29.442302125
+      },
+      {
+        "id": "SH166",
+        "failure": {
+          "kind": "Operations",
+          "source": [
+            16,
+            74
+          ],
+          "operationsAtRefusal": 2000001,
+          "detail": "exact operation budget exhausted"
+        },
+        "budgetRejection": {
+          "kind": "Operations",
+          "source": [
+            16,
+            74
+          ],
+          "phase": "sections",
+          "caller": {
+            "file": "crates/meridian-geometry/src/sections.rs",
+            "line": 358,
+            "column": 19
+          },
+          "operationBase": 0,
+          "storageBase": 0,
+          "operationsBefore": 2000000,
+          "operationsAfter": 2000001,
+          "attemptedOperations": 1,
+          "retainedBeforeCleanup": 90869,
+          "attemptedScratch": 0,
+          "requiredMemberships": null,
+          "phaseOperations": {
+            "other": 0,
+            "decode": 304157,
+            "input_audit": 275175,
+            "index": 39059,
+            "sections": 793005,
+            "arrangement_setup": 310489,
+            "arrangement_pairs": 60503,
+            "arrangement_slabs": 92633,
+            "occupancy": 59319,
+            "fields": 35870,
+            "global_points": 0,
+            "packing": 29791,
+            "noding": 0,
+            "triangulation": 0,
+            "contact_stars": 0,
+            "witness": 0,
+            "topology": 0,
+            "dependent_checks": 0
+          },
+          "stageCounters": [
+            30,
+            1,
+            0,
+            0,
+            988,
+            0,
+            0,
+            0
+          ],
+          "stageCountersAtOperations": 1999364,
+          "activeLimits": {
+            "operations": 2000000,
+            "storageMemberships": 100000,
+            "rationalBits": 4096,
+            "triangles": 512
+          }
+        },
+        "completeCandidateReturned": false,
+        "elapsedSeconds": 26.604559
+      }
+    ]
+  },
+  "interpretation": "Actual5ded76Rust9host/checkClippyBuildPASS and5Operationsrefusals15UNRUN0candidates. Complete original cost, speed, fit or minima not established. 871wholefiveUNRUN;849prioractual separate. Newsource80Rust9host/compiler/native/wholefiveUNRUN."
+}

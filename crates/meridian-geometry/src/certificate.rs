@@ -1120,10 +1120,10 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
         0,
     ]);
     b.retain(bounds_members)?;
-    let facet_bounds_members = FacetBoundsIndex::memberships(originals.len());
+    let facet_bounds_members = FacetBoundsIndex::cell_memberships(originals.len());
     b.retain(facet_bounds_members)?;
     let facet_bounds = b.with_phase(BudgetPhase::Index, |b| {
-        FacetBoundsIndex::build(originals, b)
+        FacetBoundsIndex::build_cells(originals, b)
     })?;
     let owner_bounds = b.with_phase(BudgetPhase::Index, |b| {
         component_bounds(originals, &facet_bounds.facets, b)
@@ -2358,3 +2358,10 @@ mod convex_sections;
 #[cfg(test)]
 #[path = "convex_section_tests.rs"]
 mod convex_section_tests;
+
+#[path = "cell_index.rs"]
+mod cell_index;
+
+#[cfg(test)]
+#[path = "cell_index_tests.rs"]
+mod cell_index_tests;
