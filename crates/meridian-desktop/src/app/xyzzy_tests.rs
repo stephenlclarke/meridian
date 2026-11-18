@@ -90,7 +90,11 @@ fn actual_secret_menu_publishes_clarke_real_outfit_and_visible_provenance_then_c
         9
     );
     assert!(ammo.purchases.is_empty());
-    assert!(app.game.lines(true, None)[0].contains("CLARKE | XYZZY"));
+    assert!(app.game.lines(true, None).is_empty());
+    assert!(
+        app.frame_title(true, FlightMode::Docked)
+            .starts_with("CLARKE / XYZZY")
+    );
     let viewport = ui::Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));
     for screen in ui::Screen::ALL {
         let mut docked = ok(Docked::new(&app.game.world));
@@ -120,7 +124,26 @@ fn actual_secret_menu_publishes_clarke_real_outfit_and_visible_provenance_then_c
     let mut cold = open(&directory.0);
     ok(cold.continue_saved());
     assert_eq!(cold.world.commander_name(), Some("CLARKE"));
-    assert!(cold.lines(true, None)[0].contains("FUEL UNLIMITED"));
+    assert_eq!(cold.world.snapshot().mode, FlightMode::Docked);
+    assert!(cold.lines(true, None).is_empty());
+    assert!(
+        cold.world
+            .xyzzy_snapshot()
+            .is_some_and(|state| state.active && state.unlimited_fuel)
+    );
+    let mut cold_app = App::with_profile(cold);
+    menu(&mut cold_app);
+    let panel = cold_app
+        .xyzzy
+        .as_ref()
+        .unwrap_or_else(|| panic!("missing cold XYZZY panel"))
+        .panel(&cold_app.game.world, None);
+    assert!(
+        panel
+            .lines
+            .iter()
+            .any(|line| line.contains("Fuel UNLIMITED"))
+    );
 }
 
 #[test]
@@ -138,6 +161,7 @@ fn failed_actual_profile_publication_retains_world_saved_bytes_and_secret_review
     press(&mut app, KeyCode::Enter);
     assert!(
         app.notice
+            .text
             .as_deref()
             .is_some_and(|message| message.contains("could not be saved"))
     );

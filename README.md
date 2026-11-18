@@ -77,7 +77,9 @@ A separate explicitly prepared public-core setup supplied four nonfatal contacts
 
 ## Play
 
-N starts a commander; C continues a current-format V17 save with the supported EMP content fingerprint. Unsupported formats/content refuse without changing the file. Use the download’s isolated profile: `Meridian EMP Sonar Preview/saves-current-emp-2d5f4a5` under macOS Application Support, or adjacent `saves-emp-2d5f4a5` on Windows. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.
+The current desktop source opens **Commander details** on startup. An empty slot starts a fresh commander at Avenor in memory. A valid slot shows the existing commander at the saved location before simulation resumes. Press **L** to launch from a station or **Enter** to resume a saved flight. Station services use **1–5** at a valid berth, and **0** returns to Commander details when docked. Use **H** or **?** for the current controls.
+
+Preview 8 uses the earlier startup controls. N starts a commander; C continues a current-format V17 save with the supported EMP content fingerprint. Unsupported formats/content refuse without changing the file. Use the download’s isolated profile: `Meridian EMP Sonar Preview/saves-current-emp-2d5f4a5` under macOS Application Support, or adjacent `saves-emp-2d5f4a5` on Windows. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.
 
 H or ? opens a dismissible help popup for the current screen, including station details and transaction reviews. Every station popup lists 1 Galaxy, 2 System, 3 Showroom, 4 Market, 5 Equipment, Tab/Shift+Tab and Escape/back. Escape, H or ? closes help and retains the screen, selection, search and review. Gameplay and underlying actions wait while help is open. During galaxy text search, H remains a typed letter and ? opens help.
 
@@ -85,6 +87,7 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | --- | --- |
 | H / ? | Context help; Escape, H or ? dismisses |
 | Ctrl+Shift+X when docked | Explicit XYZZY testing menu; Enter reviews then confirms |
+| 0 when docked (current source) | Commander details |
 | 1 / 2 / 3 / 4 / 5 when docked | Galaxy / System / Ships / Market / Equipment |
 | L; W/S; arrows; A/D; Q/E; Space | Launch; thrust; pitch; yaw; roll; brake |
 | J; T; R; Enter; B; F | Travel; select contact; review; confirm; cancel; buy fuel |
@@ -126,7 +129,7 @@ Fleet construction is a separate M4 lane. Its current changed original-five run 
 
 ## Context help and XYZZY testing
 
-Preview 8 retains screen-specific H/? help with explicit [XYZZY testing](docs/XYZZY.md). Every station help popup explains how to reach Galaxy, System, Showroom, Market and Equipment. Help pauses host stepping and preserves the current screen, selection, search and review. The large permanent control list is removed from the flight HUD.
+Preview 8 retains screen-specific H/? help with explicit [XYZZY testing](docs/XYZZY.md). Every station help popup explains how to reach Galaxy, System, Showroom, Market and Equipment. Help pauses host stepping and preserves the current screen, selection, search and review. Press H or ? for flight controls or station navigation. The current desktop source clears routine text from above the instruments in idle flight and at the docked exterior. Command feedback and requested reviews still appear there. The development build also gives the Lion Citadel blue-grey plating and amber lights, with four small joins around its docking entrance. [Station exterior](docs/DOCKED-PREVIEW.md#sh028-aperture-crosspieces)
 
 At a station berth, **Ctrl+Shift+X** opens the labelled XYZZY testing menu. Use Up/Down to choose, Enter to review, then Enter again to confirm and save; Escape/B cancels the review or closes the menu. H/? opens help above the menu. First activation changes the current commander to CLARKE and sets cash to 1,000,000 CR once. It grants/refits the supported SH025 outfit with explicit secret provenance; missiles and cargo stay finite. The menu shows actual cash, current jump reach, unlimited-fuel state and missing-system limits. Reading or closing it grants nothing. Other profiles are unchanged.
 

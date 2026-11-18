@@ -143,16 +143,16 @@ class NativeCoverageHarnessTests(unittest.TestCase):
             smoke.main()
         self.assertFalse((self.root / "coverage").exists())
 
-    def test_ordinary_new_commander_accepts_current_title_and_keeps_frame_and_quit_gates(self):
+    def test_ordinary_start_opens_commander_without_new_input_and_keeps_frame_and_quit_gates(self):
         save = self.root / "save"
         save.mkdir()
         app = Mock()
         app.wait.return_value = 0
         receipt = {"phases": []}
-        titles = ["Meridian", "Meridian | DOCKED | RUNNING | H / ? Help", "market", "hud"]
+        titles = [smoke.COMMANDER_TITLE, "Meridian | DOCKED | RUNNING | H / ? Help", "market", "hud"]
         frames = [
             {"phase": name, "sha256": name, "title": title}
-            for name, title in zip(("title", "system", "trading", "hud"), titles)
+            for name, title in zip(("commander", "system", "trading", "hud"), titles)
         ]
         with (patch.object(smoke, "await_result", return_value="41"),
               patch.object(smoke, "focus") as focus,
@@ -162,17 +162,17 @@ class NativeCoverageHarnessTests(unittest.TestCase):
 
         focus.assert_called_once_with("41")
         self.assertEqual(capture.call_args_list, [
-            call(app, "41", self.root, "title", smoke.title_frame),
+            call(app, "41", self.root, "commander", smoke.commander_frame),
             call(app, "41", self.root, "system", smoke.system_frame),
             call(app, "41", self.root, "trading", smoke.trading_frame),
             call(app, "41", self.root, "hud", smoke.cockpit_frame),
         ])
-        self.assertEqual(press.call_args_list, [call("n"), call("4"), call("Escape"), call("Escape")])
+        self.assertEqual(press.call_args_list, [call("2"), call("4"), call("Escape"), call("Escape")])
         self.assertEqual(receipt["phases"], frames)
         self.assertTrue(receipt["normal_quit_sent"])
         app.wait.assert_called_once_with(timeout=20)
 
-    def test_new_commander_guard_rejects_title_menu_pause_and_other_commander_states(self):
+    def test_system_guard_rejects_wrong_window_title_and_other_commander_states(self):
         save = self.root / "save"
         save.mkdir()
         for title in (
@@ -189,7 +189,7 @@ class NativeCoverageHarnessTests(unittest.TestCase):
                 app.wait.return_value = 0
                 receipt = {"phases": []}
                 frames = [
-                    {"phase": "title", "sha256": "title", "title": "Meridian"},
+                    {"phase": "commander", "sha256": "commander", "title": smoke.COMMANDER_TITLE},
                     {"phase": "system", "sha256": "system", "title": title},
                     {"phase": "trading", "sha256": "trading", "title": "market"},
                     {"phase": "hud", "sha256": "hud", "title": "hud"},
@@ -198,13 +198,41 @@ class NativeCoverageHarnessTests(unittest.TestCase):
                       patch.object(smoke, "focus"),
                       patch.object(smoke, "capture_phase", side_effect=frames) as capture,
                       patch.object(smoke, "press") as press,
-                      self.assertRaisesRegex(RuntimeError, "ordinary commander creation")):
+                      self.assertRaisesRegex(RuntimeError, "ordinary Commander details")):
                     smoke.exercise(app, self.root, save, receipt)
 
                 self.assertEqual(receipt["stage"], "system")
                 capture.assert_called_with(app, "41", self.root, "system", smoke.system_frame)
-                press.assert_called_once_with("n")
+                press.assert_called_once_with("2")
                 app.wait.assert_not_called()
+
+    def test_cold_commander_checks_the_same_first_frame_and_unmodified_save_before_quit(self):
+        save = self.root / smoke.SAVE_NAME
+        save.write_bytes(b"existing commander")
+        digest = smoke.sha256(save)
+        frame = {"title": smoke.COMMANDER_TITLE, "sha256": "same-commander-frame"}
+        app = Mock()
+        app.wait.return_value = 0
+        for saved_digest, frame_digest in ((digest, frame["sha256"]), ("wrong", frame["sha256"]),
+                                            (digest, "wrong")):
+            with self.subTest(saved_digest=saved_digest, frame_digest=frame_digest):
+                receipt = {"phases": [], "save_sha256_before_start": saved_digest,
+                           "fresh_commander_frame_sha256": frame_digest}
+                with (patch.object(smoke, "await_result", return_value="41"),
+                      patch.object(smoke, "focus"),
+                      patch.object(smoke, "capture_phase", return_value=frame) as capture,
+                      patch.object(smoke, "press") as press):
+                    if saved_digest == digest and frame_digest == frame["sha256"]:
+                        smoke.cold_commander(app, self.root, self.root, receipt)
+                        press.assert_called_once_with("Escape")
+                        self.assertTrue(receipt["normal_quit_sent"])
+                    else:
+                        with self.assertRaisesRegex(RuntimeError, "without rewriting its save"):
+                            smoke.cold_commander(app, self.root, self.root, receipt)
+                        press.assert_not_called()
+                    capture.assert_called_once_with(app, "41", self.root, "cold-commander",
+                                                    smoke.commander_frame)
+                    self.assertEqual(receipt["save_sha256_at_first_frame"], digest)
 
     def test_failure_receipt_retains_save_and_observer_streams_before_cleanup(self):
         self.write("target/debug/meridian-desktop", "desktop fixture")

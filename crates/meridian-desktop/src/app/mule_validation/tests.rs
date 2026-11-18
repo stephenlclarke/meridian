@@ -404,7 +404,7 @@ fn docking_modes_hold_the_real_terminal_frame_and_display_its_outcome() {
                 .mule_actor_snapshot()
                 .unwrap_or_else(|| panic!("approach frame"));
             check_framing(&frame);
-            if app.notice.is_some() {
+            if app.notice.text.is_some() {
                 break;
             }
         }
@@ -425,8 +425,8 @@ fn docking_modes_hold_the_real_terminal_frame_and_display_its_outcome() {
         assert!((1..=DOCKING_TICK_LIMIT).contains(&terminal.world_tick()));
         assert!(app.game.world.current_dock_context().is_none());
         assert!(app.game.world.save_bytes().is_err());
-        assert_eq!(app.notice.as_deref(), Some(notice));
-        let lines = app.game.lines(false, app.notice.as_deref());
+        assert_eq!(app.notice.text.as_deref(), Some(notice));
+        let lines = app.game.lines(false, app.notice.text.as_deref());
         assert!(lines.iter().any(|line| line == notice));
         assert!(
             lines
