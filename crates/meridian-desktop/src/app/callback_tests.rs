@@ -420,6 +420,39 @@ fn app_callback_retains_real_entry_contact_when_the_last_catchup_tick_is_clear()
 }
 
 #[test]
+fn paused_contact_warning_expires_while_world_retains_the_refusal() {
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    app.game.world = ok(World::in_flight_at_original_station(FlightStart {
+        position: [0.0, 0.0, 260.0],
+        orientation: [0.0, 1.0, 0.0, 0.0],
+        speed: 9.0,
+    }));
+    for _ in 0..100 {
+        if app.advance_frame(true, 1)
+            == FrameAdvance::Continue(Some(MotionRefusal::EntryConditions))
+        {
+            break;
+        }
+    }
+    let stopped = app.game.world.snapshot();
+    assert_eq!(stopped.motion_refusal, Some(MotionRefusal::EntryConditions));
+    app.paused = true;
+    let warning = "Entry refused: align with entrance and slow down";
+    let frame = ok(app.prepare_presentation(false, None, 0.0, |_| None));
+    assert_eq!(frame.hud_lines, [warning]);
+    let deadline = app
+        .notice
+        .expires
+        .unwrap_or_else(|| panic!("missing notice deadline"));
+    assert!(app.notice.expire(deadline));
+    assert_eq!(app.advance_frame(false, 0), FrameAdvance::Continue(None));
+    let frame = ok(app.prepare_presentation(false, None, 0.0, |_| None));
+    assert!(frame.hud_lines.is_empty());
+    assert_eq!(app.game.world.snapshot(), stopped);
+}
+
+#[test]
 fn press_repeat_release_and_unidentified_keys_preserve_held_input_rules() {
     let directory = TestDirectory::new();
     let mut app = app(&directory);

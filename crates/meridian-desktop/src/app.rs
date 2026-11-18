@@ -1009,19 +1009,25 @@ impl App {
                 && snapshot.mode == FlightMode::Flight
                 && snapshot.tick.saturating_sub(shot.tick) < 5
         });
-        let pulse_notice = self.pulse.map(|shot| match shot.contact {
-            PulseContact::AsteroidBlocked { .. } => "Rock obstructs Pulse: no ore yielded",
-            PulseContact::Npc { .. } => "NPC hull struck",
-            PulseContact::Clear => "Pulse fired",
-            PulseContact::Projectile { .. } => "Pulse intercepted missile",
-            PulseContact::StationBlocked { .. } => "Station struck | legal incident recorded",
-            PulseContact::PracticeBeacon {
-                first_hit: true, ..
-            } => "Practice beacon hit",
-            PulseContact::PracticeBeacon {
-                first_hit: false, ..
-            } => "Practice beacon already counted",
-        });
+        // A contact recorded during this catch-up frame takes precedence over beam feedback.
+        let pulse_notice =
+            self.pulse
+                .filter(|_| frame_refusal.is_none())
+                .map(|shot| match shot.contact {
+                    PulseContact::AsteroidBlocked { .. } => "Rock obstructs Pulse: no ore yielded",
+                    PulseContact::Npc { .. } => "NPC hull struck",
+                    PulseContact::Clear => "Pulse fired",
+                    PulseContact::Projectile { .. } => "Pulse intercepted missile",
+                    PulseContact::StationBlocked { .. } => {
+                        "Station struck | legal incident recorded"
+                    }
+                    PulseContact::PracticeBeacon {
+                        first_hit: true, ..
+                    } => "Practice beacon hit",
+                    PulseContact::PracticeBeacon {
+                        first_hit: false, ..
+                    } => "Practice beacon already counted",
+                });
         let prepared = self.prepare_presentation(active, pulse_notice, elapsed, |r| {
             r.map(Renderer::logical_viewport)
         });
@@ -1030,7 +1036,7 @@ impl App {
         else {
             return;
         };
-        self.draw_prepared_frame(event_loop, active, snapshot, frame_refusal, prepared);
+        self.draw_prepared_frame(event_loop, active, snapshot, prepared);
     }
 
     fn frame_title(&self, active: bool, mode: FlightMode) -> String {
@@ -1070,31 +1076,11 @@ impl App {
         )
     }
 
-    fn append_contact_notice(hud_lines: &mut Vec<String>, refusal: Option<MotionRefusal>) {
-        let contact_notice = refusal.map(|refusal| match refusal {
-            MotionRefusal::CelestialContact => {
-                "Celestial contact: stopped before the physical surface"
-            }
-            MotionRefusal::AsteroidContact => {
-                "Asteroid hull contact: stopped at last clear position"
-            }
-            MotionRefusal::NpcContact => "NPC hull contact: stopped at last clear position",
-            MotionRefusal::StationContact => "Station contact: stopped at last clear position",
-            MotionRefusal::EntryConditions => {
-                "Entry refused: align with the entrance and slow down"
-            }
-        });
-        if let Some(message) = contact_notice {
-            hud_lines.insert(hud_lines.len().min(1), message.into());
-        }
-    }
-
     fn draw_prepared_frame(
         &mut self,
         event_loop: &ActiveEventLoop,
         active: bool,
         snapshot: meridian_core::Snapshot,
-        frame_refusal: Option<MotionRefusal>,
         prepared: PreparedPresentation,
     ) {
         let PreparedPresentation {
@@ -1168,7 +1154,6 @@ impl App {
             .as_ref()
             .map(|menu| menu.panel(&self.game.world, self.notice.text.as_deref()));
         let title = self.frame_title(active, snapshot.mode);
-        Self::append_contact_notice(&mut hud_lines, frame_refusal.or(snapshot.motion_refusal));
         if let Some(renderer) = &mut self.renderer {
             renderer.window.set_title(&title);
             let station =
