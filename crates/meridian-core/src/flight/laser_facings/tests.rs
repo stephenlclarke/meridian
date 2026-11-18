@@ -377,3 +377,39 @@ fn right_mount_hits_the_actual_native_attacker_with_real_shield_damage_and_cold_
     }
     panic!("right-facing real pilot did not reach the actual native attacker's surface");
 }
+
+#[test]
+fn actual_rear_practice_hit_retains_item_facing_and_history_through_retry_cold_continue() {
+    let mut w = rear_starter();
+    crate::flight::practice::tests::consent(&mut w);
+    launch(&mut w);
+    let beacons = some(some(w.practice_snapshot()).beacons);
+    turn(&mut w, 0.0, -10000.0);
+    ok(w.request_flight_view(crate::FlightView::Rear, w.snapshot().tick));
+    let shot = ok(w.request_fire_selected_laser(w.snapshot().tick));
+    assert!(
+        matches!(shot.contact, PulseContact::PracticeBeacon { id, first_hit: true, .. } if id == beacons[1].id)
+    );
+    assert_eq!(
+        shot.fitted_item_id,
+        some(w.laser_snapshot(LaserFacing::Rear)).fitted_item_id
+    );
+    crate::flight::missiles::tests::dock(&mut w);
+    let review = ok(w.review_practice_closure(w.snapshot().tick));
+    ok(w.prepare_practice_closure(review, w.snapshot().tick)).commit();
+    let first = some(w.practice_ledger_snapshot());
+    assert_eq!(first.attempts.len(), 1);
+    assert_eq!(first.attempts[0].first_hits, 1);
+    assert_eq!(
+        first.attempts[0].outcome,
+        Some(crate::PracticeOutcome::Abandoned)
+    );
+    crate::flight::practice::tests::consent(&mut w);
+    let expected = some(w.practice_ledger_snapshot());
+    assert_eq!(expected.attempts.len(), 2);
+    assert_eq!(expected.attempts[0], first.attempts[0]);
+    let loaded = cold(&w);
+    assert_eq!(some(loaded.practice_ledger_snapshot()), expected);
+    assert_eq!(loaded.practice_snapshot(), w.practice_snapshot());
+    assert_eq!(loaded.flight_view(), crate::FlightView::Rear);
+}

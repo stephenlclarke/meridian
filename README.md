@@ -1,5 +1,10 @@
 # Meridian
 
+The joined laser/ECM Mac run compiled but reported 415/430 core passes. The
+[source correction](docs/LASER-FACINGS.md#joined-slot-and-archived-practice-correction)
+aligns typed laser fit validation and archived practice decoding; its regression
+and bounded native setup helper remain uncompiled and unrun.
+
 [![CI](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=alert_status)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=coverage)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)

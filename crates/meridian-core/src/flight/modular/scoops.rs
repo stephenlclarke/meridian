@@ -40,7 +40,7 @@ pub(super) fn validate_slots(
     if definition.hull != "SH025"
         || items
             .iter()
-            .any(|i| i.slot.is_some_and(|slot| slot != i.kind.slot()))
+            .any(|i| i.slot.is_some_and(|slot| !i.kind.accepts_slot(slot)))
     {
         return Err(ModuleError::StaleOccupant);
     }

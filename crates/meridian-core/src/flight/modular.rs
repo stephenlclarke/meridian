@@ -88,6 +88,14 @@ impl ModuleKind {
             _ => ModuleSlot::Energy,
         }
     }
+    /// One typed fit contract for command replay and complete native slot validation.
+    fn accepts_slot(self, slot: ModuleSlot) -> bool {
+        if LaserFacing::from_slot(slot).is_some() {
+            self.laser_profile().is_some()
+        } else {
+            self.slot() == slot
+        }
+    }
     pub fn energy_recharge_multiplier(self) -> Option<u16> {
         match self {
             Self::BasicEnergySystem => Some(1),
@@ -450,11 +458,7 @@ impl Ledger {
         replacing: Option<u64>,
         slot: ModuleSlot,
     ) -> Result<(), ModuleError> {
-        if LaserFacing::from_slot(slot).is_some() {
-            if self.items[index].kind.laser_profile().is_none() {
-                return Err(ModuleError::NotForSale);
-            }
-        } else if self.items[index].kind.slot() != slot {
+        if !self.items[index].kind.accepts_slot(slot) {
             return Err(ModuleError::NotForSale);
         }
         if self.fitted(slot).map(|i| i.id) != replacing {

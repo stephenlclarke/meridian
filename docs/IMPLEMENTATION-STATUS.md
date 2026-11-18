@@ -1,5 +1,25 @@
 # Implementation and validation status
 
+## Joined laser/ECM runtime correction candidate
+
+Exact Mac `3553ea5b5f99ca261ed472513c8b79afe28d1dcf`, tree
+`bda557c5e243b1e0a43eafd7297cbc7c9a64a250`, passed all-target compilation,
+99 Python cases, 51 Markdown files and formatting, then reported 415 passes and
+15 failures among 430 core tests in 55.79 seconds. Eleven report StaleOccupant;
+four genuine positive cold loads report InvalidEncoding. Compatibility, desktop,
+Clippy, observer, release and native acceptance did not run on that Mac source.
+
+The [causal source correction](LASER-FACINGS.md#joined-slot-and-archived-practice-correction)
+shares the existing typed install contract with utility fit validation and passes
+the admitted save version into archived practice decoding. Every existing test
+body/assertion remains. One additional real rear-hit/retry/cold-history case is
+authored **UNRUN**, bringing source attributes to 431 core, two compatibility,
+244 desktop and three observer (680 total). A bounded explicitly labelled public
+XYZZY setup example is included for later native acceptance; it is uncompiled,
+unrun and does not perform native purchases or demonstrate earning. Whole-delta
+Root/G2 review and changed owner execution remain required. Navigation stays
+sealed separately; no qualified preview or successful-correction claim follows.
+
 ## Targeted laser mounted-ray custody correction
 
 The [P2 receipt correction](LASER-FACINGS.md#targeted-mounted-ray-receipt-correction)

@@ -224,3 +224,94 @@ unchanged; only test visibility is widened for reuse. The P1 missing
 in the joined successor.
 This P2 source is not a whole-source compiler-clear claim. No compiler, Cargo,
 Clippy, Rust/helper, native, GPU or review bot was run by this author.
+
+## Joined slot and archived practice correction
+
+Frozen Mac head `3553ea5b5f99ca261ed472513c8b79afe28d1dcf`, tree
+`bda557c5e243b1e0a43eafd7297cbc7c9a64a250`, compiled all targets and passed
+99 Python cases, 51 Markdown files and formatting. Its core run reported
+415 passes and 15 failures in 55.79 seconds. The retained full failure receipt
+separates eleven StaleOccupant errors from four positive cold InvalidEncoding
+errors. No unchanged diagnostic rerun is used. Raw CI is 80923 bytes, SHA-256
+`fd5d092e733ccd4a4da9c0ef31306526d09c97b4d33c7c93030331c7a6ec4655`.
+Mac compatibility/desktop/Clippy/observer/release/native remained unrun.
+
+The eleven nonfront fit failures share a concrete source inconsistency:
+`Ledger::install_slot` permits laser profiles at the four typed laser slots,
+but `scoops::validate_slots` still requires every fitted item to equal its kind's
+default slot, which is Front for all lasers. Consequently real nonfront purchase
+or movement fails the full fit check as StaleOccupant. `ModuleKind::accepts_slot`
+now supplies that same explicit typed contract to both boundaries. Native SH025
+identity, wrong-kind refusals, occupant equality, units, utility counts and mount
+capacity remain intact. Laser profiles fit laser slots; every other kind still
+requires its exact typed slot. This does not make mining work follow a side view.
+
+The four cold failures all retain a prior practice attempt containing first-hit
+records. `Practice::encode_full` uses the current writer, including each current
+first hit's optional item/facing/emission tuple, but `decode_full` hardcodes
+version 9 and therefore skips those bytes. That misaligns subsequent historical
+fields and produces InvalidEncoding. The archived reader now uses its already
+admitted whole-save version, matching the live practice decoder and writer.
+No optional fields are ignored, inferred or defaulted, and no old content or
+format is admitted. The strict marker and nine-byte resources are unchanged.
+
+Every old test body and assertion is byte-preserved. Existing actual public fit,
+paid item, coordinated corruption, wrong-slot, full-history missile and practice
+cases must all pass after review. One new real rear-laser practice first hit is
+physically docked, closed as abandoned and archived by a genuine retry consent;
+cold Continue must preserve its original attempt plus the new attempt, selected
+Rear view and owned item. This covers the new facing tuple across the historical
+boundary beyond the existing front/missile history cases. The 431 core, two
+compatibility, 244 desktop and three observer source attributes are not passes.
+All corrected compiler/Rust/Clippy/native results remain **UNRUN** in this lane.
+Root owns one complete changed-delta review and existing owners own execution.
+
+### Bounded native setup artifact
+
+`crates/meridian-core/examples/prepare_native_laser_ecm.rs` is source preparation,
+not an executed helper or product feature. Existing public stock funding lives
+in `equipment/tests.rs::earned_from`; sealed laser tests reuse it, and ECM
+`ready` reuses its journey and Avenor practice consent. The EMP paid helper adds
+its separate EMP purchase/defender journey. This artifact does not duplicate
+that broad route. It chooses the explicitly permitted original public XYZZY
+setup and labels all funding as testing provenance, never native earning.
+
+After the corrected source passes compilation and review, G1 may compile the
+example with the same corrected core/lock and run it against an explicitly
+isolated current-save input and a distinct, absent staging-file path. It never
+calls new_commander, creates a profile, discovers a default save directory,
+changes an input file, imports an old EMP save or overwrites output. It uses the
+real bounded World decoder, actual Avenor berth, public Enter and fuel-toggle
+reviews/transactions. Original XYZZY fills the three utility mounts with cargo,
+EMP and Fuel Scoops; the helper publicly stores only the granted scoops to free
+one actual mount for later paid ECM. It leaves accounted fuel enabled, checks
+real purchase and
+practice reviews, cold-validates the final bytes and emits through create_new.
+An I/O failure may leave a partial staging file; retain the failure and choose a
+new output only after a changed/corrected run. The helper never installs that
+file into a profile; existing G1 isolation/publication procedures retain that
+responsibility with the app closed and real profiles untouched.
+
+The helper leaves all paid fitting, firing, ECM and practice acceptance to native
+input. Original XYZZY grants remain visibly labelled, including its supported
+outfit and finite missile grants; these are not paid or earned items. Output
+requires no pre-fitted ECM or earlier activations. Its public paid-review probes
+include Front Beam, Rear/Left/Right Pulse, ECM and Mining. They do not guarantee
+that all offers can be bought simultaneously or preserve the old review after a
+purchase; the native screen must review every actual new transaction.
+
+G1's intended native journey is: record XYZZY provenance and opening cash; buy
+Front Beam (47000 tenths), three nonfront Pulse (14500 each), ECM (21000) and,
+when needed, front Mining (33000). Four paid mount items then cost 90500 and ECM
+adds 21000; Mining adds 33000. The born Pulse remains a distinct stored item;
+using four new Pulse purchases would hit the existing four-per-kind cap. Store
+and refit the same paid items and verify exact slot/identity/cash before launch.
+Confirm actual Avenor practice with F10 then Enter. Exercise all four views and
+selected Z fire, empty-mount refusal, front-only Mining work admission/refusal
+without invented ore geometry, manual N ECM and paused/docked/no-hardware/active
+field/energy refusals as reachable through real controls. Preserve each actual
+refusal rather than claiming unobserved timing or damage. Help must retain modal
+reviews and block commands; actual Save/Quit/new-process Continue must preserve
+paid provenance, selection, pools, finite missiles and ECM journal, without
+restoring active field permission. Retain actual binary/source/lock identity,
+commands, raw log, input/output hashes and captures. None is observed here.
