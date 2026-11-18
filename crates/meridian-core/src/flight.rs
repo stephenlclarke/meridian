@@ -521,21 +521,12 @@ impl World {
         if !next.speed.is_finite() || next.position.iter().any(|value| !value.is_finite()) {
             return Err(StepError::NonFiniteState);
         }
-        if let Some(scene) = self.celestial_snapshot() {
-            let hull_radius = self
-                .station_data
-                .as_ref()
-                .map_or(0.0, |data| data.player_radius());
-            if [scene.planet, scene.sun]
-                .into_iter()
-                .any(|body| body.blocks_motion(self.state.position, next.position, hull_radius))
-            {
-                let mut stopped = self.state;
-                stopped.tick = next.tick;
-                stopped.speed = 0.0;
-                stopped.motion_refusal = Some(MotionRefusal::CelestialContact);
-                return self.publish_step(stopped);
-            }
+        if self.celestial_blocks_motion(next.position) {
+            let mut stopped = self.state;
+            stopped.tick = next.tick;
+            stopped.speed = 0.0;
+            stopped.motion_refusal = Some(MotionRefusal::CelestialContact);
+            return self.publish_step(stopped);
         }
         if let Some(data) = &self.station_data {
             let before = flight_pose(self.state.position, self.state.orientation)
@@ -591,6 +582,20 @@ impl World {
             }
         }
         self.publish_step(next)
+    }
+
+    fn celestial_blocks_motion(&self, position: [f32; 3]) -> bool {
+        if let Some(scene) = self.celestial_snapshot() {
+            let hull_radius = self
+                .station_data
+                .as_ref()
+                .map_or(0.0, |data| data.player_radius());
+            [scene.planet, scene.sun]
+                .into_iter()
+                .any(|body| body.blocks_motion(self.state.position, position, hull_radius))
+        } else {
+            false
+        }
     }
 
     fn publish_step(&mut self, mut next: Snapshot) -> Result<(), StepError> {
