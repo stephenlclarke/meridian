@@ -163,10 +163,7 @@ impl MuleHullSource {
         self.pieces.as_ref()
     }
     pub fn maximum_origin_radius(&self) -> f64 {
-        self.pieces
-            .iter()
-            .map(|piece| piece.origin_radius())
-            .fold(0.0, f64::max)
+        rounded_maximum_origin_radius(self.pieces.as_ref())
     }
     pub fn engineering(&self) -> MuleEngineering {
         MULE_ENGINEERING
@@ -202,50 +199,7 @@ impl MuleHullSource {
         station: StationPose,
         margin: f64,
     ) -> Result<bool, EnvelopeError> {
-        if !valid_pose(player)
-            || !valid_pose(station.pose)
-            || !station.axial_rotation.is_finite()
-            || !station.rotation_rate.is_finite()
-            || !margin.is_finite()
-            || margin < 0.0
-        {
-            return Err(EnvelopeError::InvalidGeometry);
-        }
-        let (sine, cosine) = station.axial_rotation.sin_cos();
-        let station_basis = Basis3 {
-            x: station.pose.orientation.apply(Vec3::new(cosine, sine, 0.0)),
-            y: station
-                .pose
-                .orientation
-                .apply(Vec3::new(-sine, cosine, 0.0)),
-            z: station.pose.orientation.z,
-        };
-        let translation = sub(player.position, station.pose.position);
-        for (index, a) in port.aperture().iter().copied().enumerate() {
-            let edge = sub(port.aperture()[(index + 1) % port.aperture().len()], a);
-            let length = (edge.x * edge.x + edge.y * edge.y).sqrt();
-            if !length.is_finite() || length <= 0.0 {
-                return Err(EnvelopeError::InvalidGeometry);
-            }
-            let inward = Vec3::new(-edge.y / length, edge.x / length, 0.0);
-            let world_inward = station_basis.apply(inward);
-            let local_negative = Vec3::new(
-                -player.orientation.x.dot(world_inward),
-                -player.orientation.y.dot(world_inward),
-                -player.orientation.z.dot(world_inward),
-            );
-            let offset = translation.dot(world_inward) - add(port.center(), a).dot(inward);
-            for piece in self.pieces.iter() {
-                let minimum = offset - piece.support_bound(local_negative)?;
-                let numeric_guard = 2048.0
-                    * f64::EPSILON
-                    * (1.0 + translation.dot(translation).sqrt() + offset.abs());
-                if !minimum.is_finite() || minimum <= margin + numeric_guard {
-                    return Ok(false);
-                }
-            }
-        }
-        Ok(true)
+        rounded_fits_port(self.pieces.as_ref(), port, player, station, margin)
     }
     /// Earliest source-bound gameplay surface; uncertainty occludes and grants no effect.
     pub fn ray_contact(
@@ -292,6 +246,64 @@ impl MuleHullSource {
         }
         Ok(true)
     }
+}
+pub(crate) fn rounded_maximum_origin_radius(pieces: &[SmoothPiece]) -> f64 {
+    pieces
+        .iter()
+        .map(|piece| piece.origin_radius())
+        .fold(0.0, f64::max)
+}
+
+pub(crate) fn rounded_fits_port(
+    pieces: &[SmoothPiece],
+    port: &DockingPort,
+    player: RigidPose,
+    station: StationPose,
+    margin: f64,
+) -> Result<bool, EnvelopeError> {
+    if !valid_pose(player)
+        || !valid_pose(station.pose)
+        || !station.axial_rotation.is_finite()
+        || !station.rotation_rate.is_finite()
+        || !margin.is_finite()
+        || margin < 0.0
+    {
+        return Err(EnvelopeError::InvalidGeometry);
+    }
+    let (sine, cosine) = station.axial_rotation.sin_cos();
+    let station_basis = Basis3 {
+        x: station.pose.orientation.apply(Vec3::new(cosine, sine, 0.0)),
+        y: station
+            .pose
+            .orientation
+            .apply(Vec3::new(-sine, cosine, 0.0)),
+        z: station.pose.orientation.z,
+    };
+    let translation = sub(player.position, station.pose.position);
+    for (index, a) in port.aperture().iter().copied().enumerate() {
+        let edge = sub(port.aperture()[(index + 1) % port.aperture().len()], a);
+        let length = (edge.x * edge.x + edge.y * edge.y).sqrt();
+        if !length.is_finite() || length <= 0.0 {
+            return Err(EnvelopeError::InvalidGeometry);
+        }
+        let inward = Vec3::new(-edge.y / length, edge.x / length, 0.0);
+        let world_inward = station_basis.apply(inward);
+        let local_negative = Vec3::new(
+            -player.orientation.x.dot(world_inward),
+            -player.orientation.y.dot(world_inward),
+            -player.orientation.z.dot(world_inward),
+        );
+        let offset = translation.dot(world_inward) - add(port.center(), a).dot(inward);
+        for piece in pieces {
+            let minimum = offset - piece.support_bound(local_negative)?;
+            let numeric_guard =
+                2048.0 * f64::EPSILON * (1.0 + translation.dot(translation).sqrt() + offset.abs());
+            if !minimum.is_finite() || minimum <= margin + numeric_guard {
+                return Ok(false);
+            }
+        }
+    }
+    Ok(true)
 }
 fn source_vertex(bytes: &[u8], index: usize) -> Result<Vec3, EnvelopeError> {
     let begin = 16 + 24 * index;

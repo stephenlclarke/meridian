@@ -1,15 +1,26 @@
-//! SH001 smooth-envelope queries against the authenticated SH028 station.
+//! Source-bound rounded hull queries against the authenticated SH028 station.
 //! These are geometric checks; only World can issue arrival, launch or owned-body commands.
 use super::{
     FlightStart, LAUNCH_SPEED, OriginalStationData, StationError, add, finite, flight_pose, sub,
 };
 use crate::docking::{Basis3, RigidPose, Vec3};
-use crate::mule::MuleHullSource;
+use crate::goshawk::GoshawkHullSource;
+use crate::mule::{MuleHullSource, SmoothPiece, rounded_fits_port, rounded_maximum_origin_radius};
 
 impl OriginalStationData {
     pub fn mule_motion_clear(
         &self,
         source: &MuleHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces().as_ref(), start, end, angular_travel)
+    }
+
+    fn rounded_station_motion_clear(
+        &self,
+        pieces: &[SmoothPiece],
         start: RigidPose,
         end: RigidPose,
         angular_travel: f64,
@@ -20,19 +31,27 @@ impl OriginalStationData {
                 self.station.vertices[face[1]],
                 self.station.vertices[face[2]],
             ];
-            source.sweep_clears_triangles(start, end, angular_travel, &[triangle]) == Ok(true)
+            pieces.iter().all(|piece| {
+                piece.sweep_clears_triangle(start, end, angular_travel, triangle) == Ok(true)
+            })
         })
     }
     pub fn mule_launch_start(&self, source: &MuleHullSource) -> Result<FlightStart, StationError> {
+        self.rounded_station_launch_start(source.pieces().as_ref())
+    }
+
+    fn rounded_station_launch_start(
+        &self,
+        pieces: &[SmoothPiece],
+    ) -> Result<FlightStart, StationError> {
         let aligned = RigidPose {
             position: Vec3::new(0.0, 0.0, 0.0),
             orientation: Basis3::IDENTITY,
         };
-        if source.fits_port(&self.port, aligned, self.station_pose(), 0.0) != Ok(true) {
+        if rounded_fits_port(pieces, &self.port, aligned, self.station_pose(), 0.0) != Ok(true) {
             return Err(StationError::UnsafeLaunch);
         }
-        let rear = source
-            .pieces()
+        let rear = pieces
             .iter()
             .try_fold(f64::NEG_INFINITY, |largest, piece| {
                 piece
@@ -58,7 +77,7 @@ impl OriginalStationData {
             position: add(pose.position, Vec3::new(0.0, 0.0, 1000.0)),
             orientation: pose.orientation,
         };
-        if !self.mule_motion_clear(source, pose, end, 0.0) {
+        if !self.rounded_station_motion_clear(pieces, pose, end, 0.0) {
             return Err(StationError::UnsafeLaunch);
         }
         Ok(start)
@@ -92,6 +111,25 @@ impl OriginalStationData {
         roll_rate: f64,
         angular_travel: f64,
     ) -> bool {
+        self.rounded_station_entry_conditions(
+            source.pieces().as_ref(),
+            start,
+            end,
+            physical_speed,
+            roll_rate,
+            angular_travel,
+        )
+    }
+
+    fn rounded_station_entry_conditions(
+        &self,
+        pieces: &[SmoothPiece],
+        start: RigidPose,
+        end: RigidPose,
+        physical_speed: f64,
+        roll_rate: f64,
+        angular_travel: f64,
+    ) -> bool {
         let old = self.depth(start);
         let depth = self.depth(end);
         if !(old > 0.0 && depth <= 0.0 && depth > -self.port.tunnel_depth())
@@ -106,7 +144,7 @@ impl OriginalStationData {
         {
             return false;
         }
-        let radius = source.maximum_origin_radius();
+        let radius = rounded_maximum_origin_radius(pieces);
         let a = sub(start.position, self.port.center());
         let b = sub(end.position, self.port.center());
         let coordinate_scale = start
@@ -122,8 +160,48 @@ impl OriginalStationData {
         let margin = (radius + a.dot(a).sqrt().max(b.dot(b).sqrt())) * angular_travel + numeric;
         let station = self.station_pose();
         margin.is_finite()
-            && source.fits_port(&self.port, start, station, margin) == Ok(true)
-            && source.fits_port(&self.port, end, station, margin) == Ok(true)
+            && rounded_fits_port(pieces, &self.port, start, station, margin) == Ok(true)
+            && rounded_fits_port(pieces, &self.port, end, station, margin) == Ok(true)
+    }
+}
+
+impl OriginalStationData {
+    /// Validate a source-relative exterior launch for the candidate SH008 envelope.
+    pub fn goshawk_launch_start(
+        &self,
+        source: &GoshawkHullSource,
+    ) -> Result<FlightStart, StationError> {
+        self.rounded_station_launch_start(source.pieces().as_ref())
+    }
+
+    pub fn goshawk_motion_clear(
+        &self,
+        source: &GoshawkHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces().as_ref(), start, end, angular_travel)
+    }
+
+    /// Validate the entire rounded SH008 crossing against the original physical SH028 port.
+    pub fn goshawk_entry_clear(
+        &self,
+        source: &GoshawkHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        physical_speed: f64,
+        roll_rate: f64,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_entry_conditions(
+            source.pieces().as_ref(),
+            start,
+            end,
+            physical_speed,
+            roll_rate,
+            angular_travel,
+        ) && self.goshawk_motion_clear(source, start, end, angular_travel)
     }
 }
 

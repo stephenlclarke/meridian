@@ -9,3 +9,9 @@ The candidate encloses both submitted point sets with 69 local convex supports p
 The authored clearance test carries a small physical triangle through ten metres of the original forebody channel and requires strict separation. It also checks a real left drive-arm point blocks contact. A source-only scalar check finds at least 0.746 m of separating-plane slack for the channel fixture across all 69 rounded supports. That result applies to the selected fixture. The core tests, detailed distance samples, original appearance, real docking and renderer cost still need owned execution. Mule's local native-well decision applies only to Mule. SH008 has no approved local alterations or stand-off exceptions.
 
 No new full-fleet hull or public-preview count follows from this source packet.
+
+## Original station docking candidate
+
+The SH008 station helpers use the same strict rounded support checks as Mule. The actual SH028 aperture controls fit, and the original station triangles control continuous clearance. The exterior launch starts from Goshawk's own aft support. The entry check keeps the existing crossing, tunnel, attitude, speed and roll thresholds. It accepts a physically clear aligned crossing in the authored case and requires refusal at the actual speed and roll boundaries.
+
+The physical lip fixture uses original Goshawk rail vertex 6 and SH028 triangle 482. Source arithmetic places the rail point strictly inside the lip triangle during the proposed two-metre sweep while the actor centre remains outside the opening. The positive, negative and launch cases are authored and await runtime checks. They call the actual station source helpers. A controlled World route, native renderer evidence and release timing are the next qualification steps.

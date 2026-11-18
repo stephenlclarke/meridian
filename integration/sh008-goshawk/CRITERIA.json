@@ -21,14 +21,37 @@
     {
       "name": "goshawk_forebody_channel_stays_clear_while_a_source_drive_arm_blocks_contact",
       "status": "UNRUN"
+    },
+    {
+      "name": "goshawk_original_sh028_accepts_aligned_entry_but_rejects_bad_speed_roll_and_aperture",
+      "status": "UNRUN"
+    },
+    {
+      "name": "goshawk_original_sh028_blocks_the_lip_and_launches_from_its_own_rear_support",
+      "status": "UNRUN"
     }
   ],
   "sourceProof": "Every source component and triangle remains assigned to one piece. Independent plane support check across the authored channel obstacle sweep has at least 0.746 m source slack; this is a local static certificate, not runtime qualification.",
   "nextAcceptance": [
-    "Run the two core tests with current protected source and strict Clippy in the owned lane",
+    "Run all four named SH008 core tests with current protected source and strict Clippy in the owned lane",
     "Measure actual detailed-to-envelope gaps with original source evidence and inspect the central channel",
     "Use the original detailed UVs/materials in a renderer bound to the same 69 pieces and qualify cost and native docking",
     "Resolve source-supported engineering mass/inertia and authored ordinary placement separately before hull acceptance"
   ],
-  "counts": "Source packet does not alter full-fleet or public-preview acceptance"
+  "counts": "Source packet does not alter full-fleet or public-preview acceptance",
+  "stationSlice": {
+    "boundBase": "6422079ccd3936224668641f106afdff12a584d7",
+    "status": "AUTHORED_UNRUN",
+    "witnessSha256": "3bf4115324203b735025469207b2c6d295cfc98d0ccdb64a8db8edff0e4861f5",
+    "evidence": "Original SH028 face 482 and exact calibrated SH008 rail vertex 6 yield a strict interior lip intersection while the body centre is still outside the aperture. Actual station source/asset data and once-calibrated appearance/partition are unchanged.",
+    "runtimeNext": "After owned check and core station tests, qualify controlled World approach, original display and close-range shimmer, runtime cost and actual station visibility. Ordinary engineering and placement pending.",
+    "reviewCorrection": {
+      "status": "AUTHORED_UNRUN",
+      "findings": [
+        "G2-SH008-DOCK-FIXTURE-INDEPENDENCE-1",
+        "G2-SH008-DOCK-CRITERIA-COUNT-1"
+      ],
+      "coverage": "Exact independent outward-rounded launch coordinate, a clear initial lip pose, and a physically clear off-aperture sweep before its separate entry refusal. Geometry and source assets stay byte exact."
+    }
+  }
 }
