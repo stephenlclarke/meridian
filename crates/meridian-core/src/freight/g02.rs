@@ -724,6 +724,19 @@ pub struct CompletionReceipt {
 }
 
 impl CompletionReceipt {
+    /// The original G02 transaction's validated Renas main orbital berth.
+    pub(crate) fn renas_departure_binding(self) -> Option<(u64, u64, u64, u64)> {
+        (self.dock.system == RENAS
+            && self.dock.kind == StationKind::MainOrbital
+            && self.dock.station_actor.entity == 1)
+            .then_some((
+                self.dock.owner,
+                self.dock.hull,
+                self.dock.arrival_sequence,
+                self.dock.station_actor.generation,
+            ))
+    }
+
     pub fn job(self) -> JobId {
         self.job
     }

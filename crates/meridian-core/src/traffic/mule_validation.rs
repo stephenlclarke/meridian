@@ -28,8 +28,16 @@ pub struct MuleActorSnapshot {
     generation: u64,
     scope: Weak<()>,
     refusal: Option<MuleValidationRefusal>,
+    crew_aboard: Option<u8>,
 }
 impl MuleActorSnapshot {
+    pub fn is_renas_encounter(&self) -> bool {
+        self.actor.id.system() == SystemId::RENAS && self.actor.id.serial() == u8::MAX - 1
+    }
+    /// Physical occupancy from the SH001 native crew count. It grants no crew service or effects.
+    pub fn crew_aboard(&self) -> Option<u8> {
+        self.crew_aboard
+    }
     pub fn actor(&self) -> &NpcSnapshot {
         &self.actor
     }
@@ -116,6 +124,40 @@ impl State {
             refusal: None,
         })
     }
+    pub(crate) fn renas_encounter(
+        owner: u64,
+        generation: u64,
+        source: MuleHullSource,
+        pose: RigidPose,
+    ) -> Result<Self, crate::station::StationError> {
+        let mut state = Self::new(owner, source, pose, 0.0, false)?;
+        state.actor.id.system = SystemId::RENAS;
+        state.actor.id.serial = u8::MAX - 1;
+        state.actor.phase = NpcPhase::Outbound;
+        state.generation = generation;
+        Ok(state)
+    }
+    pub(crate) fn renas_publication(&self, tick: u64) -> MuleActorSnapshot {
+        let mut frame = self.snapshot();
+        frame.tick = tick;
+        frame.crew_aboard = Some(2);
+        frame
+    }
+    pub(crate) fn renas_frame_matches(&self, frame: &MuleActorSnapshot, tick: u64) -> bool {
+        frame.scope.ptr_eq(&Arc::downgrade(&self.scope))
+            && frame.tick == tick
+            && frame.generation == self.generation
+            && frame.actor == self.actor
+            && frame.is_renas_encounter()
+            && frame.crew_aboard == Some(2)
+            && Arc::ptr_eq(&frame.presentation, &self.presentation)
+    }
+    pub(crate) fn source(&self) -> &MuleHullSource {
+        &self.source
+    }
+    pub(crate) fn pose(&self) -> RigidPose {
+        self.actor.pose
+    }
     pub(crate) fn snapshot(&self) -> MuleActorSnapshot {
         MuleActorSnapshot {
             actor: self.actor,
@@ -124,6 +166,7 @@ impl State {
             generation: self.generation,
             scope: Arc::downgrade(&self.scope),
             refusal: self.refusal,
+            crew_aboard: None,
         }
     }
     pub(crate) fn is_current(&self, frame: &MuleActorSnapshot) -> bool {

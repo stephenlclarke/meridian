@@ -586,6 +586,170 @@ mod tests {
     }
 
     #[test]
+    fn renas_mule_is_the_same_actor_on_the_first_completed_freight_sortie_after_continue() {
+        let mut world = World::new_commander(501).unwrap();
+        let (job, units) = accept(&mut world);
+        travel_to_receiving_station(&mut world);
+        let receiver = world.station_contacts()[0];
+        world
+            .request_contact(receiver, world.snapshot().tick)
+            .unwrap();
+        for (index, unit) in units.into_iter().enumerate() {
+            let review = reviewed(
+                &mut world,
+                Command::ReviewReceiving {
+                    actor: receiver.actor(),
+                    job,
+                },
+            );
+            assert_eq!(review.next_unit(), Some(unit));
+            assert!(matches!(
+                command(
+                    &mut world,
+                    Command::Confirm {
+                        review,
+                        choice: Choice::ReceiveOne(unit),
+                    }
+                ),
+                Ok(Event::Received { .. })
+            ));
+            if index == 6 {
+                let mut seven = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+                seven.request_launch(seven.snapshot().tick).unwrap();
+                assert!(seven.mule_actor_snapshot().is_none());
+                assert_eq!(seven.credits_tenths(), Some(7200));
+                assert!(seven.mission_snapshot().unwrap().freight.clue.is_none());
+            }
+        }
+
+        let dock = world.current_dock_context().unwrap();
+        let completed = world.mission_snapshot().unwrap().freight;
+        let clue = completed.clue.unwrap();
+        assert_eq!(clue.completion().job(), job);
+        assert_eq!(completed.completed_jobs, 1);
+        assert_eq!(world.credits_tenths(), Some(14500));
+        assert!(world.mule_actor_snapshot().is_none());
+        let docked_bytes = world.save_bytes().unwrap();
+        assert_eq!(
+            World::decode_saved_world(&docked_bytes)
+                .unwrap()
+                .save_bytes()
+                .unwrap(),
+            docked_bytes
+        );
+        let mut cold = World::from_save_bytes(&docked_bytes).unwrap();
+        assert_eq!(cold.current_dock_context(), Some(dock));
+        assert!(cold.mule_actor_snapshot().is_none());
+        assert_eq!(
+            cold.request_launch(cold.snapshot().tick + 1),
+            Err(StepError::StaleCommand)
+        );
+        assert!(cold.mule_actor_snapshot().is_none());
+        assert_eq!(cold.current_dock_context(), Some(dock));
+
+        cold.request_launch(cold.snapshot().tick).unwrap();
+        let first = cold.mule_actor_snapshot().unwrap();
+        assert_eq!(first.actor().id.system(), SystemId::RENAS);
+        assert_eq!(first.actor().id.profile(), dock.owner().seed());
+        assert_eq!(first.actor().hull_id, "SH001");
+        assert_eq!(first.generation(), dock.visit() + 1);
+        assert_eq!(first.crew_aboard(), Some(2));
+        assert!(first.is_renas_encounter());
+        assert!(cold.mule_snapshot_is_current(&first));
+        assert!(cold.mule_observer_pose(&first).is_none());
+        assert_eq!(
+            cold.request_launch(cold.snapshot().tick),
+            Err(StepError::InvalidMode)
+        );
+        assert!(cold.mule_snapshot_is_current(&first));
+
+        let flight_bytes = cold.save_bytes().unwrap();
+        assert_eq!(
+            World::decode_saved_world(&flight_bytes)
+                .unwrap()
+                .save_bytes()
+                .unwrap(),
+            flight_bytes
+        );
+        let mut resumed = World::from_save_bytes(&flight_bytes).unwrap();
+        let restored = resumed.mule_actor_snapshot().unwrap();
+        assert_eq!(restored.actor(), first.actor());
+        assert_eq!(restored.presentation(), first.presentation());
+        assert_eq!(restored.generation(), first.generation());
+        assert!(resumed.mule_snapshot_is_current(&restored));
+        assert!(!resumed.mule_snapshot_is_current(&first));
+        assert_eq!(resumed.credits_tenths(), Some(14500));
+        assert_eq!(resumed.mission_snapshot().unwrap().freight.clue, Some(clue));
+
+        return_to_renas_berth(&mut resumed);
+        assert_ne!(resumed.current_dock_context(), Some(dock));
+        assert!(resumed.mule_actor_snapshot().is_none());
+        let mut returned = World::from_save_bytes(&resumed.save_bytes().unwrap()).unwrap();
+        assert!(returned.mule_actor_snapshot().is_none());
+        returned.request_launch(returned.snapshot().tick).unwrap();
+        assert!(returned.mule_actor_snapshot().is_none());
+        assert_eq!(returned.credits_tenths(), Some(14500));
+        assert_eq!(
+            returned.mission_snapshot().unwrap().freight.clue,
+            Some(clue)
+        );
+        assert!(
+            World::from_save_bytes(&returned.save_bytes().unwrap())
+                .unwrap()
+                .mule_actor_snapshot()
+                .is_none()
+        );
+    }
+
+    fn return_to_renas_berth(world: &mut World) {
+        use super::super::{FIXED_DELTA_SECONDS, YAW_RATE};
+        for _ in 0..80 {
+            if world.snapshot().speed == 0.0 {
+                break;
+            }
+            world
+                .step(FlightInput {
+                    brake: true,
+                    ..FlightInput::default()
+                })
+                .unwrap();
+        }
+        assert_eq!(world.snapshot().speed, 0.0);
+        let yaw_ticks = std::f32::consts::PI / (YAW_RATE * FIXED_DELTA_SECONDS);
+        for _ in 0..yaw_ticks.floor() as u32 {
+            world
+                .step(FlightInput {
+                    yaw: 1.0,
+                    ..FlightInput::default()
+                })
+                .unwrap();
+        }
+        world
+            .step(FlightInput {
+                yaw: yaw_ticks.fract(),
+                ..FlightInput::default()
+            })
+            .unwrap();
+        for _ in 0..2600 {
+            if world.snapshot().mode == FlightMode::Docked {
+                break;
+            }
+            let speed = world.snapshot().speed;
+            world
+                .step(FlightInput {
+                    throttle: ((4.0 - speed) / (9.1 / 60.0)).clamp(-1.0, 1.0),
+                    ..FlightInput::default()
+                })
+                .unwrap();
+            assert_eq!(world.snapshot().motion_refusal, None);
+        }
+        assert_eq!(
+            world.current_dock_context().unwrap().system(),
+            SystemId::RENAS
+        );
+    }
+
+    #[test]
     fn public_contact_back_pause_tick_and_owner_changes_do_not_manufacture_consent() {
         let mut world = World::new_commander(51).unwrap();
         let npc = world.station_contacts()[0];

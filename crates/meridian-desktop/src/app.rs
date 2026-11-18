@@ -1,4 +1,5 @@
 mod emp;
+mod mule_presentation;
 mod mule_validation;
 use std::{
     collections::{HashSet, hash_map::RandomState},
@@ -1013,25 +1014,11 @@ impl App {
                         docked: snapshot.mode == FlightMode::Docked,
                     });
             let mule_frame = self.game.world.mule_actor_snapshot();
-            let mule_observer = mule_frame
-                .as_ref()
-                .and_then(|frame| self.game.world.mule_observer_pose(frame));
-            let mule_scene = mule_frame
-                .as_ref()
-                .zip(mule_observer)
-                .filter(|(frame, _)| {
-                    frame.world_tick() == snapshot.tick
-                        && frame.source_identity()
-                            == (
-                                meridian_core::mule::MULE_RESOURCE_SHA256,
-                                meridian_core::mule::MULE_CONTRACT_SHA256,
-                            )
-                })
-                .map(|(frame, observer)| crate::mule_render::Scene {
-                    actor: frame.actor(),
-                    envelope: frame.presentation().as_ref(),
-                    observer,
-                });
+            let mule_scene = mule_presentation::current_placement(
+                &self.game.world,
+                snapshot,
+                mule_frame.as_ref(),
+            );
             let practice = self.game.world.practice_snapshot();
             renderer.set_flight_view(if self.game.is_internal_validation() {
                 self.validation_view
