@@ -15,7 +15,7 @@ impl World {
                     return Err(invalid);
                 }
                 BeamSource::Player { item, .. }
-                    if self.front_weapon_at_tick(item, shot.world_tick) != Some(shot.weapon) =>
+                    if self.laser_weapon_at_tick(item, shot.world_tick) != Some(shot.weapon) =>
                 {
                     return Err(invalid);
                 }
@@ -290,7 +290,7 @@ impl World {
                     .ok_or(FireError::InvalidGeometry)?,
                 traffic::PlayerBeamInput {
                     weapon: self
-                        .fitted_front_laser()
+                        .fitted_laser_item(shot.fitted_item_id)
                         .ok_or(FireError::NoFittedFrontLaser)?
                         .1,
                     system: owner.system,

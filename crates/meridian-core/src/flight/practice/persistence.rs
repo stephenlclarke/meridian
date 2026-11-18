@@ -9,7 +9,7 @@ const INVALID: SaveError = SaveError::InvalidState("T02 practice consent, visit 
 
 impl Practice {
     pub(in crate::flight) fn encode(self, w: &mut Writer) {
-        self.encode_version(w, 9);
+        self.encode_version(w, crate::save::SAVE_VERSION);
     }
     fn encode_version(self, w: &mut Writer, version: u16) {
         self.consent.encode_save(w);
@@ -23,6 +23,13 @@ impl Practice {
                     hit.firing_pose.encode(w);
                     if version >= 8 {
                         w.option(hit.missile.as_ref(), |w, origin| origin.encode(w));
+                    }
+                    if version >= crate::save::SAVE_VERSION {
+                        w.option(hit.laser.as_ref(), |w, (item, facing, emission)| {
+                            w.u64(*item);
+                            w.u8(facing.tag());
+                            w.u64(*emission);
+                        });
                     }
                 });
             }
@@ -64,6 +71,17 @@ impl Practice {
                                 firing_pose: RecordedPose::decode(r)?,
                                 missile: if version >= 8 {
                                     r.option(super::super::MissileOrigin::decode)?
+                                } else {
+                                    None
+                                },
+                                laser: if version >= crate::save::SAVE_VERSION {
+                                    r.option(|r| {
+                                        Ok((
+                                            r.u64()?,
+                                            super::super::LaserFacing::from_tag(r.u8()?)?,
+                                            r.u64()?,
+                                        ))
+                                    })?
                                 } else {
                                     None
                                 },
@@ -121,15 +139,20 @@ impl Practice {
                 .iter()
                 .flatten()
                 .filter(|hit| hit.missile.is_none())
-                .map(|hit| hit.tick)
-                .max()
+                .max_by_key(|hit| hit.tick)
             {
                 // Every published step advances one global tick. Only a subset
                 // advances the weapon clock; docking and arrival retain cooldown.
                 // A later discharge can only raise the remainder of this floor.
-                let elapsed = flight.tick - latest_hit;
-                let minimum = u64::from(world.front_cadence_at_tick(latest_hit).ok_or(INVALID)?)
-                    .saturating_sub(elapsed);
+                let elapsed = flight.tick - latest_hit.tick;
+                let (item, facing, _) = latest_hit.laser.ok_or(INVALID)?;
+                let minimum = u64::from(
+                    world
+                        .laser_profile_at_tick(item, latest_hit.tick, facing)
+                        .ok_or(INVALID)?
+                        .cooldown_ticks(),
+                )
+                .saturating_sub(elapsed);
                 if u64::from(pulse.remaining_cooldown()) < minimum {
                     return Err(INVALID);
                 }
@@ -217,7 +240,7 @@ impl Range {
         if !geometry::range_clear(data, station, opening) {
             return Err(INVALID);
         }
-        let mut ticks = [0; 3];
+        let mut ticks = [(0, 0_u8); 3];
         for (ordinal, slot) in self.hits.into_iter().enumerate() {
             let Some(hit) = slot else {
                 continue;
@@ -227,8 +250,19 @@ impl Range {
             }
             let pose = hit.firing_pose.checked_pose_at(hit.tick, flight)?;
             if hit.missile.is_some() {
+                if hit.laser.is_some() {
+                    return Err(INVALID);
+                }
                 continue;
             } // World cross-validates the retained projectile contact.
+            let (item, facing, emission) = hit.laser.ok_or(INVALID)?;
+            if emission == 0 || emission > world.combat.emissions {
+                return Err(INVALID);
+            }
+            let weapon = world
+                .laser_profile_at_tick(item, hit.tick, facing)
+                .ok_or(INVALID)?;
+            let pose = facing.ray(pose);
             let station_distance = data
                 .beam_block_distance(
                     station,
@@ -242,13 +276,13 @@ impl Range {
             {
                 return Err(INVALID);
             }
-            ticks[ordinal] = hit.tick;
+            ticks[ordinal] = (hit.tick, weapon.cooldown_ticks());
         }
         ticks.sort_unstable();
-        let mut hits = ticks.into_iter().filter(|tick| *tick != 0);
+        let mut hits = ticks.into_iter().filter(|(tick, _)| *tick != 0);
         if let Some(mut prior) = hits.next() {
             for tick in hits {
-                if tick - prior < u64::from(world.front_cadence_at_tick(prior).ok_or(INVALID)?) {
+                if tick.0 - prior.0 < u64::from(prior.1) {
                     return Err(INVALID);
                 }
                 prior = tick;

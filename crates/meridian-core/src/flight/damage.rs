@@ -12,6 +12,7 @@ enum Kind {
     Berth,
     Pulse,
     Laser(super::OrdinaryWeapon),
+    FacedLaser(super::OrdinaryWeapon, super::LaserFacing),
     Mining(u8),
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -29,6 +30,7 @@ struct LaserSpend {
     clock: u64,
     weapon: super::OrdinaryWeapon,
     item: u64,
+    facing: super::LaserFacing,
 }
 
 impl State {
@@ -70,10 +72,25 @@ impl State {
         self.append(clock, Kind::Laser(weapon))
             .map_err(|()| FireError::SequenceExhausted)
     }
+    pub(super) fn laser_facing(
+        &self,
+        clock: u64,
+        weapon: super::OrdinaryWeapon,
+        facing: super::LaserFacing,
+    ) -> Result<Self, FireError> {
+        if facing == super::LaserFacing::Front {
+            return self.laser(clock, weapon);
+        }
+        if !self.enabled || !weapon.is_laser() {
+            return Err(FireError::NoFittedLaser(facing));
+        }
+        self.append(clock, Kind::FacedLaser(weapon, facing))
+            .map_err(|()| FireError::SequenceExhausted)
+    }
     pub(super) fn has_rapid_spend(&self) -> bool {
         self.events
             .iter()
-            .any(|event| matches!(event.kind, Kind::Laser(weapon) if weapon.cooldown_ticks() == 6))
+            .any(|event| matches!(event.kind, Kind::Laser(weapon) | Kind::FacedLaser(weapon, _) if weapon.cooldown_ticks() == 6))
     }
     pub(super) fn quiet_since(&self, tick: u64, anchor: u64, physical: u64) -> bool {
         let Some(elapsed) = tick.checked_sub(anchor) else {
@@ -128,6 +145,7 @@ impl State {
                 Kind::Berth => 0,
                 Kind::Pulse => 1,
                 Kind::Laser(weapon) => weapon.tag() + 1,
+                Kind::FacedLaser(weapon, facing) => 64 + facing.tag() * 8 + weapon.tag(),
                 Kind::Mining(body) => 32 + body,
             });
         }
@@ -148,6 +166,14 @@ impl State {
                     Kind::Laser(super::OrdinaryWeapon::from_tag(tag - 1)?)
                 }
                 tag @ 32..=43 if version >= 16 => Kind::Mining(tag - 32),
+                tag @ 72..=93 => {
+                    let facing = super::LaserFacing::from_tag((tag - 64) / 8)?;
+                    let weapon = super::OrdinaryWeapon::from_tag((tag - 64) % 8)?;
+                    if !weapon.is_laser() {
+                        return Err(INVALID);
+                    }
+                    Kind::FacedLaser(weapon, facing)
+                }
                 _ => return Err(INVALID),
             };
             events.push(Event { clock, kind });
@@ -198,13 +224,19 @@ impl State {
                 kind => {
                     let weapon = match kind {
                         Kind::Pulse => super::OrdinaryWeapon::FrontPulseLaser,
-                        Kind::Laser(weapon) => weapon,
+                        Kind::Laser(weapon) | Kind::FacedLaser(weapon, _) => weapon,
                         _ => return Err(INVALID),
                     };
-                    let fitted = world
-                        .modular
-                        .front_at_physical(world, event.clock)
-                        .ok_or(INVALID)?;
+                    let facing = match kind {
+                        Kind::FacedLaser(_, facing) => facing,
+                        _ => super::LaserFacing::Front,
+                    };
+                    let fitted = if facing == super::LaserFacing::Front {
+                        world.modular.front_at_physical(world, event.clock)
+                    } else {
+                        world.modular.laser_at_physical(world, event.clock, facing)
+                    }
+                    .ok_or(INVALID)?;
                     if super::OrdinaryWeapon::from_module(fitted.kind) != Some(weapon) {
                         return Err(INVALID);
                     }
@@ -213,6 +245,7 @@ impl State {
                         clock: event.clock,
                         weapon,
                         item: fitted.id,
+                        facing,
                     });
                     Effect::Laser(weapon)
                 }
@@ -391,6 +424,34 @@ fn validate_laser_receipts(
         ordinary.clone(),
         player_beams.clone().map(|(_, _, emission)| emission),
     )?;
+    let mut beacons = BTreeMap::new();
+    for practice in world.practice.iter().chain(world.practice_history.iter()) {
+        for hit in practice.laser_hits() {
+            let shot = spend(hit.emission)?;
+            if (shot.item, shot.facing) != (hit.item, hit.facing)
+                || world
+                    .state
+                    .tick
+                    .checked_sub(hit.tick)
+                    .is_none_or(|elapsed| {
+                        end.checked_sub(shot.clock)
+                            .is_none_or(|since| since > elapsed)
+                    })
+                || beacons
+                    .insert(hit.emission, hit)
+                    .is_some_and(|prior| prior != hit)
+                || ordinary
+                    .clone()
+                    .any(|ordinary| ordinary.emission == hit.emission)
+                || player_beams
+                    .clone()
+                    .any(|(_, _, emission)| emission == hit.emission)
+                || world.missiles.has_laser_interception(hit.emission)
+            {
+                return Err(INVALID);
+            }
+        }
+    }
     for hit in ordinary {
         if hit.weapon.is_laser() {
             let shot = spend(hit.emission)?;

@@ -137,6 +137,7 @@ struct FirstHit {
     tick: u64,
     firing_pose: RecordedPose,
     missile: Option<super::MissileOrigin>,
+    laser: Option<(u64, super::LaserFacing, u64)>,
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
 struct Range {
@@ -239,6 +240,7 @@ impl Practice {
         pose: RigidPose,
         limit: f64,
         station_distance: Option<f64>,
+        laser: (u64, super::LaserFacing, u64),
     ) -> Option<(PracticeBeaconId, f64, bool)> {
         let range = self.active_range()?;
         let (ordinal, distance) =
@@ -251,6 +253,7 @@ impl Practice {
                 tick: shot.tick,
                 firing_pose: RecordedPose::from_snapshot(shot),
                 missile: None,
+                laser: Some(laser),
             });
         }
         Some((id, distance, first_hit))
@@ -378,6 +381,7 @@ impl Practice {
                 tick: flight.tick,
                 firing_pose: RecordedPose::from_snapshot(flight),
                 missile: Some(origin),
+                laser: None,
             });
             return true;
         }
@@ -526,6 +530,34 @@ impl World {
             },
             |practice| practice.snapshot(self.state.tick),
         ))
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(in crate::flight) struct PracticeLaserHit {
+    pub(in crate::flight) tick: u64,
+    pub(in crate::flight) item: u64,
+    pub(in crate::flight) facing: super::LaserFacing,
+    pub(in crate::flight) emission: u64,
+    pub(in crate::flight) beacon: PracticeBeaconId,
+}
+impl Practice {
+    pub(in crate::flight) fn laser_hits(self) -> Vec<PracticeLaserHit> {
+        self.range
+            .into_iter()
+            .flat_map(|range| range.hits.into_iter().enumerate())
+            .filter_map(|(ordinal, hit)| {
+                let hit = hit?;
+                let (item, facing, emission) = hit.laser?;
+                Some(PracticeLaserHit {
+                    tick: hit.tick,
+                    item,
+                    facing,
+                    emission,
+                    beacon: self.id(ordinal),
+                })
+            })
+            .collect()
     }
 }
 

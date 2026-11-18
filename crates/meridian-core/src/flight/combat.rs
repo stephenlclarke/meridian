@@ -162,6 +162,7 @@ pub(super) struct PreparedPulseImpact {
     opening_legal: u8,
     item: u64,
     weapon: OrdinaryWeapon,
+    facing: super::LaserFacing,
     opening_pulse: super::weapons::PulseResources,
     opening_damage: super::damage::State,
     damage: super::damage::State,
@@ -463,22 +464,24 @@ impl World {
         shot: PulseShot,
     ) -> Result<PreparedPulseImpact, FireError> {
         let identity = self.combat_identity().ok_or(FireError::NoCommander)?;
-        let fitted = self
-            .fitted_front_laser()
-            .ok_or(FireError::NoFittedFrontLaser)?;
+        let (facing, weapon) = self
+            .fitted_laser_item(shot.fitted_item_id)
+            .ok_or(FireError::StaleCommand)?;
+        let fitted = (shot.fitted_item_id, weapon);
         let legal = self.legal_value().ok_or(FireError::NoCommander)?;
         let pose = flight_pose(self.state.position, self.state.orientation)
             .ok_or(FireError::InvalidGeometry)?;
+        let ray = facing.ray(pose);
         if shot.tick != self.state.tick
             || self.state.mode != FlightMode::Flight
             || self.is_paused()
             || shot.origin != pose.position
-            || shot.direction != pose.orientation.z
+            || shot.direction != ray.orientation.z
             || fitted.0 != shot.fitted_item_id
         {
             return Err(FireError::StaleCommand);
         }
-        let (_, expected, distance) = self.pulse_scene(pose)?;
+        let (_, expected, distance) = self.pulse_scene_facing(ray, facing)?;
         if shot.contact != expected || shot.end != add_scaled(shot.origin, shot.direction, distance)
         {
             return Err(FireError::InvalidGeometry);
@@ -533,9 +536,12 @@ impl World {
             opening_legal: legal,
             item: shot.fitted_item_id,
             weapon: fitted.1,
+            facing,
             opening_pulse: self.pulse,
             opening_damage: self.damage.clone(),
-            damage: self.damage.laser(self.combat.physical_tick(), fitted.1)?,
+            damage: self
+                .damage
+                .laser_facing(self.combat.physical_tick(), fitted.1, facing)?,
             pulse,
             epoch: self
                 .freight_session
@@ -580,7 +586,7 @@ impl PreparedPulseImpact {
             || world.damage != self.opening_damage
             || world.combat_identity() != Some(self.identity)
             || world.legal_value() != Some(self.opening_legal)
-            || world.fitted_front_laser() != Some((self.item, self.weapon))
+            || world.fitted_laser(self.facing) != Some((self.item, self.weapon))
         {
             return Err(FireError::StaleCommand);
         }
@@ -700,6 +706,10 @@ impl OrdinaryImpact {
             return world.missiles.validate_ordinary(self, world);
         }
         let pose = flight_pose(self.position, self.orientation).ok_or(invalid)?;
+        let facing = world
+            .laser_facing_at_tick(self.item, self.tick, self.attacker)
+            .ok_or(invalid)?;
+        let ray = facing.ray(pose);
         let station = world.state.station.ok_or(invalid)?;
         let distance = world
             .station_data
@@ -708,7 +718,7 @@ impl OrdinaryImpact {
             .beam_block_distance(
                 station,
                 pose.position,
-                pose.orientation.z,
+                ray.orientation.z,
                 super::PULSE_RANGE,
             )
             .map_err(|_| invalid)?
@@ -721,7 +731,7 @@ impl OrdinaryImpact {
         if self.victim_entity != 1
             || self.attacker.owner != current.owner
             || self.attacker.hull != current.hull
-            || world.owned_front_laser_at(self.item, self.tick, self.attacker) != Some(self.weapon)
+            || world.owned_laser_at(self.item, self.tick, self.attacker) != Some(self.weapon)
             || station_index(self.attacker.system).is_none()
             || self.attacker.visit < 2
             || self.attacker.visit > current.visit
@@ -738,7 +748,7 @@ impl OrdinaryImpact {
                 self.point,
                 0.0,
             )
-            || self.point != add_scaled(pose.position, pose.orientation.z, distance)
+            || self.point != add_scaled(pose.position, ray.orientation.z, distance)
             || (self.tick == world.state.tick
                 && (self.position != world.state.position
                     || self.orientation != world.state.orientation

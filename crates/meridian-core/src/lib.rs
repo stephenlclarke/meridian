@@ -74,3 +74,5 @@ pub use flight::{
     EmpAxis, EmpChargePhase, EmpEquipmentAction, EmpEquipmentOffer, EmpEquipmentReview, EmpError,
     EmpGrades, EmpOrigin, EmpProvenance, EmpSnapshot, OwnedEmp, PreparedEmpEquipment,
 };
+
+pub use flight::{FittedLaserSnapshot, LaserFacing};

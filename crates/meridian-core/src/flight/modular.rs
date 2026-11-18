@@ -1,5 +1,5 @@
 //! Paid modular equipment custody. Effects live in the actual weapon/work owners, not menu rows.
-use super::{FlightMode, World};
+use super::{FlightMode, LaserFacing, World};
 use crate::{
     freight::g02::CommanderAccount,
     navigation::{DockContext, NavigationFitChange, NavigationGrade},
@@ -191,6 +191,9 @@ impl ModuleKind {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleSlot {
     FrontLaser,
+    LeftLaser,
+    RightLaser,
+    RearLaser,
     Energy,
     UtilityFuelScoops,
     Navigation,
@@ -243,18 +246,34 @@ pub struct ModuleOffer {
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleAction {
+    PurchaseLaser {
+        kind: ModuleKind,
+        facing: LaserFacing,
+    },
+    InstallLaser {
+        item: u64,
+        facing: LaserFacing,
+        replacing: Option<u64>,
+    },
     PurchaseMiningLaser,
-    Purchase { kind: ModuleKind },
+    Purchase {
+        kind: ModuleKind,
+    },
     PurchaseFuelScoops,
-    Store { item: u64 },
-    Install { item: u64, replacing: Option<u64> },
+    Store {
+        item: u64,
+    },
+    Install {
+        item: u64,
+        replacing: Option<u64>,
+    },
 }
 impl ModuleAction {
     fn purchase_kind(self) -> Option<ModuleKind> {
         match self {
             Self::PurchaseFuelScoops => Some(ModuleKind::FuelScoops),
             Self::PurchaseMiningLaser => Some(ModuleKind::MiningLaser),
-            Self::Purchase { kind } => Some(kind),
+            Self::Purchase { kind } | Self::PurchaseLaser { kind, .. } => Some(kind),
             _ => None,
         }
     }
@@ -412,7 +431,21 @@ impl Ledger {
             .sum()
     }
     fn install(&mut self, index: usize, replacing: Option<u64>) -> Result<(), ModuleError> {
-        let slot = self.items[index].kind.slot();
+        self.install_slot(index, replacing, self.items[index].kind.slot())
+    }
+    fn install_slot(
+        &mut self,
+        index: usize,
+        replacing: Option<u64>,
+        slot: ModuleSlot,
+    ) -> Result<(), ModuleError> {
+        if LaserFacing::from_slot(slot).is_some() {
+            if self.items[index].kind.laser_profile().is_none() {
+                return Err(ModuleError::NotForSale);
+            }
+        } else if self.items[index].kind.slot() != slot {
+            return Err(ModuleError::NotForSale);
+        }
         if self.fitted(slot).map(|i| i.id) != replacing {
             return Err(ModuleError::StaleOccupant);
         }
@@ -450,7 +483,16 @@ impl Ledger {
             {
                 return Err(ModuleError::MissingPrerequisite);
             }
-            let replacing = self.fitted(kind.slot()).map(|i| i.id);
+            let slot = match event.action {
+                ModuleAction::PurchaseLaser { facing, .. } => {
+                    if event.xyzzy || kind.laser_profile().is_none() {
+                        return Err(ModuleError::NotForSale);
+                    }
+                    facing.slot()
+                }
+                _ => kind.slot(),
+            };
+            let replacing = self.fitted(slot).map(|i| i.id);
             self.items.push(OwnedModule {
                 id: event.item,
                 kind,
@@ -472,7 +514,7 @@ impl Ledger {
                     }
                 },
             });
-            self.install(self.items.len() - 1, replacing)?;
+            self.install_slot(self.items.len() - 1, replacing, slot)?;
             self.paid = self
                 .paid
                 .checked_add(if event.xyzzy { 0 } else { price })
@@ -501,7 +543,23 @@ impl Ledger {
                     }
                     self.install(index, replacing)?;
                 }
-                ModuleAction::PurchaseMiningLaser
+                ModuleAction::InstallLaser {
+                    item,
+                    facing,
+                    replacing,
+                } => {
+                    let index = self
+                        .items
+                        .iter()
+                        .position(|i| i.id == item)
+                        .ok_or(ModuleError::MissingItem)?;
+                    if self.items[index].slot == Some(facing.slot()) {
+                        return Err(ModuleError::NoChange);
+                    }
+                    self.install_slot(index, replacing, facing.slot())?;
+                }
+                ModuleAction::PurchaseLaser { .. }
+                | ModuleAction::PurchaseMiningLaser
                 | ModuleAction::PurchaseFuelScoops
                 | ModuleAction::Purchase { .. } => {
                     return Err(ModuleError::NotForSale);
@@ -542,7 +600,9 @@ fn validate_module_purchase(e: &Event, owner: u64, mut transaction: u32) -> Resu
             }
         }
     } else if match e.action {
-        ModuleAction::Store { item } | ModuleAction::Install { item, .. } => item != e.item,
+        ModuleAction::Store { item }
+        | ModuleAction::Install { item, .. }
+        | ModuleAction::InstallLaser { item, .. } => item != e.item,
         _ => false,
     } {
         return Err(INVALID);
@@ -689,7 +749,14 @@ impl State {
             if born.owner() != owner || !born.is_standard_birth() || born.component() != component {
                 return Err(INVALID);
             }
-            let fitted = ledger.fitted(slot).is_some_and(|i| i.id == owner + offset);
+            let fitted = if slot == ModuleSlot::FrontLaser {
+                ledger
+                    .items
+                    .iter()
+                    .any(|i| i.id == owner + offset && i.slot.is_some())
+            } else {
+                ledger.fitted(slot).is_some_and(|i| i.id == owner + offset)
+            };
             if born.fitted_hull() != fitted.then_some(world.combat_identity().ok_or(INVALID)?.hull)
             {
                 return Err(INVALID);
@@ -739,6 +806,18 @@ impl State {
         w.u32(self.events.len() as u32);
         for e in &self.events {
             match e.action {
+                ModuleAction::PurchaseLaser { kind, facing } => {
+                    w.u8(17);
+                    w.u8(kind.tag());
+                    w.u8(facing.tag());
+                }
+                ModuleAction::InstallLaser {
+                    facing, replacing, ..
+                } => {
+                    w.u8(18);
+                    w.u8(facing.tag());
+                    w.option(replacing.as_ref(), |w, i| w.u64(*i));
+                }
                 ModuleAction::PurchaseMiningLaser => w.u8(0),
                 ModuleAction::Purchase { kind } => {
                     w.u8(3);
@@ -769,7 +848,7 @@ impl State {
         let mut events = Vec::new();
         for _ in 0..count {
             let tag = r.u8()?;
-            let kind = if tag == 3 && version >= 16 {
+            let kind = if (tag == 3 || tag == 17) && version >= 16 {
                 let kind = ModuleKind::from_tag(r.u8()?)?;
                 if version < 17 && kind.navigation_reach_ly().is_some() {
                     return Err(SaveError::InvalidEncoding);
@@ -778,7 +857,12 @@ impl State {
             } else {
                 None
             };
-            let replacing = if tag == 2 {
+            let facing = if tag == 17 || tag == 18 {
+                Some(LaserFacing::from_tag(r.u8()?)?)
+            } else {
+                None
+            };
+            let replacing = if tag == 2 || tag == 18 {
                 r.option(|r| r.u64())?
             } else {
                 None
@@ -789,6 +873,15 @@ impl State {
             let revision = r.u64()?;
             let xyzzy = r.bool()?;
             let action = match tag {
+                17 => ModuleAction::PurchaseLaser {
+                    kind: kind.ok_or(SaveError::InvalidEncoding)?,
+                    facing: facing.ok_or(SaveError::InvalidEncoding)?,
+                },
+                18 => ModuleAction::InstallLaser {
+                    item,
+                    facing: facing.ok_or(SaveError::InvalidEncoding)?,
+                    replacing,
+                },
                 0 => ModuleAction::PurchaseMiningLaser,
                 16 if version >= 16 => ModuleAction::PurchaseFuelScoops,
                 1 => ModuleAction::Store { item },
@@ -871,7 +964,7 @@ impl World {
         })
         .collect()
     }
-    pub(super) fn owned_front_laser_at(
+    pub(super) fn owned_laser_at(
         &self,
         item: u64,
         tick: u64,
@@ -883,9 +976,7 @@ impl World {
             return None;
         }
         let item = self.modular.item_at(owner.owner, item, tick, owner.visit)?;
-        if item.slot != Some(ModuleSlot::FrontLaser) {
-            return None;
-        }
+        LaserFacing::from_slot(item.slot?)?;
         super::OrdinaryWeapon::from_module(item.kind)
     }
     pub(super) fn energy_recharge_hundredths(&self) -> u16 {
@@ -984,11 +1075,17 @@ impl World {
         {
             return Err(ModuleError::BerthRequired);
         }
+        if matches!(action, ModuleAction::PurchaseLaser { kind, .. } if kind.laser_profile().is_none())
+        {
+            return Err(ModuleError::NotForSale);
+        }
         let changes_energy = action
             .purchase_kind()
             .is_some_and(|kind| kind.slot() == ModuleSlot::Energy)
             || match action {
-                ModuleAction::Store { item } | ModuleAction::Install { item, .. } => self
+                ModuleAction::Store { item }
+                | ModuleAction::Install { item, .. }
+                | ModuleAction::InstallLaser { item, .. } => self
                     .modular
                     .ledger(self, account)
                     .map_err(ModuleError::Save)?
@@ -1090,7 +1187,9 @@ impl World {
                 .ok_or(ModuleError::SequenceExhausted)?
         } else {
             match review.action {
-                ModuleAction::Store { item } | ModuleAction::Install { item, .. } => item,
+                ModuleAction::Store { item }
+                | ModuleAction::Install { item, .. }
+                | ModuleAction::InstallLaser { item, .. } => item,
                 _ => return Err(ModuleError::NotForSale),
             }
         };
@@ -1122,7 +1221,10 @@ impl World {
             .map_err(ModuleError::Save)?;
         ledger.apply(event, (self.modular.purchase_count() + 1) as u32)?;
         let owner = review.dock.owner().seed();
-        let pulse_fitted = ledger.front().is_some_and(|i| i.id == owner + 7);
+        let pulse_fitted = ledger
+            .items
+            .iter()
+            .any(|i| i.id == owner + 7 && i.slot.is_some());
         let energy_fitted = ledger
             .fitted(ModuleSlot::Energy)
             .is_some_and(|i| i.id == owner + 5);
@@ -1177,6 +1279,22 @@ impl State {
         }
         Ok(changes)
     }
+    pub(super) fn laser_at_physical(
+        &self,
+        world: &World,
+        clock: u64,
+        facing: LaserFacing,
+    ) -> Option<OwnedModule> {
+        let mut ledger = Ledger::born(world.combat_identity()?.owner).ok()?;
+        let mut counters = [0; 2];
+        for event in &self.events {
+            if world.damage.berth_clock(event.dock.sequence())? > clock {
+                break;
+            }
+            ledger.replay(*event, &mut counters).ok()?;
+        }
+        ledger.fitted(facing.slot())
+    }
     pub(super) fn front_at_physical(&self, world: &World, clock: u64) -> Option<OwnedModule> {
         let mut ledger = Ledger::born(world.combat_identity()?.owner).ok()?;
         let mut counters = [0; 2];
@@ -1192,33 +1310,13 @@ impl State {
 }
 
 impl World {
-    fn historical_front_at_tick(&self, tick: u64) -> Option<OwnedModule> {
-        let mut ledger = Ledger::born(self.combat_identity()?.owner).ok()?;
-        let mut counters = [0; 2];
-        for event in self
-            .modular
-            .events
-            .iter()
-            .filter(|event| event.tick <= tick)
-        {
-            ledger.replay(*event, &mut counters).ok()?;
-        }
-        ledger.front()
-    }
-    pub(super) fn front_weapon_at_tick(
+    pub(super) fn laser_weapon_at_tick(
         &self,
         item: u64,
         tick: u64,
     ) -> Option<super::OrdinaryWeapon> {
-        let fitted = self.historical_front_at_tick(tick)?;
-        if item != fitted.id {
-            return None;
-        }
-        super::OrdinaryWeapon::from_module(fitted.kind)
-    }
-    pub(super) fn front_cadence_at_tick(&self, tick: u64) -> Option<u8> {
-        super::OrdinaryWeapon::from_module(self.historical_front_at_tick(tick)?.kind)
-            .map(super::OrdinaryWeapon::cooldown_ticks)
+        let owner = self.combat_identity()?;
+        self.owned_laser_at(item, tick, owner)
     }
 }
 
@@ -1244,9 +1342,17 @@ impl World {
         }
         let (action, item, xyzzy) = if let Some(item) = existing {
             (
-                ModuleAction::Install {
-                    item: item.id,
-                    replacing: ledger.fitted(kind.slot()).map(|item| item.id),
+                if kind.laser_profile().is_some() {
+                    ModuleAction::InstallLaser {
+                        item: item.id,
+                        facing: LaserFacing::Front,
+                        replacing: ledger.fitted(ModuleSlot::FrontLaser).map(|item| item.id),
+                    }
+                } else {
+                    ModuleAction::Install {
+                        item: item.id,
+                        replacing: ledger.fitted(kind.slot()).map(|item| item.id),
+                    }
                 },
                 item.id,
                 false,
@@ -1272,9 +1378,16 @@ impl World {
         ledger.apply(event, grant).map_err(|_| INVALID)?;
         let owner = dock.owner().seed();
         let born_fitted = |slot, offset| {
-            ledger
-                .fitted(slot)
-                .is_some_and(|item| item.id == owner + offset)
+            if slot == ModuleSlot::FrontLaser {
+                ledger
+                    .items
+                    .iter()
+                    .any(|item| item.id == owner + offset && item.slot.is_some())
+            } else {
+                ledger
+                    .fitted(slot)
+                    .is_some_and(|item| item.id == owner + offset)
+            }
         };
         let account = current
             .prepare_module(
@@ -1327,5 +1440,56 @@ impl State {
             }
         }
         Ok(changes)
+    }
+}
+
+impl World {
+    pub fn laser_offers(&self, facing: LaserFacing) -> Vec<ModuleOffer> {
+        self.module_offers()
+            .into_iter()
+            .filter(|offer| offer.kind.laser_profile().is_some())
+            .map(|mut offer| {
+                offer.slot = facing.slot();
+                offer.available = self
+                    .review_module(
+                        ModuleAction::PurchaseLaser {
+                            kind: offer.kind,
+                            facing,
+                        },
+                        self.state.tick,
+                    )
+                    .is_ok();
+                offer
+            })
+            .collect()
+    }
+    pub(super) fn laser_facing_at_tick(
+        &self,
+        item: u64,
+        tick: u64,
+        owner: super::CombatIdentity,
+    ) -> Option<LaserFacing> {
+        let current = self.combat_identity()?;
+        if current.owner != owner.owner || current.hull != owner.hull || owner.visit > current.visit
+        {
+            return None;
+        }
+        let item = self.modular.item_at(owner.owner, item, tick, owner.visit)?;
+        item.kind.laser_profile()?;
+        LaserFacing::from_slot(item.slot?)
+    }
+}
+
+impl World {
+    pub(super) fn laser_profile_at_tick(
+        &self,
+        item: u64,
+        tick: u64,
+        facing: LaserFacing,
+    ) -> Option<super::OrdinaryWeapon> {
+        if self.laser_facing_at_tick(item, tick, self.combat_identity()?)? != facing {
+            return None;
+        }
+        self.laser_weapon_at_tick(item, tick)
     }
 }
