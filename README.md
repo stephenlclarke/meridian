@@ -22,24 +22,32 @@
 [![Rust 1.99](https://img.shields.io/badge/Rust-1.99.0-000000?logo=rust)](rust-toolchain.toml)
 [![Preview platforms](https://img.shields.io/badge/preview%20platforms-macOS%20%7C%20Windows-blue)](docs/PREVIEW-RELEASES.md)
 [![macOS signing](https://img.shields.io/badge/macOS%20signing-Developer%20ID-green)](docs/PREVIEW-RELEASES.md)
-[![Notarization unconfirmed](https://img.shields.io/badge/notarization-unconfirmed-orange)](docs/IMPLEMENTATION-STATUS.md)
+[![Preview 8 notarization](https://img.shields.io/badge/Preview%208%20Mac-notarized%20%2B%20stapled-green)](docs/PREVIEW-RELEASES.md)
 [![Source-visible license](https://img.shields.io/badge/license-proprietary%20%2F%20source--visible-blue)](LICENSE)
 
 Meridian is a Rust reimplementation of the original L337 project, with direct wgpu graphics, one authoritative World and traceable original content. New code is [proprietary/source-visible](LICENSE); imported original content retains its own notices. Original Elite/Oolite assets are excluded.
 
-The current [EMP electrical weapon candidate](docs/EMP.md) has passed Mac, Linux and native Windows qualification: 631 Rust tests, 99 Python tests, 49 Markdown checks, strict Clippy and locked release builds per platform. The signed Mac candidate has also passed bounded native paid purchase, store/refit, first grades and cold Continue checks, plus early charge cancellation, one pulse release and an insufficient-bank refusal. A separately labelled XYZZY-supported setup also passed two native pulses, player and target electrical disablement, blocked controls/travel, cold disabled persistence and unheld recovery over 2326 accepted World ticks. The target was stationary; moving coast and the precise native recovery boundary remain unobserved. EMP is not part of the published Preview 7.
+The current [Preview 8 EMP utility](docs/EMP.md) is published for macOS arm64 and Windows x64. It adds paid purchase, fitting, storage and power/capacity/recharge upgrades, a held-U pulse and electrical disablement that preserves hull, crew and cargo custody. Mac, Linux and native Windows qualification passed 631 Rust tests, 99 Python tests and 49 Markdown checks per platform, strict Clippy and locked release builds. The release uses corrected source `2d5f4a5`; the full earlier EMP native journey retains its separate `5e3e98a` identity. See [implementation status](docs/IMPLEMENTATION-STATUS.md) for the exact evidence and open limits.
 
 ## Previews and validation
 
 Download qualified macOS arm64 and Windows x64 prereleases from [GitHub Releases](https://github.com/stephenlclarke/meridian/releases). Use the launcher and Read Me included with your download. Keep its app, notices and versioned save folder together; preserve earlier previews and profiles separately. Releases use Conventional Commit versions and immutable annotated tags, and retain the newest three published previews after verified downloads and a durable receipt.
 
-Mac apps are Developer ID signed and independently verified after archive extraction. Signing is separate from notarization. Apple accepted the latest submission, but subsequent status requests returned HTTP401; the final decision and stapling remain unconfirmed. The account owner reports no outstanding agreements. Windows games remain unsigned; each package documents its runtime requirements. Native Windows interactive gameplay remains unobserved.
+The Preview 8 Mac app is Developer ID signed, notarized and stapled. Apple accepted the new EMP submission; the actual public download passed strict signature, ticket and Gatekeeper checks. No older ticket was reused. Windows remains unsigned and requires the external Microsoft Visual C++ x64 runtime; no DLL is bundled. Native Windows interactive gameplay remains unobserved. Notarization does not establish commercial content clearance or broader gameplay acceptance.
 
 ## Current Rust checkpoint
 
-[Preview 7 v0.7.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.7.0-preview.1) is published for macOS arm64 and Windows x64 from main `a05c69e`, compiled `076639d`. It includes contextual H/? Help on every station screen and in flight, station navigation instructions, and the explicit Ctrl+Shift+X XYZZY testing menu. All three owned platforms passed 603 Rust tests, 99 Python tests, 48 Markdown checks, formatting, all-target checks, strict Clippy and release builds. All six exact-main CI jobs and Sonar passed with zero unresolved issues and 91.8% new-code coverage. The two documentation changes between compiled and published source leave all game, asset, lock and test bytes unchanged.
+[Preview 8 v0.8.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.8.0-preview.1) was published on 18 November 2026 at 07:26 UTC from protected main `bf31ab7`, compiled source `2d5f4a5`. All 300 committed files and modes are identical between those revisions. It retains contextual H/? Help and explicit Ctrl+Shift+X XYZZY testing, and adds the paid EMP utility. All six exact-main CI checks passed. Sonar uses that exact commit as revision and project version: zero unresolved findings, 98.8% new coverage, zero new duplication and 100% hotspot review.
 
-All four public downloads, complete archive payloads, extracted Mac Developer ID signature and annotated tag were verified before the durable release receipt and retention cleanup. The newest three previews are v0.7, v0.6 and v0.5. The new signed Mac binary passed title/System Help, blocked modal input, explicit XYZZY activation and one intentional cold Continue across two launches and two observed normal quits. Its real save decoded through the new qualified core. The broader `c98fc86` native journey below retains its own binary identity. Windows GUI gameplay, full original XYZZY parity, native Lareria travel/refill, memory and measured performance remain open. Current saves use V17; no backward compatibility is required.
+All four actual anonymous downloads matched their sealed hashes. The complete 474-file Mac wrapper and 331-file Windows package matched their payload bytes and modes. All 1,465 Mac ZIP entries, including 732 AppleDouble metadata files, were checked separately from the extracted payload. The app, game and launcher passed strict Developer ID verification; the new EMP ticket passed stapler and Gatekeeper validation. The immutable annotated tag points to the protected main. The actual release receipt was saved and flushed before removing only v0.5 and its tag. Retained previews are v0.8, v0.7 and v0.6.
+
+The new `2d5f4a5` Mac binary passed bounded title/Help, equipment/pylon and ordinary-flight checks, two normal exits with code 0, one cold Continue and 430 unheld accepted ticks. Position advanced while speed, orientation, ownership and cash/cargo stayed consistent; Space input does not prove a stopped ship. The full paid EMP purchase/grade/cancel/pulse/disable/recovery journey remains earlier `5e3e98a` evidence through the independently reviewed three-helper semantic inverse; it was not repeated on the new binary. Its labelled headless/XYZZY setup was not native-earned progression.
+
+Moving EMP-disabled coast, Help interruption during held U, the exact native 1,800/1,801-tick recovery boundary, Windows GUI gameplay, full original XYZZY parity and native Lareria travel/refill remain open. The original 416-object/19,936-byte leak is unresolved; a scoped negative 472-second run does not establish a cure, an OS-only cause or current memory acceptance. Mission/fleet completion, measured performance, original-input obligations, upstream Apple SDK policy and commercial content acceptance remain separate. Current saves use V17 with the EMP content fingerprint; unsupported older content refuses without migration. Use the isolated profile supplied with each download.
+
+### Earlier Preview 7 Help and XYZZY evidence
+
+[Preview 7 v0.7.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.7.0-preview.1) retains main `a05c69e` and compiled `076639d`. Its 603 Rust, 99 Python and 48 Markdown checks per platform, 91.8% exact-main new coverage, bounded new-binary Help/activation/cold-Continue checks and broader earlier `c98fc86` journey retain those original identities. Preview 8 does not turn them into new native runs. Preview 7 was Developer ID signed without an EMP notarization claim.
 
 ### Earlier Preview 6 mining evidence
 
@@ -65,7 +73,7 @@ A separate explicitly prepared public-core setup supplied four nonfatal contacts
 
 ## Play
 
-N starts a commander; C continues a current-format V17 save. Earlier formats refuse without changing the file. Use a separate profile for this candidate. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.
+N starts a commander; C continues a current-format V17 save with the supported EMP content fingerprint. Unsupported formats/content refuse without changing the file. Use the download’s isolated profile: `Meridian EMP Sonar Preview/saves-current-emp-2d5f4a5` under macOS Application Support, or adjacent `saves-emp-2d5f4a5` on Windows. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.
 
 H or ? opens a dismissible help popup for the current screen, including station details and transaction reviews. Every station popup lists 1 Galaxy, 2 System, 3 Showroom, 4 Market, 5 Equipment, Tab/Shift+Tab and Escape/back. Escape, H or ? closes help and retains the screen, selection, search and review. Gameplay and underlying actions wait while help is open. During galaxy text search, H remains a typed letter and ? opens help.
 
@@ -77,7 +85,8 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | L; W/S; arrows; A/D; Q/E; Space | Launch; thrust; pitch; yaw; roll; brake |
 | J; T; R; Enter; B; F | Travel; select contact; review; confirm; cancel; buy fuel |
 | M; [ / ]; G / Shift+G | Market; commodity selection; buy/sell one native unit |
-| O; K; U; Y | Equipment panel; buy/fit cargo bay; store; refit |
+| O; K; U; Y | Equipment panel; buy/fit cargo bay; store when docked; refit |
+| Hold U in active flight | Charge the fitted EMP for 600 accepted ticks; early release cancels |
 | I; V; X | Mission details; review all held freight deliveries; review abandonment |
 | F1; F2; F3; F4 | Next ship/practice lock; arm/safe; launch one missile; safe/unlock |
 | F7; F8; F10 | Review attempt closure; reception; fresh consent |
@@ -105,15 +114,15 @@ These are the source-grounded M2 and M3 boundaries; completed entries below desc
 
 | State | M2: flight, equipment and ordinary economy | M3: mission families and trusted clues |
 | --- | --- | --- |
-| Completed bounded slices | Seventeen finite commodity markets; basic paid equipment/storage/refitting; Pulse and finite missile/damage/save mechanics; bounded SH025 trader/pirate journey. | Freight custody, once-only receiving/payment/clue and cold-Continue foundations; bounded gunnery and navigation/trade lesson mechanics. |
-| In progress | Qualified NPC preview delivery; rapid/advanced lasers and energy profiles; authored mining and paid Fuel Scoops source; typed utility/XYZZY UI integration. Positive ore collection still needs eligible original body geometry. | Core prerequisites come first. Existing family mechanisms and source walkthroughs do not close the expanded mission acceptance ledger. |
-| Not yet implemented or accepted | EMP, positive salvage and bounty/legal consequences; remaining equipment and population gameplay acceptance. | Rust crew/passenger/rescue, investigation and Wayfarer family journeys, then their individual consent/failure/reward/cold-Continue acceptance. All 64 expanded runtime acceptances remain open. |
+| Completed bounded slices | Seventeen finite commodity markets; basic paid equipment/storage/refitting; Pulse and finite missile/damage/save mechanics; bounded SH025 trader/pirate journey; paid mining/Fuel Scoops with persistent pending ore; contextual Help/XYZZY; paid defensive EMP and grades with qualified tests and separately attributed native evidence. | Freight custody, once-only receiving/payment/clue and cold-Continue foundations; bounded gunnery and navigation/trade lesson mechanics. |
+| In progress | Positive ore collection still needs eligible original body geometry; broader equipment, utility, population and ship-exchange acceptance remains open. | Core prerequisites come first. Existing family mechanisms and source walkthroughs do not close the expanded mission acceptance ledger. |
+| Not yet implemented or accepted | Broader EMP civilian/off-system behavior, positive salvage and bounty/legal consequences; remaining equipment and population gameplay acceptance. | Rust crew/passenger/rescue, investigation and Wayfarer family journeys, then their individual consent/failure/reward/cold-Continue acceptance. All 64 expanded runtime acceptances remain open. |
 
 Fleet construction is a separate M4 lane. Its current changed original-five run returned no candidate meshes; no new hull admission follows from focused tests. Original mesh/material/colour fidelity and 1337 visual/mechanics parity remain requirements across these milestones. See the [source-grounded roadmap](docs/LEGACY-MILESTONES.md).
 
 ## Context help and XYZZY testing
 
-Preview 7 combines screen-specific H/? help with explicit [XYZZY testing](docs/XYZZY.md). Every station help popup explains how to reach Galaxy, System, Showroom, Market and Equipment. Help pauses host stepping and preserves the current screen, selection, search and review. The large permanent control list is removed from the flight HUD.
+Preview 8 retains screen-specific H/? help with explicit [XYZZY testing](docs/XYZZY.md). Every station help popup explains how to reach Galaxy, System, Showroom, Market and Equipment. Help pauses host stepping and preserves the current screen, selection, search and review. The large permanent control list is removed from the flight HUD.
 
 At a station berth, **Ctrl+Shift+X** opens the labelled XYZZY testing menu. Use Up/Down to choose, Enter to review, then Enter again to confirm and save; Escape/B cancels the review or closes the menu. H/? opens help above the menu. First activation changes the current commander to CLARKE and sets cash to 1,000,000 CR once. It grants/refits the supported SH025 outfit with explicit secret provenance; missiles and cargo stay finite. The menu shows actual cash, current jump reach, unlimited-fuel state and missing-system limits. Reading or closing it grants nothing. Other profiles are unchanged.
 
@@ -121,6 +130,10 @@ Source `c98fc86` passed Mac qualification: 603 top-level Rust tests (378 core, t
 
 PR 47 merged the composition at `de7d6bb`; main CI and the Sonar quality gate passed, but nine unresolved maintainability findings held publication. Correction `076639d` extracts four helpers and replaces five wildcard test imports with independently reviewed behavior and unchanged assertions. Its new Mac, Linux and native Windows binaries passed 603 Rust tests, 99 Python tests, strict Clippy and release builds. The separately signed Quality Preview passed bounded Help, explicit XYZZY activation and cold Continue checks. PR 48 merged at `a05c69e` after all final-head checks passed. All six main CI jobs and exact-main Sonar passed with zero unresolved issues; v0.7.0-preview.1 was published and its public downloads verified. The broader journey above remains attributed to `c98fc86`.
 
-The Help candidate now lists mission details and flight-lesson review/cancel/details in both the station HUD and flight popups. Its retained minimum-window regression checks the concise HUD hint, all those popup controls, complete card text, bounded rendering and unchanged saved state through docked, launch and all four flight views. The regression passed on the qualified Mac source; minimum-size native resizing remains unobserved.
+Published Help lists mission details and flight-lesson review/cancel/details in both the station HUD and flight popups. Its retained minimum-window regression checks the concise HUD hint, all those popup controls, complete card text, bounded rendering and unchanged saved state through docked, launch and all four flight views. The regression passed on the qualified Mac source; minimum-size native resizing remains unobserved.
 
-The next EMP source candidate includes an authored paid Equipment utility slot, held-U flight control and contextual Help/readouts. Fifteen core and six host regressions are authored, not run. It is not part of published Preview 7; see [EMP scope and acceptance](docs/EMP.md).
+Preview 8 includes the paid Equipment EMP utility slot, held-U flight control and contextual Help/readouts. Its bank starts empty; docked U remains Store. The current defensive slice requires a real recent attacker and valid physical geometry. It does not grant salvage, cargo, bounty or crew rewards. See [EMP scope and acceptance](docs/EMP.md) for prices, grades, electrical rules and the remaining native boundaries.
+
+## Offline reference importer
+
+The [Rust reference importer](crates/meridian-import/README.md) converts only the pinned original SH025/SH028 source into the five existing binary fixtures. It preserves original notices and emits its own Rust producer receipt. The current source has passed designated Mac, Linux and native Windows qualification, including actual CLI conversion and the current core loader. Protected integration and final-main checks are pending. It does not add ships or change gameplay, and is not included in Preview 8.

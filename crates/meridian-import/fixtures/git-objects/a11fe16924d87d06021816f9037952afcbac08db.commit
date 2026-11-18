@@ -1,0 +1,12 @@
+tree 68fec574df12ddf74acb14747e0dd6839f478642
+parent 304138150c3eee8f2c7205fcb3e56a0dd578b49a
+author Steve <stephenlclarke@mac.com> 1794741221 +0000
+committer Steve <stephenlclarke@mac.com> 1794741833 +0000
+gpgsig -----BEGIN SSH SIGNATURE-----
+ U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgCrhjiSyyo90CGqoXzHuSxQHZps
+ +tStJ9skm8FGPyywIAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5
+ AAAAQNsEjQS9ZUbIjQ1VgsrSALGQIQ/8cL3V6IuL17af1mUOWslh58e1TAMuc1uFiPnSIr
+ mk+x6S4UacC8jl5/b81QY=
+ -----END SSH SIGNATURE-----
+
+fix: bind test metadata to explicit owned build roots

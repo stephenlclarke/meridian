@@ -1,0 +1,74 @@
+{
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sources": [
+    {
+      "id": "SH025",
+      "path": "Sources/L337Core/Resources/Ships/SH025.toml",
+      "sha256": "aa8fd7b22b8881d6c4bb1017d981fe8a29907ee8243e4bfe0dfd9215a5c80883",
+      "bytes": 690857,
+      "gitBlob": "ec62ccae9acfc05b92c3c4591f079fc7ba4bf1cf"
+    },
+    {
+      "id": "SH028",
+      "path": "Sources/L337Core/Resources/Ships/SH028.toml",
+      "sha256": "65d68f37ca2ad8552d35a54550651afa86ff7f60625c401bb79c7250c4167ca9",
+      "bytes": 1397484,
+      "gitBlob": "98fe3f3aaa6eb7691ddb6a513e32e788fb2f209b"
+    }
+  ],
+  "outputs": {
+    "sh025.mesh": {
+      "sha256": "b85d726da742da00a68643429fc109b28343e164601aa013abb9aa045717c6d7",
+      "bytes": 250848
+    },
+    "sh028.mesh": {
+      "sha256": "123a63ff56db7965baba2f54d3ed4b5feab62c47115aef0a5d9a2970b6cb897e",
+      "bytes": 724032
+    },
+    "sh025.physics": {
+      "sha256": "b43418aee89564759a5db789f8efa604222a392c69a2024c7a9ed2156eff434d",
+      "bytes": 24448
+    },
+    "sh028.physics": {
+      "sha256": "cd54d30cab638f6b33feacf1fa78c9136f8ce346e8cc6133259bfc0472c259d5",
+      "bytes": 12400
+    },
+    "sh028.port": {
+      "sha256": "31a7ed33803e78ebbe7bb87c0658e47a786e8bba9107d513b2e534ccd30cf71f",
+      "bytes": 188
+    }
+  },
+  "legacyManifests": {
+    "manifest.json": {
+      "sha256": "a9f8c378e88deadb09001f730457097c5c4e2fa92527e1682e4b67e78cbecc8b",
+      "bytes": 949,
+      "scope": "Existing Python recipe provenance; retained unchanged and never used as the Rust producer label"
+    },
+    "station-manifest.json": {
+      "sha256": "b96802bf73b78eb2ab33f4311b8a810c508f9cc19c399bf000affacf09518ea2",
+      "bytes": 4073,
+      "scope": "Existing Python recipe provenance; retained unchanged and never used as the Rust producer label"
+    }
+  },
+  "legacyRecipes": {
+    "tools/import_ship.py": {
+      "sha256": "c7fc9b0b0cf73b7740f883acbb81c53c621986570a8b8e73e9ba8cc4299826a1",
+      "sourceCommit": "a583b61e4e4536003414ee9f5448131744f62eb2"
+    },
+    "tools/import_station.py": {
+      "sha256": "63b5d17232b0d9ec080346cb830bbe7787929906857550370b780faf34c25470",
+      "sourceCommit": "a583b61e4e4536003414ee9f5448131744f62eb2"
+    }
+  },
+  "notice": {
+    "path": "SOURCE-NOTICE.txt",
+    "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766",
+    "bytes": 1071
+  },
+  "palette": {
+    "formula": "c/12.92 if c<=0.04045 else ((c+0.055)/1.055)**2.4; c=byte/255; round to binary32",
+    "entries": 256,
+    "binary32LEsha256": "48a8f05136456237aae2c5349e5f0199a182daa19b7c099eb542058f794b9c5b"
+  },
+  "scope": "Independent original-input and already committed output fixtures. Binary formats and original notices retained; no new geometry or gameplay admission."
+}
