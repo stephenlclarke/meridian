@@ -93,6 +93,7 @@ enum FrameAdvance {
 struct App {
     game: Profile,
     validation_view: FlightView,
+    validation_timing: Option<mule_validation::FrameTiming>,
     celestial: crate::celestial::WorldAdapter,
     quit_failed: bool,
     renderer: Option<Renderer>,
@@ -132,6 +133,7 @@ impl App {
         Self {
             game,
             validation_view: FlightView::Front,
+            validation_timing: internal.then(mule_validation::FrameTiming::default),
             quit_failed: false,
             celestial: crate::celestial::WorldAdapter::default(),
             renderer: None,
@@ -463,7 +465,12 @@ impl App {
             return;
         }
         match self.game.prepare_quit() {
-            Ok(()) => event_loop.exit(),
+            Ok(()) => {
+                if let Some(timing) = self.validation_timing.take() {
+                    eprintln!("{}", timing.report());
+                }
+                event_loop.exit();
+            }
             Err(error) => {
                 self.paused = true;
                 self.reset_input();
@@ -1056,6 +1063,7 @@ impl App {
                     .as_ref()
                     .and_then(Docked::review_capture_identity),
             );
+            let draw_started = self.validation_timing.is_some().then(Instant::now);
             let presented = renderer.draw(
                 &snapshot,
                 station,
@@ -1079,6 +1087,9 @@ impl App {
                     help: self.help.as_ref().or(xyzzy_panel.as_ref()),
                 },
             );
+            if let (Some(started), Some(timing)) = (draw_started, &mut self.validation_timing) {
+                timing.observe(&presented, started.elapsed());
+            }
             if let Err(error) = Self::complete_presentation(
                 presented,
                 &mut self.docked,

@@ -1,9 +1,45 @@
 //! Explicit internal entry, no default directory/profile/save access or new actor authority.
 use crate::profile::Profile;
 use meridian_core::{FlightStart, OriginalStationData, World, mule::MuleHullSource};
-use std::{ffi::OsString, io, path::PathBuf};
+use std::{ffi::OsString, io, path::PathBuf, time::Duration};
 
 const DOCKING_TICK_LIMIT: u64 = 160;
+
+/// Wall time inside renderer.draw for internal frames whose present call returned.
+#[derive(Default)]
+pub(super) struct FrameTiming {
+    frames: u64,
+    sum_ns: u128,
+    range_ns: Option<(u128, u128)>,
+}
+
+impl FrameTiming {
+    pub(super) fn observe(
+        &mut self,
+        result: &Result<crate::renderer::Presentation, String>,
+        elapsed: Duration,
+    ) {
+        if !matches!(result, Ok(crate::renderer::Presentation::Presented)) {
+            return;
+        }
+        let ns = elapsed.as_nanos();
+        self.frames += 1;
+        self.sum_ns += ns;
+        let (min, max) = self.range_ns.unwrap_or((ns, ns));
+        self.range_ns = Some((min.min(ns), max.max(ns)));
+    }
+
+    pub(super) fn report(&self) -> String {
+        let (min, max) = self.range_ns.map_or_else(
+            || ("null".into(), "null".into()),
+            |(min, max)| (min.to_string(), max.to_string()),
+        );
+        format!(
+            "MULE_PRESENTED_DRAW_WALL {{\"presentedFrames\":{},\"totalNanoseconds\":{},\"minNanoseconds\":{min},\"maxNanoseconds\":{max}}}",
+            self.frames, self.sum_ns
+        )
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) enum View {

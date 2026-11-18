@@ -417,3 +417,30 @@ fn docking_modes_hold_the_real_terminal_frame_and_display_its_outcome() {
         assert_eq!(ok(app.validation_control(KeyCode::Escape)), Control::Quit);
     }
 }
+
+#[test]
+fn presented_draw_timing_aggregates_empty_single_and_multiple_samples() {
+    use crate::renderer::Presentation;
+    let mut timing = FrameTiming::default();
+    timing.observe(&Ok(Presentation::Skipped), Duration::from_nanos(900));
+    timing.observe(&Err("draw failed".into()), Duration::from_nanos(900));
+    assert_eq!(
+        timing.report(),
+        r#"MULE_PRESENTED_DRAW_WALL {"presentedFrames":0,"totalNanoseconds":0,"minNanoseconds":null,"maxNanoseconds":null}"#
+    );
+    timing.observe(&Ok(Presentation::Presented), Duration::from_nanos(20));
+    assert_eq!(
+        timing.report(),
+        r#"MULE_PRESENTED_DRAW_WALL {"presentedFrames":1,"totalNanoseconds":20,"minNanoseconds":20,"maxNanoseconds":20}"#
+    );
+    for ns in [12, 34] {
+        timing.observe(&Ok(Presentation::Presented), Duration::from_nanos(ns));
+    }
+    assert_eq!(
+        timing.report(),
+        r#"MULE_PRESENTED_DRAW_WALL {"presentedFrames":3,"totalNanoseconds":66,"minNanoseconds":12,"maxNanoseconds":34}"#
+    );
+    let directory = TestDirectory::new();
+    let ordinary = App::with_profile(crate::profile::tests::open(&directory.0));
+    assert!(ordinary.validation_timing.is_none());
+}
