@@ -4,7 +4,7 @@
 
 The internal desktop build renders the original Mule in a World-owned station scene. On the MacBook Pro, the close broadside view showed the pods, narrow supports and open gaps without a prominent halo. The validation scene starts paused and runs without a commander or save file. [Internal launch controls](MULE-VALIDATION-LAUNCH.md)
 
-The collision surface uses 34 rounded pieces. All six tested openings remained clear, including the pannier gaps. At four wells, the original low-detail rims extend beyond the detailed surface. The approved Mule collision shape encloses both originals there. The largest sampled separation was 0.765 m. Physical docking, blocked entry and collision cost still need validation before Mule joins the playable fleet. [Geometry and test evidence](MULE-GAMEPLAY-ENVELOPE.md)
+The collision surface uses 34 rounded pieces. All six tested openings remained clear, including the pannier gaps. At four wells, the original low-detail rims extend beyond the detailed surface. The approved Mule collision shape encloses both originals there. The largest sampled separation was 0.765 m. Two internal modes now exercise an aligned approach and an approach toward the station wall. Both start paused. Press P to run to the crossing or refusal, or period to step one World tick. These modes and their timing measurements await qualification before Mule joins the playable fleet. [Geometry and test evidence](MULE-GAMEPLAY-ENVELOPE.md)
 
 ## Independent single-window observer prepared, execution prohibited pending exception
 

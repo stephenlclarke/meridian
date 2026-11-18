@@ -93,6 +93,7 @@ enum FrameAdvance {
 struct App {
     game: Profile,
     validation_view: FlightView,
+    validation_timing: Option<mule_validation::FrameTiming>,
     celestial: crate::celestial::WorldAdapter,
     quit_failed: bool,
     renderer: Option<Renderer>,
@@ -132,6 +133,7 @@ impl App {
         Self {
             game,
             validation_view: FlightView::Front,
+            validation_timing: internal.then(mule_validation::FrameTiming::default),
             quit_failed: false,
             celestial: crate::celestial::WorldAdapter::default(),
             renderer: None,
@@ -463,7 +465,12 @@ impl App {
             return;
         }
         match self.game.prepare_quit() {
-            Ok(()) => event_loop.exit(),
+            Ok(()) => {
+                if let Some(timing) = self.validation_timing.take() {
+                    eprintln!("{}", timing.report());
+                }
+                event_loop.exit();
+            }
             Err(error) => {
                 self.paused = true;
                 self.reset_input();
@@ -622,14 +629,7 @@ impl App {
         let result = if active && !self.modal_open() && self.game.is_internal_validation() {
             self.pulse = None;
             self.mining = None;
-            step_frame(
-                &mut self.game.world,
-                FlightInput::default(),
-                ticks,
-                false,
-                &mut self.pulse,
-                &mut self.mining,
-            )
+            self.advance_validation(ticks)
         } else if active && !self.modal_open() {
             let input = FlightInput {
                 pitch: self.axis(KeyCode::ArrowUp, KeyCode::ArrowDown),
@@ -865,6 +865,7 @@ impl App {
                 return;
             }
         };
+        let active = self.simulation_active();
         let snapshot = self.game.world.snapshot();
         // The beam is a short-lived view of the committed shot, never saved or re-fired.
         self.pulse = self.pulse.filter(|shot| {
@@ -1062,6 +1063,7 @@ impl App {
                     .as_ref()
                     .and_then(Docked::review_capture_identity),
             );
+            let draw_started = self.validation_timing.is_some().then(Instant::now);
             let presented = renderer.draw(
                 &snapshot,
                 station,
@@ -1085,6 +1087,9 @@ impl App {
                     help: self.help.as_ref().or(xyzzy_panel.as_ref()),
                 },
             );
+            if let (Some(started), Some(timing)) = (draw_started, &mut self.validation_timing) {
+                timing.observe(&presented, started.elapsed());
+            }
             if let Err(error) = Self::complete_presentation(
                 presented,
                 &mut self.docked,
