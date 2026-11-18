@@ -1,0 +1,18 @@
+{
+  "status": "AUTHORED_UNRUN_BOUNDED_TEST_CONTROL_CFG_IMPORT_FIX",
+  "parentAuthor": "5aa0bf9c7bfbd1b52bee2f6ea09c21d385032990",
+  "wholeReviewedRoot": "391795d32cdabff629b60256e268e9008a552885",
+  "wholeReviewedTree": "27f4517295819e82313636b60c16d9770dcf1199",
+  "findingAddressed": "G2-GEOMETRY-SEPARATED-SECTIONS-1",
+  "changes": "cfg(test) on exactFacet::section control anditsonlyadd/scaleimports; sub remains production. No body/math/price/guard/control deletion/suppression.",
+  "preservation": "Complete source.rs restoresbyteexactbyremovingmethodcfg andjoiningimports. All84testbodies andeveryothersrc/testfilebyteexact. Whole geometry/accounting review carried tobounded closure.",
+  "currentRustCount": 84,
+  "hostCount": 9,
+  "newTests": 0,
+  "currentExecution": "UNRUN; source-established warning only, notexecutedcompiler/lint failure",
+  "contractSHA256": "e219757d79ceb108139c1de6f23817145d3b7d411dacb6a77fe78be4a92ddd5a",
+  "custodySHA256": "cd887cf0531e06f7fabd9463711db0f58605f52651be162252a09f813ebc0df9",
+  "freezeSHA256": "bf66cd52fb192cf599e52d30cf6e01ce4ffb33fe74f0979a2d12503bbd4e17a2",
+  "parentReviewSHA256": "38b47cffd44ad074abab79b068cc4a02b22d8cbe9dd4b0559b8ea7f4fdebff04",
+  "qualification": "Root successor since5aa only; ONEG2bounded/unaffectedclosure carryingwhole clear; existingG1heldprep untilclosure thenchanged84/9/checkClippyBuild thenONEwholefiveonlyALLPASS"
+}

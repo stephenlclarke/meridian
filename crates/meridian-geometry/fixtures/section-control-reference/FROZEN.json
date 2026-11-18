@@ -1,0 +1,9 @@
+{
+  "parent": "5aa0bf9c7bfbd1b52bee2f6ea09c21d385032990",
+  "files": {
+    "before-source.rs": {
+      "bytes": 12810,
+      "sha256": "d09b092bfb0d35a47233d1cd85ffd7615be0267a07277955c977a1961f932ad1"
+    }
+  }
+}

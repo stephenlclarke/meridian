@@ -1,0 +1,37 @@
+{
+  "parentAuthor": "5aa0bf9c7bfbd1b52bee2f6ea09c21d385032990",
+  "wholeReviewedRoot": "391795d32cdabff629b60256e268e9008a552885",
+  "wholeReviewedTree": "27f4517295819e82313636b60c16d9770dcf1199",
+  "reviewVerdict": "CHANGES_REQUIRED_ONE_ORPHANED_TEST_CONTROL_DEAD_CODE_FINDING;WHOLE_GEOMETRY_SEMANTICS_OTHERWISE_CLEAR",
+  "reviewFile": {
+    "path": "integration/section-control-gate/PARENT-REVIEW.json",
+    "bytes": 11141,
+    "sha256": "38b47cffd44ad074abab79b068cc4a02b22d8cbe9dd4b0559b8ea7f4fdebff04"
+  },
+  "rootReviewSource": {
+    "path": "/private/tmp/meridian-root-separated-sections-review/SOURCE.json",
+    "bytes": 5492,
+    "sha256": "83c8c6401e3308a54d98c0342a4859ea7c5cad2a516a0a806fff87eef568b467"
+  },
+  "verifiedRootPayloads": [
+    {
+      "path": "/private/tmp/meridian-root-separated-sections-review/ALL-SOURCE-PINS.json",
+      "bytes": 149894,
+      "sha256": "de1ace9736c5d449905f5bd96cba06d504e4fc629d2483c709af049abdb49505"
+    },
+    {
+      "path": "/private/tmp/meridian-root-separated-sections-review/SOURCE.tar",
+      "bytes": 29061120,
+      "sha256": "8c685f3e6b1524440f2aa85f5dbabe7bc97ca990d6f2977ee820e19a76cb2825"
+    },
+    {
+      "path": "/private/tmp/meridian-root-separated-sections-review/DELTA.patch",
+      "bytes": 342001,
+      "sha256": "e5d74cfdfaccaff4e9d065a32016501df20be246411f3ac752bcb729165047db"
+    }
+  ],
+  "all457ParentCrateGitPinsMatchWholeReviewedRoot": true,
+  "findingAddressed": "G2-GEOMETRY-SEPARATED-SECTIONS-1",
+  "carryWholeReview": "G2 whole geometry/accounting/control preservation otherwise clear. Carry complete whole/unaffected review to one bounded cfg/import-only closure.",
+  "actualExecution": "Current84Rust9host/compiler/Clippy/build/wholefive UNRUN; static warning/gate finding is not an executed compiler or lint failure. ExistingG1 preparation held until closure. Prior actual69 80Rust9host/checkClippyBuildPASS and5Operationsrefusals15UNRUN0candidates remain separate prior custody."
+}

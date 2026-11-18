@@ -6,6 +6,7 @@ import subprocess
 from pathlib import Path
 from restore_separated_sections import restore_separated
 from strip_budget_context import body
+from restore_section_control import restore_section_control
 
 CRATE = Path(__file__).resolve().parents[1]
 REPO = CRATE.parents[1]
@@ -58,7 +59,7 @@ def verify():
             assert body(after, signature) == body(old, signature), (path, signature)
             count += 1
         if Path(path).name not in ['certificate.rs', 'spatial_index.rs', 'sections.rs', 'convex_sections.rs']:
-            assert after == old, path
+            assert restore_section_control(Path(path).name, after) == old, path
     assert count == 80, count
     print('PASS_SOURCE_ONLY: all80 old bodies byte exact incl cell prototype; four-file inverse; frozen completec776 publisher; original rows/collector/joint/ray/fields/box logic retained as independent controls; main only constructor withdrawal and three new entry names; no compiler or geometry executed')
 

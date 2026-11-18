@@ -1,0 +1,102 @@
+{
+  "reviewedAtUTC": "2026-11-18T14:36:47.655517+00:00",
+  "verdict": "CHANGES_REQUIRED_ONE_ORPHANED_TEST_CONTROL_DEAD_CODE_FINDING;WHOLE_GEOMETRY_SEMANTICS_OTHERWISE_CLEAR",
+  "head": "391795d32cdabff629b60256e268e9008a552885",
+  "tree": "27f4517295819e82313636b60c16d9770dcf1199",
+  "immediateParent": "69e10cb13de0dc793646dbddebffeef29bf1e06c",
+  "packet": {
+    "path": "/private/tmp/meridian-root-separated-sections-review/SOURCE.json",
+    "bytes": 5492,
+    "sha256": "83c8c6401e3308a54d98c0342a4859ea7c5cad2a516a0a806fff87eef568b467"
+  },
+  "findings": [
+    {
+      "id": "G2-GEOMETRY-SEPARATED-SECTIONS-1",
+      "priority": "P2",
+      "file": "crates/meridian-geometry/src/source.rs",
+      "line": 223,
+      "title": "Gate the now-unused physical-section control to test builds",
+      "body": "The new production collector calls joint_section_source, which no longer delegates physical-only work to Facet::section. Every remaining .section call is in cfg(test) modules/functions, including the retained joint_section control. Facet::section itself remains pub(crate) and compiled in the normal library at source.rs223 with no dead-code allowance. It is therefore dead code in the non-test target, so the required strict Clippy -D warnings gate will fail even though test builds use it. This is a source-established warning/gate blocker, not an executed compiler/lint result.",
+      "requestedChange": "Retain the exact independent method body but compile it under cfg(test), and gate the add/scale imports that are used only by that method in source.rs to avoid replacing the dead-code warning with unused imports. Do not remove the control, add lint suppressions or alter geometry/prices/guards/assertions. Update the bounded source-preservation proof for that metadata/import-only correction.",
+      "evidence": "Repository-wide .section call search: only source.rs test module, sections.rs cfg(test) joint_section and cfg(test) test modules. Production new kernel has no call. source.rs add/scale are used only inside section; sub remains used by production normal/contains code. No crate-level allow(dead_code)/allow(warnings) exists."
+    }
+  ],
+  "independentChecks": {
+    "cleanExactHeadTreeImmediateParent": true,
+    "rootGitWorkingSourceTarBytesModes": 596,
+    "changedPaths": 30,
+    "unchangedPaths": 566,
+    "authorCratePinsAndSourceArchive": 457,
+    "all439AuthorParentCrateFilesExactActual69": true,
+    "authorManifestPayloadHashes": 7,
+    "completeArchiveMembers": 8,
+    "canonicalRootDeltaVerified": true,
+    "fourCompleteProductionFileInversesAndSixFrozenReferencesHashed": true,
+    "fullPublisherControlExactExceptFunctionName": true,
+    "all80OldTestBodiesByteExact": true,
+    "currentTestAttributes": 84,
+    "publisherRestoresByIndexWithdrawalAndThreeEntryNames": true,
+    "sevenOriginalSectionControlFunctionsByteExact": true,
+    "fiveOriginalConstructorQueryFunctionsByteExact": true,
+    "oldRowsControlBodyExactAfterOnlyFalseMetadataInitializerNormalization": true,
+    "newCollectorRestoresEntireOldBodyAfterOnlyThreeDispatchChanges": true,
+    "newRowsBuilderRestoresOriginalAfterOnlyStrictSeparationProofRemoved": true,
+    "facetOccupiedRestoresOriginalByRemovingOnlySeparatedSkip": true,
+    "actualParentCustodyTerminalPinsHashed": 51,
+    "actualParentCurrentRawArtifactPinsAndExactArchiveMatches": [
+      46,
+      46
+    ]
+  },
+  "wholeSemanticReview": [
+    "Production cell grouping and rank dispatch are withdrawn by restoring the original contiguous constructor and membership reservation and gating cell module/dispatch to tests. All cell implementation and test bodies remain unchanged. Original bounds, source ordinal storage, generic ray logic and prior independent publisher remain available to controls; no source geometry is changed by withdrawal.",
+    "Certified owner separation requires an original support whose exact projected affine distance is strictly positive at all three ORIGINAL source vertices. Affinity over their convex triangle gives a positive minimum finite gap on the entire source domain. Certified owner boundary triangles lie behind every original support, so a separated owner cannot supply a physical intersection/point/interval/coplanar field inside that source triangle; omitted raw segments would have clipped to None before protected/event admission. This is finite-domain geometry proof, not a sampled occupancy cache.",
+    "Parallel strictly positive constant proves a global source-plane gap; zero constant never marks separation. Existing own-source support lookup marks only outside outward occupancy and leaves separated=false. Equal/tangent/shared-edge/full-face/corner contacts and uncertified/unknown owner eligibility therefore remain. A previously established strict gap is preserved across later supports. Retained projected equations and arbitrary-sample occupied control stay unchanged; only occupied_facet may skip separated owners. Arrangement checks strict inside(domain,sample) before invoking visibility, so its callback satisfies this domain restriction.",
+    "Physical-only traversal preserves exact closed bbox predicates and adds charged separated-owner lookup. A uniform owner proves all descendants share that owner, allowing a known-unseparated flag to avoid repeated lookups; mixed leaves check original owner IDs. Joint traversal keeps physical/outward eligibility independent: only physical candidates gain separation filtering, while uncertified outward map membership, original whole-plane predicate, owner proof and multiplicity remain. Two/five fields per pending node fit the existing8perdepth stack bound. Original source order is retained; test-only cell mode still restores full ordered payloads.",
+    "New joint kernel preserves three exact distances and original all-zero coplanarity/three-edge output. Charged sign classification excludes edge walks only for all-strict-positive/all-strict-negative physical cases or all-positive/all-nonpositive outward-only cases. Physical zeros never qualify for this omission. Opposite nonzero sign bits equal the old negative distance-product predicate; outward positive/nonpositive comparison preserves the zero-below-epsilon convention. Every remaining edge keeps its visit and order.",
+    "Crossings ending on a zero-distance vertex reuse that exact original point; the same three checked coordinate visits still run. Nonzero crossings retain exact old interpolation and checks. Physical zero-point insertion, sorted min/max physical interval, duplicate limiting point multiplicity and incomplete-section refusal remain. No coordinate/UV bit guard, input audit, affine field, protected contact, star, witness, topology or positive-volume check is weakened.",
+    "Old physical-only kernel delegated into an extra48-slot guard under the96caller frame. New single shared kernel no longer has that nested frame; it admits96caller+8explicit sign/control scratch. This is a new actual workspace, not a waiver of the original retained control guard. Three distances plus classification cost4 in strict-empty case versus old completed edge walk; remaining actual edge/coordinate/hit/map/proof/lookup operations retain their prices. New finite proof evaluates each source vertex/support at1charged operation and stops only on actual failure of strictness or a prior proven gap. Separated bool fits existing16-owner reservation; equation geometry/storage is unchanged.",
+    "Rows build/collector wrappers restore their entry reservations on error after owned temporaries drop. Original rows/equations, independent32row construction/query scratch and map prices remain admitted; source kernel8scope releases on success/error after sign state drops while returned geometry remains under caller96. Node traversal stack and returned ordinal/record reservations remain. Publisher holds rows through arrangement callback and drops/releases before propagating arrangement failure. No global failed-prefix cleanup policy is changed.",
+    "Four authored cases compare all27signpatterns under4physical/outward flag combinations with exact old physical segments/coplanarity/limiting order; require reused oversized zero endpoint Rational refusal in both lanes; compare complete clipped arrangement/physical/protected/work outputs for parallel gap/nonparallel finite gap/equality; compare full primitive/subdivided opposite tetrahedron triangles/nonzero affine fields/all witnesses/retained ledger and analytic volume8/3; exercise exact/one-short row storage, collector rollback,104/103scratch and4/3operation boundaries. All lane labels and10x paired monotonic assertions remain unrun. Existing full-face/corner-negative and322/108/120 controls are retained.",
+    "Actual69 cell-index run had80Rust9host/checkClippybuildPASS but fiveOperations constructor refusals and no candidate. Extra cell setup charged about28k-31k and exhausted at earlier source IDs; that does not prove completed-original cost minima, speed or fit. Withdrawing that production prototype is consistent with evidence and does not claim a current success."
+  ],
+  "actualParentEvidence": {
+    "source": "69e10cb13de0dc793646dbddebffeef29bf1e06c",
+    "tree": "ab3714670816016f8838e5c2fafd21e0ea510573",
+    "rawFocusedRustCounts": [
+      62,
+      7,
+      9,
+      2
+    ],
+    "rustPassed": 80,
+    "hostPassed": 9,
+    "lockedCheck": "PASS",
+    "strictClippy": "PASS",
+    "devBuild": "PASS",
+    "rawPacket": {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-cell-index.69e10cb/RAW-PACKET.tar.gz",
+      "bytes": 21209288,
+      "sha256": "190cfcc7edbc33b73733fe2fb5719580b788759990db6deb2c01c57d0f552466"
+    },
+    "wholeFiveBodies": {
+      "declared": 25,
+      "decodePass": 5,
+      "constructorOperationsRefusals": 5,
+      "failed": 0,
+      "dependentUnrun": 15
+    },
+    "completeCandidates": 0,
+    "admissions": 0,
+    "wholeElapsedSeconds": 144.128453458,
+    "allFiveFailuresAndFullGuardContextsExactCustody": true,
+    "scope": "Source69 only; current84cases and whole-five UNRUN. Failed-prefix time is not completed-original speed proof."
+  },
+  "executionDecision": "First close the single test-control cfg/import finding through bounded source delta carrying this otherwise complete whole geometry review. ExistingG1 prepares only until actual closure; then exact-source84Rust9host/lockedcheck/strictClippy/devbuild when soleMac lane free. ONEalready-scoped changed whole-five25body workload ONLYallfocusedPASS under original2Moperations includingdecode/100kstorage/4096-bit coordinatesUV/512complete-outputfaces with source-lock-binary/input/precleanup-context/monotonic pins. No extra broad review or routine ACK gate.",
+  "limits": [
+    "No compiler,Cargo,Clippy,tests,SUT,geometry/native,suppliedverifier,reviewbot or integrationtesting executed byG2.",
+    "No humanWIP edit,newchat/agent,merge orpublication.",
+    "Current84Rust9host/compiler/build/wholefive remainUNRUN. Source math clear is not an executed pass,admission,fit,minimal-work or speed claim.",
+    "Separate202matrix,171fleet scope and legacy23/162ships+4/6stations remain separate."
+  ]
+}

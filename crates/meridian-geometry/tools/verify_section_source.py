@@ -7,6 +7,7 @@ import subprocess
 from strip_budget_context import strip_context
 from restore_live_runs import restore_runs
 from restore_spatial_index import restore_spatial
+from restore_section_control import restore_section_control
 from pathlib import Path
 
 CRATE = Path(__file__).resolve().parents[1]
@@ -25,6 +26,7 @@ def normalized(value):
 
 
 def verify():
+    subprocess.run(["python3", "-B", str(CRATE / "tools/verify_section_control_source.py")], check=True)
     subprocess.run(["python3", "-B", str(CRATE / "tools/verify_separated_sections_source.py")], check=True)
     subprocess.run(["python3", "-B", str(CRATE / "tools/verify_cell_index_source.py")], check=True)
     subprocess.run(["python3", "-B", str(CRATE / "tools/verify_face_contact_source.py")], check=True)
@@ -63,7 +65,7 @@ def verify():
     freeze = json.loads((control / "FROZEN.json").read_text())
     for relative in [*freeze["unchangedSharedAuthority"], "src/pruning.rs", "tests/adapter.rs", "tests/original_inputs.rs"]:
         if relative not in ["src/adapter.rs", "src/budget.rs"]:
-            assert (CRATE / relative).read_bytes() == original(relative), relative
+            assert restore_section_control(Path(relative).name, (CRATE / relative).read_text()).encode() == original(relative), relative
 
     expected = original("src/arrangement.rs").decode()
     start = expected.index("pub type Segment =")

@@ -1,11 +1,13 @@
 """Restore strict finite separation integration before historical source checks."""
 import json
 from pathlib import Path
+from restore_section_control import restore_section_control
 
 CRATE = Path(__file__).resolve().parents[1]
 
 
 def restore_separated(name, source):
+    source = restore_section_control(name, source)
     edits = json.loads((CRATE / 'integration/separated-sections/INVERSE-EDITS.json').read_text())
     if name not in edits:
         return source

@@ -1,4 +1,6 @@
-use crate::exact::{add, axis, checked, cross, dot, orient, point, project, scale, sub};
+#[cfg(test)]
+use crate::exact::{add, scale};
+use crate::exact::{axis, checked, cross, dot, orient, point, project, sub};
 use crate::{Budget, Failure, FailureKind, Point2, Point3, Rational, integer};
 use num_traits::{Signed, Zero};
 use std::sync::Arc;
@@ -220,6 +222,7 @@ impl Facet {
         }
         Ok((true, edge))
     }
+    #[cfg(test)]
     pub(crate) fn section(
         &self,
         other: &Self,

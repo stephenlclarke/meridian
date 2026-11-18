@@ -8,6 +8,8 @@ The successor restores the contiguous index. It skips foreign finite sections on
 
 Four new cases cover signed section patterns, finite separation and equality contacts, complete publisher geometry and witnesses with affine fields and analytic volume, and exact/one-short work, storage and rational guards. Current 84 Rust tests, nine host tests, compiler checks and changed original-five execution are **UNRUN**, pending independent review and owning validation. No new admission, minimum work, complete fit or measured original-model improvement is claimed.
 
+Whole-source review cleared the geometry and accounting but found an old test control still compiled in production. The bounded correction puts the unchanged `Facet::section` method and its method-only imports under `cfg(test)`. A whole-file inverse and all 84 unchanged test bodies provide source preservation evidence; compiler and runtime validation remain unrun.
+
 The following sections retain earlier source-stage context. The current execution status is stated above.
 
 ## Strict-interior facet proof: source only
