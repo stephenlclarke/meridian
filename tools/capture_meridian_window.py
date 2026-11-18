@@ -142,7 +142,10 @@ def provider_call(provider: Path, mode: str, payload: dict, expected_hash: str) 
     require(result.returncode == 0 and reply.get("status") == "ok", "native observer rejected/failed: " + str(reply.get("reason", "no success"))[:512])
     return reply
 
-def capture(scope_path: Path, provider: Path, request: int, frame: int, call=provider_call) -> dict:
+def capture(scope_path: Path, provider: Path, request: int, frame: int, call=provider_call, *, progress: dict | None = None) -> dict:
+    if progress is None:
+        progress = {}
+    progress.update(native_provider_attempted=False, capture_attempted=False)
     raw_scope = read_limited(scope_path, 65536)
     scope, launch = validate_scope(json.loads(raw_scope))
     log = read_limited(Path(scope["native_stderr"]), MAX_LOG)
@@ -166,9 +169,11 @@ def capture(scope_path: Path, provider: Path, request: int, frame: int, call=pro
     try:
         create_new(lock, str(request).encode()); acquired = True
         native_scope = {key: scope[key] for key in ["pid", "bundle_id", "bounds", "human_exception_reference"]}
+        progress["native_provider_attempted"] = True
         enumeration = call(provider, "enumerate", {"scope": native_scope}, scope["provider_sha256"])
         require(enumeration.get("status") == "ok" and enumeration.get("pid") == scope["pid"] and enumeration.get("bundle_id") == BUNDLE, "native enumeration identity mismatch")
         selected = select_window(enumeration.get("windows"), scope)
+        progress["capture_attempted"] = True
         reply = call(provider, "capture", {"scope": native_scope, "selected": selected}, scope["provider_sha256"])
         require(reply.get("status") == "ok" and reply.get("pid") == scope["pid"] and reply.get("bundle_id") == BUNDLE, "native capture identity mismatch")
         before, after = select_window([reply.get("chosen_before")], scope), select_window([reply.get("chosen_after")], scope)
@@ -183,6 +188,7 @@ def capture(scope_path: Path, provider: Path, request: int, frame: int, call=pro
     except Exception as error:
         receipt["reason"] = str(error)[:1024]
     finally:
+        receipt.update(progress)
         receipt["python_monotonic_end_ns"] = time.monotonic_ns()
         try:
             create_new(directory / f"window-capture-{request}.json", json_bytes(receipt))
@@ -198,12 +204,17 @@ def main() -> int:
     parser.add_argument("--request", type=int, required=True)
     parser.add_argument("--frame", type=int, required=True)
     args = parser.parse_args()
+    progress = {"native_provider_attempted": False, "capture_attempted": False}
     try:
-        result = capture(args.scope, args.provider, args.request, args.frame)
+        result = capture(args.scope, args.provider, args.request, args.frame, progress=progress)
         print(json.dumps({"status":result["status"],"request":args.request,"frame":args.frame,"reason":result.get("reason")}, sort_keys=True))
         return 0 if result["status"] == "captured" else 2
     except Exception as error:
-        print(json.dumps({"status":"rejected_before_capture","reason":str(error)[:1024]}, sort_keys=True))
+        # Publication/cleanup can fail after native work; never infer no capture from an escaped error.
+        status = ("capture_attempted_outcome_unknown" if progress["capture_attempted"] else
+                  "native_provider_attempted_outcome_unknown" if progress["native_provider_attempted"] else
+                  "rejected_before_capture")
+        print(json.dumps({"status":status,"reason":str(error)[:1024],**progress}, sort_keys=True))
         return 2
 if __name__ == "__main__":
     raise SystemExit(main())
