@@ -22,7 +22,7 @@ pub(super) fn apply(mesh: &mut [Vertex]) {
         ([141, 221, 210], [255, 191, 100], true),  // original emissive strips
     ]
     .map(|(source, finish, emissive)| (linear(source), linear(finish), emissive));
-    for triangle in mesh.chunks_exact_mut(3) {
+    for triangle in mesh.as_chunks_mut::<3>().0 {
         let Some((_, finish, emissive)) = finishes.iter().find(|(source, _, _)| {
             source
                 .iter()
