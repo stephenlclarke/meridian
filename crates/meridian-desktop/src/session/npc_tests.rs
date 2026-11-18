@@ -34,7 +34,12 @@ fn ship_lock_cycle_arm_safe_and_public_cold_state_use_actual_contact_ids() {
         .collect();
     let rounds = world.missile_rounds();
     let credits = world.credits_tenths();
-    ok(session.command(&mut world, Action::CycleMissileLock));
+    let notice = ok(session.command(&mut world, Action::CycleMissileLock));
+    assert_eq!(
+        notice,
+        format!("Missile locked on ship {}", ids[0].serial())
+    );
+    assert!(session.lines(&world, true, Some(&notice)).contains(&notice));
     assert_eq!(
         world
             .missile_snapshot()
@@ -42,6 +47,7 @@ fn ship_lock_cycle_arm_safe_and_public_cold_state_use_actual_contact_ids() {
             .npc_lock,
         Some(ids[0])
     );
+    ok(session.command(&mut world, Action::MissionDetails));
     assert!(
         session
             .lines(&world, true, None)

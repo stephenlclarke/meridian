@@ -1,6 +1,8 @@
 # Implementation and validation status
 
-## Flight cockpit text
+## Commander startup and flight cockpit
+
+Ordinary startup opens Commander details with the current ship, location and credits. A fresh commander starts at Avenor. A saved flight opens its summary and waits for Enter to resume. An unreadable slot opens recovery. Native first-frame and save checks are pending.
 
 The desktop source hides the routine flight summary, idle lesson and practice prompts, and repeated missile and Help text above the instruments. Command feedback expires after four seconds in ordinary flight, including when paused. Active practice, jump countdowns and contact warnings remain visible. Preview 8 still uses the older display. Native visual qualification for this change is pending.
 
