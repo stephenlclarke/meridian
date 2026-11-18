@@ -358,6 +358,26 @@
       "file": "src/source_work_tests.rs",
       "name": "source_work_complete_publisher_matches_frozen_output_fields_contacts_and_volume",
       "status": "UNRUN"
+    },
+    {
+      "file": "src/convex_section_tests.rs",
+      "name": "convex_section_rows_preserve_complete_publisher_fields_contacts_and_volume",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/convex_section_tests.rs",
+      "name": "convex_rows_classify_exact_inside_outside_parallel_and_boundary_without_cached_answers",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/convex_section_tests.rs",
+      "name": "convex_section_proofs_decline_cavities_and_keep_uncertified_original_sections",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/convex_section_tests.rs",
+      "name": "convex_rows_keep_exact_storage_work_guards_and_collection_error_rollback",
+      "status": "UNRUN"
     }
   ],
   "rustCompiler": "UNRUN",
@@ -898,5 +918,60 @@
     "parentReviewSHA256": "6e51e2e1bbc86295d718d0da30cef48aea5f4ab3f895dbd2ce8dce6cb18fd004",
     "qualification": "Root successor delta sincee234 only, preserveRootdocs/G3 work; ONE G2 bounded closure carryingwhole review thenexisting G1 focused/ONEchangedwholefive afterallPASS",
     "deltaSHA256": "bda3bcc4fd556e6a6528c00d2dac89d725713915b6ae996dfcda287e741d4ab3"
+  },
+  "certifiedLocalSections": {
+    "status": "AUTHORED_UNRUN_CERTIFIED_LOCAL_SECTIONS",
+    "parentAuthor": "116aaee6aca0783cd7e6ce150dbdca1644b7b0dd",
+    "actualParentRoot": "84936cd613c9b32134c09c8469293805449360f1",
+    "all71OldTestBodiesUnchanged": true,
+    "currentRustCount": 75,
+    "hostCount": 9,
+    "productionChanges": [
+      "Extend exact audited convex support certificates to small original owners with explicit grouping/comparison/shift work and error rollback.",
+      "Project original supports to exact per-source-facet affine inequalities; handle parallel outward convention, classify strict values freshly and return boundary ambiguity to unchanged generic policy.",
+      "Retain all physical/coplanar constraints while removing certified owner outward sections; retain old multiplicity/parity for uncertified owners.",
+      "When every eligible owner uses a certified row, use the byte-exact original finite candidate traversal; charge each ordinal conversion and retain N additional temporary slots."
+    ],
+    "notGlobalMeshCSG": "Only original-owner local cross-section representation changes; no global union surface replacement or field approximation. All original facet output/witness/contacts/topology checks remain.",
+    "unitPrices": "No discount to performed old work. New projection1+parallelpredicate1, paralleldecision1 or equationtransfer1; lookup/map/owner/query/shift operations explicitly charged.",
+    "storage": "16rowheader+16owner+8equation;32constructor/queryscratch plus independently scoped existing lookup32. Actual temporarydrop precedes release. Entry rollback on error.",
+    "controls": "Complete frozen116 publisher, three production snapshots/inverse, unchanged original joint/parity/fields/arrangement/generic/publication paths.",
+    "newTests": [
+      {
+        "file": "src/convex_section_tests.rs",
+        "name": "convex_section_rows_preserve_complete_publisher_fields_contacts_and_volume",
+        "status": "UNRUN"
+      },
+      {
+        "file": "src/convex_section_tests.rs",
+        "name": "convex_rows_classify_exact_inside_outside_parallel_and_boundary_without_cached_answers",
+        "status": "UNRUN"
+      },
+      {
+        "file": "src/convex_section_tests.rs",
+        "name": "convex_section_proofs_decline_cavities_and_keep_uncertified_original_sections",
+        "status": "UNRUN"
+      },
+      {
+        "file": "src/convex_section_tests.rs",
+        "name": "convex_rows_keep_exact_storage_work_guards_and_collection_error_rollback",
+        "status": "UNRUN"
+      }
+    ],
+    "contractSHA256": "aaf75f93a26e95dde6835e839347f605b5e39a9ae524c486400bf8beed902b6d",
+    "custodySHA256": "6df58ecc06419ff5d6de2990f04deb66ad058c56ab9d7177449af63fc48093fb",
+    "inverseSHA256": "5dd30549d48431e322b6bbbddd872f972ef878ab1f905559ac8c4672cd9a46e1",
+    "freezeSHA256": "592f8f478e38cdcae85921ead51106f192250566740d47f7781f5769d2f307f5",
+    "parentReviewSHA256": "b90a0b4804d3071f76665b75ba22e1e123cf21ea042d30793c2e417dbaac2c31",
+    "currentExecution": "UNRUN; author source-only checks only",
+    "limits": {
+      "operationsIncludingDecode": 2000000,
+      "storageMemberships": 100000,
+      "rationalBits": 4096,
+      "completeOutputTriangles": 512
+    },
+    "admissions": 0,
+    "qualification": "Root serial successor since116 only; G2 whole/relevant delta; existing G1 focused75Rust9host/checkstrictClippyBuild thenONEchangedwholefive onlyafterallPASS/solelaneavailable",
+    "deltaSHA256": "3e3104b7b2775ce1853cb8a1eaef1a84709ad43bf7aa379010c0846317bb0ad8"
   }
 }

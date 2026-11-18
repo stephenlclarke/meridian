@@ -5,6 +5,7 @@ import re
 import subprocess
 from pathlib import Path
 from restore_source_work import restore_source_work
+from restore_convex_sections import restore_convex_sections
 from strip_budget_context import body
 
 CRATE = Path(__file__).resolve().parents[1]
@@ -52,7 +53,7 @@ def verify():
                 assert body(current, signature) == body(old_source, signature), (path, signature)
                 count += 1
     assert count == 67, count
-    current = (CRATE / 'src/certificate.rs').read_text()
+    current = restore_convex_sections('certificate.rs', (CRATE / 'src/certificate.rs').read_text())
     main = body(current, 'fn reconstruct_records(')
     assert main.index('audit_original_sheets(') < main.index('InteriorCertificates::build(') < main.index('collect_certified(')
     assert 'Arrangement::build_source(' in main

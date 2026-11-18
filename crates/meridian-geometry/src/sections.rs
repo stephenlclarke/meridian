@@ -504,6 +504,7 @@ fn joint_section(
 }
 
 impl Frame {
+    #[cfg(test)]
     pub(super) fn collect<'a>(
         face: &Facet,
         finite: &Bounds,
@@ -520,6 +521,7 @@ impl Frame {
         result
     }
 
+    #[cfg(test)]
     pub(super) fn collect_certified<'a>(
         face: &Facet,
         finite: &Bounds,
@@ -545,6 +547,129 @@ impl Frame {
         result
     }
 
+    pub(super) fn collect_rows<'a>(
+        face: &Facet,
+        finite: &Bounds,
+        originals: &'a [Facet],
+        owners: &BTreeMap<u32, ComponentBounds>,
+        index: &FacetBoundsIndex,
+        rows: &super::convex_sections::Rows,
+        b: &mut Budget,
+    ) -> Result<(Vec<Segment>, Vec<&'a Facet>, Self), Failure> {
+        let entry = b.retained_memberships();
+        let result = Self::collect_rows_admitted(face, finite, originals, owners, index, rows, b);
+        if result.is_err() {
+            b.release(b.retained_memberships() - entry);
+        }
+        result
+    }
+
+    fn collect_rows_admitted<'a>(
+        face: &Facet,
+        finite: &Bounds,
+        originals: &'a [Facet],
+        owners: &BTreeMap<u32, ComponentBounds>,
+        index: &FacetBoundsIndex,
+        rows: &super::convex_sections::Rows,
+        b: &mut Budget,
+    ) -> Result<(Vec<Segment>, Vec<&'a Facet>, Self), Failure> {
+        b.retain(24)?;
+        let mut frame = Self {
+            owners: BTreeMap::new(),
+            members: 24,
+        };
+        for (owner, group) in owners {
+            b.step(1)?;
+            if finite.meets(&group.bounds, b)? && !rows.contains(*owner, b)? {
+                log_cost(frame.owners.len(), b)?;
+                b.retain(6)?;
+                frame.members += 6;
+                frame.owners.insert(*owner, Vec::new());
+            }
+        }
+        let mut barriers = Vec::new();
+        let mut coplanar = Vec::new();
+        b.state([
+            frame.members,
+            frame.owners.len(),
+            barriers.len(),
+            coplanar.len(),
+            originals.len(),
+            0,
+            0,
+            0,
+        ]);
+        b.with_retained(3 * originals.len(), |b| {
+            let candidates = if frame.owners.is_empty() {
+                // No owner needs an outward section. Use the unchanged finite
+                // traversal, retaining its ordinal vector through conversion.
+                b.with_retained(originals.len(), |b| {
+                    index
+                        .candidates(finite, b)?
+                        .into_iter()
+                        .map(|ordinal| {
+                            b.step(1)?;
+                            Ok((ordinal, true, false))
+                        })
+                        .collect::<Result<Vec<_>, Failure>>()
+                })?
+            } else {
+                index.collection_candidates(face, finite, &frame.owners, originals, b)?
+            };
+            for (ordinal, physical, outward) in candidates {
+                b.state([
+                    frame.members,
+                    frame.owners.len(),
+                    barriers.len(),
+                    coplanar.len(),
+                    originals.len(),
+                    ordinal,
+                    96,
+                    0,
+                ]);
+                b.step(1)?;
+                let other = &originals[ordinal];
+                // This exact triangle is entirely on its own source plane and
+                // contributes neither a physical cut nor an outward section.
+                if face.id() == other.id() {
+                    continue;
+                }
+                b.with_retained(96, |b| {
+                    let (segments, same_plane, limiting) =
+                        joint_section(face, other, physical, outward, b)?;
+                    b.retain(8 * segments.len())?;
+                    barriers.extend(
+                        segments
+                            .into_iter()
+                            .map(|[a, c]| [project(&a, face.axis()), project(&c, face.axis())]),
+                    );
+                    if physical
+                        && same_plane
+                        && crate::exact::dot(face.normal(), other.normal()) > integer(0)
+                    {
+                        b.step(1)?;
+                        b.retain(1)?;
+                        coplanar.push(other);
+                    }
+                    if let Some(segment) = limiting {
+                        log_cost(frame.owners.len(), b)?;
+                        let edges =
+                            frame.owners.get_mut(&other.id().component).ok_or_else(|| {
+                                b.fail(FailureKind::UncertifiedContact, "section owner missing")
+                            })?;
+                        b.retain(7)?;
+                        frame.members += 7;
+                        edges.push(segment);
+                    }
+                    Ok(())
+                })?;
+            }
+            Ok(())
+        })?;
+        Ok((barriers, coplanar, frame))
+    }
+
+    #[cfg(test)]
     fn collect_admitted<'a>(
         face: &Facet,
         finite: &Bounds,

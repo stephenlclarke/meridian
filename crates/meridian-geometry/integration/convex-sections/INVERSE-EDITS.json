@@ -1,0 +1,86 @@
+{
+  "certificate.rs": [
+    {
+      "afterStart": 460,
+      "afterEnd": 460,
+      "before": "    #[cfg(test)]\n",
+      "after": ""
+    },
+    {
+      "afterStart": 1131,
+      "afterEnd": 1132,
+      "before": "        strict_interior::InteriorCertificates::build(originals, &owner_bounds, b)\n",
+      "after": "        strict_interior::InteriorCertificates::build_sections(originals, &owner_bounds, b)\n"
+    },
+    {
+      "afterStart": 1162,
+      "afterEnd": 1163,
+      "before": "",
+      "after": "        let rows = convex_sections::Rows::build(face, face_bounds, interior.as_ref(), b)?;\n"
+    },
+    {
+      "afterStart": 1164,
+      "afterEnd": 1166,
+      "before": "            b.with_retained(16, |local| match &interior {\n                Some(certificates) => sections::Frame::collect_certified(\n",
+      "after": "            b.with_retained(16, |local| {\n                sections::Frame::collect_rows(\n"
+    },
+    {
+      "afterStart": 1171,
+      "afterEnd": 1172,
+      "before": "                    certificates,\n",
+      "after": "                    &rows,\n"
+    },
+    {
+      "afterStart": 1173,
+      "afterEnd": 1174,
+      "before": "                ),\n                None => sections::Frame::collect(\n                    face,\n                    face_bounds,\n                    originals,\n                    &owner_bounds,\n                    &facet_bounds,\n                    local,\n                ),\n",
+      "after": "                )\n"
+    },
+    {
+      "afterStart": 1189,
+      "afterEnd": 1195,
+      "before": "                            |b| match &parity_index {\n                                Some(index) => index.occupied(sample, b),\n                                None => sections.occupied(sample, b),\n",
+      "after": "                            |b| match rows.occupied(sample, b)? {\n                                Some(false) => match &parity_index {\n                                    Some(index) => index.occupied(sample, b),\n                                    None => sections.occupied(sample, b),\n                                },\n                                decisive => Ok(decisive),\n"
+    },
+    {
+      "afterStart": 1231,
+      "afterEnd": 1234,
+      "before": "",
+      "after": "        let row_members = rows.memberships();\n        drop(rows);\n        b.release(row_members);\n"
+    },
+    {
+      "afterStart": 2353,
+      "afterEnd": 2360,
+      "before": "",
+      "after": "\n#[path = \"convex_sections.rs\"]\nmod convex_sections;\n\n#[cfg(test)]\n#[path = \"convex_section_tests.rs\"]\nmod convex_section_tests;\n"
+    }
+  ],
+  "sections.rs": [
+    {
+      "afterStart": 506,
+      "afterEnd": 507,
+      "before": "",
+      "after": "    #[cfg(test)]\n"
+    },
+    {
+      "afterStart": 523,
+      "afterEnd": 524,
+      "before": "",
+      "after": "    #[cfg(test)]\n"
+    },
+    {
+      "afterStart": 549,
+      "afterEnd": 672,
+      "before": "",
+      "after": "    pub(super) fn collect_rows<'a>(\n        face: &Facet,\n        finite: &Bounds,\n        originals: &'a [Facet],\n        owners: &BTreeMap<u32, ComponentBounds>,\n        index: &FacetBoundsIndex,\n        rows: &super::convex_sections::Rows,\n        b: &mut Budget,\n    ) -> Result<(Vec<Segment>, Vec<&'a Facet>, Self), Failure> {\n        let entry = b.retained_memberships();\n        let result = Self::collect_rows_admitted(face, finite, originals, owners, index, rows, b);\n        if result.is_err() {\n            b.release(b.retained_memberships() - entry);\n        }\n        result\n    }\n\n    fn collect_rows_admitted<'a>(\n        face: &Facet,\n        finite: &Bounds,\n        originals: &'a [Facet],\n        owners: &BTreeMap<u32, ComponentBounds>,\n        index: &FacetBoundsIndex,\n        rows: &super::convex_sections::Rows,\n        b: &mut Budget,\n    ) -> Result<(Vec<Segment>, Vec<&'a Facet>, Self), Failure> {\n        b.retain(24)?;\n        let mut frame = Self {\n            owners: BTreeMap::new(),\n            members: 24,\n        };\n        for (owner, group) in owners {\n            b.step(1)?;\n            if finite.meets(&group.bounds, b)? && !rows.contains(*owner, b)? {\n                log_cost(frame.owners.len(), b)?;\n                b.retain(6)?;\n                frame.members += 6;\n                frame.owners.insert(*owner, Vec::new());\n            }\n        }\n        let mut barriers = Vec::new();\n        let mut coplanar = Vec::new();\n        b.state([\n            frame.members,\n            frame.owners.len(),\n            barriers.len(),\n            coplanar.len(),\n            originals.len(),\n            0,\n            0,\n            0,\n        ]);\n        b.with_retained(3 * originals.len(), |b| {\n            let candidates = if frame.owners.is_empty() {\n                // No owner needs an outward section. Use the unchanged finite\n                // traversal, retaining its ordinal vector through conversion.\n                b.with_retained(originals.len(), |b| {\n                    index\n                        .candidates(finite, b)?\n                        .into_iter()\n                        .map(|ordinal| {\n                            b.step(1)?;\n                            Ok((ordinal, true, false))\n                        })\n                        .collect::<Result<Vec<_>, Failure>>()\n                })?\n            } else {\n                index.collection_candidates(face, finite, &frame.owners, originals, b)?\n            };\n            for (ordinal, physical, outward) in candidates {\n                b.state([\n                    frame.members,\n                    frame.owners.len(),\n                    barriers.len(),\n                    coplanar.len(),\n                    originals.len(),\n                    ordinal,\n                    96,\n                    0,\n                ]);\n                b.step(1)?;\n                let other = &originals[ordinal];\n                // This exact triangle is entirely on its own source plane and\n                // contributes neither a physical cut nor an outward section.\n                if face.id() == other.id() {\n                    continue;\n                }\n                b.with_retained(96, |b| {\n                    let (segments, same_plane, limiting) =\n                        joint_section(face, other, physical, outward, b)?;\n                    b.retain(8 * segments.len())?;\n                    barriers.extend(\n                        segments\n                            .into_iter()\n                            .map(|[a, c]| [project(&a, face.axis()), project(&c, face.axis())]),\n                    );\n                    if physical\n                        && same_plane\n                        && crate::exact::dot(face.normal(), other.normal()) > integer(0)\n                    {\n                        b.step(1)?;\n                        b.retain(1)?;\n                        coplanar.push(other);\n                    }\n                    if let Some(segment) = limiting {\n                        log_cost(frame.owners.len(), b)?;\n                        let edges =\n                            frame.owners.get_mut(&other.id().component).ok_or_else(|| {\n                                b.fail(FailureKind::UncertifiedContact, \"section owner missing\")\n                            })?;\n                        b.retain(7)?;\n                        frame.members += 7;\n                        edges.push(segment);\n                    }\n                    Ok(())\n                })?;\n            }\n            Ok(())\n        })?;\n        Ok((barriers, coplanar, frame))\n    }\n\n    #[cfg(test)]\n"
+    }
+  ],
+  "strict_interior.rs": [
+    {
+      "afterStart": 30,
+      "afterEnd": 122,
+      "before": "",
+      "after": "    }\n    // Reuse every existing large-owner proof, then certify the remaining\n    // closed original owners for source-local section inequalities.\n    pub(super) fn build_sections(\n        originals: &'a [Facet],\n        owners: &'a BTreeMap<u32, ComponentBounds>,\n        b: &mut Budget,\n    ) -> Result<Option<Self>, Failure> {\n        let entry = b.retained_memberships();\n        let result = Self::build_all(originals, owners, b);\n        if result.is_err() {\n            b.release(b.retained_memberships() - entry);\n        }\n        result\n    }\n    fn build_all(\n        originals: &'a [Facet],\n        owners: &'a BTreeMap<u32, ComponentBounds>,\n        b: &mut Budget,\n    ) -> Result<Option<Self>, Failure> {\n        let mut result = Self::build(originals, owners, b)?;\n        b.with_retained(32, |b| {\n            let mut groups: BTreeMap<u32, Group<'a>> = BTreeMap::new();\n            for (id, owner) in owners {\n                b.step(1)?;\n                if owner.facets <= 4 * FacetBoundsIndex::LEAF_SIZE {\n                    log_cost(groups.len(), b)?;\n                    b.retain(6)?;\n                    groups.insert(*id, (&owner.bounds, Vec::new()));\n                }\n            }\n            if groups.is_empty() {\n                return Ok(());\n            }\n            for face in originals {\n                b.step(1)?;\n                log_cost(groups.len(), b)?;\n                if let Some((_, faces)) = groups.get_mut(&face.id().component) {\n                    b.retain(1)?;\n                    faces.push(face);\n                }\n            }\n            for (id, (bounds, faces)) in groups {\n                b.step(1)?;\n                let group_members = 6 + faces.len();\n                let planes = Self::certify(&faces, b)?;\n                drop(faces);\n                b.release(group_members);\n                if let Some(planes) = planes {\n                    if result.is_none() {\n                        b.retain(16)?;\n                        result = Some(Self {\n                            owners: Vec::new(),\n                            members: 16,\n                        });\n                    }\n                    let table = result.as_mut().ok_or_else(|| {\n                        b.fail(crate::FailureKind::InvalidWitness, \"missing support table\")\n                    })?;\n                    let (mut low, mut high) = (0, table.owners.len());\n                    while low < high {\n                        b.step(1)?;\n                        let middle = low + (high - low) / 2;\n                        if table.owners[middle].id < id {\n                            low = middle + 1;\n                        } else {\n                            high = middle;\n                        }\n                    }\n                    b.state([\n                        table.members,\n                        table.owners.len(),\n                        low,\n                        planes.len(),\n                        0,\n                        0,\n                        32,\n                        0,\n                    ]);\n                    b.step((table.owners.len() - low + 1) as u64)?;\n                    table.members += 16 + planes.len();\n                    table.owners.insert(low, Owner { id, bounds, planes });\n                }\n            }\n            Ok(())\n        })?;\n        Ok(result)\n    }\n    pub(super) fn section_owners(&self) -> impl Iterator<Item = (u32, &Bounds, &[&Facet])> {\n        self.owners\n            .iter()\n            .map(|owner| (owner.id, owner.bounds, owner.planes.as_slice()))\n"
+    }
+  ]
+}

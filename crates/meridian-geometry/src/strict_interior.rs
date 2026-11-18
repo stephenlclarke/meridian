@@ -29,6 +29,98 @@ impl<'a> InteriorCertificates<'a> {
         }
         result
     }
+    // Reuse every existing large-owner proof, then certify the remaining
+    // closed original owners for source-local section inequalities.
+    pub(super) fn build_sections(
+        originals: &'a [Facet],
+        owners: &'a BTreeMap<u32, ComponentBounds>,
+        b: &mut Budget,
+    ) -> Result<Option<Self>, Failure> {
+        let entry = b.retained_memberships();
+        let result = Self::build_all(originals, owners, b);
+        if result.is_err() {
+            b.release(b.retained_memberships() - entry);
+        }
+        result
+    }
+    fn build_all(
+        originals: &'a [Facet],
+        owners: &'a BTreeMap<u32, ComponentBounds>,
+        b: &mut Budget,
+    ) -> Result<Option<Self>, Failure> {
+        let mut result = Self::build(originals, owners, b)?;
+        b.with_retained(32, |b| {
+            let mut groups: BTreeMap<u32, Group<'a>> = BTreeMap::new();
+            for (id, owner) in owners {
+                b.step(1)?;
+                if owner.facets <= 4 * FacetBoundsIndex::LEAF_SIZE {
+                    log_cost(groups.len(), b)?;
+                    b.retain(6)?;
+                    groups.insert(*id, (&owner.bounds, Vec::new()));
+                }
+            }
+            if groups.is_empty() {
+                return Ok(());
+            }
+            for face in originals {
+                b.step(1)?;
+                log_cost(groups.len(), b)?;
+                if let Some((_, faces)) = groups.get_mut(&face.id().component) {
+                    b.retain(1)?;
+                    faces.push(face);
+                }
+            }
+            for (id, (bounds, faces)) in groups {
+                b.step(1)?;
+                let group_members = 6 + faces.len();
+                let planes = Self::certify(&faces, b)?;
+                drop(faces);
+                b.release(group_members);
+                if let Some(planes) = planes {
+                    if result.is_none() {
+                        b.retain(16)?;
+                        result = Some(Self {
+                            owners: Vec::new(),
+                            members: 16,
+                        });
+                    }
+                    let table = result.as_mut().ok_or_else(|| {
+                        b.fail(crate::FailureKind::InvalidWitness, "missing support table")
+                    })?;
+                    let (mut low, mut high) = (0, table.owners.len());
+                    while low < high {
+                        b.step(1)?;
+                        let middle = low + (high - low) / 2;
+                        if table.owners[middle].id < id {
+                            low = middle + 1;
+                        } else {
+                            high = middle;
+                        }
+                    }
+                    b.state([
+                        table.members,
+                        table.owners.len(),
+                        low,
+                        planes.len(),
+                        0,
+                        0,
+                        32,
+                        0,
+                    ]);
+                    b.step((table.owners.len() - low + 1) as u64)?;
+                    table.members += 16 + planes.len();
+                    table.owners.insert(low, Owner { id, bounds, planes });
+                }
+            }
+            Ok(())
+        })?;
+        Ok(result)
+    }
+    pub(super) fn section_owners(&self) -> impl Iterator<Item = (u32, &Bounds, &[&Facet])> {
+        self.owners
+            .iter()
+            .map(|owner| (owner.id, owner.bounds, owner.planes.as_slice()))
+    }
     fn build_admitted(
         originals: &'a [Facet],
         owners: &'a BTreeMap<u32, ComponentBounds>,

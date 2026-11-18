@@ -458,7 +458,6 @@ impl FacetBoundsIndex {
         Ok(node)
     }
     // The caller retains up to one candidate ordinal per original facet.
-    #[cfg(test)]
     fn candidates(&self, query: &Bounds, b: &mut Budget) -> Result<Vec<usize>, Failure> {
         b.with_retained(Self::stack_members(self.facets.len()), |b| {
             let mut pending = vec![self.root];
@@ -1130,7 +1129,7 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
         component_bounds(originals, &facet_bounds.facets, b)
     })?;
     let interior = b.with_phase(BudgetPhase::InputAudit, |b| {
-        strict_interior::InteriorCertificates::build(originals, &owner_bounds, b)
+        strict_interior::InteriorCertificates::build_sections(originals, &owner_bounds, b)
     })?;
     let plane_groups = b.with_phase(BudgetPhase::Index, |b| {
         build_plane_groups(originals, &owner_bounds, b)
@@ -1161,25 +1160,18 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
         if area(&domain, b)?.is_negative() {
             domain.reverse();
         }
+        let rows = convex_sections::Rows::build(face, face_bounds, interior.as_ref(), b)?;
         let (mut barriers, coplanar, sections) = b.with_phase(BudgetPhase::Sections, |b| {
-            b.with_retained(16, |local| match &interior {
-                Some(certificates) => sections::Frame::collect_certified(
+            b.with_retained(16, |local| {
+                sections::Frame::collect_rows(
                     face,
                     face_bounds,
                     originals,
                     &owner_bounds,
                     &facet_bounds,
-                    certificates,
+                    &rows,
                     local,
-                ),
-                None => sections::Frame::collect(
-                    face,
-                    face_bounds,
-                    originals,
-                    &owner_bounds,
-                    &facet_bounds,
-                    local,
-                ),
+                )
             })
         })?;
         prune_impossible_barriers(face, face_bounds, &mut barriers, b)?;
@@ -1195,9 +1187,12 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
                         match local.with_phase_state(
                             BudgetPhase::Occupancy,
                             local.state_values(),
-                            |b| match &parity_index {
-                                Some(index) => index.occupied(sample, b),
-                                None => sections.occupied(sample, b),
+                            |b| match rows.occupied(sample, b)? {
+                                Some(false) => match &parity_index {
+                                    Some(index) => index.occupied(sample, b),
+                                    None => sections.occupied(sample, b),
+                                },
+                                decisive => Ok(decisive),
                             },
                         )? {
                             Some(true) => Ok(false),
@@ -1234,6 +1229,9 @@ fn reconstruct_records(originals: &[Facet], b: &mut Budget) -> Result<Hull, Fail
         b.release(parity_members);
         drop(sections);
         b.release(section_members);
+        let row_members = rows.memberships();
+        drop(rows);
+        b.release(row_members);
         let arrangement = arrangement_result?;
         drop(barriers);
         // The original witness publisher retains no record for an invisible
@@ -2353,3 +2351,10 @@ mod strict_interior;
 #[cfg(test)]
 #[path = "source_work_tests.rs"]
 mod source_work_tests;
+
+#[path = "convex_sections.rs"]
+mod convex_sections;
+
+#[cfg(test)]
+#[path = "convex_section_tests.rs"]
+mod convex_section_tests;

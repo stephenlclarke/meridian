@@ -1,14 +1,14 @@
 # Meridian
 
-The whole-source review found one test-only compiler-bound and lint problem in seven new refusal assertions. The bounded correction now extracts each `Err` through an exhaustive helper that fails every unexpected `Ok`, without requiring the success type to implement `Debug`. Production geometry, all four new case names, refusal kinds and all other test tokens remain unchanged. The corrected 71 Rust and nine host tests are still **UNRUN**; bounded review closure and owning execution remain required.
+## Certified local sections: source only
 
-## Original section and arrangement work: source only
+The actual `84936cd` run passed 71 Rust tests, nine host tests, all-target check, strict Clippy and development build. Its single changed original-five run still returned five Operations constructor refusals, fifteen dependent checks unrun and zero candidates. Original limits remain unchanged. These incomplete prefixes do not establish minimum work, complete fit or completed-original speed improvement.
 
-The actual `463dccc` run passed 67 Rust tests, nine host tests, all-target check, strict Clippy and dev build. Its one original-five run still returned five Operations constructor refusals, fifteen dependent checks unrun and zero candidates. All original caps remain. The measured section and arrangement prefixes identify the next work to remove; they do not establish minimum total work or complete fit.
+The next implementation represents each certified original owner's local outward section with exact projected support inequalities. It keeps original finite physical cuts and coplanar fields in the existing collector. Uncertified owners retain their original outward sections; exact boundary ambiguity uses the unchanged generic-ray policy. Every sample is evaluated afresh, and all performed construction, lookup, query and storage work remains charged. No cross-source mesh output, approximation or field averaging is introduced.
 
-The changed source uses existing audited convex-owner support equations to omit proved-empty own-owner outward sections on oblique queries while retaining physical cuts and every foreign query. Arrangement setup retains validated domain edges directly and reuses checked endpoints only when their clipping bounds never changed. Arbitrary barriers keep their original checks. Every performed comparison, lookup and visit remains charged; no sampled values, approximation or field averaging is introduced.
+All 71 previous test bodies and strict 322/108/120 assertions remain byte exact. Four new cases compare complete triangles, affine fields, witnesses and volume against the frozen previous publisher, with oblique and touching geometry, cavity fallback, fresh occupancy queries and exact/one-short work and storage guards. Current 75 Rust tests, nine host tests, compiler checks and changed original-five execution are **UNRUN**, pending independent whole-source review and owning validation. No new hull admission, full-fit or measured speed claim is made.
 
-All 67 prior test bodies and strict 322/108/120 assertions remain unchanged. Four new cases compare complete sections, arrangements, triangles, fields, witnesses and volume against frozen independent controls, including guards and one-short rollback. Current 71 Rust and nine host tests and the changed original-five run are **UNRUN**, pending source review and owning execution. No new hull, full-fit or measured speed claim is made.
+The following sections retain earlier source-stage context. The current execution status is stated above.
 
 ## Strict-interior facet proof: source only
 

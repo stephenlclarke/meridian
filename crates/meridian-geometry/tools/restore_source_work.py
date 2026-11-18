@@ -1,11 +1,13 @@
 """Restore source-work integration before running historical source proofs."""
 import json
 from pathlib import Path
+from restore_convex_sections import restore_convex_sections
 
 CRATE = Path(__file__).resolve().parents[1]
 
 
 def restore_source_work(name, source):
+    source = restore_convex_sections(name, source)
     edits = json.loads((CRATE / 'integration/source-work/INVERSE-EDITS.json').read_text())
     if name not in edits:
         return source

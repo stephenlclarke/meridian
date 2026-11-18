@@ -1,0 +1,63 @@
+{
+  "reviewedAtUTC": "2026-11-18T12:15:31.019171+00:00",
+  "verdict": "SOURCE_CLEAR_BOUNDED_REFUSAL_EXTRACTION_DELTA;G2-GEOMETRY-SOURCE-WORK-1_CLOSED;WHOLE_SEMANTIC_REVIEW_CARRIED",
+  "head": "84936cd613c9b32134c09c8469293805449360f1",
+  "tree": "d648116dc51d4c9a9080e222d50a8ca1398e4a75",
+  "immediateParent": "c451a394c32aaf8fc65f351b31e4a716588c2990",
+  "packet": {
+    "path": "/private/tmp/meridian-root-source-work-refusal-review/SOURCE.json",
+    "bytes": 3711,
+    "sha256": "10ec4d74d3cd3af004753f2adb44b19f6deeb452a32decb634509625a4fbc350"
+  },
+  "parentWholeReview": {
+    "path": "/private/tmp/g2-meridian-c451a394-source-work-whole-source-findings.json",
+    "bytes": 7062,
+    "sha256": "6e51e2e1bbc86295d718d0da30cef48aea5f4ab3f895dbd2ce8dce6cb18fd004"
+  },
+  "findings": [],
+  "independentChecks": {
+    "rootGitWorkingSourceTarBytesModes": 533,
+    "changedPaths": 13,
+    "unchangedPaths": 520,
+    "authorCrateGitWorkingTarPins": 394,
+    "authorManifestPayloadHashesAndCompleteArchiveMembers": [
+      7,
+      8
+    ],
+    "all387AuthorParentCrateFilesMatchWholeReviewedRoot": true,
+    "canonicalRootDeltaVerified": true,
+    "cleanExactHeadTreeImmediateParentVerified": true,
+    "frozenBeforeTestMatchesBothRootAndAuthorParents": true,
+    "sevenWrapperFullTestInverseExceptWhitespace": true,
+    "fourNewCaseNamesUnchanged": true,
+    "allOtherExistingProductionSourceAndTestFilesByteExact": 27,
+    "changes": "One existing test module, verifier registration, new source-only preservation verifier, frozen test/reference/custody contract data and documentation. No production algorithm, caps, prices, features, dependencies or other compiled tests change."
+  },
+  "closure": {
+    "id": "G2-GEOMETRY-SOURCE-WORK-1",
+    "status": "CLOSED_FROM_SOURCE",
+    "helper": "private fn checked_failure<T>(Result<T,Failure>)->Failure matches Err(failure)=>failure, Ok(_)=>panic!(unexpected success). No T:Debug bound, production Debug derive, allow/suppression, expect_err or Option comparison.",
+    "sevenUses": "All seven old unwrap_err expressions replaced with checked_failure around exactly their original Result-producing expressions. Same arguments and Failure.kind comparisons. Both invalid-domain sides independently require Err; two unexpected Ok values cannot pass by None==None.",
+    "preservation": "Removed helper and independently inverted seven wrapper parentheses back to .unwrap_err(); entire parent test file matches after whitespace normalization. Read diff confirms string literals unchanged. Frozen parent file exact. Four current new case names and all geometry/timing/refusal/callback/retention/strict comparisons preserved. All other src/tests files exact parent.",
+    "compileLintMeaning": "Removes the Result::unwrap_err success Debug requirement and all seven new unwrap_used instances without weakening unexpected-success behavior. Compiler and lint cure remain to be executed by owning lane."
+  },
+  "wholeReviewCarry": {
+    "eligible": true,
+    "scope": "Carry unchanged c451 whole semantic/math/accounting/reference/lifetime review and67 old exact bodies; only actionable extraction finding now closed. New four tests remain unchanged semantically, current71Rust/9host remain UNRUN. No broad unchanged rereview needed.",
+    "geometry": "Certified same-owner convex support exclusions, independent physical/foreign-owner eligibility, validated source-domain edge reuse, unchanged endpoint reuse, all rational/operations/storage guards and rollback semantics remain exactly whole-reviewed c451. Frozen full publisher/common arrangement controls remain exact.",
+    "caps": {
+      "operationsIncludingDecode": 2000000,
+      "storageMemberships": 100000,
+      "rationalBits": 4096,
+      "completeOutputTriangles": 512
+    },
+    "preservedAssertions": "All67old bodies and322/108/120 assertions plus4newcases retained. Separate202case matrix not conflated with originalfive25bodies."
+  },
+  "executionDecision": "Existing designated G1 lane may qualify exact84936cd6 source once the soleMac lane is free:71Rust9host,locked all-target check,strictClippy,development original_five build. Only after all focused gates PASS,ONEalready-scoped changed whole-five workload using original inputs/caps/source-binary-lock pins and actual monotonic timings. No additional review ACK gate. Preserve natural failures/refusals and dependentUNRUN status.",
+  "limits": [
+    "No compiler,Cargo,Clippy,tests,SUT,geometry/native execution,supplied verifier or review bot executed by G2.",
+    "No human WIP edits,new agents,chats,merge or publication.",
+    "Prior actual463focused67Rust9hostPASS andfiveOperationsconstructorrefusals15dependentUNRUN0candidates retain their own identities. No current71pass,admission,complete-fit,minimal-work or speed claim.",
+    "Sourceclear closes the specific static finding; actual execution acceptance remains UNRUN."
+  ]
+}

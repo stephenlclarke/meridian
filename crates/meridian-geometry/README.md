@@ -10,7 +10,7 @@ The previous five-hull execution at `0c2677b5` exhausted operations on every ori
 
 ## Validation
 
-The current source work removal and four additional Rust regressions are **UNRUN**. Parent joined source `463dccc` passed all 67 Rust tests, nine host tests, locked all-target check, strict Clippy and development build. Its one changed original-five run passed all five decodes and refused all five constructors on Operations; 15 dependent bodies stayed UNRUN and zero candidates returned. The new source retains every prior test body and adds four comparisons for 71 Rust tests. The author lane checks syntax, formatting and exact source preservation only. G2 whole-source and relevant delta review precedes G1's focused checks and one changed original-five run. See [the contract](integration/source-work/CONTRACT.md) and [the source-bound prior results](integration/source-work/CUSTODY.json).
+The current certified local section implementation and four additional Rust tests are **UNRUN**. Parent Root `84936cd` passed all 71 Rust and nine host tests, locked all-target check, strict Clippy and development build. Its one changed original-five batch passed five decodes and refused all five constructors on Operations; 15 dependent bodies stayed UNRUN and zero candidates returned. The new source retains all 71 test bodies and adds four cases for 75 Rust tests. Source-only preservation, syntax and formatting checks do not establish compiler or runtime acceptance. G2 whole-source review precedes existing G1's focused gates and one changed original-five batch. See [the complete contract](integration/convex-sections/CONTRACT.md) and [actual prior source binding](integration/convex-sections/CUSTODY.json).
 
 ```sh
 cargo check --locked -p meridian-geometry --all-targets
@@ -221,3 +221,7 @@ Certified convex source supports exclude only their own owner's provably empty o
 ## Checked refusal assertions
 
 G2's whole-source review found one test-only static compiler/lint issue in seven new refusal assertions. The bounded correction uses a private generic helper that returns each expected Failure and fails on every unexpected success without a Debug bound. The complete review, exact test-token preservation proof and successor contract are in [the correction handoff](integration/source-work-refusal/CONTRACT.md). All 67 prior test bodies, four new case names, geometry, guards and strict comparisons remain. Current 71 Rust and nine host tests, compiler, strict Clippy, build and whole-five remain UNRUN pending the bounded review closure and G1's lane.
+
+## Certified local sections
+
+Audited convex original owners can use exact inequalities on the current original facet plane instead of rebuilding their triangulated outward section and parity index. Physical cuts, source fields and contact constraints still use the original collector. Nonconvex owners retain original outward segments and multiplicity; projected boundary ambiguity retains the original generic-ray fallback. All inputs, output triangles, witnesses, topology audits and fixed caps remain. The [contract](integration/convex-sections/CONTRACT.md) gives the source-plane proof, full charging and lifetime rules. Current tests and execution are UNRUN; prior failed prefixes do not prove full fit or completed-original speed.

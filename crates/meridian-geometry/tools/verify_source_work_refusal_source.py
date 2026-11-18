@@ -5,6 +5,7 @@ import re
 import subprocess
 from pathlib import Path
 from strip_budget_context import body, end_delimiter
+from restore_convex_sections import restore_convex_sections
 
 CRATE = Path(__file__).resolve().parents[1]
 REPO = CRATE.parents[1]
@@ -47,8 +48,9 @@ def verify():
     for relative in subprocess.check_output(['git', '-C', str(REPO), 'ls-tree', '-r', '--name-only', pins['parent'], '--', 'crates/meridian-geometry/src', 'crates/meridian-geometry/tests'], text=True).splitlines():
         if relative != path:
             expected = subprocess.check_output(['git', '-C', str(REPO), 'show', pins['parent'] + ':' + relative])
-            assert (REPO / relative).read_bytes() == expected, relative
-    print('PASS_SOURCE_ONLY: seven checked failure wrappers invert to exact parent tokens; helper has no T bound and every Ok panics; paired invalid-domain errors cannot pass on two successes; all other production and test files byte exact; four case names unchanged')
+            actual = restore_convex_sections(Path(relative).name, (REPO / relative).read_text()).encode()
+            assert actual == expected, relative
+    print('PASS_SOURCE_ONLY: seven checked failure wrappers invert to exact parent tokens; helper has no T bound and every Ok panics; paired invalid-domain errors cannot pass on two successes; all other prior production and test files byte exact after successor inversion; four case names unchanged')
 
 
 if __name__ == '__main__':

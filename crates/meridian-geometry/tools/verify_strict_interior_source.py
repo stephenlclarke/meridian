@@ -5,6 +5,7 @@ import re
 import subprocess
 from pathlib import Path
 from restore_strict_interior import restore_interior
+from restore_convex_sections import restore_convex_sections
 from strip_budget_context import body
 
 CRATE = Path(__file__).resolve().parents[1]
@@ -29,7 +30,7 @@ def verify():
     raw = body(old, 'fn reconstruct_records(') + '\n'
     assert (f / 'reconstruct-control.rs.txt').read_text() == raw
     assert (f / 'compiled-reconstruct-control.rs').read_text() == raw.replace('fn reconstruct_records(', 'fn reference_reconstruct_records(', 1)
-    current = (CRATE / 'src/certificate.rs').read_text()
+    current = restore_convex_sections('certificate.rs', (CRATE / 'src/certificate.rs').read_text())
     main = body(current, 'fn reconstruct_records(')
     assert 'FacetBoundsIndex::build_spatial(' not in main
     assert 'FacetBoundsIndex::spatial_memberships(' not in main
