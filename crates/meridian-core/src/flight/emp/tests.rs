@@ -458,6 +458,15 @@ fn target_settled(
     *previous = Some(body.pose);
     *quiet >= 30
 }
+fn traffic_start_failure_evidence(w: &World) -> String {
+    w.traffic.validation_failure_evidence(
+        w.combat_identity().unwrap().owner,
+        w.snapshot().tick,
+        w.combat.emissions,
+        w.station_data.as_ref().unwrap(),
+        w.station_markets.as_ref().unwrap(),
+    )
+}
 fn start_charge(w: &mut World, target: crate::traffic::NpcId) {
     let mut previous = None;
     let mut quiet = 0;
@@ -481,7 +490,10 @@ fn start_charge(w: &mut World, target: crate::traffic::NpcId) {
                 | EmpError::InvalidContact
                 | EmpError::Resources,
             ) => {}
-            Err(error) => panic!("unexpected start refusal {error:?}"),
+            Err(error) => panic!(
+                "unexpected start refusal {error:?}; {}",
+                traffic_start_failure_evidence(w)
+            ),
         }
         w.step(aim_input(w, target)).unwrap();
     }
@@ -1007,7 +1019,10 @@ fn start_real_3d_charge(w: &mut World, target: crate::traffic::NpcId) {
                 return;
             }
             Err(EmpError::NoTarget | EmpError::InvalidContact | EmpError::Resources) => {}
-            other => panic!("real recovery fixture lost recent-attacker admission {other:?}"),
+            other => panic!(
+                "real recovery fixture lost recent-attacker admission {other:?}; {}",
+                traffic_start_failure_evidence(w)
+            ),
         }
         w.step(track_real_target(w, target)).unwrap();
     }

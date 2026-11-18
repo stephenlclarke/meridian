@@ -7,6 +7,46 @@ use super::{
 };
 use crate::save::{Reader, Writer};
 impl State {
+    /// Failure-only evidence from the same read-only guards as validate; never repairs state.
+    #[cfg(test)]
+    pub(crate) fn validation_failure_evidence(
+        &self,
+        seed: u64,
+        world_tick: u64,
+        player_emissions: u64,
+        data: &OriginalStationData,
+        markets: &StationMarkets,
+    ) -> String {
+        let actors: Vec<_> = self
+            .actors
+            .iter()
+            .enumerate()
+            .filter_map(|(index, actor)| {
+                let actor = (*actor)?;
+                Some((
+                    index,
+                    self.validate_identity(actor, index, seed, world_tick, data),
+                    Self::validate_economy(actor, seed, world_tick, markets),
+                    self.validate_resources(actor),
+                    self.validate_terminal_manifest(actor),
+                    self.resources_at(
+                        actor,
+                        actor.resource_clock,
+                        u64::MAX,
+                        super::SceneStage::Command(u64::MAX),
+                    ),
+                ))
+            })
+            .collect();
+        format!(
+            "traffic failure evidence: seed={seed} world_tick={world_tick} player_emissions={player_emissions}; whole={:?}; actors (slot, identity, economy, resources, terminal_manifest, replay_expected)={actors:#?}; separation={:?}; shots={:?}; player_hits={:?}; missile_resource_replay={:?}; actual_state={self:#?}",
+            self.validate(seed, world_tick, player_emissions, data, markets),
+            self.validate_separation(data),
+            self.validate_shots(world_tick, player_emissions, data),
+            self.validate_player_hits(world_tick, data),
+            self.validate_missile_resource_replay(),
+        )
+    }
     pub(crate) fn validate(
         &self,
         seed: u64,
