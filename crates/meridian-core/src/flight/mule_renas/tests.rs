@@ -5,34 +5,38 @@ const LEGACY_OVERLAP: &[u8] =
     include_bytes!("../../../tests/fixtures/renas-mule-pre-pr-overlap-v17.bin");
 
 #[test]
-fn genuine_pre_pr_v17_overlap_continues_in_place_and_releases_the_same_mule_after_escape() {
-    let checked = World::decode_saved_world(LEGACY_OVERLAP).unwrap();
-    assert_eq!(checked.save_bytes().unwrap(), LEGACY_OVERLAP);
-    let mut world = World::from_save_bytes(LEGACY_OVERLAP).unwrap();
+fn genuine_pre_pr_v17_overlap_continues_in_place_and_releases_the_same_mule_after_escape()
+-> Result<(), Box<dyn std::error::Error>> {
+    let checked = World::decode_saved_world(LEGACY_OVERLAP)?;
+    assert_eq!(checked.save_bytes()?, LEGACY_OVERLAP);
+    let mut world = World::from_save_bytes(LEGACY_OVERLAP)?;
     let opening = world.snapshot();
     assert_eq!(opening.mode, FlightMode::Flight);
     assert_eq!(opening.position, [133.50058, 10.411001, 1324.3611]);
     assert_eq!(opening.orientation, [0.0, 0.0, 0.0, 1.0]);
     assert!(world.mule_actor_snapshot().is_none());
-    let deferred = world.mule_renas.as_ref().unwrap();
+    let deferred = world.mule_renas.as_ref().ok_or("missing deferred Mule")?;
     assert!(deferred.renas_is_deferred());
     let intended_pose = deferred.pose();
-    let intended_generation = opening.navigation.unwrap().visit;
+    let intended_generation = opening.navigation.ok_or("missing Renas navigation")?.visit;
 
-    let freight = world.mission_snapshot().unwrap().freight;
+    let freight = world
+        .mission_snapshot()
+        .ok_or("missing freight snapshot")?
+        .freight;
     assert_eq!(freight.completed_jobs, 1);
     assert!(freight.clue.is_some());
     assert_eq!(world.credits_tenths(), Some(14500));
 
     // A second cold continuation while still intersecting must not publish it.
-    let mut replay = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    let mut replay = World::from_save_bytes(&world.save_bytes()?)?;
     assert_eq!(replay.snapshot(), opening);
     assert!(replay.mule_actor_snapshot().is_none());
 
     let mut escaped = None;
     for _ in 0..128 {
-        world.step(FlightInput::default()).unwrap();
-        replay.step(FlightInput::default()).unwrap();
+        world.step(FlightInput::default())?;
+        replay.step(FlightInput::default())?;
         assert_eq!(world.snapshot(), replay.snapshot());
         assert_eq!(world.snapshot().motion_refusal, None);
         assert_ne!(world.snapshot().position, opening.position);
@@ -41,7 +45,7 @@ fn genuine_pre_pr_v17_overlap_continues_in_place_and_releases_the_same_mule_afte
         let cold = replay.mule_actor_snapshot();
         assert_eq!(current.is_some(), cold.is_some());
         if let Some(current) = current {
-            let cold = cold.unwrap();
+            let cold = cold.ok_or("missing Mule on replay")?;
             assert_eq!(current.actor(), cold.actor());
             assert_eq!(current.generation(), cold.generation());
             assert_eq!(current.actor().pose, intended_pose);
@@ -55,11 +59,20 @@ fn genuine_pre_pr_v17_overlap_continues_in_place_and_releases_the_same_mule_afte
     }
 
     let escaped = escaped.unwrap_or_else(|| panic!("ordinary flight never cleared the Mule berth"));
-    let again = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
-    let restored = again.mule_actor_snapshot().unwrap();
+    let again = World::from_save_bytes(&world.save_bytes()?)?;
+    let restored = again
+        .mule_actor_snapshot()
+        .ok_or("missing Mule after Continue")?;
     assert_eq!(restored.actor(), escaped.actor());
     assert_eq!(restored.presentation(), escaped.presentation());
     assert_eq!(restored.generation(), escaped.generation());
-    assert_eq!(again.mission_snapshot().unwrap().freight, freight);
+    assert_eq!(
+        again
+            .mission_snapshot()
+            .ok_or("missing restored freight snapshot")?
+            .freight,
+        freight
+    );
     assert_eq!(again.credits_tenths(), Some(14500));
+    Ok(())
 }
