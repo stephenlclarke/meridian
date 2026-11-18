@@ -315,3 +315,66 @@ reviews and block commands; actual Save/Quit/new-process Continue must preserve
 paid provenance, selection, pools, finite missiles and ECM journal, without
 restoring active field permission. Retain actual binary/source/lock identity,
 commands, raw log, input/output hashes and captures. None is observed here.
+
+## Source-derived geometry pilot correction
+
+Actual Mac `ba8dc70bb6d7d0ddb8070869f4594d8bdb8b2174`, tree
+`1ed634e72c30937d00880492c1fd3591f34bee86`, compiles and reports 428/431
+core passes. The previous eleven StaleOccupant/four InvalidEncoding cases all
+execute: twelve pass and three fail at later geometric/flight assertions. The
+new real rear-hit archived retry case passes. The raw failure report contains no
+actual contact, endpoint number or yaw angle for these three failures; none is
+invented here. Static source analysis proves three setup inconsistencies. The
+correction starts at sealed `2fb707b08cb167d0e7fc252adad4087a31e61025`, whose
+core/desktop source matches this frozen ba8 qualification exactly.
+
+Original SH028 native faces 482/483 form a two-metre front trim strip with X
+68.12 through 70.12, Y -48.384 through 48.384 and Z 136.32. The old wall pilot
+crossed X 70 at speed 1, then braked. Real movement uses 18 metres per speed unit,
+acceleration/deceleration 9.1 and 1/60-second ticks: independent discrete braking
+arithmetic gives about 0.8445 metres of additional travel, before waypoint-step
+overshoot. This can leave the strip even though X 70 itself hits its front plane.
+The corrected public pilot targets the original strip midpoint X 69.12 at speed
+0.25 and checks the actual ray's source-quad crossing before firing. Its original
+StationBlocked, Z direction, endpoint Z 136.32 at tolerance 1e-6, exact impact
+point/item/body pose and cold assertions remain. No broader endpoint tolerance or
+replacement collision surface is introduced.
+
+Original faces 384/387 meet on their Y=0 edge from (105.632,0,-112) to
+(96.8,0,-76.16). The prior rear-occlusion pilot approached X 90 at speed 4; braking
+can drift about 15 metres toward an actual mesh opening. A bounding box or a
+nominal waypoint cannot prove obstruction. The changed pilot derives its X
+waypoint from the actual beacon and actual rear Z position, aiming through the
+source edge midpoint (101.216,0,-94.08), and approaches at speed 0.25. An
+independent source-plane equation, `35.84*(x-105.632)+8.832*(z+112)=0`, checks the
+actual rear ray crosses within that edge before reaching the real beacon cube.
+StationBlocked, zero beacon hits and full cold custody assertions remain. The
+station aperture/native triangles are neither filled nor enlarged.
+
+The old interception setup called a general yaw helper that subtracts raw atan2
+headings. Across -PI/+PI it can request 270 degrees rather than its intended
+90 while the real missile advances at 792 metres/second. That unsafe raw delta
+is source-proven; the actual failed run's angle and terminal contact were not
+logged, so they are not claimed. Only this finite-projectile setup now wraps the
+yaw delta, retains a stopped ship, caps the intended quarter-turn at 146 existing
+rate ticks and checks actual muzzle-to-beacon distance exceeds missile travel
+during that turn. The following 120-step tracking bound, actual owned airborne
+projectile requirement, real interception, finite spent round, no beacon award,
+exact cash and historical cold/P2 coordinated corruption controls all remain.
+Missile speed/range/lifetime, targets, hit geometry and production command
+admission are unchanged; no projectile or positive receipt is fabricated.
+
+The original SH028 TOML is pinned in [source references](LASER-FACINGS-SOURCES.json)
+and byte-identically reproduces the admitted native physics asset. Independent
+Python source/triangle/plane/braking arithmetic is preparation, not Rust or
+native execution. The packet retains exact original raw qualification evidence,
+all changed test source, untouched production/test proofs and execution criteria.
+No test is dropped, skipped or added; all original named assertions retain their
+meaning. Current 431 core, two compatibility, 244 desktop and three observer
+source attributes remain counts, not passing results for this correction.
+The current-main importer and its 32 cases remain separately owned and unrun in
+that Mac failure; no 712-pass claim follows. The same sealed public XYZZY native
+setup example remains uncompiled/unrun, for G1 only after changed compilation
+passes and complete Root/G2 source review. Navigation/trade progress is preserved
+separately and does not enter this delta. No compiler, Cargo, Clippy, Rust/helper,
+native/GPU or bot is run by this author.

@@ -1,6 +1,6 @@
 # Implementation and validation status
 
-The first section records the current delivered release. Earlier source-specific sections retain their original observations and limits; their historical pending states do not override the current checkpoint.
+Current candidate work and the delivered release are recorded separately below. Earlier source-specific sections retain their original observations and limits; their historical pending states do not override the current checkpoint.
 
 ## Current importer main and method-reference correction
 
@@ -8,9 +8,29 @@ PR 52 merged at `22715d60604acc57ac6acad99e3be54a6085a618` on 18 November 2026 a
 
 ## Current-main composition for the corrected laser/ECM candidate
 
-The actual `ba8dc70` Mac run passed all-target compilation, 99 Python checks, 52 Markdown files and formatting, then ran 431 core cases: 428 passed and three failed. Twelve of the fifteen prior failing cases now pass; the remaining three reach later station-wall or airborne-projectile assertions. The new rear-hit archive/cold-Continue regression passed. Compatibility, desktop, importer, observer, strict Clippy, releases and native work remained unrun. The method-reference correction below changes only the importer CLI and does not cure those three game failures. A further causal game correction is required; no 680-case game or 712-case workspace pass is carried from this run.
+The actual `ba8dc70` Mac run passed all-target compilation, 99 Python checks, 52 Markdown files and formatting, then ran 431 core cases: 428 passed and three failed. Twelve of the fifteen prior failing cases now pass; the remaining three reach later station-wall or airborne-projectile assertions. The new rear-hit archive/cold-Continue regression passed. Compatibility, desktop, importer, observer, strict Clippy, releases and native work remained unrun. The method-reference correction below changes only the importer CLI and does not cure those three game failures. The source-derived pilot corrections below now address those cases, but require changed-source execution; no 680-case game or 712-case workspace pass is carried from this run.
 
 Root joined the source correction onto protected main `22715d6` after PR 52 merged. The reviewed offline importer and actual Preview 8 delivery documentation are retained. The combined source now contains 431 core, two compatibility, 244 desktop, 32 importer and three observer test attributes: 712 expected cases, all unrun for this combined candidate. Its 52 Markdown files pass. The prior `3553ea5` 415-pass/15-fail result stays bound to that earlier source. PR 52 main CI and its exact-main Sonar gate passed; one CLI method-reference finding is corrected in this candidate and awaits changed-source qualification. The published Preview 8 retains its separate `bf31ab7`/`2d5f4a5` source and accepted notarization.
+
+## Source-derived laser geometry pilot correction
+
+Actual Mac `ba8dc70bb6d7d0ddb8070869f4594d8bdb8b2174`, tree
+`1ed634e72c30937d00880492c1fd3591f34bee86`, passed compilation, formatting,
+99 Python cases and 52 Markdown files, then reported 428/431 core passes.
+All 15 earlier cases executed: 12 now pass and three reach later geometry/flight
+assertions. No StaleOccupant or InvalidEncoding remains in that report. The new
+rear-hit archived retry/cold case passes. Compatibility, desktop, importer,
+observer, Clippy, releases, helper and native acceptance remain unrun there.
+
+The [three-pilot correction](LASER-FACINGS.md#source-derived-geometry-pilot-correction)
+changes only the failed setups: controlled braking inside a source trim strip,
+a ray through a genuine source back-wall edge, and a wrapped bounded quarter-turn
+while a real finite missile stays in flight. Independent original mesh arithmetic
+pins the geometry; every original contact, endpoint tolerance, shield, custody,
+finite-missile and P2 corruption assertion remains. Production/asset/content/lock
+and native helper bytes stay unchanged. Corrected Rust/native execution remains
+**UNRUN**, with 431 core attributes unchanged. Root owns complete changed-source
+review and existing platform owners own qualification; no new pass/preview claim.
 
 ## Joined laser/ECM runtime correction candidate
 

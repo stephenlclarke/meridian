@@ -201,8 +201,38 @@ fn genuine_paid_right_interception_rejects_coordinated_item_spend_and_receipt_fa
     let beacon = some(some(w.practice_snapshot()).beacons)[1];
     crate::flight::practice::tests::aim_at(&mut w, beacon.pose.position);
     let origin = crate::flight::missiles::tests::fire(&mut w, beacon.id);
-    let p = w.snapshot().position.map(f64::from);
-    crate::flight::practice::tests::aim_at(&mut w, Vec3::new(p[0] + 10000.0, p[1], p[2]));
+    // atan2's -PI/+PI branch cut permits the old raw-delta helper to take270 degrees,
+    // not the intended90, while a finite projectile keeps moving. Wrap only this pilot.
+    let body = some(crate::flight::flight_pose(
+        w.snapshot().position,
+        w.snapshot().orientation,
+    ));
+    assert_eq!(w.snapshot().speed, 0.0);
+    let aim = core::f64::consts::FRAC_PI_2;
+    let raw = aim - body.orientation.z.x.atan2(body.orientation.z.z);
+    let yaw = raw.sin().atan2(raw.cos());
+    let turn_ticks = (yaw.abs() / (0.65 / 60.0)).ceil() as u16;
+    assert!(
+        turn_ticks <= 146,
+        "intended shortest quarter-turn: raw={raw} yaw={yaw}"
+    );
+    let target_delta = Vec3::new(
+        beacon.pose.position.x - origin.muzzle.x,
+        beacon.pose.position.y - origin.muzzle.y,
+        beacon.pose.position.z - origin.muzzle.z,
+    );
+    let target_distance = target_delta.dot(target_delta).sqrt();
+    assert!(
+        target_distance
+            > f64::from(turn_ticks) * crate::MISSILE_SPEED / 60.0 + crate::PRACTICE_HALF_SIDE,
+        "actual launch must retain flight time through the bounded quarter-turn"
+    );
+    for _ in 0..turn_ticks {
+        ok(w.step(FlightInput {
+            yaw: (yaw / (0.65 / 60.0) / f64::from(turn_ticks)) as f32,
+            ..FlightInput::default()
+        }));
+    }
     let mut emitted = None;
     for _ in 0..120 {
         let projectile = some(
@@ -214,7 +244,7 @@ fn genuine_paid_right_interception_rejects_coordinated_item_spend_and_receipt_fa
         );
         assert!(
             projectile.ended.is_none(),
-            "real owned projectile must still be airborne"
+            "real owned projectile must still be airborne after bounded quarter-turn: {projectile:?}"
         );
         let snapshot = w.snapshot();
         let body = some(crate::flight::flight_pose(
