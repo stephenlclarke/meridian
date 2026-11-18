@@ -640,3 +640,195 @@ fn flight_feedback_expires_once_at_its_deadline_and_repeated_input_renews_it() {
     assert!(notice.text.is_none());
     assert!(!notice.expire(renewed));
 }
+
+fn startup(directory: &TestDirectory) -> App {
+    ok(App::from_launch(super::mule_validation::Launch::Profile(
+        directory.0.clone(),
+    )))
+}
+
+fn commander_labels(app: &mut App) -> Vec<String> {
+    ok(
+        app.prepare_presentation(app.simulation_active(), None, 0.0, |_| {
+            Some([1280.0, 720.0])
+        }),
+    )
+    .docked_frame
+    .unwrap_or_else(|| panic!("missing Commander frame"))
+    .labels
+    .into_iter()
+    .map(|label| label.text)
+    .collect()
+}
+
+#[test]
+fn ordinary_start_opens_fresh_commander_with_live_station_bindings_and_without_a_save() {
+    let directory = TestDirectory::new();
+    let path = directory.0.join("commander.meridian");
+    let mut app = startup(&directory);
+    assert!(app.commander_open && app.has_berth() && !app.simulation_active());
+    let labels = commander_labels(&mut app);
+    assert_eq!(labels[0], "COMMANDER DETAILS");
+    for value in [
+        "Commander ID",
+        "SH025",
+        "Avenor",
+        "720.0 CR",
+        "5 Equipment",
+        "L Launch",
+    ] {
+        assert!(
+            labels.iter().any(|label| label.contains(value)),
+            "{value}: {labels:?}"
+        );
+    }
+    assert!(!path.exists());
+
+    assert_eq!(
+        key(&mut app, KeyCode::KeyH, ElementState::Pressed, false, None),
+        None
+    );
+    assert_eq!(
+        app.help.as_ref().map(|panel| panel.title.as_str()),
+        Some("Commander details")
+    );
+    assert_eq!(
+        key(&mut app, KeyCode::KeyL, ElementState::Pressed, false, None),
+        None
+    );
+    assert_eq!(
+        key(
+            &mut app,
+            KeyCode::Escape,
+            ElementState::Pressed,
+            false,
+            None
+        ),
+        None
+    );
+    assert!(app.commander_open && app.has_berth());
+
+    for (code, screen) in [
+        (KeyCode::Digit1, ui::Screen::Galaxy),
+        (KeyCode::Digit2, ui::Screen::System),
+        (KeyCode::Digit3, ui::Screen::Showroom),
+        (KeyCode::Digit4, ui::Screen::Trading),
+        (KeyCode::Digit5, ui::Screen::Equipment),
+    ] {
+        assert!(app.commander_key(code));
+        assert!(app.menu_active());
+        assert_eq!(app.docked.as_ref().map(|menu| menu.screen()), Some(screen));
+        app.show_station_commander();
+        assert!(app.commander_open && !app.menu_active() && !app.simulation_active());
+    }
+    assert!(!path.exists());
+    assert!(app.commander_key(KeyCode::KeyL));
+    assert!(!app.commander_open);
+    assert_eq!(app.game.world.snapshot().mode, FlightMode::Launching);
+    assert!(app.simulation_active());
+    assert!(!path.exists());
+}
+
+#[test]
+fn ordinary_cold_airborne_save_is_held_at_exact_snapshot_until_explicit_resume() {
+    let directory = TestDirectory::new();
+    let path = directory.0.join("commander.meridian");
+    let expected = {
+        let mut app = app(&directory);
+        launched(&mut app);
+        let snapshot = app.game.world.snapshot();
+        ok(app.game.world.request_pause(true, snapshot.tick));
+        ok(app.game.save());
+        snapshot
+    };
+    let bytes = ok(std::fs::read(&path));
+    let mut app = startup(&directory);
+    assert!(app.commander_open && app.game.playing() && !app.has_berth());
+    assert_eq!(app.game.world.snapshot(), expected);
+    let labels = commander_labels(&mut app);
+    assert!(
+        labels
+            .iter()
+            .any(|label| label.contains("Enter Resume flight"))
+    );
+    assert!(!labels.iter().any(|label| label.contains("Market")));
+    app.focus_changed(false);
+    app.focus_changed(true);
+    app.occlusion_changed(true);
+    app.occlusion_changed(false);
+    for blocked in [
+        KeyCode::Digit2,
+        KeyCode::Digit4,
+        KeyCode::KeyL,
+        KeyCode::KeyW,
+    ] {
+        assert!(app.commander_key(blocked));
+    }
+    assert_eq!(
+        key(&mut app, KeyCode::Enter, ElementState::Pressed, true, None),
+        None
+    );
+    assert!(!app.simulation_active());
+    assert!(
+        app.game
+            .world
+            .mission_snapshot()
+            .is_some_and(|mission| mission.paused)
+    );
+    assert_eq!(app.game.world.snapshot(), expected);
+    assert_eq!(ok(std::fs::read(&path)), bytes);
+
+    assert!(app.commander_key(KeyCode::Enter));
+    assert!(!app.commander_open && app.simulation_active());
+    assert_eq!(app.game.world.snapshot(), expected);
+    assert_eq!(
+        app.advance_frame(app.simulation_active(), 1),
+        FrameAdvance::Continue(None)
+    );
+    assert_eq!(app.game.world.snapshot().tick, expected.tick + 1);
+    assert_eq!(ok(std::fs::read(&path)), bytes);
+}
+
+#[test]
+fn corrupt_and_unsupported_startup_keep_the_slot_until_confirmed_replacement_is_saved() {
+    let samples: [&[u8]; 2] = [
+        b"damaged commander",
+        include_bytes!("../../../meridian-core/tests/fixtures/pr44-v16-m02-purchases.bin"),
+    ];
+    for bytes in samples {
+        let directory = TestDirectory::new();
+        let path = directory.0.join("commander.meridian");
+        ok(std::fs::write(&path, bytes));
+        let mut app = startup(&directory);
+        assert!(app.commander_open && !app.game.playing() && !app.has_berth());
+        assert!(
+            commander_labels(&mut app)
+                .iter()
+                .any(|line| line.contains("startup refused"))
+        );
+        assert!(app.commander_key(KeyCode::Digit2));
+        assert!(!app.commander_key(KeyCode::KeyC));
+        app.load_profile();
+        assert!(
+            app.notice
+                .text
+                .as_deref()
+                .is_some_and(|notice| notice.contains("Continue refused"))
+        );
+        ok(app.game.prepare_quit());
+        assert_eq!(ok(std::fs::read(&path)), bytes);
+
+        assert!(!ok(app.game.new_commander(98012)));
+        assert_eq!(
+            key(&mut app, KeyCode::KeyN, ElementState::Pressed, true, None),
+            None
+        );
+        assert!(!app.game.playing());
+        assert!(ok(app.game.new_commander(98012)));
+        app.sync_profile_controls();
+        assert!(app.commander_open && app.has_berth());
+        assert_eq!(ok(std::fs::read(&path)), bytes);
+        ok(app.game.save());
+        assert_ne!(ok(std::fs::read(&path)), bytes);
+    }
+}

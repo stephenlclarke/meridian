@@ -18,8 +18,11 @@ pub struct Profile {
 impl Profile {
     pub fn open(directory: PathBuf) -> Result<Self, Box<dyn std::error::Error>> {
         let store = Store::open(directory)?;
-        // An unreadable existing slot must not silently become a new commander.
         let has_save = !matches!(store.load(MAX_SAVE_BYTES), Ok(None));
+        Self::with_store(store, has_save)
+    }
+
+    fn with_store(store: Store, has_save: bool) -> Result<Self, Box<dyn std::error::Error>> {
         Ok(Self {
             world: World::at_original_station()?,
             session: Session::default(),
@@ -29,6 +32,25 @@ impl Profile {
             new_armed: false,
         })
     }
+
+    pub(crate) fn open_startup(
+        directory: PathBuf,
+        seed: u64,
+    ) -> Result<(Self, Option<String>), Box<dyn std::error::Error>> {
+        let store = Store::open(directory)?;
+        let slot = store.load(MAX_SAVE_BYTES);
+        let mut profile = Self::with_store(store, !matches!(&slot, Ok(None)))?;
+        let result = match slot {
+            Ok(None) => profile.new_commander(seed).map(|_| ()),
+            Ok(Some(bytes)) => profile.accept_save(&bytes),
+            Err(error) => Err(error.to_string()),
+        };
+        let notice = result
+            .err()
+            .map(|error| format!("Commander startup refused: {error}"));
+        Ok((profile, notice))
+    }
+
     /// A fresh World-owned source scenario has no Store, directory resolution or profile lease.
     pub(crate) fn mule_validation(world: World) -> Result<Self, String> {
         let frame = world
@@ -153,12 +175,14 @@ impl Profile {
             .load(MAX_SAVE_BYTES)
             .map_err(|e| e.to_string())?
             .ok_or("No saved commander exists in this save slot")?;
+        self.accept_save(&bytes)
+    }
+
+    fn accept_save(&mut self, bytes: &[u8]) -> Result<(), String> {
         if self.playing {
-            self.world
-                .restore_bytes(&bytes)
-                .map_err(|e| e.to_string())?;
+            self.world.restore_bytes(bytes).map_err(|e| e.to_string())?;
         } else {
-            let world = World::from_save_bytes(&bytes).map_err(|e| e.to_string())?;
+            let world = World::from_save_bytes(bytes).map_err(|e| e.to_string())?;
             self.world = world;
         }
         self.session = Session::from_world(&self.world);
