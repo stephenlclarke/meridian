@@ -33,6 +33,8 @@ Coverage artifacts retain their original measurements. `make coverage-paths` cre
 
 The Linux coverage job also launches the instrumented desktop under Xvfb with Mesa software Vulkan. It drives the normal title, new commander, System, Trading, Back to HUD, and quit controls through X11. The job requires the expected presented frames, a valid isolated starter save, a clean exit, and native coverage hits in the viewport, scale, and GPU upload adapters. The coverage artifact contains the captures, backend and process receipt, and the app-only LLVM report alongside the merged unit and native report used by SonarQube.
 
+The same Linux job then opens a separate instrumented process with `--internal-mule-validation dock`. It checks the paused opening and the changed hull region after single-step controls, requires a normal exit with a presented-draw timing aggregate, and verifies that the internal route creates no profile directory. Its own LLVM profile must cover the production Mule texture upload, uniform update and both draws. It must also cover at least 80 percent of the executable GPU source lines, with a floor based on the 267 lines missed by the original main analysis. Both profiles feed the workspace report. The ordinary journey's native boundary checks use its own profile, and the explicit offscreen Metal test remains a separate qualification.
+
 The coverage helpers read build and report files at fixed checkout paths and reject symlink redirection. Python coverage combines the two helpers' actual Linux runs with host tests for path validation, native coverage marker checks, and failure evidence.
 
 ## Repository maintenance

@@ -17,6 +17,9 @@ HEIGHT = 720
 RECTANGLE = (WIDTH, HEIGHT)
 SAVE_NAME = "commander.meridian"
 MAX_SAVE_BYTES = 65_536
+MULE_TITLE = "Meridian INTERNAL MULE VALIDATION / NO SAVE | FLIGHT | PAUSED | H / ? Help"
+MULE_REGION = (70, 260, 620, 460)
+MULE_STEPS = 16
 
 
 def run(*argv, env=None):
@@ -167,6 +170,76 @@ def exercise(app, output, save, receipt):
         raise RuntimeError(f"Desktop normal quit exited {code}")
 
 
+def mule_changed_pixels(before, after):
+    """Count strong RGB changes in the projected opening/approach hull region, outside the HUD."""
+    left, top, right, bottom = MULE_REGION
+    return sum(
+        max(abs(before[index + channel] - after[index + channel]) for channel in range(3)) >= 24
+        for y in range(top, bottom, 2)
+        for x in range(left, right, 2)
+        for index in (3 * (y * WIDTH + x),)
+    )
+
+
+def exercise_mule(app, output, profile_root, receipt):
+    receipt["stage"] = "Mule map and focus"
+    window = await_result(app, "visible Mule X11 window", lambda: mapped_window(app))
+    receipt["x11_window"] = window
+    focus(window)
+    receipt["stage"] = "Mule opening hull"
+    await_result(app, "paused Mule title", lambda: run(
+        "xdotool", "getwindowname", window,
+    ).decode().strip() == MULE_TITLE)
+    opening = capture_phase(
+        app, window, output, "mule-opening",
+        lambda rgb: count_pixels(rgb, MULE_REGION, bright, step=2) > 80,
+    )
+    receipt["phases"].append(opening)
+    image = (output / opening["image"]).read_bytes().split(b"\n", 3)[3]
+    if opening["title"] != MULE_TITLE:
+        raise RuntimeError("Opening frame is not the paused Mule validation scene")
+    receipt["stage"] = "Mule inbound movement"
+    # Each distinct key press advances World once while the physical observer and station stay fixed.
+    run("xdotool", "key", "--delay", "30", *(["period"] * MULE_STEPS))
+    approach = capture_phase(
+        app, window, output, "mule-approach",
+        lambda rgb: mule_changed_pixels(image, rgb) > 200,
+    )
+    receipt["phases"].append(approach)
+    moved = (output / approach["image"]).read_bytes().split(b"\n", 3)[3]
+    receipt["changed_hull_region_samples"] = mule_changed_pixels(image, moved)
+    if approach["title"] != MULE_TITLE:
+        raise RuntimeError("Mule approach did not present in the isolated paused scene")
+    receipt["stage"] = "Mule normal quit"
+    press("Escape")
+    receipt["normal_quit_sent"] = True
+    code = app.wait(timeout=20)
+    if code or profile_root.exists():
+        raise RuntimeError(f"Mule exit {code} or unexpected profile directory")
+
+
+def verify_mule_log(log):
+    adapter = verify_log(log)
+    text = log.read_text()
+    if "Meridian Mule shimmer unavailable:" in text:
+        raise RuntimeError("Mule production shimmer was disabled")
+    prefix = "MULE_PRESENTED_DRAW_WALL "
+    rows = [line.removeprefix(prefix) for line in text.splitlines() if line.startswith(prefix)]
+    if len(rows) != 1:
+        raise RuntimeError("Expected exactly one Mule normal-exit presentation aggregate")
+    timing = json.loads(rows[0])
+    frames, total, minimum, maximum = (
+        timing.get(key) for key in (
+            "presentedFrames", "totalNanoseconds", "minNanoseconds", "maxNanoseconds",
+        )
+    )
+    if (any(type(value) is not int for value in (frames, total, minimum, maximum))
+            or frames < 2 or not 0 < minimum <= maximum <= total
+            or not frames * minimum <= total <= frames * maximum):
+        raise RuntimeError("Mule timing did not verify multiple presented draws")
+    return adapter, timing
+
+
 def verify_log(log):
     text = log.read_text()
     adapter = next((line for line in text.splitlines() if line.startswith("Meridian adapter: ")), "")
@@ -231,12 +304,12 @@ def retain_failed_save(directory, output):
             "retained_sha256": hashlib.sha256(retained).hexdigest()}
 
 
-def run_app(argv, env, output, save, receipt):
-    with (output / "desktop.log").open("xb") as stream:
+def run_app(argv, env, output, save, receipt, *, journey=exercise, log_name="desktop.log"):
+    with (output / log_name).open("xb") as stream:
         app = subprocess.Popen(argv, env=env, stdout=stream, stderr=subprocess.STDOUT)
         receipt["pid"] = app.pid
         try:
-            exercise(app, output, save, receipt)
+            journey(app, output, save, receipt)
         finally:
             if app.poll() is None:
                 try:
@@ -263,11 +336,52 @@ def at_stage(receipt, label, operation, *args):
     return operation(*args)
 
 
-def native_profile_for(output, pid):
-    path = output / f"desktop-{pid}.profraw"
+def native_profile_for(output, pid, prefix="desktop"):
+    path = output / f"{prefix}-{pid}.profraw"
     if not path.is_file() or path.stat().st_size == 0:
         raise RuntimeError("Normal exit produced no native LLVM coverage data")
     return path
+
+
+def run_mule(binary, output, ordinary):
+    started = time.monotonic()
+    argv = [str(binary), "--internal-mule-validation", "dock"]
+    receipt = {
+        "commit": ordinary["commit"], "binary_sha256": sha256(binary), "viewport": RECTANGLE,
+        "argv": argv, "stage": "launch", "pid": None, "exit": None,
+        "normal_quit_sent": False, "forced_cleanup": False, "phases": [],
+    }
+    log = output / "mule-desktop.log"
+    with tempfile.TemporaryDirectory(prefix="meridian-x11-mule-") as temp:
+        root = Path(temp)
+        runtime = root / "runtime"
+        runtime.mkdir(mode=0o700)
+        profile_root = root / "profile"
+        env = dict(
+            os.environ, XDG_RUNTIME_DIR=str(runtime), XDG_DATA_HOME=str(profile_root),
+            LLVM_PROFILE_FILE=str(output / "desktop-mule-%p.profraw"),
+        )
+        env.pop("WAYLAND_DISPLAY", None)
+        try:
+            if receipt["binary_sha256"] != ordinary["binary_sha256"]:
+                raise RuntimeError("Instrumented desktop changed between native journeys")
+            run_app(argv, env, output, profile_root, receipt, journey=exercise_mule, log_name=log.name)
+            receipt["adapter"], receipt["presented_draw_wall"] = at_stage(
+                receipt, "Mule backend, shimmer and presentation", verify_mule_log, log,
+            )
+            native_profile = at_stage(
+                receipt, "Mule native LLVM profile", native_profile_for, output, receipt["pid"], "desktop-mule",
+            )
+            receipt.update(profraw=native_profile.name, profraw_sha256=sha256(native_profile))
+        except Exception as error:
+            receipt.update(status="failed", failure={"type": type(error).__name__, "message": str(error)})
+            raise
+        else:
+            receipt.update(status="passed", stage="complete")
+        finally:
+            receipt["seconds"] = round(time.monotonic() - started, 3)
+            (output / "mule-native-smoke.json").write_text(json.dumps(receipt, indent=2) + "\n")
+            print(json.dumps(receipt), flush=True)
 
 
 def main():
@@ -318,6 +432,7 @@ def main():
             receipt["seconds"] = round(time.monotonic() - started, 3)
             (output / "native-smoke.json").write_text(json.dumps(receipt, indent=2) + "\n")
             print(json.dumps(receipt), flush=True)
+    run_mule(argv_binary, output, receipt)
 
 
 if __name__ == "__main__":

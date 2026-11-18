@@ -243,6 +243,83 @@ class NativeCoverageHarnessTests(unittest.TestCase):
         self.assertEqual((output / result["failed_save"]["artifact"]).read_bytes(), save_bytes)
         self.assertFalse(self.save_path.exists())
 
+    def test_mule_native_report_requires_the_production_upload_and_both_draws(self):
+        source = (SCRIPTS.parents[1] / checker.MULE_GPU).read_text()
+        self.write(checker.MULE_GPU, source)
+        markers = {
+            line for line, text in enumerate(source.splitlines(), 1)
+            if text.strip() in checker.MULE_GPU_MARKERS
+        }
+        self.assertEqual(len(markers), 8)
+        rows = markers | set(range(1, 268))
+        hit_rows = markers | set(range(1, 230))
+        target = self.write(
+            "coverage/native/mule-desktop.lcov",
+            f"SF:{self.root / checker.MULE_GPU}\n"
+            + "".join(f"DA:{n},{int(n in hit_rows)}\n" for n in sorted(rows))
+            + "end_of_record\n",
+        )
+        with contextlib.redirect_stdout(io.StringIO()):
+            checker.check_mule_coverage()
+        original = target.read_text()
+        for marker in markers:
+            target.write_text(original.replace(f"DA:{marker},1\n", f"DA:{marker},0\n"))
+            with self.subTest(marker=marker), self.assertRaisesRegex(SystemExit, "missing"):
+                checker.check_mule_coverage()
+        target.write_text(
+            f"SF:{self.root / checker.MULE_GPU}\n"
+            + "".join(f"DA:{n},{int(n in markers)}\n" for n in sorted(rows))
+            + "end_of_record\n",
+        )
+        with contextlib.redirect_stdout(io.StringIO()), self.assertRaisesRegex(SystemExit, "below 80"):
+            checker.check_mule_coverage()
+
+    def test_mule_journey_accepts_distinct_hull_pixels_and_keeps_profile_absent(self):
+        app = Mock()
+        app.wait.return_value = 0
+        receipt = {"phases": []}
+        profile = self.root / "profile"
+        before = bytes(smoke.WIDTH * smoke.HEIGHT * 3)
+        after = bytearray(before)
+        x0, y0, _, _ = smoke.MULE_REGION
+        for y in range(y0, y0 + 50, 2):
+            for x in range(x0, x0 + 50, 2):
+                after[3 * (y * smoke.WIDTH + x)] = 80
+        self.assertEqual(smoke.mule_changed_pixels(before, before), 0)
+        header = b"P6\n1280 720\n255\n"
+        for name, pixels in (("mule-opening", before), ("mule-approach", after)):
+            (self.root / f"{name}.ppm").write_bytes(header + pixels)
+        frames = [
+            {"phase": name, "image": f"{name}.ppm", "title": smoke.MULE_TITLE}
+            for name in ("mule-opening", "mule-approach")
+        ]
+        with (patch.object(smoke, "await_result", return_value="41"),
+              patch.object(smoke, "focus"),
+              patch.object(smoke, "run") as run,
+              patch.object(smoke, "capture_phase", side_effect=frames) as capture,
+              patch.object(smoke, "press") as press):
+            smoke.exercise_mule(app, self.root, profile, receipt)
+        self.assertFalse(capture.call_args_list[1].args[4](before))
+        self.assertTrue(capture.call_args_list[1].args[4](after))
+        self.assertEqual(receipt["changed_hull_region_samples"], 625)
+        self.assertEqual(receipt["phases"], frames)
+        run.assert_called_once_with("xdotool", "key", "--delay", "30", *(["period"] * smoke.MULE_STEPS))
+        press.assert_called_once_with("Escape")
+        self.assertFalse(profile.exists())
+
+    def test_mule_log_requires_two_presented_draws_and_a_working_shimmer(self):
+        log = self.write("mule.log", "")
+        adapter = "Meridian adapter: llvmpipe, device_type: Cpu, backend: Vulkan\n"
+        record = ('MULE_PRESENTED_DRAW_WALL {"presentedFrames":2,"totalNanoseconds":35,'
+                  '"minNanoseconds":10,"maxNanoseconds":25}\n')
+        log.write_text(adapter + record)
+        self.assertEqual(smoke.verify_mule_log(log)[1]["presentedFrames"], 2)
+        for text in (adapter, adapter + record * 2, adapter + record.replace("35", "999"),
+                     adapter + record + "Meridian Mule shimmer unavailable: disabled\n"):
+            with self.subTest(text=text), self.assertRaises(RuntimeError):
+                log.write_text(text)
+                smoke.verify_mule_log(log)
+
     def test_log_and_exit_classifications_reject_incomplete_native_runs(self):
         log = self.write("desktop.log", "Meridian adapter: device_type: Cpu, backend: Gl\n")
         with self.assertRaisesRegex(RuntimeError, "Expected Mesa"):
