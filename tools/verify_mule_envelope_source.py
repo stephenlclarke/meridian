@@ -5,7 +5,6 @@ import json
 from pathlib import Path
 import re
 import struct
-import subprocess
 import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -89,19 +88,18 @@ def verify():
             b'pub use mule_validation::{MuleActorSnapshot, MuleValidationRefusal};\n',
         ],
     }
-    core_root = Path('crates/meridian-core/src')
-    base_tree = subprocess.check_output(['git', '-C', str(ROOT), 'ls-tree', '-rz', base, '--', str(core_root)])
+    pin_bytes = (ROOT / 'integration/sh001-mule/PROTECTED-CORE.json').read_bytes()
+    assert sha(pin_bytes) == 'a3cc243f3e8993157e98fc0b876375c06ede55dda93a5a4178247108cc0a5f93'
+    baseline = json.loads(pin_bytes)
+    assert baseline['base'] == base
     checked = set()
-    for entry in base_tree.rstrip(b'\0').split(b'\0'):
-        metadata, name = entry.split(b'\t', 1)
-        path = Path(name.decode())
-        relative = str(path.relative_to(core_root))
-        data = (ROOT / path).read_bytes()
+    for relative, blob in baseline['gitBlobs'].items():
+        data = (ROOT / 'crates/meridian-core/src' / relative).read_bytes()
         for addition in additions.get(relative, []):
             assert data.count(addition) == 1, relative
             data = data.replace(addition, b'', 1)
         header = b'blob ' + str(len(data)).encode() + b'\0'
-        assert hashlib.sha1(header + data).hexdigest() == metadata.split()[2].decode(), relative
+        assert hashlib.sha1(header + data).hexdigest() == blob, relative
         checked.add(relative)
     assert set(additions) <= checked and len(checked) == 115
     # Preserve the historical component and World patch identities separately.
