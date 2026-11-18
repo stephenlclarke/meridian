@@ -49,7 +49,7 @@ fn every_detailed_face_keeps_original_index_order_scale_and_finite_uv_materials(
     assert_eq!(std::mem::size_of::<VisualVertex>(), 56);
     let source = include_bytes!("../../../../assets/fleet/sh001/all-source.vertices");
     let triangles = include_bytes!("../../../../assets/fleet/sh001/source-triangles.bin");
-    let mut layers = std::collections::BTreeSet::new();
+    let mut faces_per_layer = [0; 3];
     let mut emissive = 0;
     for (face, actual) in triangles[..7236 * 12]
         .as_chunks::<12>()
@@ -57,7 +57,10 @@ fn every_detailed_face_keeps_original_index_order_scale_and_finite_uv_materials(
         .iter()
         .zip(vertices.as_chunks::<3>().0)
     {
+        let layer = actual[0].texture;
+        faces_per_layer[layer as usize] += 1;
         for (index, v) in face.as_chunks::<4>().0.iter().zip(actual) {
+            assert_eq!(v.texture, layer);
             let index = u32::from_le_bytes(
                 index
                     .as_slice()
@@ -70,13 +73,14 @@ fn every_detailed_face_keeps_original_index_order_scale_and_finite_uv_materials(
             }
             assert!(v.uv.iter().all(|v| v.is_finite()));
             assert_eq!(v.color[3], 1.0);
-            layers.insert(v.texture);
             emissive += usize::from(v.emissive != 0);
             let n = v.normal.map(f64::from);
             assert!((n.iter().map(|a| a * a).sum::<f64>() - 1.0).abs() < 0.000001);
         }
     }
-    assert_eq!(layers, std::collections::BTreeSet::from([0, 1, 2]));
+    // The texture catalogue includes the strike map, but no detailed SH001 face references it.
+    // The independent source-field fixture checks each individual face, including its layer.
+    assert_eq!(faces_per_layer, [452, 0, 6784]);
     assert!(emissive > 0);
 }
 #[test]
