@@ -610,6 +610,7 @@ fn module_rows(
         ModuleSlot::Energy => "Energy system",
         ModuleSlot::Navigation => "Navigation computer",
         ModuleSlot::UtilityFuelScoops => "Fuel Scoops",
+        ModuleSlot::UtilityEcm => "E.C.M. System",
     };
     let fitted = modules.items.iter().find(|item| item.slot == Some(slot));
     let mut rows = Vec::new();

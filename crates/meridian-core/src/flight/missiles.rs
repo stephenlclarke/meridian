@@ -103,6 +103,7 @@ pub enum MissileEnd {
     TargetLost,
     Culled,
     Intercepted,
+    Ecm,
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum MissileContact {
@@ -158,6 +159,7 @@ pub struct ProjectileSnapshot {
     pub contact: Option<MissileContact>,
     pub last_tick: u64,
     pub intercepting_emission: Option<u64>,
+    pub ecm: Option<super::ecm::EcmTermination>,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MissileRound {
@@ -529,6 +531,7 @@ impl World {
             contact: None,
             last_tick: tick,
             intercepting_emission: None,
+            ecm: None,
         };
         let npc_launch = if matches!(target, MissileTarget::Npc(_)) {
             Some(npc::NpcLaunch {
@@ -568,6 +571,13 @@ impl World {
         self.missiles.npc_launches[index] = npc_launch;
         self.missiles.armed = false;
         self.missiles.cooldown = MISSILE_COOLDOWN_TICKS;
+        self.ecm.terminate_live(
+            &mut self.missiles,
+            owner,
+            tick,
+            self.combat.physical_tick(),
+            emission,
+        );
         if let Some(p) = &mut self.practice {
             p.pending_missiles = self.missiles.pending_for_lesson(*p);
             p.observe_discharge(tick);

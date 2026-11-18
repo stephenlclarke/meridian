@@ -11,6 +11,7 @@ enum Change {
     Energy(Option<u8>),
     Pulse(usize),
     Start,
+    EcmGuard,
 }
 struct Replay {
     meter: meter::Meter,
@@ -164,6 +165,9 @@ impl State {
         if end > 0 && !world.damage.alive_before_commands(world)? {
             events.push((end, 0, Change::FinalDeath));
         }
+        for clock in world.ecm.activation_clocks() {
+            events.push((clock, 4, Change::EcmGuard));
+        }
         events.sort_by_key(|&(clock, phase, _)| (clock, phase));
         Ok(events)
     }
@@ -210,6 +214,11 @@ impl State {
                         Change::Equipment(event) => replay.equipment(event)?,
                         Change::Energy(stage) => replay.energy = stage,
                         Change::Start => replay.admission()?,
+                        Change::EcmGuard => {
+                            if replay.meter.disabled_at.is_some() {
+                                return Err(INVALID);
+                            }
+                        }
                         _ => return Err(INVALID),
                     }
                 }

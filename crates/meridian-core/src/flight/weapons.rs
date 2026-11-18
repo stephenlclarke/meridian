@@ -155,6 +155,15 @@ impl PulseResources {
             self.heat = self.heat.saturating_sub(1);
         }
     }
+    pub(super) fn prepare_ecm_discharge(self) -> Result<Self, FireError> {
+        if self.energy <= super::ecm::ECM_ENERGY_COST_HUNDREDTHS {
+            return Err(FireError::InsufficientEnergy);
+        }
+        Ok(Self {
+            energy: self.energy - super::ecm::ECM_ENERGY_COST_HUNDREDTHS,
+            ..self
+        })
+    }
     pub(super) fn prepare_emp_discharge(self) -> Result<Self, FireError> {
         if self.cooldown != 0 {
             return Err(FireError::CoolingDown);

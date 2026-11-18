@@ -217,6 +217,7 @@ impl State {
                     Effect::Laser(weapon)
                 }
             };
+            world.ecm.validate_emission(event.clock, next_emission)?;
             next_emission += 1;
             events.push((event.clock, 3, 0, effect));
         }
@@ -308,6 +309,14 @@ impl State {
             }
             events.push((clock, 3, sequence as u64, Effect::Emp { contact }));
         }
+        for (ordinal, clock) in world.ecm.activation_clocks().enumerate() {
+            if clock > end {
+                return Err(INVALID);
+            }
+            // An ECM spend commutes with same-tick laser spends: both require positive
+            // energy afterward and ECM changes neither heat nor the weapon cooldown.
+            events.push((clock, 4, ordinal as u64, Effect::Ecm));
+        }
         events.sort_by_key(|&(clock, phase, sequence, _)| (clock, phase, sequence));
         Ok(events)
     }
@@ -322,6 +331,7 @@ impl State {
                 && world.traffic.player_hits().is_empty()
                 && world.mining.strokes().is_empty()
                 && world.emp.resource_effects().is_empty()
+                && world.ecm.activation_clocks().next().is_none()
             {
                 Ok(())
             } else {
@@ -449,6 +459,7 @@ enum Effect {
     Mining,
     Hit { front: bool, damage: u16 },
     Emp { contact: Option<(bool, u16, u16)> },
+    Ecm,
 }
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 struct Pools {
@@ -482,6 +493,9 @@ fn replay(events: &[ResourceEvent], end: u64) -> Result<Pools, SaveError> {
                     .pulse
                     .prepare_mining_discharge()
                     .map_err(|_| INVALID)?;
+            }
+            Effect::Ecm => {
+                pools.pulse = pools.pulse.prepare_ecm_discharge().map_err(|_| INVALID)?
             }
             Effect::Emp { contact } => {
                 pools.pulse = pools.pulse.prepare_emp_discharge().map_err(|_| INVALID)?;

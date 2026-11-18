@@ -74,3 +74,8 @@ pub use flight::{
     EmpAxis, EmpChargePhase, EmpEquipmentAction, EmpEquipmentOffer, EmpEquipmentReview, EmpError,
     EmpGrades, EmpOrigin, EmpProvenance, EmpSnapshot, OwnedEmp, PreparedEmpEquipment,
 };
+
+pub use flight::{
+    ECM_ENERGY_COST_HUNDREDTHS, ECM_FIELD_TICKS, ECM_PRICE_TENTHS, ECM_REQUIRED_TECHNOLOGY,
+    EcmError, EcmOrigin, EcmSnapshot, EcmTermination,
+};

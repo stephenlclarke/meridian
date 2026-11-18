@@ -369,7 +369,15 @@ impl State {
         let utilities = modules
             .items
             .iter()
-            .filter(|i| i.slot == Some(super::super::ModuleSlot::UtilityFuelScoops))
+            .filter(|i| {
+                matches!(
+                    i.slot,
+                    Some(
+                        super::super::ModuleSlot::UtilityFuelScoops
+                            | super::super::ModuleSlot::UtilityEcm
+                    )
+                )
+            })
             .count();
         if usize::from(account.equipment_state().units_used())
             + utilities

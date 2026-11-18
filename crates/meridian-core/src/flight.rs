@@ -1,3 +1,8 @@
+mod ecm;
+pub use ecm::{
+    ECM_ENERGY_COST_HUNDREDTHS, ECM_FIELD_TICKS, ECM_PRICE_TENTHS, ECM_REQUIRED_TECHNOLOGY,
+    EcmError, EcmOrigin, EcmSnapshot, EcmTermination,
+};
 pub(crate) mod emp;
 pub use emp::{
     EmpAxis, EmpChargePhase, EmpEquipmentAction, EmpEquipmentOffer, EmpEquipmentReview, EmpError,
@@ -180,6 +185,7 @@ pub struct World {
     modular: modular::State,
     xyzzy: xyzzy::State,
     emp: emp::State,
+    ecm: ecm::State,
     navigation_trade: navigation_trade::State,
     flight_reception: flight_reception::State,
     practice: Option<practice::Practice>,
@@ -224,6 +230,7 @@ impl World {
             modular: modular::State::default(),
             xyzzy: xyzzy::State::default(),
             emp: emp::State::default(),
+            ecm: ecm::State::default(),
             navigation_trade: navigation_trade::State::default(),
             flight_reception: flight_reception::State::default(),
             practice: None,

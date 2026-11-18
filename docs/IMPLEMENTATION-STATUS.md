@@ -1,5 +1,9 @@
 # Implementation and validation status
 
+## Paid manual ECM source candidate
+
+The owner branch adds paid TL-5 E.C.M. System hardware at 2100 CR, one shared utility mount and a manual 22-energy, 32-tick standard-missile field. It terminates genuine current-visit player missiles, preserves motion/round identity and cancels EMP warmup without an EMP release or reward. Cold Continue retains the timer and historical effects while clearing live field authority, as the original restore requires. Automatic ECM and hostile missile production remain missing. The new Rust tests and all compiler, coverage and native acceptance checks are UNRUN. Root owns the desktop join and complete independent review before the existing compiler owners execute. See [scope, provenance, cold semantics and acceptance](ECM.md).
+
 ## Distinct EMP source candidate
 
 The source candidate adds an owned EMP utility to the single World, with paid purchase/fit/store/grade transactions, a separate initially empty bank and electrical pool, exact 80-percent transfer, a 600-tick held charge and shared heat/cooldown cost. It queries the actual native SH025 collision scene and drains the facing shield then independent electrical reserve. It preserves fatal hull energy, actor identity, cargo and the one source crew member. Zero electrical power blocks engines/weapons, keeps physical coasting and recovers strictly after 1800 accepted physical ticks. No capsule, bounty or reward is fabricated.

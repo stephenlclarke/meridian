@@ -28,11 +28,11 @@ pub struct FuelScoopsSnapshot {
     pub owned: Option<OwnedModule>,
     pub fitted: Option<FittedFuelScoops>,
     pub current_offer: Option<ModuleOffer>,
-    /// Actual implemented cargo-expansion and scoop mounts; other utility families are absent.
+    /// Actual fitted cargo expansion, Fuel Scoops, ECM and distinct EMP mounts.
     pub utility_mounts_used: u16,
     pub utility_mounts_capacity: u16,
 }
-fn validate_slots(
+pub(super) fn validate_slots(
     definition: crate::equipment::Definition,
     items: &[OwnedModule],
     cargo_mounts: u16,
@@ -44,12 +44,17 @@ fn validate_slots(
     {
         return Err(ModuleError::StaleOccupant);
     }
-    let scoops = items
+    let utilities = items
         .iter()
-        .filter(|i| i.slot == Some(ModuleSlot::UtilityFuelScoops))
+        .filter(|i| {
+            matches!(
+                i.slot,
+                Some(ModuleSlot::UtilityFuelScoops | ModuleSlot::UtilityEcm)
+            )
+        })
         .count();
     let used = cargo_mounts
-        .checked_add(u16::try_from(scoops).map_err(|_| ModuleError::Capacity)?)
+        .checked_add(u16::try_from(utilities).map_err(|_| ModuleError::Capacity)?)
         .ok_or(ModuleError::Capacity)?;
     if used > definition.utility_mounts_capacity {
         return Err(ModuleError::Capacity);

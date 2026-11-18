@@ -133,7 +133,7 @@ impl State {
             _ => Err(EmpError::IncompatibleEnergy),
         }
     }
-    fn cancel(&mut self, clock: u64) {
+    pub(in crate::flight) fn cancel(&mut self, clock: u64) {
         if let Some(charge) = &mut self.charge
             && charge.phase == EmpChargePhase::Charging
         {

@@ -1,0 +1,104 @@
+{
+  "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "tree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1071,
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766",
+      "gitBlob": "b27f022cea044295412849dec93512dad638f08e"
+    },
+    {
+      "path": "NOTICE.md",
+      "bytes": 7601,
+      "sha256": "406570037626edd737b25da0a8cc13cdd57a3223086788715a315d84033a2aaa",
+      "gitBlob": "dfac99b5ecdd21cd5c38c12182b0fdd13a1fef82"
+    },
+    {
+      "path": "Sources/L337Core/Resources/OriginalWorlds/authoring.toml",
+      "bytes": 6664,
+      "sha256": "47d83caae5a9b22a4a932f19c55f79c5cb5435b962826a0969ece096b11f80eb",
+      "gitBlob": "0373b5cb3e2a18ef4d4f372c7a64952b2964a456"
+    },
+    {
+      "path": "Sources/L337Core/ECMControl.swift",
+      "bytes": 6826,
+      "sha256": "e399ff153ae54f82aceb57148a5e05e946674b6494a313915441f6f81accdc59",
+      "gitBlob": "2a0f8cf65a37eea012dc79ba4fa8c351db0eb44e"
+    },
+    {
+      "path": "Sources/L337Core/EquipmentRuntimeCatalog.swift",
+      "bytes": 8337,
+      "sha256": "ccf1ee2a940175f0d1a26a65aaa7b62ca7cf61d0eb33906f8b8feb6664210e27",
+      "gitBlob": "4f9bf9ec70d239e9c099f00a9c63a80d4648833d"
+    },
+    {
+      "path": "Sources/L337Core/OriginalFleetR3Contract.swift",
+      "bytes": 2474,
+      "sha256": "a8d3a1afc767b068fc6c97ec1230a1100a94969b5b4a7a7adf3220418cf43ce6",
+      "gitBlob": "2749014002aa9917a24439483e252e3da853b0e7"
+    },
+    {
+      "path": "Sources/L337Core/OriginalFleetR3Data.swift",
+      "bytes": 285755,
+      "sha256": "ceba81e0702526ed3ff0e6e7f28868bae4ab508ae9ac6bfa9f18d63d78d7946a",
+      "gitBlob": "50ee232a826932f9248f2e5aa070f7e099fa70a5"
+    },
+    {
+      "path": "Sources/L337Core/OriginalFleetR3Fitting.swift",
+      "bytes": 4922,
+      "sha256": "5a50e94cb510d7ce51da194cc3570159a28f1b7bd126e140a948192412d913ee",
+      "gitBlob": "920e1d802e63ab9038e7885974618f4e9b402257"
+    },
+    {
+      "path": "Sources/L337Core/Game.swift",
+      "bytes": 313817,
+      "sha256": "e5b4e30c835d460aa7ca6f77364db0aaeaf877bb9d73bacc162e9111b26e2e17",
+      "gitBlob": "0f94ff0c7bf46d47e65e077cc3c5db37694bd706"
+    },
+    {
+      "path": "Sources/L337Core/GameplayOrdnance.swift",
+      "bytes": 60738,
+      "sha256": "9a853fa3a187a5a7ef7f824d19e27b2fa5787d025b2877db5b15719fb0461bbe",
+      "gitBlob": "8894115c804b1958ec95917597a0d3a5c64afe30"
+    },
+    {
+      "path": "Sources/L337Core/GameplayOrdnanceRuntime.swift",
+      "bytes": 11500,
+      "sha256": "009f10af6ac4dfaa47dfff16288d6bf0f17eb63e1ec995293451ac19ce7ec999",
+      "gitBlob": "1ac2f0203714ce2d1474de5eacf153eb9513c9b7"
+    },
+    {
+      "path": "Sources/L337Core/EMPElectricalRuntime.swift",
+      "bytes": 30779,
+      "sha256": "fd7dae3dae7a4cb51ccc8ec259f024d3b5996b8358f243ee74f4fcb1a720cac2",
+      "gitBlob": "32fd36bfd70fc67e7aea7eb8697caea9e6f0ab9c"
+    },
+    {
+      "path": "Tests/L337CoreTests/CR05ECMElapsedTimeTests.swift",
+      "bytes": 4211,
+      "sha256": "0a558bdb6fb398c8e636543ec286d729763d9eb3ae34905fb9635d11204975d8",
+      "gitBlob": "c6d2476af846ad967060101d8c2962d9cdf41ae8"
+    }
+  ],
+  "independentExpectations": {
+    "priceTenths": 21000,
+    "requiredTechnology": 5,
+    "energyCostHundredths": 2200,
+    "energyComparison": "strictly greater than cost",
+    "fieldTicksAt60Hz": 32,
+    "family": "utility-ecm",
+    "slot": "utility.ecm",
+    "supportedHull": "SH025",
+    "utilityMounts": 3,
+    "manualEligibility": "actual live standard missiles, same emitter system+visit, both sides; no player ray/distance gate",
+    "restore": "remaining duration only; active identity and live ownership/events cleared",
+    "autoPrerequisite": "actual incoming missile plus XYZzy autoECM or stationAutoDockingActive"
+  },
+  "reuse": "Names and numerical gameplay rules reimplemented in Rust; no new geometry, original executor or player profiles imported. Existing original notices retained.",
+  "limits": [
+    "No incoming hostile missile producer or automatic ECM claimed",
+    "No plasma or alien-seeker producer invented",
+    "No original ECM tests executed in this author lane"
+  ]
+}

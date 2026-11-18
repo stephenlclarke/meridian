@@ -26,6 +26,7 @@ pub enum ModuleKind {
     BasicNavigation,
     IntermediateNavigation,
     AdvancedNavigation,
+    EcmSystem,
 }
 impl ModuleKind {
     pub fn family(self) -> &'static str {
@@ -36,6 +37,7 @@ impl ModuleKind {
             | Self::MilitaryLaser
             | Self::NavalLaser => "laser",
             Self::FuelScoops => "utility-fuelScoops",
+            Self::EcmSystem => "utility-ecm",
             Self::BasicNavigation | Self::IntermediateNavigation | Self::AdvancedNavigation => {
                 "navigation"
             }
@@ -55,6 +57,7 @@ impl ModuleKind {
             Self::PulseLaser => "Pulse Laser",
             Self::MiningLaser => "Mining Laser",
             Self::FuelScoops => "Fuel Scoops",
+            Self::EcmSystem => "E.C.M. System",
             Self::BeamLaser => "Beam Laser",
             Self::MilitaryLaser => "Military Laser",
             Self::NavalLaser => "Naval Laser",
@@ -78,6 +81,7 @@ impl ModuleKind {
             | Self::MilitaryLaser
             | Self::NavalLaser => ModuleSlot::FrontLaser,
             Self::FuelScoops => ModuleSlot::UtilityFuelScoops,
+            Self::EcmSystem => ModuleSlot::UtilityEcm,
             Self::BasicNavigation | Self::IntermediateNavigation | Self::AdvancedNavigation => {
                 ModuleSlot::Navigation
             }
@@ -122,6 +126,10 @@ impl ModuleKind {
     fn shop(self) -> Option<(u32, u8)> {
         match self {
             Self::FuelScoops => Some((scoops::PRICE_TENTHS, scoops::REQUIRED_TL)),
+            Self::EcmSystem => Some((
+                super::ecm::ECM_PRICE_TENTHS,
+                super::ecm::ECM_REQUIRED_TECHNOLOGY,
+            )),
             Self::PulseLaser => Some((14500, 3)),
             Self::MiningLaser => Some((MINING_LASER_PRICE_TENTHS, MINING_LASER_REQUIRED_TL)),
             Self::BeamLaser => Some((47000, 7)),
@@ -167,6 +175,7 @@ impl ModuleKind {
             Self::BasicNavigation => 10,
             Self::IntermediateNavigation => 11,
             Self::AdvancedNavigation => 12,
+            Self::EcmSystem => 13,
         }
     }
     fn from_tag(tag: u8) -> Result<Self, SaveError> {
@@ -184,6 +193,7 @@ impl ModuleKind {
             10 => Ok(Self::BasicNavigation),
             11 => Ok(Self::IntermediateNavigation),
             12 => Ok(Self::AdvancedNavigation),
+            13 => Ok(Self::EcmSystem),
             _ => Err(SaveError::InvalidEncoding),
         }
     }
@@ -193,6 +203,7 @@ pub enum ModuleSlot {
     FrontLaser,
     Energy,
     UtilityFuelScoops,
+    UtilityEcm,
     Navigation,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -729,6 +740,30 @@ impl State {
         }
         Some(ledger)
     }
+    pub(in crate::flight) fn ecm_was_fitted(
+        &self,
+        world: &World,
+        item: u64,
+        tick: u64,
+        clock: u64,
+        owner: super::CombatIdentity,
+    ) -> bool {
+        self.item_at(owner.owner, item, tick, owner.visit)
+            .is_some_and(|item| {
+                item.kind == ModuleKind::EcmSystem && item.slot == Some(ModuleSlot::UtilityEcm)
+            })
+            && self
+                .events
+                .iter()
+                .filter(|event| event.tick <= tick)
+                .all(|event| {
+                    event.dock.visit() < owner.visit
+                        && world
+                            .damage
+                            .berth_clock(event.dock.sequence())
+                            .is_some_and(|at| at <= clock)
+                })
+    }
     fn item_at(&self, owner: u64, item: u64, tick: u64, visit: u64) -> Option<OwnedModule> {
         self.ledger_at(owner, tick, visit)?
             .items
@@ -823,7 +858,12 @@ impl World {
         Some(ModularEquipmentSnapshot {
             equipment_units_used: ledger.fitted_units() + account.equipment_state().units_used(),
             equipment_units_capacity: definition.equipment_units_capacity,
-            utility_mounts_used: account.equipment_state().units_used() + self.emp.utility_mounts(),
+            utility_mounts_used: scoops::validate_slots(
+                definition,
+                &ledger.items,
+                account.equipment_state().units_used() + self.emp.utility_mounts(),
+            )
+            .ok()?,
             utility_mounts_capacity: definition.utility_mounts_capacity,
             items: ledger.items,
             fit_revision: ledger.revision,
@@ -852,6 +892,7 @@ impl World {
             ModuleKind::EliteEnergyUnit,
             ModuleKind::IntermediateNavigation,
             ModuleKind::AdvancedNavigation,
+            ModuleKind::EcmSystem,
         ]
         .into_iter()
         .filter_map(|kind| {
