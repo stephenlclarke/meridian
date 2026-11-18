@@ -35,7 +35,7 @@
   "nextAcceptance": [
     "Run all four named SH008 core tests with current protected source and strict Clippy in the owned lane",
     "Measure actual detailed-to-envelope gaps with original source evidence and inspect the central channel",
-    "Use the original detailed UVs/materials in a renderer bound to the same 69 pieces and qualify cost and native docking",
+    "Qualify the source-bound Showroom appearance, rounded support shimmer and cost in the owned native lane",
     "Resolve source-supported engineering mass/inertia and authored ordinary placement separately before hull acceptance"
   ],
   "counts": "Source packet does not alter full-fleet or public-preview acceptance",
@@ -53,5 +53,16 @@
       ],
       "coverage": "Exact independent outward-rounded launch coordinate, a clear initial lip pose, and a physically clear off-aperture sweep before its separate entry refusal. Geometry and source assets stay byte exact."
     }
+  },
+  "presentation": {
+    "status": "SOURCE_BOUND_SHOWROOM_AUTHORED;NATIVE_UNRUN",
+    "path": "Ordinary station Ship Showroom, exact SH008 catalogue selection",
+    "visualProvenance": "assets/fleet/sh008/VISUAL-PROVENANCE.json",
+    "geometry": "3484 original detailed faces, 69 existing rounded supports and one depth-tested shimmer result",
+    "tests": [
+      "selecting_goshawk_routes_the_original_preview_without_granting_exchange",
+      "goshawk_original_visual_and_all_local_supports_bind_to_the_shader"
+    ],
+    "nativeAcceptance": "Capture original forest-silver appearance, the open wishbone and close grazing shimmer while rotating in the ordinary Showroom; verify resize, view clipping and draw cost."
   }
 }

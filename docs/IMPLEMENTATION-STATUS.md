@@ -12,6 +12,10 @@ The Lion Citadel exterior now uses blue-grey plating, darker structural steel an
 
 A fresh commander delivered all eight G02 freight units at Renas, received 730 CR and the trusted clue, and saw the Mule on the next launch. Cold Continue restored the same SH001 identity and pose in the ordinary Mac cockpit. A regression using a genuine older v17 save verifies that a player already inside the encounter berth can move clear. World tests cover retirement and later launches. Close-range shimmer still needs visual confirmation. Preview 8 predates this encounter.
 
+## Goshawk Explorer source candidate
+
+The SH008 geometry and Showroom source target the original forest-silver Goshawk Explorer. A docked commander can select the original detailed preview and inspect the open wishbone and subtle rounded-envelope shimmer through the existing Showroom controls. The native view, render cost, ordinary placement, flight and docking are pending. [Geometry and presentation scope](GOSHAWK-GAMEPLAY-ENVELOPE.md)
+
 ## Internal Mule docking validation
 
 Mac build `ffb7112` passed 702 Rust tests, 102 Python tests, strict Clippy, and the release build. In the native scene the aligned Mule crossed at tick 104 and the obstructed Mule stopped for station contact at tick 11. Linux and native Windows each passed 705 Rust tests including three observer tests, 102 Python tests, strict Clippy, and both release builds. One Metal fixture was excluded from the ordinary test counts on each platform. These results qualify the internal docking scene. At that checkpoint, ordinary encounters and player acquisition were still open. [Controls and test scope](MULE-VALIDATION-LAUNCH.md)

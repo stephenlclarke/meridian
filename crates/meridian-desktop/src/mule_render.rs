@@ -3,6 +3,7 @@ mod gpu;
 #[cfg(test)]
 mod gpu_tests;
 mod rounded;
+pub(crate) mod showroom;
 #[cfg(test)]
 mod tests;
 pub use gpu::Pass;
@@ -77,15 +78,22 @@ const TEXTURES: [&[u8]; 3] = [
 ];
 
 fn visual() -> Result<Vec<VisualVertex>, &'static str> {
-    if VISUAL.get(..8) != Some(b"MULEVIS1")
-        || VISUAL.get(8..12) != Some(&(VERTEX_COUNT as u32).to_le_bytes())
-        || VISUAL.get(12..16) != Some(&56u32.to_le_bytes())
-        || VISUAL.len() != 16 + VERTEX_COUNT * 56
+    decode_visual(VISUAL, b"MULEVIS1", VERTEX_COUNT)
+}
+fn decode_visual(
+    bytes: &[u8],
+    magic: &[u8; 8],
+    count: usize,
+) -> Result<Vec<VisualVertex>, &'static str> {
+    if bytes.get(..8) != Some(magic)
+        || bytes.get(8..12) != Some(&(count as u32).to_le_bytes())
+        || bytes.get(12..16) != Some(&56u32.to_le_bytes())
+        || bytes.len() != 16 + count * 56
     {
-        return Err("SH001 visual encoding changed");
+        return Err("Detailed visual encoding changed");
     }
     // include_bytes need not have Pod alignment. Read each complete record without unsafe.
-    let result: Vec<VisualVertex> = VISUAL[16..]
+    let result: Vec<VisualVertex> = bytes[16..]
         .as_chunks::<56>()
         .0
         .iter()
@@ -101,7 +109,7 @@ fn visual() -> Result<Vec<VisualVertex>, &'static str> {
             || v.texture >= 3
             || v.emissive > 1
     }) {
-        return Err("SH001 invalid visual attributes");
+        return Err("Invalid detailed visual attributes");
     }
     Ok(result)
 }
@@ -181,14 +189,21 @@ fn supports(
     {
         return Err("SH001 presentation/contact source mismatch");
     }
+    support_mesh(presentation.pieces.as_ref(), MAX_POINTS)
+}
+
+fn support_mesh<const N: usize>(
+    source: &[meridian_core::mule::SmoothPiece; N],
+    expected_points: usize,
+) -> Result<(Vec<Triangle>, [Piece; N]), &'static str> {
     let mut points = Vec::new();
     let mut source_count = 0;
     let mut pieces = [Piece {
         range: [0; 4],
         low: [0.0; 4],
         high: [0.0; 4],
-    }; MULE_PIECES];
-    for (index, piece) in presentation.pieces.iter().enumerate() {
+    }; N];
+    for (index, piece) in source.iter().enumerate() {
         let start = points.len();
         source_count += piece.source_points().len();
         for point in piece.source_points() {
@@ -198,7 +213,7 @@ fn supports(
                 .zip([point.x, point.y, point.z])
                 .any(|(a, b)| !a.is_finite() || (f64::from(*a) - b).abs() > 0.000004)
             {
-                return Err("SH001 support precision exceeds four micrometres");
+                return Err("Hull support precision exceeds four micrometres");
             }
         }
         let hull = rounded::build(piece.source_points())?;
@@ -215,11 +230,11 @@ fn supports(
         pieces[index].low[3] = piece.rounding_metres() as f32;
         pieces[index].high[3] = hull.error_metres as f32;
     }
-    if points.len() > 2 * MAX_POINTS - 4 * MULE_PIECES {
-        return Err("SH001 total render facet bound exceeded");
+    if points.len() > 2 * expected_points - 4 * N {
+        return Err("Hull total render facet bound exceeded");
     }
-    if source_count != MAX_POINTS {
-        return Err("SH001 support point count changed");
+    if source_count != expected_points {
+        return Err("Hull support point count changed");
     }
     Ok((points, pieces))
 }

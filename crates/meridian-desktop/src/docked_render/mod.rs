@@ -10,10 +10,16 @@ const MAX_GEOMETRY: usize = 180_000;
 const MAX_MODELS: usize = 2;
 const MAX_MODEL_VERTICES: usize = 10452 * MAX_MODELS * 9;
 const SHIP_KEY: &str = "assets/legacy/sh025.mesh";
-pub const MODELS: [AvailableModel<'static>; 1] = [AvailableModel {
-    object: "SH025",
-    geometry_key: SHIP_KEY,
-}];
+pub const MODELS: [AvailableModel<'static>; 2] = [
+    AvailableModel {
+        object: "SH025",
+        geometry_key: SHIP_KEY,
+    },
+    AvailableModel {
+        object: "SH008",
+        geometry_key: crate::mule_render::showroom::GEOMETRY_KEY,
+    },
+];
 #[repr(C)]
 #[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct TextVertex {
@@ -376,7 +382,7 @@ fn atlas() -> Vec<u8> {
     }
     pixels
 }
-fn rotate(mut v: [f64; 3], o: Orientation) -> [f64; 3] {
+pub(crate) fn rotate(mut v: [f64; 3], o: Orientation) -> [f64; 3] {
     for (axis, angle) in [(1, o.yaw), (0, o.pitch), (2, o.roll)] {
         let (s, c) = angle.rem_euclid(std::f64::consts::TAU).sin_cos();
         let (i, j) = match axis {
@@ -521,6 +527,9 @@ impl Geometry {
         planet_system: Option<meridian_core::navigation::SystemId>,
     ) -> Result<(), String> {
         for p in &frame.models {
+            if crate::mule_render::showroom::matches(p) {
+                continue;
+            }
             if !model.matches(p) {
                 self.unavailable_models += 1;
                 label(
