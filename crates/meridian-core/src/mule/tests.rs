@@ -1,3 +1,4 @@
+use super::geometry::scale;
 use super::*;
 use crate::docking::GeometryError;
 use crate::station::OriginalStationData;
@@ -57,7 +58,7 @@ fn mule_authenticates_source_and_encloses_all_components_and_triangle_interiors(
     }
     let triangles = include_bytes!("../../../../assets/fleet/sh001/source-triangles.bin");
     assert_eq!(triangles.len(), 12 * (7236 + 1772));
-    for record in triangles.chunks_exact(12) {
+    for record in triangles.as_chunks::<12>().0 {
         let mut indices = [0usize; 3];
         for (axis, index) in indices.iter_mut().enumerate() {
             *index = u32::from_le_bytes(
