@@ -1,0 +1,54 @@
+{
+  "reviewedAtUTC": "2026-11-18T15:49:26.531534+00:00",
+  "verdict": "SOURCE_CLEAR_BOUNDED_TWO_DISPATCH_CFG_REMOVALS;FINDING_CLOSED;WHOLE_DISTANCE_ALGORITHM_REVIEW_CARRIED",
+  "head": "5416e1014d3e40fe4fe534121a1fcf2e6b6cd03f",
+  "tree": "9bea766e3e3a5f9e99bba6e90c541df425b811f3",
+  "immediateParent": "c05156ffa53d166a1bcd0ab5f6b1ba9c9bd3f4b6",
+  "packet": {
+    "path": "/private/tmp/meridian-root-vertex-dispatch-review/SOURCE.json",
+    "bytes": 4244,
+    "sha256": "dc41ef93867aab273986972d2506cbc4889ad61ebb1dd03c73f72de85fc97a3f"
+  },
+  "parentWholeReview": {
+    "path": "/private/tmp/g2-meridian-c05156ff-vertex-distances-whole-source-findings.json",
+    "bytes": 11104,
+    "sha256": "85567fbba7b2706c3ffb396d74b0bc963360730954b0242c3ac3bc35fd4568fb"
+  },
+  "findings": [],
+  "independentChecks": {
+    "cleanExactHeadTreeImmediateParent": true,
+    "rootGitWorkingSourceTarBytesModes": 631,
+    "changedPaths": 17,
+    "unchangedPaths": 614,
+    "authorCratePinsAndSourceArchive": 492,
+    "all482AuthorParentCrateFilesExactWholeReviewedRootC051": true,
+    "authorManifestPayloadHashes": 7,
+    "completeArchiveMembers": 8,
+    "canonicalRootDeltaVerified": true,
+    "entireSectionsFileTwoCfgInverseExactParentAndFrozen": true,
+    "bothCompleteDispatchBodiesAndCachedCollectorBodyByteExact": true,
+    "otherExistingSrcTestFilesByteExact": 35,
+    "all88OldTestBodiesByteExact": true,
+    "newTestCases": 0
+  },
+  "closure": {
+    "id": "G2-GEOMETRY-VERTEX-DISTANCES-1",
+    "status": "CLOSED_FROM_SOURCE",
+    "change": "Removed exactly the cfg(test) attributes preceding FacetBoundsIndex::collection_candidates and collection_with_support. Both original definitions now exist in the normal library, satisfying production collect_cached_admitted method dispatch and its delegate.",
+    "preservation": "Independently reinserted just the two attributes and recovered the entire reviewed parent sections.rs byte-for-byte, also equal to frozen da8c parent. Both complete method bodies, cached collector, every other Rust source/test file and all88testbodies unchanged. No forced physical-only branch,uncertified-owner bypass,altered prices/eligibility/order or suppression.",
+    "proofChain": "Read the minimal inverse helper,exact frozen whole-file/body checks and earlier restore/verification registration. These invert only the two attrs before historical source checks; geometry/assertion checks remain strict. No supplied verifier executed byG2."
+  },
+  "wholeReviewCarry": {
+    "eligible": true,
+    "scope": "Carry the complete otherwise-clear c051 exact distance algorithm,pricing,admission,lifetime/rollback and independent control review. No new broad review required.",
+    "retained": "N>=256 exact originalXYZ IDs and exclusive source-plane epochs/lazy validity reset,charged actual distance misses and fixed-record metadata model,original field/source identities,borrowed-distance kernel with unchanged coordinate guards,cached collector and uncertified physical/outward logic,small finite-gap path,contiguous index/test-only cell controls,persistent/transient/context/joint reservations and drop boundaries all unchanged.",
+    "testsAndCaps": "All88old bodies,322/108/120 guards,frozen independent publishers and original2Moperations includingdecode/100kstorage/4096-bit coordinateUV/512complete-outputface caps retained. Separate202matrix/fleet scope unchanged."
+  },
+  "executionDecision": "Current source review is CLEAR for existing designatedG1 exact-source locked all-target check,88Rust9host,strictClippy and development original_five build when soleMac lane free. Only after ALL focused gatesPASS may the ONEalready-scoped changed whole-five25body workload run with exact source-lock-binary/input/precleanup-guard-context/monotonic pins and original caps. No routineACK or new broad review gate. Preserve natural first failure/refusal and dependentUNRUN results;no unchanged or diagnostic repeat.",
+  "limits": [
+    "Current compiler,88Rust9host,Clippy/build and wholefive remainUNRUN;source closure is not an executed pass.",
+    "G2 ran no compiler,Cargo,Clippy,tests,SUT,geometry/probe/native,suppliedverifier,reviewbot or integrationtesting.",
+    "Actual93 84/9gatesPASS andfiveOperationsrefusals15dependentUNRUN0candidates retain93 identity;no current originalbenefit,fit,minima,speed,admission,native/full-game acceptance claim.",
+    "No humanWIP edit,newchat/agent,merge orpublication."
+  ]
+}

@@ -120,13 +120,7 @@ impl<'a> VertexDistances<'a> {
     }
 }
 impl<'a> Plane<'_, '_, 'a> {
-    pub(in crate::certificate) fn section(
-        &mut self,
-        ordinal: usize,
-        physical: bool,
-        outward: bool,
-        b: &mut Budget,
-    ) -> Result<JointSection, Failure> {
+    fn prepare(&mut self, ordinal: usize, b: &mut Budget) -> Result<[usize; 3], Failure> {
         let originals: &'a [Facet] = self.cache.originals;
         let other = originals.get(ordinal).ok_or_else(|| {
             b.fail(
@@ -172,6 +166,32 @@ impl<'a> Plane<'_, '_, 'a> {
                 self.cache.bits[word] |= mask;
             }
         }
+        Ok(ids)
+    }
+    pub(in crate::certificate) fn outward(
+        &mut self,
+        ordinal: usize,
+        b: &mut Budget,
+    ) -> Result<bool, Failure> {
+        let ids = self.prepare(ordinal, b)?;
+        // An affine plane distance attains its extrema at triangle vertices.
+        // A limiting outward section exists exactly when positive and
+        // nonpositive vertices coexist. Zeros stay below the shifted plane.
+        b.step(1)?;
+        Ok(ids.iter().any(|id| self.cache.values[*id] > integer(0))
+            && ids.iter().any(|id| self.cache.values[*id] <= integer(0)))
+    }
+
+    pub(in crate::certificate) fn section(
+        &mut self,
+        ordinal: usize,
+        physical: bool,
+        outward: bool,
+        b: &mut Budget,
+    ) -> Result<JointSection, Failure> {
+        let ids = self.prepare(ordinal, b)?;
+        let originals: &'a [Facet] = self.cache.originals;
+        let other = &originals[ordinal];
         let face = self.face;
         b.state([
             originals.len(),

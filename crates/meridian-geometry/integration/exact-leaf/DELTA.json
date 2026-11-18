@@ -1,0 +1,44 @@
+{
+  "status": "AUTHORED_UNRUN_EXACT_TRIANGLE_OUTWARD_LEAF_ELIGIBILITY",
+  "parentAuthor": "82a79090e3c4d2160e0046f72d3fa8a01c6a46fe",
+  "actualParentRoot": "5416e1014d3e40fe4fe534121a1fcf2e6b6cd03f",
+  "all88OldBodiesUnchanged": true,
+  "currentRustCount": 91,
+  "hostCount": 9,
+  "changes": [
+    "Retain production exact vertex cache; replace only leaf outward box-plane eligibility with exact triangle mixed-positive/nonpositive support using the same active-plane distances.",
+    "Keep complete node/owner/physical/source-order traversal; specialize existing None support argument. Retain full prior collector/index as independent test controls.",
+    "Extract unchanged distance initialization for leaf and joint use; keep exact joint kernel, small finite-gap path and all old prices/guards. Admit extra8 traversal context and96 numeric scratch per leaf."
+  ],
+  "newTests": [
+    {
+      "file": "src/exact_leaf_tests.rs",
+      "name": "exact_leaf_eligibility_preserves_joint_results_and_reduces_complete_batch_work",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/exact_leaf_tests.rs",
+      "name": "exact_leaf_sign_filter_keeps_zero_contact_multiplicity_and_failure_guards",
+      "status": "UNRUN"
+    },
+    {
+      "file": "src/exact_leaf_tests.rs",
+      "name": "exact_leaf_complete_publisher_matches_parent_fields_witnesses_and_volume",
+      "status": "UNRUN"
+    }
+  ],
+  "currentExecution": "UNRUN; no author compiler/geometry/probe/native",
+  "limits": {
+    "operationsIncludingDecode": 2000000,
+    "storageMemberships": 100000,
+    "rationalBits": 4096,
+    "completeOutputTriangles": 512
+  },
+  "newAdmissions": 0,
+  "contractSHA256": "b678a5ebd913a4b474178a4b3edb3b5107db97752159e39005cd0720d6cf93da",
+  "custodySHA256": "f866c22ef1408c93caff5ab6cbdfdbd12559978cfd1d3043622e29f32b066673",
+  "freezeSHA256": "7a55ddc5079875b5329ff51815cedfdf9413752a138bd6c1ad76d83e9b82f135",
+  "inverseSHA256": "2c0f27122c7fb8a5c063f0ebff541829aa7c4d0a94222d31ccbc3f5571ddac7c",
+  "parentReviewSHA256": "7dc334f491bb74e334354167e514d88468f8c989bf1164542afc54c069655764",
+  "qualification": "Root successor since82a only; one G2 whole/relevant review; existing G1 changed91/9/check/strictClippy/build, then one changed whole-five only ALL PASS and sole lane available. No unchanged diagnostic batch."
+}

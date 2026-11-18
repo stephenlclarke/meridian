@@ -1,0 +1,25 @@
+{
+  "parent": "82a79090e3c4d2160e0046f72d3fa8a01c6a46fe",
+  "files": {
+    "before-vertex_distances.rs": {
+      "bytes": 6640,
+      "sha256": "74ba1ba6567067660586f4ecb9ae226f4d75268cd46ab991a85a3ff025b3dd0c"
+    },
+    "before-sections.rs": {
+      "bytes": 73783,
+      "sha256": "0a3037fcd9a0fdf6c4a9df504680fe783c12b977ca298c70ed5d7312c6fbdc5e"
+    },
+    "publisher-control.rs.txt": {
+      "bytes": 15542,
+      "sha256": "c0b1cae1c7af6d9b5b5dad67fe677d4078611e1ed2664b1e7b0d454e306f9057"
+    },
+    "compiled-publisher-control.rs": {
+      "bytes": 15561,
+      "sha256": "fe1e864f149cb70560a0f8792763a5d1cee5cc37838fcdbf33319a315ebcfad6"
+    },
+    "before-certificate.rs": {
+      "bytes": 88001,
+      "sha256": "67463a1d5af16be630cd85db4af901816e40d10374062a40814f467cfb9bb923"
+    }
+  }
+}

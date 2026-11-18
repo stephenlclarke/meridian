@@ -5,6 +5,7 @@ import re
 import subprocess
 from pathlib import Path
 from restore_vertex_distances import restore_vertex_distances
+from restore_exact_leaf import restore_exact_leaf
 from strip_budget_context import body
 
 CRATE = Path(__file__).resolve().parents[1]
@@ -30,7 +31,7 @@ def verify():
     assert (f / 'publisher-control.rs.txt').read_text() == raw
     assert (f / 'compiled-publisher-control.rs').read_text() == raw.replace('fn reconstruct_records(', 'fn reference_vertex_distance_publisher(', 1)
     before = (f / 'before-sections.rs').read_text()
-    current = (CRATE / 'src/sections.rs').read_text()
+    current = restore_exact_leaf('sections.rs', (CRATE / 'src/sections.rs').read_text())
     for signature in ['fn joint_section_source_admitted(', 'pub(super) fn joint_section_source(', 'fn collect_separating_admitted<', 'pub(super) fn collect_separating<', 'fn collect_rows_admitted<', 'pub(super) fn occupied(', 'fn crosses(', 'pub(super) fn fields_visible(']:
         assert body(current, signature) == body(before, signature), signature
     old_kernel = body(before, 'fn joint_section_source_admitted(')

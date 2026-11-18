@@ -1,0 +1,757 @@
+{
+  "parentAuthor": "82a79090e3c4d2160e0046f72d3fa8a01c6a46fe",
+  "actualParentRoot": "5416e1014d3e40fe4fe534121a1fcf2e6b6cd03f",
+  "actualParentTree": "9bea766e3e3a5f9e99bba6e90c541df425b811f3",
+  "terminalHandoff": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/EXECUTION-TERMINAL-HANDOFF.json",
+    "bytes": 26348,
+    "sha256": "694ae7c4f54341dbd1b7ad54c030bdb6566a60cf0c75b65eff370fadde8bca38"
+  },
+  "rawPacket": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/RAW-PACKET.tar.gz",
+    "bytes": 21377452,
+    "sha256": "43842e20fcd8c4de2f97c3d1c1cf388d6198dcacfb1291eb00fc855e8a9092e7"
+  },
+  "parentSourcePins": {
+    "path": "/private/tmp/meridian-root-vertex-dispatch-review/ALL-SOURCE-PINS.json",
+    "bytes": 159069,
+    "sha256": "cebcb4cfa32f682a52f05939e96ef38b59520a946eb4523f852f1d5986f31c32"
+  },
+  "all492ParentCrateFilesMatchActualRoot5416": true,
+  "verifiedRawArtifactPins": [
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/AUTHOR-EXECUTION.json",
+      "bytes": 1782,
+      "sha256": "8afca0052376ef8751f59f559794df26abccee5ccf502eeef076fc4d2cf1e70d"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/BUILD-INTENT.json",
+      "bytes": 1829,
+      "sha256": "da64563a9c000dc6cbbb39cdf4bdc1e177d9092d8264e3932c0aad385b275387"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/BUILD-START.json",
+      "bytes": 1844,
+      "sha256": "56189ac6aef963c82f9dd950dc25779f1f49b0ff6d063d8c4925f48faf410c57"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/BUILD-TERMINAL.json",
+      "bytes": 2128,
+      "sha256": "41fd9166839b1be696e7cb06a4d58bf95cc2c6e36b78414104ae00f2132dd486"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/CHECK-INTENT.json",
+      "bytes": 1816,
+      "sha256": "f0b45c2ba872b536c6affc142ceb7e164251a1616ffa1fede755ad0b8a2810df"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/CHECK-START.json",
+      "bytes": 1831,
+      "sha256": "cfd9fac1e0169404841969653ffe7e9ba77d55b65f5c3bf1d74a185c1bbbb591"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/CHECK-TERMINAL.json",
+      "bytes": 2116,
+      "sha256": "f9e5557516973051b479aaacfe853760030ba4648a4758421057e80f5aa20d6e"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/CLIPPY-INTENT.json",
+      "bytes": 1854,
+      "sha256": "b0ce6514ab7b52dc27259cd10370ce9d90af205b85818fbacc5f9366bfcda3ec"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/CLIPPY-START.json",
+      "bytes": 1869,
+      "sha256": "d52c4dd896195eb9f3ed8ab98acd2443b955f3d14e9459834ea0cd315637d172"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/CLIPPY-TERMINAL.json",
+      "bytes": 2155,
+      "sha256": "cdb24c5e150b6f0dff7fa3bb119160bb6ab670ea058194c3eee5ed8ec1e27fe2"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/EXECUTION-CLEAR.json",
+      "bytes": 529,
+      "sha256": "5eb129d56a48b043fff94f455d0ac9b2c6ec0e290b30598ae71f8ecec0af6974"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/FOCUSED-OWNER.json",
+      "bytes": 1611,
+      "sha256": "873a4a19fd852a1edc64c87f95a30c2c2b55486cfe97938abe007746b57d18c8"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/FOCUSED-TERMINAL.json",
+      "bytes": 3188,
+      "sha256": "c329a438a91cff54cc725bb777591e6456dff45da57d06e843ee89c8dd504888"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/HOST-INTENT.json",
+      "bytes": 1885,
+      "sha256": "7622867c09d58b4761ef065d8478a2e71a6700b8d8b1f2787a33abc2a1e5bd41"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/HOST-START.json",
+      "bytes": 1900,
+      "sha256": "643680dbc5299e2ca5749fa2b538d18912ed4810bb9f3da8046cec796a01df2f"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/HOST-TERMINAL.json",
+      "bytes": 2185,
+      "sha256": "96c612ff68495b081e5b8dc515294808a31e47958c1df1b762784bd18af37ce5"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/PREPARED.json",
+      "bytes": 1117,
+      "sha256": "72fa8d5416e210ee847b93d6a598b77624aa38ff03b1af1e654767eb86d58432"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/PRIOR-WHOLE-SOURCE.json",
+      "bytes": 5561,
+      "sha256": "68d47e4379013bc87e83302246c5397fe1e6b0735b87c64c7f4b75661a455f9f"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/RETAINED-PRIOR-WHOLE-REVIEW.json",
+      "bytes": 11104,
+      "sha256": "85567fbba7b2706c3ffb396d74b0bc963360730954b0242c3ac3bc35fd4568fb"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/REVIEW.json",
+      "bytes": 4443,
+      "sha256": "7dc334f491bb74e334354167e514d88468f8c989bf1164542afc54c069655764"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/ROOT-ALL-SOURCE-PINS.json",
+      "bytes": 159069,
+      "sha256": "cebcb4cfa32f682a52f05939e96ef38b59520a946eb4523f852f1d5986f31c32"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/ROOT-SOURCE.json",
+      "bytes": 4244,
+      "sha256": "dc41ef93867aab273986972d2506cbc4889ad61ebb1dd03c73f72de85fc97a3f"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/SOURCE-BINDING.json",
+      "bytes": 166766,
+      "sha256": "8afc3ceb9c518a850ca5d66397bf38a5639095ca418eae16ab650407b7bcfe29"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/TEST-INTENT.json",
+      "bytes": 1822,
+      "sha256": "6ddfc325748ec4c3b9e01ca69c0eed4c767a3735212b6de029eab70c589a2f1b"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/TEST-START.json",
+      "bytes": 1837,
+      "sha256": "0b4f2a3bf9da52c5b9f4f6c3545894e40375a9ab7d91327c96ba9107ba275360"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/TEST-TERMINAL.json",
+      "bytes": 2123,
+      "sha256": "bc920032712205a241dd350e72b7ce7886b3df503f378c9ae307d7b49328b45f"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/build.log",
+      "bytes": 72,
+      "sha256": "59639588a6f1826f129cbcd121edc07279dab94786f5fa5bde6b3439b2e845cc"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/check.log",
+      "bytes": 364,
+      "sha256": "9df4c5c2a102356ede209ed9a6bccf971e77813c318de1610564ce4e808b79e5"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/clippy.log",
+      "bytes": 207,
+      "sha256": "46e64cd29d55d98a359fe76ce777d632d75d95723ab421a0ef15cbaf242f3d7b"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/host.log",
+      "bytes": 1473,
+      "sha256": "f420e9cd3aa6205cf4e8cbe997038ffaaee3793c1e61ac9166f718cc687e267a"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/test.log",
+      "bytes": 25691,
+      "sha256": "0ee622a76174f45daf8725dfd5450c3eb5d40b9d8517d230d517073114164091"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/whole-five/ACTUAL-START.json",
+      "bytes": 956,
+      "sha256": "1cea684b0b967de72e1cdca8f90e2f8e8cd01c767884fbddb8b0c76c38e7dece"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/whole-five/ARTIFACTS.json",
+      "bytes": 2144,
+      "sha256": "1584057bd5e1d9c0477d361f55eb85df8e19cf33f6577035dd8bfcca2a9626ad"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/whole-five/EXECUTION-BINDING.json",
+      "bytes": 167536,
+      "sha256": "d0845caea6417c3f69666a93670d22e359bffb6dbca39f20de35bdc78265577b"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/whole-five/OWNER-TERMINAL.json",
+      "bytes": 23605,
+      "sha256": "3e8ce060877b0f6056bee55c3aea410fb7dec35886ff196d8c4043df2f899f30"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/whole-five/results/EXECUTION-BINDING.json",
+      "bytes": 167536,
+      "sha256": "d0845caea6417c3f69666a93670d22e359bffb6dbca39f20de35bdc78265577b"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/whole-five/results/ORIGINAL-BINDINGS.json",
+      "bytes": 11618,
+      "sha256": "6115342c17444e3f368f4a72f1ea9cc578b9fff2d1a0f1ca2f19d33b225ebf66"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/whole-five/results/SH010-CASE.json",
+      "bytes": 2888,
+      "sha256": "813acf666c21cf5ec092801275db4527eb7cafe720dd8afd1bf25f0240183227"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/whole-five/results/SH011-CASE.json",
+      "bytes": 2898,
+      "sha256": "23112f262cc803e41e0262b37c6ffa09b31b7d9d5a479b5b19a9a34a70b4d0f9"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/whole-five/results/SH016-CASE.json",
+      "bytes": 2901,
+      "sha256": "ff33bd81cf89201dcc8b12cd1225ecfef1d7f0e93ac51ce11ab7118e632b050a"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/whole-five/results/SH017-CASE.json",
+      "bytes": 2887,
+      "sha256": "edc2d9f5a23fa803068da50122a234dc5b790023cd497d78976907bc64c5a358"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/whole-five/results/SH166-CASE.json",
+      "bytes": 2891,
+      "sha256": "31ca0f5a235d04c68e0e3d20f7005e14fe8710c17a45341765308e644ca580f5"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/whole-five/results/TERMINAL.json",
+      "bytes": 14773,
+      "sha256": "99c1456668747f743c8990e41e81b67478dcc810a4add34ef411a8af65d4fbf4"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/whole-five/results/WHOLE-FIVE-CRITERIA.json",
+      "bytes": 4977,
+      "sha256": "ace9c47feecd0aa7b0507f15492e3a1d01edc00a4e0a489c707f5955701dd9c8"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/whole-five/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/whole-five/stdout.log",
+      "bytes": 14715,
+      "sha256": "f74d044bb3977de9e177516c43858b4a98a15765b3985a00d2eb561f9e8e6365"
+    }
+  ],
+  "review": {
+    "path": "/tmp/meridian-g4-exact-facet/crates/meridian-geometry/integration/exact-leaf/PARENT-REVIEW.json",
+    "bytes": 4443,
+    "sha256": "7dc334f491bb74e334354167e514d88468f8c989bf1164542afc54c069655764"
+  },
+  "priorWholeReview": {
+    "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/RETAINED-PRIOR-WHOLE-REVIEW.json",
+    "bytes": 11104,
+    "sha256": "85567fbba7b2706c3ffb396d74b0bc963360730954b0242c3ac3bc35fd4568fb"
+  },
+  "sourceArchive": {
+    "path": "/private/tmp/meridian-root-vertex-dispatch-review/SOURCE.tar",
+    "bytes": 29521920,
+    "sha256": "906e9d3091bc0d2ec7050c4fd3fff278ef865f1f80dad99e01fa77c15907b36c"
+  },
+  "parentFocused": {
+    "rustTests": 88,
+    "library": 70,
+    "binary": 7,
+    "adapter": 9,
+    "originalControls": 2,
+    "hostTests": 9,
+    "lockedAllTargetCheck": "PASS",
+    "strictClippy": "PASS",
+    "devBuild": "PASS",
+    "originalAssertions": "322/108/120 unchanged and passing",
+    "terminal": {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/evidence/FOCUSED-TERMINAL.json",
+      "bytes": 3188,
+      "sha256": "c329a438a91cff54cc725bb777591e6456dff45da57d06e843ee89c8dd504888"
+    }
+  },
+  "parentWholeFive": {
+    "start": {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/whole-five/ACTUAL-START.json",
+      "bytes": 956,
+      "sha256": "1cea684b0b967de72e1cdca8f90e2f8e8cd01c767884fbddb8b0c76c38e7dece"
+    },
+    "terminal": {
+      "path": "/Volumes/SSD/offload/meridian-g1-fleet-vertex-dispatch.5416e10/whole-five/OWNER-TERMINAL.json",
+      "bytes": 23605,
+      "sha256": "3e8ce060877b0f6056bee55c3aea410fb7dec35886ff196d8c4043df2f899f30"
+    },
+    "exitCode": 1,
+    "rustExitCode": 1,
+    "postflightError": null,
+    "inputsAndBinaryUnchanged": true,
+    "elapsedSeconds": 147.061048709,
+    "runs": 1,
+    "caps": {
+      "operations": 2000000,
+      "storageMemberships": 100000,
+      "rationalBits": 4096,
+      "candidateTriangles": 512
+    },
+    "bodies": {
+      "declaredBodies": 25,
+      "bodiesPass": 5,
+      "bodiesRefused": 5,
+      "bodiesFail": 0,
+      "bodiesUnrun": 15
+    },
+    "cases": [
+      {
+        "id": "SH010",
+        "bodies": [
+          "PASS",
+          "REFUSED",
+          "UNRUN",
+          "UNRUN",
+          "UNRUN"
+        ],
+        "failure": {
+          "kind": "Operations",
+          "source": [
+            11,
+            3
+          ],
+          "operationsAtRefusal": 2000001,
+          "detail": "exact operation budget exhausted"
+        },
+        "budgetRejection": {
+          "kind": "Operations",
+          "source": [
+            11,
+            3
+          ],
+          "phase": "sections",
+          "caller": {
+            "file": "crates/meridian-geometry/src/certificate.rs",
+            "line": 75,
+            "column": 7
+          },
+          "operationBase": 0,
+          "storageBase": 0,
+          "operationsBefore": 1999999,
+          "operationsAfter": 2000001,
+          "attemptedOperations": 2,
+          "retainedBeforeCleanup": 88722,
+          "attemptedScratch": 0,
+          "requiredMemberships": null,
+          "phaseOperations": {
+            "other": 0,
+            "decode": 320970,
+            "input_audit": 280501,
+            "index": 71731,
+            "sections": 584594,
+            "arrangement_setup": 224877,
+            "arrangement_pairs": 59270,
+            "arrangement_slabs": 158640,
+            "occupancy": 234731,
+            "fields": 27577,
+            "global_points": 0,
+            "packing": 37110,
+            "noding": 0,
+            "triangulation": 0,
+            "contact_stars": 0,
+            "witness": 0,
+            "topology": 0,
+            "dependent_checks": 0
+          },
+          "stageCounters": [
+            36,
+            2,
+            0,
+            0,
+            1012,
+            0,
+            0,
+            0
+          ],
+          "stageCountersAtOperations": 1999902,
+          "activeLimits": {
+            "operations": 2000000,
+            "storageMemberships": 100000,
+            "rationalBits": 4096,
+            "triangles": 512
+          }
+        },
+        "operations": 2000001,
+        "peakAttemptedStorageMemberships": 88990,
+        "peakAdmittedStorageMemberships": 88990,
+        "retainedTerminalMemberships": 85490,
+        "elapsedSeconds": 35.262565583,
+        "priorActual93eSameCaseSeconds": 36.488605666,
+        "elapsedRatioVsActual93eSameCase": 0.9663993715127782,
+        "completeCandidateReturned": false,
+        "fleetAdmission": false
+      },
+      {
+        "id": "SH011",
+        "bodies": [
+          "PASS",
+          "REFUSED",
+          "UNRUN",
+          "UNRUN",
+          "UNRUN"
+        ],
+        "failure": {
+          "kind": "Operations",
+          "source": [
+            11,
+            5
+          ],
+          "operationsAtRefusal": 2000001,
+          "detail": "exact operation budget exhausted"
+        },
+        "budgetRejection": {
+          "kind": "Operations",
+          "source": [
+            11,
+            5
+          ],
+          "phase": "sections",
+          "caller": {
+            "file": "crates/meridian-geometry/src/sections.rs",
+            "line": 664,
+            "column": 11
+          },
+          "operationBase": 0,
+          "storageBase": 0,
+          "operationsBefore": 2000000,
+          "operationsAfter": 2000001,
+          "attemptedOperations": 1,
+          "retainedBeforeCleanup": 88517,
+          "attemptedScratch": 0,
+          "requiredMemberships": null,
+          "phaseOperations": {
+            "other": 0,
+            "decode": 325330,
+            "input_audit": 280501,
+            "index": 71731,
+            "sections": 589548,
+            "arrangement_setup": 225049,
+            "arrangement_pairs": 58616,
+            "arrangement_slabs": 156084,
+            "occupancy": 229406,
+            "fields": 27420,
+            "global_points": 0,
+            "packing": 36316,
+            "noding": 0,
+            "triangulation": 0,
+            "contact_stars": 0,
+            "witness": 0,
+            "topology": 0,
+            "dependent_checks": 0
+          },
+          "stageCounters": [
+            1012,
+            568,
+            223,
+            2,
+            124,
+            128,
+            129,
+            370
+          ],
+          "stageCountersAtOperations": 1999999,
+          "activeLimits": {
+            "operations": 2000000,
+            "storageMemberships": 100000,
+            "rationalBits": 4096,
+            "triangles": 512
+          }
+        },
+        "operations": 2000001,
+        "peakAttemptedStorageMemberships": 88819,
+        "peakAdmittedStorageMemberships": 88819,
+        "retainedTerminalMemberships": 85272,
+        "elapsedSeconds": 35.044644792,
+        "priorActual93eSameCaseSeconds": 36.501964625,
+        "elapsedRatioVsActual93eSameCase": 0.960075578178554,
+        "completeCandidateReturned": false,
+        "fleetAdmission": false
+      },
+      {
+        "id": "SH016",
+        "bodies": [
+          "PASS",
+          "REFUSED",
+          "UNRUN",
+          "UNRUN",
+          "UNRUN"
+        ],
+        "failure": {
+          "kind": "Operations",
+          "source": [
+            16,
+            8
+          ],
+          "operationsAtRefusal": 2000002,
+          "detail": "exact operation budget exhausted"
+        },
+        "budgetRejection": {
+          "kind": "Operations",
+          "source": [
+            16,
+            8
+          ],
+          "phase": "arrangement_setup",
+          "caller": {
+            "file": "crates/meridian-geometry/src/section_arrangement.rs",
+            "line": 27,
+            "column": 7
+          },
+          "operationBase": 0,
+          "storageBase": 0,
+          "operationsBefore": 2000000,
+          "operationsAfter": 2000002,
+          "attemptedOperations": 2,
+          "retainedBeforeCleanup": 95109,
+          "attemptedScratch": 0,
+          "requiredMemberships": null,
+          "phaseOperations": {
+            "other": 0,
+            "decode": 323877,
+            "input_audit": 304466,
+            "index": 79971,
+            "sections": 722168,
+            "arrangement_setup": 257342,
+            "arrangement_pairs": 61433,
+            "arrangement_slabs": 99187,
+            "occupancy": 84433,
+            "fields": 36401,
+            "global_points": 0,
+            "packing": 30724,
+            "noding": 0,
+            "triangulation": 0,
+            "contact_stars": 0,
+            "witness": 0,
+            "topology": 0,
+            "dependent_checks": 0
+          },
+          "stageCounters": [
+            250,
+            1,
+            0,
+            2,
+            2,
+            0,
+            0,
+            0
+          ],
+          "stageCountersAtOperations": 2000000,
+          "activeLimits": {
+            "operations": 2000000,
+            "storageMemberships": 100000,
+            "rationalBits": 4096,
+            "triangles": 512
+          }
+        },
+        "operations": 2000002,
+        "peakAttemptedStorageMemberships": 98850,
+        "peakAdmittedStorageMemberships": 98850,
+        "retainedTerminalMemberships": 94880,
+        "elapsedSeconds": 24.5386545,
+        "priorActual93eSameCaseSeconds": 25.861675792,
+        "elapsedRatioVsActual93eSameCase": 0.9488423989751947,
+        "completeCandidateReturned": false,
+        "fleetAdmission": false
+      },
+      {
+        "id": "SH017",
+        "bodies": [
+          "PASS",
+          "REFUSED",
+          "UNRUN",
+          "UNRUN",
+          "UNRUN"
+        ],
+        "failure": {
+          "kind": "Operations",
+          "source": [
+            15,
+            19
+          ],
+          "operationsAtRefusal": 2000001,
+          "detail": "exact operation budget exhausted"
+        },
+        "budgetRejection": {
+          "kind": "Operations",
+          "source": [
+            15,
+            19
+          ],
+          "phase": "sections",
+          "caller": {
+            "file": "crates/meridian-geometry/src/sections.rs",
+            "line": 389,
+            "column": 27
+          },
+          "operationBase": 0,
+          "storageBase": 0,
+          "operationsBefore": 2000000,
+          "operationsAfter": 2000001,
+          "attemptedOperations": 1,
+          "retainedBeforeCleanup": 97987,
+          "attemptedScratch": 0,
+          "requiredMemberships": null,
+          "phaseOperations": {
+            "other": 0,
+            "decode": 348672,
+            "input_audit": 304352,
+            "index": 79971,
+            "sections": 710824,
+            "arrangement_setup": 248559,
+            "arrangement_pairs": 60692,
+            "arrangement_slabs": 97744,
+            "occupancy": 83544,
+            "fields": 34910,
+            "global_points": 0,
+            "packing": 30733,
+            "noding": 0,
+            "triangulation": 0,
+            "contact_stars": 0,
+            "witness": 0,
+            "topology": 0,
+            "dependent_checks": 0
+          },
+          "stageCounters": [
+            36,
+            2,
+            0,
+            0,
+            1100,
+            0,
+            0,
+            0
+          ],
+          "stageCountersAtOperations": 1998743,
+          "activeLimits": {
+            "operations": 2000000,
+            "storageMemberships": 100000,
+            "rationalBits": 4096,
+            "triangles": 512
+          }
+        },
+        "operations": 2000001,
+        "peakAttemptedStorageMemberships": 98060,
+        "peakAdmittedStorageMemberships": 98060,
+        "retainedTerminalMemberships": 94483,
+        "elapsedSeconds": 27.383918292,
+        "priorActual93eSameCaseSeconds": 28.871896208,
+        "elapsedRatioVsActual93eSameCase": 0.9484627575106168,
+        "completeCandidateReturned": false,
+        "fleetAdmission": false
+      },
+      {
+        "id": "SH166",
+        "bodies": [
+          "PASS",
+          "REFUSED",
+          "UNRUN",
+          "UNRUN",
+          "UNRUN"
+        ],
+        "failure": {
+          "kind": "Operations",
+          "source": [
+            16,
+            71
+          ],
+          "operationsAtRefusal": 2000001,
+          "detail": "exact operation budget exhausted"
+        },
+        "budgetRejection": {
+          "kind": "Operations",
+          "source": [
+            16,
+            71
+          ],
+          "phase": "arrangement_setup",
+          "caller": {
+            "file": "crates/meridian-geometry/src/exact.rs",
+            "line": 45,
+            "column": 12
+          },
+          "operationBase": 0,
+          "storageBase": 0,
+          "operationsBefore": 2000000,
+          "operationsAfter": 2000001,
+          "attemptedOperations": 1,
+          "retainedBeforeCleanup": 89183,
+          "attemptedScratch": 0,
+          "requiredMemberships": null,
+          "phaseOperations": {
+            "other": 0,
+            "decode": 304157,
+            "input_audit": 275175,
+            "index": 69958,
+            "sections": 763942,
+            "arrangement_setup": 309092,
+            "arrangement_pairs": 60353,
+            "arrangement_slabs": 92454,
+            "occupancy": 59314,
+            "fields": 35855,
+            "global_points": 0,
+            "packing": 29701,
+            "noding": 0,
+            "triangulation": 0,
+            "contact_stars": 0,
+            "witness": 0,
+            "topology": 0,
+            "dependent_checks": 0
+          },
+          "stageCounters": [
+            148,
+            12,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "stageCountersAtOperations": 1999988,
+          "activeLimits": {
+            "operations": 2000000,
+            "storageMemberships": 100000,
+            "rationalBits": 4096,
+            "triangles": 512
+          }
+        },
+        "operations": 2000001,
+        "peakAttemptedStorageMemberships": 92371,
+        "peakAdmittedStorageMemberships": 92371,
+        "retainedTerminalMemberships": 89137,
+        "elapsedSeconds": 24.468264125,
+        "priorActual93eSameCaseSeconds": 26.051561583,
+        "elapsedRatioVsActual93eSameCase": 0.9392244701740573,
+        "completeCandidateReturned": false,
+        "fleetAdmission": false
+      }
+    ],
+    "completeCandidates": 0,
+    "newFleetAdmissions": 0
+  },
+  "interpretation": [
+    "Actual guard operands and caller/phase/context are preserved. Partial prefixes and partial storage peaks are not complete work/storage bounds or minima.",
+    "Parent same-case elapsed ratios are informational and compare distinct failed prefixes where no candidate completes; no completed-geometry speed claim.",
+    "Broader202 parity lane remains separate. Baseline23/162 ships and4/6 stations unchanged; no automatic fleet admission.",
+    "No caps, charges, original inputs, assertions or dependent skips waived. No unchanged visibility run or retry. No native/GPU/profile/sign/notary or production-game edits."
+  ],
+  "currentExecution": "UNRUN; source-only author checks; no current review or original benefit claim"
+}

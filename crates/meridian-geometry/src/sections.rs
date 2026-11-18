@@ -318,6 +318,7 @@ impl<'a> OutwardPlane<'a> {
 }
 
 impl FacetBoundsIndex {
+    #[cfg(test)]
     fn collection_candidates(
         &self,
         face: &Facet,
@@ -329,6 +330,7 @@ impl FacetBoundsIndex {
         self.collection_with_support(face, finite, owners, originals, None, b)
     }
 
+    #[cfg(test)]
     fn collection_with_support(
         &self,
         face: &Facet,
@@ -401,6 +403,77 @@ impl FacetBoundsIndex {
                                 owners.contains_key(&originals[ordinal].id().component)
                             };
                             owner_allowed && plane.meets(bounds, b)?
+                        } else {
+                            false
+                        };
+                        if physical || outward {
+                            result.push((ordinal, physical, outward));
+                        }
+                    }
+                }
+            }
+            self.source_order(result, 3, |record| record.0, b)
+        })
+    }
+
+    fn collection_cached(
+        &self,
+        face: &Facet,
+        finite: &Bounds,
+        owners: &BTreeMap<u32, Vec<Segment>>,
+        originals: &[Facet],
+        distances: &mut vertex_distances::Plane<'_, '_, '_>,
+        b: &mut Budget,
+    ) -> Result<Vec<(usize, bool, bool)>, Failure> {
+        b.with_retained(Self::stack_members(self.facets.len()) + 16, |b| {
+            let plane = OutwardPlane::new(face, b)?;
+            // Four fields per pending node fit the existing eight-membership
+            // per-depth bound. Carry both exclusions to the descendants.
+            let mut pending = vec![(self.root, true, true, false)];
+            let mut result = Vec::new();
+            while let Some((index, physical_possible, outward_possible, owner_known)) =
+                pending.pop()
+            {
+                b.step(1)?;
+                let node = &self.nodes[index];
+                let physical_possible = physical_possible && finite.meets(&node.bounds, b)?;
+                // A uniform owner is exact metadata about this source range,
+                // including unordered inputs. Excluded owners cannot supply an
+                // outward section; physical cuts remain independently eligible.
+                let owner_allowed = if outward_possible && !owner_known {
+                    if let Some(owner) = node.owner {
+                        log_cost(owners.len(), b)?;
+                        owners.contains_key(&owner)
+                    } else {
+                        true
+                    }
+                } else {
+                    outward_possible
+                };
+                let owner_known = owner_known || node.owner.is_some();
+                let outward_possible =
+                    outward_possible && owner_allowed && plane.meets(&node.bounds, b)?;
+                if !physical_possible && !outward_possible {
+                    continue;
+                }
+                if let Some([left, right]) = node.children {
+                    pending.push((right, physical_possible, outward_possible, owner_known));
+                    pending.push((left, physical_possible, outward_possible, owner_known));
+                } else {
+                    for position in node.start..node.end {
+                        b.step(1)?;
+                        let ordinal = self.source_ordinal(position);
+                        let bounds = &self.facets[ordinal];
+                        let physical = physical_possible && finite.meets(bounds, b)?;
+                        let outward = if outward_possible {
+                            let owner_allowed = if node.owner.is_some() {
+                                true
+                            } else {
+                                log_cost(owners.len(), b)?;
+                                owners.contains_key(&originals[ordinal].id().component)
+                            };
+                            owner_allowed
+                                && b.with_retained(96, |b| distances.outward(ordinal, b))?
                         } else {
                             false
                         };
@@ -898,7 +971,132 @@ impl Frame {
         }
         result
     }
+
+    #[cfg(test)]
+    pub(super) fn collect_cached_control<'a>(
+        face: &Facet,
+        finite: &Bounds,
+        source: CachedCollection<'a, '_>,
+        b: &mut Budget,
+    ) -> Result<(Vec<Segment>, Vec<&'a Facet>, Self), Failure> {
+        let entry = b.retained_memberships();
+        let result = b.with_retained(16, |b| {
+            Self::collect_cached_control_admitted(face, finite, source, b)
+        });
+        if result.is_err() {
+            b.release(b.retained_memberships() - entry);
+        }
+        result
+    }
     fn collect_cached_admitted<'a>(
+        face: &Facet,
+        finite: &Bounds,
+        source: CachedCollection<'a, '_>,
+        b: &mut Budget,
+    ) -> Result<(Vec<Segment>, Vec<&'a Facet>, Self), Failure> {
+        let originals = source.distances.originals();
+        let owners = source.owners;
+        let index = source.index;
+        let rows = source.rows;
+        let mut plane = source.distances.plane(face, b)?;
+        b.retain(24)?;
+        let mut frame = Self {
+            owners: BTreeMap::new(),
+            members: 24,
+        };
+        for (owner, group) in owners {
+            b.step(1)?;
+            if finite.meets(&group.bounds, b)? && !rows.contains(*owner, b)? {
+                log_cost(frame.owners.len(), b)?;
+                b.retain(6)?;
+                frame.members += 6;
+                frame.owners.insert(*owner, Vec::new());
+            }
+        }
+        let mut barriers = Vec::new();
+        let mut coplanar = Vec::new();
+        b.state([
+            frame.members,
+            frame.owners.len(),
+            barriers.len(),
+            coplanar.len(),
+            originals.len(),
+            0,
+            0,
+            0,
+        ]);
+        b.with_retained(3 * originals.len(), |b| {
+            let candidates = if frame.owners.is_empty() {
+                // No owner needs an outward section. Use the unchanged finite
+                // traversal, retaining its ordinal vector through conversion.
+                b.with_retained(originals.len(), |b| {
+                    index
+                        .candidates(finite, b)?
+                        .into_iter()
+                        .map(|ordinal| {
+                            b.step(1)?;
+                            Ok((ordinal, true, false))
+                        })
+                        .collect::<Result<Vec<_>, Failure>>()
+                })?
+            } else {
+                index.collection_cached(face, finite, &frame.owners, originals, &mut plane, b)?
+            };
+            for (ordinal, physical, outward) in candidates {
+                b.state([
+                    frame.members,
+                    frame.owners.len(),
+                    barriers.len(),
+                    coplanar.len(),
+                    originals.len(),
+                    ordinal,
+                    96,
+                    0,
+                ]);
+                b.step(1)?;
+                let other = &originals[ordinal];
+                // This exact triangle is entirely on its own source plane and
+                // contributes neither a physical cut nor an outward section.
+                if face.id() == other.id() {
+                    continue;
+                }
+                b.with_retained(96, |b| {
+                    let (segments, same_plane, limiting) =
+                        plane.section(ordinal, physical, outward, b)?;
+                    b.retain(8 * segments.len())?;
+                    barriers.extend(
+                        segments
+                            .into_iter()
+                            .map(|[a, c]| [project(&a, face.axis()), project(&c, face.axis())]),
+                    );
+                    if physical
+                        && same_plane
+                        && crate::exact::dot(face.normal(), other.normal()) > integer(0)
+                    {
+                        b.step(1)?;
+                        b.retain(1)?;
+                        coplanar.push(other);
+                    }
+                    if let Some(segment) = limiting {
+                        log_cost(frame.owners.len(), b)?;
+                        let edges =
+                            frame.owners.get_mut(&other.id().component).ok_or_else(|| {
+                                b.fail(FailureKind::UncertifiedContact, "section owner missing")
+                            })?;
+                        b.retain(7)?;
+                        frame.members += 7;
+                        edges.push(segment);
+                    }
+                    Ok(())
+                })?;
+            }
+            Ok(())
+        })?;
+        Ok((barriers, coplanar, frame))
+    }
+
+    #[cfg(test)]
+    fn collect_cached_control_admitted<'a>(
         face: &Facet,
         finite: &Bounds,
         source: CachedCollection<'a, '_>,
@@ -1985,3 +2183,7 @@ pub(super) struct CachedCollection<'a, 'b> {
     pub rows: &'b super::convex_sections::Rows,
     pub distances: &'b mut VertexDistances<'a>,
 }
+
+#[cfg(test)]
+#[path = "exact_leaf_tests.rs"]
+mod exact_leaf_tests;

@@ -1,0 +1,54 @@
+{
+  "sections.rs": [
+    {
+      "afterStart": 320,
+      "afterEnd": 321,
+      "after": "    #[cfg(test)]\n",
+      "before": ""
+    },
+    {
+      "afterStart": 332,
+      "afterEnd": 333,
+      "after": "    #[cfg(test)]\n",
+      "before": ""
+    },
+    {
+      "afterStart": 405,
+      "afterEnd": 476,
+      "after": "                        } else {\n                            false\n                        };\n                        if physical || outward {\n                            result.push((ordinal, physical, outward));\n                        }\n                    }\n                }\n            }\n            self.source_order(result, 3, |record| record.0, b)\n        })\n    }\n\n    fn collection_cached(\n        &self,\n        face: &Facet,\n        finite: &Bounds,\n        owners: &BTreeMap<u32, Vec<Segment>>,\n        originals: &[Facet],\n        distances: &mut vertex_distances::Plane<'_, '_, '_>,\n        b: &mut Budget,\n    ) -> Result<Vec<(usize, bool, bool)>, Failure> {\n        b.with_retained(Self::stack_members(self.facets.len()) + 16, |b| {\n            let plane = OutwardPlane::new(face, b)?;\n            // Four fields per pending node fit the existing eight-membership\n            // per-depth bound. Carry both exclusions to the descendants.\n            let mut pending = vec![(self.root, true, true, false)];\n            let mut result = Vec::new();\n            while let Some((index, physical_possible, outward_possible, owner_known)) =\n                pending.pop()\n            {\n                b.step(1)?;\n                let node = &self.nodes[index];\n                let physical_possible = physical_possible && finite.meets(&node.bounds, b)?;\n                // A uniform owner is exact metadata about this source range,\n                // including unordered inputs. Excluded owners cannot supply an\n                // outward section; physical cuts remain independently eligible.\n                let owner_allowed = if outward_possible && !owner_known {\n                    if let Some(owner) = node.owner {\n                        log_cost(owners.len(), b)?;\n                        owners.contains_key(&owner)\n                    } else {\n                        true\n                    }\n                } else {\n                    outward_possible\n                };\n                let owner_known = owner_known || node.owner.is_some();\n                let outward_possible =\n                    outward_possible && owner_allowed && plane.meets(&node.bounds, b)?;\n                if !physical_possible && !outward_possible {\n                    continue;\n                }\n                if let Some([left, right]) = node.children {\n                    pending.push((right, physical_possible, outward_possible, owner_known));\n                    pending.push((left, physical_possible, outward_possible, owner_known));\n                } else {\n                    for position in node.start..node.end {\n                        b.step(1)?;\n                        let ordinal = self.source_ordinal(position);\n                        let bounds = &self.facets[ordinal];\n                        let physical = physical_possible && finite.meets(bounds, b)?;\n                        let outward = if outward_possible {\n                            let owner_allowed = if node.owner.is_some() {\n                                true\n                            } else {\n                                log_cost(owners.len(), b)?;\n                                owners.contains_key(&originals[ordinal].id().component)\n                            };\n                            owner_allowed\n                                && b.with_retained(96, |b| distances.outward(ordinal, b))?\n",
+      "before": ""
+    },
+    {
+      "afterStart": 973,
+      "afterEnd": 990,
+      "after": "\n    #[cfg(test)]\n    pub(super) fn collect_cached_control<'a>(\n        face: &Facet,\n        finite: &Bounds,\n        source: CachedCollection<'a, '_>,\n        b: &mut Budget,\n    ) -> Result<(Vec<Segment>, Vec<&'a Facet>, Self), Failure> {\n        let entry = b.retained_memberships();\n        let result = b.with_retained(16, |b| {\n            Self::collect_cached_control_admitted(face, finite, source, b)\n        });\n        if result.is_err() {\n            b.release(b.retained_memberships() - entry);\n        }\n        result\n    }\n",
+      "before": ""
+    },
+    {
+      "afterStart": 991,
+      "afterEnd": 1099,
+      "after": "        face: &Facet,\n        finite: &Bounds,\n        source: CachedCollection<'a, '_>,\n        b: &mut Budget,\n    ) -> Result<(Vec<Segment>, Vec<&'a Facet>, Self), Failure> {\n        let originals = source.distances.originals();\n        let owners = source.owners;\n        let index = source.index;\n        let rows = source.rows;\n        let mut plane = source.distances.plane(face, b)?;\n        b.retain(24)?;\n        let mut frame = Self {\n            owners: BTreeMap::new(),\n            members: 24,\n        };\n        for (owner, group) in owners {\n            b.step(1)?;\n            if finite.meets(&group.bounds, b)? && !rows.contains(*owner, b)? {\n                log_cost(frame.owners.len(), b)?;\n                b.retain(6)?;\n                frame.members += 6;\n                frame.owners.insert(*owner, Vec::new());\n            }\n        }\n        let mut barriers = Vec::new();\n        let mut coplanar = Vec::new();\n        b.state([\n            frame.members,\n            frame.owners.len(),\n            barriers.len(),\n            coplanar.len(),\n            originals.len(),\n            0,\n            0,\n            0,\n        ]);\n        b.with_retained(3 * originals.len(), |b| {\n            let candidates = if frame.owners.is_empty() {\n                // No owner needs an outward section. Use the unchanged finite\n                // traversal, retaining its ordinal vector through conversion.\n                b.with_retained(originals.len(), |b| {\n                    index\n                        .candidates(finite, b)?\n                        .into_iter()\n                        .map(|ordinal| {\n                            b.step(1)?;\n                            Ok((ordinal, true, false))\n                        })\n                        .collect::<Result<Vec<_>, Failure>>()\n                })?\n            } else {\n                index.collection_cached(face, finite, &frame.owners, originals, &mut plane, b)?\n            };\n            for (ordinal, physical, outward) in candidates {\n                b.state([\n                    frame.members,\n                    frame.owners.len(),\n                    barriers.len(),\n                    coplanar.len(),\n                    originals.len(),\n                    ordinal,\n                    96,\n                    0,\n                ]);\n                b.step(1)?;\n                let other = &originals[ordinal];\n                // This exact triangle is entirely on its own source plane and\n                // contributes neither a physical cut nor an outward section.\n                if face.id() == other.id() {\n                    continue;\n                }\n                b.with_retained(96, |b| {\n                    let (segments, same_plane, limiting) =\n                        plane.section(ordinal, physical, outward, b)?;\n                    b.retain(8 * segments.len())?;\n                    barriers.extend(\n                        segments\n                            .into_iter()\n                            .map(|[a, c]| [project(&a, face.axis()), project(&c, face.axis())]),\n                    );\n                    if physical\n                        && same_plane\n                        && crate::exact::dot(face.normal(), other.normal()) > integer(0)\n                    {\n                        b.step(1)?;\n                        b.retain(1)?;\n                        coplanar.push(other);\n                    }\n                    if let Some(segment) = limiting {\n                        log_cost(frame.owners.len(), b)?;\n                        let edges =\n                            frame.owners.get_mut(&other.id().component).ok_or_else(|| {\n                                b.fail(FailureKind::UncertifiedContact, \"section owner missing\")\n                            })?;\n                        b.retain(7)?;\n                        frame.members += 7;\n                        edges.push(segment);\n                    }\n                    Ok(())\n                })?;\n            }\n            Ok(())\n        })?;\n        Ok((barriers, coplanar, frame))\n    }\n\n    #[cfg(test)]\n    fn collect_cached_control_admitted<'a>(\n",
+      "before": ""
+    },
+    {
+      "afterStart": 2185,
+      "afterEnd": 2189,
+      "after": "\n#[cfg(test)]\n#[path = \"exact_leaf_tests.rs\"]\nmod exact_leaf_tests;\n",
+      "before": ""
+    }
+  ],
+  "vertex_distances.rs": [
+    {
+      "afterStart": 122,
+      "afterEnd": 123,
+      "after": "    fn prepare(&mut self, ordinal: usize, b: &mut Budget) -> Result<[usize; 3], Failure> {\n",
+      "before": "    pub(in crate::certificate) fn section(\n        &mut self,\n        ordinal: usize,\n        physical: bool,\n        outward: bool,\n        b: &mut Budget,\n    ) -> Result<JointSection, Failure> {\n"
+    },
+    {
+      "afterStart": 168,
+      "afterEnd": 194,
+      "after": "        Ok(ids)\n    }\n    pub(in crate::certificate) fn outward(\n        &mut self,\n        ordinal: usize,\n        b: &mut Budget,\n    ) -> Result<bool, Failure> {\n        let ids = self.prepare(ordinal, b)?;\n        // An affine plane distance attains its extrema at triangle vertices.\n        // A limiting outward section exists exactly when positive and\n        // nonpositive vertices coexist. Zeros stay below the shifted plane.\n        b.step(1)?;\n        Ok(ids.iter().any(|id| self.cache.values[*id] > integer(0))\n            && ids.iter().any(|id| self.cache.values[*id] <= integer(0)))\n    }\n\n    pub(in crate::certificate) fn section(\n        &mut self,\n        ordinal: usize,\n        physical: bool,\n        outward: bool,\n        b: &mut Budget,\n    ) -> Result<JointSection, Failure> {\n        let ids = self.prepare(ordinal, b)?;\n        let originals: &'a [Facet] = self.cache.originals;\n        let other = &originals[ordinal];\n",
+      "before": ""
+    }
+  ]
+}

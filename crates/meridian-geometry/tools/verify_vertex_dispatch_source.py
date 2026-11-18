@@ -5,6 +5,7 @@ import re
 import subprocess
 from pathlib import Path
 from restore_vertex_dispatch import restore_vertex_dispatch
+from restore_exact_leaf import restore_exact_leaf
 from strip_budget_context import body
 
 CRATE = Path(__file__).resolve().parents[1]
@@ -28,7 +29,7 @@ def verify():
                 assert body(after, signature) == body(old, signature), (path, signature)
                 count += 1
     assert count == 88, count
-    current = (CRATE / 'src/sections.rs').read_text()
+    current = restore_exact_leaf('sections.rs', (CRATE / 'src/sections.rs').read_text())
     before = (fixture / 'before-sections.rs').read_text()
     for name in ['collection_candidates', 'collection_with_support']:
         signature = 'fn ' + name + '('

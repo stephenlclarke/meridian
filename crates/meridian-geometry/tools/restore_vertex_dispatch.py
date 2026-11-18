@@ -1,10 +1,12 @@
 """Restore only the two production joint-dispatch cfg attributes."""
 from pathlib import Path
+from restore_exact_leaf import restore_exact_leaf
 
 CRATE = Path(__file__).resolve().parents[1]
 
 
 def restore_vertex_dispatch(name, source):
+    source = restore_exact_leaf(name, source)
     if name != 'sections.rs':
         return source
     result = source
