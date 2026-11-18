@@ -1,6 +1,6 @@
 # Meridian
 
-The signed internal candidate reproduced the black Fit review despite identical first-attempt CPU/API records. A [bounded cross-frame and pixel capture](docs/LASER-FACINGS.md#opt-in-cross-frame-and-pixel-capture-v2) is now authored to observe later frames and supported actual-target copies. It is **UNRUN**, collects causal evidence and does not claim a renderer cure. The native blocker and dependent gameplay acceptance remain open.
+The current native run produced three byte-identical, nonblack GPU target copies with accepted App acknowledgements, while the paired Fit still appeared black through CUA. The [presentation/window observation investigation](docs/LASER-FACINGS.md#post-render-presentation-and-window-observation-boundary) found no supported source fix. The remaining boundary is drawable presentation, window/layer identity and compositor/CUA observation; another unchanged render capture would not resolve it. Native acceptance remains blocked.
 
 [![CI](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=alert_status)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)
