@@ -241,6 +241,7 @@ fn beam_fixture() -> (Snapshot, TrafficSnapshot) {
     let mut scene = scene.clone();
     // Explicit retained-segment fixture with real descriptive IDs, not a simulated hit.
     scene.last_beam = Some(TrafficBeam {
+        mounted_emission: None,
         weapon: meridian_core::OrdinaryWeapon::FrontPulseLaser,
         source: BeamSource::Npc(scene.actors[1].id),
         victim: scene.actors[0].id,
@@ -591,6 +592,11 @@ fn incoming_segment_tie_keeps_separate_player_pulse_and_retains_one_traffic_segm
         .find(|a| a.id != hit.attacker)
         .unwrap_or_else(|| panic!("actual other actor"));
     scene.last_beam = Some(TrafficBeam {
+        mounted_emission: Some(meridian_core::MountedLaserEmission {
+            body_pose: hit.player_pose,
+            facing: meridian_core::LaserFacing::Front,
+            physical_tick: hit.physical_tick,
+        }),
         weapon: meridian_core::OrdinaryWeapon::FrontPulseLaser,
         source: BeamSource::Player {
             owner: 12001,
