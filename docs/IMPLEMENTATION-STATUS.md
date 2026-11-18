@@ -9,14 +9,14 @@ and exact shared spend; native rays derive from retained body/facing. The curren
 content fingerprint changes and old content refuses without migration. Two real
 paid two-mount NPC/interception regressions with coordinated corruption controls
 are authored **UNRUN**. Existing collision/resource/emission rules remain. Root
-separately fixes P1's missing live ECM clone in the EMP control fork; whole-source
+retains P1's live ECM clone correction in the EMP control fork; whole-source
 compiler/tests/Clippy/native acceptance remain pending for the changed composition.
 
 ## Joined four-facing laser and manual ECM source candidate
 
 Root has joined the isolated core and desktop implementations on the separately qualified `2d5f4a5` quality correction. The current source preserves the celestial-motion, traffic-goal and pylon-slot helpers. Equipment has exactly 19 slots: four laser mounts, cargo, energy, navigation, scoops, EMP, ECM and nine pylons. EMP remains at index 8. Both content rules markers are retained; incompatible old fingerprints still refuse without migration.
 
-The composition adds one meaningful core regression for both same-tick side-laser/ECM command orders: genuine paid hardware and owned missiles, failed prepared publication, exact shared 23-energy debit, heat/cooldown, effect/item/cash/cargo custody and cold replay. Together with the author cases, the expected source counts are 428 core and 244 desktop, plus two compatibility and three observer cases (677 Rust), 99 Python and 51 Markdown. These new Rust cases and all joined-source compiler, Clippy, coverage and native acceptance remain **UNRUN**. Whole-source independent review and existing G1/Dell execution are required. No new playable preview is claimed.
+The composition adds one meaningful core regression for both same-tick side-laser/ECM command orders: genuine paid hardware and owned missiles, failed prepared publication, exact shared 23-energy debit, heat/cooldown, effect/item/cash/cargo custody and cold replay. Together with the author cases, the expected source counts are 430 core and 244 desktop, plus two compatibility and three observer cases (679 Rust), 99 Python and 51 Markdown. These new Rust cases and all joined-source compiler, Clippy, coverage and native acceptance remain **UNRUN**. Whole-source independent review and existing G1/Dell execution are required. No new playable preview is claimed.
 
 ## Paid manual ECM source candidate
 

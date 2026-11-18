@@ -219,7 +219,8 @@ creates a positive body, actor, hit, resource spend or incoming NPC missile.
 The existing traffic-only unit fixture supplies an explicit rigid body and its
 forward direction for the newly required input. It remains a component fixture,
 not a public journey. Existing EMP paid/defender helper bodies and assertions are
-unchanged; only test visibility is widened for reuse. The existing P1 missing
-`ecm` clone in the EMP control fork remains Root's separately assigned correction.
+unchanged; only test visibility is widened for reuse. The P1 missing
+`ecm` clone in the EMP control fork is corrected separately by Root and retained
+in the joined successor.
 This P2 source is not a whole-source compiler-clear claim. No compiler, Cargo,
 Clippy, Rust/helper, native, GPU or review bot was run by this author.
