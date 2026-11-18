@@ -405,6 +405,20 @@ pub(crate) fn rotate_inverse(q: [f32; 4], v: [f32; 3]) -> [f32; 3] {
     std::array::from_fn(|i| v[i] + q[3] * t[i] + c[i])
 }
 
+pub(crate) fn frame_vertices_for_observer(
+    snapshot: &Snapshot,
+    ship: &[Vertex],
+    station: Option<StationRender<'_>>,
+    observer: Option<RigidPose>,
+    output: &mut Vec<Vertex>,
+) -> Result<(), String> {
+    if let (Some(station), Some(observer)) = (station, observer) {
+        station_from_observer(station, observer, output)
+    } else {
+        frame_vertices(snapshot, ship, station, output)
+    }
+}
+
 pub fn frame_vertices(
     snapshot: &Snapshot,
     ship: &[Vertex],

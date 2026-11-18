@@ -397,6 +397,7 @@ impl World {
             state,
             traffic: crate::traffic::State::default(),
             mule_validation: None,
+            mule_renas: None,
             mining: crate::mining::State::legacy_absent(),
             mining_scope: std::sync::Arc::new(()),
             damage: super::damage::State::default(),
@@ -444,6 +445,9 @@ impl World {
             &candidate.flight_reception,
             &Commerce::current(&candidate),
         )?;
+        candidate
+            .restore_renas_mule()
+            .map_err(|_| SaveError::ContentMismatch)?;
         Ok(candidate)
     }
 

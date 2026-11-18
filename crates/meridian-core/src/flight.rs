@@ -6,6 +6,7 @@ pub use emp::{
 mod celestial;
 mod damage;
 mod mining;
+mod mule_renas;
 mod mule_validation;
 mod xyzzy;
 pub(crate) use xyzzy::{AccountEffect, AccountEvent, STARTING_CREDITS_TENTHS};
@@ -165,6 +166,7 @@ pub struct World {
     state: Snapshot,
     traffic: crate::traffic::State,
     mule_validation: Option<crate::traffic::mule_validation::State>,
+    mule_renas: Option<crate::traffic::mule_validation::State>,
     mining: crate::mining::State,
     mining_scope: std::sync::Arc<()>,
     damage: damage::State,
@@ -210,6 +212,7 @@ impl World {
             },
             traffic: crate::traffic::State::default(),
             mule_validation: None,
+            mule_renas: None,
             mining: crate::mining::State::legacy_absent(),
             mining_scope: std::sync::Arc::new(()),
             damage: damage::State::default(),
@@ -468,12 +471,19 @@ impl World {
             .map(mission::FreightSession::launch_epoch)
             .transpose()
             .map_err(|_| StepError::TickOverflow)?;
+        let mule_renas = self
+            .prepare_renas_mule(next.mode, navigation)
+            .map_err(|_| StepError::UnsafeLaunch)?;
+        if let Some(actor) = &mule_renas {
+            self.validate_renas_mule_launch(actor, launch_pose)?;
+        }
         if let Some(account) = &mut self.commander_account {
             account.record_departure_legality();
         }
         self.state = next;
         self.navigation = navigation;
         self.missiles.berth();
+        self.mule_renas = mule_renas;
         if let Some((session, epoch)) = self.freight_session.as_mut().zip(mission_epoch) {
             session.publish_launch(epoch);
         }
@@ -555,7 +565,7 @@ impl World {
                     + input.yaw.abs() * YAW_RATE
                     + input.roll.abs() * ROLL_RATE,
             ) * f64::from(FIXED_DELTA_SECONDS);
-            if !self.traffic_motion_clear(before, after) {
+            if !self.traffic_and_renas_mule_motion_clear(before, after, angular_travel) {
                 let mut stopped = self.state;
                 stopped.tick = next.tick;
                 stopped.speed = 0.0;
@@ -775,6 +785,7 @@ impl World {
         }
         self.state = next;
         self.navigation = navigation;
+        self.refresh_deferred_renas_mule();
         self.observe_flight_reception(flight_reception_start);
         if let Some((session, epoch)) = self.freight_session.as_mut().zip(mission_epoch) {
             session.rebind_dock(navigation.and_then(NavigationState::dock), epoch);

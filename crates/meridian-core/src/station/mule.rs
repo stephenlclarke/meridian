@@ -152,3 +152,98 @@ impl OriginalStationData {
         })
     }
 }
+
+impl OriginalStationData {
+    /// A stationary authored courier outside the station-facing launch corridor.
+    pub(crate) fn renas_mule_berth(
+        &self,
+        source: &MuleHullSource,
+    ) -> Result<RigidPose, StationError> {
+        let station = self.station_pose().pose;
+        let launch = self.launch_start()?;
+        let at_launch =
+            flight_pose(launch.position, launch.orientation).ok_or(StationError::InvalidPose)?;
+        let side = source.maximum_origin_radius() + self.player_radius() * 1.001 + 16.0;
+        let offset = station.orientation.apply(Vec3::new(side, 0.0, 88.0));
+        let pose = RigidPose {
+            position: add(at_launch.position, offset),
+            orientation: station.orientation,
+        };
+        if !self.mule_motion_clear(source, pose, pose, 0.0) {
+            return Err(StationError::UnsafeLaunch);
+        }
+        Ok(pose)
+    }
+
+    /// In the player's translating frame, the stationary Mule sweeps against the
+    /// original SH025 triangles from the opening pose. Bound the player rotation
+    /// by inflating the separating certificates with its maximum point travel.
+    pub(crate) fn mule_ordinary_player_clear(
+        &self,
+        source: &MuleHullSource,
+        mule: RigidPose,
+        before: RigidPose,
+        after: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        if !finite(before.position)
+            || !finite(after.position)
+            || !before.orientation.is_valid_rotation()
+            || !after.orientation.is_valid_rotation()
+            || !angular_travel.is_finite()
+            || angular_travel < 0.0
+        {
+            return false;
+        }
+        let margin = (source.maximum_origin_radius() + self.player_radius()) * 1.001 + 0.001;
+        let center = mule.position;
+        let a = sub(before.position, center);
+        let b = sub(after.position, center);
+        if [(a.x, b.x), (a.y, b.y), (a.z, b.z)]
+            .into_iter()
+            .any(|(first, last)| first.min(last) > margin || first.max(last) < -margin)
+        {
+            return true;
+        }
+        let mut end = mule;
+        end.position = add(mule.position, sub(before.position, after.position));
+        let padding = self.player_radius() * (1.001 * (angular_travel + 1e-6).min(2.0) + 1e-9);
+        self.hull.faces.iter().all(|face| {
+            let triangle = [face[0], face[1], face[2]].map(|i| {
+                add(
+                    before.position,
+                    before.orientation.apply(self.hull.vertices[i]),
+                )
+            });
+            source.pieces().iter().all(|piece| {
+                piece.sweep_clears_triangle_with_padding(mule, end, 0.0, triangle, padding)
+                    == Ok(true)
+            })
+        })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{MuleHullSource, OriginalStationData, StationError, flight_pose};
+
+    #[test]
+    fn authored_berth_clears_the_source_launch_but_blocks_a_swept_player_hull()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let station = OriginalStationData::bundled()?;
+        let source = MuleHullSource::bundled()?;
+        let berth = station.renas_mule_berth(&source)?;
+        let launch = station.launch_start()?;
+        let before =
+            flight_pose(launch.position, launch.orientation).ok_or(StationError::InvalidPose)?;
+        assert!(station.mule_ordinary_player_clear(&source, berth, before, before, 0.0));
+
+        let mut end = before;
+        end.position.x = 2.0 * berth.position.x - before.position.x;
+        end.position.z = 2.0 * berth.position.z - before.position.z;
+        // Both endpoints are clear. The interpolated path crosses the berth.
+        assert!(station.mule_ordinary_player_clear(&source, berth, end, end, 0.0));
+        assert!(!station.mule_ordinary_player_clear(&source, berth, before, end, 0.0));
+        Ok(())
+    }
+}

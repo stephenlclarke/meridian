@@ -87,10 +87,21 @@ impl World {
     }
     /// One coherent immutable actor/surface publication; renderer cannot manufacture its scope.
     pub fn mule_actor_snapshot(&self) -> Option<MuleActorSnapshot> {
-        self.mule_validation.as_ref().map(State::snapshot)
+        self.mule_validation
+            .as_ref()
+            .map(State::snapshot)
+            .or_else(|| {
+                self.active_renas_mule()
+                    .map(|actor| actor.renas_publication(self.state.tick))
+            })
     }
     /// Validate immediately before adapting the publication for a render frame.
     pub fn mule_snapshot_is_current(&self, frame: &MuleActorSnapshot) -> bool {
+        if frame.is_renas_encounter() {
+            return self
+                .active_renas_mule()
+                .is_some_and(|actor| actor.renas_frame_matches(frame, self.state.tick));
+        }
         self.mule_validation
             .as_ref()
             .is_some_and(|state| state.is_current(frame))
@@ -101,7 +112,7 @@ impl World {
         &self,
         frame: &MuleActorSnapshot,
     ) -> Option<crate::docking::RigidPose> {
-        if !self.mule_snapshot_is_current(frame) {
+        if frame.is_renas_encounter() || !self.mule_snapshot_is_current(frame) {
             return None;
         }
         flight_pose(self.state.position, self.state.orientation)

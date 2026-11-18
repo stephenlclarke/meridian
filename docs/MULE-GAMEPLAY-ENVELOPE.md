@@ -48,11 +48,21 @@ The exact `25130c7` run confirmed all 34 piece records and cleared the historica
 
 The controlled inbound World constructor validates an exterior SH001 start and advances the same source geometry and actor publication used by the renderer. At the actual SH028 port plane, the World applies the strict aperture and continuous collision checks. Accepted crossing publishes a stopped, complete inbound actor. Overspeed or obstructed approaches stop before committing the rejected pose. The observer remains in its original World context. The authored test records the cost of real World ticks for an aligned approach, overspeed refusal and sidewall contact. Qualification must retain release timings and terminal tick cost together with the native frame results. The bundled SH028 physical scene has a fixed station pose.
 
+## First ordinary Renas encounter
+
+The human authorized one identifiable, two-crew SH001 near Renas Main Orbital. The actual eighth G02 handover and the next successful departure from that berth open the encounter. The Mule holds at a station-relative exterior position clear of the launch corridor. The usual player flight path checks against the same rounded hull that the renderer presents.
+
+A valid pre-encounter v17 save can place the player in the new berth. Continue keeps that saved pose and holds the Mule back while the player occupies its envelope. The first committed clear movement exposes the same actor at its original berth. Saving during the overlap and continuing again uses the same clearance rule.
+
+The original receipt stores the owner, hull, system, berth sequence and visit. Current save v17 already retains the receipt and navigation visit and berth sequence. Continue reconstructs the same pose and identity during that first sortie. Redocking or arriving in another system ends the encounter, and subsequent launches do not recreate it. The normal G02 payment and clue retain their original transaction.
+
+The ordinary frame exposes physical crew count and the same source identity and shield surface as the controlled Mule. Crew work and player ownership require their own authority. Native render and the complete G02 journey on the joined revision await qualification.
+
 ## Renderer dependency
 
 `MulePresentation` shares immutable `Arc` surface data with collision. The existing renderer owner must draw that same rounded-support union. Maximum single-surface opacity is 0.018, with fourth-power grazing fade, full close fade through 32 metres and zero by 64 metres. Front/rear strength uses the existing local +Z bank split. Internal piece surfaces must be discarded and overlapping pieces must not accumulate into a bright halo. The detailed original model remains the visible hull; the envelope is a very slight close-up edge shimmer.
 
-The [authored desktop pass](MULE-RENDERER.md) preserves original visible faces, material/UV fields and three immutable original diffuse maps. The rounded source-bound union blends once at maximum alpha 0.018, with grazing and close-range fade. The App adapter now checks actual World-owned scope, generation, tick, source identity and observer before presenting a Mule. Ordinary Worlds still contain no Mule. Renderer Rust/shader/GPU tests and native close, far, depleted, contact and rotating-dock views remain UNRUN. Core qualification does not establish visual acceptance.
+The [authored desktop pass](MULE-RENDERER.md) preserves original visible faces, material/UV fields and three immutable original diffuse maps. The rounded source-bound union blends once at maximum alpha 0.018, with grazing and close-range fade. The App adapter now checks actual World-owned scope, generation, tick, source identity and observer before presenting a Mule. The ordinary Renas adapter uses the verified World-owned encounter frame and the ordinary player camera. Renderer Rust/shader/GPU tests and native close, far, depleted, contact and rotating-dock views remain UNRUN. Core qualification does not establish visual acceptance.
 
 ## Integration and remaining acceptance
 
@@ -62,7 +72,7 @@ Eleven new core tests cover all source vertices/triangle interiors, directional 
 
 The ordinary save fixture now preserves raw byte equality at checked decode. Public Continue must independently change only the existing saved review sequence and session epoch by one, plus the checksum; it must still grant no validation Mule. Those anti-replay changes are deliberate current behavior and remain untouched. [The causal record](../integration/sh001-mule/CAUSAL-CORRECTION.json) binds the source and immutable first-failure evidence.
 
-SH001 remains unadmitted. Current World actor selection, real per-ID equipment/crew/paid blueprint acquisition, current-save ownership, existing contact/EMP binding, renderer evidence, native docking/gameplay qualification and protected main integration are still required. Root retains merge ownership. The accepted baseline stays 23/162 ships and 4/6 stations. Do not advance to SH008 or apply blanket fleet admission until Mule's actual one-by-one acceptance is complete.
+SH001 remains unadmitted. The ordinary Renas encounter still needs a joined renderer and native qualification. Player ownership, paid effects and crew services are separate milestones. Root retains merge ownership. The accepted baseline stays 23/162 ships and 4/6 stations. Do not advance to SH008 or apply blanket fleet admission until Mule's actual one-by-one acceptance is complete.
 
 ## Reproducing the packaged source
 

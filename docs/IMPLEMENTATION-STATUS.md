@@ -8,6 +8,10 @@ The desktop source hides the routine flight summary, idle lesson and practice pr
 
 The Lion Citadel exterior now uses blue-grey plating, darker structural steel and amber light strips in the desktop source. Subtle face shading gives adjacent panels depth. The renderer applies this finish at load time to the original material assignments. Four short strips join the rim to the upper and lower crosspieces. On a CPU projection of the reported view, the strips cover all 184 sampled gaps and nine sightlines through the port stay clear. A visual check in the Mac build is pending.
 
+## First Renas Mule encounter
+
+A fresh commander delivered all eight G02 freight units at Renas, received 730 CR and the trusted clue, and saw the Mule on the next launch. Cold Continue restored the same SH001 identity and pose in the ordinary Mac cockpit. A regression using a genuine older v17 save verifies that a player already inside the encounter berth can move clear. World tests cover retirement and later launches. Close-range shimmer still needs visual confirmation. Preview 8 predates this encounter.
+
 ## Internal Mule docking validation
 
 Mac build `ffb7112` passed 702 Rust tests, 102 Python tests, strict Clippy, and the release build. In the native scene the aligned Mule crossed at tick 104 and the obstructed Mule stopped for station contact at tick 11. Linux and native Windows each passed 705 Rust tests including three observer tests, 102 Python tests, strict Clippy, and both release builds. One Metal fixture was excluded from the ordinary test counts on each platform. These results qualify the internal docking scene. Ordinary encounters and player acquisition remain open. [Controls and test scope](MULE-VALIDATION-LAUNCH.md)

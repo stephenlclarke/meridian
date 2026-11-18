@@ -180,7 +180,7 @@
       "status": "UNRUN"
     }
   ],
-  "totalMuleCoreTests": 23,
+  "totalMuleCoreTests": 24,
   "controlledWorldScenario": {
     "status": "AUTHORED_UNRUN;NOT_ORDINARY_HULL_ADMISSION",
     "base": "af97ee6bbba60b2d492216ad12035a90e9dde34e",
@@ -330,5 +330,21 @@
       "unchangedPublicContract": "Existing OriginalStationData::mule_entry_clear stays the conjunction of the original condition/fit gate and continuous station sweep. No aperture, speed, orientation, angular, margin, or station asset changes.",
       "qualify": "Keep aligned/overspeed and original x=100 at cap. Also exercise x=100 at regular entry speed and x=69 at cap. The x=69 lane physically encounters SH028 +X lip triangle 482 before the centre crosses the opening. Retain five cost rows and all terminal pose/source/authority assertions."
     }
+  },
+  "restoreCoreTests": [
+    {
+      "file": "crates/meridian-core/src/flight/mule_renas/tests.rs",
+      "name": "genuine_pre_pr_v17_overlap_continues_in_place_and_releases_the_same_mule_after_escape",
+      "status": "UNRUN"
+    }
+  ],
+  "prePrRenasRestoreFixture": {
+    "path": "crates/meridian-core/tests/fixtures/renas-mule-pre-pr-overlap-v17.bin",
+    "bytes": 4429,
+    "sha256": "cc780234206983ea04d7dec8787d6d5b4b7ef683c4aa1bfc5df1e0053d009fdb",
+    "actualProducerBase": "4151bf4f04d990362a84b378b9361a2e32fb7301",
+    "oldSerializerAndDecoder": "G1 PASS, one exact test; real freight and launch receipts, source witness introduced by fixture only",
+    "producerTerminalSHA256": "c37ed8e9f4d371735db2e9c48a5b5a45a980bad946e0f7c52de85e093c7e69ea",
+    "correctedSourceReplay": "UNRUN"
   }
 }

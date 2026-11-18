@@ -236,7 +236,20 @@ impl SmoothPiece {
         angular_travel: f64,
         triangle: [Vec3; 3],
     ) -> Result<bool, EnvelopeError> {
-        if !valid_pose(start)
+        self.sweep_clears_triangle_with_padding(start, end, angular_travel, triangle, 0.0)
+    }
+
+    pub(crate) fn sweep_clears_triangle_with_padding(
+        &self,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+        triangle: [Vec3; 3],
+        peer_padding: f64,
+    ) -> Result<bool, EnvelopeError> {
+        if !peer_padding.is_finite()
+            || peer_padding < 0.0
+            || !valid_pose(start)
             || !valid_pose(end)
             || !angular_travel.is_finite()
             || angular_travel < 0.0
@@ -267,7 +280,7 @@ impl SmoothPiece {
         let movement = sub(end.position, start.position);
         let center = add(start.position, start.orientation.apply(self.center()));
         let rotation_padding =
-            self.origin_radius * (1.001 * (angular_travel + 1e-6).min(2.0) + 1e-9);
+            self.origin_radius * (1.001 * (angular_travel + 1e-6).min(2.0) + 1e-9) + peer_padding;
         let (low, high) = self.placed_source_bounds(start);
         let guard = 4096.0
             * f64::EPSILON
