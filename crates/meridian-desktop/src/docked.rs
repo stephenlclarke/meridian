@@ -680,6 +680,23 @@ fn module_rows(
     }
     rows
 }
+fn append_pylon_slots(
+    slots: &mut Vec<ui::EquipmentSlot>,
+    ammo: &meridian_core::AmmunitionSnapshot,
+) {
+    for pylon in 0..ammo.capacity {
+        let occupied = ammo
+            .items
+            .iter()
+            .any(|i| !i.consumed && i.pylon == Some(pylon));
+        slots.push(ui::EquipmentSlot {
+            id: format!("pylon-{pylon}"),
+            label: format!("Pylon {}", pylon + 1),
+            fitted: if occupied { "Missile" } else { "Empty" }.into(),
+            available: true,
+        });
+    }
+}
 fn equipment_panel(
     world: &World,
     selected: &str,
@@ -738,18 +755,7 @@ fn equipment_panel(
     });
     slots.push(ui::fuel_scoops::slot(world)?);
     slots.push(ui::emp::slot(world));
-    for pylon in 0..ammo.capacity {
-        let occupied = ammo
-            .items
-            .iter()
-            .any(|i| !i.consumed && i.pylon == Some(pylon));
-        slots.push(ui::EquipmentSlot {
-            id: format!("pylon-{pylon}"),
-            label: format!("Pylon {}", pylon + 1),
-            fitted: if occupied { "Missile" } else { "Empty" }.into(),
-            available: true,
-        });
-    }
+    append_pylon_slots(&mut slots, &ammo);
     let mut rows = Vec::new();
     let module_slot = match selected {
         "front-laser" => Some(ModuleSlot::FrontLaser),

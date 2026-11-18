@@ -115,59 +115,14 @@ fn move_actor(
             missile_aggression,
         )
     });
-    let (mut goal, mut speed) = if actor.resources.emp_disabled() {
-        (
-            add(actor.position, scale(actor.pose().orientation.z, 100000.0)),
-            actor.speed,
-        )
-    } else {
-        player_goal.map_or_else(
-            || {
-                intent(
-                    actor,
-                    opening,
-                    player_after.position,
-                    shots,
-                    missile_aggression,
-                )
-            },
-            |goal| {
-                (
-                    goal,
-                    if length(sub(goal, actor.position)) < 800.0 {
-                        0.0
-                    } else {
-                        34.3
-                    },
-                )
-            },
-        )
-    };
-    let yielding = if actor.resources.emp_disabled() {
-        None
-    } else {
-        super::admission::yield_goal(actor, goal, context)
-    };
-    if let Some(detour) = yielding {
-        goal = detour;
-        speed = speed.min(length(sub(goal, actor.position)) * 0.65 / (18.0 * 4.0));
-    } else if !actor.resources.emp_disabled()
-        && actor.id.serial == 2
-        && actor.resources.energy >= 9500
-    {
-        let target_pose = if player_goal.is_some() {
-            Some(player_after)
-        } else {
-            target(actor, opening).map(Actor::pose)
-        };
-        if let Some(target_pose) = target_pose
-            && let Some(point) = data
-                .player_planar_aimpoint(target_pose, actor.position)
-                .map_err(|_| TrafficError::InvalidState)?
-        {
-            goal = point;
-        }
-    }
+    let (goal, mut speed) = movement_goal(
+        actor,
+        opening,
+        context,
+        shots,
+        missile_aggression,
+        player_goal,
+    )?;
     let delta = sub(goal, actor.position);
     let desired = delta.x.atan2(delta.z);
     let error = (desired - actor.yaw)
@@ -254,6 +209,72 @@ fn move_actor(
         advance_route(&mut actor);
     }
     Ok(actor)
+}
+fn movement_goal(
+    actor: Actor,
+    opening: &[Option<Actor>; MAX_TRAFFIC_ACTORS],
+    context: &TickContext<'_>,
+    shots: &[TrafficBeam],
+    missile_aggression: bool,
+    player_goal: Option<Vec3>,
+) -> Result<(Vec3, f64), TrafficError> {
+    let TickContext {
+        data, player_after, ..
+    } = *context;
+    let (mut goal, mut speed) = if actor.resources.emp_disabled() {
+        (
+            add(actor.position, scale(actor.pose().orientation.z, 100000.0)),
+            actor.speed,
+        )
+    } else {
+        player_goal.map_or_else(
+            || {
+                intent(
+                    actor,
+                    opening,
+                    player_after.position,
+                    shots,
+                    missile_aggression,
+                )
+            },
+            |goal| {
+                (
+                    goal,
+                    if length(sub(goal, actor.position)) < 800.0 {
+                        0.0
+                    } else {
+                        34.3
+                    },
+                )
+            },
+        )
+    };
+    let yielding = if actor.resources.emp_disabled() {
+        None
+    } else {
+        super::admission::yield_goal(actor, goal, context)
+    };
+    if let Some(detour) = yielding {
+        goal = detour;
+        speed = speed.min(length(sub(goal, actor.position)) * 0.65 / (18.0 * 4.0));
+    } else if !actor.resources.emp_disabled()
+        && actor.id.serial == 2
+        && actor.resources.energy >= 9500
+    {
+        let target_pose = if player_goal.is_some() {
+            Some(player_after)
+        } else {
+            target(actor, opening).map(Actor::pose)
+        };
+        if let Some(target_pose) = target_pose
+            && let Some(point) = data
+                .player_planar_aimpoint(target_pose, actor.position)
+                .map_err(|_| TrafficError::InvalidState)?
+        {
+            goal = point;
+        }
+    }
+    Ok((goal, speed))
 }
 fn resolve_peer_paths(
     opening: &[Option<Actor>; MAX_TRAFFIC_ACTORS],
