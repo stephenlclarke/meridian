@@ -1,6 +1,5 @@
 //! Actual held input and finite electrical publication under the sole World owner.
 use super::{Arc, EmpError, EmpOrigin, FlightMode, MAX_PULSES, State, World, policy, scene};
-use crate::docking::RigidPose;
 use crate::traffic::{EmpResourceAction, NpcId};
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EmpChargePhase {
