@@ -1,0 +1,327 @@
+{
+  "targetHull": "SH001",
+  "name": "Mule",
+  "status": "SH001_FOUR_WELL_EXCEPTION_ACCEPTED;CONTROLLED_DOCKING_COST_AUTHORED_UNRUN",
+  "immediateAuthorParent": "8e2e5d3a3ef5f6caffd0323ca4b2540e1e57981b",
+  "currentGameplayAuthority": "ad5b9f9da259c85389cd662af2473e543e26ab11",
+  "newCoreTests": [
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "mule_authenticates_source_and_encloses_all_components_and_triangle_interiors",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "mule_directional_gap_is_two_centimetres_and_engineering_is_preserved",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "rounded_piece_keeps_real_contacts_without_box_corner_false_blocks",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "rounded_piece_sweeps_translation_and_rotation_without_tunnelling",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "mule_actual_inter_pannier_gap_stays_clear_in_the_compound_surface",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "mule_analytic_port_fit_is_strict_rotated_and_covers_all_outer_protrusions",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "mule_shield_depletion_hides_the_subtle_shimmer_without_retracting_collision",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "mule_launch_uses_its_surface_without_relabelling_sh025_or_granting_arrival",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "rounded_ray_contacts_require_an_inside_witness_and_leave_tangency_uncertain",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "rounded_support_invalid_geometry_never_grants_clearance_or_a_contact",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tests.rs",
+      "name": "rounded_sweep_accounts_for_near_orthogonal_trace_three_endpoint",
+      "status": "UNRUN"
+    }
+  ],
+  "existingGeometryTests": {
+    "count": 92,
+    "source": "unchanged519geometryfiles;prioractualRoota92qualificationnotrebound",
+    "currentRun": "NOT_REQUESTED;nooriginalretry"
+  },
+  "shape": {
+    "pieces": 34,
+    "type": "convex_hull_authenticated_assigned_source_vertices_plus_closed_ball",
+    "standOffMetres": 0.02,
+    "directionalSupportGapMetres": 0.02,
+    "sourceVertices": 5344,
+    "sourceTriangles": 9008,
+    "coordinateScaleExact": "40000/3411",
+    "note": "Directional bound is against source convex support; not a Hausdorff distance claim to concave detailed surfaces."
+  },
+  "shimmer": {
+    "maximumOpacity": 0.018,
+    "grazingExponent": 4,
+    "fadeMetres": [
+      32,
+      64
+    ],
+    "collisionRetractionAtZeroShield": false,
+    "internalSurfaces": "discard;unionopacitydoesnotaccumulate"
+  },
+  "limitsContract": {
+    "originalExactGeometry": [
+      2000000,
+      100000,
+      4096,
+      512
+    ],
+    "newEnvelope": "separate authorized approximate gameplay contract;notexactoriginalunionorcapwaiver",
+    "boundedQueries": "16sourcepieces;48supportiterations,64rayadvances;uncertainmeansblockednotpermission"
+  },
+  "currentChecks": {
+    "compiler": "UNRUN",
+    "cargoTests": "UNRUN",
+    "strictClippy": "UNRUN",
+    "native": "UNRUN",
+    "renderer": "UNIMPLEMENTED;existingG3handoff",
+    "MuleWorldActorAndGenerationBinding": "CONTROLLED_SOURCE_SCENARIO_AUTHORED_UNRUN;ordinaryactor/contactEMP/savepending",
+    "MulePaidAcquisitionCrewEquipmentPersistence": "UNIMPLEMENTED",
+    "existingPaidEMPAndDamageReducers": "UNCHANGED;currentad5authority",
+    "fleetAdmission": false
+  },
+  "ownerCommands": [
+    "cargo check --locked --workspace --all-targets",
+    "cargo test --locked -p meridian-core -- --nocapture",
+    "cargo clippy --locked --workspace --all-targets -- -D warnings",
+    "make ci (owned current-project checks; no author execution)"
+  ],
+  "executionOwner": "existingG1only;Rootreview/serialjoin;G3rendererdependency",
+  "sourceOnlyCommands": [
+    "python3 -B tools/verify_mule_envelope_source.py",
+    "rustfmt --edition 2024 --check on changed Rust files",
+    "markdownlint on affected Markdown",
+    "PythonAST/JSON/sourcehash/patchchecks"
+  ],
+  "originalExecution": "No unchanged or diagnostic original-five run;nooriginalSH001unionconstructororprobefromauthor",
+  "acceptanceNext": [
+    "G2whole/relevantreviewofnewapproximation/sourcebinding/current-gameplayminimaladaptation",
+    "G1ownedchangedcoretests/check/strictClippy/currentgameplayregressionsandactualparametercapture",
+    "G3same-surfaceveryslightshimmerusingimmutabledata;G1actualrender/contact/dockingviews",
+    "CompleteWorldMuleidentity/generation/currentcontact/EMP/saveandpaidacquisition/crew/fittingroutes",
+    "ActualMuleordinarygameacceptance,requiredPRreview/checks,andRootprotectedmainmergebeforeSH008"
+  ],
+  "baseline": {
+    "ships": "23/162",
+    "stations": "4/6",
+    "newAdmissions": 0
+  },
+  "boundedCorrection": {
+    "finding": "G2-MULE-ENVELOPE-1",
+    "reviewedRoot": "158a2d3bc43b9533fa57895f85af34159c693d11",
+    "authorParent": "a43ec10965fa1a3075acdd0c358d5d120b8d7935",
+    "behavior": "Reject understated endpoint travel using atan2 sine/cosine plus admitted-basis residual guard; preserve contact blocking and correctly supplied proper rotations, including near half-turn.",
+    "newCase": "rounded_sweep_accounts_for_near_orthogonal_trace_three_endpoint",
+    "status": "AUTHORED_UNRUN;source-only checks;existing G2 delta/G1 qualification owners"
+  },
+  "worldCoreTests": [
+    {
+      "file": "crates/meridian-core/src/flight/mule_validation/tests.rs",
+      "name": "mule_world_publication_binds_actual_actor_pose_surface_scope_and_generation",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/flight/mule_validation/tests.rs",
+      "name": "mule_validation_refuses_observer_commands_and_grants_no_profile_or_save",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/flight/mule_validation/tests.rs",
+      "name": "mule_world_sweep_stops_before_the_actual_stationary_observer_mesh",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/flight/mule_validation/tests.rs",
+      "name": "ordinary_world_and_current_save_do_not_acquire_a_validation_mule",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/flight/mule_validation/tests.rs",
+      "name": "mule_docking_accepts_the_source_speed_cap_and_rejects_the_next_f32",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/flight/mule_validation/tests.rs",
+      "name": "mule_world_docking_accepts_aligned_crossing_and_refuses_speed_and_wall_contact",
+      "status": "UNRUN"
+    }
+  ],
+  "totalMuleCoreTests": 22,
+  "controlledWorldScenario": {
+    "status": "AUTHORED_UNRUN;NOT_ORDINARY_HULL_ADMISSION",
+    "base": "af97ee6bbba60b2d492216ad12035a90e9dde34e",
+    "scope": "One actual World-owned SH001 validation NPC; immutable coherent NpcSnapshot+Arc presentation+private scope/tick/generation. Stationary source-validated SH025 observer. Fixed World ticks move Mule using real station and observer native meshes.",
+    "refusals": "Invalid observer/overlap/source inputs; non-default observer controls; stale/foreign publications; uncertain contact. No paid current gameplay interaction or save entitlement.",
+    "pendingCatalogue": "PlayerFlyable=false/pendingFabrication/authored encounter; roles/placement/rarity/locations pending. No ambient substitution.",
+    "renderer": "Adapt only a frame for which world.mule_snapshot_is_current(frame) is true; borrow frame.actor() and frame.presentation();never construct IDs in desktop.",
+    "noEntitlements": [
+      "commander",
+      "blueprint",
+      "equipment",
+      "crew",
+      "cargo",
+      "ordinary population",
+      "save",
+      "EMP or damage capability"
+    ]
+  },
+  "tightnessCoreTests": [
+    {
+      "file": "crates/meridian-core/src/mule/tightness_tests.rs",
+      "name": "mule_sampled_visible_envelope_excess_reports_actual_detailed_surface_gaps",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tightness_tests.rs",
+      "name": "mule_preserves_named_pannier_cockpit_and_engine_source_gaps",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tightness_tests.rs",
+      "name": "compound_gap_sampling_does_not_invent_visibility_for_an_internal_member",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tightness_tests.rs",
+      "name": "mule_pressure_body_well_partition_clears_the_recorded_convex_bridge",
+      "status": "UNRUN"
+    },
+    {
+      "file": "crates/meridian-core/src/mule/tightness_tests.rs",
+      "name": "near_boundary_measurement_requires_clearance_across_seam_error",
+      "status": "UNRUN"
+    }
+  ],
+  "tightnessEvidence": {
+    "status": "REVISED_SHAPE_AND_MEASUREMENT_UNRUN",
+    "metrics": "Keep original rays and report their inside witness and point exclusion counts separately. Measure support witnesses only with certified separation from every other piece throughout the boundary error radius.",
+    "flags": "exceedsTwoCentimetres flags sampled distances>0.020001m;this is an evidence flag,not an acceptance budget. Large filled empty space must be assessed/repaired before rollout.",
+    "limits": "Not exhaustive;not a maximum/Hausdorff guarantee;no runtime values claimed. Uncertain/internal samples reported,not treated as measured clearance or discarded without disclosure.",
+    "namedGaps": [
+      "4inter-pannier slots",
+      "forward cockpit/body opening",
+      "rear inter-engine opening"
+    ],
+    "gapCheck": "Each named source-coordinate center must stay outside the full union and a2cm extent triangle there must have actual separation certificates.",
+    "knownApproximationRisks": "Convex supports fill service wells;engine support/casing and cockpit/crossmember convex grouping can fill concave space. Actual extent is unmeasured.",
+    "acceptance": "Require the authored strict-separation and tiny physical obstacle regression at the exact recorded point; measure all 34 pieces and any remaining union coverage or sample gaps including other unchanged concave assemblies; validate rendered shimmer, contact and docking on the same revision 2 surface.",
+    "observed": {
+      "head": "ccd89b2af0c75786e8915bf91a554a7f2c549cb5",
+      "completedPiece0SampleMetres": 0.6596408669309312,
+      "piece0ConfirmedRays": 28,
+      "piece0UncertainRays": 8,
+      "piece0InternalExcluded": 2,
+      "nextPiece1": "No confirmed visible samples;first failure stopped full16 metrics",
+      "namedOpeningChecks": "6PASS",
+      "globalMaximum": "NOT_ESTABLISHED"
+    },
+    "missingValues": "No visible sample yields null distance/point/face/excess,visibleCoverageEstablished=false,never zero-gap/complete/accepted."
+  },
+  "causalCorrection": {
+    "record": "integration/sh001-mule/CAUSAL-CORRECTION.json",
+    "currentRoot": "316f831a21c212648b951e67866ce9199d6fca10",
+    "sourceBinding": "integration/sh001-mule/CAUSAL-BINDING.json",
+    "correctedSourceTests": "UNRUN;no prior pass rebound",
+    "observedPriorQualification": "ccd89CHECKPASS;library446PASS2FAILof448;downstreamcompatibility/desktop/importer/Clippy/release/MetalUNRUN",
+    "cases": "Checked-decode raw equality + exact publicContinue2counter/checksum delta;bounded authenticated support-face measurement fixtures;independent nested-member visibility regression.",
+    "productionGeometryWorldEMPContinueBehavior": "UNCHANGED_CURRENT_ROOT",
+    "tightFitStatus": "BLOCKED_ACTUAL_0.6596408669309312m_CONVEX_BRIDGE;INCOMPLETE_VISIBLE_COVERAGE",
+    "requiredBeforeAcceptance": "Remove excessive source-convex bridging through genuine tighter source-derived shape/partition retaining all detailed/native vertices and triangle containment;coherent G3renderer and actual G1shape/contact/docking/tightness evidence. No blanket fleet rollout."
+  },
+  "shapeCorrection": {
+    "historicalFailure": "Keep the exact ccd89 measured gap and causal record for the earlier 16-piece geometry.",
+    "candidate": "Preserve slots 1\u201315. Slot 0 keeps only the primary body. Slots 16\u201327 hold separate detailed body well assemblies with their own struts. Slots 28\u201331 hold separate native body well assemblies. Slots 32\u201333 hold the two longitudinal service struts.",
+    "proof": "Whole creator components stay together. Every detailed/native triangle has all three vertices assigned to the same piece, so convex containment covers the whole triangle. Each new support is a subset of the former body support, and the common 2 cm ball preserves this inclusion.",
+    "acceptance": "Require the authored strict-separation and tiny physical obstacle regression at the exact recorded point; measure all 34 pieces and any remaining union coverage or sample gaps including other unchanged concave assemblies; validate rendered shimmer, contact and docking on the same revision 2 surface.",
+    "execution": "AUTHOR UNRUN. G3 matching renderer revision and G1 qualification pending.",
+    "visibilityReview": {
+      "finding": "G2-MULE-CAUSAL-VISIBILITY-1",
+      "reviewSHA256": "9738140a52a13a78b75e1e31a1cbe32cf4a038963be13f371e2a63ee1661a45b",
+      "coverage": "Count a support witness only if the closed neighbourhood containing the nearby member boundary is certified clear from every other piece. Report ray inside witnesses separately without giving them boundary exposure credit. Missing metrics remain null."
+    }
+  },
+  "sh001OnlyNativeWellStandOff": {
+    "authority": "Human chose dual original source preservation and accepted these four measured local differences.",
+    "hull": "SH001",
+    "sourceRevision": "25130c7bda302c6fa151695a96f39a6d764c7532",
+    "scope": "Only the four body native well rim discrepancies at slots 28\u201331. Both source models and the common 2 cm spherical offset remain required.",
+    "evidenceSHA256": "80b3bd591e8f03b5baa0d5cd7e49569c2e3ad91d0136ea05e6f2eb0da1e0ea3b",
+    "wells": [
+      {
+        "slot": 28,
+        "nativeVertex": 63,
+        "measuredSampleMetres": "0.7644109260836986",
+        "mandatoryVertexLowerBoundMetres": "0.744409"
+      },
+      {
+        "slot": 29,
+        "nativeVertex": 74,
+        "measuredSampleMetres": "0.7645563918663092",
+        "mandatoryVertexLowerBoundMetres": "0.744555"
+      },
+      {
+        "slot": 30,
+        "nativeVertex": 87,
+        "measuredSampleMetres": "0.7647230423069084",
+        "mandatoryVertexLowerBoundMetres": "0.744722"
+      },
+      {
+        "slot": 31,
+        "nativeVertex": 98,
+        "measuredSampleMetres": "0.7641993333319775",
+        "mandatoryVertexLowerBoundMetres": "0.744198"
+      }
+    ]
+  },
+  "worldDockingAcceptance": {
+    "status": "AUTHORED_UNRUN",
+    "authority": "Controlled fixed SH028 station, one World-owned inbound SH001 with exact same SmoothPiece data as its scope-bound render snapshot. Test follows real fixed World ticks through approach, physical entry, fast rejection and sidewall stop.",
+    "cost": "Measure agreed Mac release configuration. Keep all MULE_WORLD_DOCK_COST rows for actual step durations including each terminal. Compare p95 against the existing 60 Hz simulation frame interval, report terminal cost independently. Keep native renderer frame timing with the same source and camera setting as a separate measurement.",
+    "scope": "Physical crossing gate and terminal controlled NPC state. No actual station rotation in bundled source. Ordinary population, player purchase, effects and current save remain outside this controlled scenario.",
+    "native": "Root/G1 owns native and compiler execution. Coordinate with existing G3 adapter for inbound capture.",
+    "launchSpeedBoundaryCorrection": {
+      "actualFailure": "5075d94 Mac core 451 passed / 1 failed. Aligned and overspeed cases emitted costs. The sidewall constructor failed before its first tick.",
+      "cause": "The immutable cap is 33.2 FlightStart speed units. It is representable at the f32 boundary as 33.20000076293945 when widened. State rejected that value against a distinct f64 literal.",
+      "change": "Validate both constructor stages against the same source-derived f32 cap. Widen to f64 after validation for snapshots and motion arithmetic. The physical docking gate remains strictly below 144 m/s.",
+      "test": "The original 33.2 sidewall case remains. The separate targeted test requires exact widened storage at advertised f32 cap and InvalidPose for the immediate successor with identical placement.",
+      "actualHandoffSHA256": "5b3720bb89b26617b3a8abdf1b23756b2d2ad166f24c6c0005eefa24bf01a636",
+      "status": "SOURCE_ONLY_UNRUN"
+    },
+    "classificationCorrection": {
+      "status": "SOURCE_ONLY_UNRUN",
+      "firstFailure": "b6be346 Mac core 452 passed / 1 failed. The speed boundary passed. The x=100 attempt correctly failed entry but had been labeled as a wall fixture.",
+      "actualHandoffSHA256": "0845f7feebb673f5eb5905abfe487f72a1ce3949234861ac4424bd8228551d2f",
+      "sourceWitnessSHA256": "991778b680562f1c750cd6174f619ea7a5103c37c03ac8e16f1edf4b7ac895d4",
+      "classification": "Use exactly one station sweep before evaluating crossing conditions. StationContact means the mesh sweep did not certify clearance. EntryConditions means station sweep was clear and the crossing failed the original gate. Keep existing observer refusal and correct pose hold.",
+      "unchangedPublicContract": "Existing OriginalStationData::mule_entry_clear stays the conjunction of the original condition/fit gate and continuous station sweep. No aperture, speed, orientation, angular, margin, or station asset changes.",
+      "qualify": "Keep aligned/overspeed and original x=100 at cap. Also exercise x=100 at regular entry speed and x=69 at cap. The x=69 lane physically encounters SH028 +X lip triangle 482 before the centre crosses the opening. Retain five cost rows and all terminal pose/source/authority assertions."
+    }
+  }
+}

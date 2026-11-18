@@ -1,0 +1,3786 @@
+{
+  "design": [
+    {
+      "component": 0,
+      "name": "body primary pressure envelope",
+      "piece": 0,
+      "vertexStart": 0,
+      "vertexCount": 120,
+      "faceStart": 0,
+      "faceCount": 236
+    },
+    {
+      "component": 1,
+      "name": "body primary pressure envelope/service-well-0-0",
+      "piece": 16,
+      "vertexStart": 120,
+      "vertexCount": 12,
+      "faceStart": 236,
+      "faceCount": 20
+    },
+    {
+      "component": 2,
+      "name": "body primary pressure envelope/service-well-0-0/recess-service-strut-0",
+      "piece": 16,
+      "vertexStart": 132,
+      "vertexCount": 8,
+      "faceStart": 256,
+      "faceCount": 12
+    },
+    {
+      "component": 3,
+      "name": "body primary pressure envelope/service-well-0-0/recess-service-strut-1",
+      "piece": 16,
+      "vertexStart": 140,
+      "vertexCount": 8,
+      "faceStart": 268,
+      "faceCount": 12
+    },
+    {
+      "component": 4,
+      "name": "body primary pressure envelope/service-well-0-0/recess-service-strut-2",
+      "piece": 16,
+      "vertexStart": 148,
+      "vertexCount": 8,
+      "faceStart": 280,
+      "faceCount": 12
+    },
+    {
+      "component": 5,
+      "name": "body primary pressure envelope/service-well-0-1",
+      "piece": 17,
+      "vertexStart": 156,
+      "vertexCount": 12,
+      "faceStart": 292,
+      "faceCount": 20
+    },
+    {
+      "component": 6,
+      "name": "body primary pressure envelope/service-well-0-1/recess-service-strut-0",
+      "piece": 17,
+      "vertexStart": 168,
+      "vertexCount": 8,
+      "faceStart": 312,
+      "faceCount": 12
+    },
+    {
+      "component": 7,
+      "name": "body primary pressure envelope/service-well-0-1/recess-service-strut-1",
+      "piece": 17,
+      "vertexStart": 176,
+      "vertexCount": 8,
+      "faceStart": 324,
+      "faceCount": 12
+    },
+    {
+      "component": 8,
+      "name": "body primary pressure envelope/service-well-0-1/recess-service-strut-2",
+      "piece": 17,
+      "vertexStart": 184,
+      "vertexCount": 8,
+      "faceStart": 336,
+      "faceCount": 12
+    },
+    {
+      "component": 9,
+      "name": "body primary pressure envelope/service-well-0-2",
+      "piece": 18,
+      "vertexStart": 192,
+      "vertexCount": 12,
+      "faceStart": 348,
+      "faceCount": 20
+    },
+    {
+      "component": 10,
+      "name": "body primary pressure envelope/service-well-0-2/recess-service-strut-0",
+      "piece": 18,
+      "vertexStart": 204,
+      "vertexCount": 8,
+      "faceStart": 368,
+      "faceCount": 12
+    },
+    {
+      "component": 11,
+      "name": "body primary pressure envelope/service-well-0-2/recess-service-strut-1",
+      "piece": 18,
+      "vertexStart": 212,
+      "vertexCount": 8,
+      "faceStart": 380,
+      "faceCount": 12
+    },
+    {
+      "component": 12,
+      "name": "body primary pressure envelope/service-well-0-2/recess-service-strut-2",
+      "piece": 18,
+      "vertexStart": 220,
+      "vertexCount": 8,
+      "faceStart": 392,
+      "faceCount": 12
+    },
+    {
+      "component": 13,
+      "name": "body primary pressure envelope/service-well-1-0",
+      "piece": 19,
+      "vertexStart": 228,
+      "vertexCount": 12,
+      "faceStart": 404,
+      "faceCount": 20
+    },
+    {
+      "component": 14,
+      "name": "body primary pressure envelope/service-well-1-0/recess-service-strut-0",
+      "piece": 19,
+      "vertexStart": 240,
+      "vertexCount": 8,
+      "faceStart": 424,
+      "faceCount": 12
+    },
+    {
+      "component": 15,
+      "name": "body primary pressure envelope/service-well-1-0/recess-service-strut-1",
+      "piece": 19,
+      "vertexStart": 248,
+      "vertexCount": 8,
+      "faceStart": 436,
+      "faceCount": 12
+    },
+    {
+      "component": 16,
+      "name": "body primary pressure envelope/service-well-1-0/recess-service-strut-2",
+      "piece": 19,
+      "vertexStart": 256,
+      "vertexCount": 8,
+      "faceStart": 448,
+      "faceCount": 12
+    },
+    {
+      "component": 17,
+      "name": "body primary pressure envelope/service-well-1-1",
+      "piece": 20,
+      "vertexStart": 264,
+      "vertexCount": 12,
+      "faceStart": 460,
+      "faceCount": 20
+    },
+    {
+      "component": 18,
+      "name": "body primary pressure envelope/service-well-1-1/recess-service-strut-0",
+      "piece": 20,
+      "vertexStart": 276,
+      "vertexCount": 8,
+      "faceStart": 480,
+      "faceCount": 12
+    },
+    {
+      "component": 19,
+      "name": "body primary pressure envelope/service-well-1-1/recess-service-strut-1",
+      "piece": 20,
+      "vertexStart": 284,
+      "vertexCount": 8,
+      "faceStart": 492,
+      "faceCount": 12
+    },
+    {
+      "component": 20,
+      "name": "body primary pressure envelope/service-well-1-1/recess-service-strut-2",
+      "piece": 20,
+      "vertexStart": 292,
+      "vertexCount": 8,
+      "faceStart": 504,
+      "faceCount": 12
+    },
+    {
+      "component": 21,
+      "name": "body primary pressure envelope/service-well-1-2",
+      "piece": 21,
+      "vertexStart": 300,
+      "vertexCount": 12,
+      "faceStart": 516,
+      "faceCount": 20
+    },
+    {
+      "component": 22,
+      "name": "body primary pressure envelope/service-well-1-2/recess-service-strut-0",
+      "piece": 21,
+      "vertexStart": 312,
+      "vertexCount": 8,
+      "faceStart": 536,
+      "faceCount": 12
+    },
+    {
+      "component": 23,
+      "name": "body primary pressure envelope/service-well-1-2/recess-service-strut-1",
+      "piece": 21,
+      "vertexStart": 320,
+      "vertexCount": 8,
+      "faceStart": 548,
+      "faceCount": 12
+    },
+    {
+      "component": 24,
+      "name": "body primary pressure envelope/service-well-1-2/recess-service-strut-2",
+      "piece": 21,
+      "vertexStart": 328,
+      "vertexCount": 8,
+      "faceStart": 560,
+      "faceCount": 12
+    },
+    {
+      "component": 25,
+      "name": "body primary pressure envelope/service-well-2-0",
+      "piece": 22,
+      "vertexStart": 336,
+      "vertexCount": 12,
+      "faceStart": 572,
+      "faceCount": 20
+    },
+    {
+      "component": 26,
+      "name": "body primary pressure envelope/service-well-2-0/recess-service-strut-0",
+      "piece": 22,
+      "vertexStart": 348,
+      "vertexCount": 8,
+      "faceStart": 592,
+      "faceCount": 12
+    },
+    {
+      "component": 27,
+      "name": "body primary pressure envelope/service-well-2-0/recess-service-strut-1",
+      "piece": 22,
+      "vertexStart": 356,
+      "vertexCount": 8,
+      "faceStart": 604,
+      "faceCount": 12
+    },
+    {
+      "component": 28,
+      "name": "body primary pressure envelope/service-well-2-0/recess-service-strut-2",
+      "piece": 22,
+      "vertexStart": 364,
+      "vertexCount": 8,
+      "faceStart": 616,
+      "faceCount": 12
+    },
+    {
+      "component": 29,
+      "name": "body primary pressure envelope/service-well-2-1",
+      "piece": 23,
+      "vertexStart": 372,
+      "vertexCount": 12,
+      "faceStart": 628,
+      "faceCount": 20
+    },
+    {
+      "component": 30,
+      "name": "body primary pressure envelope/service-well-2-1/recess-service-strut-0",
+      "piece": 23,
+      "vertexStart": 384,
+      "vertexCount": 8,
+      "faceStart": 648,
+      "faceCount": 12
+    },
+    {
+      "component": 31,
+      "name": "body primary pressure envelope/service-well-2-1/recess-service-strut-1",
+      "piece": 23,
+      "vertexStart": 392,
+      "vertexCount": 8,
+      "faceStart": 660,
+      "faceCount": 12
+    },
+    {
+      "component": 32,
+      "name": "body primary pressure envelope/service-well-2-1/recess-service-strut-2",
+      "piece": 23,
+      "vertexStart": 400,
+      "vertexCount": 8,
+      "faceStart": 672,
+      "faceCount": 12
+    },
+    {
+      "component": 33,
+      "name": "body primary pressure envelope/service-well-2-2",
+      "piece": 24,
+      "vertexStart": 408,
+      "vertexCount": 12,
+      "faceStart": 684,
+      "faceCount": 20
+    },
+    {
+      "component": 34,
+      "name": "body primary pressure envelope/service-well-2-2/recess-service-strut-0",
+      "piece": 24,
+      "vertexStart": 420,
+      "vertexCount": 8,
+      "faceStart": 704,
+      "faceCount": 12
+    },
+    {
+      "component": 35,
+      "name": "body primary pressure envelope/service-well-2-2/recess-service-strut-1",
+      "piece": 24,
+      "vertexStart": 428,
+      "vertexCount": 8,
+      "faceStart": 716,
+      "faceCount": 12
+    },
+    {
+      "component": 36,
+      "name": "body primary pressure envelope/service-well-2-2/recess-service-strut-2",
+      "piece": 24,
+      "vertexStart": 436,
+      "vertexCount": 8,
+      "faceStart": 728,
+      "faceCount": 12
+    },
+    {
+      "component": 37,
+      "name": "body primary pressure envelope/service-well-3-0",
+      "piece": 25,
+      "vertexStart": 444,
+      "vertexCount": 12,
+      "faceStart": 740,
+      "faceCount": 20
+    },
+    {
+      "component": 38,
+      "name": "body primary pressure envelope/service-well-3-0/recess-service-strut-0",
+      "piece": 25,
+      "vertexStart": 456,
+      "vertexCount": 8,
+      "faceStart": 760,
+      "faceCount": 12
+    },
+    {
+      "component": 39,
+      "name": "body primary pressure envelope/service-well-3-0/recess-service-strut-1",
+      "piece": 25,
+      "vertexStart": 464,
+      "vertexCount": 8,
+      "faceStart": 772,
+      "faceCount": 12
+    },
+    {
+      "component": 40,
+      "name": "body primary pressure envelope/service-well-3-0/recess-service-strut-2",
+      "piece": 25,
+      "vertexStart": 472,
+      "vertexCount": 8,
+      "faceStart": 784,
+      "faceCount": 12
+    },
+    {
+      "component": 41,
+      "name": "body primary pressure envelope/service-well-3-1",
+      "piece": 26,
+      "vertexStart": 480,
+      "vertexCount": 12,
+      "faceStart": 796,
+      "faceCount": 20
+    },
+    {
+      "component": 42,
+      "name": "body primary pressure envelope/service-well-3-1/recess-service-strut-0",
+      "piece": 26,
+      "vertexStart": 492,
+      "vertexCount": 8,
+      "faceStart": 816,
+      "faceCount": 12
+    },
+    {
+      "component": 43,
+      "name": "body primary pressure envelope/service-well-3-1/recess-service-strut-1",
+      "piece": 26,
+      "vertexStart": 500,
+      "vertexCount": 8,
+      "faceStart": 828,
+      "faceCount": 12
+    },
+    {
+      "component": 44,
+      "name": "body primary pressure envelope/service-well-3-1/recess-service-strut-2",
+      "piece": 26,
+      "vertexStart": 508,
+      "vertexCount": 8,
+      "faceStart": 840,
+      "faceCount": 12
+    },
+    {
+      "component": 45,
+      "name": "body primary pressure envelope/service-well-3-2",
+      "piece": 27,
+      "vertexStart": 516,
+      "vertexCount": 12,
+      "faceStart": 852,
+      "faceCount": 20
+    },
+    {
+      "component": 46,
+      "name": "body primary pressure envelope/service-well-3-2/recess-service-strut-0",
+      "piece": 27,
+      "vertexStart": 528,
+      "vertexCount": 8,
+      "faceStart": 872,
+      "faceCount": 12
+    },
+    {
+      "component": 47,
+      "name": "body primary pressure envelope/service-well-3-2/recess-service-strut-1",
+      "piece": 27,
+      "vertexStart": 536,
+      "vertexCount": 8,
+      "faceStart": 884,
+      "faceCount": 12
+    },
+    {
+      "component": 48,
+      "name": "body primary pressure envelope/service-well-3-2/recess-service-strut-2",
+      "piece": 27,
+      "vertexStart": 544,
+      "vertexCount": 8,
+      "faceStart": 896,
+      "faceCount": 12
+    },
+    {
+      "component": 49,
+      "name": "body primary pressure envelope/longitudinal-service-strut-0",
+      "piece": 32,
+      "vertexStart": 552,
+      "vertexCount": 8,
+      "faceStart": 908,
+      "faceCount": 12
+    },
+    {
+      "component": 50,
+      "name": "body primary pressure envelope/longitudinal-service-strut-1",
+      "piece": 33,
+      "vertexStart": 560,
+      "vertexCount": 8,
+      "faceStart": 920,
+      "faceCount": 12
+    },
+    {
+      "component": 51,
+      "name": "pannier connected structural support",
+      "piece": 1,
+      "vertexStart": 568,
+      "vertexCount": 8,
+      "faceStart": 932,
+      "faceCount": 12
+    },
+    {
+      "component": 52,
+      "name": "pannier pressure envelope",
+      "piece": 2,
+      "vertexStart": 576,
+      "vertexCount": 120,
+      "faceStart": 944,
+      "faceCount": 236
+    },
+    {
+      "component": 53,
+      "name": "pannier pressure envelope/service-well-0-0",
+      "piece": 2,
+      "vertexStart": 696,
+      "vertexCount": 12,
+      "faceStart": 1180,
+      "faceCount": 20
+    },
+    {
+      "component": 54,
+      "name": "pannier pressure envelope/service-well-0-0/recess-service-strut-0",
+      "piece": 2,
+      "vertexStart": 708,
+      "vertexCount": 8,
+      "faceStart": 1200,
+      "faceCount": 12
+    },
+    {
+      "component": 55,
+      "name": "pannier pressure envelope/service-well-0-0/recess-service-strut-1",
+      "piece": 2,
+      "vertexStart": 716,
+      "vertexCount": 8,
+      "faceStart": 1212,
+      "faceCount": 12
+    },
+    {
+      "component": 56,
+      "name": "pannier pressure envelope/service-well-0-0/recess-service-strut-2",
+      "piece": 2,
+      "vertexStart": 724,
+      "vertexCount": 8,
+      "faceStart": 1224,
+      "faceCount": 12
+    },
+    {
+      "component": 57,
+      "name": "pannier pressure envelope/service-well-0-1",
+      "piece": 2,
+      "vertexStart": 732,
+      "vertexCount": 12,
+      "faceStart": 1236,
+      "faceCount": 20
+    },
+    {
+      "component": 58,
+      "name": "pannier pressure envelope/service-well-0-1/recess-service-strut-0",
+      "piece": 2,
+      "vertexStart": 744,
+      "vertexCount": 8,
+      "faceStart": 1256,
+      "faceCount": 12
+    },
+    {
+      "component": 59,
+      "name": "pannier pressure envelope/service-well-0-1/recess-service-strut-1",
+      "piece": 2,
+      "vertexStart": 752,
+      "vertexCount": 8,
+      "faceStart": 1268,
+      "faceCount": 12
+    },
+    {
+      "component": 60,
+      "name": "pannier pressure envelope/service-well-0-1/recess-service-strut-2",
+      "piece": 2,
+      "vertexStart": 760,
+      "vertexCount": 8,
+      "faceStart": 1280,
+      "faceCount": 12
+    },
+    {
+      "component": 61,
+      "name": "pannier pressure envelope/service-well-0-2",
+      "piece": 2,
+      "vertexStart": 768,
+      "vertexCount": 12,
+      "faceStart": 1292,
+      "faceCount": 20
+    },
+    {
+      "component": 62,
+      "name": "pannier pressure envelope/service-well-0-2/recess-service-strut-0",
+      "piece": 2,
+      "vertexStart": 780,
+      "vertexCount": 8,
+      "faceStart": 1312,
+      "faceCount": 12
+    },
+    {
+      "component": 63,
+      "name": "pannier pressure envelope/service-well-0-2/recess-service-strut-1",
+      "piece": 2,
+      "vertexStart": 788,
+      "vertexCount": 8,
+      "faceStart": 1324,
+      "faceCount": 12
+    },
+    {
+      "component": 64,
+      "name": "pannier pressure envelope/service-well-0-2/recess-service-strut-2",
+      "piece": 2,
+      "vertexStart": 796,
+      "vertexCount": 8,
+      "faceStart": 1336,
+      "faceCount": 12
+    },
+    {
+      "component": 65,
+      "name": "pannier pressure envelope/service-well-1-0",
+      "piece": 2,
+      "vertexStart": 804,
+      "vertexCount": 12,
+      "faceStart": 1348,
+      "faceCount": 20
+    },
+    {
+      "component": 66,
+      "name": "pannier pressure envelope/service-well-1-0/recess-service-strut-0",
+      "piece": 2,
+      "vertexStart": 816,
+      "vertexCount": 8,
+      "faceStart": 1368,
+      "faceCount": 12
+    },
+    {
+      "component": 67,
+      "name": "pannier pressure envelope/service-well-1-0/recess-service-strut-1",
+      "piece": 2,
+      "vertexStart": 824,
+      "vertexCount": 8,
+      "faceStart": 1380,
+      "faceCount": 12
+    },
+    {
+      "component": 68,
+      "name": "pannier pressure envelope/service-well-1-0/recess-service-strut-2",
+      "piece": 2,
+      "vertexStart": 832,
+      "vertexCount": 8,
+      "faceStart": 1392,
+      "faceCount": 12
+    },
+    {
+      "component": 69,
+      "name": "pannier pressure envelope/service-well-1-1",
+      "piece": 2,
+      "vertexStart": 840,
+      "vertexCount": 12,
+      "faceStart": 1404,
+      "faceCount": 20
+    },
+    {
+      "component": 70,
+      "name": "pannier pressure envelope/service-well-1-1/recess-service-strut-0",
+      "piece": 2,
+      "vertexStart": 852,
+      "vertexCount": 8,
+      "faceStart": 1424,
+      "faceCount": 12
+    },
+    {
+      "component": 71,
+      "name": "pannier pressure envelope/service-well-1-1/recess-service-strut-1",
+      "piece": 2,
+      "vertexStart": 860,
+      "vertexCount": 8,
+      "faceStart": 1436,
+      "faceCount": 12
+    },
+    {
+      "component": 72,
+      "name": "pannier pressure envelope/service-well-1-1/recess-service-strut-2",
+      "piece": 2,
+      "vertexStart": 868,
+      "vertexCount": 8,
+      "faceStart": 1448,
+      "faceCount": 12
+    },
+    {
+      "component": 73,
+      "name": "pannier pressure envelope/service-well-1-2",
+      "piece": 2,
+      "vertexStart": 876,
+      "vertexCount": 12,
+      "faceStart": 1460,
+      "faceCount": 20
+    },
+    {
+      "component": 74,
+      "name": "pannier pressure envelope/service-well-1-2/recess-service-strut-0",
+      "piece": 2,
+      "vertexStart": 888,
+      "vertexCount": 8,
+      "faceStart": 1480,
+      "faceCount": 12
+    },
+    {
+      "component": 75,
+      "name": "pannier pressure envelope/service-well-1-2/recess-service-strut-1",
+      "piece": 2,
+      "vertexStart": 896,
+      "vertexCount": 8,
+      "faceStart": 1492,
+      "faceCount": 12
+    },
+    {
+      "component": 76,
+      "name": "pannier pressure envelope/service-well-1-2/recess-service-strut-2",
+      "piece": 2,
+      "vertexStart": 904,
+      "vertexCount": 8,
+      "faceStart": 1504,
+      "faceCount": 12
+    },
+    {
+      "component": 77,
+      "name": "pannier pressure envelope/service-well-2-0",
+      "piece": 2,
+      "vertexStart": 912,
+      "vertexCount": 12,
+      "faceStart": 1516,
+      "faceCount": 20
+    },
+    {
+      "component": 78,
+      "name": "pannier pressure envelope/service-well-2-0/recess-service-strut-0",
+      "piece": 2,
+      "vertexStart": 924,
+      "vertexCount": 8,
+      "faceStart": 1536,
+      "faceCount": 12
+    },
+    {
+      "component": 79,
+      "name": "pannier pressure envelope/service-well-2-0/recess-service-strut-1",
+      "piece": 2,
+      "vertexStart": 932,
+      "vertexCount": 8,
+      "faceStart": 1548,
+      "faceCount": 12
+    },
+    {
+      "component": 80,
+      "name": "pannier pressure envelope/service-well-2-0/recess-service-strut-2",
+      "piece": 2,
+      "vertexStart": 940,
+      "vertexCount": 8,
+      "faceStart": 1560,
+      "faceCount": 12
+    },
+    {
+      "component": 81,
+      "name": "pannier pressure envelope/service-well-2-1",
+      "piece": 2,
+      "vertexStart": 948,
+      "vertexCount": 12,
+      "faceStart": 1572,
+      "faceCount": 20
+    },
+    {
+      "component": 82,
+      "name": "pannier pressure envelope/service-well-2-1/recess-service-strut-0",
+      "piece": 2,
+      "vertexStart": 960,
+      "vertexCount": 8,
+      "faceStart": 1592,
+      "faceCount": 12
+    },
+    {
+      "component": 83,
+      "name": "pannier pressure envelope/service-well-2-1/recess-service-strut-1",
+      "piece": 2,
+      "vertexStart": 968,
+      "vertexCount": 8,
+      "faceStart": 1604,
+      "faceCount": 12
+    },
+    {
+      "component": 84,
+      "name": "pannier pressure envelope/service-well-2-1/recess-service-strut-2",
+      "piece": 2,
+      "vertexStart": 976,
+      "vertexCount": 8,
+      "faceStart": 1616,
+      "faceCount": 12
+    },
+    {
+      "component": 85,
+      "name": "pannier pressure envelope/service-well-2-2",
+      "piece": 2,
+      "vertexStart": 984,
+      "vertexCount": 12,
+      "faceStart": 1628,
+      "faceCount": 20
+    },
+    {
+      "component": 86,
+      "name": "pannier pressure envelope/service-well-2-2/recess-service-strut-0",
+      "piece": 2,
+      "vertexStart": 996,
+      "vertexCount": 8,
+      "faceStart": 1648,
+      "faceCount": 12
+    },
+    {
+      "component": 87,
+      "name": "pannier pressure envelope/service-well-2-2/recess-service-strut-1",
+      "piece": 2,
+      "vertexStart": 1004,
+      "vertexCount": 8,
+      "faceStart": 1660,
+      "faceCount": 12
+    },
+    {
+      "component": 88,
+      "name": "pannier pressure envelope/service-well-2-2/recess-service-strut-2",
+      "piece": 2,
+      "vertexStart": 1012,
+      "vertexCount": 8,
+      "faceStart": 1672,
+      "faceCount": 12
+    },
+    {
+      "component": 89,
+      "name": "pannier pressure envelope/service-well-3-0",
+      "piece": 2,
+      "vertexStart": 1020,
+      "vertexCount": 12,
+      "faceStart": 1684,
+      "faceCount": 20
+    },
+    {
+      "component": 90,
+      "name": "pannier pressure envelope/service-well-3-0/recess-service-strut-0",
+      "piece": 2,
+      "vertexStart": 1032,
+      "vertexCount": 8,
+      "faceStart": 1704,
+      "faceCount": 12
+    },
+    {
+      "component": 91,
+      "name": "pannier pressure envelope/service-well-3-0/recess-service-strut-1",
+      "piece": 2,
+      "vertexStart": 1040,
+      "vertexCount": 8,
+      "faceStart": 1716,
+      "faceCount": 12
+    },
+    {
+      "component": 92,
+      "name": "pannier pressure envelope/service-well-3-0/recess-service-strut-2",
+      "piece": 2,
+      "vertexStart": 1048,
+      "vertexCount": 8,
+      "faceStart": 1728,
+      "faceCount": 12
+    },
+    {
+      "component": 93,
+      "name": "pannier pressure envelope/service-well-3-1",
+      "piece": 2,
+      "vertexStart": 1056,
+      "vertexCount": 12,
+      "faceStart": 1740,
+      "faceCount": 20
+    },
+    {
+      "component": 94,
+      "name": "pannier pressure envelope/service-well-3-1/recess-service-strut-0",
+      "piece": 2,
+      "vertexStart": 1068,
+      "vertexCount": 8,
+      "faceStart": 1760,
+      "faceCount": 12
+    },
+    {
+      "component": 95,
+      "name": "pannier pressure envelope/service-well-3-1/recess-service-strut-1",
+      "piece": 2,
+      "vertexStart": 1076,
+      "vertexCount": 8,
+      "faceStart": 1772,
+      "faceCount": 12
+    },
+    {
+      "component": 96,
+      "name": "pannier pressure envelope/service-well-3-1/recess-service-strut-2",
+      "piece": 2,
+      "vertexStart": 1084,
+      "vertexCount": 8,
+      "faceStart": 1784,
+      "faceCount": 12
+    },
+    {
+      "component": 97,
+      "name": "pannier pressure envelope/service-well-3-2",
+      "piece": 2,
+      "vertexStart": 1092,
+      "vertexCount": 12,
+      "faceStart": 1796,
+      "faceCount": 20
+    },
+    {
+      "component": 98,
+      "name": "pannier pressure envelope/service-well-3-2/recess-service-strut-0",
+      "piece": 2,
+      "vertexStart": 1104,
+      "vertexCount": 8,
+      "faceStart": 1816,
+      "faceCount": 12
+    },
+    {
+      "component": 99,
+      "name": "pannier pressure envelope/service-well-3-2/recess-service-strut-1",
+      "piece": 2,
+      "vertexStart": 1112,
+      "vertexCount": 8,
+      "faceStart": 1828,
+      "faceCount": 12
+    },
+    {
+      "component": 100,
+      "name": "pannier pressure envelope/service-well-3-2/recess-service-strut-2",
+      "piece": 2,
+      "vertexStart": 1120,
+      "vertexCount": 8,
+      "faceStart": 1840,
+      "faceCount": 12
+    },
+    {
+      "component": 101,
+      "name": "pannier pressure envelope/longitudinal-service-strut-0",
+      "piece": 2,
+      "vertexStart": 1128,
+      "vertexCount": 8,
+      "faceStart": 1852,
+      "faceCount": 12
+    },
+    {
+      "component": 102,
+      "name": "pannier pressure envelope/longitudinal-service-strut-1",
+      "piece": 2,
+      "vertexStart": 1136,
+      "vertexCount": 8,
+      "faceStart": 1864,
+      "faceCount": 12
+    },
+    {
+      "component": 103,
+      "name": "pannier connected structural support",
+      "piece": 3,
+      "vertexStart": 1144,
+      "vertexCount": 8,
+      "faceStart": 1876,
+      "faceCount": 12
+    },
+    {
+      "component": 104,
+      "name": "pannier pressure envelope",
+      "piece": 4,
+      "vertexStart": 1152,
+      "vertexCount": 120,
+      "faceStart": 1888,
+      "faceCount": 236
+    },
+    {
+      "component": 105,
+      "name": "pannier pressure envelope/service-well-0-0",
+      "piece": 4,
+      "vertexStart": 1272,
+      "vertexCount": 12,
+      "faceStart": 2124,
+      "faceCount": 20
+    },
+    {
+      "component": 106,
+      "name": "pannier pressure envelope/service-well-0-0/recess-service-strut-0",
+      "piece": 4,
+      "vertexStart": 1284,
+      "vertexCount": 8,
+      "faceStart": 2144,
+      "faceCount": 12
+    },
+    {
+      "component": 107,
+      "name": "pannier pressure envelope/service-well-0-0/recess-service-strut-1",
+      "piece": 4,
+      "vertexStart": 1292,
+      "vertexCount": 8,
+      "faceStart": 2156,
+      "faceCount": 12
+    },
+    {
+      "component": 108,
+      "name": "pannier pressure envelope/service-well-0-0/recess-service-strut-2",
+      "piece": 4,
+      "vertexStart": 1300,
+      "vertexCount": 8,
+      "faceStart": 2168,
+      "faceCount": 12
+    },
+    {
+      "component": 109,
+      "name": "pannier pressure envelope/service-well-0-1",
+      "piece": 4,
+      "vertexStart": 1308,
+      "vertexCount": 12,
+      "faceStart": 2180,
+      "faceCount": 20
+    },
+    {
+      "component": 110,
+      "name": "pannier pressure envelope/service-well-0-1/recess-service-strut-0",
+      "piece": 4,
+      "vertexStart": 1320,
+      "vertexCount": 8,
+      "faceStart": 2200,
+      "faceCount": 12
+    },
+    {
+      "component": 111,
+      "name": "pannier pressure envelope/service-well-0-1/recess-service-strut-1",
+      "piece": 4,
+      "vertexStart": 1328,
+      "vertexCount": 8,
+      "faceStart": 2212,
+      "faceCount": 12
+    },
+    {
+      "component": 112,
+      "name": "pannier pressure envelope/service-well-0-1/recess-service-strut-2",
+      "piece": 4,
+      "vertexStart": 1336,
+      "vertexCount": 8,
+      "faceStart": 2224,
+      "faceCount": 12
+    },
+    {
+      "component": 113,
+      "name": "pannier pressure envelope/service-well-0-2",
+      "piece": 4,
+      "vertexStart": 1344,
+      "vertexCount": 12,
+      "faceStart": 2236,
+      "faceCount": 20
+    },
+    {
+      "component": 114,
+      "name": "pannier pressure envelope/service-well-0-2/recess-service-strut-0",
+      "piece": 4,
+      "vertexStart": 1356,
+      "vertexCount": 8,
+      "faceStart": 2256,
+      "faceCount": 12
+    },
+    {
+      "component": 115,
+      "name": "pannier pressure envelope/service-well-0-2/recess-service-strut-1",
+      "piece": 4,
+      "vertexStart": 1364,
+      "vertexCount": 8,
+      "faceStart": 2268,
+      "faceCount": 12
+    },
+    {
+      "component": 116,
+      "name": "pannier pressure envelope/service-well-0-2/recess-service-strut-2",
+      "piece": 4,
+      "vertexStart": 1372,
+      "vertexCount": 8,
+      "faceStart": 2280,
+      "faceCount": 12
+    },
+    {
+      "component": 117,
+      "name": "pannier pressure envelope/service-well-1-0",
+      "piece": 4,
+      "vertexStart": 1380,
+      "vertexCount": 12,
+      "faceStart": 2292,
+      "faceCount": 20
+    },
+    {
+      "component": 118,
+      "name": "pannier pressure envelope/service-well-1-0/recess-service-strut-0",
+      "piece": 4,
+      "vertexStart": 1392,
+      "vertexCount": 8,
+      "faceStart": 2312,
+      "faceCount": 12
+    },
+    {
+      "component": 119,
+      "name": "pannier pressure envelope/service-well-1-0/recess-service-strut-1",
+      "piece": 4,
+      "vertexStart": 1400,
+      "vertexCount": 8,
+      "faceStart": 2324,
+      "faceCount": 12
+    },
+    {
+      "component": 120,
+      "name": "pannier pressure envelope/service-well-1-0/recess-service-strut-2",
+      "piece": 4,
+      "vertexStart": 1408,
+      "vertexCount": 8,
+      "faceStart": 2336,
+      "faceCount": 12
+    },
+    {
+      "component": 121,
+      "name": "pannier pressure envelope/service-well-1-1",
+      "piece": 4,
+      "vertexStart": 1416,
+      "vertexCount": 12,
+      "faceStart": 2348,
+      "faceCount": 20
+    },
+    {
+      "component": 122,
+      "name": "pannier pressure envelope/service-well-1-1/recess-service-strut-0",
+      "piece": 4,
+      "vertexStart": 1428,
+      "vertexCount": 8,
+      "faceStart": 2368,
+      "faceCount": 12
+    },
+    {
+      "component": 123,
+      "name": "pannier pressure envelope/service-well-1-1/recess-service-strut-1",
+      "piece": 4,
+      "vertexStart": 1436,
+      "vertexCount": 8,
+      "faceStart": 2380,
+      "faceCount": 12
+    },
+    {
+      "component": 124,
+      "name": "pannier pressure envelope/service-well-1-1/recess-service-strut-2",
+      "piece": 4,
+      "vertexStart": 1444,
+      "vertexCount": 8,
+      "faceStart": 2392,
+      "faceCount": 12
+    },
+    {
+      "component": 125,
+      "name": "pannier pressure envelope/service-well-1-2",
+      "piece": 4,
+      "vertexStart": 1452,
+      "vertexCount": 12,
+      "faceStart": 2404,
+      "faceCount": 20
+    },
+    {
+      "component": 126,
+      "name": "pannier pressure envelope/service-well-1-2/recess-service-strut-0",
+      "piece": 4,
+      "vertexStart": 1464,
+      "vertexCount": 8,
+      "faceStart": 2424,
+      "faceCount": 12
+    },
+    {
+      "component": 127,
+      "name": "pannier pressure envelope/service-well-1-2/recess-service-strut-1",
+      "piece": 4,
+      "vertexStart": 1472,
+      "vertexCount": 8,
+      "faceStart": 2436,
+      "faceCount": 12
+    },
+    {
+      "component": 128,
+      "name": "pannier pressure envelope/service-well-1-2/recess-service-strut-2",
+      "piece": 4,
+      "vertexStart": 1480,
+      "vertexCount": 8,
+      "faceStart": 2448,
+      "faceCount": 12
+    },
+    {
+      "component": 129,
+      "name": "pannier pressure envelope/service-well-2-0",
+      "piece": 4,
+      "vertexStart": 1488,
+      "vertexCount": 12,
+      "faceStart": 2460,
+      "faceCount": 20
+    },
+    {
+      "component": 130,
+      "name": "pannier pressure envelope/service-well-2-0/recess-service-strut-0",
+      "piece": 4,
+      "vertexStart": 1500,
+      "vertexCount": 8,
+      "faceStart": 2480,
+      "faceCount": 12
+    },
+    {
+      "component": 131,
+      "name": "pannier pressure envelope/service-well-2-0/recess-service-strut-1",
+      "piece": 4,
+      "vertexStart": 1508,
+      "vertexCount": 8,
+      "faceStart": 2492,
+      "faceCount": 12
+    },
+    {
+      "component": 132,
+      "name": "pannier pressure envelope/service-well-2-0/recess-service-strut-2",
+      "piece": 4,
+      "vertexStart": 1516,
+      "vertexCount": 8,
+      "faceStart": 2504,
+      "faceCount": 12
+    },
+    {
+      "component": 133,
+      "name": "pannier pressure envelope/service-well-2-1",
+      "piece": 4,
+      "vertexStart": 1524,
+      "vertexCount": 12,
+      "faceStart": 2516,
+      "faceCount": 20
+    },
+    {
+      "component": 134,
+      "name": "pannier pressure envelope/service-well-2-1/recess-service-strut-0",
+      "piece": 4,
+      "vertexStart": 1536,
+      "vertexCount": 8,
+      "faceStart": 2536,
+      "faceCount": 12
+    },
+    {
+      "component": 135,
+      "name": "pannier pressure envelope/service-well-2-1/recess-service-strut-1",
+      "piece": 4,
+      "vertexStart": 1544,
+      "vertexCount": 8,
+      "faceStart": 2548,
+      "faceCount": 12
+    },
+    {
+      "component": 136,
+      "name": "pannier pressure envelope/service-well-2-1/recess-service-strut-2",
+      "piece": 4,
+      "vertexStart": 1552,
+      "vertexCount": 8,
+      "faceStart": 2560,
+      "faceCount": 12
+    },
+    {
+      "component": 137,
+      "name": "pannier pressure envelope/service-well-2-2",
+      "piece": 4,
+      "vertexStart": 1560,
+      "vertexCount": 12,
+      "faceStart": 2572,
+      "faceCount": 20
+    },
+    {
+      "component": 138,
+      "name": "pannier pressure envelope/service-well-2-2/recess-service-strut-0",
+      "piece": 4,
+      "vertexStart": 1572,
+      "vertexCount": 8,
+      "faceStart": 2592,
+      "faceCount": 12
+    },
+    {
+      "component": 139,
+      "name": "pannier pressure envelope/service-well-2-2/recess-service-strut-1",
+      "piece": 4,
+      "vertexStart": 1580,
+      "vertexCount": 8,
+      "faceStart": 2604,
+      "faceCount": 12
+    },
+    {
+      "component": 140,
+      "name": "pannier pressure envelope/service-well-2-2/recess-service-strut-2",
+      "piece": 4,
+      "vertexStart": 1588,
+      "vertexCount": 8,
+      "faceStart": 2616,
+      "faceCount": 12
+    },
+    {
+      "component": 141,
+      "name": "pannier pressure envelope/service-well-3-0",
+      "piece": 4,
+      "vertexStart": 1596,
+      "vertexCount": 12,
+      "faceStart": 2628,
+      "faceCount": 20
+    },
+    {
+      "component": 142,
+      "name": "pannier pressure envelope/service-well-3-0/recess-service-strut-0",
+      "piece": 4,
+      "vertexStart": 1608,
+      "vertexCount": 8,
+      "faceStart": 2648,
+      "faceCount": 12
+    },
+    {
+      "component": 143,
+      "name": "pannier pressure envelope/service-well-3-0/recess-service-strut-1",
+      "piece": 4,
+      "vertexStart": 1616,
+      "vertexCount": 8,
+      "faceStart": 2660,
+      "faceCount": 12
+    },
+    {
+      "component": 144,
+      "name": "pannier pressure envelope/service-well-3-0/recess-service-strut-2",
+      "piece": 4,
+      "vertexStart": 1624,
+      "vertexCount": 8,
+      "faceStart": 2672,
+      "faceCount": 12
+    },
+    {
+      "component": 145,
+      "name": "pannier pressure envelope/service-well-3-1",
+      "piece": 4,
+      "vertexStart": 1632,
+      "vertexCount": 12,
+      "faceStart": 2684,
+      "faceCount": 20
+    },
+    {
+      "component": 146,
+      "name": "pannier pressure envelope/service-well-3-1/recess-service-strut-0",
+      "piece": 4,
+      "vertexStart": 1644,
+      "vertexCount": 8,
+      "faceStart": 2704,
+      "faceCount": 12
+    },
+    {
+      "component": 147,
+      "name": "pannier pressure envelope/service-well-3-1/recess-service-strut-1",
+      "piece": 4,
+      "vertexStart": 1652,
+      "vertexCount": 8,
+      "faceStart": 2716,
+      "faceCount": 12
+    },
+    {
+      "component": 148,
+      "name": "pannier pressure envelope/service-well-3-1/recess-service-strut-2",
+      "piece": 4,
+      "vertexStart": 1660,
+      "vertexCount": 8,
+      "faceStart": 2728,
+      "faceCount": 12
+    },
+    {
+      "component": 149,
+      "name": "pannier pressure envelope/service-well-3-2",
+      "piece": 4,
+      "vertexStart": 1668,
+      "vertexCount": 12,
+      "faceStart": 2740,
+      "faceCount": 20
+    },
+    {
+      "component": 150,
+      "name": "pannier pressure envelope/service-well-3-2/recess-service-strut-0",
+      "piece": 4,
+      "vertexStart": 1680,
+      "vertexCount": 8,
+      "faceStart": 2760,
+      "faceCount": 12
+    },
+    {
+      "component": 151,
+      "name": "pannier pressure envelope/service-well-3-2/recess-service-strut-1",
+      "piece": 4,
+      "vertexStart": 1688,
+      "vertexCount": 8,
+      "faceStart": 2772,
+      "faceCount": 12
+    },
+    {
+      "component": 152,
+      "name": "pannier pressure envelope/service-well-3-2/recess-service-strut-2",
+      "piece": 4,
+      "vertexStart": 1696,
+      "vertexCount": 8,
+      "faceStart": 2784,
+      "faceCount": 12
+    },
+    {
+      "component": 153,
+      "name": "pannier pressure envelope/longitudinal-service-strut-0",
+      "piece": 4,
+      "vertexStart": 1704,
+      "vertexCount": 8,
+      "faceStart": 2796,
+      "faceCount": 12
+    },
+    {
+      "component": 154,
+      "name": "pannier pressure envelope/longitudinal-service-strut-1",
+      "piece": 4,
+      "vertexStart": 1712,
+      "vertexCount": 8,
+      "faceStart": 2808,
+      "faceCount": 12
+    },
+    {
+      "component": 155,
+      "name": "pannier connected structural support",
+      "piece": 5,
+      "vertexStart": 1720,
+      "vertexCount": 8,
+      "faceStart": 2820,
+      "faceCount": 12
+    },
+    {
+      "component": 156,
+      "name": "pannier pressure envelope",
+      "piece": 6,
+      "vertexStart": 1728,
+      "vertexCount": 120,
+      "faceStart": 2832,
+      "faceCount": 236
+    },
+    {
+      "component": 157,
+      "name": "pannier pressure envelope/service-well-0-0",
+      "piece": 6,
+      "vertexStart": 1848,
+      "vertexCount": 12,
+      "faceStart": 3068,
+      "faceCount": 20
+    },
+    {
+      "component": 158,
+      "name": "pannier pressure envelope/service-well-0-0/recess-service-strut-0",
+      "piece": 6,
+      "vertexStart": 1860,
+      "vertexCount": 8,
+      "faceStart": 3088,
+      "faceCount": 12
+    },
+    {
+      "component": 159,
+      "name": "pannier pressure envelope/service-well-0-0/recess-service-strut-1",
+      "piece": 6,
+      "vertexStart": 1868,
+      "vertexCount": 8,
+      "faceStart": 3100,
+      "faceCount": 12
+    },
+    {
+      "component": 160,
+      "name": "pannier pressure envelope/service-well-0-0/recess-service-strut-2",
+      "piece": 6,
+      "vertexStart": 1876,
+      "vertexCount": 8,
+      "faceStart": 3112,
+      "faceCount": 12
+    },
+    {
+      "component": 161,
+      "name": "pannier pressure envelope/service-well-0-1",
+      "piece": 6,
+      "vertexStart": 1884,
+      "vertexCount": 12,
+      "faceStart": 3124,
+      "faceCount": 20
+    },
+    {
+      "component": 162,
+      "name": "pannier pressure envelope/service-well-0-1/recess-service-strut-0",
+      "piece": 6,
+      "vertexStart": 1896,
+      "vertexCount": 8,
+      "faceStart": 3144,
+      "faceCount": 12
+    },
+    {
+      "component": 163,
+      "name": "pannier pressure envelope/service-well-0-1/recess-service-strut-1",
+      "piece": 6,
+      "vertexStart": 1904,
+      "vertexCount": 8,
+      "faceStart": 3156,
+      "faceCount": 12
+    },
+    {
+      "component": 164,
+      "name": "pannier pressure envelope/service-well-0-1/recess-service-strut-2",
+      "piece": 6,
+      "vertexStart": 1912,
+      "vertexCount": 8,
+      "faceStart": 3168,
+      "faceCount": 12
+    },
+    {
+      "component": 165,
+      "name": "pannier pressure envelope/service-well-0-2",
+      "piece": 6,
+      "vertexStart": 1920,
+      "vertexCount": 12,
+      "faceStart": 3180,
+      "faceCount": 20
+    },
+    {
+      "component": 166,
+      "name": "pannier pressure envelope/service-well-0-2/recess-service-strut-0",
+      "piece": 6,
+      "vertexStart": 1932,
+      "vertexCount": 8,
+      "faceStart": 3200,
+      "faceCount": 12
+    },
+    {
+      "component": 167,
+      "name": "pannier pressure envelope/service-well-0-2/recess-service-strut-1",
+      "piece": 6,
+      "vertexStart": 1940,
+      "vertexCount": 8,
+      "faceStart": 3212,
+      "faceCount": 12
+    },
+    {
+      "component": 168,
+      "name": "pannier pressure envelope/service-well-0-2/recess-service-strut-2",
+      "piece": 6,
+      "vertexStart": 1948,
+      "vertexCount": 8,
+      "faceStart": 3224,
+      "faceCount": 12
+    },
+    {
+      "component": 169,
+      "name": "pannier pressure envelope/service-well-1-0",
+      "piece": 6,
+      "vertexStart": 1956,
+      "vertexCount": 12,
+      "faceStart": 3236,
+      "faceCount": 20
+    },
+    {
+      "component": 170,
+      "name": "pannier pressure envelope/service-well-1-0/recess-service-strut-0",
+      "piece": 6,
+      "vertexStart": 1968,
+      "vertexCount": 8,
+      "faceStart": 3256,
+      "faceCount": 12
+    },
+    {
+      "component": 171,
+      "name": "pannier pressure envelope/service-well-1-0/recess-service-strut-1",
+      "piece": 6,
+      "vertexStart": 1976,
+      "vertexCount": 8,
+      "faceStart": 3268,
+      "faceCount": 12
+    },
+    {
+      "component": 172,
+      "name": "pannier pressure envelope/service-well-1-0/recess-service-strut-2",
+      "piece": 6,
+      "vertexStart": 1984,
+      "vertexCount": 8,
+      "faceStart": 3280,
+      "faceCount": 12
+    },
+    {
+      "component": 173,
+      "name": "pannier pressure envelope/service-well-1-1",
+      "piece": 6,
+      "vertexStart": 1992,
+      "vertexCount": 12,
+      "faceStart": 3292,
+      "faceCount": 20
+    },
+    {
+      "component": 174,
+      "name": "pannier pressure envelope/service-well-1-1/recess-service-strut-0",
+      "piece": 6,
+      "vertexStart": 2004,
+      "vertexCount": 8,
+      "faceStart": 3312,
+      "faceCount": 12
+    },
+    {
+      "component": 175,
+      "name": "pannier pressure envelope/service-well-1-1/recess-service-strut-1",
+      "piece": 6,
+      "vertexStart": 2012,
+      "vertexCount": 8,
+      "faceStart": 3324,
+      "faceCount": 12
+    },
+    {
+      "component": 176,
+      "name": "pannier pressure envelope/service-well-1-1/recess-service-strut-2",
+      "piece": 6,
+      "vertexStart": 2020,
+      "vertexCount": 8,
+      "faceStart": 3336,
+      "faceCount": 12
+    },
+    {
+      "component": 177,
+      "name": "pannier pressure envelope/service-well-1-2",
+      "piece": 6,
+      "vertexStart": 2028,
+      "vertexCount": 12,
+      "faceStart": 3348,
+      "faceCount": 20
+    },
+    {
+      "component": 178,
+      "name": "pannier pressure envelope/service-well-1-2/recess-service-strut-0",
+      "piece": 6,
+      "vertexStart": 2040,
+      "vertexCount": 8,
+      "faceStart": 3368,
+      "faceCount": 12
+    },
+    {
+      "component": 179,
+      "name": "pannier pressure envelope/service-well-1-2/recess-service-strut-1",
+      "piece": 6,
+      "vertexStart": 2048,
+      "vertexCount": 8,
+      "faceStart": 3380,
+      "faceCount": 12
+    },
+    {
+      "component": 180,
+      "name": "pannier pressure envelope/service-well-1-2/recess-service-strut-2",
+      "piece": 6,
+      "vertexStart": 2056,
+      "vertexCount": 8,
+      "faceStart": 3392,
+      "faceCount": 12
+    },
+    {
+      "component": 181,
+      "name": "pannier pressure envelope/service-well-2-0",
+      "piece": 6,
+      "vertexStart": 2064,
+      "vertexCount": 12,
+      "faceStart": 3404,
+      "faceCount": 20
+    },
+    {
+      "component": 182,
+      "name": "pannier pressure envelope/service-well-2-0/recess-service-strut-0",
+      "piece": 6,
+      "vertexStart": 2076,
+      "vertexCount": 8,
+      "faceStart": 3424,
+      "faceCount": 12
+    },
+    {
+      "component": 183,
+      "name": "pannier pressure envelope/service-well-2-0/recess-service-strut-1",
+      "piece": 6,
+      "vertexStart": 2084,
+      "vertexCount": 8,
+      "faceStart": 3436,
+      "faceCount": 12
+    },
+    {
+      "component": 184,
+      "name": "pannier pressure envelope/service-well-2-0/recess-service-strut-2",
+      "piece": 6,
+      "vertexStart": 2092,
+      "vertexCount": 8,
+      "faceStart": 3448,
+      "faceCount": 12
+    },
+    {
+      "component": 185,
+      "name": "pannier pressure envelope/service-well-2-1",
+      "piece": 6,
+      "vertexStart": 2100,
+      "vertexCount": 12,
+      "faceStart": 3460,
+      "faceCount": 20
+    },
+    {
+      "component": 186,
+      "name": "pannier pressure envelope/service-well-2-1/recess-service-strut-0",
+      "piece": 6,
+      "vertexStart": 2112,
+      "vertexCount": 8,
+      "faceStart": 3480,
+      "faceCount": 12
+    },
+    {
+      "component": 187,
+      "name": "pannier pressure envelope/service-well-2-1/recess-service-strut-1",
+      "piece": 6,
+      "vertexStart": 2120,
+      "vertexCount": 8,
+      "faceStart": 3492,
+      "faceCount": 12
+    },
+    {
+      "component": 188,
+      "name": "pannier pressure envelope/service-well-2-1/recess-service-strut-2",
+      "piece": 6,
+      "vertexStart": 2128,
+      "vertexCount": 8,
+      "faceStart": 3504,
+      "faceCount": 12
+    },
+    {
+      "component": 189,
+      "name": "pannier pressure envelope/service-well-2-2",
+      "piece": 6,
+      "vertexStart": 2136,
+      "vertexCount": 12,
+      "faceStart": 3516,
+      "faceCount": 20
+    },
+    {
+      "component": 190,
+      "name": "pannier pressure envelope/service-well-2-2/recess-service-strut-0",
+      "piece": 6,
+      "vertexStart": 2148,
+      "vertexCount": 8,
+      "faceStart": 3536,
+      "faceCount": 12
+    },
+    {
+      "component": 191,
+      "name": "pannier pressure envelope/service-well-2-2/recess-service-strut-1",
+      "piece": 6,
+      "vertexStart": 2156,
+      "vertexCount": 8,
+      "faceStart": 3548,
+      "faceCount": 12
+    },
+    {
+      "component": 192,
+      "name": "pannier pressure envelope/service-well-2-2/recess-service-strut-2",
+      "piece": 6,
+      "vertexStart": 2164,
+      "vertexCount": 8,
+      "faceStart": 3560,
+      "faceCount": 12
+    },
+    {
+      "component": 193,
+      "name": "pannier pressure envelope/service-well-3-0",
+      "piece": 6,
+      "vertexStart": 2172,
+      "vertexCount": 12,
+      "faceStart": 3572,
+      "faceCount": 20
+    },
+    {
+      "component": 194,
+      "name": "pannier pressure envelope/service-well-3-0/recess-service-strut-0",
+      "piece": 6,
+      "vertexStart": 2184,
+      "vertexCount": 8,
+      "faceStart": 3592,
+      "faceCount": 12
+    },
+    {
+      "component": 195,
+      "name": "pannier pressure envelope/service-well-3-0/recess-service-strut-1",
+      "piece": 6,
+      "vertexStart": 2192,
+      "vertexCount": 8,
+      "faceStart": 3604,
+      "faceCount": 12
+    },
+    {
+      "component": 196,
+      "name": "pannier pressure envelope/service-well-3-0/recess-service-strut-2",
+      "piece": 6,
+      "vertexStart": 2200,
+      "vertexCount": 8,
+      "faceStart": 3616,
+      "faceCount": 12
+    },
+    {
+      "component": 197,
+      "name": "pannier pressure envelope/service-well-3-1",
+      "piece": 6,
+      "vertexStart": 2208,
+      "vertexCount": 12,
+      "faceStart": 3628,
+      "faceCount": 20
+    },
+    {
+      "component": 198,
+      "name": "pannier pressure envelope/service-well-3-1/recess-service-strut-0",
+      "piece": 6,
+      "vertexStart": 2220,
+      "vertexCount": 8,
+      "faceStart": 3648,
+      "faceCount": 12
+    },
+    {
+      "component": 199,
+      "name": "pannier pressure envelope/service-well-3-1/recess-service-strut-1",
+      "piece": 6,
+      "vertexStart": 2228,
+      "vertexCount": 8,
+      "faceStart": 3660,
+      "faceCount": 12
+    },
+    {
+      "component": 200,
+      "name": "pannier pressure envelope/service-well-3-1/recess-service-strut-2",
+      "piece": 6,
+      "vertexStart": 2236,
+      "vertexCount": 8,
+      "faceStart": 3672,
+      "faceCount": 12
+    },
+    {
+      "component": 201,
+      "name": "pannier pressure envelope/service-well-3-2",
+      "piece": 6,
+      "vertexStart": 2244,
+      "vertexCount": 12,
+      "faceStart": 3684,
+      "faceCount": 20
+    },
+    {
+      "component": 202,
+      "name": "pannier pressure envelope/service-well-3-2/recess-service-strut-0",
+      "piece": 6,
+      "vertexStart": 2256,
+      "vertexCount": 8,
+      "faceStart": 3704,
+      "faceCount": 12
+    },
+    {
+      "component": 203,
+      "name": "pannier pressure envelope/service-well-3-2/recess-service-strut-1",
+      "piece": 6,
+      "vertexStart": 2264,
+      "vertexCount": 8,
+      "faceStart": 3716,
+      "faceCount": 12
+    },
+    {
+      "component": 204,
+      "name": "pannier pressure envelope/service-well-3-2/recess-service-strut-2",
+      "piece": 6,
+      "vertexStart": 2272,
+      "vertexCount": 8,
+      "faceStart": 3728,
+      "faceCount": 12
+    },
+    {
+      "component": 205,
+      "name": "pannier pressure envelope/longitudinal-service-strut-0",
+      "piece": 6,
+      "vertexStart": 2280,
+      "vertexCount": 8,
+      "faceStart": 3740,
+      "faceCount": 12
+    },
+    {
+      "component": 206,
+      "name": "pannier pressure envelope/longitudinal-service-strut-1",
+      "piece": 6,
+      "vertexStart": 2288,
+      "vertexCount": 8,
+      "faceStart": 3752,
+      "faceCount": 12
+    },
+    {
+      "component": 207,
+      "name": "pannier connected structural support",
+      "piece": 7,
+      "vertexStart": 2296,
+      "vertexCount": 8,
+      "faceStart": 3764,
+      "faceCount": 12
+    },
+    {
+      "component": 208,
+      "name": "pannier pressure envelope",
+      "piece": 8,
+      "vertexStart": 2304,
+      "vertexCount": 120,
+      "faceStart": 3776,
+      "faceCount": 236
+    },
+    {
+      "component": 209,
+      "name": "pannier pressure envelope/service-well-0-0",
+      "piece": 8,
+      "vertexStart": 2424,
+      "vertexCount": 12,
+      "faceStart": 4012,
+      "faceCount": 20
+    },
+    {
+      "component": 210,
+      "name": "pannier pressure envelope/service-well-0-0/recess-service-strut-0",
+      "piece": 8,
+      "vertexStart": 2436,
+      "vertexCount": 8,
+      "faceStart": 4032,
+      "faceCount": 12
+    },
+    {
+      "component": 211,
+      "name": "pannier pressure envelope/service-well-0-0/recess-service-strut-1",
+      "piece": 8,
+      "vertexStart": 2444,
+      "vertexCount": 8,
+      "faceStart": 4044,
+      "faceCount": 12
+    },
+    {
+      "component": 212,
+      "name": "pannier pressure envelope/service-well-0-0/recess-service-strut-2",
+      "piece": 8,
+      "vertexStart": 2452,
+      "vertexCount": 8,
+      "faceStart": 4056,
+      "faceCount": 12
+    },
+    {
+      "component": 213,
+      "name": "pannier pressure envelope/service-well-0-1",
+      "piece": 8,
+      "vertexStart": 2460,
+      "vertexCount": 12,
+      "faceStart": 4068,
+      "faceCount": 20
+    },
+    {
+      "component": 214,
+      "name": "pannier pressure envelope/service-well-0-1/recess-service-strut-0",
+      "piece": 8,
+      "vertexStart": 2472,
+      "vertexCount": 8,
+      "faceStart": 4088,
+      "faceCount": 12
+    },
+    {
+      "component": 215,
+      "name": "pannier pressure envelope/service-well-0-1/recess-service-strut-1",
+      "piece": 8,
+      "vertexStart": 2480,
+      "vertexCount": 8,
+      "faceStart": 4100,
+      "faceCount": 12
+    },
+    {
+      "component": 216,
+      "name": "pannier pressure envelope/service-well-0-1/recess-service-strut-2",
+      "piece": 8,
+      "vertexStart": 2488,
+      "vertexCount": 8,
+      "faceStart": 4112,
+      "faceCount": 12
+    },
+    {
+      "component": 217,
+      "name": "pannier pressure envelope/service-well-0-2",
+      "piece": 8,
+      "vertexStart": 2496,
+      "vertexCount": 12,
+      "faceStart": 4124,
+      "faceCount": 20
+    },
+    {
+      "component": 218,
+      "name": "pannier pressure envelope/service-well-0-2/recess-service-strut-0",
+      "piece": 8,
+      "vertexStart": 2508,
+      "vertexCount": 8,
+      "faceStart": 4144,
+      "faceCount": 12
+    },
+    {
+      "component": 219,
+      "name": "pannier pressure envelope/service-well-0-2/recess-service-strut-1",
+      "piece": 8,
+      "vertexStart": 2516,
+      "vertexCount": 8,
+      "faceStart": 4156,
+      "faceCount": 12
+    },
+    {
+      "component": 220,
+      "name": "pannier pressure envelope/service-well-0-2/recess-service-strut-2",
+      "piece": 8,
+      "vertexStart": 2524,
+      "vertexCount": 8,
+      "faceStart": 4168,
+      "faceCount": 12
+    },
+    {
+      "component": 221,
+      "name": "pannier pressure envelope/service-well-1-0",
+      "piece": 8,
+      "vertexStart": 2532,
+      "vertexCount": 12,
+      "faceStart": 4180,
+      "faceCount": 20
+    },
+    {
+      "component": 222,
+      "name": "pannier pressure envelope/service-well-1-0/recess-service-strut-0",
+      "piece": 8,
+      "vertexStart": 2544,
+      "vertexCount": 8,
+      "faceStart": 4200,
+      "faceCount": 12
+    },
+    {
+      "component": 223,
+      "name": "pannier pressure envelope/service-well-1-0/recess-service-strut-1",
+      "piece": 8,
+      "vertexStart": 2552,
+      "vertexCount": 8,
+      "faceStart": 4212,
+      "faceCount": 12
+    },
+    {
+      "component": 224,
+      "name": "pannier pressure envelope/service-well-1-0/recess-service-strut-2",
+      "piece": 8,
+      "vertexStart": 2560,
+      "vertexCount": 8,
+      "faceStart": 4224,
+      "faceCount": 12
+    },
+    {
+      "component": 225,
+      "name": "pannier pressure envelope/service-well-1-1",
+      "piece": 8,
+      "vertexStart": 2568,
+      "vertexCount": 12,
+      "faceStart": 4236,
+      "faceCount": 20
+    },
+    {
+      "component": 226,
+      "name": "pannier pressure envelope/service-well-1-1/recess-service-strut-0",
+      "piece": 8,
+      "vertexStart": 2580,
+      "vertexCount": 8,
+      "faceStart": 4256,
+      "faceCount": 12
+    },
+    {
+      "component": 227,
+      "name": "pannier pressure envelope/service-well-1-1/recess-service-strut-1",
+      "piece": 8,
+      "vertexStart": 2588,
+      "vertexCount": 8,
+      "faceStart": 4268,
+      "faceCount": 12
+    },
+    {
+      "component": 228,
+      "name": "pannier pressure envelope/service-well-1-1/recess-service-strut-2",
+      "piece": 8,
+      "vertexStart": 2596,
+      "vertexCount": 8,
+      "faceStart": 4280,
+      "faceCount": 12
+    },
+    {
+      "component": 229,
+      "name": "pannier pressure envelope/service-well-1-2",
+      "piece": 8,
+      "vertexStart": 2604,
+      "vertexCount": 12,
+      "faceStart": 4292,
+      "faceCount": 20
+    },
+    {
+      "component": 230,
+      "name": "pannier pressure envelope/service-well-1-2/recess-service-strut-0",
+      "piece": 8,
+      "vertexStart": 2616,
+      "vertexCount": 8,
+      "faceStart": 4312,
+      "faceCount": 12
+    },
+    {
+      "component": 231,
+      "name": "pannier pressure envelope/service-well-1-2/recess-service-strut-1",
+      "piece": 8,
+      "vertexStart": 2624,
+      "vertexCount": 8,
+      "faceStart": 4324,
+      "faceCount": 12
+    },
+    {
+      "component": 232,
+      "name": "pannier pressure envelope/service-well-1-2/recess-service-strut-2",
+      "piece": 8,
+      "vertexStart": 2632,
+      "vertexCount": 8,
+      "faceStart": 4336,
+      "faceCount": 12
+    },
+    {
+      "component": 233,
+      "name": "pannier pressure envelope/service-well-2-0",
+      "piece": 8,
+      "vertexStart": 2640,
+      "vertexCount": 12,
+      "faceStart": 4348,
+      "faceCount": 20
+    },
+    {
+      "component": 234,
+      "name": "pannier pressure envelope/service-well-2-0/recess-service-strut-0",
+      "piece": 8,
+      "vertexStart": 2652,
+      "vertexCount": 8,
+      "faceStart": 4368,
+      "faceCount": 12
+    },
+    {
+      "component": 235,
+      "name": "pannier pressure envelope/service-well-2-0/recess-service-strut-1",
+      "piece": 8,
+      "vertexStart": 2660,
+      "vertexCount": 8,
+      "faceStart": 4380,
+      "faceCount": 12
+    },
+    {
+      "component": 236,
+      "name": "pannier pressure envelope/service-well-2-0/recess-service-strut-2",
+      "piece": 8,
+      "vertexStart": 2668,
+      "vertexCount": 8,
+      "faceStart": 4392,
+      "faceCount": 12
+    },
+    {
+      "component": 237,
+      "name": "pannier pressure envelope/service-well-2-1",
+      "piece": 8,
+      "vertexStart": 2676,
+      "vertexCount": 12,
+      "faceStart": 4404,
+      "faceCount": 20
+    },
+    {
+      "component": 238,
+      "name": "pannier pressure envelope/service-well-2-1/recess-service-strut-0",
+      "piece": 8,
+      "vertexStart": 2688,
+      "vertexCount": 8,
+      "faceStart": 4424,
+      "faceCount": 12
+    },
+    {
+      "component": 239,
+      "name": "pannier pressure envelope/service-well-2-1/recess-service-strut-1",
+      "piece": 8,
+      "vertexStart": 2696,
+      "vertexCount": 8,
+      "faceStart": 4436,
+      "faceCount": 12
+    },
+    {
+      "component": 240,
+      "name": "pannier pressure envelope/service-well-2-1/recess-service-strut-2",
+      "piece": 8,
+      "vertexStart": 2704,
+      "vertexCount": 8,
+      "faceStart": 4448,
+      "faceCount": 12
+    },
+    {
+      "component": 241,
+      "name": "pannier pressure envelope/service-well-2-2",
+      "piece": 8,
+      "vertexStart": 2712,
+      "vertexCount": 12,
+      "faceStart": 4460,
+      "faceCount": 20
+    },
+    {
+      "component": 242,
+      "name": "pannier pressure envelope/service-well-2-2/recess-service-strut-0",
+      "piece": 8,
+      "vertexStart": 2724,
+      "vertexCount": 8,
+      "faceStart": 4480,
+      "faceCount": 12
+    },
+    {
+      "component": 243,
+      "name": "pannier pressure envelope/service-well-2-2/recess-service-strut-1",
+      "piece": 8,
+      "vertexStart": 2732,
+      "vertexCount": 8,
+      "faceStart": 4492,
+      "faceCount": 12
+    },
+    {
+      "component": 244,
+      "name": "pannier pressure envelope/service-well-2-2/recess-service-strut-2",
+      "piece": 8,
+      "vertexStart": 2740,
+      "vertexCount": 8,
+      "faceStart": 4504,
+      "faceCount": 12
+    },
+    {
+      "component": 245,
+      "name": "pannier pressure envelope/service-well-3-0",
+      "piece": 8,
+      "vertexStart": 2748,
+      "vertexCount": 12,
+      "faceStart": 4516,
+      "faceCount": 20
+    },
+    {
+      "component": 246,
+      "name": "pannier pressure envelope/service-well-3-0/recess-service-strut-0",
+      "piece": 8,
+      "vertexStart": 2760,
+      "vertexCount": 8,
+      "faceStart": 4536,
+      "faceCount": 12
+    },
+    {
+      "component": 247,
+      "name": "pannier pressure envelope/service-well-3-0/recess-service-strut-1",
+      "piece": 8,
+      "vertexStart": 2768,
+      "vertexCount": 8,
+      "faceStart": 4548,
+      "faceCount": 12
+    },
+    {
+      "component": 248,
+      "name": "pannier pressure envelope/service-well-3-0/recess-service-strut-2",
+      "piece": 8,
+      "vertexStart": 2776,
+      "vertexCount": 8,
+      "faceStart": 4560,
+      "faceCount": 12
+    },
+    {
+      "component": 249,
+      "name": "pannier pressure envelope/service-well-3-1",
+      "piece": 8,
+      "vertexStart": 2784,
+      "vertexCount": 12,
+      "faceStart": 4572,
+      "faceCount": 20
+    },
+    {
+      "component": 250,
+      "name": "pannier pressure envelope/service-well-3-1/recess-service-strut-0",
+      "piece": 8,
+      "vertexStart": 2796,
+      "vertexCount": 8,
+      "faceStart": 4592,
+      "faceCount": 12
+    },
+    {
+      "component": 251,
+      "name": "pannier pressure envelope/service-well-3-1/recess-service-strut-1",
+      "piece": 8,
+      "vertexStart": 2804,
+      "vertexCount": 8,
+      "faceStart": 4604,
+      "faceCount": 12
+    },
+    {
+      "component": 252,
+      "name": "pannier pressure envelope/service-well-3-1/recess-service-strut-2",
+      "piece": 8,
+      "vertexStart": 2812,
+      "vertexCount": 8,
+      "faceStart": 4616,
+      "faceCount": 12
+    },
+    {
+      "component": 253,
+      "name": "pannier pressure envelope/service-well-3-2",
+      "piece": 8,
+      "vertexStart": 2820,
+      "vertexCount": 12,
+      "faceStart": 4628,
+      "faceCount": 20
+    },
+    {
+      "component": 254,
+      "name": "pannier pressure envelope/service-well-3-2/recess-service-strut-0",
+      "piece": 8,
+      "vertexStart": 2832,
+      "vertexCount": 8,
+      "faceStart": 4648,
+      "faceCount": 12
+    },
+    {
+      "component": 255,
+      "name": "pannier pressure envelope/service-well-3-2/recess-service-strut-1",
+      "piece": 8,
+      "vertexStart": 2840,
+      "vertexCount": 8,
+      "faceStart": 4660,
+      "faceCount": 12
+    },
+    {
+      "component": 256,
+      "name": "pannier pressure envelope/service-well-3-2/recess-service-strut-2",
+      "piece": 8,
+      "vertexStart": 2848,
+      "vertexCount": 8,
+      "faceStart": 4672,
+      "faceCount": 12
+    },
+    {
+      "component": 257,
+      "name": "pannier pressure envelope/longitudinal-service-strut-0",
+      "piece": 8,
+      "vertexStart": 2856,
+      "vertexCount": 8,
+      "faceStart": 4684,
+      "faceCount": 12
+    },
+    {
+      "component": 258,
+      "name": "pannier pressure envelope/longitudinal-service-strut-1",
+      "piece": 8,
+      "vertexStart": 2864,
+      "vertexCount": 8,
+      "faceStart": 4696,
+      "faceCount": 12
+    },
+    {
+      "component": 259,
+      "name": "pannier connected structural support",
+      "piece": 9,
+      "vertexStart": 2872,
+      "vertexCount": 8,
+      "faceStart": 4708,
+      "faceCount": 12
+    },
+    {
+      "component": 260,
+      "name": "pannier pressure envelope",
+      "piece": 10,
+      "vertexStart": 2880,
+      "vertexCount": 120,
+      "faceStart": 4720,
+      "faceCount": 236
+    },
+    {
+      "component": 261,
+      "name": "pannier pressure envelope/service-well-0-0",
+      "piece": 10,
+      "vertexStart": 3000,
+      "vertexCount": 12,
+      "faceStart": 4956,
+      "faceCount": 20
+    },
+    {
+      "component": 262,
+      "name": "pannier pressure envelope/service-well-0-0/recess-service-strut-0",
+      "piece": 10,
+      "vertexStart": 3012,
+      "vertexCount": 8,
+      "faceStart": 4976,
+      "faceCount": 12
+    },
+    {
+      "component": 263,
+      "name": "pannier pressure envelope/service-well-0-0/recess-service-strut-1",
+      "piece": 10,
+      "vertexStart": 3020,
+      "vertexCount": 8,
+      "faceStart": 4988,
+      "faceCount": 12
+    },
+    {
+      "component": 264,
+      "name": "pannier pressure envelope/service-well-0-0/recess-service-strut-2",
+      "piece": 10,
+      "vertexStart": 3028,
+      "vertexCount": 8,
+      "faceStart": 5000,
+      "faceCount": 12
+    },
+    {
+      "component": 265,
+      "name": "pannier pressure envelope/service-well-0-1",
+      "piece": 10,
+      "vertexStart": 3036,
+      "vertexCount": 12,
+      "faceStart": 5012,
+      "faceCount": 20
+    },
+    {
+      "component": 266,
+      "name": "pannier pressure envelope/service-well-0-1/recess-service-strut-0",
+      "piece": 10,
+      "vertexStart": 3048,
+      "vertexCount": 8,
+      "faceStart": 5032,
+      "faceCount": 12
+    },
+    {
+      "component": 267,
+      "name": "pannier pressure envelope/service-well-0-1/recess-service-strut-1",
+      "piece": 10,
+      "vertexStart": 3056,
+      "vertexCount": 8,
+      "faceStart": 5044,
+      "faceCount": 12
+    },
+    {
+      "component": 268,
+      "name": "pannier pressure envelope/service-well-0-1/recess-service-strut-2",
+      "piece": 10,
+      "vertexStart": 3064,
+      "vertexCount": 8,
+      "faceStart": 5056,
+      "faceCount": 12
+    },
+    {
+      "component": 269,
+      "name": "pannier pressure envelope/service-well-0-2",
+      "piece": 10,
+      "vertexStart": 3072,
+      "vertexCount": 12,
+      "faceStart": 5068,
+      "faceCount": 20
+    },
+    {
+      "component": 270,
+      "name": "pannier pressure envelope/service-well-0-2/recess-service-strut-0",
+      "piece": 10,
+      "vertexStart": 3084,
+      "vertexCount": 8,
+      "faceStart": 5088,
+      "faceCount": 12
+    },
+    {
+      "component": 271,
+      "name": "pannier pressure envelope/service-well-0-2/recess-service-strut-1",
+      "piece": 10,
+      "vertexStart": 3092,
+      "vertexCount": 8,
+      "faceStart": 5100,
+      "faceCount": 12
+    },
+    {
+      "component": 272,
+      "name": "pannier pressure envelope/service-well-0-2/recess-service-strut-2",
+      "piece": 10,
+      "vertexStart": 3100,
+      "vertexCount": 8,
+      "faceStart": 5112,
+      "faceCount": 12
+    },
+    {
+      "component": 273,
+      "name": "pannier pressure envelope/service-well-1-0",
+      "piece": 10,
+      "vertexStart": 3108,
+      "vertexCount": 12,
+      "faceStart": 5124,
+      "faceCount": 20
+    },
+    {
+      "component": 274,
+      "name": "pannier pressure envelope/service-well-1-0/recess-service-strut-0",
+      "piece": 10,
+      "vertexStart": 3120,
+      "vertexCount": 8,
+      "faceStart": 5144,
+      "faceCount": 12
+    },
+    {
+      "component": 275,
+      "name": "pannier pressure envelope/service-well-1-0/recess-service-strut-1",
+      "piece": 10,
+      "vertexStart": 3128,
+      "vertexCount": 8,
+      "faceStart": 5156,
+      "faceCount": 12
+    },
+    {
+      "component": 276,
+      "name": "pannier pressure envelope/service-well-1-0/recess-service-strut-2",
+      "piece": 10,
+      "vertexStart": 3136,
+      "vertexCount": 8,
+      "faceStart": 5168,
+      "faceCount": 12
+    },
+    {
+      "component": 277,
+      "name": "pannier pressure envelope/service-well-1-1",
+      "piece": 10,
+      "vertexStart": 3144,
+      "vertexCount": 12,
+      "faceStart": 5180,
+      "faceCount": 20
+    },
+    {
+      "component": 278,
+      "name": "pannier pressure envelope/service-well-1-1/recess-service-strut-0",
+      "piece": 10,
+      "vertexStart": 3156,
+      "vertexCount": 8,
+      "faceStart": 5200,
+      "faceCount": 12
+    },
+    {
+      "component": 279,
+      "name": "pannier pressure envelope/service-well-1-1/recess-service-strut-1",
+      "piece": 10,
+      "vertexStart": 3164,
+      "vertexCount": 8,
+      "faceStart": 5212,
+      "faceCount": 12
+    },
+    {
+      "component": 280,
+      "name": "pannier pressure envelope/service-well-1-1/recess-service-strut-2",
+      "piece": 10,
+      "vertexStart": 3172,
+      "vertexCount": 8,
+      "faceStart": 5224,
+      "faceCount": 12
+    },
+    {
+      "component": 281,
+      "name": "pannier pressure envelope/service-well-1-2",
+      "piece": 10,
+      "vertexStart": 3180,
+      "vertexCount": 12,
+      "faceStart": 5236,
+      "faceCount": 20
+    },
+    {
+      "component": 282,
+      "name": "pannier pressure envelope/service-well-1-2/recess-service-strut-0",
+      "piece": 10,
+      "vertexStart": 3192,
+      "vertexCount": 8,
+      "faceStart": 5256,
+      "faceCount": 12
+    },
+    {
+      "component": 283,
+      "name": "pannier pressure envelope/service-well-1-2/recess-service-strut-1",
+      "piece": 10,
+      "vertexStart": 3200,
+      "vertexCount": 8,
+      "faceStart": 5268,
+      "faceCount": 12
+    },
+    {
+      "component": 284,
+      "name": "pannier pressure envelope/service-well-1-2/recess-service-strut-2",
+      "piece": 10,
+      "vertexStart": 3208,
+      "vertexCount": 8,
+      "faceStart": 5280,
+      "faceCount": 12
+    },
+    {
+      "component": 285,
+      "name": "pannier pressure envelope/service-well-2-0",
+      "piece": 10,
+      "vertexStart": 3216,
+      "vertexCount": 12,
+      "faceStart": 5292,
+      "faceCount": 20
+    },
+    {
+      "component": 286,
+      "name": "pannier pressure envelope/service-well-2-0/recess-service-strut-0",
+      "piece": 10,
+      "vertexStart": 3228,
+      "vertexCount": 8,
+      "faceStart": 5312,
+      "faceCount": 12
+    },
+    {
+      "component": 287,
+      "name": "pannier pressure envelope/service-well-2-0/recess-service-strut-1",
+      "piece": 10,
+      "vertexStart": 3236,
+      "vertexCount": 8,
+      "faceStart": 5324,
+      "faceCount": 12
+    },
+    {
+      "component": 288,
+      "name": "pannier pressure envelope/service-well-2-0/recess-service-strut-2",
+      "piece": 10,
+      "vertexStart": 3244,
+      "vertexCount": 8,
+      "faceStart": 5336,
+      "faceCount": 12
+    },
+    {
+      "component": 289,
+      "name": "pannier pressure envelope/service-well-2-1",
+      "piece": 10,
+      "vertexStart": 3252,
+      "vertexCount": 12,
+      "faceStart": 5348,
+      "faceCount": 20
+    },
+    {
+      "component": 290,
+      "name": "pannier pressure envelope/service-well-2-1/recess-service-strut-0",
+      "piece": 10,
+      "vertexStart": 3264,
+      "vertexCount": 8,
+      "faceStart": 5368,
+      "faceCount": 12
+    },
+    {
+      "component": 291,
+      "name": "pannier pressure envelope/service-well-2-1/recess-service-strut-1",
+      "piece": 10,
+      "vertexStart": 3272,
+      "vertexCount": 8,
+      "faceStart": 5380,
+      "faceCount": 12
+    },
+    {
+      "component": 292,
+      "name": "pannier pressure envelope/service-well-2-1/recess-service-strut-2",
+      "piece": 10,
+      "vertexStart": 3280,
+      "vertexCount": 8,
+      "faceStart": 5392,
+      "faceCount": 12
+    },
+    {
+      "component": 293,
+      "name": "pannier pressure envelope/service-well-2-2",
+      "piece": 10,
+      "vertexStart": 3288,
+      "vertexCount": 12,
+      "faceStart": 5404,
+      "faceCount": 20
+    },
+    {
+      "component": 294,
+      "name": "pannier pressure envelope/service-well-2-2/recess-service-strut-0",
+      "piece": 10,
+      "vertexStart": 3300,
+      "vertexCount": 8,
+      "faceStart": 5424,
+      "faceCount": 12
+    },
+    {
+      "component": 295,
+      "name": "pannier pressure envelope/service-well-2-2/recess-service-strut-1",
+      "piece": 10,
+      "vertexStart": 3308,
+      "vertexCount": 8,
+      "faceStart": 5436,
+      "faceCount": 12
+    },
+    {
+      "component": 296,
+      "name": "pannier pressure envelope/service-well-2-2/recess-service-strut-2",
+      "piece": 10,
+      "vertexStart": 3316,
+      "vertexCount": 8,
+      "faceStart": 5448,
+      "faceCount": 12
+    },
+    {
+      "component": 297,
+      "name": "pannier pressure envelope/service-well-3-0",
+      "piece": 10,
+      "vertexStart": 3324,
+      "vertexCount": 12,
+      "faceStart": 5460,
+      "faceCount": 20
+    },
+    {
+      "component": 298,
+      "name": "pannier pressure envelope/service-well-3-0/recess-service-strut-0",
+      "piece": 10,
+      "vertexStart": 3336,
+      "vertexCount": 8,
+      "faceStart": 5480,
+      "faceCount": 12
+    },
+    {
+      "component": 299,
+      "name": "pannier pressure envelope/service-well-3-0/recess-service-strut-1",
+      "piece": 10,
+      "vertexStart": 3344,
+      "vertexCount": 8,
+      "faceStart": 5492,
+      "faceCount": 12
+    },
+    {
+      "component": 300,
+      "name": "pannier pressure envelope/service-well-3-0/recess-service-strut-2",
+      "piece": 10,
+      "vertexStart": 3352,
+      "vertexCount": 8,
+      "faceStart": 5504,
+      "faceCount": 12
+    },
+    {
+      "component": 301,
+      "name": "pannier pressure envelope/service-well-3-1",
+      "piece": 10,
+      "vertexStart": 3360,
+      "vertexCount": 12,
+      "faceStart": 5516,
+      "faceCount": 20
+    },
+    {
+      "component": 302,
+      "name": "pannier pressure envelope/service-well-3-1/recess-service-strut-0",
+      "piece": 10,
+      "vertexStart": 3372,
+      "vertexCount": 8,
+      "faceStart": 5536,
+      "faceCount": 12
+    },
+    {
+      "component": 303,
+      "name": "pannier pressure envelope/service-well-3-1/recess-service-strut-1",
+      "piece": 10,
+      "vertexStart": 3380,
+      "vertexCount": 8,
+      "faceStart": 5548,
+      "faceCount": 12
+    },
+    {
+      "component": 304,
+      "name": "pannier pressure envelope/service-well-3-1/recess-service-strut-2",
+      "piece": 10,
+      "vertexStart": 3388,
+      "vertexCount": 8,
+      "faceStart": 5560,
+      "faceCount": 12
+    },
+    {
+      "component": 305,
+      "name": "pannier pressure envelope/service-well-3-2",
+      "piece": 10,
+      "vertexStart": 3396,
+      "vertexCount": 12,
+      "faceStart": 5572,
+      "faceCount": 20
+    },
+    {
+      "component": 306,
+      "name": "pannier pressure envelope/service-well-3-2/recess-service-strut-0",
+      "piece": 10,
+      "vertexStart": 3408,
+      "vertexCount": 8,
+      "faceStart": 5592,
+      "faceCount": 12
+    },
+    {
+      "component": 307,
+      "name": "pannier pressure envelope/service-well-3-2/recess-service-strut-1",
+      "piece": 10,
+      "vertexStart": 3416,
+      "vertexCount": 8,
+      "faceStart": 5604,
+      "faceCount": 12
+    },
+    {
+      "component": 308,
+      "name": "pannier pressure envelope/service-well-3-2/recess-service-strut-2",
+      "piece": 10,
+      "vertexStart": 3424,
+      "vertexCount": 8,
+      "faceStart": 5616,
+      "faceCount": 12
+    },
+    {
+      "component": 309,
+      "name": "pannier pressure envelope/longitudinal-service-strut-0",
+      "piece": 10,
+      "vertexStart": 3432,
+      "vertexCount": 8,
+      "faceStart": 5628,
+      "faceCount": 12
+    },
+    {
+      "component": 310,
+      "name": "pannier pressure envelope/longitudinal-service-strut-1",
+      "piece": 10,
+      "vertexStart": 3440,
+      "vertexCount": 8,
+      "faceStart": 5640,
+      "faceCount": 12
+    },
+    {
+      "component": 311,
+      "name": "pannier connected structural support",
+      "piece": 11,
+      "vertexStart": 3448,
+      "vertexCount": 8,
+      "faceStart": 5652,
+      "faceCount": 12
+    },
+    {
+      "component": 312,
+      "name": "pannier pressure envelope",
+      "piece": 12,
+      "vertexStart": 3456,
+      "vertexCount": 120,
+      "faceStart": 5664,
+      "faceCount": 236
+    },
+    {
+      "component": 313,
+      "name": "pannier pressure envelope/service-well-0-0",
+      "piece": 12,
+      "vertexStart": 3576,
+      "vertexCount": 12,
+      "faceStart": 5900,
+      "faceCount": 20
+    },
+    {
+      "component": 314,
+      "name": "pannier pressure envelope/service-well-0-0/recess-service-strut-0",
+      "piece": 12,
+      "vertexStart": 3588,
+      "vertexCount": 8,
+      "faceStart": 5920,
+      "faceCount": 12
+    },
+    {
+      "component": 315,
+      "name": "pannier pressure envelope/service-well-0-0/recess-service-strut-1",
+      "piece": 12,
+      "vertexStart": 3596,
+      "vertexCount": 8,
+      "faceStart": 5932,
+      "faceCount": 12
+    },
+    {
+      "component": 316,
+      "name": "pannier pressure envelope/service-well-0-0/recess-service-strut-2",
+      "piece": 12,
+      "vertexStart": 3604,
+      "vertexCount": 8,
+      "faceStart": 5944,
+      "faceCount": 12
+    },
+    {
+      "component": 317,
+      "name": "pannier pressure envelope/service-well-0-1",
+      "piece": 12,
+      "vertexStart": 3612,
+      "vertexCount": 12,
+      "faceStart": 5956,
+      "faceCount": 20
+    },
+    {
+      "component": 318,
+      "name": "pannier pressure envelope/service-well-0-1/recess-service-strut-0",
+      "piece": 12,
+      "vertexStart": 3624,
+      "vertexCount": 8,
+      "faceStart": 5976,
+      "faceCount": 12
+    },
+    {
+      "component": 319,
+      "name": "pannier pressure envelope/service-well-0-1/recess-service-strut-1",
+      "piece": 12,
+      "vertexStart": 3632,
+      "vertexCount": 8,
+      "faceStart": 5988,
+      "faceCount": 12
+    },
+    {
+      "component": 320,
+      "name": "pannier pressure envelope/service-well-0-1/recess-service-strut-2",
+      "piece": 12,
+      "vertexStart": 3640,
+      "vertexCount": 8,
+      "faceStart": 6000,
+      "faceCount": 12
+    },
+    {
+      "component": 321,
+      "name": "pannier pressure envelope/service-well-0-2",
+      "piece": 12,
+      "vertexStart": 3648,
+      "vertexCount": 12,
+      "faceStart": 6012,
+      "faceCount": 20
+    },
+    {
+      "component": 322,
+      "name": "pannier pressure envelope/service-well-0-2/recess-service-strut-0",
+      "piece": 12,
+      "vertexStart": 3660,
+      "vertexCount": 8,
+      "faceStart": 6032,
+      "faceCount": 12
+    },
+    {
+      "component": 323,
+      "name": "pannier pressure envelope/service-well-0-2/recess-service-strut-1",
+      "piece": 12,
+      "vertexStart": 3668,
+      "vertexCount": 8,
+      "faceStart": 6044,
+      "faceCount": 12
+    },
+    {
+      "component": 324,
+      "name": "pannier pressure envelope/service-well-0-2/recess-service-strut-2",
+      "piece": 12,
+      "vertexStart": 3676,
+      "vertexCount": 8,
+      "faceStart": 6056,
+      "faceCount": 12
+    },
+    {
+      "component": 325,
+      "name": "pannier pressure envelope/service-well-1-0",
+      "piece": 12,
+      "vertexStart": 3684,
+      "vertexCount": 12,
+      "faceStart": 6068,
+      "faceCount": 20
+    },
+    {
+      "component": 326,
+      "name": "pannier pressure envelope/service-well-1-0/recess-service-strut-0",
+      "piece": 12,
+      "vertexStart": 3696,
+      "vertexCount": 8,
+      "faceStart": 6088,
+      "faceCount": 12
+    },
+    {
+      "component": 327,
+      "name": "pannier pressure envelope/service-well-1-0/recess-service-strut-1",
+      "piece": 12,
+      "vertexStart": 3704,
+      "vertexCount": 8,
+      "faceStart": 6100,
+      "faceCount": 12
+    },
+    {
+      "component": 328,
+      "name": "pannier pressure envelope/service-well-1-0/recess-service-strut-2",
+      "piece": 12,
+      "vertexStart": 3712,
+      "vertexCount": 8,
+      "faceStart": 6112,
+      "faceCount": 12
+    },
+    {
+      "component": 329,
+      "name": "pannier pressure envelope/service-well-1-1",
+      "piece": 12,
+      "vertexStart": 3720,
+      "vertexCount": 12,
+      "faceStart": 6124,
+      "faceCount": 20
+    },
+    {
+      "component": 330,
+      "name": "pannier pressure envelope/service-well-1-1/recess-service-strut-0",
+      "piece": 12,
+      "vertexStart": 3732,
+      "vertexCount": 8,
+      "faceStart": 6144,
+      "faceCount": 12
+    },
+    {
+      "component": 331,
+      "name": "pannier pressure envelope/service-well-1-1/recess-service-strut-1",
+      "piece": 12,
+      "vertexStart": 3740,
+      "vertexCount": 8,
+      "faceStart": 6156,
+      "faceCount": 12
+    },
+    {
+      "component": 332,
+      "name": "pannier pressure envelope/service-well-1-1/recess-service-strut-2",
+      "piece": 12,
+      "vertexStart": 3748,
+      "vertexCount": 8,
+      "faceStart": 6168,
+      "faceCount": 12
+    },
+    {
+      "component": 333,
+      "name": "pannier pressure envelope/service-well-1-2",
+      "piece": 12,
+      "vertexStart": 3756,
+      "vertexCount": 12,
+      "faceStart": 6180,
+      "faceCount": 20
+    },
+    {
+      "component": 334,
+      "name": "pannier pressure envelope/service-well-1-2/recess-service-strut-0",
+      "piece": 12,
+      "vertexStart": 3768,
+      "vertexCount": 8,
+      "faceStart": 6200,
+      "faceCount": 12
+    },
+    {
+      "component": 335,
+      "name": "pannier pressure envelope/service-well-1-2/recess-service-strut-1",
+      "piece": 12,
+      "vertexStart": 3776,
+      "vertexCount": 8,
+      "faceStart": 6212,
+      "faceCount": 12
+    },
+    {
+      "component": 336,
+      "name": "pannier pressure envelope/service-well-1-2/recess-service-strut-2",
+      "piece": 12,
+      "vertexStart": 3784,
+      "vertexCount": 8,
+      "faceStart": 6224,
+      "faceCount": 12
+    },
+    {
+      "component": 337,
+      "name": "pannier pressure envelope/service-well-2-0",
+      "piece": 12,
+      "vertexStart": 3792,
+      "vertexCount": 12,
+      "faceStart": 6236,
+      "faceCount": 20
+    },
+    {
+      "component": 338,
+      "name": "pannier pressure envelope/service-well-2-0/recess-service-strut-0",
+      "piece": 12,
+      "vertexStart": 3804,
+      "vertexCount": 8,
+      "faceStart": 6256,
+      "faceCount": 12
+    },
+    {
+      "component": 339,
+      "name": "pannier pressure envelope/service-well-2-0/recess-service-strut-1",
+      "piece": 12,
+      "vertexStart": 3812,
+      "vertexCount": 8,
+      "faceStart": 6268,
+      "faceCount": 12
+    },
+    {
+      "component": 340,
+      "name": "pannier pressure envelope/service-well-2-0/recess-service-strut-2",
+      "piece": 12,
+      "vertexStart": 3820,
+      "vertexCount": 8,
+      "faceStart": 6280,
+      "faceCount": 12
+    },
+    {
+      "component": 341,
+      "name": "pannier pressure envelope/service-well-2-1",
+      "piece": 12,
+      "vertexStart": 3828,
+      "vertexCount": 12,
+      "faceStart": 6292,
+      "faceCount": 20
+    },
+    {
+      "component": 342,
+      "name": "pannier pressure envelope/service-well-2-1/recess-service-strut-0",
+      "piece": 12,
+      "vertexStart": 3840,
+      "vertexCount": 8,
+      "faceStart": 6312,
+      "faceCount": 12
+    },
+    {
+      "component": 343,
+      "name": "pannier pressure envelope/service-well-2-1/recess-service-strut-1",
+      "piece": 12,
+      "vertexStart": 3848,
+      "vertexCount": 8,
+      "faceStart": 6324,
+      "faceCount": 12
+    },
+    {
+      "component": 344,
+      "name": "pannier pressure envelope/service-well-2-1/recess-service-strut-2",
+      "piece": 12,
+      "vertexStart": 3856,
+      "vertexCount": 8,
+      "faceStart": 6336,
+      "faceCount": 12
+    },
+    {
+      "component": 345,
+      "name": "pannier pressure envelope/service-well-2-2",
+      "piece": 12,
+      "vertexStart": 3864,
+      "vertexCount": 12,
+      "faceStart": 6348,
+      "faceCount": 20
+    },
+    {
+      "component": 346,
+      "name": "pannier pressure envelope/service-well-2-2/recess-service-strut-0",
+      "piece": 12,
+      "vertexStart": 3876,
+      "vertexCount": 8,
+      "faceStart": 6368,
+      "faceCount": 12
+    },
+    {
+      "component": 347,
+      "name": "pannier pressure envelope/service-well-2-2/recess-service-strut-1",
+      "piece": 12,
+      "vertexStart": 3884,
+      "vertexCount": 8,
+      "faceStart": 6380,
+      "faceCount": 12
+    },
+    {
+      "component": 348,
+      "name": "pannier pressure envelope/service-well-2-2/recess-service-strut-2",
+      "piece": 12,
+      "vertexStart": 3892,
+      "vertexCount": 8,
+      "faceStart": 6392,
+      "faceCount": 12
+    },
+    {
+      "component": 349,
+      "name": "pannier pressure envelope/service-well-3-0",
+      "piece": 12,
+      "vertexStart": 3900,
+      "vertexCount": 12,
+      "faceStart": 6404,
+      "faceCount": 20
+    },
+    {
+      "component": 350,
+      "name": "pannier pressure envelope/service-well-3-0/recess-service-strut-0",
+      "piece": 12,
+      "vertexStart": 3912,
+      "vertexCount": 8,
+      "faceStart": 6424,
+      "faceCount": 12
+    },
+    {
+      "component": 351,
+      "name": "pannier pressure envelope/service-well-3-0/recess-service-strut-1",
+      "piece": 12,
+      "vertexStart": 3920,
+      "vertexCount": 8,
+      "faceStart": 6436,
+      "faceCount": 12
+    },
+    {
+      "component": 352,
+      "name": "pannier pressure envelope/service-well-3-0/recess-service-strut-2",
+      "piece": 12,
+      "vertexStart": 3928,
+      "vertexCount": 8,
+      "faceStart": 6448,
+      "faceCount": 12
+    },
+    {
+      "component": 353,
+      "name": "pannier pressure envelope/service-well-3-1",
+      "piece": 12,
+      "vertexStart": 3936,
+      "vertexCount": 12,
+      "faceStart": 6460,
+      "faceCount": 20
+    },
+    {
+      "component": 354,
+      "name": "pannier pressure envelope/service-well-3-1/recess-service-strut-0",
+      "piece": 12,
+      "vertexStart": 3948,
+      "vertexCount": 8,
+      "faceStart": 6480,
+      "faceCount": 12
+    },
+    {
+      "component": 355,
+      "name": "pannier pressure envelope/service-well-3-1/recess-service-strut-1",
+      "piece": 12,
+      "vertexStart": 3956,
+      "vertexCount": 8,
+      "faceStart": 6492,
+      "faceCount": 12
+    },
+    {
+      "component": 356,
+      "name": "pannier pressure envelope/service-well-3-1/recess-service-strut-2",
+      "piece": 12,
+      "vertexStart": 3964,
+      "vertexCount": 8,
+      "faceStart": 6504,
+      "faceCount": 12
+    },
+    {
+      "component": 357,
+      "name": "pannier pressure envelope/service-well-3-2",
+      "piece": 12,
+      "vertexStart": 3972,
+      "vertexCount": 12,
+      "faceStart": 6516,
+      "faceCount": 20
+    },
+    {
+      "component": 358,
+      "name": "pannier pressure envelope/service-well-3-2/recess-service-strut-0",
+      "piece": 12,
+      "vertexStart": 3984,
+      "vertexCount": 8,
+      "faceStart": 6536,
+      "faceCount": 12
+    },
+    {
+      "component": 359,
+      "name": "pannier pressure envelope/service-well-3-2/recess-service-strut-1",
+      "piece": 12,
+      "vertexStart": 3992,
+      "vertexCount": 8,
+      "faceStart": 6548,
+      "faceCount": 12
+    },
+    {
+      "component": 360,
+      "name": "pannier pressure envelope/service-well-3-2/recess-service-strut-2",
+      "piece": 12,
+      "vertexStart": 4000,
+      "vertexCount": 8,
+      "faceStart": 6560,
+      "faceCount": 12
+    },
+    {
+      "component": 361,
+      "name": "pannier pressure envelope/longitudinal-service-strut-0",
+      "piece": 12,
+      "vertexStart": 4008,
+      "vertexCount": 8,
+      "faceStart": 6572,
+      "faceCount": 12
+    },
+    {
+      "component": 362,
+      "name": "pannier pressure envelope/longitudinal-service-strut-1",
+      "piece": 12,
+      "vertexStart": 4016,
+      "vertexCount": 8,
+      "faceStart": 6584,
+      "faceCount": 12
+    },
+    {
+      "component": 363,
+      "name": "cockpit glazing envelope",
+      "piece": 13,
+      "vertexStart": 4024,
+      "vertexCount": 120,
+      "faceStart": 6596,
+      "faceCount": 236
+    },
+    {
+      "component": 364,
+      "name": "cockpit connected structural crossmember",
+      "piece": 13,
+      "vertexStart": 4144,
+      "vertexCount": 8,
+      "faceStart": 6832,
+      "faceCount": 12
+    },
+    {
+      "component": 365,
+      "name": "engine_pair/negative side/connected support",
+      "piece": 14,
+      "vertexStart": 4152,
+      "vertexCount": 8,
+      "faceStart": 6844,
+      "faceCount": 12
+    },
+    {
+      "component": 366,
+      "name": "engine_pair/negative side/propulsion casing",
+      "piece": 14,
+      "vertexStart": 4160,
+      "vertexCount": 48,
+      "faceStart": 6856,
+      "faceCount": 92
+    },
+    {
+      "component": 367,
+      "name": "engine_pair/negative side/propulsion luminous recess",
+      "piece": 14,
+      "vertexStart": 4208,
+      "vertexCount": 48,
+      "faceStart": 6948,
+      "faceCount": 92
+    },
+    {
+      "component": 368,
+      "name": "engine_pair/positive side/connected support",
+      "piece": 15,
+      "vertexStart": 4256,
+      "vertexCount": 8,
+      "faceStart": 7040,
+      "faceCount": 12
+    },
+    {
+      "component": 369,
+      "name": "engine_pair/positive side/propulsion casing",
+      "piece": 15,
+      "vertexStart": 4264,
+      "vertexCount": 48,
+      "faceStart": 7052,
+      "faceCount": 92
+    },
+    {
+      "component": 370,
+      "name": "engine_pair/positive side/propulsion luminous recess",
+      "piece": 15,
+      "vertexStart": 4312,
+      "vertexCount": 48,
+      "faceStart": 7144,
+      "faceCount": 92
+    }
+  ],
+  "nativeDesign": [
+    {
+      "component": 0,
+      "name": "body primary pressure envelope",
+      "piece": 0,
+      "vertexStart": 0,
+      "vertexCount": 60,
+      "faceStart": 0,
+      "faceCount": 116
+    },
+    {
+      "component": 1,
+      "name": "body primary pressure envelope/service-well-0-0",
+      "piece": 28,
+      "vertexStart": 60,
+      "vertexCount": 12,
+      "faceStart": 116,
+      "faceCount": 20
+    },
+    {
+      "component": 2,
+      "name": "body primary pressure envelope/service-well-1-0",
+      "piece": 29,
+      "vertexStart": 72,
+      "vertexCount": 12,
+      "faceStart": 136,
+      "faceCount": 20
+    },
+    {
+      "component": 3,
+      "name": "body primary pressure envelope/service-well-2-0",
+      "piece": 30,
+      "vertexStart": 84,
+      "vertexCount": 12,
+      "faceStart": 156,
+      "faceCount": 20
+    },
+    {
+      "component": 4,
+      "name": "body primary pressure envelope/service-well-3-0",
+      "piece": 31,
+      "vertexStart": 96,
+      "vertexCount": 12,
+      "faceStart": 176,
+      "faceCount": 20
+    },
+    {
+      "component": 5,
+      "name": "pannier connected structural support",
+      "piece": 1,
+      "vertexStart": 108,
+      "vertexCount": 8,
+      "faceStart": 196,
+      "faceCount": 12
+    },
+    {
+      "component": 6,
+      "name": "pannier pressure envelope",
+      "piece": 2,
+      "vertexStart": 116,
+      "vertexCount": 60,
+      "faceStart": 208,
+      "faceCount": 116
+    },
+    {
+      "component": 7,
+      "name": "pannier pressure envelope/service-well-0-0",
+      "piece": 2,
+      "vertexStart": 176,
+      "vertexCount": 12,
+      "faceStart": 324,
+      "faceCount": 20
+    },
+    {
+      "component": 8,
+      "name": "pannier pressure envelope/service-well-1-0",
+      "piece": 2,
+      "vertexStart": 188,
+      "vertexCount": 12,
+      "faceStart": 344,
+      "faceCount": 20
+    },
+    {
+      "component": 9,
+      "name": "pannier pressure envelope/service-well-2-0",
+      "piece": 2,
+      "vertexStart": 200,
+      "vertexCount": 12,
+      "faceStart": 364,
+      "faceCount": 20
+    },
+    {
+      "component": 10,
+      "name": "pannier pressure envelope/service-well-3-0",
+      "piece": 2,
+      "vertexStart": 212,
+      "vertexCount": 12,
+      "faceStart": 384,
+      "faceCount": 20
+    },
+    {
+      "component": 11,
+      "name": "pannier connected structural support",
+      "piece": 3,
+      "vertexStart": 224,
+      "vertexCount": 8,
+      "faceStart": 404,
+      "faceCount": 12
+    },
+    {
+      "component": 12,
+      "name": "pannier pressure envelope",
+      "piece": 4,
+      "vertexStart": 232,
+      "vertexCount": 60,
+      "faceStart": 416,
+      "faceCount": 116
+    },
+    {
+      "component": 13,
+      "name": "pannier pressure envelope/service-well-0-0",
+      "piece": 4,
+      "vertexStart": 292,
+      "vertexCount": 12,
+      "faceStart": 532,
+      "faceCount": 20
+    },
+    {
+      "component": 14,
+      "name": "pannier pressure envelope/service-well-1-0",
+      "piece": 4,
+      "vertexStart": 304,
+      "vertexCount": 12,
+      "faceStart": 552,
+      "faceCount": 20
+    },
+    {
+      "component": 15,
+      "name": "pannier pressure envelope/service-well-2-0",
+      "piece": 4,
+      "vertexStart": 316,
+      "vertexCount": 12,
+      "faceStart": 572,
+      "faceCount": 20
+    },
+    {
+      "component": 16,
+      "name": "pannier pressure envelope/service-well-3-0",
+      "piece": 4,
+      "vertexStart": 328,
+      "vertexCount": 12,
+      "faceStart": 592,
+      "faceCount": 20
+    },
+    {
+      "component": 17,
+      "name": "pannier connected structural support",
+      "piece": 5,
+      "vertexStart": 340,
+      "vertexCount": 8,
+      "faceStart": 612,
+      "faceCount": 12
+    },
+    {
+      "component": 18,
+      "name": "pannier pressure envelope",
+      "piece": 6,
+      "vertexStart": 348,
+      "vertexCount": 60,
+      "faceStart": 624,
+      "faceCount": 116
+    },
+    {
+      "component": 19,
+      "name": "pannier pressure envelope/service-well-0-0",
+      "piece": 6,
+      "vertexStart": 408,
+      "vertexCount": 12,
+      "faceStart": 740,
+      "faceCount": 20
+    },
+    {
+      "component": 20,
+      "name": "pannier pressure envelope/service-well-1-0",
+      "piece": 6,
+      "vertexStart": 420,
+      "vertexCount": 12,
+      "faceStart": 760,
+      "faceCount": 20
+    },
+    {
+      "component": 21,
+      "name": "pannier pressure envelope/service-well-2-0",
+      "piece": 6,
+      "vertexStart": 432,
+      "vertexCount": 12,
+      "faceStart": 780,
+      "faceCount": 20
+    },
+    {
+      "component": 22,
+      "name": "pannier pressure envelope/service-well-3-0",
+      "piece": 6,
+      "vertexStart": 444,
+      "vertexCount": 12,
+      "faceStart": 800,
+      "faceCount": 20
+    },
+    {
+      "component": 23,
+      "name": "pannier connected structural support",
+      "piece": 7,
+      "vertexStart": 456,
+      "vertexCount": 8,
+      "faceStart": 820,
+      "faceCount": 12
+    },
+    {
+      "component": 24,
+      "name": "pannier pressure envelope",
+      "piece": 8,
+      "vertexStart": 464,
+      "vertexCount": 60,
+      "faceStart": 832,
+      "faceCount": 116
+    },
+    {
+      "component": 25,
+      "name": "pannier pressure envelope/service-well-0-0",
+      "piece": 8,
+      "vertexStart": 524,
+      "vertexCount": 12,
+      "faceStart": 948,
+      "faceCount": 20
+    },
+    {
+      "component": 26,
+      "name": "pannier pressure envelope/service-well-1-0",
+      "piece": 8,
+      "vertexStart": 536,
+      "vertexCount": 12,
+      "faceStart": 968,
+      "faceCount": 20
+    },
+    {
+      "component": 27,
+      "name": "pannier pressure envelope/service-well-2-0",
+      "piece": 8,
+      "vertexStart": 548,
+      "vertexCount": 12,
+      "faceStart": 988,
+      "faceCount": 20
+    },
+    {
+      "component": 28,
+      "name": "pannier pressure envelope/service-well-3-0",
+      "piece": 8,
+      "vertexStart": 560,
+      "vertexCount": 12,
+      "faceStart": 1008,
+      "faceCount": 20
+    },
+    {
+      "component": 29,
+      "name": "pannier connected structural support",
+      "piece": 9,
+      "vertexStart": 572,
+      "vertexCount": 8,
+      "faceStart": 1028,
+      "faceCount": 12
+    },
+    {
+      "component": 30,
+      "name": "pannier pressure envelope",
+      "piece": 10,
+      "vertexStart": 580,
+      "vertexCount": 60,
+      "faceStart": 1040,
+      "faceCount": 116
+    },
+    {
+      "component": 31,
+      "name": "pannier pressure envelope/service-well-0-0",
+      "piece": 10,
+      "vertexStart": 640,
+      "vertexCount": 12,
+      "faceStart": 1156,
+      "faceCount": 20
+    },
+    {
+      "component": 32,
+      "name": "pannier pressure envelope/service-well-1-0",
+      "piece": 10,
+      "vertexStart": 652,
+      "vertexCount": 12,
+      "faceStart": 1176,
+      "faceCount": 20
+    },
+    {
+      "component": 33,
+      "name": "pannier pressure envelope/service-well-2-0",
+      "piece": 10,
+      "vertexStart": 664,
+      "vertexCount": 12,
+      "faceStart": 1196,
+      "faceCount": 20
+    },
+    {
+      "component": 34,
+      "name": "pannier pressure envelope/service-well-3-0",
+      "piece": 10,
+      "vertexStart": 676,
+      "vertexCount": 12,
+      "faceStart": 1216,
+      "faceCount": 20
+    },
+    {
+      "component": 35,
+      "name": "pannier connected structural support",
+      "piece": 11,
+      "vertexStart": 688,
+      "vertexCount": 8,
+      "faceStart": 1236,
+      "faceCount": 12
+    },
+    {
+      "component": 36,
+      "name": "pannier pressure envelope",
+      "piece": 12,
+      "vertexStart": 696,
+      "vertexCount": 60,
+      "faceStart": 1248,
+      "faceCount": 116
+    },
+    {
+      "component": 37,
+      "name": "pannier pressure envelope/service-well-0-0",
+      "piece": 12,
+      "vertexStart": 756,
+      "vertexCount": 12,
+      "faceStart": 1364,
+      "faceCount": 20
+    },
+    {
+      "component": 38,
+      "name": "pannier pressure envelope/service-well-1-0",
+      "piece": 12,
+      "vertexStart": 768,
+      "vertexCount": 12,
+      "faceStart": 1384,
+      "faceCount": 20
+    },
+    {
+      "component": 39,
+      "name": "pannier pressure envelope/service-well-2-0",
+      "piece": 12,
+      "vertexStart": 780,
+      "vertexCount": 12,
+      "faceStart": 1404,
+      "faceCount": 20
+    },
+    {
+      "component": 40,
+      "name": "pannier pressure envelope/service-well-3-0",
+      "piece": 12,
+      "vertexStart": 792,
+      "vertexCount": 12,
+      "faceStart": 1424,
+      "faceCount": 20
+    },
+    {
+      "component": 41,
+      "name": "cockpit glazing envelope",
+      "piece": 13,
+      "vertexStart": 804,
+      "vertexCount": 60,
+      "faceStart": 1444,
+      "faceCount": 116
+    },
+    {
+      "component": 42,
+      "name": "cockpit connected structural crossmember",
+      "piece": 13,
+      "vertexStart": 864,
+      "vertexCount": 8,
+      "faceStart": 1560,
+      "faceCount": 12
+    },
+    {
+      "component": 43,
+      "name": "engine_pair/negative side/connected support",
+      "piece": 14,
+      "vertexStart": 872,
+      "vertexCount": 8,
+      "faceStart": 1572,
+      "faceCount": 12
+    },
+    {
+      "component": 44,
+      "name": "engine_pair/negative side/propulsion casing",
+      "piece": 14,
+      "vertexStart": 880,
+      "vertexCount": 24,
+      "faceStart": 1584,
+      "faceCount": 44
+    },
+    {
+      "component": 45,
+      "name": "engine_pair/negative side/propulsion luminous recess",
+      "piece": 14,
+      "vertexStart": 904,
+      "vertexCount": 24,
+      "faceStart": 1628,
+      "faceCount": 44
+    },
+    {
+      "component": 46,
+      "name": "engine_pair/positive side/connected support",
+      "piece": 15,
+      "vertexStart": 928,
+      "vertexCount": 8,
+      "faceStart": 1672,
+      "faceCount": 12
+    },
+    {
+      "component": 47,
+      "name": "engine_pair/positive side/propulsion casing",
+      "piece": 15,
+      "vertexStart": 936,
+      "vertexCount": 24,
+      "faceStart": 1684,
+      "faceCount": 44
+    },
+    {
+      "component": 48,
+      "name": "engine_pair/positive side/propulsion luminous recess",
+      "piece": 15,
+      "vertexStart": 960,
+      "vertexCount": 24,
+      "faceStart": 1728,
+      "faceCount": 44
+    }
+  ]
+}

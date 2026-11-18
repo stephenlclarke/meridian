@@ -1,5 +1,9 @@
 # Implementation and validation status
 
+## Internal Mule docking validation
+
+Two controlled docking modes run the original SH001 Mule against the original SH028 station. On development revision `4288969`, the MacBook Pro showed an aligned crossing at tick 104 and stopped the obstructed approach at the front lip at tick 11. The 95th-percentile simulation step was 1.57–2.17 ms across five release-mode cases. The isolated integration onto `792f448` awaits its own qualification. Mule is available only in the internal validation scene. [Controls and test scope](MULE-VALIDATION-LAUNCH.md)
+
 The first section records the current delivered release. Earlier source-specific sections retain their original observations and limits; their historical pending states do not override the current checkpoint.
 
 ## Current importer main and method-reference correction

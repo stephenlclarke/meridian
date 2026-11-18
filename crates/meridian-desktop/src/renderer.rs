@@ -11,6 +11,10 @@ use winit::{dpi::PhysicalSize, event_loop::OwnedDisplayHandle, window::Window};
 use crate::mesh::{self, Vertex};
 use crate::{asteroid_render, hud};
 
+pub(crate) fn flight_projection(width: u32, height: u32) -> [f32; 4] {
+    [width as f32 / height as f32, 1.6, 1.0, 20000.0]
+}
+
 pub struct StationScene<'a> {
     pub pose: StationPose,
     pub port: &'a DockingPort,
@@ -24,6 +28,7 @@ pub struct HudScene<'a> {
 }
 
 pub struct SceneEffects<'a> {
+    pub mule: Option<crate::mule_render::Scene<'a>>,
     pub traffic: Option<&'a meridian_core::traffic::TrafficSnapshot>,
     pub pulse: Option<&'a PulseShot>,
     pub mining: Option<asteroid_render::Scene<'a>>,
@@ -43,6 +48,7 @@ pub enum Presentation {
 pub struct Renderer {
     flight_view: FlightView,
     celestial: crate::celestial::Pass,
+    mule: Option<crate::mule_render::Pass>,
     docked: crate::docked_render::Pass,
     surface: wgpu::Surface<'static>,
     pub window: Arc<Window>,
@@ -187,12 +193,7 @@ impl Renderer {
         });
         let projection = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Projection"),
-            contents: bytemuck::cast_slice(&[
-                config.width as f32 / config.height as f32,
-                1.6,
-                1.0,
-                20000.0,
-            ]),
+            contents: bytemuck::cast_slice(&flight_projection(config.width, config.height)),
             usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
         });
         let projection_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
@@ -227,6 +228,7 @@ impl Renderer {
             window,
             flight_view: FlightView::Front,
             celestial,
+            mule: None,
             docked,
             instance,
             device,
@@ -291,7 +293,7 @@ impl Renderer {
         self.queue.write_buffer(
             &self.projection,
             0,
-            bytemuck::cast_slice(&[size.width as f32 / size.height as f32, 1.6, 1.0, 20000.0]),
+            bytemuck::cast_slice(&flight_projection(size.width, size.height)),
         );
     }
 
@@ -414,6 +416,7 @@ impl Renderer {
         } = hud;
 
         let SceneEffects {
+            mule,
             traffic,
             pulse,
             mining,
@@ -507,7 +510,37 @@ impl Renderer {
                 port: scene.port,
                 docked: scene.docked,
             });
-            mesh::frame_vertices(snapshot, &self.ship, station, &mut self.frame)?;
+            if let (Some(scene), Some(_)) = (mule, station) {
+                let camera = scene.observer;
+                if self.mule.is_none() {
+                    self.mule = Some(crate::mule_render::Pass::new(
+                        &self.device,
+                        &self.queue,
+                        self.config.format,
+                        scene,
+                    )?);
+                }
+                if let Some(pass) = &mut self.mule {
+                    pass.prepare(
+                        &self.queue,
+                        Some(scene),
+                        crate::mule_render::View {
+                            camera,
+                            flight: self.flight_view,
+                            projection: flight_projection(self.config.width, self.config.height),
+                            tick: snapshot.tick,
+                        },
+                    )?;
+                }
+            } else if let Some(pass) = &mut self.mule {
+                pass.hide();
+            }
+            if let (Some(scene), Some(station)) = (mule, station) {
+                mesh::station_from_observer(station, scene.observer, &mut self.frame)?;
+            } else {
+                mesh::frame_vertices(snapshot, &self.ship, station, &mut self.frame)?;
+            }
+            let additional_start = self.frame.len();
             if let (Some(station), Some(beacons)) = (station, practice) {
                 mesh::append_practice_beacons(snapshot, station, beacons, &mut self.frame)?;
             }
@@ -526,6 +559,13 @@ impl Renderer {
             if let (Some(station), Some(mining)) = (station, mining) {
                 let sun = celestial.and_then(|scene| scene.sun.map(|sun| sun.position));
                 mining.append(snapshot, station, sun, &mut self.frame)?;
+            }
+            if let (Some(scene), Some(station)) = (mule, station) {
+                mesh::reframe_observer(
+                    &mut self.frame[additional_start..],
+                    mesh::scene_camera_pose(snapshot, station)?,
+                    scene.observer,
+                )?;
             }
             mesh::apply_flight_view(self.flight_view, &mut self.frame);
             if self.frame.len() > self.vertex_capacity {
@@ -581,7 +621,13 @@ impl Renderer {
                 pass.set_bind_group(0, &self.projection_group, &[]);
                 pass.set_vertex_buffer(0, self.vertices.slice(..));
                 pass.draw(0..self.frame.len() as u32, 0..1);
+                if let Some(mule) = &self.mule {
+                    mule.draw_solid(&mut pass);
+                }
                 self.celestial.draw_halos(&mut pass);
+                if let Some(mule) = &self.mule {
+                    mule.draw_shimmer(&mut pass);
+                }
             }
         }
         self.draw_overlay(&mut encoder, &view, docked, help);

@@ -1,5 +1,9 @@
 # Meridian
 
+## Internal Mule docking validation
+
+Two controlled docking modes run the original SH001 Mule against the original SH028 station. On development revision `4288969`, the MacBook Pro showed an aligned crossing at tick 104 and stopped the obstructed approach at the front lip at tick 11. The 95th-percentile simulation step was 1.57–2.17 ms across five release-mode cases. The isolated integration onto `792f448` awaits its own qualification. Mule is available only in the internal validation scene. [Controls and test scope](docs/MULE-VALIDATION-LAUNCH.md)
+
 [![CI](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/stephenlclarke/meridian/actions/workflows/ci.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=alert_status)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stephenlclarke_Meridian&metric=coverage)](https://sonarcloud.io/dashboard?id=stephenlclarke_Meridian)
