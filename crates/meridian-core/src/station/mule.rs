@@ -333,6 +333,17 @@ impl OriginalStationData {
         )
     }
 
+    /// Qualifies explicit SH035 motion against the original SH028 source triangles.
+    pub fn stag_liner_motion_clear(
+        &self,
+        source: &crate::stag_liner::StagLinerHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces(), start, end, angular_travel)
+    }
+
     pub(crate) fn goshawk_custom_observer_clear(
         &self,
         source: &crate::goshawk_custom::GoshawkCustomHullSource,

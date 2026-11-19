@@ -1,0 +1,253 @@
+{
+  "clearanceMillimetres": {
+    "left-under-diagonal-bridge": 1440,
+    "left-inboard-tower-shoulder": 834,
+    "left-outboard-tower-shoulder": 748,
+    "right-under-diagonal-bridge": 1440,
+    "right-inboard-tower-shoulder": 834,
+    "right-outboard-tower-shoulder": 748,
+    "centre-tower-aisle": 918
+  },
+  "alignedMillimetres": 33278,
+  "offsetStartMillimetres": 979,
+  "sourceLipWitness": {
+    "fraction": 0.5,
+    "pointMetres": [
+      69.4,
+      -2.0,
+      136.32
+    ],
+    "barycentrics": [
+      0.359999999999994,
+      0.16066798941799543,
+      0.4793320105820106
+    ]
+  },
+  "sourceSolidContactsMetres": [
+    [
+      3.52,
+      -2.0,
+      -33.0
+    ],
+    [
+      -6.9697088,
+      8.0012862,
+      14.5133913
+    ],
+    [
+      9.0714753,
+      8.0012862,
+      13.5792728
+    ]
+  ],
+  "originalJoints": [
+    {
+      "name": "main-hull-to-gallery",
+      "pointMetres": [
+        0.13,
+        4.14,
+        -15.77
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "gallery-to-pilot-glazing",
+      "pointMetres": [
+        0.13,
+        7.27,
+        -4.31
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "left-tower-to-window",
+      "pointMetres": [
+        -8.07,
+        13.07,
+        19.89
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "left-bridge-to-tower",
+      "pointMetres": [
+        -7.87,
+        8.03,
+        11.17
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "left-gallery-to-bridge",
+      "pointMetres": [
+        -1.13,
+        7.68,
+        -2.83
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "right-tower-to-window",
+      "pointMetres": [
+        8.07,
+        13.07,
+        19.89
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "right-bridge-to-tower",
+      "pointMetres": [
+        7.87,
+        8.03,
+        11.17
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "right-gallery-to-bridge",
+      "pointMetres": [
+        1.13,
+        7.68,
+        -2.83
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ]
+}
