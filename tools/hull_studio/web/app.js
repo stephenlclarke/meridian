@@ -1,4 +1,4 @@
-import { autoGroups, canExport, editableDefinition, groupIds, inputNumber, isRecord, isVector, mergeGroups, updatedParameter } from './geometry.js';
+import { autoGroups, canExport, editableDefinition, groupIds, inputNumber, isRecord, isVector, mergeGroups, resolvedGroupDefinition, updatedParameter } from './geometry.js';
 import { HullViewer } from './viewer.js';
 
 const $ = id => document.getElementById(id);
@@ -61,8 +61,13 @@ function editParameter(field, value) {
   render(false);
 }
 
-function renderGroups(definition) {
-  const ids = groupIds(definition);
+function editableGroups(definition, build = currentBuild()) {
+  return canExport(definition, build, state.revision) ? resolvedGroupDefinition(definition, build.package) : definition;
+}
+
+function renderGroups(definition, build) {
+  const authored = groupIds(definition);
+  const ids = groupIds(editableGroups(definition, build));
   const previous = [$('group-source').value, $('group-target').value];
   for (const [index, key] of ['group-source', 'group-target'].entries()) {
     const select = $(key);
@@ -71,7 +76,8 @@ function renderGroups(definition) {
     if (ids?.includes(Number(previous[index])) && previous[index] !== '') select.value = previous[index];
     else if (ids?.length > index) select.value = String(ids[index]);
   }
-  text('group-summary', !definition ? 'No groups loaded.' : ids === null ? 'Auto / unset · build to assign components' : `${ids.length} authored ${ids.length === 1 ? 'group' : 'groups'} across both meshes`);
+  const count = ids === null ? 'Auto / unset · build to assign components' : `${ids.length} ${authored === null ? 'resolved' : 'authored'} ${ids.length === 1 ? 'group' : 'groups'} across both meshes`;
+  text('group-summary', !definition ? 'No groups loaded.' : authored === null && ids !== null ? `${count} · merge to adopt` : count);
   $('auto-groups').disabled = !definition || !['detail', 'native'].some(key => Object.hasOwn(definition[key] ?? {}, 'groups'));
   $('undo-groups').disabled = !groupHistory.length;
   updateMergeButton();
@@ -224,7 +230,7 @@ function render(syncFields = true) {
   text('material-summary', Array.isArray(definition?.materials) ? numberText(definition.materials.length) : '—');
   text('clearance-summary', Array.isArray(definition?.clearances) ? numberText(definition.clearances.length) : '—');
   renderMaterials(definition);
-  renderGroups(definition);
+  renderGroups(definition, build);
   $('save-button').disabled = !definition;
   $('build-button').disabled = !definition || Boolean(state.job);
   $('export-button').disabled = !canExport(definition, build, state.revision) || Boolean(state.job);
@@ -434,7 +440,11 @@ $('export-button').addEventListener('click', exportPackage);
 $('showroom-button').addEventListener('click', openShowroom);
 $('quit-button').addEventListener('click', quitStudio);
 for (const key of ['group-source', 'group-target']) $(key).addEventListener('change', updateMergeButton);
-$('merge-groups').addEventListener('click', () => changeGroups(mergeGroups(state.definition, Number($('group-source').value), Number($('group-target').value)), 'Groups merged · build required'));
+$('merge-groups').addEventListener('click', () => {
+  const resolved = editableGroups(state.definition);
+  const merged = mergeGroups(resolved, Number($('group-source').value), Number($('group-target').value));
+  if (merged !== resolved) changeGroups(merged, 'Groups merged · build required');
+});
 $('auto-groups').addEventListener('click', () => changeGroups(autoGroups(state.definition), 'Auto-grouping selected · build required'));
 $('undo-groups').addEventListener('click', () => { if (groupHistory.length) changeGroups(groupHistory.pop(), 'Group edit undone · build required', true); });
 $('load-example').addEventListener('click', () => loadExample());

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { autoGroups, canExport, editableDefinition, fitScene, groupIds, inputNumber, mergeGroups, meshGeometry, rotatePoint, sceneFor, updatedParameter } from './geometry.js';
+import { autoGroups, canExport, editableDefinition, fitScene, groupIds, inputNumber, mergeGroups, meshGeometry, resolvedGroupDefinition, rotatePoint, sceneFor, updatedParameter } from './geometry.js';
 
 const definition = {
   schema: 1, id: 'example', name: 'Example hull', metresPerUnit: 2, roundingMetres: 0.01,
@@ -98,4 +98,27 @@ test('intentional group merge uses shared IDs across both meshes and leaves sour
   assert.equal(Object.hasOwn(automatic.detail, 'groups'), false);
   assert.equal(Object.hasOwn(automatic.native, 'groups'), false);
   assert.equal(automatic.provenance, original.provenance);
+});
+
+test('automatic or imported groupless source adopts validated memberships only on merge and undo restores omissions', () => {
+  const authored = { ...definition, native: { ...definition.native, groups: [7, 8, 9] } };
+  const automatic = autoGroups(authored);
+  const imported = JSON.parse(JSON.stringify(automatic));
+  const built = { ...authored, name: 'not the source name', detail: { ...authored.detail, groups: [0, 0, 0] }, native: { ...authored.native, groups: [1, 1, 1] } };
+  for (const source of [automatic, imported]) {
+    assert.equal(groupIds(source), null);
+    const resolved = resolvedGroupDefinition(source, built);
+    assert.deepEqual(groupIds(resolved), [0, 1]);
+    assert.equal(resolved.name, source.name);
+    const merged = mergeGroups(resolved, 0, 1);
+    assert.deepEqual(groupIds(merged), [1]);
+    assert.equal(merged.detail.vertices, source.detail.vertices);
+    assert.equal(Object.hasOwn(source.detail, 'groups'), false);
+    assert.equal(Object.hasOwn(source.native, 'groups'), false);
+    // Undo restores source as it was, and a subsequent valid build resolves it again.
+    assert.deepEqual(groupIds(resolvedGroupDefinition(source, built)), [0, 1]);
+  }
+  const partial = resolvedGroupDefinition(definition, built);
+  assert.deepEqual(partial.detail.groups, definition.detail.groups);
+  assert.deepEqual(partial.native.groups, [1, 1, 1]);
 });

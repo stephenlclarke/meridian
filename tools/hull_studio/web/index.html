@@ -123,7 +123,7 @@
         <div id="help-panel" class="tab-content" role="tabpanel" aria-labelledby="help-tab" hidden>
           <p>Hull Studio builds and validates versioned ship packages from original source meshes. Source vertices stay in source units; clearance paths and generated envelope positions are in metres.</p>
           <p>Use Edit JSON for geometry, groups or supports, material assignments, engineering, flight and clearance definitions. Unknown fields are retained.</p>
-          <p>Group IDs span both meshes. Merge changes the source ID to the target ID everywhere; Auto by component clears authored membership so the builder assigns connected components. Undo restores the previous authored membership.</p>
+          <p>Group IDs span both meshes. Merge changes the source ID to the target ID everywhere; Auto by component clears authored membership so the builder assigns connected components. A valid build resolves automatic IDs. The first merge adopts those IDs; Undo restores the previous source, including omitted membership.</p>
           <p>Drag or use arrow keys to rotate. Shift-drag rolls the view. Scroll or use +/− to zoom; reset with Home.</p>
           <p>A support-point view is not a generated surface. Unmeasured gaps and unsupported validation results are never inferred from the preview.</p>
         </div>
