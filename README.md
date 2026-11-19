@@ -8,7 +8,7 @@ In Preview 10, press 3 at a station and search for Goshawk Explorer. Compare sho
 
 The development source also provides a separate Goshawk Mk II Custom Showroom and collision candidate. Its original detailed appearance, four lower mounts and SH028 fit evidence are in the [SH010 hull guide](docs/GOSHAWK-MK-II-CUSTOM.md). Owned native validation is pending.
 
-The separate Peregrine Mk I development source adds its own cobalt-cream Showroom and preserves its hooked forward bow gap with a local shield. Native and ordinary admission remain pending. [SH022 geometry and validation scope](docs/PEREGRINE-MK-I-GAMEPLAY-ENVELOPE.md)
+The joined Peregrine development source gives Mk I and Mk III separate original cobalt-cream Showroom previews and local shields. Search their names separately or Pin either as the Compare baseline. Both refuse exchange; Mk III has no adopted runtime mass or ordinary flight admission. This is development source, with owned renderer and runtime qualification pending. [SH022 geometry](docs/PEREGRINE-MK-I-GAMEPLAY-ENVELOPE.md) · [SH023 geometry](docs/PEREGRINE-MK3-GAMEPLAY-ENVELOPE.md)
 
 ## Internal Mule docking validation
 

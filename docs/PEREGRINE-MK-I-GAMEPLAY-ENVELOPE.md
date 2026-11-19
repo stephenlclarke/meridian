@@ -105,13 +105,18 @@ search for Peregrine Mk I. The original cobalt-cream visual submits
 all 3,484 detailed triangles with original materials, winding,
 licensed shared textures and UVs. The close rounded shimmer is a
 separate presentation layer. Compare retains SH025 as the new
-commander's baseline, and selecting Mk III cannot route Mk I
-geometry. SH023 remains separately owned. Exchange is refused.
+commander's baseline. The joined development source also registers
+Mk III as its own SH023 preview. Search switches between real hull
+identities and ordinary Pin Baseline compares them in either order.
+Their actual visual and support payloads refuse crossed inputs;
+the two source assets are not interchangeable. Exchange is refused.
 
 The authored CPU and Mac-owner Metal tests bind exact source visual
 and shader, minimum 640×360 logical projection, same-pose shimmer
 and full-target direct RGB/cache identity with Explorer and Custom
-in both pane orders. Rust, Metal and exact native collision execution
+in both pane orders. Joined evidence adds both original Peregrines
+in both orders and duplicate same-hull panes with different poses
+and independent reference passes. Rust, Metal and exact native collision execution
 remain pending, as do ordinary actor placement, acquisition, paid
 fittings and actual window resizing/compositor or GPU timing. No
 published preview changes.
@@ -126,3 +131,4 @@ python3 -B -m unittest discover -s tools -p 'test_audit_peregrine_mk_i_surface.p
 ```
 
 [Source, owned Rust and Metal criteria](../integration/sh022-peregrine-mk-i/CRITERIA.json)
+· [Joined sibling criteria](../integration/sh022-sh023-peregrine/CRITERIA.json)

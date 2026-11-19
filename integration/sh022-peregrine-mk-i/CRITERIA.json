@@ -92,6 +92,7 @@
       "Ordinary Showroom selects the own original cobalt-cream visual separately from SH023 and existing SH025 baseline, refuses exchange and retains the hooked bow silhouette."
     ]
   },
+  "joinedShowroomCriteria": "integration/sh022-sh023-peregrine/CRITERIA.json",
   "metal": {
     "invocation": "Set each directory variable to a distinct new absolute directory and run cargo test --locked -p meridian-desktop <test> -- --ignored --exact --nocapture.",
     "tests": [
@@ -114,6 +115,6 @@
   "remaining": [
     "Owned Rust/Metal and exact native qualification.",
     "Ordinary actor placement, loaded engineering, crew/custody, acquisition and paid equipment.",
-    "SH023 Mk III remains independently owned; no Crow/Sable/Gazelle composition changes."
+    "SH023 retains independent source and engineering scope; the joined Showroom does not change Crow, Sable or Gazelle."
   ]
 }

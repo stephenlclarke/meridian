@@ -1,0 +1,90 @@
+import Foundation
+
+/// Closed SH023 commissioning from the current source, calibrated hull and optional tool design.
+/// Capacity and catalogue eligibility grant no owned hardware, crew, blueprint or receipt.
+enum OriginalPeregrineMkIIIActivation {
+  static let id = "SH023"
+  static let specificationSHA256 =
+    "a9a7493a346f06aa594ce764e64bcb6635b8284c78293c3a2724c4607472887e"
+  static let nativeSourceSHA256 =
+    "5997060c2e36909aff5de387bd6d6a5676a13679ddeeedc66e2fafecd4d01b40"
+
+  enum Failure: Error { case unsupportedSource }
+
+  static func supports(_ definition: OriginalFleetDefinition) -> Bool {
+    definition.id == id && definition.name == "Peregrine Mk III"
+      && definition.family == "peregrine" && definition.role == "trader"
+      && definition.playerFlyable && definition.purchasePolicy == "blueprintFabrication"
+      && definition.sourceSHA256 == specificationSHA256 && definition.approvedMeshAvailable
+      && definition.nativePerformance?.valid == true
+      && definition.nativePerformance?.fuel == 130 && definition.nativePerformance?.facings == 7
+      && definition.nativePerformance?.workTools == [.salvageCutter, .miningLaser]
+  }
+
+  static func resolve(_ retained: CatalogueShip) throws -> CatalogueShip {
+    guard retained.id == id, retained.name == "Peregrine Mk III",
+      retained.catalogue.family == "peregrine", retained.catalogue.objectKind == .ship,
+      retained.catalogue.origin == .human, !retained.catalogue.playerFlyable,
+      !retained.catalogue.normalPurchaseEligible,
+      retained.catalogue.mechanicsStatus == .pending,
+      retained.catalogue.purchasePolicy == .pendingFabrication,
+      retained.nativeHull == nil, retained.nativeCombat == nil,
+      let definition = OriginalFleetDefinitionData.definition(for: id), supports(definition),
+      let current = OriginalFleetR3Data.contract(for: id),
+      current.sourceSHA256 == specificationSHA256,
+      let performance = current.performance, performance == retained.game,
+      let accommodation = current.accommodation, let fitting = current.fitting,
+      fitting.utilityMounts == 2, !fitting.roleKitIncluded,
+      fitting.compatibleUtilities.contains("miningLaser"),
+      fitting.compatibleUtilities.contains("salvageCutter"),
+      accommodation.initialPurchasedCabins == 0,
+      let result = OriginalFleetPhysicalContractCache.result(for: id),
+      OriginalPeregrineMiningToolSource.current != nil
+    else { throw Failure.unsupportedSource }
+    let physical = try result.get()
+    guard physical.id == id, physical.specificationSHA256 == specificationSHA256,
+      physical.model.sourceSHA256 == nativeSourceSHA256,
+      physical.nativeTriangles == 512, physical.model.nativeDesign == retained.nativeDesign,
+      physical.metresPerSourceUnit == 250_000.0 / 19_057.0,
+      physical.engineering?.contractSHA256 == specificationSHA256
+    else { throw Failure.unsupportedSource }
+
+    // The current source supplies mechanics but no issued fabrication threshold or population.
+    // Keep those unavailable rather than invent a shop, technology level or encounter weight.
+    let metadata = ShipCatalogueMetadata(
+      schemaVersion: retained.catalogue.schemaVersion, family: current.family,
+      aliases: retained.catalogue.aliases, objectKind: .ship, origin: .human,
+      primaryType: .trader, primaryRole: nil, roleWeights: [], access: .normal,
+      playerFlyable: true, normalPurchaseEligible: false, purchasePolicy: .never,
+      minimumBuildTechLevel: nil, isCapital: false, capitalSubtype: nil,
+      collectionMilestone: .none, damagePolicy: .destructible, habitat: nil,
+      discoveryEligible: false, encounterMode: .none, mechanicsStatus: .ready,
+      placementStatus: .declared, rarity: .unplaced, galaxies: [], regions: [], authoredSystems: [],
+      basis: "Current authenticated SH023 physical/player/fitting source " + specificationSHA256
+        + ". Fabrication technology, acquisition and population remain unavailable. "
+        + "Compatibility grants no installed tool, crew, blueprint, stock or title.")
+    let ship = CatalogueShip(
+      id: retained.id, name: retained.name, shipClass: retained.shipClass,
+      appearances: retained.appearances, evidence: retained.evidence, refit: retained.refit,
+      model: retained.model, modelSource: retained.modelSource,
+      dimensions: [
+        physical.envelope.dimensions.x, physical.envelope.dimensions.y,
+        physical.envelope.dimensions.z,
+      ],
+      geometryContext: physical.unitBasis + " " + physical.model.sourcePath
+        + " / " + physical.model.sourceSHA256,
+      profiles: [
+        OriginalPlayerHullActivation.standardProfile(
+          performance: performance, definition: definition,
+          accommodation: accommodation, fitting: fitting)
+      ],
+      game: retained.game, catalogue: metadata, design: retained.design,
+      nativeHull: retained.nativeHull, nativeDesign: retained.nativeDesign,
+      nativeCombat: retained.nativeCombat)
+    guard OriginalFleetR3Fitting.contract(for: ship) != nil,
+      metadata.valid(shipID: id, performance: performance, nativeCombat: ship.nativeCombat),
+      metadata.validEffectiveCargo(performance: performance, profiles: ship.profiles)
+    else { throw Failure.unsupportedSource }
+    return ship
+  }
+}

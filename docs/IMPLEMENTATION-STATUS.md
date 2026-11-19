@@ -12,6 +12,10 @@ Preview 10 is published for macOS arm64 and Windows x64. It includes the Goshawk
 
 SH022 has its own original detailed Showroom, 69 local collision supports including separate hooked forks, independently certified forward bow clearance and a 103,972 kg adopted source engineering budget. The original packaged native candidate has 964 faces against the original 512 limit. A separate frozen cached input is explicitly unqualified, with candidate bytes and count absent from this frozen tree. Rust and native Metal execution, exact native qualification and ordinary admission remain pending. [SH022 source and criteria](PEREGRINE-MK-I-GAMEPLAY-ENVELOPE.md)
 
+## Peregrine Mk III and joined Showroom source
+
+SH023 independently binds its original detailed visual and 69 local supports. Its original active 512-face native successor meets the source face limit; that fact does not establish Meridian native collision, hardware, adopted runtime mass or ordinary flight admission. Mk I and Mk III can be selected as distinct Showroom identities in the joined development source. The authored tests cover their actual crossed payloads, ordinary pinned comparisons in either order, and independent reference passes for both same-hull, different-pose cache controls. Owned portable and Metal execution remains pending. [SH023 source and criteria](PEREGRINE-MK3-GAMEPLAY-ENVELOPE.md) · [joined acceptance criteria](../integration/sh022-sh023-peregrine/CRITERIA.json)
+
 ## Commander startup and flight cockpit
 
 Ordinary startup opens Commander details with the current ship, location and credits. A fresh commander starts at Avenor. A saved flight opens its summary and waits for Enter to resume. An unreadable slot opens recovery. On Mac, a fresh commander reached this screen without creating a save. An airborne commander stayed on the summary until Enter. Recovery preserved the original damaged and unsupported save bytes.
