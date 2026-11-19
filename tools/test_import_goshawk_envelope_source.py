@@ -1,5 +1,6 @@
 """Check the Goshawk production importer against the shipped geometry and source pins."""
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -49,6 +50,23 @@ class GoshawkSourceImport(unittest.TestCase):
             with self.assertRaisesRegex(AssertionError, "source-triangles"):
                 self.invoke(out, "--check")
             self.assertEqual(faces.read_bytes(), damaged)
+
+    def test_optimized_python_refuses_both_cli_modes_before_accessing_assets(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            script = Path(tmp) / "tools" / "import_goshawk_envelope_source.py"
+            script.parent.mkdir()
+            shutil.copyfile(importer.__file__, script)
+            for flag in ("-O", "-OO"):
+                for args in (["--check"], ["--snapshot", tmp, "--proposal", tmp]):
+                    with self.subTest(flag=flag, args=args):
+                        result = subprocess.run(
+                            [sys.executable, "-B", flag, str(script), *args],
+                            capture_output=True, text=True, check=False,
+                        )
+                        self.assertNotEqual(result.returncode, 0)
+                        self.assertIn("requires Python assertions", result.stderr)
+                        self.assertEqual(result.stdout, "")
+                        self.assertFalse((Path(tmp) / "assets").exists())
 
     def test_each_changed_original_input_is_rejected_before_encoding(self):
         originals = {name: (importer.ASSET / name).read_bytes() for name in importer.PINS}

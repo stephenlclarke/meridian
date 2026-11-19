@@ -7,6 +7,9 @@ from pathlib import Path
 import struct
 import tomllib
 
+if not __debug__:
+    raise RuntimeError('Goshawk source verification requires Python assertions. Run without -O or -OO.')
+
 ROOT = Path(__file__).resolve().parents[1]
 ASSET = ROOT / 'assets/fleet/sh008'
 RESOURCE = 'resource.toml'
