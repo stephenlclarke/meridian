@@ -1,6 +1,15 @@
 # GitHub preview releases
 
-## Local Mac Preview 10
+## Published Preview 10
+
+[Download Preview 10 for macOS arm64 or Windows x64](https://github.com/stephenlclarke/meridian/releases/tag/v0.10.0-preview.1). Released 19 November 2026 at 02:37 UTC from protected commit `201e9f9f1ecfd73a20ba27dcebc00f70ac3457fe`. All four public downloads passed verification. The macOS archive contains the original notarized app built at `f3cf5b8` and a corrected guide alongside it. The unsigned Windows executable was built at `993035e` and requires the Microsoft Visual C++ x64 runtime.
+
+| Download | Size in bytes | SHA-256 |
+| --- | ---: | --- |
+| macOS arm64 | 5,992,345 | `a02e322ec6cc8feb52fe6d4db2ef1e65a15428b582e7693d7a362c4295648095` |
+| Windows x64 | 5,603,240 | `4b218974f886fed43893f681387b9a85d03bf7034a6206c0c07e556ec8fed9f0` |
+
+### Local Mac installation
 
 Open `~/Applications/Meridian Preview 10/Meridian Goshawk Showroom Preview.app`. From Commander Details, press **3** to open the station Showroom, search for **Goshawk Explorer**, and press **C** to switch between the single-ship and comparison views. The preview has its own save directory under Application Support at `Meridian Preview 10/saves-v17-3fe3ff8`. Apple notarized this Mac build. The extracted archive and local installation passed verification.
 
