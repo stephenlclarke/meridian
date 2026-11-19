@@ -1,0 +1,46 @@
+{
+  "hull": "SH014 Buffalo Mk II",
+  "status": "CORRECTED_SOURCE_SHIELD_AND_VISUAL_AUTHORED;OWNED_RUST_PENDING",
+  "source": "assets/fleet/sh014/SOURCE-GEOMETRY.json",
+  "geometryTests": [
+    "buffalo_mk2_corrected_detailed_and_native_faces_share_complete_local_supports",
+    "buffalo_mk2_preserves_both_interdrum_sweeps_but_blocks_an_original_drum_contact",
+    "buffalo_mk2_original_sh028_aligned_crossing_clears_before_offset_native_lip_contact"
+  ],
+  "visualCorners": 10380,
+  "originalTextures": {
+    "assets/fleet/sh001/l337-patrol-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "9699517d12b4fbbb28746e00bed9ee65c19a098d14402b1d5160280c6f6bfc54",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-patrol-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-strike-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "e56f149228caf90237a652d720ae549768bde1056af3d903dc8a5c243ad26e97",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-strike-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-service-details.rgba": {
+      "bytes": 4194304,
+      "sha256": "35edd84f6ce527195dd8a9bcc039521a6efc5aa2333452bbbc30217b8372103d",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-service-details.rgba",
+      "license": "MIT"
+    }
+  },
+  "air": {
+    "hostname": "SteveMBA",
+    "topologyUtc": "2026-11-19T07:58:18Z",
+    "fitStartUtc": "2026-11-19T08:01:01Z",
+    "fitEndUtc": "2026-11-19T08:01:05Z",
+    "witnessStartUtc": "2026-11-19T08:01:21Z",
+    "witnessEndUtc": "2026-11-19T08:01:22Z",
+    "reports": {
+      "CONTACT-RESULT.json": "e23c5d34c9848e285feece525458c0c212562be388f26eb06f51199570c9c8db",
+      "ORIGINAL-DIFFERENCE.json": "386e469e58906b7d976304e8b00435ae97fe939d74770ce79857276404fdebba",
+      "SURFACE-FIT.json": "d05c4c756a8d939ea6a955940b00d2f2c70db60a1cabc62ee1b98f58fc9a4731"
+    }
+  },
+  "stockMass": "UNASSIGNED",
+  "nativeVisualCorners": 1500
+}

@@ -213,6 +213,7 @@ def verify_protected_core(root):
     baseline = json.loads(pin_bytes)
     assert baseline['base'] == base
     checked = set()
+    additions['lib.rs'].append(b'\npub mod buffalo_mk2;\n')
     for relative, expected in baseline['sha256'].items():
         data = (root / 'crates/meridian-core/src' / relative).read_bytes()
         data = undo_goshawk_world(relative, data)
