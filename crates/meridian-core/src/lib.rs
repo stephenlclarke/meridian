@@ -65,6 +65,8 @@ pub use flight::{
     MissilePurchase, PreparedAmmunition,
 };
 
+pub mod okapi;
+
 pub use flight::{
     FittedFuelScoops, FittedMiningTool, FuelScoopsSnapshot, ModularEquipmentSnapshot, ModuleAction,
     ModuleError, ModuleKind, ModuleOffer, ModuleProvenance, ModuleReview, ModuleSlot, OwnedModule,
