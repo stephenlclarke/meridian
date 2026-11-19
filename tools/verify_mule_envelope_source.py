@@ -214,6 +214,7 @@ def verify_protected_core(root):
         ],
     }
     pin_bytes = (root / 'integration/sh001-mule/PROTECTED-CORE.json').read_bytes()
+    additions['lib.rs'].append(b'pub mod crow_prototype;\n')
     assert sha(pin_bytes) == '8a2929218820a8e15536aa554c0f8df56a23981944be85ec1b1947778fd48133'
     baseline = json.loads(pin_bytes)
     assert baseline['base'] == base

@@ -3,6 +3,7 @@
 #![forbid(unsafe_code)]
 
 pub mod celestial;
+pub mod crow_prototype;
 pub mod docking;
 pub mod equipment;
 mod flight;
