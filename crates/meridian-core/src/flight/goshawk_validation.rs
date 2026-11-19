@@ -9,6 +9,10 @@ use crate::goshawk_custom::{
     CUSTOM_CONTRACT_SHA256, CUSTOM_MAX_SPEED_UNITS, CUSTOM_PIECES, CUSTOM_RESOURCE_SHA256,
     GoshawkCustomHullSource,
 };
+use crate::mole_prospector::{
+    MoleProspectorHullSource, PROSPECTOR_CONTRACT_SHA256, PROSPECTOR_MAX_SPEED_UNITS,
+    PROSPECTOR_PIECES, PROSPECTOR_RESOURCE_SHA256,
+};
 use crate::mule::{SmoothPiece, rounded_maximum_origin_radius};
 use crate::station::{DISTANCE_PER_SPEED_UNIT, OriginalStationData, StationError};
 use std::sync::{Arc, Weak};
@@ -38,6 +42,7 @@ pub struct GoshawkHullApproachSnapshot<const N: usize, E> {
 pub type GoshawkApproachSnapshot =
     GoshawkHullApproachSnapshot<GOSHAWK_PIECES, &'static GoshawkEngineering>;
 pub type GoshawkCustomApproachSnapshot = GoshawkHullApproachSnapshot<CUSTOM_PIECES, ()>;
+pub type MoleProspectorApproachSnapshot = GoshawkHullApproachSnapshot<PROSPECTOR_PIECES, ()>;
 
 impl<const N: usize, E> GoshawkHullApproachSnapshot<N, E> {
     pub fn pose(&self) -> RigidPose {
@@ -80,6 +85,7 @@ impl GoshawkApproachSnapshot {
 enum HullSource {
     Explorer(GoshawkHullSource),
     Custom(GoshawkCustomHullSource),
+    MoleProspector(MoleProspectorHullSource),
 }
 
 impl HullSource {
@@ -87,6 +93,7 @@ impl HullSource {
         match self {
             Self::Explorer(source) => source.pieces().as_ref(),
             Self::Custom(source) => source.pieces(),
+            Self::MoleProspector(source) => source.pieces(),
         }
     }
 
@@ -94,6 +101,7 @@ impl HullSource {
         match self {
             Self::Explorer(_) => GOSHAWK_MAX_SPEED_UNITS,
             Self::Custom(_) => CUSTOM_MAX_SPEED_UNITS,
+            Self::MoleProspector(_) => PROSPECTOR_MAX_SPEED_UNITS,
         }
     }
 
@@ -101,6 +109,9 @@ impl HullSource {
         match self {
             Self::Explorer(source) => data.goshawk_motion_clear(source, start, end, 0.0),
             Self::Custom(source) => data.goshawk_custom_motion_clear(source, start, end, 0.0),
+            Self::MoleProspector(source) => {
+                data.mole_prospector_motion_clear(source, start, end, 0.0)
+            }
         }
     }
 
@@ -115,6 +126,9 @@ impl HullSource {
             Self::Explorer(source) => data.goshawk_observer_clear(source, start, end, observer),
             Self::Custom(source) => {
                 data.goshawk_custom_observer_clear(source, start, end, observer)
+            }
+            Self::MoleProspector(source) => {
+                data.mole_prospector_observer_clear(source, start, end, observer)
             }
         }
     }
@@ -132,6 +146,9 @@ impl HullSource {
             }
             Self::Custom(source) => {
                 data.goshawk_custom_entry_conditions(source, start, end, speed, 0.0, 0.0)
+            }
+            Self::MoleProspector(source) => {
+                data.mole_prospector_entry_conditions(source, start, end, speed, 0.0, 0.0)
             }
         }
     }
@@ -256,6 +273,15 @@ impl World {
         Self::goshawk_source_scenario(observer, approach, HullSource::Custom(source))
     }
 
+    /// The separate SH017-only World approach. There is no ordinary player or fleet placement.
+    pub fn mole_prospector_docking_validation_scenario(
+        observer: FlightStart,
+        approach: FlightStart,
+    ) -> Result<Self, StationError> {
+        let source = MoleProspectorHullSource::bundled().map_err(|_| StationError::InvalidMesh)?;
+        Self::goshawk_source_scenario(observer, approach, HullSource::MoleProspector(source))
+    }
+
     fn goshawk_source_scenario(
         observer: FlightStart,
         approach: FlightStart,
@@ -321,6 +347,19 @@ impl World {
         ))
     }
 
+    pub fn mole_prospector_approach_snapshot(&self) -> Option<MoleProspectorApproachSnapshot> {
+        let approach = self.goshawk_validation.as_ref()?;
+        let HullSource::MoleProspector(source) = &approach.source else {
+            return None;
+        };
+        Some(approach.snapshot(
+            source.shared_pieces(),
+            self.state.tick,
+            (),
+            (PROSPECTOR_RESOURCE_SHA256, PROSPECTOR_CONTRACT_SHA256),
+        ))
+    }
+
     pub fn goshawk_snapshot_is_current(&self, frame: &GoshawkApproachSnapshot) -> bool {
         self.goshawk_validation.as_ref().is_some_and(|approach| {
             if let HullSource::Explorer(source) = &approach.source {
@@ -344,6 +383,19 @@ impl World {
         })
     }
 
+    pub fn mole_prospector_snapshot_is_current(
+        &self,
+        frame: &MoleProspectorApproachSnapshot,
+    ) -> bool {
+        self.goshawk_validation.as_ref().is_some_and(|approach| {
+            if let HullSource::MoleProspector(source) = &approach.source {
+                approach.snapshot_current(frame, source.shared_pieces(), self.state.tick)
+            } else {
+                false
+            }
+        })
+    }
+
     pub fn goshawk_observer_pose(&self, frame: &GoshawkApproachSnapshot) -> Option<RigidPose> {
         if !self.goshawk_snapshot_is_current(frame) {
             return None;
@@ -356,6 +408,16 @@ impl World {
         frame: &GoshawkCustomApproachSnapshot,
     ) -> Option<RigidPose> {
         if !self.goshawk_custom_snapshot_is_current(frame) {
+            return None;
+        }
+        flight_pose(self.state.position, self.state.orientation)
+    }
+
+    pub fn mole_prospector_observer_pose(
+        &self,
+        frame: &MoleProspectorApproachSnapshot,
+    ) -> Option<RigidPose> {
+        if !self.mole_prospector_snapshot_is_current(frame) {
             return None;
         }
         flight_pose(self.state.position, self.state.orientation)

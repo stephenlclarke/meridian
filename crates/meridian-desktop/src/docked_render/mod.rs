@@ -10,7 +10,7 @@ const MAX_GEOMETRY: usize = 180_000;
 const MAX_MODELS: usize = 2;
 const MAX_MODEL_VERTICES: usize = 10452 * MAX_MODELS * 9;
 const SHIP_KEY: &str = "assets/legacy/sh025.mesh";
-pub const MODELS: [AvailableModel<'static>; 4] = [
+pub const MODELS: [AvailableModel<'static>; 5] = [
     AvailableModel {
         object: "SH025",
         geometry_key: SHIP_KEY,
@@ -26,6 +26,10 @@ pub const MODELS: [AvailableModel<'static>; 4] = [
     AvailableModel {
         object: "SH016",
         geometry_key: crate::mule_render::showroom::MOLE_MINER_GEOMETRY_KEY,
+    },
+    AvailableModel {
+        object: "SH017",
+        geometry_key: crate::mule_render::showroom::PROSPECTOR_GEOMETRY_KEY,
     },
 ];
 #[repr(C)]
