@@ -6,7 +6,15 @@ import tomllib
 from functools import lru_cache
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[1]
+
+
+def reference_fit():
+    packed = HERE / "reference-fit.json"
+    if packed.is_file():
+        return parse(packed.read_bytes())
+    return parse((ROOT / "integration/sh023-peregrine-mk3/SURFACE-FIT.json").read_bytes())["summary"]["detailed"]
 
 
 def parse(raw):
@@ -96,6 +104,9 @@ def prepare(definition):
 
 @lru_cache(maxsize=1)
 def reference_bytes():
+    packaged = HERE / "reference.json"
+    if packaged.is_file():
+        return packaged.read_bytes()
     folder = ROOT / "assets/fleet/sh023"
     geometry = parse((folder / "SOURCE-GEOMETRY.json").read_bytes())
 

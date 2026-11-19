@@ -7,6 +7,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import threading
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlsplit
@@ -39,6 +40,10 @@ def build(definition, validator):
 
 
 class StudioRequest(BaseHTTPRequestHandler):
+    def log_message(self, fmt, *args):
+        if sys.stderr is not None:
+            super().log_message(fmt, *args)
+
     def respond(self, status, content, mime="application/json", attachment=False):
         self.send_response(status)
         self.send_header("Content-Type", mime)
@@ -72,7 +77,7 @@ class StudioRequest(BaseHTTPRequestHandler):
         if not self.local():
             return self.respond(403, encode({"error":"Use the local Studio address"}))
         route = urlsplit(self.path).path
-        if route not in ("/api/build", "/api/export"):
+        if route not in ("/api/build", "/api/export", "/api/quit"):
             return self.respond(404, encode({"error":"Unknown operation"}))
         if self.headers.get_content_type() != "application/json":
             return self.respond(415, encode({"error":"Send a JSON definition"}))
@@ -81,6 +86,12 @@ class StudioRequest(BaseHTTPRequestHandler):
             if not 0 < length <= 32 * 1024 * 1024:
                 return self.respond(413, encode({"error":"Expected a JSON upload of at most 32 MiB"}))
             body = parse(self.rfile.read(length))
+            if route == "/api/quit":
+                if body != {}:
+                    raise ValueError("Expected an empty object")
+                self.respond(200, encode({"closed": True}))
+                threading.Thread(target=self.server.shutdown, daemon=True).start()
+                return
             if not isinstance(body, dict) or set(body) != {"definition"}:
                 raise ValueError("Expected an object with a definition field")
             package, report = build(body["definition"], self.server.validator)
@@ -106,7 +117,9 @@ class StudioRequest(BaseHTTPRequestHandler):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     binary = "meridian-hull-tool" + (".exe" if os.name == "nt" else "")
-    parser.add_argument("--validator", type=Path, default=ROOT / "target/release" / binary)
+    default_validator = (Path(__file__).with_name(binary) if getattr(sys, "frozen", False)
+                         else ROOT / "target/release" / binary)
+    parser.add_argument("--validator", type=Path, default=default_validator)
     parser.add_argument("--definition", type=Path, help="Open a local definition in place of Peregrine Mk III")
     parser.add_argument("--export", type=Path, help="Validate and export without opening the editor")
     parser.add_argument("--port", type=int, default=0)
@@ -136,7 +149,8 @@ def main():
     with ThreadingHTTPServer(("127.0.0.1", args.port), StudioRequest) as server:
         server.validator, server.example = validator, sample
         address = f"http://127.0.0.1:{server.server_port}/"
-        print(f"Meridian Hull Studio is open at {address}", flush=True)
+        if sys.stdout is not None:
+            print(f"Meridian Hull Studio is open at {address}", flush=True)
         if not args.no_browser:
             webbrowser.open(address)
         try:

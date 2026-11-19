@@ -1,8 +1,8 @@
 """Inspect distances from displayed piece surfaces to the detailed visible mesh."""
-from math import dist, sqrt
+from math import sqrt
 from statistics import fmean
 
-from definitions import ROOT, parse, reference_bytes
+from definitions import parse, reference_bytes, reference_fit
 
 
 def sub(a, b):
@@ -77,8 +77,7 @@ def fit_report(package, envelope):
     # Fit evidence binds geometry and grouping, independently of name and palette.
     original = parse(reference_bytes())
     if all(package[key] == original[key] for key in ("detail","native","metresPerUnit","roundingMetres")):
-        report = parse((ROOT/"integration/sh023-peregrine-mk3/SURFACE-FIT.json").read_bytes())
-        summary = report["summary"]["detailed"]
+        summary = reference_fit()
         sample = summary["largestSample"]
         return {"maxMetres":sample["metres"], "point":sample["point"], "nearestPoint":sample["closestPoint"],
                 "upperBoundMetres":summary["fullUpperMillimetres"]/1000,

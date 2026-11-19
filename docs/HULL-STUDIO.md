@@ -4,7 +4,7 @@ Hull Studio is a separate local ship editor. Open it with `make hull-studio`
 from the Meridian checkout using Python 3.11 or later. It starts with
 Peregrine Mk III, including both original meshes, its palette and its 69
 collision pieces. The browser connects only to the loopback server. Stop the
-server with Ctrl+C in its terminal.
+server with Quit Studio or Ctrl+C in its terminal.
 
 ## Author a ship
 
@@ -58,3 +58,18 @@ python3 tools/hull_studio/studio.py --definition ship.json --export ship.hull.js
 ```
 
 To select an already built validator, pass `--validator PATH`.
+
+## Standalone desktop build
+
+Build the validator for the host with `cargo build --release --locked -p meridian-hull-tool`.
+In a Python environment with PyInstaller installed, run:
+
+```sh
+python tools/hull_studio/package_app.py --validator target/release/meridian-hull-tool --dist OUTPUT
+```
+
+On Windows use `meridian-hull-tool.exe`. On macOS pass an existing Developer ID
+Application identity with `--signing-identity` for a signed bundle. The output
+includes the Rust validator, Python runtime, editor assets, original reference
+definition and notices. The installed app opens the editor in the default
+browser and can run without a checkout or an internet connection.
