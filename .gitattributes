@@ -6,6 +6,11 @@ assets/fleet/sh001/visual.bin binary
 assets/fleet/sh008/** -text
 assets/fleet/sh008/visual.bin binary
 
+# Ibex replay helpers have published byte hashes.
+tools/measure_ibex_air.py text eol=lf
+tools/prepare_ibex_geometry.py text eol=lf
+tools/verify_ibex_geometry.py text eol=lf
+
 # These source and review fixtures are verified against their Git blob bytes.
 crates/meridian-core/src/**/*.rs text eol=lf
 integration/sh001-mule/*.json text eol=lf

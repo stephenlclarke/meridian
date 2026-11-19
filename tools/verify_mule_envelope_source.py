@@ -182,6 +182,7 @@ def undo_goshawk_world(relative, data):
         FLIGHT_PERSISTENCE: [(b'            goshawk_validation: None,\n', b'')],
         EMP_TESTS: [(b'        goshawk_validation: None,\n', b'')],
         'lib.rs': [
+            (b'\npub mod ibex;\n', b''),
             (b'pub mod goshawk_custom;\n', b''),
             (b'pub use flight::GoshawkCustomApproachSnapshot;\n', b''),
             (b'pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};\n', b''),

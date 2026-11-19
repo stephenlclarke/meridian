@@ -1,0 +1,83 @@
+{
+  "id": "SH027",
+  "name": "Ibex",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourceUnits": "metres",
+  "metresPerSourceUnit": 1,
+  "detail": {
+    "vertices": 1612,
+    "faces": 3108,
+    "components": 29,
+    "bounds": [
+      [
+        -7.832,
+        -8.0,
+        -18.59
+      ],
+      [
+        7.832,
+        8.12,
+        16.0
+      ]
+    ]
+  },
+  "native": {
+    "vertices": 112,
+    "faces": 184,
+    "components": 10,
+    "bounds": [
+      [
+        -7.832,
+        -8.0,
+        -18.59
+      ],
+      [
+        7.832,
+        8.002,
+        16.0
+      ]
+    ],
+    "faceLimit": 512,
+    "approvedSourcePath": "fleet-completion-20261019/batch-02-native-lod/SH027-design.toml",
+    "approvedSourceSha256": "db3494ecc09b427242eed021bae074124aad87c38fe03b654161d49269952484"
+  },
+  "shapePieces": 25,
+  "textures": [
+    "l337-patrol-diffuse",
+    "l337-strike-diffuse",
+    "l337-service-details"
+  ],
+  "unmappedMaterialSlot": 4294967295,
+  "pins": {
+    "resource.toml": "6c206e271dbdb23c620c12808092f1e64439180e1fedfc4e7bec6bd81f646771",
+    "native-export.json": "f6c2b5bd866c6d37619c745d4a7bb4cca5e56417934c7f3d4a91210de57e6151",
+    "contract.toml": "7b038e5e6675b715d56d0ffbecf5ebaed4dd0216109c63aaf5c7dd990efa1aa8",
+    "LICENSE": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+  },
+  "outputs": {
+    "source.vertices": {
+      "bytes": 41392,
+      "sha256": "3eac86862cf879ab80b2372ec3e1bfd0891816a73c463a6c2ab8d80dc4f8dcd3"
+    },
+    "source-triangles.bin": {
+      "bytes": 39504,
+      "sha256": "56c02ef09550bddba241d1f821e7a819b6c81269162107d0cc399fa0f7b64226"
+    },
+    "source-piece-membership.bin": {
+      "bytes": 1724,
+      "sha256": "3cd200a946b0ce172d733794d9dcd396a2b3992ce8566ff49b91740231e8913a"
+    },
+    "PIECES.json": {
+      "bytes": 633,
+      "sha256": "bd6e016ebe79b8d24364de62ee3a6a912495ce8cede91a4c4ee1fbdfe863067e"
+    },
+    "visual.bin": {
+      "bytes": 522160,
+      "sha256": "4d9d65fc69c740ec91896ae38eee20a5618f2abfd66cc8c5b9b6053e18a87659"
+    },
+    "native-visual.bin": {
+      "bytes": 30928,
+      "sha256": "24316bcf36bc9d02c1d2093579d32c2f8e0db11e25ca685f44225c345f04d156"
+    }
+  }
+}
