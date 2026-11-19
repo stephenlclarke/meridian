@@ -56,7 +56,8 @@
       "No substitution after a selection change or mixed-pane ordering",
       "640 x 360 actual station frame, both solo and Compare",
       "Minimum and mixed isolated models contain nonblack RGB with at least two logical pixels of own-pane clearance",
-      "Both mixed orders match independent original-hull draws, and all combined pixels equal the exact isolated RGB union, including the full-target gutter"
+      "Both mixed orders match independent original-hull draws, and all combined pixels equal the exact isolated RGB union, including the full-target gutter",
+      "On the joined Mk II/Custom registry capture both mixed orders, a duplicate of each with front and upper poses, compare every isolated pane to an independent original draw and every combined target to the exact isolated union, then verify solo returns."
     ],
     "rgbVerifier": "crates/meridian-desktop/src/mule_render/showroom/minimum_rgb.rs",
     "rgbNegativeControl": "own_pane_and_full_union_reject_black_gutter_wrong_pane_and_rgb",
@@ -64,7 +65,8 @@
     "macOnly": {
       "metal_goshawk_mk2_same_pose_shimmer": "MERIDIAN_SH009_EVIDENCE_DIR",
       "metal_goshawk_mk2_minimum_showroom_model_pass": "MERIDIAN_SH009_MINIMUM_DIR",
-      "metal_goshawk_mk2_cache_switching": "MERIDIAN_SH009_CACHE_DIR"
+      "metal_goshawk_mk2_cache_switching": "MERIDIAN_SH009_CACHE_DIR",
+      "metal_goshawk_mk2_custom_cache_orders": "MERIDIAN_SH009_CUSTOM_CACHE_DIR"
     },
     "outsideScope": [
       "Ordinary ship placement",
