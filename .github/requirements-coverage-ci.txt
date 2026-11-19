@@ -1,0 +1,4 @@
+# Coverage runs on Linux x64 with CPython 3.13.
+-r requirements-geometry-ci.txt
+coverage==7.17.3 \
+    --hash=sha256:222bc51858b0f64cb15d51380541712f8d5dc9bb5ce4fd9828bf466503d6debb

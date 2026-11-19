@@ -37,7 +37,7 @@ jobs:
           python-version: '3.13'
       - name: Install pinned scientific test dependencies
         run: |
-          python -m pip install --only-binary :all: -r tools/requirements-goshawk-surface-fit.txt
+          python -m pip install --require-hashes --only-binary :all: -r .github/requirements-geometry-ci.txt
       - run: python -B -m unittest discover -s tools -p 'test_*.py' -v
 
   docs:
@@ -77,7 +77,7 @@ jobs:
           python-version: '3.13'
       - name: Install pinned Python coverage tooling
         run: |
-          python -m pip install --only-binary :all: coverage==7.17.3 -r tools/requirements-goshawk-surface-fit.txt
+          python -m pip install --require-hashes --only-binary :all: -r .github/requirements-coverage-ci.txt
       - name: Rust unit and native window coverage
         run: |
           mkdir -p coverage
