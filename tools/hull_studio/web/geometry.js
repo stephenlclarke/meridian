@@ -107,6 +107,19 @@ export function groupIds(definition) {
   return [...new Set(meshes.flatMap(mesh => mesh.groups))].sort((a, b) => a - b);
 }
 
+// Adopt only generated memberships, never other package data. The untouched
+// definition remains the source of truth until an edit explicitly needs them.
+export function resolvedGroupDefinition(definition, packageData) {
+  if (groupIds(definition) !== null || groupIds(packageData) === null) return definition;
+  const meshes = ['detail', 'native'];
+  if (!meshes.every(key => isRecord(definition?.[key]) && Array.isArray(definition[key].vertices) && definition[key].vertices.length === packageData[key].groups.length)) return definition;
+  const resolved = { ...definition };
+  for (const key of meshes) {
+    if (!Object.hasOwn(definition[key], 'groups')) resolved[key] = { ...definition[key], groups: [...packageData[key].groups] };
+  }
+  return groupIds(resolved) !== null ? resolved : definition;
+}
+
 export function mergeGroups(definition, source, target) {
   const groups = groupIds(definition);
   if (!groups?.includes(source) || !groups.includes(target) || source === target) return definition;
