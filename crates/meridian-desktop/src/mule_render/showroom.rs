@@ -1,5 +1,7 @@
-//! Source-authenticated SH008 showroom presentation. Inputs grant no World authority.
-use super::{Piece, Vec3, VisualVertex, decode_visual, gpu, subtract, support_mesh, vector};
+//! Source-authenticated original-hull showroom. Inputs grant no World authority.
+use super::{
+    Piece, Triangle, Vec3, VisualVertex, decode_visual, gpu, subtract, support_mesh, vector,
+};
 use crate::docked_screens::{ModelPreview, Orientation, Rect};
 use meridian_core::{
     docking::Basis3,
@@ -7,38 +9,119 @@ use meridian_core::{
         GOSHAWK_DETAILED_VERTICES, GOSHAWK_NATIVE_CANDIDATE_VERTICES, GOSHAWK_PIECES,
         GoshawkHullSource,
     },
+    mole_prospector::{
+        MoleProspectorHullSource, PROSPECTOR_DETAILED_FACES, PROSPECTOR_DETAILED_VERTICES,
+        PROSPECTOR_NATIVE_VERTICES, PROSPECTOR_PIECES,
+    },
+    mule::EnvelopeError,
 };
 
 pub(crate) const GEOMETRY_KEY: &str = "assets/fleet/sh008/visual.bin";
 const VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh008/visual.bin");
 const VERTICES: usize = 3_484 * 3;
 const VISUAL_FNV: u64 = 0x7a17_0c0c_6cdc_d5fd;
+pub(crate) const PROSPECTOR_GEOMETRY_KEY: &str = "assets/fleet/sh017/visual.bin";
+const PROSPECTOR_VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh017/visual.bin");
+const PROSPECTOR_VISUAL_FNV: u64 = 0xf2a8_36bd_3d89_c5f0;
 const EMPTY_PIECE: Piece = Piece {
     range: [0; 4],
     low: [0.0; 4],
     high: [0.0; 4],
 };
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum Hull {
+    Explorer,
+    MoleProspector,
+}
+
+pub(crate) fn hull(model: &ModelPreview) -> Option<Hull> {
+    match (model.object.as_str(), model.geometry_key.as_str()) {
+        ("SH008", GEOMETRY_KEY) => Some(Hull::Explorer),
+        ("SH017", PROSPECTOR_GEOMETRY_KEY) => Some(Hull::MoleProspector),
+        _ => None,
+    }
+}
+
 pub(crate) fn matches(model: &ModelPreview) -> bool {
-    model.object == "SH008" && model.geometry_key == GEOMETRY_KEY
+    hull(model).is_some()
+}
+
+fn authenticated_visual(
+    bytes: &[u8],
+    expected_hash: u64,
+    magic: &[u8; 8],
+    count: usize,
+) -> Result<Vec<VisualVertex>, &'static str> {
+    let hash = bytes.iter().fold(0xcbf2_9ce4_8422_2325_u64, |hash, byte| {
+        (hash ^ u64::from(*byte)).wrapping_mul(0x100_0000_01b3)
+    });
+    if hash != expected_hash {
+        return Err("Goshawk preview bytes changed");
+    }
+    decode_visual(bytes, magic, count)
 }
 
 fn visual() -> Result<Vec<VisualVertex>, &'static str> {
-    let hash = VISUAL.iter().fold(0xcbf2_9ce4_8422_2325_u64, |hash, byte| {
-        (hash ^ u64::from(*byte)).wrapping_mul(0x100_0000_01b3)
-    });
-    if hash != VISUAL_FNV {
-        return Err("SH008 preview bytes changed");
-    }
-    decode_visual(VISUAL, b"GOSHVIZ1", VERTICES)
+    authenticated_visual(VISUAL, VISUAL_FNV, b"GOSHVIZ1", VERTICES)
 }
 
-fn shader() -> String {
+fn shader(piece_count: usize) -> String {
     include_str!("mule.wgsl").replacen(
         "const MULE_PIECES: u32 = 34u;",
-        &format!("const MULE_PIECES: u32 = {GOSHAWK_PIECES}u;"),
+        &format!("const MULE_PIECES: u32 = {piece_count}u;"),
         1,
     )
+}
+
+impl Hull {
+    fn visual(self) -> Result<Vec<VisualVertex>, &'static str> {
+        match self {
+            Self::Explorer => visual(),
+            Self::MoleProspector => authenticated_visual(
+                PROSPECTOR_VISUAL,
+                PROSPECTOR_VISUAL_FNV,
+                b"SH017VZ1",
+                PROSPECTOR_DETAILED_FACES * 3,
+            ),
+        }
+    }
+
+    fn piece_count(self) -> usize {
+        match self {
+            Self::Explorer => GOSHAWK_PIECES,
+            Self::MoleProspector => PROSPECTOR_PIECES,
+        }
+    }
+
+    fn supports(self) -> Result<(Vec<Triangle>, Vec<Piece>), SupportError> {
+        match self {
+            Self::Explorer => {
+                let source = GoshawkHullSource::bundled().map_err(SupportError::Source)?;
+                let (triangles, pieces) = support_mesh(
+                    source.pieces().as_ref(),
+                    GOSHAWK_DETAILED_VERTICES + GOSHAWK_NATIVE_CANDIDATE_VERTICES,
+                )
+                .map_err(SupportError::Render)?;
+                Ok((triangles, pieces.to_vec()))
+            }
+            Self::MoleProspector => {
+                let source = MoleProspectorHullSource::bundled().map_err(SupportError::Source)?;
+                let (triangles, pieces) = support_mesh(
+                    source.pieces(),
+                    PROSPECTOR_DETAILED_VERTICES + PROSPECTOR_NATIVE_VERTICES,
+                )
+                .map_err(SupportError::Render)?;
+                Ok((triangles, pieces.to_vec()))
+            }
+        }
+    }
+}
+
+#[derive(Debug)]
+enum SupportError {
+    Source(EnvelopeError),
+    Render(&'static str),
 }
 
 #[repr(C)]
@@ -53,19 +136,16 @@ struct Uniforms {
     banks: [f32; 4],
     low: [f32; 4],
     high: [f32; 4],
-    // The 69 GPU pieces occupy three contiguous Pod arrays of 23.
-    pieces: [[Piece; 23]; 3],
 }
 
 struct View {
     center: Vec3,
     radius: f64,
-    pieces: [Piece; GOSHAWK_PIECES],
     low: [f32; 4],
     high: [f32; 4],
 }
 impl View {
-    fn new(vertices: &[VisualVertex], pieces: [Piece; GOSHAWK_PIECES]) -> Self {
+    fn new(vertices: &[VisualVertex], pieces: impl AsRef<[Piece]>) -> Self {
         let mut low = [f32::INFINITY; 4];
         let mut high = [f32::NEG_INFINITY; 4];
         let mut visual_low = [f32::INFINITY; 3];
@@ -87,7 +167,7 @@ impl View {
                 delta.dot(delta).sqrt()
             })
             .fold(0.0, f64::max);
-        for piece in &pieces {
+        for piece in pieces.as_ref() {
             let stand_off = piece.low[3] + 0.001;
             for axis in 0..3 {
                 low[axis] = low[axis].min(piece.low[axis] - stand_off);
@@ -99,7 +179,6 @@ impl View {
         Self {
             center,
             radius,
-            pieces,
             low,
             high,
         }
@@ -123,7 +202,7 @@ impl View {
             || aspect <= 0.0
             || self.radius <= 0.0
         {
-            return Err("Invalid SH008 showroom view".into());
+            return Err("Invalid Goshawk showroom view".into());
         }
         // The original bow points +Z. The Showroom's camera looks along +Z, so start
         // bow-on and retain the existing pitch, roll and yaw controls in the preview.
@@ -158,9 +237,6 @@ impl View {
             banks: [1.0, 1.0, 0.018, 64.0],
             low: self.low,
             high: self.high,
-            pieces: std::array::from_fn(|group| {
-                std::array::from_fn(|i| self.pieces[group * 23 + i])
-            }),
         })
     }
 }
@@ -174,6 +250,8 @@ pub(crate) struct Pass {
     view: View,
     viewport: [f32; 4],
     shimmer: bool,
+    hull: Hull,
+    vertex_count: u32,
 }
 
 impl Pass {
@@ -182,18 +260,40 @@ impl Pass {
         queue: &wgpu::Queue,
         format: wgpu::TextureFormat,
     ) -> Result<Self, String> {
-        let vertices = visual()?;
-        let source = GoshawkHullSource::bundled().map_err(|e| e.to_string())?;
-        let (triangles, pieces, shimmer) = match support_mesh(
-            source.pieces().as_ref(),
-            GOSHAWK_DETAILED_VERTICES + GOSHAWK_NATIVE_CANDIDATE_VERTICES,
-        ) {
+        Self::construct(device, queue, format, Hull::Explorer)
+    }
+
+    pub(crate) fn for_hull(
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        format: wgpu::TextureFormat,
+        hull: Hull,
+    ) -> Result<Self, String> {
+        match hull {
+            Hull::Explorer => Self::new(device, queue, format),
+            Hull::MoleProspector => Self::construct(device, queue, format, hull),
+        }
+    }
+
+    pub(crate) fn hull(&self) -> Hull {
+        self.hull
+    }
+
+    fn construct(
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        format: wgpu::TextureFormat,
+        hull: Hull,
+    ) -> Result<Self, String> {
+        let vertices = hull.visual()?;
+        let (triangles, pieces, shimmer) = match hull.supports() {
             Ok((triangles, pieces)) => (triangles, pieces, true),
-            Err(reason) => {
-                eprintln!("Meridian Goshawk showroom shimmer unavailable: {reason}");
+            Err(SupportError::Source(reason)) => return Err(reason.to_string()),
+            Err(SupportError::Render(reason)) => {
+                eprintln!("Meridian {hull:?} showroom shimmer unavailable: {reason}");
                 (
                     vec![bytemuck::Zeroable::zeroed()],
-                    [EMPTY_PIECE; GOSHAWK_PIECES],
+                    vec![EMPTY_PIECE; hull.piece_count()],
                     false,
                 )
             }
@@ -203,17 +303,26 @@ impl Pass {
             queue,
             format,
             gpu::Inputs {
-                shader: &shader(),
-                uniform_size: size_of::<Uniforms>() as u64,
+                shader: &shader(hull.piece_count()),
+                uniform_size: (size_of::<Uniforms>() + pieces.len() * size_of::<Piece>()) as u64,
                 points: &triangles,
                 visual: &vertices,
             },
         )?;
+        // The uniform header and all source-local support records are contiguous in WGSL.
+        // Support data is immutable for this pass, so write it only when constructing the asset.
+        queue.write_buffer(
+            &hardware.uniform,
+            size_of::<Uniforms>() as u64,
+            bytemuck::cast_slice(&pieces),
+        );
         Ok(Self {
             hardware,
-            view: View::new(&vertices, pieces),
+            view: View::new(&vertices, &pieces),
             viewport: [0.0; 4],
             shimmer,
+            hull,
+            vertex_count: vertices.len() as u32,
         })
     }
 
@@ -225,6 +334,9 @@ impl Pass {
         scale: [f64; 2],
         srgb: bool,
     ) -> Result<(), String> {
+        if hull(model) != Some(self.hull) {
+            return Err("Goshawk Showroom hull mismatch".into());
+        }
         let [x, y, width, height] = [
             bounds.x * scale[0],
             bounds.y * scale[1],
@@ -254,7 +366,7 @@ impl Pass {
         render.set_pipeline(&self.hardware.solid);
         render.set_bind_group(0, &self.hardware.group, &[]);
         render.set_vertex_buffer(0, self.hardware.vertices.slice(..));
-        render.draw(0..VERTICES as u32, 0..1);
+        render.draw(0..self.vertex_count, 0..1);
     }
 
     fn draw_shimmer(&self, render: &mut wgpu::RenderPass<'_>) {
@@ -268,6 +380,9 @@ impl Pass {
 
 #[cfg(test)]
 mod minimum_qualification;
+
+#[cfg(test)]
+mod minimum_rgb;
 
 #[cfg(all(test, target_os = "macos"))]
 mod metal_qualification;
@@ -283,10 +398,48 @@ mod tests {
 
     #[test]
     fn goshawk_original_visual_and_all_local_supports_bind_to_the_shader() {
-        let vertices = ok(visual());
-        assert_eq!(vertices.len(), 3_484 * 3);
-        let source = ok(GoshawkHullSource::bundled());
-        let (triangles, pieces) = ok(support_mesh(source.pieces().as_ref(), 2608));
+        check_variant(Hull::Explorer, 3484, GOSHAWK_PIECES);
+    }
+
+    #[test]
+    fn mole_prospector_original_visual_and_all_local_supports_bind_to_its_own_shader() {
+        check_variant(
+            Hull::MoleProspector,
+            PROSPECTOR_DETAILED_FACES,
+            PROSPECTOR_PIECES,
+        );
+        assert!(
+            authenticated_visual(PROSPECTOR_VISUAL, VISUAL_FNV, b"GOSHVIZ1", VERTICES).is_err()
+        );
+        assert!(
+            authenticated_visual(
+                VISUAL,
+                PROSPECTOR_VISUAL_FNV,
+                b"SH017VZ1",
+                PROSPECTOR_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        let mut model = ModelPreview {
+            object: "SH017".into(),
+            geometry_key: PROSPECTOR_GEOMETRY_KEY.into(),
+            bounds: Rect::new(0.0, 0.0, 256.0, 256.0),
+            orientation: Orientation::default(),
+        };
+        assert_eq!(hull(&model), Some(Hull::MoleProspector));
+        model.geometry_key = GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+        model.object = "SH008".into();
+        assert_eq!(hull(&model), Some(Hull::Explorer));
+        model.geometry_key = PROSPECTOR_GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+    }
+
+    fn check_variant(hull: Hull, face_count: usize, piece_count: usize) {
+        let vertices = ok(hull.visual());
+        assert_eq!(vertices.len(), face_count * 3);
+        let (triangles, pieces) = ok(hull.supports());
+        assert_eq!(pieces.len(), piece_count);
         assert!(!triangles.is_empty());
         assert!(
             pieces
@@ -307,7 +460,7 @@ mod tests {
                 assert!((y * focal).abs() <= z);
             }
         }
-        let module = ok(naga::front::wgsl::parse_str(&shader()));
+        let module = ok(naga::front::wgsl::parse_str(&shader(piece_count)));
         ok(naga::valid::Validator::new(
             naga::valid::ValidationFlags::all(),
             naga::valid::Capabilities::empty(),
@@ -322,12 +475,12 @@ mod tests {
         let TypeInner::Struct { members, span } = input else {
             panic!("unexpected shader Inputs")
         };
-        assert_eq!(*span as usize, size_of::<Uniforms>());
-        let pieces = members.last().unwrap_or_else(|| panic!("missing pieces"));
         assert_eq!(
-            pieces.offset as usize,
-            std::mem::offset_of!(Uniforms, pieces)
+            *span as usize,
+            size_of::<Uniforms>() + piece_count * size_of::<Piece>()
         );
+        let pieces = members.last().unwrap_or_else(|| panic!("missing pieces"));
+        assert_eq!(pieces.offset as usize, size_of::<Uniforms>());
         let TypeInner::Array {
             size: ArraySize::Constant(count),
             stride,
@@ -336,7 +489,7 @@ mod tests {
         else {
             panic!("unexpected GPU support array");
         };
-        assert_eq!(count.get() as usize, GOSHAWK_PIECES);
+        assert_eq!(count.get() as usize, piece_count);
         assert_eq!(*stride as usize, size_of::<Piece>());
     }
 }

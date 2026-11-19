@@ -4,6 +4,10 @@
 
 Preview 10 is published for macOS arm64 and Windows x64. It includes the Goshawk Explorer in the ordinary station Showroom. The signed and notarized app was extracted and checked against the local installation, including all 483 files. Earlier Mac gameplay checks covered the Showroom on the source used for this build. Packaging verification did not include a new graphical launch. [Preview guide](PREVIEW-RELEASES.md)
 
+## Mole Prospector source candidate
+
+SH017 has its own original detailed Showroom, 83 local rounded collision pieces, independent SH028/tool-cradle fit and full source-surface evidence, and an adopted 116,421 kg engineering budget. The eight original detailed boring-head collars have their own bounded supports; the native candidate omits them and exceeds its exact face limit. Rust and native Metal execution, actual native collision, ordinary placement and acquisition remain pending. [SH017 evidence and acceptance](MOLE-PROSPECTOR-GAMEPLAY-ENVELOPE.md)
+
 ## Commander startup and flight cockpit
 
 Ordinary startup opens Commander details with the current ship, location and credits. A fresh commander starts at Avenor. A saved flight opens its summary and waits for Enter to resume. An unreadable slot opens recovery. On Mac, a fresh commander reached this screen without creating a save. An airborne commander stayed on the summary until Enter. Recovery preserved the original damaged and unsupported save bytes.

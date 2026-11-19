@@ -1,5 +1,5 @@
-//! Explicit Metal evidence from the production SH008 Showroom pass.
-use super::{Pass, Uniforms, matches};
+//! Explicit Metal evidence from the production Goshawk Showroom pass.
+use super::{Hull, Pass, Uniforms};
 use crate::{
     app::MIN_WINDOW_LOGICAL,
     docked::Docked,
@@ -25,11 +25,17 @@ const SAMPLES: u32 = 16;
 const POSES: [&str; 3] = ["front", "oblique", "upper"];
 const PHASE_SECONDS: f32 = std::f32::consts::PI / 0.7;
 
+mod mole_prospector_qualification;
+
 fn ok<T, E: std::fmt::Debug>(result: Result<T, E>) -> T {
     result.unwrap_or_else(|error| panic!("{error:?}"))
 }
 
 fn showroom_models() -> [ModelPreview; 3] {
+    showroom_models_for("Goshawk Explorer", Hull::Explorer)
+}
+
+fn showroom_models_for(name: &str, expected: Hull) -> [ModelPreview; 3] {
     let directory = TestDirectory::new();
     let mut profile = open(&directory.0);
     assert!(ok(profile.new_commander(97008)));
@@ -48,12 +54,12 @@ fn showroom_models() -> [ModelPreview; 3] {
             .models
             .try_into()
             .unwrap_or_else(|_| panic!("expected exactly one production Showroom model"));
-        assert!(matches(&model));
+        assert_eq!(super::hull(&model), Some(expected));
         model
     };
     for action in [
         Input::Key(Key::Search),
-        Input::Text("Goshawk Explorer".into()),
+        Input::Text(name.into()),
         Input::Key(Key::Confirm),
         Input::Key(Key::Compare),
         Input::Key(Key::ResetView),
@@ -393,7 +399,11 @@ fn run_pose(
     name: &str,
 ) -> [usize; 2] {
     ok(pass.prepare(&gpu.queue, model, model.bounds, SCALE, FORMAT.is_srgb()));
-    assert!(pass.shimmer, "SH008 rounded support certification failed");
+    assert!(
+        pass.shimmer,
+        "{} rounded support certification failed",
+        model.object
+    );
     let crop = Crop::from_pass(pass, target);
     let solid = crop.capture_preview(gpu, target, pass, true);
     let normal = crop.capture_preview(gpu, target, pass, false);
@@ -422,6 +432,20 @@ fn run_pose(
         repeat == normal,
         "{name}: identical production samples drifted"
     );
+    assert!(
+        solid.iter().any(|&channel| channel != 0),
+        "{name}: missing solid hull"
+    );
+    let peak_delta = |before: &[u8], after: &[u8]| {
+        before
+            .iter()
+            .zip(after)
+            .map(|(a, b)| a.abs_diff(*b))
+            .max()
+            .unwrap_or(0)
+    };
+    assert!(peak_delta(&solid, &normal) <= 24 && peak_delta(&solid, &shifted) <= 24);
+    assert!(peak_delta(&normal, &shifted) <= 7);
     let changed = |from: &[u8], to: &[u8]| {
         from.as_chunks::<3>()
             .0
@@ -432,7 +456,8 @@ fn run_pose(
     };
     let changed = [changed(&solid, &normal), changed(&normal, &shifted)];
     println!(
-        "SH008 {name} viewport={:?} orientation={:?} crop={}x{}+{}+{} normal_delta_pixels={} phase_delta_pixels={}",
+        "{} {name} viewport={:?} orientation={:?} crop={}x{}+{}+{} normal_delta_pixels={} phase_delta_pixels={}",
+        model.object,
         pass.viewport,
         model.orientation,
         crop.extent.width,
@@ -506,6 +531,10 @@ fn output_directory(variable: &str) -> PathBuf {
 }
 
 fn metal_gpu(request_timing: bool) -> Gpu {
+    metal_gpu_for("SH008", request_timing)
+}
+
+fn metal_gpu_for(object: &str, request_timing: bool) -> Gpu {
     let mut descriptor = wgpu::InstanceDescriptor::new_without_display_handle();
     descriptor.backends = wgpu::Backends::METAL;
     let instance = wgpu::Instance::new(descriptor);
@@ -521,7 +550,7 @@ fn metal_gpu(request_timing: bool) -> Gpu {
         wgpu::Features::empty()
     };
     println!(
-        "SH008 adapter={info:?} format={FORMAT:?} logical={LOGICAL:?} scale={SCALE:?} timestamp_available={timestamps:?} timestamp_requested={required_features:?} phase_seconds={PHASE_SECONDS}"
+        "{object} adapter={info:?} format={FORMAT:?} logical={LOGICAL:?} scale={SCALE:?} timestamp_available={timestamps:?} timestamp_requested={required_features:?} phase_seconds={PHASE_SECONDS}"
     );
     let (device, queue) = ok(pollster::block_on(adapter.request_device(
         &wgpu::DeviceDescriptor {
@@ -539,12 +568,32 @@ fn metal_gpu(request_timing: bool) -> Gpu {
 #[test]
 #[ignore = "Mac owner only: explicit production SH008 visual qualification"]
 fn metal_goshawk_same_pose_shimmer() {
-    let output = output_directory("MERIDIAN_SH008_EVIDENCE_DIR");
-    let gpu = metal_gpu(false);
+    same_pose_shimmer(
+        Hull::Explorer,
+        "SH008",
+        "Goshawk Explorer",
+        "MERIDIAN_SH008_EVIDENCE_DIR",
+    );
+}
+
+#[test]
+#[ignore = "Mac owner only: explicit production SH017 visual qualification"]
+fn metal_mole_prospector_same_pose_shimmer() {
+    same_pose_shimmer(
+        Hull::MoleProspector,
+        "SH017",
+        "Mole Prospector",
+        "MERIDIAN_SH017_EVIDENCE_DIR",
+    );
+}
+
+fn same_pose_shimmer(hull: Hull, object: &str, name: &str, variable: &str) {
+    let output = output_directory(variable);
+    let gpu = metal_gpu_for(object, false);
     let target = Target::new(&gpu.device, LOGICAL);
-    let mut pass = ok(Pass::new(&gpu.device, &gpu.queue, FORMAT));
+    let mut pass = ok(Pass::for_hull(&gpu.device, &gpu.queue, FORMAT, hull));
     let mut totals = [0, 0];
-    let models = showroom_models();
+    let models = showroom_models_for(name, hull);
     let [front, oblique, upper] = models
         .each_ref()
         .map(|model| hull_local_direction(&pass, model));
@@ -552,7 +601,7 @@ fn metal_goshawk_same_pose_shimmer() {
     for ((name, [x, y, z]), model) in POSES.into_iter().zip([front, oblique, upper]).zip(&models) {
         use std::fmt::Write as _;
         println!(
-            "SH008 {name} orientation={:?} hull_local_direction=[{x:.9}, {y:.9}, {z:.9}]",
+            "{object} {name} orientation={:?} hull_local_direction=[{x:.9}, {y:.9}, {z:.9}]",
             model.orientation
         );
         ok(writeln!(directions, "{name}\t{x:.9}\t{y:.9}\t{z:.9}"));

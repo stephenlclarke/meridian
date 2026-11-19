@@ -1,9 +1,13 @@
-//! Controlled SH008 approach using one World and the authenticated SH028 station.
+//! Controlled Goshawk approaches using one World and the authenticated SH028 station.
 use super::{FlightInput, FlightStart, StepError, World, flight_pose};
 use crate::docking::{RigidPose, Vec3};
 use crate::goshawk::{
     GOSHAWK_CONTRACT_SHA256, GOSHAWK_MAX_SPEED_UNITS, GOSHAWK_PIECES, GOSHAWK_RESOURCE_SHA256,
     GoshawkEngineering, GoshawkHullSource,
+};
+use crate::mole_prospector::{
+    MoleProspectorHullSource, PROSPECTOR_CONTRACT_SHA256, PROSPECTOR_MAX_SPEED_UNITS,
+    PROSPECTOR_PIECES, PROSPECTOR_RESOURCE_SHA256,
 };
 use crate::mule::{SmoothPiece, rounded_maximum_origin_radius};
 use crate::station::{DISTANCE_PER_SPEED_UNIT, OriginalStationData, StationError};
@@ -20,17 +24,22 @@ pub enum GoshawkApproachStatus {
 
 /// One read-only publication of the World-owned validation hull.
 #[derive(Debug, Clone)]
-pub struct GoshawkApproachSnapshot {
+pub struct GoshawkHullApproachSnapshot<const N: usize, E> {
     pose: RigidPose,
     speed: f32,
     status: GoshawkApproachStatus,
-    pieces: Arc<[SmoothPiece; GOSHAWK_PIECES]>,
-    engineering: &'static GoshawkEngineering,
+    pieces: Arc<[SmoothPiece; N]>,
+    engineering: E,
     tick: u64,
     scope: Weak<()>,
+    identity: (&'static str, &'static str),
 }
 
-impl GoshawkApproachSnapshot {
+pub type GoshawkApproachSnapshot =
+    GoshawkHullApproachSnapshot<GOSHAWK_PIECES, &'static GoshawkEngineering>;
+pub type MoleProspectorApproachSnapshot = GoshawkHullApproachSnapshot<PROSPECTOR_PIECES, ()>;
+
+impl<const N: usize, E> GoshawkHullApproachSnapshot<N, E> {
     pub fn pose(&self) -> RigidPose {
         self.pose
     }
@@ -43,9 +52,15 @@ impl GoshawkApproachSnapshot {
     pub fn world_tick(&self) -> u64 {
         self.tick
     }
-    pub fn pieces(&self) -> &Arc<[SmoothPiece; GOSHAWK_PIECES]> {
+    pub fn pieces(&self) -> &Arc<[SmoothPiece; N]> {
         &self.pieces
     }
+    pub fn source_identity(&self) -> (&'static str, &'static str) {
+        self.identity
+    }
+}
+
+impl GoshawkApproachSnapshot {
     pub fn engineering(&self) -> &'static GoshawkEngineering {
         self.engineering
     }
@@ -59,14 +74,74 @@ impl GoshawkApproachSnapshot {
             self.pose.position.z + offset.z,
         )
     }
-    pub fn source_identity(&self) -> (&'static str, &'static str) {
-        (GOSHAWK_RESOURCE_SHA256, GOSHAWK_CONTRACT_SHA256)
+}
+
+#[derive(Debug)]
+enum HullSource {
+    Explorer(GoshawkHullSource),
+    MoleProspector(MoleProspectorHullSource),
+}
+
+impl HullSource {
+    fn pieces(&self) -> &[SmoothPiece] {
+        match self {
+            Self::Explorer(source) => source.pieces().as_ref(),
+            Self::MoleProspector(source) => source.pieces(),
+        }
+    }
+
+    fn max_speed(&self) -> f32 {
+        match self {
+            Self::Explorer(_) => GOSHAWK_MAX_SPEED_UNITS,
+            Self::MoleProspector(_) => PROSPECTOR_MAX_SPEED_UNITS,
+        }
+    }
+
+    fn motion_clear(&self, data: &OriginalStationData, start: RigidPose, end: RigidPose) -> bool {
+        match self {
+            Self::Explorer(source) => data.goshawk_motion_clear(source, start, end, 0.0),
+            Self::MoleProspector(source) => {
+                data.mole_prospector_motion_clear(source, start, end, 0.0)
+            }
+        }
+    }
+
+    fn observer_clear(
+        &self,
+        data: &OriginalStationData,
+        start: RigidPose,
+        end: RigidPose,
+        observer: RigidPose,
+    ) -> bool {
+        match self {
+            Self::Explorer(source) => data.goshawk_observer_clear(source, start, end, observer),
+            Self::MoleProspector(source) => {
+                data.mole_prospector_observer_clear(source, start, end, observer)
+            }
+        }
+    }
+
+    fn entry_conditions(
+        &self,
+        data: &OriginalStationData,
+        start: RigidPose,
+        end: RigidPose,
+        speed: f64,
+    ) -> bool {
+        match self {
+            Self::Explorer(source) => {
+                data.goshawk_entry_conditions(source, start, end, speed, 0.0, 0.0)
+            }
+            Self::MoleProspector(source) => {
+                data.mole_prospector_entry_conditions(source, start, end, speed, 0.0, 0.0)
+            }
+        }
     }
 }
 
 #[derive(Debug)]
 pub(super) struct Approach {
-    source: GoshawkHullSource,
+    source: HullSource,
     pose: RigidPose,
     speed: f32,
     status: GoshawkApproachStatus,
@@ -74,6 +149,36 @@ pub(super) struct Approach {
 }
 
 impl Approach {
+    fn snapshot<const N: usize, E>(
+        &self,
+        pieces: &Arc<[SmoothPiece; N]>,
+        tick: u64,
+        engineering: E,
+        identity: (&'static str, &'static str),
+    ) -> GoshawkHullApproachSnapshot<N, E> {
+        GoshawkHullApproachSnapshot {
+            pose: self.pose,
+            speed: self.speed,
+            status: self.status,
+            pieces: pieces.clone(),
+            engineering,
+            tick,
+            scope: Arc::downgrade(&self.scope),
+            identity,
+        }
+    }
+
+    fn snapshot_current<const N: usize, E>(
+        &self,
+        frame: &GoshawkHullApproachSnapshot<N, E>,
+        pieces: &Arc<[SmoothPiece; N]>,
+        tick: u64,
+    ) -> bool {
+        frame.scope.ptr_eq(&Arc::downgrade(&self.scope))
+            && Arc::ptr_eq(&frame.pieces, pieces)
+            && frame.tick == tick
+    }
+
     fn advance(&mut self, data: &OriginalStationData, observer: RigidPose) {
         use GoshawkApproachStatus as Status;
         if self.status != Status::Approaching {
@@ -93,19 +198,14 @@ impl Approach {
         };
         let crossing = data.depth(before) > 0.0 && data.depth(proposed) <= 0.0;
 
-        self.status = if !data.goshawk_motion_clear(&self.source, before, proposed, 0.0) {
+        self.status = if !self.source.motion_clear(data, before, proposed) {
             Status::StationContact
-        } else if !data.goshawk_observer_clear(&self.source, before, proposed, observer) {
+        } else if !self.source.observer_clear(data, before, proposed, observer) {
             Status::ObserverContact
         } else if crossing
-            && !data.goshawk_entry_conditions(
-                &self.source,
-                before,
-                proposed,
-                physical_speed,
-                0.0,
-                0.0,
-            )
+            && !self
+                .source
+                .entry_conditions(data, before, proposed, physical_speed)
         {
             Status::EntryConditions
         } else {
@@ -122,9 +222,9 @@ impl Approach {
     }
 }
 
-fn start_pose(start: FlightStart) -> Result<RigidPose, StationError> {
+fn start_pose(start: FlightStart, max_speed: f32) -> Result<RigidPose, StationError> {
     let norm = start.orientation.iter().map(|v| v * v).sum::<f32>();
-    if !(0.0..=GOSHAWK_MAX_SPEED_UNITS).contains(&start.speed)
+    if !(0.0..=max_speed).contains(&start.speed)
         || start.speed <= 0.0
         || !norm.is_finite()
         || (norm - 1.0).abs() > 1e-5
@@ -145,6 +245,24 @@ impl World {
         observer: FlightStart,
         approach: FlightStart,
     ) -> Result<Self, StationError> {
+        let source = GoshawkHullSource::bundled().map_err(|_| StationError::InvalidMesh)?;
+        Self::goshawk_source_scenario(observer, approach, HullSource::Explorer(source))
+    }
+
+    /// The separate SH017-only World approach. There is no ordinary player or fleet placement.
+    pub fn mole_prospector_docking_validation_scenario(
+        observer: FlightStart,
+        approach: FlightStart,
+    ) -> Result<Self, StationError> {
+        let source = MoleProspectorHullSource::bundled().map_err(|_| StationError::InvalidMesh)?;
+        Self::goshawk_source_scenario(observer, approach, HullSource::MoleProspector(source))
+    }
+
+    fn goshawk_source_scenario(
+        observer: FlightStart,
+        approach: FlightStart,
+        source: HullSource,
+    ) -> Result<Self, StationError> {
         if observer.speed != 0.0 {
             return Err(StationError::InvalidPose);
         }
@@ -153,11 +271,10 @@ impl World {
             .station_data
             .as_ref()
             .ok_or(StationError::InvalidPose)?;
-        let source = GoshawkHullSource::bundled().map_err(|_| StationError::InvalidMesh)?;
-        let pose = start_pose(approach)?;
+        let pose = start_pose(approach, source.max_speed())?;
         let observer = flight_pose(world.state.position, world.state.orientation)
             .ok_or(StationError::InvalidPose)?;
-        let radius = rounded_maximum_origin_radius(source.pieces().as_ref());
+        let radius = rounded_maximum_origin_radius(source.pieces());
         let delta = Vec3::new(
             pose.position.x - observer.position.x,
             pose.position.y - observer.position.y,
@@ -166,7 +283,7 @@ impl World {
         let separation = (radius + data.player_radius()) * 1.001 + 0.001;
         if data.depth(pose) <= radius * 1.001
             || delta.dot(delta) <= separation * separation
-            || !data.goshawk_motion_clear(&source, pose, pose, 0.0)
+            || !source.motion_clear(data, pose, pose)
         {
             return Err(StationError::InvalidPose);
         }
@@ -182,27 +299,65 @@ impl World {
 
     pub fn goshawk_approach_snapshot(&self) -> Option<GoshawkApproachSnapshot> {
         let approach = self.goshawk_validation.as_ref()?;
-        Some(GoshawkApproachSnapshot {
-            pose: approach.pose,
-            speed: approach.speed,
-            status: approach.status,
-            pieces: approach.source.pieces().clone(),
-            engineering: approach.source.engineering(),
-            tick: self.state.tick,
-            scope: Arc::downgrade(&approach.scope),
-        })
+        let HullSource::Explorer(source) = &approach.source else {
+            return None;
+        };
+        Some(approach.snapshot(
+            source.pieces(),
+            self.state.tick,
+            source.engineering(),
+            (GOSHAWK_RESOURCE_SHA256, GOSHAWK_CONTRACT_SHA256),
+        ))
+    }
+
+    pub fn mole_prospector_approach_snapshot(&self) -> Option<MoleProspectorApproachSnapshot> {
+        let approach = self.goshawk_validation.as_ref()?;
+        let HullSource::MoleProspector(source) = &approach.source else {
+            return None;
+        };
+        Some(approach.snapshot(
+            source.shared_pieces(),
+            self.state.tick,
+            (),
+            (PROSPECTOR_RESOURCE_SHA256, PROSPECTOR_CONTRACT_SHA256),
+        ))
     }
 
     pub fn goshawk_snapshot_is_current(&self, frame: &GoshawkApproachSnapshot) -> bool {
         self.goshawk_validation.as_ref().is_some_and(|approach| {
-            frame.scope.ptr_eq(&Arc::downgrade(&approach.scope))
-                && Arc::ptr_eq(&frame.pieces, approach.source.pieces())
-                && frame.tick == self.state.tick
+            if let HullSource::Explorer(source) = &approach.source {
+                approach.snapshot_current(frame, source.pieces(), self.state.tick)
+            } else {
+                false
+            }
+        })
+    }
+
+    pub fn mole_prospector_snapshot_is_current(
+        &self,
+        frame: &MoleProspectorApproachSnapshot,
+    ) -> bool {
+        self.goshawk_validation.as_ref().is_some_and(|approach| {
+            if let HullSource::MoleProspector(source) = &approach.source {
+                approach.snapshot_current(frame, source.shared_pieces(), self.state.tick)
+            } else {
+                false
+            }
         })
     }
 
     pub fn goshawk_observer_pose(&self, frame: &GoshawkApproachSnapshot) -> Option<RigidPose> {
         if !self.goshawk_snapshot_is_current(frame) {
+            return None;
+        }
+        flight_pose(self.state.position, self.state.orientation)
+    }
+
+    pub fn mole_prospector_observer_pose(
+        &self,
+        frame: &MoleProspectorApproachSnapshot,
+    ) -> Option<RigidPose> {
+        if !self.mole_prospector_snapshot_is_current(frame) {
             return None;
         }
         flight_pose(self.state.position, self.state.orientation)

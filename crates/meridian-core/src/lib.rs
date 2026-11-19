@@ -9,6 +9,7 @@ mod flight;
 pub mod freight;
 pub mod goshawk;
 pub mod mining;
+pub mod mole_prospector;
 pub mod mule;
 pub mod navigation;
 pub mod save;
@@ -16,6 +17,7 @@ pub mod station;
 pub mod station_services;
 pub mod traffic;
 
+pub use flight::MoleProspectorApproachSnapshot;
 pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};
 pub use flight::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
 
