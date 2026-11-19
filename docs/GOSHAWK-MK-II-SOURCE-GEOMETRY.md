@@ -69,6 +69,22 @@ python3 -B tools/verify_goshawk_mk2_fixture_source.py
 cargo test --locked -p meridian-core goshawk_mk2::tests:: -- --nocapture
 ```
 
+The Air audit adapter is retained byte-for-byte. With the dependencies in
+`tools/requirements-goshawk-surface-fit.txt` installed, run from the
+repository root using a fresh output directory.
+
+```bash
+audit_dir=$(mktemp -d)
+python3 -B tools/measure_sh009_air.py > "$audit_dir/SH009-SURFACE-FIT.json"
+cmp "$audit_dir/SH009-SURFACE-FIT.json" integration/sh009-goshawk-mk2/SH009-SURFACE-FIT.json
+```
+
+The criteria file records the original packet and numerical input hashes.
+The current shared helper checks that assertions are enabled at import time.
+Its certificate functions match the Air run. The station fixtures establish
+swept clearance and lip contact. Full speed and attitude admission, controlled
+and ordinary flight, GPU timing and native window resizing remain open.
+
 ## Adopted stock engineering
 
 SH009's adopted dry mass is **33,072 kg**, including both drive liners in
