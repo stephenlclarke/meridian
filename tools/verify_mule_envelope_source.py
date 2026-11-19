@@ -228,10 +228,9 @@ def verify_protected_core(root):
             data = data.replace(addition, b'', 1)
         data = undo_commander_launch(relative, data)
         if relative == LIB_SOURCE:
-            # Invert only the reviewed Stag Liner geometry publication.
-            addition = b'pub mod stag_liner;\n\n'
-            assert data.count(addition) == 1, relative
-            data = data.replace(addition, b'', 1)
+            for publication in (b'pub mod stag_liner;\n\n', b'pub mod saker;\n'):
+                assert data.count(publication) == 1, relative
+                data = data.replace(publication, b'', 1)
         if relative == FLIGHT_SOURCE:
             speed_line = b'        if !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
             original_line = b'        if !self.state.speed.is_finite() || !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'

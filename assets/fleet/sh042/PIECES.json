@@ -1,0 +1,31 @@
+{
+  "pieces": [
+    "forward-barrel",
+    "upper-shroud",
+    "upper-thrust-brace",
+    "upper-drive",
+    "left-shroud",
+    "left-thrust-brace",
+    "left-drive",
+    "right-shroud",
+    "right-thrust-brace",
+    "right-drive",
+    "pressure-canopy",
+    "canopy-centre-brace",
+    "left-service-pipe",
+    "left-instrument-housing",
+    "left-louvre-0",
+    "left-louvre-1",
+    "left-louvre-2",
+    "left-louvre-3",
+    "left-louvre-4",
+    "right-service-pipe",
+    "right-instrument-housing",
+    "right-louvre-0",
+    "right-louvre-1",
+    "right-louvre-2",
+    "right-louvre-3",
+    "right-louvre-4"
+  ],
+  "roundingMetres": 0.02
+}

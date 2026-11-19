@@ -40,6 +40,10 @@ execution. Ordinary placement and gameplay docking remain open.
 
 SH035 preserves the two original pearl-teal meshes and uses 26 local supports. SteveMBA verified seven routes, eight structural overlaps and the original SH028 offset lip contact. The full fit bounds are 705 mm detailed and 3,038 mm native. The installed signed Hull Studio exported the exact definition with all 26 groups and seven routes passing. The per-hull Rust contact tests and Showroom qualification remain pending. [Stag Liner source and evidence](STAG-LINER-GAMEPLAY-ENVELOPE.md)
 
+## Saker source envelope
+
+The SH042 Saker source package preserves the original forest-ivory meshes and both frozen engineering records. SteveMBA verified seven routes, seven overlaps in both LODs and the offset contact with the original SH028 station lip. The full fit upper bounds are 448 mm detailed and 2,106 mm native. A detailed instrument housing absent from the native LOD accounts for the limiting native stand-off. The Rust contact tests and Showroom qualification are pending. [Saker source and evidence](SAKER-GAMEPLAY-ENVELOPE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)
