@@ -8,6 +8,8 @@ In Preview 10, press 3 at a station and search for Goshawk Explorer. Compare sho
 
 The development source also provides a separate Goshawk Mk II Custom Showroom and collision candidate. Its original detailed appearance, four lower mounts and SH028 fit evidence are in the [SH010 hull guide](docs/GOSHAWK-MK-II-CUSTOM.md). Owned native validation is pending.
 
+The separate Gazelle Explorer development source adds the original ice-cobalt model and an open, sector-local aft loop. Native and ordinary admission remain pending. [SH019 geometry and validation scope](docs/GAZELLE-EXPLORER-GAMEPLAY-ENVELOPE.md)
+
 ## Internal Mule docking validation
 
 The internal SH001 Mule scene uses the original SH028 station. On Mac build `ffb7112`, Mule entered the clear opening at tick 104. On the obstructed approach it stopped at the station lip at tick 11. In the development build, completing all eight G02 freight handovers unlocks a single Mule encounter on the next launch from Renas. A returning pilot whose saved ship overlaps the Mule’s berth can fly clear before the Mule appears. Preview 8 predates this encounter. The reviewed renderer build `1cdac5e` also passed the aligned crossing on Mac and the docking regressions on Linux and native Windows. [Controls and test scope](docs/MULE-VALIDATION-LAUNCH.md)

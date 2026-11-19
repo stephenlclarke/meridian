@@ -1,0 +1,186 @@
+{
+  "id": "SH019",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "originalDesignSHA256": "56172839f14cc1aca09814de34d181b98832e87e071130d0c4c930a760d66944",
+  "metresPerSourceUnit": "1",
+  "axes": "+Z forward, +Y up; original origin",
+  "detailed": {
+    "vertices": 3008,
+    "faces": 5900,
+    "components": 30,
+    "boundsMetres": [
+      [
+        -11.3,
+        -6.9,
+        -16.79
+      ],
+      [
+        11.3,
+        6.9,
+        21.5
+      ]
+    ]
+  },
+  "nativeCandidate": {
+    "vertices": 172,
+    "faces": 304,
+    "components": 11,
+    "boundsMetres": [
+      [
+        -11.3,
+        -6.9,
+        -16.79
+      ],
+      [
+        11.3,
+        6.9,
+        21.5
+      ]
+    ],
+    "exactFaceLimit": 512,
+    "sourceStatus": "Approved authored metre native LOD; no Meridian native qualification claimed."
+  },
+  "physicalAuthority": {
+    "status": "AUTHORED_METRE_GEOMETRY_ONLY_NO_REGISTERED_ENGINEERING",
+    "dryMassKg": null,
+    "centreOfMassMetres": null,
+    "inertiaKgM2": null
+  },
+  "collision": {
+    "pieces": 37,
+    "roundingMetres": 0.02,
+    "supportPoints": [
+      3104,
+      204
+    ],
+    "scope": "Source-local rounded convex supports. Eight separate loop sectors duplicate only canonical seam points in support stream; original geometry/indices unchanged."
+  },
+  "legacyInputs": {
+    "resource.toml": {
+      "path": "Sources/L337Core/Resources/Ships/SH019.toml",
+      "bytes": 752694,
+      "sha256": "b37924110f28d2b0d541af5b7de2feb7c386254350afe6f4a8c162af471169ac"
+    },
+    "contract.toml": {
+      "path": "docs/fleet-design-v2/ships/SH019.toml",
+      "bytes": 3504,
+      "sha256": "9eb70cd7503964f5613f86cd6ceec2cf34f64598e8018779380fc6eca5b08a04"
+    },
+    "native-source.json": {
+      "path": "Sources/L337Core/Resources/OriginalFleetShowroomModels/SH019.json",
+      "bytes": 29054,
+      "sha256": "664c9a5ad747c60982d4f0bf460a3dbd69e286ce47c733a25d8a335cfec6fa6f"
+    },
+    "native-export-manifest.json": {
+      "path": "Sources/L337Core/Resources/OriginalFleetShowroomModels/manifest.json",
+      "bytes": 45988,
+      "sha256": "118b05757dc54096faa15dd79801f38999b87fe9424f1b3513133ead94f71971"
+    },
+    "legacy-activation.swift": {
+      "path": "Sources/L337Core/OriginalGazelleExplorerActivation.swift",
+      "bytes": 1464,
+      "sha256": "ed92011aebc8482c578a67e316da4aded15828b102e51bfd135a97b1ecd08389"
+    },
+    "legacy-physical-contract.swift": {
+      "path": "Sources/L337Core/OriginalHullPhysicalContract.swift",
+      "bytes": 31230,
+      "sha256": "2c68d8d51acdd469faa25124bcc19027aec1a8f747eb267da2e84e5a98e3c027"
+    },
+    "legacy-source-tests.swift": {
+      "path": "Tests/L337CoreTests/OriginalGazelleExplorerUnitTests.swift",
+      "bytes": 3270,
+      "sha256": "8fe0010a4985eff0c862b6aa974ec3d9b219bb89f30f106ff0f7c1642c88e7e6"
+    },
+    "legacy-appearance.swift": {
+      "path": "Sources/L337Core/ShipAppearance.swift",
+      "bytes": 3510,
+      "sha256": "629e75651da678609f1092fb0f287f48d1718331066c29a81626c1e660fadbb5"
+    },
+    "legacy-registrations.swift": {
+      "path": "Sources/L337Core/OriginalFleetPhysicalRegistrations.swift",
+      "bytes": 24586,
+      "sha256": "5ec9cd96763e0cf96783052127a0d0ec05a2a9155fd0289d3f8e25682510c0fa"
+    },
+    "legacy-baseline-registrations.swift": {
+      "path": "Sources/L337Core/OriginalFleetBaselinePhysicalRegistrations.swift",
+      "bytes": 1407,
+      "sha256": "7264c4af506629f5559fda999267d78376aaaaed6d27cb7325551a45e25da8e3"
+    },
+    "legacy-relative-registrations.swift": {
+      "path": "Sources/L337Core/OriginalFleetRelativePhysicalRegistrations.swift",
+      "bytes": 54590,
+      "sha256": "f27bb348cd77faa18eb2c01c71afbf503f2e240ce974fec59036447eef70017d"
+    },
+    "legacy-larvaal-registrations.swift": {
+      "path": "Sources/L337Core/OriginalFleetLarvaalPhysicalRegistrations.swift",
+      "bytes": 6525,
+      "sha256": "560232d01d8954477df164531b0ed3595caca3657d77c0e99cc6bd65353d8001"
+    },
+    "LICENSE": {
+      "path": "LICENSE",
+      "bytes": 1071,
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+    }
+  },
+  "encoded": {
+    "source.vertices": {
+      "bytes": 76336,
+      "sha256": "e947efcf9e3e9844112bfaa27bcb58e810064b9ededc893394b003ef21d02a47"
+    },
+    "source-triangles.bin": {
+      "bytes": 74448,
+      "sha256": "b6aa03729ee03823b79b403a186e753932a483754ce506bf31191cff1defbe55"
+    },
+    "source-face-membership.bin": {
+      "bytes": 6204,
+      "sha256": "f5725f9d90ff85a3de210c062f185eb31af938c28eca1686f1f0e3663c73f551"
+    },
+    "support.vertices": {
+      "bytes": 79408,
+      "sha256": "e50f114e893372018a852335960b0ffd1bf9fafe4c542337b89a06a9db8a02e3"
+    },
+    "support-source-indices.bin": {
+      "bytes": 13232,
+      "sha256": "c04f5fa12bea5db5ebdac01b8f8ebf3f1c9b2f46eeacdc449f21391385e62b9c"
+    },
+    "support-piece-membership.bin": {
+      "bytes": 3308,
+      "sha256": "a51557dbd1a6bdc5559264745194a2af021491a019dc52bef112e817eb611622"
+    },
+    "COMPONENT-PIECES.json": {
+      "bytes": 10717,
+      "sha256": "66e3ea9b7f587ad6520f61fa1e752f06606cd795e2d6e2e2a49622b4e012edf9"
+    },
+    "visual.bin": {
+      "bytes": 991216,
+      "sha256": "6ce8b842260972cd327a4ab9e6f7fec2ee69f14003b51bc0c9f0e743d5182006"
+    }
+  },
+  "sharedTextures": {
+    "assets/fleet/sh001/l337-patrol-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "9699517d12b4fbbb28746e00bed9ee65c19a098d14402b1d5160280c6f6bfc54",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-patrol-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-strike-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "e56f149228caf90237a652d720ae549768bde1056af3d903dc8a5c243ad26e97",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-strike-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-service-details.rgba": {
+      "bytes": 4194304,
+      "sha256": "35edd84f6ce527195dd8a9bcc039521a6efc5aa2333452bbbc30217b8372103d",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-service-details.rgba",
+      "license": "MIT"
+    }
+  },
+  "appearance": {
+    "detailedUntexturedFaces": 1216,
+    "nativeUntexturedFaces": 16,
+    "originalNoMap": -1,
+    "packedNoMapSentinel": 3,
+    "scope": "Source glazing and emitter face colour without a diffuse map; source UV fields retained."
+  }
+}

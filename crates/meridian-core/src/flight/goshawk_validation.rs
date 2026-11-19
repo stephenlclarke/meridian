@@ -1,6 +1,10 @@
 //! Controlled Goshawk approaches using one World and the authenticated SH028 station.
 use super::{FlightInput, FlightStart, StepError, World, flight_pose};
 use crate::docking::{RigidPose, Vec3};
+use crate::gazelle::{
+    GAZELLE_CONTRACT_SHA256, GAZELLE_MAX_SPEED_UNITS, GAZELLE_PIECES, GAZELLE_RESOURCE_SHA256,
+    GazelleHullSource,
+};
 use crate::goshawk::{
     GOSHAWK_CONTRACT_SHA256, GOSHAWK_MAX_SPEED_UNITS, GOSHAWK_PIECES, GOSHAWK_RESOURCE_SHA256,
     GoshawkEngineering, GoshawkHullSource,
@@ -38,6 +42,7 @@ pub struct GoshawkHullApproachSnapshot<const N: usize, E> {
 pub type GoshawkApproachSnapshot =
     GoshawkHullApproachSnapshot<GOSHAWK_PIECES, &'static GoshawkEngineering>;
 pub type GoshawkCustomApproachSnapshot = GoshawkHullApproachSnapshot<CUSTOM_PIECES, ()>;
+pub type GazelleApproachSnapshot = GoshawkHullApproachSnapshot<GAZELLE_PIECES, ()>;
 
 impl<const N: usize, E> GoshawkHullApproachSnapshot<N, E> {
     pub fn pose(&self) -> RigidPose {
@@ -80,6 +85,7 @@ impl GoshawkApproachSnapshot {
 enum HullSource {
     Explorer(GoshawkHullSource),
     Custom(GoshawkCustomHullSource),
+    Gazelle(GazelleHullSource),
 }
 
 impl HullSource {
@@ -87,6 +93,7 @@ impl HullSource {
         match self {
             Self::Explorer(source) => source.pieces().as_ref(),
             Self::Custom(source) => source.pieces(),
+            Self::Gazelle(source) => source.pieces(),
         }
     }
 
@@ -94,6 +101,7 @@ impl HullSource {
         match self {
             Self::Explorer(_) => GOSHAWK_MAX_SPEED_UNITS,
             Self::Custom(_) => CUSTOM_MAX_SPEED_UNITS,
+            Self::Gazelle(_) => GAZELLE_MAX_SPEED_UNITS,
         }
     }
 
@@ -101,6 +109,7 @@ impl HullSource {
         match self {
             Self::Explorer(source) => data.goshawk_motion_clear(source, start, end, 0.0),
             Self::Custom(source) => data.goshawk_custom_motion_clear(source, start, end, 0.0),
+            Self::Gazelle(source) => data.gazelle_motion_clear(source, start, end, 0.0),
         }
     }
 
@@ -116,6 +125,7 @@ impl HullSource {
             Self::Custom(source) => {
                 data.goshawk_custom_observer_clear(source, start, end, observer)
             }
+            Self::Gazelle(source) => data.gazelle_observer_clear(source, start, end, observer),
         }
     }
 
@@ -132,6 +142,9 @@ impl HullSource {
             }
             Self::Custom(source) => {
                 data.goshawk_custom_entry_conditions(source, start, end, speed, 0.0, 0.0)
+            }
+            Self::Gazelle(source) => {
+                data.gazelle_entry_conditions(source, start, end, speed, 0.0, 0.0)
             }
         }
     }
@@ -256,6 +269,15 @@ impl World {
         Self::goshawk_source_scenario(observer, approach, HullSource::Custom(source))
     }
 
+    /// The separate SH019-only World approach. There is no ordinary player or fleet placement.
+    pub fn gazelle_docking_validation_scenario(
+        observer: FlightStart,
+        approach: FlightStart,
+    ) -> Result<Self, StationError> {
+        let source = GazelleHullSource::bundled().map_err(|_| StationError::InvalidMesh)?;
+        Self::goshawk_source_scenario(observer, approach, HullSource::Gazelle(source))
+    }
+
     fn goshawk_source_scenario(
         observer: FlightStart,
         approach: FlightStart,
@@ -321,6 +343,19 @@ impl World {
         ))
     }
 
+    pub fn gazelle_approach_snapshot(&self) -> Option<GazelleApproachSnapshot> {
+        let approach = self.goshawk_validation.as_ref()?;
+        let HullSource::Gazelle(source) = &approach.source else {
+            return None;
+        };
+        Some(approach.snapshot(
+            source.shared_pieces(),
+            self.state.tick,
+            (),
+            (GAZELLE_RESOURCE_SHA256, GAZELLE_CONTRACT_SHA256),
+        ))
+    }
+
     pub fn goshawk_snapshot_is_current(&self, frame: &GoshawkApproachSnapshot) -> bool {
         self.goshawk_validation.as_ref().is_some_and(|approach| {
             if let HullSource::Explorer(source) = &approach.source {
@@ -344,6 +379,16 @@ impl World {
         })
     }
 
+    pub fn gazelle_snapshot_is_current(&self, frame: &GazelleApproachSnapshot) -> bool {
+        self.goshawk_validation.as_ref().is_some_and(|approach| {
+            if let HullSource::Gazelle(source) = &approach.source {
+                approach.snapshot_current(frame, source.shared_pieces(), self.state.tick)
+            } else {
+                false
+            }
+        })
+    }
+
     pub fn goshawk_observer_pose(&self, frame: &GoshawkApproachSnapshot) -> Option<RigidPose> {
         if !self.goshawk_snapshot_is_current(frame) {
             return None;
@@ -356,6 +401,13 @@ impl World {
         frame: &GoshawkCustomApproachSnapshot,
     ) -> Option<RigidPose> {
         if !self.goshawk_custom_snapshot_is_current(frame) {
+            return None;
+        }
+        flight_pose(self.state.position, self.state.orientation)
+    }
+
+    pub fn gazelle_observer_pose(&self, frame: &GazelleApproachSnapshot) -> Option<RigidPose> {
+        if !self.gazelle_snapshot_is_current(frame) {
             return None;
         }
         flight_pose(self.state.position, self.state.orientation)

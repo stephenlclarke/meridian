@@ -1,0 +1,511 @@
+{
+  "labelScope": "Derived geometric labels; no creator-ownership record is present in the frozen source.",
+  "pieces": [
+    "pressure body",
+    "ventral telescope keel",
+    "elliptical service loop sector 0",
+    "elliptical service loop sector 1",
+    "elliptical service loop sector 2",
+    "elliptical service loop sector 3",
+    "elliptical service loop sector 4",
+    "elliptical service loop sector 5",
+    "elliptical service loop sector 6",
+    "elliptical service loop sector 7",
+    "negative loop support",
+    "negative survey float",
+    "negative engine casing",
+    "negative engine detail",
+    "negative engine recess",
+    "positive loop support",
+    "positive survey float",
+    "positive engine casing",
+    "positive engine detail",
+    "positive engine recess",
+    "upper glazing envelope",
+    "upper glazing structural member",
+    "forward telescope head",
+    "negative upper local feature 0",
+    "negative upper local feature 1",
+    "negative upper local feature 2",
+    "negative upper local feature 3",
+    "negative upper local feature 4",
+    "negative upper local feature 5",
+    "negative upper local feature 6",
+    "positive upper local feature 0",
+    "positive upper local feature 1",
+    "positive upper local feature 2",
+    "positive upper local feature 3",
+    "positive upper local feature 4",
+    "positive upper local feature 5",
+    "positive upper local feature 6"
+  ],
+  "detailed": [
+    {
+      "component": 0,
+      "derivedLabel": "pressure body",
+      "startVertex": 0,
+      "vertexCount": 482,
+      "startFace": 0,
+      "faceCount": 960,
+      "pieces": [
+        0
+      ]
+    },
+    {
+      "component": 1,
+      "derivedLabel": "ventral telescope keel",
+      "startVertex": 482,
+      "vertexCount": 194,
+      "startFace": 960,
+      "faceCount": 384,
+      "pieces": [
+        1
+      ]
+    },
+    {
+      "component": 2,
+      "derivedLabel": "elliptical service loop",
+      "startVertex": 676,
+      "vertexCount": 768,
+      "startFace": 1344,
+      "faceCount": 1536,
+      "pieces": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "component": 3,
+      "derivedLabel": "negative loop support",
+      "startVertex": 1444,
+      "vertexCount": 8,
+      "startFace": 2880,
+      "faceCount": 12,
+      "pieces": [
+        10
+      ]
+    },
+    {
+      "component": 4,
+      "derivedLabel": "negative survey float",
+      "startVertex": 1452,
+      "vertexCount": 194,
+      "startFace": 2892,
+      "faceCount": 384,
+      "pieces": [
+        11
+      ]
+    },
+    {
+      "component": 5,
+      "derivedLabel": "negative engine casing",
+      "startVertex": 1646,
+      "vertexCount": 66,
+      "startFace": 3276,
+      "faceCount": 128,
+      "pieces": [
+        12
+      ]
+    },
+    {
+      "component": 6,
+      "derivedLabel": "negative engine detail",
+      "startVertex": 1712,
+      "vertexCount": 66,
+      "startFace": 3404,
+      "faceCount": 128,
+      "pieces": [
+        13
+      ]
+    },
+    {
+      "component": 7,
+      "derivedLabel": "negative engine recess",
+      "startVertex": 1778,
+      "vertexCount": 66,
+      "startFace": 3532,
+      "faceCount": 128,
+      "pieces": [
+        14
+      ]
+    },
+    {
+      "component": 8,
+      "derivedLabel": "positive loop support",
+      "startVertex": 1844,
+      "vertexCount": 8,
+      "startFace": 3660,
+      "faceCount": 12,
+      "pieces": [
+        15
+      ]
+    },
+    {
+      "component": 9,
+      "derivedLabel": "positive survey float",
+      "startVertex": 1852,
+      "vertexCount": 194,
+      "startFace": 3672,
+      "faceCount": 384,
+      "pieces": [
+        16
+      ]
+    },
+    {
+      "component": 10,
+      "derivedLabel": "positive engine casing",
+      "startVertex": 2046,
+      "vertexCount": 66,
+      "startFace": 4056,
+      "faceCount": 128,
+      "pieces": [
+        17
+      ]
+    },
+    {
+      "component": 11,
+      "derivedLabel": "positive engine detail",
+      "startVertex": 2112,
+      "vertexCount": 66,
+      "startFace": 4184,
+      "faceCount": 128,
+      "pieces": [
+        18
+      ]
+    },
+    {
+      "component": 12,
+      "derivedLabel": "positive engine recess",
+      "startVertex": 2178,
+      "vertexCount": 66,
+      "startFace": 4312,
+      "faceCount": 128,
+      "pieces": [
+        19
+      ]
+    },
+    {
+      "component": 13,
+      "derivedLabel": "upper glazing envelope",
+      "startVertex": 2244,
+      "vertexCount": 482,
+      "startFace": 4440,
+      "faceCount": 960,
+      "pieces": [
+        20
+      ]
+    },
+    {
+      "component": 14,
+      "derivedLabel": "upper glazing structural member",
+      "startVertex": 2726,
+      "vertexCount": 8,
+      "startFace": 5400,
+      "faceCount": 12,
+      "pieces": [
+        21
+      ]
+    },
+    {
+      "component": 15,
+      "derivedLabel": "forward telescope head",
+      "startVertex": 2734,
+      "vertexCount": 162,
+      "startFace": 5412,
+      "faceCount": 320,
+      "pieces": [
+        22
+      ]
+    },
+    {
+      "component": 16,
+      "derivedLabel": "negative upper local feature 0",
+      "startVertex": 2896,
+      "vertexCount": 8,
+      "startFace": 5732,
+      "faceCount": 12,
+      "pieces": [
+        23
+      ]
+    },
+    {
+      "component": 17,
+      "derivedLabel": "negative upper local feature 1",
+      "startVertex": 2904,
+      "vertexCount": 8,
+      "startFace": 5744,
+      "faceCount": 12,
+      "pieces": [
+        24
+      ]
+    },
+    {
+      "component": 18,
+      "derivedLabel": "negative upper local feature 2",
+      "startVertex": 2912,
+      "vertexCount": 8,
+      "startFace": 5756,
+      "faceCount": 12,
+      "pieces": [
+        25
+      ]
+    },
+    {
+      "component": 19,
+      "derivedLabel": "negative upper local feature 3",
+      "startVertex": 2920,
+      "vertexCount": 8,
+      "startFace": 5768,
+      "faceCount": 12,
+      "pieces": [
+        26
+      ]
+    },
+    {
+      "component": 20,
+      "derivedLabel": "negative upper local feature 4",
+      "startVertex": 2928,
+      "vertexCount": 8,
+      "startFace": 5780,
+      "faceCount": 12,
+      "pieces": [
+        27
+      ]
+    },
+    {
+      "component": 21,
+      "derivedLabel": "negative upper local feature 5",
+      "startVertex": 2936,
+      "vertexCount": 8,
+      "startFace": 5792,
+      "faceCount": 12,
+      "pieces": [
+        28
+      ]
+    },
+    {
+      "component": 22,
+      "derivedLabel": "negative upper local feature 6",
+      "startVertex": 2944,
+      "vertexCount": 8,
+      "startFace": 5804,
+      "faceCount": 12,
+      "pieces": [
+        29
+      ]
+    },
+    {
+      "component": 23,
+      "derivedLabel": "positive upper local feature 0",
+      "startVertex": 2952,
+      "vertexCount": 8,
+      "startFace": 5816,
+      "faceCount": 12,
+      "pieces": [
+        30
+      ]
+    },
+    {
+      "component": 24,
+      "derivedLabel": "positive upper local feature 1",
+      "startVertex": 2960,
+      "vertexCount": 8,
+      "startFace": 5828,
+      "faceCount": 12,
+      "pieces": [
+        31
+      ]
+    },
+    {
+      "component": 25,
+      "derivedLabel": "positive upper local feature 2",
+      "startVertex": 2968,
+      "vertexCount": 8,
+      "startFace": 5840,
+      "faceCount": 12,
+      "pieces": [
+        32
+      ]
+    },
+    {
+      "component": 26,
+      "derivedLabel": "positive upper local feature 3",
+      "startVertex": 2976,
+      "vertexCount": 8,
+      "startFace": 5852,
+      "faceCount": 12,
+      "pieces": [
+        33
+      ]
+    },
+    {
+      "component": 27,
+      "derivedLabel": "positive upper local feature 4",
+      "startVertex": 2984,
+      "vertexCount": 8,
+      "startFace": 5864,
+      "faceCount": 12,
+      "pieces": [
+        34
+      ]
+    },
+    {
+      "component": 28,
+      "derivedLabel": "positive upper local feature 5",
+      "startVertex": 2992,
+      "vertexCount": 8,
+      "startFace": 5876,
+      "faceCount": 12,
+      "pieces": [
+        35
+      ]
+    },
+    {
+      "component": 29,
+      "derivedLabel": "positive upper local feature 6",
+      "startVertex": 3000,
+      "vertexCount": 8,
+      "startFace": 5888,
+      "faceCount": 12,
+      "pieces": [
+        36
+      ]
+    }
+  ],
+  "nativeCandidate": [
+    {
+      "component": 0,
+      "derivedLabel": "pressure body",
+      "startVertex": 0,
+      "vertexCount": 26,
+      "startFace": 0,
+      "faceCount": 48,
+      "pieces": [
+        0
+      ]
+    },
+    {
+      "component": 1,
+      "derivedLabel": "ventral telescope keel",
+      "startVertex": 26,
+      "vertexCount": 18,
+      "startFace": 48,
+      "faceCount": 32,
+      "pieces": [
+        1
+      ]
+    },
+    {
+      "component": 2,
+      "derivedLabel": "elliptical service loop",
+      "startVertex": 44,
+      "vertexCount": 32,
+      "startFace": 80,
+      "faceCount": 64,
+      "pieces": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "component": 3,
+      "derivedLabel": "negative loop support",
+      "startVertex": 76,
+      "vertexCount": 8,
+      "startFace": 144,
+      "faceCount": 12,
+      "pieces": [
+        10
+      ]
+    },
+    {
+      "component": 4,
+      "derivedLabel": "negative survey float",
+      "startVertex": 84,
+      "vertexCount": 18,
+      "startFace": 156,
+      "faceCount": 32,
+      "pieces": [
+        11
+      ]
+    },
+    {
+      "component": 5,
+      "derivedLabel": "negative engine casing",
+      "startVertex": 102,
+      "vertexCount": 10,
+      "startFace": 188,
+      "faceCount": 16,
+      "pieces": [
+        12
+      ]
+    },
+    {
+      "component": 6,
+      "derivedLabel": "positive loop support",
+      "startVertex": 112,
+      "vertexCount": 8,
+      "startFace": 204,
+      "faceCount": 12,
+      "pieces": [
+        15
+      ]
+    },
+    {
+      "component": 7,
+      "derivedLabel": "positive survey float",
+      "startVertex": 120,
+      "vertexCount": 18,
+      "startFace": 216,
+      "faceCount": 32,
+      "pieces": [
+        16
+      ]
+    },
+    {
+      "component": 8,
+      "derivedLabel": "positive engine casing",
+      "startVertex": 138,
+      "vertexCount": 10,
+      "startFace": 248,
+      "faceCount": 16,
+      "pieces": [
+        17
+      ]
+    },
+    {
+      "component": 9,
+      "derivedLabel": "upper glazing envelope",
+      "startVertex": 148,
+      "vertexCount": 6,
+      "startFace": 264,
+      "faceCount": 8,
+      "pieces": [
+        20
+      ]
+    },
+    {
+      "component": 10,
+      "derivedLabel": "forward telescope head",
+      "startVertex": 154,
+      "vertexCount": 18,
+      "startFace": 272,
+      "faceCount": 32,
+      "pieces": [
+        22
+      ]
+    }
+  ]
+}
