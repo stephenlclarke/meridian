@@ -519,8 +519,61 @@ mod tests {
             authenticated_visual(
                 PEREGRINE_I_VISUAL,
                 PEREGRINE_I_VISUAL_FNV,
-                b"SH023VZ1",
+                b"PRG3VIZ1",
                 PEREGRINE_I_DETAILED_FACES * 3,
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    #[ignore = "Requires the actual SH023 visual in the joined source tree"]
+    fn peregrine_mk_i_and_mk_iii_refuse_actual_crossed_visual_payloads() {
+        // PR85's actual source is independent of this branch. Run this test after joining
+        // both originals; a missing peer payload is a failure, not a skipped acceptance.
+        let mk3_path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../assets/fleet/sh023/visual.bin");
+        let mk3 = ok(std::fs::read(mk3_path));
+        const MK3_FNV: u64 = 0x09d8_c8bd_7b6a_6a63;
+        const MK3_MAGIC: &[u8; 8] = b"PRG3VIZ1";
+        const MK3_VERTICES: usize = 10_452;
+        assert_eq!(
+            ok(authenticated_visual(&mk3, MK3_FNV, MK3_MAGIC, MK3_VERTICES)).len(),
+            MK3_VERTICES
+        );
+        assert_eq!(
+            ok(authenticated_visual(
+                PEREGRINE_I_VISUAL,
+                PEREGRINE_I_VISUAL_FNV,
+                b"SH022VZ1",
+                PEREGRINE_I_DETAILED_FACES * 3,
+            ))
+            .len(),
+            PEREGRINE_I_DETAILED_FACES * 3
+        );
+        assert!(
+            authenticated_visual(
+                &mk3,
+                PEREGRINE_I_VISUAL_FNV,
+                b"SH022VZ1",
+                PEREGRINE_I_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        assert!(
+            authenticated_visual(PEREGRINE_I_VISUAL, MK3_FNV, MK3_MAGIC, MK3_VERTICES).is_err()
+        );
+        // Even with each payload's real fingerprint, the other original's header must refuse.
+        assert!(
+            authenticated_visual(&mk3, MK3_FNV, b"SH022VZ1", PEREGRINE_I_DETAILED_FACES * 3)
+                .is_err()
+        );
+        assert!(
+            authenticated_visual(
+                PEREGRINE_I_VISUAL,
+                PEREGRINE_I_VISUAL_FNV,
+                MK3_MAGIC,
+                MK3_VERTICES
             )
             .is_err()
         );
