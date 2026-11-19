@@ -173,6 +173,7 @@ def undo_goshawk_world(relative, data):
     replacements = {
         'flight.rs': [
             (b'mod goshawk_validation;\n', b''),
+            (b'pub use goshawk_validation::RavenApproachSnapshot;\n', b''),
             (b'pub use goshawk_validation::{GoshawkApproachSnapshot, GoshawkApproachStatus};\n', b''),
             (b'    goshawk_validation: Option<goshawk_validation::Approach>,\n', b''),
             (b'            goshawk_validation: None,\n', b''),
@@ -180,7 +181,11 @@ def undo_goshawk_world(relative, data):
         ],
         FLIGHT_PERSISTENCE: [(b'            goshawk_validation: None,\n', b'')],
         EMP_TESTS: [(b'        goshawk_validation: None,\n', b'')],
-        'lib.rs': [(b'pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};\n', b'')],
+        'lib.rs': [
+            (b'pub use flight::RavenApproachSnapshot;\n', b''),
+            (b'pub mod raven;\n', b''),
+            (b'pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};\n', b''),
+        ],
     }
     for current, previous in replacements.get(relative, []):
         assert data.count(current) == 1, relative

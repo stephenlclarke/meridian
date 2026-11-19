@@ -1,0 +1,88 @@
+{
+  "hull": "SH015",
+  "name": "Raven",
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourceManifestSha256": "b66cba3e414994f0c11317948ad23b31125a7d27c6fe10cf98395ab1e5f7f8f3",
+  "independentFitWitnessSha256": "f30930a3440cb4a2c8432b85ba53a478d5fdc5ccd5f4c5aa63d434dfce244305",
+  "independentSurfaceFitSha256": "2fe417d15247951a02ec2777e4e22d9500fa8fa084b9a2ae523f8c497cd77a49",
+  "geometry": {
+    "sourceDetailedFaces": 3496,
+    "nativeOriginalFaces": 976,
+    "nativeExactLimit": 512,
+    "roundedPieces": 70,
+    "roundingMetres": 0.02,
+    "criteria": [
+      "Every source vertex and triangle remains in its own declared local piece. No byte-substituted sibling is accepted.",
+      "Both original meshes retain their bilateral structural components and independent detailed/native well domains.",
+      "Read the own detailed visuals and textures through the ordinary Showroom without changing original coordinates, winding, face materials or UVs.",
+      "Independently certify both source-surface directions, bilateral gap probes, and strict SH028 lip witness."
+    ]
+  },
+  "sourceOnly": {
+    "command": "python3 -B tools/prepare_raven.py --check",
+    "independent": "python3 -B tools/verify_raven_fit.py",
+    "surfaceAudit": "python3 -B tools/audit_raven_surface.py",
+    "negativeControls": "python3 -B -m unittest discover -s tools -p 'test_raven.py' -v",
+    "checks": "Run all source pins, fixture projection certificates and negative mutations.",
+    "surfaceReplay": "python3 -B -m unittest discover -s tools -p 'test_audit_raven_surface.py' -v"
+  },
+  "ownedTests": {
+    "core": "cargo test --locked -p meridian-core raven::tests -- --nocapture",
+    "controlledWorld": "cargo test --locked -p meridian-core flight::goshawk_validation::tests::raven_world -- --nocapture",
+    "desktop": [
+      "cargo test --locked -p meridian-desktop raven_original_visual_and_all_local_supports_bind_to_its_own_shader",
+      "cargo test --locked -p meridian-desktop selecting_raven_routes_its_own_preview_without_granting_exchange",
+      "cargo test --locked -p meridian-desktop original_raven_fits_minimum_station_showroom_solo_and_compare"
+    ],
+    "acceptance": [
+      "Core fit tests pass on the assigned platforms, including independent SH028 station lip/contact, aligned entry, off-aperture and bilateral clear probes and actual source contact cases.",
+      "The SH015-controlled World passes five actual approach routes and source/snapshot invariants.",
+      "Current SH008 source/Showroom tests remain green after the common renderer extension.",
+      "Ordinary Showroom native capture shows SH015 alone and in Compare, with source appearance, salvage shoulders, transverse spar, short engine cradle and underslung cockpit visible from rotated views.",
+      "The ordinary Ship Showroom still refuses unadmitted exchange. Existing hulls and saves remain intact."
+    ]
+  },
+  "reviewEvidence": {
+    "originalContractSpeedUnits": 46,
+    "compiledEngineering": "cargo test --locked -p meridian-core sh015_compiled_engineering_and_calibrated_source_match_independent_bits",
+    "sourceContractAndEngineeringWords": "python3 -B -m unittest discover -s tools -p 'test_raven.py' -v",
+    "retainedSurfaceBoundsMillimetres": {
+      "detailed": [
+        864,
+        900
+      ],
+      "nativeCandidate": [
+        1524,
+        1530
+      ],
+      "mandatoryCrossSourceVertices": [
+        1508,
+        862
+      ]
+    },
+    "portableRgbNegatives": "cargo test --locked -p meridian-desktop own_pane_and_full_union_reject_black_gutter_wrong_pane_and_rgb",
+    "metal": [
+      {
+        "directoryVariable": "MERIDIAN_SH015_EVIDENCE_DIR",
+        "test": "mule_render::showroom::metal_qualification::metal_raven_same_pose_shimmer",
+        "verifier": "python3 -B tools/verify_goshawk_showroom_evidence.py <evidence-directory>"
+      },
+      {
+        "directoryVariable": "MERIDIAN_SH015_MINIMUM_DIR",
+        "test": "mule_render::showroom::metal_qualification::raven_qualification::metal_raven_minimum_showroom_model_pass"
+      },
+      {
+        "directoryVariable": "MERIDIAN_SH015_CACHE_DIR",
+        "test": "mule_render::showroom::metal_qualification::raven_qualification::metal_raven_cache_switching"
+      }
+    ],
+    "invocation": "Each Metal test is ignored by default. Set its directory variable to a distinct new absolute directory and run cargo test --locked -p meridian-desktop <test> -- --ignored --exact --nocapture.",
+    "minimumAndCacheReceipt": "Full-target PPMs, matching independent -direct.ppm references, model-panes.tsv and rgb-measurements.tsv. Each isolated image must be nonblack, with at least 2 logical pixels of in-pane clearance. Compare and both mixed orders must match exact full-target isolated RGB union, with direct original render identity and repeat/return checks.",
+    "scope": "Offscreen native model only. No GPU timing, native window resizing, compositor output or ordinary placement."
+  },
+  "remaining": [
+    "Full native source/exact collision qualification",
+    "Owned execution of the controlled World regressions, ordinary placement, acquisition, paid fitting, crew and player admission",
+    "Native window/compositor, GPU timing, actual as-built materials, hardware volume, loaded mass and role population."
+  ]
+}
