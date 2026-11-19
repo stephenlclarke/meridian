@@ -149,6 +149,19 @@ fn original_custom_fits_minimum_station_showroom_solo_and_compare() {
     );
 }
 
+#[test]
+fn original_mole_prospector_fits_minimum_station_showroom_solo_and_compare() {
+    let vertices = ok(super::Hull::MoleProspector.visual());
+    assert_eq!(vertices.len(), super::PROSPECTOR_DETAILED_FACES * 3);
+    let view = View::new(&vertices, [EMPTY_PIECE; super::PROSPECTOR_PIECES]);
+    assert_variant_fits_minimum(
+        station_frames_for("Mole Prospector"),
+        &view,
+        &vertices,
+        "SH017",
+    );
+}
+
 fn assert_variant_fits_minimum(
     frames: Vec<Frames>,
     view: &View,

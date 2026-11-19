@@ -1,0 +1,101 @@
+{
+  "hull": "SH017",
+  "sourceVerticesSha256": "dbc7afef52027d910c79e8cfd55c4f422b4623b5731afc3226285eb5be4c921e",
+  "stationSha256": "cd54d30cab638f6b33feacf1fa78c9136f8ce346e8cc6133259bfc0472c259d5",
+  "portSha256": "31a7ed33803e78ebbe7bb87c0658e47a786e8bba9107d513b2e534ccd30cf71f",
+  "guardedPaddingMetres": 0.021,
+  "sourceTriangles": 13936,
+  "alignedApertureSlackMetres": 40.00704974541841,
+  "offApertureSlackMetres": -53.65044133979101,
+  "alignedStationSweepGapMetres": 40.00704974541841,
+  "offApertureStationSweepGapMetres": 1.5167426508417927,
+  "completeControlledSweep": {
+    "centreZSweepMetres": [
+      220.0,
+      135.0
+    ],
+    "alignedGapMetres": 40.00704974541841,
+    "offApertureGapMetres": 0.6967426508417994
+  },
+  "toolCradleChannel": {
+    "triangleMetres": [
+      [
+        -0.15,
+        -4,
+        17
+      ],
+      [
+        0.15,
+        -4,
+        17
+      ],
+      [
+        0,
+        -3.7,
+        17
+      ]
+    ],
+    "localTranslationMetres": [
+      0,
+      0,
+      8
+    ],
+    "minimumSeparatingGapMetres": 2.7269230051196267,
+    "limitingPiece": 0,
+    "axis": [
+      -0.08352072428030596,
+      -0.9712680460293612,
+      0.22285123149311917
+    ]
+  },
+  "lip": {
+    "sourceVertex": 1776,
+    "sourceVertexMetres": [
+      -7.83681941561552,
+      -3.2643213227597707,
+      22.282257349158197
+    ],
+    "stationFace": 482,
+    "stationTriangleMetres": [
+      [
+        68.12,
+        -48.384,
+        136.32
+      ],
+      [
+        70.11999999999999,
+        -48.384,
+        136.32
+      ],
+      [
+        70.11999999999999,
+        48.384,
+        136.32
+      ]
+    ],
+    "centreXMetres": 61.56318058438448,
+    "centreZAtContactMetres": 158.60225734915818,
+    "centreZSweepMetres": [
+      159.60225734915818,
+      157.60225734915818
+    ],
+    "contactMetres": [
+      69.4,
+      -3.2643213227597707,
+      136.32
+    ],
+    "barycentric": [
+      0.3599999999999949,
+      0.1737334792778632,
+      0.4662665207221419
+    ],
+    "initialSeparatingGapMetres": 0.979
+  },
+  "launch": {
+    "rearSourceVertex": 6608,
+    "unroundedZMetres": 1160.0577426508419,
+    "outwardF32ZMetres": 1160.057861328125,
+    "outwardF32Bits": "0x449101da"
+  },
+  "scope": "Original metre vertices and strict projection bounds; all 13,936 triangles are enclosed by local convexity. No claim of continuous whole-surface tightness, native execution, or fleet admission."
+}

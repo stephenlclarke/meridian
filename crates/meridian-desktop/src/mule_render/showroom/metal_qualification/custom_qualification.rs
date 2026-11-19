@@ -1,4 +1,4 @@
-//! SH010's production minimum viewport and cross-hull GPU cache evidence.
+//! Production minimum viewport and cross-hull GPU cache evidence shared by original hulls.
 use super::{
     Crop, FORMAT, Gpu, MIN_WINDOW_LOGICAL, SCALE, Target, metal_gpu_for, ok, output_directory,
     write_new,
@@ -11,7 +11,8 @@ use crate::mule_render::showroom::{
 };
 use std::{fmt::Write as _, path::Path};
 
-struct Capture<'a> {
+pub(super) struct Capture<'a> {
+    object: &'static str,
     gpu: &'a Gpu,
     target: &'a Target,
     crop: Crop,
@@ -22,8 +23,14 @@ struct Capture<'a> {
 }
 
 impl<'a> Capture<'a> {
-    fn new(gpu: &'a Gpu, target: &'a Target, output: &'a Path) -> Self {
+    pub(super) fn new(
+        gpu: &'a Gpu,
+        target: &'a Target,
+        output: &'a Path,
+        object: &'static str,
+    ) -> Self {
         Self {
+            object,
             gpu,
             target,
             output,
@@ -43,7 +50,7 @@ impl<'a> Capture<'a> {
         }
     }
 
-    fn size(&self) -> [u32; 2] {
+    pub(super) fn size(&self) -> [u32; 2] {
         [self.target.extent.width, self.target.extent.height]
     }
 
@@ -119,7 +126,12 @@ impl<'a> Capture<'a> {
         rgb
     }
 
-    fn solo(&mut self, name: &str, frame: &Frame, reference: &mut showroom::Pass) -> Vec<u8> {
+    pub(super) fn solo(
+        &mut self,
+        name: &str,
+        frame: &Frame,
+        reference: &mut showroom::Pass,
+    ) -> Vec<u8> {
         let [model] = frame.models.as_slice() else {
             panic!("expected a single original model")
         };
@@ -133,12 +145,12 @@ impl<'a> Capture<'a> {
         rgb
     }
 
-    fn comparison(
+    pub(super) fn comparison(
         &mut self,
         name: &str,
         frame: &Frame,
-        mut explorer: Option<&mut showroom::Pass>,
-        custom: &mut showroom::Pass,
+        mut alternate: Option<&mut showroom::Pass>,
+        selected: &mut showroom::Pass,
     ) {
         let [left, right] = frame.models.as_slice() else {
             panic!("expected two model panes")
@@ -153,8 +165,14 @@ impl<'a> Capture<'a> {
             let rgb = self.frame(&isolated_name, &isolated);
             self.own_pixels(&isolated_name, model, &rgb);
             let reference = match showroom::hull(model) {
-                Some(Hull::Custom) => Some(&mut *custom),
-                Some(Hull::Explorer) => explorer.as_deref_mut(),
+                Some(hull) if hull == selected.hull() => Some(&mut *selected),
+                Some(hull) => {
+                    let reference = alternate
+                        .as_deref_mut()
+                        .unwrap_or_else(|| panic!("missing original reference pass"));
+                    assert_eq!(hull, reference.hull());
+                    Some(reference)
+                }
                 None => {
                     assert_eq!(model.object, "SH025");
                     None
@@ -175,12 +193,13 @@ impl<'a> Capture<'a> {
             self.size(),
         ));
         println!(
-            "SH010 {name}: full-target exact isolated RGB union at {:?}",
+            "{} {name}: full-target exact isolated RGB union at {:?}",
+            self.object,
             self.size()
         );
     }
 
-    fn finish(self) {
+    pub(super) fn finish(self) {
         write_new(self.output.join("model-panes.tsv"), self.panes.as_bytes());
         write_new(
             self.output.join("rgb-measurements.tsv"),
@@ -189,7 +208,7 @@ impl<'a> Capture<'a> {
     }
 }
 
-fn original_pass(gpu: &Gpu, hull: Hull) -> showroom::Pass {
+pub(super) fn original_pass(gpu: &Gpu, hull: Hull) -> showroom::Pass {
     ok(showroom::Pass::for_hull(
         &gpu.device,
         &gpu.queue,
@@ -204,7 +223,7 @@ fn metal_goshawk_custom_minimum_showroom_model_pass() {
     let output = output_directory("MERIDIAN_SH010_MINIMUM_DIR");
     let gpu = metal_gpu_for("SH010", false);
     let target = Target::new(&gpu.device, MIN_WINDOW_LOGICAL);
-    let mut capture = Capture::new(&gpu, &target, &output);
+    let mut capture = Capture::new(&gpu, &target, &output, "SH010");
     let mut custom = original_pass(&gpu, Hull::Custom);
     for (pose, Frames { solo, comparison }) in
         minimum_qualification::POSES
@@ -234,7 +253,7 @@ fn metal_goshawk_custom_cache_switching() {
     let output = output_directory("MERIDIAN_SH010_CACHE_DIR");
     let gpu = metal_gpu_for("SH010", false);
     let target = Target::new(&gpu.device, MIN_WINDOW_LOGICAL);
-    let mut capture = Capture::new(&gpu, &target, &output);
+    let mut capture = Capture::new(&gpu, &target, &output, "SH010");
     let mut explorer_pass = original_pass(&gpu, Hull::Explorer);
     let mut custom_pass = original_pass(&gpu, Hull::Custom);
     let explorer = minimum_qualification::station_frames().remove(0);
