@@ -6,8 +6,12 @@ use crate::{
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 
+mod preview;
+pub use preview::{PreviewFit, PreviewTriangle};
+
 const MAX_POINTS_PER_MESH: usize = 100_000;
 pub const MAX_PACKAGE_JSON_BYTES: u64 = 64 * 1024 * 1024;
+pub const LOCAL_INSPECTION_PREFIX: &str = "LOCAL:";
 const MAX_DETAILED_FACES: usize = 200_000;
 const MAX_NATIVE_FACES: usize = 512;
 const MAX_GROUPS: usize = 1_024;
@@ -404,6 +408,14 @@ pub fn validate_package(package: &HullPackage) -> ValidationReport {
     if package.schema != 1 || !valid_text(&package.id) || !valid_text(&package.name) {
         report.reject("Expected schema 1 and nonempty hull ID and name");
     }
+    if package
+        .id
+        .trim()
+        .to_ascii_uppercase()
+        .starts_with(LOCAL_INSPECTION_PREFIX)
+    {
+        report.reject("Authored source ID uses reserved LOCAL: inspection namespace");
+    }
     let valid_scale = package.metres_per_unit.is_finite() && package.metres_per_unit > 0.0;
     let valid_rounding = package.rounding_metres.is_finite()
         && package.rounding_metres > 0.0
@@ -470,6 +482,21 @@ pub fn validate_package(package: &HullPackage) -> ValidationReport {
     let (Some(detail), Some(native)) = (detail, native) else {
         return report;
     };
+    // The desktop will use this exact presentation fit, so f64-valid geometry that
+    // collapses in the actual f32 vertex stream cannot pass Studio preflight.
+    let fit = match PreviewFit::new(&detail) {
+        Ok(fit) => fit,
+        Err(error) => {
+            report.reject(format!("Detailed preview: {error}"));
+            return report;
+        }
+    };
+    for (index, &triangle) in package.detail.triangles.iter().enumerate() {
+        if let Err(error) = fit.triangle(triangle) {
+            report.reject(format!("Detailed preview triangle {index}: {error}"));
+            return report;
+        }
+    }
     let mut groups = BTreeMap::<u32, Vec<[f64; 3]>>::new();
     for (vertices, labels) in [
         (detail, &package.detail.groups),

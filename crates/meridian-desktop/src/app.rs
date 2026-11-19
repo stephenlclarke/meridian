@@ -5,6 +5,7 @@ use std::{
     collections::{HashSet, hash_map::RandomState},
     error::Error,
     hash::{BuildHasher, Hasher},
+    io::Write,
     sync::Arc,
     time::Instant,
 };
@@ -76,6 +77,30 @@ struct PreparedPresentation {
     docked_frame: Option<ui::Frame>,
 }
 
+/// Acknowledge only the actual requested, authenticated preview after a successful presentation.
+fn take_studio_ready(
+    pending: &mut Option<String>,
+    authored: &AuthoredHulls,
+    frame: Option<&ui::Frame>,
+    presented: &Result<Presentation, String>,
+) -> bool {
+    let Some(id) = pending.as_ref() else {
+        return false;
+    };
+    if !matches!(presented, Ok(Presentation::Presented))
+        || !frame.is_some_and(|frame| {
+            frame.screen == Some(ui::Screen::Showroom)
+                && frame.models.last().is_some_and(|model| {
+                    model.object.as_str() == id.as_str() && authored.visual_for(model).is_some()
+                })
+        })
+    {
+        return false;
+    }
+    *pending = None;
+    true
+}
+
 // This shell owns the World synchronously. No gameplay mutation occurs in renderer code.
 // Retain the frame-wide contact even when a later catch-up tick is clear.
 #[derive(Debug, PartialEq, Eq)]
@@ -111,6 +136,7 @@ impl Notice {
 struct App {
     game: Profile,
     authored_hulls: Arc<AuthoredHulls>,
+    studio_ready: Option<String>,
     validation_view: FlightView,
     validation_timing: Option<mule_validation::FrameTiming>,
     celestial: crate::celestial::WorldAdapter,
@@ -162,6 +188,12 @@ impl App {
                     let mut menu = app.new_docked_menu()?;
                     menu.open_authored_showroom(&app.game.world)?;
                     app.docked = Some(menu);
+                    app.studio_ready = Some(
+                        app.authored_hulls
+                            .inspection_id()
+                            .ok_or("Missing isolated authored hull for Studio readiness")?
+                            .to_owned(),
+                    );
                     // Initial presentation only; never simulate a key or change World state.
                     app.commander_open = false;
                 }
@@ -202,6 +234,7 @@ impl App {
         Self {
             game,
             authored_hulls: Arc::default(),
+            studio_ready: None,
             validation_view: FlightView::Front,
             validation_timing: internal.then(mule_validation::FrameTiming::default),
             quit_failed: false,
@@ -1259,6 +1292,14 @@ impl App {
             if let (Some(started), Some(timing)) = (draw_started, &mut self.validation_timing) {
                 timing.observe(&presented, started.elapsed());
             }
+            let studio_ready = self.help.is_none()
+                && self.xyzzy.is_none()
+                && take_studio_ready(
+                    &mut self.studio_ready,
+                    &self.authored_hulls,
+                    docked_frame.as_ref(),
+                    &presented,
+                );
             if let Err(error) = Self::complete_presentation(
                 presented,
                 &mut self.docked,
@@ -1268,6 +1309,16 @@ impl App {
                 &self.xyzzy,
             ) {
                 self.fail(event_loop, error);
+            } else if studio_ready {
+                let mut stdout = std::io::stdout().lock();
+                if let Err(error) =
+                    writeln!(stdout, "MERIDIAN_HULL_STUDIO_READY").and_then(|()| stdout.flush())
+                {
+                    self.fail(
+                        event_loop,
+                        format!("Studio readiness output failed: {error}"),
+                    );
+                }
             }
         }
     }

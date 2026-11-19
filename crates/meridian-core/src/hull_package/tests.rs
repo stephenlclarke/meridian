@@ -205,3 +205,59 @@ fn shared_json_boundary_refuses_oversized_input_before_parsing() {
     };
     assert!(error.to_string().contains("64 MiB input limit"));
 }
+
+#[test]
+fn f64_valid_detail_that_collapses_in_shared_f32_preview_refuses_preflight() {
+    let mut source = package();
+    source.clearances.clear();
+    source.detail.vertices = vec![[0., 0., 0.], [1e-10, 0., 0.], [0., 1e-10, 0.], [1., 1., 1.]];
+    let mut geometric = ValidationReport::default();
+    let metres = validate_mesh(
+        "detail",
+        &source.detail,
+        source.metres_per_unit,
+        MAX_DETAILED_FACES,
+        &mut geometric,
+    )
+    .unwrap_or_else(|| panic!("ordinary f64 geometry: {:?}", geometric.diagnostics));
+    assert!(geometric.diagnostics.is_empty());
+    assert!(triangle_nonzero([metres[0], metres[1], metres[2]]));
+    let fit = PreviewFit::new(&metres).unwrap_or_else(|error| panic!("{error}"));
+    assert_eq!(fit.dimensions(), [2., 2., 2.]);
+    assert_eq!(
+        fit.triangle([0, 1, 2]),
+        Err("Authored visual face exceeds renderer coordinate precision")
+    );
+    let report = validate_package(&source);
+    assert!(!report.valid);
+    assert!(
+        report
+            .diagnostics
+            .iter()
+            .any(|d| d.message.contains("Detailed preview triangle 0")
+                && d.message.contains("renderer coordinate precision"))
+    );
+    assert!(source.pieces().is_err());
+    source.detail.vertices[1][0] = 1e-3;
+    source.detail.vertices[2][1] = 1e-3;
+    assert!(validate_package(&source).valid);
+}
+
+#[test]
+fn reserved_local_inspection_source_ids_refuse_without_affecting_ordinary_names() {
+    let mut source = package();
+    for id in ["LOCAL:SH023", " local:custom ", "LoCaL:another"] {
+        source.id = id.into();
+        let report = validate_package(&source);
+        assert!(!report.valid);
+        assert!(
+            report
+                .diagnostics
+                .iter()
+                .any(|d| d.message.contains("reserved LOCAL:"))
+        );
+    }
+    source.id = "local-hull".into();
+    source.name = "LOCAL: descriptive name".into();
+    assert!(validate_package(&source).valid);
+}

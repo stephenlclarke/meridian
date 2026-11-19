@@ -1,8 +1,9 @@
-use super::{App, mule_validation::Launch};
+use super::{App, mule_validation::Launch, take_studio_ready};
 use crate::{
     authored_hull::fixture_path,
     docked_screens::{self as ui, Input, Key},
     profile::tests::{TestDirectory, open},
+    renderer::Presentation,
 };
 use std::ffi::OsString;
 use winit::keyboard::KeyCode;
@@ -23,6 +24,7 @@ fn normal_game_entry_searches_authored_package_and_never_changes_owned_ship_or_s
     ];
     let mut app = ok(App::from_launch(ok(Launch::parse(args.into_iter()))));
     assert!(app.commander_open && app.game.playing());
+    assert!(app.studio_ready.is_none());
     let before = ok(app.game.world.save_bytes());
     // Ordinary navigation out of Commander Details invalidates freight review authority
     // via request_pause, even when the pause value is unchanged. Match that actual transition.
@@ -198,6 +200,39 @@ fn one_click_authored_showroom_opens_actual_local_model_once_without_world_mutat
     assert_eq!(selected.object, "LOCAL:SH023");
     assert!(app.authored_hulls.visual_for(selected).is_some());
     assert!(crate::mule_render::showroom::hull(selected).is_none());
+    assert_eq!(app.studio_ready.as_deref(), Some("LOCAL:SH023"));
+    let mut crossed = first.clone();
+    crossed
+        .models
+        .last_mut()
+        .unwrap_or_else(|| panic!("local pane"))
+        .geometry_key = "assets/fleet/sh023/visual.bin".into();
+    for (frame, outcome) in [
+        (Some(&first), Ok(Presentation::Skipped)),
+        (Some(&first), Err("render failure".into())),
+        (Some(&crossed), Ok(Presentation::Presented)),
+        (None, Ok(Presentation::Presented)),
+    ] {
+        assert!(!take_studio_ready(
+            &mut app.studio_ready,
+            &app.authored_hulls,
+            frame,
+            &outcome
+        ));
+        assert_eq!(app.studio_ready.as_deref(), Some("LOCAL:SH023"));
+    }
+    assert!(take_studio_ready(
+        &mut app.studio_ready,
+        &app.authored_hulls,
+        Some(&first),
+        &Ok(Presentation::Presented)
+    ));
+    assert!(!take_studio_ready(
+        &mut app.studio_ready,
+        &app.authored_hulls,
+        Some(&first),
+        &Ok(Presentation::Presented)
+    ));
     for action in [
         Input::Key(Key::Search),
         Input::Text("SH023".into()),
