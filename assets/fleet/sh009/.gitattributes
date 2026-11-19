@@ -1,3 +1,4 @@
 * -text
 source.vertices binary
 source-triangles.bin binary
+visual.bin binary

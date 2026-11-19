@@ -1,0 +1,74 @@
+{
+  "id": "SH009",
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "stagedSourceCommit": "06c2649da4bac073445f3e8e116c5b9a4850e1d5",
+  "resource": {
+    "bytes": 524399,
+    "sha256": "4fc835b6f40c1b7751ff8c03940c0501ce7c445b1bd0be95f15651a174c67552",
+    "source": "Sources/L337Core/Resources/Ships/SH009.toml"
+  },
+  "geometry": {
+    "source.vertices": {
+      "bytes": 64144,
+      "sha256": "022b4fe3b25d84085411d32ef4de8e19f17ff6f83ff178dc7bc4164edb95b2d7"
+    },
+    "source-triangles.bin": {
+      "bytes": 54528,
+      "sha256": "944398f70608e4def2783ceb0ff591de602a7799d36f7f88e63124ad8cc57d73"
+    }
+  },
+  "geometryReceipt": {
+    "bytes": 3077,
+    "sha256": "7437c000492b4c8495032ce123cdd33f5dc06bca96cf61899d8956501df34525"
+  },
+  "visual": {
+    "bytes": 593392,
+    "sha256": "739e5d77bb999afb668422869e4a04b131130e719f099b9da9df77c8a7cd74f0",
+    "path": "assets/fleet/sh009/visual.bin",
+    "fnv1a64": "d01cabc6c77a3b19",
+    "magic": "GOS2VIZ1",
+    "strideBytes": 56,
+    "faces": 3532,
+    "vertices": 10596,
+    "textureFaceCounts": {
+      "l337-patrol-diffuse": 1356,
+      "l337-strike-diffuse": 0,
+      "l337-service-details": 2176
+    },
+    "emissiveFaces": 184,
+    "encoder": "tools/encode_goshawk_mk2_visual.py",
+    "format": "SH008 Showroom record layout; SH009-specific header. Calibrated detailed positions, ordered flat normals, per-face RGBA, original corner UV, texture index and emissive bit."
+  },
+  "sharedOriginalTextureManifestSHA256": "96c4c9699b81f50be5a8aefeeca74a6e4870e0bb981d1cd33a9ff2921cd2bd3c",
+  "sharedOriginalTextures": {
+    "assets/fleet/sh001/l337-patrol-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "9699517d12b4fbbb28746e00bed9ee65c19a098d14402b1d5160280c6f6bfc54",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-patrol-diffuse.rgba",
+      "license": "MIT",
+      "width": 1024,
+      "height": 1024,
+      "authorship": "Original periodic geometric surface artwork; no imported pixels"
+    },
+    "assets/fleet/sh001/l337-strike-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "e56f149228caf90237a652d720ae549768bde1056af3d903dc8a5c243ad26e97",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-strike-diffuse.rgba",
+      "license": "MIT",
+      "width": 1024,
+      "height": 1024,
+      "authorship": "Original periodic geometric surface artwork; no imported pixels"
+    },
+    "assets/fleet/sh001/l337-service-details.rgba": {
+      "bytes": 4194304,
+      "sha256": "35edd84f6ce527195dd8a9bcc039521a6efc5aa2333452bbbc30217b8372103d",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-service-details.rgba",
+      "license": "MIT",
+      "width": 1024,
+      "height": 1024,
+      "authorship": "Original periodic geometric surface artwork; no imported pixels"
+    }
+  },
+  "license": "MIT; see assets/fleet/sh009/LICENSE and the original shared texture manifest.",
+  "presentation": "Opaque detailed Showroom asset only. Collision envelope, shimmer, registration and ordinary gameplay placement require separate integration and qualification."
+}
