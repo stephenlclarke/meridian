@@ -118,6 +118,8 @@ class TestStagLinerSources(unittest.TestCase):
         self.assertEqual(definition, studio.definition())
         self.assertEqual(hashlib.sha256(studio.OUTPUT.read_bytes()).hexdigest(),
                          criteria['hullStudio']['sha256'])
+        self.assertRegex(criteria['hullStudio']['installedExport']['testedConfigurationGitRevision'],
+                         r'^[0-9a-f]{40}$')
         for field, original, membership in (
             ('detail', source['design'], (0, stag_liner.DETAIL[0])),
             ('native', source['nativeDesign'], (stag_liner.DETAIL[0], None)),
@@ -154,6 +156,42 @@ class TestStagLinerSources(unittest.TestCase):
                 output.write_bytes(b'{}')
                 with self.assertRaisesRegex(ValueError, 'changed Stag Liner Hull Studio definition'):
                     runpy.run_path(studio.__file__, run_name='__main__')
+
+    def test_studio_output_refuses_invalid_paths_before_generating_or_reading(self):
+        with tempfile.TemporaryDirectory() as temp:
+            scratch = Path(temp)
+            directory = scratch / 'directory.json'
+            directory.mkdir()
+            with mock.patch.object(studio, 'definition', side_effect=AssertionError('generated before validation')):
+                for selected, reason in (
+                    (scratch / '..' / 'result.json', 'Invalid'),
+                    (scratch / 'result.txt', 'Invalid'),
+                    (proof.INTEGRATION / 'CRITERIA.json', 'temporary JSON file'),
+                    (scratch / 'missing' / 'result.json', 'directory is missing'),
+                    (directory, 'regular file'),
+                ):
+                    for mode in ([], ['--check']):
+                        with self.subTest(path=selected, mode=mode), self.assertRaisesRegex(ValueError, reason):
+                            studio.main(['--output', str(selected), *mode])
+        self.assertEqual(studio.checked_output(studio.OUTPUT), studio.OUTPUT)
+
+    def test_studio_output_refuses_file_and_directory_redirects(self):
+        with tempfile.TemporaryDirectory() as temp:
+            scratch = Path(temp)
+            target = scratch / 'target.json'
+            target.write_bytes(b'keep')
+            file_link = scratch / 'file.json'
+            directory_link = scratch / 'redirect'
+            try:
+                file_link.symlink_to(target)
+                directory_link.symlink_to(scratch, target_is_directory=True)
+            except OSError as error:
+                self.skipTest(f'symbolic link unavailable: {error}')
+            for selected, reason in ((file_link, 'regular file'), (directory_link / 'target.json', 'redirects')):
+                for mode in ([], ['--check']):
+                    with self.subTest(path=selected, mode=mode), self.assertRaisesRegex(ValueError, reason):
+                        studio.main(['--output', str(selected), *mode])
+            self.assertEqual(target.read_bytes(), b'keep')
 
     def test_controls_refuse_wrong_edges_and_missing_separation(self):
         lip = [(0, 0, 0), (4, 0, 0), (0, 4, 0)]

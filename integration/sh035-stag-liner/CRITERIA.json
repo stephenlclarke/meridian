@@ -78,7 +78,7 @@
       "tools/verify_stag_liner_geometry.py": "bcdb40ee7067a0fd2c561e1f804479a7fca43df065b3ad77aa31f2d9f65d207e",
       "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
       "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
-      "tools/prepare_stag_liner_studio.py": "0c757a9b2ac463bb85f52646f78d246434f8f9c7887560d21de0848ba533961b"
+      "tools/prepare_stag_liner_studio.py": "89c8b9a39c128f7013f1038774dad3a2ee7a88fc448746ecbba73c96d90e3cfa"
     },
     "fixtures": {
       "integration/sh035-stag-liner/FIXTURES.json": "06136d6e0e01df76ee1dbcacf94076f1edcf9335a52b03e2c678b69ac322f121"
@@ -115,7 +115,7 @@
     "loaderSha256": "f68ea0f442267b793338af6ebec6a937f9e1ee3946dc9be96e58db3e2a796e43",
     "state": "INSTALLED_SIGNED_STUDIO_EXPORT_PASS;CONTROLLED_HULL_RUST_AND_SHOWROOM_PENDING",
     "installedExport": {
-      "testedAuthorConfigCommit": "e43312c21acffea765d0fb63eca9c47f66325e78",
+      "testedConfigurationGitRevision": "e43312c21acffea765d0fb63eca9c47f66325e78",
       "toolSourceHead": "1789030980e0d2a7897c2dc48518fad728c9bbf2",
       "toolSourceTree": "fb22a072408e94b4553ea9c5e586916ff7e6ecae",
       "studioSha256": "ee1e6e307707a385c7ad24e00cbcce589f5ab0762e31b474720715f62c146f9f",
