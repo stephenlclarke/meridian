@@ -9,6 +9,7 @@ tools/measure_vulture_mk_i_air.py text eol=lf
 tools/prepare_vulture_mk_i_geometry.py text eol=lf
 tools/prepare_vulture_mk_i_studio.py text eol=lf
 tools/verify_vulture_mk_i_geometry.py text eol=lf
+tools/vulture_mk_i_exact_fit.py text eol=lf
 
 assets/fleet/sh008/** -text
 assets/fleet/sh008/visual.bin binary

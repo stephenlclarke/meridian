@@ -58,6 +58,25 @@ at least 978 mm clear before crossing SH028 triangle 482 at
 the proxy and the fit, original difference and contact reports byte for
 byte.
 
+### Cross-platform certificate
+
+The historical reports gave positive-sensor detailed bounds of 945 mm on
+the MBA and 905 mm on Windows. The old method allowed the convex-hull
+triangulation and floating nearest-triangle query to choose the individual
+patch witnesses. Either witness can yield a conservative bound. An
+independent run using the authored fan and a 905 mm refinement target
+certified the whole positive-sensor piece at 905 mm, which confirms both
+historical limits. The full report retains the original refinement targets.
+Its positive-sensor detailed bound is 944 mm and the two hull-wide bounds
+are 986 mm and 1,030 mm.
+
+Both platforms also measured the same distance from source vertex 6038.
+Five original triangles share its exact nearest point. The report lists
+faces 3654, 3655, 3658, 3659 and 3661, using 3654 as the lowest-index
+representative. Patch bounds now use the frozen authored fan and exact
+integers. The direct comparison searches exact distances over both full
+meshes. The original reports and their hashes remain available.
+
 [Evidence and replay commands](../integration/sh037-vulture-mk-i/CRITERIA.json)
 
 ## Hull Studio

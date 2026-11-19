@@ -4,3 +4,5 @@ FIXTURES.json text eol=lf
 ORIGINAL-DIFFERENCE.json text eol=lf
 SURFACE-FIT.json text eol=lf
 VULTURE-MK-I-STUDIO.json text eol=lf
+DETERMINISTIC-ORIGINAL-DIFFERENCE.json text eol=lf
+DETERMINISTIC-SURFACE-FIT.json text eol=lf

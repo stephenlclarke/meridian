@@ -14,7 +14,10 @@ import tomllib
 import unittest
 from unittest import mock
 
+import numpy as np
+
 import measure_vulture_mk_i_air as measure
+from vulture_mk_i_exact_fit import TriangleIndex, bound_fan, full_upper, grid_index
 import prepare_vulture_mk_i_geometry as vulture_mk_i
 import verify_vulture_mk_i_geometry as proof
 import prepare_vulture_mk_i_studio as studio
@@ -119,8 +122,8 @@ class TestVultureMkISources(unittest.TestCase):
 
     def test_fit_and_difference_emit_utf8_lf_with_crlf_text_stdout(self):
         for options, generator, file in (
-            ([], 'audit', 'SURFACE-FIT.json'),
-            (['--difference'], 'original_difference', 'ORIGINAL-DIFFERENCE.json'),
+            ([], 'audit', 'DETERMINISTIC-SURFACE-FIT.json'),
+            (['--difference'], 'original_difference', 'DETERMINISTIC-ORIGINAL-DIFFERENCE.json'),
         ):
             with self.subTest(file=file):
                 expected = (proof.INTEGRATION / file).read_bytes()
@@ -190,6 +193,21 @@ class TestVultureMkISources(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'misses a separating plane'):
             proof.separating_planes([[(0, 0, 0), (2, 0, 0)]], [(1, 0, 0)], [(1, 0, 0)])
 
+    def test_exact_source_ties_and_independent_sensor_bound(self):
+        vertices, names, groups, meshes, faces = measure.load()
+        original, scale, triangles = measure.fit.integer_source(vertices, meshes)
+        (num, den), ties = TriangleIndex(triangles['detailed']).nearest(original[6038])
+        self.assertEqual(ties, [3654, 3655, 3658, 3659, 3661])
+        shared = set.intersection(*(set(triangles['detailed'][i]) for i in ties))
+        self.assertEqual(len(shared), 1)
+        offset = measure.fit.sub(original[6038], shared.pop())
+        self.assertEqual(measure.fit.dot(offset, offset) * den, num)
+        slot = groups[names.index('positive-sensor')]
+        fan = faces[np.isin(faces[:, 0], slot)]
+        bound_fan(vertices[slot], np.searchsorted(slot, fan))
+        index = grid_index(meshes['detailed'][1])
+        self.assertLessEqual(full_upper(index, vertices[fan], 905), 905)
+
     def test_fit_contact_and_numerical_helper_pins(self):
         criteria = json.loads((proof.INTEGRATION / 'CRITERIA.json').read_bytes())
         replay = criteria['independentReplay']
@@ -197,11 +215,11 @@ class TestVultureMkISources(unittest.TestCase):
             self.assertEqual(hashlib.sha256((proof.ROOT / name).read_bytes()).hexdigest(), expected)
         for name, expected in criteria['air']['reports'].items():
             self.assertEqual(hashlib.sha256((proof.INTEGRATION / name).read_bytes()).hexdigest(), expected)
-        summary = json.loads((proof.INTEGRATION / 'SURFACE-FIT.json').read_bytes())['summary']
+        summary = json.loads((proof.INTEGRATION / 'DETERMINISTIC-SURFACE-FIT.json').read_bytes())['summary']
         for kind, low, upper in (('detailed', 931, 986), ('originalNative', 941, 1030)):
             self.assertEqual(summary[kind]['largestSample']['certifiedLowerMillimetres'], low)
             self.assertEqual(summary[kind]['fullUpperMillimetres'], upper)
 
-        delta = json.loads((proof.INTEGRATION / 'ORIGINAL-DIFFERENCE.json').read_bytes())
+        delta = json.loads((proof.INTEGRATION / 'DETERMINISTIC-ORIGINAL-DIFFERENCE.json').read_bytes())
         self.assertEqual(delta['detailed']['strictLowerMillimetres'], 146)
         self.assertEqual(delta['originalNative']['strictLowerMillimetres'], 323)

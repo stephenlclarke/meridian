@@ -1,7 +1,9 @@
 """Replay the measured SH037 fit and direct original-to-original difference."""
 import argparse
+from decimal import Decimal, localcontext
 import hashlib
 import json
+from math import isqrt
 from pathlib import Path
 import sys
 
@@ -9,6 +11,7 @@ import numpy as np
 import trimesh
 
 import measure_goshawk_surface_fit as fit
+from vulture_mk_i_exact_fit import TriangleIndex, bound_fan, full_upper, grid_index
 from prepare_vulture_mk_i_geometry import DETAIL, NATIVE, PIECES, require
 
 
@@ -39,11 +42,11 @@ def load():
         'originalNative': (detailed, trimesh.Trimesh(vertices[detailed:real_count],
                             faces[DETAIL[1]:DETAIL[1] + NATIVE[1]] - detailed, process=False)),
     }
-    return vertices, names, groups, meshes
+    return vertices, names, groups, meshes, faces[DETAIL[1] + NATIVE[1]:]
 
 
 def audit():
-    vertices, names, groups, meshes = load()
+    vertices, names, groups, meshes, authored_faces = load()
     pieces = []
     for ids, name in zip(groups, names, strict=True):
         unique, first = np.unique(vertices[ids], axis=0, return_index=True)
@@ -52,9 +55,15 @@ def audit():
         except AssertionError as error:
             raise ValueError('geometry audit could not certify ' + name) from error
         piece['sourceIds'] = ids[first]
+        faces = authored_faces[np.isin(authored_faces[:, 0], ids)]
+        local = np.searchsorted(ids, faces)
+        assert np.array_equal(ids[local], faces)
+        bound_fan(vertices[ids], local)
+        piece['authoredFan'] = vertices[faces]
         pieces.append(piece)
     _, scale, exact = fit.integer_source(vertices, meshes)
     target = {'detailed': 955, 'originalNative': 960}
+    indices = {key: grid_index(mesh) for key, (_, mesh) in meshes.items()}
     witnesses = {key: [] for key in meshes}
     rows = []
     for name, piece in zip(names, pieces, strict=True):
@@ -66,7 +75,7 @@ def audit():
                 witnesses[key].append((row, index, samples, piece))
             comparisons[key] = {
                 'largestExposedSample': row,
-                'fullPieceSurfaceUpperMillimetres': fit.certified_upper(mesh, piece, target[key]),
+                'fullPieceSurfaceUpperMillimetres': full_upper(indices[key], piece['authoredFan'], target[key]),
             }
         rows.append({'piece': name, 'exposedSamples': len(samples[0]), 'sourceComparisons': comparisons})
     summary = {}
@@ -83,19 +92,27 @@ def audit():
 
 
 def original_difference():
-    vertices, _, _, meshes = load()
+    vertices, _, _, meshes, _ = load()
     exact, scale, triangles = fit.integer_source(vertices, meshes)
     result = {}
     for key, source in [('detailed', range(DETAIL[0], DETAIL[0] + NATIVE[0])),
                         ('originalNative', range(DETAIL[0]))]:
-        ids = np.asarray(source)
-        _, distances, faces = fit.nearest(meshes[key][1], vertices[ids])
-        at = distances.argmax()
-        vertex = int(ids[at])
-        lower = int(distances[at] * 1000) - 1
+        index = TriangleIndex(triangles[key])
+        best = None
+        for vertex in source:
+            (num, den), faces = index.nearest(exact[vertex])
+            if best is None or num * best[1] > best[0] * den:
+                best = num, den, vertex, faces
+        num, den, vertex, faces = best
+        scale_squared = den * scale**2
+        lower = isqrt(num * 1_000_000 // scale_squared) - 1
         fit.verify_lower(exact[vertex], triangles[key], scale, lower)
-        result[key] = {'mandatoryOppositeSourceVertex': vertex, 'nearestFace': int(faces[at]),
-                       'sampledMetres': float(distances[at]), 'strictLowerMillimetres': lower}
+        with localcontext() as context:
+            context.prec = 50
+            distance = float((Decimal(num) / Decimal(scale_squared)).sqrt())
+        result[key] = {'mandatoryOppositeSourceVertex': vertex, 'nearestFace': faces[0],
+                       'exactNearestFaces': faces, 'sampledMetres': distance,
+                       'strictLowerMillimetres': lower}
     return result
 
 
