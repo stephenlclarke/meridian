@@ -16,17 +16,22 @@ def encode(source, points, triangles):
     if hashlib.sha256(source).hexdigest() != RESOURCE_SHA:
         raise ValueError("Changed selected SH008 resource")
     model = tomllib.loads(source.decode())["design"]
-    if (len(model["vertices"]), len(model["faces"])) != (2072, 3484):
+    return encode_model(model, points, triangles, b"MSH008V1", (2072, 536, 3484), b"GOSHVIZ1")
+
+
+def encode_model(model, points, triangles, source_magic, counts, visual_magic):
+    detailed_vertices, native_vertices, face_count = counts
+    if (len(model["vertices"]), len(model["faces"])) != (detailed_vertices, face_count):
         raise ValueError("Changed detailed face set")
     if [t["asset"] for t in model["textures"]] != TEXTURES:
         raise ValueError("Changed source texture ordering")
     packed_points = b"".join(struct.pack("<3d", *p) for p in model["vertices"])
     packed_faces = b"".join(struct.pack("<3I", *face) for face in model["faces"])
-    if points[:16] != struct.pack("<8sII", b"MSH008V1", 2072, 536) or packed_points != points[16:16 + len(packed_points)]:
+    if points[:16] != struct.pack("<8sII", source_magic, detailed_vertices, native_vertices) or packed_points != points[16:16 + len(packed_points)]:
         raise ValueError("Display positions differ from the reviewed detailed collision input")
     if packed_faces != triangles[:len(packed_faces)]:
         raise ValueError("Display winding differs from the reviewed detailed collision input")
-    output = bytearray(struct.pack("<8sII", b"GOSHVIZ1", 3484 * 3, 56))
+    output = bytearray(struct.pack("<8sII", visual_magic, face_count * 3, 56))
     for face, material_index, mapping in zip(
         model["faces"], model["faceMaterials"], model["faceTextures"], strict=True
     ):
