@@ -52,6 +52,17 @@ class GoshawkShowroomEvidence(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Invalid GPU timestamp sample"):
             verify(self.root, timing_dir=self.root)
 
+    def test_refuses_partial_measurement_and_stray_samples_on_unsupported_adapter(self):
+        self.measured_timing()
+        path = self.root / "front-gpu.tsv"
+        rows = path.read_text().splitlines(keepends=True)
+        path.write_text("".join(rows[:-1]))
+        with self.assertRaisesRegex(ValueError, "sample count"):
+            verify(self.root, timing_dir=self.root)
+        path.write_text("unsupported: adapter has no TIMESTAMP_QUERY\n" + rows[1])
+        with self.assertRaisesRegex(ValueError, "Unsupported timing file contains samples"):
+            verify(self.root, timing_dir=self.root)
+
     def test_rejects_overlapping_intervals_within_and_across_poses(self):
         self.measured_timing()
         self.write_timing("front", 100, overlap=True)
