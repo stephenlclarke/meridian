@@ -70,8 +70,8 @@
     "actualGameSweepQualified": false
   },
   "rawCheckoutProtection": {
-    "physicalSourceAttributes": "assets/fleet/sh036/.gitattributes * -text; root assets/legacy/** -text; integration/sh036-zebu/.gitattributes *.json -text",
-    "forcedCoreAutocrlfTrueCheckout": "11 pinned original physical, geometry, station and evidence inputs retained exact bytes"
+    "physicalSourceAttributes": "assets/fleet/sh036/.gitattributes * -text; root assets/legacy/** -text; integration/sh036-zebu/.gitattributes *.json -text; three explicitly pinned certificate tools text eol=lf",
+    "forcedCoreAutocrlfTrueCheckout": "26 pinned repository inputs retained exact bytes; unrelated Python control retained normal CRLF conversion"
   },
   "hullStudio": {
     "definition": "integration/sh036-zebu/ZEBU-STUDIO.json",
