@@ -4,6 +4,7 @@
 //! `MERIDIAN_SH009_MINIMUM_DIR` (solo and comparison panes), and
 //! `MERIDIAN_SH009_CACHE_DIR` (same-hull return and renderer-only mixed panes).
 //! The existing same-pose PPM verifier applies the same subtle-shimmer bounds to either hull.
+use super::minimum_rgb::{exact_original, exact_pane_union, isolated_pane};
 use super::{Hull, Pass, Uniforms};
 use crate::{
     app::MIN_WINDOW_LOGICAL,
@@ -683,6 +684,36 @@ fn metal_goshawk_gpu_cost() {
     validate_timings(timings);
 }
 
+fn minimum_rgb(
+    solo: &crate::docked_screens::Frame,
+    solo_rgb: &[u8],
+    comparison: &crate::docked_screens::Frame,
+    combined: &[u8],
+    isolated: &[Vec<u8>],
+    size: [u32; 2],
+) -> Result<[usize; 3], &'static str> {
+    let [standalone] = solo.models.as_slice() else {
+        return Err("Expected the single Mk II pane");
+    };
+    let [left, right] = comparison.models.as_slice() else {
+        return Err("Expected the two ordinary comparison panes");
+    };
+    let [first, second] = isolated else {
+        return Err("Expected two isolated comparison images");
+    };
+    if left.object != "SH025"
+        || Hull::from_model(right) != Some(Hull::Mk2)
+        || Hull::from_model(standalone) != Some(Hull::Mk2)
+    {
+        return Err("Incorrect ordinary Mk II comparison identity");
+    }
+    let solo = isolated_pane(solo_rgb, size, SCALE, standalone.bounds)?;
+    let left = isolated_pane(first, size, SCALE, left.bounds)?;
+    let right = isolated_pane(second, size, SCALE, right.bounds)?;
+    exact_pane_union(combined, [first, second], size)?;
+    Ok([solo.nonblack, left.nonblack, right.nonblack])
+}
+
 fn minimum_showroom_model_pass(hull: Hull, directory_variable: &str) {
     use super::minimum_qualification::{self, Frames};
     use std::fmt::Write as _;
@@ -729,21 +760,49 @@ fn minimum_showroom_model_pass(hull: Hull, directory_variable: &str) {
         ));
         let rgb = crop.capture(&gpu, &target, |render| docked.draw_models(render));
         crop.save(output.join(image), &rgb);
+        rgb
     };
+    let mut qualification = Vec::new();
     for (pose, Frames { solo, comparison }) in minimum_qualification::POSES
         .into_iter()
         .zip(minimum_qualification::station_frames(hull))
     {
-        capture(&format!("{pose}-solo"), &solo);
-        capture(&format!("{pose}-compare"), &comparison);
+        let solo_rgb = capture(&format!("{pose}-solo"), &solo);
+        let combined = capture(&format!("{pose}-compare"), &comparison);
+        let mut isolates = Vec::new();
         for model in &comparison.models {
             // Keep the Compare frame and its original pose and pane. Remove only the peer.
             let mut isolated = comparison.clone();
             isolated.models = vec![model.clone()];
-            capture(&format!("{pose}-compare-{}", model.object), &isolated);
+            isolates.push(capture(
+                &format!("{pose}-compare-{}", model.object),
+                &isolated,
+            ));
+        }
+        if hull == Hull::Mk2 {
+            qualification.push((
+                pose,
+                minimum_rgb(&solo, &solo_rgb, &comparison, &combined, &isolates, size),
+            ));
         }
     }
     write_new(output.join("model-panes.tsv"), panes.as_bytes());
+    if hull == Hull::Mk2 {
+        let mut report = String::from("pose\tsolo_visible\tleft_visible\tright_visible\tstatus\n");
+        for (pose, result) in &qualification {
+            match result {
+                Ok([solo, left, right]) => {
+                    ok(writeln!(report, "{pose}\t{solo}\t{left}\t{right}\tPASS"))
+                }
+                Err(reason) => ok(writeln!(report, "{pose}\t0\t0\t0\t{reason}")),
+            }
+        }
+        write_new(output.join("rgb-qualification.tsv"), report.as_bytes());
+        assert_eq!(qualification.len(), minimum_qualification::POSES.len());
+        for (_, result) in qualification {
+            ok(result);
+        }
+    }
     println!(
         "{} minimum Showroom model pass logical={MIN_WINDOW_LOGICAL:?} physical={size:?}",
         hull.object_id()
@@ -766,7 +825,8 @@ fn metal_goshawk_mk2_minimum_showroom_model_pass() {
 #[ignore = "Mac owner only: original-hull renderer cache switching and mixed panes"]
 fn metal_goshawk_mk2_cache_switching() {
     use super::minimum_qualification::station_frames;
-    use crate::docked_screens::{Frame, Rect};
+    use crate::docked_screens::Frame;
+    use std::fmt::Write as _;
 
     let output = output_directory("MERIDIAN_SH009_CACHE_DIR");
     let gpu = metal_gpu(Hull::Mk2, false);
@@ -794,12 +854,54 @@ fn metal_goshawk_mk2_cache_switching() {
         crop.save(output.join(format!("{name}.ppm")), &rgb);
         rgb
     };
+    // Separate source-bound GPU passes bypass the docked cache completely. Otherwise an
+    // incorrectly reused hull could agree with the same wrong hull in the isolated frame.
+    let mut direct_explorer = ok(Pass::new(&gpu.device, &gpu.queue, FORMAT, Hull::Explorer));
+    let mut direct_mk2 = ok(Pass::new(&gpu.device, &gpu.queue, FORMAT, Hull::Mk2));
+    let mut reference = |name: &str, model: &ModelPreview| {
+        let pass = match Hull::from_model(model) {
+            Some(Hull::Explorer) => &mut direct_explorer,
+            Some(Hull::Mk2) => &mut direct_mk2,
+            None => panic!("unexpected hull in independent reference"),
+        };
+        assert_eq!(Hull::from_model(model), Some(pass.hull()));
+        ok(pass.prepare(&gpu.queue, model, model.bounds, SCALE, FORMAT.is_srgb()));
+        assert!(
+            pass.shimmer,
+            "{} support qualification failed",
+            model.object
+        );
+        let rgb = crop.capture_preview(&gpu, &target, pass, false);
+        crop.save(output.join(format!("{name}.ppm")), &rgb);
+        rgb
+    };
     let explorer = station_frames(Hull::Explorer).remove(0);
     let mk2 = station_frames(Hull::Mk2).remove(0);
+    let [explorer_source] = explorer.solo.models.as_slice() else {
+        panic!("expected one Explorer model")
+    };
+    let [mk2_source] = mk2.solo.models.as_slice() else {
+        panic!("expected one Mk II model")
+    };
     let original = capture("explorer-before", &explorer.solo);
     let revised = capture("mk2-before", &mk2.solo);
-    assert!(original.iter().any(|&channel| channel > 0));
-    assert!(revised.iter().any(|&channel| channel > 0));
+    ok(isolated_pane(
+        &original,
+        size,
+        SCALE,
+        explorer_source.bounds,
+    ));
+    ok(isolated_pane(&revised, size, SCALE, mk2_source.bounds));
+    ok(exact_original(
+        &original,
+        &reference("explorer-reference", explorer_source),
+        size,
+    ));
+    ok(exact_original(
+        &revised,
+        &reference("mk2-reference", mk2_source),
+        size,
+    ));
     assert_ne!(
         original, revised,
         "distinct original hulls rendered identically"
@@ -813,32 +915,51 @@ fn metal_goshawk_mk2_cache_switching() {
     let [left, right] = mixed.models.as_mut_slice() else {
         panic!("expected two comparison panes")
     };
-    let [explorer_source] = explorer.solo.models.as_slice() else {
-        panic!("expected one Explorer model")
-    };
     left.object.clone_from(&explorer_source.object);
     left.geometry_key.clone_from(&explorer_source.geometry_key);
     left.orientation = right.orientation;
-    let assert_pane = |combined: &[u8], isolated: &[u8], bounds: Rect| {
-        let left = (bounds.x * SCALE[0]).ceil() as usize;
-        let right = ((bounds.x + bounds.width) * SCALE[0]).floor() as usize;
-        let top = (bounds.y * SCALE[1]).ceil() as usize;
-        let bottom = ((bounds.y + bounds.height) * SCALE[1]).floor() as usize;
-        assert!(left < right && top < bottom);
-        for row in top..bottom {
-            let start = (row * size[0] as usize + left) * 3;
-            let end = (row * size[0] as usize + right) * 3;
-            assert_eq!(&combined[start..end], &isolated[start..end]);
+    let mut report = String::from(
+        "order\tleft_hull\tright_hull\tleft_visible\tright_visible\tfull_union\tindependent_references\n",
+    );
+    let mut previous_combined: Option<Vec<u8>> = None;
+    for (order, expected) in [
+        ("explorer-mk2", [Hull::Explorer, Hull::Mk2]),
+        ("mk2-explorer", [Hull::Mk2, Hull::Explorer]),
+    ] {
+        assert_eq!(mixed.models.len(), expected.len());
+        for (model, hull) in mixed.models.iter().zip(expected) {
+            assert_eq!(Hull::from_model(model), Some(hull));
         }
-    };
-    for order in ["explorer-mk2", "mk2-explorer"] {
         let combined = capture(order, &mixed);
+        let mut independent_images = Vec::new();
         for model in &mixed.models {
             let mut isolated = mixed.clone();
             isolated.models = vec![model.clone()];
             let solo = capture(&format!("{order}-{}", model.object), &isolated);
-            assert_pane(&combined, &solo, model.bounds);
+            let measured = ok(isolated_pane(&solo, size, SCALE, model.bounds));
+            let independent = reference(&format!("{order}-reference-{}", model.object), model);
+            ok(exact_original(&solo, &independent, size));
+            independent_images.push((independent, measured.nonblack));
         }
+        let [first, second] = independent_images.as_slice() else {
+            panic!("expected two full-target independent references")
+        };
+        ok(exact_pane_union(&combined, [&first.0, &second.0], size));
+        let (left_pixels, right_pixels) = (first.1, second.1);
+        if let Some(old_combined) = previous_combined.take() {
+            assert!(
+                exact_pane_union(&old_combined, [&first.0, &second.0], size).is_err(),
+                "the old hull order must fail against the current independent references"
+            );
+        } else {
+            previous_combined = Some(combined);
+        }
+        ok(writeln!(
+            report,
+            "{order}\t{}\t{}\t{left_pixels}\t{right_pixels}\tPASS\tPASS",
+            expected[0].object_id(),
+            expected[1].object_id()
+        ));
         // Swap hull identity, preserving the two panes and their synchronized orientation.
         let [left, right] = mixed.models.as_mut_slice() else {
             unreachable!()
@@ -848,4 +969,5 @@ fn metal_goshawk_mk2_cache_switching() {
     }
     assert_eq!(original, capture("explorer-final", &explorer.solo));
     assert_eq!(revised, capture("mk2-final", &mk2.solo));
+    write_new(output.join("rgb-qualification.tsv"), report.as_bytes());
 }
