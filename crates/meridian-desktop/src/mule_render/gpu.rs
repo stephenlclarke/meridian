@@ -67,6 +67,7 @@ impl Pass {
                 uniform_size: size_of::<Uniforms>() as u64,
                 points: &points,
                 visual: &visual()?,
+                authored_materials: false,
             },
         )?;
         Ok(Self {
@@ -135,6 +136,7 @@ pub(super) struct Inputs<'a> {
     pub(super) uniform_size: u64,
     pub(super) points: &'a [Triangle],
     pub(super) visual: &'a [VisualVertex],
+    pub(super) authored_materials: bool,
 }
 
 impl Hardware {
@@ -149,6 +151,7 @@ impl Hardware {
             uniform_size,
             points,
             visual,
+            authored_materials,
         } = inputs;
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("Original hull material and source-rounded union"),
@@ -314,6 +317,8 @@ impl Hardware {
                     module: &shader,
                     entry_point: Some(if shimmer {
                         "union_vertex"
+                    } else if authored_materials {
+                        "authored_vertex"
                     } else {
                         "solid_vertex"
                     }),
@@ -324,6 +329,8 @@ impl Hardware {
                     module: &shader,
                     entry_point: Some(if shimmer {
                         "union_fragment"
+                    } else if authored_materials {
+                        "authored_fragment"
                     } else {
                         "solid_fragment"
                     }),
@@ -332,6 +339,8 @@ impl Hardware {
                         format,
                         blend: if shimmer {
                             Some(wgpu::BlendState::PREMULTIPLIED_ALPHA_BLENDING)
+                        } else if authored_materials {
+                            Some(wgpu::BlendState::ALPHA_BLENDING)
                         } else {
                             None
                         },

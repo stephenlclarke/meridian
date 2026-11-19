@@ -25,6 +25,7 @@ const SAMPLES: u32 = 16;
 const POSES: [&str; 3] = ["front", "oblique", "upper"];
 const PHASE_SECONDS: f32 = std::f32::consts::PI / 0.7;
 
+mod authored_qualification;
 mod custom_qualification;
 mod peregrine_mk_i_qualification;
 mod peregrine_pair_qualification;

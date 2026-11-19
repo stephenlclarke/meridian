@@ -24,7 +24,7 @@ use crate::clock::FixedClock;
 use crate::profile::Profile;
 use crate::renderer::{HudScene, Presentation, Renderer, SceneEffects, StationScene};
 use crate::session::Action;
-use crate::{asteroid_render, docked::Docked, docked_screens as ui};
+use crate::{asteroid_render, authored_hull::AuthoredHulls, docked::Docked, docked_screens as ui};
 
 // Ephemeral profile IDs are allocated by the host, never by the deterministic core.
 fn fresh_profile_seed() -> u64 {
@@ -110,6 +110,7 @@ impl Notice {
 
 struct App {
     game: Profile,
+    authored_hulls: Arc<AuthoredHulls>,
     validation_view: FlightView,
     validation_timing: Option<mule_validation::FrameTiming>,
     celestial: crate::celestial::WorldAdapter,
@@ -144,18 +145,15 @@ impl App {
         let view = launch.camera_view();
         let mut app = match launch {
             mule_validation::Launch::Profile(directory) => {
-                let (game, notice) = Profile::open_startup(directory, fresh_profile_seed())?;
-                let mut app = Self::with_profile(game);
-                app.commander_open = true;
-                app.paused = app
-                    .game
-                    .world
-                    .mission_snapshot()
-                    .is_some_and(|mission| mission.paused);
-                if let Some(notice) = notice {
-                    app.notice.set(notice);
-                }
-                app
+                Self::open_profile(directory, Arc::default())?
+            }
+            mule_validation::Launch::Authored {
+                directory,
+                packages,
+            } => {
+                // Reject every invalid/conflicting input before opening a profile or its save.
+                let authored = Arc::new(AuthoredHulls::load(&packages)?);
+                Self::open_profile(directory, authored)?
             }
             launch => Self::with_profile(launch.open()?),
         };
@@ -163,10 +161,35 @@ impl App {
         Ok(app)
     }
 
+    fn open_profile(
+        directory: std::path::PathBuf,
+        authored_hulls: Arc<AuthoredHulls>,
+    ) -> Result<Self, Box<dyn Error>> {
+        let (game, notice) = Profile::open_startup(directory, fresh_profile_seed())?;
+        let mut app = Self::with_profile(game);
+        app.authored_hulls = authored_hulls;
+        app.commander_open = true;
+        app.paused = app
+            .game
+            .world
+            .mission_snapshot()
+            .is_some_and(|mission| mission.paused);
+        if let Some(notice) = notice {
+            app.notice.set(notice);
+        } else if let Some(first) = app.authored_hulls.records().next() {
+            app.notice.set(format!(
+                "Local hull loaded. At a station press 3, search {}.",
+                first.id
+            ));
+        }
+        Ok(app)
+    }
+
     fn with_profile(game: Profile) -> Self {
         let internal = game.is_internal_validation();
         Self {
             game,
+            authored_hulls: Arc::default(),
             validation_view: FlightView::Front,
             validation_timing: internal.then(mule_validation::FrameTiming::default),
             quit_failed: false,
@@ -563,7 +586,7 @@ impl App {
             self.docked = None;
             return;
         }
-        self.docked = match Docked::new(&self.game.world) {
+        self.docked = match self.new_docked_menu() {
             Ok(mut menu) => {
                 if self.game.world.current_dock_context().is_some()
                     && let Err(error) = menu.open(&self.game.world, ui::Screen::System)
@@ -624,6 +647,13 @@ impl App {
                 .as_ref()
                 .is_some_and(|menu| menu.active(&self.game.world))
     }
+    fn new_docked_menu(&self) -> Result<Docked, String> {
+        if self.authored_hulls.is_empty() {
+            Docked::new(&self.game.world)
+        } else {
+            Docked::with_authored(&self.game.world, self.authored_hulls.clone())
+        }
+    }
     fn menu_input(&mut self, input: ui::Input) {
         if self.modal_open() {
             return;
@@ -650,7 +680,7 @@ impl App {
             _ => return false,
         };
         if self.docked.is_none() {
-            match Docked::new(&self.game.world) {
+            match self.new_docked_menu() {
                 Ok(menu) => self.docked = Some(menu),
                 Err(error) => {
                     self.notice.set(error);
@@ -1250,7 +1280,11 @@ impl ApplicationHandler for App {
             Ok(window) => Arc::new(window),
             Err(error) => return self.fail(event_loop, error),
         };
-        match pollster::block_on(Renderer::new(window, event_loop.owned_display_handle())) {
+        match pollster::block_on(Renderer::new(
+            window,
+            event_loop.owned_display_handle(),
+            self.authored_hulls.clone(),
+        )) {
             Ok(renderer) => self.renderer = Some(renderer),
             Err(error) => self.fail(event_loop, error),
         }
@@ -1339,8 +1373,8 @@ impl ApplicationHandler for App {
 }
 
 pub fn run() -> Result<(), Box<dyn Error>> {
-    let event_loop = EventLoop::new()?;
     let mut app = App::new()?;
+    let event_loop = EventLoop::new()?;
     event_loop.run_app(&mut app)?;
     if let Some(error) = app.error {
         return Err(std::io::Error::other(error).into());
@@ -1442,5 +1476,7 @@ mod help_tests;
 #[cfg(test)]
 mod xyzzy_tests;
 
+#[cfg(test)]
+mod authored_hull_tests;
 #[cfg(test)]
 mod emp_tests;

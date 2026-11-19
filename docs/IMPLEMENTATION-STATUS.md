@@ -14,6 +14,8 @@ SH023 independently binds its original detailed visual and 69 local supports. It
 
 ## Commander startup and flight cockpit
 
+The authored package desktop entry and Showroom are implemented in development source. Explicit local packages use the shared core validation, actual rounded collision pieces and continuous clearance results. Arbitrary new identities render from their own vertices, materials and UVs, while original identities can be inspected only under a separate local key. No save or campaign admission changes. Owned portable compilation and native GPU execution remain pending. [Controls, fixtures and acceptance](AUTHORED-HULL-SHOWROOM.md)
+
 Ordinary startup opens Commander details with the current ship, location and credits. A fresh commander starts at Avenor. A saved flight opens its summary and waits for Enter to resume. An unreadable slot opens recovery. On Mac, a fresh commander reached this screen without creating a save. An airborne commander stayed on the summary until Enter. Recovery preserved the original damaged and unsupported save bytes.
 
 The desktop source clears the text area above the instruments in idle flight and in the idle docked exterior. Command feedback expires after four seconds in either view, including when paused. Requested details, review terms and action-specific confirmations remain accessible. For controls and station navigation, press H or ?. Active flight practice, jump countdowns and contact warnings remain visible. Mac qualification verified the clear docked view, four-second expiry and deliberate freight review. The installed Mac Preview 9 includes this HUD.
