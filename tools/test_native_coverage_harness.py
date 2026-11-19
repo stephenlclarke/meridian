@@ -127,7 +127,8 @@ class NativeCoverageHarnessTests(unittest.TestCase):
         renderer = Path("crates/meridian-desktop/src/renderer.rs")
         source = (self.root / renderer).read_text().splitlines()
         helper = next(n for n, text in enumerate(source, 1) if "to_logical::<f64>(scale_factor())" in text)
-        other_queue = next(n for n, text in enumerate(source, 1) if text.strip() == "self.queue.write_buffer(")
+        other_queue = next(n for n, text in enumerate(source, 1)
+                           if ".write_buffer(&self.projection," in text)
         records = [f"SF:{self.root / renderer}", f"DA:{helper},9", f"DA:{other_queue},9", "end_of_record"]
         for _, line, marker in boundaries:
             if "scale_factor" not in marker and "queue.write_buffer" not in marker:
