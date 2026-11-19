@@ -23,6 +23,7 @@ pub(super) fn search_name(hull: Hull) -> &'static str {
         Hull::Explorer => "Goshawk Explorer",
         Hull::Mk2 => "Goshawk Mk II",
         Hull::Custom => "Goshawk Mk II Custom",
+        Hull::SableLiner => "Sable Liner",
     }
 }
 
@@ -188,4 +189,9 @@ fn original_goshawk_mk2_fits_minimum_station_showroom_solo_and_compare() {
 #[test]
 fn original_custom_fits_minimum_station_showroom_solo_and_compare() {
     assert_minimum_station_fit(Hull::Custom, super::CUSTOM_DETAILED_FACES * 3);
+}
+
+#[test]
+fn original_sable_liner_fits_minimum_station_showroom_solo_and_compare() {
+    assert_minimum_station_fit(Hull::SableLiner, 4_496 * 3);
 }

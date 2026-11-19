@@ -1,4 +1,4 @@
-//! Source-authenticated Goshawk Showroom presentation. Inputs grant no World authority.
+//! Source-authenticated original-hull Showroom presentation. Inputs grant no World authority.
 use super::{Piece, Triangle, Vec3, VisualVertex, gpu, subtract, support_mesh, vector};
 use crate::docked_screens::{ModelPreview, Orientation, Rect};
 use meridian_core::{
@@ -13,13 +13,17 @@ use meridian_core::{
     },
     goshawk_mk2::{GOSHAWK_MK2_PIECES, GoshawkMk2HullSource},
     mule::SmoothPiece,
+    sable_liner::{SABLE_LINER_PIECES, SableLinerHullSource},
 };
 
 pub(crate) const GEOMETRY_KEY: &str = "assets/fleet/sh008/visual.bin";
 pub(crate) const MK2_GEOMETRY_KEY: &str = "assets/fleet/sh009/visual.bin";
 pub(crate) const CUSTOM_GEOMETRY_KEY: &str = "assets/fleet/sh010/visual.bin";
+pub(crate) const SABLE_GEOMETRY_KEY: &str = "assets/fleet/sh012/visual.bin";
 const VERTICES: usize = 3_484 * 3;
 const MK2_SOURCE_POINTS: usize = 2_104 + 568;
+// The crescent splits reuse original vertices on both sides of their seams.
+const SABLE_SOURCE_POINT_SLOTS: usize = 2_576;
 mod visual_assets;
 const EMPTY_PIECE: Piece = Piece {
     range: [0; 4],
@@ -32,16 +36,18 @@ pub(crate) enum Hull {
     Explorer,
     Mk2,
     Custom,
+    SableLiner,
 }
 
 impl Hull {
-    pub(crate) const COUNT: usize = 3;
+    pub(crate) const COUNT: usize = 4;
 
     pub(crate) fn from_model(model: &ModelPreview) -> Option<Self> {
         match (model.object.as_str(), model.geometry_key.as_str()) {
             ("SH008", GEOMETRY_KEY) => Some(Self::Explorer),
             ("SH009", MK2_GEOMETRY_KEY) => Some(Self::Mk2),
             ("SH010", CUSTOM_GEOMETRY_KEY) => Some(Self::Custom),
+            ("SH012", SABLE_GEOMETRY_KEY) => Some(Self::SableLiner),
             _ => None,
         }
     }
@@ -51,6 +57,7 @@ impl Hull {
             Self::Explorer => GEOMETRY_KEY,
             Self::Mk2 => MK2_GEOMETRY_KEY,
             Self::Custom => CUSTOM_GEOMETRY_KEY,
+            Self::SableLiner => SABLE_GEOMETRY_KEY,
         }
     }
 
@@ -59,6 +66,7 @@ impl Hull {
             Self::Explorer => "SH008",
             Self::Mk2 => "SH009",
             Self::Custom => "SH010",
+            Self::SableLiner => "SH012",
         }
     }
 
@@ -67,6 +75,7 @@ impl Hull {
             Self::Explorer => GOSHAWK_PIECES,
             Self::Mk2 => GOSHAWK_MK2_PIECES,
             Self::Custom => CUSTOM_PIECES,
+            Self::SableLiner => SABLE_LINER_PIECES,
         }
     }
 
@@ -98,6 +107,14 @@ impl Hull {
                     self,
                     source.pieces(),
                     CUSTOM_DETAILED_VERTICES + CUSTOM_NATIVE_VERTICES,
+                ))
+            }
+            Self::SableLiner => {
+                let source = SableLinerHullSource::bundled().map_err(|e| e.to_string())?;
+                Ok(Supports::new(
+                    self,
+                    source.pieces().as_ref(),
+                    SABLE_SOURCE_POINT_SLOTS,
                 ))
             }
         }
@@ -515,6 +532,18 @@ mod tests {
     }
 
     #[test]
+    fn sable_liner_original_visual_and_47_supports_bind_to_the_shader() {
+        let hull = Hull::SableLiner;
+        let vertices = ok(visual_assets::load(hull.geometry_key()));
+        assert_eq!(vertices.len(), 4_496 * 3);
+        let source = ok(SableLinerHullSource::bundled());
+        let supports = assert_local_supports(hull, source.pieces().as_ref());
+        assert_eq!(supports.pieces.len(), 47);
+        assert_projection(&vertices, &supports.pieces);
+        assert_shader_layout(hull);
+    }
+
+    #[test]
     fn source_selection_requires_matching_ship_id_and_geometry_key() {
         let preview = |object: &str, geometry_key: &str| ModelPreview {
             object: object.into(),
@@ -526,6 +555,7 @@ mod tests {
             ("SH008", GEOMETRY_KEY, Hull::Explorer),
             ("SH009", MK2_GEOMETRY_KEY, Hull::Mk2),
             ("SH010", CUSTOM_GEOMETRY_KEY, Hull::Custom),
+            ("SH012", SABLE_GEOMETRY_KEY, Hull::SableLiner),
         ] {
             let model = preview(object, key);
             assert_eq!(Hull::from_model(&model), Some(hull));
@@ -540,6 +570,13 @@ mod tests {
             preview("SH010", GEOMETRY_KEY),
             preview("SH010", MK2_GEOMETRY_KEY),
             preview("SH025", CUSTOM_GEOMETRY_KEY),
+            preview("SH012", GEOMETRY_KEY),
+            preview("SH012", MK2_GEOMETRY_KEY),
+            preview("SH012", CUSTOM_GEOMETRY_KEY),
+            preview("SH008", SABLE_GEOMETRY_KEY),
+            preview("SH009", SABLE_GEOMETRY_KEY),
+            preview("SH010", SABLE_GEOMETRY_KEY),
+            preview("SH025", SABLE_GEOMETRY_KEY),
         ] {
             assert_eq!(Hull::from_model(&model), None);
             assert!(!matches(&model));

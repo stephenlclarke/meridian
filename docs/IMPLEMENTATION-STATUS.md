@@ -4,6 +4,10 @@
 
 Preview 10 is published for macOS arm64 and Windows x64. It includes the Goshawk Explorer in the ordinary station Showroom. The signed and notarized app was extracted and checked against the local installation, including all 483 files. Earlier Mac gameplay checks covered the Showroom on the source used for this build. Packaging verification did not include a new graphical launch. [Preview guide](PREVIEW-RELEASES.md)
 
+## Sable Liner source and Showroom
+
+Meridian's SH012 Sable Liner Showroom source routes the original plum-gold detail with a 47-piece source-rounded shimmer. Its untextured faces use their original face colours, and textured faces keep the original maps and repeated UVs. The Air passed the source check for all 13,488 corners. Selection, solo and Compare regressions are authored. Owned Rust and Metal qualification are pending, and stock mass remains unassigned. [SH012 source and Showroom](SABLE-LINER-GAMEPLAY-ENVELOPE.md)
+
 ## Commander startup and flight cockpit
 
 Ordinary startup opens Commander details with the current ship, location and credits. A fresh commander starts at Avenor. A saved flight opens its summary and waits for Enter to resume. An unreadable slot opens recovery. On Mac, a fresh commander reached this screen without creating a save. An airborne commander stayed on the summary until Enter. Recovery preserved the original damaged and unsupported save bytes.

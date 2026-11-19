@@ -575,13 +575,14 @@ fn same_pose_shimmer(hull: Hull, directory_variable: &str) {
             Hull::Explorer => 10_452,
             Hull::Mk2 => 10_596,
             Hull::Custom => super::CUSTOM_DETAILED_FACES as u32 * 3,
+            Hull::SableLiner => 13_488,
         }
     );
     let mut totals = [0, 0];
     let models = showroom_models(hull);
     let other = match hull {
         Hull::Explorer => Hull::Mk2,
-        Hull::Mk2 => Hull::Explorer,
+        Hull::Mk2 | Hull::SableLiner => Hull::Explorer,
         Hull::Custom => Hull::Mk2,
     };
     let mut wrong = models[0].clone();
@@ -659,6 +660,66 @@ fn metal_goshawk_custom_same_pose_shimmer() {
 }
 
 #[test]
+#[ignore = "Mac owner only: production SH012 subtle shimmer"]
+fn metal_sable_liner_same_pose_shimmer() {
+    same_pose_shimmer(Hull::SableLiner, "MERIDIAN_SH012_EVIDENCE_DIR");
+}
+
+#[test]
+#[ignore = "Mac owner only: original untextured SH012 source colour through production shader"]
+fn metal_sable_liner_untextured_face_uses_exact_source_colour() {
+    use super::super::{Triangle, VisualVertex, gpu as renderer};
+
+    let hull = Hull::SableLiner;
+    let device = metal_gpu(hull, false);
+    let target = Target::new(&device.device, [32.0, 32.0]);
+    let original = ok(super::visual_assets::load(hull.geometry_key()))[2156 * 3];
+    assert_eq!(original.texture, u32::MAX);
+    // Preserve original face attributes. Put the flat test triangle at a known camera depth.
+    let vertices =
+        [[-1.0, -1.0, 2.0], [1.0, -1.0, 2.0], [0.0, 1.0, 2.0]].map(|position| VisualVertex {
+            position,
+            ..original
+        });
+    let no_pieces = [<Triangle as bytemuck::Zeroable>::zeroed()];
+    let hardware = ok(renderer::Hardware::new(
+        &device.device,
+        &device.queue,
+        FORMAT,
+        renderer::Inputs {
+            shader: &super::shader(hull),
+            uniform_size: hull.uniform_size() as u64,
+            points: &no_pieces,
+            visual: &vertices,
+        },
+    ));
+    let mut uniforms = <Uniforms as bytemuck::Zeroable>::zeroed();
+    uniforms.projection = [1.0, 1.0, 0.1, 128.0];
+    uniforms.origin[3] = 1.0;
+    uniforms.x[0] = 1.0;
+    uniforms.y[1] = 1.0;
+    uniforms.z[2] = 1.0;
+    device
+        .queue
+        .write_buffer(&hardware.uniform, 0, bytemuck::bytes_of(&uniforms));
+    let crop = Crop {
+        origin: wgpu::Origin3d { x: 32, y: 32, z: 0 },
+        extent: wgpu::Extent3d {
+            width: 1,
+            height: 1,
+            depth_or_array_layers: 1,
+        },
+    };
+    let center = crop.capture(&device, &target, |render| {
+        render.set_pipeline(&hardware.solid);
+        render.set_bind_group(0, &hardware.group, &[]);
+        render.set_vertex_buffer(0, hardware.vertices.slice(..));
+        render.draw(0..3, 0..1);
+    });
+    assert_eq!(center, [0x74, 0xbf, 0xcc]);
+}
+
+#[test]
 #[ignore = "Mac owner only: explicit production SH008 GPU timestamp qualification"]
 fn metal_goshawk_gpu_cost() {
     let output = output_directory("MERIDIAN_SH008_TIMING_DIR");
@@ -700,6 +761,7 @@ fn metal_goshawk_gpu_cost() {
 }
 
 fn minimum_rgb(
+    hull: Hull,
     solo: &crate::docked_screens::Frame,
     solo_rgb: &[u8],
     comparison: &crate::docked_screens::Frame,
@@ -708,7 +770,7 @@ fn minimum_rgb(
     size: [u32; 2],
 ) -> Result<[usize; 3], &'static str> {
     let [standalone] = solo.models.as_slice() else {
-        return Err("Expected the single Mk II pane");
+        return Err("Expected the single original hull pane");
     };
     let [left, right] = comparison.models.as_slice() else {
         return Err("Expected the two ordinary comparison panes");
@@ -717,10 +779,10 @@ fn minimum_rgb(
         return Err("Expected two isolated comparison images");
     };
     if left.object != "SH025"
-        || Hull::from_model(right) != Some(Hull::Mk2)
-        || Hull::from_model(standalone) != Some(Hull::Mk2)
+        || Hull::from_model(right) != Some(hull)
+        || Hull::from_model(standalone) != Some(hull)
     {
-        return Err("Incorrect ordinary Mk II comparison identity");
+        return Err("Incorrect ordinary original hull comparison identity");
     }
     let solo = isolated_pane(solo_rgb, size, SCALE, standalone.bounds)?;
     let left = isolated_pane(first, size, SCALE, left.bounds)?;
@@ -777,6 +839,7 @@ fn minimum_showroom_model_pass(hull: Hull, directory_variable: &str) {
         crop.save(output.join(image), &rgb);
         rgb
     };
+    let verify_rgb = matches!(hull, Hull::Mk2 | Hull::SableLiner);
     let mut qualification = Vec::new();
     for (pose, Frames { solo, comparison }) in minimum_qualification::POSES
         .into_iter()
@@ -794,15 +857,23 @@ fn minimum_showroom_model_pass(hull: Hull, directory_variable: &str) {
                 &isolated,
             ));
         }
-        if hull == Hull::Mk2 {
+        if verify_rgb {
             qualification.push((
                 pose,
-                minimum_rgb(&solo, &solo_rgb, &comparison, &combined, &isolates, size),
+                minimum_rgb(
+                    hull,
+                    &solo,
+                    &solo_rgb,
+                    &comparison,
+                    &combined,
+                    &isolates,
+                    size,
+                ),
             ));
         }
     }
     write_new(output.join("model-panes.tsv"), panes.as_bytes());
-    if hull == Hull::Mk2 {
+    if verify_rgb {
         let mut report = String::from("pose\tsolo_visible\tleft_visible\tright_visible\tstatus\n");
         for (pose, result) in &qualification {
             match result {
@@ -834,6 +905,12 @@ fn metal_goshawk_minimum_showroom_model_pass() {
 #[ignore = "Mac owner only: explicit minimum-size production SH009 Showroom model pass"]
 fn metal_goshawk_mk2_minimum_showroom_model_pass() {
     minimum_showroom_model_pass(Hull::Mk2, "MERIDIAN_SH009_MINIMUM_DIR");
+}
+
+#[test]
+#[ignore = "Mac owner only: minimum-size production SH012 solo and Compare"]
+fn metal_sable_liner_minimum_showroom_model_pass() {
+    minimum_showroom_model_pass(Hull::SableLiner, "MERIDIAN_SH012_MINIMUM_DIR");
 }
 
 #[test]
@@ -882,7 +959,9 @@ fn metal_goshawk_mk2_cache_switching() {
         let pass = match Hull::from_model(model) {
             Some(Hull::Explorer) => &mut direct_explorer,
             Some(Hull::Mk2) => &mut direct_mk2,
-            Some(Hull::Custom) | None => panic!("unexpected hull in independent reference"),
+            Some(Hull::Custom | Hull::SableLiner) | None => {
+                panic!("unexpected hull in independent reference")
+            }
         };
         assert_eq!(Hull::from_model(model), Some(pass.hull()));
         ok(pass.prepare(&gpu.queue, model, model.bounds, SCALE, FORMAT.is_srgb()));

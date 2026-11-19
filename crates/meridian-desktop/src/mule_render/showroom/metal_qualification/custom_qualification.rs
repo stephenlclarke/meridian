@@ -155,7 +155,9 @@ impl<'a> Capture<'a> {
             let reference = match showroom::hull(model) {
                 Some(Hull::Custom) => Some(&mut *custom),
                 Some(Hull::Explorer) => explorer.as_deref_mut(),
-                Some(Hull::Mk2) => panic!("unexpected SH009 in SH010 qualification"),
+                Some(Hull::Mk2 | Hull::SableLiner) => {
+                    panic!("unexpected hull in SH010 qualification")
+                }
                 None => {
                     assert_eq!(model.object, "SH025");
                     None

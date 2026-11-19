@@ -1,16 +1,22 @@
-//! Original detailed visuals for the Goshawk family. No collision or selection authority.
-use super::super::{VisualVertex, decode_visual};
-use super::{CUSTOM_DETAILED_FACES, CUSTOM_GEOMETRY_KEY, GEOMETRY_KEY, MK2_GEOMETRY_KEY, VERTICES};
+//! Bound detailed visuals for original Showroom hulls. No collision or selection authority.
+use super::super::{VisualVertex, decode_visual, decode_visual_layers};
+use super::{
+    CUSTOM_DETAILED_FACES, CUSTOM_GEOMETRY_KEY, GEOMETRY_KEY, MK2_GEOMETRY_KEY, SABLE_GEOMETRY_KEY,
+    VERTICES,
+};
 
 const SH008_VISUAL: &[u8] = include_bytes!("../../../../../assets/fleet/sh008/visual.bin");
 const SH009_VISUAL: &[u8] = include_bytes!("../../../../../assets/fleet/sh009/visual.bin");
 const SH010_VISUAL: &[u8] = include_bytes!("../../../../../assets/fleet/sh010/visual.bin");
+const SH012_VISUAL: &[u8] = include_bytes!("../../../../../assets/fleet/sh012/visual.bin");
 const SH009_VERTICES: usize = 3_532 * 3;
+const SH012_VERTICES: usize = 4_496 * 3;
 const SH008_FNV: u64 = 0x7a17_0c0c_6cdc_d5fd;
 const SH009_FNV: u64 = 0xd01c_abc6_c77a_3b19;
 const SH010_FNV: u64 = 0xfe21_3755_8ea3_8ccb;
+const SH012_FNV: u64 = 0xba25_8fe1_88c3_f200;
 
-// Loader shared by all three authenticated original Goshawk hulls.
+// Loader shared by authenticated original showroom hulls.
 pub(super) fn load(geometry_key: &str) -> Result<Vec<VisualVertex>, &'static str> {
     match geometry_key {
         GEOMETRY_KEY => checked(SH008_VISUAL, b"GOSHVIZ1", VERTICES, SH008_FNV),
@@ -21,7 +27,11 @@ pub(super) fn load(geometry_key: &str) -> Result<Vec<VisualVertex>, &'static str
             CUSTOM_DETAILED_FACES * 3,
             SH010_FNV,
         ),
-        _ => Err("Unknown Goshawk detailed visual"),
+        SABLE_GEOMETRY_KEY => {
+            verify_hash(SH012_VISUAL, SH012_FNV)?;
+            decode_visual_layers(SH012_VISUAL, b"SBLRVIZ1", SH012_VERTICES, true)
+        }
+        _ => Err("Unknown original detailed visual"),
     }
 }
 
@@ -31,14 +41,22 @@ fn checked(
     count: usize,
     expected_hash: u64,
 ) -> Result<Vec<VisualVertex>, &'static str> {
+    verify_hash(bytes, expected_hash)?;
+    decode_visual(bytes, magic, count)
+}
+
+fn verify_hash(bytes: &[u8], expected_hash: u64) -> Result<(), &'static str> {
     let hash = bytes.iter().fold(0xcbf2_9ce4_8422_2325_u64, |hash, byte| {
         (hash ^ u64::from(*byte)).wrapping_mul(0x100_0000_01b3)
     });
     if hash != expected_hash {
-        return Err("Goshawk detailed visual bytes changed");
+        return Err("Original detailed visual bytes changed");
     }
-    decode_visual(bytes, magic, count)
+    Ok(())
 }
+
+#[cfg(test)]
+mod sable_liner_tests;
 
 #[cfg(test)]
 mod tests {
@@ -115,5 +133,21 @@ mod tests {
             .is_err()
         );
         assert!(checked(SH010_VISUAL, b"GOS2VIZ1", SH009_VERTICES, SH009_FNV).is_err());
+    }
+
+    #[test]
+    fn all_goshawk_visuals_still_reject_untextured_and_unknown_layers() {
+        for (visual, magic, count) in [
+            (SH008_VISUAL, b"GOSHVIZ1", VERTICES),
+            (SH009_VISUAL, b"GOS2VIZ1", SH009_VERTICES),
+            (SH010_VISUAL, b"SH010VZ1", CUSTOM_DETAILED_FACES * 3),
+        ] {
+            assert!(decode_visual(visual, magic, count).is_ok());
+            let mut changed = visual.to_vec();
+            for layer in [3_u32, u32::MAX] {
+                changed[16 + 48..16 + 52].copy_from_slice(&layer.to_le_bytes());
+                assert!(decode_visual(&changed, magic, count).is_err());
+            }
+        }
     }
 }

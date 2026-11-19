@@ -37,8 +37,10 @@ struct Solid {
 }
 @fragment fn solid_fragment(v:Solid)->@location(0) vec4<f32> {
     // Diffuse source maps already contain restrained baked relief. Do not double-light them.
-    let texel=textureSample(diffuse,repeat_sampler,v.uv,i32(v.layer));
-    return vec4<f32>(output_color(texel.rgb*linear(v.color.rgb)),1.0);
+    // Keep the sample uniform and in-bounds. The explicit source sentinel uses face colour.
+    let texel=textureSample(diffuse,repeat_sampler,v.uv,i32(min(v.layer,2u)));
+    let reflectance=select(texel.rgb,vec3<f32>(1.0),v.layer==0xffffffffu);
+    return vec4<f32>(output_color(reflectance*linear(v.color.rgb)),1.0);
 }
 struct Screen { @builtin(position) position:vec4<f32>, @location(0) ray:vec3<f32> }
 @vertex fn union_vertex(@builtin(vertex_index) index:u32)->Screen {
