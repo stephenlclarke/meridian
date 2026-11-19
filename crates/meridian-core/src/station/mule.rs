@@ -194,6 +194,25 @@ impl OriginalStationData {
         roll_rate: f64,
         angular_travel: f64,
     ) -> bool {
+        self.goshawk_entry_conditions(
+            source,
+            start,
+            end,
+            physical_speed,
+            roll_rate,
+            angular_travel,
+        ) && self.goshawk_motion_clear(source, start, end, angular_travel)
+    }
+
+    pub(crate) fn goshawk_entry_conditions(
+        &self,
+        source: &GoshawkHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        physical_speed: f64,
+        roll_rate: f64,
+        angular_travel: f64,
+    ) -> bool {
         self.rounded_station_entry_conditions(
             source.pieces().as_ref(),
             start,
@@ -201,7 +220,36 @@ impl OriginalStationData {
             physical_speed,
             roll_rate,
             angular_travel,
-        ) && self.goshawk_motion_clear(source, start, end, angular_travel)
+        )
+    }
+
+    pub(crate) fn goshawk_observer_clear(
+        &self,
+        source: &GoshawkHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        observer: RigidPose,
+    ) -> bool {
+        // Fixed orientations and linear translation bound every point by the two hull radii.
+        let radius = rounded_maximum_origin_radius(source.pieces().as_ref());
+        let margin = (radius + self.player_radius()) * 1.001 + 0.001;
+        let a = sub(start.position, observer.position);
+        let b = sub(end.position, observer.position);
+        if [(a.x, b.x), (a.y, b.y), (a.z, b.z)]
+            .into_iter()
+            .any(|(first, last)| first.min(last) > margin || first.max(last) < -margin)
+        {
+            return true;
+        }
+        self.hull.faces.iter().all(|face| {
+            let triangle = [face[0], face[1], face[2]].map(|i| {
+                add(
+                    observer.position,
+                    observer.orientation.apply(self.hull.vertices[i]),
+                )
+            });
+            source.sweep_clears_triangles(start, end, 0.0, &[triangle]) == Ok(true)
+        })
     }
 }
 

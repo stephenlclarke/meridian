@@ -595,6 +595,7 @@ fn actual_secret_base_release_spends_once_drains_shield_and_preserves_hull_cargo
     let decoded = World::decode_saved_world(&bytes).unwrap();
     assert_eq!(w.mission_snapshot().unwrap().contact, None);
     let mut native_control = World {
+        goshawk_validation: None,
         mule_validation: None,
         mule_renas: None,
         state: w.state,

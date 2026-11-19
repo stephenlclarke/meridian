@@ -64,5 +64,43 @@
       "goshawk_original_visual_and_all_local_supports_bind_to_the_shader"
     ],
     "nativeAcceptance": "Capture original forest-silver appearance, the open wishbone and close grazing shimmer while rotating in the ordinary Showroom; verify resize, view clipping and draw cost."
+  },
+  "controlledWorld": {
+    "boundBase": "cfaab8a9704ba0124a08ce5e8a9e474c18484df6",
+    "status": "AUTHORED_UNRUN",
+    "qualifiedPrerequisites": "All four prior SH008 core and SH028 cases passed hosted Linux, hosted Mac and the owned Mac workspace. The ordinary Mac Showroom displays SH008.",
+    "scope": "One World with fixed original SH028, stationary native SH025 observer, and the 69 existing rounded SH008 pieces. No change to fleet or public-preview acceptance.",
+    "regressions": [
+      "goshawk_world_approach_reports_physical_contact_and_entry_clearance",
+      "goshawk_world_snapshots_keep_source_and_scope_without_a_commander",
+      "goshawk_world_refuses_unbound_motion_and_overlapping_starts"
+    ],
+    "routes": {
+      "aligned": "Entered",
+      "overspeed": "EntryConditions",
+      "lip": "StationContact",
+      "off-aperture": "EntryConditions",
+      "observer": "ObserverContact"
+    },
+    "timing": {
+      "label": "GOSHAWK_WORLD_COLLISION_COST",
+      "horizonTicks": 160,
+      "fields": [
+        "route",
+        "status",
+        "ticks",
+        "median_ns",
+        "p95_ns",
+        "max_ns",
+        "terminal_ns"
+      ],
+      "boundary": "External Instant samples of release World::step only, through the terminal tick. No compiled or measured results on the source-authoring lane.",
+      "command": "cargo test --locked --release -p meridian-core flight::goshawk_validation::tests::goshawk_world_approach_reports_physical_contact_and_entry_clearance -- --exact --nocapture"
+    },
+    "ownedAcceptance": [
+      "Run all three controlled World regressions and all four existing source/SH028 cases against the joined exact source",
+      "Run repository checks and strict Clippy on the joined revision",
+      "Record release timing by route with commit and machine/runtime identity"
+    ]
   }
 }
