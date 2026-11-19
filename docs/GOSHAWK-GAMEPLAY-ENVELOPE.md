@@ -43,3 +43,64 @@ cargo test --locked --release -p meridian-core \
 ```
 
 Record each `GOSHAWK_WORLD_COLLISION_COST` line with the tested commit, machine and runtime. The test samples `World::step` through each route's terminal tick and reports the tick count, median, p95, maximum, and terminal nanoseconds. Scenario setup, snapshots, assertions, and reporting occur outside the timed interval.
+
+## Full-surface fit evidence
+
+The audit measures directed Euclidean distance from the exposed rounded union
+to each calibrated source triangle set separately. The nominal 20 mm rounding
+expands the convex supports. The gap to an original concave surface
+depends on the convex fill and on differences between the originals.
+
+| Original | Certified exposed lower bound | Largest exposed sample | Certified full-surface upper bound | Worst sampled region |
+| --- | ---: | ---: | ---: | --- |
+| Detailed | 558 mm | 559.27 mm | 699 mm | Ends of native-candidate body wells 0 and 1 |
+| Native candidate | 1,098 mm | 1,099.73 mm | 1,105 mm | Aft corners of detailed body wells 0 and 3 |
+
+Excess above the 20 mm nominal padding is therefore bounded by 538–679 mm
+against detailed and 1,078–1,085 mm against the native candidate. The upper
+bounds also cover hidden member surfaces, rounded edges, and corners. The
+29,057 guarded exposed samples cover 68 of the 69 pieces. The cockpit
+crossmember has no retained sample and remains unresolved for exposure.
+Every piece, including the crossmember, has a full rounded-surface upper
+bound. The exact lower certificates reconstruct the two largest exposed
+samples for each mesh and check every triangle of the compared mesh.
+[Per-piece results and witnesses](../integration/sh008-goshawk/SURFACE-FIT.json)
+
+The accepted relative forebody-channel sweep has at least 1.467 m of certified
+clearance from all pieces. Both aft body-well mouths measured about 1.733 by
+3.330 m with a 0.311 m recess depth. The source representations place those
+mouth centers 1.567 m apart. The current envelope covers both mouth centers.
+The detailed mouth center is over 130 mm from every detailed triangle and
+over 72 mm from every native triangle. The native mouth center is over
+310 mm from every native triangle and over 34 mm from every detailed
+triangle. The detailed left arm control has a 1.412 by 1.633 m mouth and
+0.311 m recess depth. Its covered mouth center is over 130 mm from every
+detailed triangle and over 48 mm from every native triangle.
+
+Two mandatory detailed rim vertices, 1288 and 1397, are more than 1,082 mm
+and 1,081 mm from every native triangle. Native vertices 326 and 315 are
+each more than 318 mm from every detailed triangle. Any envelope enclosing
+both original triangle sets must retain those point locations. Changing the
+convex partition can remove empty space in a well mouth, but closing the
+cross-source discrepancy requires selecting or revising an authoritative
+source. A local decision is needed on whether the measured mouths serve
+as collision-accessible recesses. A source-only trial replaces four local
+supports with separate walls, floors, and existing struts. It encloses every
+original triangle and certifies 53 and 15 mm of clearance at the paired
+body-well centers and 29 and 7 mm at the paired arm-well centers. The trial
+uses 91 total pieces. Adopting that split requires settling the intended
+openings and requalifying the envelope and its dependent regressions.
+
+The source-only audit can be repeated without a simulator or asset import.
+Use NumPy 2.5.5, SciPy 1.18.1, trimesh 5.2.1, and rtree 1.4.1.
+
+```bash
+python3 -B tools/measure_goshawk_surface_fit.py
+```
+
+The audit independently checks the encoded triangle assignments. Exact
+arithmetic validates the radial coverage of the triangulated convex pieces.
+Dyadic patch witnesses and outward error allowances bound every rounded
+piece surface against each original. Floating-point nearest-face searches
+nominate candidate witnesses. The certificates check their geometric bounds
+independently. This is a source-only audit.

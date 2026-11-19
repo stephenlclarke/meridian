@@ -34,7 +34,7 @@
   "sourceProof": "Every source component and triangle remains assigned to one piece. Independent plane support check across the authored channel obstacle sweep has at least 0.746 m source slack; this is a local static certificate, not runtime qualification.",
   "nextAcceptance": [
     "Run all four named SH008 core tests with current protected source and strict Clippy in the owned lane",
-    "Measure actual detailed-to-envelope gaps with original source evidence and inspect the central channel",
+    "Resolve the measured well-mouth fit and cross-source discrepancy under a source-specific decision",
     "Qualify the source-bound Showroom appearance, rounded support shimmer and cost in the owned native lane",
     "Resolve source-supported engineering mass/inertia and authored ordinary placement separately before hull acceptance"
   ],
@@ -112,5 +112,24 @@
       "Run repository checks and strict Clippy on the joined revision",
       "Record release timing by route with commit and machine/runtime identity"
     ]
+  },
+  "surfaceFit": {
+    "status": "CERTIFIED_SOURCE_BOUNDS;LOCAL_WELL_DECISION_PENDING",
+    "evidence": "integration/sh008-goshawk/SURFACE-FIT.json",
+    "envelopePieces": 69,
+    "guardedExposedSamples": 29057,
+    "reportedPieceWithoutExposedSample": "cockpit-crossmember",
+    "directedExposedDistanceBoundsMillimetres": {
+      "detailed": [
+        558,
+        699
+      ],
+      "nativeCandidate": [
+        1098,
+        1105
+      ]
+    },
+    "channelMinimumCertifiedMillimetres": 1467,
+    "wellDecision": "Decide whether the measured original service-well mouths must be collision-accessible, or whether their local rounded fill can be approved. Preserve both source records and distinguish mandatory cross-source mismatch from removable convex fill. A different authoritative source strategy would be needed to remove the mandatory vertex discrepancy."
   }
 }
