@@ -18,6 +18,9 @@ from fit import fit_report
 from surface import envelope_view
 
 
+MAX_UPLOAD_BYTES = 64 * 1024 * 1024 + 32
+
+
 class InvalidHull(ValueError):
     def __init__(self, message, report=None, package=None):
         super().__init__(message)
@@ -162,6 +165,18 @@ class StudioRequest(BaseHTTPRequestHandler):
 
     def do_POST(self):
         if not self.local():
+            # Winsock can reset a closed socket with unread request data,
+            # discarding its 403 response. Drain bounded input without parsing it.
+            try:
+                remaining = int(self.headers.get("Content-Length", "0"))
+            except ValueError:
+                remaining = 0
+            if 0 < remaining <= MAX_UPLOAD_BYTES:
+                while remaining:
+                    block = self.rfile.read(min(65536, remaining))
+                    if not block:
+                        break
+                    remaining -= len(block)
             return self.respond(403, encode({"error": "Use the local Studio address"}))
         route = urlsplit(self.path).path
         if route not in ("/api/build", "/api/export", "/api/quit", "/api/showroom"):
@@ -170,7 +185,7 @@ class StudioRequest(BaseHTTPRequestHandler):
             return self.respond(415, encode({"error": "Send a JSON definition"}))
         try:
             length = int(self.headers.get("Content-Length", "-1"))
-            if not 0 < length <= 64 * 1024 * 1024 + 32:
+            if not 0 < length <= MAX_UPLOAD_BYTES:
                 return self.respond(
                     413, encode({"error": "Expected a JSON upload of at most 64 MiB"})
                 )
