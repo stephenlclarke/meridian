@@ -20,7 +20,10 @@ def reference_wave(name, duration, frequency):
         progress = index / count
         phase += frequency(progress) / rate
         noise = (noise * 1664525 + 1013904223) & 0xFFFFFFFF
-        sign = (1 if noise & 1 else -1) if name == "explosion" else (-1 if math.fmod(phase, 1) < .5 else 1)
+        if name == "explosion":
+            sign = 1 if noise & 1 else -1
+        else:
+            sign = -1 if math.fmod(phase, 1) < .5 else 1
         samples.append(int(sign * 5000 * (1 - progress)))
     pcm = struct.pack("<" + "h" * count, *samples)
     return b"RIFF" + struct.pack("<I", 36 + len(pcm)) + b"WAVEfmt " + struct.pack("<IHHIIHH", 16, 1, 1, rate, rate * 2, 2, 16) + b"data" + struct.pack("<I", len(pcm)) + pcm
