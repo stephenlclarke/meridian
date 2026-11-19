@@ -37,7 +37,8 @@ fn showroom_models() -> [ModelPreview; 3] {
     let viewport = Viewport::new(LOGICAL[0], LOGICAL[1])
         .unwrap_or_else(|| panic!("invalid qualification viewport"));
     let input = |menu: &mut Docked, profile: &mut Profile, input| {
-        menu.presented(ok(menu.build_frame(&profile.world, viewport, 0.0)));
+        let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
+        menu.presented(frame);
         ok(menu.input(profile, input));
     };
     let preview = |menu: &mut Docked, profile: &Profile| {
