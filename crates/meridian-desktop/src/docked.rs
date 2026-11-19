@@ -213,9 +213,10 @@ impl Docked {
     pub(crate) fn open_authored_showroom(&mut self, world: &World) -> Result<(), String> {
         let id = self
             .authored
-            .inspection_id()
+            .inspection_record()
             .ok_or("Expected exactly one isolated authored hull")?
-            .to_owned();
+            .id
+            .clone();
         if self.catalogue.object(&id).is_none() {
             return Err("Isolated authored hull missing from the Showroom catalogue".into());
         }

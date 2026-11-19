@@ -201,9 +201,10 @@ impl App {
                     app.docked = Some(menu);
                     app.studio_ready = Some(
                         app.authored_hulls
-                            .inspection_id()
+                            .inspection_record()
                             .ok_or("Missing isolated authored hull for Studio readiness")?
-                            .to_owned(),
+                            .id
+                            .clone(),
                     );
                     // Initial presentation only; never simulate a key or change World state.
                     app.commander_open = false;
@@ -1187,8 +1188,13 @@ impl App {
                 FlightMode::Flight => "FLIGHT",
             }
         };
+        let inspection = self
+            .authored_hulls
+            .inspection_record()
+            .map(|ship| format!(" | {} [{}]", ship.name, ship.id))
+            .unwrap_or_default();
         format!(
-            "{commander} | {mode} | {} | H / ? Help",
+            "{commander}{inspection} | {mode} | {} | H / ? Help",
             if modal_open {
                 "MENU"
             } else if self.commander_open {

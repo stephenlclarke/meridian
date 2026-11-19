@@ -27,7 +27,9 @@ server with Quit Studio or Ctrl+C in its terminal.
    unknown.
 5. In the standalone app, choose **Open in Showroom** to inspect your ship in
    the game. This opens a disposable commander profile and removes it when
-   the game exits. You can also pass a new ship to the Meridian desktop executable with
+   the game exits. In development builds the window title includes the inspected
+   ship’s name and local ID. Use those to find its window when several are open.
+   You can also pass a new ship to the Meridian desktop executable with
    `--hull-package PATH`. For a variant sharing a catalogue identity, use
    `--inspect-hull-package PATH` to compare it with the original in the
    Ship Showroom. This workflow adds an inspectable hull. Encounters, purchase

@@ -5,7 +5,8 @@ Preview 10 opens on Commander Details. Press H or ? for the current screen’s c
 ## Ship authoring
 
 Use [Hull Studio](docs/HULL-STUDIO.md) to edit ship definitions, generate
-rounded collision pieces and check clearances against the game kernel.
+rounded collision pieces and check clearances against the game kernel. In development builds,
+the private game window identifies the inspected ship by name and local ID.
 
 ## Goshawk Explorer in the Ship Showroom
 
