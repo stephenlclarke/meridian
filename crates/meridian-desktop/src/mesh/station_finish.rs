@@ -42,6 +42,26 @@ mod tests {
     use super::*;
 
     #[test]
+    fn all_five_station_roles_get_their_display_finish() {
+        for (source, paint, light) in [
+            ([214, 217, 211], [44, 103, 145], 0.808),
+            ([182, 193, 188], [34, 65, 92], 0.808),
+            ([23, 35, 42], [24, 41, 55], 0.808),
+            ([125, 144, 152], [73, 97, 109], 0.808),
+            ([141, 221, 210], [255, 146, 24], 1.0),
+        ] {
+            let mut panel = [[0., 0., 0.], [1., 0., 0.], [0., 1., 0.]].map(|position| Vertex {
+                position,
+                color: linear(source),
+            });
+            apply(&mut panel);
+            for corner in panel {
+                assert_eq!(corner.color, linear(paint).map(|channel| channel * light));
+            }
+        }
+    }
+
+    #[test]
     fn station_finish_changes_paint_only_and_keeps_original_lights_readable() {
         let original =
             crate::mesh::decode_mesh(include_bytes!("../../../../assets/legacy/sh028.mesh"))

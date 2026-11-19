@@ -353,9 +353,14 @@ impl Hardware {
         };
         let solid = pipeline(false);
         let shimmer = pipeline(true);
+        let painted: Vec<_> = visual
+            .iter()
+            .copied()
+            .map(VisualVertex::with_display_paint)
+            .collect();
         let vertices = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Original detailed triangles, materials and UVs"),
-            contents: bytemuck::cast_slice(visual),
+            contents: bytemuck::cast_slice(&painted),
             usage: wgpu::BufferUsages::VERTEX,
         });
         Ok(Self {

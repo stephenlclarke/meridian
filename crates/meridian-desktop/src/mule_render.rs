@@ -67,6 +67,15 @@ struct VisualVertex {
     texture: u32,
     emissive: u32,
 }
+impl VisualVertex {
+    fn with_display_paint(mut self) -> Self {
+        let [r, g, b, alpha] = self.color;
+        let paint = crate::mesh::paint::ship_srgb([r, g, b].map(|v| (255.0 * v).round() as u8));
+        let [r, g, b] = paint.map(|v| f32::from(v) / 255.0);
+        self.color = [r, g, b, alpha];
+        self
+    }
+}
 const VISUAL: &[u8] = include_bytes!("../../../assets/fleet/sh001/visual.bin");
 const VERTEX_COUNT: usize = 7236 * 3;
 const MAX_POINTS: usize = 5344;
@@ -93,7 +102,7 @@ fn decode_visual(
         return Err("Detailed visual encoding changed");
     }
     // include_bytes need not have Pod alignment. Read each complete record without unsafe.
-    let mut result: Vec<VisualVertex> = bytes[16..]
+    let result: Vec<VisualVertex> = bytes[16..]
         .as_chunks::<56>()
         .0
         .iter()
@@ -110,12 +119,6 @@ fn decode_visual(
             || v.emissive > 1
     }) {
         return Err("Invalid detailed visual attributes");
-    }
-    for vertex in &mut result {
-        let [r, g, b, alpha] = vertex.color;
-        let paint = crate::mesh::paint::ship_srgb([r, g, b].map(|v| (255.0 * v).round() as u8));
-        let [r, g, b] = paint.map(|v| f32::from(v) / 255.0);
-        vertex.color = [r, g, b, alpha];
     }
     Ok(result)
 }
