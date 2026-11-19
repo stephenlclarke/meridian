@@ -59,18 +59,13 @@ fn showroom_models() -> [ModelPreview; 3] {
         input(&mut menu, &mut profile, action);
     }
     let front = preview(&mut menu, &profile);
-    // Showroom starts on roll. Advance through pitch to yaw for a new line of sight.
-    for _ in 0..2 {
-        input(&mut menu, &mut profile, Input::Key(Key::NextAxis));
-    }
+    // ResetView preserves the initial yaw axis.
     for _ in 0..2 {
         input(&mut menu, &mut profile, Input::Key(Key::TurnRight));
     }
     let oblique = preview(&mut menu, &profile);
-    // Advance through roll to pitch, then move the viewer above the source hull.
-    for _ in 0..2 {
-        input(&mut menu, &mut profile, Input::Key(Key::NextAxis));
-    }
+    // The next axis after yaw is pitch. Move the viewer above the source hull.
+    input(&mut menu, &mut profile, Input::Key(Key::NextAxis));
     for _ in 0..4 {
         input(&mut menu, &mut profile, Input::Key(Key::TurnLeft));
     }
@@ -479,18 +474,35 @@ fn metal_goshawk_same_pose_shimmer_and_gpu_cost() {
     let [front, oblique, upper] = models
         .each_ref()
         .map(|model| hull_local_direction(&pass, model));
-    assert!(front[0].abs() < 0.05 && front[2] > 0.9);
-    assert!(oblique[0].abs() > 0.4 && oblique[2] > 0.7);
-    assert!(upper[1] > 0.6 && upper[2] > 0.4);
     let mut directions = String::from("pose\tx\ty\tz\n");
-    for (name, [x, y, z]) in ["front", "oblique", "upper"]
+    for ((name, [x, y, z]), model) in ["front", "oblique", "upper"]
         .into_iter()
         .zip([front, oblique, upper])
+        .zip(&models)
     {
         use std::fmt::Write as _;
+        println!(
+            "SH008 {name} orientation={:?} hull_local_direction=[{x:.9}, {y:.9}, {z:.9}]",
+            model.orientation
+        );
         ok(writeln!(directions, "{name}\t{x:.9}\t{y:.9}\t{z:.9}"));
     }
     write_new(output.join("hull-local-views.tsv"), directions.as_bytes());
+
+    let [front_pose, oblique_pose, upper_pose] = models.each_ref().map(|model| model.orientation);
+    let expected_yaw = std::f64::consts::PI / 6.0;
+    let expected_upper_pitch =
+        (front_pose.pitch - std::f64::consts::PI / 3.0).rem_euclid(std::f64::consts::TAU);
+    assert_eq!(front_pose, crate::docked_screens::Orientation::default());
+    assert_eq!(oblique_pose.pitch, front_pose.pitch);
+    assert_eq!(oblique_pose.roll, front_pose.roll);
+    assert!((oblique_pose.yaw - expected_yaw).abs() < 1e-12);
+    assert_eq!(upper_pose.roll, oblique_pose.roll);
+    assert_eq!(upper_pose.yaw, oblique_pose.yaw);
+    assert!((upper_pose.pitch - expected_upper_pitch).abs() < 1e-12);
+    assert!(front[0].abs() < 0.05 && front[2] > 0.9);
+    assert!(oblique[0].abs() > 0.4 && oblique[2] > 0.7);
+    assert!(upper[1] > 0.6 && upper[2] > 0.4);
     for (name, model) in ["front", "oblique", "upper"].into_iter().zip(models) {
         let [effect, phase] = run_pose(&gpu, &target, &mut pass, &model, &output, name);
         totals[0] += effect;
