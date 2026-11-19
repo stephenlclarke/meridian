@@ -113,6 +113,40 @@
     "loaderRevision": "7e3234540b6cf1dd6b3c2b4ea83bb76ea507a9c8",
     "loaderSource": "tools/hull_studio/definitions.py",
     "loaderSha256": "f68ea0f442267b793338af6ebec6a937f9e1ee3946dc9be96e58db3e2a796e43",
-    "state": "PYTHON_DEFINITION_LOADER_AND_BYTE_REPLAY_PASS;RUST_VALIDATOR_AND_SHOWROOM_PENDING"
+    "state": "STUDIO_RUST_VALIDATOR_AND_EXPORT_PASS;CONTROLLED_HULL_RUST_AND_SHOWROOM_PENDING",
+    "rustExport": {
+      "date": "2026-11-19",
+      "inputCommit": "12d24b8d87ee4f5e42d6ecc2b34ae12a3a5a46ca",
+      "validationReportSha256": "a330a3cfdf7dd9e4e7b2eefdb6bf724d327ab4942ff71e99b6c5e3dda8766c9a",
+      "exportSha256": "f1730a2939c5b743114c35bd9d0c059bf0a2ef0b6587573597313e0294f085f5",
+      "exportBytes": 394077,
+      "supportGroups": 25,
+      "clearances": [
+        {
+          "name": "left-bow-channel",
+          "passed": true
+        },
+        {
+          "name": "left-underslab-channel",
+          "passed": true
+        },
+        {
+          "name": "left-inboard-dorsal-channel",
+          "passed": true
+        },
+        {
+          "name": "right-bow-channel",
+          "passed": true
+        },
+        {
+          "name": "right-underslab-channel",
+          "passed": true
+        },
+        {
+          "name": "right-inboard-dorsal-channel",
+          "passed": true
+        }
+      ]
+    }
   }
 }

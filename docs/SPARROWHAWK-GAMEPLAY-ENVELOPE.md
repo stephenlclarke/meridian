@@ -64,11 +64,13 @@ carries detailed face appearance. The original native face appearance
 remains available in its source and encoded stream.
 
 The pinned Studio Python loader accepted the definition and preserved it
-through preparation and a JSON round trip on SteveMBA. The Studio Rust
-validator, package export and Showroom launch await the owned platform
-run. The explicit native hull contact regressions also await compilation
-and execution. Campaign encounters, blueprint fabrication and installed
-preview acceptance remain separate.
+through preparation and a JSON round trip on SteveMBA. The orchestrator
+then ran the Rust Studio validator and export on the exact definition at
+`12d24b8`. The validator accepted all 25 groups and all six 100 mm sphere
+routes. The exported JSON preserved the original definition and its
+SHA-256 is recorded in the evidence. The per-hull Rust contact regressions
+and a Sparrowhawk Showroom launch await the owned run. Campaign encounters,
+blueprint fabrication and installed preview acceptance remain separate.
 
 Regenerate with `python3 -B tools/prepare_sparrowhawk_studio.py`.
 Run the byte check with `python3 -B tools/prepare_sparrowhawk_studio.py --check`.
