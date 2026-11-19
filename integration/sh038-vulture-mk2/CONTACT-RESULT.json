@@ -1,0 +1,254 @@
+{
+  "hull": "SH038",
+  "candidateSHA256": "d032ed5734f5d2d0ea3b2a6f60e1abe08ca051339cfbde299ff53dc67ebadc06",
+  "openRoutes": [
+    {
+      "name": "Port inner side opening",
+      "start": [
+        -7.75,
+        2,
+        -9
+      ],
+      "end": [
+        -7.75,
+        2,
+        -4
+      ],
+      "radiusMetres": 0.1,
+      "lowerBoundMetres": 0.15111292962356793
+    },
+    {
+      "name": "Starboard inner side opening",
+      "start": [
+        7.75,
+        2,
+        -9
+      ],
+      "end": [
+        7.75,
+        2,
+        -4
+      ],
+      "radiusMetres": 0.1,
+      "lowerBoundMetres": 0.15111292962356793
+    },
+    {
+      "name": "Port collar shoulder",
+      "start": [
+        -8.75,
+        2,
+        8
+      ],
+      "end": [
+        -8.75,
+        2,
+        13
+      ],
+      "radiusMetres": 0.1,
+      "lowerBoundMetres": 0.7268903436988553
+    },
+    {
+      "name": "Starboard collar shoulder",
+      "start": [
+        8.75,
+        2,
+        8
+      ],
+      "end": [
+        8.75,
+        2,
+        13
+      ],
+      "radiusMetres": 0.1,
+      "lowerBoundMetres": 0.7268903436988553
+    }
+  ],
+  "solidRoutes": [
+    {
+      "name": "part-000-0",
+      "start": [
+        -0.9836713325867861,
+        -0.012120811439400464,
+        -0.6428202256869671
+      ],
+      "end": [
+        1.016328667413214,
+        -0.012120811439400464,
+        -0.6428202256869671
+      ],
+      "radiusMetres": 0.1
+    },
+    {
+      "name": "part-001-0",
+      "start": [
+        -0.9636144786064998,
+        0.9139380406827216,
+        8.696808510638297
+      ],
+      "end": [
+        1.0363855213935,
+        0.9139380406827216,
+        8.696808510638297
+      ],
+      "radiusMetres": 0.1
+    },
+    {
+      "name": "part-078-0",
+      "start": [
+        10.188354835266491,
+        -0.32196011527787655,
+        -6.111862235821532
+      ],
+      "end": [
+        12.188354835266491,
+        -0.32196011527787655,
+        -6.111862235821532
+      ],
+      "radiusMetres": 0.1
+    },
+    {
+      "name": "part-326-0",
+      "start": [
+        -12.231808830854622,
+        -0.3175396356649825,
+        -6.111862235821532
+      ],
+      "end": [
+        -10.231808830854622,
+        -0.3175396356649825,
+        -6.111862235821532
+      ],
+      "radiusMetres": 0.1
+    }
+  ],
+  "station": {
+    "stationSHA256": "cd54d30cab638f6b33feacf1fa78c9136f8ce346e8cc6133259bfc0472c259d5",
+    "aligned": {
+      "actorX": 0,
+      "actorZ": [
+        137.32,
+        135.32
+      ],
+      "minimumSeparationMillimetres": 43865
+    },
+    "offsetOpening": {
+      "actorX": 69.5,
+      "actorZ": 151.55895253682488,
+      "minimumSeparationMillimetres": 979
+    },
+    "offsetContact": {
+      "actorX": 69.5,
+      "actorZ": [
+        151.55895253682488,
+        149.55895253682488
+      ],
+      "face": 482,
+      "nativeVertex": 37,
+      "pointMetres": [
+        0.0,
+        -1.099836333878887,
+        14.238952536824875
+      ],
+      "crossingFraction": 0.5000000000000036,
+      "barycentrics": [
+        0.3099999999999974,
+        0.2013657028550672,
+        0.48863429714493545
+      ],
+      "stationPointMetres": [
+        69.5,
+        -1.099836333878887,
+        136.32
+      ]
+    },
+    "scope": "Exact separation of all rounded support AABBs and 488 original station triangles; exact vertex lip crossing. No runtime game admission."
+  },
+  "validator": {
+    "sha256": "fef5d09229091438a0118182b23434f985f504ee78702185d554761b960f5477",
+    "cases": [
+      {
+        "label": "open",
+        "exitCode": 0,
+        "clearances": [
+          {
+            "name": "Port inner side opening",
+            "passed": true
+          },
+          {
+            "name": "Starboard inner side opening",
+            "passed": true
+          },
+          {
+            "name": "Port collar shoulder",
+            "passed": true
+          },
+          {
+            "name": "Starboard collar shoulder",
+            "passed": true
+          }
+        ],
+        "diagnostics": []
+      },
+      {
+        "label": "part-000-0",
+        "exitCode": 1,
+        "clearances": [
+          {
+            "name": "part-000-0",
+            "passed": false
+          }
+        ],
+        "diagnostics": [
+          {
+            "message": "Clearance part-000-0 is blocked or indeterminate"
+          }
+        ]
+      },
+      {
+        "label": "part-001-0",
+        "exitCode": 1,
+        "clearances": [
+          {
+            "name": "part-001-0",
+            "passed": false
+          }
+        ],
+        "diagnostics": [
+          {
+            "message": "Clearance part-001-0 is blocked or indeterminate"
+          }
+        ]
+      },
+      {
+        "label": "part-078-0",
+        "exitCode": 1,
+        "clearances": [
+          {
+            "name": "part-078-0",
+            "passed": false
+          }
+        ],
+        "diagnostics": [
+          {
+            "message": "Clearance part-078-0 is blocked or indeterminate"
+          }
+        ]
+      },
+      {
+        "label": "part-326-0",
+        "exitCode": 1,
+        "clearances": [
+          {
+            "name": "part-326-0",
+            "passed": false
+          }
+        ],
+        "diagnostics": [
+          {
+            "message": "Clearance part-326-0 is blocked or indeterminate"
+          }
+        ]
+      }
+    ]
+  }
+}
