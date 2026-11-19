@@ -24,6 +24,7 @@ pub(super) fn search_name(hull: Hull) -> &'static str {
         Hull::Mk2 => "Goshawk Mk II",
         Hull::Custom => "Goshawk Mk II Custom",
         Hull::SableLiner => "Sable Liner",
+        Hull::Gazelle => "Gazelle Explorer",
     }
 }
 
@@ -78,6 +79,77 @@ pub(super) fn station_frames(hull: Hull) -> Vec<Frames> {
     }
     assert_eq!(ok(profile.world.save_bytes()), before);
     frames
+}
+
+pub(super) fn material_sibling_frames() -> [Frame; 2] {
+    let directory = TestDirectory::new();
+    let mut profile = open(&directory.0);
+    assert!(ok(profile.new_commander(97019)));
+    let before = ok(profile.world.save_bytes());
+    let mut menu = ok(Docked::new(&profile.world));
+    ok(menu.open(&profile.world, Screen::Showroom));
+    let [width, height] = MIN_WINDOW_LOGICAL;
+    let viewport = Viewport::new(width, height).unwrap_or_else(|| panic!("invalid window minimum"));
+    let frames = [
+        (Hull::SableLiner, Hull::Gazelle),
+        (Hull::Gazelle, Hull::SableLiner),
+    ]
+    .map(|(a, b)| {
+        {
+            let mut input = |action| {
+                let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
+                menu.presented(frame);
+                ok(menu.input(&mut profile, action));
+            };
+            for action in [
+                Input::Key(Key::Search),
+                Input::Key(Key::ClearSearch),
+                Input::Text(search_name(a).into()),
+                Input::Key(Key::Confirm),
+                Input::Key(Key::PinBaseline),
+                Input::Key(Key::Search),
+                Input::Key(Key::ClearSearch),
+                Input::Text(search_name(b).into()),
+                Input::Key(Key::Confirm),
+                Input::Key(Key::ResetView),
+            ] {
+                input(action);
+            }
+        }
+        let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
+        let [left, right] = frame.models.as_slice() else {
+            panic!("expected pinned Sable and Gazelle")
+        };
+        assert_eq!(
+            [Hull::from_model(left), Hull::from_model(right)],
+            [Some(a), Some(b)]
+        );
+        assert_eq!(left.orientation, right.orientation);
+        assert!(!overlaps(left.bounds, right.bounds));
+        assert!(left.bounds.x < right.bounds.x);
+        assert_model_pane(&frame, left.bounds);
+        assert_model_pane(&frame, right.bounds);
+        frame
+    });
+    assert_eq!(ok(profile.world.save_bytes()), before);
+    frames
+}
+
+#[test]
+fn joined_material_hulls_pin_actual_station_compare_in_both_orders() {
+    let sable = ok(visual_assets::load(Hull::SableLiner.geometry_key()));
+    let gazelle = ok(visual_assets::load(Hull::Gazelle.geometry_key()));
+    let a = View::new(&sable, &vec![EMPTY_PIECE; Hull::SableLiner.piece_count()]);
+    let b = View::new(&gazelle, &vec![EMPTY_PIECE; Hull::Gazelle.piece_count()]);
+    for frame in material_sibling_frames() {
+        for model in &frame.models {
+            match Hull::from_model(model) {
+                Some(Hull::SableLiner) => assert_original_fits(&a, &sable, model),
+                Some(Hull::Gazelle) => assert_original_fits(&b, &gazelle, model),
+                _ => panic!("unexpected pinned model"),
+            }
+        }
+    }
 }
 
 fn encloses(outer: Rect, inner: Rect) -> bool {
@@ -194,4 +266,9 @@ fn original_custom_fits_minimum_station_showroom_solo_and_compare() {
 #[test]
 fn original_sable_liner_fits_minimum_station_showroom_solo_and_compare() {
     assert_minimum_station_fit(Hull::SableLiner, 4_496 * 3);
+}
+
+#[test]
+fn original_gazelle_fits_minimum_station_showroom_solo_and_compare() {
+    assert_minimum_station_fit(Hull::Gazelle, super::GAZELLE_DETAILED_FACES * 3);
 }

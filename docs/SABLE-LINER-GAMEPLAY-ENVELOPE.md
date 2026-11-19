@@ -50,7 +50,7 @@ uses the original opaque pass and subtle shimmer from the same 47 source
 supports. Compare keeps the current ship in its own pane. Selection and rotation
 do not alter ownership, inventory or paid fitting. SH012 uses its own immutable
 pass and visual key; the shared cache now supports up to two passes for each of
-the four original hulls without reusing another hull's pass.
+the five registered original hulls without reusing another hull's pass.
 
 ## Qualification
 
@@ -73,8 +73,10 @@ The Showroom qualification covers the 640×360 solo and Compare frames, actual
 nonblack RGB with at least two logical pixels of own-pane clearance, and the
 exact isolated full-target union, including black gutters. It also verifies all
 13,488 positions and winding, independently pinned colour and UV samples
-including untextured source face 2156, all 47 supports and the WGSL layout. The
-shared shader's sentinel branch is byte-identical to G4's Air-checked source.
+including untextured source face 2156, all 47 supports and the WGSL layout. G4's
+Air-checked parent shader remains historical evidence. The joined shared shader
+recognizes the SH012 `0xffffffff` and SH019 `3` markers; both use neutral
+reflectance, and each format accepts only its own marker at decoding.
 Native Metal checks for SH012 and the existing SH008–SH010 regressions remain
 owned executions on this combined head.
 
@@ -90,6 +92,22 @@ The minimum capture writes `rgb-qualification.tsv` as well as the original
 PPM files and pane metadata. All original ship cache orders, including SH012
 and each Goshawk, and duplicate-hull panes are covered by the portable cache
 allocation test; the SH009 and SH010 native mixed-cache tests are retained.
+
+## Joined material-only rendering and later finishes
+
+The combined Sable/Gazelle renderer keeps the original visual bytes and material indices. Both no-map sources use raw source RGB [116, 191, 204] for glazing and [185, 235, 217] for emitters. SH012 has 984 glazing and 256 emitter faces; SH019 has 960 glazing and 256 emitter faces. The shared fragment shader always samples within the three real map layers, then selects neutral reflectance only for either authorized marker. SH001 and all Goshawk formats refuse both markers; the Sable and Gazelle decoders refuse each other's marker and any other out-of-range value.
+
+The joined Metal test directly draws every original material-only face in its own small tile, keeping the original colour, texture marker, UV, normal and emissive attributes. It saves the full 320×256 PPM and per-face RGB receipts for independent verification against the source TOML. A separate actual station Pin Baseline test draws both sibling orders, with direct isolated references and exact full-target union. Parent native receipts do not qualify this combined shader.
+
+```bash
+cargo test --locked -p meridian-desktop joined_material
+cargo test --locked -p meridian-desktop joined_visual_policies
+MERIDIAN_SH012_SH019_MATERIAL_DIR=/absolute/fresh/material-raw cargo test --locked -p meridian-desktop metal_sable_gazelle_material_only_faces_exact_raw_rgb -- --ignored --nocapture
+python3 -B tools/verify_joined_material_faces.py --evidence /absolute/fresh/material-raw
+MERIDIAN_SH012_SH019_CACHE_DIR=/absolute/fresh/material-cache cargo test --locked -p meridian-desktop metal_sable_gazelle_cache_orders -- --ignored --nocapture
+```
+
+This is raw-source qualification, not the separate PR76 richer display finish. PR76's current `f30c6a3` candidate changes colours only at GPU upload, leaving source decoding raw. If that finish is later joined, its current fallback maps these raw colours to [100, 175, 188] and [100, 150, 132]. Qualify the approved styled renderer on its distinct final head and separately preserve raw-source/grid evidence (use an explicitly raw upload for the raw test). Do not reinterpret the raw grid as styled evidence, change original asset bytes, or silently apply that paint transform in this join.
 
 ## Reproducing the surface measurements
 

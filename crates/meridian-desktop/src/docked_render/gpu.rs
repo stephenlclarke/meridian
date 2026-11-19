@@ -294,7 +294,7 @@ impl Pass {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use showroom::Hull::{Custom, Explorer, Mk2, SableLiner};
+    use showroom::Hull::{Custom, Explorer, Gazelle, Mk2, SableLiner};
 
     #[test]
     fn original_showroom_cache_reuses_only_the_same_hull_and_unused_pane() {
@@ -331,12 +331,22 @@ mod tests {
         assert_eq!(frame(&[SableLiner, Explorer]), [Some(6), Some(0)]);
         assert_eq!(frame(&[Explorer, SableLiner]), [Some(0), Some(6)]);
         assert_eq!(frame(&[SableLiner, SableLiner]), [Some(6), Some(7)]);
+        assert_eq!(frame(&[Gazelle, SableLiner]), [Some(8), Some(6)]);
+        assert_eq!(frame(&[SableLiner, Gazelle]), [Some(6), Some(8)]);
+        assert_eq!(frame(&[Gazelle, Explorer]), [Some(8), Some(0)]);
+        assert_eq!(frame(&[Explorer, Gazelle]), [Some(0), Some(8)]);
+        assert_eq!(frame(&[Gazelle, Mk2]), [Some(8), Some(1)]);
+        assert_eq!(frame(&[Mk2, Gazelle]), [Some(1), Some(8)]);
+        assert_eq!(frame(&[Gazelle, Custom]), [Some(8), Some(4)]);
+        assert_eq!(frame(&[Custom, Gazelle]), [Some(4), Some(8)]);
+        assert_eq!(frame(&[Gazelle, Gazelle]), [Some(8), Some(9)]);
         assert_eq!(frame(&[]), [None, None]);
         assert_eq!(frame(&[Mk2]), [Some(1), None]);
         assert_eq!(
             cached,
             [
-                Explorer, Mk2, Mk2, Explorer, Custom, Custom, SableLiner, SableLiner
+                Explorer, Mk2, Mk2, Explorer, Custom, Custom, SableLiner, SableLiner, Gazelle,
+                Gazelle
             ]
         );
         assert_eq!(cached.len(), showroom::Hull::COUNT * MAX_MODELS);

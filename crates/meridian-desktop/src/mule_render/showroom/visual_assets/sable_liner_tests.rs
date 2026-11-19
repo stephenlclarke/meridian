@@ -103,7 +103,23 @@ fn only_the_explicit_untextured_sentinel_extends_the_sh012_material_policy() {
     assert!(decode_visual(SH012_VISUAL, b"SBLRVIZ1", SH012_VERTICES).is_err());
     let mut wrong = SH012_VISUAL.to_vec();
     wrong[16 + 48..16 + 52].copy_from_slice(&3u32.to_le_bytes());
-    assert!(decode_visual_layers(&wrong, b"SBLRVIZ1", SH012_VERTICES, true).is_err());
+    assert!(
+        decode_visual_layers(
+            &wrong,
+            b"SBLRVIZ1",
+            SH012_VERTICES,
+            VisualTexturePolicy::SableLiner
+        )
+        .is_err()
+    );
     assert!(verify_hash(&wrong, SH012_FNV).is_err());
-    assert!(decode_visual_layers(SH012_VISUAL, b"GOSHVIZ1", SH012_VERTICES, true).is_err());
+    assert!(
+        decode_visual_layers(
+            SH012_VISUAL,
+            b"GOSHVIZ1",
+            SH012_VERTICES,
+            VisualTexturePolicy::SableLiner
+        )
+        .is_err()
+    );
 }

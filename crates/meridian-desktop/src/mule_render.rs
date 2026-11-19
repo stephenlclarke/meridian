@@ -69,7 +69,8 @@ struct VisualVertex {
 }
 const VISUAL: &[u8] = include_bytes!("../../../assets/fleet/sh001/visual.bin");
 const VERTEX_COUNT: usize = 7236 * 3;
-const UNTEXTURED_VISUAL_LAYER: u32 = u32::MAX;
+const SABLE_NO_MAP_LAYER: u32 = u32::MAX;
+const GAZELLE_NO_MAP_LAYER: u32 = 3;
 const MAX_POINTS: usize = 5344;
 type SmoothPieceArray = [meridian_core::mule::SmoothPiece; MULE_PIECES];
 const TEXTURES: [&[u8]; 3] = [
@@ -86,16 +87,43 @@ fn decode_visual(
     magic: &[u8; 8],
     count: usize,
 ) -> Result<Vec<VisualVertex>, &'static str> {
-    decode_visual_layers(bytes, magic, count, false)
+    decode_visual_layers(bytes, magic, count, VisualTexturePolicy::TexturedOnly)
+}
+
+#[derive(Clone, Copy)]
+enum VisualTexturePolicy {
+    TexturedOnly,
+    SableLiner,
+    Gazelle,
+}
+
+impl VisualTexturePolicy {
+    fn matches_format(self, magic: &[u8; 8]) -> bool {
+        match self {
+            Self::TexturedOnly => magic != b"SBLRVIZ1" && magic != b"SH019VZ1",
+            Self::SableLiner => magic == b"SBLRVIZ1",
+            Self::Gazelle => magic == b"SH019VZ1",
+        }
+    }
+
+    fn allows(self, layer: u32) -> bool {
+        layer < 3
+            || match self {
+                Self::TexturedOnly => false,
+                Self::SableLiner => layer == SABLE_NO_MAP_LAYER,
+                Self::Gazelle => layer == GAZELLE_NO_MAP_LAYER,
+            }
+    }
 }
 
 fn decode_visual_layers(
     bytes: &[u8],
     magic: &[u8; 8],
     count: usize,
-    allow_untextured: bool,
+    policy: VisualTexturePolicy,
 ) -> Result<Vec<VisualVertex>, &'static str> {
-    if bytes.get(..8) != Some(magic)
+    if !policy.matches_format(magic)
+        || bytes.get(..8) != Some(magic)
         || bytes.get(8..12) != Some(&(count as u32).to_le_bytes())
         || bytes.get(12..16) != Some(&56u32.to_le_bytes())
         || bytes.len() != 16 + count * 56
@@ -116,7 +144,7 @@ fn decode_visual_layers(
             .chain(&v.color)
             .chain(&v.uv)
             .any(|x| !x.is_finite())
-            || (v.texture >= 3 && !(allow_untextured && v.texture == UNTEXTURED_VISUAL_LAYER))
+            || !policy.allows(v.texture)
             || v.emissive > 1
     }) {
         return Err("Invalid detailed visual attributes");
