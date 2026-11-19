@@ -22,7 +22,7 @@ pub(super) fn station_frames() -> Vec<Frames> {
     station_frames_for("Goshawk Explorer")
 }
 
-fn station_frames_for(name: &str) -> Vec<Frames> {
+pub(super) fn station_frames_for(name: &str) -> Vec<Frames> {
     let directory = TestDirectory::new();
     let mut profile = open(&directory.0);
     assert!(ok(profile.new_commander(97009)));

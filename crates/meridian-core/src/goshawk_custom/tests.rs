@@ -4,6 +4,65 @@ use crate::goshawk::source_vertex;
 
 const TRIANGLES: &[u8] = include_bytes!("../../../../assets/fleet/sh010/source-triangles.bin");
 
+// These independent IEEE-754 words are derived from the immutable original physical
+// JSON and the direct rational scaling of detailed vertex 6, not from CUSTOM_ENGINEERING.
+// The Python source tests bind every word back to those inputs.
+const ORIGINAL_MASS_KG: u32 = 32411;
+const ORIGINAL_COM_BITS: [u64; 3] = [
+    0xbfd0_9d1b_1f88_2dce,
+    0x3fb7_b26e_b9d9_0464,
+    0xc001_952a_5681_95d5,
+];
+const ORIGINAL_INERTIA_BITS: [u64; 9] = [
+    0x4143_8691_3a54_7686,
+    0xc0be_0287_42ee_a619,
+    0x40c1_ced3_d400_c34a,
+    0xc0be_0287_42ee_a619,
+    0x414b_b6bd_7d6f_5949,
+    0x40f5_4480_e701_e0d8,
+    0x40c1_ced3_d400_c34a,
+    0x40f5_4480_e701_e0d8,
+    0x4133_0ecf_c498_26bc,
+];
+const ORIGINAL_SCALE: [u32; 2] = [15_000_000, 1_644_589];
+const ORIGINAL_SCALE_BITS: u64 = 0x4022_3ddc_1984_48d6;
+const ORIGINAL_VERTEX6_BITS: [u64; 3] = [
+    0xc021_0897_f83d_9568,
+    0x3fda_4499_1a81_0cba,
+    0x4029_f444_62d4_1c15,
+];
+
+#[test]
+fn sh010_compiled_engineering_and_calibrated_source_match_independent_bits()
+-> Result<(), EnvelopeError> {
+    let source = GoshawkCustomHullSource::bundled()?;
+    let engineering = source.engineering();
+    assert_eq!(engineering.dry_mass_kilograms, ORIGINAL_MASS_KG);
+    assert_eq!(
+        engineering.center_of_mass_metres.map(f64::to_bits),
+        ORIGINAL_COM_BITS
+    );
+    assert_eq!(
+        engineering.inertia_about_center_kg_m2.map(f64::to_bits),
+        ORIGINAL_INERTIA_BITS
+    );
+    assert_eq!(
+        [engineering.scale_numerator, engineering.scale_denominator],
+        ORIGINAL_SCALE
+    );
+    assert_eq!(
+        (f64::from(engineering.scale_numerator) / f64::from(engineering.scale_denominator))
+            .to_bits(),
+        ORIGINAL_SCALE_BITS
+    );
+    let point = source_vertex(VERTICES, 6)?;
+    assert_eq!(
+        [point.x, point.y, point.z].map(f64::to_bits),
+        ORIGINAL_VERTEX6_BITS
+    );
+    Ok(())
+}
+
 fn pose(x: f64, z: f64, inward: bool) -> RigidPose {
     RigidPose {
         position: Vec3::new(x, 0.0, z),

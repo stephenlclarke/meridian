@@ -1,15 +1,19 @@
 """Verify SH010 source identity, exact visual output, independent fit and failure controls."""
 
 from contextlib import redirect_stdout
+from decimal import Decimal
+from fractions import Fraction
 import hashlib
 from io import StringIO
 import json
 from pathlib import Path
 import re
 import shutil
+import struct
 import subprocess
 import sys
 import tempfile
+import tomllib
 import unittest
 from unittest.mock import patch
 
@@ -46,6 +50,44 @@ class GoshawkCustom(unittest.TestCase):
         scalar = re.search(r"dry_mass_kilograms:\s*(\d+)",runtime)
         self.assertIsNotNone(scalar)
         self.assertEqual(int(scalar[1]),physical["dryMassKilograms"])
+
+    def test_compiled_test_words_and_speed_bind_to_original_physical_and_contract_bytes(self):
+        physical = json.loads(self.inputs["physical.json"], parse_float=Decimal)
+        resource = tomllib.loads(self.inputs["resource.toml"].decode(), parse_float=Decimal)
+        contract = tomllib.loads(self.inputs["contract.toml"].decode(), parse_float=Decimal)
+        runtime = (importer.ROOT/"crates/meridian-core/src/goshawk_custom.rs").read_text()
+        checks = (importer.ROOT/"crates/meridian-core/src/goshawk_custom/tests.rs").read_text()
+        world_checks = (importer.ROOT/"crates/meridian-core/src/flight/goshawk_validation/tests.rs").read_text()
+
+        def words(name):
+            record = re.search(rf"const {name}:[^=]+?=\s*\[([^]]+)\]",checks)
+            self.assertIsNotNone(record,name)
+            return [int(token.strip().replace("_",""),0) for token in record[1].split(",") if token.strip()]
+
+        def integer(name):
+            record = re.search(rf"const {name}:[^=]+?=\s*(0x[\da-f_]+|[\d_]+);",checks)
+            self.assertIsNotNone(record,name)
+            return int(record[1].replace("_",""),0)
+
+        def bits(value):
+            return struct.unpack(">Q",struct.pack(">d",float(value)))[0]
+
+        self.assertEqual(integer("ORIGINAL_MASS_KG"),physical["dryMassKilograms"])
+        self.assertEqual(words("ORIGINAL_COM_BITS"),[bits(x) for x in physical["centreOfMassMetres"]])
+        self.assertEqual(words("ORIGINAL_INERTIA_BITS"),[bits(x) for x in physical["inertiaAboutCentreOfMassKgM2"]])
+        ratio = Fraction(physical["metresPerSourceUnitExact"])
+        self.assertEqual(words("ORIGINAL_SCALE"),[ratio.numerator,ratio.denominator])
+        self.assertEqual(integer("ORIGINAL_SCALE_BITS"),bits(ratio))
+        self.assertEqual(words("ORIGINAL_VERTEX6_BITS"),[bits(Fraction(x)*ratio) for x in resource["design"]["vertices"][6]])
+        self.assertEqual(re.search(r'CUSTOM_CONTRACT_SHA256:\s*&str\s*=\s*"([\da-f]+)"',runtime)[1],
+                         hashlib.sha256(self.inputs["contract.toml"]).hexdigest())
+        self.assertEqual(re.search(r'CUSTOM_PHYSICAL_SHA256:\s*&str\s*=\s*"([\da-f]+)"',runtime)[1],
+                         hashlib.sha256(self.inputs["physical.json"]).hexdigest())
+        speed = re.search(r"CUSTOM_MAX_SPEED_UNITS:\s*f32\s*=\s*([\d.]+);",runtime)
+        self.assertEqual(Decimal(speed[1]),contract["performance"]["maxSpeed"])
+        world = re.search(r"fn custom_world_enforces_own_r3_speed_and_snapshot_scope[\s\S]+",world_checks)[0]
+        self.assertRegex(world,r"inbound\(0.0,\s*220.0,\s*40.0\)")
+        self.assertRegex(world,r"speed in \[0.0,\s*40.0_f32.next_up\(\)\]")
 
     def test_all_original_source_mutations_refuse_and_wrong_sibling_is_refused(self):
         for name, raw in self.inputs.items():

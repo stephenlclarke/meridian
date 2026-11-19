@@ -311,6 +311,28 @@ fn custom_world_enforces_own_r3_speed_and_snapshot_scope() -> Result<(), Box<dyn
     assert!(world.goshawk_custom_observer_pose(&first).is_none());
     assert_eq!(world.goshawk_custom_observer_pose(&second), Some(observer));
     assert!(Arc::ptr_eq(first.pieces(), second.pieces()));
+    // R3's inclusive 40.0 controlled speed comes from the pinned SH010 contract.
+    // Exercise the actual constructor and step at the boundary, independent of
+    // the ordinary station entry speed limit.
+    let mut maximum =
+        World::goshawk_custom_docking_validation_scenario(OBSERVER, inbound(0.0, 220.0, 40.0))?;
+    let at_limit = maximum
+        .goshawk_custom_approach_snapshot()
+        .ok_or(StepError::InvalidMode)?;
+    assert_eq!(at_limit.speed_units(), 40.0);
+    assert_eq!(at_limit.status(), Status::Approaching);
+    assert_eq!(
+        at_limit.source_identity(),
+        (CUSTOM_RESOURCE_SHA256, CUSTOM_CONTRACT_SHA256)
+    );
+    maximum.step(FlightInput::default())?;
+    let advanced = maximum
+        .goshawk_custom_approach_snapshot()
+        .ok_or(StepError::InvalidMode)?;
+    assert_eq!(advanced.speed_units(), 40.0);
+    assert_eq!(advanced.status(), Status::Approaching);
+    assert_eq!(advanced.world_tick(), at_limit.world_tick() + 1);
+    assert!(advanced.pose().position.z < at_limit.pose().position.z);
     for speed in [0.0, 40.0_f32.next_up()] {
         assert!(matches!(
             World::goshawk_custom_docking_validation_scenario(OBSERVER, inbound(0.0, 220.0, speed)),

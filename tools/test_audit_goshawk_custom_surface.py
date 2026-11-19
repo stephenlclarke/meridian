@@ -29,15 +29,25 @@ class GoshawkCustomSurface(unittest.TestCase):
         self.assertEqual(replay["manifestSha256"], accepted["manifestSha256"])
         self.assertEqual(replay["pieceCount"], 73)
         self.assertEqual([r["piece"] for r in replay["perPiece"]],[r["piece"] for r in accepted["perPiece"]])
-        for source, minimum in (("detailed", 600),("nativeCandidate", 1000)):
+        self.assertEqual(audit.TARGET_MM,{"detailed":800,"nativeCandidate":1197})
+        for source, lower, upper in (("detailed", 603, 800),("nativeCandidate", 1014, 1197)):
             with self.subTest(source=source):
                 summary = replay["sourceComparisons"][source]
-                self.assertLessEqual(summary["certifiedUpperMillimetres"], audit.TARGET_MM[source])
-                self.assertGreaterEqual(summary["largestExposedSample"]["certifiedLowerMillimetres"], minimum)
+                retained = accepted["sourceComparisons"][source]
+                self.assertEqual(retained["largestExposedSample"]["certifiedLowerMillimetres"],lower)
+                self.assertEqual(retained["certifiedUpperMillimetres"],upper)
+                self.assertLessEqual(summary["certifiedUpperMillimetres"], upper)
+                self.assertGreaterEqual(summary["largestExposedSample"]["certifiedLowerMillimetres"], lower)
                 self.assertEqual(summary["certifiedUpperMillimetres"],max(
                     row["comparisons"][source]["fullRoundedPieceUpperMillimetres"] for row in replay["perPiece"]))
-        self.assertGreaterEqual(replay["mandatoryCrossSourceVertices"][0]["certifiedLowerMillimetres"], 995)
-        self.assertGreaterEqual(replay["mandatoryCrossSourceVertices"][1]["certifiedLowerMillimetres"], 295)
+        for retained, witness, (source, other, vertex, minimum) in zip(
+            accepted["mandatoryCrossSourceVertices"],replay["mandatoryCrossSourceVertices"],
+            (("detailed","nativeCandidate",1288,998),("nativeCandidate","detailed",326,297)),strict=True
+        ):
+            self.assertEqual((retained["source"],retained["comparedTo"],retained["vertex"],
+                              retained["certifiedLowerMillimetres"]),(source,other,vertex,minimum))
+            self.assertEqual((witness["source"],witness["comparedTo"],witness["vertex"]),(source,other,vertex))
+            self.assertGreaterEqual(witness["certifiedLowerMillimetres"],minimum)
 
     def test_audit_refuses_same_length_asset_mutation_and_wrong_original(self):
         with tempfile.TemporaryDirectory() as tmp:

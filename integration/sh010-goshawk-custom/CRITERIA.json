@@ -40,6 +40,21 @@
       "The ordinary Ship Showroom still refuses unadmitted exchange. Existing hulls and saves remain intact."
     ]
   },
+  "reviewEvidence": {
+    "originalContractSpeedUnits": 40.0,
+    "compiledEngineering": "cargo test --locked -p meridian-core sh010_compiled_engineering_and_calibrated_source_match_independent_bits",
+    "sourceContractAndEngineeringWords": "python3 -B -m unittest discover -s tools -p 'test_goshawk_custom.py' -v",
+    "retainedSurfaceBoundsMillimetres": {"detailed":[603,800],"nativeCandidate":[1014,1197],"mandatoryCrossSourceVertices":[998,297]},
+    "portableRgbNegatives": "cargo test --locked -p meridian-desktop own_pane_and_full_union_reject_black_gutter_wrong_pane_and_rgb",
+    "metal": [
+      {"directoryVariable":"MERIDIAN_SH010_EVIDENCE_DIR","test":"mule_render::showroom::metal_qualification::metal_goshawk_custom_same_pose_shimmer","verifier":"python3 -B tools/verify_goshawk_showroom_evidence.py <evidence-directory>"},
+      {"directoryVariable":"MERIDIAN_SH010_MINIMUM_DIR","test":"mule_render::showroom::metal_qualification::custom_qualification::metal_goshawk_custom_minimum_showroom_model_pass"},
+      {"directoryVariable":"MERIDIAN_SH010_CACHE_DIR","test":"mule_render::showroom::metal_qualification::custom_qualification::metal_goshawk_custom_cache_switching"}
+    ],
+    "invocation":"Each Metal test is ignored by default. Set its directory variable to a distinct new absolute directory and run cargo test --locked -p meridian-desktop <test> -- --ignored --exact --nocapture.",
+    "minimumAndCacheReceipt":"Full-target PPMs, matching independent -direct.ppm references, model-panes.tsv and rgb-measurements.tsv. Each isolated image must be nonblack, with at least 2 logical pixels of in-pane clearance. Compare and both mixed orders must match exact full-target isolated RGB union, with direct original render identity and repeat/return checks.",
+    "scope":"Offscreen native model only. No GPU timing, native window resizing, compositor output or ordinary placement."
+  },
   "remaining": [
     "Full native source/exact collision qualification",
     "Owned execution of the controlled World regressions, ordinary placement, acquisition, paid fitting, crew and player admission"

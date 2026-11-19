@@ -15,7 +15,7 @@ from measure_goshawk_surface_fit import (
 from prepare_goshawk_custom import ASSETS, COUNTS, MANIFEST_SHA, ROOT, pin, require
 
 OUTPUT = ROOT / "integration/sh010-goshawk-custom/SURFACE-FIT.json"
-TARGET_MM = {"detailed": 800, "nativeCandidate": 1200}
+TARGET_MM = {"detailed": 800, "nativeCandidate": 1197}
 
 
 def read_inputs(folder):

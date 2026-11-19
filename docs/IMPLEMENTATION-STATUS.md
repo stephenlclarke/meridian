@@ -31,6 +31,8 @@ open. [Service-well decision](GOSHAWK-GAMEPLAY-ENVELOPE.md#full-surface-fit-evid
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)
 
+The SH010 review candidate additionally binds the inclusive 40.0 controlled speed, compiled source engineering values and retained complete surface audit thresholds. The three authored Metal fixtures now cover direct source RGB, minimum-size ordinary Compare and solo, and mixed-order GPU cache motion, with full-target isolated pixel checks. Actual Metal and platform execution remain pending.
+
 ## Internal Mule docking validation
 
 Mac build `ffb7112` passed 702 Rust tests, 102 Python tests, strict Clippy, and the release build. In the native scene the aligned Mule crossed at tick 104 and the obstructed Mule stopped for station contact at tick 11. Linux and native Windows each passed 705 Rust tests including three observer tests, 102 Python tests, strict Clippy, and both release builds. One Metal fixture was excluded from the ordinary test counts on each platform. These results qualify the internal docking scene. At that checkpoint, ordinary encounters and player acquisition were still open. [Controls and test scope](MULE-VALIDATION-LAUNCH.md)
