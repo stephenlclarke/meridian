@@ -197,7 +197,7 @@ impl Pass {
             model,
             srgb: format.is_srgb(),
             format,
-            goshawk: Vec::with_capacity(2 * MAX_MODELS),
+            goshawk: Vec::with_capacity(showroom::Hull::COUNT * MAX_MODELS),
             goshawk_active: [None; MAX_MODELS],
         })
     }
@@ -235,7 +235,7 @@ impl Pass {
         let mut active = [None; MAX_MODELS];
         let scale = std::array::from_fn(|axis| f64::from(physical_size[axis]) / logical_size[axis]);
         for preview in &frame.models {
-            let Some(hull) = showroom::Hull::from_model(preview) else {
+            let Some(hull) = showroom::hull(preview) else {
                 continue;
             };
             let Some(bounds) = intersection(preview.bounds, frame.viewport.canvas()) else {
@@ -249,14 +249,18 @@ impl Pass {
                 match reusable_slot(self.goshawk.iter().map(showroom::Pass::hull), &active, hull) {
                     Some(index) => index,
                     None => {
-                        if self.goshawk.len() >= 2 * MAX_MODELS {
+                        if self.goshawk.len() >= showroom::Hull::COUNT * MAX_MODELS {
                             return Err(
                                 "Goshawk Showroom pass cache exceeded its hull/pane bound".into()
                             );
                         }
                         let index = self.goshawk.len();
-                        self.goshawk
-                            .push(showroom::Pass::new(device, queue, self.format, hull)?);
+                        self.goshawk.push(showroom::Pass::for_hull(
+                            device,
+                            queue,
+                            self.format,
+                            hull,
+                        )?);
                         index
                     }
                 };
@@ -290,7 +294,7 @@ impl Pass {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use showroom::Hull::{Explorer, Mk2};
+    use showroom::Hull::{Custom, Explorer, Mk2};
 
     #[test]
     fn original_showroom_cache_reuses_only_the_same_hull_and_unused_pane() {
@@ -314,8 +318,14 @@ mod tests {
         assert_eq!(frame(&[Mk2, Explorer]), [Some(1), Some(0)]);
         assert_eq!(frame(&[Mk2, Mk2]), [Some(1), Some(2)]);
         assert_eq!(frame(&[Explorer, Explorer]), [Some(0), Some(3)]);
+        assert_eq!(frame(&[Custom, Mk2]), [Some(4), Some(1)]);
+        assert_eq!(frame(&[Mk2, Custom]), [Some(1), Some(4)]);
+        assert_eq!(frame(&[Custom, Custom]), [Some(4), Some(5)]);
+        assert_eq!(frame(&[Explorer, Custom]), [Some(0), Some(4)]);
+        assert_eq!(frame(&[Custom, Explorer]), [Some(4), Some(0)]);
         assert_eq!(frame(&[]), [None, None]);
         assert_eq!(frame(&[Mk2]), [Some(1), None]);
-        assert_eq!(cached, [Explorer, Mk2, Mk2, Explorer]);
+        assert_eq!(cached, [Explorer, Mk2, Mk2, Explorer, Custom, Custom]);
+        assert_eq!(cached.len(), showroom::Hull::COUNT * MAX_MODELS);
     }
 }

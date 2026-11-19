@@ -298,6 +298,15 @@ fn selecting_goshawk_mk2_routes_its_own_original_preview_without_granting_exchan
     assert_showroom_selection("Goshawk Mk II", "SH009", "assets/fleet/sh009/visual.bin");
 }
 
+#[test]
+fn selecting_mk_ii_custom_routes_its_own_preview_without_granting_exchange() {
+    assert_showroom_selection(
+        "Goshawk Mk II Custom",
+        "SH010",
+        "assets/fleet/sh010/visual.bin",
+    );
+}
+
 fn assert_showroom_selection(query: &str, object: &str, geometry_key: &str) {
     use crate::docked_screens::{Catalogue, DockedScreens, Input, Key, Outcome, Screen, Viewport};
     let world = meridian_core::World::new_commander(95006).unwrap_or_else(|e| panic!("{e}"));

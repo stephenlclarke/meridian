@@ -31,6 +31,8 @@ const SAMPLES: u32 = 16;
 const POSES: [&str; 3] = ["front", "oblique", "upper"];
 const PHASE_SECONDS: f32 = std::f32::consts::PI / 0.7;
 
+mod custom_qualification;
+
 fn ok<T, E: std::fmt::Debug>(result: Result<T, E>) -> T {
     result.unwrap_or_else(|error| panic!("{error:?}"))
 }
@@ -565,13 +567,14 @@ fn same_pose_shimmer(hull: Hull, directory_variable: &str) {
     let output = output_directory(directory_variable);
     let gpu = metal_gpu(hull, false);
     let target = Target::new(&gpu.device, LOGICAL);
-    let mut pass = ok(Pass::new(&gpu.device, &gpu.queue, FORMAT, hull));
+    let mut pass = ok(Pass::for_hull(&gpu.device, &gpu.queue, FORMAT, hull));
     assert_eq!(pass.hull(), hull);
     assert_eq!(
         pass.draw_count,
         match hull {
             Hull::Explorer => 10_452,
             Hull::Mk2 => 10_596,
+            Hull::Custom => super::CUSTOM_DETAILED_FACES as u32 * 3,
         }
     );
     let mut totals = [0, 0];
@@ -579,6 +582,7 @@ fn same_pose_shimmer(hull: Hull, directory_variable: &str) {
     let other = match hull {
         Hull::Explorer => Hull::Mk2,
         Hull::Mk2 => Hull::Explorer,
+        Hull::Custom => Hull::Mk2,
     };
     let mut wrong = models[0].clone();
     wrong.object = other.object_id().into();
@@ -649,6 +653,12 @@ fn metal_goshawk_mk2_same_pose_shimmer() {
 }
 
 #[test]
+#[ignore = "Mac owner only: explicit production SH010 visual qualification"]
+fn metal_goshawk_custom_same_pose_shimmer() {
+    same_pose_shimmer(Hull::Custom, "MERIDIAN_SH010_EVIDENCE_DIR");
+}
+
+#[test]
 #[ignore = "Mac owner only: explicit production SH008 GPU timestamp qualification"]
 fn metal_goshawk_gpu_cost() {
     let output = output_directory("MERIDIAN_SH008_TIMING_DIR");
@@ -669,7 +679,12 @@ fn metal_goshawk_gpu_cost() {
     println!("SH008 timing variant={variant}");
     let gpu = metal_gpu(Hull::Explorer, true);
     let target = Target::new(&gpu.device, LOGICAL);
-    let mut pass = ok(Pass::new(&gpu.device, &gpu.queue, FORMAT, Hull::Explorer));
+    let mut pass = ok(Pass::for_hull(
+        &gpu.device,
+        &gpu.queue,
+        FORMAT,
+        Hull::Explorer,
+    ));
     assert!(pass.shimmer, "SH008 rounded support certification failed");
     let models = showroom_models(Hull::Explorer);
     let mut names = POSES.into_iter();
@@ -856,13 +871,18 @@ fn metal_goshawk_mk2_cache_switching() {
     };
     // Separate source-bound GPU passes bypass the docked cache completely. Otherwise an
     // incorrectly reused hull could agree with the same wrong hull in the isolated frame.
-    let mut direct_explorer = ok(Pass::new(&gpu.device, &gpu.queue, FORMAT, Hull::Explorer));
-    let mut direct_mk2 = ok(Pass::new(&gpu.device, &gpu.queue, FORMAT, Hull::Mk2));
+    let mut direct_explorer = ok(Pass::for_hull(
+        &gpu.device,
+        &gpu.queue,
+        FORMAT,
+        Hull::Explorer,
+    ));
+    let mut direct_mk2 = ok(Pass::for_hull(&gpu.device, &gpu.queue, FORMAT, Hull::Mk2));
     let mut reference = |name: &str, model: &ModelPreview| {
         let pass = match Hull::from_model(model) {
             Some(Hull::Explorer) => &mut direct_explorer,
             Some(Hull::Mk2) => &mut direct_mk2,
-            None => panic!("unexpected hull in independent reference"),
+            Some(Hull::Custom) | None => panic!("unexpected hull in independent reference"),
         };
         assert_eq!(Hull::from_model(model), Some(pass.hull()));
         ok(pass.prepare(&gpu.queue, model, model.bounds, SCALE, FORMAT.is_srgb()));

@@ -34,18 +34,24 @@ def encode_for_hull(source, points, triangles, spec):
     if resource["id"] != spec.hull:
         raise ValueError("Changed original hull identity")
     model = resource["design"]
-    if (len(model["vertices"]), len(model["faces"])) != (spec.detailed_vertices, spec.detailed_faces):
+    return encode_model(model, points, triangles, spec.geometry_magic,
+                        (spec.detailed_vertices, spec.native_vertices, spec.detailed_faces), spec.visual_magic)
+
+
+def encode_model(model, points, triangles, source_magic, counts, visual_magic):
+    detailed_vertices, native_vertices, face_count = counts
+    if (len(model["vertices"]), len(model["faces"])) != (detailed_vertices, face_count):
         raise ValueError("Changed detailed face set")
     if [t["asset"] for t in model["textures"]] != TEXTURES:
         raise ValueError("Changed source texture ordering")
     packed_points = b"".join(struct.pack("<3d", *p) for p in model["vertices"])
     packed_faces = b"".join(struct.pack("<3I", *face) for face in model["faces"])
-    expected_header = struct.pack("<8sII", spec.geometry_magic, spec.detailed_vertices, spec.native_vertices)
+    expected_header = struct.pack("<8sII", source_magic, detailed_vertices, native_vertices)
     if points[:16] != expected_header or packed_points != points[16:16 + len(packed_points)]:
         raise ValueError("Display positions differ from the reviewed detailed collision input")
     if packed_faces != triangles[:len(packed_faces)]:
         raise ValueError("Display winding differs from the reviewed detailed collision input")
-    output = bytearray(struct.pack("<8sII", spec.visual_magic, spec.detailed_faces * 3, 56))
+    output = bytearray(struct.pack("<8sII", visual_magic, face_count * 3, 56))
     for face, material_index, mapping in zip(
         model["faces"], model["faceMaterials"], model["faceTextures"], strict=True
     ):

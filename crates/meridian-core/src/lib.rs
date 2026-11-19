@@ -8,6 +8,7 @@ pub mod equipment;
 mod flight;
 pub mod freight;
 pub mod goshawk;
+pub mod goshawk_custom;
 pub mod goshawk_mk2;
 pub mod mining;
 pub mod mule;
@@ -17,6 +18,7 @@ pub mod station;
 pub mod station_services;
 pub mod traffic;
 
+pub use flight::GoshawkCustomApproachSnapshot;
 pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};
 pub use flight::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
 

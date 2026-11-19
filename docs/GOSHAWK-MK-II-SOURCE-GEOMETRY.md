@@ -109,3 +109,9 @@ python3 -B -m unittest discover -s tools -p 'test_encode_goshawk*visual.py' -v
 ```
 
 The focused Python parity and mutation tests inspect all ordered records against the original TOML and check that source, winding, texture, geometry and packed-output mutations are refused. The Rust loader regressions are authored for designated compiler execution. No native SH009 Showroom observation follows from the source checks.
+
+## Joined SH009 and SH010 renderer review
+
+After the SH010 integration, the shared Showroom recognizes three exact ship ID and visual key pairs: SH008 Explorer, SH009 Mk II and SH010 Mk II Custom. Each immutable renderer pass uses only its own authenticated visual and source-local supports, even when SH009 and SH010 have equal face and support counts. The cache retains at most two passes per hull and only draws the successfully prepared current panes. The source encoder shares the face-record writer while retaining the distinct hull and resource identity checks; the SH010 calibrated-model caller retains its existing inputs.
+
+The overlapping code requires delta review and owned execution: model registration and search selection, pass construction and shader layout, per-hull cache reuse including SH009/SH010 ordering, and the shared Metal pose and minimum-frame helpers. Both SH009 and SH010 retain their separate same-pose, minimum-window and mixed-cache qualification cases. Their minimum and mixed RGB checks share the unchanged `minimum_rgb.rs` verifier. The SH010 controlled World and engineering tests are unchanged; SH009's scoped station-motion method and source tests are retained. The join does not qualify native rendering, ordinary ownership or flight.
