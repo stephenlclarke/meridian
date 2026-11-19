@@ -174,6 +174,7 @@ def undo_goshawk_world(relative, data):
         'flight.rs': [
             (b'mod goshawk_validation;\n', b''),
             (b'pub use goshawk_validation::GoshawkCustomApproachSnapshot;\n', b''),
+            (b'pub use goshawk_validation::ZebraApproachSnapshot;\n', b''),
             (b'pub use goshawk_validation::{GoshawkApproachSnapshot, GoshawkApproachStatus};\n', b''),
             (b'    goshawk_validation: Option<goshawk_validation::Approach>,\n', b''),
             (b'            goshawk_validation: None,\n', b''),
@@ -183,7 +184,9 @@ def undo_goshawk_world(relative, data):
         EMP_TESTS: [(b'        goshawk_validation: None,\n', b'')],
         'lib.rs': [
             (b'pub mod goshawk_custom;\n', b''),
+            (b'pub mod zebra;\n', b''),
             (b'pub use flight::GoshawkCustomApproachSnapshot;\n', b''),
+            (b'pub use flight::ZebraApproachSnapshot;\n', b''),
             (b'pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};\n', b''),
         ],
     }

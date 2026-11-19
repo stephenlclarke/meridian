@@ -149,6 +149,14 @@ fn original_custom_fits_minimum_station_showroom_solo_and_compare() {
     );
 }
 
+#[test]
+fn original_zebra_fits_minimum_station_showroom_solo_and_compare() {
+    let vertices = ok(super::Hull::Zebra.visual());
+    assert_eq!(vertices.len(), super::ZEBRA_DETAILED_FACES * 3);
+    let view = View::new(&vertices, [EMPTY_PIECE; super::ZEBRA_PIECES]);
+    assert_variant_fits_minimum(station_frames_for("Zebra"), &view, &vertices, "SH021");
+}
+
 fn assert_variant_fits_minimum(
     frames: Vec<Frames>,
     view: &View,
