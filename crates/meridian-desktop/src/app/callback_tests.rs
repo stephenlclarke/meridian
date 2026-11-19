@@ -99,7 +99,7 @@ fn audio_resume_reopens_once_and_primes_live_missile_without_replay() {
     assert!(
         app.notice
             .expires
-            .is_some_and(|deadline| Instant::now() < deadline)
+            .is_some_and(|deadline| std::time::Instant::now() < deadline)
     );
     app.resume_audio_with(|| Box::new(RecordedAudio(resumed.clone())));
     app.resume_audio_with(|| panic!("duplicate resume must not open another device"));
