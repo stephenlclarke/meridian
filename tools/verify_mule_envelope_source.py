@@ -224,6 +224,11 @@ def verify_protected_core(root):
     checked = set()
     for relative, expected in baseline['sha256'].items():
         data = (root / 'crates/meridian-core/src' / relative).read_bytes()
+        if relative == 'lib.rs':
+            before = b'pub mod goshawk_custom;\npub mod mining;\n'
+            authored = b'pub mod goshawk_custom;\npub mod hull_package;\npub mod mining;\n'
+            assert data.count(authored) == 1, relative
+            data = data.replace(authored, before, 1)
         data = undo_goshawk_world(relative, data)
         data = undo_renas_encounter(relative, data)
         for addition in additions.get(relative, []):

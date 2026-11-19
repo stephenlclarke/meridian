@@ -722,8 +722,8 @@ fn showroom(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         f,
         format!(
             "{} ships; {} catalogue objects",
-            162,
-            c.catalogue.objects.len()
+            c.catalogue.ship_count(),
+            c.catalogue.object_count()
         ),
         details.x,
         details.y + 18.0,
@@ -835,7 +835,7 @@ fn showroom_previews(
     c: &Context<'_>,
     f: &mut Frame,
     model: Rect,
-    ship: &ObjectRecord,
+    ship: &ObjectRecord<'_>,
     baseline: &str,
 ) {
     let preview_ids = if s.compare {
@@ -873,7 +873,7 @@ fn showroom_previews(
 fn showroom_specifications(
     s: &DockedScreens,
     c: &Context<'_>,
-    ship: &ObjectRecord,
+    ship: &ObjectRecord<'_>,
     baseline: &str,
 ) -> Vec<String> {
     let mut lines = vec![
@@ -896,6 +896,10 @@ fn showroom_specifications(
             c.catalogue.object(baseline).map_or(baseline, |o| o.name),
             ship.name
         ));
+    }
+    if let Some(specs) = c.catalogue.authored_specifications(ship.id) {
+        lines.extend(specs.iter().cloned());
+        return lines;
     }
     for spec in c
         .catalogue

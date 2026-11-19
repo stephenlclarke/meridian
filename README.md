@@ -2,6 +2,15 @@
 
 Preview 10 opens on Commander Details. Press H or ? for the current screen’s controls and station navigation. Its docked exterior and flight HUD leave the view above the instruments clear at rest. [Download Preview 10 for macOS arm64 or Windows x64](https://github.com/stephenlclarke/meridian/releases/tag/v0.10.0-preview.1) · [Preview guide](docs/PREVIEW-RELEASES.md)
 
+## Ship authoring
+
+Use [Hull Studio](docs/HULL-STUDIO.md) to edit ship definitions, generate
+rounded collision pieces and check clearances against the game kernel.
+The standalone macOS build opens the isolated game inspector as a separate
+Meridian Hull Showroom app when a compatible game is bundled.
+In development builds, the private game window identifies the inspected ship
+by name and local ID.
+
 ## Goshawk Explorer in the Ship Showroom
 
 In Preview 10, press 3 at a station and search for Goshawk Explorer. Compare shows the Peregrine Mk V beside the Goshawk for a new commander. Press C for a single-ship view. Mac testing verified the original dark green hull, silver cross-member, open wishbone and refusal of an unavailable exchange. Preview 9 predates this ship. [Goshawk geometry and Showroom controls](docs/GOSHAWK-GAMEPLAY-ENVELOPE.md)
@@ -9,6 +18,8 @@ In Preview 10, press 3 at a station and search for Goshawk Explorer. Compare sho
 The development source also provides a separate Goshawk Mk II Custom Showroom and collision candidate. Its original detailed appearance, four lower mounts and SH028 fit evidence are in the [SH010 hull guide](docs/GOSHAWK-MK-II-CUSTOM.md). Owned native validation is pending.
 
 The joined Peregrine development source gives Mk I and Mk III separate original cobalt-cream Showroom previews and local shields. Search their names separately or Pin either as the Compare baseline. Both refuse exchange; Mk III has no adopted runtime mass or ordinary flight admission. This is development source, with owned renderer and runtime qualification pending. [SH022 geometry](docs/PEREGRINE-MK-I-GAMEPLAY-ENVELOPE.md) · [SH023 geometry](docs/PEREGRINE-MK3-GAMEPLAY-ENVELOPE.md)
+
+The development desktop can explicitly load local validated hull packages with repeatable `--hull-package PATH` flags, or inspect a conflicting original under its separate `LOCAL:` identity using `--inspect-hull-package PATH`. Press 3 while docked and search its ID; no purchase or campaign spawn is authorized. [Authored hull package controls and limits](docs/AUTHORED-HULL-SHOWROOM.md)
 
 ## Internal Mule docking validation
 

@@ -23,6 +23,8 @@ use meridian_core::{
         PEREGRINE_MK3_NATIVE_VERTICES, PEREGRINE_MK3_PIECES, PeregrineMk3HullSource,
     },
 };
+mod authored;
+pub(crate) use authored::{AuthoredFace, AuthoredPass, AuthoredVisual};
 
 pub(crate) const GEOMETRY_KEY: &str = "assets/fleet/sh008/visual.bin";
 const VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh008/visual.bin");
@@ -359,6 +361,7 @@ impl Pass {
                 uniform_size: (size_of::<Uniforms>() + pieces.len() * size_of::<Piece>()) as u64,
                 points: &triangles,
                 visual: &vertices,
+                authored_materials: false,
             },
         )?;
         // The uniform header and all source-local support records are contiguous in WGSL.

@@ -1,5 +1,27 @@
 # Implementation and validation status
 
+## Config-defined ship authoring
+
+The [Hull Studio authoring guide](HULL-STUDIO.md) describes the separate editor
+and the opt-in package workflow. Its reference uses the 3,484 detailed and 512
+native faces of SH023. The Mac validator produced 69 collision pieces, passed
+all four reference probes and matched the stock station entrance and lip tests.
+The real editor smoke exported a second config-only hull, changed its collision
+groups from four to two and refused export after a route crossed the hull.
+The signed macOS Studio build at `eef206f` opened Zebu (SH036) and Stag Liner
+(SH035) in separate game processes with disposable profiles. Both confirmed
+their first frame while open together. The window title identified each local
+package. On the Mac, both ships rendered beside the Peregrine Mk V and alone
+after pressing C. The inspection tool selected Zebu first and Stag after Zebu
+closed. Both temporary workspaces were removed. Switching the inspection tool
+freely between two still-open processes remains unverified.
+
+The five desktop package-launch tests passed on macOS, Linux and native
+Windows. The signed Mac Showroom helper has its own application identity.
+The earlier unbundled game could confirm a frame while its window remained
+unavailable to the inspection tool. Stock registration and campaign placement
+are separate from this private inspection.
+
 ## Generated desktop audio source candidate
 
 The authored desktop integration routes generated launch and docking cues from actual mode transitions, front-laser sounds from accepted Pulse or Mining Laser discharges, and the original missile notification ping after an accepted missile launch. Ctrl+Shift+M toggles sound; Help displays availability. New/Continue primes without replay, and a missing device leaves gameplay active. Application suspension releases the audio device; resuming restores the mute preference without replaying accepted cues. No speech, kill, ECM, continuous cutter or EMP effects are claimed. Native device and Rust qualification remain pending.
@@ -17,6 +39,8 @@ SH022 has its own original detailed Showroom, 69 local collision supports includ
 SH023 independently binds its original detailed visual and 69 local supports. Its original active 512-face native successor meets the source face limit; that fact does not establish Meridian native collision, hardware, adopted runtime mass or ordinary flight admission. Mk I and Mk III can be selected as distinct Showroom identities in the joined development source. The authored tests cover their actual crossed payloads, ordinary pinned comparisons in either order, and independent reference passes for both same-hull, different-pose cache controls. Owned portable and Metal execution remains pending. [SH023 source and criteria](PEREGRINE-MK3-GAMEPLAY-ENVELOPE.md) · [joined acceptance criteria](../integration/sh022-sh023-peregrine/CRITERIA.json)
 
 ## Commander startup and flight cockpit
+
+The authored package desktop entry and Showroom are implemented in development source. Explicit local packages use the shared core validation, actual rounded collision pieces and continuous clearance results. Arbitrary new identities render from their own vertices, materials and UVs, while original identities can be inspected only under a separate local key. No save or campaign admission changes. Owned portable compilation and native GPU execution remain pending. [Controls, fixtures and acceptance](AUTHORED-HULL-SHOWROOM.md)
 
 Ordinary startup opens Commander details with the current ship, location and credits. A fresh commander starts at Avenor. A saved flight opens its summary and waits for Enter to resume. An unreadable slot opens recovery. On Mac, a fresh commander reached this screen without creating a save. An airborne commander stayed on the summary until Enter. Recovery preserved the original damaged and unsupported save bytes.
 

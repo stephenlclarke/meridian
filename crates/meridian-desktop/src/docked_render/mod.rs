@@ -1,5 +1,6 @@
 //! GPU-ready docked screen geometry. Draws the exact immutable UI frame, not gameplay state.
 use crate::{
+    authored_hull::AuthoredHulls,
     docked_screens::{AvailableModel, Frame, Ink, ModelPreview, Orientation, Rect},
     mesh::Vertex,
 };
@@ -425,12 +426,23 @@ impl Geometry {
             unavailable_models: 0,
         }
     }
+    #[cfg(test)]
     fn compose(
         &mut self,
         frame: &Frame,
         model: &Model,
         srgb: bool,
         planet_system: Option<meridian_core::navigation::SystemId>,
+    ) -> Result<(), String> {
+        self.compose_with_authored(frame, model, srgb, planet_system, &AuthoredHulls::default())
+    }
+    fn compose_with_authored(
+        &mut self,
+        frame: &Frame,
+        model: &Model,
+        srgb: bool,
+        planet_system: Option<meridian_core::navigation::SystemId>,
+        authored: &AuthoredHulls,
     ) -> Result<(), String> {
         self.shapes.clear();
         self.text.clear();
@@ -524,7 +536,7 @@ impl Geometry {
         if let Some(r) = frame.hovered {
             outline(&mut self.shapes, r, canvas, colour(Ink::Yellow, srgb), size);
         }
-        self.append_previews(frame, model, canvas, srgb, planet_system)?;
+        self.append_previews(frame, model, canvas, srgb, planet_system, authored)?;
         if self.shapes.len() > MAX_GEOMETRY || self.models.len() > MAX_MODEL_VERTICES {
             return Err("docked geometry exceeds fixed buffer capacity".into());
         }
@@ -537,9 +549,10 @@ impl Geometry {
         canvas: Rect,
         srgb: bool,
         planet_system: Option<meridian_core::navigation::SystemId>,
+        authored: &AuthoredHulls,
     ) -> Result<(), String> {
         for p in &frame.models {
-            if crate::mule_render::showroom::matches(p) {
+            if crate::mule_render::showroom::matches(p) || authored.visual_for(p).is_some() {
                 continue;
             }
             if !model.matches(p) {
@@ -579,6 +592,7 @@ impl Geometry {
         Ok(())
     }
 }
+
 fn append_model(
     out: &mut Vec<Vertex>,
     preview: &ModelPreview,

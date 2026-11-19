@@ -1,5 +1,5 @@
 //! Explicit internal entry, no default directory/profile/save access or new actor authority.
-use crate::profile::Profile;
+use crate::{authored_hull::PackagePath, profile::Profile};
 use meridian_core::{FlightStart, OriginalStationData, World, mule::MuleHullSource};
 use std::{ffi::OsString, io, path::PathBuf, time::Duration};
 
@@ -53,6 +53,11 @@ pub(super) enum View {
 #[derive(Debug, PartialEq, Eq)]
 pub(super) enum Launch {
     Profile(PathBuf),
+    Authored {
+        directory: PathBuf,
+        packages: Vec<PackagePath>,
+        open_showroom: bool,
+    },
     Mule(View),
 }
 impl Launch {
@@ -84,7 +89,71 @@ impl Launch {
             }
             return Ok(Self::Mule(view));
         }
-        crate::profile::directory_from_args(args.into_iter()).map(Self::Profile)
+        if !args.iter().any(|arg| {
+            arg == "--hull-package"
+                || arg == "--inspect-hull-package"
+                || arg == "--open-authored-showroom"
+        }) {
+            return crate::profile::directory_from_args(args.into_iter()).map(Self::Profile);
+        }
+        let mut args = args.into_iter();
+        let mut profile_args = Vec::new();
+        let mut packages = Vec::new();
+        let mut open_showroom = false;
+        while let Some(flag) = args.next() {
+            if flag == "--open-authored-showroom" {
+                if open_showroom {
+                    return Err(io::Error::new(
+                        io::ErrorKind::InvalidInput,
+                        "Duplicate --open-authored-showroom",
+                    ));
+                }
+                open_showroom = true;
+                continue;
+            }
+            let path = args
+                .next()
+                .filter(|p| !p.is_empty() && !p.to_string_lossy().starts_with("--"))
+                .ok_or_else(|| {
+                    io::Error::new(
+                        io::ErrorKind::InvalidInput,
+                        format!("{} needs a path", flag.to_string_lossy()),
+                    )
+                })?;
+            match flag.to_str() {
+                Some("--save-dir") if profile_args.is_empty() => {
+                    profile_args.extend([flag, path]);
+                }
+                Some("--hull-package") => packages.push(PackagePath::new(path.into(), false)),
+                Some("--inspect-hull-package") => {
+                    packages.push(PackagePath::new(path.into(), true))
+                }
+                _ => {
+                    return Err(io::Error::new(
+                        io::ErrorKind::InvalidInput,
+                        "Expected --save-dir PATH, --hull-package PATH, --inspect-hull-package PATH or --open-authored-showroom; no internal validation or duplicate save directory",
+                    ));
+                }
+            }
+        }
+        if open_showroom
+            && packages
+                .iter()
+                .filter(|package| package.is_isolated())
+                .count()
+                != 1
+        {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "--open-authored-showroom requires exactly one --inspect-hull-package PATH",
+            ));
+        }
+        let directory = crate::profile::directory_from_args(profile_args.into_iter())?;
+        Ok(Self::Authored {
+            directory,
+            packages,
+            open_showroom,
+        })
     }
     pub(super) fn camera_view(&self) -> meridian_core::FlightView {
         if matches!(self, Self::Mule(View::Side)) {
@@ -96,6 +165,10 @@ impl Launch {
     pub(super) fn open(self) -> Result<Profile, Box<dyn std::error::Error>> {
         match self {
             Self::Profile(directory) => Profile::open(directory),
+            Self::Authored { .. } => Err(io::Error::other(
+                "Authored package requires the desktop validation adapter",
+            )
+            .into()),
             Self::Mule(view) => {
                 const SEED: u64 = 0x4d55_4c45;
                 let world = match view {
