@@ -149,6 +149,14 @@ fn original_custom_fits_minimum_station_showroom_solo_and_compare() {
     );
 }
 
+#[test]
+fn original_raven_fits_minimum_station_showroom_solo_and_compare() {
+    let vertices = ok(super::Hull::Raven.visual());
+    assert_eq!(vertices.len(), super::RAVEN_DETAILED_FACES * 3);
+    let view = View::new(&vertices, [EMPTY_PIECE; super::RAVEN_PIECES]);
+    assert_variant_fits_minimum(station_frames_for("Raven"), &view, &vertices, "SH015");
+}
+
 fn assert_variant_fits_minimum(
     frames: Vec<Frames>,
     view: &View,
