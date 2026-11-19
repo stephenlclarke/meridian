@@ -1,25 +1,16 @@
 //! Station display materials, applied once when the original SH028 mesh loads.
 use super::{Vertex, cross, difference, point};
 
-fn linear(rgb: [u8; 3]) -> [f32; 3] {
-    rgb.map(|channel| {
-        let value = f64::from(channel) / 255.0;
-        if value <= 0.04045 {
-            (value / 12.92) as f32
-        } else {
-            ((value + 0.055) / 1.055).powf(2.4) as f32
-        }
-    })
-}
+use super::paint::linear;
 
 pub(super) fn apply(mesh: &mut [Vertex]) {
     // Original paint colours identify the five used materials in SH028.design.
     let finishes = [
-        ([214, 217, 211], [151, 174, 189], false), // blue-grey hull plating
-        ([182, 193, 188], [89, 112, 132], false),  // structural frame
-        ([23, 35, 42], [54, 70, 83], false),       // recessed details
-        ([125, 144, 152], [103, 119, 130], false), // exposed metal
-        ([141, 221, 210], [255, 191, 100], true),  // original emissive strips
+        ([214, 217, 211], [44, 103, 145], false), // ocean-blue hull plating
+        ([182, 193, 188], [34, 65, 92], false),  // structural frame
+        ([23, 35, 42], [24, 41, 55], false),       // recessed details
+        ([125, 144, 152], [73, 97, 109], false), // exposed metal
+        ([141, 221, 210], [255, 146, 24], true),  // original emissive strips
     ]
     .map(|(source, finish, emissive)| (linear(source), linear(finish), emissive));
     for triangle in mesh.as_chunks_mut::<3>().0 {
@@ -65,7 +56,7 @@ mod tests {
             assert!(after.color.iter().all(|c| (0.0..=1.0).contains(c)));
             if before.color == source_light {
                 lights += 1;
-                assert_eq!(after.color, linear([255, 191, 100]));
+                assert_eq!(after.color, linear([255, 146, 24]));
             } else {
                 assert!(after.color[2] > after.color[0]);
             }

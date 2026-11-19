@@ -93,7 +93,7 @@ fn decode_visual(
         return Err("Detailed visual encoding changed");
     }
     // include_bytes need not have Pod alignment. Read each complete record without unsafe.
-    let result: Vec<VisualVertex> = bytes[16..]
+    let mut result: Vec<VisualVertex> = bytes[16..]
         .as_chunks::<56>()
         .0
         .iter()
@@ -110,6 +110,12 @@ fn decode_visual(
             || v.emissive > 1
     }) {
         return Err("Invalid detailed visual attributes");
+    }
+    for vertex in &mut result {
+        let [r, g, b, alpha] = vertex.color;
+        let paint = crate::mesh::paint::ship_srgb([r, g, b].map(|v| (255.0 * v).round() as u8));
+        let [r, g, b] = paint.map(|v| f32::from(v) / 255.0);
+        vertex.color = [r, g, b, alpha];
     }
     Ok(result)
 }

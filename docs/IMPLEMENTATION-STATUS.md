@@ -1,5 +1,7 @@
 # Implementation and validation status
 
+The development renderer gives the Peregrine lapis and ochre paint, the Mule petrol and turquoise, and the Goshawk family pine green and blued steel. Lion Citadel uses ocean-blue plating and orange-amber docking lights. Preview 10 shows the earlier finishes.
+
 ## Goshawk Showroom preview
 
 Preview 10 is published for macOS arm64 and Windows x64. It includes the Goshawk Explorer in the ordinary station Showroom. The signed and notarized app was extracted and checked against the local installation, including all 483 files. Earlier Mac gameplay checks covered the Showroom on the source used for this build. Packaging verification did not include a new graphical launch. [Preview guide](PREVIEW-RELEASES.md)
@@ -10,7 +12,7 @@ Ordinary startup opens Commander details with the current ship, location and cre
 
 The desktop source clears the text area above the instruments in idle flight and in the idle docked exterior. Command feedback expires after four seconds in either view, including when paused. Requested details, review terms and action-specific confirmations remain accessible. For controls and station navigation, press H or ?. Active flight practice, jump countdowns and contact warnings remain visible. Mac qualification verified the clear docked view, four-second expiry and deliberate freight review. The installed Mac Preview 9 includes this HUD.
 
-The Lion Citadel exterior now uses blue-grey plating, darker structural steel and amber light strips in the desktop source. Subtle face shading gives adjacent panels depth. The renderer applies this finish at load time to the original material assignments. Four short strips join the rim to the upper and lower crosspieces. On a CPU projection of the reported view, the strips cover all 184 sampled gaps and nine sightlines through the port stay clear. In the straight-on docked Mac view, all 208 formerly exposed background pixels show station material and all nine sightlines through the port remain clear.
+The Lion Citadel exterior now uses ocean-blue plating, navy framing and orange-amber light strips in the desktop source. Subtle face shading gives adjacent panels depth. The renderer applies this finish at load time to the original material assignments. Four short strips join the rim to the upper and lower crosspieces. On a CPU projection of the reported view, the strips cover all 184 sampled gaps and nine sightlines through the port stay clear. In the straight-on docked Mac view, all 208 formerly exposed background pixels show station material and all nine sightlines through the port remain clear.
 
 ## First Renas Mule encounter
 

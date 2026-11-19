@@ -45,6 +45,8 @@ fn decode_point(bytes: &[u8]) -> Vec3 {
 #[test]
 fn every_detailed_face_keeps_original_index_order_scale_and_finite_uv_materials() {
     let vertices = ok(visual());
+    let petrol = [45_u8, 112, 124].map(|value| f32::from(value) / 255.0);
+    assert!(vertices.iter().any(|v| v.color[..3] == petrol));
     assert_eq!(vertices.len(), 7236 * 3);
     assert_eq!(std::mem::size_of::<VisualVertex>(), 56);
     let source = include_bytes!("../../../../assets/fleet/sh001/all-source.vertices");
