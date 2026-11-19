@@ -91,8 +91,10 @@ jobs:
           mapfile -t lavapipe < <(dpkg -L mesa-vulkan-drivers | grep -E '/lvp_icd(\.[^.]+)?\.json$')
           test "${#lavapipe[@]}" -eq 1
           test -f "${lavapipe[0]}"
+          # Keep the display alive between the two desktop processes in the cold-save check.
           VK_DRIVER_FILES="${lavapipe[0]}" VK_ICD_FILENAMES="${lavapipe[0]}" WINIT_X11_SCALE_FACTOR=1 \
-            xvfb-run --auto-servernum --server-args="-screen 0 1600x900x24 -dpi 96 -nolisten tcp" \
+            xvfb-run --auto-servernum --error-file=coverage/xvfb.log \
+              --server-args="-screen 0 1600x900x24 -dpi 96 -nolisten tcp -noreset" \
             python -B -m coverage run --parallel-mode .github/scripts/native_coverage_smoke.py
           llvm_bin="$(rustc --print target-libdir)/../bin"
           "$llvm_bin/llvm-profdata" merge -sparse coverage/native/desktop-[0-9]*.profraw \
