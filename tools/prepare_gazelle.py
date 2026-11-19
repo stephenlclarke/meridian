@@ -201,13 +201,21 @@ def build(inputs):
     return encoded
 
 
+def read_legacy_inputs(repository: Path) -> dict[str, bytes]:
+    repo=repository.resolve(strict=True)
+    return {
+        name:subprocess.check_output(["git","cat-file","blob",f"{LEGACY_REVISION}:{path}"],cwd=repo)
+        for name,(path,_) in PINS.items()
+    }
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__); parser.add_argument("--legacy-repo",type=Path); parser.add_argument("--check",action="store_true"); args=parser.parse_args()
     if args.check:
         inputs={name:(ASSETS/name).read_bytes() for name in PINS}
     else:
         if args.legacy_repo is None: parser.error("--legacy-repo is required to stage immutable originals")
-        inputs={name:subprocess.check_output(["git","-C",str(args.legacy_repo),"show",f"{LEGACY_REVISION}:{path}"]) for name,(path,_) in PINS.items()}
+        inputs=read_legacy_inputs(args.legacy_repo)
     outputs={**inputs,**build(inputs)}
     require(pin(outputs["MANIFEST.json"])["sha256"]==MANIFEST_SHA,"Changed SH019 manifest")
     if args.check:

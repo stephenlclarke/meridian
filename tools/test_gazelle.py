@@ -115,6 +115,40 @@ class Gazelle(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,"resource.toml"):
                 importer.build({**self.inputs,"resource.toml":sibling})
 
+    def test_staging_reads_fixed_blob_argv_in_repository_with_spaces_and_refuses_missing_inputs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repo=Path(tmp)/"legacy repository with spaces"
+            repo.mkdir()
+            hooks=Path(tmp)/"empty hooks"
+            hooks.mkdir()
+            subprocess.run(["git","init","--quiet"],cwd=repo,check=True,capture_output=True)
+            (repo/".gitattributes").write_text("* -text\n",encoding="utf-8")
+            for name,(path,_) in importer.PINS.items():
+                destination=repo/path
+                destination.parent.mkdir(parents=True,exist_ok=True)
+                destination.write_bytes(self.inputs[name])
+            subprocess.run(["git","add","--all"],cwd=repo,check=True,capture_output=True)
+            subprocess.run(["git","-c","user.name=Source Fixture","-c","user.email=fixture@example.invalid",
+                            "-c","commit.gpgSign=false","-c",f"core.hooksPath={hooks}","commit","--quiet","-m","test source fixture"],
+                           cwd=repo,check=True,capture_output=True)
+            revision=subprocess.check_output(["git","rev-parse","HEAD"],cwd=repo,text=True).strip()
+            with patch.object(importer,"LEGACY_REVISION",revision):
+                real_check_output=subprocess.check_output
+                with patch.object(importer.subprocess,"check_output",wraps=real_check_output) as calls:
+                    self.assertEqual(importer.read_legacy_inputs(repo),self.inputs)
+                    self.assertEqual(calls.call_count,len(importer.PINS))
+                    for call,(_, (source_path,_)) in zip(calls.call_args_list,importer.PINS.items(),strict=True):
+                        self.assertEqual(call.args,(["git","cat-file","blob",f"{revision}:{source_path}"],))
+                        self.assertEqual(call.kwargs,{"cwd":repo.resolve(strict=True)})
+                with patch.object(importer,"PINS",{**importer.PINS,"missing":("missing-source.blob","unused")}):
+                    output=Path(tmp)/"missing blob output"
+                    with patch.object(importer,"ASSETS",output),patch.object(sys,"argv",["prepare_gazelle.py","--legacy-repo",str(repo)]):
+                        with self.assertRaises(subprocess.CalledProcessError):
+                            importer.main()
+                    self.assertFalse(output.exists())
+                with self.assertRaises(FileNotFoundError):
+                    importer.read_legacy_inputs(repo/"missing directory")
+
     def test_loop_topology_mutation_and_corrupted_support_refuse(self):
         resource=importer.authenticated(self.inputs)
         model=resource["design"]
