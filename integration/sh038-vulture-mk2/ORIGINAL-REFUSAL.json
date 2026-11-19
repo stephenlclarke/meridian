@@ -1,0 +1,15 @@
+{
+  "validatorSHA256": "fef5d09229091438a0118182b23434f985f504ee78702185d554761b960f5477",
+  "packageSHA256": "830146297942971a87cef9c9d8527f15c48ccd1ecdd87d16b5c2b39ae1fcf208",
+  "exitCode": 1,
+  "report": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "message": "native: invalid vertex, triangle or group cardinality (face limit 512)"
+      }
+    ],
+    "clearances": [],
+    "supportGroups": []
+  }
+}
