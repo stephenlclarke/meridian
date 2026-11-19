@@ -1270,6 +1270,7 @@ impl App {
 
 impl ApplicationHandler for App {
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
+        self.resume_audio();
         if self.renderer.is_some() {
             return;
         }
@@ -1376,7 +1377,7 @@ impl ApplicationHandler for App {
     }
 
     fn suspended(&mut self, _event_loop: &ActiveEventLoop) {
-        self.shutdown_audio();
+        self.suspend_audio();
     }
 
     fn exiting(&mut self, _event_loop: &ActiveEventLoop) {

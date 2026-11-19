@@ -35,6 +35,7 @@ pub(crate) struct DesktopAudio {
     missile_notice: bool,
     journal: DischargeJournal,
     muted: bool,
+    suspended: bool,
 }
 
 impl DesktopAudio {
@@ -47,6 +48,7 @@ impl DesktopAudio {
             missile_notice: false,
             journal: DischargeJournal::default(),
             muted: false,
+            suspended: false,
         }
     }
 
@@ -60,7 +62,31 @@ impl DesktopAudio {
     }
 
     pub(crate) fn shutdown(&mut self) {
+        self.suspended = false;
         self.presenter.shutdown();
+    }
+
+    pub(crate) fn suspend(&mut self) {
+        if self.status() != OutputStatus::Shutdown {
+            self.suspended = true;
+            self.presenter.shutdown();
+        }
+    }
+
+    pub(crate) fn resume(
+        &mut self,
+        output: impl FnOnce() -> Box<dyn AudioOutput>,
+        current: Option<(bool, bool)>,
+    ) {
+        if !self.suspended {
+            return;
+        }
+        self.suspended = false;
+        self.presenter = AudioPresenter::new(output());
+        self.presenter.set_muted(self.muted);
+        if let Some((docked, missile_notice)) = current {
+            self.prime(docked, missile_notice);
+        }
     }
 
     pub(crate) fn begin(&mut self, docked: bool) {

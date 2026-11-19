@@ -73,6 +73,72 @@ fn attach_audio(app: &mut App) -> std::rc::Rc<std::cell::RefCell<AudioRecording>
 }
 
 #[test]
+fn audio_resume_reopens_once_and_primes_live_missile_without_replay() {
+    use crate::audio::SoundEffect::{Laser, Launch, Ping};
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    let original = attach_audio(&mut app);
+    let review = ok(app.game.world.review_practice(0));
+    ok(app.game.world.prepare_practice_confirmation(review, 0)).commit();
+    app.game_key(KeyCode::KeyL);
+    app.advance_frame(true, 1);
+    app.game_key(KeyCode::F1);
+    app.game_key(KeyCode::F2);
+    app.game_key(KeyCode::F3);
+    assert_eq!(original.borrow().sounds, [Launch, Ping]);
+    app.suspend_audio();
+    app.suspend_audio();
+    assert_eq!(original.borrow().shutdowns, 1);
+    app.keys.insert(KeyCode::KeyZ);
+    app.advance_frame(true, 1); // accepted while output is suspended
+    assert_eq!(original.borrow().sounds, [Launch, Ping]);
+    let resumed = std::rc::Rc::new(std::cell::RefCell::new(AudioRecording::default()));
+    app.resume_audio_with(|| Box::new(RecordedAudio(resumed.clone())));
+    app.resume_audio_with(|| panic!("duplicate resume must not open another device"));
+    app.publish_audio(false);
+    assert!(resumed.borrow().sounds.is_empty());
+    app.advance_frame(true, usize::from(meridian_core::PULSE_COOLDOWN_TICKS));
+    assert_eq!(resumed.borrow().sounds, [Laser]);
+    app.shutdown_audio();
+    app.resume_audio_with(|| panic!("terminal shutdown must not reopen audio"));
+    assert_eq!(resumed.borrow().shutdowns, 1);
+}
+
+#[test]
+fn audio_resume_preserves_mute_and_terminal_shutdown_while_suspended() {
+    use crate::audio::SoundEffect::Laser;
+    use winit::keyboard::ModifiersState;
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    let original = attach_audio(&mut app);
+    app.modifiers = ModifiersState::CONTROL | ModifiersState::SHIFT;
+    assert_eq!(
+        key(&mut app, KeyCode::KeyM, ElementState::Pressed, false, None),
+        None
+    );
+    launched(&mut app);
+    app.suspend_audio();
+    let resumed = std::rc::Rc::new(std::cell::RefCell::new(AudioRecording::default()));
+    app.resume_audio_with(|| Box::new(RecordedAudio(resumed.clone())));
+    assert!(app.audio_help_line().ends_with("Muted"));
+    app.keys.insert(KeyCode::KeyZ);
+    app.advance_frame(true, 1);
+    assert!(original.borrow().sounds.is_empty());
+    assert!(resumed.borrow().sounds.is_empty());
+    assert_eq!(
+        key(&mut app, KeyCode::KeyM, ElementState::Pressed, false, None),
+        None
+    );
+    assert!(resumed.borrow().sounds.is_empty());
+    app.advance_frame(true, usize::from(meridian_core::PULSE_COOLDOWN_TICKS));
+    assert_eq!(resumed.borrow().sounds, [Laser]);
+    app.suspend_audio();
+    app.shutdown_audio();
+    app.resume_audio_with(|| panic!("terminal shutdown during suspension must not reopen"));
+    assert_eq!(resumed.borrow().shutdowns, 1);
+}
+
+#[test]
 fn actual_launch_and_front_laser_route_once_per_accepted_event() {
     use crate::audio::SoundEffect::{Laser, Launch};
     let directory = TestDirectory::new();
