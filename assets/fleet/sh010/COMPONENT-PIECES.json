@@ -1,0 +1,1881 @@
+{
+  "pieces": [
+    "left-rail",
+    "left-drive-arm",
+    "left-detailed-well-0",
+    "left-detailed-well-1",
+    "left-detailed-well-2",
+    "left-detailed-well-3",
+    "left-detailed-well-4",
+    "left-detailed-well-5",
+    "left-detailed-well-6",
+    "left-detailed-well-7",
+    "left-detailed-well-8",
+    "left-detailed-well-9",
+    "left-detailed-well-10",
+    "left-detailed-well-11",
+    "left-candidate-well-0",
+    "left-candidate-well-1",
+    "left-candidate-well-2",
+    "left-candidate-well-3",
+    "left-strut-0",
+    "left-strut-1",
+    "right-rail",
+    "right-drive-arm",
+    "right-detailed-well-0",
+    "right-detailed-well-1",
+    "right-detailed-well-2",
+    "right-detailed-well-3",
+    "right-detailed-well-4",
+    "right-detailed-well-5",
+    "right-detailed-well-6",
+    "right-detailed-well-7",
+    "right-detailed-well-8",
+    "right-detailed-well-9",
+    "right-detailed-well-10",
+    "right-detailed-well-11",
+    "right-candidate-well-0",
+    "right-candidate-well-1",
+    "right-candidate-well-2",
+    "right-candidate-well-3",
+    "right-strut-0",
+    "right-strut-1",
+    "fore-crossbrace",
+    "aft-crossbrace",
+    "primary-body",
+    "detailed-body-well-0",
+    "detailed-body-well-1",
+    "detailed-body-well-2",
+    "detailed-body-well-3",
+    "detailed-body-well-4",
+    "detailed-body-well-5",
+    "detailed-body-well-6",
+    "detailed-body-well-7",
+    "detailed-body-well-8",
+    "detailed-body-well-9",
+    "detailed-body-well-10",
+    "detailed-body-well-11",
+    "candidate-body-well-0",
+    "candidate-body-well-1",
+    "candidate-body-well-2",
+    "candidate-body-well-3",
+    "upper-body-strut",
+    "lower-body-strut",
+    "cockpit",
+    "cockpit-crossmember",
+    "left-engine-support",
+    "left-engine-casing",
+    "left-engine-recess",
+    "right-engine-support",
+    "right-engine-casing",
+    "right-engine-recess",
+    "left-lower-mount-upright",
+    "left-lower-mount-longitudinal-member",
+    "right-lower-mount-upright",
+    "right-lower-mount-longitudinal-member"
+  ],
+  "detailed": [
+    {
+      "component": 0,
+      "name": "wishbone connected arm",
+      "startVertex": 0,
+      "vertexCount": 8,
+      "startFace": 0,
+      "faceCount": 12,
+      "piece": 0
+    },
+    {
+      "component": 1,
+      "name": "wishbone forward envelope",
+      "startVertex": 8,
+      "vertexCount": 120,
+      "startFace": 12,
+      "faceCount": 236,
+      "piece": 1
+    },
+    {
+      "component": 2,
+      "name": "wishbone forward envelope/service-well-0-0",
+      "startVertex": 128,
+      "vertexCount": 12,
+      "startFace": 248,
+      "faceCount": 20,
+      "piece": 2
+    },
+    {
+      "component": 3,
+      "name": "wishbone forward envelope/service-well-0-0/recess-service-strut-0",
+      "startVertex": 140,
+      "vertexCount": 8,
+      "startFace": 268,
+      "faceCount": 12,
+      "piece": 2
+    },
+    {
+      "component": 4,
+      "name": "wishbone forward envelope/service-well-0-0/recess-service-strut-1",
+      "startVertex": 148,
+      "vertexCount": 8,
+      "startFace": 280,
+      "faceCount": 12,
+      "piece": 2
+    },
+    {
+      "component": 5,
+      "name": "wishbone forward envelope/service-well-0-0/recess-service-strut-2",
+      "startVertex": 156,
+      "vertexCount": 8,
+      "startFace": 292,
+      "faceCount": 12,
+      "piece": 2
+    },
+    {
+      "component": 6,
+      "name": "wishbone forward envelope/service-well-0-1",
+      "startVertex": 164,
+      "vertexCount": 12,
+      "startFace": 304,
+      "faceCount": 20,
+      "piece": 3
+    },
+    {
+      "component": 7,
+      "name": "wishbone forward envelope/service-well-0-1/recess-service-strut-0",
+      "startVertex": 176,
+      "vertexCount": 8,
+      "startFace": 324,
+      "faceCount": 12,
+      "piece": 3
+    },
+    {
+      "component": 8,
+      "name": "wishbone forward envelope/service-well-0-1/recess-service-strut-1",
+      "startVertex": 184,
+      "vertexCount": 8,
+      "startFace": 336,
+      "faceCount": 12,
+      "piece": 3
+    },
+    {
+      "component": 9,
+      "name": "wishbone forward envelope/service-well-0-1/recess-service-strut-2",
+      "startVertex": 192,
+      "vertexCount": 8,
+      "startFace": 348,
+      "faceCount": 12,
+      "piece": 3
+    },
+    {
+      "component": 10,
+      "name": "wishbone forward envelope/service-well-0-2",
+      "startVertex": 200,
+      "vertexCount": 12,
+      "startFace": 360,
+      "faceCount": 20,
+      "piece": 4
+    },
+    {
+      "component": 11,
+      "name": "wishbone forward envelope/service-well-0-2/recess-service-strut-0",
+      "startVertex": 212,
+      "vertexCount": 8,
+      "startFace": 380,
+      "faceCount": 12,
+      "piece": 4
+    },
+    {
+      "component": 12,
+      "name": "wishbone forward envelope/service-well-0-2/recess-service-strut-1",
+      "startVertex": 220,
+      "vertexCount": 8,
+      "startFace": 392,
+      "faceCount": 12,
+      "piece": 4
+    },
+    {
+      "component": 13,
+      "name": "wishbone forward envelope/service-well-0-2/recess-service-strut-2",
+      "startVertex": 228,
+      "vertexCount": 8,
+      "startFace": 404,
+      "faceCount": 12,
+      "piece": 4
+    },
+    {
+      "component": 14,
+      "name": "wishbone forward envelope/service-well-1-0",
+      "startVertex": 236,
+      "vertexCount": 12,
+      "startFace": 416,
+      "faceCount": 20,
+      "piece": 5
+    },
+    {
+      "component": 15,
+      "name": "wishbone forward envelope/service-well-1-0/recess-service-strut-0",
+      "startVertex": 248,
+      "vertexCount": 8,
+      "startFace": 436,
+      "faceCount": 12,
+      "piece": 5
+    },
+    {
+      "component": 16,
+      "name": "wishbone forward envelope/service-well-1-0/recess-service-strut-1",
+      "startVertex": 256,
+      "vertexCount": 8,
+      "startFace": 448,
+      "faceCount": 12,
+      "piece": 5
+    },
+    {
+      "component": 17,
+      "name": "wishbone forward envelope/service-well-1-0/recess-service-strut-2",
+      "startVertex": 264,
+      "vertexCount": 8,
+      "startFace": 460,
+      "faceCount": 12,
+      "piece": 5
+    },
+    {
+      "component": 18,
+      "name": "wishbone forward envelope/service-well-1-1",
+      "startVertex": 272,
+      "vertexCount": 12,
+      "startFace": 472,
+      "faceCount": 20,
+      "piece": 6
+    },
+    {
+      "component": 19,
+      "name": "wishbone forward envelope/service-well-1-1/recess-service-strut-0",
+      "startVertex": 284,
+      "vertexCount": 8,
+      "startFace": 492,
+      "faceCount": 12,
+      "piece": 6
+    },
+    {
+      "component": 20,
+      "name": "wishbone forward envelope/service-well-1-1/recess-service-strut-1",
+      "startVertex": 292,
+      "vertexCount": 8,
+      "startFace": 504,
+      "faceCount": 12,
+      "piece": 6
+    },
+    {
+      "component": 21,
+      "name": "wishbone forward envelope/service-well-1-1/recess-service-strut-2",
+      "startVertex": 300,
+      "vertexCount": 8,
+      "startFace": 516,
+      "faceCount": 12,
+      "piece": 6
+    },
+    {
+      "component": 22,
+      "name": "wishbone forward envelope/service-well-1-2",
+      "startVertex": 308,
+      "vertexCount": 12,
+      "startFace": 528,
+      "faceCount": 20,
+      "piece": 7
+    },
+    {
+      "component": 23,
+      "name": "wishbone forward envelope/service-well-1-2/recess-service-strut-0",
+      "startVertex": 320,
+      "vertexCount": 8,
+      "startFace": 548,
+      "faceCount": 12,
+      "piece": 7
+    },
+    {
+      "component": 24,
+      "name": "wishbone forward envelope/service-well-1-2/recess-service-strut-1",
+      "startVertex": 328,
+      "vertexCount": 8,
+      "startFace": 560,
+      "faceCount": 12,
+      "piece": 7
+    },
+    {
+      "component": 25,
+      "name": "wishbone forward envelope/service-well-1-2/recess-service-strut-2",
+      "startVertex": 336,
+      "vertexCount": 8,
+      "startFace": 572,
+      "faceCount": 12,
+      "piece": 7
+    },
+    {
+      "component": 26,
+      "name": "wishbone forward envelope/service-well-2-0",
+      "startVertex": 344,
+      "vertexCount": 12,
+      "startFace": 584,
+      "faceCount": 20,
+      "piece": 8
+    },
+    {
+      "component": 27,
+      "name": "wishbone forward envelope/service-well-2-0/recess-service-strut-0",
+      "startVertex": 356,
+      "vertexCount": 8,
+      "startFace": 604,
+      "faceCount": 12,
+      "piece": 8
+    },
+    {
+      "component": 28,
+      "name": "wishbone forward envelope/service-well-2-0/recess-service-strut-1",
+      "startVertex": 364,
+      "vertexCount": 8,
+      "startFace": 616,
+      "faceCount": 12,
+      "piece": 8
+    },
+    {
+      "component": 29,
+      "name": "wishbone forward envelope/service-well-2-0/recess-service-strut-2",
+      "startVertex": 372,
+      "vertexCount": 8,
+      "startFace": 628,
+      "faceCount": 12,
+      "piece": 8
+    },
+    {
+      "component": 30,
+      "name": "wishbone forward envelope/service-well-2-1",
+      "startVertex": 380,
+      "vertexCount": 12,
+      "startFace": 640,
+      "faceCount": 20,
+      "piece": 9
+    },
+    {
+      "component": 31,
+      "name": "wishbone forward envelope/service-well-2-1/recess-service-strut-0",
+      "startVertex": 392,
+      "vertexCount": 8,
+      "startFace": 660,
+      "faceCount": 12,
+      "piece": 9
+    },
+    {
+      "component": 32,
+      "name": "wishbone forward envelope/service-well-2-1/recess-service-strut-1",
+      "startVertex": 400,
+      "vertexCount": 8,
+      "startFace": 672,
+      "faceCount": 12,
+      "piece": 9
+    },
+    {
+      "component": 33,
+      "name": "wishbone forward envelope/service-well-2-1/recess-service-strut-2",
+      "startVertex": 408,
+      "vertexCount": 8,
+      "startFace": 684,
+      "faceCount": 12,
+      "piece": 9
+    },
+    {
+      "component": 34,
+      "name": "wishbone forward envelope/service-well-2-2",
+      "startVertex": 416,
+      "vertexCount": 12,
+      "startFace": 696,
+      "faceCount": 20,
+      "piece": 10
+    },
+    {
+      "component": 35,
+      "name": "wishbone forward envelope/service-well-2-2/recess-service-strut-0",
+      "startVertex": 428,
+      "vertexCount": 8,
+      "startFace": 716,
+      "faceCount": 12,
+      "piece": 10
+    },
+    {
+      "component": 36,
+      "name": "wishbone forward envelope/service-well-2-2/recess-service-strut-1",
+      "startVertex": 436,
+      "vertexCount": 8,
+      "startFace": 728,
+      "faceCount": 12,
+      "piece": 10
+    },
+    {
+      "component": 37,
+      "name": "wishbone forward envelope/service-well-2-2/recess-service-strut-2",
+      "startVertex": 444,
+      "vertexCount": 8,
+      "startFace": 740,
+      "faceCount": 12,
+      "piece": 10
+    },
+    {
+      "component": 38,
+      "name": "wishbone forward envelope/service-well-3-0",
+      "startVertex": 452,
+      "vertexCount": 12,
+      "startFace": 752,
+      "faceCount": 20,
+      "piece": 11
+    },
+    {
+      "component": 39,
+      "name": "wishbone forward envelope/service-well-3-0/recess-service-strut-0",
+      "startVertex": 464,
+      "vertexCount": 8,
+      "startFace": 772,
+      "faceCount": 12,
+      "piece": 11
+    },
+    {
+      "component": 40,
+      "name": "wishbone forward envelope/service-well-3-0/recess-service-strut-1",
+      "startVertex": 472,
+      "vertexCount": 8,
+      "startFace": 784,
+      "faceCount": 12,
+      "piece": 11
+    },
+    {
+      "component": 41,
+      "name": "wishbone forward envelope/service-well-3-0/recess-service-strut-2",
+      "startVertex": 480,
+      "vertexCount": 8,
+      "startFace": 796,
+      "faceCount": 12,
+      "piece": 11
+    },
+    {
+      "component": 42,
+      "name": "wishbone forward envelope/service-well-3-1",
+      "startVertex": 488,
+      "vertexCount": 12,
+      "startFace": 808,
+      "faceCount": 20,
+      "piece": 12
+    },
+    {
+      "component": 43,
+      "name": "wishbone forward envelope/service-well-3-1/recess-service-strut-0",
+      "startVertex": 500,
+      "vertexCount": 8,
+      "startFace": 828,
+      "faceCount": 12,
+      "piece": 12
+    },
+    {
+      "component": 44,
+      "name": "wishbone forward envelope/service-well-3-1/recess-service-strut-1",
+      "startVertex": 508,
+      "vertexCount": 8,
+      "startFace": 840,
+      "faceCount": 12,
+      "piece": 12
+    },
+    {
+      "component": 45,
+      "name": "wishbone forward envelope/service-well-3-1/recess-service-strut-2",
+      "startVertex": 516,
+      "vertexCount": 8,
+      "startFace": 852,
+      "faceCount": 12,
+      "piece": 12
+    },
+    {
+      "component": 46,
+      "name": "wishbone forward envelope/service-well-3-2",
+      "startVertex": 524,
+      "vertexCount": 12,
+      "startFace": 864,
+      "faceCount": 20,
+      "piece": 13
+    },
+    {
+      "component": 47,
+      "name": "wishbone forward envelope/service-well-3-2/recess-service-strut-0",
+      "startVertex": 536,
+      "vertexCount": 8,
+      "startFace": 884,
+      "faceCount": 12,
+      "piece": 13
+    },
+    {
+      "component": 48,
+      "name": "wishbone forward envelope/service-well-3-2/recess-service-strut-1",
+      "startVertex": 544,
+      "vertexCount": 8,
+      "startFace": 896,
+      "faceCount": 12,
+      "piece": 13
+    },
+    {
+      "component": 49,
+      "name": "wishbone forward envelope/service-well-3-2/recess-service-strut-2",
+      "startVertex": 552,
+      "vertexCount": 8,
+      "startFace": 908,
+      "faceCount": 12,
+      "piece": 13
+    },
+    {
+      "component": 50,
+      "name": "wishbone forward envelope/longitudinal-service-strut-0",
+      "startVertex": 560,
+      "vertexCount": 8,
+      "startFace": 920,
+      "faceCount": 12,
+      "piece": 18
+    },
+    {
+      "component": 51,
+      "name": "wishbone forward envelope/longitudinal-service-strut-1",
+      "startVertex": 568,
+      "vertexCount": 8,
+      "startFace": 932,
+      "faceCount": 12,
+      "piece": 19
+    },
+    {
+      "component": 52,
+      "name": "wishbone connected arm",
+      "startVertex": 576,
+      "vertexCount": 8,
+      "startFace": 944,
+      "faceCount": 12,
+      "piece": 20
+    },
+    {
+      "component": 53,
+      "name": "wishbone forward envelope",
+      "startVertex": 584,
+      "vertexCount": 120,
+      "startFace": 956,
+      "faceCount": 236,
+      "piece": 21
+    },
+    {
+      "component": 54,
+      "name": "wishbone forward envelope/service-well-0-0",
+      "startVertex": 704,
+      "vertexCount": 12,
+      "startFace": 1192,
+      "faceCount": 20,
+      "piece": 22
+    },
+    {
+      "component": 55,
+      "name": "wishbone forward envelope/service-well-0-0/recess-service-strut-0",
+      "startVertex": 716,
+      "vertexCount": 8,
+      "startFace": 1212,
+      "faceCount": 12,
+      "piece": 22
+    },
+    {
+      "component": 56,
+      "name": "wishbone forward envelope/service-well-0-0/recess-service-strut-1",
+      "startVertex": 724,
+      "vertexCount": 8,
+      "startFace": 1224,
+      "faceCount": 12,
+      "piece": 22
+    },
+    {
+      "component": 57,
+      "name": "wishbone forward envelope/service-well-0-0/recess-service-strut-2",
+      "startVertex": 732,
+      "vertexCount": 8,
+      "startFace": 1236,
+      "faceCount": 12,
+      "piece": 22
+    },
+    {
+      "component": 58,
+      "name": "wishbone forward envelope/service-well-0-1",
+      "startVertex": 740,
+      "vertexCount": 12,
+      "startFace": 1248,
+      "faceCount": 20,
+      "piece": 23
+    },
+    {
+      "component": 59,
+      "name": "wishbone forward envelope/service-well-0-1/recess-service-strut-0",
+      "startVertex": 752,
+      "vertexCount": 8,
+      "startFace": 1268,
+      "faceCount": 12,
+      "piece": 23
+    },
+    {
+      "component": 60,
+      "name": "wishbone forward envelope/service-well-0-1/recess-service-strut-1",
+      "startVertex": 760,
+      "vertexCount": 8,
+      "startFace": 1280,
+      "faceCount": 12,
+      "piece": 23
+    },
+    {
+      "component": 61,
+      "name": "wishbone forward envelope/service-well-0-1/recess-service-strut-2",
+      "startVertex": 768,
+      "vertexCount": 8,
+      "startFace": 1292,
+      "faceCount": 12,
+      "piece": 23
+    },
+    {
+      "component": 62,
+      "name": "wishbone forward envelope/service-well-0-2",
+      "startVertex": 776,
+      "vertexCount": 12,
+      "startFace": 1304,
+      "faceCount": 20,
+      "piece": 24
+    },
+    {
+      "component": 63,
+      "name": "wishbone forward envelope/service-well-0-2/recess-service-strut-0",
+      "startVertex": 788,
+      "vertexCount": 8,
+      "startFace": 1324,
+      "faceCount": 12,
+      "piece": 24
+    },
+    {
+      "component": 64,
+      "name": "wishbone forward envelope/service-well-0-2/recess-service-strut-1",
+      "startVertex": 796,
+      "vertexCount": 8,
+      "startFace": 1336,
+      "faceCount": 12,
+      "piece": 24
+    },
+    {
+      "component": 65,
+      "name": "wishbone forward envelope/service-well-0-2/recess-service-strut-2",
+      "startVertex": 804,
+      "vertexCount": 8,
+      "startFace": 1348,
+      "faceCount": 12,
+      "piece": 24
+    },
+    {
+      "component": 66,
+      "name": "wishbone forward envelope/service-well-1-0",
+      "startVertex": 812,
+      "vertexCount": 12,
+      "startFace": 1360,
+      "faceCount": 20,
+      "piece": 25
+    },
+    {
+      "component": 67,
+      "name": "wishbone forward envelope/service-well-1-0/recess-service-strut-0",
+      "startVertex": 824,
+      "vertexCount": 8,
+      "startFace": 1380,
+      "faceCount": 12,
+      "piece": 25
+    },
+    {
+      "component": 68,
+      "name": "wishbone forward envelope/service-well-1-0/recess-service-strut-1",
+      "startVertex": 832,
+      "vertexCount": 8,
+      "startFace": 1392,
+      "faceCount": 12,
+      "piece": 25
+    },
+    {
+      "component": 69,
+      "name": "wishbone forward envelope/service-well-1-0/recess-service-strut-2",
+      "startVertex": 840,
+      "vertexCount": 8,
+      "startFace": 1404,
+      "faceCount": 12,
+      "piece": 25
+    },
+    {
+      "component": 70,
+      "name": "wishbone forward envelope/service-well-1-1",
+      "startVertex": 848,
+      "vertexCount": 12,
+      "startFace": 1416,
+      "faceCount": 20,
+      "piece": 26
+    },
+    {
+      "component": 71,
+      "name": "wishbone forward envelope/service-well-1-1/recess-service-strut-0",
+      "startVertex": 860,
+      "vertexCount": 8,
+      "startFace": 1436,
+      "faceCount": 12,
+      "piece": 26
+    },
+    {
+      "component": 72,
+      "name": "wishbone forward envelope/service-well-1-1/recess-service-strut-1",
+      "startVertex": 868,
+      "vertexCount": 8,
+      "startFace": 1448,
+      "faceCount": 12,
+      "piece": 26
+    },
+    {
+      "component": 73,
+      "name": "wishbone forward envelope/service-well-1-1/recess-service-strut-2",
+      "startVertex": 876,
+      "vertexCount": 8,
+      "startFace": 1460,
+      "faceCount": 12,
+      "piece": 26
+    },
+    {
+      "component": 74,
+      "name": "wishbone forward envelope/service-well-1-2",
+      "startVertex": 884,
+      "vertexCount": 12,
+      "startFace": 1472,
+      "faceCount": 20,
+      "piece": 27
+    },
+    {
+      "component": 75,
+      "name": "wishbone forward envelope/service-well-1-2/recess-service-strut-0",
+      "startVertex": 896,
+      "vertexCount": 8,
+      "startFace": 1492,
+      "faceCount": 12,
+      "piece": 27
+    },
+    {
+      "component": 76,
+      "name": "wishbone forward envelope/service-well-1-2/recess-service-strut-1",
+      "startVertex": 904,
+      "vertexCount": 8,
+      "startFace": 1504,
+      "faceCount": 12,
+      "piece": 27
+    },
+    {
+      "component": 77,
+      "name": "wishbone forward envelope/service-well-1-2/recess-service-strut-2",
+      "startVertex": 912,
+      "vertexCount": 8,
+      "startFace": 1516,
+      "faceCount": 12,
+      "piece": 27
+    },
+    {
+      "component": 78,
+      "name": "wishbone forward envelope/service-well-2-0",
+      "startVertex": 920,
+      "vertexCount": 12,
+      "startFace": 1528,
+      "faceCount": 20,
+      "piece": 28
+    },
+    {
+      "component": 79,
+      "name": "wishbone forward envelope/service-well-2-0/recess-service-strut-0",
+      "startVertex": 932,
+      "vertexCount": 8,
+      "startFace": 1548,
+      "faceCount": 12,
+      "piece": 28
+    },
+    {
+      "component": 80,
+      "name": "wishbone forward envelope/service-well-2-0/recess-service-strut-1",
+      "startVertex": 940,
+      "vertexCount": 8,
+      "startFace": 1560,
+      "faceCount": 12,
+      "piece": 28
+    },
+    {
+      "component": 81,
+      "name": "wishbone forward envelope/service-well-2-0/recess-service-strut-2",
+      "startVertex": 948,
+      "vertexCount": 8,
+      "startFace": 1572,
+      "faceCount": 12,
+      "piece": 28
+    },
+    {
+      "component": 82,
+      "name": "wishbone forward envelope/service-well-2-1",
+      "startVertex": 956,
+      "vertexCount": 12,
+      "startFace": 1584,
+      "faceCount": 20,
+      "piece": 29
+    },
+    {
+      "component": 83,
+      "name": "wishbone forward envelope/service-well-2-1/recess-service-strut-0",
+      "startVertex": 968,
+      "vertexCount": 8,
+      "startFace": 1604,
+      "faceCount": 12,
+      "piece": 29
+    },
+    {
+      "component": 84,
+      "name": "wishbone forward envelope/service-well-2-1/recess-service-strut-1",
+      "startVertex": 976,
+      "vertexCount": 8,
+      "startFace": 1616,
+      "faceCount": 12,
+      "piece": 29
+    },
+    {
+      "component": 85,
+      "name": "wishbone forward envelope/service-well-2-1/recess-service-strut-2",
+      "startVertex": 984,
+      "vertexCount": 8,
+      "startFace": 1628,
+      "faceCount": 12,
+      "piece": 29
+    },
+    {
+      "component": 86,
+      "name": "wishbone forward envelope/service-well-2-2",
+      "startVertex": 992,
+      "vertexCount": 12,
+      "startFace": 1640,
+      "faceCount": 20,
+      "piece": 30
+    },
+    {
+      "component": 87,
+      "name": "wishbone forward envelope/service-well-2-2/recess-service-strut-0",
+      "startVertex": 1004,
+      "vertexCount": 8,
+      "startFace": 1660,
+      "faceCount": 12,
+      "piece": 30
+    },
+    {
+      "component": 88,
+      "name": "wishbone forward envelope/service-well-2-2/recess-service-strut-1",
+      "startVertex": 1012,
+      "vertexCount": 8,
+      "startFace": 1672,
+      "faceCount": 12,
+      "piece": 30
+    },
+    {
+      "component": 89,
+      "name": "wishbone forward envelope/service-well-2-2/recess-service-strut-2",
+      "startVertex": 1020,
+      "vertexCount": 8,
+      "startFace": 1684,
+      "faceCount": 12,
+      "piece": 30
+    },
+    {
+      "component": 90,
+      "name": "wishbone forward envelope/service-well-3-0",
+      "startVertex": 1028,
+      "vertexCount": 12,
+      "startFace": 1696,
+      "faceCount": 20,
+      "piece": 31
+    },
+    {
+      "component": 91,
+      "name": "wishbone forward envelope/service-well-3-0/recess-service-strut-0",
+      "startVertex": 1040,
+      "vertexCount": 8,
+      "startFace": 1716,
+      "faceCount": 12,
+      "piece": 31
+    },
+    {
+      "component": 92,
+      "name": "wishbone forward envelope/service-well-3-0/recess-service-strut-1",
+      "startVertex": 1048,
+      "vertexCount": 8,
+      "startFace": 1728,
+      "faceCount": 12,
+      "piece": 31
+    },
+    {
+      "component": 93,
+      "name": "wishbone forward envelope/service-well-3-0/recess-service-strut-2",
+      "startVertex": 1056,
+      "vertexCount": 8,
+      "startFace": 1740,
+      "faceCount": 12,
+      "piece": 31
+    },
+    {
+      "component": 94,
+      "name": "wishbone forward envelope/service-well-3-1",
+      "startVertex": 1064,
+      "vertexCount": 12,
+      "startFace": 1752,
+      "faceCount": 20,
+      "piece": 32
+    },
+    {
+      "component": 95,
+      "name": "wishbone forward envelope/service-well-3-1/recess-service-strut-0",
+      "startVertex": 1076,
+      "vertexCount": 8,
+      "startFace": 1772,
+      "faceCount": 12,
+      "piece": 32
+    },
+    {
+      "component": 96,
+      "name": "wishbone forward envelope/service-well-3-1/recess-service-strut-1",
+      "startVertex": 1084,
+      "vertexCount": 8,
+      "startFace": 1784,
+      "faceCount": 12,
+      "piece": 32
+    },
+    {
+      "component": 97,
+      "name": "wishbone forward envelope/service-well-3-1/recess-service-strut-2",
+      "startVertex": 1092,
+      "vertexCount": 8,
+      "startFace": 1796,
+      "faceCount": 12,
+      "piece": 32
+    },
+    {
+      "component": 98,
+      "name": "wishbone forward envelope/service-well-3-2",
+      "startVertex": 1100,
+      "vertexCount": 12,
+      "startFace": 1808,
+      "faceCount": 20,
+      "piece": 33
+    },
+    {
+      "component": 99,
+      "name": "wishbone forward envelope/service-well-3-2/recess-service-strut-0",
+      "startVertex": 1112,
+      "vertexCount": 8,
+      "startFace": 1828,
+      "faceCount": 12,
+      "piece": 33
+    },
+    {
+      "component": 100,
+      "name": "wishbone forward envelope/service-well-3-2/recess-service-strut-1",
+      "startVertex": 1120,
+      "vertexCount": 8,
+      "startFace": 1840,
+      "faceCount": 12,
+      "piece": 33
+    },
+    {
+      "component": 101,
+      "name": "wishbone forward envelope/service-well-3-2/recess-service-strut-2",
+      "startVertex": 1128,
+      "vertexCount": 8,
+      "startFace": 1852,
+      "faceCount": 12,
+      "piece": 33
+    },
+    {
+      "component": 102,
+      "name": "wishbone forward envelope/longitudinal-service-strut-0",
+      "startVertex": 1136,
+      "vertexCount": 8,
+      "startFace": 1864,
+      "faceCount": 12,
+      "piece": 38
+    },
+    {
+      "component": 103,
+      "name": "wishbone forward envelope/longitudinal-service-strut-1",
+      "startVertex": 1144,
+      "vertexCount": 8,
+      "startFace": 1876,
+      "faceCount": 12,
+      "piece": 39
+    },
+    {
+      "component": 104,
+      "name": "wishbone forward cross bridge",
+      "startVertex": 1152,
+      "vertexCount": 8,
+      "startFace": 1888,
+      "faceCount": 12,
+      "piece": 40
+    },
+    {
+      "component": 105,
+      "name": "aft transverse bridge",
+      "startVertex": 1160,
+      "vertexCount": 8,
+      "startFace": 1900,
+      "faceCount": 12,
+      "piece": 41
+    },
+    {
+      "component": 106,
+      "name": "body primary pressure envelope",
+      "startVertex": 1168,
+      "vertexCount": 120,
+      "startFace": 1912,
+      "faceCount": 236,
+      "piece": 42
+    },
+    {
+      "component": 107,
+      "name": "body primary pressure envelope/service-well-0-0",
+      "startVertex": 1288,
+      "vertexCount": 12,
+      "startFace": 2148,
+      "faceCount": 20,
+      "piece": 43
+    },
+    {
+      "component": 108,
+      "name": "body primary pressure envelope/service-well-0-0/recess-service-strut-0",
+      "startVertex": 1300,
+      "vertexCount": 8,
+      "startFace": 2168,
+      "faceCount": 12,
+      "piece": 43
+    },
+    {
+      "component": 109,
+      "name": "body primary pressure envelope/service-well-0-0/recess-service-strut-1",
+      "startVertex": 1308,
+      "vertexCount": 8,
+      "startFace": 2180,
+      "faceCount": 12,
+      "piece": 43
+    },
+    {
+      "component": 110,
+      "name": "body primary pressure envelope/service-well-0-0/recess-service-strut-2",
+      "startVertex": 1316,
+      "vertexCount": 8,
+      "startFace": 2192,
+      "faceCount": 12,
+      "piece": 43
+    },
+    {
+      "component": 111,
+      "name": "body primary pressure envelope/service-well-0-1",
+      "startVertex": 1324,
+      "vertexCount": 12,
+      "startFace": 2204,
+      "faceCount": 20,
+      "piece": 44
+    },
+    {
+      "component": 112,
+      "name": "body primary pressure envelope/service-well-0-1/recess-service-strut-0",
+      "startVertex": 1336,
+      "vertexCount": 8,
+      "startFace": 2224,
+      "faceCount": 12,
+      "piece": 44
+    },
+    {
+      "component": 113,
+      "name": "body primary pressure envelope/service-well-0-1/recess-service-strut-1",
+      "startVertex": 1344,
+      "vertexCount": 8,
+      "startFace": 2236,
+      "faceCount": 12,
+      "piece": 44
+    },
+    {
+      "component": 114,
+      "name": "body primary pressure envelope/service-well-0-1/recess-service-strut-2",
+      "startVertex": 1352,
+      "vertexCount": 8,
+      "startFace": 2248,
+      "faceCount": 12,
+      "piece": 44
+    },
+    {
+      "component": 115,
+      "name": "body primary pressure envelope/service-well-0-2",
+      "startVertex": 1360,
+      "vertexCount": 12,
+      "startFace": 2260,
+      "faceCount": 20,
+      "piece": 45
+    },
+    {
+      "component": 116,
+      "name": "body primary pressure envelope/service-well-0-2/recess-service-strut-0",
+      "startVertex": 1372,
+      "vertexCount": 8,
+      "startFace": 2280,
+      "faceCount": 12,
+      "piece": 45
+    },
+    {
+      "component": 117,
+      "name": "body primary pressure envelope/service-well-0-2/recess-service-strut-1",
+      "startVertex": 1380,
+      "vertexCount": 8,
+      "startFace": 2292,
+      "faceCount": 12,
+      "piece": 45
+    },
+    {
+      "component": 118,
+      "name": "body primary pressure envelope/service-well-0-2/recess-service-strut-2",
+      "startVertex": 1388,
+      "vertexCount": 8,
+      "startFace": 2304,
+      "faceCount": 12,
+      "piece": 45
+    },
+    {
+      "component": 119,
+      "name": "body primary pressure envelope/service-well-1-0",
+      "startVertex": 1396,
+      "vertexCount": 12,
+      "startFace": 2316,
+      "faceCount": 20,
+      "piece": 46
+    },
+    {
+      "component": 120,
+      "name": "body primary pressure envelope/service-well-1-0/recess-service-strut-0",
+      "startVertex": 1408,
+      "vertexCount": 8,
+      "startFace": 2336,
+      "faceCount": 12,
+      "piece": 46
+    },
+    {
+      "component": 121,
+      "name": "body primary pressure envelope/service-well-1-0/recess-service-strut-1",
+      "startVertex": 1416,
+      "vertexCount": 8,
+      "startFace": 2348,
+      "faceCount": 12,
+      "piece": 46
+    },
+    {
+      "component": 122,
+      "name": "body primary pressure envelope/service-well-1-0/recess-service-strut-2",
+      "startVertex": 1424,
+      "vertexCount": 8,
+      "startFace": 2360,
+      "faceCount": 12,
+      "piece": 46
+    },
+    {
+      "component": 123,
+      "name": "body primary pressure envelope/service-well-1-1",
+      "startVertex": 1432,
+      "vertexCount": 12,
+      "startFace": 2372,
+      "faceCount": 20,
+      "piece": 47
+    },
+    {
+      "component": 124,
+      "name": "body primary pressure envelope/service-well-1-1/recess-service-strut-0",
+      "startVertex": 1444,
+      "vertexCount": 8,
+      "startFace": 2392,
+      "faceCount": 12,
+      "piece": 47
+    },
+    {
+      "component": 125,
+      "name": "body primary pressure envelope/service-well-1-1/recess-service-strut-1",
+      "startVertex": 1452,
+      "vertexCount": 8,
+      "startFace": 2404,
+      "faceCount": 12,
+      "piece": 47
+    },
+    {
+      "component": 126,
+      "name": "body primary pressure envelope/service-well-1-1/recess-service-strut-2",
+      "startVertex": 1460,
+      "vertexCount": 8,
+      "startFace": 2416,
+      "faceCount": 12,
+      "piece": 47
+    },
+    {
+      "component": 127,
+      "name": "body primary pressure envelope/service-well-1-2",
+      "startVertex": 1468,
+      "vertexCount": 12,
+      "startFace": 2428,
+      "faceCount": 20,
+      "piece": 48
+    },
+    {
+      "component": 128,
+      "name": "body primary pressure envelope/service-well-1-2/recess-service-strut-0",
+      "startVertex": 1480,
+      "vertexCount": 8,
+      "startFace": 2448,
+      "faceCount": 12,
+      "piece": 48
+    },
+    {
+      "component": 129,
+      "name": "body primary pressure envelope/service-well-1-2/recess-service-strut-1",
+      "startVertex": 1488,
+      "vertexCount": 8,
+      "startFace": 2460,
+      "faceCount": 12,
+      "piece": 48
+    },
+    {
+      "component": 130,
+      "name": "body primary pressure envelope/service-well-1-2/recess-service-strut-2",
+      "startVertex": 1496,
+      "vertexCount": 8,
+      "startFace": 2472,
+      "faceCount": 12,
+      "piece": 48
+    },
+    {
+      "component": 131,
+      "name": "body primary pressure envelope/service-well-2-0",
+      "startVertex": 1504,
+      "vertexCount": 12,
+      "startFace": 2484,
+      "faceCount": 20,
+      "piece": 49
+    },
+    {
+      "component": 132,
+      "name": "body primary pressure envelope/service-well-2-0/recess-service-strut-0",
+      "startVertex": 1516,
+      "vertexCount": 8,
+      "startFace": 2504,
+      "faceCount": 12,
+      "piece": 49
+    },
+    {
+      "component": 133,
+      "name": "body primary pressure envelope/service-well-2-0/recess-service-strut-1",
+      "startVertex": 1524,
+      "vertexCount": 8,
+      "startFace": 2516,
+      "faceCount": 12,
+      "piece": 49
+    },
+    {
+      "component": 134,
+      "name": "body primary pressure envelope/service-well-2-0/recess-service-strut-2",
+      "startVertex": 1532,
+      "vertexCount": 8,
+      "startFace": 2528,
+      "faceCount": 12,
+      "piece": 49
+    },
+    {
+      "component": 135,
+      "name": "body primary pressure envelope/service-well-2-1",
+      "startVertex": 1540,
+      "vertexCount": 12,
+      "startFace": 2540,
+      "faceCount": 20,
+      "piece": 50
+    },
+    {
+      "component": 136,
+      "name": "body primary pressure envelope/service-well-2-1/recess-service-strut-0",
+      "startVertex": 1552,
+      "vertexCount": 8,
+      "startFace": 2560,
+      "faceCount": 12,
+      "piece": 50
+    },
+    {
+      "component": 137,
+      "name": "body primary pressure envelope/service-well-2-1/recess-service-strut-1",
+      "startVertex": 1560,
+      "vertexCount": 8,
+      "startFace": 2572,
+      "faceCount": 12,
+      "piece": 50
+    },
+    {
+      "component": 138,
+      "name": "body primary pressure envelope/service-well-2-1/recess-service-strut-2",
+      "startVertex": 1568,
+      "vertexCount": 8,
+      "startFace": 2584,
+      "faceCount": 12,
+      "piece": 50
+    },
+    {
+      "component": 139,
+      "name": "body primary pressure envelope/service-well-2-2",
+      "startVertex": 1576,
+      "vertexCount": 12,
+      "startFace": 2596,
+      "faceCount": 20,
+      "piece": 51
+    },
+    {
+      "component": 140,
+      "name": "body primary pressure envelope/service-well-2-2/recess-service-strut-0",
+      "startVertex": 1588,
+      "vertexCount": 8,
+      "startFace": 2616,
+      "faceCount": 12,
+      "piece": 51
+    },
+    {
+      "component": 141,
+      "name": "body primary pressure envelope/service-well-2-2/recess-service-strut-1",
+      "startVertex": 1596,
+      "vertexCount": 8,
+      "startFace": 2628,
+      "faceCount": 12,
+      "piece": 51
+    },
+    {
+      "component": 142,
+      "name": "body primary pressure envelope/service-well-2-2/recess-service-strut-2",
+      "startVertex": 1604,
+      "vertexCount": 8,
+      "startFace": 2640,
+      "faceCount": 12,
+      "piece": 51
+    },
+    {
+      "component": 143,
+      "name": "body primary pressure envelope/service-well-3-0",
+      "startVertex": 1612,
+      "vertexCount": 12,
+      "startFace": 2652,
+      "faceCount": 20,
+      "piece": 52
+    },
+    {
+      "component": 144,
+      "name": "body primary pressure envelope/service-well-3-0/recess-service-strut-0",
+      "startVertex": 1624,
+      "vertexCount": 8,
+      "startFace": 2672,
+      "faceCount": 12,
+      "piece": 52
+    },
+    {
+      "component": 145,
+      "name": "body primary pressure envelope/service-well-3-0/recess-service-strut-1",
+      "startVertex": 1632,
+      "vertexCount": 8,
+      "startFace": 2684,
+      "faceCount": 12,
+      "piece": 52
+    },
+    {
+      "component": 146,
+      "name": "body primary pressure envelope/service-well-3-0/recess-service-strut-2",
+      "startVertex": 1640,
+      "vertexCount": 8,
+      "startFace": 2696,
+      "faceCount": 12,
+      "piece": 52
+    },
+    {
+      "component": 147,
+      "name": "body primary pressure envelope/service-well-3-1",
+      "startVertex": 1648,
+      "vertexCount": 12,
+      "startFace": 2708,
+      "faceCount": 20,
+      "piece": 53
+    },
+    {
+      "component": 148,
+      "name": "body primary pressure envelope/service-well-3-1/recess-service-strut-0",
+      "startVertex": 1660,
+      "vertexCount": 8,
+      "startFace": 2728,
+      "faceCount": 12,
+      "piece": 53
+    },
+    {
+      "component": 149,
+      "name": "body primary pressure envelope/service-well-3-1/recess-service-strut-1",
+      "startVertex": 1668,
+      "vertexCount": 8,
+      "startFace": 2740,
+      "faceCount": 12,
+      "piece": 53
+    },
+    {
+      "component": 150,
+      "name": "body primary pressure envelope/service-well-3-1/recess-service-strut-2",
+      "startVertex": 1676,
+      "vertexCount": 8,
+      "startFace": 2752,
+      "faceCount": 12,
+      "piece": 53
+    },
+    {
+      "component": 151,
+      "name": "body primary pressure envelope/service-well-3-2",
+      "startVertex": 1684,
+      "vertexCount": 12,
+      "startFace": 2764,
+      "faceCount": 20,
+      "piece": 54
+    },
+    {
+      "component": 152,
+      "name": "body primary pressure envelope/service-well-3-2/recess-service-strut-0",
+      "startVertex": 1696,
+      "vertexCount": 8,
+      "startFace": 2784,
+      "faceCount": 12,
+      "piece": 54
+    },
+    {
+      "component": 153,
+      "name": "body primary pressure envelope/service-well-3-2/recess-service-strut-1",
+      "startVertex": 1704,
+      "vertexCount": 8,
+      "startFace": 2796,
+      "faceCount": 12,
+      "piece": 54
+    },
+    {
+      "component": 154,
+      "name": "body primary pressure envelope/service-well-3-2/recess-service-strut-2",
+      "startVertex": 1712,
+      "vertexCount": 8,
+      "startFace": 2808,
+      "faceCount": 12,
+      "piece": 54
+    },
+    {
+      "component": 155,
+      "name": "body primary pressure envelope/longitudinal-service-strut-0",
+      "startVertex": 1720,
+      "vertexCount": 8,
+      "startFace": 2820,
+      "faceCount": 12,
+      "piece": 59
+    },
+    {
+      "component": 156,
+      "name": "body primary pressure envelope/longitudinal-service-strut-1",
+      "startVertex": 1728,
+      "vertexCount": 8,
+      "startFace": 2832,
+      "faceCount": 12,
+      "piece": 60
+    },
+    {
+      "component": 157,
+      "name": "cockpit glazing envelope",
+      "startVertex": 1736,
+      "vertexCount": 120,
+      "startFace": 2844,
+      "faceCount": 236,
+      "piece": 61
+    },
+    {
+      "component": 158,
+      "name": "cockpit connected structural crossmember",
+      "startVertex": 1856,
+      "vertexCount": 8,
+      "startFace": 3080,
+      "faceCount": 12,
+      "piece": 62
+    },
+    {
+      "component": 159,
+      "name": "engine_pair/negative side/connected support",
+      "startVertex": 1864,
+      "vertexCount": 8,
+      "startFace": 3092,
+      "faceCount": 12,
+      "piece": 63
+    },
+    {
+      "component": 160,
+      "name": "engine_pair/negative side/propulsion casing",
+      "startVertex": 1872,
+      "vertexCount": 48,
+      "startFace": 3104,
+      "faceCount": 92,
+      "piece": 64
+    },
+    {
+      "component": 161,
+      "name": "engine_pair/negative side/propulsion luminous recess",
+      "startVertex": 1920,
+      "vertexCount": 48,
+      "startFace": 3196,
+      "faceCount": 92,
+      "piece": 65
+    },
+    {
+      "component": 162,
+      "name": "engine_pair/positive side/connected support",
+      "startVertex": 1968,
+      "vertexCount": 8,
+      "startFace": 3288,
+      "faceCount": 12,
+      "piece": 66
+    },
+    {
+      "component": 163,
+      "name": "engine_pair/positive side/propulsion casing",
+      "startVertex": 1976,
+      "vertexCount": 48,
+      "startFace": 3300,
+      "faceCount": 92,
+      "piece": 67
+    },
+    {
+      "component": 164,
+      "name": "engine_pair/positive side/propulsion luminous recess",
+      "startVertex": 2024,
+      "vertexCount": 48,
+      "startFace": 3392,
+      "faceCount": 92,
+      "piece": 68
+    },
+    {
+      "component": 165,
+      "name": "explicit military mount upright",
+      "startVertex": 2072,
+      "vertexCount": 8,
+      "startFace": 3484,
+      "faceCount": 12,
+      "piece": 69
+    },
+    {
+      "component": 166,
+      "name": "explicit military mount longitudinal member",
+      "startVertex": 2080,
+      "vertexCount": 8,
+      "startFace": 3496,
+      "faceCount": 12,
+      "piece": 70
+    },
+    {
+      "component": 167,
+      "name": "explicit military mount upright",
+      "startVertex": 2088,
+      "vertexCount": 8,
+      "startFace": 3508,
+      "faceCount": 12,
+      "piece": 71
+    },
+    {
+      "component": 168,
+      "name": "explicit military mount longitudinal member",
+      "startVertex": 2096,
+      "vertexCount": 8,
+      "startFace": 3520,
+      "faceCount": 12,
+      "piece": 72
+    }
+  ],
+  "nativeCandidate": [
+    {
+      "component": 0,
+      "name": "wishbone connected arm",
+      "startVertex": 0,
+      "vertexCount": 8,
+      "startFace": 0,
+      "faceCount": 12,
+      "piece": 0
+    },
+    {
+      "component": 1,
+      "name": "wishbone forward envelope",
+      "startVertex": 8,
+      "vertexCount": 60,
+      "startFace": 12,
+      "faceCount": 116,
+      "piece": 1
+    },
+    {
+      "component": 2,
+      "name": "wishbone forward envelope/service-well-0-0",
+      "startVertex": 68,
+      "vertexCount": 12,
+      "startFace": 128,
+      "faceCount": 20,
+      "piece": 14
+    },
+    {
+      "component": 3,
+      "name": "wishbone forward envelope/service-well-1-0",
+      "startVertex": 80,
+      "vertexCount": 12,
+      "startFace": 148,
+      "faceCount": 20,
+      "piece": 15
+    },
+    {
+      "component": 4,
+      "name": "wishbone forward envelope/service-well-2-0",
+      "startVertex": 92,
+      "vertexCount": 12,
+      "startFace": 168,
+      "faceCount": 20,
+      "piece": 16
+    },
+    {
+      "component": 5,
+      "name": "wishbone forward envelope/service-well-3-0",
+      "startVertex": 104,
+      "vertexCount": 12,
+      "startFace": 188,
+      "faceCount": 20,
+      "piece": 17
+    },
+    {
+      "component": 6,
+      "name": "wishbone connected arm",
+      "startVertex": 116,
+      "vertexCount": 8,
+      "startFace": 208,
+      "faceCount": 12,
+      "piece": 20
+    },
+    {
+      "component": 7,
+      "name": "wishbone forward envelope",
+      "startVertex": 124,
+      "vertexCount": 60,
+      "startFace": 220,
+      "faceCount": 116,
+      "piece": 21
+    },
+    {
+      "component": 8,
+      "name": "wishbone forward envelope/service-well-0-0",
+      "startVertex": 184,
+      "vertexCount": 12,
+      "startFace": 336,
+      "faceCount": 20,
+      "piece": 34
+    },
+    {
+      "component": 9,
+      "name": "wishbone forward envelope/service-well-1-0",
+      "startVertex": 196,
+      "vertexCount": 12,
+      "startFace": 356,
+      "faceCount": 20,
+      "piece": 35
+    },
+    {
+      "component": 10,
+      "name": "wishbone forward envelope/service-well-2-0",
+      "startVertex": 208,
+      "vertexCount": 12,
+      "startFace": 376,
+      "faceCount": 20,
+      "piece": 36
+    },
+    {
+      "component": 11,
+      "name": "wishbone forward envelope/service-well-3-0",
+      "startVertex": 220,
+      "vertexCount": 12,
+      "startFace": 396,
+      "faceCount": 20,
+      "piece": 37
+    },
+    {
+      "component": 12,
+      "name": "wishbone forward cross bridge",
+      "startVertex": 232,
+      "vertexCount": 8,
+      "startFace": 416,
+      "faceCount": 12,
+      "piece": 40
+    },
+    {
+      "component": 13,
+      "name": "aft transverse bridge",
+      "startVertex": 240,
+      "vertexCount": 8,
+      "startFace": 428,
+      "faceCount": 12,
+      "piece": 41
+    },
+    {
+      "component": 14,
+      "name": "body primary pressure envelope",
+      "startVertex": 248,
+      "vertexCount": 60,
+      "startFace": 440,
+      "faceCount": 116,
+      "piece": 42
+    },
+    {
+      "component": 15,
+      "name": "body primary pressure envelope/service-well-0-0",
+      "startVertex": 308,
+      "vertexCount": 12,
+      "startFace": 556,
+      "faceCount": 20,
+      "piece": 55
+    },
+    {
+      "component": 16,
+      "name": "body primary pressure envelope/service-well-1-0",
+      "startVertex": 320,
+      "vertexCount": 12,
+      "startFace": 576,
+      "faceCount": 20,
+      "piece": 56
+    },
+    {
+      "component": 17,
+      "name": "body primary pressure envelope/service-well-2-0",
+      "startVertex": 332,
+      "vertexCount": 12,
+      "startFace": 596,
+      "faceCount": 20,
+      "piece": 57
+    },
+    {
+      "component": 18,
+      "name": "body primary pressure envelope/service-well-3-0",
+      "startVertex": 344,
+      "vertexCount": 12,
+      "startFace": 616,
+      "faceCount": 20,
+      "piece": 58
+    },
+    {
+      "component": 19,
+      "name": "cockpit glazing envelope",
+      "startVertex": 356,
+      "vertexCount": 60,
+      "startFace": 636,
+      "faceCount": 116,
+      "piece": 61
+    },
+    {
+      "component": 20,
+      "name": "cockpit connected structural crossmember",
+      "startVertex": 416,
+      "vertexCount": 8,
+      "startFace": 752,
+      "faceCount": 12,
+      "piece": 62
+    },
+    {
+      "component": 21,
+      "name": "engine_pair/negative side/connected support",
+      "startVertex": 424,
+      "vertexCount": 8,
+      "startFace": 764,
+      "faceCount": 12,
+      "piece": 63
+    },
+    {
+      "component": 22,
+      "name": "engine_pair/negative side/propulsion casing",
+      "startVertex": 432,
+      "vertexCount": 24,
+      "startFace": 776,
+      "faceCount": 44,
+      "piece": 64
+    },
+    {
+      "component": 23,
+      "name": "engine_pair/negative side/propulsion luminous recess",
+      "startVertex": 456,
+      "vertexCount": 24,
+      "startFace": 820,
+      "faceCount": 44,
+      "piece": 65
+    },
+    {
+      "component": 24,
+      "name": "engine_pair/positive side/connected support",
+      "startVertex": 480,
+      "vertexCount": 8,
+      "startFace": 864,
+      "faceCount": 12,
+      "piece": 66
+    },
+    {
+      "component": 25,
+      "name": "engine_pair/positive side/propulsion casing",
+      "startVertex": 488,
+      "vertexCount": 24,
+      "startFace": 876,
+      "faceCount": 44,
+      "piece": 67
+    },
+    {
+      "component": 26,
+      "name": "engine_pair/positive side/propulsion luminous recess",
+      "startVertex": 512,
+      "vertexCount": 24,
+      "startFace": 920,
+      "faceCount": 44,
+      "piece": 68
+    },
+    {
+      "component": 27,
+      "name": "explicit military mount upright",
+      "startVertex": 536,
+      "vertexCount": 8,
+      "startFace": 964,
+      "faceCount": 12,
+      "piece": 69
+    },
+    {
+      "component": 28,
+      "name": "explicit military mount longitudinal member",
+      "startVertex": 544,
+      "vertexCount": 8,
+      "startFace": 976,
+      "faceCount": 12,
+      "piece": 70
+    },
+    {
+      "component": 29,
+      "name": "explicit military mount upright",
+      "startVertex": 552,
+      "vertexCount": 8,
+      "startFace": 988,
+      "faceCount": 12,
+      "piece": 71
+    },
+    {
+      "component": 30,
+      "name": "explicit military mount longitudinal member",
+      "startVertex": 560,
+      "vertexCount": 8,
+      "startFace": 1000,
+      "faceCount": 12,
+      "piece": 72
+    }
+  ]
+}
