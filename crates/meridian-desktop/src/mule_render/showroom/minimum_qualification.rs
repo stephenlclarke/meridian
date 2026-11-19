@@ -75,6 +75,87 @@ pub(super) fn station_frames_for(name: &str) -> Vec<Frames> {
     frames
 }
 
+/// Actual station Pin Baseline followed by a new search, not a substituted model list.
+pub(super) fn mole_sibling_compare_frames() -> [Frame; 4] {
+    let directory = TestDirectory::new();
+    let mut profile = open(&directory.0);
+    assert!(ok(profile.new_commander(97016)));
+    let before = ok(profile.world.save_bytes());
+    let mut menu = ok(Docked::new(&profile.world));
+    ok(menu.open(&profile.world, Screen::Showroom));
+    let [width, height] = MIN_WINDOW_LOGICAL;
+    let viewport = Viewport::new(width, height).unwrap_or_else(|| panic!("invalid window minimum"));
+    let frames = [
+        ("Mole Miner", "Mole Prospector", ["SH016", "SH017"]),
+        ("Mole Prospector", "Mole Miner", ["SH017", "SH016"]),
+        ("Mole Miner", "Mole Miner", ["SH016", "SH016"]),
+        ("Mole Prospector", "Mole Prospector", ["SH017", "SH017"]),
+    ]
+    .map(|(baseline, selected, expected)| {
+        {
+            let mut input = |action| {
+                let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
+                menu.presented(frame);
+                ok(menu.input(&mut profile, action));
+            };
+            for action in [
+                Input::Key(Key::Search),
+                Input::Key(Key::ClearSearch),
+                Input::Text(baseline.into()),
+                Input::Key(Key::Confirm),
+                Input::Key(Key::PinBaseline),
+                Input::Key(Key::Search),
+                Input::Key(Key::ClearSearch),
+                Input::Text(selected.into()),
+                Input::Key(Key::Confirm),
+                Input::Key(Key::ResetView),
+            ] {
+                input(action);
+            }
+        }
+        let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
+        let [left, right] = frame.models.as_slice() else {
+            panic!("expected two pinned original models")
+        };
+        for (model, id) in [left, right].into_iter().zip(expected) {
+            assert_eq!(model.object, id);
+            let (key, hull) = if id == "SH016" {
+                (super::MOLE_MINER_GEOMETRY_KEY, super::Hull::MoleMiner)
+            } else {
+                (super::PROSPECTOR_GEOMETRY_KEY, super::Hull::MoleProspector)
+            };
+            assert_eq!(model.geometry_key, key);
+            assert_eq!(super::hull(model), Some(hull));
+            assert_model_pane(&frame, model.bounds);
+        }
+        assert!(!overlaps(left.bounds, right.bounds));
+        assert!(left.bounds.x < right.bounds.x);
+        assert_eq!(left.orientation, right.orientation);
+        frame
+    });
+    assert_eq!(ok(profile.world.save_bytes()), before);
+    frames
+}
+
+#[test]
+fn mole_siblings_pin_actual_station_compare_in_both_orders_and_duplicates() {
+    let miner = ok(super::Hull::MoleMiner.visual());
+    let prospector = ok(super::Hull::MoleProspector.visual());
+    let miner_view = View::new(&miner, [EMPTY_PIECE; super::MOLE_MINER_PIECES]);
+    let prospector_view = View::new(&prospector, [EMPTY_PIECE; super::PROSPECTOR_PIECES]);
+    for frame in mole_sibling_compare_frames() {
+        for model in &frame.models {
+            match super::hull(model) {
+                Some(super::Hull::MoleMiner) => assert_original_fits(&miner_view, &miner, model),
+                Some(super::Hull::MoleProspector) => {
+                    assert_original_fits(&prospector_view, &prospector, model)
+                }
+                _ => panic!("unrelated model in pinned Mole comparison"),
+            }
+        }
+    }
+}
+
 fn encloses(outer: Rect, inner: Rect) -> bool {
     inner.width > 0.0
         && inner.height > 0.0
@@ -155,6 +236,19 @@ fn original_mole_miner_fits_minimum_station_showroom_solo_and_compare() {
     assert_eq!(vertices.len(), super::MOLE_MINER_FACES * 3);
     let view = View::new(&vertices, [EMPTY_PIECE; super::MOLE_MINER_PIECES]);
     assert_variant_fits_minimum(station_frames_for("Mole Miner"), &view, &vertices, "SH016");
+}
+
+#[test]
+fn original_mole_prospector_fits_minimum_station_showroom_solo_and_compare() {
+    let vertices = ok(super::Hull::MoleProspector.visual());
+    assert_eq!(vertices.len(), super::PROSPECTOR_DETAILED_FACES * 3);
+    let view = View::new(&vertices, [EMPTY_PIECE; super::PROSPECTOR_PIECES]);
+    assert_variant_fits_minimum(
+        station_frames_for("Mole Prospector"),
+        &view,
+        &vertices,
+        "SH017",
+    );
 }
 
 fn assert_variant_fits_minimum(

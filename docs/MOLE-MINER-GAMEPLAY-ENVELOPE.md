@@ -33,7 +33,7 @@ The original slate-and-orange detailed and native visuals supply 38,508 and 3,30
 
 Open the Showroom with 3 and search for Mole Miner. The SH016-specific preview routes the complete detailed `visual.bin`, authenticated by its exact header, count and bytes. The 3,300-corner native mesh remains an original reference; it is not substituted for the detailed model. The detailed mesh has 476 patrol-map and 12,360 service-map faces, with 208 emissive faces. Its slate and orange material samples and all original corners are checked independently of the renderer.
 
-The original 203 source-local rounded supports (8,912 membership slots, including collar seam repetitions) supply the existing slight 1.8% shimmer. The pass uploads its own shader support array and draws all 38,508 detailed corners. Compare places SH016 alongside the commander's SH025 baseline with the same view orientation. C switches to solo. Rotation and selection do not mutate ownership, inventory or save bytes; Exchange remains refused. SH017 Mole Prospector is a distinct catalogue entry. On this source base it has no registered model, so its preview remains unavailable rather than displaying the Miner.
+The original 203 source-local rounded supports (8,912 membership slots, including collar seam repetitions) supply the existing slight 1.8% shimmer. The pass uploads its own shader support array and draws all 38,508 detailed corners. Compare places SH016 alongside the commander's SH025 baseline with the same view orientation. C switches to solo. Rotation and selection do not mutate ownership, inventory or save bytes; Exchange remains refused. SH017 Mole Prospector has its own registered model and 83 distinct supports. Pin Baseline lets the player compare the actual siblings in either order without changing the current ship.
 
 SteveMBA verified the source topology, generated both metric encodings and measured fit and contact controls on 19 November 2026. The replay manifest pins the drivers, shared numerical helper, exact inputs and reports. The older general exact importer stopped on the SH016 storage budget before returning a candidate. The rounded supports use a separate controlled geometry path.
 
@@ -54,4 +54,11 @@ MERIDIAN_SH016_CACHE_DIR=/absolute/fresh/sh016-cache cargo test --locked -p meri
 python3 -B tools/verify_goshawk_showroom_evidence.py /absolute/fresh/sh016-shimmer
 ```
 
-Minimum and cache tests save actual station pane metadata, nonblack counts, minimum gutter measurements, isolated and independent direct PPMs. They check exact full-target RGB union and refuse clipping, black models or a wrong independent hull. Mixed and duplicate panes are renderer-only cache fixtures, not an additional admitted player hull or ordinary gameplay mode. Stock mass and native face-budget compliance remain open, and no ordinary flight or fabrication entitlement is added.
+Minimum and cache tests save actual station pane metadata, nonblack counts, minimum gutter measurements, isolated and independent direct PPMs. They check exact full-target RGB union and refuse clipping, black models or a wrong independent hull. The Miner/Custom mixed and duplicate poses are renderer-only cache fixtures, not an additional admitted player hull. Stock mass and native face-budget compliance remain open, and no ordinary flight or fabrication entitlement is added.
+
+The joined sibling qualification uses the actual station Pin Baseline frames for SH016/SH017 and SH017/SH016, plus each actual duplicate pair. Both panes normally rotate together. For the duplicate-pose cache check only, the right pane takes the genuine upper pose from the same ship's solo frame while retaining the UI's two actual model keys and bounds. Independent original-hull renders verify every isolated and combined RGB pixel, and returning to solo verifies both original images. Crossed collision sources, membership streams, visual hashes and formats refuse even though both detailed streams have 38,508 corners. Prior independent executions do not qualify this joined head.
+
+```bash
+cargo test --locked -p meridian-desktop mole_siblings
+MERIDIAN_SH016_SH017_CACHE_DIR=/absolute/fresh/mole-siblings cargo test --locked -p meridian-desktop metal_mole_sibling_cache_orders -- --ignored --nocapture
+```

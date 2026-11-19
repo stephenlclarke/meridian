@@ -4,6 +4,12 @@ const SOURCE_POINTS: &[u8] = include_bytes!("../../../../../assets/fleet/sh016/s
 const SOURCE_FACES: &[u8] =
     include_bytes!("../../../../../assets/fleet/sh016/source-triangles.bin");
 const NATIVE_VISUAL: &[u8] = include_bytes!("../../../../../assets/fleet/sh016/native-visual.bin");
+const MINER_MEMBERSHIP: &[u8] =
+    include_bytes!("../../../../../assets/fleet/sh016/source-piece-membership.bin");
+const PROSPECTOR_POINTS: &[u8] =
+    include_bytes!("../../../../../assets/fleet/sh017/source.vertices");
+const PROSPECTOR_MEMBERSHIP: &[u8] =
+    include_bytes!("../../../../../assets/fleet/sh017/source-piece-membership.bin");
 
 fn bytes<const N: usize>(source: &[u8], start: usize) -> [u8; N] {
     source[start..start + N]
@@ -174,4 +180,89 @@ fn mole_miner_model_key_never_matches_mole_prospector_or_other_hulls() {
         assert_eq!(hull(&model), None);
         assert!(!matches(&model));
     }
+}
+
+#[test]
+fn mole_siblings_refuse_crossed_collision_and_equal_length_visual_sources() {
+    assert_eq!(SOURCE_POINTS.len(), PROSPECTOR_POINTS.len());
+    assert_ne!(&SOURCE_POINTS[..8], &PROSPECTOR_POINTS[..8]);
+    let miner = MoleMinerHullSource::from_bytes(SOURCE_POINTS, MINER_MEMBERSHIP)
+        .unwrap_or_else(|error| panic!("{error:?}"));
+    let prospector = MoleProspectorHullSource::from_bytes(PROSPECTOR_POINTS, PROSPECTOR_MEMBERSHIP)
+        .unwrap_or_else(|error| panic!("{error:?}"));
+    assert_eq!(miner.pieces().len(), 203);
+    assert_eq!(prospector.pieces().len(), 83);
+    for (points, membership) in [
+        (PROSPECTOR_POINTS, MINER_MEMBERSHIP),
+        (SOURCE_POINTS, PROSPECTOR_MEMBERSHIP),
+        (PROSPECTOR_POINTS, PROSPECTOR_MEMBERSHIP),
+    ] {
+        assert!(matches!(
+            MoleMinerHullSource::from_bytes(points, membership),
+            Err(EnvelopeError::ChangedSource)
+        ));
+    }
+    for (points, membership) in [
+        (SOURCE_POINTS, PROSPECTOR_MEMBERSHIP),
+        (PROSPECTOR_POINTS, MINER_MEMBERSHIP),
+        (SOURCE_POINTS, MINER_MEMBERSHIP),
+    ] {
+        assert!(matches!(
+            MoleProspectorHullSource::from_bytes(points, membership),
+            Err(EnvelopeError::ChangedSource)
+        ));
+    }
+    assert_eq!(MOLE_MINER_VISUAL.len(), PROSPECTOR_VISUAL.len());
+    assert_ne!(&MOLE_MINER_VISUAL[..8], &PROSPECTOR_VISUAL[..8]);
+    let a = Hull::MoleMiner
+        .visual()
+        .unwrap_or_else(|error| panic!("{error}"));
+    let b = Hull::MoleProspector
+        .visual()
+        .unwrap_or_else(|error| panic!("{error}"));
+    assert_eq!(a.len(), 38_508);
+    assert_eq!(b.len(), 38_508);
+    assert!(
+        a.iter()
+            .zip(&b)
+            .any(|(miner, prospector)| miner.position != prospector.position
+                || miner.color != prospector.color)
+    );
+    assert!(
+        authenticated_visual(
+            PROSPECTOR_VISUAL,
+            MOLE_MINER_VISUAL_FNV,
+            b"MOLEVIS1",
+            a.len()
+        )
+        .is_err()
+    );
+    assert!(
+        authenticated_visual(
+            MOLE_MINER_VISUAL,
+            PROSPECTOR_VISUAL_FNV,
+            b"SH017VZ1",
+            b.len()
+        )
+        .is_err()
+    );
+    // Correct byte hash does not authorize the other sibling's format either.
+    assert!(
+        authenticated_visual(
+            PROSPECTOR_VISUAL,
+            PROSPECTOR_VISUAL_FNV,
+            b"MOLEVIS1",
+            a.len()
+        )
+        .is_err()
+    );
+    assert!(
+        authenticated_visual(
+            MOLE_MINER_VISUAL,
+            MOLE_MINER_VISUAL_FNV,
+            b"SH017VZ1",
+            b.len()
+        )
+        .is_err()
+    );
 }

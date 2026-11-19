@@ -6,7 +6,11 @@ Preview 10 is published for macOS arm64 and Windows x64. It includes the Goshawk
 
 ## Mole Miner source and Showroom
 
-SH016 has its original slate-orange detailed preview, 203 source-local rounded supports and its own selected-model identity. The authored station solo and Compare checks retain exchange refusal and distinguish the Miner from the not-yet-registered SH017 Mole Prospector. Original geometry, stock engineering budget and native face-limit discrepancy remain separate from ordinary flight admission. Owned Rust and Metal execution remain pending. [SH016 source and Showroom](MOLE-MINER-GAMEPLAY-ENVELOPE.md)
+SH016 has its original slate-orange detailed preview, 203 source-local rounded supports and its own selected-model identity. The authored station solo and Compare checks retain exchange refusal and distinguish the Miner from SH017 Mole Prospector. Original geometry, stock engineering budget and native face-limit discrepancy remain separate from ordinary flight admission. Owned Rust and Metal execution remain pending. [SH016 source and Showroom](MOLE-MINER-GAMEPLAY-ENVELOPE.md)
+
+## Mole Prospector source candidate
+
+SH017 has its own original detailed Showroom, 83 local rounded collision pieces, independent SH028/tool-cradle fit and full source-surface evidence, and an adopted 116,421 kg engineering budget. The eight original detailed boring-head collars have their own bounded supports; the native candidate omits them and exceeds its exact face limit. Rust and native Metal execution, actual native collision, ordinary placement and acquisition remain pending. [SH017 evidence and acceptance](MOLE-PROSPECTOR-GAMEPLAY-ENVELOPE.md)
 
 ## Commander startup and flight cockpit
 

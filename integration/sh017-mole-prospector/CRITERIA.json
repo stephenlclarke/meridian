@@ -1,0 +1,114 @@
+{
+  "hull": "SH017",
+  "name": "Mole Prospector",
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourceManifestSha256": "72ee0f8388143e63e8cec7d6ddaffae4cd4296240856cf891ecd2a3b115949c2",
+  "independentFitWitnessSha256": "b4e6b0fbe4f0951ddcf34daa912bc555c62b967e48909591e0faf9772046a1bf",
+  "independentSurfaceFitSha256": "9ad33433866326321f64a1ccef4c33c69495aefae39c9748264e1cd13c7a3508",
+  "geometry": {
+    "sourceDetailedFaces": 12836,
+    "nativeOriginalFaces": 1100,
+    "nativeExactLimit": 512,
+    "roundedPieces": 83,
+    "roundingMetres": 0.02,
+    "criteria": [
+      "Every source vertex and triangle remains in its own declared local piece. No byte-substituted sibling is accepted.",
+      "Both original meshes retain separate boring heads, rectangular tool-cradle members and independent well domains. The detailed original retains eight individually bounded collars which the native candidate omits.",
+      "Read the own detailed visuals and textures through the ordinary Showroom without changing original coordinates, winding, face materials or UVs.",
+      "Independently certify both source-surface directions, tool cradle gap probe and both full controlled sweep paths, and strict SH028 lip witness.",
+      "Retain the distinction between the annular detailed collars and their enclosing convex disks; do not report exact annular clearance. The central actual tool-cradle path remains independently clear."
+    ]
+  },
+  "sourceOnly": {
+    "command": "python3 -B tools/prepare_mole_prospector.py --check",
+    "independent": "python3 -B tools/verify_mole_prospector_fit.py",
+    "surfaceAudit": "python3 -B tools/audit_mole_prospector_surface.py",
+    "negativeControls": "python3 -B -m unittest discover -s tools -p 'test_mole_prospector.py' -v",
+    "checks": "Run all source pins, fixture projection certificates and negative mutations.",
+    "surfaceReplay": "python3 -B -m unittest discover -s tools -p 'test_audit_mole_prospector_surface.py' -v"
+  },
+  "ownedTests": {
+    "core": "cargo test --locked -p meridian-core mole_prospector::tests -- --nocapture",
+    "controlledWorld": "cargo test --locked -p meridian-core flight::goshawk_validation::tests::mole_prospector_world -- --nocapture",
+    "desktop": [
+      "cargo test --locked -p meridian-desktop mole_prospector_original_visual_and_all_local_supports_bind_to_its_own_shader",
+      "cargo test --locked -p meridian-desktop selecting_mole_prospector_routes_its_own_preview_without_granting_exchange",
+      "cargo test --locked -p meridian-desktop original_mole_prospector_fits_minimum_station_showroom_solo_and_compare"
+    ],
+    "acceptance": [
+      "Core fit tests pass on the assigned platforms, including independent SH028 station lip/contact, aligned entry, off-aperture and tool cradle pass and actual source contact cases.",
+      "The SH017-controlled World passes five actual approach routes and source/snapshot invariants.",
+      "Current SH008 source, stock engineering, World and Showroom tests and SH010 source, World and Showroom tests remain green after the common renderer extension. Both alternate snapshots and swapped visual identities refuse.",
+      "Ordinary Showroom native capture shows SH017 alone and in Compare, with source appearance, twin boring heads, eight collars, rectangular tool cradle and upper control bay visible from rotated views.",
+      "The ordinary Ship Showroom still refuses unadmitted exchange. Existing hulls and saves remain intact."
+    ]
+  },
+  "reviewEvidence": {
+    "originalContractSpeedUnits": 29,
+    "compiledEngineering": "cargo test --locked -p meridian-core sh017_compiled_engineering_and_calibrated_source_match_independent_bits",
+    "sourceContractAndEngineeringWords": "python3 -B -m unittest discover -s tools -p 'test_mole_prospector.py' -v",
+    "retainedSurfaceBoundsMillimetres": {
+      "detailed": [
+        1273,
+        1998
+      ],
+      "nativeCandidate": [
+        2021,
+        2130
+      ],
+      "mandatoryCrossSourceVertices": [
+        2004,
+        723
+      ]
+    },
+    "retainedCollarUpperMillimetres": {
+      "negative X": {"detailed":[1485,1479,1500,1998],"nativeCandidate":[2047,2024,2024,2048]},
+      "positive X": {"detailed":[1493,1479,1500,1998],"nativeCandidate":[2047,2024,2024,2048]},
+      "scope":"Axial collars 0–3 in original order; bounds include each complete rounded convex disk, including hidden interior surfaces. They do not certify exact annular clearance."
+    },
+    "portableRgbNegatives": "cargo test --locked -p meridian-desktop own_pane_and_full_union_reject_black_gutter_wrong_pane_and_rgb",
+    "metal": [
+      {
+        "directoryVariable": "MERIDIAN_SH017_EVIDENCE_DIR",
+        "test": "mule_render::showroom::metal_qualification::metal_mole_prospector_same_pose_shimmer",
+        "verifier": "python3 -B tools/verify_goshawk_showroom_evidence.py <evidence-directory>"
+      },
+      {
+        "directoryVariable": "MERIDIAN_SH017_MINIMUM_DIR",
+        "test": "mule_render::showroom::metal_qualification::mole_prospector_qualification::metal_mole_prospector_minimum_showroom_model_pass"
+      },
+      {
+        "directoryVariable": "MERIDIAN_SH017_CACHE_DIR",
+        "test": "mule_render::showroom::metal_qualification::mole_prospector_qualification::metal_mole_prospector_cache_switching"
+      }
+    ],
+    "invocation": "Each Metal test is ignored by default. Set its directory variable to a distinct new absolute directory and run cargo test --locked -p meridian-desktop <test> -- --ignored --exact --nocapture.",
+    "minimumAndCacheReceipt": "Full-target PPMs, matching independent -direct.ppm references, model-panes.tsv and rgb-measurements.tsv. Each isolated image must be nonblack, with at least 2 logical pixels of in-pane clearance. Compare and both mixed orders for each Explorer/Prospector and Custom/Prospector pair must match exact full-target isolated RGB union, with direct original render identity, three distinct solo identities and repeat/return checks.",
+    "scope": "Offscreen native model only. No GPU timing, native window resizing, compositor output or ordinary placement."
+  },
+  "joinedRegression": {
+    "protectedBase": "dae39800a35e2d8ca57b3d6a7ead20c7438c6b49",
+    "existingHullCriteria": ["integration/sh008-goshawk/CRITERIA.json", "integration/sh010-goshawk-custom/CRITERIA.json"],
+    "workspace": "cargo test --locked --workspace",
+    "typedWorldAll": "cargo test --locked -p meridian-core flight::goshawk_validation::tests -- --nocapture",
+    "siblingSelection": "cargo test --locked -p meridian-desktop selecting_mole_miner_does_not_select_prospector_or_its_geometry",
+    "siblingIdentity": {
+      "SH016": {"name":"Mole Miner","frozenResourceSha256":"b23f6d0c214e199e19e6eaf71647cdbe45cc2a1c6b25935d30c1299335c5a2aa","frozenContractSha256":"d1bf21e0ad41a1fab71976310b850c67c28de10666f331b9b09e99363967d366","maxSpeedUnits":25,"nativeExactFaceLimit":512},
+      "SH017": {"name":"Mole Prospector","frozenResourceSha256":"1a31ae1c3827227f79d7fa826d69c6970d34806400d9ab642d0db0f1ddcd2fb6","frozenContractSha256":"c31408f9cbf0e76af47c583fcf084080addb1d8e84970cc0168d7c065bae385a","maxSpeedUnits":29,"nativeExactFaceLimit":512},
+      "scope":"Independent frozen source identities and separate parent implementation. This renderer join retains both registries without changing either controlled source or granting SH016 runtime admission."
+    },
+    "siblingShowroomJoin": {
+      "minerParent": "de9b0c60defb6de4606d4ac723d15159a137d3e6",
+      "prospectorParent": "69507b672b79823c499e37bfc872845a423bf747",
+      "portable": ["mole_siblings_refuse_crossed_collision_and_equal_length_visual_sources", "mole_siblings_pin_actual_station_compare_in_both_orders_and_duplicates"],
+      "metal": "mule_render::showroom::metal_qualification::mole_sibling_qualification::metal_mole_sibling_cache_orders",
+      "directoryVariable": "MERIDIAN_SH016_SH017_CACHE_DIR",
+      "receipt": "Actual pinned station sibling orders and both duplicate model pairs, genuine front/upper pose on renderer-only duplicates, independent direct original draws, nonblack two-pixel clearance, exact full-target union and solo returns. Prior independent native runs do not qualify the joined candidate."
+    }
+  },
+  "remaining": [
+    "Full native source/exact collision qualification",
+    "Owned execution of the controlled World regressions, ordinary placement, acquisition, paid fitting, crew and player admission",
+    "Native window/compositor, GPU timing, actual as-built materials, hardware volume, loaded mass and role population."
+  ]
+}
