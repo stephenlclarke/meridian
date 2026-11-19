@@ -145,9 +145,9 @@ fn sh021_encloses_every_original_triangle_and_refuses_other_or_changed_sources()
         Err(EnvelopeError::ChangedSource)
     );
     let mut wrong_sibling_identity = VERTICES.to_vec();
-    wrong_mole_identity[..8].copy_from_slice(b"MSH020V1");
+    wrong_sibling_identity[..8].copy_from_slice(b"MSH020V1");
     assert_eq!(
-        ZebraHullSource::from_bytes(&wrong_mole_identity, MEMBERSHIP),
+        ZebraHullSource::from_bytes(&wrong_sibling_identity, MEMBERSHIP),
         Err(EnvelopeError::ChangedSource)
     );
     assert_eq!(
