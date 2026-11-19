@@ -6,6 +6,8 @@ Rust is the core product. G1 is the sole Mac compiler, native Metal, controls, p
 
 The core must build independently of GPU/window/filesystem/clock adapters. Use deterministic meaningful regressions and transactional refusal tests. Keep original assets, reference identities, notices and acceptance requirements intact. Never edit/import the human working Elite checkout or copy real player profiles.
 
+Acquire a drawable before preparing frame GPU uploads. The native wgpu queue retains staging writes until a submission completes; surface Timeout, Occluded, Outdated and Lost results may skip presentation indefinitely. Never enqueue per-frame staging on those paths. Resize projection updates retain only the latest CPU value until a drawable is acquired. This source guard addresses the identified upload-lifetime hazard; it does not by itself establish macOS memory acceptance.
+
 ## Commands
 
 Use the pinned Rust toolchain and Cargo.lock. `make ci` runs documentation lint, formatting, Python importers, workspace check/tests and strict Clippy. `make run` launches the desktop app in an owned graphics session. Coverage reports and SonarQube are part of GitHub CI. Aim for at least 90 percent focused new-code coverage with explicit evidence-backed exceptions; coverage is not gameplay acceptance.
