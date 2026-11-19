@@ -21,8 +21,20 @@ fn metal_stock_kite_normal_showroom() {
 #[test]
 #[ignore = "Mac owner only: independently rendered stock pair and duplicate pane cache evidence"]
 fn metal_stock_sparrowhawk_kite_cache_comparison() {
-    let output = output_directory("MERIDIAN_SH030_SH031_STOCK_CACHE_DIR");
-    let gpu = metal_gpu_for("SH030-SH031 stock", false);
+    qualify_stock_pair(
+        ("Sparrowhawk", "SH030", "sparrowhawk"),
+        ("Kite Interceptor", "SH031", "kite"),
+        "MERIDIAN_SH030_SH031_STOCK_CACHE_DIR",
+    );
+}
+
+pub(super) fn qualify_stock_pair(
+    first: (&str, &str, &str),
+    second: (&str, &str, &str),
+    variable: &str,
+) {
+    let output = output_directory(variable);
+    let gpu = metal_gpu_for(&format!("{}-{} stock", first.1, second.1), false);
     let target = Target::new(&gpu.device, MIN_WINDOW_LOGICAL);
     let crop = Crop {
         origin: wgpu::Origin3d::ZERO,
@@ -34,12 +46,12 @@ fn metal_stock_sparrowhawk_kite_cache_comparison() {
         &gpu.queue,
         FORMAT,
     ));
-    let a = minimum_qualification::station_frames_for("Sparrowhawk");
-    let b = minimum_qualification::station_frames_for("Kite Interceptor");
+    let a = minimum_qualification::station_frames_for(first.0);
+    let b = minimum_qualification::station_frames_for(second.0);
     let mut solos = Vec::new();
     for (name, frame) in [
-        ("sparrowhawk-before", &a[0].solo),
-        ("kite-before", &b[0].solo),
+        (format!("{}-before", first.2), &a[0].solo),
+        (format!("{}-before", second.2), &b[0].solo),
     ] {
         ok(docked.prepare(
             &gpu.device,
@@ -63,7 +75,8 @@ fn metal_stock_sparrowhawk_kite_cache_comparison() {
         solos[0], solos[1],
         "different original stock ships rendered identical RGB"
     );
-    let mut frames = minimum_qualification::stock_sparrowhawk_kite_compare_frames();
+    let mut frames =
+        minimum_qualification::stock_pair_compare_frames((first.0, first.1), (second.0, second.1));
     for (frame, upper) in frames[2..].iter_mut().zip([
         a[2].solo.models[0].orientation,
         b[2].solo.models[0].orientation,
@@ -72,10 +85,10 @@ fn metal_stock_sparrowhawk_kite_cache_comparison() {
         assert_ne!(frame.models[0].orientation, frame.models[1].orientation);
     }
     for (name, frame) in [
-        "sparrowhawk-kite",
-        "kite-sparrowhawk",
-        "sparrowhawk-sparrowhawk",
-        "kite-kite",
+        format!("{}-{}", first.2, second.2),
+        format!("{}-{}", second.2, first.2),
+        format!("{}-{}", first.2, first.2),
+        format!("{}-{}", second.2, second.2),
     ]
     .into_iter()
     .zip(frames)
@@ -133,8 +146,8 @@ fn metal_stock_sparrowhawk_kite_cache_comparison() {
         crop.save(output.join(format!("{name}.ppm")), &combined);
     }
     for (index, (name, frame)) in [
-        ("sparrowhawk-return", &a[0].solo),
-        ("kite-return", &b[0].solo),
+        (format!("{}-return", first.2), &a[0].solo),
+        (format!("{}-return", second.2), &b[0].solo),
     ]
     .into_iter()
     .enumerate()

@@ -31,6 +31,7 @@ mod kite_stock_qualification;
 mod peregrine_mk_i_qualification;
 mod peregrine_pair_qualification;
 mod sparrowhawk_stock_qualification;
+mod stag_stock_qualification;
 
 fn ok<T, E: std::fmt::Debug>(result: Result<T, E>) -> T {
     result.unwrap_or_else(|error| panic!("{error:?}"))

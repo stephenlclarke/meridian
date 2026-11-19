@@ -17,7 +17,9 @@ The joined Peregrine development source gives Mk I and Mk III separate original 
 
 In the joined development source, search **Sparrowhawk** or **SH030** from the ordinary station Showroom to inspect its original ice-cobalt hull. No local package flag is needed. Exchange remains unavailable, and stock renderer qualification is pending. [Sparrowhawk source and Showroom](docs/SPARROWHAWK-GAMEPLAY-ENVELOPE.md)
 
-Search **Kite Interceptor** or **SH031** for its original navy-copper hull and twin blades. The two original stock previews use the same immutable package registry; Pin either to compare. No package flag, stock ownership or encounter is granted. [Kite source and Showroom](docs/KITE-INTERCEPTOR-GAMEPLAY-ENVELOPE.md)
+Search **Kite Interceptor** or **SH031** for its original navy-copper hull and twin blades. The original stock previews use the same immutable package registry; Pin any to compare. No package flag, stock ownership or encounter is granted. [Kite source and Showroom](docs/KITE-INTERCEPTOR-GAMEPLAY-ENVELOPE.md)
+
+Search **Stag Liner** or **SH035** for its original pearl-teal liner and twin towers. It uses the same stock package registry and the qualified Studio export; ordinary stock renderer qualification remains pending. [Stag Liner source and Showroom](docs/STAG-LINER-GAMEPLAY-ENVELOPE.md)
 
 The development desktop can explicitly load local validated hull packages with repeatable `--hull-package PATH` flags, or inspect a conflicting original under its separate `LOCAL:` identity using `--inspect-hull-package PATH`. Press 3 while docked and search its ID; no purchase or campaign spawn is authorized. [Authored hull package controls and limits](docs/AUTHORED-HULL-SHOWROOM.md)
 
@@ -130,6 +132,7 @@ The freight journey requires eight identified one-tonne deliveries and awards 73
 The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain.toml) and [Cargo.lock](Cargo.lock). Use `make ci` for documentation, formatting, importers, compilation, tests and strict Clippy. `make run` starts the desktop app in an owned graphics session. G1 owns Mac compilation/native validation; Dell owns Linux/native Windows validation; MBA retains its existing fleet work.
 
 - [Development and repository maintenance](docs/DEVELOPMENT.md)
+- [Stag Liner source envelope and Hull Studio definition](docs/STAG-LINER-GAMEPLAY-ENVELOPE.md)
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)
 - [Content provenance and reuse](docs/LEGACY-REUSE.md)

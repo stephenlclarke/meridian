@@ -16,7 +16,7 @@ use std::{
 
 mod stock;
 #[cfg(test)]
-pub(crate) use stock::{KITE_GEOMETRY_KEY, SPARROWHAWK_GEOMETRY_KEY};
+pub(crate) use stock::{KITE_GEOMETRY_KEY, SPARROWHAWK_GEOMETRY_KEY, STAG_GEOMETRY_KEY};
 pub(crate) use stock::{STOCK_MODELS, stock_matches, stock_visual_for};
 
 #[derive(Debug, PartialEq, Eq)]

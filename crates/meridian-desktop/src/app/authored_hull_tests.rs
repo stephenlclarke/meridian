@@ -281,6 +281,18 @@ fn ordinary_game_entry_switches_stock_kite_sparrowhawk_and_owned_baseline() {
     ]);
 }
 
+#[test]
+fn ordinary_game_entry_switches_stock_stag_all_stock_peers_and_owned_baseline() {
+    assert_stock_navigation(&[
+        ("Stag Liner", "SH035"),
+        ("Sparrowhawk", "SH030"),
+        ("Kite Interceptor", "SH031"),
+        ("SH035", "SH035"),
+        ("Peregrine Mk V", "SH025"),
+        ("Stag Liner", "SH035"),
+    ]);
+}
+
 fn assert_stock_navigation(queries: &[(&str, &str)]) {
     let directory = TestDirectory::new();
     let mut app = ok(App::from_launch(Launch::Profile(
