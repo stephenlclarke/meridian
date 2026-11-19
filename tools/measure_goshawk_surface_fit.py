@@ -18,20 +18,21 @@ RADIUS = 0.02
 GRID = 2**20
 DEPTH = 6
 ASSETS = Path(__file__).resolve().parents[1] / 'assets/fleet/sh008'
+SOURCE_VERTICES = 'source.vertices'
 
 
 def load(folder):
     manifest = json.loads((folder / 'MANIFEST.json').read_bytes())
     inputs = {}
-    for key in ['source.vertices', 'source-triangles.bin', 'source-piece-membership.bin',
+    for key in [SOURCE_VERTICES, 'source-triangles.bin', 'source-piece-membership.bin',
                 'COMPONENT-PIECES.json']:
         blob = (folder / key).read_bytes()
         pin = manifest['files'][key]
         assert len(blob) == pin['bytes'] and hashlib.sha256(blob).hexdigest() == pin['sha256'], key
         inputs[key] = blob
     header = struct.pack('<8sII', b'MSH008V1', 2072, 536)
-    assert inputs['source.vertices'].startswith(header)
-    vertices = np.frombuffer(inputs['source.vertices'], dtype='<f8', offset=len(header)).reshape(-1, 3)
+    assert inputs[SOURCE_VERTICES].startswith(header)
+    vertices = np.frombuffer(inputs[SOURCE_VERTICES], dtype='<f8', offset=len(header)).reshape(-1, 3)
     faces = np.frombuffer(inputs['source-triangles.bin'], dtype='<u4').reshape(-1, 3)
     membership = np.frombuffer(inputs['source-piece-membership.bin'], dtype='u1')
     names = json.loads(inputs['COMPONENT-PIECES.json'])['pieces']
