@@ -1,5 +1,5 @@
 //! Exercise actual HUD preparation; no window, queue or GPU submission is fabricated.
-use super::Renderer;
+use super::{PendingProjection, Renderer, SurfaceRecovery, flight_projection};
 use crate::{hud, mesh::Vertex};
 
 fn stale_buffer() -> Vec<Vertex> {
@@ -191,4 +191,106 @@ fn zero_viewports_clear_reused_buffers_in_both_hud_paths() {
         &mut actual,
     );
     assert!(actual.is_empty());
+}
+
+#[test]
+fn repeated_surface_skips_never_prepare_or_accumulate_frame_uploads() {
+    use wgpu::CurrentSurfaceTexture::{Lost, Occluded, Outdated, Timeout};
+    let mut uploads = 0;
+    let mut recoveries = Vec::new();
+    // Concrete wgpu skip statuses, but no interactive surface, GPU or queue is created.
+    for _ in 0..256 {
+        for status in [Timeout, Occluded, Outdated, Lost] {
+            let acquired = Renderer::resolve_surface_acquisition(status, |recovery| {
+                recoveries.push(recovery);
+                Ok(())
+            });
+            let result = Renderer::prepare_acquired_frame(acquired, || {
+                uploads += 1;
+                Ok(())
+            });
+            assert!(matches!(result, Ok(None)));
+            assert_eq!(uploads, 0);
+        }
+    }
+    assert_eq!(recoveries.len(), 512);
+    assert!(
+        recoveries
+            .chunks_exact(2)
+            .all(|pair| pair == [SurfaceRecovery::Configure, SurfaceRecovery::Recreate])
+    );
+
+    // A later successful normal or suboptimal frame runs the exact prepare callback once.
+    for token in [(7, false), (8, true)] {
+        let prepared = Renderer::prepare_acquired_frame(Ok(Some(token)), || {
+            uploads += 1;
+            Ok(())
+        });
+        assert_eq!(prepared, Ok(Some(token)));
+    }
+    assert_eq!(uploads, 2);
+}
+
+#[test]
+fn surface_validation_or_failed_recovery_never_runs_uploads() {
+    use wgpu::CurrentSurfaceTexture::{Lost, Outdated, Validation};
+    let validation =
+        Renderer::resolve_surface_acquisition(Validation, |_| panic!("validation cannot recover"));
+    assert_eq!(
+        Renderer::prepare_acquired_frame(validation, || panic!("validation cannot stage data"))
+            .err()
+            .as_deref(),
+        Some("Surface validation failed")
+    );
+    for (status, expected) in [
+        (Outdated, SurfaceRecovery::Configure),
+        (Lost, SurfaceRecovery::Recreate),
+    ] {
+        let acquired = Renderer::resolve_surface_acquisition(status, |recovery| {
+            assert_eq!(recovery, expected);
+            Err("recover failed".into())
+        });
+        assert_eq!(
+            Renderer::prepare_acquired_frame(acquired, || panic!(
+                "failed recovery cannot stage data"
+            ))
+            .err()
+            .as_deref(),
+            Some("recover failed")
+        );
+    }
+    let failure = Renderer::prepare_acquired_frame(Ok(Some(1)), || Err("prepare refused".into()));
+    assert_eq!(failure, Err("prepare refused".into()));
+}
+
+#[test]
+fn resize_projection_coalesces_through_skipped_frames_and_uploads_latest_once() {
+    use wgpu::CurrentSurfaceTexture::{Occluded, Timeout};
+    let mut pending = PendingProjection::default();
+    let mut writes = Vec::new();
+    for width in 640..896 {
+        pending.resize(winit::dpi::PhysicalSize::new(width, 720));
+        for status in [Occluded, Timeout] {
+            let acquired = Renderer::resolve_surface_acquisition(status, |_| panic!("no recovery"));
+            let prepared = Renderer::prepare_acquired_frame(acquired, || {
+                pending.upload(|projection| writes.push(projection));
+                Ok(())
+            });
+            assert!(matches!(prepared, Ok(None)));
+        }
+        assert!(writes.is_empty());
+    }
+    pending.resize(winit::dpi::PhysicalSize::new(0, 0));
+    let prepared = Renderer::prepare_acquired_frame(Ok(Some(1)), || {
+        pending.upload(|projection| writes.push(projection));
+        Ok(())
+    });
+    assert_eq!(prepared, Ok(Some(1)));
+    assert_eq!(writes, [flight_projection(895, 720)]);
+    let prepared = Renderer::prepare_acquired_frame(Ok(Some(2)), || {
+        pending.upload(|projection| writes.push(projection));
+        Ok(())
+    });
+    assert_eq!(prepared, Ok(Some(2)));
+    assert_eq!(writes, [flight_projection(895, 720)]);
 }

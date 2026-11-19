@@ -45,6 +45,31 @@ pub enum Presentation {
     Skipped,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum SurfaceRecovery {
+    Configure,
+    Recreate,
+}
+
+/// Resize can arrive repeatedly while a surface cannot present. Retain only the latest
+/// CPU projection, rather than enqueueing a new GPU staging allocation for each event.
+#[derive(Default)]
+struct PendingProjection(Option<[f32; 4]>);
+
+impl PendingProjection {
+    fn resize(&mut self, size: PhysicalSize<u32>) {
+        if size.width != 0 && size.height != 0 {
+            self.0 = Some(flight_projection(size.width, size.height));
+        }
+    }
+
+    fn upload(&mut self, write: impl FnOnce([f32; 4])) {
+        if let Some(projection) = self.0.take() {
+            write(projection);
+        }
+    }
+}
+
 pub struct Renderer {
     flight_view: FlightView,
     celestial: crate::celestial::Pass,
@@ -59,6 +84,7 @@ pub struct Renderer {
     size: PhysicalSize<u32>,
     pipeline: wgpu::RenderPipeline,
     projection: wgpu::Buffer,
+    pending_projection: PendingProjection,
     projection_group: wgpu::BindGroup,
     vertices: wgpu::Buffer,
     depth: wgpu::TextureView,
@@ -237,6 +263,7 @@ impl Renderer {
             size,
             pipeline,
             projection,
+            pending_projection: PendingProjection::default(),
             projection_group,
             vertices,
             depth,
@@ -290,11 +317,7 @@ impl Renderer {
         self.config.height = size.height;
         self.surface.configure(&self.device, &self.config);
         self.depth = Self::depth_texture(&self.device, &self.config);
-        self.queue.write_buffer(
-            &self.projection,
-            0,
-            bytemuck::cast_slice(&flight_projection(size.width, size.height)),
-        );
+        self.pending_projection.resize(size);
     }
 
     pub fn set_flight_view(&mut self, view: FlightView) {
@@ -619,6 +642,54 @@ impl Renderer {
         }
     }
 
+    /// Resolve drawable acquisition and recovery before any frame uploads can allocate staging.
+    fn resolve_surface_acquisition(
+        current: wgpu::CurrentSurfaceTexture,
+        recover: impl FnOnce(SurfaceRecovery) -> Result<(), String>,
+    ) -> Result<Option<(wgpu::SurfaceTexture, bool)>, String> {
+        match current {
+            wgpu::CurrentSurfaceTexture::Success(frame) => Ok(Some((frame, false))),
+            wgpu::CurrentSurfaceTexture::Suboptimal(frame) => Ok(Some((frame, true))),
+            wgpu::CurrentSurfaceTexture::Timeout | wgpu::CurrentSurfaceTexture::Occluded => {
+                Ok(None)
+            }
+            wgpu::CurrentSurfaceTexture::Outdated => {
+                recover(SurfaceRecovery::Configure)?;
+                Ok(None)
+            }
+            wgpu::CurrentSurfaceTexture::Lost => {
+                recover(SurfaceRecovery::Recreate)?;
+                Ok(None)
+            }
+            wgpu::CurrentSurfaceTexture::Validation => Err("Surface validation failed".into()),
+        }
+    }
+
+    fn recover_surface(&mut self, recovery: SurfaceRecovery) -> Result<(), String> {
+        if recovery == SurfaceRecovery::Recreate {
+            self.surface = self
+                .instance
+                .create_surface(self.window.clone())
+                .map_err(|e| e.to_string())?;
+        }
+        self.surface.configure(&self.device, &self.config);
+        self.window.request_redraw();
+        Ok(())
+    }
+
+    /// Queue writes own native staging buffers until a submission completes. Nothing in
+    /// the prepare callback may run for skipped or unrecoverable acquisitions.
+    fn prepare_acquired_frame<T>(
+        acquired: Result<Option<T>, String>,
+        prepare: impl FnOnce() -> Result<(), String>,
+    ) -> Result<Option<T>, String> {
+        let Some(frame) = acquired? else {
+            return Ok(None);
+        };
+        prepare()?;
+        Ok(Some(frame))
+    }
+
     pub fn draw(
         &mut self,
         snapshot: &Snapshot,
@@ -639,39 +710,29 @@ impl Renderer {
         if self.is_zero_sized() {
             return Ok(Presentation::Skipped);
         }
-        self.prepare_scene_surfaces(snapshot, &effects)?;
-        let (frame, reconfigure) = match self.surface.get_current_texture() {
-            wgpu::CurrentSurfaceTexture::Success(frame) => (frame, false),
-            wgpu::CurrentSurfaceTexture::Suboptimal(frame) => (frame, true),
-            wgpu::CurrentSurfaceTexture::Timeout | wgpu::CurrentSurfaceTexture::Occluded => {
-                return Ok(Presentation::Skipped);
+        let surface_result = self.surface.get_current_texture();
+        let acquired = Self::resolve_surface_acquisition(surface_result, |recovery| {
+            self.recover_surface(recovery)
+        });
+        let Some((frame, reconfigure)) = Self::prepare_acquired_frame(acquired, || {
+            self.pending_projection.upload(|projection| {
+                self.queue
+                    .write_buffer(&self.projection, 0, bytemuck::cast_slice(&projection))
+            });
+            self.prepare_scene_surfaces(snapshot, &effects)?;
+            if docked.is_none() {
+                self.prepare_flight_geometry(snapshot, station, effects)?;
             }
-            wgpu::CurrentSurfaceTexture::Outdated => {
-                self.surface.configure(&self.device, &self.config);
-                self.window.request_redraw();
-                return Ok(Presentation::Skipped);
+            if docked.is_none() {
+                self.upload_hud(hud_lines, cockpit, help);
+            } else if help.is_some() {
+                self.upload_hud(&[], None, help);
             }
-            wgpu::CurrentSurfaceTexture::Lost => {
-                self.surface = self
-                    .instance
-                    .create_surface(self.window.clone())
-                    .map_err(|e| e.to_string())?;
-                self.surface.configure(&self.device, &self.config);
-                self.window.request_redraw();
-                return Ok(Presentation::Skipped);
-            }
-            wgpu::CurrentSurfaceTexture::Validation => {
-                return Err("Surface validation failed".into());
-            }
+            Ok(())
+        })?
+        else {
+            return Ok(Presentation::Skipped);
         };
-        if docked.is_none() {
-            self.prepare_flight_geometry(snapshot, station, effects)?;
-        }
-        if docked.is_none() {
-            self.upload_hud(hud_lines, cockpit, help);
-        } else if help.is_some() {
-            self.upload_hud(&[], None, help);
-        }
 
         let view = frame.texture.create_view(&Default::default());
         let mut encoder = self.device.create_command_encoder(&Default::default());
