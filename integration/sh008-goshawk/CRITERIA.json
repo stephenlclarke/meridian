@@ -1,6 +1,6 @@
 {
   "target": "SH008 Goshawk Explorer",
-  "status": "SOURCE_BOUND_CANDIDATE;RUNTIME_UNRUN;NO_ADMISSION",
+  "status": "PARTIALLY_QUALIFIED;JOINED_RUNTIME_PENDING;NO_ADMISSION",
   "base": "a9bd0cc66c15e4ecfe57a0d86b774b797addc231",
   "order": "Next unresolved original after SH001; SH009 remains held",
   "detailedModel": "Authenticated staged asset with original fields and once-applied exact calibration",
@@ -16,46 +16,52 @@
   "tests": [
     {
       "name": "goshawk_encloses_both_source_triangle_sets_without_redistributing_vertices",
-      "status": "UNRUN"
+      "status": "PASS",
+      "testedRevision": "f3cf5b8263cc6f132cd66eb0deea7fb982f1e347"
     },
     {
       "name": "goshawk_forebody_channel_stays_clear_while_a_source_drive_arm_blocks_contact",
-      "status": "UNRUN"
+      "status": "PASS",
+      "testedRevision": "f3cf5b8263cc6f132cd66eb0deea7fb982f1e347"
     },
     {
       "name": "goshawk_original_sh028_accepts_aligned_entry_but_rejects_bad_speed_roll_and_aperture",
-      "status": "UNRUN"
+      "status": "PASS",
+      "testedRevision": "f3cf5b8263cc6f132cd66eb0deea7fb982f1e347"
     },
     {
       "name": "goshawk_original_sh028_blocks_the_lip_and_launches_from_its_own_rear_support",
-      "status": "UNRUN"
+      "status": "PASS",
+      "testedRevision": "f3cf5b8263cc6f132cd66eb0deea7fb982f1e347"
     }
   ],
   "sourceProof": "Every source component and triangle remains assigned to one piece. Independent plane support check across the authored channel obstacle sweep has at least 0.746 m source slack; this is a local static certificate, not runtime qualification.",
   "nextAcceptance": [
     "Run all four named SH008 core tests with current protected source and strict Clippy in the owned lane",
     "Resolve the measured well-mouth fit and cross-source discrepancy under a source-specific decision",
-    "Qualify the source-bound Showroom appearance, rounded support shimmer and cost in the owned native lane",
+    "Measure GPU draw cost with valid counters and qualify minimum-size clipping. The three offscreen visual comparisons passed on their recorded revision.",
     "Resolve source-supported engineering mass/inertia and authored ordinary placement separately before hull acceptance"
   ],
   "counts": "Source packet does not alter full-fleet or public-preview acceptance",
   "stationSlice": {
     "boundBase": "6422079ccd3936224668641f106afdff12a584d7",
-    "status": "AUTHORED_UNRUN",
+    "status": "FOUR_CORE_CASES_PASSED",
     "witnessSha256": "3bf4115324203b735025469207b2c6d295cfc98d0ccdb64a8db8edff0e4861f5",
     "evidence": "Original SH028 face 482 and exact calibrated SH008 rail vertex 6 yield a strict interior lip intersection while the body centre is still outside the aperture. Actual station source/asset data and once-calibrated appearance/partition are unchanged.",
-    "runtimeNext": "After owned check and core station tests, qualify controlled World approach, original display and close-range shimmer, runtime cost and actual station visibility. Ordinary engineering and placement pending.",
+    "runtimeNext": "Qualify the joined source on the owned platforms. Ordinary placement and gameplay docking remain open.",
     "reviewCorrection": {
-      "status": "AUTHORED_UNRUN",
+      "status": "COVERED_BY_FOUR_CORE_PASSES",
       "findings": [
         "G2-SH008-DOCK-FIXTURE-INDEPENDENCE-1",
         "G2-SH008-DOCK-CRITERIA-COUNT-1"
       ],
-      "coverage": "Exact independent outward-rounded launch coordinate, a clear initial lip pose, and a physically clear off-aperture sweep before its separate entry refusal. Geometry and source assets stay byte exact."
-    }
+      "coverage": "Exact independent outward-rounded launch coordinate, a clear initial lip pose, and a physically clear off-aperture sweep before its separate entry refusal. Geometry and source assets stay byte exact.",
+      "testedRevision": "f3cf5b8263cc6f132cd66eb0deea7fb982f1e347"
+    },
+    "testedRevision": "f3cf5b8263cc6f132cd66eb0deea7fb982f1e347"
   },
   "presentation": {
-    "status": "SOURCE_BOUND_SHOWROOM_AUTHORED;NATIVE_UNRUN",
+    "status": "NORMAL_SIZE_MAC_SHOWROOM_OBSERVED",
     "path": "Ordinary station Ship Showroom, exact SH008 catalogue selection",
     "visualProvenance": "assets/fleet/sh008/VISUAL-PROVENANCE.json",
     "geometry": "3484 original detailed faces, 69 existing rounded supports and one depth-tested shimmer result",
@@ -65,19 +71,23 @@
     ],
     "nativeAcceptance": "Capture original forest-silver appearance, the open wishbone and close grazing shimmer while rotating in the ordinary Showroom; verify resize, view clipping and draw cost.",
     "metalShimmerQualification": {
-      "status": "AUTHORED_UNRUN",
+      "status": "THREE_OFFSCREEN_VIEWS_VERIFIED;GPU_TIMING_INVALID",
       "visualTest": "metal_goshawk_same_pose_shimmer",
       "gpuTimingTest": "metal_goshawk_gpu_cost",
       "verifier": "tools/verify_goshawk_showroom_evidence.py",
       "capture": "Three stationary front, yaw-oblique and elevated Showroom views at 1280x720 logical, 2x scale, BGRA8 sRGB and production depth. Retain the hull-local unit directions and solid, production, repeat and shifted phase panes.",
       "pixelChecks": "Identical production repeat and nonzero solid-to-production and phase differences across distinct hull-local views. Both phases are at most 24 sRGB codes per channel from the solid, and at most seven codes apart. Inspect the upper view and amplified differences for the local open wishbone.",
       "gpuTiming": "Three warmups and 16 Metal GPU timestamp pairs per pose if the adapter exposes TIMESTAMP_QUERY. Each pair brackets the isolated production shimmer draw and attachment load/store. Preserve every pair and period for all poses before validation. Require ordered nonoverlapping intervals within and across poses, one finite positive period and no invalid Metal counters. Otherwise record unsupported only if the adapter lacks queries. An optional trailing-render diagnostic uses a fresh timing directory and adds one unmeasured solid render before resolve.",
-      "scope": "Offscreen production hull pass. Ordinary Showroom UI and fixed illumination are preserved. Windows graphics and physical collision cost are outside this receipt."
-    }
+      "scope": "Offscreen production hull pass. Ordinary Showroom UI and fixed illumination are preserved. Windows graphics and physical collision cost are outside this receipt.",
+      "testedRevision": "1311359cf78b0a13ea6d075eae53d5117e32a2ec",
+      "result": "Front, oblique and upper same-phase repeats matched byte for byte. Across both phases the largest changes from solid were 15, 22 and 17 sRGB codes respectively. Phase-only peaks were two codes in all views. In both timing variants each pose had 15 overlapping adjacent intervals and a zero final end tick.",
+      "gpuCostNanoseconds": null
+    },
+    "nativeRevision": "cfaab8a9704ba0124a08ce5e8a9e474c18484df6"
   },
   "controlledWorld": {
     "boundBase": "cfaab8a9704ba0124a08ce5e8a9e474c18484df6",
-    "status": "AUTHORED_UNRUN",
+    "status": "FIVE_ROUTE_MAC_RUN_PASSED;JOINED_REGRESSIONS_PENDING",
     "qualifiedPrerequisites": "All four prior SH008 core and SH028 cases passed hosted Linux, hosted Mac and the owned Mac workspace. The ordinary Mac Showroom displays SH008.",
     "scope": "One World with fixed original SH028, stationary native SH025 observer, and the 69 existing rounded SH008 pieces. No change to fleet or public-preview acceptance.",
     "regressions": [
@@ -111,7 +121,18 @@
       "Run all three controlled World regressions and all four existing source/SH028 cases against the joined exact source",
       "Run repository checks and strict Clippy on the joined revision",
       "Record release timing by route with commit and machine/runtime identity"
-    ]
+    ],
+    "verifiedReleaseRun": {
+      "revision": "8f8fff2d16b950720605032c445917e6d060a454",
+      "platform": "macOS arm64",
+      "terminalTicks": {
+        "aligned": 70,
+        "overspeed": 31,
+        "lip": 20,
+        "off-aperture": 70,
+        "observer": 58
+      }
+    }
   },
   "surfaceFit": {
     "status": "CERTIFIED_SOURCE_BOUNDS;LOCAL_WELL_DECISION_PENDING",
