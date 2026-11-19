@@ -61,7 +61,9 @@ mod tests {
         assert_eq!(explorer.len(), 10_452);
         let mut textures = [0; 3];
         let mut emissive = 0;
-        for (index, face) in mk2.chunks_exact(3).enumerate() {
+        let (triangles, remainder) = mk2.as_chunks::<3>();
+        assert!(remainder.is_empty());
+        for (index, face) in triangles.iter().enumerate() {
             for (corner, vertex) in face.iter().enumerate() {
                 let source_index = u32::from_le_bytes(array(FACES, index * 12 + corner * 4));
                 assert_eq!(vertex.position, point(source_index as usize));
