@@ -9,6 +9,7 @@ assets/fleet/sh033/** -text
 
 # These source and review fixtures are verified against their Git blob bytes.
 crates/meridian-core/src/**/*.rs text eol=lf
+tools/measure_goshawk_surface_fit.py text eol=lf
 integration/sh001-mule/*.json text eol=lf
 integration/sh001-mule/*.patch -text
 integration/sh008-goshawk/*.json text eol=lf
