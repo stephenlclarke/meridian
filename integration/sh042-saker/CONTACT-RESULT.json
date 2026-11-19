@@ -1,0 +1,227 @@
+{
+  "clearanceMillimetres": {
+    "forward-under-upper-shroud": 813,
+    "forward-inboard-left-shroud": 499,
+    "forward-inboard-right-shroud": 499,
+    "aft-ventral-between-drives": 2248,
+    "aft-port-between-drives": 2725,
+    "aft-starboard-between-drives": 2725,
+    "astern-between-three-drives": 479
+  },
+  "alignedMillimetres": 41772,
+  "offsetStartMillimetres": 979,
+  "sourceLipWitness": {
+    "fraction": 0.5,
+    "pointMetres": [
+      69.4,
+      0.0,
+      136.32
+    ],
+    "barycentrics": [
+      0.3599999999999941,
+      0.1400000000000059,
+      0.5
+    ]
+  },
+  "sourceSolidContactsMetres": [
+    [
+      0.65,
+      -0.2728764,
+      -6.4775337
+    ],
+    [
+      0.5572755,
+      -0.4954699,
+      -6.4110397
+    ],
+    [
+      0.15869,
+      -0.4954699,
+      -5.3259621
+    ]
+  ],
+  "originalJoints": [
+    {
+      "name": "upper-barrel-to-brace",
+      "pointMetres": [
+        -0.117,
+        2.0,
+        -7.61
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "upper-brace-to-shroud",
+      "pointMetres": [
+        -0.117,
+        5.9,
+        -9.13
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "left-barrel-to-brace",
+      "pointMetres": [
+        -1.3724999999999998,
+        -0.622698,
+        -7.61
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "left-brace-to-shroud",
+      "pointMetres": [
+        -5.0508999999999995,
+        -3.0513220000000003,
+        -9.13
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "right-barrel-to-brace",
+      "pointMetres": [
+        1.3575,
+        -0.648678,
+        -7.61
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "right-brace-to-shroud",
+      "pointMetres": [
+        5.1679,
+        -2.848678,
+        -9.13
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "barrel-to-canopy",
+      "pointMetres": [
+        0.19,
+        1.85,
+        9.31
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ]
+}

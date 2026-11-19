@@ -1,0 +1,85 @@
+{
+  "id": "SH042",
+  "name": "Saker",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourceUnits": "metres",
+  "metresPerSourceUnit": 1,
+  "detail": {
+    "vertices": 1996,
+    "faces": 3864,
+    "components": 32,
+    "bounds": [
+      [
+        -8.0681778,
+        -5.506,
+        -20.09
+      ],
+      [
+        8.0681778,
+        9.006,
+        21.5
+      ]
+    ]
+  },
+  "native": {
+    "vertices": 132,
+    "faces": 220,
+    "components": 11,
+    "bounds": [
+      [
+        -8.0681778,
+        -5.506,
+        -20.09
+      ],
+      [
+        8.0681778,
+        9.006,
+        21.5
+      ]
+    ],
+    "faceLimit": 512,
+    "approvedSourcePath": "fleet-completion-20261019/batch-02-native-lod/SH042-design.toml",
+    "approvedSourceSha256": "8b64ebb1529abe86018b7b2553c45f961c06f0e0a9182321ec1b528cb0a716c8"
+  },
+  "shapePieces": 26,
+  "textures": [
+    "l337-patrol-diffuse",
+    "l337-strike-diffuse",
+    "l337-service-details"
+  ],
+  "unmappedMaterialSlot": 4294967295,
+  "pins": {
+    "resource.toml": "94707ec289d9b4b1147158ded2c69fc3fe1225a7686ce53a6b4968b3d16c3b1f",
+    "native-export.json": "ecf4c8d379c676ef7c309ebfcb1b52870d773f6eabf0d739c0aa99a1a276f689",
+    "contract.toml": "36a903484eb884b1774baf0c18270d99916c54cc1cfa55aad32253284faf4293",
+    "engineering.json": "f113d1c0b723760cb7755ae51204d89e125bb5c3f8d1cf1f0070eaf96d54fa75",
+    "finite-dry-source.json": "0ba38f2ab61682ba99c62696c2e22120131ab560018d785ee34f8924ad85358c",
+    "LICENSE": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+  },
+  "outputs": {
+    "source.vertices": {
+      "bytes": 51088,
+      "sha256": "8c23090d7f5e679918ed8a77f968992866a84b0a5b04477c543f16fb101f72e4"
+    },
+    "source-triangles.bin": {
+      "bytes": 49008,
+      "sha256": "4602cf4b5803b4e578f72251578aef6ab7d590091fdc51b5aa0293f4852f5987"
+    },
+    "source-piece-membership.bin": {
+      "bytes": 2128,
+      "sha256": "aae78d9636ccc7143dc44ea72c484f37e82d0094e0e666912eda3172074c0be2"
+    },
+    "PIECES.json": {
+      "bytes": 640,
+      "sha256": "5ad2e540d694f1e3b328aa379539f675f79b1a2528ce66749a9dbcb8926440a2"
+    },
+    "visual.bin": {
+      "bytes": 649168,
+      "sha256": "5ed42fc83cb251d3de72933194f12615b04811426ef01f51d929b041b7b6b5ba"
+    },
+    "native-visual.bin": {
+      "bytes": 36976,
+      "sha256": "4a5979528152ae46657529c2664f9b3e278008147ab6bc9a526f316019f23d9a"
+    }
+  }
+}

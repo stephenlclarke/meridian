@@ -1,0 +1,173 @@
+{
+  "hull": "SH042 Saker",
+  "status": "AUTHORED_CONTROLLED_SOURCE;SIGNED_STUDIO_EXPORT_PASS;RUST_AND_SHOWROOM_PENDING",
+  "source": "assets/fleet/sh042/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh042-saker/FROZEN-SOURCES.json",
+  "geometryTests": [
+    "saker_original_detailed_and_native_faces_share_complete_local_supports",
+    "saker_shroud_and_drive_passages_clear_and_solid_sources_contact",
+    "saker_original_sh028_aligned_crossing_clears_before_offset_native_lip_contact"
+  ],
+  "originalTextures": {
+    "assets/fleet/sh001/l337-patrol-diffuse.rgba": {
+      "path": "Sources/L337Core/Resources/OriginalShipTextures/l337-patrol-diffuse.rgba",
+      "blob": "e4afc5f105872431548b4707ea5055dad413a066",
+      "sha256": "9699517d12b4fbbb28746e00bed9ee65c19a098d14402b1d5160280c6f6bfc54",
+      "bytes": 4194304
+    },
+    "assets/fleet/sh001/l337-strike-diffuse.rgba": {
+      "path": "Sources/L337Core/Resources/OriginalShipTextures/l337-strike-diffuse.rgba",
+      "blob": "15de9d9bef17ca1920f55d14d95deb155a0fd928",
+      "sha256": "e56f149228caf90237a652d720ae549768bde1056af3d903dc8a5c243ad26e97",
+      "bytes": 4194304
+    },
+    "assets/fleet/sh001/l337-service-details.rgba": {
+      "path": "Sources/L337Core/Resources/OriginalShipTextures/l337-service-details.rgba",
+      "blob": "372a604db778f6bb545ba146c9bd85cbd5039a63",
+      "sha256": "35edd84f6ce527195dd8a9bcc039521a6efc5aa2333452bbbc30217b8372103d",
+      "bytes": 4194304
+    }
+  },
+  "nativeFaceCompliance": {
+    "sourceFaces": 220,
+    "contractMaximum": 512,
+    "state": "ORIGINAL_WITHIN_CONTRACT_LIMIT"
+  },
+  "engineering": {
+    "stockRecord": "assets/fleet/sh042/engineering.json",
+    "finiteEmptyDryRecord": "assets/fleet/sh042/finite-dry-source.json",
+    "studioReference": "finite-intrinsic-empty-saker",
+    "operatingAuthorityGranted": false
+  },
+  "air": {
+    "hostname": "SteveMBA",
+    "reports": {
+      "SURFACE-FIT.json": "128c651e975f3929187ae4b3b6cbbc64c6f17d2f656471894443873a124d0bc6",
+      "ORIGINAL-DIFFERENCE.json": "016b17ea66f294efa2225cd68699e1487295e6e6407f3aba25d8c9fb359c478f",
+      "CONTACT-RESULT.json": "a3bf3b9baa6d82cb6eb4b86a4ffe3c9af0c1499daf78cb5e4540280d66af7270"
+    },
+    "nativeLimitingFeature": {
+      "piece": "left-instrument-housing",
+      "sourceVertex": 1899,
+      "nearestOriginalNativeFace": 14,
+      "pointDistanceMetres": 2.0855163309712954,
+      "strictPointLowerMillimetres": 2084,
+      "nativeEnvelopeUpperMillimetres": 2106,
+      "detailedEnvelopeUpperMillimetres": 344,
+      "originalNativeSupportVertices": 0
+    }
+  },
+  "independentReplay": {
+    "tools": {
+      "tools/prepare_saker_geometry.py": "b6170b306d55757bf9391265115b400ba83cfbfd2721732bd9b2d56660eb0576",
+      "tools/prepare_saker_studio.py": "3350b3a5beb17af6e05b6dbdb8538ce76b223bcb5a2f66169804fc0b0b3c3695",
+      "tools/verify_saker_geometry.py": "98652e217879a9096556138663101424683401258eb0408ed7602477dc67fd74",
+      "tools/measure_saker_air.py": "fc9112de41ab428ba6a5e877360eff0fd988f2abb8d6a6b8f415eb10c8b608bb",
+      "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+      "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+      "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+      "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e"
+    },
+    "fixtures": {
+      "integration/sh042-saker/FIXTURES.json": "d81ace1ec50d8578e172bec88060cc3810ec38c87c9983ff2993a40f42d21b6d",
+      "integration/sh042-saker/SUPPORT-FAN.json": "b537e1545b9d956d71723ee772cd2c069d74cf4b11dd249e598daf17077b2243",
+      "integration/sh042-saker/FROZEN-SOURCES.json": "7a8e605130bc2a951c7e50b8004339139d79ab0c19e5d644ab0570e262505b6e"
+    },
+    "reproduce": [
+      "python3 -B tools/prepare_saker_geometry.py --check",
+      "python3 -B tools/prepare_saker_studio.py --check",
+      "python3 -B tools/verify_saker_geometry.py | cmp - integration/sh042-saker/CONTACT-RESULT.json",
+      "python3 -B tools/measure_saker_air.py --difference | cmp - integration/sh042-saker/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/measure_saker_air.py | cmp - integration/sh042-saker/SURFACE-FIT.json"
+    ],
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "byteReplay": {
+      "startedUtc": "2026-11-19T19:46:01Z",
+      "finishedUtc": "2026-11-19T19:46:49Z",
+      "logSha256": "a613d283577905d43a8cc2ba56b7de2f74a0c8cbfedaaf8fb67f25af896f6ade"
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh042-saker/SAKER-STUDIO.json",
+    "bytes": 505788,
+    "sha256": "9d1c0ba389ffe82b4aba0bb1aff2b18c0e81dc31b4c5080421f8214eb00983b1",
+    "schema": 1,
+    "probeCount": 7,
+    "probeRadiusMetres": 0.1,
+    "loaderRevision": "eef206fdd64e3b1ee538b0d1e2d808483f307282",
+    "loaderSource": "tools/hull_studio/definitions.py",
+    "loaderSha256": "f68ea0f442267b793338af6ebec6a937f9e1ee3946dc9be96e58db3e2a796e43",
+    "installedExport": {
+      "toolSourceTree": "1b8d2bdaaef99286d84d46c1a4b2b3052abd884d",
+      "studioSha256": "d0eed94a34000aa4153f4ef05d79a593666b67ed200489bc9668fa99d4949501",
+      "validatorSha256": "fda086879cbb5543134437a0606900d6d0335884cd52bd392366158765f460ed",
+      "startedUtc": "2026-11-19T19:46:00.919412+00:00",
+      "finishedUtc": "2026-11-19T19:46:01.211610+00:00",
+      "pid": 44014,
+      "supportGroups": 26,
+      "clearances": [
+        {
+          "name": "forward-under-upper-shroud",
+          "passed": true
+        },
+        {
+          "name": "forward-inboard-left-shroud",
+          "passed": true
+        },
+        {
+          "name": "forward-inboard-right-shroud",
+          "passed": true
+        },
+        {
+          "name": "aft-ventral-between-drives",
+          "passed": true
+        },
+        {
+          "name": "aft-port-between-drives",
+          "passed": true
+        },
+        {
+          "name": "aft-starboard-between-drives",
+          "passed": true
+        },
+        {
+          "name": "astern-between-three-drives",
+          "passed": true
+        }
+      ],
+      "comparison": "Export bytes equal input bytes excluding final LF.",
+      "packetEntries": {
+        "studio/ACTUAL-START.json": {
+          "bytes": 16557,
+          "sha256": "09a9314e46b4b0f01443b58cd0a48eadc2de07a87e43e11084878a33155e430e"
+        },
+        "studio/TERMINAL.json": {
+          "bytes": 18666,
+          "sha256": "bcdb88c1a55d79e3b56cdf5724088e7d01350d3c25339947b7b2822f2dd3fa58"
+        },
+        "studio/export.stdout": {
+          "bytes": 68364,
+          "sha256": "e4421aa837116ad981d94c35ddb6bc2b84e9809cc8033ab099d59bfa71e3eecc"
+        },
+        "studio/export.stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "studio/SAKER.hull.json": {
+          "bytes": 505787,
+          "sha256": "c879911d14d18ec575ec9a5cc6fa714a94325ddd2591454d11d07fec3d1f115c"
+        },
+        "studio/RAW-PACKET.tar.gz": {
+          "bytes": 141893,
+          "sha256": "62902423570f49ae829b6840d17e3e07d81b2d304919bdb28be8515c22e6e580"
+        }
+      }
+    }
+  }
+}
