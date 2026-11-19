@@ -37,7 +37,7 @@
   ],
   "sourceProof": "Every source component and triangle remains assigned to one piece. Independent plane support check across the authored channel obstacle sweep has at least 0.746 m source slack; this is a local static certificate, not runtime qualification.",
   "nextAcceptance": [
-    "Resolve the measured well-mouth fit and cross-source discrepancy under a source-specific decision",
+    "Qualify the selected 69-piece service-well shield regression. Retain both measured original sources.",
     "Measure GPU draw cost with valid counters. The three offscreen visual comparisons passed on their recorded revision.",
     "Resolve source-supported engineering mass/inertia and authored ordinary placement separately before hull acceptance"
   ],
@@ -158,7 +158,7 @@
     }
   },
   "surfaceFit": {
-    "status": "CERTIFIED_SOURCE_BOUNDS;LOCAL_WELL_DECISION_PENDING",
+    "status": "CERTIFIED_SOURCE_BOUNDS;WELL_BRIDGE_CHOSEN;COLLISION_REGRESSION_PENDING",
     "evidence": "integration/sh008-goshawk/SURFACE-FIT.json",
     "envelopePieces": 69,
     "guardedExposedSamples": 29057,
@@ -174,6 +174,13 @@
       ]
     },
     "channelMinimumCertifiedMillimetres": 1467,
-    "wellDecision": "Decide whether the measured original service-well mouths must be collision-accessible, or whether their local rounded fill can be approved. Preserve both source records and distinguish mandatory cross-source mismatch from removable convex fill. A different authoritative source strategy would be needed to remove the mandatory vertex discrepancy."
+    "wellDecision": "Keep the existing 69 rounded convex pieces and bridge the four measured service-well mouths. The independent original forebody-channel sweep stays clear. Retain both calibrated originals and the previously recorded cross-source bounds.",
+    "wellAccessEvidence": {
+      "base": "4bc91f338115dafc47263c8b8a2aacaf8d2d146b",
+      "reportSha256": "aa94c8e6925584ec85852668ed54fc168ec2e653cb2572eb91b10065bbf92543",
+      "packetSha256": "6a71ac2fc89add10dfd4bdcfc08c3054914f60ec22c125900c972f6f9b5997d3"
+    },
+    "collisionRegression": "goshawk_smoothed_service_wells_block_the_four_original_approaches",
+    "channelRegression": "goshawk_forebody_channel_stays_clear_while_a_source_drive_arm_blocks_contact"
   }
 }

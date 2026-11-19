@@ -88,6 +88,70 @@ fn goshawk_forebody_channel_stays_clear_while_a_source_drive_arm_blocks_contact(
     Ok(())
 }
 
+#[test]
+fn goshawk_smoothed_service_wells_block_the_four_original_approaches() -> Result<(), EnvelopeError>
+{
+    let source = GoshawkHullSource::bundled()?;
+    // Calibrated mouth centers and exterior stations from the independent swept-clearance
+    // certificate. These fixed coordinates do not read the runtime vertices or partition.
+    let cases = [
+        (
+            "detailed body well 0",
+            Vec3::new(2.321_523_564, 3.487_682_746, -9.963_112_909),
+            Vec3::new(30.195_440_190, 32.176_418_708, -9.963_112_909),
+        ),
+        (
+            "native body well 0",
+            Vec3::new(2.302_049_164, 3.474_782_475, -8.396_213_846),
+            Vec3::new(30.196_679_596, 32.143_376_835, -8.396_213_846),
+        ),
+        (
+            "detailed left arm well 3",
+            Vec3::new(-10.086_669_591, 0.703_563_159, 4.316_363_456),
+            Vec3::new(-38.111_228_612, 29.245_204_394, 4.316_363_456),
+        ),
+        (
+            "native left arm well 1",
+            Vec3::new(-10.070_866_394, 0.692_846_161, 5.085_030_921),
+            Vec3::new(-38.115_986_634, 29.214_269_500, 5.085_030_921),
+        ),
+    ];
+    let at_mouth = RigidPose {
+        position: Vec3::new(0.0, 0.0, 0.0),
+        orientation: Basis3::IDENTITY,
+    };
+    for (well, mouth, outside) in cases {
+        // The triangle fits within a 1 mm radius, inside even the narrowest open trial route.
+        let probe = [[
+            Vec3::new(mouth.x - 0.001, mouth.y, mouth.z),
+            Vec3::new(mouth.x + 0.001, mouth.y, mouth.z),
+            Vec3::new(mouth.x, mouth.y + 0.001, mouth.z),
+        ]];
+        // Move the hull past a fixed probe so the relative sweep follows the original approach.
+        let at_exterior = RigidPose {
+            position: Vec3::new(
+                mouth.x - outside.x,
+                mouth.y - outside.y,
+                mouth.z - outside.z,
+            ),
+            ..at_mouth
+        };
+        assert!(
+            source.sweep_clears_triangles(at_exterior, at_exterior, 0.0, &probe)?,
+            "{well} must start clear outside the hull"
+        );
+        assert!(
+            !source.sweep_clears_triangles(at_mouth, at_mouth, 0.0, &probe)?,
+            "{well} must be covered by the rounded envelope"
+        );
+        assert!(
+            !source.sweep_clears_triangles(at_exterior, at_mouth, 0.0, &probe)?,
+            "{well} must block the continuous approach"
+        );
+    }
+    Ok(())
+}
+
 fn inward_at(x: f64, z: f64) -> RigidPose {
     RigidPose {
         position: Vec3::new(x, 0.0, z),

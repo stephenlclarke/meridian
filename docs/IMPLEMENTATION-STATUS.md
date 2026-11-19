@@ -22,6 +22,13 @@ The SH008 geometry and Showroom source target the original forest-silver Goshawk
 
 The SH009 Goshawk Mk II visual source packet encodes all 3,532 original detailed faces and their original appearance through the shared Showroom visual layout. Source-level Python parity and mutation checks cover every corner record. The candidate registers SH009 with a distinct visual key. The Air reproduced the 73-piece shield fit, aligned station crossing and offset lip contact. The stock engineering model is 33,072 kg. The joined Rust, renderer and native Showroom checks are pending. [Mk II source geometry and visual](GOSHAWK-MK-II-SOURCE-GEOMETRY.md)
 
+The chosen 69-piece Goshawk shield bridges the four measured service wells
+and keeps the forebody channel open. A gameplay collision regression now
+checks the original mouth centers and complete approaches for both aft body
+wells and both left arm wells. Execution of that new regression is pending.
+Stock dry mass and inertia, ordinary placement and gameplay docking remain
+open. [Service-well decision](GOSHAWK-GAMEPLAY-ENVELOPE.md#full-surface-fit-evidence)
+
 ## Internal Mule docking validation
 
 Mac build `ffb7112` passed 702 Rust tests, 102 Python tests, strict Clippy, and the release build. In the native scene the aligned Mule crossed at tick 104 and the obstructed Mule stopped for station contact at tick 11. Linux and native Windows each passed 705 Rust tests including three observer tests, 102 Python tests, strict Clippy, and both release builds. One Metal fixture was excluded from the ordinary test counts on each platform. These results qualify the internal docking scene. At that checkpoint, ordinary encounters and player acquisition were still open. [Controls and test scope](MULE-VALIDATION-LAUNCH.md)
