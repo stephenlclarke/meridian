@@ -63,6 +63,57 @@ def inspect_surface(package, report):
         ]
 
 
+class GamePreview:
+    """Keep the disposable profile alive until its game process exits."""
+
+    def __init__(self, executable):
+        self.executable = executable
+        self.lock = threading.Lock()
+        self.running = False
+
+    def launch(self, package):
+        if self.executable is None:
+            raise RuntimeError("The game inspector is unavailable in this installation")
+        with self.lock:
+            if self.running:
+                raise RuntimeError(
+                    "Close the open Showroom window before opening another ship"
+                )
+            workspace = tempfile.TemporaryDirectory(prefix="meridian-hull-showroom-")
+            folder = Path(workspace.name)
+            try:
+                hull = folder / "ship.hull.json"
+                hull.write_bytes(encode(package))
+                profile = folder / "profile"
+                profile.mkdir()
+                child = subprocess.Popen(
+                    [
+                        str(self.executable),
+                        "--save-dir",
+                        str(profile),
+                        "--inspect-hull-package",
+                        str(hull),
+                        "--open-authored-showroom",
+                    ],
+                    cwd=folder,
+                    stdin=subprocess.DEVNULL,
+                )
+            except BaseException:
+                workspace.cleanup()
+                raise
+            self.running = True
+
+        def on_exit():
+            try:
+                child.wait()
+                workspace.cleanup()
+            finally:
+                with self.lock:
+                    self.running = False
+
+        threading.Thread(target=on_exit, daemon=False).start()
+
+
 class StudioRequest(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         if sys.stderr is not None:
@@ -93,6 +144,10 @@ class StudioRequest(BaseHTTPRequestHandler):
         if not self.local():
             return self.respond(403, encode({"error": "Use the local Studio address"}))
         route = urlsplit(self.path).path
+        if route == "/api/capabilities":
+            return self.respond(
+                200, encode({"showroom": self.server.preview.executable is not None})
+            )
         if route == "/api/example":
             return self.respond(200, self.server.example)
         root = Path(__file__).with_name("web").resolve()
@@ -109,7 +164,7 @@ class StudioRequest(BaseHTTPRequestHandler):
         if not self.local():
             return self.respond(403, encode({"error": "Use the local Studio address"}))
         route = urlsplit(self.path).path
-        if route not in ("/api/build", "/api/export", "/api/quit"):
+        if route not in ("/api/build", "/api/export", "/api/quit", "/api/showroom"):
             return self.respond(404, encode({"error": "Unknown operation"}))
         if self.headers.get_content_type() != "application/json":
             return self.respond(415, encode({"error": "Send a JSON definition"}))
@@ -129,6 +184,9 @@ class StudioRequest(BaseHTTPRequestHandler):
             if not isinstance(body, dict) or set(body) != {"definition"}:
                 raise ValueError("Expected an object with a definition field")
             package, report = build(body["definition"], self.server.validator)
+            if route == "/api/showroom":
+                self.server.preview.launch(package)
+                return self.respond(200, encode({"opened": True}))
         except InvalidHull as error:
             if route == "/api/build" and error.report.get("supportGroups"):
                 inspect_surface(error.package, error.report)
@@ -154,6 +212,11 @@ def main():
         else ROOT / "target/release" / binary
     )
     parser.add_argument("--validator", type=Path, default=default_validator)
+    parser.add_argument(
+        "--game",
+        type=Path,
+        help="Meridian desktop executable for opening validated ships",
+    )
     parser.add_argument(
         "--definition",
         type=Path,
@@ -195,6 +258,13 @@ def main():
         print(json.dumps(report))
         return
     with ThreadingHTTPServer(("127.0.0.1", args.port), StudioRequest) as server:
+        game_name = "meridian-desktop" + (".exe" if os.name == "nt" else "")
+        game = (
+            args.game.resolve() if args.game else default_validator.with_name(game_name)
+        )
+        if args.game and not game.is_file():
+            parser.error(f"Game executable is missing: {game}")
+        server.preview = GamePreview(game if game.is_file() else None)
         server.validator, server.example = validator, sample
         address = f"http://127.0.0.1:{server.server_port}/"
         if sys.stdout is not None:

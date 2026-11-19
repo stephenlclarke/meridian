@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -11,7 +12,7 @@ from pathlib import Path
 from definitions import HERE, ROOT, encode, reference_bytes, reference_fit
 
 
-def package(validator, destination, identity):
+def package(validator, destination, identity, game):
     platform = sys.platform
     if platform not in ("darwin", "win32"):
         raise ValueError("The packaged editor targets macOS and Windows")
@@ -37,7 +38,6 @@ def package(validator, destination, identity):
         binary = stage / (
             "meridian-hull-tool.exe" if platform == "win32" else "meridian-hull-tool"
         )
-        import shutil
 
         shutil.copy2(validator, binary)
         cmd = [
@@ -68,6 +68,12 @@ def package(validator, destination, identity):
             "--add-data",
             f"{ROOT / 'assets/fleet/sh023/LICENSE'}{os.pathsep}notices/sh023",
         ]
+        if game:
+            desktop = stage / (
+                "meridian-desktop.exe" if platform == "win32" else "meridian-desktop"
+            )
+            shutil.copy2(game, desktop)
+            cmd.extend(["--add-binary", f"{desktop}{os.pathsep}."])
         if platform == "darwin":
             cmd.extend(["--osx-bundle-identifier", "io.xyzzy.meridian.hullstudio"])
             if identity:
@@ -84,7 +90,10 @@ if __name__ == "__main__":
     parser.add_argument("--validator", type=Path, required=True)
     parser.add_argument("--dist", type=Path, required=True)
     parser.add_argument(
+        "--game", type=Path, help="Optional compatible Meridian Showroom executable"
+    )
+    parser.add_argument(
         "--signing-identity", help="Existing macOS Developer ID Application identity"
     )
     ns = parser.parse_args()
-    package(ns.validator.resolve(), ns.dist.resolve(), ns.signing_identity)
+    package(ns.validator.resolve(), ns.dist.resolve(), ns.signing_identity, ns.game)

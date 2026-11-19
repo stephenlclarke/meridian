@@ -25,7 +25,9 @@ server with Quit Studio or Ctrl+C in its terminal.
    definition invalidates the preceding result. A failed clearance blocks
    export. A package may carry null engineering data where mass or inertia is
    unknown.
-5. Pass a new ship to the Meridian desktop executable with
+5. In the standalone app, choose **Open in Showroom** to inspect your ship in
+   the game. This opens a disposable commander profile and removes it when
+   the game exits. You can also pass a new ship to the Meridian desktop executable with
    `--hull-package PATH`. For a variant sharing a catalogue identity, use
    `--inspect-hull-package PATH` to compare it with the original in the
    Ship Showroom. This workflow adds an inspectable hull. Encounters, purchase
@@ -62,10 +64,11 @@ To select an already built validator, pass `--validator PATH`.
 ## Standalone desktop build
 
 Build the validator for the host with `cargo build --release --locked -p meridian-hull-tool`.
+Build `meridian-desktop` in release mode as well to include the Showroom.
 In a Python environment with PyInstaller installed, run:
 
 ```sh
-python tools/hull_studio/package_app.py --validator target/release/meridian-hull-tool --dist OUTPUT
+python tools/hull_studio/package_app.py --validator target/release/meridian-hull-tool --game target/release/meridian-desktop --dist OUTPUT
 ```
 
 On Windows use `meridian-hull-tool.exe`. On macOS pass an existing Developer ID
