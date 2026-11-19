@@ -1,6 +1,7 @@
 //! Generic detailed-face renderer for session-local hull packages only.
 use super::{EMPTY_PIECE, Rect, Triangle, Uniforms, View, VisualVertex, gpu, shader};
 use crate::docked_screens::ModelPreview;
+use meridian_core::hull_package::PreviewFit;
 use std::ops::Range;
 
 pub(crate) struct AuthoredFace {
@@ -22,49 +23,10 @@ impl AuthoredVisual {
         vertices: &[[f64; 3]],
         faces: impl IntoIterator<Item = AuthoredFace>,
     ) -> Result<(Self, [f64; 3]), String> {
-        let mut low = [f64::INFINITY; 3];
-        let mut high = [f64::NEG_INFINITY; 3];
-        for point in vertices {
-            if point.iter().any(|n| !n.is_finite()) {
-                return Err("Nonfinite authored visual point".into());
-            }
-            for axis in 0..3 {
-                low[axis] = low[axis].min(point[axis]);
-                high[axis] = high[axis].max(point[axis]);
-            }
-        }
-        let dimensions: [f64; 3] = std::array::from_fn(|axis| high[axis] - low[axis]);
-        let extent = dimensions.into_iter().fold(0.0, f64::max);
-        if !extent.is_finite()
-            || extent <= 0.0
-            || dimensions.into_iter().any(|n| !n.is_finite() || n < 0.0)
-        {
-            return Err("Authored visual has no finite extent".into());
-        }
-        let center: [f64; 3] = std::array::from_fn(|axis| low[axis] + dimensions[axis] * 0.5);
-        let fitted: Vec<[f64; 3]> = vertices
-            .iter()
-            .map(|point| std::array::from_fn(|axis| (point[axis] - center[axis]) / extent * 32.0))
-            .collect();
+        let fit = PreviewFit::new(vertices)?;
         let mut corners = Vec::new();
         for face in faces {
-            let [Some(a), Some(b), Some(c)] = face.indices.map(|index| fitted.get(index).copied())
-            else {
-                return Err("Authored visual face index is invalid".into());
-            };
-            let normal = |a: [f64; 3], b: [f64; 3], c: [f64; 3]| -> Option<[f64; 3]> {
-                let [x, y, z] = std::array::from_fn(|i| b[i] - a[i]);
-                let [u, v, w] = std::array::from_fn(|i| c[i] - a[i]);
-                let n = [y * w - z * v, z * u - x * w, x * v - y * u];
-                let length = n[0].hypot(n[1]).hypot(n[2]);
-                (length.is_finite() && length > 0.0).then(|| n.map(|axis| axis / length))
-            };
-            let normal64 = normal(a, b, c).ok_or("Authored visual face has no finite normal")?;
-            let points = [a, b, c].map(|p| p.map(|n| n as f32));
-            let [a32, b32, c32] = points.map(|p| p.map(f64::from));
-            if normal(a32, b32, c32).is_none() {
-                return Err("Authored visual face exceeds renderer coordinate precision".into());
-            }
+            let triangle = fit.triangle(face.indices)?;
             if face.texture.is_some_and(|layer| layer >= 3) {
                 return Err("Unknown authored texture atlas layer".into());
             }
@@ -74,10 +36,10 @@ impl AuthoredVisual {
             }
             let [r, g, b] = face.rgb;
             let color = [r, g, b, face.alpha].map(|n| f32::from(n) / 255.0);
-            for (position, uv) in points.into_iter().zip(uv) {
+            for (position, uv) in triangle.positions.into_iter().zip(uv) {
                 corners.push(VisualVertex {
                     position,
-                    normal: normal64.map(|n| n as f32),
+                    normal: triangle.normal,
                     color,
                     uv,
                     texture: face.texture.unwrap_or(u32::MAX),
@@ -88,7 +50,7 @@ impl AuthoredVisual {
         if corners.is_empty() {
             return Err("Authored visual has no faces".into());
         }
-        Ok((Self { vertices: corners }, dimensions))
+        Ok((Self { vertices: corners }, fit.dimensions()))
     }
 
     #[cfg(test)]
@@ -278,5 +240,30 @@ mod tests {
         assert_eq!(visual.vertices[0].emissive, 1);
         assert_eq!(visual.vertices[3].texture, u32::MAX);
         assert_eq!(visual.vertices[3].normal, [0.0, 0.0, -1.0]);
+    }
+
+    #[test]
+    fn authored_encoder_refuses_same_f32_collapsed_triangle_as_core_fit() {
+        let points = [[0., 0., 0.], [1e-10, 0., 0.], [0., 1e-10, 0.], [1., 1., 1.]];
+        let fit = PreviewFit::new(&points).unwrap_or_else(|error| panic!("{error}"));
+        let expected = fit
+            .triangle([0, 1, 2])
+            .err()
+            .unwrap_or_else(|| panic!("collapsed shared fit accepted"));
+        let result = AuthoredVisual::from_geometry(
+            &points,
+            [AuthoredFace {
+                indices: [0, 1, 2],
+                rgb: [255; 3],
+                alpha: 255,
+                emissive: false,
+                texture: None,
+                uv: [[0.; 2]; 3],
+            }],
+        );
+        let actual = result
+            .err()
+            .unwrap_or_else(|| panic!("collapsed desktop geometry accepted"));
+        assert_eq!(actual, expected);
     }
 }

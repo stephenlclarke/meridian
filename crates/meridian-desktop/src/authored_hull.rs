@@ -5,15 +5,14 @@ use crate::{
     mule_render::showroom::{AuthoredFace, AuthoredVisual},
 };
 use meridian_core::docking::Vec3;
-use meridian_core::hull_package::{HullPackage, MAX_PACKAGE_JSON_BYTES, validate_package};
+use meridian_core::hull_package::{
+    HullPackage, LOCAL_INSPECTION_PREFIX as LOCAL_PREFIX, MAX_PACKAGE_JSON_BYTES, validate_package,
+};
 use std::{
     fs,
     io::{self, Read},
     path::{Path, PathBuf},
 };
-
-// The core also validates the content limits; do not read an unbounded external file first.
-const LOCAL_PREFIX: &str = "LOCAL:";
 
 #[derive(Debug, PartialEq, Eq)]
 pub(crate) struct PackagePath {
@@ -116,13 +115,6 @@ impl AuthoredHull {
         fingerprint: u64,
     ) -> Result<Self, String> {
         let source_id = package.id().to_owned();
-        if source_id
-            .trim()
-            .to_ascii_uppercase()
-            .starts_with(LOCAL_PREFIX)
-        {
-            return Err("Authored source ID uses reserved LOCAL: inspection namespace".into());
-        }
         let id = if isolated {
             format!("{LOCAL_PREFIX}{source_id}")
         } else {
@@ -409,5 +401,16 @@ mod tests {
         ok(fs::write(&invalid, b"{}"));
         assert!(AuthoredHulls::load(&[PackagePath::new(invalid, false)]).is_err());
         assert!(AuthoredHulls::load(&[PackagePath::new(directory.0.clone(), false)]).is_err());
+        let reserved = directory.0.join("reserved.json");
+        ok(fs::write(
+            &reserved,
+            fixture.replace("SH023", "  LoCaL:other  "),
+        ));
+        for isolated in [false, true] {
+            let error = AuthoredHulls::load(&[PackagePath::new(reserved.clone(), isolated)])
+                .err()
+                .unwrap_or_else(|| panic!("reserved source identity accepted"));
+            assert!(error.contains("reserved LOCAL:"), "{error}");
+        }
     }
 }
