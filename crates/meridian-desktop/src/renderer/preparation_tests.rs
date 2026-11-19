@@ -214,10 +214,12 @@ fn repeated_surface_skips_never_prepare_or_accumulate_frame_uploads() {
         }
     }
     assert_eq!(recoveries.len(), 512);
+    let (pairs, trailing) = recoveries.as_chunks::<2>();
+    assert!(trailing.is_empty());
     assert!(
-        recoveries
-            .chunks_exact(2)
-            .all(|pair| pair == [SurfaceRecovery::Configure, SurfaceRecovery::Recreate])
+        pairs
+            .iter()
+            .all(|pair| *pair == [SurfaceRecovery::Configure, SurfaceRecovery::Recreate])
     );
 
     // A later successful normal or suboptimal frame runs the exact prepare callback once.
