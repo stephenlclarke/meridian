@@ -1,0 +1,56 @@
+{
+  "hull": "SH036 Zebu",
+  "status": "AUTHORED_ORIGINAL_SOURCE;INSTALLED_SIGNED_STUDIO_EXPORT_AND_PROBE_PASS;OWNED_NATIVE_AND_OPERATIONAL_PENDING",
+  "legacyRevision": "0d8cc9ebe0018bf74b0d9fa10ef23b70339dd6b0",
+  "sourceManifest": "assets/fleet/sh036/SOURCE-GEOMETRY.json",
+  "sourceUnits": "metres",
+  "metresPerSourceUnit": 1,
+  "detailed": {"vertices": 1790, "triangles": 3468, "components": 28},
+  "native": {"vertices": 114, "triangles": 192, "components": 9, "maximumFaces": 512},
+  "supportGroups": 24,
+  "roundingMetres": 0.02,
+  "originalTextures": {
+    "l337-patrol-diffuse": "9699517d12b4fbbb28746e00bed9ee65c19a098d14402b1d5160280c6f6bfc54",
+    "l337-strike-diffuse": "e56f149228caf90237a652d720ae549768bde1056af3d903dc8a5c243ad26e97",
+    "l337-service-details": "35edd84f6ce527195dd8a9bcc039521a6efc5aa2333452bbbc30217b8372103d"
+  },
+  "engineering": {
+    "active": null,
+    "referenceDryMassKg": 64051,
+    "referenceOnly": true,
+    "budget": "assets/fleet/sh036/engineering-budget.json",
+    "finiteDry": "assets/fleet/sh036/finite-dry-reference.json",
+    "nativeQualification": false,
+    "operatingAuthority": false,
+    "loadedState": "UNASSIGNED"
+  },
+  "campaignPlacement": "UNASSIGNED; authored catalogue and acquisition proposals are not game entitlement",
+  "hullStudio": {
+    "definition": "integration/sh036-zebu/ZEBU-STUDIO.json",
+    "definitionSha256": "390218fe32ae2efb75a9c24de051c091143b52f8c432c927c959e7f3f233cd56",
+    "witnesses": "integration/sh036-zebu/CONTACT-WITNESSES.json",
+    "witnessesSha256": "6a41a70002a5281a9ad81c8909bf63a4d90612c6170a314e5322a4a3708367b1",
+    "installedExport": {
+      "utcDate": "2026-11-19",
+      "host": "StevesM5Pro",
+      "validatorSha256": "8800efb734ca5b8123ae88b1ab06aa62f1e22f37975cd6230f88581f69cf76e7",
+      "launcherSha256": "ee1e6e307707a385c7ad24e00cbcce589f5ab0762e31b474720715f62c146f9f",
+      "bundleSignatureVerified": true,
+      "export": {"bytes": 443654, "sha256": "191cd027ddb4d908bf256237de1956f89ad447f31cd65e96b6245c31ccca5c9b"},
+      "positiveReport": {"bytes": 59896, "sha256": "4c8ba190814be7afdddbf27c08b40732d2577d81efdd298c5699b4e2c3afcc05", "exit": 0},
+      "negativeInput": {"bytes": 443935, "sha256": "fd781f546313bd69b5231c26cf3b76fc4e833220e6ce21abdd5ab98ae6430900"},
+      "negativeReport": {"bytes": 152745, "sha256": "461c3b8b834c603e58157a5f4e43b03f70316ab5299ee0631e8a853a66a275a9", "exit": 1},
+      "openingProbesPassed": 3,
+      "contactProbesRefused": 3,
+      "supportPointsExactlyMatchAuthoredMeshes": true,
+      "byteReplayExportAndReports": true,
+      "gameLaunch": false
+    }
+  },
+  "execution": {
+    "sourceReplay": "python3 -B tools/prepare_zebu_studio.py --check",
+    "focusedTests": "python3 -B -m unittest discover -s tools -p test_prepare_zebu_studio.py -v",
+    "installedExportReplay": "python3 -B tools/verify_zebu_studio_export.py --studio <studio-executable> --validator <bundled-validator> --output <new-evidence-directory>",
+    "ownedNative": "Load exact schema 1 definition through generic Hull Studio and use the actual game Showroom after current-main compiler and graphics qualification; no additional hull-specific runtime ownership yet."
+  }
+}
