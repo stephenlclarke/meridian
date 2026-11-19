@@ -113,7 +113,7 @@
     "loaderRevision": "1789030980e0d2a7897c2dc48518fad728c9bbf2",
     "loaderSource": "tools/hull_studio/definitions.py",
     "loaderSha256": "f68ea0f442267b793338af6ebec6a937f9e1ee3946dc9be96e58db3e2a796e43",
-    "state": "INSTALLED_SIGNED_STUDIO_VALIDATOR_PASS;STUDIO_EXPORT_CONTROLLED_HULL_RUST_AND_SHOWROOM_PENDING",
+    "state": "INSTALLED_SIGNED_STUDIO_EXPORT_PASS;CONTROLLED_HULL_RUST_AND_SHOWROOM_PENDING",
     "installedValidator": {
       "date": "2026-11-19",
       "inputCommit": "400a5bf67b7c6c460b914cb4d791997c490fdace",
@@ -148,6 +148,17 @@
           "passed": true
         }
       ]
+    },
+    "installedExport": {
+      "date": "2026-11-19",
+      "inputCommit": "f5f7a36d382c32baff74e045f5438eafbcaa5e84",
+      "exportSha256": "f194bba180a38fd72ea24f9641bd10a0daa8063f5001e64f166c3e18e4138cfb",
+      "exportBytes": 401032,
+      "reportSha256": "0077c1217893e72272d451bb45116cb4d698054aee7d605127e6a512c07a9627",
+      "reportBytes": 54238,
+      "comparison": "Export matches the source bytes after removing its final LF. The fresh JSON report equals the prior installed validator report.",
+      "supportGroups": 25,
+      "passedRoutes": 6
     }
   }
 }

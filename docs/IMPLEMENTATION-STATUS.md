@@ -18,7 +18,7 @@ The Lion Citadel exterior now uses blue-grey plating, darker structural steel an
 
 ## Kite Interceptor source envelope
 
-SH031 preserves both original metre-authored meshes and uses 25 rounded supports. SteveMBA verified six swept passages, five structural overlaps, a clear aligned SH028 sweep and a strict offset lip crossing. The certified full fit bounds are 321 mm detailed and 1,438 mm native. The installed signed Hull Studio validator accepted all 25 groups and six sphere routes. Studio export, per-hull Rust contact tests and Showroom qualification remain pending. [Kite Interceptor source and evidence](KITE-INTERCEPTOR-GAMEPLAY-ENVELOPE.md)
+SH031 preserves both original metre-authored meshes and uses 25 rounded supports. SteveMBA verified six swept passages, five structural overlaps, a clear aligned SH028 sweep and a strict offset lip crossing. The certified full fit bounds are 321 mm detailed and 1,438 mm native. The installed signed Hull Studio validated and exported the exact definition from `f5f7a36`, with all 25 groups and six sphere routes passing. The per-hull Rust contact tests and Showroom qualification remain pending. [Kite Interceptor source and evidence](KITE-INTERCEPTOR-GAMEPLAY-ENVELOPE.md)
 
 ## First Renas Mule encounter
 

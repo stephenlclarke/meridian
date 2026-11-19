@@ -66,9 +66,11 @@ The pinned Hull Studio Python loader on the MBA accepted the definition
 and preserved it through a JSON round trip. The installed signed macOS
 Rust Studio validator then accepted all 25 support groups and all six
 sphere routes on that exact definition. Its report records the original
-support points and 20 mm rounding. Studio export, the per-hull Rust contact
-tests and a Kite Interceptor Showroom launch await their owned runs.
-Campaign placement and acquisition remain separate.
+support points and 20 mm rounding. The installed signed Studio exported
+the exact definition from `f5f7a36` with all 25 groups and six routes passing.
+The resulting JSON matches the input except for its final line feed. The
+per-hull Rust contact tests and a Kite Interceptor Showroom launch await
+their owned runs. Campaign placement and acquisition remain separate.
 
 Regenerate the definition with `python3 -B tools/prepare_kite_interceptor_studio.py`.
 Add `--check` to check the committed definition.
