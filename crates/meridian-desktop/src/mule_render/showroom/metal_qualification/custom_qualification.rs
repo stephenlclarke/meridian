@@ -137,7 +137,7 @@ impl<'a> Capture<'a> {
         &mut self,
         name: &str,
         frame: &Frame,
-        mut explorer: Option<&mut showroom::Pass>,
+        mut other: Option<&mut showroom::Pass>,
         custom: &mut showroom::Pass,
     ) {
         let [left, right] = frame.models.as_slice() else {
@@ -146,16 +146,25 @@ impl<'a> Capture<'a> {
         assert!(left.bounds.x + left.bounds.width <= right.bounds.x);
         let combined = self.frame(name, frame);
         let mut images = Vec::with_capacity(2);
-        for model in [left, right] {
+        for (pane, model) in [left, right].into_iter().enumerate() {
             let mut isolated = frame.clone();
             isolated.models = vec![model.clone()];
-            let isolated_name = format!("{name}-{}", model.object);
+            let isolated_name = if left.object == right.object {
+                format!("{name}-pane{pane}-{}", model.object)
+            } else {
+                format!("{name}-{}", model.object)
+            };
             let rgb = self.frame(&isolated_name, &isolated);
             self.own_pixels(&isolated_name, model, &rgb);
             let reference = match showroom::hull(model) {
                 Some(Hull::Custom) => Some(&mut *custom),
-                Some(Hull::Explorer) => explorer.as_deref_mut(),
-                Some(Hull::Mk2) => panic!("unexpected SH009 in SH010 qualification"),
+                Some(hull) => {
+                    let Some(pass) = other.as_deref_mut() else {
+                        panic!("missing independent hull pass")
+                    };
+                    assert_eq!(pass.hull(), hull);
+                    Some(pass)
+                }
                 None => {
                     assert_eq!(model.object, "SH025");
                     None
@@ -282,5 +291,46 @@ fn metal_goshawk_custom_cache_switching() {
         "SH010 cache return and both pane identity orders passed at {:?}",
         capture.size()
     );
+    capture.finish();
+}
+
+#[test]
+#[ignore = "Mac owner only: joined Mk II/Custom mixed and duplicate pane Metal evidence"]
+fn metal_goshawk_mk2_custom_cache_orders() {
+    let output = output_directory("MERIDIAN_SH009_CUSTOM_CACHE_DIR");
+    let gpu = metal_gpu(Hull::Custom, false);
+    let target = Target::new(&gpu.device, MIN_WINDOW_LOGICAL);
+    let mut capture = Capture::new(&gpu, &target, &output);
+    let mut mk2_pass = original_pass(&gpu, Hull::Mk2);
+    let mut custom_pass = original_pass(&gpu, Hull::Custom);
+    let mk2 = minimum_qualification::station_frames(Hull::Mk2);
+    let custom = minimum_qualification::station_frames(Hull::Custom);
+    let mut mixed = mk2[0].comparison.clone();
+    let first = capture.solo("mk2-before", &mk2[0].solo, &mut mk2_pass);
+    let second = capture.solo("custom-before", &custom[0].solo, &mut custom_pass);
+    assert!(first != second, "distinct originals produced identical RGB");
+    for (name, a, b) in [
+        ("mk2-custom", &mk2, &custom),
+        ("custom-mk2", &custom, &mk2),
+        ("mk2-mk2", &mk2, &mk2),
+        ("custom-custom", &custom, &custom),
+    ] {
+        let [left, right] = mixed.models.as_mut_slice() else {
+            panic!("expected two station Compare panes")
+        };
+        for (pane, pose) in [(left, &a[0]), (right, &b[2])] {
+            let [model] = pose.solo.models.as_slice() else {
+                panic!("expected one selected hull")
+            };
+            *pane = ModelPreview {
+                bounds: pane.bounds,
+                ..model.clone()
+            };
+        }
+        assert_ne!(mixed.models[0].orientation, mixed.models[1].orientation);
+        capture.comparison(name, &mixed, Some(&mut mk2_pass), &mut custom_pass);
+    }
+    assert!(first == capture.solo("mk2-return", &mk2[0].solo, &mut mk2_pass));
+    assert!(second == capture.solo("custom-return", &custom[0].solo, &mut custom_pass));
     capture.finish();
 }
