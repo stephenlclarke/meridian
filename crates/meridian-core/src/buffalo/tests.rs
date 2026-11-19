@@ -40,6 +40,11 @@ fn buffalo_corrected_detailed_and_native_faces_share_complete_local_supports()
         BuffaloHullSource::from_bytes(&rewritten, MEMBERSHIP),
         Err(EnvelopeError::ChangedSource)
     );
+    let explorer = include_bytes!("../../../../assets/fleet/sh008/source.vertices");
+    assert_eq!(
+        BuffaloHullSource::from_bytes(explorer, MEMBERSHIP),
+        Err(EnvelopeError::ChangedSource)
+    );
     let mut shifted = MEMBERSHIP.to_vec();
     shifted[0] ^= 1;
     assert_eq!(

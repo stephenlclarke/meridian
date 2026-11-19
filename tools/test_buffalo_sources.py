@@ -1,5 +1,7 @@
 """Geometry and appearance tests against the authenticated corrected SH013 originals."""
 import contextlib
+import hashlib
+import math
 from io import StringIO
 from pathlib import Path
 import json
@@ -41,14 +43,28 @@ class BuffaloSources(unittest.TestCase):
                                                   original['faceTextures'], strict=True):
             mat = original['materials'][material_index]
             color = tuple((mat['colour'] >> shift & 255) / 255 for shift in (24, 16, 8, 0))
+            a, b, c = (original['vertices'][i] for i in face)
+            ab = [y - x for x, y in zip(a, b, strict=True)]
+            ac = [y - x for x, y in zip(a, c, strict=True)]
+            cross = [ab[j] * ac[k] - ab[k] * ac[j] for j, k in ((1, 2), (2, 0), (0, 1))]
+            normal = f32([value / math.hypot(*cross) for value in cross])
             for i, uv in zip(face, mapping['uv'], strict=True):
                 row = next(records)
                 self.assertEqual(row[:3], f32(original['vertices'][i]))
+                self.assertEqual(row[3:6], normal)
                 self.assertEqual(row[6:12], f32((*color, *uv)))
                 self.assertEqual(row[12:], (mapping['texture'], int(mat['emissive'])))
             counts[mapping['texture']] += 1
         self.assertIsNone(next(records, None))
         self.assertEqual(counts, [1356, 0, 2104])
+        criteria = json.loads((proof.ROOT / 'integration/sh013-buffalo/CRITERIA.json').read_bytes())
+        maps = criteria['originalTextures']
+        self.assertEqual({Path(path).stem for path in maps},
+                         {entry['asset'] for entry in original['textures']})
+        for path, pin in maps.items():
+            blob = (proof.ROOT / path).read_bytes()
+            self.assertEqual(len(blob), pin['bytes'])
+            self.assertEqual(hashlib.sha256(blob).hexdigest(), pin['sha256'])
 
     def test_cli_generates_but_refuses_rewritten_active_sources_and_outputs(self):
         with tempfile.TemporaryDirectory() as temp, contextlib.redirect_stdout(StringIO()):
