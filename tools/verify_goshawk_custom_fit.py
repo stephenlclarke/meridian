@@ -9,6 +9,7 @@ import struct
 
 from prepare_goshawk_custom import ASSETS, ROOT, COUNTS, MANIFEST_SHA, json_bytes, require
 
+SOURCE_VERTICES = "source.vertices"
 GUARDED_PADDING_METRES = 0.021
 STATION_SHA = "cd54d30cab638f6b33feacf1fa78c9136f8ce346e8cc6133259bfc0472c259d5"
 PORT_SHA = "31a7ed33803e78ebbe7bb87c0658e47a786e8bba9107d513b2e534ccd30cf71f"
@@ -65,7 +66,7 @@ def f32(value):
 def verify():
     source = json.loads(pinned(ASSETS / "MANIFEST.json", MANIFEST_SHA))
     enc = source["encoded"]
-    points_raw = pinned(ASSETS / "source.vertices", enc["source.vertices"]["sha256"])
+    points_raw = pinned(ASSETS / SOURCE_VERTICES, enc[SOURCE_VERTICES]["sha256"])
     faces_raw = pinned(ASSETS / "source-triangles.bin", enc["source-triangles.bin"]["sha256"])
     membership = pinned(ASSETS / "source-piece-membership.bin", enc["source-piece-membership.bin"]["sha256"])
     require(struct.unpack_from("<8sII", points_raw) == (b"MSH010V1", COUNTS[0][0], COUNTS[1][0]), "Wrong hull fixture")
@@ -139,7 +140,7 @@ def verify():
     outward = struct.unpack("<f",struct.pack("<I",bits))[0]
     require(outward >= launch > struct.unpack("<f",struct.pack("<I",bits-1))[0], "Outward f32 launch witness")
     return {
-        "hull":"SH010", "sourceVerticesSha256":enc["source.vertices"]["sha256"], "stationSha256":STATION_SHA,
+        "hull":"SH010", "sourceVerticesSha256":enc[SOURCE_VERTICES]["sha256"], "stationSha256":STATION_SHA,
         "portSha256":PORT_SHA, "guardedPaddingMetres":GUARDED_PADDING_METRES, "sourceTriangles":len(faces),
         "alignedApertureSlackMetres":aperture_slack(0), "offApertureSlackMetres":aperture_slack(100),
         "alignedStationSweepGapMetres":aligned[0], "offApertureStationSweepGapMetres":off[0],
