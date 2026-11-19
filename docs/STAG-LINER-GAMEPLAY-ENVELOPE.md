@@ -74,5 +74,4 @@ The per-hull Rust contact tests and a Stag Liner Showroom launch await
 their owned runs.
 
 Regenerate with `python3 -B tools/prepare_stag_liner_studio.py`.
-Use `--check` to verify the current definition byte for byte. An explicit `--output` may select the canonical definition or a regular JSON file in an existing system temporary directory. The generator refuses paths to other repository files and symbolic-link redirects before reading or writing the output.
-Add `--check` to compare the committed definition byte for byte.
+Use `--check` to verify the current definition byte for byte without writing. An explicit `--output` may select the canonical definition or a regular JSON file in an existing system temporary directory. The generator refuses paths to other repository files and symbolic-link redirects before reading or writing the output. Generation replaces the destination atomically rather than changing the contents of any hard-linked file.

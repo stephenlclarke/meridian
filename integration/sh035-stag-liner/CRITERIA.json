@@ -78,7 +78,7 @@
       "tools/verify_stag_liner_geometry.py": "bcdb40ee7067a0fd2c561e1f804479a7fca43df065b3ad77aa31f2d9f65d207e",
       "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
       "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
-      "tools/prepare_stag_liner_studio.py": "89c8b9a39c128f7013f1038774dad3a2ee7a88fc448746ecbba73c96d90e3cfa"
+      "tools/prepare_stag_liner_studio.py": "823fbd89b2c72722d877f801aba9dbcc68a61cbe5cc08b57cc9269971e2e09bf"
     },
     "fixtures": {
       "integration/sh035-stag-liner/FIXTURES.json": "06136d6e0e01df76ee1dbcacf94076f1edcf9335a52b03e2c678b69ac322f121"

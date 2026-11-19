@@ -2,7 +2,9 @@
 import argparse
 import json
 import math
+import os
 from pathlib import Path
+import stat
 import tempfile
 import tomllib
 
@@ -88,6 +90,33 @@ def checked_output(selected):
     return path
 
 
+def write_definition(path, data):
+    """Replace the destination entry without writing through existing file links."""
+    try:
+        mode = stat.S_IMODE(path.stat().st_mode) & 0o777
+    except FileNotFoundError:
+        mode = None
+    sibling = None
+    try:
+        with tempfile.NamedTemporaryFile(dir=path.parent, prefix='.stag-studio-', delete=False) as stream:
+            sibling = Path(stream.name)
+            stream.write(data)
+            stream.flush()
+            os.fsync(stream.fileno())
+        if mode is not None:
+            sibling.chmod(mode)
+        sibling.replace(path)
+        sibling = None
+    finally:
+        if sibling is not None:
+            try:
+                sibling.unlink(missing_ok=True)
+            except PermissionError:
+                # Windows cannot remove a read-only file after a failed replacement.
+                sibling.chmod(0o600)
+                sibling.unlink(missing_ok=True)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=OUTPUT,
@@ -99,7 +128,7 @@ def main(argv=None):
     if args.check:
         require(output.read_bytes() == data, 'changed Stag Liner Hull Studio definition')
     else:
-        output.write_bytes(data)
+        write_definition(output, data)
 
 
 if __name__ == '__main__':
