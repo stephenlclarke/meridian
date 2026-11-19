@@ -14,6 +14,7 @@ RUST_TEST_NAME = r'#\[test\]\s*fn\s+(\w+)\('
 FLIGHT_SOURCE = 'flight.rs'
 FLIGHT_PERSISTENCE = 'flight/persistence.rs'
 EMP_TESTS = 'flight/emp/tests.rs'
+LIB_SOURCE = 'lib.rs'
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -181,7 +182,7 @@ def undo_goshawk_world(relative, data):
         ],
         FLIGHT_PERSISTENCE: [(b'            goshawk_validation: None,\n', b'')],
         EMP_TESTS: [(b'        goshawk_validation: None,\n', b'')],
-        'lib.rs': [
+        LIB_SOURCE: [
             (b'pub mod goshawk_custom;\n', b''),
             (b'pub use flight::GoshawkCustomApproachSnapshot;\n', b''),
             (b'pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};\n', b''),
@@ -206,7 +207,7 @@ def verify_protected_core(root):
         ],
         EMP_TESTS: [b'        mule_validation: None,\n'],
         FLIGHT_PERSISTENCE: [b'            mule_validation: None,\n'],
-        'lib.rs': [b'pub mod mule;\n', b'pub mod goshawk;\n'],
+        LIB_SOURCE: [b'pub mod mule;\n', b'pub mod goshawk;\n'],
         'station.rs': [b'mod mule;\n'],
         'traffic.rs': [
             b'pub(crate) mod mule_validation;\n',
@@ -226,12 +227,10 @@ def verify_protected_core(root):
             assert data.count(addition) == 1, relative
             data = data.replace(addition, b'', 1)
         data = undo_commander_launch(relative, data)
-        if relative == 'lib.rs':
-            # Invert only the reviewed Stag Liner geometry publication.
-            data = data.replace(b'pub mod stag_liner;\n\n', b'', 1)
-            saker_declaration = b'pub mod saker;\n'
-            assert data.count(saker_declaration) == 1, relative
-            data = data.replace(saker_declaration, b'', 1)
+        if relative == LIB_SOURCE:
+            for publication in (b'pub mod stag_liner;\n\n', b'pub mod saker;\n'):
+                assert data.count(publication) == 1, relative
+                data = data.replace(publication, b'', 1)
         if relative == FLIGHT_SOURCE:
             speed_line = b'        if !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
             original_line = b'        if !self.state.speed.is_finite() || !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'

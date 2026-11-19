@@ -4,9 +4,11 @@ import hashlib
 from io import StringIO
 import json
 from math import hypot
+import os
 from pathlib import Path
 import runpy
 import shutil
+import stat
 import struct
 import sys
 import tempfile
@@ -118,6 +120,8 @@ class TestStagLinerSources(unittest.TestCase):
         self.assertEqual(definition, studio.definition())
         self.assertEqual(hashlib.sha256(studio.OUTPUT.read_bytes()).hexdigest(),
                          criteria['hullStudio']['sha256'])
+        self.assertRegex(criteria['hullStudio']['installedExport']['testedConfigurationGitRevision'],
+                         r'^[0-9a-f]{40}$')
         for field, original, membership in (
             ('detail', source['design'], (0, stag_liner.DETAIL[0])),
             ('native', source['nativeDesign'], (stag_liner.DETAIL[0], None)),
@@ -154,6 +158,89 @@ class TestStagLinerSources(unittest.TestCase):
                 output.write_bytes(b'{}')
                 with self.assertRaisesRegex(ValueError, 'changed Stag Liner Hull Studio definition'):
                     runpy.run_path(studio.__file__, run_name='__main__')
+
+    def test_studio_output_refuses_invalid_paths_before_generating_or_reading(self):
+        with tempfile.TemporaryDirectory() as temp:
+            scratch = Path(temp)
+            directory = scratch / 'directory.json'
+            directory.mkdir()
+            with mock.patch.object(studio, 'definition', side_effect=AssertionError('generated before validation')):
+                for selected, reason in (
+                    (scratch / '..' / 'result.json', 'Invalid'),
+                    (scratch / 'result.txt', 'Invalid'),
+                    (proof.INTEGRATION / 'CRITERIA.json', 'temporary JSON file'),
+                    (scratch / 'missing' / 'result.json', 'directory is missing'),
+                    (directory, 'regular file'),
+                ):
+                    for mode in ([], ['--check']):
+                        with self.subTest(path=selected, mode=mode), self.assertRaisesRegex(ValueError, reason):
+                            studio.main(['--output', str(selected), *mode])
+        self.assertEqual(studio.checked_output(studio.OUTPUT), studio.OUTPUT)
+
+    def test_studio_output_refuses_file_and_directory_redirects(self):
+        with tempfile.TemporaryDirectory() as temp:
+            scratch = Path(temp)
+            target = scratch / 'target.json'
+            target.write_bytes(b'keep')
+            file_link = scratch / 'file.json'
+            directory_link = scratch / 'redirect'
+            try:
+                file_link.symlink_to(target)
+                directory_link.symlink_to(scratch, target_is_directory=True)
+            except OSError as error:
+                self.skipTest(f'symbolic link unavailable: {error}')
+            for selected, reason in ((file_link, 'regular file'), (directory_link / 'target.json', 'redirects')):
+                for mode in ([], ['--check']):
+                    with self.subTest(path=selected, mode=mode), self.assertRaisesRegex(ValueError, reason):
+                        studio.main(['--output', str(selected), *mode])
+            self.assertEqual(target.read_bytes(), b'keep')
+
+    def test_studio_generation_replaces_hard_link_without_changing_other_name(self):
+        with tempfile.TemporaryDirectory() as temp:
+            scratch = Path(temp)
+            original = scratch / 'original.json'
+            output = scratch / 'output.json'
+            original.write_bytes(b'keep')
+            if os.name != 'nt':
+                original.chmod(0o640)
+            try:
+                os.link(original, output)
+            except OSError as error:
+                self.skipTest(f'hard link unavailable: {error}')
+            mode = stat.S_IMODE(original.stat().st_mode)
+            args = ['--output', str(output)]
+            with mock.patch.object(studio, 'definition', return_value={'id': 'SH035'}):
+                with self.assertRaisesRegex(ValueError, 'changed Stag Liner Hull Studio definition'):
+                    studio.main(args + ['--check'])
+                self.assertTrue(output.samefile(original))
+                self.assertEqual(original.read_bytes(), b'keep')
+                studio.main(args)
+                self.assertFalse(output.samefile(original))
+                self.assertEqual(original.read_bytes(), b'keep')
+                self.assertEqual(output.read_bytes(), b'{"id":"SH035"}\n')
+                self.assertEqual(stat.S_IMODE(output.stat().st_mode), mode)
+                with mock.patch.object(studio, 'write_definition', side_effect=AssertionError('check wrote output')):
+                    studio.main(args + ['--check'])
+            self.assertEqual({entry.name for entry in scratch.iterdir()}, {'original.json', 'output.json'})
+
+    def test_studio_atomic_write_cleans_up_after_failure_and_keeps_destination(self):
+        with tempfile.TemporaryDirectory() as temp:
+            scratch = Path(temp)
+            output = scratch / 'output.json'
+            output.write_bytes(b'keep')
+            for error_at in ('fsync', 'replace'):
+                owner = os if error_at == 'fsync' else Path
+                with (self.subTest(error_at=error_at),
+                      mock.patch.object(owner, error_at, side_effect=OSError('injected failure')),
+                      self.assertRaisesRegex(OSError, 'injected failure')):
+                    studio.write_definition(output, b'replacement')
+                self.assertEqual(output.read_bytes(), b'keep')
+                self.assertEqual(list(scratch.iterdir()), [output])
+            new_output = scratch / 'new.json'
+            studio.write_definition(new_output, b'new')
+            self.assertEqual(new_output.read_bytes(), b'new')
+            if os.name != 'nt':
+                self.assertEqual(stat.S_IMODE(new_output.stat().st_mode), 0o600)
 
     def test_controls_refuse_wrong_edges_and_missing_separation(self):
         lip = [(0, 0, 0), (4, 0, 0), (0, 4, 0)]
