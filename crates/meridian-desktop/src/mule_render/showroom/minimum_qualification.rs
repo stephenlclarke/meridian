@@ -140,6 +140,75 @@ pub(super) fn peregrine_sibling_compare_frames() -> [Frame; 4] {
     frames
 }
 
+/// Actual ordinary Pin Baseline for both schema-stock identities, in both orders and duplicates.
+pub(super) fn stock_sparrowhawk_kite_compare_frames() -> [Frame; 4] {
+    let directory = TestDirectory::new();
+    let mut profile = open(&directory.0);
+    assert!(ok(profile.new_commander(97031)));
+    let before = ok(profile.world.save_bytes());
+    let mut menu = ok(Docked::new(&profile.world));
+    ok(menu.open(&profile.world, Screen::Showroom));
+    let [width, height] = MIN_WINDOW_LOGICAL;
+    let viewport = Viewport::new(width, height).unwrap_or_else(|| panic!("viewport"));
+    let frames = [
+        ("Sparrowhawk", "Kite Interceptor", ["SH030", "SH031"]),
+        ("Kite Interceptor", "Sparrowhawk", ["SH031", "SH030"]),
+        ("Sparrowhawk", "Sparrowhawk", ["SH030", "SH030"]),
+        ("Kite Interceptor", "Kite Interceptor", ["SH031", "SH031"]),
+    ]
+    .map(|(baseline, selected, ids)| {
+        for action in [
+            Input::Key(Key::Search),
+            Input::Key(Key::ClearSearch),
+            Input::Text(baseline.into()),
+            Input::Key(Key::Confirm),
+            Input::Key(Key::PinBaseline),
+            Input::Key(Key::Search),
+            Input::Key(Key::ClearSearch),
+            Input::Text(selected.into()),
+            Input::Key(Key::Confirm),
+            Input::Key(Key::ResetView),
+        ] {
+            let frame = ok(menu.build_frame(&profile.world, viewport, 0.));
+            menu.presented(frame);
+            ok(menu.input(&mut profile, action));
+        }
+        let frame = ok(menu.build_frame(&profile.world, viewport, 0.));
+        let [left, right] = frame.models.as_slice() else {
+            panic!("expected actual stock comparison panes");
+        };
+        for (model, id) in [left, right].into_iter().zip(ids) {
+            assert_eq!(model.object, id);
+            assert!(ok(crate::authored_hull::stock_visual_for(model)).is_some());
+            assert_model_pane(&frame, model.bounds);
+        }
+        assert!(!overlaps(left.bounds, right.bounds));
+        assert!(left.bounds.x < right.bounds.x);
+        assert_eq!(left.orientation, right.orientation);
+        frame
+    });
+    assert_eq!(ok(profile.world.save_bytes()), before);
+    frames
+}
+
+#[test]
+fn stock_sparrowhawk_kite_pin_actual_station_compare_in_both_orders_and_duplicates() {
+    let frames = stock_sparrowhawk_kite_compare_frames();
+    assert_eq!(
+        frames.each_ref().map(|frame| frame
+            .models
+            .iter()
+            .map(|model| model.object.as_str())
+            .collect::<Vec<_>>()),
+        [
+            vec!["SH030", "SH031"],
+            vec!["SH031", "SH030"],
+            vec!["SH030", "SH030"],
+            vec!["SH031", "SH031"]
+        ]
+    );
+}
+
 #[test]
 fn peregrine_siblings_pin_actual_station_compare_in_both_orders_and_duplicates() {
     let mk_i = ok(super::Hull::PeregrineMkI.visual());

@@ -263,6 +263,25 @@ fn one_click_authored_showroom_opens_actual_local_model_once_without_world_mutat
 
 #[test]
 fn ordinary_game_entry_opens_stock_sparrowhawk_and_returns_to_owned_baseline() {
+    assert_stock_navigation(&[
+        ("Sparrowhawk", "SH030"),
+        ("Peregrine Mk V", "SH025"),
+        ("SH030", "SH030"),
+    ]);
+}
+
+#[test]
+fn ordinary_game_entry_switches_stock_kite_sparrowhawk_and_owned_baseline() {
+    assert_stock_navigation(&[
+        ("Kite Interceptor", "SH031"),
+        ("Sparrowhawk", "SH030"),
+        ("SH031", "SH031"),
+        ("Peregrine Mk V", "SH025"),
+        ("SH031", "SH031"),
+    ]);
+}
+
+fn assert_stock_navigation(queries: &[(&str, &str)]) {
     let directory = TestDirectory::new();
     let mut app = ok(App::from_launch(Launch::Profile(
         directory.0.join("profile"),
@@ -275,11 +294,7 @@ fn ordinary_game_entry_opens_stock_sparrowhawk_and_returns_to_owned_baseline() {
         .docked
         .as_mut()
         .unwrap_or_else(|| panic!("actual station menu"));
-    for (query, id) in [
-        ("Sparrowhawk", "SH030"),
-        ("Peregrine Mk V", "SH025"),
-        ("SH030", "SH030"),
-    ] {
+    for &(query, id) in queries {
         for action in [
             Input::Key(Key::Search),
             Input::Key(Key::ClearSearch),
@@ -298,10 +313,10 @@ fn ordinary_game_entry_opens_stock_sparrowhawk_and_returns_to_owned_baseline() {
         assert_eq!(selected.object, id);
         assert_eq!(
             ok(crate::authored_hull::stock_visual_for(selected)).is_some(),
-            id == "SH030"
+            id != "SH025"
         );
         assert!(app.authored_hulls.visual_for(selected).is_none());
-        if id == "SH030" {
+        if id != "SH025" {
             menu.presented(comparison);
             ok(menu.input(&mut app.game, Input::Key(Key::Exchange)));
         }

@@ -36,6 +36,10 @@ The desktop source clears the text area above the instruments in idle flight and
 
 The Lion Citadel exterior now uses blue-grey plating, darker structural steel and amber light strips in the desktop source. Subtle face shading gives adjacent panels depth. The renderer applies this finish at load time to the original material assignments. Four short strips join the rim to the upper and lower crosspieces. On a CPU projection of the reported view, the strips cover all 184 sampled gaps and nine sightlines through the port stay clear. In the straight-on docked Mac view, all 208 formerly exposed background pixels show station material and all nine sightlines through the port remain clear.
 
+## Kite Interceptor source envelope
+
+SH031 preserves both original metre-authored meshes and uses 25 rounded supports. SteveMBA verified six swept passages, five structural overlaps, a clear aligned SH028 sweep and a strict offset lip crossing. The certified full fit bounds are 321 mm detailed and 1,438 mm native. The installed signed Hull Studio validated and exported the exact definition from `f5f7a36`, with all 25 groups and six sphere routes passing. The joined development source registers Kite alongside Sparrowhawk in the same authenticated stock package registry, with ordinary selection, separate local identity and independently prepared exact RGB peer comparisons authored. Owned stock rendering, contact and release qualification remain separate. [Kite Interceptor source and evidence](KITE-INTERCEPTOR-GAMEPLAY-ENVELOPE.md)
+
 ## First Renas Mule encounter
 
 A fresh commander delivered all eight G02 freight units at Renas, received 730 CR and the trusted clue, and saw the Mule on the next launch. Cold Continue restored the same SH001 identity and pose in the ordinary Mac cockpit. A regression using a genuine older v17 save verifies that a player already inside the encounter berth can move clear. World tests cover retirement and later launches. Close-range shimmer still needs visual confirmation. Preview 8 predates this encounter.

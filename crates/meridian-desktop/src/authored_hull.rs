@@ -15,7 +15,9 @@ use std::{
 };
 
 mod stock;
-pub(crate) use stock::{SPARROWHAWK_GEOMETRY_KEY, stock_matches, stock_visual_for};
+#[cfg(test)]
+pub(crate) use stock::{KITE_GEOMETRY_KEY, SPARROWHAWK_GEOMETRY_KEY};
+pub(crate) use stock::{STOCK_MODELS, stock_matches, stock_visual_for};
 
 #[derive(Debug, PartialEq, Eq)]
 pub(crate) struct PackagePath {

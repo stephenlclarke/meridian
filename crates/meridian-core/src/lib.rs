@@ -60,6 +60,8 @@ pub use flight::{
     FlightReceptionSnapshot, FlightReceptionTrace, FlightView, PreparedFlightReception,
 };
 
+pub mod kite_interceptor;
+
 pub use flight::{
     NavigationTonneId, NavigationTradeAction, NavigationTradeAttemptSnapshot, NavigationTradeError,
     NavigationTradeId, NavigationTradeMarketSnapshot, NavigationTradeOutcome,

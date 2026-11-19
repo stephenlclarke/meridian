@@ -27,6 +27,7 @@ const PHASE_SECONDS: f32 = std::f32::consts::PI / 0.7;
 
 mod authored_qualification;
 mod custom_qualification;
+mod kite_stock_qualification;
 mod peregrine_mk_i_qualification;
 mod peregrine_pair_qualification;
 mod sparrowhawk_stock_qualification;
