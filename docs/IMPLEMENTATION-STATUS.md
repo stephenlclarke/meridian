@@ -8,6 +8,10 @@ The authored desktop integration routes generated launch and docking cues from a
 
 Preview 10 is published for macOS arm64 and Windows x64. It includes the Goshawk Explorer in the ordinary station Showroom. The signed and notarized app was extracted and checked against the local installation, including all 483 files. Earlier Mac gameplay checks covered the Showroom on the source used for this build. Packaging verification did not include a new graphical launch. [Preview guide](PREVIEW-RELEASES.md)
 
+## Panther Explorer source envelope
+
+SH032 preserves both original metre-authored Explorer meshes. The 36-piece envelope uses four local spans per arch. SteveMBA verified fourteen routes and ten overlaps, with exact counterexamples for the whole arch and each adjacent merge. The full fit bounds are 1,001 mm against detail and 2,170 mm against the selected native mesh. The Hull Studio Python loader accepted the exact definition. Rust Studio validation and export, per-hull contact tests and Showroom qualification remain pending. [Panther Explorer source and evidence](PANTHER-EXPLORER-GAMEPLAY-ENVELOPE.md)
+
 ## Commander startup and flight cockpit
 
 Ordinary startup opens Commander details with the current ship, location and credits. A fresh commander starts at Avenor. A saved flight opens its summary and waits for Enter to resume. An unreadable slot opens recovery. On Mac, a fresh commander reached this screen without creating a save. An airborne commander stayed on the summary until Enter. Recovery preserved the original damaged and unsupported save bytes.

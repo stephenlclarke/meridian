@@ -118,6 +118,7 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 
 - [Development and repository maintenance](docs/DEVELOPMENT.md)
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
+- [Panther Explorer source envelope and Hull Studio definition](docs/PANTHER-EXPLORER-GAMEPLAY-ENVELOPE.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)
 - [Content provenance and reuse](docs/LEGACY-REUSE.md)
 - [Finite missile behavior and save boundary](docs/FINITE-STARTER-MISSILES.md)

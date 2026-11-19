@@ -1,0 +1,359 @@
+{
+  "clearanceMillimetres": {
+    "left-keel-sled-channel": 328,
+    "left-above-sled-channel": 448,
+    "left-below-aft-tie-channel": 558,
+    "left-under-arch-channel": 930,
+    "left-fore-arch-shoulder": 304,
+    "left-mid-arch-shoulder": 252,
+    "left-aft-arch-shoulder": 213,
+    "right-keel-sled-channel": 328,
+    "right-above-sled-channel": 448,
+    "right-below-aft-tie-channel": 558,
+    "right-under-arch-channel": 930,
+    "right-fore-arch-shoulder": 304,
+    "right-mid-arch-shoulder": 252,
+    "right-aft-arch-shoulder": 213
+  },
+  "alignedMillimetres": 43218,
+  "offsetStartMillimetres": 979,
+  "sourceLipWitness": {
+    "fraction": 0.5,
+    "pointMetres": [
+      69.4,
+      -1.8,
+      136.32
+    ],
+    "barycentrics": [
+      0.35999999999999716,
+      0.1586011904761933,
+      0.48139880952380953
+    ]
+  },
+  "sourceSolidContactsMetres": [
+    [
+      1.28,
+      -1.8,
+      -19.0
+    ],
+    [
+      0.0,
+      -3.6,
+      -11.65
+    ],
+    [
+      0.0,
+      -3.6,
+      -10.35
+    ],
+    [
+      0.0,
+      5.0,
+      4.5
+    ]
+  ],
+  "originalJoints": [
+    {
+      "name": "keel-to-pressure-cabin",
+      "pointMetres": [
+        0.17,
+        0.37,
+        -2.17
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "cabin-to-panoramic-glazing",
+      "pointMetres": [
+        0.13,
+        2.8,
+        7.87
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "left-opaque-sponson-to-side-window",
+      "pointMetres": [
+        -5.49,
+        2.91,
+        -5.37
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "left-keel-to-tie",
+      "pointMetres": [
+        -0.31,
+        -2.79,
+        -10.83
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "left-tie-to-sled",
+      "pointMetres": [
+        -7.89,
+        -2.79,
+        -10.83
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "left-curved-support-to-sponson",
+      "pointMetres": [
+        -5.53,
+        2.68,
+        -7.13
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "right-opaque-sponson-to-side-window",
+      "pointMetres": [
+        5.49,
+        2.91,
+        -5.37
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "right-keel-to-tie",
+      "pointMetres": [
+        0.31,
+        -2.79,
+        -10.83
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "right-tie-to-sled",
+      "pointMetres": [
+        7.89,
+        -2.79,
+        -10.83
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "right-curved-support-to-sponson",
+      "pointMetres": [
+        5.53,
+        2.68,
+        -7.13
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ],
+  "mergedArchBlockedPointsMetres": {
+    "left-under-arch-channel": [
+      -5.7,
+      0.48857740000000005,
+      -1.5
+    ],
+    "left-fore-arch-shoulder": [
+      -5.7,
+      1.30990905,
+      5.6373318
+    ],
+    "left-mid-arch-shoulder": [
+      -6.2,
+      2.03027435,
+      -1.5
+    ],
+    "left-aft-arch-shoulder": [
+      -5.7,
+      1.30990905,
+      -8.6373318
+    ],
+    "right-under-arch-channel": [
+      5.7,
+      0.48857740000000005,
+      -1.5
+    ],
+    "right-fore-arch-shoulder": [
+      5.7,
+      1.30990905,
+      5.6373318
+    ],
+    "right-mid-arch-shoulder": [
+      6.2,
+      2.03027435,
+      -1.5
+    ],
+    "right-aft-arch-shoulder": [
+      5.7,
+      1.30990905,
+      -8.6373318
+    ]
+  }
+}
