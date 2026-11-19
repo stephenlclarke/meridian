@@ -439,6 +439,17 @@ impl OriginalStationData {
 }
 
 impl OriginalStationData {
+    /// Qualifies explicit SH031 motion against the original SH028 source triangles.
+    pub fn kite_interceptor_motion_clear(
+        &self,
+        source: &crate::kite_interceptor::KiteInterceptorHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces(), start, end, angular_travel)
+    }
+
     /// A stationary authored courier outside the station-facing launch corridor.
     pub(crate) fn renas_mule_berth(
         &self,
