@@ -1,12 +1,14 @@
 """Independent source topology, variant identity and clearance witness checks."""
 
 import json
+import hashlib
 import shutil
 import tempfile
 import unittest
 from pathlib import Path
 
 from prepare_panther_scout_studio import ASSETS, FIXTURES, OUTPUT, authenticated, clearance_fixtures, definition
+from verify_panther_scout_station import OUTPUT_REPORT, verify
 
 
 class PantherScoutStudioTests(unittest.TestCase):
@@ -54,6 +56,33 @@ class PantherScoutStudioTests(unittest.TestCase):
             path.write_bytes(original.replace(b'SH033', b'SH032', 1))
             with self.assertRaisesRegex(ValueError, 'Changed Scout source native-export.json'):
                 definition(copied)
+
+    def test_actual_station_triangles_and_native_lip_crossing(self):
+        report = verify()
+        self.assertEqual(report, json.loads(OUTPUT_REPORT.read_bytes()))
+        self.assertEqual(report['aligned']['minimumSeparationMillimetres'], 43218)
+        self.assertEqual(report['offsetOpening']['minimumSeparationMillimetres'], 979)
+        crossing = report['offsetLipContact']
+        self.assertEqual(crossing['stationFace'], 482)
+        self.assertEqual(crossing['nativePointMetres'], [0.0,-.524,17.0])
+        self.assertEqual(crossing['crossingFraction'], .5)
+        self.assertGreater(min(crossing['barycentrics']), 0)
+        self.assertFalse(crossing['expectedClear'])
+
+    def test_retained_fit_bounds_and_independent_mesh_witnesses(self):
+        report = json.loads(OUTPUT.with_name('SURFACE-FIT.json').read_bytes())
+        self.assertEqual(report['packageSHA256'], hashlib.sha256(OUTPUT.read_bytes()).hexdigest())
+        self.assertEqual(report['groups'], 35)
+        self.assertEqual(len(report['perGroup']), 35)
+        for domain, minimum, maximum in [('detailed',437,1001), ('native',2164,2292)]:
+            summary = report['summary'][domain]
+            self.assertEqual(summary['largestSample']['certifiedLowerMillimetres'], minimum)
+            self.assertEqual(summary['fullUpperMillimetres'], maximum)
+            self.assertEqual(max(row['comparisons'][domain]['fullRoundedPieceUpperMillimetres']
+                                 for row in report['perGroup']), maximum)
+            self.assertLess(minimum, maximum)
+        self.assertEqual(report['originalCrossSourceDiscrepancy']['detailed']['strictLowerMillimetres'], 88)
+        self.assertEqual(report['originalCrossSourceDiscrepancy']['native']['strictLowerMillimetres'], 1848)
 
 
 if __name__ == '__main__':
