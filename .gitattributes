@@ -11,3 +11,8 @@ crates/meridian-core/src/**/*.rs text eol=lf
 integration/sh001-mule/*.json text eol=lf
 integration/sh001-mule/*.patch -text
 integration/sh008-goshawk/*.json text eol=lf
+
+# Okapi replay helpers have published byte hashes.
+tools/measure_okapi_air.py text eol=lf
+tools/prepare_okapi_geometry.py text eol=lf
+tools/verify_okapi_geometry.py text eol=lf
