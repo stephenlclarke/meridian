@@ -48,7 +48,7 @@ pub(super) fn isolated_pane(
     let pixels = pixels(rgb, size)?;
     let mut minimum = f64::INFINITY;
     let mut count = 0;
-    for (index, pixel) in pixels.iter().enumerate().filter(|(_, p)| active(p)) {
+    for (index, _) in pixels.iter().enumerate().filter(|(_, p)| active(p)) {
         let x = ((index % size[0] as usize) as f64 + 0.5) / scale[0];
         let y = ((index / size[0] as usize) as f64 + 0.5) / scale[1];
         let gutter = (x - pane.x)
