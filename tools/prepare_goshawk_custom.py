@@ -19,13 +19,17 @@ from import_goshawk_envelope_source import components, partition_ranges
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "assets/fleet/sh010"
 LEGACY_REVISION = "a11fe16924d87d06021816f9037952afcbac08db"
+CONTRACT = "contract.toml"
+NATIVE_SOURCE = "native-source.json"
+PHYSICAL = "physical.json"
+OWNERSHIP = "ownership.json"
 PINS = {
     "resource.toml": ("Sources/L337Core/Resources/Ships/SH010.toml", "66f8a18a52854fad92f8c0b1cb76ef3d0b6f7405d6e8e66e944b1b9e63bb89d3"),
-    "contract.toml": ("docs/fleet-design-v2/ships/SH010.toml", "755f776227dcb1d7816b5e426fbe239a98f0f9d1df46fc1ebdbd90c5b15e5983"),
-    "native-source.json": ("Sources/L337Core/Resources/OriginalFleetShowroomModels/SH010.json", "6b2fcf012eaf7cea3bede3f95679c80dd74517f39cffc8a6356ea173070cfced"),
+    CONTRACT: ("docs/fleet-design-v2/ships/SH010.toml", "755f776227dcb1d7816b5e426fbe239a98f0f9d1df46fc1ebdbd90c5b15e5983"),
+    NATIVE_SOURCE: ("Sources/L337Core/Resources/OriginalFleetShowroomModels/SH010.json", "6b2fcf012eaf7cea3bede3f95679c80dd74517f39cffc8a6356ea173070cfced"),
     "native-export-manifest.json": ("Sources/L337Core/Resources/OriginalFleetShowroomModels/manifest.json", "118b05757dc54096faa15dd79801f38999b87fe9424f1b3513133ead94f71971"),
-    "physical.json": ("Sources/L337Core/Resources/OriginalFleetPhysical/SH010.json", "30aba17c31f65a5d1bcb9a29455f45bb876628ce5906d4af5cf16f249d2a79a6"),
-    "ownership.json": ("docs/milestones/fleet-physical/creator-ownership-records/SH010.json", "5b3b4ff988a01b91e592fd73b048b2af8712c40b071406402def30b62f312bf9"),
+    PHYSICAL: ("Sources/L337Core/Resources/OriginalFleetPhysical/SH010.json", "30aba17c31f65a5d1bcb9a29455f45bb876628ce5906d4af5cf16f249d2a79a6"),
+    OWNERSHIP: ("docs/milestones/fleet-physical/creator-ownership-records/SH010.json", "5b3b4ff988a01b91e592fd73b048b2af8712c40b071406402def30b62f312bf9"),
     "LICENSE": ("LICENSE", "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"),
 }
 DESIGN_SHA = "3e131707177a4b934ad969dc62da49963adf9aa6a71985e6dcf21c8ba9dd179c"
@@ -54,21 +58,21 @@ def authenticated(inputs):
     for name, (_, expected) in PINS.items():
         require(pin(inputs[name])["sha256"] == expected, f"Changed SH010 source: {name}")
     resource = tomllib.loads(inputs["resource.toml"].decode(), parse_float=Decimal)
-    contract = tomllib.loads(inputs["contract.toml"].decode(), parse_float=Decimal)
-    export = json.loads(inputs["native-source.json"], parse_float=Decimal)
-    engineering = json.loads(inputs["physical.json"])
-    ownership = json.loads(inputs["ownership.json"])
+    contract = tomllib.loads(inputs[CONTRACT].decode(), parse_float=Decimal)
+    export = json.loads(inputs[NATIVE_SOURCE], parse_float=Decimal)
+    engineering = json.loads(inputs[PHYSICAL])
+    ownership = json.loads(inputs[OWNERSHIP])
     index = json.loads(inputs["native-export-manifest.json"])
     require(all(x["id"] == "SH010" for x in (resource, contract, export, engineering, ownership)), "Wrong SH010 identity")
     require(resource["name"] == contract["name"] == "Goshawk Mk II Custom", "Changed hull name")
     info = contract["source"]
     require(info["geometryFile"] == export["sourcePath"] == "replacement-hulls/SH010-design.toml", "Changed original design path")
     require(info["geometrySHA256"] == export["sourceSHA256"] == engineering["detailedSourceSHA256"] == ownership["geometrySHA256"] == DESIGN_SHA, "Changed original design pin")
-    require(engineering["contractSHA256"] == ownership["contractSHA256"] == pin(inputs["contract.toml"])["sha256"], "Changed engineering design binding")
-    require(engineering["componentSourceSHA256"] == pin(inputs["ownership.json"])["sha256"], "Changed creator component binding")
+    require(engineering["contractSHA256"] == ownership["contractSHA256"] == pin(inputs[CONTRACT])["sha256"], "Changed engineering design binding")
+    require(engineering["componentSourceSHA256"] == pin(inputs[OWNERSHIP])["sha256"], "Changed creator component binding")
     require(Fraction(engineering["metresPerSourceUnitExact"]) == SCALE and engineering["sourceOriginUnchanged"], "Changed adopted calibration")
     require(resource["nativeDesign"] == export["nativeDesign"], "Original native display and resource disagree")
-    expected = {"id": "SH010", "file": "SH010.json", "sourcePath": info["geometryFile"], "sourceSHA256": DESIGN_SHA, **pin(inputs["native-source.json"])}
+    expected = {"id": "SH010", "file": "SH010.json", "sourcePath": info["geometryFile"], "sourceSHA256": DESIGN_SHA, **pin(inputs[NATIVE_SOURCE])}
     require([r for r in index["models"] if r["id"] == "SH010"] == [expected], "SH010 native exporter does not bind the original")
     require(contract["geometry"]["nativeFaceLimit"] == 512, "Changed native qualification limit")
     require(contract["performance"]["maxSpeed"] == Decimal("40.0"), "Changed SH010 source speed")
@@ -159,7 +163,7 @@ def build(inputs):
         "metresPerSourceUnit": str(SCALE), "axes": "+Z forward, +Y up; original origin",
         "detailed": {"vertices": COUNTS[0][0], "faces": COUNTS[0][1], "components": COUNTS[0][2], "boundsMetres": bounds[:2]},
         "nativeCandidate": {"vertices": COUNTS[1][0], "faces": COUNTS[1][1], "components": COUNTS[1][2], "boundsMetres": bounds[2:], "exactFaceLimit": 512},
-        "physicalAuthority": {"status": engineering["status"], "dryMassKg": engineering["dryMassKilograms"], "sha256": pin(inputs["physical.json"])["sha256"]},
+        "physicalAuthority": {"status": engineering["status"], "dryMassKg": engineering["dryMassKilograms"], "sha256": pin(inputs[PHYSICAL])["sha256"]},
         "collision": {"pieces": len(names), "roundingMetres": 0.02,
                       "scope": "Convex local supports enclose both source meshes. Service wells are bridged locally; the central forebody channel is tested separately. Native qualification and ordinary placement pending."},
         "legacyInputs": {n: {"path": p, **pin(inputs[n])} for n, (p, _) in PINS.items()},
@@ -182,8 +186,13 @@ def main():
     else:
         if args.legacy_repo is None:
             parser.error("--legacy-repo is required to stage the immutable originals")
-        inputs = {name: subprocess.check_output(["git", "-C", str(args.legacy_repo), "show", f"{LEGACY_REVISION}:{path}"])
-                  for name, (path, _) in PINS.items()}
+        repo = args.legacy_repo.resolve(strict=True)
+        inputs = {
+            name: subprocess.check_output(
+                ["git", "cat-file", "blob", f"{LEGACY_REVISION}:{path}"], cwd=repo
+            )
+            for name, (path, _) in PINS.items()
+        }
     outputs = {**inputs, **build(inputs)}
     if args.check:
         for name, blob in outputs.items():
