@@ -1,0 +1,14 @@
+{
+  "hull": "SH039",
+  "candidateOriginalCoverage": {
+    "certifiedOutsideWitness": true,
+    "archivedNativeVertex": 1017,
+    "pointMetres": [
+      6.724978723404256,
+      2.112137479541735,
+      4.811783960720131
+    ],
+    "strictLowerMillimetresFromRoundedCandidateUnion": 125,
+    "method": "Exact integer separating axes against every candidate support; no inference from viewport."
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "hull": "SH039",
+  "directedSurfaceFit": {
+    "detailedToderivedNative": {
+      "witness": {
+        "vertex": 4674,
+        "pointMetres": [
+          -7.471266775777414,
+          2.0919672667757774,
+          0.45171849427168576
+        ],
+        "nearestTargetFace": 38,
+        "sampledMetres": 1.1624043153800043,
+        "strictLowerMillimetres": 1161
+      },
+      "fullUpperMillimetres": 1188
+    },
+    "derivedNativeTodetailed": {
+      "witness": {
+        "faceCentroid": 105,
+        "pointMetres": [
+          6.608019639934533,
+          2.824605564648118,
+          7.725040916530278
+        ],
+        "nearestTargetFace": 297,
+        "sampledMetres": 0.784923597268839,
+        "strictLowerMillimetres": 783
+      },
+      "fullUpperMillimetres": 916
+    },
+    "archivedNativeToderivedNative": {
+      "witness": {
+        "vertex": 1682,
+        "pointMetres": [
+          -7.2877414075286415,
+          2.2280523731587563,
+          0.9819967266775778
+        ],
+        "nearestTargetFace": 38,
+        "sampledMetres": 1.1757597913805884,
+        "strictLowerMillimetres": 1174
+      },
+      "fullUpperMillimetres": 1200
+    },
+    "derivedNativeToarchivedNative": {
+      "witness": {
+        "faceCentroid": 105,
+        "pointMetres": [
+          6.608019639934533,
+          2.824605564648118,
+          7.725040916530278
+        ],
+        "nearestTargetFace": 174,
+        "sampledMetres": 0.6473364222001958,
+        "strictLowerMillimetres": 646
+      },
+      "fullUpperMillimetres": 927
+    }
+  }
+}

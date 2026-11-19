@@ -11,3 +11,11 @@ crates/meridian-core/src/**/*.rs text eol=lf
 integration/sh001-mule/*.json text eol=lf
 integration/sh001-mule/*.patch -text
 integration/sh008-goshawk/*.json text eol=lf
+
+# The SH039 source and replay tools are pinned by their raw SHA-256.
+tools/prepare_vulture_mk3_studio.py text eol=lf
+tools/measure_vulture_mk3_fit.py text eol=lf
+tools/verify_vulture_mk3_station.py text eol=lf
+tools/verify_vulture_mk3_studio.py text eol=lf
+tools/measure_goshawk_surface_fit.py text eol=lf
+tools/import_goshawk_envelope_source.py text eol=lf

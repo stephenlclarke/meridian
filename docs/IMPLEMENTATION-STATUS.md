@@ -1,5 +1,9 @@
 # Implementation and validation status
 
+## SH039 Vulture Mk III source and blocked derived candidate
+
+The archived Mk III native source contains 3,016 faces and the unchanged package is rejected by the 512-face limit. A separately identified 508-face original-point structural proposal passes the installed Studio export and all three opening and three solid controls. Independent measured surface bounds reveal a roughly 1.2 m maximum directed original-to-candidate visual difference and a certified archived native vertex more than 125 mm outside its rounded collision supports. The original remains preserved and the derived candidate is not admitted. Both support unions pass the fixed-yaw SH028 aligned crossing and retain the same original native lip-contact witness. No game execution or operative physical data is claimed. [Source and admission limits](VULTURE-MK3-GAMEPLAY-ENVELOPE.md)
+
 ## Generated desktop audio source candidate
 
 The authored desktop integration routes generated launch and docking cues from actual mode transitions, front-laser sounds from accepted Pulse or Mining Laser discharges, and the original missile notification ping after an accepted missile launch. Ctrl+Shift+M toggles sound; Help displays availability. New/Continue primes without replay, and a missing device leaves gameplay active. Application suspension releases the audio device; resuming restores the mute preference without replaying accepted cues. No speech, kill, ECM, continuous cutter or EMP effects are claimed. Native device and Rust qualification remain pending.

@@ -1,0 +1,66 @@
+{
+  "hull": "SH039",
+  "station": "SH028",
+  "stationSha256": "cd54d30cab638f6b33feacf1fa78c9136f8ce346e8cc6133259bfc0472c259d5",
+  "method": "Exact binary64 rational fixed yaw half-turn swept support boxes; 20mm rounding plus 1mm guard; retained original native vertex crosses actual station face interior.",
+  "alignedActorCentreZMetres": [
+    152,
+    117
+  ],
+  "guardedLeadingTrailingEdgesMetres": [
+    137.74004746317513,
+    132.78204746317513
+  ],
+  "lipBandZMetres": [
+    134.32,
+    136.32
+  ],
+  "offsetActorXMetres": 72.6,
+  "offsetActorCentreZMetres": [
+    152,
+    149.5
+  ],
+  "unions": {
+    "original": {
+      "aligned": {
+        "netMillimetres": 43099,
+        "limitingPiece": 2,
+        "limitingStationFace": 452
+      },
+      "offsetStart": {
+        "netMillimetres": 1420,
+        "limitingPiece": 1,
+        "limitingStationFace": 480
+      }
+    },
+    "candidate": {
+      "aligned": {
+        "netMillimetres": 43099,
+        "limitingPiece": 2,
+        "limitingStationFace": 452
+      },
+      "offsetStart": {
+        "netMillimetres": 1420,
+        "limitingPiece": 1,
+        "limitingStationFace": 480
+      }
+    }
+  },
+  "lipCrossing": {
+    "archivedNativeVertex": 120,
+    "derivedNativeVertex": 72,
+    "stationFace": 482,
+    "fraction": 0.5764189852700519,
+    "actorCentreZMetres": 150.55895253682488,
+    "pointMetres": [
+      69.89950900163666,
+      0.9819967266775778,
+      136.32
+    ],
+    "barycentrics": [
+      0.11024549918166826,
+      0.3796065518405955,
+      0.5101479489777362
+    ]
+  }
+}
