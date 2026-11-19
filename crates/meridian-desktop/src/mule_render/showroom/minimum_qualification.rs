@@ -149,6 +149,14 @@ fn original_custom_fits_minimum_station_showroom_solo_and_compare() {
     );
 }
 
+#[test]
+fn original_mole_miner_fits_minimum_station_showroom_solo_and_compare() {
+    let vertices = ok(super::Hull::MoleMiner.visual());
+    assert_eq!(vertices.len(), super::MOLE_MINER_FACES * 3);
+    let view = View::new(&vertices, [EMPTY_PIECE; super::MOLE_MINER_PIECES]);
+    assert_variant_fits_minimum(station_frames_for("Mole Miner"), &view, &vertices, "SH016");
+}
+
 fn assert_variant_fits_minimum(
     frames: Vec<Frames>,
     view: &View,

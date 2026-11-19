@@ -302,6 +302,80 @@ fn selecting_mk_ii_custom_routes_its_own_preview_without_granting_exchange() {
     );
 }
 
+#[test]
+fn selecting_mole_miner_routes_its_original_preview_without_granting_exchange() {
+    assert_goshawk_preview("Mole Miner", "SH016", "assets/fleet/sh016/visual.bin");
+}
+
+#[test]
+fn mole_prospector_selection_does_not_fall_back_to_mole_miner() {
+    use crate::docked_screens::{Catalogue, DockedScreens, Input, Key, Outcome, Screen, Viewport};
+    let world = meridian_core::World::new_commander(95016).unwrap_or_else(|e| panic!("{e}"));
+    let before = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+    let catalogue = Catalogue::bundled().unwrap_or_else(|e| panic!("{e}"));
+    let mut ui = DockedScreens::new(meridian_core::navigation::SystemId::AVENOR, "SH025");
+    let ctx = context(&world, &catalogue);
+    let viewport = Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));
+    let assert_prospector = |frame: &crate::docked_screens::Frame, compare: bool| {
+        assert!(frame.models.iter().all(|model| model.object != "SH016"
+            && model.geometry_key != "assets/fleet/sh016/visual.bin"));
+        let selected = frame.models.iter().find(|model| model.object == "SH017");
+        if MODELS.iter().any(|model| model.object == "SH017") {
+            let selected =
+                selected.unwrap_or_else(|| panic!("registered SH017 must have its own model"));
+            assert_eq!(selected.geometry_key, "assets/fleet/sh017/visual.bin");
+            assert!(crate::mule_render::showroom::matches(selected));
+            assert_eq!(frame.models.len(), if compare { 2 } else { 1 });
+        } else {
+            assert!(selected.is_none());
+            assert_eq!(frame.models.len(), if compare { 1 } else { 0 });
+            assert!(
+                frame
+                    .labels
+                    .iter()
+                    .any(|label| label.text.contains("SH017: preview unavailable"))
+            );
+        }
+        if compare {
+            assert_eq!(frame.models[0].object, "SH025");
+        }
+    };
+    ui.open(Screen::Showroom);
+    for (query, id) in [("Mole Miner", "SH016"), ("Mole Prospector", "SH017")] {
+        for input in [
+            Input::Key(Key::Search),
+            Input::Key(Key::ClearSearch),
+            Input::Text(query.into()),
+            Input::Key(Key::Confirm),
+        ] {
+            let frame = ui.frame(&ctx, viewport);
+            assert!(matches!(ui.handle(input, &frame, &ctx), Outcome::Updated));
+        }
+        assert_eq!(ui.selected_ship(), id);
+        let frame = ui.frame(&ctx, viewport);
+        if id == "SH016" {
+            assert!(
+                frame.models.iter().any(|model| model.object == id
+                    && model.geometry_key == "assets/fleet/sh016/visual.bin")
+            );
+        } else {
+            assert_prospector(&frame, true);
+        }
+    }
+    let comparison = ui.frame(&ctx, viewport);
+    assert!(matches!(
+        ui.handle(Input::Key(Key::Compare), &comparison, &ctx),
+        Outcome::Updated
+    ));
+    let solo = ui.frame(&ctx, viewport);
+    assert_prospector(&solo, false);
+    assert!(matches!(
+        ui.handle(Input::Key(Key::Exchange), &solo, &ctx),
+        Outcome::Refused(_)
+    ));
+    assert_eq!(world.save_bytes().unwrap_or_else(|e| panic!("{e}")), before);
+}
+
 fn assert_goshawk_preview(name: &str, id: &str, key: &str) {
     use crate::docked_screens::{Catalogue, DockedScreens, Input, Key, Outcome, Screen, Viewport};
     let world = meridian_core::World::new_commander(95006).unwrap_or_else(|e| panic!("{e}"));

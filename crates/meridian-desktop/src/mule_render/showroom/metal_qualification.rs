@@ -587,6 +587,17 @@ fn metal_goshawk_custom_same_pose_shimmer() {
     );
 }
 
+#[test]
+#[ignore = "Mac owner only: explicit production SH016 visual qualification"]
+fn metal_mole_miner_same_pose_shimmer() {
+    same_pose_shimmer(
+        Hull::MoleMiner,
+        "SH016",
+        "Mole Miner",
+        "MERIDIAN_SH016_EVIDENCE_DIR",
+    );
+}
+
 fn same_pose_shimmer(hull: Hull, object: &str, name: &str, variable: &str) {
     let output = output_directory(variable);
     let gpu = metal_gpu_for(object, false);

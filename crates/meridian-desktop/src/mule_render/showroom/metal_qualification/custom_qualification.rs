@@ -137,8 +137,8 @@ impl<'a> Capture<'a> {
         &mut self,
         name: &str,
         frame: &Frame,
-        mut explorer: Option<&mut showroom::Pass>,
-        custom: &mut showroom::Pass,
+        mut other: Option<&mut showroom::Pass>,
+        primary: &mut showroom::Pass,
     ) {
         let [left, right] = frame.models.as_slice() else {
             panic!("expected two model panes")
@@ -146,15 +146,25 @@ impl<'a> Capture<'a> {
         assert!(left.bounds.x + left.bounds.width <= right.bounds.x);
         let combined = self.frame(name, frame);
         let mut images = Vec::with_capacity(2);
-        for model in [left, right] {
+        for (pane, model) in [left, right].into_iter().enumerate() {
             let mut isolated = frame.clone();
             isolated.models = vec![model.clone()];
-            let isolated_name = format!("{name}-{}", model.object);
+            let isolated_name = if left.object == right.object {
+                format!("{name}-pane{pane}-{}", model.object)
+            } else {
+                format!("{name}-{}", model.object)
+            };
             let rgb = self.frame(&isolated_name, &isolated);
             self.own_pixels(&isolated_name, model, &rgb);
             let reference = match showroom::hull(model) {
-                Some(Hull::Custom) => Some(&mut *custom),
-                Some(Hull::Explorer) => explorer.as_deref_mut(),
+                Some(hull) if hull == primary.hull() => Some(&mut *primary),
+                Some(hull) => {
+                    let Some(pass) = other.as_deref_mut() else {
+                        panic!("missing independent hull pass")
+                    };
+                    assert_eq!(pass.hull(), hull);
+                    Some(pass)
+                }
                 None => {
                     assert_eq!(model.object, "SH025");
                     None
@@ -174,8 +184,12 @@ impl<'a> Capture<'a> {
             [&images[0], &images[1]],
             self.size(),
         ));
+        let primary_id = [left, right]
+            .into_iter()
+            .find(|model| showroom::hull(model) == Some(primary.hull()))
+            .map_or("original", |model| model.object.as_str());
         println!(
-            "SH010 {name}: full-target exact isolated RGB union at {:?}",
+            "{primary_id} {name}: full-target exact isolated RGB union at {:?}",
             self.size()
         );
     }
@@ -284,5 +298,73 @@ fn metal_goshawk_custom_cache_switching() {
         "SH010 cache return and both pane identity orders passed at {:?}",
         capture.size()
     );
+    capture.finish();
+}
+
+#[test]
+#[ignore = "Mac owner only: independent SH016 production minimum Showroom RGB evidence"]
+fn metal_mole_miner_minimum_showroom_model_pass() {
+    let output = output_directory("MERIDIAN_SH016_MINIMUM_DIR");
+    let gpu = metal_gpu_for("SH016", false);
+    let target = Target::new(&gpu.device, MIN_WINDOW_LOGICAL);
+    let mut capture = Capture::new(&gpu, &target, &output);
+    let mut miner = original_pass(&gpu, Hull::MoleMiner);
+    assert_eq!(
+        miner.vertex_count,
+        super::super::MOLE_MINER_FACES as u32 * 3
+    );
+    for (pose, Frames { solo, comparison }) in minimum_qualification::POSES
+        .into_iter()
+        .zip(minimum_qualification::station_frames_for("Mole Miner"))
+    {
+        let [left, right] = comparison.models.as_slice() else {
+            panic!("expected SH025/SH016 Compare")
+        };
+        assert_eq!(left.object, "SH025");
+        assert_eq!(showroom::hull(right), Some(Hull::MoleMiner));
+        capture.solo(&format!("{pose}-solo"), &solo, &mut miner);
+        capture.comparison(&format!("{pose}-compare"), &comparison, None, &mut miner);
+    }
+    capture.finish();
+}
+
+#[test]
+#[ignore = "Mac owner only: SH016 original hull cache identity and duplicate panes"]
+fn metal_mole_miner_cache_switching() {
+    let output = output_directory("MERIDIAN_SH016_CACHE_DIR");
+    let gpu = metal_gpu_for("SH016", false);
+    let target = Target::new(&gpu.device, MIN_WINDOW_LOGICAL);
+    let mut capture = Capture::new(&gpu, &target, &output);
+    let mut miner_pass = original_pass(&gpu, Hull::MoleMiner);
+    let mut custom_pass = original_pass(&gpu, Hull::Custom);
+    let miner = minimum_qualification::station_frames_for("Mole Miner");
+    let custom = minimum_qualification::station_frames_for("Goshawk Mk II Custom");
+    let first = capture.solo("miner-before", &miner[0].solo, &mut miner_pass);
+    let second = capture.solo("custom-before", &custom[0].solo, &mut custom_pass);
+    assert!(first != second, "different hulls produced identical RGB");
+    // Renderer-only mixed and duplicate fixtures reuse real station pane bounds.
+    let mut mixed = miner[0].comparison.clone();
+    for (name, a, b) in [
+        ("miner-custom", &miner, &custom),
+        ("custom-miner", &custom, &miner),
+        ("miner-miner", &miner, &miner),
+    ] {
+        let [left, right] = mixed.models.as_mut_slice() else {
+            panic!("expected two panes")
+        };
+        for (pane, frame) in [(left, &a[0]), (right, &b[2])] {
+            let [model] = frame.solo.models.as_slice() else {
+                panic!("expected original model")
+            };
+            *pane = ModelPreview {
+                bounds: pane.bounds,
+                ..model.clone()
+            };
+        }
+        assert_ne!(mixed.models[0].orientation, mixed.models[1].orientation);
+        capture.comparison(name, &mixed, Some(&mut custom_pass), &mut miner_pass);
+    }
+    assert!(first == capture.solo("miner-return", &miner[0].solo, &mut miner_pass));
+    assert!(second == capture.solo("custom-return", &custom[0].solo, &mut custom_pass));
     capture.finish();
 }

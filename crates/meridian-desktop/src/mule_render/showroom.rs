@@ -1,4 +1,4 @@
-//! Source-authenticated Goshawk showroom presentation. Inputs grant no World authority.
+//! Source-authenticated original-hull Showroom presentation. Inputs grant no World authority.
 use super::{
     Piece, Triangle, Vec3, VisualVertex, decode_visual, gpu, subtract, support_mesh, vector,
 };
@@ -13,6 +13,7 @@ use meridian_core::{
         CUSTOM_DETAILED_FACES, CUSTOM_DETAILED_VERTICES, CUSTOM_NATIVE_VERTICES, CUSTOM_PIECES,
         GoshawkCustomHullSource,
     },
+    mole_miner::{MOLE_MINER_PIECES, MoleMinerHullSource},
     mule::EnvelopeError,
 };
 
@@ -23,6 +24,12 @@ const VISUAL_FNV: u64 = 0x7a17_0c0c_6cdc_d5fd;
 pub(crate) const CUSTOM_GEOMETRY_KEY: &str = "assets/fleet/sh010/visual.bin";
 const CUSTOM_VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh010/visual.bin");
 const CUSTOM_VISUAL_FNV: u64 = 0xfe21_3755_8ea3_8ccb;
+pub(crate) const MOLE_MINER_GEOMETRY_KEY: &str = "assets/fleet/sh016/visual.bin";
+const MOLE_MINER_VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh016/visual.bin");
+const MOLE_MINER_VISUAL_FNV: u64 = 0xa991_ee15_43a5_1756;
+const MOLE_MINER_FACES: usize = 12_836;
+// Collar supports share boundary vertex rings, so these are membership slots, not distinct points.
+const MOLE_MINER_SOURCE_SLOTS: usize = 8_912;
 const EMPTY_PIECE: Piece = Piece {
     range: [0; 4],
     low: [0.0; 4],
@@ -33,12 +40,14 @@ const EMPTY_PIECE: Piece = Piece {
 pub(crate) enum Hull {
     Explorer,
     Custom,
+    MoleMiner,
 }
 
 pub(crate) fn hull(model: &ModelPreview) -> Option<Hull> {
     match (model.object.as_str(), model.geometry_key.as_str()) {
         ("SH008", GEOMETRY_KEY) => Some(Hull::Explorer),
         ("SH010", CUSTOM_GEOMETRY_KEY) => Some(Hull::Custom),
+        ("SH016", MOLE_MINER_GEOMETRY_KEY) => Some(Hull::MoleMiner),
         _ => None,
     }
 }
@@ -57,7 +66,7 @@ fn authenticated_visual(
         (hash ^ u64::from(*byte)).wrapping_mul(0x100_0000_01b3)
     });
     if hash != expected_hash {
-        return Err("Goshawk preview bytes changed");
+        return Err("Original hull preview bytes changed");
     }
     decode_visual(bytes, magic, count)
 }
@@ -84,6 +93,12 @@ impl Hull {
                 b"SH010VZ1",
                 CUSTOM_DETAILED_FACES * 3,
             ),
+            Self::MoleMiner => authenticated_visual(
+                MOLE_MINER_VISUAL,
+                MOLE_MINER_VISUAL_FNV,
+                b"MOLEVIS1",
+                MOLE_MINER_FACES * 3,
+            ),
         }
     }
 
@@ -91,6 +106,7 @@ impl Hull {
         match self {
             Self::Explorer => GOSHAWK_PIECES,
             Self::Custom => CUSTOM_PIECES,
+            Self::MoleMiner => MOLE_MINER_PIECES,
         }
     }
 
@@ -112,6 +128,12 @@ impl Hull {
                     CUSTOM_DETAILED_VERTICES + CUSTOM_NATIVE_VERTICES,
                 )
                 .map_err(SupportError::Render)?;
+                Ok((triangles, pieces.to_vec()))
+            }
+            Self::MoleMiner => {
+                let source = MoleMinerHullSource::bundled().map_err(SupportError::Source)?;
+                let (triangles, pieces) = support_mesh(source.pieces(), MOLE_MINER_SOURCE_SLOTS)
+                    .map_err(SupportError::Render)?;
                 Ok((triangles, pieces.to_vec()))
             }
         }
@@ -271,7 +293,7 @@ impl Pass {
     ) -> Result<Self, String> {
         match hull {
             Hull::Explorer => Self::new(device, queue, format),
-            Hull::Custom => Self::construct(device, queue, format, hull),
+            Hull::Custom | Hull::MoleMiner => Self::construct(device, queue, format, hull),
         }
     }
 
@@ -335,7 +357,7 @@ impl Pass {
         srgb: bool,
     ) -> Result<(), String> {
         if hull(model) != Some(self.hull) {
-            return Err("Goshawk Showroom hull mismatch".into());
+            return Err("Original Showroom hull mismatch".into());
         }
         let [x, y, width, height] = [
             bounds.x * scale[0],
@@ -384,6 +406,9 @@ mod minimum_qualification;
 #[cfg(test)]
 mod minimum_rgb;
 
+#[cfg(test)]
+mod mole_miner_tests;
+
 #[cfg(all(test, target_os = "macos"))]
 mod metal_qualification;
 
@@ -427,6 +452,11 @@ mod tests {
         assert_eq!(hull(&model), Some(Hull::Explorer));
         model.geometry_key = CUSTOM_GEOMETRY_KEY.into();
         assert!(!matches(&model));
+    }
+
+    #[test]
+    fn mole_miner_original_visual_and_203_supports_bind_to_the_shader() {
+        check_variant(Hull::MoleMiner, MOLE_MINER_FACES, MOLE_MINER_PIECES);
     }
 
     fn check_variant(hull: Hull, face_count: usize, piece_count: usize) {
