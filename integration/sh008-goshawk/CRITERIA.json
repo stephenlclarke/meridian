@@ -66,11 +66,12 @@
     "nativeAcceptance": "Capture original forest-silver appearance, the open wishbone and close grazing shimmer while rotating in the ordinary Showroom; verify resize, view clipping and draw cost.",
     "metalShimmerQualification": {
       "status": "AUTHORED_UNRUN",
-      "test": "metal_goshawk_same_pose_shimmer_and_gpu_cost",
+      "visualTest": "metal_goshawk_same_pose_shimmer",
+      "gpuTimingTest": "metal_goshawk_gpu_cost",
       "verifier": "tools/verify_goshawk_showroom_evidence.py",
       "capture": "Three stationary front, yaw-oblique and elevated Showroom views at 1280x720 logical, 2x scale, BGRA8 sRGB and production depth. Retain the hull-local unit directions and solid, production, repeat and shifted phase panes.",
       "pixelChecks": "Identical production repeat and nonzero solid-to-production and phase differences across distinct hull-local views. Both phases are at most 24 sRGB codes per channel from the solid, and at most seven codes apart. Inspect the upper view and amplified differences for the local open wishbone.",
-      "gpuTiming": "Three warmups and 16 Metal GPU timestamp pairs per pose if the adapter exposes TIMESTAMP_QUERY. Each pair brackets the isolated production shimmer draw and attachment load/store. Require ordered nonoverlapping intervals within and across poses and one period per queue. Otherwise record unsupported.",
+      "gpuTiming": "Three warmups and 16 Metal GPU timestamp pairs per pose if the adapter exposes TIMESTAMP_QUERY. Each pair brackets the isolated production shimmer draw and attachment load/store. Preserve every pair and period for all poses before validation. Require ordered nonoverlapping intervals within and across poses, one finite positive period and no invalid Metal counters. Otherwise record unsupported only if the adapter lacks queries. An optional trailing-render diagnostic uses a fresh timing directory and adds one unmeasured solid render before resolve.",
       "scope": "Offscreen production hull pass. Ordinary Showroom UI and fixed illumination are preserved. Windows graphics and physical collision cost are outside this receipt."
     }
   },

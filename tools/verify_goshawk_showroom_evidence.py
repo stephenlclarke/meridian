@@ -10,6 +10,7 @@ from pathlib import Path
 POSES = ("front", "oblique", "upper")
 VARIANTS = ("solid", "normal", "repeat", "phase")
 SAMPLES = 16
+METAL_COUNTER_ERROR = (1 << 64) - 1
 
 
 def ppm(path):
@@ -74,7 +75,7 @@ def timing(path):
             if period_ns is None:
                 period_ns = current_period
             if (
-                int(sample) != index or start < 0 or end <= start
+                int(sample) != index or not 0 < start < end < METAL_COUNTER_ERROR
                 or not math.isfinite(current_period) or current_period <= 0
                 or current_period != period_ns
             ):
@@ -102,7 +103,7 @@ def timing(path):
     }
 
 
-def verify(folder, write_diffs=False):
+def verify(folder, write_diffs=False, timing_dir=None):
     directions = view_directions(folder / "hull-local-views.tsv")
     poses = {}
     for pose in POSES:
@@ -138,12 +139,17 @@ def verify(folder, write_diffs=False):
             "shimmer": shimmer,
             "shifted_shimmer": shifted_shimmer,
             "phase": phase,
-            "gpu_timing": timing(folder / f"{pose}-gpu.tsv"),
         }
     if any(not any(pose[effect]["changed_pixels"] for pose in poses.values())
            for effect in ("shimmer", "phase")):
         raise ValueError("No nonzero same-pose shimmer or phase difference resolved")
-    reports = [pose["gpu_timing"] for pose in poses.values()]
+    if timing_dir is None:
+        return poses
+    reports = []
+    for name, pose in poses.items():
+        report = timing(timing_dir / f"{name}-gpu.tsv")
+        pose["gpu_timing"] = report
+        reports.append(report)
     if len({report["status"] for report in reports}) != 1:
         raise ValueError("Inconsistent timestamp capability for one adapter")
     if reports[0]["status"] == "measured":
@@ -159,5 +165,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("evidence", type=Path)
     parser.add_argument("--write-diffs", action="store_true")
+    parser.add_argument("--timing-dir", type=Path, help="Also verify the separate GPU timestamp run")
     args = parser.parse_args()
-    print(json.dumps(verify(args.evidence, args.write_diffs), indent=2))
+    print(json.dumps(verify(args.evidence, args.write_diffs, args.timing_dir), indent=2))

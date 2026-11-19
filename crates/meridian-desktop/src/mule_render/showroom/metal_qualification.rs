@@ -21,6 +21,7 @@ const FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Bgra8UnormSrgb;
 const TIMEOUT: Duration = Duration::from_secs(30);
 const WARMUP: usize = 3;
 const SAMPLES: u32 = 16;
+const POSES: [&str; 3] = ["front", "oblique", "upper"];
 const PHASE_SECONDS: f32 = std::f32::consts::PI / 0.7;
 
 fn ok<T, E: std::fmt::Debug>(result: Result<T, E>) -> T {
@@ -294,7 +295,7 @@ struct Gpu {
     timestamps: bool,
 }
 impl Gpu {
-    fn timings(&self, target: &Target, pass: &Pass) -> Option<(f32, Vec<[u64; 2]>)> {
+    fn timings(&self, target: &Target, pass: &Pass, trailing_render: bool) -> Option<Timing> {
         if !self.timestamps {
             return None;
         }
@@ -336,6 +337,12 @@ impl Gpu {
                 pass.draw_shimmer(render);
             });
         }
+        if trailing_render {
+            target.render(&mut encoder, false, false, None, |render| {
+                pass.set_viewport(render);
+                pass.draw_solid(render);
+            });
+        }
         encoder.resolve_query_set(&set, 0..count, &resolved, 0);
         encoder.copy_buffer_to_buffer(&resolved, 0, &readback, 0, size);
         let bytes = read_buffer(
@@ -354,7 +361,10 @@ impl Gpu {
                 [u64::from_le_bytes(*start), u64::from_le_bytes(*end)]
             })
             .collect();
-        Some((self.queue.get_timestamp_period(), ticks))
+        Some(Timing {
+            period: self.queue.get_timestamp_period(),
+            ticks,
+        })
     }
 }
 
@@ -416,33 +426,70 @@ fn run_pose(
         changed[0],
         changed[1]
     );
+    changed
+}
+
+struct Timing {
+    period: f32,
+    ticks: Vec<[u64; 2]>,
+}
+
+fn write_timing(path: PathBuf, timing: Option<&Timing>) {
     let mut raw = String::new();
-    if let Some((period, ticks)) = gpu.timings(target, pass) {
+    if let Some(Timing { period, ticks }) = timing {
         use std::fmt::Write as _;
-        assert!(period.is_finite() && period > 0.0);
-        assert_eq!(ticks.len(), SAMPLES as usize);
         ok(writeln!(raw, "sample\tstart_tick\tend_tick\tns_per_tick"));
-        for (sample, [start, end]) in ticks.into_iter().enumerate() {
-            assert!(end > start, "invalid GPU timestamp pair {sample}");
+        for (sample, [start, end]) in ticks.iter().enumerate() {
             ok(writeln!(raw, "{sample}\t{start}\t{end}\t{period}"));
         }
     } else {
         raw.push_str("unsupported: adapter has no TIMESTAMP_QUERY\n");
     }
-    write_new(directory.join(format!("{name}-gpu.tsv")), raw.as_bytes());
-    changed
+    write_new(path, raw.as_bytes());
 }
 
-#[test]
-#[ignore = "Mac owner only: explicit production SH008 pixel and GPU timestamp qualification"]
-fn metal_goshawk_same_pose_shimmer_and_gpu_cost() {
+fn validate_timings(timings: [Option<Timing>; 3]) {
+    let mut last_tick = None;
+    let mut queue_period = None;
+    for (name, timing) in POSES.into_iter().zip(timings) {
+        let Some(Timing { period, ticks }) = timing else {
+            continue;
+        };
+        assert!(
+            period.is_finite() && period > 0.0,
+            "{name}: invalid GPU timestamp period {period}"
+        );
+        if let Some(expected) = queue_period {
+            assert_eq!(period, expected, "{name}: GPU timestamp period changed");
+        }
+        queue_period = Some(period);
+        assert_eq!(ticks.len(), SAMPLES as usize);
+        for (sample, [start, end]) in ticks.into_iter().enumerate() {
+            // Metal uses all ones to signal an invalid counter result.
+            assert!(
+                start > 0 && end > start && end != u64::MAX,
+                "{name}: invalid GPU timestamp pair {sample}: {start}..{end}, {period} ns/tick"
+            );
+            assert!(
+                last_tick.is_none_or(|last| start >= last),
+                "{name}: GPU timestamp pair {sample} overlaps or moves backwards"
+            );
+            last_tick = Some(end);
+        }
+    }
+}
+
+fn output_directory(variable: &str) -> PathBuf {
     let output = PathBuf::from(
-        std::env::var_os("MERIDIAN_SH008_EVIDENCE_DIR").unwrap_or_else(|| {
-            panic!("set MERIDIAN_SH008_EVIDENCE_DIR to a new absolute directory")
-        }),
+        std::env::var_os(variable)
+            .unwrap_or_else(|| panic!("set {variable} to a new absolute directory")),
     );
     assert!(output.is_absolute());
     ok(fs::create_dir(&output));
+    output
+}
+
+fn metal_gpu(request_timing: bool) -> Gpu {
     let mut descriptor = wgpu::InstanceDescriptor::new_without_display_handle();
     descriptor.backends = wgpu::Backends::METAL;
     let instance = wgpu::Instance::new(descriptor);
@@ -451,10 +498,14 @@ fn metal_goshawk_same_pose_shimmer_and_gpu_cost() {
     ));
     let info = adapter.get_info();
     assert_eq!(info.backend, wgpu::Backend::Metal);
-    let required_features = adapter.features() & wgpu::Features::TIMESTAMP_QUERY;
+    let timestamps = adapter.features() & wgpu::Features::TIMESTAMP_QUERY;
+    let required_features = if request_timing {
+        timestamps
+    } else {
+        wgpu::Features::empty()
+    };
     println!(
-        "SH008 adapter={info:?} format={FORMAT:?} logical={LOGICAL:?} scale={SCALE:?} timestamp_queries={:?} phase_seconds={PHASE_SECONDS}",
-        required_features
+        "SH008 adapter={info:?} format={FORMAT:?} logical={LOGICAL:?} scale={SCALE:?} timestamp_available={timestamps:?} timestamp_requested={required_features:?} phase_seconds={PHASE_SECONDS}"
     );
     let (device, queue) = ok(pollster::block_on(adapter.request_device(
         &wgpu::DeviceDescriptor {
@@ -462,11 +513,18 @@ fn metal_goshawk_same_pose_shimmer_and_gpu_cost() {
             ..Default::default()
         },
     )));
-    let gpu = Gpu {
+    Gpu {
         device,
         queue,
         timestamps: required_features.contains(wgpu::Features::TIMESTAMP_QUERY),
-    };
+    }
+}
+
+#[test]
+#[ignore = "Mac owner only: explicit production SH008 visual qualification"]
+fn metal_goshawk_same_pose_shimmer() {
+    let output = output_directory("MERIDIAN_SH008_EVIDENCE_DIR");
+    let gpu = metal_gpu(false);
     let target = Target::new(&gpu.device);
     let mut pass = ok(Pass::new(&gpu.device, &gpu.queue, FORMAT));
     let mut totals = [0, 0];
@@ -475,11 +533,7 @@ fn metal_goshawk_same_pose_shimmer_and_gpu_cost() {
         .each_ref()
         .map(|model| hull_local_direction(&pass, model));
     let mut directions = String::from("pose\tx\ty\tz\n");
-    for ((name, [x, y, z]), model) in ["front", "oblique", "upper"]
-        .into_iter()
-        .zip([front, oblique, upper])
-        .zip(&models)
-    {
+    for ((name, [x, y, z]), model) in POSES.into_iter().zip([front, oblique, upper]).zip(&models) {
         use std::fmt::Write as _;
         println!(
             "SH008 {name} orientation={:?} hull_local_direction=[{x:.9}, {y:.9}, {z:.9}]",
@@ -503,7 +557,7 @@ fn metal_goshawk_same_pose_shimmer_and_gpu_cost() {
     assert!(front[0].abs() < 0.05 && front[2] > 0.9);
     assert!(oblique[0].abs() > 0.4 && oblique[2] > 0.7);
     assert!(upper[1] > 0.6 && upper[2] > 0.4);
-    for (name, model) in ["front", "oblique", "upper"].into_iter().zip(models) {
+    for (name, model) in POSES.into_iter().zip(models) {
         let [effect, phase] = run_pose(&gpu, &target, &mut pass, &model, &output, name);
         totals[0] += effect;
         totals[1] += phase;
@@ -516,4 +570,40 @@ fn metal_goshawk_same_pose_shimmer_and_gpu_cost() {
         totals[1] > 0,
         "no temporal modulation resolved at production sRGB precision"
     );
+}
+
+#[test]
+#[ignore = "Mac owner only: explicit production SH008 GPU timestamp qualification"]
+fn metal_goshawk_gpu_cost() {
+    let output = output_directory("MERIDIAN_SH008_TIMING_DIR");
+    let trailing_render = match std::env::var("MERIDIAN_SH008_TIMING_VARIANT") {
+        Err(std::env::VarError::NotPresent) => false,
+        Ok(variant) if variant == "trailing-render" => true,
+        other => panic!("unknown timestamp diagnostic variant: {other:?}"),
+    };
+    let variant = if trailing_render {
+        "trailing-render"
+    } else {
+        "original"
+    };
+    write_new(
+        output.join("timing-variant.txt"),
+        format!("{variant}\n").as_bytes(),
+    );
+    println!("SH008 timing variant={variant}");
+    let gpu = metal_gpu(true);
+    let target = Target::new(&gpu.device);
+    let mut pass = ok(Pass::new(&gpu.device, &gpu.queue, FORMAT));
+    assert!(pass.shimmer, "SH008 rounded support certification failed");
+    let models = showroom_models();
+    let mut names = POSES.into_iter();
+    let timings = models.each_ref().map(|model| {
+        let name = names.next().unwrap_or_else(|| panic!("missing pose name"));
+        ok(pass.prepare(&gpu.queue, model, model.bounds, SCALE, FORMAT.is_srgb()));
+        let timing = gpu.timings(&target, &pass, trailing_render);
+        write_timing(output.join(format!("{name}-gpu.tsv")), timing.as_ref());
+        timing
+    });
+    // Persist every returned pair from every pose before validation can fail.
+    validate_timings(timings);
 }

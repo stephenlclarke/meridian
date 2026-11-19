@@ -24,7 +24,7 @@ class GoshawkShowroomEvidence(unittest.TestCase):
         (self.root / f"{pose}-{variant}.ppm").write_bytes(b"P6\n1 1\n255\n" + bytes([red, 0, 0]))
 
     def test_reads_stable_pairs_and_marks_missing_timestamp_feature(self):
-        result = verify(self.root, write_diffs=True)
+        result = verify(self.root, write_diffs=True, timing_dir=self.root)
         self.assertEqual(result["front"]["gpu_timing"], {"status": "unsupported"})
         self.assertEqual(result["front"]["shimmer"], {"changed_pixels": 1, "peak_channel_delta": 4})
         self.assertEqual(result["front"]["phase"], {"changed_pixels": 1, "peak_channel_delta": 1})
@@ -43,30 +43,43 @@ class GoshawkShowroomEvidence(unittest.TestCase):
 
     def test_converts_raw_supported_gpu_ticks_and_rejects_nonpositive_intervals(self):
         self.measured_timing()
-        result = verify(self.root)["oblique"]["gpu_timing"]
+        result = verify(self.root, timing_dir=self.root)["oblique"]["gpu_timing"]
         self.assertEqual(result["status"], "measured")
         self.assertEqual((result["min_ns"], result["median_ns"], result["p95_ns"]), (2, 17, 32))
         self.assertEqual(result["ns_per_tick"], 2)
         timing = self.root / "front-gpu.tsv"
         timing.write_text(timing.read_text().replace("100\t101", "100\t99", 1))
         with self.assertRaisesRegex(ValueError, "Invalid GPU timestamp sample"):
-            verify(self.root)
+            verify(self.root, timing_dir=self.root)
 
     def test_rejects_overlapping_intervals_within_and_across_poses(self):
         self.measured_timing()
         self.write_timing("front", 100, overlap=True)
         with self.assertRaisesRegex(ValueError, "within a pose"):
-            verify(self.root)
+            verify(self.root, timing_dir=self.root)
         self.write_timing("front", 100)
         self.write_timing("oblique", 400)
         with self.assertRaisesRegex(ValueError, "across poses"):
-            verify(self.root)
+            verify(self.root, timing_dir=self.root)
 
     def test_rejects_a_new_timestamp_period_on_the_same_queue(self):
         self.measured_timing()
         self.write_timing("oblique", 1100, period=3)
         with self.assertRaisesRegex(ValueError, "period changed across poses"):
-            verify(self.root)
+            verify(self.root, timing_dir=self.root)
+
+    def test_visual_verification_is_independent_of_invalid_or_missing_gpu_timing(self):
+        self.measured_timing()
+        (self.root / "front-gpu.tsv").unlink()
+        self.assertNotIn("gpu_timing", verify(self.root)["front"])
+        with self.assertRaises(FileNotFoundError):
+            verify(self.root, timing_dir=self.root)
+        self.write_timing("front", 100)
+        front = self.root / "front-gpu.tsv"
+        front.write_text(front.read_text().replace("100\t101", "100\t18446744073709551615", 1))
+        self.assertNotIn("gpu_timing", verify(self.root)["front"])
+        with self.assertRaisesRegex(ValueError, "Invalid GPU timestamp sample"):
+            verify(self.root, timing_dir=self.root)
 
     def test_rejects_an_oblique_capture_with_only_image_plane_roll(self):
         self.views.write_text(self.views.read_text().replace(
