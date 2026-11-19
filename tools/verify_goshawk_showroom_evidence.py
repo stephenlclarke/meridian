@@ -66,26 +66,30 @@ def timing(path):
             return {"status": "unsupported"}
         if header != "sample\tstart_tick\tend_tick\tns_per_tick":
             raise ValueError("Invalid GPU timestamp header")
-        durations = []
-        first_tick = last_tick = None
-        period_ns = None
-        for index, (sample, start, end, period) in enumerate(csv.reader(source, delimiter="\t")):
-            start, end = int(start), int(end)
-            current_period = float(period)
-            if period_ns is None:
-                period_ns = current_period
-            if (
-                int(sample) != index or not 0 < start < end < METAL_COUNTER_ERROR
-                or not math.isfinite(current_period) or current_period <= 0
-                or current_period != period_ns
-            ):
-                raise ValueError("Invalid GPU timestamp sample")
-            if last_tick is not None and start < last_tick:
-                raise ValueError("GPU intervals overlap or move backwards within a pose")
-            if first_tick is None:
-                first_tick = start
-            last_tick = end
-            durations.append((end - start) * current_period)
+        return summarize_timestamps(csv.reader(source, delimiter="\t"))
+
+
+def summarize_timestamps(rows):
+    durations = []
+    first_tick = last_tick = None
+    period_ns = None
+    for index, (sample, start, end, period) in enumerate(rows):
+        start, end = int(start), int(end)
+        current_period = float(period)
+        if period_ns is None:
+            period_ns = current_period
+        if (
+            int(sample) != index or not 0 < start < end < METAL_COUNTER_ERROR
+            or not math.isfinite(current_period) or current_period <= 0
+            or current_period != period_ns
+        ):
+            raise ValueError("Invalid GPU timestamp sample")
+        if last_tick is not None and start < last_tick:
+            raise ValueError("GPU intervals overlap or move backwards within a pose")
+        if first_tick is None:
+            first_tick = start
+        last_tick = end
+        durations.append((end - start) * current_period)
     if len(durations) != SAMPLES:
         raise ValueError("Unexpected GPU timestamp sample count")
     ordered = sorted(durations)
@@ -103,43 +107,46 @@ def timing(path):
     }
 
 
+def verify_pose(folder, pose, direction, write_diffs):
+    frames = {variant: ppm(folder / f"{pose}-{variant}.ppm") for variant in VARIANTS}
+    dimensions, solid, _ = frames["solid"]
+    if any(frame[0] != dimensions for frame in frames.values()) or not any(solid):
+        raise ValueError(f"{pose}: missing solid hull or inconsistent crop")
+    if frames["normal"][1] != frames["repeat"][1]:
+        raise ValueError(f"{pose}: repeated production frame changed")
+    normal = frames["normal"][1]
+    shimmer, effect_pixels = compare(solid, normal)
+    shifted = frames["phase"][1]
+    shifted_shimmer, _ = compare(solid, shifted)
+    phase, phase_pixels = compare(normal, shifted)
+    # The strongest tint over black gives about 22 sRGB codes at 1.8% alpha.
+    for name, effect in (("normal", shimmer), ("shifted", shifted_shimmer)):
+        if effect["peak_channel_delta"] > 24:
+            raise ValueError(f"{pose}: {name} versus solid exceeds the subtle-shimmer bound")
+    # The wave moves alpha by at most 0.018 * 0.10. Across every base
+    # channel the distance to the tint is <= 0.88, so the maximum sRGB
+    # slope 12.92 gives <= 5.22 codes before 8-bit quantization.
+    if phase["peak_channel_delta"] > 7:
+        raise ValueError(f"{pose}: shifted versus normal exceeds the phase-modulation bound")
+    if write_diffs:
+        header = f"P6\n{dimensions[0]} {dimensions[1]}\n255\n".encode("ascii")
+        for name, pixels in (("shimmer", effect_pixels), ("phase", phase_pixels)):
+            with (folder / f"{pose}-{name}-delta-16x.ppm").open("xb") as image:
+                image.write(header + pixels)
+    return {
+        "crop_pixels": dimensions,
+        "hull_local_viewer_direction": direction,
+        "sha256": {name: frame[2] for name, frame in frames.items()},
+        "shimmer": shimmer,
+        "shifted_shimmer": shifted_shimmer,
+        "phase": phase,
+    }
+
+
+
 def verify(folder, write_diffs=False, timing_dir=None):
     directions = view_directions(folder / "hull-local-views.tsv")
-    poses = {}
-    for pose in POSES:
-        frames = {variant: ppm(folder / f"{pose}-{variant}.ppm") for variant in VARIANTS}
-        dimensions, solid, _ = frames["solid"]
-        if any(frame[0] != dimensions for frame in frames.values()) or not any(solid):
-            raise ValueError(f"{pose}: missing solid hull or inconsistent crop")
-        if frames["normal"][1] != frames["repeat"][1]:
-            raise ValueError(f"{pose}: repeated production frame changed")
-        normal = frames["normal"][1]
-        shimmer, effect_pixels = compare(solid, normal)
-        shifted = frames["phase"][1]
-        shifted_shimmer, _ = compare(solid, shifted)
-        phase, phase_pixels = compare(normal, shifted)
-        # The strongest tint over black gives about 22 sRGB codes at 1.8% alpha.
-        for name, effect in (("normal", shimmer), ("shifted", shifted_shimmer)):
-            if effect["peak_channel_delta"] > 24:
-                raise ValueError(f"{pose}: {name} versus solid exceeds the subtle-shimmer bound")
-        # The wave moves alpha by at most 0.018 * 0.10. Across every base
-        # channel the distance to the tint is <= 0.88, so the maximum sRGB
-        # slope 12.92 gives <= 5.22 codes before 8-bit quantization.
-        if phase["peak_channel_delta"] > 7:
-            raise ValueError(f"{pose}: shifted versus normal exceeds the phase-modulation bound")
-        if write_diffs:
-            header = f"P6\n{dimensions[0]} {dimensions[1]}\n255\n".encode("ascii")
-            for name, pixels in (("shimmer", effect_pixels), ("phase", phase_pixels)):
-                with (folder / f"{pose}-{name}-delta-16x.ppm").open("xb") as image:
-                    image.write(header + pixels)
-        poses[pose] = {
-            "crop_pixels": dimensions,
-            "hull_local_viewer_direction": directions[pose],
-            "sha256": {name: frame[2] for name, frame in frames.items()},
-            "shimmer": shimmer,
-            "shifted_shimmer": shifted_shimmer,
-            "phase": phase,
-        }
+    poses = {name: verify_pose(folder, name, directions[name], write_diffs) for name in POSES}
     if any(not any(pose[effect]["changed_pixels"] for pose in poses.values())
            for effect in ("shimmer", "phase")):
         raise ValueError("No nonzero same-pose shimmer or phase difference resolved")

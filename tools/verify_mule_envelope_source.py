@@ -9,6 +9,8 @@ import tomllib
 
 RUST_TEST_NAME = r'#\[test\]\s*fn\s+(\w+)\('
 FLIGHT_SOURCE = 'flight.rs'
+FLIGHT_PERSISTENCE = 'flight/persistence.rs'
+EMP_TESTS = 'flight/emp/tests.rs'
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -134,14 +136,14 @@ def undo_renas_encounter(relative, data):
             (b'        self.refresh_deferred_renas_mule();\n', b''),
             (b'            if !self.traffic_and_renas_mule_motion_clear(before, after, angular_travel) {\n', b'            if !self.traffic_motion_clear(before, after) {\n'),
         ],
-        'flight/persistence.rs': [
+        FLIGHT_PERSISTENCE: [
             (b'            mule_renas: None,\n', b''),
             (b'        candidate\n            .restore_renas_mule()\n            .map_err(|_| SaveError::ContentMismatch)?;\n', b''),
         ],
         'flight/mission.rs': [
             (b'    fn renas_mule_is_the_same_actor_on_the_first_completed_freight_sortie_after_continue() {\n        let mut world = World::new_commander(501).unwrap();\n', b'    fn public_contact_back_pause_tick_and_owner_changes_do_not_manufacture_consent() {\n        let mut world = World::new_commander(51).unwrap();\n', '02ae2146927ff0e3d37b1c4605c72614c585399f2a46e1134c101e7c48183c8e'),
         ],
-        'flight/emp/tests.rs': [
+        EMP_TESTS: [
             (b'        mule_renas: None,\n', b''),
         ],
         'freight/g02.rs': [
@@ -173,8 +175,8 @@ def undo_goshawk_world(relative, data):
             (b'            goshawk_validation: None,\n', b''),
             (b'        if let Some(result) = self.controlled_hull_step(input) {\n            return result;\n        }\n', b'        if self.mule_validation.is_some() {\n            return self.step_mule_validation(input);\n        }\n'),
         ],
-        'flight/persistence.rs': [(b'            goshawk_validation: None,\n', b'')],
-        'flight/emp/tests.rs': [(b'        goshawk_validation: None,\n', b'')],
+        FLIGHT_PERSISTENCE: [(b'            goshawk_validation: None,\n', b'')],
+        EMP_TESTS: [(b'        goshawk_validation: None,\n', b'')],
         'lib.rs': [(b'pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};\n', b'')],
     }
     for current, previous in replacements.get(relative, []):
@@ -194,8 +196,8 @@ def verify_protected_core(root):
             b'            mule_validation: None,\n',
             b'        if self.mule_validation.is_some() {\n            return self.step_mule_validation(input);\n        }\n',
         ],
-        'flight/emp/tests.rs': [b'        mule_validation: None,\n'],
-        'flight/persistence.rs': [b'            mule_validation: None,\n'],
+        EMP_TESTS: [b'        mule_validation: None,\n'],
+        FLIGHT_PERSISTENCE: [b'            mule_validation: None,\n'],
         'lib.rs': [b'pub mod mule;\n', b'pub mod goshawk;\n'],
         'station.rs': [b'mod mule;\n'],
         'traffic.rs': [
