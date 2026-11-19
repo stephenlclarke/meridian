@@ -1,6 +1,6 @@
 {
   "id": "SH009",
-  "status": "SOURCE_SHIELD_AND_STOCK_ENGINEERING_AUTHORED;OWNED_RUST_RUN_PENDING",
+  "status": "JOINED_SOURCE_PENDING_REVIEW_AND_OWNED_EXECUTION",
   "originalSource": "assets/fleet/sh009/SOURCE-GEOMETRY.json",
   "partition": "assets/fleet/sh009/SHIELD-PARTITION.json",
   "sourceFixtures": "integration/sh009-goshawk-mk2/SH009-FIXTURES.json",
@@ -33,5 +33,27 @@
     "goshawk_mk2_ventral_brackets_and_runners_leave_their_source_gap_clear",
     "goshawk_mk2_original_sh028_crossing_clears_but_swept_lip_blocks",
     "goshawk_mk2_carries_the_adopted_stock_tensor_and_split_interface"
-  ]
+  ],
+  "showroom": {
+    "ship": "SH009",
+    "selection": "Open station Showroom, search Goshawk Mk II, confirm in Compare, switch to solo, inspect rotation and exchange refusal.",
+    "visualVertices": 10596,
+    "supportPieces": 73,
+    "shimmer": "Retain existing slight 1.8% alpha and per-pixel bounds; verify nonzero phase change across multiple poses.",
+    "rendererChecks": [
+      "Source identity and full draw range for both Goshawk hulls",
+      "No substitution after a selection change or mixed-pane ordering",
+      "640 x 360 actual station frame, both solo and Compare"
+    ],
+    "macOnly": {
+      "metal_goshawk_mk2_same_pose_shimmer": "MERIDIAN_SH009_EVIDENCE_DIR",
+      "metal_goshawk_mk2_minimum_showroom_model_pass": "MERIDIAN_SH009_MINIMUM_DIR",
+      "metal_goshawk_mk2_cache_switching": "MERIDIAN_SH009_CACHE_DIR"
+    },
+    "outsideScope": [
+      "Ordinary ship placement",
+      "Exchange or player ownership",
+      "Exact-original importer admission"
+    ]
+  }
 }
