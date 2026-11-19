@@ -10,6 +10,14 @@ The core must build independently of GPU/window/filesystem/clock adapters. Use d
 
 Use the pinned Rust toolchain and Cargo.lock. `make ci` runs documentation lint, formatting, Python importers, workspace check/tests and strict Clippy. `make run` launches the desktop app in an owned graphics session. Coverage reports and SonarQube are part of GitHub CI. Aim for at least 90 percent focused new-code coverage with explicit evidence-backed exceptions; coverage is not gameplay acceptance.
 
+The Goshawk surface-fit audit and Mule source verifier require Python assertions when run as scripts or imported as modules. Run them with the default interpreter settings.
+
+Install the pinned scientific test dependencies in the active Python environment before running `make ci` or discovering the Python tests.
+
+```bash
+python -m pip install --only-binary :all: -r tools/requirements-goshawk-surface-fit.txt
+```
+
 On native Windows, use the MSVC developer environment:
 
 ```powershell
