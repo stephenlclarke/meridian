@@ -36,7 +36,6 @@ envelope, renderer and runtime review.
 python3 -B tools/prepare_goshawk_mk2_geometry.py --check
 ```
 
-<<<<<<< HEAD
 ## Rounded shield and station fixtures
 
 The Mk II uses 73 local convex supports with a 20 mm spherical offset.
@@ -79,7 +78,6 @@ centres. The authenticated SH009 hull publishes the matched centre of mass,
 full XYZ tensor about that centre, and the two mass locations for use in
 certification. Utility volume, equipment access, occupied fittings, and
 ordinary insertion await separate qualification.
-=======
 ## Detailed Showroom visual
 
 The SH009 display asset retains all 3,532 calibrated detailed faces in their original order, with 10,596 corner records. Each record uses the SH008 Showroom layout of 56 bytes: binary32 position, flat normal from the ordered face, original material RGBA, corner UV, texture index and emissive bit. The SH009-specific `GOS2VIZ1` header and runtime FNV check prevent a changed or wrong-hull visual from entering the decoder. The native candidate is excluded from display record generation.
@@ -94,4 +92,3 @@ python3 -B -m unittest discover -s tools -p 'test_encode_goshawk*visual.py' -v
 ```
 
 The focused Python parity and mutation tests inspect all ordered records against the original TOML and check that source, winding, texture, geometry and packed-output mutations are refused. The Rust loader regressions are authored for designated compiler execution. No native SH009 Showroom observation follows from the source checks.
->>>>>>> ba5c6b8 (feat(showroom): prepare original Goshawk Mk II visual)
