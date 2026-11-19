@@ -67,8 +67,11 @@ python3 tools/hull_studio/studio.py --definition integration/sh035-stag-liner/ST
 ```
 
 The pinned Studio Python loader and JSON round trip passed on the MBA.
-The Rust Studio export, per-hull Rust contact tests and Showroom launch
-await their owned runs.
+The installed signed macOS Studio then validated and exported that exact
+definition. All 26 support groups and seven sphere routes passed with no
+diagnostics. The output equals the input except for its final line feed.
+The per-hull Rust contact tests and a Stag Liner Showroom launch await
+their owned runs.
 
 Regenerate with `python3 -B tools/prepare_stag_liner_studio.py`.
 Add `--check` to compare the committed definition byte for byte.

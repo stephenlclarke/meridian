@@ -113,6 +113,65 @@
     "loaderRevision": "1789030980e0d2a7897c2dc48518fad728c9bbf2",
     "loaderSource": "tools/hull_studio/definitions.py",
     "loaderSha256": "f68ea0f442267b793338af6ebec6a937f9e1ee3946dc9be96e58db3e2a796e43",
-    "state": "PYTHON_DEFINITION_LOADER_AND_BYTE_REPLAY_PASS;RUST_VALIDATOR_AND_SHOWROOM_PENDING"
+    "state": "INSTALLED_SIGNED_STUDIO_EXPORT_PASS;CONTROLLED_HULL_RUST_AND_SHOWROOM_PENDING",
+    "installedExport": {
+      "testedAuthorConfigCommit": "e43312c21acffea765d0fb63eca9c47f66325e78",
+      "toolSourceHead": "1789030980e0d2a7897c2dc48518fad728c9bbf2",
+      "toolSourceTree": "fb22a072408e94b4553ea9c5e586916ff7e6ecae",
+      "studioSha256": "ee1e6e307707a385c7ad24e00cbcce589f5ab0762e31b474720715f62c146f9f",
+      "validatorSha256": "8800efb734ca5b8123ae88b1ab06aa62f1e22f37975cd6230f88581f69cf76e7",
+      "startedUtc": "2026-11-19T10:36:34.615696+00:00",
+      "finishedUtc": "2026-11-19T10:36:34.751244+00:00",
+      "supportGroups": 26,
+      "clearances": [
+        {
+          "name": "left-under-diagonal-bridge",
+          "passed": true
+        },
+        {
+          "name": "left-inboard-tower-shoulder",
+          "passed": true
+        },
+        {
+          "name": "left-outboard-tower-shoulder",
+          "passed": true
+        },
+        {
+          "name": "right-under-diagonal-bridge",
+          "passed": true
+        },
+        {
+          "name": "right-inboard-tower-shoulder",
+          "passed": true
+        },
+        {
+          "name": "right-outboard-tower-shoulder",
+          "passed": true
+        },
+        {
+          "name": "centre-tower-aisle",
+          "passed": true
+        }
+      ],
+      "comparison": "Export matches the source bytes after removing its final LF; report support points and rounding match the exact definition.",
+      "packetEntries": {
+        "studio/ACTUAL-START.json": {
+          "bytes": 1229,
+          "sha256": "fa2536a83a4b23779376a22f4788f79eb1468ee5efbeea938bc0b27bba23e660"
+        },
+        "studio/STAG-LINER-EXPORT-REPORT.json": {
+          "bytes": 61456,
+          "sha256": "3b93dadd14454bc34499f25d5f5fee05e009184a40684b5117e4f46e07dfcdb5"
+        },
+        "studio/STAG-LINER.hull.json": {
+          "bytes": 451470,
+          "sha256": "af8869d0257765db542aefa69b50055d6b6b849389801c8a6362d0b546168653"
+        },
+        "studio/TERMINAL.json": {
+          "bytes": 2582,
+          "sha256": "b823e25b306a917281d27bc3181fa65230595a0c45b94a250f0e1cc1384c4789"
+        }
+      }
+    }
   }
 }

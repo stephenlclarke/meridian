@@ -38,7 +38,7 @@ execution. Ordinary placement and gameplay docking remain open.
 
 ## Stag Liner source envelope
 
-SH035 preserves the two original pearl-teal meshes and uses 26 local supports. SteveMBA verified seven routes, eight structural overlaps and the original SH028 offset lip contact. The full fit bounds are 705 mm detailed and 3,038 mm native. The Hull Studio Python loader accepted the original definition. Rust Studio export, per-hull contact tests and Showroom qualification remain pending. [Stag Liner source and evidence](STAG-LINER-GAMEPLAY-ENVELOPE.md)
+SH035 preserves the two original pearl-teal meshes and uses 26 local supports. SteveMBA verified seven routes, eight structural overlaps and the original SH028 offset lip contact. The full fit bounds are 705 mm detailed and 3,038 mm native. The installed signed Hull Studio exported the exact definition with all 26 groups and seven routes passing. The per-hull Rust contact tests and Showroom qualification remain pending. [Stag Liner source and evidence](STAG-LINER-GAMEPLAY-ENVELOPE.md)
 
 ## Goshawk Mk II Custom candidate
 
