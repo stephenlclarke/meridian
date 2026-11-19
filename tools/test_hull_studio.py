@@ -1,5 +1,6 @@
 """Authoring imports, measurements and the local validator boundary."""
 
+import io
 import json
 import struct
 import sys
@@ -105,6 +106,7 @@ class HullStudioTests(unittest.TestCase):
         preview = studio.GamePreview(Path("/example/meridian-desktop"))
         finished, cleaned = threading.Event(), threading.Event()
         child = mock.Mock()
+        child.stdout = io.BytesIO(b"MERIDIAN_HULL_STUDIO_READY\n")
         child.wait.side_effect = finished.wait
         original = tempfile.TemporaryDirectory
 
@@ -154,6 +156,15 @@ class HullStudioTests(unittest.TestCase):
             self.assertFalse(preview.running)
         with self.assertRaisesRegex(RuntimeError, "unavailable"):
             studio.GamePreview(None).launch({})
+
+    def test_process_start_without_a_rendered_frame_reports_the_actual_error(self):
+        preview = studio.GamePreview(Path("/example/meridian-desktop"))
+        child = mock.Mock(stdout=io.BytesIO(b"Graphics adapter unavailable\n"))
+        child.wait.return_value = 1
+        with mock.patch.object(studio.subprocess, "Popen", return_value=child):
+            with self.assertRaisesRegex(RuntimeError, "Graphics adapter unavailable"):
+                preview.launch({"id": "TEST"})
+        self.assertFalse(preview.running)
 
     def test_validation_failure_never_exports(self):
         def reject(argv, **kwargs):

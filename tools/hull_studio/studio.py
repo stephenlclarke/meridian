@@ -100,21 +100,52 @@ class GamePreview:
                     ],
                     cwd=folder,
                     stdin=subprocess.DEVNULL,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
                 )
             except BaseException:
                 workspace.cleanup()
                 raise
             self.running = True
 
-        def on_exit():
-            try:
-                child.wait()
-                workspace.cleanup()
-            finally:
-                with self.lock:
-                    self.running = False
+        startup = threading.Event()
+        rendered = threading.Event()
+        failure = []
 
-        threading.Thread(target=on_exit, daemon=False).start()
+        def monitor():
+            last_line = ""
+            try:
+                with child.stdout as messages:
+                    for raw in messages:
+                        line = raw.decode(errors="replace").strip()
+                        if line == "MERIDIAN_HULL_STUDIO_READY":
+                            rendered.set()
+                            startup.set()
+                        elif line:
+                            last_line = line[-1000:]
+                status = child.wait()
+                if not rendered.is_set():
+                    failure.append(
+                        last_line
+                        or f"Game exited with status {status} before rendering"
+                    )
+            finally:
+                try:
+                    workspace.cleanup()
+                finally:
+                    with self.lock:
+                        self.running = False
+                    startup.set()
+
+        threading.Thread(target=monitor, daemon=False).start()
+        if not startup.wait(45):
+            raise RuntimeError(
+                "The game is still starting; its Showroom window has not confirmed a frame"
+            )
+        if not rendered.is_set():
+            raise RuntimeError(
+                f"Showroom did not open: {failure[0] if failure else 'game startup interrupted'}"
+            )
 
 
 class StudioRequest(BaseHTTPRequestHandler):
