@@ -20,6 +20,8 @@ python -m pip install --only-binary :all: -r tools/requirements-goshawk-surface-
 
 Hosted tests use CPython 3.13 and verify SHA-256 hashes for the wheels listed in the CI requirements files. When updating a scientific package, update its development pin and the wheel hashes for all three hosted platforms.
 
+Linux desktop builds also require ALSA development headers (`libasound2-dev` on Debian/Ubuntu) and `pkg-config` for Rodio/CPAL. A live playback device is not required by the headless unit and Xvfb coverage paths.
+
 On native Windows, use the MSVC developer environment:
 
 ```powershell

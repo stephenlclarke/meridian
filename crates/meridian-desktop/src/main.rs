@@ -1,5 +1,6 @@
 mod app;
 mod asteroid_render;
+pub mod audio;
 pub mod celestial;
 mod clock;
 mod docked;

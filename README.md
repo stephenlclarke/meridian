@@ -94,6 +94,7 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | Controls | Action |
 | --- | --- |
 | H / ? | Context help; Escape, H or ? dismisses |
+| Ctrl+Shift+M | Toggle generated sound (session-local); status in Help |
 | Ctrl+Shift+X when docked | Explicit XYZZY testing menu; Enter reviews then confirms |
 | 0 when docked (current source) | Commander details |
 | 1 / 2 / 3 / 4 / 5 when docked | Galaxy / System / Ships / Market / Equipment |
