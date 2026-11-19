@@ -1,0 +1,89 @@
+{
+  "id": "SH026",
+  "name": "Harrier",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourceUnits": "metres",
+  "metresPerSourceUnit": 1,
+  "authoringMetresPerOriginalUnit": "1875/262",
+  "detail": {
+    "vertices": 5764,
+    "faces": 8884,
+    "components": 661,
+    "bounds": [
+      [
+        -11.82767175572519,
+        -4.2853053435114505,
+        -14.82824427480916
+      ],
+      [
+        11.59386927480916,
+        2.779737595419847,
+        15.17175572519084
+      ]
+    ]
+  },
+  "native": {
+    "vertices": 306,
+    "faces": 512,
+    "components": 25,
+    "bounds": [
+      [
+        -11.59351145038168,
+        -4.2853053435114505,
+        -14.82824427480916
+      ],
+      [
+        11.59351145038168,
+        2.600925572519084,
+        15.17175572519084
+      ]
+    ],
+    "faceLimit": 512,
+    "activeInput": "resource.toml"
+  },
+  "historicalNative": {
+    "faces": 2852,
+    "sourcePath": "replacement-hulls/SH026-design.toml",
+    "sourceSha256": "d0b3155b579a53d027741e93cae48295749c315447e0891319946f569421dd58"
+  },
+  "localVentPanelSupports": 139,
+  "shapePieces": 180,
+  "textures": [
+    "l337-patrol-diffuse",
+    "l337-strike-diffuse",
+    "l337-service-details"
+  ],
+  "unmappedMaterialSlot": 4294967295,
+  "pins": {
+    "resource.toml": "c76bbee83e1c58ec423a11988b9681794ef2e899c897a09ca1bbe66bb48aefc3",
+    "pre-bare-native-export.json": "f74febcad4a0a8003acc9e0b44a78b8dfbb9ebd2928bb1618e187cfbe87b2a6d",
+    "contract.toml": "f23d79dc0c1a0caf93d36a118fc33db7bc7289eac393f49d0c64795d6aa0972e",
+    "LICENSE": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+  },
+  "outputs": {
+    "source.vertices": {
+      "bytes": 145696,
+      "sha256": "59020e212f2e26bf757504fcafedb83a2db341046af78221d92ac7a0f5200640"
+    },
+    "source-triangles.bin": {
+      "bytes": 112752,
+      "sha256": "9683baf44f75ff96090ba99a7e4f8787a503031b2bdc8ff05b8a423773c5a91f"
+    },
+    "source-piece-membership.bin": {
+      "bytes": 6070,
+      "sha256": "efa33d600c212b3bf88a59be8dbc2bab67b627a6c62a27c12d95570d2f0b5574"
+    },
+    "PIECES.json": {
+      "bytes": 4838,
+      "sha256": "02167ac63c0403c6a5e38e865f2c0339467bedd6f671f0362595df8e4bc9b6bf"
+    },
+    "visual.bin": {
+      "bytes": 1492528,
+      "sha256": "6f5c3ba5785b1c6ac7450f2c13989003bbff917035d8527b9db320b8421204a6"
+    },
+    "native-visual.bin": {
+      "bytes": 86032,
+      "sha256": "cf5392023cfb14bbfd7b9793581213df32b4a3cb41b2952b48cbdf3c43b990c5"
+    }
+  }
+}

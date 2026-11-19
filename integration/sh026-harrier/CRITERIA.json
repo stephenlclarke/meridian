@@ -1,0 +1,113 @@
+{
+  "hull": "SH026 Harrier",
+  "status": "AUTHORED_CONTROLLED_SOURCE;OWNED_RUST_AND_NATIVE_PENDING",
+  "source": "assets/fleet/sh026/SOURCE-GEOMETRY.json",
+  "geometryTests": [
+    "harrier_original_detailed_and_native_faces_share_complete_local_supports",
+    "harrier_both_pod_channels_and_empty_rail_runs_clear",
+    "harrier_original_sh028_aligned_crossing_clears_before_offset_native_lip_contact"
+  ],
+  "originalVisualCorners": {
+    "detailed": 26652,
+    "native": 1536
+  },
+  "originalUnmappedFaces": {
+    "detailed": 200,
+    "native": 88,
+    "selector": 4294967295,
+    "packedUvForAbsentSource": [
+      0.0,
+      0.0
+    ]
+  },
+  "originalTextures": {
+    "assets/fleet/sh001/l337-patrol-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "9699517d12b4fbbb28746e00bed9ee65c19a098d14402b1d5160280c6f6bfc54",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-patrol-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-strike-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "e56f149228caf90237a652d720ae549768bde1056af3d903dc8a5c243ad26e97",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-strike-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-service-details.rgba": {
+      "bytes": 4194304,
+      "sha256": "35edd84f6ce527195dd8a9bcc039521a6efc5aa2333452bbbc30217b8372103d",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-service-details.rgba",
+      "license": "MIT"
+    }
+  },
+  "nativeFaceCompliance": {
+    "sourceFaces": 512,
+    "contractMaximum": 512,
+    "state": "ACTIVE_BARE_ORIGINAL_AT_CONTRACT_LIMIT",
+    "historicalArchiveFaces": 2852
+  },
+  "legacyRuntimeAuthority": {
+    "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+    "files": [
+      {
+        "path": "Sources/L337Core/ShipRawMeshCache.swift",
+        "artifact": "integration/sh026-harrier/LEGACY-FLEET-RAW-MESH.swift.txt",
+        "sha256": "13879bfe6a2dd5871c5a26532e82231f25087401966931e6cce99ea8ac8ce23b"
+      },
+      {
+        "path": "Sources/L337Core/NativeC01SurveyorGeometry.swift",
+        "artifact": "integration/sh026-harrier/LEGACY-C01-GEOMETRY.swift.txt",
+        "sha256": "a80e607cec4ba4d3d03e722243728d2595e26065528f4c8d773d7e681972fdf0"
+      }
+    ]
+  },
+  "legacyDryMass": {
+    "kilograms": 25545,
+    "status": "SOURCE_PROFILE_ONLY_NO_RUNTIME_ASSIGNMENT"
+  },
+  "air": {
+    "hostname": "SteveMBA",
+    "topologyUtc": "2026-11-19T09:04:49Z",
+    "fitStartUtc": "2026-11-19T09:11:57Z",
+    "fitEndUtc": "2026-11-19T09:12:34Z",
+    "witnessStartUtc": "2026-11-19T09:12:26Z",
+    "witnessEndUtc": "2026-11-19T09:12:28Z",
+    "reports": {
+      "SURFACE-FIT.json": "d606d3e0b4fb71f735e63949b8fcff77b2a9f514f4c1473a994acbf4aae1a69c",
+      "CONTACT-RESULT.json": "54a6efad88fd71236f72f5c2fb38bcd66004948f1a1de5770475813b0eee3871",
+      "ORIGINAL-DIFFERENCE.json": "4715dd44066f25ceb718b7c870882f93b0e7f044af36d5abcb0f9a7a07df6f32"
+    }
+  },
+  "independentReplay": {
+    "tools": {
+      "tools/measure_harrier_air.py": "895ad8f8c7aa87d7935a3f5e9dab85d2c0b5f982646be7606a57aeda0b4078f3",
+      "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+      "tools/prepare_harrier_geometry.py": "a96611c206312b52cf6efe99d19e1dc16e95b0daefba90e86c98382250294369",
+      "tools/verify_harrier_geometry.py": "812b5a2cb4d95c86dc9701a6c51b0c762dd1443b007a6fad154d8c683e9c5000",
+      "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+      "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e"
+    },
+    "fixtures": {
+      "integration/sh026-harrier/FIXTURES.json": "5f450a910db577e94b0718149aa6fcd97103a7a905c1891d9413ca6d360ed107"
+    },
+    "reproduce": [
+      "python3 -B tools/measure_harrier_air.py | cmp - integration/sh026-harrier/SURFACE-FIT.json",
+      "python3 -B tools/measure_harrier_air.py --difference | cmp - integration/sh026-harrier/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/verify_harrier_geometry.py | cmp - integration/sh026-harrier/CONTACT-RESULT.json"
+    ],
+    "fitDependencies": {
+      "python": "3.14.3 (assertions enabled)",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "hostContactPython": "3.14.3",
+    "byteReplay": {
+      "hostname": "SteveMBA",
+      "startedUtc": "2026-11-19T09:13:20Z",
+      "finishedUtc": "2026-11-19T09:13:59Z",
+      "logSha256": "4df1eee3cf102661ca62c55ef0862f13ff4ca7728265561297afae868339ecd6"
+    }
+  }
+}
