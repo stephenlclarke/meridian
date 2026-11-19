@@ -1,0 +1,35 @@
+{
+  "corridorClearanceMillimetres": [
+    1652,
+    1655
+  ],
+  "lipStartClearanceMillimetres": 979,
+  "alignedClearanceMillimetres": 26949,
+  "sourceLipWitness": {
+    "fraction": 0.5,
+    "pointMetres": [
+      69.4,
+      -4.75,
+      136.32
+    ],
+    "barycentrics": [
+      0.35999999999999843,
+      0.18908647486772642,
+      0.4509135251322751
+    ]
+  },
+  "plinth": {
+    "heightMetres": 3.999999999999999,
+    "certifiedInteriorDeckJointCubeSideMetres": 0.5,
+    "detailedOpaqueCabinPointMetres": [
+      -1.7408275,
+      9.9491375,
+      17.361250000000002
+    ],
+    "nativeOpaqueCabinPointMetres": [
+      0.0,
+      9.699999999999998,
+      15.36625
+    ]
+  }
+}

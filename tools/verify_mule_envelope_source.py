@@ -212,6 +212,7 @@ def verify_protected_core(root):
     assert sha(pin_bytes) == '8a2929218820a8e15536aa554c0f8df56a23981944be85ec1b1947778fd48133'
     baseline = json.loads(pin_bytes)
     assert baseline['base'] == base
+    additions['lib.rs'].append(b'pub mod buffalo;\n')
     checked = set()
     for relative, expected in baseline['sha256'].items():
         data = (root / 'crates/meridian-core/src' / relative).read_bytes()

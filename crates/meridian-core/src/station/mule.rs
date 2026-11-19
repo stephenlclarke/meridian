@@ -36,6 +36,17 @@ impl OriginalStationData {
             })
         })
     }
+    /// Controlled SH013 motion against the original SH028 mesh.
+    pub fn buffalo_motion_clear(
+        &self,
+        source: &crate::buffalo::BuffaloHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces().as_ref(), start, end, angular_travel)
+    }
+
     pub fn mule_launch_start(&self, source: &MuleHullSource) -> Result<FlightStart, StationError> {
         self.rounded_station_launch_start(source.pieces().as_ref())
     }
