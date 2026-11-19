@@ -116,6 +116,17 @@ class TestPeregrineMk3Sources(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'misses a separating plane'):
             proof.separating_planes([[(0, 0, 0), (2, 0, 0)]], [(1, 0, 0)], [(1, 0, 0)])
 
+    def test_frozen_legacy_activation_binds_active_resource_and_native_successor(self):
+        criteria = json.loads((proof.INTEGRATION / 'CRITERIA.json').read_bytes())
+        authority = criteria['legacyActiveNativeSuccessor']
+        raw = (proof.ROOT / authority['activationArtifact']).read_bytes()
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), authority['activationSha256'])
+        self.assertIn(b'static let id = "SH023"', raw)
+        self.assertIn(authority['sha256'].encode(), raw)
+        self.assertIn(peregrine_mk3.PINS['contract.toml'].encode(), raw)
+        self.assertIn(b'physical.nativeTriangles == 512', raw)
+        self.assertIn(b'physical.metresPerSourceUnit == 250_000.0 / 19_057.0', raw)
+
     def test_fit_contact_and_numerical_helper_pins(self):
         criteria = json.loads((proof.INTEGRATION / 'CRITERIA.json').read_bytes())
         replay = criteria['independentReplay']

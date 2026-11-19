@@ -40,7 +40,9 @@
     "path": "docs/fleet-design-v2/successors/SH023-station-ring-512.json",
     "sha256": "5997060c2e36909aff5de387bd6d6a5676a13679ddeeedc66e2fafecd4d01b40",
     "activationPath": "Sources/L337Core/OriginalPeregrineMkIIIActivation.swift",
-    "activationSha256": "c4795e307d814a51d1164a0879b1f720fbac5c444d2317c134e56d54f3e10cd9"
+    "activationSha256": "c4795e307d814a51d1164a0879b1f720fbac5c444d2317c134e56d54f3e10cd9",
+    "activationRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+    "activationArtifact": "integration/sh023-peregrine-mk3/LEGACY-ACTIVATION.swift.txt"
   },
   "physicalEngineering": {
     "legacyDryMassKg": 101208,
