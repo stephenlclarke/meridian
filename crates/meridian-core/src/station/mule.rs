@@ -233,6 +233,17 @@ impl OriginalStationData {
         self.rounded_observer_clear(source.pieces().as_ref(), start, end, observer)
     }
 
+    /// Controlled SH023 motion against the original SH028 mesh.
+    pub fn peregrine_mk3_motion_clear(
+        &self,
+        source: &crate::peregrine_mk3::PeregrineMk3HullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces(), start, end, angular_travel)
+    }
+
     fn rounded_observer_clear(
         &self,
         pieces: &[SmoothPiece],

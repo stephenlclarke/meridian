@@ -185,6 +185,7 @@ def undo_goshawk_world(relative, data):
             (b'pub mod goshawk_custom;\n', b''),
             (b'pub use flight::GoshawkCustomApproachSnapshot;\n', b''),
             (b'pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};\n', b''),
+            (b'\npub mod peregrine_mk3;\n', b''),
         ],
     }
     for current, previous in replacements.get(relative, []):
