@@ -33,6 +33,188 @@ fn launched(app: &mut App) {
     }
     assert_eq!(app.game.world.snapshot().mode, FlightMode::Flight);
 }
+
+#[derive(Default)]
+struct AudioRecording {
+    sounds: Vec<crate::audio::SoundEffect>,
+    unavailable: bool,
+    shutdowns: usize,
+}
+
+struct RecordedAudio(std::rc::Rc<std::cell::RefCell<AudioRecording>>);
+
+impl crate::audio::AudioOutput for RecordedAudio {
+    fn available(&self) -> bool {
+        !self.0.borrow().unavailable
+    }
+    fn maintain(&mut self) {}
+    fn play(&mut self, effect: crate::audio::SoundEffect) {
+        self.0.borrow_mut().sounds.push(effect);
+    }
+    fn continuous_tool_active(&self) -> bool {
+        false
+    }
+    fn play_continuous_tool(&mut self) {
+        panic!("unsupported cutter routed")
+    }
+    fn stop_all(&mut self) {}
+    fn shutdown(&mut self) {
+        self.0.borrow_mut().shutdowns += 1;
+    }
+}
+
+fn attach_audio(app: &mut App) -> std::rc::Rc<std::cell::RefCell<AudioRecording>> {
+    let recording = std::rc::Rc::new(std::cell::RefCell::new(AudioRecording::default()));
+    app.audio = Some(crate::audio::host::DesktopAudio::new(Box::new(
+        RecordedAudio(recording.clone()),
+    )));
+    app.begin_audio_session();
+    recording
+}
+
+#[test]
+fn actual_launch_and_front_laser_route_once_per_accepted_event() {
+    use crate::audio::SoundEffect::{Laser, Launch};
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    let recording = attach_audio(&mut app);
+    assert!(recording.borrow().sounds.is_empty());
+    app.launch_from_commander();
+    assert_eq!(recording.borrow().sounds, [Launch]);
+    app.launch_from_commander(); // refused duplicate
+    assert_eq!(recording.borrow().sounds, [Launch]);
+    for _ in 0..600 {
+        if app.game.world.snapshot().mode == FlightMode::Flight {
+            break;
+        }
+        assert_eq!(app.advance_frame(true, 1), FrameAdvance::Continue(None));
+    }
+    assert_eq!(app.game.world.snapshot().mode, FlightMode::Flight);
+    app.keys.insert(KeyCode::KeyZ);
+    app.advance_frame(true, 0);
+    assert_eq!(recording.borrow().sounds, [Launch]);
+    app.advance_frame(true, 1);
+    assert_eq!(recording.borrow().sounds, [Launch, Laser]);
+    app.publish_audio(false);
+    app.advance_frame(true, usize::from(meridian_core::PULSE_COOLDOWN_TICKS) - 1);
+    assert_eq!(recording.borrow().sounds, [Launch, Laser]);
+    app.advance_frame(true, 1);
+    assert_eq!(recording.borrow().sounds, [Launch, Laser, Laser]);
+    app.keys.clear();
+    app.advance_frame(true, 1);
+    assert_eq!(recording.borrow().sounds, [Launch, Laser, Laser]);
+    app.shutdown_audio();
+    app.shutdown_audio();
+    assert_eq!(recording.borrow().shutdowns, 1);
+}
+
+#[test]
+fn actual_missile_notice_and_restored_airborne_session_do_not_replay() {
+    use crate::audio::SoundEffect::{Launch, Ping};
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    let recording = attach_audio(&mut app);
+    let review = ok(app.game.world.review_practice(0));
+    ok(app.game.world.prepare_practice_confirmation(review, 0)).commit();
+    app.game_key(KeyCode::KeyL);
+    app.advance_frame(true, 1);
+    app.game_key(KeyCode::F3); // not armed
+    assert_eq!(recording.borrow().sounds, [Launch]);
+    app.game_key(KeyCode::F1);
+    app.game_key(KeyCode::F2);
+    app.game_key(KeyCode::F3);
+    assert!(app.notice.missile);
+    assert_eq!(recording.borrow().sounds, [Launch, Ping]);
+    app.publish_audio(false);
+    ok(app.game.save());
+    app.load_profile();
+    assert!(!app.notice.missile);
+    assert_ne!(app.game.world.snapshot().mode, FlightMode::Docked);
+    app.publish_audio(false);
+    assert_eq!(recording.borrow().sounds, [Launch, Ping]);
+}
+
+#[test]
+fn actual_mute_chord_is_modal_and_consumes_events_while_unavailable() {
+    use crate::audio::SoundEffect::Laser;
+    use winit::keyboard::ModifiersState;
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    let recording = attach_audio(&mut app);
+    app.help = Some(app.help_panel());
+    let before = ok(app.game.world.save_bytes());
+    app.modifiers = ModifiersState::CONTROL | ModifiersState::SHIFT;
+    assert_eq!(
+        key(
+            &mut app,
+            KeyCode::KeyM,
+            ElementState::Pressed,
+            false,
+            Some("M")
+        ),
+        None
+    );
+    assert_eq!(
+        key(
+            &mut app,
+            KeyCode::KeyM,
+            ElementState::Pressed,
+            true,
+            Some("M")
+        ),
+        None
+    );
+    assert!(
+        app.help
+            .as_ref()
+            .and_then(|panel| panel.lines.last())
+            .is_some_and(|line| line.ends_with("Muted"))
+    );
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+    app.help = None;
+    launched(&mut app);
+    app.keys.insert(KeyCode::KeyZ);
+    app.advance_frame(true, 1);
+    assert!(recording.borrow().sounds.is_empty());
+    assert_eq!(
+        key(&mut app, KeyCode::KeyM, ElementState::Pressed, false, None),
+        None
+    );
+    assert!(recording.borrow().sounds.is_empty());
+    recording.borrow_mut().unavailable = true;
+    app.advance_frame(true, usize::from(meridian_core::PULSE_COOLDOWN_TICKS));
+    assert!(recording.borrow().sounds.is_empty());
+    recording.borrow_mut().unavailable = false;
+    app.publish_audio(false);
+    assert!(recording.borrow().sounds.is_empty());
+    app.advance_frame(true, usize::from(meridian_core::PULSE_COOLDOWN_TICKS));
+    assert_eq!(recording.borrow().sounds, [Laser]);
+}
+
+#[test]
+fn actual_physical_dock_cues_only_when_the_core_admits_entry() {
+    use crate::audio::SoundEffect::Dock;
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    app.game.world = ok(World::in_flight_at_original_station(FlightStart {
+        position: [0.0, 0.0, 260.0],
+        orientation: [0.0, 1.0, 0.0, 0.0],
+        speed: 4.0,
+    }));
+    let recording = attach_audio(&mut app);
+    assert!(recording.borrow().sounds.is_empty());
+    for _ in 0..4000 {
+        if app.game.world.snapshot().mode == FlightMode::Docked {
+            break;
+        }
+        assert_eq!(app.advance_frame(true, 1), FrameAdvance::Continue(None));
+    }
+    assert_eq!(app.game.world.snapshot().mode, FlightMode::Docked);
+    assert_eq!(recording.borrow().sounds, [Dock]);
+    app.publish_audio(false);
+    app.advance_frame(true, 1);
+    assert_eq!(recording.borrow().sounds, [Dock]);
+}
 fn key(
     app: &mut App,
     code: KeyCode,
@@ -258,6 +440,7 @@ fn active_callback_uses_held_axes_and_fire_on_actual_advanced_ticks() {
         true,
         &mut expected_pulse,
         &mut None,
+        || {},
     ));
     assert_eq!(
         app.advance_frame(true, 2),

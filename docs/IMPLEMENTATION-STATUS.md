@@ -1,5 +1,9 @@
 # Implementation and validation status
 
+## Generated desktop audio source candidate
+
+The authored desktop integration routes generated launch and docking cues from actual mode transitions, front-laser sounds from accepted Pulse or Mining Laser discharges, and the original missile notification ping after an accepted missile launch. Ctrl+Shift+M toggles sound; Help displays availability. New/Continue primes without replay, and a missing device leaves gameplay active. No speech, kill, ECM, continuous cutter or EMP effects are claimed. Native device and Rust qualification remain pending.
+
 ## Goshawk Showroom preview
 
 Preview 10 is published for macOS arm64 and Windows x64. It includes the Goshawk Explorer in the ordinary station Showroom. The signed and notarized app was extracted and checked against the local installation, including all 483 files. Earlier Mac gameplay checks covered the Showroom on the source used for this build. Packaging verification did not include a new graphical launch. [Preview guide](PREVIEW-RELEASES.md)

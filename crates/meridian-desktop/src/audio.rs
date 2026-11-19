@@ -1,5 +1,6 @@
 //! Presentation-only generated audio. The host supplies actual accepted events.
 //! No World, save data, window, or gameplay authority is retained here.
+pub(crate) mod host;
 mod output;
 mod presenter;
 mod synth;

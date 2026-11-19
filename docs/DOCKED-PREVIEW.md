@@ -12,6 +12,8 @@ The authored station display repair joins the rear ring rim to the back of the t
 
 ## Controls
 
+In the audio source candidate, Ctrl+Shift+M toggles sound on or off, including in Help and station screens; Help reports the current output status. This is process-local and never alters the commander save. Missing playback hardware does not prevent play. Native qualification is pending.
+
 While docked, 1 through 5 select galaxy, system, showroom, trading and equipment. M opens trading and O opens equipment. Arrow keys, Tab/Shift+Tab, Enter and Escape navigate; / opens search. G and Shift+G buy and sell, Y/U fit and store, and ] changes equipment slot. H or ? opens a popup with the actual page controls and all station screen shortcuts. Mouse clicks, wheel scrolling and chart/model dragging use logical coordinates. Only admitted world routes can be selected for the subsequent J jump. Unavailable ships cannot be exchanged. In flight, H or ? opens the fitted-weapon and flight controls popup. Unshifted / remains galaxy search.
 
 ## Actual Mac qualification

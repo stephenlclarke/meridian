@@ -1,6 +1,6 @@
 # Original generated audio port
 
-Author-stage implementation. Rust tests and native audio are UNRUN until the joined source is reviewed and the existing executor runs it. This module is not yet registered or wired into App. It does not change the current preview.
+Integrated source candidate. Rust tests and native audio are UNRUN until independent review and the designated executor runs the joined source. This does not change a published preview.
 
 ## Frozen source
 
@@ -8,17 +8,17 @@ The reference is Elite/L337 commit `a11fe16924d87d06021816f9037952afcbac08db`, t
 
 The six source waveforms preserve mono PCM16 at 22,050 Hz, truncating sample count/envelope, square phase, wrapping noise seed and 0.4 playback volume. Reference fixtures are an independent Python transcription of the frozen formulas, not output from an executed Swift oracle. Their manifest records this limit. Playback converts the PCM16 samples to float without changing the reference generator. Device resampling and audible equivalence still require actual platform checks.
 
-## Root integration binding
+## Desktop integration binding
 
-Root owns App, main and serial Cargo integration. Add `pub mod audio;` to the desktop crate root, then own one `AudioPresenter<NativeOutput>` on the desktop owner. `NativeOutput::open()` is the only device-open operation. It requires no recording or decoder feature. Keep the presenter out of World and save data.
+The desktop App owns one `DesktopAudio`, which contains an `AudioPresenter` and a playback boundary. `NativeOutput::open()` is the only device-open operation. It requires no recording or decoder feature. The isolated internal validation and headless unit-test paths do not open an audio device. Neither World nor save data owns audio state.
 
 1. After successful New or Continue, allocate a strictly increasing, process-local presentation epoch and call `begin_session` with the actual restored/current facts. A failed load must not rotate the epoch. Prime before accepting live flight commands. Never save or reuse the epoch across live session replacement.
 2. Feed immutable `AudioFrame` values with a monotonically increasing host presentation revision. Increase revision when simulation or host presentation facts change; repeat render frames may reuse it. Older and equal revisions cannot rewind docking edges or event cursors. Rotate to a new epoch before revision or event-ID exhaustion. Do not sort or reconstruct old snapshots as new revisions.
 3. Set `docked` only from the actual `FlightMode::Docked`. Launching and Flight are both undocked. An actual launch transition gives Launch; successful physical docking gives Dock. Priming a flying Continue gives neither.
-4. Record one monotonically increasing discharge ID only after each successful `request_fire_front_pulse` result. A held fire key, retained PulseShot, hit, pulse TTL or render frame is not another discharge. Use DischargeJournal to keep the last 32 accepted discharges, as in the source. Its record method refuses ID exhaustion without wrapping; rotate the host epoch and replace the journal before continuing. Do not generate sound from failed/refused fire. The frame borrows this ring; the presenter retains only its high-water cursor.
+4. Record one monotonically increasing discharge ID only after each successful `request_fire_front_laser` or `request_mining` result. A held fire key, retained PulseShot, hit, beam TTL or render frame is not another discharge. DischargeJournal keeps the last 32 accepted discharges. Its record method refuses ID exhaustion without wrapping; rotate the host epoch and replace the journal before continuing. The frame borrows this ring; the presenter retains only its high-water cursor.
 5. The source missile launch has no bespoke missile sound. Its actual `MISSILE AWAY` notification gives Ping. Bind the real accepted missile-launch message once and route actual current notification text/liveness through the same message edge. Do not play a second direct missile tone, narrate cold restored missiles, or fabricate kills or ECM activations.
-6. OneShot is the actual front Pulse path. ContinuousTool preserves the source cutter's one short Laser voice at a time and only restarts on another fresh event after completion. It is a presentation behavior, not implemented salvage/mining hardware. Do not wire unsupported tool gameplay.
-7. Expose `status()` as Ready, Muted, Unavailable or Shutdown. `set_muted` stops current voices; muted and unavailable updates still consume events. Default-output failure leaves gameplay running and does not silently reopen another device. No reconnect feature is claimed.
+6. OneShot is the actual accepted front Pulse and Mining Laser path. ContinuousTool preserves the source cutter's one short Laser voice at a time and only restarts on another fresh event after completion; no Meridian equivalent is admitted or wired.
+7. Ctrl+Shift+M toggles `set_muted` and stops current voices; Help reports Ready (On), Muted, Unavailable or Stopped. Muted and unavailable updates still consume events. Default-output failure leaves gameplay running and does not silently reopen another device. No reconnect feature is claimed.
 8. Call `shutdown()` before window/application teardown, including any suspended frame or replacement host path. It stops voices and releases the device. Later frames, New, Continue and unmute cannot resurrect this presenter. Construct a new presenter only for a new app lifetime, not to evade shutdown.
 
 Only small event cursors, prior dock state and the latest notification text are retained. Audio does not own a World, mission state or another simulation clock. The device error callback can set only an atomic flag. It cannot call the host or retain the presenter.

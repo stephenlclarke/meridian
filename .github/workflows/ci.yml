@@ -23,7 +23,7 @@ jobs:
           persist-credentials: false
       - name: Install Linux window dependencies
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libxkbcommon-dev libx11-dev libwayland-dev pkg-config
+        run: sudo apt-get update && sudo apt-get install -y libxkbcommon-dev libx11-dev libwayland-dev libasound2-dev pkg-config
       - name: Install pinned Rust toolchain
         shell: bash
         run: rustup toolchain install 1.99.0 --profile minimal --component rustfmt --component clippy
@@ -62,7 +62,7 @@ jobs:
       - name: Install Linux window and software Vulkan dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libxkbcommon-dev libx11-dev libwayland-dev pkg-config \
+          sudo apt-get install -y libxkbcommon-dev libx11-dev libwayland-dev libasound2-dev pkg-config \
             xvfb xauth xdotool imagemagick libvulkan1 mesa-vulkan-drivers libxkbcommon-x11-0
       - name: Install pinned Rust toolchain
         run: rustup toolchain install 1.99.0 --profile minimal --component llvm-tools-preview --component clippy
