@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 
 const MAX_POINTS_PER_MESH: usize = 100_000;
+pub const MAX_PACKAGE_JSON_BYTES: u64 = 64 * 1024 * 1024;
 const MAX_DETAILED_FACES: usize = 200_000;
 const MAX_NATIVE_FACES: usize = 512;
 const MAX_GROUPS: usize = 1_024;
@@ -39,6 +40,11 @@ pub struct HullPackage {
 
 impl HullPackage {
     pub fn from_json(bytes: &[u8]) -> Result<Self, serde_json::Error> {
+        if bytes.len() as u64 > MAX_PACKAGE_JSON_BYTES {
+            return Err(serde::de::Error::custom(
+                "Package exceeds the 64 MiB input limit",
+            ));
+        }
         serde_json::from_slice(bytes)
     }
 

@@ -196,3 +196,12 @@ fn optional_textures_round_trip_only_known_atlas_and_finite_uvs() -> Result<(), 
     assert!(!validate_package(&bad).valid);
     Ok(())
 }
+
+#[test]
+fn shared_json_boundary_refuses_oversized_input_before_parsing() {
+    let input = vec![b' '; MAX_PACKAGE_JSON_BYTES as usize + 1];
+    let Err(error) = HullPackage::from_json(&input) else {
+        panic!("oversized package accepted")
+    };
+    assert!(error.to_string().contains("64 MiB input limit"));
+}
