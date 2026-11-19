@@ -1,0 +1,71 @@
+{
+  "clearanceMillimetres": {
+    "left-pod-gap": 628,
+    "right-pod-gap": 628,
+    "underframe": 209,
+    "left-pipe-gap": 138,
+    "right-pipe-gap": 138,
+    "hatch-outer-strip": 4
+  },
+  "alignedMillimetres": 42618,
+  "offsetStartMillimetres": 979,
+  "sourceLipWitness": {
+    "fraction": 0.5,
+    "pointMetres": [
+      69.39999999999999,
+      4.0,
+      136.32
+    ],
+    "barycentrics": [
+      0.3599999999999991,
+      0.09866402116402206,
+      0.5413359788359788
+    ]
+  },
+  "sourcePodContactsMetres": [
+    [
+      -5.8,
+      -2.0,
+      -11.1
+    ],
+    [
+      10.2,
+      -2.0,
+      -11.1
+    ]
+  ],
+  "cockpitJoint": {
+    "pointMetres": [
+      0.35,
+      5.65,
+      10.2
+    ],
+    "sourceFaceHitCountsAboveBelow": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        1
+      ]
+    ]
+  },
+  "hatch": {
+    "originalFaceIndices": [
+      6,
+      7
+    ],
+    "planeXMetres": 6.5,
+    "nominalRoundedStandOffMillimetres": 20,
+    "innerControlGapMillimetres": 19.000000000000128
+  }
+}

@@ -206,7 +206,7 @@ def verify_protected_core(root):
         ],
         EMP_TESTS: [b'        mule_validation: None,\n'],
         FLIGHT_PERSISTENCE: [b'            mule_validation: None,\n'],
-        'lib.rs': [b'pub mod mule;\n', b'pub mod goshawk;\n'],
+        'lib.rs': [b'pub mod mule;\n', b'pub mod goshawk;\n', b'\npub mod onager;\n'],
         'station.rs': [b'mod mule;\n'],
         'traffic.rs': [
             b'pub(crate) mod mule_validation;\n',
