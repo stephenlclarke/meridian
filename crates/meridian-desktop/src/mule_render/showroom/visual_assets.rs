@@ -1,8 +1,7 @@
 //! Original detailed visuals for the Goshawk family. No collision or selection authority.
 use super::super::{VisualVertex, decode_visual};
-use super::{GEOMETRY_KEY, VERTICES};
+use super::{GEOMETRY_KEY, MK2_GEOMETRY_KEY, VERTICES};
 
-pub(super) const MK2_GEOMETRY_KEY: &str = "assets/fleet/sh009/visual.bin";
 const SH008_VISUAL: &[u8] = include_bytes!("../../../../../assets/fleet/sh008/visual.bin");
 const SH009_VISUAL: &[u8] = include_bytes!("../../../../../assets/fleet/sh009/visual.bin");
 const SH009_VERTICES: usize = 3_532 * 3;

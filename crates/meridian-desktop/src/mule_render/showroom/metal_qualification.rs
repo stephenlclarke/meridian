@@ -1,5 +1,10 @@
-//! Explicit Metal evidence from the production SH008 Showroom pass.
-use super::{Pass, Uniforms, matches};
+//! Explicit Metal evidence from the production Goshawk Showroom passes.
+//! The Mac owner runs SH009's three ignored cases with separate new directories:
+//! `MERIDIAN_SH009_EVIDENCE_DIR` (same-pose normal/repeat/phase/solid),
+//! `MERIDIAN_SH009_MINIMUM_DIR` (solo and comparison panes), and
+//! `MERIDIAN_SH009_CACHE_DIR` (same-hull return and renderer-only mixed panes).
+//! The existing same-pose PPM verifier applies the same subtle-shimmer bounds to either hull.
+use super::{Hull, Pass, Uniforms};
 use crate::{
     app::MIN_WINDOW_LOGICAL,
     docked::Docked,
@@ -29,7 +34,7 @@ fn ok<T, E: std::fmt::Debug>(result: Result<T, E>) -> T {
     result.unwrap_or_else(|error| panic!("{error:?}"))
 }
 
-fn showroom_models() -> [ModelPreview; 3] {
+fn showroom_models(hull: Hull) -> [ModelPreview; 3] {
     let directory = TestDirectory::new();
     let mut profile = open(&directory.0);
     assert!(ok(profile.new_commander(97008)));
@@ -48,12 +53,12 @@ fn showroom_models() -> [ModelPreview; 3] {
             .models
             .try_into()
             .unwrap_or_else(|_| panic!("expected exactly one production Showroom model"));
-        assert!(matches(&model));
+        assert_eq!(Hull::from_model(&model), Some(hull));
         model
     };
     for action in [
         Input::Key(Key::Search),
-        Input::Text("Goshawk Explorer".into()),
+        Input::Text(super::minimum_qualification::search_name(hull).into()),
         Input::Key(Key::Confirm),
         Input::Key(Key::Compare),
         Input::Key(Key::ResetView),
@@ -137,7 +142,7 @@ impl Target {
         };
         let texture = |format, usage| {
             device.create_texture(&wgpu::TextureDescriptor {
-                label: Some("SH008 qualification target"),
+                label: Some("Goshawk qualification target"),
                 size: extent,
                 mip_level_count: 1,
                 sample_count: 1,
@@ -174,7 +179,7 @@ impl Target {
         draw: impl FnOnce(&mut wgpu::RenderPass<'_>),
     ) {
         let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-            label: Some("SH008 Showroom evidence"),
+            label: Some("Goshawk Showroom evidence"),
             color_attachments: &[Some(wgpu::RenderPassColorAttachment {
                 view: &self.color,
                 depth_slice: None,
@@ -262,7 +267,7 @@ impl Crop {
         let stride =
             row.div_ceil(wgpu::COPY_BYTES_PER_ROW_ALIGNMENT) * wgpu::COPY_BYTES_PER_ROW_ALIGNMENT;
         let readback = gpu.device.create_buffer(&wgpu::BufferDescriptor {
-            label: Some("SH008 screenshot crop"),
+            label: Some("Goshawk screenshot crop"),
             size: u64::from(stride) * u64::from(self.extent.height),
             usage: wgpu::BufferUsages::COPY_DST | wgpu::BufferUsages::MAP_READ,
             mapped_at_creation: false,
@@ -393,7 +398,11 @@ fn run_pose(
     name: &str,
 ) -> [usize; 2] {
     ok(pass.prepare(&gpu.queue, model, model.bounds, SCALE, FORMAT.is_srgb()));
-    assert!(pass.shimmer, "SH008 rounded support certification failed");
+    assert!(
+        pass.shimmer,
+        "{} rounded support certification failed",
+        model.object
+    );
     let crop = Crop::from_pass(pass, target);
     let solid = crop.capture_preview(gpu, target, pass, true);
     let normal = crop.capture_preview(gpu, target, pass, false);
@@ -422,6 +431,19 @@ fn run_pose(
         repeat == normal,
         "{name}: identical production samples drifted"
     );
+    assert!(
+        solid.iter().any(|&channel| channel > 0),
+        "{name}: missing solid hull"
+    );
+    let peak_delta = |from: &[u8], to: &[u8]| {
+        from.iter()
+            .zip(to)
+            .map(|(a, b)| a.abs_diff(*b))
+            .max()
+            .unwrap_or(0)
+    };
+    assert!(peak_delta(&solid, &normal) <= 24 && peak_delta(&solid, &shifted) <= 24);
+    assert!(peak_delta(&normal, &shifted) <= 7);
     let changed = |from: &[u8], to: &[u8]| {
         from.as_chunks::<3>()
             .0
@@ -432,7 +454,8 @@ fn run_pose(
     };
     let changed = [changed(&solid, &normal), changed(&normal, &shifted)];
     println!(
-        "SH008 {name} viewport={:?} orientation={:?} crop={}x{}+{}+{} normal_delta_pixels={} phase_delta_pixels={}",
+        "{} {name} viewport={:?} orientation={:?} crop={}x{}+{}+{} normal_delta_pixels={} phase_delta_pixels={}",
+        model.object,
         pass.viewport,
         model.orientation,
         crop.extent.width,
@@ -505,7 +528,7 @@ fn output_directory(variable: &str) -> PathBuf {
     output
 }
 
-fn metal_gpu(request_timing: bool) -> Gpu {
+fn metal_gpu(hull: Hull, request_timing: bool) -> Gpu {
     let mut descriptor = wgpu::InstanceDescriptor::new_without_display_handle();
     descriptor.backends = wgpu::Backends::METAL;
     let instance = wgpu::Instance::new(descriptor);
@@ -521,7 +544,8 @@ fn metal_gpu(request_timing: bool) -> Gpu {
         wgpu::Features::empty()
     };
     println!(
-        "SH008 adapter={info:?} format={FORMAT:?} logical={LOGICAL:?} scale={SCALE:?} timestamp_available={timestamps:?} timestamp_requested={required_features:?} phase_seconds={PHASE_SECONDS}"
+        "{} adapter={info:?} format={FORMAT:?} logical={LOGICAL:?} scale={SCALE:?} timestamp_available={timestamps:?} timestamp_requested={required_features:?} phase_seconds={PHASE_SECONDS}",
+        hull.object_id()
     );
     let (device, queue) = ok(pollster::block_on(adapter.request_device(
         &wgpu::DeviceDescriptor {
@@ -536,15 +560,38 @@ fn metal_gpu(request_timing: bool) -> Gpu {
     }
 }
 
-#[test]
-#[ignore = "Mac owner only: explicit production SH008 visual qualification"]
-fn metal_goshawk_same_pose_shimmer() {
-    let output = output_directory("MERIDIAN_SH008_EVIDENCE_DIR");
-    let gpu = metal_gpu(false);
+fn same_pose_shimmer(hull: Hull, directory_variable: &str) {
+    let output = output_directory(directory_variable);
+    let gpu = metal_gpu(hull, false);
     let target = Target::new(&gpu.device, LOGICAL);
-    let mut pass = ok(Pass::new(&gpu.device, &gpu.queue, FORMAT));
+    let mut pass = ok(Pass::new(&gpu.device, &gpu.queue, FORMAT, hull));
+    assert_eq!(pass.hull(), hull);
+    assert_eq!(
+        pass.draw_count,
+        match hull {
+            Hull::Explorer => 10_452,
+            Hull::Mk2 => 10_596,
+        }
+    );
     let mut totals = [0, 0];
-    let models = showroom_models();
+    let models = showroom_models(hull);
+    let other = match hull {
+        Hull::Explorer => Hull::Mk2,
+        Hull::Mk2 => Hull::Explorer,
+    };
+    let mut wrong = models[0].clone();
+    wrong.object = other.object_id().into();
+    wrong.geometry_key = other.geometry_key().into();
+    assert!(
+        pass.prepare(&gpu.queue, &wrong, wrong.bounds, SCALE, FORMAT.is_srgb())
+            .is_err()
+    );
+    let empty = crate::docked_screens::Rect::new(0.0, 0.0, 0.0, 1.0);
+    assert!(
+        pass.prepare(&gpu.queue, &models[0], empty, SCALE, FORMAT.is_srgb())
+            .is_err()
+    );
+    assert_eq!(pass.viewport, [0.0; 4]);
     let [front, oblique, upper] = models
         .each_ref()
         .map(|model| hull_local_direction(&pass, model));
@@ -552,8 +599,8 @@ fn metal_goshawk_same_pose_shimmer() {
     for ((name, [x, y, z]), model) in POSES.into_iter().zip([front, oblique, upper]).zip(&models) {
         use std::fmt::Write as _;
         println!(
-            "SH008 {name} orientation={:?} hull_local_direction=[{x:.9}, {y:.9}, {z:.9}]",
-            model.orientation
+            "{} {name} orientation={:?} hull_local_direction=[{x:.9}, {y:.9}, {z:.9}]",
+            model.object, model.orientation
         );
         ok(writeln!(directions, "{name}\t{x:.9}\t{y:.9}\t{z:.9}"));
     }
@@ -589,6 +636,18 @@ fn metal_goshawk_same_pose_shimmer() {
 }
 
 #[test]
+#[ignore = "Mac owner only: explicit production SH008 visual qualification"]
+fn metal_goshawk_same_pose_shimmer() {
+    same_pose_shimmer(Hull::Explorer, "MERIDIAN_SH008_EVIDENCE_DIR");
+}
+
+#[test]
+#[ignore = "Mac owner only: explicit production SH009 visual qualification"]
+fn metal_goshawk_mk2_same_pose_shimmer() {
+    same_pose_shimmer(Hull::Mk2, "MERIDIAN_SH009_EVIDENCE_DIR");
+}
+
+#[test]
 #[ignore = "Mac owner only: explicit production SH008 GPU timestamp qualification"]
 fn metal_goshawk_gpu_cost() {
     let output = output_directory("MERIDIAN_SH008_TIMING_DIR");
@@ -607,11 +666,11 @@ fn metal_goshawk_gpu_cost() {
         format!("{variant}\n").as_bytes(),
     );
     println!("SH008 timing variant={variant}");
-    let gpu = metal_gpu(true);
+    let gpu = metal_gpu(Hull::Explorer, true);
     let target = Target::new(&gpu.device, LOGICAL);
-    let mut pass = ok(Pass::new(&gpu.device, &gpu.queue, FORMAT));
+    let mut pass = ok(Pass::new(&gpu.device, &gpu.queue, FORMAT, Hull::Explorer));
     assert!(pass.shimmer, "SH008 rounded support certification failed");
-    let models = showroom_models();
+    let models = showroom_models(Hull::Explorer);
     let mut names = POSES.into_iter();
     let timings = models.each_ref().map(|model| {
         let name = names.next().unwrap_or_else(|| panic!("missing pose name"));
@@ -624,14 +683,12 @@ fn metal_goshawk_gpu_cost() {
     validate_timings(timings);
 }
 
-#[test]
-#[ignore = "Mac owner only: explicit minimum-size production Showroom model pass"]
-fn metal_goshawk_minimum_showroom_model_pass() {
+fn minimum_showroom_model_pass(hull: Hull, directory_variable: &str) {
     use super::minimum_qualification::{self, Frames};
     use std::fmt::Write as _;
 
-    let output = output_directory("MERIDIAN_SH008_MINIMUM_DIR");
-    let gpu = metal_gpu(false);
+    let output = output_directory(directory_variable);
+    let gpu = metal_gpu(hull, false);
     let target = Target::new(&gpu.device, MIN_WINDOW_LOGICAL);
     let crop = Crop {
         origin: wgpu::Origin3d::ZERO,
@@ -675,7 +732,7 @@ fn metal_goshawk_minimum_showroom_model_pass() {
     };
     for (pose, Frames { solo, comparison }) in minimum_qualification::POSES
         .into_iter()
-        .zip(minimum_qualification::station_frames())
+        .zip(minimum_qualification::station_frames(hull))
     {
         capture(&format!("{pose}-solo"), &solo);
         capture(&format!("{pose}-compare"), &comparison);
@@ -687,5 +744,108 @@ fn metal_goshawk_minimum_showroom_model_pass() {
         }
     }
     write_new(output.join("model-panes.tsv"), panes.as_bytes());
-    println!("SH008 minimum Showroom model pass logical={MIN_WINDOW_LOGICAL:?} physical={size:?}");
+    println!(
+        "{} minimum Showroom model pass logical={MIN_WINDOW_LOGICAL:?} physical={size:?}",
+        hull.object_id()
+    );
+}
+
+#[test]
+#[ignore = "Mac owner only: explicit minimum-size production SH008 Showroom model pass"]
+fn metal_goshawk_minimum_showroom_model_pass() {
+    minimum_showroom_model_pass(Hull::Explorer, "MERIDIAN_SH008_MINIMUM_DIR");
+}
+
+#[test]
+#[ignore = "Mac owner only: explicit minimum-size production SH009 Showroom model pass"]
+fn metal_goshawk_mk2_minimum_showroom_model_pass() {
+    minimum_showroom_model_pass(Hull::Mk2, "MERIDIAN_SH009_MINIMUM_DIR");
+}
+
+#[test]
+#[ignore = "Mac owner only: original-hull renderer cache switching and mixed panes"]
+fn metal_goshawk_mk2_cache_switching() {
+    use super::minimum_qualification::station_frames;
+    use crate::docked_screens::{Frame, Rect};
+
+    let output = output_directory("MERIDIAN_SH009_CACHE_DIR");
+    let gpu = metal_gpu(Hull::Mk2, false);
+    let target = Target::new(&gpu.device, MIN_WINDOW_LOGICAL);
+    let crop = Crop {
+        origin: wgpu::Origin3d::ZERO,
+        extent: target.extent,
+    };
+    let size = [target.extent.width, target.extent.height];
+    let mut docked = ok(crate::docked_render::Pass::new(
+        &gpu.device,
+        &gpu.queue,
+        FORMAT,
+    ));
+    let mut capture = |name: &str, frame: &Frame| {
+        ok(docked.prepare(
+            &gpu.device,
+            &gpu.queue,
+            frame,
+            MIN_WINDOW_LOGICAL,
+            size,
+            None,
+        ));
+        let rgb = crop.capture(&gpu, &target, |render| docked.draw_models(render));
+        crop.save(output.join(format!("{name}.ppm")), &rgb);
+        rgb
+    };
+    let explorer = station_frames(Hull::Explorer).remove(0);
+    let mk2 = station_frames(Hull::Mk2).remove(0);
+    let original = capture("explorer-before", &explorer.solo);
+    let revised = capture("mk2-before", &mk2.solo);
+    assert!(original.iter().any(|&channel| channel > 0));
+    assert!(revised.iter().any(|&channel| channel > 0));
+    assert_ne!(
+        original, revised,
+        "distinct original hulls rendered identically"
+    );
+    assert_eq!(original, capture("explorer-return", &explorer.solo));
+    assert_eq!(revised, capture("mk2-return", &mk2.solo));
+
+    // A renderer-only mixed-hull frame exercises two simultaneous cached passes. This
+    // does not claim that the ordinary station UI offers that particular comparison pair.
+    let mut mixed = mk2.comparison.clone();
+    let [left, right] = mixed.models.as_mut_slice() else {
+        panic!("expected two comparison panes")
+    };
+    let [explorer_source] = explorer.solo.models.as_slice() else {
+        panic!("expected one Explorer model")
+    };
+    left.object.clone_from(&explorer_source.object);
+    left.geometry_key.clone_from(&explorer_source.geometry_key);
+    left.orientation = right.orientation;
+    let assert_pane = |combined: &[u8], isolated: &[u8], bounds: Rect| {
+        let left = (bounds.x * SCALE[0]).ceil() as usize;
+        let right = ((bounds.x + bounds.width) * SCALE[0]).floor() as usize;
+        let top = (bounds.y * SCALE[1]).ceil() as usize;
+        let bottom = ((bounds.y + bounds.height) * SCALE[1]).floor() as usize;
+        assert!(left < right && top < bottom);
+        for row in top..bottom {
+            let start = (row * size[0] as usize + left) * 3;
+            let end = (row * size[0] as usize + right) * 3;
+            assert_eq!(&combined[start..end], &isolated[start..end]);
+        }
+    };
+    for order in ["explorer-mk2", "mk2-explorer"] {
+        let combined = capture(order, &mixed);
+        for model in &mixed.models {
+            let mut isolated = mixed.clone();
+            isolated.models = vec![model.clone()];
+            let solo = capture(&format!("{order}-{}", model.object), &isolated);
+            assert_pane(&combined, &solo, model.bounds);
+        }
+        // Swap hull identity, preserving the two panes and their synchronized orientation.
+        let [left, right] = mixed.models.as_mut_slice() else {
+            unreachable!()
+        };
+        std::mem::swap(&mut left.object, &mut right.object);
+        std::mem::swap(&mut left.geometry_key, &mut right.geometry_key);
+    }
+    assert_eq!(original, capture("explorer-final", &explorer.solo));
+    assert_eq!(revised, capture("mk2-final", &mk2.solo));
 }
