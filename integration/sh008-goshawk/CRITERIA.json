@@ -1,6 +1,6 @@
 {
   "target": "SH008 Goshawk Explorer",
-  "status": "PARTIALLY_QUALIFIED;JOINED_RUNTIME_PENDING;NO_ADMISSION",
+  "status": "CONTROLLED_WORLD_QUALIFIED;MINIMUM_OFFSCREEN_VERIFIED;NO_ADMISSION",
   "base": "a9bd0cc66c15e4ecfe57a0d86b774b797addc231",
   "order": "Next unresolved original after SH001; SH009 remains held",
   "detailedModel": "Authenticated staged asset with original fields and once-applied exact calibration",
@@ -37,9 +37,8 @@
   ],
   "sourceProof": "Every source component and triangle remains assigned to one piece. Independent plane support check across the authored channel obstacle sweep has at least 0.746 m source slack; this is a local static certificate, not runtime qualification.",
   "nextAcceptance": [
-    "Run all four named SH008 core tests with current protected source and strict Clippy in the owned lane",
     "Resolve the measured well-mouth fit and cross-source discrepancy under a source-specific decision",
-    "Measure GPU draw cost with valid counters and qualify minimum-size clipping. The three offscreen visual comparisons passed on their recorded revision.",
+    "Measure GPU draw cost with valid counters. The three offscreen visual comparisons passed on their recorded revision.",
     "Resolve source-supported engineering mass/inertia and authored ordinary placement separately before hull acceptance"
   ],
   "counts": "Source packet does not alter full-fleet or public-preview acceptance",
@@ -48,7 +47,7 @@
     "status": "FOUR_CORE_CASES_PASSED",
     "witnessSha256": "3bf4115324203b735025469207b2c6d295cfc98d0ccdb64a8db8edff0e4861f5",
     "evidence": "Original SH028 face 482 and exact calibrated SH008 rail vertex 6 yield a strict interior lip intersection while the body centre is still outside the aperture. Actual station source/asset data and once-calibrated appearance/partition are unchanged.",
-    "runtimeNext": "Qualify the joined source on the owned platforms. Ordinary placement and gameplay docking remain open.",
+    "runtimeNext": "Ordinary placement and gameplay docking remain open.",
     "reviewCorrection": {
       "status": "COVERED_BY_FOUR_CORE_PASSES",
       "findings": [
@@ -71,12 +70,18 @@
     ],
     "nativeAcceptance": "Capture original forest-silver appearance, the open wishbone and close grazing shimmer while rotating in the ordinary Showroom; verify resize, view clipping and draw cost.",
     "minimumWindowQualification": {
-      "status": "AUTHORED_UNRUN",
-      "logicalSize": [640, 360],
+      "status": "MAC_PROJECTION_AND_OFFSCREEN_PIXELS_PASSED",
+      "logicalSize": [
+        640,
+        360
+      ],
       "projectionTest": "original_goshawk_fits_minimum_station_showroom_solo_and_compare",
       "metalOffscreenTest": "metal_goshawk_minimum_showroom_model_pass",
       "criteria": "Real Showroom controls and model panes. All original detailed vertices are inside the Goshawk pane with at least two logical pixels of margin. Retain the combined Compare images and full-target captures of each isolated model from their original Compare frames. Verify each visible model against its own pane and compare the combined image with the pixel union of the isolated images.",
-      "scope": "Offscreen Metal model pass at 2x. Native window resizing and compositor observation remain separate."
+      "scope": "Offscreen Metal model pass at 2x. Native window resizing and compositor observation remain separate.",
+      "testedRevision": "b17edd2f2da5972ee6eb7c35f641b9cb7a889668",
+      "minimumGoshawkGutterLogicalPixels": 6.23,
+      "combinedMatchesIsolatedAtAllThreePoses": true
     },
     "metalShimmerQualification": {
       "status": "THREE_OFFSCREEN_VIEWS_VERIFIED;GPU_TIMING_INVALID",
@@ -95,7 +100,7 @@
   },
   "controlledWorld": {
     "boundBase": "cfaab8a9704ba0124a08ce5e8a9e474c18484df6",
-    "status": "FIVE_ROUTE_MAC_RUN_PASSED;JOINED_REGRESSIONS_PENDING",
+    "status": "SEVEN_FOCUSED_CASES_PASSED_ON_THREE_PLATFORMS",
     "qualifiedPrerequisites": "All four prior SH008 core and SH028 cases passed hosted Linux, hosted Mac and the owned Mac workspace. The ordinary Mac Showroom displays SH008.",
     "scope": "One World with fixed original SH028, stationary native SH025 observer, and the 69 existing rounded SH008 pieces. No change to fleet or public-preview acceptance.",
     "regressions": [
@@ -140,6 +145,16 @@
         "off-aperture": 70,
         "observer": 58
       }
+    },
+    "joinedQualification": {
+      "revision": "91e5daf90d697abd99578e1bc853f76fadcdc26f",
+      "platforms": [
+        "macOS arm64",
+        "Linux x64 (WSL2)",
+        "Windows x64 (MSVC)"
+      ],
+      "workspaceRustPassedPerPlatform": 730,
+      "pythonPassedPerPlatform": 134
     }
   },
   "surfaceFit": {

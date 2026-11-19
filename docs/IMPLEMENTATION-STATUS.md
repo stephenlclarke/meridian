@@ -14,7 +14,7 @@ A fresh commander delivered all eight G02 freight units at Renas, received 730 C
 
 ## Goshawk Explorer source candidate
 
-The SH008 geometry and Showroom source target the original forest-silver Goshawk Explorer. A docked commander can select the original detailed preview and inspect the open wishbone and subtle rounded-envelope shimmer through the existing Showroom controls. On Mac, Compare showed both ships, a single-ship view showed the wishbone, and Exchange left the commander and cargo unchanged. Four core geometry and station tests passed on Mac, Linux and native Windows. Three offscreen Mac views passed temporal shimmer checks, and five controlled World approaches passed on Mac. GPU timing returned invalid counters. Ordinary placement, physical design adoption and gameplay docking remain open. [Geometry and presentation scope](GOSHAWK-GAMEPLAY-ENVELOPE.md)
+The SH008 geometry and Showroom source target the original forest-silver Goshawk Explorer. A docked commander can select the original detailed preview and inspect the open wishbone and subtle rounded-envelope shimmer through the existing Showroom controls. On Mac, Compare showed both ships, a single-ship view showed the wishbone, and Exchange left the commander and cargo unchanged. Four core geometry and station tests passed on Mac, Linux and native Windows. Three offscreen Mac views passed temporal shimmer checks. All seven controlled World and station cases passed on Mac, Linux and native Windows. The 640×360 offscreen Showroom checks passed in solo and Compare views. GPU timing returned invalid counters. Ordinary placement, physical design adoption and gameplay docking remain open. [Geometry and presentation scope](GOSHAWK-GAMEPLAY-ENVELOPE.md)
 
 ## Internal Mule docking validation
 
