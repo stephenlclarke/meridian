@@ -8,6 +8,7 @@ import struct
 import tomllib
 
 RUST_TEST_NAME = r'#\[test\]\s*fn\s+(\w+)\('
+FLIGHT_SOURCE = 'flight.rs'
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -17,7 +18,7 @@ def sha(data):
 
 def undo_commander_launch(relative, data):
     replacements = {
-        'flight.rs': [
+        FLIGHT_SOURCE: [
             (
                 b'        self.launch(expected_tick, false)\n'
                 b'    }\n\n'
@@ -124,7 +125,7 @@ def verify_geometry(folder):
 def undo_renas_encounter(relative, data):
     # Restore only the reviewed Renas additions before checking the protected blobs.
     replacements = {
-        'flight.rs': [
+        FLIGHT_SOURCE: [
             (b'mod mule_renas;\n', b''),
             (b'    mule_renas: Option<crate::traffic::mule_validation::State>,\n', b''),
             (b'            mule_renas: None,\n', b''),
@@ -167,7 +168,7 @@ def verify_protected_core(root):
     # Checking every pre-existing core blob catches unrelated gameplay edits.
     base = '792f4485372ae37d0c1d583ae11229e85932ce2f'
     additions = {
-        'flight.rs': [
+        FLIGHT_SOURCE: [
             b'mod mule_validation;\n',
             b'    mule_validation: Option<crate::traffic::mule_validation::State>,\n',
             b'            mule_validation: None,\n',
@@ -194,7 +195,7 @@ def verify_protected_core(root):
             assert data.count(addition) == 1, relative
             data = data.replace(addition, b'', 1)
         data = undo_commander_launch(relative, data)
-        if relative == 'flight.rs':
+        if relative == FLIGHT_SOURCE:
             speed_line = b'        if !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
             original_line = b'        if !self.state.speed.is_finite() || !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
             assert data.count(speed_line) == 1, relative
