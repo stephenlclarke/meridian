@@ -11,3 +11,9 @@ crates/meridian-core/src/**/*.rs text eol=lf
 integration/sh001-mule/*.json text eol=lf
 integration/sh001-mule/*.patch -text
 integration/sh008-goshawk/*.json text eol=lf
+
+# Panther Explorer replay helpers have published byte hashes.
+tools/measure_panther_explorer_air.py text eol=lf
+tools/prepare_panther_explorer_geometry.py text eol=lf
+tools/prepare_panther_explorer_studio.py text eol=lf
+tools/verify_panther_explorer_geometry.py text eol=lf
