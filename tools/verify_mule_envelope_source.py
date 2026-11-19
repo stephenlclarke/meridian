@@ -208,6 +208,7 @@ def verify_protected_core(root):
             b'pub use mule_validation::{MuleActorSnapshot, MuleValidationRefusal};\n',
         ],
     }
+    additions['lib.rs'].append(b'pub mod sable_liner;\n')
     pin_bytes = (root / 'integration/sh001-mule/PROTECTED-CORE.json').read_bytes()
     assert sha(pin_bytes) == '8a2929218820a8e15536aa554c0f8df56a23981944be85ec1b1947778fd48133'
     baseline = json.loads(pin_bytes)
