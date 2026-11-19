@@ -1,0 +1,108 @@
+{
+  "id": "SH009",
+  "name": "Goshawk Mk II",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "mode": "SOURCE_PREPARATION_ONLY;RUNTIME_ADMISSION_PENDING",
+  "calibration": {
+    "detailed": "Already calibrated by original stage, retained as supplied",
+    "native": "30000000/3186991 m per original source unit, rounded once to binary64",
+    "orientation": "+Z forward, +Y up",
+    "extentMetres": [
+      21.95279497180883,
+      10.745245279952155,
+      30.0
+    ]
+  },
+  "detailed": {
+    "vertices": 2104,
+    "faces": 3532,
+    "components": 169,
+    "boundsMetres": [
+      [
+        -10.976397485904416,
+        -4.3771695621355695,
+        -17.030390107785056
+      ],
+      [
+        10.976397485904416,
+        6.368075717816586,
+        12.969609892214946
+      ]
+    ],
+    "palette": "forest-silver",
+    "textureIds": [
+      "l337-patrol-diffuse",
+      "l337-strike-diffuse",
+      "l337-service-details"
+    ]
+  },
+  "nativeCandidate": {
+    "vertices": 568,
+    "faces": 1012,
+    "components": 31,
+    "boundsMetres": [
+      [
+        -10.976397485904416,
+        -4.3771695621355695,
+        -17.030390107785056
+      ],
+      [
+        10.976397485904416,
+        6.368075717816586,
+        12.969609892214946
+      ]
+    ],
+    "palette": "forest-silver",
+    "textureIds": [
+      "l337-patrol-diffuse",
+      "l337-strike-diffuse",
+      "l337-service-details"
+    ],
+    "exactNativeFaceLimit": 512
+  },
+  "legacyInputs": {
+    "resource.toml": {
+      "bytes": 524399,
+      "sha256": "4fc835b6f40c1b7751ff8c03940c0501ce7c445b1bd0be95f15651a174c67552",
+      "path": "Sources/L337Core/Resources/Ships/SH009.toml"
+    },
+    "native-source.json": {
+      "bytes": 114241,
+      "sha256": "bb4b2f9bf1b5ad045feceb3692fabfa81334d1cd559bfd54447cd5e625af7abe",
+      "path": "Sources/L337Core/Resources/OriginalFleetShowroomModels/SH009.json"
+    },
+    "native-export-manifest.json": {
+      "bytes": 45988,
+      "sha256": "118b05757dc54096faa15dd79801f38999b87fe9424f1b3513133ead94f71971",
+      "path": "Sources/L337Core/Resources/OriginalFleetShowroomModels/manifest.json"
+    },
+    "contract.toml": {
+      "bytes": 3475,
+      "sha256": "8487d3b24cff75389b9451eb6a3e9f041c907df16caf696a67cd31f46feec670",
+      "path": "docs/fleet-design-v2/ships/SH009.toml"
+    },
+    "LICENSE": {
+      "bytes": 1071,
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766",
+      "path": "LICENSE"
+    }
+  },
+  "originalNativeProposal": {
+    "path": "replacement-hulls/SH009-design.toml",
+    "sha256": "41cda75d40e41e4de1a745de9f5c8770618fe5de2f0df0568a49a8c72ba92722"
+  },
+  "encodings": {
+    "source.vertices": {
+      "bytes": 64144,
+      "sha256": "022b4fe3b25d84085411d32ef4de8e19f17ff6f83ff178dc7bc4164edb95b2d7"
+    },
+    "source-triangles.bin": {
+      "bytes": 54528,
+      "sha256": "944398f70608e4def2783ceb0ff591de602a7799d36f7f88e63124ad8cc57d73"
+    },
+    "COMPONENTS.json": {
+      "bytes": 22107,
+      "sha256": "ea41d3109cdc5624325f6e1fceaa1d069c55a2fdeca80085efbeed89a7c1b410"
+    }
+  }
+}
