@@ -1,5 +1,7 @@
 # Meridian
 
+The development renderer gives the Peregrine lapis and ochre paint, the Mule petrol and turquoise, and the Goshawk family pine green and blued steel. Lion Citadel uses ocean-blue plating and orange-amber docking lights. Preview 10 shows the earlier finishes.
+
 Preview 10 opens on Commander Details. Press H or ? for the current screen’s controls and station navigation. Its docked exterior and flight HUD leave the view above the instruments clear at rest. [Download Preview 10 for macOS arm64 or Windows x64](https://github.com/stephenlclarke/meridian/releases/tag/v0.10.0-preview.1) · [Preview guide](docs/PREVIEW-RELEASES.md)
 
 ## Goshawk Explorer in the Ship Showroom
@@ -137,7 +139,7 @@ Fleet construction is a separate M4 lane. Its current changed original-five run 
 
 ## Context help and XYZZY testing
 
-Preview 8 retains screen-specific H/? help with explicit [XYZZY testing](docs/XYZZY.md). Every station help popup explains how to reach Galaxy, System, Showroom, Market and Equipment. Help pauses host stepping and preserves the current screen, selection, search and review. Press H or ? for flight controls or station navigation. The current desktop source clears routine text from above the instruments in idle flight and at the docked exterior. Command feedback and requested reviews still appear there. The development build also gives the Lion Citadel blue-grey plating and amber lights, with four small joins around its docking entrance. [Station exterior](docs/DOCKED-PREVIEW.md#sh028-aperture-crosspieces)
+Preview 8 retains screen-specific H/? help with explicit [XYZZY testing](docs/XYZZY.md). Every station help popup explains how to reach Galaxy, System, Showroom, Market and Equipment. Help pauses host stepping and preserves the current screen, selection, search and review. Press H or ? for flight controls or station navigation. The current desktop source clears routine text from above the instruments in idle flight and at the docked exterior. Command feedback and requested reviews still appear there. The development build also gives the Lion Citadel ocean-blue plating and orange-amber lights, with four small joins around its docking entrance. [Station exterior](docs/DOCKED-PREVIEW.md#sh028-aperture-crosspieces)
 
 At a station berth, **Ctrl+Shift+X** opens the labelled XYZZY testing menu. Use Up/Down to choose, Enter to review, then Enter again to confirm and save; Escape/B cancels the review or closes the menu. H/? opens help above the menu. First activation changes the current commander to CLARKE and sets cash to 1,000,000 CR once. It grants/refits the supported SH025 outfit with explicit secret provenance; missiles and cargo stay finite. The menu shows actual cash, current jump reach, unlimited-fuel state and missing-system limits. Reading or closing it grants nothing. Other profiles are unchanged.
 

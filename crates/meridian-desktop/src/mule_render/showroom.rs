@@ -487,3 +487,34 @@ mod tests {
         assert_eq!(*stride as usize, size_of::<Piece>());
     }
 }
+
+#[cfg(test)]
+mod display_paint_tests {
+    use super::*;
+    #[test]
+    fn original_materials_and_painted_vertices_are_distinct_for_each_hull() {
+        for (vertices, source, finish) in [
+            (super::super::visual(), [214, 217, 211], [45, 112, 124]),
+            (Hull::Explorer.visual(), [75, 117, 101], [39, 126, 83]),
+            (Hull::Custom.visual(), [75, 117, 101], [39, 126, 83]),
+        ] {
+            let vertices = vertices.unwrap_or_else(|error| panic!("{error}"));
+            let rgb = |channels: [u8; 3]| channels.map(|c| f32::from(c) / 255.0);
+            let mut matching = 0;
+            for v in vertices {
+                let painted = v.with_display_paint();
+                if v.color[..3] == rgb(source) {
+                    assert_eq!(painted.color[..3], rgb(finish));
+                    matching += 1;
+                }
+                assert_eq!(v.position, painted.position);
+                assert_eq!(v.normal, painted.normal);
+                assert_eq!(v.uv, painted.uv);
+                assert_eq!(v.texture, painted.texture);
+                assert_eq!(v.emissive, painted.emissive);
+                assert_eq!(v.color[3], painted.color[3]);
+            }
+            assert!(matching > 0);
+        }
+    }
+}

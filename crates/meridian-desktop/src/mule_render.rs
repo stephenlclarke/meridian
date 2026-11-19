@@ -67,6 +67,15 @@ struct VisualVertex {
     texture: u32,
     emissive: u32,
 }
+impl VisualVertex {
+    fn with_display_paint(mut self) -> Self {
+        let [r, g, b, alpha] = self.color;
+        let paint = crate::mesh::paint::ship_srgb([r, g, b].map(|v| (255.0 * v).round() as u8));
+        let [r, g, b] = paint.map(|v| f32::from(v) / 255.0);
+        self.color = [r, g, b, alpha];
+        self
+    }
+}
 const VISUAL: &[u8] = include_bytes!("../../../assets/fleet/sh001/visual.bin");
 const VERTEX_COUNT: usize = 7236 * 3;
 const MAX_POINTS: usize = 5344;
