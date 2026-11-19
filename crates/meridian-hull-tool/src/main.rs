@@ -1,5 +1,7 @@
 //! Command-line boundary for offline hull authoring. Never writes runtime assets or saves.
-use meridian_core::hull_package::{HullPackage, ValidationReport, validate_package};
+use meridian_core::hull_package::{
+    HullPackage, MAX_PACKAGE_JSON_BYTES, ValidationReport, validate_package,
+};
 use std::{
     env,
     ffi::OsString,
@@ -10,7 +12,6 @@ use std::{
 };
 
 const HELP: &str = "meridian-hull-tool validate PACKAGE --report NEW_REPORT\nValidate a self-contained schema-1 hull package. Exit 0 = valid, 1 = invalid package, 2 = usage/I/O error. Existing reports are not overwritten.";
-const INPUT_LIMIT: u64 = 64 * 1024 * 1024;
 
 fn read_package(path: &Path) -> Result<ValidationReport, String> {
     let file = File::open(path).map_err(|error| format!("Read package: {error}"))?;
@@ -21,10 +22,10 @@ fn read_package(path: &Path) -> Result<ValidationReport, String> {
         return Err("Package must be a regular file".into());
     }
     let mut bytes = Vec::new();
-    file.take(INPUT_LIMIT + 1)
+    file.take(MAX_PACKAGE_JSON_BYTES + 1)
         .read_to_end(&mut bytes)
         .map_err(|error| format!("Read package: {error}"))?;
-    if bytes.len() as u64 > INPUT_LIMIT {
+    if bytes.len() as u64 > MAX_PACKAGE_JSON_BYTES {
         return Ok(ValidationReport::invalid(
             "Package exceeds the 64 MiB input limit",
         ));
