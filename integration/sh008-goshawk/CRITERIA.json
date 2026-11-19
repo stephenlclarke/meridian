@@ -63,7 +63,16 @@
       "selecting_goshawk_routes_the_original_preview_without_granting_exchange",
       "goshawk_original_visual_and_all_local_supports_bind_to_the_shader"
     ],
-    "nativeAcceptance": "Capture original forest-silver appearance, the open wishbone and close grazing shimmer while rotating in the ordinary Showroom; verify resize, view clipping and draw cost."
+    "nativeAcceptance": "Capture original forest-silver appearance, the open wishbone and close grazing shimmer while rotating in the ordinary Showroom; verify resize, view clipping and draw cost.",
+    "metalShimmerQualification": {
+      "status": "AUTHORED_UNRUN",
+      "test": "metal_goshawk_same_pose_shimmer_and_gpu_cost",
+      "verifier": "tools/verify_goshawk_showroom_evidence.py",
+      "capture": "Three stationary authored Showroom views at 1280x720 logical, 2x scale, BGRA8 sRGB and production depth. Retain solid, production, repeat and shifted phase panes.",
+      "pixelChecks": "Identical production repeat, nonzero solid-to-production and phase differences across the fixed views, and at most 24 sRGB codes per channel for the shimmer. Inspect the upper view and amplified differences for the local open wishbone.",
+      "gpuTiming": "Three warmups and 16 Metal GPU timestamp pairs per pose if the adapter exposes TIMESTAMP_QUERY. Each pair brackets the isolated production shimmer draw and attachment load/store; otherwise record unsupported.",
+      "scope": "Offscreen production hull pass. Ordinary Showroom UI and fixed illumination are preserved. Windows graphics and physical collision cost are outside this receipt."
+    }
   },
   "controlledWorld": {
     "boundBase": "cfaab8a9704ba0124a08ce5e8a9e474c18484df6",

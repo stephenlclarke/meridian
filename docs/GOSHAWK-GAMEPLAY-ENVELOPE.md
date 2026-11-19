@@ -14,6 +14,12 @@ At a station berth, open Ship Showroom with 3 and search for Goshawk Explorer. T
 
 The preview rotates with the existing Showroom controls. It draws the opaque detailed hull and a separate close grazing shimmer from the 69 rounded pieces in the geometry packet. The union shades at most one exposed surface per ray and reaches zero opacity at 64 m. The preview uses fixed illumination. The authored World placement, physical mass and inertia, cockpit, docking and acquisition still need their own source and acceptance. Native viewing and render cost are pending.
 
+## Metal shimmer evidence
+
+The Mac owner's offscreen check runs the production Showroom renderer at a fixed 2× scale and keeps the exact preview pose, material, projection and depth for each pair. It compares the opaque hull against the ordinary shimmer, then repeats the ordinary draw and changes only the shader phase in a separate sample. The independent verifier checks the raw pixel pairs and can write amplified difference images. Inspect the upper-view captures for the open wishbone.
+
+When Metal exposes timestamp queries, the check measures one shimmer draw in an isolated render pass after the opaque depth is established. The raw timestamp pairs include the attachment load and store for that pass. This scope supplies a GPU cost for the effect. Whole-frame cost, native Windows graphics and physical collision timing require separate measurements.
+
 No new full-fleet hull or public-preview count follows from this source packet.
 
 ## Original station docking candidate

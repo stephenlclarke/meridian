@@ -240,18 +240,34 @@ impl Pass {
     }
 
     pub(crate) fn draw(&self, render: &mut wgpu::RenderPass<'_>) {
+        self.set_viewport(render);
+        self.draw_solid(render);
+        self.draw_shimmer(render);
+    }
+
+    fn set_viewport(&self, render: &mut wgpu::RenderPass<'_>) {
         let [x, y, width, height] = self.viewport;
         render.set_viewport(x, y, width, height, 0.0, 1.0);
+    }
+
+    fn draw_solid(&self, render: &mut wgpu::RenderPass<'_>) {
         render.set_pipeline(&self.hardware.solid);
         render.set_bind_group(0, &self.hardware.group, &[]);
         render.set_vertex_buffer(0, self.hardware.vertices.slice(..));
         render.draw(0..VERTICES as u32, 0..1);
+    }
+
+    fn draw_shimmer(&self, render: &mut wgpu::RenderPass<'_>) {
         if self.shimmer {
             render.set_pipeline(&self.hardware.shimmer);
+            render.set_bind_group(0, &self.hardware.group, &[]);
             render.draw(0..3, 0..1);
         }
     }
 }
+
+#[cfg(all(test, target_os = "macos"))]
+mod metal_qualification;
 
 #[cfg(test)]
 mod tests {
