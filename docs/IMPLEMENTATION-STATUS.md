@@ -2,11 +2,11 @@
 
 ## Commander startup and flight cockpit
 
-Ordinary startup opens Commander details with the current ship, location and credits. A fresh commander starts at Avenor. A saved flight opens its summary and waits for Enter to resume. An unreadable slot opens recovery. Native first-frame and save checks are pending.
+Ordinary startup opens Commander details with the current ship, location and credits. A fresh commander starts at Avenor. A saved flight opens its summary and waits for Enter to resume. An unreadable slot opens recovery. On Mac, a fresh commander reached this screen without creating a save. An airborne commander stayed on the summary until Enter. Recovery preserved the original damaged and unsupported save bytes.
 
-The desktop source clears the text area above the instruments in idle flight and in the idle docked exterior. Command feedback expires after four seconds in either view, including when paused. Requested details, review terms and action-specific confirmations remain accessible. For controls and station navigation, press H or ?. Active flight practice, jump countdowns and contact warnings remain visible. Preview 8 still uses the older display. Native visual qualification for this change is pending.
+The desktop source clears the text area above the instruments in idle flight and in the idle docked exterior. Command feedback expires after four seconds in either view, including when paused. Requested details, review terms and action-specific confirmations remain accessible. For controls and station navigation, press H or ?. Active flight practice, jump countdowns and contact warnings remain visible. Mac qualification verified the clear docked view, four-second expiry and deliberate freight review. The installed Mac Preview 9 includes this HUD.
 
-The Lion Citadel exterior now uses blue-grey plating, darker structural steel and amber light strips in the desktop source. Subtle face shading gives adjacent panels depth. The renderer applies this finish at load time to the original material assignments. Four short strips join the rim to the upper and lower crosspieces. On a CPU projection of the reported view, the strips cover all 184 sampled gaps and nine sightlines through the port stay clear. A visual check in the Mac build is pending.
+The Lion Citadel exterior now uses blue-grey plating, darker structural steel and amber light strips in the desktop source. Subtle face shading gives adjacent panels depth. The renderer applies this finish at load time to the original material assignments. Four short strips join the rim to the upper and lower crosspieces. On a CPU projection of the reported view, the strips cover all 184 sampled gaps and nine sightlines through the port stay clear. In the straight-on docked Mac view, all 208 formerly exposed background pixels show station material and all nine sightlines through the port remain clear.
 
 ## First Renas Mule encounter
 
