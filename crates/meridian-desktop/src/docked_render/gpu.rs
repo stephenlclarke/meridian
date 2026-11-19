@@ -251,7 +251,7 @@ impl Pass {
                     None => {
                         if self.goshawk.len() >= showroom::Hull::COUNT * MAX_MODELS {
                             return Err(
-                                "Goshawk Showroom pass cache exceeded its hull/pane bound".into()
+                                "Original Showroom pass cache exceeded its hull/pane bound".into(),
                             );
                         }
                         let index = self.goshawk.len();
@@ -294,7 +294,7 @@ impl Pass {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use showroom::Hull::{Custom, Explorer, Mk2};
+    use showroom::Hull::{Custom, Explorer, Mk2, SableLiner};
 
     #[test]
     fn original_showroom_cache_reuses_only_the_same_hull_and_unused_pane() {
@@ -323,9 +323,22 @@ mod tests {
         assert_eq!(frame(&[Custom, Custom]), [Some(4), Some(5)]);
         assert_eq!(frame(&[Explorer, Custom]), [Some(0), Some(4)]);
         assert_eq!(frame(&[Custom, Explorer]), [Some(4), Some(0)]);
+        assert_eq!(frame(&[SableLiner]), [Some(6), None]);
+        assert_eq!(frame(&[SableLiner, Mk2]), [Some(6), Some(1)]);
+        assert_eq!(frame(&[Mk2, SableLiner]), [Some(1), Some(6)]);
+        assert_eq!(frame(&[SableLiner, Custom]), [Some(6), Some(4)]);
+        assert_eq!(frame(&[Custom, SableLiner]), [Some(4), Some(6)]);
+        assert_eq!(frame(&[SableLiner, Explorer]), [Some(6), Some(0)]);
+        assert_eq!(frame(&[Explorer, SableLiner]), [Some(0), Some(6)]);
+        assert_eq!(frame(&[SableLiner, SableLiner]), [Some(6), Some(7)]);
         assert_eq!(frame(&[]), [None, None]);
         assert_eq!(frame(&[Mk2]), [Some(1), None]);
-        assert_eq!(cached, [Explorer, Mk2, Mk2, Explorer, Custom, Custom]);
+        assert_eq!(
+            cached,
+            [
+                Explorer, Mk2, Mk2, Explorer, Custom, Custom, SableLiner, SableLiner
+            ]
+        );
         assert_eq!(cached.len(), showroom::Hull::COUNT * MAX_MODELS);
     }
 }

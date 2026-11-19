@@ -69,6 +69,7 @@ struct VisualVertex {
 }
 const VISUAL: &[u8] = include_bytes!("../../../assets/fleet/sh001/visual.bin");
 const VERTEX_COUNT: usize = 7236 * 3;
+const UNTEXTURED_VISUAL_LAYER: u32 = u32::MAX;
 const MAX_POINTS: usize = 5344;
 type SmoothPieceArray = [meridian_core::mule::SmoothPiece; MULE_PIECES];
 const TEXTURES: [&[u8]; 3] = [
@@ -84,6 +85,15 @@ fn decode_visual(
     bytes: &[u8],
     magic: &[u8; 8],
     count: usize,
+) -> Result<Vec<VisualVertex>, &'static str> {
+    decode_visual_layers(bytes, magic, count, false)
+}
+
+fn decode_visual_layers(
+    bytes: &[u8],
+    magic: &[u8; 8],
+    count: usize,
+    allow_untextured: bool,
 ) -> Result<Vec<VisualVertex>, &'static str> {
     if bytes.get(..8) != Some(magic)
         || bytes.get(8..12) != Some(&(count as u32).to_le_bytes())
@@ -106,7 +116,7 @@ fn decode_visual(
             .chain(&v.color)
             .chain(&v.uv)
             .any(|x| !x.is_finite())
-            || v.texture >= 3
+            || (v.texture >= 3 && !(allow_untextured && v.texture == UNTEXTURED_VISUAL_LAYER))
             || v.emissive > 1
     }) {
         return Err("Invalid detailed visual attributes");

@@ -1,0 +1,5 @@
+* -text
+source.vertices binary
+source-triangles.bin binary
+piece-indices.bin binary
+visual.bin binary

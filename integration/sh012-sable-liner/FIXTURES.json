@@ -1,0 +1,46 @@
+{
+  "sourceSha256": {
+    "assets/fleet/sh012/source.vertices": "97037db61ad219b6b4d937ff7c6e6f53b1b0048326b463667f293e2f273e70a9",
+    "assets/fleet/sh012/piece-indices.bin": "4a463a2709ab1593514ba4c7f6d6909b47f15273a7b8ac3ac4369f41ce2becd6",
+    "assets/legacy/sh028.physics": "cd54d30cab638f6b33feacf1fa78c9136f8ce346e8cc6133259bfc0472c259d5"
+  },
+  "opening": {
+    "triangleMetres": [
+      [
+        20,
+        0.85,
+        -0.15
+      ],
+      [
+        20,
+        1.15,
+        -0.15
+      ],
+      [
+        20,
+        1,
+        0.15
+      ]
+    ],
+    "hullTranslationX": 12,
+    "rimVertex": 194,
+    "rimPointMetres": [
+      16.4906331,
+      1.0,
+      6.9136843
+    ]
+  },
+  "station": {
+    "stationFace": 482,
+    "sourceVertex": 2334,
+    "actorX": 69.4,
+    "actorZ": [
+      161.82,
+      159.82
+    ],
+    "alignedZ": [
+      137.32,
+      135.32
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "detailed": {
+    "sourceFace": 4403,
+    "globalVertexIds": [
+      2248,
+      2250,
+      2251
+    ],
+    "weightNumeratorsOver12": [
+      0,
+      0,
+      12
+    ],
+    "oppositeNearestFace": 15,
+    "sampledMetres": 2.706031322026532,
+    "strictLowerMillimetres": 2705
+  },
+  "native": {
+    "sourceFace": 22,
+    "globalVertexIds": [
+      2317,
+      2318,
+      2322
+    ],
+    "weightNumeratorsOver12": [
+      3,
+      1,
+      8
+    ],
+    "oppositeNearestFace": 310,
+    "sampledMetres": 2.0234701746184682,
+    "strictLowerMillimetres": 2022
+  }
+}
