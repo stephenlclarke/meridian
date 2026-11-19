@@ -277,6 +277,11 @@ mod tests {
         assert_stock_minimum("Kite Interceptor", "SH031");
     }
 
+    #[test]
+    fn stock_stag_original_fits_actual_minimum_station_showroom_panes() {
+        assert_stock_minimum("Stag Liner", "SH035");
+    }
+
     fn assert_stock_minimum(name: &str, id: &str) {
         let frames = super::super::minimum_qualification::station_frames_for(name);
         for pair in frames {

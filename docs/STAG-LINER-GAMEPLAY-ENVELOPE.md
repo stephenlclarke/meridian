@@ -70,8 +70,18 @@ The pinned Studio Python loader and JSON round trip passed on the MBA.
 The installed signed macOS Studio then validated and exported that exact
 definition. All 26 support groups and seven sphere routes passed with no
 diagnostics. The output equals the input except for its final line feed.
-The per-hull Rust contact tests and a Stag Liner Showroom launch await
-their owned runs.
+Separate signed private inspection at `eef206f` visibly showed Stag in
+Compare and solo within its disposable profile. The ordinary stock
+renderer requires independent qualification; its tests and the per-hull contact
+tests await their owned runs in the joined development source.
 
 Regenerate with `python3 -B tools/prepare_stag_liner_studio.py`.
 Add `--check` to compare the committed definition byte for byte.
+
+## Ordinary stock Showroom
+
+In the joined development game, press 3 at a station and search **Stag Liner** or `SH035`. No local package flag is required. Compare initially retains the current owned hull, C changes to solo and Pin can compare Stag with Sparrowhawk or Kite. The `LOCAL:SH035` explicit inspection remains separate. Exchange is unavailable.
+
+The stock descriptor authenticates the exact reviewed JSON and its installed-qualified export projection (only the final LF is removed); the shared package validator and renderer consume the actual export bytes. All 10,476 original detailed corner positions, winding, normals and material attributes remain bound, including the 1,240 unmapped faces. The original 26.496 × 26.5 × 69.09 m dimensions are preserved in the uniform presentation fit; neither the native low-detail mesh nor another hull is substituted.
+
+The authored stock tests cover ordinary navigation between Stag, both earlier stock peers and the owned baseline; actual minimum panes; independently prepared exact RGB references, both orders and independently oriented duplicate panes with each peer. They do not repeat private Studio inspection, grant paid ownership, stock mass, new shield shimmer or a campaign encounter. [Stock integration criteria and owner commands](../integration/sh035-stock-showroom/CRITERIA.json)

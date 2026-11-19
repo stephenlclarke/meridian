@@ -142,6 +142,10 @@ pub(super) fn peregrine_sibling_compare_frames() -> [Frame; 4] {
 
 /// Actual ordinary Pin Baseline for both schema-stock identities, in both orders and duplicates.
 pub(super) fn stock_sparrowhawk_kite_compare_frames() -> [Frame; 4] {
+    stock_pair_compare_frames(("Sparrowhawk", "SH030"), ("Kite Interceptor", "SH031"))
+}
+
+pub(super) fn stock_pair_compare_frames(first: (&str, &str), second: (&str, &str)) -> [Frame; 4] {
     let directory = TestDirectory::new();
     let mut profile = open(&directory.0);
     assert!(ok(profile.new_commander(97031)));
@@ -151,10 +155,10 @@ pub(super) fn stock_sparrowhawk_kite_compare_frames() -> [Frame; 4] {
     let [width, height] = MIN_WINDOW_LOGICAL;
     let viewport = Viewport::new(width, height).unwrap_or_else(|| panic!("viewport"));
     let frames = [
-        ("Sparrowhawk", "Kite Interceptor", ["SH030", "SH031"]),
-        ("Kite Interceptor", "Sparrowhawk", ["SH031", "SH030"]),
-        ("Sparrowhawk", "Sparrowhawk", ["SH030", "SH030"]),
-        ("Kite Interceptor", "Kite Interceptor", ["SH031", "SH031"]),
+        (first.0, second.0, [first.1, second.1]),
+        (second.0, first.0, [second.1, first.1]),
+        (first.0, first.0, [first.1, first.1]),
+        (second.0, second.0, [second.1, second.1]),
     ]
     .map(|(baseline, selected, ids)| {
         for action in [
@@ -207,6 +211,27 @@ fn stock_sparrowhawk_kite_pin_actual_station_compare_in_both_orders_and_duplicat
             vec!["SH031", "SH031"]
         ]
     );
+}
+
+#[test]
+fn stock_stag_pins_with_each_stock_peer_in_both_orders_and_duplicates() {
+    for (name, id) in [("Sparrowhawk", "SH030"), ("Kite Interceptor", "SH031")] {
+        let frames = stock_pair_compare_frames(("Stag Liner", "SH035"), (name, id));
+        for (frame, expected) in
+            frames
+                .iter()
+                .zip([["SH035", id], [id, "SH035"], ["SH035", "SH035"], [id, id]])
+        {
+            assert_eq!(
+                frame
+                    .models
+                    .iter()
+                    .map(|model| model.object.as_str())
+                    .collect::<Vec<_>>(),
+                expected
+            );
+        }
+    }
 }
 
 #[test]

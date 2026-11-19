@@ -14,12 +14,20 @@ pub(crate) const KITE_GEOMETRY_KEY: &str =
 const KITE_PACKAGE: &[u8] =
     include_bytes!("../../../../integration/sh031-kite-interceptor/KITE-INTERCEPTOR-STUDIO.json");
 const KITE_FNV: u64 = 0x9209_a322_acda_f89d;
+pub(crate) const STAG_GEOMETRY_KEY: &str = "integration/sh035-stag-liner/STAG-LINER-STUDIO.json";
+const STAG_PACKAGE: &[u8] =
+    include_bytes!("../../../../integration/sh035-stag-liner/STAG-LINER-STUDIO.json");
+const STAG_FNV: u64 = 0x42ef_f6ef_984e_79ae;
+const STAG_EXPORT_FNV: u64 = 0x8004_d37c_b9ba_bc90;
 
 struct StockDescriptor {
     model: AvailableModel<'static>,
     name: &'static str,
     package: &'static [u8],
     fnv: u64,
+    /// Some installed Studio exports exactly omit the reviewed source's terminal LF.
+    /// When pinned, authenticate both representations and consume the actual export bytes.
+    export_fnv: Option<u64>,
 }
 
 // One descriptor registers a checked-in schema package throughout catalogue, visual lookup and cache.
@@ -32,6 +40,7 @@ const DESCRIPTORS: &[StockDescriptor] = &[
         name: "Sparrowhawk",
         package: SPARROWHAWK_PACKAGE,
         fnv: SPARROWHAWK_FNV,
+        export_fnv: None,
     },
     StockDescriptor {
         model: AvailableModel {
@@ -41,6 +50,17 @@ const DESCRIPTORS: &[StockDescriptor] = &[
         name: "Kite Interceptor",
         package: KITE_PACKAGE,
         fnv: KITE_FNV,
+        export_fnv: None,
+    },
+    StockDescriptor {
+        model: AvailableModel {
+            object: "SH035",
+            geometry_key: STAG_GEOMETRY_KEY,
+        },
+        name: "Stag Liner",
+        package: STAG_PACKAGE,
+        fnv: STAG_FNV,
+        export_fnv: Some(STAG_EXPORT_FNV),
     },
 ];
 pub(crate) const STOCK_MODELS: [AvailableModel<'static>; DESCRIPTORS.len()] = {
@@ -81,14 +101,37 @@ pub(crate) fn stock_visual_for(
     }
 }
 
-fn load_stock(descriptor: &StockDescriptor, bytes: &[u8]) -> Result<AuthoredVisual, String> {
+fn authenticated_package_bytes<'a>(
+    descriptor: &StockDescriptor,
+    bytes: &'a [u8],
+) -> Result<&'a [u8], String> {
     if fingerprint(bytes) != descriptor.fnv {
         return Err(format!(
             "{} immutable stock package changed",
             descriptor.model.object
         ));
     }
-    let package = HullPackage::from_json(bytes).map_err(|error| error.to_string())?;
+    if let Some(expected) = descriptor.export_fnv {
+        let export = bytes.strip_suffix(b"\n").ok_or_else(|| {
+            format!(
+                "{} qualified stock export projection missing",
+                descriptor.model.object
+            )
+        })?;
+        if fingerprint(export) != expected {
+            return Err(format!(
+                "{} qualified stock export changed",
+                descriptor.model.object
+            ));
+        }
+        return Ok(export);
+    }
+    Ok(bytes)
+}
+
+fn load_stock(descriptor: &StockDescriptor, bytes: &[u8]) -> Result<AuthoredVisual, String> {
+    let package = HullPackage::from_json(authenticated_package_bytes(descriptor, bytes)?)
+        .map_err(|error| error.to_string())?;
     if package.id() != descriptor.model.object || package.name() != descriptor.name {
         return Err(format!(
             "{} stock package identity changed",
@@ -215,6 +258,51 @@ mod tests {
     }
 
     #[test]
+    fn stock_stag_binds_qualified_export_original_corners_own_pieces_and_refuses_peer_payloads() {
+        let entry = descriptor("SH035");
+        let export = ok(authenticated_package_bytes(entry, STAG_PACKAGE));
+        assert_eq!(export.len(), 451470);
+        assert_eq!(fingerprint(export), STAG_EXPORT_FNV);
+        assert_eq!(
+            export,
+            STAG_PACKAGE
+                .strip_suffix(b"\n")
+                .unwrap_or_else(|| panic!("missing source LF"))
+        );
+        let package = ok(HullPackage::from_json(export));
+        assert_eq!(package, ok(HullPackage::from_json(STAG_PACKAGE)));
+        assert!(package.engineering.is_none());
+        let original = ok(meridian_core::stag_liner::StagLinerHullSource::bundled());
+        assert_eq!(
+            ok(package.pieces()).as_slice(),
+            original.pieces().as_slice()
+        );
+        let visual = ok(load_stock(entry, STAG_PACKAGE));
+        let packed = include_bytes!("../../../../assets/fleet/sh035/visual.bin");
+        assert_eq!(&packed[..8], b"STAGVIZ1");
+        assert_original_corners(&visual, packed, [0., 4.25, -1.545], 69.09, 10476, 1240);
+        for peer in ["SH030", "SH031"] {
+            let d = descriptor(peer);
+            assert!(load_stock(entry, d.package).is_err());
+            assert!(load_stock(d, STAG_PACKAGE).is_err());
+        }
+        assert!(
+            load_stock(
+                entry,
+                include_bytes!("../../../../assets/fleet/sh035/native-visual.bin")
+            )
+            .is_err()
+        );
+        assert!(
+            load_stock(entry, export).is_err(),
+            "raw source pin must hold even for raw export bytes"
+        );
+        let mut changed = STAG_PACKAGE.to_vec();
+        changed[0] ^= 1;
+        assert!(load_stock(entry, &changed).is_err());
+    }
+
+    #[test]
     fn stock_sparrowhawk_refuses_local_or_crossed_identity_and_geometry_key() {
         let mut stock = ModelPreview {
             object: "SH030".into(),
@@ -267,6 +355,38 @@ mod tests {
         ] {
             assert!(ok(stock_visual_for(&crossed)).is_none());
         }
+    }
+
+    #[test]
+    fn stock_and_explicit_local_stag_remain_independent_from_all_stock_peers() {
+        assert_stock_and_local("SH035", STAG_GEOMETRY_KEY);
+        let make = |id: &str, key: &str| ModelPreview {
+            object: id.into(),
+            geometry_key: key.into(),
+            bounds: Rect::new(0., 0., 200., 200.),
+            orientation: Orientation::default(),
+        };
+        let stag = make("SH035", STAG_GEOMETRY_KEY);
+        let original = ok(stock_visual_for(&stag)).unwrap_or_else(|| panic!("Stag"));
+        for (id, key) in [
+            ("SH030", SPARROWHAWK_GEOMETRY_KEY),
+            ("SH031", KITE_GEOMETRY_KEY),
+        ] {
+            let peer = make(id, key);
+            assert_ne!(
+                original.bytes(),
+                ok(stock_visual_for(&peer))
+                    .unwrap_or_else(|| panic!("peer"))
+                    .bytes()
+            );
+            assert!(ok(stock_visual_for(&make("SH035", key))).is_none());
+            assert!(ok(stock_visual_for(&make(id, STAG_GEOMETRY_KEY))).is_none());
+            assert!(std::ptr::eq(
+                original,
+                ok(stock_visual_for(&stag)).unwrap_or_else(|| panic!("Stag return"))
+            ));
+        }
+        assert!(ok(stock_visual_for(&make("LOCAL:SH035", STAG_GEOMETRY_KEY))).is_none());
     }
 
     fn assert_stock_and_local(id: &str, key: &str) {
