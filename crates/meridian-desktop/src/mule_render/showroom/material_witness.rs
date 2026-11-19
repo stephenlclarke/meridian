@@ -3,6 +3,15 @@ use super::{Hull, VisualVertex, visual_assets};
 
 const GLASS: [u8; 3] = [116, 191, 204];
 const EMITTER: [u8; 3] = [185, 235, 217];
+// Independent expected output of PR76's approved pale-floor rule. Do not derive
+// the oracle by calling the production paint function.
+pub(super) fn styled_rgb(raw: [u8; 3]) -> [u8; 3] {
+    match raw {
+        GLASS => [100, 175, 188],
+        EMITTER => [100, 150, 132],
+        _ => panic!("unexpected original material-only colour"),
+    }
+}
 type SourceRange = (usize, usize, [u8; 3], u32);
 // Half-open ranges extracted from original faceTextures/faceMaterials, not from visual.bin.
 const SABLE: &[SourceRange] = &[
@@ -66,6 +75,41 @@ fn joined_material_only_faces_match_independent_original_raw_colours() {
         assert_eq!(
             faces.iter().filter(|(_, _, rgb)| *rgb == EMITTER).count(),
             256
+        );
+    }
+}
+
+#[test]
+fn joined_material_only_paint_changes_only_rgb_to_independent_styled_values() {
+    for hull in [Hull::SableLiner, Hull::Gazelle] {
+        let raw_vertices =
+            visual_assets::load(hull.geometry_key()).unwrap_or_else(|error| panic!("{error}"));
+        for original in &raw_vertices {
+            let painted = original.with_display_paint();
+            assert_eq!(painted.color[3], original.color[3]);
+            assert_eq!(painted.position, original.position);
+            assert_eq!(painted.normal, original.normal);
+            assert_eq!(painted.uv, original.uv);
+            assert_eq!(painted.texture, original.texture);
+            assert_eq!(painted.emissive, original.emissive);
+        }
+        for (face_index, corners, raw) in material_faces(hull) {
+            let expected = styled_rgb(raw).map(|byte| f32::from(byte) / 255.0);
+            for (corner_index, original) in corners.into_iter().enumerate() {
+                let painted = original.with_display_paint();
+                assert_eq!(painted.color[..3], expected);
+                let raw_vertex = &raw_vertices[face_index * 3 + corner_index];
+                assert_eq!(
+                    bytemuck::bytes_of(raw_vertex),
+                    bytemuck::bytes_of(&original)
+                );
+            }
+        }
+        let reloaded =
+            visual_assets::load(hull.geometry_key()).unwrap_or_else(|error| panic!("{error}"));
+        assert_eq!(
+            bytemuck::cast_slice::<VisualVertex, u8>(&raw_vertices),
+            bytemuck::cast_slice::<VisualVertex, u8>(&reloaded)
         );
     }
 }

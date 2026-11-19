@@ -137,12 +137,29 @@ pub(super) struct Inputs<'a> {
     pub(super) visual: &'a [VisualVertex],
 }
 
+#[derive(Clone, Copy)]
+pub(super) enum VisualUpload {
+    Display,
+    #[cfg(all(test, target_os = "macos"))]
+    Raw,
+}
+
 impl Hardware {
     pub(super) fn new(
         device: &wgpu::Device,
         queue: &wgpu::Queue,
         format: wgpu::TextureFormat,
         inputs: Inputs<'_>,
+    ) -> Result<Self, String> {
+        Self::with_upload(device, queue, format, inputs, VisualUpload::Display)
+    }
+
+    pub(super) fn with_upload(
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        format: wgpu::TextureFormat,
+        inputs: Inputs<'_>,
+        upload: VisualUpload,
     ) -> Result<Self, String> {
         let Inputs {
             shader: shader_source,
@@ -353,9 +370,20 @@ impl Hardware {
         };
         let solid = pipeline(false);
         let shimmer = pipeline(true);
+        let uploaded: std::borrow::Cow<'_, [VisualVertex]> = match upload {
+            VisualUpload::Display => std::borrow::Cow::Owned(
+                visual
+                    .iter()
+                    .copied()
+                    .map(VisualVertex::with_display_paint)
+                    .collect(),
+            ),
+            #[cfg(all(test, target_os = "macos"))]
+            VisualUpload::Raw => std::borrow::Cow::Borrowed(visual),
+        };
         let vertices = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Original detailed triangles, materials and UVs"),
-            contents: bytemuck::cast_slice(visual),
+            contents: bytemuck::cast_slice(uploaded.as_ref()),
             usage: wgpu::BufferUsages::VERTEX,
         });
         Ok(Self {

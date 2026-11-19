@@ -40,7 +40,7 @@ pub fn contains_pulse(scene: &TrafficSnapshot, tick: u64, pulse: &PulseShot) -> 
         })
 }
 
-/// `ship` is the renderer's existing, decoded SH025 mesh, including its original colors.
+/// `ship` is the renderer's existing, decoded SH025 mesh, including its display finishes.
 /// This consumes a World projection; it never creates an actor or reconstructs a hit.
 pub fn append(
     snapshot: &Snapshot,

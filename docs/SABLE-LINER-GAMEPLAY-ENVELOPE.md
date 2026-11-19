@@ -39,8 +39,9 @@ order, with flat normals derived from the original winding and the
 original plum-gold face colours, emissivity and UVs. The established
 original patrol, strike and service-detail textures retain their exact
 identities. The 1,240 deliberately untextured faces use the unsigned
-`0xffffffff` marker. The production adapter uses exact face colour for that
-marker with the same colour-space conversion as the textured faces. The three
+`0xffffffff` marker. The shared shader uses the uploaded face colour for that
+marker with the same colour-space conversion as textured faces. Raw tests use
+the original colour; production uses the approved display finish below. The three
 original maps still use repeating UVs. SH001 and all three Goshawk hulls retain
 the strict textured-only decoder, with unknown layers and sentinel mutation
 refused.
@@ -107,7 +108,23 @@ python3 -B tools/verify_joined_material_faces.py --evidence /absolute/fresh/mate
 MERIDIAN_SH012_SH019_CACHE_DIR=/absolute/fresh/material-cache cargo test --locked -p meridian-desktop metal_sable_gazelle_cache_orders -- --ignored --nocapture
 ```
 
-This is raw-source qualification, not the separate PR76 richer display finish. PR76's current `f30c6a3` candidate changes colours only at GPU upload, leaving source decoding raw. If that finish is later joined, its current fallback maps these raw colours to [100, 175, 188] and [100, 150, 132]. Qualify the approved styled renderer on its distinct final head and separately preserve raw-source/grid evidence (use an explicitly raw upload for the raw test). Do not reinterpret the raw grid as styled evidence, change original asset bytes, or silently apply that paint transform in this join.
+## Richer display-finish join
+
+The separate PR76 `f30c6a3` display-finish parent is now composed with the raw PR87 `7ae40ef` source. Its paint policy is unchanged. Ordinary GPU vertex upload applies that finish exactly once; original asset decoding remains raw and the paint changes only RGB, preserving positions, normals, UVs, texture markers, emissive bits and alpha. The raw tests use an explicit Mac-test-only original upload, including the two raw pinned whole-model cache orders, rather than relying on the production styled path. Existing raw scripts, names and receipts are retained. Raw evidence from PR87 is historical and does not qualify the styled join.
+
+| Original material | Raw RGB | Styled RGB | SH012 faces | SH019 faces |
+| --- | --- | --- | ---: | ---: |
+| Glazing | 116, 191, 204 | 100, 175, 188 | 984 | 960 |
+| Emitter | 185, 235, 217 | 100, 150, 132 | 256 | 256 |
+
+The production styled grid renders each of the 2,456 original no-map faces with the original input colour and the normal display upload, not prepainted test vertices. Its independent verifier reads the original TOML and the fixed expected RGB table, then checks each actual styled PPM sample and receipt row. The styled pinned station cache test also captures both whole models in front, oblique, upper and aft poses and checks that both styled material colours are visible. Both actual Compare orders and solo returns must match independent full-target references. Native execution is required on the joined head; it is not claimed by the source tests.
+
+```bash
+cargo test --locked -p meridian-desktop joined_material_only_paint_changes_only_rgb_to_independent_styled_values
+MERIDIAN_SH012_SH019_STYLED_MATERIAL_DIR=/absolute/fresh/styled-faces cargo test --locked -p meridian-desktop metal_sable_gazelle_material_only_faces_exact_styled_rgb -- --ignored --nocapture
+MERIDIAN_SH012_SH019_STYLED_CACHE_DIR=/absolute/fresh/styled-cache cargo test --locked -p meridian-desktop metal_sable_gazelle_styled_cache_orders -- --ignored --nocapture
+python3 -B tools/verify_styled_material_faces.py --evidence /absolute/fresh/styled-faces --cache-evidence /absolute/fresh/styled-cache
+```
 
 ## Reproducing the surface measurements
 

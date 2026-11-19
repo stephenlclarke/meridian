@@ -118,6 +118,6 @@ python3 -B tools/verify_gazelle_fit.py
 python3 -B -m unittest discover -s tools -p 'test_audit_gazelle_surface.py' -v
 ```
 
-The joined Sable/Gazelle renderer uses one shared material-only shader but separate authenticated format policies. Its all-face raw RGB proof and both actual pinned station comparison orders are described in [joined material qualification](SABLE-LINER-GAMEPLAY-ENVELOPE.md#joined-material-only-rendering-and-later-finishes). The future PR76 display finish requires its own styled qualification and does not replace raw source evidence.
+The joined Sable/Gazelle renderer uses one shared material-only shader but separate authenticated format policies. Its all-face raw RGB proof and both actual pinned station comparison orders are described in [joined material qualification](SABLE-LINER-GAMEPLAY-ENVELOPE.md#joined-material-only-rendering-and-later-finishes). The [PR76 richer-finish join](SABLE-LINER-GAMEPLAY-ENVELOPE.md#richer-display-finish-join) retains separate raw evidence and qualifies production styled RGB for all 1,216 Gazelle material-only faces and actual station comparisons.
 
 [Source, owned Rust and Metal criteria](../integration/sh019-gazelle/CRITERIA.json)

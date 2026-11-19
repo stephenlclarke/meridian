@@ -691,7 +691,7 @@ fn metal_sable_liner_untextured_face_uses_exact_source_colour() {
             ..original
         });
     let no_pieces = [<Triangle as bytemuck::Zeroable>::zeroed()];
-    let hardware = ok(renderer::Hardware::new(
+    let hardware = ok(renderer::Hardware::with_upload(
         &device.device,
         &device.queue,
         FORMAT,
@@ -701,6 +701,7 @@ fn metal_sable_liner_untextured_face_uses_exact_source_colour() {
             points: &no_pieces,
             visual: &vertices,
         },
+        renderer::VisualUpload::Raw,
     ));
     let mut uniforms = <Uniforms as bytemuck::Zeroable>::zeroed();
     uniforms.projection = [1.0, 1.0, 0.1, 128.0];

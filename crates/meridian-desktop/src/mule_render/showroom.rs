@@ -322,11 +322,31 @@ impl Pass {
         format: wgpu::TextureFormat,
         hull: Hull,
     ) -> Result<Self, String> {
+        Self::for_hull_upload(device, queue, format, hull, gpu::VisualUpload::Display)
+    }
+
+    #[cfg(all(test, target_os = "macos"))]
+    pub(crate) fn for_hull_raw(
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        format: wgpu::TextureFormat,
+        hull: Hull,
+    ) -> Result<Self, String> {
+        Self::for_hull_upload(device, queue, format, hull, gpu::VisualUpload::Raw)
+    }
+
+    fn for_hull_upload(
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        format: wgpu::TextureFormat,
+        hull: Hull,
+        upload: gpu::VisualUpload,
+    ) -> Result<Self, String> {
         let vertices = visual_assets::load(hull.geometry_key())?;
         let supports = hull.supports()?;
         let draw_count =
             u32::try_from(vertices.len()).map_err(|_| "Goshawk visual count overflow")?;
-        let hardware = gpu::Hardware::new(
+        let hardware = gpu::Hardware::with_upload(
             device,
             queue,
             format,
@@ -336,6 +356,7 @@ impl Pass {
                 points: &supports.triangles,
                 visual: &vertices,
             },
+            upload,
         )?;
         // The pieces are immutable for the lifetime of this hull-bound pass. Only the header
         // changes with orientation and viewport, so each hull's exact pieces are uploaded once.
@@ -650,6 +671,45 @@ mod tests {
         ] {
             assert_eq!(Hull::from_model(&model), None);
             assert!(!matches(&model));
+        }
+    }
+}
+
+#[cfg(test)]
+mod display_paint_tests {
+    use super::*;
+    #[test]
+    fn original_materials_and_painted_vertices_are_distinct_for_each_hull() {
+        for (vertices, source, finish) in [
+            (super::super::visual(), [214, 217, 211], [45, 112, 124]),
+            (
+                visual_assets::load(Hull::Explorer.geometry_key()),
+                [75, 117, 101],
+                [39, 126, 83],
+            ),
+            (
+                visual_assets::load(Hull::Custom.geometry_key()),
+                [75, 117, 101],
+                [39, 126, 83],
+            ),
+        ] {
+            let vertices = vertices.unwrap_or_else(|error| panic!("{error}"));
+            let rgb = |channels: [u8; 3]| channels.map(|c| f32::from(c) / 255.0);
+            let mut matching = 0;
+            for v in vertices {
+                let painted = v.with_display_paint();
+                if v.color[..3] == rgb(source) {
+                    assert_eq!(painted.color[..3], rgb(finish));
+                    matching += 1;
+                }
+                assert_eq!(v.position, painted.position);
+                assert_eq!(v.normal, painted.normal);
+                assert_eq!(v.uv, painted.uv);
+                assert_eq!(v.texture, painted.texture);
+                assert_eq!(v.emissive, painted.emissive);
+                assert_eq!(v.color[3], painted.color[3]);
+            }
+            assert!(matching > 0);
         }
     }
 }

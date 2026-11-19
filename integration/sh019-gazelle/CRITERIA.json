@@ -155,6 +155,14 @@
     "portable": ["joined_visual_policies_reject_crossed_markers_and_textured_only_hulls", "joined_material_only_faces_match_independent_original_raw_colours", "joined_material_hulls_pin_actual_station_compare_in_both_orders"],
     "scope": "Separate per-format no-map markers, all 2,456 combined original no-map faces independently tested at raw RGB; both actual station cache orders. See SH012 criteria for raw face counts and separate later PR76 styled qualification. No styling transform introduced here."
   },
+  "styledFinishJoin": {
+    "parents": ["7ae40ef3cf7f3eda5e35242a7da2a5cecbb30914", "f30c6a31962b5175798be9353dda049b53ccd0aa"],
+    "portable": "joined_material_only_paint_changes_only_rgb_to_independent_styled_values",
+    "material": {"test": "mule_render::showroom::metal_qualification::joined_material_qualification::metal_sable_gazelle_material_only_faces_exact_styled_rgb", "directoryVariable": "MERIDIAN_SH012_SH019_STYLED_MATERIAL_DIR"},
+    "cache": {"test": "mule_render::showroom::metal_qualification::joined_material_qualification::metal_sable_gazelle_styled_cache_orders", "directoryVariable": "MERIDIAN_SH012_SH019_STYLED_CACHE_DIR"},
+    "independentVerifier": "python3 -B tools/verify_styled_material_faces.py --evidence <styled-material-directory> --cache-evidence <styled-cache-directory>",
+    "scope": "Actual production styled material grid, both actual sibling pane orders, visible styled poses and independent raw-to-styled expected values. PR76 paint implementation is unchanged, raw source and explicit raw test upload retained separately. Native combined execution required."
+  },
   "remaining": [
     "Owned Rust, native Metal and native exact collision qualification.",
     "Ordinary actor placement, acquisition, role/crew/cargo/equipment, physical mass properties and loaded engineering.",

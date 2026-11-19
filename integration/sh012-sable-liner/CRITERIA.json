@@ -86,6 +86,19 @@
       "shaderSha256": "09d9ed0564695824d7499c5e60adfdafa8009409a34484b64e2f3568108294e7",
       "patchSha256": "726099ae5f76cd9a3eb6de10482b7b619557985d4d79c328885be68a284cf3b6",
       "archiveSha256": "a60a62be74b8f1e56a06fcc838f7ce76ddef6b0de19792db9a9662433f141243"
+    },
+    "styledFinishJoin": {
+      "parents": ["7ae40ef3cf7f3eda5e35242a7da2a5cecbb30914", "f30c6a31962b5175798be9353dda049b53ccd0aa"],
+      "paintPolicySha256": "a220b92718498a45fd3e04da95371f905c8347947ac49dcac003508632400965",
+      "rawVerifierSha256": "f114008abf4d1799129d6bf926548c394612889f1a8192c192570fd0066b8208",
+      "styledVerifierSha256": "276d42b91dd05822cda49c04a89660081ad82774755fbd6fd18e6a5fcda0d9e6",
+      "independentRgbMapping": {"116,191,204": [100, 175, 188], "185,235,217": [100, 150, 132]},
+      "portable": ["original_materials_and_painted_vertices_are_distinct_for_each_hull", "joined_material_only_paint_changes_only_rgb_to_independent_styled_values", "joined_visual_policies_reject_crossed_markers_and_textured_only_hulls"],
+      "styledMaterialDirectoryVariable": "MERIDIAN_SH012_SH019_STYLED_MATERIAL_DIR",
+      "styledCacheDirectoryVariable": "MERIDIAN_SH012_SH019_STYLED_CACHE_DIR",
+      "metal": ["metal_sable_gazelle_material_only_faces_exact_styled_rgb", "metal_sable_gazelle_styled_cache_orders"],
+      "styledVerifier": "python3 -B tools/verify_styled_material_faces.py --evidence <styled-material-directory> --cache-evidence <styled-cache-directory>",
+      "scope": "Production display upload, all 2,456 original material-only faces and actual pinned station comparisons and visible whole-hull poses. Original attributes unchanged except uploaded RGB. Original raw tests explicitly use Mac-test-only raw upload and distinct evidence directories; the raw parent evidence does not qualify this styled head."
     }
   },
   "air": {

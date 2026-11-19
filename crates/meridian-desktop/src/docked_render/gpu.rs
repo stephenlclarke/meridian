@@ -28,6 +28,8 @@ pub struct Pass {
     format: wgpu::TextureFormat,
     goshawk: Vec<showroom::Pass>,
     goshawk_active: [Option<usize>; MAX_MODELS],
+    #[cfg(all(test, target_os = "macos"))]
+    raw_showroom: bool,
 }
 impl Pass {
     pub fn new(
@@ -199,7 +201,34 @@ impl Pass {
             format,
             goshawk: Vec::with_capacity(showroom::Hull::COUNT * MAX_MODELS),
             goshawk_active: [None; MAX_MODELS],
+            #[cfg(all(test, target_os = "macos"))]
+            raw_showroom: false,
         })
+    }
+
+    /// Raw original-hull evidence only; ordinary renderer construction always uses the display finish.
+    #[cfg(all(test, target_os = "macos"))]
+    pub(crate) fn new_raw_showroom(
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        format: wgpu::TextureFormat,
+    ) -> Result<Self, String> {
+        let mut pass = Self::new(device, queue, format)?;
+        pass.raw_showroom = true;
+        Ok(pass)
+    }
+
+    fn original_pass(
+        &self,
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        hull: showroom::Hull,
+    ) -> Result<showroom::Pass, String> {
+        #[cfg(all(test, target_os = "macos"))]
+        if self.raw_showroom {
+            return showroom::Pass::for_hull_raw(device, queue, self.format, hull);
+        }
+        showroom::Pass::for_hull(device, queue, self.format, hull)
     }
     pub fn prepare(
         &mut self,
@@ -255,12 +284,8 @@ impl Pass {
                             );
                         }
                         let index = self.goshawk.len();
-                        self.goshawk.push(showroom::Pass::for_hull(
-                            device,
-                            queue,
-                            self.format,
-                            hull,
-                        )?);
+                        let pass = self.original_pass(device, queue, hull)?;
+                        self.goshawk.push(pass);
                         index
                     }
                 };

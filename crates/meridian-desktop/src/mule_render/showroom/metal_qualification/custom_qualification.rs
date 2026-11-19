@@ -29,6 +29,45 @@ impl<'a> Capture<'a> {
         output: &'a Path,
         object: &'static str,
     ) -> Self {
+        Self::with_docked(
+            gpu,
+            target,
+            output,
+            object,
+            ok(crate::docked_render::Pass::new(
+                &gpu.device,
+                &gpu.queue,
+                FORMAT,
+            )),
+        )
+    }
+
+    pub(super) fn new_raw(
+        gpu: &'a Gpu,
+        target: &'a Target,
+        output: &'a Path,
+        object: &'static str,
+    ) -> Self {
+        Self::with_docked(
+            gpu,
+            target,
+            output,
+            object,
+            ok(crate::docked_render::Pass::new_raw_showroom(
+                &gpu.device,
+                &gpu.queue,
+                FORMAT,
+            )),
+        )
+    }
+
+    fn with_docked(
+        gpu: &'a Gpu,
+        target: &'a Target,
+        output: &'a Path,
+        object: &'static str,
+        docked: crate::docked_render::Pass,
+    ) -> Self {
         Self {
             object,
             gpu,
@@ -38,11 +77,7 @@ impl<'a> Capture<'a> {
                 origin: wgpu::Origin3d::ZERO,
                 extent: target.extent,
             },
-            docked: ok(crate::docked_render::Pass::new(
-                &gpu.device,
-                &gpu.queue,
-                FORMAT,
-            )),
+            docked,
             panes: String::from("image\tship\tx\ty\twidth\theight\tpitch\troll\tyaw\n"),
             measurements: String::from(
                 "image\tship\tgeometry_key\tnonblack_pixels\tminimum_gutter_logical\n",
@@ -214,6 +249,15 @@ impl<'a> Capture<'a> {
 
 pub(super) fn original_pass(gpu: &Gpu, hull: Hull) -> showroom::Pass {
     ok(showroom::Pass::for_hull(
+        &gpu.device,
+        &gpu.queue,
+        FORMAT,
+        hull,
+    ))
+}
+
+pub(super) fn original_pass_raw(gpu: &Gpu, hull: Hull) -> showroom::Pass {
+    ok(showroom::Pass::for_hull_raw(
         &gpu.device,
         &gpu.queue,
         FORMAT,

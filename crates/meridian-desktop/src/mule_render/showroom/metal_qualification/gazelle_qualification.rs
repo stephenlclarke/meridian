@@ -1,7 +1,7 @@
 //! SH019 production minimum viewport and cross-hull GPU cache evidence.
 use super::{
     Crop, FORMAT, LOGICAL, MIN_WINDOW_LOGICAL, SCALE, Target,
-    custom_qualification::{Capture, original_pass},
+    custom_qualification::{Capture, original_pass, original_pass_raw},
     metal_gpu, ok, output_directory, showroom_models,
 };
 use crate::mule_render::showroom::{
@@ -15,7 +15,7 @@ fn metal_gazelle_untextured_materials() {
     let output = output_directory("MERIDIAN_SH019_MATERIAL_DIR");
     let gpu = metal_gpu(Hull::Gazelle, false);
     let target = Target::new(&gpu.device, LOGICAL);
-    let mut pass = original_pass(&gpu, Hull::Gazelle);
+    let mut pass = original_pass_raw(&gpu, Hull::Gazelle);
     let [front, oblique, upper] = showroom_models(Hull::Gazelle);
     let mut aft = front.clone();
     aft.orientation.yaw += std::f64::consts::PI;
