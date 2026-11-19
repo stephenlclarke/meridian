@@ -381,6 +381,17 @@ impl OriginalStationData {
         Ok(pose)
     }
 
+    /// Qualifies explicit SH030 motion against the original SH028 source triangles.
+    pub fn sparrowhawk_motion_clear(
+        &self,
+        source: &crate::sparrowhawk::SparrowhawkHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces(), start, end, angular_travel)
+    }
+
     /// In the player's translating frame, the stationary Mule sweeps against the
     /// original SH025 triangles from the opening pose. Bound the player rotation
     /// by inflating the separating certificates with its maximum point travel.

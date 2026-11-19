@@ -1,0 +1,118 @@
+{
+  "hull": "SH030 Sparrowhawk",
+  "status": "AUTHORED_CONTROLLED_SOURCE;OWNED_RUST_AND_NATIVE_PENDING",
+  "source": "assets/fleet/sh030/SOURCE-GEOMETRY.json",
+  "geometryTests": [
+    "sparrowhawk_original_detailed_and_native_faces_share_complete_local_supports",
+    "sparrowhawk_sweeps_clear_the_bow_underslab_and_dorsal_channels_and_contact_solid_sources",
+    "sparrowhawk_original_sh028_aligned_crossing_clears_before_offset_native_lip_contact"
+  ],
+  "originalVisualCorners": {
+    "detailed": 9324,
+    "native": 648
+  },
+  "originalUnmappedFaces": {
+    "detailed": 1216,
+    "native": 16,
+    "selector": 4294967295
+  },
+  "originalTextures": {
+    "assets/fleet/sh001/l337-patrol-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "9699517d12b4fbbb28746e00bed9ee65c19a098d14402b1d5160280c6f6bfc54",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-patrol-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-strike-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "e56f149228caf90237a652d720ae549768bde1056af3d903dc8a5c243ad26e97",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-strike-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-service-details.rgba": {
+      "bytes": 4194304,
+      "sha256": "35edd84f6ce527195dd8a9bcc039521a6efc5aa2333452bbbc30217b8372103d",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-service-details.rgba",
+      "license": "MIT"
+    }
+  },
+  "nativeFaceCompliance": {
+    "sourceFaces": 216,
+    "contractMaximum": 512,
+    "state": "ORIGINAL_WITHIN_CONTRACT_LIMIT"
+  },
+  "legacyMetreAuthority": {
+    "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+    "files": [
+      {
+        "path": "Sources/L337Core/OriginalSparrowhawkActivation.swift",
+        "artifact": "integration/sh030-sparrowhawk/LEGACY-ACTIVATION.swift.txt",
+        "sha256": "71eff382629043fe501ee0ba7a271120fcbba3656ddf17baeab25800b6315d4d"
+      },
+      {
+        "path": "Sources/L337Core/OriginalHullPhysicalContract.swift",
+        "artifact": "integration/sh030-sparrowhawk/LEGACY-PHYSICAL-CONTRACT.swift.txt",
+        "sha256": "2c68d8d51acdd469faa25124bcc19027aec1a8f747eb267da2e84e5a98e3c027"
+      }
+    ]
+  },
+  "stockMass": "UNASSIGNED",
+  "air": {
+    "hostname": "SteveMBA",
+    "topologyUtc": "2026-11-19T09:46:23Z",
+    "fitStartUtc": "2026-11-19T09:48:43Z",
+    "fitEndUtc": "2026-11-19T09:48:46Z",
+    "witnessStartUtc": "2026-11-19T09:49:06Z",
+    "witnessEndUtc": "2026-11-19T09:49:06Z",
+    "reports": {
+      "SURFACE-FIT.json": "d830dd435e0c1c76416f65fbe8ca625d8b809f4c12b30f971bc23c57f929bb59",
+      "CONTACT-RESULT.json": "c764e6a1dd8d926fbdf6a4b07553969873d38a96c4e6680491cf016ab0a7aa12",
+      "ORIGINAL-DIFFERENCE.json": "efeaa3d98b4f50c4d6139105757e5e787d11948ead327ad2aa436f66a414e11c"
+    }
+  },
+  "independentReplay": {
+    "tools": {
+      "tools/measure_sparrowhawk_air.py": "f46c467c327d51a0d3d80c7e8f97fc3b7fd4f200e538826dd644023999c4e7b0",
+      "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+      "tools/prepare_sparrowhawk_geometry.py": "8ed5ca00847a53182033935b05cc5c9a270260de6a2d05bfaf202466847add9c",
+      "tools/verify_sparrowhawk_geometry.py": "be47bac5cccb66f7cae230fbef1c024c988bf992e6013632785240c578825a92",
+      "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+      "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+      "tools/prepare_sparrowhawk_studio.py": "7cf4bae01120ca4c3480841cefbe301395105e5eaee5ac37d121f74fafdf98d6"
+    },
+    "fixtures": {
+      "integration/sh030-sparrowhawk/FIXTURES.json": "0d51cb9da5cf10d23b01216fa8ff8b8846cc0e9edf89af840e4dcbfc77f443b3"
+    },
+    "reproduce": [
+      "python3 -B tools/measure_sparrowhawk_air.py | cmp - integration/sh030-sparrowhawk/SURFACE-FIT.json",
+      "python3 -B tools/measure_sparrowhawk_air.py --difference | cmp - integration/sh030-sparrowhawk/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/verify_sparrowhawk_geometry.py | cmp - integration/sh030-sparrowhawk/CONTACT-RESULT.json",
+      "python3 -B tools/prepare_sparrowhawk_studio.py --check"
+    ],
+    "fitDependencies": {
+      "python": "3.14.3 (assertions enabled)",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "hostContactPython": "3.14.3",
+    "byteReplay": {
+      "hostname": "SteveMBA",
+      "startedUtc": "2026-11-19T09:51:11Z",
+      "finishedUtc": "2026-11-19T09:51:16Z",
+      "logSha256": "7f3355859a2a98cf794588c7f8b25c331eac0d75a9fddc98a62d27491a8c26de"
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh030-sparrowhawk/SPARROWHAWK-STUDIO.json",
+    "sha256": "623d68f3936be2bdcbdf632f49a14c6fb65f29a9e214ba8cca5c9f3c680ee2de",
+    "schema": 1,
+    "probeCount": 6,
+    "probeRadiusMetres": 0.1,
+    "loaderRevision": "7e3234540b6cf1dd6b3c2b4ea83bb76ea507a9c8",
+    "loaderSource": "tools/hull_studio/definitions.py",
+    "loaderSha256": "f68ea0f442267b793338af6ebec6a937f9e1ee3946dc9be96e58db3e2a796e43",
+    "state": "PYTHON_DEFINITION_LOADER_AND_BYTE_REPLAY_PASS;RUST_VALIDATOR_AND_SHOWROOM_PENDING"
+  }
+}
