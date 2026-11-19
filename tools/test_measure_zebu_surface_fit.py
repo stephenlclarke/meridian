@@ -1,6 +1,6 @@
 """Verify the original SH036 fit adapter and bounded surface certificate."""
 from contextlib import redirect_stdout
-from io import StringIO
+from io import BytesIO, TextIOWrapper
 import json
 from pathlib import Path
 import shutil
@@ -76,12 +76,13 @@ class ZebuFitTests(unittest.TestCase):
         with patch.object(zebu.fit, 'audit_fan', side_effect=AssertionError('invalid fan')), self.assertRaisesRegex(ValueError, 'Could not certify radial fan'):
             zebu.build_pieces(np.zeros((4,3)), ['invalid'], [np.arange(4)])
 
-    def test_cli_selects_report_modes(self):
+    def test_cli_selects_report_modes_and_writes_canonical_lf(self):
         for flags, operation, expected in (([], 'audit', [False]), (['--samples-only'], 'audit', [True]), (['--difference'], 'original_difference', [])):
-            with self.subTest(flags=flags), patch('sys.argv', ['fit'] + flags), patch.object(zebu, operation, return_value={'passed': True}) as run, redirect_stdout(StringIO()) as stdout:
+            with self.subTest(flags=flags), patch('sys.argv', ['fit'] + flags), patch.object(zebu, operation, return_value={'passed': True}) as run, BytesIO() as raw, TextIOWrapper(raw, encoding='utf-8', newline='\r\n') as stdout, redirect_stdout(stdout):
                 zebu.main()
                 run.assert_called_once_with(*expected)
-                self.assertEqual(json.loads(stdout.getvalue()), {'passed': True})
+                stdout.flush()
+                self.assertEqual(raw.getvalue(), b'{\n  "passed": true\n}\n')
 
 
 if __name__ == '__main__':

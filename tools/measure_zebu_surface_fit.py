@@ -4,6 +4,7 @@ import hashlib
 import json
 import math
 import struct
+import sys
 
 import numpy as np
 import trimesh
@@ -133,7 +134,9 @@ def main():
     parser.add_argument('--difference', action='store_true', help='Direct original-to-original vertex distance witness')
     parser.add_argument('--samples-only', action='store_true', help='Diagnostic exposed samples without upper bound')
     args = parser.parse_args()
-    print(json.dumps(original_difference() if args.difference else audit(args.samples_only), indent=2))
+    report = original_difference() if args.difference else audit(args.samples_only)
+    # Emit canonical UTF-8/LF bytes instead of the host's text-mode newlines.
+    sys.stdout.buffer.write((json.dumps(report, indent=2) + '\n').encode('utf-8'))
 
 
 if __name__ == '__main__':

@@ -1,9 +1,11 @@
 """Verify SH036 fixed-orientation physical crossing and source-pinning controls."""
 from contextlib import redirect_stdout
-from io import StringIO
+from io import BytesIO, TextIOWrapper
 import json
 from pathlib import Path
 import runpy
+import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -25,10 +27,17 @@ class ZebuStationTests(unittest.TestCase):
         self.assertAlmostEqual(sum(crossing['barycentrics']), 1)
         self.assertEqual(report, json.loads(FIXTURE.with_name('STATION-RESULT.json').read_bytes()))
 
-    def test_cli_prints_identical_exact_result(self):
-        with redirect_stdout(StringIO()) as stdout:
+    def test_cli_emits_canonical_lf_under_redirected_text_translation(self):
+        expected = FIXTURE.with_name('STATION-RESULT.json').read_bytes()
+        # Windows redirected stdout translates text LF to CRLF. Simulate that
+        # boundary even on a developer host that usually leaves LF unchanged.
+        with BytesIO() as raw, TextIOWrapper(raw, encoding='utf-8', newline='\r\n') as stdout, redirect_stdout(stdout):
             runpy.run_module('verify_zebu_station', run_name='__main__')
-        self.assertEqual(stdout.getvalue().encode(), FIXTURE.with_name('STATION-RESULT.json').read_bytes())
+            stdout.flush()
+            self.assertEqual(raw.getvalue(), expected)
+        result = subprocess.run([sys.executable, '-B', str(ROOT / 'tools/verify_zebu_station.py')], capture_output=True, check=True)
+        self.assertEqual(result.stdout, expected)
+        self.assertEqual(result.stderr, b'')
 
     def test_changed_original_station_bytes_are_refused(self):
         with tempfile.TemporaryDirectory() as temporary:

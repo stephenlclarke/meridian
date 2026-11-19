@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import struct
+import sys
 
 from prepare_zebu_studio import COUNTS, NAMES, require
 
@@ -89,4 +90,5 @@ def verify(root=ROOT, fixture=FIXTURE):
 
 
 if __name__ == '__main__':
-    print(json.dumps(verify(), indent=2))
+    # The committed report is hashed as UTF-8/LF, even under Windows redirection.
+    sys.stdout.buffer.write((json.dumps(verify(), indent=2) + '\n').encode('utf-8'))
