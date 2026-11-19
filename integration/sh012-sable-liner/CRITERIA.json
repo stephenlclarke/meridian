@@ -52,14 +52,32 @@
       "all_goshawk_visuals_still_reject_untextured_and_unknown_layers",
       "source_selection_requires_matching_ship_id_and_geometry_key",
       "original_showroom_cache_reuses_only_the_same_hull_and_unused_pane",
-      "own_pane_and_full_union_reject_black_gutter_wrong_pane_and_rgb"
+      "own_pane_and_full_union_reject_black_gutter_wrong_pane_and_rgb",
+      "joined_visual_policies_reject_crossed_markers_and_textured_only_hulls",
+      "joined_material_only_faces_match_independent_original_raw_colours",
+      "joined_material_hulls_pin_actual_station_compare_in_both_orders"
     ],
     "metalOwnerTests": [
       "metal_sable_liner_untextured_face_uses_exact_source_colour",
       "metal_sable_liner_same_pose_shimmer",
-      "metal_sable_liner_minimum_showroom_model_pass"
+      "metal_sable_liner_minimum_showroom_model_pass",
+      "metal_sable_gazelle_material_only_faces_exact_raw_rgb",
+      "metal_sable_gazelle_cache_orders"
     ],
     "minimumRgbReceipt": "MERIDIAN_SH012_MINIMUM_DIR/rgb-qualification.tsv; exact full-target RGB union, black outside panes and two logical pixels minimum clearance",
+    "joinedMaterialPolicy": {
+      "parents": ["7e68b7a74b6354de261064e5c61643ac69a8cd2f", "dab6eb6836a1047e8ba841a0cf01f2ee199322e3"],
+      "shaderSha256": "16ac374a449adf428a7cd37ea89d8aac452039708141f4613f5d4d1b986aa97a",
+      "verifierSha256": "f114008abf4d1799129d6bf926548c394612889f1a8192c192570fd0066b8208",
+      "formats": {"SBLRVIZ1": 4294967295, "SH019VZ1": 3},
+      "rawMaterialRgb": {"glazing": [116, 191, 204], "emitter": [185, 235, 217]},
+      "rawMaterialFaceCounts": {"SH012": [984, 256], "SH019": [960, 256]},
+      "materialDirectoryVariable": "MERIDIAN_SH012_SH019_MATERIAL_DIR",
+      "cacheDirectoryVariable": "MERIDIAN_SH012_SH019_CACHE_DIR",
+      "independentVerifier": "python3 -B tools/verify_joined_material_faces.py --evidence <material-directory>",
+      "scope": "All original material-only faces, each independent raw pixel and both pinned station cache orders; raw source renderer only. Earlier Air and separate parent native receipts remain historical.",
+      "laterStyledQualification": "PR76 f30c6a3 GPU upload finish remains separate; current proposed styled RGB [100,175,188] and [100,150,132] must be checked against the final approved paint policy, with raw source bytes and explicitly raw qualification retained."
+    },
     "airMaterialCheck": {
       "host": "SteveMBA",
       "startUtc": "2026-11-19T07:37:38Z",

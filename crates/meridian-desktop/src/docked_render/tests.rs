@@ -312,6 +312,43 @@ fn selecting_sable_liner_routes_its_original_solo_and_compare_without_exchange()
     assert_showroom_selection("Sable Liner", "SH012", "assets/fleet/sh012/visual.bin");
 }
 
+#[test]
+fn selecting_gazelle_routes_its_own_preview_without_granting_exchange() {
+    assert_showroom_selection("Gazelle Explorer", "SH019", "assets/fleet/sh019/visual.bin");
+}
+
+#[test]
+fn selecting_onager_does_not_select_gazelle_or_its_geometry() {
+    use crate::docked_screens::{Catalogue, DockedScreens, Input, Key, Outcome, Screen, Viewport};
+    let world = meridian_core::World::new_commander(95006).unwrap_or_else(|e| panic!("{e}"));
+    let catalogue = Catalogue::bundled().unwrap_or_else(|e| panic!("{e}"));
+    let ctx = context(&world, &catalogue);
+    let viewport = Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));
+    let mut ui = DockedScreens::new(meridian_core::navigation::SystemId::AVENOR, "SH025");
+    ui.open(Screen::Showroom);
+    let frame = ui.frame(&ctx, viewport);
+    assert!(matches!(
+        ui.handle(Input::Key(Key::Search), &frame, &ctx),
+        Outcome::Updated
+    ));
+    let frame = ui.frame(&ctx, viewport);
+    assert!(matches!(
+        ui.handle(Input::Text("Onager".into()), &frame, &ctx),
+        Outcome::Updated
+    ));
+    assert_eq!(ui.selected_ship(), "SH018");
+    let frame = ui.frame(&ctx, viewport);
+    assert!(matches!(
+        ui.handle(Input::Key(Key::Confirm), &frame, &ctx),
+        Outcome::Updated
+    ));
+    let frame = ui.frame(&ctx, viewport);
+    assert!(
+        frame.models.iter().all(|model| model.object != "SH019"
+            && model.geometry_key != "assets/fleet/sh019/visual.bin")
+    );
+}
+
 fn assert_showroom_selection(query: &str, object: &str, geometry_key: &str) {
     use crate::docked_screens::{Catalogue, DockedScreens, Input, Key, Outcome, Screen, Viewport};
     let world = meridian_core::World::new_commander(95006).unwrap_or_else(|e| panic!("{e}"));

@@ -38,7 +38,7 @@ def encode_for_hull(source, points, triangles, spec):
                         (spec.detailed_vertices, spec.native_vertices, spec.detailed_faces), spec.visual_magic)
 
 
-def encode_model(model, points, triangles, source_magic, counts, visual_magic):
+def encode_model(model, points, triangles, source_magic, counts, visual_magic, *, allow_untextured=False):
     detailed_vertices, native_vertices, face_count = counts
     if (len(model["vertices"]), len(model["faces"])) != (detailed_vertices, face_count):
         raise ValueError("Changed detailed face set")
@@ -60,14 +60,19 @@ def encode_model(model, points, triangles, source_magic, counts, visual_magic):
         b = [q - p for p, q in zip(vertices[0], vertices[2], strict=True)]
         normal = [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]
         length = math.sqrt(sum(n*n for n in normal))
-        if length <= 0 or not math.isfinite(length) or not 0 <= mapping["texture"] < len(TEXTURES):
+        texture = mapping["texture"]
+        if allow_untextured and texture == -1:
+            texture = len(TEXTURES)  # Explicit no-map sentinel, not a fourth texture.
+        elif not 0 <= texture < len(TEXTURES):
+            raise ValueError("Invalid original face")
+        if length <= 0 or not math.isfinite(length):
             raise ValueError("Invalid original face")
         material = model["materials"][material_index]
         color = [(material["colour"] >> shift & 255) / 255 for shift in (24, 16, 8, 0)]
         for vertex, uv in zip(vertices, mapping["uv"], strict=True):
             output.extend(struct.pack(
                 "<12fII", *vertex, *(n / length for n in normal), *color, *uv,
-                mapping["texture"], int(material["emissive"])
+                texture, int(material["emissive"])
             ))
     return bytes(output)
 

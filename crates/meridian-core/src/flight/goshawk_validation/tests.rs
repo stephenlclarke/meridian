@@ -423,3 +423,136 @@ fn custom_world_enforces_own_r3_speed_and_snapshot_scope() -> Result<(), Box<dyn
     }
     Ok(())
 }
+
+#[test]
+fn gazelle_world_approach_reports_its_own_physical_contacts_and_entry() -> Result<(), Box<dyn Error>>
+{
+    let closer_observer = FlightStart {
+        position: [0.0, 0.0, 360.0],
+        ..OBSERVER
+    };
+    let cases = [
+        (
+            "gazelle-aligned",
+            OBSERVER,
+            inbound(0.0, 220.0, 4.0),
+            Status::Entered,
+        ),
+        (
+            "gazelle-overspeed",
+            OBSERVER,
+            inbound(0.0, 220.0, 9.0),
+            Status::EntryConditions,
+        ),
+        (
+            "gazelle-lip",
+            OBSERVER,
+            inbound(69.62, 220.0, 12.0),
+            Status::StationContact,
+        ),
+        (
+            "gazelle-off-aperture",
+            OBSERVER,
+            inbound(100.0, 220.0, 4.0),
+            Status::EntryConditions,
+        ),
+        (
+            "gazelle-observer",
+            closer_observer,
+            inbound(0.0, 520.0, 8.0),
+            Status::ObserverContact,
+        ),
+    ];
+    for (label, observer, approach, expected) in cases {
+        let world = World::gazelle_docking_validation_scenario(observer, approach)?;
+        assert!(world.goshawk_approach_snapshot().is_none());
+        assert!(world.goshawk_custom_approach_snapshot().is_none());
+        run_world(label, world, expected, World::gazelle_approach_snapshot)?;
+    }
+    Ok(())
+}
+
+#[test]
+fn gazelle_world_enforces_own_r3_speed_and_snapshot_scope() -> Result<(), Box<dyn Error>> {
+    use crate::gazelle::{GAZELLE_CONTRACT_SHA256, GAZELLE_RESOURCE_SHA256};
+    assert!(World::new().gazelle_approach_snapshot().is_none());
+    let start = inbound(0.0, 220.0, 4.0);
+    let mut world = World::gazelle_docking_validation_scenario(OBSERVER, start)?;
+    let other = World::gazelle_docking_validation_scenario(OBSERVER, start)?;
+    let explorer = World::goshawk_docking_validation_scenario(OBSERVER, start)?;
+    let custom = World::goshawk_custom_docking_validation_scenario(OBSERVER, start)?;
+    let first = world
+        .gazelle_approach_snapshot()
+        .ok_or(StepError::InvalidMode)?;
+    assert!(world.goshawk_approach_snapshot().is_none());
+    assert!(world.goshawk_custom_approach_snapshot().is_none());
+    assert!(explorer.gazelle_approach_snapshot().is_none());
+    assert!(custom.gazelle_approach_snapshot().is_none());
+    assert!(!custom.gazelle_snapshot_is_current(&first));
+    let explorer_frame = explorer
+        .goshawk_approach_snapshot()
+        .ok_or(StepError::InvalidMode)?;
+    let custom_frame = custom
+        .goshawk_custom_approach_snapshot()
+        .ok_or(StepError::InvalidMode)?;
+    assert!(!world.goshawk_snapshot_is_current(&explorer_frame));
+    assert!(!world.goshawk_custom_snapshot_is_current(&custom_frame));
+    assert_eq!(explorer_frame.engineering().dry_mass_kilograms, 33_719);
+    assert_eq!(custom_frame.pieces().len(), 73);
+    assert!(!explorer.gazelle_snapshot_is_current(&first));
+    assert!(!other.gazelle_snapshot_is_current(&first));
+    assert!(world.gazelle_snapshot_is_current(&first));
+    assert_eq!(first.pieces().len(), 37);
+    assert_eq!(
+        first.source_identity(),
+        (GAZELLE_RESOURCE_SHA256, GAZELLE_CONTRACT_SHA256)
+    );
+    assert!(world.commander_id().is_none() && world.player_ship_id().is_none());
+    assert_eq!(world.save_bytes(), Err(SaveError::NoCommander));
+    let observer = world
+        .gazelle_observer_pose(&first)
+        .ok_or(StepError::InvalidMode)?;
+    let input = FlightInput {
+        yaw: 0.5,
+        ..FlightInput::default()
+    };
+    assert_eq!(world.step(input), Err(StepError::InvalidMode));
+    assert!(world.gazelle_snapshot_is_current(&first));
+    world.step(FlightInput::default())?;
+    let second = world
+        .gazelle_approach_snapshot()
+        .ok_or(StepError::InvalidMode)?;
+    assert!(!world.gazelle_snapshot_is_current(&first));
+    assert!(world.gazelle_observer_pose(&first).is_none());
+    assert_eq!(world.gazelle_observer_pose(&second), Some(observer));
+    assert!(Arc::ptr_eq(first.pieces(), second.pieces()));
+    // R3's inclusive 43.0 controlled speed comes from the pinned SH019 contract.
+    // Exercise the actual constructor and step at the boundary, independent of
+    // the ordinary station entry speed limit.
+    let mut maximum =
+        World::gazelle_docking_validation_scenario(OBSERVER, inbound(0.0, 220.0, 43.0))?;
+    let at_limit = maximum
+        .gazelle_approach_snapshot()
+        .ok_or(StepError::InvalidMode)?;
+    assert_eq!(at_limit.speed_units(), 43.0);
+    assert_eq!(at_limit.status(), Status::Approaching);
+    assert_eq!(
+        at_limit.source_identity(),
+        (GAZELLE_RESOURCE_SHA256, GAZELLE_CONTRACT_SHA256)
+    );
+    maximum.step(FlightInput::default())?;
+    let advanced = maximum
+        .gazelle_approach_snapshot()
+        .ok_or(StepError::InvalidMode)?;
+    assert_eq!(advanced.speed_units(), 43.0);
+    assert_eq!(advanced.status(), Status::Approaching);
+    assert_eq!(advanced.world_tick(), at_limit.world_tick() + 1);
+    assert!(advanced.pose().position.z < at_limit.pose().position.z);
+    for speed in [0.0, 43.0_f32.next_up()] {
+        assert!(matches!(
+            World::gazelle_docking_validation_scenario(OBSERVER, inbound(0.0, 220.0, speed)),
+            Err(StationError::InvalidPose)
+        ));
+    }
+    Ok(())
+}

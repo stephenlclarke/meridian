@@ -32,6 +32,8 @@ const POSES: [&str; 3] = ["front", "oblique", "upper"];
 const PHASE_SECONDS: f32 = std::f32::consts::PI / 0.7;
 
 mod custom_qualification;
+mod gazelle_qualification;
+mod joined_material_qualification;
 
 fn ok<T, E: std::fmt::Debug>(result: Result<T, E>) -> T {
     result.unwrap_or_else(|error| panic!("{error:?}"))
@@ -576,13 +578,14 @@ fn same_pose_shimmer(hull: Hull, directory_variable: &str) {
             Hull::Mk2 => 10_596,
             Hull::Custom => super::CUSTOM_DETAILED_FACES as u32 * 3,
             Hull::SableLiner => 13_488,
+            Hull::Gazelle => super::GAZELLE_DETAILED_FACES as u32 * 3,
         }
     );
     let mut totals = [0, 0];
     let models = showroom_models(hull);
     let other = match hull {
         Hull::Explorer => Hull::Mk2,
-        Hull::Mk2 | Hull::SableLiner => Hull::Explorer,
+        Hull::Mk2 | Hull::SableLiner | Hull::Gazelle => Hull::Explorer,
         Hull::Custom => Hull::Mk2,
     };
     let mut wrong = models[0].clone();
@@ -663,6 +666,12 @@ fn metal_goshawk_custom_same_pose_shimmer() {
 #[ignore = "Mac owner only: production SH012 subtle shimmer"]
 fn metal_sable_liner_same_pose_shimmer() {
     same_pose_shimmer(Hull::SableLiner, "MERIDIAN_SH012_EVIDENCE_DIR");
+}
+
+#[test]
+#[ignore = "Mac owner only: explicit production SH019 visual qualification"]
+fn metal_gazelle_same_pose_shimmer() {
+    same_pose_shimmer(Hull::Gazelle, "MERIDIAN_SH019_EVIDENCE_DIR");
 }
 
 #[test]
@@ -959,7 +968,7 @@ fn metal_goshawk_mk2_cache_switching() {
         let pass = match Hull::from_model(model) {
             Some(Hull::Explorer) => &mut direct_explorer,
             Some(Hull::Mk2) => &mut direct_mk2,
-            Some(Hull::Custom | Hull::SableLiner) | None => {
+            Some(Hull::Custom | Hull::SableLiner | Hull::Gazelle) | None => {
                 panic!("unexpected hull in independent reference")
             }
         };
