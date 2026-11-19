@@ -26,6 +26,7 @@ impl App {
                     self.notice.set(error.to_string());
                 }
             }
+            let mut fired = false;
             refusal = step_frame(
                 &mut self.game.world,
                 input,
@@ -33,9 +34,11 @@ impl App {
                 self.keys.contains(&KeyCode::KeyZ),
                 &mut self.pulse,
                 &mut self.mining,
+                || fired = true,
             )?
             .or(refusal);
             self.emp_feedback(previous);
+            self.publish_audio(fired);
         }
         Ok(refusal)
     }
