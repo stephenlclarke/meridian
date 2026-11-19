@@ -14,6 +14,9 @@ use std::{
     path::{Path, PathBuf},
 };
 
+mod stock;
+pub(crate) use stock::{SPARROWHAWK_GEOMETRY_KEY, stock_matches, stock_visual_for};
+
 #[derive(Debug, PartialEq, Eq)]
 pub(crate) struct PackagePath {
     path: PathBuf,

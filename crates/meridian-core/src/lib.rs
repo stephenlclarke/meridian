@@ -52,6 +52,8 @@ pub use flight::{
     MissileOrigin, MissileRound, MissileSnapshot, MissileTarget, ProjectileId, ProjectileSnapshot,
 };
 
+pub mod sparrowhawk;
+
 pub use flight::{
     FLIGHT_RECEPTION_MAX_BERTH_RECORDS, FlightReceptionAction, FlightReceptionAttemptSnapshot,
     FlightReceptionError, FlightReceptionId, FlightReceptionOutcome, FlightReceptionReview,

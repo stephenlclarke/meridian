@@ -246,7 +246,11 @@ impl Pass {
         self.authored_count = 0;
         let scale = std::array::from_fn(|axis| f64::from(physical_size[axis]) / logical_size[axis]);
         for preview in &frame.models {
-            let Some(visual) = self.authored.visual_for(preview) else {
+            let visual = match self.authored.visual_for(preview) {
+                Some(visual) => Some(visual),
+                None => crate::authored_hull::stock_visual_for(preview)?,
+            };
+            let Some(visual) = visual else {
                 continue;
             };
             let Some(bounds) = intersection(preview.bounds, frame.viewport.canvas()) else {

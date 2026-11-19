@@ -15,6 +15,8 @@ The development source also provides a separate Goshawk Mk II Custom Showroom an
 
 The joined Peregrine development source gives Mk I and Mk III separate original cobalt-cream Showroom previews and local shields. Search their names separately or Pin either as the Compare baseline. Both refuse exchange; Mk III has no adopted runtime mass or ordinary flight admission. This is development source, with owned renderer and runtime qualification pending. [SH022 geometry](docs/PEREGRINE-MK-I-GAMEPLAY-ENVELOPE.md) · [SH023 geometry](docs/PEREGRINE-MK3-GAMEPLAY-ENVELOPE.md)
 
+In the joined development source, search **Sparrowhawk** or **SH030** from the ordinary station Showroom to inspect its original ice-cobalt hull. No local package flag is needed. Exchange remains unavailable, and stock renderer qualification is pending. [Sparrowhawk source and Showroom](docs/SPARROWHAWK-GAMEPLAY-ENVELOPE.md)
+
 The development desktop can explicitly load local validated hull packages with repeatable `--hull-package PATH` flags, or inspect a conflicting original under its separate `LOCAL:` identity using `--inspect-hull-package PATH`. Press 3 while docked and search its ID; no purchase or campaign spawn is authorized. [Authored hull package controls and limits](docs/AUTHORED-HULL-SHOWROOM.md)
 
 ## Internal Mule docking validation
@@ -129,6 +131,7 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)
 - [Content provenance and reuse](docs/LEGACY-REUSE.md)
+- [Sparrowhawk source envelope and Hull Studio definition](docs/SPARROWHAWK-GAMEPLAY-ENVELOPE.md)
 - [Finite missile behavior and save boundary](docs/FINITE-STARTER-MISSILES.md)
 
 GitHub Actions validates Linux, Windows and macOS. Protected main requires pull requests, current required checks, linear history and resolved conversations; force pushes and deletion are blocked, including for administrators. SonarQube runs after merge from committed main with the exact commit SHA and Previous version policy. Historical change descriptions live in merged GitHub PRs and Git history rather than duplicate issue/PR Markdown files.

@@ -266,4 +266,51 @@ mod tests {
             .unwrap_or_else(|| panic!("collapsed desktop geometry accepted"));
         assert_eq!(actual, expected);
     }
+
+    #[test]
+    fn stock_sparrowhawk_original_fits_actual_minimum_station_showroom_panes() {
+        let frames = super::super::minimum_qualification::station_frames_for("Sparrowhawk");
+        for pair in frames {
+            let [solo] = pair.solo.models.as_slice() else {
+                panic!("expected ordinary solo pane");
+            };
+            let [baseline, selected] = pair.comparison.models.as_slice() else {
+                panic!("expected ordinary Compare panes");
+            };
+            assert_eq!(baseline.object, "SH025");
+            assert_eq!(solo.orientation, selected.orientation);
+            for model in [solo, selected] {
+                assert_eq!(model.object, "SH030");
+                let visual = crate::authored_hull::stock_visual_for(model)
+                    .unwrap_or_else(|error| panic!("{error}"))
+                    .unwrap_or_else(|| panic!("missing stock preview"));
+                let view = View::new(&visual.vertices, [EMPTY_PIECE]);
+                let bounds = model.bounds;
+                let uniforms = view
+                    .uniforms(model.orientation, bounds.width / bounds.height, true)
+                    .unwrap_or_else(|error| panic!("{error}"));
+                let [aspect, focal, near, far] = uniforms.projection;
+                for vertex in &visual.vertices {
+                    let [a, b, c] = vertex.position;
+                    let [x, y, z]: [f32; 3] = std::array::from_fn(|i| {
+                        uniforms.origin[i]
+                            + a * uniforms.x[i]
+                            + b * uniforms.y[i]
+                            + c * uniforms.z[i]
+                    });
+                    assert!(z > near && z < far);
+                    let pixel = [
+                        bounds.x + (1.0 + f64::from(x * focal / aspect / z)) * bounds.width / 2.0,
+                        bounds.y + (1.0 - f64::from(y * focal / z)) * bounds.height / 2.0,
+                    ];
+                    assert!(
+                        pixel[0] >= bounds.x + 2.0
+                            && pixel[0] <= bounds.x + bounds.width - 2.0
+                            && pixel[1] >= bounds.y + 2.0
+                            && pixel[1] <= bounds.y + bounds.height - 2.0
+                    );
+                }
+            }
+        }
+    }
 }
