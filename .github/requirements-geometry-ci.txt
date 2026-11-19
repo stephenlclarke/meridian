@@ -1,0 +1,19 @@
+# CPython 3.13 wheels for macOS arm64, Linux x64 and Windows x64.
+# Keep the CI resolution aligned with the development requirements.
+-c ../tools/requirements-goshawk-surface-fit.txt
+numpy==2.5.5 \
+    --hash=sha256:7e71ac4284c700afa654e2d15b1b174166710dca932f24045e5dc92001b5bda0 \
+    --hash=sha256:e0cf407a83118faf0463ade48a4533982f1737c7c58aac29e08855f7d9ad2977 \
+    --hash=sha256:824025655df929268bfe6b47ed91a00d14209a6f760847cf150be446829e1ce4 \
+    --hash=sha256:e0608d1585557b68dcb6a70a41654f7536567960afad79d91752d2863b242b68
+scipy==1.18.1 \
+    --hash=sha256:e6fb6a55cc0ba97b59a1f288fb86dc6fce8bdfc0fffcbfd015e3a954bf2a2d93 \
+    --hash=sha256:ea324d9dd34c38bfb9bec8ca4d1b407db97dbb74029f566b8e322b1b6fe56fe6 \
+    --hash=sha256:fdaf5ea890a6183d0565f51a61799d67081bd5b1cf03c5f4b3fd3732108625c9 \
+    --hash=sha256:559ed65f60c1af5a03f3912605a1b5114f522c7c32fb23c3376ae8f03219fe28
+trimesh==5.2.1 \
+    --hash=sha256:ba4b5dbdf030bbffbb6337d9c67595435a8d1f224f23eb6500e9662f42a3c5df
+rtree==1.4.1 \
+    --hash=sha256:a7e48d805e12011c2cf739a29d6a60ae852fb1de9fc84220bbcef67e6e595d7d \
+    --hash=sha256:12de4578f1b3381a93a655846900be4e3d5f4cd5e306b8b00aa77c1121dc7e8c \
+    --hash=sha256:efe125f416fd27150197ab8521158662943a40f87acab8028a1aac4ad667a489

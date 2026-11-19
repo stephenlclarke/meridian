@@ -18,6 +18,8 @@ Install the pinned scientific test dependencies in the active Python environment
 python -m pip install --only-binary :all: -r tools/requirements-goshawk-surface-fit.txt
 ```
 
+Hosted tests use CPython 3.13 and verify SHA-256 hashes for the wheels listed in the CI requirements files. When updating a scientific package, update its development pin and the wheel hashes for all three hosted platforms.
+
 On native Windows, use the MSVC developer environment:
 
 ```powershell
