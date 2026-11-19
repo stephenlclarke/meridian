@@ -1,5 +1,11 @@
 # Implementation and validation status
 
+## Config-defined ship authoring
+
+The [Hull Studio authoring guide](HULL-STUDIO.md) describes the separate editor
+and the opt-in package workflow. Its reference uses the 3,484 detailed and 512
+native faces of SH023. Gameplay admission and campaign placement are separate.
+
 ## Goshawk Showroom preview
 
 Preview 10 is published for macOS arm64 and Windows x64. It includes the Goshawk Explorer in the ordinary station Showroom. The signed and notarized app was extracted and checked against the local installation, including all 483 files. Earlier Mac gameplay checks covered the Showroom on the source used for this build. Packaging verification did not include a new graphical launch. [Preview guide](PREVIEW-RELEASES.md)
