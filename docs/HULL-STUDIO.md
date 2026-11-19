@@ -73,3 +73,12 @@ Application identity with `--signing-identity` for a signed bundle. The output
 includes the Rust validator, Python runtime, editor assets, original reference
 definition and notices. The installed app opens the editor in the default
 browser and can run without a checkout or an internet connection.
+
+## Schema 1 limits
+
+The validator accepts a JSON package up to 64 MiB. Each mesh supports up to
+100,000 vertices. The detailed mesh supports 200,000 faces and the native
+mesh supports 512. A package may have up to 1,024 local groups with 5,344
+points per group, counting both meshes, and 256 clearance routes. Rounding
+must be positive and at most 20 mm. The gap measured at concave surfaces can
+exceed that rounding distance wherever a convex group bridges a recess.

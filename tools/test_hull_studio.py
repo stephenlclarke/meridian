@@ -1,4 +1,5 @@
 """Authoring imports, measurements and the local validator boundary."""
+
 import json
 import struct
 import sys
@@ -14,79 +15,102 @@ import studio
 
 
 def sample():
-    mesh = {"vertices":[[0,0,0],[1,0,0],[0,1,0]],"triangles":[[0,1,2]]}
-    return {"id":"TEST-SKIF","detail":dict(mesh),"native":dict(mesh),
-            "metresPerUnit":1,"roundingMetres":0.01}
+    mesh = {"vertices": [[0, 0, 0], [1, 0, 0], [0, 1, 0]], "triangles": [[0, 1, 2]]}
+    return {
+        "id": "TEST-SKIF",
+        "detail": dict(mesh),
+        "native": dict(mesh),
+        "metresPerUnit": 1,
+        "roundingMetres": 0.01,
+    }
 
 
 class HullStudioTests(unittest.TestCase):
     def test_reference_keeps_exact_original_topology_and_appearance(self):
         src = definitions.ROOT / "assets/fleet/sh023"
         hull = definitions.parse(definitions.reference_bytes())
-        self.assertEqual(hull["engineering"]["massKg"],101208)
-        self.assertEqual([len(hull[k]["triangles"]) for k in ("detail","native")], [3484,512])
+        self.assertEqual(hull["engineering"]["massKg"], 101208)
+        self.assertEqual(
+            [len(hull[k]["triangles"]) for k in ("detail", "native")], [3484, 512]
+        )
         groups = bytes(hull["detail"]["groups"] + hull["native"]["groups"])
-        self.assertEqual(groups,(src / "source-piece-membership.bin").read_bytes())
-        self.assertEqual(len(set(groups)),69)
-        positions = b"".join(struct.pack("<3d",*p) for k in ("detail","native") for p in hull[k]["vertices"])
-        self.assertEqual(positions,(src / "source.vertices").read_bytes()[16:])
-        self.assertEqual(len(hull["faceTextures"]),3484)
-        self.assertEqual(len(hull["faceMaterials"]),3484)
-        self.assertIn("MIT License",hull["provenance"]["license"])
-        self.assertEqual(len(hull["clearances"]),4)
-        self.assertLessEqual(fit.fit_report(hull,{})["maxMetres"],1.133)
+        self.assertEqual(groups, (src / "source-piece-membership.bin").read_bytes())
+        self.assertEqual(len(set(groups)), 69)
+        positions = b"".join(
+            struct.pack("<3d", *p)
+            for k in ("detail", "native")
+            for p in hull[k]["vertices"]
+        )
+        self.assertEqual(positions, (src / "source.vertices").read_bytes()[16:])
+        self.assertEqual(len(hull["faceTextures"]), 3484)
+        self.assertEqual(len(hull["faceMaterials"]), 3484)
+        self.assertIn("MIT License", hull["provenance"]["license"])
+        self.assertEqual(len(hull["clearances"]), 4)
+        self.assertLessEqual(fit.fit_report(hull, {})["maxMetres"], 1.133)
 
     def test_grouping_is_disjoint_unless_explicitly_shared(self):
         hull = sample()
-        hull["detail"]["vertices"] += [[10,0,0],[10,1,0],[10,0,1]]
-        hull["detail"]["triangles"] = [[0,1,2],[3,4,5]]
+        hull["detail"]["vertices"] += [[10, 0, 0], [10, 1, 0], [10, 0, 1]]
+        hull["detail"]["triangles"] = [[0, 1, 2], [3, 4, 5]]
         result = definitions.prepare(hull)
-        self.assertEqual(result["detail"]["groups"],[0,0,0,1,1,1])
-        self.assertTrue(set(result["native"]["groups"]).isdisjoint(result["detail"]["groups"]))
-        self.assertNotIn("groups",hull["detail"])
-        hull["native"]["groups"] = [7,7,7]
-        hull["detail"]["groups"] = [7,7,7,8,8,8]
-        self.assertEqual(definitions.prepare(hull),hull)
+        self.assertEqual(result["detail"]["groups"], [0, 0, 0, 1, 1, 1])
+        self.assertTrue(
+            set(result["native"]["groups"]).isdisjoint(result["detail"]["groups"])
+        )
+        self.assertNotIn("groups", hull["detail"])
+        hull["native"]["groups"] = [7, 7, 7]
+        hull["detail"]["groups"] = [7, 7, 7, 8, 8, 8]
+        self.assertEqual(definitions.prepare(hull), hull)
 
     def test_invalid_input_and_external_path_refused(self):
-        for raw in [b'{"id":1,"id":2}',b'[NaN]',b'[Infinity]']:
+        for raw in [b'{"id":1,"id":2}', b"[NaN]", b"[Infinity]"]:
             with self.assertRaises(ValueError):
                 definitions.parse(raw)
         hull = sample()
-        hull["detail"]["triangles"][0] = [0,1,-1]
-        with self.assertRaisesRegex(ValueError,"invalid triangle"):
+        hull["detail"]["triangles"][0] = [0, 1, -1]
+        with self.assertRaisesRegex(ValueError, "invalid triangle"):
             definitions.prepare(hull)
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            p = root/"hull.json"
-            (root/"detail.json").write_bytes(b'{"vertices":[]}')
+            p = root / "hull.json"
+            (root / "detail.json").write_bytes(b'{"vertices":[]}')
             p.write_text('{"detail":{"file":"detail.json"}}')
-            self.assertEqual(definitions.local_definition(p)["detail"],{"vertices":[]})
+            self.assertEqual(
+                definitions.local_definition(p)["detail"], {"vertices": []}
+            )
             p.write_text('{"detail":{"file":"../other.json"}}')
-            with self.assertRaisesRegex(ValueError,"directory"):
+            with self.assertRaisesRegex(ValueError, "directory"):
                 definitions.local_definition(p)
 
     def test_nearest_sample_uses_face_interiors_and_respects_scale(self):
-        face = [[0,0,0],[4,0,0],[0,4,0]]
-        for query,expected in [([1,1,1],[1,1,0]),([5,0,1],[4,0,0]),([2,3,1],[1.5,2.5,0])]:
-            self.assertEqual(list(fit.closest(query,face)),expected)
+        face = [[0, 0, 0], [4, 0, 0], [0, 4, 0]]
+        for query, expected in [
+            ([1, 1, 1], [1, 1, 0]),
+            ([5, 0, 1], [4, 0, 0]),
+            ([2, 3, 1], [1.5, 2.5, 0]),
+        ]:
+            self.assertEqual(list(fit.closest(query, face)), expected)
         package = definitions.prepare(sample())
         package["metresPerUnit"] = 4
-        envelope = {"vertices":[[1,1,1],[1,2,1],[2,1,1]],"triangles":[[0,1,2]]}
-        measured = fit.fit_report(package,envelope)
-        self.assertEqual(measured["maxMetres"],1)
-        self.assertEqual(measured["nearestPoint"][2],0)
+        envelope = {
+            "vertices": [[1, 1, 1], [1, 2, 1], [2, 1, 1]],
+            "triangles": [[0, 1, 2]],
+        }
+        measured = fit.fit_report(package, envelope)
+        self.assertEqual(measured["maxMetres"], 1)
+        self.assertEqual(measured["nearestPoint"][2], 0)
 
     def test_validation_failure_never_exports(self):
         def reject(argv, **kwargs):
-            self.assertEqual(argv[1],"validate")
-            self.assertEqual(json.loads(Path(argv[2]).read_bytes())["id"],"TEST-SKIF")
-            report = {"valid":False,"diagnostics":[{"message":"Blocked bow"}]}
+            self.assertEqual(argv[1], "validate")
+            self.assertEqual(json.loads(Path(argv[2]).read_bytes())["id"], "TEST-SKIF")
+            report = {"valid": False, "diagnostics": [{"message": "Blocked bow"}]}
             Path(argv[-1]).write_bytes(definitions.encode(report))
-            return studio.subprocess.CompletedProcess(argv,1,b"",b"Blocked bow")
-        with mock.patch.object(studio.subprocess,"run",side_effect=reject):
-            with self.assertRaisesRegex(studio.InvalidHull,"Blocked bow") as context:
-                studio.build(sample(),Path("validator"))
+            return studio.subprocess.CompletedProcess(argv, 1, b"", b"Blocked bow")
+
+        with mock.patch.object(studio.subprocess, "run", side_effect=reject):
+            with self.assertRaisesRegex(studio.InvalidHull, "Blocked bow") as context:
+                studio.build(sample(), Path("validator"))
             self.assertFalse(context.exception.report["valid"])
 
 
