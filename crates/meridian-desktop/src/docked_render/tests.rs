@@ -287,3 +287,93 @@ fn current_system_planet_preview_uses_actual_world_recipe_and_never_a_foreign_wo
             .is_none()
     );
 }
+
+#[test]
+fn selecting_goshawk_routes_the_original_preview_without_granting_exchange() {
+    use crate::docked_screens::{Catalogue, DockedScreens, Input, Key, Outcome, Screen, Viewport};
+    let world = meridian_core::World::new_commander(95006).unwrap_or_else(|e| panic!("{e}"));
+    let save = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+    let catalogue = Catalogue::bundled().unwrap_or_else(|e| panic!("{e}"));
+    let mut ui = DockedScreens::new(meridian_core::navigation::SystemId::AVENOR, "SH025");
+    let ctx = context(&world, &catalogue);
+    let viewport = Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));
+    ui.open(Screen::Showroom);
+    let frame = ui.frame(&ctx, viewport);
+    assert!(matches!(
+        ui.handle(Input::Key(Key::Search), &frame, &ctx),
+        Outcome::Updated
+    ));
+    assert!(ui.search_active());
+    let frame = ui.frame(&ctx, viewport);
+    assert!(matches!(
+        ui.handle(Input::Text("Goshawk Explorer".into()), &frame, &ctx),
+        Outcome::Updated
+    ));
+    assert_eq!(ui.selected_ship(), "SH008");
+    let frame = ui.frame(&ctx, viewport);
+    assert!(matches!(
+        ui.handle(Input::Key(Key::Confirm), &frame, &ctx),
+        Outcome::Updated
+    ));
+    assert!(!ui.search_active());
+    assert!(!ui.details_open());
+
+    // Compare starts enabled. Search changes the selected ship, not the current-hull baseline.
+    let comparison = ui.frame(&ctx, viewport);
+    let [baseline, selected] = comparison.models.as_slice() else {
+        panic!("expected exactly two previews in default Compare");
+    };
+    let current_model = Model::sh025().unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(baseline.object, "SH025");
+    assert_eq!(baseline.geometry_key, SHIP_KEY);
+    assert!(current_model.matches(baseline));
+    assert_eq!(selected.object, "SH008");
+    assert_eq!(selected.geometry_key, "assets/fleet/sh008/visual.bin");
+    assert!(crate::mule_render::showroom::matches(selected));
+    assert!(baseline.bounds.x + baseline.bounds.width <= selected.bounds.x);
+    let mut geometry = Geometry::with_capacity();
+    geometry
+        .compose(&comparison, &current_model, true, None)
+        .unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(geometry.unavailable_models, 0);
+    assert!(
+        !geometry.models.is_empty(),
+        "SH025 baseline was not composed"
+    );
+
+    assert!(matches!(
+        ui.handle(Input::Key(Key::Compare), &comparison, &ctx),
+        Outcome::Updated
+    ));
+    let frame = ui.frame(&ctx, viewport);
+    let [solo] = frame.models.as_slice() else {
+        panic!("expected exactly one preview with Compare off");
+    };
+    assert_eq!(solo.object, selected.object);
+    assert_eq!(solo.geometry_key, selected.geometry_key);
+    assert!(crate::mule_render::showroom::matches(solo));
+    assert!(solo.bounds.width > selected.bounds.width);
+    assert!(
+        frame
+            .labels
+            .iter()
+            .any(|label| label.text.contains("Exchange unavailable"))
+    );
+    geometry
+        .compose(&frame, &current_model, true, None)
+        .unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(geometry.unavailable_models, 0);
+    assert!(
+        geometry.models.is_empty(),
+        "SH008 entered the legacy hull path"
+    );
+
+    let outcome = ui.handle(Input::Key(Key::Exchange), &frame, &ctx);
+    assert!(matches!(
+        outcome,
+        Outcome::Refused(reason) if reason == "No admitted ship exchange offer for this hull"
+    ));
+    assert_eq!(ui.selected_ship(), "SH008");
+    assert_eq!(ui.frame(&ctx, viewport), frame);
+    assert_eq!(world.save_bytes().unwrap_or_else(|e| panic!("{e}")), save);
+}

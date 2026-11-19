@@ -1,0 +1,89 @@
+{
+  "base": "6422079ccd3936224668641f106afdff12a584d7",
+  "stationSource": {
+    "path": "assets/legacy/sh028.physics",
+    "bytes": 12400,
+    "sha256": "cd54d30cab638f6b33feacf1fa78c9136f8ce346e8cc6133259bfc0472c259d5"
+  },
+  "goshawkSourceVerticesSha256": "b800dde4cc63355a3aa133c8ecf57a346cf092505134fcbc8dc7b4b8be662b35",
+  "faceZeroBased": 482,
+  "faceVertices": [
+    265,
+    266,
+    270
+  ],
+  "triangleMetres": [
+    [
+      68.12,
+      -48.384,
+      136.32
+    ],
+    [
+      70.11999999999999,
+      -48.384,
+      136.32
+    ],
+    [
+      70.11999999999999,
+      48.384,
+      136.32
+    ]
+  ],
+  "goshawkSourceVertex": 6,
+  "goshawkLocalMetres": [
+    -8.590315995849352,
+    0.437626972603579,
+    12.961723199967324
+  ],
+  "noseDirection": "inward: X and Z reversed",
+  "actorCentreX": 60.809684004150654,
+  "intersectionMetres": [
+    69.4,
+    0.437626972603579,
+    136.32
+  ],
+  "centreZAtContact": 149.2817231999673,
+  "centreZSweep": [
+    150.2817231999673,
+    148.2817231999673
+  ],
+  "barycentric": [
+    0.3599999999999949,
+    0.13547756518060639,
+    0.5045224348193987
+  ],
+  "scope": "Independent pinned source coordinates and scalar interpolation only. No runtime geometry execution.",
+  "independentLaunchPin": {
+    "stationMaximumZMetres": 136.32,
+    "aftSourceVertex": 1920,
+    "aftVertexZMetres": -17.038276800032676,
+    "roundingMetres": 0.02,
+    "exteriorGapMetres": 1000,
+    "minimumCentreZBeforeNumericalGuardMetres": 1153.3782768000326,
+    "previousF32Metres": 1153.378173828125,
+    "outwardF32Metres": 1153.3782958984375,
+    "outwardF32Bits": "0x44902c1b"
+  },
+  "clearControls": {
+    "lipOpeningPose": {
+      "pairCount": 33672,
+      "minimumSeparatingAxisGapMetres": 0.978999999999985,
+      "limitingPair": {
+        "piece": 0,
+        "face": 480,
+        "axis": 2
+      },
+      "paddingMetres": 0.021
+    },
+    "offApertureSweep": {
+      "pairCount": 33672,
+      "minimumSeparatingAxisGapMetres": 10.837276800032669,
+      "limitingPair": {
+        "piece": 0,
+        "face": 406,
+        "axis": 2
+      },
+      "paddingMetres": 0.021
+    }
+  }
+}

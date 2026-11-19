@@ -3,8 +3,11 @@ assets/legacy/** -text
 assets/fleet/sh001/** -text
 assets/fleet/sh001/*.rgba binary
 assets/fleet/sh001/visual.bin binary
+assets/fleet/sh008/** -text
+assets/fleet/sh008/visual.bin binary
 
 # These source and review fixtures are verified against their Git blob bytes.
 crates/meridian-core/src/**/*.rs text eol=lf
 integration/sh001-mule/*.json text eol=lf
 integration/sh001-mule/*.patch -text
+integration/sh008-goshawk/*.json text eol=lf

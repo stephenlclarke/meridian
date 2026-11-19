@@ -1,0 +1,1037 @@
+{
+  "pieces": [
+    "left-rail",
+    "left-drive-arm",
+    "left-detailed-well-0",
+    "left-detailed-well-1",
+    "left-detailed-well-2",
+    "left-detailed-well-3",
+    "left-detailed-well-4",
+    "left-detailed-well-5",
+    "left-detailed-well-6",
+    "left-detailed-well-7",
+    "left-detailed-well-8",
+    "left-detailed-well-9",
+    "left-detailed-well-10",
+    "left-detailed-well-11",
+    "left-candidate-well-0",
+    "left-candidate-well-1",
+    "left-candidate-well-2",
+    "left-candidate-well-3",
+    "left-strut-0",
+    "left-strut-1",
+    "right-rail",
+    "right-drive-arm",
+    "right-detailed-well-0",
+    "right-detailed-well-1",
+    "right-detailed-well-2",
+    "right-detailed-well-3",
+    "right-detailed-well-4",
+    "right-detailed-well-5",
+    "right-detailed-well-6",
+    "right-detailed-well-7",
+    "right-detailed-well-8",
+    "right-detailed-well-9",
+    "right-detailed-well-10",
+    "right-detailed-well-11",
+    "right-candidate-well-0",
+    "right-candidate-well-1",
+    "right-candidate-well-2",
+    "right-candidate-well-3",
+    "right-strut-0",
+    "right-strut-1",
+    "fore-crossbrace",
+    "aft-crossbrace",
+    "primary-body",
+    "detailed-body-well-0",
+    "detailed-body-well-1",
+    "detailed-body-well-2",
+    "detailed-body-well-3",
+    "detailed-body-well-4",
+    "detailed-body-well-5",
+    "detailed-body-well-6",
+    "detailed-body-well-7",
+    "detailed-body-well-8",
+    "detailed-body-well-9",
+    "detailed-body-well-10",
+    "detailed-body-well-11",
+    "candidate-body-well-0",
+    "candidate-body-well-1",
+    "candidate-body-well-2",
+    "candidate-body-well-3",
+    "upper-body-strut",
+    "lower-body-strut",
+    "cockpit",
+    "cockpit-crossmember",
+    "left-engine-support",
+    "left-engine-casing",
+    "left-engine-recess",
+    "right-engine-support",
+    "right-engine-casing",
+    "right-engine-recess"
+  ],
+  "detailed": [
+    {
+      "startVertex": 0,
+      "vertexCount": 8,
+      "piece": 0
+    },
+    {
+      "startVertex": 8,
+      "vertexCount": 120,
+      "piece": 1
+    },
+    {
+      "startVertex": 128,
+      "vertexCount": 12,
+      "piece": 2
+    },
+    {
+      "startVertex": 140,
+      "vertexCount": 8,
+      "piece": 2
+    },
+    {
+      "startVertex": 148,
+      "vertexCount": 8,
+      "piece": 2
+    },
+    {
+      "startVertex": 156,
+      "vertexCount": 8,
+      "piece": 2
+    },
+    {
+      "startVertex": 164,
+      "vertexCount": 12,
+      "piece": 3
+    },
+    {
+      "startVertex": 176,
+      "vertexCount": 8,
+      "piece": 3
+    },
+    {
+      "startVertex": 184,
+      "vertexCount": 8,
+      "piece": 3
+    },
+    {
+      "startVertex": 192,
+      "vertexCount": 8,
+      "piece": 3
+    },
+    {
+      "startVertex": 200,
+      "vertexCount": 12,
+      "piece": 4
+    },
+    {
+      "startVertex": 212,
+      "vertexCount": 8,
+      "piece": 4
+    },
+    {
+      "startVertex": 220,
+      "vertexCount": 8,
+      "piece": 4
+    },
+    {
+      "startVertex": 228,
+      "vertexCount": 8,
+      "piece": 4
+    },
+    {
+      "startVertex": 236,
+      "vertexCount": 12,
+      "piece": 5
+    },
+    {
+      "startVertex": 248,
+      "vertexCount": 8,
+      "piece": 5
+    },
+    {
+      "startVertex": 256,
+      "vertexCount": 8,
+      "piece": 5
+    },
+    {
+      "startVertex": 264,
+      "vertexCount": 8,
+      "piece": 5
+    },
+    {
+      "startVertex": 272,
+      "vertexCount": 12,
+      "piece": 6
+    },
+    {
+      "startVertex": 284,
+      "vertexCount": 8,
+      "piece": 6
+    },
+    {
+      "startVertex": 292,
+      "vertexCount": 8,
+      "piece": 6
+    },
+    {
+      "startVertex": 300,
+      "vertexCount": 8,
+      "piece": 6
+    },
+    {
+      "startVertex": 308,
+      "vertexCount": 12,
+      "piece": 7
+    },
+    {
+      "startVertex": 320,
+      "vertexCount": 8,
+      "piece": 7
+    },
+    {
+      "startVertex": 328,
+      "vertexCount": 8,
+      "piece": 7
+    },
+    {
+      "startVertex": 336,
+      "vertexCount": 8,
+      "piece": 7
+    },
+    {
+      "startVertex": 344,
+      "vertexCount": 12,
+      "piece": 8
+    },
+    {
+      "startVertex": 356,
+      "vertexCount": 8,
+      "piece": 8
+    },
+    {
+      "startVertex": 364,
+      "vertexCount": 8,
+      "piece": 8
+    },
+    {
+      "startVertex": 372,
+      "vertexCount": 8,
+      "piece": 8
+    },
+    {
+      "startVertex": 380,
+      "vertexCount": 12,
+      "piece": 9
+    },
+    {
+      "startVertex": 392,
+      "vertexCount": 8,
+      "piece": 9
+    },
+    {
+      "startVertex": 400,
+      "vertexCount": 8,
+      "piece": 9
+    },
+    {
+      "startVertex": 408,
+      "vertexCount": 8,
+      "piece": 9
+    },
+    {
+      "startVertex": 416,
+      "vertexCount": 12,
+      "piece": 10
+    },
+    {
+      "startVertex": 428,
+      "vertexCount": 8,
+      "piece": 10
+    },
+    {
+      "startVertex": 436,
+      "vertexCount": 8,
+      "piece": 10
+    },
+    {
+      "startVertex": 444,
+      "vertexCount": 8,
+      "piece": 10
+    },
+    {
+      "startVertex": 452,
+      "vertexCount": 12,
+      "piece": 11
+    },
+    {
+      "startVertex": 464,
+      "vertexCount": 8,
+      "piece": 11
+    },
+    {
+      "startVertex": 472,
+      "vertexCount": 8,
+      "piece": 11
+    },
+    {
+      "startVertex": 480,
+      "vertexCount": 8,
+      "piece": 11
+    },
+    {
+      "startVertex": 488,
+      "vertexCount": 12,
+      "piece": 12
+    },
+    {
+      "startVertex": 500,
+      "vertexCount": 8,
+      "piece": 12
+    },
+    {
+      "startVertex": 508,
+      "vertexCount": 8,
+      "piece": 12
+    },
+    {
+      "startVertex": 516,
+      "vertexCount": 8,
+      "piece": 12
+    },
+    {
+      "startVertex": 524,
+      "vertexCount": 12,
+      "piece": 13
+    },
+    {
+      "startVertex": 536,
+      "vertexCount": 8,
+      "piece": 13
+    },
+    {
+      "startVertex": 544,
+      "vertexCount": 8,
+      "piece": 13
+    },
+    {
+      "startVertex": 552,
+      "vertexCount": 8,
+      "piece": 13
+    },
+    {
+      "startVertex": 560,
+      "vertexCount": 8,
+      "piece": 18
+    },
+    {
+      "startVertex": 568,
+      "vertexCount": 8,
+      "piece": 19
+    },
+    {
+      "startVertex": 576,
+      "vertexCount": 8,
+      "piece": 20
+    },
+    {
+      "startVertex": 584,
+      "vertexCount": 120,
+      "piece": 21
+    },
+    {
+      "startVertex": 704,
+      "vertexCount": 12,
+      "piece": 22
+    },
+    {
+      "startVertex": 716,
+      "vertexCount": 8,
+      "piece": 22
+    },
+    {
+      "startVertex": 724,
+      "vertexCount": 8,
+      "piece": 22
+    },
+    {
+      "startVertex": 732,
+      "vertexCount": 8,
+      "piece": 22
+    },
+    {
+      "startVertex": 740,
+      "vertexCount": 12,
+      "piece": 23
+    },
+    {
+      "startVertex": 752,
+      "vertexCount": 8,
+      "piece": 23
+    },
+    {
+      "startVertex": 760,
+      "vertexCount": 8,
+      "piece": 23
+    },
+    {
+      "startVertex": 768,
+      "vertexCount": 8,
+      "piece": 23
+    },
+    {
+      "startVertex": 776,
+      "vertexCount": 12,
+      "piece": 24
+    },
+    {
+      "startVertex": 788,
+      "vertexCount": 8,
+      "piece": 24
+    },
+    {
+      "startVertex": 796,
+      "vertexCount": 8,
+      "piece": 24
+    },
+    {
+      "startVertex": 804,
+      "vertexCount": 8,
+      "piece": 24
+    },
+    {
+      "startVertex": 812,
+      "vertexCount": 12,
+      "piece": 25
+    },
+    {
+      "startVertex": 824,
+      "vertexCount": 8,
+      "piece": 25
+    },
+    {
+      "startVertex": 832,
+      "vertexCount": 8,
+      "piece": 25
+    },
+    {
+      "startVertex": 840,
+      "vertexCount": 8,
+      "piece": 25
+    },
+    {
+      "startVertex": 848,
+      "vertexCount": 12,
+      "piece": 26
+    },
+    {
+      "startVertex": 860,
+      "vertexCount": 8,
+      "piece": 26
+    },
+    {
+      "startVertex": 868,
+      "vertexCount": 8,
+      "piece": 26
+    },
+    {
+      "startVertex": 876,
+      "vertexCount": 8,
+      "piece": 26
+    },
+    {
+      "startVertex": 884,
+      "vertexCount": 12,
+      "piece": 27
+    },
+    {
+      "startVertex": 896,
+      "vertexCount": 8,
+      "piece": 27
+    },
+    {
+      "startVertex": 904,
+      "vertexCount": 8,
+      "piece": 27
+    },
+    {
+      "startVertex": 912,
+      "vertexCount": 8,
+      "piece": 27
+    },
+    {
+      "startVertex": 920,
+      "vertexCount": 12,
+      "piece": 28
+    },
+    {
+      "startVertex": 932,
+      "vertexCount": 8,
+      "piece": 28
+    },
+    {
+      "startVertex": 940,
+      "vertexCount": 8,
+      "piece": 28
+    },
+    {
+      "startVertex": 948,
+      "vertexCount": 8,
+      "piece": 28
+    },
+    {
+      "startVertex": 956,
+      "vertexCount": 12,
+      "piece": 29
+    },
+    {
+      "startVertex": 968,
+      "vertexCount": 8,
+      "piece": 29
+    },
+    {
+      "startVertex": 976,
+      "vertexCount": 8,
+      "piece": 29
+    },
+    {
+      "startVertex": 984,
+      "vertexCount": 8,
+      "piece": 29
+    },
+    {
+      "startVertex": 992,
+      "vertexCount": 12,
+      "piece": 30
+    },
+    {
+      "startVertex": 1004,
+      "vertexCount": 8,
+      "piece": 30
+    },
+    {
+      "startVertex": 1012,
+      "vertexCount": 8,
+      "piece": 30
+    },
+    {
+      "startVertex": 1020,
+      "vertexCount": 8,
+      "piece": 30
+    },
+    {
+      "startVertex": 1028,
+      "vertexCount": 12,
+      "piece": 31
+    },
+    {
+      "startVertex": 1040,
+      "vertexCount": 8,
+      "piece": 31
+    },
+    {
+      "startVertex": 1048,
+      "vertexCount": 8,
+      "piece": 31
+    },
+    {
+      "startVertex": 1056,
+      "vertexCount": 8,
+      "piece": 31
+    },
+    {
+      "startVertex": 1064,
+      "vertexCount": 12,
+      "piece": 32
+    },
+    {
+      "startVertex": 1076,
+      "vertexCount": 8,
+      "piece": 32
+    },
+    {
+      "startVertex": 1084,
+      "vertexCount": 8,
+      "piece": 32
+    },
+    {
+      "startVertex": 1092,
+      "vertexCount": 8,
+      "piece": 32
+    },
+    {
+      "startVertex": 1100,
+      "vertexCount": 12,
+      "piece": 33
+    },
+    {
+      "startVertex": 1112,
+      "vertexCount": 8,
+      "piece": 33
+    },
+    {
+      "startVertex": 1120,
+      "vertexCount": 8,
+      "piece": 33
+    },
+    {
+      "startVertex": 1128,
+      "vertexCount": 8,
+      "piece": 33
+    },
+    {
+      "startVertex": 1136,
+      "vertexCount": 8,
+      "piece": 38
+    },
+    {
+      "startVertex": 1144,
+      "vertexCount": 8,
+      "piece": 39
+    },
+    {
+      "startVertex": 1152,
+      "vertexCount": 8,
+      "piece": 40
+    },
+    {
+      "startVertex": 1160,
+      "vertexCount": 8,
+      "piece": 41
+    },
+    {
+      "startVertex": 1168,
+      "vertexCount": 120,
+      "piece": 42
+    },
+    {
+      "startVertex": 1288,
+      "vertexCount": 12,
+      "piece": 43
+    },
+    {
+      "startVertex": 1300,
+      "vertexCount": 8,
+      "piece": 43
+    },
+    {
+      "startVertex": 1308,
+      "vertexCount": 8,
+      "piece": 43
+    },
+    {
+      "startVertex": 1316,
+      "vertexCount": 8,
+      "piece": 43
+    },
+    {
+      "startVertex": 1324,
+      "vertexCount": 12,
+      "piece": 44
+    },
+    {
+      "startVertex": 1336,
+      "vertexCount": 8,
+      "piece": 44
+    },
+    {
+      "startVertex": 1344,
+      "vertexCount": 8,
+      "piece": 44
+    },
+    {
+      "startVertex": 1352,
+      "vertexCount": 8,
+      "piece": 44
+    },
+    {
+      "startVertex": 1360,
+      "vertexCount": 12,
+      "piece": 45
+    },
+    {
+      "startVertex": 1372,
+      "vertexCount": 8,
+      "piece": 45
+    },
+    {
+      "startVertex": 1380,
+      "vertexCount": 8,
+      "piece": 45
+    },
+    {
+      "startVertex": 1388,
+      "vertexCount": 8,
+      "piece": 45
+    },
+    {
+      "startVertex": 1396,
+      "vertexCount": 12,
+      "piece": 46
+    },
+    {
+      "startVertex": 1408,
+      "vertexCount": 8,
+      "piece": 46
+    },
+    {
+      "startVertex": 1416,
+      "vertexCount": 8,
+      "piece": 46
+    },
+    {
+      "startVertex": 1424,
+      "vertexCount": 8,
+      "piece": 46
+    },
+    {
+      "startVertex": 1432,
+      "vertexCount": 12,
+      "piece": 47
+    },
+    {
+      "startVertex": 1444,
+      "vertexCount": 8,
+      "piece": 47
+    },
+    {
+      "startVertex": 1452,
+      "vertexCount": 8,
+      "piece": 47
+    },
+    {
+      "startVertex": 1460,
+      "vertexCount": 8,
+      "piece": 47
+    },
+    {
+      "startVertex": 1468,
+      "vertexCount": 12,
+      "piece": 48
+    },
+    {
+      "startVertex": 1480,
+      "vertexCount": 8,
+      "piece": 48
+    },
+    {
+      "startVertex": 1488,
+      "vertexCount": 8,
+      "piece": 48
+    },
+    {
+      "startVertex": 1496,
+      "vertexCount": 8,
+      "piece": 48
+    },
+    {
+      "startVertex": 1504,
+      "vertexCount": 12,
+      "piece": 49
+    },
+    {
+      "startVertex": 1516,
+      "vertexCount": 8,
+      "piece": 49
+    },
+    {
+      "startVertex": 1524,
+      "vertexCount": 8,
+      "piece": 49
+    },
+    {
+      "startVertex": 1532,
+      "vertexCount": 8,
+      "piece": 49
+    },
+    {
+      "startVertex": 1540,
+      "vertexCount": 12,
+      "piece": 50
+    },
+    {
+      "startVertex": 1552,
+      "vertexCount": 8,
+      "piece": 50
+    },
+    {
+      "startVertex": 1560,
+      "vertexCount": 8,
+      "piece": 50
+    },
+    {
+      "startVertex": 1568,
+      "vertexCount": 8,
+      "piece": 50
+    },
+    {
+      "startVertex": 1576,
+      "vertexCount": 12,
+      "piece": 51
+    },
+    {
+      "startVertex": 1588,
+      "vertexCount": 8,
+      "piece": 51
+    },
+    {
+      "startVertex": 1596,
+      "vertexCount": 8,
+      "piece": 51
+    },
+    {
+      "startVertex": 1604,
+      "vertexCount": 8,
+      "piece": 51
+    },
+    {
+      "startVertex": 1612,
+      "vertexCount": 12,
+      "piece": 52
+    },
+    {
+      "startVertex": 1624,
+      "vertexCount": 8,
+      "piece": 52
+    },
+    {
+      "startVertex": 1632,
+      "vertexCount": 8,
+      "piece": 52
+    },
+    {
+      "startVertex": 1640,
+      "vertexCount": 8,
+      "piece": 52
+    },
+    {
+      "startVertex": 1648,
+      "vertexCount": 12,
+      "piece": 53
+    },
+    {
+      "startVertex": 1660,
+      "vertexCount": 8,
+      "piece": 53
+    },
+    {
+      "startVertex": 1668,
+      "vertexCount": 8,
+      "piece": 53
+    },
+    {
+      "startVertex": 1676,
+      "vertexCount": 8,
+      "piece": 53
+    },
+    {
+      "startVertex": 1684,
+      "vertexCount": 12,
+      "piece": 54
+    },
+    {
+      "startVertex": 1696,
+      "vertexCount": 8,
+      "piece": 54
+    },
+    {
+      "startVertex": 1704,
+      "vertexCount": 8,
+      "piece": 54
+    },
+    {
+      "startVertex": 1712,
+      "vertexCount": 8,
+      "piece": 54
+    },
+    {
+      "startVertex": 1720,
+      "vertexCount": 8,
+      "piece": 59
+    },
+    {
+      "startVertex": 1728,
+      "vertexCount": 8,
+      "piece": 60
+    },
+    {
+      "startVertex": 1736,
+      "vertexCount": 120,
+      "piece": 61
+    },
+    {
+      "startVertex": 1856,
+      "vertexCount": 8,
+      "piece": 62
+    },
+    {
+      "startVertex": 1864,
+      "vertexCount": 8,
+      "piece": 63
+    },
+    {
+      "startVertex": 1872,
+      "vertexCount": 48,
+      "piece": 64
+    },
+    {
+      "startVertex": 1920,
+      "vertexCount": 48,
+      "piece": 65
+    },
+    {
+      "startVertex": 1968,
+      "vertexCount": 8,
+      "piece": 66
+    },
+    {
+      "startVertex": 1976,
+      "vertexCount": 48,
+      "piece": 67
+    },
+    {
+      "startVertex": 2024,
+      "vertexCount": 48,
+      "piece": 68
+    }
+  ],
+  "nativeCandidate": [
+    {
+      "startVertex": 0,
+      "vertexCount": 8,
+      "piece": 0
+    },
+    {
+      "startVertex": 8,
+      "vertexCount": 60,
+      "piece": 1
+    },
+    {
+      "startVertex": 68,
+      "vertexCount": 12,
+      "piece": 14
+    },
+    {
+      "startVertex": 80,
+      "vertexCount": 12,
+      "piece": 15
+    },
+    {
+      "startVertex": 92,
+      "vertexCount": 12,
+      "piece": 16
+    },
+    {
+      "startVertex": 104,
+      "vertexCount": 12,
+      "piece": 17
+    },
+    {
+      "startVertex": 116,
+      "vertexCount": 8,
+      "piece": 20
+    },
+    {
+      "startVertex": 124,
+      "vertexCount": 60,
+      "piece": 21
+    },
+    {
+      "startVertex": 184,
+      "vertexCount": 12,
+      "piece": 34
+    },
+    {
+      "startVertex": 196,
+      "vertexCount": 12,
+      "piece": 35
+    },
+    {
+      "startVertex": 208,
+      "vertexCount": 12,
+      "piece": 36
+    },
+    {
+      "startVertex": 220,
+      "vertexCount": 12,
+      "piece": 37
+    },
+    {
+      "startVertex": 232,
+      "vertexCount": 8,
+      "piece": 40
+    },
+    {
+      "startVertex": 240,
+      "vertexCount": 8,
+      "piece": 41
+    },
+    {
+      "startVertex": 248,
+      "vertexCount": 60,
+      "piece": 42
+    },
+    {
+      "startVertex": 308,
+      "vertexCount": 12,
+      "piece": 55
+    },
+    {
+      "startVertex": 320,
+      "vertexCount": 12,
+      "piece": 56
+    },
+    {
+      "startVertex": 332,
+      "vertexCount": 12,
+      "piece": 57
+    },
+    {
+      "startVertex": 344,
+      "vertexCount": 12,
+      "piece": 58
+    },
+    {
+      "startVertex": 356,
+      "vertexCount": 60,
+      "piece": 61
+    },
+    {
+      "startVertex": 416,
+      "vertexCount": 8,
+      "piece": 62
+    },
+    {
+      "startVertex": 424,
+      "vertexCount": 8,
+      "piece": 63
+    },
+    {
+      "startVertex": 432,
+      "vertexCount": 24,
+      "piece": 64
+    },
+    {
+      "startVertex": 456,
+      "vertexCount": 24,
+      "piece": 65
+    },
+    {
+      "startVertex": 480,
+      "vertexCount": 8,
+      "piece": 66
+    },
+    {
+      "startVertex": 488,
+      "vertexCount": 24,
+      "piece": 67
+    },
+    {
+      "startVertex": 512,
+      "vertexCount": 24,
+      "piece": 68
+    }
+  ]
+}

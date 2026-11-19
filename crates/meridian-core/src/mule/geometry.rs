@@ -77,7 +77,7 @@ struct DistanceBracket {
     direction: Vec3,
 }
 impl SmoothPiece {
-    pub(super) fn new(points: Vec<Vec3>, radius: f64) -> Result<Self, EnvelopeError> {
+    pub(crate) fn new(points: Vec<Vec3>, radius: f64) -> Result<Self, EnvelopeError> {
         if points.is_empty()
             || points.len() > 5344
             || !points.iter().copied().all(finite)

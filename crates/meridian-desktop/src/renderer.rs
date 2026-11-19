@@ -417,9 +417,11 @@ impl Renderer {
             let scale = self.window.scale_factor();
             let logical = self.size.to_logical::<f64>(scale);
             self.docked.prepare(
+                &self.device,
                 &self.queue,
                 menu,
                 [logical.width, logical.height],
+                [self.size.width, self.size.height],
                 docked_planet.and_then(|s| s.planet.as_ref().map(|p| p.id.system)),
             )?;
             self.celestial
@@ -591,6 +593,14 @@ impl Renderer {
             self.celestial.draw_surfaces(&mut pass);
             pass.set_scissor_rect(0, 0, self.config.width, self.config.height);
             self.docked.draw_models(&mut pass);
+            pass.set_viewport(
+                0.0,
+                0.0,
+                self.config.width as f32,
+                self.config.height as f32,
+                0.0,
+                1.0,
+            );
             self.celestial.draw_halos(&mut pass);
         } else {
             self.celestial.draw_surfaces(&mut pass);

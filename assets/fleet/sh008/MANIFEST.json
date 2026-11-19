@@ -1,0 +1,49 @@
+{
+  "id": "SH008",
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "calibration": "10000000/1028273 m per source unit; exact staged display f64 and original native candidate rounded once",
+  "detailed": {
+    "vertices": 2072,
+    "faces": 3484
+  },
+  "nativeCandidate": {
+    "vertices": 536,
+    "faces": 964
+  },
+  "envelope": "69 source-local convex supports plus a 0.02 m sphere; candidate only",
+  "authority": "Detailed asset staged. Native candidate and engineering/runtime qualification pending.",
+  "files": {
+    "resource.toml": {
+      "bytes": 514622,
+      "sha256": "aafcb5dfec2cb5d141316756daae267888bf3541383f4f155c2561a4d7dd0bb7"
+    },
+    "original-design.toml": {
+      "bytes": 524419,
+      "sha256": "9a6b3e1403a5cbb45691592f2db2e1dac79bfc7c0d328a4b86a234487943e127"
+    },
+    "contract.toml": {
+      "bytes": 3496,
+      "sha256": "6815e92d5480692d18576ab5ed5e98cd1f99b1bff622c3c7eb346ed59bcf8d42"
+    },
+    "LICENSE": {
+      "bytes": 1071,
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+    },
+    "source.vertices": {
+      "bytes": 62608,
+      "sha256": "b800dde4cc63355a3aa133c8ecf57a346cf092505134fcbc8dc7b4b8be662b35"
+    },
+    "source-triangles.bin": {
+      "bytes": 53376,
+      "sha256": "1c9cce536f98447a9a5d966e86a8992983b1d341e190b072985357ca0bde706a"
+    },
+    "source-piece-membership.bin": {
+      "bytes": 2608,
+      "sha256": "619e385179e58761a376417a59a3f8af8a071ba6cd4bd76f268e4cad02d8a9ff"
+    },
+    "COMPONENT-PIECES.json": {
+      "bytes": 17575,
+      "sha256": "ac6df6d43df9cf4f70432c479bc9441004135b418ba034a22beb8b657a12cc2b"
+    }
+  }
+}
