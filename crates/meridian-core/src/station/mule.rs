@@ -174,6 +174,17 @@ impl OriginalStationData {
         self.rounded_station_launch_start(source.pieces().as_ref())
     }
 
+    /// Controlled SH016 motion against the original SH028 mesh.
+    pub fn mole_miner_motion_clear(
+        &self,
+        source: &crate::mole_miner::MoleMinerHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces(), start, end, angular_travel)
+    }
+
     pub fn goshawk_motion_clear(
         &self,
         source: &GoshawkHullSource,

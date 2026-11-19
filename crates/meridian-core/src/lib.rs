@@ -73,6 +73,8 @@ pub use flight::{
 
 pub use flight::{FlightResourcesSnapshot, FrontLaserSnapshot};
 
+pub mod mole_miner;
+
 pub use flight::{EquipmentPreparationError, PreparedEquipment};
 
 pub use flight::{
