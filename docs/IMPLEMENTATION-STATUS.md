@@ -1,5 +1,9 @@
 # Implementation and validation status
 
+## SH041 Serval Fighter source candidate
+
+The exact archived 224-face native Serval source fits the cap without a replacement. The signed installed Studio exported all 23 source-local groups, verified three openings and refused three original solid routes; reports and export replayed byte-for-byte. Independent surface certificates bound the exposed envelope at 278–348 mm against detail and 1,317–1,323 mm against native; the latter difference comes from the original detailed canopy crest. The complete fixed-yaw SH028 lip sweep has 45,138 mm net aligned clearance and an offset actual native lip-face intersection following a 1,159 mm-clear start. Physical operation, native game rendering and campaign admission remain pending. [Source and measurements](SERVAL-GAMEPLAY-ENVELOPE.md)
+
 ## Generated desktop audio source candidate
 
 The authored desktop integration routes generated launch and docking cues from actual mode transitions, front-laser sounds from accepted Pulse or Mining Laser discharges, and the original missile notification ping after an accepted missile launch. Ctrl+Shift+M toggles sound; Help displays availability. New/Continue primes without replay, and a missing device leaves gameplay active. Application suspension releases the audio device; resuming restores the mute preference without replaying accepted cues. No speech, kill, ECM, continuous cutter or EMP effects are claimed. Native device and Rust qualification remain pending.
