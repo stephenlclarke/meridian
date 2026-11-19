@@ -19,6 +19,10 @@ pub(super) struct Frames {
 }
 
 pub(super) fn station_frames() -> Vec<Frames> {
+    station_frames_for("Goshawk Explorer")
+}
+
+fn station_frames_for(name: &str) -> Vec<Frames> {
     let directory = TestDirectory::new();
     let mut profile = open(&directory.0);
     assert!(ok(profile.new_commander(97009)));
@@ -35,7 +39,7 @@ pub(super) fn station_frames() -> Vec<Frames> {
             ok(menu.input(&mut profile, action));
         };
         input(Input::Key(Key::Search));
-        input(Input::Text("Goshawk Explorer".into()));
+        input(Input::Text(name.into()));
         input(Input::Key(Key::Confirm));
         input(Input::Key(Key::ResetView));
     }
@@ -129,16 +133,40 @@ fn original_goshawk_fits_minimum_station_showroom_solo_and_compare() {
     assert_eq!(vertices.len(), 3_484 * 3);
     // The opaque projection uses the original detailed visual, independently of shimmer.
     let view = View::new(&vertices, [EMPTY_PIECE; GOSHAWK_PIECES]);
-    for (index, Frames { solo, comparison }) in station_frames().into_iter().enumerate() {
+    assert_variant_fits_minimum(station_frames(), &view, &vertices, "SH008");
+}
+
+#[test]
+fn original_custom_fits_minimum_station_showroom_solo_and_compare() {
+    let vertices = ok(super::Hull::Custom.visual());
+    assert_eq!(vertices.len(), super::CUSTOM_DETAILED_FACES * 3);
+    let view = View::new(&vertices, [EMPTY_PIECE; super::CUSTOM_PIECES]);
+    assert_variant_fits_minimum(
+        station_frames_for("Goshawk Mk II Custom"),
+        &view,
+        &vertices,
+        "SH010",
+    );
+}
+
+fn assert_variant_fits_minimum(
+    frames: Vec<Frames>,
+    view: &View,
+    vertices: &[VisualVertex],
+    id: &str,
+) {
+    for (index, Frames { solo, comparison }) in frames.into_iter().enumerate() {
         let [standalone] = solo.models.as_slice() else {
-            panic!("expected solo SH008")
+            panic!("expected solo {id}")
         };
         let [baseline, selected] = comparison.models.as_slice() else {
-            panic!("expected baseline and SH008 comparison");
+            panic!("expected baseline and {id} comparison");
         };
         assert_eq!(baseline.object, "SH025");
         assert_eq!(baseline.geometry_key, "assets/legacy/sh025.mesh");
         assert!(matches(standalone) && matches(selected));
+        assert_eq!(standalone.object, id);
+        assert_eq!(selected.object, id);
         assert_eq!(standalone.orientation, selected.orientation);
         let orientation = standalone.orientation;
         let yaw = if index == 0 {
@@ -162,7 +190,7 @@ fn original_goshawk_fits_minimum_station_showroom_solo_and_compare() {
         assert!(!overlaps(baseline.bounds, selected.bounds));
         assert!(baseline.bounds.x < selected.bounds.x);
         for model in [standalone, selected] {
-            assert_original_fits(&view, &vertices, model);
+            assert_original_fits(view, vertices, model);
         }
     }
 }

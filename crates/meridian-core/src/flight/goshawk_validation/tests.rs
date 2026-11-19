@@ -1,4 +1,6 @@
-use super::{GoshawkApproachSnapshot, GoshawkApproachStatus as Status, World};
+use super::{
+    GoshawkApproachSnapshot, GoshawkApproachStatus as Status, GoshawkHullApproachSnapshot, World,
+};
 use crate::save::SaveError;
 use crate::{FlightInput, FlightStart, StationError, StepError};
 use std::error::Error;
@@ -31,7 +33,17 @@ fn run(
     approach: FlightStart,
     expected: Status,
 ) -> Result<(), Box<dyn Error>> {
-    let mut world = World::goshawk_docking_validation_scenario(observer, approach)?;
+    let world = World::goshawk_docking_validation_scenario(observer, approach)?;
+    run_world(label, world, expected, World::goshawk_approach_snapshot)
+}
+
+fn run_world<const N: usize>(
+    label: &str,
+    mut world: World,
+    expected: Status,
+    snapshot: fn(&World) -> Option<GoshawkHullApproachSnapshot<N>>,
+) -> Result<(), Box<dyn Error>> {
+    let frame = |world: &World| snapshot(world).ok_or(StepError::InvalidMode);
     let plane = world
         .station_port()
         .ok_or(StationError::InvalidPort)?
@@ -205,4 +217,105 @@ fn goshawk_world_refuses_unbound_motion_and_overlapping_starts() {
         ),
         Err(StationError::InvalidPose)
     ));
+}
+
+#[test]
+fn custom_world_approach_reports_its_own_physical_contacts_and_entry() -> Result<(), Box<dyn Error>>
+{
+    let closer_observer = FlightStart {
+        position: [0.0, 0.0, 360.0],
+        ..OBSERVER
+    };
+    let cases = [
+        (
+            "custom-aligned",
+            OBSERVER,
+            inbound(0.0, 220.0, 4.0),
+            Status::Entered,
+        ),
+        (
+            "custom-overspeed",
+            OBSERVER,
+            inbound(0.0, 220.0, 9.0),
+            Status::EntryConditions,
+        ),
+        (
+            "custom-lip",
+            OBSERVER,
+            inbound(60.883_217, 220.0, 12.0),
+            Status::StationContact,
+        ),
+        (
+            "custom-off-aperture",
+            OBSERVER,
+            inbound(100.0, 220.0, 4.0),
+            Status::EntryConditions,
+        ),
+        (
+            "custom-observer",
+            closer_observer,
+            inbound(0.0, 520.0, 8.0),
+            Status::ObserverContact,
+        ),
+    ];
+    for (label, observer, approach, expected) in cases {
+        let world = World::goshawk_custom_docking_validation_scenario(observer, approach)?;
+        assert!(world.goshawk_approach_snapshot().is_none());
+        run_world(
+            label,
+            world,
+            expected,
+            World::goshawk_custom_approach_snapshot,
+        )?;
+    }
+    Ok(())
+}
+
+#[test]
+fn custom_world_enforces_own_r3_speed_and_snapshot_scope() -> Result<(), Box<dyn Error>> {
+    use crate::goshawk_custom::{CUSTOM_CONTRACT_SHA256, CUSTOM_RESOURCE_SHA256};
+    assert!(World::new().goshawk_custom_approach_snapshot().is_none());
+    let start = inbound(0.0, 220.0, 4.0);
+    let mut world = World::goshawk_custom_docking_validation_scenario(OBSERVER, start)?;
+    let other = World::goshawk_custom_docking_validation_scenario(OBSERVER, start)?;
+    let explorer = World::goshawk_docking_validation_scenario(OBSERVER, start)?;
+    let first = world
+        .goshawk_custom_approach_snapshot()
+        .ok_or(StepError::InvalidMode)?;
+    assert!(world.goshawk_approach_snapshot().is_none());
+    assert!(explorer.goshawk_custom_approach_snapshot().is_none());
+    assert!(!explorer.goshawk_custom_snapshot_is_current(&first));
+    assert!(!other.goshawk_custom_snapshot_is_current(&first));
+    assert!(world.goshawk_custom_snapshot_is_current(&first));
+    assert_eq!(first.pieces().len(), 73);
+    assert_eq!(
+        first.source_identity(),
+        (CUSTOM_RESOURCE_SHA256, CUSTOM_CONTRACT_SHA256)
+    );
+    assert!(world.commander_id().is_none() && world.player_ship_id().is_none());
+    assert_eq!(world.save_bytes(), Err(SaveError::NoCommander));
+    let observer = world
+        .goshawk_custom_observer_pose(&first)
+        .ok_or(StepError::InvalidMode)?;
+    let input = FlightInput {
+        yaw: 0.5,
+        ..FlightInput::default()
+    };
+    assert_eq!(world.step(input), Err(StepError::InvalidMode));
+    assert!(world.goshawk_custom_snapshot_is_current(&first));
+    world.step(FlightInput::default())?;
+    let second = world
+        .goshawk_custom_approach_snapshot()
+        .ok_or(StepError::InvalidMode)?;
+    assert!(!world.goshawk_custom_snapshot_is_current(&first));
+    assert!(world.goshawk_custom_observer_pose(&first).is_none());
+    assert_eq!(world.goshawk_custom_observer_pose(&second), Some(observer));
+    assert!(Arc::ptr_eq(first.pieces(), second.pieces()));
+    for speed in [0.0, 40.0_f32.next_up()] {
+        assert!(matches!(
+            World::goshawk_custom_docking_validation_scenario(OBSERVER, inbound(0.0, 220.0, speed)),
+            Err(StationError::InvalidPose)
+        ));
+    }
+    Ok(())
 }
