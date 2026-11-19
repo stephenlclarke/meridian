@@ -22,14 +22,19 @@ A fresh commander delivered all eight G02 freight units at Renas, received 730 C
 
 ## Goshawk Explorer source candidate
 
-The SH008 geometry and Showroom source target the original forest-silver Goshawk Explorer. A docked commander can select the original detailed preview and inspect the open wishbone and subtle rounded-envelope shimmer through the existing Showroom controls. On Mac, Compare showed both ships, a single-ship view showed the wishbone, and Exchange left the commander and cargo unchanged. Four core geometry and station tests passed on Mac, Linux and native Windows. Three offscreen Mac views passed temporal shimmer checks. All seven controlled World and station cases passed on Mac, Linux and native Windows. The 640×360 offscreen Showroom checks passed in solo and Compare views. GPU timing returned invalid counters. Ordinary placement, physical design adoption and gameplay docking remain open. [Geometry and presentation scope](GOSHAWK-GAMEPLAY-ENVELOPE.md)
+The SH008 geometry and Showroom source target the original forest-silver Goshawk Explorer. A docked commander can select the original detailed preview and inspect the open wishbone and subtle rounded-envelope shimmer through the existing Showroom controls. On Mac, Compare showed both ships, a single-ship view showed the wishbone, and Exchange left the commander and cargo unchanged. Four core geometry and station tests passed on Mac, Linux and native Windows. Three offscreen Mac views passed temporal shimmer checks. All seven controlled World and station cases passed on Mac, Linux and native Windows. The 640×360 offscreen Showroom checks passed in solo and Compare views. GPU timing returned invalid counters. [Geometry and presentation scope](GOSHAWK-GAMEPLAY-ENVELOPE.md)
 
 The chosen 69-piece Goshawk shield bridges the four measured service wells
 and keeps the forebody channel open. A gameplay collision regression now
 checks the original mouth centers and complete approaches for both aft body
 wells and both left arm wells. Execution of that new regression is pending.
-Stock dry mass and inertia, ordinary placement and gameplay docking remain
-open. [Service-well decision](GOSHAWK-GAMEPLAY-ENVELOPE.md#full-surface-fit-evidence)
+[Service-well decision](GOSHAWK-GAMEPLAY-ENVELOPE.md#full-surface-fit-evidence)
+
+The controlled Goshawk actor now publishes the adopted 33,719 kg stock dry
+mass, matched centre of mass and inertia tensor. The drive mechanism mass
+includes both luminous recesses. The new World regression awaits owned
+execution. Ordinary placement and gameplay docking remain open.
+[Stock engineering](GOSHAWK-GAMEPLAY-ENVELOPE.md#adopted-stock-engineering)
 
 ## Internal Mule docking validation
 

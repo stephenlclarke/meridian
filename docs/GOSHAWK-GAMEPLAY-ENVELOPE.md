@@ -1,6 +1,6 @@
 # SH008 Goshawk Explorer envelope candidate
 
-Goshawk Explorer is the next unresolved original ship in catalogue order after Mule. This slice binds the original SH008 detailed model, original native candidate, and R3 contract. It prepares a hull-specific gameplay envelope for review and qualification. Ordinary placement, engineering mass and inertia, player acquisition, paid effects and crew custody still need their own source authority.
+Goshawk Explorer is the next unresolved original ship in catalogue order after Mule. This slice binds the original SH008 detailed model, original native candidate, and R3 contract. It prepares a hull-specific gameplay envelope for review and qualification. Ordinary placement, player acquisition, paid effects and crew custody still need their own source authority.
 
 The staged forest-silver display resource keeps its original 3,484 triangles, winding, materials, texture identities and UVs. Its positions use the authorized 30 m detailed length calibration of 10000000/1028273 metres per source unit. The original 964-triangle native candidate uses the same coordinate convention and exact rational calibration. It remains unqualified. The staged resource publishes only a detailed model. Preserve that distinction and the original 512-face exact qualification limit.
 
@@ -14,7 +14,7 @@ The authored clearance test carries a small physical triangle through ten metres
 
 At a station berth, open Ship Showroom with 3 and search for Goshawk Explorer. The preview submits all 3,484 calibrated detailed triangles in their original order with the original forest-silver material assignments and repeated texture coordinates. The same project-authored diffuse maps already bundled for SH001 are reused by source identity. [Visual provenance](../assets/fleet/sh008/VISUAL-PROVENANCE.json)
 
-The preview rotates with the existing Showroom controls. It draws the opaque detailed hull and a separate close grazing shimmer from the 69 rounded pieces in the geometry packet. The union shades at most one exposed surface per ray and reaches zero opacity at 64 m. The preview uses fixed illumination. The authored World placement, physical mass and inertia, cockpit, docking and acquisition still need their own source and acceptance. The native Mac Showroom displayed the Goshawk in Compare and single-ship views. Rotation exposed the opening between its arms. The normal-size view passed. GPU draw cost remains open.
+The preview rotates with the existing Showroom controls. It draws the opaque detailed hull and a separate close grazing shimmer from the 69 rounded pieces in the geometry packet. The union shades at most one exposed surface per ray and reaches zero opacity at 64 m. The preview uses fixed illumination. The controlled World uses the adopted stock mass and inertia. Ordinary placement, mass-dependent flight, cockpit operation, gameplay docking and acquisition still need acceptance. The native Mac Showroom displayed the Goshawk in Compare and single-ship views. Rotation exposed the opening between its arms. The normal-size view passed. GPU draw cost remains open.
 
 ## Metal shimmer evidence
 
@@ -109,8 +109,7 @@ admit spherical probes to those mouth centers. The four certified straight
 routes support probe diameters of at least 106.716, 30.782, 59.596 and
 15.256 mm respectively. The selected 69-piece shield blocks a point probe
 on each of the same routes. Both original triangle sets and the forest-silver
-Showroom asset are preserved. Stock dry mass and inertia are a separate
-engineering decision.
+Showroom asset are preserved.
 
 The source-only audit can be repeated without a simulator or asset import.
 Use NumPy 2.5.5, SciPy 1.18.1, trimesh 5.2.1, and rtree 1.4.1.
@@ -125,3 +124,23 @@ Dyadic patch witnesses and outward error allowances bound every rounded
 piece surface against each original. Floating-point nearest-face searches
 nominate candidate witnesses. The certificates check their geometric bounds
 independently. This is a source-only audit.
+
+## Adopted stock engineering
+
+The Goshawk Explorer's stock dry mass is **33,719 kg**. The two luminous
+recesses are included in the existing drive mechanisms' mass. The selected
+centre of mass is approximately `[-0.000013111, 0.311774780, -2.362604393]`
+metres from the calibrated hull origin. The full symmetric XYZ inertia
+tensor is expressed about that centre in kg·m².
+
+The controlled SH028 World publishes the adopted stock mass properties from
+the same authenticated SH008 hull that supplies its collision geometry.
+The certification snapshot makes the hull-local tensor available and
+transforms the centre of mass into station coordinates. The approach
+uses the source hull frame for contact and port fit. The mass properties
+are stock data for this controlled path. Ordinary placement and
+mass-dependent flight remain separate qualification.
+
+The regression checks the exact mass, three centre coordinates and all nine
+tensor entries against the independent MC1 baseline, then checks the centre
+in the World before and after a fixed tick. [Retained MC1 proposal](../integration/sh008-goshawk/SH008-STOCK-ENGINEERING-PROPOSAL.json)
