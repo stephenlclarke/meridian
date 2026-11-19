@@ -1,0 +1,547 @@
+{
+  "hull": "SH009 Goshawk Mk II",
+  "status": "Proposed source-based dry-hull values, pending Orchestrator disposition.",
+  "meridianRevision": "06c2649da4bac073445f3e8e116c5b9a4850e1d5",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourceManifestSha256": "7437c000492b4c8495032ce123cdd33f5dc06bca96cf61899d8956501df34525",
+  "roleMap": {
+    "file": "SH009-ROLE-AND-MOUNT-PROPOSAL.json",
+    "sha256": "a557a10c7325a250a27c6ffc3869ad7979992fe689911178b067d6609443cb7c"
+  },
+  "calculator": {
+    "file": "calculate_sh009.py",
+    "sha256": "b302c2c3387212d4faa99d6316e932d5f97236baab16c53570bb94889a490e09"
+  },
+  "axes": "Original hull-local XYZ metres, +Y up and +Z forward. Tensor row/column order X Y Z.",
+  "method": "Uniform stock surface mass via exact polynomial triangle moments; hardware point lumps; single ceiling-kilogram reserve placed at COM.",
+  "recommended": {
+    "stockMassKg": 29831.519098223267,
+    "hardwareMassKg": 3240,
+    "unroundedDryMassKg": 33071.51909822327,
+    "dryMassKg": 33072,
+    "centreOfMassMetres": [
+      -8.861534966633264e-06,
+      0.19826192100360518,
+      -2.153649052231662
+    ],
+    "roundingReserveKg": 0.4809017767329351,
+    "roundingReserveLocationMetres": [
+      -8.861534966633264e-06,
+      0.19826192100360518,
+      -2.153649052231662
+    ],
+    "inertiaAboutCentreOfMassKgM2": [
+      [
+        2647102.4435325763,
+        3.060870338590036,
+        -13.994218130815712
+      ],
+      [
+        3.060870338590036,
+        3698817.432572852,
+        105297.48583464578
+      ],
+      [
+        -13.994218130815712,
+        105297.48583464578,
+        1258367.897183716
+      ]
+    ],
+    "inertiaAboutSourceOriginIncludingReserveKgM2": [
+      [
+        2801797.1213721465,
+        3.1189746989484495,
+        -14.625385225248076
+      ],
+      [
+        3.1189746989484495,
+        3852212.123206627,
+        119418.78661240113
+      ],
+      [
+        -14.625385225248076,
+        119418.78661240113,
+        1259667.8843947055
+      ]
+    ],
+    "positiveLeadingPrincipalMinors": [
+      2647102.4435325763,
+      9791148663935.117,
+      1.2291517245962287e+19
+    ],
+    "roleTotals": {
+      "structural": {
+        "faces": 3112,
+        "areaM2": 2112.477070734933,
+        "stockMassKg": 29574.678990289063
+      },
+      "glazing": {
+        "faces": 236,
+        "areaM2": 51.36802158684134,
+        "stockMassKg": 256.8401079342067
+      },
+      "drive-internal": {
+        "faces": 184,
+        "areaM2": 30.858365386172082,
+        "stockMassKg": 0.0
+      }
+    },
+    "blockAreas": [
+      {
+        "name": "Negative-X rail",
+        "faces": [
+          0,
+          12
+        ],
+        "role": "structural",
+        "areaM2": 304.9477645420146
+      },
+      {
+        "name": "Negative-X forward arm envelope",
+        "faces": [
+          12,
+          248
+        ],
+        "role": "structural",
+        "areaM2": 108.12231783456647
+      },
+      {
+        "name": "Negative-X twelve recessed wells and baffles",
+        "faces": [
+          248,
+          920
+        ],
+        "role": "structural",
+        "areaM2": 118.94890318177494
+      },
+      {
+        "name": "Negative-X opaque struts",
+        "faces": [
+          920,
+          944
+        ],
+        "role": "structural",
+        "areaM2": 3.3768130742532834
+      },
+      {
+        "name": "Positive-X rail",
+        "faces": [
+          944,
+          956
+        ],
+        "role": "structural",
+        "areaM2": 304.9477645420146
+      },
+      {
+        "name": "Positive-X forward arm envelope",
+        "faces": [
+          956,
+          1192
+        ],
+        "role": "structural",
+        "areaM2": 108.12231783456649
+      },
+      {
+        "name": "Positive-X twelve recessed wells and baffles",
+        "faces": [
+          1192,
+          1864
+        ],
+        "role": "structural",
+        "areaM2": 118.94890318177494
+      },
+      {
+        "name": "Positive-X opaque struts",
+        "faces": [
+          1864,
+          1888
+        ],
+        "role": "structural",
+        "areaM2": 3.3768130742532882
+      },
+      {
+        "name": "Fore transverse brace",
+        "faces": [
+          1888,
+          1900
+        ],
+        "role": "structural",
+        "areaM2": 148.44732870775073
+      },
+      {
+        "name": "Aft transverse brace",
+        "faces": [
+          1900,
+          1912
+        ],
+        "role": "structural",
+        "areaM2": 128.42102471614336
+      },
+      {
+        "name": "Primary pressure body",
+        "faces": [
+          1912,
+          2148
+        ],
+        "role": "structural",
+        "areaM2": 257.7433044068154
+      },
+      {
+        "name": "Pressure body twelve recessed wells and baffles",
+        "faces": [
+          2148,
+          2820
+        ],
+        "role": "structural",
+        "areaM2": 229.11667953520092
+      },
+      {
+        "name": "Pressure body opaque struts",
+        "faces": [
+          2820,
+          2844
+        ],
+        "role": "structural",
+        "areaM2": 6.764242288912691
+      },
+      {
+        "name": "Glazing envelope",
+        "faces": [
+          2844,
+          3080
+        ],
+        "role": "glazing",
+        "areaM2": 51.36802158684134
+      },
+      {
+        "name": "Opaque cockpit crossmember",
+        "faces": [
+          3080,
+          3092
+        ],
+        "role": "structural",
+        "areaM2": 3.2067818617924826
+      },
+      {
+        "name": "Negative-X propulsion support",
+        "faces": [
+          3092,
+          3104
+        ],
+        "role": "structural",
+        "areaM2": 39.19835920189405
+      },
+      {
+        "name": "Negative-X outer propulsion casing",
+        "faces": [
+          3104,
+          3196
+        ],
+        "role": "structural",
+        "areaM2": 71.43720302587103
+      },
+      {
+        "name": "Negative-X propulsion luminous recess",
+        "faces": [
+          3196,
+          3288
+        ],
+        "role": "drive-internal",
+        "areaM2": 15.429182693086041
+      },
+      {
+        "name": "Positive-X propulsion support",
+        "faces": [
+          3288,
+          3300
+        ],
+        "role": "structural",
+        "areaM2": 39.19835920189406
+      },
+      {
+        "name": "Positive-X outer propulsion casing",
+        "faces": [
+          3300,
+          3392
+        ],
+        "role": "structural",
+        "areaM2": 71.43720302587103
+      },
+      {
+        "name": "Positive-X propulsion luminous recess",
+        "faces": [
+          3392,
+          3484
+        ],
+        "role": "drive-internal",
+        "areaM2": 15.429182693086041
+      },
+      {
+        "name": "Negative-X lower mount upright",
+        "faces": [
+          3484,
+          3496
+        ],
+        "role": "structural",
+        "areaM2": 11.324308426003844
+      },
+      {
+        "name": "Negative-X lower mount longitudinal member",
+        "faces": [
+          3496,
+          3508
+        ],
+        "role": "structural",
+        "areaM2": 12.033185322780312
+      },
+      {
+        "name": "Positive-X lower mount upright",
+        "faces": [
+          3508,
+          3520
+        ],
+        "role": "structural",
+        "areaM2": 11.324308426003844
+      },
+      {
+        "name": "Positive-X lower mount longitudinal member",
+        "faces": [
+          3520,
+          3532
+        ],
+        "role": "structural",
+        "areaM2": 12.033185322780312
+      }
+    ],
+    "hardware": [
+      {
+        "name": "Negative-X intrinsic drive",
+        "massKg": 900,
+        "component": 160,
+        "vertexRange": [
+          1872,
+          1920
+        ],
+        "basis": "Both complete rings of the actual negative-X casing.",
+        "anchorMetres": [
+          -8.066229242567676,
+          0.0,
+          -15.543093783446517
+        ]
+      },
+      {
+        "name": "Positive-X intrinsic drive",
+        "massKg": 900,
+        "component": 163,
+        "vertexRange": [
+          1976,
+          2024
+        ],
+        "basis": "Both complete rings of the actual positive-X casing.",
+        "anchorMetres": [
+          8.066229242567676,
+          0.0,
+          -15.543093783446517
+        ]
+      },
+      {
+        "name": "Intrinsic electrical plant",
+        "massKg": 750,
+        "component": 106,
+        "vertexRange": [
+          1192,
+          1216
+        ],
+        "basis": "Proposed centre of the wider aft pressure-body station.",
+        "anchorMetres": [
+          0.0,
+          1.6002555388452617,
+          -10.373675357100161
+        ]
+      },
+      {
+        "name": "Empty tank and plumbing",
+        "massKg": 180,
+        "component": 106,
+        "vertexRange": [
+          1192,
+          1240
+        ],
+        "basis": "Proposed midpoint of the aft and middle pressure-body stations.",
+        "anchorMetres": [
+          0.0,
+          1.6002555388452617,
+          -4.879550962020288
+        ]
+      },
+      {
+        "name": "One empty life-support and quarters assembly",
+        "massKg": 120,
+        "component": 106,
+        "vertexRange": [
+          1216,
+          1240
+        ],
+        "basis": "Proposed centre of the middle body station. R3 has one intrinsic crew place.",
+        "anchorMetres": [
+          0.0,
+          1.6002555388452617,
+          0.614573433059585
+        ]
+      },
+      {
+        "name": "Controls and sensors",
+        "massKg": 90,
+        "component": 158,
+        "vertexRange": [
+          1856,
+          1864
+        ],
+        "basis": "Proposed centre of the actual opaque cockpit crossmember.",
+        "anchorMetres": [
+          0.0,
+          5.1772973315582,
+          1.2800161657186984
+        ]
+      },
+      {
+        "name": "Empty equipment interface, negative-X half",
+        "massKg": 70,
+        "component": 166,
+        "vertexRange": [
+          2080,
+          2088
+        ],
+        "basis": "One half of the single 140 kg empty interface; a proposed point at the actual longitudinal support centre.",
+        "anchorMetres": [
+          -4.669922193065497,
+          -4.047705186490957,
+          8.568521216407577
+        ]
+      },
+      {
+        "name": "Empty equipment interface, positive-X half",
+        "massKg": 70,
+        "component": 168,
+        "vertexRange": [
+          2096,
+          2104
+        ],
+        "basis": "The second half of that assembly; mirrored actual longitudinal support centre.",
+        "anchorMetres": [
+          4.669922193065497,
+          -4.047705186490957,
+          8.568521216407577
+        ]
+      },
+      {
+        "name": "Empty internal magazine and launcher assembly",
+        "massKg": 160,
+        "component": 106,
+        "vertexRange": [
+          1240,
+          1264
+        ],
+        "basis": "Proposed forward central pressure-body station. R3 specifies internal storage and rules out external pylons.",
+        "anchorMetres": [
+          0.0,
+          1.6002555388452617,
+          5.127595277175241
+        ]
+      }
+    ],
+    "minimumTriangleAreaM2": 0.0011370909993198034
+  },
+  "independentCalculation": {
+    "unroundedDryMassKg": 33071.51909822327,
+    "dryMassKg": 33072,
+    "centreOfMassMetres": [
+      -8.861534966664606e-06,
+      0.19826192100360515,
+      -2.153649052231662
+    ],
+    "inertiaAboutCentreOfMassKgM2": [
+      [
+        2647102.4435325763,
+        3.0608703385869402,
+        -13.994218130801555
+      ],
+      [
+        3.0608703385869402,
+        3698817.432572852,
+        105297.48583464578
+      ],
+      [
+        -13.994218130801555,
+        105297.48583464578,
+        1258367.8971837158
+      ]
+    ],
+    "inertiaAboutSourceOriginIncludingReserveKgM2": [
+      [
+        2801797.1213721465,
+        3.1189746989451628,
+        -14.625385225259171
+      ],
+      [
+        3.1189746989451628,
+        3852212.1232066266,
+        119418.78661240113
+      ],
+      [
+        -14.625385225259171,
+        119418.78661240113,
+        1259667.8843947053
+      ]
+    ],
+    "minimumTriangleAreaM2": 0.0011370909993198008
+  },
+  "absoluteMaxDifferences": {
+    "massKg": 0.0,
+    "comM": 3.134191311430362e-17,
+    "tensorKgM2": 2.3283064365386963e-10,
+    "originIncludingReserveTensorKgM2": 4.656612873077393e-10
+  },
+  "mountSourceMatches": [
+    {
+      "name": "Negative-X lower mount upright",
+      "detailedComponent": 165,
+      "nativeComponent": 27,
+      "exactOrderedGeometryMatch": true
+    },
+    {
+      "name": "Negative-X lower mount longitudinal member",
+      "detailedComponent": 166,
+      "nativeComponent": 28,
+      "exactOrderedGeometryMatch": true
+    },
+    {
+      "name": "Positive-X lower mount upright",
+      "detailedComponent": 167,
+      "nativeComponent": 29,
+      "exactOrderedGeometryMatch": true
+    },
+    {
+      "name": "Positive-X lower mount longitudinal member",
+      "detailedComponent": 168,
+      "nativeComponent": 30,
+      "exactOrderedGeometryMatch": true
+    }
+  ],
+  "sourceProof": {
+    "verifiedAgainstBothGitRevisions": true,
+    "detailedTrianglesWithPositiveArea": 3532,
+    "nativeFacesExcludedFromMass": 1012,
+    "exactComponentPartitions": 169,
+    "duplicateIndexOrPositionFaces": 0,
+    "originalSpecificationMassAuthority": "Unissued",
+    "nativeFaceLimit": 512
+  },
+  "unsupportedAssumptions": [
+    "Original source specification/export and the R3 resource supply no dry mass, density, COM or inertia.",
+    "The stock areal loads and intrinsic hardware budgets are adopted project design estimates. Actual material thickness and physical hardware volume remain unspecified.",
+    "The two actual structural attachment stations have no recovered slot type, fitting access, clearance, mounted item or equipment purchase. Associating the two utility interfaces with them and distributing their empty hardware mass evenly is a new design decision.",
+    "The electrical plant, tank, empty accommodation, controls and empty internal magazine have no recovered individual geometry or mount coordinates. Their point locations use explicitly listed SH009 source vertices as proposed anchors.",
+    "No crew person, cargo, fuel, ammunition, paid role kit, additional cabin, or purchased utility is included. Native admission, collision shape, docking, role kit fit and gameplay remain independent."
+  ]
+}

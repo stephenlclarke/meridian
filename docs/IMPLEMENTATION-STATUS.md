@@ -20,6 +20,8 @@ A fresh commander delivered all eight G02 freight units at Renas, received 730 C
 
 The SH008 geometry and Showroom source target the original forest-silver Goshawk Explorer. A docked commander can select the original detailed preview and inspect the open wishbone and subtle rounded-envelope shimmer through the existing Showroom controls. On Mac, Compare showed both ships, a single-ship view showed the wishbone, and Exchange left the commander and cargo unchanged. Four core geometry and station tests passed on Mac, Linux and native Windows. Three offscreen Mac views passed temporal shimmer checks. All seven controlled World and station cases passed on Mac, Linux and native Windows. The 640×360 offscreen Showroom checks passed in solo and Compare views. GPU timing returned invalid counters. [Geometry and presentation scope](GOSHAWK-GAMEPLAY-ENVELOPE.md)
 
+The SH009 Goshawk Mk II visual source packet encodes all 3,532 original detailed faces and their original appearance through the shared Showroom visual layout. Source-level Python parity and mutation checks cover every corner record. The candidate registers SH009 with a distinct visual key. The Air reproduced the 73-piece shield fit, aligned station crossing and offset lip contact. The stock engineering model is 33,072 kg. The joined Rust, renderer and native Showroom checks are pending. [Mk II source geometry and visual](GOSHAWK-MK-II-SOURCE-GEOMETRY.md)
+
 The chosen 69-piece Goshawk shield bridges the four measured service wells
 and keeps the forebody channel open. A gameplay collision regression now
 checks the original mouth centers and complete approaches for both aft body

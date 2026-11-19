@@ -5,12 +5,24 @@ use super::{
 };
 use crate::docking::{Basis3, RigidPose, Vec3};
 use crate::goshawk::GoshawkHullSource;
+use crate::goshawk_mk2::GoshawkMk2HullSource;
 use crate::mule::{MuleHullSource, SmoothPiece, rounded_fits_port, rounded_maximum_origin_radius};
 
 impl OriginalStationData {
     pub fn mule_motion_clear(
         &self,
         source: &MuleHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces().as_ref(), start, end, angular_travel)
+    }
+
+    /// Controlled SH009 motion against the original SH028 mesh.
+    pub fn goshawk_mk2_motion_clear(
+        &self,
+        source: &GoshawkMk2HullSource,
         start: RigidPose,
         end: RigidPose,
         angular_travel: f64,

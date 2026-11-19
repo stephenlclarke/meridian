@@ -1,5 +1,6 @@
 """Encode the authenticated, already calibrated SH008 detailed presentation."""
 import argparse
+from dataclasses import dataclass
 import hashlib
 import json
 import math
@@ -12,11 +13,29 @@ RESOURCE_SHA = "aafcb5dfec2cb5d141316756daae267888bf3541383f4f155c2561a4d7dd0bb7
 TEXTURES = ["l337-patrol-diffuse", "l337-strike-diffuse", "l337-service-details"]
 
 
-def encode(source, points, triangles):
-    if hashlib.sha256(source).hexdigest() != RESOURCE_SHA:
-        raise ValueError("Changed selected SH008 resource")
-    model = tomllib.loads(source.decode())["design"]
-    return encode_model(model, points, triangles, b"MSH008V1", (2072, 536, 3484), b"GOSHVIZ1")
+@dataclass(frozen=True)
+class VisualSource:
+    hull: str
+    resource_sha: str
+    detailed_vertices: int
+    detailed_faces: int
+    native_vertices: int
+    geometry_magic: bytes
+    visual_magic: bytes
+
+
+SH008 = VisualSource("SH008", RESOURCE_SHA, 2072, 3484, 536, b"MSH008V1", b"GOSHVIZ1")
+
+
+def encode_for_hull(source, points, triangles, spec):
+    if hashlib.sha256(source).hexdigest() != spec.resource_sha:
+        raise ValueError(f"Changed selected {spec.hull} resource")
+    resource = tomllib.loads(source.decode())
+    if resource["id"] != spec.hull:
+        raise ValueError("Changed original hull identity")
+    model = resource["design"]
+    return encode_model(model, points, triangles, spec.geometry_magic,
+                        (spec.detailed_vertices, spec.native_vertices, spec.detailed_faces), spec.visual_magic)
 
 
 def encode_model(model, points, triangles, source_magic, counts, visual_magic):
@@ -27,7 +46,8 @@ def encode_model(model, points, triangles, source_magic, counts, visual_magic):
         raise ValueError("Changed source texture ordering")
     packed_points = b"".join(struct.pack("<3d", *p) for p in model["vertices"])
     packed_faces = b"".join(struct.pack("<3I", *face) for face in model["faces"])
-    if points[:16] != struct.pack("<8sII", source_magic, detailed_vertices, native_vertices) or packed_points != points[16:16 + len(packed_points)]:
+    expected_header = struct.pack("<8sII", source_magic, detailed_vertices, native_vertices)
+    if points[:16] != expected_header or packed_points != points[16:16 + len(packed_points)]:
         raise ValueError("Display positions differ from the reviewed detailed collision input")
     if packed_faces != triangles[:len(packed_faces)]:
         raise ValueError("Display winding differs from the reviewed detailed collision input")
@@ -50,6 +70,10 @@ def encode_model(model, points, triangles, source_magic, counts, visual_magic):
                 mapping["texture"], int(material["emissive"])
             ))
     return bytes(output)
+
+
+def encode(source, points, triangles):
+    return encode_for_hull(source, points, triangles, SH008)
 
 
 def main():
