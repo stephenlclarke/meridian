@@ -35,7 +35,8 @@ export function sceneFor(definition, report, meshMode = 'detail') {
   const source = meshGeometry(mesh, scale, definition?.materials, materialIndices);
   const proposed = meshGeometry(report?.envelope, 1);
   const envelope = proposed.available && proposed.omitted === 0 && proposed.faces.length > 0 ? proposed : null;
-  const supportPoints = Array.isArray(report?.supportPoints) ? report.supportPoints.filter(isVector) : [];
+  const suppliedPoints = Array.isArray(report?.supportPoints) ? report.supportPoints : Array.isArray(report?.supportGroups) ? report.supportGroups.flatMap(group => Array.isArray(group?.points) ? group.points : []) : [];
+  const supportPoints = suppliedPoints.filter(isVector);
   const paths = Array.isArray(definition?.clearances) ? definition.clearances.filter(path => isRecord(path) && isVector(path.start) && isVector(path.end) && Number.isFinite(path.radiusMetres) && path.radiusMetres >= 0).map(path => ({
     name: typeof path.name === 'string' ? path.name : 'Unnamed path',
     start: path.start,
@@ -45,13 +46,14 @@ export function sceneFor(definition, report, meshMode = 'detail') {
   })) : [];
   const measuredGap = Number.isFinite(report?.fit?.maxMetres) && report.fit.maxMetres >= 0 ? report.fit.maxMetres : null;
   const gap = measuredGap !== null && isVector(report.fit.point) ? { point: report.fit.point, metres: measuredGap } : null;
+  if (gap && isVector(report.fit.nearestPoint)) gap.nearestPoint = report.fit.nearestPoint;
   const notices = [];
   if (!definition) notices.push('Load or import a hull definition to inspect its source mesh.');
   else if (!source.available) notices.push('Source mesh or scale is unavailable; edit the definition to preview it.');
   else if (source.omitted) notices.push(`${source.omitted} invalid source records omitted from the preview; build to validate.`);
   if (report && !envelope) notices.push(supportPoints.length ? 'No generated envelope surface supplied; showing support points only.' : 'No generated envelope surface or support points supplied.');
   if (!report && definition) notices.push('Source preview · Build & validate to generate the envelope.');
-  if (measuredGap !== null && !gap) notices.push('Maximum gap measured; no location supplied by the builder.');
+  if (measuredGap !== null && !gap) notices.push('Largest sampled gap measured; no location supplied by the builder.');
   if (Array.isArray(definition?.clearances) && paths.length < definition.clearances.length) notices.push('Invalid clearance definitions omitted from the preview.');
   return { source, envelope, supportPoints, paths, gap, notices };
 }
@@ -70,7 +72,7 @@ export function fitScene(scene) {
   for (const vertex of scene.envelope?.vertices ?? []) include(vertex);
   for (const point of scene.supportPoints) include(point);
   for (const path of scene.paths) { include(path.start, path.radius); include(path.end, path.radius); }
-  if (scene.gap) include(scene.gap.point);
+  if (scene.gap) { include(scene.gap.point); include(scene.gap.nearestPoint); }
   if (!low.every(Number.isFinite) || !high.every(Number.isFinite)) return { center: [0, 0, 0], radius: 1, low: [-1, -1, -1], empty: true };
   const center = low.map((value, i) => value / 2 + high[i] / 2);
   const span = low.map((value, i) => high[i] / 2 - value / 2);
@@ -97,6 +99,27 @@ export function updatedParameter(definition, field, value) {
   if (!isRecord(definition)) return definition;
   if (field === 'maxSpeed') return { ...definition, flight: { ...(isRecord(definition.flight) ? definition.flight : {}), maxSpeed: value } };
   return { ...definition, [field]: value };
+}
+
+export function groupIds(definition) {
+  const meshes = ['detail', 'native'].map(key => definition?.[key]);
+  if (!meshes.every(mesh => Array.isArray(mesh?.groups) && mesh.groups.length === mesh.vertices?.length && mesh.groups.every(group => Number.isSafeInteger(group) && group >= 0))) return null;
+  return [...new Set(meshes.flatMap(mesh => mesh.groups))].sort((a, b) => a - b);
+}
+
+export function mergeGroups(definition, source, target) {
+  const groups = groupIds(definition);
+  if (!groups?.includes(source) || !groups.includes(target) || source === target) return definition;
+  return { ...definition, ...Object.fromEntries(['detail', 'native'].map(key => [key, { ...definition[key], groups: definition[key].groups.map(id => id === source ? target : id) }])) };
+}
+
+export function autoGroups(definition) {
+  if (!['detail', 'native'].every(key => isRecord(definition?.[key]))) return definition;
+  const meshes = ['detail', 'native'].map(key => {
+    const { groups, ...mesh } = definition[key];
+    return [key, mesh];
+  });
+  return { ...definition, ...Object.fromEntries(meshes) };
 }
 
 export function editableDefinition(input) {

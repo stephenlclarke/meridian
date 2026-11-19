@@ -63,6 +63,10 @@ dd { text-align: right; font-variant-numeric: tabular-nums; }
 .summary-list dd { color: #e0e9f0; white-space: normal; }
 .definition-actions { margin-top: 20px; display: grid; gap: 10px; }
 .definition-actions button { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.group-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0; }
+.group-fields label { display: grid; gap: 5px; font-size: 12px; }
+.group-actions { display: grid; gap: 6px; }
+.closed-panel { margin: auto; padding: 32px; text-align: center; }
 .material-list { list-style: none; margin: 9px 0 0; padding: 0; display: grid; gap: 6px; }
 .material-list li { display: flex; align-items: center; gap: 7px; font-size: 12px; overflow-wrap: anywhere; }
 .material-swatch { width: 13px; height: 13px; border: 1px solid #8294a2; border-radius: 2px; flex-shrink: 0; }
