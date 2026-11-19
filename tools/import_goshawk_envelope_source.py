@@ -9,9 +9,11 @@ import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSET = ROOT / 'assets/fleet/sh008'
+RESOURCE = 'resource.toml'
+ORIGINAL_DESIGN = 'original-design.toml'
 PINS = {
-    'resource.toml': 'aafcb5dfec2cb5d141316756daae267888bf3541383f4f155c2561a4d7dd0bb7',
-    'original-design.toml': '9a6b3e1403a5cbb45691592f2db2e1dac79bfc7c0d328a4b86a234487943e127',
+    RESOURCE: 'aafcb5dfec2cb5d141316756daae267888bf3541383f4f155c2561a4d7dd0bb7',
+    ORIGINAL_DESIGN: '9a6b3e1403a5cbb45691592f2db2e1dac79bfc7c0d328a4b86a234487943e127',
     'contract.toml': '6815e92d5480692d18576ab5ed5e98cd1f99b1bff622c3c7eb346ed59bcf8d42',
     'LICENSE': '033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766',
 }
@@ -41,6 +43,14 @@ def components(model):
     return list(groups.values())
 
 
+def assign_range(table, interval, slot):
+    if interval is None:
+        return
+    for index in range(*interval):
+        assert index not in table
+        table[index] = slot
+
+
 def partition_ranges():
     """Source-local assemblies; matching dense/coarse structures share a piece."""
     detail = {}
@@ -50,12 +60,8 @@ def partition_ranges():
     def piece(name, d=None, n=None):
         slot = len(names)
         names.append(name)
-        for table, interval in [(detail, d), (native, n)]:
-            if interval is None:
-                continue
-            for i in range(*interval):
-                assert i not in table
-                table[i] = slot
+        assign_range(detail, d, slot)
+        assign_range(native, n, slot)
 
     for side, d, n in [('left', 0, 0), ('right', 576, 116)]:
         piece(side + '-rail', (d, d + 8), (n, n + 8))
@@ -99,8 +105,8 @@ def calibrated(raw_point):
 def encode(inputs):
     for name, expected in PINS.items():
         assert pin(inputs[name])['sha256'] == expected, name
-    resource = tomllib.loads(inputs['resource.toml'].decode(), parse_float=Decimal)
-    original = tomllib.loads(inputs['original-design.toml'].decode(), parse_float=Decimal)
+    resource = tomllib.loads(inputs[RESOURCE].decode(), parse_float=Decimal)
+    original = tomllib.loads(inputs[ORIGINAL_DESIGN].decode(), parse_float=Decimal)
     detailed, native = original['design'], original['nativeDesign']
     staged = resource['design']
     assert {k: v for k, v in staged.items() if k != 'vertices'} == {
@@ -163,8 +169,8 @@ def main():
             parser.error('production requires --snapshot and --proposal')
         base = options.snapshot
         inputs = {
-            'resource.toml': (base / 'Sources/L337Core/Resources/Ships/SH008.toml').read_bytes(),
-            'original-design.toml': (options.proposal / 'replacement-hulls/SH008-design.toml').read_bytes(),
+            RESOURCE: (base / 'Sources/L337Core/Resources/Ships/SH008.toml').read_bytes(),
+            ORIGINAL_DESIGN: (options.proposal / 'replacement-hulls/SH008-design.toml').read_bytes(),
             'contract.toml': (base / 'docs/fleet-design-v2/ships/SH008.toml').read_bytes(),
             'LICENSE': (base / 'LICENSE').read_bytes(),
         }
