@@ -1,7 +1,19 @@
 use super::{
-    Geometry, MAX_GEOMETRY, MAX_GLYPHS, MAX_MODEL_VERTICES, Model, TextVertex, atlas, intersection,
+    Geometry, MAX_GEOMETRY, MAX_GLYPHS, MAX_MODEL_VERTICES, MAX_MODELS, Model, TextVertex, atlas,
+    intersection,
 };
 use crate::{docked_screens::Frame, mesh::Vertex, mule_render::showroom};
+
+fn reusable_slot(
+    cached: impl Iterator<Item = showroom::Hull>,
+    active: &[Option<usize>; MAX_MODELS],
+    hull: showroom::Hull,
+) -> Option<usize> {
+    cached.enumerate().find_map(|(index, candidate)| {
+        (candidate == hull && !active.contains(&Some(index))).then_some(index)
+    })
+}
+
 pub struct Pass {
     shape_pipeline: wgpu::RenderPipeline,
     model_pipeline: wgpu::RenderPipeline,
@@ -15,7 +27,7 @@ pub struct Pass {
     srgb: bool,
     format: wgpu::TextureFormat,
     goshawk: Vec<showroom::Pass>,
-    goshawk_count: usize,
+    goshawk_active: [Option<usize>; MAX_MODELS],
 }
 impl Pass {
     pub fn new(
@@ -185,8 +197,8 @@ impl Pass {
             model,
             srgb: format.is_srgb(),
             format,
-            goshawk: Vec::new(),
-            goshawk_count: 0,
+            goshawk: Vec::with_capacity(2 * MAX_MODELS),
+            goshawk_active: [None; MAX_MODELS],
         })
     }
     pub fn prepare(
@@ -198,6 +210,7 @@ impl Pass {
         physical_size: [u32; 2],
         planet_system: Option<meridian_core::navigation::SystemId>,
     ) -> Result<(), String> {
+        self.goshawk_active.fill(None);
         if (frame.viewport.width - logical_size[0]).abs() > 0.01
             || (frame.viewport.height - logical_size[1]).abs() > 0.01
         {
@@ -219,23 +232,39 @@ impl Pass {
         logical_size: [f64; 2],
         physical_size: [u32; 2],
     ) -> Result<(), String> {
-        self.goshawk_count = 0;
+        let mut active = [None; MAX_MODELS];
         let scale = std::array::from_fn(|axis| f64::from(physical_size[axis]) / logical_size[axis]);
-        for preview in frame
-            .models
-            .iter()
-            .filter(|preview| showroom::matches(preview))
-        {
+        for preview in &frame.models {
+            let Some(hull) = showroom::Hull::from_model(preview) else {
+                continue;
+            };
             let Some(bounds) = intersection(preview.bounds, frame.viewport.canvas()) else {
                 continue;
             };
-            if self.goshawk_count == self.goshawk.len() {
-                self.goshawk
-                    .push(showroom::Pass::new(device, queue, self.format)?);
-            }
-            self.goshawk[self.goshawk_count].prepare(queue, preview, bounds, scale, self.srgb)?;
-            self.goshawk_count += 1;
+            let active_slot = active
+                .iter()
+                .position(|slot| slot.is_none())
+                .ok_or("Too many original Showroom preview panes")?;
+            let cache_slot =
+                match reusable_slot(self.goshawk.iter().map(showroom::Pass::hull), &active, hull) {
+                    Some(index) => index,
+                    None => {
+                        if self.goshawk.len() >= 2 * MAX_MODELS {
+                            return Err(
+                                "Goshawk Showroom pass cache exceeded its hull/pane bound".into()
+                            );
+                        }
+                        let index = self.goshawk.len();
+                        self.goshawk
+                            .push(showroom::Pass::new(device, queue, self.format, hull)?);
+                        index
+                    }
+                };
+            self.goshawk[cache_slot].prepare(queue, preview, bounds, scale, self.srgb)?;
+            active[active_slot] = Some(cache_slot);
         }
+        // Commit only fully prepared panes. Cached passes from previous selections are never drawn.
+        self.goshawk_active = active;
         Ok(())
     }
     /// The caller supplies a black-cleared colour target and fresh depth attachment for models.
@@ -243,8 +272,8 @@ impl Pass {
         pass.set_pipeline(&self.model_pipeline);
         pass.set_vertex_buffer(0, self.models.slice(..));
         pass.draw(0..self.frame.models.len() as u32, 0..1);
-        for preview in &self.goshawk[..self.goshawk_count] {
-            preview.draw(pass);
+        for index in self.goshawk_active.into_iter().flatten() {
+            self.goshawk[index].draw(pass);
         }
     }
     pub fn draw_overlay(&self, pass: &mut wgpu::RenderPass<'_>) {
@@ -255,5 +284,38 @@ impl Pass {
         pass.set_bind_group(0, &self.glyphs, &[]);
         pass.set_vertex_buffer(0, self.text.slice(..));
         pass.draw(0..self.frame.text.len() as u32, 0..1);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use showroom::Hull::{Explorer, Mk2};
+
+    #[test]
+    fn original_showroom_cache_reuses_only_the_same_hull_and_unused_pane() {
+        let mut cached = Vec::new();
+        let mut frame = |hulls: &[showroom::Hull]| {
+            let mut active = [None; MAX_MODELS];
+            for (slot, hull) in hulls.iter().copied().enumerate() {
+                let index =
+                    reusable_slot(cached.iter().copied(), &active, hull).unwrap_or_else(|| {
+                        cached.push(hull);
+                        cached.len() - 1
+                    });
+                active[slot] = Some(index);
+            }
+            active
+        };
+        assert_eq!(frame(&[Explorer]), [Some(0), None]);
+        assert_eq!(frame(&[Mk2]), [Some(1), None]);
+        assert_eq!(frame(&[Explorer]), [Some(0), None]);
+        assert_eq!(frame(&[Explorer, Mk2]), [Some(0), Some(1)]);
+        assert_eq!(frame(&[Mk2, Explorer]), [Some(1), Some(0)]);
+        assert_eq!(frame(&[Mk2, Mk2]), [Some(1), Some(2)]);
+        assert_eq!(frame(&[Explorer, Explorer]), [Some(0), Some(3)]);
+        assert_eq!(frame(&[]), [None, None]);
+        assert_eq!(frame(&[Mk2]), [Some(1), None]);
+        assert_eq!(cached, [Explorer, Mk2, Mk2, Explorer]);
     }
 }
