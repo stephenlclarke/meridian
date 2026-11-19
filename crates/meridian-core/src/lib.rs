@@ -9,6 +9,7 @@ mod flight;
 pub mod freight;
 pub mod goshawk;
 pub mod goshawk_custom;
+pub mod hull_package;
 pub mod mining;
 pub mod mule;
 pub mod navigation;
