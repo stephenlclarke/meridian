@@ -73,7 +73,11 @@ pub struct Renderer {
 }
 
 impl Renderer {
-    pub async fn new(window: Arc<Window>, display: OwnedDisplayHandle) -> Result<Self, String> {
+    pub async fn new(
+        window: Arc<Window>,
+        display: OwnedDisplayHandle,
+        authored: Arc<crate::authored_hull::AuthoredHulls>,
+    ) -> Result<Self, String> {
         let instance = wgpu::Instance::new(wgpu::InstanceDescriptor::new_with_display_handle(
             Box::new(display),
         ));
@@ -112,7 +116,11 @@ impl Renderer {
             surface.configure(&device, &config);
         }
         let celestial = crate::celestial::Pass::new(&device, config.format);
-        let docked = crate::docked_render::Pass::new(&device, &queue, config.format)?;
+        let docked = if authored.is_empty() {
+            crate::docked_render::Pass::new(&device, &queue, config.format)?
+        } else {
+            crate::docked_render::Pass::with_authored(&device, &queue, config.format, authored)?
+        };
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("Meridian flight WGSL"),
             source: wgpu::ShaderSource::Wgsl(include_str!("flight.wgsl").into()),

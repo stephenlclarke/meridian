@@ -15,6 +15,8 @@ The development source also provides a separate Goshawk Mk II Custom Showroom an
 
 The joined Peregrine development source gives Mk I and Mk III separate original cobalt-cream Showroom previews and local shields. Search their names separately or Pin either as the Compare baseline. Both refuse exchange; Mk III has no adopted runtime mass or ordinary flight admission. This is development source, with owned renderer and runtime qualification pending. [SH022 geometry](docs/PEREGRINE-MK-I-GAMEPLAY-ENVELOPE.md) · [SH023 geometry](docs/PEREGRINE-MK3-GAMEPLAY-ENVELOPE.md)
 
+The development desktop can explicitly load local validated hull packages with repeatable `--hull-package PATH` flags, or inspect a conflicting original under its separate `LOCAL:` identity using `--inspect-hull-package PATH`. Press 3 while docked and search its ID; no purchase or campaign spawn is authorized. [Authored hull package controls and limits](docs/AUTHORED-HULL-SHOWROOM.md)
+
 ## Internal Mule docking validation
 
 The internal SH001 Mule scene uses the original SH028 station. On Mac build `ffb7112`, Mule entered the clear opening at tick 104. On the obstructed approach it stopped at the station lip at tick 11. In the development build, completing all eight G02 freight handovers unlocks a single Mule encounter on the next launch from Renas. A returning pilot whose saved ship overlaps the Mule’s berth can fly clear before the Mule appears. Preview 8 predates this encounter. The reviewed renderer build `1cdac5e` also passed the aligned crossing on Mac and the docking regressions on Linux and native Windows. [Controls and test scope](docs/MULE-VALIDATION-LAUNCH.md)

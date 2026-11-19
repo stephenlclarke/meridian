@@ -216,8 +216,13 @@ impl DockedScreens {
         if context.review.is_some() {
             Outcome::Ignored
         } else if self.searching {
+            let limit = if self.screen == Screen::Showroom {
+                262
+            } else {
+                64
+            };
             for c in text.chars().filter(|c| !c.is_control()) {
-                if self.query.chars().count() < 64 {
+                if self.query.chars().count() < limit {
                     self.query.push(c);
                 }
             }

@@ -1,7 +1,10 @@
 use super::{
     Geometry, MAX_GEOMETRY, MAX_GLYPHS, MAX_MODEL_VERTICES, Model, TextVertex, atlas, intersection,
 };
-use crate::{docked_screens::Frame, mesh::Vertex, mule_render::showroom};
+use crate::{
+    authored_hull::AuthoredHulls, docked_screens::Frame, mesh::Vertex, mule_render::showroom,
+};
+use std::sync::Arc;
 pub struct Pass {
     shape_pipeline: wgpu::RenderPipeline,
     model_pipeline: wgpu::RenderPipeline,
@@ -12,16 +15,28 @@ pub struct Pass {
     glyphs: wgpu::BindGroup,
     frame: Geometry,
     model: Model,
+    authored: Arc<AuthoredHulls>,
     srgb: bool,
     format: wgpu::TextureFormat,
     goshawk: Vec<showroom::Pass>,
     goshawk_count: usize,
+    authored_passes: Vec<showroom::AuthoredPass>,
+    authored_count: usize,
 }
 impl Pass {
     pub fn new(
         device: &wgpu::Device,
         queue: &wgpu::Queue,
         format: wgpu::TextureFormat,
+    ) -> Result<Self, String> {
+        Self::with_authored(device, queue, format, Arc::default())
+    }
+
+    pub(crate) fn with_authored(
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        format: wgpu::TextureFormat,
+        authored: Arc<AuthoredHulls>,
     ) -> Result<Self, String> {
         let model = Model::sh025()?;
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
@@ -183,10 +198,13 @@ impl Pass {
             glyphs,
             frame: Geometry::with_capacity(),
             model,
+            authored,
             srgb: format.is_srgb(),
             format,
             goshawk: Vec::new(),
             goshawk_count: 0,
+            authored_passes: Vec::new(),
+            authored_count: 0,
         })
     }
     pub fn prepare(
@@ -203,12 +221,54 @@ impl Pass {
         {
             return Err("docked frame viewport no longer matches the window".into());
         }
-        self.frame
-            .compose(frame, &self.model, self.srgb, planet_system)?;
+        self.frame.compose_with_authored(
+            frame,
+            &self.model,
+            self.srgb,
+            planet_system,
+            &self.authored,
+        )?;
         queue.write_buffer(&self.shapes, 0, bytemuck::cast_slice(&self.frame.shapes));
         queue.write_buffer(&self.text, 0, bytemuck::cast_slice(&self.frame.text));
         queue.write_buffer(&self.models, 0, bytemuck::cast_slice(&self.frame.models));
-        self.prepare_goshawk(device, queue, frame, logical_size, physical_size)
+        self.prepare_goshawk(device, queue, frame, logical_size, physical_size)?;
+        self.prepare_authored(device, queue, frame, logical_size, physical_size)
+    }
+
+    fn prepare_authored(
+        &mut self,
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        frame: &Frame,
+        logical_size: [f64; 2],
+        physical_size: [u32; 2],
+    ) -> Result<(), String> {
+        self.authored_count = 0;
+        let scale = std::array::from_fn(|axis| f64::from(physical_size[axis]) / logical_size[axis]);
+        for preview in &frame.models {
+            let Some(visual) = self.authored.visual_for(preview) else {
+                continue;
+            };
+            let Some(bounds) = intersection(preview.bounds, frame.viewport.canvas()) else {
+                continue;
+            };
+            if self.authored_count == self.authored_passes.len() {
+                self.authored_passes.push(showroom::AuthoredPass::new(
+                    device,
+                    queue,
+                    self.format,
+                    preview,
+                    visual,
+                )?);
+            } else if !self.authored_passes[self.authored_count].matches(preview) {
+                self.authored_passes[self.authored_count] =
+                    showroom::AuthoredPass::new(device, queue, self.format, preview, visual)?;
+            }
+            self.authored_passes[self.authored_count]
+                .prepare(queue, preview, bounds, scale, self.srgb)?;
+            self.authored_count += 1;
+        }
+        Ok(())
     }
 
     fn prepare_goshawk(
@@ -246,6 +306,9 @@ impl Pass {
         pass.set_vertex_buffer(0, self.models.slice(..));
         pass.draw(0..self.frame.models.len() as u32, 0..1);
         for preview in &self.goshawk[..self.goshawk_count] {
+            preview.draw(pass);
+        }
+        for preview in &self.authored_passes[..self.authored_count] {
             preview.draw(pass);
         }
     }
