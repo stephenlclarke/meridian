@@ -1,5 +1,9 @@
 # GitHub preview releases
 
+## Local Mac Preview 9
+
+Open `Meridian HUD and Mule Preview.app` in the `Meridian Preview 9` folder under your user Applications folder. Apple notarized this build. The extracted archive and installed app passed signature, ticket and Gatekeeper verification. Its save directory is `Meridian Preview 9/saves-v17-0962f14` under Application Support. The GitHub prerelease is pending.
+
 ## Current preview
 
 [Preview 8 v0.8.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.8.0-preview.1) contains the paid EMP utility and retains contextual Help and XYZZY testing for macOS arm64 and Windows x64. It was published on 18 November 2026 at 07:26:13 UTC. Protected main is `bf31ab72f2e4845b8963219cf9e507da6da090de`; compiled source is `2d5f4a57ae05db68ec7f233f9b695f3ecc4b2f75`. All 300 committed files and modes have the same tree `16391c8e179353703b32ddb8d65e69f361f51dcd`.
