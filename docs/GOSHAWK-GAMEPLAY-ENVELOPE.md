@@ -95,13 +95,22 @@ each more than 318 mm from every detailed triangle. Any envelope enclosing
 both original triangle sets must retain those point locations. Changing the
 convex partition can remove empty space in a well mouth, but closing the
 cross-source discrepancy requires selecting or revising an authoritative
-source. A local decision is needed on whether the measured mouths serve
-as collision-accessible recesses. A source-only trial replaces four local
-supports with separate walls, floors, and existing struts. It encloses every
-original triangle and certifies 53 and 15 mm of clearance at the paired
-body-well centers and 29 and 7 mm at the paired arm-well centers. The trial
-uses 91 total pieces. Adopting that split requires settling the intended
-openings and requalifying the envelope and its dependent regressions.
+source.
+
+The chosen shield bridges all four measured service-well mouths with the
+existing 69 rounded pieces. The channels between the forebody arms remain
+open. The collision regression uses independent calibrated coordinates for
+the two aft body wells and two left arm wells. A 1 mm probe starts clear on
+each original approach and is blocked at the mouth and during the complete
+sweep through the gameplay collision API.
+
+The 91-piece comparison trial retained every original triangle and would
+admit spherical probes to those mouth centers. The four certified straight
+routes support probe diameters of at least 106.716, 30.782, 59.596 and
+15.256 mm respectively. The selected 69-piece shield blocks a point probe
+on each of the same routes. Both original triangle sets and the forest-silver
+Showroom asset are preserved. Stock dry mass and inertia are a separate
+engineering decision.
 
 The source-only audit can be repeated without a simulator or asset import.
 Use NumPy 2.5.5, SciPy 1.18.1, trimesh 5.2.1, and rtree 1.4.1.

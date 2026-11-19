@@ -20,6 +20,13 @@ A fresh commander delivered all eight G02 freight units at Renas, received 730 C
 
 The SH008 geometry and Showroom source target the original forest-silver Goshawk Explorer. A docked commander can select the original detailed preview and inspect the open wishbone and subtle rounded-envelope shimmer through the existing Showroom controls. On Mac, Compare showed both ships, a single-ship view showed the wishbone, and Exchange left the commander and cargo unchanged. Four core geometry and station tests passed on Mac, Linux and native Windows. Three offscreen Mac views passed temporal shimmer checks. All seven controlled World and station cases passed on Mac, Linux and native Windows. The 640×360 offscreen Showroom checks passed in solo and Compare views. GPU timing returned invalid counters. Ordinary placement, physical design adoption and gameplay docking remain open. [Geometry and presentation scope](GOSHAWK-GAMEPLAY-ENVELOPE.md)
 
+The chosen 69-piece Goshawk shield bridges the four measured service wells
+and keeps the forebody channel open. A gameplay collision regression now
+checks the original mouth centers and complete approaches for both aft body
+wells and both left arm wells. Execution of that new regression is pending.
+Stock dry mass and inertia, ordinary placement and gameplay docking remain
+open. [Service-well decision](GOSHAWK-GAMEPLAY-ENVELOPE.md#full-surface-fit-evidence)
+
 ## Internal Mule docking validation
 
 Mac build `ffb7112` passed 702 Rust tests, 102 Python tests, strict Clippy, and the release build. In the native scene the aligned Mule crossed at tick 104 and the obstructed Mule stopped for station contact at tick 11. Linux and native Windows each passed 705 Rust tests including three observer tests, 102 Python tests, strict Clippy, and both release builds. One Metal fixture was excluded from the ordinary test counts on each platform. These results qualify the internal docking scene. At that checkpoint, ordinary encounters and player acquisition were still open. [Controls and test scope](MULE-VALIDATION-LAUNCH.md)
