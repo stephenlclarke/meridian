@@ -78,10 +78,10 @@ fn run(
     let mut ordered = samples.clone();
     ordered.sort_unstable();
     let count = ordered.len();
+    let median = ordered[(count - 1) / 2].midpoint(ordered[count / 2]);
     let p95 = (count * 95).div_ceil(100) - 1;
     eprintln!(
-        "GOSHAWK_WORLD_COLLISION_COST route={label} status={expected:?} ticks={count} median_ns={} p95_ns={} max_ns={} terminal_ns={}",
-        ordered[count / 2],
+        "GOSHAWK_WORLD_COLLISION_COST route={label} status={expected:?} ticks={count} median_ns={median} p95_ns={} max_ns={} terminal_ns={}",
         ordered[p95],
         ordered[count - 1],
         samples[count - 1],

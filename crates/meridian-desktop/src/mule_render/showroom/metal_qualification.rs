@@ -58,21 +58,46 @@ fn showroom_models() -> [ModelPreview; 3] {
         input(&mut menu, &mut profile, action);
     }
     let front = preview(&mut menu, &profile);
+    // Showroom starts on roll. Advance through pitch to yaw for a new line of sight.
+    for _ in 0..2 {
+        input(&mut menu, &mut profile, Input::Key(Key::NextAxis));
+    }
     for _ in 0..2 {
         input(&mut menu, &mut profile, Input::Key(Key::TurnRight));
     }
     let oblique = preview(&mut menu, &profile);
-    input(&mut menu, &mut profile, Input::Key(Key::NextAxis));
+    // Advance through roll to pitch, then move the viewer above the source hull.
+    for _ in 0..2 {
+        input(&mut menu, &mut profile, Input::Key(Key::NextAxis));
+    }
     for _ in 0..4 {
         input(&mut menu, &mut profile, Input::Key(Key::TurnLeft));
     }
     let upper = preview(&mut menu, &profile);
     assert_eq!(front.bounds, oblique.bounds);
     assert_eq!(front.bounds, upper.bounds);
-    assert_ne!(front.orientation, oblique.orientation);
-    assert_ne!(oblique.orientation, upper.orientation);
     assert_eq!(before, ok(profile.world.save_bytes()));
     [front, oblique, upper]
+}
+
+fn hull_local_direction(pass: &Pass, model: &ModelPreview) -> [f64; 3] {
+    let width = model.bounds.width * SCALE[0];
+    let height = model.bounds.height * SCALE[1];
+    let data = ok(pass
+        .view
+        .uniforms(model.orientation, width / height, FORMAT.is_srgb()));
+    let direction = [
+        f64::from(data.camera[0]) - pass.view.center.x,
+        f64::from(data.camera[1]) - pass.view.center.y,
+        f64::from(data.camera[2]) - pass.view.center.z,
+    ];
+    let norm = direction
+        .iter()
+        .map(|component| component * component)
+        .sum::<f64>()
+        .sqrt();
+    assert!(norm.is_finite() && norm > 0.0);
+    direction.map(|component| component / norm)
 }
 
 fn write_new(path: PathBuf, data: &[u8]) {
@@ -449,10 +474,23 @@ fn metal_goshawk_same_pose_shimmer_and_gpu_cost() {
     let target = Target::new(&gpu.device);
     let mut pass = ok(Pass::new(&gpu.device, &gpu.queue, FORMAT));
     let mut totals = [0, 0];
-    for (name, model) in ["front", "oblique", "upper"]
+    let models = showroom_models();
+    let [front, oblique, upper] = models
+        .each_ref()
+        .map(|model| hull_local_direction(&pass, model));
+    assert!(front[0].abs() < 0.05 && front[2] > 0.9);
+    assert!(oblique[0].abs() > 0.4 && oblique[2] > 0.7);
+    assert!(upper[1] > 0.6 && upper[2] > 0.4);
+    let mut directions = String::from("pose\tx\ty\tz\n");
+    for (name, [x, y, z]) in ["front", "oblique", "upper"]
         .into_iter()
-        .zip(showroom_models())
+        .zip([front, oblique, upper])
     {
+        use std::fmt::Write as _;
+        ok(writeln!(directions, "{name}\t{x:.9}\t{y:.9}\t{z:.9}"));
+    }
+    write_new(output.join("hull-local-views.tsv"), directions.as_bytes());
+    for (name, model) in ["front", "oblique", "upper"].into_iter().zip(models) {
         let [effect, phase] = run_pose(&gpu, &target, &mut pass, &model, &output, name);
         totals[0] += effect;
         totals[1] += phase;
