@@ -85,6 +85,7 @@ enum FrameAdvance {
 }
 
 const DEFAULT_FLIGHT_WINDOW: [u32; 2] = [1280, 720];
+pub(crate) const MIN_WINDOW_LOGICAL: [f64; 2] = [640.0, 360.0];
 
 #[derive(Clone, Default, Debug, PartialEq, Eq)]
 struct Notice {
@@ -1241,7 +1242,10 @@ impl ApplicationHandler for App {
                 DEFAULT_FLIGHT_WINDOW[0],
                 DEFAULT_FLIGHT_WINDOW[1],
             ))
-            .with_min_inner_size(winit::dpi::LogicalSize::new(640.0, 360.0));
+            .with_min_inner_size(winit::dpi::LogicalSize::new(
+                MIN_WINDOW_LOGICAL[0],
+                MIN_WINDOW_LOGICAL[1],
+            ));
         let window = match event_loop.create_window(attributes) {
             Ok(window) => Arc::new(window),
             Err(error) => return self.fail(event_loop, error),

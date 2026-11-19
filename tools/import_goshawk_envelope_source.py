@@ -3,6 +3,7 @@ import argparse
 from decimal import Decimal, localcontext
 import hashlib
 import json
+import re
 from pathlib import Path
 import struct
 import tomllib
@@ -177,6 +178,10 @@ def main():
             'contract.toml': (base / 'docs/fleet-design-v2/ships/SH008.toml').read_bytes(),
             'LICENSE': (base / 'LICENSE').read_bytes(),
         }
+    contract = tomllib.loads(inputs['contract.toml'].decode(), parse_float=Decimal)
+    core = (ROOT / 'crates/meridian-core/src/goshawk.rs').read_text()
+    speed = re.search(r'^pub\(crate\) const GOSHAWK_MAX_SPEED_UNITS: f32 = (\d+\.\d+);$', core, re.M)
+    assert speed is not None and Decimal(speed[1]) == contract['performance']['maxSpeed']
     for name, data in encode(inputs).items():
         path = ASSET / name
         if options.check:

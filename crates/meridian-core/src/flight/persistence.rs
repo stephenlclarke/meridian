@@ -396,6 +396,7 @@ impl World {
         let mut candidate = Self {
             state,
             traffic: crate::traffic::State::default(),
+            goshawk_validation: None,
             mule_validation: None,
             mule_renas: None,
             mining: crate::mining::State::legacy_absent(),
