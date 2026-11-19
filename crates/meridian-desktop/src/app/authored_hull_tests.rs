@@ -260,3 +260,51 @@ fn one_click_authored_showroom_opens_actual_local_model_once_without_world_mutat
     );
     assert!(app.authored_hulls.visual_for(selected).is_none());
 }
+
+#[test]
+fn ordinary_game_entry_opens_stock_sparrowhawk_and_returns_to_owned_baseline() {
+    let directory = TestDirectory::new();
+    let mut app = ok(App::from_launch(Launch::Profile(
+        directory.0.join("profile"),
+    )));
+    assert!(app.authored_hulls.is_empty() && app.studio_ready.is_none());
+    assert!(app.commander_key(KeyCode::Digit3));
+    let before = ok(app.game.world.save_bytes());
+    let viewport = ui::Viewport::new(1280., 720.).unwrap_or_else(|| panic!("viewport"));
+    let menu = app
+        .docked
+        .as_mut()
+        .unwrap_or_else(|| panic!("actual station menu"));
+    for (query, id) in [
+        ("Sparrowhawk", "SH030"),
+        ("Peregrine Mk V", "SH025"),
+        ("SH030", "SH030"),
+    ] {
+        for action in [
+            Input::Key(Key::Search),
+            Input::Key(Key::ClearSearch),
+            Input::Text(query.into()),
+            Input::Key(Key::Confirm),
+        ] {
+            let frame = ok(menu.build_frame(&app.game.world, viewport, 0.));
+            menu.presented(frame);
+            ok(menu.input(&mut app.game, action));
+        }
+        let comparison = ok(menu.build_frame(&app.game.world, viewport, 0.));
+        let [baseline, selected] = comparison.models.as_slice() else {
+            panic!("expected ordinary Compare panes");
+        };
+        assert_eq!(baseline.object, "SH025");
+        assert_eq!(selected.object, id);
+        assert_eq!(
+            ok(crate::authored_hull::stock_visual_for(selected)).is_some(),
+            id == "SH030"
+        );
+        assert!(app.authored_hulls.visual_for(selected).is_none());
+        if id == "SH030" {
+            menu.presented(comparison);
+            ok(menu.input(&mut app.game, Input::Key(Key::Exchange)));
+        }
+    }
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+}

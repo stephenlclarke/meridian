@@ -69,8 +69,16 @@ then ran the Rust Studio validator and export on the exact definition at
 `12d24b8`. The validator accepted all 25 groups and all six 100 mm sphere
 routes. The exported JSON preserved the original definition and its
 SHA-256 is recorded in the evidence. The per-hull Rust contact regressions
-and a Sparrowhawk Showroom launch await the owned run. Campaign encounters,
+and stock Sparrowhawk Showroom qualification await the owned run. Campaign encounters,
 blueprint fabrication and installed preview acceptance remain separate.
 
 Regenerate with `python3 -B tools/prepare_sparrowhawk_studio.py`.
 Run the byte check with `python3 -B tools/prepare_sparrowhawk_studio.py --check`.
+
+## Ordinary stock Showroom
+
+In the joined development game, press 3 at a station and search **Sparrowhawk** or `SH030`; no external file or flag is required. Compare initially retains the current owned hull (SH025 for a new commander); C switches to solo and the standard turn/Pin controls remain available. Exchange is unavailable. The stock identity is distinct from a `LOCAL:SH030` explicit package inspection, even when both use the same original geometry.
+
+The stock registry authenticates the frozen original JSON and routes it through the same core preflight, contact package and detailed material/UV renderer as Hull Studio. All 9,324 original detailed corners retain tint, alpha, emission, UV and atlas selectors, including the 1,216 unmapped faces. The presentation fits the original 24 × 8.3 × 25 m geometry into the pane; it does not substitute a native low-detail visual or existing stock ship. This is the shared material preview, not a new shield-shimmer or World admission path. No stock mass, acquisition, fabrication or campaign encounter is authorized.
+
+[Stock integration criteria and owner commands](../integration/sh030-stock-showroom/CRITERIA.json) distinguish authored portable and native evidence from the earlier source and isolated Studio validation. The stock preview is not yet an installed release claim.

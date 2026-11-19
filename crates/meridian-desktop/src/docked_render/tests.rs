@@ -366,6 +366,29 @@ fn selecting_peregrine_mk_iii_does_not_select_peregrine_mk_i_or_its_geometry() {
 }
 
 fn assert_goshawk_preview(name: &str, id: &str, key: &str) {
+    assert_original_preview(name, id, key, crate::mule_render::showroom::matches);
+}
+
+#[test]
+fn selecting_stock_sparrowhawk_routes_its_original_preview_without_granting_exchange() {
+    assert_original_preview(
+        "Sparrowhawk",
+        "SH030",
+        crate::authored_hull::SPARROWHAWK_GEOMETRY_KEY,
+        |model| {
+            crate::authored_hull::stock_visual_for(model)
+                .unwrap_or_else(|error| panic!("{error}"))
+                .is_some()
+        },
+    );
+}
+
+fn assert_original_preview(
+    name: &str,
+    id: &str,
+    key: &str,
+    matches: impl Fn(&ModelPreview) -> bool,
+) {
     use crate::docked_screens::{Catalogue, DockedScreens, Input, Key, Outcome, Screen, Viewport};
     let world = meridian_core::World::new_commander(95006).unwrap_or_else(|e| panic!("{e}"));
     let save = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
@@ -405,7 +428,7 @@ fn assert_goshawk_preview(name: &str, id: &str, key: &str) {
     assert!(current_model.matches(baseline));
     assert_eq!(selected.object, id);
     assert_eq!(selected.geometry_key, key);
-    assert!(crate::mule_render::showroom::matches(selected));
+    assert!(matches(selected));
     assert!(baseline.bounds.x + baseline.bounds.width <= selected.bounds.x);
     let mut geometry = Geometry::with_capacity();
     geometry
@@ -427,7 +450,7 @@ fn assert_goshawk_preview(name: &str, id: &str, key: &str) {
     };
     assert_eq!(solo.object, selected.object);
     assert_eq!(solo.geometry_key, selected.geometry_key);
-    assert!(crate::mule_render::showroom::matches(solo));
+    assert!(matches(solo));
     assert!(solo.bounds.width > selected.bounds.width);
     assert!(
         frame

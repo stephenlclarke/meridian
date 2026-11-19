@@ -64,7 +64,7 @@ The SH010 review candidate additionally binds the inclusive 40.0 controlled spee
 
 ## Sparrowhawk source envelope
 
-SH030 preserves both original metre-authored meshes and uses 25 rounded supports. SteveMBA confirmed six swept passages, five structural overlaps, an aligned SH028 passage and a strict offset lip crossing. The certified full surface bounds are 295 mm against the detailed mesh and 1,328 mm against the selected native mesh. The Rust Studio validator exported the original definition from `12d24b8` after passing all 25 support groups and six sphere routes. The per-hull Rust contact tests and Sparrowhawk Showroom qualification remain pending. [Sparrowhawk source and evidence](SPARROWHAWK-GAMEPLAY-ENVELOPE.md)
+SH030 preserves both original metre-authored meshes and uses 25 rounded supports. SteveMBA confirmed six swept passages, five structural overlaps, an aligned SH028 passage and a strict offset lip crossing. The certified full surface bounds are 295 mm against the detailed mesh and 1,328 mm against the selected native mesh. The Rust Studio validator exported the original definition from `12d24b8` after passing all 25 support groups and six sphere routes. The joined development source registers its authenticated original detailed package in ordinary station Showroom, independent from a `LOCAL:SH030` inspection. Stock exchange and runtime mass remain unavailable; owned contact, normal Showroom and actual RGB qualification remain pending. [Sparrowhawk source and evidence](SPARROWHAWK-GAMEPLAY-ENVELOPE.md)
 
 ## Internal Mule docking validation
 
