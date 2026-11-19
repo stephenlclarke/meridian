@@ -1,0 +1,90 @@
+{
+  "id": "SH018",
+  "name": "Onager",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourceUnits": "metres",
+  "metresPerSourceUnit": 1,
+  "detail": {
+    "vertices": 1992,
+    "faces": 3864,
+    "components": 30,
+    "bounds": [
+      [
+        -10.2,
+        -5.4,
+        -16.59
+      ],
+      [
+        10.2,
+        8.16,
+        14.5
+      ]
+    ]
+  },
+  "native": {
+    "vertices": 140,
+    "faces": 236,
+    "components": 11,
+    "bounds": [
+      [
+        -10.2,
+        -5.4,
+        -16.59
+      ],
+      [
+        10.2,
+        8.06,
+        14.5
+      ]
+    ],
+    "faceLimit": 512,
+    "approvedSourcePath": "fleet-completion-20261019/batch-02-native-lod/SH018-design.toml",
+    "approvedSourceSha256": "40e2a5fdd0f7945141cb55701deab76a64f974a38133f86333bb4fd8d199fbf6"
+  },
+  "hatch": {
+    "faceIndices": [
+      6,
+      7
+    ],
+    "outwardPlaneXMetres": 6.5
+  },
+  "shapePieces": 26,
+  "textures": [
+    "l337-patrol-diffuse",
+    "l337-strike-diffuse",
+    "l337-service-details"
+  ],
+  "unmappedMaterialSlot": 4294967295,
+  "pins": {
+    "resource.toml": "7f58accbbe2b13deaeed84c6ad913801ac947d2ccf3e1a1189d9cde18222d63e",
+    "native-export.json": "92280e976a8410894368ae0ca749640194932f1c8304a92450a6c0cb11118ec1",
+    "contract.toml": "93ec89428324d31d6639ad069107c767d7c0129d1683d26f27475fc89a56cc38",
+    "LICENSE": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+  },
+  "outputs": {
+    "source.vertices": {
+      "bytes": 51184,
+      "sha256": "ffa48be4ab621779c39baa9186d39cfaa8f11fd038d92f3a43754b2364bfd63f"
+    },
+    "source-triangles.bin": {
+      "bytes": 49200,
+      "sha256": "f65d3018c13be36da831d9477c24cbe77e2e87f6a51622dc58d751bc20c1899f"
+    },
+    "source-piece-membership.bin": {
+      "bytes": 2132,
+      "sha256": "5f1250b2afbc5b2233af087782347044b05c23f998da39d71f7baf0f5bdbc2b3"
+    },
+    "PIECES.json": {
+      "bytes": 653,
+      "sha256": "e791a981fa33473275a5d34fe6b3e50edd1d851cca76e74d883473f2febb1eaf"
+    },
+    "visual.bin": {
+      "bytes": 649168,
+      "sha256": "fe59bd41aba019ee0cfa54de216f0c82d1904bd379877fce128df021679f9933"
+    },
+    "native-visual.bin": {
+      "bytes": 39664,
+      "sha256": "64170bc9182efa68f29c9dc296c03ea896ed2ef392ede31bf1a1609e3ab43141"
+    }
+  }
+}
