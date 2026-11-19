@@ -163,6 +163,26 @@ def undo_renas_encounter(relative, data):
     return data
 
 
+def undo_goshawk_world(relative, data):
+    # Restore the preceding SH001 dispatch and verify the same protected blobs.
+    replacements = {
+        'flight.rs': [
+            (b'mod goshawk_validation;\n', b''),
+            (b'pub use goshawk_validation::{GoshawkApproachSnapshot, GoshawkApproachStatus};\n', b''),
+            (b'    goshawk_validation: Option<goshawk_validation::Approach>,\n', b''),
+            (b'            goshawk_validation: None,\n', b''),
+            (b'        if let Some(result) = self.controlled_hull_step(input) {\n            return result;\n        }\n', b'        if self.mule_validation.is_some() {\n            return self.step_mule_validation(input);\n        }\n'),
+        ],
+        'flight/persistence.rs': [(b'            goshawk_validation: None,\n', b'')],
+        'flight/emp/tests.rs': [(b'        goshawk_validation: None,\n', b'')],
+        'lib.rs': [(b'pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};\n', b'')],
+    }
+    for current, previous in replacements.get(relative, []):
+        assert data.count(current) == 1, relative
+        data = data.replace(current, previous, 1)
+    return data
+
+
 def verify_protected_core(root):
     # Undo the reviewed Mule hooks and the equivalent finite-speed range check.
     # Checking every pre-existing core blob catches unrelated gameplay edits.
@@ -190,6 +210,7 @@ def verify_protected_core(root):
     checked = set()
     for relative, expected in baseline['sha256'].items():
         data = (root / 'crates/meridian-core/src' / relative).read_bytes()
+        data = undo_goshawk_world(relative, data)
         data = undo_renas_encounter(relative, data)
         for addition in additions.get(relative, []):
             assert data.count(addition) == 1, relative

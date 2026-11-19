@@ -5,6 +5,8 @@ pub use emp::{
 };
 mod celestial;
 mod damage;
+mod goshawk_validation;
+pub use goshawk_validation::{GoshawkApproachSnapshot, GoshawkApproachStatus};
 mod mining;
 mod mule_renas;
 mod mule_validation;
@@ -165,6 +167,7 @@ impl std::error::Error for StepError {}
 pub struct World {
     state: Snapshot,
     traffic: crate::traffic::State,
+    goshawk_validation: Option<goshawk_validation::Approach>,
     mule_validation: Option<crate::traffic::mule_validation::State>,
     mule_renas: Option<crate::traffic::mule_validation::State>,
     mining: crate::mining::State,
@@ -211,6 +214,7 @@ impl World {
                 navigation: None,
             },
             traffic: crate::traffic::State::default(),
+            goshawk_validation: None,
             mule_validation: None,
             mule_renas: None,
             mining: crate::mining::State::legacy_absent(),
@@ -500,8 +504,8 @@ impl World {
             return Err(StepError::Paused);
         }
         input.validate()?;
-        if self.mule_validation.is_some() {
-            return self.step_mule_validation(input);
+        if let Some(result) = self.controlled_hull_step(input) {
+            return result;
         }
         let input = if self.emp.electrical_disabled() {
             FlightInput::default()

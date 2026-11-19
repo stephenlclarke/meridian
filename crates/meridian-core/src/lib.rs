@@ -16,6 +16,7 @@ pub mod station;
 pub mod station_services;
 pub mod traffic;
 
+pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};
 pub use flight::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
 
 pub use flight::{

@@ -1,6 +1,6 @@
 {
   "target": "SH008 Goshawk Explorer",
-  "status": "SOURCE_BOUND_CANDIDATE;RUNTIME_UNRUN;NO_ADMISSION",
+  "status": "CONTROLLED_WORLD_QUALIFIED;MINIMUM_OFFSCREEN_VERIFIED;NO_ADMISSION",
   "base": "a9bd0cc66c15e4ecfe57a0d86b774b797addc231",
   "order": "Next unresolved original after SH001; SH009 remains held",
   "detailedModel": "Authenticated staged asset with original fields and once-applied exact calibration",
@@ -16,46 +16,51 @@
   "tests": [
     {
       "name": "goshawk_encloses_both_source_triangle_sets_without_redistributing_vertices",
-      "status": "UNRUN"
+      "status": "PASS",
+      "testedRevision": "f3cf5b8263cc6f132cd66eb0deea7fb982f1e347"
     },
     {
       "name": "goshawk_forebody_channel_stays_clear_while_a_source_drive_arm_blocks_contact",
-      "status": "UNRUN"
+      "status": "PASS",
+      "testedRevision": "f3cf5b8263cc6f132cd66eb0deea7fb982f1e347"
     },
     {
       "name": "goshawk_original_sh028_accepts_aligned_entry_but_rejects_bad_speed_roll_and_aperture",
-      "status": "UNRUN"
+      "status": "PASS",
+      "testedRevision": "f3cf5b8263cc6f132cd66eb0deea7fb982f1e347"
     },
     {
       "name": "goshawk_original_sh028_blocks_the_lip_and_launches_from_its_own_rear_support",
-      "status": "UNRUN"
+      "status": "PASS",
+      "testedRevision": "f3cf5b8263cc6f132cd66eb0deea7fb982f1e347"
     }
   ],
   "sourceProof": "Every source component and triangle remains assigned to one piece. Independent plane support check across the authored channel obstacle sweep has at least 0.746 m source slack; this is a local static certificate, not runtime qualification.",
   "nextAcceptance": [
-    "Run all four named SH008 core tests with current protected source and strict Clippy in the owned lane",
-    "Measure actual detailed-to-envelope gaps with original source evidence and inspect the central channel",
-    "Qualify the source-bound Showroom appearance, rounded support shimmer and cost in the owned native lane",
+    "Resolve the measured well-mouth fit and cross-source discrepancy under a source-specific decision",
+    "Measure GPU draw cost with valid counters. The three offscreen visual comparisons passed on their recorded revision.",
     "Resolve source-supported engineering mass/inertia and authored ordinary placement separately before hull acceptance"
   ],
   "counts": "Source packet does not alter full-fleet or public-preview acceptance",
   "stationSlice": {
     "boundBase": "6422079ccd3936224668641f106afdff12a584d7",
-    "status": "AUTHORED_UNRUN",
+    "status": "FOUR_CORE_CASES_PASSED",
     "witnessSha256": "3bf4115324203b735025469207b2c6d295cfc98d0ccdb64a8db8edff0e4861f5",
     "evidence": "Original SH028 face 482 and exact calibrated SH008 rail vertex 6 yield a strict interior lip intersection while the body centre is still outside the aperture. Actual station source/asset data and once-calibrated appearance/partition are unchanged.",
-    "runtimeNext": "After owned check and core station tests, qualify controlled World approach, original display and close-range shimmer, runtime cost and actual station visibility. Ordinary engineering and placement pending.",
+    "runtimeNext": "Ordinary placement and gameplay docking remain open.",
     "reviewCorrection": {
-      "status": "AUTHORED_UNRUN",
+      "status": "COVERED_BY_FOUR_CORE_PASSES",
       "findings": [
         "G2-SH008-DOCK-FIXTURE-INDEPENDENCE-1",
         "G2-SH008-DOCK-CRITERIA-COUNT-1"
       ],
-      "coverage": "Exact independent outward-rounded launch coordinate, a clear initial lip pose, and a physically clear off-aperture sweep before its separate entry refusal. Geometry and source assets stay byte exact."
-    }
+      "coverage": "Exact independent outward-rounded launch coordinate, a clear initial lip pose, and a physically clear off-aperture sweep before its separate entry refusal. Geometry and source assets stay byte exact.",
+      "testedRevision": "f3cf5b8263cc6f132cd66eb0deea7fb982f1e347"
+    },
+    "testedRevision": "f3cf5b8263cc6f132cd66eb0deea7fb982f1e347"
   },
   "presentation": {
-    "status": "SOURCE_BOUND_SHOWROOM_AUTHORED;NATIVE_UNRUN",
+    "status": "NORMAL_SIZE_MAC_SHOWROOM_OBSERVED",
     "path": "Ordinary station Ship Showroom, exact SH008 catalogue selection",
     "visualProvenance": "assets/fleet/sh008/VISUAL-PROVENANCE.json",
     "geometry": "3484 original detailed faces, 69 existing rounded supports and one depth-tested shimmer result",
@@ -63,6 +68,112 @@
       "selecting_goshawk_routes_the_original_preview_without_granting_exchange",
       "goshawk_original_visual_and_all_local_supports_bind_to_the_shader"
     ],
-    "nativeAcceptance": "Capture original forest-silver appearance, the open wishbone and close grazing shimmer while rotating in the ordinary Showroom; verify resize, view clipping and draw cost."
+    "nativeAcceptance": "Capture original forest-silver appearance, the open wishbone and close grazing shimmer while rotating in the ordinary Showroom; verify resize, view clipping and draw cost.",
+    "minimumWindowQualification": {
+      "status": "MAC_PROJECTION_AND_OFFSCREEN_PIXELS_PASSED",
+      "logicalSize": [
+        640,
+        360
+      ],
+      "projectionTest": "original_goshawk_fits_minimum_station_showroom_solo_and_compare",
+      "metalOffscreenTest": "metal_goshawk_minimum_showroom_model_pass",
+      "criteria": "Real Showroom controls and model panes. All original detailed vertices are inside the Goshawk pane with at least two logical pixels of margin. Retain the combined Compare images and full-target captures of each isolated model from their original Compare frames. Verify each visible model against its own pane and compare the combined image with the pixel union of the isolated images.",
+      "scope": "Offscreen Metal model pass at 2x. Native window resizing and compositor observation remain separate.",
+      "testedRevision": "b17edd2f2da5972ee6eb7c35f641b9cb7a889668",
+      "minimumGoshawkGutterLogicalPixels": 6.23,
+      "combinedMatchesIsolatedAtAllThreePoses": true
+    },
+    "metalShimmerQualification": {
+      "status": "THREE_OFFSCREEN_VIEWS_VERIFIED;GPU_TIMING_INVALID",
+      "visualTest": "metal_goshawk_same_pose_shimmer",
+      "gpuTimingTest": "metal_goshawk_gpu_cost",
+      "verifier": "tools/verify_goshawk_showroom_evidence.py",
+      "capture": "Three stationary front, yaw-oblique and elevated Showroom views at 1280x720 logical, 2x scale, BGRA8 sRGB and production depth. Retain the hull-local unit directions and solid, production, repeat and shifted phase panes.",
+      "pixelChecks": "Identical production repeat and nonzero solid-to-production and phase differences across distinct hull-local views. Both phases are at most 24 sRGB codes per channel from the solid, and at most seven codes apart. Inspect the upper view and amplified differences for the local open wishbone.",
+      "gpuTiming": "Three warmups and 16 Metal GPU timestamp pairs per pose if the adapter exposes TIMESTAMP_QUERY. Each pair brackets the isolated production shimmer draw and attachment load/store. Preserve every pair and period for all poses before validation. Require ordered nonoverlapping intervals within and across poses, one finite positive period and no invalid Metal counters. Otherwise record unsupported only if the adapter lacks queries. An optional trailing-render diagnostic uses a fresh timing directory and adds one unmeasured solid render before resolve.",
+      "scope": "Offscreen production hull pass. Ordinary Showroom UI and fixed illumination are preserved. Windows graphics and physical collision cost are outside this receipt.",
+      "testedRevision": "1311359cf78b0a13ea6d075eae53d5117e32a2ec",
+      "result": "Front, oblique and upper same-phase repeats matched byte for byte. Across both phases the largest changes from solid were 15, 22 and 17 sRGB codes respectively. Phase-only peaks were two codes in all views. In both timing variants each pose had 15 overlapping adjacent intervals and a zero final end tick.",
+      "gpuCostNanoseconds": null
+    },
+    "nativeRevision": "cfaab8a9704ba0124a08ce5e8a9e474c18484df6"
+  },
+  "controlledWorld": {
+    "boundBase": "cfaab8a9704ba0124a08ce5e8a9e474c18484df6",
+    "status": "SEVEN_FOCUSED_CASES_PASSED_ON_THREE_PLATFORMS",
+    "qualifiedPrerequisites": "All four prior SH008 core and SH028 cases passed hosted Linux, hosted Mac and the owned Mac workspace. The ordinary Mac Showroom displays SH008.",
+    "scope": "One World with fixed original SH028, stationary native SH025 observer, and the 69 existing rounded SH008 pieces. No change to fleet or public-preview acceptance.",
+    "regressions": [
+      "goshawk_world_approach_reports_physical_contact_and_entry_clearance",
+      "goshawk_world_snapshots_keep_source_and_scope_without_a_commander",
+      "goshawk_world_refuses_unbound_motion_and_overlapping_starts"
+    ],
+    "routes": {
+      "aligned": "Entered",
+      "overspeed": "EntryConditions",
+      "lip": "StationContact",
+      "off-aperture": "EntryConditions",
+      "observer": "ObserverContact"
+    },
+    "timing": {
+      "label": "GOSHAWK_WORLD_COLLISION_COST",
+      "horizonTicks": 160,
+      "fields": [
+        "route",
+        "status",
+        "ticks",
+        "median_ns",
+        "p95_ns",
+        "max_ns",
+        "terminal_ns"
+      ],
+      "boundary": "External Instant samples of release World::step only, through the terminal tick. No compiled or measured results on the source-authoring lane.",
+      "command": "cargo test --locked --release -p meridian-core flight::goshawk_validation::tests::goshawk_world_approach_reports_physical_contact_and_entry_clearance -- --exact --nocapture"
+    },
+    "ownedAcceptance": [
+      "Run all three controlled World regressions and all four existing source/SH028 cases against the joined exact source",
+      "Run repository checks and strict Clippy on the joined revision",
+      "Record release timing by route with commit and machine/runtime identity"
+    ],
+    "verifiedReleaseRun": {
+      "revision": "8f8fff2d16b950720605032c445917e6d060a454",
+      "platform": "macOS arm64",
+      "terminalTicks": {
+        "aligned": 70,
+        "overspeed": 31,
+        "lip": 20,
+        "off-aperture": 70,
+        "observer": 58
+      }
+    },
+    "joinedQualification": {
+      "revision": "91e5daf90d697abd99578e1bc853f76fadcdc26f",
+      "platforms": [
+        "macOS arm64",
+        "Linux x64 (WSL2)",
+        "Windows x64 (MSVC)"
+      ],
+      "workspaceRustPassedPerPlatform": 730,
+      "pythonPassedPerPlatform": 134
+    }
+  },
+  "surfaceFit": {
+    "status": "CERTIFIED_SOURCE_BOUNDS;LOCAL_WELL_DECISION_PENDING",
+    "evidence": "integration/sh008-goshawk/SURFACE-FIT.json",
+    "envelopePieces": 69,
+    "guardedExposedSamples": 29057,
+    "reportedPieceWithoutExposedSample": "cockpit-crossmember",
+    "directedExposedDistanceBoundsMillimetres": {
+      "detailed": [
+        558,
+        699
+      ],
+      "nativeCandidate": [
+        1098,
+        1105
+      ]
+    },
+    "channelMinimumCertifiedMillimetres": 1467,
+    "wellDecision": "Decide whether the measured original service-well mouths must be collision-accessible, or whether their local rounded fill can be approved. Preserve both source records and distinguish mandatory cross-source mismatch from removable convex fill. A different authoritative source strategy would be needed to remove the mandatory vertex discrepancy."
   }
 }

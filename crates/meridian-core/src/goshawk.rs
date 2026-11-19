@@ -4,6 +4,8 @@ use crate::mule::{EnvelopeError, MULE_CLEARANCE_METRES, SmoothPiece};
 use std::sync::Arc;
 
 pub const GOSHAWK_PIECES: usize = 69;
+/// Authenticated SH008 R3 performance.maxSpeed, in FlightStart units.
+pub(crate) const GOSHAWK_MAX_SPEED_UNITS: f32 = 41.0;
 pub const GOSHAWK_DETAILED_VERTICES: usize = 2072;
 pub const GOSHAWK_NATIVE_CANDIDATE_VERTICES: usize = 536;
 pub const GOSHAWK_RESOURCE_SHA256: &str =
