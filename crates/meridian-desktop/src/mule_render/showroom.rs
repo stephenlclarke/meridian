@@ -612,6 +612,14 @@ mod tests {
         assert!(PeregrineMk3HullSource::from_bytes(source_i, membership_i).is_err());
         assert!(PeregrineMkIHullSource::from_bytes(source_i, membership_iii).is_err());
         assert!(PeregrineMk3HullSource::from_bytes(source_iii, membership_i).is_err());
+        assert_eq!(
+            PeregrineMkIHullSource::from_bytes(source_iii, membership_i),
+            Err(EnvelopeError::ChangedSource)
+        );
+        assert_eq!(
+            PeregrineMk3HullSource::from_bytes(source_i, membership_iii),
+            Err(EnvelopeError::ChangedSource)
+        );
     }
 
     fn check_variant(hull: Hull, face_count: usize, piece_count: usize) {
