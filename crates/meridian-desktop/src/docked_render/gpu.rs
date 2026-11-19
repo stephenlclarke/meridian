@@ -221,17 +221,19 @@ impl Pass {
     ) -> Result<(), String> {
         self.goshawk_count = 0;
         let scale = std::array::from_fn(|axis| f64::from(physical_size[axis]) / logical_size[axis]);
-        for preview in frame
-            .models
-            .iter()
-            .filter(|preview| showroom::matches(preview))
-        {
+        for preview in &frame.models {
+            let Some(hull) = showroom::hull(preview) else {
+                continue;
+            };
             let Some(bounds) = intersection(preview.bounds, frame.viewport.canvas()) else {
                 continue;
             };
             if self.goshawk_count == self.goshawk.len() {
                 self.goshawk
-                    .push(showroom::Pass::new(device, queue, self.format)?);
+                    .push(showroom::Pass::for_hull(device, queue, self.format, hull)?);
+            } else if self.goshawk[self.goshawk_count].hull() != hull {
+                self.goshawk[self.goshawk_count] =
+                    showroom::Pass::for_hull(device, queue, self.format, hull)?;
             }
             self.goshawk[self.goshawk_count].prepare(queue, preview, bounds, scale, self.srgb)?;
             self.goshawk_count += 1;

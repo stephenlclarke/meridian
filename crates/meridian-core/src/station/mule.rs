@@ -230,8 +230,18 @@ impl OriginalStationData {
         end: RigidPose,
         observer: RigidPose,
     ) -> bool {
+        self.rounded_observer_clear(source.pieces().as_ref(), start, end, observer)
+    }
+
+    fn rounded_observer_clear(
+        &self,
+        pieces: &[SmoothPiece],
+        start: RigidPose,
+        end: RigidPose,
+        observer: RigidPose,
+    ) -> bool {
         // Fixed orientations and linear translation bound every point by the two hull radii.
-        let radius = rounded_maximum_origin_radius(source.pieces().as_ref());
+        let radius = rounded_maximum_origin_radius(pieces);
         let margin = (radius + self.player_radius()) * 1.001 + 0.001;
         let a = sub(start.position, observer.position);
         let b = sub(end.position, observer.position);
@@ -248,8 +258,78 @@ impl OriginalStationData {
                     observer.orientation.apply(self.hull.vertices[i]),
                 )
             });
-            source.sweep_clears_triangles(start, end, 0.0, &[triangle]) == Ok(true)
+            pieces
+                .iter()
+                .all(|piece| piece.sweep_clears_triangle(start, end, 0.0, triangle) == Ok(true))
         })
+    }
+}
+
+impl OriginalStationData {
+    pub fn goshawk_custom_launch_start(
+        &self,
+        source: &crate::goshawk_custom::GoshawkCustomHullSource,
+    ) -> Result<FlightStart, StationError> {
+        self.rounded_station_launch_start(source.pieces())
+    }
+
+    pub fn goshawk_custom_motion_clear(
+        &self,
+        source: &crate::goshawk_custom::GoshawkCustomHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces(), start, end, angular_travel)
+    }
+
+    /// Test SH010 against the actual SH028 aperture, admission conditions and station triangles.
+    pub fn goshawk_custom_entry_clear(
+        &self,
+        source: &crate::goshawk_custom::GoshawkCustomHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        physical_speed: f64,
+        roll_rate: f64,
+        angular_travel: f64,
+    ) -> bool {
+        self.goshawk_custom_entry_conditions(
+            source,
+            start,
+            end,
+            physical_speed,
+            roll_rate,
+            angular_travel,
+        ) && self.goshawk_custom_motion_clear(source, start, end, angular_travel)
+    }
+
+    pub(crate) fn goshawk_custom_entry_conditions(
+        &self,
+        source: &crate::goshawk_custom::GoshawkCustomHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        physical_speed: f64,
+        roll_rate: f64,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_entry_conditions(
+            source.pieces(),
+            start,
+            end,
+            physical_speed,
+            roll_rate,
+            angular_travel,
+        )
+    }
+
+    pub(crate) fn goshawk_custom_observer_clear(
+        &self,
+        source: &crate::goshawk_custom::GoshawkCustomHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        observer: RigidPose,
+    ) -> bool {
+        self.rounded_observer_clear(source.pieces(), start, end, observer)
     }
 }
 
