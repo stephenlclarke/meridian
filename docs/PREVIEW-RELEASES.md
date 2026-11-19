@@ -1,14 +1,27 @@
 # GitHub preview releases
 
-## Local Mac Preview 9
+## Published Preview 10
 
-Open `Meridian HUD and Mule Preview.app` in the `Meridian Preview 9` folder under your user Applications folder. Apple notarized this build. The extracted archive and installed app passed signature, ticket and Gatekeeper verification. Its save directory is `Meridian Preview 9/saves-v17-0962f14` under Application Support. The GitHub prerelease is pending.
+[Download Preview 10 for macOS arm64 or Windows x64](https://github.com/stephenlclarke/meridian/releases/tag/v0.10.0-preview.1). Released 19 November 2026 at 02:37 UTC from protected commit `201e9f9f1ecfd73a20ba27dcebc00f70ac3457fe`. All four public downloads passed verification. The macOS archive contains the original notarized app built at `f3cf5b8` and a corrected guide alongside it. The unsigned Windows executable was built at `993035e` and requires the Microsoft Visual C++ x64 runtime.
 
-## Current preview
+| Download | Size in bytes | SHA-256 |
+| --- | ---: | --- |
+| macOS arm64 | 5,992,345 | `a02e322ec6cc8feb52fe6d4db2ef1e65a15428b582e7693d7a362c4295648095` |
+| Windows x64 | 5,603,240 | `4b218974f886fed43893f681387b9a85d03bf7034a6206c0c07e556ec8fed9f0` |
+
+### Local Mac installation
+
+Open `~/Applications/Meridian Preview 10/Meridian Goshawk Showroom Preview.app`. From Commander Details, press **3** to open the station Showroom, search for **Goshawk Explorer**, and press **C** to switch between the single-ship and comparison views. The preview has its own save directory under Application Support at `Meridian Preview 10/saves-v17-3fe3ff8`. Apple notarized this Mac build. The extracted archive and local installation passed verification.
+
+## Published Preview 9
+
+Open `Meridian HUD and Mule Preview.app` in the `Meridian Preview 9` folder under your user Applications folder. Apple notarized this build. The extracted archive and installed app passed signature, ticket and Gatekeeper verification. Its save directory is `Meridian Preview 9/saves-v17-0962f14` under Application Support. The macOS arm64 and Windows x64 packages were published on 19 November 2026. [Preview 9 downloads](https://github.com/stephenlclarke/meridian/releases/tag/v0.9.0-preview.1)
+
+## Preview 8 release record
 
 [Preview 8 v0.8.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.8.0-preview.1) contains the paid EMP utility and retains contextual Help and XYZZY testing for macOS arm64 and Windows x64. It was published on 18 November 2026 at 07:26:13 UTC. Protected main is `bf31ab72f2e4845b8963219cf9e507da6da090de`; compiled source is `2d5f4a57ae05db68ec7f233f9b695f3ecc4b2f75`. All 300 committed files and modes have the same tree `16391c8e179353703b32ddb8d65e69f361f51dcd`.
 
-All six exact-main checks passed, with Sonar revision/project version bound to that main, zero unresolved findings and 98.8% new coverage. All four anonymous public downloads, full package bytes/modes, all raw Mac ZIP metadata and the immutable annotated tag were verified. The actual release receipt was flushed before removing only v0.5 and its tag. Retained previews are v0.8, v0.7 and v0.6.
+All six exact-main checks passed, with Sonar revision/project version bound to that main, zero unresolved findings and 98.8% new coverage. All four anonymous public downloads, full package bytes/modes, all raw Mac ZIP metadata and the immutable annotated tag were verified. The actual release receipt was flushed before removing only v0.5 and its tag. At publication, the retained previews were v0.8, v0.7 and v0.6.
 
 | Public archive | Bytes | SHA-256 |
 | --- | --- | --- |
