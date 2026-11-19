@@ -9,6 +9,9 @@ from math import isqrt
 from pathlib import Path
 import struct
 
+if not __debug__:
+    raise RuntimeError("The geometric certificate checks require Python assertions")
+
 import numpy as np
 from scipy.spatial import ConvexHull
 import trimesh
@@ -466,8 +469,6 @@ def measure(folder):
 
 
 def main():
-    if not __debug__:
-        raise RuntimeError("The geometric certificate checks require Python assertions")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--assets', type=Path, default=ASSETS)
     args = parser.parse_args()

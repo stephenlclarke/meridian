@@ -7,6 +7,9 @@ import re
 import struct
 import tomllib
 
+if not __debug__:
+    raise RuntimeError("Mule source verification requires Python assertions")
+
 RUST_TEST_NAME = r'#\[test\]\s*fn\s+(\w+)\('
 FLIGHT_SOURCE = 'flight.rs'
 FLIGHT_PERSISTENCE = 'flight/persistence.rs'

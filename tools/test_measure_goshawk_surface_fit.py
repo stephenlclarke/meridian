@@ -185,11 +185,21 @@ class TestPinnedAssets(unittest.TestCase):
                 with self.assertRaises(AssertionError):
                     fit.load(folder)
 
-    def test_cli_refuses_python_optimization_that_disables_assertions(self):
-        result = subprocess.run([sys.executable, '-O', '-B', fit.__file__, '--help'],
-                                capture_output=True, text=True, check=False)
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn('The geometric certificate checks require Python assertions', result.stderr)
+    def test_optimized_python_refuses_hull_verifiers_as_scripts_and_imports(self):
+        tools_dir = Path(fit.__file__).parent
+        modules = {
+            'measure_goshawk_surface_fit': 'geometric certificate checks require Python assertions',
+            'verify_mule_envelope_source': 'Mule source verification requires Python assertions',
+        }
+        for module, message in modules.items():
+            for flag in ('-O', '-OO'):
+                for entry in ([str(tools_dir / (module + '.py'))], ['-c', 'import ' + module]):
+                    with self.subTest(module=module, flag=flag, entry=entry):
+                        result = subprocess.run([sys.executable, '-B', flag, *entry], cwd=tools_dir,
+                                                capture_output=True, text=True, check=False)
+                        self.assertNotEqual(result.returncode, 0)
+                        self.assertIn(message, result.stderr)
+                        self.assertEqual(result.stdout, '')
 
     def test_real_cli_replays_certificate_against_both_originals(self):
         saved_bytes = REPORT.read_bytes()
