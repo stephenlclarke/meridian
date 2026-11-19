@@ -242,6 +242,24 @@ fn goshawk_world_publishes_the_adopted_stock_mass_properties() -> Result<(), Box
 }
 
 #[test]
+fn goshawk_world_rotates_the_stock_center_forward_at_oblique_yaw() -> Result<(), Box<dyn Error>> {
+    let approach = FlightStart {
+        position: [6.0, 4.0, 520.0],
+        orientation: [0.0, 0.8, 0.0, 0.6],
+        speed: 4.0,
+    };
+    let world = World::goshawk_docking_validation_scenario(OBSERVER, approach)?;
+    let center = frame(&world)?.center_of_mass_world_metres();
+    let [x, y, z] = PROPOSAL_CENTER_BITS.map(f64::from_bits);
+    // For this yaw, sine is 24/25 and cosine is -7/25. An inverse rotation
+    // gives the opposite sign for both sine terms. Allow for the f32 input.
+    assert!((center.x - (6.0 - 0.28 * x + 0.96 * z)).abs() < 1e-6);
+    assert_eq!(center.y, 4.0 + y);
+    assert!((center.z - (520.0 - 0.96 * x - 0.28 * z)).abs() < 1e-6);
+    Ok(())
+}
+
+#[test]
 fn goshawk_world_refuses_unbound_motion_and_overlapping_starts() {
     let starts = [
         inbound(0.0, 220.0, 41.0_f32.next_up()),
