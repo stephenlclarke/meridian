@@ -24,6 +24,12 @@ No new full-fleet hull or public-preview count follows from this source packet.
 
 The offscreen M5 Pro run at `1311359` passed independent pixel verification at all three poses. The maximum differences from the opaque hull across the two phases were 15, 22 and 17 sRGB codes per channel for the front, oblique and upper views respectively. Advancing only the animation phase changed each channel by at most two codes in every view. Same-phase repeats matched byte for byte.
 
+## Minimum Showroom size
+
+The minimum-window regression drives the station Showroom's search, rotation and Compare controls at 640×360 logical. It projects all 10,452 original Goshawk face vertices through the production camera for front, oblique and elevated views in both modes. It requires at least two logical pixels of clearance inside each Goshawk pane and checks that the model panes stay apart and clear of the station controls.
+
+The Mac owner's optional minimum-size check renders the production docked model pass into a 1,280×720 offscreen target at 2× scale. It captures the complete target so visible model pixels can be checked against each pane, including the SH025 baseline in Compare. That check is pending and does not exercise OS window resizing or the native compositor.
+
 ## Original station docking candidate
 
 The SH008 station helpers use the same strict rounded support checks as Mule. The actual SH028 aperture controls fit, and the original station triangles control continuous clearance. The exterior launch starts from Goshawk's own aft support. The entry check keeps the existing crossing, tunnel, attitude, speed and roll thresholds. It accepts a physically clear aligned crossing in the authored case and requires refusal at the actual speed and roll boundaries.

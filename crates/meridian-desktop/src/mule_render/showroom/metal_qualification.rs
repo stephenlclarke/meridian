@@ -1,6 +1,7 @@
 //! Explicit Metal evidence from the production SH008 Showroom pass.
 use super::{Pass, Uniforms, matches};
 use crate::{
+    app::MIN_WINDOW_LOGICAL,
     docked::Docked,
     docked_screens::{Input, Key, ModelPreview, Screen, Viewport},
     profile::{
@@ -128,10 +129,10 @@ struct Target {
     extent: wgpu::Extent3d,
 }
 impl Target {
-    fn new(device: &wgpu::Device) -> Self {
+    fn new(device: &wgpu::Device, logical: [f64; 2]) -> Self {
         let extent = wgpu::Extent3d {
-            width: (LOGICAL[0] * SCALE[0]) as u32,
-            height: (LOGICAL[1] * SCALE[1]) as u32,
+            width: (logical[0] * SCALE[0]) as u32,
+            height: (logical[1] * SCALE[1]) as u32,
             depth_or_array_layers: 1,
         };
         let texture = |format, usage| {
@@ -234,7 +235,29 @@ impl Crop {
         }
     }
 
-    fn capture(&self, gpu: &Gpu, target: &Target, pass: &Pass, solid_only: bool) -> Vec<u8> {
+    fn capture_preview(
+        &self,
+        gpu: &Gpu,
+        target: &Target,
+        pass: &Pass,
+        solid_only: bool,
+    ) -> Vec<u8> {
+        self.capture(gpu, target, |render| {
+            if solid_only {
+                pass.set_viewport(render);
+                pass.draw_solid(render);
+            } else {
+                pass.draw(render);
+            }
+        })
+    }
+
+    fn capture(
+        &self,
+        gpu: &Gpu,
+        target: &Target,
+        draw: impl FnOnce(&mut wgpu::RenderPass<'_>),
+    ) -> Vec<u8> {
         let row = self.extent.width * 4;
         let stride =
             row.div_ceil(wgpu::COPY_BYTES_PER_ROW_ALIGNMENT) * wgpu::COPY_BYTES_PER_ROW_ALIGNMENT;
@@ -245,14 +268,7 @@ impl Crop {
             mapped_at_creation: false,
         });
         let mut encoder = gpu.device.create_command_encoder(&Default::default());
-        target.render(&mut encoder, false, false, None, |render| {
-            if solid_only {
-                pass.set_viewport(render);
-                pass.draw_solid(render);
-            } else {
-                pass.draw(render);
-            }
-        });
+        target.render(&mut encoder, false, false, None, draw);
         encoder.copy_texture_to_buffer(
             wgpu::TexelCopyTextureInfo {
                 texture: &target.pixels,
@@ -379,16 +395,16 @@ fn run_pose(
     ok(pass.prepare(&gpu.queue, model, model.bounds, SCALE, FORMAT.is_srgb()));
     assert!(pass.shimmer, "SH008 rounded support certification failed");
     let crop = Crop::from_pass(pass, target);
-    let solid = crop.capture(gpu, target, pass, true);
-    let normal = crop.capture(gpu, target, pass, false);
-    let repeat = crop.capture(gpu, target, pass, false);
+    let solid = crop.capture_preview(gpu, target, pass, true);
+    let normal = crop.capture_preview(gpu, target, pass, false);
+    let repeat = crop.capture_preview(gpu, target, pass, false);
     let phase_offset = (std::mem::offset_of!(Uniforms, camera) + 3 * size_of::<f32>()) as u64;
     gpu.queue.write_buffer(
         &pass.hardware.uniform,
         phase_offset,
         bytemuck::bytes_of(&PHASE_SECONDS),
     );
-    let shifted = crop.capture(gpu, target, pass, false);
+    let shifted = crop.capture_preview(gpu, target, pass, false);
     gpu.queue.write_buffer(
         &pass.hardware.uniform,
         phase_offset,
@@ -525,7 +541,7 @@ fn metal_gpu(request_timing: bool) -> Gpu {
 fn metal_goshawk_same_pose_shimmer() {
     let output = output_directory("MERIDIAN_SH008_EVIDENCE_DIR");
     let gpu = metal_gpu(false);
-    let target = Target::new(&gpu.device);
+    let target = Target::new(&gpu.device, LOGICAL);
     let mut pass = ok(Pass::new(&gpu.device, &gpu.queue, FORMAT));
     let mut totals = [0, 0];
     let models = showroom_models();
@@ -592,7 +608,7 @@ fn metal_goshawk_gpu_cost() {
     );
     println!("SH008 timing variant={variant}");
     let gpu = metal_gpu(true);
-    let target = Target::new(&gpu.device);
+    let target = Target::new(&gpu.device, LOGICAL);
     let mut pass = ok(Pass::new(&gpu.device, &gpu.queue, FORMAT));
     assert!(pass.shimmer, "SH008 rounded support certification failed");
     let models = showroom_models();
@@ -606,4 +622,54 @@ fn metal_goshawk_gpu_cost() {
     });
     // Persist every returned pair from every pose before validation can fail.
     validate_timings(timings);
+}
+
+#[test]
+#[ignore = "Mac owner only: explicit minimum-size production Showroom model pass"]
+fn metal_goshawk_minimum_showroom_model_pass() {
+    use super::minimum_qualification::{self, Frames};
+    use std::fmt::Write as _;
+
+    let output = output_directory("MERIDIAN_SH008_MINIMUM_DIR");
+    let gpu = metal_gpu(false);
+    let target = Target::new(&gpu.device, MIN_WINDOW_LOGICAL);
+    let crop = Crop {
+        origin: wgpu::Origin3d::ZERO,
+        extent: target.extent,
+    };
+    let size = [target.extent.width, target.extent.height];
+    let mut docked = ok(crate::docked_render::Pass::new(
+        &gpu.device,
+        &gpu.queue,
+        FORMAT,
+    ));
+    let mut panes = String::from("image\tship\tx\ty\twidth\theight\n");
+    for (pose, Frames { solo, comparison }) in minimum_qualification::POSES
+        .into_iter()
+        .zip(minimum_qualification::station_frames())
+    {
+        for (mode, frame) in [("solo", solo), ("compare", comparison)] {
+            let image = format!("{pose}-{mode}.ppm");
+            for model in &frame.models {
+                let bounds = model.bounds;
+                ok(writeln!(
+                    panes,
+                    "{image}\t{}\t{}\t{}\t{}\t{}",
+                    model.object, bounds.x, bounds.y, bounds.width, bounds.height
+                ));
+            }
+            ok(docked.prepare(
+                &gpu.device,
+                &gpu.queue,
+                &frame,
+                MIN_WINDOW_LOGICAL,
+                size,
+                None,
+            ));
+            let rgb = crop.capture(&gpu, &target, |render| docked.draw_models(render));
+            crop.save(output.join(&image), &rgb);
+        }
+    }
+    write_new(output.join("model-panes.tsv"), panes.as_bytes());
+    println!("SH008 minimum Showroom model pass logical={MIN_WINDOW_LOGICAL:?} physical={size:?}");
 }

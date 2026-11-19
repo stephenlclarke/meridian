@@ -70,6 +70,14 @@
       "goshawk_original_visual_and_all_local_supports_bind_to_the_shader"
     ],
     "nativeAcceptance": "Capture original forest-silver appearance, the open wishbone and close grazing shimmer while rotating in the ordinary Showroom; verify resize, view clipping and draw cost.",
+    "minimumWindowQualification": {
+      "status": "AUTHORED_UNRUN",
+      "logicalSize": [640, 360],
+      "projectionTest": "original_goshawk_fits_minimum_station_showroom_solo_and_compare",
+      "metalOffscreenTest": "metal_goshawk_minimum_showroom_model_pass",
+      "criteria": "Real Showroom controls and model panes. All original detailed vertices are inside the Goshawk pane with at least two logical pixels of margin. Each Metal image has a visible model in each assigned pane and no model pixels outside the pane interiors.",
+      "scope": "Offscreen Metal model pass at 2x. Native window resizing and compositor observation remain separate."
+    },
     "metalShimmerQualification": {
       "status": "THREE_OFFSCREEN_VIEWS_VERIFIED;GPU_TIMING_INVALID",
       "visualTest": "metal_goshawk_same_pose_shimmer",

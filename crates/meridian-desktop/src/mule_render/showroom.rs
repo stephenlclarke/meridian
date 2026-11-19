@@ -266,6 +266,9 @@ impl Pass {
     }
 }
 
+#[cfg(test)]
+mod minimum_qualification;
+
 #[cfg(all(test, target_os = "macos"))]
 mod metal_qualification;
 
