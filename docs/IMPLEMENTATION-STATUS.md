@@ -4,7 +4,11 @@
 
 The [Hull Studio authoring guide](HULL-STUDIO.md) describes the separate editor
 and the opt-in package workflow. Its reference uses the 3,484 detailed and 512
-native faces of SH023. Gameplay admission and campaign placement are separate.
+native faces of SH023. The Mac validator produced 69 collision pieces, passed
+all four reference probes and matched the stock station entrance and lip tests.
+The real editor smoke exported a second config-only hull, changed its collision
+groups from four to two and refused export after a route crossed the hull.
+Gameplay admission and campaign placement are separate.
 
 ## Goshawk Showroom preview
 
