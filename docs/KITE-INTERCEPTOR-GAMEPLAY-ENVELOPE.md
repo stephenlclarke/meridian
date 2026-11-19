@@ -63,9 +63,12 @@ appearance remains in the frozen asset and packed native stream. Mass,
 centre of mass and inertia remain unassigned in the original calibration.
 
 The pinned Hull Studio Python loader on the MBA accepted the definition
-and preserved it through a JSON round trip. The Rust Studio export,
-per-hull Rust contact tests and Showroom qualification await their owned
-runs. Campaign placement and acquisition remain separate.
+and preserved it through a JSON round trip. The installed signed macOS
+Rust Studio validator then accepted all 25 support groups and all six
+sphere routes on that exact definition. Its report records the original
+support points and 20 mm rounding. Studio export, the per-hull Rust contact
+tests and a Kite Interceptor Showroom launch await their owned runs.
+Campaign placement and acquisition remain separate.
 
 Regenerate the definition with `python3 -B tools/prepare_kite_interceptor_studio.py`.
 Add `--check` to check the committed definition.

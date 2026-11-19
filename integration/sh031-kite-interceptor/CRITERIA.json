@@ -113,6 +113,41 @@
     "loaderRevision": "1789030980e0d2a7897c2dc48518fad728c9bbf2",
     "loaderSource": "tools/hull_studio/definitions.py",
     "loaderSha256": "f68ea0f442267b793338af6ebec6a937f9e1ee3946dc9be96e58db3e2a796e43",
-    "state": "PYTHON_DEFINITION_LOADER_AND_BYTE_REPLAY_PASS;RUST_VALIDATOR_AND_SHOWROOM_PENDING"
+    "state": "INSTALLED_SIGNED_STUDIO_VALIDATOR_PASS;STUDIO_EXPORT_CONTROLLED_HULL_RUST_AND_SHOWROOM_PENDING",
+    "installedValidator": {
+      "date": "2026-11-19",
+      "inputCommit": "400a5bf67b7c6c460b914cb4d791997c490fdace",
+      "reportedValidatorSha256": "8800efb734ca5b8123ae88b1ab06aa62f1e22f37975cd6230f88581f69cf76e7",
+      "report": "studio/KITE-INTERCEPTOR-REPORT.json",
+      "reportSha256": "03a8879eb6ed6169c3c5b0005d79aa51b12a2f43a3062dbfd1b710eab0fbc0af",
+      "reportBytes": 137272,
+      "supportGroups": 25,
+      "clearances": [
+        {
+          "name": "left-bow-channel",
+          "passed": true
+        },
+        {
+          "name": "left-inboard-blade-channel",
+          "passed": true
+        },
+        {
+          "name": "left-outboard-blade-channel",
+          "passed": true
+        },
+        {
+          "name": "right-bow-channel",
+          "passed": true
+        },
+        {
+          "name": "right-inboard-blade-channel",
+          "passed": true
+        },
+        {
+          "name": "right-outboard-blade-channel",
+          "passed": true
+        }
+      ]
+    }
   }
 }
