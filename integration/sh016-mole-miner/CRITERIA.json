@@ -1,6 +1,6 @@
 {
   "hull": "SH016 Mole Miner",
-  "status": "AUTHORED_CONTROLLED_SOURCE;OWNED_RUST_AND_NATIVE_PENDING",
+  "status": "AUTHORED_CONTROLLED_SOURCE_AND_SHOWROOM;OWNED_RUST_AND_NATIVE_PENDING",
   "source": "assets/fleet/sh016/SOURCE-GEOMETRY.json",
   "geometryTests": [
     "mole_miner_original_faces_belong_to_complete_local_supports",
@@ -10,6 +10,41 @@
   "originalVisualCorners": {
     "detailed": 38508,
     "native": 3300
+  },
+  "showroom": {
+    "ship": "SH016",
+    "geometryKey": "assets/fleet/sh016/visual.bin",
+    "visualMagic": "MOLEVIS1",
+    "detailedFaces": 12836,
+    "detailedVisualSha256": "17beb44f344808ea9379331f186424c26de105c5bb72c3226e038fa9a9322059",
+    "detailedVisualFnv64": "a991ee1543a51756",
+    "retainedNativeVisualSha256": "c61ab51f973d68b7ce53c2713ebe1510e519c10f59499da8479f58fcd4949b0b",
+    "nativeVisualScope": "Retained original reference; not the Showroom model and not admitted as a 512-face compliant hull.",
+    "textureFaceCounts": [476, 0, 12360],
+    "emissiveFaces": 208,
+    "supportPieces": 203,
+    "supportMembershipSlots": 8912,
+    "shimmerAlpha": 0.018,
+    "selection": "Ordinary station Showroom search Mole Miner; exact SH016 ID/key required; SH017 Mole Prospector has no preview on this base. SH025 Compare baseline, synchronized pose, solo, exchange refused and no commander save mutation.",
+    "portableTests": [
+      "selecting_mole_miner_routes_its_original_preview_without_granting_exchange",
+      "mole_prospector_selection_does_not_fall_back_to_mole_miner",
+      "mole_miner_model_key_never_matches_mole_prospector_or_other_hulls",
+      "mole_miner_authentication_refuses_native_mutated_and_sibling_visuals",
+      "mole_miner_visual_keeps_original_corners_winding_and_slate_orange_materials",
+      "mole_miner_203_shimmer_support_ranges_match_original_membership",
+      "mole_miner_original_visual_and_203_supports_bind_to_the_shader",
+      "original_mole_miner_fits_minimum_station_showroom_solo_and_compare",
+      "own_pane_and_full_union_reject_black_gutter_wrong_pane_and_rgb"
+    ],
+    "macOnly": {
+      "metal_mole_miner_same_pose_shimmer": "MERIDIAN_SH016_EVIDENCE_DIR",
+      "metal_mole_miner_minimum_showroom_model_pass": "MERIDIAN_SH016_MINIMUM_DIR",
+      "metal_mole_miner_cache_switching": "MERIDIAN_SH016_CACHE_DIR"
+    },
+    "nativeRgbContract": "Actual 640x360 minimum frame, each isolated pane nonblack and at least two logical pixels inside its bounds, direct original equality and exact full-target RGB union including black gutters. Mixed two orders and duplicate Miner with independent orientations are renderer-only fixtures.",
+    "minimumAndCacheReceipts": ["model-panes.tsv", "rgb-measurements.tsv", "isolated and direct PPM images"],
+    "outsideScope": ["Native face-budget compliance", "Stock engineering assignment", "Ordinary flight or ownership admission", "Exchange or fabrication authorization", "Prospector hull presentation", "GPU timing"]
   },
   "originalTextures": {
     "assets/fleet/sh001/l337-patrol-diffuse.rgba": {
