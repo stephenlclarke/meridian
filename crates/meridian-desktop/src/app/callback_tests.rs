@@ -90,9 +90,17 @@ fn audio_resume_reopens_once_and_primes_live_missile_without_replay() {
     app.suspend_audio();
     assert_eq!(original.borrow().shutdowns, 1);
     app.keys.insert(KeyCode::KeyZ);
-    app.advance_frame(true, 1); // accepted while output is suspended
+    let firing_tick = app.game.world.snapshot().tick + 1;
+    assert_eq!(app.advance_frame(true, 1), FrameAdvance::Continue(None));
+    assert_eq!(app.pulse.map(|shot| shot.tick), Some(firing_tick));
     assert_eq!(original.borrow().sounds, [Launch, Ping]);
     let resumed = std::rc::Rc::new(std::cell::RefCell::new(AudioRecording::default()));
+    assert!(app.notice.missile);
+    assert!(
+        app.notice
+            .expires
+            .is_some_and(|deadline| Instant::now() < deadline)
+    );
     app.resume_audio_with(|| Box::new(RecordedAudio(resumed.clone())));
     app.resume_audio_with(|| panic!("duplicate resume must not open another device"));
     app.publish_audio(false);
