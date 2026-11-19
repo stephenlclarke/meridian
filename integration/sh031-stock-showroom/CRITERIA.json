@@ -8,6 +8,8 @@
   "packageSha256": "fb1e1012a7b2fd9903ffb2438e081edeaf16024b50a71d893e46268bfc0d941d",
   "packageFnv1a64": "9209a322acdaf89d",
   "peerPackageSha256": "623d68f3936be2bdcbdf632f49a14c6fb65f29a9e214ba8cca5c9f3c680ee2de",
+  "sparrowhawkWindowsSourceCorrection": "310082e80343c1ad753fff916313976552f63fcd",
+  "packageCheckout": {"SH030": "nearest rule text eol=lf", "SH031": "shared root rule -text", "scope": "Both rules preserve exact published package bytes with core.autocrlf=true; native Windows qualification remains separately owned."},
   "originalDetailedPackedSha256": "4fcae58eee6b677d8f82754231af7debd871bd22546d90cea649640283c7294e",
   "detailCorners": 9324,
   "unmappedFaces": 1216,
