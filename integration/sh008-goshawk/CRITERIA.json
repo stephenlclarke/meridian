@@ -39,7 +39,8 @@
   "nextAcceptance": [
     "Qualify the selected 69-piece service-well shield regression. Retain both measured original sources.",
     "Measure GPU draw cost with valid counters. The three offscreen visual comparisons passed on their recorded revision.",
-    "Resolve source-supported engineering mass/inertia and authored ordinary placement separately before hull acceptance"
+    "Qualify the controlled World stock mass property regression.",
+    "Resolve authored ordinary placement before hull acceptance."
   ],
   "counts": "Source packet does not alter full-fleet or public-preview acceptance",
   "stationSlice": {
@@ -182,5 +183,16 @@
     },
     "collisionRegression": "goshawk_smoothed_service_wells_block_the_four_original_approaches",
     "channelRegression": "goshawk_forebody_channel_stays_clear_while_a_source_drive_arm_blocks_contact"
+  },
+  "stockEngineering": {
+    "status": "ADOPTED_AND_BOUND_TO_CONTROLLED_WORLD;REGRESSION_PENDING",
+    "dryMassKilograms": 33719,
+    "driveRecessMassPolicy": "Include both luminous recesses in their drive mechanisms\u2019 mass.",
+    "reference": "integration/sh008-goshawk/SH008-STOCK-ENGINEERING-PROPOSAL.json",
+    "referenceSection": "baseline",
+    "referenceSha256": "c086123c0e38c12189719bbbcb36120da8c3099e0e959f335520de2851eceb55",
+    "independentRoleMapSha256": "5124a2e67d2912948730bd660abdc7061746eacadaa65bbc2973fb03cff8ca4e",
+    "regression": "goshawk_world_publishes_the_adopted_stock_mass_properties",
+    "scope": "Controlled SH028 World snapshot, stock dry mass, calibrated XYZ centre, and full tensor about the stock centre. Ordinary placement and mass-dependent flight await their own work."
   }
 }

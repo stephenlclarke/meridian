@@ -3,7 +3,7 @@ use super::{FlightInput, FlightStart, StepError, World, flight_pose};
 use crate::docking::{RigidPose, Vec3};
 use crate::goshawk::{
     GOSHAWK_CONTRACT_SHA256, GOSHAWK_MAX_SPEED_UNITS, GOSHAWK_PIECES, GOSHAWK_RESOURCE_SHA256,
-    GoshawkHullSource,
+    GoshawkEngineering, GoshawkHullSource,
 };
 use crate::goshawk_custom::{
     CUSTOM_CONTRACT_SHA256, CUSTOM_MAX_SPEED_UNITS, CUSTOM_PIECES, CUSTOM_RESOURCE_SHA256,
@@ -24,20 +24,22 @@ pub enum GoshawkApproachStatus {
 
 /// One read-only publication of the World-owned validation hull.
 #[derive(Debug, Clone)]
-pub struct GoshawkHullApproachSnapshot<const N: usize> {
+pub struct GoshawkHullApproachSnapshot<const N: usize, E> {
     pose: RigidPose,
     speed: f32,
     status: GoshawkApproachStatus,
     pieces: Arc<[SmoothPiece; N]>,
+    engineering: E,
     tick: u64,
     scope: Weak<()>,
     identity: (&'static str, &'static str),
 }
 
-pub type GoshawkApproachSnapshot = GoshawkHullApproachSnapshot<GOSHAWK_PIECES>;
-pub type GoshawkCustomApproachSnapshot = GoshawkHullApproachSnapshot<CUSTOM_PIECES>;
+pub type GoshawkApproachSnapshot =
+    GoshawkHullApproachSnapshot<GOSHAWK_PIECES, &'static GoshawkEngineering>;
+pub type GoshawkCustomApproachSnapshot = GoshawkHullApproachSnapshot<CUSTOM_PIECES, ()>;
 
-impl<const N: usize> GoshawkHullApproachSnapshot<N> {
+impl<const N: usize, E> GoshawkHullApproachSnapshot<N, E> {
     pub fn pose(&self) -> RigidPose {
         self.pose
     }
@@ -55,6 +57,22 @@ impl<const N: usize> GoshawkHullApproachSnapshot<N> {
     }
     pub fn source_identity(&self) -> (&'static str, &'static str) {
         self.identity
+    }
+}
+
+impl GoshawkApproachSnapshot {
+    pub fn engineering(&self) -> &'static GoshawkEngineering {
+        self.engineering
+    }
+    /// Position of the stock centre of mass in station metres.
+    pub fn center_of_mass_world_metres(&self) -> Vec3 {
+        let [x, y, z] = self.engineering.center_of_mass_metres;
+        let offset = self.pose.orientation.apply(Vec3::new(x, y, z));
+        Vec3::new(
+            self.pose.position.x + offset.x,
+            self.pose.position.y + offset.y,
+            self.pose.position.z + offset.z,
+        )
     }
 }
 
@@ -129,26 +147,28 @@ pub(super) struct Approach {
 }
 
 impl Approach {
-    fn snapshot<const N: usize>(
+    fn snapshot<const N: usize, E>(
         &self,
         pieces: &Arc<[SmoothPiece; N]>,
         tick: u64,
+        engineering: E,
         identity: (&'static str, &'static str),
-    ) -> GoshawkHullApproachSnapshot<N> {
+    ) -> GoshawkHullApproachSnapshot<N, E> {
         GoshawkHullApproachSnapshot {
             pose: self.pose,
             speed: self.speed,
             status: self.status,
             pieces: pieces.clone(),
+            engineering,
             tick,
             scope: Arc::downgrade(&self.scope),
             identity,
         }
     }
 
-    fn snapshot_current<const N: usize>(
+    fn snapshot_current<const N: usize, E>(
         &self,
-        frame: &GoshawkHullApproachSnapshot<N>,
+        frame: &GoshawkHullApproachSnapshot<N, E>,
         pieces: &Arc<[SmoothPiece; N]>,
         tick: u64,
     ) -> bool {
@@ -283,6 +303,7 @@ impl World {
         Some(approach.snapshot(
             source.pieces(),
             self.state.tick,
+            source.engineering(),
             (GOSHAWK_RESOURCE_SHA256, GOSHAWK_CONTRACT_SHA256),
         ))
     }
@@ -295,6 +316,7 @@ impl World {
         Some(approach.snapshot(
             source.shared_pieces(),
             self.state.tick,
+            (),
             (CUSTOM_RESOURCE_SHA256, CUSTOM_CONTRACT_SHA256),
         ))
     }
