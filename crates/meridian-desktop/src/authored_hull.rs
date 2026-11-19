@@ -75,12 +75,12 @@ impl AuthoredHulls {
     }
 
     /// The single isolated identity authorized for the explicit one-click entry.
-    pub(crate) fn inspection_id(&self) -> Option<&str> {
+    pub(crate) fn inspection_record(&self) -> Option<&AuthoredRecord> {
         let mut isolated = self
             .records()
             .filter(|record| record.id.starts_with(LOCAL_PREFIX));
-        let id = isolated.next()?.id.as_str();
-        isolated.next().is_none().then_some(id)
+        let record = isolated.next()?;
+        isolated.next().is_none().then_some(record)
     }
 
     pub(crate) fn available_models(&self) -> Vec<AvailableModel<'_>> {

@@ -8,6 +8,9 @@ native faces of SH023. The Mac validator produced 69 collision pieces, passed
 all four reference probes and matched the stock station entrance and lip tests.
 The real editor smoke exported a second config-only hull, changed its collision
 groups from four to two and refused export after a route crossed the hull.
+The development desktop identifies a single inspected package by name and local ID
+in its window title, including after the first frame. Visual selection of two
+simultaneous packaged Mac windows still requires native qualification.
 Gameplay admission and campaign placement are separate.
 
 The previous packaged Mac game was bundleless: Zebu confirmed its first frame

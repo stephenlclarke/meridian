@@ -8,6 +8,8 @@ Use [Hull Studio](docs/HULL-STUDIO.md) to edit ship definitions, generate
 rounded collision pieces and check clearances against the game kernel.
 The standalone macOS build opens the isolated game inspector as a separate
 Meridian Hull Showroom app when a compatible game is bundled.
+In development builds, the private game window identifies the inspected ship
+by name and local ID.
 
 ## Goshawk Explorer in the Ship Showroom
 
