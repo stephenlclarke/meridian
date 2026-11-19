@@ -7,9 +7,9 @@ pub(super) fn apply(mesh: &mut [Vertex]) {
     // Original paint colours identify the five used materials in SH028.design.
     let finishes = [
         ([214, 217, 211], [44, 103, 145], false), // ocean-blue hull plating
-        ([182, 193, 188], [34, 65, 92], false),  // structural frame
-        ([23, 35, 42], [24, 41, 55], false),       // recessed details
-        ([125, 144, 152], [73, 97, 109], false), // exposed metal
+        ([182, 193, 188], [34, 65, 92], false),   // structural frame
+        ([23, 35, 42], [24, 41, 55], false),      // recessed details
+        ([125, 144, 152], [73, 97, 109], false),  // exposed metal
         ([141, 221, 210], [255, 146, 24], true),  // original emissive strips
     ]
     .map(|(source, finish, emissive)| (linear(source), linear(finish), emissive));
