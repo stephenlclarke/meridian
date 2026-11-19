@@ -1,10 +1,10 @@
 # Meridian
 
-The locally installed Mac Preview 9 opens on Commander Details. Press H or ? for the current screen’s controls and station navigation. Its docked exterior and flight HUD leave the view above the instruments clear at rest. [Preview guide](docs/PREVIEW-RELEASES.md)
+The locally installed Mac Preview 10 opens on Commander Details. Press H or ? for the current screen’s controls and station navigation. Its docked exterior and flight HUD leave the view above the instruments clear at rest. [Preview guide](docs/PREVIEW-RELEASES.md)
 
 ## Goshawk Explorer in the Ship Showroom
 
-In the development build, press 3 at a station and search for Goshawk Explorer. Compare shows the Peregrine Mk V beside the Goshawk for a new commander. Press C for a single-ship view. Mac testing verified the original dark green hull, silver cross-member, open wishbone and refusal of an unavailable exchange. Preview 9 predates this ship. [Goshawk geometry and Showroom controls](docs/GOSHAWK-GAMEPLAY-ENVELOPE.md)
+In Mac Preview 10, press 3 at a station and search for Goshawk Explorer. Compare shows the Peregrine Mk V beside the Goshawk for a new commander. Press C for a single-ship view. Mac testing verified the original dark green hull, silver cross-member, open wishbone and refusal of an unavailable exchange. Preview 9 predates this ship. [Goshawk geometry and Showroom controls](docs/GOSHAWK-GAMEPLAY-ENVELOPE.md)
 
 ## Internal Mule docking validation
 

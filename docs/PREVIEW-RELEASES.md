@@ -1,14 +1,18 @@
 # GitHub preview releases
 
-## Local Mac Preview 9
+## Local Mac Preview 10
 
-Open `Meridian HUD and Mule Preview.app` in the `Meridian Preview 9` folder under your user Applications folder. Apple notarized this build. The extracted archive and installed app passed signature, ticket and Gatekeeper verification. Its save directory is `Meridian Preview 9/saves-v17-0962f14` under Application Support. The GitHub prerelease is pending.
+Open `~/Applications/Meridian Preview 10/Meridian Goshawk Showroom Preview.app`. From Commander Details, press **3** to open the station Showroom, search for **Goshawk Explorer**, and press **C** to switch between the single-ship and comparison views. The preview has its own save directory under Application Support at `Meridian Preview 10/saves-v17-3fe3ff8`. Apple notarized this Mac build. The extracted archive and local installation passed verification.
 
-## Current preview
+## Published Preview 9
+
+Open `Meridian HUD and Mule Preview.app` in the `Meridian Preview 9` folder under your user Applications folder. Apple notarized this build. The extracted archive and installed app passed signature, ticket and Gatekeeper verification. Its save directory is `Meridian Preview 9/saves-v17-0962f14` under Application Support. The macOS arm64 and Windows x64 packages were published on 19 November 2026. [Preview 9 downloads](https://github.com/stephenlclarke/meridian/releases/tag/v0.9.0-preview.1)
+
+## Preview 8 release record
 
 [Preview 8 v0.8.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.8.0-preview.1) contains the paid EMP utility and retains contextual Help and XYZZY testing for macOS arm64 and Windows x64. It was published on 18 November 2026 at 07:26:13 UTC. Protected main is `bf31ab72f2e4845b8963219cf9e507da6da090de`; compiled source is `2d5f4a57ae05db68ec7f233f9b695f3ecc4b2f75`. All 300 committed files and modes have the same tree `16391c8e179353703b32ddb8d65e69f361f51dcd`.
 
-All six exact-main checks passed, with Sonar revision/project version bound to that main, zero unresolved findings and 98.8% new coverage. All four anonymous public downloads, full package bytes/modes, all raw Mac ZIP metadata and the immutable annotated tag were verified. The actual release receipt was flushed before removing only v0.5 and its tag. Retained previews are v0.8, v0.7 and v0.6.
+All six exact-main checks passed, with Sonar revision/project version bound to that main, zero unresolved findings and 98.8% new coverage. All four anonymous public downloads, full package bytes/modes, all raw Mac ZIP metadata and the immutable annotated tag were verified. The actual release receipt was flushed before removing only v0.5 and its tag. At publication, the retained previews were v0.8, v0.7 and v0.6.
 
 | Public archive | Bytes | SHA-256 |
 | --- | --- | --- |
