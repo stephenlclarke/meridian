@@ -58,6 +58,12 @@ The candidate **does not retain complete original collision coverage**. The arch
 
 [Original envelope fit](../integration/sh039-vulture-mk3/ORIGINAL-ENVELOPE-FIT.json) · [Candidate envelope fit](../integration/sh039-vulture-mk3/CANDIDATE-ENVELOPE-FIT.json) · [Directed surface comparisons](../integration/sh039-vulture-mk3/DIRECTED-FIT.json) · [Exact outside-coverage witness](../integration/sh039-vulture-mk3/COVERAGE-GAP.json)
 
+### Local shield correction is blocked
+
+The candidate's existing input points and rounding cannot provide the missing archived native surface, even if all its local groups were merged. Every regrouping of those same points lies inside their complete convex hull plus 20 mm. An exact integer support-plane audit certifies 122 archived native vertices outside that bound, across 28 source groups. Its strongest witness is archived vertex 776 on the starboard nacelle panel, strictly more than 95 mm outside. The original native triangles 1427 and 2471 also have interior points, not just vertices, with strictly positive barycentric weights `998:1:1`, each more than 17 mm outside the complete possible support set. All 8,272 detailed source triangles remain contained by their own original convex groups.
+
+The 26 affected, omitted closed nacelle panel components alone contain 312 source faces; the candidate has only four faces remaining under the cap. Simply appending these complete original local features cannot fit. The evidence therefore rules out a grouping-only repair of the existing proposal, not every potential independently redesigned native topology. The whole hull bound is used only to prove impossibility, never as proposed collision geometry. No new collision inflation, global shield, or cap waiver is introduced. The existing opening, stand-off, and docking evidence remains unchanged and applies only to its existing unadmitted candidate. [Exact local-shield blocker](../integration/sh039-vulture-mk3/SHIELD-BLOCKER.json)
+
 ## Physical and mission data
 
 The original authored source specifies maximum speed 52.5 m/s, 24 t cargo, seven missile slots, and laser-facing mask 7. The original engineering budget contains a 64,757 kg authored empty-dry reference and a center and inertia tensor. It explicitly grants no native or physical-operating qualification, crew, occupied cabins, paid equipment or service rights. The active engineering field remains null, and no mission placement, acquisition, population or loaded-state authority is inferred. The frozen design contract and physical records retain these proposals for future qualified use.
@@ -71,7 +77,8 @@ python3 -B tools/measure_vulture_mk3_fit.py | cmp - integration/sh039-vulture-mk
 python3 -B tools/measure_vulture_mk3_fit.py --union candidate | cmp - integration/sh039-vulture-mk3/CANDIDATE-ENVELOPE-FIT.json
 python3 -B tools/measure_vulture_mk3_fit.py --union original | cmp - integration/sh039-vulture-mk3/ORIGINAL-ENVELOPE-FIT.json
 python3 -B tools/measure_vulture_mk3_fit.py --coverage-gap | cmp - integration/sh039-vulture-mk3/COVERAGE-GAP.json
+python3 -B tools/verify_vulture_mk3_shield_blocker.py | cmp - integration/sh039-vulture-mk3/SHIELD-BLOCKER.json
 python3 -B -m unittest discover -s tools -p 'test*vulture_mk3*.py' -v
 ```
 
-The surface results use the pinned scientific dependencies and Python 3.14.3 with assertions enabled on SteveMBA. The station and fit commands emit canonical UTF-8/LF report bytes under redirected stdout. Raw source and reports use explicit `-text` attributes, and the six pinned tooling files use narrow `text eol=lf` rules. The complete [criteria](../integration/sh039-vulture-mk3/CRITERIA.json) records raw identity, prior refusal, and candidate execution evidence. No additional Mac compiler or game graphics run was started.
+The surface results use the pinned scientific dependencies and Python 3.14.3 with assertions enabled on SteveMBA. The station and fit commands emit canonical UTF-8/LF report bytes under redirected stdout. Raw source and reports use explicit `-text` attributes, and the seven pinned tooling files use narrow `text eol=lf` rules. The complete [criteria](../integration/sh039-vulture-mk3/CRITERIA.json) records raw identity, prior refusal, and candidate execution evidence. No additional Mac compiler or game graphics run was started.

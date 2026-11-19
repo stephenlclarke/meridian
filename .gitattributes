@@ -17,5 +17,6 @@ tools/prepare_vulture_mk3_studio.py text eol=lf
 tools/measure_vulture_mk3_fit.py text eol=lf
 tools/verify_vulture_mk3_station.py text eol=lf
 tools/verify_vulture_mk3_studio.py text eol=lf
+tools/verify_vulture_mk3_shield_blocker.py text eol=lf
 tools/measure_goshawk_surface_fit.py text eol=lf
 tools/import_goshawk_envelope_source.py text eol=lf

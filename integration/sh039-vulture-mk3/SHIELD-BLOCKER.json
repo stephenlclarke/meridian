@@ -1,0 +1,1331 @@
+{
+  "hull": "SH039",
+  "candidate": "SH039-DERIVED-NATIVE-508",
+  "state": "NO_GROUP_ONLY_CORRECTION_WITH_UNCHANGED_CANDIDATE_POINTS",
+  "detailedSourceFacesContainedByOwnConvexGroups": 8272,
+  "archivedOriginalCoverage": false,
+  "method": "Every regrouping of existing points lies inside their full convex hull; exact integer separating-axis witnesses include 20 mm rounding. Whole candidate hull used only as an impossibility bound, never as proposed collision geometry.",
+  "previousLocalWitnessNativeVertex": 1017,
+  "certifiedOutsideGlobalRoundedHullVertexCount": 122,
+  "affectedSourceGroups": [
+    "port-drive",
+    "port-nacelle-panel-0",
+    "port-nacelle-panel-1",
+    "port-nacelle-panel-2",
+    "port-nacelle-panel-21",
+    "port-nacelle-panel-22",
+    "port-nacelle-panel-23",
+    "port-nacelle-panel-24",
+    "port-nacelle-panel-25",
+    "port-nacelle-panel-26",
+    "port-nacelle-panel-3",
+    "port-nacelle-panel-4",
+    "port-nacelle-panel-5",
+    "port-nacelle-panel-6",
+    "starboard-drive",
+    "starboard-nacelle-panel-0",
+    "starboard-nacelle-panel-1",
+    "starboard-nacelle-panel-2",
+    "starboard-nacelle-panel-21",
+    "starboard-nacelle-panel-22",
+    "starboard-nacelle-panel-23",
+    "starboard-nacelle-panel-24",
+    "starboard-nacelle-panel-25",
+    "starboard-nacelle-panel-26",
+    "starboard-nacelle-panel-3",
+    "starboard-nacelle-panel-4",
+    "starboard-nacelle-panel-5",
+    "starboard-nacelle-panel-6"
+  ],
+  "strongestWitness": {
+    "archivedNativeVertex": 776,
+    "sourceGroup": "starboard-nacelle-panel-0",
+    "axisIntegerCoefficients": [
+      1028769,
+      87303,
+      -183096
+    ],
+    "strictOutsideLowerMillimetres": 95
+  },
+  "strictOriginalTriangleInteriorWitnesses": [
+    {
+      "nativeVertex": 787,
+      "nativeFace": 1427,
+      "sourceFaceIndices": [
+        784,
+        786,
+        787
+      ],
+      "barycentricNumeratorsOver1000": [
+        1,
+        1,
+        998
+      ],
+      "pointMetres": [
+        16.114695898527003,
+        0.5743920589198036,
+        -2.9491325695581017
+      ],
+      "exactOutsideLowerMillimetres": 17,
+      "axis": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "nativeVertex": 1459,
+      "nativeFace": 2471,
+      "sourceFaceIndices": [
+        1459,
+        1458,
+        1456
+      ],
+      "barycentricNumeratorsOver1000": [
+        998,
+        1,
+        1
+      ],
+      "pointMetres": [
+        -16.114695898527003,
+        0.5743920589198036,
+        -2.9491325695581017
+      ],
+      "exactOutsideLowerMillimetres": 17,
+      "axis": [
+        -1,
+        0,
+        0
+      ]
+    }
+  ],
+  "missingClosedNacellePanelGroups": 26,
+  "completeMissingPanelSourceFaces": 312,
+  "candidateFaces": 508,
+  "faceCap": 512,
+  "remainingFaces": 4,
+  "completePanelAdditionWouldExceedCap": true,
+  "blockerLimit": "Proves no local regrouping of this candidate point set can work. Does not prove that every possible independently redesigned <=512-face native mesh is infeasible. A new approved topology or separately validated collision support stream is required.",
+  "outsideWitnesses": [
+    {
+      "archivedNativeVertex": 701,
+      "sourceGroup": "starboard-drive",
+      "axisIntegerCoefficients": [
+        930230,
+        444356,
+        -191657
+      ],
+      "strictOutsideLowerMillimetres": 7
+    },
+    {
+      "archivedNativeVertex": 711,
+      "sourceGroup": "starboard-drive",
+      "axisIntegerCoefficients": [
+        930144,
+        -444315,
+        -192165
+      ],
+      "strictOutsideLowerMillimetres": 7
+    },
+    {
+      "archivedNativeVertex": 737,
+      "sourceGroup": "starboard-drive",
+      "axisIntegerCoefficients": [
+        924078,
+        400486,
+        291893
+      ],
+      "strictOutsideLowerMillimetres": 2
+    },
+    {
+      "archivedNativeVertex": 747,
+      "sourceGroup": "starboard-drive",
+      "axisIntegerCoefficients": [
+        923843,
+        -400385,
+        292776
+      ],
+      "strictOutsideLowerMillimetres": 2
+    },
+    {
+      "archivedNativeVertex": 772,
+      "sourceGroup": "starboard-nacelle-panel-0",
+      "axisIntegerCoefficients": [
+        1028769,
+        87303,
+        -183096
+      ],
+      "strictOutsideLowerMillimetres": 28
+    },
+    {
+      "archivedNativeVertex": 773,
+      "sourceGroup": "starboard-nacelle-panel-0",
+      "axisIntegerCoefficients": [
+        795862,
+        661083,
+        -170545
+      ],
+      "strictOutsideLowerMillimetres": 20
+    },
+    {
+      "archivedNativeVertex": 776,
+      "sourceGroup": "starboard-nacelle-panel-0",
+      "axisIntegerCoefficients": [
+        1028769,
+        87303,
+        -183096
+      ],
+      "strictOutsideLowerMillimetres": 95
+    },
+    {
+      "archivedNativeVertex": 777,
+      "sourceGroup": "starboard-nacelle-panel-0",
+      "axisIntegerCoefficients": [
+        795862,
+        661083,
+        -170545
+      ],
+      "strictOutsideLowerMillimetres": 87
+    },
+    {
+      "archivedNativeVertex": 779,
+      "sourceGroup": "starboard-nacelle-panel-0",
+      "axisIntegerCoefficients": [
+        1043090,
+        -106493,
+        -11569
+      ],
+      "strictOutsideLowerMillimetres": 19
+    },
+    {
+      "archivedNativeVertex": 783,
+      "sourceGroup": "starboard-nacelle-panel-1",
+      "axisIntegerCoefficients": [
+        1044878,
+        -24235,
+        84584
+      ],
+      "strictOutsideLowerMillimetres": 19
+    },
+    {
+      "archivedNativeVertex": 784,
+      "sourceGroup": "starboard-nacelle-panel-1",
+      "axisIntegerCoefficients": [
+        1043090,
+        -106493,
+        -11569
+      ],
+      "strictOutsideLowerMillimetres": 19
+    },
+    {
+      "archivedNativeVertex": 786,
+      "sourceGroup": "starboard-nacelle-panel-1",
+      "axisIntegerCoefficients": [
+        814519,
+        655674,
+        78495
+      ],
+      "strictOutsideLowerMillimetres": 68
+    },
+    {
+      "archivedNativeVertex": 787,
+      "sourceGroup": "starboard-nacelle-panel-1",
+      "axisIntegerCoefficients": [
+        1044878,
+        -24235,
+        84584
+      ],
+      "strictOutsideLowerMillimetres": 85
+    },
+    {
+      "archivedNativeVertex": 788,
+      "sourceGroup": "starboard-nacelle-panel-2",
+      "axisIntegerCoefficients": [
+        1044878,
+        -24235,
+        84584
+      ],
+      "strictOutsideLowerMillimetres": 5
+    },
+    {
+      "archivedNativeVertex": 791,
+      "sourceGroup": "starboard-nacelle-panel-2",
+      "axisIntegerCoefficients": [
+        997607,
+        134399,
+        293649
+      ],
+      "strictOutsideLowerMillimetres": 2
+    },
+    {
+      "archivedNativeVertex": 792,
+      "sourceGroup": "starboard-nacelle-panel-2",
+      "axisIntegerCoefficients": [
+        1044878,
+        -24235,
+        84584
+      ],
+      "strictOutsideLowerMillimetres": 71
+    },
+    {
+      "archivedNativeVertex": 793,
+      "sourceGroup": "starboard-nacelle-panel-2",
+      "axisIntegerCoefficients": [
+        814519,
+        655674,
+        78495
+      ],
+      "strictOutsideLowerMillimetres": 56
+    },
+    {
+      "archivedNativeVertex": 794,
+      "sourceGroup": "starboard-nacelle-panel-2",
+      "axisIntegerCoefficients": [
+        800769,
+        623907,
+        262717
+      ],
+      "strictOutsideLowerMillimetres": 60
+    },
+    {
+      "archivedNativeVertex": 795,
+      "sourceGroup": "starboard-nacelle-panel-2",
+      "axisIntegerCoefficients": [
+        997607,
+        134399,
+        293649
+      ],
+      "strictOutsideLowerMillimetres": 68
+    },
+    {
+      "archivedNativeVertex": 796,
+      "sourceGroup": "starboard-nacelle-panel-3",
+      "axisIntegerCoefficients": [
+        795862,
+        661083,
+        -170545
+      ],
+      "strictOutsideLowerMillimetres": 19
+    },
+    {
+      "archivedNativeVertex": 797,
+      "sourceGroup": "starboard-nacelle-panel-3",
+      "axisIntegerCoefficients": [
+        285816,
+        997371,
+        -151895
+      ],
+      "strictOutsideLowerMillimetres": 8
+    },
+    {
+      "archivedNativeVertex": 800,
+      "sourceGroup": "starboard-nacelle-panel-3",
+      "axisIntegerCoefficients": [
+        795862,
+        661083,
+        -170545
+      ],
+      "strictOutsideLowerMillimetres": 86
+    },
+    {
+      "archivedNativeVertex": 801,
+      "sourceGroup": "starboard-nacelle-panel-3",
+      "axisIntegerCoefficients": [
+        285816,
+        997371,
+        -151895
+      ],
+      "strictOutsideLowerMillimetres": 75
+    },
+    {
+      "archivedNativeVertex": 810,
+      "sourceGroup": "starboard-nacelle-panel-4",
+      "axisIntegerCoefficients": [
+        451754,
+        943998,
+        65549
+      ],
+      "strictOutsideLowerMillimetres": 42
+    },
+    {
+      "archivedNativeVertex": 811,
+      "sourceGroup": "starboard-nacelle-panel-4",
+      "axisIntegerCoefficients": [
+        806281,
+        666414,
+        72901
+      ],
+      "strictOutsideLowerMillimetres": 65
+    },
+    {
+      "archivedNativeVertex": 815,
+      "sourceGroup": "starboard-nacelle-panel-5",
+      "axisIntegerCoefficients": [
+        771648,
+        656351,
+        270693
+      ],
+      "strictOutsideLowerMillimetres": 5
+    },
+    {
+      "archivedNativeVertex": 816,
+      "sourceGroup": "starboard-nacelle-panel-5",
+      "axisIntegerCoefficients": [
+        806281,
+        666414,
+        72901
+      ],
+      "strictOutsideLowerMillimetres": 53
+    },
+    {
+      "archivedNativeVertex": 817,
+      "sourceGroup": "starboard-nacelle-panel-5",
+      "axisIntegerCoefficients": [
+        451754,
+        943998,
+        65549
+      ],
+      "strictOutsideLowerMillimetres": 33
+    },
+    {
+      "archivedNativeVertex": 818,
+      "sourceGroup": "starboard-nacelle-panel-5",
+      "axisIntegerCoefficients": [
+        582102,
+        834307,
+        254168
+      ],
+      "strictOutsideLowerMillimetres": 44
+    },
+    {
+      "archivedNativeVertex": 819,
+      "sourceGroup": "starboard-nacelle-panel-5",
+      "axisIntegerCoefficients": [
+        771648,
+        656351,
+        270693
+      ],
+      "strictOutsideLowerMillimetres": 70
+    },
+    {
+      "archivedNativeVertex": 820,
+      "sourceGroup": "starboard-nacelle-panel-6",
+      "axisIntegerCoefficients": [
+        285816,
+        997371,
+        -151895
+      ],
+      "strictOutsideLowerMillimetres": 8
+    },
+    {
+      "archivedNativeVertex": 824,
+      "sourceGroup": "starboard-nacelle-panel-6",
+      "axisIntegerCoefficients": [
+        285816,
+        997371,
+        -151895
+      ],
+      "strictOutsideLowerMillimetres": 75
+    },
+    {
+      "archivedNativeVertex": 940,
+      "sourceGroup": "starboard-nacelle-panel-21",
+      "axisIntegerCoefficients": [
+        0,
+        -1037605,
+        -151288
+      ],
+      "strictOutsideLowerMillimetres": 5
+    },
+    {
+      "archivedNativeVertex": 941,
+      "sourceGroup": "starboard-nacelle-panel-21",
+      "axisIntegerCoefficients": [
+        606535,
+        -841448,
+        -153594
+      ],
+      "strictOutsideLowerMillimetres": 15
+    },
+    {
+      "archivedNativeVertex": 944,
+      "sourceGroup": "starboard-nacelle-panel-21",
+      "axisIntegerCoefficients": [
+        0,
+        -1037605,
+        -151288
+      ],
+      "strictOutsideLowerMillimetres": 72
+    },
+    {
+      "archivedNativeVertex": 945,
+      "sourceGroup": "starboard-nacelle-panel-21",
+      "axisIntegerCoefficients": [
+        606535,
+        -841448,
+        -153594
+      ],
+      "strictOutsideLowerMillimetres": 82
+    },
+    {
+      "archivedNativeVertex": 946,
+      "sourceGroup": "starboard-nacelle-panel-21",
+      "axisIntegerCoefficients": [
+        613092,
+        -850539,
+        -14566
+      ],
+      "strictOutsideLowerMillimetres": 4
+    },
+    {
+      "archivedNativeVertex": 953,
+      "sourceGroup": "starboard-nacelle-panel-22",
+      "axisIntegerCoefficients": [
+        613092,
+        -850539,
+        -14566
+      ],
+      "strictOutsideLowerMillimetres": 4
+    },
+    {
+      "archivedNativeVertex": 954,
+      "sourceGroup": "starboard-nacelle-panel-22",
+      "axisIntegerCoefficients": [
+        613986,
+        -847561,
+        64603
+      ],
+      "strictOutsideLowerMillimetres": 65
+    },
+    {
+      "archivedNativeVertex": 955,
+      "sourceGroup": "starboard-nacelle-panel-22",
+      "axisIntegerCoefficients": [
+        211051,
+        -1025309,
+        60912
+      ],
+      "strictOutsideLowerMillimetres": 33
+    },
+    {
+      "archivedNativeVertex": 960,
+      "sourceGroup": "starboard-nacelle-panel-23",
+      "axisIntegerCoefficients": [
+        211051,
+        -1025309,
+        60912
+      ],
+      "strictOutsideLowerMillimetres": 23
+    },
+    {
+      "archivedNativeVertex": 961,
+      "sourceGroup": "starboard-nacelle-panel-23",
+      "axisIntegerCoefficients": [
+        613986,
+        -847561,
+        64603
+      ],
+      "strictOutsideLowerMillimetres": 53
+    },
+    {
+      "archivedNativeVertex": 962,
+      "sourceGroup": "starboard-nacelle-panel-23",
+      "axisIntegerCoefficients": [
+        619895,
+        -811862,
+        236902
+      ],
+      "strictOutsideLowerMillimetres": 65
+    },
+    {
+      "archivedNativeVertex": 963,
+      "sourceGroup": "starboard-nacelle-panel-23",
+      "axisIntegerCoefficients": [
+        346073,
+        -958353,
+        247599
+      ],
+      "strictOutsideLowerMillimetres": 9
+    },
+    {
+      "archivedNativeVertex": 964,
+      "sourceGroup": "starboard-nacelle-panel-24",
+      "axisIntegerCoefficients": [
+        606535,
+        -841448,
+        -153594
+      ],
+      "strictOutsideLowerMillimetres": 15
+    },
+    {
+      "archivedNativeVertex": 965,
+      "sourceGroup": "starboard-nacelle-panel-24",
+      "axisIntegerCoefficients": [
+        988463,
+        -300454,
+        -179387
+      ],
+      "strictOutsideLowerMillimetres": 25
+    },
+    {
+      "archivedNativeVertex": 968,
+      "sourceGroup": "starboard-nacelle-panel-24",
+      "axisIntegerCoefficients": [
+        606535,
+        -841448,
+        -153594
+      ],
+      "strictOutsideLowerMillimetres": 82
+    },
+    {
+      "archivedNativeVertex": 969,
+      "sourceGroup": "starboard-nacelle-panel-24",
+      "axisIntegerCoefficients": [
+        988463,
+        -300454,
+        -179387
+      ],
+      "strictOutsideLowerMillimetres": 92
+    },
+    {
+      "archivedNativeVertex": 970,
+      "sourceGroup": "starboard-nacelle-panel-24",
+      "axisIntegerCoefficients": [
+        1043034,
+        -107015,
+        -11809
+      ],
+      "strictOutsideLowerMillimetres": 19
+    },
+    {
+      "archivedNativeVertex": 971,
+      "sourceGroup": "starboard-nacelle-panel-24",
+      "axisIntegerCoefficients": [
+        615098,
+        -849102,
+        -13842
+      ],
+      "strictOutsideLowerMillimetres": 4
+    },
+    {
+      "archivedNativeVertex": 974,
+      "sourceGroup": "starboard-nacelle-panel-25",
+      "axisIntegerCoefficients": [
+        1034313,
+        -151856,
+        81538
+      ],
+      "strictOutsideLowerMillimetres": 21
+    },
+    {
+      "archivedNativeVertex": 975,
+      "sourceGroup": "starboard-nacelle-panel-25",
+      "axisIntegerCoefficients": [
+        624350,
+        -839405,
+        71401
+      ],
+      "strictOutsideLowerMillimetres": 1
+    },
+    {
+      "archivedNativeVertex": 976,
+      "sourceGroup": "starboard-nacelle-panel-25",
+      "axisIntegerCoefficients": [
+        615098,
+        -849102,
+        -13842
+      ],
+      "strictOutsideLowerMillimetres": 4
+    },
+    {
+      "archivedNativeVertex": 977,
+      "sourceGroup": "starboard-nacelle-panel-25",
+      "axisIntegerCoefficients": [
+        1043034,
+        -107015,
+        -11809
+      ],
+      "strictOutsideLowerMillimetres": 19
+    },
+    {
+      "archivedNativeVertex": 978,
+      "sourceGroup": "starboard-nacelle-panel-25",
+      "axisIntegerCoefficients": [
+        1034313,
+        -151856,
+        81538
+      ],
+      "strictOutsideLowerMillimetres": 87
+    },
+    {
+      "archivedNativeVertex": 979,
+      "sourceGroup": "starboard-nacelle-panel-25",
+      "axisIntegerCoefficients": [
+        624350,
+        -839405,
+        71401
+      ],
+      "strictOutsideLowerMillimetres": 68
+    },
+    {
+      "archivedNativeVertex": 981,
+      "sourceGroup": "starboard-nacelle-panel-26",
+      "axisIntegerCoefficients": [
+        1034313,
+        -151856,
+        81538
+      ],
+      "strictOutsideLowerMillimetres": 7
+    },
+    {
+      "archivedNativeVertex": 984,
+      "sourceGroup": "starboard-nacelle-panel-26",
+      "axisIntegerCoefficients": [
+        624350,
+        -839405,
+        71401
+      ],
+      "strictOutsideLowerMillimetres": 57
+    },
+    {
+      "archivedNativeVertex": 985,
+      "sourceGroup": "starboard-nacelle-panel-26",
+      "axisIntegerCoefficients": [
+        1034313,
+        -151856,
+        81538
+      ],
+      "strictOutsideLowerMillimetres": 73
+    },
+    {
+      "archivedNativeVertex": 986,
+      "sourceGroup": "starboard-nacelle-panel-26",
+      "axisIntegerCoefficients": [
+        923843,
+        -400385,
+        292776
+      ],
+      "strictOutsideLowerMillimetres": 65
+    },
+    {
+      "archivedNativeVertex": 987,
+      "sourceGroup": "starboard-nacelle-panel-26",
+      "axisIntegerCoefficients": [
+        769764,
+        -654748,
+        279783
+      ],
+      "strictOutsideLowerMillimetres": 63
+    },
+    {
+      "archivedNativeVertex": 1373,
+      "sourceGroup": "port-drive",
+      "axisIntegerCoefficients": [
+        -930230,
+        444356,
+        -191657
+      ],
+      "strictOutsideLowerMillimetres": 7
+    },
+    {
+      "archivedNativeVertex": 1383,
+      "sourceGroup": "port-drive",
+      "axisIntegerCoefficients": [
+        -930144,
+        -444315,
+        -192165
+      ],
+      "strictOutsideLowerMillimetres": 7
+    },
+    {
+      "archivedNativeVertex": 1409,
+      "sourceGroup": "port-drive",
+      "axisIntegerCoefficients": [
+        -924078,
+        400486,
+        291893
+      ],
+      "strictOutsideLowerMillimetres": 2
+    },
+    {
+      "archivedNativeVertex": 1419,
+      "sourceGroup": "port-drive",
+      "axisIntegerCoefficients": [
+        -923843,
+        -400385,
+        292776
+      ],
+      "strictOutsideLowerMillimetres": 2
+    },
+    {
+      "archivedNativeVertex": 1444,
+      "sourceGroup": "port-nacelle-panel-0",
+      "axisIntegerCoefficients": [
+        -1028769,
+        87303,
+        -183096
+      ],
+      "strictOutsideLowerMillimetres": 28
+    },
+    {
+      "archivedNativeVertex": 1445,
+      "sourceGroup": "port-nacelle-panel-0",
+      "axisIntegerCoefficients": [
+        -795862,
+        661083,
+        -170545
+      ],
+      "strictOutsideLowerMillimetres": 20
+    },
+    {
+      "archivedNativeVertex": 1448,
+      "sourceGroup": "port-nacelle-panel-0",
+      "axisIntegerCoefficients": [
+        -1028769,
+        87303,
+        -183096
+      ],
+      "strictOutsideLowerMillimetres": 95
+    },
+    {
+      "archivedNativeVertex": 1449,
+      "sourceGroup": "port-nacelle-panel-0",
+      "axisIntegerCoefficients": [
+        -795862,
+        661083,
+        -170545
+      ],
+      "strictOutsideLowerMillimetres": 87
+    },
+    {
+      "archivedNativeVertex": 1451,
+      "sourceGroup": "port-nacelle-panel-0",
+      "axisIntegerCoefficients": [
+        -1043090,
+        -106493,
+        -11569
+      ],
+      "strictOutsideLowerMillimetres": 19
+    },
+    {
+      "archivedNativeVertex": 1455,
+      "sourceGroup": "port-nacelle-panel-1",
+      "axisIntegerCoefficients": [
+        -1044878,
+        -24235,
+        84584
+      ],
+      "strictOutsideLowerMillimetres": 19
+    },
+    {
+      "archivedNativeVertex": 1456,
+      "sourceGroup": "port-nacelle-panel-1",
+      "axisIntegerCoefficients": [
+        -1043090,
+        -106493,
+        -11569
+      ],
+      "strictOutsideLowerMillimetres": 19
+    },
+    {
+      "archivedNativeVertex": 1458,
+      "sourceGroup": "port-nacelle-panel-1",
+      "axisIntegerCoefficients": [
+        -814519,
+        655674,
+        78495
+      ],
+      "strictOutsideLowerMillimetres": 68
+    },
+    {
+      "archivedNativeVertex": 1459,
+      "sourceGroup": "port-nacelle-panel-1",
+      "axisIntegerCoefficients": [
+        -1044878,
+        -24235,
+        84584
+      ],
+      "strictOutsideLowerMillimetres": 85
+    },
+    {
+      "archivedNativeVertex": 1460,
+      "sourceGroup": "port-nacelle-panel-2",
+      "axisIntegerCoefficients": [
+        -1044878,
+        -24235,
+        84584
+      ],
+      "strictOutsideLowerMillimetres": 5
+    },
+    {
+      "archivedNativeVertex": 1463,
+      "sourceGroup": "port-nacelle-panel-2",
+      "axisIntegerCoefficients": [
+        -997607,
+        134399,
+        293649
+      ],
+      "strictOutsideLowerMillimetres": 2
+    },
+    {
+      "archivedNativeVertex": 1464,
+      "sourceGroup": "port-nacelle-panel-2",
+      "axisIntegerCoefficients": [
+        -1044878,
+        -24235,
+        84584
+      ],
+      "strictOutsideLowerMillimetres": 71
+    },
+    {
+      "archivedNativeVertex": 1465,
+      "sourceGroup": "port-nacelle-panel-2",
+      "axisIntegerCoefficients": [
+        -814519,
+        655674,
+        78495
+      ],
+      "strictOutsideLowerMillimetres": 56
+    },
+    {
+      "archivedNativeVertex": 1466,
+      "sourceGroup": "port-nacelle-panel-2",
+      "axisIntegerCoefficients": [
+        -800769,
+        623907,
+        262717
+      ],
+      "strictOutsideLowerMillimetres": 60
+    },
+    {
+      "archivedNativeVertex": 1467,
+      "sourceGroup": "port-nacelle-panel-2",
+      "axisIntegerCoefficients": [
+        -997607,
+        134399,
+        293649
+      ],
+      "strictOutsideLowerMillimetres": 68
+    },
+    {
+      "archivedNativeVertex": 1468,
+      "sourceGroup": "port-nacelle-panel-3",
+      "axisIntegerCoefficients": [
+        -795862,
+        661083,
+        -170545
+      ],
+      "strictOutsideLowerMillimetres": 19
+    },
+    {
+      "archivedNativeVertex": 1469,
+      "sourceGroup": "port-nacelle-panel-3",
+      "axisIntegerCoefficients": [
+        -285816,
+        997371,
+        -151895
+      ],
+      "strictOutsideLowerMillimetres": 8
+    },
+    {
+      "archivedNativeVertex": 1472,
+      "sourceGroup": "port-nacelle-panel-3",
+      "axisIntegerCoefficients": [
+        -795862,
+        661083,
+        -170545
+      ],
+      "strictOutsideLowerMillimetres": 86
+    },
+    {
+      "archivedNativeVertex": 1473,
+      "sourceGroup": "port-nacelle-panel-3",
+      "axisIntegerCoefficients": [
+        -285816,
+        997371,
+        -151895
+      ],
+      "strictOutsideLowerMillimetres": 75
+    },
+    {
+      "archivedNativeVertex": 1482,
+      "sourceGroup": "port-nacelle-panel-4",
+      "axisIntegerCoefficients": [
+        -451754,
+        943998,
+        65549
+      ],
+      "strictOutsideLowerMillimetres": 42
+    },
+    {
+      "archivedNativeVertex": 1483,
+      "sourceGroup": "port-nacelle-panel-4",
+      "axisIntegerCoefficients": [
+        -806281,
+        666414,
+        72901
+      ],
+      "strictOutsideLowerMillimetres": 65
+    },
+    {
+      "archivedNativeVertex": 1487,
+      "sourceGroup": "port-nacelle-panel-5",
+      "axisIntegerCoefficients": [
+        -771648,
+        656351,
+        270693
+      ],
+      "strictOutsideLowerMillimetres": 5
+    },
+    {
+      "archivedNativeVertex": 1488,
+      "sourceGroup": "port-nacelle-panel-5",
+      "axisIntegerCoefficients": [
+        -806281,
+        666414,
+        72901
+      ],
+      "strictOutsideLowerMillimetres": 53
+    },
+    {
+      "archivedNativeVertex": 1489,
+      "sourceGroup": "port-nacelle-panel-5",
+      "axisIntegerCoefficients": [
+        -451754,
+        943998,
+        65549
+      ],
+      "strictOutsideLowerMillimetres": 33
+    },
+    {
+      "archivedNativeVertex": 1490,
+      "sourceGroup": "port-nacelle-panel-5",
+      "axisIntegerCoefficients": [
+        -582102,
+        834307,
+        254168
+      ],
+      "strictOutsideLowerMillimetres": 44
+    },
+    {
+      "archivedNativeVertex": 1491,
+      "sourceGroup": "port-nacelle-panel-5",
+      "axisIntegerCoefficients": [
+        -771648,
+        656351,
+        270693
+      ],
+      "strictOutsideLowerMillimetres": 70
+    },
+    {
+      "archivedNativeVertex": 1492,
+      "sourceGroup": "port-nacelle-panel-6",
+      "axisIntegerCoefficients": [
+        -285816,
+        997371,
+        -151895
+      ],
+      "strictOutsideLowerMillimetres": 8
+    },
+    {
+      "archivedNativeVertex": 1496,
+      "sourceGroup": "port-nacelle-panel-6",
+      "axisIntegerCoefficients": [
+        -285816,
+        997371,
+        -151895
+      ],
+      "strictOutsideLowerMillimetres": 75
+    },
+    {
+      "archivedNativeVertex": 1612,
+      "sourceGroup": "port-nacelle-panel-21",
+      "axisIntegerCoefficients": [
+        0,
+        -1037605,
+        -151288
+      ],
+      "strictOutsideLowerMillimetres": 5
+    },
+    {
+      "archivedNativeVertex": 1613,
+      "sourceGroup": "port-nacelle-panel-21",
+      "axisIntegerCoefficients": [
+        -606535,
+        -841448,
+        -153594
+      ],
+      "strictOutsideLowerMillimetres": 15
+    },
+    {
+      "archivedNativeVertex": 1616,
+      "sourceGroup": "port-nacelle-panel-21",
+      "axisIntegerCoefficients": [
+        0,
+        -1037605,
+        -151288
+      ],
+      "strictOutsideLowerMillimetres": 72
+    },
+    {
+      "archivedNativeVertex": 1617,
+      "sourceGroup": "port-nacelle-panel-21",
+      "axisIntegerCoefficients": [
+        -606535,
+        -841448,
+        -153594
+      ],
+      "strictOutsideLowerMillimetres": 82
+    },
+    {
+      "archivedNativeVertex": 1618,
+      "sourceGroup": "port-nacelle-panel-21",
+      "axisIntegerCoefficients": [
+        -613092,
+        -850539,
+        -14566
+      ],
+      "strictOutsideLowerMillimetres": 4
+    },
+    {
+      "archivedNativeVertex": 1625,
+      "sourceGroup": "port-nacelle-panel-22",
+      "axisIntegerCoefficients": [
+        -613092,
+        -850539,
+        -14566
+      ],
+      "strictOutsideLowerMillimetres": 4
+    },
+    {
+      "archivedNativeVertex": 1626,
+      "sourceGroup": "port-nacelle-panel-22",
+      "axisIntegerCoefficients": [
+        -613986,
+        -847561,
+        64603
+      ],
+      "strictOutsideLowerMillimetres": 65
+    },
+    {
+      "archivedNativeVertex": 1627,
+      "sourceGroup": "port-nacelle-panel-22",
+      "axisIntegerCoefficients": [
+        -211051,
+        -1025309,
+        60912
+      ],
+      "strictOutsideLowerMillimetres": 33
+    },
+    {
+      "archivedNativeVertex": 1632,
+      "sourceGroup": "port-nacelle-panel-23",
+      "axisIntegerCoefficients": [
+        -211051,
+        -1025309,
+        60912
+      ],
+      "strictOutsideLowerMillimetres": 23
+    },
+    {
+      "archivedNativeVertex": 1633,
+      "sourceGroup": "port-nacelle-panel-23",
+      "axisIntegerCoefficients": [
+        -613986,
+        -847561,
+        64603
+      ],
+      "strictOutsideLowerMillimetres": 53
+    },
+    {
+      "archivedNativeVertex": 1634,
+      "sourceGroup": "port-nacelle-panel-23",
+      "axisIntegerCoefficients": [
+        -619895,
+        -811862,
+        236902
+      ],
+      "strictOutsideLowerMillimetres": 65
+    },
+    {
+      "archivedNativeVertex": 1635,
+      "sourceGroup": "port-nacelle-panel-23",
+      "axisIntegerCoefficients": [
+        -346073,
+        -958353,
+        247599
+      ],
+      "strictOutsideLowerMillimetres": 9
+    },
+    {
+      "archivedNativeVertex": 1636,
+      "sourceGroup": "port-nacelle-panel-24",
+      "axisIntegerCoefficients": [
+        -606535,
+        -841448,
+        -153594
+      ],
+      "strictOutsideLowerMillimetres": 15
+    },
+    {
+      "archivedNativeVertex": 1637,
+      "sourceGroup": "port-nacelle-panel-24",
+      "axisIntegerCoefficients": [
+        -988463,
+        -300454,
+        -179387
+      ],
+      "strictOutsideLowerMillimetres": 25
+    },
+    {
+      "archivedNativeVertex": 1640,
+      "sourceGroup": "port-nacelle-panel-24",
+      "axisIntegerCoefficients": [
+        -606535,
+        -841448,
+        -153594
+      ],
+      "strictOutsideLowerMillimetres": 82
+    },
+    {
+      "archivedNativeVertex": 1641,
+      "sourceGroup": "port-nacelle-panel-24",
+      "axisIntegerCoefficients": [
+        -988463,
+        -300454,
+        -179387
+      ],
+      "strictOutsideLowerMillimetres": 92
+    },
+    {
+      "archivedNativeVertex": 1642,
+      "sourceGroup": "port-nacelle-panel-24",
+      "axisIntegerCoefficients": [
+        -1043034,
+        -107015,
+        -11809
+      ],
+      "strictOutsideLowerMillimetres": 19
+    },
+    {
+      "archivedNativeVertex": 1643,
+      "sourceGroup": "port-nacelle-panel-24",
+      "axisIntegerCoefficients": [
+        -615098,
+        -849102,
+        -13842
+      ],
+      "strictOutsideLowerMillimetres": 4
+    },
+    {
+      "archivedNativeVertex": 1646,
+      "sourceGroup": "port-nacelle-panel-25",
+      "axisIntegerCoefficients": [
+        -1034313,
+        -151856,
+        81538
+      ],
+      "strictOutsideLowerMillimetres": 21
+    },
+    {
+      "archivedNativeVertex": 1647,
+      "sourceGroup": "port-nacelle-panel-25",
+      "axisIntegerCoefficients": [
+        -624350,
+        -839405,
+        71401
+      ],
+      "strictOutsideLowerMillimetres": 1
+    },
+    {
+      "archivedNativeVertex": 1648,
+      "sourceGroup": "port-nacelle-panel-25",
+      "axisIntegerCoefficients": [
+        -615098,
+        -849102,
+        -13842
+      ],
+      "strictOutsideLowerMillimetres": 4
+    },
+    {
+      "archivedNativeVertex": 1649,
+      "sourceGroup": "port-nacelle-panel-25",
+      "axisIntegerCoefficients": [
+        -1043034,
+        -107015,
+        -11809
+      ],
+      "strictOutsideLowerMillimetres": 19
+    },
+    {
+      "archivedNativeVertex": 1650,
+      "sourceGroup": "port-nacelle-panel-25",
+      "axisIntegerCoefficients": [
+        -1034313,
+        -151856,
+        81538
+      ],
+      "strictOutsideLowerMillimetres": 87
+    },
+    {
+      "archivedNativeVertex": 1651,
+      "sourceGroup": "port-nacelle-panel-25",
+      "axisIntegerCoefficients": [
+        -624350,
+        -839405,
+        71401
+      ],
+      "strictOutsideLowerMillimetres": 68
+    },
+    {
+      "archivedNativeVertex": 1653,
+      "sourceGroup": "port-nacelle-panel-26",
+      "axisIntegerCoefficients": [
+        -1034313,
+        -151856,
+        81538
+      ],
+      "strictOutsideLowerMillimetres": 7
+    },
+    {
+      "archivedNativeVertex": 1656,
+      "sourceGroup": "port-nacelle-panel-26",
+      "axisIntegerCoefficients": [
+        -624350,
+        -839405,
+        71401
+      ],
+      "strictOutsideLowerMillimetres": 57
+    },
+    {
+      "archivedNativeVertex": 1657,
+      "sourceGroup": "port-nacelle-panel-26",
+      "axisIntegerCoefficients": [
+        -1034313,
+        -151856,
+        81538
+      ],
+      "strictOutsideLowerMillimetres": 73
+    },
+    {
+      "archivedNativeVertex": 1658,
+      "sourceGroup": "port-nacelle-panel-26",
+      "axisIntegerCoefficients": [
+        -923843,
+        -400385,
+        292776
+      ],
+      "strictOutsideLowerMillimetres": 65
+    },
+    {
+      "archivedNativeVertex": 1659,
+      "sourceGroup": "port-nacelle-panel-26",
+      "axisIntegerCoefficients": [
+        -769764,
+        -654748,
+        279783
+      ],
+      "strictOutsideLowerMillimetres": 63
+    }
+  ]
+}

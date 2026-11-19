@@ -11,6 +11,7 @@ from unittest.mock import patch
 import numpy as np
 
 import measure_vulture_mk3_fit as measure
+import verify_vulture_mk3_shield_blocker as shield
 
 
 class VultureMk3FitTests(unittest.TestCase):
@@ -55,6 +56,17 @@ class VultureMk3FitTests(unittest.TestCase):
         witness=measure.candidate_coverage_witness(self.meshes,self.unions)
         self.assertTrue(witness['certifiedOutsideWitness'])
         self.assertGreaterEqual(witness['strictLowerMillimetresFromRoundedCandidateUnion'],120)
+
+    def test_no_regrouping_can_enclose_original_native_surface_interiors(self):
+        report=shield.blocker(self.meshes,self.unions)
+        self.assertFalse(report['archivedOriginalCoverage'])
+        self.assertEqual(report['detailedSourceFacesContainedByOwnConvexGroups'],8272)
+        self.assertGreaterEqual(report['certifiedOutsideGlobalRoundedHullVertexCount'],100)
+        self.assertGreaterEqual(report['strongestWitness']['strictOutsideLowerMillimetres'],90)
+        self.assertEqual([r['nativeFace'] for r in report['strictOriginalTriangleInteriorWitnesses']],[1427,2471])
+        self.assertTrue(all(min(r['barycentricNumeratorsOver1000'])>0 and r['exactOutsideLowerMillimetres']==17 for r in report['strictOriginalTriangleInteriorWitnesses']))
+        self.assertTrue(report['completePanelAdditionWouldExceedCap'])
+        self.assertEqual(report['remainingFaces'],4)
 
     def test_cli_emits_lf_even_with_host_crlf_translation(self):
         cases=(([],'direct_fit'),(['--union','candidate'],'union_fit'),(['--union','original','--samples-only'],'union_fit'),(['--coverage-gap'],'candidate_coverage_witness'))
