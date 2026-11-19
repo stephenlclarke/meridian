@@ -383,6 +383,20 @@ fn selecting_stock_sparrowhawk_routes_its_original_preview_without_granting_exch
     );
 }
 
+#[test]
+fn selecting_stock_kite_routes_its_original_preview_without_granting_exchange() {
+    assert_original_preview(
+        "Kite Interceptor",
+        "SH031",
+        crate::authored_hull::KITE_GEOMETRY_KEY,
+        |model| {
+            crate::authored_hull::stock_visual_for(model)
+                .unwrap_or_else(|error| panic!("{error}"))
+                .is_some()
+        },
+    );
+}
+
 fn assert_original_preview(
     name: &str,
     id: &str,

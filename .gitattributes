@@ -11,3 +11,6 @@ crates/meridian-core/src/**/*.rs text eol=lf
 integration/sh001-mule/*.json text eol=lf
 integration/sh001-mule/*.patch -text
 integration/sh008-goshawk/*.json text eol=lf
+
+# Bundled stock schema packages authenticate their exact exported bytes (including final LF).
+integration/**/*-STUDIO.json -text

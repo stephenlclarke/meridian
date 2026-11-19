@@ -17,6 +17,8 @@ The joined Peregrine development source gives Mk I and Mk III separate original 
 
 In the joined development source, search **Sparrowhawk** or **SH030** from the ordinary station Showroom to inspect its original ice-cobalt hull. No local package flag is needed. Exchange remains unavailable, and stock renderer qualification is pending. [Sparrowhawk source and Showroom](docs/SPARROWHAWK-GAMEPLAY-ENVELOPE.md)
 
+Search **Kite Interceptor** or **SH031** for its original navy-copper hull and twin blades. The two original stock previews use the same immutable package registry; Pin either to compare. No package flag, stock ownership or encounter is granted. [Kite source and Showroom](docs/KITE-INTERCEPTOR-GAMEPLAY-ENVELOPE.md)
+
 The development desktop can explicitly load local validated hull packages with repeatable `--hull-package PATH` flags, or inspect a conflicting original under its separate `LOCAL:` identity using `--inspect-hull-package PATH`. Press 3 while docked and search its ID; no purchase or campaign spawn is authorized. [Authored hull package controls and limits](docs/AUTHORED-HULL-SHOWROOM.md)
 
 ## Internal Mule docking validation

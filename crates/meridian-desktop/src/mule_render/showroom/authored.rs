@@ -269,7 +269,16 @@ mod tests {
 
     #[test]
     fn stock_sparrowhawk_original_fits_actual_minimum_station_showroom_panes() {
-        let frames = super::super::minimum_qualification::station_frames_for("Sparrowhawk");
+        assert_stock_minimum("Sparrowhawk", "SH030");
+    }
+
+    #[test]
+    fn stock_kite_original_fits_actual_minimum_station_showroom_panes() {
+        assert_stock_minimum("Kite Interceptor", "SH031");
+    }
+
+    fn assert_stock_minimum(name: &str, id: &str) {
+        let frames = super::super::minimum_qualification::station_frames_for(name);
         for pair in frames {
             let [solo] = pair.solo.models.as_slice() else {
                 panic!("expected ordinary solo pane");
@@ -280,7 +289,7 @@ mod tests {
             assert_eq!(baseline.object, "SH025");
             assert_eq!(solo.orientation, selected.orientation);
             for model in [solo, selected] {
-                assert_eq!(model.object, "SH030");
+                assert_eq!(model.object, id);
                 let visual = crate::authored_hull::stock_visual_for(model)
                     .unwrap_or_else(|error| panic!("{error}"))
                     .unwrap_or_else(|| panic!("missing stock preview"));

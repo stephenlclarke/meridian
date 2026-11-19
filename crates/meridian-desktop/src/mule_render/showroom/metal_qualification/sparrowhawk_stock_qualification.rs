@@ -8,8 +8,12 @@ use crate::{
 #[test]
 #[ignore = "Mac owner only: stock Sparrowhawk ordinary Showroom RGB evidence"]
 fn metal_stock_sparrowhawk_normal_showroom() {
-    let output = output_directory("MERIDIAN_SH030_STOCK_SHOWROOM_DIR");
-    let gpu = metal_gpu_for("SH030 stock", false);
+    qualify_stock("Sparrowhawk", "SH030", "MERIDIAN_SH030_STOCK_SHOWROOM_DIR");
+}
+
+pub(super) fn qualify_stock(name: &str, id: &str, variable: &str) {
+    let output = output_directory(variable);
+    let gpu = metal_gpu_for(id, false);
     let target = Target::new(&gpu.device, MIN_WINDOW_LOGICAL);
     let crop = Crop {
         origin: wgpu::Origin3d::ZERO,
@@ -24,17 +28,17 @@ fn metal_stock_sparrowhawk_normal_showroom() {
     let mut prior = None;
     for (pose, frames) in minimum_qualification::POSES
         .into_iter()
-        .zip(minimum_qualification::station_frames_for("Sparrowhawk"))
+        .zip(minimum_qualification::station_frames_for(name))
     {
         let [solo] = frames.solo.models.as_slice() else {
-            panic!("expected ordinary SH030 solo");
+            panic!("expected ordinary {id} solo");
         };
         let [baseline, selected] = frames.comparison.models.as_slice() else {
-            panic!("expected ordinary SH025/SH030 Compare");
+            panic!("expected ordinary SH025/{id} Compare");
         };
         assert_eq!(baseline.object, "SH025");
-        assert_eq!(solo.object, "SH030");
-        assert_eq!(selected.object, "SH030");
+        assert_eq!(solo.object, id);
+        assert_eq!(selected.object, id);
         let visual = ok(stock_visual_for(solo))
             .unwrap_or_else(|| panic!("missing own original stock visual"));
         let mut reference = ok(AuthoredPass::new(
@@ -94,12 +98,12 @@ fn metal_stock_sparrowhawk_normal_showroom() {
                 SCALE,
                 model.bounds,
             ));
-            if model.object == "SH030" {
+            if model.object == id {
                 ok(reference.prepare(&gpu.queue, model, model.bounds, SCALE, FORMAT.is_srgb()));
                 let direct = crop.capture(&gpu, &target, |pass| reference.draw(pass));
                 ok(minimum_rgb::exact_original(&image, &direct, size));
                 crop.save(
-                    output.join(format!("{pose}-compare-SH030-direct.ppm")),
+                    output.join(format!("{pose}-compare-{id}-direct.ppm")),
                     &direct,
                 );
             }

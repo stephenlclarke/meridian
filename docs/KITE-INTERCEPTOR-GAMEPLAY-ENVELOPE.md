@@ -69,8 +69,16 @@ sphere routes on that exact definition. Its report records the original
 support points and 20 mm rounding. The installed signed Studio exported
 the exact definition from `f5f7a36` with all 25 groups and six routes passing.
 The resulting JSON matches the input except for its final line feed. The
-per-hull Rust contact tests and a Kite Interceptor Showroom launch await
+per-hull Rust contact tests and an ordinary stock Kite Interceptor Showroom qualification await
 their owned runs. Campaign placement and acquisition remain separate.
 
 Regenerate the definition with `python3 -B tools/prepare_kite_interceptor_studio.py`.
 Add `--check` to check the committed definition.
+
+## Ordinary stock Showroom
+
+In the joined development game, press 3 at a station and search **Kite Interceptor** or `SH031`. No external file or activation flag is needed. Compare starts with the current owned hull, C selects solo, and ordinary Pin can show Kite and Sparrowhawk in either order. The `LOCAL:SH031` package inspection remains distinct even when it uses the same bytes. Exchange is unavailable.
+
+One descriptor registers each of the two stock schema packages with the catalogue, exact fingerprint, identity lookup and shared renderer cache. Kite's original fitted 13.34 × 13 × 39 m geometry preserves all 9,324 detailed corners, tint, alpha, emission and UV/atlas selectors, including the 1,216 unmapped faces. The original low-detail native mesh is not substituted. Git checkout explicitly preserves exact package bytes on all platforms.
+
+The authored acceptance covers actual ordinary navigation, independent own support groups and packed materials, minimum-window solo/Compare panes, actual mixed stock pairs in both orders, independently oriented duplicate panes, exact RGB references and return after cache switches. No new shield-shimmer, stock mass, flight admission, purchase or encounter is implied. [Stock integration criteria and owner commands](../integration/sh031-stock-showroom/CRITERIA.json)
