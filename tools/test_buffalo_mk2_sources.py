@@ -1,9 +1,10 @@
 """Geometry and appearance tests against the authenticated corrected SH014 originals."""
 import contextlib
+import hashlib
 from io import StringIO
 from pathlib import Path
 import json
-from math import sqrt
+from math import hypot
 import runpy
 import shutil
 import struct
@@ -54,8 +55,7 @@ class BuffaloMk2Sources(unittest.TestCase):
             u = [q - p for p, q in zip(a, b, strict=True)]
             v = [q - p for p, q in zip(a, c, strict=True)]
             cross = [u[j] * v[k] - u[k] * v[j] for j, k in [(1, 2), (2, 0), (0, 1)]]
-            length = sqrt(sum(n * n for n in cross))
-            normal = [n / length for n in cross]
+            normal = [n / hypot(*cross) for n in cross]
             for i, uv in zip(face, mapping['uv'], strict=True):
                 row = next(records)
                 self.assertEqual(row[:6], f32((*original['vertices'][i], *normal)))
@@ -64,6 +64,26 @@ class BuffaloMk2Sources(unittest.TestCase):
             counts[mapping['texture']] += 1
         self.assertIsNone(next(records, None))
         self.assertEqual(counts, map_counts)
+        criteria = json.loads((proof.ROOT / 'integration/sh014-buffalo-mk2/CRITERIA.json').read_bytes())
+        maps = criteria['originalTextures']
+        self.assertEqual({Path(path).stem for path in maps},
+                         {entry['asset'] for entry in original['textures']})
+        for path, pinned in maps.items():
+            blob = (proof.ROOT / path).read_bytes()
+            self.assertEqual(len(blob), pinned['bytes'])
+            self.assertEqual(hashlib.sha256(blob).hexdigest(), pinned['sha256'])
+
+    def test_air_drivers_helper_and_reports_match_pinned_inputs(self):
+        integration = proof.ROOT / 'integration/sh014-buffalo-mk2'
+        criteria = json.loads((integration / 'CRITERIA.json').read_bytes())
+        replay = criteria['independentReplay']
+        for name, digest in replay['committedTools'].items():
+            path = proof.ROOT / name
+            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), digest)
+        self.assertEqual(replay['airSharedHelperSha256'],
+                         replay['committedTools']['tools/measure_goshawk_surface_fit.py'])
+        for name, digest in criteria['air']['reports'].items():
+            self.assertEqual(hashlib.sha256((integration / name).read_bytes()).hexdigest(), digest)
 
     def test_cli_generates_but_refuses_rewritten_active_sources_and_outputs(self):
         with tempfile.TemporaryDirectory() as temp, contextlib.redirect_stdout(StringIO()):

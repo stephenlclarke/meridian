@@ -42,5 +42,31 @@
     }
   },
   "stockMass": "UNASSIGNED",
-  "nativeVisualCorners": 1500
+  "nativeVisualCorners": 1500,
+  "independentReplay": {
+    "airArchiveSha256": "26f4ce85be8a83c3396ea63b9fd7cc47c39c0cce3b9487900629b4dc9413847f",
+    "airSharedHelperSha256": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "committedTools": {
+      "tools/measure_buffalo_mk2_air.py": "417be3bcbfb515d93108f88b69702ea85ee7639fa16ac64056e8a1c1289fef48",
+      "tools/compare_buffalo_mk2_originals.py": "d398a4677dc7c8fa2cd52b84131c6a206aa7d0b1ea25161f7ab21fde3ec47624",
+      "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b"
+    },
+    "reproduce": [
+      "python3 -B tools/measure_buffalo_mk2_air.py | cmp - integration/sh014-buffalo-mk2/SURFACE-FIT.json",
+      "python3 -B tools/compare_buffalo_mk2_originals.py | cmp - integration/sh014-buffalo-mk2/ORIGINAL-DIFFERENCE.json"
+    ],
+    "dependencies": {
+      "python": "3.14.3 (assertions enabled)",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "byteReplay": {
+      "host": "SteveMBA",
+      "startedUtc": "2026-11-19T08:07:06Z",
+      "finishedUtc": "2026-11-19T08:07:11Z",
+      "logSha256": "f356f27df94707efa58a63ef242ffa7037002720e4f3740d207a557a094c9bd0"
+    }
+  }
 }
