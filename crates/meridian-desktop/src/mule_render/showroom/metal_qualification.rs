@@ -643,31 +643,47 @@ fn metal_goshawk_minimum_showroom_model_pass() {
         &gpu.queue,
         FORMAT,
     ));
-    let mut panes = String::from("image\tship\tx\ty\twidth\theight\n");
+    let mut panes = String::from("image\tship\tx\ty\twidth\theight\tpitch\troll\tyaw\n");
+    let mut capture = |name: &str, frame: &crate::docked_screens::Frame| {
+        let image = format!("{name}.ppm");
+        for model in &frame.models {
+            let bounds = model.bounds;
+            let orientation = model.orientation;
+            ok(writeln!(
+                panes,
+                "{image}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}",
+                model.object,
+                bounds.x,
+                bounds.y,
+                bounds.width,
+                bounds.height,
+                orientation.pitch,
+                orientation.roll,
+                orientation.yaw,
+            ));
+        }
+        ok(docked.prepare(
+            &gpu.device,
+            &gpu.queue,
+            frame,
+            MIN_WINDOW_LOGICAL,
+            size,
+            None,
+        ));
+        let rgb = crop.capture(&gpu, &target, |render| docked.draw_models(render));
+        crop.save(output.join(image), &rgb);
+    };
     for (pose, Frames { solo, comparison }) in minimum_qualification::POSES
         .into_iter()
         .zip(minimum_qualification::station_frames())
     {
-        for (mode, frame) in [("solo", solo), ("compare", comparison)] {
-            let image = format!("{pose}-{mode}.ppm");
-            for model in &frame.models {
-                let bounds = model.bounds;
-                ok(writeln!(
-                    panes,
-                    "{image}\t{}\t{}\t{}\t{}\t{}",
-                    model.object, bounds.x, bounds.y, bounds.width, bounds.height
-                ));
-            }
-            ok(docked.prepare(
-                &gpu.device,
-                &gpu.queue,
-                &frame,
-                MIN_WINDOW_LOGICAL,
-                size,
-                None,
-            ));
-            let rgb = crop.capture(&gpu, &target, |render| docked.draw_models(render));
-            crop.save(output.join(&image), &rgb);
+        capture(&format!("{pose}-solo"), &solo);
+        capture(&format!("{pose}-compare"), &comparison);
+        for model in &comparison.models {
+            // Keep the Compare frame and its original pose and pane. Remove only the peer.
+            let mut isolated = comparison.clone();
+            isolated.models = vec![model.clone()];
+            capture(&format!("{pose}-compare-{}", model.object), &isolated);
         }
     }
     write_new(output.join("model-panes.tsv"), panes.as_bytes());

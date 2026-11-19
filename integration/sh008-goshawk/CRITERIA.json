@@ -75,7 +75,7 @@
       "logicalSize": [640, 360],
       "projectionTest": "original_goshawk_fits_minimum_station_showroom_solo_and_compare",
       "metalOffscreenTest": "metal_goshawk_minimum_showroom_model_pass",
-      "criteria": "Real Showroom controls and model panes. All original detailed vertices are inside the Goshawk pane with at least two logical pixels of margin. Each Metal image has a visible model in each assigned pane and no model pixels outside the pane interiors.",
+      "criteria": "Real Showroom controls and model panes. All original detailed vertices are inside the Goshawk pane with at least two logical pixels of margin. Retain the combined Compare images and full-target captures of each isolated model from their original Compare frames. Verify each visible model against its own pane and compare the combined image with the pixel union of the isolated images.",
       "scope": "Offscreen Metal model pass at 2x. Native window resizing and compositor observation remain separate."
     },
     "metalShimmerQualification": {

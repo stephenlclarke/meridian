@@ -28,7 +28,7 @@ The offscreen M5 Pro run at `1311359` passed independent pixel verification at a
 
 The minimum-window regression drives the station Showroom's search, rotation and Compare controls at 640×360 logical. It projects all 10,452 original Goshawk face vertices through the production camera for front, oblique and elevated views in both modes. It requires at least two logical pixels of clearance inside each Goshawk pane and checks that the model panes stay apart and clear of the station controls.
 
-The Mac owner's optional minimum-size check renders the production docked model pass into a 1,280×720 offscreen target at 2× scale. It captures the complete target so visible model pixels can be checked against each pane, including the SH025 baseline in Compare. That check is pending and does not exercise OS window resizing or the native compositor.
+The Mac owner's optional minimum-size check renders the production docked model pass into a 1,280×720 offscreen target at 2× scale. It captures the complete target for solo and combined Compare, then draws each Compare model separately from the same frame and pane. The independent checker measures both models’ own gutters and verifies that their isolated pixels reproduce the combined Compare image. That check is pending and does not exercise OS window resizing or the native compositor.
 
 ## Original station docking candidate
 
