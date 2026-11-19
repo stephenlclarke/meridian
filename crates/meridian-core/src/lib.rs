@@ -60,6 +60,8 @@ pub use flight::{
     NavigationTradeTrace, PreparedNavigationTrade, PreparedStationService,
 };
 
+pub mod ibex;
+
 pub use flight::{
     AmmunitionAction, AmmunitionError, AmmunitionItem, AmmunitionReview, AmmunitionSnapshot,
     MissilePurchase, PreparedAmmunition,

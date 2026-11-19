@@ -1,0 +1,1160 @@
+{
+  "hull": "SH027",
+  "nominalPaddingMetres": 0.02,
+  "summary": {
+    "detailed": {
+      "largestSample": {
+        "metres": 0.28815683955484656,
+        "beyondPaddingMetres": 0.26815683955484654,
+        "point": [
+          -7.094167348177148,
+          1.8002412141471669,
+          -3.6531051144214968
+        ],
+        "closestPoint": [
+          -6.825089434371486,
+          1.6971888302993503,
+          -3.6565178358446904
+        ],
+        "face": 136,
+        "certifiedLowerMillimetres": 287,
+        "supportFacetGlobalVertices": [
+          76,
+          44,
+          45
+        ],
+        "supportFacetWeightNumeratorsOver12": [
+          5,
+          2,
+          5
+        ]
+      },
+      "fullUpperMillimetres": 300
+    },
+    "native": {
+      "largestSample": {
+        "metres": 3.2022648235272473,
+        "beyondPaddingMetres": 3.1822648235272473,
+        "point": [
+          -1.41,
+          7.619999999999999,
+          -8.25
+        ],
+        "closestPoint": [
+          -3.1,
+          4.9,
+          -8.25
+        ],
+        "face": 41,
+        "certifiedLowerMillimetres": 3201,
+        "supportFacetGlobalVertices": [
+          1515,
+          1510,
+          1511
+        ],
+        "supportFacetWeightNumeratorsOver12": [
+          0,
+          12,
+          0
+        ]
+      },
+      "fullUpperMillimetres": 3206
+    }
+  },
+  "pieces": [
+    {
+      "piece": "left-cargo-keel",
+      "exposedSamples": 5146,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.28815683955484656,
+            "beyondPaddingMetres": 0.26815683955484654,
+            "point": [
+              -7.094167348177148,
+              1.8002412141471669,
+              -3.6531051144214968
+            ],
+            "closestPoint": [
+              -6.825089434371486,
+              1.6971888302993503,
+              -3.6565178358446904
+            ],
+            "face": 136,
+            "certifiedLowerMillimetres": 287,
+            "supportFacetGlobalVertices": [
+              76,
+              44,
+              45
+            ],
+            "supportFacetWeightNumeratorsOver12": [
+              5,
+              2,
+              5
+            ]
+          },
+          "fullPieceSurfaceUpperMillimetres": 300
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 1.2586384143507274,
+            "beyondPaddingMetres": 1.2386384143507274,
+            "point": [
+              -3.398266606186585,
+              -4.340320652625272,
+              12.48234652337604
+            ],
+            "closestPoint": [
+              -4.527132458184296,
+              -3.8244916730318743,
+              12.273174321388227
+            ],
+            "face": 26
+          },
+          "fullPieceSurfaceUpperMillimetres": 1268
+        }
+      }
+    },
+    {
+      "piece": "left-upper-keel-frame",
+      "exposedSamples": 227,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000462,
+            "beyondPaddingMetres": 4.614364446098307e-16,
+            "point": [
+              -6.920000000000001,
+              4.816666666666667,
+              6.333333333333333
+            ],
+            "closestPoint": [
+              -6.9,
+              4.81666666666667,
+              6.333333333333343
+            ],
+            "face": 395
+          },
+          "fullPieceSurfaceUpperMillimetres": 270
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000462,
+            "beyondPaddingMetres": 4.614364446098307e-16,
+            "point": [
+              -6.920000000000001,
+              4.816666666666667,
+              6.333333333333333
+            ],
+            "closestPoint": [
+              -6.9,
+              4.81666666666667,
+              6.333333333333343
+            ],
+            "face": 43
+          },
+          "fullPieceSurfaceUpperMillimetres": 520
+        }
+      }
+    },
+    {
+      "piece": "left-cross-bridge",
+      "exposedSamples": 81,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000462,
+            "beyondPaddingMetres": 4.614364446098307e-16,
+            "point": [
+              -1.6666666666666667,
+              1.8499999999999999,
+              5.920000000000001
+            ],
+            "closestPoint": [
+              -1.6666666666666674,
+              1.85,
+              5.9
+            ],
+            "face": 402
+          },
+          "fullPieceSurfaceUpperMillimetres": 232
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000462,
+            "beyondPaddingMetres": 4.614364446098307e-16,
+            "point": [
+              -1.6666666666666667,
+              1.8499999999999999,
+              5.920000000000001
+            ],
+            "closestPoint": [
+              -1.6666666666666674,
+              1.85,
+              5.9
+            ],
+            "face": 50
+          },
+          "fullPieceSurfaceUpperMillimetres": 444
+        }
+      }
+    },
+    {
+      "piece": "left-drive",
+      "exposedSamples": 2265,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.10999999999999943,
+            "beyondPaddingMetres": 0.08999999999999943,
+            "point": [
+              -5.2,
+              -0.20000000000000004,
+              -18.61
+            ],
+            "closestPoint": [
+              -5.2,
+              -0.2000000000000005,
+              -18.5
+            ],
+            "face": 416
+          },
+          "fullPieceSurfaceUpperMillimetres": 298
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 0.849180739846637,
+            "beyondPaddingMetres": 0.829180739846637,
+            "point": [
+              -7.017830261326778,
+              0.015085955171353181,
+              -15.502837146874676
+            ],
+            "closestPoint": [
+              -6.417372153077713,
+              -0.5853721530777127,
+              -15.5
+            ],
+            "face": 63
+          },
+          "fullPieceSurfaceUpperMillimetres": 850
+        }
+      }
+    },
+    {
+      "piece": "right-cargo-keel",
+      "exposedSamples": 5146,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.28815683955484656,
+            "beyondPaddingMetres": 0.26815683955484654,
+            "point": [
+              7.094167348177148,
+              -5.800241214147166,
+              -3.6531051144214968
+            ],
+            "closestPoint": [
+              6.825089434371486,
+              -5.69718883029935,
+              -3.656517835844691
+            ],
+            "face": 976,
+            "certifiedLowerMillimetres": 287,
+            "supportFacetGlobalVertices": [
+              469,
+              500,
+              468
+            ],
+            "supportFacetWeightNumeratorsOver12": [
+              5,
+              5,
+              2
+            ]
+          },
+          "fullPieceSurfaceUpperMillimetres": 300
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 1.2586384143507274,
+            "beyondPaddingMetres": 1.2386384143507274,
+            "point": [
+              6.601733393813415,
+              -4.340320652625272,
+              12.48234652337604
+            ],
+            "closestPoint": [
+              5.472867541815704,
+              -3.8244916730318743,
+              12.273174321388227
+            ],
+            "face": 98
+          },
+          "fullPieceSurfaceUpperMillimetres": 1268
+        }
+      }
+    },
+    {
+      "piece": "right-upper-keel-frame",
+      "exposedSamples": 227,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000462,
+            "beyondPaddingMetres": 4.614364446098307e-16,
+            "point": [
+              6.920000000000001,
+              3.983333333333333,
+              6.333333333333333
+            ],
+            "closestPoint": [
+              6.9,
+              3.9833333333333303,
+              6.333333333333343
+            ],
+            "face": 1183
+          },
+          "fullPieceSurfaceUpperMillimetres": 270
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000462,
+            "beyondPaddingMetres": 4.614364446098307e-16,
+            "point": [
+              6.920000000000001,
+              3.983333333333333,
+              6.333333333333333
+            ],
+            "closestPoint": [
+              6.9,
+              3.9833333333333303,
+              6.333333333333343
+            ],
+            "face": 111
+          },
+          "fullPieceSurfaceUpperMillimetres": 520
+        }
+      }
+    },
+    {
+      "piece": "right-cross-bridge",
+      "exposedSamples": 81,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000462,
+            "beyondPaddingMetres": 4.614364446098307e-16,
+            "point": [
+              0.4166666666666667,
+              2.6,
+              5.920000000000001
+            ],
+            "closestPoint": [
+              0.4166666666666668,
+              2.6,
+              5.9
+            ],
+            "face": 1198
+          },
+          "fullPieceSurfaceUpperMillimetres": 232
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000462,
+            "beyondPaddingMetres": 4.614364446098307e-16,
+            "point": [
+              0.4166666666666667,
+              2.6,
+              5.920000000000001
+            ],
+            "closestPoint": [
+              0.4166666666666668,
+              2.6,
+              5.9
+            ],
+            "face": 126
+          },
+          "fullPieceSurfaceUpperMillimetres": 657
+        }
+      }
+    },
+    {
+      "piece": "right-drive",
+      "exposedSamples": 2265,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.10999999999999943,
+            "beyondPaddingMetres": 0.08999999999999943,
+            "point": [
+              4.8,
+              -0.20000000000000004,
+              -18.61
+            ],
+            "closestPoint": [
+              4.8,
+              -0.2000000000000005,
+              -18.5
+            ],
+            "face": 1208
+          },
+          "fullPieceSurfaceUpperMillimetres": 298
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 0.8491807398466371,
+            "beyondPaddingMetres": 0.8291807398466371,
+            "point": [
+              2.984914044828647,
+              0.01783026132677816,
+              -15.502837146874676
+            ],
+            "closestPoint": [
+              3.5853721530777127,
+              -0.5826278469222874,
+              -15.5
+            ],
+            "face": 135
+          },
+          "fullPieceSurfaceUpperMillimetres": 850
+        }
+      }
+    },
+    {
+      "piece": "opaque-cabin",
+      "exposedSamples": 5678,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.18187786363072514,
+            "beyondPaddingMetres": 0.16187786363072515,
+            "point": [
+              1.4832362648352588,
+              6.64187225903459,
+              -1.1697555840102158
+            ],
+            "closestPoint": [
+              1.3078461706430686,
+              6.690000020133059,
+              -1.171016833303584
+            ],
+            "face": 1691
+          },
+          "fullPieceSurfaceUpperMillimetres": 300
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 0.8254338786070549,
+            "beyondPaddingMetres": 0.8054338786070548,
+            "point": [
+              -1.1657748260652727,
+              6.0553781471057775,
+              10.022740800198488
+            ],
+            "closestPoint": [
+              -0.6252459777343431,
+              5.450500626354499,
+              9.87012089008152
+            ],
+            "face": 166
+          },
+          "fullPieceSurfaceUpperMillimetres": 826
+        }
+      }
+    },
+    {
+      "piece": "glazing",
+      "exposedSamples": 10478,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000057499980958,
+            "beyondPaddingMetres": 5.749998095716524e-08,
+            "point": [
+              -0.23171213127040458,
+              7.939405802624611,
+              7.764414392524459
+            ],
+            "closestPoint": [
+              -0.23050798713346252,
+              7.919686592818926,
+              7.761299091328846
+            ],
+            "face": 2528
+          },
+          "fullPieceSurfaceUpperMillimetres": 293
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 0.7600616505067161,
+            "beyondPaddingMetres": 0.7400616505067161,
+            "point": [
+              -1.2428126777718387,
+              7.4814992152787685,
+              5.602268031824554
+            ],
+            "closestPoint": [
+              -0.8765787960791523,
+              6.890799406097017,
+              5.909904492446411
+            ],
+            "face": 177
+          },
+          "fullPieceSurfaceUpperMillimetres": 761
+        }
+      }
+    },
+    {
+      "piece": "canopy-crest",
+      "exposedSamples": 184,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.01999999999999999,
+            "beyondPaddingMetres": 0.0,
+            "point": [
+              0.16,
+              7.853333333333333,
+              8.500000000000002
+            ],
+            "closestPoint": [
+              0.14,
+              7.853333333333333,
+              8.5
+            ],
+            "face": 2935
+          },
+          "fullPieceSurfaceUpperMillimetres": 231
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 0.9640554653333836,
+            "beyondPaddingMetres": 0.9440554653333836,
+            "point": [
+              -0.14,
+              8.139999999999999,
+              8.8
+            ],
+            "closestPoint": [
+              0.0,
+              7.294017945920583,
+              8.35941254623544
+            ],
+            "face": 181
+          },
+          "fullPieceSurfaceUpperMillimetres": 967
+        }
+      }
+    },
+    {
+      "piece": "left-pipe",
+      "exposedSamples": 167,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              -2.02,
+              6.919999999999999,
+              -0.03333333333333336
+            ],
+            "closestPoint": [
+              -2.04,
+              6.92,
+              -0.03333333333333677
+            ],
+            "face": 2947
+          },
+          "fullPieceSurfaceUpperMillimetres": 260
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 2.4535088251796977,
+            "beyondPaddingMetres": 2.4335088251796977,
+            "point": [
+              -2.08,
+              7.14,
+              -6.366666666666667
+            ],
+            "closestPoint": [
+              -0.49119231051674805,
+              5.431030384421376,
+              -5.608498786772905
+            ],
+            "face": 150
+          },
+          "fullPieceSurfaceUpperMillimetres": 2495
+        }
+      }
+    },
+    {
+      "piece": "left-pipe-mount",
+      "exposedSamples": 223,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              -1.39,
+              6.958333333333333,
+              -6.833333333333333
+            ],
+            "closestPoint": [
+              -1.41,
+              6.958333333333333,
+              -6.833333333333332
+            ],
+            "face": 2959
+          },
+          "fullPieceSurfaceUpperMillimetres": 182
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 3.2022648235272473,
+            "beyondPaddingMetres": 3.1822648235272473,
+            "point": [
+              -1.41,
+              7.619999999999999,
+              -8.25
+            ],
+            "closestPoint": [
+              -3.1,
+              4.9,
+              -8.25
+            ],
+            "face": 41,
+            "certifiedLowerMillimetres": 3201,
+            "supportFacetGlobalVertices": [
+              1515,
+              1510,
+              1511
+            ],
+            "supportFacetWeightNumeratorsOver12": [
+              0,
+              12,
+              0
+            ]
+          },
+          "fullPieceSurfaceUpperMillimetres": 3206
+        }
+      }
+    },
+    {
+      "piece": "left-pipe-clamp-0",
+      "exposedSamples": 210,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              -1.9666666666666666,
+              6.956666666666667,
+              -1.09
+            ],
+            "closestPoint": [
+              -1.9666666666666666,
+              6.956666666666667,
+              -1.07
+            ],
+            "face": 2964
+          },
+          "fullPieceSurfaceUpperMillimetres": 245
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 1.87724069040374,
+            "beyondPaddingMetres": 1.85724069040374,
+            "point": [
+              -2.92,
+              7.015,
+              -0.93
+            ],
+            "closestPoint": [
+              -1.6839059996228296,
+              5.60232114242609,
+              -0.9510398978787604
+            ],
+            "face": 158
+          },
+          "fullPieceSurfaceUpperMillimetres": 1883
+        }
+      }
+    },
+    {
+      "piece": "left-pipe-clamp-1",
+      "exposedSamples": 210,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              -1.9666666666666666,
+              6.956666666666667,
+              -0.71
+            ],
+            "closestPoint": [
+              -1.9666666666666666,
+              6.956666666666667,
+              -0.69
+            ],
+            "face": 2976
+          },
+          "fullPieceSurfaceUpperMillimetres": 245
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 1.881499686724669,
+            "beyondPaddingMetres": 1.861499686724669,
+            "point": [
+              -2.92,
+              7.015,
+              -0.55
+            ],
+            "closestPoint": [
+              -1.6811016070764495,
+              5.599116122373085,
+              -0.5710876322199749
+            ],
+            "face": 158
+          },
+          "fullPieceSurfaceUpperMillimetres": 1887
+        }
+      }
+    },
+    {
+      "piece": "left-pipe-clamp-2",
+      "exposedSamples": 210,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              -1.9666666666666666,
+              6.956666666666667,
+              -0.33
+            ],
+            "closestPoint": [
+              -1.9666666666666666,
+              6.956666666666667,
+              -0.31
+            ],
+            "face": 2988
+          },
+          "fullPieceSurfaceUpperMillimetres": 245
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 1.8857586830455995,
+            "beyondPaddingMetres": 1.8657586830455994,
+            "point": [
+              -2.92,
+              7.015,
+              -0.17
+            ],
+            "closestPoint": [
+              -1.6782972145300694,
+              5.595911102320079,
+              -0.19113536656119035
+            ],
+            "face": 158
+          },
+          "fullPieceSurfaceUpperMillimetres": 1891
+        }
+      }
+    },
+    {
+      "piece": "left-pipe-clamp-3",
+      "exposedSamples": 210,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              -1.8599999999999999,
+              6.784166666666667,
+              0.18666666666666668
+            ],
+            "closestPoint": [
+              -1.88,
+              6.784166666666667,
+              0.18666666666666665
+            ],
+            "face": 3007
+          },
+          "fullPieceSurfaceUpperMillimetres": 245
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 1.8900176793665289,
+            "beyondPaddingMetres": 1.8700176793665289,
+            "point": [
+              -2.92,
+              7.015,
+              0.21
+            ],
+            "closestPoint": [
+              -1.6754928219836895,
+              5.592706082267073,
+              0.18881689909759514
+            ],
+            "face": 158
+          },
+          "fullPieceSurfaceUpperMillimetres": 1895
+        }
+      }
+    },
+    {
+      "piece": "left-pipe-clamp-4",
+      "exposedSamples": 210,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              -1.9666666666666666,
+              6.956666666666667,
+              0.43
+            ],
+            "closestPoint": [
+              -1.9666666666666666,
+              6.956666666666667,
+              0.45
+            ],
+            "face": 3012
+          },
+          "fullPieceSurfaceUpperMillimetres": 245
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 1.8942766756874578,
+            "beyondPaddingMetres": 1.8742766756874578,
+            "point": [
+              -2.92,
+              7.015,
+              0.59
+            ],
+            "closestPoint": [
+              -1.6726884294373097,
+              5.589501062214068,
+              0.5687691647563793
+            ],
+            "face": 158
+          },
+          "fullPieceSurfaceUpperMillimetres": 1900
+        }
+      }
+    },
+    {
+      "piece": "right-pipe",
+      "exposedSamples": 167,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              2.3,
+              6.919999999999999,
+              -0.03333333333333336
+            ],
+            "closestPoint": [
+              2.28,
+              6.92,
+              -0.03333333333333677
+            ],
+            "face": 3031
+          },
+          "fullPieceSurfaceUpperMillimetres": 260
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 2.4501972121104783,
+            "beyondPaddingMetres": 2.4301972121104782,
+            "point": [
+              2.06,
+              7.14,
+              -6.366666666666667
+            ],
+            "closestPoint": [
+              0.4606466754575087,
+              5.419687180324043,
+              -5.6694872607979905
+            ],
+            "face": 148
+          },
+          "fullPieceSurfaceUpperMillimetres": 2496
+        }
+      }
+    },
+    {
+      "piece": "right-pipe-mount",
+      "exposedSamples": 223,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              2.93,
+              6.958333333333333,
+              -6.833333333333333
+            ],
+            "closestPoint": [
+              2.91,
+              6.958333333333333,
+              -6.833333333333332
+            ],
+            "face": 3043
+          },
+          "fullPieceSurfaceUpperMillimetres": 182
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 3.2022648235272473,
+            "beyondPaddingMetres": 3.1822648235272473,
+            "point": [
+              1.41,
+              7.619999999999999,
+              -8.25
+            ],
+            "closestPoint": [
+              3.1,
+              4.9,
+              -8.25
+            ],
+            "face": 112,
+            "certifiedLowerMillimetres": 3201,
+            "supportFacetGlobalVertices": [
+              1571,
+              1566,
+              1567
+            ],
+            "supportFacetWeightNumeratorsOver12": [
+              0,
+              0,
+              12
+            ]
+          },
+          "fullPieceSurfaceUpperMillimetres": 3206
+        }
+      }
+    },
+    {
+      "piece": "right-pipe-clamp-0",
+      "exposedSamples": 210,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              2.7466666666666666,
+              6.975833333333334,
+              -1.09
+            ],
+            "closestPoint": [
+              2.7466666666666666,
+              6.975833333333334,
+              -1.07
+            ],
+            "face": 3049
+          },
+          "fullPieceSurfaceUpperMillimetres": 245
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 1.8711416454890366,
+            "beyondPaddingMetres": 1.8511416454890366,
+            "point": [
+              2.92,
+              7.015,
+              -0.93
+            ],
+            "closestPoint": [
+              1.6878790027468284,
+              5.606861717424946,
+              -0.9439815148624466
+            ],
+            "face": 156
+          },
+          "fullPieceSurfaceUpperMillimetres": 1877
+        }
+      }
+    },
+    {
+      "piece": "right-pipe-clamp-1",
+      "exposedSamples": 210,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              2.7466666666666666,
+              6.975833333333334,
+              -0.71
+            ],
+            "closestPoint": [
+              2.7466666666666666,
+              6.975833333333334,
+              -0.69
+            ],
+            "face": 3061
+          },
+          "fullPieceSurfaceUpperMillimetres": 245
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 1.8739810754491033,
+            "beyondPaddingMetres": 1.8539810754491033,
+            "point": [
+              2.92,
+              7.015,
+              -0.55
+            ],
+            "closestPoint": [
+              1.6860092772332833,
+              5.604724888266609,
+              -0.5640027316058633
+            ],
+            "face": 156
+          },
+          "fullPieceSurfaceUpperMillimetres": 1879
+        }
+      }
+    },
+    {
+      "piece": "right-pipe-clamp-2",
+      "exposedSamples": 210,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              2.7466666666666666,
+              6.975833333333334,
+              -0.33
+            ],
+            "closestPoint": [
+              2.7466666666666666,
+              6.975833333333334,
+              -0.31
+            ],
+            "face": 3073
+          },
+          "fullPieceSurfaceUpperMillimetres": 245
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 1.8768205054091696,
+            "beyondPaddingMetres": 1.8568205054091695,
+            "point": [
+              2.92,
+              7.015,
+              -0.17
+            ],
+            "closestPoint": [
+              1.684139551719738,
+              5.602588059108272,
+              -0.18402394834927938
+            ],
+            "face": 156
+          },
+          "fullPieceSurfaceUpperMillimetres": 1882
+        }
+      }
+    },
+    {
+      "piece": "right-pipe-clamp-3",
+      "exposedSamples": 210,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              2.94,
+              6.784166666666667,
+              0.18666666666666668
+            ],
+            "closestPoint": [
+              2.92,
+              6.784166666666667,
+              0.18666666666666665
+            ],
+            "face": 3091
+          },
+          "fullPieceSurfaceUpperMillimetres": 245
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 1.8805118399119674,
+            "beyondPaddingMetres": 1.8605118399119673,
+            "point": [
+              2.92,
+              7.015,
+              0.21
+            ],
+            "closestPoint": [
+              1.6670372819599475,
+              5.6128750536218455,
+              0.18867297501208516
+            ],
+            "face": 157
+          },
+          "fullPieceSurfaceUpperMillimetres": 1886
+        }
+      }
+    },
+    {
+      "piece": "right-pipe-clamp-4",
+      "exposedSamples": 210,
+      "sourceComparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              2.7466666666666666,
+              6.975833333333334,
+              0.43
+            ],
+            "closestPoint": [
+              2.7466666666666666,
+              6.975833333333334,
+              0.45
+            ],
+            "face": 3097
+          },
+          "fullPieceSurfaceUpperMillimetres": 245
+        },
+        "native": {
+          "largestExposedSample": {
+            "metres": 1.8848214482448704,
+            "beyondPaddingMetres": 1.8648214482448704,
+            "point": [
+              2.92,
+              7.015,
+              0.59
+            ],
+            "closestPoint": [
+              1.6641658410809927,
+              5.609661774543015,
+              0.5686240994226539
+            ],
+            "face": 157
+          },
+          "fullPieceSurfaceUpperMillimetres": 1890
+        }
+      }
+    }
+  ]
+}

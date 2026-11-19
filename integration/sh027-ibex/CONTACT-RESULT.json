@@ -1,0 +1,119 @@
+{
+  "clearanceMillimetres": {
+    "longitudinal-trench": 1997,
+    "lateral-trench": 1010,
+    "left-pipe-channel": 225,
+    "right-pipe-channel": 225
+  },
+  "alignedMillimetres": 42658,
+  "offsetStartMillimetres": 979,
+  "sourceLipWitness": {
+    "fraction": 0.5,
+    "pointMetres": [
+      69.4,
+      -2.0,
+      136.32
+    ],
+    "barycentrics": [
+      0.3599999999999949,
+      0.16066798941799454,
+      0.4793320105820106
+    ]
+  },
+  "sourceKeelContactsMetres": [
+    [
+      -2.2,
+      -2.0,
+      -9.92
+    ],
+    [
+      7.8,
+      -2.0,
+      -9.92
+    ]
+  ],
+  "originalJoints": [
+    {
+      "name": "left-bridge-to-keel",
+      "pointMetres": [
+        -4.83,
+        1.95,
+        5.17
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "right-bridge-to-keel",
+      "pointMetres": [
+        4.83,
+        1.95,
+        5.17
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "opaque-cabin-to-glazing",
+      "pointMetres": [
+        0.19,
+        6.2,
+        6.8
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ],
+  "bridgeMatingAreaSquareMetres": [
+    3.240000000000001,
+    3.240000000000001
+  ]
+}
