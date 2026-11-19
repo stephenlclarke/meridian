@@ -97,6 +97,10 @@ impl DockedScreens {
         self.scroll = 0;
         self.bump();
     }
+    pub(crate) fn select_initial_showroom_ship(&mut self, id: &str) {
+        self.ship = id.into();
+        self.bump();
+    }
     fn bump(&mut self) {
         self.ui_revision = self.ui_revision.wrapping_add(1);
         self.hovered = None;

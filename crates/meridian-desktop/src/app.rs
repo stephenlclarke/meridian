@@ -150,10 +150,22 @@ impl App {
             mule_validation::Launch::Authored {
                 directory,
                 packages,
+                open_showroom,
             } => {
                 // Reject every invalid/conflicting input before opening a profile or its save.
                 let authored = Arc::new(AuthoredHulls::load(&packages)?);
-                Self::open_profile(directory, authored)?
+                let mut app = Self::open_profile(directory, authored)?;
+                if open_showroom {
+                    if !app.has_berth() {
+                        return Err("--open-authored-showroom requires a docked commander".into());
+                    }
+                    let mut menu = app.new_docked_menu()?;
+                    menu.open_authored_showroom(&app.game.world)?;
+                    app.docked = Some(menu);
+                    // Initial presentation only; never simulate a key or change World state.
+                    app.commander_open = false;
+                }
+                app
             }
             launch => Self::with_profile(launch.open()?),
         };
@@ -1289,7 +1301,7 @@ impl ApplicationHandler for App {
             Err(error) => self.fail(event_loop, error),
         }
         self.last_frame = Instant::now();
-        if self.commander_open {
+        if self.commander_open || self.menu_active() {
             self.request_redraw();
         }
     }
