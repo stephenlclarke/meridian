@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import sys
 
 import numpy as np
 import trimesh
@@ -102,7 +103,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--difference', action='store_true')
     args = parser.parse_args()
-    print(json.dumps(original_difference() if args.difference else audit(), indent=2))
+    report = original_difference() if args.difference else audit()
+    sys.stdout.buffer.write((json.dumps(report, indent=2) + '\n').encode('utf-8'))
 
 
 if __name__ == '__main__':

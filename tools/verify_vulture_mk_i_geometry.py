@@ -5,6 +5,7 @@ import json
 from math import isqrt
 from pathlib import Path
 import struct
+import sys
 import tomllib
 
 from prepare_vulture_mk_i_geometry import DETAIL, NATIVE, PIECES, require
@@ -187,4 +188,4 @@ def verify():
 
 
 if __name__ == '__main__':
-    print(json.dumps(verify(), indent=2))
+    sys.stdout.buffer.write((json.dumps(verify(), indent=2) + '\n').encode('utf-8'))

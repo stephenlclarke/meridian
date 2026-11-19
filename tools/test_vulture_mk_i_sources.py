@@ -1,7 +1,7 @@
 """Check immutable SH037 meshes, material inputs and independent controls."""
 import contextlib
 import hashlib
-from io import StringIO
+from io import BytesIO, TextIOWrapper
 import json
 from math import hypot
 from pathlib import Path
@@ -14,6 +14,7 @@ import tomllib
 import unittest
 from unittest import mock
 
+import measure_vulture_mk_i_air as measure
 import prepare_vulture_mk_i_geometry as vulture_mk_i
 import verify_vulture_mk_i_geometry as proof
 import prepare_vulture_mk_i_studio as studio
@@ -111,9 +112,27 @@ class TestVultureMkISources(unittest.TestCase):
             self.assertTrue(all(.225 <= v <= .264 for v in row['recessMetres']))
         for row in result['originalJoints']:
             self.assertEqual(row['sourceFaceHitCountsAboveBelow'], [[1, 1]] * 4)
-        with contextlib.redirect_stdout(StringIO()) as out:
-            runpy.run_path(proof.__file__, run_name='__main__')
-        self.assertEqual(json.loads(out.getvalue()), result)
+        with TextIOWrapper(BytesIO(), encoding='ascii', newline='\r\n') as out:
+            with contextlib.redirect_stdout(out):
+                runpy.run_path(proof.__file__, run_name='__main__')
+            self.assertEqual(out.buffer.getvalue(), (proof.INTEGRATION / 'CONTACT-RESULT.json').read_bytes())
+
+    def test_fit_and_difference_emit_utf8_lf_with_crlf_text_stdout(self):
+        for options, generator, file in (
+            ([], 'audit', 'SURFACE-FIT.json'),
+            (['--difference'], 'original_difference', 'ORIGINAL-DIFFERENCE.json'),
+        ):
+            with self.subTest(file=file):
+                expected = (proof.INTEGRATION / file).read_bytes()
+                with TextIOWrapper(BytesIO(), encoding='ascii', newline='\r\n') as out:
+                    with (
+                        contextlib.redirect_stdout(out),
+                        mock.patch.object(sys, 'argv', [measure.__file__, *options]),
+                        mock.patch.object(measure, generator, return_value=json.loads(expected)) as produce,
+                    ):
+                        measure.main()
+                    produce.assert_called_once_with()
+                    self.assertEqual(out.buffer.getvalue(), expected)
 
     def test_hull_studio_retains_source_ordered_meshes_and_witness_probes(self):
         source = tomllib.loads((vulture_mk_i.ASSETS / 'resource.toml').read_text())
