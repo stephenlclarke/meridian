@@ -2,7 +2,7 @@
 
 ## SH036 Zebu authoring candidate
 
-The original metre-authored Zebu source carries 3,468 detailed and 192 native triangles, 24 local rounded supports, and unchanged appearance and source identity. On 19 November 2026 the installed signed Studio validated and exported the exact definition. Three opening probes passed and three probes that cross actual source triangles were refused, with both reports and the export reproduced byte-for-byte. Seven focused source and execution-binding tests passed. Intrinsic empty-dry references are preserved but not used as operational mass. Native game rendering, acquisition and placement are unqualified. [Source and evidence](ZEBU-GAMEPLAY-ENVELOPE.md)
+The original metre-authored Zebu source carries 3,468 detailed and 192 native triangles, 24 local rounded supports, and unchanged appearance and source identity. On 19 November 2026 the installed signed Studio validated and exported the exact definition. Three opening probes passed and three probes that cross actual source triangles were refused, with both reports and the export reproduced byte-for-byte. Source certificates now bound the exposed envelope between 546 and 691 mm from detailed geometry and 4,980 and 4,989 mm from native geometry; the native omission is explicitly unresolved rather than hidden. The complete aligned SH028 lip sweep has a 39,038 mm guarded clearance while an offset native source vertex crosses the original lip face after a 1,159 mm-clear start. The two fit reports replayed byte-for-byte on SteveMBA. Intrinsic empty-dry references are preserved but not used as operational mass. Native game rendering, acquisition and placement are unqualified. [Source and evidence](ZEBU-GAMEPLAY-ENVELOPE.md)
 
 ## Generated desktop audio source candidate
 

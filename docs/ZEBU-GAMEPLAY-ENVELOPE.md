@@ -11,7 +11,7 @@ The native face count is below 512. The original sand-maroon palette, eight mate
 
 ## Conservative hull geometry
 
-Twenty-four rounded local convex supports contain every vertex and triangle from both original geometry levels. The lower fuselage, hump, reserve tanks, struts, glazing and service features each retain local support; each drive's casing, recess and emitter share that drive's support. Each local convex hull has 20 mm rounding. Separate supports preserve the two passages alongside the hump and the opening between the rear drives. This is a conservative collision approximation, not a globally measured surface-fit certificate. No whole-ship box or invented geometry is used.
+Twenty-four rounded local convex supports contain every vertex and triangle from both original geometry levels. The lower fuselage, hump, reserve tanks, struts, glazing and service features each retain local support; each drive's casing, recess and emitter share that drive's support. Each local convex hull has 20 mm rounding. Separate supports preserve the two passages alongside the hump and the opening between the rear drives. No whole-ship box or invented geometry is used.
 
 The following net clearances are certified using a separating coordinate axis for every piece along each straight swept-sphere route, subtracting rounding, sphere radius and a further 1 mm guard.
 
@@ -31,6 +31,27 @@ Three other centerline sweeps cross the interior of actual source triangles, rat
 
 [Exact definition](../integration/sh036-zebu/ZEBU-STUDIO.json) · [Opening and contact witnesses](../integration/sh036-zebu/CONTACT-WITNESSES.json) · [Criteria and validation evidence](../integration/sh036-zebu/CRITERIA.json) · [Source manifest](../assets/fleet/sh036/SOURCE-GEOMETRY.json)
 
+## Bounded fit against both original meshes
+
+An independent MBA replay checked all 24 exact support fans, including their radial coverage. The certified exposed lower bound proves at least one rounded surface point is outside every other rounded piece and farther than the bound from every original triangle. The full upper bound covers every patch of every rounded piece, including buried surfaces; it is therefore conservative for the exposed union. Eight adaptive subdivision levels give the detailed upper bound below. No sampled point or viewport image is treated as a global bound.
+
+| Distance from exposed envelope to original surface | Strict exposed lower | Full upper |
+| --- | ---: | ---: |
+| Detailed mesh | 546 mm | 691 mm |
+| Native mesh | 4,980 mm | 4,989 mm |
+
+The native discrepancy is large evidence of the source-level difference, not an acceptable assertion of close native fit. Its exposed witness is on the starboard pipe mount. Original detailed vertex 1744 alone is strictly more than 4,967 mm from every original native triangle; conversely, original native vertex 1852 in the combined stream gives an 88 mm strict lower bound to the detailed mesh. The active envelope must preserve both sources, so deleting the original pipe support to reduce the native-distance result would invalidate the source. Any closer native representation would require a separately authored and qualified native variant. The global upper bound is not an exact or symmetric Hausdorff distance, and this does not establish acceptable visual/gameplay fit.
+
+[Complete patch bounds and certified witness positions](../integration/sh036-zebu/SURFACE-FIT.json) · [Direct original-to-original difference](../integration/sh036-zebu/ORIGINAL-DIFFERENCE.json)
+
+## Physical crossing of original SH028
+
+The original 272-vertex, 488-triangle SH028 physics mesh is hash-pinned. The aligned Zebu has a half-turn yaw, zero lateral offset, and translates from actor center Z = 163 m to 112 m at fixed orientation. The guarded leading and trailing edges begin at 137.479 m and finish at 133.111 m, fully crossing the 134.32–136.32 m lip band. Exact rational swept support bounds and the actual station triangle bounds certify at least 39,038 mm net clearance, including rounding and a 1 mm guard.
+
+Offset the actor to X = 69.9 m, retaining its orientation, and move from Z = 163 m to 160 m. The initial rounded hull is still at least 1,159 mm clear. Original selected native vertex 31 (combined-stream vertex 1821) crosses the interior of original station triangle 482 at `[69.9, 5.03, 136.32]` m, when the actor center reaches Z = 161.82 m. All three exact barycentric weights are positive. This is a genuine native-source contact, not a control inferred from an AABB overlap. These are fixed-orientation source certificates, not evidence of a live station approach, rotating body or game physics dispatch.
+
+[Station fixture and source pins](../integration/sh036-zebu/STATION-FIXTURE.json) · [Exact station result](../integration/sh036-zebu/STATION-RESULT.json)
+
 ## Original physical and gameplay data
 
 The frozen resource carries the original 33 m/s maximum speed, 72 t cargo, 230 shield capacity per bank, four missile slots, and laser-facing mask 3 as authored values. The frozen contract separately records crew, equipment, purchase and salvage proposals; these are design requirements, not installed equipment, earned entitlement, or proof of accepted gameplay. The 64,051 kg dry engineering budget and separate finite-intrinsic empty-dry reference both survive unchanged. They carry distinct centers and inertia tensors and explicitly deny native or operational qualification. The Studio definition leaves active engineering null; no operational mass, loadout, crew, cargo, fuel or campaign placement is invented or granted.
@@ -40,6 +61,9 @@ The frozen resource carries the original 33 m/s maximum speed, 72 t cargo, 230 s
 ```sh
 python3 -B tools/prepare_zebu_studio.py --check
 python3 -B -m unittest discover -s tools -p test_prepare_zebu_studio.py -v
+python3 -B tools/verify_zebu_station.py | cmp - integration/sh036-zebu/STATION-RESULT.json
+python3 -B tools/measure_zebu_surface_fit.py | cmp - integration/sh036-zebu/SURFACE-FIT.json
+python3 -B tools/measure_zebu_surface_fit.py --difference | cmp - integration/sh036-zebu/ORIGINAL-DIFFERENCE.json
 python3 -B tools/verify_zebu_studio_export.py \
   --studio "$HOME/Applications/Meridian Hull Studio.app/Contents/MacOS/Meridian Hull Studio" \
   --validator "$HOME/Applications/Meridian Hull Studio.app/Contents/Frameworks/meridian-hull-tool" \
@@ -47,5 +71,7 @@ python3 -B tools/verify_zebu_studio_export.py \
 ```
 
 On 19 November 2026, the installed signed Mac Studio exported the exact authoring package; the export differs only by the final newline. The bundled Rust validator reported all 24 original support groups with exact ordered source points, all three opening probes passing, zero diagnostics, and all three original-solid contact probes specifically blocked when submitted as additional clearance routes. The independent scripted replay reproduced both raw reports and the export byte-for-byte. It did not run the game or compile a new Mac build.
+
+The surface fit and direct difference also reproduced byte-for-byte on SteveMBA with Python 3.14.3 and the pinned scientific dependencies. The separate station verifier uses only the standard library and exact original binary64 rational values. Those three source reports are independent of the installed Studio proof. The newly pinned physical references, station physics bytes and report JSON use explicit `-text` Git attributes to preserve their raw byte identities, including checkouts with CRLF conversion enabled.
 
 To inspect the hull, open the definition file in the generic currently installed Hull Studio, build and validate it, and use its Showroom action in an isolated profile after the owned native lane qualifies this exact hull. The authored source and installed Studio export do not establish native game rendering, ordinary acquisition, mission placement, operational physical behavior or admission into a released catalogue. These remain separate owner gates.
