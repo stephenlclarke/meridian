@@ -26,6 +26,7 @@ const POSES: [&str; 3] = ["front", "oblique", "upper"];
 const PHASE_SECONDS: f32 = std::f32::consts::PI / 0.7;
 
 mod custom_qualification;
+mod raven_qualification;
 
 fn ok<T, E: std::fmt::Debug>(result: Result<T, E>) -> T {
     result.unwrap_or_else(|error| panic!("{error:?}"))
@@ -585,6 +586,12 @@ fn metal_goshawk_custom_same_pose_shimmer() {
         "Goshawk Mk II Custom",
         "MERIDIAN_SH010_EVIDENCE_DIR",
     );
+}
+
+#[test]
+#[ignore = "Mac owner only: explicit production SH015 visual qualification"]
+fn metal_raven_same_pose_shimmer() {
+    same_pose_shimmer(Hull::Raven, "SH015", "Raven", "MERIDIAN_SH015_EVIDENCE_DIR");
 }
 
 fn same_pose_shimmer(hull: Hull, object: &str, name: &str, variable: &str) {

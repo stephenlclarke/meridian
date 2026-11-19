@@ -10,6 +10,10 @@ use crate::goshawk_custom::{
     GoshawkCustomHullSource,
 };
 use crate::mule::{SmoothPiece, rounded_maximum_origin_radius};
+use crate::raven::{
+    RAVEN_CONTRACT_SHA256, RAVEN_MAX_SPEED_UNITS, RAVEN_PIECES, RAVEN_RESOURCE_SHA256,
+    RavenHullSource,
+};
 use crate::station::{DISTANCE_PER_SPEED_UNIT, OriginalStationData, StationError};
 use std::sync::{Arc, Weak};
 
@@ -38,6 +42,7 @@ pub struct GoshawkHullApproachSnapshot<const N: usize, E> {
 pub type GoshawkApproachSnapshot =
     GoshawkHullApproachSnapshot<GOSHAWK_PIECES, &'static GoshawkEngineering>;
 pub type GoshawkCustomApproachSnapshot = GoshawkHullApproachSnapshot<CUSTOM_PIECES, ()>;
+pub type RavenApproachSnapshot = GoshawkHullApproachSnapshot<RAVEN_PIECES, ()>;
 
 impl<const N: usize, E> GoshawkHullApproachSnapshot<N, E> {
     pub fn pose(&self) -> RigidPose {
@@ -80,6 +85,7 @@ impl GoshawkApproachSnapshot {
 enum HullSource {
     Explorer(GoshawkHullSource),
     Custom(GoshawkCustomHullSource),
+    Raven(RavenHullSource),
 }
 
 impl HullSource {
@@ -87,6 +93,7 @@ impl HullSource {
         match self {
             Self::Explorer(source) => source.pieces().as_ref(),
             Self::Custom(source) => source.pieces(),
+            Self::Raven(source) => source.pieces(),
         }
     }
 
@@ -94,6 +101,7 @@ impl HullSource {
         match self {
             Self::Explorer(_) => GOSHAWK_MAX_SPEED_UNITS,
             Self::Custom(_) => CUSTOM_MAX_SPEED_UNITS,
+            Self::Raven(_) => RAVEN_MAX_SPEED_UNITS,
         }
     }
 
@@ -101,6 +109,7 @@ impl HullSource {
         match self {
             Self::Explorer(source) => data.goshawk_motion_clear(source, start, end, 0.0),
             Self::Custom(source) => data.goshawk_custom_motion_clear(source, start, end, 0.0),
+            Self::Raven(source) => data.raven_motion_clear(source, start, end, 0.0),
         }
     }
 
@@ -116,6 +125,7 @@ impl HullSource {
             Self::Custom(source) => {
                 data.goshawk_custom_observer_clear(source, start, end, observer)
             }
+            Self::Raven(source) => data.raven_observer_clear(source, start, end, observer),
         }
     }
 
@@ -133,6 +143,7 @@ impl HullSource {
             Self::Custom(source) => {
                 data.goshawk_custom_entry_conditions(source, start, end, speed, 0.0, 0.0)
             }
+            Self::Raven(source) => data.raven_entry_conditions(source, start, end, speed, 0.0, 0.0),
         }
     }
 }
@@ -256,6 +267,15 @@ impl World {
         Self::goshawk_source_scenario(observer, approach, HullSource::Custom(source))
     }
 
+    /// The separate SH015-only World approach. There is no ordinary player or fleet placement.
+    pub fn raven_docking_validation_scenario(
+        observer: FlightStart,
+        approach: FlightStart,
+    ) -> Result<Self, StationError> {
+        let source = RavenHullSource::bundled().map_err(|_| StationError::InvalidMesh)?;
+        Self::goshawk_source_scenario(observer, approach, HullSource::Raven(source))
+    }
+
     fn goshawk_source_scenario(
         observer: FlightStart,
         approach: FlightStart,
@@ -321,6 +341,19 @@ impl World {
         ))
     }
 
+    pub fn raven_approach_snapshot(&self) -> Option<RavenApproachSnapshot> {
+        let approach = self.goshawk_validation.as_ref()?;
+        let HullSource::Raven(source) = &approach.source else {
+            return None;
+        };
+        Some(approach.snapshot(
+            source.shared_pieces(),
+            self.state.tick,
+            (),
+            (RAVEN_RESOURCE_SHA256, RAVEN_CONTRACT_SHA256),
+        ))
+    }
+
     pub fn goshawk_snapshot_is_current(&self, frame: &GoshawkApproachSnapshot) -> bool {
         self.goshawk_validation.as_ref().is_some_and(|approach| {
             if let HullSource::Explorer(source) = &approach.source {
@@ -344,6 +377,16 @@ impl World {
         })
     }
 
+    pub fn raven_snapshot_is_current(&self, frame: &RavenApproachSnapshot) -> bool {
+        self.goshawk_validation.as_ref().is_some_and(|approach| {
+            if let HullSource::Raven(source) = &approach.source {
+                approach.snapshot_current(frame, source.shared_pieces(), self.state.tick)
+            } else {
+                false
+            }
+        })
+    }
+
     pub fn goshawk_observer_pose(&self, frame: &GoshawkApproachSnapshot) -> Option<RigidPose> {
         if !self.goshawk_snapshot_is_current(frame) {
             return None;
@@ -356,6 +399,13 @@ impl World {
         frame: &GoshawkCustomApproachSnapshot,
     ) -> Option<RigidPose> {
         if !self.goshawk_custom_snapshot_is_current(frame) {
+            return None;
+        }
+        flight_pose(self.state.position, self.state.orientation)
+    }
+
+    pub fn raven_observer_pose(&self, frame: &RavenApproachSnapshot) -> Option<RigidPose> {
+        if !self.raven_snapshot_is_current(frame) {
             return None;
         }
         flight_pose(self.state.position, self.state.orientation)
