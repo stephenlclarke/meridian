@@ -1,0 +1,13 @@
+{
+  "pieces": [
+    "pressure-hull",
+    "cockpit",
+    "positive-shoulder",
+    "positive-drive",
+    "positive-sensor",
+    "negative-shoulder",
+    "negative-drive",
+    "negative-sensor"
+  ],
+  "roundingMetres": 0.02
+}

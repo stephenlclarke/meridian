@@ -1,0 +1,6 @@
+LEGACY-*.txt -text
+CONTACT-RESULT.json text eol=lf
+FIXTURES.json text eol=lf
+ORIGINAL-DIFFERENCE.json text eol=lf
+SURFACE-FIT.json text eol=lf
+VULTURE-MK-I-STUDIO.json text eol=lf

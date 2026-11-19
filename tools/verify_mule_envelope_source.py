@@ -222,6 +222,8 @@ def verify_protected_core(root):
         data = (root / 'crates/meridian-core/src' / relative).read_bytes()
         data = undo_goshawk_world(relative, data)
         data = undo_renas_encounter(relative, data)
+        if relative == 'lib.rs':
+            data = data.replace(b'\npub mod vulture_mk_i;\n', b'', 1)
         for addition in additions.get(relative, []):
             assert data.count(addition) == 1, relative
             data = data.replace(addition, b'', 1)

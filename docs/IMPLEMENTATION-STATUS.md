@@ -42,6 +42,10 @@ SH010 has its own original detailed preview, authenticated engineering record an
 
 The SH010 review candidate additionally binds the inclusive 40.0 controlled speed, compiled source engineering values and retained complete surface audit thresholds. The three authored Metal fixtures now cover direct source RGB, minimum-size ordinary Compare and solo, and mixed-order GPU cache motion, with full-target isolated pixel checks. Actual Metal and platform execution remain pending.
 
+## Vulture Mk I source envelope
+
+SH037 preserves both original relative-unit meshes and their adopted 30 m length. Eight supports preserve six exterior routes. A separately authored 512-face Studio proxy strictly encloses every respective original vertex. SteveMBA measured full fit bounds of 986 mm detailed and 1,030 mm original native. The installed signed Studio exported the exact proxy definition with all eight groups and six routes passing. The same tool refused the original 3,016-face mesh at the 512-face limit. The per-hull Rust contact tests and Showroom qualification remain pending. [Vulture Mk I source and evidence](VULTURE-MK-I-GAMEPLAY-ENVELOPE.md)
+
 ## Internal Mule docking validation
 
 Mac build `ffb7112` passed 702 Rust tests, 102 Python tests, strict Clippy, and the release build. In the native scene the aligned Mule crossed at tick 104 and the obstructed Mule stopped for station contact at tick 11. Linux and native Windows each passed 705 Rust tests including three observer tests, 102 Python tests, strict Clippy, and both release builds. One Metal fixture was excluded from the ordinary test counts on each platform. These results qualify the internal docking scene. At that checkpoint, ordinary encounters and player acquisition were still open. [Controls and test scope](MULE-VALIDATION-LAUNCH.md)

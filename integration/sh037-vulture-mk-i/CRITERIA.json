@@ -1,0 +1,200 @@
+{
+  "hull": "SH037 Vulture Mk I",
+  "status": "SOURCE_CONTACT_REPLAY_PASS;OWNED_RUST_AND_SHOWROOM_PENDING",
+  "source": "assets/fleet/sh037/SOURCE-GEOMETRY.json",
+  "geometryTests": [
+    "vulture_mk_i_original_detailed_and_native_faces_share_complete_local_supports",
+    "vulture_mk_i_shoulder_drive_and_fore_passages_clear_and_solid_sources_contact",
+    "vulture_mk_i_original_sh028_aligned_crossing_clears_before_offset_native_lip_contact"
+  ],
+  "originalVisualCorners": {
+    "detailed": 24816,
+    "originalNative": 9048
+  },
+  "originalTextureMode": "None; original palette and emissive flag supplied per face",
+  "nativeFaceCompliance": {
+    "originalFaces": 3016,
+    "studioProxyFaces": 512,
+    "contractMaximum": 512,
+    "state": "ORIGINAL_ARCHIVED;SEPARATE_CERTIFIED_STUDIO_PROXY"
+  },
+  "legacyMetreAuthority": {
+    "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+    "files": [
+      {
+        "path": "Sources/L337Core/OriginalHullPhysicalContract.swift",
+        "artifact": "integration/sh037-vulture-mk-i/LEGACY-PHYSICAL-CONTRACT.swift.txt",
+        "sha256": "2c68d8d51acdd469faa25124bcc19027aec1a8f747eb267da2e84e5a98e3c027"
+      }
+    ],
+    "observedRegistration": {
+      "path": "Sources/L337Core/OriginalFleetRelativePhysicalRegistrations.swift",
+      "sha256": "f27bb348cd77faa18eb2c01c71afbf503f2e240ce974fec59036447eef70017d",
+      "note": "Observed in frozen revision; original SH037 engineering blob is retained verbatim as the reproducible calibration record."
+    },
+    "sourceEngineering": {
+      "path": "Sources/L337Core/Resources/OriginalFleetPhysical/SH037.json",
+      "artifact": "assets/fleet/sh037/engineering.json",
+      "bytes": 369629,
+      "sha256": "0043c48d88c2c86063ad8aaaf99870dba03fbef733d5ed553f0db3066db50345"
+    },
+    "metresPerSourceUnitExact": "6000/611",
+    "status": "Adopted uniform engineering scale"
+  },
+  "proxy": {
+    "originalVerticesCertified": 6944,
+    "pieces": 8,
+    "authorScript": {
+      "bytes": 4956,
+      "sha256": "cb8395cace79f94f00ee715d9b0d1c0fc0a057ccda88f2b06c55e16d16f378ef"
+    },
+    "routeSource": {
+      "bytes": 4772,
+      "sha256": "5c461fa6c767638ad5cbd61dc185bfee2fe07d0c6936a5161e806877faaf369a"
+    },
+    "nativeProxy": {
+      "bytes": 43045,
+      "sha256": "491f39c14121e9d89bdb8c67522842c03fee684acd700ce711e4b3417ec1eff9"
+    },
+    "proof": "Exact dyadic half-space checks against all source vertices and oriented closed faces, after production metre conversion."
+  },
+  "air": {
+    "hostname": "SteveMBA",
+    "topologyUtc": "2026-11-19T18:52:53Z",
+    "fitStartUtc": "2026-11-19T18:47:28Z",
+    "fitEndUtc": "2026-11-19T18:47:32Z",
+    "witnessStartUtc": "2026-11-19T18:50:47Z",
+    "witnessEndUtc": "2026-11-19T18:50:47Z",
+    "reports": {
+      "SURFACE-FIT.json": "bf4de44b8f143c09a7589ca7a80eddaa09a740f5fdb5c0faeb68908bee2d3e64",
+      "CONTACT-RESULT.json": "954a0692a5408eb3cf0221891a61fe0a41c24212cba51ba93486eb0cdf9f132b",
+      "ORIGINAL-DIFFERENCE.json": "71346ad21688206cf059307c8a09cc6c7538b0a07f266790c3953738c66c0119"
+    }
+  },
+  "independentReplay": {
+    "tools": {
+      "tools/measure_vulture_mk_i_air.py": "5654f6c25f25e20c21d4363e9c8c7bcecef7e9381dc495d6f33585d298555414",
+      "tools/prepare_vulture_mk_i_geometry.py": "73b91086dba146909386d85dded7b42a79bc75e12ffb5da7127faca022cc0c7f",
+      "tools/prepare_vulture_mk_i_studio.py": "59c79bd58ca2ccec00696a94e99e674a21e606e525e084630c820da627893efa",
+      "tools/verify_vulture_mk_i_geometry.py": "80430afeb97b2b62e1c73baaf60a59ac6e0be6fb608b4a0f5889bffc9f9ebd8c",
+      "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+      "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e"
+    },
+    "fixtures": {
+      "integration/sh037-vulture-mk-i/FIXTURES.json": "c5e3189ec59c7e6f0e877a959e27c33d94ed6cc723bc1a2c443e813324e3d3ba"
+    },
+    "reproduce": [
+      "python3 -B tools/measure_vulture_mk_i_air.py | cmp - integration/sh037-vulture-mk-i/SURFACE-FIT.json",
+      "python3 -B tools/measure_vulture_mk_i_air.py --difference | cmp - integration/sh037-vulture-mk-i/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/verify_vulture_mk_i_geometry.py | cmp - integration/sh037-vulture-mk-i/CONTACT-RESULT.json",
+      "python3 -B tools/prepare_vulture_mk_i_studio.py --check"
+    ],
+    "fitDependencies": {
+      "python": "3.14.3 (assertions enabled)",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "byteReplay": {
+      "hostname": "SteveMBA",
+      "startedUtc": "2026-11-19T18:50:49Z",
+      "finishedUtc": "2026-11-19T18:50:55Z",
+      "logSha256": "e2e945d50d2011228c55454d209fb901632727d5e0f18474d9f9495c7f99bd70"
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh037-vulture-mk-i/VULTURE-MK-I-STUDIO.json",
+    "sha256": "7450d1f90903a65d671e6e0317b6117f47e90fd6ef7b0b6cc25442504de6fa92",
+    "schema": 1,
+    "probeCount": 6,
+    "probeRadiusMetres": 0.1,
+    "loaderRevision": "76b287d5c2cc0f07c4b8096fc90bb3f99b4aff4a",
+    "loaderSource": "tools/hull_studio/definitions.py",
+    "loaderSha256": "f68ea0f442267b793338af6ebec6a937f9e1ee3946dc9be96e58db3e2a796e43",
+    "state": "INSTALLED_SIGNED_STUDIO_EXPORT_AND_ORIGINAL_NATIVE_REFUSAL_PASS;CONTROLLED_RUNTIME_AND_SHOWROOM_PENDING",
+    "installedExport": {
+      "toolSourceHead": "eef206fdd64e3b1ee538b0d1e2d808483f307282",
+      "toolSourceTree": "1b8d2bdaaef99286d84d46c1a4b2b3052abd884d",
+      "studioSha256": "d0eed94a34000aa4153f4ef05d79a593666b67ed200489bc9668fa99d4949501",
+      "validatorSha256": "fda086879cbb5543134437a0606900d6d0335884cd52bd392366158765f460ed",
+      "startedUtc": "2026-11-19T18:52:23.279951+00:00",
+      "finishedUtc": "2026-11-19T18:52:23.499145+00:00",
+      "supportGroups": 8,
+      "clearances": [
+        {
+          "name": "negative-under-shoulder",
+          "passed": true
+        },
+        {
+          "name": "negative-aft-inboard-drive",
+          "passed": true
+        },
+        {
+          "name": "negative-outside-cockpit-fore",
+          "passed": true
+        },
+        {
+          "name": "positive-under-shoulder",
+          "passed": true
+        },
+        {
+          "name": "positive-aft-inboard-drive",
+          "passed": true
+        },
+        {
+          "name": "positive-outside-cockpit-fore",
+          "passed": true
+        }
+      ],
+      "packetEntries": {
+        "studio/accepted/ACTUAL-START.json": {
+          "bytes": 16613,
+          "sha256": "f47cbfad6d053394f8bea71212e85c5cf2c2c77498b761de41d5f6429bcddfc6"
+        },
+        "studio/accepted/EXPORT-REPORT.json": {
+          "bytes": 333544,
+          "sha256": "f692f2e33bb18f75524c17171cb2d9dd08d80077e867d3aeb13f5f1e2a39a29f"
+        },
+        "studio/accepted/TERMINAL.json": {
+          "bytes": 18235,
+          "sha256": "4caffae8ff0f44cfc3ae9d78adf18a6eeae0593ff00735a5fd1e80f02a44b0a6"
+        },
+        "studio/accepted/VULTURE-MK-I.hull.json": {
+          "bytes": 317443,
+          "sha256": "4def715b6f02b4668da80e0bfe7ba9785dec0c59aed51ec60b626dd45ce95dad"
+        }
+      }
+    },
+    "originalNativeRefusal": {
+      "exitCode": 1,
+      "noExport": true,
+      "originalNativeFaces": 3016,
+      "nativeProxyFaces": 512,
+      "diagnostic": "native: invalid vertex, triangle or group cardinality (face limit 512)",
+      "onlyNativeFieldChanged": true,
+      "packetEntries": {
+        "studio/refused/ACTUAL-START.json": {
+          "bytes": 16951,
+          "sha256": "e344f6277b399f167cbaf1cf943f57cf1e4bbc0d110cf9c91049bc3bc14b6e8f"
+        },
+        "studio/refused/TERMINAL.json": {
+          "bytes": 17682,
+          "sha256": "138389cd07af84b0b9a7fb85da697ff4280fa22920fb709ed92765c10ec564d4"
+        },
+        "studio/refused/VULTURE-MK-I-ORIGINAL-NATIVE-OVER-LIMIT.json": {
+          "bytes": 395032,
+          "sha256": "2ebd5adc5f3a8ef7bef225eb0af89f97d6c8210b65cf4cf1442d2e05809d9cfb"
+        },
+        "studio/refused/export.stderr": {
+          "bytes": 71,
+          "sha256": "6027e60b89e6dea00e931f0da9b6ef6c58974c5eb16b63da63702707c6056ef1"
+        },
+        "studio/refused/export.stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  }
+}

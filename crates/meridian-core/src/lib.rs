@@ -29,6 +29,8 @@ pub use flight::{
 };
 pub use station::{FlightMode, FlightStart, MotionRefusal, OriginalStationData, StationError};
 
+pub mod vulture_mk_i;
+
 pub use flight::{
     PRACTICE_HALF_SIDE, PRACTICE_MAX_OFFERS, PRACTICE_QUIET_TICKS, PracticeAttemptId,
     PracticeAttemptSnapshot, PracticeBeaconId, PracticeBeaconSnapshot, PracticeClosureReview,
