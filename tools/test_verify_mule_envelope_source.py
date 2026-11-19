@@ -40,7 +40,7 @@ class MuleSourceVerification(unittest.TestCase):
         with self.assertRaises(AssertionError):
             verifier.verify_component('design', part, assigned, [(5, 6, 8)], {})
 
-    def test_stag_publication_must_be_removed_exactly_once(self):
+    def test_hull_publications_must_each_be_removed_exactly_once(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             core = Path('crates/meridian-core/src')
@@ -50,8 +50,9 @@ class MuleSourceVerification(unittest.TestCase):
             shutil.copyfile(verifier.ROOT / baseline, root / baseline)
             source = root / core / verifier.LIB_SOURCE
             original = source.read_bytes()
-            addition = b'pub mod stag_liner;\n\n'
-            for altered in (original.replace(addition, b''), original + addition):
-                source.write_bytes(altered)
-                with self.assertRaisesRegex(AssertionError, 'lib.rs'):
-                    verifier.verify_protected_core(root)
+            for publication in (b'pub mod stag_liner;\n\n', b'pub mod saker;\n'):
+                for altered in (original.replace(publication, b''), original + publication):
+                    with self.subTest(publication=publication):
+                        source.write_bytes(altered)
+                        with self.assertRaisesRegex(AssertionError, 'lib.rs'):
+                            verifier.verify_protected_core(root)

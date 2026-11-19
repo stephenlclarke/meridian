@@ -4,9 +4,11 @@ import hashlib
 from io import BytesIO, TextIOWrapper
 import json
 from math import hypot
+import os
 from pathlib import Path
 import runpy
 import shutil
+import stat
 import struct
 import sys
 import tempfile
@@ -14,6 +16,7 @@ import tomllib
 import unittest
 from unittest import mock
 
+import atomic_asset_output as atomic
 import prepare_saker_geometry as saker
 import verify_saker_geometry as proof
 import prepare_saker_studio as studio
@@ -167,6 +170,143 @@ class TestSakerSources(unittest.TestCase):
                 output.write_bytes(b'{}')
                 with self.assertRaisesRegex(ValueError, 'changed Saker Hull Studio definition'):
                     runpy.run_path(studio.__file__, run_name='__main__')
+
+    def test_studio_output_refuses_invalid_paths_before_generating_or_reading(self):
+        with tempfile.TemporaryDirectory() as temp:
+            scratch = Path(temp)
+            directory = scratch / 'directory.json'
+            directory.mkdir()
+            with mock.patch.object(studio, 'definition', side_effect=AssertionError('generated before validation')):
+                for selected, reason in (
+                    (scratch / '..' / 'result.json', 'Invalid'),
+                    (scratch / 'result.txt', 'Invalid'),
+                    (proof.INTEGRATION / 'CRITERIA.json', 'temporary JSON file'),
+                    (scratch / 'missing' / 'result.json', 'directory is missing'),
+                    (directory, 'regular file'),
+                ):
+                    for mode in ([], ['--check']):
+                        with self.subTest(path=selected, mode=mode), self.assertRaisesRegex(ValueError, reason):
+                            studio.main(['--output', str(selected), *mode])
+        self.assertEqual(studio.checked_output(studio.OUTPUT), studio.OUTPUT)
+
+    def test_studio_output_refuses_file_and_directory_redirects(self):
+        with tempfile.TemporaryDirectory() as temp:
+            scratch = Path(temp)
+            target = scratch / 'target.json'
+            target.write_bytes(b'keep')
+            file_link = scratch / 'file.json'
+            directory_link = scratch / 'redirect'
+            try:
+                file_link.symlink_to(target)
+                directory_link.symlink_to(scratch, target_is_directory=True)
+            except OSError as error:
+                self.skipTest(f'symbolic link unavailable: {error}')
+            for selected, reason in ((file_link, 'regular file'), (directory_link / 'target.json', 'redirects')):
+                for mode in ([], ['--check']):
+                    with self.subTest(path=selected, mode=mode), self.assertRaisesRegex(ValueError, reason):
+                        studio.main(['--output', str(selected), *mode])
+            self.assertEqual(target.read_bytes(), b'keep')
+
+    def test_studio_generation_replaces_hard_link_without_changing_other_name(self):
+        with tempfile.TemporaryDirectory() as temp:
+            scratch = Path(temp)
+            original = scratch / 'original.json'
+            output = scratch / 'output.json'
+            original.write_bytes(b'keep')
+            if os.name != 'nt':
+                original.chmod(0o640)
+            try:
+                os.link(original, output)
+            except OSError as error:
+                self.skipTest(f'hard link unavailable: {error}')
+            mode = stat.S_IMODE(original.stat().st_mode)
+            args = ['--output', str(output)]
+            with mock.patch.object(studio, 'definition', return_value={'id': 'SH042'}):
+                with self.assertRaisesRegex(ValueError, 'changed Saker Hull Studio definition'):
+                    studio.main(args + ['--check'])
+                self.assertTrue(output.samefile(original))
+                self.assertEqual(original.read_bytes(), b'keep')
+                studio.main(args)
+                self.assertFalse(output.samefile(original))
+                self.assertEqual(original.read_bytes(), b'keep')
+                self.assertEqual(output.read_bytes(), b'{"id":"SH042"}\n')
+                self.assertEqual(stat.S_IMODE(output.stat().st_mode), mode)
+                with mock.patch.object(studio, 'replace_output', side_effect=AssertionError('check wrote output')):
+                    studio.main(args + ['--check'])
+            self.assertEqual({entry.name for entry in scratch.iterdir()}, {'original.json', 'output.json'})
+
+    def test_studio_atomic_write_cleans_up_after_failure_and_keeps_destination(self):
+        with tempfile.TemporaryDirectory() as temp:
+            scratch = Path(temp)
+            output = scratch / 'output.json'
+            output.write_bytes(b'keep')
+            for error_at in ('fsync', 'replace'):
+                owner = os if error_at == 'fsync' else Path
+                with (self.subTest(error_at=error_at),
+                      mock.patch.object(owner, error_at, side_effect=OSError('injected failure')),
+                      self.assertRaisesRegex(OSError, 'injected failure')):
+                    atomic.replace_output(output, b'replacement')
+                self.assertEqual(output.read_bytes(), b'keep')
+                self.assertEqual(list(scratch.iterdir()), [output])
+            new_output = scratch / 'new.json'
+            atomic.replace_output(new_output, b'new')
+            self.assertEqual(new_output.read_bytes(), b'new')
+            if os.name != 'nt':
+                self.assertEqual(stat.S_IMODE(new_output.stat().st_mode), 0o600)
+
+    def test_geometry_checks_every_fixed_destination_before_writing(self):
+        with tempfile.TemporaryDirectory() as temp:
+            scratch = Path(temp)
+            folder = scratch / 'sh042'
+            shutil.copytree(saker.ASSETS, folder)
+            first = folder / 'source.vertices'
+            first.write_bytes(b'prior geometry')
+            manifest = folder / 'SOURCE-GEOMETRY.json'
+            manifest.unlink()
+            target = scratch / 'outside.json'
+            target.write_bytes(b'keep')
+            alias = scratch / 'redirect'
+            try:
+                manifest.symlink_to(target)
+                alias.symlink_to(folder, target_is_directory=True)
+            except OSError as error:
+                self.skipTest(f'symbolic link unavailable: {error}')
+            for mode in ([], ['--check']):
+                with self.assertRaisesRegex(ValueError, 'regular file without redirects'):
+                    saker.main(['--assets', str(folder), *mode])
+                with self.assertRaisesRegex(ValueError, 'directory is missing or redirects'):
+                    saker.main(['--assets', str(alias), *mode])
+            self.assertEqual(first.read_bytes(), b'prior geometry')
+            self.assertEqual(target.read_bytes(), b'keep')
+
+    def test_geometry_replaces_hard_link_without_writing_its_source(self):
+        with tempfile.TemporaryDirectory() as temp:
+            scratch = Path(temp)
+            folder = scratch / 'sh042'
+            shutil.copytree(saker.ASSETS, folder)
+            original = folder / 'resource.toml'
+            before = original.read_bytes()
+            output = folder / 'source.vertices'
+            output.unlink()
+            try:
+                os.link(original, output)
+            except OSError as error:
+                self.skipTest(f'hard link unavailable: {error}')
+            args = ['--assets', str(folder)]
+            with self.assertRaisesRegex(ValueError, 'changed SH042 encoding'):
+                saker.main(args + ['--check'])
+            self.assertTrue(output.samefile(original))
+            with (mock.patch.object(Path, 'replace', side_effect=OSError('injected failure')),
+                  self.assertRaisesRegex(OSError, 'injected failure')):
+                saker.main(args)
+            self.assertTrue(output.samefile(original))
+            self.assertFalse(list(folder.glob('.asset-output-*')))
+            saker.main(args)
+            self.assertFalse(output.samefile(original))
+            self.assertEqual(original.read_bytes(), before)
+            self.assertEqual(output.read_bytes(), (saker.ASSETS / output.name).read_bytes())
+            with mock.patch.object(saker, 'replace_output', side_effect=AssertionError('check wrote output')):
+                saker.main(args + ['--check'])
 
     def test_controls_refuse_wrong_edges_and_missing_separation(self):
         lip = [(0, 0, 0), (4, 0, 0), (0, 4, 0)]

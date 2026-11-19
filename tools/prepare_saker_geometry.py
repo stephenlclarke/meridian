@@ -7,6 +7,7 @@ from pathlib import Path
 import struct
 import tomllib
 
+from atomic_asset_output import checked_directory, checked_file, replace_output, temporary_path
 from encode_goshawk_visual import TEXTURES
 from import_goshawk_envelope_source import components, pin
 
@@ -167,17 +168,24 @@ def prepare(folder):
     return output
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--assets', type=Path, default=ASSETS)
     parser.add_argument('--check', action='store_true')
-    args = parser.parse_args()
-    for name, data in prepare(args.assets).items():
-        out = args.assets / name
+    args = parser.parse_args(argv)
+    folder = args.assets.absolute()
+    require('..' not in folder.parts, 'Invalid Saker assets directory')
+    if folder != ASSETS:
+        folder, _ = temporary_path(folder)
+    checked_directory(folder)
+    output = prepare(folder)
+    paths = {name: checked_file(folder / name) for name in output}
+    for name, data in output.items():
+        out = paths[name]
         if args.check:
             require(out.read_bytes() == data, 'changed SH042 encoding: ' + name)
         else:
-            out.write_bytes(data)
+            replace_output(out, data)
 
 
 if __name__ == '__main__':

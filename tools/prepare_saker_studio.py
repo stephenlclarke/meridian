@@ -5,10 +5,11 @@ import math
 from pathlib import Path
 import tomllib
 
+from atomic_asset_output import checked_directory, checked_file, replace_output, temporary_path
 from prepare_saker_geometry import (
     ASSETS, DETAIL, PINS, authenticate, prepare, require,
 )
-from verify_saker_geometry import INTEGRATION, verify
+from verify_saker_geometry import INTEGRATION, ROOT, verify
 
 
 OUTPUT = INTEGRATION / 'SAKER-STUDIO.json'
@@ -74,16 +75,31 @@ def definition():
     }
 
 
-def main():
+def checked_output(selected):
+    """Allow the canonical Studio definition or a scratch JSON file."""
+    path = selected.absolute()
+    if '..' in path.parts or path.suffix != '.json':
+        raise ValueError('Invalid Saker Hull Studio output filename')
+    if path != OUTPUT:
+        path, scratch = temporary_path(path)
+        if not path.is_relative_to(scratch) or path.is_relative_to(ROOT):
+            raise ValueError('Saker Hull Studio output must be the definition or a temporary JSON file')
+    checked_directory(path.parent)
+    return checked_file(path)
+
+
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output', type=Path, default=OUTPUT)
+    parser.add_argument('--output', type=Path, default=OUTPUT,
+                        help='canonical definition or a JSON file in the system temporary directory')
     parser.add_argument('--check', action='store_true')
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
+    output = checked_output(args.output)
     data = (json.dumps(definition(), allow_nan=False, separators=(',', ':')) + '\n').encode()
     if args.check:
-        require(args.output.read_bytes() == data, 'changed Saker Hull Studio definition')
+        require(output.read_bytes() == data, 'changed Saker Hull Studio definition')
     else:
-        args.output.write_bytes(data)
+        replace_output(output, data)
 
 
 if __name__ == '__main__':

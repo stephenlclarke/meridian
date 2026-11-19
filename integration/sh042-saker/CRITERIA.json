@@ -59,9 +59,10 @@
   },
   "independentReplay": {
     "tools": {
-      "tools/prepare_saker_geometry.py": "b6170b306d55757bf9391265115b400ba83cfbfd2721732bd9b2d56660eb0576",
-      "tools/prepare_saker_studio.py": "3350b3a5beb17af6e05b6dbdb8538ce76b223bcb5a2f66169804fc0b0b3c3695",
+      "tools/prepare_saker_geometry.py": "19eabc2030d694512885f9c87a88005fc8acb87960633f0683a8b970ce61671a",
+      "tools/prepare_saker_studio.py": "f9e903ce2197633667418a1d2e736cf56c8dec50fa548d5c627e5a60a70ef530",
       "tools/verify_saker_geometry.py": "98652e217879a9096556138663101424683401258eb0408ed7602477dc67fd74",
+      "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
       "tools/measure_saker_air.py": "fc9112de41ab428ba6a5e877360eff0fd988f2abb8d6a6b8f415eb10c8b608bb",
       "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
       "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
@@ -88,9 +89,9 @@
       "rtree": "1.4.1"
     },
     "byteReplay": {
-      "startedUtc": "2026-11-19T19:46:01Z",
-      "finishedUtc": "2026-11-19T19:46:49Z",
-      "logSha256": "a613d283577905d43a8cc2ba56b7de2f74a0c8cbfedaaf8fb67f25af896f6ade"
+      "startedUtc": "2026-11-19T19:53:13Z",
+      "finishedUtc": "2026-11-19T19:54:02Z",
+      "logSha256": "82de4bc968328986abdba3ea404efd73e48f435f6224ca91554d64a364270399"
     }
   },
   "hullStudio": {
@@ -105,6 +106,7 @@
     "loaderSha256": "f68ea0f442267b793338af6ebec6a937f9e1ee3946dc9be96e58db3e2a796e43",
     "installedExport": {
       "toolSourceTree": "1b8d2bdaaef99286d84d46c1a4b2b3052abd884d",
+      "identicalDefinitionGitRevision": "0605ce7b40bac196f7eaf4cc25a1f3878f95bce1",
       "studioSha256": "d0eed94a34000aa4153f4ef05d79a593666b67ed200489bc9668fa99d4949501",
       "validatorSha256": "fda086879cbb5543134437a0606900d6d0335884cd52bd392366158765f460ed",
       "startedUtc": "2026-11-19T19:46:00.919412+00:00",
