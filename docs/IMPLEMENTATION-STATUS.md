@@ -8,17 +8,19 @@ native faces of SH023. The Mac validator produced 69 collision pieces, passed
 all four reference probes and matched the stock station entrance and lip tests.
 The real editor smoke exported a second config-only hull, changed its collision
 groups from four to two and refused export after a route crossed the hull.
-The development desktop identifies a single inspected package by name and local ID
-in its window title, including after the first frame. Visual selection of two
-simultaneous packaged Mac windows still requires native qualification.
-Gameplay admission and campaign placement are separate.
+The signed macOS Studio build at `eef206f` opened Zebu (SH036) and Stag Liner
+(SH035) in separate game processes with disposable profiles. Both confirmed
+their first frame while open together. The window title identified each local
+package. On the Mac, both ships rendered beside the Peregrine Mk V and alone
+after pressing C. The inspection tool selected Zebu first and Stag after Zebu
+closed. Both temporary workspaces were removed. Switching the inspection tool
+freely between two still-open processes remains unverified.
 
-The previous packaged Mac game was bundleless: Zebu confirmed its first frame
-but the supported window adapter could not identify its window independently.
-The corrected packaging source gives the optional Showroom a nested app
-identity and an independent signature before re-sealing Studio. Actual
-window selection and normal disposal with two distinct hulls remain pending
-until the signed staging build is qualified.
+The five desktop package-launch tests passed on macOS, Linux and native
+Windows. The signed Mac Showroom helper has its own application identity.
+The earlier unbundled game could confirm a frame while its window remained
+unavailable to the inspection tool. Stock registration and campaign placement
+are separate from this private inspection.
 
 ## Generated desktop audio source candidate
 
