@@ -447,7 +447,7 @@ fn raven_world_approach_reports_its_own_physical_contacts_and_entry() -> Result<
         (
             "raven-lip",
             OBSERVER,
-            inbound(70.328_20, 220.0, 12.0),
+            inbound(70.328_2, 220.0, 12.0),
             Status::StationContact,
         ),
         (
