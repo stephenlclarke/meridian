@@ -4,6 +4,7 @@ import json
 import struct
 import sys
 import tempfile
+import threading
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -99,6 +100,60 @@ class HullStudioTests(unittest.TestCase):
         measured = fit.fit_report(package, envelope)
         self.assertEqual(measured["maxMetres"], 1)
         self.assertEqual(measured["nearestPoint"][2], 0)
+
+    def test_game_preview_uses_a_private_profile_and_the_exact_package(self):
+        preview = studio.GamePreview(Path("/example/meridian-desktop"))
+        finished, cleaned = threading.Event(), threading.Event()
+        child = mock.Mock()
+        child.wait.side_effect = finished.wait
+        original = tempfile.TemporaryDirectory
+
+        def workspace(*args, **kwargs):
+            folder = original(*args, **kwargs)
+            cleanup = folder.cleanup
+
+            def close():
+                cleanup()
+                cleaned.set()
+
+            folder.cleanup = close
+            return folder
+
+        with mock.patch.object(
+            studio.subprocess, "Popen", return_value=child
+        ) as launch:
+            with mock.patch.object(
+                studio.tempfile, "TemporaryDirectory", side_effect=workspace
+            ):
+                preview.launch({"id": "CONFIG-ONLY"})
+            try:
+                argv = launch.call_args.args[0]
+                profile = Path(argv[argv.index("--save-dir") + 1])
+                authored = Path(argv[argv.index("--inspect-hull-package") + 1])
+                self.assertEqual(authored.parent, profile.parent)
+                self.assertEqual(
+                    json.loads(authored.read_bytes()), {"id": "CONFIG-ONLY"}
+                )
+                self.assertEqual(list(profile.iterdir()), [])
+                self.assertIn("--open-authored-showroom", argv)
+                with self.assertRaisesRegex(RuntimeError, "Close the open Showroom"):
+                    preview.launch({"id": "OTHER"})
+            finally:
+                finished.set()
+            self.assertTrue(cleaned.wait(2))
+            self.assertFalse(profile.parent.exists())
+
+    def test_game_launch_failure_frees_the_private_workspace(self):
+        preview = studio.GamePreview(Path("/missing/desktop"))
+        with mock.patch.object(
+            studio.subprocess, "Popen", side_effect=OSError("missing")
+        ) as launch:
+            with self.assertRaisesRegex(OSError, "missing"):
+                preview.launch({})
+            self.assertFalse(launch.call_args.kwargs["cwd"].exists())
+            self.assertFalse(preview.running)
+        with self.assertRaisesRegex(RuntimeError, "unavailable"):
+            studio.GamePreview(None).launch({})
 
     def test_validation_failure_never_exports(self):
         def reject(argv, **kwargs):
