@@ -1,0 +1,4 @@
+# Shared replay helpers are hashed as Git blob bytes.
+encode_goshawk_visual.py text eol=lf
+import_goshawk_envelope_source.py text eol=lf
+measure_goshawk_surface_fit.py text eol=lf

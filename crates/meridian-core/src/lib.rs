@@ -21,6 +21,8 @@ pub use flight::GoshawkCustomApproachSnapshot;
 pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};
 pub use flight::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
 
+pub mod stag_liner;
+
 pub use flight::{
     ENERGY_CAPACITY_HUNDREDTHS, FIXED_DELTA_SECONDS, FireError, FlightInput, MAX_SPEED,
     MissionError, MissionSnapshot, PULSE_COOLDOWN_TICKS, PULSE_RANGE, PulseContact,
