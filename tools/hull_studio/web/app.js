@@ -7,6 +7,7 @@ const state = { definition: null, revision: 0, build: null, mesh: 'detail', dirt
 const fields = [['hull-id', 'id', false], ['hull-name', 'name', false], ['scale', 'metresPerUnit', true], ['rounding', 'roundingMetres', true], ['speed', 'maxSpeed', true]];
 let lastScene = [];
 let groupHistory = [];
+let showroomAvailable = false;
 
 const numberText = value => Number.isFinite(value) ? value.toLocaleString('en-US', { maximumFractionDigits: 8 }) : '—';
 const text = (id, value) => { $(id).textContent = value; };
@@ -227,6 +228,8 @@ function render(syncFields = true) {
   $('save-button').disabled = !definition;
   $('build-button').disabled = !definition || Boolean(state.job);
   $('export-button').disabled = !canExport(definition, build, state.revision) || Boolean(state.job);
+  $('showroom-button').hidden = !showroomAvailable;
+  $('showroom-button').disabled = !canExport(definition, build, state.revision) || Boolean(state.job);
   $('load-example').disabled = state.job?.kind === 'example';
   $('quit-button').disabled = Boolean(state.job);
   text('schema-status', definition?.schema == null ? 'Schema —' : `Schema ${definition.schema}`);
@@ -353,6 +356,29 @@ async function exportPackage() {
   } catch (error) { finishError(job, error, 'Export refused · rebuild if needed'); }
 }
 
+async function discoverCapabilities() {
+  try {
+    const response = await fetch('/api/capabilities', { headers: { Accept: 'application/json' } });
+    showroomAvailable = response.ok && (await jsonResponse(response))?.showroom === true;
+  } catch { showroomAvailable = false; }
+  render(false);
+}
+
+async function openShowroom() {
+  if (!showroomAvailable || !canExport(state.definition, currentBuild(), state.revision) || state.job) return;
+  const job = beginJob('showroom', 'Opening isolated game showroom…');
+  try {
+    const response = await fetch('/api/showroom', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ definition: state.definition }), signal: job.controller.signal });
+    const payload = await jsonResponse(response);
+    if (!jobCurrent(job)) return;
+    if (!response.ok || payload?.opened !== true) throw new Error(payload?.error || `Showroom refused (HTTP ${response.status}).`);
+    state.job = null;
+    state.status = 'Opened in isolated game showroom';
+    state.tone = 'ready';
+    render(false);
+  } catch (error) { finishError(job, error, 'Showroom could not be opened · validated build retained'); }
+}
+
 async function quitStudio() {
   if (state.job) return;
   if (state.dirty && !window.confirm('The definition has unsaved changes. Quit Studio without saving?')) return;
@@ -405,6 +431,7 @@ $('import-file').addEventListener('change', event => { importFile(event.target.f
 $('save-button').addEventListener('click', saveDefinition);
 $('build-button').addEventListener('click', buildDefinition);
 $('export-button').addEventListener('click', exportPackage);
+$('showroom-button').addEventListener('click', openShowroom);
 $('quit-button').addEventListener('click', quitStudio);
 for (const key of ['group-source', 'group-target']) $(key).addEventListener('change', updateMergeButton);
 $('merge-groups').addEventListener('click', () => changeGroups(mergeGroups(state.definition, Number($('group-source').value), Number($('group-target').value)), 'Groups merged · build required'));
@@ -433,4 +460,5 @@ for (const tab of ['inspect', 'help']) {
 $('inspect-select').addEventListener('change', () => renderInspect(currentBuild()));
 
 render();
+discoverCapabilities();
 loadExample(true);
