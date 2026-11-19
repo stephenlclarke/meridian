@@ -177,6 +177,70 @@ fn goshawk_world_snapshots_keep_source_and_scope_without_a_commander() -> Result
     Ok(())
 }
 
+// These independent bit patterns come from the adopted baseline in the retained
+// MC1 proposal. The proposal also records the separately charged liner alternative.
+const PROPOSAL_CENTER_BITS: [u64; 3] = [
+    0xbeeb_7eef_cbd4_29e1,
+    0x3fd3_f41e_356c_f7c6,
+    0xc002_e69d_21d0_7f38,
+];
+const PROPOSAL_INERTIA_BITS: [[u64; 3]; 3] = [
+    [
+        0x4144_2315_a201_7f17,
+        0x400b_f138_abb8_9cbf,
+        0xc02d_3bf5_d7de_de95,
+    ],
+    [
+        0x400b_f138_abb8_9cbf,
+        0x414c_8a2d_eb7c_b2cb,
+        0x40f2_b168_40d7_add0,
+    ],
+    [
+        0xc02d_3bf5_d7de_de95,
+        0x40f2_b168_40d7_add0,
+        0x4133_eae6_dd58_4f58,
+    ],
+];
+
+#[test]
+fn goshawk_world_publishes_the_adopted_stock_mass_properties() -> Result<(), Box<dyn Error>> {
+    let mut world = World::goshawk_docking_validation_scenario(OBSERVER, inbound(6.0, 220.0, 4.0))?;
+    let first = frame(&world)?;
+    let properties = first.engineering();
+    assert_eq!(properties.dry_mass_kilograms, 33_719);
+    assert_eq!(
+        properties.center_of_mass_metres.map(f64::to_bits),
+        PROPOSAL_CENTER_BITS
+    );
+    assert_eq!(
+        properties
+            .inertia_about_center_kg_m2
+            .map(|row| row.map(f64::to_bits)),
+        PROPOSAL_INERTIA_BITS,
+    );
+    assert_eq!(
+        properties.proposal_sha256,
+        "c086123c0e38c12189719bbbcb36120da8c3099e0e959f335520de2851eceb55"
+    );
+
+    // The inbound half-turn around Y reverses the local X and Z offsets only.
+    let [x, y, z] = PROPOSAL_CENTER_BITS.map(f64::from_bits);
+    let center = first.center_of_mass_world_metres();
+    assert_eq!((center.x, center.y, center.z), (6.0 - x, y, 220.0 - z));
+    world.step(FlightInput::default())?;
+    let next = frame(&world)?;
+    assert!(world.goshawk_snapshot_is_current(&next));
+    assert!(core::ptr::eq(next.engineering(), properties));
+    let position = next.pose().position;
+    let center = next.center_of_mass_world_metres();
+    assert!(position.z < 220.0);
+    assert_eq!(
+        (center.x, center.y, center.z),
+        (position.x - x, position.y + y, position.z - z)
+    );
+    Ok(())
+}
+
 #[test]
 fn goshawk_world_refuses_unbound_motion_and_overlapping_starts() {
     let starts = [
