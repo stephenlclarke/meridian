@@ -56,6 +56,7 @@ pub(super) enum Launch {
     Authored {
         directory: PathBuf,
         packages: Vec<PackagePath>,
+        open_showroom: bool,
     },
     Mule(View),
 }
@@ -88,16 +89,28 @@ impl Launch {
             }
             return Ok(Self::Mule(view));
         }
-        if !args
-            .iter()
-            .any(|arg| arg == "--hull-package" || arg == "--inspect-hull-package")
-        {
+        if !args.iter().any(|arg| {
+            arg == "--hull-package"
+                || arg == "--inspect-hull-package"
+                || arg == "--open-authored-showroom"
+        }) {
             return crate::profile::directory_from_args(args.into_iter()).map(Self::Profile);
         }
         let mut args = args.into_iter();
         let mut profile_args = Vec::new();
         let mut packages = Vec::new();
+        let mut open_showroom = false;
         while let Some(flag) = args.next() {
+            if flag == "--open-authored-showroom" {
+                if open_showroom {
+                    return Err(io::Error::new(
+                        io::ErrorKind::InvalidInput,
+                        "Duplicate --open-authored-showroom",
+                    ));
+                }
+                open_showroom = true;
+                continue;
+            }
             let path = args
                 .next()
                 .filter(|p| !p.is_empty() && !p.to_string_lossy().starts_with("--"))
@@ -118,15 +131,28 @@ impl Launch {
                 _ => {
                     return Err(io::Error::new(
                         io::ErrorKind::InvalidInput,
-                        "Expected --save-dir PATH, --hull-package PATH or --inspect-hull-package PATH; no internal validation or duplicate save directory",
+                        "Expected --save-dir PATH, --hull-package PATH, --inspect-hull-package PATH or --open-authored-showroom; no internal validation or duplicate save directory",
                     ));
                 }
             }
+        }
+        if open_showroom
+            && packages
+                .iter()
+                .filter(|package| package.is_isolated())
+                .count()
+                != 1
+        {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "--open-authored-showroom requires exactly one --inspect-hull-package PATH",
+            ));
         }
         let directory = crate::profile::directory_from_args(profile_args.into_iter())?;
         Ok(Self::Authored {
             directory,
             packages,
+            open_showroom,
         })
     }
     pub(super) fn camera_view(&self) -> meridian_core::FlightView {

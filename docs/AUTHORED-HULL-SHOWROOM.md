@@ -12,6 +12,8 @@ On Commander Details at a station, press **3** to open Ship Showroom, **/** to s
 
 Repeat `--hull-package PATH` or `--inspect-hull-package PATH` to load multiple distinct definitions. A regular package must have a new ID and name; conflicting original or session identities refuse explicitly before a profile opens. For example, `--inspect-hull-package /path/to/SH023.json` makes the local copy searchable as `LOCAL:SH023`, separately from built-in `SH023`. The package source ID remains visible in its specifications. Duplicate loaded source IDs cannot be combined, even across the two flags. The flags cannot be combined with internal Mule validation.
 
+Hull Studio's one-click Open in Showroom uses `--open-authored-showroom` together with exactly one `--inspect-hull-package PATH`, normally in a fresh disposable save directory. It opens the ordinary station Showroom with that isolated `LOCAL:` preview selected on the first frame. It refuses if there is no docked commander, does not change World or bypass save validation, and never repeats selection on later visits. Without the explicit opt-in, Commander Details remains the startup screen.
+
 Only a regular local file within the shared 64 MiB validator bound is accepted. The shared core validates all fields, material/texture indices, finite UVs, support groups, engineering and native topology limits; any declared blocked or indeterminate clearance refuses the launch. Accepted clearance readouts come from the actual conservative continuous collision kernel, with the same package's rounded pieces also consumed for the local-origin contact readout. Source engineering values and positive clearance results are not acquired mass or flight admission.
 
 The generic renderer submits the detailed face order, winding, exact tint channels including alpha, emissive flags and optional corner UVs against the three shared original atlases. Untextured non-emissive surfaces use restrained directional relief; original maps retain baked relief. Partial alpha uses face-centre depth sorting over opaque depth, not order-independent translucency. Presentation uses a uniform fit independent of unscaled collision coordinates and reports physical metres separately. Device and shared core geometry limits still apply; authored assets do not modify built-ins or request external textures.
@@ -25,6 +27,7 @@ cargo test --locked -p meridian-desktop authored_package
 cargo test --locked -p meridian-desktop normal_game_entry_searches_authored_package
 cargo test --locked -p meridian-desktop conflicts_and_invalid_inputs_refuse
 cargo test --locked -p meridian-desktop authored_shader_and_corner_material_attributes
+cargo test --locked -p meridian-desktop one_click_authored_showroom
 ```
 
 For the Mac validation owner, use a fresh absolute evidence directory:

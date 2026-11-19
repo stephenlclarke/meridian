@@ -210,6 +210,19 @@ impl Docked {
         self.open = true;
         Ok(())
     }
+    pub(crate) fn open_authored_showroom(&mut self, world: &World) -> Result<(), String> {
+        let id = self
+            .authored
+            .inspection_id()
+            .ok_or("Expected exactly one isolated authored hull")?
+            .to_owned();
+        if self.catalogue.object(&id).is_none() {
+            return Err("Isolated authored hull missing from the Showroom catalogue".into());
+        }
+        self.open(world, ui::Screen::Showroom)?;
+        self.screens.select_initial_showroom_ship(&id);
+        Ok(())
+    }
     pub(crate) fn review_pending(&self) -> bool {
         self.pending.is_some()
     }

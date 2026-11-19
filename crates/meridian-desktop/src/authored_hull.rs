@@ -25,6 +25,10 @@ impl PackagePath {
     pub(crate) fn new(path: PathBuf, isolated: bool) -> Self {
         Self { path, isolated }
     }
+
+    pub(crate) fn is_isolated(&self) -> bool {
+        self.isolated
+    }
 }
 
 struct AuthoredHull {
@@ -69,6 +73,15 @@ impl AuthoredHulls {
 
     pub(crate) fn records(&self) -> impl Iterator<Item = &AuthoredRecord> {
         self.hulls.iter().map(|hull| &hull.record)
+    }
+
+    /// The single isolated identity authorized for the explicit one-click entry.
+    pub(crate) fn inspection_id(&self) -> Option<&str> {
+        let mut isolated = self
+            .records()
+            .filter(|record| record.id.starts_with(LOCAL_PREFIX));
+        let id = isolated.next()?.id.as_str();
+        isolated.next().is_none().then_some(id)
     }
 
     pub(crate) fn available_models(&self) -> Vec<AvailableModel<'_>> {
