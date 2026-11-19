@@ -82,9 +82,12 @@ python3 tools/hull_studio/studio.py --definition integration/sh032-panther-explo
 ```
 
 The pinned Studio Python loader accepted the exact definition and
-preserved it through a JSON round trip on the MBA. Rust Studio validation
-and export, the explicit Panther Explorer Rust contact tests, and
-Showroom qualification await their owned runs.
+preserved it through a JSON round trip on the MBA. The installed signed
+macOS Studio then validated and exported that same definition. Its report
+accepted all 36 support groups and all fourteen routes with no
+diagnostics. The exported JSON equals the input except for its final
+line feed. The explicit Panther Explorer Rust contact tests and a
+Showroom launch await their owned runs.
 
 Regenerate with `python3 -B tools/prepare_panther_explorer_studio.py`.
 Add `--check` for byte comparison.

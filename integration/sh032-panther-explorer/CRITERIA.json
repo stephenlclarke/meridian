@@ -114,7 +114,94 @@
     "loaderRevision": "1789030980e0d2a7897c2dc48518fad728c9bbf2",
     "loaderSource": "tools/hull_studio/definitions.py",
     "loaderSha256": "f68ea0f442267b793338af6ebec6a937f9e1ee3946dc9be96e58db3e2a796e43",
-    "state": "PYTHON_DEFINITION_LOADER_AND_BYTE_REPLAY_PASS;RUST_VALIDATOR_AND_SHOWROOM_PENDING"
+    "state": "INSTALLED_SIGNED_STUDIO_EXPORT_PASS;CONTROLLED_HULL_RUST_AND_SHOWROOM_PENDING",
+    "installedExport": {
+      "testedAuthorConfigCommit": "5afd8bc84ed65cec0b6df62316594ca3a5b9978e",
+      "toolSourceHead": "1789030980e0d2a7897c2dc48518fad728c9bbf2",
+      "toolSourceTree": "fb22a072408e94b4553ea9c5e586916ff7e6ecae",
+      "studioSha256": "ee1e6e307707a385c7ad24e00cbcce589f5ab0762e31b474720715f62c146f9f",
+      "validatorSha256": "8800efb734ca5b8123ae88b1ab06aa62f1e22f37975cd6230f88581f69cf76e7",
+      "startedUtc": "2026-11-19T10:24:28.684551+00:00",
+      "finishedUtc": "2026-11-19T10:24:28.858100+00:00",
+      "supportGroups": 36,
+      "clearances": [
+        {
+          "name": "left-keel-sled-channel",
+          "passed": true
+        },
+        {
+          "name": "left-above-sled-channel",
+          "passed": true
+        },
+        {
+          "name": "left-below-aft-tie-channel",
+          "passed": true
+        },
+        {
+          "name": "left-under-arch-channel",
+          "passed": true
+        },
+        {
+          "name": "left-fore-arch-shoulder",
+          "passed": true
+        },
+        {
+          "name": "left-mid-arch-shoulder",
+          "passed": true
+        },
+        {
+          "name": "left-aft-arch-shoulder",
+          "passed": true
+        },
+        {
+          "name": "right-keel-sled-channel",
+          "passed": true
+        },
+        {
+          "name": "right-above-sled-channel",
+          "passed": true
+        },
+        {
+          "name": "right-below-aft-tie-channel",
+          "passed": true
+        },
+        {
+          "name": "right-under-arch-channel",
+          "passed": true
+        },
+        {
+          "name": "right-fore-arch-shoulder",
+          "passed": true
+        },
+        {
+          "name": "right-mid-arch-shoulder",
+          "passed": true
+        },
+        {
+          "name": "right-aft-arch-shoulder",
+          "passed": true
+        }
+      ],
+      "comparison": "Export matches the source bytes after removing its final LF; report support points and rounding match the exact definition.",
+      "packetEntries": {
+        "studio/ACTUAL-START.json": {
+          "bytes": 1262,
+          "sha256": "5412644463783a5f1782665e178fdbc1660ceb42480464f8efd05f9e3e3a8ec8"
+        },
+        "studio/PANTHER-EXPLORER-EXPORT-REPORT.json": {
+          "bytes": 99747,
+          "sha256": "6a5c54786f245d608b0883f35dec9a89c9e60f475ea69323a2999c3c964314ba"
+        },
+        "studio/PANTHER-EXPLORER.hull.json": {
+          "bytes": 748824,
+          "sha256": "1ad2314515c7793df88b61e210c24ecd8db5b7c008facd45e2aa08c461866e3e"
+        },
+        "studio/TERMINAL.json": {
+          "bytes": 3140,
+          "sha256": "c5b3b8825f9aad7d0865bc5ab3579ad5e3a681dac74341358b27d4ecb009cbdb"
+        }
+      }
+    }
   },
   "archSupportSelection": {
     "groupsPerArch": 4,

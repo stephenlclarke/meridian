@@ -10,7 +10,7 @@ Preview 10 is published for macOS arm64 and Windows x64. It includes the Goshawk
 
 ## Panther Explorer source envelope
 
-SH032 preserves both original metre-authored Explorer meshes. The 36-piece envelope uses four local spans per arch. SteveMBA verified fourteen routes and ten overlaps, with exact counterexamples for the whole arch and each adjacent merge. The full fit bounds are 1,001 mm against detail and 2,170 mm against the selected native mesh. The Hull Studio Python loader accepted the exact definition. Rust Studio validation and export, per-hull contact tests and Showroom qualification remain pending. [Panther Explorer source and evidence](PANTHER-EXPLORER-GAMEPLAY-ENVELOPE.md)
+SH032 preserves both original metre-authored Explorer meshes. The 36-piece envelope uses four local spans per arch. SteveMBA verified fourteen routes and ten overlaps, with exact counterexamples for the whole arch and each adjacent merge. The full fit bounds are 1,001 mm against detail and 2,170 mm against the selected native mesh. The installed signed Hull Studio validated and exported the exact definition with all 36 groups and fourteen sphere routes passing. The per-hull Rust contact tests and Showroom qualification remain pending. [Panther Explorer source and evidence](PANTHER-EXPLORER-GAMEPLAY-ENVELOPE.md)
 
 ## Commander startup and flight cockpit
 
