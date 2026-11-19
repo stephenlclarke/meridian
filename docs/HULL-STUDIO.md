@@ -77,6 +77,14 @@ includes the Rust validator, Python runtime, editor assets, original reference
 definition and notices. The installed app opens the editor in the default
 browser and can run without a checkout or an internet connection.
 
+With `--game`, the macOS bundle contains a separately identifiable **Meridian
+Hull Showroom** helper application. Packaging signs the helper first, then
+the outer Studio, so its game window is distinguishable from the editor and
+ordinary Meridian. Windows and checkout-based development continue to use the
+direct game executable. One Showroom can be open per Studio instance; close
+the game normally before inspecting another hull. The first-frame readiness
+check and private disposable profile are unchanged.
+
 ## Schema 1 limits
 
 The validator accepts a JSON package up to 64 MiB. Each mesh supports up to

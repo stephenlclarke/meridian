@@ -10,6 +10,13 @@ The real editor smoke exported a second config-only hull, changed its collision
 groups from four to two and refused export after a route crossed the hull.
 Gameplay admission and campaign placement are separate.
 
+The previous packaged Mac game was bundleless: Zebu confirmed its first frame
+but the supported window adapter could not identify its window independently.
+The corrected packaging source gives the optional Showroom a nested app
+identity and an independent signature before re-sealing Studio. Actual
+window selection and normal disposal with two distinct hulls remain pending
+until the signed staging build is qualified.
+
 ## Generated desktop audio source candidate
 
 The authored desktop integration routes generated launch and docking cues from actual mode transitions, front-laser sounds from accepted Pulse or Mining Laser discharges, and the original missile notification ping after an accepted missile launch. Ctrl+Shift+M toggles sound; Help displays availability. New/Continue primes without replay, and a missing device leaves gameplay active. Application suspension releases the audio device; resuming restores the mute preference without replaying accepted cues. No speech, kill, ECM, continuous cutter or EMP effects are claimed. Native device and Rust qualification remain pending.

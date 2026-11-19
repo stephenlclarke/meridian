@@ -15,6 +15,7 @@ from urllib.parse import urlsplit
 
 from definitions import ROOT, encode, local_definition, parse, prepare, reference_bytes
 from fit import fit_report
+from showroom_bundle import showroom_executable
 from surface import envelope_view
 
 
@@ -304,9 +305,15 @@ def main():
         print(json.dumps(report))
         return
     with ThreadingHTTPServer(("127.0.0.1", args.port), StudioRequest) as server:
-        game_name = "meridian-desktop" + (".exe" if os.name == "nt" else "")
         game = (
-            args.game.resolve() if args.game else default_validator.with_name(game_name)
+            args.game.resolve()
+            if args.game
+            else showroom_executable(
+                default_validator,
+                Path(sys.executable),
+                sys.platform,
+                getattr(sys, "frozen", False),
+            )
         )
         if args.game and not game.is_file():
             parser.error(f"Game executable is missing: {game}")
