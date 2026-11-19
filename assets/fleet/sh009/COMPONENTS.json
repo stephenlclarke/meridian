@@ -1,0 +1,1206 @@
+{
+  "detailed": [
+    {
+      "startVertex": 0,
+      "vertexCount": 8,
+      "startFace": 0,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 8,
+      "vertexCount": 120,
+      "startFace": 12,
+      "faceCount": 236
+    },
+    {
+      "startVertex": 128,
+      "vertexCount": 12,
+      "startFace": 248,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 140,
+      "vertexCount": 8,
+      "startFace": 268,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 148,
+      "vertexCount": 8,
+      "startFace": 280,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 156,
+      "vertexCount": 8,
+      "startFace": 292,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 164,
+      "vertexCount": 12,
+      "startFace": 304,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 176,
+      "vertexCount": 8,
+      "startFace": 324,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 184,
+      "vertexCount": 8,
+      "startFace": 336,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 192,
+      "vertexCount": 8,
+      "startFace": 348,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 200,
+      "vertexCount": 12,
+      "startFace": 360,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 212,
+      "vertexCount": 8,
+      "startFace": 380,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 220,
+      "vertexCount": 8,
+      "startFace": 392,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 228,
+      "vertexCount": 8,
+      "startFace": 404,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 236,
+      "vertexCount": 12,
+      "startFace": 416,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 248,
+      "vertexCount": 8,
+      "startFace": 436,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 256,
+      "vertexCount": 8,
+      "startFace": 448,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 264,
+      "vertexCount": 8,
+      "startFace": 460,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 272,
+      "vertexCount": 12,
+      "startFace": 472,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 284,
+      "vertexCount": 8,
+      "startFace": 492,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 292,
+      "vertexCount": 8,
+      "startFace": 504,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 300,
+      "vertexCount": 8,
+      "startFace": 516,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 308,
+      "vertexCount": 12,
+      "startFace": 528,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 320,
+      "vertexCount": 8,
+      "startFace": 548,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 328,
+      "vertexCount": 8,
+      "startFace": 560,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 336,
+      "vertexCount": 8,
+      "startFace": 572,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 344,
+      "vertexCount": 12,
+      "startFace": 584,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 356,
+      "vertexCount": 8,
+      "startFace": 604,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 364,
+      "vertexCount": 8,
+      "startFace": 616,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 372,
+      "vertexCount": 8,
+      "startFace": 628,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 380,
+      "vertexCount": 12,
+      "startFace": 640,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 392,
+      "vertexCount": 8,
+      "startFace": 660,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 400,
+      "vertexCount": 8,
+      "startFace": 672,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 408,
+      "vertexCount": 8,
+      "startFace": 684,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 416,
+      "vertexCount": 12,
+      "startFace": 696,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 428,
+      "vertexCount": 8,
+      "startFace": 716,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 436,
+      "vertexCount": 8,
+      "startFace": 728,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 444,
+      "vertexCount": 8,
+      "startFace": 740,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 452,
+      "vertexCount": 12,
+      "startFace": 752,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 464,
+      "vertexCount": 8,
+      "startFace": 772,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 472,
+      "vertexCount": 8,
+      "startFace": 784,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 480,
+      "vertexCount": 8,
+      "startFace": 796,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 488,
+      "vertexCount": 12,
+      "startFace": 808,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 500,
+      "vertexCount": 8,
+      "startFace": 828,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 508,
+      "vertexCount": 8,
+      "startFace": 840,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 516,
+      "vertexCount": 8,
+      "startFace": 852,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 524,
+      "vertexCount": 12,
+      "startFace": 864,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 536,
+      "vertexCount": 8,
+      "startFace": 884,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 544,
+      "vertexCount": 8,
+      "startFace": 896,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 552,
+      "vertexCount": 8,
+      "startFace": 908,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 560,
+      "vertexCount": 8,
+      "startFace": 920,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 568,
+      "vertexCount": 8,
+      "startFace": 932,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 576,
+      "vertexCount": 8,
+      "startFace": 944,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 584,
+      "vertexCount": 120,
+      "startFace": 956,
+      "faceCount": 236
+    },
+    {
+      "startVertex": 704,
+      "vertexCount": 12,
+      "startFace": 1192,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 716,
+      "vertexCount": 8,
+      "startFace": 1212,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 724,
+      "vertexCount": 8,
+      "startFace": 1224,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 732,
+      "vertexCount": 8,
+      "startFace": 1236,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 740,
+      "vertexCount": 12,
+      "startFace": 1248,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 752,
+      "vertexCount": 8,
+      "startFace": 1268,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 760,
+      "vertexCount": 8,
+      "startFace": 1280,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 768,
+      "vertexCount": 8,
+      "startFace": 1292,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 776,
+      "vertexCount": 12,
+      "startFace": 1304,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 788,
+      "vertexCount": 8,
+      "startFace": 1324,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 796,
+      "vertexCount": 8,
+      "startFace": 1336,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 804,
+      "vertexCount": 8,
+      "startFace": 1348,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 812,
+      "vertexCount": 12,
+      "startFace": 1360,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 824,
+      "vertexCount": 8,
+      "startFace": 1380,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 832,
+      "vertexCount": 8,
+      "startFace": 1392,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 840,
+      "vertexCount": 8,
+      "startFace": 1404,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 848,
+      "vertexCount": 12,
+      "startFace": 1416,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 860,
+      "vertexCount": 8,
+      "startFace": 1436,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 868,
+      "vertexCount": 8,
+      "startFace": 1448,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 876,
+      "vertexCount": 8,
+      "startFace": 1460,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 884,
+      "vertexCount": 12,
+      "startFace": 1472,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 896,
+      "vertexCount": 8,
+      "startFace": 1492,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 904,
+      "vertexCount": 8,
+      "startFace": 1504,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 912,
+      "vertexCount": 8,
+      "startFace": 1516,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 920,
+      "vertexCount": 12,
+      "startFace": 1528,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 932,
+      "vertexCount": 8,
+      "startFace": 1548,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 940,
+      "vertexCount": 8,
+      "startFace": 1560,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 948,
+      "vertexCount": 8,
+      "startFace": 1572,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 956,
+      "vertexCount": 12,
+      "startFace": 1584,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 968,
+      "vertexCount": 8,
+      "startFace": 1604,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 976,
+      "vertexCount": 8,
+      "startFace": 1616,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 984,
+      "vertexCount": 8,
+      "startFace": 1628,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 992,
+      "vertexCount": 12,
+      "startFace": 1640,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 1004,
+      "vertexCount": 8,
+      "startFace": 1660,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1012,
+      "vertexCount": 8,
+      "startFace": 1672,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1020,
+      "vertexCount": 8,
+      "startFace": 1684,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1028,
+      "vertexCount": 12,
+      "startFace": 1696,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 1040,
+      "vertexCount": 8,
+      "startFace": 1716,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1048,
+      "vertexCount": 8,
+      "startFace": 1728,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1056,
+      "vertexCount": 8,
+      "startFace": 1740,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1064,
+      "vertexCount": 12,
+      "startFace": 1752,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 1076,
+      "vertexCount": 8,
+      "startFace": 1772,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1084,
+      "vertexCount": 8,
+      "startFace": 1784,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1092,
+      "vertexCount": 8,
+      "startFace": 1796,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1100,
+      "vertexCount": 12,
+      "startFace": 1808,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 1112,
+      "vertexCount": 8,
+      "startFace": 1828,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1120,
+      "vertexCount": 8,
+      "startFace": 1840,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1128,
+      "vertexCount": 8,
+      "startFace": 1852,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1136,
+      "vertexCount": 8,
+      "startFace": 1864,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1144,
+      "vertexCount": 8,
+      "startFace": 1876,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1152,
+      "vertexCount": 8,
+      "startFace": 1888,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1160,
+      "vertexCount": 8,
+      "startFace": 1900,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1168,
+      "vertexCount": 120,
+      "startFace": 1912,
+      "faceCount": 236
+    },
+    {
+      "startVertex": 1288,
+      "vertexCount": 12,
+      "startFace": 2148,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 1300,
+      "vertexCount": 8,
+      "startFace": 2168,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1308,
+      "vertexCount": 8,
+      "startFace": 2180,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1316,
+      "vertexCount": 8,
+      "startFace": 2192,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1324,
+      "vertexCount": 12,
+      "startFace": 2204,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 1336,
+      "vertexCount": 8,
+      "startFace": 2224,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1344,
+      "vertexCount": 8,
+      "startFace": 2236,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1352,
+      "vertexCount": 8,
+      "startFace": 2248,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1360,
+      "vertexCount": 12,
+      "startFace": 2260,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 1372,
+      "vertexCount": 8,
+      "startFace": 2280,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1380,
+      "vertexCount": 8,
+      "startFace": 2292,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1388,
+      "vertexCount": 8,
+      "startFace": 2304,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1396,
+      "vertexCount": 12,
+      "startFace": 2316,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 1408,
+      "vertexCount": 8,
+      "startFace": 2336,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1416,
+      "vertexCount": 8,
+      "startFace": 2348,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1424,
+      "vertexCount": 8,
+      "startFace": 2360,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1432,
+      "vertexCount": 12,
+      "startFace": 2372,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 1444,
+      "vertexCount": 8,
+      "startFace": 2392,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1452,
+      "vertexCount": 8,
+      "startFace": 2404,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1460,
+      "vertexCount": 8,
+      "startFace": 2416,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1468,
+      "vertexCount": 12,
+      "startFace": 2428,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 1480,
+      "vertexCount": 8,
+      "startFace": 2448,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1488,
+      "vertexCount": 8,
+      "startFace": 2460,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1496,
+      "vertexCount": 8,
+      "startFace": 2472,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1504,
+      "vertexCount": 12,
+      "startFace": 2484,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 1516,
+      "vertexCount": 8,
+      "startFace": 2504,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1524,
+      "vertexCount": 8,
+      "startFace": 2516,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1532,
+      "vertexCount": 8,
+      "startFace": 2528,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1540,
+      "vertexCount": 12,
+      "startFace": 2540,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 1552,
+      "vertexCount": 8,
+      "startFace": 2560,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1560,
+      "vertexCount": 8,
+      "startFace": 2572,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1568,
+      "vertexCount": 8,
+      "startFace": 2584,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1576,
+      "vertexCount": 12,
+      "startFace": 2596,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 1588,
+      "vertexCount": 8,
+      "startFace": 2616,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1596,
+      "vertexCount": 8,
+      "startFace": 2628,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1604,
+      "vertexCount": 8,
+      "startFace": 2640,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1612,
+      "vertexCount": 12,
+      "startFace": 2652,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 1624,
+      "vertexCount": 8,
+      "startFace": 2672,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1632,
+      "vertexCount": 8,
+      "startFace": 2684,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1640,
+      "vertexCount": 8,
+      "startFace": 2696,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1648,
+      "vertexCount": 12,
+      "startFace": 2708,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 1660,
+      "vertexCount": 8,
+      "startFace": 2728,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1668,
+      "vertexCount": 8,
+      "startFace": 2740,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1676,
+      "vertexCount": 8,
+      "startFace": 2752,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1684,
+      "vertexCount": 12,
+      "startFace": 2764,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 1696,
+      "vertexCount": 8,
+      "startFace": 2784,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1704,
+      "vertexCount": 8,
+      "startFace": 2796,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1712,
+      "vertexCount": 8,
+      "startFace": 2808,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1720,
+      "vertexCount": 8,
+      "startFace": 2820,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1728,
+      "vertexCount": 8,
+      "startFace": 2832,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1736,
+      "vertexCount": 120,
+      "startFace": 2844,
+      "faceCount": 236
+    },
+    {
+      "startVertex": 1856,
+      "vertexCount": 8,
+      "startFace": 3080,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1864,
+      "vertexCount": 8,
+      "startFace": 3092,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1872,
+      "vertexCount": 48,
+      "startFace": 3104,
+      "faceCount": 92
+    },
+    {
+      "startVertex": 1920,
+      "vertexCount": 48,
+      "startFace": 3196,
+      "faceCount": 92
+    },
+    {
+      "startVertex": 1968,
+      "vertexCount": 8,
+      "startFace": 3288,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 1976,
+      "vertexCount": 48,
+      "startFace": 3300,
+      "faceCount": 92
+    },
+    {
+      "startVertex": 2024,
+      "vertexCount": 48,
+      "startFace": 3392,
+      "faceCount": 92
+    },
+    {
+      "startVertex": 2072,
+      "vertexCount": 8,
+      "startFace": 3484,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 2080,
+      "vertexCount": 8,
+      "startFace": 3496,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 2088,
+      "vertexCount": 8,
+      "startFace": 3508,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 2096,
+      "vertexCount": 8,
+      "startFace": 3520,
+      "faceCount": 12
+    }
+  ],
+  "nativeCandidate": [
+    {
+      "startVertex": 0,
+      "vertexCount": 8,
+      "startFace": 0,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 8,
+      "vertexCount": 60,
+      "startFace": 12,
+      "faceCount": 116
+    },
+    {
+      "startVertex": 68,
+      "vertexCount": 12,
+      "startFace": 128,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 80,
+      "vertexCount": 12,
+      "startFace": 148,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 92,
+      "vertexCount": 12,
+      "startFace": 168,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 104,
+      "vertexCount": 12,
+      "startFace": 188,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 116,
+      "vertexCount": 8,
+      "startFace": 208,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 124,
+      "vertexCount": 60,
+      "startFace": 220,
+      "faceCount": 116
+    },
+    {
+      "startVertex": 184,
+      "vertexCount": 12,
+      "startFace": 336,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 196,
+      "vertexCount": 12,
+      "startFace": 356,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 208,
+      "vertexCount": 12,
+      "startFace": 376,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 220,
+      "vertexCount": 12,
+      "startFace": 396,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 232,
+      "vertexCount": 8,
+      "startFace": 416,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 240,
+      "vertexCount": 8,
+      "startFace": 428,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 248,
+      "vertexCount": 60,
+      "startFace": 440,
+      "faceCount": 116
+    },
+    {
+      "startVertex": 308,
+      "vertexCount": 12,
+      "startFace": 556,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 320,
+      "vertexCount": 12,
+      "startFace": 576,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 332,
+      "vertexCount": 12,
+      "startFace": 596,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 344,
+      "vertexCount": 12,
+      "startFace": 616,
+      "faceCount": 20
+    },
+    {
+      "startVertex": 356,
+      "vertexCount": 60,
+      "startFace": 636,
+      "faceCount": 116
+    },
+    {
+      "startVertex": 416,
+      "vertexCount": 8,
+      "startFace": 752,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 424,
+      "vertexCount": 8,
+      "startFace": 764,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 432,
+      "vertexCount": 24,
+      "startFace": 776,
+      "faceCount": 44
+    },
+    {
+      "startVertex": 456,
+      "vertexCount": 24,
+      "startFace": 820,
+      "faceCount": 44
+    },
+    {
+      "startVertex": 480,
+      "vertexCount": 8,
+      "startFace": 864,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 488,
+      "vertexCount": 24,
+      "startFace": 876,
+      "faceCount": 44
+    },
+    {
+      "startVertex": 512,
+      "vertexCount": 24,
+      "startFace": 920,
+      "faceCount": 44
+    },
+    {
+      "startVertex": 536,
+      "vertexCount": 8,
+      "startFace": 964,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 544,
+      "vertexCount": 8,
+      "startFace": 976,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 552,
+      "vertexCount": 8,
+      "startFace": 988,
+      "faceCount": 12
+    },
+    {
+      "startVertex": 560,
+      "vertexCount": 8,
+      "startFace": 1000,
+      "faceCount": 12
+    }
+  ]
+}

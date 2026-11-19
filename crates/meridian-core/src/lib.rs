@@ -8,6 +8,7 @@ pub mod equipment;
 mod flight;
 pub mod freight;
 pub mod goshawk;
+pub mod goshawk_mk2;
 pub mod mining;
 pub mod mule;
 pub mod navigation;

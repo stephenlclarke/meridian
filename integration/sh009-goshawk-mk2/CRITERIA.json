@@ -1,0 +1,37 @@
+{
+  "id": "SH009",
+  "status": "SOURCE_SHIELD_AND_STOCK_ENGINEERING_AUTHORED;OWNED_RUST_RUN_PENDING",
+  "originalSource": "assets/fleet/sh009/SOURCE-GEOMETRY.json",
+  "partition": "assets/fleet/sh009/SHIELD-PARTITION.json",
+  "sourceFixtures": "integration/sh009-goshawk-mk2/SH009-FIXTURES.json",
+  "airFixtureResults": "integration/sh009-goshawk-mk2/SH009-FIXTURE-RESULT.json",
+  "airSurfaceFit": "integration/sh009-goshawk-mk2/SH009-SURFACE-FIT.json",
+  "airSourceRun": {
+    "hostname": "SteveMBA",
+    "startUtc": "2026-11-19T07:13:09Z",
+    "finishUtc": "2026-11-19T07:13:13Z",
+    "fitStartUtc": "2026-11-19T07:13:10Z",
+    "membershipSha256": "09f51e2e53e4483f651573491d0bb985b7fe8ae3808988e970ebf822df5b0e53",
+    "fitSha256": "9a7930cf66b085d52c2490f9242b7f0ecc83df67215721a801d9a8d996190175",
+    "fixtureResultSha256": "20d23b43fd9d6ca54ea155b6e6977cf0773554edd9e72014b6207c75f0916f36"
+  },
+  "engineering": {
+    "dryMassKilograms": 33072,
+    "adoptedSection": "recommended",
+    "driveLiners": "Mass included in both intrinsic drives",
+    "splitEmptyInterfaceKilograms": [
+      70,
+      70
+    ],
+    "modelSha256": "b35cbf08f9075f1bb99b88a374e078fed3f34ad06d8463554d585452981e7ede",
+    "roleMapSha256": "a557a10c7325a250a27c6ffc3869ad7979992fe689911178b067d6609443cb7c",
+    "utilityAccessAndVolume": "UNVERIFIED"
+  },
+  "ownedRustTests": [
+    "goshawk_mk2_encloses_every_original_face_and_rejects_changed_source",
+    "goshawk_mk2_forebody_sweep_clears_but_original_arm_blocks_contact",
+    "goshawk_mk2_ventral_brackets_and_runners_leave_their_source_gap_clear",
+    "goshawk_mk2_original_sh028_crossing_clears_but_swept_lip_blocks",
+    "goshawk_mk2_carries_the_adopted_stock_tensor_and_split_interface"
+  ]
+}
