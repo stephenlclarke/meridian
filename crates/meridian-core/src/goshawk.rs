@@ -16,6 +16,44 @@ const VERTICES: &[u8] = include_bytes!("../../../assets/fleet/sh008/source.verti
 const MEMBERSHIP: &[u8] = include_bytes!("../../../assets/fleet/sh008/source-piece-membership.bin");
 const POINTS: usize = GOSHAWK_DETAILED_VERTICES + GOSHAWK_NATIVE_CANDIDATE_VERTICES;
 
+/// Adopted SH008 stock mass properties in the calibrated hull-local XYZ frame.
+/// The inertia tensor is about the centre of mass, with rows and columns ordered X, Y, Z.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct GoshawkEngineering {
+    pub dry_mass_kilograms: u32,
+    pub center_of_mass_metres: [f64; 3],
+    pub inertia_about_center_kg_m2: [[f64; 3]; 3],
+    pub proposal_sha256: &'static str,
+}
+
+// The two luminous recesses are included in drive mechanism mass.
+static STOCK_ENGINEERING: GoshawkEngineering = GoshawkEngineering {
+    dry_mass_kilograms: 33_719,
+    center_of_mass_metres: [
+        -0.000_013_111_041_307_319_17,
+        0.311_774_780_438_892_3,
+        -2.362_604_393_172_571,
+    ],
+    inertia_about_center_kg_m2: [
+        [
+            2_639_403.265_670_668,
+            3.492_783_872_195_644_3,
+            -14.617_110_010_104_89,
+        ],
+        [
+            3.492_783_872_195_644_3,
+            3_740_763.839_742_993_5,
+            76_566.515_830_687_48,
+        ],
+        [
+            -14.617_110_010_104_89,
+            76_566.515_830_687_48,
+            1_305_318.864_628_752_7,
+        ],
+    ],
+    proposal_sha256: "c086123c0e38c12189719bbbcb36120da8c3099e0e959f335520de2851eceb55",
+};
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct GoshawkHullSource {
     pieces: Arc<[SmoothPiece; GOSHAWK_PIECES]>,
@@ -60,6 +98,11 @@ impl GoshawkHullSource {
 
     pub fn pieces(&self) -> &Arc<[SmoothPiece; GOSHAWK_PIECES]> {
         &self.pieces
+    }
+
+    /// Stock mass properties of the authenticated SH008 hull.
+    pub fn engineering(&self) -> &'static GoshawkEngineering {
+        &STOCK_ENGINEERING
     }
 
     /// Clearance requires a strict separating certificate for every piece and triangle.

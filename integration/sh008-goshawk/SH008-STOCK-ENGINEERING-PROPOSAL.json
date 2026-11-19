@@ -1,0 +1,876 @@
+{
+  "hull": "SH008 Goshawk Explorer",
+  "status": "New calculated engineering proposal for human review. These values remain unadopted.",
+  "roleMap": {
+    "path": "SH008-PROPOSED-ROLE-AND-MOUNT-MAP.json",
+    "sha256": "5124a2e67d2912948730bd660abdc7061746eacadaa65bbc2973fb03cff8ca4e"
+  },
+  "calculation": {
+    "path": "compute_sh008_proposal.py",
+    "sha256": "eaa9c2e7484aa8150ba969e4bde82fb666c7528308aeec1b96510341886659f1"
+  },
+  "geometryFrame": "Calibrated original hull-local XYZ with original origin, +Y up and +Z forward. Tensor rows and columns are X, Y, Z.",
+  "method": "Uniform surface stock plus point-lumped empty hardware. Analytic surface moments were cross-checked against a quadratic-exact three-point rule about the centre of mass. Round up once with the reserve at COM.",
+  "concreteDesignChoices": {
+    "stock": "Count the original opaque assembly shells, including all well liners and baffles, separately where they overlap.",
+    "glazing": "Only the isolated cockpit shell receives glazing stock. Its attached crossmember is separate opaque stock.",
+    "driveRecess": "Baseline charges the two luminous recesses to the already budgeted drive mechanisms. The sensitivity shows the effect of adding these as separately charged opaque liner stock.",
+    "mounts": "Two rear casing-centred drives, one cockpit controls unit, and six point masses within the original central pressure body. Four separate proposed empty utility positions are accounted for by the single 140 kg equipment interface."
+  },
+  "baseline": {
+    "arealKgPerSquareMetreByRole": {
+      "structural": 14,
+      "glazing": 5,
+      "intrinsic_drive_recess": 0
+    },
+    "stockMassKg": 30358.707338690467,
+    "hardwareMassKg": 3360,
+    "unroundedDryMassKg": 33718.70733869047,
+    "dryMassKg": 33719,
+    "roundingReserveKg": 0.29266130953328684,
+    "roundingReserveLocationMetres": [
+      -1.311104130731917e-05,
+      0.3117747804388923,
+      -2.362604393172571
+    ],
+    "centreOfMassOffsetMetres": [
+      -1.311104130731917e-05,
+      0.3117747804388923,
+      -2.362604393172571
+    ],
+    "inertiaAboutComKgM2": [
+      [
+        2639403.265670668,
+        3.4927838721956443,
+        -14.61711001010489
+      ],
+      [
+        3.4927838721956443,
+        3740763.8397429935,
+        76566.51583068748
+      ],
+      [
+        -14.61711001010489,
+        76566.51583068748,
+        1305318.8646287527
+      ]
+    ],
+    "inertiaAboutSourceOriginIncludingReserveKgM2": [
+      [
+        2830896.9408186814,
+        3.6306167595837424,
+        -15.661596625758548
+      ],
+      [
+        3.6306167595837424,
+        3928979.9096177556,
+        101403.94694189841
+      ],
+      [
+        -15.661596625758548,
+        101403.94694189841,
+        1308596.4699135968
+      ]
+    ],
+    "positiveLeadingPrincipalMinors": [
+      2639403.265670668,
+      9873384294708.205,
+      1.2872441456364208e+19
+    ],
+    "directCentredQuadratureMaxMatrixAbsoluteErrorKgM2": 4.656612873077393e-10
+  },
+  "alternateSeparatelyChargedDriveLiners": {
+    "arealKgPerSquareMetreByRole": {
+      "structural": 14,
+      "glazing": 5,
+      "intrinsic_drive_recess": 14
+    },
+    "stockMassKg": 30819.81597096241,
+    "hardwareMassKg": 3360,
+    "unroundedDryMassKg": 34179.81597096241,
+    "dryMassKg": 34180,
+    "roundingReserveKg": 0.18402903759124456,
+    "roundingReserveLocationMetres": [
+      -1.2934164570169102e-05,
+      0.3075687296308014,
+      -2.5597362699539055
+    ],
+    "centreOfMassOffsetMetres": [
+      -1.2934164570169102e-05,
+      0.3075687296308014,
+      -2.5597362699539055
+    ],
+    "inertiaAboutComKgM2": [
+      [
+        2736879.1545966268,
+        3.494643314113529,
+        -14.529960498192168
+      ],
+      [
+        3.494643314113529,
+        3868674.3876503315,
+        74494.13886951198
+      ],
+      [
+        -14.529960498192168,
+        74494.13886951198,
+        1336442.8262514675
+      ]
+    ],
+    "inertiaAboutSourceOriginIncludingReserveKgM2": [
+      [
+        2964068.4293253403,
+        3.6306162953685615,
+        -15.661593653064791
+      ],
+      [
+        3.6306162953685615,
+        4092630.2848533546,
+        101403.87625255181
+      ],
+      [
+        -15.661593653064791,
+        101403.87625255181,
+        1339676.2037885939
+      ]
+    ],
+    "positiveLeadingPrincipalMinors": [
+      2736879.1545966268,
+      10588094287469.85,
+      1.4135194679856759e+19
+    ],
+    "directCentredQuadratureMaxMatrixAbsoluteErrorKgM2": 9.313225746154785e-10
+  },
+  "hardwareMounts": [
+    {
+      "assembly": "Left intrinsic propulsion mechanism",
+      "massKg": 900,
+      "piece": 64,
+      "anchorMetres": [
+        -8.130136646590934,
+        0.0,
+        -15.501719874002331
+      ]
+    },
+    {
+      "assembly": "Right intrinsic propulsion mechanism",
+      "massKg": 900,
+      "piece": 67,
+      "anchorMetres": [
+        8.130136646590934,
+        0.0,
+        -15.501719874002331
+      ]
+    },
+    {
+      "assembly": "Electrical plant",
+      "massKg": 750,
+      "piece": 42,
+      "anchorMetres": [
+        0.0,
+        1.6532574520579653,
+        -10.354837674430817
+      ]
+    },
+    {
+      "assembly": "Empty tank and plumbing",
+      "massKg": 180,
+      "piece": 42,
+      "anchorMetres": [
+        0.0,
+        1.6532574520579653,
+        -4.870690954639478
+      ]
+    },
+    {
+      "assembly": "Left empty intrinsic life-support and quarters hardware",
+      "massKg": 120,
+      "piece": 42,
+      "anchorMetres": [
+        -1.2209792535639854,
+        1.6532574520579653,
+        0.6134557651518614
+      ]
+    },
+    {
+      "assembly": "Right empty intrinsic life-support and quarters hardware",
+      "massKg": 120,
+      "piece": 42,
+      "anchorMetres": [
+        1.2209792535639854,
+        1.6532574520579653,
+        0.6134557651518614
+      ]
+    },
+    {
+      "assembly": "Controls and sensors",
+      "massKg": 90,
+      "piece": 62,
+      "anchorMetres": [
+        0.0,
+        5.348774109599299,
+        1.2448056109612915
+      ]
+    },
+    {
+      "assembly": "Empty equipment interface",
+      "massKg": 140,
+      "piece": 42,
+      "anchorMetres": [
+        0.0,
+        1.6532574520579653,
+        2.8658731679233043
+      ]
+    },
+    {
+      "assembly": "Empty launcher and magazine assembly",
+      "massKg": 160,
+      "piece": 42,
+      "anchorMetres": [
+        0.0,
+        1.6532574520579653,
+        5.1182905706947475
+      ]
+    }
+  ],
+  "utilityPositions": [
+    {
+      "name": "Mid body left utility interface",
+      "piece": 42,
+      "anchorMetres": [
+        -1.8314688803459782,
+        1.6532574520579653,
+        0.6134557651518614
+      ]
+    },
+    {
+      "name": "Mid body right utility interface",
+      "piece": 42,
+      "anchorMetres": [
+        1.8314688803459782,
+        1.6532574520579653,
+        0.6134557651518614
+      ]
+    },
+    {
+      "name": "Forward body left utility interface",
+      "piece": 42,
+      "anchorMetres": [
+        -1.083126757193858,
+        1.6532574520579653,
+        5.1182905706947475
+      ]
+    },
+    {
+      "name": "Forward body right utility interface",
+      "piece": 42,
+      "anchorMetres": [
+        1.083126757193858,
+        1.6532574520579653,
+        5.1182905706947475
+      ]
+    }
+  ],
+  "stockRoleSummary": {
+    "structural": {
+      "assemblies": 54,
+      "faces": 3064,
+      "areaSquareMetres": 2148.897994605024,
+      "baselineStockMassKg": 30084.571924470336
+    },
+    "glazing": {
+      "assemblies": 1,
+      "faces": 236,
+      "areaSquareMetres": 54.82708284402548,
+      "baselineStockMassKg": 274.1354142201274
+    },
+    "intrinsic_drive_recess": {
+      "assemblies": 2,
+      "faces": 184,
+      "areaSquareMetres": 32.93633087656738,
+      "baselineStockMassKg": 0.0
+    }
+  },
+  "sourceChecks": {
+    "positiveAreaDetailedTriangles": 3484,
+    "minimumDetailedTriangleAreaSquareMetres": 0.0012136613499023978,
+    "duplicateIndexTriangles": 0,
+    "duplicatePositionTriangles": 0,
+    "quadratureNodes": 10452,
+    "axesAndCalibratedDetailedPositionsExactlyMatchStagedSource": true,
+    "faceOrderAndMembershipMatchTheAuthenticatedSource": true
+  },
+  "pieceAreaSquareMetres": [
+    {
+      "piece": 0,
+      "component": "left-rail",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        0,
+        12
+      ],
+      "areaSquareMetres": 315.11865984406404
+    },
+    {
+      "piece": 1,
+      "component": "left-drive-arm",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        12,
+        248
+      ],
+      "areaSquareMetres": 111.95218800972775
+    },
+    {
+      "piece": 2,
+      "component": "left-detailed-well-0",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        248,
+        304
+      ],
+      "areaSquareMetres": 10.349806576385738
+    },
+    {
+      "piece": 3,
+      "component": "left-detailed-well-1",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        304,
+        360
+      ],
+      "areaSquareMetres": 10.349765833292247
+    },
+    {
+      "piece": 4,
+      "component": "left-detailed-well-2",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        360,
+        416
+      ],
+      "areaSquareMetres": 10.349734834387371
+    },
+    {
+      "piece": 5,
+      "component": "left-detailed-well-3",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        416,
+        472
+      ],
+      "areaSquareMetres": 10.349738793900823
+    },
+    {
+      "piece": 6,
+      "component": "left-detailed-well-4",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        472,
+        528
+      ],
+      "areaSquareMetres": 10.349798980141262
+    },
+    {
+      "piece": 7,
+      "component": "left-detailed-well-5",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        528,
+        584
+      ],
+      "areaSquareMetres": 10.349838045395218
+    },
+    {
+      "piece": 8,
+      "component": "left-detailed-well-6",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        584,
+        640
+      ],
+      "areaSquareMetres": 10.349683276756773
+    },
+    {
+      "piece": 9,
+      "component": "left-detailed-well-7",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        640,
+        696
+      ],
+      "areaSquareMetres": 10.349744564763062
+    },
+    {
+      "piece": 10,
+      "component": "left-detailed-well-8",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        696,
+        752
+      ],
+      "areaSquareMetres": 10.349761766743216
+    },
+    {
+      "piece": 11,
+      "component": "left-detailed-well-9",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        752,
+        808
+      ],
+      "areaSquareMetres": 10.349772583433836
+    },
+    {
+      "piece": 12,
+      "component": "left-detailed-well-10",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        808,
+        864
+      ],
+      "areaSquareMetres": 10.349737896236983
+    },
+    {
+      "piece": 13,
+      "component": "left-detailed-well-11",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        864,
+        920
+      ],
+      "areaSquareMetres": 10.349757916295461
+    },
+    {
+      "piece": 18,
+      "component": "left-strut-0",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        920,
+        932
+      ],
+      "areaSquareMetres": 1.7432336352158055
+    },
+    {
+      "piece": 19,
+      "component": "left-strut-1",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        932,
+        944
+      ],
+      "areaSquareMetres": 1.7432336352158067
+    },
+    {
+      "piece": 20,
+      "component": "right-rail",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        944,
+        956
+      ],
+      "areaSquareMetres": 315.11865984406404
+    },
+    {
+      "piece": 21,
+      "component": "right-drive-arm",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        956,
+        1192
+      ],
+      "areaSquareMetres": 111.95218800972775
+    },
+    {
+      "piece": 22,
+      "component": "right-detailed-well-0",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        1192,
+        1248
+      ],
+      "areaSquareMetres": 10.349806576385731
+    },
+    {
+      "piece": 23,
+      "component": "right-detailed-well-1",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        1248,
+        1304
+      ],
+      "areaSquareMetres": 10.349765833292249
+    },
+    {
+      "piece": 24,
+      "component": "right-detailed-well-2",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        1304,
+        1360
+      ],
+      "areaSquareMetres": 10.349734834387373
+    },
+    {
+      "piece": 25,
+      "component": "right-detailed-well-3",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        1360,
+        1416
+      ],
+      "areaSquareMetres": 10.349738793900826
+    },
+    {
+      "piece": 26,
+      "component": "right-detailed-well-4",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        1416,
+        1472
+      ],
+      "areaSquareMetres": 10.349798980141268
+    },
+    {
+      "piece": 27,
+      "component": "right-detailed-well-5",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        1472,
+        1528
+      ],
+      "areaSquareMetres": 10.349838045395218
+    },
+    {
+      "piece": 28,
+      "component": "right-detailed-well-6",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        1528,
+        1584
+      ],
+      "areaSquareMetres": 10.349683276756773
+    },
+    {
+      "piece": 29,
+      "component": "right-detailed-well-7",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        1584,
+        1640
+      ],
+      "areaSquareMetres": 10.349744564763066
+    },
+    {
+      "piece": 30,
+      "component": "right-detailed-well-8",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        1640,
+        1696
+      ],
+      "areaSquareMetres": 10.349761766743223
+    },
+    {
+      "piece": 31,
+      "component": "right-detailed-well-9",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        1696,
+        1752
+      ],
+      "areaSquareMetres": 10.34977258343384
+    },
+    {
+      "piece": 32,
+      "component": "right-detailed-well-10",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        1752,
+        1808
+      ],
+      "areaSquareMetres": 10.349737896236984
+    },
+    {
+      "piece": 33,
+      "component": "right-detailed-well-11",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        1808,
+        1864
+      ],
+      "areaSquareMetres": 10.349757916295461
+    },
+    {
+      "piece": 38,
+      "component": "right-strut-0",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        1864,
+        1876
+      ],
+      "areaSquareMetres": 1.7432336352157964
+    },
+    {
+      "piece": 39,
+      "component": "right-strut-1",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        1876,
+        1888
+      ],
+      "areaSquareMetres": 1.7432336352157976
+    },
+    {
+      "piece": 40,
+      "component": "fore-crossbrace",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        1888,
+        1900
+      ],
+      "areaSquareMetres": 154.80656160300754
+    },
+    {
+      "piece": 41,
+      "component": "aft-crossbrace",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        1900,
+        1912
+      ],
+      "areaSquareMetres": 133.95812287975605
+    },
+    {
+      "piece": 42,
+      "component": "primary-body",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        1912,
+        2148
+      ],
+      "areaSquareMetres": 266.3173349038261
+    },
+    {
+      "piece": 43,
+      "component": "detailed-body-well-0",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        2148,
+        2204
+      ],
+      "areaSquareMetres": 20.030082037818676
+    },
+    {
+      "piece": 44,
+      "component": "detailed-body-well-1",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        2204,
+        2260
+      ],
+      "areaSquareMetres": 20.029986057084127
+    },
+    {
+      "piece": 45,
+      "component": "detailed-body-well-2",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        2260,
+        2316
+      ],
+      "areaSquareMetres": 20.03009612515767
+    },
+    {
+      "piece": 46,
+      "component": "detailed-body-well-3",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        2316,
+        2372
+      ],
+      "areaSquareMetres": 20.0300829716022
+    },
+    {
+      "piece": 47,
+      "component": "detailed-body-well-4",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        2372,
+        2428
+      ],
+      "areaSquareMetres": 20.030025786105092
+    },
+    {
+      "piece": 48,
+      "component": "detailed-body-well-5",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        2428,
+        2484
+      ],
+      "areaSquareMetres": 20.029978295081573
+    },
+    {
+      "piece": 49,
+      "component": "detailed-body-well-6",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        2484,
+        2540
+      ],
+      "areaSquareMetres": 20.030025455983207
+    },
+    {
+      "piece": 50,
+      "component": "detailed-body-well-7",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        2540,
+        2596
+      ],
+      "areaSquareMetres": 20.030065958534934
+    },
+    {
+      "piece": 51,
+      "component": "detailed-body-well-8",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        2596,
+        2652
+      ],
+      "areaSquareMetres": 20.03005794395784
+    },
+    {
+      "piece": 52,
+      "component": "detailed-body-well-9",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        2652,
+        2708
+      ],
+      "areaSquareMetres": 20.03005397714903
+    },
+    {
+      "piece": 53,
+      "component": "detailed-body-well-10",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        2708,
+        2764
+      ],
+      "areaSquareMetres": 20.030018076955358
+    },
+    {
+      "piece": 54,
+      "component": "detailed-body-well-11",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        2764,
+        2820
+      ],
+      "areaSquareMetres": 20.030038480899925
+    },
+    {
+      "piece": 59,
+      "component": "upper-body-strut",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        2820,
+        2832
+      ],
+      "areaSquareMetres": 3.4898720236253906
+    },
+    {
+      "piece": 60,
+      "component": "lower-body-strut",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        2832,
+        2844
+      ],
+      "areaSquareMetres": 3.4898720236253884
+    },
+    {
+      "piece": 61,
+      "component": "cockpit",
+      "proposedRole": "glazing",
+      "detailedFaces": [
+        2844,
+        3080
+      ],
+      "areaSquareMetres": 54.82708284402548
+    },
+    {
+      "piece": 62,
+      "component": "cockpit-crossmember",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        3080,
+        3092
+      ],
+      "areaSquareMetres": 3.4227227245258245
+    },
+    {
+      "piece": 63,
+      "component": "left-engine-support",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        3092,
+        3104
+      ],
+      "areaSquareMetres": 40.52434344303193
+    },
+    {
+      "piece": 64,
+      "component": "left-engine-casing",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        3104,
+        3196
+      ],
+      "areaSquareMetres": 76.24769900517676
+    },
+    {
+      "piece": 65,
+      "component": "left-engine-recess",
+      "proposedRole": "intrinsic_drive_recess",
+      "detailedFaces": [
+        3196,
+        3288
+      ],
+      "areaSquareMetres": 16.468165438283688
+    },
+    {
+      "piece": 66,
+      "component": "right-engine-support",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        3288,
+        3300
+      ],
+      "areaSquareMetres": 40.52434344303193
+    },
+    {
+      "piece": 67,
+      "component": "right-engine-casing",
+      "proposedRole": "structural",
+      "detailedFaces": [
+        3300,
+        3392
+      ],
+      "areaSquareMetres": 76.24769900517676
+    },
+    {
+      "piece": 68,
+      "component": "right-engine-recess",
+      "proposedRole": "intrinsic_drive_recess",
+      "detailedFaces": [
+        3392,
+        3484
+      ],
+      "areaSquareMetres": 16.46816543828369
+    }
+  ],
+  "scope": "Numerical source-only prototype. Hardware volumes, fit and clearance, native collision, ordinary World insertion, and gameplay are outside this result."
+}
