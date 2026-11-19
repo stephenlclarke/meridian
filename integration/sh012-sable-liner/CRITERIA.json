@@ -52,5 +52,12 @@
   "legacyMetreAuthority": {
     "Sources/L337Core/OriginalSableLinerActivation.swift": "82a89da7d0a45b9a54a3b3f75c6ae18c5cbb8f1d8377840831b0bc259fb93fa0",
     "Sources/L337Core/OriginalHullPhysicalContract.swift": "2c68d8d51acdd469faa25124bcc19027aec1a8f747eb267da2e84e5a98e3c027"
+  },
+  "independentReplay": {
+    "airPacketSha256": "1badc72e88ba261dce618a1dc9f0d8fad7638517a6e0f6a1e15b0f4cb9f78e73",
+    "adapters": {
+      "tools/measure_sable_liner_air.py": "9c696b58e59e12407ddeb59c5ec4eee798ca068eeef1a214fa499c050685f4a6",
+      "tools/compare_sable_originals.py": "781fb0904e2cb1b8e58ae925500f61eda9499e2f7eb01ee2c4705a272befdb42"
+    }
   }
 }

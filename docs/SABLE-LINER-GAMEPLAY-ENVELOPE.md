@@ -58,3 +58,17 @@ cargo test --locked -p meridian-core sable_liner::tests:: -- --nocapture
 The three Rust regressions exercise seam coverage, the opening and native
 station contact. The source work leaves the stock mass and inertia decision,
 ordinary insertion and native drawing to their respective owners.
+
+## Reproducing the surface measurements
+
+With the packages in `tools/requirements-goshawk-surface-fit.txt` installed,
+run the two original Air adapters from the repository root. The criteria
+record binds both adapters and their original evidence archive.
+
+```bash
+audit_dir=$(mktemp -d)
+python3 -B tools/measure_sable_liner_air.py > "$audit_dir/SURFACE-FIT.json"
+python3 -B tools/compare_sable_originals.py > "$audit_dir/ORIGINAL-DIFFERENCE.json"
+cmp "$audit_dir/SURFACE-FIT.json" integration/sh012-sable-liner/SURFACE-FIT.json
+cmp "$audit_dir/ORIGINAL-DIFFERENCE.json" integration/sh012-sable-liner/ORIGINAL-DIFFERENCE.json
+```

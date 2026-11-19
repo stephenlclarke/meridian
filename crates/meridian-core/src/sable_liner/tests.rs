@@ -35,6 +35,15 @@ fn sable_liner_all_original_faces_keep_a_complete_piece_at_ring_seams() -> Resul
             (a.z + b.z + c.z) / 3.0,
         )));
     }
+    let mut changed_vertices = VERTICES.to_vec();
+    changed_vertices[16] ^= 1;
+    let explorer = include_bytes!("../../../../assets/fleet/sh008/source.vertices");
+    for invalid in [changed_vertices.as_slice(), explorer.as_slice()] {
+        assert_eq!(
+            SableLinerHullSource::from_bytes(invalid, INDICES),
+            Err(EnvelopeError::ChangedSource)
+        );
+    }
     let mut changed = INDICES.to_vec();
     changed[20] ^= 1;
     assert_eq!(

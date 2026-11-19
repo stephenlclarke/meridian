@@ -1,5 +1,7 @@
 """Independent verification for both immutable SH012 geometry and prepared visual data."""
 import contextlib
+import hashlib
+import math
 from io import StringIO
 from pathlib import Path
 import json
@@ -36,14 +38,26 @@ class SableLinerSourceTests(unittest.TestCase):
                 staged['faces'], staged['faceTextures'], staged['faceMaterials'], strict=True):
             material = staged['materials'][material_index]
             color = tuple((material['colour'] >> shift & 255) / 255 for shift in (24, 16, 8, 0))
+            a, b, c = (staged['vertices'][i] for i in face)
+            ab = [y - x for x, y in zip(a, b, strict=True)]
+            ac = [y - x for x, y in zip(a, c, strict=True)]
+            cross = [ab[(i+1)%3] * ac[(i+2)%3] - ac[(i+1)%3] * ab[(i+2)%3] for i in range(3)]
+            normal = f32([x / math.hypot(*cross) for x in cross])
             for vertex, uv in zip(face, mapping['uv'], strict=True):
                 row = next(records)
                 self.assertEqual(row[:3], f32(staged['vertices'][vertex]))
+                self.assertEqual(row[3:6], normal)
                 self.assertEqual(row[6:12], f32((*color, *uv)))
                 self.assertEqual(row[12:], (mapping['texture'] & 0xffff_ffff, int(material['emissive'])))
             untextured += int(mapping['texture'] == -1)
         self.assertEqual(untextured, 1240)
         self.assertIsNone(next(records, None))
+        root = Path(__file__).resolve().parents[1]
+        criteria = json.loads((root / 'integration/sh012-sable-liner/CRITERIA.json').read_text())
+        maps = criteria['visual']['sharedOriginalTextures']
+        self.assertEqual(len(maps), 3)
+        for path, pin in maps.items():
+            self.assertEqual(hashlib.sha256((root / path).read_bytes()).hexdigest(), pin['sha256'])
 
     def test_cli_refuses_rewritten_outputs_and_originals(self):
         with tempfile.TemporaryDirectory() as d, contextlib.redirect_stdout(StringIO()):
