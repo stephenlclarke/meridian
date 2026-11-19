@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { canExport, editableDefinition, fitScene, inputNumber, meshGeometry, rotatePoint, sceneFor, updatedParameter } from './geometry.js';
+import { autoGroups, canExport, editableDefinition, fitScene, groupIds, inputNumber, mergeGroups, meshGeometry, rotatePoint, sceneFor, updatedParameter } from './geometry.js';
 
 const definition = {
   schema: 1, id: 'example', name: 'Example hull', metresPerUnit: 2, roundingMetres: 0.01,
@@ -75,4 +75,27 @@ test('orbit preserves length and fit uses actual world coordinates', () => {
   assert.equal(fit.empty, false);
   assert.ok(fit.radius > 0);
   assert.ok(fit.center[0] > 0);
+});
+
+test('report support groups and measured nearest point are used in metres', () => {
+  const report = { supportGroups: [{ points: [[1, 2, 3], ['bad', 0, 0]] }, { points: [[2, 3, 4]] }], fit: { maxMetres: 0.5, point: [0, 0, 0], nearestPoint: [0.5, 0, 0] } };
+  const scene = sceneFor(definition, report);
+  assert.deepEqual(scene.supportPoints, [[1, 2, 3], [2, 3, 4]]);
+  assert.deepEqual(scene.gap, { point: [0, 0, 0], nearestPoint: [0.5, 0, 0], metres: 0.5 });
+});
+
+test('intentional group merge uses shared IDs across both meshes and leaves source arrays unchanged', () => {
+  const original = { ...definition, native: { ...definition.native, groups: [7, 8, 9] } };
+  assert.deepEqual(groupIds(original), [7, 8, 9]);
+  const merged = mergeGroups(original, 7, 8);
+  assert.deepEqual(merged.detail.groups, [8, 8, 8]);
+  assert.deepEqual(merged.native.groups, [8, 8, 9]);
+  assert.deepEqual(original.detail.groups, [7, 7, 7]);
+  assert.equal(merged.detail.vertices, original.detail.vertices);
+  assert.equal(mergeGroups(original, 99, 8), original);
+  const automatic = autoGroups(merged);
+  assert.equal(groupIds(automatic), null);
+  assert.equal(Object.hasOwn(automatic.detail, 'groups'), false);
+  assert.equal(Object.hasOwn(automatic.native, 'groups'), false);
+  assert.equal(automatic.provenance, original.provenance);
 });

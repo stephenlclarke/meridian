@@ -1,4 +1,4 @@
-import { canExport, editableDefinition, inputNumber, isRecord, isVector, updatedParameter } from './geometry.js';
+import { autoGroups, canExport, editableDefinition, groupIds, inputNumber, isRecord, isVector, mergeGroups, updatedParameter } from './geometry.js';
 import { HullViewer } from './viewer.js';
 
 const $ = id => document.getElementById(id);
@@ -6,6 +6,7 @@ const viewer = new HullViewer($('hull-canvas'), $('geometry-notice'));
 const state = { definition: null, revision: 0, build: null, mesh: 'detail', dirty: false, job: null, error: null, status: 'Loading example…', tone: 'busy' };
 const fields = [['hull-id', 'id', false], ['hull-name', 'name', false], ['scale', 'metresPerUnit', true], ['rounding', 'roundingMetres', true], ['speed', 'maxSpeed', true]];
 let lastScene = [];
+let groupHistory = [];
 
 const numberText = value => Number.isFinite(value) ? value.toLocaleString('en-US', { maximumFractionDigits: 8 }) : '—';
 const text = (id, value) => { $(id).textContent = value; };
@@ -33,6 +34,7 @@ function jobCurrent(job) { return state.job === job && state.revision === job.re
 
 function setDefinition(definition, status, dirty = true) {
   cancelJob();
+  groupHistory = [];
   state.definition = editableDefinition(definition);
   state.revision++;
   state.build = null;
@@ -47,12 +49,47 @@ function setDefinition(definition, status, dirty = true) {
 function editParameter(field, value) {
   if (!state.definition || fieldValue(state.definition, field) === value) return;
   cancelJob();
+  groupHistory = [];
   state.definition = updatedParameter(state.definition, field, value);
   state.revision++;
   state.build = null;
   state.error = null;
   state.dirty = true;
   state.status = 'Definition changed · build required';
+  state.tone = 'stale';
+  render(false);
+}
+
+function renderGroups(definition) {
+  const ids = groupIds(definition);
+  const previous = [$('group-source').value, $('group-target').value];
+  for (const [index, key] of ['group-source', 'group-target'].entries()) {
+    const select = $(key);
+    select.replaceChildren(...(ids ?? []).map(id => new Option(`Group ${id}`, String(id))));
+    select.disabled = !ids || ids.length < 2;
+    if (ids?.includes(Number(previous[index])) && previous[index] !== '') select.value = previous[index];
+    else if (ids?.length > index) select.value = String(ids[index]);
+  }
+  text('group-summary', !definition ? 'No groups loaded.' : ids === null ? 'Auto / unset · build to assign components' : `${ids.length} authored ${ids.length === 1 ? 'group' : 'groups'} across both meshes`);
+  $('auto-groups').disabled = !definition || !['detail', 'native'].some(key => Object.hasOwn(definition[key] ?? {}, 'groups'));
+  $('undo-groups').disabled = !groupHistory.length;
+  updateMergeButton();
+}
+
+function updateMergeButton() {
+  $('merge-groups').disabled = $('group-source').disabled || $('group-source').value === $('group-target').value;
+}
+
+function changeGroups(next, status, undo = false) {
+  if (next === state.definition) return;
+  cancelJob();
+  if (!undo) groupHistory.push(state.definition);
+  state.definition = next;
+  state.revision++;
+  state.build = null;
+  state.error = null;
+  state.dirty = true;
+  state.status = status;
   state.tone = 'stale';
   render(false);
 }
@@ -96,6 +133,7 @@ function diagnostic(value, tone = 'info') {
 function renderDiagnostics(report, definition) {
   const list = $('diagnostics-list');
   const items = Array.isArray(report?.diagnostics) ? report.diagnostics.map(item => diagnostic(item, report.valid === false ? 'warning' : 'info')) : [];
+  if (typeof report?.viewWarning === 'string') items.push(diagnostic(report.viewWarning, 'warning'));
   if (state.error && !items.some(item => item.message === state.error)) items.unshift(diagnostic(state.error, 'error'));
   if (state.job?.kind === 'build') items.unshift(diagnostic('Building and validating the current source…'));
   else if (!report && !state.error) {
@@ -125,29 +163,32 @@ function renderReport(build, definition) {
   text('report-status-text', building ? 'Building / Validating…' : valid ? 'Built / Validated' : report?.valid === false ? 'Validation failed' : report ? 'Not validated' : 'Not built / Not validated');
   const groups = report?.sourceGroups ?? report?.sourceGroupCount ?? countGroups([build?.package?.detail ?? definition?.detail, build?.package?.native ?? definition?.native]);
   text('source-groups', Number.isFinite(groups) ? numberText(groups) : definition ? 'Auto / unset' : '—');
-  const envelopeGroups = report?.envelopeGroups ?? report?.envelopeGroupCount ?? report?.envelope?.groupCount;
+  const envelopeGroups = report?.envelopeGroups ?? report?.envelopeGroupCount ?? report?.envelope?.groupCount ?? (Array.isArray(report?.supportGroups) ? report.supportGroups.length : null);
   text('envelope-groups', Number.isFinite(envelopeGroups) ? numberText(envelopeGroups) : '—');
   const gap = report?.fit?.maxMetres;
   const measured = Number.isFinite(gap) && gap >= 0;
-  text('maximum-gap', measured ? `${numberText(gap)} m` : 'Not measured');
+  text('maximum-gap', measured ? `${gap.toFixed(3)} m` : 'Not measured');
   const details = [];
   if (measured && typeof report.fit.method === 'string') details.push(report.fit.method);
+  if (Number.isFinite(report?.fit?.upperBoundMetres)) details.push(`Verified upper bound ${numberText(report.fit.upperBoundMetres)} m`);
+  if (Number.isFinite(report?.fit?.samples)) details.push(`${numberText(report.fit.samples)} samples`);
   if (measured && !isVector(report.fit.point)) details.push('No measured point supplied.');
   $('gap-note').hidden = !details.length;
   text('gap-note', details.join(' · '));
   const clearances = Array.isArray(report?.clearances) ? report.clearances : null;
+  const listedClearances = clearances ?? (Array.isArray(definition?.clearances) ? definition.clearances : []);
   const expected = Array.isArray(definition?.clearances) ? definition.clearances.length : 0;
   text('clearance-checks', clearances ? `${clearances.filter(item => item?.passed === true).length} / ${clearances.length}` : expected ? `— / ${expected}` : '—');
   const results = $('clearance-result-list');
   results.replaceChildren();
-  $('clearance-results').hidden = !clearances?.length;
-  for (const [index, item] of (clearances ?? []).entries()) {
+  $('clearance-results').hidden = !listedClearances.length;
+  for (const [index, item] of listedClearances.entries()) {
     const li = document.createElement('li');
     const name = document.createElement('span');
     name.textContent = typeof item?.name === 'string' ? item.name : `Path ${index + 1}`;
     const result = document.createElement('span');
     result.className = item?.passed === true ? 'passed' : item?.passed === false ? 'failed' : 'unknown';
-    result.textContent = item?.passed === true ? 'Pass' : item?.passed === false ? 'Fail' : 'Unknown';
+    result.textContent = clearances ? item?.passed === true ? 'Pass' : item?.passed === false ? 'Fail' : 'Unknown' : 'Unchecked';
     li.append(name, result);
     results.append(li);
   }
@@ -182,10 +223,12 @@ function render(syncFields = true) {
   text('material-summary', Array.isArray(definition?.materials) ? numberText(definition.materials.length) : '—');
   text('clearance-summary', Array.isArray(definition?.clearances) ? numberText(definition.clearances.length) : '—');
   renderMaterials(definition);
+  renderGroups(definition);
   $('save-button').disabled = !definition;
   $('build-button').disabled = !definition || Boolean(state.job);
   $('export-button').disabled = !canExport(definition, build, state.revision) || Boolean(state.job);
   $('load-example').disabled = state.job?.kind === 'example';
+  $('quit-button').disabled = Boolean(state.job);
   text('schema-status', definition?.schema == null ? 'Schema —' : `Schema ${definition.schema}`);
   text('status-text', state.status);
   $('state-dot').className = `state-dot ${state.tone}`;
@@ -310,6 +353,23 @@ async function exportPackage() {
   } catch (error) { finishError(job, error, 'Export refused · rebuild if needed'); }
 }
 
+async function quitStudio() {
+  if (state.job) return;
+  if (state.dirty && !window.confirm('The definition has unsaved changes. Quit Studio without saving?')) return;
+  const job = beginJob('quit', 'Closing local Studio…');
+  try {
+    const response = await fetch('/api/quit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}', signal: job.controller.signal });
+    if (!response.ok) { const payload = await jsonResponse(response); throw new Error(payload?.error || `Quit refused (HTTP ${response.status}).`); }
+    if (!jobCurrent(job)) return;
+    state.job = null;
+    document.querySelector('.toolbar').hidden = true;
+    document.querySelector('.workspace').hidden = true;
+    document.querySelector('.statusbar').hidden = true;
+    $('closed-panel').hidden = false;
+    $('closed-panel').focus();
+  } catch (error) { finishError(job, error, 'Could not close Studio'); }
+}
+
 function emptyDefinition() {
   return { schema: 1, id: '', name: '', metresPerUnit: 1, roundingMetres: 0.01, detail: { vertices: [], triangles: [] }, native: { vertices: [], triangles: [] }, materials: [], faceMaterials: [], engineering: null, flight: { maxSpeed: null }, clearances: [], provenance: {} };
 }
@@ -345,6 +405,11 @@ $('import-file').addEventListener('change', event => { importFile(event.target.f
 $('save-button').addEventListener('click', saveDefinition);
 $('build-button').addEventListener('click', buildDefinition);
 $('export-button').addEventListener('click', exportPackage);
+$('quit-button').addEventListener('click', quitStudio);
+for (const key of ['group-source', 'group-target']) $(key).addEventListener('change', updateMergeButton);
+$('merge-groups').addEventListener('click', () => changeGroups(mergeGroups(state.definition, Number($('group-source').value), Number($('group-target').value)), 'Groups merged · build required'));
+$('auto-groups').addEventListener('click', () => changeGroups(autoGroups(state.definition), 'Auto-grouping selected · build required'));
+$('undo-groups').addEventListener('click', () => { if (groupHistory.length) changeGroups(groupHistory.pop(), 'Group edit undone · build required', true); });
 $('load-example').addEventListener('click', () => loadExample());
 $('edit-json').addEventListener('click', openEditor);
 $('apply-edit').addEventListener('click', applyEditor);

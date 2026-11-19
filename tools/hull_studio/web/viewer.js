@@ -1,6 +1,6 @@
 import { fitScene, rotatePoint, sceneFor } from './geometry.js';
 
-const INITIAL_VIEW = { yaw: -0.63, pitch: -0.31, roll: 0, zoom: 1 };
+const INITIAL_VIEW = { yaw: -0.63, pitch: -0.31, roll: 0, zoom: 1.24 };
 const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
 const sub = (a, b) => a.map((value, i) => value - b[i]);
 const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
@@ -133,6 +133,17 @@ export class HullViewer {
     if (!mesh?.faces.length) return;
     const ctx = this.context;
     const projected = mesh.vertices.map(vertex => vertex ? this.project(vertex) : null);
+    if (envelope) {
+      // One stroke avoids repeated blending at shared or overlapping triangle edges.
+      ctx.beginPath();
+      for (const face of mesh.faces) {
+        const [a, b, c] = face.indices.map(index => projected[index]);
+        ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.lineTo(c[0], c[1]); ctx.closePath();
+      }
+      ctx.strokeStyle = this.layers.original ? '#49dbe064' : '#49dbe0c0';
+      ctx.lineWidth = 0.65; ctx.lineJoin = 'round'; ctx.stroke();
+      return;
+    }
     const sorted = mesh.faces.map(face => {
       const points = face.indices.map(index => projected[index]);
       return { points, color: face.color, depth: points[0][2] + points[1][2] + points[2][2] };
@@ -143,22 +154,14 @@ export class HullViewer {
       const [a, b, c] = face.points;
       ctx.beginPath();
       ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.lineTo(c[0], c[1]); ctx.closePath();
-      if (envelope) {
-        // All lines are actual generated triangles, not a hull inferred by the viewer.
-        if (sorted.length < 3000) { ctx.fillStyle = '#28d8e80c'; ctx.fill(); }
-        ctx.strokeStyle = sorted.length > 5000 ? '#44d6e05f' : '#2ce4f5c9';
-        ctx.lineWidth = sorted.length > 5000 ? 0.48 : 0.85;
-        ctx.stroke();
-      } else {
-        const normal = cross(sub(b, a), sub(c, a));
-        const length = Math.hypot(...normal);
-        const light = length > 0 ? Math.abs((normal[0] * -0.18 + normal[1] * -0.33 + normal[2] * 0.9) / length) : 0.35;
-        const tint = face.color ?? [128, 146, 159];
-        const shade = (channel) => Math.round(clamp(channel * (0.45 + 0.55 * light) + 7, 0, 255));
-        ctx.fillStyle = `rgb(${tint.map(shade).join(',')})`;
-        ctx.fill();
-        if (edges) { ctx.strokeStyle = '#142531c0'; ctx.lineWidth = 0.6; ctx.stroke(); }
-      }
+      const normal = cross(sub(b, a), sub(c, a));
+      const length = Math.hypot(...normal);
+      const light = length > 0 ? Math.abs((normal[0] * -0.18 + normal[1] * -0.33 + normal[2] * 0.9) / length) : 0.35;
+      const tint = face.color ?? [128, 146, 159];
+      const shade = (channel) => Math.round(clamp(channel * (0.45 + 0.55 * light) + 7, 0, 255));
+      ctx.fillStyle = `rgb(${tint.map(shade).join(',')})`;
+      ctx.fill();
+      if (edges) { ctx.strokeStyle = '#142531c0'; ctx.lineWidth = 0.6; ctx.stroke(); }
     }
   }
 
@@ -190,8 +193,6 @@ export class HullViewer {
         ctx.beginPath(); ctx.arc(point[0], point[1], 4, 0, Math.PI * 2);
         ctx.fillStyle = '#10202b'; ctx.fill(); ctx.strokeStyle = color; ctx.stroke();
       }
-      ctx.fillStyle = color;
-      ctx.fillText(path.name, (a[0] + b[0]) / 2 + 5, (a[1] + b[1]) / 2 - 9);
     }
     ctx.lineCap = 'butt';
   }
@@ -201,10 +202,15 @@ export class HullViewer {
     const ctx = this.context;
     const [x, y] = this.project(this.scene.gap.point);
     ctx.strokeStyle = '#ffb72e'; ctx.lineWidth = 1.7;
+    if (this.scene.gap.nearestPoint) {
+      const end = this.project(this.scene.gap.nearestPoint);
+      ctx.beginPath(); this.line([x, y], end); ctx.setLineDash([4, 3]); ctx.stroke(); ctx.setLineDash([]);
+      ctx.beginPath(); ctx.arc(end[0], end[1], 3, 0, Math.PI * 2); ctx.stroke();
+    }
     ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.stroke();
     ctx.font = '12px system-ui, sans-serif';
     ctx.fillStyle = '#ffce79';
-    ctx.fillText(`Maximum gap ${this.scene.gap.metres.toPrecision(4)} m`, x + 9, y - 9);
+    ctx.fillText(`Largest sampled gap ${this.scene.gap.metres.toFixed(3)} m`, x + 9, y - 9);
   }
 
   drawAxes() {
