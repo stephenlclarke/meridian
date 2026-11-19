@@ -75,6 +75,100 @@ pub(super) fn station_frames_for(name: &str) -> Vec<Frames> {
     frames
 }
 
+/// Exercise ordinary station Pin Baseline and search in both orders and duplicate identities.
+pub(super) fn peregrine_sibling_compare_frames() -> [Frame; 4] {
+    let directory = TestDirectory::new();
+    let mut profile = open(&directory.0);
+    assert!(ok(profile.new_commander(97022)));
+    let before = ok(profile.world.save_bytes());
+    let mut menu = ok(Docked::new(&profile.world));
+    ok(menu.open(&profile.world, Screen::Showroom));
+    let [width, height] = MIN_WINDOW_LOGICAL;
+    let viewport = Viewport::new(width, height).unwrap_or_else(|| panic!("invalid window minimum"));
+    let frames = [
+        ("Peregrine Mk I", "Peregrine Mk III", ["SH022", "SH023"]),
+        ("Peregrine Mk III", "Peregrine Mk I", ["SH023", "SH022"]),
+        ("Peregrine Mk I", "Peregrine Mk I", ["SH022", "SH022"]),
+        ("Peregrine Mk III", "Peregrine Mk III", ["SH023", "SH023"]),
+    ]
+    .map(|(baseline, selected, expected)| {
+        {
+            let mut input = |action| {
+                let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
+                menu.presented(frame);
+                ok(menu.input(&mut profile, action));
+            };
+            for action in [
+                Input::Key(Key::Search),
+                Input::Key(Key::ClearSearch),
+                Input::Text(baseline.into()),
+                Input::Key(Key::Confirm),
+                Input::Key(Key::PinBaseline),
+                Input::Key(Key::Search),
+                Input::Key(Key::ClearSearch),
+                Input::Text(selected.into()),
+                Input::Key(Key::Confirm),
+                Input::Key(Key::ResetView),
+            ] {
+                input(action);
+            }
+        }
+        let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
+        let [left, right] = frame.models.as_slice() else {
+            panic!("expected pinned Peregrine panes");
+        };
+        for (model, id) in [left, right].into_iter().zip(expected) {
+            assert_eq!(model.object, id);
+            let (key, hull) = if id == "SH022" {
+                (super::PEREGRINE_I_GEOMETRY_KEY, super::Hull::PeregrineMkI)
+            } else {
+                (
+                    super::PEREGRINE_III_GEOMETRY_KEY,
+                    super::Hull::PeregrineMkIII,
+                )
+            };
+            assert_eq!(model.geometry_key, key);
+            assert_eq!(super::hull(model), Some(hull));
+            assert_model_pane(&frame, model.bounds);
+        }
+        assert!(!overlaps(left.bounds, right.bounds));
+        assert!(left.bounds.x < right.bounds.x);
+        assert_eq!(left.orientation, right.orientation);
+        frame
+    });
+    assert_eq!(ok(profile.world.save_bytes()), before);
+    frames
+}
+
+#[test]
+fn peregrine_siblings_pin_actual_station_compare_in_both_orders_and_duplicates() {
+    let mk_i = ok(super::Hull::PeregrineMkI.visual());
+    let mk_iii = ok(super::Hull::PeregrineMkIII.visual());
+    let mk_i_view = View::new(&mk_i, [EMPTY_PIECE; super::PEREGRINE_I_PIECES]);
+    let mk_iii_view = View::new(&mk_iii, [EMPTY_PIECE; super::PEREGRINE_MK3_PIECES]);
+    let mut frames = peregrine_sibling_compare_frames();
+    // Native cache qualification uses different poses for duplicate pane identities.
+    for (frame, name) in frames[2..]
+        .iter_mut()
+        .zip(["Peregrine Mk I", "Peregrine Mk III"])
+    {
+        let upper = station_frames_for(name)[2].solo.models[0].orientation;
+        frame.models[1].orientation = upper;
+        assert_ne!(frame.models[0].orientation, upper);
+    }
+    for frame in frames {
+        for model in &frame.models {
+            match super::hull(model) {
+                Some(super::Hull::PeregrineMkI) => assert_original_fits(&mk_i_view, &mk_i, model),
+                Some(super::Hull::PeregrineMkIII) => {
+                    assert_original_fits(&mk_iii_view, &mk_iii, model)
+                }
+                _ => panic!("unrelated model in pinned Peregrine comparison"),
+            }
+        }
+    }
+}
+
 fn encloses(outer: Rect, inner: Rect) -> bool {
     inner.width > 0.0
         && inner.height > 0.0
@@ -159,6 +253,19 @@ fn original_peregrine_mk_i_fits_minimum_station_showroom_solo_and_compare() {
         &view,
         &vertices,
         "SH022",
+    );
+}
+
+#[test]
+fn original_peregrine_mk_iii_fits_minimum_station_showroom_solo_and_compare() {
+    let vertices = ok(super::Hull::PeregrineMkIII.visual());
+    assert_eq!(vertices.len(), super::PEREGRINE_MK3_DETAILED_FACES * 3);
+    let view = View::new(&vertices, [EMPTY_PIECE; super::PEREGRINE_MK3_PIECES]);
+    assert_variant_fits_minimum(
+        station_frames_for("Peregrine Mk III"),
+        &view,
+        &vertices,
+        "SH023",
     );
 }
 

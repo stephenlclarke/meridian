@@ -309,6 +309,7 @@ fn selecting_peregrine_mk_i_routes_its_own_preview_without_granting_exchange() {
 
 #[test]
 fn selecting_peregrine_mk_iii_does_not_select_peregrine_mk_i_or_its_geometry() {
+    assert_goshawk_preview("Peregrine Mk III", "SH023", "assets/fleet/sh023/visual.bin");
     use crate::docked_screens::{Catalogue, DockedScreens, Input, Key, Outcome, Screen, Viewport};
     let world = meridian_core::World::new_commander(95006).unwrap_or_else(|e| panic!("{e}"));
     let catalogue = Catalogue::bundled().unwrap_or_else(|e| panic!("{e}"));
@@ -316,27 +317,52 @@ fn selecting_peregrine_mk_iii_does_not_select_peregrine_mk_i_or_its_geometry() {
     let viewport = Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));
     let mut ui = DockedScreens::new(meridian_core::navigation::SystemId::AVENOR, "SH025");
     ui.open(Screen::Showroom);
-    let frame = ui.frame(&ctx, viewport);
-    assert!(matches!(
-        ui.handle(Input::Key(Key::Search), &frame, &ctx),
-        Outcome::Updated
-    ));
-    let frame = ui.frame(&ctx, viewport);
-    assert!(matches!(
-        ui.handle(Input::Text("Peregrine Mk III".into()), &frame, &ctx),
-        Outcome::Updated
-    ));
-    assert_eq!(ui.selected_ship(), "SH023");
-    let frame = ui.frame(&ctx, viewport);
-    assert!(matches!(
-        ui.handle(Input::Key(Key::Confirm), &frame, &ctx),
-        Outcome::Updated
-    ));
-    let frame = ui.frame(&ctx, viewport);
-    assert!(
-        frame.models.iter().all(|model| model.object != "SH022"
-            && model.geometry_key != "assets/fleet/sh022/visual.bin")
-    );
+    let save = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+    for (name, id, key, peer) in [
+        (
+            "Peregrine Mk I",
+            "SH022",
+            "assets/fleet/sh022/visual.bin",
+            "SH023",
+        ),
+        (
+            "Peregrine Mk III",
+            "SH023",
+            "assets/fleet/sh023/visual.bin",
+            "SH022",
+        ),
+        (
+            "Peregrine Mk I",
+            "SH022",
+            "assets/fleet/sh022/visual.bin",
+            "SH023",
+        ),
+    ] {
+        for action in [
+            Input::Key(Key::Search),
+            Input::Key(Key::ClearSearch),
+            Input::Text(name.into()),
+            Input::Key(Key::Confirm),
+        ] {
+            let frame = ui.frame(&ctx, viewport);
+            assert!(matches!(ui.handle(action, &frame, &ctx), Outcome::Updated));
+        }
+        assert_eq!(ui.selected_ship(), id);
+        let frame = ui.frame(&ctx, viewport);
+        let [baseline, selected] = frame.models.as_slice() else {
+            panic!("expected default Compare");
+        };
+        assert_eq!(baseline.object, "SH025");
+        assert_eq!(selected.object, id);
+        assert_eq!(selected.geometry_key, key);
+        assert!(crate::mule_render::showroom::matches(selected));
+        assert!(frame.models.iter().all(|model| model.object != peer));
+        assert!(matches!(
+            ui.handle(Input::Key(Key::Exchange), &frame, &ctx),
+            Outcome::Refused(_)
+        ));
+    }
+    assert_eq!(world.save_bytes().unwrap_or_else(|e| panic!("{e}")), save);
 }
 
 fn assert_goshawk_preview(name: &str, id: &str, key: &str) {
