@@ -3,7 +3,7 @@ use super::{FlightInput, FlightStart, StepError, World, flight_pose};
 use crate::docking::{RigidPose, Vec3};
 use crate::goshawk::{
     GOSHAWK_CONTRACT_SHA256, GOSHAWK_MAX_SPEED_UNITS, GOSHAWK_PIECES, GOSHAWK_RESOURCE_SHA256,
-    GoshawkHullSource,
+    GoshawkEngineering, GoshawkHullSource,
 };
 use crate::mule::{SmoothPiece, rounded_maximum_origin_radius};
 use crate::station::{DISTANCE_PER_SPEED_UNIT, OriginalStationData, StationError};
@@ -25,6 +25,7 @@ pub struct GoshawkApproachSnapshot {
     speed: f32,
     status: GoshawkApproachStatus,
     pieces: Arc<[SmoothPiece; GOSHAWK_PIECES]>,
+    engineering: &'static GoshawkEngineering,
     tick: u64,
     scope: Weak<()>,
 }
@@ -44,6 +45,19 @@ impl GoshawkApproachSnapshot {
     }
     pub fn pieces(&self) -> &Arc<[SmoothPiece; GOSHAWK_PIECES]> {
         &self.pieces
+    }
+    pub fn engineering(&self) -> &'static GoshawkEngineering {
+        self.engineering
+    }
+    /// Position of the stock centre of mass in station metres.
+    pub fn center_of_mass_world_metres(&self) -> Vec3 {
+        let [x, y, z] = self.engineering.center_of_mass_metres;
+        let offset = self.pose.orientation.apply(Vec3::new(x, y, z));
+        Vec3::new(
+            self.pose.position.x + offset.x,
+            self.pose.position.y + offset.y,
+            self.pose.position.z + offset.z,
+        )
     }
     pub fn source_identity(&self) -> (&'static str, &'static str) {
         (GOSHAWK_RESOURCE_SHA256, GOSHAWK_CONTRACT_SHA256)
@@ -173,6 +187,7 @@ impl World {
             speed: approach.speed,
             status: approach.status,
             pieces: approach.source.pieces().clone(),
+            engineering: approach.source.engineering(),
             tick: self.state.tick,
             scope: Arc::downgrade(&approach.scope),
         })
