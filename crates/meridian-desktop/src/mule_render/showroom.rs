@@ -1,5 +1,5 @@
 //! Source-authenticated SH008 showroom presentation. Inputs grant no World authority.
-use super::{Piece, Vec3, VisualVertex, decode_visual, gpu, subtract, support_mesh, vector};
+use super::{Piece, Vec3, VisualVertex, gpu, subtract, support_mesh, vector};
 use crate::docked_screens::{ModelPreview, Orientation, Rect};
 use meridian_core::{
     docking::Basis3,
@@ -10,9 +10,8 @@ use meridian_core::{
 };
 
 pub(crate) const GEOMETRY_KEY: &str = "assets/fleet/sh008/visual.bin";
-const VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh008/visual.bin");
 const VERTICES: usize = 3_484 * 3;
-const VISUAL_FNV: u64 = 0x7a17_0c0c_6cdc_d5fd;
+mod visual_assets;
 const EMPTY_PIECE: Piece = Piece {
     range: [0; 4],
     low: [0.0; 4],
@@ -24,13 +23,7 @@ pub(crate) fn matches(model: &ModelPreview) -> bool {
 }
 
 fn visual() -> Result<Vec<VisualVertex>, &'static str> {
-    let hash = VISUAL.iter().fold(0xcbf2_9ce4_8422_2325_u64, |hash, byte| {
-        (hash ^ u64::from(*byte)).wrapping_mul(0x100_0000_01b3)
-    });
-    if hash != VISUAL_FNV {
-        return Err("SH008 preview bytes changed");
-    }
-    decode_visual(VISUAL, b"GOSHVIZ1", VERTICES)
+    visual_assets::load(GEOMETRY_KEY)
 }
 
 fn shader() -> String {

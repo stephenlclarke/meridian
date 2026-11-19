@@ -1,4 +1,8 @@
 * -text
 source.vertices binary
 source-triangles.bin binary
+<<<<<<< HEAD
 source-piece-membership.bin binary
+=======
+visual.bin binary
+>>>>>>> ba5c6b8 (feat(showroom): prepare original Goshawk Mk II visual)
