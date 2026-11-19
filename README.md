@@ -6,7 +6,7 @@ Preview 10 opens on Commander Details. Press H or ? for the current screen’s c
 
 In Preview 10, press 3 at a station and search for Goshawk Explorer. Compare shows the Peregrine Mk V beside the Goshawk for a new commander. Press C for a single-ship view. Mac testing verified the original dark green hull, silver cross-member, open wishbone and refusal of an unavailable exchange. Preview 9 predates this ship. [Goshawk geometry and Showroom controls](docs/GOSHAWK-GAMEPLAY-ENVELOPE.md)
 
-The original Goshawk Mk II (SH009) detailed visual is prepared for the next Showroom integration. Its selection and native rendering still require the joined source. [Mk II source and appearance](docs/GOSHAWK-MK-II-SOURCE-GEOMETRY.md)
+The next Showroom candidate adds the Goshawk Mk II (SH009). Press 3 at a station, search for Goshawk Mk II, then press Enter to inspect the selection. Native rendering awaits validation. [Mk II source and appearance](docs/GOSHAWK-MK-II-SOURCE-GEOMETRY.md)
 
 ## Internal Mule docking validation
 

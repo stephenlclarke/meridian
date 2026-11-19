@@ -78,13 +78,14 @@ centres. The authenticated SH009 hull publishes the matched centre of mass,
 full XYZ tensor about that centre, and the two mass locations for use in
 certification. Utility volume, equipment access, occupied fittings, and
 ordinary insertion await separate qualification.
+
 ## Detailed Showroom visual
 
 The SH009 display asset retains all 3,532 calibrated detailed faces in their original order, with 10,596 corner records. Each record uses the SH008 Showroom layout of 56 bytes: binary32 position, flat normal from the ordered face, original material RGBA, corner UV, texture index and emissive bit. The SH009-specific `GOS2VIZ1` header and runtime FNV check prevent a changed or wrong-hull visual from entering the decoder. The native candidate is excluded from display record generation.
 
 The original three-map texture table is retained without reordering or copying the shared image bytes. The Mk II uses 1,356 patrol diffuse faces and 2,176 service detail faces; its declared strike diffuse slot is unused. The model has 184 emissive faces. The three original MIT maps remain in `assets/fleet/sh001`. `assets/fleet/sh009/VISUAL-PROVENANCE.json` binds the legacy revision, staged geometry, output and exact shared texture identities.
 
-The existing Showroom visual loader can decode the MK2 geometry key `assets/fleet/sh009/visual.bin`. The SH008 pass continues to use its own original asset. Actual SH009 selection, the registered pass and draw count, rounded shield, World placement and native visual checks await the joined implementation. The source loader alone grants no gameplay authority.
+The existing Showroom visual loader can decode the MK2 geometry key `assets/fleet/sh009/visual.bin`. The SH008 pass continues to use its own original asset. The candidate registers SH009 in the station catalogue for Compare and solo views. Native rendering and the shield shimmer await validation. Exchange and ordinary flight placement remain unavailable.
 
 ```bash
 python3 -B tools/encode_goshawk_mk2_visual.py --check
