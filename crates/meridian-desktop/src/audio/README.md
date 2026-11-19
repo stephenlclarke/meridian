@@ -29,7 +29,7 @@ Rust has no genuine speech-enabled commander state, ECM announcement stream or p
 
 ## Qualification criteria
 
-The authored tests cover complete reference WAV bytes for all six tones, actual docking edges, retained/stale revisions, cold-session priming, fresh discharge identity, missile notification identity, expired notifications, mute/unavailable consumption, suspend/resume with retained mute and no replay, one continuous tool voice, terminal shutdown and drop. They are not passing evidence until run from the registered/joined source.
+The authored tests cover complete reference WAV bytes for all six tones, actual docking edges, retained/stale revisions, cold-session priming, fresh discharge identity, missile notification identity, expired notifications, mute/unavailable consumption, suspend/resume with retained mute and no replay, one continuous tool voice, terminal shutdown and drop. The paid Mining Laser callback regression uses a real purchase, physical approach, empty-target refusal, accepted partial and extracting strokes, and held-trigger cooldown refusal. They are not passing evidence until run from the registered/joined source.
 
 After G2 reviews the coherent joined source, the designated executor must run focused audio tests, formatting and strict Clippy, then the current required CI for the combined batch. Execute native launch/dock/front Pulse/actual missile notification, mute, output-unavailable and normal-close checks with exact source/process evidence on supported targets. Check audible/recorded wave behavior separately from synthetic fakes. Native device/race/leak/performance and full speech parity remain unverified here. Preserve the existing unresolved XPC leak finding; this authoring does not cure it.
 
