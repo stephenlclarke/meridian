@@ -8,6 +8,7 @@ use crate::{
 };
 use core::fmt;
 mod scoops;
+mod work;
 pub use scoops::{FittedFuelScoops, FuelScoopsSnapshot};
 pub const MINING_LASER_PRICE_TENTHS: u32 = 33_000;
 pub const MINING_LASER_REQUIRED_TL: u8 = 6;
@@ -28,6 +29,8 @@ pub enum ModuleKind {
     IntermediateNavigation,
     AdvancedNavigation,
     Targeting(TargetingTier),
+    MiningTargeting,
+    SalvageTargeting,
 }
 impl ModuleKind {
     pub fn family(self) -> &'static str {
@@ -42,6 +45,8 @@ impl ModuleKind {
                 "navigation"
             }
             Self::Targeting(_) => "targeting-core",
+            Self::MiningTargeting => "targeting-mining",
+            Self::SalvageTargeting => "targeting-salvage",
             _ => "energy",
         }
     }
@@ -58,6 +63,8 @@ impl ModuleKind {
                 TargetingTier::Pirate => "Targeting: Pirate",
                 TargetingTier::Military => "Targeting: Military",
             },
+            Self::MiningTargeting => "Targeting: Mining Module",
+            Self::SalvageTargeting => "Targeting: Salvage Module",
             _ => self.name(),
         }
     }
@@ -66,6 +73,8 @@ impl ModuleKind {
             Self::PulseLaser => "Pulse Laser",
             Self::MiningLaser => "Mining Laser",
             Self::FuelScoops => "Fuel Scoops",
+            Self::MiningTargeting => "Mining Targeting Module",
+            Self::SalvageTargeting => "Salvage Targeting Module",
             Self::BeamLaser => "Beam Laser",
             Self::MilitaryLaser => "Military Laser",
             Self::NavalLaser => "Naval Laser",
@@ -101,6 +110,8 @@ impl ModuleKind {
                 ModuleSlot::Navigation
             }
             Self::Targeting(_) => ModuleSlot::Targeting,
+            Self::MiningTargeting => ModuleSlot::MiningTargeting,
+            Self::SalvageTargeting => ModuleSlot::SalvageTargeting,
             _ => ModuleSlot::Energy,
         }
     }
@@ -129,6 +140,8 @@ impl ModuleKind {
                 | Self::AdvancedNavigation
                 | Self::FuelScoops
                 | Self::Targeting(TargetingTier::Military)
+                | Self::MiningTargeting
+                | Self::SalvageTargeting
         )
     }
     pub fn navigation_reach_ly(self) -> Option<u8> {
@@ -140,7 +153,7 @@ impl ModuleKind {
             Self::ExtraEnergyUnit => 2,
             Self::NavalEnergyUnit => 3,
             Self::EliteEnergyUnit => 4,
-            Self::Targeting(_) => 1,
+            Self::Targeting(_) | Self::MiningTargeting | Self::SalvageTargeting => 1,
             _ => 0,
         }
     }
@@ -159,6 +172,9 @@ impl ModuleKind {
             Self::IntermediateNavigation => Some((30_000, 8)),
             Self::AdvancedNavigation => Some((90_000, 11)),
             Self::Targeting(tier) => Some((tier.price_tenths(), tier.required_technology())),
+            // Frozen original shop, in credit tenths and displayed technology levels.
+            Self::MiningTargeting => Some((20_000, 6)),
+            Self::SalvageTargeting => Some((40_000, 8)),
         }
     }
     fn prerequisite(self) -> Option<Self> {
@@ -169,6 +185,9 @@ impl ModuleKind {
             Self::IntermediateNavigation => Some(Self::BasicNavigation),
             Self::AdvancedNavigation => Some(Self::IntermediateNavigation),
             Self::Targeting(tier) => tier.predecessor().map(Self::Targeting),
+            Self::MiningTargeting | Self::SalvageTargeting => {
+                Some(Self::Targeting(TargetingTier::Basic))
+            }
             _ => None,
         }
     }
@@ -195,6 +214,8 @@ impl ModuleKind {
             Self::IntermediateNavigation => 11,
             Self::AdvancedNavigation => 12,
             Self::Targeting(tier) => 12 + tier as u8,
+            Self::MiningTargeting => 19,
+            Self::SalvageTargeting => 20,
         }
     }
     fn from_tag(tag: u8) -> Result<Self, SaveError> {
@@ -213,6 +234,8 @@ impl ModuleKind {
             11 => Ok(Self::IntermediateNavigation),
             12 => Ok(Self::AdvancedNavigation),
             13..=18 => Ok(Self::Targeting(TargetingTier::ALL[usize::from(tag - 13)])),
+            19 => Ok(Self::MiningTargeting),
+            20 => Ok(Self::SalvageTargeting),
             _ => Err(SaveError::InvalidEncoding),
         }
     }
@@ -224,6 +247,8 @@ pub enum ModuleSlot {
     UtilityFuelScoops,
     Navigation,
     Targeting,
+    MiningTargeting,
+    SalvageTargeting,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleProvenance {
@@ -444,6 +469,13 @@ impl Ledger {
     }
     fn install(&mut self, index: usize, replacing: Option<u64>) -> Result<(), ModuleError> {
         let slot = self.items[index].kind.slot();
+        if matches!(
+            slot,
+            ModuleSlot::MiningTargeting | ModuleSlot::SalvageTargeting
+        ) && self.fitted(ModuleSlot::Targeting).is_none()
+        {
+            return Err(ModuleError::MissingPrerequisite);
+        }
         let fitted = self.fitted(slot);
         if fitted.map(|i| i.id) != replacing {
             return Err(ModuleError::StaleOccupant);
@@ -910,6 +942,8 @@ impl World {
             ModuleKind::Targeting(TargetingTier::Identification),
             ModuleKind::Targeting(TargetingTier::Pirate),
             ModuleKind::Targeting(TargetingTier::Military),
+            ModuleKind::MiningTargeting,
+            ModuleKind::SalvageTargeting,
         ]
         .into_iter()
         .filter_map(|kind| {

@@ -11,9 +11,7 @@ pub use route::{
     ROUTE_SYSTEMS, RouteAlternative, RouteError, RoutePlan, RoutePreference, RouteProgress,
     RouteStatus,
 };
-pub(crate) use route::{
-    RouteEconomy, route_alternatives, route_feasible, route_hop,
-};
+pub(crate) use route::{RouteEconomy, route_alternatives, route_feasible, route_hop};
 use std::collections::VecDeque;
 
 const CATALOGUE: &[u8] = include_bytes!("../../../assets/legacy/g01.navigation");

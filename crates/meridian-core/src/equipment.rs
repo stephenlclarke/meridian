@@ -57,6 +57,35 @@ impl TargetingTier {
     }
 }
 
+/// Usable work targeting requires both the independent fitted module and a fitted core.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub struct WorkTargetingFit {
+    pub mining: bool,
+    pub salvage: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WorkTargetId {
+    Asteroid(crate::mining::AsteroidId),
+    Ore(crate::mining::OreId),
+    Wreck(crate::traffic::NpcId),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WorkTargetRole {
+    RockHold,
+    OreTracking,
+    WreckTracking,
+}
+
+/// Guidance observation. This neither issues a work tool nor transfers custody.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct WorkTarget {
+    pub id: WorkTargetId,
+    pub role: WorkTargetRole,
+    pub position: crate::docking::Vec3,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ItemId {
     owner: u64,

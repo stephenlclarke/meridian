@@ -369,6 +369,8 @@ impl World {
                 super::modular::ModuleKind::AdvancedNavigation,
                 super::modular::ModuleKind::FuelScoops,
                 super::modular::ModuleKind::Targeting(crate::equipment::TargetingTier::Military),
+                super::modular::ModuleKind::MiningTargeting,
+                super::modular::ModuleKind::SalvageTargeting,
             ] {
                 self.grant_xyzzy_module(review.dock, review.tick, kind)?;
             }

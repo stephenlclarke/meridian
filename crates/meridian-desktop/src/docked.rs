@@ -649,6 +649,8 @@ fn module_rows(
         ModuleSlot::Energy => "Energy system",
         ModuleSlot::Navigation => "Navigation computer",
         ModuleSlot::Targeting => "Targeting computer",
+        ModuleSlot::MiningTargeting => "Mining targeting",
+        ModuleSlot::SalvageTargeting => "Salvage targeting",
         ModuleSlot::UtilityFuelScoops => "Fuel Scoops",
     };
     let fitted = modules.items.iter().find(|item| item.slot == Some(slot));
@@ -666,6 +668,20 @@ fn module_rows(
         } else if matches!(item.kind, ModuleKind::Targeting(_)) {
             row.compatibility = "Owned SH025 computer module".into();
             row.readout.push("Equipment units 1".into());
+        } else if matches!(
+            item.kind,
+            ModuleKind::MiningTargeting | ModuleKind::SalvageTargeting
+        ) {
+            row.compatibility =
+                "Independent SH025 fitting; requires a fitted targeting core".into();
+            row.readout.push(
+                if item.kind == ModuleKind::MiningTargeting {
+                    "Live rock hold and pending ore tracking"
+                } else {
+                    "Tracking verified local wrecks"
+                }
+                .into(),
+            );
         } else {
             row.compatibility =
                 "Owned SH025 module; fitting preserves shared energy and heat".into();
@@ -796,17 +812,31 @@ fn equipment_panel(
             .into(),
         available: true,
     });
-    slots.push(ui::EquipmentSlot {
-        id: "targeting".into(),
-        label: "Targeting computer".into(),
-        fitted: modules
-            .items
-            .iter()
-            .find(|item| item.slot == Some(ModuleSlot::Targeting))
-            .map_or("Empty", |item| item.kind.name())
-            .into(),
-        available: true,
-    });
+    for (id, label, slot) in [
+        ("targeting", "Targeting computer", ModuleSlot::Targeting),
+        (
+            "targeting-mining",
+            "Mining targeting",
+            ModuleSlot::MiningTargeting,
+        ),
+        (
+            "targeting-salvage",
+            "Salvage targeting",
+            ModuleSlot::SalvageTargeting,
+        ),
+    ] {
+        slots.push(ui::EquipmentSlot {
+            id: id.into(),
+            label: label.into(),
+            fitted: modules
+                .items
+                .iter()
+                .find(|item| item.slot == Some(slot))
+                .map_or("Empty", |item| item.kind.name())
+                .into(),
+            available: true,
+        });
+    }
     slots.push(ui::fuel_scoops::slot(world)?);
     slots.push(ui::emp::slot(world));
     append_pylon_slots(&mut slots, &ammo);
@@ -816,6 +846,8 @@ fn equipment_panel(
         "energy" => Some(ModuleSlot::Energy),
         "navigation" => Some(ModuleSlot::Navigation),
         "targeting" => Some(ModuleSlot::Targeting),
+        "targeting-mining" => Some(ModuleSlot::MiningTargeting),
+        "targeting-salvage" => Some(ModuleSlot::SalvageTargeting),
         _ => None,
     };
     if let Some(slot) = module_slot {
@@ -1121,6 +1153,37 @@ mod tests {
         assert_visible_feedback(&mut menu, &profile, &expected);
         assert_eq!(ok(profile.world.save_bytes()), before);
     }
+    #[test]
+    fn independent_work_target_slots_project_shop_and_secret_fits() {
+        let (_directory, mut profile, _) = start();
+        for (slot, node, price) in [
+            ("targeting-mining", "Targeting: Mining Module", 20_000),
+            ("targeting-salvage", "Targeting: Salvage Module", 40_000),
+        ] {
+            let panel = ok(equipment_panel(&profile.world, slot, ""));
+            let offer = panel
+                .rows
+                .iter()
+                .find(|row| row.node == node)
+                .unwrap_or_else(|| panic!("missing {node}"));
+            assert_eq!(offer.price_tenths, Some(price));
+            assert!(!offer.can_buy);
+        }
+        ok(profile.xyzzy(meridian_core::XyzzyAction::Enter));
+        for (slot, node) in [
+            ("targeting-mining", "Targeting: Mining Module"),
+            ("targeting-salvage", "Targeting: Salvage Module"),
+        ] {
+            let panel = ok(equipment_panel(&profile.world, slot, ""));
+            assert!(
+                panel
+                    .rows
+                    .iter()
+                    .any(|row| row.node == node && row.fitted == 1)
+            );
+        }
+    }
+
     #[test]
     fn saved_route_requests_publish_before_commit_and_cold_continue_keeps_the_selected_course() {
         let (directory, mut profile, mut menu) = start();
