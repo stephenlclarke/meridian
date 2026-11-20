@@ -222,6 +222,9 @@ def verify_protected_core(root):
     for relative, expected in baseline['sha256'].items():
         data = (root / 'crates/meridian-core/src' / relative).read_bytes()
         data = undo_goshawk_world(relative, data)
+        if relative == 'lib.rs':
+            # Invert only the reviewed Panther Explorer geometry publication.
+            data = data.replace(b'pub mod panther_explorer;\n\n', b'', 1)
         data = undo_renas_encounter(relative, data)
         for addition in additions.get(relative, []):
             assert data.count(addition) == 1, relative

@@ -77,6 +77,8 @@ pub use flight::{FlightResourcesSnapshot, FrontLaserSnapshot};
 
 pub use flight::{EquipmentPreparationError, PreparedEquipment};
 
+pub mod panther_explorer;
+
 pub use flight::{
     EmpAxis, EmpChargePhase, EmpEquipmentAction, EmpEquipmentOffer, EmpEquipmentReview, EmpError,
     EmpGrades, EmpOrigin, EmpProvenance, EmpSnapshot, OwnedEmp, PreparedEmpEquipment,

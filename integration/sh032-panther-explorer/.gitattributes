@@ -1,0 +1,9 @@
+LEGACY-*.txt -text
+
+# JSON inputs have published byte hashes.
+CONTACT-RESULT.json text eol=lf
+FIXTURES.json text eol=lf
+ORIGINAL-DIFFERENCE.json text eol=lf
+PANTHER-EXPLORER-STUDIO.json text eol=lf
+SURFACE-FIT.json text eol=lf
+UNSPLIT-FIT.json text eol=lf

@@ -1,0 +1,88 @@
+{
+  "id": "SH032",
+  "name": "Panther Explorer",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourceUnits": "metres",
+  "metresPerSourceUnit": 1,
+  "detail": {
+    "vertices": 2866,
+    "faces": 5596,
+    "components": 34,
+    "bounds": [
+      [
+        -9.829,
+        -6.2,
+        -20.09
+      ],
+      [
+        9.829,
+        7.56,
+        17.0
+      ]
+    ]
+  },
+  "native": {
+    "vertices": 206,
+    "faces": 352,
+    "components": 15,
+    "bounds": [
+      [
+        -9.829,
+        -6.2,
+        -20.09
+      ],
+      [
+        9.829,
+        7.48,
+        17.0
+      ]
+    ],
+    "faceLimit": 512,
+    "approvedSourcePath": "fleet-completion-20261019/batch-01-native-lod/SH032-design.toml",
+    "approvedSourceSha256": "d87094362d608526b5e257173478f305b0b2f786d573abdb51f7ef613a4bb131"
+  },
+  "supportIndexing": {
+    "detailedVertices": 2938,
+    "nativeVertices": 230,
+    "sourceFaceCornerOrderPreserved": true
+  },
+  "shapePieces": 36,
+  "textures": [
+    "l337-patrol-diffuse",
+    "l337-strike-diffuse",
+    "l337-service-details"
+  ],
+  "unmappedMaterialSlot": 4294967295,
+  "pins": {
+    "resource.toml": "0023556a6c7a00481cdc10461eaf5b3ef4b9477e0c4f1919442e108fe0a94d9f",
+    "native-export.json": "135ed9ca8b424fc27f4c5a65e043254b78ca8d48108fafe2099ae51060573a4f",
+    "contract.toml": "9bbbecb8af20c7c20d0d95e0a1d82aeb27950d4a6243329af3a0e6848ecd3a6f",
+    "LICENSE": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+  },
+  "outputs": {
+    "source.vertices": {
+      "bytes": 76048,
+      "sha256": "3873ce0c7c15bd4b3a36239457cf526133e1fd4ad8f87a2b2a7517160e6ac130"
+    },
+    "source-triangles.bin": {
+      "bytes": 71376,
+      "sha256": "7a54b738ff78ae08b73bbf1bab5503e54807d667c97a2b63b5b84e2d1b619361"
+    },
+    "source-piece-membership.bin": {
+      "bytes": 3168,
+      "sha256": "a8cf1d10d16908accb8dfa9230bebad8d2bd730c450b07368fd2e3d694f88024"
+    },
+    "PIECES.json": {
+      "bytes": 970,
+      "sha256": "444e03e9e232b77ca902e0bc21314b4de153ebf12e05583d8a24d767e4b62775"
+    },
+    "visual.bin": {
+      "bytes": 940144,
+      "sha256": "802be3317e57f538ccf3fbda209d2550b7e2d5b472912be503ac3a27bf96f705"
+    },
+    "native-visual.bin": {
+      "bytes": 59152,
+      "sha256": "39e59165c5de7f08631aa1321e9b84c82fd46398d5beff99582e45a549c3433a"
+    }
+  }
+}
