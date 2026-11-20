@@ -7,6 +7,56 @@ pub use content::{Definition, StationOffer, definition};
 pub const STANDARD_HOLD_TONNES: u16 = 92;
 pub const EXPANDED_HOLD_TONNES: u16 = 127;
 
+/// Original fictional catalogue grades, ordered for inventory progression.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[repr(u8)]
+pub enum TargetingTier {
+    Basic = 1,
+    Advanced,
+    Docking,
+    Identification,
+    Pirate,
+    Military,
+}
+
+impl TargetingTier {
+    pub const ALL: [Self; 6] = [
+        Self::Basic,
+        Self::Advanced,
+        Self::Docking,
+        Self::Identification,
+        Self::Pirate,
+        Self::Military,
+    ];
+    pub const fn label(self) -> &'static str {
+        match self {
+            Self::Basic => "Basic",
+            Self::Advanced => "Advanced",
+            Self::Docking => "Docking",
+            Self::Identification => "Identification",
+            Self::Pirate => "Pirate",
+            Self::Military => "Military",
+        }
+    }
+    pub const fn price_tenths(self) -> u32 {
+        [8_000, 20_000, 40_000, 60_000, 100_000, 120_000][self as usize - 1]
+    }
+    /// Displayed, one-based station technology levels.
+    pub const fn required_technology(self) -> u8 {
+        [4, 5, 7, 9, 10, 11][self as usize - 1]
+    }
+    pub const fn predecessor(self) -> Option<Self> {
+        match self {
+            Self::Basic => None,
+            Self::Advanced => Some(Self::Basic),
+            Self::Docking => Some(Self::Advanced),
+            Self::Identification => Some(Self::Docking),
+            Self::Pirate => Some(Self::Identification),
+            Self::Military => Some(Self::Pirate),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ItemId {
     owner: u64,

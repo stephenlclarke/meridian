@@ -368,6 +368,7 @@ impl World {
                 super::modular::ModuleKind::NavalLaser,
                 super::modular::ModuleKind::AdvancedNavigation,
                 super::modular::ModuleKind::FuelScoops,
+                super::modular::ModuleKind::Targeting(crate::equipment::TargetingTier::Military),
             ] {
                 self.grant_xyzzy_module(review.dock, review.tick, kind)?;
             }

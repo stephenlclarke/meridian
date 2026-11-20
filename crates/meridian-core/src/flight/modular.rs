@@ -1,6 +1,7 @@
 //! Paid modular equipment custody. Effects live in the actual weapon/work owners, not menu rows.
 use super::{FlightMode, World};
 use crate::{
+    equipment::TargetingTier,
     freight::g02::CommanderAccount,
     navigation::{DockContext, NavigationFitChange, NavigationGrade},
     save::{Reader, SaveError, Writer},
@@ -26,6 +27,7 @@ pub enum ModuleKind {
     BasicNavigation,
     IntermediateNavigation,
     AdvancedNavigation,
+    Targeting(TargetingTier),
 }
 impl ModuleKind {
     pub fn family(self) -> &'static str {
@@ -39,6 +41,7 @@ impl ModuleKind {
             Self::BasicNavigation | Self::IntermediateNavigation | Self::AdvancedNavigation => {
                 "navigation"
             }
+            Self::Targeting(_) => "targeting-core",
             _ => "energy",
         }
     }
@@ -47,6 +50,14 @@ impl ModuleKind {
             Self::BasicNavigation => "Navigation: Basic",
             Self::IntermediateNavigation => "Navigation: Advanced",
             Self::AdvancedNavigation => "Navigation: Military",
+            Self::Targeting(tier) => match tier {
+                TargetingTier::Basic => "Targeting: Basic",
+                TargetingTier::Advanced => "Targeting: Advanced",
+                TargetingTier::Docking => "Targeting: Docking",
+                TargetingTier::Identification => "Targeting: Identification",
+                TargetingTier::Pirate => "Targeting: Pirate",
+                TargetingTier::Military => "Targeting: Military",
+            },
             _ => self.name(),
         }
     }
@@ -65,6 +76,14 @@ impl ModuleKind {
             Self::BasicNavigation => "Basic Navigation Computer",
             Self::IntermediateNavigation => "Intermediate Navigation Module",
             Self::AdvancedNavigation => "Advanced Navigation Module",
+            Self::Targeting(tier) => match tier {
+                TargetingTier::Basic => "Basic Targeting Module",
+                TargetingTier::Advanced => "Advanced Targeting Module",
+                TargetingTier::Docking => "Docking Targeting Module",
+                TargetingTier::Identification => "Identification Targeting Module",
+                TargetingTier::Pirate => "Pirate Targeting Module",
+                TargetingTier::Military => "Military Targeting Module",
+            },
         }
     }
     pub fn laser_profile(self) -> Option<super::OrdinaryWeapon> {
@@ -81,6 +100,7 @@ impl ModuleKind {
             Self::BasicNavigation | Self::IntermediateNavigation | Self::AdvancedNavigation => {
                 ModuleSlot::Navigation
             }
+            Self::Targeting(_) => ModuleSlot::Targeting,
             _ => ModuleSlot::Energy,
         }
     }
@@ -104,7 +124,11 @@ impl ModuleKind {
     fn xyzzy_supported(self) -> bool {
         matches!(
             self,
-            Self::NavalLaser | Self::EliteEnergyUnit | Self::AdvancedNavigation | Self::FuelScoops
+            Self::NavalLaser
+                | Self::EliteEnergyUnit
+                | Self::AdvancedNavigation
+                | Self::FuelScoops
+                | Self::Targeting(TargetingTier::Military)
         )
     }
     pub fn navigation_reach_ly(self) -> Option<u8> {
@@ -116,6 +140,7 @@ impl ModuleKind {
             Self::ExtraEnergyUnit => 2,
             Self::NavalEnergyUnit => 3,
             Self::EliteEnergyUnit => 4,
+            Self::Targeting(_) => 1,
             _ => 0,
         }
     }
@@ -133,6 +158,7 @@ impl ModuleKind {
             Self::BasicEnergySystem | Self::BasicNavigation => None,
             Self::IntermediateNavigation => Some((30_000, 8)),
             Self::AdvancedNavigation => Some((90_000, 11)),
+            Self::Targeting(tier) => Some((tier.price_tenths(), tier.required_technology())),
         }
     }
     fn prerequisite(self) -> Option<Self> {
@@ -142,6 +168,7 @@ impl ModuleKind {
             Self::EliteEnergyUnit => Some(Self::NavalEnergyUnit),
             Self::IntermediateNavigation => Some(Self::BasicNavigation),
             Self::AdvancedNavigation => Some(Self::IntermediateNavigation),
+            Self::Targeting(tier) => tier.predecessor().map(Self::Targeting),
             _ => None,
         }
     }
@@ -167,6 +194,7 @@ impl ModuleKind {
             Self::BasicNavigation => 10,
             Self::IntermediateNavigation => 11,
             Self::AdvancedNavigation => 12,
+            Self::Targeting(tier) => 12 + tier as u8,
         }
     }
     fn from_tag(tag: u8) -> Result<Self, SaveError> {
@@ -184,6 +212,7 @@ impl ModuleKind {
             10 => Ok(Self::BasicNavigation),
             11 => Ok(Self::IntermediateNavigation),
             12 => Ok(Self::AdvancedNavigation),
+            13..=18 => Ok(Self::Targeting(TargetingTier::ALL[usize::from(tag - 13)])),
             _ => Err(SaveError::InvalidEncoding),
         }
     }
@@ -194,6 +223,7 @@ pub enum ModuleSlot {
     Energy,
     UtilityFuelScoops,
     Navigation,
+    Targeting,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleProvenance {
@@ -285,6 +315,7 @@ pub enum ModuleError {
     TechnologyUnavailable,
     MissingPrerequisite,
     StaleOccupant,
+    LowerTargetingGrade,
     NoChange,
     Capacity,
     InsufficientCredits,
@@ -413,8 +444,20 @@ impl Ledger {
     }
     fn install(&mut self, index: usize, replacing: Option<u64>) -> Result<(), ModuleError> {
         let slot = self.items[index].kind.slot();
-        if self.fitted(slot).map(|i| i.id) != replacing {
+        let fitted = self.fitted(slot);
+        if fitted.map(|i| i.id) != replacing {
             return Err(ModuleError::StaleOccupant);
+        }
+        if let (
+            ModuleKind::Targeting(next),
+            Some(OwnedModule {
+                kind: ModuleKind::Targeting(current),
+                ..
+            }),
+        ) = (self.items[index].kind, fitted)
+            && next < current
+        {
+            return Err(ModuleError::LowerTargetingGrade);
         }
         for item in &mut self.items {
             if item.slot == Some(slot) {
@@ -811,6 +854,15 @@ impl State {
     }
 }
 impl World {
+    /// The actual fitted fictional inventory grade, or no installed module.
+    pub fn targeting_tier(&self) -> Option<TargetingTier> {
+        let account = self.commander_account.as_ref()?;
+        let ledger = self.modular.ledger(self, account).ok()?;
+        match ledger.fitted(ModuleSlot::Targeting)?.kind {
+            ModuleKind::Targeting(tier) => Some(tier),
+            _ => None,
+        }
+    }
     pub fn modular_equipment_snapshot(&self) -> Option<ModularEquipmentSnapshot> {
         let account = self.commander_account.as_ref()?;
         let ledger = self.modular.ledger(self, account).ok()?;
@@ -852,6 +904,12 @@ impl World {
             ModuleKind::EliteEnergyUnit,
             ModuleKind::IntermediateNavigation,
             ModuleKind::AdvancedNavigation,
+            ModuleKind::Targeting(TargetingTier::Basic),
+            ModuleKind::Targeting(TargetingTier::Advanced),
+            ModuleKind::Targeting(TargetingTier::Docking),
+            ModuleKind::Targeting(TargetingTier::Identification),
+            ModuleKind::Targeting(TargetingTier::Pirate),
+            ModuleKind::Targeting(TargetingTier::Military),
         ]
         .into_iter()
         .filter_map(|kind| {

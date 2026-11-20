@@ -42,6 +42,128 @@ fn cold(w: &World) -> World {
     loaded
 }
 #[test]
+fn targeting_inventory_has_six_original_paid_grades() {
+    let mut w = funded(15901);
+    let kinds = TargetingTier::ALL.map(ModuleKind::Targeting);
+    let prices = [8_000, 20_000, 40_000, 60_000, 100_000, 120_000];
+    let technologies = [4, 5, 7, 9, 10, 11];
+    let dock = w.current_dock_context().unwrap();
+    let mut ledger = Ledger::born(15901).unwrap();
+    for (i, kind) in kinds.into_iter().enumerate() {
+        let offer = w
+            .module_offers()
+            .into_iter()
+            .find(|o| o.kind == kind)
+            .unwrap();
+        assert_eq!(
+            (
+                offer.price_tenths,
+                offer.required_technology,
+                offer.slot,
+                offer.equipment_units
+            ),
+            (prices[i], technologies[i], ModuleSlot::Targeting, 1)
+        );
+        assert_eq!(
+            offer.prerequisite,
+            i.checked_sub(1).map(|previous| kinds[previous])
+        );
+        assert_eq!(
+            validate_purchase(kind, technologies[i] - 1, prices[i]),
+            Err(ModuleError::TechnologyUnavailable)
+        );
+        assert_eq!(
+            validate_purchase(kind, technologies[i], prices[i] - 1),
+            Err(ModuleError::InsufficientCredits)
+        );
+        assert_eq!(ModuleKind::from_tag(kind.tag()).unwrap(), kind);
+        let id = 200_000 + i as u64;
+        ledger
+            .apply(
+                Event {
+                    xyzzy: false,
+                    action: ModuleAction::Purchase { kind },
+                    item: id,
+                    dock,
+                    tick: 0,
+                    revision: i as u64,
+                },
+                i as u32 + 1,
+            )
+            .unwrap();
+        assert_eq!(ledger.fitted(ModuleSlot::Targeting).unwrap().id, id);
+    }
+    let cash = w.credits_tenths().unwrap();
+    let buy = |kind| ModuleAction::Purchase { kind };
+    assert_eq!(w.targeting_tier(), None);
+    assert!(matches!(
+        w.review_module(buy(kinds[1]), w.snapshot().tick),
+        Err(ModuleError::MissingPrerequisite)
+    ));
+    let basic = apply(&mut w, buy(kinds[0]));
+    let advanced = apply(&mut w, buy(kinds[1]));
+    assert_eq!(w.credits_tenths(), Some(cash - prices[0] - prices[1]));
+    let before = w.save_bytes().unwrap();
+    assert!(matches!(
+        w.review_module(
+            ModuleAction::Install {
+                item: basic,
+                replacing: Some(advanced)
+            },
+            w.snapshot().tick
+        ),
+        Err(ModuleError::LowerTargetingGrade)
+    ));
+    assert_eq!(w.save_bytes().unwrap(), before);
+    apply(&mut w, ModuleAction::Store { item: advanced });
+    assert_eq!(w.targeting_tier(), None);
+    apply(
+        &mut w,
+        ModuleAction::Install {
+            item: basic,
+            replacing: None,
+        },
+    );
+    assert_eq!(cold(&w).targeting_tier(), Some(TargetingTier::Basic));
+}
+#[test]
+fn xyzzy_targeting_inventory_refits_same_maximum_item_without_another_grant() {
+    let mut w = World::new_commander(15902).unwrap();
+    let review = w.review_xyzzy(crate::XyzzyAction::Enter, 0).unwrap();
+    w.prepare_xyzzy(review, 0).unwrap().commit();
+    let maximum = snap(&w)
+        .items
+        .into_iter()
+        .find(|item| item.kind == ModuleKind::Targeting(TargetingTier::Military))
+        .unwrap();
+    assert!(matches!(maximum.provenance, ModuleProvenance::XYZzy { .. }));
+    assert_eq!(w.targeting_tier(), Some(TargetingTier::Military));
+    apply(&mut w, ModuleAction::Store { item: maximum.id });
+    apply(
+        &mut w,
+        ModuleAction::Purchase {
+            kind: ModuleKind::Targeting(TargetingTier::Basic),
+        },
+    );
+    let cash = w.credits_tenths();
+    let tick = w.snapshot().tick;
+    let review = w
+        .review_xyzzy(crate::XyzzyAction::MaximumSupportedHardware, tick)
+        .unwrap();
+    w.prepare_xyzzy(review, tick).unwrap().commit();
+    let restored = cold(&w);
+    assert_eq!(restored.credits_tenths(), cash);
+    assert_eq!(restored.targeting_tier(), Some(TargetingTier::Military));
+    assert_eq!(
+        snap(&restored)
+            .items
+            .into_iter()
+            .filter(|item| item.kind == maximum.kind)
+            .collect::<Vec<_>>(),
+        vec![maximum]
+    );
+}
+#[test]
 fn paid_mining_laser_uses_original_3300cr_tl6_and_stores_the_same_born_pulse() {
     let mut w = funded(9101);
     let cash = w.credits_tenths().unwrap();

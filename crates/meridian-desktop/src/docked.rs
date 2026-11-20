@@ -568,6 +568,19 @@ fn equipment_action(
                 .iter()
                 .find(|owned| owned.id == item && owned.kind.node() == node)
                 .ok_or("Owned module selection changed")?
+    let targeting_node = node.starts_with("Targeting: ");
+    if targeting_node != (slot == "targeting") {
+        return Err("Select the targeting computer slot".into());
+    }
+    if targeting_node
+        && operation != Buy
+        && !modules
+            .items
+            .iter()
+            .any(|owned| Some(owned.id) == instance && owned.kind.node() == node)
+    {
+        return Err("Owned module selection changed".into());
+    }
                 .kind;
             ModuleAction::Install {
                 item,
@@ -635,6 +648,7 @@ fn module_rows(
                 "Damage {} | Range 6000 | Fire interval {:.1}s",
                 profile.damage_hundredths() / 100,
                 f64::from(profile.cooldown_ticks()) / 60.0
+        ModuleSlot::Targeting => "Targeting computer",
             ));
         }
         if let Some(multiplier) = item.kind.energy_recharge_multiplier() {
@@ -649,6 +663,9 @@ fn module_rows(
             .review_module(
                 ModuleAction::Install {
                     item: item.id,
+        } else if matches!(item.kind, ModuleKind::Targeting(_)) {
+            row.compatibility = "Owned SH025 computer module".into();
+            row.readout.push("Equipment units 1".into());
                     replacing: fitted.map(|item| item.id),
                 },
                 tick,
@@ -779,6 +796,17 @@ fn equipment_panel(
             "Cargo utility",
         );
         row.instance = equipment.owned.map(|i| u64::from(i.id.serial()));
+    slots.push(ui::EquipmentSlot {
+        id: "targeting".into(),
+        label: "Targeting computer".into(),
+        fitted: modules
+            .items
+            .iter()
+            .find(|item| item.slot == Some(ModuleSlot::Targeting))
+            .map_or("Empty", |item| item.kind.name())
+            .into(),
+        available: true,
+    });
         row.owned = u32::from(equipment.owned.is_some());
         row.fitted = u32::from(equipment.owned.is_some_and(|i| i.fitted));
         if let Some(item) = equipment.owned {
@@ -787,6 +815,7 @@ fn equipment_panel(
                     "XYZZY grant; no paid purchase"
                 } else {
                     "Paid cargo bay; original receipt retained"
+        "targeting" => Some(ModuleSlot::Targeting),
                 }
                 .into(),
             );
@@ -926,6 +955,7 @@ mod secret_ui_tests {
                 .rows
                 .iter()
                 .any(|row| row.node == ModuleKind::MiningLaser.node()
+            "targeting",
                     && row.readout.iter().any(|line| line.contains("Paid module")))
         );
         assert!(
