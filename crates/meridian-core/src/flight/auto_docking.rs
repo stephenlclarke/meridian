@@ -336,6 +336,10 @@ mod tests {
         let mut world = launched();
         world.toggle_auto_docking().unwrap();
         let tick = world.snapshot().tick;
+        let active = world.snapshot();
+        assert!(world.request_pause(true, tick + 1).is_err());
+        assert_eq!(world.snapshot(), active);
+        assert!(world.auto_docking_active());
         world.request_pause(true, tick).unwrap();
         let paused = world.snapshot();
         assert_eq!(
@@ -343,8 +347,10 @@ mod tests {
             Err(super::super::StepError::Paused)
         );
         assert_eq!(world.snapshot(), paused);
-        assert!(world.auto_docking_active());
+        assert!(!world.auto_docking_active());
         world.request_pause(false, tick).unwrap();
+        assert!(!world.auto_docking_active());
+        world.toggle_auto_docking().unwrap();
         let bytes = world.save_bytes().unwrap();
         let restored = World::decode_saved_world(&bytes).unwrap();
         assert!(!restored.auto_docking_active());
@@ -381,6 +387,31 @@ mod tests {
         assert!(world.auto_docking_active());
         assert!(world.targeting_station_selected());
         assert_eq!(world.auto_docking_status(), Some("Approach"));
+        let tick = world.snapshot().tick;
+        assert!(world.request_pause(true, tick + 1).is_err());
+        assert!(world.auto_docking_active());
+        assert!(world.targeting_station_selected());
+        world.request_pause(true, tick).unwrap();
+        assert!(!world.auto_docking_active());
+        assert!(!world.targeting_station_selected());
+        world.request_pause(false, tick).unwrap();
+        for _ in 0..100 {
+            world
+                .cycle_targeting(
+                    tick,
+                    super::super::TargetingViewport {
+                        size: [640, 360],
+                        front: Vec::new(),
+                    },
+                )
+                .unwrap();
+            if world.targeting_station_selected() {
+                break;
+            }
+        }
+        assert!(world.targeting_station_selected());
+        world.step(FlightInput::default()).unwrap();
+        assert!(world.auto_docking_active());
         world
             .step(FlightInput {
                 brake: true,
