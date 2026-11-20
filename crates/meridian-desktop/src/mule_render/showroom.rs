@@ -13,6 +13,10 @@ use meridian_core::{
         CUSTOM_DETAILED_FACES, CUSTOM_DETAILED_VERTICES, CUSTOM_NATIVE_VERTICES, CUSTOM_PIECES,
         GoshawkCustomHullSource,
     },
+    mole_prospector::{
+        MoleProspectorHullSource, PROSPECTOR_DETAILED_FACES, PROSPECTOR_DETAILED_VERTICES,
+        PROSPECTOR_NATIVE_VERTICES, PROSPECTOR_PIECES,
+    },
     mule::EnvelopeError,
 };
 
@@ -23,6 +27,9 @@ const VISUAL_FNV: u64 = 0x7a17_0c0c_6cdc_d5fd;
 pub(crate) const CUSTOM_GEOMETRY_KEY: &str = "assets/fleet/sh010/visual.bin";
 const CUSTOM_VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh010/visual.bin");
 const CUSTOM_VISUAL_FNV: u64 = 0xfe21_3755_8ea3_8ccb;
+pub(crate) const PROSPECTOR_GEOMETRY_KEY: &str = "assets/fleet/sh017/visual.bin";
+const PROSPECTOR_VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh017/visual.bin");
+const PROSPECTOR_VISUAL_FNV: u64 = 0xf2a8_36bd_3d89_c5f0;
 const EMPTY_PIECE: Piece = Piece {
     range: [0; 4],
     low: [0.0; 4],
@@ -33,12 +40,14 @@ const EMPTY_PIECE: Piece = Piece {
 pub(crate) enum Hull {
     Explorer,
     Custom,
+    MoleProspector,
 }
 
 pub(crate) fn hull(model: &ModelPreview) -> Option<Hull> {
     match (model.object.as_str(), model.geometry_key.as_str()) {
         ("SH008", GEOMETRY_KEY) => Some(Hull::Explorer),
         ("SH010", CUSTOM_GEOMETRY_KEY) => Some(Hull::Custom),
+        ("SH017", PROSPECTOR_GEOMETRY_KEY) => Some(Hull::MoleProspector),
         _ => None,
     }
 }
@@ -84,6 +93,12 @@ impl Hull {
                 b"SH010VZ1",
                 CUSTOM_DETAILED_FACES * 3,
             ),
+            Self::MoleProspector => authenticated_visual(
+                PROSPECTOR_VISUAL,
+                PROSPECTOR_VISUAL_FNV,
+                b"SH017VZ1",
+                PROSPECTOR_DETAILED_FACES * 3,
+            ),
         }
     }
 
@@ -91,6 +106,7 @@ impl Hull {
         match self {
             Self::Explorer => GOSHAWK_PIECES,
             Self::Custom => CUSTOM_PIECES,
+            Self::MoleProspector => PROSPECTOR_PIECES,
         }
     }
 
@@ -110,6 +126,15 @@ impl Hull {
                 let (triangles, pieces) = support_mesh(
                     source.pieces(),
                     CUSTOM_DETAILED_VERTICES + CUSTOM_NATIVE_VERTICES,
+                )
+                .map_err(SupportError::Render)?;
+                Ok((triangles, pieces.to_vec()))
+            }
+            Self::MoleProspector => {
+                let source = MoleProspectorHullSource::bundled().map_err(SupportError::Source)?;
+                let (triangles, pieces) = support_mesh(
+                    source.pieces(),
+                    PROSPECTOR_DETAILED_VERTICES + PROSPECTOR_NATIVE_VERTICES,
                 )
                 .map_err(SupportError::Render)?;
                 Ok((triangles, pieces.to_vec()))
@@ -271,7 +296,7 @@ impl Pass {
     ) -> Result<Self, String> {
         match hull {
             Hull::Explorer => Self::new(device, queue, format),
-            Hull::Custom => Self::construct(device, queue, format, hull),
+            Hull::Custom | Hull::MoleProspector => Self::construct(device, queue, format, hull),
         }
     }
 
@@ -427,6 +452,78 @@ mod tests {
         assert_eq!(hull(&model), Some(Hull::Explorer));
         model.geometry_key = CUSTOM_GEOMETRY_KEY.into();
         assert!(!matches(&model));
+    }
+
+    #[test]
+    fn mole_prospector_original_visual_and_all_local_supports_bind_to_its_own_shader() {
+        check_variant(
+            Hull::MoleProspector,
+            PROSPECTOR_DETAILED_FACES,
+            PROSPECTOR_PIECES,
+        );
+        assert!(
+            authenticated_visual(PROSPECTOR_VISUAL, VISUAL_FNV, b"GOSHVIZ1", VERTICES).is_err()
+        );
+        assert!(
+            authenticated_visual(
+                PROSPECTOR_VISUAL,
+                CUSTOM_VISUAL_FNV,
+                b"SH010VZ1",
+                CUSTOM_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        assert!(
+            authenticated_visual(
+                CUSTOM_VISUAL,
+                PROSPECTOR_VISUAL_FNV,
+                b"SH017VZ1",
+                PROSPECTOR_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        assert!(
+            authenticated_visual(
+                VISUAL,
+                PROSPECTOR_VISUAL_FNV,
+                b"SH017VZ1",
+                PROSPECTOR_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        let mut model = ModelPreview {
+            object: "SH017".into(),
+            geometry_key: PROSPECTOR_GEOMETRY_KEY.into(),
+            bounds: Rect::new(0.0, 0.0, 256.0, 256.0),
+            orientation: Orientation::default(),
+        };
+        assert_eq!(hull(&model), Some(Hull::MoleProspector));
+        model.geometry_key = GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+        model.object = "SH008".into();
+        assert_eq!(hull(&model), Some(Hull::Explorer));
+        model.geometry_key = PROSPECTOR_GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+        model.object = "SH010".into();
+        assert!(!matches(&model));
+        model.geometry_key = CUSTOM_GEOMETRY_KEY.into();
+        assert_eq!(hull(&model), Some(Hull::Custom));
+        model.object = "SH017".into();
+        assert!(!matches(&model));
+        model.geometry_key = "assets/fleet/sh016/visual.bin".into();
+        assert!(!matches(&model));
+        model.object = "SH016".into();
+        model.geometry_key = PROSPECTOR_GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+        assert!(
+            authenticated_visual(
+                PROSPECTOR_VISUAL,
+                PROSPECTOR_VISUAL_FNV,
+                b"SH016VZ1",
+                PROSPECTOR_DETAILED_FACES * 3,
+            )
+            .is_err()
+        );
     }
 
     fn check_variant(hull: Hull, face_count: usize, piece_count: usize) {
