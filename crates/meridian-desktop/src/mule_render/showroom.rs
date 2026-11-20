@@ -14,6 +14,10 @@ use meridian_core::{
         GoshawkCustomHullSource,
     },
     mule::EnvelopeError,
+    peregrine_mk_i::{
+        PEREGRINE_I_DETAILED_FACES, PEREGRINE_I_DETAILED_VERTICES, PEREGRINE_I_NATIVE_VERTICES,
+        PEREGRINE_I_PIECES, PeregrineMkIHullSource,
+    },
 };
 
 pub(crate) const GEOMETRY_KEY: &str = "assets/fleet/sh008/visual.bin";
@@ -23,6 +27,9 @@ const VISUAL_FNV: u64 = 0x7a17_0c0c_6cdc_d5fd;
 pub(crate) const CUSTOM_GEOMETRY_KEY: &str = "assets/fleet/sh010/visual.bin";
 const CUSTOM_VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh010/visual.bin");
 const CUSTOM_VISUAL_FNV: u64 = 0xfe21_3755_8ea3_8ccb;
+pub(crate) const PEREGRINE_I_GEOMETRY_KEY: &str = "assets/fleet/sh022/visual.bin";
+const PEREGRINE_I_VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh022/visual.bin");
+const PEREGRINE_I_VISUAL_FNV: u64 = 0x0259_dab8_59ed_15d8;
 const EMPTY_PIECE: Piece = Piece {
     range: [0; 4],
     low: [0.0; 4],
@@ -33,12 +40,14 @@ const EMPTY_PIECE: Piece = Piece {
 pub(crate) enum Hull {
     Explorer,
     Custom,
+    PeregrineMkI,
 }
 
 pub(crate) fn hull(model: &ModelPreview) -> Option<Hull> {
     match (model.object.as_str(), model.geometry_key.as_str()) {
         ("SH008", GEOMETRY_KEY) => Some(Hull::Explorer),
         ("SH010", CUSTOM_GEOMETRY_KEY) => Some(Hull::Custom),
+        ("SH022", PEREGRINE_I_GEOMETRY_KEY) => Some(Hull::PeregrineMkI),
         _ => None,
     }
 }
@@ -84,6 +93,12 @@ impl Hull {
                 b"SH010VZ1",
                 CUSTOM_DETAILED_FACES * 3,
             ),
+            Self::PeregrineMkI => authenticated_visual(
+                PEREGRINE_I_VISUAL,
+                PEREGRINE_I_VISUAL_FNV,
+                b"SH022VZ1",
+                PEREGRINE_I_DETAILED_FACES * 3,
+            ),
         }
     }
 
@@ -91,6 +106,7 @@ impl Hull {
         match self {
             Self::Explorer => GOSHAWK_PIECES,
             Self::Custom => CUSTOM_PIECES,
+            Self::PeregrineMkI => PEREGRINE_I_PIECES,
         }
     }
 
@@ -110,6 +126,15 @@ impl Hull {
                 let (triangles, pieces) = support_mesh(
                     source.pieces(),
                     CUSTOM_DETAILED_VERTICES + CUSTOM_NATIVE_VERTICES,
+                )
+                .map_err(SupportError::Render)?;
+                Ok((triangles, pieces.to_vec()))
+            }
+            Self::PeregrineMkI => {
+                let source = PeregrineMkIHullSource::bundled().map_err(SupportError::Source)?;
+                let (triangles, pieces) = support_mesh(
+                    source.pieces(),
+                    PEREGRINE_I_DETAILED_VERTICES + PEREGRINE_I_NATIVE_VERTICES,
                 )
                 .map_err(SupportError::Render)?;
                 Ok((triangles, pieces.to_vec()))
@@ -271,7 +296,7 @@ impl Pass {
     ) -> Result<Self, String> {
         match hull {
             Hull::Explorer => Self::new(device, queue, format),
-            Hull::Custom => Self::construct(device, queue, format, hull),
+            Hull::Custom | Hull::PeregrineMkI => Self::construct(device, queue, format, hull),
         }
     }
 
@@ -427,6 +452,131 @@ mod tests {
         assert_eq!(hull(&model), Some(Hull::Explorer));
         model.geometry_key = CUSTOM_GEOMETRY_KEY.into();
         assert!(!matches(&model));
+    }
+
+    #[test]
+    fn peregrine_mk_i_original_visual_and_all_local_supports_bind_to_its_own_shader() {
+        check_variant(
+            Hull::PeregrineMkI,
+            PEREGRINE_I_DETAILED_FACES,
+            PEREGRINE_I_PIECES,
+        );
+        assert!(
+            authenticated_visual(PEREGRINE_I_VISUAL, VISUAL_FNV, b"GOSHVIZ1", VERTICES).is_err()
+        );
+        assert!(
+            authenticated_visual(
+                PEREGRINE_I_VISUAL,
+                CUSTOM_VISUAL_FNV,
+                b"SH010VZ1",
+                CUSTOM_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        assert!(
+            authenticated_visual(
+                CUSTOM_VISUAL,
+                PEREGRINE_I_VISUAL_FNV,
+                b"SH022VZ1",
+                PEREGRINE_I_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        assert!(
+            authenticated_visual(
+                VISUAL,
+                PEREGRINE_I_VISUAL_FNV,
+                b"SH022VZ1",
+                PEREGRINE_I_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        let mut model = ModelPreview {
+            object: "SH022".into(),
+            geometry_key: PEREGRINE_I_GEOMETRY_KEY.into(),
+            bounds: Rect::new(0.0, 0.0, 256.0, 256.0),
+            orientation: Orientation::default(),
+        };
+        assert_eq!(hull(&model), Some(Hull::PeregrineMkI));
+        model.geometry_key = GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+        model.object = "SH008".into();
+        assert_eq!(hull(&model), Some(Hull::Explorer));
+        model.geometry_key = PEREGRINE_I_GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+        model.object = "SH010".into();
+        assert!(!matches(&model));
+        model.geometry_key = CUSTOM_GEOMETRY_KEY.into();
+        assert_eq!(hull(&model), Some(Hull::Custom));
+        model.object = "SH022".into();
+        assert!(!matches(&model));
+        model.geometry_key = "assets/fleet/sh023/visual.bin".into();
+        assert!(!matches(&model));
+        model.object = "SH023".into();
+        model.geometry_key = PEREGRINE_I_GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+        assert!(
+            authenticated_visual(
+                PEREGRINE_I_VISUAL,
+                PEREGRINE_I_VISUAL_FNV,
+                b"PRG3VIZ1",
+                PEREGRINE_I_DETAILED_FACES * 3,
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    #[ignore = "Requires the actual SH023 visual in the joined source tree"]
+    fn peregrine_mk_i_and_mk_iii_refuse_actual_crossed_visual_payloads() {
+        // PR85's actual source is independent of this branch. Run this test after joining
+        // both originals; a missing peer payload is a failure, not a skipped acceptance.
+        let mk3_path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../assets/fleet/sh023/visual.bin");
+        let mk3 = ok(std::fs::read(mk3_path));
+        const MK3_FNV: u64 = 0x09d8_c8bd_7b6a_6a63;
+        const MK3_MAGIC: &[u8; 8] = b"PRG3VIZ1";
+        const MK3_VERTICES: usize = 10_452;
+        assert_eq!(
+            ok(authenticated_visual(&mk3, MK3_FNV, MK3_MAGIC, MK3_VERTICES)).len(),
+            MK3_VERTICES
+        );
+        assert_eq!(
+            ok(authenticated_visual(
+                PEREGRINE_I_VISUAL,
+                PEREGRINE_I_VISUAL_FNV,
+                b"SH022VZ1",
+                PEREGRINE_I_DETAILED_FACES * 3,
+            ))
+            .len(),
+            PEREGRINE_I_DETAILED_FACES * 3
+        );
+        assert!(
+            authenticated_visual(
+                &mk3,
+                PEREGRINE_I_VISUAL_FNV,
+                b"SH022VZ1",
+                PEREGRINE_I_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        assert!(
+            authenticated_visual(PEREGRINE_I_VISUAL, MK3_FNV, MK3_MAGIC, MK3_VERTICES).is_err()
+        );
+        // Even with each payload's real fingerprint, the other original's header must refuse.
+        assert!(
+            authenticated_visual(&mk3, MK3_FNV, b"SH022VZ1", PEREGRINE_I_DETAILED_FACES * 3)
+                .is_err()
+        );
+        assert!(
+            authenticated_visual(
+                PEREGRINE_I_VISUAL,
+                PEREGRINE_I_VISUAL_FNV,
+                MK3_MAGIC,
+                MK3_VERTICES
+            )
+            .is_err()
+        );
     }
 
     fn check_variant(hull: Hull, face_count: usize, piece_count: usize) {

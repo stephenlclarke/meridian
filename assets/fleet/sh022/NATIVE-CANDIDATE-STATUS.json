@@ -1,0 +1,81 @@
+{
+  "schema": "meridian-original-candidate-status/1",
+  "hull": "SH022",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "parentInputs": {
+    "peerBlueprint": {
+      "path": "docs/milestones/fleet-physical/peregrine-peer-native-candidate-blueprint.json",
+      "bytes": 7558,
+      "sha256": "cb7fbb763eb56da8c7651b11b705759baea74eb4b94e1560d70fbaff86e0cc70"
+    },
+    "qualificationInputs": {
+      "path": "docs/milestones/fleet-physical/actual55-candidate-qualification-inputs.json",
+      "bytes": 1202290,
+      "sha256": "2847c68d4328956b776cf89217b8b42c35990b4b0fea87bac39247fafe3dc01f"
+    }
+  },
+  "peerProposal": {
+    "id": "peregrine-three-peer-members-complete27part-native-candidates-v1",
+    "status": "IMPLEMENTED_SOURCE_GENERATOR_UNEXECUTED_NOT_NATIVE_QUALIFIED",
+    "entryStatus": "Own original resource remains pending; no family/source/crew/SH025 substitution",
+    "reportedOriginalNativeFaces": 964,
+    "originalComponents": 27,
+    "exactFaceLimit": 512,
+    "recipe": {
+      "path": "docs/fleet-physical/peregrine-peer-native-candidate-recipe.py",
+      "bytes": 10094,
+      "sha256": "2ef1cecb85127fe6294535a82d6fad18564e1575c02a8fcfb2819ebf6db2de8c"
+    },
+    "tests": {
+      "path": "docs/fleet-physical/peregrine-peer-native-candidate-tests.py",
+      "bytes": 11591,
+      "sha256": "2bd7bebc6d9cc2b721f8077fb0d317a2a6989032a55e1bbea099d98d6ad76905"
+    }
+  },
+  "laterQualificationInputs": {
+    "status": "INPUTS_FOR_G1_ONLY_NOT_FIDELITY_NATIVE_PHYSICAL_OR_RUNTIME_QUALIFICATION",
+    "sourceCommit": "83c00de3ccc1f5f8d97dd93601e718f1a0d24658",
+    "actualRunHead": "4e5352d0f161dc10d5ec7374e601fd3b2bb11d22",
+    "actualRunSession": 50084,
+    "cache": {
+      "path": "actual-run/candidates/SH022.json",
+      "bytes": 68833,
+      "sha256": "bde6d62a7afe085e73027db3b57ea715615bff89e4de0b2fe82af9c07e52d70f"
+    },
+    "sampledPartIndices": [
+      0,
+      5,
+      13,
+      19,
+      22,
+      23,
+      25,
+      26
+    ],
+    "fixedPartIndices": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      14,
+      15,
+      16,
+      17,
+      18,
+      20,
+      21,
+      24
+    ],
+    "continuousFidelityStatus": "UNISSUED_GENERAL_METRIC_AND_TOLERANCE_NO_AUTOMATIC_PASS",
+    "adoptionRoute": "current-hull-source-native-qualification-then-admission-unissued",
+    "candidateFaceCount": null
+  },
+  "scope": "The later record identifies a cached input; the candidate geometry bytes and actual count are not in this frozen Git tree. Neither proposal nor cached input was adopted or qualified here. Only the original 964-face packaged source is used."
+}

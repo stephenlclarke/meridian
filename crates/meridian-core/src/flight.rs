@@ -7,6 +7,7 @@ mod celestial;
 mod damage;
 mod goshawk_validation;
 pub use goshawk_validation::GoshawkCustomApproachSnapshot;
+pub use goshawk_validation::PeregrineMkIApproachSnapshot;
 pub use goshawk_validation::{GoshawkApproachSnapshot, GoshawkApproachStatus};
 mod mining;
 mod mule_renas;

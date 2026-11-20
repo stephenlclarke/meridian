@@ -1,0 +1,119 @@
+{
+  "hull": "SH022",
+  "name": "Peregrine Mk I",
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "protectedBase": "dae39800a35e2d8ca57b3d6a7ead20c7438c6b49",
+  "sourceManifestSha256": "b7c4ed44b129ec709ca79001f5b425daf1c98ddee0c13859a3a38f47bb791f6e",
+  "independentFitWitnessSha256": "93a6f508e260c271f6598881d68992116e923f68f657c3b8fa954080d7e2d10d",
+  "independentSurfaceFitSha256": "172efe3867ce39e77d0c4f39df997e2af27430673ffb3d88a75c427877df409c",
+  "geometry": {
+    "detailedVertices": 2072,
+    "detailedFaces": 3484,
+    "nativeVertices": 536,
+    "nativeFaces": 964,
+    "nativeExactFaceLimit": 512,
+    "roundedPieces": 69,
+    "roundingMetres": 0.02,
+    "criteria": [
+      "Both original detailed and packaged native source meshes remain unchanged; all original vertices and triangles are covered by source-local supports.",
+      "The two source fork longitudinal members, aft cross-bridge, pods, pressure body, lower prow, glazing and both drive assemblies remain separate; detailed/native wells are not substituted across domains.",
+      "The actual hooked forward bow gap is independently clear over 10m; no whole-hull convex fill or claim of an open aft route. SH022 is distinct from SH008's equal topology counts and SH023/SH025 sibling identities."
+    ]
+  },
+  "nativeAlternative": {
+    "receipt": "assets/fleet/sh022/NATIVE-CANDIDATE-STATUS.json",
+    "receiptSha256": "08e50790a1e2673d536025f94fa129c7a769375f73b1b73604ae2ea2498c1615",
+    "reportedPackagedNativeFaces": 964,
+    "exactLimit": 512,
+    "peerProposalStatus": "IMPLEMENTED_SOURCE_GENERATOR_UNEXECUTED_NOT_NATIVE_QUALIFIED",
+    "laterInputStatus": "INPUTS_FOR_G1_ONLY_NOT_FIDELITY_NATIVE_PHYSICAL_OR_RUNTIME_QUALIFICATION",
+    "cachedCandidate": "actual-run/candidates/SH022.json",
+    "cacheBytes": 68833,
+    "cacheSha256": "bde6d62a7afe085e73027db3b57ea715615bff89e4de0b2fe82af9c07e52d70f",
+    "candidateFaceCount": null,
+    "scope": "Cached candidate geometry bytes/count are absent from the frozen Git tree; continuous fidelity and adoption remain unissued. Neither alternative source generator nor cached input is selected, run or qualified by this port."
+  },
+  "engineering": {
+    "dryMassKg": 103972,
+    "metresPerSourceUnit": "800/59",
+    "maxControlledSpeedUnits": 37,
+    "physicalRecordStatus": "NEW_AUTHORED_SOURCE_BUDGET_NOT_NATIVE_QUALIFICATION",
+    "scope": "Exact adopted stock engineering and full signed tensor. Actual materials, hardware, loaded mass, paid fittings and crew unresolved."
+  },
+  "fit": {
+    "bowGapSourceClearanceMetres": 2.7188305084745763,
+    "translationMetres": 10,
+    "alignedStationSweepMetres": 41.60611864406779,
+    "offApertureCompleteSweepMetres": 3.2366271186440665,
+    "lipSourceVertex": 96,
+    "launchOutwardF32Bits": "0x44909320",
+    "retainedSurfaceBoundsMillimetres": {
+      "detailed": [
+        1156,
+        1160
+      ],
+      "nativeCandidate": [
+        1708,
+        1736
+      ],
+      "mandatoryCrossSourceVertices": [
+        1692,
+        1138
+      ],
+      "bothLongitudinalForks": {
+        "detailed": 572,
+        "nativeCandidate": 1124
+      },
+      "aftCrossBridge": {
+        "detailed": 759,
+        "nativeCandidate": 1497
+      }
+    }
+  },
+  "sourceOnly": {
+    "rebuild": "python3 -B tools/prepare_peregrine_mk_i.py --check",
+    "fit": "python3 -B tools/verify_peregrine_mk_i_fit.py",
+    "surface": "python3 -B -m unittest discover -s tools -p 'test_audit_peregrine_mk_i_surface.py' -v",
+    "negatives": "python3 -B -m unittest discover -s tools -p 'test_peregrine_mk_i.py' -v",
+    "scope": "Pinned original sources and narrow candidate receipt rebuilt from both pinned shared parent blobs; fixed Git blob argv/strict cwd; actual spaced repository and missing input controls."
+  },
+  "ownedTests": {
+    "workspace": "cargo test --locked --workspace",
+    "core": "cargo test --locked -p meridian-core peregrine_mk_i::tests -- --nocapture",
+    "typedWorld": "cargo test --locked -p meridian-core flight::goshawk_validation::tests -- --nocapture",
+    "desktop": [
+      "cargo test --locked -p meridian-desktop peregrine_mk_i_original_visual_and_all_local_supports_bind_to_its_own_shader",
+      "cargo test --locked -p meridian-desktop selecting_peregrine_mk_i_routes_its_own_preview_without_granting_exchange",
+      "cargo test --locked -p meridian-desktop selecting_peregrine_mk_iii_does_not_select_peregrine_mk_i_or_its_geometry",
+      "cargo test --locked -p meridian-desktop original_peregrine_mk_i_fits_minimum_station_showroom_solo_and_compare"
+    ],
+    "acceptance": [
+      "Five actual controlled World routes and exact inclusive 37-unit speed; prior SH008 engineering and SH010 typed scope remain unchanged.",
+      "Ordinary Showroom selects the own original cobalt-cream visual separately from SH023 and existing SH025 baseline, refuses exchange and retains the hooked bow silhouette."
+    ]
+  },
+  "metal": {
+    "invocation": "Set each directory variable to a distinct new absolute directory and run cargo test --locked -p meridian-desktop <test> -- --ignored --exact --nocapture.",
+    "tests": [
+      {
+        "directoryVariable": "MERIDIAN_SH022_EVIDENCE_DIR",
+        "test": "mule_render::showroom::metal_qualification::metal_peregrine_mk_i_same_pose_shimmer",
+        "verifier": "python3 -B tools/verify_goshawk_showroom_evidence.py <evidence-directory>"
+      },
+      {
+        "directoryVariable": "MERIDIAN_SH022_MINIMUM_DIR",
+        "test": "mule_render::showroom::metal_qualification::peregrine_mk_i_qualification::metal_peregrine_mk_i_minimum_showroom_model_pass"
+      },
+      {
+        "directoryVariable": "MERIDIAN_SH022_CACHE_DIR",
+        "test": "mule_render::showroom::metal_qualification::peregrine_mk_i_qualification::metal_peregrine_mk_i_cache_switching"
+      }
+    ],
+    "scope": "Production direct RGB and full-target pane union in both Explorer/Mk I and Custom/Mk I orders; three distinct solo/cache returns. Minimum 640×360 logical; resizes, compositor and GPU timing separate."
+  },
+  "remaining": [
+    "Owned Rust/Metal and exact native qualification.",
+    "Ordinary actor placement, loaded engineering, crew/custody, acquisition and paid equipment.",
+    "SH023 Mk III remains independently owned; no Crow/Sable/Gazelle composition changes."
+  ]
+}
