@@ -81,6 +81,8 @@ fn actual_secret_menu_publishes_clarke_real_outfit_and_visible_provenance_then_c
             .and_then(|snapshot| snapshot.owned)
             .is_some_and(|item| item.xyzzy && item.fitted)
     );
+    let specialists = world.work_targeting_fit();
+    assert!(specialists.mining && specialists.salvage);
     let emp = world.owned_emp().unwrap_or_else(|| panic!("EMP"));
     assert!(emp.fitted);
     assert_eq!(

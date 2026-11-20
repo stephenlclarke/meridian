@@ -10,7 +10,7 @@ The [complete action inventory](XYZZY-ACTIONS.json) covers every secret key and 
 
 ## Actual supported effects
 
-In the flight-computer development build, activating or refitting XYZZY installs the Military targeting computer and raises all three EMP grades to 3. Local technology and shop stock apply to ordinary purchases. Returning to the same menu after a save lets you refit and change fuel mode in one visit.
+In the flight-computer development build, activating or refitting XYZZY fits the Military targeting computer, both Mining and Salvage targeting modules, and raises all three EMP grades to 3. Local technology and shop stock apply to ordinary purchases. Returning to the same menu after a save lets you refit and change fuel mode in one visit.
 
 Explicit `Enter` persists mode/name and the once-only cash adjustment. Normal commanders remain Rowan Calder with their own720 CR birth balance. No getter, saved descriptor, purchase API or capability readout activates mode. Ordinary paid purchases continue to charge their actual prices and retain paid provenance, technology, prerequisites and limits.
 
