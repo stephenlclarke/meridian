@@ -483,8 +483,35 @@ fn chart(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         }
     }
     // Nearest-star selection applies anywhere inside the plot, with deterministic ID tie-break.
-    let fields = world_details(s, c);
-    paragraphs(f, &fields, layout.details, s.scroll);
+    button(
+        f,
+        if s.profit_scan {
+            "P: Profit scan ON"
+        } else {
+            "P: Profit scan OFF"
+        },
+        Rect::new(
+            layout.details.x,
+            layout.details.y,
+            layout.details.width.min(180.0),
+            21.0,
+        ),
+        Control::Key(Key::ProfitScan),
+        true,
+        None,
+    );
+    let mut fields = Vec::new();
+    if s.profit_scan {
+        fields.extend(profit_fields(c.catalogue, &c.world.profit_destinations()));
+    }
+    fields.extend(world_details(s, c));
+    let details = Rect::new(
+        layout.details.x,
+        layout.details.y + 25.0,
+        layout.details.width,
+        (layout.details.height - 25.0).max(0.0),
+    );
+    paragraphs(f, &fields, details, s.scroll);
     let search_button = Rect::new(layout.plot.x + 4.0, layout.plot.y + 4.0, 100.0, 21.0);
     button(f, "Find world", search_button, Control::Search, true, None);
     button(
@@ -558,6 +585,26 @@ fn chart(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
             );
         }
     }
+}
+pub(super) fn profit_fields(
+    catalogue: &super::Catalogue,
+    results: &[meridian_core::ProfitDestination],
+) -> Vec<String> {
+    if results.is_empty() {
+        return vec!["No profitable destinations in range".into()];
+    }
+    let mut fields = vec!["Estimated profit (before fuel/risk):".into()];
+    for (index, result) in results.iter().enumerate() {
+        if let Some(world) = catalogue.world(result.system) {
+            fields.push(format!(
+                "{}. {}: {} CR",
+                index + 1,
+                world.name,
+                money(result.profit_tenths)
+            ));
+        }
+    }
+    fields
 }
 fn world_details(s: &DockedScreens, c: &Context<'_>) -> Vec<String> {
     let Some(w) = c.catalogue.world(s.selected_world) else {

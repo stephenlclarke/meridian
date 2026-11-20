@@ -450,10 +450,10 @@ impl App {
             self.request_redraw();
             return;
         }
-        let chart_profit = code == KeyCode::KeyP && self.menu_active()
-            && self.docked.as_ref().is_some_and(|menu| menu.screen() == ui::Screen::Galaxy);
-        let global = matches!(code, KeyCode::F5 | KeyCode::F9 | KeyCode::F11)
-            || (code == KeyCode::KeyP && !chart_profit);
+        let global = matches!(
+            code,
+            KeyCode::F5 | KeyCode::F9 | KeyCode::F11 | KeyCode::KeyP
+        );
         if self.menu_active() && !global {
             if self.open_menu_key(code) {
                 return;
@@ -595,7 +595,9 @@ impl App {
             return;
         }
         let screen = if self.xyzzy.is_some() {
-            self.docked.as_ref().map_or(ui::Screen::System, Docked::screen)
+            self.docked
+                .as_ref()
+                .map_or(ui::Screen::System, Docked::screen)
         } else {
             ui::Screen::System
         };
@@ -953,6 +955,18 @@ impl App {
             && let Some(text) = text.filter(|s| s.chars().all(|c| !c.is_control()))
         {
             self.menu_input(ui::Input::Text(text.to_string()));
+            return None;
+        }
+        if code == KeyCode::KeyP
+            && self.menu_active()
+            && self
+                .docked
+                .as_ref()
+                .is_some_and(|menu| menu.screen() == ui::Screen::Galaxy)
+        {
+            if !repeat {
+                self.menu_input(ui::Input::Key(ui::Key::ProfitScan));
+            }
             return None;
         }
         if repeat

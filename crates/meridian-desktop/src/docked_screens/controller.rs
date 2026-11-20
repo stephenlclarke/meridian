@@ -15,6 +15,7 @@ pub struct DockedScreens {
     pub(super) remembered: [u16; 8],
     pub(super) local: bool,
     pub(super) map_colour: u8,
+    pub(super) profit_scan: bool,
     pub(super) ship: String,
     pub(super) baseline: Option<String>,
     pub(super) compare: bool,
@@ -49,6 +50,7 @@ impl DockedScreens {
             remembered,
             local: false,
             map_colour: 0,
+            profit_scan: false,
             ship: hull.into(),
             baseline: None,
             compare: true,
@@ -583,6 +585,10 @@ impl DockedScreens {
                     self.select_world(nav.system, c);
                     self.query.clear();
                 }
+            }
+            Key::ProfitScan if self.screen == Screen::Galaxy => {
+                self.profit_scan = !self.profit_scan;
+                self.scroll = 0;
             }
             Key::NextGalaxy => self.change_galaxy(self.galaxy.saturating_add(1).min(7), c),
             Key::PreviousGalaxy => self.change_galaxy(self.galaxy.saturating_sub(1), c),

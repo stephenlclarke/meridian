@@ -72,6 +72,7 @@ pub enum Key {
     SellMode,
     LocalChart,
     MapColour,
+    ProfitScan,
     NextGalaxy,
     PreviousGalaxy,
     CurrentLocation,
