@@ -68,6 +68,7 @@ fn actual_secret_menu_publishes_clarke_real_outfit_and_visible_provenance_then_c
         ModuleKind::NavalLaser,
         ModuleKind::EliteEnergyUnit,
         ModuleKind::AdvancedNavigation,
+        ModuleKind::Targeting(meridian_core::equipment::TargetingTier::Military),
         ModuleKind::FuelScoops,
     ] {
         assert!(modules.items.iter().any(|item| item.kind == kind
@@ -79,6 +80,12 @@ fn actual_secret_menu_publishes_clarke_real_outfit_and_visible_provenance_then_c
             .equipment_snapshot()
             .and_then(|snapshot| snapshot.owned)
             .is_some_and(|item| item.xyzzy && item.fitted)
+    );
+    let emp = world.owned_emp().unwrap_or_else(|| panic!("EMP"));
+    assert!(emp.fitted);
+    assert_eq!(
+        (emp.grades.power, emp.grades.capacity, emp.grades.recharge),
+        (3, 3, 3)
     );
     let ammo = world
         .ammunition_snapshot()
