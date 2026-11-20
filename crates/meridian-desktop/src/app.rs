@@ -736,7 +736,17 @@ impl App {
             self.notice.set("EMP: hold U for ten seconds; release to cancel. Recent-attacker self-defence only.".into());
             return;
         }
+        let in_flight = self.game.world.snapshot().mode == FlightMode::Flight;
+        if in_flight {
+            match code {
+                KeyCode::Tab => return self.cycle_computer_target(),
+                KeyCode::Backspace | KeyCode::Delete => return self.release_computer_target(),
+                KeyCode::KeyI if self.modifiers.shift_key() => return self.toggle_target_details(),
+                _ => {}
+            }
+        }
         let action = match code {
+            KeyCode::KeyN if in_flight => Action::ToggleAutoDocking,
             KeyCode::Digit0 => Action::SetFlightView(FlightView::Front),
             KeyCode::Digit1 => Action::SetFlightView(FlightView::Rear),
             KeyCode::Digit2 => Action::SetFlightView(FlightView::Left),
@@ -753,11 +763,35 @@ impl App {
             KeyCode::F3 => Action::FireMissile,
             KeyCode::F4 => Action::ClearMissile,
             KeyCode::KeyL => Action::Launch,
-            KeyCode::KeyJ => self
-                .docked
-                .as_ref()
-                .and_then(|menu| menu.route)
-                .map_or(Action::Jump, Action::JumpTo),
+            KeyCode::KeyJ => {
+                if let Some(route) = self.game.world.active_route_progress() {
+                    if let Some(next) = route.next_system {
+                        Action::JumpTo(next)
+                    } else {
+                        use meridian_core::navigation::RouteStatus;
+                        let message = match route.status {
+                            RouteStatus::RefuelRequired => {
+                                "Refuel at this stop before the next jump."
+                            }
+                            RouteStatus::AwaitingDock => "Dock at this stop to advance the route.",
+                            RouteStatus::ComputerUnavailable => {
+                                "Fit a navigation computer that supports this route."
+                            }
+                            RouteStatus::Complete => {
+                                "Route complete. Select a new destination at a station."
+                            }
+                            RouteStatus::Ready => "Route has no next destination.",
+                        };
+                        self.notice.set(message.into());
+                        return;
+                    }
+                } else {
+                    self.docked
+                        .as_ref()
+                        .and_then(|menu| menu.route)
+                        .map_or(Action::Jump, Action::JumpTo)
+                }
+            }
             KeyCode::KeyT => Action::Contact,
             KeyCode::KeyR => Action::Review,
             KeyCode::KeyV => Action::ReviewAll,
