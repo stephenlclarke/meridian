@@ -186,8 +186,8 @@ impl World {
         let dock = self
             .current_dock_context()
             .ok_or(RouteError::DockRequired)?;
-        if let Some(plan) = plan {
-            if !plan.agrees_with_ship(dock.ship())
+        if let Some(plan) = plan
+            && (!plan.agrees_with_ship(dock.ship())
                 || plan.stop != 0
                 || plan.origin_visit != dock.visit()
                 || self
@@ -196,10 +196,9 @@ impl World {
                 || !self
                     .route_alternatives(plan.destination())?
                     .iter()
-                    .any(|candidate| &candidate.plan == plan)
-            {
-                return Err(RouteError::StalePlan);
-            }
+                    .any(|candidate| &candidate.plan == plan))
+        {
+            return Err(RouteError::StalePlan);
         }
         let route = plan.cloned();
         let prior = std::mem::replace(&mut self.navigation_route, route.clone());

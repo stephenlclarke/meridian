@@ -234,6 +234,7 @@ fn difference(a: Vec3, b: Vec3) -> Vec3 {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
 
