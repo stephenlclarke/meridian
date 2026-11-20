@@ -1,0 +1,89 @@
+{
+  "clearanceMillimetres": {
+    "axial-fork-opening": 1793,
+    "lateral-fork-opening": 1206,
+    "port-inner-wall": 1018,
+    "starboard-inner-wall": 1018
+  },
+  "alignedMillimetres": 45437,
+  "offsetStartMillimetres": 978,
+  "sourceLipWitness": {
+    "fraction": 0.49999999999999645,
+    "pointMetres": [
+      69.4,
+      -0.7895775759968418,
+      136.32
+    ],
+    "barycentrics": [
+      0.35999999999999444,
+      0.1481594904926978,
+      0.4918405095073078
+    ]
+  },
+  "sourceArmContactsMetres": [
+    [
+      -4.974338728780102,
+      -1.2203711014607186,
+      16.506119226213976
+    ],
+    [
+      4.4216344255823135,
+      -1.2203711014607186,
+      16.506119226213976
+    ]
+  ],
+  "cockpitJoints": [
+    {
+      "name": "opaque-body",
+      "pointMetres": [
+        0.14,
+        3.55,
+        2.0
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "opaque-crossmember",
+      "pointMetres": [
+        0.23,
+        4.32,
+        0.96
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ]
+}
