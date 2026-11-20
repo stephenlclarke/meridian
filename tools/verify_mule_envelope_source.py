@@ -226,6 +226,9 @@ def verify_protected_core(root):
         for addition in additions.get(relative, []):
             assert data.count(addition) == 1, relative
             data = data.replace(addition, b'', 1)
+        if relative == 'lib.rs':
+            # Invert only the reviewed Kite Interceptor geometry publication.
+            data = data.replace(b'pub mod kite_interceptor;\n\n', b'', 1)
         data = undo_commander_launch(relative, data)
         if relative == LIB_SOURCE:
             # Invert only the reviewed Stag Liner geometry publication.
