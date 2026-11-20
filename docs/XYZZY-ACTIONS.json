@@ -147,8 +147,8 @@
     {
       "key": "max/targeting",
       "legacyBehavior": "Military targeting core plus Mining/Salvage specialist modules.",
-      "state": "DEPENDENCY",
-      "dependency": "Real targeting modules and specialist control authority, not UI availability flags."
+      "state": "PARTIAL_CORE",
+      "dependency": "Development source fits the Military targeting core. Specialist Mining and Salvage modules still require compatible work tools and live work-target support."
     },
     {
       "key": "max/lasers",

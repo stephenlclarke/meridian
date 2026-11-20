@@ -10,6 +10,8 @@ The [complete action inventory](XYZZY-ACTIONS.json) covers every secret key and 
 
 ## Actual supported effects
 
+In the flight-computer development build, activating or refitting XYZZY installs the Military targeting computer and raises all three EMP grades to 3. Local technology and shop stock apply to ordinary purchases. Returning to the same menu after a save lets you refit and change fuel mode in one visit.
+
 Explicit `Enter` persists mode/name and the once-only cash adjustment. Normal commanders remain Rowan Calder with their own720 CR birth balance. No getter, saved descriptor, purchase API or capability readout activates mode. Ordinary paid purchases continue to charge their actual prices and retain paid provenance, technology, prerequisites and limits.
 
 The supported maximum outfit grants/refits top stock Elite Energy with explicit `ModuleProvenance::XYZzy`: capacity1x, existing SH025 recharge28 hundredths/tick. This bypasses paid acquisition prerequisites without creating Extra/Naval purchase history. Lower/paid/born items remain owned and keep their IDs/provenance. A compatible held Elite is reused/refitted, never duplicated. Maximum also grants/refits the real front Naval Laser (damage64, cadence6 ticks), Advanced Navigation Computer (21 LY) and Fuel Scoops utility. The distinct [EMP utility](EMP.md) is fitted with power, capacity and recharge at grade 3. The bank keeps its existing charge and starts empty on first fit. Existing paid EMP receipts remain in the commander’s history. These use the current shared resource pool, historical item/fit proof, route journal and utility budget. Other laser facings, shield, drive and targeting owners remain absent. Fuel Scoops fitting grants no physical ore/fuel/cargo collection.
