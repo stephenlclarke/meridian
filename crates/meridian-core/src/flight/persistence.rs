@@ -403,6 +403,8 @@ impl World {
         let mut candidate = Self {
             state,
             traffic: crate::traffic::State::default(),
+            targeting: super::targeting::State::default(),
+            auto_docking: None,
             goshawk_validation: None,
             mule_validation: None,
             mule_renas: None,
@@ -414,8 +416,8 @@ impl World {
                 OriginalNavigation::bundled().map_err(|_| SaveError::ContentMismatch)?,
             ),
             navigation: Some(navigation),
-            jump_journal: crate::navigation::JumpJournal::default(),
             navigation_route: None,
+            jump_journal: crate::navigation::JumpJournal::default(),
             commander_account: Some(commander_account),
             freight_session: Some(freight_session),
             station_markets: Some(station_markets),
@@ -445,12 +447,12 @@ impl World {
         candidate.mining = crate::mining::State::decode(&mut r)?;
         candidate.jump_journal = crate::navigation::JumpJournal::decode(&mut r)?;
         if !r.finished() {
-        if !r.finished() {
             if r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)? != *ROUTE_EXTENSION {
                 return Err(SaveError::InvalidEncoding);
             }
             candidate.navigation_route = Some(crate::navigation::RoutePlan::decode_save(&mut r)?);
         }
+        if !r.finished() {
             return Err(SaveError::InvalidEncoding);
         }
         candidate.validate_saved_world(
@@ -542,8 +544,8 @@ impl World {
             self.state.tick,
             account.fuel_tenths(),
         )?;
-        if !self.damage.enabled() {
         self.validate_saved_navigation_route()?;
+        if !self.damage.enabled() {
             self.damage.validate_resources(self, nav.dock_sequence)?;
         }
         // Refuse unbound reducer damage with its established boundary before the

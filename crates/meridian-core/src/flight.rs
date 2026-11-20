@@ -17,6 +17,8 @@ pub use xyzzy::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapsh
 mod navigation_trade;
 mod route;
 pub use route::PreparedNavigationRoute;
+mod auto_docking;
+mod targeting;
 mod traffic;
 pub use navigation_trade::{
     NavigationTonneId, NavigationTradeAction, NavigationTradeAttemptSnapshot, NavigationTradeError,
@@ -24,6 +26,7 @@ pub use navigation_trade::{
     NavigationTradePlanSnapshot, NavigationTradeReview, NavigationTradeSnapshot,
     NavigationTradeTrace, PreparedNavigationTrade, PreparedStationService,
 };
+pub use targeting::{TargetIdentity, TargetMode, TargetingSnapshot, TargetingViewport};
 mod flight_reception;
 pub use flight_reception::{
     FLIGHT_RECEPTION_MAX_BERTH_RECORDS, FlightReceptionAction, FlightReceptionAttemptSnapshot,
@@ -64,7 +67,9 @@ pub use practice::{
     PracticeReceptionSnapshot, PracticeReview, PracticeSnapshot, PracticeStatus, PracticeTrace,
     PreparedPracticeConfirmation,
 };
+mod profit_scan;
 mod services;
+pub use profit_scan::ProfitDestination;
 mod weapons;
 pub use mission::{MissionError, MissionSnapshot, StationNpc};
 pub use services::ServiceSnapshot;
@@ -170,6 +175,8 @@ impl std::error::Error for StepError {}
 pub struct World {
     state: Snapshot,
     traffic: crate::traffic::State,
+    targeting: targeting::State,
+    auto_docking: Option<auto_docking::Phase>,
     goshawk_validation: Option<goshawk_validation::Approach>,
     mule_validation: Option<crate::traffic::mule_validation::State>,
     mule_renas: Option<crate::traffic::mule_validation::State>,
@@ -179,10 +186,10 @@ pub struct World {
     station_data: Option<OriginalStationData>,
     navigation_catalogue: Option<OriginalNavigation>,
     navigation: Option<NavigationState>,
+    navigation_route: Option<crate::navigation::RoutePlan>,
     jump_journal: crate::navigation::JumpJournal,
     commander_account: Option<CommanderAccount>,
     freight_session: Option<mission::FreightSession>,
-    navigation_route: Option<crate::navigation::RoutePlan>,
     station_markets: Option<crate::station_services::StationMarkets>,
     pulse: weapons::PulseResources,
     combat: combat::State,
@@ -218,6 +225,8 @@ impl World {
                 navigation: None,
             },
             traffic: crate::traffic::State::default(),
+            targeting: targeting::State::default(),
+            auto_docking: None,
             goshawk_validation: None,
             mule_validation: None,
             mule_renas: None,
@@ -227,11 +236,11 @@ impl World {
             station_data: None,
             navigation_catalogue: None,
             navigation: None,
+            navigation_route: None,
             jump_journal: crate::navigation::JumpJournal::default(),
             commander_account: None,
             freight_session: None,
             station_markets: None,
-            navigation_route: None,
             pulse: weapons::PulseResources::default(),
             combat: combat::State::default(),
             missiles: missiles::State::default(),
