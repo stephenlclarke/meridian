@@ -587,10 +587,15 @@ impl App {
             self.docked = None;
             return;
         }
+        let screen = if self.xyzzy.is_some() {
+            self.docked.as_ref().map_or(ui::Screen::System, Docked::screen)
+        } else {
+            ui::Screen::System
+        };
         self.docked = match Docked::new(&self.game.world) {
             Ok(mut menu) => {
                 if self.game.world.current_dock_context().is_some()
-                    && let Err(error) = menu.open(&self.game.world, ui::Screen::System)
+                    && let Err(error) = menu.open(&self.game.world, screen)
                 {
                     self.notice.set(error);
                 }

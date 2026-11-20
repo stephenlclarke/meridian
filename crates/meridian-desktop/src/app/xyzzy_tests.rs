@@ -208,6 +208,9 @@ fn help_above_secret_confirmation_blocks_publication_and_resumes_the_same_review
 fn activate_refit_and_toggle_fuel_without_leaving_the_menu() {
     let directory = TestDirectory::new();
     let mut app = app(&directory);
+    let mut station = ok(Docked::new(&app.game.world));
+    ok(station.open(&app.game.world, ui::Screen::Equipment));
+    app.docked = Some(station);
     menu(&mut app);
     press(&mut app, KeyCode::Enter);
     press(&mut app, KeyCode::Enter);
@@ -239,6 +242,12 @@ fn activate_refit_and_toggle_fuel_without_leaving_the_menu() {
             .world
             .xyzzy_snapshot()
             .is_some_and(|state| !state.unlimited_fuel)
+    );
+    press(&mut app, KeyCode::Escape);
+    assert!(app.xyzzy.is_none());
+    assert_eq!(
+        app.docked.as_ref().map(Docked::screen),
+        Some(ui::Screen::Equipment)
     );
     let cold = ok(World::from_save_bytes(&ok(fs::read(
         directory.0.join("commander.meridian"),
