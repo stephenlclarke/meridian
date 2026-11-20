@@ -121,6 +121,17 @@ impl OriginalStationData {
         )
     }
 
+    /// Controlled SH029 motion against the original SH028 mesh.
+    pub fn okapi_motion_clear(
+        &self,
+        source: &crate::okapi::OkapiHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces(), start, end, angular_travel)
+    }
+
     fn rounded_station_entry_conditions(
         &self,
         pieces: &[SmoothPiece],

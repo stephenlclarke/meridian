@@ -188,6 +188,7 @@ def undo_goshawk_world(relative, data):
             (b'pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};\n', b''),
         ],
     }
+    replacements['lib.rs'].append((b'\npub mod okapi;\n', b''))
     for current, previous in replacements.get(relative, []):
         assert data.count(current) == 1, relative
         data = data.replace(current, previous, 1)

@@ -1,0 +1,180 @@
+{
+  "clearanceMillimetres": {
+    "left-pallet-lane": 628,
+    "left-pipe-lane": 208,
+    "right-pallet-lane": 628,
+    "right-pipe-lane": 208,
+    "left-top-rail-gap": 29,
+    "centre-top-rail-gap": 29,
+    "right-top-rail-gap": 29
+  },
+  "alignedMillimetres": 45018,
+  "offsetStartMillimetres": 979,
+  "sourceLipWitness": {
+    "fraction": 0.5,
+    "pointMetres": [
+      69.4,
+      1.0,
+      136.32
+    ],
+    "barycentrics": [
+      0.35999999999999244,
+      0.12966600529101285,
+      0.5103339947089947
+    ]
+  },
+  "sourceRailContactsMetres": [
+    [
+      -6.2,
+      1.8,
+      -10.0
+    ],
+    [
+      -0.2,
+      1.8,
+      -10.0
+    ],
+    [
+      5.8,
+      1.8,
+      -10.0
+    ]
+  ],
+  "originalJoints": [
+    {
+      "name": "deck-to-left-pallet",
+      "pointMetres": [
+        -5.79,
+        -2.02,
+        -3.43
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "deck-to-centre-pallet",
+      "pointMetres": [
+        0.21,
+        -2.02,
+        -3.43
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "deck-to-right-pallet",
+      "pointMetres": [
+        6.21,
+        -2.02,
+        -3.43
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "deck-to-cabin",
+      "pointMetres": [
+        0.17,
+        -2.07,
+        7.5
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "opaque-cabin-to-glazing",
+      "pointMetres": [
+        0.19,
+        1.9,
+        11.97
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ],
+  "originalTopRailGapsMetres": [
+    0.10000000000000009,
+    0.10000000000000009,
+    0.10000000000000009
+  ]
+}
