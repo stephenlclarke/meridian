@@ -30,6 +30,56 @@ fn station(app: &mut App, screen: ui::Screen) {
 }
 
 #[test]
+fn p_toggles_chart_profit_scan_without_pausing_or_mutating_world() {
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    station(&mut app, ui::Screen::Galaxy);
+    let before = ok(app.game.world.save_bytes());
+    let paused = app.paused;
+    assert_eq!(press(&mut app, KeyCode::KeyP, Some("p")), None);
+    let shown = paint(&mut app);
+    assert!(
+        shown
+            .labels
+            .iter()
+            .any(|label| label.text == "P: Profit scan ON")
+    );
+    assert!(
+        shown
+            .labels
+            .iter()
+            .any(|label| label.text.contains("Renas:"))
+    );
+    assert_eq!(app.paused, paused);
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+    assert_eq!(press(&mut app, KeyCode::KeyP, Some("p")), None);
+    assert!(
+        paint(&mut app)
+            .labels
+            .iter()
+            .any(|label| label.text == "P: Profit scan OFF")
+    );
+    assert_eq!(press(&mut app, KeyCode::KeyH, Some("h")), None);
+    assert!(app.help.as_ref().is_some_and(|help| {
+        help.lines
+            .iter()
+            .any(|line| line.contains("P Toggle best-profit"))
+    }));
+    assert_eq!(press(&mut app, KeyCode::Escape, None), None);
+    station(&mut app, ui::Screen::System);
+    assert_eq!(
+        press(&mut app, KeyCode::KeyP, Some("p")),
+        Some(KeyCode::KeyP)
+    );
+    app.docked = None;
+    assert_eq!(
+        press(&mut app, KeyCode::KeyP, Some("p")),
+        Some(KeyCode::KeyP)
+    );
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+}
+
+#[test]
 fn every_station_help_retains_its_screen_selection_and_all_navigation_bindings() {
     let directory = TestDirectory::new();
     let mut app = app(&directory);
@@ -219,6 +269,12 @@ fn flight_help_lists_the_computer_keys_and_consumes_them_while_open() {
     );
     app.game_key(KeyCode::KeyN);
     assert!(!app.game.world.auto_docking_active());
+    app.game_key(KeyCode::KeyN);
+    press(&mut app, KeyCode::KeyH, Some("h"));
+    assert!(app.game.world.auto_docking_active());
+    app.focus_changed(false);
+    assert!(!app.game.world.auto_docking_active());
+    assert!(app.help.is_some());
 }
 
 #[test]

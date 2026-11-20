@@ -397,6 +397,10 @@ impl App {
     fn reset_input(&mut self) {
         self.clear_held_input();
         if self.modal_open() {
+            if !self.focused || self.occluded {
+                self.game.world.cancel_auto_docking();
+                self.game.world.cancel_targeting();
+            }
             self.request_redraw();
             return;
         }
