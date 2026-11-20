@@ -237,6 +237,9 @@ def verify_protected_core(root):
             original_line = b'        if !self.state.speed.is_finite() || !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
             assert data.count(speed_line) == 1, relative
             data = data.replace(speed_line, original_line, 1)
+        if relative == 'lib.rs':
+            # Invert only the reviewed Sparrowhawk geometry publication.
+            data = data.replace(b'pub mod sparrowhawk;\n\n', b'', 1)
         assert sha(data) == expected, relative
         checked.add(relative)
     assert set(additions) <= checked and len(checked) == 115

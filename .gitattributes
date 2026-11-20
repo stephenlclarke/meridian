@@ -1,3 +1,9 @@
+# Sparrowhawk replay helpers have published byte hashes.
+tools/measure_sparrowhawk_air.py text eol=lf
+tools/prepare_sparrowhawk_geometry.py text eol=lf
+tools/prepare_sparrowhawk_studio.py text eol=lf
+tools/verify_sparrowhawk_geometry.py text eol=lf
+
 # Asset and provenance hashes identify exact bytes on every platform.
 assets/legacy/** -text
 assets/fleet/sh001/** -text
