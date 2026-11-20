@@ -253,7 +253,7 @@ pub(super) fn append(out: &mut Vec<Vertex>, size: [u32; 2], overlay: Overlay<'_>
         overlay.target.pose,
         overlay.projection,
     );
-    if size[0] < 220 {
+    if size[0] < 220.0 {
         return;
     }
     let right = size[0] - 8.0;

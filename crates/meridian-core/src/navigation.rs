@@ -12,7 +12,7 @@ pub use route::{
     RouteStatus,
 };
 pub(crate) use route::{
-    RouteEconomy, route_alternatives, route_feasible, route_hop, route_station_index,
+    RouteEconomy, route_alternatives, route_feasible, route_hop,
 };
 use std::collections::VecDeque;
 

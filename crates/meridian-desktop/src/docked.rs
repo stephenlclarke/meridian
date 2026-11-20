@@ -1169,7 +1169,7 @@ mod tests {
     #[test]
     fn lareria_is_an_admitted_route_but_the_stock_fit_refuses_its_distance() {
         let (_directory, mut profile, mut menu) = start();
-        assert!(ROUTES.contains(&SystemId::LARERIA));
+        assert!(ROUTE_SYSTEMS.contains(&SystemId::LARERIA));
         let before = ok(profile.world.save_bytes());
         let refusal = menu
             .request(&mut profile, ui::Request::ReviewRoute(SystemId::LARERIA))
