@@ -603,6 +603,9 @@ impl Session {
 
     fn flight_alerts(world: &World, notice: Option<&str>) -> Vec<String> {
         let mut lines: Vec<String> = notice.into_iter().map(str::to_owned).collect();
+        if let Some(phase) = world.auto_docking_status() {
+            lines.push(format!("AUTO DOCK | {phase} | N Cancel"));
+        }
         if world
             .practice_snapshot()
             .is_some_and(|practice| practice.status == PracticeStatus::Active)

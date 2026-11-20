@@ -211,6 +211,12 @@ fn flight_help_lists_the_computer_keys_and_consumes_them_while_open() {
     press(&mut app, KeyCode::Escape, None);
     app.game_key(KeyCode::KeyN);
     assert!(app.game.world.auto_docking_active());
+    assert!(
+        app.game
+            .lines(true, None)
+            .iter()
+            .any(|line| line.contains("AUTO DOCK"))
+    );
     app.game_key(KeyCode::KeyN);
     assert!(!app.game.world.auto_docking_active());
 }
