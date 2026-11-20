@@ -99,6 +99,8 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | 0 when docked (current source) | Commander details |
 | 1 / 2 / 3 / 4 / 5 when docked | Galaxy / System / Ships / Market / Equipment |
 | L; W/S; arrows; A/D; Q/E; Space | Launch; thrust; pitch; yaw; roll; brake |
+| N in flight (development) | Engage the fitted navigation computer for docking, or cancel the approach |
+| Tab / Delete / Shift+I in flight (development) | Cycle target / release tracking / show target details |
 | J; T; R; Enter; B; F | Travel; select contact; review; confirm; cancel; buy fuel |
 | M; [ / ]; G / Shift+G | Market; commodity selection; buy/sell one native unit |
 | O; K; U; Y | Equipment panel; buy/fit cargo bay; store when docked; refit |

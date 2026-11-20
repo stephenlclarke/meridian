@@ -24,6 +24,7 @@ pub enum Action {
     ReviewFlightLesson,
     CancelFlightLesson,
     FlightLessonDetails,
+    ToggleAutoDocking,
     SetFlightView(FlightView),
     CycleMissileLock,
     ToggleMissileArm,
@@ -316,6 +317,10 @@ impl Session {
                 self.show_flight_lesson = true;
                 Ok("Flight lesson details. F6 reviews; F12 reviews cancellation.".into())
             }
+            Action::ToggleAutoDocking => world
+                .toggle_auto_docking()
+                .map(|message| message.to_string())
+                .map_err(|error| error.to_string()),
             Action::SetFlightView(view) => {
                 self.invalidate();
                 world

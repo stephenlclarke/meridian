@@ -184,6 +184,38 @@ fn help_freezes_actual_flight_without_changing_manual_pause_or_replaying_held_fi
 }
 
 #[test]
+fn flight_help_lists_the_computer_keys_and_consumes_them_while_open() {
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    ok(app.game.command(Action::Launch));
+    for _ in 0..120 {
+        ok(app.game.world.step(FlightInput::default()));
+    }
+    let before = ok(app.game.world.save_bytes());
+    press(&mut app, KeyCode::KeyH, Some("h"));
+    let help = app.help.as_ref().unwrap_or_else(|| panic!("flight help"));
+    let text = help.lines.join("\n");
+    for binding in [
+        "N Start / cancel auto-docking",
+        "Tab Next target",
+        "Shift+I Target details",
+    ] {
+        assert!(text.contains(binding), "Missing {binding}");
+    }
+    for key in [KeyCode::KeyN, KeyCode::Tab, KeyCode::Backspace] {
+        assert_eq!(press(&mut app, key, None), None);
+    }
+    assert!(app.help.is_some());
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+    assert!(!app.game.world.auto_docking_active());
+    press(&mut app, KeyCode::Escape, None);
+    app.game_key(KeyCode::KeyN);
+    assert!(app.game.world.auto_docking_active());
+    app.game_key(KeyCode::KeyN);
+    assert!(!app.game.world.auto_docking_active());
+}
+
+#[test]
 fn title_help_intercepts_new_continue_quit_and_repeated_toggle_without_a_profile_change() {
     let directory = TestDirectory::new();
     let profile = open(&directory.0);
