@@ -17,7 +17,10 @@ pub struct Menu {
 }
 
 const ACTIONS: [(XyzzyAction, &str); 4] = [
-    (XyzzyAction::Enter, "Activate CLARKE and fit maximum equipment"),
+    (
+        XyzzyAction::Enter,
+        "Activate CLARKE and fit maximum equipment",
+    ),
     (
         XyzzyAction::MaximumSupportedHardware,
         "Refill and fit maximum equipment",
@@ -69,21 +72,25 @@ impl Menu {
         lines.extend(ACTIONS.iter().enumerate().map(|(i, (_, label))| {
             format!("{} {}", if i == self.selected { ">" } else { " " }, label)
         }));
-        lines.extend([
-            "Maximum outfit ignores local shop stock and technology level".into(),
-            "Refitting keeps owned items and fills the available pylons".into(),
-            "Scoops fitting does not implement physical collection".into(),
-            "A station berth is required. Paid equipment keeps its history".into(),
-            if self.reviewing {
-                "Enter CONFIRM AND SAVE | Escape / B Cancel review"
-            } else {
-                "Up / Down Choose | Enter Review | Escape / B Close"
+        if let Some(emp) = world.owned_emp().filter(|item| item.fitted) {
+            lines.push(format!(
+                "EMP power {} / capacity {} / recharge {}",
+                emp.grades.power, emp.grades.capacity, emp.grades.recharge
+            ));
+        }
+        if let Some(tier) = world.targeting_tier() {
+            lines.push(format!("Targeting computer: {}", tier.label()));
+        }
+        lines.push(
+            match self.action() {
+                XyzzyAction::Enter if snapshot.is_some_and(|s| !s.active) => {
+                    "Sets cash to 1,000,000 CR once and fits maximum compatible equipment."
+                }
+                XyzzyAction::ToggleUnlimitedFuel => "Switch between normal and unlimited fuel.",
+                _ => "Fits maximum compatible equipment regardless of local technology.",
             }
             .into(),
-            "First activation SETS cash to 1,000,000 CR once".into(),
-            "After saving, choose another action or press Escape to leave".into(),
-            "H / ? Help | Close this menu before 1..5 / Tab station navigation".into(),
-        ]);
+        );
         if let Some(notice) = notice {
             // Bound the text like every other overlay row; the renderer clips to its card.
             lines.push(notice.chars().take(crate::help::MAX_COLUMNS).collect());
@@ -99,7 +106,7 @@ impl Menu {
             footer: if self.reviewing {
                 "Enter Confirm and save | Escape / B Cancel"
             } else {
-                "Up / Down Choose | Enter Review | Escape / B Close"
+                "Up / Down Choose | Enter Review | H Help | Escape / B Close"
             },
         }
     }
