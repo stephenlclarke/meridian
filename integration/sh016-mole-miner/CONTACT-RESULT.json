@@ -1,0 +1,90 @@
+{
+  "clearanceMillimetres": {
+    "tooling-aperture": 1909,
+    "left-collar-clearance": 2,
+    "right-collar-clearance": 2,
+    "left-intercollar-groove": 173,
+    "right-intercollar-groove": 173
+  },
+  "alignedMillimetres": 39731,
+  "offsetStartMillimetres": 979,
+  "sourceLipWitness": {
+    "fraction": 0.5000000000000071,
+    "pointMetres": [
+      69.4,
+      -3.347889374090247,
+      136.32
+    ],
+    "barycentrics": [
+      0.3599999999999953,
+      0.1745970710781529,
+      0.46540292892185176
+    ]
+  },
+  "sourceHeadContactsMetres": [
+    [
+      -5.6244541484716155,
+      -3.347889374090247,
+      12.05240174672489
+    ],
+    [
+      10.646288209606986,
+      -3.347889374090247,
+      12.05240174672489
+    ]
+  ],
+  "glazingJoints": [
+    {
+      "name": "opaque-body",
+      "pointMetres": [
+        0.25,
+        6.5,
+        -4.64
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "opaque-crossmember",
+      "pointMetres": [
+        0.25,
+        8.05,
+        -5.7
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ]
+}

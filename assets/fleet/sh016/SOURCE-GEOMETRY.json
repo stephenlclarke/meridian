@@ -1,0 +1,83 @@
+{
+  "id": "SH016",
+  "name": "Mole Miner",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "metresPerSourceUnit": "11500/687",
+  "sourceOriginUnchanged": true,
+  "detail": {
+    "vertices": 6760,
+    "faces": 12836,
+    "components": 179,
+    "bounds": [
+      [
+        -16.063976710334785,
+        -11.047716885007278,
+        -23.56914119359534
+      ],
+      [
+        16.060812954876273,
+        10.244541484716155,
+        22.430858806404657
+      ]
+    ]
+  },
+  "native": {
+    "vertices": 616,
+    "faces": 1100,
+    "components": 33,
+    "bounds": [
+      [
+        -16.034598981077146,
+        -10.54585152838428,
+        -23.56914119359534
+      ],
+      [
+        16.03146870451237,
+        10.244541484716155,
+        22.430858806404657
+      ]
+    ],
+    "faceLimit": 512,
+    "faceLimitStatus": "ORIGINAL_EXCEEDS_LIMIT"
+  },
+  "shapePieces": 203,
+  "membershipEncoding": "u16 little endian count, then source ids per support",
+  "textures": [
+    "l337-patrol-diffuse",
+    "l337-strike-diffuse",
+    "l337-service-details"
+  ],
+  "pins": {
+    "resource.toml": "b23f6d0c214e199e19e6eaf71647cdbe45cc2a1c6b25935d30c1299335c5a2aa",
+    "native-export.json": "9efa31451cebc03f9e00ef976d3c2ecd81e9bab8fdb7699f8b0b6aea00db60eb",
+    "engineering.json": "9e8d0af0f1eca9b6de1307c33324ac96b0fb4f4652a2477b66fbf1d95a43421d",
+    "contract.toml": "d1bf21e0ad41a1fab71976310b850c67c28de10666f331b9b09e99363967d366",
+    "LICENSE": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+  },
+  "outputs": {
+    "source.vertices": {
+      "bytes": 177040,
+      "sha256": "8ef1bddaa5f114dd676c3e9fec7007d324b37883093afa3938cb405034588246"
+    },
+    "source-triangles.bin": {
+      "bytes": 167232,
+      "sha256": "d6165e3a4cd3dd74c8d7cae5704d96ed9766a60774454b21b3afca14152215f0"
+    },
+    "source-piece-membership.bin": {
+      "bytes": 18230,
+      "sha256": "8e0527b01d82407c53e7bdae16722cb55b55e9cd95383df023d1763319f79e39"
+    },
+    "PIECES.json": {
+      "bytes": 8676,
+      "sha256": "aca0809f9d65db9b6bab25a5f0c76d2b9b26f22a68407c14d6531854c04e669e"
+    },
+    "visual.bin": {
+      "bytes": 2156464,
+      "sha256": "17beb44f344808ea9379331f186424c26de105c5bb72c3226e038fa9a9322059"
+    },
+    "native-visual.bin": {
+      "bytes": 184816,
+      "sha256": "c61ab51f973d68b7ce53c2713ebe1510e519c10f59499da8479f58fcd4949b0b"
+    }
+  }
+}
