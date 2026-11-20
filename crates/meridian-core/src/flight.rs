@@ -15,6 +15,8 @@ mod xyzzy;
 pub(crate) use xyzzy::{AccountEffect, AccountEvent, STARTING_CREDITS_TENTHS};
 pub use xyzzy::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
 mod navigation_trade;
+mod route;
+pub use route::PreparedNavigationRoute;
 mod traffic;
 pub use navigation_trade::{
     NavigationTonneId, NavigationTradeAction, NavigationTradeAttemptSnapshot, NavigationTradeError,
@@ -382,11 +384,13 @@ impl World {
             .as_ref()
             .ok_or(NavigationError::WrongMode)?;
         let reach = self.jump_reach_ly().ok_or(NavigationError::WrongMode)?;
+        let origin = navigation.snapshot(0).system;
         navigation.begin_jump(catalogue, target, distance, account.fuel_tenths(), reach)?;
         if !self.jump_journal.has_room() {
             return Err(NavigationError::SequenceExhausted);
         }
         self.navigation = Some(navigation);
+        self.cancel_route_on_manual_jump(origin, target);
         Ok(())
     }
 
@@ -638,8 +642,8 @@ impl World {
         let mut mission_epoch = None;
         let mut planned_debit = None;
         let mut completed_leg = None;
+        let entry = next.mode == FlightMode::Docked && self.state.mode != FlightMode::Docked;
         if let Some(state) = &mut navigation {
-            let entry = next.mode == FlightMode::Docked && self.state.mode != FlightMode::Docked;
             let account = self
                 .commander_account
                 .as_mut()
@@ -792,6 +796,9 @@ impl World {
         }
         self.state = next;
         self.navigation = navigation;
+        if entry || completed_leg.is_some() {
+            self.reconcile_navigation_route(entry);
+        }
         self.refresh_deferred_renas_mule();
         self.observe_flight_reception(flight_reception_start);
         if let Some((session, epoch)) = self.freight_session.as_mut().zip(mission_epoch) {

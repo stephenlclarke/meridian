@@ -1,8 +1,12 @@
+use super::route::RouteChooser;
 use super::{
     ChartLayout, Context, Control, EquipmentOperation, Frame, Input, Key, Marker, NavigationBodyId,
     Orientation, Outcome, Rect, Request, Screen, Viewport, moved, presentation,
 };
-use meridian_core::{navigation::SystemId, station_services::CommodityId};
+use meridian_core::{
+    navigation::{NavigationGrade, SystemId},
+    station_services::CommodityId,
+};
 #[derive(Debug)]
 pub struct DockedScreens {
     pub(super) screen: Screen,
@@ -30,6 +34,7 @@ pub struct DockedScreens {
     pub(super) axis: u8,
     pub(super) hovered: Option<Rect>,
     pub(super) ui_revision: u64,
+    pub(super) route_chooser: Option<RouteChooser>,
 }
 impl DockedScreens {
     pub fn new(current: SystemId, hull: &str) -> Self {
@@ -63,6 +68,7 @@ impl DockedScreens {
             axis: 2,
             hovered: None,
             ui_revision: 0,
+            route_chooser: None,
         }
     }
     pub fn search_active(&self) -> bool {
@@ -90,6 +96,7 @@ impl DockedScreens {
     }
     pub fn open(&mut self, screen: Screen) {
         self.screen = screen;
+        self.route_chooser = None;
         self.searching = false;
         self.query.clear();
         self.detail = false;
@@ -192,7 +199,7 @@ impl DockedScreens {
         } else {
             if self.searching {
                 self.searching = false;
-            } else if self.screen == Screen::Galaxy {
+            } else if self.route_chooser.is_none() && self.screen == Screen::Galaxy {
                 let nav = context.world.snapshot().navigation;
                 let local = nav
                     .and_then(|n| context.catalogue.world(n.system).map(|w| (w, n.fuel_units)))
@@ -242,6 +249,8 @@ impl DockedScreens {
     ) -> Outcome {
         if context.review.is_some() || !painted.viewport.body().contains(point) {
             Outcome::Ignored
+        } else if let Some(chooser) = &mut self.route_chooser {
+            chooser.choose(moved(chooser.selected, rows, chooser.candidates.len()))
         } else if self.screen == Screen::System
             || (self.detail && self.screen == Screen::Showroom)
             || (self.screen == Screen::Galaxy && {
@@ -298,6 +307,13 @@ impl DockedScreens {
             return Outcome::Ignored;
         }
         match control {
+            Control::RouteCandidate(index) => self
+                .route_chooser
+                .as_mut()
+                .map_or(Outcome::Ignored, |chooser| chooser.choose(*index)),
+            Control::OpenRouteProgress => self.open_route_progress(c),
+            Control::ClearNavigationRoute => Outcome::Request(Request::ClearNavigationRoute),
+            Control::RefuelNavigationRoute => Outcome::Request(Request::RefuelNavigationRoute),
             Control::ReviewConfirm => self.review_confirm(c),
             Control::ReviewCancel => c.review.map_or(Outcome::Ignored, |r| {
                 Outcome::Request(Request::CancelReview(r.token))
@@ -445,6 +461,23 @@ impl DockedScreens {
     fn key(&mut self, key: Key, c: &Context<'_>) -> Outcome {
         if self.searching {
             return self.search_key(key, c);
+        }
+        if let Some(chooser) = &mut self.route_chooser {
+            return match key {
+                Key::Back => {
+                    self.route_chooser = None;
+                    Outcome::Updated
+                }
+                Key::Confirm if !c.paused => chooser.confirm(),
+                Key::Previous | Key::Next if !chooser.candidates.is_empty() => {
+                    chooser.choose(moved(
+                        chooser.selected,
+                        selection_step(key),
+                        chooser.candidates.len(),
+                    ))
+                }
+                _ => Outcome::Ignored,
+            };
         }
         match key {
             Key::Back => {
@@ -717,7 +750,7 @@ impl DockedScreens {
             buy,
         })
     }
-    fn route(&self, c: &Context<'_>) -> Outcome {
+    fn route(&mut self, c: &Context<'_>) -> Outcome {
         if c.paused {
             return Outcome::Refused("Resume before reviewing travel".into());
         }
@@ -726,7 +759,46 @@ impl DockedScreens {
                 "Station scene and route admission are not available for this selection".into(),
             );
         }
-        Outcome::Request(Request::ReviewRoute(self.selected_world))
+        if c.world.navigation_computer_grade() == NavigationGrade::Empty {
+            return Outcome::Request(Request::ReviewRoute(self.selected_world));
+        }
+        if c.world.active_route_progress().is_some_and(|progress| {
+            progress.plan.destination() == self.selected_world
+                || c.world
+                    .snapshot()
+                    .navigation
+                    .is_some_and(|nav| nav.system == self.selected_world)
+        }) {
+            return self.open_route_progress(c);
+        }
+        match c.world.route_alternatives(self.selected_world) {
+            Ok(candidates) => {
+                self.route_chooser = Some(RouteChooser {
+                    candidates,
+                    selected: 0,
+                });
+                self.searching = false;
+                Outcome::Updated
+            }
+            Err(error) => Outcome::Refused(error.to_string()),
+        }
+    }
+
+    fn open_route_progress(&mut self, c: &Context<'_>) -> Outcome {
+        if c.world.active_route_progress().is_none() {
+            return Outcome::Refused("No active route".into());
+        }
+        self.route_chooser = Some(RouteChooser {
+            candidates: Vec::new(),
+            selected: 0,
+        });
+        self.searching = false;
+        Outcome::Updated
+    }
+
+    pub(crate) fn close_route_chooser(&mut self) {
+        self.route_chooser = None;
+        self.bump();
     }
     fn exchange(&self, c: &Context<'_>) -> Outcome {
         if c.paused {

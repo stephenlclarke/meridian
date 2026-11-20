@@ -6,7 +6,7 @@ use meridian_core::{
     station_services::{self, CommodityId},
 };
 
-const ROUTES: [SystemId; 3] = [SystemId::AVENOR, SystemId::RENAS, SystemId::LARERIA];
+use meridian_core::navigation::ROUTE_SYSTEMS;
 pub const BINDINGS: &[ui::BindingHint<'static>] = &[
     ui::BindingHint {
         key: ui::Key::Previous,
@@ -91,7 +91,7 @@ fn context<'a>(
             .zip(reach)
             .map(|(n, reach)| (f64::from(n.fuel_units) / 10.0).min(reach)),
         full_reach_ly: reach.map(|reach| reach.min(f64::from(FUEL_CAPACITY) / 10.0)),
-        route_targets: &ROUTES,
+        route_targets: &ROUTE_SYSTEMS,
         models: &crate::docked_render::MODELS,
         planet_previews: navigation.is_some_and(|n| n.system == selected)
             && world.celestial_snapshot().is_some(),
@@ -316,14 +316,37 @@ impl Docked {
                 }
                 match pending.intent {
                     Intent::Route(target) => {
+                        if world.active_route_progress().is_some() {
+                            profile.navigation_route(None)?;
+                        }
                         self.route = Some(target);
                         self.feedback = "Destination selected; launch and press J to jump".into();
                     }
                     Intent::Change(action) => self.feedback = profile.command(action)?,
                 }
             }
+            ui::Request::SetNavigationRoute(plan) => {
+                self.feedback = profile.navigation_route(Some(&plan))?;
+                self.route = None;
+                self.screens.close_route_chooser();
+            }
+            ui::Request::ClearNavigationRoute => {
+                self.feedback = profile.navigation_route(None)?;
+                self.route = None;
+                self.screens.close_route_chooser();
+            }
+            ui::Request::RefuelNavigationRoute => {
+                if !world.active_route_progress().is_some_and(|route| {
+                    route.status == meridian_core::navigation::RouteStatus::RefuelRequired
+                }) {
+                    return Err("The active route does not need fuel".into());
+                }
+                self.feedback = profile.command(Action::StationService(
+                    station_services::Command::RefillFuel,
+                ))?;
+            }
             ui::Request::ReviewRoute(target) => {
-                if !ROUTES.contains(&target)
+                if !ROUTE_SYSTEMS.contains(&target)
                     || Some(target) == world.snapshot().navigation.map(|n| n.system)
                 {
                     return Err("This destination is not available for travel".into());
@@ -1097,6 +1120,37 @@ mod tests {
         assert_visible_feedback(&mut menu, &profile, &expected);
         assert_eq!(ok(profile.world.save_bytes()), before);
     }
+    #[test]
+    fn saved_route_requests_publish_before_commit_and_cold_continue_keeps_the_selected_course() {
+        let (directory, mut profile, mut menu) = start();
+        let plan = ok(profile.world.route_alternatives(SystemId::LARERIA))[0]
+            .plan
+            .clone();
+        ok(profile.save());
+        let path = directory.0.join("commander.meridian");
+        let backup = directory.0.join("previous-save");
+        let original = ok(std::fs::read(&path));
+        ok(std::fs::rename(&path, &backup));
+        ok(std::fs::create_dir(&path));
+        assert!(
+            menu.request(&mut profile, ui::Request::SetNavigationRoute(plan.clone()))
+                .is_err()
+        );
+        assert!(profile.world.active_route_progress().is_none());
+        assert_eq!(ok(std::fs::read(&backup)), original);
+        ok(std::fs::remove_dir(&path));
+        ok(std::fs::rename(&backup, &path));
+        ok(menu.request(&mut profile, ui::Request::SetNavigationRoute(plan.clone())));
+        let restored = ok(World::from_save_bytes(&ok(std::fs::read(&path))));
+        assert_eq!(
+            ok(restored.active_route_progress().ok_or("route")).plan,
+            plan
+        );
+        ok(menu.request(&mut profile, ui::Request::ClearNavigationRoute));
+        let restored = ok(World::from_save_bytes(&ok(std::fs::read(&path))));
+        assert!(restored.active_route_progress().is_none());
+    }
+
     #[test]
     fn route_selection_instruction_is_visible_on_system_and_galaxy() {
         let (_directory, mut profile, mut menu) = start();

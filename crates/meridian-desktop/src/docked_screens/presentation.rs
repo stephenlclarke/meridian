@@ -10,7 +10,7 @@ fn fit(text: &str, width: f64) -> String {
         .take((width.max(0.0) / 7.5).floor() as usize)
         .collect()
 }
-fn label(f: &mut Frame, text: impl Into<String>, x: f64, y: f64, ink: Ink, clip: Rect) {
+pub(super) fn label(f: &mut Frame, text: impl Into<String>, x: f64, y: f64, ink: Ink, clip: Rect) {
     if y >= clip.y && y + 9.0 <= clip.y + clip.height {
         f.labels.push(Label {
             text: fit(&text.into(), (clip.x + clip.width - x).max(0.0)),
@@ -21,7 +21,7 @@ fn label(f: &mut Frame, text: impl Into<String>, x: f64, y: f64, ink: Ink, clip:
         });
     }
 }
-fn button(
+pub(super) fn button(
     f: &mut Frame,
     title: &str,
     r: Rect,
@@ -307,12 +307,28 @@ pub(super) fn project(s: &DockedScreens, c: &Context<'_>, v: Viewport) -> Frame 
         f.hits.clear();
         return f;
     }
-    match s.screen {
-        Screen::Galaxy => chart(s, c, &mut f),
-        Screen::System => system(s, c, &mut f),
-        Screen::Showroom => showroom(s, c, &mut f),
-        Screen::Trading => market(s, c, &mut f),
-        Screen::Equipment => equipment(s, c, &mut f),
+    if s.route_chooser.is_some() {
+        super::route::project(s, c, &mut f);
+    } else {
+        match s.screen {
+            Screen::Galaxy => chart(s, c, &mut f),
+            Screen::System => system(s, c, &mut f),
+            Screen::Showroom => showroom(s, c, &mut f),
+            Screen::Trading => market(s, c, &mut f),
+            Screen::Equipment => equipment(s, c, &mut f),
+        }
+        if matches!(s.screen, Screen::Galaxy | Screen::System)
+            && let Some(progress) = c.world.active_route_progress()
+        {
+            button(
+                &mut f,
+                &super::route::progress_line(c, &progress),
+                Rect::new(16.0, v.height - 47.0, (v.width - 32.0).min(470.0), 18.0),
+                Control::OpenRouteProgress,
+                true,
+                None,
+            );
+        }
     }
     let footer = Rect::new(16.0, v.height - 28.0, v.width - 110.0, 24.0);
     label(
@@ -492,6 +508,14 @@ fn chart(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         Control::Open(Screen::System),
         true,
         None,
+    );
+    button(
+        f,
+        "Plan route",
+        Rect::new(info.x - 106.0, info.y, 102.0, 21.0),
+        Control::Key(Key::Route),
+        c.route_targets.contains(&s.selected_world) && !c.paused,
+        Some("This chart destination has no supported route or the game is paused"),
     );
     if s.searching {
         let area = Rect::new(

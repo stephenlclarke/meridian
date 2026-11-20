@@ -328,10 +328,20 @@ fn chart_pointer_and_keyboard_select_the_same_source_world() {
         Outcome::Updated
     );
     assert_eq!(ui.selected_system(), SystemId::RENAS);
-    assert_eq!(
-        key(&mut ui, &ctx, Key::Route),
-        Outcome::Request(Request::ReviewRoute(SystemId::RENAS))
+    assert_eq!(key(&mut ui, &ctx, Key::Route), Outcome::Updated);
+    let frame = ui.frame(&ctx, view());
+    assert!(
+        frame
+            .labels
+            .iter()
+            .any(|label| label.text.contains("Routes to Renas"))
     );
+    assert!(frame.lines.iter().any(|line| line.from[0] != line.to[0]));
+    assert!(matches!(key(&mut ui, &ctx, Key::Confirm),
+        Outcome::Request(Request::SetNavigationRoute(plan)) if plan.destination() == SystemId::RENAS));
+    assert!(w.active_route_progress().is_none());
+    assert_eq!(key(&mut ui, &ctx, Key::Back), Outcome::Updated);
+    assert_eq!(ui.selected_system(), SystemId::RENAS);
 }
 #[test]
 fn search_consumes_text_and_navigation_keys_without_firing_other_actions() {

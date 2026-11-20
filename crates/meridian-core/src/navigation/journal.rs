@@ -10,13 +10,32 @@ use crate::save::{MAX_SAVE_BYTES, Reader, SaveError, Writer};
 const INVALID: SaveError = SaveError::InvalidState("completed jump journal");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum NavigationGrade {
+pub enum NavigationGrade {
     Empty,
     Basic,
     Intermediate,
     Advanced,
 }
 impl NavigationGrade {
+    pub const fn label(self) -> &'static str {
+        match self {
+            Self::Empty => "No computer",
+            Self::Basic => "Basic",
+            Self::Intermediate => "Intermediate",
+            Self::Advanced => "Advanced",
+        }
+    }
+
+    pub fn planning_radius_ly(self) -> Option<f64> {
+        let tank = f64::from(FUEL_CAPACITY) / 10.0;
+        match self {
+            Self::Empty => Some(0.0),
+            Self::Basic => Some(tank + 7.0),
+            Self::Intermediate => Some(tank + 14.0),
+            Self::Advanced => None,
+        }
+    }
+
     pub(crate) fn module_reach_ly(self) -> Option<u8> {
         match self {
             Self::Empty => None,
@@ -30,7 +49,7 @@ impl NavigationGrade {
             f64::from(reach).max(STOCK_JUMP_REACH_LY)
         })
     }
-    fn tag(self) -> u8 {
+    pub(super) fn tag(self) -> u8 {
         match self {
             Self::Empty => 0,
             Self::Basic => 1,
@@ -38,7 +57,7 @@ impl NavigationGrade {
             Self::Advanced => 3,
         }
     }
-    fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+    pub(super) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         match r.u8()? {
             0 => Ok(Self::Empty),
             1 => Ok(Self::Basic),
@@ -141,6 +160,24 @@ impl JumpJournal {
             .map(|_| CompletedJump::decode(r))
             .collect::<Result<Vec<_>, _>>()?;
         Ok(Self { legs })
+    }
+
+    pub(crate) fn matches_route_prefix(&self, start: u64, travelled: &[SystemId]) -> bool {
+        let Ok(start) = usize::try_from(start) else {
+            return false;
+        };
+        let Some(legs) = self.legs.get(start..) else {
+            return false;
+        };
+        let origin = start
+            .checked_sub(1)
+            .map_or(SystemId::AVENOR, |index| self.legs[index].destination);
+        travelled.first() == Some(&origin)
+            && legs.len() == travelled.len().saturating_sub(1)
+            && legs
+                .iter()
+                .zip(travelled.windows(2))
+                .all(|(leg, hop)| leg.source == hop[0] && leg.destination == hop[1])
     }
 
     pub(crate) fn emp_arrival_clocks(&self) -> Vec<u64> {
