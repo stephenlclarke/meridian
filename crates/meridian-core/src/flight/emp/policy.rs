@@ -11,6 +11,7 @@ pub(super) const HEAT_FIFTHS: u16 = 90;
 pub(super) const COOLDOWN_TICKS: u8 = 90;
 pub(super) const BASE_PRICE: u32 = 30_000;
 pub(super) const BASE_TECHNOLOGY: u8 = 9;
+pub(super) const MAX_GRADE: u8 = 3;
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct EmpGrades {
     pub power: u8,
@@ -19,7 +20,7 @@ pub struct EmpGrades {
 }
 impl EmpGrades {
     pub(super) fn valid(self) -> bool {
-        self.power <= 3 && self.capacity <= 3 && self.recharge <= 3
+        self.power <= MAX_GRADE && self.capacity <= MAX_GRADE && self.recharge <= MAX_GRADE
     }
     pub(super) fn level(self, axis: EmpAxis) -> u8 {
         match axis {
@@ -29,7 +30,7 @@ impl EmpGrades {
         }
     }
     pub(super) fn advancing(self, axis: EmpAxis) -> Result<Self, EmpError> {
-        if !self.valid() || self.level(axis) == 3 {
+        if !self.valid() || self.level(axis) == MAX_GRADE {
             return Err(EmpError::MaximumGrade);
         }
         let mut next = self;
@@ -42,7 +43,7 @@ impl EmpGrades {
     }
     pub(super) fn upgrade_offer(self, axis: EmpAxis) -> Result<(u32, u8), EmpError> {
         let level = self.level(axis);
-        if !self.valid() || level >= 3 {
+        if !self.valid() || level >= MAX_GRADE {
             return Err(EmpError::MaximumGrade);
         }
         let price = if axis == EmpAxis::Power {
