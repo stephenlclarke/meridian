@@ -1,0 +1,23 @@
+{
+  "openingMillimetres": 829,
+  "lipStartMillimetres": 979,
+  "alignedStationMillimetres": 39518,
+  "lipIntersection": {
+    "faceVertices": [
+      265,
+      266,
+      270
+    ],
+    "metres": [
+      69.4,
+      1.0,
+      136.32
+    ],
+    "fraction": 0.5,
+    "barycentric": [
+      0.3599999999999949,
+      0.1296660052910104,
+      0.5103339947089947
+    ]
+  }
+}

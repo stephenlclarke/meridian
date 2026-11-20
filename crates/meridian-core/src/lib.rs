@@ -12,6 +12,7 @@ pub mod goshawk_custom;
 pub mod mining;
 pub mod mule;
 pub mod navigation;
+pub mod sable_liner;
 pub mod save;
 pub mod station;
 pub mod station_services;
