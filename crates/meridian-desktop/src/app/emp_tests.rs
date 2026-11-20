@@ -146,11 +146,12 @@ fn presented_paid_emp_purchase_store_refit_and_cold_continue_keep_one_empty_owne
 #[test]
 fn paid_emp_grade_review_refuses_failed_atomic_writer_and_keeps_same_paid_base() {
     let d = TestDirectory::new();
-    let mut a = app(&d, 19102);
-    earned(&mut a);
-    ok(a.game.command(Action::Emp(EmpEquipmentAction::Purchase)));
-    // Explicit XYZZY funding for the grade test, after the base was genuinely earned and paid.
-    ok(a.game.xyzzy(XyzzyAction::Enter));
+    // Continue a real pre-upgrade save containing a paid base and the old XYZZY grant.
+    let bytes = include_bytes!("../../../meridian-core/tests/fixtures/xyzzy-paid-base-v17.bin");
+    ok(fs::write(d.0.join("commander.meridian"), bytes));
+    let mut profile = open(&d.0);
+    ok(profile.continue_saved());
+    let mut a = App::with_profile(profile);
     let item = a.game.world.owned_emp().unwrap_or_else(|| panic!("item"));
     assert_eq!(item.provenance, EmpProvenance::Paid);
     shop(&mut a);
