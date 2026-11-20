@@ -6,7 +6,9 @@ Preview 10 opens on Commander Details. Press H or ? for the current screen’s c
 
 In Preview 10, press 3 at a station and search for Goshawk Explorer. Compare shows the Peregrine Mk V beside the Goshawk for a new commander. Press C for a single-ship view. Mac testing verified the original dark green hull, silver cross-member, open wishbone and refusal of an unavailable exchange. Preview 9 predates this ship. [Goshawk geometry and Showroom controls](docs/GOSHAWK-GAMEPLAY-ENVELOPE.md)
 
-The development source also provides a separate Goshawk Mk II Custom Showroom and collision candidate. Its original detailed appearance, four lower mounts and SH028 fit evidence are in the [SH010 hull guide](docs/GOSHAWK-MK-II-CUSTOM.md). Owned native validation is pending.
+The Buffalo collision model preserves the two passages between its three drums. Its geometry and clearance measurements are described in the [Buffalo hull guide](docs/BUFFALO-GAMEPLAY-ENVELOPE.md).
+
+The development source also provides a separate Goshawk Mk II Custom Showroom and collision candidate. Its original detailed appearance, four lower mounts and SH028 fit evidence are in the [SH010 hull guide](docs/GOSHAWK-MK-II-CUSTOM.md). The Custom passed Mac Showroom checks for search, Compare, solo rotation and refusal of an unavailable exchange.
 
 ## Internal Mule docking validation
 
