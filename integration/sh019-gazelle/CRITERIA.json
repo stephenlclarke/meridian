@@ -1,0 +1,148 @@
+{
+  "hull": "SH019",
+  "name": "Gazelle Explorer",
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "protectedBase": "dae39800a35e2d8ca57b3d6a7ead20c7438c6b49",
+  "sourceManifestSha256": "23cc2f3e72c5ae4142046c0b64cc357ec46a4924dc7f5dd4899b71cad2fe67c5",
+  "independentFitWitnessSha256": "ebf8e3be70d1b09e3c31966ad76b9efc4f59d489906e55f95cb409f5fa442583",
+  "independentSurfaceFitSha256": "2e6bc808295497c515fdca03d80fb7b4673d5514aa0ffa102525e597f0b7e21c",
+  "geometry": {
+    "detailedVertices": 3008,
+    "detailedFaces": 5900,
+    "nativeVertices": 172,
+    "nativeFaces": 304,
+    "nativeExactLimit": 512,
+    "metresPerSourceUnit": 1,
+    "roundedPieces": 37,
+    "supportPoints": [
+      3104,
+      204
+    ],
+    "duplicatedCanonicalSeamPoints": 128,
+    "roundingMetres": 0.02,
+    "criteria": [
+      "Canonical source winding, coordinates, materials and UV fields remain exact; no sibling substitution.",
+      "All original vertices and triangles remain covered by declared local supports. Only the eight elliptical loop sector seams duplicate canonical vertices, without changing canonical source geometry or triangle indices.",
+      "The three independent actual loop paths remain strictly clear; real SH028 aligned/off-aperture sweeps, strict lip contact and outward launch are replayed.",
+      "The approved legacy native source is 304 faces under its 512 limit; Meridian native exact collision and gameplay qualification are separate."
+    ]
+  },
+  "appearance": {
+    "detailedUntexturedFaces": 1216,
+    "nativeUntexturedFaces": 16,
+    "expectedDetailedMaterialOnlyCounts": {
+      "glazing": 960,
+      "emitter": 256
+    },
+    "expectedMaterialOnlyRGB": [
+      [
+        116,
+        191,
+        204
+      ],
+      [
+        185,
+        235,
+        217
+      ]
+    ],
+    "scope": "Original source -1 map equals no texture. Preserve original UV and material data; decode sentinel 3 only for SH019, use neutral material-only multiplication in its own shader variant; old shader outputs remain unchanged."
+  },
+  "engineering": {
+    "status": "Unknown; frozen four registration lists contain no SH019 record. Legacy activation and physical contract explicitly approve one metre per source unit and native geometry only.",
+    "maxControlledSpeedUnits": 43,
+    "dryMassKg": null,
+    "centreOfMassMetres": null,
+    "inertiaKgM2": null
+  },
+  "sourceOnly": {
+    "rebuild": "python3 -B tools/prepare_gazelle.py --check",
+    "fit": "python3 -B tools/verify_gazelle_fit.py",
+    "surfaceReplay": "python3 -B -m unittest discover -s tools -p 'test_audit_gazelle_surface.py' -v",
+    "negativeAndAppearance": "python3 -B -m unittest discover -s tools -p 'test_gazelle.py' -v"
+  },
+  "retainedSurfaceBoundsMillimetres": {
+    "detailed": [
+      577,
+      890
+    ],
+    "nativeCandidate": [
+      1262,
+      1400
+    ],
+    "mandatoryCrossSourceVertices": [
+      1242,
+      88
+    ],
+    "serviceLoopSectors": {
+      "detailed": [
+        890,
+        890,
+        890,
+        890,
+        890,
+        890,
+        890,
+        890
+      ],
+      "nativeCandidate": [
+        921,
+        921,
+        921,
+        921,
+        1204,
+        1118,
+        1118,
+        1204
+      ]
+    }
+  },
+  "ownedTests": {
+    "workspace": "cargo test --locked --workspace",
+    "core": "cargo test --locked -p meridian-core gazelle::tests -- --nocapture",
+    "controlledWorld": "cargo test --locked -p meridian-core flight::goshawk_validation::tests -- --nocapture",
+    "desktop": [
+      "cargo test --locked -p meridian-desktop gazelle_original_visual_and_all_local_supports_bind_to_its_own_shader",
+      "cargo test --locked -p meridian-desktop gazelle_original_untextured_materials_use_only_its_shader_variant",
+      "cargo test --locked -p meridian-desktop selecting_gazelle_routes_its_own_preview_without_granting_exchange",
+      "cargo test --locked -p meridian-desktop selecting_onager_does_not_select_gazelle_or_its_geometry",
+      "cargo test --locked -p meridian-desktop original_gazelle_fits_minimum_station_showroom_solo_and_compare"
+    ],
+    "earlierCriteria": [
+      "integration/sh008-goshawk/CRITERIA.json",
+      "integration/sh010-goshawk-custom/CRITERIA.json"
+    ],
+    "acceptance": [
+      "Controlled SH019 World handles five actual routes, exact R3 speed, source and scope refusals; SH008 engineering and SH010 typed snapshot paths stay distinct.",
+      "Ordinary Showroom SH019 alone/Compare exposes the original ice-cobalt shape, aft loop and material-only glazing and emitters. Search for SH018 never routes SH019, and exchange remains refused."
+    ]
+  },
+  "metal": {
+    "invocation": "Set each directory variable to a distinct new absolute directory and use cargo test --locked -p meridian-desktop <test> -- --ignored --exact --nocapture.",
+    "tests": [
+      {
+        "directoryVariable": "MERIDIAN_SH019_EVIDENCE_DIR",
+        "test": "mule_render::showroom::metal_qualification::metal_gazelle_same_pose_shimmer",
+        "verifier": "python3 -B tools/verify_goshawk_showroom_evidence.py <evidence-directory>"
+      },
+      {
+        "directoryVariable": "MERIDIAN_SH019_MINIMUM_DIR",
+        "test": "mule_render::showroom::metal_qualification::gazelle_qualification::metal_gazelle_minimum_showroom_model_pass"
+      },
+      {
+        "directoryVariable": "MERIDIAN_SH019_CACHE_DIR",
+        "test": "mule_render::showroom::metal_qualification::gazelle_qualification::metal_gazelle_cache_switching"
+      },
+      {
+        "directoryVariable": "MERIDIAN_SH019_MATERIAL_DIR",
+        "test": "mule_render::showroom::metal_qualification::gazelle_qualification::metal_gazelle_untextured_materials"
+      }
+    ],
+    "scope": "Actual production pass: exact direct identity and full-target RGB union in both Explorer/Gazelle and Custom/Gazelle pane orders; three distinct solo cache returns; no-map original material colour must be visible in opaque images. Native resize/compositor and GPU timing not covered."
+  },
+  "remaining": [
+    "Owned Rust, native Metal and native exact collision qualification.",
+    "Ordinary actor placement, acquisition, role/crew/cargo/equipment, physical mass properties and loaded engineering.",
+    "SH018 Onager remains separately owned; this source does not implement it."
+  ]
+}

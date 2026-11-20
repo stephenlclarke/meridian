@@ -26,6 +26,7 @@ const POSES: [&str; 3] = ["front", "oblique", "upper"];
 const PHASE_SECONDS: f32 = std::f32::consts::PI / 0.7;
 
 mod custom_qualification;
+mod gazelle_qualification;
 
 fn ok<T, E: std::fmt::Debug>(result: Result<T, E>) -> T {
     result.unwrap_or_else(|error| panic!("{error:?}"))
@@ -584,6 +585,17 @@ fn metal_goshawk_custom_same_pose_shimmer() {
         "SH010",
         "Goshawk Mk II Custom",
         "MERIDIAN_SH010_EVIDENCE_DIR",
+    );
+}
+
+#[test]
+#[ignore = "Mac owner only: explicit production SH019 visual qualification"]
+fn metal_gazelle_same_pose_shimmer() {
+    same_pose_shimmer(
+        Hull::Gazelle,
+        "SH019",
+        "Gazelle Explorer",
+        "MERIDIAN_SH019_EVIDENCE_DIR",
     );
 }
 

@@ -85,6 +85,23 @@ fn decode_visual(
     magic: &[u8; 8],
     count: usize,
 ) -> Result<Vec<VisualVertex>, &'static str> {
+    decode_visual_with_texture_limit(bytes, magic, count, 3)
+}
+
+fn decode_visual_with_untextured(
+    bytes: &[u8],
+    magic: &[u8; 8],
+    count: usize,
+) -> Result<Vec<VisualVertex>, &'static str> {
+    decode_visual_with_texture_limit(bytes, magic, count, 4)
+}
+
+fn decode_visual_with_texture_limit(
+    bytes: &[u8],
+    magic: &[u8; 8],
+    count: usize,
+    texture_limit: u32,
+) -> Result<Vec<VisualVertex>, &'static str> {
     if bytes.get(..8) != Some(magic)
         || bytes.get(8..12) != Some(&(count as u32).to_le_bytes())
         || bytes.get(12..16) != Some(&56u32.to_le_bytes())
@@ -106,7 +123,7 @@ fn decode_visual(
             .chain(&v.color)
             .chain(&v.uv)
             .any(|x| !x.is_finite())
-            || v.texture >= 3
+            || v.texture >= texture_limit
             || v.emissive > 1
     }) {
         return Err("Invalid detailed visual attributes");

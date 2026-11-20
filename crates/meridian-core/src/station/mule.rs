@@ -345,6 +345,74 @@ impl OriginalStationData {
 }
 
 impl OriginalStationData {
+    pub fn gazelle_launch_start(
+        &self,
+        source: &crate::gazelle::GazelleHullSource,
+    ) -> Result<FlightStart, StationError> {
+        self.rounded_station_launch_start(source.pieces())
+    }
+
+    pub fn gazelle_motion_clear(
+        &self,
+        source: &crate::gazelle::GazelleHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces(), start, end, angular_travel)
+    }
+
+    /// Test SH019 against the actual SH028 aperture, admission conditions and station triangles.
+    pub fn gazelle_entry_clear(
+        &self,
+        source: &crate::gazelle::GazelleHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        physical_speed: f64,
+        roll_rate: f64,
+        angular_travel: f64,
+    ) -> bool {
+        self.gazelle_entry_conditions(
+            source,
+            start,
+            end,
+            physical_speed,
+            roll_rate,
+            angular_travel,
+        ) && self.gazelle_motion_clear(source, start, end, angular_travel)
+    }
+
+    pub(crate) fn gazelle_entry_conditions(
+        &self,
+        source: &crate::gazelle::GazelleHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        physical_speed: f64,
+        roll_rate: f64,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_entry_conditions(
+            source.pieces(),
+            start,
+            end,
+            physical_speed,
+            roll_rate,
+            angular_travel,
+        )
+    }
+
+    pub(crate) fn gazelle_observer_clear(
+        &self,
+        source: &crate::gazelle::GazelleHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        observer: RigidPose,
+    ) -> bool {
+        self.rounded_observer_clear(source.pieces(), start, end, observer)
+    }
+}
+
+impl OriginalStationData {
     /// Controlled validation only: the stationary observer retains its real SH025 mesh.
     /// Initial noncontainment is established by the World constructor, then every
     /// continuous Mule step checks the same frozen observer's complete native surface.

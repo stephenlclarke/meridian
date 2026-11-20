@@ -1,10 +1,15 @@
 //! Source-authenticated Goshawk showroom presentation. Inputs grant no World authority.
 use super::{
-    Piece, Triangle, Vec3, VisualVertex, decode_visual, gpu, subtract, support_mesh, vector,
+    Piece, Triangle, Vec3, VisualVertex, decode_visual, decode_visual_with_untextured, gpu,
+    subtract, support_mesh, vector,
 };
 use crate::docked_screens::{ModelPreview, Orientation, Rect};
 use meridian_core::{
     docking::Basis3,
+    gazelle::{
+        GAZELLE_DETAILED_FACES, GAZELLE_DETAILED_SUPPORT_POINTS, GAZELLE_NATIVE_SUPPORT_POINTS,
+        GAZELLE_PIECES, GazelleHullSource,
+    },
     goshawk::{
         GOSHAWK_DETAILED_VERTICES, GOSHAWK_NATIVE_CANDIDATE_VERTICES, GOSHAWK_PIECES,
         GoshawkHullSource,
@@ -23,6 +28,9 @@ const VISUAL_FNV: u64 = 0x7a17_0c0c_6cdc_d5fd;
 pub(crate) const CUSTOM_GEOMETRY_KEY: &str = "assets/fleet/sh010/visual.bin";
 const CUSTOM_VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh010/visual.bin");
 const CUSTOM_VISUAL_FNV: u64 = 0xfe21_3755_8ea3_8ccb;
+pub(crate) const GAZELLE_GEOMETRY_KEY: &str = "assets/fleet/sh019/visual.bin";
+const GAZELLE_VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh019/visual.bin");
+const GAZELLE_VISUAL_FNV: u64 = 0xdd3d_f8b0_db38_0fd2;
 const EMPTY_PIECE: Piece = Piece {
     range: [0; 4],
     low: [0.0; 4],
@@ -33,12 +41,14 @@ const EMPTY_PIECE: Piece = Piece {
 pub(crate) enum Hull {
     Explorer,
     Custom,
+    Gazelle,
 }
 
 pub(crate) fn hull(model: &ModelPreview) -> Option<Hull> {
     match (model.object.as_str(), model.geometry_key.as_str()) {
         ("SH008", GEOMETRY_KEY) => Some(Hull::Explorer),
         ("SH010", CUSTOM_GEOMETRY_KEY) => Some(Hull::Custom),
+        ("SH019", GAZELLE_GEOMETRY_KEY) => Some(Hull::Gazelle),
         _ => None,
     }
 }
@@ -53,13 +63,18 @@ fn authenticated_visual(
     magic: &[u8; 8],
     count: usize,
 ) -> Result<Vec<VisualVertex>, &'static str> {
+    authenticate_visual_hash(bytes, expected_hash)?;
+    decode_visual(bytes, magic, count)
+}
+
+fn authenticate_visual_hash(bytes: &[u8], expected_hash: u64) -> Result<(), &'static str> {
     let hash = bytes.iter().fold(0xcbf2_9ce4_8422_2325_u64, |hash, byte| {
         (hash ^ u64::from(*byte)).wrapping_mul(0x100_0000_01b3)
     });
     if hash != expected_hash {
         return Err("Goshawk preview bytes changed");
     }
-    decode_visual(bytes, magic, count)
+    Ok(())
 }
 
 fn visual() -> Result<Vec<VisualVertex>, &'static str> {
@@ -84,6 +99,14 @@ impl Hull {
                 b"SH010VZ1",
                 CUSTOM_DETAILED_FACES * 3,
             ),
+            Self::Gazelle => {
+                authenticate_visual_hash(GAZELLE_VISUAL, GAZELLE_VISUAL_FNV)?;
+                decode_visual_with_untextured(
+                    GAZELLE_VISUAL,
+                    b"SH019VZ1",
+                    GAZELLE_DETAILED_FACES * 3,
+                )
+            }
         }
     }
 
@@ -91,7 +114,22 @@ impl Hull {
         match self {
             Self::Explorer => GOSHAWK_PIECES,
             Self::Custom => CUSTOM_PIECES,
+            Self::Gazelle => GAZELLE_PIECES,
         }
+    }
+
+    fn shader(self) -> String {
+        let original = shader(self.piece_count());
+        if self != Self::Gazelle {
+            return original;
+        }
+        // Source texture -1 means material-only, not an alternate diffuse map.
+        // Keep the sample unconditional for WGSL derivative uniformity; never index layer 3.
+        original.replacen(
+            "let texel=textureSample(diffuse,repeat_sampler,v.uv,i32(v.layer));",
+            "let mapped=textureSample(diffuse,repeat_sampler,v.uv,i32(min(v.layer,2u)));\n    let texel=select(mapped,vec4<f32>(1.0),v.layer==3u);",
+            1,
+        )
     }
 
     fn supports(self) -> Result<(Vec<Triangle>, Vec<Piece>), SupportError> {
@@ -110,6 +148,15 @@ impl Hull {
                 let (triangles, pieces) = support_mesh(
                     source.pieces(),
                     CUSTOM_DETAILED_VERTICES + CUSTOM_NATIVE_VERTICES,
+                )
+                .map_err(SupportError::Render)?;
+                Ok((triangles, pieces.to_vec()))
+            }
+            Self::Gazelle => {
+                let source = GazelleHullSource::bundled().map_err(SupportError::Source)?;
+                let (triangles, pieces) = support_mesh(
+                    source.pieces(),
+                    GAZELLE_DETAILED_SUPPORT_POINTS + GAZELLE_NATIVE_SUPPORT_POINTS,
                 )
                 .map_err(SupportError::Render)?;
                 Ok((triangles, pieces.to_vec()))
@@ -271,7 +318,7 @@ impl Pass {
     ) -> Result<Self, String> {
         match hull {
             Hull::Explorer => Self::new(device, queue, format),
-            Hull::Custom => Self::construct(device, queue, format, hull),
+            Hull::Custom | Hull::Gazelle => Self::construct(device, queue, format, hull),
         }
     }
 
@@ -303,7 +350,7 @@ impl Pass {
             queue,
             format,
             gpu::Inputs {
-                shader: &shader(hull.piece_count()),
+                shader: &hull.shader(),
                 uniform_size: (size_of::<Uniforms>() + pieces.len() * size_of::<Piece>()) as u64,
                 points: &triangles,
                 visual: &vertices,
@@ -429,6 +476,111 @@ mod tests {
         assert!(!matches(&model));
     }
 
+    #[test]
+    fn gazelle_original_visual_and_all_local_supports_bind_to_its_own_shader() {
+        check_variant(Hull::Gazelle, GAZELLE_DETAILED_FACES, GAZELLE_PIECES);
+        assert!(authenticated_visual(GAZELLE_VISUAL, VISUAL_FNV, b"GOSHVIZ1", VERTICES).is_err());
+        assert!(
+            authenticated_visual(
+                GAZELLE_VISUAL,
+                CUSTOM_VISUAL_FNV,
+                b"SH010VZ1",
+                CUSTOM_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        assert!(
+            authenticated_visual(
+                CUSTOM_VISUAL,
+                GAZELLE_VISUAL_FNV,
+                b"SH019VZ1",
+                GAZELLE_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        assert!(
+            authenticated_visual(
+                VISUAL,
+                GAZELLE_VISUAL_FNV,
+                b"SH019VZ1",
+                GAZELLE_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        let mut model = ModelPreview {
+            object: "SH019".into(),
+            geometry_key: GAZELLE_GEOMETRY_KEY.into(),
+            bounds: Rect::new(0.0, 0.0, 256.0, 256.0),
+            orientation: Orientation::default(),
+        };
+        assert_eq!(hull(&model), Some(Hull::Gazelle));
+        model.geometry_key = GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+        model.object = "SH008".into();
+        assert_eq!(hull(&model), Some(Hull::Explorer));
+        model.geometry_key = GAZELLE_GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+        model.object = "SH010".into();
+        assert!(!matches(&model));
+        model.geometry_key = CUSTOM_GEOMETRY_KEY.into();
+        assert_eq!(hull(&model), Some(Hull::Custom));
+        model.object = "SH019".into();
+        assert!(!matches(&model));
+        model.geometry_key = "assets/fleet/sh018/visual.bin".into();
+        assert!(!matches(&model));
+        model.object = "SH018".into();
+        model.geometry_key = GAZELLE_GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+        assert!(
+            authenticated_visual(
+                GAZELLE_VISUAL,
+                GAZELLE_VISUAL_FNV,
+                b"SH018VZ1",
+                GAZELLE_DETAILED_FACES * 3,
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn gazelle_original_untextured_materials_use_only_its_shader_variant() {
+        let vertices = ok(Hull::Gazelle.visual());
+        let glazing = [116.0_f32 / 255.0, 191.0 / 255.0, 204.0 / 255.0, 1.0];
+        let emitter = [185.0_f32 / 255.0, 235.0 / 255.0, 217.0 / 255.0, 1.0];
+        let mut counts = [0, 0];
+        for vertex in vertices.iter().filter(|vertex| vertex.texture == 3) {
+            if vertex.color == glazing && vertex.emissive == 0 {
+                counts[0] += 1;
+            } else if vertex.color == emitter && vertex.emissive == 1 {
+                counts[1] += 1;
+            } else {
+                panic!("unexpected Gazelle material-only vertex");
+            }
+        }
+        assert_eq!(counts, [960 * 3, 256 * 3]);
+        // Earlier hull decoders still refuse this fourth value.
+        assert!(
+            authenticated_visual(
+                GAZELLE_VISUAL,
+                GAZELLE_VISUAL_FNV,
+                b"SH019VZ1",
+                GAZELLE_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        let mut invalid = GAZELLE_VISUAL.to_vec();
+        invalid[16 + 48..16 + 52].copy_from_slice(&4_u32.to_le_bytes());
+        assert!(
+            decode_visual_with_untextured(&invalid, b"SH019VZ1", GAZELLE_DETAILED_FACES * 3)
+                .is_err()
+        );
+        assert_eq!(Hull::Explorer.shader(), shader(GOSHAWK_PIECES));
+        assert_eq!(Hull::Custom.shader(), shader(CUSTOM_PIECES));
+        let gazelle = Hull::Gazelle.shader();
+        assert!(gazelle.contains("i32(min(v.layer,2u))"));
+        assert!(gazelle.contains("select(mapped,vec4<f32>(1.0),v.layer==3u)"));
+    }
+
     fn check_variant(hull: Hull, face_count: usize, piece_count: usize) {
         let vertices = ok(hull.visual());
         assert_eq!(vertices.len(), face_count * 3);
@@ -454,7 +606,7 @@ mod tests {
                 assert!((y * focal).abs() <= z);
             }
         }
-        let module = ok(naga::front::wgsl::parse_str(&shader(piece_count)));
+        let module = ok(naga::front::wgsl::parse_str(&hull.shader()));
         ok(naga::valid::Validator::new(
             naga::valid::ValidationFlags::all(),
             naga::valid::Capabilities::empty(),

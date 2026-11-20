@@ -8,6 +8,10 @@ The authored desktop integration routes generated launch and docking cues from a
 
 Preview 10 is published for macOS arm64 and Windows x64. It includes the Goshawk Explorer in the ordinary station Showroom. The signed and notarized app was extracted and checked against the local installation, including all 483 files. Earlier Mac gameplay checks covered the Showroom on the source used for this build. Packaging verification did not include a new graphical launch. [Preview guide](PREVIEW-RELEASES.md)
 
+## Gazelle Explorer source candidate
+
+SH019 has its own original detailed Showroom, 37 rounded collision pieces including eight separate service-loop sectors, three independently certified open paths and direct metre calibration from the approved 304-face legacy native LOD. Original untextured glazing and emitter faces retain their material-only appearance. No registered SH019 mass, centre of mass or inertia was present in the frozen source. Rust and native Metal execution, Meridian exact native qualification and ordinary admission remain pending. [SH019 source and acceptance](GAZELLE-EXPLORER-GAMEPLAY-ENVELOPE.md)
+
 ## Commander startup and flight cockpit
 
 Ordinary startup opens Commander details with the current ship, location and credits. A fresh commander starts at Avenor. A saved flight opens its summary and waits for Enter to resume. An unreadable slot opens recovery. On Mac, a fresh commander reached this screen without creating a save. An airborne commander stayed on the summary until Enter. Recovery preserved the original damaged and unsupported save bytes.
