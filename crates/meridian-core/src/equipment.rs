@@ -212,7 +212,7 @@ impl State {
             || p.account_revision == 0
             || p.account_revision > account_revision
             || p.paid != if p.xyzzy { 0 } else { declared.price_tenths }
-            || !declared.offer(p.site).purchase_available
+            || (!p.xyzzy && !declared.offer(p.site).purchase_available)
             || self.revision == 0
             || self.fitted != (self.revision % 2 == 1)
             || u128::from(p.account_revision) + u128::from(self.revision - 1)
@@ -363,6 +363,28 @@ mod tests {
             p.paid = 28000;
         }
         assert_eq!(grant.validate(21, 22, 2), Err(Error::InvalidState));
+    }
+    #[test]
+    fn secret_cargo_fit_at_each_berth_is_independent_of_local_shop_stock() {
+        for site in [MarketSite::Avenor, MarketSite::Renas, MarketSite::Lareria] {
+            let granted = State::default()
+                .grant_xyzzy(21, 22, 1, site)
+                .unwrap_or_else(|e| panic!("{e}"));
+            assert_eq!(granted.validate(21, 22, 2), Ok(()));
+            assert!(
+                granted
+                    .owned()
+                    .is_some_and(|item| item.xyzzy && item.fitted)
+            );
+            let paid = State::default().prepare(21, 22, 1, 0, site, Command::PurchaseCargoBay);
+            assert_eq!(
+                paid.is_ok(),
+                definition()
+                    .unwrap_or_else(|e| panic!("{e}"))
+                    .offer(site)
+                    .purchase_available
+            );
+        }
     }
     #[test]
     fn authentic_paid_state_keeps_hull_identity_and_usage_through_reversible_fit() {

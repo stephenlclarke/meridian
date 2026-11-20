@@ -446,3 +446,7 @@ The Help candidate now lists mission details and flight-lesson review/cancel/det
 ## Preview 8 local installation
 
 The exact public Mac wrapper is installed side-by-side at `/Users/sclarke/Applications/Meridian Preview 8/Meridian EMP Sonar Preview.app`. All 474 published logical files and modes, including the 454 app files and stapled ticket, were independently verified after installation. Strict signature verification, ticket validation and Gatekeeper passed. Installation did not launch the game or alter the prior preview or known task profile. Existing source-bound native evidence carries by exact byte identity; this adds installation acceptance only.
+
+## Flight computer development
+
+The development branch retains the XYZZY menu selection after a successful save. A failed save retains the confirmation for retry or cancellation. The secret cargo-bay receipt now validates independently of the local shop offer. Native preview qualification is pending.

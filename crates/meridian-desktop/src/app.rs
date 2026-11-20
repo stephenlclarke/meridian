@@ -384,7 +384,7 @@ impl App {
         match self.game.xyzzy(action) {
             Ok(message) => {
                 self.notice.set(message);
-                self.xyzzy = None;
+                menu.reviewing = false;
                 self.sync_profile_controls();
             }
             Err(message) => self.notice.set(message),

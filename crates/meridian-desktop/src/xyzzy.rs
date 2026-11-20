@@ -17,10 +17,10 @@ pub struct Menu {
 }
 
 const ACTIONS: [(XyzzyAction, &str); 4] = [
-    (XyzzyAction::Enter, "Activate Commander CLARKE"),
+    (XyzzyAction::Enter, "Activate CLARKE and fit maximum equipment"),
     (
         XyzzyAction::MaximumSupportedHardware,
-        "Refill / refit supported maximum outfit",
+        "Refill and fit maximum equipment",
     ),
     (
         XyzzyAction::RestoreStarter,
@@ -70,11 +70,10 @@ impl Menu {
             format!("{} {}", if i == self.selected { ">" } else { " " }, label)
         }));
         lines.extend([
-            "Supported: front Naval laser, Elite energy, Advanced navigation".into(),
-            "Cargo bay, fitted scoops, finite nine-pylon missile outfit".into(),
-            "No unlimited missiles/cargo or unavailable shields/drive/automation".into(),
+            "Maximum outfit ignores local shop stock and technology level".into(),
+            "Refitting keeps owned items and fills the available pylons".into(),
             "Scoops fitting does not implement physical collection".into(),
-            "Docked, unpaused actions only; ordinary paid history is retained".into(),
+            "A station berth is required. Paid equipment keeps its history".into(),
             if self.reviewing {
                 "Enter CONFIRM AND SAVE | Escape / B Cancel review"
             } else {
@@ -82,7 +81,7 @@ impl Menu {
             }
             .into(),
             "First activation SETS cash to 1,000,000 CR once".into(),
-            "Confirm closes old interaction reviews; other profiles stay unchanged".into(),
+            "After saving, choose another action or press Escape to leave".into(),
             "H / ? Help | Close this menu before 1..5 / Tab station navigation".into(),
         ]);
         if let Some(notice) = notice {
@@ -112,7 +111,8 @@ impl Menu {
                 "Escape / B cancels a review, then closes this testing menu",
                 "Actions publish the exact save before replacing the live commander",
                 "First activation names CLARKE and SETS cash to 1,000,000 CR once",
-                "Maximum and starter refit use the currently supported SH025 outfit",
+                "Activation fits maximum compatible equipment at any station berth",
+                "After confirmation you can choose another action here",
                 "Fuel mode is accounted separately; paid transactions still charge",
                 "Missiles and cargo remain finite; full original parity is incomplete",
                 "Close this menu first: 1 Galaxy | 2 System | 3 Showroom",

@@ -116,7 +116,17 @@ impl Profile {
         // A directory-sync warning follows publication, so the host must refresh its authorities.
         Ok(publication_message(
             published,
-            "XYZZY change saved. Supported outfit only; finite missiles and cargo.".into(),
+            match action {
+                meridian_core::XyzzyAction::Enter => {
+                    "CLARKE active. Maximum outfit fitted and saved."
+                }
+                meridian_core::XyzzyAction::MaximumSupportedHardware
+                | meridian_core::XyzzyAction::RestoreStarter => {
+                    "Outfit refitted, refilled and saved."
+                }
+                meridian_core::XyzzyAction::ToggleUnlimitedFuel => "Fuel setting saved.",
+            }
+            .into(),
         )
         .unwrap_or_else(|warning| warning))
     }

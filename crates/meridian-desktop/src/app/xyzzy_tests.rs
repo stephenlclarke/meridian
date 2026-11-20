@@ -28,7 +28,8 @@ fn activate(app: &mut App) {
     menu(app);
     assert_eq!(press(app, KeyCode::Enter), None);
     assert_eq!(press(app, KeyCode::Enter), None);
-    assert!(app.xyzzy.is_none());
+    assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
+    press(app, KeyCode::Escape);
     assert_eq!(app.game.world.commander_name(), Some("CLARKE"));
 }
 
@@ -204,15 +205,17 @@ fn help_above_secret_confirmation_blocks_publication_and_resumes_the_same_review
 }
 
 #[test]
-fn menu_refit_toggle_and_reentry_keep_once_cash_and_real_finite_items() {
+fn activate_refit_and_toggle_fuel_without_leaving_the_menu() {
     let directory = TestDirectory::new();
     let mut app = app(&directory);
-    activate(&mut app);
+    menu(&mut app);
+    press(&mut app, KeyCode::Enter);
+    press(&mut app, KeyCode::Enter);
+    assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
     let items = app.game.world.ammunition_snapshot();
     let modules = app.game.world.modular_equipment_snapshot();
-    for select in [1, 2, 0] {
-        menu(&mut app);
-        for _ in 0..select {
+    for steps in [1, 1, 2] {
+        for _ in 0..steps {
             press(&mut app, KeyCode::ArrowDown);
         }
         press(&mut app, KeyCode::Enter);
@@ -221,7 +224,7 @@ fn menu_refit_toggle_and_reentry_keep_once_cash_and_real_finite_items() {
         assert_eq!(app.game.world.ammunition_snapshot(), items);
         assert_eq!(app.game.world.modular_equipment_snapshot(), modules);
     }
-    menu(&mut app);
+    assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
     // Up wraps from activation to the fourth action, fuel mode.
     press(&mut app, KeyCode::ArrowUp);
     press(&mut app, KeyCode::Enter);
