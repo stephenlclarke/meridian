@@ -22,7 +22,6 @@ pub(super) struct Phase {
     side: Vec3,
     system: crate::navigation::SystemId,
     visit: u64,
-    station_tab: bool,
     ready: bool,
 }
 
@@ -96,7 +95,6 @@ impl World {
             side,
             system: nav.system,
             visit: nav.visit,
-            station_tab,
             ready: false,
         });
         Ok("Automatic docking engaged")
@@ -128,11 +126,7 @@ impl World {
             let local = self.snapshot().navigation.is_some_and(|nav| {
                 nav.travel.is_none() && nav.system == phase.system && nav.visit == phase.visit
             });
-            if raw != FlightInput::default()
-                || self.emp.electrical_disabled()
-                || !local
-                || (phase.station_tab && !self.targeting_station_selected())
-            {
+            if raw != FlightInput::default() || self.emp.electrical_disabled() || !local {
                 self.auto_docking = None;
                 self.cancel_targeting();
                 return raw;
@@ -140,7 +134,7 @@ impl World {
             if let Some(input) = self.docking_input() {
                 return input;
             }
-            self.auto_docking = None;
+            self.cancel_auto_docking();
             return FlightInput {
                 brake: true,
                 ..FlightInput::default()

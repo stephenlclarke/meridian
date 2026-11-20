@@ -514,6 +514,20 @@ impl World {
         if let Some(result) = self.controlled_hull_step(input) {
             return result;
         }
+        let previous_targeting = self.targeting.clone();
+        let previous_docking = self.auto_docking;
+        let input = self.flight_computer_input(input);
+        let result = self.step_flight(input);
+        if result.is_err() {
+            self.targeting = previous_targeting;
+            self.auto_docking = previous_docking;
+        } else if self.state.mode != FlightMode::Flight || self.state.motion_refusal.is_some() {
+            self.cancel_auto_docking();
+        }
+        result
+    }
+
+    fn step_flight(&mut self, input: FlightInput) -> Result<(), StepError> {
         let input = if self.emp.electrical_disabled() {
             FlightInput::default()
         } else {
