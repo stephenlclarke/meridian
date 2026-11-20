@@ -28,6 +28,13 @@ pub struct HudScene<'a> {
     pub help: Option<&'a crate::help::Panel>,
 }
 
+struct TargetHud<'a> {
+    snapshot: &'a meridian_core::TargetingSnapshot,
+    camera: meridian_core::docking::RigidPose,
+    details: Option<bool>,
+    work_mesh: Option<Vec<Vertex>>,
+}
+
 pub struct SceneEffects<'a> {
     pub(crate) mule: Option<crate::mule_render::Placement<'a>>,
     pub traffic: Option<&'a meridian_core::traffic::TrafficSnapshot>,
@@ -352,24 +359,33 @@ impl Renderer {
         station: StationScene<'_>,
         traffic: Option<&meridian_core::traffic::TrafficSnapshot>,
         mule: Option<&meridian_core::traffic::MuleActorSnapshot>,
-    ) -> Result<meridian_core::TargetingViewport, String> {
+        belt: Option<&meridian_core::mining::BeltSnapshot>,
+    ) -> Result<
+        (
+            meridian_core::TargetingViewport,
+            Vec<meridian_core::equipment::WorkTargetId>,
+        ),
+        String,
+    > {
+        use meridian_core::{equipment::WorkTargetId, traffic::NpcPhase};
         if self.is_zero_sized() {
             return Err("Targeting requires an active flight viewport".into());
         }
         let camera = self.targeting_camera(snapshot, &station)?;
         let projection = flight_projection(self.config.width, self.config.height);
         let mut front = Vec::new();
+        let mut work_front = Vec::new();
         if let Some(traffic) = traffic {
-            front.extend(
-                traffic
-                    .actors
-                    .iter()
-                    .filter(|actor| {
-                        actor.hull_id == "SH025"
-                            && targeting::visible(&self.ship, camera, actor.pose, projection)
-                    })
-                    .map(|actor| actor.id),
-            );
+            for actor in traffic.actors.iter().filter(|actor| {
+                actor.hull_id == "SH025"
+                    && targeting::visible(&self.ship, camera, actor.pose, projection)
+            }) {
+                if actor.phase == NpcPhase::Destroyed {
+                    work_front.push(WorkTargetId::Wreck(actor.id));
+                } else if actor.phase != NpcPhase::Complete {
+                    front.push(actor.id);
+                }
+            }
         }
         if let Some(mule) = mule.filter(|m| m.is_renas_encounter()) {
             let mesh = crate::mule_render::targeting_vertices()?;
@@ -377,10 +393,26 @@ impl Renderer {
                 front.push(mule.actor().id);
             }
         }
-        Ok(meridian_core::TargetingViewport {
-            size: [self.size.width, self.size.height],
-            front,
-        })
+        if let Some(belt) = belt {
+            for body in belt.bodies.iter().filter(|body| body.remaining_units > 0) {
+                let pose = meridian_core::docking::RigidPose {
+                    position: body.position,
+                    orientation: meridian_core::docking::Basis3::IDENTITY,
+                };
+                if targeting::visible(&targeting::asteroid_model(body), camera, pose, projection) {
+                    work_front.push(WorkTargetId::Asteroid(body.id));
+                }
+            }
+        }
+        // Pending ore has an actual World position but no ordinary visual mesh in this build.
+        // Its fitted work identity remains selectable as known/offscreen, never fake-visible.
+        Ok((
+            meridian_core::TargetingViewport {
+                size: [self.size.width, self.size.height],
+                front,
+            },
+            work_front,
+        ))
     }
 
     fn prepare_hud_frame(
@@ -431,11 +463,7 @@ impl Renderer {
         lines: &[String],
         cockpit: Option<&hud::cockpit::Cockpit>,
         help: Option<&crate::help::Panel>,
-        target: Option<(
-            &meridian_core::TargetingSnapshot,
-            meridian_core::docking::RigidPose,
-            Option<bool>,
-        )>,
+        target: Option<TargetHud<'_>>,
     ) -> Result<(), String> {
         let scale = self.window.scale_factor();
         let logical = self.size.to_logical::<f64>(scale);
@@ -443,7 +471,13 @@ impl Renderer {
             let width = logical.width.round() as u32;
             let height = logical.height.round() as u32;
             hud::vertices_with_cockpit(lines, width, height, cockpit, &mut self.hud_frame);
-            if let Some((target, camera, details)) = target {
+            if let Some(TargetHud {
+                snapshot: target,
+                camera,
+                details,
+                work_mesh,
+            }) = target
+            {
                 if target.model == Some("Mule") && self.target_mule_mesh.is_none() {
                     self.target_mule_mesh = Some(crate::mule_render::targeting_vertices()?);
                 }
@@ -453,6 +487,10 @@ impl Renderer {
                         self.target_mule_mesh.as_deref().unwrap_or(&[])
                     }
                     meridian_core::TargetMode::Tracking => self.ship.as_slice(),
+                    meridian_core::TargetMode::Work(
+                        meridian_core::equipment::WorkTargetRole::WreckTracking,
+                    ) => self.ship.as_slice(),
+                    meridian_core::TargetMode::Work(_) => work_mesh.as_deref().unwrap_or(&[]),
                 };
                 targeting::append(
                     &mut self.hud_frame,
@@ -812,11 +850,24 @@ impl Renderer {
             });
             self.prepare_scene_surfaces(snapshot, &effects)?;
             let target = match (effects.targeting, station.as_ref()) {
-                (Some(target), Some(station)) => Some((
-                    target,
-                    self.targeting_camera(snapshot, station)?,
-                    effects.target_details,
-                )),
+                (Some(target), Some(station)) => {
+                    let work_mesh = match target.identity {
+                        meridian_core::TargetIdentity::Work(
+                            meridian_core::equipment::WorkTargetId::Asteroid(id),
+                        ) => effects
+                            .mining
+                            .as_ref()
+                            .and_then(|scene| scene.belt.bodies.iter().find(|body| body.id == id))
+                            .map(targeting::asteroid_model),
+                        _ => None,
+                    };
+                    Some(TargetHud {
+                        snapshot: target,
+                        camera: self.targeting_camera(snapshot, station)?,
+                        details: effects.target_details,
+                        work_mesh,
+                    })
+                }
                 _ => None,
             };
             if docked.is_none() {

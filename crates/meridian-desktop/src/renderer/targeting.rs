@@ -104,6 +104,25 @@ pub(super) fn visible(
     })
 }
 
+/// The same physical asteroid corners and face ordering as the ordinary belt renderer.
+pub(super) fn asteroid_model(body: &meridian_core::mining::AsteroidSnapshot) -> Vec<Vertex> {
+    meridian_core::mining::ASTEROID_FACES
+        .into_iter()
+        .flatten()
+        .map(|index| {
+            let p = body.vertices[index];
+            Vertex {
+                position: [
+                    (p.x - body.position.x) as f32,
+                    (p.y - body.position.y) as f32,
+                    (p.z - body.position.z) as f32,
+                ],
+                color: [0.31, 0.23, 0.14],
+            }
+        })
+        .collect()
+}
+
 fn rect(out: &mut Vec<Vertex>, bounds: [f32; 4], color: [f32; 3], size: [f32; 2]) {
     let [l, t, r, b] = bounds;
     let vertex = |x, y| Vertex {
@@ -262,6 +281,7 @@ pub(super) fn append(out: &mut Vec<Vertex>, size: [u32; 2], overlay: Overlay<'_>
     let mut lines = vec![
         overlay.target.identity.label(),
         format!("AUTO: {}", overlay.target.guidance),
+        format!("F: {}", overlay.target.filter.label()),
     ];
     if expanded {
         if let Some(model) = overlay.target.model {
@@ -282,15 +302,19 @@ pub(super) fn append(out: &mut Vec<Vertex>, size: [u32; 2], overlay: Overlay<'_>
                 .map(|(key, value)| format!("{key}: {value}")),
         );
     }
-    let count = lines
-        .len()
-        .min(MAX_ROWS)
-        .min(((size[1] - 30.0) / 9.0) as usize);
-    let preview_height = if expanded && overlay.target.model.is_some() && size[1] > 200.0 {
+    let preview_height = if expanded
+        && overlay.target.model.is_some()
+        && !overlay.model.is_empty()
+        && size[1] > 200.0
+    {
         50.0
     } else {
         0.0
     };
+    let count = lines
+        .len()
+        .min(MAX_ROWS)
+        .min(((size[1] - 30.0 - preview_height) / 9.0) as usize);
     rect(
         out,
         [
@@ -362,6 +386,7 @@ mod tests {
                 visit: 1,
             },
             tier: TargetingTier::Docking,
+            filter: meridian_core::TargetFilter::Ships,
             mode: TargetMode::Station,
             guidance: "Approach",
             pose,

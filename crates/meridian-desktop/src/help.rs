@@ -63,6 +63,7 @@ impl Panel {
                 "J Jump to selected route | P Pause / resume",
                 "F6 Flight lesson | F12 Cancel | C Lesson details",
                 "I Mission details | Shift+I Target details | Tab Next target | Delete Release",
+                "F Cycle target filter: Ships / Mining / Salvage / All",
                 "Hold U 10 seconds: EMP | Release U cancels unfinished charge",
                 "F7 Close attempt | F8 Reception | F10 Practice review at Avenor berth",
                 "4 Trade review | 5 Plan | 6 Cancel | 7 Details",

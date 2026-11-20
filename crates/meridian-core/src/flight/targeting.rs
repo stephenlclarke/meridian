@@ -3,7 +3,7 @@
 //! it grants no weapon, docking, equipment, or other World authority.
 use super::{CombatIdentity, FlightInput, FlightMode, FlightView, StepError, World};
 use crate::docking::{RigidPose, Vec3};
-use crate::equipment::TargetingTier;
+use crate::equipment::{TargetingTier, WorkTarget, WorkTargetId, WorkTargetRole};
 use crate::navigation::SystemId;
 use crate::traffic::{NpcId, NpcPhase, NpcSnapshot, Population};
 
@@ -11,6 +11,7 @@ use crate::traffic::{NpcId, NpcPhase, NpcSnapshot, Population};
 pub enum TargetIdentity {
     Ship(NpcId),
     Station { system: SystemId, visit: u64 },
+    Work(WorkTargetId),
 }
 
 impl TargetIdentity {
@@ -18,13 +19,59 @@ impl TargetIdentity {
         match self {
             Self::Ship(id) => format!("Target #{}", id.serial()),
             Self::Station { .. } => "Target #0".into(),
+            Self::Work(WorkTargetId::Asteroid(id)) => format!("Rock #{}", id.ordinal() + 1),
+            Self::Work(WorkTargetId::Ore(id)) => {
+                format!("Ore #{}-{}", id.asteroid().ordinal() + 1, id.fragment() + 1)
+            }
+            Self::Work(WorkTargetId::Wreck(id)) => format!("Wreck #{}", id.serial()),
         }
     }
 
-    fn order(self) -> u8 {
+    fn order(self) -> (u8, u8, u8) {
         match self {
-            Self::Ship(id) => id.serial(),
-            Self::Station { .. } => 0,
+            Self::Ship(id) => (0, id.serial(), 0),
+            Self::Station { .. } => (1, 0, 0),
+            Self::Work(WorkTargetId::Asteroid(id)) => (2, id.ordinal(), 0),
+            Self::Work(WorkTargetId::Ore(id)) => (3, id.asteroid().ordinal(), id.fragment()),
+            Self::Work(WorkTargetId::Wreck(id)) => (4, id.serial(), 0),
+        }
+    }
+}
+
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub enum TargetFilter {
+    #[default]
+    Ships,
+    Mining,
+    Salvage,
+    All,
+}
+
+impl TargetFilter {
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::Ships => "Ships",
+            Self::Mining => "Mining",
+            Self::Salvage => "Salvage",
+            Self::All => "All",
+        }
+    }
+
+    fn next(self) -> Self {
+        match self {
+            Self::Ships => Self::Mining,
+            Self::Mining => Self::Salvage,
+            Self::Salvage => Self::All,
+            Self::All => Self::Ships,
+        }
+    }
+
+    fn includes_work(self, role: WorkTargetRole) -> bool {
+        match role {
+            WorkTargetRole::RockHold | WorkTargetRole::OreTracking => {
+                matches!(self, Self::Mining | Self::All)
+            }
+            WorkTargetRole::WreckTracking => matches!(self, Self::Salvage | Self::All),
         }
     }
 }
@@ -41,12 +88,14 @@ pub struct TargetingViewport {
 pub enum TargetMode {
     Tracking,
     Station,
+    Work(WorkTargetRole),
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TargetingSnapshot {
     pub identity: TargetIdentity,
     pub tier: TargetingTier,
+    pub filter: TargetFilter,
     pub mode: TargetMode,
     pub guidance: &'static str,
     pub pose: RigidPose,
@@ -59,6 +108,7 @@ pub struct TargetingSnapshot {
 enum Candidate {
     Ship(NpcSnapshot),
     Station(TargetIdentity, crate::docking::StationPose),
+    Work(WorkTarget),
 }
 
 impl Candidate {
@@ -66,6 +116,7 @@ impl Candidate {
         match self {
             Self::Ship(actor) => TargetIdentity::Ship(actor.id),
             Self::Station(identity, _) => identity,
+            Self::Work(work) => TargetIdentity::Work(work.id),
         }
     }
 
@@ -73,6 +124,7 @@ impl Candidate {
         match self {
             Self::Ship(actor) => actor.pose.position,
             Self::Station(_, pose) => pose.pose.position,
+            Self::Work(work) => work.position,
         }
     }
 }
@@ -82,6 +134,8 @@ pub(super) struct State {
     selected: Option<TargetIdentity>,
     origin: Option<CombatIdentity>,
     tier: Option<TargetingTier>,
+    filter: TargetFilter,
+    cycle_filter: TargetFilter,
     size: [u32; 2],
     membership: Vec<TargetIdentity>,
     remaining: Vec<TargetIdentity>,
@@ -97,12 +151,18 @@ impl State {
         ordered: Vec<TargetIdentity>,
     ) -> Option<TargetIdentity> {
         if self.origin != Some(origin) {
-            *self = Self::default();
+            *self = Self {
+                filter: self.filter,
+                ..Self::default()
+            };
             self.origin = Some(origin);
         }
         let mut membership = ordered.clone();
         membership.sort_by_key(|id| id.order());
-        let changed = self.tier != Some(tier) || self.size != size || self.membership != membership;
+        let changed = self.tier != Some(tier)
+            || self.size != size
+            || self.membership != membership
+            || self.cycle_filter != self.filter;
         if changed || self.remaining.is_empty() {
             if !changed || ordered.iter().all(|id| self.visited.contains(id)) {
                 self.visited.clear();
@@ -114,6 +174,7 @@ impl State {
                 .collect();
         }
         self.tier = Some(tier);
+        self.cycle_filter = self.filter;
         self.size = size;
         self.membership = membership;
         self.selected = self.remaining.first().copied();
@@ -133,18 +194,20 @@ fn offset(a: Vec3, b: Vec3) -> Vec3 {
     Vec3::new(a.x - b.x, a.y - b.y, a.z - b.z)
 }
 
-fn grouped(candidate: Candidate, visible: &[NpcId]) -> u8 {
+fn grouped(candidate: Candidate, visible: &[NpcId], work_visible: &[WorkTargetId]) -> u8 {
     match candidate {
         Candidate::Ship(actor) if visible.contains(&actor.id) => 0,
         Candidate::Ship(_) => 1,
         Candidate::Station(..) => 2,
+        Candidate::Work(work) if work_visible.contains(&work.id) => 0,
+        Candidate::Work(_) => 1,
     }
 }
 
-fn ship_bearing(player: RigidPose, actor: NpcSnapshot) -> [f64; 2] {
+fn target_bearing(player: RigidPose, position: Vec3) -> [f64; 2] {
     let local = player
         .orientation
-        .inverse_coordinates(offset(actor.pose.position, player.position));
+        .inverse_coordinates(offset(position, player.position));
     [
         local.x.atan2(local.z),
         local.y.atan2(local.x.hypot(local.z)),
@@ -204,6 +267,15 @@ impl World {
         expected_tick: u64,
         viewport: TargetingViewport,
     ) -> Result<bool, StepError> {
+        self.cycle_targeting_with_work(expected_tick, viewport, &[])
+    }
+
+    pub fn cycle_targeting_with_work(
+        &mut self,
+        expected_tick: u64,
+        viewport: TargetingViewport,
+        work_visible: &[WorkTargetId],
+    ) -> Result<bool, StepError> {
         if expected_tick != self.state.tick {
             return Err(StepError::StaleCommand);
         }
@@ -217,17 +289,32 @@ impl World {
         }
         let player = super::flight_pose(self.state.position, self.state.orientation)
             .ok_or(StepError::NonFiniteState)?;
-        let mut candidates = self.targeting_candidates(origin, tier);
-        candidates.retain(|candidate| {
-            tier >= TargetingTier::Advanced || grouped(*candidate, &viewport.front) == 0
-        });
+        let filter = self.targeting.filter;
+        let mut candidates = if matches!(filter, TargetFilter::Ships | TargetFilter::All) {
+            let mut ships = self.targeting_candidates(origin, tier);
+            ships.retain(|candidate| {
+                tier >= TargetingTier::Advanced
+                    || grouped(*candidate, &viewport.front, work_visible) == 0
+            });
+            ships
+        } else {
+            Vec::new()
+        };
+        if filter != TargetFilter::Ships {
+            candidates.extend(
+                self.work_targets()
+                    .into_iter()
+                    .filter(|work| filter.includes_work(work.role))
+                    .map(Candidate::Work),
+            );
+        }
         candidates.sort_by(|a, b| {
             let distance = |candidate: Candidate| {
                 let delta = offset(candidate.position(), player.position);
                 delta.dot(delta)
             };
-            grouped(*a, &viewport.front)
-                .cmp(&grouped(*b, &viewport.front))
+            grouped(*a, &viewport.front, work_visible)
+                .cmp(&grouped(*b, &viewport.front, work_visible))
                 .then_with(|| distance(*a).total_cmp(&distance(*b)))
                 .then_with(|| a.identity().order().cmp(&b.identity().order()))
         });
@@ -237,7 +324,9 @@ impl World {
             Some(TargetIdentity::Station { .. })
         );
         let selected = self.targeting.cycle(origin, tier, viewport.size, ordered);
-        if station_was_selected && !matches!(selected, Some(TargetIdentity::Station { .. })) {
+        if (station_was_selected || selected.is_some())
+            && !matches!(selected, Some(TargetIdentity::Station { .. }))
+        {
             self.auto_docking = None;
         }
         // Selection is a cockpit command, not an automatic launch or weapon command.
@@ -258,6 +347,22 @@ impl World {
         self.targeting.selected = None;
     }
 
+    pub fn target_filter(&self) -> TargetFilter {
+        self.targeting.filter
+    }
+
+    pub fn cycle_target_filter(&mut self) -> Result<TargetFilter, StepError> {
+        if self.is_paused() {
+            return Err(StepError::Paused);
+        }
+        if self.targeting_origin().is_none() {
+            return Err(StepError::InvalidMode);
+        }
+        self.cancel_targeting();
+        self.targeting.filter = self.targeting.filter.next();
+        Ok(self.targeting.filter)
+    }
+
     fn current_target(&self) -> Option<(TargetingTier, Candidate)> {
         let selected = self.targeting.selected?;
         let origin = self.targeting_origin()?;
@@ -265,6 +370,13 @@ impl World {
             return None;
         }
         let tier = self.targeting_tier()?;
+        if let TargetIdentity::Work(id) = selected {
+            return self
+                .work_targets()
+                .into_iter()
+                .find(|work| work.id == id && self.targeting.filter.includes_work(work.role))
+                .map(|work| (tier, Candidate::Work(work)));
+        }
         self.targeting_candidates(origin, tier)
             .into_iter()
             .find(|c| c.identity() == selected)
@@ -273,6 +385,13 @@ impl World {
 
     pub fn targeting_station_selected(&self) -> bool {
         matches!(self.current_target(), Some((_, Candidate::Station(..))))
+    }
+
+    pub fn selected_work_target(&self) -> Option<WorkTarget> {
+        match self.current_target()? {
+            (_, Candidate::Work(work)) => Some(work),
+            _ => None,
+        }
     }
 
     /// One selected live actor, not an owned missile lock. Manual steering releases tracking;
@@ -288,18 +407,19 @@ impl World {
         if input.pitch != 0.0
             || input.yaw != 0.0
             || input.roll != 0.0
-            || matches!(target, Candidate::Station(..)) && (input.throttle != 0.0 || input.brake)
+            || matches!(target, Candidate::Station(..) | Candidate::Work(_))
+                && (input.throttle != 0.0 || input.brake)
         {
             self.cancel_targeting();
             return input;
         }
-        let Candidate::Ship(actor) = target else {
+        if matches!(target, Candidate::Station(..)) {
             return input;
-        };
+        }
         let Some(player) = super::flight_pose(self.state.position, self.state.orientation) else {
             return input;
         };
-        let [bearing, elevation] = ship_bearing(player, actor);
+        let [bearing, elevation] = target_bearing(player, target.position());
         let tolerance = 1.5 / (f64::from(self.targeting.size[1].max(1)) * 0.8);
         let control = |angle: f64, rate: f32| {
             if angle.abs() <= tolerance {
@@ -310,10 +430,17 @@ impl World {
         };
         let yaw = control(bearing, super::YAW_RATE);
         let pitch = control(elevation, super::PITCH_RATE);
-        FlightInput {
+        let output = FlightInput {
             yaw,
             pitch,
             ..input
+        };
+        if let Candidate::Work(work) = target
+            && work.role == WorkTargetRole::RockHold
+        {
+            self.asteroid_hold_input(work, output)
+        } else {
+            output
         }
     }
 
@@ -346,7 +473,7 @@ impl World {
                     .map(|system| system.name);
                 let player = super::flight_pose(self.state.position, self.state.orientation)?;
                 let tolerance = 1.5 / (f64::from(self.targeting.size[1].max(1)) * 0.8);
-                let guidance = if ship_bearing(player, actor)
+                let guidance = if target_bearing(player, actor.pose.position)
                     .into_iter()
                     .all(|angle| angle.abs() <= tolerance)
                 {
@@ -397,10 +524,38 @@ impl World {
                     fields,
                 )
             }
+            Candidate::Work(work) => {
+                let (model, guidance) = match work.role {
+                    WorkTargetRole::RockHold => ("Asteroid", "Rock guidance"),
+                    WorkTargetRole::OreTracking => ("Ore", "Ore tracking"),
+                    WorkTargetRole::WreckTracking => ("Wreck", "Wreck tracking"),
+                };
+                let mut pose = RigidPose {
+                    position: work.position,
+                    orientation: crate::docking::Basis3::IDENTITY,
+                };
+                if let WorkTargetId::Wreck(id) = work.id
+                    && let Some(actor) = self
+                        .traffic_snapshot()
+                        .and_then(|traffic| traffic.actors.into_iter().find(|actor| actor.id == id))
+                {
+                    pose = actor.pose;
+                }
+                let identified = tier >= TargetingTier::Identification;
+                (
+                    TargetMode::Work(work.role),
+                    guidance,
+                    pose,
+                    identified.then_some(model),
+                    None,
+                    Vec::new(),
+                )
+            }
         };
         Some(TargetingSnapshot {
             identity,
             tier,
+            filter: self.targeting.filter,
             mode,
             guidance,
             pose,
@@ -703,5 +858,80 @@ mod tests {
         assert!(world.auto_docking_active());
         world.cancel_targeting();
         assert!(!world.auto_docking_active());
+    }
+
+    #[test]
+    fn work_filter_cycles_real_rock_ids_and_preserves_stable_remaining_order() {
+        let mut world = fitted(TargetingTier::Military);
+        launch(&mut world);
+        let tick = world.snapshot().tick;
+        assert_eq!(world.target_filter(), TargetFilter::Ships);
+        assert_eq!(world.cycle_target_filter().unwrap(), TargetFilter::Mining);
+        let rocks = world.work_targets();
+        let last = rocks.last().unwrap().id;
+        assert!(matches!(last, WorkTargetId::Asteroid(_)));
+        let prior = world.save_bytes().unwrap();
+        assert!(
+            world
+                .cycle_targeting_with_work(tick, viewport(vec![]), &[last])
+                .unwrap()
+        );
+        assert_eq!(world.selected_work_target().unwrap().id, last);
+        assert_eq!(
+            world.targeting_snapshot().unwrap().mode,
+            TargetMode::Work(WorkTargetRole::RockHold)
+        );
+        assert_eq!(
+            world.request_selected_target_missile_lock(tick),
+            Err(MissileError::NoLiveLock)
+        );
+        assert_eq!(world.save_bytes().unwrap(), prior);
+        let mut visited = vec![last];
+        for _ in 1..rocks.len() {
+            assert!(
+                world
+                    .cycle_targeting_with_work(tick, viewport(vec![]), &[])
+                    .unwrap()
+            );
+            let selected = world.selected_work_target().unwrap().id;
+            assert!(!visited.contains(&selected));
+            visited.push(selected);
+        }
+        assert_eq!(visited.len(), rocks.len());
+        let manual = FlightInput {
+            throttle: 0.5,
+            ..FlightInput::default()
+        };
+        assert_eq!(world.targeting_flight_input(manual), manual);
+        assert!(world.selected_work_target().is_none());
+        assert_eq!(world.cycle_target_filter().unwrap(), TargetFilter::Salvage);
+        assert!(!world.cycle_targeting(tick, viewport(vec![])).unwrap());
+        assert_eq!(world.cycle_target_filter().unwrap(), TargetFilter::All);
+        assert!(
+            world
+                .cycle_targeting_with_work(tick, viewport(vec![]), &[last])
+                .unwrap()
+        );
+        assert_eq!(world.selected_work_target().unwrap().id, last);
+        assert_eq!(world.cycle_target_filter().unwrap(), TargetFilter::Ships);
+        assert!(world.selected_work_target().is_none());
+    }
+
+    #[test]
+    fn work_filters_refuse_unfitted_specialties_and_cold_restore_resets_filter() {
+        let mut world = fitted(TargetingTier::Military);
+        let work = world.modular_equipment_snapshot().unwrap().items;
+        for kind in [ModuleKind::MiningTargeting, ModuleKind::SalvageTargeting] {
+            let item = work.iter().find(|item| item.kind == kind).unwrap().id;
+            module(&mut world, ModuleAction::Store { item });
+        }
+        launch(&mut world);
+        let tick = world.snapshot().tick;
+        assert_eq!(world.cycle_target_filter().unwrap(), TargetFilter::Mining);
+        assert!(!world.cycle_targeting(tick, viewport(vec![])).unwrap());
+        assert_eq!(world.cycle_target_filter().unwrap(), TargetFilter::Salvage);
+        assert!(!world.cycle_targeting(tick, viewport(vec![])).unwrap());
+        let restored = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+        assert_eq!(restored.target_filter(), TargetFilter::Ships);
     }
 }

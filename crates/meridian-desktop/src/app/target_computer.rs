@@ -1,5 +1,6 @@
 //! Host adapter for flight targeting. Keyboard ownership remains in App::game_key.
 use super::{App, StationScene};
+use meridian_core::TargetFilter;
 
 impl App {
     pub(super) fn cycle_computer_target(&mut self) {
@@ -23,15 +24,32 @@ impl App {
             };
             let traffic = self.game.world.traffic_snapshot();
             let mule = self.game.world.mule_actor_snapshot();
-            let viewport =
-                renderer.targeting_viewport(&snapshot, station, traffic.as_ref(), mule.as_ref())?;
+            let filter = self.game.world.target_filter();
+            let belt = (filter != TargetFilter::Ships)
+                .then(|| self.game.world.mining_belt_snapshot())
+                .flatten();
+            let (viewport, work_visible) = renderer.targeting_viewport(
+                &snapshot,
+                station,
+                traffic.as_ref(),
+                mule.as_ref(),
+                belt.as_ref(),
+            )?;
             if !self
                 .game
                 .world
-                .cycle_targeting(snapshot.tick, viewport)
+                .cycle_targeting_with_work(snapshot.tick, viewport, &work_visible)
                 .map_err(|error| error.to_string())?
             {
-                return Ok("NO TARGETS".to_owned());
+                let fit = self.game.world.work_targeting_fit();
+                let message = match filter {
+                    TargetFilter::Mining if !fit.mining => "Fit a Mining Module",
+                    TargetFilter::Salvage if !fit.salvage => "Fit a Salvage Module",
+                    TargetFilter::Mining => "No eligible rocks or ore",
+                    TargetFilter::Salvage => "No eligible salvage targets",
+                    _ => "NO TARGETS",
+                };
+                return Ok(message.to_owned());
             }
             Ok(self.game.world.targeting_snapshot().map_or_else(
                 || "NO TARGETS".into(),
@@ -47,6 +65,15 @@ impl App {
     pub(super) fn release_computer_target(&mut self) {
         self.game.world.cancel_targeting();
         self.notice.set("Target released".into());
+        self.request_redraw();
+    }
+
+    pub(super) fn cycle_computer_filter(&mut self) {
+        let result = self.game.world.cycle_target_filter();
+        self.notice.set(match result {
+            Ok(filter) => format!("TARGET FILTER: {}", filter.label()),
+            Err(error) => error.to_string(),
+        });
         self.request_redraw();
     }
 
@@ -116,6 +143,19 @@ mod tests {
             Some("Lock an actual live target")
         );
         assert_eq!(app.game.world.missile_snapshot(), missile);
+        for (filter, label) in [
+            (TargetFilter::Mining, "Mining"),
+            (TargetFilter::Salvage, "Salvage"),
+            (TargetFilter::All, "All"),
+            (TargetFilter::Ships, "Ships"),
+        ] {
+            app.game_key(KeyCode::KeyF);
+            assert_eq!(app.game.world.target_filter(), filter);
+            assert_eq!(
+                app.notice.text.as_deref(),
+                Some(format!("TARGET FILTER: {label}").as_str())
+            );
+        }
         app.toggle_target_details();
         assert_eq!(app.target_details, Some(true));
         app.toggle_target_details();

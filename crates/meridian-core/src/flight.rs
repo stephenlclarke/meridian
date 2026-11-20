@@ -26,7 +26,9 @@ pub use navigation_trade::{
     NavigationTradePlanSnapshot, NavigationTradeReview, NavigationTradeSnapshot,
     NavigationTradeTrace, PreparedNavigationTrade, PreparedStationService,
 };
-pub use targeting::{TargetIdentity, TargetMode, TargetingSnapshot, TargetingViewport};
+pub use targeting::{
+    TargetFilter, TargetIdentity, TargetMode, TargetingSnapshot, TargetingViewport,
+};
 mod flight_reception;
 pub use flight_reception::{
     FLIGHT_RECEPTION_MAX_BERTH_RECORDS, FlightReceptionAction, FlightReceptionAttemptSnapshot,

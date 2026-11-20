@@ -101,8 +101,8 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | P on the station Galaxy chart (development) | Toggle the best-profit scan of reachable markets; P in flight still pauses |
 | L; W/S; arrows; A/D; Q/E; Space | Launch; thrust; pitch; yaw; roll; brake |
 | N in flight (development) | Engage the fitted navigation computer for docking, or cancel the approach |
-| Tab / Delete / Shift+I in flight (development) | Cycle target / release tracking / show target details |
-| J; T (docked); R; Enter; B; F | Travel; select contact; review; confirm; cancel; buy fuel |
+| F / Tab / Delete / Shift+I in flight (development) | Cycle Ships/Mining/Salvage/All filter; cycle target; release tracking; show target details |
+| J; T (docked); R; Enter; B; F (docked) | Travel; select contact; review; confirm; cancel; buy fuel |
 | M; [ / ]; G / Shift+G | Market; commodity selection; buy/sell one native unit |
 | O; K; U; Y | Equipment panel; buy/fit cargo bay; store when docked; refit |
 | Hold U in active flight | Charge the fitted EMP for 600 accepted ticks; early release cancels |

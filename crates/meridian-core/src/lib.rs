@@ -44,7 +44,7 @@ pub use flight::{
 pub use flight::{
     CombatIdentity, CombatSnapshot, OrdinaryImpact, OrdinaryTarget, OrdinaryWeapon, PlayerCondition,
 };
-pub use flight::{TargetIdentity, TargetMode, TargetingSnapshot, TargetingViewport};
+pub use flight::{TargetFilter, TargetIdentity, TargetMode, TargetingSnapshot, TargetingViewport};
 
 pub use flight::{
     MISSILE_COOLDOWN_TICKS, MISSILE_FACES, MISSILE_LIFETIME_TICKS, MISSILE_MUZZLE_DISTANCE,
