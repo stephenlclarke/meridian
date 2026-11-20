@@ -14,6 +14,10 @@ use meridian_core::{
         GoshawkCustomHullSource,
     },
     mule::EnvelopeError,
+    zebra::{
+        ZEBRA_DETAILED_FACES, ZEBRA_DETAILED_VERTICES, ZEBRA_NATIVE_VERTICES, ZEBRA_PIECES,
+        ZebraHullSource,
+    },
 };
 
 pub(crate) const GEOMETRY_KEY: &str = "assets/fleet/sh008/visual.bin";
@@ -23,6 +27,9 @@ const VISUAL_FNV: u64 = 0x7a17_0c0c_6cdc_d5fd;
 pub(crate) const CUSTOM_GEOMETRY_KEY: &str = "assets/fleet/sh010/visual.bin";
 const CUSTOM_VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh010/visual.bin");
 const CUSTOM_VISUAL_FNV: u64 = 0xfe21_3755_8ea3_8ccb;
+pub(crate) const ZEBRA_GEOMETRY_KEY: &str = "assets/fleet/sh021/visual.bin";
+const ZEBRA_VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh021/visual.bin");
+const ZEBRA_VISUAL_FNV: u64 = 0xd344_36cb_554f_1645;
 const EMPTY_PIECE: Piece = Piece {
     range: [0; 4],
     low: [0.0; 4],
@@ -33,12 +40,14 @@ const EMPTY_PIECE: Piece = Piece {
 pub(crate) enum Hull {
     Explorer,
     Custom,
+    Zebra,
 }
 
 pub(crate) fn hull(model: &ModelPreview) -> Option<Hull> {
     match (model.object.as_str(), model.geometry_key.as_str()) {
         ("SH008", GEOMETRY_KEY) => Some(Hull::Explorer),
         ("SH010", CUSTOM_GEOMETRY_KEY) => Some(Hull::Custom),
+        ("SH021", ZEBRA_GEOMETRY_KEY) => Some(Hull::Zebra),
         _ => None,
     }
 }
@@ -84,6 +93,12 @@ impl Hull {
                 b"SH010VZ1",
                 CUSTOM_DETAILED_FACES * 3,
             ),
+            Self::Zebra => authenticated_visual(
+                ZEBRA_VISUAL,
+                ZEBRA_VISUAL_FNV,
+                b"SH021VZ1",
+                ZEBRA_DETAILED_FACES * 3,
+            ),
         }
     }
 
@@ -91,6 +106,7 @@ impl Hull {
         match self {
             Self::Explorer => GOSHAWK_PIECES,
             Self::Custom => CUSTOM_PIECES,
+            Self::Zebra => ZEBRA_PIECES,
         }
     }
 
@@ -110,6 +126,15 @@ impl Hull {
                 let (triangles, pieces) = support_mesh(
                     source.pieces(),
                     CUSTOM_DETAILED_VERTICES + CUSTOM_NATIVE_VERTICES,
+                )
+                .map_err(SupportError::Render)?;
+                Ok((triangles, pieces.to_vec()))
+            }
+            Self::Zebra => {
+                let source = ZebraHullSource::bundled().map_err(SupportError::Source)?;
+                let (triangles, pieces) = support_mesh(
+                    source.pieces(),
+                    ZEBRA_DETAILED_VERTICES + ZEBRA_NATIVE_VERTICES,
                 )
                 .map_err(SupportError::Render)?;
                 Ok((triangles, pieces.to_vec()))
@@ -271,7 +296,7 @@ impl Pass {
     ) -> Result<Self, String> {
         match hull {
             Hull::Explorer => Self::new(device, queue, format),
-            Hull::Custom => Self::construct(device, queue, format, hull),
+            Hull::Custom | Hull::Zebra => Self::construct(device, queue, format, hull),
         }
     }
 
@@ -427,6 +452,72 @@ mod tests {
         assert_eq!(hull(&model), Some(Hull::Explorer));
         model.geometry_key = CUSTOM_GEOMETRY_KEY.into();
         assert!(!matches(&model));
+    }
+
+    #[test]
+    fn zebra_original_visual_and_all_local_supports_bind_to_its_own_shader() {
+        check_variant(Hull::Zebra, ZEBRA_DETAILED_FACES, ZEBRA_PIECES);
+        assert!(authenticated_visual(ZEBRA_VISUAL, VISUAL_FNV, b"GOSHVIZ1", VERTICES).is_err());
+        assert!(
+            authenticated_visual(
+                ZEBRA_VISUAL,
+                CUSTOM_VISUAL_FNV,
+                b"SH010VZ1",
+                CUSTOM_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        assert!(
+            authenticated_visual(
+                CUSTOM_VISUAL,
+                ZEBRA_VISUAL_FNV,
+                b"SH021VZ1",
+                ZEBRA_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        assert!(
+            authenticated_visual(
+                VISUAL,
+                ZEBRA_VISUAL_FNV,
+                b"SH021VZ1",
+                ZEBRA_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        let mut model = ModelPreview {
+            object: "SH021".into(),
+            geometry_key: ZEBRA_GEOMETRY_KEY.into(),
+            bounds: Rect::new(0.0, 0.0, 256.0, 256.0),
+            orientation: Orientation::default(),
+        };
+        assert_eq!(hull(&model), Some(Hull::Zebra));
+        model.geometry_key = GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+        model.object = "SH008".into();
+        assert_eq!(hull(&model), Some(Hull::Explorer));
+        model.geometry_key = ZEBRA_GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+        model.object = "SH010".into();
+        assert!(!matches(&model));
+        model.geometry_key = CUSTOM_GEOMETRY_KEY.into();
+        assert_eq!(hull(&model), Some(Hull::Custom));
+        model.object = "SH021".into();
+        assert!(!matches(&model));
+        model.geometry_key = "assets/fleet/sh020/visual.bin".into();
+        assert!(!matches(&model));
+        model.object = "SH020".into();
+        model.geometry_key = ZEBRA_GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+        assert!(
+            authenticated_visual(
+                ZEBRA_VISUAL,
+                ZEBRA_VISUAL_FNV,
+                b"SH020VZ1",
+                ZEBRA_DETAILED_FACES * 3,
+            )
+            .is_err()
+        );
     }
 
     fn check_variant(hull: Hull, face_count: usize, piece_count: usize) {
