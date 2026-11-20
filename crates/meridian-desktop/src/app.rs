@@ -2,6 +2,7 @@ mod audio;
 mod emp;
 mod mule_presentation;
 mod mule_validation;
+mod target_computer;
 use std::{
     collections::{HashSet, hash_map::RandomState},
     error::Error,
@@ -119,6 +120,7 @@ struct App {
     game: Profile,
     audio: Option<DesktopAudio>,
     validation_view: FlightView,
+    target_details: Option<bool>,
     validation_timing: Option<mule_validation::FrameTiming>,
     celestial: crate::celestial::WorldAdapter,
     quit_failed: bool,
@@ -180,6 +182,7 @@ impl App {
             game,
             audio: None,
             validation_view: FlightView::Front,
+            target_details: None,
             validation_timing: internal.then(mule_validation::FrameTiming::default),
             quit_failed: false,
             celestial: crate::celestial::WorldAdapter::default(),
@@ -443,10 +446,10 @@ impl App {
             self.request_redraw();
             return;
         }
-        let global = matches!(
-            code,
-            KeyCode::F5 | KeyCode::F9 | KeyCode::F11 | KeyCode::KeyP
-        );
+        let chart_profit = code == KeyCode::KeyP && self.menu_active()
+            && self.docked.as_ref().is_some_and(|menu| menu.screen() == ui::Screen::Galaxy);
+        let global = matches!(code, KeyCode::F5 | KeyCode::F9 | KeyCode::F11)
+            || (code == KeyCode::KeyP && !chart_profit);
         if self.menu_active() && !global {
             if self.open_menu_key(code) {
                 return;
@@ -745,6 +748,7 @@ impl App {
         if in_flight {
             match code {
                 KeyCode::Tab => return self.cycle_computer_target(),
+                KeyCode::KeyT => return self.lock_computer_target(),
                 KeyCode::Backspace | KeyCode::Delete => return self.release_computer_target(),
                 KeyCode::KeyI if self.modifiers.shift_key() => return self.toggle_target_details(),
                 _ => {}
@@ -1261,6 +1265,7 @@ impl App {
                 mule_frame.as_ref(),
             );
             let practice = self.game.world.practice_snapshot();
+            let targeting = self.game.world.targeting_snapshot();
             renderer.set_flight_view(if self.game.is_internal_validation() {
                 self.validation_view
             } else {
@@ -1273,6 +1278,8 @@ impl App {
                 SceneEffects {
                     mule: mule_scene,
                     traffic: traffic.as_ref(),
+                    targeting: targeting.as_ref(),
+                    target_details: self.target_details,
                     pulse: self.pulse.as_ref(),
                     mining: belt.as_ref().map(|belt| asteroid_render::Scene {
                         belt,

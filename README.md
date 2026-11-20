@@ -101,12 +101,12 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | L; W/S; arrows; A/D; Q/E; Space | Launch; thrust; pitch; yaw; roll; brake |
 | N in flight (development) | Engage the fitted navigation computer for docking, or cancel the approach |
 | Tab / Delete / Shift+I in flight (development) | Cycle target / release tracking / show target details |
-| J; T; R; Enter; B; F | Travel; select contact; review; confirm; cancel; buy fuel |
+| J; T (docked); R; Enter; B; F | Travel; select contact; review; confirm; cancel; buy fuel |
 | M; [ / ]; G / Shift+G | Market; commodity selection; buy/sell one native unit |
 | O; K; U; Y | Equipment panel; buy/fit cargo bay; store when docked; refit |
 | Hold U in active flight | Charge the fitted EMP for 600 accepted ticks; early release cancels |
 | I; V; X | Mission details; review all held freight deliveries; review abandonment |
-| F1; F2; F3; F4 | Next ship/practice lock; arm/safe; launch one missile; safe/unlock |
+| T in flight; F1; F2; F3; F4 | Lock the selected ship; next ship/practice lock; arm/safe; launch one missile; safe/unlock |
 | F7; F8; F10 | Review attempt closure; reception; fresh consent |
 | F6; F12; C; 0/1/2/3 | Flight lesson consent/reception; cancellation; details; view direction |
 | P; F11; F5; F9 | Pause; fullscreen; save; reload the current qualified save |
