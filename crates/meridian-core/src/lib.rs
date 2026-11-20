@@ -39,6 +39,8 @@ pub use flight::{
     PreparedPracticeConfirmation,
 };
 
+pub mod peregrine_mk3;
+
 pub use flight::{
     CombatIdentity, CombatSnapshot, OrdinaryImpact, OrdinaryTarget, OrdinaryWeapon, PlayerCondition,
 };

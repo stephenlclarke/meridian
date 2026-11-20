@@ -1,0 +1,96 @@
+{
+  "hull": "SH023 Peregrine Mk III",
+  "status": "AUTHORED_CONTROLLED_SOURCE;OWNED_RUST_AND_NATIVE_PENDING",
+  "source": "assets/fleet/sh023/SOURCE-GEOMETRY.json",
+  "geometryTests": [
+    "peregrine_mk3_original_detailed_and_native_faces_share_complete_local_supports",
+    "peregrine_mk3_bow_gap_and_shoulder_sweeps_clear_but_original_solids_contact",
+    "peregrine_mk3_original_sh028_aligned_crossing_clears_before_offset_native_lip_contact"
+  ],
+  "originalVisualCorners": {
+    "detailed": 10452,
+    "native": 1536
+  },
+  "originalTextures": {
+    "assets/fleet/sh001/l337-patrol-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "9699517d12b4fbbb28746e00bed9ee65c19a098d14402b1d5160280c6f6bfc54",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-patrol-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-strike-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "e56f149228caf90237a652d720ae549768bde1056af3d903dc8a5c243ad26e97",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-strike-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-service-details.rgba": {
+      "bytes": 4194304,
+      "sha256": "35edd84f6ce527195dd8a9bcc039521a6efc5aa2333452bbbc30217b8372103d",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-service-details.rgba",
+      "license": "MIT"
+    }
+  },
+  "nativeFaceCompliance": {
+    "sourceFaces": 512,
+    "contractMaximum": 512,
+    "state": "ORIGINAL_AT_CONTRACT_LIMIT"
+  },
+  "legacyActiveNativeSuccessor": {
+    "path": "docs/fleet-design-v2/successors/SH023-station-ring-512.json",
+    "sha256": "5997060c2e36909aff5de387bd6d6a5676a13679ddeeedc66e2fafecd4d01b40",
+    "activationPath": "Sources/L337Core/OriginalPeregrineMkIIIActivation.swift",
+    "activationSha256": "c4795e307d814a51d1164a0879b1f720fbac5c444d2317c134e56d54f3e10cd9",
+    "activationRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+    "activationArtifact": "integration/sh023-peregrine-mk3/LEGACY-ACTIVATION.swift.txt"
+  },
+  "physicalEngineering": {
+    "legacyDryMassKg": 101208,
+    "status": "SOURCE_BUDGET_ONLY_NO_RUNTIME_ASSIGNMENT"
+  },
+  "air": {
+    "hostname": "SteveMBA",
+    "topologyUtc": "2026-11-19T08:54:05Z",
+    "fitStartUtc": "2026-11-19T08:57:30Z",
+    "fitEndUtc": "2026-11-19T08:57:47Z",
+    "witnessStartUtc": "2026-11-19T08:59:50Z",
+    "witnessEndUtc": "2026-11-19T08:59:50Z",
+    "reports": {
+      "SURFACE-FIT.json": "7a8738615e71ef6f84d36cbf6954725d0c00a1e10fef28256939207a7ca76eda",
+      "CONTACT-RESULT.json": "0295922d9e1ca42a65f73c9680594b126e5cdebca322aeda8dc47103f68d6cd6",
+      "ORIGINAL-DIFFERENCE.json": "ba0ea32b2e14a3de823b4ba92d230caec524ad9643a827a26bb20a9f9ff3d0b1"
+    }
+  },
+  "independentReplay": {
+    "tools": {
+      "tools/measure_peregrine_mk3_air.py": "bc17a452834c3de10e5bff968a1b11b959e4a24ff199c393b743908d29e4e196",
+      "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+      "tools/prepare_peregrine_mk3_geometry.py": "0774009ba77a1ec2152b237553eb898cce9bc6f0b801c65dd3e808abd09b1d0b",
+      "tools/verify_peregrine_mk3_geometry.py": "984df6dea8e3cd4f79caf80591daf6d36e2738d8eec29fc3247f1b61f18b48cf",
+      "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+      "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e"
+    },
+    "fixtures": {
+      "integration/sh023-peregrine-mk3/FIXTURES.json": "0ebd32c5fd1aa1e836bf49e08a1f921c743957e8c03c2c844b94ffe633a1b585"
+    },
+    "reproduce": [
+      "python3 -B tools/measure_peregrine_mk3_air.py | cmp - integration/sh023-peregrine-mk3/SURFACE-FIT.json",
+      "python3 -B tools/measure_peregrine_mk3_air.py --difference | cmp - integration/sh023-peregrine-mk3/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/verify_peregrine_mk3_geometry.py | cmp - integration/sh023-peregrine-mk3/CONTACT-RESULT.json"
+    ],
+    "fitDependencies": {
+      "python": "3.14.3 (assertions enabled)",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "hostContactPython": "3.14.3",
+    "byteReplay": {
+      "hostname": "SteveMBA",
+      "startedUtc": "2026-11-19T08:59:51Z",
+      "finishedUtc": "2026-11-19T09:00:08Z",
+      "logSha256": "c67a594e9c645e7ea33af6ecc207255e931e3449760d08b4c9f0b400ea066a17"
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "clearanceMillimetres": {
+    "axial-bow-gap": 1961,
+    "lateral-bow-gap": 2746,
+    "port-shoulder": 2090,
+    "starboard-shoulder": 2090
+  },
+  "alignedMillimetres": 41904,
+  "offsetStartMillimetres": 978,
+  "sourceLipWitness": {
+    "fraction": 0.49999999999999645,
+    "pointMetres": [
+      69.4,
+      -1.3118539119483656,
+      136.32
+    ],
+    "barycentrics": [
+      0.35999999999999577,
+      0.15355669138505265,
+      0.48644330861495155
+    ]
+  },
+  "sourceSolidContactsMetres": [
+    [
+      -10.407593010442358,
+      -2.2131762606916094,
+      19.76911371149709
+    ],
+    [
+      9.251193787059874,
+      -2.2131762606916094,
+      19.76911371149709
+    ],
+    [
+      -8.962100540483812,
+      -6.165713386157318,
+      -13.46906648475626
+    ]
+  ],
+  "cockpitCrossmemberJoint": {
+    "pointMetres": [
+      0.28,
+      7.23,
+      1.29
+    ],
+    "sourceFaceHitCountsAboveBelow": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "primaryBodyToCrossmemberVerticalGapMillimetres": [
+      360,
+      360
+    ]
+  }
+}
