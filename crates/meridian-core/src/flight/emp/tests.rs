@@ -607,6 +607,7 @@ fn actual_secret_base_release_spends_once_drains_shield_and_preserves_hull_cargo
         navigation_catalogue: decoded.navigation_catalogue,
         navigation: w.navigation,
         jump_journal: decoded.jump_journal,
+        navigation_route: decoded.navigation_route,
         commander_account: decoded.commander_account,
         freight_session: decoded.freight_session,
         station_markets: decoded.station_markets,

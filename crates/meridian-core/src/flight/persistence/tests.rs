@@ -378,6 +378,28 @@ fn markets_start(world: &World) -> usize {
 }
 
 #[test]
+fn v17_route_extension_preserves_absent_route_and_refuses_unidentified_trailers() {
+    let mut world = World::new_commander(702).unwrap();
+    let original = world.save_bytes().unwrap();
+    let decoded = World::decode_saved_world(&original).unwrap();
+    assert!(decoded.navigation_route.is_none());
+    assert_eq!(decoded.save_bytes().unwrap(), original);
+    for extension in [
+        ROUTE_EXTENSION[..4].to_vec(),
+        b"UNKNOWN1".to_vec(),
+        ROUTE_EXTENSION.to_vec(),
+    ] {
+        let mut malformed = original.clone();
+        let tail = malformed.len() - 8;
+        malformed.splice(tail..tail, extension);
+        reseal(&mut malformed);
+        assert_refused_unchanged(&mut world, &malformed);
+        assert!(world.navigation_route.is_none());
+        assert_eq!(world.save_bytes().unwrap(), original);
+    }
+}
+
+#[test]
 fn malformed_oversized_wrong_version_and_changed_content_never_replace_live_world() {
     let mut world = World::new_commander(701).unwrap();
     let actor = contact(&mut world);
