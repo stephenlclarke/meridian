@@ -1,0 +1,131 @@
+{
+  "id": "SH015",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "originalDesignSHA256": "e91491dc97b465dea7c09c06f0d0da96a50b8ab0155d3e2af22ed1f99a14e1ca",
+  "metresPerSourceUnit": "30000/2521",
+  "axes": "+Z forward, +Y up; original origin",
+  "detailed": {
+    "vertices": 2080,
+    "faces": 3496,
+    "components": 166,
+    "boundsMetres": [
+      [
+        -14.934549781832606,
+        -3.5836255454184847,
+        -15.22015073383578
+      ],
+      [
+        14.934549781832606,
+        7.735025783419278,
+        14.77984926616422
+      ]
+    ]
+  },
+  "nativeCandidate": {
+    "vertices": 544,
+    "faces": 976,
+    "components": 28,
+    "boundsMetres": [
+      [
+        -14.934549781832606,
+        -3.5362990876636253,
+        -15.22015073383578
+      ],
+      [
+        14.934549781832606,
+        7.735025783419278,
+        14.77984926616422
+      ]
+    ],
+    "exactFaceLimit": 512
+  },
+  "physicalAuthority": {
+    "status": "NEW_AUTHORED_SOURCE_BUDGET_NOT_NATIVE_QUALIFICATION",
+    "dryMassKg": 57064,
+    "sha256": "1de6745b7b55bdd273ed863e5e714691fc78eb6a449af1a4af2007094d919952"
+  },
+  "collision": {
+    "pieces": 70,
+    "roundingMetres": 0.02,
+    "scope": "Source-local rounded convex supports; corresponding authored structural parts share a support while separate original well mouths keep separate local supports. Native and ordinary admission pending."
+  },
+  "legacyInputs": {
+    "resource.toml": {
+      "path": "Sources/L337Core/Resources/Ships/SH015.toml",
+      "bytes": 552959,
+      "sha256": "2a1173b5437c16144bf46b921e8888b229685bc7d046b8fc8e4a14eb1702c412"
+    },
+    "contract.toml": {
+      "path": "docs/fleet-design-v2/ships/SH015.toml",
+      "bytes": 3449,
+      "sha256": "9996fa6457ac946c7f01ed8dcab21275b17f260fd4f4cf106bd9d0fa1df71c66"
+    },
+    "native-source.json": {
+      "path": "Sources/L337Core/Resources/OriginalFleetShowroomModels/SH015.json",
+      "bytes": 107273,
+      "sha256": "65e64ab37093999801a7267c7054ee3208b9b515a44169f26c46bfb02e419b66"
+    },
+    "native-export-manifest.json": {
+      "path": "Sources/L337Core/Resources/OriginalFleetShowroomModels/manifest.json",
+      "bytes": 45988,
+      "sha256": "118b05757dc54096faa15dd79801f38999b87fe9424f1b3513133ead94f71971"
+    },
+    "physical.json": {
+      "path": "Sources/L337Core/Resources/OriginalFleetPhysical/SH015.json",
+      "bytes": 126460,
+      "sha256": "1de6745b7b55bdd273ed863e5e714691fc78eb6a449af1a4af2007094d919952"
+    },
+    "ownership.json": {
+      "path": "docs/milestones/fleet-physical/creator-ownership-records/SH015.json",
+      "bytes": 111070,
+      "sha256": "1649cdd7aa44135bc7dce9516da4b9d8112b2c9bf1953ff33806177ad2836846"
+    },
+    "LICENSE": {
+      "path": "LICENSE",
+      "bytes": 1071,
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+    }
+  },
+  "encoded": {
+    "source.vertices": {
+      "bytes": 62992,
+      "sha256": "5befb1905f1feacff79c7b2e689bb9a859e39b3419a23aee0bfebf5e62b20564"
+    },
+    "source-triangles.bin": {
+      "bytes": 53664,
+      "sha256": "1fb727afbc711a5bf1d5d2514e32bc4789ddb1ebd5271bafd62381926e8129da"
+    },
+    "source-piece-membership.bin": {
+      "bytes": 2624,
+      "sha256": "e3d8ad5f9fe8747413dfbdb3ad47b7879beba31abe6de35b28c8ac68ee0c2563"
+    },
+    "COMPONENT-PIECES.json": {
+      "bytes": 47494,
+      "sha256": "f288aa05be7aa729ef09988e8ddff787c8ce7c9e866240c07ffc16f9d203fbb4"
+    },
+    "visual.bin": {
+      "bytes": 587344,
+      "sha256": "5716eb076f607efa55103bf674bbf9dc7d7e66575a2f3a6957d8485e08f16646"
+    }
+  },
+  "sharedTextures": {
+    "assets/fleet/sh001/l337-patrol-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "9699517d12b4fbbb28746e00bed9ee65c19a098d14402b1d5160280c6f6bfc54",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-patrol-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-strike-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "e56f149228caf90237a652d720ae549768bde1056af3d903dc8a5c243ad26e97",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-strike-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-service-details.rgba": {
+      "bytes": 4194304,
+      "sha256": "35edd84f6ce527195dd8a9bcc039521a6efc5aa2333452bbbc30217b8372103d",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-service-details.rgba",
+      "license": "MIT"
+    }
+  }
+}

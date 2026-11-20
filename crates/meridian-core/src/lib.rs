@@ -12,12 +12,14 @@ pub mod goshawk_custom;
 pub mod mining;
 pub mod mule;
 pub mod navigation;
+pub mod raven;
 pub mod save;
 pub mod station;
 pub mod station_services;
 pub mod traffic;
 
 pub use flight::GoshawkCustomApproachSnapshot;
+pub use flight::RavenApproachSnapshot;
 pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};
 pub use flight::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
 
