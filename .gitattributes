@@ -1,3 +1,9 @@
+# Oryx Voyager source preparation and replay use exact LF bytes.
+tools/measure_oryx_voyager.py text eol=lf
+tools/prepare_oryx_voyager.py text eol=lf
+tools/verify_oryx_voyager.py text eol=lf
+tools/oryx_voyager_ring_support.py text eol=lf
+
 # Tamaraw source preparation and replay use exact LF bytes.
 tools/measure_tamaraw.py text eol=lf
 tools/prepare_tamaraw.py text eol=lf
