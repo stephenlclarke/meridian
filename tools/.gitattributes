@@ -1,0 +1,7 @@
+# SH023 surface and contact replay pins compare Git blob bytes.
+encode_goshawk_visual.py text eol=lf
+import_goshawk_envelope_source.py text eol=lf
+measure_goshawk_surface_fit.py text eol=lf
+measure_peregrine_mk3_air.py text eol=lf
+prepare_peregrine_mk3_geometry.py text eol=lf
+verify_peregrine_mk3_geometry.py text eol=lf
