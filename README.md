@@ -151,6 +151,7 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Baza Mk II source envelope and Hull Studio definition](docs/BAZA-MK-II-SOURCE.md)
 - [Griffon source envelope and Hull Studio definition](docs/GRIFFON-SOURCE.md)
 - [Griffon Mk II source envelope and Hull Studio definition](docs/GRIFFON-MK-II-SOURCE.md)
+- [Griffon Spectre source envelope and Hull Studio definition](docs/GRIFFON-SPECTRE-SOURCE.md)
 - [Stag Liner source envelope and Hull Studio definition](docs/STAG-LINER-GAMEPLAY-ENVELOPE.md)
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)

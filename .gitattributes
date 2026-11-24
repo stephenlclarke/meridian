@@ -1,3 +1,8 @@
+# Griffon Spectre source preparation and replay use exact LF bytes.
+tools/measure_griffon_spectre_geometry.py text eol=lf
+tools/prepare_griffon_spectre_geometry.py text eol=lf
+tools/verify_griffon_spectre_geometry.py text eol=lf
+
 # Griffon Mk II source preparation and replay use exact LF bytes.
 tools/measure_griffon_mk_ii_geometry.py text eol=lf
 tools/prepare_griffon_mk_ii_geometry.py text eol=lf
