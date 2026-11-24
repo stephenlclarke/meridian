@@ -46,6 +46,10 @@ execution. Ordinary placement and gameplay docking remain open.
 
 SH035 preserves the two original pearl-teal meshes and uses 26 local supports. SteveMBA verified seven routes, eight structural overlaps and the original SH028 offset lip contact. The full fit bounds are 705 mm detailed and 3,038 mm native. The installed signed Hull Studio exported the exact definition with all 26 groups and seven routes passing. The per-hull Rust contact tests and Showroom qualification remain pending. [Stag Liner source and evidence](STAG-LINER-GAMEPLAY-ENVELOPE.md)
 
+## Sable Liner source envelope candidate
+
+SH012 preserves the original plum-gold detailed and native geometry and 47 local rounded supports, including the open crescent. The independent Air evidence records the opening clearance, aligned SH028 crossing, and offset lip contact; the packed visual retains all 13,488 original detailed corners. Controlled Rust contact and renderer qualification of the reconciled source remain pending. [Sable Liner source and evidence](SABLE-LINER-GAMEPLAY-ENVELOPE.md)
+
 ## Saker source envelope
 
 The SH042 Saker source package preserves the original forest-ivory meshes and both frozen engineering records. SteveMBA verified seven routes, seven overlaps in both LODs and the offset contact with the original SH028 station lip. The full fit upper bounds are 448 mm detailed and 2,106 mm native. A detailed instrument housing absent from the native LOD accounts for the limiting native stand-off. The Rust contact tests and Showroom qualification are pending. [Saker source and evidence](SAKER-GAMEPLAY-ENVELOPE.md)

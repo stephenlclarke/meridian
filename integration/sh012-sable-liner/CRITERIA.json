@@ -1,0 +1,63 @@
+{
+  "id": "SH012",
+  "status": "SOURCE_SHIELD_AND_VISUAL_PREPARED;OWNED_RUST_RUN_PENDING",
+  "rosterStatus": "Original Sable Liner, catalogue and R3 specification present in Meridian; no implemented SH012 hull steering, collision module, or visual in the protected base",
+  "source": "assets/fleet/sh012/SOURCE-GEOMETRY.json",
+  "nativeFaceLimit": 512,
+  "nativeFaces": 228,
+  "shipMetresPerSourceUnit": 1,
+  "pieces": 47,
+  "geometryTests": [
+    "sable_liner_all_original_faces_keep_a_complete_piece_at_ring_seams",
+    "sable_liner_crescent_opening_clears_but_original_rim_blocks",
+    "sable_liner_original_station_aligned_clearance_and_lip_contact"
+  ],
+  "visual": {
+    "palette": "plum-gold",
+    "faceCount": 4496,
+    "untexturedFaceCount": 1240,
+    "untexturedMarker": 4294967295,
+    "status": "source-packed; display renderer needs untextured material handling",
+    "sharedOriginalTextures": {
+      "assets/fleet/sh001/l337-patrol-diffuse.rgba": {
+        "bytes": 4194304,
+        "sha256": "9699517d12b4fbbb28746e00bed9ee65c19a098d14402b1d5160280c6f6bfc54",
+        "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-patrol-diffuse.rgba",
+        "license": "MIT"
+      },
+      "assets/fleet/sh001/l337-strike-diffuse.rgba": {
+        "bytes": 4194304,
+        "sha256": "e56f149228caf90237a652d720ae549768bde1056af3d903dc8a5c243ad26e97",
+        "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-strike-diffuse.rgba",
+        "license": "MIT"
+      },
+      "assets/fleet/sh001/l337-service-details.rgba": {
+        "bytes": 4194304,
+        "sha256": "35edd84f6ce527195dd8a9bcc039521a6efc5aa2333452bbbc30217b8372103d",
+        "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-service-details.rgba",
+        "license": "MIT"
+      }
+    }
+  },
+  "air": {
+    "host": "SteveMBA",
+    "fitStartUtc": "2026-11-19T07:19:54Z",
+    "fitEndUtc": "2026-11-19T07:20:12Z",
+    "witnessStartUtc": "2026-11-19T07:22:52Z",
+    "witnessEndUtc": "2026-11-19T07:22:54Z",
+    "surfaceFitSha256": "56a23d2abe3707a329db8cb7869fc2841d34ebe139ced9339fd1db7f89f23171",
+    "stationContactSha256": "c846cbee5dfd6ed6bb4f547c96d94b668490d9a46b908b8b692d01fc4c95d67f",
+    "originalDifferenceSha256": "35ef36df4b97cde399b493547f1dc4f6ded7fc5b172ac2806bf2cafbbf278f6b"
+  },
+  "legacyMetreAuthority": {
+    "Sources/L337Core/OriginalSableLinerActivation.swift": "82a89da7d0a45b9a54a3b3f75c6ae18c5cbb8f1d8377840831b0bc259fb93fa0",
+    "Sources/L337Core/OriginalHullPhysicalContract.swift": "2c68d8d51acdd469faa25124bcc19027aec1a8f747eb267da2e84e5a98e3c027"
+  },
+  "independentReplay": {
+    "airPacketSha256": "1badc72e88ba261dce618a1dc9f0d8fad7638517a6e0f6a1e15b0f4cb9f78e73",
+    "adapters": {
+      "tools/measure_sable_liner_air.py": "9c696b58e59e12407ddeb59c5ec4eee798ca068eeef1a214fa499c050685f4a6",
+      "tools/compare_sable_originals.py": "781fb0904e2cb1b8e58ae925500f61eda9499e2f7eb01ee2c4705a272befdb42"
+    }
+  }
+}

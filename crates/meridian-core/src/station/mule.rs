@@ -463,6 +463,19 @@ impl OriginalStationData {
     }
 }
 
+impl OriginalStationData {
+    /// Controlled SH012 motion against the original SH028 mesh.
+    pub fn sable_liner_motion_clear(
+        &self,
+        source: &crate::sable_liner::SableLinerHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces().as_ref(), start, end, angular_travel)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::{MuleHullSource, OriginalStationData, StationError, flight_pose};

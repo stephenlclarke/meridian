@@ -122,6 +122,7 @@ The freight journey requires eight identified one-tonne deliveries and awards 73
 The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain.toml) and [Cargo.lock](Cargo.lock). Use `make ci` for documentation, formatting, importers, compilation, tests and strict Clippy. `make run` starts the desktop app in an owned graphics session. G1 owns Mac compilation/native validation; Dell owns Linux/native Windows validation; MBA retains its existing fleet work.
 
 - [Development and repository maintenance](docs/DEVELOPMENT.md)
+- [Sable Liner original geometry and source envelope](docs/SABLE-LINER-GAMEPLAY-ENVELOPE.md)
 - [Saker source envelope and Hull Studio definition](docs/SAKER-GAMEPLAY-ENVELOPE.md)
 - [Eagle Cruiser source envelope and Hull Studio definition](docs/EAGLE-CRUISER-SOURCE.md)
 - [Harpy Assault source envelope and Hull Studio definition](docs/HARPY-ASSAULT-SOURCE.md)
