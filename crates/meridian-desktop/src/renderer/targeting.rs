@@ -234,7 +234,7 @@ fn preview(
     }
     let mut triangles: Vec<_> = transformed.as_chunks::<3>().0.iter().collect();
     let depth = |triangle: &[([f32; 3], [f32; 3])]| triangle.iter().map(|(p, _)| p[2]).sum::<f32>();
-    triangles.sort_by(|a, b| depth(*b).total_cmp(&depth(*a)));
+    triangles.sort_by(|a, b| depth(b.as_slice()).total_cmp(&depth(a.as_slice())));
     for triangle in triangles {
         for &(p, color) in triangle {
             let x = center[0] + p[0] / radius * 22.0;
