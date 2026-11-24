@@ -44,6 +44,16 @@ def flight_computer_inverse(root, protected):
     return files
 
 
+def undo_carabao_freighter_publication(relative, data):
+    if relative != LIB_SOURCE:
+        return data
+    declaration = b'pub mod carabao_freighter;\n'
+    before, after = b'pub mod baza_mk_ii;\n', b'pub mod caracal_scout;\n'
+    span = before + declaration + after
+    assert data.count(declaration) == 1 and data.count(span) == 1, relative
+    return data.replace(span, before + after, 1)
+
+
 def undo_oryx_voyager_publication(relative, data):
     if relative != LIB_SOURCE:
         return data
@@ -636,7 +646,8 @@ def verify_protected_core(root):
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_oryx_voyager_publication(relative, current)
+        data = undo_carabao_freighter_publication(relative, current)
+        data = undo_oryx_voyager_publication(relative, data)
         data = undo_tamaraw_publication(relative, data)
         data = undo_hog_publication(relative, data)
         data = undo_dzo_mk_ii_publication(relative, data)
