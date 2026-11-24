@@ -132,6 +132,10 @@ Moose Clipper retains the original 3,468-face detailed and 192-face native metre
 
 Seriema Courier retains its 1,656-face detailed and 608-face native visible meshes. The separately archived 512-face collision source has seven numerically verified guarded routes. The recorded creator run produced 464 faces. [Seriema Courier source and evidence](SERIEMA-COURIER-SOURCE.md)
 
+## Arna Cutter catalogue source
+
+Arna Cutter preserves the original 3,132-face detailed and 184-face native metre meshes. Signed Studio evidence covers offline artwork. Independent source replay verifies 27 groups, seven guarded routes, five overlapping joints and three flush deck contacts. [Arna Cutter source and evidence](ARNA-CUTTER-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)

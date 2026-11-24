@@ -1,0 +1,272 @@
+[
+  {
+    "name": "canopy-to-upper-bridge",
+    "pointMetres": [
+      0.19,
+      8.11,
+      -14.47
+    ],
+    "originalFaces": {
+      "detailed": {
+        "canopy": {
+          "faceRange": [
+            1992,
+            2952
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "upper-bridge": {
+          "faceRange": [
+            1608,
+            1992
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "canopy": {
+          "faceRange": [
+            176,
+            184
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "upper-bridge": {
+          "faceRange": [
+            144,
+            176
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-rail-to-keel-deck",
+    "pointMetres": [
+      -11.71,
+      -4.19,
+      -13.71
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-rail": {
+          "faceRange": [
+            12,
+            396
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "keel-deck": {
+          "faceRange": [
+            0,
+            12
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-rail": {
+          "faceRange": [
+            12,
+            44
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "keel-deck": {
+          "faceRange": [
+            0,
+            12
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-pod-to-rail",
+    "pointMetres": [
+      -10.91,
+      0.53,
+      -27.39
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-pod": {
+          "faceRange": [
+            408,
+            792
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-rail": {
+          "faceRange": [
+            12,
+            396
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-pod": {
+          "faceRange": [
+            44,
+            60
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-rail": {
+          "faceRange": [
+            12,
+            44
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-rail-to-keel-deck",
+    "pointMetres": [
+      11.71,
+      -4.51,
+      -13.71
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-rail": {
+          "faceRange": [
+            792,
+            1176
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "keel-deck": {
+          "faceRange": [
+            0,
+            12
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-rail": {
+          "faceRange": [
+            60,
+            92
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "keel-deck": {
+          "faceRange": [
+            0,
+            12
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-pod-to-rail",
+    "pointMetres": [
+      10.91,
+      0.53,
+      -27.39
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-pod": {
+          "faceRange": [
+            1188,
+            1572
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-rail": {
+          "faceRange": [
+            792,
+            1176
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-pod": {
+          "faceRange": [
+            92,
+            108
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-rail": {
+          "faceRange": [
+            60,
+            92
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  }
+]
