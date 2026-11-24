@@ -1,0 +1,55 @@
+{
+  "id": "SH012",
+  "name": "Sable Liner",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "scaleMetresPerSourceUnit": 1,
+  "originalNativeFaceLimit": 512,
+  "detailed": {
+    "vertices": 2308,
+    "faces": 4496,
+    "components": 30
+  },
+  "native": {
+    "vertices": 132,
+    "faces": 228,
+    "components": 9
+  },
+  "pieces": 47,
+  "roundingMetres": 0.02,
+  "palette": "plum-gold",
+  "textures": [
+    "l337-patrol-diffuse",
+    "l337-strike-diffuse",
+    "l337-service-details"
+  ],
+  "visualUntexturedSlot": 4294967295,
+  "inputs": {
+    "resource.toml": "21bc51b0e9526cf85c0b3d825e24e3cb899dbf15ac6dc7ffdd5885f38380b47c",
+    "native-export.json": "91eaa94d9288a1f34bc0b1cd8ffa184035532a355f4214e08109a2e728ea1c38",
+    "native-export-manifest.json": "118b05757dc54096faa15dd79801f38999b87fe9424f1b3513133ead94f71971",
+    "contract.toml": "a59ed199acd7c681bc4e590076b0853d19db9724c777c0aee483878d30fcb0df",
+    "LICENSE": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+  },
+  "outputs": {
+    "source.vertices": {
+      "bytes": 58576,
+      "sha256": "97037db61ad219b6b4d937ff7c6e6f53b1b0048326b463667f293e2f273e70a9"
+    },
+    "source-triangles.bin": {
+      "bytes": 56688,
+      "sha256": "9271c4ac19d507716043ea4fb2d23f09b538faed79fd53713b13684a82fa29eb"
+    },
+    "piece-indices.bin": {
+      "bytes": 10504,
+      "sha256": "4a463a2709ab1593514ba4c7f6d6909b47f15273a7b8ac3ac4369f41ce2becd6"
+    },
+    "PIECES.json": {
+      "bytes": 60418,
+      "sha256": "02678d5f8f41df41eea72339b925aea53e2210395139c59eaeb3471121b7b0f9"
+    },
+    "visual.bin": {
+      "bytes": 755344,
+      "sha256": "a73a4ca925eb33d0652cce48ac33dc3b5dc86fb8bd377b190e005eddfdf0b14e"
+    }
+  }
+}
