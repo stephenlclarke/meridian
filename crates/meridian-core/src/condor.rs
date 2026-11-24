@@ -3,11 +3,13 @@ use crate::docking::{RigidPose, Vec3};
 use crate::mule::{EnvelopeError, MULE_CLEARANCE_METRES, SmoothPiece};
 use std::sync::Arc;
 
-pub const CONDOR_PIECES: usize = 24;
+pub const CONDOR_PIECES: usize = 26;
 const DETAILED_VERTICES: usize = 2308;
 const NATIVE_VERTICES: usize = 144;
 const VERTICES: &[u8] = include_bytes!("../../../assets/fleet/sh055/source.vertices");
-const MEMBERSHIP: &[u8] = include_bytes!("../../../assets/fleet/sh055/source-piece-membership.bin");
+const MEMBERSHIP: &[u8] =
+    include_bytes!("../../../assets/fleet/sh055/collision-piece-membership.bin");
+const NO_SECONDARY_PIECE: u8 = u8::MAX;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct CondorHullSource {
@@ -28,21 +30,30 @@ impl CondorHullSource {
         let header = vertices.get(..16).ok_or(EnvelopeError::InvalidContent)?;
         let data = vertices.get(16..).ok_or(EnvelopeError::InvalidContent)?;
         let (points, trailing) = data.as_chunks::<24>();
+        let (memberships, trailing_membership) = membership.as_chunks::<2>();
         if header.get(..8) != Some(b"MSH055V1")
             || header.get(8..12) != Some(&(DETAILED_VERTICES as u32).to_le_bytes())
             || header.get(12..16) != Some(&(NATIVE_VERTICES as u32).to_le_bytes())
             || !trailing.is_empty()
             || points.len() != count
-            || membership.len() != count
+            || !trailing_membership.is_empty()
+            || memberships.len() != count
         {
             return Err(EnvelopeError::InvalidContent);
         }
         let mut assigned: [Vec<Vec3>; CONDOR_PIECES] = core::array::from_fn(|_| Vec::new());
-        for (point, slot) in points.iter().zip(membership) {
-            let group = assigned
-                .get_mut(usize::from(*slot))
-                .ok_or(EnvelopeError::InvalidContent)?;
-            group.push(decode_point(point));
+        for (point, &[primary, secondary]) in points.iter().zip(memberships) {
+            let point = decode_point(point);
+            assigned
+                .get_mut(usize::from(primary))
+                .ok_or(EnvelopeError::InvalidContent)?
+                .push(point);
+            if secondary != NO_SECONDARY_PIECE {
+                assigned
+                    .get_mut(usize::from(secondary))
+                    .ok_or(EnvelopeError::InvalidContent)?
+                    .push(point);
+            }
         }
         let built = assigned
             .into_iter()

@@ -139,6 +139,38 @@ def studio_definition(provenance, inputs, resource, detailed, native, detail_mem
     }
 
 
+def collision_streams(slots, detailed_membership, native_membership):
+    """Give each convex wing section its original rings, including the seam."""
+    names = []
+    members = [[] for _ in detailed_membership + native_membership]
+    for name, slot in slots.items():
+        detailed = [i for i, group in enumerate(detailed_membership) if group == slot]
+        native = [i + len(detailed_membership) for i, group in enumerate(native_membership) if group == slot]
+        if not name.endswith("-wing"):
+            for i in detailed + native:
+                members[i].append(len(names))
+            names.append(name)
+            continue
+
+        require((len(detailed), len(native)) == (30 * 12, 5 * 4), "changed Condor wing station counts")
+        for suffix, detailed_ring, native_ring in (
+            (1, slice(0, 16 * 12), slice(0, 3 * 4)),
+            (2, slice(14 * 12, None), slice(2 * 4, None)),
+        ):
+            for i in detailed[detailed_ring] + native[native_ring]:
+                members[i].append(len(names))
+            names.append(f"{name}-{suffix}")
+
+    require(len(names) == 26 and sum(len(group) == 2 for group in members) == 56,
+            "wrong Condor collision support count or overlap")
+    require(all(1 <= len(group) <= 2 for group in members), "wrong Condor collision membership")
+    packed = bytes(slot for group in members for slot in (group if len(group) == 2 else [group[0], 255]))
+    return {
+        "collision-piece-membership.bin": packed,
+        "COLLISION-PIECES.json": encode_json({"pieces": names, "roundingMetres": RADIUS}),
+    }
+
+
 def prepare():
     provenance, inputs, resource, detailed, native = load_source()
     slots = {name: slot for slot, name in enumerate(dict.fromkeys(SHAPE_NAMES))}
@@ -168,10 +200,11 @@ def prepare():
         provenance, inputs, resource, detailed, native, detail_membership, native_membership, streams
     )
     streams[STUDIO_NAME] = encode_json(definition)
+    streams.update(collision_streams(slots, detail_membership, native_membership))
     streams["SOURCE-GEOMETRY.json"] = encode_json({
         "id": "SH055", "name": "Condor", "sourceUnits": "metres", "revision": REVISION,
         "references": {"detailed": [2308, 4504, 28], "native": [144, 244, 11]},
-        "nativeFaceLimit": 512, "groups": 24, "roundingMetres": RADIUS, "pins": SOURCE_HASHES,
+        "nativeFaceLimit": 512, "artworkGroups": 24, "collisionGroups": 26, "roundingMetres": RADIUS, "pins": SOURCE_HASHES,
         "outputs": {name: pin(data) for name, data in streams.items()},
     })
     return streams

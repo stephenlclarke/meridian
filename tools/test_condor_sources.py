@@ -9,6 +9,7 @@ from unittest.mock import patch
 
 import prepare_condor as prep
 import verify_condor as proof
+import verify_condor_collision as collision
 
 
 class CondorSources(unittest.TestCase):
@@ -70,6 +71,22 @@ class CondorSources(unittest.TestCase):
         difference = json.loads((prep.INTEGRATION / "ORIGINAL-DIFFERENCE.json").read_bytes())
         self.assertEqual(difference["native"], {"vertex": 132, "metres": 1.347226300488522, "faces": [38],
                                                 "strictLowerMillimetres": 1346})
+
+    def test_split_collision_covers_original_faces_and_preserves_every_route(self):
+        result = collision.verify()
+        receipt = prep.INTEGRATION / "COLLISION-CONTACT-RESULT.json"
+        self.assertEqual(prep.encode_json(result), receipt.read_bytes())
+        self.assertEqual(result["supportGroups"], 26)
+        self.assertEqual(result["overlappingVertices"], 56)
+        self.assertEqual(result["sourceFacesCovered"], {"detailed": 4504, "native": 244})
+        self.assertEqual(result["wingFacesCovered"], {"detailed": 1432, "native": 72})
+        self.assertEqual(result["clearanceMillimetres"], proof.verify()["clearanceMillimetres"])
+        baseline = json.loads((prep.INTEGRATION / "SURFACE-FIT.json").read_bytes())
+        updated = json.loads((prep.INTEGRATION / "COLLISION-FIT.json").read_bytes())
+        for key, limit in baseline["fullUpperMillimetres"].items():
+            self.assertGreater(limit - updated["fullUpperMillimetres"][key], 2400)
+        self.assertEqual(updated["fullUpperMillimetres"], {"detailed": 3596, "native": 3596})
+        self.assertEqual(updated["priorWingStrictLowerMillimetres"], {"detailed": 5083, "native": 5126})
 
     def test_studio_uses_exact_original_engineering_and_meshes(self):
         _, inputs, _, detail, native = prep.load_source()

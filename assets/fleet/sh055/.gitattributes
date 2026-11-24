@@ -4,3 +4,4 @@ source-triangles.bin binary
 source-piece-membership.bin binary
 visual.bin binary
 native-visual.bin binary
+collision-piece-membership.bin binary

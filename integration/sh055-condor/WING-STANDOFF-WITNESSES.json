@@ -1,0 +1,38 @@
+{
+  "detailed": {
+    "strictLowerMillimetres": 5083,
+    "wing": "starboard-wing",
+    "supportVertices": [
+      963,
+      1310,
+      1311
+    ],
+    "weightsOverFive": [
+      3,
+      2,
+      0
+    ],
+    "nearestTriangles": [
+      110,
+      111
+    ]
+  },
+  "native": {
+    "strictLowerMillimetres": 5126,
+    "wing": "port-wing",
+    "supportVertices": [
+      211,
+      558,
+      559
+    ],
+    "weightsOverFive": [
+      2,
+      1,
+      2
+    ],
+    "nearestTriangles": [
+      26,
+      29
+    ]
+  }
+}

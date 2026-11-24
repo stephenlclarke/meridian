@@ -98,7 +98,7 @@ Hobby Fighter retains both original metre meshes, with 4,620 detailed faces and 
 
 ## Condor catalogue source
 
-Condor retains its original 4,504-face detailed and 244-face native metre meshes. Signed Studio evidence covers the offline artwork. Independent source verification establishes 24 local groups, seven guarded routes and eight joints in both meshes. [Condor source and evidence](CONDOR-SOURCE.md)
+Condor retains its original 4,504-face detailed and 244-face native metre meshes. Signed Studio evidence covers the offline artwork. The collision model uses 26 local groups, including two overlapping parts per wing. Independent source verification retains all seven guarded routes and eight joints in both meshes. [Condor source and evidence](CONDOR-SOURCE.md)
 
 ## Goshawk Mk II Custom candidate
 
