@@ -934,4 +934,86 @@ mod tests {
         let restored = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
         assert_eq!(restored.target_filter(), TargetFilter::Ships);
     }
+
+    #[test]
+    fn accepted_rock_obstruction_releases_selected_guidance_without_idle_retry_or_account_effects()
+    {
+        let mut world = fitted(TargetingTier::Military);
+        launch(&mut world);
+        let belt = world.mining_belt_snapshot().unwrap();
+        let blocker = belt.bodies[0];
+        let destination = belt.bodies[6];
+        assert_eq!(blocker.position.x, destination.position.x);
+        assert_eq!(blocker.position.y, destination.position.y);
+        assert!(blocker.position.z < destination.position.z);
+
+        // Start the isolated ordinary-flight fixture on the clear exterior ray to the
+        // selected rock. A different intact, real belt body obstructs that approach.
+        world.state.position = [
+            blocker.position.x as f32,
+            blocker.position.y as f32,
+            blocker.position.z as f32 - 250.0,
+        ];
+        world.state.orientation = [0.0, 0.0, 0.0, 1.0];
+        world.state.speed = 0.0;
+        let opening = world.snapshot();
+        let pose = super::super::flight_pose(opening.position, opening.orientation).unwrap();
+        assert!(world.mining_motion_clear(pose, pose, 0.0));
+        assert_eq!(world.cycle_target_filter().unwrap(), TargetFilter::Mining);
+        let target = WorkTargetId::Asteroid(destination.id);
+        assert!(
+            world
+                .cycle_targeting_with_work(opening.tick, viewport(vec![]), &[target])
+                .unwrap()
+        );
+        assert_eq!(world.selected_work_target().unwrap().id, target);
+
+        let account_revision = world.commander_account.as_ref().unwrap().revision();
+        let credits = world.credits_tenths();
+        let ammunition = world.ammunition_snapshot();
+        let work_count = world.mining.work_count();
+        let mut stopped = None;
+        for _ in 0..300 {
+            let previous = world.snapshot();
+            world.step(FlightInput::default()).unwrap();
+            let current = world.snapshot();
+            if let Some(refusal) = current.motion_refusal {
+                assert_eq!(refusal, crate::MotionRefusal::AsteroidContact);
+                assert_eq!(current.position, previous.position);
+                assert_eq!(current.orientation, previous.orientation);
+                assert_eq!(current.speed, 0.0);
+                stopped = Some(current);
+                break;
+            }
+            assert_eq!(world.selected_work_target().unwrap().id, target);
+        }
+        let stopped = stopped
+            .unwrap_or_else(|| panic!("ordinary automatic approach did not meet the blocker"));
+        assert!(stopped.position[2] > opening.position[2]);
+        assert!(world.selected_work_target().is_none());
+        assert!(world.targeting_snapshot().is_none());
+        assert_eq!(world.target_filter(), TargetFilter::Mining);
+        assert!(!world.auto_docking_active());
+
+        for offset in 1..=8 {
+            world.step(FlightInput::default()).unwrap();
+            let idle = world.snapshot();
+            assert_eq!(idle.tick, stopped.tick + offset);
+            assert_eq!(idle.motion_refusal, None);
+            assert_eq!(idle.position, stopped.position);
+            assert_eq!(idle.orientation, stopped.orientation);
+            assert_eq!(idle.speed, 0.0);
+            assert!(world.selected_work_target().is_none());
+        }
+        assert_eq!(
+            world.commander_account.as_ref().unwrap().revision(),
+            account_revision
+        );
+        assert_eq!(world.credits_tenths(), credits);
+        assert_eq!(world.ammunition_snapshot(), ammunition);
+        assert_eq!(world.mining.work_count(), work_count);
+        let after = world.mining_belt_snapshot().unwrap();
+        assert_eq!(after.bodies, belt.bodies);
+        assert_eq!(after.pending_ore, belt.pending_ore);
+    }
 }

@@ -533,6 +533,9 @@ impl World {
             self.targeting = previous_targeting;
             self.auto_docking = previous_docking;
         } else if self.state.mode != FlightMode::Flight || self.state.motion_refusal.is_some() {
+            // An accepted stop must release every computer controller, not just docking.
+            // Otherwise selected work guidance resumes thrust on the next idle tick.
+            self.cancel_targeting();
             self.cancel_auto_docking();
         }
         result
