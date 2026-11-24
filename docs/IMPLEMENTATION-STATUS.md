@@ -76,6 +76,10 @@ The Lanner package preserves the original plum-gold meshes and frozen relative c
 
 The Hyena package preserves the original sand-graphite meshes and frozen relative calibration. The signed offline artwork export uses the separate 504-face creator-pinned candidate. The 952-face original native mesh remains archived. Both contain the 26 original native parts. Source replay verifies seven routes across both arrangements. The frozen runtime catalogue disables player flight and normal purchase. The original R3 contract specifies player flight after blueprint fabrication. [Hyena source and evidence](HYENA-SOURCE.md)
 
+## Yak catalogue source
+
+The Yak package preserves the original sage-umber meshes and the frozen relative calibration. The 928-face native archive stays distinct from the 480-face candidate used in the signed artwork export. Both retain the 24 original native parts. Source replay verifies 162 supports and seven sweeps across both arrangements. The frozen runtime catalogue disables player flight and normal purchase. The original R3 contract specifies player flight after blueprint fabrication. [Yak source and evidence](YAK-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)

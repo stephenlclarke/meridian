@@ -1,0 +1,175 @@
+{
+  "hull": "SH050 Yak",
+  "scope": "Original catalogue inspection and geometry queries",
+  "frozenSources": "integration/sh050-yak/FROZEN-SOURCES.json",
+  "source": "assets/fleet/sh050/SOURCE-GEOMETRY.json",
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "originalScaleRatio": [
+    400,
+    41
+  ],
+  "archivedDetailed": {
+    "vertices": 2048,
+    "faces": 3448,
+    "parts": 162
+  },
+  "archivedNative": {
+    "vertices": 512,
+    "faces": 928,
+    "parts": 24,
+    "budgetAccepted": false
+  },
+  "nativeCandidate": {
+    "source": "assets/fleet/sh050/SH050-candidate.json",
+    "bytes": 183692,
+    "sha256": "b2b06d321bbf3fca82b6f7b7a18e7d48b83115a4cfdca093733a3ca9191ef56f",
+    "vertices": 288,
+    "faces": 480,
+    "parts": 24,
+    "faceLimit": 512,
+    "byteExactOriginalParts": 16,
+    "resampledCurvedParts": 8,
+    "archiveToCandidateUpperMillimetres": 1169,
+    "candidateToArchiveUpperMillimetres": 846,
+    "frozenRecipe": {
+      "bytes": 7568,
+      "sha256": "1074966f451e4986c8897bc04c4e4a79f0321f90ac1e633afaccba229b14ddfb"
+    },
+    "frozenBlueprint": {
+      "bytes": 4846,
+      "sha256": "d43a1e46755a838f994a39a931970899d4e67f63bb68c89ab3d7d2547711a214"
+    },
+    "frozenTests": {
+      "bytes": 7888,
+      "sha256": "a774a840ce5494338282906fe7b8550ceb79c65dc09d51f80da9325bd85002bd"
+    },
+    "recipeTestsPassing": 3,
+    "recipeTestLog": {
+      "bytes": 662,
+      "sha256": "91e785b7c33bc32eda1400512a99278c7e48645af4f55d586918f0a7a0aa79d6"
+    }
+  },
+  "supportGroups": 162,
+  "minimumRouteClearanceMillimetres": 508,
+  "fitUpperMillimetres": {
+    "detailed": 1795,
+    "archiveNative": 1771,
+    "candidateNative": 2243
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-yak",
+    "massKg": 74803
+  },
+  "replayPins": {
+    "integration/sh050-yak/FROZEN-SOURCES.json": "fede30d78a1f5d9994cc530b10ef90f81adfcae7d5c96502103eadf92de4fecc",
+    "integration/sh050-yak/ORIGINAL-OWNERSHIP.json": "d6f912f4ea39a32c2f99ae817eaaa2c592ad49910c6be7f91fffa87a1ee10c97",
+    "integration/sh050-yak/ARCHIVE-SUPPORT-PREFLIGHT.json": "0ba2a19eb7ba1167bc13e808b54e84926b64c7ada389b188185d6555e7b49cae",
+    "integration/sh050-yak/candidate-support.json": "f0155cb504007896aae3fad4b494f1411ab48a9f70119e30e3612eaf3d66a128",
+    "integration/sh050-yak/YAK-STUDIO.json": "6c276ca9c21c2228745bcf276943736a0f6a7cd8db7503c548f8ff6a01a2abf2",
+    "integration/sh050-yak/CONTACT-RESULT.json": "2941e44ed1222f9c952ee3e36af5a4bb46ba46d9f59cb27715d97017e839d9b1",
+    "integration/sh050-yak/ARCHIVE-FIT.json": "df3b28354368e3f0b93b4cfd6cfd4563bb4e794b0f54c1c36edae62a06adf164",
+    "integration/sh050-yak/candidate-fit.json": "11936297083742ab3654b055e35d9cc8d24e8b9f5277f6134167c3edf7304fb4",
+    "integration/sh050-yak/candidate-fidelity.json": "c12de44f315599d4d5549e5971cdcd5b39c1acdad2f82fb6873eb220bb70c78e",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/lanner_art_mesh.py": "f5cb59dcc0940ee02e039ba5218eb42c638ba0fed692f4b2216699620aba334b",
+    "tools/prepare_lanner_geometry.py": "3e1dc0ba15e493f8d53f385c7e2e166420e0082228b355547b3810fb028cdbc8",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/yak_art_mesh.py": "bcad55f6531a55e2551c0342e81ffcf3561d0839e555a985acddc8e58bde6b6d",
+    "tools/prepare_yak_geometry.py": "9d8b3df2aa0c280f8851cc6e49f48a035f197da98432d1392cebd52d1d2ac215",
+    "tools/verify_yak_geometry.py": "23033fc0271d4168ca3742e2104df6607837f6d42ffa48750559084a51f5825c",
+    "tools/measure_yak_geometry.py": "45640aac53849a309478c6b206542111728677c16054a819444120c4da591eb3"
+  },
+  "byteReplay": {
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T17:36:48Z",
+    "finishedUtc": "2026-11-24T17:38:18Z",
+    "log": {
+      "bytes": 483,
+      "sha256": "08caea83596b9acd0c2392c3fa2ae5bfbc4adf3fb1b77956bc24c9fbfef64199"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "commands": [
+      "python3 -B tools/prepare_yak_geometry.py --check",
+      "python3 -B tools/verify_yak_geometry.py | cmp - integration/sh050-yak/CONTACT-RESULT.json",
+      "python3 -B tools/measure_yak_geometry.py archive-fit | cmp - integration/sh050-yak/ARCHIVE-FIT.json",
+      "python3 -B tools/measure_yak_geometry.py candidate-fit | cmp - integration/sh050-yak/candidate-fit.json",
+      "python3 -B tools/measure_yak_geometry.py candidate-fidelity | cmp - integration/sh050-yak/candidate-fidelity.json"
+    ]
+  },
+  "hullStudio": {
+    "definition": "integration/sh050-yak/YAK-STUDIO.json",
+    "bytes": 485183,
+    "sha256": "6c276ca9c21c2228745bcf276943736a0f6a7cd8db7503c548f8ff6a01a2abf2",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "supports": 162,
+    "probes": 7,
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline visual artwork export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 485183,
+        "sha256": "6c276ca9c21c2228745bcf276943736a0f6a7cd8db7503c548f8ff6a01a2abf2"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "detailedTriangles": 3448,
+      "candidateNativeTriangles": 480,
+      "archivedNativeTriangles": 928,
+      "originalScaleRatio": [
+        400,
+        41
+      ],
+      "receiptFiles": {
+        "YAK.hull.json": {
+          "bytes": 485182,
+          "sha256": "72c834fb934387fb25c32af640cef830c6591a92cfd495868b3f3dcf19665e55"
+        },
+        "YAK-repeat.hull.json": {
+          "bytes": 485182,
+          "sha256": "72c834fb934387fb25c32af640cef830c6591a92cfd495868b3f3dcf19665e55"
+        },
+        "studio.stdout.json": {
+          "bytes": 145774,
+          "sha256": "192e14dd014d0c146f96945b8ab7f0232c649126cf2848bb689277503d45167d"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 145774,
+          "sha256": "192e14dd014d0c146f96945b8ab7f0232c649126cf2848bb689277503d45167d"
+        },
+        "codesign.log": {
+          "bytes": 14189,
+          "sha256": "355bf3b5e4c07863a5b2d931e5e5303c33dd5728c6853b5c40bad304455d96c7"
+        }
+      }
+    }
+  }
+}
