@@ -123,6 +123,7 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Saker source envelope and Hull Studio definition](docs/SAKER-GAMEPLAY-ENVELOPE.md)
 - [Eagle Cruiser source envelope and Hull Studio definition](docs/EAGLE-CRUISER-SOURCE.md)
 - [Harpy Assault source envelope and Hull Studio definition](docs/HARPY-ASSAULT-SOURCE.md)
+- [Erne Corvette source envelope and Hull Studio definition](docs/ERNE-CORVETTE-SOURCE.md)
 - [Stag Liner source envelope and Hull Studio definition](docs/STAG-LINER-GAMEPLAY-ENVELOPE.md)
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)
