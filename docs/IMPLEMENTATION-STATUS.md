@@ -22,6 +22,10 @@ The SH014 Buffalo Mk II source candidate retains 57 local supports and both orig
 
 SH015 Raven now has an original detailed Showroom source, 70 local rounded collision supports, original R3 contract and its adopted 57,064 kg dry engineering budget. Independent source certificates cover both input surfaces and the selected bilateral forebody and SH028 fit/contact witnesses. Rust, owned native Metal, exact native collision and ordinary placement/acquisition remain pending. This is not a published preview. [Raven source and acceptance evidence](RAVEN-GAMEPLAY-ENVELOPE.md)
 
+## Mole Miner source envelope candidate
+
+SH016 retains its 203 local rounded supports, tool aperture and collar grooves. The independent Air evidence records 39.731 m of clearance along the aligned SH028 approach and the offset lip contact. Three controlled core cases passed on Mac, WSL2 and native Windows at `0262e5d`; qualification of the reconciled source remains pending. Its original 1,100-face native mesh exceeds the 512-face exact-import limit. Stock runtime mass, ordinary placement and Showroom remain open. [Mole Miner source and evidence](MOLE-MINER-GAMEPLAY-ENVELOPE.md)
+
 ## Commander startup and flight cockpit
 
 Ordinary startup opens Commander details with the current ship, location and credits. A fresh commander starts at Avenor. A saved flight opens its summary and waits for Enter to resume. An unreadable slot opens recovery. On Mac, a fresh commander reached this screen without creating a save. An airborne commander stayed on the summary until Enter. Recovery preserved the original damaged and unsupported save bytes.
