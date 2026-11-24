@@ -10,6 +10,7 @@ mod flight;
 pub mod freight;
 pub mod goshawk;
 pub mod goshawk_custom;
+pub mod harpy_assault;
 pub mod mining;
 pub mod mule;
 pub mod navigation;

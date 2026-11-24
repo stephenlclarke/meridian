@@ -52,6 +52,10 @@ The SH042 Saker source package preserves the original forest-ivory meshes and bo
 
 The nonflyable Eagle Cruiser package preserves the original detailed and 248-face navy-copper native meshes, plus both frozen engineering records. SteveMBA verified seven capital trench routes and five structural overlaps in both LODs. The audited fit upper bounds are 1,772 mm detailed and 5,377 mm native. The installed signed Hull Studio produced two byte-identical offline exports and passed all seven probes. The exact qualification evidence records the export and defines the focused Rust tests. [Eagle Cruiser source and evidence](EAGLE-CRUISER-SOURCE.md)
 
+## Harpy Assault catalogue source
+
+The nonflyable Harpy Assault package preserves the original sand-maroon detailed and native meshes and both frozen engineering records. SteveMBA verified seven keel and shoulder routes and five structural overlaps in both original meshes. The audited fit upper bounds are 847 mm detailed and 1,642 mm native. [Harpy Assault source and evidence](HARPY-ASSAULT-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)
