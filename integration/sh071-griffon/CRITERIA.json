@@ -1,0 +1,186 @@
+{
+  "hull": "SH071 Griffon",
+  "scope": "Original catalogue artwork and distinct archived collision inspection",
+  "source": "assets/fleet/sh071/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh071-griffon/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "60000/6221",
+  "faces": {
+    "detailedOriginal": 1644,
+    "nativeVisibleOriginal": 596,
+    "archivedCollision": 512,
+    "collisionMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-griffon",
+    "massKg": 30998
+  },
+  "creatorReplay": {
+    "path": "integration/sh071-griffon/CREATOR-REPLAY.json",
+    "bytes": 777,
+    "sha256": "eaf0c27e49810d744335e8f4c26eb6fea9a77f88cb321f093b49fbc11e1b2402"
+  },
+  "supportGroups": 29,
+  "minimumRouteClearanceMillimetres": 1009,
+  "sourceContactCounts": {
+    "overlap": 7
+  },
+  "fitUpperMillimetres": {
+    "detailed": 1542,
+    "archiveNative": 1636,
+    "candidateNative": 1946
+  },
+  "hullStudio": {
+    "definition": "integration/sh071-griffon/GRIFFON-STUDIO.json",
+    "bytes": 279673,
+    "sha256": "41b4cc844eaf07ab90e2144fc24ed33f1d74ad97b8c2acf211127b0c06644ad7",
+    "supports": 29,
+    "probes": 7,
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline artwork and archived collision import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 279673,
+        "sha256": "41b4cc844eaf07ab90e2144fc24ed33f1d74ad97b8c2acf211127b0c06644ad7"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 1644,
+      "nativeTriangles": 512,
+      "supportGroups": 29,
+      "engineeringReference": "finite-intrinsic-empty-griffon",
+      "massKg": 30998,
+      "receiptFiles": {
+        "GRIFFON.hull.json": {
+          "bytes": 279672,
+          "sha256": "16cd7f623468c67a56438eea029624fe129baf7fcdf6c8b13d0d029061b5e29e"
+        },
+        "GRIFFON-repeat.hull.json": {
+          "bytes": 279672,
+          "sha256": "16cd7f623468c67a56438eea029624fe129baf7fcdf6c8b13d0d029061b5e29e"
+        },
+        "studio.stdout.json": {
+          "bytes": 78276,
+          "sha256": "4856910ac841496e9b52093d71416f55433940cd717c364da778c407678f83ec"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 78276,
+          "sha256": "4856910ac841496e9b52093d71416f55433940cd717c364da778c407678f83ec"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "eaafc0903331b3149804b57ed4d99d80b1f43e578fc458685b32843fe7b50321"
+        },
+        "codesign-details.log": {
+          "bytes": 1145,
+          "sha256": "46f22bef73c8eab385775b9c33eb76171b43a06b700a46282ba7683d72e141bb"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "central-dorsal",
+          "passed": true
+        },
+        {
+          "name": "above-forward-cross-bridge",
+          "passed": true
+        },
+        {
+          "name": "below-forward-cross-bridge",
+          "passed": true
+        },
+        {
+          "name": "port-inner-gate",
+          "passed": true
+        },
+        {
+          "name": "port-outside-gate",
+          "passed": true
+        },
+        {
+          "name": "starboard-inner-gate",
+          "passed": true
+        },
+        {
+          "name": "starboard-outside-gate",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "separately archived collision artwork"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_griffon_geometry.py --check",
+      "python3 -B tools/verify_griffon_geometry.py | cmp - integration/sh071-griffon/CONTACT-RESULT.json",
+      "python3 -B tools/measure_griffon_geometry.py archive-fit | cmp - integration/sh071-griffon/ARCHIVE-FIT.json",
+      "python3 -B tools/measure_griffon_geometry.py candidate-fit | cmp - integration/sh071-griffon/candidate-fit.json",
+      "python3 -B tools/measure_griffon_geometry.py candidate-fidelity | cmp - integration/sh071-griffon/candidate-fidelity.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T22:49:42Z",
+    "finishedUtc": "2026-11-24T22:50:05Z",
+    "log": {
+      "bytes": 604,
+      "sha256": "49ebe97bd32a571729a2e2b37fdb4cf8c72a18fcda636778c07dd94102efdaa6"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "integration/sh071-griffon/GRIFFON-STUDIO.json": "41b4cc844eaf07ab90e2144fc24ed33f1d74ad97b8c2acf211127b0c06644ad7",
+    "integration/sh071-griffon/FROZEN-SOURCES.json": "f7444aaea65f13d4f506f447bccbf0ce4a05b1fd8c8f00c7555fb40922be97bd",
+    "integration/sh071-griffon/CONTACT-RESULT.json": "f177e0f6ba4768000a9102a877526e5e8ee719f9b12d28bd604dc9e43a07f54b",
+    "integration/sh071-griffon/ORIGINAL-JOINTS.json": "7e559e96053cccee9b5229f109fe6bfea9b81c2282034dc239bf6365f6a590dd",
+    "integration/sh071-griffon/ARCHIVE-FIT.json": "9e87a65f235cc7c673e818bebb7f5007c130f6503e2f56d5d2f23679f341c03b",
+    "integration/sh071-griffon/ARCHIVE-SUPPORT-PREFLIGHT.json": "975793c19f576eb479c7d670f802f58d3b516d5c0ef13981737f7f5c78634cd3",
+    "integration/sh071-griffon/candidate-fit.json": "cef2e6f91d0c12c3bbae7ff007c9c38399085c143a44f8521330b7a4cc55667c",
+    "integration/sh071-griffon/candidate-fidelity.json": "92da79ebb43343ba40cad1610864f2035656090422102e7205bd94dc11c28b16",
+    "integration/sh071-griffon/candidate-support.json": "8e0b4dff1196c43a92ecf061bcf197f48fefc3b24d84dd8dacad05b72d988f1f",
+    "integration/sh071-griffon/CREATOR-REPLAY.json": "eaf0c27e49810d744335e8f4c26eb6fea9a77f88cb321f093b49fbc11e1b2402",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_seriema_courier_geometry.py": "0992ebf43e2ac8800c4f72adf55498efcd88da4003ec9c2ab256fc797f66055e",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_seriema_courier_geometry.py": "179ecc3241c6cd08ca359725b95c7dd958ce31d0a5ab7a132dfcaf344a121bf2",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/prepare_griffon_geometry.py": "cacb71650b7a722d3c4fdbfbf216b27a91c3a9c23c8d838cbb70213fb5d8b1a1",
+    "tools/verify_griffon_geometry.py": "4a3db567bdf36e9ca397261f9ec1675bdd35a4d005ab61ac567c9ce09d84d96f",
+    "tools/measure_griffon_geometry.py": "dcf75db671d3858edc2d22bdfe90270dc47fae2128422f0187a33c4e233b9ba2"
+  }
+}

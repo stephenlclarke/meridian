@@ -21,6 +21,7 @@ mod flight;
 pub mod freight;
 pub mod goshawk;
 pub mod goshawk_custom;
+pub mod griffon;
 pub mod harpy_assault;
 pub mod harpy_dropship;
 pub mod harpy_gunship;

@@ -160,6 +160,10 @@ Baza Fighter preserves the original 2,340-face detailed and 152-face native mesh
 
 Baza Mk II preserves the original 2,364-face detailed and 176-face native meshes in metres. Signed Studio and independent source evidence cover seven guarded inspection routes. [Baza Mk II source and evidence](BAZA-MK-II-SOURCE.md)
 
+## Griffon catalogue source
+
+Griffon retains both original visible meshes, with 1,644 detailed and 596 native faces. The separately archived 512-face collision artifact preserves seven guarded inspection routes. [Griffon source and evidence](GRIFFON-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)
