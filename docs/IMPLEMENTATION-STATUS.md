@@ -64,6 +64,10 @@ The Erne Corvette inspection package preserves both original ice-cobalt meshes a
 
 The Harpy Dropship inspection package preserves both sand-maroon meshes and the frozen engineering records. The runtime catalogue disables player flight and normal purchase. The original R3 contract specifies player flight after blueprint fabrication. SteveMBA verified 27 supports, seven clearance routes, and seven original joints. The installed signed Hull Studio accepted the package offline and passed all seven probes. [Harpy Dropship source and evidence](HARPY-DROPSHIP-SOURCE.md)
 
+## Harpy Gunship catalogue source
+
+The Harpy Gunship inspection package preserves both original sand-maroon meshes and the frozen engineering records. The runtime catalogue disables player flight and normal purchase. The original R3 contract specifies player flight after blueprint fabrication. SteveMBA reproduced the fit and contact reports for 28 supports, seven inspection routes, and eight original joints. [Harpy Gunship source and evidence](HARPY-GUNSHIP-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)
