@@ -6,6 +6,7 @@ pub mod celestial;
 pub mod docking;
 pub mod eagle_cruiser;
 pub mod equipment;
+pub mod erne_corvette;
 mod flight;
 pub mod freight;
 pub mod goshawk;

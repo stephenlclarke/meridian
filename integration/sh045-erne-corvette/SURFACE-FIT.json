@@ -1,0 +1,105 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "refinementTargetsMillimetres": {
+    "detailed": 900,
+    "native": 2350
+  },
+  "fullUpperMillimetres": {
+    "detailed": 891,
+    "native": 2333
+  },
+  "pieces": {
+    "central-hull": {
+      "detailed": 865,
+      "native": 2333
+    },
+    "port-lower-rail": {
+      "detailed": 876,
+      "native": 1731
+    },
+    "port-shoulder": {
+      "detailed": 513,
+      "native": 1992
+    },
+    "port-drive": {
+      "detailed": 891,
+      "native": 2118
+    },
+    "starboard-lower-rail": {
+      "detailed": 876,
+      "native": 1731
+    },
+    "starboard-shoulder": {
+      "detailed": 764,
+      "native": 1982
+    },
+    "starboard-drive": {
+      "detailed": 891,
+      "native": 2118
+    },
+    "canopy": {
+      "detailed": 581,
+      "native": 1410
+    },
+    "canopy-rib": {
+      "detailed": 340,
+      "native": 1575
+    },
+    "port-service-pipe": {
+      "detailed": 260,
+      "native": 2090
+    },
+    "port-instrument-housing": {
+      "detailed": 668,
+      "native": 2125
+    },
+    "port-louvre-1": {
+      "detailed": 248,
+      "native": 1944
+    },
+    "port-louvre-2": {
+      "detailed": 248,
+      "native": 1946
+    },
+    "port-louvre-3": {
+      "detailed": 248,
+      "native": 1948
+    },
+    "port-louvre-4": {
+      "detailed": 248,
+      "native": 1950
+    },
+    "port-louvre-5": {
+      "detailed": 248,
+      "native": 1952
+    },
+    "starboard-service-pipe": {
+      "detailed": 260,
+      "native": 1476
+    },
+    "starboard-instrument-housing": {
+      "detailed": 668,
+      "native": 2115
+    },
+    "starboard-louvre-1": {
+      "detailed": 248,
+      "native": 1929
+    },
+    "starboard-louvre-2": {
+      "detailed": 248,
+      "native": 1940
+    },
+    "starboard-louvre-3": {
+      "detailed": 248,
+      "native": 1962
+    },
+    "starboard-louvre-4": {
+      "detailed": 248,
+      "native": 1988
+    },
+    "starboard-louvre-5": {
+      "detailed": 248,
+      "native": 2018
+    }
+  }
+}
