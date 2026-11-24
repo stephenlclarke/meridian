@@ -1,0 +1,326 @@
+[
+  {
+    "name": "canopy-to-upper-bridge",
+    "pointMetres": [
+      0.19,
+      8.79,
+      20.11
+    ],
+    "originalFaces": {
+      "detailed": {
+        "canopy": {
+          "faceRange": [
+            2328,
+            3288
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "upper-bridge": {
+          "faceRange": [
+            384,
+            768
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "canopy": {
+          "faceRange": [
+            184,
+            192
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "upper-bridge": {
+          "faceRange": [
+            32,
+            64
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "upper-bridge-to-central-hull",
+    "pointMetres": [
+      0.31,
+      4.83,
+      4.71
+    ],
+    "originalFaces": {
+      "detailed": {
+        "upper-bridge": {
+          "faceRange": [
+            384,
+            768
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "upper-bridge": {
+          "faceRange": [
+            32,
+            64
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            32
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-rail-to-central-hull",
+    "pointMetres": [
+      -8.91,
+      -2.13,
+      -12.13
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-rail": {
+          "faceRange": [
+            768,
+            1152
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-rail": {
+          "faceRange": [
+            64,
+            96
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            32
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-fin-to-central-hull",
+    "pointMetres": [
+      -7.11,
+      1.11,
+      -23.17
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-fin": {
+          "faceRange": [
+            1152,
+            1164
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-fin": {
+          "faceRange": [
+            96,
+            108
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            32
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-rail-to-central-hull",
+    "pointMetres": [
+      8.91,
+      -2.13,
+      -12.13
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-rail": {
+          "faceRange": [
+            1548,
+            1932
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-rail": {
+          "faceRange": [
+            124,
+            156
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            32
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-fin-to-central-hull",
+    "pointMetres": [
+      7.11,
+      1.11,
+      -23.17
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-fin": {
+          "faceRange": [
+            1932,
+            1944
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-fin": {
+          "faceRange": [
+            156,
+            168
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            32
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  }
+]

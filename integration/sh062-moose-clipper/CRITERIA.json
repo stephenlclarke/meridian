@@ -1,0 +1,133 @@
+{
+  "hull": "SH062 Moose Clipper",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh062/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh062-moose-clipper/FROZEN-SOURCES.json",
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "faces": {
+    "detailed": 3468,
+    "native": 192,
+    "nativeMaximum": 512
+  },
+  "supportGroups": 24,
+  "fitUpperMillimetres": {
+    "detailed": 2791,
+    "native": 6393
+  },
+  "minimumRouteClearanceMillimetres": 758,
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-moose",
+    "massKg": 114359
+  },
+  "replayPins": {
+    "integration/sh062-moose-clipper/CONTACT-CANDIDATE.json": "98f8942de8bf8f5770f8473b991afb0c1e8efed35f3006d17cbfeff661b5a30c",
+    "integration/sh062-moose-clipper/CONTACT-RESULT.json": "d93765b0aded64840c85d06b8ee5cf21619662a5e5e3bc217baf0107110b8ba8",
+    "integration/sh062-moose-clipper/FROZEN-SOURCES.json": "c89d75ae74e06f9127e09b2a411c837cc5ca52be3ac5fb341443c96d25d11ca0",
+    "integration/sh062-moose-clipper/MOOSE-CLIPPER-STUDIO.json": "abba6b0c1a7521978f202066cfbff630408aa2937355ff714cfae1580a44d6af",
+    "integration/sh062-moose-clipper/ORIGINAL-DIFFERENCE.json": "8616c8549f3fa5554b68ce3044414b61222d206a34af6bb755db269fddacb7b0",
+    "integration/sh062-moose-clipper/ORIGINAL-JOINTS.json": "f86aaa7c328271d2e88353bd04f265c6305b5ed6b5d603b54a5a1f17bad777b2",
+    "integration/sh062-moose-clipper/SUPPORT-FAN.json": "36a6fc9488d3c85f3cb243ff386117b1775b3cb8113e885c8d30d2d97df40690",
+    "integration/sh062-moose-clipper/SURFACE-FIT.json": "1d9603834fc141c804cea4b2b74b2e837b18645d6d0b1e71295fa3db73c3b6cd",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/measure_moose_clipper.py": "d655c7ec8956d6354e02bf7e5fde1dcbac2f676ae81d81f65720833301839fd1",
+    "tools/prepare_moose_clipper.py": "40c00dfe19da313808eefc323739e7b6d0fcc02ad104fddf1df15e411a817dd8",
+    "tools/verify_moose_clipper.py": "e245b59eee7e116967bca17f96cc89397422e0b4f5ac3f08f1999576c0bc9eb5",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6"
+  },
+  "byteReplay": {
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T19:20:07Z",
+    "finishedUtc": "2026-11-24T19:21:09Z",
+    "log": {
+      "bytes": 512,
+      "sha256": "f1c0f4788498bd4633ed60fe327b827de5f8919b0914c5e4a90f6e565d2d18d3"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "commands": [
+      "python3 -B tools/prepare_moose_clipper.py --check",
+      "python3 -B tools/verify_moose_clipper.py | cmp - integration/sh062-moose-clipper/CONTACT-RESULT.json",
+      "python3 -B tools/measure_moose_clipper.py --difference | cmp - integration/sh062-moose-clipper/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/measure_moose_clipper.py | cmp - integration/sh062-moose-clipper/SURFACE-FIT.json"
+    ]
+  },
+  "hullStudio": {
+    "definition": "integration/sh062-moose-clipper/MOOSE-CLIPPER-STUDIO.json",
+    "bytes": 449381,
+    "sha256": "abba6b0c1a7521978f202066cfbff630408aa2937355ff714cfae1580a44d6af",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "supports": 24,
+    "probes": 7,
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline artwork import and export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 449381,
+        "sha256": "abba6b0c1a7521978f202066cfbff630408aa2937355ff714cfae1580a44d6af"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3468,
+      "nativeTriangles": 192,
+      "supportGroups": 24,
+      "engineeringReference": "finite-intrinsic-empty-moose",
+      "massKg": 114359.0,
+      "receiptFiles": {
+        "MOOSE-CLIPPER.hull.json": {
+          "bytes": 449380,
+          "sha256": "e70b923592c7f53ebac732ff0cc48c962d5a36ff8d63fb8269d887143e7f0417"
+        },
+        "MOOSE-CLIPPER-repeat.hull.json": {
+          "bytes": 449380,
+          "sha256": "e70b923592c7f53ebac732ff0cc48c962d5a36ff8d63fb8269d887143e7f0417"
+        },
+        "studio.stdout.json": {
+          "bytes": 61048,
+          "sha256": "99b8ed4c05e46fcc462cdc04bf64916010a51cf1592980e1681d5f6f6651978e"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 61048,
+          "sha256": "99b8ed4c05e46fcc462cdc04bf64916010a51cf1592980e1681d5f6f6651978e"
+        },
+        "codesign.log": {
+          "bytes": 14183,
+          "sha256": "e8d248e476ab041511c6d1cdf1c5daad8a5a7b59d4c267bb9ea45784dac6be28"
+        }
+      }
+    }
+  },
+  "nativeTrimWitness": {
+    "piece": "port-instrument-housing",
+    "verifiedSourceVertexLowerMillimetres": 6371,
+    "supportUpperMillimetres": 6393
+  }
+}
