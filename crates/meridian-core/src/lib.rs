@@ -18,6 +18,7 @@ pub mod harpy_assault;
 pub mod harpy_dropship;
 pub mod harpy_gunship;
 pub mod mining;
+pub mod mole_miner;
 pub mod mule;
 pub mod navigation;
 pub mod raven;

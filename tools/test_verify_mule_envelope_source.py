@@ -83,6 +83,7 @@ class MuleSourceVerification(unittest.TestCase):
                 b'pub mod buffalo;\n',
                 b'pub mod buffalo_mk2;\n',
                 b'pub mod raven;\n', b'pub use flight::RavenApproachSnapshot;\n',
+                b'pub mod mole_miner;\n',
             ):
                 for altered in (original.replace(publication, b''), original + publication):
                     with self.subTest(publication=publication):
@@ -97,6 +98,7 @@ class MuleSourceVerification(unittest.TestCase):
                 b'pub mod buffalo;\n',
                 b'pub mod buffalo_mk2;\n',
                 b'pub mod raven;\n', b'pub use flight::RavenApproachSnapshot;\n',
+                b'pub mod mole_miner;\n',
             ):
                 source.write_bytes(original.replace(declaration, b'') + declaration)
                 with self.assertRaisesRegex(AssertionError, 'lib.rs'):
@@ -123,7 +125,8 @@ class MuleSourceVerification(unittest.TestCase):
             manifest = root / verifier.FLIGHT_COMPUTER_INVERSE
             inverse = json.loads(manifest.read_bytes())
             relative = verifier.LIB_SOURCE
-            current = verifier.undo_raven_publication(relative, (core / relative).read_bytes())
+            current = verifier.undo_mole_miner_publication(relative, (core / relative).read_bytes())
+            current = verifier.undo_raven_publication(relative, current)
             current = verifier.undo_buffalo_mk2_publication(relative, current)
             current = verifier.undo_buffalo_publication(relative, current)
             current = verifier.undo_sable_publication(relative, current)

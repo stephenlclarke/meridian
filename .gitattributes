@@ -16,6 +16,12 @@ tools/measure_buffalo_mk2_air.py text eol=lf
 tools/compare_buffalo_mk2_originals.py text eol=lf
 integration/sh014-buffalo-mk2/*.json text eol=lf
 
+# Mole Miner exact replay pins.
+tools/measure_mole_miner_air.py text eol=lf
+tools/prepare_mole_miner_geometry.py text eol=lf
+tools/verify_mole_miner_geometry.py text eol=lf
+integration/sh016-mole-miner/*.json text eol=lf
+
 # Harpy Dropship authoring and replay programs use exact LF bytes.
 tools/measure_harpy_dropship.py text eol=lf
 tools/prepare_harpy_dropship.py text eol=lf
