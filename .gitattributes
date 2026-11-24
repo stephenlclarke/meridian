@@ -11,6 +11,11 @@ tools/measure_harpy_gunship.py text eol=lf
 tools/prepare_harpy_gunship.py text eol=lf
 tools/verify_harpy_gunship.py text eol=lf
 
+# Buffalo Mk II replay programs and reports have immutable LF byte hashes.
+tools/measure_buffalo_mk2_air.py text eol=lf
+tools/compare_buffalo_mk2_originals.py text eol=lf
+integration/sh014-buffalo-mk2/*.json text eol=lf
+
 # Harpy Dropship authoring and replay programs use exact LF bytes.
 tools/measure_harpy_dropship.py text eol=lf
 tools/prepare_harpy_dropship.py text eol=lf

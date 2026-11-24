@@ -1,0 +1,85 @@
+{
+  "id": "SH014",
+  "name": "Buffalo Mk II",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "source": "Corrected original resource with short opaque plinth and lowered bridge.",
+  "authoringMetresPerOriginalUnit": 33.212560386473434,
+  "runtimeScaleForBundledGeometry": 1,
+  "details": {
+    "vertices": 2056,
+    "faces": 3460,
+    "components": 163,
+    "bounds": [
+      [
+        -50.54556461352658,
+        -21.550169082125606,
+        -55.00000000000001
+      ],
+      [
+        50.52806159420291,
+        20.008454106280197,
+        55.00000000000001
+      ]
+    ]
+  },
+  "native": {
+    "vertices": 280,
+    "faces": 500,
+    "components": 15,
+    "bounds": [
+      [
+        -50.45153985507247,
+        -20.662729468599036,
+        -55.00000000000001
+      ],
+      [
+        50.45153985507247,
+        20.008454106280197,
+        55.00000000000001
+      ]
+    ],
+    "faceLimit": 512
+  },
+  "archivedNative": {
+    "file": "pre-correction-native-export.json",
+    "faces": 928,
+    "role": "provenance"
+  },
+  "textures": [
+    "l337-patrol-diffuse",
+    "l337-strike-diffuse",
+    "l337-service-details"
+  ],
+  "pins": {
+    "resource.toml": "0d5b91041b4e8afc4d9ca851ffc2575f4eda41b5458fec03099930aeb119b7c5",
+    "pre-correction-native-export.json": "8b7a13e0914b53fddfe92a0ba333976d6ed6b15d0851e23380e2be8521adf995",
+    "contract.toml": "17f2bcd6a0b854eb3c3f05714e6eca1fe2abb6935d79137dd4e222b78ec103e7",
+    "LICENSE": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+  },
+  "outputs": {
+    "source.vertices": {
+      "bytes": 56080,
+      "sha256": "07fcf02a376341045485889a31224f4f8fd4743744b3e28566bef0eded323063"
+    },
+    "source-triangles.bin": {
+      "bytes": 47520,
+      "sha256": "fe66b039e956aebe33c0b764b5b119399c18cb2149cc3c2e8ce4920a010da271"
+    },
+    "source-piece-membership.bin": {
+      "bytes": 2336,
+      "sha256": "bc7fedd276649abc0fe7e95700ba1e8ae857173d07bf165669567475ee86f4d2"
+    },
+    "visual.bin": {
+      "bytes": 581296,
+      "sha256": "3a1ed07ee0ec6348729d2da531c7c956ef9e183f40c21d38aa566007c458e85d"
+    },
+    "native-visual.bin": {
+      "bytes": 84016,
+      "sha256": "bfe8ddd25fa853601da1a08ea74d984e460a54764ba5f7833a9cb5f940dc85e8"
+    },
+    "PIECES.json": {
+      "bytes": 1586,
+      "sha256": "a5d405501914672fb22c93ae06b73cb24029ac722ac34127b9136d6bd56dd336"
+    }
+  }
+}

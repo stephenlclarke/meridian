@@ -81,6 +81,7 @@ class MuleSourceVerification(unittest.TestCase):
                 b'pub mod goshawk_mk2;\n',
                 b'pub mod sable_liner;\n',
                 b'pub mod buffalo;\n',
+                b'pub mod buffalo_mk2;\n',
             ):
                 for altered in (original.replace(publication, b''), original + publication):
                     with self.subTest(publication=publication):
@@ -93,6 +94,7 @@ class MuleSourceVerification(unittest.TestCase):
                 b'pub mod goshawk_mk2;\n',
                 b'pub mod sable_liner;\n',
                 b'pub mod buffalo;\n',
+                b'pub mod buffalo_mk2;\n',
             ):
                 source.write_bytes(original.replace(declaration, b'') + declaration)
                 with self.assertRaisesRegex(AssertionError, 'lib.rs'):
@@ -106,7 +108,8 @@ class MuleSourceVerification(unittest.TestCase):
             manifest = root / verifier.FLIGHT_COMPUTER_INVERSE
             inverse = json.loads(manifest.read_bytes())
             relative = verifier.LIB_SOURCE
-            current = verifier.undo_buffalo_publication(relative, (core / relative).read_bytes())
+            current = verifier.undo_buffalo_mk2_publication(relative, (core / relative).read_bytes())
+            current = verifier.undo_buffalo_publication(relative, current)
             current = verifier.undo_sable_publication(relative, current)
             current = verifier.undo_mk2_publication(relative, current)
             current = verifier.undo_gunship_publication(relative, current)
