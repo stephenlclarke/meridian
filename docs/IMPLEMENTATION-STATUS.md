@@ -104,6 +104,10 @@ Condor retains its original 4,504-face detailed and 244-face native metre meshes
 
 Aplomado Interceptor retains the original 2,340-face detailed and 120-face native metre meshes. Signed Studio evidence covers offline artwork. Independent source replay verifies 23 local groups, seven guarded routes, and five joints in both source meshes. [Aplomado Interceptor source and evidence](APLOMADO-INTERCEPTOR-SOURCE.md)
 
+## Falconet catalogue source
+
+Falconet retains the original 3,108-face detailed and 184-face native metre meshes. Signed Studio evidence covers offline artwork. Independent source replay verifies 25 local groups, seven guarded routes and seven joints in both source meshes. [Falconet source and evidence](FALCONET-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)

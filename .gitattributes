@@ -6,6 +6,11 @@ assets/fleet/sh001/visual.bin binary
 assets/fleet/sh008/** -text
 assets/fleet/sh008/visual.bin binary
 
+# Falconet authoring and replay programs use exact LF bytes.
+tools/measure_falconet.py text eol=lf
+tools/prepare_falconet.py text eol=lf
+tools/verify_falconet.py text eol=lf
+
 # Aplomado Interceptor authoring and replay programs use exact LF bytes.
 tools/measure_aplomado_interceptor.py text eol=lf
 tools/prepare_aplomado_interceptor.py text eol=lf
