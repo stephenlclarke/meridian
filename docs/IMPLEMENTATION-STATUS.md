@@ -196,6 +196,10 @@ Oryx Voyager preserves its original 4,620-face detailed and 200-face native mesh
 
 Carabao Freighter preserves the original 2,448-face detailed and 204-face native artwork. Six guarded lateral routes cross the gaps between cargo bays. [Carabao Freighter source and evidence](CARABAO-FREIGHTER-SOURCE.md)
 
+## Carabao Highliner catalogue source
+
+Carabao Highliner preserves its original 2,856-face detailed and 236-face native artwork. Both original meshes include the passenger spine and preserve seven guarded inspection routes. [Carabao Highliner source and evidence](CARABAO-HIGHLINER-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)
