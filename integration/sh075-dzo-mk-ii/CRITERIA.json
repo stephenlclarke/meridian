@@ -1,0 +1,190 @@
+{
+  "hull": "SH075 Dzo Mk II",
+  "scope": "Original catalogue artwork and independent segmented geometry inspection",
+  "source": "assets/fleet/sh075/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh075-dzo-mk-ii/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "1",
+  "faces": {
+    "detailed": 9612,
+    "native": 448,
+    "nativeMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-dzo-mk-ii",
+    "massKg": 88810
+  },
+  "supportGroups": 56,
+  "minimumRouteClearanceMillimetres": 1148,
+  "sourceContactCounts": {
+    "overlap": 6,
+    "occupiedCollarCenters": 4
+  },
+  "collarSupports": {
+    "selectedSpansPerCollar": 8,
+    "sharedSeamVertices": 512,
+    "alternatives": "integration/sh075-dzo-mk-ii/COLLAR-OPTIONS.json"
+  },
+  "unsegmentedFitUpperMillimetres": {
+    "detailed": 5060,
+    "native": 5096
+  },
+  "fitUpperMillimetres": {
+    "detailed": 3727,
+    "native": 5096
+  },
+  "hullStudio": {
+    "definition": "integration/sh075-dzo-mk-ii/DZO-MK-II-STUDIO.json",
+    "bytes": 1335025,
+    "sha256": "717b6e1ec4ac363c06cb875d3509ed4b555fe1c421f61def96bc82eaec420507",
+    "supports": 28,
+    "probes": 7,
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 1335025,
+        "sha256": "717b6e1ec4ac363c06cb875d3509ed4b555fe1c421f61def96bc82eaec420507"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 9612,
+      "nativeTriangles": 448,
+      "supportGroups": 28,
+      "engineeringReference": "finite-intrinsic-empty-dzo-mk-ii",
+      "massKg": 88810,
+      "receiptFiles": {
+        "DZO-MK-II.hull.json": {
+          "bytes": 1335024,
+          "sha256": "b7da5b5f4ec9fd5826bffc4787c05cb6ad3493fc98ee00a158577ce28d61462d"
+        },
+        "DZO-MK-II-repeat.hull.json": {
+          "bytes": 1335024,
+          "sha256": "b7da5b5f4ec9fd5826bffc4787c05cb6ad3493fc98ee00a158577ce28d61462d"
+        },
+        "studio.stdout.json": {
+          "bytes": 169123,
+          "sha256": "aacc6780ff6ee7c7a51c2acf2ce05afbb7d3e19351729b7cf6ae15307e501858"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 169123,
+          "sha256": "aacc6780ff6ee7c7a51c2acf2ce05afbb7d3e19351729b7cf6ae15307e501858"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "f4bbc8b829b79b9d632f1a5c82e651af6a7ccd38228b051c9e1fb5c07acfbf48"
+        },
+        "codesign-details.log": {
+          "bytes": 1145,
+          "sha256": "46f22bef73c8eab385775b9c33eb76171b43a06b700a46282ba7683d72e141bb"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "central-between-floats",
+          "passed": true
+        },
+        {
+          "name": "dorsal-exterior",
+          "passed": true
+        },
+        {
+          "name": "ventral-exterior",
+          "passed": true
+        },
+        {
+          "name": "port-outside-collars",
+          "passed": true
+        },
+        {
+          "name": "port-above-cross-bridges",
+          "passed": true
+        },
+        {
+          "name": "starboard-outside-collars",
+          "passed": true
+        },
+        {
+          "name": "starboard-above-cross-bridges",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "original native visible"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_dzo_mk_ii.py --check",
+      "python3 -B tools/verify_dzo_mk_ii.py | cmp - integration/sh075-dzo-mk-ii/CONTACT-RESULT.json",
+      "python3 -B tools/measure_dzo_mk_ii.py --difference | cmp - integration/sh075-dzo-mk-ii/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/measure_dzo_mk_ii.py | cmp - integration/sh075-dzo-mk-ii/SURFACE-FIT.json",
+      "python3 -B tools/measure_dzo_mk_ii.py --collar-options | cmp - integration/sh075-dzo-mk-ii/COLLAR-OPTIONS.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T23:06:35Z",
+    "finishedUtc": "2026-11-24T23:09:06Z",
+    "log": {
+      "bytes": 614,
+      "sha256": "e92e98db741227ba7f2eb23f9b7b380247f081643978b930f88b9401b137fffb"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "integration/sh075-dzo-mk-ii/DZO-MK-II-STUDIO.json": "717b6e1ec4ac363c06cb875d3509ed4b555fe1c421f61def96bc82eaec420507",
+    "integration/sh075-dzo-mk-ii/FROZEN-SOURCES.json": "22a0b3b95747e1755fa5920b9805c67f15b04a7343dc2288d205462679d0e208",
+    "integration/sh075-dzo-mk-ii/CONTACT-CANDIDATE.json": "f270deef65a21796b9062ea41425504ed3181a4397c754a1b312a5b6f2072765",
+    "integration/sh075-dzo-mk-ii/CONTACT-RESULT.json": "2b348478b8d2f59475c5164f715ca993ed90ee6ca33f258ff9b6cd38fc021c52",
+    "integration/sh075-dzo-mk-ii/ORIGINAL-DIFFERENCE.json": "ccdd3bbc66026242572656f9f0610079e86252d8a7cc6bf0a45a76220f7a87fa",
+    "integration/sh075-dzo-mk-ii/ORIGINAL-JOINTS.json": "a281f412e7a585790bfe42d14076f5759b1947dce27fcce1ca8a666e884da0ac",
+    "integration/sh075-dzo-mk-ii/SPLIT-ROUTES.json": "b77b72d4328f363eff06cf8ac05d3ff947b52313819445d2389d0eb7b5c87dcd",
+    "integration/sh075-dzo-mk-ii/SUPPORT-FAN.json": "ee6e75be8bdd411f74404b92ccb53046f99b62e3b54a9d927afe7b0dcf6b6d6d",
+    "integration/sh075-dzo-mk-ii/SURFACE-FIT.json": "3d6058723d23dc560781b74017002dbc2c31e213f2b85bc007300041e0da086c",
+    "integration/sh075-dzo-mk-ii/COLLAR-OPTIONS.json": "8d5163fb5908f05b976995080bc1f1c015eb27343cd4e32a4b8c1d83573f6833",
+    "assets/fleet/sh075/COLLISION-PIECES.json": "af9af4e59bf7e37df8aaed4073c121917df1486043cab9ca7441be4c8d1926cc",
+    "assets/fleet/sh075/collision-piece-membership.bin": "782d8a494954929c0061df0a601f693a9f90a6cb52e46c9076e1c9bbd0180495",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/dzo_collar_support.py": "e0be79ecdd3e908ff6215d38381e1e2dd9585ded810888ec1ed4cb644cdb6d07",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/prepare_dzo_mk_ii.py": "b9df7763048a18670bce262818c8f5c6e932577a2ef61672022fd959528acf93",
+    "tools/verify_dzo_mk_ii.py": "7be8df98005d074af5dece18420fc34e5a28be6ac22f3dc3c50182eb09e567c9",
+    "tools/measure_dzo_mk_ii.py": "7414bac5d1b59b35f5163c76c76217050b55bac289c5e17872569f2a80578e76"
+  }
+}

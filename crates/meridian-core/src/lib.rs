@@ -14,6 +14,7 @@ pub mod celestial;
 pub mod condor;
 pub mod docking;
 pub mod dzo;
+pub mod dzo_mk_ii;
 pub mod eagle_cruiser;
 pub mod equipment;
 pub mod erne_corvette;
