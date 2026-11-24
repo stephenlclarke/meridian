@@ -44,6 +44,16 @@ def flight_computer_inverse(root, protected):
     return files
 
 
+def undo_hog_publication(relative, data):
+    if relative != LIB_SOURCE:
+        return data
+    declaration = b'pub mod hog;\n'
+    before, after = b'pub mod hobby_fighter;\n', b'pub mod hyena;\n'
+    span = before + declaration + after
+    assert data.count(declaration) == 1 and data.count(span) == 1, relative
+    return data.replace(span, before + after, 1)
+
+
 def undo_dzo_mk_ii_publication(relative, data):
     if relative != LIB_SOURCE:
         return data
@@ -606,7 +616,8 @@ def verify_protected_core(root):
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_dzo_mk_ii_publication(relative, current)
+        data = undo_hog_publication(relative, current)
+        data = undo_dzo_mk_ii_publication(relative, data)
         data = undo_dzo_publication(relative, data)
         data = undo_griffon_spectre_publication(relative, data)
         data = undo_griffon_mk_ii_publication(relative, data)

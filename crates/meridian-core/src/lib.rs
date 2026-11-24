@@ -30,6 +30,7 @@ pub mod harpy_assault;
 pub mod harpy_dropship;
 pub mod harpy_gunship;
 pub mod hobby_fighter;
+pub mod hog;
 pub mod hyena;
 pub mod jackal;
 pub mod lanner;
