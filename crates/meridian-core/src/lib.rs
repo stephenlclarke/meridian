@@ -4,6 +4,7 @@
 
 pub mod aplomado_interceptor;
 pub mod banteng;
+pub mod barbary;
 pub mod caracal_scout;
 pub mod celestial;
 pub mod condor;

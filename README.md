@@ -137,6 +137,7 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Aplomado Interceptor source envelope and Hull Studio definition](docs/APLOMADO-INTERCEPTOR-SOURCE.md)
 - [Falconet source envelope and Hull Studio definition](docs/FALCONET-SOURCE.md)
 - [Muskox source envelope and Hull Studio definition](docs/MUSKOX-SOURCE.md)
+- [Barbary source envelope and Hull Studio definition](docs/BARBARY-SOURCE.md)
 - [Stag Liner source envelope and Hull Studio definition](docs/STAG-LINER-GAMEPLAY-ENVELOPE.md)
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)
