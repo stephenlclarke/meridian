@@ -257,6 +257,7 @@ class TestStagLinerSources(unittest.TestCase):
     def test_fit_contact_and_numerical_helper_pins(self):
         criteria = json.loads((proof.INTEGRATION / 'CRITERIA.json').read_bytes())
         replay = criteria['independentReplay']
+        self.assertIn('tools/hull_contact_geometry.py', replay['tools'])
         for name, expected in (replay['tools'] | replay['fixtures']).items():
             self.assertEqual(hashlib.sha256((proof.ROOT / name).read_bytes()).hexdigest(), expected)
         for name, expected in criteria['air']['reports'].items():
