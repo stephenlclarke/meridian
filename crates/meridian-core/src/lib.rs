@@ -2,6 +2,7 @@
 
 #![forbid(unsafe_code)]
 
+pub mod buffalo;
 pub mod celestial;
 pub mod docking;
 pub mod eagle_cruiser;

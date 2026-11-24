@@ -12,6 +12,10 @@ The authored desktop integration routes generated launch and docking cues from a
 
 Preview 10 is published for macOS arm64 and Windows x64. It includes the Goshawk Explorer in the ordinary station Showroom. The signed and notarized app was extracted and checked against the local installation, including all 483 files. Earlier Mac gameplay checks covered the Showroom on the source used for this build. Packaging verification did not include a new graphical launch. [Preview guide](PREVIEW-RELEASES.md)
 
+## Buffalo collision geometry
+
+The SH013 candidate uses 57 rounded supports derived from the corrected 76 m original. Source checks on the MacBook Air measured at least 1.65 m of clearance along both interdrum routes and reproduced contact with the station lip. Owned Rust verification and player-facing presentation are pending.
+
 ## Commander startup and flight cockpit
 
 Ordinary startup opens Commander details with the current ship, location and credits. A fresh commander starts at Avenor. A saved flight opens its summary and waits for Enter to resume. An unreadable slot opens recovery. On Mac, a fresh commander reached this screen without creating a save. An airborne commander stayed on the summary until Enter. Recovery preserved the original damaged and unsupported save bytes.
