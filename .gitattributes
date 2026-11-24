@@ -33,6 +33,7 @@ tools/measure_saker_air.py text eol=lf
 tools/prepare_saker_geometry.py text eol=lf
 tools/prepare_saker_studio.py text eol=lf
 tools/verify_saker_geometry.py text eol=lf
+tools/hull_contact_geometry.py text eol=lf
 tools/vulture_mk_i_exact_fit.py text eol=lf
 
 # Stag Liner replay helpers have published byte hashes.
