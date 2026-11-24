@@ -1,0 +1,137 @@
+{
+  "hull": "SH046 Harpy Dropship",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh046/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh046-harpy-dropship/FROZEN-SOURCES.json",
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "faces": {
+    "detailed": 3132,
+    "native": 240,
+    "nativeMaximum": 512
+  },
+  "supportGroups": 27,
+  "fitUpperMillimetres": {
+    "detailed": 847,
+    "native": 1379
+  },
+  "minimumRouteClearanceMillimetres": 279,
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-harpy-dropship",
+    "massKg": 51822
+  },
+  "replayPins": {
+    "integration/sh046-harpy-dropship/CONTACT-CANDIDATE.json": "618eb79af37e5e6076a8d13ccd9d887f45320d5b5cbcca42b5be078c8840fa7c",
+    "integration/sh046-harpy-dropship/CONTACT-RESULT.json": "93aaee415aa30d8038ccf813871cb4c4ffb8f49c92022f3eefcbc0d5e41498a4",
+    "integration/sh046-harpy-dropship/FROZEN-SOURCES.json": "40a47abb14429eae49d7579901917b710bd379ecfccdce5af212a84bcce09210",
+    "integration/sh046-harpy-dropship/HARPY-DROPSHIP-STUDIO.json": "cff7f38e53eef015e244b090c2bda5ac1fb132735d89f80b98089e63a43a8f10",
+    "integration/sh046-harpy-dropship/ORIGINAL-DIFFERENCE.json": "2f1a6bc78c27c79289f6c126fc506e4e82d286edc40693a1483ae12410d54bae",
+    "integration/sh046-harpy-dropship/ORIGINAL-JOINTS.json": "b3fb743cdccf47c08b44db802d35a3121148c3916cbfbaa233ef523b82c380a4",
+    "integration/sh046-harpy-dropship/SUPPORT-FAN.json": "aff40a44151097f6f061a5c634ac9bdc0cf6f082239fde8039397a5f0d4ce5f4",
+    "integration/sh046-harpy-dropship/SURFACE-FIT.json": "55ee0f4909409e9418553d2c07b04386cf49455389a27f7d24acedaae2706fdd",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/measure_harpy_dropship.py": "42298788076b005d36a7eaa369ad000d94752b22ac0fc9d61dc8f5adaa3f8362",
+    "tools/prepare_harpy_dropship.py": "a6237fe4073332bcbce930b755a29d222dea7c099283f7e34756ae8bcc298dfc",
+    "tools/verify_harpy_dropship.py": "a2ff6943c72e7d176962b0023ff2da881ea653ee8f46b3c2724994440eadf4ee",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6"
+  },
+  "byteReplay": {
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T16:55:41Z",
+    "finishedUtc": "2026-11-24T16:55:49Z",
+    "log": {
+      "bytes": 410,
+      "sha256": "1330b40303d4391ecf8a9d743c905848f0a46cce79a77a1af04a61b599f54ba1"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "commands": [
+      "python3 -B tools/prepare_harpy_dropship.py --check",
+      "python3 -B tools/verify_harpy_dropship.py | cmp - integration/sh046-harpy-dropship/CONTACT-RESULT.json",
+      "python3 -B tools/measure_harpy_dropship.py --difference | cmp - integration/sh046-harpy-dropship/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/measure_harpy_dropship.py | cmp - integration/sh046-harpy-dropship/SURFACE-FIT.json"
+    ]
+  },
+  "hullStudio": {
+    "definition": "integration/sh046-harpy-dropship/HARPY-DROPSHIP-STUDIO.json",
+    "bytes": 403994,
+    "sha256": "cff7f38e53eef015e244b090c2bda5ac1fb132735d89f80b98089e63a43a8f10",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "supports": 27,
+    "probes": 7,
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline catalogue import and export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 403994,
+        "sha256": "cff7f38e53eef015e244b090c2bda5ac1fb132735d89f80b98089e63a43a8f10"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3132,
+      "nativeTriangles": 240,
+      "supportGroups": 27,
+      "passedCatalogueProbes": [
+        "forward-below-ramp",
+        "port-between-forward-keels",
+        "port-outboard-of-skid",
+        "port-upper-aft-channel",
+        "starboard-between-forward-keels",
+        "starboard-outboard-of-skid",
+        "starboard-upper-aft-channel"
+      ],
+      "engineeringReference": "finite-intrinsic-empty-harpy-dropship",
+      "preservedSourceMassKg": 51822.0,
+      "receiptFiles": {
+        "HARPY-DROPSHIP.hull.json": {
+          "bytes": 403993,
+          "sha256": "14295dd397046d2cf2c42116584adc487ec4dc5887e65df8c0f948bac65f02db"
+        },
+        "HARPY-DROPSHIP-repeat.hull.json": {
+          "bytes": 403993,
+          "sha256": "14295dd397046d2cf2c42116584adc487ec4dc5887e65df8c0f948bac65f02db"
+        },
+        "studio.stdout.json": {
+          "bytes": 55067,
+          "sha256": "64c02767231bd5291075439a861384f3c202acb24c2b9d95caf653dbffa5aa66"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 55067,
+          "sha256": "64c02767231bd5291075439a861384f3c202acb24c2b9d95caf653dbffa5aa66"
+        },
+        "codesign.log": {
+          "bytes": 14189,
+          "sha256": "98f254f4009bf5804113bef325d9ed89fa1a57dadfd4c0d66a4ae276a889f708"
+        }
+      }
+    }
+  }
+}
