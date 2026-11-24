@@ -2,6 +2,7 @@ mod audio;
 mod emp;
 mod mule_presentation;
 mod mule_validation;
+mod target_computer;
 use std::{
     collections::{HashSet, hash_map::RandomState},
     error::Error,
@@ -119,6 +120,7 @@ struct App {
     game: Profile,
     audio: Option<DesktopAudio>,
     validation_view: FlightView,
+    target_details: Option<bool>,
     validation_timing: Option<mule_validation::FrameTiming>,
     celestial: crate::celestial::WorldAdapter,
     quit_failed: bool,
@@ -180,6 +182,7 @@ impl App {
             game,
             audio: None,
             validation_view: FlightView::Front,
+            target_details: None,
             validation_timing: internal.then(mule_validation::FrameTiming::default),
             quit_failed: false,
             celestial: crate::celestial::WorldAdapter::default(),
@@ -384,7 +387,7 @@ impl App {
         match self.game.xyzzy(action) {
             Ok(message) => {
                 self.notice.set(message);
-                self.xyzzy = None;
+                menu.reviewing = false;
                 self.sync_profile_controls();
             }
             Err(message) => self.notice.set(message),
@@ -394,6 +397,10 @@ impl App {
     fn reset_input(&mut self) {
         self.clear_held_input();
         if self.modal_open() {
+            if !self.focused || self.occluded {
+                self.game.world.cancel_auto_docking();
+                self.game.world.cancel_targeting();
+            }
             self.request_redraw();
             return;
         }
@@ -587,10 +594,17 @@ impl App {
             self.docked = None;
             return;
         }
+        let screen = if self.xyzzy.is_some() {
+            self.docked
+                .as_ref()
+                .map_or(ui::Screen::System, Docked::screen)
+        } else {
+            ui::Screen::System
+        };
         self.docked = match Docked::new(&self.game.world) {
             Ok(mut menu) => {
                 if self.game.world.current_dock_context().is_some()
-                    && let Err(error) = menu.open(&self.game.world, ui::Screen::System)
+                    && let Err(error) = menu.open(&self.game.world, screen)
                 {
                     self.notice.set(error);
                 }
@@ -736,7 +750,19 @@ impl App {
             self.notice.set("EMP: hold U for ten seconds; release to cancel. Recent-attacker self-defence only.".into());
             return;
         }
+        let in_flight = self.game.world.snapshot().mode == FlightMode::Flight;
+        if in_flight {
+            match code {
+                KeyCode::Tab => return self.cycle_computer_target(),
+                KeyCode::KeyF => return self.cycle_computer_filter(),
+                KeyCode::KeyT => return self.lock_computer_target(),
+                KeyCode::Backspace | KeyCode::Delete => return self.release_computer_target(),
+                KeyCode::KeyI if self.modifiers.shift_key() => return self.toggle_target_details(),
+                _ => {}
+            }
+        }
         let action = match code {
+            KeyCode::KeyN if in_flight => Action::ToggleAutoDocking,
             KeyCode::Digit0 => Action::SetFlightView(FlightView::Front),
             KeyCode::Digit1 => Action::SetFlightView(FlightView::Rear),
             KeyCode::Digit2 => Action::SetFlightView(FlightView::Left),
@@ -753,11 +779,35 @@ impl App {
             KeyCode::F3 => Action::FireMissile,
             KeyCode::F4 => Action::ClearMissile,
             KeyCode::KeyL => Action::Launch,
-            KeyCode::KeyJ => self
-                .docked
-                .as_ref()
-                .and_then(|menu| menu.route)
-                .map_or(Action::Jump, Action::JumpTo),
+            KeyCode::KeyJ => {
+                if let Some(route) = self.game.world.active_route_progress() {
+                    if let Some(next) = route.next_system {
+                        Action::JumpTo(next)
+                    } else {
+                        use meridian_core::navigation::RouteStatus;
+                        let message = match route.status {
+                            RouteStatus::RefuelRequired => {
+                                "Refuel at this stop before the next jump."
+                            }
+                            RouteStatus::AwaitingDock => "Dock at this stop to advance the route.",
+                            RouteStatus::ComputerUnavailable => {
+                                "Fit a navigation computer that supports this route."
+                            }
+                            RouteStatus::Complete => {
+                                "Route complete. Select a new destination at a station."
+                            }
+                            RouteStatus::Ready => "Route has no next destination.",
+                        };
+                        self.notice.set(message.into());
+                        return;
+                    }
+                } else {
+                    self.docked
+                        .as_ref()
+                        .and_then(|menu| menu.route)
+                        .map_or(Action::Jump, Action::JumpTo)
+                }
+            }
             KeyCode::KeyT => Action::Contact,
             KeyCode::KeyR => Action::Review,
             KeyCode::KeyV => Action::ReviewAll,
@@ -906,6 +956,18 @@ impl App {
             && let Some(text) = text.filter(|s| s.chars().all(|c| !c.is_control()))
         {
             self.menu_input(ui::Input::Text(text.to_string()));
+            return None;
+        }
+        if code == KeyCode::KeyP
+            && self.menu_active()
+            && self
+                .docked
+                .as_ref()
+                .is_some_and(|menu| menu.screen() == ui::Screen::Galaxy)
+        {
+            if !repeat {
+                self.menu_input(ui::Input::Key(ui::Key::ProfitScan));
+            }
             return None;
         }
         if repeat
@@ -1137,6 +1199,15 @@ impl App {
             mut hud_lines,
             docked_frame,
         } = prepared;
+        if snapshot.mode == FlightMode::Flight {
+            let filter = self.game.world.target_filter();
+            if filter != meridian_core::TargetFilter::Ships {
+                hud_lines.insert(
+                    hud_lines.len().min(2),
+                    format!("TARGET FILTER: {} | F", filter.label()),
+                );
+            }
+        }
         let belt = if snapshot.mode == FlightMode::Flight {
             self.game.world.mining_belt_snapshot()
         } else {
@@ -1222,6 +1293,7 @@ impl App {
                 mule_frame.as_ref(),
             );
             let practice = self.game.world.practice_snapshot();
+            let targeting = self.game.world.targeting_snapshot();
             renderer.set_flight_view(if self.game.is_internal_validation() {
                 self.validation_view
             } else {
@@ -1234,6 +1306,8 @@ impl App {
                 SceneEffects {
                     mule: mule_scene,
                     traffic: traffic.as_ref(),
+                    targeting: targeting.as_ref(),
+                    target_details: self.target_details,
                     pulse: self.pulse.as_ref(),
                     mining: belt.as_ref().map(|belt| asteroid_render::Scene {
                         belt,

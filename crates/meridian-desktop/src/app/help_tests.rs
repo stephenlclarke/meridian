@@ -30,6 +30,56 @@ fn station(app: &mut App, screen: ui::Screen) {
 }
 
 #[test]
+fn p_toggles_chart_profit_scan_without_pausing_or_mutating_world() {
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    station(&mut app, ui::Screen::Galaxy);
+    let before = ok(app.game.world.save_bytes());
+    let paused = app.paused;
+    assert_eq!(press(&mut app, KeyCode::KeyP, Some("p")), None);
+    let shown = paint(&mut app);
+    assert!(
+        shown
+            .labels
+            .iter()
+            .any(|label| label.text == "P: Profit scan ON")
+    );
+    assert!(
+        shown
+            .labels
+            .iter()
+            .any(|label| label.text.contains("Renas:"))
+    );
+    assert_eq!(app.paused, paused);
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+    assert_eq!(press(&mut app, KeyCode::KeyP, Some("p")), None);
+    assert!(
+        paint(&mut app)
+            .labels
+            .iter()
+            .any(|label| label.text == "P: Profit scan OFF")
+    );
+    assert_eq!(press(&mut app, KeyCode::KeyH, Some("h")), None);
+    assert!(app.help.as_ref().is_some_and(|help| {
+        help.lines
+            .iter()
+            .any(|line| line.contains("P Toggle best-profit"))
+    }));
+    assert_eq!(press(&mut app, KeyCode::Escape, None), None);
+    station(&mut app, ui::Screen::System);
+    assert_eq!(
+        press(&mut app, KeyCode::KeyP, Some("p")),
+        Some(KeyCode::KeyP)
+    );
+    app.docked = None;
+    assert_eq!(
+        press(&mut app, KeyCode::KeyP, Some("p")),
+        Some(KeyCode::KeyP)
+    );
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+}
+
+#[test]
 fn every_station_help_retains_its_screen_selection_and_all_navigation_bindings() {
     let directory = TestDirectory::new();
     let mut app = app(&directory);
@@ -181,6 +231,50 @@ fn help_freezes_actual_flight_without_changing_manual_pause_or_replaying_held_fi
             assert!(app.mining.is_none());
         }
     }
+}
+
+#[test]
+fn flight_help_lists_the_computer_keys_and_consumes_them_while_open() {
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    ok(app.game.command(Action::Launch));
+    for _ in 0..120 {
+        ok(app.game.world.step(FlightInput::default()));
+    }
+    let before = ok(app.game.world.save_bytes());
+    press(&mut app, KeyCode::KeyH, Some("h"));
+    let help = app.help.as_ref().unwrap_or_else(|| panic!("flight help"));
+    let text = help.lines.join("\n");
+    for binding in [
+        "N Start / cancel auto-docking",
+        "Tab Next target",
+        "Shift+I Target details",
+    ] {
+        assert!(text.contains(binding), "Missing {binding}");
+    }
+    for key in [KeyCode::KeyN, KeyCode::Tab, KeyCode::Backspace] {
+        assert_eq!(press(&mut app, key, None), None);
+    }
+    assert!(app.help.is_some());
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+    assert!(!app.game.world.auto_docking_active());
+    press(&mut app, KeyCode::Escape, None);
+    app.game_key(KeyCode::KeyN);
+    assert!(app.game.world.auto_docking_active());
+    assert!(
+        app.game
+            .lines(true, None)
+            .iter()
+            .any(|line| line.contains("AUTO DOCK"))
+    );
+    app.game_key(KeyCode::KeyN);
+    assert!(!app.game.world.auto_docking_active());
+    app.game_key(KeyCode::KeyN);
+    press(&mut app, KeyCode::KeyH, Some("h"));
+    assert!(app.game.world.auto_docking_active());
+    app.focus_changed(false);
+    assert!(!app.game.world.auto_docking_active());
+    assert!(app.help.is_some());
 }
 
 #[test]

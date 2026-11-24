@@ -98,13 +98,16 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | Ctrl+Shift+X when docked | Explicit XYZZY testing menu; Enter reviews then confirms |
 | 0 when docked (current source) | Commander details |
 | 1 / 2 / 3 / 4 / 5 when docked | Galaxy / System / Ships / Market / Equipment |
+| P on the station Galaxy chart (development) | Toggle the best-profit scan of reachable markets; P in flight still pauses |
 | L; W/S; arrows; A/D; Q/E; Space | Launch; thrust; pitch; yaw; roll; brake |
-| J; T; R; Enter; B; F | Travel; select contact; review; confirm; cancel; buy fuel |
+| N in flight (development) | Engage the fitted navigation computer for docking, or cancel the approach |
+| F / Tab / Delete / Shift+I in flight (development) | Cycle Ships/Mining/Salvage/All filter; cycle target; release tracking; show target details |
+| J; T (docked); R; Enter; B; F (docked) | Travel; select contact; review; confirm; cancel; buy fuel |
 | M; [ / ]; G / Shift+G | Market; commodity selection; buy/sell one native unit |
 | O; K; U; Y | Equipment panel; buy/fit cargo bay; store when docked; refit |
 | Hold U in active flight | Charge the fitted EMP for 600 accepted ticks; early release cancels |
 | I; V; X | Mission details; review all held freight deliveries; review abandonment |
-| F1; F2; F3; F4 | Next ship/practice lock; arm/safe; launch one missile; safe/unlock |
+| T in flight; F1; F2; F3; F4 | Lock the selected ship; next ship/practice lock; arm/safe; launch one missile; safe/unlock |
 | F7; F8; F10 | Review attempt closure; reception; fresh consent |
 | F6; F12; C; 0/1/2/3 | Flight lesson consent/reception; cancellation; details; view direction |
 | P; F11; F5; F9 | Pause; fullscreen; save; reload the current qualified save |
@@ -142,7 +145,7 @@ Fleet construction is a separate M4 lane. Its current changed original-five run 
 
 Preview 8 retains screen-specific H/? help with explicit [XYZZY testing](docs/XYZZY.md). Every station help popup explains how to reach Galaxy, System, Showroom, Market and Equipment. Help pauses host stepping and preserves the current screen, selection, search and review. Press H or ? for flight controls or station navigation. The current desktop source clears routine text from above the instruments in idle flight and at the docked exterior. Command feedback and requested reviews still appear there. The development build also gives the Lion Citadel blue-grey plating and amber lights, with four small joins around its docking entrance. [Station exterior](docs/DOCKED-PREVIEW.md#sh028-aperture-crosspieces)
 
-At a station berth, **Ctrl+Shift+X** opens the labelled XYZZY testing menu. Use Up/Down to choose, Enter to review, then Enter again to confirm and save; Escape/B cancels the review or closes the menu. H/? opens help above the menu. First activation changes the current commander to CLARKE and sets cash to 1,000,000 CR once. It grants/refits the supported SH025 outfit with explicit secret provenance; missiles and cargo stay finite. The menu shows actual cash, current jump reach, unlimited-fuel state and missing-system limits. Reading or closing it grants nothing. Other profiles are unchanged.
+At a station berth, **Ctrl+Shift+X** opens the labelled XYZZY testing menu. Use Up/Down to choose, Enter to review, then Enter again to confirm and save. The menu stays open on the selected action. Use the arrow keys to choose another action or Escape/B to leave. H/? opens help above the menu. First activation changes the current commander to CLARKE and sets cash to 1,000,000 CR once. It grants/refits the supported SH025 outfit with explicit secret provenance; missiles and cargo stay finite. The menu shows cash, current jump reach, fuel mode, the fitted targeting grade and the three EMP grades. Reading or closing it grants nothing. Other profiles are unchanged.
 
 Source `c98fc86` passed Mac qualification: 603 top-level Rust tests (378 core, two compatibility integrations, 220 desktop and three explicit observer cases), 94 Python tests, 48 Markdown checks, formatting, all-target checks, strict Clippy and locked release. The signed isolated app passed supported native checks of all five station Help cards, navigation, blocked controls, hidden search with nested testing Help, explicit activation, visible grant provenance and a real paid Food purchase. Repeating activation preserved 999,977.4 CR and the purchased tonne. Accounted fuel was switched off, flight Help displayed the fitted Naval Laser, manual pause survived Help, and actual Save/Quit/new-process Continue retained CLARKE and the same cash, cargo and fuel mode. Precise native clock, OS exit status and a Lareria docking/refill journey were not measured. Independent native acceptance and artifact audit passed. Dell Linux and native Windows also passed the same 603 Rust and 94 Python tests, strict Clippy and locked release; native Windows importer checks used native Python. The [36-action inventory](docs/XYZZY-ACTIONS.json) retains every unsupported or partial original action. Preview 7 now publishes these features using the corrected binary described below.
 

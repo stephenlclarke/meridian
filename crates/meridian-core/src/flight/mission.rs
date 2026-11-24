@@ -216,6 +216,10 @@ impl World {
         let epoch = session.next_epoch()?;
         session.epoch = epoch;
         session.paused = paused;
+        if paused {
+            self.cancel_auto_docking();
+            self.cancel_targeting();
+        }
         Ok(())
     }
 
