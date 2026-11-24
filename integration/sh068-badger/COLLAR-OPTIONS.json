@@ -1,0 +1,36 @@
+{
+  "unchangedOtherSupportsUpperMillimetres": {
+    "detailed": 2421,
+    "native": 3757
+  },
+  "collars": {
+    "port-forward-collar": {
+      "intactUpperMillimetres": {
+        "detailed": 2431,
+        "native": 3201
+      },
+      "4SpansUpperMillimetres": {
+        "detailed": 1873,
+        "native": 1597
+      },
+      "8SpansUpperMillimetres": {
+        "detailed": 974,
+        "native": 455
+      }
+    },
+    "starboard-forward-collar": {
+      "intactUpperMillimetres": {
+        "detailed": 2431,
+        "native": 3159
+      },
+      "4SpansUpperMillimetres": {
+        "detailed": 1873,
+        "native": 1597
+      },
+      "8SpansUpperMillimetres": {
+        "detailed": 974,
+        "native": 455
+      }
+    }
+  }
+}
