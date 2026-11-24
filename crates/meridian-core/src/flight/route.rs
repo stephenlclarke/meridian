@@ -1,11 +1,12 @@
 //! World-owned route review, publication, and progress on real jumps and docks.
+use super::profit_scan::{cargo_sale_tenths, trade_profit_tenths};
 use super::{FlightMode, World};
 use crate::navigation::{
     FUEL_CAPACITY, NavigationGrade, ROUTE_SYSTEMS, RouteAlternative, RouteEconomy, RouteError,
     RoutePlan, RouteProgress, RouteStatus, SystemId, route_alternatives, route_feasible, route_hop,
 };
 use crate::save::SaveError;
-use crate::station_services::{CargoUnit, CommodityId};
+use crate::station_services::{AccountProjection, CommodityId, CommodityQuote};
 
 /// Publish these candidate bytes before applying the route to the live World.
 pub struct PreparedNavigationRoute<'a> {
@@ -75,45 +76,16 @@ impl World {
     }
 
     fn route_economy(&self) -> RouteEconomy {
-        let mut economy = RouteEconomy::default();
         let (Some(markets), Ok(cargo)) =
             (&self.station_markets, self.reserved_service_projection())
         else {
-            return economy;
+            return RouteEconomy::default();
         };
-        let open_room = u64::from(cargo.hold_capacity_tonnes.saturating_sub(cargo.used_tonnes));
-        for good in CommodityId::ALL {
-            let sellable = if good == CommodityId::Food {
-                u64::from(cargo.food_tonnes.saturating_sub(cargo.reserved_food_tonnes))
-            } else {
-                let i = good.index() - 1;
-                cargo.other_commodities[i].saturating_sub(cargo.reserved_commodities[i])
-            };
-            let room = if good.unit() == CargoUnit::Tonne {
-                open_room
-            } else {
-                63
-            };
-            let quotes = ROUTE_SYSTEMS.map(|system| {
-                super::services::service_site(system)
-                    .map(|site| markets.commodity_quote(site, good))
-            });
-            for (to, destination) in quotes.iter().enumerate() {
-                let Some(destination) = destination else {
-                    continue;
-                };
-                economy.sale[to] = economy.sale[to]
-                    .saturating_add(sellable.saturating_mul(u64::from(destination.bid_tenths)));
-                for (from, source) in quotes.iter().enumerate() {
-                    let Some(source) = source else { continue };
-                    let profit =
-                        u64::from(destination.bid_tenths.saturating_sub(source.ask_tenths));
-                    let potential = profit * source.stock.min(room).min(63);
-                    economy.trade[from][to] = economy.trade[from][to].max(potential);
-                }
-            }
-        }
-        economy
+        let quotes = ROUTE_SYSTEMS.map(|system| {
+            super::services::service_site(system)
+                .map(|site| CommodityId::ALL.map(|id| markets.commodity_quote(site, id)))
+        });
+        estimate_route_economy(cargo, &quotes)
     }
 
     pub fn active_route_progress(&self) -> Option<RouteProgress> {
@@ -274,6 +246,25 @@ impl World {
         }
         Ok(())
     }
+}
+
+fn estimate_route_economy(
+    cargo: AccountProjection,
+    markets: &[Option<[CommodityQuote; 17]>; ROUTE_SYSTEMS.len()],
+) -> RouteEconomy {
+    let mut economy = RouteEconomy::default();
+    for (to, target) in markets.iter().enumerate() {
+        let Some(target) = target else { continue };
+        economy.sale[to] = cargo_sale_tenths(cargo, target);
+        for (from, origin) in markets.iter().enumerate() {
+            if from != to
+                && let Some(origin) = origin
+            {
+                economy.trade[from][to] = trade_profit_tenths(cargo, origin, target);
+            }
+        }
+    }
+    economy
 }
 
 #[cfg(test)]

@@ -220,3 +220,64 @@ fn actual_jump_arrival_waits_for_physical_dock_then_requires_paid_refuelling() {
     assert_eq!(completed.completed_legs, 2);
     assert_eq!(completed.status, RouteStatus::Complete);
 }
+
+#[test]
+fn route_estimates_share_cash_and_limit_market_capacity_and_non_tonne_room() {
+    use crate::station_services::{MAX_MARKET_QUANTITY, MarketSite, StationMarkets};
+
+    let world = World::new_commander(11105).unwrap();
+    let mut cargo = world.reserved_service_projection().unwrap();
+    cargo.hold_capacity_tonnes = 8;
+    cargo.used_tonnes = 4;
+    cargo.food_tonnes = 4;
+    cargo.reserved_food_tonnes = 2;
+    let gold = CommodityId::Gold.index();
+    let textiles = CommodityId::Textiles.index();
+    cargo.other_commodities[gold - 1] = 62;
+    cargo.reserved_commodities[gold - 1] = 61;
+    let markets = StationMarkets::new_commander(11105).unwrap();
+    let empty_market = |site| {
+        CommodityId::ALL.map(|id| CommodityQuote {
+            bid_tenths: 0,
+            ask_tenths: 0,
+            stock: 0,
+            ..markets.commodity_quote(site, id)
+        })
+    };
+    let mut origin = empty_market(MarketSite::Avenor);
+    origin[gold].ask_tenths = 5;
+    origin[gold].stock = 10;
+    origin[textiles].ask_tenths = 20;
+    origin[textiles].stock = 1;
+    let mut destination = empty_market(MarketSite::Lareria);
+    destination[0].bid_tenths = 25;
+    destination[0].stock = MAX_MARKET_QUANTITY - 1;
+    destination[gold].bid_tenths = 15;
+    destination[textiles].bid_tenths = 40;
+
+    cargo.credits_tenths = 0;
+    let empty_wallet = estimate_route_economy(cargo, &[Some(origin), Some(destination), None]);
+    assert_eq!(empty_wallet.trade[0][1], 0);
+    assert_eq!(empty_wallet.sale, [0, 40, 0]);
+
+    cargo.credits_tenths = 25;
+    let limited = estimate_route_economy(cargo, &[Some(origin), Some(destination), None]);
+    assert_eq!(limited.trade[0][1], 30);
+    assert_eq!(limited.sale[1], 40);
+    assert_eq!(limited.trade[1][1], 0);
+
+    cargo.credits_tenths = 100;
+    let non_tonne_room = estimate_route_economy(cargo, &[Some(origin), Some(destination), None]);
+    assert_eq!(non_tonne_room.trade[0][1], 30);
+
+    destination[gold].stock = MAX_MARKET_QUANTITY - 1;
+    let full_after_own_sale =
+        estimate_route_economy(cargo, &[Some(origin), Some(destination), None]);
+    assert_eq!(full_after_own_sale.trade[0][1], 20);
+    assert_eq!(full_after_own_sale.sale[1], 40);
+
+    cargo.credits_tenths = u32::MAX - 5;
+    let saturated = estimate_route_economy(cargo, &[Some(origin), Some(destination), None]);
+    assert_eq!(saturated.trade[0][1], 0);
+    assert_eq!(saturated.sale[1], 5);
+}

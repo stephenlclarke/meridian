@@ -85,27 +85,40 @@ fn cargo_quantity(cargo: AccountProjection, id: CommodityId) -> (u64, u64) {
     }
 }
 
-fn estimate(
+fn sale_projection(cargo: AccountProjection, market: &[CommodityQuote; 17]) -> (u128, [u64; 17]) {
+    let mut sale = 0;
+    let mut capacity = [0; 17];
+    for id in CommodityId::ALL {
+        let i = id.index();
+        let (held, reserved) = cargo_quantity(cargo, id);
+        let available = MAX_MARKET_QUANTITY.saturating_sub(market[i].stock);
+        let sold = held.saturating_sub(reserved).min(available);
+        capacity[i] = available - sold;
+        sale += u128::from(sold) * u128::from(market[i].bid_tenths);
+    }
+    (sale, capacity)
+}
+
+fn settled_wallet(cash: u64, sale: u128) -> u64 {
+    (u128::from(cash) + sale).min(u128::from(u32::MAX)) as u64
+}
+
+/// Credits from selling current, unreserved cargo into this market.
+pub(super) fn cargo_sale_tenths(cargo: AccountProjection, market: &[CommodityQuote; 17]) -> u64 {
+    let cash = u64::from(cargo.credits_tenths);
+    settled_wallet(cash, sale_projection(cargo, market).0) - cash
+}
+
+/// Additional credits from affordable exports after allowing for onboard cargo at the destination.
+pub(super) fn trade_profit_tenths(
     cargo: AccountProjection,
     origin: &[CommodityQuote; 17],
     target: &[CommodityQuote; 17],
 ) -> u64 {
     let mut room = u64::from(cargo.hold_capacity_tonnes.saturating_sub(cargo.used_tonnes));
     let mut cash = u64::from(cargo.credits_tenths);
-    let mut direct_sale = 0_u128;
-    let mut destination_sale = 0_u128;
-    let mut destination_capacity = [0; 17];
-    for id in CommodityId::ALL {
-        let i = id.index();
-        let (held, reserved) = cargo_quantity(cargo, id);
-        let sellable = held.saturating_sub(reserved);
-        let local_qty = sellable.min(MAX_MARKET_QUANTITY.saturating_sub(origin[i].stock));
-        let capacity = MAX_MARKET_QUANTITY.saturating_sub(target[i].stock);
-        let target_qty = sellable.min(capacity);
-        destination_capacity[i] = capacity - target_qty;
-        direct_sale += u128::from(local_qty) * u128::from(origin[i].bid_tenths);
-        destination_sale += u128::from(target_qty) * u128::from(target[i].bid_tenths);
-    }
+    let (mut destination_sale, destination_capacity) = sale_projection(cargo, target);
+    let destination_without_exports = settled_wallet(cash, destination_sale);
     // Original scan buys highest positive unit margin first. Share the same wallet and hold;
     // the three non-tonne goods retain the legacy scan's independent 63-unit purchase cap.
     let mut exports = CommodityId::ALL;
@@ -139,10 +152,16 @@ fn estimate(
         }
         destination_sale += u128::from(quantity) * u128::from(target[i].bid_tenths);
     }
-    // Native sales saturate cash at u32::MAX. Compare final wealth on the two paths.
-    let direct = (u128::from(cargo.credits_tenths) + direct_sale).min(u128::from(u32::MAX));
-    let remote = (u128::from(cash) + destination_sale).min(u128::from(u32::MAX));
-    u64::try_from(remote.saturating_sub(direct)).unwrap_or_default()
+    settled_wallet(cash, destination_sale).saturating_sub(destination_without_exports)
+}
+
+fn estimate(
+    cargo: AccountProjection,
+    origin: &[CommodityQuote; 17],
+    target: &[CommodityQuote; 17],
+) -> u64 {
+    let remote = cargo_sale_tenths(cargo, target) + trade_profit_tenths(cargo, origin, target);
+    remote.saturating_sub(cargo_sale_tenths(cargo, origin))
 }
 
 #[cfg(test)]

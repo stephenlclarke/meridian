@@ -453,4 +453,6 @@ The exact public Mac wrapper is installed side-by-side at `/Users/sclarke/Applic
 
 ## Flight computer development
 
+Route previews use the station profit scan’s finite wallet, stock, receiving capacity and cargo limits. Trade profit uses current quotes before fuel costs. Each leg is priced independently from the current wallet and hold. The best cargo-sale estimate shows what the existing unreserved cargo can earn at a single stop.
+
 The development branch retains the XYZZY menu selection after a successful save. A failed save retains the confirmation for retry or cancellation. The secret cargo-bay receipt now validates independently of the local shop offer. Native preview qualification is pending.

@@ -100,17 +100,22 @@ pub(super) fn project(s: &DockedScreens, context: &Context<'_>, frame: &mut Fram
                 f64::from(route.fuel_units) / 10.0
             ),
             format!(
-                "Risk {:.2} | Trade {} CR",
+                "Risk {:.2} | Trade est. {} CR",
                 route.risk,
                 money(route.trade_tenths)
             ),
-            format!("Existing cargo sale {} CR", money(route.cargo_sale_tenths)),
+            format!("Best cargo sale est. {} CR", money(route.cargo_sale_tenths)),
             route
                 .preferences
                 .iter()
                 .map(|value| value.label())
                 .collect::<Vec<_>>()
                 .join(" / "),
+            if route.plan.systems().len() > 2 {
+                "Trade legs priced separately".into()
+            } else {
+                "Based on current quotes".into()
+            },
             if route.plan.systems().len() > 2 {
                 "Refuel at intermediate stops as needed".into()
             } else {
