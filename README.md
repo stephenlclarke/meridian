@@ -141,6 +141,7 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Wombat source envelope and Hull Studio definition](docs/WOMBAT-SOURCE.md)
 - [Saiga source envelope and Hull Studio definition](docs/SAIGA-SOURCE.md)
 - [Moose Clipper source envelope and Hull Studio definition](docs/MOOSE-CLIPPER-SOURCE.md)
+- [Seriema Courier source envelope and Hull Studio definition](docs/SERIEMA-COURIER-SOURCE.md)
 - [Stag Liner source envelope and Hull Studio definition](docs/STAG-LINER-GAMEPLAY-ENVELOPE.md)
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)
