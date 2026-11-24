@@ -72,6 +72,10 @@ The Harpy Gunship inspection package preserves both original sand-maroon meshes 
 
 The Lanner package preserves the original plum-gold meshes and frozen relative coordinate scale. The 936-face archived native mesh remains separate from the 456-face creator-pinned candidate used in the signed offline artwork export. Both retain the 18 original parts. The source replay verifies 75 supports and seven routes across both arrangements. The frozen runtime catalogue disables player flight and normal purchase. The original R3 contract specifies player flight after blueprint fabrication. [Lanner source and evidence](LANNER-SOURCE.md)
 
+## Hyena catalogue source
+
+The Hyena package preserves the original sand-graphite meshes and frozen relative calibration. The signed offline artwork export uses the separate 504-face creator-pinned candidate. The 952-face original native mesh remains archived. Both contain the 26 original native parts. Source replay verifies seven routes across both arrangements. The frozen runtime catalogue disables player flight and normal purchase. The original R3 contract specifies player flight after blueprint fabrication. [Hyena source and evidence](HYENA-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)
