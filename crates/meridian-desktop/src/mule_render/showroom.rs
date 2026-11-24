@@ -1,7 +1,5 @@
-//! Source-authenticated Goshawk showroom presentation. Inputs grant no World authority.
-use super::{
-    Piece, Triangle, Vec3, VisualVertex, decode_visual, gpu, subtract, support_mesh, vector,
-};
+//! Source-authenticated Goshawk Showroom presentation. Inputs grant no World authority.
+use super::{Piece, Triangle, Vec3, VisualVertex, gpu, subtract, support_mesh, vector};
 use crate::docked_screens::{ModelPreview, Orientation, Rect};
 use meridian_core::{
     docking::Basis3,
@@ -13,16 +11,16 @@ use meridian_core::{
         CUSTOM_DETAILED_FACES, CUSTOM_DETAILED_VERTICES, CUSTOM_NATIVE_VERTICES, CUSTOM_PIECES,
         GoshawkCustomHullSource,
     },
-    mule::EnvelopeError,
+    goshawk_mk2::{GOSHAWK_MK2_PIECES, GoshawkMk2HullSource},
+    mule::SmoothPiece,
 };
 
 pub(crate) const GEOMETRY_KEY: &str = "assets/fleet/sh008/visual.bin";
-const VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh008/visual.bin");
-const VERTICES: usize = 3_484 * 3;
-const VISUAL_FNV: u64 = 0x7a17_0c0c_6cdc_d5fd;
+pub(crate) const MK2_GEOMETRY_KEY: &str = "assets/fleet/sh009/visual.bin";
 pub(crate) const CUSTOM_GEOMETRY_KEY: &str = "assets/fleet/sh010/visual.bin";
-const CUSTOM_VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh010/visual.bin");
-const CUSTOM_VISUAL_FNV: u64 = 0xfe21_3755_8ea3_8ccb;
+const VERTICES: usize = 3_484 * 3;
+const MK2_SOURCE_POINTS: usize = 2_104 + 568;
+mod visual_assets;
 const EMPTY_PIECE: Piece = Piece {
     range: [0; 4],
     low: [0.0; 4],
@@ -32,98 +30,126 @@ const EMPTY_PIECE: Piece = Piece {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum Hull {
     Explorer,
+    Mk2,
     Custom,
 }
 
-pub(crate) fn hull(model: &ModelPreview) -> Option<Hull> {
-    match (model.object.as_str(), model.geometry_key.as_str()) {
-        ("SH008", GEOMETRY_KEY) => Some(Hull::Explorer),
-        ("SH010", CUSTOM_GEOMETRY_KEY) => Some(Hull::Custom),
-        _ => None,
-    }
-}
-
-pub(crate) fn matches(model: &ModelPreview) -> bool {
-    hull(model).is_some()
-}
-
-fn authenticated_visual(
-    bytes: &[u8],
-    expected_hash: u64,
-    magic: &[u8; 8],
-    count: usize,
-) -> Result<Vec<VisualVertex>, &'static str> {
-    let hash = bytes.iter().fold(0xcbf2_9ce4_8422_2325_u64, |hash, byte| {
-        (hash ^ u64::from(*byte)).wrapping_mul(0x100_0000_01b3)
-    });
-    if hash != expected_hash {
-        return Err("Goshawk preview bytes changed");
-    }
-    decode_visual(bytes, magic, count)
-}
-
-fn visual() -> Result<Vec<VisualVertex>, &'static str> {
-    authenticated_visual(VISUAL, VISUAL_FNV, b"GOSHVIZ1", VERTICES)
-}
-
-fn shader(piece_count: usize) -> String {
-    include_str!("mule.wgsl").replacen(
-        "const MULE_PIECES: u32 = 34u;",
-        &format!("const MULE_PIECES: u32 = {piece_count}u;"),
-        1,
-    )
-}
-
 impl Hull {
-    fn visual(self) -> Result<Vec<VisualVertex>, &'static str> {
+    pub(crate) const COUNT: usize = 3;
+
+    pub(crate) fn from_model(model: &ModelPreview) -> Option<Self> {
+        match (model.object.as_str(), model.geometry_key.as_str()) {
+            ("SH008", GEOMETRY_KEY) => Some(Self::Explorer),
+            ("SH009", MK2_GEOMETRY_KEY) => Some(Self::Mk2),
+            ("SH010", CUSTOM_GEOMETRY_KEY) => Some(Self::Custom),
+            _ => None,
+        }
+    }
+
+    fn geometry_key(self) -> &'static str {
         match self {
-            Self::Explorer => visual(),
-            Self::Custom => authenticated_visual(
-                CUSTOM_VISUAL,
-                CUSTOM_VISUAL_FNV,
-                b"SH010VZ1",
-                CUSTOM_DETAILED_FACES * 3,
-            ),
+            Self::Explorer => GEOMETRY_KEY,
+            Self::Mk2 => MK2_GEOMETRY_KEY,
+            Self::Custom => CUSTOM_GEOMETRY_KEY,
+        }
+    }
+
+    fn object_id(self) -> &'static str {
+        match self {
+            Self::Explorer => "SH008",
+            Self::Mk2 => "SH009",
+            Self::Custom => "SH010",
         }
     }
 
     fn piece_count(self) -> usize {
         match self {
             Self::Explorer => GOSHAWK_PIECES,
+            Self::Mk2 => GOSHAWK_MK2_PIECES,
             Self::Custom => CUSTOM_PIECES,
         }
     }
 
-    fn supports(self) -> Result<(Vec<Triangle>, Vec<Piece>), SupportError> {
+    fn uniform_size(self) -> usize {
+        size_of::<Uniforms>() + self.piece_count() * size_of::<Piece>()
+    }
+
+    fn supports(self) -> Result<Supports, String> {
         match self {
             Self::Explorer => {
-                let source = GoshawkHullSource::bundled().map_err(SupportError::Source)?;
-                let (triangles, pieces) = support_mesh(
+                let source = GoshawkHullSource::bundled().map_err(|e| e.to_string())?;
+                Ok(Supports::new(
+                    self,
                     source.pieces().as_ref(),
                     GOSHAWK_DETAILED_VERTICES + GOSHAWK_NATIVE_CANDIDATE_VERTICES,
-                )
-                .map_err(SupportError::Render)?;
-                Ok((triangles, pieces.to_vec()))
+                ))
+            }
+            Self::Mk2 => {
+                let source = GoshawkMk2HullSource::bundled().map_err(|e| e.to_string())?;
+                Ok(Supports::new(
+                    self,
+                    source.pieces().as_ref(),
+                    MK2_SOURCE_POINTS,
+                ))
             }
             Self::Custom => {
-                let source = GoshawkCustomHullSource::bundled().map_err(SupportError::Source)?;
-                let (triangles, pieces) = support_mesh(
+                let source = GoshawkCustomHullSource::bundled().map_err(|e| e.to_string())?;
+                Ok(Supports::new(
+                    self,
                     source.pieces(),
                     CUSTOM_DETAILED_VERTICES + CUSTOM_NATIVE_VERTICES,
-                )
-                .map_err(SupportError::Render)?;
-                Ok((triangles, pieces.to_vec()))
+                ))
             }
         }
     }
 }
 
-#[derive(Debug)]
-enum SupportError {
-    Source(EnvelopeError),
-    Render(&'static str),
+pub(crate) fn hull(model: &ModelPreview) -> Option<Hull> {
+    Hull::from_model(model)
 }
 
+pub(crate) fn matches(model: &ModelPreview) -> bool {
+    hull(model).is_some()
+}
+
+fn shader(hull: Hull) -> String {
+    include_str!("mule.wgsl").replacen(
+        "const MULE_PIECES: u32 = 34u;",
+        &format!("const MULE_PIECES: u32 = {}u;", hull.piece_count()),
+        1,
+    )
+}
+
+struct Supports {
+    triangles: Vec<Triangle>,
+    pieces: Vec<Piece>,
+    shimmer: bool,
+}
+
+impl Supports {
+    fn new<const N: usize>(hull: Hull, pieces: &[SmoothPiece; N], expected_points: usize) -> Self {
+        match support_mesh(pieces, expected_points) {
+            Ok((triangles, pieces)) => Self {
+                triangles,
+                pieces: pieces.to_vec(),
+                shimmer: true,
+            },
+            Err(reason) => {
+                eprintln!(
+                    "Meridian {} showroom shimmer unavailable: {reason}",
+                    hull.object_id()
+                );
+                Self {
+                    triangles: vec![bytemuck::Zeroable::zeroed()],
+                    pieces: vec![EMPTY_PIECE; N],
+                    shimmer: false,
+                }
+            }
+        }
+    }
+}
+
+/// Exact WGSL header. The hull-specific contiguous `Piece` array immediately follows it.
 #[repr(C)]
 #[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
 struct Uniforms {
@@ -145,7 +171,7 @@ struct View {
     high: [f32; 4],
 }
 impl View {
-    fn new(vertices: &[VisualVertex], pieces: impl AsRef<[Piece]>) -> Self {
+    fn new(vertices: &[VisualVertex], pieces: &[Piece]) -> Self {
         let mut low = [f32::INFINITY; 4];
         let mut high = [f32::NEG_INFINITY; 4];
         let mut visual_low = [f32::INFINITY; 3];
@@ -167,7 +193,7 @@ impl View {
                 delta.dot(delta).sqrt()
             })
             .fold(0.0, f64::max);
-        for piece in pieces.as_ref() {
+        for piece in pieces {
             let stand_off = piece.low[3] + 0.001;
             for axis in 0..3 {
                 low[axis] = low[axis].min(piece.low[axis] - stand_off);
@@ -246,84 +272,55 @@ fn point([x, y, z]: [f32; 3]) -> Vec3 {
 }
 
 pub(crate) struct Pass {
+    hull: Hull,
     hardware: gpu::Hardware,
     view: View,
     viewport: [f32; 4],
     shimmer: bool,
-    hull: Hull,
-    vertex_count: u32,
+    draw_count: u32,
 }
 
 impl Pass {
-    pub(crate) fn new(
-        device: &wgpu::Device,
-        queue: &wgpu::Queue,
-        format: wgpu::TextureFormat,
-    ) -> Result<Self, String> {
-        Self::construct(device, queue, format, Hull::Explorer)
-    }
-
     pub(crate) fn for_hull(
         device: &wgpu::Device,
         queue: &wgpu::Queue,
         format: wgpu::TextureFormat,
         hull: Hull,
     ) -> Result<Self, String> {
-        match hull {
-            Hull::Explorer => Self::new(device, queue, format),
-            Hull::Custom => Self::construct(device, queue, format, hull),
-        }
-    }
-
-    pub(crate) fn hull(&self) -> Hull {
-        self.hull
-    }
-
-    fn construct(
-        device: &wgpu::Device,
-        queue: &wgpu::Queue,
-        format: wgpu::TextureFormat,
-        hull: Hull,
-    ) -> Result<Self, String> {
-        let vertices = hull.visual()?;
-        let (triangles, pieces, shimmer) = match hull.supports() {
-            Ok((triangles, pieces)) => (triangles, pieces, true),
-            Err(SupportError::Source(reason)) => return Err(reason.to_string()),
-            Err(SupportError::Render(reason)) => {
-                eprintln!("Meridian {hull:?} showroom shimmer unavailable: {reason}");
-                (
-                    vec![bytemuck::Zeroable::zeroed()],
-                    vec![EMPTY_PIECE; hull.piece_count()],
-                    false,
-                )
-            }
-        };
+        let vertices = visual_assets::load(hull.geometry_key())?;
+        let supports = hull.supports()?;
+        let draw_count =
+            u32::try_from(vertices.len()).map_err(|_| "Goshawk visual count overflow")?;
         let hardware = gpu::Hardware::new(
             device,
             queue,
             format,
             gpu::Inputs {
-                shader: &shader(hull.piece_count()),
-                uniform_size: (size_of::<Uniforms>() + pieces.len() * size_of::<Piece>()) as u64,
-                points: &triangles,
+                shader: &shader(hull),
+                uniform_size: hull.uniform_size() as u64,
+                points: &supports.triangles,
                 visual: &vertices,
             },
         )?;
-        // The uniform header and all source-local support records are contiguous in WGSL.
-        // Support data is immutable for this pass, so write it only when constructing the asset.
+        // The pieces are immutable for the lifetime of this hull-bound pass. Only the header
+        // changes with orientation and viewport, so each hull's exact pieces are uploaded once.
         queue.write_buffer(
             &hardware.uniform,
             size_of::<Uniforms>() as u64,
-            bytemuck::cast_slice(&pieces),
+            bytemuck::cast_slice(&supports.pieces),
         );
         Ok(Self {
-            hardware,
-            view: View::new(&vertices, &pieces),
-            viewport: [0.0; 4],
-            shimmer,
             hull,
-            vertex_count: vertices.len() as u32,
+            hardware,
+            view: View::new(&vertices, &supports.pieces),
+            viewport: [0.0; 4],
+            shimmer: supports.shimmer,
+            draw_count,
         })
+    }
+
+    pub(crate) fn hull(&self) -> Hull {
+        self.hull
     }
 
     pub(crate) fn prepare(
@@ -334,8 +331,8 @@ impl Pass {
         scale: [f64; 2],
         srgb: bool,
     ) -> Result<(), String> {
-        if hull(model) != Some(self.hull) {
-            return Err("Goshawk Showroom hull mismatch".into());
+        if Hull::from_model(model) != Some(self.hull) {
+            return Err("Goshawk Showroom pass does not match selected hull".into());
         }
         let [x, y, width, height] = [
             bounds.x * scale[0],
@@ -343,10 +340,19 @@ impl Pass {
             bounds.width * scale[0],
             bounds.height * scale[1],
         ];
+        let viewport = [x as f32, y as f32, width as f32, height as f32];
+        if !viewport.into_iter().all(f32::is_finite)
+            || viewport[0] < 0.0
+            || viewport[1] < 0.0
+            || viewport[2] <= 0.0
+            || viewport[3] <= 0.0
+        {
+            return Err("Invalid Goshawk Showroom viewport".into());
+        }
         let data = self
             .view
             .uniforms(model.orientation, width / height, srgb)?;
-        self.viewport = [x as f32, y as f32, width as f32, height as f32];
+        self.viewport = viewport;
         queue.write_buffer(&self.hardware.uniform, 0, bytemuck::bytes_of(&data));
         Ok(())
     }
@@ -366,7 +372,7 @@ impl Pass {
         render.set_pipeline(&self.hardware.solid);
         render.set_bind_group(0, &self.hardware.group, &[]);
         render.set_vertex_buffer(0, self.hardware.vertices.slice(..));
-        render.draw(0..self.vertex_count, 0..1);
+        render.draw(0..self.draw_count, 0..1);
     }
 
     fn draw_shimmer(&self, render: &mut wgpu::RenderPass<'_>) {
@@ -396,55 +402,12 @@ mod tests {
         result.unwrap_or_else(|error| panic!("{error:?}"))
     }
 
-    #[test]
-    fn goshawk_original_visual_and_all_local_supports_bind_to_the_shader() {
-        check_variant(Hull::Explorer, 3484, GOSHAWK_PIECES);
-    }
-
-    #[test]
-    fn custom_original_visual_and_all_local_supports_bind_to_its_own_shader() {
-        check_variant(Hull::Custom, CUSTOM_DETAILED_FACES, CUSTOM_PIECES);
-        assert!(authenticated_visual(CUSTOM_VISUAL, VISUAL_FNV, b"GOSHVIZ1", VERTICES).is_err());
-        assert!(
-            authenticated_visual(
-                VISUAL,
-                CUSTOM_VISUAL_FNV,
-                b"SH010VZ1",
-                CUSTOM_DETAILED_FACES * 3
-            )
-            .is_err()
-        );
-        let mut model = ModelPreview {
-            object: "SH010".into(),
-            geometry_key: CUSTOM_GEOMETRY_KEY.into(),
-            bounds: Rect::new(0.0, 0.0, 256.0, 256.0),
-            orientation: Orientation::default(),
-        };
-        assert_eq!(hull(&model), Some(Hull::Custom));
-        model.geometry_key = GEOMETRY_KEY.into();
-        assert!(!matches(&model));
-        model.object = "SH008".into();
-        assert_eq!(hull(&model), Some(Hull::Explorer));
-        model.geometry_key = CUSTOM_GEOMETRY_KEY.into();
-        assert!(!matches(&model));
-    }
-
-    fn check_variant(hull: Hull, face_count: usize, piece_count: usize) {
-        let vertices = ok(hull.visual());
-        assert_eq!(vertices.len(), face_count * 3);
-        let (triangles, pieces) = ok(hull.supports());
-        assert_eq!(pieces.len(), piece_count);
-        assert!(!triangles.is_empty());
-        assert!(
-            pieces
-                .iter()
-                .all(|piece| piece.range[1] > 0 && piece.low[3] == 0.02)
-        );
-        let view = View::new(&vertices, pieces);
+    fn assert_projection(vertices: &[VisualVertex], pieces: &[Piece]) {
+        let view = View::new(vertices, pieces);
         for aspect in [0.5, 1.0, 4.0] {
             let data = ok(view.uniforms(Orientation::default(), aspect, true));
             let [aspect, focal, near, far] = data.projection;
-            for v in &vertices {
+            for v in vertices {
                 let [a, b, c] = v.position;
                 let [x, y, z]: [f32; 3] = std::array::from_fn(|i| {
                     data.origin[i] + a * data.x[i] + b * data.y[i] + c * data.z[i]
@@ -454,7 +417,10 @@ mod tests {
                 assert!((y * focal).abs() <= z);
             }
         }
-        let module = ok(naga::front::wgsl::parse_str(&shader(piece_count)));
+    }
+
+    fn assert_shader_layout(hull: Hull) {
+        let module = ok(naga::front::wgsl::parse_str(&shader(hull)));
         ok(naga::valid::Validator::new(
             naga::valid::ValidationFlags::all(),
             naga::valid::Capabilities::empty(),
@@ -469,12 +435,15 @@ mod tests {
         let TypeInner::Struct { members, span } = input else {
             panic!("unexpected shader Inputs")
         };
-        assert_eq!(
-            *span as usize,
-            size_of::<Uniforms>() + piece_count * size_of::<Piece>()
-        );
+        assert_eq!(*span as usize, hull.uniform_size());
         let pieces = members.last().unwrap_or_else(|| panic!("missing pieces"));
         assert_eq!(pieces.offset as usize, size_of::<Uniforms>());
+        assert_eq!(size_of::<Uniforms>(), 9 * 16);
+        let camera = &members[5];
+        assert_eq!(
+            camera.offset as usize,
+            std::mem::offset_of!(Uniforms, camera)
+        );
         let TypeInner::Array {
             size: ArraySize::Constant(count),
             stride,
@@ -483,7 +452,97 @@ mod tests {
         else {
             panic!("unexpected GPU support array");
         };
-        assert_eq!(count.get() as usize, piece_count);
+        assert_eq!(count.get() as usize, hull.piece_count());
         assert_eq!(*stride as usize, size_of::<Piece>());
+    }
+
+    fn assert_local_supports<const N: usize>(hull: Hull, original: &[SmoothPiece; N]) -> Supports {
+        let supports = ok(hull.supports());
+        assert!(
+            supports.shimmer,
+            "{hull:?} source support certification failed"
+        );
+        assert_eq!(supports.pieces.len(), original.len());
+        assert!(!supports.triangles.is_empty());
+        let mut first = 0;
+        for (rendered, source) in supports.pieces.iter().zip(original) {
+            assert_eq!(rendered.range[0], first);
+            assert!(rendered.range[1] > 0);
+            first += rendered.range[1];
+            let (low, high) = source.source_bounds();
+            assert_eq!(rendered.low[..3], vector(low)[..3]);
+            assert_eq!(rendered.high[..3], vector(high)[..3]);
+            assert_eq!(rendered.low[3], source.rounding_metres() as f32);
+            assert_eq!(rendered.low[3], 0.02);
+        }
+        assert_eq!(first as usize, supports.triangles.len());
+        supports
+    }
+
+    #[test]
+    fn goshawk_original_visual_and_all_local_supports_bind_to_the_shader() {
+        let hull = Hull::Explorer;
+        let vertices = ok(visual_assets::load(hull.geometry_key()));
+        assert_eq!(vertices.len(), 3_484 * 3);
+        let source = ok(GoshawkHullSource::bundled());
+        let supports = assert_local_supports(hull, source.pieces().as_ref());
+        assert_projection(&vertices, &supports.pieces);
+        assert_shader_layout(hull);
+    }
+
+    #[test]
+    fn goshawk_mk2_original_visual_and_73_local_supports_bind_to_the_shader() {
+        let hull = Hull::Mk2;
+        let vertices = ok(visual_assets::load(hull.geometry_key()));
+        assert_eq!(vertices.len(), 3_532 * 3);
+        let source = ok(GoshawkMk2HullSource::bundled());
+        let supports = assert_local_supports(hull, source.pieces().as_ref());
+        assert_eq!(supports.pieces.len(), 73);
+        assert_projection(&vertices, &supports.pieces);
+        assert_shader_layout(hull);
+    }
+
+    #[test]
+    fn custom_original_visual_and_all_local_supports_bind_to_its_own_shader() {
+        let hull = Hull::Custom;
+        let vertices = ok(visual_assets::load(hull.geometry_key()));
+        assert_eq!(vertices.len(), CUSTOM_DETAILED_FACES * 3);
+        let source = ok(GoshawkCustomHullSource::bundled());
+        let supports = assert_local_supports(hull, source.pieces());
+        assert_eq!(supports.pieces.len(), CUSTOM_PIECES);
+        assert_projection(&vertices, &supports.pieces);
+        assert_shader_layout(hull);
+    }
+
+    #[test]
+    fn source_selection_requires_matching_ship_id_and_geometry_key() {
+        let preview = |object: &str, geometry_key: &str| ModelPreview {
+            object: object.into(),
+            geometry_key: geometry_key.into(),
+            bounds: Rect::new(0.0, 0.0, 100.0, 100.0),
+            orientation: Orientation::default(),
+        };
+        for (object, key, hull) in [
+            ("SH008", GEOMETRY_KEY, Hull::Explorer),
+            ("SH009", MK2_GEOMETRY_KEY, Hull::Mk2),
+            ("SH010", CUSTOM_GEOMETRY_KEY, Hull::Custom),
+        ] {
+            let model = preview(object, key);
+            assert_eq!(Hull::from_model(&model), Some(hull));
+            assert!(matches(&model));
+        }
+        for model in [
+            preview("SH008", MK2_GEOMETRY_KEY),
+            preview("SH009", GEOMETRY_KEY),
+            preview("SH025", MK2_GEOMETRY_KEY),
+            preview("SH008", CUSTOM_GEOMETRY_KEY),
+            preview("SH009", CUSTOM_GEOMETRY_KEY),
+            preview("SH010", GEOMETRY_KEY),
+            preview("SH010", MK2_GEOMETRY_KEY),
+            preview("SH025", CUSTOM_GEOMETRY_KEY),
+        ] {
+            assert_eq!(Hull::from_model(&model), None);
+            assert!(!matches(&model));
+        }
     }
 }

@@ -290,19 +290,24 @@ fn current_system_planet_preview_uses_actual_world_recipe_and_never_a_foreign_wo
 
 #[test]
 fn selecting_goshawk_routes_the_original_preview_without_granting_exchange() {
-    assert_goshawk_preview("Goshawk Explorer", "SH008", "assets/fleet/sh008/visual.bin");
+    assert_showroom_selection("Goshawk Explorer", "SH008", "assets/fleet/sh008/visual.bin");
+}
+
+#[test]
+fn selecting_goshawk_mk2_routes_its_own_original_preview_without_granting_exchange() {
+    assert_showroom_selection("Goshawk Mk II", "SH009", "assets/fleet/sh009/visual.bin");
 }
 
 #[test]
 fn selecting_mk_ii_custom_routes_its_own_preview_without_granting_exchange() {
-    assert_goshawk_preview(
+    assert_showroom_selection(
         "Goshawk Mk II Custom",
         "SH010",
         "assets/fleet/sh010/visual.bin",
     );
 }
 
-fn assert_goshawk_preview(name: &str, id: &str, key: &str) {
+fn assert_showroom_selection(query: &str, object: &str, geometry_key: &str) {
     use crate::docked_screens::{Catalogue, DockedScreens, Input, Key, Outcome, Screen, Viewport};
     let world = meridian_core::World::new_commander(95006).unwrap_or_else(|e| panic!("{e}"));
     let save = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
@@ -319,10 +324,10 @@ fn assert_goshawk_preview(name: &str, id: &str, key: &str) {
     assert!(ui.search_active());
     let frame = ui.frame(&ctx, viewport);
     assert!(matches!(
-        ui.handle(Input::Text(name.into()), &frame, &ctx),
+        ui.handle(Input::Text(query.into()), &frame, &ctx),
         Outcome::Updated
     ));
-    assert_eq!(ui.selected_ship(), id);
+    assert_eq!(ui.selected_ship(), object);
     let frame = ui.frame(&ctx, viewport);
     assert!(matches!(
         ui.handle(Input::Key(Key::Confirm), &frame, &ctx),
@@ -340,8 +345,8 @@ fn assert_goshawk_preview(name: &str, id: &str, key: &str) {
     assert_eq!(baseline.object, "SH025");
     assert_eq!(baseline.geometry_key, SHIP_KEY);
     assert!(current_model.matches(baseline));
-    assert_eq!(selected.object, id);
-    assert_eq!(selected.geometry_key, key);
+    assert_eq!(selected.object, object);
+    assert_eq!(selected.geometry_key, geometry_key);
     assert!(crate::mule_render::showroom::matches(selected));
     assert!(baseline.bounds.x + baseline.bounds.width <= selected.bounds.x);
     let mut geometry = Geometry::with_capacity();
@@ -378,7 +383,7 @@ fn assert_goshawk_preview(name: &str, id: &str, key: &str) {
     assert_eq!(geometry.unavailable_models, 0);
     assert!(
         geometry.models.is_empty(),
-        "{id} entered the legacy hull path"
+        "{object} entered the legacy hull path"
     );
 
     let outcome = ui.handle(Input::Key(Key::Exchange), &frame, &ctx);
@@ -386,7 +391,7 @@ fn assert_goshawk_preview(name: &str, id: &str, key: &str) {
         outcome,
         Outcome::Refused(reason) if reason == "No admitted ship exchange offer for this hull"
     ));
-    assert_eq!(ui.selected_ship(), id);
+    assert_eq!(ui.selected_ship(), object);
     assert_eq!(ui.frame(&ctx, viewport), frame);
     assert_eq!(world.save_bytes().unwrap_or_else(|e| panic!("{e}")), save);
 }

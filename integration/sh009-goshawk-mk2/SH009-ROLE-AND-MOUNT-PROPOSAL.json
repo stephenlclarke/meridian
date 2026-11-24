@@ -1,0 +1,80 @@
+{
+  "hull": "SH009 Goshawk Mk II",
+  "status": "New engineering proposal; awaiting Orchestrator disposition.",
+  "meridianRevision": "06c2649da4bac073445f3e8e116c5b9a4850e1d5",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourceGeometryManifestSha256": "7437c000492b4c8495032ce123cdd33f5dc06bca96cf61899d8956501df34525",
+  "legacyEvidence": {
+    "docs/milestones/FLEET-PHYSICAL-ENGINEERING-PROPOSAL.json": "eb976f2680c791b52f3fbe31899ab9fdc2b6b120e36f29c9b0e27885ed3c26be",
+    "docs/milestones/FLEET-PHYSICAL-ENGINEERING-PROPOSAL.md": "8f864a534d96733218e126a480353441ac77d7f169936db9a7f4df821a2a2044",
+    "docs/milestones/FLEET-PHYSICAL-POLICY-ADOPTION.md": "8758fd1e5eb4e8b08bfa682a1d0847671e68f393efddad501583352004b1757d",
+    "docs/milestones/fleet-physical/goshawk-two-native-candidate-recipe.py": "6c73a24bcff4c842cfb523021de053bacae6d45935311e04157d340a17c532d4",
+    "docs/SHIP-PROVENANCE.md": "39c581f926ccc17c53c9780abe7659a4e87d40cffe64e7e2ea148d32dea09cb5",
+    "docs/research/original-fleet-reference/fleet-reference.csv": "cc3934d8963849112819fb6b4588435fa690a93fdfab06f3eb861c19c519963f"
+  },
+  "sourceInterpretation": {
+    "calibration": "Use the already calibrated SH009 detailed resource in metres. The authored origin, +Y up, and +Z forward remain unchanged.",
+    "materialRole": "Assign by named geometric function and actual SH009 face/component evidence. Palette slots only corroborate the assigned faces.",
+    "driveRecess": "Treat both shallow recess assemblies as internal parts of the two stock-budgeted intrinsic drives. Charge zero additional sheet stock. Outer casings and connected supports remain opaque stock.",
+    "mountGeometry": "Four final detailed components are two paired mirror stations, each an 8-vertex upright and an 8-vertex longitudinal lower member. The native export has exactly the same four vertex arrays and material faces. The preserved creator-family derivative names those structures for its own SH010/SH011 variants; it supports structural vocabulary only. No other hull geometry or physical result enters this ledger.",
+    "mountAssignment": "R3 fitting specifies two utility mounts but gives no positions. Adopt both SH009 longitudinal support centres as proposed generic empty interface locations. One 140 kg interface assembly is split into two 70 kg point allocations at the mirror stations; the four actual structural mount components are already counted as opaque stock.",
+    "unsupported": [
+      "Original source specification/export and the R3 resource supply no dry mass, density, COM or inertia.",
+      "The stock areal loads and intrinsic hardware budgets are adopted project design estimates. Actual material thickness and physical hardware volume remain unspecified.",
+      "The two actual structural attachment stations have no recovered slot type, fitting access, clearance, mounted item or equipment purchase. Associating the two utility interfaces with them and distributing their empty hardware mass evenly is a new design decision.",
+      "The electrical plant, tank, empty accommodation, controls and empty internal magazine have no recovered individual geometry or mount coordinates. Their point locations use explicitly listed SH009 source vertices as proposed anchors.",
+      "No crew person, cargo, fuel, ammunition, paid role kit, additional cabin, or purchased utility is included. Native admission, collision shape, docking, role kit fit and gameplay remain independent."
+    ]
+  },
+  "roles": [
+    {"name":"Negative-X rail","components":[0,1],"faces":[0,12],"materials":{"1":12},"role":"structural"},
+    {"name":"Negative-X forward arm envelope","components":[1,2],"faces":[12,248],"materials":{"0":236},"role":"structural"},
+    {"name":"Negative-X twelve recessed wells and baffles","components":[2,50],"faces":[248,920],"materials":{"0":216,"3":24,"4":432},"role":"structural","wellPattern":true},
+    {"name":"Negative-X opaque struts","components":[50,52],"faces":[920,944],"materials":{"4":24},"role":"structural"},
+    {"name":"Positive-X rail","components":[52,53],"faces":[944,956],"materials":{"1":12},"role":"structural"},
+    {"name":"Positive-X forward arm envelope","components":[53,54],"faces":[956,1192],"materials":{"0":236},"role":"structural"},
+    {"name":"Positive-X twelve recessed wells and baffles","components":[54,102],"faces":[1192,1864],"materials":{"0":216,"3":24,"4":432},"role":"structural","wellPattern":true},
+    {"name":"Positive-X opaque struts","components":[102,104],"faces":[1864,1888],"materials":{"4":24},"role":"structural"},
+    {"name":"Fore transverse brace","components":[104,105],"faces":[1888,1900],"materials":{"2":12},"role":"structural"},
+    {"name":"Aft transverse brace","components":[105,106],"faces":[1900,1912],"materials":{"2":12},"role":"structural"},
+    {"name":"Primary pressure body","components":[106,107],"faces":[1912,2148],"materials":{"0":236},"role":"structural"},
+    {"name":"Pressure body twelve recessed wells and baffles","components":[107,155],"faces":[2148,2820],"materials":{"0":216,"3":24,"4":432},"role":"structural","wellPattern":true},
+    {"name":"Pressure body opaque struts","components":[155,157],"faces":[2820,2844],"materials":{"4":24},"role":"structural"},
+    {"name":"Glazing envelope","components":[157,158],"faces":[2844,3080],"materials":{"5":236},"role":"glazing"},
+    {"name":"Opaque cockpit crossmember","components":[158,159],"faces":[3080,3092],"materials":{"2":12},"role":"structural"},
+    {"name":"Negative-X propulsion support","components":[159,160],"faces":[3092,3104],"materials":{"1":12},"role":"structural"},
+    {"name":"Negative-X outer propulsion casing","components":[160,161],"faces":[3104,3196],"materials":{"1":92},"role":"structural"},
+    {"name":"Negative-X propulsion luminous recess","components":[161,162],"faces":[3196,3288],"materials":{"6":92},"role":"drive-internal"},
+    {"name":"Positive-X propulsion support","components":[162,163],"faces":[3288,3300],"materials":{"1":12},"role":"structural"},
+    {"name":"Positive-X outer propulsion casing","components":[163,164],"faces":[3300,3392],"materials":{"1":92},"role":"structural"},
+    {"name":"Positive-X propulsion luminous recess","components":[164,165],"faces":[3392,3484],"materials":{"6":92},"role":"drive-internal"},
+    {"name":"Negative-X lower mount upright","components":[165,166],"faces":[3484,3496],"materials":{"2":12},"role":"structural","originalNativeComponent":27},
+    {"name":"Negative-X lower mount longitudinal member","components":[166,167],"faces":[3496,3508],"materials":{"3":12},"role":"structural","originalNativeComponent":28},
+    {"name":"Positive-X lower mount upright","components":[167,168],"faces":[3508,3520],"materials":{"2":12},"role":"structural","originalNativeComponent":29},
+    {"name":"Positive-X lower mount longitudinal member","components":[168,169],"faces":[3520,3532],"materials":{"3":12},"role":"structural","originalNativeComponent":30}
+  ],
+  "arealStockKgPerM2": {"structural":14,"glazing":5,"drive-internal":0},
+  "pointHardware": [
+    {"name":"Negative-X intrinsic drive","massKg":900,"component":160,"vertexRange":[1872,1920],"basis":"Both complete rings of the actual negative-X casing."},
+    {"name":"Positive-X intrinsic drive","massKg":900,"component":163,"vertexRange":[1976,2024],"basis":"Both complete rings of the actual positive-X casing."},
+    {"name":"Intrinsic electrical plant","massKg":750,"component":106,"vertexRange":[1192,1216],"basis":"Proposed centre of the wider aft pressure-body station."},
+    {"name":"Empty tank and plumbing","massKg":180,"component":106,"vertexRange":[1192,1240],"basis":"Proposed midpoint of the aft and middle pressure-body stations."},
+    {"name":"One empty life-support and quarters assembly","massKg":120,"component":106,"vertexRange":[1216,1240],"basis":"Proposed centre of the middle body station. R3 has one intrinsic crew place."},
+    {"name":"Controls and sensors","massKg":90,"component":158,"vertexRange":[1856,1864],"basis":"Proposed centre of the actual opaque cockpit crossmember."},
+    {"name":"Empty equipment interface, negative-X half","massKg":70,"component":166,"vertexRange":[2080,2088],"basis":"One half of the single 140 kg empty interface; a proposed point at the actual longitudinal support centre."},
+    {"name":"Empty equipment interface, positive-X half","massKg":70,"component":168,"vertexRange":[2096,2104],"basis":"The second half of that assembly; mirrored actual longitudinal support centre."},
+    {"name":"Empty internal magazine and launcher assembly","massKg":160,"component":106,"vertexRange":[1240,1264],"basis":"Proposed forward central pressure-body station. R3 specifies internal storage and rules out external pylons."}
+  ],
+  "algorithmBudget": {
+    "detailedVertices":2104,
+    "detailedFaces":3532,
+    "detailedComponents":169,
+    "nativeVerticesForMountEvidence":568,
+    "nativeFacesForMountEvidence":1012,
+    "nativeMountCorrespondences":4,
+    "analyticFaceEvaluations":3532,
+    "independentFaceEvaluations":3532,
+    "independentQuadraturePoints":10596,
+    "hardwarePointsPerMethod":9
+  }
+}

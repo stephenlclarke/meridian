@@ -1,6 +1,6 @@
 //! SH010's production minimum viewport and cross-hull GPU cache evidence.
 use super::{
-    Crop, FORMAT, Gpu, MIN_WINDOW_LOGICAL, SCALE, Target, metal_gpu_for, ok, output_directory,
+    Crop, FORMAT, Gpu, MIN_WINDOW_LOGICAL, SCALE, Target, metal_gpu, ok, output_directory,
     write_new,
 };
 use crate::docked_screens::{Frame, ModelPreview};
@@ -137,7 +137,7 @@ impl<'a> Capture<'a> {
         &mut self,
         name: &str,
         frame: &Frame,
-        mut explorer: Option<&mut showroom::Pass>,
+        mut other: Option<&mut showroom::Pass>,
         custom: &mut showroom::Pass,
     ) {
         let [left, right] = frame.models.as_slice() else {
@@ -146,15 +146,25 @@ impl<'a> Capture<'a> {
         assert!(left.bounds.x + left.bounds.width <= right.bounds.x);
         let combined = self.frame(name, frame);
         let mut images = Vec::with_capacity(2);
-        for model in [left, right] {
+        for (pane, model) in [left, right].into_iter().enumerate() {
             let mut isolated = frame.clone();
             isolated.models = vec![model.clone()];
-            let isolated_name = format!("{name}-{}", model.object);
+            let isolated_name = if left.object == right.object {
+                format!("{name}-pane{pane}-{}", model.object)
+            } else {
+                format!("{name}-{}", model.object)
+            };
             let rgb = self.frame(&isolated_name, &isolated);
             self.own_pixels(&isolated_name, model, &rgb);
             let reference = match showroom::hull(model) {
                 Some(Hull::Custom) => Some(&mut *custom),
-                Some(Hull::Explorer) => explorer.as_deref_mut(),
+                Some(hull) => {
+                    let Some(pass) = other.as_deref_mut() else {
+                        panic!("missing independent hull pass")
+                    };
+                    assert_eq!(pass.hull(), hull);
+                    Some(pass)
+                }
                 None => {
                     assert_eq!(model.object, "SH025");
                     None
@@ -202,16 +212,13 @@ fn original_pass(gpu: &Gpu, hull: Hull) -> showroom::Pass {
 #[ignore = "Mac owner only: independent SH010 production minimum Showroom RGB evidence"]
 fn metal_goshawk_custom_minimum_showroom_model_pass() {
     let output = output_directory("MERIDIAN_SH010_MINIMUM_DIR");
-    let gpu = metal_gpu_for("SH010", false);
+    let gpu = metal_gpu(Hull::Custom, false);
     let target = Target::new(&gpu.device, MIN_WINDOW_LOGICAL);
     let mut capture = Capture::new(&gpu, &target, &output);
     let mut custom = original_pass(&gpu, Hull::Custom);
-    for (pose, Frames { solo, comparison }) in
-        minimum_qualification::POSES
-            .into_iter()
-            .zip(minimum_qualification::station_frames_for(
-                "Goshawk Mk II Custom",
-            ))
+    for (pose, Frames { solo, comparison }) in minimum_qualification::POSES
+        .into_iter()
+        .zip(minimum_qualification::station_frames(Hull::Custom))
     {
         let [left, right] = comparison.models.as_slice() else {
             panic!("expected native SH025/SH010 Compare")
@@ -232,13 +239,13 @@ fn metal_goshawk_custom_minimum_showroom_model_pass() {
 #[ignore = "Mac owner only: SH010 production cache switch, return and mixed order RGB evidence"]
 fn metal_goshawk_custom_cache_switching() {
     let output = output_directory("MERIDIAN_SH010_CACHE_DIR");
-    let gpu = metal_gpu_for("SH010", false);
+    let gpu = metal_gpu(Hull::Custom, false);
     let target = Target::new(&gpu.device, MIN_WINDOW_LOGICAL);
     let mut capture = Capture::new(&gpu, &target, &output);
     let mut explorer_pass = original_pass(&gpu, Hull::Explorer);
     let mut custom_pass = original_pass(&gpu, Hull::Custom);
-    let explorer = minimum_qualification::station_frames().remove(0);
-    let custom = minimum_qualification::station_frames_for("Goshawk Mk II Custom").remove(0);
+    let explorer = minimum_qualification::station_frames(Hull::Explorer).remove(0);
+    let custom = minimum_qualification::station_frames(Hull::Custom).remove(0);
     let original = capture.solo("explorer-before", &explorer.solo, &mut explorer_pass);
     let revised = capture.solo("custom-before", &custom.solo, &mut custom_pass);
     assert!(
@@ -284,5 +291,46 @@ fn metal_goshawk_custom_cache_switching() {
         "SH010 cache return and both pane identity orders passed at {:?}",
         capture.size()
     );
+    capture.finish();
+}
+
+#[test]
+#[ignore = "Mac owner only: joined Mk II/Custom mixed and duplicate pane Metal evidence"]
+fn metal_goshawk_mk2_custom_cache_orders() {
+    let output = output_directory("MERIDIAN_SH009_CUSTOM_CACHE_DIR");
+    let gpu = metal_gpu(Hull::Custom, false);
+    let target = Target::new(&gpu.device, MIN_WINDOW_LOGICAL);
+    let mut capture = Capture::new(&gpu, &target, &output);
+    let mut mk2_pass = original_pass(&gpu, Hull::Mk2);
+    let mut custom_pass = original_pass(&gpu, Hull::Custom);
+    let mk2 = minimum_qualification::station_frames(Hull::Mk2);
+    let custom = minimum_qualification::station_frames(Hull::Custom);
+    let mut mixed = mk2[0].comparison.clone();
+    let first = capture.solo("mk2-before", &mk2[0].solo, &mut mk2_pass);
+    let second = capture.solo("custom-before", &custom[0].solo, &mut custom_pass);
+    assert!(first != second, "distinct originals produced identical RGB");
+    for (name, a, b) in [
+        ("mk2-custom", &mk2, &custom),
+        ("custom-mk2", &custom, &mk2),
+        ("mk2-mk2", &mk2, &mk2),
+        ("custom-custom", &custom, &custom),
+    ] {
+        let [left, right] = mixed.models.as_mut_slice() else {
+            panic!("expected two station Compare panes")
+        };
+        for (pane, pose) in [(left, &a[0]), (right, &b[2])] {
+            let [model] = pose.solo.models.as_slice() else {
+                panic!("expected one selected hull")
+            };
+            *pane = ModelPreview {
+                bounds: pane.bounds,
+                ..model.clone()
+            };
+        }
+        assert_ne!(mixed.models[0].orientation, mixed.models[1].orientation);
+        capture.comparison(name, &mixed, Some(&mut mk2_pass), &mut custom_pass);
+    }
+    assert!(first == capture.solo("mk2-return", &mk2[0].solo, &mut mk2_pass));
+    assert!(second == capture.solo("custom-return", &custom[0].solo, &mut custom_pass));
     capture.finish();
 }
