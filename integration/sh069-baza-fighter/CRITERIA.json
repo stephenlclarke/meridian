@@ -1,0 +1,169 @@
+{
+  "hull": "SH069 Baza Fighter",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh069/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh069-baza-fighter/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "1",
+  "faces": {
+    "detailed": 2340,
+    "native": 152,
+    "nativeMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-baza",
+    "massKg": 28011
+  },
+  "supportGroups": 23,
+  "minimumRouteClearanceMillimetres": 793,
+  "sourceContactCounts": {
+    "overlap": 7
+  },
+  "fitUpperMillimetres": {
+    "detailed": 1983,
+    "native": 2810
+  },
+  "hullStudio": {
+    "definition": "integration/sh069-baza-fighter/BAZA-FIGHTER-STUDIO.json",
+    "bytes": 296560,
+    "sha256": "de54a8c8b3becfb6307bbbba9436084fb61bb2e98e4f648b52ff7e6ec472b45c",
+    "supports": 23,
+    "probes": 7,
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline artwork import and export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 296560,
+        "sha256": "de54a8c8b3becfb6307bbbba9436084fb61bb2e98e4f648b52ff7e6ec472b45c"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 2340,
+      "nativeTriangles": 152,
+      "supportGroups": 23,
+      "engineeringReference": "finite-intrinsic-empty-baza",
+      "massKg": 28011,
+      "receiptFiles": {
+        "BAZA-FIGHTER.hull.json": {
+          "bytes": 296559,
+          "sha256": "48853a2fa981ab1369512533748f346386b2d68c6acd5dc7f46eb1e79208fb5b"
+        },
+        "BAZA-FIGHTER-repeat.hull.json": {
+          "bytes": 296559,
+          "sha256": "48853a2fa981ab1369512533748f346386b2d68c6acd5dc7f46eb1e79208fb5b"
+        },
+        "studio.stdout.json": {
+          "bytes": 41930,
+          "sha256": "a8271fc4e4c61cf685d901834b44e182f4122a3514136c15cc5c9acbb4f8efb7"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 41930,
+          "sha256": "a8271fc4e4c61cf685d901834b44e182f4122a3514136c15cc5c9acbb4f8efb7"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "b7c47c439eb3387d8b2f8219e79672aaed908e3c50c87b0257895c9dd94ef9c4"
+        },
+        "codesign-details.log": {
+          "bytes": 1145,
+          "sha256": "46f22bef73c8eab385775b9c33eb76171b43a06b700a46282ba7683d72e141bb"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "central-dorsal",
+          "passed": true
+        },
+        {
+          "name": "port-outside-wing",
+          "passed": true
+        },
+        {
+          "name": "port-beneath-wing",
+          "passed": true
+        },
+        {
+          "name": "port-outside-engine",
+          "passed": true
+        },
+        {
+          "name": "starboard-outside-wing",
+          "passed": true
+        },
+        {
+          "name": "starboard-beneath-wing",
+          "passed": true
+        },
+        {
+          "name": "starboard-outside-engine",
+          "passed": true
+        }
+      ]
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_baza_fighter.py --check",
+      "python3 -B tools/verify_baza_fighter.py | cmp - integration/sh069-baza-fighter/CONTACT-RESULT.json",
+      "python3 -B tools/measure_baza_fighter.py --difference | cmp - integration/sh069-baza-fighter/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/measure_baza_fighter.py | cmp - integration/sh069-baza-fighter/SURFACE-FIT.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T22:41:39Z",
+    "finishedUtc": "2026-11-24T22:41:45Z",
+    "log": {
+      "bytes": 509,
+      "sha256": "a1ff2e72f53827dd0c534618ce45d09cec72cf85d0d782e1e6a0796a6ced477f"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "integration/sh069-baza-fighter/BAZA-FIGHTER-STUDIO.json": "de54a8c8b3becfb6307bbbba9436084fb61bb2e98e4f648b52ff7e6ec472b45c",
+    "integration/sh069-baza-fighter/FROZEN-SOURCES.json": "e5743769428d798d8e234f98ffacfe379d196bca66977d9e0172804e1a6ae53f",
+    "integration/sh069-baza-fighter/CONTACT-CANDIDATE.json": "ecaf207f9fbc9e1436b068095de88689d030d73027db76ed40ee9f7c857b7060",
+    "integration/sh069-baza-fighter/CONTACT-RESULT.json": "0f3f4bd328517b94de0e13c3cd8d9d4ee31819f544ec9b3cd4493d44dedb8efe",
+    "integration/sh069-baza-fighter/ORIGINAL-DIFFERENCE.json": "46f17962e19c74cebf0a09063b9b04b1387606b7f4d7a9a2135cd71ca73ba848",
+    "integration/sh069-baza-fighter/ORIGINAL-JOINTS.json": "1cd89c63ce3c6bcf929b77b889c7fa2aa3b1d2fca5865d668e0fea88b4ce830e",
+    "integration/sh069-baza-fighter/SUPPORT-FAN.json": "1eb693178ef079a042a1c28217681f7e611e98606516a0e5fdb82c3dc2274741",
+    "integration/sh069-baza-fighter/SURFACE-FIT.json": "fb56997bb1c8f9de46ecd3229f656f0ab71862f92073c7df24433112636e4a00",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/measure_baza_fighter.py": "489a933d70a6a84c721f935e4abc133935ac9b491ae8818c01604907dbd24ba0",
+    "tools/prepare_baza_fighter.py": "d12ef0c71c49e29ee9335ebe6efc2fa12f0d8d03e329c687f755fba6095fd590",
+    "tools/verify_baza_fighter.py": "3b45113b91f0095cccd52a7f7306ae329941bfdae85962e355f87f5e4848832a"
+  }
+}

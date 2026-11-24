@@ -1,3 +1,8 @@
+# Baza Fighter source preparation and replay use exact LF bytes.
+tools/measure_baza_fighter.py text eol=lf
+tools/prepare_baza_fighter.py text eol=lf
+tools/verify_baza_fighter.py text eol=lf
+
 # Badger source preparation and replay use exact LF bytes.
 tools/measure_badger.py text eol=lf
 tools/prepare_badger.py text eol=lf

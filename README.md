@@ -147,6 +147,7 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Rabbit Explorer source envelope and Hull Studio definition](docs/RABBIT-EXPLORER-SOURCE.md)
 - [Rhinoceros Trader source envelope and Hull Studio definition](docs/RHINOCEROS-TRADER-SOURCE.md)
 - [Badger source envelope and Hull Studio definition](docs/BADGER-SOURCE.md)
+- [Baza Fighter source envelope and Hull Studio definition](docs/BAZA-FIGHTER-SOURCE.md)
 - [Stag Liner source envelope and Hull Studio definition](docs/STAG-LINER-GAMEPLAY-ENVELOPE.md)
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)
