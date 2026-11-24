@@ -24,7 +24,7 @@
     },
     "flight.rs": {
       "beforeSHA256": "75ce2e728fd3a459c343c70950a2d49f26676e90c2fea5ca0e7ab87cfedef935",
-      "afterSHA256": "97e29cf2bf8ed39b7a0de569e5c1ea30495500f0fd23092d8663c3266ac0a0a5",
+      "afterSHA256": "dd699789001f17118e6f6e93af48ff4779c780bd75e49572e7e2b9870c8aef00",
       "hunks": [
         {
           "offset": 655,
@@ -79,20 +79,20 @@
         {
           "offset": 20940,
           "before": "",
-          "after": "        let previous_targeting = self.targeting.clone();\n        let previous_docking = self.auto_docking;\n        let input = self.flight_computer_input(input);\n        let result = self.step_flight(input);\n        if result.is_err() {\n            self.targeting = previous_targeting;\n            self.auto_docking = previous_docking;\n        } else if self.state.mode != FlightMode::Flight || self.state.motion_refusal.is_some() {\n            self.cancel_auto_docking();\n        }\n        result\n    }\n\n    fn step_flight(&mut self, input: FlightInput) -> Result<(), StepError> {\n"
+          "after": "        let previous_targeting = self.targeting.clone();\n        let previous_docking = self.auto_docking;\n        let input = self.flight_computer_input(input);\n        let result = self.step_flight(input);\n        if result.is_err() {\n            self.targeting = previous_targeting;\n            self.auto_docking = previous_docking;\n        } else if self.state.mode != FlightMode::Flight || self.state.motion_refusal.is_some() {\n            // An accepted stop must release every computer controller, not just docking.\n            // Otherwise selected work guidance resumes thrust on the next idle tick.\n            self.cancel_targeting();\n            self.cancel_auto_docking();\n        }\n        result\n    }\n\n    fn step_flight(&mut self, input: FlightInput) -> Result<(), StepError> {\n"
         },
         {
-          "offset": 27057,
+          "offset": 27270,
           "before": "",
           "after": "        let entry = next.mode == FlightMode::Docked && self.state.mode != FlightMode::Docked;\n"
         },
         {
-          "offset": 27198,
+          "offset": 27411,
           "before": "            let entry = next.mode == FlightMode::Docked && self.state.mode != FlightMode::Docked;\n",
           "after": ""
         },
         {
-          "offset": 33230,
+          "offset": 33443,
           "before": "",
           "after": "        if entry || completed_leg.is_some() {\n            self.reconcile_navigation_route(entry);\n        }\n"
         }
