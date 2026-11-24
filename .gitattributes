@@ -6,6 +6,12 @@ assets/fleet/sh001/visual.bin binary
 assets/fleet/sh008/** -text
 assets/fleet/sh008/visual.bin binary
 
+# Lanner authoring and replay programs use exact LF bytes.
+tools/lanner_art_mesh.py text eol=lf
+tools/measure_lanner_geometry.py text eol=lf
+tools/prepare_lanner_geometry.py text eol=lf
+tools/verify_lanner_geometry.py text eol=lf
+
 # Harpy Gunship authoring and replay programs use exact LF bytes.
 tools/measure_harpy_gunship.py text eol=lf
 tools/prepare_harpy_gunship.py text eol=lf
