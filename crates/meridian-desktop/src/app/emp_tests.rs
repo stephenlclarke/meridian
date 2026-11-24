@@ -159,12 +159,14 @@ fn paid_emp_grade_review_refuses_failed_atomic_writer_and_keeps_same_paid_base()
     menu_key(&mut a, ui::Key::Buy);
     let slot = d.0.join("commander.meridian");
     let retained = d.0.join("retained-valid-commander");
-    let before = ok(fs::read(&slot));
+    let before_disk = ok(fs::read(&slot));
+    assert_eq!(before_disk, bytes);
+    let before_live = ok(a.game.world.save_bytes());
     ok(fs::rename(&slot, &retained));
     ok(fs::create_dir(&slot));
     menu_key(&mut a, ui::Key::Confirm);
-    assert_eq!(ok(a.game.world.save_bytes()), before);
-    assert_eq!(ok(fs::read(&retained)), before);
+    assert_eq!(ok(a.game.world.save_bytes()), before_live);
+    assert_eq!(ok(fs::read(&retained)), before_disk);
     assert_eq!(a.game.world.owned_emp(), Some(item));
     ok(fs::remove_dir(&slot));
     ok(fs::rename(&retained, &slot));
