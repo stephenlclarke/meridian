@@ -345,6 +345,17 @@ impl OriginalStationData {
 }
 
 impl OriginalStationData {
+    /// Qualifies explicit SH042 motion against the original SH028 source triangles.
+    pub fn saker_motion_clear(
+        &self,
+        source: &crate::saker::SakerHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces(), start, end, angular_travel)
+    }
+
     /// Controlled validation only: the stationary observer retains its real SH025 mesh.
     /// Initial noncontainment is established by the World constructor, then every
     /// continuous Mule step checks the same frozen observer's complete native surface.

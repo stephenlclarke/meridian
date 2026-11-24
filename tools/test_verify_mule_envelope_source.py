@@ -68,17 +68,22 @@ class MuleSourceVerification(unittest.TestCase):
         with self.assertRaises(AssertionError):
             verifier.verify_component('design', part, assigned, [(5, 6, 8)], {})
 
-    def test_stag_publication_must_be_removed_exactly_once(self):
+    def test_hull_publications_must_each_be_removed_exactly_once(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             core = self.copy_protected_sources(root)
             source = core / verifier.LIB_SOURCE
             original = source.read_bytes()
-            addition = b'pub mod stag_liner;\n\n'
-            for altered in (original.replace(addition, b''), original + addition):
-                source.write_bytes(altered)
-                with self.assertRaisesRegex(AssertionError, 'lib.rs'):
-                    verifier.verify_protected_core(root)
+            for publication in (b'pub mod stag_liner;\n\n', b'pub mod saker;\n'):
+                for altered in (original.replace(publication, b''), original + publication):
+                    with self.subTest(publication=publication):
+                        source.write_bytes(altered)
+                        with self.assertRaisesRegex(AssertionError, 'lib.rs'):
+                            verifier.verify_protected_core(root)
+            declaration = b'pub mod saker;\n'
+            source.write_bytes(original.replace(declaration, b'') + declaration)
+            with self.assertRaisesRegex(AssertionError, 'lib.rs'):
+                verifier.verify_protected_core(root)
 
     def test_historical_stag_check_still_refuses_a_forged_preimage(self):
         # Simulate even a mistakenly approved new inverse with bad historical bytes.
@@ -88,7 +93,8 @@ class MuleSourceVerification(unittest.TestCase):
             manifest = root / verifier.FLIGHT_COMPUTER_INVERSE
             inverse = json.loads(manifest.read_bytes())
             relative = verifier.LIB_SOURCE
-            current = (core / relative).read_bytes()
+            current = verifier.undo_saker_publication(
+                relative, (core / relative).read_bytes())
             before = verifier.undo_flight_computer(relative, current, inverse['files'])
             addition = b'pub mod stag_liner;\n\n'
             self.assertEqual(before.count(addition), 1)

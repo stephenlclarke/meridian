@@ -44,6 +44,16 @@ def flight_computer_inverse(root, protected):
     return files
 
 
+def undo_saker_publication(relative, data):
+    """Restore the reviewed lib.rs insertion before checking the Flight Computer hashes."""
+    if relative != LIB_SOURCE:
+        return data
+    declaration = b'pub mod saker;\n'
+    anchor = b'pub mod navigation;\n'
+    assert data.count(declaration) == 1 and data.count(anchor + declaration) == 1, relative
+    return data.replace(anchor + declaration, anchor, 1)
+
+
 def undo_flight_computer(relative, data, inverse):
     """Restore exact pre-slice bytes, without fuzzy matching or exclusions."""
     if relative not in inverse:
@@ -266,7 +276,8 @@ def verify_protected_core(root):
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_flight_computer(relative, current, inverse)
+        data = undo_saker_publication(relative, current)
+        data = undo_flight_computer(relative, data, inverse)
         data = undo_goshawk_world(relative, data)
         data = undo_renas_encounter(relative, data)
         for addition in additions.get(relative, []):
@@ -274,10 +285,9 @@ def verify_protected_core(root):
             data = data.replace(addition, b'', 1)
         data = undo_commander_launch(relative, data)
         if relative == LIB_SOURCE:
-            # Invert only the reviewed Stag Liner geometry publication.
-            addition = b'pub mod stag_liner;\n\n'
-            assert data.count(addition) == 1, relative
-            data = data.replace(addition, b'', 1)
+            publication = b'pub mod stag_liner;\n\n'
+            assert data.count(publication) == 1, relative
+            data = data.replace(publication, b'', 1)
         if relative == FLIGHT_SOURCE:
             speed_line = b'        if !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
             original_line = b'        if !self.state.speed.is_finite() || !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
