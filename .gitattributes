@@ -6,6 +6,12 @@ assets/fleet/sh001/visual.bin binary
 assets/fleet/sh008/** -text
 assets/fleet/sh008/visual.bin binary
 
+# Eagle Cruiser authoring and replay programs use exact LF bytes.
+tools/measure_eagle_cruiser_air.py text eol=lf
+tools/prepare_eagle_cruiser_geometry.py text eol=lf
+tools/prepare_eagle_cruiser_studio.py text eol=lf
+tools/verify_eagle_cruiser_geometry.py text eol=lf
+
 # Byte-pinned Saker authoring and replay programs.
 tools/atomic_asset_output.py text eol=lf
 tools/measure_saker_air.py text eol=lf
