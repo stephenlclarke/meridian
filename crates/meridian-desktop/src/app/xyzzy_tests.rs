@@ -28,7 +28,8 @@ fn activate(app: &mut App) {
     menu(app);
     assert_eq!(press(app, KeyCode::Enter), None);
     assert_eq!(press(app, KeyCode::Enter), None);
-    assert!(app.xyzzy.is_none());
+    assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
+    press(app, KeyCode::Escape);
     assert_eq!(app.game.world.commander_name(), Some("CLARKE"));
 }
 
@@ -67,6 +68,7 @@ fn actual_secret_menu_publishes_clarke_real_outfit_and_visible_provenance_then_c
         ModuleKind::NavalLaser,
         ModuleKind::EliteEnergyUnit,
         ModuleKind::AdvancedNavigation,
+        ModuleKind::Targeting(meridian_core::equipment::TargetingTier::Military),
         ModuleKind::FuelScoops,
     ] {
         assert!(modules.items.iter().any(|item| item.kind == kind
@@ -78,6 +80,14 @@ fn actual_secret_menu_publishes_clarke_real_outfit_and_visible_provenance_then_c
             .equipment_snapshot()
             .and_then(|snapshot| snapshot.owned)
             .is_some_and(|item| item.xyzzy && item.fitted)
+    );
+    let specialists = world.work_targeting_fit();
+    assert!(specialists.mining && specialists.salvage);
+    let emp = world.owned_emp().unwrap_or_else(|| panic!("EMP"));
+    assert!(emp.fitted);
+    assert_eq!(
+        (emp.grades.power, emp.grades.capacity, emp.grades.recharge),
+        (3, 3, 3)
     );
     let ammo = world
         .ammunition_snapshot()
@@ -204,15 +214,20 @@ fn help_above_secret_confirmation_blocks_publication_and_resumes_the_same_review
 }
 
 #[test]
-fn menu_refit_toggle_and_reentry_keep_once_cash_and_real_finite_items() {
+fn activate_refit_and_toggle_fuel_without_leaving_the_menu() {
     let directory = TestDirectory::new();
     let mut app = app(&directory);
-    activate(&mut app);
+    let mut station = ok(Docked::new(&app.game.world));
+    ok(station.open(&app.game.world, ui::Screen::Equipment));
+    app.docked = Some(station);
+    menu(&mut app);
+    press(&mut app, KeyCode::Enter);
+    press(&mut app, KeyCode::Enter);
+    assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
     let items = app.game.world.ammunition_snapshot();
     let modules = app.game.world.modular_equipment_snapshot();
-    for select in [1, 2, 0] {
-        menu(&mut app);
-        for _ in 0..select {
+    for steps in [1, 1, 2] {
+        for _ in 0..steps {
             press(&mut app, KeyCode::ArrowDown);
         }
         press(&mut app, KeyCode::Enter);
@@ -221,7 +236,7 @@ fn menu_refit_toggle_and_reentry_keep_once_cash_and_real_finite_items() {
         assert_eq!(app.game.world.ammunition_snapshot(), items);
         assert_eq!(app.game.world.modular_equipment_snapshot(), modules);
     }
-    menu(&mut app);
+    assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
     // Up wraps from activation to the fourth action, fuel mode.
     press(&mut app, KeyCode::ArrowUp);
     press(&mut app, KeyCode::Enter);
@@ -236,6 +251,12 @@ fn menu_refit_toggle_and_reentry_keep_once_cash_and_real_finite_items() {
             .world
             .xyzzy_snapshot()
             .is_some_and(|state| !state.unlimited_fuel)
+    );
+    press(&mut app, KeyCode::Escape);
+    assert!(app.xyzzy.is_none());
+    assert_eq!(
+        app.docked.as_ref().map(Docked::screen),
+        Some(ui::Screen::Equipment)
     );
     let cold = ok(World::from_save_bytes(&ok(fs::read(
         directory.0.join("commander.meridian"),

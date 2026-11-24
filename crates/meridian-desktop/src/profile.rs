@@ -116,7 +116,17 @@ impl Profile {
         // A directory-sync warning follows publication, so the host must refresh its authorities.
         Ok(publication_message(
             published,
-            "XYZZY change saved. Supported outfit only; finite missiles and cargo.".into(),
+            match action {
+                meridian_core::XyzzyAction::Enter => {
+                    "CLARKE active. Maximum outfit fitted and saved."
+                }
+                meridian_core::XyzzyAction::MaximumSupportedHardware
+                | meridian_core::XyzzyAction::RestoreStarter => {
+                    "Outfit refitted, refilled and saved."
+                }
+                meridian_core::XyzzyAction::ToggleUnlimitedFuel => "Fuel setting saved.",
+            }
+            .into(),
         )
         .unwrap_or_else(|warning| warning))
     }
@@ -428,6 +438,37 @@ impl Profile {
             };
         }
         self.session.command(&mut self.world, action)
+    }
+
+    pub(crate) fn navigation_route(
+        &mut self,
+        plan: Option<&meridian_core::navigation::RoutePlan>,
+    ) -> Result<String, String> {
+        self.require_profile()?;
+        if !self.playing {
+            return Err("No active commander to set a route".into());
+        }
+        let tick = self.world.snapshot().tick;
+        let prepared = self
+            .world
+            .prepare_navigation_route(plan, tick)
+            .map_err(|e| e.to_string())?;
+        let published = self
+            .store
+            .as_ref()
+            .ok_or("No profile storage")?
+            .save(prepared.bytes(), MAX_SAVE_BYTES)
+            .map_err(|error| format!("Navigation change could not be saved: {error}"))?;
+        prepared.commit();
+        self.has_save = true;
+        self.session.invalidate();
+        let message = if plan.is_some() {
+            "Route saved. Check the next leg before launching."
+        } else {
+            "Navigation route cleared."
+        };
+        // Publication happens before the optional directory sync warning.
+        Ok(publication_message(published, message.into()).unwrap_or_else(|warning| warning))
     }
 
     pub fn save(&mut self) -> Result<String, String> {

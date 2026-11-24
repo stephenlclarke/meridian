@@ -80,6 +80,17 @@ const TEXTURES: [&[u8]; 3] = [
 fn visual() -> Result<Vec<VisualVertex>, &'static str> {
     decode_visual(VISUAL, b"MULEVIS1", VERTEX_COUNT)
 }
+
+/// CPU projection of the same detailed visual triangles used by the ordinary SH001 pass.
+pub(crate) fn targeting_vertices() -> Result<Vec<crate::mesh::Vertex>, &'static str> {
+    Ok(visual()?
+        .into_iter()
+        .map(|v| crate::mesh::Vertex {
+            position: v.position,
+            color: [v.color[0], v.color[1], v.color[2]],
+        })
+        .collect())
+}
 fn decode_visual(
     bytes: &[u8],
     magic: &[u8; 8],

@@ -1,5 +1,13 @@
 # Implementation and validation status
 
+## Station chart best-profit scan source candidate
+
+The station Galaxy chart now offers a read-only P toggle for up to five positive, directly reachable trade estimates, with an explicit empty state. The scan uses current in-game stocks and quotes, unreserved cargo, wallet, fitted jump range and fuel. It adapts `Sources/EliteCore/ProfitScan.swift` from immutable Elite source `34790e313c0d6cf8be84fe74aaf8f2f228cd3b3f` to the admitted Meridian markets; unsupported markets and speculative multi-leg refuelling do not count. The toggle is session-local and local flight P remains pause. Authored core and desktop regressions cover finite trade bounds, reserved cargo, range/fuel exclusions, stable ranking, read-only saves and the chart input path. Compiler, CI and native qualification are pending.
+
+## Generated desktop audio source candidate
+
+The authored desktop integration routes generated launch and docking cues from actual mode transitions, front-laser sounds from accepted Pulse or Mining Laser discharges, and the original missile notification ping after an accepted missile launch. Ctrl+Shift+M toggles sound; Help displays availability. New/Continue primes without replay, and a missing device leaves gameplay active. Application suspension releases the audio device; resuming restores the mute preference without replaying accepted cues. No speech, kill, ECM, continuous cutter or EMP effects are claimed. Native device and Rust qualification remain pending.
+
 ## Goshawk Showroom preview
 
 Preview 10 is published for macOS arm64 and Windows x64. It includes the Goshawk Explorer in the ordinary station Showroom. The signed and notarized app was extracted and checked against the local installation, including all 483 files. Earlier Mac gameplay checks covered the Showroom on the source used for this build. Packaging verification did not include a new graphical launch. [Preview guide](PREVIEW-RELEASES.md)
@@ -31,6 +39,10 @@ mass, matched centre of mass and inertia tensor. The drive mechanism mass
 includes both luminous recesses. The new World regression awaits owned
 execution. Ordinary placement and gameplay docking remain open.
 [Stock engineering](GOSHAWK-GAMEPLAY-ENVELOPE.md#adopted-stock-engineering)
+
+## Stag Liner source envelope
+
+SH035 preserves the two original pearl-teal meshes and uses 26 local supports. SteveMBA verified seven routes, eight structural overlaps and the original SH028 offset lip contact. The full fit bounds are 705 mm detailed and 3,038 mm native. The installed signed Hull Studio exported the exact definition with all 26 groups and seven routes passing. The per-hull Rust contact tests and Showroom qualification remain pending. [Stag Liner source and evidence](STAG-LINER-GAMEPLAY-ENVELOPE.md)
 
 ## Goshawk Mk II Custom candidate
 
@@ -438,3 +450,9 @@ The Help candidate now lists mission details and flight-lesson review/cancel/det
 ## Preview 8 local installation
 
 The exact public Mac wrapper is installed side-by-side at `/Users/sclarke/Applications/Meridian Preview 8/Meridian EMP Sonar Preview.app`. All 474 published logical files and modes, including the 454 app files and stapled ticket, were independently verified after installation. Strict signature verification, ticket validation and Gatekeeper passed. Installation did not launch the game or alter the prior preview or known task profile. Existing source-bound native evidence carries by exact byte identity; this adds installation acceptance only.
+
+## Flight computer development
+
+Route previews use the station profit scan’s finite wallet, stock, receiving capacity and cargo limits. Trade profit uses current quotes before fuel costs. Each leg is priced independently from the current wallet and hold. The best cargo-sale estimate shows what the existing unreserved cargo can earn at a single stop.
+
+The development branch retains the XYZZY menu selection after a successful save. A failed save retains the confirmation for retry or cancellation. The secret cargo-bay receipt now validates independently of the local shop offer. Native preview qualification is pending.

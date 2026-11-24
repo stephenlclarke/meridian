@@ -96,6 +96,21 @@ struct EquipmentEvent {
     tick: u64,
     revision: u64,
 }
+impl EquipmentEvent {
+    fn terms(self, grades: &mut EmpGrades) -> Result<(u32, u8), SaveError> {
+        let offer = match self.action {
+            EmpEquipmentAction::Purchase => (policy::BASE_PRICE, policy::BASE_TECHNOLOGY),
+            EmpEquipmentAction::Upgrade { axis, .. } => {
+                let offer = grades.upgrade_offer(axis).map_err(|_| INVALID)?;
+                *grades = grades.advancing(axis).map_err(|_| INVALID)?;
+                offer
+            }
+            EmpEquipmentAction::Store { .. } if self.secret => return Err(INVALID),
+            _ => (0, 0),
+        };
+        Ok(if self.secret { (0, 0) } else { offer })
+    }
+}
 #[derive(Debug, Clone, PartialEq, Default)]
 pub(super) struct State {
     equipment: Arc<Vec<EquipmentEvent>>,
@@ -157,7 +172,7 @@ impl State {
                             current.fitted = false
                         }
                         EmpEquipmentAction::Upgrade { item, axis } if item == current.item => {
-                            if current.provenance != EmpProvenance::Paid {
+                            if !event.secret && current.provenance != EmpProvenance::Paid {
                                 return Err(INVALID);
                             }
                             current.grades = current.grades.advancing(axis).map_err(|_| INVALID)?;
@@ -190,28 +205,13 @@ impl State {
                 previous.map(|e| (e.dock.sequence(), e.tick, e.revision)),
             )?;
             if event.secret
-                && (event.action != EmpEquipmentAction::Purchase
-                    || !world
-                        .xyzzy
-                        .authorizes(event.dock, event.tick, event.revision))
+                && !world
+                    .xyzzy
+                    .authorizes(event.dock, event.tick, event.revision)
             {
                 return Err(INVALID);
             }
-            let (price, required) = match event.action {
-                EmpEquipmentAction::Purchase => {
-                    if event.secret {
-                        (0, 0)
-                    } else {
-                        (policy::BASE_PRICE, policy::BASE_TECHNOLOGY)
-                    }
-                }
-                EmpEquipmentAction::Upgrade { axis, .. } => {
-                    let offer = grades.upgrade_offer(axis).map_err(|_| INVALID)?;
-                    grades = grades.advancing(axis).map_err(|_| INVALID)?;
-                    offer
-                }
-                _ => (0, 0),
-            };
+            let (price, required) = event.terms(&mut grades)?;
             let site = super::services::service_site(event.dock.system()).ok_or(INVALID)?;
             if crate::equipment::definition()
                 .map_err(|_| INVALID)?

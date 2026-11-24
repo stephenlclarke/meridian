@@ -1,0 +1,45 @@
+{
+  "referenceCommit": "a11fe16924d87d06021816f9037952afcbac08db",
+  "referenceTree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "sourceFiles": [
+    {
+      "path": "Sources/L337Mac/AudioPresenter.swift",
+      "bytes": 2769,
+      "sha256": "40f99e2b4db2becd91d6b50ef7be3fd24305bd935ea361842917f1103b936338"
+    },
+    {
+      "path": "Sources/L337Core/Sound.swift",
+      "bytes": 2085,
+      "sha256": "c111bc0131ba44a74bdb97baab92bdcea7687efb0bba2f03348b52bcd0f4d8f7"
+    },
+    {
+      "path": "Sources/L337Core/DischargeAudio.swift",
+      "bytes": 1297,
+      "sha256": "02afe49373647d96a366f85d5b10a584aaddf1155d282f00f513d6a901918d39"
+    },
+    {
+      "path": "Sources/L337Core/SpeechFeed.swift",
+      "bytes": 1599,
+      "sha256": "c5e4851872492c33064f1f7ec27812bd594fc1a11aaa12a5333db6a5a6ae9567"
+    },
+    {
+      "path": "Sources/L337Core/ECMControl.swift",
+      "bytes": 6826,
+      "sha256": "e399ff153ae54f82aceb57148a5e05e946674b6494a313915441f6f81accdc59"
+    },
+    {
+      "path": "Sources/L337Core/Game.swift",
+      "bytes": 313817,
+      "sha256": "e5b4e30c835d460aa7ca6f77364db0aaeaf877bb9d73bacc162e9111b26e2e17"
+    }
+  ],
+  "retainedSourceLicense": "assets/legacy/Elite-L337-MIT.txt",
+  "waveforms": "independently generated tones; no imported audio assets",
+  "notClaimed": [
+    "native speech/TTS",
+    "unsupported tool gameplay",
+    "invented kills/ECM",
+    "executed Rust tests",
+    "native audio qualification"
+  ]
+}

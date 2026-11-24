@@ -6,6 +6,8 @@ Rust is the core product. G1 is the sole Mac compiler, native Metal, controls, p
 
 The core must build independently of GPU/window/filesystem/clock adapters. Use deterministic meaningful regressions and transactional refusal tests. Keep original assets, reference identities, notices and acceptance requirements intact. Never edit/import the human working Elite checkout or copy real player profiles.
 
+Acquire a drawable before preparing frame GPU uploads. The native wgpu queue retains staging writes until a submission completes; surface Timeout, Occluded, Outdated and Lost results may skip presentation indefinitely. Never enqueue per-frame staging on those paths. Resize projection updates retain only the latest CPU value until a drawable is acquired. This source guard addresses the identified upload-lifetime hazard; it does not by itself establish macOS memory acceptance.
+
 ## Commands
 
 Use the pinned Rust toolchain and Cargo.lock. `make ci` runs documentation lint, formatting, Python importers, workspace check/tests and strict Clippy. `make run` launches the desktop app in an owned graphics session. Coverage reports and SonarQube are part of GitHub CI. Aim for at least 90 percent focused new-code coverage with explicit evidence-backed exceptions; coverage is not gameplay acceptance.
@@ -19,6 +21,8 @@ python -m pip install --only-binary :all: -r tools/requirements-goshawk-surface-
 ```
 
 Hosted tests use CPython 3.13 and verify SHA-256 hashes for the wheels listed in the CI requirements files. When updating a scientific package, update its development pin and the wheel hashes for all three hosted platforms.
+
+Linux desktop builds also require ALSA development headers (`libasound2-dev` on Debian/Ubuntu) and `pkg-config` for Rodio/CPAL. A live playback device is not required by the headless unit and Xvfb coverage paths.
 
 On native Windows, use the MSVC developer environment:
 

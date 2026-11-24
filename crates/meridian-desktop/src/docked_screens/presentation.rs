@@ -10,7 +10,7 @@ fn fit(text: &str, width: f64) -> String {
         .take((width.max(0.0) / 7.5).floor() as usize)
         .collect()
 }
-fn label(f: &mut Frame, text: impl Into<String>, x: f64, y: f64, ink: Ink, clip: Rect) {
+pub(super) fn label(f: &mut Frame, text: impl Into<String>, x: f64, y: f64, ink: Ink, clip: Rect) {
     if y >= clip.y && y + 9.0 <= clip.y + clip.height {
         f.labels.push(Label {
             text: fit(&text.into(), (clip.x + clip.width - x).max(0.0)),
@@ -21,7 +21,7 @@ fn label(f: &mut Frame, text: impl Into<String>, x: f64, y: f64, ink: Ink, clip:
         });
     }
 }
-fn button(
+pub(super) fn button(
     f: &mut Frame,
     title: &str,
     r: Rect,
@@ -307,12 +307,28 @@ pub(super) fn project(s: &DockedScreens, c: &Context<'_>, v: Viewport) -> Frame 
         f.hits.clear();
         return f;
     }
-    match s.screen {
-        Screen::Galaxy => chart(s, c, &mut f),
-        Screen::System => system(s, c, &mut f),
-        Screen::Showroom => showroom(s, c, &mut f),
-        Screen::Trading => market(s, c, &mut f),
-        Screen::Equipment => equipment(s, c, &mut f),
+    if s.route_chooser.is_some() {
+        super::route::project(s, c, &mut f);
+    } else {
+        match s.screen {
+            Screen::Galaxy => chart(s, c, &mut f),
+            Screen::System => system(s, c, &mut f),
+            Screen::Showroom => showroom(s, c, &mut f),
+            Screen::Trading => market(s, c, &mut f),
+            Screen::Equipment => equipment(s, c, &mut f),
+        }
+        if matches!(s.screen, Screen::Galaxy | Screen::System)
+            && let Some(progress) = c.world.active_route_progress()
+        {
+            button(
+                &mut f,
+                &super::route::progress_line(c, &progress),
+                Rect::new(16.0, v.height - 47.0, (v.width - 32.0).min(470.0), 18.0),
+                Control::OpenRouteProgress,
+                true,
+                None,
+            );
+        }
     }
     let footer = Rect::new(16.0, v.height - 28.0, v.width - 110.0, 24.0);
     label(
@@ -467,8 +483,35 @@ fn chart(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         }
     }
     // Nearest-star selection applies anywhere inside the plot, with deterministic ID tie-break.
-    let fields = world_details(s, c);
-    paragraphs(f, &fields, layout.details, s.scroll);
+    button(
+        f,
+        if s.profit_scan {
+            "P: Profit scan ON"
+        } else {
+            "P: Profit scan OFF"
+        },
+        Rect::new(
+            layout.details.x,
+            layout.details.y,
+            layout.details.width.min(180.0),
+            21.0,
+        ),
+        Control::Key(Key::ProfitScan),
+        true,
+        None,
+    );
+    let mut fields = Vec::new();
+    if s.profit_scan {
+        fields.extend(profit_fields(c.catalogue, &c.world.profit_destinations()));
+    }
+    fields.extend(world_details(s, c));
+    let details = Rect::new(
+        layout.details.x,
+        layout.details.y + 25.0,
+        layout.details.width,
+        (layout.details.height - 25.0).max(0.0),
+    );
+    paragraphs(f, &fields, details, s.scroll);
     let search_button = Rect::new(layout.plot.x + 4.0, layout.plot.y + 4.0, 100.0, 21.0);
     button(f, "Find world", search_button, Control::Search, true, None);
     button(
@@ -492,6 +535,14 @@ fn chart(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         Control::Open(Screen::System),
         true,
         None,
+    );
+    button(
+        f,
+        "Plan route",
+        Rect::new(info.x - 106.0, info.y, 102.0, 21.0),
+        Control::Key(Key::Route),
+        c.route_targets.contains(&s.selected_world) && !c.paused,
+        Some("This chart destination has no supported route or the game is paused"),
     );
     if s.searching {
         let area = Rect::new(
@@ -534,6 +585,26 @@ fn chart(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
             );
         }
     }
+}
+pub(super) fn profit_fields(
+    catalogue: &super::Catalogue,
+    results: &[meridian_core::ProfitDestination],
+) -> Vec<String> {
+    if results.is_empty() {
+        return vec!["No profitable destinations in range".into()];
+    }
+    let mut fields = vec!["Estimated profit (before fuel/risk):".into()];
+    for (index, result) in results.iter().enumerate() {
+        if let Some(world) = catalogue.world(result.system) {
+            fields.push(format!(
+                "{}. {}: {} CR",
+                index + 1,
+                world.name,
+                money(result.profit_tenths)
+            ));
+        }
+    }
+    fields
 }
 fn world_details(s: &DockedScreens, c: &Context<'_>) -> Vec<String> {
     let Some(w) = c.catalogue.world(s.selected_world) else {

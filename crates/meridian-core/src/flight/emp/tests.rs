@@ -98,6 +98,15 @@ fn secret(w: &mut World) {
     let review = w.review_xyzzy(XyzzyAction::Enter, tick).unwrap();
     w.prepare_xyzzy(review, tick).unwrap().commit();
 }
+fn legacy_funded_paid_base() -> World {
+    let w = World::from_save_bytes(include_bytes!(
+        "../../../tests/fixtures/xyzzy-paid-base-v17.bin"
+    ))
+    .unwrap();
+    assert_eq!(w.owned_emp().unwrap().grades, EmpGrades::default());
+    assert_eq!(w.credits_tenths(), Some(10_000_000));
+    w
+}
 fn steps(w: &mut World, count: usize) {
     for _ in 0..count {
         w.step(FlightInput::default()).unwrap();
@@ -219,14 +228,60 @@ fn stored_clock_gap_requires_a_real_refit_interval_and_capacity_upgrade_does_not
     cold(&w);
 }
 #[test]
-fn secret_grant_reuses_paid_emp_and_secret_only_base_cannot_buy_grades() {
-    let mut w = paid();
-    let old = w.owned_emp().unwrap();
-    secret(&mut w);
+fn xyzzy_maxes_paid_or_granted_emp_at_lower_tech_berths_and_preserves_custody() {
+    let max = EmpGrades {
+        power: 3,
+        capacity: 3,
+        recharge: 3,
+    };
+    let mut w = legacy_funded_paid_base();
+    let mut old = w.owned_emp().unwrap();
+    for _ in 0..2 {
+        equipment(
+            &mut w,
+            EmpEquipmentAction::Upgrade {
+                item: old.item,
+                axis: EmpAxis::Capacity,
+            },
+        );
+    }
+    let paid_history = Arc::clone(&w.emp.equipment);
+    assert_eq!(
+        w.review_emp_equipment(
+            EmpEquipmentAction::Upgrade {
+                item: old.item,
+                axis: EmpAxis::Capacity
+            },
+            w.snapshot().tick
+        ),
+        Err(EmpError::TechnologyUnavailable)
+    );
+    equipment(&mut w, EmpEquipmentAction::Store { item: old.item });
+    let balance = w.credits_tenths();
+    let tick = w.snapshot().tick;
+    let review = w
+        .review_xyzzy(XyzzyAction::MaximumSupportedHardware, tick)
+        .unwrap();
+    w.prepare_xyzzy(review, tick).unwrap().commit();
+    old.grades = max;
     assert_eq!(w.owned_emp(), Some(old));
+    assert_eq!(w.credits_tenths(), balance);
+    assert!(w.emp.equipment.starts_with(&paid_history));
+    assert!(
+        w.emp
+            .equipment
+            .iter()
+            .skip(paid_history.len() + 1)
+            .all(|e| e.secret)
+    );
+    let count = w.emp.equipment.len();
+    secret(&mut w);
+    assert_eq!(w.emp.equipment.len(), count);
+    cold(&w);
     let mut granted = World::new_commander(16102).unwrap();
     secret(&mut granted);
     let item = granted.owned_emp().unwrap();
+    assert_eq!(item.grades, max);
     assert_eq!(item.provenance, EmpProvenance::Xyzzy);
     assert_eq!(item.paid_tenths, 0);
     assert_eq!(granted.emp.meter.bank, 0);
@@ -240,7 +295,9 @@ fn secret_grant_reuses_paid_emp_and_secret_only_base_cannot_buy_grades() {
         ),
         Err(EmpError::PaidBaseRequired)
     );
-    cold(&granted);
+    let mut live = cold(&granted);
+    Arc::make_mut(&mut granted.emp.equipment)[1].secret = false;
+    poison_refuses(&granted, &mut live);
 }
 #[test]
 fn altered_bank_and_coordinated_transfer_totals_refuse_without_replacing_live_world() {
@@ -600,12 +657,15 @@ fn actual_secret_base_release_spends_once_drains_shield_and_preserves_hull_cargo
         mule_renas: None,
         state: w.state,
         traffic: w.traffic.clone(),
+        targeting: w.targeting.clone(),
+        auto_docking: w.auto_docking,
         mining: w.mining.clone(),
         mining_scope: Arc::clone(&w.mining_scope),
         damage: w.damage.clone(),
         station_data: decoded.station_data,
         navigation_catalogue: decoded.navigation_catalogue,
         navigation: w.navigation,
+        navigation_route: decoded.navigation_route,
         jump_journal: decoded.jump_journal,
         commander_account: decoded.commander_account,
         freight_session: decoded.freight_session,
@@ -703,10 +763,7 @@ fn cold_continue_does_not_restore_held_input_and_early_release_has_no_discharge(
 #[test]
 fn actual_paid_upgraded_emp_disables_native_attacker_then_recovers_without_loot_or_hull_replacement()
  {
-    let mut w = paid();
-    // The base is bought with earned market cash. Explicit XYZZY supplies later grade funds and
-    // Elite energy; this is not a claim of a wholly ordinary high-grade acquisition journey.
-    secret(&mut w);
+    let mut w = legacy_funded_paid_base();
     let item = w.owned_emp().unwrap().item;
     for axis in [EmpAxis::Power, EmpAxis::Capacity, EmpAxis::Recharge] {
         for _ in 0..2 {
@@ -1143,10 +1200,7 @@ fn start_real_3d_charge(w: &mut World, target: crate::traffic::NpcId) {
     panic!("actual three-dimensional EMP aim never admitted its native attacker");
 }
 fn disabled_native_target() -> (World, crate::traffic::NpcId) {
-    let mut w = paid();
-    // As in the retained World case, the base is paid with earned cash; later funds/Elite
-    // energy are an explicit XYZZY test setup, not an ordinary progression acceptance.
-    secret(&mut w);
+    let mut w = legacy_funded_paid_base();
     let item = w.owned_emp().unwrap().item;
     for axis in [EmpAxis::Power, EmpAxis::Capacity, EmpAxis::Recharge] {
         for _ in 0..2 {

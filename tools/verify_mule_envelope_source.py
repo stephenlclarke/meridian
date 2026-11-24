@@ -14,11 +14,68 @@ RUST_TEST_NAME = r'#\[test\]\s*fn\s+(\w+)\('
 FLIGHT_SOURCE = 'flight.rs'
 FLIGHT_PERSISTENCE = 'flight/persistence.rs'
 EMP_TESTS = 'flight/emp/tests.rs'
+LIB_SOURCE = 'lib.rs'
 ROOT = Path(__file__).resolve().parents[1]
+PROTECTED_CORE = Path('integration/sh001-mule/PROTECTED-CORE.json')
+FLIGHT_COMPUTER_INVERSE = Path('integration/sh001-mule/FLIGHT-COMPUTER-INVERSE.json')
+FLIGHT_COMPUTER_BASE = 'fcec61d182b66478846b92390ad17805b0dfc7e0'
+FLIGHT_COMPUTER_INVERSE_SHA256 = '094fb89c24d15d3b882c49e24a149a5ccb188ed6e949577691440f76b3872a1d'
 
 
 def sha(data):
     return hashlib.sha256(data).hexdigest()
+
+
+def protected_core_pins(root):
+    pin_bytes = (root / PROTECTED_CORE).read_bytes()
+    assert sha(pin_bytes) == '8a2929218820a8e15536aa554c0f8df56a23981944be85ec1b1947778fd48133'
+    baseline = json.loads(pin_bytes)
+    assert baseline['base'] == '792f4485372ae37d0c1d583ae11229e85932ce2f'
+    return baseline['sha256']
+
+
+def flight_computer_inverse(root, protected):
+    manifest = (root / FLIGHT_COMPUTER_INVERSE).read_bytes()
+    assert sha(manifest) == FLIGHT_COMPUTER_INVERSE_SHA256, 'flight computer inverse manifest'
+    inverse = json.loads(manifest)
+    assert inverse['base'] == FLIGHT_COMPUTER_BASE, 'flight computer inverse base'
+    files = inverse['files']
+    assert files and files.keys() <= protected.keys(), 'flight computer inverse paths'
+    return files
+
+
+def undo_peregrine_mk3_publication(relative, data):
+    if relative != LIB_SOURCE:
+        return data
+    declaration = b'pub mod peregrine_mk3;\n\n'
+    anchor = b'pub use flight::{\n    CombatIdentity, CombatSnapshot,'
+    assert data.count(declaration) == 1 and data.count(declaration + anchor) == 1, relative
+    return data.replace(declaration + anchor, anchor, 1)
+
+
+def undo_flight_computer(relative, data, inverse):
+    """Restore exact pre-slice bytes, without fuzzy matching or exclusions."""
+    if relative not in inverse:
+        return data
+    record = inverse[relative]
+    assert sha(data) == record['afterSHA256'], relative
+    assert record['hunks'], relative
+    restored = bytearray()
+    cursor = 0
+    for hunk in record['hunks']:
+        start = hunk['offset']
+        current = hunk['after'].encode('utf-8')
+        previous = hunk['before'].encode('utf-8')
+        assert cursor <= start <= len(data) and current != previous, relative
+        end = start + len(current)
+        assert end <= len(data) and data[start:end] == current, relative
+        restored.extend(data[cursor:start])
+        restored.extend(previous)
+        cursor = end
+    restored.extend(data[cursor:])
+    result = bytes(restored)
+    assert sha(result) == record['beforeSHA256'], relative
+    return result
 
 
 def undo_commander_launch(relative, data):
@@ -181,11 +238,10 @@ def undo_goshawk_world(relative, data):
         ],
         FLIGHT_PERSISTENCE: [(b'            goshawk_validation: None,\n', b'')],
         EMP_TESTS: [(b'        goshawk_validation: None,\n', b'')],
-        'lib.rs': [
+        LIB_SOURCE: [
             (b'pub mod goshawk_custom;\n', b''),
             (b'pub use flight::GoshawkCustomApproachSnapshot;\n', b''),
             (b'pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};\n', b''),
-            (b'\npub mod peregrine_mk3;\n', b''),
         ],
     }
     for current, previous in replacements.get(relative, []):
@@ -197,7 +253,6 @@ def undo_goshawk_world(relative, data):
 def verify_protected_core(root):
     # Undo the reviewed Mule hooks and the equivalent finite-speed range check.
     # Checking every pre-existing core blob catches unrelated gameplay edits.
-    base = '792f4485372ae37d0c1d583ae11229e85932ce2f'
     additions = {
         FLIGHT_SOURCE: [
             b'mod mule_validation;\n',
@@ -207,26 +262,32 @@ def verify_protected_core(root):
         ],
         EMP_TESTS: [b'        mule_validation: None,\n'],
         FLIGHT_PERSISTENCE: [b'            mule_validation: None,\n'],
-        'lib.rs': [b'pub mod mule;\n', b'pub mod goshawk;\n'],
+        LIB_SOURCE: [b'pub mod mule;\n', b'pub mod goshawk;\n'],
         'station.rs': [b'mod mule;\n'],
         'traffic.rs': [
             b'pub(crate) mod mule_validation;\n',
             b'pub use mule_validation::{MuleActorSnapshot, MuleValidationRefusal};\n',
         ],
     }
-    pin_bytes = (root / 'integration/sh001-mule/PROTECTED-CORE.json').read_bytes()
-    assert sha(pin_bytes) == '8a2929218820a8e15536aa554c0f8df56a23981944be85ec1b1947778fd48133'
-    baseline = json.loads(pin_bytes)
-    assert baseline['base'] == base
+    baseline = protected_core_pins(root)
+    inverse = flight_computer_inverse(root, baseline)
     checked = set()
-    for relative, expected in baseline['sha256'].items():
-        data = (root / 'crates/meridian-core/src' / relative).read_bytes()
+    unchanged = 0
+    for relative, expected in baseline.items():
+        current = (root / 'crates/meridian-core/src' / relative).read_bytes()
+        data = undo_peregrine_mk3_publication(relative, current)
+        data = undo_flight_computer(relative, data, inverse)
         data = undo_goshawk_world(relative, data)
         data = undo_renas_encounter(relative, data)
         for addition in additions.get(relative, []):
             assert data.count(addition) == 1, relative
             data = data.replace(addition, b'', 1)
         data = undo_commander_launch(relative, data)
+        if relative == LIB_SOURCE:
+            # Invert only the reviewed Stag Liner geometry publication.
+            addition = b'pub mod stag_liner;\n\n'
+            assert data.count(addition) == 1, relative
+            data = data.replace(addition, b'', 1)
         if relative == FLIGHT_SOURCE:
             speed_line = b'        if !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
             original_line = b'        if !self.state.speed.is_finite() || !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
@@ -234,8 +295,9 @@ def verify_protected_core(root):
             data = data.replace(speed_line, original_line, 1)
         assert sha(data) == expected, relative
         checked.add(relative)
+        unchanged += data == current
     assert set(additions) <= checked and len(checked) == 115
-    return len(checked), len(additions)
+    return len(checked), len(additions), unchanged, len(inverse)
 
 
 def verify_test_registry(criteria):
@@ -294,14 +356,14 @@ def verify():
     folder = ROOT / 'assets/fleet/sh001'
     verify_inputs(folder)
     groups = verify_geometry(folder)
-    checked, hooks = verify_protected_core(ROOT)
+    checked, hooks, unchanged, flight_computer = verify_protected_core(ROOT)
     counts = verify_historical_bindings(folder, groups)
     return {
         'status': 'PASS_SOURCE_ONLY',
-        # flight.rs is shared by the two changes, and flight/mission.rs is additional.
-        'protectedGameplayCoreFilesUnchanged': checked - hooks - 1,
+        'protectedGameplayCoreFilesUnchanged': unchanged,
         'protectedCoreFilesWithCommanderLaunch': 2,
         'protectedCoreFilesWithMuleHooks': hooks,
+        'protectedCoreFilesWithFlightComputerChanges': flight_computer,
         'protectedCoreFilesChecked': checked,
         **counts,
         'vertexEncoding': 5344,

@@ -32,21 +32,7 @@ impl State {
         let mut grades = EmpGrades::default();
         let mut events = Vec::new();
         for event in self.equipment.iter() {
-            let price = match event.action {
-                EmpEquipmentAction::Purchase => {
-                    if event.secret {
-                        0
-                    } else {
-                        policy::BASE_PRICE
-                    }
-                }
-                EmpEquipmentAction::Upgrade { axis, .. } => {
-                    let (price, _) = grades.upgrade_offer(axis).map_err(|_| INVALID)?;
-                    grades = grades.advancing(axis).map_err(|_| INVALID)?;
-                    price
-                }
-                _ => 0,
-            };
+            let (price, _) = event.terms(&mut grades)?;
             events.push(super::super::AccountEvent {
                 revision: event.revision,
                 effect: super::super::AccountEffect::Debit(price),
@@ -215,9 +201,37 @@ impl World {
         tick: u64,
     ) -> Result<(), SaveError> {
         let current = self.emp.owned()?;
-        if current.is_some_and(|item| item.fitted) {
-            return Ok(());
+        if current.is_none() {
+            self.record_xyzzy_emp(dock, tick, EmpEquipmentAction::Purchase)?;
+            self.emp.meter_clock = self.combat.physical_tick();
+            self.emp.bank_clock = self.emp.meter_clock;
         }
+        let item = self.emp.owned()?.ok_or(INVALID)?;
+        if !item.fitted {
+            self.record_xyzzy_emp(dock, tick, EmpEquipmentAction::Fit { item: item.item })?;
+        }
+        for axis in [EmpAxis::Power, EmpAxis::Capacity, EmpAxis::Recharge] {
+            for _ in item.grades.level(axis)..policy::MAX_GRADE {
+                self.record_xyzzy_emp(
+                    dock,
+                    tick,
+                    EmpEquipmentAction::Upgrade {
+                        item: item.item,
+                        axis,
+                    },
+                )?;
+                self.emp.bank_clock = self.combat.physical_tick();
+            }
+        }
+        Ok(())
+    }
+
+    fn record_xyzzy_emp(
+        &mut self,
+        dock: DockContext,
+        tick: u64,
+        action: EmpEquipmentAction,
+    ) -> Result<(), SaveError> {
         if self.emp.equipment.len() >= MAX_EQUIPMENT_EVENTS {
             return Err(SaveError::TooLarge);
         }
@@ -227,23 +241,16 @@ impl World {
             .ok_or(INVALID)?
             .prepare_emp_equipment(0)
             .map_err(|_| INVALID)?;
-        let action = current.map_or(EmpEquipmentAction::Purchase, |item| {
-            EmpEquipmentAction::Fit { item: item.item }
-        });
-        let mut state = self.emp.clone();
-        if current.is_none() {
-            state.meter_clock = self.combat.physical_tick();
-            state.bank_clock = state.meter_clock;
+        if !self.xyzzy.authorizes(dock, tick, account.revision()) {
+            return Err(INVALID);
         }
-        Arc::make_mut(&mut state.equipment).push(EquipmentEvent {
-            secret: current.is_none(),
+        Arc::make_mut(&mut self.emp.equipment).push(EquipmentEvent {
+            secret: true,
             action,
             dock,
             tick,
             revision: account.revision(),
         });
-        state.owned()?;
-        self.emp = state;
         self.commander_account = Some(account);
         Ok(())
     }

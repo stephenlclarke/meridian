@@ -2,9 +2,16 @@
 //! Descriptive catalogue/route values never constitute docking or mission authority.
 mod journal;
 mod persistence;
+mod route;
 use core::fmt;
-pub(crate) use journal::{CompletedJump, JumpJournal, NavigationFitChange, NavigationGrade};
+pub use journal::NavigationGrade;
+pub(crate) use journal::{CompletedJump, JumpJournal, NavigationFitChange};
 pub(crate) use persistence::SavedNavigationSummary;
+pub use route::{
+    ROUTE_SYSTEMS, RouteAlternative, RouteError, RoutePlan, RoutePreference, RouteProgress,
+    RouteStatus,
+};
+pub(crate) use route::{RouteEconomy, route_alternatives, route_feasible, route_hop};
 use std::collections::VecDeque;
 
 const CATALOGUE: &[u8] = include_bytes!("../../../assets/legacy/g01.navigation");

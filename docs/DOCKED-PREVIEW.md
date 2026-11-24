@@ -12,7 +12,11 @@ The authored station display repair joins the rear ring rim to the back of the t
 
 ## Controls
 
+In the audio source candidate, Ctrl+Shift+M toggles sound on or off, including in Help and station screens; Help reports the current output status. This is process-local and never alters the commander save. Missing playback hardware does not prevent play. Native qualification is pending.
+
 While docked, 1 through 5 select galaxy, system, showroom, trading and equipment. M opens trading and O opens equipment. Arrow keys, Tab/Shift+Tab, Enter and Escape navigate; / opens search. G and Shift+G buy and sell, Y/U fit and store, and ] changes equipment slot. H or ? opens a popup with the actual page controls and all station screen shortcuts. Mouse clicks, wheel scrolling and chart/model dragging use logical coordinates. Only admitted world routes can be selected for the subsequent J jump. Unavailable ships cannot be exchanged. In flight, H or ? opens the fitted-weapon and flight controls popup. Unshifted / remains galaxy search.
+
+In the development source, P or the Profit scan button toggles a read-only estimate on the station Galaxy chart, including its local view. At most five positive destinations appear, ranked by incremental profit against selling unreserved cargo here. Only directly reachable admitted markets count, using current fuel, the fitted jump range, finite source stock, actual bid/ask quotes, cash and free cargo space. Estimates exclude fuel cost and risk and do not guarantee future prices or purchase admission. The indicator shows an empty result when no positive destination qualifies. P outside the chart retains pause; P inside active chart text search types a letter. The scan preference is session-local; the scan does not mutate or save World state.
 
 ## Actual Mac qualification
 

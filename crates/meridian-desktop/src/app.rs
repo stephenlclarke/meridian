@@ -1,6 +1,8 @@
+mod audio;
 mod emp;
 mod mule_presentation;
 mod mule_validation;
+mod target_computer;
 use std::{
     collections::{HashSet, hash_map::RandomState},
     error::Error,
@@ -20,6 +22,7 @@ use winit::{
     window::{Fullscreen, Window, WindowId},
 };
 
+use crate::audio::host::DesktopAudio;
 use crate::clock::FixedClock;
 use crate::profile::Profile;
 use crate::renderer::{HudScene, Presentation, Renderer, SceneEffects, StationScene};
@@ -44,6 +47,7 @@ fn step_frame(
     fire_held: bool,
     pulse: &mut Option<PulseShot>,
     mining: &mut Option<asteroid_render::MiningVisual>,
+    mut accepted_discharge: impl FnMut(),
 ) -> Result<Option<MotionRefusal>, StepError> {
     let mut refusal = None;
     for _ in 0..ticks {
@@ -62,9 +66,11 @@ fn step_frame(
                         opening: state,
                         shot,
                     });
+                    accepted_discharge();
                 }
             } else if let Ok(shot) = world.request_fire_front_laser(state.tick) {
                 *pulse = Some(shot);
+                accepted_discharge();
             }
         }
     }
@@ -91,12 +97,14 @@ pub(crate) const MIN_WINDOW_LOGICAL: [f64; 2] = [640.0, 360.0];
 struct Notice {
     text: Option<String>,
     expires: Option<Instant>,
+    missile: bool,
 }
 
 impl Notice {
     fn set(&mut self, message: String) {
         self.text = Some(message);
         self.expires = Some(Instant::now() + std::time::Duration::from_secs(4));
+        self.missile = false;
     }
 
     fn expire(&mut self, now: Instant) -> bool {
@@ -110,7 +118,9 @@ impl Notice {
 
 struct App {
     game: Profile,
+    audio: Option<DesktopAudio>,
     validation_view: FlightView,
+    target_details: Option<bool>,
     validation_timing: Option<mule_validation::FrameTiming>,
     celestial: crate::celestial::WorldAdapter,
     quit_failed: bool,
@@ -138,7 +148,10 @@ struct App {
 
 impl App {
     fn new() -> Result<Self, Box<dyn Error>> {
-        Self::from_launch(mule_validation::Launch::parse(std::env::args_os().skip(1))?)
+        let mut app =
+            Self::from_launch(mule_validation::Launch::parse(std::env::args_os().skip(1))?)?;
+        app.open_audio();
+        Ok(app)
     }
     fn from_launch(launch: mule_validation::Launch) -> Result<Self, Box<dyn Error>> {
         let view = launch.camera_view();
@@ -167,7 +180,9 @@ impl App {
         let internal = game.is_internal_validation();
         Self {
             game,
+            audio: None,
             validation_view: FlightView::Front,
+            target_details: None,
             validation_timing: internal.then(mule_validation::FrameTiming::default),
             quit_failed: false,
             celestial: crate::celestial::WorldAdapter::default(),
@@ -198,6 +213,7 @@ impl App {
         let message = error.to_string();
         eprintln!("Meridian: {message}");
         self.error = Some(message);
+        self.shutdown_audio();
         event_loop.exit();
     }
 
@@ -253,6 +269,12 @@ impl App {
     }
 
     fn help_panel(&self) -> crate::help::Panel {
+        let mut panel = self.game_help_panel();
+        panel.lines.push(self.audio_help_line());
+        panel
+    }
+
+    fn game_help_panel(&self) -> crate::help::Panel {
         if let Some(menu) = &self.xyzzy {
             return menu.help();
         }
@@ -365,7 +387,7 @@ impl App {
         match self.game.xyzzy(action) {
             Ok(message) => {
                 self.notice.set(message);
-                self.xyzzy = None;
+                menu.reviewing = false;
                 self.sync_profile_controls();
             }
             Err(message) => self.notice.set(message),
@@ -375,6 +397,10 @@ impl App {
     fn reset_input(&mut self) {
         self.clear_held_input();
         if self.modal_open() {
+            if !self.focused || self.occluded {
+                self.game.world.cancel_auto_docking();
+                self.game.world.cancel_targeting();
+            }
             self.request_redraw();
             return;
         }
@@ -444,11 +470,15 @@ impl App {
         }
         match code {
             KeyCode::Escape => self.request_quit(event_loop),
-            KeyCode::KeyQ if self.quit_failed => event_loop.exit(),
+            KeyCode::KeyQ if self.quit_failed => {
+                self.shutdown_audio();
+                event_loop.exit();
+            }
             KeyCode::KeyN if !self.game.playing() => {
                 let message = match self.game.new_commander(fresh_profile_seed()) {
                     Ok(true) => {
                         self.sync_profile_controls();
+                        self.begin_audio_session();
                         "New commander ready".into()
                     }
                     Ok(false) => {
@@ -543,6 +573,7 @@ impl App {
                 self.leave_commander();
                 self.notice
                     .set("Launch admitted. Follow the exit corridor.".into());
+                self.publish_audio(false);
             }
             Err(error) => self.notice.set(error.to_string()),
         }
@@ -563,10 +594,17 @@ impl App {
             self.docked = None;
             return;
         }
+        let screen = if self.xyzzy.is_some() {
+            self.docked
+                .as_ref()
+                .map_or(ui::Screen::System, Docked::screen)
+        } else {
+            ui::Screen::System
+        };
         self.docked = match Docked::new(&self.game.world) {
             Ok(mut menu) => {
                 if self.game.world.current_dock_context().is_some()
-                    && let Err(error) = menu.open(&self.game.world, ui::Screen::System)
+                    && let Err(error) = menu.open(&self.game.world, screen)
                 {
                     self.notice.set(error);
                 }
@@ -583,6 +621,7 @@ impl App {
         match self.game.continue_saved() {
             Ok(()) => {
                 self.sync_profile_controls();
+                self.begin_audio_session();
                 self.notice.set(if self.commander_open {
                     "Commander loaded".into()
                 } else {
@@ -593,6 +632,7 @@ impl App {
                 "Continue refused; save and current game retained: {error}"
             )),
         }
+        self.publish_audio(false);
     }
 
     fn request_quit(&mut self, event_loop: &ActiveEventLoop) {
@@ -604,6 +644,7 @@ impl App {
                 if let Some(timing) = self.validation_timing.take() {
                     eprintln!("{}", timing.report());
                 }
+                self.shutdown_audio();
                 event_loop.exit();
             }
             Err(error) => {
@@ -709,7 +750,19 @@ impl App {
             self.notice.set("EMP: hold U for ten seconds; release to cancel. Recent-attacker self-defence only.".into());
             return;
         }
+        let in_flight = self.game.world.snapshot().mode == FlightMode::Flight;
+        if in_flight {
+            match code {
+                KeyCode::Tab => return self.cycle_computer_target(),
+                KeyCode::KeyF => return self.cycle_computer_filter(),
+                KeyCode::KeyT => return self.lock_computer_target(),
+                KeyCode::Backspace | KeyCode::Delete => return self.release_computer_target(),
+                KeyCode::KeyI if self.modifiers.shift_key() => return self.toggle_target_details(),
+                _ => {}
+            }
+        }
         let action = match code {
+            KeyCode::KeyN if in_flight => Action::ToggleAutoDocking,
             KeyCode::Digit0 => Action::SetFlightView(FlightView::Front),
             KeyCode::Digit1 => Action::SetFlightView(FlightView::Rear),
             KeyCode::Digit2 => Action::SetFlightView(FlightView::Left),
@@ -726,11 +779,35 @@ impl App {
             KeyCode::F3 => Action::FireMissile,
             KeyCode::F4 => Action::ClearMissile,
             KeyCode::KeyL => Action::Launch,
-            KeyCode::KeyJ => self
-                .docked
-                .as_ref()
-                .and_then(|menu| menu.route)
-                .map_or(Action::Jump, Action::JumpTo),
+            KeyCode::KeyJ => {
+                if let Some(route) = self.game.world.active_route_progress() {
+                    if let Some(next) = route.next_system {
+                        Action::JumpTo(next)
+                    } else {
+                        use meridian_core::navigation::RouteStatus;
+                        let message = match route.status {
+                            RouteStatus::RefuelRequired => {
+                                "Refuel at this stop before the next jump."
+                            }
+                            RouteStatus::AwaitingDock => "Dock at this stop to advance the route.",
+                            RouteStatus::ComputerUnavailable => {
+                                "Fit a navigation computer that supports this route."
+                            }
+                            RouteStatus::Complete => {
+                                "Route complete. Select a new destination at a station."
+                            }
+                            RouteStatus::Ready => "Route has no next destination.",
+                        };
+                        self.notice.set(message.into());
+                        return;
+                    }
+                } else {
+                    self.docked
+                        .as_ref()
+                        .and_then(|menu| menu.route)
+                        .map_or(Action::Jump, Action::JumpTo)
+                }
+            }
             KeyCode::KeyT => Action::Contact,
             KeyCode::KeyR => Action::Review,
             KeyCode::KeyV => Action::ReviewAll,
@@ -753,10 +830,16 @@ impl App {
             KeyCode::BracketRight => Action::NextCommodity,
             _ => return,
         };
+        let mut missile = false;
         self.notice.set(match self.game.command(action) {
-            Ok(message) => message,
+            Ok(message) => {
+                missile = matches!(action, Action::FireMissile);
+                message
+            }
             Err(error) => error,
         });
+        self.notice.missile = missile;
+        self.publish_audio(false);
     }
 
     fn advance_frame(&mut self, active: bool, ticks: usize) -> FrameAdvance {
@@ -820,6 +903,7 @@ impl App {
         ) {
             self.key(code, event_loop);
         }
+        self.publish_audio(false);
     }
 
     // Route held input and menu text without constructing a window or an event loop.
@@ -855,6 +939,9 @@ impl App {
         if !self.focused || self.occluded {
             return None;
         }
+        if self.route_audio_toggle(code, repeat) {
+            return None;
+        }
         if self.route_help(code, repeat, text) {
             return None;
         }
@@ -869,6 +956,18 @@ impl App {
             && let Some(text) = text.filter(|s| s.chars().all(|c| !c.is_control()))
         {
             self.menu_input(ui::Input::Text(text.to_string()));
+            return None;
+        }
+        if code == KeyCode::KeyP
+            && self.menu_active()
+            && self
+                .docked
+                .as_ref()
+                .is_some_and(|menu| menu.screen() == ui::Screen::Galaxy)
+        {
+            if !repeat {
+                self.menu_input(ui::Input::Key(ui::Key::ProfitScan));
+            }
             return None;
         }
         if repeat
@@ -1100,6 +1199,15 @@ impl App {
             mut hud_lines,
             docked_frame,
         } = prepared;
+        if snapshot.mode == FlightMode::Flight {
+            let filter = self.game.world.target_filter();
+            if filter != meridian_core::TargetFilter::Ships {
+                hud_lines.insert(
+                    hud_lines.len().min(2),
+                    format!("TARGET FILTER: {} | F", filter.label()),
+                );
+            }
+        }
         let belt = if snapshot.mode == FlightMode::Flight {
             self.game.world.mining_belt_snapshot()
         } else {
@@ -1185,6 +1293,7 @@ impl App {
                 mule_frame.as_ref(),
             );
             let practice = self.game.world.practice_snapshot();
+            let targeting = self.game.world.targeting_snapshot();
             renderer.set_flight_view(if self.game.is_internal_validation() {
                 self.validation_view
             } else {
@@ -1197,6 +1306,8 @@ impl App {
                 SceneEffects {
                     mule: mule_scene,
                     traffic: traffic.as_ref(),
+                    targeting: targeting.as_ref(),
+                    target_details: self.target_details,
                     pulse: self.pulse.as_ref(),
                     mining: belt.as_ref().map(|belt| asteroid_render::Scene {
                         belt,
@@ -1233,6 +1344,7 @@ impl App {
 
 impl ApplicationHandler for App {
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
+        self.resume_audio();
         if self.renderer.is_some() {
             return;
         }
@@ -1319,6 +1431,7 @@ impl ApplicationHandler for App {
     }
 
     fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
+        self.publish_audio(false);
         if self.expire_hud_notice(Instant::now()) {
             self.request_redraw();
         }
@@ -1335,6 +1448,14 @@ impl ApplicationHandler for App {
                 renderer.window.request_redraw();
             }
         }
+    }
+
+    fn suspended(&mut self, _event_loop: &ActiveEventLoop) {
+        self.suspend_audio();
+    }
+
+    fn exiting(&mut self, _event_loop: &ActiveEventLoop) {
+        self.shutdown_audio();
     }
 }
 
@@ -1361,22 +1482,30 @@ mod tests {
             .unwrap_or_else(|error| panic!("{error}"));
         let input = FlightInput::default();
         let mut pulse = None;
-        step_frame(&mut world, input, 1, false, &mut pulse, &mut None)
+        step_frame(&mut world, input, 1, false, &mut pulse, &mut None, || {})
             .unwrap_or_else(|error| panic!("{error}"));
         let tick = world.snapshot().tick;
-        step_frame(&mut world, input, 0, true, &mut pulse, &mut None)
+        step_frame(&mut world, input, 0, true, &mut pulse, &mut None, || {})
             .unwrap_or_else(|error| panic!("{error}"));
         assert_eq!(pulse, None);
-        step_frame(&mut world, input, 1, true, &mut pulse, &mut None)
+        step_frame(&mut world, input, 1, true, &mut pulse, &mut None, || {})
             .unwrap_or_else(|error| panic!("{error}"));
         let first = pulse.unwrap_or_else(|| panic!("Held trigger did not fire on the next tick"));
         assert_eq!(first.tick, tick + 1);
 
         let cooldown = usize::from(meridian_core::PULSE_COOLDOWN_TICKS);
-        step_frame(&mut world, input, cooldown - 1, true, &mut pulse, &mut None)
-            .unwrap_or_else(|error| panic!("{error}"));
+        step_frame(
+            &mut world,
+            input,
+            cooldown - 1,
+            true,
+            &mut pulse,
+            &mut None,
+            || {},
+        )
+        .unwrap_or_else(|error| panic!("{error}"));
         assert_eq!(pulse, Some(first));
-        step_frame(&mut world, input, 1, true, &mut pulse, &mut None)
+        step_frame(&mut world, input, 1, true, &mut pulse, &mut None, || {})
             .unwrap_or_else(|error| panic!("{error}"));
         assert_eq!(
             pulse.map(|shot| shot.tick),
@@ -1384,8 +1513,16 @@ mod tests {
         );
 
         let second = pulse;
-        step_frame(&mut world, input, cooldown, false, &mut pulse, &mut None)
-            .unwrap_or_else(|error| panic!("{error}"));
+        step_frame(
+            &mut world,
+            input,
+            cooldown,
+            false,
+            &mut pulse,
+            &mut None,
+            || {},
+        )
+        .unwrap_or_else(|error| panic!("{error}"));
         assert_eq!(pulse, second);
         assert_eq!(
             world
@@ -1421,6 +1558,7 @@ mod tests {
             false,
             &mut None,
             &mut None,
+            || {},
         )
         .unwrap_or_else(|error| panic!("{error}"));
         let after = world.snapshot();

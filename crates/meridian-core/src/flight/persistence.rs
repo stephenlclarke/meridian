@@ -12,6 +12,9 @@ use crate::save::{MAX_SAVE_BYTES, Reader, SAVE_VERSION, SaveError, Writer, check
 use crate::station_services::{SavedServiceSummary, StationMarkets};
 
 const MAGIC: &[u8; 8] = b"MERSAVE1";
+// A route is optional in v17. The exact legacy encoding is retained when no
+// route exists; a distinct tag separates the additive trailer from corruption.
+const ROUTE_EXTENSION: &[u8; 8] = b"MRTE0001";
 const CONTENT: &[u8] = concat!(
     "meridian-world/rules/17;explicit-xyzzy/account-prefix-replay-v2/a11fe169;distinct-emp/paid-defensive-local-v1/a11fe169;navigation-computer/exact-route-journal/a11fe169;lareria-main-services/station-combat-three-v1/a11fe169;rapid-lasers-energy/shared-nine-byte-resources-v1/a11fe169;mining/native-work-pending-v2;fuel-scoops/paid-utility-v1;npc-missiles/canonical-native-ray-v3;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
@@ -306,6 +309,10 @@ impl World {
         self.damage.encode(&mut w);
         self.mining.encode(&mut w);
         self.jump_journal.encode(&mut w);
+        if let Some(route) = &self.navigation_route {
+            w.bytes.extend(ROUTE_EXTENSION);
+            route.encode_save(&mut w);
+        }
         let digest = checksum(&w.bytes);
         w.u64(digest);
         if w.bytes.len() > MAX_SAVE_BYTES {
@@ -396,6 +403,8 @@ impl World {
         let mut candidate = Self {
             state,
             traffic: crate::traffic::State::default(),
+            targeting: super::targeting::State::default(),
+            auto_docking: None,
             goshawk_validation: None,
             mule_validation: None,
             mule_renas: None,
@@ -407,6 +416,7 @@ impl World {
                 OriginalNavigation::bundled().map_err(|_| SaveError::ContentMismatch)?,
             ),
             navigation: Some(navigation),
+            navigation_route: None,
             jump_journal: crate::navigation::JumpJournal::default(),
             commander_account: Some(commander_account),
             freight_session: Some(freight_session),
@@ -436,6 +446,12 @@ impl World {
         candidate.damage = super::damage::State::decode(&mut r, version)?;
         candidate.mining = crate::mining::State::decode(&mut r)?;
         candidate.jump_journal = crate::navigation::JumpJournal::decode(&mut r)?;
+        if !r.finished() {
+            if r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)? != *ROUTE_EXTENSION {
+                return Err(SaveError::InvalidEncoding);
+            }
+            candidate.navigation_route = Some(crate::navigation::RoutePlan::decode_save(&mut r)?);
+        }
         if !r.finished() {
             return Err(SaveError::InvalidEncoding);
         }
@@ -528,6 +544,7 @@ impl World {
             self.state.tick,
             account.fuel_tenths(),
         )?;
+        self.validate_saved_navigation_route()?;
         if !self.damage.enabled() {
             self.damage.validate_resources(self, nav.dock_sequence)?;
         }

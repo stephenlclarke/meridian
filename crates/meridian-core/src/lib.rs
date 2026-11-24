@@ -18,8 +18,12 @@ pub mod station_services;
 pub mod traffic;
 
 pub use flight::GoshawkCustomApproachSnapshot;
+pub use flight::PreparedNavigationRoute;
+pub use flight::ProfitDestination;
 pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};
 pub use flight::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
+
+pub mod stag_liner;
 
 pub use flight::{
     ENERGY_CAPACITY_HUNDREDTHS, FIXED_DELTA_SECONDS, FireError, FlightInput, MAX_SPEED,
@@ -42,6 +46,7 @@ pub mod peregrine_mk3;
 pub use flight::{
     CombatIdentity, CombatSnapshot, OrdinaryImpact, OrdinaryTarget, OrdinaryWeapon, PlayerCondition,
 };
+pub use flight::{TargetFilter, TargetIdentity, TargetMode, TargetingSnapshot, TargetingViewport};
 
 pub use flight::{
     MISSILE_COOLDOWN_TICKS, MISSILE_FACES, MISSILE_LIFETIME_TICKS, MISSILE_MUZZLE_DISTANCE,
