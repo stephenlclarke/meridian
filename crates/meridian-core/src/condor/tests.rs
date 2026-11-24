@@ -1,6 +1,6 @@
 use super::{
-    CONDOR_PIECES, CondorHullSource, DETAILED_VERTICES, MEMBERSHIP, NATIVE_VERTICES, VERTICES,
-    decode_point,
+    CONDOR_PIECES, CondorHullSource, DETAILED_VERTICES, MEMBERSHIP, NATIVE_VERTICES,
+    NO_SECONDARY_PIECE, VERTICES, decode_point,
 };
 use crate::docking::{Basis3, RigidPose, Vec3};
 use crate::mule::EnvelopeError;
@@ -15,27 +15,50 @@ fn condor_original_detailed_and_native_faces_share_complete_local_supports()
     assert_eq!(hull.pieces().len(), CONDOR_PIECES);
     assert_eq!(points.len(), DETAILED_VERTICES + NATIVE_VERTICES);
     assert_eq!(TRIANGLES.len(), (4504 + 244) * 12);
-    for (index, slot) in MEMBERSHIP.iter().copied().enumerate() {
-        let point = decode_point(&points[index]);
-        let piece = &hull.pieces()[usize::from(slot)];
-        assert!(piece.source_points().contains(&point));
-        assert_eq!(piece.rounding_metres(), 0.02);
+    let memberships = MEMBERSHIP.as_chunks::<2>().0;
+    assert_eq!(memberships.len(), points.len());
+    assert_eq!(
+        memberships
+            .iter()
+            .filter(|pair| pair[1] != NO_SECONDARY_PIECE)
+            .count(),
+        56
+    );
+    for (point, pair) in points.iter().zip(memberships) {
+        let point = decode_point(point);
+        for slot in pair
+            .iter()
+            .copied()
+            .filter(|&slot| slot != NO_SECONDARY_PIECE)
+        {
+            let piece = &hull.pieces()[usize::from(slot)];
+            assert!(piece.source_points().contains(&point));
+            assert_eq!(piece.rounding_metres(), 0.02);
+        }
     }
     for face in TRIANGLES.as_chunks::<12>().0 {
         let [a, b, c] = face.as_chunks::<4>().0 else {
             return Err(EnvelopeError::InvalidContent);
         };
         let indices = [*a, *b, *c].map(|i| u32::from_le_bytes(i) as usize);
-        let slot = MEMBERSHIP[indices[0]];
-        assert!(indices.iter().all(|&i| MEMBERSHIP[i] == slot));
         let [a, b, c] = indices.map(|i| decode_point(&points[i]));
         let center = Vec3::new(
             (a.x + b.x + c.x) / 3.0,
             (a.y + b.y + c.y) / 3.0,
             (a.z + b.z + c.z) / 3.0,
         );
-        assert!(hull.pieces()[usize::from(slot)].contains(center));
+        assert!(memberships[indices[0]].iter().copied().any(|slot| {
+            slot != NO_SECONDARY_PIECE
+                && indices.iter().all(|&i| memberships[i].contains(&slot))
+                && hull.pieces()[usize::from(slot)].contains(center)
+        }));
     }
+    let artwork_membership =
+        include_bytes!("../../../../assets/fleet/sh055/source-piece-membership.bin");
+    assert_eq!(
+        CondorHullSource::from_bytes(VERTICES, artwork_membership),
+        Err(EnvelopeError::ChangedSource)
+    );
     let mut rewritten = VERTICES.to_vec();
     rewritten[16] ^= 1;
     assert_eq!(
