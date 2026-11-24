@@ -159,6 +159,7 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Oryx Voyager source envelope and Hull Studio definition](docs/ORYX-VOYAGER-SOURCE.md)
 - [Carabao Freighter source envelope and Hull Studio definition](docs/CARABAO-FREIGHTER-SOURCE.md)
 - [Carabao Highliner source envelope and Hull Studio definition](docs/CARABAO-HIGHLINER-SOURCE.md)
+- [Jaguar source envelope and Hull Studio definition](docs/JAGUAR-SOURCE.md)
 - [Stag Liner source envelope and Hull Studio definition](docs/STAG-LINER-GAMEPLAY-ENVELOPE.md)
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)
