@@ -96,7 +96,7 @@ pub(super) fn visible(
     pose: RigidPose,
     projection: [f32; 4],
 ) -> bool {
-    mesh.chunks_exact(3).any(|triangle| {
+    mesh.as_chunks::<3>().0.iter().any(|triangle| {
         triangle_visible(
             std::array::from_fn(|i| relative(camera, pose, triangle[i].position)),
             projection,
@@ -187,10 +187,8 @@ fn marker(
     };
     let edge = (screen[0].abs() / (half[0] - 10.0)).max(screen[1].abs() / (half[1] - 10.0));
     let offscreen = z <= near || z > far || edge > 1.0;
-    if offscreen {
-        if edge > 0.0 {
-            screen = [screen[0] / edge, screen[1] / edge];
-        }
+    if offscreen && edge > 0.0 {
+        screen = [screen[0] / edge, screen[1] / edge];
     }
     let [x, y] = [half[0] + screen[0], half[1] + screen[1]];
     for bounds in [
@@ -234,9 +232,9 @@ fn preview(
     if !radius.is_finite() || radius <= 0.0 {
         return;
     }
-    let mut triangles: Vec<_> = transformed.chunks_exact(3).collect();
+    let mut triangles: Vec<_> = transformed.as_chunks::<3>().0.iter().collect();
     let depth = |triangle: &[([f32; 3], [f32; 3])]| triangle.iter().map(|(p, _)| p[2]).sum::<f32>();
-    triangles.sort_by(|a, b| depth(b).total_cmp(&depth(a)));
+    triangles.sort_by(|a, b| depth(*b).total_cmp(&depth(*a)));
     for triangle in triangles {
         for &(p, color) in triangle {
             let x = center[0] + p[0] / radius * 22.0;
