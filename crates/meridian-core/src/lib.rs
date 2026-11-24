@@ -30,6 +30,7 @@ pub mod moose_clipper;
 pub mod mule;
 pub mod muskox;
 pub mod navigation;
+pub mod rabbit_explorer;
 pub mod saiga;
 pub mod saker;
 pub mod save;

@@ -1,3 +1,9 @@
+# Rabbit Explorer source preparation and replay use exact LF bytes.
+tools/rabbit_explorer_art_mesh.py text eol=lf
+tools/measure_rabbit_explorer.py text eol=lf
+tools/prepare_rabbit_explorer.py text eol=lf
+tools/verify_rabbit_explorer.py text eol=lf
+
 # Asset and provenance hashes identify exact bytes on every platform.
 assets/legacy/** -text
 assets/fleet/sh001/** -text

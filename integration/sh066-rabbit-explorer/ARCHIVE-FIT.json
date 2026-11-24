@@ -1,0 +1,153 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 1800,
+    "archiveNative": 2000
+  },
+  "fullUpperMillimetres": {
+    "detailed": 1996,
+    "archiveNative": 2115
+  },
+  "pieces": {
+    "body primary pressure envelope[1]": {
+      "detailed": 1555,
+      "archiveNative": 1647
+    },
+    "body primary pressure envelope/service-well-0-0[1]": {
+      "detailed": 1533,
+      "archiveNative": 2115
+    },
+    "body primary pressure envelope/service-well-0-1[1]": {
+      "detailed": 1533,
+      "archiveNative": 1653
+    },
+    "body primary pressure envelope/service-well-0-2[1]": {
+      "detailed": 1533,
+      "archiveNative": 1882
+    },
+    "body primary pressure envelope/service-well-1-0[1]": {
+      "detailed": 1533,
+      "archiveNative": 2115
+    },
+    "body primary pressure envelope/service-well-1-1[1]": {
+      "detailed": 1533,
+      "archiveNative": 2000
+    },
+    "body primary pressure envelope/service-well-1-2[1]": {
+      "detailed": 1541,
+      "archiveNative": 1904
+    },
+    "body primary pressure envelope/service-well-2-0[1]": {
+      "detailed": 1533,
+      "archiveNative": 1882
+    },
+    "body primary pressure envelope/service-well-2-1[1]": {
+      "detailed": 1533,
+      "archiveNative": 1647
+    },
+    "body primary pressure envelope/service-well-2-2[1]": {
+      "detailed": 1533,
+      "archiveNative": 1412
+    },
+    "body primary pressure envelope/service-well-3-0[1]": {
+      "detailed": 1533,
+      "archiveNative": 1882
+    },
+    "body primary pressure envelope/service-well-3-1[1]": {
+      "detailed": 1533,
+      "archiveNative": 1796
+    },
+    "body primary pressure envelope/service-well-3-2[1]": {
+      "detailed": 1533,
+      "archiveNative": 1909
+    },
+    "body primary pressure envelope/longitudinal-service-strut-0[1]": {
+      "detailed": 232,
+      "archiveNative": 591
+    },
+    "body primary pressure envelope/longitudinal-service-strut-1[1]": {
+      "detailed": 232,
+      "archiveNative": 595
+    },
+    "cockpit glazing envelope[1]": {
+      "detailed": 742,
+      "archiveNative": 753
+    },
+    "cockpit connected structural crossmember[1]": {
+      "detailed": 256,
+      "archiveNative": 256
+    },
+    "engine_pair/negative side/connected support[1]": {
+      "detailed": 1303,
+      "archiveNative": 1303
+    },
+    "engine_pair/negative side/propulsion casing[1]": {
+      "detailed": 1733,
+      "archiveNative": 1894
+    },
+    "engine_pair/negative side/propulsion luminous recess[1]": {
+      "detailed": 1219,
+      "archiveNative": 1533
+    },
+    "engine_pair/positive side/connected support[1]": {
+      "detailed": 1303,
+      "archiveNative": 1303
+    },
+    "engine_pair/positive side/propulsion casing[1]": {
+      "detailed": 1733,
+      "archiveNative": 1894
+    },
+    "engine_pair/positive side/propulsion luminous recess[1]": {
+      "detailed": 1219,
+      "archiveNative": 1533
+    },
+    "open curved loop/span-01": {
+      "detailed": 1787,
+      "archiveNative": 1787
+    },
+    "open curved loop/span-02": {
+      "detailed": 1783,
+      "archiveNative": 1998
+    },
+    "open curved loop/span-03": {
+      "detailed": 1996,
+      "archiveNative": 1915
+    },
+    "open curved loop/span-04": {
+      "detailed": 1789,
+      "archiveNative": 1961
+    },
+    "open curved loop/span-05": {
+      "detailed": 1961,
+      "archiveNative": 1947
+    },
+    "open curved loop/span-06": {
+      "detailed": 1787,
+      "archiveNative": 1652
+    },
+    "open curved loop/span-07": {
+      "detailed": 1787,
+      "archiveNative": 1787
+    },
+    "open curved loop/span-08": {
+      "detailed": 1989,
+      "archiveNative": 1857
+    },
+    "open curved loop/span-09": {
+      "detailed": 1794,
+      "archiveNative": 1961
+    },
+    "open curved loop/span-10": {
+      "detailed": 1996,
+      "archiveNative": 1915
+    },
+    "open curved loop/span-11": {
+      "detailed": 1783,
+      "archiveNative": 1998
+    },
+    "open curved loop/span-12": {
+      "detailed": 1787,
+      "archiveNative": 1787
+    }
+  }
+}
