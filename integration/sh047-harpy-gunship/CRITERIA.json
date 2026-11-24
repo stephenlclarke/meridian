@@ -1,0 +1,126 @@
+{
+  "hull": "SH047 Harpy Gunship",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh047/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh047-harpy-gunship/FROZEN-SOURCES.json",
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "faces": {
+    "detailed": 5040,
+    "native": 244,
+    "nativeMaximum": 512
+  },
+  "supportGroups": 28,
+  "fitUpperMillimetres": {
+    "detailed": 847,
+    "native": 1448
+  },
+  "minimumRouteClearanceMillimetres": 621,
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-harpy-gunship",
+    "massKg": 47068
+  },
+  "replayPins": {
+    "integration/sh047-harpy-gunship/CONTACT-CANDIDATE.json": "d1fc111c3e5b2bce664195d63b393ade33f92954496dff52ce37dd8c7abd7b8e",
+    "integration/sh047-harpy-gunship/CONTACT-RESULT.json": "466be5c5690d486f17fac0aac103254cb52bda14e30082c2fef0306e4d466468",
+    "integration/sh047-harpy-gunship/FROZEN-SOURCES.json": "0e2ae71243738431e46f91408a4a96fa0f1bf9915a9374e89dc3fabe4d7917d5",
+    "integration/sh047-harpy-gunship/HARPY-GUNSHIP-STUDIO.json": "d367c5686846b824d9b94b74053be3706f7792a8aa03eb110a600ba0b13a309e",
+    "integration/sh047-harpy-gunship/ORIGINAL-DIFFERENCE.json": "16137db782b8254082aa1b95ccfd2018fc4149acfdc2e1f79843b9cb86ef31d3",
+    "integration/sh047-harpy-gunship/ORIGINAL-JOINTS.json": "8d9cd46c6f9a441141252681e8e6b215d998495c8b00c0b97ac0a707b71328c5",
+    "integration/sh047-harpy-gunship/SUPPORT-FAN.json": "4d8607d03bfb51f50a2db3abf25eccf8e5492cdc86e17c6b5d9ec03fdf97baeb",
+    "integration/sh047-harpy-gunship/SURFACE-FIT.json": "ce4126445c4070e432c8c83f8042be481288ea773c9a3a7c83b9eb9f64592da1",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/measure_harpy_gunship.py": "0d79fb1a2bee0b5cc3b38998f835e250e75fdaa19f9dd8d348c2755bc5f2a867",
+    "tools/prepare_harpy_gunship.py": "6ab885f8491134a3e9cf97b3febfb938121c3ad197fa9199a2d9440e35967b74",
+    "tools/verify_harpy_gunship.py": "d7ba3fdc1327e9b8b26eea66f8d022992b069ed87a37f17e1bff82acc30beab8",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  },
+  "byteReplay": {
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T17:27:10Z",
+    "finishedUtc": "2026-11-24T17:27:24Z",
+    "log": {
+      "bytes": 609,
+      "sha256": "ee91085fcb06b5aecb7c3e37430885db7b3df344204a791079f7bc0c60371a59"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "commands": [
+      "python3 -B tools/prepare_harpy_gunship.py --check",
+      "python3 -B tools/verify_harpy_gunship.py | cmp - integration/sh047-harpy-gunship/CONTACT-RESULT.json",
+      "python3 -B tools/measure_harpy_gunship.py --difference | cmp - integration/sh047-harpy-gunship/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/measure_harpy_gunship.py | cmp - integration/sh047-harpy-gunship/SURFACE-FIT.json"
+    ]
+  },
+  "hullStudio": {
+    "definition": "integration/sh047-harpy-gunship/HARPY-GUNSHIP-STUDIO.json",
+    "bytes": 678702,
+    "sha256": "d367c5686846b824d9b94b74053be3706f7792a8aa03eb110a600ba0b13a309e",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "supports": 28,
+    "probes": 7,
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline visual artwork export only",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 678702,
+        "sha256": "d367c5686846b824d9b94b74053be3706f7792a8aa03eb110a600ba0b13a309e"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "detailedTriangles": 5040,
+      "nativeTriangles": 244,
+      "studioClearanceQualified": false,
+      "gameplayQualified": false,
+      "receiptFiles": {
+        "HARPY-GUNSHIP.hull.json": {
+          "bytes": 678701,
+          "sha256": "98307f7fb4426df417e11fb24624d6878ef6e1afae7acf3c5d7ea184c2f2c0ac"
+        },
+        "HARPY-GUNSHIP-repeat.hull.json": {
+          "bytes": 678701,
+          "sha256": "98307f7fb4426df417e11fb24624d6878ef6e1afae7acf3c5d7ea184c2f2c0ac"
+        },
+        "studio.stdout.json": {
+          "bytes": 88790,
+          "sha256": "8bea9fdd99f6930b05f13939a3cb15e65fd3376643338661e1764e0424937a2b"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 88790,
+          "sha256": "8bea9fdd99f6930b05f13939a3cb15e65fd3376643338661e1764e0424937a2b"
+        },
+        "codesign.log": {
+          "bytes": 14189,
+          "sha256": "e17226fe8415b81970e7835f498d67fe70a8f79d952a56be2b90af8cb9a4d804"
+        }
+      }
+    }
+  }
+}

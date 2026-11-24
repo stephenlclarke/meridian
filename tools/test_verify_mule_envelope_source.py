@@ -77,6 +77,7 @@ class MuleSourceVerification(unittest.TestCase):
             for publication in (
                 b'pub mod stag_liner;\n\n', b'pub mod saker;\n', b'pub mod eagle_cruiser;\n',
                 b'pub mod harpy_assault;\n', b'pub mod erne_corvette;\n', b'pub mod harpy_dropship;\n',
+                b'pub mod harpy_gunship;\n',
             ):
                 for altered in (original.replace(publication, b''), original + publication):
                     with self.subTest(publication=publication):
@@ -85,6 +86,7 @@ class MuleSourceVerification(unittest.TestCase):
                             verifier.verify_protected_core(root)
             for declaration in (
                 b'pub mod saker;\n', b'pub mod eagle_cruiser;\n', b'pub mod harpy_assault;\n', b'pub mod erne_corvette;\n', b'pub mod harpy_dropship;\n',
+                b'pub mod harpy_gunship;\n',
             ):
                 source.write_bytes(original.replace(declaration, b'') + declaration)
                 with self.assertRaisesRegex(AssertionError, 'lib.rs'):
@@ -98,7 +100,8 @@ class MuleSourceVerification(unittest.TestCase):
             manifest = root / verifier.FLIGHT_COMPUTER_INVERSE
             inverse = json.loads(manifest.read_bytes())
             relative = verifier.LIB_SOURCE
-            current = verifier.undo_dropship_publication(relative, (core / relative).read_bytes())
+            current = verifier.undo_gunship_publication(relative, (core / relative).read_bytes())
+            current = verifier.undo_dropship_publication(relative, current)
             current = verifier.undo_erne_publication(relative, current)
             current = verifier.undo_harpy_publication(relative, current)
             current = verifier.undo_eagle_publication(relative, current)
