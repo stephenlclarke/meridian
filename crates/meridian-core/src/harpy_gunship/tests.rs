@@ -1,4 +1,6 @@
-use super::{HarpyGunshipHullSource, MEMBERSHIP, VERTICES, decode_point};
+use super::{
+    DETAILED_VERTICES, HarpyGunshipHullSource, MEMBERSHIP, NATIVE_VERTICES, VERTICES, decode_point,
+};
 use crate::docking::{Basis3, RigidPose, Vec3};
 use crate::mule::EnvelopeError;
 
@@ -10,7 +12,7 @@ fn harpy_gunship_original_detailed_and_native_faces_share_complete_local_support
     let hull = HarpyGunshipHullSource::bundled()?;
     let points = VERTICES[16..].as_chunks::<24>().0;
     assert_eq!(hull.pieces().len(), 28);
-    assert_eq!(points.len(), 2832);
+    assert_eq!(points.len(), DETAILED_VERTICES + NATIVE_VERTICES);
     assert_eq!(TRIANGLES.len(), (5040 + 244) * 12);
     for (index, slot) in MEMBERSHIP.iter().copied().enumerate() {
         let point = decode_point(&points[index]);
