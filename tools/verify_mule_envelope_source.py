@@ -44,6 +44,16 @@ def flight_computer_inverse(root, protected):
     return files
 
 
+def undo_eagle_publication(relative, data):
+    if relative != LIB_SOURCE:
+        return data
+    declaration = b'pub mod eagle_cruiser;\n'
+    before, after = b'pub mod docking;\n', b'pub mod equipment;\n'
+    span = before + declaration + after
+    assert data.count(declaration) == 1 and data.count(span) == 1, relative
+    return data.replace(span, before + after, 1)
+
+
 def undo_saker_publication(relative, data):
     """Restore the reviewed lib.rs insertion before checking the Flight Computer hashes."""
     if relative != LIB_SOURCE:
@@ -276,7 +286,8 @@ def verify_protected_core(root):
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_saker_publication(relative, current)
+        data = undo_eagle_publication(relative, current)
+        data = undo_saker_publication(relative, data)
         data = undo_flight_computer(relative, data, inverse)
         data = undo_goshawk_world(relative, data)
         data = undo_renas_encounter(relative, data)

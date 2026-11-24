@@ -4,6 +4,7 @@
 
 pub mod celestial;
 pub mod docking;
+pub mod eagle_cruiser;
 pub mod equipment;
 mod flight;
 pub mod freight;
