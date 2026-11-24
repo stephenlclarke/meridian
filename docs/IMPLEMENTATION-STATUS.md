@@ -92,6 +92,10 @@ The Banteng package preserves the original navy-copper meshes and frozen relativ
 
 The Caracal Scout package preserves the original navy-copper meshes and frozen relative calibration. The signed artwork export uses the separate 492-face project-authored candidate. The original 1,380-face native archive retains all original wells. Source replay verifies 89 local groups and both stacked-pod openings. The frozen runtime catalogue disables player flight and normal purchase. The original R3 contract specifies player flight after blueprint fabrication. [Caracal Scout source and evidence](CARACAL-SCOUT-SOURCE.md)
 
+## Hobby Fighter catalogue source
+
+Hobby Fighter retains both original metre meshes, with 4,620 detailed faces and 192 native faces. Signed Studio evidence covers the offline artwork. Independent source replay verifies 24 local support groups, seven guarded routes, and both wing joints and the canopy joint. [Hobby Fighter source and evidence](HOBBY-FIGHTER-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)
