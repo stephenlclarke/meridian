@@ -14,6 +14,8 @@ The Buffalo collision model preserves the two passages between its three drums. 
 
 The larger Buffalo Mk II source candidate retains both interdrum passages and the corrected native visual. [Buffalo Mk II geometry and source evidence](docs/BUFFALO-MK2-GAMEPLAY-ENVELOPE.md)
 
+The separate Raven development source adds its original rust-ivory Showroom and a source-bound docking envelope. Native and ordinary admission are pending; it is not in Preview 10. [Raven source and validation scope](docs/RAVEN-GAMEPLAY-ENVELOPE.md)
+
 ## Internal Mule docking validation
 
 The internal SH001 Mule scene uses the original SH028 station. On Mac build `ffb7112`, Mule entered the clear opening at tick 104. On the obstructed approach it stopped at the station lip at tick 11. In the development build, completing all eight G02 freight handovers unlocks a single Mule encounter on the next launch from Renas. A returning pilot whose saved ship overlaps the Mule’s berth can fly clear before the Mule appears. Preview 8 predates this encounter. The reviewed renderer build `1cdac5e` also passed the aligned crossing on Mac and the docking regressions on Linux and native Windows. [Controls and test scope](docs/MULE-VALIDATION-LAUNCH.md)

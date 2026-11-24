@@ -82,6 +82,7 @@ class MuleSourceVerification(unittest.TestCase):
                 b'pub mod sable_liner;\n',
                 b'pub mod buffalo;\n',
                 b'pub mod buffalo_mk2;\n',
+                b'pub mod raven;\n', b'pub use flight::RavenApproachSnapshot;\n',
             ):
                 for altered in (original.replace(publication, b''), original + publication):
                     with self.subTest(publication=publication):
@@ -95,9 +96,23 @@ class MuleSourceVerification(unittest.TestCase):
                 b'pub mod sable_liner;\n',
                 b'pub mod buffalo;\n',
                 b'pub mod buffalo_mk2;\n',
+                b'pub mod raven;\n', b'pub use flight::RavenApproachSnapshot;\n',
             ):
                 source.write_bytes(original.replace(declaration, b'') + declaration)
                 with self.assertRaisesRegex(AssertionError, 'lib.rs'):
+                    verifier.verify_protected_core(root)
+
+    def test_raven_flight_reexport_must_be_in_the_exact_reviewed_position(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            core = self.copy_protected_sources(root)
+            source = core / verifier.FLIGHT_SOURCE
+            original = source.read_bytes()
+            declaration = b'pub use goshawk_validation::RavenApproachSnapshot;\n'
+            for altered in (original.replace(declaration, b''), original + declaration,
+                            original.replace(declaration, b'') + declaration):
+                source.write_bytes(altered)
+                with self.assertRaisesRegex(AssertionError, 'flight.rs'):
                     verifier.verify_protected_core(root)
 
     def test_historical_stag_check_still_refuses_a_forged_preimage(self):
@@ -108,7 +123,8 @@ class MuleSourceVerification(unittest.TestCase):
             manifest = root / verifier.FLIGHT_COMPUTER_INVERSE
             inverse = json.loads(manifest.read_bytes())
             relative = verifier.LIB_SOURCE
-            current = verifier.undo_buffalo_mk2_publication(relative, (core / relative).read_bytes())
+            current = verifier.undo_raven_publication(relative, (core / relative).read_bytes())
+            current = verifier.undo_buffalo_mk2_publication(relative, current)
             current = verifier.undo_buffalo_publication(relative, current)
             current = verifier.undo_sable_publication(relative, current)
             current = verifier.undo_mk2_publication(relative, current)

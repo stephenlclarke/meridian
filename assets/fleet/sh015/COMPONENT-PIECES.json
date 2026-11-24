@@ -1,0 +1,1824 @@
+{
+  "pieces": [
+    "body primary pressure envelope",
+    "detailed: body primary pressure envelope/service-well-0-0",
+    "detailed: body primary pressure envelope/service-well-0-1",
+    "detailed: body primary pressure envelope/service-well-0-2",
+    "detailed: body primary pressure envelope/service-well-1-0",
+    "detailed: body primary pressure envelope/service-well-1-1",
+    "detailed: body primary pressure envelope/service-well-1-2",
+    "detailed: body primary pressure envelope/service-well-2-0",
+    "detailed: body primary pressure envelope/service-well-2-1",
+    "detailed: body primary pressure envelope/service-well-2-2",
+    "detailed: body primary pressure envelope/service-well-3-0",
+    "detailed: body primary pressure envelope/service-well-3-1",
+    "detailed: body primary pressure envelope/service-well-3-2",
+    "body primary pressure envelope/longitudinal-service-strut-0",
+    "body primary pressure envelope/longitudinal-service-strut-1",
+    "wing_pair member 0",
+    "wing_pair member 1",
+    "pods explicit member 0",
+    "detailed: pods explicit member 0/service-well-0-0",
+    "detailed: pods explicit member 0/service-well-0-1",
+    "detailed: pods explicit member 0/service-well-0-2",
+    "detailed: pods explicit member 0/service-well-1-0",
+    "detailed: pods explicit member 0/service-well-1-1",
+    "detailed: pods explicit member 0/service-well-1-2",
+    "detailed: pods explicit member 0/service-well-2-0",
+    "detailed: pods explicit member 0/service-well-2-1",
+    "detailed: pods explicit member 0/service-well-2-2",
+    "detailed: pods explicit member 0/service-well-3-0",
+    "detailed: pods explicit member 0/service-well-3-1",
+    "detailed: pods explicit member 0/service-well-3-2",
+    "pods explicit member 0/longitudinal-service-strut-0",
+    "pods explicit member 0/longitudinal-service-strut-1",
+    "pods explicit member 1",
+    "detailed: pods explicit member 1/service-well-0-0",
+    "detailed: pods explicit member 1/service-well-0-1",
+    "detailed: pods explicit member 1/service-well-0-2",
+    "detailed: pods explicit member 1/service-well-1-0",
+    "detailed: pods explicit member 1/service-well-1-1",
+    "detailed: pods explicit member 1/service-well-1-2",
+    "detailed: pods explicit member 1/service-well-2-0",
+    "detailed: pods explicit member 1/service-well-2-1",
+    "detailed: pods explicit member 1/service-well-2-2",
+    "detailed: pods explicit member 1/service-well-3-0",
+    "detailed: pods explicit member 1/service-well-3-1",
+    "detailed: pods explicit member 1/service-well-3-2",
+    "pods explicit member 1/longitudinal-service-strut-0",
+    "pods explicit member 1/longitudinal-service-strut-1",
+    "broken spar upper crossmember",
+    "broken spar raised shoulder (negative X)",
+    "broken spar raised shoulder (positive X)",
+    "cockpit glazing envelope",
+    "cockpit connected structural crossmember",
+    "engine_pair/negative side/connected support",
+    "engine_pair/negative side/propulsion casing",
+    "engine_pair/negative side/propulsion luminous recess",
+    "engine_pair/positive side/connected support",
+    "engine_pair/positive side/propulsion casing",
+    "engine_pair/positive side/propulsion luminous recess",
+    "nativeCandidate: body primary pressure envelope/service-well-0-0",
+    "nativeCandidate: body primary pressure envelope/service-well-1-0",
+    "nativeCandidate: body primary pressure envelope/service-well-2-0",
+    "nativeCandidate: body primary pressure envelope/service-well-3-0",
+    "nativeCandidate: pods explicit member 0/service-well-0-0",
+    "nativeCandidate: pods explicit member 0/service-well-1-0",
+    "nativeCandidate: pods explicit member 0/service-well-2-0",
+    "nativeCandidate: pods explicit member 0/service-well-3-0",
+    "nativeCandidate: pods explicit member 1/service-well-0-0",
+    "nativeCandidate: pods explicit member 1/service-well-1-0",
+    "nativeCandidate: pods explicit member 1/service-well-2-0",
+    "nativeCandidate: pods explicit member 1/service-well-3-0"
+  ],
+  "detailed": [
+    {
+      "component": 0,
+      "name": "body primary pressure envelope",
+      "startVertex": 0,
+      "vertexCount": 120,
+      "startFace": 0,
+      "faceCount": 236,
+      "piece": 0
+    },
+    {
+      "component": 1,
+      "name": "body primary pressure envelope/service-well-0-0",
+      "startVertex": 120,
+      "vertexCount": 12,
+      "startFace": 236,
+      "faceCount": 20,
+      "piece": 1
+    },
+    {
+      "component": 2,
+      "name": "body primary pressure envelope/service-well-0-0/recess-service-strut-0",
+      "startVertex": 132,
+      "vertexCount": 8,
+      "startFace": 256,
+      "faceCount": 12,
+      "piece": 1
+    },
+    {
+      "component": 3,
+      "name": "body primary pressure envelope/service-well-0-0/recess-service-strut-1",
+      "startVertex": 140,
+      "vertexCount": 8,
+      "startFace": 268,
+      "faceCount": 12,
+      "piece": 1
+    },
+    {
+      "component": 4,
+      "name": "body primary pressure envelope/service-well-0-0/recess-service-strut-2",
+      "startVertex": 148,
+      "vertexCount": 8,
+      "startFace": 280,
+      "faceCount": 12,
+      "piece": 1
+    },
+    {
+      "component": 5,
+      "name": "body primary pressure envelope/service-well-0-1",
+      "startVertex": 156,
+      "vertexCount": 12,
+      "startFace": 292,
+      "faceCount": 20,
+      "piece": 2
+    },
+    {
+      "component": 6,
+      "name": "body primary pressure envelope/service-well-0-1/recess-service-strut-0",
+      "startVertex": 168,
+      "vertexCount": 8,
+      "startFace": 312,
+      "faceCount": 12,
+      "piece": 2
+    },
+    {
+      "component": 7,
+      "name": "body primary pressure envelope/service-well-0-1/recess-service-strut-1",
+      "startVertex": 176,
+      "vertexCount": 8,
+      "startFace": 324,
+      "faceCount": 12,
+      "piece": 2
+    },
+    {
+      "component": 8,
+      "name": "body primary pressure envelope/service-well-0-1/recess-service-strut-2",
+      "startVertex": 184,
+      "vertexCount": 8,
+      "startFace": 336,
+      "faceCount": 12,
+      "piece": 2
+    },
+    {
+      "component": 9,
+      "name": "body primary pressure envelope/service-well-0-2",
+      "startVertex": 192,
+      "vertexCount": 12,
+      "startFace": 348,
+      "faceCount": 20,
+      "piece": 3
+    },
+    {
+      "component": 10,
+      "name": "body primary pressure envelope/service-well-0-2/recess-service-strut-0",
+      "startVertex": 204,
+      "vertexCount": 8,
+      "startFace": 368,
+      "faceCount": 12,
+      "piece": 3
+    },
+    {
+      "component": 11,
+      "name": "body primary pressure envelope/service-well-0-2/recess-service-strut-1",
+      "startVertex": 212,
+      "vertexCount": 8,
+      "startFace": 380,
+      "faceCount": 12,
+      "piece": 3
+    },
+    {
+      "component": 12,
+      "name": "body primary pressure envelope/service-well-0-2/recess-service-strut-2",
+      "startVertex": 220,
+      "vertexCount": 8,
+      "startFace": 392,
+      "faceCount": 12,
+      "piece": 3
+    },
+    {
+      "component": 13,
+      "name": "body primary pressure envelope/service-well-1-0",
+      "startVertex": 228,
+      "vertexCount": 12,
+      "startFace": 404,
+      "faceCount": 20,
+      "piece": 4
+    },
+    {
+      "component": 14,
+      "name": "body primary pressure envelope/service-well-1-0/recess-service-strut-0",
+      "startVertex": 240,
+      "vertexCount": 8,
+      "startFace": 424,
+      "faceCount": 12,
+      "piece": 4
+    },
+    {
+      "component": 15,
+      "name": "body primary pressure envelope/service-well-1-0/recess-service-strut-1",
+      "startVertex": 248,
+      "vertexCount": 8,
+      "startFace": 436,
+      "faceCount": 12,
+      "piece": 4
+    },
+    {
+      "component": 16,
+      "name": "body primary pressure envelope/service-well-1-0/recess-service-strut-2",
+      "startVertex": 256,
+      "vertexCount": 8,
+      "startFace": 448,
+      "faceCount": 12,
+      "piece": 4
+    },
+    {
+      "component": 17,
+      "name": "body primary pressure envelope/service-well-1-1",
+      "startVertex": 264,
+      "vertexCount": 12,
+      "startFace": 460,
+      "faceCount": 20,
+      "piece": 5
+    },
+    {
+      "component": 18,
+      "name": "body primary pressure envelope/service-well-1-1/recess-service-strut-0",
+      "startVertex": 276,
+      "vertexCount": 8,
+      "startFace": 480,
+      "faceCount": 12,
+      "piece": 5
+    },
+    {
+      "component": 19,
+      "name": "body primary pressure envelope/service-well-1-1/recess-service-strut-1",
+      "startVertex": 284,
+      "vertexCount": 8,
+      "startFace": 492,
+      "faceCount": 12,
+      "piece": 5
+    },
+    {
+      "component": 20,
+      "name": "body primary pressure envelope/service-well-1-1/recess-service-strut-2",
+      "startVertex": 292,
+      "vertexCount": 8,
+      "startFace": 504,
+      "faceCount": 12,
+      "piece": 5
+    },
+    {
+      "component": 21,
+      "name": "body primary pressure envelope/service-well-1-2",
+      "startVertex": 300,
+      "vertexCount": 12,
+      "startFace": 516,
+      "faceCount": 20,
+      "piece": 6
+    },
+    {
+      "component": 22,
+      "name": "body primary pressure envelope/service-well-1-2/recess-service-strut-0",
+      "startVertex": 312,
+      "vertexCount": 8,
+      "startFace": 536,
+      "faceCount": 12,
+      "piece": 6
+    },
+    {
+      "component": 23,
+      "name": "body primary pressure envelope/service-well-1-2/recess-service-strut-1",
+      "startVertex": 320,
+      "vertexCount": 8,
+      "startFace": 548,
+      "faceCount": 12,
+      "piece": 6
+    },
+    {
+      "component": 24,
+      "name": "body primary pressure envelope/service-well-1-2/recess-service-strut-2",
+      "startVertex": 328,
+      "vertexCount": 8,
+      "startFace": 560,
+      "faceCount": 12,
+      "piece": 6
+    },
+    {
+      "component": 25,
+      "name": "body primary pressure envelope/service-well-2-0",
+      "startVertex": 336,
+      "vertexCount": 12,
+      "startFace": 572,
+      "faceCount": 20,
+      "piece": 7
+    },
+    {
+      "component": 26,
+      "name": "body primary pressure envelope/service-well-2-0/recess-service-strut-0",
+      "startVertex": 348,
+      "vertexCount": 8,
+      "startFace": 592,
+      "faceCount": 12,
+      "piece": 7
+    },
+    {
+      "component": 27,
+      "name": "body primary pressure envelope/service-well-2-0/recess-service-strut-1",
+      "startVertex": 356,
+      "vertexCount": 8,
+      "startFace": 604,
+      "faceCount": 12,
+      "piece": 7
+    },
+    {
+      "component": 28,
+      "name": "body primary pressure envelope/service-well-2-0/recess-service-strut-2",
+      "startVertex": 364,
+      "vertexCount": 8,
+      "startFace": 616,
+      "faceCount": 12,
+      "piece": 7
+    },
+    {
+      "component": 29,
+      "name": "body primary pressure envelope/service-well-2-1",
+      "startVertex": 372,
+      "vertexCount": 12,
+      "startFace": 628,
+      "faceCount": 20,
+      "piece": 8
+    },
+    {
+      "component": 30,
+      "name": "body primary pressure envelope/service-well-2-1/recess-service-strut-0",
+      "startVertex": 384,
+      "vertexCount": 8,
+      "startFace": 648,
+      "faceCount": 12,
+      "piece": 8
+    },
+    {
+      "component": 31,
+      "name": "body primary pressure envelope/service-well-2-1/recess-service-strut-1",
+      "startVertex": 392,
+      "vertexCount": 8,
+      "startFace": 660,
+      "faceCount": 12,
+      "piece": 8
+    },
+    {
+      "component": 32,
+      "name": "body primary pressure envelope/service-well-2-1/recess-service-strut-2",
+      "startVertex": 400,
+      "vertexCount": 8,
+      "startFace": 672,
+      "faceCount": 12,
+      "piece": 8
+    },
+    {
+      "component": 33,
+      "name": "body primary pressure envelope/service-well-2-2",
+      "startVertex": 408,
+      "vertexCount": 12,
+      "startFace": 684,
+      "faceCount": 20,
+      "piece": 9
+    },
+    {
+      "component": 34,
+      "name": "body primary pressure envelope/service-well-2-2/recess-service-strut-0",
+      "startVertex": 420,
+      "vertexCount": 8,
+      "startFace": 704,
+      "faceCount": 12,
+      "piece": 9
+    },
+    {
+      "component": 35,
+      "name": "body primary pressure envelope/service-well-2-2/recess-service-strut-1",
+      "startVertex": 428,
+      "vertexCount": 8,
+      "startFace": 716,
+      "faceCount": 12,
+      "piece": 9
+    },
+    {
+      "component": 36,
+      "name": "body primary pressure envelope/service-well-2-2/recess-service-strut-2",
+      "startVertex": 436,
+      "vertexCount": 8,
+      "startFace": 728,
+      "faceCount": 12,
+      "piece": 9
+    },
+    {
+      "component": 37,
+      "name": "body primary pressure envelope/service-well-3-0",
+      "startVertex": 444,
+      "vertexCount": 12,
+      "startFace": 740,
+      "faceCount": 20,
+      "piece": 10
+    },
+    {
+      "component": 38,
+      "name": "body primary pressure envelope/service-well-3-0/recess-service-strut-0",
+      "startVertex": 456,
+      "vertexCount": 8,
+      "startFace": 760,
+      "faceCount": 12,
+      "piece": 10
+    },
+    {
+      "component": 39,
+      "name": "body primary pressure envelope/service-well-3-0/recess-service-strut-1",
+      "startVertex": 464,
+      "vertexCount": 8,
+      "startFace": 772,
+      "faceCount": 12,
+      "piece": 10
+    },
+    {
+      "component": 40,
+      "name": "body primary pressure envelope/service-well-3-0/recess-service-strut-2",
+      "startVertex": 472,
+      "vertexCount": 8,
+      "startFace": 784,
+      "faceCount": 12,
+      "piece": 10
+    },
+    {
+      "component": 41,
+      "name": "body primary pressure envelope/service-well-3-1",
+      "startVertex": 480,
+      "vertexCount": 12,
+      "startFace": 796,
+      "faceCount": 20,
+      "piece": 11
+    },
+    {
+      "component": 42,
+      "name": "body primary pressure envelope/service-well-3-1/recess-service-strut-0",
+      "startVertex": 492,
+      "vertexCount": 8,
+      "startFace": 816,
+      "faceCount": 12,
+      "piece": 11
+    },
+    {
+      "component": 43,
+      "name": "body primary pressure envelope/service-well-3-1/recess-service-strut-1",
+      "startVertex": 500,
+      "vertexCount": 8,
+      "startFace": 828,
+      "faceCount": 12,
+      "piece": 11
+    },
+    {
+      "component": 44,
+      "name": "body primary pressure envelope/service-well-3-1/recess-service-strut-2",
+      "startVertex": 508,
+      "vertexCount": 8,
+      "startFace": 840,
+      "faceCount": 12,
+      "piece": 11
+    },
+    {
+      "component": 45,
+      "name": "body primary pressure envelope/service-well-3-2",
+      "startVertex": 516,
+      "vertexCount": 12,
+      "startFace": 852,
+      "faceCount": 20,
+      "piece": 12
+    },
+    {
+      "component": 46,
+      "name": "body primary pressure envelope/service-well-3-2/recess-service-strut-0",
+      "startVertex": 528,
+      "vertexCount": 8,
+      "startFace": 872,
+      "faceCount": 12,
+      "piece": 12
+    },
+    {
+      "component": 47,
+      "name": "body primary pressure envelope/service-well-3-2/recess-service-strut-1",
+      "startVertex": 536,
+      "vertexCount": 8,
+      "startFace": 884,
+      "faceCount": 12,
+      "piece": 12
+    },
+    {
+      "component": 48,
+      "name": "body primary pressure envelope/service-well-3-2/recess-service-strut-2",
+      "startVertex": 544,
+      "vertexCount": 8,
+      "startFace": 896,
+      "faceCount": 12,
+      "piece": 12
+    },
+    {
+      "component": 49,
+      "name": "body primary pressure envelope/longitudinal-service-strut-0",
+      "startVertex": 552,
+      "vertexCount": 8,
+      "startFace": 908,
+      "faceCount": 12,
+      "piece": 13
+    },
+    {
+      "component": 50,
+      "name": "body primary pressure envelope/longitudinal-service-strut-1",
+      "startVertex": 560,
+      "vertexCount": 8,
+      "startFace": 920,
+      "faceCount": 12,
+      "piece": 14
+    },
+    {
+      "component": 51,
+      "name": "wing_pair member 0",
+      "startVertex": 568,
+      "vertexCount": 8,
+      "startFace": 932,
+      "faceCount": 12,
+      "piece": 15
+    },
+    {
+      "component": 52,
+      "name": "wing_pair member 1",
+      "startVertex": 576,
+      "vertexCount": 8,
+      "startFace": 944,
+      "faceCount": 12,
+      "piece": 16
+    },
+    {
+      "component": 53,
+      "name": "pods explicit member 0",
+      "startVertex": 584,
+      "vertexCount": 120,
+      "startFace": 956,
+      "faceCount": 236,
+      "piece": 17
+    },
+    {
+      "component": 54,
+      "name": "pods explicit member 0/service-well-0-0",
+      "startVertex": 704,
+      "vertexCount": 12,
+      "startFace": 1192,
+      "faceCount": 20,
+      "piece": 18
+    },
+    {
+      "component": 55,
+      "name": "pods explicit member 0/service-well-0-0/recess-service-strut-0",
+      "startVertex": 716,
+      "vertexCount": 8,
+      "startFace": 1212,
+      "faceCount": 12,
+      "piece": 18
+    },
+    {
+      "component": 56,
+      "name": "pods explicit member 0/service-well-0-0/recess-service-strut-1",
+      "startVertex": 724,
+      "vertexCount": 8,
+      "startFace": 1224,
+      "faceCount": 12,
+      "piece": 18
+    },
+    {
+      "component": 57,
+      "name": "pods explicit member 0/service-well-0-0/recess-service-strut-2",
+      "startVertex": 732,
+      "vertexCount": 8,
+      "startFace": 1236,
+      "faceCount": 12,
+      "piece": 18
+    },
+    {
+      "component": 58,
+      "name": "pods explicit member 0/service-well-0-1",
+      "startVertex": 740,
+      "vertexCount": 12,
+      "startFace": 1248,
+      "faceCount": 20,
+      "piece": 19
+    },
+    {
+      "component": 59,
+      "name": "pods explicit member 0/service-well-0-1/recess-service-strut-0",
+      "startVertex": 752,
+      "vertexCount": 8,
+      "startFace": 1268,
+      "faceCount": 12,
+      "piece": 19
+    },
+    {
+      "component": 60,
+      "name": "pods explicit member 0/service-well-0-1/recess-service-strut-1",
+      "startVertex": 760,
+      "vertexCount": 8,
+      "startFace": 1280,
+      "faceCount": 12,
+      "piece": 19
+    },
+    {
+      "component": 61,
+      "name": "pods explicit member 0/service-well-0-1/recess-service-strut-2",
+      "startVertex": 768,
+      "vertexCount": 8,
+      "startFace": 1292,
+      "faceCount": 12,
+      "piece": 19
+    },
+    {
+      "component": 62,
+      "name": "pods explicit member 0/service-well-0-2",
+      "startVertex": 776,
+      "vertexCount": 12,
+      "startFace": 1304,
+      "faceCount": 20,
+      "piece": 20
+    },
+    {
+      "component": 63,
+      "name": "pods explicit member 0/service-well-0-2/recess-service-strut-0",
+      "startVertex": 788,
+      "vertexCount": 8,
+      "startFace": 1324,
+      "faceCount": 12,
+      "piece": 20
+    },
+    {
+      "component": 64,
+      "name": "pods explicit member 0/service-well-0-2/recess-service-strut-1",
+      "startVertex": 796,
+      "vertexCount": 8,
+      "startFace": 1336,
+      "faceCount": 12,
+      "piece": 20
+    },
+    {
+      "component": 65,
+      "name": "pods explicit member 0/service-well-0-2/recess-service-strut-2",
+      "startVertex": 804,
+      "vertexCount": 8,
+      "startFace": 1348,
+      "faceCount": 12,
+      "piece": 20
+    },
+    {
+      "component": 66,
+      "name": "pods explicit member 0/service-well-1-0",
+      "startVertex": 812,
+      "vertexCount": 12,
+      "startFace": 1360,
+      "faceCount": 20,
+      "piece": 21
+    },
+    {
+      "component": 67,
+      "name": "pods explicit member 0/service-well-1-0/recess-service-strut-0",
+      "startVertex": 824,
+      "vertexCount": 8,
+      "startFace": 1380,
+      "faceCount": 12,
+      "piece": 21
+    },
+    {
+      "component": 68,
+      "name": "pods explicit member 0/service-well-1-0/recess-service-strut-1",
+      "startVertex": 832,
+      "vertexCount": 8,
+      "startFace": 1392,
+      "faceCount": 12,
+      "piece": 21
+    },
+    {
+      "component": 69,
+      "name": "pods explicit member 0/service-well-1-0/recess-service-strut-2",
+      "startVertex": 840,
+      "vertexCount": 8,
+      "startFace": 1404,
+      "faceCount": 12,
+      "piece": 21
+    },
+    {
+      "component": 70,
+      "name": "pods explicit member 0/service-well-1-1",
+      "startVertex": 848,
+      "vertexCount": 12,
+      "startFace": 1416,
+      "faceCount": 20,
+      "piece": 22
+    },
+    {
+      "component": 71,
+      "name": "pods explicit member 0/service-well-1-1/recess-service-strut-0",
+      "startVertex": 860,
+      "vertexCount": 8,
+      "startFace": 1436,
+      "faceCount": 12,
+      "piece": 22
+    },
+    {
+      "component": 72,
+      "name": "pods explicit member 0/service-well-1-1/recess-service-strut-1",
+      "startVertex": 868,
+      "vertexCount": 8,
+      "startFace": 1448,
+      "faceCount": 12,
+      "piece": 22
+    },
+    {
+      "component": 73,
+      "name": "pods explicit member 0/service-well-1-1/recess-service-strut-2",
+      "startVertex": 876,
+      "vertexCount": 8,
+      "startFace": 1460,
+      "faceCount": 12,
+      "piece": 22
+    },
+    {
+      "component": 74,
+      "name": "pods explicit member 0/service-well-1-2",
+      "startVertex": 884,
+      "vertexCount": 12,
+      "startFace": 1472,
+      "faceCount": 20,
+      "piece": 23
+    },
+    {
+      "component": 75,
+      "name": "pods explicit member 0/service-well-1-2/recess-service-strut-0",
+      "startVertex": 896,
+      "vertexCount": 8,
+      "startFace": 1492,
+      "faceCount": 12,
+      "piece": 23
+    },
+    {
+      "component": 76,
+      "name": "pods explicit member 0/service-well-1-2/recess-service-strut-1",
+      "startVertex": 904,
+      "vertexCount": 8,
+      "startFace": 1504,
+      "faceCount": 12,
+      "piece": 23
+    },
+    {
+      "component": 77,
+      "name": "pods explicit member 0/service-well-1-2/recess-service-strut-2",
+      "startVertex": 912,
+      "vertexCount": 8,
+      "startFace": 1516,
+      "faceCount": 12,
+      "piece": 23
+    },
+    {
+      "component": 78,
+      "name": "pods explicit member 0/service-well-2-0",
+      "startVertex": 920,
+      "vertexCount": 12,
+      "startFace": 1528,
+      "faceCount": 20,
+      "piece": 24
+    },
+    {
+      "component": 79,
+      "name": "pods explicit member 0/service-well-2-0/recess-service-strut-0",
+      "startVertex": 932,
+      "vertexCount": 8,
+      "startFace": 1548,
+      "faceCount": 12,
+      "piece": 24
+    },
+    {
+      "component": 80,
+      "name": "pods explicit member 0/service-well-2-0/recess-service-strut-1",
+      "startVertex": 940,
+      "vertexCount": 8,
+      "startFace": 1560,
+      "faceCount": 12,
+      "piece": 24
+    },
+    {
+      "component": 81,
+      "name": "pods explicit member 0/service-well-2-0/recess-service-strut-2",
+      "startVertex": 948,
+      "vertexCount": 8,
+      "startFace": 1572,
+      "faceCount": 12,
+      "piece": 24
+    },
+    {
+      "component": 82,
+      "name": "pods explicit member 0/service-well-2-1",
+      "startVertex": 956,
+      "vertexCount": 12,
+      "startFace": 1584,
+      "faceCount": 20,
+      "piece": 25
+    },
+    {
+      "component": 83,
+      "name": "pods explicit member 0/service-well-2-1/recess-service-strut-0",
+      "startVertex": 968,
+      "vertexCount": 8,
+      "startFace": 1604,
+      "faceCount": 12,
+      "piece": 25
+    },
+    {
+      "component": 84,
+      "name": "pods explicit member 0/service-well-2-1/recess-service-strut-1",
+      "startVertex": 976,
+      "vertexCount": 8,
+      "startFace": 1616,
+      "faceCount": 12,
+      "piece": 25
+    },
+    {
+      "component": 85,
+      "name": "pods explicit member 0/service-well-2-1/recess-service-strut-2",
+      "startVertex": 984,
+      "vertexCount": 8,
+      "startFace": 1628,
+      "faceCount": 12,
+      "piece": 25
+    },
+    {
+      "component": 86,
+      "name": "pods explicit member 0/service-well-2-2",
+      "startVertex": 992,
+      "vertexCount": 12,
+      "startFace": 1640,
+      "faceCount": 20,
+      "piece": 26
+    },
+    {
+      "component": 87,
+      "name": "pods explicit member 0/service-well-2-2/recess-service-strut-0",
+      "startVertex": 1004,
+      "vertexCount": 8,
+      "startFace": 1660,
+      "faceCount": 12,
+      "piece": 26
+    },
+    {
+      "component": 88,
+      "name": "pods explicit member 0/service-well-2-2/recess-service-strut-1",
+      "startVertex": 1012,
+      "vertexCount": 8,
+      "startFace": 1672,
+      "faceCount": 12,
+      "piece": 26
+    },
+    {
+      "component": 89,
+      "name": "pods explicit member 0/service-well-2-2/recess-service-strut-2",
+      "startVertex": 1020,
+      "vertexCount": 8,
+      "startFace": 1684,
+      "faceCount": 12,
+      "piece": 26
+    },
+    {
+      "component": 90,
+      "name": "pods explicit member 0/service-well-3-0",
+      "startVertex": 1028,
+      "vertexCount": 12,
+      "startFace": 1696,
+      "faceCount": 20,
+      "piece": 27
+    },
+    {
+      "component": 91,
+      "name": "pods explicit member 0/service-well-3-0/recess-service-strut-0",
+      "startVertex": 1040,
+      "vertexCount": 8,
+      "startFace": 1716,
+      "faceCount": 12,
+      "piece": 27
+    },
+    {
+      "component": 92,
+      "name": "pods explicit member 0/service-well-3-0/recess-service-strut-1",
+      "startVertex": 1048,
+      "vertexCount": 8,
+      "startFace": 1728,
+      "faceCount": 12,
+      "piece": 27
+    },
+    {
+      "component": 93,
+      "name": "pods explicit member 0/service-well-3-0/recess-service-strut-2",
+      "startVertex": 1056,
+      "vertexCount": 8,
+      "startFace": 1740,
+      "faceCount": 12,
+      "piece": 27
+    },
+    {
+      "component": 94,
+      "name": "pods explicit member 0/service-well-3-1",
+      "startVertex": 1064,
+      "vertexCount": 12,
+      "startFace": 1752,
+      "faceCount": 20,
+      "piece": 28
+    },
+    {
+      "component": 95,
+      "name": "pods explicit member 0/service-well-3-1/recess-service-strut-0",
+      "startVertex": 1076,
+      "vertexCount": 8,
+      "startFace": 1772,
+      "faceCount": 12,
+      "piece": 28
+    },
+    {
+      "component": 96,
+      "name": "pods explicit member 0/service-well-3-1/recess-service-strut-1",
+      "startVertex": 1084,
+      "vertexCount": 8,
+      "startFace": 1784,
+      "faceCount": 12,
+      "piece": 28
+    },
+    {
+      "component": 97,
+      "name": "pods explicit member 0/service-well-3-1/recess-service-strut-2",
+      "startVertex": 1092,
+      "vertexCount": 8,
+      "startFace": 1796,
+      "faceCount": 12,
+      "piece": 28
+    },
+    {
+      "component": 98,
+      "name": "pods explicit member 0/service-well-3-2",
+      "startVertex": 1100,
+      "vertexCount": 12,
+      "startFace": 1808,
+      "faceCount": 20,
+      "piece": 29
+    },
+    {
+      "component": 99,
+      "name": "pods explicit member 0/service-well-3-2/recess-service-strut-0",
+      "startVertex": 1112,
+      "vertexCount": 8,
+      "startFace": 1828,
+      "faceCount": 12,
+      "piece": 29
+    },
+    {
+      "component": 100,
+      "name": "pods explicit member 0/service-well-3-2/recess-service-strut-1",
+      "startVertex": 1120,
+      "vertexCount": 8,
+      "startFace": 1840,
+      "faceCount": 12,
+      "piece": 29
+    },
+    {
+      "component": 101,
+      "name": "pods explicit member 0/service-well-3-2/recess-service-strut-2",
+      "startVertex": 1128,
+      "vertexCount": 8,
+      "startFace": 1852,
+      "faceCount": 12,
+      "piece": 29
+    },
+    {
+      "component": 102,
+      "name": "pods explicit member 0/longitudinal-service-strut-0",
+      "startVertex": 1136,
+      "vertexCount": 8,
+      "startFace": 1864,
+      "faceCount": 12,
+      "piece": 30
+    },
+    {
+      "component": 103,
+      "name": "pods explicit member 0/longitudinal-service-strut-1",
+      "startVertex": 1144,
+      "vertexCount": 8,
+      "startFace": 1876,
+      "faceCount": 12,
+      "piece": 31
+    },
+    {
+      "component": 104,
+      "name": "pods explicit member 1",
+      "startVertex": 1152,
+      "vertexCount": 120,
+      "startFace": 1888,
+      "faceCount": 236,
+      "piece": 32
+    },
+    {
+      "component": 105,
+      "name": "pods explicit member 1/service-well-0-0",
+      "startVertex": 1272,
+      "vertexCount": 12,
+      "startFace": 2124,
+      "faceCount": 20,
+      "piece": 33
+    },
+    {
+      "component": 106,
+      "name": "pods explicit member 1/service-well-0-0/recess-service-strut-0",
+      "startVertex": 1284,
+      "vertexCount": 8,
+      "startFace": 2144,
+      "faceCount": 12,
+      "piece": 33
+    },
+    {
+      "component": 107,
+      "name": "pods explicit member 1/service-well-0-0/recess-service-strut-1",
+      "startVertex": 1292,
+      "vertexCount": 8,
+      "startFace": 2156,
+      "faceCount": 12,
+      "piece": 33
+    },
+    {
+      "component": 108,
+      "name": "pods explicit member 1/service-well-0-0/recess-service-strut-2",
+      "startVertex": 1300,
+      "vertexCount": 8,
+      "startFace": 2168,
+      "faceCount": 12,
+      "piece": 33
+    },
+    {
+      "component": 109,
+      "name": "pods explicit member 1/service-well-0-1",
+      "startVertex": 1308,
+      "vertexCount": 12,
+      "startFace": 2180,
+      "faceCount": 20,
+      "piece": 34
+    },
+    {
+      "component": 110,
+      "name": "pods explicit member 1/service-well-0-1/recess-service-strut-0",
+      "startVertex": 1320,
+      "vertexCount": 8,
+      "startFace": 2200,
+      "faceCount": 12,
+      "piece": 34
+    },
+    {
+      "component": 111,
+      "name": "pods explicit member 1/service-well-0-1/recess-service-strut-1",
+      "startVertex": 1328,
+      "vertexCount": 8,
+      "startFace": 2212,
+      "faceCount": 12,
+      "piece": 34
+    },
+    {
+      "component": 112,
+      "name": "pods explicit member 1/service-well-0-1/recess-service-strut-2",
+      "startVertex": 1336,
+      "vertexCount": 8,
+      "startFace": 2224,
+      "faceCount": 12,
+      "piece": 34
+    },
+    {
+      "component": 113,
+      "name": "pods explicit member 1/service-well-0-2",
+      "startVertex": 1344,
+      "vertexCount": 12,
+      "startFace": 2236,
+      "faceCount": 20,
+      "piece": 35
+    },
+    {
+      "component": 114,
+      "name": "pods explicit member 1/service-well-0-2/recess-service-strut-0",
+      "startVertex": 1356,
+      "vertexCount": 8,
+      "startFace": 2256,
+      "faceCount": 12,
+      "piece": 35
+    },
+    {
+      "component": 115,
+      "name": "pods explicit member 1/service-well-0-2/recess-service-strut-1",
+      "startVertex": 1364,
+      "vertexCount": 8,
+      "startFace": 2268,
+      "faceCount": 12,
+      "piece": 35
+    },
+    {
+      "component": 116,
+      "name": "pods explicit member 1/service-well-0-2/recess-service-strut-2",
+      "startVertex": 1372,
+      "vertexCount": 8,
+      "startFace": 2280,
+      "faceCount": 12,
+      "piece": 35
+    },
+    {
+      "component": 117,
+      "name": "pods explicit member 1/service-well-1-0",
+      "startVertex": 1380,
+      "vertexCount": 12,
+      "startFace": 2292,
+      "faceCount": 20,
+      "piece": 36
+    },
+    {
+      "component": 118,
+      "name": "pods explicit member 1/service-well-1-0/recess-service-strut-0",
+      "startVertex": 1392,
+      "vertexCount": 8,
+      "startFace": 2312,
+      "faceCount": 12,
+      "piece": 36
+    },
+    {
+      "component": 119,
+      "name": "pods explicit member 1/service-well-1-0/recess-service-strut-1",
+      "startVertex": 1400,
+      "vertexCount": 8,
+      "startFace": 2324,
+      "faceCount": 12,
+      "piece": 36
+    },
+    {
+      "component": 120,
+      "name": "pods explicit member 1/service-well-1-0/recess-service-strut-2",
+      "startVertex": 1408,
+      "vertexCount": 8,
+      "startFace": 2336,
+      "faceCount": 12,
+      "piece": 36
+    },
+    {
+      "component": 121,
+      "name": "pods explicit member 1/service-well-1-1",
+      "startVertex": 1416,
+      "vertexCount": 12,
+      "startFace": 2348,
+      "faceCount": 20,
+      "piece": 37
+    },
+    {
+      "component": 122,
+      "name": "pods explicit member 1/service-well-1-1/recess-service-strut-0",
+      "startVertex": 1428,
+      "vertexCount": 8,
+      "startFace": 2368,
+      "faceCount": 12,
+      "piece": 37
+    },
+    {
+      "component": 123,
+      "name": "pods explicit member 1/service-well-1-1/recess-service-strut-1",
+      "startVertex": 1436,
+      "vertexCount": 8,
+      "startFace": 2380,
+      "faceCount": 12,
+      "piece": 37
+    },
+    {
+      "component": 124,
+      "name": "pods explicit member 1/service-well-1-1/recess-service-strut-2",
+      "startVertex": 1444,
+      "vertexCount": 8,
+      "startFace": 2392,
+      "faceCount": 12,
+      "piece": 37
+    },
+    {
+      "component": 125,
+      "name": "pods explicit member 1/service-well-1-2",
+      "startVertex": 1452,
+      "vertexCount": 12,
+      "startFace": 2404,
+      "faceCount": 20,
+      "piece": 38
+    },
+    {
+      "component": 126,
+      "name": "pods explicit member 1/service-well-1-2/recess-service-strut-0",
+      "startVertex": 1464,
+      "vertexCount": 8,
+      "startFace": 2424,
+      "faceCount": 12,
+      "piece": 38
+    },
+    {
+      "component": 127,
+      "name": "pods explicit member 1/service-well-1-2/recess-service-strut-1",
+      "startVertex": 1472,
+      "vertexCount": 8,
+      "startFace": 2436,
+      "faceCount": 12,
+      "piece": 38
+    },
+    {
+      "component": 128,
+      "name": "pods explicit member 1/service-well-1-2/recess-service-strut-2",
+      "startVertex": 1480,
+      "vertexCount": 8,
+      "startFace": 2448,
+      "faceCount": 12,
+      "piece": 38
+    },
+    {
+      "component": 129,
+      "name": "pods explicit member 1/service-well-2-0",
+      "startVertex": 1488,
+      "vertexCount": 12,
+      "startFace": 2460,
+      "faceCount": 20,
+      "piece": 39
+    },
+    {
+      "component": 130,
+      "name": "pods explicit member 1/service-well-2-0/recess-service-strut-0",
+      "startVertex": 1500,
+      "vertexCount": 8,
+      "startFace": 2480,
+      "faceCount": 12,
+      "piece": 39
+    },
+    {
+      "component": 131,
+      "name": "pods explicit member 1/service-well-2-0/recess-service-strut-1",
+      "startVertex": 1508,
+      "vertexCount": 8,
+      "startFace": 2492,
+      "faceCount": 12,
+      "piece": 39
+    },
+    {
+      "component": 132,
+      "name": "pods explicit member 1/service-well-2-0/recess-service-strut-2",
+      "startVertex": 1516,
+      "vertexCount": 8,
+      "startFace": 2504,
+      "faceCount": 12,
+      "piece": 39
+    },
+    {
+      "component": 133,
+      "name": "pods explicit member 1/service-well-2-1",
+      "startVertex": 1524,
+      "vertexCount": 12,
+      "startFace": 2516,
+      "faceCount": 20,
+      "piece": 40
+    },
+    {
+      "component": 134,
+      "name": "pods explicit member 1/service-well-2-1/recess-service-strut-0",
+      "startVertex": 1536,
+      "vertexCount": 8,
+      "startFace": 2536,
+      "faceCount": 12,
+      "piece": 40
+    },
+    {
+      "component": 135,
+      "name": "pods explicit member 1/service-well-2-1/recess-service-strut-1",
+      "startVertex": 1544,
+      "vertexCount": 8,
+      "startFace": 2548,
+      "faceCount": 12,
+      "piece": 40
+    },
+    {
+      "component": 136,
+      "name": "pods explicit member 1/service-well-2-1/recess-service-strut-2",
+      "startVertex": 1552,
+      "vertexCount": 8,
+      "startFace": 2560,
+      "faceCount": 12,
+      "piece": 40
+    },
+    {
+      "component": 137,
+      "name": "pods explicit member 1/service-well-2-2",
+      "startVertex": 1560,
+      "vertexCount": 12,
+      "startFace": 2572,
+      "faceCount": 20,
+      "piece": 41
+    },
+    {
+      "component": 138,
+      "name": "pods explicit member 1/service-well-2-2/recess-service-strut-0",
+      "startVertex": 1572,
+      "vertexCount": 8,
+      "startFace": 2592,
+      "faceCount": 12,
+      "piece": 41
+    },
+    {
+      "component": 139,
+      "name": "pods explicit member 1/service-well-2-2/recess-service-strut-1",
+      "startVertex": 1580,
+      "vertexCount": 8,
+      "startFace": 2604,
+      "faceCount": 12,
+      "piece": 41
+    },
+    {
+      "component": 140,
+      "name": "pods explicit member 1/service-well-2-2/recess-service-strut-2",
+      "startVertex": 1588,
+      "vertexCount": 8,
+      "startFace": 2616,
+      "faceCount": 12,
+      "piece": 41
+    },
+    {
+      "component": 141,
+      "name": "pods explicit member 1/service-well-3-0",
+      "startVertex": 1596,
+      "vertexCount": 12,
+      "startFace": 2628,
+      "faceCount": 20,
+      "piece": 42
+    },
+    {
+      "component": 142,
+      "name": "pods explicit member 1/service-well-3-0/recess-service-strut-0",
+      "startVertex": 1608,
+      "vertexCount": 8,
+      "startFace": 2648,
+      "faceCount": 12,
+      "piece": 42
+    },
+    {
+      "component": 143,
+      "name": "pods explicit member 1/service-well-3-0/recess-service-strut-1",
+      "startVertex": 1616,
+      "vertexCount": 8,
+      "startFace": 2660,
+      "faceCount": 12,
+      "piece": 42
+    },
+    {
+      "component": 144,
+      "name": "pods explicit member 1/service-well-3-0/recess-service-strut-2",
+      "startVertex": 1624,
+      "vertexCount": 8,
+      "startFace": 2672,
+      "faceCount": 12,
+      "piece": 42
+    },
+    {
+      "component": 145,
+      "name": "pods explicit member 1/service-well-3-1",
+      "startVertex": 1632,
+      "vertexCount": 12,
+      "startFace": 2684,
+      "faceCount": 20,
+      "piece": 43
+    },
+    {
+      "component": 146,
+      "name": "pods explicit member 1/service-well-3-1/recess-service-strut-0",
+      "startVertex": 1644,
+      "vertexCount": 8,
+      "startFace": 2704,
+      "faceCount": 12,
+      "piece": 43
+    },
+    {
+      "component": 147,
+      "name": "pods explicit member 1/service-well-3-1/recess-service-strut-1",
+      "startVertex": 1652,
+      "vertexCount": 8,
+      "startFace": 2716,
+      "faceCount": 12,
+      "piece": 43
+    },
+    {
+      "component": 148,
+      "name": "pods explicit member 1/service-well-3-1/recess-service-strut-2",
+      "startVertex": 1660,
+      "vertexCount": 8,
+      "startFace": 2728,
+      "faceCount": 12,
+      "piece": 43
+    },
+    {
+      "component": 149,
+      "name": "pods explicit member 1/service-well-3-2",
+      "startVertex": 1668,
+      "vertexCount": 12,
+      "startFace": 2740,
+      "faceCount": 20,
+      "piece": 44
+    },
+    {
+      "component": 150,
+      "name": "pods explicit member 1/service-well-3-2/recess-service-strut-0",
+      "startVertex": 1680,
+      "vertexCount": 8,
+      "startFace": 2760,
+      "faceCount": 12,
+      "piece": 44
+    },
+    {
+      "component": 151,
+      "name": "pods explicit member 1/service-well-3-2/recess-service-strut-1",
+      "startVertex": 1688,
+      "vertexCount": 8,
+      "startFace": 2772,
+      "faceCount": 12,
+      "piece": 44
+    },
+    {
+      "component": 152,
+      "name": "pods explicit member 1/service-well-3-2/recess-service-strut-2",
+      "startVertex": 1696,
+      "vertexCount": 8,
+      "startFace": 2784,
+      "faceCount": 12,
+      "piece": 44
+    },
+    {
+      "component": 153,
+      "name": "pods explicit member 1/longitudinal-service-strut-0",
+      "startVertex": 1704,
+      "vertexCount": 8,
+      "startFace": 2796,
+      "faceCount": 12,
+      "piece": 45
+    },
+    {
+      "component": 154,
+      "name": "pods explicit member 1/longitudinal-service-strut-1",
+      "startVertex": 1712,
+      "vertexCount": 8,
+      "startFace": 2808,
+      "faceCount": 12,
+      "piece": 46
+    },
+    {
+      "component": 155,
+      "name": "broken spar upper crossmember",
+      "startVertex": 1720,
+      "vertexCount": 8,
+      "startFace": 2820,
+      "faceCount": 12,
+      "piece": 47
+    },
+    {
+      "component": 156,
+      "name": "broken spar raised shoulder",
+      "startVertex": 1728,
+      "vertexCount": 8,
+      "startFace": 2832,
+      "faceCount": 12,
+      "piece": 48
+    },
+    {
+      "component": 157,
+      "name": "broken spar raised shoulder",
+      "startVertex": 1736,
+      "vertexCount": 8,
+      "startFace": 2844,
+      "faceCount": 12,
+      "piece": 49
+    },
+    {
+      "component": 158,
+      "name": "cockpit glazing envelope",
+      "startVertex": 1744,
+      "vertexCount": 120,
+      "startFace": 2856,
+      "faceCount": 236,
+      "piece": 50
+    },
+    {
+      "component": 159,
+      "name": "cockpit connected structural crossmember",
+      "startVertex": 1864,
+      "vertexCount": 8,
+      "startFace": 3092,
+      "faceCount": 12,
+      "piece": 51
+    },
+    {
+      "component": 160,
+      "name": "engine_pair/negative side/connected support",
+      "startVertex": 1872,
+      "vertexCount": 8,
+      "startFace": 3104,
+      "faceCount": 12,
+      "piece": 52
+    },
+    {
+      "component": 161,
+      "name": "engine_pair/negative side/propulsion casing",
+      "startVertex": 1880,
+      "vertexCount": 48,
+      "startFace": 3116,
+      "faceCount": 92,
+      "piece": 53
+    },
+    {
+      "component": 162,
+      "name": "engine_pair/negative side/propulsion luminous recess",
+      "startVertex": 1928,
+      "vertexCount": 48,
+      "startFace": 3208,
+      "faceCount": 92,
+      "piece": 54
+    },
+    {
+      "component": 163,
+      "name": "engine_pair/positive side/connected support",
+      "startVertex": 1976,
+      "vertexCount": 8,
+      "startFace": 3300,
+      "faceCount": 12,
+      "piece": 55
+    },
+    {
+      "component": 164,
+      "name": "engine_pair/positive side/propulsion casing",
+      "startVertex": 1984,
+      "vertexCount": 48,
+      "startFace": 3312,
+      "faceCount": 92,
+      "piece": 56
+    },
+    {
+      "component": 165,
+      "name": "engine_pair/positive side/propulsion luminous recess",
+      "startVertex": 2032,
+      "vertexCount": 48,
+      "startFace": 3404,
+      "faceCount": 92,
+      "piece": 57
+    }
+  ],
+  "nativeCandidate": [
+    {
+      "component": 0,
+      "name": "body primary pressure envelope",
+      "startVertex": 0,
+      "vertexCount": 60,
+      "startFace": 0,
+      "faceCount": 116,
+      "piece": 0
+    },
+    {
+      "component": 1,
+      "name": "body primary pressure envelope/service-well-0-0",
+      "startVertex": 60,
+      "vertexCount": 12,
+      "startFace": 116,
+      "faceCount": 20,
+      "piece": 58
+    },
+    {
+      "component": 2,
+      "name": "body primary pressure envelope/service-well-1-0",
+      "startVertex": 72,
+      "vertexCount": 12,
+      "startFace": 136,
+      "faceCount": 20,
+      "piece": 59
+    },
+    {
+      "component": 3,
+      "name": "body primary pressure envelope/service-well-2-0",
+      "startVertex": 84,
+      "vertexCount": 12,
+      "startFace": 156,
+      "faceCount": 20,
+      "piece": 60
+    },
+    {
+      "component": 4,
+      "name": "body primary pressure envelope/service-well-3-0",
+      "startVertex": 96,
+      "vertexCount": 12,
+      "startFace": 176,
+      "faceCount": 20,
+      "piece": 61
+    },
+    {
+      "component": 5,
+      "name": "wing_pair member 0",
+      "startVertex": 108,
+      "vertexCount": 8,
+      "startFace": 196,
+      "faceCount": 12,
+      "piece": 15
+    },
+    {
+      "component": 6,
+      "name": "wing_pair member 1",
+      "startVertex": 116,
+      "vertexCount": 8,
+      "startFace": 208,
+      "faceCount": 12,
+      "piece": 16
+    },
+    {
+      "component": 7,
+      "name": "pods explicit member 0",
+      "startVertex": 124,
+      "vertexCount": 60,
+      "startFace": 220,
+      "faceCount": 116,
+      "piece": 17
+    },
+    {
+      "component": 8,
+      "name": "pods explicit member 0/service-well-0-0",
+      "startVertex": 184,
+      "vertexCount": 12,
+      "startFace": 336,
+      "faceCount": 20,
+      "piece": 62
+    },
+    {
+      "component": 9,
+      "name": "pods explicit member 0/service-well-1-0",
+      "startVertex": 196,
+      "vertexCount": 12,
+      "startFace": 356,
+      "faceCount": 20,
+      "piece": 63
+    },
+    {
+      "component": 10,
+      "name": "pods explicit member 0/service-well-2-0",
+      "startVertex": 208,
+      "vertexCount": 12,
+      "startFace": 376,
+      "faceCount": 20,
+      "piece": 64
+    },
+    {
+      "component": 11,
+      "name": "pods explicit member 0/service-well-3-0",
+      "startVertex": 220,
+      "vertexCount": 12,
+      "startFace": 396,
+      "faceCount": 20,
+      "piece": 65
+    },
+    {
+      "component": 12,
+      "name": "pods explicit member 1",
+      "startVertex": 232,
+      "vertexCount": 60,
+      "startFace": 416,
+      "faceCount": 116,
+      "piece": 32
+    },
+    {
+      "component": 13,
+      "name": "pods explicit member 1/service-well-0-0",
+      "startVertex": 292,
+      "vertexCount": 12,
+      "startFace": 532,
+      "faceCount": 20,
+      "piece": 66
+    },
+    {
+      "component": 14,
+      "name": "pods explicit member 1/service-well-1-0",
+      "startVertex": 304,
+      "vertexCount": 12,
+      "startFace": 552,
+      "faceCount": 20,
+      "piece": 67
+    },
+    {
+      "component": 15,
+      "name": "pods explicit member 1/service-well-2-0",
+      "startVertex": 316,
+      "vertexCount": 12,
+      "startFace": 572,
+      "faceCount": 20,
+      "piece": 68
+    },
+    {
+      "component": 16,
+      "name": "pods explicit member 1/service-well-3-0",
+      "startVertex": 328,
+      "vertexCount": 12,
+      "startFace": 592,
+      "faceCount": 20,
+      "piece": 69
+    },
+    {
+      "component": 17,
+      "name": "broken spar upper crossmember",
+      "startVertex": 340,
+      "vertexCount": 8,
+      "startFace": 612,
+      "faceCount": 12,
+      "piece": 47
+    },
+    {
+      "component": 18,
+      "name": "broken spar raised shoulder",
+      "startVertex": 348,
+      "vertexCount": 8,
+      "startFace": 624,
+      "faceCount": 12,
+      "piece": 48
+    },
+    {
+      "component": 19,
+      "name": "broken spar raised shoulder",
+      "startVertex": 356,
+      "vertexCount": 8,
+      "startFace": 636,
+      "faceCount": 12,
+      "piece": 49
+    },
+    {
+      "component": 20,
+      "name": "cockpit glazing envelope",
+      "startVertex": 364,
+      "vertexCount": 60,
+      "startFace": 648,
+      "faceCount": 116,
+      "piece": 50
+    },
+    {
+      "component": 21,
+      "name": "cockpit connected structural crossmember",
+      "startVertex": 424,
+      "vertexCount": 8,
+      "startFace": 764,
+      "faceCount": 12,
+      "piece": 51
+    },
+    {
+      "component": 22,
+      "name": "engine_pair/negative side/connected support",
+      "startVertex": 432,
+      "vertexCount": 8,
+      "startFace": 776,
+      "faceCount": 12,
+      "piece": 52
+    },
+    {
+      "component": 23,
+      "name": "engine_pair/negative side/propulsion casing",
+      "startVertex": 440,
+      "vertexCount": 24,
+      "startFace": 788,
+      "faceCount": 44,
+      "piece": 53
+    },
+    {
+      "component": 24,
+      "name": "engine_pair/negative side/propulsion luminous recess",
+      "startVertex": 464,
+      "vertexCount": 24,
+      "startFace": 832,
+      "faceCount": 44,
+      "piece": 54
+    },
+    {
+      "component": 25,
+      "name": "engine_pair/positive side/connected support",
+      "startVertex": 488,
+      "vertexCount": 8,
+      "startFace": 876,
+      "faceCount": 12,
+      "piece": 55
+    },
+    {
+      "component": 26,
+      "name": "engine_pair/positive side/propulsion casing",
+      "startVertex": 496,
+      "vertexCount": 24,
+      "startFace": 888,
+      "faceCount": 44,
+      "piece": 56
+    },
+    {
+      "component": 27,
+      "name": "engine_pair/positive side/propulsion luminous recess",
+      "startVertex": 520,
+      "vertexCount": 24,
+      "startFace": 932,
+      "faceCount": 44,
+      "piece": 57
+    }
+  ]
+}

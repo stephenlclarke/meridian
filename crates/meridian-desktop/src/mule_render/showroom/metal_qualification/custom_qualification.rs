@@ -138,7 +138,7 @@ impl<'a> Capture<'a> {
         name: &str,
         frame: &Frame,
         mut other: Option<&mut showroom::Pass>,
-        custom: &mut showroom::Pass,
+        selected: &mut showroom::Pass,
     ) {
         let [left, right] = frame.models.as_slice() else {
             panic!("expected two model panes")
@@ -157,7 +157,7 @@ impl<'a> Capture<'a> {
             let rgb = self.frame(&isolated_name, &isolated);
             self.own_pixels(&isolated_name, model, &rgb);
             let reference = match showroom::hull(model) {
-                Some(Hull::Custom) => Some(&mut *custom),
+                Some(hull) if hull == selected.hull() => Some(&mut *selected),
                 Some(hull) => {
                     let Some(pass) = other.as_deref_mut() else {
                         panic!("missing independent hull pass")

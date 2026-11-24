@@ -32,6 +32,7 @@ const POSES: [&str; 3] = ["front", "oblique", "upper"];
 const PHASE_SECONDS: f32 = std::f32::consts::PI / 0.7;
 
 mod custom_qualification;
+mod raven_qualification;
 
 fn ok<T, E: std::fmt::Debug>(result: Result<T, E>) -> T {
     result.unwrap_or_else(|error| panic!("{error:?}"))
@@ -575,6 +576,7 @@ fn same_pose_shimmer(hull: Hull, directory_variable: &str) {
             Hull::Explorer => 10_452,
             Hull::Mk2 => 10_596,
             Hull::Custom => super::CUSTOM_DETAILED_FACES as u32 * 3,
+            Hull::Raven => super::RAVEN_DETAILED_FACES as u32 * 3,
         }
     );
     let mut totals = [0, 0];
@@ -583,6 +585,7 @@ fn same_pose_shimmer(hull: Hull, directory_variable: &str) {
         Hull::Explorer => Hull::Mk2,
         Hull::Mk2 => Hull::Explorer,
         Hull::Custom => Hull::Mk2,
+        Hull::Raven => Hull::Mk2,
     };
     let mut wrong = models[0].clone();
     wrong.object = other.object_id().into();
@@ -656,6 +659,12 @@ fn metal_goshawk_mk2_same_pose_shimmer() {
 #[ignore = "Mac owner only: explicit production SH010 visual qualification"]
 fn metal_goshawk_custom_same_pose_shimmer() {
     same_pose_shimmer(Hull::Custom, "MERIDIAN_SH010_EVIDENCE_DIR");
+}
+
+#[test]
+#[ignore = "Mac owner only: explicit production SH015 visual qualification"]
+fn metal_raven_same_pose_shimmer() {
+    same_pose_shimmer(Hull::Raven, "MERIDIAN_SH015_EVIDENCE_DIR");
 }
 
 #[test]
@@ -882,7 +891,9 @@ fn metal_goshawk_mk2_cache_switching() {
         let pass = match Hull::from_model(model) {
             Some(Hull::Explorer) => &mut direct_explorer,
             Some(Hull::Mk2) => &mut direct_mk2,
-            Some(Hull::Custom) | None => panic!("unexpected hull in independent reference"),
+            Some(Hull::Custom | Hull::Raven) | None => {
+                panic!("unexpected hull in independent reference")
+            }
         };
         assert_eq!(Hull::from_model(model), Some(pass.hull()));
         ok(pass.prepare(&gpu.queue, model, model.bounds, SCALE, FORMAT.is_srgb()));
