@@ -13,11 +13,16 @@ use meridian_core::{
     },
     goshawk_mk2::{GOSHAWK_MK2_PIECES, GoshawkMk2HullSource},
     mule::SmoothPiece,
+    raven::{
+        RAVEN_DETAILED_FACES, RAVEN_DETAILED_VERTICES, RAVEN_NATIVE_VERTICES, RAVEN_PIECES,
+        RavenHullSource,
+    },
 };
 
 pub(crate) const GEOMETRY_KEY: &str = "assets/fleet/sh008/visual.bin";
 pub(crate) const MK2_GEOMETRY_KEY: &str = "assets/fleet/sh009/visual.bin";
 pub(crate) const CUSTOM_GEOMETRY_KEY: &str = "assets/fleet/sh010/visual.bin";
+pub(crate) const RAVEN_GEOMETRY_KEY: &str = "assets/fleet/sh015/visual.bin";
 const VERTICES: usize = 3_484 * 3;
 const MK2_SOURCE_POINTS: usize = 2_104 + 568;
 mod visual_assets;
@@ -32,16 +37,18 @@ pub(crate) enum Hull {
     Explorer,
     Mk2,
     Custom,
+    Raven,
 }
 
 impl Hull {
-    pub(crate) const COUNT: usize = 3;
+    pub(crate) const COUNT: usize = 4;
 
     pub(crate) fn from_model(model: &ModelPreview) -> Option<Self> {
         match (model.object.as_str(), model.geometry_key.as_str()) {
             ("SH008", GEOMETRY_KEY) => Some(Self::Explorer),
             ("SH009", MK2_GEOMETRY_KEY) => Some(Self::Mk2),
             ("SH010", CUSTOM_GEOMETRY_KEY) => Some(Self::Custom),
+            ("SH015", RAVEN_GEOMETRY_KEY) => Some(Self::Raven),
             _ => None,
         }
     }
@@ -51,6 +58,7 @@ impl Hull {
             Self::Explorer => GEOMETRY_KEY,
             Self::Mk2 => MK2_GEOMETRY_KEY,
             Self::Custom => CUSTOM_GEOMETRY_KEY,
+            Self::Raven => RAVEN_GEOMETRY_KEY,
         }
     }
 
@@ -59,6 +67,7 @@ impl Hull {
             Self::Explorer => "SH008",
             Self::Mk2 => "SH009",
             Self::Custom => "SH010",
+            Self::Raven => "SH015",
         }
     }
 
@@ -67,6 +76,7 @@ impl Hull {
             Self::Explorer => GOSHAWK_PIECES,
             Self::Mk2 => GOSHAWK_MK2_PIECES,
             Self::Custom => CUSTOM_PIECES,
+            Self::Raven => RAVEN_PIECES,
         }
     }
 
@@ -98,6 +108,14 @@ impl Hull {
                     self,
                     source.pieces(),
                     CUSTOM_DETAILED_VERTICES + CUSTOM_NATIVE_VERTICES,
+                ))
+            }
+            Self::Raven => {
+                let source = RavenHullSource::bundled().map_err(|e| e.to_string())?;
+                Ok(Supports::new(
+                    self,
+                    source.pieces(),
+                    RAVEN_DETAILED_VERTICES + RAVEN_NATIVE_VERTICES,
                 ))
             }
         }
@@ -515,6 +533,18 @@ mod tests {
     }
 
     #[test]
+    fn raven_original_visual_and_all_local_supports_bind_to_its_own_shader() {
+        let hull = Hull::Raven;
+        let vertices = ok(visual_assets::load(hull.geometry_key()));
+        assert_eq!(vertices.len(), RAVEN_DETAILED_FACES * 3);
+        let source = ok(RavenHullSource::bundled());
+        let supports = assert_local_supports(hull, source.pieces());
+        assert_eq!(supports.pieces.len(), RAVEN_PIECES);
+        assert_projection(&vertices, &supports.pieces);
+        assert_shader_layout(hull);
+    }
+
+    #[test]
     fn source_selection_requires_matching_ship_id_and_geometry_key() {
         let preview = |object: &str, geometry_key: &str| ModelPreview {
             object: object.into(),
@@ -526,6 +556,7 @@ mod tests {
             ("SH008", GEOMETRY_KEY, Hull::Explorer),
             ("SH009", MK2_GEOMETRY_KEY, Hull::Mk2),
             ("SH010", CUSTOM_GEOMETRY_KEY, Hull::Custom),
+            ("SH015", RAVEN_GEOMETRY_KEY, Hull::Raven),
         ] {
             let model = preview(object, key);
             assert_eq!(Hull::from_model(&model), Some(hull));
@@ -540,6 +571,12 @@ mod tests {
             preview("SH010", GEOMETRY_KEY),
             preview("SH010", MK2_GEOMETRY_KEY),
             preview("SH025", CUSTOM_GEOMETRY_KEY),
+            preview("SH015", GEOMETRY_KEY),
+            preview("SH015", MK2_GEOMETRY_KEY),
+            preview("SH015", CUSTOM_GEOMETRY_KEY),
+            preview("SH008", RAVEN_GEOMETRY_KEY),
+            preview("SH009", RAVEN_GEOMETRY_KEY),
+            preview("SH010", RAVEN_GEOMETRY_KEY),
         ] {
             assert_eq!(Hull::from_model(&model), None);
             assert!(!matches(&model));

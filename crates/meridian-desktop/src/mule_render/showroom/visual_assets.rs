@@ -1,14 +1,19 @@
 //! Original detailed visuals for the Goshawk family. No collision or selection authority.
 use super::super::{VisualVertex, decode_visual};
-use super::{CUSTOM_DETAILED_FACES, CUSTOM_GEOMETRY_KEY, GEOMETRY_KEY, MK2_GEOMETRY_KEY, VERTICES};
+use super::{
+    CUSTOM_DETAILED_FACES, CUSTOM_GEOMETRY_KEY, GEOMETRY_KEY, MK2_GEOMETRY_KEY,
+    RAVEN_DETAILED_FACES, RAVEN_GEOMETRY_KEY, VERTICES,
+};
 
 const SH008_VISUAL: &[u8] = include_bytes!("../../../../../assets/fleet/sh008/visual.bin");
 const SH009_VISUAL: &[u8] = include_bytes!("../../../../../assets/fleet/sh009/visual.bin");
 const SH010_VISUAL: &[u8] = include_bytes!("../../../../../assets/fleet/sh010/visual.bin");
+const SH015_VISUAL: &[u8] = include_bytes!("../../../../../assets/fleet/sh015/visual.bin");
 const SH009_VERTICES: usize = 3_532 * 3;
 const SH008_FNV: u64 = 0x7a17_0c0c_6cdc_d5fd;
 const SH009_FNV: u64 = 0xd01c_abc6_c77a_3b19;
 const SH010_FNV: u64 = 0xfe21_3755_8ea3_8ccb;
+const SH015_FNV: u64 = 0xcd73_dee3_aabb_2f76;
 
 // Loader shared by all three authenticated original Goshawk hulls.
 pub(super) fn load(geometry_key: &str) -> Result<Vec<VisualVertex>, &'static str> {
@@ -20,6 +25,12 @@ pub(super) fn load(geometry_key: &str) -> Result<Vec<VisualVertex>, &'static str
             b"SH010VZ1",
             CUSTOM_DETAILED_FACES * 3,
             SH010_FNV,
+        ),
+        RAVEN_GEOMETRY_KEY => checked(
+            SH015_VISUAL,
+            b"SH015VZ1",
+            RAVEN_DETAILED_FACES * 3,
+            SH015_FNV,
         ),
         _ => Err("Unknown Goshawk detailed visual"),
     }
@@ -115,5 +126,18 @@ mod tests {
             .is_err()
         );
         assert!(checked(SH010_VISUAL, b"GOS2VIZ1", SH009_VERTICES, SH009_FNV).is_err());
+        assert!(checked(SH015_VISUAL, b"GOSHVIZ1", VERTICES, SH008_FNV).is_err());
+        assert!(
+            checked(
+                SH015_VISUAL,
+                b"SH010VZ1",
+                CUSTOM_DETAILED_FACES * 3,
+                SH010_FNV
+            )
+            .is_err()
+        );
+        for other in [SH008_VISUAL, SH009_VISUAL, SH010_VISUAL] {
+            assert!(checked(other, b"SH015VZ1", RAVEN_DETAILED_FACES * 3, SH015_FNV).is_err());
+        }
     }
 }

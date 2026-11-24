@@ -294,7 +294,7 @@ impl Pass {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use showroom::Hull::{Custom, Explorer, Mk2};
+    use showroom::Hull::{Custom, Explorer, Mk2, Raven};
 
     #[test]
     fn original_showroom_cache_reuses_only_the_same_hull_and_unused_pane() {
@@ -323,9 +323,16 @@ mod tests {
         assert_eq!(frame(&[Custom, Custom]), [Some(4), Some(5)]);
         assert_eq!(frame(&[Explorer, Custom]), [Some(0), Some(4)]);
         assert_eq!(frame(&[Custom, Explorer]), [Some(4), Some(0)]);
+        assert_eq!(frame(&[Raven, Mk2]), [Some(6), Some(1)]);
+        assert_eq!(frame(&[Mk2, Raven]), [Some(1), Some(6)]);
+        assert_eq!(frame(&[Raven, Raven]), [Some(6), Some(7)]);
+        assert_eq!(frame(&[Raven, Custom]), [Some(6), Some(4)]);
         assert_eq!(frame(&[]), [None, None]);
         assert_eq!(frame(&[Mk2]), [Some(1), None]);
-        assert_eq!(cached, [Explorer, Mk2, Mk2, Explorer, Custom, Custom]);
+        assert_eq!(
+            cached,
+            [Explorer, Mk2, Mk2, Explorer, Custom, Custom, Raven, Raven]
+        );
         assert_eq!(cached.len(), showroom::Hull::COUNT * MAX_MODELS);
     }
 }

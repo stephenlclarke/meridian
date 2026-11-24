@@ -44,6 +44,26 @@ def flight_computer_inverse(root, protected):
     return files
 
 
+def undo_raven_publication(relative, data):
+    changes = {
+        LIB_SOURCE: [
+            (b'pub mod navigation;\n', b'pub mod raven;\n', b'pub mod sable_liner;\n'),
+            (b'pub use flight::ProfitDestination;\n', b'pub use flight::RavenApproachSnapshot;\n',
+             b'pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};\n'),
+        ],
+        FLIGHT_SOURCE: [
+            (b'pub use goshawk_validation::GoshawkCustomApproachSnapshot;\n',
+             b'pub use goshawk_validation::RavenApproachSnapshot;\n',
+             b'pub use goshawk_validation::{GoshawkApproachSnapshot, GoshawkApproachStatus};\n'),
+        ],
+    }
+    for before, declaration, after in changes.get(relative, []):
+        span = before + declaration + after
+        assert data.count(declaration) == 1 and data.count(span) == 1, relative
+        data = data.replace(span, before + after, 1)
+    return data
+
+
 def undo_buffalo_mk2_publication(relative, data):
     if relative != LIB_SOURCE:
         return data
@@ -366,7 +386,8 @@ def verify_protected_core(root):
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_buffalo_mk2_publication(relative, current)
+        data = undo_raven_publication(relative, current)
+        data = undo_buffalo_mk2_publication(relative, data)
         data = undo_buffalo_publication(relative, data)
         data = undo_sable_publication(relative, data)
         data = undo_mk2_publication(relative, data)

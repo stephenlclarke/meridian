@@ -307,6 +307,11 @@ fn selecting_mk_ii_custom_routes_its_own_preview_without_granting_exchange() {
     );
 }
 
+#[test]
+fn selecting_raven_routes_its_own_preview_without_granting_exchange() {
+    assert_showroom_selection("Raven", "SH015", "assets/fleet/sh015/visual.bin");
+}
+
 fn assert_showroom_selection(query: &str, object: &str, geometry_key: &str) {
     use crate::docked_screens::{Catalogue, DockedScreens, Input, Key, Outcome, Screen, Viewport};
     let world = meridian_core::World::new_commander(95006).unwrap_or_else(|e| panic!("{e}"));

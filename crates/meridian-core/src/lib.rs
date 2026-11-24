@@ -20,6 +20,7 @@ pub mod harpy_gunship;
 pub mod mining;
 pub mod mule;
 pub mod navigation;
+pub mod raven;
 pub mod sable_liner;
 pub mod saker;
 pub mod save;
@@ -30,6 +31,7 @@ pub mod traffic;
 pub use flight::GoshawkCustomApproachSnapshot;
 pub use flight::PreparedNavigationRoute;
 pub use flight::ProfitDestination;
+pub use flight::RavenApproachSnapshot;
 pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};
 pub use flight::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
 
