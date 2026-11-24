@@ -1,0 +1,380 @@
+[
+  {
+    "name": "port-shoulder-to-central-keel",
+    "pointMetres": [
+      -1.63,
+      -0.17,
+      -1.13
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-shoulder": {
+          "faceRange": [
+            768,
+            780
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-keel": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-shoulder": {
+          "faceRange": [
+            96,
+            108
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-keel": {
+          "faceRange": [
+            0,
+            64
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-shoulder-to-side-keel",
+    "pointMetres": [
+      -6.23,
+      -0.17,
+      -1.13
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-shoulder": {
+          "faceRange": [
+            768,
+            780
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-keel": {
+          "faceRange": [
+            384,
+            768
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-shoulder": {
+          "faceRange": [
+            96,
+            108
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-keel": {
+          "faceRange": [
+            64,
+            96
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-shoulder-to-central-keel",
+    "pointMetres": [
+      1.63,
+      -0.17,
+      -1.13
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-shoulder": {
+          "faceRange": [
+            1548,
+            1560
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-keel": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-shoulder": {
+          "faceRange": [
+            156,
+            168
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-keel": {
+          "faceRange": [
+            0,
+            64
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-shoulder-to-side-keel",
+    "pointMetres": [
+      6.23,
+      -0.17,
+      -1.13
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-shoulder": {
+          "faceRange": [
+            1548,
+            1560
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-keel": {
+          "faceRange": [
+            1164,
+            1548
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-shoulder": {
+          "faceRange": [
+            156,
+            168
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-keel": {
+          "faceRange": [
+            124,
+            156
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "canopy-to-central-keel",
+    "pointMetres": [
+      0.19,
+      2.43,
+      6.81
+    ],
+    "originalFaces": {
+      "detailed": {
+        "canopy": {
+          "faceRange": [
+            1944,
+            2904
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-keel": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "canopy": {
+          "faceRange": [
+            184,
+            192
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-keel": {
+          "faceRange": [
+            0,
+            64
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "belly-to-central-keel",
+    "pointMetres": [
+      0.071,
+      -1.471,
+      -9.931
+    ],
+    "originalFaces": {
+      "detailed": {
+        "belly-module": {
+          "faceRange": [
+            2916,
+            2928
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-keel": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "belly-module": {
+          "faceRange": [
+            192,
+            204
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-keel": {
+          "faceRange": [
+            0,
+            64
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "forward-ramp-to-belly",
+    "pointMetres": [
+      0.41,
+      -4.97,
+      8.461
+    ],
+    "originalFaces": {
+      "detailed": {
+        "forward-ramp": {
+          "faceRange": [
+            2928,
+            2940
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "belly-module": {
+          "faceRange": [
+            2916,
+            2928
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "forward-ramp": {
+          "faceRange": [
+            204,
+            216
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "belly-module": {
+          "faceRange": [
+            192,
+            204
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  }
+]
