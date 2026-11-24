@@ -1,0 +1,138 @@
+{
+  "hull": "SH065 Vulture Raider",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh065/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh065-vulture-raider/FROZEN-SOURCES.json",
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "faces": {
+    "detailed": 4120,
+    "native": 368,
+    "nativeMaximum": 512
+  },
+  "supportGroups": 27,
+  "fitUpperMillimetres": {
+    "detailed": 3295,
+    "native": 3800
+  },
+  "minimumRouteClearanceMillimetres": 703,
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-vulture",
+    "massKg": 57471
+  },
+  "replayPins": {
+    "integration/sh065-vulture-raider/CONTACT-CANDIDATE.json": "020650cf1b0516f538452be92e840229e8f8ca81e977742b17fbfc2f2ec22eb9",
+    "integration/sh065-vulture-raider/CONTACT-RESULT.json": "56d7b3e709e39c2411264924478584e50967ca8ac5aa413014265f5b6f4d7ff6",
+    "integration/sh065-vulture-raider/FROZEN-SOURCES.json": "98eb79e87d1cad342344ebc689711df42c60bec3548af1d57d23494f206a7464",
+    "integration/sh065-vulture-raider/VULTURE-RAIDER-STUDIO.json": "142a476691d862e2e0e1003dde4209b33d87b01428ff6bc1df97b6cf2f91e025",
+    "integration/sh065-vulture-raider/ORIGINAL-DIFFERENCE.json": "ca9c51c26058fda6151454c9a8bdae38ed7b20f531c6df7485eb91801aeceaaa",
+    "integration/sh065-vulture-raider/ORIGINAL-JOINTS.json": "a34bb64df7b11acd92e9f4962995d84dd9af3893d5bdf14eed8247b9a9079ed0",
+    "integration/sh065-vulture-raider/SUPPORT-FAN.json": "1f997cc9978680332bb40bef90026bee18f5529aefd3a7ce5d3a7ed620927dec",
+    "integration/sh065-vulture-raider/SURFACE-FIT.json": "30a10a020c056eabac52f98386693cbde58bb0d0c2047193636b717ec23c6134",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/measure_vulture_raider.py": "9b2a30a9134948b6a11fdc9c999a249fb486d476e8a9c2e68cdcb15462b742fc",
+    "tools/prepare_vulture_raider.py": "237058d340282001321e22bf466896a44ef2e7fab1d815e01069b854a5831050",
+    "tools/verify_vulture_raider.py": "a6e92659e5be33fb1a0e862d762b6e3bd3b50e0fd7a5ba591097a022173bc990",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/prepare_banteng_geometry.py": "30366a23a0deff7856d45719267e8cf57cfed24b1cea7e3655d998253afec972",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/prepare_lanner_geometry.py": "3e1dc0ba15e493f8d53f385c7e2e166420e0082228b355547b3810fb028cdbc8",
+    "tools/lanner_art_mesh.py": "f5cb59dcc0940ee02e039ba5218eb42c638ba0fed692f4b2216699620aba334b"
+  },
+  "byteReplay": {
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T19:47:35Z",
+    "finishedUtc": "2026-11-24T19:48:05Z",
+    "log": {
+      "bytes": 515,
+      "sha256": "abf3fe7cd2d51efd5d3ef0edfa18abb705f01a4fa52d0be74311d77aa7772a3c"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "commands": [
+      "python3 -B tools/prepare_vulture_raider.py --check",
+      "python3 -B tools/verify_vulture_raider.py | cmp - integration/sh065-vulture-raider/CONTACT-RESULT.json",
+      "python3 -B tools/measure_vulture_raider.py --difference | cmp - integration/sh065-vulture-raider/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/measure_vulture_raider.py | cmp - integration/sh065-vulture-raider/SURFACE-FIT.json"
+    ]
+  },
+  "hullStudio": {
+    "definition": "integration/sh065-vulture-raider/VULTURE-RAIDER-STUDIO.json",
+    "bytes": 537176,
+    "sha256": "142a476691d862e2e0e1003dde4209b33d87b01428ff6bc1df97b6cf2f91e025",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "supports": 27,
+    "probes": 7,
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline artwork import and export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 537176,
+        "sha256": "142a476691d862e2e0e1003dde4209b33d87b01428ff6bc1df97b6cf2f91e025"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 4120,
+      "nativeTriangles": 368,
+      "supportGroups": 27,
+      "engineeringReference": "finite-intrinsic-empty-vulture",
+      "massKg": 57471.0,
+      "receiptFiles": {
+        "VULTURE-RAIDER.hull.json": {
+          "bytes": 537175,
+          "sha256": "fcac246b1b5223d1e6cc3e962605f34339c333ae4ac1dda975143c28691e6488"
+        },
+        "VULTURE-RAIDER-repeat.hull.json": {
+          "bytes": 537175,
+          "sha256": "fcac246b1b5223d1e6cc3e962605f34339c333ae4ac1dda975143c28691e6488"
+        },
+        "studio.stdout.json": {
+          "bytes": 72546,
+          "sha256": "f256c206b597f3632ebcf546204bb3855f62260b3fd55d385bfe455bb75923fb"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 72546,
+          "sha256": "f256c206b597f3632ebcf546204bb3855f62260b3fd55d385bfe455bb75923fb"
+        },
+        "codesign.log": {
+          "bytes": 14183,
+          "sha256": "9ebc5ae9600279f4917c2268e0717603115f680c6927b2c8072d09815a4da610"
+        }
+      }
+    }
+  },
+  "sourceContactCounts": {
+    "overlap": 9
+  },
+  "limitingSupport": "forward-collar"
+}
