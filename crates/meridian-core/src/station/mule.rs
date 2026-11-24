@@ -105,6 +105,17 @@ impl OriginalStationData {
         }
         Ok(start)
     }
+    /// Controlled SH014 motion against the original SH028 mesh.
+    pub fn buffalo_mk2_motion_clear(
+        &self,
+        source: &crate::buffalo_mk2::BuffaloMk2HullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces().as_ref(), start, end, angular_travel)
+    }
+
     pub fn mule_entry_clear(
         &self,
         source: &MuleHullSource,

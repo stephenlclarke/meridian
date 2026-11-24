@@ -3,6 +3,7 @@
 #![forbid(unsafe_code)]
 
 pub mod buffalo;
+pub mod buffalo_mk2;
 pub mod celestial;
 pub mod docking;
 pub mod eagle_cruiser;
