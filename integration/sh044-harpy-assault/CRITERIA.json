@@ -1,8 +1,18 @@
 {
   "hull": "SH044 Harpy Assault",
-  "scope": "Original nonflyable catalogue inspection and geometry queries",
+  "scope": "Original catalogue inspection and geometry queries",
   "source": "assets/fleet/sh044/SOURCE-GEOMETRY.json",
   "frozenSources": "integration/sh044-harpy-assault/FROZEN-SOURCES.json",
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
   "faces": {
     "detailed": 3516,
     "native": 248,

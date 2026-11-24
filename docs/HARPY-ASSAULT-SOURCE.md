@@ -1,6 +1,8 @@
 # Harpy Assault source envelope
 
-SH044 Harpy Assault is a nonflyable catalogue hull. This package preserves the original L337 metre coordinates, sand-maroon palette, winding, normals, per-corner UVs, and material appearance. The three texture atlas files match the shared Meridian atlas files byte for byte.
+This SH044 Harpy Assault inspection package preserves the original L337 metre coordinates, sand-maroon palette, winding, normals, per-corner UVs, and material appearance. The three texture atlas files match the shared Meridian atlas files byte for byte.
+
+The frozen runtime catalogue disables player flight and normal purchase. The separate original R3 design contract specifies player flight after blueprint fabrication. This delivery covers catalogue inspection and geometry queries.
 
 | Original mesh | Vertices | Faces | Connected components |
 | --- | ---: | ---: | ---: |

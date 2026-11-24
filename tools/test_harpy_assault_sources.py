@@ -3,6 +3,7 @@
 import hashlib
 import json
 import struct
+import tomllib
 import unittest
 from unittest.mock import patch
 
@@ -22,6 +23,16 @@ class HarpyAssaultSources(unittest.TestCase):
                 self.assertEqual(record["blob"], hashlib.sha1(f"blob {len(data)}\0".encode() + data).hexdigest())
         self.assertFalse(resource["catalogue"]["playerFlyable"])
         self.assertFalse(resource["catalogue"]["normalPurchaseEligible"])
+        access = tomllib.loads(inputs["contract.toml"].decode())["access"]
+        self.assertTrue(access["playerFlyable"])
+        self.assertEqual(access["purchasePolicy"], "blueprintFabrication")
+        criteria = json.loads((prep.INTEGRATION / "CRITERIA.json").read_bytes())["originalAccess"]
+        self.assertEqual(criteria["runtimeCatalogue"], {
+            key: resource["catalogue"][key] for key in ("playerFlyable", "normalPurchaseEligible")
+        })
+        self.assertEqual(criteria["r3DesignContract"], {
+            key: access[key] for key in ("playerFlyable", "purchasePolicy")
+        })
         self.assertEqual((len(detail["faces"]), len(native["faces"])), (3516, 248))
 
     def test_presentation_keeps_both_meshes_and_untextured_faces(self):

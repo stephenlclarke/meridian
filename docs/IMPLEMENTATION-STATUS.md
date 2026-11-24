@@ -54,7 +54,7 @@ The nonflyable Eagle Cruiser package preserves the original detailed and 248-fac
 
 ## Harpy Assault catalogue source
 
-The nonflyable Harpy Assault package preserves the original sand-maroon detailed and native meshes and both frozen engineering records. SteveMBA verified seven keel and shoulder routes and five structural overlaps in both original meshes. The audited fit upper bounds are 847 mm detailed and 1,642 mm native. [Harpy Assault source and evidence](HARPY-ASSAULT-SOURCE.md)
+The Harpy Assault inspection package preserves the original sand-maroon detailed and native meshes and both frozen engineering records. The frozen runtime catalogue disables player flight and normal purchase. The original R3 design specifies player flight after blueprint fabrication. SteveMBA verified seven keel and shoulder routes and five structural overlaps in both original meshes. The audited fit upper bounds are 847 mm detailed and 1,642 mm native. [Harpy Assault source and evidence](HARPY-ASSAULT-SOURCE.md)
 
 ## Goshawk Mk II Custom candidate
 
