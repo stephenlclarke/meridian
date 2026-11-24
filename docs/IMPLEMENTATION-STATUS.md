@@ -184,6 +184,10 @@ Dzo Mk II preserves the original 9,612-face detailed and 448-face native meshes.
 
 Hog preserves the original 868-face detailed and 448-face native meshes with their original calibration. Exact source evidence verifies seven guarded routes across the stacked hull. [Hog source and evidence](HOG-SOURCE.md)
 
+## Tamaraw catalogue source
+
+Tamaraw preserves the original 3,864-face detailed and 212-face native artwork. Source checks verify seven guarded routes, eight shared overlaps and two flush rails present in the detailed mesh. [Tamaraw source and evidence](TAMARAW-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)

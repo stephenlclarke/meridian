@@ -1,0 +1,175 @@
+{
+  "hull": "SH077 Tamaraw",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh077/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh077-tamaraw/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "1",
+  "faces": {
+    "detailed": 3864,
+    "native": 212,
+    "nativeMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-tamaraw",
+    "massKg": 85631
+  },
+  "supportGroups": 26,
+  "minimumRouteClearanceMillimetres": 1129,
+  "sourceContactCounts": {
+    "overlap": 8
+  },
+  "sourceDetailedFlushRailContacts": 2,
+  "fitUpperMillimetres": {
+    "detailed": 2567,
+    "native": 4901
+  },
+  "hullStudio": {
+    "definition": "integration/sh077-tamaraw/TAMARAW-STUDIO.json",
+    "bytes": 506434,
+    "sha256": "dae89434852b300a8e744237eef84b3d3efed05c00a97239ccab8d33d0d89c4d",
+    "supports": 26,
+    "probes": 7,
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 506434,
+        "sha256": "dae89434852b300a8e744237eef84b3d3efed05c00a97239ccab8d33d0d89c4d"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3864,
+      "nativeTriangles": 212,
+      "supportGroups": 26,
+      "engineeringReference": "finite-intrinsic-empty-tamaraw",
+      "massKg": 85631,
+      "receiptFiles": {
+        "TAMARAW.hull.json": {
+          "bytes": 506433,
+          "sha256": "4abd95b96de28ef71d85c1e4a8f9a05e7b0575dab03d14a3e5500b2b76931a97"
+        },
+        "TAMARAW-repeat.hull.json": {
+          "bytes": 506433,
+          "sha256": "4abd95b96de28ef71d85c1e4a8f9a05e7b0575dab03d14a3e5500b2b76931a97"
+        },
+        "studio.stdout.json": {
+          "bytes": 68275,
+          "sha256": "28ff06d698e798a4f10a5f932700a3d2bbb93f4bf6f39c8c55946c0d4d88b27e"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 68275,
+          "sha256": "28ff06d698e798a4f10a5f932700a3d2bbb93f4bf6f39c8c55946c0d4d88b27e"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "7b93f817d0a6dd576eb837a11f3dffad7f4445598f815b9c6d41dc7ebfc9a2a6"
+        },
+        "codesign-details.log": {
+          "bytes": 1145,
+          "sha256": "46f22bef73c8eab385775b9c33eb76171b43a06b700a46282ba7683d72e141bb"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "central-dorsal",
+          "passed": true
+        },
+        {
+          "name": "port-between-floats",
+          "passed": true
+        },
+        {
+          "name": "port-above-rail",
+          "passed": true
+        },
+        {
+          "name": "port-outside-floats",
+          "passed": true
+        },
+        {
+          "name": "starboard-between-floats",
+          "passed": true
+        },
+        {
+          "name": "starboard-above-rail",
+          "passed": true
+        },
+        {
+          "name": "starboard-outside-floats",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "original native visible"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_tamaraw.py --check",
+      "python3 -B tools/verify_tamaraw.py | cmp - integration/sh077-tamaraw/CONTACT-RESULT.json",
+      "python3 -B tools/measure_tamaraw.py --difference | cmp - integration/sh077-tamaraw/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/measure_tamaraw.py | cmp - integration/sh077-tamaraw/SURFACE-FIT.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T23:22:22Z",
+    "finishedUtc": "2026-11-24T23:22:34Z",
+    "log": {
+      "bytes": 494,
+      "sha256": "6439783f8fbd67ac8afa6e66cfbf59111d50d644925c0e67012a6c43040cf2ef"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "integration/sh077-tamaraw/TAMARAW-STUDIO.json": "dae89434852b300a8e744237eef84b3d3efed05c00a97239ccab8d33d0d89c4d",
+    "integration/sh077-tamaraw/FROZEN-SOURCES.json": "9e1b1a17d58ad469111af52b6aacf3484f90377a4b5a7bd2ea99164a0e6629f6",
+    "integration/sh077-tamaraw/CONTACT-CANDIDATE.json": "cabc06ceded0f547d8f3450f61c0a1aa123cc9c57456f9570f5cbd6660374f70",
+    "integration/sh077-tamaraw/CONTACT-RESULT.json": "fb91f06d24db5047d34150403db07c4e706cd8e7c1edd309ee90740518fa3da2",
+    "integration/sh077-tamaraw/ORIGINAL-DIFFERENCE.json": "2a37525dc3344607756f1ce946dfb5b6f813b3e6937ab7f4afffb6686a0f10bc",
+    "integration/sh077-tamaraw/ORIGINAL-JOINTS.json": "f993d932954e3d3dcdb21a0a3c982d8da20c02bc4fdb8b8c4c1f5a7fbab9f172",
+    "integration/sh077-tamaraw/SUPPORT-FAN.json": "3543fc402b2e65d865e4a0bc9569a0a35e64f6a305cc83c3133168721a1fd9f0",
+    "integration/sh077-tamaraw/SURFACE-FIT.json": "292a876bd8fd0589db135a5f21ad148c35f510012094825ac88e7fb1e05f9673",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_tamaraw.py": "14b245a0898235f26bb95ac22dd56b9457a4e081612e7c810b63e761fa7c3efb",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_tamaraw.py": "2f06a112825952c77a8794d6b46e14f3bb1ba32184c6211163dd6f3f853d8a34",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/verify_tamaraw.py": "f495f2a0737c35beea8ed553959662eca34ac3f98292eed9ceac4d5f16957622",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6"
+  }
+}
