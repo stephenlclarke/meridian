@@ -6,6 +6,13 @@ assets/fleet/sh001/visual.bin binary
 assets/fleet/sh008/** -text
 assets/fleet/sh008/visual.bin binary
 
+# Banteng authoring and replay programs use exact LF bytes.
+tools/banteng_art_mesh.py text eol=lf
+tools/measure_banteng_geometry.py text eol=lf
+tools/prepare_banteng_candidate.py text eol=lf
+tools/prepare_banteng_geometry.py text eol=lf
+tools/verify_banteng_geometry.py text eol=lf
+
 # Jackal authoring and replay programs use exact LF bytes.
 tools/jackal_art_mesh.py text eol=lf
 tools/measure_jackal_geometry.py text eol=lf
