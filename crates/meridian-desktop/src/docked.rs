@@ -812,6 +812,9 @@ fn equipment_panel(
             .into(),
         available: true,
     });
+    slots.push(ui::fuel_scoops::slot(world)?);
+    slots.push(ui::emp::slot(world));
+    append_pylon_slots(&mut slots, &ammo);
     for (id, label, slot) in [
         ("targeting", "Targeting computer", ModuleSlot::Targeting),
         (
@@ -837,9 +840,6 @@ fn equipment_panel(
             available: true,
         });
     }
-    slots.push(ui::fuel_scoops::slot(world)?);
-    slots.push(ui::emp::slot(world));
-    append_pylon_slots(&mut slots, &ammo);
     let mut rows = Vec::new();
     let module_slot = match selected {
         "front-laser" => Some(ModuleSlot::FrontLaser),
@@ -1335,7 +1335,15 @@ mod tests {
     fn front_module_rows_and_pylon_slots_use_real_owned_instances_and_admission() {
         let (_directory, profile, _menu) = start();
         let panel = ok(equipment_panel(&profile.world, "front-laser", ""));
-        assert_eq!(panel.slots.len(), 15);
+        assert_eq!(panel.slots.len(), 18);
+        let targeting: Vec<_> = panel.slots[15..]
+            .iter()
+            .map(|slot| slot.id.as_str())
+            .collect();
+        assert_eq!(
+            targeting,
+            ["targeting", "targeting-mining", "targeting-salvage"]
+        );
         let emp = panel
             .slots
             .iter()
