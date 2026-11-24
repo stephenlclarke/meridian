@@ -50,7 +50,7 @@ The SH042 Saker source package preserves the original forest-ivory meshes and bo
 
 ## Eagle Cruiser catalogue source
 
-The nonflyable Eagle Cruiser package preserves the original detailed and 248-face navy-copper native meshes, plus both frozen engineering records. SteveMBA verified seven capital trench routes and five structural overlaps in both LODs. The audited fit upper bounds are 1,772 mm detailed and 5,377 mm native. The signed export and focused Rust tests are tracked in the qualification evidence. [Eagle Cruiser source and evidence](EAGLE-CRUISER-SOURCE.md)
+The nonflyable Eagle Cruiser package preserves the original detailed and 248-face navy-copper native meshes, plus both frozen engineering records. SteveMBA verified seven capital trench routes and five structural overlaps in both LODs. The audited fit upper bounds are 1,772 mm detailed and 5,377 mm native. The installed signed Hull Studio produced two byte-identical offline exports and passed all seven probes. The exact qualification evidence records the export and defines the focused Rust tests. [Eagle Cruiser source and evidence](EAGLE-CRUISER-SOURCE.md)
 
 ## Goshawk Mk II Custom candidate
 

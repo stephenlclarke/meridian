@@ -24,6 +24,8 @@ The original native mesh omits the detailed dorsal louvres. Detailed vertex 1943
 
 The frozen stock engineering and finite-intrinsic empty-dry records are preserved byte for byte. Both give a dry mass of 295,038 kg. The Studio definition uses the named finite empty-dry centre and exact symmetric inertia. It preserves the detailed face appearance and includes seven 100 mm probes. The source package also retains the native appearance in a separate visual stream.
 
+The installed Developer ID signed Hull Studio accepted the definition offline with 27 support groups and seven passing probes. Two exports produced the same bytes and preserved the definition except for its final newline.
+
 The source defines a catalogue inspection package. Operating, station, crew, fuel, cargo, and gameplay admission remain outside this milestone.
 
 [Source pins and replay commands](../integration/sh043-eagle-cruiser/CRITERIA.json)

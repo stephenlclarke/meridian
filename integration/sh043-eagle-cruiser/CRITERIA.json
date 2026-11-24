@@ -81,6 +81,57 @@
     "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
     "loaderSource": "tools/hull_studio/definitions.py",
     "loaderSha256": "f68ea0f442267b793338af6ebec6a937f9e1ee3946dc9be96e58db3e2a796e43",
-    "signedInstalledExport": "PENDING"
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline catalogue import and export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 503494,
+        "sha256": "a7dd0e398911dafe7c925c606db59214a678aed353ccc5ff98ada5bea20f9a51"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3876,
+      "nativeTriangles": 248,
+      "supportGroups": 27,
+      "passedCatalogueProbes": [
+        "central-forward-belly",
+        "port-inner-forward-trench",
+        "port-beneath-shoulder",
+        "port-above-aft-sensor",
+        "starboard-inner-forward-trench",
+        "starboard-beneath-shoulder",
+        "starboard-above-aft-sensor"
+      ],
+      "engineeringReference": "finite-intrinsic-empty-eagle",
+      "massKg": 295038.0,
+      "receiptFiles": {
+        "EAGLE-CRUISER.hull.json": {
+          "bytes": 503493,
+          "sha256": "883d6ffbef2a3d2049e402cb4d5f86b0b3f560adff8b951761d501489d2ded3d"
+        },
+        "EAGLE-CRUISER-repeat.hull.json": {
+          "bytes": 503493,
+          "sha256": "883d6ffbef2a3d2049e402cb4d5f86b0b3f560adff8b951761d501489d2ded3d"
+        },
+        "studio.stdout.json": {
+          "bytes": 69418,
+          "sha256": "682b7c3e5292328bdd727b4f0583e8660135fb92e8467d4c76edc4d1fed3bed5"
+        },
+        "codesign.log": {
+          "bytes": 14189,
+          "sha256": "5d5700c879f632d6dffb25ca7f430fde2e98f94f8d3b5af1748270cc2d037098"
+        }
+      }
+    }
   }
 }
