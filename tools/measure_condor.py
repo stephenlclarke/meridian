@@ -31,8 +31,12 @@ def load():
 
 
 def measure_fit(vertices, meshes, groups, *, collision=False):
-    fan_name = "COLLISION-FAN.json" if collision else "SUPPORT-FAN.json"
-    fans = json.loads((INTEGRATION / fan_name).read_bytes())
+    fans = json.loads((INTEGRATION / "SUPPORT-FAN.json").read_bytes())
+    if collision:
+        wing_fans = json.loads((INTEGRATION / "COLLISION-WING-FAN.json").read_bytes())
+        require(set(wing_fans) == set(groups) - set(fans), "wrong Condor split wing fan groups")
+        fans.update(wing_fans)
+        fans = {name: fans[name] for name in groups}
     require(list(fans) == list(groups), "wrong Condor support fan order")
     wing_target = 3600 if collision else 6200
     targets = {
