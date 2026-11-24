@@ -116,6 +116,10 @@ Muskox retains the original 4,224-face detailed and 244-face native metre meshes
 
 Barbary retains the original 3,852-face detailed and 192-face native metre meshes. Signed Studio evidence covers offline artwork. Independent source replay verifies 22 local groups, eight joints and seven guarded routes. [Barbary source and evidence](BARBARY-SOURCE.md)
 
+## Wombat catalogue source
+
+Wombat retains the original 3,544-face detailed and 1,024-face native meshes with exact relative calibration. A separately identified 496-face inspection candidate retains all seven exact guarded routes, including five through the rectangular frame and centre slit. Signed Studio evidence covers offline artwork. [Wombat source and evidence](WOMBAT-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)

@@ -1,0 +1,272 @@
+{
+  "hull": "SH060 Wombat",
+  "scope": "Original catalogue inspection and geometry queries",
+  "frozenSources": "integration/sh060-wombat/FROZEN-SOURCES.json",
+  "source": "assets/fleet/sh060/SOURCE-GEOMETRY.json",
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "originalScaleRatio": [
+    23000,
+    1211
+  ],
+  "archivedDetailed": {
+    "vertices": 2112,
+    "faces": 3544,
+    "parts": 170
+  },
+  "archivedNative": {
+    "vertices": 576,
+    "faces": 1024,
+    "parts": 32,
+    "budgetAccepted": false
+  },
+  "creatorOriginalReproduction": "integration/sh060-wombat/CREATOR-REPRODUCTION.json",
+  "nativeCandidate": {
+    "source": "assets/fleet/sh060/SH060-project-candidate.json",
+    "bytes": 59150,
+    "sha256": "e3fc141a332578870bfbf47ebae522a865da5fb1dcfed24a2439d8f7e4c26217",
+    "vertices": 304,
+    "faces": 496,
+    "parts": 28,
+    "faceLimit": 512,
+    "byteExactOriginalParts": 20,
+    "resampledCurvedParts": 8,
+    "omittedBlindWellParts": [
+      12,
+      15,
+      18,
+      19
+    ],
+    "archiveToCandidateUpperMillimetres": 2564,
+    "candidateToArchiveUpperMillimetres": 2483,
+    "fullSurfaceComparisonUpperMillimetres": {
+      "candidateToArchive": 2483,
+      "archiveToCandidate": 2564,
+      "candidateToDetailed": 2746,
+      "detailedToCandidate": 3957
+    },
+    "archivedOriginalComparisonUpperMillimetres": {
+      "archivedNativeToDetailed": 1475,
+      "detailedToArchivedNative": 3157
+    },
+    "silhouette": {
+      "directionsPerOrthographicView": 16,
+      "againstArchivedNative": {
+        "axisExtremaAbsoluteDeltaMillimetres": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "maxSampledSilhouetteOffsetMillimetres": {
+          "xy": 535,
+          "xz": 0,
+          "yz": 0
+        }
+      },
+      "againstDetailed": {
+        "axisExtremaAbsoluteDeltaMillimetres": [
+          [
+            34,
+            34
+          ],
+          [
+            570,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "maxSampledSilhouetteOffsetMillimetres": {
+          "xy": 585,
+          "xz": 34,
+          "yz": 1124
+        }
+      }
+    },
+    "omittedWellDepths": {
+      "12": {
+        "mouthToFloorUpperMillimetres": [
+          988,
+          988,
+          988,
+          988
+        ]
+      },
+      "15": {
+        "mouthToFloorUpperMillimetres": [
+          988,
+          988,
+          988,
+          988
+        ]
+      },
+      "18": {
+        "mouthToFloorUpperMillimetres": [
+          988,
+          988,
+          988,
+          988
+        ]
+      },
+      "19": {
+        "mouthToFloorUpperMillimetres": [
+          988,
+          988,
+          988,
+          988
+        ]
+      }
+    },
+    "recipeOrigin": "project-authored",
+    "recipe": "tools/prepare_wombat_candidate.py",
+    "originalLongitudinalStationsKept": true
+  },
+  "supportGroups": 62,
+  "minimumRouteClearanceMillimetres": 459,
+  "verifiedFrameRoutesMillimetres": {
+    "dock-frame-centre-blade-gap": 513,
+    "port-dock-frame-lower-aperture": 459,
+    "port-dock-frame-upper-aperture": 858,
+    "starboard-dock-frame-lower-aperture": 459,
+    "starboard-dock-frame-upper-aperture": 858
+  },
+  "sourceJointCount": 5,
+  "fitUpperMillimetres": {
+    "detailed": 1798,
+    "archiveNative": 2894,
+    "candidateNative": 3714
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-wombat",
+    "massKg": 167216
+  },
+  "replayPins": {
+    "integration/sh060-wombat/FROZEN-SOURCES.json": "aacafaccc2d7b9259811fa152ef514df39457bc058bbb348e137752ca2a82fd2",
+    "integration/sh060-wombat/ORIGINAL-OWNERSHIP.json": "e224806e20761e2eeb17a5c5c30c5ce8397cb5ad98e54f4a4256c8c51040260d",
+    "integration/sh060-wombat/CREATOR-REPRODUCTION.json": "e79b89a6bde2f2fe74c8021f1a38bab614372d26a66d8407c1661a908bf0785c",
+    "integration/sh060-wombat/ARCHIVE-SUPPORT-PREFLIGHT.json": "d332ac97da363acb79f3ff220b754b19684182f9f2ff3a113c90f255c26c6972",
+    "integration/sh060-wombat/candidate-support.json": "9f0f8f6b7982fae29f7d10f6ec8742f13fa80d63c2a2b8f9978d438828cedd65",
+    "integration/sh060-wombat/WOMBAT-STUDIO.json": "15f99e11f45dc4a28d1cf8735a1440fb76f5b964481b54cf8de199e3d93847a8",
+    "integration/sh060-wombat/CONTACT-RESULT.json": "bf332e74c833f9bc90d8134c2bb7128995c1e4d3bd46b4443a8f29a5b214e79c",
+    "integration/sh060-wombat/ARCHIVE-FIT.json": "bf7eba0c5f0b520ff8ccc19003101b8aec7284e4dc18e24fae69c56c7abaea12",
+    "integration/sh060-wombat/candidate-fit.json": "37994ee1b6c0808972eca137b9017c18468e3d4fab7a149e224e80a731f68072",
+    "integration/sh060-wombat/candidate-fidelity.json": "184d9caa304942ea80e1ff3c427b35b038079a03a664ed436f388725b5118e5f",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/lanner_art_mesh.py": "f5cb59dcc0940ee02e039ba5218eb42c638ba0fed692f4b2216699620aba334b",
+    "tools/prepare_lanner_geometry.py": "3e1dc0ba15e493f8d53f385c7e2e166420e0082228b355547b3810fb028cdbc8",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/wombat_art_mesh.py": "6abf0fa786f0f1121d7a061417a138d3b76d516f72bec5c4724951ec9b7b090d",
+    "tools/prepare_wombat_geometry.py": "4a5322045a444d82c33e320db0524ba54d1a6c602e31c7a97ea4c69df14ccc25",
+    "tools/verify_wombat_geometry.py": "ae9e05b98eb0e335977c9559fe3e18d0d73ef4aed3ce88aec3f928f914e5cf51",
+    "tools/measure_wombat_geometry.py": "818a9ca0c561ffa4fba5990642064396fcb88565f00668a93400ab046bd06799",
+    "tools/prepare_wombat_candidate.py": "00d8bf7e05857258a45343972d79c107582c07c02eb8ef01d8e1c68728ea2c2e",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/prepare_banteng_candidate.py": "451ce0cae1007b6258cf1a5ec2387f06cb0d38b5da8546398c3c97e275efb8cf",
+    "tools/prepare_banteng_geometry.py": "30366a23a0deff7856d45719267e8cf57cfed24b1cea7e3655d998253afec972"
+  },
+  "byteReplay": {
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T19:01:20Z",
+    "finishedUtc": "2026-11-24T19:02:17Z",
+    "log": {
+      "bytes": 600,
+      "sha256": "0f6cab7dda20cef7f621b9facd71681973f30b6cf69ac3b3e704b42d18dde6da"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "commands": [
+      "python3 -B tools/prepare_wombat_candidate.py --check",
+      "python3 -B tools/prepare_wombat_geometry.py --check",
+      "python3 -B tools/verify_wombat_geometry.py | cmp - integration/sh060-wombat/CONTACT-RESULT.json",
+      "python3 -B tools/measure_wombat_geometry.py archive-fit | cmp - integration/sh060-wombat/ARCHIVE-FIT.json",
+      "python3 -B tools/measure_wombat_geometry.py candidate-fit | cmp - integration/sh060-wombat/candidate-fit.json",
+      "python3 -B tools/measure_wombat_geometry.py candidate-fidelity | cmp - integration/sh060-wombat/candidate-fidelity.json"
+    ]
+  },
+  "hullStudio": {
+    "definition": "integration/sh060-wombat/WOMBAT-STUDIO.json",
+    "bytes": 507563,
+    "sha256": "15f99e11f45dc4a28d1cf8735a1440fb76f5b964481b54cf8de199e3d93847a8",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "supports": 62,
+    "probes": 7,
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline artwork import and export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 507563,
+        "sha256": "15f99e11f45dc4a28d1cf8735a1440fb76f5b964481b54cf8de199e3d93847a8"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3544,
+      "nativeTriangles": 496,
+      "supportGroups": 62,
+      "engineeringReference": "finite-intrinsic-empty-wombat",
+      "massKg": 167216.0,
+      "receiptFiles": {
+        "WOMBAT.hull.json": {
+          "bytes": 507562,
+          "sha256": "25722b18e4ae7a8e1a63148a0b79f22334d123abb88566cbbece62f0e8f705ab"
+        },
+        "WOMBAT-repeat.hull.json": {
+          "bytes": 507562,
+          "sha256": "25722b18e4ae7a8e1a63148a0b79f22334d123abb88566cbbece62f0e8f705ab"
+        },
+        "studio.stdout.json": {
+          "bytes": 153284,
+          "sha256": "aa7eb637e616b717a2ce6949adf0db9f8ee74fcce8447ec03eaf7ec7702ba07b"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 153284,
+          "sha256": "aa7eb637e616b717a2ce6949adf0db9f8ee74fcce8447ec03eaf7ec7702ba07b"
+        },
+        "codesign.log": {
+          "bytes": 14183,
+          "sha256": "3b7539c61b046bf15241d1ccfac9c9b8ad77f87663209b5ebd261d226e2e619f"
+        }
+      }
+    }
+  }
+}
