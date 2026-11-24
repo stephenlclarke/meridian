@@ -15,12 +15,19 @@ mod xyzzy;
 pub(crate) use xyzzy::{AccountEffect, AccountEvent, STARTING_CREDITS_TENTHS};
 pub use xyzzy::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
 mod navigation_trade;
+mod route;
+pub use route::PreparedNavigationRoute;
+mod auto_docking;
+mod targeting;
 mod traffic;
 pub use navigation_trade::{
     NavigationTonneId, NavigationTradeAction, NavigationTradeAttemptSnapshot, NavigationTradeError,
     NavigationTradeId, NavigationTradeMarketSnapshot, NavigationTradeOutcome,
     NavigationTradePlanSnapshot, NavigationTradeReview, NavigationTradeSnapshot,
     NavigationTradeTrace, PreparedNavigationTrade, PreparedStationService,
+};
+pub use targeting::{
+    TargetFilter, TargetIdentity, TargetMode, TargetingSnapshot, TargetingViewport,
 };
 mod flight_reception;
 pub use flight_reception::{
@@ -62,7 +69,9 @@ pub use practice::{
     PracticeReceptionSnapshot, PracticeReview, PracticeSnapshot, PracticeStatus, PracticeTrace,
     PreparedPracticeConfirmation,
 };
+mod profit_scan;
 mod services;
+pub use profit_scan::ProfitDestination;
 mod weapons;
 pub use mission::{MissionError, MissionSnapshot, StationNpc};
 pub use services::ServiceSnapshot;
@@ -168,6 +177,8 @@ impl std::error::Error for StepError {}
 pub struct World {
     state: Snapshot,
     traffic: crate::traffic::State,
+    targeting: targeting::State,
+    auto_docking: Option<auto_docking::Phase>,
     goshawk_validation: Option<goshawk_validation::Approach>,
     mule_validation: Option<crate::traffic::mule_validation::State>,
     mule_renas: Option<crate::traffic::mule_validation::State>,
@@ -177,6 +188,7 @@ pub struct World {
     station_data: Option<OriginalStationData>,
     navigation_catalogue: Option<OriginalNavigation>,
     navigation: Option<NavigationState>,
+    navigation_route: Option<crate::navigation::RoutePlan>,
     jump_journal: crate::navigation::JumpJournal,
     commander_account: Option<CommanderAccount>,
     freight_session: Option<mission::FreightSession>,
@@ -215,6 +227,8 @@ impl World {
                 navigation: None,
             },
             traffic: crate::traffic::State::default(),
+            targeting: targeting::State::default(),
+            auto_docking: None,
             goshawk_validation: None,
             mule_validation: None,
             mule_renas: None,
@@ -224,6 +238,7 @@ impl World {
             station_data: None,
             navigation_catalogue: None,
             navigation: None,
+            navigation_route: None,
             jump_journal: crate::navigation::JumpJournal::default(),
             commander_account: None,
             freight_session: None,
@@ -380,11 +395,13 @@ impl World {
             .as_ref()
             .ok_or(NavigationError::WrongMode)?;
         let reach = self.jump_reach_ly().ok_or(NavigationError::WrongMode)?;
+        let origin = navigation.snapshot(0).system;
         navigation.begin_jump(catalogue, target, distance, account.fuel_tenths(), reach)?;
         if !self.jump_journal.has_room() {
             return Err(NavigationError::SequenceExhausted);
         }
         self.navigation = Some(navigation);
+        self.cancel_route_on_manual_jump(origin, target);
         Ok(())
     }
 
@@ -508,6 +525,23 @@ impl World {
         if let Some(result) = self.controlled_hull_step(input) {
             return result;
         }
+        let previous_targeting = self.targeting.clone();
+        let previous_docking = self.auto_docking;
+        let input = self.flight_computer_input(input);
+        let result = self.step_flight(input);
+        if result.is_err() {
+            self.targeting = previous_targeting;
+            self.auto_docking = previous_docking;
+        } else if self.state.mode != FlightMode::Flight || self.state.motion_refusal.is_some() {
+            // An accepted stop must release every computer controller, not just docking.
+            // Otherwise selected work guidance resumes thrust on the next idle tick.
+            self.cancel_targeting();
+            self.cancel_auto_docking();
+        }
+        result
+    }
+
+    fn step_flight(&mut self, input: FlightInput) -> Result<(), StepError> {
         let input = if self.emp.electrical_disabled() {
             FlightInput::default()
         } else {
@@ -636,8 +670,8 @@ impl World {
         let mut mission_epoch = None;
         let mut planned_debit = None;
         let mut completed_leg = None;
+        let entry = next.mode == FlightMode::Docked && self.state.mode != FlightMode::Docked;
         if let Some(state) = &mut navigation {
-            let entry = next.mode == FlightMode::Docked && self.state.mode != FlightMode::Docked;
             let account = self
                 .commander_account
                 .as_mut()
@@ -790,6 +824,9 @@ impl World {
         }
         self.state = next;
         self.navigation = navigation;
+        if entry || completed_leg.is_some() {
+            self.reconcile_navigation_route(entry);
+        }
         self.refresh_deferred_renas_mule();
         self.observe_flight_reception(flight_reception_start);
         if let Some((session, epoch)) = self.freight_session.as_mut().zip(mission_epoch) {

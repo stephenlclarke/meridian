@@ -146,11 +146,12 @@ fn presented_paid_emp_purchase_store_refit_and_cold_continue_keep_one_empty_owne
 #[test]
 fn paid_emp_grade_review_refuses_failed_atomic_writer_and_keeps_same_paid_base() {
     let d = TestDirectory::new();
-    let mut a = app(&d, 19102);
-    earned(&mut a);
-    ok(a.game.command(Action::Emp(EmpEquipmentAction::Purchase)));
-    // Explicit XYZZY funding for the grade test, after the base was genuinely earned and paid.
-    ok(a.game.xyzzy(XyzzyAction::Enter));
+    // Continue a real pre-upgrade save containing a paid base and the old XYZZY grant.
+    let bytes = include_bytes!("../../../meridian-core/tests/fixtures/xyzzy-paid-base-v17.bin");
+    ok(fs::write(d.0.join("commander.meridian"), bytes));
+    let mut profile = open(&d.0);
+    ok(profile.continue_saved());
+    let mut a = App::with_profile(profile);
     let item = a.game.world.owned_emp().unwrap_or_else(|| panic!("item"));
     assert_eq!(item.provenance, EmpProvenance::Paid);
     shop(&mut a);
@@ -158,12 +159,14 @@ fn paid_emp_grade_review_refuses_failed_atomic_writer_and_keeps_same_paid_base()
     menu_key(&mut a, ui::Key::Buy);
     let slot = d.0.join("commander.meridian");
     let retained = d.0.join("retained-valid-commander");
-    let before = ok(fs::read(&slot));
+    let before_disk = ok(fs::read(&slot));
+    assert_eq!(before_disk, bytes);
+    let before_live = ok(a.game.world.save_bytes());
     ok(fs::rename(&slot, &retained));
     ok(fs::create_dir(&slot));
     menu_key(&mut a, ui::Key::Confirm);
-    assert_eq!(ok(a.game.world.save_bytes()), before);
-    assert_eq!(ok(fs::read(&retained)), before);
+    assert_eq!(ok(a.game.world.save_bytes()), before_live);
+    assert_eq!(ok(fs::read(&retained)), before_disk);
     assert_eq!(a.game.world.owned_emp(), Some(item));
     ok(fs::remove_dir(&slot));
     ok(fs::rename(&retained, &slot));

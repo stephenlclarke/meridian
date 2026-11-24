@@ -21,3 +21,5 @@ tree `6685f513d6b25ac5ee0bad021a69673cad9e76c5`. Its SHA-256 is
 `d2f995aa2826d8e77fc215cbaf7dee950b68c530b20d09a0dfd226d50980ddae`.
 The desktop input in the originating run remains diagnostic. This regression
 uses the emitted bytes to check explicit V16 refusal and live-state preservation. It separately checks current V17 cold Continue.
+
+`xyzzy-paid-base-v17.bin` is a synthetic commander saved on Ubuntu by Meridian revision `fcec61d182b66478846b92390ad17805b0dfc7e0`. The EMP tests' `paid()` journey earned and purchased the base, then `secret()` activated the original outfit at Renas. The original encoder wrote the fixture before XYZZY granted EMP grades. It preserves an ordinary paid base at grade zero, 1,000,000 CR, and the earlier outfit history for cold-load and paid-upgrade regression tests. SHA-256 `87caec50eba9e8cbeb1b205c545a71429972e896b1844cd53bd71b7cb39596df`.

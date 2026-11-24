@@ -24,6 +24,7 @@ pub enum Action {
     ReviewFlightLesson,
     CancelFlightLesson,
     FlightLessonDetails,
+    ToggleAutoDocking,
     SetFlightView(FlightView),
     CycleMissileLock,
     ToggleMissileArm,
@@ -316,6 +317,10 @@ impl Session {
                 self.show_flight_lesson = true;
                 Ok("Flight lesson details. F6 reviews; F12 reviews cancellation.".into())
             }
+            Action::ToggleAutoDocking => world
+                .toggle_auto_docking()
+                .map(|message| message.to_string())
+                .map_err(|error| error.to_string()),
             Action::SetFlightView(view) => {
                 self.invalidate();
                 world
@@ -598,6 +603,9 @@ impl Session {
 
     fn flight_alerts(world: &World, notice: Option<&str>) -> Vec<String> {
         let mut lines: Vec<String> = notice.into_iter().map(str::to_owned).collect();
+        if let Some(phase) = world.auto_docking_status() {
+            lines.push(format!("AUTO DOCK | {phase} | N Cancel"));
+        }
         if world
             .practice_snapshot()
             .is_some_and(|practice| practice.status == PracticeStatus::Active)

@@ -10,6 +10,7 @@ use winit::{dpi::PhysicalSize, event_loop::OwnedDisplayHandle, window::Window};
 
 use crate::mesh::{self, Vertex};
 use crate::{asteroid_render, hud};
+mod targeting;
 
 pub(crate) fn flight_projection(width: u32, height: u32) -> [f32; 4] {
     [width as f32 / height as f32, 1.6, 1.0, 20000.0]
@@ -27,9 +28,18 @@ pub struct HudScene<'a> {
     pub help: Option<&'a crate::help::Panel>,
 }
 
+struct TargetHud<'a> {
+    snapshot: &'a meridian_core::TargetingSnapshot,
+    camera: meridian_core::docking::RigidPose,
+    details: Option<bool>,
+    work_mesh: Option<Vec<Vertex>>,
+}
+
 pub struct SceneEffects<'a> {
     pub(crate) mule: Option<crate::mule_render::Placement<'a>>,
     pub traffic: Option<&'a meridian_core::traffic::TrafficSnapshot>,
+    pub targeting: Option<&'a meridian_core::TargetingSnapshot>,
+    pub target_details: Option<bool>,
     pub pulse: Option<&'a PulseShot>,
     pub mining: Option<asteroid_render::Scene<'a>>,
     pub missiles: &'a [meridian_core::ProjectileSnapshot],
@@ -89,6 +99,7 @@ pub struct Renderer {
     vertices: wgpu::Buffer,
     depth: wgpu::TextureView,
     ship: Vec<Vertex>,
+    target_mule_mesh: Option<Vec<Vertex>>,
     station: Vec<Vertex>,
     frame: Vec<Vertex>,
     vertex_capacity: usize,
@@ -213,7 +224,8 @@ impl Renderer {
         });
         let hud_vertices = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("Bounded HUD vertices"),
-            size: (hud::MAX_VERTICES * std::mem::size_of::<Vertex>()) as u64,
+            size: ((hud::MAX_VERTICES + targeting::MAX_VERTICES) * std::mem::size_of::<Vertex>())
+                as u64,
             usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
@@ -268,13 +280,14 @@ impl Renderer {
             vertices,
             depth,
             ship,
+            target_mule_mesh: None,
             station,
             frame: Vec::with_capacity(vertex_capacity),
             vertex_capacity,
             device_lost,
             hud_pipeline,
             hud_vertices,
-            hud_frame: Vec::with_capacity(hud::MAX_VERTICES),
+            hud_frame: Vec::with_capacity(hud::MAX_VERTICES + targeting::MAX_VERTICES),
         })
     }
 
@@ -322,6 +335,84 @@ impl Renderer {
 
     pub fn set_flight_view(&mut self, view: FlightView) {
         self.flight_view = view;
+    }
+
+    fn targeting_camera(
+        &self,
+        snapshot: &Snapshot,
+        station: &StationScene<'_>,
+    ) -> Result<meridian_core::docking::RigidPose, String> {
+        mesh::scene_camera_pose(
+            snapshot,
+            mesh::StationRender {
+                vertices: &self.station,
+                pose: station.pose,
+                port: station.port,
+                docked: station.docked,
+            },
+        )
+    }
+
+    pub fn targeting_viewport(
+        &self,
+        snapshot: &Snapshot,
+        station: StationScene<'_>,
+        traffic: Option<&meridian_core::traffic::TrafficSnapshot>,
+        mule: Option<&meridian_core::traffic::MuleActorSnapshot>,
+        belt: Option<&meridian_core::mining::BeltSnapshot>,
+    ) -> Result<
+        (
+            meridian_core::TargetingViewport,
+            Vec<meridian_core::equipment::WorkTargetId>,
+        ),
+        String,
+    > {
+        use meridian_core::{equipment::WorkTargetId, traffic::NpcPhase};
+        if self.is_zero_sized() {
+            return Err("Targeting requires an active flight viewport".into());
+        }
+        let camera = self.targeting_camera(snapshot, &station)?;
+        let projection = flight_projection(self.config.width, self.config.height);
+        let mut front = Vec::new();
+        let mut work_front = Vec::new();
+        if let Some(traffic) = traffic {
+            for actor in traffic.actors.iter().filter(|actor| {
+                actor.hull_id == "SH025"
+                    && targeting::visible(&self.ship, camera, actor.pose, projection)
+            }) {
+                if actor.phase == NpcPhase::Destroyed {
+                    work_front.push(WorkTargetId::Wreck(actor.id));
+                } else if actor.phase != NpcPhase::Complete {
+                    front.push(actor.id);
+                }
+            }
+        }
+        if let Some(mule) = mule.filter(|m| m.is_renas_encounter()) {
+            let mesh = crate::mule_render::targeting_vertices()?;
+            if targeting::visible(&mesh, camera, mule.actor().pose, projection) {
+                front.push(mule.actor().id);
+            }
+        }
+        if let Some(belt) = belt {
+            for body in belt.bodies.iter().filter(|body| body.remaining_units > 0) {
+                let pose = meridian_core::docking::RigidPose {
+                    position: body.position,
+                    orientation: meridian_core::docking::Basis3::IDENTITY,
+                };
+                if targeting::visible(&targeting::asteroid_model(body), camera, pose, projection) {
+                    work_front.push(WorkTargetId::Asteroid(body.id));
+                }
+            }
+        }
+        // Pending ore has an actual World position but no ordinary visual mesh in this build.
+        // Its fitted work identity remains selectable as known/offscreen, never fake-visible.
+        Ok((
+            meridian_core::TargetingViewport {
+                size: [self.size.width, self.size.height],
+                front,
+            },
+            work_front,
+        ))
     }
 
     fn prepare_hud_frame(
@@ -372,14 +463,51 @@ impl Renderer {
         lines: &[String],
         cockpit: Option<&hud::cockpit::Cockpit>,
         help: Option<&crate::help::Panel>,
-    ) {
+        target: Option<TargetHud<'_>>,
+    ) -> Result<(), String> {
         let scale = self.window.scale_factor();
         let logical = self.size.to_logical::<f64>(scale);
-        if let Some(panel) = help {
+        if help.is_some() || target.is_some() {
             let width = logical.width.round() as u32;
             let height = logical.height.round() as u32;
             hud::vertices_with_cockpit(lines, width, height, cockpit, &mut self.hud_frame);
-            hud::append_help(panel, width, height, &mut self.hud_frame);
+            if let Some(TargetHud {
+                snapshot: target,
+                camera,
+                details,
+                work_mesh,
+            }) = target
+            {
+                if target.model == Some("Mule") && self.target_mule_mesh.is_none() {
+                    self.target_mule_mesh = Some(crate::mule_render::targeting_vertices()?);
+                }
+                let model = match target.mode {
+                    meridian_core::TargetMode::Station => self.station.as_slice(),
+                    meridian_core::TargetMode::Tracking if target.model == Some("Mule") => {
+                        self.target_mule_mesh.as_deref().unwrap_or(&[])
+                    }
+                    meridian_core::TargetMode::Tracking => self.ship.as_slice(),
+                    meridian_core::TargetMode::Work(
+                        meridian_core::equipment::WorkTargetRole::WreckTracking,
+                    ) => self.ship.as_slice(),
+                    meridian_core::TargetMode::Work(_) => work_mesh.as_deref().unwrap_or(&[]),
+                };
+                targeting::append(
+                    &mut self.hud_frame,
+                    [width, height],
+                    targeting::Overlay {
+                        target,
+                        camera,
+                        view: self.flight_view,
+                        projection: flight_projection(self.config.width, self.config.height),
+                        details,
+                        model,
+                    },
+                );
+            }
+            if let Some(panel) = help {
+                hud::append_help(panel, width, height, &mut self.hud_frame);
+            }
             self.queue
                 .write_buffer(&self.hud_vertices, 0, bytemuck::cast_slice(&self.hud_frame));
         } else {
@@ -393,6 +521,7 @@ impl Renderer {
                 |bytes| self.queue.write_buffer(&self.hud_vertices, 0, bytes),
             );
         }
+        Ok(())
     }
 
     fn draw_overlay(
@@ -720,13 +849,34 @@ impl Renderer {
                     .write_buffer(&self.projection, 0, bytemuck::cast_slice(&projection))
             });
             self.prepare_scene_surfaces(snapshot, &effects)?;
+            let target = match (effects.targeting, station.as_ref()) {
+                (Some(target), Some(station)) => {
+                    let work_mesh = match target.identity {
+                        meridian_core::TargetIdentity::Work(
+                            meridian_core::equipment::WorkTargetId::Asteroid(id),
+                        ) => effects
+                            .mining
+                            .as_ref()
+                            .and_then(|scene| scene.belt.bodies.iter().find(|body| body.id == id))
+                            .map(targeting::asteroid_model),
+                        _ => None,
+                    };
+                    Some(TargetHud {
+                        snapshot: target,
+                        camera: self.targeting_camera(snapshot, station)?,
+                        details: effects.target_details,
+                        work_mesh,
+                    })
+                }
+                _ => None,
+            };
             if docked.is_none() {
                 self.prepare_flight_geometry(snapshot, station, effects)?;
             }
             if docked.is_none() {
-                self.upload_hud(hud_lines, cockpit, help);
+                self.upload_hud(hud_lines, cockpit, help, target)?;
             } else if help.is_some() {
-                self.upload_hud(&[], None, help);
+                self.upload_hud(&[], None, help, None)?;
             }
             Ok(())
         })?

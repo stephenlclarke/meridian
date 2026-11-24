@@ -140,7 +140,7 @@ impl Ledger {
         &mut self,
         action: AmmunitionAction,
         item: u64,
-        purchase: u32,
+        purchase: Option<u32>,
     ) -> Result<(), AmmunitionError> {
         match action {
             AmmunitionAction::Purchase => {
@@ -156,13 +156,13 @@ impl Ledger {
                 self.items.push(AmmunitionItem {
                     item,
                     pylon: Some(pylon),
-                    purchase: Some(purchase),
+                    purchase,
                     consumed: false,
-                    xyzzy: false,
+                    xyzzy: purchase.is_none(),
                 });
                 self.paid = self
                     .paid
-                    .checked_add(PRICE_TENTHS)
+                    .checked_add(if purchase.is_some() { PRICE_TENTHS } else { 0 })
                     .ok_or(AmmunitionError::SequenceExhausted)?;
             }
             AmmunitionAction::Store { item } => {
@@ -331,16 +331,9 @@ impl State {
                 ledger.launch(o)?;
             }
             (purchases, grants) = validate_ammunition_identity(e, world, owner, purchases, grants)?;
-            let paid_before = ledger.paid;
             ledger
-                .apply(e.action, e.item, purchases)
+                .apply(e.action, e.item, (!e.xyzzy).then_some(purchases))
                 .map_err(|_| INVALID)?;
-            if e.xyzzy {
-                let item = ledger.items.last_mut().ok_or(INVALID)?;
-                item.purchase = None;
-                item.xyzzy = true;
-                ledger.paid = paid_before;
-            }
             previous = Some(*e);
         }
         for o in launches {
@@ -501,7 +494,7 @@ impl World {
         if action == AmmunitionAction::Purchase && account.credits_tenths() < PRICE_TENTHS {
             return Err(AmmunitionError::InsufficientCredits);
         }
-        ledger.apply(action, 0, 0)?;
+        ledger.apply(action, 0, Some(0))?;
         if ledger.items.iter().filter(|i| !i.consumed).count()
             + 4
             + usize::from(account.equipment_state().owned().is_some())

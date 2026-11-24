@@ -36,6 +36,31 @@ fn context<'a>(world: &'a World, catalogue: &'a Catalogue) -> Context<'a> {
 fn view() -> Viewport {
     Viewport::new(1280.0, 800.0).unwrap_or_else(|| panic!("valid viewport"))
 }
+#[test]
+fn profit_scan_button_and_empty_state_use_chart_rows() {
+    let world = world();
+    let catalogue = catalogue();
+    let context = context(&world, &catalogue);
+    let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+    let frame = ui.frame(&context, view());
+    let button = point(&frame, &Control::Key(Key::ProfitScan));
+    assert_eq!(
+        ui.handle(Input::Click(button), &frame, &context),
+        Outcome::Updated
+    );
+    assert!(
+        ui.frame(&context, view())
+            .labels
+            .iter()
+            .any(|label| label.text.contains("Renas:"))
+    );
+    assert_eq!(
+        presentation::profit_fields(&catalogue, &[]),
+        ["No profitable destinations in range"]
+    );
+    ui.open(Screen::System);
+    assert_eq!(key(&mut ui, &context, Key::ProfitScan), Outcome::Ignored);
+}
 fn key(ui: &mut DockedScreens, c: &Context<'_>, key: Key) -> Outcome {
     let frame = ui.frame(c, view());
     ui.handle(Input::Key(key), &frame, c)
@@ -328,10 +353,20 @@ fn chart_pointer_and_keyboard_select_the_same_source_world() {
         Outcome::Updated
     );
     assert_eq!(ui.selected_system(), SystemId::RENAS);
-    assert_eq!(
-        key(&mut ui, &ctx, Key::Route),
-        Outcome::Request(Request::ReviewRoute(SystemId::RENAS))
+    assert_eq!(key(&mut ui, &ctx, Key::Route), Outcome::Updated);
+    let frame = ui.frame(&ctx, view());
+    assert!(
+        frame
+            .labels
+            .iter()
+            .any(|label| label.text.contains("Routes to Renas"))
     );
+    assert!(frame.lines.iter().any(|line| line.from[0] != line.to[0]));
+    assert!(matches!(key(&mut ui, &ctx, Key::Confirm),
+        Outcome::Request(Request::SetNavigationRoute(plan)) if plan.destination() == SystemId::RENAS));
+    assert!(w.active_route_progress().is_none());
+    assert_eq!(key(&mut ui, &ctx, Key::Back), Outcome::Updated);
+    assert_eq!(ui.selected_system(), SystemId::RENAS);
 }
 #[test]
 fn search_consumes_text_and_navigation_keys_without_firing_other_actions() {

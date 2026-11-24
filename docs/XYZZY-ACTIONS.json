@@ -147,8 +147,8 @@
     {
       "key": "max/targeting",
       "legacyBehavior": "Military targeting core plus Mining/Salvage specialist modules.",
-      "state": "DEPENDENCY",
-      "dependency": "Real targeting modules and specialist control authority, not UI availability flags."
+      "state": "PARTIAL_CORE",
+      "dependency": "Development source fits the Military targeting core and both independent Mining and Salvage targeting modules. Their operation depends on the work target and available tools."
     },
     {
       "key": "max/lasers",
@@ -202,7 +202,7 @@
       "key": "max/EMP Pirate Blaster",
       "legacyBehavior": "EMP utility.",
       "state": "PARTIAL_CORE",
-      "dependency": "Distinct source-only EMP item with empty bank, grades, held charge, finite transfer/debit, native self-defence drain and local disable/recovery. Paid base keeps identity/provenance; secret base does not unlock paid grades. Desktop controls and owner qualification pending; civilian law, qualified occupied Newt release and off-system disabled custody remain unavailable."
+      "dependency": "A confirmed outfit fits the EMP and grants missing power, capacity and recharge grades through grade 3. Each granted grade costs zero and retains its outfit receipt. Existing charge, item identity and paid history are preserved. Civilian law, qualified occupied Newt release and off-system disabled custody remain unavailable."
     },
     {
       "key": "max/mining-utility",

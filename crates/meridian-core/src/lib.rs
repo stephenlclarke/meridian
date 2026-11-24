@@ -18,6 +18,8 @@ pub mod station_services;
 pub mod traffic;
 
 pub use flight::GoshawkCustomApproachSnapshot;
+pub use flight::PreparedNavigationRoute;
+pub use flight::ProfitDestination;
 pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};
 pub use flight::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
 
@@ -42,6 +44,7 @@ pub use flight::{
 pub use flight::{
     CombatIdentity, CombatSnapshot, OrdinaryImpact, OrdinaryTarget, OrdinaryWeapon, PlayerCondition,
 };
+pub use flight::{TargetFilter, TargetIdentity, TargetMode, TargetingSnapshot, TargetingViewport};
 
 pub use flight::{
     MISSILE_COOLDOWN_TICKS, MISSILE_FACES, MISSILE_LIFETIME_TICKS, MISSILE_MUZZLE_DISTANCE,

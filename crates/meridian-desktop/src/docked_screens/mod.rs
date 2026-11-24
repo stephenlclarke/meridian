@@ -5,12 +5,17 @@ pub(crate) mod emp;
 pub(crate) mod fuel_scoops;
 mod layout;
 mod presentation;
+mod route;
 #[cfg(test)]
 mod tests;
 pub use catalogue::{Catalogue, ObjectRecord, Specification, WorldRecord};
 pub use controller::DockedScreens;
 pub use layout::{ChartLayout, Rect, Viewport};
-use meridian_core::{World, navigation::SystemId, station_services::CommodityId};
+use meridian_core::{
+    World,
+    navigation::{RoutePlan, SystemId},
+    station_services::CommodityId,
+};
 pub(crate) use presentation::commander_frame;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -67,6 +72,7 @@ pub enum Key {
     SellMode,
     LocalChart,
     MapColour,
+    ProfitScan,
     NextGalaxy,
     PreviousGalaxy,
     CurrentLocation,
@@ -128,6 +134,9 @@ pub enum EquipmentOperation {
 pub enum Request {
     Close,
     ReviewRoute(SystemId),
+    SetNavigationRoute(RoutePlan),
+    ClearNavigationRoute,
+    RefuelNavigationRoute,
     ReviewBodyRoute(NavigationBodyId),
     ReviewCommodity {
         commodity: CommodityId,
@@ -349,6 +358,10 @@ pub struct ModelPreview {
 pub(super) enum Control {
     Open(Screen),
     SelectSystem(SystemId),
+    RouteCandidate(usize),
+    OpenRouteProgress,
+    ClearNavigationRoute,
+    RefuelNavigationRoute,
     SelectShip(String),
     SelectCommodity(CommodityId),
     SelectEquipment(usize),
