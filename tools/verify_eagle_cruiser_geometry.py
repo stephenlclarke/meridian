@@ -1,59 +1,18 @@
 """Replay the frozen Eagle trench and structural witnesses with exact arithmetic."""
 from fractions import Fraction
 import json
-from math import isqrt
 import struct
 import sys
 import tomllib
 
 from prepare_eagle_cruiser_geometry import ASSETS, DETAIL, NATIVE, PIECE_COUNT, ROOT, document, prepare, require
+from hull_contact_geometry import inside_y as contact_inside_y, points, separating_planes
 
 INTEGRATION = ROOT / 'integration/sh043-eagle-cruiser'
-GUARD_MM = 21
-
-
-def dot(a, b):
-    return sum(x * y for x, y in zip(a, b, strict=True))
-
-
-def points(data):
-    return [tuple(Fraction(x) for x in p) for p in struct.iter_unpack('<3d', data)]
-
-
-def separating_planes(pieces, obstacle, axes):
-    distances = []
-    for piece, axis in zip(pieces, axes, strict=True):
-        require(all(type(v) is int for v in axis) and dot(axis, axis) > 0, 'invalid separating axis')
-        gap = min(dot(axis, p) for p in obstacle) - max(dot(axis, p) for p in piece)
-        require(gap > 0, 'opening sweep misses a separating plane')
-        distances.append(isqrt((gap * 1000)**2 // dot(axis, axis)) - GUARD_MM)
-    return min(distances)
-
-
-def projected_weights(triangle, x, y):
-    (ax, ay), (bx, by), (cx, cy) = triangle
-    denominator = (bx - ax) * (cy - ay) - (by - ay) * (cx - ax)
-    if denominator == 0:
-        return None
-    u = ((x - ax) * (cy - ay) - (y - ay) * (cx - ax)) / denominator
-    v = ((bx - ax) * (y - ay) - (by - ay) * (x - ax)) / denominator
-    return (1 - u - v, u, v)
 
 
 def inside_y(point, triangles):
-    x, y, z = point
-    above, below = 0, 0
-    for tri in triangles:
-        weights = projected_weights([(a, c) for a, _, c in tri], x, z)
-        if weights is None or min(weights) < 0:
-            continue
-        require(min(weights) > 0, 'joint parity ray hit a source edge')
-        height = sum(w * vertex[1] for w, vertex in zip(weights, tri, strict=True))
-        require(height != y, 'joint lies on a source face')
-        above += int(height > y)
-        below += int(height < y)
-    require(above % 2 == below % 2 == 1, 'joint left the source volume')
-    return (above, below)
+    return contact_inside_y(point, triangles, ray_subject='joint', joint_subject='joint')
 
 
 def verify():

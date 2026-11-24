@@ -1,4 +1,4 @@
-"""Exact fraction-based hull-contact certificate primitives shared by SH035 and SH042."""
+"""Exact fraction-based contact certificate primitives shared by original hull verifiers."""
 from fractions import Fraction
 from math import isqrt
 import struct
@@ -44,19 +44,19 @@ def projected_weights(triangle, x, y):
     return (1 - u - v, u, v)
 
 
-def inside_y(point, triangles):
+def inside_y(point, triangles, *, ray_subject='cockpit', joint_subject='cockpit joint'):
     x, y, z = point
     above, below = 0, 0
     for tri in triangles:
         weights = projected_weights([(a, c) for a, _, c in tri], x, z)
         if weights is None or min(weights) < 0:
             continue
-        require(min(weights) > 0, 'cockpit parity ray hit a source edge')
+        require(min(weights) > 0, f'{ray_subject} parity ray hit a source edge')
         height = sum(w * vertex[1] for w, vertex in zip(weights, tri, strict=True))
-        require(height != y, 'cockpit joint lies on a source face')
+        require(height != y, f'{joint_subject} lies on a source face')
         above += int(height > y)
         below += int(height < y)
-    require(above % 2 == below % 2 == 1, 'cockpit joint left the source volume')
+    require(above % 2 == below % 2 == 1, f'{joint_subject} left the source volume')
     return (above, below)
 
 
