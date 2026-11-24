@@ -6,6 +6,13 @@ assets/fleet/sh001/visual.bin binary
 assets/fleet/sh008/** -text
 assets/fleet/sh008/visual.bin binary
 
+# Caracal Scout authoring and replay programs use exact LF bytes.
+tools/caracal_scout_art_mesh.py text eol=lf
+tools/measure_caracal_scout_geometry.py text eol=lf
+tools/prepare_caracal_scout_candidate.py text eol=lf
+tools/prepare_caracal_scout_geometry.py text eol=lf
+tools/verify_caracal_scout_geometry.py text eol=lf
+
 # Banteng authoring and replay programs use exact LF bytes.
 tools/banteng_art_mesh.py text eol=lf
 tools/measure_banteng_geometry.py text eol=lf

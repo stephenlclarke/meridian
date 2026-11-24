@@ -1,0 +1,169 @@
+{
+  "hull": "SH053 Caracal Scout",
+  "scope": "Original catalogue inspection and geometry queries",
+  "frozenSources": "integration/sh053-caracal-scout/FROZEN-SOURCES.json",
+  "source": "assets/fleet/sh053/SOURCE-GEOMETRY.json",
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "originalScaleRatio": [
+    1500000,
+    171707
+  ],
+  "archivedDetailed": {
+    "vertices": 3224,
+    "faces": 5372,
+    "parts": 269
+  },
+  "archivedNative": {
+    "vertices": 768,
+    "faces": 1380,
+    "parts": 39,
+    "budgetAccepted": false
+  },
+  "nativeCandidate": {
+    "source": "assets/fleet/sh053/SH053-project-candidate.json",
+    "bytes": 59934,
+    "sha256": "31124dc9f0e1c69bf653dd315ecbc5420307dcb857bcdfc31dad7f513377f76f",
+    "vertices": 296,
+    "faces": 492,
+    "parts": 25,
+    "faceLimit": 512,
+    "byteExactOriginalParts": 15,
+    "resampledCurvedParts": 10,
+    "omittedBlindWellParts": 14,
+    "archiveToCandidateUpperMillimetres": 1761,
+    "candidateToArchiveUpperMillimetres": 1233,
+    "recipeOrigin": "project-authored",
+    "recipe": "tools/prepare_caracal_scout_candidate.py",
+    "originalLongitudinalStationsKept": true
+  },
+  "supportGroups": 89,
+  "minimumRouteClearanceMillimetres": 317,
+  "fitUpperMillimetres": {
+    "detailed": 1768,
+    "archiveNative": 1708,
+    "candidateNative": 2299
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-caracal-scout",
+    "massKg": 40097
+  },
+  "replayPins": {
+    "integration/sh053-caracal-scout/FROZEN-SOURCES.json": "7c4c258f52ae61c138d2f3fb5115329a588167ae0bc70f261b3bd89355e9c181",
+    "integration/sh053-caracal-scout/ORIGINAL-OWNERSHIP.json": "0d497c935c76f3e62da05c4d20160e8149feee5cfbee784dae217d15c9808739",
+    "integration/sh053-caracal-scout/ARCHIVE-SUPPORT-PREFLIGHT.json": "c100b0dcf85cbe230d7b304ffdc70a04065e1759de16e34ac37a1d9b71adc9f3",
+    "integration/sh053-caracal-scout/candidate-support.json": "6a110c34e05d1ab284caa6a095b466de312c3834e3405a918f35bb366f5c5844",
+    "integration/sh053-caracal-scout/CARACAL-SCOUT-STUDIO.json": "2aabab492493f8c3ac4c26ab9c46b5811266b7305541d7836d4ffe86f254be4a",
+    "integration/sh053-caracal-scout/CONTACT-RESULT.json": "254e0956eeff7ab24a07b3db24a9cddca8453cc53165b7576bab530185cbf98a",
+    "integration/sh053-caracal-scout/ARCHIVE-FIT.json": "74b758242768c551f284743856b7f68b1b1afd043a613531194ee26ed752fc18",
+    "integration/sh053-caracal-scout/candidate-fit.json": "deb2ebcdf7d8c33205b1b39441db22592cb5352c36705068b88f0801b8d4b39f",
+    "integration/sh053-caracal-scout/candidate-fidelity.json": "081d83e9f3a0c7be3306eb0a97fcb5d814e19ab815d6975d0e85364b5b61190d",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/lanner_art_mesh.py": "f5cb59dcc0940ee02e039ba5218eb42c638ba0fed692f4b2216699620aba334b",
+    "tools/prepare_lanner_geometry.py": "3e1dc0ba15e493f8d53f385c7e2e166420e0082228b355547b3810fb028cdbc8",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/caracal_scout_art_mesh.py": "d2fa9922e2621d6ba3a981973d165b9cd0effa42b2633a00ed61230a39536a38",
+    "tools/prepare_caracal_scout_geometry.py": "cd64d241f983c560c1a4efc7979e8b0fb9911c55ae2a6a84bcf8d653d8dec68b",
+    "tools/verify_caracal_scout_geometry.py": "437c889e63502998f3b085f1806cba817ad8a590546f129b8915e6513ad344fd",
+    "tools/measure_caracal_scout_geometry.py": "6625b81e7ece15060dee87017ecd7c2a5b564a17624c5306a0955e8abfdd6fff",
+    "tools/prepare_caracal_scout_candidate.py": "fe84aa6afe1ff556eab0ae16955ec43b6de936278495602c79584d86a12aef46",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/prepare_banteng_candidate.py": "451ce0cae1007b6258cf1a5ec2387f06cb0d38b5da8546398c3c97e275efb8cf",
+    "tools/prepare_banteng_geometry.py": "30366a23a0deff7856d45719267e8cf57cfed24b1cea7e3655d998253afec972"
+  },
+  "byteReplay": {
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T18:04:15Z",
+    "finishedUtc": "2026-11-24T18:04:46Z",
+    "log": {
+      "bytes": 523,
+      "sha256": "c4f2f9d7d68de4526f6c41e5c8f709328071054ae1ed5584ef14eaa4d8edaddc"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "commands": [
+      "python3 -B tools/prepare_caracal_scout_candidate.py --check",
+      "python3 -B tools/prepare_caracal_scout_geometry.py --check",
+      "python3 -B tools/verify_caracal_scout_geometry.py | cmp - integration/sh053-caracal-scout/CONTACT-RESULT.json",
+      "python3 -B tools/measure_caracal_scout_geometry.py archive-fit | cmp - integration/sh053-caracal-scout/ARCHIVE-FIT.json",
+      "python3 -B tools/measure_caracal_scout_geometry.py candidate-fit | cmp - integration/sh053-caracal-scout/candidate-fit.json",
+      "python3 -B tools/measure_caracal_scout_geometry.py candidate-fidelity | cmp - integration/sh053-caracal-scout/candidate-fidelity.json"
+    ]
+  },
+  "hullStudio": {
+    "definition": "integration/sh053-caracal-scout/CARACAL-SCOUT-STUDIO.json",
+    "bytes": 772682,
+    "sha256": "2aabab492493f8c3ac4c26ab9c46b5811266b7305541d7836d4ffe86f254be4a",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "supports": 89,
+    "probes": 7,
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline visual artwork export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 772682,
+        "sha256": "2aabab492493f8c3ac4c26ab9c46b5811266b7305541d7836d4ffe86f254be4a"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "detailedTriangles": 5372,
+      "candidateNativeTriangles": 492,
+      "archivedNativeTriangles": 1380,
+      "candidateRecipeOrigin": "project-authored",
+      "originalScaleRatio": [
+        1500000,
+        171707
+      ],
+      "receiptFiles": {
+        "CARACAL-SCOUT.hull.json": {
+          "bytes": 772681,
+          "sha256": "cfede3c3f84c58e48e1343a52aa7227d08fb94bc1664b6a60e0817e8c817fd7a"
+        },
+        "CARACAL-SCOUT-repeat.hull.json": {
+          "bytes": 772681,
+          "sha256": "cfede3c3f84c58e48e1343a52aa7227d08fb94bc1664b6a60e0817e8c817fd7a"
+        },
+        "studio.stdout.json": {
+          "bytes": 220215,
+          "sha256": "866d65fe8c00d97e365445f0ea317b567a65a69f07056ae9abd40a0d6c02875e"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 220215,
+          "sha256": "866d65fe8c00d97e365445f0ea317b567a65a69f07056ae9abd40a0d6c02875e"
+        },
+        "codesign.log": {
+          "bytes": 14189,
+          "sha256": "b05d7ed219ea6fb6119755289a84a2aa388b36b6b3dd40c9daa436326281fd01"
+        }
+      }
+    }
+  }
+}
