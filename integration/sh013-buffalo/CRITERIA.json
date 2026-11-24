@@ -1,0 +1,60 @@
+{
+  "hull": "SH013 Buffalo",
+  "status": "CORRECTED_SOURCE_SHIELD_AND_VISUAL_AUTHORED;OWNED_RUST_PENDING",
+  "source": "assets/fleet/sh013/SOURCE-GEOMETRY.json",
+  "geometryTests": [
+    "buffalo_corrected_detailed_and_native_faces_share_complete_local_supports",
+    "buffalo_preserves_both_interdrum_sweeps_but_blocks_an_original_drum_contact",
+    "buffalo_original_sh028_aligned_crossing_clears_before_offset_native_lip_contact"
+  ],
+  "visualCorners": 10380,
+  "originalTextures": {
+    "assets/fleet/sh001/l337-patrol-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "9699517d12b4fbbb28746e00bed9ee65c19a098d14402b1d5160280c6f6bfc54",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-patrol-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-strike-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "e56f149228caf90237a652d720ae549768bde1056af3d903dc8a5c243ad26e97",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-strike-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-service-details.rgba": {
+      "bytes": 4194304,
+      "sha256": "35edd84f6ce527195dd8a9bcc039521a6efc5aa2333452bbbc30217b8372103d",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-service-details.rgba",
+      "license": "MIT"
+    }
+  },
+  "air": {
+    "hostname": "SteveMBA",
+    "topologyUtc": "2026-11-19T07:42:14Z",
+    "fitStartUtc": "2026-11-19T07:46:14Z",
+    "fitEndUtc": "2026-11-19T07:46:18Z",
+    "witnessStartUtc": "2026-11-19T07:48:39Z",
+    "witnessEndUtc": "2026-11-19T07:48:40Z",
+    "reports": {
+      "CONTACT-RESULT.json": "1e9be9c4d581f7f11eb47ec26819736eb6f2681e39c1b49d07415309e0f5a3fe",
+      "ORIGINAL-DIFFERENCE.json": "48cc6bbe5b113d084e26ceaea7d6eea6104386b56e8ab27dfc8430c8b4ba8e28",
+      "SURFACE-FIT.json": "9d3c01ab1ed958ceb68aebcd835bf2eeb7e6f0b05ac4ffc01cbdc9d299163c4d"
+    }
+  },
+  "stockMass": "UNASSIGNED",
+  "independentReplay": {
+    "airArchiveSha256": "92d2e10560a28f0379ae568cfd2003affea44fd6735f3268c92e13ad37ce826e",
+    "airSharedHelperSha256": "d8f71fbe05c0c1bffdb8cdb8effe064aec27cfe64aba2ff7efe2ed942a4901a0",
+    "committedTools": {
+      "tools/measure_buffalo_air.py": "a6cde25a5584c2cc7040d62efb0f36f932776d9b83512f2e7c236b13555d4710",
+      "tools/compare_buffalo_originals.py": "95dc908a01336add830aa0231e2717ea56dd12994ac235b6884bff936fd2c9c3",
+      "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b"
+    },
+    "helperDelta": "The committed helper moves the Python assertions-enabled guard from main to import. Geometry routines are byte-identical.",
+    "reproduce": [
+      "python tools/measure_buffalo_air.py | cmp - integration/sh013-buffalo/SURFACE-FIT.json",
+      "python tools/compare_buffalo_originals.py | cmp - integration/sh013-buffalo/ORIGINAL-DIFFERENCE.json"
+    ],
+    "dependencies": "NumPy, SciPy, trimesh and rtree with Python assertions enabled."
+  }
+}

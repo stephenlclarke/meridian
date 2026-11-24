@@ -44,6 +44,16 @@ def flight_computer_inverse(root, protected):
     return files
 
 
+def undo_buffalo_publication(relative, data):
+    if relative != LIB_SOURCE:
+        return data
+    declaration = b'pub mod buffalo;\n'
+    before, after = b'#![forbid(unsafe_code)]\n\n', b'pub mod celestial;\n'
+    span = before + declaration + after
+    assert data.count(declaration) == 1 and data.count(span) == 1, relative
+    return data.replace(span, before + after, 1)
+
+
 def undo_sable_publication(relative, data):
     if relative != LIB_SOURCE:
         return data
@@ -346,7 +356,8 @@ def verify_protected_core(root):
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_sable_publication(relative, current)
+        data = undo_buffalo_publication(relative, current)
+        data = undo_sable_publication(relative, data)
         data = undo_mk2_publication(relative, data)
         data = undo_gunship_publication(relative, data)
         data = undo_dropship_publication(relative, data)
