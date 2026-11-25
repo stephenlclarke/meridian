@@ -65,6 +65,19 @@
     "archiveNative": 1395,
     "candidateNative": 1579
   },
+  "referenceTriangulation": {
+    "path": "integration/sh048-lanner/REFERENCE-FANS.json",
+    "scope": "Derived whole reference triangulation for exact replay; no original artwork or stored numerical bounds",
+    "sourceRevision": "ce24795b2e08c54c71f63cbb5c1e061a9f3dcff6",
+    "sourceMeasurementSha256": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "sourceDiagnosticScriptSha256": "55397f4513a502708ee534dd8cecf9cedbbf5cbb594b00bc3d3395bfba1a67f1",
+    "sourceDiagnosticOutputSha256": "489a52a30b1c20cb647f6fac4954b395f2b51f4a6567731ba383537b0c32191c",
+    "certificateExtractionScriptSha256": "36d138ba1a0d94e58154c35020717c12f9e057a40107d1be38c686a133e5147e",
+    "sourceEnvironment": {"platform": "macOS arm64", "python": "3.14.7", "numpy": "2.5.5", "scipy": "1.18.1", "trimesh": "5.2.1"},
+    "archive": {"supports": 75, "triangles": 2744, "supportPointIndices": 2200},
+    "candidate": {"supports": 75, "triangles": 2644, "supportPointIndices": 1916},
+    "validation": "Bind complete scaled point streams, memberships and support-local indices, then prove the original outward fan and unchanged radial tolerance before recomputing every bound."
+  },
   "engineering": {
     "sourceReference": "finite-intrinsic-empty-lanner",
     "massKg": 22321
@@ -79,6 +92,7 @@
     "integration/sh048-lanner/ARCHIVE-FIT.json": "a740d04e11ef82ed12d27d16a820236c3083e6a7a720a6947b484eaf5c26f116",
     "integration/sh048-lanner/candidate-fit.json": "a7918695d93af72a5ce66eb26671665596e733f47cb6a89570f78b5dd36fd057",
     "integration/sh048-lanner/candidate-fidelity.json": "279557e8470d599e4a342b328b4eb3e63597cf7551fcab95e711b465d1e7d231",
+    "integration/sh048-lanner/REFERENCE-FANS.json": "a5d99c432b6dd1f9efdced1935dd501478199878177da440a0a776256b25f5d7",
     "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
     "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
     "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
@@ -89,7 +103,7 @@
     "tools/lanner_art_mesh.py": "f5cb59dcc0940ee02e039ba5218eb42c638ba0fed692f4b2216699620aba334b",
     "tools/prepare_lanner_geometry.py": "3e1dc0ba15e493f8d53f385c7e2e166420e0082228b355547b3810fb028cdbc8",
     "tools/verify_lanner_geometry.py": "5abc5160c6e3ebcfeccbf1c7a4d8fad69ce73aa126df911f4aa63a631506b576",
-    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
     "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
   },
   "byteReplay": {

@@ -7,12 +7,62 @@ import signal
 import sys
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, call, patch
 
 
 SCRIPTS = Path(__file__).resolve().parents[1] / ".github/scripts"
 with patch.object(sys, "path", [str(SCRIPTS), *sys.path]):
     session = importlib.import_module("native_x11_session")
+
+
+class NativeX11EntrypointTests(unittest.TestCase):
+    def test_entrypoint_launches_only_the_fixed_coverage_command(self):
+        with (patch.object(sys, "argv", [str(SCRIPTS / "native_x11_session.py")]),
+              patch.object(session, "run_session", return_value=7) as launch):
+            self.assertEqual(session.main(), 7)
+        launch.assert_called_once_with(
+            [sys.executable, "-B", "-m", "coverage", "run", "--parallel-mode",
+             str(SCRIPTS / "native_coverage_smoke.py")],
+            SCRIPTS.parents[1] / "coverage/x11-client.log",
+        )
+
+    def test_entrypoint_rejects_arguments_before_launch(self):
+        with (patch.object(sys, "argv", [str(SCRIPTS / "native_x11_session.py"), "unexpected"]),
+              patch.object(session, "run_session") as launch):
+            with self.assertRaisesRegex(SystemExit, "does not accept arguments"):
+                session.main()
+        launch.assert_not_called()
+
+
+class NativeX11GeometryTests(unittest.TestCase):
+    def test_fragmented_geometry_uses_one_deadline_and_bounded_reads(self):
+        stream = Mock()
+        stream.read.side_effect = [b"1600 ", b"900", b"\n"]
+        with (patch.object(session.time, "monotonic", side_effect=[100, 101, 103, 104]),
+              patch.object(session.select, "select", return_value=([stream], [], [])) as ready):
+            self.assertEqual(session.read_geometry(stream), b"1600 900\n")
+        self.assertEqual(ready.call_args_list, [call([stream], [], [], n) for n in (9, 7, 6)])
+        self.assertEqual(stream.read.call_args_list,
+                         [call(session.MAX_GEOMETRY_BYTES - n) for n in (0, 5, 8)])
+
+    def test_partial_geometry_without_newline_times_out_on_original_deadline(self):
+        stream = Mock()
+        stream.read.return_value = b"1600 900"
+        with (patch.object(session.time, "monotonic", side_effect=[100, 101, 105]),
+              patch.object(session.select, "select", side_effect=[([stream], [], []), ([], [], [])]) as ready):
+            with self.assertRaisesRegex(RuntimeError, "Timed out waiting"):
+                session.read_geometry(stream)
+        self.assertEqual(ready.call_args_list, [call([stream], [], [], n) for n in (9, 5)])
+        stream.read.assert_called_once_with(session.MAX_GEOMETRY_BYTES)
+
+    def test_geometry_without_newline_cannot_exceed_record_size_limit(self):
+        stream = Mock()
+        stream.read.return_value = b"1" * session.MAX_GEOMETRY_BYTES
+        with patch.object(session.select, "select", return_value=([stream], [], [])) as ready:
+            with self.assertRaisesRegex(RuntimeError, "exceeded its size limit"):
+                session.read_geometry(stream)
+        self.assertEqual(ready.call_count, 1)
+        stream.read.assert_called_once_with(session.MAX_GEOMETRY_BYTES)
 
 
 @unittest.skipUnless(os.name == "posix", "X11 keeper uses POSIX pipes, signals and process reaping")
@@ -82,6 +132,14 @@ class NativeX11SessionTests(unittest.TestCase):
                 session.run_session(self.command(), self.log)
         self.assertFalse(self.launched.exists())
         self.assert_client_stopped()
+
+    def test_partial_geometry_at_eof_does_not_launch_and_reaps_keeper(self):
+        with patch.object(session, "X11_CLIENT", self.client("sys.stdout.write('1600 900'); sys.exit(0)")):
+            with self.assertRaisesRegex(RuntimeError, "did not establish a live display"):
+                session.run_session(self.command(), self.log)
+        self.assertFalse(self.launched.exists())
+        self.assert_client_stopped()
+        self.assertIn("1600 900", self.log.read_text())
 
     def test_readiness_timeout_does_not_launch_command(self):
         with (patch.object(session, "X11_CLIENT", self.client("sys.stdin.read()")),

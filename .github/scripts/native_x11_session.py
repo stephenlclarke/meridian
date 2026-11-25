@@ -4,11 +4,32 @@ import re
 import select
 import subprocess
 import sys
+import time
 
 from coverage_workspace import workspace_path
 
 
 X11_CLIENT = ("xdotool", "-")
+READINESS_TIMEOUT = 10
+MAX_GEOMETRY_BYTES = 128
+
+
+def read_geometry(stream):
+    deadline = time.monotonic() + READINESS_TIMEOUT
+    record = bytearray()
+    while b"\n" not in record:
+        if len(record) == MAX_GEOMETRY_BYTES:
+            raise RuntimeError("X11 display geometry record exceeded its size limit")
+        remaining = deadline - time.monotonic()
+        if remaining <= 0 or not select.select([stream], [], [], remaining)[0]:
+            raise RuntimeError("Timed out waiting for an authenticated X11 connection")
+        chunk = stream.read(MAX_GEOMETRY_BYTES - len(record))
+        if not chunk:
+            raise RuntimeError(f"X11 client did not establish a live display: {bytes(record)!r}")
+        record.extend(chunk)
+    if not re.fullmatch(rb"[1-9][0-9]* [1-9][0-9]*\n", record):
+        raise RuntimeError(f"X11 client did not establish a live display: {bytes(record)!r}")
+    return bytes(record)
 
 
 def run_session(command, log):
@@ -22,10 +43,8 @@ def run_session(command, log):
                 client.stdin.write(b"getdisplaygeometry\n")
             except BrokenPipeError:
                 raise RuntimeError("X11 client exited before readiness") from None
-            if not select.select([client.stdout], [], [], 10)[0]:
-                raise RuntimeError("Timed out waiting for an authenticated X11 connection")
-            geometry = client.stdout.read(128)
-            if not re.fullmatch(rb"[1-9][0-9]* [1-9][0-9]*\n", geometry) or client.poll() is not None:
+            geometry = read_geometry(client.stdout)
+            if client.poll() is not None:
                 raise RuntimeError(f"X11 client did not establish a live display: {geometry!r}")
             diagnostics.write(b"Authenticated X11 display geometry: " + geometry)
             diagnostics.flush()
@@ -48,7 +67,13 @@ def run_session(command, log):
             client.wait(timeout=10)
 
 
+def main():
+    if len(sys.argv) != 1:
+        raise SystemExit("The native X11 coverage session does not accept arguments")
+    command = [sys.executable, "-B", "-m", "coverage", "run", "--parallel-mode",
+               str(workspace_path(".github/scripts/native_coverage_smoke.py"))]
+    return run_session(command, workspace_path("coverage/x11-client.log"))
+
+
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        raise SystemExit("Expected a native coverage command")
-    raise SystemExit(run_session(sys.argv[1:], workspace_path("coverage/x11-client.log")))
+    raise SystemExit(main())
