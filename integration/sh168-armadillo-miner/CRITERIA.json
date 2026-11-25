@@ -1,0 +1,217 @@
+{
+  "hull": "SH168 Armadillo Miner",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh168/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh168-armadillo-miner/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "46000/3083",
+  "faces": {
+    "detailed": 13284,
+    "archivedNative": 1452,
+    "candidateNative": 512,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-armadillo-miner",
+    "massKg": 78039
+  },
+  "supportGroups": 151,
+  "candidateComponentInventory": {
+    "originalPartsRepresented": 21,
+    "unalteredNativeParts": 5,
+    "recessedWells": 4,
+    "partsUsingSelectedOriginalVertices": 8,
+    "sampledArcSections": 4,
+    "arcSeamVertices": 1248
+  },
+  "minimumRouteClearanceMillimetres": 841,
+  "sourceContactCounts": {
+    "overlap": 17,
+    "unchangedNativeParts": 5
+  },
+  "candidateRebuild": "tools/rebuild_armadillo_miner.py",
+  "fitUpperMillimetres": {
+    "detailed": 2788,
+    "archivedNative": 3761,
+    "candidateNative": 4382
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 1365,
+      "upperCeiling": 1391
+    },
+    "candidateToArchive": {
+      "lowerFloor": 792,
+      "upperCeiling": 818
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 2074,
+      "upperCeiling": 2099
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 1247,
+      "upperCeiling": 1264
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh168-armadillo-miner/ARMADILLO-MINER-STUDIO.json",
+    "bytes": 2109625,
+    "sha256": "17acb2e1c4c2743b7f3f4831a9460326655abeed01e4356e140b22f5600f7923",
+    "supports": 151,
+    "probes": 7,
+    "detail": "13,284 original detailed faces",
+    "native": "512 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 2109625,
+        "sha256": "17acb2e1c4c2743b7f3f4831a9460326655abeed01e4356e140b22f5600f7923"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 13284,
+      "nativeTriangles": 512,
+      "supportGroups": 151,
+      "engineeringReference": "finite-intrinsic-empty-armadillo-miner",
+      "massKg": 78039,
+      "receiptFiles": {
+        "armadillo-miner.hull.json": {
+          "bytes": 2109624,
+          "sha256": "b1ffd79d30df96d2ef07758ee77858042b76c6bf56a51e32faff56901b68b763"
+        },
+        "armadillo-miner-repeat.hull.json": {
+          "bytes": 2109624,
+          "sha256": "b1ffd79d30df96d2ef07758ee77858042b76c6bf56a51e32faff56901b68b763"
+        },
+        "studio.stdout.json": {
+          "bytes": 508055,
+          "sha256": "b25962359f6ffb1b83884c2d2bc866073e7ce2fc5446064d6b30e5192098c596"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 508055,
+          "sha256": "b25962359f6ffb1b83884c2d2bc866073e7ce2fc5446064d6b30e5192098c596"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "210b88ae6ff0abaa381d3d2ae41d50c168b9015aabeaa9d29bc11b2da59f5477"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "between-aft-drives",
+          "passed": true
+        },
+        {
+          "name": "under-port-hopper-collars",
+          "passed": true
+        },
+        {
+          "name": "under-starboard-hopper-collars",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_armadillo_miner.py --check",
+      "python3 -B tools/rebuild_armadillo_miner.py",
+      "python3 -B tools/verify_armadillo_miner.py | cmp - integration/sh168-armadillo-miner/CONTACT-RESULT.json",
+      "python3 -B tools/measure_armadillo_miner.py | cmp - integration/sh168-armadillo-miner/SURFACE-FIT.json",
+      "python3 -B tools/measure_armadillo_miner.py --fidelity | cmp - integration/sh168-armadillo-miner/CANDIDATE-FIDELITY.json",
+      "python3 -B tools/measure_armadillo_miner.py --directions | cmp - integration/sh168-armadillo-miner/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_armadillo_miner.py --reference-directions | cmp - integration/sh168-armadillo-miner/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T09:03:04Z",
+    "finishedUtc": "2026-11-25T09:05:06Z",
+    "log": {
+      "bytes": 748,
+      "sha256": "cf3c518e5734e115bba33a7fad980e33feb62e3d921c07d23fd96d4598e0edbf"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "integration/sh168-armadillo-miner/ARMADILLO-MINER-STUDIO.json": "17acb2e1c4c2743b7f3f4831a9460326655abeed01e4356e140b22f5600f7923",
+    "integration/sh168-armadillo-miner/FROZEN-SOURCES.json": "a0295bc7364d12fafb1ce4951a702518614f36eca22747cdbdea1048eddd5125",
+    "integration/sh168-armadillo-miner/CONTACT-CANDIDATE.json": "8c7e920ffd2549462a352c2bda9614cc977eeeaea3a731a90a7a8a260fa5c54b",
+    "integration/sh168-armadillo-miner/CONTACT-RESULT.json": "0de202da16c3a387ccc70aa3b650e7bbdb7080885ca43a851b1e2a08ea0e8322",
+    "integration/sh168-armadillo-miner/ORIGINAL-OWNERSHIP.json": "cbf5207153b62975bd96aeafbafddb1ee03663f155c3fa4ce4241d6a7f29a81d",
+    "integration/sh168-armadillo-miner/RETAINED-OVERLAPS.json": "760a103963bf6b2c838dafb4317e5eca0ae103a7d846b9412ae16c7d38b174bf",
+    "integration/sh168-armadillo-miner/CANDIDATE-FIDELITY.json": "e337f3f05435a076eaebd04526cb5f6b3c0b17a1cd6984f439e9093e8ab4bf39",
+    "integration/sh168-armadillo-miner/SUPPORT-FAN.json": "9d9cc6e4e21a0b03ca5aec5dea3c3b716a6a10a35df01ce5e2e9d937067cd599",
+    "integration/sh168-armadillo-miner/SURFACE-FIT.json": "6c6f1a5879a89fa102fcd0eb9e37d50ca37aae51ed104f07e39170081144d9bc",
+    "integration/sh168-armadillo-miner/ARCHIVED-OVERLAPS.json": "4da6ed6961ded58efade41af2b440f126816bddd302544bf159d628acd35c290",
+    "integration/sh168-armadillo-miner/CANDIDATE-TOPOLOGY-SURVEY.json": "28487edb66fb533a657de1185589fbfc47125bb7d8cee30315c125bc499d759d",
+    "integration/sh168-armadillo-miner/CANDIDATE-FIT-LOCALIZATION.json": "918df82a45942996911a2c8dd5b0dce34602784f8d149913bdc9ee2439d71490",
+    "integration/sh168-armadillo-miner/REFERENCE-FIT-LOCALIZATION.json": "c2a5104d4d729605200b61ce1d731f6f300988f0fb3f1eebaa7746517b3088da",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_armadillo_miner.py": "482312df5bcc91ead44c69ce88fb942c0cda2010d70e537b7f91a79a22ba6b38",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_armadillo_miner.py": "54087988edd5c1856b88ad8631e0e7c43d1c51746edc80649234badc64457535",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/rebuild_armadillo_miner.py": "93a5e7cd80ed0f68bd9064e3405f12e7e48bbca14625163b6c26029f554336e2",
+    "tools/verify_armadillo_miner.py": "4d0c4bbef48acced4711fd46c9bcfed5b994a0bdf9cb32f138f1506f1f275b04",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh168/GENERATED-COLLISION.json": "024f58acb0151fbb9813148bdad5848635f863f2fb80dba2dc2204efed610a5f",
+    "assets/fleet/sh168/SOURCE-GEOMETRY.json": "60407d664cbdf062e742fcd37a62ff0c003af5580fd231ba0dee26959efac990"
+  }
+}
