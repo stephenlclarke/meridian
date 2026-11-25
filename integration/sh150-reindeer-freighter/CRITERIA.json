@@ -1,0 +1,390 @@
+{
+  "hull": "SH150 Reindeer Freighter",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh150/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh150-reindeer-freighter/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "1375/46",
+  "faces": {
+    "detailed": 2532,
+    "archivedNative": 1052,
+    "candidateNative": 512,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-reindeer-freighter",
+    "massKg": 500446
+  },
+  "supportGroups": 131,
+  "candidateComponentInventory": {
+    "originalPartsRepresented": 49,
+    "unalteredNativeParts": 12,
+    "recessedWells": 16,
+    "partsUsingSelectedOriginalVertices": 21,
+    "sampledArcSections": 0,
+    "arcSeamVertices": 0
+  },
+  "minimumRouteClearanceMillimetres": 1555,
+  "sourceContactCounts": {
+    "overlap": 72,
+    "unchangedNativeParts": 12
+  },
+  "candidateRebuild": "tools/rebuild_reindeer_freighter.py",
+  "fitUpperMillimetres": {
+    "detailed": 2798,
+    "archivedNative": 3712,
+    "candidateNative": 4367
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 3379,
+      "upperCeiling": 3391
+    },
+    "candidateToArchive": {
+      "lowerFloor": 2470,
+      "upperCeiling": 2496
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 3605,
+      "upperCeiling": 3606
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 2585,
+      "upperCeiling": 2606
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh150-reindeer-freighter/REINDEER-FREIGHTER-STUDIO.json",
+    "bytes": 413252,
+    "sha256": "a1ad5c81b561cc3939722e0c252eee84e7127189bdd4087fc59eb167f65d02a8",
+    "supports": 131,
+    "probes": 7,
+    "detail": "2,532 original detailed faces",
+    "native": "512 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 413252,
+        "sha256": "a1ad5c81b561cc3939722e0c252eee84e7127189bdd4087fc59eb167f65d02a8"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 2532,
+      "nativeTriangles": 512,
+      "supportGroups": 131,
+      "engineeringReference": "finite-intrinsic-empty-reindeer-freighter",
+      "massKg": 500446,
+      "receiptFiles": {
+        "reindeer-freighter.hull.json": {
+          "bytes": 413251,
+          "sha256": "a9f97fb9675002e05ec016c6ed56ec55809c86db3fcf0d8f5fa488aa9d1828d0"
+        },
+        "reindeer-freighter-repeat.hull.json": {
+          "bytes": 413251,
+          "sha256": "a9f97fb9675002e05ec016c6ed56ec55809c86db3fcf0d8f5fa488aa9d1828d0"
+        },
+        "studio.stdout.json": {
+          "bytes": 115164,
+          "sha256": "0589e3a8b62ef57360c811b573273a4f77a013c5c020a6a32dbfbe870c98ebb7"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 115164,
+          "sha256": "0589e3a8b62ef57360c811b573273a4f77a013c5c020a6a32dbfbe870c98ebb7"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "40a187a2466138c89babf1cd00011ca3776f87aeadc613fb4f4aa936d771af40"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "below-pressure-envelope",
+          "passed": true
+        },
+        {
+          "name": "above-port-panniers",
+          "passed": true
+        },
+        {
+          "name": "above-starboard-panniers",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_reindeer_freighter.py --check",
+      "python3 -B tools/rebuild_reindeer_freighter.py",
+      "python3 -B tools/verify_reindeer_freighter.py | cmp - integration/sh150-reindeer-freighter/CONTACT-RESULT.json",
+      "python3 -B tools/measure_reindeer_freighter.py | cmp - integration/sh150-reindeer-freighter/SURFACE-FIT.json",
+      "python3 -B tools/measure_reindeer_freighter.py --fidelity | cmp - integration/sh150-reindeer-freighter/CANDIDATE-FIDELITY.json",
+      "python3 -B tools/measure_reindeer_freighter.py --directions | cmp - integration/sh150-reindeer-freighter/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_reindeer_freighter.py --reference-directions | cmp - integration/sh150-reindeer-freighter/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T08:09:31Z",
+    "finishedUtc": "2026-11-25T08:10:41Z",
+    "log": {
+      "bytes": 769,
+      "sha256": "afaf206d8cbb250ddd8ace57a953f31334e55bbfc2dfc4c035c61361d043563d"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "integration/sh150-reindeer-freighter/REINDEER-FREIGHTER-STUDIO.json": "a1ad5c81b561cc3939722e0c252eee84e7127189bdd4087fc59eb167f65d02a8",
+    "integration/sh150-reindeer-freighter/FROZEN-SOURCES.json": "1096bf8730a33687aedb234cb01738b0369e7d6fa776a60a11cd77f0e764217a",
+    "integration/sh150-reindeer-freighter/CONTACT-CANDIDATE.json": "fc17cd791e5e7936d6189df81be83fe0d50490e022f4820ff5629759bcda1c5e",
+    "integration/sh150-reindeer-freighter/CONTACT-RESULT.json": "c05f46a542f981b722d91a7512b6908611b3cadad18eae997c077f2191734d87",
+    "integration/sh150-reindeer-freighter/ORIGINAL-OWNERSHIP.json": "272e0f7930db3fa26047b1d92db080e0b0df022e5f2c2d048887784f19c331c4",
+    "integration/sh150-reindeer-freighter/RETAINED-OVERLAPS.json": "13ffd71ea30e20163245d14017d7f0790e69ce8cccfa1f59c9d1c701f83ffdbd",
+    "integration/sh150-reindeer-freighter/CANDIDATE-FIDELITY.json": "0c990f741406b2b9208a75af6af6b91d0180f341657f782bbeea38c69cf27c87",
+    "integration/sh150-reindeer-freighter/SUPPORT-FAN.json": "21f561a3ee553dc8dad4800f701baba66c2e4f5b502ebc87f4272ccaa14d5c10",
+    "integration/sh150-reindeer-freighter/SURFACE-FIT.json": "4a0ab06f0398fb3fae4c885a8b83b4da73a5ee0f70b20f596cb299b7fdeb8b6d",
+    "integration/sh150-reindeer-freighter/ARCHIVED-OVERLAPS.json": "5eb6069497f82642e1e339e05a6136ea3072480f1e7da8a5e30436c855c7839e",
+    "integration/sh150-reindeer-freighter/CANDIDATE-TOPOLOGY-SURVEY.json": "f86684e0b34678ad1fae54f93a9bd64559aa6c8d8b5fc45dff07367f6e600e99",
+    "integration/sh150-reindeer-freighter/CANDIDATE-FIT-LOCALIZATION.json": "5cd61c3d842adffa3587ffa218372eb61813bfe81daac6a64eaea3c1d7aa3378",
+    "integration/sh150-reindeer-freighter/REFERENCE-FIT-LOCALIZATION.json": "39084fe042f2b503e5d33148cfacf9dbaf51c8c929fa73e31ef38ef96bf5023a",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_reindeer_freighter.py": "8b95a99d3ee8c241075598e9d9cc556155894dc2dad6fbae34d339e266480152",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_reindeer_freighter.py": "771933f029c672cb7ba46efc5799d61798f8192d0759560322e7895a15d45ba0",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/rebuild_reindeer_freighter.py": "0d477f41567d4e3aa4df214cbea7ee5e4acb30f9d1ef6d756dface508cad1406",
+    "tools/verify_reindeer_freighter.py": "86b145cf0b1ee852db0218855b61bec8038b13a0331bd66b75e368a0eb63e453",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh150/GENERATED-COLLISION.json": "5ab6621d5749ebf3caf26d4fd08d495ceaa151e845797112db1333eaf7a09862",
+    "assets/fleet/sh150/SOURCE-GEOMETRY.json": "e82d60a6a28145e5d9be2b5f1df454003812d500b7ad1c54b2d5cd611b0c9271"
+  },
+  "fitCorrection": {
+    "reviewedHead": "7039781baf23e36c7cd3cbceb6738908a7b5bc5f",
+    "reviewedCandidateSHA256": "431355a8018b9dc6af735595aa4ef76f31f943cf6dc4ec3377ad4c4dc2da9702",
+    "forwardWitness": {
+      "archivedFace": 209,
+      "archivedPart": 6,
+      "sourcePointMetres": [
+        "-1155/32",
+        "-8750200362961697/1125899906842624",
+        "-694126471100327/17592186044416"
+      ],
+      "correctedSquaredDistanceMetres": "0"
+    },
+    "reverseWitness": {
+      "archivedCandidateFace": 349,
+      "candidatePart": 30,
+      "sourcePointMetres": [
+        "-476993/16384",
+        "-5586666385583236963/2305843009213693952",
+        "11599534838076270749/576460752303423488"
+      ],
+      "originalAndCorrectedCargoBoxInteriorParity": [
+        1,
+        1
+      ],
+      "formerCandidateWitnessNowInsideExactCargoBox": true
+    },
+    "exactCargoBoxEnvelopes": 12,
+    "retainedMeasuredJoins": 72,
+    "continuousMillimetres": {
+      "archiveToCandidate": {
+        "prior": {
+          "lowerFloor": 10049,
+          "upperCeiling": 10067
+        },
+        "corrected": {
+          "lowerFloor": 3379,
+          "upperCeiling": 3391
+        }
+      },
+      "candidateToArchive": {
+        "prior": {
+          "lowerFloor": 5347,
+          "upperCeiling": 5368
+        },
+        "corrected": {
+          "lowerFloor": 2470,
+          "upperCeiling": 2496
+        }
+      },
+      "detailedToCandidate": {
+        "prior": {
+          "lowerFloor": 10049,
+          "upperCeiling": 10067
+        },
+        "corrected": {
+          "lowerFloor": 3605,
+          "upperCeiling": 3606
+        }
+      },
+      "candidateToDetailed": {
+        "prior": {
+          "lowerFloor": 5347,
+          "upperCeiling": 5368
+        },
+        "corrected": {
+          "lowerFloor": 2585,
+          "upperCeiling": 2606
+        }
+      }
+    },
+    "globalSupportUpperMillimetres": {
+      "prior": {
+        "detailed": 2798,
+        "archivedNative": 3712,
+        "candidateNative": 10642
+      },
+      "corrected": {
+        "detailed": 2798,
+        "archivedNative": 3712,
+        "candidateNative": 4367
+      }
+    },
+    "serviceWellReview": {
+      "reviewedHead": "005b196627fcbd20e8d355a2cc4e3ab5b01aaf13",
+      "archivedPressureEnvelopeVerticesAdded": [
+        14,
+        29
+      ],
+      "archivedLuminousRecessVertexRemovedEachSide": 0,
+      "directionalMillimetres": {
+        "archiveToCandidate": {
+          "prior": {
+            "lowerFloor": 3691,
+            "upperCeiling": 3697
+          },
+          "corrected": {
+            "lowerFloor": 3379,
+            "upperCeiling": 3391
+          }
+        },
+        "candidateToArchive": {
+          "prior": {
+            "lowerFloor": 2693,
+            "upperCeiling": 2719
+          },
+          "corrected": {
+            "lowerFloor": 2470,
+            "upperCeiling": 2496
+          }
+        },
+        "detailedToCandidate": {
+          "prior": {
+            "lowerFloor": 4669,
+            "upperCeiling": 4686
+          },
+          "corrected": {
+            "lowerFloor": 3605,
+            "upperCeiling": 3606
+          }
+        },
+        "candidateToDetailed": {
+          "prior": {
+            "lowerFloor": 2861,
+            "upperCeiling": 2887
+          },
+          "corrected": {
+            "lowerFloor": 2585,
+            "upperCeiling": 2606
+          }
+        }
+      },
+      "supportUpperMillimetres": {
+        "prior": {
+          "detailed": 2798,
+          "archivedNative": 3712,
+          "candidateNative": 5105
+        },
+        "corrected": {
+          "detailed": 2798,
+          "archivedNative": 3712,
+          "candidateNative": 4367
+        },
+        "candidateObjective": 4400
+      },
+      "sourceSupportWitnesses": [
+        {
+          "group": "body primary pressure envelope/service-well-0-0",
+          "pointMetres": [
+            4.219994565217391,
+            15.005315217391304,
+            -40.430978260869566
+          ],
+          "priorContinuousMillimetres": {
+            "lowerFloor": 4669,
+            "upperCeiling": 4676
+          }
+        },
+        {
+          "group": "body primary pressure envelope/service-well-1-2",
+          "pointMetres": [
+            -6.691078804347826,
+            11.991285326086956,
+            21.39722316576087
+          ],
+          "priorContinuousMillimetres": {
+            "lowerFloor": 4412,
+            "upperCeiling": 4437
+          }
+        }
+      ]
+    }
+  }
+}
