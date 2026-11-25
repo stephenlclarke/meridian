@@ -60,6 +60,7 @@ pub mod navigation;
 pub mod oryx_voyager;
 pub mod ox;
 pub mod ox_mk_ii;
+pub mod puma;
 pub mod rabbit_explorer;
 pub mod rhinoceros_trader;
 pub mod saiga;

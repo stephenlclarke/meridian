@@ -365,3 +365,8 @@ tools/verify_hippo.py text eol=lf
 tools/measure_leopard_fighter.py text eol=lf
 tools/prepare_leopard_fighter.py text eol=lf
 tools/verify_leopard_fighter.py text eol=lf
+
+# Byte-pinned Puma replay programs.
+tools/measure_puma.py text eol=lf
+tools/prepare_puma.py text eol=lf
+tools/verify_puma.py text eol=lf

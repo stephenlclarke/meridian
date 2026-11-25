@@ -1,0 +1,180 @@
+{
+  "hull": "SH111 Puma",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh111/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh111-puma/FROZEN-SOURCES.json",
+  "sourceMetresPerUnit": 1,
+  "faces": {
+    "detailed": 3096,
+    "native": 172,
+    "nativeMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-puma",
+    "massKg": 26516
+  },
+  "supportGroups": 24,
+  "minimumRouteClearanceMillimetres": 782,
+  "sourceContactCounts": {
+    "design": 41,
+    "nativeDesign": 6
+  },
+  "sharedOverlapCount": 6,
+  "detailedOnlyOverlapCount": 35,
+  "fitUpperMillimetres": {
+    "detailed": 2263,
+    "native": 3480
+  },
+  "hullStudio": {
+    "definition": "integration/sh111-puma/PUMA-STUDIO.json",
+    "bytes": 400299,
+    "sha256": "695821a08e63344605ebc3e3c89ec266102c16964b8a84f18ece3c5e18fa9b5e",
+    "supports": 24,
+    "probes": 7,
+    "detail": "3096 original detailed faces",
+    "native": "172 original native faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 400299,
+        "sha256": "695821a08e63344605ebc3e3c89ec266102c16964b8a84f18ece3c5e18fa9b5e"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3096,
+      "nativeTriangles": 172,
+      "supportGroups": 24,
+      "engineeringReference": "finite-intrinsic-empty-puma",
+      "massKg": 26516,
+      "receiptFiles": {
+        "puma.hull.json": {
+          "bytes": 400298,
+          "sha256": "8721d397cb76b8f817c7403551e2cdb81bd1c640b83ae9ac59e661c1aa03185c"
+        },
+        "puma-repeat.hull.json": {
+          "bytes": 400298,
+          "sha256": "8721d397cb76b8f817c7403551e2cdb81bd1c640b83ae9ac59e661c1aa03185c"
+        },
+        "studio.stdout.json": {
+          "bytes": 54283,
+          "sha256": "0dfde08ae00bcf141ca140d73e83871ef4ec6dfe8d0e4367dc00cd281d92a471"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 54283,
+          "sha256": "0dfde08ae00bcf141ca140d73e83871ef4ec6dfe8d0e4367dc00cd281d92a471"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "0e00255fa342603a7519b9833dddc898912c950d6009cba905402386ccb7606e"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "between-aft-drives",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "over-port-pylon",
+          "passed": true
+        },
+        {
+          "name": "over-starboard-pylon",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "original native visible"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_puma.py --check",
+      "python3 -B tools/verify_puma.py | cmp - integration/sh111-puma/CONTACT-RESULT.json",
+      "python3 -B tools/measure_puma.py | cmp - integration/sh111-puma/SURFACE-FIT.json",
+      "python3 -B tools/measure_puma.py --difference | cmp - integration/sh111-puma/LOD-DIFFERENCE.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T05:17:13Z",
+    "finishedUtc": "2026-11-25T05:17:21Z",
+    "log": {
+      "bytes": 404,
+      "sha256": "20ccdc476ccc87d45f749df37318b5bdf517edc22bef4e6a223a4277b1a0aa0b"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "assets/fleet/sh111/SOURCE-GEOMETRY.json": "7a3cb0c65f0717a6896fd1cf55ba93f904746bd160bb857f86373a6a7557be04",
+    "integration/sh111-puma/PUMA-STUDIO.json": "695821a08e63344605ebc3e3c89ec266102c16964b8a84f18ece3c5e18fa9b5e",
+    "integration/sh111-puma/FROZEN-SOURCES.json": "466e1d9ecdb705b635be86b56982821e681382fdb24526dd8dcc7687232d8ff4",
+    "integration/sh111-puma/CONTACT-CANDIDATE.json": "a6a7b24c3d970876e91bc2bffb23349af766a456e88e31ef75b0ad25bb7d7abc",
+    "integration/sh111-puma/CONTACT-RESULT.json": "fa0784f49ad338fd838a21c93d3515f35160d0eceaa62de895a6ecc000ac4682",
+    "integration/sh111-puma/ORIGINAL-OVERLAPS.json": "866d92f45d0995348076f791f89223065fe8767d3d2dda4dc6104ce920c79d36",
+    "integration/sh111-puma/LOD-DIFFERENCE.json": "eddbed4dd1e4a6ebd3a263027358f27e3b8d544d369445420a94ae48ecc2154f",
+    "integration/sh111-puma/SUPPORT-FAN.json": "2d69d30e98154d2d19193e82fbb6d948b03afa849a12f8b2c7f07242d1c5cc05",
+    "integration/sh111-puma/SURFACE-FIT.json": "7b64e55ee28075fc0714e54ef3b98bf0709f0b701952bcc11d3f30f67598f3b0",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_puma.py": "b791fa1eefdc8d3b78881087e7f8f0b9a1daa26c26513f6c696d7fabd2cf4686",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_puma.py": "bc75533c553090e4a450cc3b4e64ff62ab8f9a5c6dc169c11baa4fb29591b4f3",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/verify_puma.py": "c207a039753783b622b81bdd68124678f3d10aba089f9ff5f8200dfbad3f9b23",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6"
+  }
+}
