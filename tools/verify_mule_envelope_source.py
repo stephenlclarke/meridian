@@ -44,6 +44,16 @@ def flight_computer_inverse(root, protected):
     return files
 
 
+def undo_falcon_mk_i_publication(relative, data):
+    if relative != LIB_SOURCE:
+        return data
+    declaration = b'pub mod falcon_mk_i;\n'
+    before, after = b'pub mod erne_corvette;\n', b'pub mod falconet;\n'
+    span = before + declaration + after
+    assert data.count(declaration) == 1 and data.count(span) == 1, relative
+    return data.replace(span, before + after, 1)
+
+
 def undo_javelina_publication(relative, data):
     if relative != LIB_SOURCE:
         return data
@@ -1026,7 +1036,8 @@ def verify_protected_core(root):
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_javelina_publication(relative, current)
+        data = undo_falcon_mk_i_publication(relative, current)
+        data = undo_javelina_publication(relative, data)
         data = undo_warthog_heavy_publication(relative, data)
         data = undo_warthog_tanker_publication(relative, data)
         data = undo_warthog_freighter_publication(relative, data)
