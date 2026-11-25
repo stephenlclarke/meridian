@@ -1,3 +1,8 @@
+# Laggar source preparation and replay use exact LF bytes.
+tools/measure_laggar.py text eol=lf
+tools/prepare_laggar.py text eol=lf
+tools/verify_laggar.py text eol=lf
+
 # Llama source preparation and replay use exact LF bytes.
 tools/measure_llama.py text eol=lf
 tools/prepare_llama.py text eol=lf
