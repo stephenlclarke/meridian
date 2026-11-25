@@ -13,6 +13,7 @@ pub mod banteng;
 pub mod barbary;
 pub mod baza_fighter;
 pub mod baza_mk_ii;
+pub mod boar_transport;
 pub mod carabao_freighter;
 pub mod carabao_highliner;
 pub mod caracal_scout;

@@ -381,3 +381,9 @@ tools/measure_gaur_trader.py text eol=lf
 tools/prepare_gaur_trader.py text eol=lf
 tools/rebuild_gaur_trader.py text eol=lf
 tools/verify_gaur_trader.py text eol=lf
+
+# Byte-pinned Boar Transport replay programs.
+tools/measure_boar_transport.py text eol=lf
+tools/prepare_boar_transport.py text eol=lf
+tools/rebuild_boar_transport.py text eol=lf
+tools/verify_boar_transport.py text eol=lf
