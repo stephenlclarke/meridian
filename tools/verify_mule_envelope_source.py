@@ -44,6 +44,16 @@ def flight_computer_inverse(root, protected):
     return files
 
 
+def undo_condor_publication(relative, data):
+    if relative != LIB_SOURCE:
+        return data
+    declaration = b'pub mod condor;\n'
+    before, after = b'pub mod celestial;\n', b'pub mod docking;\n'
+    span = before + declaration + after
+    assert data.count(declaration) == 1 and data.count(span) == 1, relative
+    return data.replace(span, before + after, 1)
+
+
 def undo_hobby_fighter_publication(relative, data):
     if relative != LIB_SOURCE:
         return data
@@ -396,7 +406,8 @@ def verify_protected_core(root):
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_hobby_fighter_publication(relative, current)
+        data = undo_condor_publication(relative, current)
+        data = undo_hobby_fighter_publication(relative, data)
         data = undo_caracal_scout_publication(relative, data)
         data = undo_banteng_publication(relative, data)
         data = undo_jackal_publication(relative, data)

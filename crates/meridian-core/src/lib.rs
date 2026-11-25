@@ -5,6 +5,7 @@
 pub mod banteng;
 pub mod caracal_scout;
 pub mod celestial;
+pub mod condor;
 pub mod docking;
 pub mod eagle_cruiser;
 pub mod equipment;
