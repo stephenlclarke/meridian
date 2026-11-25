@@ -170,6 +170,7 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Gopher source envelope and Hull Studio definition](docs/GOPHER-SOURCE.md)
 - [Elephant source envelope and Hull Studio definition](docs/ELEPHANT-SOURCE.md)
 - [Aurochs source envelope and Hull Studio definition](docs/AUROCHS-SOURCE.md)
+- [Giraffe Liner source envelope and Hull Studio definition](docs/GIRAFFE-LINER-SOURCE.md)
 - [Stag Liner source envelope and Hull Studio definition](docs/STAG-LINER-GAMEPLAY-ENVELOPE.md)
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)

@@ -287,3 +287,8 @@ integration/sh008-goshawk/*.json text eol=lf
 tools/measure_aurochs.py text eol=lf
 tools/prepare_aurochs.py text eol=lf
 tools/verify_aurochs.py text eol=lf
+
+# Byte-pinned Giraffe Liner replay programs.
+tools/measure_giraffe_liner.py text eol=lf
+tools/prepare_giraffe_liner.py text eol=lf
+tools/verify_giraffe_liner.py text eol=lf
