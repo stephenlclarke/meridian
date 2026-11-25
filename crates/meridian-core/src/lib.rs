@@ -19,6 +19,7 @@ pub mod carabao_highliner;
 pub mod caracal_scout;
 pub mod cavy_racer;
 pub mod celestial;
+pub mod chimango;
 pub mod condor;
 pub mod docking;
 pub mod dzo;

@@ -1,0 +1,180 @@
+{
+  "hull": "SH140 Chimango",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh140/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh140-chimango/FROZEN-SOURCES.json",
+  "sourceMetresPerUnit": 1,
+  "faces": {
+    "detailed": 3084,
+    "native": 192,
+    "nativeMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-chimango",
+    "massKg": 26022
+  },
+  "supportGroups": 23,
+  "minimumRouteClearanceMillimetres": 979,
+  "sourceContactCounts": {
+    "design": 26,
+    "nativeDesign": 7
+  },
+  "sharedOverlapCount": 7,
+  "detailedOnlyOverlapCount": 19,
+  "fitUpperMillimetres": {
+    "detailed": 2031,
+    "native": 4042
+  },
+  "hullStudio": {
+    "definition": "integration/sh140-chimango/CHIMANGO-STUDIO.json",
+    "bytes": 393754,
+    "sha256": "2a429c70214472bca3480677c6fe128fed16fc91e857d0c1f44b46bf75a32f0f",
+    "supports": 23,
+    "probes": 7,
+    "detail": "3084 original detailed faces",
+    "native": "192 original native faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 393754,
+        "sha256": "2a429c70214472bca3480677c6fe128fed16fc91e857d0c1f44b46bf75a32f0f"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3084,
+      "nativeTriangles": 192,
+      "supportGroups": 23,
+      "engineeringReference": "finite-intrinsic-empty-chimango",
+      "massKg": 26022,
+      "receiptFiles": {
+        "chimango.hull.json": {
+          "bytes": 393753,
+          "sha256": "495f1a63704bd9c214e860bf7b102f6e7715f710ae9f426534f6c390332f4f07"
+        },
+        "chimango-repeat.hull.json": {
+          "bytes": 393753,
+          "sha256": "495f1a63704bd9c214e860bf7b102f6e7715f710ae9f426534f6c390332f4f07"
+        },
+        "studio.stdout.json": {
+          "bytes": 53742,
+          "sha256": "89aa35e8ae75b13ffaa57a5edec0b5cb3833f26ee779e93aef3898c25faef4ba"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 53742,
+          "sha256": "89aa35e8ae75b13ffaa57a5edec0b5cb3833f26ee779e93aef3898c25faef4ba"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "38acdc837cf27ac4f0b2fd5e1d2ebd071c54f8c5e22019bb552c8d89c76c6e94"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "between-aft-drives",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "between-port-nacelle-and-body",
+          "passed": true
+        },
+        {
+          "name": "between-starboard-nacelle-and-body",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "original native visible"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_chimango.py --check",
+      "python3 -B tools/verify_chimango.py | cmp - integration/sh140-chimango/CONTACT-RESULT.json",
+      "python3 -B tools/measure_chimango.py | cmp - integration/sh140-chimango/SURFACE-FIT.json",
+      "python3 -B tools/measure_chimango.py --difference | cmp - integration/sh140-chimango/LOD-DIFFERENCE.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T06:41:16Z",
+    "finishedUtc": "2026-11-25T06:41:23Z",
+    "log": {
+      "bytes": 420,
+      "sha256": "73ca070968bb0e226038f031fa9ad5e6c47866e12974a3d7a4084ea9f7f0eca4"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "assets/fleet/sh140/SOURCE-GEOMETRY.json": "cee26d871e0eb9e4e8b10d111fefdd9ff22fd2d61b762f55a14be887ead451dd",
+    "integration/sh140-chimango/CHIMANGO-STUDIO.json": "2a429c70214472bca3480677c6fe128fed16fc91e857d0c1f44b46bf75a32f0f",
+    "integration/sh140-chimango/FROZEN-SOURCES.json": "f6ed43e93fef79d477c0ff7495a665c4a212999c147cd39af76cd0450c8e3540",
+    "integration/sh140-chimango/CONTACT-CANDIDATE.json": "5679e71bd330609325da7631282fd2a4b5eeb7adff787e22cc44f39572d7cb69",
+    "integration/sh140-chimango/CONTACT-RESULT.json": "b19f992e0ce2edf39a64eb19edbbedbe5b16c8c8db2fbfbfac12729e21de8f7d",
+    "integration/sh140-chimango/ORIGINAL-OVERLAPS.json": "2257b0172f1060f6052f6863a8597c22ee11ad567b5eb5502c319a8a3a79fb6d",
+    "integration/sh140-chimango/LOD-DIFFERENCE.json": "3eae553c1d20823a052d6ae6506fcaddbcbefac89ad2a5c784bd846cf94ee4fe",
+    "integration/sh140-chimango/SUPPORT-FAN.json": "03e794d3653e7bab19e902636e36ebf6aa1dd3da54a6153b67afb7f56635485e",
+    "integration/sh140-chimango/SURFACE-FIT.json": "510e113989d68591a2a0ffa9a9cfc95da4feb539727c7e4a4954043770b33d4a",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_chimango.py": "10adae74fb7ef4b9f2b2068f0982f77ef6b3141f8b8fafc9224f42c20baa33a9",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_chimango.py": "641a76a8d4296d72075fd0935149845832e62472858120ff156f3895cf554dca",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/verify_chimango.py": "d73b3964093d1bacbd4ef29147e46be07c94881a58cbc2ae5dd840459463af03",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6"
+  }
+}
