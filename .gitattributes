@@ -457,3 +457,9 @@ tools/measure_buzzard_mk_ii.py text eol=lf
 tools/prepare_buzzard_mk_ii.py text eol=lf
 tools/rebuild_buzzard_mk_ii.py text eol=lf
 tools/verify_buzzard_mk_ii.py text eol=lf
+
+# Byte-pinned Aardvark Miner replay programs.
+tools/measure_aardvark_miner.py text eol=lf
+tools/prepare_aardvark_miner.py text eol=lf
+tools/rebuild_aardvark_miner.py text eol=lf
+tools/verify_aardvark_miner.py text eol=lf

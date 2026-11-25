@@ -44,6 +44,15 @@ def flight_computer_inverse(root, protected):
     return files
 
 
+def undo_aardvark_miner_publication(relative, data):
+    if relative != LIB_SOURCE:
+        return data
+    inserted = b"pub mod aardvark_miner;\n"
+    anchor = b"pub mod aardvark_miner;\npub mod alpaca;\n"
+    assert data.count(inserted) == 1 and data.count(anchor) == 1, relative
+    return data.replace(inserted, b"", 1)
+
+
 def undo_buzzard_mk_ii_publication(relative, data):
     if relative != LIB_SOURCE:
         return data
@@ -1086,7 +1095,8 @@ def verify_protected_core(root):
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_buzzard_mk_ii_publication(relative, current)
+        data = undo_aardvark_miner_publication(relative, current)
+        data = undo_buzzard_mk_ii_publication(relative, data)
         data = undo_chimango_publication(relative, data)
         data = undo_falcon_mk_iv_publication(relative, data)
         data = undo_falcon_mk_iii_publication(relative, data)

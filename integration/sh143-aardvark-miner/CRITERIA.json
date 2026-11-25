@@ -1,0 +1,214 @@
+{
+  "hull": "SH143 Aardvark Miner",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh143/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh143-aardvark-miner/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "4600/481",
+  "faces": {
+    "detailed": 12848,
+    "archivedNative": 1112,
+    "candidateNative": 512,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-aardvark-miner",
+    "massKg": 50705
+  },
+  "supportGroups": 180,
+  "candidateComponentInventory": {
+    "originalPartsRepresented": 34,
+    "unalteredNativeParts": 13,
+    "recessedWells": 11
+  },
+  "minimumRouteClearanceMillimetres": 841,
+  "sourceContactCounts": {
+    "overlap": 31,
+    "unchangedNativeParts": 13
+  },
+  "candidateRebuild": "tools/rebuild_aardvark_miner.py",
+  "fitUpperMillimetres": {
+    "detailed": 2680,
+    "archivedNative": 2824,
+    "candidateNative": 3285
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 1080,
+      "upperCeiling": 1104
+    },
+    "candidateToArchive": {
+      "lowerFloor": 441,
+      "upperCeiling": 462
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 1360,
+      "upperCeiling": 1382
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 812,
+      "upperCeiling": 834
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh143-aardvark-miner/AARDVARK-MINER-STUDIO.json",
+    "bytes": 2011618,
+    "sha256": "5e9bb6bc70ec3d5e441c1e0865b534efb089b1dc5918f491100c6c6ed6b49159",
+    "supports": 180,
+    "probes": 7,
+    "detail": "12,848 original detailed faces",
+    "native": "512 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 2011618,
+        "sha256": "5e9bb6bc70ec3d5e441c1e0865b534efb089b1dc5918f491100c6c6ed6b49159"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 12848,
+      "nativeTriangles": 512,
+      "supportGroups": 180,
+      "engineeringReference": "finite-intrinsic-empty-aardvark-miner",
+      "massKg": 50705,
+      "receiptFiles": {
+        "aardvark-miner.hull.json": {
+          "bytes": 2011617,
+          "sha256": "dc6a90a504036bbdc8f920e9991d379c3973e11e766a0fc7471ce9f270ee1974"
+        },
+        "aardvark-miner-repeat.hull.json": {
+          "bytes": 2011617,
+          "sha256": "dc6a90a504036bbdc8f920e9991d379c3973e11e766a0fc7471ce9f270ee1974"
+        },
+        "studio.stdout.json": {
+          "bytes": 448659,
+          "sha256": "ad40079dc12bfebfeb0c3294c4d9edcb842f61bfe239a3878ffe85d4ed87f2f1"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 448659,
+          "sha256": "ad40079dc12bfebfeb0c3294c4d9edcb842f61bfe239a3878ffe85d4ed87f2f1"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "46ae3fd9a92636d420bbba8a5946c0cdbb8932aa498697642cb084f89adb195e"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "through-dock-aperture",
+          "passed": true
+        },
+        {
+          "name": "above-port-mining-head",
+          "passed": true
+        },
+        {
+          "name": "above-starboard-mining-head",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_aardvark_miner.py --check",
+      "python3 -B tools/rebuild_aardvark_miner.py",
+      "python3 -B tools/verify_aardvark_miner.py | cmp - integration/sh143-aardvark-miner/CONTACT-RESULT.json",
+      "python3 -B tools/measure_aardvark_miner.py | cmp - integration/sh143-aardvark-miner/SURFACE-FIT.json",
+      "python3 -B tools/measure_aardvark_miner.py --fidelity | cmp - integration/sh143-aardvark-miner/CANDIDATE-FIDELITY.json",
+      "python3 -B tools/measure_aardvark_miner.py --directions | cmp - integration/sh143-aardvark-miner/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_aardvark_miner.py --reference-directions | cmp - integration/sh143-aardvark-miner/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T06:53:41Z",
+    "finishedUtc": "2026-11-25T06:55:38Z",
+    "log": {
+      "bytes": 741,
+      "sha256": "cdbc819f0483774119fa17b66132f83bb79ec59fa2cdca833a86f969408446bc"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "integration/sh143-aardvark-miner/AARDVARK-MINER-STUDIO.json": "5e9bb6bc70ec3d5e441c1e0865b534efb089b1dc5918f491100c6c6ed6b49159",
+    "integration/sh143-aardvark-miner/FROZEN-SOURCES.json": "c6db15c2d83ceb77abc577480427c74d639faf6703f5f104c86aa480a1899cec",
+    "integration/sh143-aardvark-miner/CONTACT-CANDIDATE.json": "58ee57fb550534ae455e1d5bc4c766dab1bb1b6d0d0ace12de2981f60a6fbb1c",
+    "integration/sh143-aardvark-miner/CONTACT-RESULT.json": "a658353fcfcc7dc814115f88cc0b0fdbebfba98e6689892c890442a43e872b94",
+    "integration/sh143-aardvark-miner/ORIGINAL-OWNERSHIP.json": "3b7357a8207ecba600a003e08758f210b3585b9ca760ec233f2957d071181716",
+    "integration/sh143-aardvark-miner/RETAINED-OVERLAPS.json": "cac1c0d1b8302e39bd6bd739d942ac293a5a995d542bb1a20b0f2d8829b32ff2",
+    "integration/sh143-aardvark-miner/CANDIDATE-FIDELITY.json": "399742c6f239677e4ec0c36b4fe73e00546b99decc9ff361e0001db8ef2bda60",
+    "integration/sh143-aardvark-miner/SUPPORT-FAN.json": "b441b6d252b7b23c5475451622f3fd2366b444355d3ecea6c7903e5015455e83",
+    "integration/sh143-aardvark-miner/SURFACE-FIT.json": "8637027c8b482c3f97cca7ef461622066a825c198f556002e352ef13cad9a7d8",
+    "integration/sh143-aardvark-miner/ARCHIVED-OVERLAPS.json": "24c2afcd2b517f33e748226d28bae23e58def929e4659103d51f6fb5e7f8eca6",
+    "integration/sh143-aardvark-miner/CANDIDATE-TOPOLOGY-SURVEY.json": "c41a6baf08503895630b2a4caf114ff58b2d51c71bf77810c770112dd459340a",
+    "integration/sh143-aardvark-miner/CANDIDATE-FIT-LOCALIZATION.json": "c75a672afecfd22a61bacbedff6defc62f723141204328ecccf9a706411864cd",
+    "integration/sh143-aardvark-miner/REFERENCE-FIT-LOCALIZATION.json": "3cb079d50cbd13d6c49603e27ef7080a526900402cd9ed878199f2b51cd612d9",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_aardvark_miner.py": "1d99ac9a4ab312e72e8a6a9504cf07eb217b0480df4221542f94ba73e3315e68",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_aardvark_miner.py": "56e49a337590cf53526ff235080e3f7143af7a25920fc65ec12a59b10b8e7d1b",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/rebuild_aardvark_miner.py": "9576348d00ac24e69e9ce145665d84f1f417babae2e92a386bd4499c92e6eb19",
+    "tools/verify_aardvark_miner.py": "6a0b3db7a15a500291747cd74e936c5a8b24851024d0334c59606c9dc0cb4e2e",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh143/GENERATED-COLLISION.json": "81f7f30dcb6e3a397440abc4b09c0f5d7e7916efa5979c989ed3fce527c28c59",
+    "assets/fleet/sh143/SOURCE-GEOMETRY.json": "6494a443fdcb8dfb38b882ff8d85421ef830cb3e8cf06b21d69635a62c6a45c3"
+  }
+}
