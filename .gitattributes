@@ -6,6 +6,12 @@ assets/fleet/sh001/visual.bin binary
 assets/fleet/sh008/** -text
 assets/fleet/sh008/visual.bin binary
 
+# Hyena authoring and replay programs use exact LF bytes.
+tools/hyena_art_mesh.py text eol=lf
+tools/measure_hyena_geometry.py text eol=lf
+tools/prepare_hyena_geometry.py text eol=lf
+tools/verify_hyena_geometry.py text eol=lf
+
 # Lanner authoring and replay programs use exact LF bytes.
 tools/lanner_art_mesh.py text eol=lf
 tools/measure_lanner_geometry.py text eol=lf

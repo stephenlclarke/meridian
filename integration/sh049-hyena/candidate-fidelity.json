@@ -1,0 +1,268 @@
+{
+  "originalArchivedNativeFaces": 952,
+  "candidateNativeFaces": 504,
+  "archiveWithin512FaceBudget": false,
+  "nativeCandidateWithin512FaceBudget": true,
+  "parts": [
+    {
+      "index": 0,
+      "name": "pods explicit member 0",
+      "originalFaces": 116,
+      "candidateFaces": 36,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 1113,
+        "archiveToCandidate": 1442
+      }
+    },
+    {
+      "index": 1,
+      "name": "pods explicit member 0/service-well-0-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 2,
+      "name": "pods explicit member 0/service-well-1-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 3,
+      "name": "pods explicit member 0/service-well-2-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 4,
+      "name": "pods explicit member 0/service-well-3-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 5,
+      "name": "pods explicit member 1",
+      "originalFaces": 116,
+      "candidateFaces": 36,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 1113,
+        "archiveToCandidate": 1442
+      }
+    },
+    {
+      "index": 6,
+      "name": "pods explicit member 1/service-well-0-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 7,
+      "name": "pods explicit member 1/service-well-1-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 8,
+      "name": "pods explicit member 1/service-well-2-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 9,
+      "name": "pods explicit member 1/service-well-3-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 10,
+      "name": "fork longitudinal envelope",
+      "originalFaces": 12,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 11,
+      "name": "fork longitudinal envelope",
+      "originalFaces": 12,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 12,
+      "name": "fork aft cross bridge",
+      "originalFaces": 12,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 13,
+      "name": "body primary pressure envelope",
+      "originalFaces": 116,
+      "candidateFaces": 36,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 802,
+        "archiveToCandidate": 965
+      }
+    },
+    {
+      "index": 14,
+      "name": "body primary pressure envelope/service-well-0-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 15,
+      "name": "body primary pressure envelope/service-well-1-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 16,
+      "name": "body primary pressure envelope/service-well-2-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 17,
+      "name": "body primary pressure envelope/service-well-3-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 18,
+      "name": "cockpit glazing envelope",
+      "originalFaces": 116,
+      "candidateFaces": 36,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 500,
+        "archiveToCandidate": 709
+      }
+    },
+    {
+      "index": 19,
+      "name": "cockpit connected structural crossmember",
+      "originalFaces": 12,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 20,
+      "name": "engine_pair/negative side/connected support",
+      "originalFaces": 12,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 21,
+      "name": "engine_pair/negative side/propulsion casing",
+      "originalFaces": 44,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 782,
+        "archiveToCandidate": 1199
+      }
+    },
+    {
+      "index": 22,
+      "name": "engine_pair/negative side/propulsion luminous recess",
+      "originalFaces": 44,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 500,
+        "archiveToCandidate": 503
+      }
+    },
+    {
+      "index": 23,
+      "name": "engine_pair/positive side/connected support",
+      "originalFaces": 12,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 24,
+      "name": "engine_pair/positive side/propulsion casing",
+      "originalFaces": 44,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 782,
+        "archiveToCandidate": 1199
+      }
+    },
+    {
+      "index": 25,
+      "name": "engine_pair/positive side/propulsion luminous recess",
+      "originalFaces": 44,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 500,
+        "archiveToCandidate": 503
+      }
+    }
+  ]
+}
