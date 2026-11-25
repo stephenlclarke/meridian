@@ -24,6 +24,7 @@ pub mod save;
 pub mod station;
 pub mod station_services;
 pub mod traffic;
+pub mod yak;
 
 pub use flight::GoshawkCustomApproachSnapshot;
 pub use flight::PreparedNavigationRoute;
