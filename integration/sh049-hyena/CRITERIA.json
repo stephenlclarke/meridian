@@ -83,6 +83,20 @@
     "archiveNative": 2184,
     "candidateNative": 2559
   },
+  "referenceTriangulation": {
+    "path": "integration/sh049-hyena/REFERENCE-FANS.json",
+    "scope": "Derived whole reference triangulation for exact replay; no original artwork or stored numerical bounds",
+    "sourceRevision": "6526eebf241fd65fa8beb60169a203872ebaa863",
+    "sourceMeasurementSha256": "1e91387338451d5d30cd9129f5c482b26aa99259884574502b9e787091387f88",
+    "sourceSharedMeasurementSha256": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "sourceDiagnosticScriptSha256": "d98f4acc804ee7ac663fd8eeb9a59c6b971170722ebd40780fb1980839e92e4d",
+    "sourceDiagnosticOutputSha256": "5beb2813bb9cbfbeefe85055345ef9f193a24edb380dd09ea8dae4a153cef4b6",
+    "certificateExtractionScriptSha256": "d88f753c18f0acc1885375386d43c47714b7db616e1c6b50ce6494070bf76f3b",
+    "sourceEnvironment": {"platform": "macOS arm64", "python": "3.14.7", "numpy": "2.5.5", "scipy": "1.18.1", "trimesh": "5.2.1"},
+    "archive": {"supports": 164, "triangles": 3328, "supportPointIndices": 2592},
+    "candidate": {"supports": 164, "triangles": 3328, "supportPointIndices": 2368},
+    "validation": "Bind complete scaled point streams, memberships and support-local indices, then use the shared original outward fan and unchanged radial proof before recomputing every adaptive bound."
+  },
   "engineering": {
     "sourceReference": "finite-intrinsic-empty-hyena",
     "massKg": 58298
@@ -97,6 +111,7 @@
     "integration/sh049-hyena/ARCHIVE-FIT.json": "f8b5a190ce59fa650be9c60094729db1735dde62f704a9e92c98e10b1a5fbba0",
     "integration/sh049-hyena/candidate-fit.json": "aea1a230fe682a906591d1eb053f340c02ec4c9fb714b1ce3d73a905335b773a",
     "integration/sh049-hyena/candidate-fidelity.json": "29e80a72accfb09e2d7f0580532c68dc5c87f75f8c085c2375599e7e768fcb46",
+    "integration/sh049-hyena/REFERENCE-FANS.json": "52f3159b174aa373dd610c975026ef3ea1ae085604757d698bac63f7c57875a9",
     "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
     "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
     "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
@@ -106,11 +121,11 @@
     "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
     "tools/lanner_art_mesh.py": "f5cb59dcc0940ee02e039ba5218eb42c638ba0fed692f4b2216699620aba334b",
     "tools/prepare_lanner_geometry.py": "3e1dc0ba15e493f8d53f385c7e2e166420e0082228b355547b3810fb028cdbc8",
-    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
     "tools/hyena_art_mesh.py": "ed3018ff64189cbeaf7986c3397d084b6fc96d6898e3858f65a4f00f96bd167c",
     "tools/prepare_hyena_geometry.py": "980993fa36ee6269c43483764ce6cf0cdb56599ece946a0ade3315bb08626fbd",
     "tools/verify_hyena_geometry.py": "6c415455230e1cc32efb126d1334b879ba0a23fe4df9658a488099cb657079b9",
-    "tools/measure_hyena_geometry.py": "1e91387338451d5d30cd9129f5c482b26aa99259884574502b9e787091387f88",
+    "tools/measure_hyena_geometry.py": "03a820dbfd5f1b1836e3631881dc4f2e83f8942135bf73c87a7cb34c3dcfb589",
     "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
   },
   "byteReplay": {

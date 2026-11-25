@@ -20,6 +20,8 @@ The 164 local convex supports match the creator part boundaries and use nominal 
 | Archived native mesh | 2,184 mm |
 | Creator-pinned native candidate | 2,559 mm |
 
+The fit replay preserves the complete independently captured reference triangulation as a derived proof input. Identical source coordinates can yield different Qhull facet diagonals across platforms, changing conservative per-piece bounds. The shared reference validator binds every support to its original scaled points and indices, proves the closed outward fan with the unchanged exact radial tolerance, and recomputes all adaptive bounds. The original artwork, report bytes and acceptance thresholds remain unchanged.
+
 The signed installed Hull Studio exported the exact detailed artwork and 504-face candidate twice offline. Both exports and both raw responses matched byte for byte. The package retains the original relative coordinate scale and the frozen 58,298 kg finite empty-dry engineering data. The signed receipt covers the artwork export. The geometry results above come from the independent source replay.
 
 [Source pins and replay commands](../integration/sh049-hyena/CRITERIA.json)
