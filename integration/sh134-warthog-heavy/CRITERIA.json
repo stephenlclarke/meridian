@@ -1,0 +1,180 @@
+{
+  "hull": "SH134 Warthog Heavy",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh134/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh134-warthog-heavy/FROZEN-SOURCES.json",
+  "sourceMetresPerUnit": 1,
+  "faces": {
+    "detailed": 3108,
+    "native": 160,
+    "nativeMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-warthog-heavy",
+    "massKg": 151862
+  },
+  "supportGroups": 25,
+  "minimumRouteClearanceMillimetres": 1029,
+  "sourceContactCounts": {
+    "design": 40,
+    "nativeDesign": 7
+  },
+  "sharedOverlapCount": 7,
+  "detailedOnlyOverlapCount": 33,
+  "fitUpperMillimetres": {
+    "detailed": 2394,
+    "native": 4311
+  },
+  "hullStudio": {
+    "definition": "integration/sh134-warthog-heavy/WARTHOG-HEAVY-STUDIO.json",
+    "bytes": 399691,
+    "sha256": "7eae3b655d246508314c44f95bfd42efb231a262ac21d3528e3872199ddd6ad6",
+    "supports": 25,
+    "probes": 7,
+    "detail": "3108 original detailed faces",
+    "native": "160 original native faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 399691,
+        "sha256": "7eae3b655d246508314c44f95bfd42efb231a262ac21d3528e3872199ddd6ad6"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3108,
+      "nativeTriangles": 160,
+      "supportGroups": 25,
+      "engineeringReference": "finite-intrinsic-empty-warthog-heavy",
+      "massKg": 151862,
+      "receiptFiles": {
+        "warthog-heavy.hull.json": {
+          "bytes": 399690,
+          "sha256": "a0584d767e20c261c7986ecd07f09b747fb90f961e3da14680607ba3bcdf187c"
+        },
+        "warthog-heavy-repeat.hull.json": {
+          "bytes": 399690,
+          "sha256": "a0584d767e20c261c7986ecd07f09b747fb90f961e3da14680607ba3bcdf187c"
+        },
+        "studio.stdout.json": {
+          "bytes": 55711,
+          "sha256": "a487d7e6e4fe4dbb1ecede6033e2dc814310d9ef2c54405128fe41192b94fe59"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 55711,
+          "sha256": "a487d7e6e4fe4dbb1ecede6033e2dc814310d9ef2c54405128fe41192b94fe59"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "c20db84057544de969426da4e3e764a982d87c616deee5b28702f4537b56812b"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "above-aft-upper-module",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "over-port-drive",
+          "passed": true
+        },
+        {
+          "name": "over-starboard-drive",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "original native visible"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_warthog_heavy.py --check",
+      "python3 -B tools/verify_warthog_heavy.py | cmp - integration/sh134-warthog-heavy/CONTACT-RESULT.json",
+      "python3 -B tools/measure_warthog_heavy.py | cmp - integration/sh134-warthog-heavy/SURFACE-FIT.json",
+      "python3 -B tools/measure_warthog_heavy.py --difference | cmp - integration/sh134-warthog-heavy/LOD-DIFFERENCE.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T06:10:18Z",
+    "finishedUtc": "2026-11-25T06:10:27Z",
+    "log": {
+      "bytes": 440,
+      "sha256": "fcc59f91ca783e9e0b716229785a8bc77acadc136681639d6bb1726825ef9cf7"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "assets/fleet/sh134/SOURCE-GEOMETRY.json": "bdef17c87f5178f79b1e75db8323ddc473b75f7cf25e376d8e610781f5659ea5",
+    "integration/sh134-warthog-heavy/WARTHOG-HEAVY-STUDIO.json": "7eae3b655d246508314c44f95bfd42efb231a262ac21d3528e3872199ddd6ad6",
+    "integration/sh134-warthog-heavy/FROZEN-SOURCES.json": "2f6c170490d92433fd8e0a700e515a8921c6732ec5fa6823fade5e1e4306a7c9",
+    "integration/sh134-warthog-heavy/CONTACT-CANDIDATE.json": "719a7a16c7d05e7dc90254fe275bbbfc4dd932d0b6b1dd4bfedb532ecd906864",
+    "integration/sh134-warthog-heavy/CONTACT-RESULT.json": "354bbaa367a8ac65f63784a339ea8c9d5f42e1013538d50d2ead972296882a0d",
+    "integration/sh134-warthog-heavy/ORIGINAL-OVERLAPS.json": "3dc981947ee4977498c2f73703ad8f802a46632a29fe1ab7a1e13940997df683",
+    "integration/sh134-warthog-heavy/LOD-DIFFERENCE.json": "08c77be0a9569c76dddabead2e995eacb511f1e309f0e0d7c91f84785f536551",
+    "integration/sh134-warthog-heavy/SUPPORT-FAN.json": "beeacf469c4f901a55096ebf397c7b897be44406154468f549d3c4ec6244c356",
+    "integration/sh134-warthog-heavy/SURFACE-FIT.json": "5ccb36b345d7f8ffc838cbd9865f91b7adadbe99cf07a9ac36b026d6d117d585",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_warthog_heavy.py": "ddbb77a77296b43e227c6b0f2ec5cc249a1eed1961c4e22493abe2f2066f4c66",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_warthog_heavy.py": "25aa0ab74e1676816a757019f1703564b529ee5aa18337d048d1e661960ef76d",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/verify_warthog_heavy.py": "ece35f5fecfb869281e8e4b3aa37a465abe482f072c7895e2dac0501a1304eb0",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6"
+  }
+}

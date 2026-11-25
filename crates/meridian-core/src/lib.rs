@@ -83,6 +83,7 @@ pub mod traffic;
 pub mod vulture_raider;
 pub mod warthog_escort;
 pub mod warthog_freighter;
+pub mod warthog_heavy;
 pub mod warthog_light;
 pub mod warthog_tanker;
 pub mod wildebeest;
