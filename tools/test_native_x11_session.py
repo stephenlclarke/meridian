@@ -15,6 +15,7 @@ with patch.object(sys, "path", [str(SCRIPTS), *sys.path]):
     session = importlib.import_module("native_x11_session")
 
 
+@unittest.skipUnless(os.name == "posix", "X11 keeper uses POSIX pipes, signals and process reaping")
 class NativeX11SessionTests(unittest.TestCase):
     def setUp(self):
         directory = tempfile.TemporaryDirectory()
