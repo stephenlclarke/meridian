@@ -6,6 +6,11 @@ assets/fleet/sh001/visual.bin binary
 assets/fleet/sh008/** -text
 assets/fleet/sh008/visual.bin binary
 
+# Hobby Fighter authoring and replay programs use exact LF bytes.
+tools/measure_hobby_fighter.py text eol=lf
+tools/prepare_hobby_fighter.py text eol=lf
+tools/verify_hobby_fighter.py text eol=lf
+
 # Caracal Scout authoring and replay programs use exact LF bytes.
 tools/caracal_scout_art_mesh.py text eol=lf
 tools/measure_caracal_scout_geometry.py text eol=lf

@@ -134,6 +134,7 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Jackal source envelope and Hull Studio definition](docs/JACKAL-SOURCE.md)
 - [Banteng source envelope and Hull Studio definition](docs/BANTENG-SOURCE.md)
 - [Caracal Scout source envelope and Hull Studio definition](docs/CARACAL-SCOUT-SOURCE.md)
+- [Hobby Fighter source envelope and Hull Studio definition](docs/HOBBY-FIGHTER-SOURCE.md)
 - [Stag Liner source envelope and Hull Studio definition](docs/STAG-LINER-GAMEPLAY-ENVELOPE.md)
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)
