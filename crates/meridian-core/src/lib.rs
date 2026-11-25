@@ -22,6 +22,7 @@ pub mod carabao_freighter;
 pub mod carabao_highliner;
 pub mod caracal_scout;
 pub mod caracara_mk_i;
+pub mod caracara_mk_ii;
 pub mod cavy_racer;
 pub mod celestial;
 pub mod chimango;
