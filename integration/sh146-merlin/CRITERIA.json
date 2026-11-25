@@ -1,0 +1,180 @@
+{
+  "hull": "SH146 Merlin",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh146/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh146-merlin/FROZEN-SOURCES.json",
+  "sourceMetresPerUnit": 1,
+  "faces": {
+    "detailed": 3084,
+    "native": 160,
+    "nativeMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-merlin",
+    "massKg": 23622
+  },
+  "supportGroups": 23,
+  "minimumRouteClearanceMillimetres": 779,
+  "sourceContactCounts": {
+    "design": 36,
+    "nativeDesign": 6
+  },
+  "sharedOverlapCount": 6,
+  "detailedOnlyOverlapCount": 30,
+  "fitUpperMillimetres": {
+    "detailed": 2221,
+    "native": 4311
+  },
+  "hullStudio": {
+    "definition": "integration/sh146-merlin/MERLIN-STUDIO.json",
+    "bytes": 397610,
+    "sha256": "6603455c01ba39d7c5e9fb0cce4fddb21438048cc5e420178dc8ad3780c52b50",
+    "supports": 23,
+    "probes": 7,
+    "detail": "3084 original detailed faces",
+    "native": "160 original native faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 397610,
+        "sha256": "6603455c01ba39d7c5e9fb0cce4fddb21438048cc5e420178dc8ad3780c52b50"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3084,
+      "nativeTriangles": 160,
+      "supportGroups": 23,
+      "engineeringReference": "finite-intrinsic-empty-merlin",
+      "massKg": 23622,
+      "receiptFiles": {
+        "merlin.hull.json": {
+          "bytes": 397609,
+          "sha256": "9fb2980313070d445b6fd2e099d75ac3595d3634895539c365345c917ccd44bf"
+        },
+        "merlin-repeat.hull.json": {
+          "bytes": 397609,
+          "sha256": "9fb2980313070d445b6fd2e099d75ac3595d3634895539c365345c917ccd44bf"
+        },
+        "studio.stdout.json": {
+          "bytes": 53478,
+          "sha256": "8e9b0b489fda3963124d5c1e33c4419c1ca3dfbda36367021fcdb58fa3e71877"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 53478,
+          "sha256": "8e9b0b489fda3963124d5c1e33c4419c1ca3dfbda36367021fcdb58fa3e71877"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "89e6f3d224eb3d6c8b17eb5e8ac769606d58c98b97fdb7e78379365907faeff2"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "between-aft-drives",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "above-port-nacelle",
+          "passed": true
+        },
+        {
+          "name": "above-starboard-nacelle",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "original native visible"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_merlin.py --check",
+      "python3 -B tools/verify_merlin.py | cmp - integration/sh146-merlin/CONTACT-RESULT.json",
+      "python3 -B tools/measure_merlin.py | cmp - integration/sh146-merlin/SURFACE-FIT.json",
+      "python3 -B tools/measure_merlin.py --difference | cmp - integration/sh146-merlin/LOD-DIFFERENCE.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T07:10:11Z",
+    "finishedUtc": "2026-11-25T07:10:18Z",
+    "log": {
+      "bytes": 412,
+      "sha256": "80cb50c2be35681e3075abf4504be7c46ac29d6bb377be7d775dd5c34fcc3ca2"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "assets/fleet/sh146/SOURCE-GEOMETRY.json": "ea6dcf4aa0fd3d4afc213a359cd4d08a6c91b4ec4b38d0cdb5fcbe28a49dc4d4",
+    "integration/sh146-merlin/MERLIN-STUDIO.json": "6603455c01ba39d7c5e9fb0cce4fddb21438048cc5e420178dc8ad3780c52b50",
+    "integration/sh146-merlin/FROZEN-SOURCES.json": "7c6b494879c642ba6dd54fc6058287713a15ec9d6d5ed6345324f96c3552d687",
+    "integration/sh146-merlin/CONTACT-CANDIDATE.json": "1a9dc10a907e147f41e26a25210e0cce1f57ddb8a0f14ffd02ad862a9990196c",
+    "integration/sh146-merlin/CONTACT-RESULT.json": "757ba7dec2a34203c2f18847e50b1e471485ba77494b91cf6486655c991e486d",
+    "integration/sh146-merlin/ORIGINAL-OVERLAPS.json": "190f6adfdc62658e0e79eb0f1e3ba0908ba0658825ef5dd8cf6bd3d2cf51ee63",
+    "integration/sh146-merlin/LOD-DIFFERENCE.json": "06a4a913de04345dfd82d8f778c9f12985c808b9abbb6e820a7dd64271bc8200",
+    "integration/sh146-merlin/SUPPORT-FAN.json": "48bf83d36ed8270e61cf5b06dc3a86db6aef67149df32fb60c01e12d8b512b9f",
+    "integration/sh146-merlin/SURFACE-FIT.json": "3af2bba5bdcf96149ee939ee174e0e31ee80e7d8bf64dcb37f15be66139ee26d",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_merlin.py": "21cafa3f121e5c7c635ff8a9c1b52d7cc424abd7ecc173b7541df908a845d9f4",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_merlin.py": "42dea26196f68faf5e14dda11578b0c0244a740f54dd6e806a745680874f3523",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/verify_merlin.py": "1691bfd01ffe759570d4b8f92ab3a552f7de3853a3caeb928817c9ee75ce27ec",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6"
+  }
+}
