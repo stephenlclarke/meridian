@@ -15,6 +15,25 @@ with patch.object(sys, "path", [str(SCRIPTS), *sys.path]):
     session = importlib.import_module("native_x11_session")
 
 
+class NativeX11EntrypointTests(unittest.TestCase):
+    def test_entrypoint_launches_only_the_fixed_coverage_command(self):
+        with (patch.object(sys, "argv", [str(SCRIPTS / "native_x11_session.py")]),
+              patch.object(session, "run_session", return_value=7) as launch):
+            self.assertEqual(session.main(), 7)
+        launch.assert_called_once_with(
+            [sys.executable, "-B", "-m", "coverage", "run", "--parallel-mode",
+             str(SCRIPTS / "native_coverage_smoke.py")],
+            SCRIPTS.parents[1] / "coverage/x11-client.log",
+        )
+
+    def test_entrypoint_rejects_arguments_before_launch(self):
+        with (patch.object(sys, "argv", [str(SCRIPTS / "native_x11_session.py"), "unexpected"]),
+              patch.object(session, "run_session") as launch):
+            with self.assertRaisesRegex(SystemExit, "does not accept arguments"):
+                session.main()
+        launch.assert_not_called()
+
+
 @unittest.skipUnless(os.name == "posix", "X11 keeper uses POSIX pipes, signals and process reaping")
 class NativeX11SessionTests(unittest.TestCase):
     def setUp(self):

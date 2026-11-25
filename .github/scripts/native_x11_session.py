@@ -48,7 +48,13 @@ def run_session(command, log):
             client.wait(timeout=10)
 
 
+def main():
+    if len(sys.argv) != 1:
+        raise SystemExit("The native X11 coverage session does not accept arguments")
+    command = [sys.executable, "-B", "-m", "coverage", "run", "--parallel-mode",
+               str(workspace_path(".github/scripts/native_coverage_smoke.py"))]
+    return run_session(command, workspace_path("coverage/x11-client.log"))
+
+
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        raise SystemExit("Expected a native coverage command")
-    raise SystemExit(run_session(sys.argv[1:], workspace_path("coverage/x11-client.log")))
+    raise SystemExit(main())
