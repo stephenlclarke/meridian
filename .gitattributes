@@ -337,3 +337,9 @@ tools/verify_cavy_racer.py text eol=lf
 tools/measure_wildebeest.py text eol=lf
 tools/prepare_wildebeest.py text eol=lf
 tools/verify_wildebeest.py text eol=lf
+
+# Byte-pinned Tapir Shuttle replay programs.
+tools/measure_tapir_shuttle.py text eol=lf
+tools/prepare_tapir_shuttle.py text eol=lf
+tools/rebuild_tapir_shuttle.py text eol=lf
+tools/verify_tapir_shuttle.py text eol=lf

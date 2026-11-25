@@ -69,6 +69,7 @@ pub mod springbok_starliner;
 pub mod station;
 pub mod station_services;
 pub mod tamaraw;
+pub mod tapir_shuttle;
 pub mod traffic;
 pub mod vulture_raider;
 pub mod wildebeest;
