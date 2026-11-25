@@ -28,6 +28,7 @@ pub mod mining;
 pub mod mule;
 pub mod muskox;
 pub mod navigation;
+pub mod saiga;
 pub mod saker;
 pub mod save;
 pub mod station;
