@@ -28,6 +28,7 @@ pub mod goshawk_custom;
 pub mod griffon;
 pub mod griffon_mk_ii;
 pub mod griffon_spectre;
+pub mod hare_explorer;
 pub mod harpy_assault;
 pub mod harpy_dropship;
 pub mod harpy_gunship;

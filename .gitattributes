@@ -1,3 +1,8 @@
+# Hare Explorer source preparation and replay use exact LF bytes.
+tools/measure_hare_explorer.py text eol=lf
+tools/prepare_hare_explorer.py text eol=lf
+tools/verify_hare_explorer.py text eol=lf
+
 # Jaguar source preparation and replay use exact LF bytes.
 tools/measure_jaguar.py text eol=lf
 tools/prepare_jaguar.py text eol=lf

@@ -204,6 +204,10 @@ Carabao Highliner preserves its original 2,856-face detailed and 236-face native
 
 Jaguar preserves its original 5,820-face detailed and 432-face native artwork. Both original records keep Jaguar unavailable for player flight and purchase. Four nozzle contacts and 14 overlap witnesses reproduce in both meshes. [Jaguar source and evidence](JAGUAR-SOURCE.md)
 
+## Hare Explorer catalogue source
+
+Hare Explorer preserves its original 3,108-face detailed and 184-face native artwork. Both meshes retain the canopy and wing-mount overlaps. The detailed nozzles seat flush on the hull, and the original native mesh keeps those parts apart. [Hare Explorer source and evidence](HARE-EXPLORER-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)
