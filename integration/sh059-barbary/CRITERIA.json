@@ -1,0 +1,129 @@
+{
+  "hull": "SH059 Barbary",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh059/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh059-barbary/FROZEN-SOURCES.json",
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "faces": {
+    "detailed": 3852,
+    "native": 192,
+    "nativeMaximum": 512
+  },
+  "supportGroups": 22,
+  "fitUpperMillimetres": {
+    "detailed": 2890,
+    "native": 2881
+  },
+  "minimumRouteClearanceMillimetres": 609,
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-barbary",
+    "massKg": 25117
+  },
+  "replayPins": {
+    "integration/sh059-barbary/CONTACT-CANDIDATE.json": "453611956a32cd7dddd0fffce8b2d12a61ce18d7b012ab399b0d3c9ea71e2957",
+    "integration/sh059-barbary/CONTACT-RESULT.json": "e49aa6617d9eedb3fa47be2aea201733429413c74e2a87e4d8bf12550fedc293",
+    "integration/sh059-barbary/FROZEN-SOURCES.json": "73e706ff7b25ba3ea40a1678ad40f611f2cb2d188d7ef9a1b9ae2e9e98733d31",
+    "integration/sh059-barbary/BARBARY-STUDIO.json": "a96533cf60d2f3885b4c83a74f9f4c7a5c1068dfcd5fe2c2a10caf8170f49dfb",
+    "integration/sh059-barbary/ORIGINAL-DIFFERENCE.json": "5240de738d9f512d98045ccaa8f353ea4a1e6ec3de56f8db8e36642fb59a061d",
+    "integration/sh059-barbary/ORIGINAL-JOINTS.json": "1ab64db58f7c846f47203cb1bc4c1512de6dc3da98e65551fd6ffa3b6f7532f4",
+    "integration/sh059-barbary/SUPPORT-FAN.json": "5d09500f20f81f6c99fed25642f433b58e62a240e47e3285fc6ebff49db357ac",
+    "integration/sh059-barbary/SURFACE-FIT.json": "efa1fc5a4f0eeff146af201233147c892e4d1da11f8d3041b155fa869f52a67a",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/measure_barbary.py": "deac4c8bcf77561831c303b4a6217f2e3408c1cbbb80b917ed9fe3b18aba050d",
+    "tools/prepare_barbary.py": "f4d937835dc059d322bb20fc19e8d00e2e6047d64a40b0e0919d57b639f535ae",
+    "tools/verify_barbary.py": "10cfd319bc3fee81790ba4db9ff5da3a47121e7a3483e71c4899e6ff7c506c50",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  },
+  "byteReplay": {
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T18:53:02Z",
+    "finishedUtc": "2026-11-24T18:53:13Z",
+    "log": {
+      "bytes": 591,
+      "sha256": "a59192a0b92d4d158386426518b38d93fd71dc76de76ca611b4fbf28f728b20b"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "commands": [
+      "python3 -B tools/prepare_barbary.py --check",
+      "python3 -B tools/verify_barbary.py | cmp - integration/sh059-barbary/CONTACT-RESULT.json",
+      "python3 -B tools/measure_barbary.py --difference | cmp - integration/sh059-barbary/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/measure_barbary.py | cmp - integration/sh059-barbary/SURFACE-FIT.json"
+    ]
+  },
+  "hullStudio": {
+    "definition": "integration/sh059-barbary/BARBARY-STUDIO.json",
+    "bytes": 505455,
+    "sha256": "a96533cf60d2f3885b4c83a74f9f4c7a5c1068dfcd5fe2c2a10caf8170f49dfb",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "supports": 22,
+    "probes": 7,
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline artwork import and export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 505455,
+        "sha256": "a96533cf60d2f3885b4c83a74f9f4c7a5c1068dfcd5fe2c2a10caf8170f49dfb"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3852,
+      "nativeTriangles": 192,
+      "supportGroups": 22,
+      "engineeringReference": "finite-intrinsic-empty-barbary",
+      "massKg": 25117.0,
+      "receiptFiles": {
+        "BARBARY.hull.json": {
+          "bytes": 505454,
+          "sha256": "b7af4553eaccf11c37a3a643fc53cc490132061ae9e7721151957f342ab80079"
+        },
+        "BARBARY-repeat.hull.json": {
+          "bytes": 505454,
+          "sha256": "b7af4553eaccf11c37a3a643fc53cc490132061ae9e7721151957f342ab80079"
+        },
+        "studio.stdout.json": {
+          "bytes": 65791,
+          "sha256": "1480846385354cfa73513c94809cd37e0e92f352c3b36689422cbbbddec65f1b"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 65791,
+          "sha256": "1480846385354cfa73513c94809cd37e0e92f352c3b36689422cbbbddec65f1b"
+        },
+        "codesign.log": {
+          "bytes": 14183,
+          "sha256": "a7fc0cfb4df8b501aed5cbb4d5b6285133736d02a93af0c6ce3e0cb202c16fa3"
+        }
+      }
+    }
+  }
+}
