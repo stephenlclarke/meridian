@@ -1,5 +1,7 @@
 # World save and continue
 
+Only one open profile can own a save directory. Closing the profile releases its lock immediately, including when a concurrently starting process still holds a copy of the file descriptor.
+
 The SH025 navigation source candidate reads and writes private format **17**. Qualification on the final combined source remains pending. The current reader requires exact completed-jump receipts from the initial commander state and rejects every previous format before replacing World.
 
 Ordinary startup presents Commander details. An empty slot creates a fresh Avenor commander in memory. A valid save shows its existing identity, ship, location and credits. The game holds the saved pose, mode and tick while Commander details is open. Press Enter to resume a saved flight. Station screens and launch require a valid berth. Pressing L resumes a paused docked commander only when World admits departure. If launch is refused, an immediate save still records the paused berth. Startup leaves the save slot untouched.
