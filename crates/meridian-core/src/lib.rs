@@ -11,6 +11,7 @@ pub mod docking;
 pub mod eagle_cruiser;
 pub mod equipment;
 pub mod erne_corvette;
+pub mod falconet;
 mod flight;
 pub mod freight;
 pub mod goshawk;
