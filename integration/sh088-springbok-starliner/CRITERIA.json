@@ -1,0 +1,226 @@
+{
+  "hull": "SH088 Springbok Starliner",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh088/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh088-springbok-starliner/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "64000000/4107151",
+  "faces": {
+    "detailed": 2672,
+    "archivedNative": 912,
+    "candidateNative": 504,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-springbok-starliner",
+    "massKg": 89404
+  },
+  "supportGroups": 37,
+  "minimumRouteClearanceMillimetres": 961,
+  "sourceContactCounts": {
+    "overlap": 12
+  },
+  "openArcEulerCharacteristic": {
+    "detailed": 2,
+    "archivedNative": 2,
+    "candidateNative": 2
+  },
+  "independentApertureMillimetres": {
+    "detailed": {
+      "bow-gap": 3424,
+      "port-aperture--4": 2323,
+      "port-aperture-+0": 2668,
+      "port-aperture-+4": 2273,
+      "starboard-aperture--4": 2323,
+      "starboard-aperture-+0": 2668,
+      "starboard-aperture-+4": 2273
+    },
+    "archivedNative": {
+      "bow-gap": 3424,
+      "port-aperture--4": 2323,
+      "port-aperture-+0": 2273,
+      "port-aperture-+4": 2273,
+      "starboard-aperture--4": 2323,
+      "starboard-aperture-+0": 2273,
+      "starboard-aperture-+4": 2273
+    },
+    "candidateNative": {
+      "bow-gap": 3424,
+      "port-aperture--4": 1872,
+      "port-aperture-+0": 1872,
+      "port-aperture-+4": 1872,
+      "starboard-aperture--4": 1872,
+      "starboard-aperture-+0": 1872,
+      "starboard-aperture-+4": 1872
+    }
+  },
+  "arcProfile": {
+    "openArcVolumeCubicMetres": {
+      "detailed": 2289.562859,
+      "archivedNative": 2140.413674,
+      "candidateNative": 1473.411469
+    },
+    "originalToCandidateUpperMillimetres": 1673,
+    "candidateToOriginalUpperMillimetres": 1494
+  },
+  "standaloneCreatorReplay": "integration/sh088-springbok-starliner/CREATOR-REPLAY.json",
+  "fitUpperMillimetres": {
+    "detailed": 2595,
+    "archivedNative": 2840,
+    "candidateNative": 2988
+  },
+  "hullStudio": {
+    "definition": "integration/sh088-springbok-starliner/SPRINGBOK-STARLINER-STUDIO.json",
+    "bytes": 445733,
+    "sha256": "f9cf79156b1fc54c2995be1ec771fd9478f12cb6f0d4860b64668d74d558a1ff",
+    "supports": 37,
+    "probes": 7,
+    "detail": "2,672 original detailed faces",
+    "native": "504 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 445733,
+        "sha256": "f9cf79156b1fc54c2995be1ec771fd9478f12cb6f0d4860b64668d74d558a1ff"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 2672,
+      "nativeTriangles": 504,
+      "supportGroups": 37,
+      "engineeringReference": "finite-intrinsic-empty-springbok-starliner",
+      "massKg": 89404,
+      "receiptFiles": {
+        "springbok.hull.json": {
+          "bytes": 445732,
+          "sha256": "3980d14ded321eacc7b28249cbc29668b4fde649a40b6b3f916c0e934878fbb4"
+        },
+        "springbok-repeat.hull.json": {
+          "bytes": 445732,
+          "sha256": "3980d14ded321eacc7b28249cbc29668b4fde649a40b6b3f916c0e934878fbb4"
+        },
+        "studio.stdout.json": {
+          "bytes": 119720,
+          "sha256": "7ae0b468abe85cd6b450c6500c95f5234e42638aea7ba326174ea90d5d62e393"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 119720,
+          "sha256": "7ae0b468abe85cd6b450c6500c95f5234e42638aea7ba326174ea90d5d62e393"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "5dded3c477c10293cdd6d71a417a7785fd54595b9849494308d26b28a025cd97"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "bow-gap",
+          "passed": true
+        },
+        {
+          "name": "port-aperture--4",
+          "passed": true
+        },
+        {
+          "name": "port-aperture-+0",
+          "passed": true
+        },
+        {
+          "name": "port-aperture-+4",
+          "passed": true
+        },
+        {
+          "name": "starboard-aperture--4",
+          "passed": true
+        },
+        {
+          "name": "starboard-aperture-+0",
+          "passed": true
+        },
+        {
+          "name": "starboard-aperture-+4",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_springbok_starliner.py --check",
+      "python3 -B tools/verify_springbok_starliner.py | cmp - integration/sh088-springbok-starliner/CONTACT-RESULT.json",
+      "python3 -B tools/measure_springbok_starliner.py --arc | cmp - integration/sh088-springbok-starliner/ARC-PROFILE.json",
+      "python3 -B tools/measure_springbok_starliner.py | cmp - integration/sh088-springbok-starliner/SURFACE-FIT.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T02:27:55Z",
+    "finishedUtc": "2026-11-25T02:28:11Z",
+    "log": {
+      "bytes": 461,
+      "sha256": "bdfb2c03f4d7cef25a8e0887e9e6a97b6f5e35b132725e01831434912b88515d"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "integration/sh088-springbok-starliner/SPRINGBOK-STARLINER-STUDIO.json": "f9cf79156b1fc54c2995be1ec771fd9478f12cb6f0d4860b64668d74d558a1ff",
+    "integration/sh088-springbok-starliner/FROZEN-SOURCES.json": "fecc53347155844d07b5b10c619bd61b6921aad9c704c85f82a154fc789d5805",
+    "integration/sh088-springbok-starliner/CONTACT-CANDIDATE.json": "1da7f5db6a172c5ccf727d7fc8cb5020ef61ab061f95deafdb3c304ba0225691",
+    "integration/sh088-springbok-starliner/CONTACT-RESULT.json": "35eff78351a2bd1d6c30a56299640447124d3b4e37928257baf676a5a83e80b8",
+    "integration/sh088-springbok-starliner/ORIGINAL-OWNERSHIP.json": "7d670474398ce0a9d7b1401f4bb46c502cdd418e1c3208b7f97556ca8a539904",
+    "integration/sh088-springbok-starliner/CANDIDATE-CONTACTS-AND-APERTURE.json": "05d5c4123895c66417bc7e495119646a80736762ca156c9323ced11c923534ed",
+    "integration/sh088-springbok-starliner/CANDIDATE-FIDELITY.json": "fb64b7cb39abac13157d80797180fbe71d422253dfe3852fe14c66cfda760bfe",
+    "integration/sh088-springbok-starliner/ARC-PROFILE.json": "f51d8f3dea7f5b705d75a2b4cee900a019099f7aabd5e2fa9f9d0339109a4d15",
+    "integration/sh088-springbok-starliner/SUPPORT-FAN.json": "04f2636a0eb70d95afa3b16500232ac4974e24d4140d54691ad0821946827b32",
+    "integration/sh088-springbok-starliner/SURFACE-FIT.json": "70bcb16218cebc0faeeeb8b5525aa01dd00f68f6dd992863627cb71348437e73",
+    "integration/sh088-springbok-starliner/CREATOR-REPLAY.json": "734ddbbce42ec8eb808e0303a0cd496fbdba59e88020b5f154c21dd354592ae8",
+    "assets/fleet/sh088/GENERATED-COLLISION.json": "5e4dc38ce8569065b04e59be6333bf4e36817b530ebe7eababf6a3a78c699359",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_springbok_starliner.py": "0644ca4962464d8fd796e74339f832ac558186c04c1955a1ac8468f068b8f7ba",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_springbok_starliner.py": "16771dcf08ed1901e5e9699f181c5e75c876a785e1984d0bb97b2eddc1fa9482",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/verify_springbok_starliner.py": "1e4440d5bd311cd81ab4c414e9d082b146decb5e3fa94e41073b6cb5ff819cc4",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6"
+  }
+}
