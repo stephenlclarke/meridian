@@ -1,5 +1,7 @@
 # Implementation and validation status
 
+The development save store explicitly unlocks on close. Dell Linux reproduced the cold-reopen failure during concurrent process startup and verified the fix while retaining exclusive access for a live owner.
+
 ## Station chart best-profit scan source candidate
 
 The station Galaxy chart now offers a read-only P toggle for up to five positive, directly reachable trade estimates, with an explicit empty state. The scan uses current in-game stocks and quotes, unreserved cargo, wallet, fitted jump range and fuel. It adapts `Sources/EliteCore/ProfitScan.swift` from immutable Elite source `34790e313c0d6cf8be84fe74aaf8f2f228cd3b3f` to the admitted Meridian markets; unsupported markets and speculative multi-leg refuelling do not count. The toggle is session-local and local flight P remains pause. Authored core and desktop regressions cover finite trade bounds, reserved cargo, range/fuel exclusions, stable ranking, read-only saves and the chart input path. Compiler, CI and native qualification are pending.

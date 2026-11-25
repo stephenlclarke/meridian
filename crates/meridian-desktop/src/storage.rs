@@ -22,7 +22,15 @@ pub enum SaveCommit {
 pub struct Store {
     directory: PathBuf,
     // An OS lease survives for this Store's lifetime and releases on process exit, including crashes.
-    _lease: File,
+    lease: File,
+}
+
+impl Drop for Store {
+    fn drop(&mut self) {
+        // A forked child can retain the open file description until exec closes its copy.
+        // Release ownership now. The File still closes normally when Drop returns.
+        let _ = self.lease.unlock();
+    }
 }
 
 fn private_options() -> OpenOptions {
@@ -56,10 +64,7 @@ impl Store {
                 "Cannot acquire this save's exclusive session lease: {error}"
             ))
         })?;
-        Ok(Self {
-            directory,
-            _lease: lease,
-        })
+        Ok(Self { directory, lease })
     }
 
     pub fn load(&self, max_bytes: usize) -> io::Result<Option<Vec<u8>>> {
@@ -208,6 +213,24 @@ mod tests {
             ),
             _ => panic!("unknown explicit child test mode"),
         }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn dropping_owner_releases_lease_while_a_duplicate_descriptor_remains_open() {
+        let directory = TestDirectory::new();
+        let owner = store(&directory.0);
+        // Model the descriptor temporarily inherited by a concurrent fork before exec.
+        let inherited = owner.lease.try_clone().unwrap_or_else(|e| panic!("{e}"));
+        assert!(Store::open(directory.0.clone()).is_err());
+        drop(owner);
+
+        let next_owner = store(&directory.0);
+        assert!(Store::open(directory.0.clone()).is_err());
+        drop(inherited);
+        assert!(Store::open(directory.0.clone()).is_err());
+        drop(next_owner);
+        let _new_owner = store(&directory.0);
     }
 
     #[test]

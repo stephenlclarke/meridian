@@ -1,5 +1,7 @@
 # Meridian
 
+In the development build, closing a profile releases its save lock immediately so it can be reopened while a helper process is starting.
+
 Preview 10 opens on Commander Details. Press H or ? for the current screen’s controls and station navigation. Its docked exterior and flight HUD leave the view above the instruments clear at rest. [Download Preview 10 for macOS arm64 or Windows x64](https://github.com/stephenlclarke/meridian/releases/tag/v0.10.0-preview.1) · [Preview guide](docs/PREVIEW-RELEASES.md)
 
 ## Goshawk Explorer in the Ship Showroom
