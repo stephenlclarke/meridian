@@ -1,3 +1,8 @@
+# Elk source preparation and replay use exact LF bytes.
+tools/measure_elk.py text eol=lf
+tools/prepare_elk.py text eol=lf
+tools/verify_elk.py text eol=lf
+
 # Alpaca source preparation and replay use exact LF bytes.
 tools/measure_alpaca.py text eol=lf
 tools/prepare_alpaca.py text eol=lf
