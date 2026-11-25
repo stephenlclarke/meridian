@@ -360,3 +360,8 @@ tools/verify_magpie.py text eol=lf
 tools/measure_hippo.py text eol=lf
 tools/prepare_hippo.py text eol=lf
 tools/verify_hippo.py text eol=lf
+
+# Byte-pinned Leopard Fighter replay programs.
+tools/measure_leopard_fighter.py text eol=lf
+tools/prepare_leopard_fighter.py text eol=lf
+tools/verify_leopard_fighter.py text eol=lf
