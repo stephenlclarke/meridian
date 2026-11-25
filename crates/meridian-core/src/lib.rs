@@ -74,6 +74,7 @@ pub mod ox;
 pub mod ox_mk_ii;
 pub mod puma;
 pub mod rabbit_explorer;
+pub mod razorback;
 pub mod rhinoceros_trader;
 pub mod saiga;
 pub mod saker;
