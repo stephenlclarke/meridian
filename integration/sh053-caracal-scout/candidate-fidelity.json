@@ -1,0 +1,350 @@
+{
+  "originalArchivedNativeFaces": 1380,
+  "candidateNativeFaces": 492,
+  "fixedParts": 15,
+  "resampledParts": 10,
+  "omittedBlindWellParts": 14,
+  "fullUpperMillimetres": {
+    "candidateToArchive": 1233,
+    "archiveToCandidate": 1761
+  },
+  "parts": [
+    {
+      "index": 0,
+      "name": "body primary pressure envelope",
+      "mode": "resampled original longitudinal stations",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 1233,
+        "archiveToCandidate": 1207
+      }
+    },
+    {
+      "index": 1,
+      "name": "body primary pressure envelope/service-well-0-0",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 2,
+      "name": "body primary pressure envelope/service-well-1-0",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 3,
+      "name": "body primary pressure envelope/service-well-2-0",
+      "mode": "omitted independent shallow well",
+      "verifiedUpperMillimetres": {
+        "archiveToCandidate": 1756
+      }
+    },
+    {
+      "index": 4,
+      "name": "body primary pressure envelope/service-well-3-0",
+      "mode": "omitted independent shallow well",
+      "verifiedUpperMillimetres": {
+        "archiveToCandidate": 1761
+      }
+    },
+    {
+      "index": 5,
+      "name": "wing_pair member 0",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 6,
+      "name": "wing_pair member 1",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 7,
+      "name": "pods explicit member 0",
+      "mode": "resampled original longitudinal stations",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 961,
+        "archiveToCandidate": 971
+      }
+    },
+    {
+      "index": 8,
+      "name": "pods explicit member 0/service-well-0-0",
+      "mode": "omitted independent shallow well",
+      "verifiedUpperMillimetres": {
+        "archiveToCandidate": 1149
+      }
+    },
+    {
+      "index": 9,
+      "name": "pods explicit member 0/service-well-1-0",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 10,
+      "name": "pods explicit member 0/service-well-2-0",
+      "mode": "omitted independent shallow well",
+      "verifiedUpperMillimetres": {
+        "archiveToCandidate": 799
+      }
+    },
+    {
+      "index": 11,
+      "name": "pods explicit member 0/service-well-3-0",
+      "mode": "omitted independent shallow well",
+      "verifiedUpperMillimetres": {
+        "archiveToCandidate": 818
+      }
+    },
+    {
+      "index": 12,
+      "name": "pods explicit member 1",
+      "mode": "resampled original longitudinal stations",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 914,
+        "archiveToCandidate": 989
+      }
+    },
+    {
+      "index": 13,
+      "name": "pods explicit member 1/service-well-0-0",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 14,
+      "name": "pods explicit member 1/service-well-1-0",
+      "mode": "omitted independent shallow well",
+      "verifiedUpperMillimetres": {
+        "archiveToCandidate": 1161
+      }
+    },
+    {
+      "index": 15,
+      "name": "pods explicit member 1/service-well-2-0",
+      "mode": "omitted independent shallow well",
+      "verifiedUpperMillimetres": {
+        "archiveToCandidate": 799
+      }
+    },
+    {
+      "index": 16,
+      "name": "pods explicit member 1/service-well-3-0",
+      "mode": "omitted independent shallow well",
+      "verifiedUpperMillimetres": {
+        "archiveToCandidate": 802
+      }
+    },
+    {
+      "index": 17,
+      "name": "pods explicit member 0",
+      "mode": "resampled original longitudinal stations",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 810,
+        "archiveToCandidate": 952
+      }
+    },
+    {
+      "index": 18,
+      "name": "pods explicit member 0/service-well-0-0",
+      "mode": "omitted independent shallow well",
+      "verifiedUpperMillimetres": {
+        "archiveToCandidate": 914
+      }
+    },
+    {
+      "index": 19,
+      "name": "pods explicit member 0/service-well-1-0",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 20,
+      "name": "pods explicit member 0/service-well-2-0",
+      "mode": "omitted independent shallow well",
+      "verifiedUpperMillimetres": {
+        "archiveToCandidate": 915
+      }
+    },
+    {
+      "index": 21,
+      "name": "pods explicit member 0/service-well-3-0",
+      "mode": "omitted independent shallow well",
+      "verifiedUpperMillimetres": {
+        "archiveToCandidate": 916
+      }
+    },
+    {
+      "index": 22,
+      "name": "pods explicit member 1",
+      "mode": "resampled original longitudinal stations",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 810,
+        "archiveToCandidate": 971
+      }
+    },
+    {
+      "index": 23,
+      "name": "pods explicit member 1/service-well-0-0",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 24,
+      "name": "pods explicit member 1/service-well-1-0",
+      "mode": "omitted independent shallow well",
+      "verifiedUpperMillimetres": {
+        "archiveToCandidate": 917
+      }
+    },
+    {
+      "index": 25,
+      "name": "pods explicit member 1/service-well-2-0",
+      "mode": "omitted independent shallow well",
+      "verifiedUpperMillimetres": {
+        "archiveToCandidate": 915
+      }
+    },
+    {
+      "index": 26,
+      "name": "pods explicit member 1/service-well-3-0",
+      "mode": "omitted independent shallow well",
+      "verifiedUpperMillimetres": {
+        "archiveToCandidate": 916
+      }
+    },
+    {
+      "index": 27,
+      "name": "cockpit glazing envelope",
+      "mode": "resampled original longitudinal stations",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 992,
+        "archiveToCandidate": 886
+      }
+    },
+    {
+      "index": 28,
+      "name": "cockpit connected structural crossmember",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 29,
+      "name": "engine_pair/negative side/connected support",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 30,
+      "name": "engine_pair/negative side/propulsion casing",
+      "mode": "resampled original longitudinal stations",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 894,
+        "archiveToCandidate": 1160
+      }
+    },
+    {
+      "index": 31,
+      "name": "engine_pair/negative side/propulsion luminous recess",
+      "mode": "resampled original longitudinal stations",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 885,
+        "archiveToCandidate": 632
+      }
+    },
+    {
+      "index": 32,
+      "name": "engine_pair/positive side/connected support",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 33,
+      "name": "engine_pair/positive side/propulsion casing",
+      "mode": "resampled original longitudinal stations",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 894,
+        "archiveToCandidate": 925
+      }
+    },
+    {
+      "index": 34,
+      "name": "engine_pair/positive side/propulsion luminous recess",
+      "mode": "resampled original longitudinal stations",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 885,
+        "archiveToCandidate": 632
+      }
+    },
+    {
+      "index": 35,
+      "name": "explicit military mount upright",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 36,
+      "name": "explicit military mount longitudinal member",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 37,
+      "name": "explicit military mount upright",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 38,
+      "name": "explicit military mount longitudinal member",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    }
+  ]
+}
