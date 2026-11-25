@@ -228,6 +228,10 @@ Elk preserves its original 1,584 detailed and 536 native faces. A separate 464-f
 
 Springbok Starliner preserves 2,672 detailed and 912 native original faces. A separate 504-face inspection candidate retains both caps, the open bow gap, and 12 measured original overlaps. [Springbok Starliner source and evidence](SPRINGBOK-STARLINER-SOURCE.md)
 
+## Antelope catalogue source
+
+Antelope preserves 2,672 detailed and 912 native original faces. A separate 504-face inspection candidate retains both caps, the open bow gap, and 14 measured original overlaps. [Antelope source and evidence](ANTELOPE-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)

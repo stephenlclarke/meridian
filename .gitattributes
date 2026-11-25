@@ -1,3 +1,8 @@
+# Antelope source preparation and replay use exact LF bytes.
+tools/measure_antelope.py text eol=lf
+tools/prepare_antelope.py text eol=lf
+tools/verify_antelope.py text eol=lf
+
 # Springbok Starliner source preparation and replay use exact LF bytes.
 tools/measure_springbok_starliner.py text eol=lf
 tools/prepare_springbok_starliner.py text eol=lf

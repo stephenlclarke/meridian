@@ -1,0 +1,226 @@
+{
+  "hull": "SH089 Antelope",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh089/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh089-antelope/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "20000000/1533783",
+  "faces": {
+    "detailed": 2672,
+    "archivedNative": 912,
+    "candidateNative": 504,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-antelope",
+    "massKg": 50994
+  },
+  "supportGroups": 37,
+  "minimumRouteClearanceMillimetres": 190,
+  "sourceContactCounts": {
+    "overlap": 14
+  },
+  "openArcEulerCharacteristic": {
+    "detailed": 2,
+    "archivedNative": 2,
+    "candidateNative": 2
+  },
+  "independentApertureMillimetres": {
+    "detailed": {
+      "bow-gap": 2422,
+      "port-aperture--4": 750,
+      "port-aperture-+0": 983,
+      "port-aperture-+4": 742,
+      "starboard-aperture--4": 750,
+      "starboard-aperture-+0": 983,
+      "starboard-aperture-+4": 742
+    },
+    "archivedNative": {
+      "bow-gap": 2422,
+      "port-aperture--4": 746,
+      "port-aperture-+0": 1071,
+      "port-aperture-+4": 730,
+      "starboard-aperture--4": 746,
+      "starboard-aperture-+0": 1071,
+      "starboard-aperture-+4": 730
+    },
+    "candidateNative": {
+      "bow-gap": 2422,
+      "port-aperture--4": 499,
+      "port-aperture-+0": 844,
+      "port-aperture-+4": 542,
+      "starboard-aperture--4": 499,
+      "starboard-aperture-+0": 844,
+      "starboard-aperture-+4": 542
+    }
+  },
+  "arcProfile": {
+    "openArcVolumeCubicMetres": {
+      "detailed": 1040.255306,
+      "archivedNative": 972.431397,
+      "candidateNative": 669.26717
+    },
+    "originalToCandidateUpperMillimetres": 1417,
+    "candidateToOriginalUpperMillimetres": 1245
+  },
+  "standaloneCreatorReplay": "integration/sh089-antelope/CREATOR-REPLAY.json",
+  "fitUpperMillimetres": {
+    "detailed": 2560,
+    "archivedNative": 2840,
+    "candidateNative": 2950
+  },
+  "hullStudio": {
+    "definition": "integration/sh089-antelope/ANTELOPE-STUDIO.json",
+    "bytes": 445554,
+    "sha256": "851eb49281296459cb9cb7be2a0346b50f2f78bc20ab29b1b62abce4fbd1c79a",
+    "supports": 37,
+    "probes": 7,
+    "detail": "2,672 original detailed faces",
+    "native": "504 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 445554,
+        "sha256": "851eb49281296459cb9cb7be2a0346b50f2f78bc20ab29b1b62abce4fbd1c79a"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 2672,
+      "nativeTriangles": 504,
+      "supportGroups": 37,
+      "engineeringReference": "finite-intrinsic-empty-antelope",
+      "massKg": 50994,
+      "receiptFiles": {
+        "antelope.hull.json": {
+          "bytes": 445553,
+          "sha256": "d9ea54da67bb82e7dc8c161b4b95fe5a9aca8a52ddd9092c97ddf25410d53651"
+        },
+        "antelope-repeat.hull.json": {
+          "bytes": 445553,
+          "sha256": "d9ea54da67bb82e7dc8c161b4b95fe5a9aca8a52ddd9092c97ddf25410d53651"
+        },
+        "studio.stdout.json": {
+          "bytes": 119372,
+          "sha256": "c17c9def03617604cf1f6e5b418a5fca770f5c8e19a398e65265e6f27211ee33"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 119372,
+          "sha256": "c17c9def03617604cf1f6e5b418a5fca770f5c8e19a398e65265e6f27211ee33"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "7c8c0cb0844106b6061db81df9fc700324f971228cd403d9562aa0fa365041c9"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "bow-gap",
+          "passed": true
+        },
+        {
+          "name": "port-aperture--4",
+          "passed": true
+        },
+        {
+          "name": "port-aperture-+0",
+          "passed": true
+        },
+        {
+          "name": "port-aperture-+4",
+          "passed": true
+        },
+        {
+          "name": "starboard-aperture--4",
+          "passed": true
+        },
+        {
+          "name": "starboard-aperture-+0",
+          "passed": true
+        },
+        {
+          "name": "starboard-aperture-+4",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_antelope.py --check",
+      "python3 -B tools/verify_antelope.py | cmp - integration/sh089-antelope/CONTACT-RESULT.json",
+      "python3 -B tools/measure_antelope.py --arc | cmp - integration/sh089-antelope/ARC-PROFILE.json",
+      "python3 -B tools/measure_antelope.py | cmp - integration/sh089-antelope/SURFACE-FIT.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T02:29:27Z",
+    "finishedUtc": "2026-11-25T02:29:41Z",
+    "log": {
+      "bytes": 417,
+      "sha256": "e7ae89f451af76857892867ccc9f7bf4ee0e869cb9b4a601d6a61f51561feea3"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "integration/sh089-antelope/ANTELOPE-STUDIO.json": "851eb49281296459cb9cb7be2a0346b50f2f78bc20ab29b1b62abce4fbd1c79a",
+    "integration/sh089-antelope/FROZEN-SOURCES.json": "aee51bdfeea0739d850df7ec4f0bb82f92695534c3c4e49c228e0064133506bc",
+    "integration/sh089-antelope/CONTACT-CANDIDATE.json": "592aca93363a07a0fc53103ad54146188cffae8609b3029888ae0e63050d0d9a",
+    "integration/sh089-antelope/CONTACT-RESULT.json": "4f8d906bd2a21bedb0bc07b902b977286fd6c43e964b431142ab1aaba6be6bb7",
+    "integration/sh089-antelope/ORIGINAL-OWNERSHIP.json": "2b826987358e1d15e45b30915c76ae6d826c1d20f2fbe1a5e3ce0f2ea256581b",
+    "integration/sh089-antelope/CANDIDATE-CONTACTS-AND-APERTURE.json": "b88a04882b1c18c0fcd7bb0998e76a621c2a93a9ea4aae300f15c03c514567ac",
+    "integration/sh089-antelope/CANDIDATE-FIDELITY.json": "7761b1c30c767f6077b8fd47c64d5f581ae05b41942af6bef0768d5303bbe3de",
+    "integration/sh089-antelope/ARC-PROFILE.json": "d6c5938a5427c09ff1d8d4ab24e7c80f160fb1d1e8c1a4d9896ecd718a3aa605",
+    "integration/sh089-antelope/SUPPORT-FAN.json": "b4eeb92d4e914f2f30f1daec682c58a0acf8d50baf77de4a4bc3305695d33db0",
+    "integration/sh089-antelope/SURFACE-FIT.json": "1462e498afebc21d2b1823d38963e6cd7c2368fe88b7896cf85356a2d7e4f9b8",
+    "integration/sh089-antelope/CREATOR-REPLAY.json": "734ddbbce42ec8eb808e0303a0cd496fbdba59e88020b5f154c21dd354592ae8",
+    "assets/fleet/sh089/GENERATED-COLLISION.json": "5f729016e436c3b78571dbd677b326ba3e1877850abfb8ac5c432cb7ef54e156",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_antelope.py": "8dace3e785fc84612d98ad6b7eddfe706490bf8154da22ac19a38d0b3fed1484",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_antelope.py": "6d5224faa3827ed94af065b4cff2844ad8922f315c740199fb3b55df8e52bc6f",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/verify_antelope.py": "f8c42d213f01ac48e4c40605729c17aa8dbd48888c52f8505c2fd270a9fb785f",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6"
+  }
+}
