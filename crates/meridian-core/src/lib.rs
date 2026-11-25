@@ -60,6 +60,7 @@ pub mod jaguar;
 pub mod javelina;
 pub mod kestrel;
 pub mod laggar;
+pub mod lammergeier;
 pub mod lanner;
 pub mod leopard_fighter;
 pub mod llama;
