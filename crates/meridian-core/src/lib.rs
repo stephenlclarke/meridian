@@ -14,6 +14,7 @@ pub mod goshawk_custom;
 pub mod harpy_assault;
 pub mod harpy_dropship;
 pub mod harpy_gunship;
+pub mod hyena;
 pub mod lanner;
 pub mod mining;
 pub mod mule;
