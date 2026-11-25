@@ -397,3 +397,8 @@ tools/verify_warthog_escort.py text eol=lf
 tools/measure_marmot_prospector.py text eol=lf
 tools/prepare_marmot_prospector.py text eol=lf
 tools/verify_marmot_prospector.py text eol=lf
+
+# Byte-pinned Warthog Light replay programs.
+tools/measure_warthog_light.py text eol=lf
+tools/prepare_warthog_light.py text eol=lf
+tools/verify_warthog_light.py text eol=lf
