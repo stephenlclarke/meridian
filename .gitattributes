@@ -312,3 +312,8 @@ tools/verify_wisent.py text eol=lf
 tools/measure_wisent_mk_ii.py text eol=lf
 tools/prepare_wisent_mk_ii.py text eol=lf
 tools/verify_wisent_mk_ii.py text eol=lf
+
+# Byte-pinned Anoa replay programs.
+tools/measure_anoa.py text eol=lf
+tools/prepare_anoa.py text eol=lf
+tools/verify_anoa.py text eol=lf
