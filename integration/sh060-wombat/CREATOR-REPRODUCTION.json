@@ -1,0 +1,21 @@
+{
+  "design": {
+    "vertices": 2112,
+    "faces": 3544,
+    "exactArchivedDesignAndPackagedResource": true
+  },
+  "nativeDesign": {
+    "vertices": 576,
+    "faces": 1024,
+    "exactArchivedDesignAndPackagedResource": true
+  },
+  "angleOnlyLowerBound": {
+    "fixedFaces": 384,
+    "fiveRingLofts": 4,
+    "twoRingLofts": 4,
+    "minimumSides": 3,
+    "minimumFaces": 520,
+    "budget": 512,
+    "components": 32
+  }
+}
