@@ -63,6 +63,7 @@ pub mod laggar;
 pub mod lanner;
 pub mod leopard_fighter;
 pub mod llama;
+pub mod lynx_escort;
 pub mod magpie;
 pub mod mangalica;
 pub mod marmot_prospector;

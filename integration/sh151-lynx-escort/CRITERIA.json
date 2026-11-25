@@ -1,0 +1,217 @@
+{
+  "hull": "SH151 Lynx Escort",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh151/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh151-lynx-escort/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "30000/2521",
+  "faces": {
+    "detailed": 3508,
+    "archivedNative": 988,
+    "candidateNative": 512,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-lynx-escort",
+    "massKg": 50393
+  },
+  "supportGroups": 167,
+  "candidateComponentInventory": {
+    "originalPartsRepresented": 29,
+    "unalteredNativeParts": 9,
+    "recessedWells": 12,
+    "partsUsingSelectedOriginalVertices": 8,
+    "sampledArcSections": 0,
+    "arcSeamVertices": 0
+  },
+  "minimumRouteClearanceMillimetres": 799,
+  "sourceContactCounts": {
+    "overlap": 22,
+    "unchangedNativeParts": 9
+  },
+  "candidateRebuild": "tools/rebuild_lynx_escort.py",
+  "fitUpperMillimetres": {
+    "detailed": 2691,
+    "archivedNative": 3046,
+    "candidateNative": 3678
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 932,
+      "upperCeiling": 957
+    },
+    "candidateToArchive": {
+      "lowerFloor": 380,
+      "upperCeiling": 405
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 1509,
+      "upperCeiling": 1531
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 951,
+      "upperCeiling": 971
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh151-lynx-escort/LYNX-ESCORT-STUDIO.json",
+    "bytes": 581989,
+    "sha256": "887fb279d8bdfea857b66cfdd8ca87dc871f034243811802b4611636e664371d",
+    "supports": 167,
+    "probes": 7,
+    "detail": "3,508 original detailed faces",
+    "native": "512 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 581989,
+        "sha256": "887fb279d8bdfea857b66cfdd8ca87dc871f034243811802b4611636e664371d"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3508,
+      "nativeTriangles": 512,
+      "supportGroups": 167,
+      "engineeringReference": "finite-intrinsic-empty-lynx-escort",
+      "massKg": 50393,
+      "receiptFiles": {
+        "lynx-escort.hull.json": {
+          "bytes": 581988,
+          "sha256": "4426cb195d7acf80f0147bb8ebdc056217bc0b5a37f525bfd934c4cf6d6575e4"
+        },
+        "lynx-escort-repeat.hull.json": {
+          "bytes": 581988,
+          "sha256": "4426cb195d7acf80f0147bb8ebdc056217bc0b5a37f525bfd934c4cf6d6575e4"
+        },
+        "studio.stdout.json": {
+          "bytes": 155978,
+          "sha256": "9bfb2e9a9e3f3eeeb743c524bf20bcf9e25658e98151b936bbf8c59313ee6d1a"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 155978,
+          "sha256": "9bfb2e9a9e3f3eeeb743c524bf20bcf9e25658e98151b936bbf8c59313ee6d1a"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "55a60c11f144e12f8b5a5d02128e263cc902b6e22ae68516cc7c98faf89089af"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "between-aft-drives",
+          "passed": true
+        },
+        {
+          "name": "above-port-wing",
+          "passed": true
+        },
+        {
+          "name": "above-starboard-wing",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_lynx_escort.py --check",
+      "python3 -B tools/rebuild_lynx_escort.py",
+      "python3 -B tools/verify_lynx_escort.py | cmp - integration/sh151-lynx-escort/CONTACT-RESULT.json",
+      "python3 -B tools/measure_lynx_escort.py | cmp - integration/sh151-lynx-escort/SURFACE-FIT.json",
+      "python3 -B tools/measure_lynx_escort.py --fidelity | cmp - integration/sh151-lynx-escort/CANDIDATE-FIDELITY.json",
+      "python3 -B tools/measure_lynx_escort.py --directions | cmp - integration/sh151-lynx-escort/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_lynx_escort.py --reference-directions | cmp - integration/sh151-lynx-escort/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T07:39:15Z",
+    "finishedUtc": "2026-11-25T07:39:58Z",
+    "log": {
+      "bytes": 720,
+      "sha256": "8ad4b97144eb414265032bad24f085e174271e0935ee9fbdca45ecaddb5fc976"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "integration/sh151-lynx-escort/LYNX-ESCORT-STUDIO.json": "887fb279d8bdfea857b66cfdd8ca87dc871f034243811802b4611636e664371d",
+    "integration/sh151-lynx-escort/FROZEN-SOURCES.json": "67f8ecd9e3cf55472dcd68ee8d77e7074320afd362acbf3f8c2e2563601e3af7",
+    "integration/sh151-lynx-escort/CONTACT-CANDIDATE.json": "116aefa89a1d899ddf40b095f050884c7cf9824a02e18cb6f989cae2c5753ca3",
+    "integration/sh151-lynx-escort/CONTACT-RESULT.json": "b941e8ed570ccc998cedc986e7bf5fb0d58baef14ab8cfdc241f46b30586b635",
+    "integration/sh151-lynx-escort/ORIGINAL-OWNERSHIP.json": "109e3ac78e1a9119f4c3e1ff793408e22eaf3e137902d924028ed082af153b16",
+    "integration/sh151-lynx-escort/RETAINED-OVERLAPS.json": "61e00a5534a70c56bf242d89e0c2e3f1808925d7859a048c96c43fae00eed839",
+    "integration/sh151-lynx-escort/CANDIDATE-FIDELITY.json": "69459f141477a9a81f3d07994f02539ebb10667911ba7ce4c8a795512e55b69a",
+    "integration/sh151-lynx-escort/SUPPORT-FAN.json": "78696ff0afcc70faa9abace231c4e79ff93ecb5c8b01732fa9ee9a3f86d784d4",
+    "integration/sh151-lynx-escort/SURFACE-FIT.json": "fb53ddc2165ef6a7c9e07eeffb3918567092fc1d6f6a7ca0eadd5af17fa66317",
+    "integration/sh151-lynx-escort/ARCHIVED-OVERLAPS.json": "92876eb15174fef79a30f8e3fb84e208ae0f02b9ecd6641ce4f03734454d9e60",
+    "integration/sh151-lynx-escort/CANDIDATE-TOPOLOGY-SURVEY.json": "7bffdbed779a31d534ba52cc079af7bcae8efda5df5c408ee7b370ec0cf26e83",
+    "integration/sh151-lynx-escort/CANDIDATE-FIT-LOCALIZATION.json": "7eaf082d8f1bd97d41c65e9c3f066f9ad861ab64d2fdccc580d665d5ac2bd9f8",
+    "integration/sh151-lynx-escort/REFERENCE-FIT-LOCALIZATION.json": "ef6d30de98141f84a67a4d033ed16ddee08037b44444753c74d4063add561464",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_lynx_escort.py": "488f3c901a6c70ec9ff8def9fecc777e6bef94838f65ace6913cacaadc9217df",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_lynx_escort.py": "dde14b65272524a7b13446d70a04ecb74444dfa07332fcee1642b310662f1a7d",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/rebuild_lynx_escort.py": "2efaa92f78f69125049b790c7e7fb639272c567a6555b5dba49ae07253ad7502",
+    "tools/verify_lynx_escort.py": "af28d1c74f93eb8fe5a23364ada9cb16d097514d344c9a981a61d19c44f89d2e",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh151/GENERATED-COLLISION.json": "5c77f1a76159fbbb35b273d83bb87a3fc85d4449b6c8da4cfcc300f41f67a00e",
+    "assets/fleet/sh151/SOURCE-GEOMETRY.json": "4884939c6f65801452ef4717a6e13b9bad4dc05062d84d6a00020bb7c0ec3b68"
+  }
+}

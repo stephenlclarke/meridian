@@ -495,3 +495,9 @@ tools/measure_owlet_mk_ii.py text eol=lf
 tools/prepare_owlet_mk_ii.py text eol=lf
 tools/rebuild_owlet_mk_ii.py text eol=lf
 tools/verify_owlet_mk_ii.py text eol=lf
+
+# Byte-pinned Lynx Escort replay programs.
+tools/measure_lynx_escort.py text eol=lf
+tools/prepare_lynx_escort.py text eol=lf
+tools/rebuild_lynx_escort.py text eol=lf
+tools/verify_lynx_escort.py text eol=lf
