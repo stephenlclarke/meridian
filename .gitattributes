@@ -375,3 +375,9 @@ tools/verify_puma.py text eol=lf
 tools/measure_mangalica.py text eol=lf
 tools/prepare_mangalica.py text eol=lf
 tools/verify_mangalica.py text eol=lf
+
+# Byte-pinned Gaur Trader replay programs.
+tools/measure_gaur_trader.py text eol=lf
+tools/prepare_gaur_trader.py text eol=lf
+tools/rebuild_gaur_trader.py text eol=lf
+tools/verify_gaur_trader.py text eol=lf
