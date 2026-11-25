@@ -16,6 +16,7 @@ pub mod goshawk_custom;
 pub mod harpy_assault;
 pub mod harpy_dropship;
 pub mod harpy_gunship;
+pub mod hobby_fighter;
 pub mod hyena;
 pub mod jackal;
 pub mod lanner;
