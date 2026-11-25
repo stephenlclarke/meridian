@@ -579,3 +579,9 @@ tools/measure_armadillo_miner.py text eol=lf
 tools/prepare_armadillo_miner.py text eol=lf
 tools/rebuild_armadillo_miner.py text eol=lf
 tools/verify_armadillo_miner.py text eol=lf
+
+# Byte-pinned Caracara Mk I replay programs.
+tools/measure_caracara_mk_i.py text eol=lf
+tools/prepare_caracara_mk_i.py text eol=lf
+tools/rebuild_caracara_mk_i.py text eol=lf
+tools/verify_caracara_mk_i.py text eol=lf
