@@ -434,3 +434,9 @@ tools/measure_falcon_mk_ii.py text eol=lf
 tools/prepare_falcon_mk_ii.py text eol=lf
 tools/rebuild_falcon_mk_ii.py text eol=lf
 tools/verify_falcon_mk_ii.py text eol=lf
+
+# Byte-pinned Falcon Mk III replay programs.
+tools/measure_falcon_mk_iii.py text eol=lf
+tools/prepare_falcon_mk_iii.py text eol=lf
+tools/rebuild_falcon_mk_iii.py text eol=lf
+tools/verify_falcon_mk_iii.py text eol=lf
