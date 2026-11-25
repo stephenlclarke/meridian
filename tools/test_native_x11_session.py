@@ -7,7 +7,7 @@ import signal
 import sys
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, call, patch
 
 
 SCRIPTS = Path(__file__).resolve().parents[1] / ".github/scripts"
@@ -32,6 +32,37 @@ class NativeX11EntrypointTests(unittest.TestCase):
             with self.assertRaisesRegex(SystemExit, "does not accept arguments"):
                 session.main()
         launch.assert_not_called()
+
+
+class NativeX11GeometryTests(unittest.TestCase):
+    def test_fragmented_geometry_uses_one_deadline_and_bounded_reads(self):
+        stream = Mock()
+        stream.read.side_effect = [b"1600 ", b"900", b"\n"]
+        with (patch.object(session.time, "monotonic", side_effect=[100, 101, 103, 104]),
+              patch.object(session.select, "select", return_value=([stream], [], [])) as ready):
+            self.assertEqual(session.read_geometry(stream), b"1600 900\n")
+        self.assertEqual(ready.call_args_list, [call([stream], [], [], n) for n in (9, 7, 6)])
+        self.assertEqual(stream.read.call_args_list,
+                         [call(session.MAX_GEOMETRY_BYTES - n) for n in (0, 5, 8)])
+
+    def test_partial_geometry_without_newline_times_out_on_original_deadline(self):
+        stream = Mock()
+        stream.read.return_value = b"1600 900"
+        with (patch.object(session.time, "monotonic", side_effect=[100, 101, 105]),
+              patch.object(session.select, "select", side_effect=[([stream], [], []), ([], [], [])]) as ready):
+            with self.assertRaisesRegex(RuntimeError, "Timed out waiting"):
+                session.read_geometry(stream)
+        self.assertEqual(ready.call_args_list, [call([stream], [], [], n) for n in (9, 5)])
+        stream.read.assert_called_once_with(session.MAX_GEOMETRY_BYTES)
+
+    def test_geometry_without_newline_cannot_exceed_record_size_limit(self):
+        stream = Mock()
+        stream.read.return_value = b"1" * session.MAX_GEOMETRY_BYTES
+        with patch.object(session.select, "select", return_value=([stream], [], [])) as ready:
+            with self.assertRaisesRegex(RuntimeError, "exceeded its size limit"):
+                session.read_geometry(stream)
+        self.assertEqual(ready.call_count, 1)
+        stream.read.assert_called_once_with(session.MAX_GEOMETRY_BYTES)
 
 
 @unittest.skipUnless(os.name == "posix", "X11 keeper uses POSIX pipes, signals and process reaping")
@@ -101,6 +132,14 @@ class NativeX11SessionTests(unittest.TestCase):
                 session.run_session(self.command(), self.log)
         self.assertFalse(self.launched.exists())
         self.assert_client_stopped()
+
+    def test_partial_geometry_at_eof_does_not_launch_and_reaps_keeper(self):
+        with patch.object(session, "X11_CLIENT", self.client("sys.stdout.write('1600 900'); sys.exit(0)")):
+            with self.assertRaisesRegex(RuntimeError, "did not establish a live display"):
+                session.run_session(self.command(), self.log)
+        self.assertFalse(self.launched.exists())
+        self.assert_client_stopped()
+        self.assertIn("1600 900", self.log.read_text())
 
     def test_readiness_timeout_does_not_launch_command(self):
         with (patch.object(session, "X11_CLIENT", self.client("sys.stdin.read()")),
