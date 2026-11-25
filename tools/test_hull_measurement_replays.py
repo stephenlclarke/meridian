@@ -101,6 +101,9 @@ class HullMeasurementReplays(unittest.TestCase):
     def assert_replays(self, suffix, required, modes):
         cases = list(measurement_cases(suffix, modes))
         self.assertTrue(required <= {folder.name for folder, _ in cases})
+        self.assert_pinned_replays(cases, modes)
+
+    def assert_pinned_replays(self, cases, modes):
         jobs = []
         for folder, script in cases:
             criteria = json.loads((folder / 'CRITERIA.json').read_bytes())
@@ -134,6 +137,10 @@ class HullMeasurementReplays(unittest.TestCase):
                         if active:
                             merge_worker_coverage(active, coverage_file, script)
                         self.assertEqual(actual, expected)
+
+    def test_condor_collision_fit_is_recomputed_byte_for_byte(self):
+        case = (ROOT / 'integration/sh055-condor', ROOT / 'tools/measure_condor.py')
+        self.assert_pinned_replays([case], ((('--collision',), 'COLLISION-FIT.json'),))
 
     def test_frozen_fit_and_difference_are_recomputed_byte_for_byte(self):
         self.assert_replays('', REQUIRED, MODES)

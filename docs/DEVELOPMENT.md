@@ -22,7 +22,7 @@ python -m pip install --only-binary :all: -r tools/requirements-goshawk-surface-
 
 Hosted tests use CPython 3.13 and verify SHA-256 hashes for the wheels listed in the CI requirements files. When updating a scientific package, update its development pin and the wheel hashes for all three hosted platforms.
 
-Compact hull measurement programs use `tools/measure_hull_name.py` alongside `integration/shNNN-hull-name/CRITERIA.json`. The Python measurement replay test discovers these pairs, runs both the normal and `--difference` CLI paths under coverage, and compares their output bytes with the frozen surface-fit and original-difference receipts. Keep both replay commands and the program and receipt hashes in the criteria record when adding another hull.
+Compact hull measurement programs use `tools/measure_hull_name.py` alongside `integration/shNNN-hull-name/CRITERIA.json`. The Python measurement replay test discovers these pairs, runs both the normal and `--difference` CLI paths under coverage, and compares their output bytes with the frozen surface-fit and original-difference receipts. Keep both replay commands and the program and receipt hashes in the criteria record when adding another hull. For Condor (SH055), CI also runs `tools/measure_condor.py --collision` and compares its output byte for byte with the pinned `COLLISION-FIT.json`.
 
 Linux desktop builds also require ALSA development headers (`libasound2-dev` on Debian/Ubuntu) and `pkg-config` for Rodio/CPAL. A live playback device is not required by the headless unit and Xvfb coverage paths.
 
