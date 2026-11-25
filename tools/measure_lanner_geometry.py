@@ -2,6 +2,7 @@
 
 import argparse
 from collections import Counter
+import hashlib
 import json
 import sys
 import tomllib
@@ -17,6 +18,8 @@ from vulture_mk_i_exact_fit import bound_fan, full_upper, grid_index
 
 
 EXPECTED_CHANGED = {0, 1, 6, 9, 10, 12, 13}
+REFERENCE_FANS_SHA = "a5d99c432b6dd1f9efdced1935dd501478199878177da440a0a776256b25f5d7"
+REFERENCE_DIAGNOSTIC_SHA = "489a52a30b1c20cb647f6fac4954b395f2b51f4a6567731ba383537b0c32191c"
 
 
 def section(model, part):
@@ -99,6 +102,85 @@ def make_fan(vertices, indices):
     return faces
 
 
+def array_sha256(values, dtype):
+    return hashlib.sha256(np.asarray(values, dtype=dtype).tobytes()).hexdigest()
+
+
+def load_reference_records(path, certificate_sha, diagnostic_sha, mode, scaled, support_ids, count, label):
+    raw = path.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != certificate_sha:
+        raise ValueError(f"Changed {label} reference triangulation certificate")
+    document = json.loads(raw)
+    if (not isinstance(document, dict) or set(document) != {"schema", "derivedFromDiagnosticSha256", "modes"}
+            or type(document["schema"]) is not int or document["schema"] != 1
+            or document["derivedFromDiagnosticSha256"] != diagnostic_sha):
+        raise ValueError(f"Invalid {label} reference triangulation schema or provenance")
+    modes = document["modes"]
+    if not isinstance(modes, dict) or set(modes) != {"archive", "candidate"}:
+        raise ValueError(f"Missing or extra {label} reference triangulation mode")
+    for entry in modes.values():
+        if (not isinstance(entry, dict) or set(entry) != {"scaledSha256", "groupSha256", "supports"}
+                or not isinstance(entry["supports"], list) or len(entry["supports"]) != count):
+            raise ValueError(f"Missing, extra or malformed {label} reference support records")
+    entry = modes[mode]
+    if (entry["scaledSha256"] != array_sha256(scaled, "<f8")
+            or entry["groupSha256"] != array_sha256(support_ids, "<i8")):
+        raise ValueError(f"{label} reference triangulation point stream or membership changed")
+    return entry["supports"]
+
+
+def reference_records(mode, scaled, support_ids, count):
+    return load_reference_records(INTEGRATION / "REFERENCE-FANS.json", REFERENCE_FANS_SHA, REFERENCE_DIAGNOSTIC_SHA,
+                                  mode, scaled, support_ids, count, "Lanner")
+
+
+def validated_reference_fan(record, key, scaled, point_ids, label="Lanner"):
+    """Revalidate the preserved outward fan against exactly the original support points."""
+    if (not isinstance(record, dict) or set(record) != {"part", "occurrence", "sourceIndices", "pointsSha256", "triangles"}
+            or type(record["occurrence"]) is not int or (record["part"], record["occurrence"]) != key):
+        raise ValueError(f"Malformed or misplaced {label} reference support {key}")
+    source_indices = record["sourceIndices"]
+    points = scaled[point_ids]
+    if (not isinstance(source_indices, list) or any(type(i) is not int for i in source_indices)
+            or source_indices != point_ids.tolist() or record["pointsSha256"] != array_sha256(points, "<f8")):
+        raise ValueError(f"{label} reference support point identity changed: {key}")
+    triangles = record["triangles"]
+    if (not isinstance(triangles, list) or not triangles
+            or any(not isinstance(face, list) or len(face) != 3
+                   or any(type(i) is not int or not 0 <= i < len(point_ids) for i in face)
+                   or len(set(face)) != 3 for face in triangles)):
+        raise ValueError(f"Invalid or out-of-support {label} reference triangle: {key}")
+    if (triangles != sorted(triangles) or any(face[0] != min(face) for face in triangles)
+            or len({tuple(sorted(face)) for face in triangles}) != len(triangles)):
+        raise ValueError(f"Duplicate or noncanonical {label} reference triangle: {key}")
+    used = {i for face in triangles for i in face}
+    _, first = np.unique(points, axis=0, return_index=True)
+    if not used <= set(first.tolist()):
+        raise ValueError(f"{label} reference fan uses a duplicate point representative: {key}")
+    # A single closed spherical surface is required, as well as the exact
+    # outward orientation, paired edges and sub-micrometre radial bound below.
+    edges = {tuple(sorted((a, b))) for a, b, c in triangles for a, b in ((a, b), (b, c), (c, a))}
+    neighbours = {i: set() for i in used}
+    for a, b in edges:
+        neighbours[a].add(b)
+        neighbours[b].add(a)
+    reached, pending = set(), [next(iter(used))]
+    while pending:
+        vertex = pending.pop()
+        if vertex not in reached:
+            reached.add(vertex)
+            pending.extend(neighbours[vertex] - reached)
+    if reached != used:
+        raise ValueError(f"Disconnected {label} reference topology: {key}")
+    if len(used) - len(edges) + len(triangles) != 2:
+        raise ValueError(f"{label} reference topology is not a closed sphere: {key}")
+    try:
+        bound_fan(points, triangles)
+    except AssertionError as error:
+        raise ValueError(f"{label} reference fan failed exact outward or radial proof: {key}") from error
+    return point_ids[np.asarray(triangles, dtype=np.intp)].tolist()
+
+
 def envelope_fit(candidate_path):
     source = tomllib.loads((ORIGINAL / "resource.toml").read_text())
     parts = json.loads((INTEGRATION / "ORIGINAL-OWNERSHIP.json").read_bytes())["models"]
@@ -110,6 +192,9 @@ def envelope_fit(candidate_path):
     slots, meshes = assemble((source["design"], parts["design"]["parts"], 12), native)
     scaled = np.array(meshes[0]["vertices"] + meshes[1]["vertices"]) * float(SCALE)
     support_ids = np.array(meshes[0]["groups"] + meshes[1]["groups"])
+    records = reference_records("candidate" if candidate else "archive", scaled, support_ids, len(slots))
+    fans = [validated_reference_fan(record, key, scaled, np.flatnonzero(support_ids == identifier))
+            for (key, identifier), record in zip(slots.items(), records, strict=True)]
     targets = {"detailed": 1400, "archiveNative": 1400}
     original_native = source["nativeDesign"]
     references = {
@@ -124,9 +209,7 @@ def envelope_fit(candidate_path):
         for lod, (points, faces) in references.items()
     }
     rows = []
-    for (name, ordinal), identifier in slots.items():
-        point_ids = np.flatnonzero(support_ids == identifier)
-        fan = make_fan(scaled, point_ids)
+    for (name, ordinal), fan in zip(slots, fans, strict=True):
         rows.append({
             "part": name,
             "occurrence": ordinal,
