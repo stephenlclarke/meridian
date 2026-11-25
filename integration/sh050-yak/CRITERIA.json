@@ -65,6 +65,22 @@
     "archiveNative": 1771,
     "candidateNative": 2243
   },
+  "referenceTriangulation": {
+    "path": "integration/sh050-yak/REFERENCE-FANS.json",
+    "scope": "Derived whole reference triangulation for exact replay; no original artwork or stored numerical bounds",
+    "sourceRevision": "888fc271d5e05301718db05cdb1ebd112c6d3be3",
+    "sourceMeasurementSha256": "45640aac53849a309478c6b206542111728677c16054a819444120c4da591eb3",
+    "originalSharedMeasurementSha256": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "sourceSharedMeasurementSha256": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "sourceSharedDependencyNote": "The original and source make_fan function ASTs are identical; the exact queued source uses the corrected shared measurement script.",
+    "sourceDiagnosticScriptSha256": "28efab2b6252d6f4896172a6880154dbf7dae35088d4add781150ad21b9d0330",
+    "sourceDiagnosticOutputSha256": "e39b396239652c27bd33e61666cea1c9c6b797fbc4f9bee909c11c05db05fe39",
+    "certificateExtractionScriptSha256": "e158bab78464e2a9e2e3a25e6cad8bf456c864ef5692dc5b08509ff7523dc75e",
+    "sourceEnvironment": {"platform": "macOS arm64", "python": "3.14.7", "numpy": "2.5.5", "scipy": "1.18.1", "trimesh": "5.2.1"},
+    "archive": {"supports": 162, "triangles": 3304, "supportPointIndices": 2560},
+    "candidate": {"supports": 162, "triangles": 3304, "supportPointIndices": 2336},
+    "validation": "Bind complete scaled point streams, memberships and support-local indices, then use the shared original outward fan and unchanged radial proof before recomputing every adaptive bound."
+  },
   "engineering": {
     "sourceReference": "finite-intrinsic-empty-yak",
     "massKg": 74803
@@ -79,6 +95,7 @@
     "integration/sh050-yak/ARCHIVE-FIT.json": "df3b28354368e3f0b93b4cfd6cfd4563bb4e794b0f54c1c36edae62a06adf164",
     "integration/sh050-yak/candidate-fit.json": "11936297083742ab3654b055e35d9cc8d24e8b9f5277f6134167c3edf7304fb4",
     "integration/sh050-yak/candidate-fidelity.json": "c12de44f315599d4d5549e5971cdcd5b39c1acdad2f82fb6873eb220bb70c78e",
+    "integration/sh050-yak/REFERENCE-FANS.json": "57aa9f8a45b240ecbcadb01db794092043492f3dd0184ebae19c19f2d4dffbcf",
     "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
     "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
     "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
@@ -88,11 +105,11 @@
     "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
     "tools/lanner_art_mesh.py": "f5cb59dcc0940ee02e039ba5218eb42c638ba0fed692f4b2216699620aba334b",
     "tools/prepare_lanner_geometry.py": "3e1dc0ba15e493f8d53f385c7e2e166420e0082228b355547b3810fb028cdbc8",
-    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
     "tools/yak_art_mesh.py": "bcad55f6531a55e2551c0342e81ffcf3561d0839e555a985acddc8e58bde6b6d",
     "tools/prepare_yak_geometry.py": "9d8b3df2aa0c280f8851cc6e49f48a035f197da98432d1392cebd52d1d2ac215",
     "tools/verify_yak_geometry.py": "23033fc0271d4168ca3742e2104df6607837f6d42ffa48750559084a51f5825c",
-    "tools/measure_yak_geometry.py": "45640aac53849a309478c6b206542111728677c16054a819444120c4da591eb3",
+    "tools/measure_yak_geometry.py": "8f47535397a830c0346841b13debf3bfbec1769a91db0e7ba8e9753dd6e563bc",
     "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
   },
   "byteReplay": {

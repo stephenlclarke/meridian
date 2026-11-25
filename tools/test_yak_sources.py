@@ -1,13 +1,20 @@
 """Verify the two original Yak meshes, separate candidate and grouped artwork."""
 
+from copy import deepcopy
 from fractions import Fraction
 import hashlib
 import json
+from pathlib import Path
 import struct
+import tempfile
 import tomllib
 import unittest
 from unittest.mock import patch
 
+import numpy as np
+
+import measure_lanner_geometry as shared_fans
+import measure_yak_geometry as measure
 import prepare_yak_geometry as prep
 import verify_yak_geometry as proof
 
@@ -95,6 +102,45 @@ class YakSources(unittest.TestCase):
         with patch.object(prep, "replace_output", side_effect=AssertionError("check rewrote stream")):
             with patch("sys.argv", ["prepare_yak_geometry", "--check"]):
                 prep.main()
+
+    def test_both_complete_reference_fans_revalidate_original_points_without_qhull(self):
+        source = tomllib.loads((prep.ORIGINAL / "resource.toml").read_text())
+        ownership = json.loads((prep.INTEGRATION / "ORIGINAL-OWNERSHIP.json").read_bytes())["models"]
+        candidate = json.loads((prep.ORIGINAL / "SH050-candidate.json").read_bytes())
+        for mode, native in (
+            ("archive", (source["nativeDesign"], ownership["nativeDesign"]["parts"])),
+            ("candidate", (candidate["nativeCandidate"], candidate["parts"])),
+        ):
+            slots, meshes = measure.assemble((source["design"], ownership["design"]["parts"]), native)
+            scaled = np.array(meshes[0]["vertices"] + meshes[1]["vertices"]) * float(prep.SCALE)
+            groups = np.array(meshes[0]["groups"] + meshes[1]["groups"])
+            records = measure.reference_records(mode, scaled, groups, len(slots))
+            with (self.subTest(mode=mode),
+                  patch.object(shared_fans, "ConvexHull", side_effect=AssertionError("unfrozen triangulation")),
+                  patch.object(shared_fans, "bound_fan", wraps=shared_fans.bound_fan) as outward):
+                for (key, identifier), record in zip(slots.items(), records, strict=True):
+                    point_ids = np.flatnonzero(groups == identifier)
+                    actual = measure.validated_reference_fan(record, key, scaled, point_ids, "Yak")
+                    self.assertEqual(actual, [[record["sourceIndices"][i] for i in face] for face in record["triangles"]])
+                self.assertEqual(outward.call_count, 162)
+
+            key, identifier = tuple(slots.items())[5]
+            point_ids = np.flatnonzero(groups == identifier)
+            tampered = deepcopy(records[5])
+            tampered["triangles"][0][0] = len(point_ids)
+            with patch.object(shared_fans, "bound_fan") as outward:
+                with self.assertRaisesRegex(ValueError, "out-of-support Yak"):
+                    measure.validated_reference_fan(tampered, key, scaled, point_ids, "Yak")
+                outward.assert_not_called()
+            with patch.object(measure, "INTEGRATION", shared_fans.INTEGRATION):
+                with self.assertRaisesRegex(ValueError, "Changed Yak reference triangulation"):
+                    measure.reference_records(mode, scaled, groups, len(slots))
+            raw = (prep.INTEGRATION / "REFERENCE-FANS.json").read_bytes()
+            with tempfile.TemporaryDirectory() as folder:
+                (Path(folder) / "REFERENCE-FANS.json").write_bytes(raw + b" ")
+                with patch.object(measure, "INTEGRATION", Path(folder)):
+                    with self.assertRaisesRegex(ValueError, "Changed Yak reference triangulation"):
+                        measure.reference_records(mode, scaled, groups, len(slots))
 
 
 if __name__ == "__main__":
