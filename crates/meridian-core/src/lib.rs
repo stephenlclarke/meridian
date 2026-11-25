@@ -16,6 +16,7 @@ pub mod baza_mk_ii;
 pub mod carabao_freighter;
 pub mod carabao_highliner;
 pub mod caracal_scout;
+pub mod cavy_racer;
 pub mod celestial;
 pub mod condor;
 pub mod docking;

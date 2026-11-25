@@ -276,6 +276,10 @@ Ox preserves its original 688 detailed and 376 native faces. Both originals reta
 
 Ox Mk II preserves its own 688 detailed and 376 native faces. Both originals retain the same 13 measured overlap pairs. The seven guarded routes include the service gap between the original freight decks. [Ox Mk II source and evidence](OX-MK-II-SOURCE.md)
 
+## Cavy Racer catalogue source
+
+Cavy Racer preserves both original meshes at 3,084 detailed and 160 native faces. Both contain the same eight measured structural overlap pairs. Seven swept guards include the gap between the aft nozzles. [Cavy Racer source and evidence](CAVY-RACER-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)

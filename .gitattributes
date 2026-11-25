@@ -327,3 +327,8 @@ tools/verify_ox.py text eol=lf
 tools/measure_ox_mk_ii.py text eol=lf
 tools/prepare_ox_mk_ii.py text eol=lf
 tools/verify_ox_mk_ii.py text eol=lf
+
+# Byte-pinned Cavy Racer replay programs.
+tools/measure_cavy_racer.py text eol=lf
+tools/prepare_cavy_racer.py text eol=lf
+tools/verify_cavy_racer.py text eol=lf
