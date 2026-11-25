@@ -20,6 +20,7 @@ pub mod docking;
 pub mod dzo;
 pub mod dzo_mk_ii;
 pub mod eagle_cruiser;
+pub mod elephant;
 pub mod elk;
 pub mod equipment;
 pub mod erne_corvette;
