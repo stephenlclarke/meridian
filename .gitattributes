@@ -282,3 +282,8 @@ crates/meridian-core/src/**/*.rs text eol=lf
 integration/sh001-mule/*.json text eol=lf
 integration/sh001-mule/*.patch -text
 integration/sh008-goshawk/*.json text eol=lf
+
+# Byte-pinned Aurochs replay programs.
+tools/measure_aurochs.py text eol=lf
+tools/prepare_aurochs.py text eol=lf
+tools/verify_aurochs.py text eol=lf

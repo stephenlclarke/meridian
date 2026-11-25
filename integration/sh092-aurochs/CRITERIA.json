@@ -1,0 +1,182 @@
+{
+  "hull": "SH092 Aurochs",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh092/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh092-aurochs/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "40000/4221",
+  "faces": {
+    "detailed": 2504,
+    "archivedNative": 720,
+    "candidateNative": 444,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-aurochs",
+    "massKg": 37180
+  },
+  "supportGroups": 38,
+  "nativeCargoCapsuleVerticalSeparationMillimetres": 284,
+  "minimumRouteClearanceMillimetres": 772,
+  "sourceContactCounts": {
+    "overlap": 12
+  },
+  "standaloneCreatorReplay": "integration/sh092-aurochs/CREATOR-REPLAY.json",
+  "fitUpperMillimetres": {
+    "detailed": 2524,
+    "archivedNative": 2524,
+    "candidateNative": 2882
+  },
+  "hullStudio": {
+    "definition": "integration/sh092-aurochs/AUROCHS-STUDIO.json",
+    "bytes": 412684,
+    "sha256": "9884197c893a334f4385d4b05dbe0d20bfd6f80d345d1b6d2eb653b36fa51f50",
+    "supports": 38,
+    "probes": 7,
+    "detail": "2,504 original detailed faces",
+    "native": "444 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 412684,
+        "sha256": "9884197c893a334f4385d4b05dbe0d20bfd6f80d345d1b6d2eb653b36fa51f50"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 2504,
+      "nativeTriangles": 444,
+      "supportGroups": 38,
+      "engineeringReference": "finite-intrinsic-empty-aurochs",
+      "massKg": 37180,
+      "receiptFiles": {
+        "aurochs.hull.json": {
+          "bytes": 412683,
+          "sha256": "24a3b4f767d0a8a4b182ed952ed287ffe04b6326dee9b7d50ab26bc354d61269"
+        },
+        "aurochs-repeat.hull.json": {
+          "bytes": 412683,
+          "sha256": "24a3b4f767d0a8a4b182ed952ed287ffe04b6326dee9b7d50ab26bc354d61269"
+        },
+        "studio.stdout.json": {
+          "bytes": 107875,
+          "sha256": "a9b097652bf48cc84536b0dbf07a4cb9b4863df4bbd62533f9bd10c2a93af15d"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 107875,
+          "sha256": "a9b097652bf48cc84536b0dbf07a4cb9b4863df4bbd62533f9bd10c2a93af15d"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "ab8b033a023aea5e0e4f5db9dd8da085f8447b548be1bb0a95b4bd3dcebb1489"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "upper-aft-approach",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "port-forward-between-capsule-heights",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-forward-between-capsule-heights",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_aurochs.py --check",
+      "python3 -B tools/verify_aurochs.py | cmp - integration/sh092-aurochs/CONTACT-RESULT.json",
+      "python3 -B tools/measure_aurochs.py | cmp - integration/sh092-aurochs/SURFACE-FIT.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T03:05:56Z",
+    "finishedUtc": "2026-11-25T03:06:03Z",
+    "log": {
+      "bytes": 304,
+      "sha256": "776d4a3e30385c5e607ad870d2bef4ac7c73c8f3f9f117f9a77c0c2dbaed93e8"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "integration/sh092-aurochs/AUROCHS-STUDIO.json": "9884197c893a334f4385d4b05dbe0d20bfd6f80d345d1b6d2eb653b36fa51f50",
+    "integration/sh092-aurochs/FROZEN-SOURCES.json": "5df60fb35b05f39a3011f5213cc3a3ba3049c209e56ae28a55ce00cb87924217",
+    "integration/sh092-aurochs/CONTACT-CANDIDATE.json": "16df956a4170de6beec543a98884bdee304a700bb69320383bf72118ba85d3e2",
+    "integration/sh092-aurochs/CONTACT-RESULT.json": "991009ec459730182f7abb4eede0542683fcf57d7c55af0a49d578d7f4a9ec99",
+    "integration/sh092-aurochs/ORIGINAL-OWNERSHIP.json": "0ec0447fe2ebee2a6e07623527d15149a7c4f5cd40818becccc7292a1429fc9a",
+    "integration/sh092-aurochs/CANDIDATE-CONTACTS-AND-CLEARANCE.json": "e28ed4b355c133215c02a92e4a2c08b66cc0f1d0f9d7bc69d5d5a5618d75bdeb",
+    "integration/sh092-aurochs/CANDIDATE-FIDELITY.json": "0a7c50c99bd6d423e01911bfc596b5c1977bf6eb01ae63057c41ef7ed75bde45",
+    "integration/sh092-aurochs/SUPPORT-FAN.json": "90fc90ad93f49aeb3429d7595df78048132378c5f98d7b6c22a007290ae9431f",
+    "integration/sh092-aurochs/SURFACE-FIT.json": "9c74a344641a5679d41858fc250ce5b4a6d08a1e0f8491c5e61b4e858dac0a21",
+    "integration/sh092-aurochs/CREATOR-REPLAY.json": "f30f763f06ec1db0f4c2d86801a27473fc75d0e5a6ab29322702aa4b9b1160b2",
+    "assets/fleet/sh092/GENERATED-COLLISION.json": "45edabcc0317e11a8b5e46176136e790536877ccdcd8ae0037fca6c9bf0cd256",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_aurochs.py": "4cd22f7c86fe8986a392c1086e91c377dacda7cace72300f41a9d985aa3a8660",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_aurochs.py": "12a095a644e6dda0688cf2ce17290a9a3b4be9379bff4280d08c9b387dcff903",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/verify_aurochs.py": "d79bbb4d5d87c387c0be0e4bb06a41e1cb4a428cab77bfc8161fce87938a1617",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6"
+  }
+}

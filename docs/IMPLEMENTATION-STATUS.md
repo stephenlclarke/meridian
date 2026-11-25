@@ -240,6 +240,10 @@ Gopher preserves its original 4,696 detailed and 212 native faces. Both meshes r
 
 Elephant preserves its original 4,368 detailed and 1,112 native faces. Its separate 512-face inspection candidate retains the shield shoulders, 19 exact original parts and all 22 measured original joins. [Elephant source and evidence](ELEPHANT-SOURCE.md)
 
+## Aurochs catalogue source
+
+Aurochs preserves its original 2,504 detailed and 720 native faces. Its separate 444-face inspection candidate preserves the staggered cargo capsules, 11 exact original parts and all 12 measured original overlaps. [Aurochs source and evidence](AUROCHS-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)
