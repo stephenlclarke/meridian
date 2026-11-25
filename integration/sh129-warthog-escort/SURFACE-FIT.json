@@ -1,0 +1,125 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 2400,
+    "native": 4500
+  },
+  "fullUpperMillimetres": {
+    "detailed": 2394,
+    "native": 4497
+  },
+  "pieces": {
+    "pressure body": {
+      "detailed": 1589,
+      "native": 3158
+    },
+    "port outrigger": {
+      "detailed": 1565,
+      "native": 4110
+    },
+    "port rail": {
+      "detailed": 1999,
+      "native": 4497
+    },
+    "port nozzle": {
+      "detailed": 2356,
+      "native": 3915
+    },
+    "starboard outrigger": {
+      "detailed": 1565,
+      "native": 4110
+    },
+    "starboard rail": {
+      "detailed": 1999,
+      "native": 4497
+    },
+    "starboard nozzle": {
+      "detailed": 2356,
+      "native": 3915
+    },
+    "forward upper deck": {
+      "detailed": 2394,
+      "native": 4464
+    },
+    "port upper housing": {
+      "detailed": 1961,
+      "native": 3901
+    },
+    "port upper brace": {
+      "detailed": 1016,
+      "native": 1016
+    },
+    "starboard upper housing": {
+      "detailed": 1961,
+      "native": 3901
+    },
+    "starboard upper brace": {
+      "detailed": 1016,
+      "native": 1016
+    },
+    "canopy": {
+      "detailed": 450,
+      "native": 1392
+    },
+    "canopy ridge": {
+      "detailed": 339,
+      "native": 1843
+    },
+    "port service line": {
+      "detailed": 260,
+      "native": 641
+    },
+    "port instrument housing": {
+      "detailed": 668,
+      "native": 1831
+    },
+    "port louvre 1": {
+      "detailed": 250,
+      "native": 1866
+    },
+    "port louvre 2": {
+      "detailed": 250,
+      "native": 1866
+    },
+    "port louvre 3": {
+      "detailed": 250,
+      "native": 1866
+    },
+    "port louvre 4": {
+      "detailed": 250,
+      "native": 1866
+    },
+    "port louvre 5": {
+      "detailed": 250,
+      "native": 1866
+    },
+    "starboard service line": {
+      "detailed": 260,
+      "native": 641
+    },
+    "starboard instrument housing": {
+      "detailed": 668,
+      "native": 1831
+    },
+    "starboard louvre 1": {
+      "detailed": 250,
+      "native": 1866
+    },
+    "starboard louvre 2": {
+      "detailed": 250,
+      "native": 1866
+    },
+    "starboard louvre 3": {
+      "detailed": 250,
+      "native": 1866
+    },
+    "starboard louvre 4": {
+      "detailed": 250,
+      "native": 1866
+    },
+    "starboard louvre 5": {
+      "detailed": 250,
+      "native": 1866
+    }
+  }
+}
