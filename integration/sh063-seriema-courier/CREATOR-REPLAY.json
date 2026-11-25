@@ -1,0 +1,31 @@
+{
+  "matchStatus": "MISMATCH",
+  "pinnedRecipeOutput": {
+    "vertices": 272,
+    "faces": 464,
+    "parts": 20,
+    "bytes": 175387,
+    "sha256": "07e35800a66cb50bb82a8c38c8e4e7cde1a17257a2c238aae25cc94d8614902a"
+  },
+  "legacyRecipeTests": {
+    "passed": 2,
+    "bytes": 472,
+    "sha256": "6076d207e1d1c77413f78f89ca6787db89cbbd44874c927fcb5fbb5fb8640f14"
+  },
+  "frozenCollisionArtifact": {
+    "vertices": 296,
+    "faces": 512,
+    "parts": 20,
+    "bytes": 65916,
+    "sha256": "01fe5a05526d0380715e7187992f447c66277d3ed708daf3655204a5d10a394d"
+  },
+  "countMatchedVariant": {
+    "vertices": 296,
+    "faces": 512,
+    "parts": 20,
+    "streamMatch": false,
+    "comparison": "CREATOR-ARCHIVE-COMPARISON.json",
+    "bytes": 1971,
+    "sha256": "05fe9ca633867de632fe810ac4baa15ca3b678246971ff3198beb311a6bf4e2e"
+  }
+}
