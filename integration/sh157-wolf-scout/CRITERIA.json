@@ -1,0 +1,217 @@
+{
+  "hull": "SH157 Wolf Scout",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh157/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh157-wolf-scout/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "1875/214",
+  "faces": {
+    "detailed": 2028,
+    "archivedNative": 764,
+    "candidateNative": 512,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-wolf-scout",
+    "massKg": 36375
+  },
+  "supportGroups": 93,
+  "candidateComponentInventory": {
+    "originalPartsRepresented": 29,
+    "unalteredNativeParts": 13,
+    "recessedWells": 10,
+    "partsUsingSelectedOriginalVertices": 6,
+    "sampledArcSections": 0,
+    "arcSeamVertices": 0
+  },
+  "minimumRouteClearanceMillimetres": 935,
+  "sourceContactCounts": {
+    "overlap": 21,
+    "unchangedNativeParts": 13
+  },
+  "candidateRebuild": "tools/rebuild_wolf_scout.py",
+  "fitUpperMillimetres": {
+    "detailed": 2466,
+    "archivedNative": 2940,
+    "candidateNative": 2940
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 1664,
+      "upperCeiling": 1685
+    },
+    "candidateToArchive": {
+      "lowerFloor": 280,
+      "upperCeiling": 306
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 1664,
+      "upperCeiling": 1685
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 589,
+      "upperCeiling": 611
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh157-wolf-scout/WOLF-SCOUT-STUDIO.json",
+    "bytes": 340396,
+    "sha256": "e73138f80091152c274218b12b8b9e12c52ccc48790676fc73a897c7325acc3f",
+    "supports": 93,
+    "probes": 7,
+    "detail": "2,028 original detailed faces",
+    "native": "512 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 340396,
+        "sha256": "e73138f80091152c274218b12b8b9e12c52ccc48790676fc73a897c7325acc3f"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 2028,
+      "nativeTriangles": 512,
+      "supportGroups": 93,
+      "engineeringReference": "finite-intrinsic-empty-wolf-scout",
+      "massKg": 36375,
+      "receiptFiles": {
+        "wolf-scout.hull.json": {
+          "bytes": 340395,
+          "sha256": "05e0476656114d1eae8de93d41d7606d39aac5008fada5438c5fcf7a9a73a920"
+        },
+        "wolf-scout-repeat.hull.json": {
+          "bytes": 340395,
+          "sha256": "05e0476656114d1eae8de93d41d7606d39aac5008fada5438c5fcf7a9a73a920"
+        },
+        "studio.stdout.json": {
+          "bytes": 97081,
+          "sha256": "9352c783cff9daaea8b8dd33bc46b439e6a50f37cdfcd8c147da3763cae097ca"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 97081,
+          "sha256": "9352c783cff9daaea8b8dd33bc46b439e6a50f37cdfcd8c147da3763cae097ca"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "a70d98ee9fc91c176077388af11674c460aa00f0dca1301a48613e331bc63b69"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "under-pressure-envelope",
+          "passed": true
+        },
+        {
+          "name": "above-port-lateral-structure",
+          "passed": true
+        },
+        {
+          "name": "above-starboard-lateral-structure",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_wolf_scout.py --check",
+      "python3 -B tools/rebuild_wolf_scout.py",
+      "python3 -B tools/verify_wolf_scout.py | cmp - integration/sh157-wolf-scout/CONTACT-RESULT.json",
+      "python3 -B tools/measure_wolf_scout.py | cmp - integration/sh157-wolf-scout/SURFACE-FIT.json",
+      "python3 -B tools/measure_wolf_scout.py --fidelity | cmp - integration/sh157-wolf-scout/CANDIDATE-FIDELITY.json",
+      "python3 -B tools/measure_wolf_scout.py --directions | cmp - integration/sh157-wolf-scout/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_wolf_scout.py --reference-directions | cmp - integration/sh157-wolf-scout/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T08:15:01Z",
+    "finishedUtc": "2026-11-25T08:15:51Z",
+    "log": {
+      "bytes": 713,
+      "sha256": "d7290cb4c3aa24e154c7fcdc80a2988f7a9b51184801fdea87d4382ef1042e43"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "integration/sh157-wolf-scout/WOLF-SCOUT-STUDIO.json": "e73138f80091152c274218b12b8b9e12c52ccc48790676fc73a897c7325acc3f",
+    "integration/sh157-wolf-scout/FROZEN-SOURCES.json": "0368cc4e2570fd26937e6d86055215b9af6eb7248e0d84444623b72a632353fd",
+    "integration/sh157-wolf-scout/CONTACT-CANDIDATE.json": "88f1a723f4ff56d084265ae508dc78048d75b35cb9510e4dbae25b4a33f43f2e",
+    "integration/sh157-wolf-scout/CONTACT-RESULT.json": "ea227fd8386fbd33c7af23b42d09aac07f145a6e576fc1b701890b5f9e5161a7",
+    "integration/sh157-wolf-scout/ORIGINAL-OWNERSHIP.json": "26ab255379875fe33fd05177a5612ebdfbcfbcb707062d015874431aff4d1ef4",
+    "integration/sh157-wolf-scout/RETAINED-OVERLAPS.json": "7705e4d5674d49240bdd64bcea879786ce325c16fff6a9a1527d8598d301bc2e",
+    "integration/sh157-wolf-scout/CANDIDATE-FIDELITY.json": "355d6029f8a585dbe8f3295b2feb9c3fa7ccfb5ad32458590e89bf10ecec36e9",
+    "integration/sh157-wolf-scout/SUPPORT-FAN.json": "3169b3a1c6d27732d702e363df49db00a5ba5a24e6feebb37905355be0e2fb2b",
+    "integration/sh157-wolf-scout/SURFACE-FIT.json": "59593ddd98c822fe890d70197bfcf5e6a810335a3426039dd7f52b0314d6bff7",
+    "integration/sh157-wolf-scout/ARCHIVED-OVERLAPS.json": "7fd27ef27a035684dc0655697c67552347f1976be736c27f153c74d06b27fde1",
+    "integration/sh157-wolf-scout/CANDIDATE-TOPOLOGY-SURVEY.json": "b217de4b6a0f358ddd99ce1df9ae4245884594b31bed4078467ac7b4d9198029",
+    "integration/sh157-wolf-scout/CANDIDATE-FIT-LOCALIZATION.json": "47f649fe710a5f684b48b177366ddc06a1c813559f95c03e64ba80656c00b57d",
+    "integration/sh157-wolf-scout/REFERENCE-FIT-LOCALIZATION.json": "d0402f3da09e0605092d7082873c51ee61e4c9ede99d7bcc6cc7216d1dc36565",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_wolf_scout.py": "b980d925ef8d88b10e0e8c4492a98563133874c617cf3facd8eed9888f1d4aa3",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_wolf_scout.py": "4e8703c48ddfe9b9a07b1402bbf976c769ecc3d5f0c703c2b935daeae797ca21",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/rebuild_wolf_scout.py": "1c052c66e68ae791df4908add14f51d6e5e5dd5a174d3a6e6b3733f88239ae71",
+    "tools/verify_wolf_scout.py": "62e7e1d00bb6b3a5ee898fd9e14150e8c7fd443308c75e65a84ab50fe617844d",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh157/GENERATED-COLLISION.json": "b2a67cc2ad5d85650dfe44d64ca23e1900ca11acce01bb939a8a4da4ba3aadbf",
+    "assets/fleet/sh157/SOURCE-GEOMETRY.json": "3e3c424f52c05fe1e3fefdb15d07b0f067d9332805ac09acd6aea7822568e5d2"
+  }
+}
