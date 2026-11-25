@@ -49,6 +49,7 @@ pub mod jaguar;
 pub mod laggar;
 pub mod lanner;
 pub mod llama;
+pub mod magpie;
 pub mod mining;
 pub mod moose_clipper;
 pub mod mule;

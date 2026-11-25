@@ -349,3 +349,9 @@ tools/measure_tapir_mk_ii.py text eol=lf
 tools/prepare_tapir_mk_ii.py text eol=lf
 tools/rebuild_tapir_mk_ii.py text eol=lf
 tools/verify_tapir_mk_ii.py text eol=lf
+
+# Byte-pinned Magpie replay programs.
+tools/measure_magpie.py text eol=lf
+tools/prepare_magpie.py text eol=lf
+tools/rebuild_magpie.py text eol=lf
+tools/verify_magpie.py text eol=lf

@@ -1,0 +1,222 @@
+{
+  "hull": "SH107 Magpie",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh107/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh107-magpie/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "1875/152",
+  "faces": {
+    "detailed": 3484,
+    "archivedNative": 964,
+    "candidateNative": 512,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-magpie",
+    "massKg": 53082
+  },
+  "supportGroups": 57,
+  "archivedProposal": {
+    "source": "integration/sh107-magpie/ARCHIVED-COLLISION.json",
+    "glazingGapMillimetres": 117,
+    "repairedJoin": [
+      0,
+      19
+    ],
+    "sourceVertexExchange": [
+      411,
+      377
+    ]
+  },
+  "minimumRouteClearanceMillimetres": 425,
+  "sourceContactCounts": {
+    "overlap": 22,
+    "unchangedNativeParts": 19
+  },
+  "candidateRebuild": "tools/rebuild_magpie.py",
+  "fitUpperMillimetres": {
+    "detailed": 1997,
+    "archivedNative": 2727,
+    "candidateNative": 3300
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 1393,
+      "upperCeiling": 1412
+    },
+    "candidateToArchive": {
+      "lowerFloor": 1271,
+      "upperCeiling": 1293
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 2093,
+      "upperCeiling": 2113
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 1300,
+      "upperCeiling": 1324
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh107-magpie/MAGPIE-STUDIO.json",
+    "bytes": 575285,
+    "sha256": "d9f5776791858ddb30ca0c370def2f9a4d6c9520af9bdc39e90da0ddd6dd00c9",
+    "supports": 57,
+    "probes": 7,
+    "detail": "3,484 original detailed faces",
+    "native": "512 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 575285,
+        "sha256": "d9f5776791858ddb30ca0c370def2f9a4d6c9520af9bdc39e90da0ddd6dd00c9"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3484,
+      "nativeTriangles": 512,
+      "supportGroups": 57,
+      "engineeringReference": "finite-intrinsic-empty-magpie",
+      "massKg": 53082,
+      "receiptFiles": {
+        "magpie.hull.json": {
+          "bytes": 575284,
+          "sha256": "cb65691b13371f38edbd375713cd23ca38d2da3f8e3cbf2ad7e4148855393908"
+        },
+        "magpie-repeat.hull.json": {
+          "bytes": 575284,
+          "sha256": "cb65691b13371f38edbd375713cd23ca38d2da3f8e3cbf2ad7e4148855393908"
+        },
+        "studio.stdout.json": {
+          "bytes": 148274,
+          "sha256": "852291bb01e0e6c84d41e1b55d934a669093fdf15f8bdca03f94b01103ff7ea1"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 148274,
+          "sha256": "852291bb01e0e6c84d41e1b55d934a669093fdf15f8bdca03f94b01103ff7ea1"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "4604e3db5ccdd02d424257dc29f485c2fb0aee6ecbe3e07fd44e418f2814b2ae"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "port-inboard-of-fin",
+          "passed": true
+        },
+        {
+          "name": "starboard-inboard-of-fin",
+          "passed": true
+        },
+        {
+          "name": "between-aft-drives",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_magpie.py --check",
+      "python3 -B tools/rebuild_magpie.py",
+      "python3 -B tools/verify_magpie.py | cmp - integration/sh107-magpie/CONTACT-RESULT.json",
+      "python3 -B tools/measure_magpie.py | cmp - integration/sh107-magpie/SURFACE-FIT.json",
+      "python3 -B tools/measure_magpie.py --fidelity | cmp - integration/sh107-magpie/CANDIDATE-FIDELITY.json",
+      "python3 -B tools/measure_magpie.py --directions | cmp - integration/sh107-magpie/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_magpie.py --reference-directions | cmp - integration/sh107-magpie/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T05:02:58Z",
+    "finishedUtc": "2026-11-25T05:03:30Z",
+    "log": {
+      "bytes": 685,
+      "sha256": "c7e50744690db42aaba3ad5244a4892abc42ccb8734c355ca37086fbefd2c678"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "integration/sh107-magpie/MAGPIE-STUDIO.json": "d9f5776791858ddb30ca0c370def2f9a4d6c9520af9bdc39e90da0ddd6dd00c9",
+    "integration/sh107-magpie/FROZEN-SOURCES.json": "bece2f297cbce1567a9e1c8473a054b9d3f1bb27375cdd461f4005d8de712ac6",
+    "integration/sh107-magpie/CONTACT-CANDIDATE.json": "5a8bcd3159398bcb82947b4de915b404228abb7b0b8aff3e608cfbb38bea01d7",
+    "integration/sh107-magpie/CONTACT-RESULT.json": "98d57f490163ef0dd7c41f79a3b6573bc89e99883bb27f9fff5737a7123b1e15",
+    "integration/sh107-magpie/ORIGINAL-OWNERSHIP.json": "c2450de4882a60d21d9c9738721485f71a3e4025a26f50b0d8d2943428f6a0ce",
+    "integration/sh107-magpie/RETAINED-OVERLAPS.json": "6defa22abcad765ca5212c6b2a00a58f3120cb75a33d98c71b104f79d94c6aaf",
+    "integration/sh107-magpie/CANDIDATE-FIDELITY.json": "bf320c5cb04d66ba467d40a03fe2b3a3503d314c32601be7a07b9b4a51cf3f79",
+    "integration/sh107-magpie/SUPPORT-FAN.json": "569a961923ea8c168f6991352324c84bef22f8a0ca67bb4713675c9f95b53798",
+    "integration/sh107-magpie/SURFACE-FIT.json": "a373a28a6eeaa7baf26a67ba1d5faedaa25851c9ef22e7b5f2053ade425179bc",
+    "integration/sh107-magpie/ARCHIVED-OVERLAPS.json": "3ff923934b57699e10c6d61b12ebbde1a73521ecf8c05d3d87e3d7c522c2ba02",
+    "integration/sh107-magpie/ARCHIVED-COLLISION.json": "14bd0b0b60ec183d862c9d58707fb78cfe87a5c7dbbc8dedd7dcc8806b048f28",
+    "integration/sh107-magpie/CANDIDATE-TOPOLOGY-SURVEY.json": "901bf8f5dd6387c278ba0f9f2bbdd6923e9ffd014d7ba58461a889d575f5cf03",
+    "integration/sh107-magpie/CANDIDATE-FIT-LOCALIZATION.json": "edae9db9dbddd1eaac797dd7037bb543e61139e4b3dc2732a65b21f60f0f098d",
+    "integration/sh107-magpie/REFERENCE-FIT-LOCALIZATION.json": "5eef4ca25611f6dedafcbec925fe2a837cbf016c00c4e8f6bc2dcb732a955972",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_magpie.py": "fc0b20ec3916a8f8daec6c5eb32f5b1306a4532fc7f1e5b17a407ecb76d94b9a",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_magpie.py": "e7cf3c88bdbcf9c5c3d9c0acda1da6c0a55efc957a2a4fe90074c2c4b0906e63",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/rebuild_magpie.py": "0729336a68604324ad81688de966cf2438210082b8dcb00c8c79842de8c5e54c",
+    "tools/verify_magpie.py": "3d74b7835aeb98944b59d19f28e4bd109b33c1ca3068bddfe6fe016489241d9f",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh107/GENERATED-COLLISION.json": "939d1ef87003f2e4f9929d676b3cda6ba05eef50dde23bc8b0418a50156b845a",
+    "assets/fleet/sh107/SOURCE-GEOMETRY.json": "735ec209e51c52788fa0b5a8087982b8cb998b4982f3654a435f67937f64575f"
+  }
+}
