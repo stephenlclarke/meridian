@@ -1,0 +1,185 @@
+{
+  "hull": "SH100 Ox Mk II",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh100/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh100-ox-mk-ii/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "2200000/82469",
+  "faces": {
+    "detailed": 688,
+    "native": 376,
+    "nativeMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-ox-mk-ii",
+    "massKg": 515013
+  },
+  "supportGroups": 12,
+  "minimumRouteClearanceMillimetres": 2123,
+  "sourceContactCounts": {
+    "design": 13,
+    "nativeDesign": 13
+  },
+  "structuralSeparationsMillimetres": {
+    "betweenDeckBodies": 7469,
+    "betweenUpperDeckAndGlazing": 426,
+    "portDriveRecess": 133,
+    "starboardDriveRecess": 133
+  },
+  "fitUpperMillimetres": {
+    "detailed": 2384,
+    "native": 3499
+  },
+  "hullStudio": {
+    "definition": "integration/sh100-ox-mk-ii/OX-MK-II-STUDIO.json",
+    "bytes": 124682,
+    "sha256": "aef52771077477b363fc0d74981cbf8eb10be2696fdaa0ef73c392070695f88c",
+    "supports": 12,
+    "probes": 7,
+    "detail": "688 original detailed faces",
+    "native": "376 original native faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 124682,
+        "sha256": "aef52771077477b363fc0d74981cbf8eb10be2696fdaa0ef73c392070695f88c"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 688,
+      "nativeTriangles": 376,
+      "supportGroups": 12,
+      "engineeringReference": "finite-intrinsic-empty-ox-mk-ii",
+      "massKg": 515013,
+      "receiptFiles": {
+        "ox-mk-ii.hull.json": {
+          "bytes": 124681,
+          "sha256": "9dc5394314c4a1d5c478144893045d215cf29cb91d608dcd721a6c54e0714715"
+        },
+        "ox-mk-ii-repeat.hull.json": {
+          "bytes": 124681,
+          "sha256": "9dc5394314c4a1d5c478144893045d215cf29cb91d608dcd721a6c54e0714715"
+        },
+        "studio.stdout.json": {
+          "bytes": 35759,
+          "sha256": "b6d90fcbabe5abbda35b3ec840726d8af6bef8554849e39cef0213ade01748d5"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 35759,
+          "sha256": "b6d90fcbabe5abbda35b3ec840726d8af6bef8554849e39cef0213ade01748d5"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "42e5ee3ba1c6fc03bfb537ceaeded80754811d7e1cb0d2b6ea2f28e77c60aab5"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "centre-service-gap",
+          "passed": true
+        },
+        {
+          "name": "port-forward-service-gap",
+          "passed": true
+        },
+        {
+          "name": "starboard-forward-service-gap",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "original native visible"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_ox_mk_ii.py --check",
+      "python3 -B tools/verify_ox_mk_ii.py | cmp - integration/sh100-ox-mk-ii/CONTACT-RESULT.json",
+      "python3 -B tools/measure_ox_mk_ii.py | cmp - integration/sh100-ox-mk-ii/SURFACE-FIT.json",
+      "python3 -B tools/measure_ox_mk_ii.py --difference | cmp - integration/sh100-ox-mk-ii/LOD-DIFFERENCE.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T04:27:30Z",
+    "finishedUtc": "2026-11-25T04:27:36Z",
+    "log": {
+      "bytes": 420,
+      "sha256": "f7fd15e60f0afadd614d661e186bc7193a3fe1a6cfab40bd4596a131509626a4"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "assets/fleet/sh100/SOURCE-GEOMETRY.json": "a5aab1312ee04350fe7077355608f42e581672a20bcf8cde66faaee9925d3428",
+    "integration/sh100-ox-mk-ii/OX-MK-II-STUDIO.json": "aef52771077477b363fc0d74981cbf8eb10be2696fdaa0ef73c392070695f88c",
+    "integration/sh100-ox-mk-ii/FROZEN-SOURCES.json": "1ab2fc1b8b5fc1bf2e3a8f6e0a321c049a6261942eca2321f84cee1393a58807",
+    "integration/sh100-ox-mk-ii/CONTACT-CANDIDATE.json": "bf3a2567e454d9a1de14bbad90ae568b4c6e744708262df9adba00c81e129180",
+    "integration/sh100-ox-mk-ii/CONTACT-RESULT.json": "60e75aa305296ef323cc6f8dff20a67a7377aacabde2a17ee240e98f6241bde2",
+    "integration/sh100-ox-mk-ii/ORIGINAL-OVERLAPS.json": "c525f4eb83a6d9001bbb13c7b7d5f2841e29e602c9f83368a59212757eb79739",
+    "integration/sh100-ox-mk-ii/ORIGINAL-OWNERSHIP.json": "88782bdde90ffaea98517a3f4c32aedeb9184c092edaea6f40e924505441f7a2",
+    "integration/sh100-ox-mk-ii/LOD-DIFFERENCE.json": "86e09b4e4823403c4d708e7a943f870124e15f47d32b50ee31208abe57e20cf9",
+    "integration/sh100-ox-mk-ii/SUPPORT-FAN.json": "1ff4a409107e0a3307e0d95f1ec68e67d866a26ee600c03093a22bf8d17547f1",
+    "integration/sh100-ox-mk-ii/SURFACE-FIT.json": "d60b079ed3cc32248f4ce917d11b466c2d8555cce8e9426111c24478f8afd6f7",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_ox_mk_ii.py": "18f4baab770dabdaf24461a042ffc1cdd03059d312a46d0f38f4f02ac75e986d",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_ox_mk_ii.py": "2b7d9c4101181e4613f41749353fb860b2ca61eb04c0e2a86003162d53fc1f30",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/verify_ox_mk_ii.py": "edb1a662f7d744d7211d39bd7f6a1f9c8774f688b77efc7430072aa06860db46",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6"
+  }
+}

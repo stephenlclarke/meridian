@@ -55,6 +55,7 @@ pub mod muskox;
 pub mod navigation;
 pub mod oryx_voyager;
 pub mod ox;
+pub mod ox_mk_ii;
 pub mod rabbit_explorer;
 pub mod rhinoceros_trader;
 pub mod saiga;

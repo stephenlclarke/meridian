@@ -272,6 +272,10 @@ Anoa preserves its original 6,720 detailed and 1,928 native faces. Its separate 
 
 Ox preserves its original 688 detailed and 376 native faces. Both originals retain all 13 measured overlap pairs. Seven swept guards include the longitudinal service gap between the two freight decks. [Ox source and evidence](OX-SOURCE.md)
 
+## Ox Mk II catalogue source
+
+Ox Mk II preserves its own 688 detailed and 376 native faces. Both originals retain the same 13 measured overlap pairs. The seven guarded routes include the service gap between the original freight decks. [Ox Mk II source and evidence](OX-MK-II-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)
