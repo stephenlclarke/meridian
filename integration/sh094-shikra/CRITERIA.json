@@ -1,0 +1,185 @@
+{
+  "hull": "SH094 Shikra",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh094/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh094-shikra/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "1250/131",
+  "faces": {
+    "detailed": 5396,
+    "archivedNative": 1404,
+    "candidateNative": 512,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-shikra",
+    "massKg": 39320
+  },
+  "supportGroups": 91,
+  "casingRecessLongitudinalGapMillimetres": 47,
+  "minimumRouteClearanceMillimetres": 375,
+  "sourceContactCounts": {
+    "overlap": 18
+  },
+  "candidateRebuild": "integration/sh094-shikra/CANDIDATE-REPLAY.json",
+  "fitUpperMillimetres": {
+    "detailed": 2557,
+    "archivedNative": 2446,
+    "candidateNative": 2904
+  },
+  "hullStudio": {
+    "definition": "integration/sh094-shikra/SHIKRA-STUDIO.json",
+    "bytes": 887185,
+    "sha256": "7367d91e9e9617ede301058cc912f175757570a3eb10f72081bc9e68efb7e782",
+    "supports": 91,
+    "probes": 7,
+    "detail": "5,396 original detailed faces",
+    "native": "512 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 887185,
+        "sha256": "7367d91e9e9617ede301058cc912f175757570a3eb10f72081bc9e68efb7e782"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 5396,
+      "nativeTriangles": 512,
+      "supportGroups": 91,
+      "engineeringReference": "finite-intrinsic-empty-shikra",
+      "massKg": 39320,
+      "receiptFiles": {
+        "shikra.hull.json": {
+          "bytes": 887184,
+          "sha256": "5058fe4c8f20af42cb9939691b399d2368bf9dd8bf1c9e6390f6509fd965174d"
+        },
+        "shikra-repeat.hull.json": {
+          "bytes": 887184,
+          "sha256": "5058fe4c8f20af42cb9939691b399d2368bf9dd8bf1c9e6390f6509fd965174d"
+        },
+        "studio.stdout.json": {
+          "bytes": 223940,
+          "sha256": "dd110d490d837c4fb37733b061eeb5db27d42b28750eec4c404d5b48a4399753"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 223940,
+          "sha256": "dd110d490d837c4fb37733b061eeb5db27d42b28750eec4c404d5b48a4399753"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "ab128ed50117eadf15153449e4bd1daba23f384eb3e74919e1d6c5cdc6ddfba5"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "between-aft-drives",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "port-between-diagonal-spars",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-between-diagonal-spars",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_shikra.py --check",
+      "python3 -B tools/verify_shikra.py | cmp - integration/sh094-shikra/CONTACT-RESULT.json",
+      "python3 -B tools/measure_shikra.py | cmp - integration/sh094-shikra/SURFACE-FIT.json",
+      "python3 -B tools/measure_shikra.py --fidelity | cmp - integration/sh094-shikra/CANDIDATE-FIDELITY.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T03:25:26Z",
+    "finishedUtc": "2026-11-25T03:26:05Z",
+    "log": {
+      "bytes": 416,
+      "sha256": "a4b9870eb5bb3c6edaa118086cd410c839bcb574c4cb0f394a092a3f467feef6"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "integration/sh094-shikra/SHIKRA-STUDIO.json": "7367d91e9e9617ede301058cc912f175757570a3eb10f72081bc9e68efb7e782",
+    "integration/sh094-shikra/FROZEN-SOURCES.json": "ee971e8abb2e507ad8865306433a8826beaed48c05fe4952bc4e497e74e87b7b",
+    "integration/sh094-shikra/CONTACT-CANDIDATE.json": "b742897e999787498d985349cf519260c19b45f826fcd779afcf72b199e29bc0",
+    "integration/sh094-shikra/CONTACT-RESULT.json": "85d8690c6e3699aa5e426bebde58f20d1d55432386e18855d926fd5d50dd0fe5",
+    "integration/sh094-shikra/ORIGINAL-OWNERSHIP.json": "994a952631b79d91f284e7e2561555265c779f2f87c275f8f57fa19821b81b80",
+    "integration/sh094-shikra/RETAINED-OVERLAPS.json": "6eb78f0656a514178cc9cccf347d7b448eec6f6d0871a8a9c2ba27a0b4cab9a2",
+    "integration/sh094-shikra/CANDIDATE-TOPOLOGY-SURVEY.json": "74d9eda6a6d1157729143f2ab65e9c5e5bbd1be98e12bf7df37ddf3329832f29",
+    "integration/sh094-shikra/CANDIDATE-FIDELITY.json": "43202bcad9a3537ac03d4889ba2359d6868f1ad6fefe791e6a7784da7e74dc6a",
+    "integration/sh094-shikra/SUPPORT-FAN.json": "e3169f66078df73d8aa3ddf0f69e0a45c81b1ebd425244a8845a04f867ef4d8b",
+    "integration/sh094-shikra/SURFACE-FIT.json": "2478769405593ca5b23ef4a59f0e513f304f7e0a19dad47e4b143e8d2d1e56b1",
+    "integration/sh094-shikra/CANDIDATE-REPLAY.json": "0bb02f26b51a22bd535717c9ae5a7e03a41779f27ee38ed5cfe31a72050c47a6",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_shikra.py": "ede7ba873b8a14e7f9e13be51b056779b3d06117ecb3e093c4b91e8ba3057bf2",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_shikra.py": "2411434afe888b158d93c9d585a6f527c44a8fad80f701c2a71912ef11fd81de",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/verify_shikra.py": "0ab07fc92bfb77dd39274a832317a888b9bbe5bf5947623e1b4f27e3f753b9d1",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh094/GENERATED-COLLISION.json": "f2e7df5acfd78cf223e6815dd71924630b1639a0531add97ca9cd84f68209706",
+    "assets/fleet/sh094/SOURCE-GEOMETRY.json": "4d939b4cec4b63caed09960b29afef107a2eca268ba7d2de2c496b13ae8fc603"
+  }
+}
