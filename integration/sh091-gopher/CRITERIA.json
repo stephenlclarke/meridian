@@ -1,0 +1,190 @@
+{
+  "hull": "SH091 Gopher",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh091/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh091-gopher/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "1",
+  "faces": {
+    "detailed": 4696,
+    "native": 212,
+    "nativeMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-gopher",
+    "massKg": 20633
+  },
+  "supportGroups": 31,
+  "minimumRouteClearanceMillimetres": 312,
+  "sourceContactCounts": {
+    "detailed": 10,
+    "native": 9
+  },
+  "rollFrameEulerCharacteristic": {
+    "detailed": 0,
+    "native": 0
+  },
+  "pressureHullCentreParity": {
+    "detailed": [
+      1,
+      1
+    ],
+    "native": [
+      1,
+      1
+    ]
+  },
+  "fitUpperMillimetres": {
+    "detailed": 2952,
+    "native": 2221
+  },
+  "hullStudio": {
+    "definition": "integration/sh091-gopher/GOPHER-STUDIO.json",
+    "bytes": 636026,
+    "sha256": "eb3dc9da8dbdde47517c959fe13048eec89a7dbf8c90dacf241b73f0edcf6de5",
+    "supports": 31,
+    "probes": 7,
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 636026,
+        "sha256": "eb3dc9da8dbdde47517c959fe13048eec89a7dbf8c90dacf241b73f0edcf6de5"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 4696,
+      "nativeTriangles": 212,
+      "supportGroups": 31,
+      "engineeringReference": "finite-intrinsic-empty-gopher",
+      "massKg": 20633,
+      "receiptFiles": {
+        "gopher.hull.json": {
+          "bytes": 636025,
+          "sha256": "1b2eb6bc16f430bf7da18fea87aa79dfd9a990dcabb6deabdb3ac4d2ef42e284"
+        },
+        "gopher-repeat.hull.json": {
+          "bytes": 636025,
+          "sha256": "1b2eb6bc16f430bf7da18fea87aa79dfd9a990dcabb6deabdb3ac4d2ef42e284"
+        },
+        "studio.stdout.json": {
+          "bytes": 86212,
+          "sha256": "9b44dfbb38974afaba9d10712ea371e2d4f87a128b6edad6e0dd64b52570c499"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 86212,
+          "sha256": "9b44dfbb38974afaba9d10712ea371e2d4f87a128b6edad6e0dd64b52570c499"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "72975ac3a5682fbe529d17b4cd321fada13e5dcba05c5b4436e5ef59700b39ec"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "above-hull-inside-frame",
+          "passed": true
+        },
+        {
+          "name": "below-hull-inside-frame",
+          "passed": true
+        },
+        {
+          "name": "port-inside-frame",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-inside-frame",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "original native visible"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_gopher.py --check",
+      "python3 -B tools/verify_gopher.py | cmp - integration/sh091-gopher/CONTACT-RESULT.json",
+      "python3 -B tools/measure_gopher.py --difference | cmp - integration/sh091-gopher/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/measure_gopher.py | cmp - integration/sh091-gopher/SURFACE-FIT.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T02:40:30Z",
+    "finishedUtc": "2026-11-25T02:40:40Z",
+    "log": {
+      "bytes": 417,
+      "sha256": "c056cdcb2939a1594221819918e81083175ea65b672200cb0435b3b03803347c"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "integration/sh091-gopher/GOPHER-STUDIO.json": "eb3dc9da8dbdde47517c959fe13048eec89a7dbf8c90dacf241b73f0edcf6de5",
+    "integration/sh091-gopher/FROZEN-SOURCES.json": "7a33dda5166310fd20d6a639fe76ee59f7cb40b78e8c583f52f3dd88ba48e74e",
+    "integration/sh091-gopher/CONTACT-CANDIDATE.json": "1977afe17b1ad624fab19253f41d00be3f0166f8e4a3eeea95cd7943bf0edd4d",
+    "integration/sh091-gopher/CONTACT-RESULT.json": "849e6745a178ff4df265fd9140b3b8f8aee1d5a41855001b2e3a5f3c7014ac83",
+    "integration/sh091-gopher/ORIGINAL-DIFFERENCE.json": "f44a9ab9cc277f22d7a203251e949d13dec38cafa2153368d3bad13e6f31b7d1",
+    "integration/sh091-gopher/ORIGINAL-JOINTS.json": "c4e04e511dcc4b990491825f4ad85be41124d6b74dd74a81e4ed2519f5447b0c",
+    "integration/sh091-gopher/SUPPORT-FAN.json": "6e0cc27dad52e0dbd743095b190037791744b3655e1159fb79cf2317b66aef07",
+    "integration/sh091-gopher/SURFACE-FIT.json": "b70d27757b9ea45d8cb7f968795215439f61421ee96b249e7a1e4306b3c97342",
+    "tools/dzo_collar_support.py": "e0be79ecdd3e908ff6215d38381e1e2dd9585ded810888ec1ed4cb644cdb6d07",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_gopher.py": "0a32b3969e16253d74d113964b8180da302b70da5ac726ef4b644237f0f5fa99",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_gopher.py": "1238f38f9e733ad607ae53d2fdc3465e37d5698eae15d7a9c6d030c88024bbc1",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/verify_gopher.py": "d11176a3c0d0017f478bf654ddbfcf39c01037ea8c27bf16ee38e29127de648a",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6"
+  }
+}
