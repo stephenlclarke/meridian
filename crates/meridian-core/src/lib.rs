@@ -25,6 +25,7 @@ pub mod jackal;
 pub mod lanner;
 pub mod mining;
 pub mod mule;
+pub mod muskox;
 pub mod navigation;
 pub mod saker;
 pub mod save;

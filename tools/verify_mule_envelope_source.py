@@ -44,6 +44,16 @@ def flight_computer_inverse(root, protected):
     return files
 
 
+def undo_muskox_publication(relative, data):
+    if relative != LIB_SOURCE:
+        return data
+    declaration = b'pub mod muskox;\n'
+    before, after = b'pub mod mule;\n', b'pub mod navigation;\n'
+    span = before + declaration + after
+    assert data.count(declaration) == 1 and data.count(span) == 1, relative
+    return data.replace(span, before + after, 1)
+
+
 def undo_falconet_publication(relative, data):
     if relative != LIB_SOURCE:
         return data
@@ -426,7 +436,8 @@ def verify_protected_core(root):
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_falconet_publication(relative, current)
+        data = undo_muskox_publication(relative, current)
+        data = undo_falconet_publication(relative, data)
         data = undo_aplomado_interceptor_publication(relative, data)
         data = undo_condor_publication(relative, data)
         data = undo_hobby_fighter_publication(relative, data)

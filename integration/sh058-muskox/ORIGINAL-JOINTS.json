@@ -1,0 +1,326 @@
+[
+  {
+    "name": "canopy-to-forward-bridge",
+    "pointMetres": [
+      0.19,
+      8.77,
+      18.31
+    ],
+    "originalFaces": {
+      "detailed": {
+        "canopy": {
+          "faceRange": [
+            3084,
+            4044
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "forward-bridge": {
+          "faceRange": [
+            1932,
+            2316
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "canopy": {
+          "faceRange": [
+            236,
+            244
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "forward-bridge": {
+          "faceRange": [
+            172,
+            204
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-outboard-bay-to-keel-deck",
+    "pointMetres": [
+      -11.93,
+      -0.39,
+      -11.77
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-outboard-bay": {
+          "faceRange": [
+            12,
+            396
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "keel-deck": {
+          "faceRange": [
+            0,
+            12
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-outboard-bay": {
+          "faceRange": [
+            12,
+            44
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "keel-deck": {
+          "faceRange": [
+            0,
+            12
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-inboard-bay-to-keel-deck",
+    "pointMetres": [
+      -5.93,
+      -0.39,
+      -11.77
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-inboard-bay": {
+          "faceRange": [
+            396,
+            780
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "keel-deck": {
+          "faceRange": [
+            0,
+            12
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-inboard-bay": {
+          "faceRange": [
+            44,
+            76
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "keel-deck": {
+          "faceRange": [
+            0,
+            12
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "central-bay-to-keel-deck",
+    "pointMetres": [
+      0.07,
+      -0.39,
+      -11.77
+    ],
+    "originalFaces": {
+      "detailed": {
+        "central-bay": {
+          "faceRange": [
+            780,
+            1164
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "keel-deck": {
+          "faceRange": [
+            0,
+            12
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "central-bay": {
+          "faceRange": [
+            76,
+            108
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "keel-deck": {
+          "faceRange": [
+            0,
+            12
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-inboard-bay-to-keel-deck",
+    "pointMetres": [
+      6.07,
+      -0.39,
+      -11.77
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-inboard-bay": {
+          "faceRange": [
+            1164,
+            1548
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "keel-deck": {
+          "faceRange": [
+            0,
+            12
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-inboard-bay": {
+          "faceRange": [
+            108,
+            140
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "keel-deck": {
+          "faceRange": [
+            0,
+            12
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-outboard-bay-to-keel-deck",
+    "pointMetres": [
+      12.07,
+      -0.39,
+      -11.77
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-outboard-bay": {
+          "faceRange": [
+            1548,
+            1932
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "keel-deck": {
+          "faceRange": [
+            0,
+            12
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-outboard-bay": {
+          "faceRange": [
+            140,
+            172
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "keel-deck": {
+          "faceRange": [
+            0,
+            12
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  }
+]
