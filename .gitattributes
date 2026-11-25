@@ -6,6 +6,12 @@ assets/fleet/sh001/visual.bin binary
 assets/fleet/sh008/** -text
 assets/fleet/sh008/visual.bin binary
 
+# Condor authoring and replay programs use exact LF bytes.
+tools/measure_condor.py text eol=lf
+tools/prepare_condor.py text eol=lf
+tools/verify_condor.py text eol=lf
+tools/verify_condor_collision.py text eol=lf
+
 # Hobby Fighter authoring and replay programs use exact LF bytes.
 tools/measure_hobby_fighter.py text eol=lf
 tools/prepare_hobby_fighter.py text eol=lf

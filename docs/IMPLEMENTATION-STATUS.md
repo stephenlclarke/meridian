@@ -98,6 +98,10 @@ The Caracal Scout package preserves the original navy-copper meshes and frozen r
 
 Hobby Fighter retains both original metre meshes, with 4,620 detailed faces and 192 native faces. Signed Studio evidence covers the offline artwork. Independent source replay verifies 24 local support groups, seven guarded routes, and both wing joints and the canopy joint. [Hobby Fighter source and evidence](HOBBY-FIGHTER-SOURCE.md)
 
+## Condor catalogue source
+
+Condor retains its original 4,504-face detailed and 244-face native metre meshes. Signed Studio evidence covers the offline artwork. The collision model uses 26 local groups, including two overlapping parts per wing. Independent source verification retains all seven guarded routes and eight joints in both meshes. [Condor source and evidence](CONDOR-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)

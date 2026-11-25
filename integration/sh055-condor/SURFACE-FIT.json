@@ -1,0 +1,115 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "refinementTargetsMillimetres": {
+    "wings": {
+      "detailed": 6200,
+      "native": 6200
+    },
+    "otherPieces": {
+      "detailed": 1500,
+      "native": 2100
+    }
+  },
+  "fullUpperMillimetres": {
+    "detailed": 6047,
+    "native": 6180
+  },
+  "pieces": {
+    "centre-crossbar": {
+      "detailed": 1246,
+      "native": 1246
+    },
+    "forward-hull": {
+      "detailed": 1379,
+      "native": 1931
+    },
+    "port-wing": {
+      "detailed": 5950,
+      "native": 6180
+    },
+    "port-boom": {
+      "detailed": 793,
+      "native": 2013
+    },
+    "port-pod": {
+      "detailed": 1397,
+      "native": 1471
+    },
+    "starboard-wing": {
+      "detailed": 6047,
+      "native": 6180
+    },
+    "starboard-boom": {
+      "detailed": 793,
+      "native": 2013
+    },
+    "starboard-pod": {
+      "detailed": 1397,
+      "native": 1471
+    },
+    "canopy": {
+      "detailed": 332,
+      "native": 1029
+    },
+    "canopy-rib": {
+      "detailed": 339,
+      "native": 1483
+    },
+    "port-service-pipe": {
+      "detailed": 260,
+      "native": 1083
+    },
+    "port-instrument-housing": {
+      "detailed": 668,
+      "native": 668
+    },
+    "port-louvre-1": {
+      "detailed": 250,
+      "native": 229
+    },
+    "port-louvre-2": {
+      "detailed": 250,
+      "native": 574
+    },
+    "port-louvre-3": {
+      "detailed": 250,
+      "native": 296
+    },
+    "port-louvre-4": {
+      "detailed": 250,
+      "native": 216
+    },
+    "port-louvre-5": {
+      "detailed": 250,
+      "native": 216
+    },
+    "starboard-service-pipe": {
+      "detailed": 260,
+      "native": 1373
+    },
+    "starboard-instrument-housing": {
+      "detailed": 668,
+      "native": 668
+    },
+    "starboard-louvre-1": {
+      "detailed": 250,
+      "native": 216
+    },
+    "starboard-louvre-2": {
+      "detailed": 250,
+      "native": 216
+    },
+    "starboard-louvre-3": {
+      "detailed": 250,
+      "native": 216
+    },
+    "starboard-louvre-4": {
+      "detailed": 250,
+      "native": 216
+    },
+    "starboard-louvre-5": {
+      "detailed": 250,
+      "native": 216
+    }
+  }
+}
