@@ -49,6 +49,7 @@ pub mod hog;
 pub mod hyena;
 pub mod jackal;
 pub mod jaguar;
+pub mod javelina;
 pub mod laggar;
 pub mod lanner;
 pub mod leopard_fighter;

@@ -1,0 +1,105 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 2400,
+    "native": 4500
+  },
+  "fullUpperMillimetres": {
+    "detailed": 2386,
+    "native": 4341
+  },
+  "pieces": {
+    "lower deck": {
+      "detailed": 1514,
+      "native": 3007
+    },
+    "port cargo pod": {
+      "detailed": 1120,
+      "native": 2803
+    },
+    "central cargo pod": {
+      "detailed": 1120,
+      "native": 4341
+    },
+    "starboard cargo pod": {
+      "detailed": 1120,
+      "native": 4222
+    },
+    "forward upper deck": {
+      "detailed": 2386,
+      "native": 3437
+    },
+    "port nozzle": {
+      "detailed": 2106,
+      "native": 2971
+    },
+    "starboard nozzle": {
+      "detailed": 2106,
+      "native": 2971
+    },
+    "canopy": {
+      "detailed": 373,
+      "native": 1068
+    },
+    "canopy ridge": {
+      "detailed": 339,
+      "native": 1486
+    },
+    "port service line": {
+      "detailed": 260,
+      "native": 2595
+    },
+    "port instrument housing": {
+      "detailed": 668,
+      "native": 3213
+    },
+    "port louvre 1": {
+      "detailed": 249,
+      "native": 2768
+    },
+    "port louvre 2": {
+      "detailed": 249,
+      "native": 2803
+    },
+    "port louvre 3": {
+      "detailed": 249,
+      "native": 2846
+    },
+    "port louvre 4": {
+      "detailed": 249,
+      "native": 2733
+    },
+    "port louvre 5": {
+      "detailed": 249,
+      "native": 2738
+    },
+    "starboard service line": {
+      "detailed": 260,
+      "native": 2491
+    },
+    "starboard instrument housing": {
+      "detailed": 668,
+      "native": 3244
+    },
+    "starboard louvre 1": {
+      "detailed": 249,
+      "native": 2731
+    },
+    "starboard louvre 2": {
+      "detailed": 249,
+      "native": 2734
+    },
+    "starboard louvre 3": {
+      "detailed": 249,
+      "native": 2737
+    },
+    "starboard louvre 4": {
+      "detailed": 249,
+      "native": 2740
+    },
+    "starboard louvre 5": {
+      "detailed": 249,
+      "native": 2743
+    }
+  }
+}

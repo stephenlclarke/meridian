@@ -1,0 +1,180 @@
+{
+  "hull": "SH135 Javelina",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh135/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh135-javelina/FROZEN-SOURCES.json",
+  "sourceMetresPerUnit": 1,
+  "faces": {
+    "detailed": 3456,
+    "native": 180,
+    "nativeMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-javelina",
+    "massKg": 54624
+  },
+  "supportGroups": 23,
+  "minimumRouteClearanceMillimetres": 449,
+  "sourceContactCounts": {
+    "design": 20,
+    "nativeDesign": 5
+  },
+  "sharedOverlapCount": 5,
+  "detailedOnlyOverlapCount": 15,
+  "fitUpperMillimetres": {
+    "detailed": 2386,
+    "native": 4341
+  },
+  "hullStudio": {
+    "definition": "integration/sh135-javelina/JAVELINA-STUDIO.json",
+    "bytes": 446156,
+    "sha256": "d68071730e6af9bf023bdf8ae0414bdef1ad90642222e77cf505709a18b9968e",
+    "supports": 23,
+    "probes": 7,
+    "detail": "3456 original detailed faces",
+    "native": "180 original native faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 446156,
+        "sha256": "d68071730e6af9bf023bdf8ae0414bdef1ad90642222e77cf505709a18b9968e"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3456,
+      "nativeTriangles": 180,
+      "supportGroups": 23,
+      "engineeringReference": "finite-intrinsic-empty-javelina",
+      "massKg": 54624,
+      "receiptFiles": {
+        "javelina.hull.json": {
+          "bytes": 446155,
+          "sha256": "9d144c99413ed296d261795608a0e2c2aa3e7ee6370edf4a21af47923cb212ba"
+        },
+        "javelina-repeat.hull.json": {
+          "bytes": 446155,
+          "sha256": "9d144c99413ed296d261795608a0e2c2aa3e7ee6370edf4a21af47923cb212ba"
+        },
+        "studio.stdout.json": {
+          "bytes": 59292,
+          "sha256": "58590fd59df7d0f83e0005d78889b2f8cc5eb4c80ee3558ba988dabba8b96cfc"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 59292,
+          "sha256": "58590fd59df7d0f83e0005d78889b2f8cc5eb4c80ee3558ba988dabba8b96cfc"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "80124b58adbb5299d6010754c8c5b0c752c2a6e7d6117120dc7d26273a67ab86"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "between-aft-drives",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "port-cargo-channel",
+          "passed": true
+        },
+        {
+          "name": "starboard-cargo-channel",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "original native visible"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_javelina.py --check",
+      "python3 -B tools/verify_javelina.py | cmp - integration/sh135-javelina/CONTACT-RESULT.json",
+      "python3 -B tools/measure_javelina.py | cmp - integration/sh135-javelina/SURFACE-FIT.json",
+      "python3 -B tools/measure_javelina.py --difference | cmp - integration/sh135-javelina/LOD-DIFFERENCE.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T06:14:52Z",
+    "finishedUtc": "2026-11-25T06:15:04Z",
+    "log": {
+      "bytes": 420,
+      "sha256": "00f142dd1e1781e8d3d0d4ae8940738c238410a949e2359e3c90459eafc38ef5"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "assets/fleet/sh135/SOURCE-GEOMETRY.json": "be02853e1b8f450622fa59494da73ebc1c2a655aa799be6b22ed054d197cec38",
+    "integration/sh135-javelina/JAVELINA-STUDIO.json": "d68071730e6af9bf023bdf8ae0414bdef1ad90642222e77cf505709a18b9968e",
+    "integration/sh135-javelina/FROZEN-SOURCES.json": "7f24fa20968d82c87a9169968778b5c1622af45bcfd3b76b376fe979870babcf",
+    "integration/sh135-javelina/CONTACT-CANDIDATE.json": "208c02c3a551ea371dad7f8488034a95f09dd72ea256663a9ca34daa34098d86",
+    "integration/sh135-javelina/CONTACT-RESULT.json": "51f97f0c05e874aa08655646e095ae539ea11e697b1a147497a174f60cced273",
+    "integration/sh135-javelina/ORIGINAL-OVERLAPS.json": "77a13cbaa5a21c5cc173396387be76d0f7af82aa7f9a437b1f9f575eb1c69376",
+    "integration/sh135-javelina/LOD-DIFFERENCE.json": "c2ab3616a9e9b3806c578a907d5b7465e7421aabd10221ce78e71787f32d4ba3",
+    "integration/sh135-javelina/SUPPORT-FAN.json": "a2e275672577cfe0ab34b6a19fef85d39a2cb18fb0a6379f9afede3c11fa3c01",
+    "integration/sh135-javelina/SURFACE-FIT.json": "acb8cf51904852b657976e8398b3b75b777ce89e441ececfc6c1f5edc70bed78",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_javelina.py": "a48c7bb5f127c3347dbb4a91b2ee81e3a00ec91da4082ad750117b5bb41b2e93",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_javelina.py": "d90712a089d8508ce86b5c8f16413890c38d87d4fa81934a4d6c3749518e84d2",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/verify_javelina.py": "29082dd20d5e7e287c97009ace047f6f849021e90f2984b06556e3b9b95f1f64",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6"
+  }
+}
