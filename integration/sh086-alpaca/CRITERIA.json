@@ -1,0 +1,223 @@
+{
+  "hull": "SH086 Alpaca",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh086/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh086-alpaca/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "2000/147",
+  "faces": {
+    "detailed": 2724,
+    "archivedNative": 908,
+    "candidateNative": 508,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-alpaca",
+    "massKg": 52355
+  },
+  "supportGroups": 31,
+  "minimumRouteClearanceMillimetres": 905,
+  "sourceContactCounts": {
+    "overlap": 10
+  },
+  "closedLoopEulerCharacteristic": {
+    "detailed": 0,
+    "archivedNative": 0,
+    "candidateNative": 0
+  },
+  "independentApertureMillimetres": {
+    "detailed": {
+      "port-aperture--4": 2070,
+      "port-aperture-+0": 2888,
+      "port-aperture-+4": 2000,
+      "starboard-aperture--4": 2070,
+      "starboard-aperture-+0": 2894,
+      "starboard-aperture-+4": 2000
+    },
+    "archivedNative": {
+      "port-aperture--4": 1726,
+      "port-aperture-+0": 3085,
+      "port-aperture-+4": 1726,
+      "starboard-aperture--4": 1726,
+      "starboard-aperture-+0": 3085,
+      "starboard-aperture-+4": 1726
+    },
+    "candidateNative": {
+      "port-aperture--4": 2070,
+      "port-aperture-+0": 2513,
+      "port-aperture-+4": 2000,
+      "starboard-aperture--4": 2070,
+      "starboard-aperture-+0": 2513,
+      "starboard-aperture-+4": 2000
+    }
+  },
+  "shieldProfile": {
+    "closedLoopVolumeCubicMetres": {
+      "detailed": 1315.370035,
+      "archivedNative": 1229.532363,
+      "candidateNative": 856.992087
+    },
+    "originalToCandidateUpperMillimetres": 1120,
+    "candidateToOriginalUpperMillimetres": 1248
+  },
+  "standaloneCreatorReplay": "integration/sh086-alpaca/CREATOR-REPLAY.json",
+  "fitUpperMillimetres": {
+    "detailed": 2580,
+    "archivedNative": 2772,
+    "candidateNative": 2984
+  },
+  "hullStudio": {
+    "definition": "integration/sh086-alpaca/ALPACA-STUDIO.json",
+    "bytes": 444368,
+    "sha256": "89280ea54b6bc3a1bca7efbfe9d2f18077091574dc542534968108aa549ac6d4",
+    "supports": 31,
+    "probes": 7,
+    "detail": "2,724 original detailed faces",
+    "native": "508 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 444368,
+        "sha256": "89280ea54b6bc3a1bca7efbfe9d2f18077091574dc542534968108aa549ac6d4"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 2724,
+      "nativeTriangles": 508,
+      "supportGroups": 31,
+      "engineeringReference": "finite-intrinsic-empty-alpaca",
+      "massKg": 52355,
+      "receiptFiles": {
+        "alpaca.hull.json": {
+          "bytes": 444367,
+          "sha256": "2db1a68330843be72b6564bfcdcf9c45b36bd01a9c296e5aae9922645efbcdae"
+        },
+        "alpaca-repeat.hull.json": {
+          "bytes": 444367,
+          "sha256": "2db1a68330843be72b6564bfcdcf9c45b36bd01a9c296e5aae9922645efbcdae"
+        },
+        "studio.stdout.json": {
+          "bytes": 115345,
+          "sha256": "07fcf0b98baa606c1822f7ad458769588acac1f4438f9b601e68cf7a161c0654"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 115345,
+          "sha256": "07fcf0b98baa606c1822f7ad458769588acac1f4438f9b601e68cf7a161c0654"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "923f95895f10824c108995ec1a3f36c45c828109792716fd0f1652b9d468d7b2"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "port-aperture--4",
+          "passed": true
+        },
+        {
+          "name": "port-aperture-+0",
+          "passed": true
+        },
+        {
+          "name": "port-aperture-+4",
+          "passed": true
+        },
+        {
+          "name": "starboard-aperture--4",
+          "passed": true
+        },
+        {
+          "name": "starboard-aperture-+0",
+          "passed": true
+        },
+        {
+          "name": "starboard-aperture-+4",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_alpaca.py --check",
+      "python3 -B tools/verify_alpaca.py | cmp - integration/sh086-alpaca/CONTACT-RESULT.json",
+      "python3 -B tools/measure_alpaca.py --shield | cmp - integration/sh086-alpaca/SHIELD-PROFILE.json",
+      "python3 -B tools/measure_alpaca.py | cmp - integration/sh086-alpaca/SURFACE-FIT.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T02:12:04Z",
+    "finishedUtc": "2026-11-25T02:12:17Z",
+    "log": {
+      "bytes": 412,
+      "sha256": "9e7b3581c292fc2d0c887092df34083aea25062f203c5cba8b29e2a706b7bddf"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "integration/sh086-alpaca/ALPACA-STUDIO.json": "89280ea54b6bc3a1bca7efbfe9d2f18077091574dc542534968108aa549ac6d4",
+    "integration/sh086-alpaca/FROZEN-SOURCES.json": "cada5ca5d11a6a9f9c526e4d0ba2d1096a0b89820463c960d5e4931291f9bed8",
+    "integration/sh086-alpaca/CONTACT-CANDIDATE.json": "d6321fa86f52e34c31e351be281a5b2779591227cc9bd5703fbc9fa17787616b",
+    "integration/sh086-alpaca/CONTACT-RESULT.json": "6f792e16a6f2296c216730ffaf375d221bfa31b3335a8a17c4ba39d0ca895559",
+    "integration/sh086-alpaca/ORIGINAL-OWNERSHIP.json": "13f19c3b39a7bb01f492c4509f58d4dff839f81f6146732a71120f73aaaeecff",
+    "integration/sh086-alpaca/CANDIDATE-CONTACTS-AND-APERTURE.json": "14c43f2eb26d599251e4ab08088866f96bc51d614481a4f5c31240f72d3feaf8",
+    "integration/sh086-alpaca/CANDIDATE-FIDELITY.json": "faa17dc95e15d649fe2558463436e892d0add7b66b9b5419f1a5e2bce365a277",
+    "integration/sh086-alpaca/SHIELD-PROFILE.json": "686e7512e8a53bb5fb19e31ff2d1dbcf6157e9be5fbc056dcc0f4cff2dc85594",
+    "integration/sh086-alpaca/SUPPORT-FAN.json": "23f1ec06f0bc99a23b998a2769503f6a82f0afd8d85096abd947c60111857324",
+    "integration/sh086-alpaca/SURFACE-FIT.json": "831ddc97b341a8355b4fec20d62866d67c5ae6a37e7a0a25bf4dd64a07643aa5",
+    "integration/sh086-alpaca/CREATOR-REPLAY.json": "df9acc3927bdd2fc7adc9735290645bd1313f40de7a3425f7f030af2480e8965",
+    "assets/fleet/sh086/GENERATED-COLLISION.json": "62baebb7eab59e34d554ec2be120008ba8c45d90cded4085abc79c18211ab3a8",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_alpaca.py": "955b47a190066ef5232dba3423adf175ba642d164d4130b9106235b5b45360ef",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_alpaca.py": "625fd67005a5911edec6d9fcecb5412107c2394d282662d71188049c87a3d9a0",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/verify_alpaca.py": "5bae25bf93e7676196c6b1b15c7ba51436e65f4d397b2d891a6bb452f0e0d228",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6"
+  }
+}

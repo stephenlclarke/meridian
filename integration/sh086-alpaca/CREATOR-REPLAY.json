@@ -1,0 +1,58 @@
+{
+  "host": "SteveMBA",
+  "python": "3.14.3",
+  "numpy": "2.5.5",
+  "pillow": "13.0.0",
+  "testCount": 3,
+  "testResult": "PASS",
+  "sourceRecipeRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "staging": "The driver redirects the three input file paths in its staged blueprint and restores the exact original blueprint. Recipe and test source are unmodified.",
+  "candidate": {
+    "vertices": 280,
+    "triangles": 508,
+    "parts": 14,
+    "fixedParts": 7
+  },
+  "receipts": {
+    "SH086-candidate.json": {
+      "bytes": 57269,
+      "sha256": "62baebb7eab59e34d554ec2be120008ba8c45d90cded4085abc79c18211ab3a8"
+    },
+    "Sources/L337Core/Resources/Ships/SH086.toml": {
+      "bytes": 436090,
+      "sha256": "0a41ccf69de01bd2d5a2902c92a73cc3594be300a3dfd6014f87c61449771970"
+    },
+    "docs/fleet-physical/SH086-native-candidate-blueprint.json": {
+      "bytes": 4747,
+      "sha256": "f565ad99e3f3c8599f2ff883113225b6b3240029c4e0e92f9c6eaa0a48b85721"
+    },
+    "docs/fleet-physical/SH086-native-candidate-recipe.py": {
+      "bytes": 8282,
+      "sha256": "2d751dc034bbfda4e7e5e749805a7c0cb96446fcab4db9f9b336848d9d72371e"
+    },
+    "docs/fleet-physical/SH086-native-candidate-tests.py": {
+      "bytes": 8544,
+      "sha256": "3c0bff7dfa2f1221fa29a721b41d880fbdb1a7ea4f0ffdf13a7bbbf0d882de35"
+    },
+    "docs/fleet-physical/creator-ownership-records/SH086.json": {
+      "bytes": 43065,
+      "sha256": "13f19c3b39a7bb01f492c4509f58d4dff839f81f6146732a71120f73aaaeecff"
+    },
+    "original-creator/SH086-design.toml": {
+      "bytes": 412006,
+      "sha256": "f1d7fc3e040aaf7f480ed0dadb32b35a3501c20b2c99452edf194c4bec80d0c0"
+    },
+    "original-creator/fleet_redesign.py": {
+      "bytes": 48273,
+      "sha256": "3f029d5a417dea1b787dc5f0327d72687822275cc372de79790c3531e7cba429"
+    },
+    "original-creator/generate.py": {
+      "bytes": 32122,
+      "sha256": "a80f3606edd1ca0c9e4f0133136ab97257b07b2afe3efbbeb8a46960eb836476"
+    },
+    "tests.log": {
+      "bytes": 1839,
+      "sha256": "3037e6135c04205df1e0b126dac75ba2e7af58dc765080864974c6e602dcab50"
+    }
+  }
+}
