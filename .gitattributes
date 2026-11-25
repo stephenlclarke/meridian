@@ -370,3 +370,8 @@ tools/verify_leopard_fighter.py text eol=lf
 tools/measure_puma.py text eol=lf
 tools/prepare_puma.py text eol=lf
 tools/verify_puma.py text eol=lf
+
+# Byte-pinned Mangalica replay programs.
+tools/measure_mangalica.py text eol=lf
+tools/prepare_mangalica.py text eol=lf
+tools/verify_mangalica.py text eol=lf
