@@ -25,6 +25,7 @@ pub mod hyena;
 pub mod jackal;
 pub mod lanner;
 pub mod mining;
+pub mod moose_clipper;
 pub mod mule;
 pub mod muskox;
 pub mod navigation;
