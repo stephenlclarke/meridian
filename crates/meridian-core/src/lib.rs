@@ -108,6 +108,7 @@ pub mod warthog_tanker;
 pub mod wildebeest;
 pub mod wisent;
 pub mod wisent_mk_ii;
+pub mod wolf_mk_i;
 pub mod wolf_scout;
 pub mod wombat;
 pub mod yak;
