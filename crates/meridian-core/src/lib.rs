@@ -69,6 +69,7 @@ pub mod marmot_prospector;
 pub mod merlin;
 pub mod mining;
 pub mod moose_clipper;
+pub mod morepork;
 pub mod mule;
 pub mod muskox;
 pub mod navigation;
