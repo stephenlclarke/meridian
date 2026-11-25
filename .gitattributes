@@ -6,6 +6,11 @@ assets/fleet/sh001/visual.bin binary
 assets/fleet/sh008/** -text
 assets/fleet/sh008/visual.bin binary
 
+# Aplomado Interceptor authoring and replay programs use exact LF bytes.
+tools/measure_aplomado_interceptor.py text eol=lf
+tools/prepare_aplomado_interceptor.py text eol=lf
+tools/verify_aplomado_interceptor.py text eol=lf
+
 # Condor authoring and replay programs use exact LF bytes.
 tools/measure_condor.py text eol=lf
 tools/prepare_condor.py text eol=lf

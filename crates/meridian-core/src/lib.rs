@@ -2,6 +2,7 @@
 
 #![forbid(unsafe_code)]
 
+pub mod aplomado_interceptor;
 pub mod banteng;
 pub mod caracal_scout;
 pub mod celestial;
