@@ -55,6 +55,7 @@ pub mod leopard_fighter;
 pub mod llama;
 pub mod magpie;
 pub mod mangalica;
+pub mod marmot_prospector;
 pub mod mining;
 pub mod moose_clipper;
 pub mod mule;

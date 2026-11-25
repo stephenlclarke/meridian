@@ -392,3 +392,8 @@ tools/verify_boar_transport.py text eol=lf
 tools/measure_warthog_escort.py text eol=lf
 tools/prepare_warthog_escort.py text eol=lf
 tools/verify_warthog_escort.py text eol=lf
+
+# Byte-pinned Marmot Prospector replay programs.
+tools/measure_marmot_prospector.py text eol=lf
+tools/prepare_marmot_prospector.py text eol=lf
+tools/verify_marmot_prospector.py text eol=lf
