@@ -174,6 +174,7 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Shikra source envelope and Hull Studio definition](docs/SHIKRA-SOURCE.md)
 - [Shikra Interdictor source envelope and Hull Studio definition](docs/SHIKRA-INTERDICTOR-SOURCE.md)
 - [Wisent source envelope and Hull Studio definition](docs/WISENT-SOURCE.md)
+- [Wisent Mk II source envelope and Hull Studio definition](docs/WISENT-MK-II-SOURCE.md)
 - [Stag Liner source envelope and Hull Studio definition](docs/STAG-LINER-GAMEPLAY-ENVELOPE.md)
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)
