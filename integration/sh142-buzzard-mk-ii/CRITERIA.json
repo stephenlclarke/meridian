@@ -1,0 +1,218 @@
+{
+  "hull": "SH142 Buzzard Mk II",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh142/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh142-buzzard-mk-ii/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "6000/611",
+  "faces": {
+    "detailed": 3924,
+    "archivedNative": 1340,
+    "candidateNative": 484,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-buzzard-mk-ii",
+    "massKg": 25757
+  },
+  "supportGroups": 79,
+  "candidateComponentInventory": {
+    "originalPartsRepresented": 19,
+    "retainedClosedHoops": 2,
+    "nativeWells": 4,
+    "unalteredNativeParts": 11,
+    "hoopSeamVertices": 384
+  },
+  "minimumRouteClearanceMillimetres": 172,
+  "sourceContactCounts": {
+    "overlap": 12,
+    "unchangedNativeParts": 11
+  },
+  "candidateRebuild": "tools/rebuild_buzzard_mk_ii.py",
+  "fitUpperMillimetres": {
+    "detailed": 2759,
+    "archivedNative": 3791,
+    "candidateNative": 2604
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 890,
+      "upperCeiling": 914
+    },
+    "candidateToArchive": {
+      "lowerFloor": 821,
+      "upperCeiling": 842
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 1068,
+      "upperCeiling": 1069
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 894,
+      "upperCeiling": 918
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh142-buzzard-mk-ii/BUZZARD-MK-II-STUDIO.json",
+    "bytes": 632068,
+    "sha256": "2ab32e8cbfa93c06bbbf41a5350c83ed125456aca029be870af6e70d45116f08",
+    "supports": 79,
+    "probes": 7,
+    "detail": "3,924 original detailed faces",
+    "native": "484 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 632068,
+        "sha256": "2ab32e8cbfa93c06bbbf41a5350c83ed125456aca029be870af6e70d45116f08"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3924,
+      "nativeTriangles": 484,
+      "supportGroups": 79,
+      "engineeringReference": "finite-intrinsic-empty-buzzard-mk-ii",
+      "massKg": 25757,
+      "receiptFiles": {
+        "buzzard-mk-ii.hull.json": {
+          "bytes": 632067,
+          "sha256": "03216bb4a58402493aa73dae5d9bccfc18eaeec9e897a559991ce9888f262f8c"
+        },
+        "buzzard-mk-ii-repeat.hull.json": {
+          "bytes": 632067,
+          "sha256": "03216bb4a58402493aa73dae5d9bccfc18eaeec9e897a559991ce9888f262f8c"
+        },
+        "studio.stdout.json": {
+          "bytes": 160589,
+          "sha256": "55382d6ffc16777d248d85d1559e442ba5940212f70c6811726e957d7b453557"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 160589,
+          "sha256": "55382d6ffc16777d248d85d1559e442ba5940212f70c6811726e957d7b453557"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "516896a94b87e108cb962df140aa6bc174715017b78683643e47c46adeffbd76"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "through-aft-hoop",
+          "passed": true
+        },
+        {
+          "name": "port-through-hoops",
+          "passed": true
+        },
+        {
+          "name": "starboard-through-hoops",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_buzzard_mk_ii.py --check",
+      "python3 -B tools/rebuild_buzzard_mk_ii.py",
+      "python3 -B tools/verify_buzzard_mk_ii.py | cmp - integration/sh142-buzzard-mk-ii/CONTACT-RESULT.json",
+      "python3 -B tools/measure_buzzard_mk_ii.py | cmp - integration/sh142-buzzard-mk-ii/SURFACE-FIT.json",
+      "python3 -B tools/measure_buzzard_mk_ii.py --fidelity | cmp - integration/sh142-buzzard-mk-ii/CANDIDATE-FIDELITY.json",
+      "python3 -B tools/measure_buzzard_mk_ii.py --directions | cmp - integration/sh142-buzzard-mk-ii/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_buzzard_mk_ii.py --reference-directions | cmp - integration/sh142-buzzard-mk-ii/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T06:46:17Z",
+    "finishedUtc": "2026-11-25T06:46:55Z",
+    "log": {
+      "bytes": 734,
+      "sha256": "37326bfa127874e750f29765270dc51921d9ebc569439a357a15f82bc53bb20d"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    }
+  },
+  "replayPins": {
+    "integration/sh142-buzzard-mk-ii/BUZZARD-MK-II-STUDIO.json": "2ab32e8cbfa93c06bbbf41a5350c83ed125456aca029be870af6e70d45116f08",
+    "integration/sh142-buzzard-mk-ii/FROZEN-SOURCES.json": "2d22669b9c35ac738f991c08c6cd1d4aaf06c772ae02e3ffb90cad7ea787d6f5",
+    "integration/sh142-buzzard-mk-ii/CONTACT-CANDIDATE.json": "fa237271457ed7b8728fca67cf125c337074f5476844e24698c957f2e1dbd0e1",
+    "integration/sh142-buzzard-mk-ii/CONTACT-RESULT.json": "fcef6f901bebf0d35214468d9b49b01c1b624020e52ed1a35a2c1ab51910615b",
+    "integration/sh142-buzzard-mk-ii/ORIGINAL-OWNERSHIP.json": "428f3dcd6fd770ba6f59e08a18edb69c7c62901f967078a839f0dab0a7662cd1",
+    "integration/sh142-buzzard-mk-ii/RETAINED-OVERLAPS.json": "31a75f71b31dd420240f93d84c4815515f742eaea074e2a9d12c426038f60b85",
+    "integration/sh142-buzzard-mk-ii/ARCHIVED-RECIPE-PROVENANCE.json": "6012b590c3b95444ec11231c62881e75c87d1ed46297ebe6b17909dbb5096ca3",
+    "integration/sh142-buzzard-mk-ii/ARCHIVED-CANDIDATE-SECTIONS.json": "561b7cc39e1e9e432f4c9f4104e02cecdc6e8be55e90c371dc6abd8f50a66301",
+    "integration/sh142-buzzard-mk-ii/CANDIDATE-FIDELITY.json": "284ebb12ca605eeb14a1ba33b8277fa7aefb7e07f46721d6edc34ae4cfb42204",
+    "integration/sh142-buzzard-mk-ii/SUPPORT-FAN.json": "8b9f1f0ba8cbea796a2ff1a8aed08d94937ef3ea392e2ee3b41c1185cc51573b",
+    "integration/sh142-buzzard-mk-ii/SURFACE-FIT.json": "93f44f29657dcebca3109fe4a96b166f0dbc47cb71a1a99a82fa8e477520c081",
+    "integration/sh142-buzzard-mk-ii/ARCHIVED-OVERLAPS.json": "0efc860f61ed49995c0b4ddab77bfbc4550d56778b045c92a06954409d39c10d",
+    "integration/sh142-buzzard-mk-ii/CANDIDATE-TOPOLOGY-SURVEY.json": "3c8e4110db1051a79bced5c4a0b8df890a0f1594727c4f5a97d769162ddb290f",
+    "integration/sh142-buzzard-mk-ii/CANDIDATE-FIT-LOCALIZATION.json": "6d00bf81f956a7df7cb9257d10eaee8cfdb5000023a75a41525e77a81c2d8d92",
+    "integration/sh142-buzzard-mk-ii/REFERENCE-FIT-LOCALIZATION.json": "b3dcf4162e2b2e2749c4efd12788226292ef52f205cabda663d990d4bee4d98f",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_buzzard_mk_ii.py": "44564c11e098e6df19a94f8bc087c2f17c682885a72353df61bc507f1f82d405",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_buzzard_mk_ii.py": "a61f1c38a233e52d2a98593d1f2299f095be8edacbdd4b059bf34ab0c263700c",
+    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/rebuild_buzzard_mk_ii.py": "e19b00582c69981096de96c59e5713969f5e73600b104b8277b2f59cf8ef55e1",
+    "tools/verify_buzzard_mk_ii.py": "f057a3bfbb62a270be47cdc2ab232ecb34661293e5225f09eef3d8556abc41ce",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh142/GENERATED-COLLISION.json": "979dfd06089f6fb9b8243c04f3b2e9c2bab40010984887fe43d913af9d311770",
+    "assets/fleet/sh142/SOURCE-GEOMETRY.json": "0d31a91f566b2a92f0d39ecc1631f4c3d7a3d06abd82969922f3e2ea8e67353f"
+  }
+}

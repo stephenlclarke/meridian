@@ -451,3 +451,9 @@ tools/verify_falcon_mk_iv.py text eol=lf
 tools/measure_chimango.py text eol=lf
 tools/prepare_chimango.py text eol=lf
 tools/verify_chimango.py text eol=lf
+
+# Byte-pinned Buzzard Mk II replay programs.
+tools/measure_buzzard_mk_ii.py text eol=lf
+tools/prepare_buzzard_mk_ii.py text eol=lf
+tools/rebuild_buzzard_mk_ii.py text eol=lf
+tools/verify_buzzard_mk_ii.py text eol=lf
