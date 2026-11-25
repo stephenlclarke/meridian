@@ -67,6 +67,7 @@ pub mod station_services;
 pub mod tamaraw;
 pub mod traffic;
 pub mod vulture_raider;
+pub mod wisent;
 pub mod wombat;
 pub mod yak;
 

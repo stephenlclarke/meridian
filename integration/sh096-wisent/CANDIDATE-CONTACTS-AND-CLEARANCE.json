@@ -1,0 +1,1587 @@
+{
+  "metresPerSourceUnit": 16.88888888888889,
+  "scaleRatio": [
+    152,
+    9
+  ],
+  "faceCounts": {
+    "detailed": 2600,
+    "archivedNative": 816,
+    "candidateNative": 488
+  },
+  "contacts": {
+    "lost": [],
+    "retained": [
+      {
+        "parts": [
+          0,
+          10
+        ],
+        "names": [
+          "pods explicit member 0",
+          "keel cross bridge"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -15.5107525,
+            2.4811041,
+            -19.7489962
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -15.5107525,
+            2.321155,
+            -19.7489962
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          0,
+          11
+        ],
+        "names": [
+          "pods explicit member 0",
+          "keel cross bridge"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -15.5107525,
+            2.4811041,
+            24.3310038
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -15.5107525,
+            2.321155,
+            24.3310038
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          0,
+          12
+        ],
+        "names": [
+          "pods explicit member 0",
+          "dock lateral structural member 0"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -21.8858936,
+            -1.6177489,
+            24.3944834
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -21.8858936,
+            -2.0810354,
+            24.3944834
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          0,
+          14
+        ],
+        "names": [
+          "pods explicit member 0",
+          "dock transverse structural member 0"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -20.0455354,
+            -6.8077848,
+            24.4874053
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -20.0455354,
+            -6.8077848,
+            24.4874053
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          0,
+          16
+        ],
+        "names": [
+          "pods explicit member 0",
+          "dock aperture guidance marker 0"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -23.0617164,
+            -1.026443,
+            25.0829859
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -23.3809911,
+            -2.4397179,
+            25.088517
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          0,
+          20
+        ],
+        "names": [
+          "pods explicit member 0",
+          "engine_pair/negative side/connected support"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -8.9186923,
+            0.6727931,
+            -22.426056
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -8.9186923,
+            0.6727931,
+            -22.426056
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          0,
+          21
+        ],
+        "names": [
+          "pods explicit member 0",
+          "engine_pair/negative side/propulsion casing"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -21.4562253,
+            -2.0266315,
+            -29.8661743
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -17.5407588,
+            -1.4376811,
+            -30.8899208
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          0,
+          22
+        ],
+        "names": [
+          "pods explicit member 0",
+          "engine_pair/negative side/propulsion luminous recess"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -20.3737404,
+            -1.2427214,
+            -34.4638343
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -20.3737404,
+            -1.2427214,
+            -34.4638343
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          1,
+          10
+        ],
+        "names": [
+          "pods explicit member 0/service-well-0-0",
+          "keel cross bridge"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -6.8559183,
+            2.3460675,
+            -20.3377425
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -6.8559183,
+            2.3460675,
+            -20.3377425
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          1,
+          20
+        ],
+        "names": [
+          "pods explicit member 0/service-well-0-0",
+          "engine_pair/negative side/connected support"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -5.0457123,
+            0.7247453,
+            -20.732303
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -5.0457123,
+            0.7247453,
+            -20.732303
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          5,
+          10
+        ],
+        "names": [
+          "pods explicit member 1",
+          "keel cross bridge"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            18.8211716,
+            4.0586356,
+            -23.4703889
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            18.8211716,
+            3.6108612,
+            -23.4703889
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          5,
+          11
+        ],
+        "names": [
+          "pods explicit member 1",
+          "keel cross bridge"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            16.8048685,
+            1.8311147,
+            20.0362777
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            16.8048685,
+            1.7897581,
+            20.0362777
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          5,
+          13
+        ],
+        "names": [
+          "pods explicit member 1",
+          "dock lateral structural member 1"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            22.4719275,
+            -2.7880427,
+            24.4874053
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            22.4719275,
+            -3.1342562,
+            24.4874053
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          5,
+          14
+        ],
+        "names": [
+          "pods explicit member 1",
+          "dock transverse structural member 0"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            24.6509291,
+            -5.2302533,
+            19.2774555
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            21.8458856,
+            -7.4577741,
+            18.4747888
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          5,
+          17
+        ],
+        "names": [
+          "pods explicit member 1",
+          "dock aperture guidance marker 1"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            23.4671725,
+            -1.026443,
+            25.0829859
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            23.1478978,
+            -2.4397179,
+            25.088517
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          5,
+          23
+        ],
+        "names": [
+          "pods explicit member 1",
+          "engine_pair/positive side/connected support"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            17.1064699,
+            -0.6186618,
+            -29.842877
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            17.1064699,
+            -0.6186618,
+            -29.842877
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          5,
+          24
+        ],
+        "names": [
+          "pods explicit member 1",
+          "engine_pair/positive side/propulsion casing"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            15.7668858,
+            -2.0266315,
+            -29.8661743
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            14.9510592,
+            -0.4352769,
+            -32.6686367
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          5,
+          25
+        ],
+        "names": [
+          "pods explicit member 1",
+          "engine_pair/positive side/propulsion luminous recess"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            16.8493708,
+            -1.2427214,
+            -34.4638343
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            16.8493708,
+            -1.2427214,
+            -34.4638343
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          7,
+          10
+        ],
+        "names": [
+          "pods explicit member 1/service-well-1-0",
+          "keel cross bridge"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            7.453745,
+            2.7723929,
+            -20.1614061
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            7.453745,
+            2.7723929,
+            -20.1614061
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          7,
+          23
+        ],
+        "names": [
+          "pods explicit member 1/service-well-1-0",
+          "engine_pair/positive side/connected support"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            6.6618682,
+            2.3737093,
+            -20.5844252
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            6.6618682,
+            2.3737093,
+            -20.5844252
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          10,
+          20
+        ],
+        "names": [
+          "keel cross bridge",
+          "engine_pair/negative side/connected support"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -7.1314364,
+            2.159553,
+            -21.470885
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -7.1314364,
+            2.159553,
+            -21.470885
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          10,
+          23
+        ],
+        "names": [
+          "keel cross bridge",
+          "engine_pair/positive side/connected support"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            5.3346524,
+            2.015701,
+            -19.7489962
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            5.3346524,
+            2.015701,
+            -19.7489962
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          12,
+          14
+        ],
+        "names": [
+          "dock lateral structural member 0",
+          "dock transverse structural member 0"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -21.8356683,
+            -5.0217933,
+            19.2774555
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -21.8356683,
+            -5.0217933,
+            19.2774555
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          12,
+          15
+        ],
+        "names": [
+          "dock lateral structural member 0",
+          "dock transverse structural member 1"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -21.8356683,
+            6.0404289,
+            19.2774555
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -21.8356683,
+            6.0404289,
+            19.2774555
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          12,
+          16
+        ],
+        "names": [
+          "dock lateral structural member 0",
+          "dock aperture guidance marker 0"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -23.0543303,
+            3.7246112,
+            24.7170037
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -23.0543303,
+            3.7246112,
+            24.7170037
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          13,
+          14
+        ],
+        "names": [
+          "dock lateral structural member 1",
+          "dock transverse structural member 0"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            24.6932206,
+            -5.0217933,
+            19.2774555
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            24.6932206,
+            -5.0217933,
+            19.2774555
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          13,
+          15
+        ],
+        "names": [
+          "dock lateral structural member 1",
+          "dock transverse structural member 1"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            24.6932206,
+            6.0404289,
+            19.2774555
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            24.6932206,
+            6.0404289,
+            19.2774555
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          13,
+          17
+        ],
+        "names": [
+          "dock lateral structural member 1",
+          "dock aperture guidance marker 1"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            23.4745586,
+            3.7246112,
+            24.7170037
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            23.4745586,
+            3.7246112,
+            24.7170037
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          14,
+          16
+        ],
+        "names": [
+          "dock transverse structural member 0",
+          "dock aperture guidance marker 0"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -23.0543303,
+            -4.8766071,
+            24.7170037
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -23.0543303,
+            -4.8766071,
+            24.7170037
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          14,
+          17
+        ],
+        "names": [
+          "dock transverse structural member 0",
+          "dock aperture guidance marker 1"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            23.4745586,
+            -4.8766071,
+            24.7170037
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            23.4745586,
+            -4.8766071,
+            24.7170037
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          15,
+          16
+        ],
+        "names": [
+          "dock transverse structural member 1",
+          "dock aperture guidance marker 0"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -23.0543303,
+            5.1857929,
+            24.7170037
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -23.0543303,
+            5.1857929,
+            24.7170037
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          15,
+          17
+        ],
+        "names": [
+          "dock transverse structural member 1",
+          "dock aperture guidance marker 1"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            23.4745586,
+            5.1857929,
+            24.7170037
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            23.4745586,
+            5.1857929,
+            24.7170037
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          18,
+          19
+        ],
+        "names": [
+          "cockpit glazing envelope",
+          "cockpit connected structural crossmember"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            4.0005732,
+            11.6342438,
+            17.9757519
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            4.0005732,
+            11.6342438,
+            17.9757519
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          20,
+          21
+        ],
+        "names": [
+          "engine_pair/negative side/connected support",
+          "engine_pair/negative side/propulsion casing"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -17.9188456,
+            0.2588239,
+            -29.722724
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -17.9188456,
+            0.2588239,
+            -29.722724
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          23,
+          24
+        ],
+        "names": [
+          "engine_pair/positive side/connected support",
+          "engine_pair/positive side/propulsion casing"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            16.9295786,
+            0.6569447,
+            -30.097163
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            16.9295786,
+            0.6569447,
+            -30.097163
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "unresolved": []
+  },
+  "routeClearanceMillimetres": {
+    "detailed": {
+      "dorsal": 2093,
+      "ventral": 6734,
+      "central-bay-lane": 1915,
+      "between-aft-drive-walls": 1905,
+      "through-dock-aperture": 1523,
+      "port-outboard": 2180,
+      "starboard-outboard": 2180
+    },
+    "archivedNative": {
+      "dorsal": 2093,
+      "ventral": 6734,
+      "central-bay-lane": 1915,
+      "between-aft-drive-walls": 1905,
+      "through-dock-aperture": 1523,
+      "port-outboard": 2494,
+      "starboard-outboard": 2476
+    },
+    "candidateNative": {
+      "dorsal": 2093,
+      "ventral": 6734,
+      "central-bay-lane": 1915,
+      "between-aft-drive-walls": 1905,
+      "through-dock-aperture": 1523,
+      "port-outboard": 2494,
+      "starboard-outboard": 2476
+    }
+  }
+}
