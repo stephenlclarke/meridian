@@ -334,3 +334,8 @@ tools/verify_wisent_mk_ii.py text eol=lf
 tools/measure_anoa.py text eol=lf
 tools/prepare_anoa.py text eol=lf
 tools/verify_anoa.py text eol=lf
+
+# Byte-pinned Ox replay programs.
+tools/measure_ox.py text eol=lf
+tools/prepare_ox.py text eol=lf
+tools/verify_ox.py text eol=lf
