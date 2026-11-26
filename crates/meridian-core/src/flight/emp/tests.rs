@@ -662,6 +662,7 @@ fn actual_secret_base_release_spends_once_drains_shield_and_preserves_hull_cargo
         mining: w.mining.clone(),
         mining_scope: Arc::clone(&w.mining_scope),
         damage: w.damage.clone(),
+        solar: w.solar.clone(),
         station_data: decoded.station_data,
         navigation_catalogue: decoded.navigation_catalogue,
         navigation: w.navigation,
@@ -726,6 +727,15 @@ fn actual_secret_base_release_spends_once_drains_shield_and_preserves_hull_cargo
         w.commodity_quantity(crate::station_services::CommodityId::Food),
         cargo
     );
+    // A solar terminal effect occurs after this actual admitted release. It must not
+    // generate a second FinalDeath special event or suppress its accepted discharge.
+    // The cross-phase marker is intentionally an isolated ordering fixture; solar's
+    // real fatal-flight test separately proves full cold publication with fitted EMP.
+    let previous_solar = w.solar.clone();
+    w.solar = crate::flight::solar::State::phase_fixture(&w).unwrap();
+    assert!(w.damage.alive_before_emp_step(&w).unwrap());
+    w.emp.replay_meter(&w, &w.modular).unwrap();
+    w.solar = previous_solar;
     hold(&mut w, target, 100);
     assert_eq!(w.emp.pulses.len(), 1, "held input must not rearm");
     cold(&w);

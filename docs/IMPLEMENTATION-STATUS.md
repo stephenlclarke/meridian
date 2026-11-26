@@ -12,6 +12,8 @@ The [seven shield grades](SHIELD-GRADES.md) use the source-defined bank capaciti
 
 The [fuel storage source candidate](FUEL-STORAGE.md) implements four separately owned and paid physical units, up to three fitted normally on SH025, actual tank capacity and paid refuel, refusal to store occupied capacity, and an explicit four-tank XYZZY exception with current freight and trade custody guards. Gameplay replay, account/route persistence and native acceptance require owned validation.
 
+The [solar fuel source candidate](SOLAR-FUEL-SCOOPS.md) adds the original near-sun collection rate using the actual fitted Fuel Scoops and real current tank, independent cabin heat and lethal overheat, exact account/flight continuation receipts, an explicit scoop-only test action, and actual cockpit status. Physical ore and cargo intake remain open. Authored tests require owned native validation.
+
 ## Medusa Showroom inspection
 
 The empty stock reference exposes 40,712 kg in the Showroom. The MacBook Air replayed the original 14 finite distributions and passed all six source tests. The live preview and exact-head compiler validation remain pending for this addition. Flight, exchange and PLUGH fabrication remain unavailable.

@@ -84,6 +84,11 @@ impl Panel {
             ),
         );
         panel.review(review, "After help: B cancels; Escape saves and quits");
+        if panel.lines.len() < MAX_LINES - 2 {
+            panel
+                .lines
+                .push("Solar fuel: fitted scoops, face sun and cruise; watch cabin temp".into());
+        }
         panel
     }
 

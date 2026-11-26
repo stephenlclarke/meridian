@@ -161,7 +161,7 @@ impl State {
         }
         // An incoming fatal hit suppresses only the final bank transfer, after main posting.
         // A later command that destroys the player cannot erase the already accepted transfer.
-        if end > 0 && !world.damage.alive_before_commands(world)? {
+        if end > 0 && !world.damage.alive_before_emp_step(world)? {
             events.push((end, 0, Change::FinalDeath));
         }
         events.sort_by_key(|&(clock, phase, _)| (clock, phase));

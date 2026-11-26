@@ -26,6 +26,11 @@ pub(crate) struct MissileScene {
     pub(crate) bodies: Vec<NpcBody>,
 }
 impl MissileScene {
+    pub(crate) fn player_motion_clear(&self, before: Vec3, after: Vec3, radius: f64) -> bool {
+        self.bodies.iter().all(|body| {
+            super::segment_distance(before, after, body.pose.position) > radius * 2.0 + 1.0
+        })
+    }
     pub(crate) fn target(&self, id: NpcId) -> Option<NpcBody> {
         self.bodies
             .iter()

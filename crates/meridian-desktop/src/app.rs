@@ -40,6 +40,12 @@ fn fresh_profile_seed() -> u64 {
 }
 
 // A catch-up frame must retain a contact reported before a later clear tick.
+fn player_destroyed(world: &World) -> bool {
+    world
+        .combat_snapshot()
+        .is_some_and(|combat| combat.player.destroyed)
+}
+
 fn step_frame(
     world: &mut World,
     input: FlightInput,
@@ -51,9 +57,19 @@ fn step_frame(
 ) -> Result<Option<MotionRefusal>, StepError> {
     let mut refusal = None;
     for _ in 0..ticks {
+        if player_destroyed(world) {
+            *pulse = None;
+            *mining = None;
+            break;
+        }
         world.step(input)?;
         let state = world.snapshot();
         refusal = state.motion_refusal.or(refusal);
+        if player_destroyed(world) {
+            *pulse = None;
+            *mining = None;
+            break;
+        }
         if state.mode != FlightMode::Flight
             || state.navigation.is_some_and(|nav| nav.travel.is_some())
         {
@@ -90,8 +106,18 @@ enum FrameAdvance {
     Fatal(StepError),
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum QuitRecovery {
+    Resume,
+    Discard,
+}
+
 const DEFAULT_FLIGHT_WINDOW: [u32; 2] = [1280, 720];
 pub(crate) const MIN_WINDOW_LOGICAL: [f64; 2] = [640.0, 360.0];
+const DESTROYED_NOTICE: &str =
+    "DESTROYED | F9 RESTORE | N NEW (CONFIRM) | F5 SAVE TERMINAL | ESC QUIT";
+const DESTROYED_QUIT_NOTICE: &str =
+    "DESTROYED | F9 RESTORE | F5 SAVE TERMINAL | Q QUIT WITHOUT SAVE";
 
 #[derive(Clone, Default, Debug, PartialEq, Eq)]
 struct Notice {
@@ -124,6 +150,7 @@ struct App {
     validation_timing: Option<mule_validation::FrameTiming>,
     celestial: crate::celestial::WorldAdapter,
     quit_failed: bool,
+    terminal_redraw_pending: bool,
     renderer: Option<Renderer>,
     keys: HashSet<KeyCode>,
     paused: bool,
@@ -167,6 +194,8 @@ impl App {
                     .is_some_and(|mission| mission.paused);
                 if let Some(notice) = notice {
                     app.notice.set(notice);
+                } else if player_destroyed(&app.game.world) {
+                    app.notice.set(DESTROYED_NOTICE.into());
                 }
                 app
             }
@@ -185,6 +214,7 @@ impl App {
             target_details: None,
             validation_timing: internal.then(mule_validation::FrameTiming::default),
             quit_failed: false,
+            terminal_redraw_pending: false,
             celestial: crate::celestial::WorldAdapter::default(),
             renderer: None,
             keys: HashSet::new(),
@@ -229,6 +259,24 @@ impl App {
             && !self.commander_open
             && !self.modal_open()
             && self.game.playing()
+            && !player_destroyed(&self.game.world)
+    }
+
+    fn terminal_cockpit_visible(&self) -> bool {
+        self.game.playing()
+            && !self.commander_open
+            && !self.game.is_internal_validation()
+            && player_destroyed(&self.game.world)
+    }
+
+    fn terminal_retry_needed(&self, zero_sized: bool) -> bool {
+        self.terminal_redraw_pending
+            && self.terminal_cockpit_visible()
+            && !self.occluded
+            && !zero_sized
+    }
+    fn record_terminal_presentation(&mut self, skipped: bool) {
+        self.terminal_redraw_pending = self.terminal_cockpit_visible() && skipped;
     }
 
     fn timed_hud_notices(&self) -> bool {
@@ -241,6 +289,7 @@ impl App {
             && !self.commander_open
             && !self.modal_open()
             && !self.quit_failed
+            && !player_destroyed(&self.game.world)
     }
 
     fn expire_hud_notice(&mut self, now: Instant) -> bool {
@@ -401,6 +450,13 @@ impl App {
 
     fn reset_input(&mut self) {
         self.clear_held_input();
+        if player_destroyed(&self.game.world) {
+            // Terminal state is evidence. Focus, occlusion, menus and pause keys
+            // may clear host controls but cannot rewrite World epochs or guidance.
+            self.game.session.invalidate();
+            self.request_redraw();
+            return;
+        }
         if self.modal_open() {
             if !self.focused || self.occluded {
                 self.game.world.cancel_auto_docking();
@@ -446,6 +502,16 @@ impl App {
             }
             return;
         }
+        if let Some(recovery) = self.quit_recovery_key(code) {
+            match recovery {
+                QuitRecovery::Resume => self.request_redraw(),
+                QuitRecovery::Discard => {
+                    self.shutdown_audio();
+                    event_loop.exit();
+                }
+            }
+            return;
+        }
         if code == KeyCode::Digit0 && !self.commander_open && self.has_berth() {
             self.show_station_commander();
             self.request_redraw();
@@ -475,23 +541,8 @@ impl App {
         }
         match code {
             KeyCode::Escape => self.request_quit(event_loop),
-            KeyCode::KeyQ if self.quit_failed => {
-                self.shutdown_audio();
-                event_loop.exit();
-            }
-            KeyCode::KeyN if !self.game.playing() => {
-                let message = match self.game.new_commander(fresh_profile_seed()) {
-                    Ok(true) => {
-                        self.sync_profile_controls();
-                        self.begin_audio_session();
-                        "New commander ready".into()
-                    }
-                    Ok(false) => {
-                        "Press N again to confirm new game; existing save is not changed yet".into()
-                    }
-                    Err(error) => error,
-                };
-                self.notice.set(message);
+            KeyCode::KeyN if !self.game.playing() || player_destroyed(&self.game.world) => {
+                self.new_commander_from_key(fresh_profile_seed());
             }
             KeyCode::KeyC if !self.game.playing() => self.load_profile(),
             KeyCode::F9 if self.game.playing() => self.load_profile(),
@@ -544,6 +595,8 @@ impl App {
         match code {
             KeyCode::Escape | KeyCode::F11 => return false,
             KeyCode::KeyN | KeyCode::KeyC if !self.game.playing() => return false,
+            KeyCode::KeyN if player_destroyed(&self.game.world) => return false,
+            KeyCode::KeyP if player_destroyed(&self.game.world) => return false,
             KeyCode::KeyP | KeyCode::KeyQ if self.quit_failed => return false,
             KeyCode::F5 | KeyCode::F9 if self.game.playing() => return false,
             KeyCode::Digit1
@@ -591,9 +644,25 @@ impl App {
         });
     }
 
+    fn new_commander_from_key(&mut self, seed: u64) {
+        let message = match self.game.new_commander(seed) {
+            Ok(true) => {
+                self.sync_profile_controls();
+                self.begin_audio_session();
+                "New commander ready".into()
+            }
+            Ok(false) => {
+                "Press N again to confirm new game; existing save is not changed yet".into()
+            }
+            Err(error) => error,
+        };
+        self.notice.set(message);
+    }
+
     fn sync_profile_controls(&mut self) {
         self.paused = self.game.world.mission_snapshot().is_some_and(|m| m.paused);
         self.quit_failed = false;
+        self.terminal_redraw_pending = false;
         self.reset_input();
         if self.commander_open {
             self.docked = None;
@@ -627,7 +696,9 @@ impl App {
             Ok(()) => {
                 self.sync_profile_controls();
                 self.begin_audio_session();
-                self.notice.set(if self.commander_open {
+                self.notice.set(if player_destroyed(&self.game.world) {
+                    DESTROYED_NOTICE.into()
+                } else if self.commander_open {
                     "Commander loaded".into()
                 } else {
                     "Commander continued; select the actual current crew with T".into()
@@ -653,13 +724,39 @@ impl App {
                 event_loop.exit();
             }
             Err(error) => {
-                self.paused = true;
-                self.reset_input();
-                self.quit_failed = true;
-                self.notice
-                    .set(format!("P resumes; Q quits without saving again. {error}"));
+                self.record_quit_failure(&error);
                 self.request_redraw();
             }
+        }
+    }
+
+    fn record_quit_failure(&mut self, error: &str) {
+        self.paused = true;
+        self.reset_input();
+        self.quit_failed = true;
+        self.notice.set(if player_destroyed(&self.game.world) {
+            DESTROYED_QUIT_NOTICE.into()
+        } else {
+            format!("P resumes; Q discards unsaved progress and quits. {error}")
+        });
+    }
+
+    fn quit_recovery_key(&mut self, code: KeyCode) -> Option<QuitRecovery> {
+        if !self.quit_failed {
+            return None;
+        }
+        match code {
+            KeyCode::KeyP => {
+                self.quit_failed = false;
+                self.paused = false;
+                self.reset_input();
+                if player_destroyed(&self.game.world) {
+                    self.notice.set(DESTROYED_NOTICE.into());
+                }
+                Some(QuitRecovery::Resume)
+            }
+            KeyCode::KeyQ => Some(QuitRecovery::Discard),
+            _ => None,
         }
     }
 
@@ -751,6 +848,10 @@ impl App {
     }
 
     fn game_key(&mut self, code: KeyCode) {
+        if player_destroyed(&self.game.world) {
+            self.notice.set(DESTROYED_NOTICE.into());
+            return;
+        }
         if code == KeyCode::KeyU && self.game.world.snapshot().mode == FlightMode::Flight {
             self.notice.set("EMP: hold U for ten seconds; release to cancel. Recent-attacker self-defence only.".into());
             return;
@@ -870,12 +971,19 @@ impl App {
     fn frame_feedback(&mut self, result: Result<Option<MotionRefusal>, StepError>) -> FrameAdvance {
         let frame_refusal = match result {
             Ok(refusal) => refusal,
+            Err(StepError::InvalidMode) if player_destroyed(&self.game.world) => None,
             Err(error) if matches!(error, StepError::Collision | StepError::UnsafeEntry) => {
                 self.notice.set(error.to_string());
                 None
             }
             Err(error) => return FrameAdvance::Fatal(error),
         };
+        if player_destroyed(&self.game.world) {
+            if self.notice.text.is_none() {
+                self.notice.set(DESTROYED_NOTICE.into());
+            }
+            return FrameAdvance::Continue(frame_refusal);
+        }
         if let Some(refusal) = frame_refusal {
             self.notice.set(
                 match refusal {
@@ -1077,10 +1185,10 @@ impl App {
         presented: Result<Presentation, String>,
         docked: &mut Option<Docked>,
         docked_frame: Option<ui::Frame>,
-        renderer: &Renderer,
-        help: &Option<crate::help::Panel>,
-        xyzzy: &Option<crate::xyzzy::Menu>,
-    ) -> Result<(), String> {
+        zero_sized: bool,
+        retry_inactive: bool,
+        request_redraw: impl FnOnce(),
+    ) -> Result<bool, String> {
         match presented {
             Ok(Presentation::Presented) => {
                 if let (Some(menu), Some(frame)) = (docked, docked_frame)
@@ -1088,21 +1196,16 @@ impl App {
                 {
                     menu.presented(frame);
                 }
+                Ok(false)
             }
             Ok(Presentation::Skipped) => {
-                if (help.is_some()
-                    || xyzzy.is_some()
-                    || docked_frame
-                        .as_ref()
-                        .is_some_and(|frame| frame.screen.is_none()))
-                    && !renderer.is_zero_sized()
-                {
-                    renderer.window.request_redraw();
+                if retry_inactive && !zero_sized {
+                    request_redraw();
                 }
+                Ok(true)
             }
-            Err(error) => return Err(error),
+            Err(error) => Err(error),
         }
-        Ok(())
     }
 
     fn redraw(&mut self, event_loop: &ActiveEventLoop) {
@@ -1170,7 +1273,9 @@ impl App {
         } else {
             "Meridian"
         };
-        let mode = if self.commander_open && !self.game.playing() {
+        let mode = if player_destroyed(&self.game.world) {
+            "DESTROYED"
+        } else if self.commander_open && !self.game.playing() {
             "SAVE RECOVERY"
         } else {
             match mode {
@@ -1181,7 +1286,9 @@ impl App {
         };
         format!(
             "{commander} | {mode} | {} | H / ? Help",
-            if modal_open {
+            if player_destroyed(&self.game.world) {
+                "STOPPED"
+            } else if modal_open {
                 "MENU"
             } else if self.commander_open {
                 "COMMANDER"
@@ -1280,6 +1387,13 @@ impl App {
             .as_ref()
             .map(|menu| menu.panel(&self.game.world, self.notice.text.as_deref()));
         let title = self.frame_title(active, snapshot.mode);
+        let terminal_visible = self.terminal_cockpit_visible();
+        let retry_inactive = (terminal_visible && !self.occluded)
+            || self.help.is_some()
+            || self.xyzzy.is_some()
+            || docked_frame
+                .as_ref()
+                .is_some_and(|frame| frame.screen.is_none());
         if let Some(renderer) = &mut self.renderer {
             renderer.window.set_title(&title);
             let station =
@@ -1333,15 +1447,16 @@ impl App {
             if let (Some(started), Some(timing)) = (draw_started, &mut self.validation_timing) {
                 timing.observe(&presented, started.elapsed());
             }
-            if let Err(error) = Self::complete_presentation(
+            match Self::complete_presentation(
                 presented,
                 &mut self.docked,
                 docked_frame,
-                renderer,
-                &self.help,
-                &self.xyzzy,
+                renderer.is_zero_sized(),
+                retry_inactive,
+                || renderer.window.request_redraw(),
             ) {
-                self.fail(event_loop, error);
+                Ok(skipped) => self.record_terminal_presentation(skipped),
+                Err(error) => self.fail(event_loop, error),
             }
         }
     }
@@ -1441,6 +1556,9 @@ impl ApplicationHandler for App {
             self.request_redraw();
         }
         if let Some(renderer) = &self.renderer {
+            if self.terminal_retry_needed(renderer.is_zero_sized()) {
+                renderer.window.request_redraw();
+            }
             if !self.simulation_active() || renderer.is_zero_sized() {
                 let until = self
                     .notice

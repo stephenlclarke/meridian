@@ -210,6 +210,37 @@ impl JumpJournal {
             })
             .collect()
     }
+    /// A physical sample's system must belong to its actual retained visit,
+    /// not merely to any system in the original catalogue.
+    pub(crate) fn system_at_visit(&self, visit: u64, tick: u64) -> Result<SystemId, SaveError> {
+        let mut system = SystemId::AVENOR;
+        for leg in &self.legs {
+            if visit <= leg.source_visit {
+                if tick >= leg.arrival_tick {
+                    return Err(INVALID);
+                }
+                break;
+            }
+            if tick < leg.arrival_tick {
+                return Err(INVALID);
+            }
+            system = leg.destination;
+        }
+        Ok(system)
+    }
+    /// Completed legs before this visit and, for an actual arrival visit, its
+    /// accepted physical clock. Other visits start at a physical launch.
+    pub(crate) fn visit_origin(&self, visit: u64) -> (u64, Option<u64>) {
+        let mut count = 0;
+        let mut arrival = None;
+        for leg in self.legs.iter().take_while(|leg| leg.source_visit < visit) {
+            count += 1;
+            if leg.source_visit.checked_add(1) == Some(visit) {
+                arrival = Some(leg.physical_tick);
+            }
+        }
+        (count, arrival)
+    }
 
     /// Exact completed prefix at this physical berth, independent of secret annotations.
     pub(crate) fn spent_at(&self, dock: DockContext, tick: u64) -> Result<u64, SaveError> {

@@ -17,7 +17,7 @@ pub struct Menu {
     pub reviewing: bool,
 }
 
-const ACTIONS: [(XyzzyAction, &str); 4] = [
+const ACTIONS: [(XyzzyAction, &str); 5] = [
     (
         XyzzyAction::Enter,
         "Activate CLARKE and fit maximum equipment",
@@ -34,6 +34,7 @@ const ACTIONS: [(XyzzyAction, &str); 4] = [
         XyzzyAction::ToggleUnlimitedFuel,
         "Toggle accounted unlimited fuel",
     ),
+    (XyzzyAction::FitFuelScoops, "Fit Fuel Scoops only"),
 ];
 const SHIELD_ACTION: usize = ACTIONS.len();
 const MAX_TANK_ACTION: usize = SHIELD_ACTION + 1;
@@ -128,6 +129,9 @@ impl Menu {
                 XyzzyAction::ToggleUnlimitedFuel => "Switch between normal and unlimited fuel.",
                 XyzzyAction::FitShield(_) => {
                     "Fits only the selected shield grade; no cash or fuel grant."
+                }
+                XyzzyAction::FitFuelScoops => {
+                    "Fits only an eligible scoop in a free ordinary mount; no refuel."
                 }
                 XyzzyAction::MaximumFuelStorage => {
                     "Test-only 4 tanks; exceeds normal mounts. No active custody."

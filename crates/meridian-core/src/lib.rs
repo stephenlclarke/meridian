@@ -47,6 +47,7 @@ pub use flight::ProfitDestination;
 pub use flight::ShieldGrade;
 pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};
 pub use flight::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
+pub use flight::{SolarScoopStatus, SolarSnapshot};
 
 pub mod stag_liner;
 

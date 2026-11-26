@@ -252,7 +252,8 @@ impl State {
             .prepare_emp_discharge()
             .is_ok())
     }
-    pub(super) fn alive_before_commands(&self, world: &World) -> Result<bool, SaveError> {
+    /// EMP transfer/release happens inside the accepted physical step, before solar heat.
+    pub(super) fn alive_before_emp_step(&self, world: &World) -> Result<bool, SaveError> {
         let dock = world.navigation.ok_or(INVALID)?.dock_sequence();
         let end = world.combat.physical_tick();
         let mut events = self.resource_events(world, dock)?;
@@ -316,6 +317,16 @@ impl State {
             }
             events.push((clock, 3, sequence as u64, Effect::Emp { contact }));
         }
+        if let Some(clock) = world.solar.fatal_clock() {
+            if clock != end
+                || events.iter().any(|&(at, _, _, effect)| {
+                    at == clock && matches!(effect, Effect::Laser(_) | Effect::Mining)
+                })
+            {
+                return Err(INVALID);
+            }
+            events.push((clock, 4, 0, Effect::SolarFatal));
+        }
         events.sort_by_key(|&(clock, phase, sequence, _)| (clock, phase, sequence));
         Ok(events)
     }
@@ -330,6 +341,7 @@ impl State {
                 && world.traffic.player_hits().is_empty()
                 && world.mining.strokes().is_empty()
                 && world.emp.resource_effects().is_empty()
+                && world.solar.fatal_clock().is_none()
             {
                 Ok(())
             } else {
@@ -458,6 +470,7 @@ enum Effect {
     Mining,
     Hit { front: bool, damage: u16 },
     Emp { contact: Option<(bool, u16, u16)> },
+    SolarFatal,
 }
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 struct Pools {
@@ -508,6 +521,12 @@ fn replay(events: &[ResourceEvent], end: u64) -> Result<Pools, SaveError> {
                 }
                 let absorbed = pools.shields.absorb(front, damage);
                 pools.pulse.damage_energy(damage - absorbed);
+            }
+            Effect::SolarFatal => {
+                if !pools.pulse.alive() {
+                    return Err(INVALID);
+                }
+                pools.pulse.damage_energy(u16::MAX);
             }
         }
         clock = at;

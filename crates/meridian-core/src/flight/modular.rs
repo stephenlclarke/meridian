@@ -914,6 +914,9 @@ impl State {
                     ModuleKind::FuelStorage => {
                         world.xyzzy.authorizes_max_tanks(e.dock, e.tick, e.revision)
                     }
+                    ModuleKind::FuelScoops => {
+                        world.xyzzy.authorizes_scoops(e.dock, e.tick, e.revision)
+                    }
                     _ => world.xyzzy.authorizes(e.dock, e.tick, e.revision),
                 };
                 if !authorized {
@@ -1042,6 +1045,73 @@ impl State {
             .items
             .into_iter()
             .find(|i| i.id == item)
+    }
+    pub(super) fn scoop_item_at(&self, owner: u64, tick: u64, visit: u64) -> Option<OwnedModule> {
+        self.ledger_at(owner, tick, visit)?
+            .fitted(ModuleSlot::UtilityFuelScoops)
+    }
+    pub(super) fn validate_scoop_test_record(
+        &self,
+        owner: u64,
+        start: u64,
+        end: u64,
+        account: &CommanderAccount,
+        emp: &super::emp::State,
+    ) -> Result<(), SaveError> {
+        let fit_at = |revision| -> Result<Ledger, SaveError> {
+            let mut ledger = Ledger::born(owner)?;
+            let mut counters = [0; 2];
+            for event in self
+                .events
+                .iter()
+                .take_while(|event| event.revision <= revision)
+            {
+                ledger.replay(*event, &mut counters).map_err(|_| INVALID)?;
+            }
+            Ok(ledger)
+        };
+        let before = fit_at(start)?.fitted(ModuleSlot::UtilityFuelScoops);
+        let after_ledger = fit_at(end)?;
+        let after = after_ledger
+            .fitted(ModuleSlot::UtilityFuelScoops)
+            .ok_or(INVALID)?;
+        if start == end {
+            return if before == Some(after) {
+                Ok(())
+            } else {
+                Err(INVALID)
+            };
+        }
+        if before.is_some() || start.checked_add(1) != Some(end) {
+            return Err(INVALID);
+        }
+        let event = self
+            .events
+            .iter()
+            .find(|event| event.revision == end)
+            .ok_or(INVALID)?;
+        let budget = crate::equipment::definition().map_err(|_| INVALID)?;
+        let cargo = self.known_cargo_mounts_at(account, end);
+        let mounts = u16::from(after_ledger.fuel_storage_count())
+            + 1
+            + cargo
+            + emp.utility_mounts_at_revision(end);
+        if event.item != after.id
+            || mounts > budget.utility_mounts_capacity
+            || after_ledger.fitted_units() + cargo > budget.equipment_units_capacity
+        {
+            return Err(INVALID);
+        }
+        match event.action {
+            ModuleAction::Purchase {
+                kind: ModuleKind::FuelScoops,
+            } if event.xyzzy => Ok(()),
+            ModuleAction::Install {
+                item,
+                replacing: None,
+            } if !event.xyzzy && item == after.id => Ok(()),
+            _ => Err(INVALID),
+        }
     }
     pub(super) fn encode(&self, w: &mut Writer) {
         w.u32(

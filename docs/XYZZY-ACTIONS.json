@@ -106,7 +106,7 @@
       "key": "F",
       "legacyBehavior": "Fit Fuel Scoops with xyzzy provenance.",
       "state": "PARTIAL_CORE",
-      "dependency": "MaximumSupportedHardware grants/refits a real Fuel Scoops item. Dedicated F-only host dispatch/action and physical collection remain dependencies."
+      "dependency": "Explicit FitFuelScoops action grants/refits only the real owned item in an eligible ordinary mount; no fuel, cash or other equipment grant. Solar collection requires actual flight."
     },
     {
       "key": "arrows/pageup/pagedown",
@@ -159,8 +159,8 @@
     {
       "key": "max/Fuel Scoops",
       "legacyBehavior": "Fuel Scoops utility.",
-      "state": "IMPLEMENTED_FITTING_ONLY",
-      "dependency": "Real secret Fuel Scoops item, slot, utility budget and fitted readout. Physical fuel/cargo/ore collection remains unavailable."
+      "state": "PARTIAL_CORE",
+      "dependency": "Real secret Fuel Scoops item, slot, ordinary utility budget and source solar fuel/thermal effect. Physical cargo and ore intake remain unavailable."
     },
     {
       "key": "max/E.C.M. System",
@@ -230,7 +230,8 @@
     "RestoreStarter",
     "ToggleUnlimitedFuel",
     "FitShield(ShieldGrade)",
-    "MaximumFuelStorage"
+    "MaximumFuelStorage",
+    "FitFuelScoops"
   ],
   "execution": "Whole current core+host composition authored, compilation/tests/native/publication unrun.",
   "hostBinding": "Explicit Ctrl+Shift+X testing menu; original menu numbering not preserved; whole composition authored/unrun."

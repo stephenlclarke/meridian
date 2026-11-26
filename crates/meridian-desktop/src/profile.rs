@@ -3,7 +3,10 @@ use crate::{
     session::{Action, PracticeSelection, Session},
     storage::{SaveCommit, Store},
 };
-use meridian_core::{FlightMode, World, save::MAX_SAVE_BYTES};
+use meridian_core::{
+    FlightMode, World,
+    save::{MAX_SAVE_FILE_BYTES, MAX_SOLAR_HISTORY_BYTES},
+};
 use std::{io, path::PathBuf};
 
 pub struct Profile {
@@ -18,7 +21,7 @@ pub struct Profile {
 impl Profile {
     pub fn open(directory: PathBuf) -> Result<Self, Box<dyn std::error::Error>> {
         let store = Store::open(directory)?;
-        let has_save = !matches!(store.load(MAX_SAVE_BYTES), Ok(None));
+        let has_save = !matches!(store.load(MAX_SAVE_FILE_BYTES), Ok(None));
         Self::with_store(store, has_save)
     }
 
@@ -38,7 +41,7 @@ impl Profile {
         seed: u64,
     ) -> Result<(Self, Option<String>), Box<dyn std::error::Error>> {
         let store = Store::open(directory)?;
-        let slot = store.load(MAX_SAVE_BYTES);
+        let slot = store.load(MAX_SAVE_FILE_BYTES);
         let mut profile = Self::with_store(store, !matches!(&slot, Ok(None)))?;
         let result = match slot {
             Ok(None) => profile.new_commander(seed).map(|_| ()),
@@ -108,7 +111,7 @@ impl Profile {
             .store
             .as_ref()
             .ok_or("Internal validation has no profile storage")?
-            .save(prepared.bytes(), MAX_SAVE_BYTES)
+            .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
             .map_err(|e| format!("XYZZY change could not be saved: {e}"))?;
         prepared.commit();
         self.has_save = true;
@@ -126,6 +129,7 @@ impl Profile {
                 }
                 meridian_core::XyzzyAction::ToggleUnlimitedFuel => "Fuel setting saved.",
                 meridian_core::XyzzyAction::FitShield(_) => "Selected shield test fit saved.",
+                meridian_core::XyzzyAction::FitFuelScoops => "Fuel Scoops-only test fit saved.",
                 meridian_core::XyzzyAction::MaximumFuelStorage => {
                     "TEST MAX: four fuel tanks fitted, filled and saved."
                 }
@@ -152,7 +156,7 @@ impl Profile {
             .store
             .as_ref()
             .ok_or("Internal validation has no profile storage")?
-            .save(prepared.bytes(), MAX_SAVE_BYTES)
+            .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
             .map_err(|e| format!("EMP change could not be saved: {e}"))?;
         prepared.commit();
         self.has_save = true;
@@ -165,7 +169,12 @@ impl Profile {
 
     pub fn new_commander(&mut self, seed: u64) -> Result<bool, String> {
         self.require_profile()?;
-        if self.playing {
+        if self.playing
+            && !self
+                .world
+                .combat_snapshot()
+                .is_some_and(|combat| combat.player.destroyed)
+        {
             return Err("Start a new commander from the title screen".into());
         }
         if self.has_save && !self.new_armed {
@@ -186,7 +195,7 @@ impl Profile {
             .store
             .as_ref()
             .ok_or("Internal validation has no profile storage")?
-            .load(MAX_SAVE_BYTES)
+            .load(MAX_SAVE_FILE_BYTES)
             .map_err(|e| e.to_string())?
             .ok_or("No saved commander exists in this save slot")?;
         self.accept_save(&bytes)
@@ -241,7 +250,7 @@ impl Profile {
                 .store
                 .as_ref()
                 .ok_or("Internal validation has no profile storage")?
-                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
                 .map_err(|e| format!("Module change could not be saved: {e}"))?;
             prepared.commit();
             self.has_save = true;
@@ -277,7 +286,7 @@ impl Profile {
                 .store
                 .as_ref()
                 .ok_or("Internal validation has no profile storage")?
-                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
                 .map_err(|e| format!("Cargo equipment change could not be saved: {e}"))?;
             prepared.commit();
             self.has_save = true;
@@ -310,7 +319,7 @@ impl Profile {
                 .store
                 .as_ref()
                 .ok_or("Internal validation has no profile storage")?
-                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
                 .map_err(|e| format!("Market change could not be saved: {e}"))?;
             prepared.commit();
             self.has_save = true;
@@ -336,7 +345,7 @@ impl Profile {
                 .store
                 .as_ref()
                 .ok_or("Internal validation has no profile storage")?
-                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
                 .map_err(|e| format!("Missile equipment change could not be saved: {e}"))?;
             prepared.commit();
             self.has_save = true;
@@ -354,7 +363,7 @@ impl Profile {
                 .store
                 .as_ref()
                 .ok_or("Internal validation has no profile storage")?
-                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
                 .map_err(|e| format!("Market transaction could not be saved: {e}"))?;
             prepared.commit();
             self.has_save = true;
@@ -372,7 +381,7 @@ impl Profile {
                 .store
                 .as_ref()
                 .ok_or("Internal validation has no profile storage")?
-                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
                 .map_err(|e| format!("Trade lesson confirmation could not be saved: {e}"))?;
             prepared.commit();
             self.has_save = true;
@@ -392,7 +401,7 @@ impl Profile {
                 .store
                 .as_ref()
                 .ok_or("Internal validation has no profile storage")?
-                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
                 .map_err(|e| format!("Flight lesson confirmation could not be saved: {e}"))?;
             prepared.commit();
             self.has_save = true;
@@ -428,7 +437,7 @@ impl Profile {
                 .store
                 .as_ref()
                 .ok_or("Internal validation has no profile storage")?
-                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
                 .map_err(|error| format!("Practice confirmation could not be saved: {error}"))?;
             prepared.commit();
             self.has_save = true;
@@ -461,7 +470,7 @@ impl Profile {
             .store
             .as_ref()
             .ok_or("No profile storage")?
-            .save(prepared.bytes(), MAX_SAVE_BYTES)
+            .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
             .map_err(|error| format!("Navigation change could not be saved: {error}"))?;
         prepared.commit();
         self.has_save = true;
@@ -476,16 +485,30 @@ impl Profile {
     }
 
     pub fn save(&mut self) -> Result<String, String> {
+        self.save_with_limits(MAX_SAVE_FILE_BYTES, MAX_SOLAR_HISTORY_BYTES)
+    }
+
+    fn save_with_limits(
+        &mut self,
+        file_limit: usize,
+        solar_limit: usize,
+    ) -> Result<String, String> {
         self.require_profile()?;
         if !self.playing {
             return Err("No active commander to save".into());
+        }
+        if self.world.solar_save_limit_reached(solar_limit) {
+            return Err(
+                "Solar save history is full. Flight continues; the previous save is retained."
+                    .into(),
+            );
         }
         let bytes = self.world.save_bytes().map_err(|e| e.to_string())?;
         let committed = self
             .store
             .as_ref()
             .ok_or("Internal validation has no profile storage")?
-            .save(&bytes, MAX_SAVE_BYTES)
+            .save(&bytes, file_limit)
             .map_err(|e| format!("Save failed; previous file retained: {e}"))?;
         self.has_save = true;
         match committed {
@@ -503,11 +526,26 @@ impl Profile {
     }
 
     pub fn prepare_quit(&mut self) -> Result<(), String> {
+        self.prepare_quit_with_limits(MAX_SAVE_FILE_BYTES, MAX_SOLAR_HISTORY_BYTES)
+    }
+
+    pub(crate) fn prepare_quit_with_limits(
+        &mut self,
+        file_limit: usize,
+        solar_limit: usize,
+    ) -> Result<(), String> {
         if self.is_internal_validation() {
             return Ok(());
         }
         if self.playing {
-            self.save()?;
+            if self
+                .world
+                .combat_snapshot()
+                .is_some_and(|combat| combat.player.destroyed)
+            {
+                return Err("Commander destroyed; normal Quit retains the previous save. F5 explicitly saves terminal state.".into());
+            }
+            self.save_with_limits(file_limit, solar_limit)?;
         }
         Ok(())
     }
@@ -685,6 +723,183 @@ pub(crate) mod tests {
     }
     pub(super) fn action(profile: &mut Profile, value: Action) {
         profile.command(value).unwrap_or_else(|e| panic!("{e}"));
+    }
+    pub(crate) fn solar_history_profile(directory: &TestDirectory) -> Profile {
+        let mut profile = open(&directory.0);
+        assert!(
+            profile
+                .new_commander(18310)
+                .unwrap_or_else(|e| panic!("{e}"))
+        );
+        action(&mut profile, Action::Launch);
+        let step = |profile: &mut Profile, input| {
+            profile.world.step(input).unwrap_or_else(|e| panic!("{e}"));
+        };
+        step(&mut profile, FlightInput::default());
+        let sun = profile
+            .world
+            .celestial_snapshot()
+            .unwrap_or_else(|| panic!("sun"))
+            .sun;
+        let target = [
+            sun.position.x as f32,
+            sun.position.y as f32,
+            sun.position.z as f32,
+        ];
+        let local = |world: &World| {
+            let frame = world.snapshot();
+            let delta = core::array::from_fn(|i| target[i] - frame.position[i]);
+            crate::mesh::rotate_inverse(frame.orientation, delta)
+        };
+        let [x, _, z] = local(&profile.world);
+        let yaw = x.atan2(z);
+        let count = (yaw.abs() / (0.65 / 60.0)).ceil() as u16;
+        for _ in 0..count {
+            step(
+                &mut profile,
+                FlightInput {
+                    yaw: yaw / (0.65 / 60.0) / f32::from(count),
+                    ..FlightInput::default()
+                },
+            );
+        }
+        let [x, y, z] = local(&profile.world);
+        let pitch = y.atan2(x.hypot(z));
+        let count = (pitch.abs() / (0.7 / 60.0)).ceil() as u16;
+        for _ in 0..count {
+            step(
+                &mut profile,
+                FlightInput {
+                    pitch: pitch / (0.7 / 60.0) / f32::from(count),
+                    ..FlightInput::default()
+                },
+            );
+        }
+        let ratio = |world: &World| {
+            world
+                .snapshot()
+                .position
+                .into_iter()
+                .zip(target)
+                .map(|(a, b)| f64::from(a - b).powi(2))
+                .sum::<f64>()
+                .sqrt()
+                / sun.radius
+        };
+        for _ in 0..6000 {
+            if ratio(&profile.world) <= 4.0 {
+                break;
+            }
+            step(
+                &mut profile,
+                FlightInput {
+                    throttle: 1.0,
+                    ..FlightInput::default()
+                },
+            );
+        }
+        assert!(ratio(&profile.world) <= 4.0);
+        for _ in 0..300 {
+            if profile.world.snapshot().speed == 0.0 {
+                break;
+            }
+            step(
+                &mut profile,
+                FlightInput {
+                    brake: true,
+                    ..FlightInput::default()
+                },
+            );
+        }
+        for i in 0..720 {
+            step(
+                &mut profile,
+                FlightInput {
+                    yaw: if i % 2 == 0 { 0.1 } else { -0.1 },
+                    ..FlightInput::default()
+                },
+            );
+        }
+        profile
+    }
+    #[test]
+    fn chunked_solar_profile_publishes_atomically_and_refuses_small_or_failed_writer() {
+        let directory = TestDirectory::new();
+        let mut profile = solar_history_profile(&directory);
+        let before = profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+        assert!(before.len() > meridian_core::save::MAX_SAVE_BYTES);
+        profile.save().unwrap_or_else(|e| panic!("{e}"));
+        let path = directory.0.join("commander.meridian");
+        assert_eq!(fs::read(&path).unwrap_or_else(|e| panic!("{e}")), before);
+        profile
+            .world
+            .step(FlightInput {
+                yaw: 0.2,
+                ..FlightInput::default()
+            })
+            .unwrap_or_else(|e| panic!("{e}"));
+        let current = profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+        assert!(
+            profile
+                .save_with_limits(meridian_core::save::MAX_SAVE_BYTES, MAX_SOLAR_HISTORY_BYTES)
+                .is_err()
+        );
+        assert!(
+            profile
+                .prepare_quit_with_limits(
+                    meridian_core::save::MAX_SAVE_BYTES,
+                    MAX_SOLAR_HISTORY_BYTES
+                )
+                .is_err()
+        );
+        assert!(
+            !profile
+                .world
+                .solar_save_limit_reached(MAX_SOLAR_HISTORY_BYTES)
+        );
+        assert!(profile.world.solar_save_limit_reached(1));
+        let failure = profile
+            .save_with_limits(MAX_SAVE_FILE_BYTES, 1)
+            .err()
+            .unwrap_or_else(|| panic!("solar limit admitted save"));
+        assert!(failure.contains("Solar save history is full"));
+        assert_eq!(
+            profile.prepare_quit_with_limits(MAX_SAVE_FILE_BYTES, 1),
+            Err(failure)
+        );
+        assert!(profile.playing());
+        assert_eq!(fs::read(&path).unwrap_or_else(|e| panic!("{e}")), before);
+        assert_eq!(
+            profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}")),
+            current
+        );
+        let previous = World::from_save_bytes(&before).unwrap_or_else(|e| panic!("{e}"));
+        assert!(previous.snapshot().tick < profile.world.snapshot().tick);
+        let backup = directory.0.join("previous-save");
+        fs::rename(&path, &backup).unwrap_or_else(|e| panic!("{e}"));
+        fs::create_dir(&path).unwrap_or_else(|e| panic!("{e}"));
+        assert!(profile.save().is_err());
+        assert!(profile.prepare_quit().is_err());
+        assert!(profile.playing());
+        assert_eq!(fs::read(&backup).unwrap_or_else(|e| panic!("{e}")), before);
+        assert_eq!(
+            profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}")),
+            current
+        );
+        fs::remove_dir(&path).unwrap_or_else(|e| panic!("{e}"));
+        fs::rename(&backup, &path).unwrap_or_else(|e| panic!("{e}"));
+        profile.save().unwrap_or_else(|e| panic!("{e}"));
+        let disk = fs::read(&path).unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(disk, current);
+        let restored = World::from_save_bytes(&disk).unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(restored.snapshot(), profile.world.snapshot());
+        assert_eq!(restored.solar_snapshot(), profile.world.solar_snapshot());
+        assert_eq!(restored.commander_id(), profile.world.commander_id());
+        drop(profile);
+        let mut reopened = open(&directory.0);
+        reopened.continue_saved().unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(reopened.world.snapshot(), restored.snapshot());
+        assert_eq!(reopened.world.solar_snapshot(), restored.solar_snapshot());
     }
     fn travel(profile: &mut Profile) {
         action(profile, Action::Launch);

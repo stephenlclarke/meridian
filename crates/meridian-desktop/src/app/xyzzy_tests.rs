@@ -291,6 +291,34 @@ fn actual_max_tank_row_is_explicit_and_publishes_four_distinct_items_to_disk() {
 }
 
 #[test]
+fn dedicated_fuel_scoops_row_does_not_change_other_equipment_or_fuel() {
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    activate(&mut app);
+    let before = app.game.world.modular_equipment_snapshot();
+    let fuel = app.game.world.snapshot().navigation;
+    let cash = app.game.world.credits_tenths();
+    menu(&mut app);
+    for _ in 0..4 {
+        press(&mut app, KeyCode::ArrowDown);
+    }
+    assert_eq!(
+        app.xyzzy.as_ref().map(crate::xyzzy::Menu::action),
+        Some(XyzzyAction::FitFuelScoops)
+    );
+    press(&mut app, KeyCode::Enter);
+    press(&mut app, KeyCode::Enter);
+    assert_eq!(app.game.world.modular_equipment_snapshot(), before);
+    assert_eq!(app.game.world.snapshot().navigation, fuel);
+    assert_eq!(app.game.world.credits_tenths(), cash);
+    let saved = ok(fs::read(directory.0.join("commander.meridian")));
+    assert_eq!(
+        ok(World::from_save_bytes(&saved)).modular_equipment_snapshot(),
+        before
+    );
+}
+
+#[test]
 fn failed_actual_profile_publication_retains_world_saved_bytes_and_secret_review() {
     let directory = TestDirectory::new();
     let mut app = app(&directory);
@@ -360,7 +388,7 @@ fn activate_refit_and_toggle_fuel_without_leaving_the_menu() {
     assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
     let items = app.game.world.ammunition_snapshot();
     let modules = app.game.world.modular_equipment_snapshot();
-    for steps in [1, 1, 4] {
+    for steps in [1, 1, 5] {
         for _ in 0..steps {
             press(&mut app, KeyCode::ArrowDown);
         }
@@ -371,7 +399,8 @@ fn activate_refit_and_toggle_fuel_without_leaving_the_menu() {
         assert_eq!(app.game.world.modular_equipment_snapshot(), modules);
     }
     assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
-    // Up wraps through explicit tank and shield testing rows to the fuel action.
+    // Up wraps through tank, shield and scoop testing rows to the fuel action.
+    press(&mut app, KeyCode::ArrowUp);
     press(&mut app, KeyCode::ArrowUp);
     press(&mut app, KeyCode::ArrowUp);
     press(&mut app, KeyCode::ArrowUp);

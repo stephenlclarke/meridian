@@ -3,7 +3,7 @@
 use super::{glyph, quad};
 use crate::mesh::{Vertex, rotate_inverse};
 use meridian_core::traffic::{MAX_TRAFFIC_ACTORS, NpcPhase, Population, TrafficSnapshot};
-use meridian_core::{FlightMode, FlightView, Snapshot, World};
+use meridian_core::{FlightMode, FlightView, Snapshot, SolarScoopStatus, SolarSnapshot, World};
 
 const YELLOW: [f32; 3] = [1.0, 1.0, 0.0];
 const GREEN: [f32; 3] = [0.0, 1.0, 0.0];
@@ -15,7 +15,7 @@ const CYAN: [f32; 3] = [0.0, 1.0, 1.0];
 const NPC_CONTACT_START: usize = 4 + crate::mesh::MAX_MISSILE_PROJECTILES;
 pub const MAX_CONTACTS: usize = NPC_CONTACT_START + MAX_TRAFFIC_ACTORS;
 // Two line quads per additional scanner contact; eight edges per added pylon icon.
-pub const MAX_VERTICES: usize = 30_000 + (MAX_CONTACTS - 7) * 12 + (9 - 3) * 8 * 6;
+pub const MAX_VERTICES: usize = 30_000 + (MAX_CONTACTS - 7) * 12 + (9 - 3) * 8 * 6 + 40 * 35 * 6;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Cockpit {
@@ -25,6 +25,8 @@ pub struct Cockpit {
     pub energy: Option<f32>,
     pub heat: Option<f32>,
     pub fuel: Option<f32>,
+    pub solar: Option<SolarSnapshot>,
+    pub solar_limited: bool,
     pub missiles: usize,
     pub armed: bool,
     pub locked: bool,
@@ -77,6 +79,9 @@ impl Cockpit {
             fuel: flight
                 .navigation
                 .map(|n| f32::from(n.fuel_units) / f32::from(n.fuel_capacity_units)),
+            solar: world.solar_snapshot(),
+            solar_limited: world
+                .solar_save_limit_reached(meridian_core::save::MAX_SOLAR_HISTORY_BYTES),
             missiles: world
                 .missile_rounds()
                 .map_or(0, |rounds| rounds.iter().flatten().count()),
@@ -97,6 +102,28 @@ impl Cockpit {
         } else {
             "FLIGHT"
         } // Hostile/Safe requires the unported active hostile-body authority.
+    }
+    pub fn solar_label(&self) -> Option<(&'static str, [f32; 3])> {
+        let solar = self.solar?;
+        if self.destroyed && solar.cabin_temperature >= 1.0 {
+            return Some(("CABIN OVERHEAT - HULL DESTROYED", RED));
+        }
+        if solar.cabin_temperature >= 0.9 {
+            return Some(("CABIN CRITICAL - LEAVE CORONA", RED));
+        }
+        if solar.cabin_temperature >= 0.75 {
+            return Some(("CABIN DANGER - LEAVE CORONA", RED));
+        }
+        if self.solar_limited {
+            return Some(("SAVE HISTORY FULL - FLIGHT ACTIVE", YELLOW));
+        }
+        match solar.status {
+            SolarScoopStatus::Inactive => None,
+            SolarScoopStatus::NoScoops => Some(("SOLAR CORONA - NO SCOOPS", YELLOW)),
+            SolarScoopStatus::TurnTowardSun => Some(("SOLAR SCOOP - FACE SUN AND CRUISE", YELLOW)),
+            SolarScoopStatus::Collecting => Some(("SOLAR SCOOP ACTIVE", GREEN)),
+            SolarScoopStatus::TankFull => Some(("SOLAR SCOOP - TANK FULL", GREEN)),
+        }
     }
     pub fn station_navigation(&self) -> Option<(f32, f32, f32)> {
         let p = self.station?;
@@ -382,7 +409,11 @@ pub fn append(c: &Cockpit, width: u32, height: u32, out: &mut Vec<Vertex>) {
         ("FRONT SHIELD", c.shield[0], GREEN),
         ("REAR SHIELD", c.shield[1], GREEN),
         ("FUEL", c.fuel, GREEN),
-        ("CABIN TEMP", None, RED),
+        (
+            "CABIN TEMP",
+            c.solar.map(|solar| solar.cabin_temperature as f32),
+            RED,
+        ),
         ("LASER HEAT", c.heat, RED),
         ("ALTITUDE", None, YELLOW),
     ];
@@ -469,6 +500,11 @@ pub fn append(c: &Cockpit, width: u32, height: u32, out: &mut Vec<Vertex>) {
     }
     scanner(out, c, l, size);
     append_station_navigation(out, c, l, size);
+    if c.flight.mode != FlightMode::Docked
+        && let Some((text, color)) = c.solar_label()
+    {
+        label(out, text, 12.0, l.top - 14.0, l.scale, color, size);
+    }
 }
 
 fn append_station_navigation(out: &mut Vec<Vertex>, c: &Cockpit, l: Layout, size: [f32; 2]) {
@@ -607,6 +643,7 @@ mod tests {
         assert_eq!(c.energy, Some(1.0));
         assert_eq!(c.fuel, Some(1.0));
         assert_eq!(c.heat, Some(0.0));
+        assert_eq!(c.solar, Some(SolarSnapshot::default()));
         assert_eq!(c.missiles, 3);
         assert!(!c.armed);
         assert!(!c.locked);
@@ -620,6 +657,48 @@ mod tests {
             world.save_bytes().unwrap_or_else(|error| panic!("{error}")),
             before
         );
+    }
+    #[test]
+    fn solar_readout_uses_status_and_thermal_warning_precedence() {
+        let mut world = world();
+        world.request_launch(0).unwrap_or_else(|e| panic!("{e}"));
+        world
+            .step(FlightInput::default())
+            .unwrap_or_else(|e| panic!("{e}"));
+        let mut cockpit =
+            Cockpit::capture(&world, world.snapshot()).unwrap_or_else(|e| panic!("{e}"));
+        let before = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+        for (temperature, status, text) in [
+            (0.1, SolarScoopStatus::Collecting, "SOLAR SCOOP ACTIVE"),
+            (0.2, SolarScoopStatus::NoScoops, "SOLAR CORONA - NO SCOOPS"),
+            (
+                0.4,
+                SolarScoopStatus::TurnTowardSun,
+                "SOLAR SCOOP - FACE SUN AND CRUISE",
+            ),
+            (0.6, SolarScoopStatus::TankFull, "SOLAR SCOOP - TANK FULL"),
+            (
+                0.75,
+                SolarScoopStatus::Collecting,
+                "CABIN DANGER - LEAVE CORONA",
+            ),
+            (
+                0.9,
+                SolarScoopStatus::Collecting,
+                "CABIN CRITICAL - LEAVE CORONA",
+            ),
+        ] {
+            cockpit.solar = Some(SolarSnapshot {
+                status,
+                cabin_temperature: temperature,
+                fuel_remainder: 0.0,
+            });
+            assert_eq!(cockpit.solar_label().map(|(label, _)| label), Some(text));
+            let mut vertices = Vec::new();
+            append(&cockpit, 640, 360, &mut vertices);
+            assert!(vertices.len() <= MAX_VERTICES);
+        }
+        assert_eq!(world.save_bytes().unwrap_or_else(|e| panic!("{e}")), before);
     }
     #[test]
     fn actual_flight_and_pulse_change_speed_energy_and_heat_readings() {
