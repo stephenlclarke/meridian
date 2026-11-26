@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh090-elephant",
+  "undoBefore": [
+    "sh091-gopher"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "elephant",
+  "before": "pub mod eagle_cruiser;\n",
+  "after": "pub mod elk;\n"
+}

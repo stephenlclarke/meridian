@@ -1,3 +1,8 @@
+# Elephant source preparation and replay use exact LF bytes.
+tools/measure_elephant.py text eol=lf
+tools/prepare_elephant.py text eol=lf
+tools/verify_elephant.py text eol=lf
+
 # Gopher source preparation and replay use exact LF bytes.
 tools/measure_gopher.py text eol=lf
 tools/prepare_gopher.py text eol=lf
