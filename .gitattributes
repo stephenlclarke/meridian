@@ -548,3 +548,9 @@ tools/measure_osprey_support.py text eol=lf
 tools/prepare_osprey_support.py text eol=lf
 tools/rebuild_osprey_support.py text eol=lf
 tools/verify_osprey_support.py text eol=lf
+
+# Byte-pinned Wolf Scout replay programs.
+tools/measure_wolf_scout.py text eol=lf
+tools/prepare_wolf_scout.py text eol=lf
+tools/rebuild_wolf_scout.py text eol=lf
+tools/verify_wolf_scout.py text eol=lf
