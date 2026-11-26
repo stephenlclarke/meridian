@@ -119,12 +119,16 @@ fn market_funded_commander() -> World {
 
 fn buy_fitted(world: &mut World, kind: ModuleKind, action: ModuleAction, price: u32) {
     let cash = some(world.credits_tenths());
-    let offer = some(
+    let offer = some(if kind == ModuleKind::FuelScoops {
+        world
+            .fuel_scoops_snapshot()
+            .and_then(|scoops| scoops.current_offer)
+    } else {
         world
             .module_offers()
             .into_iter()
-            .find(|offer| offer.kind == kind),
-    );
+            .find(|offer| offer.kind == kind)
+    });
     assert_eq!(offer.price_tenths, price);
     assert!(offer.available);
     let tick = world.snapshot().tick;
