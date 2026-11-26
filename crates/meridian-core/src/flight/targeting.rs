@@ -441,6 +441,18 @@ impl World {
         }
     }
 
+    pub fn selected_disabled_salvage_target(&self) -> Option<NpcId> {
+        let candidate = self.current_target()?.1;
+        let WorkTargetId::Wreck(id) = self.automatic_work_target(candidate)?.id else {
+            return None;
+        };
+        self.traffic_snapshot()?
+            .actors
+            .into_iter()
+            .find(|actor| actor.id == id && actor.electrical_disabled && is_live(actor))
+            .map(|actor| actor.id)
+    }
+
     pub fn automatic_work_status(&self) -> Option<&'static str> {
         self.targeting.work_status
     }
@@ -492,6 +504,13 @@ impl World {
         } else {
             match work.id {
                 WorkTargetId::Asteroid(id) => self.auto_mine_tick(id),
+                WorkTargetId::Wreck(id) if self.selected_disabled_salvage_target() == Some(id) => {
+                    if self.fitted_salvage_cutter().is_none() {
+                        "Cutter not fitted"
+                    } else {
+                        "Occupied: confirm cut"
+                    }
+                }
                 WorkTargetId::Wreck(id) => self.auto_salvage_tick(id),
                 WorkTargetId::Ore(_) => return,
             }
