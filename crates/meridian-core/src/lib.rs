@@ -13,6 +13,7 @@ pub mod caracal_scout;
 pub mod celestial;
 pub mod condor;
 pub mod docking;
+pub mod dzo;
 pub mod eagle_cruiser;
 pub mod equipment;
 pub mod erne_corvette;

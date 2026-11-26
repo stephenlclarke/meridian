@@ -1,3 +1,9 @@
+# Dzo source preparation and replay use exact LF bytes.
+tools/dzo_collar_support.py text eol=lf
+tools/measure_dzo.py text eol=lf
+tools/prepare_dzo.py text eol=lf
+tools/verify_dzo.py text eol=lf
+
 # Griffon Spectre source preparation and replay use exact LF bytes.
 tools/measure_griffon_spectre_geometry.py text eol=lf
 tools/prepare_griffon_spectre_geometry.py text eol=lf
