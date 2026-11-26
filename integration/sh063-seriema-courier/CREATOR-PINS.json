@@ -1,0 +1,35 @@
+{
+  "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "paths": {
+    "ORIGINAL-OWNERSHIP.json": {
+      "source": "docs/milestones/fleet-physical/creator-ownership-records/SH063.json",
+      "blob": "20cf3b9db4b78929112066f572815986ee7b2db1",
+      "bytes": 48986,
+      "sha256": "c97ff5f6027e5df2d70d450da5c2aafc2b1b7b0ad7935231ec65eba81598dfee"
+    },
+    "CREATOR-CANDIDATE.json": {
+      "source": "docs/milestones/fleet-physical/collision-sources/SH063-collision-candidate.json",
+      "blob": "f03186b89d23d42893753e58b9e4dff522d0475a",
+      "bytes": 65916,
+      "sha256": "01fe5a05526d0380715e7187992f447c66277d3ed708daf3655204a5d10a394d"
+    },
+    "CREATOR-BLUEPRINT.json": {
+      "source": "docs/milestones/fleet-physical/SH063-native-candidate-blueprint.json",
+      "blob": "30d9d137f7555239aa21d72e2ea988dbc6a1a541",
+      "bytes": 4858,
+      "sha256": "461ff3ad5a14b8bcf0d4219aa90bb90467ad35b929d264715ce1a03683b154ed"
+    },
+    "LEGACY-CANDIDATE-RECIPE.py.txt": {
+      "source": "docs/milestones/fleet-physical/SH063-native-candidate-recipe.py",
+      "blob": "d8fafe9229cf5a5c96dad9cfd2114c6c448f37b7",
+      "bytes": 8144,
+      "sha256": "8efd00e4fdc2b9378b421c7cf99a3ecb9c6234f69dc0d797c541e7bccb957ca2"
+    },
+    "LEGACY-CANDIDATE-TESTS.py.txt": {
+      "source": "docs/milestones/fleet-physical/SH063-native-candidate-tests.py",
+      "blob": "24a821c7c46a7ea7334c129de2fc72fdf955535b",
+      "bytes": 6614,
+      "sha256": "d051d4b86e65931b8a1e7ec5448501a449de7fd0743c3d473fdd435285066fe5"
+    }
+  }
+}
