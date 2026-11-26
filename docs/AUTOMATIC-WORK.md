@@ -14,7 +14,9 @@ Press **Tab** to select the nearest scanner contact, including contacts behind y
 | Docking targeting and navigation computer | Selecting a station starts the docking approach. **N** also starts or cancels automatic docking. |
 | Mining or Salvage targeting module and work equipment | Selecting the corresponding contact starts the work sequence. Occupied cutter contact still requires confirmation. |
 
-Press **T** to request a missile lock on the selected ship. Laser fire against a ship always needs pilot input.
+Steering by hand takes over the current approach and keeps the scanner mark. Press **F** to resume assistance on that contact. **Delete** clears it. With Basic alignment, the pilot can still use the throttle. Identification adds legal status to the readout. Pirate targeting adds available cargo and route information. Military targeting adds shield and laser heat readings.
+
+In manual flight, point the fitted mining laser at the selected rock and press **Z**. To collect released ore, select the fragment, match speed and bring it into the scoop below the nose. Press **Z** to collect. At an eligible wreck, match its motion at cutter range and press **Z** with the cutter and scoops fitted. A disabled occupied ship opens a review before contact. Press **T** to request a missile lock on the selected ship. Laser fire against a ship always needs pilot input.
 
 For mining, fit the targeting core, Mining Module and Fuel Scoops. Carry a Mining Laser in storage or fit it in front. The computer fits the owned laser, holds the ship clear of the rock and fires. Keep the same rock selected. When ore breaks free, the computer follows the moving fragment and guides it into the scoop below the nose. Once collection finishes, the previous front laser returns. The six vertices that define the visible Meridian ore fragment also determine whether it fits through the scoop.
 
