@@ -1428,13 +1428,30 @@ mod tests {
         let (_directory, profile, _menu) = start();
         let panel = ok(equipment_panel(&profile.world, "front-laser", ""));
         assert_eq!(panel.slots.len(), 19);
-        let targeting: Vec<_> = panel.slots[15..]
-            .iter()
-            .map(|slot| slot.id.as_str())
-            .collect();
+        let actual: Vec<_> = panel.slots.iter().map(|slot| slot.id.as_str()).collect();
         assert_eq!(
-            targeting,
-            ["targeting", "targeting-mining", "targeting-salvage"]
+            actual,
+            [
+                "front-laser",
+                "cargo-expansion",
+                "energy",
+                "navigation",
+                "drive",
+                ui::fuel_scoops::SLOT,
+                ui::emp::SLOT,
+                "pylon-0",
+                "pylon-1",
+                "pylon-2",
+                "pylon-3",
+                "pylon-4",
+                "pylon-5",
+                "pylon-6",
+                "pylon-7",
+                "pylon-8",
+                "targeting",
+                "targeting-mining",
+                "targeting-salvage"
+            ]
         );
         let emp = panel
             .slots
