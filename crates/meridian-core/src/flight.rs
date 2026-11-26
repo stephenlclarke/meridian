@@ -89,7 +89,7 @@ pub use practice::{
 };
 mod profit_scan;
 mod services;
-pub use profit_scan::ProfitDestination;
+pub use profit_scan::{ProfitDestination, ProfitDetail};
 mod weapons;
 pub use mission::{MissionError, MissionSnapshot, StationNpc};
 pub use services::ServiceSnapshot;

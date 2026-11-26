@@ -261,7 +261,11 @@ impl DockedScreens {
         if context.review.is_some() || !painted.viewport.body().contains(point) {
             Outcome::Ignored
         } else if let Some(chooser) = &mut self.route_chooser {
-            chooser.choose(moved(chooser.selected, rows, chooser.candidates.len()))
+            if chooser.trade_detail {
+                chooser.scroll_details(rows, context)
+            } else {
+                chooser.choose(moved(chooser.selected, rows, chooser.candidates.len()))
+            }
         } else if self.screen == Screen::System
             || (self.detail && self.screen == Screen::Showroom)
             || (self.screen == Screen::Galaxy && {
@@ -474,12 +478,21 @@ impl DockedScreens {
             return self.search_key(key, c);
         }
         if let Some(chooser) = &mut self.route_chooser {
+            if chooser.trade_detail {
+                return match key {
+                    Key::Back | Key::Details | Key::Confirm => chooser.toggle_trade_detail(),
+                    Key::Previous | Key::PagePrevious => chooser.scroll_details(-1, c),
+                    Key::Next | Key::PageNext => chooser.scroll_details(1, c),
+                    _ => Outcome::Ignored,
+                };
+            }
             return match key {
                 Key::Back => {
                     self.route_chooser = None;
                     Outcome::Updated
                 }
                 Key::Confirm if !c.paused => chooser.confirm(),
+                Key::Details => chooser.toggle_trade_detail(),
                 Key::Previous | Key::Next if !chooser.candidates.is_empty() => {
                     chooser.choose(moved(
                         chooser.selected,
@@ -795,6 +808,8 @@ impl DockedScreens {
                 self.route_chooser = Some(RouteChooser {
                     candidates,
                     selected: 0,
+                    trade_detail: false,
+                    detail_scroll: 0,
                 });
                 self.searching = false;
                 Outcome::Updated
@@ -810,6 +825,8 @@ impl DockedScreens {
         self.route_chooser = Some(RouteChooser {
             candidates: Vec::new(),
             selected: 0,
+            trade_detail: false,
+            detail_scroll: 0,
         });
         self.searching = false;
         Outcome::Updated

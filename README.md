@@ -120,7 +120,8 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | Ctrl+Shift+X when docked | Explicit XYZZY testing menu; Enter reviews then confirms |
 | 0 when docked (current source) | Commander details |
 | 1 / 2 / 3 / 4 / 5 when docked | Galaxy / System / Ships / Market / Equipment |
-| P on the station Galaxy chart (development) | Toggle the best-profit scan of reachable markets; P in flight still pauses |
+| P on the station Galaxy chart (development) | Toggle the best-profit scan with commodity quantities and live quote estimates; P in flight still pauses |
+| R, then D in a station route review (development) | Inspect estimated trade per leg; D, B or Enter closes details without installing a route |
 | L; W/S; arrows; A/D; Q/E; Space | Launch; thrust; pitch; yaw; roll; brake |
 | N in flight (development) | Engage the fitted navigation computer for docking, or cancel the approach |
 | Tab / F / Delete / Shift+I in flight (development) | Cycle scanner contacts by distance / switch between assisted and manual targeting / release target / show target details |
@@ -130,6 +131,8 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | Hold U in active flight | Charge the fitted EMP for 600 accepted ticks; early release cancels |
 | I; V; X | Mission details; review all held freight deliveries; review abandonment |
 | T in flight; F1; F2; F3; F4 | Lock the selected ship for missiles; next ship/practice lock; arm/safe; launch one missile; safe/unlock |
+
+The [station trade estimate details](integration/followup-trade-detail/README.md) show the current finite commodity allocation behind the chart scan and route estimates. They do not purchase, sell or install a route.
 | F7; F8; F10 | Review attempt closure; reception; fresh consent |
 | F6; F12; C; 0/1/2/3 | Flight lesson consent/reception; cancellation; details; view direction |
 | P; F11; F5; F9 | Pause; fullscreen; save; reload the current qualified save |

@@ -10,6 +10,55 @@ fn first_plan(world: &World, destination: SystemId) -> RoutePlan {
         .clone()
 }
 
+#[test]
+fn route_trade_details_share_current_score_and_do_not_install_or_save_a_route() {
+    let world = World::new_commander(11109).unwrap();
+    let before = world.save_bytes().unwrap();
+    let routes = world.route_alternatives(SystemId::LARERIA).unwrap();
+    let markets = world.station_markets.as_ref().unwrap();
+    for route in &routes {
+        assert_eq!(route.trade_legs.len(), route.plan.systems().len() - 1);
+        assert_eq!(
+            route.trade_tenths,
+            route
+                .trade_legs
+                .iter()
+                .map(|leg| leg.profit_tenths)
+                .sum::<u64>()
+        );
+        for (leg, hop) in route.trade_legs.iter().zip(route.plan.systems().windows(2)) {
+            assert_eq!([leg.from, leg.to], [hop[0], hop[1]]);
+            for row in &leg.exports {
+                let origin = super::super::services::service_site(leg.from).unwrap();
+                let target = super::super::services::service_site(leg.to).unwrap();
+                assert_eq!(
+                    markets.commodity_quote(origin, row.commodity).ask_tenths,
+                    row.ask_tenths
+                );
+                assert_eq!(
+                    markets.commodity_quote(target, row.commodity).bid_tenths,
+                    row.bid_tenths
+                );
+                assert!(row.quantity > 0);
+            }
+        }
+    }
+    assert!(
+        routes
+            .iter()
+            .any(|route| route.trade_legs.iter().any(|leg| !leg.exports.is_empty()))
+    );
+    assert!(world.active_route_progress().is_none());
+    assert_eq!(world.save_bytes().unwrap(), before);
+    assert_eq!(
+        World::from_save_bytes(&before)
+            .unwrap()
+            .route_alternatives(SystemId::LARERIA)
+            .unwrap(),
+        routes
+    );
+}
+
 fn cold(world: &World) -> World {
     let restored = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
     assert_eq!(

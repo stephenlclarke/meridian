@@ -83,7 +83,6 @@ pub mod yak;
 pub use flight::GoshawkCustomApproachSnapshot;
 pub use flight::PeregrineMkIApproachSnapshot;
 pub use flight::PreparedNavigationRoute;
-pub use flight::ProfitDestination;
 pub use flight::ShieldGrade;
 pub use flight::{
     ECM_ENERGY_HUNDREDTHS, ECM_FIELD_TICKS, EcmActivation, EcmError, EcmSnapshot, EcmTermination,
@@ -92,6 +91,7 @@ pub use flight::{
 pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};
 pub use flight::{MedusaPreviewFit, PlayerHullKind};
 pub use flight::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
+pub use flight::{ProfitDestination, ProfitDetail};
 pub use flight::{SolarScoopStatus, SolarSnapshot};
 
 pub mod stag_liner;
