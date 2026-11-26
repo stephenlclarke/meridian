@@ -1088,6 +1088,43 @@ fn real_charge_blocks_both_laser_commands_but_preserves_fitted_snapshot_and_canc
     assert_eq!(w.front_laser_snapshot(), Some(fit));
     cold(&w);
 }
+
+#[test]
+fn real_manual_ecm_cancels_an_unfinished_emp_without_a_discharge_and_cold_retains_field() {
+    let mut w = World::new_commander(12001).unwrap();
+    secret(&mut w);
+    let scoop = w.fitted_fuel_scoops().unwrap();
+    let tick = w.snapshot().tick;
+    let review = w
+        .review_module(crate::ModuleAction::Store { item: scoop.item }, tick)
+        .unwrap();
+    w.prepare_module(review, tick).unwrap().commit();
+    let review = w.review_xyzzy(XyzzyAction::FitEcm, tick).unwrap();
+    w.prepare_xyzzy(review, tick).unwrap().commit();
+    let (mut w, target) = defender(w);
+    start_charge(&mut w, target);
+    let tick = w.snapshot().tick;
+    let before = w.flight_resources_snapshot().unwrap();
+    let activation = w.request_ecm(tick).unwrap();
+    let after = w.flight_resources_snapshot().unwrap();
+    assert_eq!(after.energy_hundredths, before.energy_hundredths - 2200);
+    assert_eq!(
+        w.emp.charge.as_ref().unwrap().phase,
+        EmpChargePhase::Cancelled
+    );
+    assert_eq!(
+        w.emp.charge.as_ref().unwrap().ended_at,
+        Some(activation.physical_tick)
+    );
+    assert_eq!(w.emp.meter.bank_spent, 0);
+    assert!(w.emp.pulses.is_empty());
+    assert_eq!(w.request_emp_trigger(true, tick), Err(EmpError::Resources));
+    let mut loaded = cold(&w);
+    assert_eq!(loaded.ecm_snapshot(), w.ecm_snapshot());
+    loaded.emp.charge.as_mut().unwrap().phase = EmpChargePhase::Charging;
+    loaded.emp.charge.as_mut().unwrap().ended_at = None;
+    assert!(loaded.save_bytes().is_err());
+}
 #[test]
 fn isolated_electrical_disable_blocks_both_lasers_with_positive_fatal_energy_and_truthful_fit() {
     let mut w = World::new_commander(16105).unwrap();

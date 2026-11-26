@@ -31,7 +31,7 @@ class MuleSourceVerification(unittest.TestCase):
         self.assertEqual(result['protectedCoreFilesWithStockShieldChanges'], 16)
         self.assertEqual(result['protectedCoreFilesWithFuelStorageChanges'], 22)
         self.assertEqual(result['protectedCoreFilesWithSolarScoopsChanges'], 16)
-        self.assertEqual(result['protectedCoreFilesWithStockEcmChanges'], 10)
+        self.assertEqual(result['protectedCoreFilesWithStockEcmChanges'], 11)
         self.assertEqual(result['geometryCoreTests'], 1)
         self.assertEqual(result['restoreCoreTests'], 1)
         self.assertEqual(result['totalMuleCoreTests'], 24)
@@ -181,7 +181,7 @@ class MuleSourceVerification(unittest.TestCase):
             root = Path(directory)
             core = self.copy_protected_sources(root)
             inverse = verifier.stock_ecm_inverse(root, verifier.protected_core_pins(root))
-            self.assertEqual(len(inverse), 10)
+            self.assertEqual(len(inverse), 11)
             for relative in inverse:
                 with self.subTest(relative=relative):
                     source = core / relative

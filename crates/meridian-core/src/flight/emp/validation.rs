@@ -60,7 +60,18 @@ impl State {
     ) -> Result<(), SaveError> {
         charge.start.validate(world, before)?;
         let item = self.item_at(world, &charge.start)?;
+        let begin = charge.start.physical_tick;
+        let end = charge.ended_at.unwrap_or(self.meter_clock);
         if charge.item != item.item
+            || world.ecm.activations().iter().any(|activation| {
+                let clock = activation.physical_tick;
+                activation.owner == charge.start.owner
+                    && if clock < begin {
+                        begin < clock.saturating_add(crate::ECM_FIELD_TICKS)
+                    } else {
+                        clock < end || (clock == end && charge.phase == EmpChargePhase::Charging)
+                    }
+            })
             || !State::recent_attack(
                 &world.traffic,
                 charge.start.owner,

@@ -195,6 +195,7 @@ impl State {
                 || at > tick
                 || tick - at > world.state.tick.checked_sub(end).ok_or(INVALID)?
                 || at.checked_add(ECM_FIELD_TICKS).is_none()
+                || (activation.owner == owner && at == end && world.emp.electrical_disabled())
                 || world.jump_journal.system_at_visit(visit, tick)? != activation.owner.system
                 || modular
                     .ecm_item_at(owner.owner, tick, visit)
@@ -287,16 +288,25 @@ impl World {
         let size = self
             .encoded_current_size()
             .map_err(|_| EcmError::Capacity)?;
+        let mut emp = self.emp.clone();
+        emp.cancel_for_ecm(activation.physical_tick);
+        let emp_size = |state: &super::emp::State| {
+            let mut writer = Writer::new();
+            state.encode(&mut writer);
+            writer.bytes.len()
+        };
         if size
             .checked_sub(self.ecm.encoded_len())
             .and_then(|n| n.checked_add(candidate.encoded_len()))
+            .and_then(|n| n.checked_sub(emp_size(&self.emp)))
+            .and_then(|n| n.checked_add(emp_size(&emp)))
             .is_none_or(|n| n > crate::save::MAX_SAVE_BYTES)
         {
             return Err(EcmError::Capacity);
         }
         self.ecm = candidate;
         self.pulse = pulse;
-        self.emp.cancel_for_ecm(activation.physical_tick);
+        self.emp = emp;
         Ok(activation)
     }
 }
