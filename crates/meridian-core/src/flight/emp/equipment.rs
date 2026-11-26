@@ -50,6 +50,9 @@ impl World {
         action: EmpEquipmentAction,
         tick: u64,
     ) -> Result<EmpEquipmentReview, EmpError> {
+        if self.modular.salvage_exchange_pending() {
+            return Err(EmpError::UtilityCapacity);
+        }
         if tick != self.state.tick {
             return Err(EmpError::StaleReview);
         }
@@ -180,6 +183,7 @@ impl World {
             dock: review.dock,
             tick,
             revision: account.revision(),
+            flight: None,
         });
         state.owned().map_err(EmpError::Save)?;
         let bytes = self
@@ -250,6 +254,7 @@ impl World {
             dock,
             tick,
             revision: account.revision(),
+            flight: None,
         });
         self.commander_account = Some(account);
         Ok(())

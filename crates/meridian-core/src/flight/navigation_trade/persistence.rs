@@ -24,7 +24,9 @@ impl State {
         t01: (usize, usize),
         t02: (usize, usize),
     ) -> Result<(), SaveError> {
+        let (passenger_records, passenger_active) = commerce.modular.passenger_occupancy();
         let records = self.attempts.len()
+            + passenger_records
             + t01.0
             + t02.0
             + world
@@ -32,6 +34,7 @@ impl State {
                 .as_ref()
                 .map_or(0, |s| s.state.retained_mission_records());
         let active = usize::from(self.active().is_some())
+            + passenger_active
             + t01.1
             + t02.1
             + usize::from(world.active_freight_job().is_some());
@@ -46,6 +49,9 @@ impl State {
         let account = commerce.account.ok_or(INVALID)?;
         let projection = account
             .service_projection(&world.freight_session.as_ref().ok_or(INVALID)?.state)
+            .map_err(|_| INVALID)?;
+        let cabin_tonnes = commerce.modular.cabin_tonnes().map_err(|_| INVALID)?;
+        let projection = crate::flight::modular::add_cabin_mass(projection, cabin_tonnes)
             .map_err(|_| INVALID)?;
         self.reservations().apply(projection).map_err(|_| INVALID)?;
         if self

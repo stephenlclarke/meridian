@@ -6,6 +6,8 @@ use meridian_core::{
     mining::{ASTEROID_FACES, AsteroidId, BELT_BODY_COUNT, BeltSnapshot, MiningShot},
 };
 pub const VERTEX_COUNT: usize = BELT_BODY_COUNT * ASTEROID_FACES.len() * 3;
+pub const ORE_VERTEX_COUNT: usize =
+    meridian_core::mining::MAX_PENDING_ORE * ASTEROID_FACES.len() * 3;
 pub const BEAM_VERTEX_COUNT: usize = 12;
 #[derive(Debug, Clone, Copy)]
 pub struct MiningVisual {
@@ -138,6 +140,17 @@ fn validate(snapshot: Snapshot, belt: &BeltSnapshot) -> Result<(), String> {
         }
         ids |= 1 << ordinal;
     }
+    for (i, ore) in belt.pending_ore.iter().enumerate() {
+        if ore.id.asteroid().system() != nav.system
+            || ore.quantity != 1
+            || !finite(ore.position)
+            || !finite(ore.velocity)
+            || ore.vertices().into_iter().any(|p| !finite(p))
+            || belt.pending_ore[..i].iter().any(|old| old.id == ore.id)
+        {
+            return Err("invalid physical ore fragment".into());
+        }
+    }
     Ok(())
 }
 /// Emits every face from the SAME world vertices/faces used by actual ray and collision admission.
@@ -194,6 +207,29 @@ pub fn append(
                 if !position.into_iter().all(f32::is_finite) {
                     output.truncate(start);
                     return Err("asteroid camera transform overflow".into());
+                }
+                output.push(Vertex { position, color });
+            }
+        }
+    }
+    for ore in &belt.pending_ore {
+        let vertices = ore.vertices();
+        let base = match ore.commodity {
+            meridian_core::station_services::CommodityId::Gold => [0.95, 0.65, 0.19],
+            meridian_core::station_services::CommodityId::Platinum => [0.75, 0.87, 0.91],
+            meridian_core::station_services::CommodityId::Alloys => [0.46, 0.69, 0.78],
+            _ => [0.68, 0.42, 0.26],
+        };
+        for (index, face) in ASTEROID_FACES.into_iter().enumerate() {
+            let color = base.map(|v| v * (0.55 + 0.10 * (index % 4) as f32));
+            for world in face.map(|i| vertices[i]) {
+                let view = camera
+                    .orientation
+                    .inverse_coordinates(sub(world, camera.position));
+                let position = [view.x as f32, view.y as f32, view.z as f32];
+                if !position.into_iter().all(f32::is_finite) {
+                    output.truncate(start);
+                    return Err("ore camera transform overflow".into());
                 }
                 output.push(Vertex { position, color });
             }

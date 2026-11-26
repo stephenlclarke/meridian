@@ -365,6 +365,21 @@ impl CommanderAccount {
     pub(crate) fn ammunition_revision(&self) -> u64 {
         self.data.ammunition_revision
     }
+    /// An original passenger transaction advances the account but does not change equipment fit.
+    pub(crate) fn prepare_passage_action(&self, delivered: bool) -> Result<Self, Error> {
+        let mut data = self.data;
+        data.revision = data
+            .revision
+            .checked_add(1)
+            .ok_or(Error::SequenceExhausted)?;
+        if delivered {
+            data.credits = data
+                .credits
+                .checked_add(crate::flight::PASSAGE_REWARD_TENTHS)
+                .ok_or(Error::CreditOverflow)?;
+        }
+        Ok(Self { data })
+    }
     pub(crate) fn revision(&self) -> u64 {
         self.data.revision
     }
@@ -578,6 +593,45 @@ impl CommanderAccount {
             used_tonnes: u16::try_from(occupied_tonnes(&freight.data, &self.data))
                 .map_err(|_| services::Error::InvalidAccount)?,
         })
+    }
+
+    /// Prospective single-unit lawful intake, without buying stock or changing cash.
+    /// Only an accepted physical source may publish this candidate and its receipt.
+    pub(crate) fn prepare_cargo_intake(
+        &self,
+        freight: &State,
+        commodity: services::CommodityId,
+        reservations: services::Reservations,
+    ) -> Result<Self, services::Error> {
+        use services::{CargoUnit, Error as ServiceError};
+        if commodity.departure_legal_weight() != 0 {
+            return Err(ServiceError::InvalidAccount);
+        }
+        let before = reservations.apply(self.service_projection(freight)?)?;
+        if commodity.unit() == CargoUnit::Tonne && before.used_tonnes >= before.hold_capacity_tonnes
+        {
+            return Err(ServiceError::HoldFull);
+        }
+        let mut candidate = Self { data: self.data };
+        candidate.data.revision = before
+            .revision
+            .checked_add(1)
+            .ok_or(ServiceError::SequenceExhausted)?;
+        if commodity == services::CommodityId::Food {
+            candidate.data.food_tonnes = candidate
+                .data
+                .food_tonnes
+                .checked_add(1)
+                .ok_or(ServiceError::QuantityLimit)?;
+        } else {
+            let held = &mut candidate.data.other_commodities[commodity.index() - 1];
+            *held = held
+                .checked_add(1)
+                .filter(|&n| n <= services::MAX_MARKET_QUANTITY)
+                .ok_or(ServiceError::QuantityLimit)?;
+        }
+        reservations.apply(candidate.service_projection(freight)?)?;
+        Ok(candidate)
     }
 
     #[cfg(test)]
@@ -876,6 +930,15 @@ pub struct State {
     pending: Option<PendingReview>,
 }
 
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct FreightMassEvent {
+    pub(crate) sequence: u64,
+    pub(crate) revision: Option<u64>,
+    pub(crate) delta: i16,
+    pub(crate) system: System,
+    pub(crate) dock_sequence: Option<u64>,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Snapshot {
     pub available_source_units: u8,
@@ -901,6 +964,49 @@ pub(crate) struct Prepared {
 }
 
 impl State {
+    pub(crate) fn cargo_sequence(&self) -> u64 {
+        self.data.sequence
+    }
+
+    /// Every G02 custody transition in logical source order. Older issue/abandon records did
+    /// not retain account revisions; exact delivery receipts did.
+    pub(crate) fn cargo_mass_events(&self) -> Vec<FreightMassEvent> {
+        let mut events = Vec::new();
+        for job in self.data.jobs.iter().flatten() {
+            events.push(FreightMassEvent {
+                sequence: job.issue_sequence,
+                revision: job.issue_account_revision,
+                delta: 8,
+                system: job.issuer.system,
+                dock_sequence: Some(job.issuer.arrival_sequence),
+            });
+            let mut remaining = 8_i16;
+            let mut sequence = job.issue_sequence;
+            for transfer in job.transfers.iter().flatten() {
+                let amount = transfer.mask.count_ones() as i16;
+                remaining -= amount;
+                sequence = transfer.sequence;
+                events.push(FreightMassEvent {
+                    sequence,
+                    revision: Some(transfer.account_revision),
+                    delta: -amount,
+                    system: transfer.dock.system,
+                    dock_sequence: Some(transfer.dock.arrival_sequence),
+                });
+            }
+            if job.status == JobStatus::Abandoned {
+                events.push(FreightMassEvent {
+                    sequence: sequence.saturating_add(1),
+                    revision: job.abandoned_account_revision,
+                    delta: -remaining,
+                    system: AVENOR,
+                    dock_sequence: None,
+                });
+            }
+        }
+        events.sort_unstable_by_key(|event| event.sequence);
+        events
+    }
     pub(crate) fn account_events(&self) -> Vec<crate::flight::AccountEvent> {
         use crate::flight::{AccountEffect, AccountEvent};
         let mut events = Vec::new();

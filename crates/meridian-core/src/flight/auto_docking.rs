@@ -26,7 +26,7 @@ pub(super) struct Phase {
 }
 
 impl World {
-    fn docking_computer_available(&self) -> bool {
+    pub(super) fn docking_computer_available(&self) -> bool {
         self.commander_account.as_ref().is_some_and(|account| {
             self.modular
                 .ledger(self, account)
@@ -128,7 +128,11 @@ impl World {
             });
             if raw != FlightInput::default() || self.emp.electrical_disabled() || !local {
                 self.auto_docking = None;
-                self.cancel_targeting();
+                if local && !self.emp.electrical_disabled() {
+                    self.take_manual_control();
+                } else {
+                    self.cancel_targeting();
+                }
                 return raw;
             }
             if let Some(input) = self.docking_input() {
@@ -144,7 +148,7 @@ impl World {
             self.cancel_targeting();
             return raw;
         }
-        if raw == FlightInput::default() && self.targeting_station_selected() {
+        if raw == FlightInput::default() && self.station_docking_assistance() {
             if self.engage_auto_docking(true).is_ok()
                 && let Some(input) = self.docking_input()
             {

@@ -1,7 +1,9 @@
 mod audio;
 mod emp;
+mod manual_work;
 mod mule_presentation;
 mod mule_validation;
+mod occupied_cut;
 mod target_computer;
 use std::{
     collections::{HashSet, hash_map::RandomState},
@@ -75,7 +77,10 @@ fn step_frame(
         {
             *pulse = None;
             *mining = None;
-        } else if fire_held {
+        } else if fire_held
+            && !world.pilot_operates_selected_tool()
+            && occupied_cut::ready_target(world).is_none()
+        {
             if let Ok(tool) = world.mining_tool_authority() {
                 if let Ok(shot) = world.request_mining(tool, state.tick) {
                     *mining = Some(asteroid_render::MiningVisual {
@@ -155,6 +160,7 @@ struct App {
     keys: HashSet<KeyCode>,
     paused: bool,
     help: Option<crate::help::Panel>,
+    occupied_cut: Option<meridian_core::OccupiedCutReview>,
     xyzzy: Option<crate::xyzzy::Menu>,
     focused: bool,
     docked: Option<Docked>,
@@ -220,6 +226,7 @@ impl App {
             keys: HashSet::new(),
             paused: internal,
             help: None,
+            occupied_cut: None,
             xyzzy: None,
             focused: true,
             docked: None,
@@ -297,7 +304,7 @@ impl App {
     }
 
     fn modal_open(&self) -> bool {
-        self.help.is_some() || self.xyzzy.is_some()
+        self.help.is_some() || self.xyzzy.is_some() || self.occupied_cut.is_some()
     }
 
     fn request_redraw(&self) {
@@ -363,9 +370,18 @@ impl App {
             && self.docked.as_ref().is_some_and(Docked::search_active);
         let question = text == Some("?") || (code == KeyCode::Slash && self.modifiers.shift_key());
         let toggle = question || (code == KeyCode::KeyH && !searching);
+        let journal = code == KeyCode::KeyJ && self.modifiers.shift_key() && !searching;
         if self.help.is_some() {
-            if !repeat && (toggle || code == KeyCode::KeyH || code == KeyCode::Escape) {
+            if !repeat && (toggle || journal || code == KeyCode::KeyH || code == KeyCode::Escape) {
                 self.help = None;
+                self.clear_held_input();
+                self.request_redraw();
+            }
+            return true;
+        }
+        if journal && self.game.playing() && self.xyzzy.is_none() {
+            if !repeat && let Some(progress) = self.game.world.unwritten_route_clue_progress() {
+                self.help = Some(crate::help::Panel::clue_journal(&progress));
                 self.clear_held_input();
                 self.request_redraw();
             }
@@ -449,6 +465,11 @@ impl App {
     }
 
     fn reset_input(&mut self) {
+        if (!self.focused || self.occluded)
+            && self.cancel_occupied_cut("Occupied contact cancelled on focus loss")
+        {
+            return;
+        }
         self.clear_held_input();
         if player_destroyed(&self.game.world) {
             // Terminal state is evidence. Focus, occlusion, menus and pause keys
@@ -860,7 +881,7 @@ impl App {
         if in_flight {
             match code {
                 KeyCode::Tab => return self.cycle_computer_target(),
-                KeyCode::KeyF => return self.cycle_computer_filter(),
+                KeyCode::KeyF => return self.toggle_computer_assistance(),
                 KeyCode::KeyT => return self.lock_computer_target(),
                 KeyCode::Backspace | KeyCode::Delete => return self.release_computer_target(),
                 KeyCode::KeyI if self.modifiers.shift_key() => return self.toggle_target_details(),
@@ -970,6 +991,9 @@ impl App {
     }
 
     fn advance_frame(&mut self, active: bool, ticks: usize) -> FrameAdvance {
+        if self.close_stale_occupied_cut() || (active && self.maybe_open_occupied_cut()) {
+            return FrameAdvance::Continue(None);
+        }
         let result = if active && !self.modal_open() && self.game.is_internal_validation() {
             self.pulse = None;
             self.mining = None;
@@ -1065,12 +1089,15 @@ impl App {
         }
         if state == ElementState::Released {
             self.keys.remove(&code);
-            if code == KeyCode::KeyU {
+            if code == KeyCode::KeyU && self.occupied_cut.is_none() {
                 self.cancel_emp_input();
             }
             return None;
         }
         if !self.focused || self.occluded {
+            return None;
+        }
+        if self.route_occupied_cut(code, repeat) {
             return None;
         }
         if self.route_audio_toggle(code, repeat) {
@@ -1115,6 +1142,9 @@ impl App {
                         | KeyCode::Backspace
                 ))
         {
+            return None;
+        }
+        if code == KeyCode::KeyZ && self.simulation_active() && self.use_manual_tool() {
             return None;
         }
         if !self.menu_active() {
@@ -1332,14 +1362,8 @@ impl App {
             mut hud_lines,
             docked_frame,
         } = prepared;
-        if snapshot.mode == FlightMode::Flight {
-            let filter = self.game.world.target_filter();
-            if filter != meridian_core::TargetFilter::Ships {
-                hud_lines.insert(
-                    hud_lines.len().min(2),
-                    format!("TARGET FILTER: {} | F", filter.label()),
-                );
-            }
+        if snapshot.mode == FlightMode::Flight && self.game.world.manual_scanner_target() {
+            hud_lines.insert(hud_lines.len().min(2), "MANUAL TARGET | F ASSIST".into());
         }
         let belt = if snapshot.mode == FlightMode::Flight {
             self.game.world.mining_belt_snapshot()
@@ -1407,11 +1431,13 @@ impl App {
             .xyzzy
             .as_ref()
             .map(|menu| menu.panel(&self.game.world, self.notice.text.as_deref()));
+        let occupied_panel = self.occupied_cut_panel();
         let title = self.frame_title(active, snapshot.mode);
         let terminal_visible = self.terminal_cockpit_visible();
         let retry_inactive = (terminal_visible && !self.occluded)
             || self.help.is_some()
             || self.xyzzy.is_some()
+            || occupied_panel.is_some()
             || docked_frame
                 .as_ref()
                 .is_some_and(|frame| frame.screen.is_none());
@@ -1433,7 +1459,7 @@ impl App {
                 mule_frame.as_ref(),
             );
             let practice = self.game.world.practice_snapshot();
-            let targeting = self.game.world.targeting_snapshot();
+            let targeting = Self::target_readout(&self.game.world);
             renderer.set_flight_view(if self.game.is_internal_validation() {
                 self.validation_view
             } else {
@@ -1462,7 +1488,10 @@ impl App {
                 HudScene {
                     lines: &hud_lines,
                     cockpit: cockpit.as_ref(),
-                    help: self.help.as_ref().or(xyzzy_panel.as_ref()),
+                    help: occupied_panel
+                        .as_ref()
+                        .or(self.help.as_ref())
+                        .or(xyzzy_panel.as_ref()),
                 },
             );
             if let (Some(started), Some(timing)) = (draw_started, &mut self.validation_timing) {

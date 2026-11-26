@@ -12,6 +12,10 @@ The [fuel storage development candidate](docs/FUEL-STORAGE.md) adds four separat
 
 The [solar fuel development candidate](docs/SOLAR-FUEL-SCOOPS.md) adds actual near-sun fuel collection with fitted scoops, independent cabin-temperature danger and retained collection receipts. Physical cargo and ore intake remain separate. Owned validation is pending.
 
+The passenger-cabin development candidate offers all six original paid cabin layouts, with real five-tonne fit costs and separate Avenor-to-Renas G04 passenger consent, boarding and reception. See [passenger cabins and G04 controls](docs/PASSENGER-CABINS.md). Owned validation is pending.
+
+In the scanner development build, press **Tab** to mark the nearest contact. Press again to move through the others by distance. **F** switches between hand flight and the assistance your equipment provides. You can aim and fire at ships, fly a docking approach, mine or salvage by hand. [Flight controls and required equipment](docs/AUTOMATIC-WORK.md)
+
 ## Goshawk Explorer in the Ship Showroom
 
 In Preview 10, press 3 at a station and search for Goshawk Explorer. Compare shows the Peregrine Mk V beside the Goshawk for a new commander. Press C for a single-ship view. Mac testing verified the original dark green hull, silver cross-member, open wishbone and refusal of an unavailable exchange. Preview 9 predates this ship. [Goshawk geometry and Showroom controls](docs/GOSHAWK-GAMEPLAY-ENVELOPE.md)
@@ -97,6 +101,8 @@ A separate explicitly prepared public-core setup supplied four nonfatal contacts
 
 ## Play
 
+Open the [Unwritten Route clue journal](integration/unwritten-route/README.md) with **Shift+J** to see the source clues your commander has earned.
+
 The current desktop source opens **Commander details** on startup. An empty slot starts a fresh commander at Avenor in memory. A valid slot shows the existing commander at the saved location before simulation resumes. Press **L** to launch from a station or **Enter** to resume a saved flight. Station services use **1–5** at a valid berth, and **0** returns to Commander details when docked. Use **H** or **?** for the current controls.
 
 Preview 8 uses the earlier startup controls. N starts a commander; C continues a current-format V17 save with the supported EMP content fingerprint. Unsupported formats/content refuse without changing the file. Use the download’s isolated profile: `Meridian EMP Sonar Preview/saves-current-emp-2d5f4a5` under macOS Application Support, or adjacent `saves-emp-2d5f4a5` on Windows. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.
@@ -113,13 +119,13 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | P on the station Galaxy chart (development) | Toggle the best-profit scan of reachable markets; P in flight still pauses |
 | L; W/S; arrows; A/D; Q/E; Space | Launch; thrust; pitch; yaw; roll; brake |
 | N in flight (development) | Engage the fitted navigation computer for docking, or cancel the approach |
-| F / Tab / Delete / Shift+I in flight (development) | Cycle Ships/Mining/Salvage/All filter; cycle target; release tracking; show target details |
+| Tab / F / Delete / Shift+I in flight (development) | Cycle scanner contacts by distance / switch between assisted and manual targeting / release target / show target details |
 | J; T (docked); R; Enter; B; F (docked) | Travel; select contact; review; confirm; cancel; buy fuel |
 | M; [ / ]; G / Shift+G | Market; commodity selection; buy/sell one native unit |
 | O; K; U; Y | Equipment panel; buy/fit cargo bay; store when docked; refit |
 | Hold U in active flight | Charge the fitted EMP for 600 accepted ticks; early release cancels |
 | I; V; X | Mission details; review all held freight deliveries; review abandonment |
-| T in flight; F1; F2; F3; F4 | Lock the selected ship; next ship/practice lock; arm/safe; launch one missile; safe/unlock |
+| T in flight; F1; F2; F3; F4 | Lock the selected ship for missiles; next ship/practice lock; arm/safe; launch one missile; safe/unlock |
 | F7; F8; F10 | Review attempt closure; reception; fresh consent |
 | F6; F12; C; 0/1/2/3 | Flight lesson consent/reception; cancellation; details; view direction |
 | P; F11; F5; F9 | Pause; fullscreen; save; reload the current qualified save |

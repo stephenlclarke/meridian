@@ -315,6 +315,7 @@ impl World {
             }
         }
         let facts = self.freight_facts()?;
+        let cargo_dock = self.current_dock_context().ok_or(MissionError::NotDocked)?;
         let account = self
             .commander_account
             .as_mut()
@@ -327,10 +328,19 @@ impl World {
             .state
             .prepare(account, &facts, command)
             .map_err(MissionError::Freight)?;
-        session
+        let sequence = session.state.cargo_sequence();
+        let event = session
             .state
             .commit(account, &facts, plan)
-            .map_err(MissionError::Freight)
+            .map_err(MissionError::Freight)?;
+        if session.state.cargo_sequence() != sequence {
+            self.modular.record_freight(
+                account.revision(),
+                session.state.cargo_sequence(),
+                cargo_dock,
+            );
+        }
+        Ok(event)
     }
 }
 

@@ -54,6 +54,10 @@ impl App {
                 self.notice.set(DESTROYED_NOTICE.into());
                 break;
             }
+            // Stop catch-up at the first accepted physical hold that needs consent.
+            if self.maybe_open_occupied_cut() {
+                break;
+            }
         }
         Ok(refusal)
     }

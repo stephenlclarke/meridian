@@ -184,11 +184,9 @@ fn fixed_rock_guidance_brakes_to_a_clear_hold_using_ordinary_flight_steps() {
     let cash = world.credits_tenths();
     let starting_range = rock.position.z - f64::from(world.state.position[2]);
     let input = crate::FlightInput::default();
-    assert!(world.asteroid_hold_input(target, input).throttle > 0.0);
+    assert!(world.work_hold_input(target, input).throttle > 0.0);
     for _ in 0..600 {
-        world
-            .step(world.asteroid_hold_input(target, input))
-            .unwrap();
+        world.step(world.work_hold_input(target, input)).unwrap();
         assert_eq!(world.snapshot().motion_refusal, None);
     }
     let ending_range = rock.position.z - f64::from(world.state.position[2]);

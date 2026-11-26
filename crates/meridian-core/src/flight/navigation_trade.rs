@@ -274,7 +274,69 @@ pub(super) struct State {
     attempts: Vec<Attempt>,
     trace: Option<u8>,
 }
+
+#[derive(Debug, Clone, Copy)]
+pub(in crate::flight) struct ReservationInterval {
+    pub start: u64,
+    pub end_exclusive: Option<u64>,
+    pub cargo_at_plan: u16,
+    pub capacity_at_plan: u16,
+}
+
+impl ReservationInterval {
+    pub fn contains(self, revision: u64) -> bool {
+        revision >= self.start && self.end_exclusive.is_none_or(|end| revision < end)
+    }
+}
 impl State {
+    #[cfg(test)]
+    pub(in crate::flight) fn omit_last_reservation_release_for_test(&mut self) -> bool {
+        self.attempts
+            .last_mut()
+            .and_then(|attempt| attempt.terminal.as_mut())
+            .and_then(|terminal| terminal.account_revision.take())
+            .is_some()
+    }
+    /// Plans reserve one tonne after their confirmed account prefix. Purchase transfers the
+    /// reservation into actual cargo in the same transaction; cancellation releases it only
+    /// after its recorded prefix, including any cargo or fit operation at that revision.
+    pub(in crate::flight) fn reservation_intervals(
+        &self,
+        anchor_tick: u64,
+    ) -> Result<Vec<ReservationInterval>, crate::save::SaveError> {
+        let mut intervals = Vec::new();
+        for attempt in &self.attempts {
+            let Some(plan) = attempt.plan else {
+                continue;
+            };
+            let end_exclusive = if let Some(buy) = attempt.buy {
+                Some(buy.account_revision)
+            } else if let Some(terminal) = attempt.terminal {
+                match terminal.account_revision {
+                    Some(revision) => Some(
+                        revision
+                            .checked_add(1)
+                            .ok_or(crate::save::SaveError::SequenceExhausted)?,
+                    ),
+                    None if terminal.tick < anchor_tick => continue,
+                    None => {
+                        return Err(crate::save::SaveError::InvalidState(
+                            "unbound historical T04 reservation release",
+                        ));
+                    }
+                }
+            } else {
+                None
+            };
+            intervals.push(ReservationInterval {
+                start: plan.account_revision,
+                end_exclusive,
+                cargo_at_plan: plan.cargo,
+                capacity_at_plan: plan.capacity,
+            });
+        }
+        Ok(intervals)
+    }
     fn active(&self) -> Option<&Attempt> {
         self.attempts.last().filter(|a| a.terminal.is_none())
     }

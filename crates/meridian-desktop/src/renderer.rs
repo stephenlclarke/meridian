@@ -251,6 +251,7 @@ impl Renderer {
             + mesh::PRACTICE_VERTEX_COUNT
             + mesh::MISSILE_VERTEX_COUNT
             + asteroid_render::VERTEX_COUNT
+            + asteroid_render::ORE_VERTEX_COUNT
             + asteroid_render::BEAM_VERTEX_COUNT
             + mesh::traffic::vertex_capacity(ship.len())
                 .ok_or("Traffic vertex capacity overflow")?;
@@ -353,66 +354,8 @@ impl Renderer {
         )
     }
 
-    pub fn targeting_viewport(
-        &self,
-        snapshot: &Snapshot,
-        station: StationScene<'_>,
-        traffic: Option<&meridian_core::traffic::TrafficSnapshot>,
-        mule: Option<&meridian_core::traffic::MuleActorSnapshot>,
-        belt: Option<&meridian_core::mining::BeltSnapshot>,
-    ) -> Result<
-        (
-            meridian_core::TargetingViewport,
-            Vec<meridian_core::equipment::WorkTargetId>,
-        ),
-        String,
-    > {
-        use meridian_core::{equipment::WorkTargetId, traffic::NpcPhase};
-        if self.is_zero_sized() {
-            return Err("Targeting requires an active flight viewport".into());
-        }
-        let camera = self.targeting_camera(snapshot, &station)?;
-        let projection = flight_projection(self.config.width, self.config.height);
-        let mut front = Vec::new();
-        let mut work_front = Vec::new();
-        if let Some(traffic) = traffic {
-            for actor in traffic.actors.iter().filter(|actor| {
-                actor.hull_id == "SH025"
-                    && targeting::visible(&self.ship, camera, actor.pose, projection)
-            }) {
-                if actor.phase == NpcPhase::Destroyed {
-                    work_front.push(WorkTargetId::Wreck(actor.id));
-                } else if actor.phase != NpcPhase::Complete {
-                    front.push(actor.id);
-                }
-            }
-        }
-        if let Some(mule) = mule.filter(|m| m.is_renas_encounter()) {
-            let mesh = crate::mule_render::targeting_vertices()?;
-            if targeting::visible(&mesh, camera, mule.actor().pose, projection) {
-                front.push(mule.actor().id);
-            }
-        }
-        if let Some(belt) = belt {
-            for body in belt.bodies.iter().filter(|body| body.remaining_units > 0) {
-                let pose = meridian_core::docking::RigidPose {
-                    position: body.position,
-                    orientation: meridian_core::docking::Basis3::IDENTITY,
-                };
-                if targeting::visible(&targeting::asteroid_model(body), camera, pose, projection) {
-                    work_front.push(WorkTargetId::Asteroid(body.id));
-                }
-            }
-        }
-        // Pending ore has an actual World position but no ordinary visual mesh in this build.
-        // Its fitted work identity remains selectable as known/offscreen, never fake-visible.
-        Ok((
-            meridian_core::TargetingViewport {
-                size: [self.size.width, self.size.height],
-                front,
-            },
-            work_front,
-        ))
+    pub fn scanner_viewport(&self) -> [u32; 2] {
+        [self.size.width.max(1), self.size.height.max(1)]
     }
 
     fn prepare_hud_frame(
@@ -851,9 +794,19 @@ impl Renderer {
             self.prepare_scene_surfaces(snapshot, &effects)?;
             let target = match (effects.targeting, station.as_ref()) {
                 (Some(target), Some(station)) => {
-                    let work_mesh = match target.identity {
-                        meridian_core::TargetIdentity::Work(
-                            meridian_core::equipment::WorkTargetId::Asteroid(id),
+                    let work_mesh = match (target.tracked_fragment, target.identity) {
+                        (Some(id), _) => effects
+                            .mining
+                            .as_ref()
+                            .and_then(|scene| {
+                                scene.belt.pending_ore.iter().find(|ore| ore.id == id)
+                            })
+                            .map(targeting::ore_model),
+                        (
+                            None,
+                            meridian_core::TargetIdentity::Work(
+                                meridian_core::equipment::WorkTargetId::Asteroid(id),
+                            ),
                         ) => effects
                             .mining
                             .as_ref()

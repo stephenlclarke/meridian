@@ -25,6 +25,7 @@ mod navigation_trade;
 mod route;
 pub use route::PreparedNavigationRoute;
 mod auto_docking;
+mod occupied_salvage;
 mod targeting;
 mod traffic;
 pub use navigation_trade::{
@@ -32,6 +33,9 @@ pub use navigation_trade::{
     NavigationTradeId, NavigationTradeMarketSnapshot, NavigationTradeOutcome,
     NavigationTradePlanSnapshot, NavigationTradeReview, NavigationTradeSnapshot,
     NavigationTradeTrace, PreparedNavigationTrade, PreparedStationService,
+};
+pub use occupied_salvage::{
+    OccupiedCutContact, OccupiedCutError, OccupiedCutReview, PreparedOccupiedCut,
 };
 pub use targeting::{
     TargetFilter, TargetIdentity, TargetMode, TargetingSnapshot, TargetingViewport,
@@ -44,8 +48,10 @@ pub use flight_reception::{
 };
 mod modular;
 pub use modular::{
-    FittedFuelScoops, FittedMiningTool, FuelScoopsSnapshot, ModularEquipmentSnapshot, ModuleAction,
-    ModuleError, ModuleKind, ModuleOffer, ModuleProvenance, ModuleReview, ModuleSlot, OwnedModule,
+    CABIN_TONNES, CabinGrade, CabinStatus, FittedFuelScoops, FittedMiningTool, FuelScoopsSnapshot,
+    ModularEquipmentSnapshot, ModuleAction, ModuleError, ModuleKind, ModuleOffer, ModuleProvenance,
+    ModuleReview, ModuleSlot, OwnedModule, PASSAGE_CLUE_ID, PASSAGE_REWARD_TENTHS, PassageStatus,
+    PassageTerminalReceipt, PassengerAction, PassengerIdentity, PassengerJourneySnapshot,
     PreparedModule,
 };
 mod ammunition;
@@ -211,6 +217,7 @@ pub struct World {
     xyzzy: xyzzy::State,
     emp: emp::State,
     ecm: ecm::State,
+    occupied_salvage: occupied_salvage::State,
     navigation_trade: navigation_trade::State,
     flight_reception: flight_reception::State,
     practice: Option<practice::Practice>,
@@ -263,6 +270,7 @@ impl World {
             xyzzy: xyzzy::State::default(),
             emp: emp::State::default(),
             ecm: ecm::State::default(),
+            occupied_salvage: occupied_salvage::State::default(),
             navigation_trade: navigation_trade::State::default(),
             flight_reception: flight_reception::State::default(),
             practice: None,
@@ -594,16 +602,21 @@ impl World {
         }
         let previous_targeting = self.targeting.clone();
         let previous_docking = self.auto_docking;
+        let occupied_motion = self.occupied_motion_opening();
         let input = self.flight_computer_input(input);
         let result = self.step_flight(input);
         if result.is_err() {
             self.targeting = previous_targeting;
             self.auto_docking = previous_docking;
-        } else if self.state.mode != FlightMode::Flight || self.state.motion_refusal.is_some() {
-            // An accepted stop must release every computer controller, not just docking.
-            // Otherwise selected work guidance resumes thrust on the next idle tick.
-            self.cancel_targeting();
-            self.cancel_auto_docking();
+        } else {
+            self.occupied_salvage.before_motion = occupied_motion;
+            if self.state.mode != FlightMode::Flight || self.state.motion_refusal.is_some() {
+                self.cancel_targeting();
+                self.cancel_auto_docking();
+            }
+            // A stop releases guidance and returns temporarily selected equipment on
+            // the accepted tick, including when no further flight input follows.
+            self.advance_selected_work();
         }
         result
     }
@@ -938,6 +951,9 @@ impl World {
         }
         let navigation_trade =
             self.prepare_navigation_trade_step(navigation, planned_debit, next.tick)?;
+        if entry && !self.modular.has_berth_room() {
+            return Err(StepError::TickOverflow);
+        }
         let ecm = self
             .ecm
             .prepare_step(
@@ -998,6 +1014,9 @@ impl World {
         }
         self.state = next;
         self.navigation = navigation;
+        if entry && let Some(dock) = navigation.and_then(NavigationState::dock) {
+            self.modular.record_berth(dock);
+        }
         if entry || completed_leg.is_some() {
             self.reconcile_navigation_route(entry);
         }
