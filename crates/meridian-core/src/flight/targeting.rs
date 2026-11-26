@@ -1187,8 +1187,7 @@ mod tests {
     }
 
     #[test]
-    fn accepted_rock_obstruction_releases_selected_guidance_without_idle_retry_or_account_effects()
-    {
+    fn accepted_rock_obstruction_releases_guidance_and_returns_the_tool_without_retry() {
         let mut world = fitted(TargetingTier::Military);
         launch(&mut world);
         let belt = world.mining_belt_snapshot().unwrap();
@@ -1219,6 +1218,7 @@ mod tests {
         );
         assert_eq!(world.selected_work_target().unwrap().id, target);
 
+        let equipment = world.modular_equipment_snapshot().unwrap();
         let account_revision = world.commander_account.as_ref().unwrap().revision();
         let credits = world.credits_tenths();
         let ammunition = world.ammunition_snapshot();
@@ -1258,8 +1258,11 @@ mod tests {
         }
         assert_eq!(
             world.commander_account.as_ref().unwrap().revision(),
-            account_revision
+            account_revision + 2
         );
+        let restored = world.modular_equipment_snapshot().unwrap();
+        assert_eq!(restored.fit_revision, equipment.fit_revision + 2);
+        assert_eq!(restored.items, equipment.items);
         assert_eq!(world.credits_tenths(), credits);
         assert_eq!(world.ammunition_snapshot(), ammunition);
         assert_eq!(world.mining.work_count(), work_count);
