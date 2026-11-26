@@ -1,3 +1,8 @@
+# Badger source preparation and replay use exact LF bytes.
+tools/measure_badger.py text eol=lf
+tools/prepare_badger.py text eol=lf
+tools/verify_badger.py text eol=lf
+
 # Rhinoceros Trader source preparation and replay use exact LF bytes.
 tools/measure_rhinoceros_trader.py text eol=lf
 tools/prepare_rhinoceros_trader.py text eol=lf

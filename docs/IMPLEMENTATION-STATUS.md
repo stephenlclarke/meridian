@@ -180,6 +180,10 @@ Rabbit Explorer retains its original 2,648-face detailed and 888-face native art
 
 Rhinoceros Trader preserves the original 700-face detailed and 388-face native meshes and their exact calibration. Signed Studio exports and independent checks cover seven inspection paths. [Rhinoceros Trader source and evidence](RHINOCEROS-TRADER-SOURCE.md)
 
+## Badger catalogue source
+
+Badger preserves the original 5,912-face detailed and 284-face native meshes in metres. Seven source checks verify guarded routes outside the collars. Both original meshes confirm that the forward pods occupy the collar centres. [Badger source and evidence](BADGER-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)

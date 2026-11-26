@@ -4,6 +4,7 @@
 
 pub mod aplomado_interceptor;
 pub mod arna_cutter;
+pub mod badger;
 pub mod banteng;
 pub mod barbary;
 pub mod caracal_scout;
