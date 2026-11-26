@@ -1324,10 +1324,9 @@ fn disabled_native_target_with_fit(
     panic!("actual aimed paid EMP releases did not disable the real recent attacker");
 }
 
-#[test]
-fn occupied_cut_requires_explicit_review_and_retains_actual_finite_game_contact() {
+fn occupied_fixture(full_mounts: bool) -> (World, crate::traffic::NpcId, u64) {
     use crate::equipment::TargetingTier;
-    use crate::{ModuleAction, ModuleKind, OccupiedCutError, TargetingViewport};
+    use crate::{ModuleAction, ModuleKind, TargetingViewport};
     fn buy(world: &mut World, kind: ModuleKind) {
         let tick = world.snapshot().tick;
         let action = if kind == ModuleKind::FuelScoops {
@@ -1339,6 +1338,15 @@ fn occupied_cut_requires_explicit_review_and_retains_actual_finite_game_contact(
         world.prepare_module(review, tick).unwrap().commit();
     }
     let (mut world, target) = disabled_native_target_with_fit(|world| {
+        let bay = world.equipment_snapshot().unwrap().owned.unwrap();
+        // The three existing utility mounts are occupied. Use the normal berth
+        // equipment action before departure; never remove cargo capacity in flight.
+        world
+            .request_equipment(
+                crate::equipment::Command::UnfitCargoBay(bay.id),
+                world.snapshot().tick,
+            )
+            .unwrap();
         if world.targeting_tier().is_none() {
             buy(world, ModuleKind::Targeting(TargetingTier::Basic));
         }
@@ -1349,8 +1357,34 @@ fn occupied_cut_requires_explicit_review_and_retains_actual_finite_game_contact(
             buy(world, ModuleKind::FuelScoops);
         }
         buy(world, ModuleKind::SalvageCutter);
+        let cutter = world.fitted_salvage_cutter().unwrap();
+        let tick = world.snapshot().tick;
+        let review = world
+            .review_module(ModuleAction::Store { item: cutter.id }, tick)
+            .unwrap();
+        world.prepare_module(review, tick).unwrap().commit();
+        if full_mounts {
+            world
+                .request_equipment(
+                    crate::equipment::Command::FitCargoBay(bay.id),
+                    world.snapshot().tick,
+                )
+                .unwrap();
+        }
     });
-    let cutter = world.fitted_salvage_cutter().unwrap().id;
+    let cutter = world
+        .modular_equipment_snapshot()
+        .unwrap()
+        .items
+        .into_iter()
+        .find(|item| item.kind == ModuleKind::SalvageCutter)
+        .unwrap();
+    assert!(cutter.slot.is_none());
+    let cutter = cutter.id;
+    world
+        .request_emp_trigger(false, world.snapshot().tick)
+        .unwrap();
+    world.step(FlightInput::default()).unwrap();
     let tick = world.snapshot().tick;
     assert!(
         world
@@ -1378,6 +1412,14 @@ fn occupied_cut_requires_explicit_review_and_retains_actual_finite_game_contact(
             .unwrap();
     }
     assert_eq!(world.selected_disabled_salvage_target(), Some(target));
+    (world, target, cutter)
+}
+
+#[test]
+fn occupied_cut_requires_explicit_review_and_retains_actual_finite_game_contact() {
+    use crate::OccupiedCutError;
+    let (mut world, target, cutter) = occupied_fixture(false);
+    let tick = world.snapshot().tick;
     // Readiness includes the actual working hold, so advance the ordinary guidance
     // until the same review shown to the pilot becomes available.
     let review = loop {
@@ -1385,13 +1427,19 @@ fn occupied_cut_requires_explicit_review_and_retains_actual_finite_game_contact(
         assert!(now - tick < 1600, "occupied hold did not settle");
         match world.review_occupied_cut(target, now) {
             Ok(review) => break review,
-            Err(OccupiedCutError::UnsafeHold | OccupiedCutError::ContactUnavailable) => {
+            Err(
+                OccupiedCutError::UnsafeHold
+                | OccupiedCutError::ContactUnavailable
+                | OccupiedCutError::MissingFit,
+            ) => {
                 world.step(FlightInput::default()).unwrap();
             }
             Err(error) => panic!("unexpected occupied review refusal: {error}"),
         }
     };
     let before = world.save_bytes().unwrap();
+    assert!(world.modular.salvage_exchange_source() == Some(target));
+    assert_eq!(world.fitted_salvage_cutter().unwrap().id, cutter);
     assert!(review.warning().contains("OCCUPIED / CLAIMED"));
     review.cancel();
     assert_eq!(world.save_bytes().unwrap(), before);
@@ -1465,6 +1513,35 @@ fn occupied_cut_requires_explicit_review_and_retains_actual_finite_game_contact(
     assert!(World::from_save_bytes(&erased).is_err());
     assert!(world.restore_bytes(&erased).is_err());
     assert_eq!(world.save_bytes().unwrap(), retained);
+    world.cancel_targeting();
+    world.step(FlightInput::default()).unwrap();
+    assert!(world.fitted_salvage_cutter().is_none());
+    assert!(world.modular.salvage_exchange_source().is_none());
+    let cold = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    assert_eq!(cold.occupied_cut_contacts().collect::<Vec<_>>(), [contact]);
+    assert!(cold.fitted_salvage_cutter().is_none());
+}
+
+#[test]
+fn occupied_cut_with_all_mounts_committed_preserves_crew_and_equipment() {
+    let (mut world, target, _) = occupied_fixture(true);
+    let emp = world.owned_emp().unwrap();
+    let bay = world.equipment_snapshot().unwrap().owned.unwrap();
+    let scoops = world.fitted_fuel_scoops().unwrap().item;
+    assert!(emp.fitted && bay.fitted);
+    world.step(FlightInput::default()).unwrap();
+    assert_eq!(world.automatic_work_status(), Some("No free cutter mount"));
+    assert!(matches!(
+        world.review_occupied_cut(target, world.snapshot().tick),
+        Err(crate::OccupiedCutError::MissingFit)
+    ));
+    assert_eq!(world.owned_emp(), Some(emp));
+    assert_eq!(world.equipment_snapshot().unwrap().owned, Some(bay));
+    assert_eq!(world.fitted_fuel_scoops().unwrap().item, scoops);
+    assert!(world.fitted_salvage_cutter().is_none());
+    assert!(world.modular.salvage_exchange_source().is_none());
+    assert_eq!(world.occupied_cut_contacts().count(), 0);
+    assert!(World::from_save_bytes(&world.save_bytes().unwrap()).is_ok());
 }
 fn native_facing_budget(w: &World, target: crate::traffic::NpcId) -> Option<u32> {
     let p = w.snapshot();

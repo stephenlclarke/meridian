@@ -204,7 +204,7 @@ impl State {
                 || tick - physical > world.state.tick.checked_sub(end).ok_or(INVALID)?
                 || world.jump_journal.system_at_visit(visit, tick)? != receipt.owner.system
                 || modular
-                    .salvage_cut_fit_at(owner.owner, tick, visit)
+                    .salvage_cut_fit_at(owner.owner, tick, visit, contact.target)
                     .is_none_or(|item| item.id != contact.cutter_item)
                 || previous.is_some_and(|p| {
                     p.owner.visit > visit
@@ -385,6 +385,13 @@ impl World {
             return Err(OccupiedCutError::NotDisabledOccupied);
         }
         if !self.work_targeting_fit().salvage || self.fitted_fuel_scoops().is_none() {
+            return Err(OccupiedCutError::MissingFit);
+        }
+        if self
+            .modular
+            .salvage_exchange_source()
+            .is_some_and(|id| id != target)
+        {
             return Err(OccupiedCutError::MissingFit);
         }
         let item = self

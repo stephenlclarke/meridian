@@ -19,7 +19,7 @@ const RECOVERY_TICKS: u64 = 60;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) struct Exchange {
-    source: NpcId,
+    pub(super) source: NpcId,
     pub(super) cutter: u64,
     displaced_emp: Option<u64>,
     visit: u64,
@@ -348,8 +348,11 @@ impl super::State {
                     .jump_journal
                     .system_at_visit(exchange.visit, event.tick)?
                     != exchange.source.system()
-                    || historical_claim(world, exchange.source)
-                        .is_none_or(|claim| claim.terminal_tick >= event.tick)))
+                    || (historical_claim(world, exchange.source)
+                        .is_none_or(|claim| claim.terminal_tick >= event.tick)
+                        && !world
+                            .traffic
+                            .occupied_disabled_at_tick(exchange.source, event.tick))))
         {
             return Err(INVALID);
         }
@@ -491,19 +494,29 @@ impl World {
         historical_claim(self, id)
     }
 
-    /// Select an owned cutter solely for a selected, independently admitted terminal cargo source.
+    /// Select an owned cutter for a separately admitted terminal or occupied target.
+    /// Occupied equipment selection never authorises contact or material acquisition.
     pub(in crate::flight) fn select_auto_salvage_tool(
         &mut self,
         id: NpcId,
     ) -> Result<(), ModuleError> {
+        let occupied = self.selected_disabled_salvage_target() == Some(id)
+            && self.traffic_snapshot().is_some_and(|s| {
+                s.actors
+                    .into_iter()
+                    .any(|actor| actor.id == id && actor.emp_crew_aboard == Some(1))
+            })
+            && self.work_targeting_fit().salvage
+            && self.fitted_fuel_scoops().is_some();
+        let terminal = self.auto_salvage_eligible(id)
+            && self
+                .selected_work_target()
+                .is_some_and(|target| target.id == WorkTargetId::Wreck(id));
         if self.state.mode != crate::FlightMode::Flight
             || self.is_paused()
             || self.emp.input_blocked()
             || self.combat_snapshot().is_none_or(|s| s.player.destroyed)
-            || !self.auto_salvage_eligible(id)
-            || self
-                .selected_work_target()
-                .is_none_or(|target| target.id != WorkTargetId::Wreck(id))
+            || (!occupied && !terminal)
         {
             return Err(ModuleError::MissingPrerequisite);
         }

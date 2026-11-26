@@ -1464,8 +1464,15 @@ impl State {
         owner: u64,
         tick: u64,
         visit: u64,
+        target: crate::traffic::NpcId,
     ) -> Option<OwnedModule> {
         let ledger = self.ledger_at(owner, tick, visit)?;
+        if ledger
+            .salvage_return
+            .is_some_and(|exchange| exchange.source != target)
+        {
+            return None;
+        }
         ledger.fitted(ModuleSlot::Targeting)?;
         ledger.fitted(ModuleSlot::SalvageTargeting)?;
         ledger.fitted(ModuleSlot::UtilityFuelScoops)?;
