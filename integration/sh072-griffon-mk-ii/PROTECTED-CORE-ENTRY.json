@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh072-griffon-mk-ii",
+  "undoBefore": [
+    "sh071-griffon"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "griffon_mk_ii",
+  "before": "pub mod griffon;\n",
+  "after": "pub mod harpy_assault;\n"
+}

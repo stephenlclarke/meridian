@@ -24,7 +24,7 @@ The development source also provides a separate Goshawk Mk II Custom Showroom an
 
 Medusa (SH171) can be inspected in the station Showroom. The source package preserves both original meshes and the inspection shield. The Showroom lists the verified empty stock dry mass. [Medusa inspection and flight limits](integration/sh171-medusa/README.md)
 
-The follow-up development candidate offers 37 selectable stock previews in the ordinary station Showroom. This includes 31 validated Hull Studio schema-1 fleet packages and six original stock models. These are catalogue previews, not new ships for purchase or flight. [Hull Studio](docs/HULL-STUDIO.md) also opens a local or archived preview in a disposable Showroom session without changing the player's ship. Native qualification of the combined candidate is pending.
+The follow-up development candidate offers 41 selectable stock previews in the ordinary station Showroom. This includes 35 validated Hull Studio schema-1 fleet packages and six original stock models. These are catalogue previews, not new ships for purchase or flight. [Hull Studio](docs/HULL-STUDIO.md) also opens a local or archived preview in a disposable Showroom session without changing the player's ship. Native qualification of the combined candidate is pending.
 
 The separate [Medusa player flight preview](integration/sh171-medusa-preview/README.md) uses a dedicated profile and the admitted reduced flight geometry. The chase view draws the original detailed artwork. Ordinary progression, fabrication and exchange do not grant the Medusa. Native validation of the combined player preview is pending.
 
@@ -170,6 +170,10 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Rhinoceros Trader source envelope and Hull Studio definition](docs/RHINOCEROS-TRADER-SOURCE.md)
 - [Badger source envelope and Hull Studio definition](docs/BADGER-SOURCE.md)
 - [Baza Fighter source envelope and Hull Studio definition](docs/BAZA-FIGHTER-SOURCE.md)
+- [Baza Mk II source envelope and Hull Studio definition](docs/BAZA-MK-II-SOURCE.md)
+- [Griffon source envelope and Hull Studio definition](docs/GRIFFON-SOURCE.md)
+- [Griffon Mk II source envelope and Hull Studio definition](docs/GRIFFON-MK-II-SOURCE.md)
+- [Griffon Spectre source envelope and Hull Studio definition](docs/GRIFFON-SPECTRE-SOURCE.md)
 - [Stag Liner source envelope and Hull Studio definition](docs/STAG-LINER-GAMEPLAY-ENVELOPE.md)
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)

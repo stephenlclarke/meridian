@@ -34,7 +34,7 @@ SH171 is available for catalogue inspection with the original detailed artwork a
 
 ## Combined Showroom and Hull Studio source candidate
 
-The ordinary station Showroom has 37 selectable stock previews: 31 authenticated schema-1 packages and six original stock models. It keeps the linked source identities, engineering readouts and inspection-only exchange rules. The combined source also restores the Studio launcher, including explicit inspection of schema-2 archives. Stock ship and station finishes are display-only; local authored material colours remain exact. Portable Studio and source checks have passed during integration. Combined compiler checks and native presentation acceptance are pending.
+The ordinary station Showroom has 41 selectable stock previews: 35 authenticated schema-1 packages and six original stock models. It keeps the linked source identities, engineering readouts and inspection-only exchange rules. The combined source also restores the Studio launcher, including explicit inspection of schema-2 archives. Stock ship and station finishes are display-only; local authored material colours remain exact. Portable Studio and source checks have passed during integration. Combined compiler checks and native presentation acceptance are pending.
 
 The separate [Medusa player preview](../integration/sh171-medusa-preview/README.md) now connects the active World hull identity to the original detailed flight rendering. The renderer retains the Peregrine model for ordinary players and existing traffic. It does not use the archived 729-piece inspection shield or reduced contact hull as flight artwork. The combined native acceptance is pending.
 
@@ -193,6 +193,22 @@ Badger preserves the original 5,912-face detailed and 284-face native meshes in 
 ## Baza Fighter catalogue source
 
 Baza Fighter preserves the original 2,340-face detailed and 152-face native meshes in metres. Signed Studio and independent source evidence cover seven guarded inspection routes. [Baza Fighter source and evidence](BAZA-FIGHTER-SOURCE.md)
+
+## Baza Mk II catalogue source
+
+Baza Mk II preserves the original 2,364-face detailed and 176-face native meshes in metres. Signed Studio and independent source evidence cover seven guarded inspection routes. [Baza Mk II source and evidence](BAZA-MK-II-SOURCE.md)
+
+## Griffon catalogue source
+
+Griffon retains both original visible meshes, with 1,644 detailed and 596 native faces. The separately archived 512-face collision artifact preserves seven guarded inspection routes. [Griffon source and evidence](GRIFFON-SOURCE.md)
+
+## Griffon Mk II catalogue source
+
+Griffon Mk II retains both original visible meshes, with 1,644 detailed and 596 native faces. The separate 380-face generated inspection candidate preserves seven guarded routes. [Griffon Mk II source and evidence](GRIFFON-MK-II-SOURCE.md)
+
+## Griffon Spectre catalogue source
+
+Griffon Spectre retains both original visible meshes, with 1,644 detailed and 596 native faces. Its separate 380-face generated inspection geometry preserves seven guarded routes. [Griffon Spectre source and evidence](GRIFFON-SPECTRE-SOURCE.md)
 
 ## Goshawk Mk II Custom candidate
 

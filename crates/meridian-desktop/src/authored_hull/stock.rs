@@ -245,6 +245,30 @@ const DESCRIPTORS: &[StockDescriptor] = &[
         "integration/sh069-baza-fighter/BAZA-FIGHTER-STUDIO.json",
         0x6792_feef_26de_7571
     ),
+    stock_package!(
+        "SH070",
+        "Baza Mk II",
+        "integration/sh070-baza-mk-ii/BAZA-MK-II-STUDIO.json",
+        0xcc38_b57c_bd7a_aaee
+    ),
+    stock_package!(
+        "SH071",
+        "Griffon",
+        "integration/sh071-griffon/GRIFFON-STUDIO.json",
+        0x5cc3_7883_3c9e_2d84
+    ),
+    stock_package!(
+        "SH072",
+        "Griffon Mk II",
+        "integration/sh072-griffon-mk-ii/GRIFFON-MK-II-STUDIO.json",
+        0x4f50_51bc_d510_ec9e
+    ),
+    stock_package!(
+        "SH073",
+        "Griffon Spectre",
+        "integration/sh073-griffon-spectre/GRIFFON-SPECTRE-STUDIO.json",
+        0xf80f_0554_1e38_ec7e
+    ),
 ];
 pub(crate) const STOCK_MODELS: [AvailableModel<'static>; DESCRIPTORS.len()] = {
     let mut models = [DESCRIPTORS[0].model; DESCRIPTORS.len()];
@@ -347,7 +371,7 @@ mod tests {
     #[test]
     fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
         let catalogue = ok(crate::docked_screens::Catalogue::bundled());
-        assert_eq!(STOCK_MODELS.len(), 31);
+        assert_eq!(STOCK_MODELS.len(), 35);
         let mut identities = std::collections::BTreeSet::new();
         let mut keys = std::collections::BTreeSet::new();
         for entry in DESCRIPTORS {

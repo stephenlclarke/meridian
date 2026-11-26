@@ -1,3 +1,23 @@
+# Griffon Spectre source preparation and replay use exact LF bytes.
+tools/measure_griffon_spectre_geometry.py text eol=lf
+tools/prepare_griffon_spectre_geometry.py text eol=lf
+tools/verify_griffon_spectre_geometry.py text eol=lf
+
+# Griffon Mk II source preparation and replay use exact LF bytes.
+tools/measure_griffon_mk_ii_geometry.py text eol=lf
+tools/prepare_griffon_mk_ii_geometry.py text eol=lf
+tools/verify_griffon_mk_ii_geometry.py text eol=lf
+
+# Griffon source preparation and replay use exact LF bytes.
+tools/measure_griffon_geometry.py text eol=lf
+tools/prepare_griffon_geometry.py text eol=lf
+tools/verify_griffon_geometry.py text eol=lf
+
+# Baza Mk II source preparation and replay use exact LF bytes.
+tools/measure_baza_mk_ii.py text eol=lf
+tools/prepare_baza_mk_ii.py text eol=lf
+tools/verify_baza_mk_ii.py text eol=lf
+
 # Baza Fighter source preparation and replay use exact LF bytes.
 tools/measure_baza_fighter.py text eol=lf
 tools/prepare_baza_fighter.py text eol=lf
