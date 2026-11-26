@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh145-kestrel",
+  "undoBefore": [
+    "sh144-razorback"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "kestrel",
+  "before": "pub mod javelina;\n",
+  "after": "pub mod laggar;\n"
+}

@@ -485,3 +485,8 @@ tools/verify_aardvark_miner.py text eol=lf
 tools/measure_razorback.py text eol=lf
 tools/prepare_razorback.py text eol=lf
 tools/verify_razorback.py text eol=lf
+
+# Byte-pinned Kestrel replay programs.
+tools/measure_kestrel.py text eol=lf
+tools/prepare_kestrel.py text eol=lf
+tools/verify_kestrel.py text eol=lf
