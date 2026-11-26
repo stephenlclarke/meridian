@@ -6,6 +6,10 @@ The development save store explicitly unlocks on close. Dell Linux reproduced th
 
 The station Equipment screen exposes the born Basic drive and the two original paid upgrades. Their actual countdowns are 10, 5 and 1 second, and the existing station mass-lock thresholds are 600, 480 and 360. Purchases, refitting, saved pending jumps, historical completed legs and the explicit XYZZY top-grade grant use the same owned equipment ledger. The [equipment implementation and testing ledger](EQUIPMENT-PLAYABLE.md) reconciles remaining original grades and Medusa design constraints. Authored source and regression coverage await the owning compiler, whole-slice review, CI and native preview.
 
+## Stock shield source candidate
+
+The [seven shield grades](SHIELD-GRADES.md) use the source-defined bank capacities from 300 to 2,760 and unchanged recharge. Four successive shop grades are payable through the existing account; Advanced II retains its unavailable Elite-rank and PLUGH-only acquisition paths, and Elite remains acquisition-only with explicit maximum test access. A separate XYZZY grade selector exercises each real fit without cash, fuel or unrelated equipment changes. The wider bank codec, historical fit/damage replay, actual incoming hit, HUD and paid/refit/Continue regressions await owned execution; no native preview claim follows from authored source.
+
 ## Medusa Showroom inspection
 
 SH171 is available for catalogue inspection with the original detailed artwork and seven materials. The archived native mesh has 76,228 faces and stays outside the 512-face flight gate. The source-bound shield uses 729 local supports and keeps the crown opening clear in its own geometry. See the [Medusa inspection record](../integration/sh171-medusa/README.md) for the measured bounds and the remaining flight, player and PLUGH fabrication work.

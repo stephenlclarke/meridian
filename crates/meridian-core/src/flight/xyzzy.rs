@@ -1,6 +1,6 @@
 //! Explicit secret transactions. No getter, normal purchase or save decoder grants property.
 mod history;
-use super::{FlightMode, World};
+use super::{FlightMode, ShieldGrade, World};
 use crate::navigation::DockContext;
 use crate::save::{Reader, SaveError, Writer};
 pub(crate) use history::{AccountEffect, AccountEvent};
@@ -16,10 +16,21 @@ pub enum XyzzyAction {
     MaximumSupportedHardware,
     RestoreStarter,
     ToggleUnlimitedFuel,
+    /// Meridian disposable-preview test access, separate from the original maximum outfit.
+    FitShield(ShieldGrade),
 }
 impl XyzzyAction {
     fn outfit(self) -> bool {
-        self != Self::ToggleUnlimitedFuel
+        matches!(
+            self,
+            Self::Enter | Self::MaximumSupportedHardware | Self::RestoreStarter
+        )
+    }
+    fn changes_equipment(self) -> bool {
+        self.outfit() || matches!(self, Self::FitShield(_))
+    }
+    fn refills(self, mode: bool) -> bool {
+        !matches!(self, Self::FitShield(_)) && (self.outfit() || mode)
     }
     fn tag(self) -> u8 {
         match self {
@@ -27,6 +38,7 @@ impl XyzzyAction {
             Self::MaximumSupportedHardware => 1,
             Self::RestoreStarter => 2,
             Self::ToggleUnlimitedFuel => 3,
+            Self::FitShield(grade) => 4 + grade as u8,
         }
     }
     fn from_tag(tag: u8) -> Result<Self, SaveError> {
@@ -35,6 +47,7 @@ impl XyzzyAction {
             1 => Ok(Self::MaximumSupportedHardware),
             2 => Ok(Self::RestoreStarter),
             3 => Ok(Self::ToggleUnlimitedFuel),
+            4..=10 => Ok(Self::FitShield(ShieldGrade::from_tag(tag - 4)?)),
             _ => Err(SaveError::InvalidEncoding),
         }
     }
@@ -73,7 +86,7 @@ pub struct XyzzySnapshot {
     pub cash_granted_once: bool,
     pub cash_tenths: u32,
     pub jump_limit_ly: f64,
-    /// Full original outfit needs missing shield, drive, targeting and utility owners.
+    /// Full original outfit still needs broader targeting, utility and hull owners.
     pub full_legacy_outfit_available: bool,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -114,6 +127,22 @@ impl State {
                 && revision <= r.end_revision
         })
     }
+    pub(super) fn authorizes_shield(
+        &self,
+        grade: ShieldGrade,
+        dock: DockContext,
+        tick: u64,
+        revision: u64,
+    ) -> bool {
+        self.records.iter().any(|record| {
+            (record.action == XyzzyAction::FitShield(grade)
+                || (record.action.outfit() && grade == ShieldGrade::Elite))
+                && record.dock == dock
+                && record.tick == tick
+                && revision > record.revision
+                && revision <= record.end_revision
+        })
+    }
     pub(super) fn validate(
         &self,
         world: &World,
@@ -151,9 +180,17 @@ impl State {
                 || r.fuel_spent > spent
                 || previous.is_some_and(|p| r.fuel_spent < p.fuel_spent)
                 || r.fuel_added > crate::navigation::FUEL_CAPACITY
-                || (!r.action.outfit() && !r.unlimited_fuel && r.fuel_added != 0)
+                || (!r.action.refills(r.unlimited_fuel) && r.fuel_added != 0)
             {
                 return Err(INVALID);
+            }
+            if let XyzzyAction::FitShield(grade) = r.action {
+                commerce.modular.validate_shield_test_record(
+                    r.dock.owner().seed(),
+                    r.revision,
+                    r.end_revision,
+                    grade,
+                )?;
             }
             if let Some(p) = previous
                 && p.unlimited_fuel
@@ -289,7 +326,7 @@ impl World {
         if self
             .navigation_trade_snapshot()
             .is_some_and(|s| s.active.is_some())
-            && (action.outfit() || !self.xyzzy.unlimited_fuel())
+            && (action.changes_equipment() || !self.xyzzy.unlimited_fuel())
         {
             return Err(XyzzyError::ActiveFuelPractice);
         }
@@ -340,7 +377,7 @@ impl World {
         } else {
             self.xyzzy.unlimited_fuel()
         };
-        let refill = review.action.outfit() || mode;
+        let refill = review.action.refills(mode);
         let current = self.commander_account.as_ref().ok_or(INVALID)?;
         let record = Record {
             action: review.action,
@@ -372,6 +409,7 @@ impl World {
                 super::modular::ModuleKind::MiningTargeting,
                 super::modular::ModuleKind::SalvageTargeting,
                 super::modular::ModuleKind::Drive(crate::navigation::DriveGrade::Advanced),
+                super::modular::ModuleKind::Shield(ShieldGrade::Elite),
             ] {
                 self.grant_xyzzy_module(review.dock, review.tick, kind)?;
             }
@@ -388,6 +426,12 @@ impl World {
             self.commander_account = Some(account);
             // The present supported mutation boundary is docked: ordinary docking already reset
             // energy/shields. Do not clear heat/cooldown or erase retained combat/mining evidence.
+        } else if let XyzzyAction::FitShield(grade) = review.action {
+            self.grant_xyzzy_module(
+                review.dock,
+                review.tick,
+                super::modular::ModuleKind::Shield(grade),
+            )?;
         }
         let revision = self.commander_account.as_ref().ok_or(INVALID)?.revision();
         self.xyzzy.records.last_mut().ok_or(INVALID)?.end_revision = revision;

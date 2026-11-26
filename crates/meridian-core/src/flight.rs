@@ -53,10 +53,12 @@ pub use missiles::{
     MissileOrigin, MissileRound, MissileSnapshot, MissileTarget, ProjectileId, ProjectileSnapshot,
 };
 mod combat;
+mod shield;
 pub use combat::{
     CombatIdentity, CombatSnapshot, OrdinaryImpact, OrdinaryTarget, OrdinaryWeapon,
     PlayerCondition, SHIELD_CAPACITY,
 };
+pub use shield::ShieldGrade;
 mod equipment;
 pub use equipment::{EquipmentPreparationError, PreparedEquipment};
 mod mission;

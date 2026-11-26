@@ -585,6 +585,21 @@ fn equipment_action(
     {
         return Err("Owned drive selection changed".into());
     }
+    let shield_node = meridian_core::ShieldGrade::ALL
+        .iter()
+        .any(|grade| grade.node() == node);
+    if shield_node != (slot == "shield") {
+        return Err("Select the shield system slot".into());
+    }
+    if shield_node
+        && operation != Buy
+        && !modules
+            .items
+            .iter()
+            .any(|owned| Some(owned.id) == instance && owned.kind.node() == node)
+    {
+        return Err("Owned shield selection changed".into());
+    }
     if targeting_node
         && operation != Buy
         && !modules
@@ -662,6 +677,7 @@ fn module_rows(
         ModuleSlot::Energy => "Energy system",
         ModuleSlot::Navigation => "Navigation computer",
         ModuleSlot::Drive => "Hyperspace drive",
+        ModuleSlot::Shield => "Shield system",
         ModuleSlot::Targeting => "Targeting computer",
         ModuleSlot::MiningTargeting => "Mining targeting",
         ModuleSlot::SalvageTargeting => "Salvage targeting",
@@ -676,7 +692,13 @@ fn module_rows(
         row.fitted = u32::from(item.slot.is_some());
         row.readout
             .push(crate::xyzzy::provenance(item.provenance).into());
-        if let ModuleKind::Drive(grade) = item.kind {
+        if let ModuleKind::Shield(grade) = item.kind {
+            row.compatibility = "Owned SH025 shield module; one fitted shield required".into();
+            row.readout.push(format!(
+                "Capacity {} per bank | Recharge unchanged",
+                grade.capacity() / 100
+            ));
+        } else if let ModuleKind::Drive(grade) = item.kind {
             row.compatibility = "Owned SH025 hyperspace drive; one fitted drive required".into();
             row.readout.push(format!(
                 "Spool {}s | Station mass lock {}",
@@ -762,6 +784,12 @@ fn module_rows(
                 grade.mass_lock_distance()
             ));
         }
+        if let ModuleKind::Shield(grade) = offer.kind {
+            row.readout.push(format!(
+                "Capacity {} per bank | Recharge unchanged",
+                grade.capacity() / 100
+            ));
+        }
         let action = if offer.kind == ModuleKind::MiningLaser {
             ModuleAction::PurchaseMiningLaser
         } else {
@@ -773,6 +801,33 @@ fn module_rows(
         rows.push(row);
     }
     rows
+}
+fn shield_acquisition_rows() -> Vec<ui::EquipmentRow> {
+    use meridian_core::ShieldGrade;
+    [
+        (
+            ShieldGrade::AdvancedII,
+            "ELITE-rank earned reward or PLUGH-only paid stock",
+            "PLUGH source quote 10125.0 CR; unlock and rank paths are not available here",
+        ),
+        (
+            ShieldGrade::Elite,
+            "Acquisition-only; explicit XYZZY maximum or test grant",
+            "No ordinary shop offer; test access does not create an earned receipt",
+        ),
+    ]
+    .into_iter()
+    .map(|(grade, rule, limit)| {
+        let mut row = base_row(grade.node(), grade.name(), "Shield source acquisition");
+        row.compatibility = rule.into();
+        row.readout.push(format!(
+            "Capacity {} per bank | Recharge unchanged",
+            grade.capacity() / 100
+        ));
+        row.refusal = Some(limit.into());
+        row
+    })
+    .collect()
 }
 fn append_pylon_slots(
     slots: &mut Vec<ui::EquipmentSlot>,
@@ -858,6 +913,17 @@ fn equipment_panel(
             .into(),
         available: true,
     });
+    slots.push(ui::EquipmentSlot {
+        id: "shield".into(),
+        label: "Shield system".into(),
+        fitted: modules
+            .items
+            .iter()
+            .find(|item| item.slot == Some(ModuleSlot::Shield))
+            .map_or("Empty", |item| item.kind.name())
+            .into(),
+        available: true,
+    });
     slots.push(ui::fuel_scoops::slot(world)?);
     slots.push(ui::emp::slot(world));
     append_pylon_slots(&mut slots, &ammo);
@@ -892,6 +958,7 @@ fn equipment_panel(
         "energy" => Some(ModuleSlot::Energy),
         "navigation" => Some(ModuleSlot::Navigation),
         "drive" => Some(ModuleSlot::Drive),
+        "shield" => Some(ModuleSlot::Shield),
         "targeting" => Some(ModuleSlot::Targeting),
         "targeting-mining" => Some(ModuleSlot::MiningTargeting),
         "targeting-salvage" => Some(ModuleSlot::SalvageTargeting),
@@ -899,6 +966,9 @@ fn equipment_panel(
     };
     if let Some(slot) = module_slot {
         rows = module_rows(world, &modules, slot, tick);
+        if slot == ModuleSlot::Shield {
+            rows.extend(shield_acquisition_rows());
+        }
     } else if selected == ui::emp::SLOT {
         rows = ui::emp::rows(world);
     } else if selected == ui::fuel_scoops::SLOT {
@@ -1034,6 +1104,7 @@ mod secret_ui_tests {
             "front-laser",
             "energy",
             "navigation",
+            "shield",
             "targeting",
             "utility-fuelScoops",
             "cargo-expansion",
@@ -1349,6 +1420,60 @@ mod tests {
         assert_eq!(ok(profile.world.save_bytes()), after_external_purchase);
     }
     #[test]
+    fn shield_panel_exposes_source_grades_and_distinguishes_unavailable_acquisition() {
+        use meridian_core::ShieldGrade;
+        let (_directory, profile, _menu) = start();
+        let panel = ok(equipment_panel(&profile.world, "shield", ""));
+        let slot = panel
+            .slots
+            .iter()
+            .find(|slot| slot.id == "shield")
+            .unwrap_or_else(|| panic!("shield slot"));
+        assert_eq!(slot.fitted, "Basic Shield");
+        for grade in ShieldGrade::ALL {
+            let row = panel
+                .rows
+                .iter()
+                .find(|row| row.node == grade.node())
+                .unwrap_or_else(|| panic!("missing shield grade"));
+            assert!(row.readout.iter().any(|line| {
+                line.contains(&format!("Capacity {} per bank", grade.capacity() / 100))
+            }));
+            assert!(!row.can_buy);
+            if let Some((price, _)) = grade.ordinary_offer() {
+                assert_eq!(row.price_tenths, Some(u64::from(price)));
+                assert_eq!(row.instance, None);
+            } else if grade == ShieldGrade::Basic {
+                assert_eq!(row.fitted, 1);
+                assert!(!row.can_store);
+                assert!(row.instance.is_some());
+            } else {
+                assert!(row.refusal.is_some());
+                assert_eq!(row.price_tenths, None);
+                assert_eq!(row.instance, None);
+            }
+        }
+        let capital = panel
+            .rows
+            .iter()
+            .find(|row| row.node == ShieldGrade::AdvancedII.node())
+            .unwrap_or_else(|| panic!("capital row"));
+        assert!(
+            capital.compatibility.contains("ELITE-rank") && capital.compatibility.contains("PLUGH")
+        );
+        assert!(
+            equipment_action(
+                &profile.world,
+                ShieldGrade::BasicII.node(),
+                None,
+                "energy",
+                ui::EquipmentOperation::Buy
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
     fn hyperspace_drive_panel_uses_actual_fitted_item_and_paid_offer_rules() {
         use meridian_core::navigation::DriveGrade;
         let (_directory, profile, _menu) = start();
@@ -1427,7 +1552,7 @@ mod tests {
     fn front_module_rows_and_pylon_slots_use_real_owned_instances_and_admission() {
         let (_directory, profile, _menu) = start();
         let panel = ok(equipment_panel(&profile.world, "front-laser", ""));
-        assert_eq!(panel.slots.len(), 19);
+        assert_eq!(panel.slots.len(), 20);
         let actual: Vec<_> = panel.slots.iter().map(|slot| slot.id.as_str()).collect();
         assert_eq!(
             actual,
@@ -1437,6 +1562,7 @@ mod tests {
                 "energy",
                 "navigation",
                 "drive",
+                "shield",
                 ui::fuel_scoops::SLOT,
                 ui::emp::SLOT,
                 "pylon-0",

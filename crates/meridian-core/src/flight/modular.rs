@@ -1,5 +1,5 @@
 //! Paid modular equipment custody. Effects live in the actual weapon/work owners, not menu rows.
-use super::{FlightMode, World};
+use super::{FlightMode, ShieldGrade, World};
 use crate::{
     equipment::TargetingTier,
     freight::g02::CommanderAccount,
@@ -8,6 +8,8 @@ use crate::{
 };
 use core::fmt;
 mod scoops;
+mod shields;
+pub(super) use shields::ResourceFitChange;
 mod work;
 pub use scoops::{FittedFuelScoops, FuelScoopsSnapshot};
 pub const MINING_LASER_PRICE_TENTHS: u32 = 33_000;
@@ -32,6 +34,7 @@ pub enum ModuleKind {
     MiningTargeting,
     SalvageTargeting,
     Drive(DriveGrade),
+    Shield(ShieldGrade),
 }
 impl ModuleKind {
     pub fn family(self) -> &'static str {
@@ -49,6 +52,7 @@ impl ModuleKind {
             Self::MiningTargeting => "targeting-mining",
             Self::SalvageTargeting => "targeting-salvage",
             Self::Drive(_) => "hyperspace-drive",
+            Self::Shield(_) => "shields",
             _ => "energy",
         }
     }
@@ -67,6 +71,7 @@ impl ModuleKind {
             },
             Self::MiningTargeting => "Targeting: Mining Module",
             Self::SalvageTargeting => "Targeting: Salvage Module",
+            Self::Shield(grade) => grade.node(),
             _ => self.name(),
         }
     }
@@ -80,6 +85,7 @@ impl ModuleKind {
             Self::Drive(DriveGrade::Basic) => "Basic Hyperspace Drive",
             Self::Drive(DriveGrade::Intermediate) => "Intermediate Hyperspace Drive",
             Self::Drive(DriveGrade::Advanced) => "Advanced Hyperspace Drive",
+            Self::Shield(grade) => grade.name(),
             Self::BeamLaser => "Beam Laser",
             Self::MilitaryLaser => "Military Laser",
             Self::NavalLaser => "Naval Laser",
@@ -118,6 +124,7 @@ impl ModuleKind {
             Self::MiningTargeting => ModuleSlot::MiningTargeting,
             Self::SalvageTargeting => ModuleSlot::SalvageTargeting,
             Self::Drive(_) => ModuleSlot::Drive,
+            Self::Shield(_) => ModuleSlot::Shield,
             _ => ModuleSlot::Energy,
         }
     }
@@ -149,6 +156,7 @@ impl ModuleKind {
                 | Self::MiningTargeting
                 | Self::SalvageTargeting
                 | Self::Drive(DriveGrade::Advanced)
+                | Self::Shield(_)
         )
     }
     pub fn navigation_reach_ly(self) -> Option<u8> {
@@ -162,6 +170,7 @@ impl ModuleKind {
             Self::EliteEnergyUnit => 4,
             Self::Targeting(_) | Self::MiningTargeting | Self::SalvageTargeting => 1,
             Self::Drive(DriveGrade::Intermediate | DriveGrade::Advanced) => 1,
+            Self::Shield(grade) => grade.equipment_units(),
             _ => 0,
         }
     }
@@ -186,6 +195,7 @@ impl ModuleKind {
             Self::Drive(DriveGrade::Basic) => None,
             Self::Drive(DriveGrade::Intermediate) => Some((50_000, 10)),
             Self::Drive(DriveGrade::Advanced) => Some((150_000, 13)),
+            Self::Shield(grade) => grade.ordinary_offer(),
         }
     }
     fn prerequisite(self) -> Option<Self> {
@@ -201,6 +211,7 @@ impl ModuleKind {
             }
             Self::Drive(DriveGrade::Intermediate) => Some(Self::Drive(DriveGrade::Basic)),
             Self::Drive(DriveGrade::Advanced) => Some(Self::Drive(DriveGrade::Intermediate)),
+            Self::Shield(grade) => grade.predecessor().map(Self::Shield),
             _ => None,
         }
     }
@@ -232,6 +243,7 @@ impl ModuleKind {
             Self::Drive(DriveGrade::Basic) => 21,
             Self::Drive(DriveGrade::Intermediate) => 22,
             Self::Drive(DriveGrade::Advanced) => 23,
+            Self::Shield(grade) => 24 + grade as u8,
         }
     }
     fn from_tag(tag: u8) -> Result<Self, SaveError> {
@@ -255,6 +267,7 @@ impl ModuleKind {
             21 => Ok(Self::Drive(DriveGrade::Basic)),
             22 => Ok(Self::Drive(DriveGrade::Intermediate)),
             23 => Ok(Self::Drive(DriveGrade::Advanced)),
+            24..=30 => Ok(Self::Shield(ShieldGrade::from_tag(tag - 24)?)),
             _ => Err(SaveError::InvalidEncoding),
         }
     }
@@ -269,6 +282,7 @@ pub enum ModuleSlot {
     MiningTargeting,
     SalvageTargeting,
     Drive,
+    Shield,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleProvenance {
@@ -362,6 +376,7 @@ pub enum ModuleError {
     StaleOccupant,
     LowerTargetingGrade,
     DriveRequired,
+    ShieldRequired,
     NoChange,
     Capacity,
     InsufficientCredits,
@@ -399,6 +414,7 @@ pub struct PreparedModule<'a> {
     world: &'a mut World,
     state: State,
     account: CommanderAccount,
+    combat: super::combat::State,
     bytes: Vec<u8>,
     item: u64,
 }
@@ -416,6 +432,7 @@ impl PreparedModule<'_> {
     pub fn commit(self) -> u64 {
         self.world.commander_account = Some(self.account);
         self.world.modular = self.state;
+        self.world.combat = self.combat;
         self.item
     }
 }
@@ -467,6 +484,12 @@ impl Ledger {
                     id: owner.checked_add(6).ok_or(INVALID)?,
                     kind: ModuleKind::Drive(DriveGrade::Basic),
                     slot: Some(ModuleSlot::Drive),
+                    provenance: ModuleProvenance::StandardBirth,
+                },
+                OwnedModule {
+                    id: owner.checked_add(3).ok_or(INVALID)?,
+                    kind: ModuleKind::Shield(ShieldGrade::Basic),
+                    slot: Some(ModuleSlot::Shield),
                     provenance: ModuleProvenance::StandardBirth,
                 },
             ],
@@ -604,6 +627,9 @@ impl Ledger {
                     }
                     if i.slot == Some(ModuleSlot::Drive) {
                         return Err(ModuleError::DriveRequired);
+                    }
+                    if i.slot == Some(ModuleSlot::Shield) {
+                        return Err(ModuleError::ShieldRequired);
                     }
                     i.slot = None;
                 }
@@ -747,12 +773,18 @@ impl State {
                 previous.map(|p| (p.dock.sequence(), p.tick, p.revision)),
             )?;
             let serial = if e.xyzzy {
-                if !e
+                let kind = e
                     .action
                     .purchase_kind()
-                    .is_some_and(ModuleKind::xyzzy_supported)
-                    || !world.xyzzy.authorizes(e.dock, e.tick, e.revision)
-                {
+                    .filter(|kind| kind.xyzzy_supported())
+                    .ok_or(INVALID)?;
+                let authorized = match kind {
+                    ModuleKind::Shield(grade) => world
+                        .xyzzy
+                        .authorizes_shield(grade, e.dock, e.tick, e.revision),
+                    _ => world.xyzzy.authorizes(e.dock, e.tick, e.revision),
+                };
+                if !authorized {
                     return Err(INVALID);
                 }
                 grants = grants.checked_add(1).ok_or(INVALID)?;
@@ -799,6 +831,7 @@ impl State {
                 super::StarterComponent::BasicNavigation,
             ),
             (6, ModuleSlot::Drive, super::StarterComponent::BasicDrive),
+            (3, ModuleSlot::Shield, super::StarterComponent::BasicShield),
         ] {
             let born = account
                 .starter_items()
@@ -984,6 +1017,10 @@ impl World {
             ModuleKind::AdvancedNavigation,
             ModuleKind::Drive(DriveGrade::Intermediate),
             ModuleKind::Drive(DriveGrade::Advanced),
+            ModuleKind::Shield(ShieldGrade::BasicII),
+            ModuleKind::Shield(ShieldGrade::Intermediate),
+            ModuleKind::Shield(ShieldGrade::IntermediateII),
+            ModuleKind::Shield(ShieldGrade::Advanced),
             ModuleKind::Targeting(TargetingTier::Basic),
             ModuleKind::Targeting(TargetingTier::Advanced),
             ModuleKind::Targeting(TargetingTier::Docking),
@@ -1124,9 +1161,10 @@ impl World {
         {
             return Err(ModuleError::BerthRequired);
         }
-        let changes_energy = action
+        let resource_slot = |slot| matches!(slot, ModuleSlot::Energy | ModuleSlot::Shield);
+        let changes_resources = action
             .purchase_kind()
-            .is_some_and(|kind| kind.slot() == ModuleSlot::Energy)
+            .is_some_and(|kind| resource_slot(kind.slot()))
             || match action {
                 ModuleAction::Store { item } | ModuleAction::Install { item, .. } => self
                     .modular
@@ -1134,12 +1172,12 @@ impl World {
                     .map_err(ModuleError::Save)?
                     .items
                     .iter()
-                    .any(|i| i.id == item && i.kind.slot() == ModuleSlot::Energy),
+                    .any(|i| i.id == item && resource_slot(i.kind.slot())),
                 _ => false,
             };
-        if changes_energy && !self.damage.enabled() {
+        if changes_resources && !self.damage.enabled() {
             return Err(ModuleError::Save(SaveError::InvalidState(
-                "energy fitting requires resource birth provenance",
+                "energy or shield fitting requires resource birth provenance",
             )));
         }
         if let Some(kind) = action.purchase_kind() {
@@ -1270,6 +1308,10 @@ impl World {
             .fitted(ModuleSlot::Navigation)
             .is_some_and(|item| item.id == owner + 4);
         let drive_fitted = ledger.drive().is_some_and(|(id, _)| id == owner + 6);
+        let shield_fitted = ledger
+            .fitted(ModuleSlot::Shield)
+            .is_some_and(|item| item.id == owner + 3);
+        let shield_grade = ledger.shield_grade().ok_or(ModuleError::ShieldRequired)?;
         let account = current
             .prepare_module(
                 paid,
@@ -1277,17 +1319,27 @@ impl World {
                 energy_fitted,
                 navigation_fitted,
                 drive_fitted,
+                shield_fitted,
             )
             .map_err(|_| ModuleError::SequenceExhausted)?;
         let mut state = self.modular.clone();
         state.events.push(event);
-        let bytes = self
-            .save_bytes_with_modules(&account, &state)
-            .map_err(ModuleError::Save)?;
+        let mut combat = self.combat;
+        let (account, state, bytes) = if shield_grade != combat.shields().grade() {
+            combat.refit_shields(shield_grade);
+            self.shield_fit_save(account, state, combat)
+                .map_err(ModuleError::Save)?
+        } else {
+            let bytes = self
+                .save_bytes_with_modules(&account, &state)
+                .map_err(ModuleError::Save)?;
+            (account, state, bytes)
+        };
         Ok(PreparedModule {
             world: self,
             state,
             account,
+            combat,
             bytes,
             item,
         })
@@ -1299,33 +1351,11 @@ mod drive_tests;
 #[cfg(test)]
 mod navigation_tests;
 #[cfg(test)]
+mod shield_tests;
+#[cfg(test)]
 mod tests;
 
 impl State {
-    pub(super) fn energy_changes(&self, world: &World) -> Result<Vec<(u64, u16)>, SaveError> {
-        let owner = world.combat_identity().ok_or(INVALID)?.owner;
-        let mut ledger = Ledger::born(owner)?;
-        let mut changes = Vec::new();
-        let mut counters = [0; 2];
-        let mut before = 7;
-        for event in &self.events {
-            ledger.replay(*event, &mut counters).map_err(|_| INVALID)?;
-            let rate = ledger
-                .fitted(ModuleSlot::Energy)
-                .and_then(|i| i.kind.energy_recharge_multiplier())
-                .unwrap_or(1)
-                * 7;
-            if rate != before {
-                let clock = world
-                    .damage
-                    .berth_clock(event.dock.sequence())
-                    .ok_or(INVALID)?;
-                changes.push((clock, rate));
-            }
-            before = rate;
-        }
-        Ok(changes)
-    }
     pub(super) fn front_at_physical(&self, world: &World, clock: u64) -> Option<OwnedModule> {
         let mut ledger = Ledger::born(world.combat_identity()?.owner).ok()?;
         let mut counters = [0; 2];
@@ -1432,8 +1462,15 @@ impl World {
                 born_fitted(ModuleSlot::Energy, 5),
                 born_fitted(ModuleSlot::Navigation, 4),
                 born_fitted(ModuleSlot::Drive, 6),
+                born_fitted(ModuleSlot::Shield, 3),
             )
             .map_err(|_| INVALID)?;
+        if let ModuleKind::Shield(grade) = kind {
+            if !self.damage.enabled() {
+                return Err(INVALID);
+            }
+            self.combat.refit_shields(grade);
+        }
         self.commander_account = Some(account);
         self.modular.events.push(event);
         Ok(())

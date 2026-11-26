@@ -27,7 +27,7 @@ impl State {
     ) -> Result<bool, SaveError> {
         let r = self.records.get(index).ok_or(INVALID)?;
         let expected_spent = world.jump_journal.spent_at(r.dock, r.tick)?;
-        let refill = r.action.outfit() || r.unlimited_fuel;
+        let refill = r.action.refills(r.unlimited_fuel);
         let expected_added = if refill {
             crate::navigation::FUEL_CAPACITY
                 .checked_sub(*fuel)
