@@ -40,7 +40,7 @@ class MuleSourceVerification(unittest.TestCase):
         self.assertEqual(result['protectedCoreFilesWithCombinedToCabinChanges'], 22)
         self.assertEqual(result['protectedCoreFilesWithCombinedToEcmChanges'], 20)
         self.assertEqual(result['protectedCoreFilesWithSalvageCutterChanges'], 10)
-        self.assertEqual(result['protectedCoreFilesWithScannerTargetCycleChanges'], 4)
+        self.assertEqual(result['protectedCoreFilesWithScannerTargetCycleChanges'], 6)
         self.assertEqual(result['geometryCoreTests'], 1)
         self.assertEqual(result['restoreCoreTests'], 1)
         self.assertEqual(result['totalMuleCoreTests'], 24)

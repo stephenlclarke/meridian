@@ -69,6 +69,58 @@
           "after": ""
         }
       ]
+    },
+    "mining/ore.rs": {
+      "beforeSHA256": "b01f8463d28bee817d4b5363ce16b960f391c08dfe242ea609ab0aab13cc00a9",
+      "afterSHA256": "13743527e29e8bef8bd9524372b11c511c15d25df9d4dde1812857f9a65c04c7",
+      "hunks": [
+        {
+          "offset": 954,
+          "before": "    /// World vertices shared by the Meridian fragment mesh and automatic scoop checks.\n",
+          "after": "    /// World vertices shared by the Meridian fragment mesh and full-aperture scoop checks.\n"
+        },
+        {
+          "offset": 1400,
+          "before": "    pub(crate) fn scoop_admissible(self, pose: RigidPose, speed: f32, automatic: bool) -> bool {\n",
+          "after": "    pub(crate) fn scoop_admissible(self, pose: RigidPose, speed: f32, full_aperture: bool) -> bool {\n"
+        },
+        {
+          "offset": 2170,
+          "before": "        if !automatic {\n",
+          "after": "        if !full_aperture {\n"
+        },
+        {
+          "offset": 3112,
+          "before": "    pub(crate) automatic: bool,\n",
+          "after": "    pub(crate) full_aperture: bool,\n"
+        },
+        {
+          "offset": 8532,
+          "before": "                || !ore.scoop_admissible(receipt.pose, receipt.speed, receipt.automatic)\n",
+          "after": "                || !ore.scoop_admissible(receipt.pose, receipt.speed, receipt.full_aperture)\n"
+        },
+        {
+          "offset": 9352,
+          "before": "            w.bool(c.automatic);\n",
+          "after": "            w.bool(c.full_aperture);\n"
+        },
+        {
+          "offset": 10380,
+          "before": "                automatic: r.bool()?,\n",
+          "after": "                full_aperture: r.bool()?,\n"
+        }
+      ]
+    },
+    "mining/tests.rs": {
+      "beforeSHA256": "b19dda8c93a3b05ad2111f6919b12974492a5a3e7b7216d8287cf992c6d3efe2",
+      "afterSHA256": "8d4ad383f7b4fd36fe60607de7dba006ed757c470b99e8ed8cd3a17979dbc54c",
+      "hunks": [
+        {
+          "offset": 5385,
+          "before": "        automatic: true,\n",
+          "after": "        full_aperture: true,\n"
+        }
+      ]
     }
   }
 }
