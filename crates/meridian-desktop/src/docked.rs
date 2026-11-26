@@ -981,7 +981,7 @@ fn passenger_service_rows(world: &World) -> Result<Vec<ui::EquipmentRow>, String
             row.readout.push(format!("{}: {status}", person.name));
         }
         row.readout.push(detail.into());
-        if let Some(clue) = journey.clue {
+        if let Some(clue) = journey.clue.and_then(|receipt| receipt.clue_id()) {
             row.readout.push(format!("Trusted clue: {clue}"));
         }
         let review = world.review_module(ModuleAction::Passenger(action), world.snapshot().tick);

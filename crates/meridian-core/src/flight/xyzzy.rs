@@ -415,6 +415,12 @@ impl World {
             }
             self.grant_xyzzy_emp(review.dock, review.tick)?;
             self.grant_xyzzy_missiles(review.dock, review.tick)?;
+            let current_bay_revision = self
+                .commander_account
+                .as_ref()
+                .ok_or(INVALID)?
+                .equipment_state()
+                .revision();
             let account = self
                 .commander_account
                 .as_ref()
@@ -423,6 +429,9 @@ impl World {
                     super::services::service_site(review.dock.system()).ok_or(INVALID)?,
                 )
                 .map_err(|_| INVALID)?;
+            if account.equipment_state().revision() != current_bay_revision {
+                self.modular.record_bay(&account, review.dock);
+            }
             self.commander_account = Some(account);
             // The present supported mutation boundary is docked: ordinary docking already reset
             // energy/shields. Do not clear heat/cooldown or erase retained combat/mining evidence.

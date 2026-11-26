@@ -8,10 +8,11 @@ use crate::{
 };
 use core::fmt;
 mod cabins;
+mod history;
 pub(super) use cabins::add_cabin_mass;
 pub use cabins::{
-    CABIN_TONNES, CabinGrade, CabinStatus, PASSAGE_REWARD_TENTHS, PassageStatus, PassengerAction,
-    PassengerIdentity, PassengerJourneySnapshot,
+    CABIN_TONNES, CabinGrade, CabinStatus, PASSAGE_CLUE_ID, PASSAGE_REWARD_TENTHS, PassageStatus,
+    PassageTerminalReceipt, PassengerAction, PassengerIdentity, PassengerJourneySnapshot,
 };
 mod scoops;
 mod shields;
@@ -398,6 +399,7 @@ pub enum ModuleError {
     CabinOccupied,
     PassageConsent,
     PassageClosed,
+    PassageHistory,
     NoChange,
     Capacity,
     InsufficientCredits,
@@ -430,6 +432,7 @@ struct Event {
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub(super) struct State {
     events: Vec<Event>,
+    history: history::History,
 }
 pub struct PreparedModule<'a> {
     world: &'a mut World,
@@ -833,6 +836,7 @@ impl State {
         let mut transaction = 0_u32;
         let mut grants = 0_u32;
         let mut previous: Option<Event> = None;
+        let budget = crate::equipment::definition().map_err(|_| INVALID)?;
         for e in &self.events {
             super::ammunition::validate_berth_event(
                 world,
@@ -875,10 +879,14 @@ impl State {
                 world
                     .jump_journal
                     .validate_passenger_berth(e.dock, e.tick)?;
+                if !self.history.owns_berth(e.dock) {
+                    return Err(INVALID);
+                }
                 if matches!(
                     action,
                     PassengerAction::RequestReplies | PassengerAction::Board
-                ) && e.item / 256 > world.freight_session.as_ref().ok_or(INVALID)?.epoch()
+                ) && cabins::receipt_epoch(e.item)
+                    > world.freight_session.as_ref().ok_or(INVALID)?.epoch()
                 {
                     return Err(INVALID);
                 }
@@ -888,6 +896,11 @@ impl State {
             ledger
                 .apply(*e, if e.xyzzy { serial } else { transaction })
                 .map_err(|_| INVALID)?;
+            if ledger.fitted_units() > budget.equipment_units_capacity
+                || ledger.cabin_tonnes() > crate::equipment::EXPANDED_HOLD_TONNES
+            {
+                return Err(INVALID);
+            }
             let grade = ledger.navigation_grade();
             let drive = ledger.drive().ok_or(INVALID)?;
             if grade != previous_grade || Some(drive) != previous_drive {
@@ -931,7 +944,6 @@ impl State {
                 return Err(INVALID);
             }
         }
-        let budget = crate::equipment::definition().map_err(|_| INVALID)?;
         if ledger.fitted_units() + account.equipment_state().units_used()
             > budget.equipment_units_capacity
         {
@@ -981,7 +993,7 @@ impl State {
             .find(|i| i.id == item)
     }
     pub(super) fn encode(&self, w: &mut Writer) {
-        w.u32(self.events.len() as u32);
+        w.u32(self.events.len() as u32 | if self.history.active() { 1 << 31 } else { 0 });
         for e in &self.events {
             match e.action {
                 ModuleAction::PurchaseMiningLaser => w.u8(0),
@@ -1008,12 +1020,14 @@ impl State {
             w.u64(e.revision);
             w.bool(e.xyzzy);
         }
+        self.history.encode(w);
     }
     pub(super) fn decode(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
         if version != crate::save::SAVE_VERSION {
             return Err(SaveError::UnsupportedVersion);
         }
-        let count = r.u32()? as usize;
+        let header = r.u32()?;
+        let count = (header & 0x7fff_ffff) as usize;
         if count > crate::save::MAX_SAVE_BYTES / 64 {
             return Err(SaveError::TooLarge);
         }
@@ -1062,7 +1076,19 @@ impl State {
                 revision,
             });
         }
-        Ok(Self { events })
+        let history = if header & (1 << 31) != 0 {
+            history::History::decode(r)?
+        } else {
+            history::History::default()
+        };
+        if events
+            .iter()
+            .any(|event| history::requires_history(event.action))
+            != history.active()
+        {
+            return Err(SaveError::InvalidEncoding);
+        }
+        Ok(Self { events, history })
     }
 }
 impl World {
@@ -1307,6 +1333,10 @@ impl World {
             .modular
             .ledger(self, account)
             .map_err(ModuleError::Save)?;
+        if history::requires_history(action) && !self.modular.history.active() {
+            let mut history = history::History::default();
+            history.activate(self, account, dock)?;
+        }
         if matches!(action, ModuleAction::Passenger(PassengerAction::Board))
             && !self.original_service_has_capacity()
         {
@@ -1460,6 +1490,9 @@ impl World {
         }
         .map_err(|_| ModuleError::SequenceExhausted)?;
         let mut state = self.modular.clone();
+        if history::requires_history(review.action) {
+            state.history.activate(self, current, review.dock)?;
+        }
         state.events.push(event);
         let mut combat = self.combat;
         let (account, state, bytes) = if shield_grade != combat.shields().grade() {

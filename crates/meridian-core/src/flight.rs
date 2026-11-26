@@ -39,8 +39,9 @@ mod modular;
 pub use modular::{
     CABIN_TONNES, CabinGrade, CabinStatus, FittedFuelScoops, FittedMiningTool, FuelScoopsSnapshot,
     ModularEquipmentSnapshot, ModuleAction, ModuleError, ModuleKind, ModuleOffer, ModuleProvenance,
-    ModuleReview, ModuleSlot, OwnedModule, PASSAGE_REWARD_TENTHS, PassageStatus, PassengerAction,
-    PassengerIdentity, PassengerJourneySnapshot, PreparedModule,
+    ModuleReview, ModuleSlot, OwnedModule, PASSAGE_CLUE_ID, PASSAGE_REWARD_TENTHS, PassageStatus,
+    PassageTerminalReceipt, PassengerAction, PassengerIdentity, PassengerJourneySnapshot,
+    PreparedModule,
 };
 mod ammunition;
 mod missiles;
@@ -810,6 +811,9 @@ impl World {
         }
         let navigation_trade =
             self.prepare_navigation_trade_step(navigation, planned_debit, next.tick)?;
+        if entry && !self.modular.has_berth_room() {
+            return Err(StepError::TickOverflow);
+        }
         if let (Some(practice), Some(nav), Some(data)) =
             (&mut prepared.practice, navigation, &self.station_data)
         {
@@ -855,6 +859,9 @@ impl World {
         }
         self.state = next;
         self.navigation = navigation;
+        if entry && let Some(dock) = navigation.and_then(NavigationState::dock) {
+            self.modular.record_berth(dock);
+        }
         if entry || completed_leg.is_some() {
             self.reconcile_navigation_route(entry);
         }

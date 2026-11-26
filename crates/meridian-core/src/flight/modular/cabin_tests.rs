@@ -38,6 +38,53 @@ fn funded_avenor(seed: u64) -> World {
     world
 }
 
+fn journey_with_arrival(world: &mut World, target: SystemId) -> u64 {
+    use crate::{FlightInput, FlightMode};
+    world.request_launch(world.snapshot().tick).unwrap();
+    world.step(FlightInput::default()).unwrap();
+    world.request_jump(target, world.snapshot().tick).unwrap();
+    let remaining = world
+        .snapshot()
+        .navigation
+        .unwrap()
+        .travel
+        .unwrap()
+        .remaining_ticks;
+    for _ in 0..remaining {
+        world.step(FlightInput::default()).unwrap();
+    }
+    let arrival = world.snapshot().tick;
+    assert_eq!(world.current_dock_context(), None);
+    for _ in 0..9000 {
+        let snapshot = world.snapshot();
+        if snapshot.mode == FlightMode::Docked {
+            return arrival;
+        }
+        let speed = if snapshot.position[2] > 2500.0 {
+            34.3
+        } else {
+            4.0
+        };
+        world
+            .step(FlightInput {
+                throttle: ((speed - snapshot.speed) / (9.1 / 60.0)).clamp(-1.0, 1.0),
+                ..FlightInput::default()
+            })
+            .unwrap();
+        assert_eq!(world.snapshot().motion_refusal, None);
+    }
+    panic!("actual public flight did not dock");
+}
+
+fn reject_changed_history(world: &World, live: &mut World, retained: &[u8]) {
+    assert!(world.save_bytes().is_err());
+    assert!(
+        live.restore_bytes(&world.unchecked_test_save().unwrap())
+            .is_err()
+    );
+    assert_eq!(live.save_bytes().unwrap(), retained);
+}
+
 #[test]
 fn original_six_offers_empty_start_and_no_grant() {
     let mut world = World::new_commander(31001).unwrap();
@@ -150,6 +197,51 @@ fn paid_repeatable_cabins_reserve_hold_and_units_and_failed_write_is_atomic() {
     );
     assert_eq!(world.service_snapshot().unwrap().used_tonnes, 10);
     assert_eq!(world.credits_tenths(), Some(cash - 50_000));
+    use crate::equipment::{Command as Bay, Event as BayEvent};
+    use crate::freight::g02::{Choice, Command as Freight, Event as FreightEvent};
+    let BayEvent::Purchased { item: bay, .. } = world
+        .request_equipment(Bay::PurchaseCargoBay, world.snapshot().tick)
+        .unwrap()
+    else {
+        panic!("paid cargo bay");
+    };
+    world
+        .request_equipment(Bay::UnfitCargoBay(bay), world.snapshot().tick)
+        .unwrap();
+    world
+        .request_equipment(Bay::FitCargoBay(bay), world.snapshot().tick)
+        .unwrap();
+    let actor = world.station_contacts()[0];
+    world.request_contact(actor, world.snapshot().tick).unwrap();
+    let FreightEvent::Reviewed(offer) = world
+        .request_freight(
+            Freight::ReviewOffer {
+                actor: actor.actor(),
+            },
+            world.snapshot().tick,
+        )
+        .unwrap()
+    else {
+        panic!("freight offer");
+    };
+    world
+        .request_freight(
+            Freight::Confirm {
+                review: offer,
+                choice: Choice::Accept,
+            },
+            world.snapshot().tick,
+        )
+        .unwrap();
+    assert_eq!(world.service_snapshot().unwrap().used_tonnes, 18);
+    let bytes = world.save_bytes().unwrap();
+    let mut live = World::from_save_bytes(&bytes).unwrap();
+    let retained = live.save_bytes().unwrap();
+    world.modular.history.remove_last_bay_for_test();
+    reject_changed_history(&world, &mut live, &retained);
+    world = World::from_save_bytes(&bytes).unwrap();
+    world.modular.history.remove_last_freight_for_test();
+    reject_changed_history(&world, &mut live, &retained);
 }
 
 #[test]
@@ -206,7 +298,7 @@ fn original_two_private_cabins_board_travel_receive_once_and_continue() {
         Err(ModuleError::BerthRequired)
     );
     act(&mut world, ModuleAction::Store { item: packed });
-    journey(&mut world, SystemId::RENAS);
+    let arrival = journey_with_arrival(&mut world, SystemId::RENAS);
     world = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
     let before_receipt = world.passenger_journey_snapshot().unwrap();
     assert_eq!(before_receipt.people, aboard.people);
@@ -231,20 +323,52 @@ fn original_two_private_cabins_board_travel_receive_once_and_continue() {
     world = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
     let done = world.passenger_journey_snapshot().unwrap();
     assert_eq!(
-        (done.people, done.cabins, done.status, done.clue),
+        (
+            done.people,
+            done.cabins,
+            done.status,
+            done.clue.and_then(|receipt| receipt.clue_id())
+        ),
         (
             aboard.people,
             aboard.cabins,
             PassageStatus::Delivered,
-            Some("cabin-journey-family-trace")
+            Some(PASSAGE_CLUE_ID)
         )
     );
+    let terminal = done.terminal.unwrap();
+    assert_eq!(terminal.owner, aboard.people[0].owner);
+    assert_eq!(terminal.cabins, [first, second]);
+    assert_eq!(terminal.receiving.system(), SystemId::RENAS);
+    assert_eq!(terminal.boarding.system(), SystemId::AVENOR);
+    assert!(terminal.terminal_revision > terminal.boarding_revision);
     assert_eq!(
         review(&world, ModuleAction::Passenger(PassengerAction::Receive)),
         Err(ModuleError::PassageClosed)
     );
     act(&mut world, ModuleAction::Store { item: first });
     assert_eq!(world.credits_tenths(), Some(cash + 6100));
+    journey(&mut world, SystemId::AVENOR);
+    let valid = world.save_bytes().unwrap();
+    let mut live = World::from_save_bytes(&valid).unwrap();
+    let retained = live.save_bytes().unwrap();
+    world.modular.history.remove_last_berth_for_test();
+    reject_changed_history(&world, &mut live, &retained);
+    world = World::from_save_bytes(&valid).unwrap();
+    // Same historical Renas arrival visit, but before its accepted physical dock. Neither
+    // a plausible visit/system prefix nor the eventual wallet balance authorizes reception.
+    let receipt = world
+        .modular
+        .events
+        .iter_mut()
+        .find(|event| event.action == ModuleAction::Passenger(PassengerAction::Receive))
+        .unwrap();
+    let mut encoded = Writer::new();
+    receipt.dock.encode_save(&mut encoded);
+    let tick_offset = encoded.bytes.len() - 9;
+    encoded.bytes[tick_offset..tick_offset + 8].copy_from_slice(&arrival.to_le_bytes());
+    receipt.dock = DockContext::decode_save(&mut Reader::new(&encoded.bytes)).unwrap();
+    reject_changed_history(&world, &mut live, &retained);
 }
 
 #[test]
@@ -309,6 +433,27 @@ fn cabin_mass_is_shared_with_ordinary_market_and_refit() {
     );
     world = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
     assert_eq!(world.service_snapshot().unwrap().used_tonnes, 88);
+    let valid = world.save_bytes().unwrap();
+    let mut live = World::from_save_bytes(&valid).unwrap();
+    let retained = live.save_bytes().unwrap();
+    let market_revision = world.commander_account.as_ref().unwrap().revision();
+    let store = world
+        .modular
+        .events
+        .iter_mut()
+        .find(|event| event.action == ModuleAction::Store { item: cabin })
+        .unwrap();
+    assert!(
+        world
+            .station_markets
+            .as_mut()
+            .unwrap()
+            .move_cargo_revision_for_test(market_revision, store.revision)
+    );
+    store.revision = market_revision;
+    // The same paid cabin is stored and the final 88 tonnes still fit, but the reordered
+    // market purchase would transiently occupy 93t. The actual prefix must refuse it.
+    reject_changed_history(&world, &mut live, &retained);
 }
 
 #[test]
@@ -333,4 +478,65 @@ fn forged_passage_receipt_cannot_change_historical_fuel_or_create_boarding() {
             .is_err()
     );
     assert_eq!(live.save_bytes().unwrap(), retained);
+}
+
+#[test]
+fn extended_receipt_requires_marker_and_exact_bounded_sixteen_bit_fuel() {
+    let packed = cabins::pack_receipt(17, 410).unwrap();
+    assert_eq!(cabins::receipt_epoch(packed), 17);
+    assert_eq!(cabins::receipt_fuel(packed), Some(410));
+    assert_eq!(cabins::receipt_fuel((17 << 16) | 411), None);
+    assert_eq!(cabins::receipt_fuel(410), None);
+    assert_eq!(
+        cabins::pack_receipt(u64::MAX, 410),
+        Err(ModuleError::SequenceExhausted)
+    );
+    let mut world = World::new_commander(31007).unwrap();
+    passage(&mut world, PassengerAction::RequestReplies);
+    let mut writer = Writer::new();
+    world.modular.encode(&mut writer);
+    let complete = writer.bytes.clone();
+    let mut reader = Reader::new(&complete);
+    assert_eq!(
+        State::decode(&mut reader, crate::save::SAVE_VERSION).unwrap(),
+        world.modular
+    );
+    assert!(reader.finished());
+    writer.bytes[3] &= 0x7f;
+    assert!(State::decode(&mut Reader::new(&writer.bytes), crate::save::SAVE_VERSION).is_err());
+    assert!(
+        State::decode(
+            &mut Reader::new(&complete[..complete.len() - 1]),
+            crate::save::SAVE_VERSION
+        )
+        .is_err()
+    );
+}
+
+#[test]
+fn legacy_unrecorded_bay_refit_is_not_fabricated_into_an_anchor() {
+    use crate::equipment::Command as Bay;
+    let mut world = World::from_save_bytes(include_bytes!(
+        "../../../tests/fixtures/xyzzy-paid-base-v17.bin"
+    ))
+    .unwrap();
+    let mut equipment = world.equipment_snapshot().unwrap();
+    if equipment.owned.is_none() {
+        world
+            .request_equipment(Bay::PurchaseCargoBay, world.snapshot().tick)
+            .unwrap();
+        equipment = world.equipment_snapshot().unwrap();
+    }
+    let item = equipment.owned.unwrap();
+    if item.fitted {
+        world
+            .request_equipment(Bay::UnfitCargoBay(item.id), world.snapshot().tick)
+            .unwrap();
+    }
+    let before = world.save_bytes().unwrap();
+    assert_eq!(
+        review(&world, buy(CabinGrade::PackedStasis)),
+        Err(ModuleError::PassageHistory)
+    );
+    assert_eq!(world.save_bytes().unwrap(), before);
 }

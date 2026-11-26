@@ -12,6 +12,33 @@ pub(super) struct Receipt {
     pub(super) event: Event,
 }
 impl StationMarkets {
+    pub(crate) fn cargo_mass_events(&self) -> Vec<(u64, i16)> {
+        self.receipts
+            .iter()
+            .filter_map(|r| {
+                let (commodity, delta) = match r.event {
+                    Event::BoughtFood { .. } => (CommodityId::Food, 1),
+                    Event::SoldFood { .. } => (CommodityId::Food, -1),
+                    Event::BoughtCommodity { commodity, .. } => (commodity, 1),
+                    Event::SoldCommodity { commodity, .. } => (commodity, -1),
+                    Event::Refuelled { .. } => return None,
+                };
+                (commodity.unit() == super::CargoUnit::Tonne).then_some((r.revision, delta))
+            })
+            .collect()
+    }
+    #[cfg(test)]
+    pub(crate) fn move_cargo_revision_for_test(&mut self, from: u64, to: u64) -> bool {
+        let Some(receipt) = self
+            .receipts
+            .iter_mut()
+            .find(|receipt| receipt.revision == from)
+        else {
+            return false;
+        };
+        receipt.revision = to;
+        true
+    }
     pub(crate) fn account_events(&self) -> Vec<AccountEvent> {
         self.receipts
             .iter()

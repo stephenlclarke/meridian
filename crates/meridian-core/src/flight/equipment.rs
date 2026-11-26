@@ -25,6 +25,17 @@ impl World {
         command: Command,
         expected_tick: u64,
     ) -> Result<Event, MissionError> {
+        if self.modular.history_active() {
+            return self
+                .prepare_equipment(command, expected_tick)
+                .map(PreparedEquipment::commit)
+                .map_err(|error| match error {
+                    EquipmentPreparationError::Command(error) => error,
+                    EquipmentPreparationError::Save(_) => {
+                        MissionError::Equipment(equipment::Error::InvalidState)
+                    }
+                });
+        }
         let facts = self.current_service_facts(expected_tick)?;
         let reserved_capacity = self.navigation_trade.reservations().capacity
             + self.cabin_tonnes().map_err(MissionError::Service)?;
@@ -49,6 +60,7 @@ pub(super) mod tests;
 pub struct PreparedEquipment<'a> {
     world: &'a mut World,
     account: crate::freight::g02::CommanderAccount,
+    modular: super::modular::State,
     event: Event,
     bytes: Vec<u8>,
 }
@@ -75,6 +87,7 @@ impl PreparedEquipment<'_> {
     }
     pub fn commit(self) -> Event {
         self.world.commander_account = Some(self.account);
+        self.world.modular = self.modular;
         self.event
     }
 }
@@ -105,12 +118,19 @@ impl World {
                         .map_err(|error| command_error(MissionError::Service(error)))?,
             )
             .map_err(|error| command_error(MissionError::Equipment(error)))?;
+        let mut modular = self.modular.clone();
+        modular.record_bay(
+            &account,
+            self.current_dock_context()
+                .ok_or_else(|| command_error(MissionError::NotDocked))?,
+        );
         let bytes = self
-            .save_bytes_with_modules(&account, &self.modular)
+            .save_bytes_with_modules(&account, &modular)
             .map_err(EquipmentPreparationError::Save)?;
         Ok(PreparedEquipment {
             world: self,
             account,
+            modular,
             event,
             bytes,
         })

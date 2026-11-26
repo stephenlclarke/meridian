@@ -854,6 +854,15 @@ pub struct State {
     pending: Option<PendingReview>,
 }
 
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct FreightMassEvent {
+    pub(crate) sequence: u64,
+    pub(crate) revision: Option<u64>,
+    pub(crate) delta: i16,
+    pub(crate) system: System,
+    pub(crate) dock_sequence: Option<u64>,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Snapshot {
     pub available_source_units: u8,
@@ -879,6 +888,49 @@ pub(crate) struct Prepared {
 }
 
 impl State {
+    pub(crate) fn cargo_sequence(&self) -> u64 {
+        self.data.sequence
+    }
+
+    /// Every G02 custody transition in logical source order. Older issue/abandon records did
+    /// not retain account revisions; exact delivery receipts did.
+    pub(crate) fn cargo_mass_events(&self) -> Vec<FreightMassEvent> {
+        let mut events = Vec::new();
+        for job in self.data.jobs.iter().flatten() {
+            events.push(FreightMassEvent {
+                sequence: job.issue_sequence,
+                revision: None,
+                delta: 8,
+                system: job.issuer.system,
+                dock_sequence: Some(job.issuer.arrival_sequence),
+            });
+            let mut remaining = 8_i16;
+            let mut sequence = job.issue_sequence;
+            for transfer in job.transfers.iter().flatten() {
+                let amount = transfer.mask.count_ones() as i16;
+                remaining -= amount;
+                sequence = transfer.sequence;
+                events.push(FreightMassEvent {
+                    sequence,
+                    revision: Some(transfer.account_revision),
+                    delta: -amount,
+                    system: transfer.dock.system,
+                    dock_sequence: Some(transfer.dock.arrival_sequence),
+                });
+            }
+            if job.status == JobStatus::Abandoned {
+                events.push(FreightMassEvent {
+                    sequence: sequence.saturating_add(1),
+                    revision: None,
+                    delta: -remaining,
+                    system: AVENOR,
+                    dock_sequence: None,
+                });
+            }
+        }
+        events.sort_unstable_by_key(|event| event.sequence);
+        events
+    }
     pub(crate) fn account_events(&self) -> Vec<crate::flight::AccountEvent> {
         self.data
             .jobs

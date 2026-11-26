@@ -28,7 +28,7 @@ class MuleSourceVerification(unittest.TestCase):
         self.assertEqual(result['protectedCoreFilesWithFlightComputerChanges'], 17)
         self.assertEqual(result['protectedCoreFilesWithHyperspaceDriveChanges'], 12)
         self.assertEqual(result['protectedCoreFilesWithStockShieldChanges'], 16)
-        self.assertEqual(result['protectedCoreFilesWithPassengerCabinChanges'], 14)
+        self.assertEqual(result['protectedCoreFilesWithPassengerCabinChanges'], 18)
         self.assertEqual(result['geometryCoreTests'], 1)
         self.assertEqual(result['restoreCoreTests'], 1)
         self.assertEqual(result['totalMuleCoreTests'], 24)
@@ -108,7 +108,7 @@ class MuleSourceVerification(unittest.TestCase):
             root = Path(directory)
             core = self.copy_protected_sources(root)
             inverse = verifier.passenger_cabin_inverse(root, verifier.protected_core_pins(root))
-            self.assertEqual(len(inverse), 14)
+            self.assertEqual(len(inverse), 18)
             for relative in inverse:
                 with self.subTest(relative=relative):
                     source = core / relative

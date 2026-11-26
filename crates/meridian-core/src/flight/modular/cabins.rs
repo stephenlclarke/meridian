@@ -7,6 +7,8 @@ use crate::station_services::{self as services, AccountProjection, Reservations}
 
 pub const CABIN_TONNES: u16 = 5;
 pub const PASSAGE_REWARD_TENTHS: u32 = 6_100;
+pub const PASSAGE_CLUE_ID: &str = "l337.unwritten-route/clue/cabin-journey-family-trace";
+const MAX_PASSAGE_FUEL: u16 = 410;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PassengerAction {
@@ -43,7 +45,32 @@ pub struct PassengerJourneySnapshot {
     /// One private place (ordinal zero) in each separately identified cabin.
     pub cabins: Option<[u64; 2]>,
     pub reply_is_current: bool,
-    pub clue: Option<&'static str>,
+    pub terminal: Option<PassageTerminalReceipt>,
+    pub clue: Option<PassageTerminalReceipt>,
+}
+
+/// An owner-bound receipt reconstructed only from validated accepted boarding and terminal
+/// events, including the independent accepted berth proofs and the exact private cabin IDs.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PassageTerminalReceipt {
+    pub owner: u64,
+    pub hull: u64,
+    pub boarding_revision: u64,
+    pub terminal_revision: u64,
+    pub boarding: DockContext,
+    pub receiving: DockContext,
+    pub cabins: [u64; 2],
+    pub status: PassageStatus,
+}
+
+impl PassageTerminalReceipt {
+    pub const fn clue_id(self) -> Option<&'static str> {
+        if matches!(self.status, PassageStatus::Delivered) {
+            Some(PASSAGE_CLUE_ID)
+        } else {
+            None
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -71,6 +98,8 @@ pub(super) struct Passage {
     requests: u8,
     cabins: Option<[u64; 2]>,
     offer: Option<Offer>,
+    boarding: Option<(u64, DockContext)>,
+    terminal: Option<PassageTerminalReceipt>,
     pub(super) events: u64,
 }
 
@@ -122,7 +151,8 @@ impl Passage {
                 self.status,
                 PassageStatus::Accepted | PassageStatus::Refused
             ) && self.current(dock, epoch, revision),
-            clue: (self.status == PassageStatus::Delivered).then_some("cabin-journey-family-trace"),
+            terminal: self.terminal,
+            clue: self.terminal.filter(|receipt| receipt.clue_id().is_some()),
         }
     }
 }
@@ -143,15 +173,26 @@ pub(super) fn receipt_data(world: &World, action: PassengerAction) -> Result<u64
         .as_ref()
         .ok_or(ModuleError::NoCommander)?
         .fuel_tenths();
+    pack_receipt(epoch, fuel)
+}
+
+pub(super) fn pack_receipt(epoch: u64, fuel: u16) -> Result<u64, ModuleError> {
+    if epoch == 0 || fuel > MAX_PASSAGE_FUEL {
+        return Err(ModuleError::PassageConsent);
+    }
     epoch
-        .checked_mul(256)
+        .checked_mul(1 << 16)
         .and_then(|value| value.checked_add(u64::from(fuel)))
         .ok_or(ModuleError::SequenceExhausted)
 }
 
+pub(super) fn receipt_epoch(item: u64) -> u64 {
+    item >> 16
+}
+
 pub(super) fn receipt_fuel(item: u64) -> Option<u16> {
-    let fuel = (item % 256) as u16;
-    (item / 256 > 0 && fuel <= crate::navigation::FUEL_CAPACITY).then_some(fuel)
+    let fuel = item as u16;
+    (receipt_epoch(item) > 0 && fuel <= MAX_PASSAGE_FUEL).then_some(fuel)
 }
 
 impl Ledger {
@@ -172,14 +213,17 @@ impl Ledger {
                     return Err(ModuleError::BerthRequired);
                 }
                 let fuel = receipt_fuel(event.item).ok_or(ModuleError::PassageConsent)?;
-                let epoch = event.item / 256;
+                let epoch = receipt_epoch(event.item);
                 let mut ids = self
                     .items
                     .iter()
                     .filter(|item| fitted_cabin(item).is_some_and(CabinGrade::supports_awake))
                     .map(|item| item.id);
                 let eligible = ids.next().zip(ids.next()).map(|(a, b)| [a, b]);
-                let eligible = eligible.filter(|_| fuel >= 34 && self.jump_reach_ly() >= 3.365);
+                let eligible = eligible.filter(|_| {
+                    fuel >= crate::freight::g02::DEPARTURE_FUEL_TENTHS
+                        && self.jump_reach_ly() >= crate::freight::g02::ROUTE_DISTANCE_LY
+                });
                 if action == Action::RequestReplies {
                     if self.passage.requests >= 64 {
                         return Err(ModuleError::Capacity);
@@ -203,6 +247,7 @@ impl Ledger {
                     return Err(ModuleError::PassageConsent);
                 } else {
                     self.passage.status = Status::Aboard;
+                    self.passage.boarding = Some((event.revision, event.dock));
                 }
             }
             Action::Receive | Action::Cancel => {
@@ -225,6 +270,18 @@ impl Ledger {
                 } else {
                     Status::Cancelled
                 };
+                let (boarding_revision, boarding) =
+                    self.passage.boarding.ok_or(ModuleError::PassageConsent)?;
+                self.passage.terminal = Some(PassageTerminalReceipt {
+                    owner: event.dock.owner().seed(),
+                    hull: event.dock.ship().ordinal(),
+                    boarding_revision,
+                    terminal_revision: event.revision,
+                    boarding,
+                    receiving: event.dock,
+                    cabins: self.passage.cabins.ok_or(ModuleError::PassageConsent)?,
+                    status: self.passage.status,
+                });
             }
         }
         self.passage.events = self
