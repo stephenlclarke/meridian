@@ -207,7 +207,7 @@ impl Attempt {
             .sum::<u64>();
         if end.refilled_units > current.refilled_units
             || end.jump > current.jump
-            || end.fuel > 130
+            || end.fuel > crate::navigation::MAX_FUEL_CAPACITY
             || end.refilled_units.checked_sub(plan.refilled_at_plan) != Some(added)
         {
             return Err(INVALID);
@@ -289,7 +289,7 @@ impl Attempt {
             return Ok(());
         };
         validate_dock(t.dock, c)?;
-        if t.fuel.fuel > 130
+        if t.fuel.fuel > crate::navigation::MAX_FUEL_CAPACITY
             || t.fuel.jump > c.nav.jumps
             || t.fuel.refilled_units > c.commerce.markets.ok_or(INVALID)?.fuel_accounting().0
         {
@@ -486,7 +486,10 @@ impl Plan {
             || distance <= 0.0
             || distance > STOCK_JUMP_REACH_LY
             || distance > f64::from(self.fuel_at_plan) / 10.0
-            || self.fuel_at_plan > 130
+            || self.fuel_at_plan
+                > c.commerce
+                    .modular
+                    .fuel_capacity_at_revision(c.nav.owner, self.account_revision)?
             || self.refilled_at_plan > markets.fuel_accounting().0
             || stock_jump_fuel_cost(distance).map_err(|_| INVALID)? != self.fuel_debit
             || self.fuel_debit > self.fuel_at_plan
@@ -601,7 +604,10 @@ impl Trade {
             || self.account_revision <= plan.account_revision
             || self.account_revision > account.revision
             || self.jump_sequence > c.nav.jumps
-            || self.fuel_at_trade > 130
+            || self.fuel_at_trade
+                > c.commerce
+                    .modular
+                    .fuel_capacity_at_revision(c.nav.owner, self.account_revision)?
             || self.after.bought.saturating_add(self.after.sold) > self.transaction
             || stock_at(
                 markets,
@@ -748,7 +754,10 @@ impl Journey {
             || self.source_visit <= buy.dock.visit()
             || self.source_visit.checked_add(1) != Some(self.arrival_visit)
             || self.arrival_visit > c.nav.visit
-            || self.fuel_before > 130
+            || self.fuel_before
+                > c.commerce
+                    .modular
+                    .fuel_capacity_at_revision(c.nav.owner, self.account_revision)?
             || self.fuel_before.checked_sub(self.debit) != Some(self.fuel_after)
             || self.debit == 0
             || stock_jump_fuel_cost(distance).map_err(|_| INVALID)? != self.debit
@@ -794,6 +803,10 @@ impl Fuel {
             .ok_or(INVALID)?
             .service_projection(&c.world.freight_session.as_ref().ok_or(INVALID)?.state)
             .map_err(|_| INVALID)?;
+        let capacity = c
+            .commerce
+            .modular
+            .fuel_capacity_at_revision(c.nav.owner, self.account_revision)?;
         if self.tick < plan.confirmed_tick
             || self.tick < self.dock.tick()
             || self.tick > c.world.state.tick
@@ -803,9 +816,9 @@ impl Fuel {
             || self.account_revision > account.revision
             || self.ordinal == 0
             || self.ordinal > markets.fuel_accounting().1
-            || self.units_before >= 130
-            || self.units_after != 130
-            || self.paid != u32::from(130 - self.units_before) * 2
+            || self.units_before >= capacity
+            || self.units_after != capacity
+            || self.paid != u32::from(capacity - self.units_before) * 2
             || self.credits_before.checked_sub(self.paid) != Some(self.credits_after)
         {
             return Err(INVALID);

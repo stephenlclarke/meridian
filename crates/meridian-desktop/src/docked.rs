@@ -2,7 +2,7 @@
 use crate::{docked_screens as ui, profile::Profile, session::Action};
 use meridian_core::{
     AmmunitionAction, ModuleAction, ModuleKind, ModuleSlot, World, equipment,
-    navigation::{DockContext, FUEL_CAPACITY, SystemId},
+    navigation::{DockContext, SystemId},
     station_services::{self, CommodityId},
 };
 
@@ -90,7 +90,9 @@ fn context<'a>(
         current_reach_ly: navigation
             .zip(reach)
             .map(|(n, reach)| (f64::from(n.fuel_units) / 10.0).min(reach)),
-        full_reach_ly: reach.map(|reach| reach.min(f64::from(FUEL_CAPACITY) / 10.0)),
+        full_reach_ly: navigation
+            .zip(reach)
+            .map(|(n, reach)| reach.min(f64::from(n.fuel_capacity_units) / 10.0)),
         route_targets: &ROUTE_SYSTEMS,
         models: &crate::docked_render::MODELS,
         planet_previews: navigation.is_some_and(|n| n.system == selected)
@@ -600,6 +602,19 @@ fn equipment_action(
     {
         return Err("Owned shield selection changed".into());
     }
+    let tank_node = node == ModuleKind::FuelStorage.node();
+    if tank_node != (slot == "fuel-storage") {
+        return Err("Select the fuel storage slot".into());
+    }
+    if tank_node
+        && operation != Buy
+        && !modules
+            .items
+            .iter()
+            .any(|owned| Some(owned.id) == instance && owned.kind == ModuleKind::FuelStorage)
+    {
+        return Err("Owned fuel storage selection changed".into());
+    }
     if targeting_node
         && operation != Buy
         && !modules
@@ -635,11 +650,15 @@ fn equipment_action(
                 .kind;
             ModuleAction::Install {
                 item,
-                replacing: modules
-                    .items
-                    .iter()
-                    .find(|owned| owned.slot == Some(kind.slot()))
-                    .map(|owned| owned.id),
+                replacing: if kind == ModuleKind::FuelStorage {
+                    None
+                } else {
+                    modules
+                        .items
+                        .iter()
+                        .find(|owned| owned.slot == Some(kind.slot()))
+                        .map(|owned| owned.id)
+                },
             }
         }
         _ => return Err("Unsupported module operation".into()),
@@ -682,6 +701,7 @@ fn module_rows(
         ModuleSlot::MiningTargeting => "Mining targeting",
         ModuleSlot::SalvageTargeting => "Salvage targeting",
         ModuleSlot::UtilityFuelScoops => "Fuel Scoops",
+        ModuleSlot::FuelStorage(_) => "Fuel storage",
     };
     let fitted = modules.items.iter().find(|item| item.slot == Some(slot));
     let mut rows = Vec::new();
@@ -692,7 +712,16 @@ fn module_rows(
         row.fitted = u32::from(item.slot.is_some());
         row.readout
             .push(crate::xyzzy::provenance(item.provenance).into());
-        if let ModuleKind::Shield(grade) = item.kind {
+        if item.kind == ModuleKind::FuelStorage {
+            row.compatibility =
+                "Repeatable physical tank; 1 utility mount and 1 equipment unit".into();
+            row.readout
+                .push("Adds 7.0 LY of tank fuel; refuel separately".into());
+            if let Some(ModuleSlot::FuelStorage(index)) = item.slot {
+                row.readout
+                    .push(format!("Fitted tank position {}", index + 1));
+            }
+        } else if let ModuleKind::Shield(grade) = item.kind {
             row.compatibility = "Owned SH025 shield module; one fitted shield required".into();
             row.readout.push(format!(
                 "Capacity {} per bank | Recharge unchanged",
@@ -748,7 +777,11 @@ fn module_rows(
             .review_module(
                 ModuleAction::Install {
                     item: item.id,
-                    replacing: fitted.map(|item| item.id),
+                    replacing: if item.kind == ModuleKind::FuelStorage {
+                        None
+                    } else {
+                        fitted.map(|item| item.id)
+                    },
                 },
                 tick,
             )
@@ -789,6 +822,12 @@ fn module_rows(
                 "Capacity {} per bank | Recharge unchanged",
                 grade.capacity() / 100
             ));
+        }
+        if offer.kind == ModuleKind::FuelStorage {
+            row.readout
+                .push("Adds 7.0 LY of tank fuel; fuel not included".into());
+            row.readout
+                .push("Normal SH025: 3 shared utility mounts; global ownership cap 4".into());
         }
         let action = if offer.kind == ModuleKind::MiningLaser {
             ModuleAction::PurchaseMiningLaser
@@ -952,6 +991,22 @@ fn equipment_panel(
             available: true,
         });
     }
+    let fitted_tanks = modules
+        .items
+        .iter()
+        .filter(|item| item.kind == ModuleKind::FuelStorage && item.slot.is_some())
+        .count();
+    let fuel = world.snapshot().navigation.ok_or("No fuel account")?;
+    slots.push(ui::EquipmentSlot {
+        id: "fuel-storage".into(),
+        label: "Fuel storage".into(),
+        fitted: format!(
+            "{fitted_tanks} fitted | {:.1}/{:.1} LY fuel",
+            f32::from(fuel.fuel_units) / 10.0,
+            f32::from(fuel.fuel_capacity_units) / 10.0
+        ),
+        available: true,
+    });
     let mut rows = Vec::new();
     let module_slot = match selected {
         "front-laser" => Some(ModuleSlot::FrontLaser),
@@ -959,6 +1014,7 @@ fn equipment_panel(
         "navigation" => Some(ModuleSlot::Navigation),
         "drive" => Some(ModuleSlot::Drive),
         "shield" => Some(ModuleSlot::Shield),
+        "fuel-storage" => Some(ModuleSlot::FuelStorage(0)),
         "targeting" => Some(ModuleSlot::Targeting),
         "targeting-mining" => Some(ModuleSlot::MiningTargeting),
         "targeting-salvage" => Some(ModuleSlot::SalvageTargeting),
@@ -1009,11 +1065,16 @@ fn equipment_panel(
                 .is_some_and(|o| o.purchase_available)
             && world
                 .credits_tenths()
-                .is_some_and(|c| c >= equipment.definition.price_tenths);
+                .is_some_and(|c| c >= equipment.definition.price_tenths)
+            && modules.utility_mounts_used < modules.utility_mounts_capacity
+            && modules.equipment_units_used < modules.equipment_units_capacity;
         row.can_store = equipment.service_available
             && equipment.owned.is_some_and(|i| i.fitted)
             && equipment.used_tonnes <= equipment.definition.base_hold_tonnes;
-        row.can_fit = equipment.service_available && equipment.owned.is_some_and(|i| !i.fitted);
+        row.can_fit = equipment.service_available
+            && equipment.owned.is_some_and(|i| !i.fitted)
+            && modules.utility_mounts_used < modules.utility_mounts_capacity
+            && modules.equipment_units_used < modules.equipment_units_capacity;
         rows.push(row);
     } else if let Some(pylon) = selected
         .strip_prefix("pylon-")
@@ -1078,8 +1139,8 @@ fn equipment_panel(
             u32::from(modules.equipment_units_capacity),
         ],
         utility_mounts: [
-            u32::from(equipment.utility_mounts_used),
-            u32::from(equipment.definition.utility_mounts_capacity),
+            u32::from(modules.utility_mounts_used),
+            u32::from(modules.utility_mounts_capacity),
         ],
         assigned_crew: None,
         required_crew: None,
@@ -1093,6 +1154,48 @@ mod secret_ui_tests {
     use crate::profile::tests::{TestDirectory, open};
     fn ok<T, E: std::fmt::Debug>(result: Result<T, E>) -> T {
         result.unwrap_or_else(|error| panic!("{error:?}"))
+    }
+    #[test]
+    fn fuel_storage_rows_show_actual_count_capacity_and_repeatable_identity() {
+        let directory = TestDirectory::new();
+        let mut profile = open(&directory.0);
+        assert!(ok(profile.new_commander(99037)));
+        let panel = ok(equipment_panel(&profile.world, "fuel-storage", ""));
+        assert!(
+            panel
+                .rows
+                .iter()
+                .any(|row| row.price_tenths == Some(20_000) && !row.can_buy)
+        );
+        ok(profile.xyzzy(meridian_core::XyzzyAction::MaximumFuelStorage));
+        let panel = ok(equipment_panel(&profile.world, "fuel-storage", ""));
+        assert_eq!(panel.utility_mounts, [7, 3]);
+        let slot = panel
+            .slots
+            .iter()
+            .find(|slot| slot.id == "fuel-storage")
+            .unwrap_or_else(|| panic!("tank slot"));
+        assert!(slot.fitted.contains("4 fitted"));
+        assert!(slot.fitted.contains("41.0/41.0"));
+        let owned = panel
+            .rows
+            .iter()
+            .filter(|row| row.instance.is_some())
+            .collect::<Vec<_>>();
+        assert_eq!(owned.len(), 4);
+        assert!(owned.iter().all(|row| row.fitted == 1
+            && !row.can_store
+            && row.readout.iter().any(|line| line.contains("XYZZY grant"))));
+        assert!(
+            equipment_action(
+                &profile.world,
+                ModuleKind::FuelStorage.node(),
+                None,
+                "shield",
+                ui::EquipmentOperation::Buy
+            )
+            .is_err()
+        );
     }
     #[test]
     fn actual_equipment_panels_keep_born_paid_and_xyzzy_provenance_distinct() {
@@ -1552,7 +1655,7 @@ mod tests {
     fn front_module_rows_and_pylon_slots_use_real_owned_instances_and_admission() {
         let (_directory, profile, _menu) = start();
         let panel = ok(equipment_panel(&profile.world, "front-laser", ""));
-        assert_eq!(panel.slots.len(), 20);
+        assert_eq!(panel.slots.len(), 21);
         let actual: Vec<_> = panel.slots.iter().map(|slot| slot.id.as_str()).collect();
         assert_eq!(
             actual,
@@ -1576,7 +1679,8 @@ mod tests {
                 "pylon-8",
                 "targeting",
                 "targeting-mining",
-                "targeting-salvage"
+                "targeting-salvage",
+                "fuel-storage"
             ]
         );
         let emp = panel

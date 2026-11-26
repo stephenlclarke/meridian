@@ -14,6 +14,8 @@ The ordinary-drive development candidate adds the actual Advanced Hyperspace Dri
 
 The stock-shield candidate adds actual Elite to the maximum outfit, plus a distinct Meridian-only test action. Select Test shield with Up/Down, select any grade with Left/Right, then Enter to review and confirm. It fits only that grade, reuses held paid property, and neither refills fuel nor changes cash. [Shield source and acceptance](SHIELD-GRADES.md). This candidate awaits owned validation.
 
+The [fuel storage candidate](FUEL-STORAGE.md) adds a separately labelled TEST MAX action for the original four-tank maximum exception. It can fit all four identified units and refill the actual 410-unit tank, while the ordinary SH025 still has three shared utility mounts. Active custody refuses this exception. A player must restore ordinary limits before accepting G02 freight or T04 trade custody.
+
 In the flight-computer development build, activating or refitting XYZZY fits the Military targeting computer, both Mining and Salvage targeting modules, and raises all three EMP grades to 3. Local technology and shop stock apply to ordinary purchases. Returning to the same menu after a save lets you refit and change fuel mode in one visit.
 
 Explicit `Enter` persists mode/name and the once-only cash adjustment. Normal commanders remain Rowan Calder with their own720 CR birth balance. No getter, saved descriptor, purchase API or capability readout activates mode. Ordinary paid purchases continue to charge their actual prices and retain paid provenance, technology, prerequisites and limits.

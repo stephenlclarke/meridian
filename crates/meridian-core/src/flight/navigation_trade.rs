@@ -47,6 +47,7 @@ pub enum NavigationTradeError {
     Stock,
     Credits,
     Fuel,
+    TestFit,
     FitOrStockChanged,
     NotReady,
     ReceiptCapacity,
@@ -277,6 +278,14 @@ impl State {
     }
     pub(super) fn occupancy(&self) -> (usize, usize) {
         (self.attempts.len(), usize::from(self.active().is_some()))
+    }
+    /// T04 consent/closure do not advance the account or simulation tick; only
+    /// a strictly interior retained tick proves a prior active interval.
+    pub(super) fn known_active_at_tick(&self, tick: u64) -> bool {
+        self.attempts.iter().any(|attempt| {
+            attempt.accepted_tick < tick
+                && attempt.terminal.is_none_or(|terminal| terminal.tick > tick)
+        })
     }
     pub(super) fn reservations(&self) -> services::Reservations {
         let Some(a) = self.active() else {

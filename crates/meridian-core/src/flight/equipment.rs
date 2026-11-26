@@ -2,6 +2,29 @@
 use super::{MissionError, World};
 use crate::equipment::{self, Command, Event, Snapshot};
 impl World {
+    fn check_cargo_mount(&self, command: Command) -> Result<(), MissionError> {
+        let account = self
+            .commander_account
+            .as_ref()
+            .ok_or(MissionError::NoCommander)?;
+        let owned = account.equipment_state().owned();
+        let adds = match command {
+            Command::PurchaseCargoBay => owned.is_none(),
+            Command::FitCargoBay(id) => owned.is_some_and(|i| i.id == id && !i.fitted),
+            Command::UnfitCargoBay(_) => false,
+        };
+        if adds {
+            let fit = self
+                .modular_equipment_snapshot()
+                .ok_or(MissionError::Equipment(equipment::Error::InvalidState))?;
+            if fit.utility_mounts_used >= fit.utility_mounts_capacity
+                || fit.equipment_units_used >= fit.equipment_units_capacity
+            {
+                return Err(MissionError::Equipment(equipment::Error::Unavailable));
+            }
+        }
+        Ok(())
+    }
     pub fn equipment_snapshot(&self) -> Option<Snapshot> {
         let account = self.commander_account.as_ref()?;
         let projection = self.reserved_service_projection().ok()?;
@@ -26,6 +49,7 @@ impl World {
         expected_tick: u64,
     ) -> Result<Event, MissionError> {
         let facts = self.current_service_facts(expected_tick)?;
+        self.check_cargo_mount(command)?;
         let reserved_capacity = self.navigation_trade.reservations().capacity;
         let account = self
             .commander_account
@@ -85,6 +109,7 @@ impl World {
     ) -> Result<PreparedEquipment<'_>, EquipmentPreparationError> {
         let command_error = EquipmentPreparationError::Command;
         let facts = self.current_service_facts(tick).map_err(command_error)?;
+        self.check_cargo_mount(command).map_err(command_error)?;
         let account = self
             .commander_account
             .as_ref()

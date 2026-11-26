@@ -49,6 +49,9 @@ impl World {
         let dock = self.navigation_trade_berth(tick)?;
         let plan = match action {
             Action::Accept => {
+                if self.test_tank_overfit() {
+                    return Err(Error::TestFit);
+                }
                 if self.xyzzy_snapshot().is_some_and(|s| s.unlimited_fuel) {
                     return Err(Error::Fuel);
                 }

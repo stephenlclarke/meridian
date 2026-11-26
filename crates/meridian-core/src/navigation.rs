@@ -16,6 +16,26 @@ use std::collections::VecDeque;
 
 const CATALOGUE: &[u8] = include_bytes!("../../../assets/legacy/g01.navigation");
 pub const FUEL_CAPACITY: u16 = 130;
+pub const FUEL_STORAGE_UNIT_CAPACITY: u16 = 70;
+pub const MAX_FUEL_STORAGE_UNITS: u8 = 4;
+pub const MAX_FUEL_CAPACITY: u16 = fuel_capacity(MAX_FUEL_STORAGE_UNITS);
+pub const fn fuel_capacity(storage_units: u8) -> u16 {
+    FUEL_CAPACITY + FUEL_STORAGE_UNIT_CAPACITY * storage_units as u16
+}
+
+// Retain the existing two-byte stock save field. Fuel occupies nine bits; the
+// next three carry the installed count, and the remaining bits are reserved.
+pub(crate) const fn pack_fuel(units: u16, storage_units: u8) -> u16 {
+    units | ((storage_units as u16) << 9)
+}
+pub(crate) fn unpack_fuel(encoded: u16) -> Result<(u16, u8), crate::save::SaveError> {
+    let units = encoded & 511;
+    let count = (encoded >> 9) as u8;
+    if count > MAX_FUEL_STORAGE_UNITS || units > fuel_capacity(count) {
+        return Err(crate::save::SaveError::InvalidEncoding);
+    }
+    Ok((units, count))
+}
 pub const STOCK_JUMP_REACH_LY: f64 = 9.0;
 // HyperspaceDriveTier.basic.activationSeconds (not the old ship [game].spool value).
 pub const BASIC_SPOOL_TICKS: u32 = 600;
@@ -292,6 +312,7 @@ pub struct TravelProgress {
 pub struct NavigationSnapshot {
     pub system: SystemId,
     pub fuel_units: u16,
+    pub fuel_capacity_units: u16,
     pub visit: u64,
     pub travel: Option<TravelProgress>,
 }
@@ -441,9 +462,13 @@ impl NavigationState {
         }
     }
     pub(crate) fn snapshot(self, fuel: u16) -> NavigationSnapshot {
+        self.snapshot_with_capacity(fuel, FUEL_CAPACITY)
+    }
+    pub(crate) fn snapshot_with_capacity(self, fuel: u16, capacity: u16) -> NavigationSnapshot {
         NavigationSnapshot {
             system: self.system,
             fuel_units: fuel,
+            fuel_capacity_units: capacity,
             visit: self.visit,
             travel: self.pending.map(|jump| TravelProgress {
                 destination: jump.destination,
@@ -873,6 +898,7 @@ mod tests {
             NavigationSnapshot {
                 system: SystemId::RENAS,
                 fuel_units: 96,
+                fuel_capacity_units: FUEL_CAPACITY,
                 visit: 3,
                 travel: None
             }

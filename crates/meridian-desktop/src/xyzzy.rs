@@ -36,12 +36,15 @@ const ACTIONS: [(XyzzyAction, &str); 4] = [
     ),
 ];
 const SHIELD_ACTION: usize = ACTIONS.len();
-const ACTION_COUNT: usize = ACTIONS.len() + 1;
+const MAX_TANK_ACTION: usize = SHIELD_ACTION + 1;
+const ACTION_COUNT: usize = ACTIONS.len() + 2;
 
 impl Menu {
     pub fn action(&self) -> XyzzyAction {
         if self.selected == SHIELD_ACTION {
             XyzzyAction::FitShield(ShieldGrade::ALL[self.shield_index])
+        } else if self.selected == MAX_TANK_ACTION {
+            XyzzyAction::MaximumFuelStorage
         } else {
             ACTIONS[self.selected].0
         }
@@ -94,6 +97,14 @@ impl Menu {
             },
             ShieldGrade::ALL[self.shield_index].name()
         ));
+        lines.push(format!(
+            "{} TEST MAX: fit all four fuel tanks",
+            if self.selected == MAX_TANK_ACTION {
+                ">"
+            } else {
+                " "
+            }
+        ));
         if let Some(combat) = world.combat_snapshot() {
             lines.push(format!(
                 "Fitted shield: {}",
@@ -117,6 +128,9 @@ impl Menu {
                 XyzzyAction::ToggleUnlimitedFuel => "Switch between normal and unlimited fuel.",
                 XyzzyAction::FitShield(_) => {
                     "Fits only the selected shield grade; no cash or fuel grant."
+                }
+                XyzzyAction::MaximumFuelStorage => {
+                    "Test-only 4 tanks; exceeds normal mounts. No active custody."
                 }
                 _ => "Fits maximum compatible equipment regardless of local technology.",
             }
@@ -152,6 +166,8 @@ impl Menu {
                 "Activation fits maximum compatible equipment at any station berth",
                 "Test shield: choose the row, then Left / Right selects one grade",
                 "Test shield fits only that grade, without a paid or earned receipt",
+                "TEST MAX fits 4 tanks beyond normal SH025 mounts; no active custody",
+                "Store test tanks to meet ordinary fitting limits before contracts",
                 "After confirmation you can choose another action here",
                 "Fuel mode is accounted separately; paid transactions still charge",
                 "Missiles and cargo remain finite; full original parity is incomplete",
