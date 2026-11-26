@@ -947,17 +947,24 @@ fn showroom_specifications(
     ship: &ObjectRecord,
     baseline: &str,
 ) -> Vec<String> {
-    let mut lines = vec![
-        format!(
-            "Authored standard: {} | {}",
-            ship.role, ship.purchase_policy
-        ),
-        format!(
-            "Authored flyable hull: {}",
-            if ship.player_flyable { "Yes" } else { "No" }
-        ),
-        "Reference specifications; fitted equipment can change capability.".into(),
-    ];
+    let mut lines = if ship.id == "SH171" {
+        vec![
+            "Inspection only. Flight unavailable.".into(),
+            "PLUGH fabrication is unavailable.".into(),
+        ]
+    } else {
+        vec![
+            format!(
+                "Authored standard: {} | {}",
+                ship.role, ship.purchase_policy
+            ),
+            format!(
+                "Authored flyable hull: {}",
+                if ship.player_flyable { "Yes" } else { "No" }
+            ),
+            "Reference specifications; fitted equipment can change capability.".into(),
+        ]
+    };
     if s.detail {
         lines.push(format!("Source status: {}", ship.source_status));
     }
