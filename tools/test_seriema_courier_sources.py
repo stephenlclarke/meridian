@@ -101,6 +101,17 @@ class SeriemaCourierSources(unittest.TestCase):
         for path, expected in criteria["replayPins"].items():
             self.assertEqual(prep.pin((prep.ROOT / path).read_bytes())["sha256"], expected)
 
+    def test_fit_rejects_an_unverified_triangulation_before_measurement(self):
+        import measure_seriema_courier_geometry as measure
+
+        source = measure.load()
+        for candidate in (False, True):
+            with self.subTest(candidate=candidate), patch.object(measure, "REFERENCE_FANS_SHA", "0" * 64):
+                with patch.object(measure, "adaptive_upper") as upper:
+                    with self.assertRaisesRegex(ValueError, "Changed Seriema Courier reference triangulation"):
+                        measure.support_fit(source, candidate)
+                    upper.assert_not_called()
+
     def test_check_replays_outputs_without_mutation(self):
         with patch.object(prep, "replace_output", side_effect=AssertionError("check rewrote output")):
             with patch("sys.argv", ["prepare_seriema_courier_geometry", "--check"]):

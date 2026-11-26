@@ -28,7 +28,7 @@
       "key": "2",
       "legacyBehavior": "Maximum hardware and refill current hull.",
       "state": "PARTIAL_CORE",
-      "dependency": "Actual Elite Energy, front Naval Laser, Advanced Navigation (21 LY), Fuel Scoops fitting, cargo bay, finite nine-pylon fill and 130-unit refill. Missing maximum components remain listed below."
+      "dependency": "Actual Elite Energy and Elite Shield, front Naval Laser, Advanced Navigation (21 LY), Advanced Hyperspace Drive, Fuel Scoops fitting, cargo bay, finite nine-pylon fill and actual current-capacity refill. Separate TEST MAX exercises the guarded four-tank exception; missing maximum components remain listed below."
     },
     {
       "key": "C",
@@ -129,8 +129,8 @@
     {
       "key": "max/shield",
       "legacyBehavior": "Elite Shield Module.",
-      "state": "DEPENDENCY",
-      "dependency": "Actual shield-grade capacity and widened shield scalar, fit effects/resource fractions."
+      "state": "IMPLEMENTED_SOURCE",
+      "dependency": "Actual Elite Shield Module, 2760 units per bank on SH025, unchanged recharge, proportional fit and historical damage replay. The dedicated Meridian test selector can independently exercise all seven grades; no ordinary earned or PLUGH receipt is fabricated."
     },
     {
       "key": "max/navigation",
@@ -141,8 +141,8 @@
     {
       "key": "max/drive",
       "legacyBehavior": "Advanced hyperspace drive.",
-      "state": "DEPENDENCY",
-      "dependency": "Actual drive custody/spool/fuel/galaxy rules."
+      "state": "IMPLEMENTED_SOURCE",
+      "dependency": "Actual Advanced Hyperspace Drive item, one-second spool and 360-unit station mass lock; held paid item is reused. Ordinary route/fuel checks remain. Broader celestial/body mass lock, alien immediate drive and inter-galaxy travel remain separate."
     },
     {
       "key": "max/targeting",
@@ -213,8 +213,8 @@
     {
       "key": "max/fuel-storage",
       "legacyBehavior": "Grant four Fuel Storage Units,70 fuel units each.",
-      "state": "DEPENDENCY",
-      "dependency": "Actual four owned tank slots/compatibility/utility budget/capacity and save accounting; current tank remains130."
+      "state": "PARTIAL_CORE",
+      "dependency": "Separate explicit TEST MAX fits all four identified units and refills 410, with real G02 and T04 custody guards. Ordinary SH025 retains three shared mounts. Broader passenger and other contract owners are still unavailable."
     },
     {
       "key": "max/missiles",
@@ -228,7 +228,9 @@
     "Enter",
     "MaximumSupportedHardware",
     "RestoreStarter",
-    "ToggleUnlimitedFuel"
+    "ToggleUnlimitedFuel",
+    "FitShield(ShieldGrade)",
+    "MaximumFuelStorage"
   ],
   "execution": "Whole current core+host composition authored, compilation/tests/native/publication unrun.",
   "hostBinding": "Explicit Ctrl+Shift+X testing menu; original menu numbering not preserved; whole composition authored/unrun."

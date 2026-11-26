@@ -12,9 +12,13 @@ import trimesh
 
 from wombat_art_mesh import SCALE, assemble
 from measure_banteng_geometry import adaptive_upper, section, solid, upper
-from measure_lanner_geometry import make_fan
+from measure_lanner_geometry import load_reference_records, validated_reference_fan
 from prepare_wombat_geometry import INTEGRATION, ORIGINAL, build
 from vulture_mk_i_exact_fit import grid_index
+
+
+REFERENCE_FANS_SHA = "121ec763dc8227253c859a607645b3745947ee1ab0aeb75e6f09b753cb36fc61"
+REFERENCE_DIAGNOSTIC_SHA = "88060109ac37f96f2cf92ceefea68841d1c56d456e82049fe58b28906940ec8a"
 
 
 def surface(section_data):
@@ -154,6 +158,9 @@ def envelope_fit(candidate_path):
     slots, meshes = assemble((source["design"], parts["design"]["parts"]), native)
     scaled = np.array(meshes[0]["vertices"] + meshes[1]["vertices"]) * float(SCALE)
     support_ids = np.array(meshes[0]["groups"] + meshes[1]["groups"])
+    mode = "candidate" if candidate else "archive"
+    records = load_reference_records(INTEGRATION / "REFERENCE-FANS.json", REFERENCE_FANS_SHA,
+                                     REFERENCE_DIAGNOSTIC_SHA, mode, scaled, support_ids, len(slots), "Wombat")
     targets = {"detailed": 1800, "archiveNative": 1800}
     original_native = source["nativeDesign"]
     references = {
@@ -168,9 +175,9 @@ def envelope_fit(candidate_path):
         for lod, (points, faces) in references.items()
     }
     rows = []
-    for (name, ordinal), identifier in slots.items():
+    for ((name, ordinal), identifier), record in zip(slots.items(), records, strict=True):
         point_ids = np.flatnonzero(support_ids == identifier)
-        fan = make_fan(scaled, point_ids)
+        fan = validated_reference_fan(record, (name, ordinal), scaled, point_ids, "Wombat")
         rows.append({
             "part": name,
             "occurrence": ordinal,

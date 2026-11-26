@@ -41,6 +41,12 @@ three meshes. The bundled support stand-off upper bounds are 2,173 mm from
 the detailed mesh, 2,556 mm from the archived native mesh and 4,671 mm from the
 candidate. The largest candidate stand-off is at an omitted inboard well.
 
+Both fit calculations use the original MacBook Air triangulations for all 72
+supports. Each replay checks the original vertex indices, metre coordinates,
+and outward triangles, including vertices shared by adjacent collar sectors,
+then recalculates the distance bounds. The [inspection criteria](../integration/sh061-saiga/CRITERIA.json)
+record the original measurement script hashes and the triangulation capture.
+
 Developer ID–signed Hull Studio produced two byte-identical offline artwork
 exports and responses for the 5,776/512 definition and recorded three exterior
 probes. The bundled collision verifier checks all seven routes, including those

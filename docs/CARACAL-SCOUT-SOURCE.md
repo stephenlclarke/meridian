@@ -20,6 +20,8 @@ The 89 local convex supports use nominal 20 mm rounding. Rims share the support 
 | Archived native mesh | 1,708 mm |
 | Project-authored native candidate | 2,299 mm |
 
+The fit replay preserves the complete original reference triangulation as a derived proof input. The same support points produced different Qhull facet diagonals on x86 in 25 archived and 28 candidate supports, changing individual conservative bounds while preserving the reported maxima. The shared validator binds both full point streams and every support identity, validates the closed outward reference fan with the unchanged exact radial tolerance, and recomputes every adaptive bound. A macOS arm64 capture reproduced all three original numerical reports byte for byte. The four imported Banteng measurement functions retain their exact original sources. Artwork, numerical receipts and acceptance thresholds remain unchanged.
+
 The installed signed Hull Studio exported the exact original detail and 492-face candidate twice offline. Both exports and both raw responses matched byte for byte. The package retains the original relative scale and the frozen 40,097 kg finite empty-dry engineering record. The signed receipt covers artwork export. The geometry results come from the independent source replay.
 
 [Source pins and replay commands](../integration/sh053-caracal-scout/CRITERIA.json)

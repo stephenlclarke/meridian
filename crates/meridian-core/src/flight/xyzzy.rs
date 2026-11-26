@@ -1,6 +1,6 @@
 //! Explicit secret transactions. No getter, normal purchase or save decoder grants property.
 mod history;
-use super::{FlightMode, World};
+use super::{FlightMode, ShieldGrade, World};
 use crate::navigation::DockContext;
 use crate::save::{Reader, SaveError, Writer};
 pub(crate) use history::{AccountEffect, AccountEvent};
@@ -16,10 +16,26 @@ pub enum XyzzyAction {
     MaximumSupportedHardware,
     RestoreStarter,
     ToggleUnlimitedFuel,
+    /// Meridian disposable-preview test access, separate from the original maximum outfit.
+    FitShield(ShieldGrade),
+    /// Separately labelled maximum test fit, including the original four-tank exception.
+    MaximumFuelStorage,
 }
 impl XyzzyAction {
     fn outfit(self) -> bool {
-        self != Self::ToggleUnlimitedFuel
+        matches!(
+            self,
+            Self::Enter
+                | Self::MaximumSupportedHardware
+                | Self::RestoreStarter
+                | Self::MaximumFuelStorage
+        )
+    }
+    fn changes_equipment(self) -> bool {
+        self.outfit() || matches!(self, Self::FitShield(_))
+    }
+    fn refills(self, mode: bool) -> bool {
+        !matches!(self, Self::FitShield(_)) && (self.outfit() || mode)
     }
     fn tag(self) -> u8 {
         match self {
@@ -27,6 +43,8 @@ impl XyzzyAction {
             Self::MaximumSupportedHardware => 1,
             Self::RestoreStarter => 2,
             Self::ToggleUnlimitedFuel => 3,
+            Self::FitShield(grade) => 4 + grade as u8,
+            Self::MaximumFuelStorage => 11,
         }
     }
     fn from_tag(tag: u8) -> Result<Self, SaveError> {
@@ -35,6 +53,8 @@ impl XyzzyAction {
             1 => Ok(Self::MaximumSupportedHardware),
             2 => Ok(Self::RestoreStarter),
             3 => Ok(Self::ToggleUnlimitedFuel),
+            4..=10 => Ok(Self::FitShield(ShieldGrade::from_tag(tag - 4)?)),
+            11 => Ok(Self::MaximumFuelStorage),
             _ => Err(SaveError::InvalidEncoding),
         }
     }
@@ -47,6 +67,7 @@ pub enum XyzzyError {
     BerthRequired,
     Inactive,
     ActiveFuelPractice,
+    ActiveContractCustody,
     Save(SaveError),
 }
 impl core::fmt::Display for XyzzyError {
@@ -73,7 +94,7 @@ pub struct XyzzySnapshot {
     pub cash_granted_once: bool,
     pub cash_tenths: u32,
     pub jump_limit_ly: f64,
-    /// Full original outfit needs missing shield, drive, targeting and utility owners.
+    /// Full original outfit still needs broader targeting, utility and hull owners.
     pub full_legacy_outfit_available: bool,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -114,6 +135,145 @@ impl State {
                 && revision <= r.end_revision
         })
     }
+    pub(super) fn authorizes_shield(
+        &self,
+        grade: ShieldGrade,
+        dock: DockContext,
+        tick: u64,
+        revision: u64,
+    ) -> bool {
+        self.records.iter().any(|record| {
+            (record.action == XyzzyAction::FitShield(grade)
+                || (record.action.outfit() && grade == ShieldGrade::Elite))
+                && record.dock == dock
+                && record.tick == tick
+                && revision > record.revision
+                && revision <= record.end_revision
+        })
+    }
+    pub(super) fn authorizes_max_tanks(&self, dock: DockContext, tick: u64, revision: u64) -> bool {
+        self.records.iter().any(|record| {
+            record.action == XyzzyAction::MaximumFuelStorage
+                && record.dock == dock
+                && record.tick == tick
+                && revision > record.revision
+                && revision <= record.end_revision
+        })
+    }
+    pub(super) fn max_tank_intervals(
+        &self,
+    ) -> impl Iterator<Item = (u64, u64, DockContext, u64)> + '_ {
+        self.records
+            .iter()
+            .filter(|record| record.action == XyzzyAction::MaximumFuelStorage)
+            .map(|record| {
+                (
+                    record.revision,
+                    record.end_revision,
+                    record.dock,
+                    record.tick,
+                )
+            })
+    }
+    /// The exact retained fuel prefix at a T04 terminal, independent of later
+    /// explicit supply. The full account validator still checks every receipt.
+    pub(super) fn historical_fuel(
+        &self,
+        world: &World,
+        markets: &crate::station_services::StationMarkets,
+        dock: DockContext,
+        tick: u64,
+        revision: u64,
+    ) -> Result<(u64, u16), SaveError> {
+        let spent = world.jump_journal.spent_at(dock, tick)?;
+        let mut journal_spent = 0_u64;
+        let mut jumps = 0_u64;
+        for event in world
+            .jump_journal
+            .account_events()
+            .into_iter()
+            .filter(|event| event.revision <= revision)
+        {
+            if let AccountEffect::Jump(debit) = event.effect {
+                journal_spent = journal_spent.checked_add(u64::from(debit)).ok_or(INVALID)?;
+                jumps = jumps.checked_add(1).ok_or(INVALID)?;
+            }
+        }
+        if journal_spent != spent || dock.visit().checked_sub(dock.sequence()) != Some(jumps) {
+            return Err(INVALID);
+        }
+        let mut refilled = 0_u64;
+        for event in markets
+            .account_events()
+            .into_iter()
+            .filter(|event| event.revision <= revision)
+        {
+            if let AccountEffect::Refill { units, .. } = event.effect {
+                refilled = refilled.checked_add(u64::from(units)).ok_or(INVALID)?;
+            }
+        }
+        let mut supplied = 0_u64;
+        let mut previous: Option<Record> = None;
+        for record in self
+            .records
+            .iter()
+            .take_while(|record| record.revision <= revision)
+        {
+            if record.end_revision > revision || record.fuel_spent > spent {
+                return Err(INVALID);
+            }
+            if let Some(prior) = previous
+                && prior.unlimited_fuel
+            {
+                supplied = supplied
+                    .checked_add(
+                        record
+                            .fuel_spent
+                            .checked_sub(prior.fuel_spent)
+                            .ok_or(INVALID)?,
+                    )
+                    .ok_or(INVALID)?;
+            }
+            supplied = supplied
+                .checked_add(u64::from(record.fuel_added))
+                .ok_or(INVALID)?;
+            previous = Some(*record);
+        }
+        if let Some(prior) = previous
+            && prior.unlimited_fuel
+        {
+            supplied = supplied
+                .checked_add(spent.checked_sub(prior.fuel_spent).ok_or(INVALID)?)
+                .ok_or(INVALID)?;
+        }
+        let fuel = u64::from(crate::navigation::FUEL_CAPACITY)
+            .checked_add(refilled)
+            .and_then(|value| value.checked_add(supplied))
+            .and_then(|value| value.checked_sub(spent))
+            .ok_or(INVALID)?;
+        Ok((refilled, u16::try_from(fuel).map_err(|_| INVALID)?))
+    }
+    pub(super) fn refills_after_terminal(
+        &self,
+        dock: DockContext,
+        tick: u64,
+        revision: Option<u64>,
+    ) -> u64 {
+        self.records
+            .iter()
+            .filter(|record| match revision {
+                Some(revision) => record.revision > revision,
+                None => {
+                    record.dock.sequence() > dock.sequence()
+                        || (record.dock.sequence() == dock.sequence()
+                            && (record.tick > tick
+                                || (record.tick == tick
+                                    && record.action == XyzzyAction::MaximumFuelStorage)))
+                }
+            })
+            .map(|record| u64::from(record.fuel_added))
+            .sum()
+    }
     pub(super) fn validate(
         &self,
         world: &World,
@@ -143,17 +303,47 @@ impl State {
             } else {
                 old_mode
             };
-            if (i == 0 && r.action != XyzzyAction::Enter)
+            if (i == 0
+                && !matches!(
+                    r.action,
+                    XyzzyAction::Enter | XyzzyAction::MaximumFuelStorage
+                ))
                 || r.cash_before_reset.is_some() != (i == 0)
                 || r.unlimited_fuel != expected_mode
                 || r.revision > r.end_revision
                 || r.end_revision > account.revision()
                 || r.fuel_spent > spent
                 || previous.is_some_and(|p| r.fuel_spent < p.fuel_spent)
-                || r.fuel_added > crate::navigation::FUEL_CAPACITY
-                || (!r.action.outfit() && !r.unlimited_fuel && r.fuel_added != 0)
+                || r.fuel_added > crate::navigation::MAX_FUEL_CAPACITY
+                || (!r.action.refills(r.unlimited_fuel) && r.fuel_added != 0)
             {
                 return Err(INVALID);
+            }
+            if let XyzzyAction::FitShield(grade) = r.action {
+                commerce.modular.validate_shield_test_record(
+                    r.dock.owner().seed(),
+                    r.revision,
+                    r.end_revision,
+                    grade,
+                )?;
+            }
+            if r.action == XyzzyAction::MaximumFuelStorage {
+                if r.end_revision <= r.revision
+                    || !world
+                        .freight_session
+                        .as_ref()
+                        .ok_or(INVALID)?
+                        .state
+                        .custody_clear_at(r.revision, r.dock.sequence())
+                    || commerce.lesson.known_active_at(r.tick, r.revision)
+                    || commerce
+                        .modular
+                        .fuel_capacity_at_revision(r.dock.owner().seed(), r.end_revision)?
+                        != crate::navigation::MAX_FUEL_CAPACITY
+                {
+                    return Err(INVALID);
+                }
+                terms.revisions = terms.revisions.checked_add(1).ok_or(INVALID)?;
             }
             if let Some(p) = previous
                 && p.unlimited_fuel
@@ -171,7 +361,10 @@ impl State {
         {
             terms.fuel_supplied += u128::from(spent - p.fuel_spent);
         }
-        terms.revisions = self.records.len() as u64;
+        terms.revisions = terms
+            .revisions
+            .checked_add(self.records.len() as u64)
+            .ok_or(INVALID)?;
         if let Some(revision) = account.equipment_state().xyzzy_acquisition_revision() {
             let item = account.equipment_state().owned().ok_or(INVALID)?;
             if !self.records.iter().any(|r| {
@@ -246,6 +439,13 @@ impl PreparedXyzzy<'_> {
     }
 }
 impl World {
+    pub(super) fn test_tank_custody_clear(&self) -> bool {
+        self.active_freight_job().is_none() && self.navigation_trade.occupancy().1 == 0
+    }
+    fn xyzzy_has_free_ordinary_utility_mount(&self) -> Result<bool, SaveError> {
+        let fit = self.fuel_scoops_snapshot().ok_or(INVALID)?;
+        Ok(fit.utility_mounts_used < fit.utility_mounts_capacity)
+    }
     pub fn commander_name(&self) -> Option<&'static str> {
         self.commander_account.as_ref()?;
         Some(if self.xyzzy.active() {
@@ -283,20 +483,41 @@ impl World {
             .commander_account
             .as_ref()
             .ok_or(XyzzyError::NoCommander)?;
-        if action != XyzzyAction::Enter && !self.xyzzy.active() {
+        if !matches!(action, XyzzyAction::Enter | XyzzyAction::MaximumFuelStorage)
+            && !self.xyzzy.active()
+        {
             return Err(XyzzyError::Inactive);
         }
         if self
             .navigation_trade_snapshot()
             .is_some_and(|s| s.active.is_some())
-            && (action.outfit() || !self.xyzzy.unlimited_fuel())
+            && (action.changes_equipment() || !self.xyzzy.unlimited_fuel())
         {
             return Err(XyzzyError::ActiveFuelPractice);
+        }
+        if action == XyzzyAction::MaximumFuelStorage && !self.test_tank_custody_clear() {
+            return Err(XyzzyError::ActiveContractCustody);
         }
         let dock = self
             .current_dock_context()
             .filter(|_| self.state.mode == FlightMode::Docked)
             .ok_or(XyzzyError::BerthRequired)?;
+        if action == XyzzyAction::MaximumFuelStorage
+            && !self
+                .freight_session
+                .as_ref()
+                .ok_or(XyzzyError::NoCommander)?
+                .state
+                .custody_clear_at(
+                    account
+                        .revision()
+                        .checked_add(1)
+                        .ok_or(XyzzyError::Save(INVALID))?,
+                    dock.sequence(),
+                )
+        {
+            return Err(XyzzyError::ActiveContractCustody);
+        }
         self.current_service_facts(tick)
             .map_err(|_| XyzzyError::BerthRequired)?;
         Ok(XyzzyReview {
@@ -340,7 +561,8 @@ impl World {
         } else {
             self.xyzzy.unlimited_fuel()
         };
-        let refill = review.action.outfit() || mode;
+        let refill = review.action.refills(mode);
+        let max_tanks = review.action == XyzzyAction::MaximumFuelStorage;
         let current = self.commander_account.as_ref().ok_or(INVALID)?;
         let record = Record {
             action: review.action,
@@ -350,7 +572,13 @@ impl World {
             end_revision: u64::MAX,
             cash_before_reset: first.then_some(current.credits_tenths()),
             fuel_added: if refill {
-                130_u16.checked_sub(current.fuel_tenths()).ok_or(INVALID)?
+                (if max_tanks {
+                    crate::navigation::MAX_FUEL_CAPACITY
+                } else {
+                    current.fuel_capacity()
+                })
+                .checked_sub(current.fuel_tenths())
+                .ok_or(INVALID)?
             } else {
                 0
             },
@@ -358,10 +586,19 @@ impl World {
             unlimited_fuel: mode,
         };
         let account = current
-            .prepare_xyzzy(first, refill, mode)
+            .prepare_xyzzy(first, refill && !max_tanks, mode)
             .map_err(|_| INVALID)?;
         self.xyzzy.records.push(record);
         self.commander_account = Some(account);
+        if max_tanks {
+            for _ in 0..crate::navigation::MAX_FUEL_STORAGE_UNITS {
+                self.grant_xyzzy_module(
+                    review.dock,
+                    review.tick,
+                    super::modular::ModuleKind::FuelStorage,
+                )?;
+            }
+        }
         if review.action.outfit() {
             for kind in [
                 super::modular::ModuleKind::EliteEnergyUnit,
@@ -371,25 +608,75 @@ impl World {
                 super::modular::ModuleKind::Targeting(crate::equipment::TargetingTier::Military),
                 super::modular::ModuleKind::MiningTargeting,
                 super::modular::ModuleKind::SalvageTargeting,
+                super::modular::ModuleKind::Drive(crate::navigation::DriveGrade::Advanced),
+                super::modular::ModuleKind::Shield(ShieldGrade::Elite),
             ] {
+                if kind == super::modular::ModuleKind::FuelScoops
+                    && !max_tanks
+                    && self.fitted_fuel_scoops().is_none()
+                    && !self.xyzzy_has_free_ordinary_utility_mount()?
+                {
+                    continue;
+                }
                 self.grant_xyzzy_module(review.dock, review.tick, kind)?;
             }
-            self.grant_xyzzy_emp(review.dock, review.tick)?;
+            if max_tanks
+                || self.owned_emp().is_some_and(|item| item.fitted)
+                || self.xyzzy_has_free_ordinary_utility_mount()?
+            {
+                self.grant_xyzzy_emp(review.dock, review.tick)?;
+            }
             self.grant_xyzzy_missiles(review.dock, review.tick)?;
+            let cargo_fitted = self
+                .commander_account
+                .as_ref()
+                .ok_or(INVALID)?
+                .equipment_state()
+                .units_used()
+                != 0;
+            if max_tanks || cargo_fitted || self.xyzzy_has_free_ordinary_utility_mount()? {
+                let prior = self.commander_account.as_ref().ok_or(INVALID)?;
+                let previous_cargo_revision = prior.equipment_state().revision();
+                let account = prior
+                    .grant_xyzzy_cargo_bay(
+                        super::services::service_site(review.dock.system()).ok_or(INVALID)?,
+                    )
+                    .map_err(|_| INVALID)?;
+                if self.modular.has_test_cargo_history()
+                    && account.equipment_state().revision() != previous_cargo_revision
+                {
+                    self.modular
+                        .record_test_cargo_fit(&account, review.dock, review.tick)?;
+                }
+                self.commander_account = Some(account);
+            }
+            // The present supported mutation boundary is docked: ordinary docking already reset
+            // energy/shields. Do not clear heat/cooldown or erase retained combat/mining evidence.
+        } else if let XyzzyAction::FitShield(grade) = review.action {
+            self.grant_xyzzy_module(
+                review.dock,
+                review.tick,
+                super::modular::ModuleKind::Shield(grade),
+            )?;
+        }
+        if max_tanks {
             let account = self
                 .commander_account
                 .as_ref()
                 .ok_or(INVALID)?
-                .grant_xyzzy_cargo_bay(
-                    super::services::service_site(review.dock.system()).ok_or(INVALID)?,
-                )
+                .prepare_xyzzy(false, true, mode)
                 .map_err(|_| INVALID)?;
             self.commander_account = Some(account);
-            // The present supported mutation boundary is docked: ordinary docking already reset
-            // energy/shields. Do not clear heat/cooldown or erase retained combat/mining evidence.
         }
         let revision = self.commander_account.as_ref().ok_or(INVALID)?.revision();
         self.xyzzy.records.last_mut().ok_or(INVALID)?.end_revision = revision;
+        if max_tanks && !self.modular.has_test_cargo_history() {
+            self.modular.record_test_cargo_fit(
+                self.commander_account.as_ref().ok_or(INVALID)?,
+                review.dock,
+                review.tick,
+            )?;
+        }
         Ok(())
     }
 }

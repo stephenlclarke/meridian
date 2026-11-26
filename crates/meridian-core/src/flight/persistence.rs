@@ -569,13 +569,22 @@ impl World {
             ),
         )?;
         let modular = commerce.modular.ledger(self, account)?;
-        navigation.validate_pending_reach(catalogue, modular.jump_reach_ly())?;
+        if modular.shield_grade() != Some(self.combat.shields().grade()) {
+            return Err(SaveError::InvalidState(
+                "shield banks do not match the fitted module",
+            ));
+        }
+        let fitted_drive = modular
+            .drive()
+            .ok_or(SaveError::InvalidState("missing fitted drive"))?;
+        navigation.validate_pending_reach(catalogue, modular.jump_reach_ly(), fitted_drive)?;
         self.jump_journal.validate(
             navigation,
             catalogue,
             self.state.tick,
             self.combat.physical_tick(),
             &modular.navigation_changes,
+            fitted_drive.1,
         )?;
         let ammunition = commerce.ammunition.ledger_with_module_count(
             self,
@@ -640,6 +649,12 @@ impl World {
         };
         let emp = commerce.emp.validate(self, account, commerce.modular)?;
         let secret = self.xyzzy.validate(self, account, commerce)?;
+        commerce.modular.validate_test_custody_history(
+            self,
+            account,
+            commerce.emp,
+            commerce.lesson,
+        )?;
         validate_accounting(
             domain,
             services,

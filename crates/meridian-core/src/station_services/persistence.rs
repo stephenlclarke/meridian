@@ -1,6 +1,6 @@
 use super::{
     CommodityId, CommodityQuote, FUEL_PRICE_TENTHS, FoodQuote, MAX_MARKET_QUANTITY, MarketData,
-    MarketSite, SEEDS, STOCK_FUEL_TENTHS, StationMarkets, commodities, read_seeds,
+    MarketSite, SEEDS, StationMarkets, commodities, read_seeds,
 };
 use crate::save::{Reader, SaveError, Writer};
 
@@ -128,7 +128,7 @@ impl StationMarkets {
         if sold > bought
             || bought + sold + u128::from(self.data.refills) != u128::from(self.data.revision)
             || u128::from(self.data.refilled_units)
-                > u128::from(self.data.refills) * u128::from(STOCK_FUEL_TENTHS)
+                > u128::from(self.data.refills) * u128::from(crate::navigation::MAX_FUEL_CAPACITY)
             || paid != u128::from(self.data.paid_tenths)
             || u128::from(self.data.credited_tenths) > gross_credit
         {

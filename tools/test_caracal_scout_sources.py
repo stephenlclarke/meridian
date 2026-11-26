@@ -1,13 +1,22 @@
 """Verify the two original Caracal Scout meshes, separate candidate and grouped artwork."""
 
+from copy import deepcopy
 from fractions import Fraction
 import hashlib
+import inspect
 import json
+from pathlib import Path
 import struct
+import tempfile
 import tomllib
 import unittest
 from unittest.mock import patch
 
+import numpy as np
+
+import measure_banteng_geometry as shared_banteng
+import measure_caracal_scout_geometry as measure
+import measure_lanner_geometry as shared_fans
 import prepare_caracal_scout_candidate as recipe
 import prepare_caracal_scout_geometry as prep
 import verify_caracal_scout_geometry as proof
@@ -109,6 +118,69 @@ class CaracalScoutSources(unittest.TestCase):
         with patch.object(prep, "replace_output", side_effect=AssertionError("check rewrote stream")):
             with patch("sys.argv", ["prepare_caracal_scout_geometry", "--check"]):
                 prep.main()
+
+    def test_shared_banteng_functions_retain_the_original_pinned_sources(self):
+        criteria = json.loads((prep.INTEGRATION / "CRITERIA.json").read_bytes())
+        hashes = criteria["sharedBantengDependency"]["importedFunctionSourceSha256"]
+        self.assertEqual(set(hashes), {"adaptive_upper", "section", "solid", "upper"})
+        for name, expected in hashes.items():
+            function = getattr(shared_banteng, name)
+            self.assertIs(getattr(measure, name), function)
+            self.assertEqual(hashlib.sha256(inspect.getsource(function).encode()).hexdigest(), expected)
+
+    def test_both_complete_reference_fans_revalidate_original_points_without_qhull(self):
+        source = tomllib.loads((prep.ORIGINAL / "resource.toml").read_text())
+        ownership = json.loads((prep.INTEGRATION / "ORIGINAL-OWNERSHIP.json").read_bytes())["models"]
+        candidate = json.loads((prep.ORIGINAL / "SH053-project-candidate.json").read_bytes())
+        for mode, native in (
+            ("archive", (source["nativeDesign"], ownership["nativeDesign"]["parts"])),
+            ("candidate", (candidate["nativeCandidate"], candidate["parts"])),
+        ):
+            slots, meshes = measure.assemble((source["design"], ownership["design"]["parts"]), native)
+            scaled = np.array(meshes[0]["vertices"] + meshes[1]["vertices"]) * float(prep.SCALE)
+            groups = np.array(meshes[0]["groups"] + meshes[1]["groups"])
+            records = measure.reference_records(mode, scaled, groups, len(slots))
+            self.assertEqual(len(records), 89)
+            self.assertEqual(sum(len(record["triangles"]) for record in records),
+                             2972 if mode == "archive" else 2804)
+            self.assertEqual(sum(len(record["sourceIndices"]) for record in records),
+                             3992 if mode == "archive" else 3520)
+            with (self.subTest(mode=mode),
+                  patch.object(shared_fans, "ConvexHull", side_effect=AssertionError("unfrozen triangulation")),
+                  patch.object(shared_fans, "bound_fan", wraps=shared_fans.bound_fan) as outward):
+                for (key, identifier), record in zip(slots.items(), records, strict=True):
+                    point_ids = np.flatnonzero(groups == identifier)
+                    actual = measure.validated_reference_fan(record, key, scaled, point_ids, "Caracal Scout")
+                    self.assertEqual(actual, [[record["sourceIndices"][i] for i in face] for face in record["triangles"]])
+                self.assertEqual(outward.call_count, 89)
+
+            key, identifier = tuple(slots.items())[5]
+            point_ids = np.flatnonzero(groups == identifier)
+            tampered = deepcopy(records[5])
+            tampered["triangles"][0][0] = len(point_ids)
+            with patch.object(shared_fans, "bound_fan") as outward:
+                with self.assertRaisesRegex(ValueError, "out-of-support Caracal Scout"):
+                    measure.validated_reference_fan(tampered, key, scaled, point_ids, "Caracal Scout")
+                outward.assert_not_called()
+            tampered = deepcopy(records[5])
+            tampered["sourceIndices"][0] += 1
+            with self.assertRaisesRegex(ValueError, "Caracal Scout reference support point identity changed"):
+                measure.validated_reference_fan(tampered, key, scaled, point_ids, "Caracal Scout")
+            tampered = deepcopy(records[5])
+            face = tampered["triangles"][0]
+            face[1], face[2] = face[2], face[1]
+            tampered["triangles"].sort()
+            with self.assertRaisesRegex(ValueError, "Caracal Scout reference fan failed exact outward or radial proof"):
+                measure.validated_reference_fan(tampered, key, scaled, point_ids, "Caracal Scout")
+            with patch.object(measure, "INTEGRATION", shared_fans.INTEGRATION):
+                with self.assertRaisesRegex(ValueError, "Changed Caracal Scout reference triangulation"):
+                    measure.reference_records(mode, scaled, groups, len(slots))
+            raw = (prep.INTEGRATION / "REFERENCE-FANS.json").read_bytes()
+            with tempfile.TemporaryDirectory() as folder:
+                (Path(folder) / "REFERENCE-FANS.json").write_bytes(raw + b" ")
+                with patch.object(measure, "INTEGRATION", Path(folder)):
+                    with self.assertRaisesRegex(ValueError, "Changed Caracal Scout reference triangulation"):
+                        measure.reference_records(mode, scaled, groups, len(slots))
 
 
 if __name__ == "__main__":

@@ -61,7 +61,8 @@
     "tools": {
       "tools/prepare_saker_geometry.py": "19eabc2030d694512885f9c87a88005fc8acb87960633f0683a8b970ce61671a",
       "tools/prepare_saker_studio.py": "f9e903ce2197633667418a1d2e736cf56c8dec50fa548d5c627e5a60a70ef530",
-      "tools/verify_saker_geometry.py": "98652e217879a9096556138663101424683401258eb0408ed7602477dc67fd74",
+      "tools/verify_saker_geometry.py": "68d98bb5b7aaa4de204e01e05dfc04cb7c661e1a8cfa509924d74b30a12d0cbc",
+      "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839",
       "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
       "tools/measure_saker_air.py": "fc9112de41ab428ba6a5e877360eff0fd988f2abb8d6a6b8f415eb10c8b608bb",
       "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",

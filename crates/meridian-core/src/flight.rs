@@ -53,10 +53,12 @@ pub use missiles::{
     MissileOrigin, MissileRound, MissileSnapshot, MissileTarget, ProjectileId, ProjectileSnapshot,
 };
 mod combat;
+mod shield;
 pub use combat::{
     CombatIdentity, CombatSnapshot, OrdinaryImpact, OrdinaryTarget, OrdinaryWeapon,
     PlayerCondition, SHIELD_CAPACITY,
 };
+pub use shield::ShieldGrade;
 mod equipment;
 pub use equipment::{EquipmentPreparationError, PreparedEquipment};
 mod mission;
@@ -260,10 +262,13 @@ impl World {
 
     pub fn snapshot(&self) -> Snapshot {
         let mut snapshot = self.state;
-        snapshot.navigation = self
-            .navigation
-            .zip(self.commander_account.as_ref())
-            .map(|(navigation, account)| navigation.snapshot(account.fuel_tenths()));
+        snapshot.navigation =
+            self.navigation
+                .zip(self.commander_account.as_ref())
+                .map(|(navigation, account)| {
+                    navigation
+                        .snapshot_with_capacity(account.fuel_tenths(), account.fuel_capacity())
+                });
         snapshot
     }
 
@@ -317,8 +322,7 @@ impl World {
             return false;
         };
         let owned = |item: &&crate::freight::g02::OwnedStarterItem| {
-            item.owner() == navigation.owner().seed()
-                && item.fitted_hull() == Some(navigation.ship().ordinal())
+            item.owner() == navigation.owner().seed() && item.is_standard_birth()
         };
         items.iter().filter(owned).any(|item| {
             item.component() == StarterComponent::BasicDrive
@@ -333,10 +337,9 @@ impl World {
         if !Self::has_bound_drive(navigation, account) {
             return None;
         }
-        self.modular
-            .ledger(self, account)
-            .ok()
-            .map(|ledger| ledger.jump_reach_ly())
+        let ledger = self.modular.ledger(self, account).ok()?;
+        ledger.drive()?;
+        Some(ledger.jump_reach_ly())
     }
 
     pub fn commander_id(&self) -> Option<CommanderId> {
@@ -394,9 +397,24 @@ impl World {
             .commander_account
             .as_ref()
             .ok_or(NavigationError::WrongMode)?;
-        let reach = self.jump_reach_ly().ok_or(NavigationError::WrongMode)?;
+        if !Self::has_bound_drive(navigation, account) {
+            return Err(NavigationError::WrongMode);
+        }
+        let ledger = self
+            .modular
+            .ledger(self, account)
+            .map_err(|_| NavigationError::WrongMode)?;
+        let drive = ledger.drive().ok_or(NavigationError::WrongMode)?;
+        let reach = ledger.jump_reach_ly();
         let origin = navigation.snapshot(0).system;
-        navigation.begin_jump(catalogue, target, distance, account.fuel_tenths(), reach)?;
+        navigation.begin_jump(
+            catalogue,
+            target,
+            distance,
+            account.fuel_tenths(),
+            reach,
+            drive,
+        )?;
         if !self.jump_journal.has_room() {
             return Err(NavigationError::SequenceExhausted);
         }
@@ -674,13 +692,28 @@ impl World {
         if let Some(state) = &mut navigation {
             let account = self
                 .commander_account
-                .as_mut()
+                .as_ref()
                 .ok_or(StepError::NonFiniteState)?;
             if !Self::has_bound_drive(*state, account) {
                 return Err(StepError::NonFiniteState);
             }
+            // Fitting is station-only. The pending binding is checked when opened, on
+            // Continue, and once more before arrival; do not replay the ledger every tick.
+            let fitted_drive = if state
+                .snapshot(0)
+                .travel
+                .is_some_and(|travel| travel.remaining_ticks == 1)
+                && !entry
+            {
+                self.modular
+                    .ledger(self, account)
+                    .map_err(|_| StepError::NonFiniteState)?
+                    .drive()
+            } else {
+                None
+            };
             let arrival_debit = state
-                .step(entry, next.tick, account.fuel_tenths())
+                .step(entry, next.tick, account.fuel_tenths(), fitted_drive)
                 .map_err(|_| StepError::NonFiniteState)?;
             if entry || arrival_debit.is_some() {
                 mission_epoch = self
@@ -709,7 +742,7 @@ impl World {
                     *state,
                     debit,
                     next.tick,
-                    grade,
+                    (grade, fitted_drive.ok_or(StepError::NonFiniteState)?.1),
                     account
                         .revision()
                         .checked_add(1)
