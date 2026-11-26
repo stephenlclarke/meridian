@@ -434,3 +434,8 @@ tools/verify_warthog_tanker.py text eol=lf
 tools/measure_warthog_heavy.py text eol=lf
 tools/prepare_warthog_heavy.py text eol=lf
 tools/verify_warthog_heavy.py text eol=lf
+
+# Byte-pinned Javelina replay programs.
+tools/measure_javelina.py text eol=lf
+tools/prepare_javelina.py text eol=lf
+tools/verify_javelina.py text eol=lf

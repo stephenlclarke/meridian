@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh135-javelina",
+  "undoBefore": [
+    "sh134-warthog-heavy"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "javelina",
+  "before": "pub mod jaguar;\n",
+  "after": "pub mod laggar;\n"
+}
