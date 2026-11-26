@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh154-osprey-patrol",
+  "undoBefore": [
+    "sh153-osprey-strike"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "osprey_patrol",
+  "before": "pub mod oryx_voyager;\n",
+  "after": "pub mod osprey_scout;\n"
+}

@@ -536,3 +536,9 @@ tools/measure_osprey_strike.py text eol=lf
 tools/prepare_osprey_strike.py text eol=lf
 tools/rebuild_osprey_strike.py text eol=lf
 tools/verify_osprey_strike.py text eol=lf
+
+# Byte-pinned Osprey Patrol replay programs.
+tools/measure_osprey_patrol.py text eol=lf
+tools/prepare_osprey_patrol.py text eol=lf
+tools/rebuild_osprey_patrol.py text eol=lf
+tools/verify_osprey_patrol.py text eol=lf
