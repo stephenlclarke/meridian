@@ -1,0 +1,49 @@
+{
+  "host": "SteveMBA",
+  "python": "3.14.3",
+  "numpy": "2.5.5",
+  "scipy": "1.18.1",
+  "trimesh": "5.2.1",
+  "rtree": "1.4.1",
+  "method": "Retain both closed collars using eight original angular sections per collar and three source points per section. Fit the remaining twenty-five variable parts with original vertices, constrain the overlap witnesses, and keep seven part records exact.",
+  "candidateCounts": {
+    "vertices": 320,
+    "faces": 512,
+    "parts": 34,
+    "exactParts": 7
+  },
+  "reproducedByteForByte": [
+    "SH098-candidate.json",
+    "RETAINED-OVERLAPS.json"
+  ],
+  "receipts": {
+    "build_anoa_three_minor.py": {
+      "bytes": 13234,
+      "sha256": "b011ea9fafeeedad42d085da87e8b5ed8407164073ee3823321be1ab98603e26"
+    },
+    "inventory_anoa.py": {
+      "bytes": 2516,
+      "sha256": "58e8c486be5e45ebab0e43fc9456774200a45dcb77d3197e90e1b7be391b1448"
+    },
+    "ARCHIVED-OVERLAPS.json": {
+      "bytes": 11358,
+      "sha256": "1cbdefe2e7197715973483d58806e08fcd4a5167a974898d71b114b914676e36"
+    },
+    "ORIGINAL-OWNERSHIP.json": {
+      "bytes": 144172,
+      "sha256": "e5c790227927e5891c0d0fbcbc680b7a1dde99c2ac93060b0afa708cf6c792ba"
+    },
+    "CANDIDATE-REBUILD.log": {
+      "bytes": 638,
+      "sha256": "1b1cc4557b41de95c56da5711ed5cd392dcf6347ceb5f0d3d253da22a59b38eb"
+    },
+    "SH098-candidate.json": {
+      "bytes": 61404,
+      "sha256": "d150c102f20437c477023c9040841a8cc824fd56aa433bf2f25461503d214c81"
+    },
+    "RETAINED-OVERLAPS.json": {
+      "bytes": 14396,
+      "sha256": "f2ecb15bee86084be4ee1f03a2a2f08913f00bed464d87282ad19429113d1a41"
+    }
+  }
+}

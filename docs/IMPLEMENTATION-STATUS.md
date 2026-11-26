@@ -296,6 +296,10 @@ Wisent preserves the original 2,600 detailed and 816 native faces. Its historica
 
 Wisent Mk II preserves the original 2,600 detailed and 816 native faces. Its independent 488-face historical candidate retains 26 native parts and all 35 measured native overlaps. The dock aperture retains a 1,469 mm guarded lower bound. [Wisent Mk II source and evidence](WISENT-MK-II-SOURCE.md)
 
+## Anoa catalogue source
+
+Anoa preserves its original 6,720 detailed and 1,928 native faces. Its separate 512-face candidate retains all 34 native parts, the two closed collars, and all 40 measured native overlaps. [Anoa source and evidence](ANOA-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)
