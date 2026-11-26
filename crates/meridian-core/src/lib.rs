@@ -59,6 +59,7 @@ pub use flight::{
     EcmTrigger, PreparedEcm,
 };
 pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};
+pub use flight::{MedusaPreviewFit, PlayerHullKind};
 pub use flight::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
 pub use flight::{SolarScoopStatus, SolarSnapshot};
 

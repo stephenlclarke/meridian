@@ -58,7 +58,7 @@ fn station<'a>(
         pose: snapshot.station.unwrap_or_else(|| panic!("station")),
         port,
         docked: false,
-        player_hull: crate::mesh::PlayerRenderHull::Peregrine,
+        player_hull: meridian_core::PlayerHullKind::Peregrine,
     }
 }
 

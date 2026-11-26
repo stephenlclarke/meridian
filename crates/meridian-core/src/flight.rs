@@ -9,6 +9,8 @@ pub use ecm::{
     EcmTrigger, PreparedEcm,
 };
 mod celestial;
+mod medusa_preview;
+pub use medusa_preview::{MedusaPreviewFit, PlayerHullKind};
 mod solar;
 pub use solar::{SolarScoopStatus, SolarSnapshot};
 mod damage;
@@ -203,6 +205,7 @@ pub struct World {
     damage: damage::State,
     solar: solar::State,
     station_data: Option<OriginalStationData>,
+    medusa_preview_fit: Option<MedusaPreviewFit>,
     navigation_catalogue: Option<OriginalNavigation>,
     navigation: Option<NavigationState>,
     navigation_route: Option<crate::navigation::RoutePlan>,
@@ -256,6 +259,7 @@ impl World {
             damage: damage::State::default(),
             solar: solar::State::default(),
             station_data: None,
+            medusa_preview_fit: None,
             navigation_catalogue: None,
             navigation: None,
             navigation_route: None,
@@ -640,13 +644,19 @@ impl World {
         if next.mode == FlightMode::Docked {
             return self.publish_step(next, None);
         }
-        if !(0.0..=MAX_SPEED).contains(&self.state.speed) {
+        let hull = if self.medusa_preview_fit.is_some() {
+            PlayerHullKind::Medusa
+        } else {
+            PlayerHullKind::Peregrine
+        };
+        let (max_speed, acceleration, pitch_rate, yaw_rate, roll_rate) = hull.flight_rates();
+        if !(0.0..=max_speed).contains(&self.state.speed) {
             return Err(StepError::NonFiniteState);
         }
 
-        let yaw = axis_rotation(1, input.yaw * YAW_RATE * FIXED_DELTA_SECONDS);
-        let pitch = axis_rotation(0, -input.pitch * PITCH_RATE * FIXED_DELTA_SECONDS);
-        let roll = axis_rotation(2, input.roll * ROLL_RATE * FIXED_DELTA_SECONDS);
+        let yaw = axis_rotation(1, input.yaw * yaw_rate * FIXED_DELTA_SECONDS);
+        let pitch = axis_rotation(0, -input.pitch * pitch_rate * FIXED_DELTA_SECONDS);
+        let roll = axis_rotation(2, input.roll * roll_rate * FIXED_DELTA_SECONDS);
         next.orientation = normalize(multiply(
             multiply(multiply(next.orientation, yaw), pitch),
             roll,
@@ -655,7 +665,7 @@ impl World {
 
         let throttle = if input.brake { -1.0 } else { input.throttle };
         next.speed =
-            (next.speed + throttle * ACCELERATION * FIXED_DELTA_SECONDS).clamp(0.0, MAX_SPEED);
+            (next.speed + throttle * acceleration * FIXED_DELTA_SECONDS).clamp(0.0, max_speed);
         let forward = forward(next.orientation);
         let distance_scale = if self.station_data.is_some() {
             DISTANCE_PER_SPEED_UNIT
@@ -687,9 +697,9 @@ impl World {
             let after =
                 flight_pose(next.position, next.orientation).ok_or(StepError::NonFiniteState)?;
             let angular_travel = f64::from(
-                input.pitch.abs() * PITCH_RATE
-                    + input.yaw.abs() * YAW_RATE
-                    + input.roll.abs() * ROLL_RATE,
+                input.pitch.abs() * pitch_rate
+                    + input.yaw.abs() * yaw_rate
+                    + input.roll.abs() * roll_rate,
             ) * f64::from(FIXED_DELTA_SECONDS);
             if !self.traffic_and_renas_mule_motion_clear(before, after, angular_travel) {
                 let mut stopped = self.state;
@@ -721,7 +731,7 @@ impl World {
                     before,
                     after,
                     f64::from(next.speed * DISTANCE_PER_SPEED_UNIT),
-                    f64::from(input.roll * ROLL_RATE),
+                    f64::from(input.roll * roll_rate),
                     angular_travel,
                 ) {
                     let mut stopped = self.state;
@@ -1012,6 +1022,11 @@ impl World {
         self.practice = prepared.practice;
         if let Some(account) = &mut self.commander_account {
             account.apply_ordinary_legal(prepared.legal);
+        }
+        if entry && self.medusa_preview_fit.is_some() {
+            // Docked preview has no flight body. Do not save a pose inside station geometry.
+            next.position = [0.0; 3];
+            next.orientation = [0.0, 0.0, 0.0, 1.0];
         }
         self.state = next;
         self.navigation = navigation;

@@ -82,7 +82,7 @@ impl PendingProjection {
 
 pub struct Renderer {
     flight_view: FlightView,
-    player_hull: mesh::PlayerRenderHull,
+    player_hull: meridian_core::PlayerHullKind,
     player_medusa: Option<crate::mule_render::showroom::PlayerMedusaPass>,
     celestial: crate::celestial::Pass,
     mule: Option<crate::mule_render::Pass>,
@@ -276,7 +276,7 @@ impl Renderer {
             surface,
             window,
             flight_view: FlightView::Front,
-            player_hull: mesh::PlayerRenderHull::Peregrine,
+            player_hull: meridian_core::PlayerHullKind::Peregrine,
             player_medusa: None,
             celestial,
             mule: None,
@@ -350,7 +350,7 @@ impl Renderer {
         self.flight_view = view;
     }
 
-    pub(crate) fn set_player_hull(&mut self, hull: mesh::PlayerRenderHull) {
+    pub(crate) fn set_player_hull(&mut self, hull: meridian_core::PlayerHullKind) {
         self.player_hull = hull;
     }
 
@@ -629,7 +629,7 @@ impl Renderer {
         let internal_observer = mule.and_then(crate::mule_render::Placement::internal_observer);
         let medusa_camera = if let Some(station) = station {
             mesh::medusa_chase_camera(snapshot, station)?
-        } else if self.player_hull == mesh::PlayerRenderHull::Medusa {
+        } else if self.player_hull == meridian_core::PlayerHullKind::Medusa {
             return Err("Active Medusa has no station presentation frame".into());
         } else {
             None

@@ -1,0 +1,7411 @@
+{
+  "scope": "All original vertices and triangle surfaces remain contact witnesses; diagnostic union of closed pieces, not flight admission.",
+  "arcReportSha256": "6a739d73df089dfb9065f801c85aaeaa141ccb5be0a15b1010a4fb6a53f75986",
+  "populatedFaces": 512,
+  "crownFaces": 96,
+  "crownAxialClearanceMetres": 6.083381858489175,
+  "station": {
+    "alignedApertureSlackMetres": 40.041869772999995,
+    "alignedSweepAabbSeparationMetres": 40.041869772999995,
+    "alignedSweepClosestStationFace": 452,
+    "stationTriangles": 488,
+    "supportMarginMetres": 0.021
+  },
+  "structuralOwners": [
+    {
+      "index": 0,
+      "name": "central grown seed carapace",
+      "supports": [
+        "central carapace with its four surface folds, span 1",
+        "central carapace with its four surface folds, span 2",
+        "central carapace with its four surface folds, span 3"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999967297528342,
+        "nativeDesign": 0.0004999973348316706
+      }
+    },
+    {
+      "index": 1,
+      "name": "central flowing surface fold 0",
+      "supports": [
+        "central carapace with its four surface folds, span 1",
+        "central carapace with its four surface folds, span 2",
+        "central carapace with its four surface folds, span 3"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.002540072622480793,
+        "nativeDesign": 0.04539793240526309
+      }
+    },
+    {
+      "index": 2,
+      "name": "central flowing surface fold 1",
+      "supports": [
+        "central carapace with its four surface folds, span 1",
+        "central carapace with its four surface folds, span 2",
+        "central carapace with its four surface folds, span 3"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999981520838837,
+        "nativeDesign": 0.04341401876513041
+      }
+    },
+    {
+      "index": 3,
+      "name": "central flowing surface fold 2",
+      "supports": [
+        "central carapace with its four surface folds, span 1",
+        "central carapace with its four surface folds, span 2",
+        "central carapace with its four surface folds, span 3"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0842686711566358,
+        "nativeDesign": 0.1258592563121146
+      }
+    },
+    {
+      "index": 4,
+      "name": "central flowing surface fold 3",
+      "supports": [
+        "central carapace with its four surface folds, span 1",
+        "central carapace with its four surface folds, span 2",
+        "central carapace with its four surface folds, span 3"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.08659655872410212,
+        "nativeDesign": 0.1281290749025067
+      }
+    },
+    {
+      "index": 5,
+      "name": "central crown connected cartilage 0",
+      "supports": [
+        "central crown cartilage 0"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999968403612809,
+        "nativeDesign": 0.0004999971536936115
+      }
+    },
+    {
+      "index": 6,
+      "name": "central crown connected cartilage 1",
+      "supports": [
+        "central crown cartilage 1"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999968403612809,
+        "nativeDesign": 0.0004999971536936115
+      }
+    },
+    {
+      "index": 7,
+      "name": "curved seed propulsion organ 0",
+      "supports": [
+        "propulsion organ 0, folds and tendon"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.000499996253078965,
+        "nativeDesign": 0.0004999979835115165
+      }
+    },
+    {
+      "index": 8,
+      "name": "propulsion organ connected stem 0",
+      "supports": [
+        "propulsion stem 0"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999969350688045,
+        "nativeDesign": 0.000499996640447052
+      }
+    },
+    {
+      "index": 9,
+      "name": "propulsion organ breathing fold 0-0",
+      "supports": [
+        "propulsion organ 0, folds and tendon"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.07066966429388727,
+        "nativeDesign": 0.08676278252214494
+      }
+    },
+    {
+      "index": 10,
+      "name": "propulsion organ breathing fold 0-1",
+      "supports": [
+        "propulsion organ 0, folds and tendon"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.44583458516487273,
+        "nativeDesign": 0.46042646051992836
+      }
+    },
+    {
+      "index": 11,
+      "name": "propulsion organ breathing fold 0-2",
+      "supports": [
+        "propulsion organ 0, folds and tendon"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.6032350282115023,
+        "nativeDesign": 0.6160912456843027
+      }
+    },
+    {
+      "index": 12,
+      "name": "inward forward gland 0",
+      "supports": [
+        "forward gland 0"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999959859855546,
+        "nativeDesign": 0.006124429408681565
+      }
+    },
+    {
+      "index": 13,
+      "name": "warm outer tendon 0",
+      "supports": [
+        "propulsion organ 0, folds and tendon"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999963274610378,
+        "nativeDesign": 0.0013128322297961941
+      }
+    },
+    {
+      "index": 14,
+      "name": "curved seed propulsion organ 1",
+      "supports": [
+        "propulsion organ 1, folds and tendon, span 1",
+        "propulsion organ 1, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.00049999659562294,
+        "nativeDesign": 0.0004999966397899218
+      }
+    },
+    {
+      "index": 15,
+      "name": "propulsion organ connected stem 1",
+      "supports": [
+        "propulsion stem 1"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999970199064842,
+        "nativeDesign": 0.001904078948261149
+      }
+    },
+    {
+      "index": 16,
+      "name": "propulsion organ breathing fold 1-0",
+      "supports": [
+        "propulsion organ 1, folds and tendon, span 1",
+        "propulsion organ 1, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.36891000296783616,
+        "nativeDesign": 0.353772235589652
+      }
+    },
+    {
+      "index": 17,
+      "name": "propulsion organ breathing fold 1-1",
+      "supports": [
+        "propulsion organ 1, folds and tendon, span 1",
+        "propulsion organ 1, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.28441689870570697,
+        "nativeDesign": 0.31698666540209314
+      }
+    },
+    {
+      "index": 18,
+      "name": "propulsion organ breathing fold 1-2",
+      "supports": [
+        "propulsion organ 1, folds and tendon, span 1",
+        "propulsion organ 1, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.012055669803139879,
+        "nativeDesign": 0.012838229761002852
+      }
+    },
+    {
+      "index": 19,
+      "name": "inward forward gland 1",
+      "supports": [
+        "forward gland 1"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999961122130631,
+        "nativeDesign": 0.006124365355275586
+      }
+    },
+    {
+      "index": 20,
+      "name": "warm outer tendon 1",
+      "supports": [
+        "propulsion organ 1, folds and tendon, span 1",
+        "propulsion organ 1, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999968714536235,
+        "nativeDesign": 0.0014004572507914893
+      }
+    },
+    {
+      "index": 21,
+      "name": "curved seed propulsion organ 2",
+      "supports": [
+        "propulsion organ 2, folds and tendon, span 1",
+        "propulsion organ 2, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999972962390902,
+        "nativeDesign": 0.0004999967876568659
+      }
+    },
+    {
+      "index": 22,
+      "name": "propulsion organ connected stem 2",
+      "supports": [
+        "propulsion stem 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999972287532371,
+        "nativeDesign": 0.0004999974469727255
+      }
+    },
+    {
+      "index": 23,
+      "name": "propulsion organ breathing fold 2-0",
+      "supports": [
+        "propulsion organ 2, folds and tendon, span 1",
+        "propulsion organ 2, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.2929521838963607,
+        "nativeDesign": 0.21153946045722752
+      }
+    },
+    {
+      "index": 24,
+      "name": "propulsion organ breathing fold 2-1",
+      "supports": [
+        "propulsion organ 2, folds and tendon, span 1",
+        "propulsion organ 2, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999974118975277,
+        "nativeDesign": 0.0016612256752152694
+      }
+    },
+    {
+      "index": 25,
+      "name": "propulsion organ breathing fold 2-2",
+      "supports": [
+        "propulsion organ 2, folds and tendon, span 1",
+        "propulsion organ 2, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.04083253907691527,
+        "nativeDesign": 0.04258031541260892
+      }
+    },
+    {
+      "index": 26,
+      "name": "inward forward gland 2",
+      "supports": [
+        "forward gland 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999959859855546,
+        "nativeDesign": 0.006124429408681565
+      }
+    },
+    {
+      "index": 27,
+      "name": "warm outer tendon 2",
+      "supports": [
+        "propulsion organ 2, folds and tendon, span 1",
+        "propulsion organ 2, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999967166732562,
+        "nativeDesign": 0.0012013677314864396
+      }
+    },
+    {
+      "index": 28,
+      "name": "curved seed propulsion organ 3",
+      "supports": [
+        "propulsion organ 3, folds and tendon, span 1",
+        "propulsion organ 3, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999964976524599,
+        "nativeDesign": 0.0004999968744125355
+      }
+    },
+    {
+      "index": 29,
+      "name": "propulsion organ connected stem 3",
+      "supports": [
+        "propulsion stem 3"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999970199064842,
+        "nativeDesign": 0.001904078948261149
+      }
+    },
+    {
+      "index": 30,
+      "name": "propulsion organ breathing fold 3-0",
+      "supports": [
+        "propulsion organ 3, folds and tendon, span 1",
+        "propulsion organ 3, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.3645447268766619,
+        "nativeDesign": 0.35023373665299273
+      }
+    },
+    {
+      "index": 31,
+      "name": "propulsion organ breathing fold 3-1",
+      "supports": [
+        "propulsion organ 3, folds and tendon, span 1",
+        "propulsion organ 3, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.2882247337237732,
+        "nativeDesign": 0.31273329016432067
+      }
+    },
+    {
+      "index": 32,
+      "name": "propulsion organ breathing fold 3-2",
+      "supports": [
+        "propulsion organ 3, folds and tendon, span 1",
+        "propulsion organ 3, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.01680254413206027,
+        "nativeDesign": 0.016331109422049447
+      }
+    },
+    {
+      "index": 33,
+      "name": "inward forward gland 3",
+      "supports": [
+        "forward gland 3"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999961122130631,
+        "nativeDesign": 0.006124365355275586
+      }
+    },
+    {
+      "index": 34,
+      "name": "warm outer tendon 3",
+      "supports": [
+        "propulsion organ 3, folds and tendon, span 1",
+        "propulsion organ 3, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999967093965726,
+        "nativeDesign": 0.0014050038692546495
+      }
+    },
+    {
+      "index": 35,
+      "name": "curved seed propulsion organ 4",
+      "supports": [
+        "propulsion organ 4, folds and tendon"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999972569125641,
+        "nativeDesign": 0.0004999980368567031
+      }
+    },
+    {
+      "index": 36,
+      "name": "propulsion organ connected stem 4",
+      "supports": [
+        "propulsion stem 4"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999969350688045,
+        "nativeDesign": 0.000499996640447052
+      }
+    },
+    {
+      "index": 37,
+      "name": "propulsion organ breathing fold 4-0",
+      "supports": [
+        "propulsion organ 4, folds and tendon"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.5986707951323292,
+        "nativeDesign": 0.6034039478308219
+      }
+    },
+    {
+      "index": 38,
+      "name": "propulsion organ breathing fold 4-1",
+      "supports": [
+        "propulsion organ 4, folds and tendon"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.2751778110073908,
+        "nativeDesign": 0.28124707334897225
+      }
+    },
+    {
+      "index": 39,
+      "name": "propulsion organ breathing fold 4-2",
+      "supports": [
+        "propulsion organ 4, folds and tendon"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999980973403714,
+        "nativeDesign": 0.010147787208065367
+      }
+    },
+    {
+      "index": 40,
+      "name": "inward forward gland 4",
+      "supports": [
+        "forward gland 4"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999959859855546,
+        "nativeDesign": 0.006124429408681565
+      }
+    },
+    {
+      "index": 41,
+      "name": "warm outer tendon 4",
+      "supports": [
+        "propulsion organ 4, folds and tendon"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.001718888831240178,
+        "nativeDesign": 0.0004999978307344834
+      }
+    },
+    {
+      "index": 42,
+      "name": "curved seed propulsion organ 5",
+      "supports": [
+        "propulsion organ 5, folds and tendon"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999966437708575,
+        "nativeDesign": 0.0004999975666043887
+      }
+    },
+    {
+      "index": 43,
+      "name": "propulsion organ connected stem 5",
+      "supports": [
+        "propulsion stem 5"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999967139549787,
+        "nativeDesign": 0.0019040789996026624
+      }
+    },
+    {
+      "index": 44,
+      "name": "propulsion organ breathing fold 5-0",
+      "supports": [
+        "propulsion organ 5, folds and tendon"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.6604308127349298,
+        "nativeDesign": 0.6644154926739546
+      }
+    },
+    {
+      "index": 45,
+      "name": "propulsion organ breathing fold 5-1",
+      "supports": [
+        "propulsion organ 5, folds and tendon"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.23488133788892357,
+        "nativeDesign": 0.2360512012614472
+      }
+    },
+    {
+      "index": 46,
+      "name": "propulsion organ breathing fold 5-2",
+      "supports": [
+        "propulsion organ 5, folds and tendon"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.014660461711936024,
+        "nativeDesign": 0.023253142897086732
+      }
+    },
+    {
+      "index": 47,
+      "name": "inward forward gland 5",
+      "supports": [
+        "forward gland 5"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999961122130631,
+        "nativeDesign": 0.006124365355275586
+      }
+    },
+    {
+      "index": 48,
+      "name": "warm outer tendon 5",
+      "supports": [
+        "propulsion organ 5, folds and tendon"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0013461681991208919,
+        "nativeDesign": 0.0004999965992041573
+      }
+    },
+    {
+      "index": 49,
+      "name": "curved seed propulsion organ 6",
+      "supports": [
+        "propulsion organ 6, folds and tendon, span 1",
+        "propulsion organ 6, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999969175578313,
+        "nativeDesign": 0.0004999969230444471
+      }
+    },
+    {
+      "index": 50,
+      "name": "propulsion organ connected stem 6",
+      "supports": [
+        "propulsion stem 6"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999972287532371,
+        "nativeDesign": 0.0004999974469727255
+      }
+    },
+    {
+      "index": 51,
+      "name": "propulsion organ breathing fold 6-0",
+      "supports": [
+        "propulsion organ 6, folds and tendon, span 1",
+        "propulsion organ 6, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.41360022274882685,
+        "nativeDesign": 0.4306238547664208
+      }
+    },
+    {
+      "index": 52,
+      "name": "propulsion organ breathing fold 6-1",
+      "supports": [
+        "propulsion organ 6, folds and tendon, span 1",
+        "propulsion organ 6, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.20329842173501764,
+        "nativeDesign": 0.18385104911615296
+      }
+    },
+    {
+      "index": 53,
+      "name": "propulsion organ breathing fold 6-2",
+      "supports": [
+        "propulsion organ 6, folds and tendon, span 1",
+        "propulsion organ 6, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.027784927721930665,
+        "nativeDesign": 0.03455514490652498
+      }
+    },
+    {
+      "index": 54,
+      "name": "inward forward gland 6",
+      "supports": [
+        "forward gland 6"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999959859855546,
+        "nativeDesign": 0.006124429408681565
+      }
+    },
+    {
+      "index": 55,
+      "name": "warm outer tendon 6",
+      "supports": [
+        "propulsion organ 6, folds and tendon, span 1",
+        "propulsion organ 6, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999972972539602,
+        "nativeDesign": 0.0012010584128906235
+      }
+    },
+    {
+      "index": 56,
+      "name": "curved seed propulsion organ 7",
+      "supports": [
+        "propulsion organ 7, folds and tendon, span 1",
+        "propulsion organ 7, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999967663370183,
+        "nativeDesign": 0.0004999968862309787
+      }
+    },
+    {
+      "index": 57,
+      "name": "propulsion organ connected stem 7",
+      "supports": [
+        "propulsion stem 7"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999967139549787,
+        "nativeDesign": 0.0019040789996026624
+      }
+    },
+    {
+      "index": 58,
+      "name": "propulsion organ breathing fold 7-0",
+      "supports": [
+        "propulsion organ 7, folds and tendon, span 1",
+        "propulsion organ 7, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.40076745433859134,
+        "nativeDesign": 0.43433338182126346
+      }
+    },
+    {
+      "index": 59,
+      "name": "propulsion organ breathing fold 7-1",
+      "supports": [
+        "propulsion organ 7, folds and tendon, span 1",
+        "propulsion organ 7, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.1989526422519428,
+        "nativeDesign": 0.18153099537340567
+      }
+    },
+    {
+      "index": 60,
+      "name": "propulsion organ breathing fold 7-2",
+      "supports": [
+        "propulsion organ 7, folds and tendon, span 1",
+        "propulsion organ 7, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0087754377119382,
+        "nativeDesign": 0.012761161185536041
+      }
+    },
+    {
+      "index": 61,
+      "name": "inward forward gland 7",
+      "supports": [
+        "forward gland 7"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999961122130631,
+        "nativeDesign": 0.006124365355275586
+      }
+    },
+    {
+      "index": 62,
+      "name": "warm outer tendon 7",
+      "supports": [
+        "propulsion organ 7, folds and tendon, span 1",
+        "propulsion organ 7, folds and tendon, span 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.000499996830187981,
+        "nativeDesign": 0.0014043975843887001
+      }
+    },
+    {
+      "index": 63,
+      "name": "continuous rounded elliptical living crown",
+      "support": "closed 12-sector annulus",
+      "signedContainmentLowerMetres": {
+        "design": 0.000499989878048829,
+        "nativeDesign": 0.0004999896929901939
+      }
+    },
+    {
+      "index": 64,
+      "name": "inward rear glowing blob 0",
+      "supports": [
+        "rear blob 0"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999966997544256,
+        "nativeDesign": 0.0004999966937908153
+      }
+    },
+    {
+      "index": 65,
+      "name": "inward rear glowing blob 1",
+      "supports": [
+        "rear blob 1"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999972960278389,
+        "nativeDesign": 0.0004999966581471968
+      }
+    },
+    {
+      "index": 66,
+      "name": "inward rear glowing blob 2",
+      "supports": [
+        "rear blob 2"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999967185730951,
+        "nativeDesign": 0.0004999964273182646
+      }
+    },
+    {
+      "index": 67,
+      "name": "inward rear glowing blob 3",
+      "supports": [
+        "rear blob 3"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999972960278389,
+        "nativeDesign": 0.0004999966581471968
+      }
+    },
+    {
+      "index": 68,
+      "name": "inward rear glowing blob 4",
+      "supports": [
+        "rear blob 4"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999966693536588,
+        "nativeDesign": 0.0004999964424356046
+      }
+    },
+    {
+      "index": 69,
+      "name": "inward rear glowing blob 5",
+      "supports": [
+        "rear blob 5"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999964202252366,
+        "nativeDesign": 0.0004999969592810983
+      }
+    },
+    {
+      "index": 70,
+      "name": "inward rear glowing blob 6",
+      "supports": [
+        "rear blob 6"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999959754894384,
+        "nativeDesign": 0.0004999962316597307
+      }
+    },
+    {
+      "index": 71,
+      "name": "inward rear glowing blob 7",
+      "supports": [
+        "rear blob 7"
+      ],
+      "signedContainmentLowerMetres": {
+        "design": 0.0004999964202252366,
+        "nativeDesign": 0.0004999969592810983
+      }
+    }
+  ],
+  "structuralSupports": [
+    {
+      "name": "central carapace with its four surface folds, span 1",
+      "faces": 8,
+      "ownerIndices": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "groupAlternatives": {
+        "4": 11.462602131510973,
+        "8": 6.619921267958979,
+        "12": 4.213994640723145,
+        "16": 3.222572336857599,
+        "20": 4.118061816582794,
+        "24": 4.121113825694768,
+        "28": 2.317138694058969,
+        "32": 3.302773964608765,
+        "36": 3.479328488209486,
+        "40": 2.6453357082769244,
+        "44": 3.1637202494187933,
+        "48": 3.264505562028212
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 2.1819998740772815,
+          "nearestSourceOwnerIndex": 0,
+          "nearestSourceOwner": "central grown seed carapace",
+          "candidatePointMetres": [
+            0.004516347,
+            -2.730138977,
+            -10.87090757
+          ],
+          "sourcePointMetres": [
+            0.0,
+            -0.6803930487804878,
+            -10.122813536585365
+          ],
+          "sourceFace": 4931
+        },
+        "nativeDesign": {
+          "distanceMetres": 2.2084309805913076,
+          "nearestSourceOwnerIndex": 0,
+          "nearestSourceOwner": "central grown seed carapace",
+          "candidatePointMetres": [
+            0.004516347,
+            -2.730138977,
+            -10.87090757
+          ],
+          "sourcePointMetres": [
+            0.0,
+            -0.6643984382188317,
+            -10.089970296538585
+          ],
+          "sourceFace": 1844
+        }
+      }
+    },
+    {
+      "name": "central carapace with its four surface folds, span 2",
+      "faces": 12,
+      "ownerIndices": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "groupAlternatives": {
+        "4": 11.462602131510973,
+        "8": 6.619921267958979,
+        "12": 4.213994640723145,
+        "16": 3.222572336857599,
+        "20": 4.118061816582794,
+        "24": 4.121113825694768,
+        "28": 2.317138694058969,
+        "32": 3.302773964608765,
+        "36": 3.479328488209486,
+        "40": 2.6453357082769244,
+        "44": 3.1637202494187933,
+        "48": 3.264505562028212
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 2.107249606595934,
+          "nearestSourceOwnerIndex": 0,
+          "nearestSourceOwner": "central grown seed carapace",
+          "candidatePointMetres": [
+            -4.05250256,
+            3.17946211,
+            -4.493701258
+          ],
+          "sourcePointMetres": [
+            -2.703384268292683,
+            1.6484674390243903,
+            -3.967929390243903
+          ],
+          "sourceFace": 3394
+        },
+        "nativeDesign": {
+          "distanceMetres": 2.113091786111251,
+          "nearestSourceOwnerIndex": 0,
+          "nearestSourceOwner": "central grown seed carapace",
+          "candidatePointMetres": [
+            -4.05250256,
+            3.17946211,
+            -4.493701258
+          ],
+          "sourcePointMetres": [
+            -2.704615893669105,
+            1.6480798085331765,
+            -3.9430410378892686
+          ],
+          "sourceFace": 1302
+        }
+      }
+    },
+    {
+      "name": "central carapace with its four surface folds, span 3",
+      "faces": 8,
+      "ownerIndices": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "groupAlternatives": {
+        "4": 11.462602131510973,
+        "8": 6.619921267958979,
+        "12": 4.213994640723145,
+        "16": 3.222572336857599,
+        "20": 4.118061816582794,
+        "24": 4.121113825694768,
+        "28": 2.317138694058969,
+        "32": 3.302773964608765,
+        "36": 3.479328488209486,
+        "40": 2.6453357082769244,
+        "44": 3.1637202494187933,
+        "48": 3.264505562028212
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 0.9731365169107522,
+          "nearestSourceOwnerIndex": 3,
+          "nearestSourceOwner": "central flowing surface fold 2",
+          "candidatePointMetres": [
+            1.4693033213333335,
+            -0.2564948003333334,
+            5.733363454
+          ],
+          "sourcePointMetres": [
+            2.4032367316524472,
+            -0.4929181197794422,
+            5.870720942536242
+          ],
+          "sourceFace": 7079
+        },
+        "nativeDesign": {
+          "distanceMetres": 0.914158746527617,
+          "nearestSourceOwnerIndex": 3,
+          "nearestSourceOwner": "central flowing surface fold 2",
+          "candidatePointMetres": [
+            1.4693033213333335,
+            -0.2564948003333334,
+            5.733363454
+          ],
+          "sourcePointMetres": [
+            2.345589803543702,
+            -0.48571809825824874,
+            5.85691463625556
+          ],
+          "sourceFace": 2619
+        }
+      }
+    },
+    {
+      "name": "central crown cartilage 0",
+      "faces": 8,
+      "ownerIndices": [
+        5
+      ],
+      "groupAlternatives": {
+        "4": 5.16468894447376,
+        "8": 1.1413241664059601,
+        "12": 1.4553066093166869
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 1.1139179808648028,
+          "nearestSourceOwnerIndex": 5,
+          "nearestSourceOwner": "central crown connected cartilage 0",
+          "candidatePointMetres": [
+            -1.185094443,
+            1.2890123,
+            -3.164959858
+          ],
+          "sourcePointMetres": [
+            -1.3654810975609755,
+            0.7530675609756098,
+            -2.205253048780488
+          ],
+          "sourceFace": 10609
+        },
+        "nativeDesign": {
+          "distanceMetres": 1.1143001110027688,
+          "nearestSourceOwnerIndex": 5,
+          "nearestSourceOwner": "central crown connected cartilage 0",
+          "candidatePointMetres": [
+            -1.185094443,
+            1.2890123,
+            -3.164959858
+          ],
+          "sourcePointMetres": [
+            -1.362780975609756,
+            0.7533025609756098,
+            -2.2041751219512196
+          ],
+          "sourceFace": 3803
+        }
+      }
+    },
+    {
+      "name": "central crown cartilage 1",
+      "faces": 8,
+      "ownerIndices": [
+        6
+      ],
+      "groupAlternatives": {
+        "4": 5.16468894447376,
+        "8": 1.1413241664059601,
+        "12": 1.4553066093166869
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 1.1139179808648028,
+          "nearestSourceOwnerIndex": 6,
+          "nearestSourceOwner": "central crown connected cartilage 1",
+          "candidatePointMetres": [
+            1.185094443,
+            1.2890123,
+            -3.164959858
+          ],
+          "sourcePointMetres": [
+            1.3654810975609755,
+            0.7530675609756098,
+            -2.205253048780488
+          ],
+          "sourceFace": 12581
+        },
+        "nativeDesign": {
+          "distanceMetres": 1.1143001110027688,
+          "nearestSourceOwnerIndex": 6,
+          "nearestSourceOwner": "central crown connected cartilage 1",
+          "candidatePointMetres": [
+            1.185094443,
+            1.2890123,
+            -3.164959858
+          ],
+          "sourcePointMetres": [
+            1.362780975609756,
+            0.7533025609756098,
+            -2.2041751219512196
+          ],
+          "sourceFace": 4442
+        }
+      }
+    },
+    {
+      "name": "propulsion organ 0, folds and tendon",
+      "faces": 12,
+      "ownerIndices": [
+        7,
+        9,
+        10,
+        11,
+        13
+      ],
+      "groupAlternatives": {
+        "4": 6.896387465193518,
+        "8": 3.2006591837115597,
+        "12": 2.732738128175926,
+        "16": 2.4895794673007368,
+        "20": 1.943141858170789,
+        "24": 1.9876429419133717
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 2.732738128175926,
+          "nearestSourceOwnerIndex": 7,
+          "nearestSourceOwner": "curved seed propulsion organ 0",
+          "candidatePointMetres": [
+            0.000521064,
+            10.737130227,
+            -11.446455131
+          ],
+          "sourcePointMetres": [
+            0.0,
+            8.130696463414635,
+            -10.625260609756097
+          ],
+          "sourceFace": 14407
+        },
+        "nativeDesign": {
+          "distanceMetres": 2.7362901049410393,
+          "nearestSourceOwnerIndex": 7,
+          "nearestSourceOwner": "curved seed propulsion organ 0",
+          "candidatePointMetres": [
+            0.000521064,
+            10.737130227,
+            -11.446455131
+          ],
+          "sourcePointMetres": [
+            0.0,
+            8.088917751495163,
+            -10.75779414657363
+          ],
+          "sourceFace": 4979
+        }
+      }
+    },
+    {
+      "name": "propulsion stem 0",
+      "faces": 8,
+      "ownerIndices": [
+        8
+      ],
+      "groupAlternatives": {
+        "4": 4.180258126466655,
+        "8": 2.25966858641995,
+        "12": 1.3056243340091818
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 1.4541641775351277,
+          "nearestSourceOwnerIndex": 5,
+          "nearestSourceOwner": "central crown connected cartilage 0",
+          "candidatePointMetres": [
+            -0.177179618,
+            0.059081877,
+            4.972416107
+          ],
+          "sourcePointMetres": [
+            -1.1900342589973827,
+            1.1020764787033215,
+            5.002100989587059
+          ],
+          "sourceFace": 9293
+        },
+        "nativeDesign": {
+          "distanceMetres": 1.4550783282823851,
+          "nearestSourceOwnerIndex": 5,
+          "nearestSourceOwner": "central crown connected cartilage 0",
+          "candidatePointMetres": [
+            -0.177179618,
+            0.059081877,
+            4.972416107
+          ],
+          "sourcePointMetres": [
+            -1.1930791435292545,
+            1.1004498050597151,
+            4.999873963345909
+          ],
+          "sourceFace": 3402
+        }
+      }
+    },
+    {
+      "name": "forward gland 0",
+      "faces": 4,
+      "ownerIndices": [
+        12
+      ],
+      "groupAlternatives": {
+        "4": 0.7491497799988169,
+        "8": 0.5486802116765719,
+        "12": 0.29583511407165225
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 0.6845181122129332,
+          "nearestSourceOwnerIndex": 0,
+          "nearestSourceOwner": "central grown seed carapace",
+          "candidatePointMetres": [
+            -0.889595098,
+            3.667310104,
+            3.150700471
+          ],
+          "sourcePointMetres": [
+            -0.7368266348926016,
+            3.001851407064142,
+            3.1017968382127337
+          ],
+          "sourceFace": 2116
+        },
+        "nativeDesign": {
+          "distanceMetres": 0.6948803595881988,
+          "nearestSourceOwnerIndex": 0,
+          "nearestSourceOwner": "central grown seed carapace",
+          "candidatePointMetres": [
+            -0.889595098,
+            3.667310104,
+            3.150700471
+          ],
+          "sourcePointMetres": [
+            -0.7416226537282699,
+            2.991260274190798,
+            3.0880945807609534
+          ],
+          "sourceFace": 739
+        }
+      }
+    },
+    {
+      "name": "rear blob 0",
+      "faces": 4,
+      "ownerIndices": [
+        64
+      ],
+      "groupAlternatives": {
+        "4": 0.8117833402752745,
+        "8": 0.5834868646321743,
+        "12": 0.3100843042591139
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 0.6912263816006448,
+          "nearestSourceOwnerIndex": 7,
+          "nearestSourceOwner": "curved seed propulsion organ 0",
+          "candidatePointMetres": [
+            0.478592888,
+            7.002368395,
+            -12.861481006
+          ],
+          "sourcePointMetres": [
+            0.061829268292682926,
+            7.090243902439024,
+            -12.317073170731707
+          ],
+          "sourceFace": 14589
+        },
+        "nativeDesign": {
+          "distanceMetres": 0.6891500721109906,
+          "nearestSourceOwnerIndex": 340,
+          "nearestSourceOwner": "appended luminous projection dot 268",
+          "candidatePointMetres": [
+            0.478592888,
+            7.002368395,
+            -12.861481006
+          ],
+          "sourcePointMetres": [
+            0.06917280487804878,
+            6.453260487804878,
+            -12.937530487804878
+          ],
+          "sourceFace": 56910
+        }
+      }
+    },
+    {
+      "name": "propulsion organ 1, folds and tendon, span 1",
+      "faces": 8,
+      "ownerIndices": [
+        14,
+        16,
+        17,
+        18,
+        20
+      ],
+      "groupAlternatives": {
+        "4": 7.350134027606093,
+        "8": 3.526031611842804,
+        "12": 3.0212374792914045,
+        "16": 2.416672523597203,
+        "20": 2.027253042763567,
+        "24": 2.011601690692539
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 2.2325890472952623,
+          "nearestSourceOwnerIndex": 14,
+          "nearestSourceOwner": "curved seed propulsion organ 1",
+          "candidatePointMetres": [
+            -10.329835353,
+            7.352380551,
+            -1.716263662
+          ],
+          "sourcePointMetres": [
+            -9.062235533788177,
+            5.628838916271837,
+            -2.3542674126124026
+          ],
+          "sourceFace": 22325
+        },
+        "nativeDesign": {
+          "distanceMetres": 2.274077083128115,
+          "nearestSourceOwnerIndex": 14,
+          "nearestSourceOwner": "curved seed propulsion organ 1",
+          "candidatePointMetres": [
+            -10.329835353,
+            7.352380551,
+            -1.716263662
+          ],
+          "sourcePointMetres": [
+            -8.951314603925168,
+            5.6471276579379115,
+            -2.318940768817585
+          ],
+          "sourceFace": 7766
+        }
+      }
+    },
+    {
+      "name": "propulsion organ 1, folds and tendon, span 2",
+      "faces": 8,
+      "ownerIndices": [
+        14,
+        16,
+        17,
+        18,
+        20
+      ],
+      "groupAlternatives": {
+        "4": 7.350134027606093,
+        "8": 3.526031611842804,
+        "12": 3.0212374792914045,
+        "16": 2.416672523597203,
+        "20": 2.027253042763567,
+        "24": 2.011601690692539
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 2.4156858797334873,
+          "nearestSourceOwnerIndex": 14,
+          "nearestSourceOwner": "curved seed propulsion organ 1",
+          "candidatePointMetres": [
+            -5.938170296,
+            5.084909104,
+            4.953938673
+          ],
+          "sourcePointMetres": [
+            -5.789251338033329,
+            3.741436532162397,
+            2.9518290700506684
+          ],
+          "sourceFace": 21540
+        },
+        "nativeDesign": {
+          "distanceMetres": 2.426391515071687,
+          "nearestSourceOwnerIndex": 14,
+          "nearestSourceOwner": "curved seed propulsion organ 1",
+          "candidatePointMetres": [
+            -5.938170296,
+            5.084909104,
+            4.953938673
+          ],
+          "sourcePointMetres": [
+            -5.763263678215918,
+            3.679936322256193,
+            2.9834476321611234
+          ],
+          "sourceFace": 7513
+        }
+      }
+    },
+    {
+      "name": "propulsion stem 1",
+      "faces": 8,
+      "ownerIndices": [
+        15
+      ],
+      "groupAlternatives": {
+        "4": 4.88817117703413,
+        "8": 2.0032302418891277,
+        "12": 1.42191027682728
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 1.0501931278284053,
+          "nearestSourceOwnerIndex": 0,
+          "nearestSourceOwner": "central grown seed carapace",
+          "candidatePointMetres": [
+            -1.241658657,
+            -0.548372332,
+            4.569018439
+          ],
+          "sourcePointMetres": [
+            -1.6068814368107982,
+            -1.5240858232492447,
+            4.7013101992857145
+          ],
+          "sourceFace": 1772
+        },
+        "nativeDesign": {
+          "distanceMetres": 1.0460693984019316,
+          "nearestSourceOwnerIndex": 0,
+          "nearestSourceOwner": "central grown seed carapace",
+          "candidatePointMetres": [
+            -1.241658657,
+            -0.548372332,
+            4.569018439
+          ],
+          "sourcePointMetres": [
+            -1.5940742766447635,
+            -1.5257395861006218,
+            4.69074628263155
+          ],
+          "sourceFace": 700
+        }
+      }
+    },
+    {
+      "name": "forward gland 1",
+      "faces": 4,
+      "ownerIndices": [
+        19
+      ],
+      "groupAlternatives": {
+        "4": 0.7491497074851831,
+        "8": 0.5486802968269202,
+        "12": 0.2958352053029866
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 0.717830147128946,
+          "nearestSourceOwnerIndex": 14,
+          "nearestSourceOwner": "curved seed propulsion organ 1",
+          "candidatePointMetres": [
+            -5.082571374,
+            1.927063487,
+            3.150700424
+          ],
+          "sourcePointMetres": [
+            -5.294818780487804,
+            2.563435487804878,
+            2.8952364634146344
+          ],
+          "sourceFace": 21472
+        },
+        "nativeDesign": {
+          "distanceMetres": 0.7243345148945072,
+          "nearestSourceOwnerIndex": 14,
+          "nearestSourceOwner": "curved seed propulsion organ 1",
+          "candidatePointMetres": [
+            -5.082571374,
+            1.927063487,
+            3.150700424
+          ],
+          "sourcePointMetres": [
+            -5.285539717930849,
+            2.579388916017512,
+            2.9100017005165784
+          ],
+          "sourceFace": 7504
+        }
+      }
+    },
+    {
+      "name": "rear blob 1",
+      "faces": 4,
+      "ownerIndices": [
+        65
+      ],
+      "groupAlternatives": {
+        "4": 0.8103456717011522,
+        "8": 0.5831673135767843,
+        "12": 0.3104303648562471
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 0.685185770355141,
+          "nearestSourceOwnerIndex": 14,
+          "nearestSourceOwner": "curved seed propulsion organ 1",
+          "candidatePointMetres": [
+            -8.297298838,
+            5.380334305,
+            -12.852217698
+          ],
+          "sourcePointMetres": [
+            -8.588718048780487,
+            5.067005853658536,
+            -12.317073170731707
+          ],
+          "sourceFace": 23343
+        },
+        "nativeDesign": {
+          "distanceMetres": 0.6791170667915675,
+          "nearestSourceOwnerIndex": 366,
+          "nearestSourceOwner": "appended luminous projection dot 294",
+          "candidatePointMetres": [
+            -8.297298838,
+            5.380334305,
+            -12.852217698
+          ],
+          "sourcePointMetres": [
+            -8.037840026142154,
+            4.753946724976732,
+            -12.891201219512194
+          ],
+          "sourceFace": 58976
+        }
+      }
+    },
+    {
+      "name": "propulsion organ 2, folds and tendon, span 1",
+      "faces": 8,
+      "ownerIndices": [
+        21,
+        23,
+        24,
+        25,
+        27
+      ],
+      "groupAlternatives": {
+        "4": 7.5916154790160855,
+        "8": 3.636748474974574,
+        "12": 3.202704205628889,
+        "16": 2.533432296555069,
+        "20": 2.486582921766114,
+        "24": 2.486582921766114
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 2.2656959247153385,
+          "nearestSourceOwnerIndex": 21,
+          "nearestSourceOwner": "curved seed propulsion organ 2",
+          "candidatePointMetres": [
+            -14.905387409,
+            -1.544047679,
+            -3.06917021
+          ],
+          "sourcePointMetres": [
+            -13.076803749863101,
+            -0.31558713484062645,
+            -3.5988347418056157
+          ],
+          "sourceFace": 31243
+        },
+        "nativeDesign": {
+          "distanceMetres": 2.2756439075853123,
+          "nearestSourceOwnerIndex": 21,
+          "nearestSourceOwner": "curved seed propulsion organ 2",
+          "candidatePointMetres": [
+            -14.905387409,
+            -1.544047679,
+            -3.06917021
+          ],
+          "sourcePointMetres": [
+            -12.94361106781784,
+            -0.518284356947141,
+            -3.596236039322271
+          ],
+          "sourceFace": 10841
+        }
+      }
+    },
+    {
+      "name": "propulsion organ 2, folds and tendon, span 2",
+      "faces": 8,
+      "ownerIndices": [
+        21,
+        23,
+        24,
+        25,
+        27
+      ],
+      "groupAlternatives": {
+        "4": 7.5916154790160855,
+        "8": 3.636748474974574,
+        "12": 3.202704205628889,
+        "16": 2.533432296555069,
+        "20": 2.486582921766114,
+        "24": 2.486582921766114
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 2.2311388252994466,
+          "nearestSourceOwnerIndex": 21,
+          "nearestSourceOwner": "curved seed propulsion organ 2",
+          "candidatePointMetres": [
+            -8.509545759,
+            1.40665042,
+            4.953783141
+          ],
+          "sourcePointMetres": [
+            -7.942953170731707,
+            0.3073123170731707,
+            3.0967939024390243
+          ],
+          "sourceFace": 30296
+        },
+        "nativeDesign": {
+          "distanceMetres": 2.2353925004523183,
+          "nearestSourceOwnerIndex": 21,
+          "nearestSourceOwner": "curved seed propulsion organ 2",
+          "candidatePointMetres": [
+            -8.509545759,
+            1.40665042,
+            4.953783141
+          ],
+          "sourcePointMetres": [
+            -7.888563048780488,
+            0.268620243902439,
+            3.132726463414634
+          ],
+          "sourceFace": 10524
+        }
+      }
+    },
+    {
+      "name": "propulsion stem 2",
+      "faces": 8,
+      "ownerIndices": [
+        22
+      ],
+      "groupAlternatives": {
+        "4": 5.38699128461393,
+        "8": 1.938093530751762,
+        "12": 1.4717989983474957
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 0.9662103797667922,
+          "nearestSourceOwnerIndex": 0,
+          "nearestSourceOwner": "central grown seed carapace",
+          "candidatePointMetres": [
+            -1.12429388,
+            -0.622138049,
+            5.015215844
+          ],
+          "sourcePointMetres": [
+            -1.45922572158875,
+            -1.517415895322178,
+            5.156143972291623
+          ],
+          "sourceFace": 1629
+        },
+        "nativeDesign": {
+          "distanceMetres": 0.9633923097113345,
+          "nearestSourceOwnerIndex": 0,
+          "nearestSourceOwner": "central grown seed carapace",
+          "candidatePointMetres": [
+            -1.12429388,
+            -0.622138049,
+            5.015215844
+          ],
+          "sourcePointMetres": [
+            -1.446959465213383,
+            -1.5178764093758517,
+            5.162404336352581
+          ],
+          "sourceFace": 605
+        }
+      }
+    },
+    {
+      "name": "forward gland 2",
+      "faces": 4,
+      "ownerIndices": [
+        26
+      ],
+      "groupAlternatives": {
+        "4": 0.7491497799988163,
+        "8": 0.5486802116765719,
+        "12": 0.29583511407165225
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 0.7178302139290671,
+          "nearestSourceOwnerIndex": 21,
+          "nearestSourceOwner": "curved seed propulsion organ 2",
+          "candidatePointMetres": [
+            -6.667310104,
+            0.889595098,
+            3.150700471
+          ],
+          "sourcePointMetres": [
+            -7.170731707317072,
+            0.4462159756097561,
+            2.8952364634146344
+          ],
+          "sourceFace": 30190
+        },
+        "nativeDesign": {
+          "distanceMetres": 0.7243345517817914,
+          "nearestSourceOwnerIndex": 21,
+          "nearestSourceOwner": "curved seed propulsion organ 2",
+          "candidatePointMetres": [
+            -6.667310104,
+            0.889595098,
+            3.150700471
+          ],
+          "sourcePointMetres": [
+            -7.170731707317072,
+            0.4277602913061438,
+            2.910001813869044
+          ],
+          "sourceFace": 10494
+        }
+      }
+    },
+    {
+      "name": "rear blob 2",
+      "faces": 4,
+      "ownerIndices": [
+        66
+      ],
+      "groupAlternatives": {
+        "4": 0.8092617932994381,
+        "8": 0.5829495635915807,
+        "12": 0.31069128655707323
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 0.6797100936286783,
+          "nearestSourceOwnerIndex": 21,
+          "nearestSourceOwner": "curved seed propulsion organ 2",
+          "candidatePointMetres": [
+            -12.091432987,
+            -0.47963246,
+            -12.844029248
+          ],
+          "sourcePointMetres": [
+            -12.190243902439024,
+            -0.061829268292682926,
+            -12.317073170731707
+          ],
+          "sourceFace": 32127
+        },
+        "nativeDesign": {
+          "distanceMetres": 0.6700008140109581,
+          "nearestSourceOwnerIndex": 397,
+          "nearestSourceOwner": "appended luminous projection dot 325",
+          "candidatePointMetres": [
+            -12.091432987,
+            -0.47963246,
+            -12.844029248
+          ],
+          "sourcePointMetres": [
+            -11.565274390243902,
+            -0.069165,
+            -12.903817926829268
+          ],
+          "sourceFace": 61460
+        }
+      }
+    },
+    {
+      "name": "propulsion organ 3, folds and tendon, span 1",
+      "faces": 8,
+      "ownerIndices": [
+        28,
+        30,
+        31,
+        32,
+        34
+      ],
+      "groupAlternatives": {
+        "4": 7.347537507528389,
+        "8": 3.526752522247719,
+        "12": 3.0215725492217955,
+        "16": 2.417714679654812,
+        "20": 2.0239956871095184,
+        "24": 2.0107321040365935
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 2.2875672956123356,
+          "nearestSourceOwnerIndex": 28,
+          "nearestSourceOwner": "curved seed propulsion organ 3",
+          "candidatePointMetres": [
+            -10.063726303,
+            -7.590955872,
+            -1.737635883
+          ],
+          "sourcePointMetres": [
+            -9.058918648921985,
+            -5.6268653556752755,
+            -2.3423458580662695
+          ],
+          "sourceFace": 39886
+        },
+        "nativeDesign": {
+          "distanceMetres": 2.2955183609228644,
+          "nearestSourceOwnerIndex": 28,
+          "nearestSourceOwner": "curved seed propulsion organ 3",
+          "candidatePointMetres": [
+            -10.063726303,
+            -7.590955872,
+            -1.737635883
+          ],
+          "sourcePointMetres": [
+            -8.83851743902439,
+            -5.743564634146342,
+            -2.333801463414634
+          ],
+          "sourceFace": 13789
+        }
+      }
+    },
+    {
+      "name": "propulsion organ 3, folds and tendon, span 2",
+      "faces": 8,
+      "ownerIndices": [
+        28,
+        30,
+        31,
+        32,
+        34
+      ],
+      "groupAlternatives": {
+        "4": 7.347537507528389,
+        "8": 3.526752522247719,
+        "12": 3.0215725492217955,
+        "16": 2.417714679654812,
+        "20": 2.0239956871095184,
+        "24": 2.0107321040365935
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 2.416702252368093,
+          "nearestSourceOwnerIndex": 28,
+          "nearestSourceOwner": "curved seed propulsion organ 3",
+          "candidatePointMetres": [
+            -7.357518154,
+            -2.640455921,
+            4.952316277
+          ],
+          "sourcePointMetres": [
+            -6.113781100206115,
+            -3.181812622926639,
+            2.9521910711940658
+          ],
+          "sourceFace": 39052
+        },
+        "nativeDesign": {
+          "distanceMetres": 2.427490408292025,
+          "nearestSourceOwnerIndex": 28,
+          "nearestSourceOwner": "curved seed propulsion organ 3",
+          "candidatePointMetres": [
+            -7.357518154,
+            -2.640455921,
+            4.952316277
+          ],
+          "sourcePointMetres": [
+            -6.047512130051357,
+            -3.1896467462745575,
+            2.9838185409072464
+          ],
+          "sourceFace": 13537
+        }
+      }
+    },
+    {
+      "name": "propulsion stem 3",
+      "faces": 8,
+      "ownerIndices": [
+        29
+      ],
+      "groupAlternatives": {
+        "4": 4.88817117703413,
+        "8": 2.0032302418891277,
+        "12": 1.42191027682728
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 1.0863398248217822,
+          "nearestSourceOwnerIndex": 0,
+          "nearestSourceOwner": "central grown seed carapace",
+          "candidatePointMetres": [
+            -0.795753453,
+            -0.623542085,
+            4.862030172
+          ],
+          "sourcePointMetres": [
+            -1.0724781454016408,
+            -1.6653449944024008,
+            4.996953696893661
+          ],
+          "sourceFace": 1768
+        },
+        "nativeDesign": {
+          "distanceMetres": 1.082652181446325,
+          "nearestSourceOwnerIndex": 0,
+          "nearestSourceOwner": "central grown seed carapace",
+          "candidatePointMetres": [
+            -0.795753453,
+            -0.623542085,
+            4.862030172
+          ],
+          "sourcePointMetres": [
+            -1.0850310667339096,
+            -1.6593818631380377,
+            4.986489652192721
+          ],
+          "sourceFace": 698
+        }
+      }
+    },
+    {
+      "name": "forward gland 3",
+      "faces": 4,
+      "ownerIndices": [
+        33
+      ],
+      "groupAlternatives": {
+        "4": 0.7491497074851831,
+        "8": 0.5486802968269202,
+        "12": 0.2958352053029866
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 0.717830147128946,
+          "nearestSourceOwnerIndex": 28,
+          "nearestSourceOwner": "curved seed propulsion organ 3",
+          "candidatePointMetres": [
+            -5.082571374,
+            -1.927063487,
+            3.150700424
+          ],
+          "sourcePointMetres": [
+            -5.294818780487804,
+            -2.563435487804878,
+            2.8952364634146344
+          ],
+          "sourceFace": 38947
+        },
+        "nativeDesign": {
+          "distanceMetres": 0.7243345148945072,
+          "nearestSourceOwnerIndex": 28,
+          "nearestSourceOwner": "curved seed propulsion organ 3",
+          "candidatePointMetres": [
+            -5.082571374,
+            -1.927063487,
+            3.150700424
+          ],
+          "sourcePointMetres": [
+            -5.285539717930849,
+            -2.579388916017512,
+            2.9100017005165784
+          ],
+          "sourceFace": 13506
+        }
+      }
+    },
+    {
+      "name": "rear blob 3",
+      "faces": 4,
+      "ownerIndices": [
+        67
+      ],
+      "groupAlternatives": {
+        "4": 0.8103456717011522,
+        "8": 0.5831673135767843,
+        "12": 0.3104303648562471
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 0.685185770355141,
+          "nearestSourceOwnerIndex": 28,
+          "nearestSourceOwner": "curved seed propulsion organ 3",
+          "candidatePointMetres": [
+            -8.297298838,
+            -5.380334305,
+            -12.852217698
+          ],
+          "sourcePointMetres": [
+            -8.588718048780487,
+            -5.067005853658536,
+            -12.317073170731707
+          ],
+          "sourceFace": 40885
+        },
+        "nativeDesign": {
+          "distanceMetres": 0.6791170667915675,
+          "nearestSourceOwnerIndex": 431,
+          "nearestSourceOwner": "appended luminous projection dot 359",
+          "candidatePointMetres": [
+            -8.297298838,
+            -5.380334305,
+            -12.852217698
+          ],
+          "sourcePointMetres": [
+            -8.037840026142154,
+            -4.753946724976732,
+            -12.891201219512194
+          ],
+          "sourceFace": 64182
+        }
+      }
+    },
+    {
+      "name": "propulsion organ 4, folds and tendon",
+      "faces": 12,
+      "ownerIndices": [
+        35,
+        37,
+        38,
+        39,
+        41
+      ],
+      "groupAlternatives": {
+        "4": 7.052738004280302,
+        "8": 3.199752960240721,
+        "12": 2.6173810325460813,
+        "16": 2.3891983378082093,
+        "20": 1.926278263532285,
+        "24": 2.0001680320407873
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 2.622072438748777,
+          "nearestSourceOwnerIndex": 35,
+          "nearestSourceOwner": "curved seed propulsion organ 4",
+          "candidatePointMetres": [
+            -1.413714682,
+            -10.217715163,
+            -11.574317091
+          ],
+          "sourcePointMetres": [
+            -0.2809049345156514,
+            -7.98379731222076,
+            -10.798677364051803
+          ],
+          "sourceFace": 49460
+        },
+        "nativeDesign": {
+          "distanceMetres": 2.6173810325460813,
+          "nearestSourceOwnerIndex": 35,
+          "nearestSourceOwner": "curved seed propulsion organ 4",
+          "candidatePointMetres": [
+            -1.413714682,
+            -10.217715163,
+            -11.574317091
+          ],
+          "sourcePointMetres": [
+            -0.25010841463414635,
+            -8.012434146341462,
+            -10.778427926829268
+          ],
+          "sourceFace": 17045
+        }
+      }
+    },
+    {
+      "name": "propulsion stem 4",
+      "faces": 8,
+      "ownerIndices": [
+        36
+      ],
+      "groupAlternatives": {
+        "4": 4.180258126466655,
+        "8": 2.25966858641995,
+        "12": 1.3056243340091818
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 1.5396945714606225,
+          "nearestSourceOwnerIndex": 5,
+          "nearestSourceOwner": "central crown connected cartilage 0",
+          "candidatePointMetres": [
+            -0.177179618,
+            -0.059081877,
+            4.972416107
+          ],
+          "sourcePointMetres": [
+            -1.2139371406070305,
+            1.0788218726601833,
+            5.003533131477577
+          ],
+          "sourceFace": 9292
+        },
+        "nativeDesign": {
+          "distanceMetres": 1.5418555067208686,
+          "nearestSourceOwnerIndex": 5,
+          "nearestSourceOwner": "central crown connected cartilage 0",
+          "candidatePointMetres": [
+            -0.177179618,
+            -0.059081877,
+            4.972416107
+          ],
+          "sourcePointMetres": [
+            -1.1930603530399697,
+            1.1004405133741912,
+            5.000921580176903
+          ],
+          "sourceFace": 3405
+        }
+      }
+    },
+    {
+      "name": "forward gland 4",
+      "faces": 4,
+      "ownerIndices": [
+        40
+      ],
+      "groupAlternatives": {
+        "4": 0.7491497799988169,
+        "8": 0.5486802116765719,
+        "12": 0.29583511407165225
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 0.717830213929068,
+          "nearestSourceOwnerIndex": 35,
+          "nearestSourceOwner": "curved seed propulsion organ 4",
+          "candidatePointMetres": [
+            0.889595098,
+            -3.667310104,
+            3.150700471
+          ],
+          "sourcePointMetres": [
+            0.4462159756097561,
+            -4.170731707317073,
+            2.8952364634146344
+          ],
+          "sourceFace": 47683
+        },
+        "nativeDesign": {
+          "distanceMetres": 0.7243345517817924,
+          "nearestSourceOwnerIndex": 35,
+          "nearestSourceOwner": "curved seed propulsion organ 4",
+          "candidatePointMetres": [
+            0.889595098,
+            -3.667310104,
+            3.150700471
+          ],
+          "sourcePointMetres": [
+            0.4277602913061438,
+            -4.170731707317073,
+            2.910001813869044
+          ],
+          "sourceFace": 16524
+        }
+      }
+    },
+    {
+      "name": "rear blob 4",
+      "faces": 4,
+      "ownerIndices": [
+        68
+      ],
+      "groupAlternatives": {
+        "4": 0.8124763171198021,
+        "8": 0.5834839805800671,
+        "12": 0.3103304823431525
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 0.6918661246623964,
+          "nearestSourceOwnerIndex": 35,
+          "nearestSourceOwner": "curved seed propulsion organ 4",
+          "candidatePointMetres": [
+            0.478806791,
+            -7.000734741,
+            -12.86186358
+          ],
+          "sourcePointMetres": [
+            0.061829268292682926,
+            -7.090243902439024,
+            -12.317073170731707
+          ],
+          "sourceFace": 49610
+        },
+        "nativeDesign": {
+          "distanceMetres": 0.6891944766058237,
+          "nearestSourceOwnerIndex": 462,
+          "nearestSourceOwner": "appended luminous projection dot 390",
+          "candidatePointMetres": [
+            0.478806791,
+            -7.000734741,
+            -12.86186358
+          ],
+          "sourcePointMetres": [
+            0.0691730487804878,
+            -6.451639756097561,
+            -12.937255365853657
+          ],
+          "sourceFace": 66664
+        }
+      }
+    },
+    {
+      "name": "propulsion organ 5, folds and tendon",
+      "faces": 12,
+      "ownerIndices": [
+        42,
+        44,
+        45,
+        46,
+        48
+      ],
+      "groupAlternatives": {
+        "4": 7.380154726593142,
+        "8": 3.47362940670394,
+        "12": 2.9056113604279408,
+        "16": 2.3600158651925485,
+        "20": 2.0233211255560883,
+        "24": 2.00422337869986
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 2.894792979275184,
+          "nearestSourceOwnerIndex": 42,
+          "nearestSourceOwner": "curved seed propulsion organ 5",
+          "candidatePointMetres": [
+            12.487996433,
+            -5.713147103,
+            -11.039388993
+          ],
+          "sourcePointMetres": [
+            9.69981333774221,
+            -5.347415435685994,
+            -10.352292371189568
+          ],
+          "sourceFace": 58154
+        },
+        "nativeDesign": {
+          "distanceMetres": 2.901509630168224,
+          "nearestSourceOwnerIndex": 42,
+          "nearestSourceOwner": "curved seed propulsion organ 5",
+          "candidatePointMetres": [
+            12.487996433,
+            -5.713147103,
+            -11.039388993
+          ],
+          "sourcePointMetres": [
+            9.695101360830112,
+            -5.314990938973385,
+            -10.36118038286908
+          ],
+          "sourceFace": 20053
+        }
+      }
+    },
+    {
+      "name": "propulsion stem 5",
+      "faces": 8,
+      "ownerIndices": [
+        43
+      ],
+      "groupAlternatives": {
+        "4": 5.007564197859585,
+        "8": 2.0032302418891277,
+        "12": 1.42191027682728
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 1.3107383381753575,
+          "nearestSourceOwnerIndex": 0,
+          "nearestSourceOwner": "central grown seed carapace",
+          "candidatePointMetres": [
+            0.622651027,
+            -0.517473684,
+            5.022828566
+          ],
+          "sourcePointMetres": [
+            0.7538517798119201,
+            -1.8037560038851799,
+            5.238000932197622
+          ],
+          "sourceFace": 1613
+        },
+        "nativeDesign": {
+          "distanceMetres": 1.3071503931702337,
+          "nearestSourceOwnerIndex": 0,
+          "nearestSourceOwner": "central grown seed carapace",
+          "candidatePointMetres": [
+            0.622651027,
+            -0.517473684,
+            5.022828566
+          ],
+          "sourcePointMetres": [
+            0.7303011745033138,
+            -1.8012160581701377,
+            5.244321484323882
+          ],
+          "sourceFace": 595
+        }
+      }
+    },
+    {
+      "name": "forward gland 5",
+      "faces": 4,
+      "ownerIndices": [
+        47
+      ],
+      "groupAlternatives": {
+        "4": 0.7491497074851831,
+        "8": 0.5486802968269202,
+        "12": 0.2958352053029866
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 0.717830147128946,
+          "nearestSourceOwnerIndex": 42,
+          "nearestSourceOwner": "curved seed propulsion organ 5",
+          "candidatePointMetres": [
+            5.082571374,
+            -1.927063487,
+            3.150700424
+          ],
+          "sourcePointMetres": [
+            5.294818780487804,
+            -2.563435487804878,
+            2.8952364634146344
+          ],
+          "sourceFace": 56468
+        },
+        "nativeDesign": {
+          "distanceMetres": 0.7243345148945072,
+          "nearestSourceOwnerIndex": 42,
+          "nearestSourceOwner": "curved seed propulsion organ 5",
+          "candidatePointMetres": [
+            5.082571374,
+            -1.927063487,
+            3.150700424
+          ],
+          "sourcePointMetres": [
+            5.285539717930849,
+            -2.579388916017512,
+            2.9100017005165784
+          ],
+          "sourceFace": 19536
+        }
+      }
+    },
+    {
+      "name": "rear blob 5",
+      "faces": 4,
+      "ownerIndices": [
+        69
+      ],
+      "groupAlternatives": {
+        "4": 0.8110401830138391,
+        "8": 0.5831626449051224,
+        "12": 0.31067699855984826
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 0.6857967817818489,
+          "nearestSourceOwnerIndex": 42,
+          "nearestSourceOwner": "curved seed propulsion organ 5",
+          "candidatePointMetres": [
+            8.777834973,
+            -4.550872961,
+            -12.852539988
+          ],
+          "sourcePointMetres": [
+            8.650890243902438,
+            -4.960113170731707,
+            -12.317073170731707
+          ],
+          "sourceFace": 58366
+        },
+        "nativeDesign": {
+          "distanceMetres": 0.6731297547253378,
+          "nearestSourceOwnerIndex": 488,
+          "nearestSourceOwner": "appended luminous projection dot 416",
+          "candidatePointMetres": [
+            8.777834973,
+            -4.550872961,
+            -12.852539988
+          ],
+          "sourcePointMetres": [
+            8.115247195121952,
+            -4.663173780487805,
+            -12.890875731707316
+          ],
+          "sourceFace": 68732
+        }
+      }
+    },
+    {
+      "name": "propulsion organ 6, folds and tendon, span 1",
+      "faces": 8,
+      "ownerIndices": [
+        49,
+        51,
+        52,
+        53,
+        55
+      ],
+      "groupAlternatives": {
+        "4": 7.681816763924117,
+        "8": 3.643983200768572,
+        "12": 3.082738467251181,
+        "16": 2.6335228969868703,
+        "20": 2.482954089583263,
+        "24": 2.47779521445864
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 2.2808164292101796,
+          "nearestSourceOwnerIndex": 521,
+          "nearestSourceOwner": "appended luminous projection dot 449",
+          "candidatePointMetres": [
+            13.081275092,
+            1.425720122,
+            -14.216729425
+          ],
+          "sourcePointMetres": [
+            11.31632963414634,
+            0.04819414634146341,
+            -13.781398170731707
+          ],
+          "sourceFace": 155264
+        },
+        "nativeDesign": {
+          "distanceMetres": 2.2596578964457716,
+          "nearestSourceOwnerIndex": 521,
+          "nearestSourceOwner": "appended luminous projection dot 449",
+          "candidatePointMetres": [
+            13.081275092,
+            1.425720122,
+            -14.216729425
+          ],
+          "sourcePointMetres": [
+            11.314688658536584,
+            0.06814512195121951,
+            -13.839613658536585
+          ],
+          "sourceFace": 71389
+        }
+      }
+    },
+    {
+      "name": "propulsion organ 6, folds and tendon, span 2",
+      "faces": 8,
+      "ownerIndices": [
+        49,
+        51,
+        52,
+        53,
+        55
+      ],
+      "groupAlternatives": {
+        "4": 7.681816763924117,
+        "8": 3.643983200768572,
+        "12": 3.082738467251181,
+        "16": 2.6335228969868703,
+        "20": 2.482954089583263,
+        "24": 2.47779521445864
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 2.475764731197267,
+          "nearestSourceOwnerIndex": 49,
+          "nearestSourceOwner": "curved seed propulsion organ 6",
+          "candidatePointMetres": [
+            8.739561913,
+            1.421805414,
+            5.16220759
+          ],
+          "sourcePointMetres": [
+            8.064098227629014,
+            0.313494427900124,
+            3.0539365988616125
+          ],
+          "sourceFace": 65343
+        },
+        "nativeDesign": {
+          "distanceMetres": 2.4822484807155525,
+          "nearestSourceOwnerIndex": 49,
+          "nearestSourceOwner": "curved seed propulsion organ 6",
+          "candidatePointMetres": [
+            8.739561913,
+            1.421805414,
+            5.16220759
+          ],
+          "sourcePointMetres": [
+            8.006901119718112,
+            0.2740370327538615,
+            3.0867815072367906
+          ],
+          "sourceFace": 22582
+        }
+      }
+    },
+    {
+      "name": "propulsion stem 6",
+      "faces": 8,
+      "ownerIndices": [
+        50
+      ],
+      "groupAlternatives": {
+        "4": 5.38699128461393,
+        "8": 1.938093530751762,
+        "12": 1.4717989983474957
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 1.1126757656225863,
+          "nearestSourceOwnerIndex": 0,
+          "nearestSourceOwner": "central grown seed carapace",
+          "candidatePointMetres": [
+            1.12429388,
+            -0.622138049,
+            5.015215844
+          ],
+          "sourcePointMetres": [
+            1.4877094368010768,
+            -1.6543419893594649,
+            5.216540253809557
+          ],
+          "sourceFace": 1607
+        },
+        "nativeDesign": {
+          "distanceMetres": 1.1063976244852554,
+          "nearestSourceOwnerIndex": 0,
+          "nearestSourceOwner": "central grown seed carapace",
+          "candidatePointMetres": [
+            1.12429388,
+            -0.622138049,
+            5.015215844
+          ],
+          "sourcePointMetres": [
+            1.463251161419458,
+            -1.6550553605908451,
+            5.220898833708161
+          ],
+          "sourceFace": 591
+        }
+      }
+    },
+    {
+      "name": "forward gland 6",
+      "faces": 4,
+      "ownerIndices": [
+        54
+      ],
+      "groupAlternatives": {
+        "4": 0.7491497799988163,
+        "8": 0.5486802116765719,
+        "12": 0.29583511407165225
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 0.7178302139290671,
+          "nearestSourceOwnerIndex": 49,
+          "nearestSourceOwner": "curved seed propulsion organ 6",
+          "candidatePointMetres": [
+            6.667310104,
+            -0.889595098,
+            3.150700471
+          ],
+          "sourcePointMetres": [
+            7.170731707317072,
+            -0.4462159756097561,
+            2.8952364634146344
+          ],
+          "sourceFace": 65242
+        },
+        "nativeDesign": {
+          "distanceMetres": 0.7243345517817914,
+          "nearestSourceOwnerIndex": 49,
+          "nearestSourceOwner": "curved seed propulsion organ 6",
+          "candidatePointMetres": [
+            6.667310104,
+            -0.889595098,
+            3.150700471
+          ],
+          "sourcePointMetres": [
+            7.170731707317072,
+            -0.4277602913061438,
+            2.910001813869044
+          ],
+          "sourceFace": 22558
+        }
+      }
+    },
+    {
+      "name": "rear blob 6",
+      "faces": 4,
+      "ownerIndices": [
+        70
+      ],
+      "groupAlternatives": {
+        "4": 0.8099552869468793,
+        "8": 0.5829440848641527,
+        "12": 0.31093844013018646
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 0.6802987811457417,
+          "nearestSourceOwnerIndex": 49,
+          "nearestSourceOwner": "curved seed propulsion organ 6",
+          "candidatePointMetres": [
+            12.089777088,
+            0.479847402,
+            -12.844305274
+          ],
+          "sourcePointMetres": [
+            12.190243902439024,
+            0.061829268292682926,
+            -12.317073170731707
+          ],
+          "sourceFace": 67122
+        },
+        "nativeDesign": {
+          "distanceMetres": 0.6700273959341654,
+          "nearestSourceOwnerIndex": 519,
+          "nearestSourceOwner": "appended luminous projection dot 447",
+          "candidatePointMetres": [
+            12.089777088,
+            0.479847402,
+            -12.844305274
+          ],
+          "sourcePointMetres": [
+            11.563679756097562,
+            0.06916524390243901,
+            -12.903453170731707
+          ],
+          "sourceFace": 71229
+        }
+      }
+    },
+    {
+      "name": "propulsion organ 7, folds and tendon, span 1",
+      "faces": 8,
+      "ownerIndices": [
+        56,
+        58,
+        59,
+        60,
+        62
+      ],
+      "groupAlternatives": {
+        "4": 7.377688910740452,
+        "8": 3.475434663396709,
+        "12": 2.9072066642511403,
+        "16": 2.360407646603159,
+        "20": 2.0216588801813726,
+        "24": 2.0009739150712877
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 2.367518231536106,
+          "nearestSourceOwnerIndex": 56,
+          "nearestSourceOwner": "curved seed propulsion organ 7",
+          "candidatePointMetres": [
+            10.367205522,
+            7.33759006,
+            -1.724543375
+          ],
+          "sourcePointMetres": [
+            8.774896142054201,
+            5.731327009515913,
+            -2.424266482980598
+          ],
+          "sourceFace": 74883
+        },
+        "nativeDesign": {
+          "distanceMetres": 2.360407646603159,
+          "nearestSourceOwnerIndex": 56,
+          "nearestSourceOwner": "curved seed propulsion organ 7",
+          "candidatePointMetres": [
+            10.367205522,
+            7.33759006,
+            -1.724543375
+          ],
+          "sourcePointMetres": [
+            8.794609878048782,
+            5.693340853658537,
+            -2.352963414634146
+          ],
+          "sourceFace": 25852
+        }
+      }
+    },
+    {
+      "name": "propulsion organ 7, folds and tendon, span 2",
+      "faces": 8,
+      "ownerIndices": [
+        56,
+        58,
+        59,
+        60,
+        62
+      ],
+      "groupAlternatives": {
+        "4": 7.377688910740452,
+        "8": 3.475434663396709,
+        "12": 2.9072066642511403,
+        "16": 2.360407646603159,
+        "20": 2.0216588801813726,
+        "24": 2.0009739150712877
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 2.217627457898137,
+          "nearestSourceOwnerIndex": 56,
+          "nearestSourceOwner": "curved seed propulsion organ 7",
+          "candidatePointMetres": [
+            5.776046729,
+            5.013207991,
+            4.769152709
+          ],
+          "sourcePointMetres": [
+            5.718554132997732,
+            3.6940883164963476,
+            2.9874430166634367
+          ],
+          "sourceFace": 74099
+        },
+        "nativeDesign": {
+          "distanceMetres": 2.2290481993874405,
+          "nearestSourceOwnerIndex": 56,
+          "nearestSourceOwner": "curved seed propulsion organ 7",
+          "candidatePointMetres": [
+            5.776046729,
+            5.013207991,
+            4.769152709
+          ],
+          "sourcePointMetres": [
+            5.694280013117796,
+            3.6339421215210956,
+            3.019982694205317
+          ],
+          "sourceFace": 25594
+        }
+      }
+    },
+    {
+      "name": "propulsion stem 7",
+      "faces": 8,
+      "ownerIndices": [
+        57
+      ],
+      "groupAlternatives": {
+        "4": 5.007564197859585,
+        "8": 2.0032302418891277,
+        "12": 1.42191027682728
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 1.1415467309111487,
+          "nearestSourceOwnerIndex": 0,
+          "nearestSourceOwner": "central grown seed carapace",
+          "candidatePointMetres": [
+            1.068556231,
+            -0.654440733,
+            4.729816834
+          ],
+          "sourcePointMetres": [
+            1.352992185506761,
+            -1.7457657935403121,
+            4.906550359043899
+          ],
+          "sourceFace": 1752
+        },
+        "nativeDesign": {
+          "distanceMetres": 1.139408907135961,
+          "nearestSourceOwnerIndex": 0,
+          "nearestSourceOwner": "central grown seed carapace",
+          "candidatePointMetres": [
+            1.068556231,
+            -0.654440733,
+            4.729816834
+          ],
+          "sourcePointMetres": [
+            1.4201812433346361,
+            -1.7248853253849505,
+            4.899407172743837
+          ],
+          "sourceFace": 686
+        }
+      }
+    },
+    {
+      "name": "forward gland 7",
+      "faces": 4,
+      "ownerIndices": [
+        61
+      ],
+      "groupAlternatives": {
+        "4": 0.7491497074851831,
+        "8": 0.5486802968269202,
+        "12": 0.2958352053029866
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 0.717830147128946,
+          "nearestSourceOwnerIndex": 56,
+          "nearestSourceOwner": "curved seed propulsion organ 7",
+          "candidatePointMetres": [
+            5.082571374,
+            1.927063487,
+            3.150700424
+          ],
+          "sourcePointMetres": [
+            5.294818780487804,
+            2.563435487804878,
+            2.8952364634146344
+          ],
+          "sourceFace": 73996
+        },
+        "nativeDesign": {
+          "distanceMetres": 0.7243345148945072,
+          "nearestSourceOwnerIndex": 56,
+          "nearestSourceOwner": "curved seed propulsion organ 7",
+          "candidatePointMetres": [
+            5.082571374,
+            1.927063487,
+            3.150700424
+          ],
+          "sourcePointMetres": [
+            5.285539717930849,
+            2.579388916017512,
+            2.9100017005165784
+          ],
+          "sourceFace": 25570
+        }
+      }
+    },
+    {
+      "name": "rear blob 7",
+      "faces": 4,
+      "ownerIndices": [
+        71
+      ],
+      "groupAlternatives": {
+        "4": 0.8110401830138391,
+        "8": 0.5831626449051224,
+        "12": 0.31067699855984826
+      },
+      "reverseWitness": {
+        "design": {
+          "distanceMetres": 0.6857967817818489,
+          "nearestSourceOwnerIndex": 56,
+          "nearestSourceOwner": "curved seed propulsion organ 7",
+          "candidatePointMetres": [
+            8.777834973,
+            4.550872961,
+            -12.852539988
+          ],
+          "sourcePointMetres": [
+            8.650890243902438,
+            4.960113170731707,
+            -12.317073170731707
+          ],
+          "sourceFace": 75906
+        },
+        "nativeDesign": {
+          "distanceMetres": 0.6731297547253378,
+          "nearestSourceOwnerIndex": 553,
+          "nearestSourceOwner": "appended luminous projection dot 481",
+          "candidatePointMetres": [
+            8.777834973,
+            4.550872961,
+            -12.852539988
+          ],
+          "sourcePointMetres": [
+            8.115247195121952,
+            4.663173780487805,
+            -12.890875731707316
+          ],
+          "sourceFace": 73947
+        }
+      }
+    }
+  ],
+  "fit": {
+    "design": {
+      "forwardUnsignedSample": {
+        "metres": 1.3471637511222574,
+        "sourcePartIndex": 42,
+        "sourcePart": "curved seed propulsion organ 5",
+        "sourceVertex": 29094,
+        "sourceFaceCentroid": null,
+        "sourcePointMetres": [
+          9.816990243902438,
+          -5.709882073170731,
+          -9.025248048780488
+        ],
+        "closestPointMetres": [
+          10.499190884750146,
+          -4.548224031729147,
+          -9.02350084562366
+        ],
+        "targetFace": 202
+      },
+      "reverseSample": {
+        "support": "propulsion organ 5, folds and tendon",
+        "distanceMetres": 2.894792979275184,
+        "nearestSourceOwnerIndex": 42,
+        "nearestSourceOwner": "curved seed propulsion organ 5",
+        "candidatePointMetres": [
+          12.487996433,
+          -5.713147103,
+          -11.039388993
+        ],
+        "sourcePointMetres": [
+          9.69981333774221,
+          -5.347415435685994,
+          -10.352292371189568
+        ],
+        "sourceFace": 58154
+      },
+      "originalToCandidateUpperMillimetres": 1461,
+      "candidateToOriginalUpperMillimetres": 3059
+    },
+    "nativeDesign": {
+      "forwardUnsignedSample": {
+        "metres": 1.3468174253826206,
+        "sourcePartIndex": 42,
+        "sourcePart": "curved seed propulsion organ 5",
+        "sourceVertex": 10088,
+        "sourceFaceCentroid": null,
+        "sourcePointMetres": [
+          9.832786951219513,
+          -5.71907,
+          -8.817337073170732
+        ],
+        "closestPointMetres": [
+          10.514812213505165,
+          -4.55771059491949,
+          -8.81559031918085
+        ],
+        "targetFace": 202
+      },
+      "reverseSample": {
+        "support": "propulsion organ 5, folds and tendon",
+        "distanceMetres": 2.901509630168224,
+        "nearestSourceOwnerIndex": 42,
+        "nearestSourceOwner": "curved seed propulsion organ 5",
+        "candidatePointMetres": [
+          12.487996433,
+          -5.713147103,
+          -11.039388993
+        ],
+        "sourcePointMetres": [
+          9.695101360830112,
+          -5.314990938973385,
+          -10.36118038286908
+        ],
+        "sourceFace": 20053
+      },
+      "originalToCandidateUpperMillimetres": 1470,
+      "candidateToOriginalUpperMillimetres": 3081
+    }
+  },
+  "candidate": {
+    "verticesMetres": [
+      [
+        -4.726570209,
+        -1.994799684,
+        -3.517962367
+      ],
+      [
+        0.004516347,
+        -2.730138977,
+        -10.87090757
+      ],
+      [
+        4.688873159,
+        -1.989833177,
+        -3.521914259
+      ],
+      [
+        -4.729224515,
+        2.665033449,
+        -3.985681908
+      ],
+      [
+        0.00186204,
+        1.929694156,
+        -11.33862711
+      ],
+      [
+        4.686218853,
+        2.669999956,
+        -3.9896338
+      ],
+      [
+        3.677431521,
+        -2.274688572,
+        -4.461729352
+      ],
+      [
+        3.675610932,
+        3.181833151,
+        -4.51496621
+      ],
+      [
+        -4.050681971,
+        -2.277059613,
+        -4.4404644
+      ],
+      [
+        -4.05250256,
+        3.17946211,
+        -4.493701258
+      ],
+      [
+        3.707809705,
+        -2.1668483,
+        6.590340768
+      ],
+      [
+        3.705989116,
+        3.289673423,
+        6.537103911
+      ],
+      [
+        -4.020303788,
+        -2.169219341,
+        6.611605721
+      ],
+      [
+        -4.022124376,
+        3.287302382,
+        6.558368863
+      ],
+      [
+        -4.457799182,
+        2.681937529,
+        5.946795624
+      ],
+      [
+        4.430100418,
+        2.687025265,
+        5.953009024
+      ],
+      [
+        -3.8237e-05,
+        2.18920078,
+        12.646708551
+      ],
+      [
+        -4.455045027,
+        -1.730798701,
+        5.620433969
+      ],
+      [
+        4.432854573,
+        -1.725710965,
+        5.626647369
+      ],
+      [
+        0.002715918,
+        -2.22353545,
+        12.320346897
+      ],
+      [
+        -1.162050515,
+        0.820812358,
+        8.321778807
+      ],
+      [
+        -4.020384349,
+        1.203435787,
+        3.858575516
+      ],
+      [
+        -1.315963507,
+        0.542848589,
+        -3.145115869
+      ],
+      [
+        -1.031181451,
+        1.566976069,
+        8.301934818
+      ],
+      [
+        -3.889515285,
+        1.949599498,
+        3.838731528
+      ],
+      [
+        -1.185094443,
+        1.2890123,
+        -3.164959858
+      ],
+      [
+        1.162050515,
+        0.820812358,
+        8.321778807
+      ],
+      [
+        4.020384349,
+        1.203435787,
+        3.858575516
+      ],
+      [
+        1.315963507,
+        0.542848589,
+        -3.145115869
+      ],
+      [
+        1.031181451,
+        1.566976069,
+        8.301934818
+      ],
+      [
+        3.889515285,
+        1.949599498,
+        3.838731528
+      ],
+      [
+        1.185094443,
+        1.2890123,
+        -3.164959858
+      ],
+      [
+        2.545227914,
+        4.47417454,
+        3.245920132
+      ],
+      [
+        2.542819212,
+        8.260845283,
+        -12.05950566
+      ],
+      [
+        0.00014364,
+        2.01195535,
+        2.6371502
+      ],
+      [
+        -0.002265061,
+        5.798626094,
+        -12.668275592
+      ],
+      [
+        0.002929765,
+        6.950459483,
+        3.858970661
+      ],
+      [
+        0.000521064,
+        10.737130227,
+        -11.446455131
+      ],
+      [
+        -2.542154508,
+        4.488240294,
+        3.250200729
+      ],
+      [
+        -2.54456321,
+        8.274911037,
+        -12.055225063
+      ],
+      [
+        2.647717284,
+        6.659466361,
+        -1.527649417
+      ],
+      [
+        -1.676739324,
+        8.438385475,
+        -3.279530816
+      ],
+      [
+        -0.177179618,
+        0.059081877,
+        4.972416107
+      ],
+      [
+        2.647717284,
+        5.343221712,
+        -2.864208367
+      ],
+      [
+        -1.676739324,
+        7.122140827,
+        -4.616089766
+      ],
+      [
+        -0.177179618,
+        -1.257162771,
+        3.635857157
+      ],
+      [
+        0.889595098,
+        4.527811847,
+        3.150700471
+      ],
+      [
+        0.889595098,
+        3.667310104,
+        1.72734831
+      ],
+      [
+        -0.889595098,
+        3.667310104,
+        3.150700471
+      ],
+      [
+        -0.889595098,
+        4.527811847,
+        1.72734831
+      ],
+      [
+        -0.49901826,
+        6.096811217,
+        -12.781727183
+      ],
+      [
+        0.478592888,
+        7.002368395,
+        -12.861481006
+      ],
+      [
+        -0.49901826,
+        7.236771448,
+        -10.199973868
+      ],
+      [
+        0.478592888,
+        6.33121427,
+        -10.120220045
+      ],
+      [
+        -3.930246601,
+        4.000045334,
+        -0.565979194
+      ],
+      [
+        -10.329835353,
+        7.352380551,
+        -1.716263662
+      ],
+      [
+        -8.50878039,
+        6.535335729,
+        -14.228830244
+      ],
+      [
+        -5.179852779,
+        1.605795666,
+        -0.591504911
+      ],
+      [
+        -11.579441531,
+        4.958130883,
+        -1.741789379
+      ],
+      [
+        -9.758386568,
+        4.141086061,
+        -14.254355961
+      ],
+      [
+        -1.330248586,
+        2.194936816,
+        -0.33764153
+      ],
+      [
+        -5.938170296,
+        5.084909104,
+        4.953938673
+      ],
+      [
+        -9.313134336,
+        6.988128007,
+        -4.246372191
+      ],
+      [
+        -2.7067815,
+        -0.06750853,
+        -0.300705785
+      ],
+      [
+        -7.314703209,
+        2.822463757,
+        4.990874418
+      ],
+      [
+        -10.68966725,
+        4.725682661,
+        -4.209436446
+      ],
+      [
+        -0.795753453,
+        0.623542085,
+        4.862030172
+      ],
+      [
+        -1.752717962,
+        2.49913468,
+        -1.183183563
+      ],
+      [
+        -10.002784035,
+        6.265144206,
+        -3.690569382
+      ],
+      [
+        -1.241658657,
+        -0.548372332,
+        4.569018439
+      ],
+      [
+        -2.198623166,
+        1.327220263,
+        -1.476195295
+      ],
+      [
+        -10.448689239,
+        5.093229789,
+        -3.983581114
+      ],
+      [
+        -5.082571374,
+        1.927063487,
+        3.150700424
+      ],
+      [
+        -5.826404547,
+        2.359701148,
+        1.727348378
+      ],
+      [
+        -4.931874483,
+        3.897665119,
+        3.150700424
+      ],
+      [
+        -4.18804131,
+        3.465027457,
+        1.727348378
+      ],
+      [
+        -8.008953265,
+        4.081388223,
+        -12.73970387
+      ],
+      [
+        -9.074766789,
+        4.701300189,
+        -10.200449605
+      ],
+      [
+        -7.803136675,
+        5.092913449,
+        -10.087935777
+      ],
+      [
+        -8.297298838,
+        5.380334305,
+        -12.852217698
+      ],
+      [
+        -8.210173306,
+        1.435524989,
+        0.414353547
+      ],
+      [
+        -15.030848302,
+        1.154988714,
+        -3.040646225
+      ],
+      [
+        -12.685015537,
+        1.381569518,
+        -14.162498896
+      ],
+      [
+        -8.084712413,
+        -1.263511405,
+        0.385829562
+      ],
+      [
+        -14.905387409,
+        -1.544047679,
+        -3.06917021
+      ],
+      [
+        -12.559554644,
+        -1.317466875,
+        -14.191022881
+      ],
+      [
+        -2.703245389,
+        1.216918585,
+        -0.653617183
+      ],
+      [
+        -8.509545759,
+        1.40665042,
+        4.953783141
+      ],
+      [
+        -13.948357649,
+        1.359635873,
+        -3.879318703
+      ],
+      [
+        -2.74896656,
+        -1.430776685,
+        -0.611372788
+      ],
+      [
+        -8.55526693,
+        -1.241044851,
+        4.996027536
+      ],
+      [
+        -13.994078819,
+        -1.288059397,
+        -3.837074308
+      ],
+      [
+        -3.658605341,
+        0.622138049,
+        -1.893386561
+      ],
+      [
+        -1.12429388,
+        0.622138049,
+        5.015215844
+      ],
+      [
+        -13.968002136,
+        0.622138049,
+        -3.624638348
+      ],
+      [
+        -3.658605341,
+        -0.622138049,
+        -1.893386561
+      ],
+      [
+        -1.12429388,
+        -0.622138049,
+        5.015215844
+      ],
+      [
+        -13.968002136,
+        -0.622138049,
+        -3.624638348
+      ],
+      [
+        -7.527811847,
+        0.889595098,
+        1.72734831
+      ],
+      [
+        -6.667310104,
+        0.889595098,
+        3.150700471
+      ],
+      [
+        -6.667310104,
+        -0.889595098,
+        1.72734831
+      ],
+      [
+        -7.527811847,
+        -0.889595098,
+        3.150700471
+      ],
+      [
+        -11.596272028,
+        -0.47963246,
+        -10.064561638
+      ],
+      [
+        -12.495345433,
+        0.498424199,
+        -10.202012284
+      ],
+      [
+        -12.091432987,
+        -0.47963246,
+        -12.844029248
+      ],
+      [
+        -11.192359582,
+        0.498424199,
+        -12.706578603
+      ],
+      [
+        -10.063726303,
+        -7.590955872,
+        -1.737635883
+      ],
+      [
+        -3.952620025,
+        -3.734396354,
+        -0.587500246
+      ],
+      [
+        -8.432417803,
+        -6.443348705,
+        -14.253477049
+      ],
+      [
+        -11.506444863,
+        -5.311087067,
+        -1.716632522
+      ],
+      [
+        -5.395338586,
+        -1.454527549,
+        -0.566496885
+      ],
+      [
+        -9.875136363,
+        -4.163479901,
+        -14.232473688
+      ],
+      [
+        -6.074533014,
+        -4.95778348,
+        4.992168573
+      ],
+      [
+        -1.277911604,
+        -2.393139425,
+        -0.299211477
+      ],
+      [
+        -9.395220902,
+        -6.954494579,
+        -4.207814435
+      ],
+      [
+        -7.357518154,
+        -2.640455921,
+        4.952316277
+      ],
+      [
+        -2.560896744,
+        -0.075811866,
+        -0.339063773
+      ],
+      [
+        -10.678206042,
+        -4.63716702,
+        -4.24766673
+      ],
+      [
+        -0.795753453,
+        -0.623542085,
+        4.862030172
+      ],
+      [
+        -1.752717962,
+        -2.49913468,
+        -1.183183563
+      ],
+      [
+        -10.002784035,
+        -6.265144206,
+        -3.690569382
+      ],
+      [
+        -1.241658657,
+        0.548372332,
+        4.569018439
+      ],
+      [
+        -2.198623166,
+        -1.327220263,
+        -1.476195295
+      ],
+      [
+        -10.448689239,
+        -5.093229789,
+        -3.983581114
+      ],
+      [
+        -5.082571374,
+        -1.927063487,
+        3.150700424
+      ],
+      [
+        -5.826404547,
+        -2.359701148,
+        1.727348378
+      ],
+      [
+        -4.931874483,
+        -3.897665119,
+        3.150700424
+      ],
+      [
+        -4.18804131,
+        -3.465027457,
+        1.727348378
+      ],
+      [
+        -9.074766789,
+        -4.701300189,
+        -10.200449605
+      ],
+      [
+        -7.803136675,
+        -5.092913449,
+        -10.087935777
+      ],
+      [
+        -8.008953265,
+        -4.081388223,
+        -12.73970387
+      ],
+      [
+        -8.297298838,
+        -5.380334305,
+        -12.852217698
+      ],
+      [
+        1.373229767,
+        -2.04621283,
+        2.645109755
+      ],
+      [
+        -1.376928025,
+        -2.02599935,
+        2.640578313
+      ],
+      [
+        1.339070845,
+        -6.449379761,
+        3.735071141
+      ],
+      [
+        -1.411086947,
+        -6.42916628,
+        3.730539699
+      ],
+      [
+        1.370602031,
+        -5.834761713,
+        -12.659747035
+      ],
+      [
+        -1.37955576,
+        -5.814548233,
+        -12.664278477
+      ],
+      [
+        1.336443109,
+        -10.237928644,
+        -11.569785649
+      ],
+      [
+        -1.413714682,
+        -10.217715163,
+        -11.574317091
+      ],
+      [
+        2.647717284,
+        -6.659466361,
+        -1.527649417
+      ],
+      [
+        -1.676739324,
+        -8.438385475,
+        -3.279530816
+      ],
+      [
+        -0.177179618,
+        -0.059081877,
+        4.972416107
+      ],
+      [
+        2.647717284,
+        -5.343221712,
+        -2.864208367
+      ],
+      [
+        -1.676739324,
+        -7.122140827,
+        -4.616089766
+      ],
+      [
+        -0.177179618,
+        1.257162771,
+        3.635857157
+      ],
+      [
+        -0.889595098,
+        -4.527811847,
+        3.150700471
+      ],
+      [
+        -0.889595098,
+        -3.667310104,
+        1.72734831
+      ],
+      [
+        0.889595098,
+        -3.667310104,
+        3.150700471
+      ],
+      [
+        0.889595098,
+        -4.527811847,
+        1.72734831
+      ],
+      [
+        0.478806791,
+        -7.000734741,
+        -12.86186358
+      ],
+      [
+        -0.499203218,
+        -6.094722929,
+        -12.782095539
+      ],
+      [
+        0.478806791,
+        -6.329146154,
+        -10.119497706
+      ],
+      [
+        -0.499203218,
+        -7.235157966,
+        -10.199265746
+      ],
+      [
+        1.946164934,
+        -2.667115838,
+        2.154220129
+      ],
+      [
+        3.310733578,
+        -0.34351477,
+        2.157714964
+      ],
+      [
+        6.462182205,
+        -5.322032781,
+        4.029067567
+      ],
+      [
+        7.826750849,
+        -2.998431713,
+        4.032562402
+      ],
+      [
+        6.607410519,
+        -5.381831229,
+        -12.917731265
+      ],
+      [
+        7.971979163,
+        -3.058230161,
+        -12.91423643
+      ],
+      [
+        11.12342779,
+        -8.036748172,
+        -11.042883828
+      ],
+      [
+        12.487996433,
+        -5.713147103,
+        -11.039388993
+      ],
+      [
+        2.115931701,
+        -2.66493534,
+        -1.293572615
+      ],
+      [
+        0.622651027,
+        -0.517473684,
+        5.022828566
+      ],
+      [
+        10.002784035,
+        -6.265144206,
+        -3.690569382
+      ],
+      [
+        2.561836905,
+        -1.493020923,
+        -1.586584348
+      ],
+      [
+        1.068556231,
+        0.654440733,
+        4.729816834
+      ],
+      [
+        10.448689239,
+        -5.093229789,
+        -3.983581114
+      ],
+      [
+        5.082571374,
+        -1.927063487,
+        3.150700424
+      ],
+      [
+        5.826404547,
+        -2.359701148,
+        1.727348378
+      ],
+      [
+        4.931874483,
+        -3.897665119,
+        3.150700424
+      ],
+      [
+        4.18804131,
+        -3.465027457,
+        1.727348378
+      ],
+      [
+        8.571870793,
+        -5.562773779,
+        -10.199683599
+      ],
+      [
+        7.505612129,
+        -4.942603103,
+        -12.739994995
+      ],
+      [
+        8.283333264,
+        -4.263254809,
+        -10.087138561
+      ],
+      [
+        8.777834973,
+        -4.550872961,
+        -12.852539988
+      ],
+      [
+        14.564413299,
+        1.149030914,
+        -1.662671961
+      ],
+      [
+        6.939272757,
+        1.579725019,
+        -0.752344307
+      ],
+      [
+        13.081275092,
+        1.425720122,
+        -14.216729425
+      ],
+      [
+        14.407015088,
+        -1.551114705,
+        -1.703587646
+      ],
+      [
+        6.781874545,
+        -1.1204206,
+        -0.793259991
+      ],
+      [
+        12.923876881,
+        -1.274425497,
+        -14.257645109
+      ],
+      [
+        8.775068274,
+        -1.234528741,
+        5.210676467
+      ],
+      [
+        2.655060107,
+        -1.424027296,
+        -0.691508327
+      ],
+      [
+        13.454366082,
+        -1.336329554,
+        -3.796377887
+      ],
+      [
+        8.739561913,
+        1.421805414,
+        5.16220759
+      ],
+      [
+        2.619553747,
+        1.232306859,
+        -0.739977205
+      ],
+      [
+        13.418859721,
+        1.320004601,
+        -3.844846764
+      ],
+      [
+        3.658605341,
+        0.622138049,
+        -1.893386561
+      ],
+      [
+        1.12429388,
+        0.622138049,
+        5.015215844
+      ],
+      [
+        13.968002136,
+        0.622138049,
+        -3.624638348
+      ],
+      [
+        3.658605341,
+        -0.622138049,
+        -1.893386561
+      ],
+      [
+        1.12429388,
+        -0.622138049,
+        5.015215844
+      ],
+      [
+        13.968002136,
+        -0.622138049,
+        -3.624638348
+      ],
+      [
+        7.527811847,
+        -0.889595098,
+        1.72734831
+      ],
+      [
+        6.667310104,
+        -0.889595098,
+        3.150700471
+      ],
+      [
+        6.667310104,
+        0.889595098,
+        1.72734831
+      ],
+      [
+        7.527811847,
+        0.889595098,
+        3.150700471
+      ],
+      [
+        11.190253068,
+        -0.498605917,
+        -12.706810875
+      ],
+      [
+        12.089777088,
+        0.479847402,
+        -12.844305274
+      ],
+      [
+        12.493780703,
+        -0.498605917,
+        -10.201208822
+      ],
+      [
+        11.594256683,
+        0.479847402,
+        -10.063714424
+      ],
+      [
+        10.367205522,
+        7.33759006,
+        -1.724543375
+      ],
+      [
+        3.930821976,
+        4.09896016,
+        -0.564908469
+      ],
+      [
+        8.468046819,
+        6.578143023,
+        -14.125775191
+      ],
+      [
+        11.577788044,
+        4.918370144,
+        -1.761783138
+      ],
+      [
+        5.141404497,
+        1.679740244,
+        -0.602148232
+      ],
+      [
+        9.678629341,
+        4.158923108,
+        -14.163014954
+      ],
+      [
+        1.245577024,
+        2.16142838,
+        -0.43695372
+      ],
+      [
+        5.776046729,
+        5.013207991,
+        4.769152709
+      ],
+      [
+        9.252305985,
+        6.901640176,
+        -4.329964903
+      ],
+      [
+        2.617142406,
+        -0.112539539,
+        -0.384895634
+      ],
+      [
+        7.147612111,
+        2.739240072,
+        4.821210795
+      ],
+      [
+        10.623871367,
+        4.627672257,
+        -4.277906817
+      ],
+      [
+        2.115931701,
+        2.66493534,
+        -1.293572615
+      ],
+      [
+        0.622651027,
+        0.517473684,
+        5.022828566
+      ],
+      [
+        10.002784035,
+        6.265144206,
+        -3.690569382
+      ],
+      [
+        2.561836905,
+        1.493020923,
+        -1.586584348
+      ],
+      [
+        1.068556231,
+        -0.654440733,
+        4.729816834
+      ],
+      [
+        10.448689239,
+        5.093229789,
+        -3.983581114
+      ],
+      [
+        5.082571374,
+        1.927063487,
+        3.150700424
+      ],
+      [
+        5.826404547,
+        2.359701148,
+        1.727348378
+      ],
+      [
+        4.931874483,
+        3.897665119,
+        3.150700424
+      ],
+      [
+        4.18804131,
+        3.465027457,
+        1.727348378
+      ],
+      [
+        8.571870793,
+        5.562773779,
+        -10.199683599
+      ],
+      [
+        7.505612129,
+        4.942603103,
+        -12.739994995
+      ],
+      [
+        8.283333264,
+        4.263254809,
+        -10.087138561
+      ],
+      [
+        8.777834973,
+        4.550872961,
+        -12.852539988
+      ],
+      [
+        10.627587972,
+        0.0,
+        -3.720012195
+      ],
+      [
+        13.805611168,
+        0.0,
+        -3.720012195
+      ],
+      [
+        13.805611168,
+        0.0,
+        -2.133646341
+      ],
+      [
+        10.627587972,
+        0.0,
+        -2.133646341
+      ],
+      [
+        9.203761164,
+        3.07811237,
+        -3.720012195
+      ],
+      [
+        11.956009987,
+        3.998576405,
+        -3.720012195
+      ],
+      [
+        11.956009987,
+        3.998576405,
+        -2.133646341
+      ],
+      [
+        9.203761164,
+        3.07811237,
+        -2.133646341
+      ],
+      [
+        5.313793986,
+        5.331447016,
+        -3.720012195
+      ],
+      [
+        6.902805584,
+        6.925737492,
+        -3.720012195
+      ],
+      [
+        6.902805584,
+        6.925737492,
+        -2.133646341
+      ],
+      [
+        5.313793986,
+        5.331447016,
+        -2.133646341
+      ],
+      [
+        0.0,
+        6.15622474,
+        -3.720012195
+      ],
+      [
+        0.0,
+        7.997152811,
+        -3.720012195
+      ],
+      [
+        0.0,
+        7.997152811,
+        -2.133646341
+      ],
+      [
+        0.0,
+        6.15622474,
+        -2.133646341
+      ],
+      [
+        -5.313793986,
+        5.331447016,
+        -3.720012195
+      ],
+      [
+        -6.902805584,
+        6.925737492,
+        -3.720012195
+      ],
+      [
+        -6.902805584,
+        6.925737492,
+        -2.133646341
+      ],
+      [
+        -5.313793986,
+        5.331447016,
+        -2.133646341
+      ],
+      [
+        -9.203761164,
+        3.07811237,
+        -3.720012195
+      ],
+      [
+        -11.956009987,
+        3.998576405,
+        -3.720012195
+      ],
+      [
+        -11.956009987,
+        3.998576405,
+        -2.133646341
+      ],
+      [
+        -9.203761164,
+        3.07811237,
+        -2.133646341
+      ],
+      [
+        -10.627587972,
+        0.0,
+        -3.720012195
+      ],
+      [
+        -13.805611168,
+        0.0,
+        -3.720012195
+      ],
+      [
+        -13.805611168,
+        0.0,
+        -2.133646341
+      ],
+      [
+        -10.627587972,
+        0.0,
+        -2.133646341
+      ],
+      [
+        -9.203761164,
+        -3.07811237,
+        -3.720012195
+      ],
+      [
+        -11.956009987,
+        -3.998576405,
+        -3.720012195
+      ],
+      [
+        -11.956009987,
+        -3.998576405,
+        -2.133646341
+      ],
+      [
+        -9.203761164,
+        -3.07811237,
+        -2.133646341
+      ],
+      [
+        -5.313793986,
+        -5.331447016,
+        -3.720012195
+      ],
+      [
+        -6.902805584,
+        -6.925737492,
+        -3.720012195
+      ],
+      [
+        -6.902805584,
+        -6.925737492,
+        -2.133646341
+      ],
+      [
+        -5.313793986,
+        -5.331447016,
+        -2.133646341
+      ],
+      [
+        -0.0,
+        -6.15622474,
+        -3.720012195
+      ],
+      [
+        -0.0,
+        -7.997152811,
+        -3.720012195
+      ],
+      [
+        -0.0,
+        -7.997152811,
+        -2.133646341
+      ],
+      [
+        -0.0,
+        -6.15622474,
+        -2.133646341
+      ],
+      [
+        5.313793986,
+        -5.331447016,
+        -3.720012195
+      ],
+      [
+        6.902805584,
+        -6.925737492,
+        -3.720012195
+      ],
+      [
+        6.902805584,
+        -6.925737492,
+        -2.133646341
+      ],
+      [
+        5.313793986,
+        -5.331447016,
+        -2.133646341
+      ],
+      [
+        9.203761164,
+        -3.07811237,
+        -3.720012195
+      ],
+      [
+        11.956009987,
+        -3.998576405,
+        -3.720012195
+      ],
+      [
+        11.956009987,
+        -3.998576405,
+        -2.133646341
+      ],
+      [
+        9.203761164,
+        -3.07811237,
+        -2.133646341
+      ],
+      [
+        -0.517849696,
+        3.355242913,
+        10.967312099
+      ],
+      [
+        0.121431114,
+        -0.301812239,
+        17.998989471
+      ],
+      [
+        0.153563916,
+        4.090635785,
+        1.460087252
+      ],
+      [
+        -0.727621586,
+        3.278705237,
+        10.946577451
+      ],
+      [
+        -0.088340776,
+        -0.378349914,
+        17.978254823
+      ],
+      [
+        -0.056207973,
+        4.01409811,
+        1.439352604
+      ],
+      [
+        -5.065187907,
+        2.865510884,
+        1.46805591
+      ],
+      [
+        -3.790622853,
+        1.573143523,
+        11.342994923
+      ],
+      [
+        0.423288729,
+        -0.408928279,
+        18.210454714
+      ],
+      [
+        -4.985990474,
+        3.108777262,
+        1.489670954
+      ],
+      [
+        -3.71142542,
+        1.816409901,
+        11.364609968
+      ],
+      [
+        0.502486162,
+        -0.165661901,
+        18.232069758
+      ],
+      [
+        -7.221217901,
+        -0.074768902,
+        1.441022764
+      ],
+      [
+        -4.4733944,
+        -0.504555738,
+        12.166592492
+      ],
+      [
+        0.564057376,
+        -0.159168068,
+        17.9757393
+      ],
+      [
+        -7.264620476,
+        0.191665653,
+        1.462818593
+      ],
+      [
+        -4.516796975,
+        -0.238121183,
+        12.188388321
+      ],
+      [
+        0.5206548,
+        0.107266487,
+        17.997535128
+      ],
+      [
+        -4.999715618,
+        -2.990166056,
+        1.444480472
+      ],
+      [
+        -3.076423787,
+        -2.475900474,
+        12.275394273
+      ],
+      [
+        0.403318849,
+        0.072554221,
+        17.714683888
+      ],
+      [
+        -5.174735825,
+        -2.798052279,
+        1.466437754
+      ],
+      [
+        -3.251443994,
+        -2.283786696,
+        12.297351555
+      ],
+      [
+        0.228298642,
+        0.264667999,
+        17.736641171
+      ],
+      [
+        0.517849696,
+        -3.355242913,
+        10.967312099
+      ],
+      [
+        -0.121431114,
+        0.301812239,
+        17.998989471
+      ],
+      [
+        -0.153563916,
+        -4.090635785,
+        1.460087252
+      ],
+      [
+        0.727621586,
+        -3.278705237,
+        10.946577451
+      ],
+      [
+        0.088340776,
+        0.378349914,
+        17.978254823
+      ],
+      [
+        0.056207973,
+        -4.01409811,
+        1.439352604
+      ],
+      [
+        5.065187907,
+        -2.865510884,
+        1.46805591
+      ],
+      [
+        3.790622853,
+        -1.573143523,
+        11.342994923
+      ],
+      [
+        -0.423288729,
+        0.408928279,
+        18.210454714
+      ],
+      [
+        4.985990474,
+        -3.108777262,
+        1.489670954
+      ],
+      [
+        3.71142542,
+        -1.816409901,
+        11.364609968
+      ],
+      [
+        -0.502486162,
+        0.165661901,
+        18.232069758
+      ],
+      [
+        7.221217901,
+        0.074768902,
+        1.441022764
+      ],
+      [
+        4.4733944,
+        0.504555738,
+        12.166592492
+      ],
+      [
+        -0.564057376,
+        0.159168068,
+        17.9757393
+      ],
+      [
+        7.264620476,
+        -0.191665653,
+        1.462818593
+      ],
+      [
+        4.516796975,
+        0.238121183,
+        12.188388321
+      ],
+      [
+        -0.5206548,
+        -0.107266487,
+        17.997535128
+      ],
+      [
+        4.999715618,
+        2.990166056,
+        1.444480472
+      ],
+      [
+        3.076423787,
+        2.475900474,
+        12.275394273
+      ],
+      [
+        -0.403318849,
+        -0.072554221,
+        17.714683888
+      ],
+      [
+        5.174735825,
+        2.798052279,
+        1.466437754
+      ],
+      [
+        3.251443994,
+        2.283786696,
+        12.297351555
+      ],
+      [
+        -0.228298642,
+        -0.264667999,
+        17.736641171
+      ],
+      [
+        -0.1005,
+        5.239296464,
+        -19.175676736
+      ],
+      [
+        -0.1005,
+        7.076793628,
+        -10.349138627
+      ],
+      [
+        -0.1005,
+        -0.520282663,
+        -21.310847487
+      ],
+      [
+        0.1005,
+        5.239296464,
+        -19.175676736
+      ],
+      [
+        0.1005,
+        7.076793628,
+        -10.349138627
+      ],
+      [
+        0.1005,
+        -0.520282663,
+        -21.310847487
+      ],
+      [
+        -8.705964354,
+        4.947410546,
+        -10.584670309
+      ],
+      [
+        -6.890249265,
+        3.89133137,
+        -18.693493024
+      ],
+      [
+        0.894808742,
+        -0.636712568,
+        -21.691344942
+      ],
+      [
+        -8.604907328,
+        5.121157715,
+        -10.584670309
+      ],
+      [
+        -6.789192238,
+        4.065078539,
+        -18.693493024
+      ],
+      [
+        0.995865768,
+        -0.462965399,
+        -21.691344942
+      ],
+      [
+        -12.588011508,
+        -0.1005,
+        -10.490657695
+      ],
+      [
+        -9.502596213,
+        -0.1005,
+        -18.8371631
+      ],
+      [
+        1.24113871,
+        -0.1005,
+        -21.604848266
+      ],
+      [
+        -12.588011508,
+        0.1005,
+        -10.490657695
+      ],
+      [
+        -9.502596213,
+        0.1005,
+        -18.8371631
+      ],
+      [
+        1.24113871,
+        0.1005,
+        -21.604848266
+      ],
+      [
+        -8.705964354,
+        -4.947410546,
+        -10.584670309
+      ],
+      [
+        -6.890249265,
+        -3.89133137,
+        -18.693493024
+      ],
+      [
+        0.894808742,
+        0.636712568,
+        -21.691344942
+      ],
+      [
+        -8.604907328,
+        -5.121157715,
+        -10.584670309
+      ],
+      [
+        -6.789192238,
+        -4.065078539,
+        -18.693493024
+      ],
+      [
+        0.995865768,
+        0.462965399,
+        -21.691344942
+      ],
+      [
+        -0.1005,
+        -5.238145694,
+        -19.175362077
+      ],
+      [
+        -0.1005,
+        -7.075106763,
+        -10.34808741
+      ],
+      [
+        -0.1005,
+        0.520266498,
+        -21.311036079
+      ],
+      [
+        0.1005,
+        -5.238145694,
+        -19.175362077
+      ],
+      [
+        0.1005,
+        -7.075106763,
+        -10.34808741
+      ],
+      [
+        0.1005,
+        0.520266498,
+        -21.311036079
+      ],
+      [
+        6.727597702,
+        -3.796727965,
+        -18.755474501
+      ],
+      [
+        8.843796237,
+        -5.027578123,
+        -10.425219178
+      ],
+      [
+        -0.895098068,
+        0.636880807,
+        -21.691679629
+      ],
+      [
+        6.626540728,
+        -3.970475042,
+        -18.755474501
+      ],
+      [
+        8.742739264,
+        -5.2013252,
+        -10.425219177
+      ],
+      [
+        -0.996155041,
+        0.46313373,
+        -21.691679628
+      ],
+      [
+        9.50149735,
+        0.1005,
+        -18.836933461
+      ],
+      [
+        12.586274776,
+        0.1005,
+        -10.489942699
+      ],
+      [
+        -1.241062744,
+        0.1005,
+        -21.604986335
+      ],
+      [
+        9.50149735,
+        -0.1005,
+        -18.836933461
+      ],
+      [
+        12.586274776,
+        -0.1005,
+        -10.489942699
+      ],
+      [
+        -1.241062744,
+        -0.1005,
+        -21.604986335
+      ],
+      [
+        6.727597702,
+        3.796727965,
+        -18.755474501
+      ],
+      [
+        8.843796237,
+        5.027578123,
+        -10.425219178
+      ],
+      [
+        -0.895098068,
+        -0.636880807,
+        -21.691679629
+      ],
+      [
+        6.626540728,
+        3.970475042,
+        -18.755474501
+      ],
+      [
+        8.742739264,
+        5.2013252,
+        -10.425219177
+      ],
+      [
+        -0.996155041,
+        -0.46313373,
+        -21.691679628
+      ]
+    ],
+    "faces": [
+      [
+        0,
+        1,
+        2
+      ],
+      [
+        0,
+        2,
+        5
+      ],
+      [
+        0,
+        3,
+        4
+      ],
+      [
+        0,
+        4,
+        1
+      ],
+      [
+        0,
+        5,
+        3
+      ],
+      [
+        1,
+        4,
+        5
+      ],
+      [
+        1,
+        5,
+        2
+      ],
+      [
+        3,
+        5,
+        4
+      ],
+      [
+        6,
+        7,
+        11
+      ],
+      [
+        6,
+        8,
+        9
+      ],
+      [
+        6,
+        9,
+        7
+      ],
+      [
+        6,
+        10,
+        12
+      ],
+      [
+        6,
+        11,
+        10
+      ],
+      [
+        6,
+        12,
+        8
+      ],
+      [
+        7,
+        9,
+        13
+      ],
+      [
+        7,
+        13,
+        11
+      ],
+      [
+        8,
+        12,
+        13
+      ],
+      [
+        8,
+        13,
+        9
+      ],
+      [
+        10,
+        11,
+        13
+      ],
+      [
+        10,
+        13,
+        12
+      ],
+      [
+        14,
+        15,
+        17
+      ],
+      [
+        14,
+        16,
+        15
+      ],
+      [
+        14,
+        17,
+        19
+      ],
+      [
+        14,
+        19,
+        16
+      ],
+      [
+        15,
+        16,
+        19
+      ],
+      [
+        15,
+        18,
+        17
+      ],
+      [
+        15,
+        19,
+        18
+      ],
+      [
+        17,
+        18,
+        19
+      ],
+      [
+        20,
+        21,
+        22
+      ],
+      [
+        20,
+        22,
+        25
+      ],
+      [
+        20,
+        23,
+        24
+      ],
+      [
+        20,
+        24,
+        21
+      ],
+      [
+        20,
+        25,
+        23
+      ],
+      [
+        21,
+        24,
+        25
+      ],
+      [
+        21,
+        25,
+        22
+      ],
+      [
+        23,
+        25,
+        24
+      ],
+      [
+        26,
+        27,
+        30
+      ],
+      [
+        26,
+        28,
+        27
+      ],
+      [
+        26,
+        29,
+        31
+      ],
+      [
+        26,
+        30,
+        29
+      ],
+      [
+        26,
+        31,
+        28
+      ],
+      [
+        27,
+        28,
+        31
+      ],
+      [
+        27,
+        31,
+        30
+      ],
+      [
+        29,
+        30,
+        31
+      ],
+      [
+        32,
+        33,
+        36
+      ],
+      [
+        32,
+        34,
+        35
+      ],
+      [
+        32,
+        35,
+        33
+      ],
+      [
+        32,
+        36,
+        38
+      ],
+      [
+        32,
+        38,
+        34
+      ],
+      [
+        33,
+        35,
+        37
+      ],
+      [
+        33,
+        37,
+        36
+      ],
+      [
+        34,
+        38,
+        35
+      ],
+      [
+        35,
+        38,
+        39
+      ],
+      [
+        35,
+        39,
+        37
+      ],
+      [
+        36,
+        37,
+        38
+      ],
+      [
+        37,
+        39,
+        38
+      ],
+      [
+        40,
+        41,
+        42
+      ],
+      [
+        40,
+        42,
+        43
+      ],
+      [
+        40,
+        43,
+        44
+      ],
+      [
+        40,
+        44,
+        41
+      ],
+      [
+        41,
+        44,
+        42
+      ],
+      [
+        42,
+        44,
+        45
+      ],
+      [
+        42,
+        45,
+        43
+      ],
+      [
+        43,
+        45,
+        44
+      ],
+      [
+        46,
+        47,
+        49
+      ],
+      [
+        46,
+        48,
+        47
+      ],
+      [
+        46,
+        49,
+        48
+      ],
+      [
+        47,
+        48,
+        49
+      ],
+      [
+        50,
+        51,
+        53
+      ],
+      [
+        50,
+        52,
+        51
+      ],
+      [
+        50,
+        53,
+        52
+      ],
+      [
+        51,
+        52,
+        53
+      ],
+      [
+        54,
+        55,
+        57
+      ],
+      [
+        54,
+        56,
+        55
+      ],
+      [
+        54,
+        57,
+        56
+      ],
+      [
+        55,
+        56,
+        58
+      ],
+      [
+        55,
+        58,
+        57
+      ],
+      [
+        56,
+        57,
+        59
+      ],
+      [
+        56,
+        59,
+        58
+      ],
+      [
+        57,
+        58,
+        59
+      ],
+      [
+        60,
+        61,
+        64
+      ],
+      [
+        60,
+        62,
+        61
+      ],
+      [
+        60,
+        63,
+        62
+      ],
+      [
+        60,
+        64,
+        63
+      ],
+      [
+        61,
+        62,
+        65
+      ],
+      [
+        61,
+        65,
+        64
+      ],
+      [
+        62,
+        63,
+        65
+      ],
+      [
+        63,
+        64,
+        65
+      ],
+      [
+        66,
+        67,
+        68
+      ],
+      [
+        66,
+        68,
+        71
+      ],
+      [
+        66,
+        69,
+        67
+      ],
+      [
+        66,
+        71,
+        69
+      ],
+      [
+        67,
+        69,
+        70
+      ],
+      [
+        67,
+        70,
+        68
+      ],
+      [
+        68,
+        70,
+        71
+      ],
+      [
+        69,
+        71,
+        70
+      ],
+      [
+        72,
+        73,
+        75
+      ],
+      [
+        72,
+        74,
+        73
+      ],
+      [
+        72,
+        75,
+        74
+      ],
+      [
+        73,
+        74,
+        75
+      ],
+      [
+        76,
+        77,
+        79
+      ],
+      [
+        76,
+        78,
+        77
+      ],
+      [
+        76,
+        79,
+        78
+      ],
+      [
+        77,
+        78,
+        79
+      ],
+      [
+        80,
+        81,
+        83
+      ],
+      [
+        80,
+        82,
+        81
+      ],
+      [
+        80,
+        83,
+        85
+      ],
+      [
+        80,
+        85,
+        82
+      ],
+      [
+        81,
+        82,
+        84
+      ],
+      [
+        81,
+        84,
+        83
+      ],
+      [
+        82,
+        85,
+        84
+      ],
+      [
+        83,
+        84,
+        85
+      ],
+      [
+        86,
+        87,
+        90
+      ],
+      [
+        86,
+        88,
+        87
+      ],
+      [
+        86,
+        89,
+        91
+      ],
+      [
+        86,
+        90,
+        89
+      ],
+      [
+        86,
+        91,
+        88
+      ],
+      [
+        87,
+        88,
+        90
+      ],
+      [
+        88,
+        91,
+        90
+      ],
+      [
+        89,
+        90,
+        91
+      ],
+      [
+        92,
+        93,
+        96
+      ],
+      [
+        92,
+        94,
+        93
+      ],
+      [
+        92,
+        95,
+        97
+      ],
+      [
+        92,
+        96,
+        95
+      ],
+      [
+        92,
+        97,
+        94
+      ],
+      [
+        93,
+        94,
+        97
+      ],
+      [
+        93,
+        97,
+        96
+      ],
+      [
+        95,
+        96,
+        97
+      ],
+      [
+        98,
+        99,
+        100
+      ],
+      [
+        98,
+        100,
+        101
+      ],
+      [
+        98,
+        101,
+        99
+      ],
+      [
+        99,
+        101,
+        100
+      ],
+      [
+        102,
+        103,
+        104
+      ],
+      [
+        102,
+        104,
+        105
+      ],
+      [
+        102,
+        105,
+        103
+      ],
+      [
+        103,
+        105,
+        104
+      ],
+      [
+        106,
+        107,
+        110
+      ],
+      [
+        106,
+        108,
+        107
+      ],
+      [
+        106,
+        109,
+        111
+      ],
+      [
+        106,
+        110,
+        109
+      ],
+      [
+        106,
+        111,
+        108
+      ],
+      [
+        107,
+        108,
+        111
+      ],
+      [
+        107,
+        111,
+        110
+      ],
+      [
+        109,
+        110,
+        111
+      ],
+      [
+        112,
+        113,
+        116
+      ],
+      [
+        112,
+        114,
+        113
+      ],
+      [
+        112,
+        115,
+        117
+      ],
+      [
+        112,
+        116,
+        115
+      ],
+      [
+        112,
+        117,
+        114
+      ],
+      [
+        113,
+        114,
+        116
+      ],
+      [
+        114,
+        117,
+        116
+      ],
+      [
+        115,
+        116,
+        117
+      ],
+      [
+        118,
+        119,
+        121
+      ],
+      [
+        118,
+        120,
+        119
+      ],
+      [
+        118,
+        121,
+        123
+      ],
+      [
+        118,
+        123,
+        120
+      ],
+      [
+        119,
+        120,
+        122
+      ],
+      [
+        119,
+        122,
+        121
+      ],
+      [
+        120,
+        123,
+        122
+      ],
+      [
+        121,
+        122,
+        123
+      ],
+      [
+        124,
+        125,
+        126
+      ],
+      [
+        124,
+        126,
+        127
+      ],
+      [
+        124,
+        127,
+        125
+      ],
+      [
+        125,
+        127,
+        126
+      ],
+      [
+        128,
+        129,
+        130
+      ],
+      [
+        128,
+        130,
+        131
+      ],
+      [
+        128,
+        131,
+        129
+      ],
+      [
+        129,
+        131,
+        130
+      ],
+      [
+        132,
+        133,
+        135
+      ],
+      [
+        132,
+        134,
+        138
+      ],
+      [
+        132,
+        135,
+        134
+      ],
+      [
+        132,
+        136,
+        133
+      ],
+      [
+        132,
+        138,
+        136
+      ],
+      [
+        133,
+        136,
+        137
+      ],
+      [
+        133,
+        137,
+        135
+      ],
+      [
+        134,
+        135,
+        138
+      ],
+      [
+        135,
+        137,
+        139
+      ],
+      [
+        135,
+        139,
+        138
+      ],
+      [
+        136,
+        138,
+        137
+      ],
+      [
+        137,
+        138,
+        139
+      ],
+      [
+        140,
+        141,
+        144
+      ],
+      [
+        140,
+        142,
+        141
+      ],
+      [
+        140,
+        143,
+        142
+      ],
+      [
+        140,
+        144,
+        143
+      ],
+      [
+        141,
+        142,
+        144
+      ],
+      [
+        142,
+        143,
+        145
+      ],
+      [
+        142,
+        145,
+        144
+      ],
+      [
+        143,
+        144,
+        145
+      ],
+      [
+        146,
+        147,
+        149
+      ],
+      [
+        146,
+        148,
+        147
+      ],
+      [
+        146,
+        149,
+        148
+      ],
+      [
+        147,
+        148,
+        149
+      ],
+      [
+        150,
+        151,
+        152
+      ],
+      [
+        150,
+        152,
+        153
+      ],
+      [
+        150,
+        153,
+        151
+      ],
+      [
+        151,
+        153,
+        152
+      ],
+      [
+        154,
+        155,
+        158
+      ],
+      [
+        154,
+        156,
+        155
+      ],
+      [
+        154,
+        158,
+        156
+      ],
+      [
+        155,
+        156,
+        157
+      ],
+      [
+        155,
+        157,
+        161
+      ],
+      [
+        155,
+        159,
+        158
+      ],
+      [
+        155,
+        161,
+        159
+      ],
+      [
+        156,
+        158,
+        160
+      ],
+      [
+        156,
+        160,
+        161
+      ],
+      [
+        156,
+        161,
+        157
+      ],
+      [
+        158,
+        159,
+        161
+      ],
+      [
+        158,
+        161,
+        160
+      ],
+      [
+        162,
+        163,
+        165
+      ],
+      [
+        162,
+        164,
+        163
+      ],
+      [
+        162,
+        165,
+        164
+      ],
+      [
+        163,
+        164,
+        166
+      ],
+      [
+        163,
+        166,
+        165
+      ],
+      [
+        164,
+        165,
+        167
+      ],
+      [
+        164,
+        167,
+        166
+      ],
+      [
+        165,
+        166,
+        167
+      ],
+      [
+        168,
+        169,
+        171
+      ],
+      [
+        168,
+        170,
+        169
+      ],
+      [
+        168,
+        171,
+        170
+      ],
+      [
+        169,
+        170,
+        171
+      ],
+      [
+        172,
+        173,
+        175
+      ],
+      [
+        172,
+        174,
+        173
+      ],
+      [
+        172,
+        175,
+        174
+      ],
+      [
+        173,
+        174,
+        175
+      ],
+      [
+        176,
+        177,
+        180
+      ],
+      [
+        176,
+        178,
+        177
+      ],
+      [
+        176,
+        179,
+        178
+      ],
+      [
+        176,
+        180,
+        179
+      ],
+      [
+        177,
+        178,
+        180
+      ],
+      [
+        178,
+        179,
+        181
+      ],
+      [
+        178,
+        181,
+        180
+      ],
+      [
+        179,
+        180,
+        181
+      ],
+      [
+        182,
+        183,
+        184
+      ],
+      [
+        182,
+        184,
+        187
+      ],
+      [
+        182,
+        185,
+        183
+      ],
+      [
+        182,
+        187,
+        185
+      ],
+      [
+        183,
+        185,
+        186
+      ],
+      [
+        183,
+        186,
+        184
+      ],
+      [
+        184,
+        186,
+        187
+      ],
+      [
+        185,
+        187,
+        186
+      ],
+      [
+        188,
+        189,
+        190
+      ],
+      [
+        188,
+        190,
+        193
+      ],
+      [
+        188,
+        191,
+        192
+      ],
+      [
+        188,
+        192,
+        189
+      ],
+      [
+        188,
+        193,
+        191
+      ],
+      [
+        189,
+        192,
+        193
+      ],
+      [
+        189,
+        193,
+        190
+      ],
+      [
+        191,
+        193,
+        192
+      ],
+      [
+        194,
+        195,
+        196
+      ],
+      [
+        194,
+        196,
+        197
+      ],
+      [
+        194,
+        197,
+        195
+      ],
+      [
+        195,
+        197,
+        196
+      ],
+      [
+        198,
+        199,
+        200
+      ],
+      [
+        198,
+        200,
+        201
+      ],
+      [
+        198,
+        201,
+        199
+      ],
+      [
+        199,
+        201,
+        200
+      ],
+      [
+        202,
+        203,
+        205
+      ],
+      [
+        202,
+        204,
+        203
+      ],
+      [
+        202,
+        205,
+        207
+      ],
+      [
+        202,
+        207,
+        204
+      ],
+      [
+        203,
+        204,
+        206
+      ],
+      [
+        203,
+        206,
+        205
+      ],
+      [
+        204,
+        207,
+        206
+      ],
+      [
+        205,
+        206,
+        207
+      ],
+      [
+        208,
+        209,
+        210
+      ],
+      [
+        208,
+        210,
+        211
+      ],
+      [
+        208,
+        211,
+        209
+      ],
+      [
+        209,
+        211,
+        212
+      ],
+      [
+        209,
+        212,
+        210
+      ],
+      [
+        210,
+        212,
+        213
+      ],
+      [
+        210,
+        213,
+        211
+      ],
+      [
+        211,
+        213,
+        212
+      ],
+      [
+        214,
+        215,
+        216
+      ],
+      [
+        214,
+        216,
+        217
+      ],
+      [
+        214,
+        217,
+        215
+      ],
+      [
+        215,
+        217,
+        218
+      ],
+      [
+        215,
+        218,
+        216
+      ],
+      [
+        216,
+        218,
+        219
+      ],
+      [
+        216,
+        219,
+        217
+      ],
+      [
+        217,
+        219,
+        218
+      ],
+      [
+        220,
+        221,
+        222
+      ],
+      [
+        220,
+        222,
+        223
+      ],
+      [
+        220,
+        223,
+        221
+      ],
+      [
+        221,
+        223,
+        222
+      ],
+      [
+        224,
+        225,
+        226
+      ],
+      [
+        224,
+        226,
+        227
+      ],
+      [
+        224,
+        227,
+        225
+      ],
+      [
+        225,
+        227,
+        226
+      ],
+      [
+        228,
+        232,
+        229
+      ],
+      [
+        232,
+        233,
+        229
+      ],
+      [
+        229,
+        233,
+        230
+      ],
+      [
+        233,
+        234,
+        230
+      ],
+      [
+        230,
+        234,
+        231
+      ],
+      [
+        234,
+        235,
+        231
+      ],
+      [
+        231,
+        235,
+        228
+      ],
+      [
+        235,
+        232,
+        228
+      ],
+      [
+        232,
+        236,
+        233
+      ],
+      [
+        236,
+        237,
+        233
+      ],
+      [
+        233,
+        237,
+        234
+      ],
+      [
+        237,
+        238,
+        234
+      ],
+      [
+        234,
+        238,
+        235
+      ],
+      [
+        238,
+        239,
+        235
+      ],
+      [
+        235,
+        239,
+        232
+      ],
+      [
+        239,
+        236,
+        232
+      ],
+      [
+        236,
+        240,
+        237
+      ],
+      [
+        240,
+        241,
+        237
+      ],
+      [
+        237,
+        241,
+        238
+      ],
+      [
+        241,
+        242,
+        238
+      ],
+      [
+        238,
+        242,
+        239
+      ],
+      [
+        242,
+        243,
+        239
+      ],
+      [
+        239,
+        243,
+        236
+      ],
+      [
+        243,
+        240,
+        236
+      ],
+      [
+        240,
+        244,
+        241
+      ],
+      [
+        244,
+        245,
+        241
+      ],
+      [
+        241,
+        245,
+        242
+      ],
+      [
+        245,
+        246,
+        242
+      ],
+      [
+        242,
+        246,
+        243
+      ],
+      [
+        246,
+        247,
+        243
+      ],
+      [
+        243,
+        247,
+        240
+      ],
+      [
+        247,
+        244,
+        240
+      ],
+      [
+        244,
+        248,
+        245
+      ],
+      [
+        248,
+        249,
+        245
+      ],
+      [
+        245,
+        249,
+        246
+      ],
+      [
+        249,
+        250,
+        246
+      ],
+      [
+        246,
+        250,
+        247
+      ],
+      [
+        250,
+        251,
+        247
+      ],
+      [
+        247,
+        251,
+        244
+      ],
+      [
+        251,
+        248,
+        244
+      ],
+      [
+        248,
+        252,
+        249
+      ],
+      [
+        252,
+        253,
+        249
+      ],
+      [
+        249,
+        253,
+        250
+      ],
+      [
+        253,
+        254,
+        250
+      ],
+      [
+        250,
+        254,
+        251
+      ],
+      [
+        254,
+        255,
+        251
+      ],
+      [
+        251,
+        255,
+        248
+      ],
+      [
+        255,
+        252,
+        248
+      ],
+      [
+        252,
+        256,
+        253
+      ],
+      [
+        256,
+        257,
+        253
+      ],
+      [
+        253,
+        257,
+        254
+      ],
+      [
+        257,
+        258,
+        254
+      ],
+      [
+        254,
+        258,
+        255
+      ],
+      [
+        258,
+        259,
+        255
+      ],
+      [
+        255,
+        259,
+        252
+      ],
+      [
+        259,
+        256,
+        252
+      ],
+      [
+        256,
+        260,
+        257
+      ],
+      [
+        260,
+        261,
+        257
+      ],
+      [
+        257,
+        261,
+        258
+      ],
+      [
+        261,
+        262,
+        258
+      ],
+      [
+        258,
+        262,
+        259
+      ],
+      [
+        262,
+        263,
+        259
+      ],
+      [
+        259,
+        263,
+        256
+      ],
+      [
+        263,
+        260,
+        256
+      ],
+      [
+        260,
+        264,
+        261
+      ],
+      [
+        264,
+        265,
+        261
+      ],
+      [
+        261,
+        265,
+        262
+      ],
+      [
+        265,
+        266,
+        262
+      ],
+      [
+        262,
+        266,
+        263
+      ],
+      [
+        266,
+        267,
+        263
+      ],
+      [
+        263,
+        267,
+        260
+      ],
+      [
+        267,
+        264,
+        260
+      ],
+      [
+        264,
+        268,
+        265
+      ],
+      [
+        268,
+        269,
+        265
+      ],
+      [
+        265,
+        269,
+        266
+      ],
+      [
+        269,
+        270,
+        266
+      ],
+      [
+        266,
+        270,
+        267
+      ],
+      [
+        270,
+        271,
+        267
+      ],
+      [
+        267,
+        271,
+        264
+      ],
+      [
+        271,
+        268,
+        264
+      ],
+      [
+        268,
+        272,
+        269
+      ],
+      [
+        272,
+        273,
+        269
+      ],
+      [
+        269,
+        273,
+        270
+      ],
+      [
+        273,
+        274,
+        270
+      ],
+      [
+        270,
+        274,
+        271
+      ],
+      [
+        274,
+        275,
+        271
+      ],
+      [
+        271,
+        275,
+        268
+      ],
+      [
+        275,
+        272,
+        268
+      ],
+      [
+        272,
+        228,
+        273
+      ],
+      [
+        228,
+        229,
+        273
+      ],
+      [
+        273,
+        229,
+        274
+      ],
+      [
+        229,
+        230,
+        274
+      ],
+      [
+        274,
+        230,
+        275
+      ],
+      [
+        230,
+        231,
+        275
+      ],
+      [
+        275,
+        231,
+        272
+      ],
+      [
+        231,
+        228,
+        272
+      ],
+      [
+        276,
+        277,
+        278
+      ],
+      [
+        276,
+        278,
+        281
+      ],
+      [
+        276,
+        279,
+        280
+      ],
+      [
+        276,
+        280,
+        277
+      ],
+      [
+        276,
+        281,
+        279
+      ],
+      [
+        277,
+        280,
+        281
+      ],
+      [
+        277,
+        281,
+        278
+      ],
+      [
+        279,
+        281,
+        280
+      ],
+      [
+        285,
+        286,
+        287
+      ],
+      [
+        284,
+        287,
+        286
+      ],
+      [
+        284,
+        285,
+        287
+      ],
+      [
+        283,
+        284,
+        286
+      ],
+      [
+        282,
+        285,
+        284
+      ],
+      [
+        282,
+        284,
+        283
+      ],
+      [
+        282,
+        283,
+        286
+      ],
+      [
+        282,
+        286,
+        285
+      ],
+      [
+        288,
+        289,
+        292
+      ],
+      [
+        288,
+        290,
+        289
+      ],
+      [
+        288,
+        291,
+        290
+      ],
+      [
+        288,
+        292,
+        291
+      ],
+      [
+        289,
+        290,
+        293
+      ],
+      [
+        289,
+        293,
+        292
+      ],
+      [
+        290,
+        291,
+        293
+      ],
+      [
+        291,
+        292,
+        293
+      ],
+      [
+        295,
+        299,
+        298
+      ],
+      [
+        297,
+        298,
+        299
+      ],
+      [
+        295,
+        298,
+        297
+      ],
+      [
+        295,
+        296,
+        299
+      ],
+      [
+        294,
+        297,
+        299
+      ],
+      [
+        294,
+        296,
+        295
+      ],
+      [
+        294,
+        295,
+        297
+      ],
+      [
+        294,
+        299,
+        296
+      ],
+      [
+        300,
+        301,
+        302
+      ],
+      [
+        300,
+        302,
+        305
+      ],
+      [
+        300,
+        303,
+        304
+      ],
+      [
+        300,
+        304,
+        301
+      ],
+      [
+        300,
+        305,
+        303
+      ],
+      [
+        301,
+        304,
+        305
+      ],
+      [
+        301,
+        305,
+        302
+      ],
+      [
+        303,
+        305,
+        304
+      ],
+      [
+        306,
+        310,
+        309
+      ],
+      [
+        309,
+        310,
+        311
+      ],
+      [
+        308,
+        311,
+        310
+      ],
+      [
+        308,
+        309,
+        311
+      ],
+      [
+        306,
+        308,
+        307
+      ],
+      [
+        306,
+        309,
+        308
+      ],
+      [
+        306,
+        307,
+        310
+      ],
+      [
+        307,
+        308,
+        310
+      ],
+      [
+        314,
+        315,
+        317
+      ],
+      [
+        312,
+        313,
+        316
+      ],
+      [
+        312,
+        314,
+        313
+      ],
+      [
+        312,
+        315,
+        314
+      ],
+      [
+        312,
+        316,
+        315
+      ],
+      [
+        313,
+        314,
+        317
+      ],
+      [
+        313,
+        317,
+        316
+      ],
+      [
+        315,
+        316,
+        317
+      ],
+      [
+        319,
+        322,
+        321
+      ],
+      [
+        321,
+        322,
+        323
+      ],
+      [
+        319,
+        320,
+        323
+      ],
+      [
+        319,
+        323,
+        322
+      ],
+      [
+        318,
+        321,
+        323
+      ],
+      [
+        318,
+        320,
+        319
+      ],
+      [
+        318,
+        319,
+        321
+      ],
+      [
+        318,
+        323,
+        320
+      ],
+      [
+        324,
+        325,
+        328
+      ],
+      [
+        324,
+        326,
+        325
+      ],
+      [
+        324,
+        327,
+        329
+      ],
+      [
+        324,
+        328,
+        327
+      ],
+      [
+        324,
+        329,
+        326
+      ],
+      [
+        325,
+        326,
+        329
+      ],
+      [
+        325,
+        329,
+        328
+      ],
+      [
+        327,
+        328,
+        329
+      ],
+      [
+        333,
+        335,
+        334
+      ],
+      [
+        332,
+        335,
+        333
+      ],
+      [
+        331,
+        335,
+        332
+      ],
+      [
+        331,
+        334,
+        335
+      ],
+      [
+        331,
+        333,
+        334
+      ],
+      [
+        330,
+        332,
+        333
+      ],
+      [
+        330,
+        331,
+        332
+      ],
+      [
+        330,
+        333,
+        331
+      ],
+      [
+        336,
+        337,
+        338
+      ],
+      [
+        336,
+        338,
+        341
+      ],
+      [
+        336,
+        339,
+        340
+      ],
+      [
+        336,
+        340,
+        337
+      ],
+      [
+        336,
+        341,
+        339
+      ],
+      [
+        337,
+        340,
+        341
+      ],
+      [
+        337,
+        341,
+        338
+      ],
+      [
+        339,
+        341,
+        340
+      ],
+      [
+        345,
+        346,
+        347
+      ],
+      [
+        344,
+        345,
+        347
+      ],
+      [
+        343,
+        346,
+        345
+      ],
+      [
+        343,
+        347,
+        346
+      ],
+      [
+        342,
+        345,
+        344
+      ],
+      [
+        342,
+        344,
+        343
+      ],
+      [
+        342,
+        343,
+        345
+      ],
+      [
+        343,
+        344,
+        347
+      ],
+      [
+        348,
+        349,
+        350
+      ],
+      [
+        348,
+        350,
+        353
+      ],
+      [
+        348,
+        351,
+        352
+      ],
+      [
+        348,
+        352,
+        349
+      ],
+      [
+        348,
+        353,
+        351
+      ],
+      [
+        349,
+        352,
+        353
+      ],
+      [
+        349,
+        353,
+        350
+      ],
+      [
+        351,
+        353,
+        352
+      ],
+      [
+        357,
+        358,
+        359
+      ],
+      [
+        356,
+        359,
+        358
+      ],
+      [
+        355,
+        356,
+        358
+      ],
+      [
+        356,
+        357,
+        359
+      ],
+      [
+        354,
+        357,
+        356
+      ],
+      [
+        354,
+        356,
+        355
+      ],
+      [
+        354,
+        355,
+        358
+      ],
+      [
+        354,
+        358,
+        357
+      ],
+      [
+        363,
+        364,
+        365
+      ],
+      [
+        362,
+        365,
+        364
+      ],
+      [
+        360,
+        365,
+        362
+      ],
+      [
+        361,
+        362,
+        364
+      ],
+      [
+        360,
+        363,
+        365
+      ],
+      [
+        360,
+        362,
+        361
+      ],
+      [
+        360,
+        361,
+        364
+      ],
+      [
+        360,
+        364,
+        363
+      ],
+      [
+        368,
+        371,
+        369
+      ],
+      [
+        366,
+        367,
+        368
+      ],
+      [
+        366,
+        368,
+        369
+      ],
+      [
+        366,
+        369,
+        370
+      ],
+      [
+        366,
+        370,
+        367
+      ],
+      [
+        367,
+        370,
+        368
+      ],
+      [
+        368,
+        370,
+        371
+      ],
+      [
+        369,
+        371,
+        370
+      ]
+    ]
+  }
+}

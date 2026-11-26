@@ -19,6 +19,59 @@ pub struct Profile {
 }
 
 impl Profile {
+    pub(crate) fn open_medusa_preview(
+        directory: PathBuf,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
+        let store = Store::open_medusa_preview(directory)?;
+        let saved = store.load(MAX_SAVE_FILE_BYTES)?;
+        let world = match &saved {
+            Some(bytes) => World::from_medusa_preview_save(bytes)?,
+            None => World::new_medusa_preview()?,
+        };
+        Ok(Self {
+            world,
+            session: Session::default(),
+            store: Some(store),
+            playing: true,
+            has_save: saved.is_some(),
+            new_armed: false,
+        })
+    }
+
+    pub(crate) fn is_medusa_preview(&self) -> bool {
+        self.world.medusa_preview_fit().is_some()
+    }
+
+    pub(crate) fn medusa_preview_fit(
+        &mut self,
+        fit: meridian_core::MedusaPreviewFit,
+    ) -> Result<String, String> {
+        let current = self
+            .world
+            .medusa_preview_save_bytes()
+            .map_err(|error| error.to_string())?;
+        let mut candidate =
+            World::from_medusa_preview_save(&current).map_err(|error| error.to_string())?;
+        candidate
+            .set_medusa_preview_fit(fit)
+            .map_err(|error| error.to_string())?;
+        let bytes = candidate
+            .medusa_preview_save_bytes()
+            .map_err(|error| error.to_string())?;
+        let published = self
+            .store
+            .as_ref()
+            .ok_or("Preview storage unavailable")?
+            .save(&bytes, MAX_SAVE_FILE_BYTES)
+            .map_err(|error| error.to_string())?;
+        self.world = candidate;
+        self.has_save = true;
+        publication_message(
+            published,
+            "Medusa preview fit saved; no ordinary equipment granted.".into(),
+        )
+    }
+
     pub fn open(directory: PathBuf) -> Result<Self, Box<dyn std::error::Error>> {
         let store = Store::open(directory)?;
         let has_save = !matches!(store.load(MAX_SAVE_FILE_BYTES), Ok(None));
@@ -171,6 +224,9 @@ impl Profile {
 
     pub fn new_commander(&mut self, seed: u64) -> Result<bool, String> {
         self.require_profile()?;
+        if self.is_medusa_preview() {
+            return Err("Ordinary commander creation is unavailable in Medusa preview".into());
+        }
         if self.playing
             && !self
                 .world
@@ -204,7 +260,9 @@ impl Profile {
     }
 
     fn accept_save(&mut self, bytes: &[u8]) -> Result<(), String> {
-        if self.playing {
+        if self.is_medusa_preview() {
+            self.world = World::from_medusa_preview_save(bytes).map_err(|e| e.to_string())?;
+        } else if self.playing {
             self.world.restore_bytes(bytes).map_err(|e| e.to_string())?;
         } else {
             let world = World::from_save_bytes(bytes).map_err(|e| e.to_string())?;
@@ -219,6 +277,14 @@ impl Profile {
 
     pub fn command(&mut self, action: Action) -> Result<String, String> {
         self.require_profile()?;
+        if self.is_medusa_preview() {
+            return match action {
+                Action::Launch | Action::SetFlightView(_) => {
+                    self.session.command(&mut self.world, action)
+                }
+                _ => Err("Only preview flight and the checked preview fit are available".into()),
+            };
+        }
         if !self.playing {
             return Err("N starts a new commander; C continues the existing save".into());
         }
@@ -583,7 +649,12 @@ impl Profile {
                     .into(),
             );
         }
-        let bytes = self.world.save_bytes().map_err(|e| e.to_string())?;
+        let bytes = if self.is_medusa_preview() {
+            self.world.medusa_preview_save_bytes()
+        } else {
+            self.world.save_bytes()
+        }
+        .map_err(|e| e.to_string())?;
         let committed = self
             .store
             .as_ref()
@@ -631,6 +702,21 @@ impl Profile {
     }
 
     pub fn lines(&self, active: bool, notice: Option<&str>) -> Vec<String> {
+        if let Some(fit) = self.world.medusa_preview_fit() {
+            let state = self.world.snapshot();
+            let mut lines = vec![
+                "SH171 MEDUSA | ISOLATED PREVIEW / NOT A QUEST REWARD".into(),
+                format!("{:?} | SPEED {:.2} / 50.30 | TICK {} | {}", state.mode, state.speed, state.tick,
+                    if active { "RUNNING" } else { "PAUSED" }),
+                format!("CARGO {} / {} t | CABINS {} / 4 | EQUIPMENT {} / 13 | UTILITY {} / 4", fit.cargo_used_tonnes(), fit.cargo_capacity_tonnes(), fit.cabins, fit.equipment_used(), fit.utility_used()),
+                "L launch | W/S throttle | A/D yaw | arrows pitch | Q/E roll | Space brake".into(),
+                "Docked: B cargo expansion | [ / ] cabin count | F5 save / F9 continue | P pause | Esc quit".into(),
+            ];
+            if let Some(notice) = notice {
+                lines.push(notice.into());
+            }
+            return lines;
+        }
         if self.is_internal_validation() {
             let mut lines = vec![
                 "INTERNAL MULE VALIDATION | NO COMMANDER / NO SAVE".into(),
@@ -1660,3 +1746,6 @@ mod ammunition_tests;
 #[cfg(test)]
 #[path = "profile/traffic_tests.rs"]
 mod traffic_tests;
+
+#[cfg(test)]
+mod medusa_preview_tests;

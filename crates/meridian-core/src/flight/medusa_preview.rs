@@ -1,0 +1,312 @@
+//! Isolated SH171 preview custody. It is not the PLUGH quest or an ordinary owned hull.
+use super::{
+    FlightMode, FlightStart, OriginalStationData, Snapshot, StationError, StepError, World,
+};
+use crate::save::{Reader, SAVE_VERSION, SaveError, Writer, checksum};
+
+const MAGIC: &[u8; 8] = b"MEDPRV01";
+const INVALID: SaveError = SaveError::InvalidState("Medusa preview hull, fit or pose");
+const MAX_SAVE: usize = 128;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PlayerHullKind {
+    Peregrine,
+    Medusa,
+}
+
+impl PlayerHullKind {
+    pub const fn source_id(self) -> &'static str {
+        match self {
+            Self::Peregrine => "SH025",
+            Self::Medusa => "SH171",
+        }
+    }
+
+    /// Speed, acceleration, pitch, yaw and roll in original gameplay units.
+    pub(super) const fn flight_rates(self) -> (f32, f32, f32, f32, f32) {
+        match self {
+            Self::Peregrine => (
+                super::MAX_SPEED,
+                super::ACCELERATION,
+                super::PITCH_RATE,
+                super::YAW_RATE,
+                super::ROLL_RATE,
+            ),
+            Self::Medusa => (50.3, 18.0, 1.21, 1.12, 1.37),
+        }
+    }
+}
+
+/// A non-commercial fixture fit, never issued to the ordinary commander ledger.
+/// Each cabin consumes the source's 5 t and one equipment unit. A cargo expansion
+/// consumes one equipment unit and one utility mount; no paid or quest item is granted.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub struct MedusaPreviewFit {
+    pub cargo_expansion: bool,
+    pub cabins: u8,
+}
+
+impl MedusaPreviewFit {
+    pub const fn cargo_capacity_tonnes(self) -> u16 {
+        22 + if self.cargo_expansion { 10 } else { 0 }
+    }
+    pub const fn cargo_used_tonnes(self) -> u16 {
+        5 * self.cabins as u16
+    }
+    pub const fn equipment_used(self) -> u16 {
+        self.cabins as u16 + self.cargo_expansion as u16
+    }
+    pub const fn utility_used(self) -> u16 {
+        self.cargo_expansion as u16
+    }
+    pub const fn valid(self) -> bool {
+        self.cabins <= 4
+            && self.cargo_used_tonnes() <= self.cargo_capacity_tonnes()
+            && self.equipment_used() <= 13
+            && self.utility_used() <= 4
+    }
+}
+
+impl World {
+    pub fn player_hull_kind(&self) -> PlayerHullKind {
+        if self
+            .station_data
+            .as_ref()
+            .and_then(OriginalStationData::medusa_pieces)
+            .is_some()
+        {
+            PlayerHullKind::Medusa
+        } else {
+            PlayerHullKind::Peregrine
+        }
+    }
+
+    /// Explicit, separate preview World. No ordinary commander, wallet, quest or trade exists.
+    pub fn new_medusa_preview() -> Result<Self, StationError> {
+        let mut world = Self::at_station(OriginalStationData::medusa_bundled()?)?;
+        world.medusa_preview_fit = Some(MedusaPreviewFit::default());
+        Ok(world)
+    }
+
+    pub const fn medusa_preview_fit(&self) -> Option<MedusaPreviewFit> {
+        self.medusa_preview_fit
+    }
+
+    /// Preview equipment changes remain local and dock-only. No hidden acquisition authority.
+    pub fn set_medusa_preview_fit(&mut self, fit: MedusaPreviewFit) -> Result<(), StepError> {
+        if self.medusa_preview_fit.is_none()
+            || self.state.mode != FlightMode::Docked
+            || !fit.valid()
+        {
+            return Err(StepError::InvalidMode);
+        }
+        self.medusa_preview_fit = Some(fit);
+        Ok(())
+    }
+
+    pub fn medusa_preview_save_bytes(&self) -> Result<Vec<u8>, SaveError> {
+        let fit = self.medusa_preview_fit.ok_or(INVALID)?;
+        if self.commander_id().is_some()
+            || self.player_hull_kind() != PlayerHullKind::Medusa
+            || !fit.valid()
+        {
+            return Err(INVALID);
+        }
+        let station = self.station_data.as_ref().ok_or(INVALID)?;
+        validate_pose(station, &self.state)?;
+        let mut writer = Writer::new();
+        writer.bytes.extend(MAGIC);
+        writer.u64(source_fingerprint());
+        writer.bool(fit.cargo_expansion);
+        writer.u8(fit.cabins);
+        writer.u8(match self.flight_view() {
+            super::FlightView::Front => 0,
+            super::FlightView::Rear => 1,
+            super::FlightView::Left => 2,
+            super::FlightView::Right => 3,
+        });
+        super::persistence::write_flight(&mut writer, &self.state);
+        let digest = checksum(&writer.bytes);
+        writer.u64(digest);
+        Ok(writer.bytes)
+    }
+
+    pub fn from_medusa_preview_save(bytes: &[u8]) -> Result<Self, SaveError> {
+        if bytes.len() > MAX_SAVE {
+            return Err(SaveError::TooLarge);
+        }
+        let end = bytes.len().checked_sub(8).ok_or(SaveError::Truncated)?;
+        let (body, tail) = bytes.split_at(end);
+        if checksum(body) != Reader::new(tail).u64()? {
+            return Err(SaveError::ChecksumMismatch);
+        }
+        let mut reader = Reader::new(body);
+        if &reader.fixed::<8>()? != MAGIC || reader.u64()? != source_fingerprint() {
+            return Err(SaveError::ContentMismatch);
+        }
+        let fit = MedusaPreviewFit {
+            cargo_expansion: reader.bool()?,
+            cabins: reader.u8()?,
+        };
+        if !fit.valid() {
+            return Err(INVALID);
+        }
+        let view = match reader.u8()? {
+            0 => super::FlightView::Front,
+            1 => super::FlightView::Rear,
+            2 => super::FlightView::Left,
+            3 => super::FlightView::Right,
+            _ => return Err(SaveError::InvalidEncoding),
+        };
+        let mut state = super::persistence::read_flight(&mut reader, SAVE_VERSION)?;
+        if !reader.finished() {
+            return Err(SaveError::InvalidEncoding);
+        }
+        let mut candidate = Self::new_medusa_preview().map_err(|_| SaveError::ContentMismatch)?;
+        let station = candidate.station_data.as_ref().ok_or(INVALID)?;
+        validate_pose(station, &state)?;
+        state.station = Some(station.station_pose());
+        candidate.state = state;
+        candidate.medusa_preview_fit = Some(fit);
+        candidate
+            .request_flight_view(view, state.tick)
+            .map_err(|_| INVALID)?;
+        Ok(candidate)
+    }
+}
+
+fn source_fingerprint() -> u64 {
+    let mut bytes = b"SH171/stock-preview/flight/v1".to_vec();
+    bytes.extend(include_bytes!(
+        "../../../../assets/fleet/sh171/flight.physics"
+    ));
+    bytes.extend(include_bytes!(
+        "../../../../assets/fleet/sh171/flight.supports"
+    ));
+    bytes.extend(include_bytes!(
+        "../../../../integration/sh171-medusa/MEDUSA-FLAGSHIP.json"
+    ));
+    checksum(&bytes)
+}
+
+fn validate_pose(station: &OriginalStationData, state: &Snapshot) -> Result<(), SaveError> {
+    let norm = state
+        .orientation
+        .iter()
+        .map(|value| value * value)
+        .sum::<f32>();
+    let bound = 16_000.0
+        + state.tick as f64
+            * 50.3
+            * f64::from(super::DISTANCE_PER_SPEED_UNIT * super::FIXED_DELTA_SECONDS)
+            * 1.1;
+    if !state.speed.is_finite()
+        || !(0.0..=50.3).contains(&state.speed)
+        || state
+            .position
+            .iter()
+            .any(|v| !v.is_finite() || f64::from(v.abs()) > bound)
+        || !norm.is_finite()
+        || (norm - 1.0).abs() > 1e-5
+        || (state.motion_refusal.is_some() && state.speed != 0.0)
+        || matches!(
+            state.motion_refusal,
+            Some(
+                super::MotionRefusal::NpcContact
+                    | super::MotionRefusal::AsteroidContact
+                    | super::MotionRefusal::CelestialContact
+            )
+        )
+    {
+        return Err(INVALID);
+    }
+    if state.mode == FlightMode::Docked {
+        return if state.speed == 0.0
+            && state.position == [0.0; 3]
+            && state.orientation == [0.0, 0.0, 0.0, 1.0]
+            && state.motion_refusal.is_none()
+        {
+            Ok(())
+        } else {
+            Err(INVALID)
+        };
+    }
+    let start = FlightStart {
+        position: state.position,
+        orientation: state.orientation,
+        speed: state.speed,
+    };
+    if state.mode == FlightMode::Launching && station.launch_start().map_err(|_| INVALID)? != start
+    {
+        return Err(INVALID);
+    }
+    if !station.initial_flight_is_clear(start) {
+        return Err(INVALID);
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::FlightInput;
+
+    #[test]
+    fn stock_preview_fit_save_and_flight_are_separate_from_ordinary_custody()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let mut world = World::new_medusa_preview()?;
+        assert_eq!(world.player_hull_kind(), PlayerHullKind::Medusa);
+        assert_eq!(world.commander_id(), None);
+        assert!(world.save_bytes().is_err());
+        assert!(
+            World::new_commander(551)?
+                .medusa_preview_save_bytes()
+                .is_err()
+        );
+        let fit = MedusaPreviewFit {
+            cargo_expansion: true,
+            cabins: 4,
+        };
+        world.set_medusa_preview_fit(fit)?;
+        assert!(
+            world
+                .set_medusa_preview_fit(MedusaPreviewFit { cabins: 5, ..fit })
+                .is_err()
+        );
+        let docked = world.medusa_preview_save_bytes()?;
+        assert!(World::from_save_bytes(&docked).is_err());
+        let mut world = World::from_medusa_preview_save(&docked)?;
+        assert_eq!(world.medusa_preview_fit(), Some(fit));
+        world.request_launch(0)?;
+        assert!(
+            world
+                .set_medusa_preview_fit(MedusaPreviewFit::default())
+                .is_err()
+        );
+        let launching = world.medusa_preview_save_bytes()?;
+        let mut world = World::from_medusa_preview_save(&launching)?;
+        for _ in 0..8 {
+            world.step(FlightInput {
+                throttle: 1.0,
+                ..FlightInput::default()
+            })?;
+        }
+        let snapshot = world.snapshot();
+        assert_eq!(snapshot.mode, FlightMode::Flight);
+        let flight = world.medusa_preview_save_bytes()?;
+        let mut restored = World::from_medusa_preview_save(&flight)?;
+        assert_eq!(restored.snapshot(), snapshot);
+        for _ in 0..8 {
+            world.step(FlightInput::default())?;
+            restored.step(FlightInput::default())?;
+        }
+        assert_eq!(world.snapshot(), restored.snapshot());
+        let mut broken = flight;
+        broken[17] = 5;
+        let end = broken.len() - 8;
+        let digest = checksum(&broken[..end]);
+        broken[end..].copy_from_slice(&digest.to_le_bytes());
+        assert!(World::from_medusa_preview_save(&broken).is_err());
+        Ok(())
+    }
+}

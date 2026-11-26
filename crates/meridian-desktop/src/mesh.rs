@@ -1,5 +1,7 @@
 use meridian_core::docking::{Basis3, DockingPort, RigidPose, StationPose, Vec3};
-use meridian_core::{PRACTICE_HALF_SIDE, PracticeBeaconSnapshot, PulseShot, Snapshot};
+use meridian_core::{
+    PRACTICE_HALF_SIDE, PlayerHullKind, PracticeBeaconSnapshot, PulseShot, Snapshot,
+};
 
 pub(crate) mod paint;
 mod station_finish;
@@ -35,14 +37,7 @@ pub struct StationRender<'a> {
     pub pose: StationPose,
     pub port: &'a DockingPort,
     pub docked: bool,
-    pub(crate) player_hull: PlayerRenderHull,
-}
-
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-pub(crate) enum PlayerRenderHull {
-    #[default]
-    Peregrine,
-    Medusa,
+    pub(crate) player_hull: PlayerHullKind,
 }
 
 struct Camera {
@@ -123,8 +118,8 @@ fn camera_for(snapshot: &Snapshot, station: StationRender<'_>) -> Result<Camera,
         });
     }
     let local_offset = match station.player_hull {
-        PlayerRenderHull::Peregrine => Vec3::new(0.0, 45.0, -220.0),
-        PlayerRenderHull::Medusa => Vec3::new(0.0, 15.0, -76.0),
+        PlayerHullKind::Peregrine => Vec3::new(0.0, 45.0, -220.0),
+        PlayerHullKind::Medusa => Vec3::new(0.0, 15.0, -76.0),
     };
     let offset = player.orientation.apply(local_offset);
     Ok(Camera {
@@ -152,7 +147,7 @@ pub(crate) fn medusa_chase_camera(
     snapshot: &Snapshot,
     station: StationRender<'_>,
 ) -> Result<Option<RigidPose>, String> {
-    if station.player_hull != PlayerRenderHull::Medusa {
+    if station.player_hull != PlayerHullKind::Medusa {
         return Ok(None);
     }
     let camera = camera_for(snapshot, station)?;
@@ -457,7 +452,7 @@ pub fn frame_vertices(
     output.clear();
     if let Some(station) = station {
         let camera = camera_for(snapshot, station)?;
-        if camera.draw_ship && station.player_hull == PlayerRenderHull::Peregrine {
+        if camera.draw_ship && station.player_hull == PlayerHullKind::Peregrine {
             append_mesh(ship, player_pose(snapshot), &camera, output)?;
         }
         append_mesh(
@@ -559,7 +554,7 @@ mod tests {
                     .station_port()
                     .unwrap_or_else(|| panic!("Expected station_port")),
                 docked: false,
-                player_hull: crate::mesh::PlayerRenderHull::Peregrine,
+                player_hull: meridian_core::PlayerHullKind::Peregrine,
             };
             let mut frame = Vec::new();
             append_missiles(
@@ -716,7 +711,7 @@ mod tests {
             pose: reference_station_pose(),
             port: &port,
             docked: true,
-            player_hull: crate::mesh::PlayerRenderHull::Peregrine,
+            player_hull: meridian_core::PlayerHullKind::Peregrine,
         };
         let camera = camera_for(&snapshot, station).unwrap_or_else(|e| panic!("{e}"));
         assert!(!camera.draw_ship);
@@ -752,7 +747,7 @@ mod tests {
             pose: reference_station_pose(),
             port: &port,
             docked: false,
-            player_hull: crate::mesh::PlayerRenderHull::Peregrine,
+            player_hull: meridian_core::PlayerHullKind::Peregrine,
         };
         assert!(
             !camera_for(&snapshot, station)
@@ -809,7 +804,7 @@ mod tests {
             pose: reference_station_pose(),
             port: &port,
             docked: false,
-            player_hull: crate::mesh::PlayerRenderHull::Peregrine,
+            player_hull: meridian_core::PlayerHullKind::Peregrine,
         };
         let camera = camera_for(&snapshot, station).unwrap_or_else(|e| panic!("{e}"));
         assert!(!camera.draw_ship);
@@ -841,10 +836,10 @@ mod tests {
             pose: reference_station_pose(),
             port: &port,
             docked: false,
-            player_hull: PlayerRenderHull::Peregrine,
+            player_hull: PlayerHullKind::Peregrine,
         };
         let mut medusa = StationRender {
-            player_hull: PlayerRenderHull::Medusa,
+            player_hull: PlayerHullKind::Medusa,
             ..stock
         };
         let camera = camera_for(&snapshot, stock).unwrap_or_else(|e| panic!("{e}"));

@@ -602,6 +602,11 @@ impl App {
             }
             return;
         }
+        if self.game.is_medusa_preview() {
+            self.medusa_preview_key(code, event_loop);
+            self.request_redraw();
+            return;
+        }
         if code == KeyCode::Digit0 && !self.commander_open && self.has_berth() {
             self.show_station_commander();
             self.request_redraw();
@@ -659,6 +664,54 @@ impl App {
 
     fn has_berth(&self) -> bool {
         self.game.playing() && self.game.world.current_dock_context().is_some()
+    }
+
+    fn medusa_preview_key(&mut self, code: KeyCode, event_loop: &ActiveEventLoop) {
+        use KeyCode::*;
+        match code {
+            Escape => self.request_quit(event_loop),
+            F5 => self.save_profile(),
+            F9 => match self.game.continue_saved() {
+                Ok(()) => {
+                    self.reset_input();
+                    self.notice.set("Medusa preview continued".into());
+                }
+                Err(error) => self
+                    .notice
+                    .set(format!("Preview Continue refused: {error}")),
+            },
+            KeyP => {
+                self.paused = !self.paused;
+                self.reset_input();
+            }
+            KeyL | Digit0 | Digit1 | Digit2 | Digit3 => {
+                let action = match code {
+                    KeyL => Action::Launch,
+                    Digit0 => Action::SetFlightView(FlightView::Front),
+                    Digit1 => Action::SetFlightView(FlightView::Rear),
+                    Digit2 => Action::SetFlightView(FlightView::Left),
+                    _ => Action::SetFlightView(FlightView::Right),
+                };
+                self.notice
+                    .set(self.game.command(action).unwrap_or_else(|error| error));
+            }
+            KeyB | BracketLeft | BracketRight => {
+                let Some(mut fit) = self.game.world.medusa_preview_fit() else {
+                    return;
+                };
+                match code {
+                    KeyB => fit.cargo_expansion = !fit.cargo_expansion,
+                    BracketLeft => fit.cabins = fit.cabins.saturating_sub(1),
+                    _ => fit.cabins = fit.cabins.saturating_add(1),
+                }
+                self.notice.set(
+                    self.game
+                        .medusa_preview_fit(fit)
+                        .unwrap_or_else(|error| error),
+                );
+            }
+            _ => {}
+        }
     }
 
     fn show_station_commander(&mut self) {
@@ -1163,6 +1216,31 @@ impl App {
                 ))
             .then_some(code);
         }
+        if self.game.is_medusa_preview() {
+            if state == ElementState::Released {
+                self.keys.remove(&code);
+                return None;
+            }
+            if !self.focused || self.occluded || repeat {
+                return None;
+            }
+            let held = matches!(
+                code,
+                KeyCode::ArrowUp
+                    | KeyCode::ArrowDown
+                    | KeyCode::KeyA
+                    | KeyCode::KeyD
+                    | KeyCode::KeyQ
+                    | KeyCode::KeyE
+                    | KeyCode::KeyW
+                    | KeyCode::KeyS
+                    | KeyCode::Space
+            );
+            if held {
+                self.keys.insert(code);
+            }
+            return Some(code);
+        }
         if state == ElementState::Released {
             self.keys.remove(&code);
             if code == KeyCode::KeyU && self.occupied_cut.is_none() {
@@ -1390,6 +1468,8 @@ impl App {
         let modal_open = self.modal_open();
         let commander = if self.game.is_internal_validation() {
             "Meridian INTERNAL MULE VALIDATION / NO SAVE"
+        } else if self.game.is_medusa_preview() {
+            "Meridian SH171 MEDUSA / ISOLATED PREVIEW"
         } else if self
             .game
             .world
@@ -1463,18 +1543,21 @@ impl App {
         }
 
         let traffic = self.game.world.traffic_snapshot();
-        let cockpit =
-            if self.game.playing() && !self.commander_open && !self.game.is_internal_validation() {
-                match crate::hud::cockpit::Cockpit::capture(&self.game.world, snapshot) {
-                    Ok(cockpit) => Some(cockpit),
-                    Err(error) => {
-                        self.fail(event_loop, error);
-                        return;
-                    }
+        let cockpit = if self.game.playing()
+            && !self.commander_open
+            && !self.game.is_internal_validation()
+            && !self.game.is_medusa_preview()
+        {
+            match crate::hud::cockpit::Cockpit::capture(&self.game.world, snapshot) {
+                Ok(cockpit) => Some(cockpit),
+                Err(error) => {
+                    self.fail(event_loop, error);
+                    return;
                 }
-            } else {
-                None
-            };
+            }
+        } else {
+            None
+        };
         self.missile_bodies.clear();
         self.missile_bodies.extend(
             self.game
@@ -1541,6 +1624,7 @@ impl App {
             );
             let practice = self.game.world.practice_snapshot();
             let targeting = Self::target_readout(&self.game.world);
+            renderer.set_player_hull(self.game.world.player_hull_kind());
             renderer.set_flight_view(if self.game.is_internal_validation() {
                 self.validation_view
             } else {

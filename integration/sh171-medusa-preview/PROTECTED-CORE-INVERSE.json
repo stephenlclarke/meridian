@@ -1,0 +1,100 @@
+{
+  "base": "0ee29620932d0f74e0540e8344bcbf319078c3ec",
+  "files": {
+    "flight.rs": {
+      "beforeSHA256": "3a7c020b4eef43b6c4a7ccf8db5cdb0e126451b3d94117cbfcfc460acbcc1365",
+      "afterSHA256": "ec32d85a50a574e78d6903c17e51b8f19b76efbaf97fa3bd8603035babb802cc",
+      "hunks": [
+        {
+          "offset": 391,
+          "before": "",
+          "after": "mod medusa_preview;\npub use medusa_preview::{MedusaPreviewFit, PlayerHullKind};\n"
+        },
+        {
+          "offset": 7894,
+          "before": "",
+          "after": "    medusa_preview_fit: Option<MedusaPreviewFit>,\n"
+        },
+        {
+          "offset": 9787,
+          "before": "",
+          "after": "            medusa_preview_fit: None,\n"
+        },
+        {
+          "offset": 25536,
+          "before": "        if !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n",
+          "after": "        let hull = if self.medusa_preview_fit.is_some() {\n            PlayerHullKind::Medusa\n        } else {\n            PlayerHullKind::Peregrine\n        };\n        let (max_speed, acceleration, pitch_rate, yaw_rate, roll_rate) = hull.flight_rates();\n        if !(0.0..=max_speed).contains(&self.state.speed) {\n"
+        },
+        {
+          "offset": 25911,
+          "before": "        let yaw = axis_rotation(1, input.yaw * YAW_RATE * FIXED_DELTA_SECONDS);\n        let pitch = axis_rotation(0, -input.pitch * PITCH_RATE * FIXED_DELTA_SECONDS);\n        let roll = axis_rotation(2, input.roll * ROLL_RATE * FIXED_DELTA_SECONDS);\n",
+          "after": "        let yaw = axis_rotation(1, input.yaw * yaw_rate * FIXED_DELTA_SECONDS);\n        let pitch = axis_rotation(0, -input.pitch * pitch_rate * FIXED_DELTA_SECONDS);\n        let roll = axis_rotation(2, input.roll * roll_rate * FIXED_DELTA_SECONDS);\n"
+        },
+        {
+          "offset": 26437,
+          "before": "            (next.speed + throttle * ACCELERATION * FIXED_DELTA_SECONDS).clamp(0.0, MAX_SPEED);\n",
+          "after": "            (next.speed + throttle * acceleration * FIXED_DELTA_SECONDS).clamp(0.0, max_speed);\n"
+        },
+        {
+          "offset": 27881,
+          "before": "                input.pitch.abs() * PITCH_RATE\n                    + input.yaw.abs() * YAW_RATE\n                    + input.roll.abs() * ROLL_RATE,\n",
+          "after": "                input.pitch.abs() * pitch_rate\n                    + input.yaw.abs() * yaw_rate\n                    + input.roll.abs() * roll_rate,\n"
+        },
+        {
+          "offset": 29441,
+          "before": "                    f64::from(input.roll * ROLL_RATE),\n",
+          "after": "                    f64::from(input.roll * roll_rate),\n"
+        },
+        {
+          "offset": 40696,
+          "before": "",
+          "after": "        if entry && self.medusa_preview_fit.is_some() {\n            // Docked preview has no flight body. Do not save a pose inside station geometry.\n            next.position = [0.0; 3];\n            next.orientation = [0.0, 0.0, 0.0, 1.0];\n        }\n"
+        }
+      ]
+    },
+    "flight/emp/tests.rs": {
+      "beforeSHA256": "fa0952492c31518165f8591524d6deb2ed4ad6b47b348e6d8d6ae14db4d328c2",
+      "afterSHA256": "80a082a07f56c228f2cc28c585e271fb007be6ace1fb304a0092711db737f05d",
+      "hunks": [
+        {
+          "offset": 24403,
+          "before": "",
+          "after": "        medusa_preview_fit: decoded.medusa_preview_fit,\n"
+        }
+      ]
+    },
+    "flight/flight_reception.rs": {
+      "beforeSHA256": "d2c6ac3b7f0f7d353de9017d70b4b6ccff04d0a320622eb797773abb072f7b75",
+      "afterSHA256": "66613ec89ba35f5dc6a398f7548ddc1c304c39674a9d20a34ec4467fcfa80984",
+      "hunks": [
+        {
+          "offset": 6971,
+          "before": "        self.flight_reception_admission(expected_tick)?;\n",
+          "after": "        if self.medusa_preview_fit.is_some() {\n            if expected_tick != self.state.tick {\n                return Err(FlightReceptionError::StaleReview);\n            }\n        } else {\n            self.flight_reception_admission(expected_tick)?;\n        }\n"
+        }
+      ]
+    },
+    "flight/persistence.rs": {
+      "beforeSHA256": "fec2a139acd3ebd64998363f0c82047eb777cfc7bb8ed9e20010255d0d66f487",
+      "afterSHA256": "4628ba0f08a5dde7da89774d797598ce12b27c55fb69b4d51c821aae554bcf1a",
+      "hunks": [
+        {
+          "offset": 22800,
+          "before": "",
+          "after": "            medusa_preview_fit: None,\n"
+        }
+      ]
+    },
+    "lib.rs": {
+      "beforeSHA256": "955fb67afbfe6bfcb2678ebb1a0aeb3e2aaff03afadd3edb662a95157d55bce4",
+      "afterSHA256": "3afae139460a809b3341bf0242c836018200b802d3f5b507faca6cde129a04a9",
+      "hunks": [
+        {
+          "offset": 1277,
+          "before": "",
+          "after": "pub use flight::{MedusaPreviewFit, PlayerHullKind};\n"
+        }
+      ]
+    }
+  }
+}
