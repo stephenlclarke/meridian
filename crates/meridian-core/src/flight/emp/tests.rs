@@ -1251,6 +1251,11 @@ fn start_real_3d_charge(w: &mut World, target: crate::traffic::NpcId) {
     panic!("actual three-dimensional EMP aim never admitted its native attacker");
 }
 fn disabled_native_target() -> (World, crate::traffic::NpcId) {
+    disabled_native_target_with_fit(|_| {})
+}
+fn disabled_native_target_with_fit(
+    configure: impl FnOnce(&mut World),
+) -> (World, crate::traffic::NpcId) {
     let mut w = legacy_funded_paid_base();
     let item = w.owned_emp().unwrap().item;
     for axis in [EmpAxis::Power, EmpAxis::Capacity, EmpAxis::Recharge] {
@@ -1258,6 +1263,7 @@ fn disabled_native_target() -> (World, crate::traffic::NpcId) {
             equipment(&mut w, EmpEquipmentAction::Upgrade { item, axis });
         }
     }
+    configure(&mut w);
     let (mut w, target) = defender(w);
     leave_native_npc_beam_plane(&mut w);
     let mut shield_shots = 0;
@@ -1315,6 +1321,149 @@ fn disabled_native_target() -> (World, crate::traffic::NpcId) {
         w.step(track_real_target(&w, target)).unwrap();
     }
     panic!("actual aimed paid EMP releases did not disable the real recent attacker");
+}
+
+#[test]
+fn occupied_cut_requires_explicit_review_and_retains_actual_finite_game_contact() {
+    use crate::equipment::TargetingTier;
+    use crate::{ModuleAction, ModuleKind, OccupiedCutError, TargetingViewport};
+    fn buy(world: &mut World, kind: ModuleKind) {
+        let tick = world.snapshot().tick;
+        let action = if kind == ModuleKind::FuelScoops {
+            ModuleAction::PurchaseFuelScoops
+        } else {
+            ModuleAction::Purchase { kind }
+        };
+        let review = world.review_module(action, tick).unwrap();
+        world.prepare_module(review, tick).unwrap().commit();
+    }
+    let (mut world, target) = disabled_native_target_with_fit(|world| {
+        if world.targeting_tier().is_none() {
+            buy(world, ModuleKind::Targeting(TargetingTier::Basic));
+        }
+        if !world.work_targeting_fit().salvage {
+            buy(world, ModuleKind::SalvageTargeting);
+        }
+        if world.fitted_fuel_scoops().is_none() {
+            buy(world, ModuleKind::FuelScoops);
+        }
+        buy(world, ModuleKind::SalvageCutter);
+    });
+    let cutter = world.fitted_salvage_cutter().unwrap().id;
+    let tick = world.snapshot().tick;
+    assert!(
+        world
+            .cycle_targeting(
+                tick,
+                TargetingViewport {
+                    size: [1280, 720],
+                    front: vec![target]
+                }
+            )
+            .unwrap()
+    );
+    for _ in 0..4 {
+        if world.selected_disabled_salvage_target() == Some(target) {
+            break;
+        }
+        world
+            .cycle_targeting(
+                tick,
+                TargetingViewport {
+                    size: [1280, 720],
+                    front: vec![target],
+                },
+            )
+            .unwrap();
+    }
+    assert_eq!(world.selected_disabled_salvage_target(), Some(target));
+    // Readiness includes the actual working hold, so advance the ordinary guidance
+    // until the same review shown to the pilot becomes available.
+    let review = loop {
+        let now = world.snapshot().tick;
+        assert!(now - tick < 1600, "occupied hold did not settle");
+        match world.review_occupied_cut(target, now) {
+            Ok(review) => break review,
+            Err(OccupiedCutError::UnsafeHold | OccupiedCutError::ContactUnavailable) => {
+                world.step(FlightInput::default()).unwrap();
+            }
+            Err(error) => panic!("unexpected occupied review refusal: {error}"),
+        }
+    };
+    let before = world.save_bytes().unwrap();
+    assert!(review.warning().contains("OCCUPIED / CLAIMED"));
+    review.cancel();
+    assert_eq!(world.save_bytes().unwrap(), before);
+    let stale = world
+        .review_occupied_cut(target, world.snapshot().tick)
+        .unwrap();
+    world.step(FlightInput::default()).unwrap();
+    assert!(matches!(
+        world.prepare_occupied_cut(stale),
+        Err(OccupiedCutError::StaleReview)
+    ));
+    // The composed guidance owns the actual hold. Do not inject an actor, pose or cargo.
+    let contact = loop {
+        assert!(
+            world.snapshot().tick - tick < 1600,
+            "actual occupied hold did not settle before recovery"
+        );
+        let now = world.snapshot().tick;
+        let review = match world.review_occupied_cut(target, now) {
+            Ok(review) => review,
+            Err(OccupiedCutError::UnsafeHold | OccupiedCutError::ContactUnavailable) => {
+                world.step(FlightInput::default()).unwrap();
+                continue;
+            }
+            Err(error) => panic!("unexpected occupied review refusal: {error}"),
+        };
+        let actor_before = world.traffic_snapshot().unwrap().actors;
+        let account = world.service_snapshot();
+        let credits = world.credits_tenths();
+        let receipt_count = world.occupied_cut_contacts().count();
+        match world.prepare_occupied_cut(review) {
+            Ok(prepared) => {
+                assert_eq!(
+                    prepared.publish_with(|_| Err::<(), _>("writer")),
+                    Err("writer")
+                );
+                assert_eq!(world.occupied_cut_contacts().count(), receipt_count);
+                let opening = world.save_bytes().unwrap();
+                let again = world.review_occupied_cut(target, now).unwrap();
+                let prepared = world.prepare_occupied_cut(again).unwrap();
+                let cold = World::from_save_bytes(prepared.bytes()).unwrap();
+                let contact = prepared.commit();
+                assert_ne!(world.save_bytes().unwrap(), opening);
+                assert_eq!(contact.cutter_item, cutter);
+                assert_eq!(contact.target, target);
+                assert_eq!(cold.occupied_cut_contacts().collect::<Vec<_>>(), [contact]);
+                assert_eq!(world.traffic_snapshot().unwrap().actors, actor_before);
+                assert_eq!(world.service_snapshot(), account);
+                assert_eq!(world.credits_tenths(), credits);
+                assert!(matches!(
+                    world.review_occupied_cut(target, now),
+                    Err(OccupiedCutError::Cooldown)
+                ));
+                break contact;
+            }
+            Err(OccupiedCutError::UnsafeHold | OccupiedCutError::ContactUnavailable) => {
+                assert_eq!(world.occupied_cut_contacts().count(), receipt_count);
+                world.step(FlightInput::default()).unwrap();
+            }
+            Err(error) => panic!("unexpected occupied hold refusal: {error}"),
+        }
+    };
+    assert_eq!(world.occupied_cut_contacts().collect::<Vec<_>>(), [contact]);
+    let retained = world.save_bytes().unwrap();
+    let marker = retained
+        .windows(8)
+        .position(|part| part == b"MCUT0001")
+        .unwrap();
+    let mut erased = retained[..marker].to_vec();
+    erased.extend(crate::save::checksum(&erased).to_le_bytes());
+    assert!(World::from_save_bytes(&erased).is_err());
+    assert!(world.restore_bytes(&erased).is_err());
+    assert_eq!(world.save_bytes().unwrap(), retained);
 }
 fn native_facing_budget(w: &World, target: crate::traffic::NpcId) -> Option<u32> {
     let p = w.snapshot();

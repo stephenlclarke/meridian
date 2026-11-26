@@ -502,6 +502,37 @@ impl Profile {
         self.session.command(&mut self.world, action)
     }
 
+    pub fn confirm_occupied_cut(
+        &mut self,
+        review: meridian_core::OccupiedCutReview,
+    ) -> Result<String, String> {
+        self.require_profile()?;
+        if !self.playing {
+            return Err("No active commander".into());
+        }
+        let prepared = self
+            .world
+            .prepare_occupied_cut(review)
+            .map_err(|e| e.to_string())?;
+        let published = self
+            .store
+            .as_ref()
+            .ok_or("No profile storage")?
+            .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
+            .map_err(|error| format!("Occupied contact could not be saved: {error}"))?;
+        let contact = prepared.commit();
+        self.has_save = true;
+        self.session.invalidate();
+        publication_message(
+            published,
+            if contact.unlawful {
+                "Occupied contact recorded as unlawful; no verified material. Change saved.".into()
+            } else {
+                "Occupied contact attributed; no verified material. Change saved.".into()
+            },
+        )
+    }
+
     pub(crate) fn navigation_route(
         &mut self,
         plan: Option<&meridian_core::navigation::RoutePlan>,

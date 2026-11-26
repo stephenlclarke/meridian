@@ -25,6 +25,7 @@ mod navigation_trade;
 mod route;
 pub use route::PreparedNavigationRoute;
 mod auto_docking;
+mod occupied_salvage;
 mod targeting;
 mod traffic;
 pub use navigation_trade::{
@@ -32,6 +33,9 @@ pub use navigation_trade::{
     NavigationTradeId, NavigationTradeMarketSnapshot, NavigationTradeOutcome,
     NavigationTradePlanSnapshot, NavigationTradeReview, NavigationTradeSnapshot,
     NavigationTradeTrace, PreparedNavigationTrade, PreparedStationService,
+};
+pub use occupied_salvage::{
+    OccupiedCutContact, OccupiedCutError, OccupiedCutReview, PreparedOccupiedCut,
 };
 pub use targeting::{
     TargetFilter, TargetIdentity, TargetMode, TargetingSnapshot, TargetingViewport,
@@ -213,6 +217,7 @@ pub struct World {
     xyzzy: xyzzy::State,
     emp: emp::State,
     ecm: ecm::State,
+    occupied_salvage: occupied_salvage::State,
     navigation_trade: navigation_trade::State,
     flight_reception: flight_reception::State,
     practice: Option<practice::Practice>,
@@ -265,6 +270,7 @@ impl World {
             xyzzy: xyzzy::State::default(),
             emp: emp::State::default(),
             ecm: ecm::State::default(),
+            occupied_salvage: occupied_salvage::State::default(),
             navigation_trade: navigation_trade::State::default(),
             flight_reception: flight_reception::State::default(),
             practice: None,

@@ -310,4 +310,26 @@ impl State {
             .and_then(|i| self.actors[i])
             .is_some_and(|a| a.resources.energy == 0 && a.resource_clock <= local)
     }
+
+    /// Check the retained game actor's actual resource state at a command witness.
+    pub(crate) fn occupied_disabled_at(
+        &self,
+        id: NpcId,
+        scene: &MissileScene,
+    ) -> Result<super::Population, SaveError> {
+        let actor = self.actors[self.actor_index(id).ok_or(INVALID)?].ok_or(INVALID)?;
+        if scene.target(id).is_none() || id.system() != scene.system {
+            return Err(INVALID);
+        }
+        let resources =
+            self.resources_at(actor, scene.local_tick, scene.world_tick, scene.stage)?;
+        if resources.energy == 0
+            || !resources
+                .electrical
+                .is_some_and(|pool| pool.disabled && pool.crew_aboard == 1)
+        {
+            return Err(INVALID);
+        }
+        Ok(actor.snapshot().population)
+    }
 }

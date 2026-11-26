@@ -14,6 +14,26 @@ pub struct Panel {
 }
 
 impl Panel {
+    pub fn occupied_cut(review: &meridian_core::OccupiedCutReview) -> Self {
+        let mut panel = Self::new(
+            "Occupied salvage - confirm contact",
+            &[
+                "OCCUPIED / CLAIMED. The ship is not abandoned salvage.",
+                "Crew and paid cargo remain protected.",
+                "Deliberate cutter contact is attributed to your commander.",
+                "No verified detachable material is available on this hull.",
+                "Enter confirms one contact. Escape cancels without any change.",
+            ],
+        );
+        if review.is_unlawful() {
+            panel.lines.insert(
+                2,
+                "Warning: contact is an unlawful attack in this game.".into(),
+            );
+        }
+        panel.footer = "Enter Confirm | Escape Cancel";
+        panel
+    }
     fn new(title: impl Into<String>, controls: &[&str]) -> Self {
         Self {
             title: title.into(),

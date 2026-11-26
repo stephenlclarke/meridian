@@ -1459,6 +1459,18 @@ impl State {
         self.ledger_at(owner, tick, visit)?
             .fitted(ModuleSlot::UtilityEcm)
     }
+    pub(super) fn salvage_cut_fit_at(
+        &self,
+        owner: u64,
+        tick: u64,
+        visit: u64,
+    ) -> Option<OwnedModule> {
+        let ledger = self.ledger_at(owner, tick, visit)?;
+        ledger.fitted(ModuleSlot::Targeting)?;
+        ledger.fitted(ModuleSlot::SalvageTargeting)?;
+        ledger.fitted(ModuleSlot::UtilityFuelScoops)?;
+        ledger.fitted(ModuleSlot::UtilitySalvageCutter)
+    }
     pub(super) fn drive_at_visit(&self, owner: u64, tick: u64, visit: u64) -> Option<DriveGrade> {
         self.ledger_at(owner, tick, visit)?
             .drive()

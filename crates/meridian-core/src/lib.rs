@@ -74,6 +74,7 @@ pub use flight::{
 pub use flight::{
     CombatIdentity, CombatSnapshot, OrdinaryImpact, OrdinaryTarget, OrdinaryWeapon, PlayerCondition,
 };
+pub use flight::{OccupiedCutContact, OccupiedCutError, OccupiedCutReview, PreparedOccupiedCut};
 pub use flight::{TargetFilter, TargetIdentity, TargetMode, TargetingSnapshot, TargetingViewport};
 
 pub use flight::{

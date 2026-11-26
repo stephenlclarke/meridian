@@ -112,7 +112,15 @@ impl World {
         self.traffic.wreck_manifest(source)
     }
     pub fn traffic_snapshot(&self) -> Option<TrafficSnapshot> {
-        self.traffic.snapshot(self.combat_identity()?.system)
+        let system = self.combat_identity()?.system;
+        let mut snapshot = self.traffic.snapshot(system)?;
+        snapshot.verified_crimes = snapshot
+            .verified_crimes
+            .saturating_add(self.occupied_salvage.crimes());
+        if self.occupied_salvage.crime_in(system) {
+            snapshot.police_required_hull = Some("SH031");
+        }
+        Some(snapshot)
     }
     pub(super) fn traffic_beam_contact(
         &self,

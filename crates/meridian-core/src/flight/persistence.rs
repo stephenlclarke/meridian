@@ -22,6 +22,7 @@ const SOLAR_EXTENSION: &[u8; 8] = b"MSOL0003";
 const ECM_EXTENSION: &[u8; 8] = b"MECM0002";
 const ECM_FIELD_EXTENSION: &[u8; 8] = b"MECM0003";
 const MINING_INTAKE_EXTENSION: &[u8; 8] = b"MINT0001";
+const OCCUPIED_CUT_EXTENSION: &[u8; 8] = b"MCUT0001";
 const CONTENT: &[u8] = concat!(
     "meridian-world/rules/17;explicit-xyzzy/account-prefix-replay-v2/a11fe169;distinct-emp/paid-defensive-local-v1/a11fe169;navigation-computer/exact-route-journal/a11fe169;lareria-main-services/station-combat-three-v1/a11fe169;rapid-lasers-energy/shared-nine-byte-resources-v1/a11fe169;mining/native-work-pending-v2;fuel-scoops/paid-utility-v1;npc-missiles/canonical-native-ray-v3;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
@@ -68,6 +69,12 @@ fn ecm_content_fingerprint(base: u64, field: bool) -> u64 {
     } else {
         b"stock-ecm-history/v2-local-flight".as_slice()
     });
+    checksum(&bytes)
+}
+
+fn occupied_cut_fingerprint(base: u64) -> u64 {
+    let mut bytes = base.to_le_bytes().to_vec();
+    bytes.extend(b"occupied-salvage-contact/v1");
     checksum(&bytes)
 }
 
@@ -334,10 +341,15 @@ impl World {
         } else {
             solar_content_fingerprint(!self.solar.is_empty())
         };
-        w.u64(if self.ecm.is_empty() {
+        let fingerprint = if self.ecm.is_empty() {
             base_fingerprint
         } else {
             ecm_content_fingerprint(base_fingerprint, self.ecm.has_field_history())
+        };
+        w.u64(if self.occupied_salvage.is_empty() {
+            fingerprint
+        } else {
+            occupied_cut_fingerprint(fingerprint)
         });
         write_flight(&mut w, &self.state);
         self.navigation
@@ -391,6 +403,10 @@ impl World {
                 ECM_EXTENSION
             });
             self.ecm.encode(&mut w);
+        }
+        if !self.occupied_salvage.is_empty() {
+            w.bytes.extend(OCCUPIED_CUT_EXTENSION);
+            self.occupied_salvage.encode(&mut w);
         }
         // The checksum remains part of the original fixed ordinary budget.
         if w.bytes.len() + 8 > MAX_SAVE_BYTES {
@@ -475,6 +491,21 @@ impl World {
             return Err(SaveError::ContentMismatch);
         }
         let fingerprint = header.u64()?;
+        let (fingerprint, cut_expected) = [
+            compiled_content_fingerprint(CONTENT),
+            solar_content_fingerprint(true),
+            solar_content_fingerprint(false),
+        ]
+        .into_iter()
+        .flat_map(|base| {
+            [
+                base,
+                ecm_content_fingerprint(base, false),
+                ecm_content_fingerprint(base, true),
+            ]
+        })
+        .find(|&base| occupied_cut_fingerprint(base) == fingerprint)
+        .map_or((fingerprint, false), |base| (base, true));
         let (fingerprint, ecm_version) = [
             compiled_content_fingerprint(CONTENT),
             solar_content_fingerprint(true),
@@ -565,6 +596,7 @@ impl World {
             xyzzy,
             emp,
             ecm: super::ecm::State::default(),
+            occupied_salvage: super::occupied_salvage::State::default(),
             flight_reception,
             navigation_trade,
             practice_history,
@@ -585,38 +617,44 @@ impl World {
         candidate.damage = super::damage::State::decode(&mut r, version)?;
         candidate.mining = crate::mining::State::decode_base(&mut r)?;
         candidate.jump_journal = crate::navigation::JumpJournal::decode(&mut r)?;
-        let mut tag = if r.finished() {
-            None
-        } else {
-            Some(r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)?)
+        let next_tag = |reader: &mut Reader<'_>| {
+            if reader.finished() {
+                Ok(None)
+            } else {
+                reader
+                    .fixed::<8>()
+                    .map(Some)
+                    .map_err(|_| SaveError::InvalidEncoding)
+            }
         };
+        let mut tag = next_tag(&mut r)?;
         if tag == Some(*MINING_INTAKE_EXTENSION) {
             candidate.mining.decode_collections(&mut r)?;
-            tag = if r.finished() {
-                None
-            } else {
-                Some(r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)?)
-            };
+            tag = next_tag(&mut r)?;
         }
-        if let Some(tag) = tag {
-            if tag == *ROUTE_EXTENSION {
-                candidate.navigation_route =
-                    Some(crate::navigation::RoutePlan::decode_save(&mut r)?);
-                if let Some(field) = ecm_version {
-                    if r.fixed::<8>()? != *ecm_tag {
-                        return Err(SaveError::InvalidEncoding);
-                    }
-                    candidate.ecm = super::ecm::State::decode(&mut r, field)?;
-                }
-            } else if let Some(field) = ecm_version
-                && tag == *ecm_tag
-            {
-                candidate.ecm = super::ecm::State::decode(&mut r, field)?;
-            } else {
+        if tag == Some(*ROUTE_EXTENSION) {
+            candidate.navigation_route = Some(crate::navigation::RoutePlan::decode_save(&mut r)?);
+            tag = next_tag(&mut r)?;
+        }
+        if let Some(field) = ecm_version {
+            if tag != Some(*ecm_tag) {
                 return Err(SaveError::InvalidEncoding);
             }
+            candidate.ecm = super::ecm::State::decode(&mut r, field)?;
+            tag = next_tag(&mut r)?;
         }
-        if !r.finished() || ecm_expected == candidate.ecm.is_empty() {
+        if cut_expected {
+            if tag != Some(*OCCUPIED_CUT_EXTENSION) {
+                return Err(SaveError::InvalidEncoding);
+            }
+            candidate.occupied_salvage = super::occupied_salvage::State::decode(&mut r)?;
+            tag = None;
+        }
+        if tag.is_some()
+            || !r.finished()
+            || ecm_expected == candidate.ecm.is_empty()
+            || cut_expected == candidate.occupied_salvage.is_empty()
+        {
             return Err(SaveError::InvalidEncoding);
         }
         if solar_expected == Some(true) {
@@ -806,6 +844,7 @@ impl World {
             markets,
         )?;
         self.validate_traffic_player_scenes()?;
+        self.occupied_salvage.validate(self, commerce.modular)?;
         self.validate_npc_missile_receipts()?;
         self.validate_mining_work(commerce.modular)?;
         if self.state.mode != FlightMode::Docked {
