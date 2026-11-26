@@ -1,0 +1,65 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 1550,
+    "native": 1800
+  },
+  "fullUpperMillimetres": {
+    "detailed": 1529,
+    "native": 1794
+  },
+  "pieces": {
+    "low freight deck[1]": {
+      "detailed": 815,
+      "native": 1609
+    },
+    "raised aft pressure envelope[1]": {
+      "detailed": 1350,
+      "native": 1350
+    },
+    "longitudinal low deck support[1]": {
+      "detailed": 756,
+      "native": 756
+    },
+    "longitudinal low deck support[2]": {
+      "detailed": 756,
+      "native": 756
+    },
+    "longitudinal low deck support[3]": {
+      "detailed": 756,
+      "native": 756
+    },
+    "cockpit glazing envelope[1]": {
+      "detailed": 820,
+      "native": 992
+    },
+    "cockpit connected structural crossmember[1]": {
+      "detailed": 265,
+      "native": 265
+    },
+    "engine_pair/negative side/connected support[1]": {
+      "detailed": 1362,
+      "native": 1362
+    },
+    "engine_pair/negative side/propulsion casing[1]": {
+      "detailed": 1529,
+      "native": 1718
+    },
+    "engine_pair/negative side/propulsion luminous recess[1]": {
+      "detailed": 1431,
+      "native": 1794
+    },
+    "engine_pair/positive side/connected support[1]": {
+      "detailed": 1362,
+      "native": 1362
+    },
+    "engine_pair/positive side/propulsion casing[1]": {
+      "detailed": 1529,
+      "native": 1718
+    },
+    "engine_pair/positive side/propulsion luminous recess[1]": {
+      "detailed": 1431,
+      "native": 1427
+    }
+  }
+}

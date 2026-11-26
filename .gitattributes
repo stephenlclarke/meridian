@@ -1,3 +1,18 @@
+# Baza Fighter source preparation and replay use exact LF bytes.
+tools/measure_baza_fighter.py text eol=lf
+tools/prepare_baza_fighter.py text eol=lf
+tools/verify_baza_fighter.py text eol=lf
+
+# Badger source preparation and replay use exact LF bytes.
+tools/measure_badger.py text eol=lf
+tools/prepare_badger.py text eol=lf
+tools/verify_badger.py text eol=lf
+
+# Rhinoceros Trader source preparation and replay use exact LF bytes.
+tools/measure_rhinoceros_trader.py text eol=lf
+tools/prepare_rhinoceros_trader.py text eol=lf
+tools/verify_rhinoceros_trader.py text eol=lf
+
 # Rabbit Explorer source preparation and replay use exact LF bytes.
 tools/rabbit_explorer_art_mesh.py text eol=lf
 tools/measure_rabbit_explorer.py text eol=lf

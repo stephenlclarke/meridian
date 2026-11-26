@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh068-badger",
+  "undoBefore": [
+    "sh067-rhinoceros-trader"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "badger",
+  "before": "pub mod arna_cutter;\n",
+  "after": "pub mod banteng;\n"
+}
