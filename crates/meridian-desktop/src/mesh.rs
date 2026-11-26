@@ -1,6 +1,7 @@
 use meridian_core::docking::{Basis3, DockingPort, RigidPose, StationPose, Vec3};
 use meridian_core::{PRACTICE_HALF_SIDE, PracticeBeaconSnapshot, PulseShot, Snapshot};
 
+pub(crate) mod paint;
 mod station_finish;
 mod station_seams;
 pub mod traffic;
@@ -13,7 +14,11 @@ pub struct Vertex {
 }
 
 pub fn load_ship() -> Result<Vec<Vertex>, String> {
-    decode_mesh(include_bytes!("../../../assets/legacy/sh025.mesh"))
+    let mut ship = decode_mesh(include_bytes!("../../../assets/legacy/sh025.mesh"))?;
+    for vertex in &mut ship {
+        vertex.color = paint::ship_linear(vertex.color);
+    }
+    Ok(ship)
 }
 
 pub fn load_station() -> Result<Vec<Vertex>, String> {
