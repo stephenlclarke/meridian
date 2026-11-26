@@ -132,13 +132,13 @@ def _number(value, name):
 def envelope_view(package):
     """Return ``{"vertices": [[x,y,z]], "triangles": [[i,j,k]]}`` in metres.
 
-    The schema-1 detail and native group IDs refer to the same local supports.
+    The detail and native group IDs refer to the same local supports.
     Call after authoritative package validation; this overlay validates only its
     own inputs and deliberately does not reproduce runtime semantic checks.
     A non-volumetric or unrepresentable sampled group raises ValueError.
     """
-    if not isinstance(package, dict) or type(package.get("schema")) is not int or package["schema"] != 1:
-        raise ValueError("Expected schema-1 hull package")
+    if not isinstance(package, dict) or type(package.get("schema")) is not int or package["schema"] not in (1, 2):
+        raise ValueError("Expected a schema-1 or archived inspection hull package")
     scale = _number(package.get("metresPerUnit"), "metresPerUnit")
     radius = _number(package.get("roundingMetres"), "roundingMetres")
     if scale <= 0 or radius < 0:

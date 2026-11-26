@@ -6,7 +6,8 @@ use crate::{
 };
 use meridian_core::docking::Vec3;
 use meridian_core::hull_package::{
-    HullPackage, LOCAL_INSPECTION_PREFIX as LOCAL_PREFIX, MAX_PACKAGE_JSON_BYTES, validate_package,
+    ARCHIVED_INSPECTION_SCHEMA, HullPackage, LOCAL_INSPECTION_PREFIX as LOCAL_PREFIX,
+    MAX_PACKAGE_JSON_BYTES, validate_inspection_package, validate_package,
 };
 use std::{
     fs,
@@ -114,6 +115,9 @@ impl AuthoredHull {
         isolated: bool,
         fingerprint: u64,
     ) -> Result<Self, String> {
+        if package.schema == ARCHIVED_INSPECTION_SCHEMA && !isolated {
+            return Err("Archived mesh packages require --inspect-hull-package".into());
+        }
         let source_id = package.id().to_owned();
         let id = if isolated {
             format!("{LOCAL_PREFIX}{source_id}")
@@ -176,7 +180,12 @@ fn fingerprint(bytes: &[u8]) -> u64 {
 }
 
 fn package_presentation(package: &HullPackage) -> Result<(AuthoredVisual, Vec<String>), String> {
-    let report = validate_package(package);
+    let archived = package.schema == ARCHIVED_INSPECTION_SCHEMA;
+    let report = if archived {
+        validate_inspection_package(package)
+    } else {
+        validate_package(package)
+    };
     if !report.valid {
         return Err(format!(
             "Core hull validation refused: {}",
@@ -188,12 +197,17 @@ fn package_presentation(package: &HullPackage) -> Result<(AuthoredVisual, Vec<St
                 .join("; ")
         ));
     }
-    let pieces = package
-        .pieces()
-        .map_err(|report| format!("Core collision package refused: {:?}", report.diagnostics))?;
-    if pieces.len() != report.support_groups.len() {
-        return Err("Core collision package changed after validation".into());
-    }
+    let pieces = if archived {
+        Vec::new()
+    } else {
+        let pieces = package.pieces().map_err(|report| {
+            format!("Core collision package refused: {:?}", report.diagnostics)
+        })?;
+        if pieces.len() != report.support_groups.len() {
+            return Err("Core collision package changed after validation".into());
+        }
+        pieces
+    };
     // The immutable definition stores source units; collision and every published dimension use metres.
     let vertices: Vec<[f64; 3]> = package
         .detail
@@ -232,22 +246,6 @@ fn package_presentation(package: &HullPackage) -> Result<(AuthoredVisual, Vec<St
             package.native.triangles.len()
         ),
         format!(
-            "Core collision supports: {} ({} m rounding)",
-            pieces.len(),
-            package.rounding_metres
-        ),
-        format!(
-            "Local origin (core contact): {}",
-            if pieces
-                .iter()
-                .any(|piece| piece.contains(Vec3::new(0.0, 0.0, 0.0)))
-            {
-                "BLOCKED"
-            } else {
-                "CLEAR"
-            }
-        ),
-        format!(
             "Materials: {}; mapped faces: {}",
             package.materials.len(),
             package.face_textures.as_ref().map_or(0, |textures| textures
@@ -268,6 +266,35 @@ fn package_presentation(package: &HullPackage) -> Result<(AuthoredVisual, Vec<St
                 format!("Source maximum speed: {speed} (not flight admission)")
             }),
     ];
+    if archived {
+        specs.push(format!(
+            "Archived inspection supports: {} ({} m rounding)",
+            report.support_groups.len(),
+            package.rounding_metres
+        ));
+        specs.push("Native mesh is an archive. Flight export is unavailable.".into());
+        return Ok((visual, specs));
+    }
+    specs.insert(
+        2,
+        format!(
+            "Core collision supports: {} ({} m rounding)",
+            pieces.len(),
+            package.rounding_metres
+        ),
+    );
+    let origin = Vec3::new(0.0, 0.0, 0.0);
+    specs.insert(
+        3,
+        format!(
+            "Local origin (core contact): {}",
+            if pieces.iter().any(|piece| piece.contains(origin)) {
+                "BLOCKED"
+            } else {
+                "CLEAR"
+            }
+        ),
+    );
     if report.clearances.is_empty() {
         specs.push("Core clearance sweeps: none authored".into());
     }
@@ -315,6 +342,28 @@ mod tests {
             bounds: Rect::new(0.0, 0.0, 200.0, 200.0),
             orientation: Orientation::default(),
         }
+    }
+
+    #[test]
+    fn archives_require_isolated_showroom_admission() {
+        let bytes = ok(std::fs::read(fixture_path(false)));
+        let mut package = ok(HullPackage::from_json(&bytes));
+        package.schema = ARCHIVED_INSPECTION_SCHEMA;
+        package.engineering = None;
+        package.flight.max_speed = None;
+        package.clearances.clear();
+        let failure = AuthoredHull::from_package(&package, false, 0)
+            .err()
+            .expect("archive accepted as an ordinary package");
+        assert!(failure.contains("--inspect-hull-package"));
+        let hull = ok(AuthoredHull::from_package(&package, true, 0));
+        assert!(hull.record.id.starts_with(LOCAL_PREFIX));
+        assert!(
+            hull.record
+                .specifications
+                .iter()
+                .any(|line| line.contains("Flight export is unavailable"))
+        );
     }
 
     #[test]

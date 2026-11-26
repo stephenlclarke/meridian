@@ -1,4 +1,4 @@
-import { autoGroups, canExport, editableDefinition, groupIds, inputNumber, isRecord, isVector, mergeGroups, resolvedGroupDefinition, updatedParameter } from './geometry.js';
+import { autoGroups, canExport, canInspect, editableDefinition, groupIds, inputNumber, isRecord, isVector, mergeGroups, resolvedGroupDefinition, updatedParameter } from './geometry.js';
 import { HullViewer } from './viewer.js';
 
 const $ = id => document.getElementById(id);
@@ -165,7 +165,7 @@ function renderReport(build, definition) {
   const report = build?.report;
   const status = $('report-status');
   const building = state.job?.kind === 'build';
-  const valid = canExport(definition, build, state.revision);
+  const valid = canInspect(definition, build, state.revision);
   status.className = `report-status ${building ? 'pending' : valid ? 'valid' : report?.valid === false || state.error ? 'invalid' : ''}`;
   text('report-status-text', building ? 'Building / Validating…' : valid ? 'Built / Validated' : report?.valid === false ? 'Validation failed' : report ? 'Not validated' : 'Not built / Not validated');
   const groups = report?.sourceGroups ?? report?.sourceGroupCount ?? countGroups([build?.package?.detail ?? definition?.detail, build?.package?.native ?? definition?.native]);
@@ -235,10 +235,10 @@ function render(syncFields = true) {
   $('build-button').disabled = !definition || Boolean(state.job);
   $('export-button').disabled = !canExport(definition, build, state.revision) || Boolean(state.job);
   $('showroom-button').hidden = !showroomAvailable;
-  $('showroom-button').disabled = !canExport(definition, build, state.revision) || Boolean(state.job);
+  $('showroom-button').disabled = !canInspect(definition, build, state.revision) || Boolean(state.job);
   $('load-example').disabled = state.job?.kind === 'example';
   $('quit-button').disabled = Boolean(state.job);
-  text('schema-status', definition?.schema == null ? 'Schema —' : `Schema ${definition.schema}`);
+  text('schema-status', definition?.schema == null ? 'Schema —' : `Schema ${definition.schema}${definition.schema === 2 ? ' · inspection only' : ''}`);
   text('status-text', state.status);
   $('state-dot').className = `state-dot ${state.tone}`;
   renderReport(build, definition);
@@ -303,8 +303,12 @@ async function buildDefinition() {
       state.tone = 'error';
     } else {
       state.build = { revision: state.revision, package: isRecord(payload.package) ? payload.package : null, report };
-      const valid = canExport(state.definition, state.build, state.revision);
-      state.status = valid ? 'Validated · ready to export' : 'Build not validated · review diagnostics';
+      const valid = canInspect(state.definition, state.build, state.revision);
+      if (valid) {
+        state.status = state.definition.schema === 2 ? "Archive validated · inspection only" : "Validated · ready to export";
+      } else {
+        state.status = "Build not validated · review diagnostics";
+      }
       state.tone = valid ? 'ready' : 'error';
       if (report.valid === true && !state.build.package) state.error = 'The report was valid, but no package was returned.';
     }
@@ -371,7 +375,7 @@ async function discoverCapabilities() {
 }
 
 async function openShowroom() {
-  if (!showroomAvailable || !canExport(state.definition, currentBuild(), state.revision) || state.job) return;
+  if (!showroomAvailable || !canInspect(state.definition, currentBuild(), state.revision) || state.job) return;
   const job = beginJob('showroom', 'Opening isolated game showroom…');
   try {
     const response = await fetch('/api/showroom', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ definition: state.definition }), signal: job.controller.signal });

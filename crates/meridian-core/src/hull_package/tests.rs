@@ -21,6 +21,7 @@ fn package() -> HullPackage {
             emissive: false,
         }],
         face_materials: vec![0; 4],
+        native_face_materials: None,
         face_textures: None,
         engineering: Some(Engineering {
             mass_kg: 50.,
@@ -260,4 +261,24 @@ fn reserved_local_inspection_source_ids_refuse_without_affecting_ordinary_names(
     source.id = "local-hull".into();
     source.name = "LOCAL: descriptive name".into();
     assert!(validate_package(&source).valid);
+}
+
+#[test]
+fn oversized_native_archive_passes_only_inspection_validation() {
+    let mut definition = package();
+    definition.schema = ARCHIVED_INSPECTION_SCHEMA;
+    definition.engineering = None;
+    definition.flight.max_speed = None;
+    definition.clearances.clear();
+    definition
+        .native
+        .triangles
+        .extend([[0, 1, 2]; MAX_NATIVE_FACES]);
+    definition.native_face_materials = Some(vec![0; definition.native.triangles.len()]);
+    assert!(validate_inspection_package(&definition).valid);
+    assert!(!validate_package(&definition).valid);
+    assert!(definition.pieces().is_err());
+    definition.schema = 1;
+    assert!(!validate_package(&definition).valid);
+    assert!(!validate_inspection_package(&definition).valid);
 }
