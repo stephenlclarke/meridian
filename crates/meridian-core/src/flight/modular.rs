@@ -10,6 +10,7 @@ use core::fmt;
 mod cabins;
 mod fuel_history;
 mod history;
+mod salvage;
 pub(super) use cabins::add_cabin_mass;
 pub use cabins::{
     CABIN_TONNES, CabinGrade, CabinStatus, PASSAGE_CLUE_ID, PASSAGE_REWARD_TENTHS, PassageStatus,
@@ -35,6 +36,7 @@ pub enum ModuleKind {
     NavalEnergyUnit,
     EliteEnergyUnit,
     FuelScoops,
+    SalvageCutter,
     Ecm,
     FuelStorage,
     BasicNavigation,
@@ -56,6 +58,7 @@ impl ModuleKind {
             | Self::MilitaryLaser
             | Self::NavalLaser => "laser",
             Self::FuelScoops => "utility-fuelScoops",
+            Self::SalvageCutter => "utility-salvageCutter",
             Self::Ecm => "utility-ecm",
             Self::FuelStorage => "fuel-storage",
             Self::BasicNavigation | Self::IntermediateNavigation | Self::AdvancedNavigation => {
@@ -94,6 +97,7 @@ impl ModuleKind {
             Self::PulseLaser => "Pulse Laser",
             Self::MiningLaser => "Mining Laser",
             Self::FuelScoops => "Fuel Scoops",
+            Self::SalvageCutter => "Salvage Cutter",
             Self::Ecm => "E.C.M. System",
             Self::FuelStorage => "Fuel Storage Unit",
             Self::MiningTargeting => "Mining Targeting Module",
@@ -134,6 +138,7 @@ impl ModuleKind {
             | Self::MilitaryLaser
             | Self::NavalLaser => ModuleSlot::FrontLaser,
             Self::FuelScoops => ModuleSlot::UtilityFuelScoops,
+            Self::SalvageCutter => ModuleSlot::UtilitySalvageCutter,
             Self::Ecm => ModuleSlot::UtilityEcm,
             Self::FuelStorage => ModuleSlot::FuelStorage(0),
             Self::BasicNavigation | Self::IntermediateNavigation | Self::AdvancedNavigation => {
@@ -172,6 +177,7 @@ impl ModuleKind {
                 | Self::EliteEnergyUnit
                 | Self::AdvancedNavigation
                 | Self::FuelScoops
+                | Self::SalvageCutter
                 | Self::Ecm
                 | Self::FuelStorage
                 | Self::Targeting(TargetingTier::Military)
@@ -192,7 +198,7 @@ impl ModuleKind {
             Self::EliteEnergyUnit => 4,
             Self::Targeting(_) | Self::MiningTargeting | Self::SalvageTargeting => 1,
             Self::Drive(DriveGrade::Intermediate | DriveGrade::Advanced) => 1,
-            Self::FuelStorage | Self::Ecm => 1,
+            Self::FuelStorage | Self::Ecm | Self::SalvageCutter => 1,
             Self::Shield(grade) => grade.equipment_units(),
             Self::Cabin(_) => 1,
             _ => 0,
@@ -201,6 +207,7 @@ impl ModuleKind {
     fn shop(self) -> Option<(u32, u8)> {
         match self {
             Self::FuelScoops => Some((scoops::PRICE_TENTHS, scoops::REQUIRED_TL)),
+            Self::SalvageCutter => Some((25_000, 7)),
             Self::Ecm => Some((21_000, 5)),
             Self::FuelStorage => Some((20_000, 1)),
             Self::PulseLaser => Some((14500, 3)),
@@ -276,6 +283,7 @@ impl ModuleKind {
             Self::Shield(grade) => 24 + grade as u8,
             Self::FuelStorage => 31,
             Self::Ecm => 32,
+            Self::SalvageCutter => 33,
             Self::Cabin(grade) => 40 + grade as u8,
         }
     }
@@ -303,6 +311,7 @@ impl ModuleKind {
             24..=30 => Ok(Self::Shield(ShieldGrade::from_tag(tag - 24)?)),
             31 => Ok(Self::FuelStorage),
             32 => Ok(Self::Ecm),
+            33 => Ok(Self::SalvageCutter),
             40..=45 => Ok(Self::Cabin(CabinGrade::ALL[usize::from(tag - 40)])),
             _ => Err(SaveError::InvalidEncoding),
         }
@@ -313,6 +322,7 @@ pub enum ModuleSlot {
     FrontLaser,
     Energy,
     UtilityFuelScoops,
+    UtilitySalvageCutter,
     UtilityEcm,
     FuelStorage(u8),
     Navigation,
@@ -372,16 +382,26 @@ pub struct ModuleOffer {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleAction {
     PurchaseMiningLaser,
-    Purchase { kind: ModuleKind },
+    Purchase {
+        kind: ModuleKind,
+    },
     PurchaseFuelScoops,
-    Store { item: u64 },
-    Install { item: u64, replacing: Option<u64> },
+    /// Reserved for the explicit XYZZY outfit; ordinary reviews refuse it.
+    GrantStoredSalvageCutter,
+    Store {
+        item: u64,
+    },
+    Install {
+        item: u64,
+        replacing: Option<u64>,
+    },
     Passenger(PassengerAction),
 }
 impl ModuleAction {
     fn purchase_kind(self) -> Option<ModuleKind> {
         match self {
             Self::PurchaseFuelScoops => Some(ModuleKind::FuelScoops),
+            Self::GrantStoredSalvageCutter => Some(ModuleKind::SalvageCutter),
             Self::PurchaseMiningLaser => Some(ModuleKind::MiningLaser),
             Self::Purchase { kind } => Some(kind),
             _ => None,
@@ -456,6 +476,7 @@ pub(super) struct State {
     events: Vec<Event>,
     cargo_fit_history: Vec<fuel_history::CargoFit>,
     history: history::History,
+    salvage: salvage::State,
 }
 pub struct PreparedModule<'a> {
     world: &'a mut World,
@@ -693,6 +714,9 @@ impl Ledger {
         })
     }
     fn apply(&mut self, event: Event, transaction: u32) -> Result<(), ModuleError> {
+        if event.action == ModuleAction::GrantStoredSalvageCutter && !event.xyzzy {
+            return Err(ModuleError::NotForSale);
+        }
         if let Some(kind) = event.action.purchase_kind() {
             let price = if event.xyzzy {
                 0
@@ -732,7 +756,9 @@ impl Ledger {
                     }
                 },
             });
-            self.install(self.items.len() - 1, replacing)?;
+            if event.action != ModuleAction::GrantStoredSalvageCutter {
+                self.install(self.items.len() - 1, replacing)?;
+            }
             self.paid = self
                 .paid
                 .checked_add(if event.xyzzy { 0 } else { price })
@@ -773,6 +799,7 @@ impl Ledger {
                 }
                 ModuleAction::PurchaseMiningLaser
                 | ModuleAction::PurchaseFuelScoops
+                | ModuleAction::GrantStoredSalvageCutter
                 | ModuleAction::Purchase { .. } => {
                     return Err(ModuleError::NotForSale);
                 }
@@ -1079,6 +1106,7 @@ impl State {
                     let cargo = self.history.bay_fitted_at(e.revision).ok_or(INVALID)?;
                     let mounts = u16::from(ledger.fuel_storage_count())
                         + u16::from(ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())
+                        + u16::from(ledger.fitted(ModuleSlot::UtilitySalvageCutter).is_some())
                         + u16::from(ledger.fitted(ModuleSlot::UtilityEcm).is_some())
                         + cargo
                         + world.emp.utility_mounts_at_revision(e.revision);
@@ -1110,6 +1138,7 @@ impl State {
                     let budget = crate::equipment::definition().map_err(|_| INVALID)?;
                     if u16::from(tanks)
                         + u16::from(ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())
+                        + u16::from(ledger.fitted(ModuleSlot::UtilitySalvageCutter).is_some())
                         + u16::from(ledger.fitted(ModuleSlot::UtilityEcm).is_some())
                         > budget.utility_mounts_capacity
                     {
@@ -1122,6 +1151,18 @@ impl State {
             } else {
                 ledger.test_tank_count()
             };
+            if ledger.fitted(ModuleSlot::UtilitySalvageCutter).is_some() {
+                let cargo = self.known_cargo_mounts_at(account, e.revision);
+                let mounts = u16::from(tanks)
+                    + u16::from(ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())
+                    + u16::from(ledger.fitted(ModuleSlot::UtilityEcm).is_some())
+                    + 1
+                    + cargo
+                    + world.emp.utility_mounts_at_revision(e.revision);
+                if mounts.saturating_sub(allowance) > budget.utility_mounts_capacity {
+                    return Err(INVALID);
+                }
+            }
             if ledger.fitted_units().saturating_sub(allowance) > budget.equipment_units_capacity
                 || ledger.cabin_tonnes() > crate::equipment::EXPANDED_HOLD_TONNES
             {
@@ -1278,6 +1319,11 @@ impl State {
         let cargo = self.known_cargo_mounts_at(account, end);
         let mounts = u16::from(after_ledger.fuel_storage_count())
             + u16::from(after_ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())
+            + u16::from(
+                after_ledger
+                    .fitted(ModuleSlot::UtilitySalvageCutter)
+                    .is_some(),
+            )
             + u16::from(after_ledger.fitted(ModuleSlot::UtilityEcm).is_some())
             + cargo
             + emp.utility_mounts_at_revision(end);
@@ -1300,7 +1346,8 @@ impl State {
     }
     pub(super) fn encode(&self, w: &mut Writer) {
         let flags = (u32::from(!self.cargo_fit_history.is_empty()) << 31)
-            | (u32::from(self.history.active()) << 30);
+            | (u32::from(self.history.active()) << 30)
+            | (u32::from(!self.salvage.is_empty()) << 29);
         w.u32(self.events.len() as u32 | flags);
         for e in &self.events {
             match e.action {
@@ -1310,6 +1357,7 @@ impl State {
                     w.u8(kind.tag());
                 }
                 ModuleAction::PurchaseFuelScoops => w.u8(16),
+                ModuleAction::GrantStoredSalvageCutter => w.u8(17),
                 ModuleAction::Store { .. } => w.u8(1),
                 ModuleAction::Install { replacing, .. } => {
                     w.u8(2);
@@ -1332,13 +1380,16 @@ impl State {
             self.encode_cargo_history(w);
         }
         self.history.encode(w);
+        if !self.salvage.is_empty() {
+            self.salvage.encode(w);
+        }
     }
     pub(super) fn decode(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
         if version != crate::save::SAVE_VERSION {
             return Err(SaveError::UnsupportedVersion);
         }
         let raw_count = r.u32()?;
-        let count = (raw_count & 0x3fff_ffff) as usize;
+        let count = (raw_count & 0x1fff_ffff) as usize;
         if count > crate::save::MAX_SAVE_BYTES / 64 {
             return Err(SaveError::TooLarge);
         }
@@ -1367,6 +1418,7 @@ impl State {
             let action = match tag {
                 0 => ModuleAction::PurchaseMiningLaser,
                 16 if version >= 16 => ModuleAction::PurchaseFuelScoops,
+                17 => ModuleAction::GrantStoredSalvageCutter,
                 1 => ModuleAction::Store { item },
                 2 => ModuleAction::Install { item, replacing },
                 3 if version >= 16 => ModuleAction::Purchase {
@@ -1397,6 +1449,11 @@ impl State {
         } else {
             history::History::default()
         };
+        let salvage = if raw_count & (1 << 29) != 0 {
+            salvage::State::decode(r)?
+        } else {
+            salvage::State::default()
+        };
         if events
             .iter()
             .any(|event| history::requires_history(event.action))
@@ -1408,6 +1465,7 @@ impl State {
             events,
             cargo_fit_history,
             history,
+            salvage,
         })
     }
 }
@@ -1479,6 +1537,7 @@ impl World {
             ModuleKind::IntermediateNavigation,
             ModuleKind::AdvancedNavigation,
             ModuleKind::FuelStorage,
+            ModuleKind::SalvageCutter,
             ModuleKind::Ecm,
             ModuleKind::Drive(DriveGrade::Intermediate),
             ModuleKind::Drive(DriveGrade::Advanced),
@@ -1611,6 +1670,9 @@ impl World {
         action: ModuleAction,
         tick: u64,
     ) -> Result<ModuleReview, ModuleError> {
+        if action == ModuleAction::GrantStoredSalvageCutter {
+            return Err(ModuleError::NotForSale);
+        }
         if tick != self.state.tick {
             return Err(ModuleError::StaleReview);
         }
@@ -1956,6 +2018,19 @@ impl World {
             .iter()
             .find(|item| item.kind == kind && (!tank || item.slot.is_none()))
             .copied();
+        let cutter_stored = if kind == ModuleKind::SalvageCutter {
+            let definition = crate::equipment::definition().map_err(|_| INVALID)?;
+            let (units, mounts) = ledger
+                .budget_usage(current, self.emp.utility_mounts())
+                .map_err(|_| INVALID)?;
+            units >= definition.equipment_units_capacity
+                || mounts >= definition.utility_mounts_capacity
+        } else {
+            false
+        };
+        if cutter_stored && existing.is_some() {
+            return Ok(());
+        }
         if !tank && existing.is_some_and(|item| item.slot == Some(kind.slot())) {
             return Ok(());
         }
@@ -1978,7 +2053,11 @@ impl World {
             )
         } else {
             (
-                ModuleAction::Purchase { kind },
+                if cutter_stored {
+                    ModuleAction::GrantStoredSalvageCutter
+                } else {
+                    ModuleAction::Purchase { kind }
+                },
                 dock.owner()
                     .seed()
                     .checked_add(200010 + u64::from(grant))

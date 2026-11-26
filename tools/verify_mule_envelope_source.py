@@ -47,6 +47,9 @@ COMBINED_CABIN_SHA256 = '5e8fa008a56c78fd187419afa11b57def6ec4cc9ec3ab3de5444dc2
 COMBINED_ECM_INVERSE = Path('integration/sh001-mule/COMBINED-CABIN-ECM-INVERSE.json')
 COMBINED_ECM_BASE = '7626d695bc453a71fcb80379f1e02b7f97feac58'
 COMBINED_ECM_SHA256 = 'a645cfe0bdc6c05955ea178d360518c7ea1abf810dfb78e013b837cf7f39d77c'
+SALVAGE_CUTTER_INVERSE = Path('integration/sh001-mule/SALVAGE-CUTTER-INVERSE.json')
+SALVAGE_CUTTER_BASE = '4eabe14e93ac37dd3272b4d8076537fd87796758'
+SALVAGE_CUTTER_SHA256 = '4350bf75aae405e7baeb45ff38e2511e62b26160a57991c3b64e1bad24ae62eb'
 
 
 def sha(data):
@@ -128,6 +131,11 @@ def combined_cabin_inverse(root, protected):
 def combined_ecm_inverse(root, protected):
     return approved_inverse(root, protected, COMBINED_ECM_INVERSE,
                             COMBINED_ECM_SHA256, COMBINED_ECM_BASE, 'combined to ECM')
+
+
+def salvage_cutter_inverse(root, protected):
+    return approved_inverse(root, protected, SALVAGE_CUTTER_INVERSE,
+                            SALVAGE_CUTTER_SHA256, SALVAGE_CUTTER_BASE, 'salvage cutter')
 
 
 def undo_combined_to_cabin(relative, data, inverse, cabin):
@@ -600,12 +608,14 @@ def verify_protected_core(root):
     ecm_field_inverse = stock_ecm_field_inverse(root, baseline)
     combined_cabin = combined_cabin_inverse(root, baseline)
     combined_ecm = combined_ecm_inverse(root, baseline)
+    salvage_cutter = salvage_cutter_inverse(root, baseline)
     checked = set()
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_combined_to_cabin(relative, current, combined_cabin, cabin_inverse)
-        other = undo_combined_to_ecm(relative, current, combined_ecm, ecm_field_inverse, ecm_inverse)
+        before_salvage = undo_flight_computer(relative, current, salvage_cutter)
+        data = undo_combined_to_cabin(relative, before_salvage, combined_cabin, cabin_inverse)
+        other = undo_combined_to_ecm(relative, before_salvage, combined_ecm, ecm_field_inverse, ecm_inverse)
         assert data == other, relative
         data = undo_flight_computer(relative, data, solar_inverse)
         data = undo_flight_computer(relative, data, fuel_inverse)
@@ -655,7 +665,7 @@ def verify_protected_core(root):
     assert set(additions) <= checked and len(checked) == 115
     return (len(checked), len(additions), unchanged, len(inverse), len(drive_inverse), len(shield_inverse),
             len(fuel_inverse), len(solar_inverse), len(cabin_inverse), len(ecm_inverse), len(ecm_field_inverse),
-            len(combined_cabin), len(combined_ecm))
+            len(combined_cabin), len(combined_ecm), len(salvage_cutter))
 
 
 def verify_test_registry(criteria):
@@ -715,7 +725,8 @@ def verify():
     verify_inputs(folder)
     groups = verify_geometry(folder)
     (checked, hooks, unchanged, flight_computer, hyperspace_drive, stock_shield, fuel_storage,
-     solar_scoops, passenger_cabin, stock_ecm, stock_ecm_field, combined_cabin, combined_ecm) = verify_protected_core(ROOT)
+     solar_scoops, passenger_cabin, stock_ecm, stock_ecm_field, combined_cabin, combined_ecm,
+     salvage_cutter) = verify_protected_core(ROOT)
     counts = verify_historical_bindings(folder, groups)
     return {
         'status': 'PASS_SOURCE_ONLY',
@@ -732,6 +743,7 @@ def verify():
         'protectedCoreFilesWithStockEcmFieldChanges': stock_ecm_field,
         'protectedCoreFilesWithCombinedToCabinChanges': combined_cabin,
         'protectedCoreFilesWithCombinedToEcmChanges': combined_ecm,
+        'protectedCoreFilesWithSalvageCutterChanges': salvage_cutter,
         'protectedCoreFilesChecked': checked,
         **counts,
         'vertexEncoding': 5344,

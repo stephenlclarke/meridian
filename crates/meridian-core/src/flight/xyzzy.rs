@@ -755,6 +755,7 @@ impl World {
                 }
                 self.commander_account = Some(account);
             }
+            self.grant_xyzzy_module(review.dock, review.tick, super::ModuleKind::SalvageCutter)?;
             // The present supported mutation boundary is docked: ordinary docking already reset
             // energy/shields. Do not clear heat/cooldown or erase retained combat/mining evidence.
         } else if let XyzzyAction::FitShield(grade) = review.action {

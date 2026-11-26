@@ -268,6 +268,9 @@ impl Profile {
                 meridian_core::ModuleAction::Purchase { .. } => {
                     "Owned module purchased and fitted."
                 }
+                meridian_core::ModuleAction::GrantStoredSalvageCutter => {
+                    "Salvage Cutter grant is available only through the explicit test outfit."
+                }
                 meridian_core::ModuleAction::Store { .. } => "Owned module stored.",
                 meridian_core::ModuleAction::Install { .. } => "Owned module fitted.",
                 meridian_core::ModuleAction::Passenger(action) => match action {

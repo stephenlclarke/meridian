@@ -19,7 +19,7 @@ class MuleSourceVerification(unittest.TestCase):
                        verifier.FUEL_STORAGE_INVERSE, verifier.SOLAR_SCOOPS_INVERSE,
                        verifier.PASSENGER_CABIN_INVERSE, verifier.STOCK_ECM_INVERSE,
                        verifier.STOCK_ECM_FIELD_INVERSE, verifier.COMBINED_CABIN_INVERSE,
-                       verifier.COMBINED_ECM_INVERSE):
+                       verifier.COMBINED_ECM_INVERSE, verifier.SALVAGE_CUTTER_INVERSE):
             (root / record).parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(verifier.ROOT / record, root / record)
         return root / core
@@ -38,6 +38,7 @@ class MuleSourceVerification(unittest.TestCase):
         self.assertEqual(result['protectedCoreFilesWithStockEcmFieldChanges'], 12)
         self.assertEqual(result['protectedCoreFilesWithCombinedToCabinChanges'], 22)
         self.assertEqual(result['protectedCoreFilesWithCombinedToEcmChanges'], 20)
+        self.assertEqual(result['protectedCoreFilesWithSalvageCutterChanges'], 4)
         self.assertEqual(result['geometryCoreTests'], 1)
         self.assertEqual(result['restoreCoreTests'], 1)
         self.assertEqual(result['totalMuleCoreTests'], 24)
@@ -249,6 +250,8 @@ class MuleSourceVerification(unittest.TestCase):
                  verifier.combined_cabin_inverse(root, protected)),
                 ('combined to ECM', verifier.COMBINED_ECM_INVERSE,
                  verifier.combined_ecm_inverse(root, protected)),
+                ('salvage cutter', verifier.SALVAGE_CUTTER_INVERSE,
+                 verifier.salvage_cutter_inverse(root, protected)),
             ):
                 for relative in inverse:
                     with self.subTest(name=name, relative=relative):
@@ -274,8 +277,10 @@ class MuleSourceVerification(unittest.TestCase):
             inverse = json.loads(manifest.read_bytes())
             relative = verifier.LIB_SOURCE
             protected = verifier.protected_core_pins(root)
+            current = verifier.undo_flight_computer(relative, (core / relative).read_bytes(),
+                                                     verifier.salvage_cutter_inverse(root, protected))
             current = verifier.undo_combined_to_cabin(
-                relative, (core / relative).read_bytes(),
+                relative, current,
                 verifier.combined_cabin_inverse(root, protected),
                 verifier.passenger_cabin_inverse(root, protected))
             current = verifier.undo_flight_computer(relative, current,

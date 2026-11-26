@@ -688,6 +688,19 @@ fn equipment_action(
     {
         return Err("Owned E.C.M. selection changed".into());
     }
+    let cutter_node = node == ModuleKind::SalvageCutter.node();
+    if cutter_node != (slot == "utility-salvage-cutter") {
+        return Err("Select the Salvage Cutter utility slot".into());
+    }
+    if cutter_node
+        && operation != Buy
+        && !modules
+            .items
+            .iter()
+            .any(|owned| Some(owned.id) == instance && owned.kind == ModuleKind::SalvageCutter)
+    {
+        return Err("Owned Salvage Cutter selection changed".into());
+    }
     if targeting_node
         && operation != Buy
         && !modules
@@ -774,6 +787,7 @@ fn module_rows(
         ModuleSlot::MiningTargeting => "Mining targeting",
         ModuleSlot::SalvageTargeting => "Salvage targeting",
         ModuleSlot::UtilityFuelScoops => "Fuel Scoops",
+        ModuleSlot::UtilitySalvageCutter => "Salvage Cutter",
         ModuleSlot::UtilityEcm => "E.C.M. utility",
         ModuleSlot::FuelStorage(_) => "Fuel storage",
         ModuleSlot::PassengerCabin => "Passenger cabins",
@@ -839,6 +853,11 @@ fn module_rows(
                         .push(format!("Private reservation: {}", person.name));
                 }
             }
+        } else if item.kind == ModuleKind::SalvageCutter {
+            row.compatibility =
+                "Unique SH025 work utility; 1 shared mount and 1 equipment unit".into();
+            row.readout
+                .push("Requires lawful salvage custody; not a combat laser".into());
         } else if item.kind == ModuleKind::Ecm {
             row.compatibility = "Unique SH025 utility; 1 shared mount and 1 equipment unit".into();
             row.readout
@@ -1236,6 +1255,17 @@ fn equipment_panel(
             .into(),
         available: true,
     });
+    slots.push(ui::EquipmentSlot {
+        id: "utility-salvage-cutter".into(),
+        label: "Salvage Cutter".into(),
+        fitted: modules
+            .items
+            .iter()
+            .find(|item| item.slot == Some(ModuleSlot::UtilitySalvageCutter))
+            .map_or("Empty", |item| item.kind.name())
+            .into(),
+        available: true,
+    });
     let mut rows = Vec::new();
     let module_slot = match selected {
         "front-laser" => Some(ModuleSlot::FrontLaser),
@@ -1246,6 +1276,7 @@ fn equipment_panel(
         "fuel-storage" => Some(ModuleSlot::FuelStorage(0)),
         "passenger-cabins" => Some(ModuleSlot::PassengerCabin),
         "utility-ecm" => Some(ModuleSlot::UtilityEcm),
+        "utility-salvage-cutter" => Some(ModuleSlot::UtilitySalvageCutter),
         "targeting" => Some(ModuleSlot::Targeting),
         "targeting-mining" => Some(ModuleSlot::MiningTargeting),
         "targeting-salvage" => Some(ModuleSlot::SalvageTargeting),
@@ -2105,7 +2136,7 @@ mod tests {
     fn front_module_rows_and_pylon_slots_use_real_owned_instances_and_admission() {
         let (_directory, profile, _menu) = start();
         let panel = ok(equipment_panel(&profile.world, "front-laser", ""));
-        assert_eq!(panel.slots.len(), 24);
+        assert_eq!(panel.slots.len(), 25);
         let actual: Vec<_> = panel.slots.iter().map(|slot| slot.id.as_str()).collect();
         assert_eq!(
             actual,
@@ -2133,7 +2164,8 @@ mod tests {
                 "targeting-mining",
                 "targeting-salvage",
                 "fuel-storage",
-                "utility-ecm"
+                "utility-ecm",
+                "utility-salvage-cutter"
             ]
         );
         let emp = panel
