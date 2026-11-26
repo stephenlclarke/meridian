@@ -17,11 +17,25 @@ pub(super) fn visual() -> Result<Vec<VisualVertex>, &'static str> {
 }
 
 pub(super) fn supports() -> Result<(Vec<Triangle>, Vec<Piece>), &'static str> {
-    if fnv(POINTS) != 0x1333_358a_3e32_0f44 || fnv(FANS) != 0x2621_a4e7_5eb0_1d92 {
+    authenticated_supports(POINTS, FANS)
+}
+
+fn authenticated_supports(
+    points: &[u8],
+    fans: &[u8],
+) -> Result<(Vec<Triangle>, Vec<Piece>), &'static str> {
+    if fnv(points) != 0x1333_358a_3e32_0f44 || fnv(fans) != 0x2621_a4e7_5eb0_1d92 {
         return Err("Medusa inspection source bytes changed");
     }
-    let mut words = POINTS.get(8..).ok_or("Missing Medusa point header")?;
-    if POINTS.get(..8) != Some(b"MDU171V1")
+    decode_supports(points, fans)
+}
+
+fn decode_supports(
+    points: &[u8],
+    fans: &[u8],
+) -> Result<(Vec<Triangle>, Vec<Piece>), &'static str> {
+    let mut words = points.get(8..).ok_or("Missing Medusa point header")?;
+    if points.get(..8) != Some(b"MDU171V1")
         || word(&mut words)? != DETAIL_POINTS
         || word(&mut words)? != NATIVE_POINTS
     {
@@ -34,36 +48,31 @@ pub(super) fn supports() -> Result<(Vec<Triangle>, Vec<Piece>), &'static str> {
     let points: Vec<_> = encoded_points
         .iter()
         .map(|point| {
-            let [x, y, z] = point.as_chunks::<8>().0 else {
-                unreachable!("Medusa points use three f64 coordinates");
-            };
-            Vec3::new(
-                f64::from_le_bytes(*x),
-                f64::from_le_bytes(*y),
-                f64::from_le_bytes(*z),
-            )
+            let coordinate =
+                |start| f64::from_le_bytes(std::array::from_fn(|offset| point[start + offset]));
+            Vec3::new(coordinate(0), coordinate(8), coordinate(16))
         })
         .collect();
-    let mut fans = FANS.get(8..).ok_or("Missing Medusa shield header")?;
-    if FANS.get(..8) != Some(b"MDUSHLD1") || word(&mut fans)? != PIECES {
+    let mut words = fans.get(8..).ok_or("Missing Medusa shield header")?;
+    if fans.get(..8) != Some(b"MDUSHLD1") || word(&mut words)? != PIECES {
         return Err("Invalid Medusa shield header");
     }
 
     let mut triangles = Vec::new();
     let mut pieces = Vec::with_capacity(PIECES);
     for _ in 0..PIECES {
-        let count = word(&mut fans)?;
+        let count = word(&mut words)?;
         let first = triangles.len();
         let mut low = [f32::INFINITY; 4];
         let mut high = [f32::NEG_INFINITY; 4];
-        if count < 4 || count > fans.len() / 12 {
+        if count < 4 || count > words.len() / 12 {
             return Err("Invalid Medusa shield facet count");
         }
         for _ in 0..count {
             let [a, b, c] = [
-                point(&points, &mut fans)?,
-                point(&points, &mut fans)?,
-                point(&points, &mut fans)?,
+                point(&points, &mut words)?,
+                point(&points, &mut words)?,
+                point(&points, &mut words)?,
             ];
             for vertex in [a, b, c] {
                 for (axis, coordinate) in vector(vertex)[..3].iter().enumerate() {
@@ -81,7 +90,7 @@ pub(super) fn supports() -> Result<(Vec<Triangle>, Vec<Piece>), &'static str> {
             high,
         });
     }
-    if !fans.is_empty() {
+    if !words.is_empty() {
         return Err("Trailing Medusa shield facets");
     }
     Ok((triangles, pieces))
@@ -101,4 +110,64 @@ fn point(points: &[Vec3], bytes: &mut &[u8]) -> Result<Vec3, &'static str> {
         .get(index)
         .copied()
         .ok_or("Invalid Medusa shield point")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn altered_inspection_assets_are_refused_before_payload_decode() {
+        let authentication = Some("Medusa inspection source bytes changed");
+        assert_eq!(
+            authenticated_supports(&POINTS[1..], FANS).err(),
+            authentication
+        );
+        assert_eq!(
+            authenticated_supports(POINTS, &FANS[..FANS.len() - 1]).err(),
+            authentication
+        );
+    }
+
+    #[test]
+    fn malformed_point_magic_and_count_fail_closed() {
+        let mut wrong_magic = POINTS[..16].to_vec();
+        wrong_magic[0] ^= 1;
+        assert_eq!(
+            decode_supports(&wrong_magic, FANS).err(),
+            Some("Invalid Medusa source point header")
+        );
+        assert_eq!(
+            decode_supports(&POINTS[..POINTS.len() - 1], FANS).err(),
+            Some("Invalid Medusa source point count")
+        );
+    }
+
+    #[test]
+    fn invalid_shield_groups_indices_and_trailing_facets_fail_closed() {
+        assert_eq!(
+            decode_supports(POINTS, b"MDUSHLD1\0\0\0\0").err(),
+            Some("Invalid Medusa shield header")
+        );
+        let mut bad_facets = FANS[..16].to_vec();
+        bad_facets[12..16].copy_from_slice(&3u32.to_le_bytes());
+        assert_eq!(
+            decode_supports(POINTS, &bad_facets).err(),
+            Some("Invalid Medusa shield facet count")
+        );
+
+        let mut bad_index = FANS.to_vec();
+        bad_index[16..20].copy_from_slice(&u32::MAX.to_le_bytes());
+        assert_eq!(
+            decode_supports(POINTS, &bad_index).err(),
+            Some("Invalid Medusa shield point")
+        );
+
+        let mut trailing = FANS.to_vec();
+        trailing.extend_from_slice(&[0; 12]);
+        assert_eq!(
+            decode_supports(POINTS, &trailing).err(),
+            Some("Trailing Medusa shield facets")
+        );
+    }
 }
