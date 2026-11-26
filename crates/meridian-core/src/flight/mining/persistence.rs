@@ -176,16 +176,12 @@ impl World {
         // Historical native contact lies outside the actual source mesh. A later terminal
         // tombstone must not legitimize having fired from inside an intact original rock.
         let original = self.mining.before_emission(emission);
-        let Some(data) = &self.station_data else {
-            return false;
-        };
-        original
-            .bodies()
-            .into_iter()
-            .filter(|body| body.remaining_energy > 0.0)
-            .all(|body| {
-                !body.contains_point(pose.position)
-                    && data.asteroid_motion_clear(pose, pose, 0.0, body)
-            })
+        self.mining_motion_clear_with(
+            &original,
+            crate::navigation::SystemId::AVENOR,
+            pose,
+            pose,
+            0.0,
+        )
     }
 }

@@ -458,10 +458,28 @@ impl World {
     }
 
     pub(super) fn advance_selected_work(&mut self) {
-        let work = self
-            .current_target()
-            .and_then(|(_, c)| self.automatic_work_target(c));
-        if !matches!(work.map(|w| w.id), Some(WorkTargetId::Asteroid(_))) {
+        let selected = self.current_target().map(|(_, candidate)| candidate);
+        let work = selected.and_then(|candidate| self.automatic_work_target(candidate));
+        let mining_lock = matches!(
+            selected.map(Candidate::identity),
+            Some(TargetIdentity::Work(WorkTargetId::Asteroid(_)))
+        );
+        if let Some(WorkTargetId::Ore(ore)) = work.map(|target| target.id) {
+            // Pursuing a released fragment keeps the original asteroid lock and tool.
+            // The intake itself depends on the scoops, including for a direct ore lock.
+            let status = self.auto_scoop_mined_ore_tick(ore.asteroid());
+            let completed = self.current_target().is_none();
+            if completed {
+                self.cancel_targeting();
+            } else {
+                self.targeting.work_status = Some(status);
+            }
+            if (!mining_lock || completed) && self.restore_auto_mining_tool().is_err() {
+                self.targeting.work_status = Some("Tool change unavailable");
+            }
+            return;
+        }
+        if !mining_lock {
             if self.restore_auto_mining_tool().is_err() {
                 self.targeting.work_status = Some("Tool change unavailable");
                 return;
@@ -478,10 +496,6 @@ impl World {
             self.targeting.work_status = None;
             return;
         };
-        if let WorkTargetId::Ore(ore) = work.id {
-            self.targeting.work_status = Some(self.auto_scoop_mined_ore_tick(ore.asteroid()));
-            return;
-        }
         let Some(standoff) = self.work_standoff(work) else {
             return;
         };
@@ -560,8 +574,12 @@ impl World {
         let [bearing, mut elevation] = target_bearing(player, aim);
         if collecting {
             let range = offset(aim, player.position);
-            if range.dot(range) < 85.0 * 85.0 {
-                // At pickup range bring the fragment below the nose into the scoop aperture.
+            if work
+                .and_then(|target| self.work_standoff(target))
+                .is_some_and(|distance| range.dot(range).sqrt() <= distance + 1.0)
+            {
+                // Turn above the fragment at the working distance, once its entire
+                // mesh can enter the lower-forward aperture.
                 elevation += 45.0_f64.atan2(55.0);
             }
         }

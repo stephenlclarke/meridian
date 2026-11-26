@@ -395,6 +395,7 @@ fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_contin
                     .count(),
                 1
             );
+            assert_eq!(some(world.fitted_mining_tool()).item, mining.id);
             verify_fragment(&world, rock, ore);
             if let Some((id, released_tick, released_physical_tick)) = witnessed_ore {
                 assert_eq!(

@@ -104,15 +104,9 @@ impl World {
                     .mining
                     .body(usize::from(id.ordinal()))
                     .filter(|rock| rock.id == id)?;
-                let radius = rock
-                    .vertices
-                    .into_iter()
-                    .map(|vertex| {
-                        let delta = difference(vertex, rock.position);
-                        delta.dot(delta).sqrt()
-                    })
-                    .fold(0.0, f64::max);
-                Some(radius + player_radius + 1.0)
+                // Leave the settled hold outside the swept collision margin even at
+                // the inner edge of its half-unit position tolerance.
+                Some(rock.bounding_radius() + player_radius + 2.0)
             }
             // Traffic rejects centre distances <= 2 * radius + 1.
             WorkTargetId::Wreck(_) => Some(2.0 * player_radius + 2.0),
