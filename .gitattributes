@@ -439,3 +439,9 @@ tools/verify_warthog_heavy.py text eol=lf
 tools/measure_javelina.py text eol=lf
 tools/prepare_javelina.py text eol=lf
 tools/verify_javelina.py text eol=lf
+
+# Byte-pinned Falcon Mk I replay programs.
+tools/measure_falcon_mk_i.py text eol=lf
+tools/prepare_falcon_mk_i.py text eol=lf
+tools/rebuild_falcon_mk_i.py text eol=lf
+tools/verify_falcon_mk_i.py text eol=lf
