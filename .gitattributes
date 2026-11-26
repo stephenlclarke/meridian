@@ -1,3 +1,8 @@
+# Springbok Starliner source preparation and replay use exact LF bytes.
+tools/measure_springbok_starliner.py text eol=lf
+tools/prepare_springbok_starliner.py text eol=lf
+tools/verify_springbok_starliner.py text eol=lf
+
 # Elk source preparation and replay use exact LF bytes.
 tools/measure_elk.py text eol=lf
 tools/prepare_elk.py text eol=lf
