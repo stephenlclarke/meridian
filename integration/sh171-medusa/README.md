@@ -8,8 +8,32 @@ Run `python -B tools/prepare_medusa_inspection.py --check` to compare the packed
 
 Run `python -B tools/prepare_medusa_inspection.py --studio-definition /path/to/new-medusa.json` to write the archived inspection definition for the companion Hull Studio change. The definition retains the source position, winding and material of every triangle, including native material indices. Boundary points shared by supports are repeated at the same position for Studio's one-group-per-vertex format. The archive carries no flight clearance or engineering claims in Studio.
 
+## Empty stock reference
+
+The station Showroom lists the empty stock dry mass of 40,712 kg. The finite-equivalent model retains the original 8,640 kg intrinsic hardware allocation and the surface-stock budget. Its centre of mass and full inertia tensor use the verified 5/41 metre calibration. Fourteen closed, separate distributions fit their original owners in both LODs. This model describes mass distribution. It grants no flight authority, occupied space, material qualification or equipment ownership.
+
+The frozen configuration record separates catalogue stock, the limited mission instance, the paid PLUGH stock purchase and the legal maximum player fit. The 32-unit expansion and higher target statistics remain proposals. The current inspection does not issue a quote, change the player's hull or grant equipment.
+
+Run `python -B tools/prepare_medusa_stock.py --check` to verify the Rust reference. To replay the original geometry and independent finite proof on the MacBook Air with the pinned scientific Python, stage a new directory first.
+
+```sh
+python -B tools/prepare_medusa_stock.py --stage-legacy /tmp/medusa-stock-replay
+cd /tmp/medusa-stock-replay
+python -B build-medusa-finite-source.py . finite-stock.json
+python -B test-medusa-finite-source.py
+```
+
+The original builder and tests retain the 30 CPU-second and 512 MiB limits. The checked source is from archive commit `a11fe16924d87d06021816f9037952afcbac08db` under `docs/milestones/fleet-physical/medusa-finite-proposal`. The replayed `FINITE-STOCK.json` records the exact inputs, plan and builder identities.
+
+### Native preview criteria
+
+1. Open a fresh isolated commander and select Medusa in the station Showroom.
+2. In single-ship view, confirm the original artwork and the `Empty stock dry mass: 40712 kg` line. Confirm that the stock line excludes paid upgrades and the flight and PLUGH refusals remain visible.
+3. Attempt exchange and confirm refusal. Check that the commander still has SH025, the same balance, and the same equipment. Quit normally, reopen the same isolated slot, and confirm those values persist.
+4. Record the signed preview hash, exact Git commit and result. Keep existing player profile directories separate.
+
 ## Outstanding integration
 
-- Flight needs a separately qualified low-detail mesh within 512 faces and an admitted finite-dry engineering record. The archived engineering budget records 40,712 kg at the adopted scale.
+- Flight needs a separately qualified low-detail mesh within 512 faces and a hull admission path that uses the finite-dry reference.
 - Player control and purchase need explicit admission, crew and equipment checks, and save/continue qualification.
 - The PLUGH fabrication quest, mission encounter, EMP disable, Salvage Beam lattice recovery and transfer of fabrication rights remain separate gameplay work.

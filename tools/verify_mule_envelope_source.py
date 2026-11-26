@@ -80,6 +80,16 @@ def passenger_cabin_inverse(root, protected):
                             PASSENGER_CABIN_INVERSE_SHA256, PASSENGER_CABIN_BASE, 'passenger cabin')
 
 
+def undo_medusa_stock_publication(relative, data):
+    if relative != LIB_SOURCE:
+        return data
+    declaration = b'pub mod medusa;\n'
+    before, after = b'pub mod lanner;\n', b'pub mod mining;\n'
+    span = before + declaration + after
+    assert data.count(declaration) == 1 and data.count(span) == 1, relative
+    return data.replace(span, before + after, 1)
+
+
 def undo_seriema_courier_publication(relative, data):
     if relative != LIB_SOURCE:
         return data
@@ -526,7 +536,8 @@ def verify_protected_core(root):
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_flight_computer(relative, current, cabin_inverse)
+        data = undo_medusa_stock_publication(relative, current)
+        data = undo_flight_computer(relative, data, cabin_inverse)
         data = undo_flight_computer(relative, data, fuel_inverse)
         data = undo_flight_computer(relative, data, shield_inverse)
         data = undo_flight_computer(relative, data, drive_inverse)

@@ -951,6 +951,11 @@ fn showroom_specifications(
         vec![
             "Inspection only. Flight unavailable.".into(),
             "PLUGH fabrication is unavailable.".into(),
+            format!(
+                "Empty stock dry mass: {} kg",
+                meridian_core::medusa::STOCK_EMPTY_DRY.dry_mass_kilograms
+            ),
+            "Stock figures exclude paid upgrades.".into(),
         ]
     } else {
         vec![
