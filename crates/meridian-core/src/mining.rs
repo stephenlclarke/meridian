@@ -173,7 +173,7 @@ pub struct MiningShot {
     pub tick: u64,
 }
 /// A one-account-revision work capability. Only the account/equipment integration inside core
-/// can produce it, after checking genuine paid ownership, mining compatibility and actual fit.
+/// can produce it, after checking actual paid or explicit maximum-owned equipment and fit.
 /// No constructor, decoding, UI-selected item or caller-supplied availability flag exists.
 #[derive(Debug)]
 pub struct MiningToolAuthority {

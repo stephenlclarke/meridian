@@ -168,7 +168,7 @@ impl World {
             scope: std::sync::Arc::downgrade(&self.mining_scope),
         })
     }
-    /// A genuine paid fitted tool emits only after the actual native first-contact query.
+    /// An actual owned fitted tool emits only after the native first-contact query.
     /// Damage releases finite pending ore; it does not credit cargo or a wallet.
     pub fn request_mining(
         &mut self,
@@ -325,8 +325,12 @@ impl World {
         {
             return "Align mining laser";
         }
-        if self.select_auto_mining_tool().is_err() {
-            return "Fit mining laser";
+        match self.select_auto_mining_tool() {
+            Ok(()) => {}
+            Err(MiningError::NoCompatibleFittedTool) => return "Fit mining laser",
+            Err(MiningError::ProtectedActivity) => return "Protected activity",
+            Err(MiningError::Resources) => return "Mining recharging",
+            Err(_) => return "Mining unavailable",
         }
         let Ok(tool) = self.mining_tool_authority() else {
             return "Fit mining laser";

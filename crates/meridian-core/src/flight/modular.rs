@@ -1854,12 +1854,12 @@ impl World {
         }
         self.pulse.prepare_mining_discharge()
     }
-    pub(crate) fn paid_fitted_mining_item(&self) -> Option<u64> {
+    fn owned_fitted_mining_item(&self) -> Option<u64> {
         self.fitted_mining_tool().map(|tool| tool.item)
     }
     pub fn mining_resources_ready(&self, tick: u64) -> Result<(), super::FireError> {
         let item = self
-            .paid_fitted_mining_item()
+            .owned_fitted_mining_item()
             .ok_or(super::FireError::NoCompatibleMiningTool)?;
         self.prepare_mining_resources(item, tick).map(|_| ())
     }
