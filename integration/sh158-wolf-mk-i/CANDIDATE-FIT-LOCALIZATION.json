@@ -1,0 +1,256 @@
+{
+  "archiveToCandidate": {
+    "directedMaximumMillimetres": {
+      "lowerFloor": 1610,
+      "upperCeiling": 1630
+    },
+    "sourceWitness": {
+      "face": 64,
+      "part": [
+        4,
+        "twin spine shoulder service well"
+      ],
+      "pointMetres": [
+        -4.438389020569482,
+        4.491893403696913,
+        9.604600376867031
+      ],
+      "exactPointMetres": [
+        "-4997181784790505/1125899906842624",
+        "632177795596169/140737488355328",
+        "5406909334787611/562949953421312"
+      ],
+      "squaredDistanceMetres": "13148430149115826537693244347321/5070602400912917605986812821504"
+    },
+    "nearestTarget": {
+      "faces": [
+        6,
+        9
+      ],
+      "parts": [
+        [
+          0,
+          "twin spine pressure envelope"
+        ],
+        [
+          0,
+          "twin spine pressure envelope"
+        ]
+      ],
+      "oneTriangleBoxMetres": [
+        [
+          -4.438389020569482,
+          -4.438389020569482
+        ],
+        [
+          -2.881591994824435,
+          2.881591994824435
+        ],
+        [
+          -14.666625232010531,
+          14.666625232010531
+        ]
+      ]
+    },
+    "refinedPatches": 71
+  },
+  "candidateToArchive": {
+    "directedMaximumMillimetres": {
+      "lowerFloor": 271,
+      "upperCeiling": 296
+    },
+    "sourceWitness": {
+      "face": 223,
+      "part": [
+        15,
+        "twin spine central forward envelope/service-well-2-0"
+      ],
+      "pointMetres": [
+        -2.134327388401875,
+        -1.0219121057939775,
+        1.3708284011967082
+      ],
+      "exactPointMetres": [
+        "-9612156031093327/4503599627370496",
+        "-36818263830873249/36028797018963968",
+        "49389298214547101/36028797018963968"
+      ],
+      "squaredDistanceMetres": "165480347669231353942357371847218242973159445131201119474881/2249704748312428187342914139401947722580222576997236312375296"
+    },
+    "nearestTarget": {
+      "faces": [
+        365
+      ],
+      "parts": [
+        [
+          15,
+          "twin spine central forward envelope/service-well-2-0"
+        ]
+      ],
+      "oneTriangleBoxMetres": [
+        [
+          -2.0796110415825027,
+          -1.3115481211737685
+        ],
+        [
+          -1.466433690895582,
+          -0.6919210895807849
+        ],
+        [
+          -0.1846676705153812,
+          1.6513301937164342
+        ]
+      ]
+    },
+    "refinedPatches": 1081
+  },
+  "detailedToCandidate": {
+    "directedMaximumMillimetres": {
+      "lowerFloor": 1610,
+      "upperCeiling": 1630
+    },
+    "sourceWitness": {
+      "face": 136,
+      "part": [
+        10,
+        "twin spine shoulder service well"
+      ],
+      "pointMetres": [
+        -4.438389020569482,
+        4.491893403696913,
+        9.604600376867031
+      ],
+      "exactPointMetres": [
+        "-4997181784790505/1125899906842624",
+        "632177795596169/140737488355328",
+        "5406909334787611/562949953421312"
+      ],
+      "squaredDistanceMetres": "13148430149115826537693244347321/5070602400912917605986812821504"
+    },
+    "nearestTarget": {
+      "faces": [
+        6,
+        9
+      ],
+      "parts": [
+        [
+          0,
+          "twin spine pressure envelope"
+        ],
+        [
+          0,
+          "twin spine pressure envelope"
+        ]
+      ],
+      "oneTriangleBoxMetres": [
+        [
+          -4.438389020569482,
+          -4.438389020569482
+        ],
+        [
+          -2.881591994824435,
+          2.881591994824435
+        ],
+        [
+          -14.666625232010531,
+          14.666625232010531
+        ]
+      ]
+    },
+    "refinedPatches": 93
+  },
+  "candidateToDetailed": {
+    "directedMaximumMillimetres": {
+      "lowerFloor": 562,
+      "upperCeiling": 587
+    },
+    "sourceWitness": {
+      "face": 224,
+      "part": [
+        15,
+        "twin spine central forward envelope/service-well-2-0"
+      ],
+      "pointMetres": [
+        -2.3805000974656116,
+        -0.7736735495280688,
+        1.3708284011967082
+      ],
+      "exactPointMetres": [
+        "-5360409675950779/2251799813685248",
+        "-6968631818722039/9007199254740992",
+        "49389298214547101/36028797018963968"
+      ],
+      "squaredDistanceMetres": "410718020929218790987079214848089/1298074214633706907132624082305024"
+    },
+    "nearestTarget": {
+      "faces": [
+        990
+      ],
+      "parts": [
+        [
+          55,
+          "twin spine central forward envelope/service-well-2-0"
+        ]
+      ],
+      "oneTriangleBoxMetres": [
+        [
+          -2.3965861610131904,
+          -1.0984713436976477
+        ],
+        [
+          -1.4664591167073007,
+          -0.47421681437179886
+        ],
+        [
+          0.808328930901119,
+          0.808328930901119
+        ]
+      ]
+    },
+    "refinedPatches": 414
+  },
+  "axisExtremaMetres": {
+    "detailed": [
+      [
+        -8.11824980012487,
+        8.11824980012487
+      ],
+      [
+        -3.9410008164510653,
+        4.491893403696913
+      ],
+      [
+        -15.333374767989469,
+        14.666625232010531
+      ]
+    ],
+    "archive": [
+      [
+        -8.11824980012487,
+        8.11824980012487
+      ],
+      [
+        -3.9410008164510653,
+        4.491893403696913
+      ],
+      [
+        -15.333374767989469,
+        14.666625232010531
+      ]
+    ],
+    "candidate": [
+      [
+        -8.11824980012487,
+        8.11824980012487
+      ],
+      [
+        -3.9410008164510653,
+        4.491893403696913
+      ],
+      [
+        -15.333374767989469,
+        14.666625232010531
+      ]
+    ]
+  }
+}

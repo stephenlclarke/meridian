@@ -1,0 +1,102 @@
+{
+  "detailedToArchive": {
+    "directedMaximumMillimetres": {
+      "lowerFloor": 893,
+      "upperCeiling": 902
+    },
+    "sourceWitness": {
+      "face": 980,
+      "part": [
+        55,
+        "twin spine central forward envelope/service-well-2-0"
+      ],
+      "pointMetres": [
+        -2.3965861610131904,
+        -0.7847761539787157,
+        -1.7416596274836074
+      ],
+      "exactPointMetres": [
+        "-2698316135425073/1125899906842624",
+        "-3534317594627795/4503599627370496",
+        "-7843737649341411/4503599627370496"
+      ],
+      "squaredDistanceMetres": "20374435350239798227905747193595314536643176496344735693302689156835512362591686838590435651121/25547156351640665728796924126800285801154373451149829187197967026668162667397279368504045207552"
+    },
+    "nearestTarget": {
+      "faces": [
+        214
+      ],
+      "parts": [
+        [
+          12,
+          "twin spine central forward envelope"
+        ]
+      ],
+      "oneTriangleBoxMetres": [
+        [
+          -1.834946930680762,
+          -0.9541713869215275
+        ],
+        [
+          -0.6780216458410435,
+          0.25425811719039126
+        ],
+        [
+          -3.1666577205477284,
+          -0.7666645007641869
+        ]
+      ]
+    },
+    "refinedPatches": 113
+  },
+  "archiveToDetailed": {
+    "directedMaximumMillimetres": {
+      "lowerFloor": 562,
+      "upperCeiling": 585
+    },
+    "sourceWitness": {
+      "face": 363,
+      "part": [
+        15,
+        "twin spine central forward envelope/service-well-2-0"
+      ],
+      "pointMetres": [
+        -2.3805000974656116,
+        -0.7736735495280688,
+        1.3708284011967082
+      ],
+      "exactPointMetres": [
+        "-5360409675950779/2251799813685248",
+        "-6968631818722039/9007199254740992",
+        "49389298214547101/36028797018963968"
+      ],
+      "squaredDistanceMetres": "410718020929218790987079214848089/1298074214633706907132624082305024"
+    },
+    "nearestTarget": {
+      "faces": [
+        990
+      ],
+      "parts": [
+        [
+          55,
+          "twin spine central forward envelope/service-well-2-0"
+        ]
+      ],
+      "oneTriangleBoxMetres": [
+        [
+          -2.3965861610131904,
+          -1.0984713436976477
+        ],
+        [
+          -1.4664591167073007,
+          -0.47421681437179886
+        ],
+        [
+          0.808328930901119,
+          0.808328930901119
+        ]
+      ]
+    },
+    "refinedPatches": 227
+  }
+}
