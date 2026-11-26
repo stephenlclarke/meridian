@@ -1,9 +1,10 @@
-"""Measure the separate SH060 project candidate and both original references."""
+"""Measure the separate Saiga project candidate and both original references."""
 
 from fractions import Fraction
 import argparse
 import json
 from math import isqrt
+import sys
 import tomllib
 
 import numpy as np
@@ -11,11 +12,15 @@ import trimesh
 
 from measure_banteng_geometry import adaptive_upper, section, solid, upper
 from prepare_banteng_candidate import closed
-from measure_lanner_geometry import make_fan
+from measure_lanner_geometry import load_reference_records, validated_reference_fan
 from prepare_saiga_geometry import INTEGRATION, ORIGINAL, build
 from saiga_art_mesh import SCALE, assemble, collision_groups
 from verify_saiga_geometry import load_collision
 from vulture_mk_i_exact_fit import grid_index
+
+
+REFERENCE_FANS_SHA = "fb601692968be7a17beff20d315f8cc4d9ad8de05484a24c38c9c4ae7c7c70a7"
+REFERENCE_DIAGNOSTIC_SHA = "e13756e5b349b4595b1a4852f854998b641e7689febdff2d830739be8f57f546"
 
 
 def surface(section_data):
@@ -182,14 +187,17 @@ def measure_fit(use_candidate):
             for mesh in meshes for point in mesh["vertices"]
         ]
     points = np.array(raw_points)
+    mode = "candidate" if use_candidate else "archive"
+    membership = np.concatenate(list(groups.values()))
+    records = load_reference_records(INTEGRATION / "REFERENCE-FANS.json", REFERENCE_FANS_SHA,
+                                     REFERENCE_DIAGNOSTIC_SHA, mode, points, membership, len(groups), "Saiga")
     indices = {
         lod: grid_index(surface((mesh["vertices"], mesh["faces"])))
         for lod, mesh in references.items()
     }
     rows = {}
-    for name, group in groups.items():
-        vertices = np.array(group)
-        fan = make_fan(points, vertices)
+    for (name, group), record in zip(groups.items(), records, strict=True):
+        fan = validated_reference_fan(record, (name, 1), points, np.array(group), "Saiga")
         rows[name] = {lod: adaptive_upper(index, points[fan], targets[lod]) for lod, index in indices.items()}
     return {
         "roundingMetres": .02, "minimumRefinementTargetsMillimetres": targets,
@@ -207,7 +215,7 @@ def main():
         result = compare(ORIGINAL / "SH061-project-candidate.json")
     else:
         result = measure_fit(args.report == "candidate-fit")
-    print(json.dumps(result, indent=2))
+    sys.stdout.buffer.write((json.dumps(result, indent=2) + "\n").encode())
 
 
 if __name__ == "__main__":

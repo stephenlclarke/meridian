@@ -368,6 +368,11 @@ impl App {
                     menu.select(code == KeyCode::ArrowDown);
                 }
             }
+            KeyCode::ArrowLeft | KeyCode::ArrowRight => {
+                if let Some(menu) = &mut self.xyzzy {
+                    menu.select_shield(code == KeyCode::ArrowRight);
+                }
+            }
             KeyCode::Enter => self.confirm_xyzzy(),
             _ => {}
         }

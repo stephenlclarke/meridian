@@ -34,10 +34,20 @@ fn shop(a: &mut App) {
     let mut m = ok(Docked::new(&a.game.world));
     ok(m.open(&a.game.world, ui::Screen::Equipment));
     a.docked = Some(m);
-    paint(a);
-    for _ in 0..5 {
-        menu_key(a, ui::Key::NextSlot);
+    let mut frame = paint(a);
+    // Select the actual presented EMP slot instead of assuming a fixed position.
+    for _ in 0..32 {
+        if frame
+            .labels
+            .iter()
+            .any(|label| label.text.starts_with("> EMP utility:"))
+        {
+            return;
+        }
+        a.menu_input(ui::Input::Key(ui::Key::NextSlot));
+        frame = paint(a);
     }
+    panic!("EMP slot was not reachable through station controls");
 }
 // Funding uses the original finite markets and charged public travel, never a wallet fixture.
 fn journey(w: &mut World, target: SystemId) {

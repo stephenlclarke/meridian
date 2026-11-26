@@ -290,19 +290,24 @@ fn current_system_planet_preview_uses_actual_world_recipe_and_never_a_foreign_wo
 
 #[test]
 fn selecting_goshawk_routes_the_original_preview_without_granting_exchange() {
-    assert_goshawk_preview("Goshawk Explorer", "SH008", "assets/fleet/sh008/visual.bin");
+    assert_inspection_preview("Goshawk Explorer", "SH008", "assets/fleet/sh008/visual.bin");
 }
 
 #[test]
 fn selecting_mk_ii_custom_routes_its_own_preview_without_granting_exchange() {
-    assert_goshawk_preview(
+    assert_inspection_preview(
         "Goshawk Mk II Custom",
         "SH010",
         "assets/fleet/sh010/visual.bin",
     );
 }
 
-fn assert_goshawk_preview(name: &str, id: &str, key: &str) {
+#[test]
+fn selecting_medusa_routes_the_original_preview_without_granting_exchange() {
+    assert_inspection_preview("Medusa", "SH171", "assets/fleet/sh171/visual.bin");
+}
+
+fn assert_inspection_preview(name: &str, id: &str, key: &str) {
     use crate::docked_screens::{Catalogue, DockedScreens, Input, Key, Outcome, Screen, Viewport};
     let world = meridian_core::World::new_commander(95006).unwrap_or_else(|e| panic!("{e}"));
     let save = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
@@ -365,6 +370,38 @@ fn assert_goshawk_preview(name: &str, id: &str, key: &str) {
     assert_eq!(solo.object, selected.object);
     assert_eq!(solo.geometry_key, selected.geometry_key);
     assert!(crate::mule_render::showroom::matches(solo));
+    if id == "SH171" {
+        assert!(
+            frame
+                .labels
+                .iter()
+                .any(|label| label.text == "Inspection only. Flight unavailable.")
+        );
+        assert!(
+            frame
+                .labels
+                .iter()
+                .any(|label| label.text == "PLUGH fabrication is unavailable.")
+        );
+        assert!(
+            !frame
+                .labels
+                .iter()
+                .any(|label| label.text.contains("Authored flyable hull"))
+        );
+        assert!(
+            frame
+                .labels
+                .iter()
+                .any(|label| label.text == "Empty stock dry mass: 40712 kg")
+        );
+        assert!(
+            frame
+                .labels
+                .iter()
+                .any(|label| label.text == "Stock figures exclude paid upgrades.")
+        );
+    }
     assert!(solo.bounds.width > selected.bounds.width);
     assert!(
         frame

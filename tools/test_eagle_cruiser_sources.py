@@ -88,6 +88,7 @@ class EagleCruiserSources(unittest.TestCase):
         self.assertEqual(sorted(result['clearanceMillimetres'].values()), [984, 984, 1923, 1923, 3138, 3138, 3349])
         self.assertEqual(len(result['originalJoints']), 5)
         criteria = json.loads((directory / 'CRITERIA.json').read_bytes())
+        self.assertIn('tools/hull_contact_geometry.py', criteria['replayPins'])
         for name, digest in criteria['replayPins'].items():
             with self.subTest(path=name):
                 self.assertEqual(hashlib.sha256((geometry.ROOT / name).read_bytes()).hexdigest(), digest)
@@ -99,6 +100,16 @@ class EagleCruiserSources(unittest.TestCase):
         self.assertEqual(delta['mandatoryOppositeSourceVertex'], 1943)
         self.assertEqual(delta['exactNearestFaces'], [109, 116])
         self.assertEqual(delta['strictLowerMillimetres'], 5088)
+
+    def test_shared_parity_preserves_eagle_refusal_diagnostics(self):
+        top = [[(0, 1, 0), (4, 1, 0), (0, 1, 4)]]
+        for point, message in (
+            ((0, 0, 0), 'joint parity ray hit a source edge'),
+            ((1, 1, 1), 'joint lies on a source face'),
+            ((1, 0, 1), 'joint left the source volume'),
+        ):
+            with self.subTest(point=point), self.assertRaisesRegex(ValueError, '^' + message + '$'):
+                proof.inside_y(point, top)
 
     def test_studio_binds_original_meshes_and_distinct_finite_engineering(self):
         detail, native = geometry.authenticate(geometry.ASSETS)
