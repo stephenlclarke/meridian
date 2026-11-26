@@ -319,3 +319,8 @@ tools/verify_shikra.py text eol=lf
 tools/measure_shikra_interdictor.py text eol=lf
 tools/prepare_shikra_interdictor.py text eol=lf
 tools/verify_shikra_interdictor.py text eol=lf
+
+# Byte-pinned Wisent replay programs.
+tools/measure_wisent.py text eol=lf
+tools/prepare_wisent.py text eol=lf
+tools/verify_wisent.py text eol=lf
