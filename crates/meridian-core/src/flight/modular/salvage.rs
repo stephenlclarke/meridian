@@ -790,6 +790,13 @@ impl World {
         }
         self.modular = modular;
         self.commander_account = Some(candidate);
+        if !self.auto_salvage_eligible(id) {
+            self.cancel_targeting();
+            if self.restore_auto_salvage_tool().is_err() {
+                return "Cutter return unavailable";
+            }
+            return "Salvage complete";
+        }
         "Salvage recovered"
     }
 }

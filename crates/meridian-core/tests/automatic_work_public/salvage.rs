@@ -273,7 +273,21 @@ fn select_wreck(world: &mut World, target: WorkTargetId) -> bool {
 
 #[test]
 fn earned_external_salvage_recovers_only_the_actual_legal_manifest_once() {
+    check_paid_wreck_recovery(finance_salvage());
+}
+
+#[test]
+fn stored_paid_cutter_is_selected_for_recovery_and_returned_on_the_final_unit() {
     let mut world = finance_salvage();
+    let cutter = some(world.fitted_salvage_cutter());
+    let tick = world.snapshot().tick;
+    let store = ok(world.review_module(ModuleAction::Store { item: cutter.id }, tick));
+    ok(world.prepare_module(store, tick)).commit();
+    assert!(world.fitted_salvage_cutter().is_none());
+    check_paid_wreck_recovery(world);
+}
+
+fn check_paid_wreck_recovery(mut world: World) {
     let manifest = terminal_source(&mut world);
     let held = some(world.commodity_quantity(manifest.commodity));
     let cash = world.credits_tenths();
@@ -299,6 +313,9 @@ fn earned_external_salvage_recovers_only_the_actual_legal_manifest_once() {
         if quantity != held + recovered {
             assert_eq!(quantity, held + recovered + 1);
             recovered += 1;
+            if recovered < u64::from(manifest.quantity) {
+                assert!(world.fitted_salvage_cutter().is_some());
+            }
             let tick = world.snapshot().tick;
             if let Some(previous) = previous_recovery {
                 assert!(
