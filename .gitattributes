@@ -308,6 +308,9 @@ integration/scanner-preview/historical/*.json text eol=lf
 # Bundled stock schema packages authenticate their exact exported bytes (including final LF).
 integration/**/*-STUDIO.json -text
 
+# Studio ships the same web asset bytes on Mac and Windows.
+tools/hull_studio/web/* text eol=lf
+
 # Kite Interceptor replay helpers have published byte hashes.
 tools/measure_kite_interceptor_air.py text eol=lf
 tools/prepare_kite_interceptor_geometry.py text eol=lf
