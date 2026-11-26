@@ -103,19 +103,33 @@ impl StationMarkets {
         historical_capacity: u16,
         traffic: crate::traffic::Flows,
     ) -> Result<SavedServiceSummary, SaveError> {
+        self.validate_save_with_intakes(owner, capacity, historical_capacity, traffic, &[])
+    }
+    pub(crate) fn validate_save_with_intakes(
+        &self,
+        owner: u64,
+        capacity: u16,
+        historical_capacity: u16,
+        traffic: crate::traffic::Flows,
+        intakes: &[super::CargoIntake],
+    ) -> Result<SavedServiceSummary, SaveError> {
         let invalid = SaveError::InvalidState("market stock or accounting");
         if owner == 0 || self.data.owner != owner {
             return Err(invalid);
         }
-        self.validate_receipts()?;
-        let food_summary = validate_food_markets(&self.data, capacity, traffic)?;
+        self.validate_receipts(intakes)?;
+        let mut incoming = [0_u128; 17];
+        for entry in intakes {
+            incoming[entry.commodity.index()] += 1;
+        }
+        let food_summary = validate_food_markets(&self.data, capacity, traffic, incoming[0])?;
         let food = food_summary.food;
         let mut bought = food_summary.bought;
         let mut sold = food_summary.sold;
         let mut paid = food_summary.paid
             + u128::from(self.data.refilled_units) * u128::from(FUEL_PRICE_TENTHS);
         let mut gross_credit = food_summary.gross_credit;
-        let other = validate_other_markets(&self.data, historical_capacity, traffic)?;
+        let other = validate_other_markets(&self.data, historical_capacity, traffic, incoming)?;
         bought += other.bought;
         sold += other.sold;
         paid += other.paid;
@@ -125,7 +139,7 @@ impl StationMarkets {
         if commodities::other_tonnes(other_commodities) + food > u128::from(capacity) {
             return Err(invalid);
         }
-        if sold > bought
+        if sold > bought + intakes.len() as u128
             || bought + sold + u128::from(self.data.refills) != u128::from(self.data.revision)
             || u128::from(self.data.refilled_units)
                 > u128::from(self.data.refills) * u128::from(crate::navigation::MAX_FUEL_CAPACITY)
@@ -169,6 +183,7 @@ fn validate_other_markets(
     data: &MarketData,
     historical_capacity: u16,
     traffic: crate::traffic::Flows,
+    incoming: [u128; 17],
 ) -> Result<OtherSummary, SaveError> {
     let invalid = SaveError::InvalidState("native commodity stock or accounting");
     let mut other_commodities = [0; 16];
@@ -202,7 +217,7 @@ fn validate_other_markets(
             paid += b * u128::from(seed.ask_tenths);
             gross_credit += s * u128::from(seed.bid_tenths);
         }
-        let held = commodity_bought
+        let held = (commodity_bought + incoming[id.index()])
             .checked_sub(commodity_sold)
             .ok_or(invalid)?;
         if held > u128::from(MAX_MARKET_QUANTITY) {
@@ -258,6 +273,7 @@ fn validate_food_markets(
     data: &MarketData,
     capacity: u16,
     traffic: crate::traffic::Flows,
+    incoming: u128,
 ) -> Result<FoodSummary, SaveError> {
     let invalid = SaveError::InvalidState("Food stock or accounting");
     let seeds = read_seeds(SEEDS).map_err(|_| SaveError::ContentMismatch)?;
@@ -283,7 +299,7 @@ fn validate_food_markets(
         paid += site_bought * u128::from(seed.ask_tenths);
         gross_credit += site_sold * u128::from(seed.bid_tenths);
     }
-    let food = bought.checked_sub(sold).ok_or(invalid)?;
+    let food = (bought + incoming).checked_sub(sold).ok_or(invalid)?;
     if food > u128::from(capacity) {
         return Err(invalid);
     }

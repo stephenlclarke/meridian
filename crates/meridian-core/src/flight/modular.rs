@@ -170,6 +170,7 @@ impl ModuleKind {
             self,
             Self::NavalLaser
                 | Self::EliteEnergyUnit
+                | Self::MiningLaser
                 | Self::AdvancedNavigation
                 | Self::FuelScoops
                 | Self::Ecm
@@ -372,17 +373,37 @@ pub struct ModuleOffer {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleAction {
     PurchaseMiningLaser,
-    Purchase { kind: ModuleKind },
+    Purchase {
+        kind: ModuleKind,
+    },
     PurchaseFuelScoops,
-    Store { item: u64 },
-    Install { item: u64, replacing: Option<u64> },
+    Store {
+        item: u64,
+    },
+    Install {
+        item: u64,
+        replacing: Option<u64>,
+    },
     Passenger(PassengerAction),
+    #[doc(hidden)]
+    GrantStoredMiningLaser,
+    #[doc(hidden)]
+    FlightLaserExchange {
+        item: u64,
+        replacing: u64,
+        visit: u64,
+        clock: u64,
+        emission: u64,
+        restoring: bool,
+    },
 }
 impl ModuleAction {
     fn purchase_kind(self) -> Option<ModuleKind> {
         match self {
             Self::PurchaseFuelScoops => Some(ModuleKind::FuelScoops),
-            Self::PurchaseMiningLaser => Some(ModuleKind::MiningLaser),
+            Self::PurchaseMiningLaser | Self::GrantStoredMiningLaser => {
+                Some(ModuleKind::MiningLaser)
+            }
             Self::Purchase { kind } => Some(kind),
             _ => None,
         }
@@ -506,6 +527,7 @@ pub(super) struct Ledger {
     pub(super) navigation_changes: Vec<NavigationFitChange>,
     test_tank_items: Vec<u64>,
     passage: cabins::Passage,
+    auto_return: Option<u64>,
 }
 impl Ledger {
     pub(super) fn passenger_totals(&self) -> (u32, u64) {
@@ -693,6 +715,63 @@ impl Ledger {
         })
     }
     fn apply(&mut self, event: Event, transaction: u32) -> Result<(), ModuleError> {
+        if let ModuleAction::FlightLaserExchange {
+            item,
+            replacing,
+            restoring,
+            ..
+        } = event.action
+        {
+            if event.xyzzy
+                || event.item != item
+                || self.front().is_none_or(|front| front.id != replacing)
+            {
+                return Err(ModuleError::StaleOccupant);
+            }
+            let index = self
+                .items
+                .iter()
+                .position(|i| i.id == item && i.slot.is_none())
+                .ok_or(ModuleError::MissingItem)?;
+            let current = self.front().ok_or(ModuleError::MissingItem)?;
+            let target = self.items[index];
+            let combat = |kind| {
+                kind != ModuleKind::MiningLaser
+                    && super::OrdinaryWeapon::from_module(kind).is_some()
+            };
+            let adopting = !restoring
+                && current.kind == ModuleKind::MiningLaser
+                && combat(target.kind)
+                && self.auto_return.is_none();
+            if adopting {
+                self.auto_return = Some(item);
+            } else if !restoring
+                && target.kind == ModuleKind::MiningLaser
+                && combat(current.kind)
+                && self.auto_return.is_none()
+            {
+                self.auto_return = Some(replacing);
+            } else if restoring
+                && current.kind == ModuleKind::MiningLaser
+                && combat(target.kind)
+                && self.auto_return == Some(item)
+            {
+                self.auto_return = None;
+            } else {
+                return Err(ModuleError::StaleOccupant);
+            }
+            if !adopting {
+                self.install(index, Some(replacing))?;
+            }
+            self.revision = self
+                .revision
+                .checked_add(1)
+                .ok_or(ModuleError::SequenceExhausted)?;
+            return Ok(());
+        }
+        if matches!(event.action, ModuleAction::GrantStoredMiningLaser) && !event.xyzzy {
+            return Err(ModuleError::NotForSale);
+        }
         if let Some(kind) = event.action.purchase_kind() {
             let price = if event.xyzzy {
                 0
@@ -732,7 +811,12 @@ impl Ledger {
                     }
                 },
             });
-            self.install(self.items.len() - 1, replacing)?;
+            if !matches!(event.action, ModuleAction::GrantStoredMiningLaser) {
+                self.install(self.items.len() - 1, replacing)?;
+                if kind.slot() == ModuleSlot::FrontLaser {
+                    self.auto_return = None;
+                }
+            }
             self.paid = self
                 .paid
                 .checked_add(if event.xyzzy { 0 } else { price })
@@ -757,6 +841,9 @@ impl Ledger {
                     if i.slot == Some(ModuleSlot::Shield) {
                         return Err(ModuleError::ShieldRequired);
                     }
+                    if i.slot == Some(ModuleSlot::FrontLaser) {
+                        self.auto_return = None;
+                    }
                     i.slot = None;
                     self.test_tank_items.retain(|&id| id != item);
                 }
@@ -770,8 +857,13 @@ impl Ledger {
                         return Err(ModuleError::NoChange);
                     }
                     self.install(index, replacing)?;
+                    if self.items[index].kind.slot() == ModuleSlot::FrontLaser {
+                        self.auto_return = None;
+                    }
                 }
                 ModuleAction::PurchaseMiningLaser
+                | ModuleAction::GrantStoredMiningLaser
+                | ModuleAction::FlightLaserExchange { .. }
                 | ModuleAction::PurchaseFuelScoops
                 | ModuleAction::Purchase { .. } => {
                     return Err(ModuleError::NotForSale);
@@ -914,6 +1006,8 @@ impl State {
                 )
             {
                 super::AccountEffect::Debit(0)
+            } else if matches!(e.action, ModuleAction::FlightLaserExchange { .. }) {
+                super::AccountEffect::Debit(0)
             } else {
                 continue;
             };
@@ -971,11 +1065,15 @@ impl State {
             return false;
         };
         let mut counters = [0; 2];
-        for e in self.events.iter().filter(|e| e.tick <= hit.world_tick) {
+        for e in self
+            .events
+            .iter()
+            .filter(|e| e.revision <= hit.account_revision)
+        {
             if e.dock.owner().seed() != hit.owner.owner
                 || e.dock.ship().ordinal() != hit.owner.hull
                 || e.dock.visit() >= hit.owner.visit
-                || e.revision > hit.account_revision
+                || e.tick > hit.world_tick
             {
                 return false;
             }
@@ -986,7 +1084,10 @@ impl State {
         ledger.front().is_some_and(|i| {
             i.id == hit.item
                 && i.kind == ModuleKind::MiningLaser
-                && matches!(i.provenance, ModuleProvenance::Paid { .. })
+                && matches!(
+                    i.provenance,
+                    ModuleProvenance::Paid { .. } | ModuleProvenance::XYZzy { .. }
+                )
         })
     }
     fn grant_count(&self) -> usize {
@@ -1021,12 +1122,37 @@ impl State {
                 e.revision,
                 previous.map(|p| (p.dock.sequence(), p.tick, p.revision)),
             )?;
+            if let ModuleAction::FlightLaserExchange {
+                visit,
+                clock,
+                emission,
+                ..
+            } = e.action
+            {
+                let prior_dock = previous.map(|event| event.dock).ok_or(INVALID)?;
+                if e.dock != prior_dock
+                    || visit <= e.dock.visit()
+                    || visit > world.combat_identity().ok_or(INVALID)?.visit
+                    || clock == 0
+                    || clock > world.combat.physical_tick()
+                    || clock > e.tick
+                    || emission > world.combat.emissions
+                    || world.jump_journal.system_at_visit(visit, e.tick).is_err()
+                {
+                    return Err(INVALID);
+                }
+            }
             let serial = if e.xyzzy {
                 let kind = e
                     .action
                     .purchase_kind()
                     .filter(|kind| kind.xyzzy_supported())
                     .ok_or(INVALID)?;
+                if kind == ModuleKind::MiningLaser
+                    && e.action != ModuleAction::GrantStoredMiningLaser
+                {
+                    return Err(INVALID);
+                }
                 let authorized = match kind {
                     ModuleKind::Shield(grade) => world
                         .xyzzy
@@ -1225,6 +1351,18 @@ impl State {
         self.ledger_at(owner, tick, visit)?
             .fitted(ModuleSlot::UtilityFuelScoops)
     }
+    pub(in crate::flight) fn scoop_was_fitted_for_collection(
+        &self,
+        receipt: &crate::mining::Collection,
+    ) -> bool {
+        self.ledger_at_revision(receipt.owner.owner, receipt.revision.saturating_sub(1))
+            .ok()
+            .and_then(|ledger| ledger.fitted(ModuleSlot::UtilityFuelScoops))
+            .is_some_and(|item| item.id == receipt.item)
+            && self
+                .scoop_item_at(receipt.owner.owner, receipt.world_tick, receipt.owner.visit)
+                .is_some_and(|item| item.id == receipt.item)
+    }
     pub(super) fn ecm_item_at(&self, owner: u64, tick: u64, visit: u64) -> Option<OwnedModule> {
         self.ledger_at(owner, tick, visit)?
             .fitted(ModuleSlot::UtilityEcm)
@@ -1305,6 +1443,21 @@ impl State {
         for e in &self.events {
             match e.action {
                 ModuleAction::PurchaseMiningLaser => w.u8(0),
+                ModuleAction::GrantStoredMiningLaser => w.u8(19),
+                ModuleAction::FlightLaserExchange {
+                    replacing,
+                    visit,
+                    clock,
+                    emission,
+                    restoring,
+                    ..
+                } => {
+                    w.u8(18);
+                    for value in [replacing, visit, clock, emission] {
+                        w.u64(value);
+                    }
+                    w.bool(restoring);
+                }
                 ModuleAction::Purchase { kind } => {
                     w.u8(3);
                     w.u8(kind.tag());
@@ -1359,6 +1512,11 @@ impl State {
             } else {
                 None
             };
+            let exchange = if tag == 18 {
+                Some((r.u64()?, r.u64()?, r.u64()?, r.u64()?, r.bool()?))
+            } else {
+                None
+            };
             let item = r.u64()?;
             let dock = DockContext::decode_save(r)?;
             let tick = r.u64()?;
@@ -1366,6 +1524,19 @@ impl State {
             let xyzzy = r.bool()?;
             let action = match tag {
                 0 => ModuleAction::PurchaseMiningLaser,
+                19 => ModuleAction::GrantStoredMiningLaser,
+                18 => {
+                    let (replacing, visit, clock, emission, restoring) =
+                        exchange.ok_or(SaveError::InvalidEncoding)?;
+                    ModuleAction::FlightLaserExchange {
+                        item,
+                        replacing,
+                        visit,
+                        clock,
+                        emission,
+                        restoring,
+                    }
+                }
                 16 if version >= 16 => ModuleAction::PurchaseFuelScoops,
                 1 => ModuleAction::Store { item },
                 2 => ModuleAction::Install { item, replacing },
@@ -1556,7 +1727,10 @@ impl World {
         let account = self.commander_account.as_ref()?;
         let item = self.modular_front().filter(|i| {
             i.kind == ModuleKind::MiningLaser
-                && matches!(i.provenance, ModuleProvenance::Paid { .. })
+                && matches!(
+                    i.provenance,
+                    ModuleProvenance::Paid { .. } | ModuleProvenance::XYZzy { .. }
+                )
         })?;
         let owner = self.combat_identity()?;
         Some(FittedMiningTool {
@@ -1611,6 +1785,12 @@ impl World {
         action: ModuleAction,
         tick: u64,
     ) -> Result<ModuleReview, ModuleError> {
+        if matches!(
+            action,
+            ModuleAction::GrantStoredMiningLaser | ModuleAction::FlightLaserExchange { .. }
+        ) {
+            return Err(ModuleError::NotForSale);
+        }
         if tick != self.state.tick {
             return Err(ModuleError::StaleReview);
         }
@@ -1890,12 +2070,25 @@ mod shield_tests;
 mod tests;
 
 impl State {
-    pub(super) fn front_at_physical(&self, world: &World, clock: u64) -> Option<OwnedModule> {
+    pub(super) fn front_at_physical(
+        &self,
+        world: &World,
+        clock: u64,
+        firing_emission: u64,
+    ) -> Option<OwnedModule> {
         let mut ledger = Ledger::born(world.combat_identity()?.owner).ok()?;
         let mut counters = [0; 2];
         for event in &self.events {
-            let at = world.damage.berth_clock(event.dock.sequence())?;
-            if at > clock {
+            if let ModuleAction::FlightLaserExchange {
+                clock: at,
+                emission,
+                ..
+            } = event.action
+            {
+                if at > clock || (at == clock && emission >= firing_emission) {
+                    break;
+                }
+            } else if world.damage.berth_clock(event.dock.sequence())? > clock {
                 break;
             }
             ledger.replay(*event, &mut counters).ok()?;
@@ -1905,7 +2098,7 @@ impl State {
 }
 
 impl World {
-    fn historical_front_at_tick(&self, tick: u64) -> Option<OwnedModule> {
+    fn historical_front_at_tick(&self, tick: u64, firing_emission: u64) -> Option<OwnedModule> {
         let mut ledger = Ledger::born(self.combat_identity()?.owner).ok()?;
         let mut counters = [0; 2];
         for event in self
@@ -1914,6 +2107,10 @@ impl World {
             .iter()
             .filter(|event| event.tick <= tick)
         {
+            if matches!(event.action, ModuleAction::FlightLaserExchange { emission, .. } if event.tick == tick && emission >= firing_emission)
+            {
+                break;
+            }
             ledger.replay(*event, &mut counters).ok()?;
         }
         ledger.front()
@@ -1922,20 +2119,215 @@ impl World {
         &self,
         item: u64,
         tick: u64,
+        emission: u64,
     ) -> Option<super::OrdinaryWeapon> {
-        let fitted = self.historical_front_at_tick(tick)?;
+        let fitted = self.historical_front_at_tick(tick, emission)?;
         if item != fitted.id {
             return None;
         }
         super::OrdinaryWeapon::from_module(fitted.kind)
     }
     pub(super) fn front_cadence_at_tick(&self, tick: u64) -> Option<u8> {
-        super::OrdinaryWeapon::from_module(self.historical_front_at_tick(tick)?.kind)
+        super::OrdinaryWeapon::from_module(self.historical_front_at_tick(tick, u64::MAX)?.kind)
             .map(super::OrdinaryWeapon::cooldown_ticks)
     }
 }
 
 impl World {
+    /// Select an actual owned work tool in the original front laser mount. No purchase,
+    /// new item, resource refill or extra mount is implied by selecting a rock.
+    pub(in crate::flight) fn select_auto_mining_tool(
+        &mut self,
+    ) -> Result<(), crate::mining::MiningError> {
+        use crate::mining::MiningError;
+        if self.state.mode != super::FlightMode::Flight || self.is_paused() || !self.pulse.alive() {
+            return Err(MiningError::NotInFlight);
+        }
+        if self.emp.input_blocked() {
+            return Err(MiningError::Resources);
+        }
+        if self
+            .selected_work_target()
+            .is_none_or(|target| !matches!(target.id, crate::equipment::WorkTargetId::Asteroid(_)))
+        {
+            return Err(MiningError::NoTarget);
+        }
+        if self.flight_reception.occupancy().1 > 0
+            || self.navigation_trade.occupancy().1 > 0
+            || self.practice.is_some_and(|p| !p.reception_is_terminal())
+            || self
+                .mission_snapshot()
+                .is_some_and(|s| s.freight.held_tonnes > 0)
+        {
+            return Err(MiningError::ProtectedActivity);
+        }
+        let account = self
+            .commander_account
+            .as_ref()
+            .ok_or(MiningError::NoCommander)?;
+        let ledger = self
+            .modular
+            .ledger(self, account)
+            .map_err(|_| MiningError::InvalidState)?;
+        let front = ledger.front().ok_or(MiningError::NoCompatibleFittedTool)?;
+        if front.kind == ModuleKind::MiningLaser {
+            if ledger.auto_return.is_some() {
+                return Ok(());
+            }
+            let combat = ledger
+                .items
+                .iter()
+                .filter(|i| {
+                    i.slot.is_none()
+                        && i.kind != ModuleKind::MiningLaser
+                        && super::OrdinaryWeapon::from_module(i.kind).is_some()
+                })
+                .max_by_key(|i| {
+                    (
+                        super::OrdinaryWeapon::from_module(i.kind).map(|w| w.damage_hundredths()),
+                        i.id,
+                    )
+                })
+                .copied();
+            return if let Some(combat) = combat {
+                self.exchange_auto_mining_tool(ledger, front, combat, false)
+            } else {
+                Ok(())
+            };
+        }
+        let mining = ledger
+            .items
+            .iter()
+            .find(|i| {
+                i.slot.is_none()
+                    && i.kind == ModuleKind::MiningLaser
+                    && matches!(
+                        i.provenance,
+                        ModuleProvenance::Paid { .. } | ModuleProvenance::XYZzy { .. }
+                    )
+            })
+            .copied()
+            .ok_or(MiningError::NoCompatibleFittedTool)?;
+        self.exchange_auto_mining_tool(ledger, front, mining, false)
+    }
+
+    pub(in crate::flight) fn restore_auto_mining_tool(
+        &mut self,
+    ) -> Result<(), crate::mining::MiningError> {
+        use crate::mining::MiningError;
+        // No full ledger replay on ordinary flight before automatic mining is used.
+        if !self
+            .modular
+            .events
+            .iter()
+            .rev()
+            .find_map(|e| match e.action {
+                ModuleAction::FlightLaserExchange { restoring, .. } => Some(!restoring),
+                _ => None,
+            })
+            .unwrap_or(false)
+        {
+            return Ok(());
+        }
+        let account = self
+            .commander_account
+            .as_ref()
+            .ok_or(MiningError::NoCommander)?;
+        let ledger = self
+            .modular
+            .ledger(self, account)
+            .map_err(|_| MiningError::InvalidState)?;
+        let Some(item) = ledger.auto_return else {
+            return Ok(());
+        };
+        if self.is_paused() || self.emp.input_blocked() || !self.pulse.alive() {
+            return Err(MiningError::Resources);
+        }
+        let front = ledger.front().ok_or(MiningError::InvalidState)?;
+        let combat = ledger
+            .items
+            .iter()
+            .find(|i| i.id == item && i.slot.is_none())
+            .copied()
+            .ok_or(MiningError::InvalidState)?;
+        self.exchange_auto_mining_tool(ledger, front, combat, true)
+    }
+
+    fn exchange_auto_mining_tool(
+        &mut self,
+        mut ledger: Ledger,
+        front: OwnedModule,
+        next: OwnedModule,
+        restoring: bool,
+    ) -> Result<(), crate::mining::MiningError> {
+        use crate::mining::MiningError;
+        let owner = self.combat_identity().ok_or(MiningError::NoCommander)?;
+        let current = self
+            .commander_account
+            .as_ref()
+            .ok_or(MiningError::NoCommander)?;
+        let dock = self
+            .modular
+            .events
+            .last()
+            .ok_or(MiningError::InvalidState)?
+            .dock;
+        let event = Event {
+            xyzzy: false,
+            action: ModuleAction::FlightLaserExchange {
+                item: next.id,
+                replacing: front.id,
+                visit: owner.visit,
+                clock: self.combat.physical_tick(),
+                emission: self.combat.emissions,
+                restoring,
+            },
+            item: next.id,
+            dock,
+            tick: self.state.tick,
+            revision: current
+                .revision()
+                .checked_add(1)
+                .ok_or(MiningError::ProofCapacity)?,
+        };
+        ledger
+            .apply(event, 0)
+            .map_err(|_| MiningError::InvalidState)?;
+        let allowance = if self.test_tank_custody_clear() {
+            ledger.test_tank_count()
+        } else {
+            0
+        };
+        ledger
+            .validate_budgets(current, self.emp.utility_mounts(), allowance)
+            .map_err(|_| MiningError::InvalidState)?;
+        let born = |slot, offset| {
+            ledger
+                .fitted(slot)
+                .is_some_and(|item| item.id == owner.owner + offset)
+        };
+        let account = current
+            .prepare_module(
+                0,
+                [
+                    born(ModuleSlot::FrontLaser, 7),
+                    born(ModuleSlot::Energy, 5),
+                    born(ModuleSlot::Navigation, 4),
+                    born(ModuleSlot::Drive, 6),
+                    born(ModuleSlot::Shield, 3),
+                ],
+                ledger.fuel_storage_count(),
+            )
+            .map_err(|_| MiningError::InvalidState)?;
+        let mut modules = self.modular.clone();
+        modules.events.push(event);
+        self.save_bytes_with_modules(&account, &modules)
+            .map_err(|_| MiningError::ProofCapacity)?;
+        self.modular = modules;
+        self.commander_account = Some(account);
+        Ok(())
+    }
+
     pub(super) fn grant_xyzzy_module(
         &mut self,
         dock: DockContext,
@@ -1956,6 +2348,9 @@ impl World {
             .iter()
             .find(|item| item.kind == kind && (!tank || item.slot.is_none()))
             .copied();
+        if kind == ModuleKind::MiningLaser && existing.is_some() {
+            return Ok(());
+        }
         if !tank && existing.is_some_and(|item| item.slot == Some(kind.slot())) {
             return Ok(());
         }
@@ -1978,7 +2373,11 @@ impl World {
             )
         } else {
             (
-                ModuleAction::Purchase { kind },
+                if kind == ModuleKind::MiningLaser {
+                    ModuleAction::GrantStoredMiningLaser
+                } else {
+                    ModuleAction::Purchase { kind }
+                },
                 dock.owner()
                     .seed()
                     .checked_add(200010 + u64::from(grant))

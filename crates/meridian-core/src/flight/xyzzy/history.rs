@@ -61,6 +61,10 @@ impl State {
         commerce: &Commerce<'_>,
     ) -> Result<(), SaveError> {
         let mut events = commerce.markets.ok_or(INVALID)?.account_events();
+        events.extend(world.cargo_intakes().into_iter().map(|entry| AccountEvent {
+            revision: entry.revision,
+            effect: AccountEffect::Debit(0),
+        }));
         events.extend(
             commerce
                 .modular

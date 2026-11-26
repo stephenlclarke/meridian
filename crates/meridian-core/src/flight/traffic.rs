@@ -14,8 +14,9 @@ impl World {
                 BeamSource::Npc(_) if shot.weapon != super::OrdinaryWeapon::FrontPulseLaser => {
                     return Err(invalid);
                 }
-                BeamSource::Player { item, .. }
-                    if self.front_weapon_at_tick(item, shot.world_tick) != Some(shot.weapon) =>
+                BeamSource::Player { item, emission, .. }
+                    if self.front_weapon_at_tick(item, shot.world_tick, emission)
+                        != Some(shot.weapon) =>
                 {
                     return Err(invalid);
                 }

@@ -253,7 +253,7 @@ impl State {
                     };
                     let fitted = world
                         .modular
-                        .front_at_physical(world, event.clock)
+                        .front_at_physical(world, event.clock, next_emission)
                         .ok_or(INVALID)?;
                     if super::OrdinaryWeapon::from_module(fitted.kind) != Some(weapon) {
                         return Err(INVALID);

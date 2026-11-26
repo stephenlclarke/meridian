@@ -6,6 +6,7 @@ use crate::mining::{
     belt_destination,
 };
 use crate::navigation::SystemId;
+mod collection;
 mod persistence;
 
 impl World {
@@ -288,22 +289,54 @@ impl World {
             tick,
         })
     }
-    /// Paid fitted equipment alone cannot replace an eligible original physical ore actor.
-    /// Pending descriptions never confer collection authority or cargo ownership.
-    pub fn request_collect_mined_ore(&mut self, tick: u64) -> Result<(), MiningError> {
-        if tick != self.state.tick {
-            return Err(MiningError::StaleCommand);
+    pub(in crate::flight) fn auto_mine_tick(
+        &mut self,
+        id: crate::mining::AsteroidId,
+    ) -> &'static str {
+        if !self.mining_selected(id) {
+            return "Target released";
         }
-        if self.is_paused() {
-            return Err(MiningError::Paused);
-        }
-        if self.state.mode != FlightMode::Flight {
-            return Err(MiningError::NotInFlight);
+        let Some(body) = self
+            .mining
+            .body(usize::from(id.ordinal()))
+            .filter(|b| b.id == id)
+        else {
+            return "Target unavailable";
+        };
+        if body.remaining_energy <= 0.0 {
+            return if self.mining_collection_target(id).is_some() {
+                "Ore ready"
+            } else {
+                "Mining complete"
+            };
         }
         if self.fitted_fuel_scoops().is_none() {
-            Err(MiningError::NoScoops)
-        } else {
-            Err(MiningError::NoEligibleOreBody)
+            return "Fit fuel scoops";
+        }
+        match self.prepare_mining_intake_account(body.commodity) {
+            Err(MiningError::HoldFull) => return "Cargo hold full",
+            Err(_) => return "Cargo unavailable",
+            Ok(_) => {}
+        }
+        if self
+            .mining_belt_snapshot()
+            .and_then(|belt| belt.front_contact)
+            .is_none_or(|contact| contact.asteroid != id)
+        {
+            return "Align mining laser";
+        }
+        if self.select_auto_mining_tool().is_err() {
+            return "Fit mining laser";
+        }
+        let Ok(tool) = self.mining_tool_authority() else {
+            return "Fit mining laser";
+        };
+        match self.request_mining(tool, self.state.tick) {
+            Ok(shot) if shot.extracted_units > 0 => "Ore ready",
+            Ok(_) => "Mining pulse",
+            Err(MiningError::Resources) => "Mining recharging",
+            Err(MiningError::ProtectedActivity) => "Protected activity",
+            Err(_) => "Mining unavailable",
         }
     }
 }

@@ -705,6 +705,7 @@ impl World {
             for kind in [
                 super::modular::ModuleKind::EliteEnergyUnit,
                 super::modular::ModuleKind::NavalLaser,
+                super::modular::ModuleKind::MiningLaser,
                 super::modular::ModuleKind::AdvancedNavigation,
                 super::modular::ModuleKind::FuelScoops,
                 super::modular::ModuleKind::Targeting(crate::equipment::TargetingTier::Military),

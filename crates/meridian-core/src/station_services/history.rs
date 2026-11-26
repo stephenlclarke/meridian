@@ -70,7 +70,10 @@ impl StationMarkets {
             })
             .collect()
     }
-    pub(super) fn validate_receipts(&self) -> Result<(), SaveError> {
+    pub(super) fn validate_receipts(
+        &self,
+        intakes: &[super::CargoIntake],
+    ) -> Result<(), SaveError> {
         let invalid = SaveError::InvalidState("service transaction prefix");
         if self.receipts.len() > MAX_RECEIPTS || self.receipts.len() as u64 != self.data.revision {
             return Err(invalid);
@@ -80,8 +83,33 @@ impl StationMarkets {
             .data;
         let mut previous = 0;
         let mut held = [0_u64; 17];
+        let mut incoming = intakes.to_vec();
+        incoming.sort_unstable_by_key(|entry| entry.revision);
+        if incoming
+            .iter()
+            .any(|entry| entry.revision == 0 || entry.commodity.departure_legal_weight() != 0)
+            || incoming
+                .windows(2)
+                .any(|entries| entries[0].revision == entries[1].revision)
+        {
+            return Err(invalid);
+        }
+        let mut incoming = incoming.into_iter().peekable();
         for receipt in self.receipts.iter() {
             if receipt.revision <= previous {
+                return Err(invalid);
+            }
+            while let Some(entry) = incoming.next_if(|entry| entry.revision < receipt.revision) {
+                let slot = &mut held[entry.commodity.index()];
+                *slot = slot
+                    .checked_add(1)
+                    .filter(|&n| n <= super::MAX_MARKET_QUANTITY)
+                    .ok_or(invalid)?;
+            }
+            if incoming
+                .peek()
+                .is_some_and(|entry| entry.revision == receipt.revision)
+            {
                 return Err(invalid);
             }
             let (site, commodity, bought, amount) = match receipt.event {
