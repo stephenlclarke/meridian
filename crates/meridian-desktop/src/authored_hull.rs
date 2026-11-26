@@ -357,9 +357,9 @@ mod tests {
         package.engineering = None;
         package.flight.max_speed = None;
         package.clearances.clear();
-        let failure = AuthoredHull::from_package(&package, false, 0)
-            .err()
-            .expect("archive accepted as an ordinary package");
+        let Err(failure) = AuthoredHull::from_package(&package, false, 0) else {
+            panic!("archive accepted as an ordinary package");
+        };
         assert!(failure.contains("--inspect-hull-package"));
         let hull = ok(AuthoredHull::from_package(&package, true, 0));
         assert!(hull.record.id.starts_with(LOCAL_PREFIX));

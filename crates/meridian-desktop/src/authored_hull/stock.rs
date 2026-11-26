@@ -449,11 +449,10 @@ mod tests {
         };
         let mut unmapped = 0;
         let mut emitters = 0;
-        for (actual, source) in visual
-            .bytes()
-            .chunks_exact(56)
-            .zip(original[16..].chunks_exact(56))
-        {
+        let (actual, actual_remainder) = visual.bytes().as_chunks::<56>();
+        let (source, source_remainder) = original[16..].as_chunks::<56>();
+        assert!(actual_remainder.is_empty() && source_remainder.is_empty());
+        for (actual, source) in actual.iter().zip(source) {
             assert_eq!(
                 &actual[24..56],
                 &source[24..56],
