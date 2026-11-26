@@ -142,7 +142,8 @@ class MuleSourceVerification(unittest.TestCase):
             inverse = json.loads(manifest.read_bytes())
             relative = verifier.LIB_SOURCE
             protected = verifier.protected_core_pins(root)
-            current = verifier.undo_medusa_stock_publication(relative, (core / relative).read_bytes())
+            current = verifier.undo_unwritten_route_publication(relative, (core / relative).read_bytes())
+            current = verifier.undo_medusa_stock_publication(relative, current)
             current = verifier.undo_flight_computer(relative, current,
                                                      verifier.stock_shield_inverse(root, protected))
             current = verifier.undo_flight_computer(relative, current,

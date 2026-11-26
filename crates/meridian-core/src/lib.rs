@@ -37,6 +37,7 @@ pub mod seriema_courier;
 pub mod station;
 pub mod station_services;
 pub mod traffic;
+pub mod unwritten_route;
 pub mod wombat;
 pub mod yak;
 

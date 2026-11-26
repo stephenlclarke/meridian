@@ -1561,3 +1561,76 @@ fn corrupt_and_unsupported_startup_keep_the_slot_until_confirmed_replacement_is_
         assert_ne!(ok(std::fs::read(&path)), bytes);
     }
 }
+
+#[test]
+fn normal_flight_opens_unwritten_route_clue_journal_without_advancing_or_jumping() {
+    use winit::keyboard::ModifiersState;
+
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    launched(&mut app);
+    let before = ok(app.game.world.save_bytes());
+    assert_eq!(
+        key(
+            &mut app,
+            KeyCode::KeyJ,
+            ElementState::Pressed,
+            false,
+            Some("j")
+        ),
+        Some(KeyCode::KeyJ)
+    );
+    assert!(app.help.is_none());
+    app.modifiers = ModifiersState::SHIFT;
+    assert_eq!(
+        key(
+            &mut app,
+            KeyCode::KeyJ,
+            ElementState::Pressed,
+            false,
+            Some("J")
+        ),
+        None,
+    );
+    let panel = app
+        .help
+        .as_ref()
+        .unwrap_or_else(|| panic!("missing clue journal"));
+    assert_eq!(panel.title, "The Unwritten Route - Clue Journal");
+    assert_eq!(panel.lines[0], "0 of 64 distinct source clues collected");
+    assert!(
+        panel
+            .lines
+            .iter()
+            .all(|line| !line.contains("PLUGH") && !line.contains("Corur"))
+    );
+    assert!(app.modal_open());
+    assert!(matches!(
+        app.advance_frame(true, 6),
+        FrameAdvance::Continue(None)
+    ));
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+    assert_eq!(
+        key(
+            &mut app,
+            KeyCode::KeyJ,
+            ElementState::Pressed,
+            true,
+            Some("J")
+        ),
+        None,
+    );
+    assert!(app.help.is_some());
+    assert_eq!(
+        key(
+            &mut app,
+            KeyCode::Escape,
+            ElementState::Pressed,
+            false,
+            None
+        ),
+        None,
+    );
+    assert!(app.help.is_none());
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+}

@@ -314,9 +314,18 @@ impl App {
             && self.docked.as_ref().is_some_and(Docked::search_active);
         let question = text == Some("?") || (code == KeyCode::Slash && self.modifiers.shift_key());
         let toggle = question || (code == KeyCode::KeyH && !searching);
+        let journal = code == KeyCode::KeyJ && self.modifiers.shift_key() && !searching;
         if self.help.is_some() {
-            if !repeat && (toggle || code == KeyCode::KeyH || code == KeyCode::Escape) {
+            if !repeat && (toggle || journal || code == KeyCode::KeyH || code == KeyCode::Escape) {
                 self.help = None;
+                self.clear_held_input();
+                self.request_redraw();
+            }
+            return true;
+        }
+        if journal && self.game.playing() && self.xyzzy.is_none() {
+            if !repeat && let Some(progress) = self.game.world.unwritten_route_clue_progress() {
+                self.help = Some(crate::help::Panel::clue_journal(&progress));
                 self.clear_held_input();
                 self.request_redraw();
             }

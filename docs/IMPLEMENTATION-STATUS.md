@@ -10,6 +10,10 @@ The station Equipment screen exposes the born Basic drive and the two original p
 
 The [seven shield grades](SHIELD-GRADES.md) use the source-defined bank capacities from 300 to 2,760 and unchanged recharge. Four successive shop grades are payable through the existing account; Advanced II retains its unavailable Elite-rank and PLUGH-only acquisition paths, and Elite remains acquisition-only with explicit maximum test access. A separate XYZZY grade selector exercises each real fit without cash, fuel or unrelated equipment changes. The wider bank codec, historical fit/damage replay, actual incoming hit, HUD and paid/refit/Continue regressions await owned execution; no native preview claim follows from authored source.
 
+## The Unwritten Route clue journal
+
+The [ordinary clue journal](../integration/unwritten-route/README.md) reads the existing first receipts for four playable source families against the original 64-clue catalogue. Shift+J opens the journal. Later trail instructions and the paid Medusa path follow the original quest prerequisites.
+
 ## Medusa Showroom inspection
 
 The empty stock reference exposes 40,712 kg in the Showroom. The MacBook Air replayed the original 14 finite distributions and passed all six source tests. The live preview and exact-head compiler validation remain pending for this addition. Flight, exchange and PLUGH fabrication remain unavailable.
