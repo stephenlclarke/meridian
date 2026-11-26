@@ -596,3 +596,9 @@ tools/measure_secretarybird_survey.py text eol=lf
 tools/prepare_secretarybird_survey.py text eol=lf
 tools/rebuild_secretarybird_survey.py text eol=lf
 tools/verify_secretarybird_survey.py text eol=lf
+
+# Byte-pinned Armadillo Miner replay programs.
+tools/measure_armadillo_miner.py text eol=lf
+tools/prepare_armadillo_miner.py text eol=lf
+tools/rebuild_armadillo_miner.py text eol=lf
+tools/verify_armadillo_miner.py text eol=lf

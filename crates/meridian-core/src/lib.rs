@@ -7,6 +7,7 @@ pub mod alpaca;
 pub mod anoa;
 pub mod antelope;
 pub mod aplomado_interceptor;
+pub mod armadillo_miner;
 pub mod arna_cutter;
 pub mod aurochs;
 pub mod badger;
