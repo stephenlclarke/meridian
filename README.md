@@ -182,6 +182,7 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Llama source envelope and Hull Studio definition](docs/LLAMA-SOURCE.md)
 - [Laggar source envelope and Hull Studio definition](docs/LAGGAR-SOURCE.md)
 - [Alpaca source envelope and Hull Studio definition](docs/ALPACA-SOURCE.md)
+- [Elk source envelope and Hull Studio definition](docs/ELK-SOURCE.md)
 - [Stag Liner source envelope and Hull Studio definition](docs/STAG-LINER-GAMEPLAY-ENVELOPE.md)
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)

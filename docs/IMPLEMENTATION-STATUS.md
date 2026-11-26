@@ -252,6 +252,10 @@ Laggar preserves 3,108 detailed and 184 native original faces. Both meshes retai
 
 Alpaca preserves 2,724 detailed and 908 native original faces. A separate, source-derived 508-face inspection candidate preserves the closed shield and ten measured original joins. [Alpaca source and evidence](ALPACA-SOURCE.md)
 
+## Elk catalogue source
+
+Elk preserves its original 1,584 detailed and 536 native faces. A separate 464-face inspection candidate retains all 14 parts and all nine measured original joins. [Elk source and evidence](ELK-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)
