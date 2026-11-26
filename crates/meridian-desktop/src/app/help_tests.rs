@@ -253,7 +253,12 @@ fn flight_help_lists_the_computer_keys_and_consumes_them_while_open() {
     ] {
         assert!(text.contains(binding), "Missing {binding}");
     }
-    for key in [KeyCode::KeyN, KeyCode::KeyT, KeyCode::Tab, KeyCode::Backspace] {
+    for key in [
+        KeyCode::KeyN,
+        KeyCode::KeyT,
+        KeyCode::Tab,
+        KeyCode::Backspace,
+    ] {
         assert_eq!(press(&mut app, key, None), None);
     }
     assert!(app.help.is_some());
