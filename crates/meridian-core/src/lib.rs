@@ -77,6 +77,7 @@ pub mod muskox;
 pub mod navigation;
 pub mod oryx_voyager;
 pub mod osprey_scout;
+pub mod osprey_strike;
 pub mod owlet_mk_ii;
 pub mod ox;
 pub mod ox_mk_ii;
