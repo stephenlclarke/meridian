@@ -391,7 +391,12 @@ impl World {
         self.auto_docking = None;
         self.targeting.work_status = None;
         self.targeting.wreck_avoidance = None;
-        Ok(!self.targeting.manual)
+        let enabled = !self.targeting.manual && self.targeting_tier().is_some();
+        if enabled && self.targeting.selected.is_some() {
+            self.request_flight_view(FlightView::Front, self.state.tick)
+                .map_err(|_| StepError::InvalidMode)?;
+        }
+        Ok(enabled)
     }
 
     pub(super) fn station_docking_assistance(&self) -> bool {
