@@ -1853,7 +1853,7 @@ mod tests {
     fn front_module_rows_and_pylon_slots_use_real_owned_instances_and_admission() {
         let (_directory, profile, _menu) = start();
         let panel = ok(equipment_panel(&profile.world, "front-laser", ""));
-        assert_eq!(panel.slots.len(), 21);
+        assert_eq!(panel.slots.len(), 22);
         let actual: Vec<_> = panel.slots.iter().map(|slot| slot.id.as_str()).collect();
         assert_eq!(
             actual,
@@ -1878,7 +1878,8 @@ mod tests {
                 "targeting",
                 "targeting-mining",
                 "targeting-salvage",
-                "fuel-storage"
+                "fuel-storage",
+                "utility-ecm"
             ]
         );
         let emp = panel
@@ -1933,6 +1934,62 @@ mod tests {
                 .count(),
             3
         );
+    }
+
+    #[test]
+    fn stock_ecm_real_slot_exposes_paid_offer_then_retains_owned_fit_across_publications() {
+        use ui::EquipmentOperation::{Buy, Fit, Store};
+        let (directory, mut profile, _menu) = start();
+        let slot = "utility-ecm";
+        let node = ModuleKind::Ecm.node();
+        let panel = ok(equipment_panel(&profile.world, slot, ""));
+        let offer = panel
+            .rows
+            .iter()
+            .find(|r| r.node == node)
+            .unwrap_or_else(|| panic!("ECM offer"));
+        assert_eq!(offer.price_tenths, Some(21_000));
+        assert!(!offer.can_buy);
+        assert!(equipment_action(&profile.world, node, None, "energy", Buy).is_err());
+        ok(profile.xyzzy(meridian_core::XyzzyAction::Enter));
+        let scoop = profile
+            .world
+            .fitted_fuel_scoops()
+            .unwrap_or_else(|| panic!("scoop"));
+        ok(profile.command(Action::Module(ModuleAction::Store { item: scoop.item })));
+        let cash = profile
+            .world
+            .credits_tenths()
+            .unwrap_or_else(|| panic!("cash"));
+        let action = ok(equipment_action(&profile.world, node, None, slot, Buy));
+        ok(profile.command(action));
+        let item = profile
+            .world
+            .fitted_ecm()
+            .unwrap_or_else(|| panic!("fitted ECM"));
+        assert_eq!(profile.world.credits_tenths(), Some(cash - 21_000));
+        let action = ok(equipment_action(
+            &profile.world,
+            node,
+            Some(item.id),
+            slot,
+            Store,
+        ));
+        ok(profile.command(action));
+        assert!(profile.world.fitted_ecm().is_none());
+        let action = ok(equipment_action(
+            &profile.world,
+            node,
+            Some(item.id),
+            slot,
+            Fit,
+        ));
+        ok(profile.command(action));
+        let cold = ok(World::from_save_bytes(&ok(std::fs::read(
+            directory.0.join("commander.meridian"),
+        ))));
+        assert_eq!(cold.fitted_ecm(), Some(item));
+        assert_eq!(cold.credits_tenths(), Some(cash - 21_000));
     }
 
     #[test]

@@ -196,19 +196,16 @@ impl Menu {
         Panel {
             title: "XYZZY testing help".into(),
             lines: [
-                "Up / Down selects an action; Enter reviews, then Enter confirms",
+                "Up / Down chooses; Enter reviews, then confirms; choose again after save",
                 "Escape / B cancels a review, then closes this testing menu",
                 "Actions publish the exact save before replacing the live commander",
                 "First activation names CLARKE and SETS cash to 1,000,000 CR once",
                 "Activation fits maximum compatible equipment at any station berth",
-                "Test shield: choose the row, then Left / Right selects one grade",
-                "Test shield fits only that grade, without a paid or earned receipt",
+                "Test shield: Left / Right chooses one grade; no paid or earned receipt",
                 "TEST MAX fits 4 tanks beyond normal SH025 mounts; no active custody",
                 "Store test tanks to meet ordinary fitting limits before contracts",
-                "Limited outfits keep fitted tanks; optional utilities use free mounts",
-                "E.C.M. test fit needs a free mount, or an already fitted module",
+                "Limited outfits keep tanks; E.C.M. needs a free mount or an existing fit",
                 "Auto E.C.M. setting only; incoming NPC missiles remain unavailable",
-                "After confirmation you can choose another action here",
                 "Fuel mode is accounted separately; paid transactions still charge",
                 "Missiles and cargo remain finite; full original parity is incomplete",
                 "Close this menu first: 1 Galaxy | 2 System | 3 Showroom",
@@ -220,5 +217,26 @@ impl Menu {
             .collect(),
             footer: "Escape / H / ? Close help",
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn ecm_help_keeps_all_controls_and_footer_with_audio_line() {
+        let panel = super::Menu::default().help();
+        assert!(panel.lines.len() + 3 <= crate::help::MAX_LINES);
+        assert!(
+            panel
+                .lines
+                .iter()
+                .all(|line| line.len() <= crate::help::MAX_COLUMNS)
+        );
+        assert!(
+            panel
+                .lines
+                .iter()
+                .any(|line| line.contains("incoming NPC missiles"))
+        );
     }
 }

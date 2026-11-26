@@ -17,7 +17,8 @@ const CYAN: [f32; 3] = [0.0, 1.0, 1.0];
 const NPC_CONTACT_START: usize = 4 + crate::mesh::MAX_MISSILE_PROJECTILES;
 pub const MAX_CONTACTS: usize = NPC_CONTACT_START + MAX_TRAFFIC_ACTORS;
 // Two line quads per additional scanner contact; eight edges per added pylon icon.
-pub const MAX_VERTICES: usize = 30_000 + (MAX_CONTACTS - 7) * 12 + (9 - 3) * 8 * 6 + 40 * 35 * 6;
+pub const MAX_VERTICES: usize =
+    30_000 + (MAX_CONTACTS - 7) * 12 + (9 - 3) * 8 * 6 + (40 + 10) * 35 * 6;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Cockpit {
