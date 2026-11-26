@@ -490,3 +490,8 @@ tools/verify_razorback.py text eol=lf
 tools/measure_kestrel.py text eol=lf
 tools/prepare_kestrel.py text eol=lf
 tools/verify_kestrel.py text eol=lf
+
+# Byte-pinned Merlin replay programs.
+tools/measure_merlin.py text eol=lf
+tools/prepare_merlin.py text eol=lf
+tools/verify_merlin.py text eol=lf
