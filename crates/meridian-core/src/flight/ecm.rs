@@ -3,6 +3,7 @@ use super::{CombatIdentity, FlightMode, OwnedModule, World, weapons::PulseResour
 use crate::navigation::SystemId;
 use crate::save::{Reader, SaveError, Writer};
 use std::sync::Arc;
+mod local;
 
 pub const ECM_ENERGY_HUNDREDTHS: u16 = 2_200;
 pub const ECM_FIELD_TICKS: u64 = 32;
@@ -68,13 +69,17 @@ impl core::fmt::Display for EcmError {
 }
 impl std::error::Error for EcmError {}
 
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub(super) struct State {
     activations: Arc<Vec<EcmActivation>>,
+    local: local::Local,
 }
 impl State {
     pub(super) fn is_empty(&self) -> bool {
-        self.activations.is_empty()
+        self.activations.is_empty() && self.local.is_empty()
+    }
+    pub(super) fn unchanged_since(&self, old: &Self) -> bool {
+        Arc::ptr_eq(&self.activations, &old.activations) && self.local.unchanged_since(&old.local)
     }
     pub(super) fn active(&self, owner: CombatIdentity, clock: u64) -> Option<EcmActivation> {
         self.activations.last().copied().filter(|activation| {
@@ -90,8 +95,67 @@ impl State {
         if self.is_empty() {
             0
         } else {
-            8 + 2 + self.activations.len() * (2 + 8 * 6 + 3 + 1)
+            let mut writer = Writer::new();
+            self.encode(&mut writer);
+            8 + writer.bytes.len()
         }
+    }
+    pub(super) fn prepare_launch(
+        &self,
+        world: &World,
+        navigation: Option<super::NavigationState>,
+    ) -> Result<Self, SaveError> {
+        let mut next = self.clone();
+        if let Some(item) = world.fitted_ecm() {
+            let owner = world.combat_identity().ok_or(INVALID)?;
+            let nav = navigation.ok_or(INVALID)?.snapshot(0);
+            next.local.begin_launch(
+                CombatIdentity {
+                    system: nav.system,
+                    visit: nav.visit,
+                    ..owner
+                },
+                item.id,
+                world.state.tick,
+                world.combat.physical_tick(),
+            )?;
+        }
+        Ok(next)
+    }
+    pub(super) fn prepare_departure(
+        &self,
+        owner: CombatIdentity,
+        fitted: bool,
+        destination: SystemId,
+        tick: u64,
+        clock: u64,
+        spool: u32,
+    ) -> Result<Self, SaveError> {
+        let mut next = self.clone();
+        if fitted {
+            let before = self
+                .activations
+                .last()
+                .filter(|a| a.owner == owner && a.world_tick == tick && a.physical_tick == clock)
+                .map(|a| a.sequence);
+            next.local
+                .begin_departure(owner, destination, tick, clock, spool, before)?;
+        }
+        Ok(next)
+    }
+    pub(super) fn prepare_step(
+        &self,
+        world: &World,
+        next: super::Snapshot,
+        navigation: Option<super::NavigationState>,
+        clock: u64,
+        motion: Option<super::solar::Motion>,
+    ) -> Result<Self, SaveError> {
+        let mut candidate = self.clone();
+        candidate
+            .local
+            .step(world, next, navigation, clock, motion)?;
+        Ok(candidate)
     }
     fn prepare(
         &self,
@@ -141,10 +205,11 @@ impl State {
                 EcmTrigger::Manual => 0,
             });
         }
+        self.local.encode(w);
     }
     pub(super) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         let count = usize::from(r.u16()?);
-        if count == 0 || count > MAX_ACTIVATIONS {
+        if count > MAX_ACTIVATIONS {
             return Err(INVALID);
         }
         let mut activations = Vec::with_capacity(count);
@@ -169,15 +234,21 @@ impl State {
                 },
             });
         }
-        Ok(Self {
+        let state = Self {
             activations: Arc::new(activations),
-        })
+            local: local::Local::decode(r)?,
+        };
+        if state.is_empty() {
+            return Err(INVALID);
+        }
+        Ok(state)
     }
     pub(super) fn validate(
         &self,
         world: &World,
         modular: &super::modular::State,
     ) -> Result<(), SaveError> {
+        self.local.validate(world, modular, &self.activations)?;
         let owner = world.combat_identity().ok_or(INVALID)?;
         let end = world.combat.physical_tick();
         let mut previous: Option<EcmActivation> = None;
@@ -230,6 +301,33 @@ impl State {
 }
 
 impl World {
+    pub(super) fn check_ecm_command_capacity(
+        &self,
+        candidate: &State,
+        navigation: Option<super::NavigationState>,
+    ) -> Result<(), SaveError> {
+        if *candidate == self.ecm {
+            return Ok(());
+        }
+        let navigation_size = |navigation: Option<super::NavigationState>| {
+            let mut w = Writer::new();
+            if let Some(nav) = navigation {
+                nav.encode_save(&mut w);
+            }
+            w.bytes.len()
+        };
+        let size = self
+            .encoded_current_size()?
+            .checked_sub(self.ecm.encoded_len())
+            .and_then(|n| n.checked_add(candidate.encoded_len()))
+            .and_then(|n| n.checked_sub(navigation_size(self.navigation)))
+            .and_then(|n| n.checked_add(navigation_size(navigation)))
+            .ok_or(SaveError::TooLarge)?;
+        if size > crate::save::MAX_SAVE_BYTES {
+            return Err(SaveError::TooLarge);
+        }
+        Ok(())
+    }
     pub fn fitted_ecm(&self) -> Option<OwnedModule> {
         self.modular
             .ledger(self, self.commander_account.as_ref()?)

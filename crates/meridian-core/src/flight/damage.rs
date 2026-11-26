@@ -11,9 +11,16 @@ const MAX_EVENTS: usize = MAX_SAVE_BYTES / 9;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Kind {
     Berth,
+    EcmCancelledBerth,
+    EcmLocalFlight,
     Pulse,
     Laser(super::OrdinaryWeapon),
     Mining(u8),
+}
+impl Kind {
+    fn is_berth(self) -> bool {
+        matches!(self, Self::Berth | Self::EcmCancelledBerth)
+    }
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct Event {
@@ -83,9 +90,9 @@ impl State {
         let Some(through) = physical.checked_sub(elapsed) else {
             return false;
         };
-        self.events
-            .iter()
-            .all(|event| event.kind == Kind::Berth || event.clock <= through)
+        self.events.iter().all(|event| {
+            event.kind.is_berth() || event.kind == Kind::EcmLocalFlight || event.clock <= through
+        })
     }
     pub(super) fn berth_clock(&self, sequence: u64) -> Option<u64> {
         if !self.enabled {
@@ -96,9 +103,23 @@ impl State {
         }
         self.events
             .iter()
-            .filter(|event| event.kind == Kind::Berth)
+            .filter(|event| event.kind.is_berth())
             .nth(usize::try_from(sequence.checked_sub(2)?).ok()?)
             .map(|event| event.clock)
+    }
+    pub(super) fn cancelled_ecm_berths(&self) -> impl Iterator<Item = (u64, u64)> + '_ {
+        self.events
+            .iter()
+            .filter(|e| e.kind.is_berth())
+            .enumerate()
+            .filter(|(_, e)| e.kind == Kind::EcmCancelledBerth)
+            .map(|(index, e)| (index as u64 + 2, e.clock))
+    }
+    pub(super) fn ecm_launch_clocks(&self) -> impl Iterator<Item = u64> + '_ {
+        self.events
+            .iter()
+            .filter(|e| e.kind == Kind::EcmLocalFlight)
+            .map(|e| e.clock)
     }
     pub(super) fn mining(&self, clock: u64, body: u8) -> Result<Self, FireError> {
         if usize::from(body) >= crate::mining::BELT_BODY_COUNT || !self.enabled {
@@ -112,9 +133,21 @@ impl State {
         opening: FlightMode,
         next: FlightMode,
         clock: u64,
+        cancelled_ecm_jump: bool,
+        ecm_launch_admitted: bool,
     ) -> Result<Self, StepError> {
         if opening != FlightMode::Docked && next == FlightMode::Docked {
-            self.append(clock, Kind::Berth)
+            self.append(
+                clock,
+                if cancelled_ecm_jump {
+                    Kind::EcmCancelledBerth
+                } else {
+                    Kind::Berth
+                },
+            )
+            .map_err(|()| StepError::TickOverflow)
+        } else if ecm_launch_admitted {
+            self.append(clock, Kind::EcmLocalFlight)
                 .map_err(|()| StepError::TickOverflow)
         } else {
             Ok(self.clone())
@@ -127,6 +160,8 @@ impl State {
             w.u64(event.clock);
             w.u8(match event.kind {
                 Kind::Berth => 0,
+                Kind::EcmCancelledBerth => 7,
+                Kind::EcmLocalFlight => 8,
                 Kind::Pulse => 1,
                 Kind::Laser(weapon) => weapon.tag() + 1,
                 Kind::Mining(body) => 32 + body,
@@ -145,6 +180,8 @@ impl State {
             let kind = match r.u8()? {
                 0 => Kind::Berth,
                 1 => Kind::Pulse,
+                7 if version >= 17 => Kind::EcmCancelledBerth,
+                8 if version >= 17 => Kind::EcmLocalFlight,
                 tag @ 3..=6 if version >= 16 => {
                     Kind::Laser(super::OrdinaryWeapon::from_tag(tag - 1)?)
                 }
@@ -169,16 +206,28 @@ impl State {
         let mut missiles = missile_spends.into_iter().peekable();
         let mut next_emission = 1;
         let mut prior = 0;
+        let mut previous_launch = false;
         let mut mining_count = 0_usize;
         let mut berths = 1_u64;
         let mut events = Vec::with_capacity(self.events.len() + 128);
         let mut lasers = Vec::new();
         for event in self.events.iter() {
-            if event.clock <= prior || event.clock > end {
+            if event.clock < prior
+                || event.clock == 0
+                || event.clock > end
+                || (event.clock == prior
+                    && (!previous_launch
+                        || event.kind.is_berth()
+                        || event.kind == Kind::EcmLocalFlight))
+            {
                 return Err(INVALID);
             }
             prior = event.clock;
-            if event.kind == Kind::Berth {
+            previous_launch = event.kind == Kind::EcmLocalFlight;
+            if previous_launch {
+                continue;
+            }
+            if event.kind.is_berth() {
                 berths += 1;
                 events.push((event.clock, 0, 0, Effect::Berth));
                 continue;
@@ -239,7 +288,7 @@ impl State {
     pub(super) fn emp_berths(&self) -> Vec<u64> {
         self.events
             .iter()
-            .filter(|event| event.kind == Kind::Berth)
+            .filter(|event| event.kind.is_berth())
             .map(|event| event.clock)
             .collect()
     }
@@ -361,6 +410,15 @@ impl State {
             return Err(INVALID);
         }
         Ok(())
+    }
+    /// Negative save fixtures can balance the shared pools independently before
+    /// testing another owner. This does not grant a production command.
+    #[cfg(test)]
+    pub(super) fn replayed_pulse_for_test(world: &World) -> Result<PulseResources, SaveError> {
+        let end = world.combat.physical_tick();
+        let dock = world.navigation.ok_or(INVALID)?.dock_sequence();
+        let events = world.damage.resource_events(world, dock)?;
+        Ok(replay(&events, end)?.pulse)
     }
 }
 fn merge_missile_emissions(

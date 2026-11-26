@@ -428,7 +428,21 @@ impl World {
         if !self.jump_journal.has_room() {
             return Err(NavigationError::SequenceExhausted);
         }
+        let ecm = self
+            .ecm
+            .prepare_departure(
+                self.combat_identity().ok_or(NavigationError::WrongMode)?,
+                ledger.fitted(ModuleSlot::UtilityEcm).is_some(),
+                target,
+                self.state.tick,
+                self.combat.physical_tick(),
+                drive.1.spool_ticks(),
+            )
+            .map_err(|_| NavigationError::SequenceExhausted)?;
+        self.check_ecm_command_capacity(&ecm, Some(navigation))
+            .map_err(|_| NavigationError::SequenceExhausted)?;
         self.navigation = Some(navigation);
+        self.ecm = ecm;
         self.cancel_route_on_manual_jump(origin, target);
         Ok(())
     }
@@ -527,11 +541,18 @@ impl World {
         if let Some(actor) = &mule_renas {
             self.validate_renas_mule_launch(actor, launch_pose)?;
         }
+        let ecm = self
+            .ecm
+            .prepare_launch(self, navigation)
+            .map_err(|_| StepError::TickOverflow)?;
+        self.check_ecm_command_capacity(&ecm, navigation)
+            .map_err(|_| StepError::TickOverflow)?;
         if let Some(account) = &mut self.commander_account {
             account.record_departure_legality();
         }
         self.state = next;
         self.navigation = navigation;
+        self.ecm = ecm;
         self.missiles.berth();
         self.mule_renas = mule_renas;
         if let Some((session, epoch)) = self.freight_session.as_mut().zip(mission_epoch) {
@@ -831,9 +852,21 @@ impl World {
             prepared.practice,
             prepared.pulse.alive(),
         );
-        let damage =
-            self.damage
-                .step(self.state.mode, next.mode, prepared.combat.physical_tick())?;
+        let cancelled_ecm_jump = entry
+            && self
+                .navigation
+                .is_some_and(|n| n.snapshot(0).travel.is_some())
+            && self.fitted_ecm().is_some();
+        let ecm_launch_admitted = self.state.mode == FlightMode::Launching
+            && next.mode == FlightMode::Flight
+            && self.fitted_ecm().is_some();
+        let damage = self.damage.step(
+            self.state.mode,
+            next.mode,
+            prepared.combat.physical_tick(),
+            cancelled_ecm_jump,
+            ecm_launch_admitted,
+        )?;
         let emp = self.emp.prepare_step(
             self,
             emp::Frame {
@@ -887,6 +920,16 @@ impl World {
         }
         let navigation_trade =
             self.prepare_navigation_trade_step(navigation, planned_debit, next.tick)?;
+        let ecm = self
+            .ecm
+            .prepare_step(
+                self,
+                next,
+                navigation,
+                prepared.combat.physical_tick(),
+                motion,
+            )
+            .map_err(|_| StepError::TickOverflow)?;
         if let (Some(practice), Some(nav), Some(data)) =
             (&mut prepared.practice, navigation, &self.station_data)
         {
@@ -897,7 +940,7 @@ impl World {
             navigation,
             &prepared,
             traffic.as_ref(),
-            (&damage, &mining, &emp.state),
+            (&damage, &mining, &emp.state, &ecm),
             navigation_trade.as_ref(),
         )
         .map_err(|_| StepError::TickOverflow)?;
@@ -929,6 +972,7 @@ impl World {
         self.damage = damage;
         self.solar = solar;
         self.emp = emp.state;
+        self.ecm = ecm;
         self.mining = mining;
         self.practice = prepared.practice;
         if let Some(account) = &mut self.commander_account {

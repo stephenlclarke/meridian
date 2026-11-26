@@ -196,6 +196,7 @@ fn resource_threshold_is_strict_and_retained_history_cannot_be_removed_or_forged
         let pulse = PulseResources::decode_save(&mut Reader::new(&writer.bytes)).unwrap();
         match pulse.prepare_ecm_discharge() {
             Ok(result) => {
+                assert!(energy > 2200);
                 let mut output = Writer::new();
                 result.encode_save(&mut output);
                 let mut reader = Reader::new(&output.bytes);
@@ -226,7 +227,7 @@ fn resource_threshold_is_strict_and_retained_history_cannot_be_removed_or_forged
     world.request_pause(false, world.snapshot().tick).unwrap();
     let bytes = world.save_bytes().unwrap();
     // Strip only the tagged extension, keep the independent header marker, then re-checksum.
-    let from = bytes.windows(8).position(|tag| tag == b"MECM0001").unwrap();
+    let from = bytes.windows(8).position(|tag| tag == b"MECM0002").unwrap();
     let mut stripped = bytes[..from].to_vec();
     stripped.extend(crate::save::checksum(&stripped).to_le_bytes());
     assert!(World::from_save_bytes(&stripped).is_err());

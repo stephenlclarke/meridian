@@ -1065,6 +1065,11 @@ impl State {
         self.ledger_at(owner, tick, visit)?
             .fitted(ModuleSlot::UtilityEcm)
     }
+    pub(super) fn drive_at_visit(&self, owner: u64, tick: u64, visit: u64) -> Option<DriveGrade> {
+        self.ledger_at(owner, tick, visit)?
+            .drive()
+            .map(|(_, grade)| grade)
+    }
     pub(super) fn validate_utility_test_record(
         &self,
         owner: u64,

@@ -719,6 +719,7 @@ fn actual_secret_base_release_spends_once_drains_shield_and_preserves_hull_cargo
         "actual target-centred splash must include the nearby firing hull; {}",
         self_splash_failure_evidence(&w, target)
     );
+    super::replay::verify_ecm_disabled_fixture(w.emp.pulses[0].clone()).unwrap();
     let after = w.traffic.emp_resources(target).unwrap();
     assert_eq!(after.0, before.0, "EMP must not be fatal hull damage");
     assert!(after.1 < before.1 || after.2 < before.2);

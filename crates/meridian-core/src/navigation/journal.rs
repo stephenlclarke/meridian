@@ -94,6 +94,17 @@ pub(crate) struct CompletedJump {
     account_revision: u64,
     physical_tick: u64,
 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct JumpTiming {
+    pub(crate) source: SystemId,
+    pub(crate) destination: SystemId,
+    pub(crate) visit: u64,
+    pub(crate) departure_tick: u64,
+    pub(crate) departure_clock: u64,
+    pub(crate) arrival_tick: u64,
+    pub(crate) arrival_clock: u64,
+    pub(crate) spool: u32,
+}
 impl CompletedJump {
     pub(crate) const ENCODED_SIZE: usize = 41;
 
@@ -162,6 +173,28 @@ impl JumpJournal {
     }
     pub(crate) fn append(&mut self, leg: CompletedJump) {
         self.legs.push(leg);
+    }
+    pub(crate) fn completed_timing(&self, visit: u64) -> Result<Option<JumpTiming>, SaveError> {
+        let Some(leg) = self.legs.iter().find(|leg| leg.source_visit == visit) else {
+            return Ok(None);
+        };
+        let spool = leg.drive.spool_ticks();
+        Ok(Some(JumpTiming {
+            source: leg.source,
+            destination: leg.destination,
+            visit,
+            departure_tick: leg
+                .arrival_tick
+                .checked_sub(u64::from(spool))
+                .ok_or(INVALID)?,
+            departure_clock: leg
+                .physical_tick
+                .checked_sub(u64::from(spool))
+                .ok_or(INVALID)?,
+            arrival_tick: leg.arrival_tick,
+            arrival_clock: leg.physical_tick,
+            spool,
+        }))
     }
     pub(crate) fn encode(&self, w: &mut Writer) {
         w.u16(self.legs.len() as u16);
