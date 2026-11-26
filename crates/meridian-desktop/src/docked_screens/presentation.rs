@@ -1046,8 +1046,8 @@ fn category(id: meridian_core::station_services::CommodityId) -> Ink {
     }
 }
 fn market(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
-    let body = f.viewport.body();
-    let cell = body.width / 4.0;
+    let area = f.viewport.body();
+    let cell = area.width / 4.0;
     for (i, (title, control)) in [
         ("Buy", Control::TradeMode(false)),
         ("Sell", Control::TradeMode(true)),
@@ -1072,12 +1072,39 @@ fn market(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         button(
             f,
             title,
-            Rect::new(body.x + i as f64 * cell, 77.0, cell - 4.0, 21.0),
+            Rect::new(area.x + i as f64 * cell, 77.0, cell - 4.0, 21.0),
             control,
             refusal.is_none(),
             refusal,
         );
     }
+    for (index, (title, key)) in [
+        ("-10", Key::QuantityLessTen),
+        ("-1", Key::QuantityLess),
+        ("+1", Key::QuantityMore),
+        ("+10", Key::QuantityMoreTen),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        button(
+            f,
+            title,
+            Rect::new(area.x + index as f64 * 38.0, area.y, 34.0, 20.0),
+            Control::Key(key),
+            true,
+            None,
+        );
+    }
+    label(
+        f,
+        format!("Qty {} {}", s.quantity, s.commodity.unit().symbol()),
+        area.x + 152.0,
+        area.y,
+        Ink::Yellow,
+        area,
+    );
+    let body = Rect::new(area.x, area.y + 25.0, area.width, area.height - 25.0);
     let offsets = [0.0, 0.38, 0.57, 0.73, 0.87];
     for (i, title) in ["Product", "Price CR", "Stock", "Hold", "Unit"]
         .iter()
@@ -1104,7 +1131,7 @@ fn market(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         return;
     };
     let selected = order.iter().position(|id| *id == s.commodity).unwrap_or(0);
-    let count = f.viewport.rows(body, 60.0);
+    let count = f.viewport.rows(body, 60.0).max(1);
     let offset = start(selected, count, order.len());
     for (i, id) in order.iter().skip(offset).take(count).enumerate() {
         let y = body.y + 22.0 + i as f64 * 20.0;
@@ -1169,17 +1196,25 @@ fn market(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
             )
         },
     );
-    label(
-        f,
-        quote,
-        body.x,
-        body.y + body.height - 40.0,
-        Ink::Yellow,
-        body,
-    );
+    if body.height >= 84.0 {
+        label(
+            f,
+            quote,
+            body.x,
+            body.y + body.height - 40.0,
+            Ink::Yellow,
+            body,
+        );
+    }
     let text = reserved.map_or_else(
         || "Cargo custody unavailable".into(),
-        |n| format!("Reserved: {n}; Mission cargo requires authorisation for sale."),
+        |n| {
+            if body.height >= 84.0 {
+                format!("Reserved: {n}; Mission cargo requires authorisation for sale.")
+            } else {
+                format!("Reserved: {n} | F Refuel")
+            }
+        },
     );
     label(
         f,

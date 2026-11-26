@@ -211,6 +211,7 @@ impl Panel {
                 &[
                     "Up / Down Select goods | Page Up / Down Scroll",
                     "G Buy | Shift+G Sell | Enter Review current trade mode",
+                    "Left / Right Quantity -/+1 | Shift+Left / Right -/+10",
                     "F Refuel actual tank at the displayed price",
                     "Trade confirmation uses the current price and native unit",
                 ],

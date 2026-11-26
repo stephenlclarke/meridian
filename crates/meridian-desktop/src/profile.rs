@@ -428,6 +428,24 @@ impl Profile {
                 },
             );
         }
+        if let Action::CommodityTrade(trade) = action {
+            let tick = self.world.snapshot().tick;
+            let prepared = self
+                .world
+                .prepare_commodity_trade(trade, tick)
+                .map_err(|e| e.to_string())?;
+            let message = crate::market::commodity_trade_message(prepared.event())?;
+            let published = self
+                .store
+                .as_ref()
+                .ok_or("Internal validation has no profile storage")?
+                .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
+                .map_err(|e| format!("Market change could not be saved: {e}"))?;
+            prepared.commit();
+            self.has_save = true;
+            self.session.invalidate();
+            return publication_message(published, message);
+        }
         if let Action::StationService(command) = action {
             let tick = self.world.snapshot().tick;
             let prepared = self

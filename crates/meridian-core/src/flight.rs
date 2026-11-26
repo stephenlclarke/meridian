@@ -35,7 +35,7 @@ pub use navigation_trade::{
     NavigationTonneId, NavigationTradeAction, NavigationTradeAttemptSnapshot, NavigationTradeError,
     NavigationTradeId, NavigationTradeMarketSnapshot, NavigationTradeOutcome,
     NavigationTradePlanSnapshot, NavigationTradeReview, NavigationTradeSnapshot,
-    NavigationTradeTrace, PreparedNavigationTrade, PreparedStationService,
+    NavigationTradeTrace, PreparedCommodityTrade, PreparedNavigationTrade, PreparedStationService,
 };
 pub use occupied_salvage::{
     OccupiedCutContact, OccupiedCutError, OccupiedCutReview, PreparedOccupiedCut,

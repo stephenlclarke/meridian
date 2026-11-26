@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "followup-bulk-market",
+  "undoBefore": [
+    "followup-trade-detail"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/followup-bulk-market/PROTECTED-CORE-INVERSE.json",
+  "sha256": "cca2a0d55a597e5c1944c387604f8fbbb578678723bf98b26c760077a37e9f8f",
+  "base": "e5041c2fb6986b7606aa2d9f76160e0091342c28",
+  "label": "Atomic native market quantities"
+}

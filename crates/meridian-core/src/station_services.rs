@@ -8,8 +8,10 @@ mod commodities;
 pub use commodities::{CargoUnit, CommodityDefinition, CommodityId, CommodityQuote};
 mod history;
 mod persistence;
+mod quantities;
 mod traffic;
 pub(crate) use persistence::SavedServiceSummary;
+pub use quantities::{CommodityTrade, CommodityTradeEvent, MAX_TRADE_QUANTITY, TradeSide};
 
 const SEEDS: &[u8] = include_bytes!("../../../assets/legacy/g01-food.markets");
 
@@ -65,6 +67,8 @@ pub enum Error {
     HoldFull,
     NoSellableCargo,
     QuantityLimit,
+    ZeroQuantity,
+    PriceOverflow,
     SequenceExhausted,
 }
 
