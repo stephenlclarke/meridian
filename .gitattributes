@@ -506,3 +506,9 @@ tools/measure_morepork.py text eol=lf
 tools/prepare_morepork.py text eol=lf
 tools/rebuild_morepork.py text eol=lf
 tools/verify_morepork.py text eol=lf
+
+# Byte-pinned Owlet Mk II replay programs.
+tools/measure_owlet_mk_ii.py text eol=lf
+tools/prepare_owlet_mk_ii.py text eol=lf
+tools/rebuild_owlet_mk_ii.py text eol=lf
+tools/verify_owlet_mk_ii.py text eol=lf
