@@ -284,6 +284,10 @@ Giraffe Liner preserves 3,492 detailed and 216 native faces, including both elev
 
 Shikra preserves the original 5,396 detailed and 1,404 native faces. Its separate 512-face inspection candidate retains all 41 native parts and all 18 measured native overlaps, with clear routes between the diagonal spars. [Shikra source and evidence](SHIKRA-SOURCE.md)
 
+## Shikra Interdictor catalogue source
+
+Shikra Interdictor preserves its original 5,396 detailed and 1,404 native faces. A separate 512-face candidate retains all 41 native parts and 18 measured original overlaps. The seven clearance guards include a 359 mm lower bound in each diagonal-spar opening. [Shikra Interdictor source and evidence](SHIKRA-INTERDICTOR-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)
