@@ -6,6 +6,7 @@ pub mod alpaca;
 pub mod antelope;
 pub mod aplomado_interceptor;
 pub mod arna_cutter;
+pub mod aurochs;
 pub mod badger;
 pub mod banteng;
 pub mod barbary;

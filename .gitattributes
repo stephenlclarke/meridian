@@ -299,3 +299,8 @@ integration/sh001-mule/*.patch -text
 integration/sh008-goshawk/*.json text eol=lf
 integration/scanner-preview/*.json text eol=lf
 integration/scanner-preview/historical/*.json text eol=lf
+
+# Byte-pinned Aurochs replay programs.
+tools/measure_aurochs.py text eol=lf
+tools/prepare_aurochs.py text eol=lf
+tools/verify_aurochs.py text eol=lf
