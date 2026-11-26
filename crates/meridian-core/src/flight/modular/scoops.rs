@@ -69,6 +69,7 @@ fn count_slots(
                 i.slot,
                 Some(
                     ModuleSlot::UtilityFuelScoops
+                        | ModuleSlot::UtilitySalvageCutter
                         | ModuleSlot::UtilityEcm
                         | ModuleSlot::FuelStorage(_)
                 )

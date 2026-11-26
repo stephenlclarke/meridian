@@ -1,0 +1,209 @@
+{
+  "base": "4eabe14e93ac37dd3272b4d8076537fd87796758",
+  "files": {
+    "flight/modular.rs": {
+      "beforeSHA256": "f9763f427721e0d5f91fc0e4c8055111869f087ad79b60063d4747f479e9be5b",
+      "afterSHA256": "048ce47658907fadd51459d1a53d630a9ba6d8536a663186770efa06e78d98fd",
+      "hunks": [
+        {
+          "offset": 403,
+          "before": "",
+          "after": "mod salvage;\n"
+        },
+        {
+          "offset": 1239,
+          "before": "",
+          "after": "    SalvageCutter,\n"
+        },
+        {
+          "offset": 1806,
+          "before": "",
+          "after": "            Self::SalvageCutter => \"utility-salvageCutter\",\n"
+        },
+        {
+          "offset": 3591,
+          "before": "",
+          "after": "            Self::SalvageCutter => \"Salvage Cutter\",\n"
+        },
+        {
+          "offset": 5737,
+          "before": "",
+          "after": "            Self::SalvageCutter => ModuleSlot::UtilitySalvageCutter,\n"
+        },
+        {
+          "offset": 7337,
+          "before": "",
+          "after": "                | Self::SalvageCutter\n"
+        },
+        {
+          "offset": 8176,
+          "before": "            Self::FuelStorage | Self::Ecm => 1,\n",
+          "after": "            Self::FuelStorage | Self::Ecm | Self::SalvageCutter => 1,\n"
+        },
+        {
+          "offset": 8520,
+          "before": "",
+          "after": "            Self::SalvageCutter => Some((25_000, 7)),\n"
+        },
+        {
+          "offset": 12280,
+          "before": "",
+          "after": "            Self::SalvageCutter => 33,\n"
+        },
+        {
+          "offset": 13520,
+          "before": "",
+          "after": "            33 => Ok(Self::SalvageCutter),\n"
+        },
+        {
+          "offset": 13829,
+          "before": "",
+          "after": "    UtilitySalvageCutter,\n"
+        },
+        {
+          "offset": 15316,
+          "before": "    Purchase { kind: ModuleKind },\n",
+          "after": "    Purchase {\n        kind: ModuleKind,\n    },\n"
+        },
+        {
+          "offset": 15388,
+          "before": "    Store { item: u64 },\n    Install { item: u64, replacing: Option<u64> },\n",
+          "after": "    /// Reserved for the explicit XYZZY outfit; ordinary reviews refuse it.\n    GrantStoredSalvageCutter,\n    Store {\n        item: u64,\n    },\n    Install {\n        item: u64,\n        replacing: Option<u64>,\n    },\n"
+        },
+        {
+          "offset": 15800,
+          "before": "",
+          "after": "            Self::GrantStoredSalvageCutter => Some(ModuleKind::SalvageCutter),\n"
+        },
+        {
+          "offset": 17752,
+          "before": "",
+          "after": "    salvage: salvage::State,\n"
+        },
+        {
+          "offset": 26229,
+          "before": "",
+          "after": "        if event.action == ModuleAction::GrantStoredSalvageCutter && !event.xyzzy {\n            return Err(ModuleError::NotForSale);\n        }\n"
+        },
+        {
+          "offset": 27919,
+          "before": "            self.install(self.items.len() - 1, replacing)?;\n",
+          "after": "            if event.action != ModuleAction::GrantStoredSalvageCutter {\n                self.install(self.items.len() - 1, replacing)?;\n            }\n"
+        },
+        {
+          "offset": 29809,
+          "before": "",
+          "after": "                | ModuleAction::GrantStoredSalvageCutter\n"
+        },
+        {
+          "offset": 41213,
+          "before": "",
+          "after": "                        + u16::from(ledger.fitted(ModuleSlot::UtilitySalvageCutter).is_some())\n"
+        },
+        {
+          "offset": 42948,
+          "before": "",
+          "after": "                        + u16::from(ledger.fitted(ModuleSlot::UtilitySalvageCutter).is_some())\n"
+        },
+        {
+          "offset": 43471,
+          "before": "",
+          "after": "            if ledger.fitted(ModuleSlot::UtilitySalvageCutter).is_some() {\n                let cargo = self.known_cargo_mounts_at(account, e.revision);\n                let mounts = u16::from(tanks)\n                    + u16::from(ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())\n                    + u16::from(ledger.fitted(ModuleSlot::UtilityEcm).is_some())\n                    + 1\n                    + cargo\n                    + world.emp.utility_mounts_at_revision(e.revision);\n                if mounts.saturating_sub(allowance) > budget.utility_mounts_capacity {\n                    return Err(INVALID);\n                }\n            }\n"
+        },
+        {
+          "offset": 50109,
+          "before": "",
+          "after": "            + u16::from(\n                after_ledger\n                    .fitted(ModuleSlot::UtilitySalvageCutter)\n                    .is_some(),\n            )\n"
+        },
+        {
+          "offset": 51133,
+          "before": "            | (u32::from(self.history.active()) << 30);\n",
+          "after": "            | (u32::from(self.history.active()) << 30)\n            | (u32::from(!self.salvage.is_empty()) << 29);\n"
+        },
+        {
+          "offset": 51619,
+          "before": "",
+          "after": "                ModuleAction::GrantStoredSalvageCutter => w.u8(17),\n"
+        },
+        {
+          "offset": 52522,
+          "before": "",
+          "after": "        if !self.salvage.is_empty() {\n            self.salvage.encode(w);\n        }\n"
+        },
+        {
+          "offset": 52849,
+          "before": "        let count = (raw_count & 0x3fff_ffff) as usize;\n",
+          "after": "        let count = (raw_count & 0x1fff_ffff) as usize;\n"
+        },
+        {
+          "offset": 53954,
+          "before": "",
+          "after": "                17 => ModuleAction::GrantStoredSalvageCutter,\n"
+        },
+        {
+          "offset": 55166,
+          "before": "",
+          "after": "        let salvage = if raw_count & (1 << 29) != 0 {\n            salvage::State::decode(r)?\n        } else {\n            salvage::State::default()\n        };\n"
+        },
+        {
+          "offset": 55623,
+          "before": "",
+          "after": "            salvage,\n"
+        },
+        {
+          "offset": 58363,
+          "before": "",
+          "after": "            ModuleKind::SalvageCutter,\n"
+        },
+        {
+          "offset": 63565,
+          "before": "",
+          "after": "        if action == ModuleAction::GrantStoredSalvageCutter {\n            return Err(ModuleError::NotForSale);\n        }\n"
+        },
+        {
+          "offset": 76006,
+          "before": "",
+          "after": "        let cutter_stored = if kind == ModuleKind::SalvageCutter {\n            let definition = crate::equipment::definition().map_err(|_| INVALID)?;\n            let (units, mounts) = ledger\n                .budget_usage(current, self.emp.utility_mounts())\n                .map_err(|_| INVALID)?;\n            units >= definition.equipment_units_capacity\n                || mounts >= definition.utility_mounts_capacity\n        } else {\n            false\n        };\n        if cutter_stored && existing.is_some() {\n            return Ok(());\n        }\n"
+        },
+        {
+          "offset": 77296,
+          "before": "                ModuleAction::Purchase { kind },\n",
+          "after": "                if cutter_stored {\n                    ModuleAction::GrantStoredSalvageCutter\n                } else {\n                    ModuleAction::Purchase { kind }\n                },\n"
+        }
+      ]
+    },
+    "flight/modular/scoops.rs": {
+      "beforeSHA256": "c5176dd7df6d8709283e34d9a499166d4939128cc1e77a05aef70b8a334b42a0",
+      "afterSHA256": "8c114b556cf50accdc4cf23ab978a61971c25c7b90bf3b20e396eab4137d2ffa",
+      "hunks": [
+        {
+          "offset": 2324,
+          "before": "",
+          "after": "                        | ModuleSlot::UtilitySalvageCutter\n"
+        }
+      ]
+    },
+    "flight/persistence.rs": {
+      "beforeSHA256": "a2cfdc95b51dbe5df8cca58937b49fa7c415288d12bb885a5c8172acfae5e1a9",
+      "afterSHA256": "d47cb4f2da1c40c2ed19ed02e751b03b5e0cdf59d84be0b23b25c355a4c5587c",
+      "hunks": [
+        {
+          "offset": 32717,
+          "before": "",
+          "after": "        commerce.modular.validate_salvage(self, account)?;\n"
+        }
+      ]
+    },
+    "flight/xyzzy.rs": {
+      "beforeSHA256": "243f584fca8a79b0b8c8c6bd379fab9bdd10e64172c237555b085e74786d6ee4",
+      "afterSHA256": "7fd935b391895e7ca1cf819f43b325ec9b0248d4a8e096ddc790d57ff6210b6e",
+      "hunks": [
+        {
+          "offset": 28716,
+          "before": "",
+          "after": "            self.grant_xyzzy_module(review.dock, review.tick, super::ModuleKind::SalvageCutter)?;\n"
+        }
+      ]
+    }
+  }
+}

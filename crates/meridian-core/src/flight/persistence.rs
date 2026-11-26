@@ -815,6 +815,7 @@ impl World {
             )?
         };
         let emp = commerce.emp.validate(self, account, commerce.modular)?;
+        commerce.modular.validate_salvage(self, account)?;
         commerce
             .modular
             .validate_capacity_history(self, account, markets, commerce.lesson)?;
