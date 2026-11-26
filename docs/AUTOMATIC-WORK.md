@@ -18,6 +18,8 @@ The modal stops accepted simulation ticks and clears held flight inputs. It show
 
 The host consumes ordinary steering, fire, EMP, route, pause, help, Save and Quit inputs while the warning is open. The validated receipt is separate from any cargo or ship acquisition. An unlawful contact is explicitly described as such; no reward, people, intact cargo or hull entitlement is inferred. The authored native acceptance must verify the actual warning, frozen tick and unchanged pre-confirmation receipt, Escape with no new receipt, stale/focus cancellation, explicit saved confirmation, failed-write rollback, cold continuation and no repeat. These observations remain unrun.
 
+For an eligible stationary wreck, the approach predicts the remaining ordinary braking path. If that path would enter the hull-clearance boundary, it brakes and turns clear before resuming the hold approach. The turn is retained until the ship stops; manual controls or a new selection cancel it. This does not strengthen braking or bypass any swept collision checks. At an already unavoidable immediate contact, the normal collision refusal remains authoritative. This correction is authored against the earned recovery trace; a new physical replay remains required.
+
 ## Earned public acceptance: mining
 
 Use a fresh isolated standard commander. Do not use XYZZY, injected balances, generated test cargo, a private state setter or prepositioned ships. The existing finite public market sequence funds the normal equipment purchase:

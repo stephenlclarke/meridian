@@ -6,6 +6,7 @@ use crate::docking::{RigidPose, Vec3};
 use crate::equipment::{TargetingTier, WorkTarget, WorkTargetId, WorkTargetRole};
 use crate::navigation::SystemId;
 use crate::traffic::{NpcId, NpcPhase, NpcSnapshot, Population};
+mod wreck_avoidance;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TargetIdentity {
@@ -134,6 +135,7 @@ impl Candidate {
 pub(super) struct State {
     selected: Option<TargetIdentity>,
     work_status: Option<&'static str>,
+    wreck_avoidance: Option<wreck_avoidance::Steering>,
     origin: Option<CombatIdentity>,
     tier: Option<TargetingTier>,
     filter: TargetFilter,
@@ -180,6 +182,7 @@ impl State {
         self.size = size;
         self.membership = membership;
         self.work_status = None;
+        self.wreck_avoidance = None;
         self.selected = self.remaining.first().copied();
         if let Some(id) = self.selected {
             self.remaining.remove(0);
@@ -364,6 +367,7 @@ impl World {
         }
         self.targeting.work_status = None;
         self.targeting.selected = None;
+        self.targeting.wreck_avoidance = None;
     }
 
     pub fn target_filter(&self) -> TargetFilter {
@@ -522,6 +526,10 @@ impl World {
             self.targeting.work_status = None;
             return;
         };
+        if self.targeting.wreck_avoidance.is_some() {
+            self.targeting.work_status = Some("Braking for clearance");
+            return;
+        }
         let Some(standoff) = self.work_standoff(work) else {
             return;
         };
@@ -625,8 +633,23 @@ impl World {
             ..input
         };
         if let Some(work) = work {
-            self.work_hold_input(work, output)
+            let desired = self.work_hold_input(work, output);
+            if let WorkTargetId::Wreck(id) = work.id
+                && self.auto_salvage_eligible(id)
+                && let Some(standoff) = self.work_standoff(work)
+            {
+                return wreck_avoidance::protect(
+                    &mut self.targeting.wreck_avoidance,
+                    self.state,
+                    work.position,
+                    standoff,
+                    desired,
+                );
+            }
+            self.targeting.wreck_avoidance = None;
+            desired
         } else {
+            self.targeting.wreck_avoidance = None;
             output
         }
     }
