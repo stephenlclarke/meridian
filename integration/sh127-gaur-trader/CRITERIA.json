@@ -1,0 +1,222 @@
+{
+  "hull": "SH127 Gaur Trader",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh127/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh127-gaur-trader/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "625/69",
+  "faces": {
+    "detailed": 9124,
+    "archivedNative": 2188,
+    "candidateNative": 512,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-gaur-trader",
+    "massKg": 55112
+  },
+  "supportGroups": 151,
+  "candidateComponentInventory": {
+    "originalPartsRepresented": 61,
+    "unalteredNativeParts": 11,
+    "recessedWells": 36,
+    "trianglesPerRecessedWell": 6
+  },
+  "minimumRouteClearanceMillimetres": 913,
+  "sourceContactCounts": {
+    "overlap": 34,
+    "unchangedNativeParts": 11
+  },
+  "candidateRebuild": "tools/rebuild_gaur_trader.py",
+  "fitUpperMillimetres": {
+    "detailed": 2557,
+    "archivedNative": 3221,
+    "candidateNative": 3913
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 1636,
+      "upperCeiling": 1659
+    },
+    "candidateToArchive": {
+      "lowerFloor": 1581,
+      "upperCeiling": 1603
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 2329,
+      "upperCeiling": 2354
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 1626,
+      "upperCeiling": 1651
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh127-gaur-trader/GAUR-TRADER-STUDIO.json",
+    "bytes": 1480993,
+    "sha256": "e116c2231623c5c19079df4fc782565bf31f50eb4025440378c23f34879f6d4f",
+    "supports": 151,
+    "probes": 7,
+    "detail": "9,124 original detailed faces",
+    "native": "512 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 1480993,
+        "sha256": "e116c2231623c5c19079df4fc782565bf31f50eb4025440378c23f34879f6d4f"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 9124,
+      "nativeTriangles": 512,
+      "supportGroups": 151,
+      "engineeringReference": "finite-intrinsic-empty-gaur-trader",
+      "massKg": 55112,
+      "receiptFiles": {
+        "gaur-trader.hull.json": {
+          "bytes": 1480992,
+          "sha256": "24f47e0da429d9d4079c8ec5f51763856f7ac826ae1450a3e6bc5a818d07e5c4"
+        },
+        "gaur-trader-repeat.hull.json": {
+          "bytes": 1480992,
+          "sha256": "24f47e0da429d9d4079c8ec5f51763856f7ac826ae1450a3e6bc5a818d07e5c4"
+        },
+        "studio.stdout.json": {
+          "bytes": 368540,
+          "sha256": "d8506be98233ea5175416d11a951a04c6515c2ab0653bbca80ce2b956d1918ba"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 368540,
+          "sha256": "d8506be98233ea5175416d11a951a04c6515c2ab0653bbca80ce2b956d1918ba"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "e828ad69efcc64b93407fe29e4dcb686a56278e5fb825f25e27fb8d1f5a219f6"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "below-central-spine",
+          "passed": true
+        },
+        {
+          "name": "over-port-panniers",
+          "passed": true
+        },
+        {
+          "name": "over-starboard-panniers",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_gaur_trader.py --check",
+      "python3 -B tools/rebuild_gaur_trader.py",
+      "python3 -B tools/verify_gaur_trader.py | cmp - integration/sh127-gaur-trader/CONTACT-RESULT.json",
+      "python3 -B tools/measure_gaur_trader.py | cmp - integration/sh127-gaur-trader/SURFACE-FIT.json",
+      "python3 -B tools/measure_gaur_trader.py --fidelity | cmp - integration/sh127-gaur-trader/CANDIDATE-FIDELITY.json",
+      "python3 -B tools/measure_gaur_trader.py --directions | cmp - integration/sh127-gaur-trader/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_gaur_trader.py --reference-directions | cmp - integration/sh127-gaur-trader/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T05:29:56Z",
+    "finishedUtc": "2026-11-25T05:31:13Z",
+    "log": {
+      "bytes": 720,
+      "sha256": "88c145fe88f9723dccdc9fbdf2d0fa59c7e826c6983d4799d47d84e3d5db3cf3"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "ceeedd20dd2bf3b1675f521a315c811158be86b1",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "integration/sh127-gaur-trader/GAUR-TRADER-STUDIO.json": "e116c2231623c5c19079df4fc782565bf31f50eb4025440378c23f34879f6d4f",
+    "integration/sh127-gaur-trader/FROZEN-SOURCES.json": "5697b12e1968b6ceb08379c5d5d9d477853defe8a95deeca1241eba2e90dc162",
+    "integration/sh127-gaur-trader/CONTACT-CANDIDATE.json": "51a9b07bd480967e69b64f8c4d1c9f7b4f6d1730a4f06d7dbc9ef2cabf80b98d",
+    "integration/sh127-gaur-trader/CONTACT-RESULT.json": "8ba2c9e4b97e006389041471e2965f779dde1ea4609641d97b1168c251c7b5af",
+    "integration/sh127-gaur-trader/ORIGINAL-OWNERSHIP.json": "b95d3744b59656680581b45e1a95d00fca682676d2ee953b419d9a532369a5dc",
+    "integration/sh127-gaur-trader/RETAINED-OVERLAPS.json": "f4fbaed6e02a727dbf6cd902197805f1d494e62acdcf23b393351da46d8ba65f",
+    "integration/sh127-gaur-trader/CANDIDATE-FIDELITY.json": "c49f34a1a49bc7d029752ee881028d734843d237d40d0b33a89fdb1e919237fe",
+    "integration/sh127-gaur-trader/SUPPORT-FAN.json": "d1301b20a5e6ee856fd6e7264a2095805cf460186c385cf9395cec83e1e4dd7c",
+    "integration/sh127-gaur-trader/SURFACE-FIT.json": "9474d767904a41fb3f4b8c9cecfa00c9df36b874602ee06537fef1f8983271bd",
+    "integration/sh127-gaur-trader/ARCHIVED-OVERLAPS.json": "bd4c645c1cbb2331e8d37a26a1eb96e4510a7e83042b3e943486eab3d44f7918",
+    "integration/sh127-gaur-trader/CANDIDATE-TOPOLOGY-SURVEY.json": "dd22216b1acdb8646658ce648450dda7561c3f83c1b19115e5fd3247b6fe46f8",
+    "integration/sh127-gaur-trader/CANDIDATE-FIT-LOCALIZATION.json": "9570d65d55c0912a44fe43247a25303d6b368f8a7a9762ba0ea65bdd4c957c3e",
+    "integration/sh127-gaur-trader/REFERENCE-FIT-LOCALIZATION.json": "75de221878b9e838b4f8999042e26bb3aa6538e8808287d424d2f7a66794115a",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_gaur_trader.py": "138292cfbcc3271b54098c1f140162941c09bf3f23375390fa8412887fad2268",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_gaur_trader.py": "2bc9de3eb3e3d076b605a44a89ab92490d1d1a15361a3e8bb2f9df7b3cc9e597",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/rebuild_gaur_trader.py": "c7ac74598771e80b5c1969e5712dff3039530dc5c205759cdebcd1d3077adc28",
+    "tools/verify_gaur_trader.py": "0a2812768fb2ac3a36caf5bcaeedcb93417b99de215af3ef529c0097709feacf",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh127/GENERATED-COLLISION.json": "99084b39bc058e1e3d5b9a8e0b0d66790b21df883ec85f7c108d995878851d33",
+    "assets/fleet/sh127/SOURCE-GEOMETRY.json": "eca7984e184fc5b989e8d7624e1f0fc4a2aa33eb86f4e5d985f273336ebdc9d1",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

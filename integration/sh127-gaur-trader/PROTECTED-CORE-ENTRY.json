@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh127-gaur-trader",
+  "undoBefore": [
+    "sh126-mangalica"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "gaur_trader",
+  "before": "pub mod freight;\n",
+  "after": "pub mod giraffe_liner;\n"
+}
