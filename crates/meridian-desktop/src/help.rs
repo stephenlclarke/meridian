@@ -104,7 +104,7 @@ impl Panel {
                 "F3 Launch missile | F4 Safe/clear target | K E.C.M. (22 energy)",
                 "J Jump | Shift+J Clue Journal | P Pause / resume",
                 "F6 Flight lesson | F12 Cancel | C Lesson details",
-                "Tab Cycle targets; select a ship to auto-align | Delete Release tracking",
+                "Tab Cycle: healthy ships align; auto-work (no Z) | Delete/manual flight cancel",
                 "F Filter Ships/Mining/Salvage/All | I Mission details | Shift+I Target details",
                 "Hold U 10 seconds: EMP | Release U cancels unfinished charge",
                 "F7 Close attempt | F8 Reception | F10 Practice review at Avenor berth",
@@ -118,7 +118,7 @@ impl Panel {
                 || "Z unavailable: no fitted front laser".into(),
                 |weapon| {
                     if weapon == "Mining Laser" {
-                        "Z Mine eligible rock with fitted Mining Laser; no automatic pickup".into()
+                        "Z Mine eligible rock manually with fitted Mining Laser".into()
                     } else {
                         format!("Z Fire fitted {weapon}")
                     }
