@@ -141,6 +141,10 @@ export function editableDefinition(input) {
   return value;
 }
 
-export function canExport(definition, build, revision) {
+export function canInspect(definition, build, revision) {
   return isRecord(definition) && build?.revision === revision && build.report?.valid === true && isRecord(build.package);
+}
+
+export function canExport(definition, build, revision) {
+  return canInspect(definition, build, revision) && definition.schema !== 2 && build.package.schema !== 2;
 }

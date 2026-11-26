@@ -1,6 +1,7 @@
 //! Command-line boundary for offline hull authoring. Never writes runtime assets or saves.
 use meridian_core::hull_package::{
-    HullPackage, MAX_PACKAGE_JSON_BYTES, ValidationReport, validate_package,
+    HullPackage, MAX_PACKAGE_JSON_BYTES, ValidationReport, validate_inspection_package,
+    validate_package,
 };
 use std::{
     env,
@@ -11,9 +12,9 @@ use std::{
     process::ExitCode,
 };
 
-const HELP: &str = "meridian-hull-tool validate PACKAGE --report NEW_REPORT\nValidate a self-contained schema-1 hull package. Exit 0 = valid, 1 = invalid package, 2 = usage/I/O error. Existing reports are not overwritten.";
+const HELP: &str = "meridian-hull-tool {validate|inspect} PACKAGE --report NEW_REPORT\nValidate a schema-1 flight export or inspect a schema-2 archive. Exit 0 = valid, 1 = invalid package, 2 = usage/I/O error. Existing reports are not overwritten.";
 
-fn read_package(path: &Path) -> Result<ValidationReport, String> {
+fn read_package(path: &Path, inspect: bool) -> Result<ValidationReport, String> {
     let file = File::open(path).map_err(|error| format!("Read package: {error}"))?;
     let metadata = file
         .metadata()
@@ -31,6 +32,7 @@ fn read_package(path: &Path) -> Result<ValidationReport, String> {
         ));
     }
     Ok(match HullPackage::from_json(&bytes) {
+        Ok(package) if inspect => validate_inspection_package(&package),
         Ok(package) => validate_package(&package),
         Err(error) => ValidationReport::invalid(format!("Invalid hull package JSON: {error}")),
     })
@@ -59,10 +61,15 @@ fn run(args: Vec<OsString>) -> Result<u8, String> {
     let [command, package, flag, output] = args.as_slice() else {
         return Err(HELP.into());
     };
-    if command != "validate" || flag != "--report" || package.is_empty() || output.is_empty() {
+    let inspect = command == "inspect";
+    if (!inspect && command != "validate")
+        || flag != "--report"
+        || package.is_empty()
+        || output.is_empty()
+    {
         return Err(HELP.into());
     }
-    let report = read_package(&PathBuf::from(package))?;
+    let report = read_package(&PathBuf::from(package), inspect)?;
     write_report(&PathBuf::from(output), &report)?;
     if report.valid {
         Ok(0)

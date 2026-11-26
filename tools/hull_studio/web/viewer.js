@@ -129,19 +129,51 @@ export class HullViewer {
     ctx.stroke();
   }
 
+  drawEnvelope(faces, projected) {
+    const ctx = this.context;
+    const batchSize = 2048;
+    const large = faces.length > batchSize;
+    let outline = ctx;
+    if (large) {
+      // Keep large archived envelopes out of one unbounded Canvas path. Composite
+      // the batches together so overlaps do not accumulate the wireframe opacity.
+      const layer = this.envelopeLayer ??= document.createElement('canvas');
+      if (layer.width !== this.canvas.width || layer.height !== this.canvas.height) {
+        layer.width = this.canvas.width;
+        layer.height = this.canvas.height;
+      }
+      outline = layer.getContext('2d');
+      outline.setTransform(layer.width / this.width, 0, 0, layer.height / this.height, 0, 0);
+      outline.clearRect(0, 0, this.width, this.height);
+    }
+    outline.strokeStyle = large ? '#49dbe0' : this.layers.original ? '#49dbe064' : '#49dbe0c0';
+    outline.lineWidth = 0.65;
+    outline.lineJoin = 'round';
+    for (let start = 0; start < faces.length; start += batchSize) {
+      outline.beginPath();
+      for (const face of faces.slice(start, start + batchSize)) {
+        const [a, b, c] = face.indices.map(index => projected[index]);
+        outline.moveTo(a[0], a[1]);
+        outline.lineTo(b[0], b[1]);
+        outline.lineTo(c[0], c[1]);
+        outline.closePath();
+      }
+      outline.stroke();
+    }
+    if (large) {
+      ctx.save();
+      ctx.globalAlpha = (this.layers.original ? 100 : 192) / 255;
+      ctx.drawImage(this.envelopeLayer, 0, 0, this.width, this.height);
+      ctx.restore();
+    }
+  }
+
   drawMesh(mesh, envelope = false) {
     if (!mesh?.faces.length) return;
     const ctx = this.context;
     const projected = mesh.vertices.map(vertex => vertex ? this.project(vertex) : null);
     if (envelope) {
-      // One stroke avoids repeated blending at shared or overlapping triangle edges.
-      ctx.beginPath();
-      for (const face of mesh.faces) {
-        const [a, b, c] = face.indices.map(index => projected[index]);
-        ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.lineTo(c[0], c[1]); ctx.closePath();
-      }
-      ctx.strokeStyle = this.layers.original ? '#49dbe064' : '#49dbe0c0';
-      ctx.lineWidth = 0.65; ctx.lineJoin = 'round'; ctx.stroke();
+      this.drawEnvelope(mesh.faces, projected);
       return;
     }
     const sorted = mesh.faces.map(face => {

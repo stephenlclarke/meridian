@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { autoGroups, canExport, editableDefinition, fitScene, groupIds, inputNumber, mergeGroups, meshGeometry, resolvedGroupDefinition, rotatePoint, sceneFor, updatedParameter } from './geometry.js';
+import { autoGroups, canExport, canInspect, editableDefinition, fitScene, groupIds, inputNumber, mergeGroups, meshGeometry, resolvedGroupDefinition, rotatePoint, sceneFor, updatedParameter } from './geometry.js';
 
 const definition = {
   schema: 1, id: 'example', name: 'Example hull', metresPerUnit: 2, roundingMetres: 0.01,
@@ -121,4 +121,14 @@ test('automatic or imported groupless source adopts validated memberships only o
   const partial = resolvedGroupDefinition(definition, built);
   assert.deepEqual(partial.detail.groups, definition.detail.groups);
   assert.deepEqual(partial.native.groups, [1, 1, 1]);
+});
+
+
+test('a validated archived mesh opens for inspection and cannot be exported', () => {
+  const definition = { schema: 2 };
+  const build = { revision: 2, report: { valid: true }, package: definition };
+  assert.equal(canInspect(definition, build, 2), true);
+  assert.equal(canExport(definition, build, 2), false);
+  assert.equal(canInspect(definition, build, 3), false);
+  assert.equal(canExport({ schema: 1 }, build, 2), false);
 });

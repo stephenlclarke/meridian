@@ -29,15 +29,22 @@ class InvalidHull(ValueError):
         self.package = package
 
 
+def flight_export_definition(definition):
+    if isinstance(definition, dict) and definition.get("schema") == 2:
+        raise ValueError("Archived mesh inspection cannot be exported for flight")
+    return definition
+
+
 def build(definition, validator):
     package = prepare(definition)
     encoded = encode(package)
+    operation = "inspect" if package.get("schema") == 2 else "validate"
     with tempfile.TemporaryDirectory(prefix="meridian-hull-") as folder:
         path = Path(folder) / "package.json"
         report_path = path.with_name("report.json")
         path.write_bytes(encoded)
         result = subprocess.run(
-            [str(validator), "validate", str(path), "--report", str(report_path)],
+            [str(validator), operation, str(path), "--report", str(report_path)],
             capture_output=True,
             check=False,
         )
@@ -230,7 +237,10 @@ class StudioRequest(BaseHTTPRequestHandler):
                 return
             if not isinstance(body, dict) or set(body) != {"definition"}:
                 raise ValueError("Expected an object with a definition field")
-            package, report = build(body["definition"], self.server.validator)
+            definition = body["definition"]
+            if route == "/api/export":
+                flight_export_definition(definition)
+            package, report = build(definition, self.server.validator)
             if route == "/api/showroom":
                 self.server.preview.launch(package)
                 return self.respond(200, encode({"opened": True}))
@@ -286,7 +296,11 @@ def main():
         else reference_bytes()
     )
     if args.export:
-        package, report = build(parse(sample), validator)
+        try:
+            definition = flight_export_definition(parse(sample))
+        except ValueError as error:
+            parser.error(str(error))
+        package, report = build(definition, validator)
         with tempfile.NamedTemporaryFile(
             dir=args.export.parent, delete=False
         ) as stream:

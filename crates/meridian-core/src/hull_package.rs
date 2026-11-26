@@ -14,6 +14,8 @@ pub const MAX_PACKAGE_JSON_BYTES: u64 = 64 * 1024 * 1024;
 pub const LOCAL_INSPECTION_PREFIX: &str = "LOCAL:";
 const MAX_DETAILED_FACES: usize = 200_000;
 const MAX_NATIVE_FACES: usize = 512;
+/// Archived meshes may be inspected with a local package in schema 2.
+pub const ARCHIVED_INSPECTION_SCHEMA: u32 = 2;
 const MAX_GROUPS: usize = 1_024;
 const MAX_CLEARANCES: usize = 256;
 const COORDINATE_LIMIT_METRES: f64 = 1.0e6;
@@ -31,6 +33,8 @@ pub struct HullPackage {
     pub native: Mesh,
     pub materials: Vec<Material>,
     pub face_materials: Vec<usize>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub native_face_materials: Option<Vec<usize>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub face_textures: Option<Vec<FaceTexture>>,
     /// Missing physical engineering stays unknown; authoring never invents a stock budget.
@@ -368,6 +372,14 @@ fn validate_appearance(package: &HullPackage, report: &mut ValidationReport) {
     {
         report.reject("Invalid detailed face material coverage or material name/index");
     }
+    if let Some(indices) = &package.native_face_materials
+        && (indices.len() != package.native.triangles.len()
+            || indices
+                .iter()
+                .any(|&index| index >= package.materials.len()))
+    {
+        report.reject("Invalid native face material coverage or material index");
+    }
     if let Some(mapping) = &package.face_textures
         && (mapping.len() != package.detail.triangles.len()
             || mapping
@@ -404,9 +416,32 @@ fn clearance_passes(clearance: &Clearance, pieces: &[SmoothPiece]) -> bool {
 /// Build immutable support groups from both LODs, then prove each declared continuous clearance.
 /// The report is authoring evidence only and never changes World or authorizes a new hull.
 pub fn validate_package(package: &HullPackage) -> ValidationReport {
+    if package.schema != 1 {
+        return ValidationReport::invalid("Expected schema 1 for a flight export");
+    }
+    validate_with_native_limit(package, MAX_NATIVE_FACES)
+}
+
+/// Check archived artwork and its inspection supports without allowing flight export.
+pub fn validate_inspection_package(package: &HullPackage) -> ValidationReport {
+    if package.schema != ARCHIVED_INSPECTION_SCHEMA {
+        return ValidationReport::invalid("Expected schema 2 for archived mesh inspection");
+    }
+    if package.engineering.is_some()
+        || package.flight.max_speed.is_some()
+        || !package.clearances.is_empty()
+    {
+        return ValidationReport::invalid(
+            "Archived inspection cannot declare flight or engineering qualification",
+        );
+    }
+    validate_with_native_limit(package, MAX_DETAILED_FACES)
+}
+
+fn validate_with_native_limit(package: &HullPackage, native_face_limit: usize) -> ValidationReport {
     let mut report = ValidationReport::default();
-    if package.schema != 1 || !valid_text(&package.id) || !valid_text(&package.name) {
-        report.reject("Expected schema 1 and nonempty hull ID and name");
+    if !valid_text(&package.id) || !valid_text(&package.name) {
+        report.reject("Expected nonempty hull ID and name");
     }
     if package
         .id
@@ -476,7 +511,7 @@ pub fn validate_package(package: &HullPackage) -> ValidationReport {
         "native",
         &package.native,
         package.metres_per_unit,
-        MAX_NATIVE_FACES,
+        native_face_limit,
         &mut report,
     );
     let (Some(detail), Some(native)) = (detail, native) else {

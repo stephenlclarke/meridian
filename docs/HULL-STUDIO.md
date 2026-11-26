@@ -95,3 +95,17 @@ mesh supports 512. A package may have up to 1,024 local groups with 5,344
 points per group, counting both meshes, and 256 clearance routes. Rounding
 must be positive and at most 20 mm. The gap measured at concave surfaces can
 exceed that rounding distance wherever a convex group bridges a recess.
+
+## Archived mesh inspection
+
+Schema 2 accepts archived low-detail artwork for local inspection. Each mesh
+can hold up to 200,000 faces. The 64 MiB file limit, 100,000-point limit per
+mesh and support-group limits still apply. A schema-2 package can carry native
+face material indices. It carries neither a flight specification nor an
+engineering qualification.
+
+Build the archive in Studio, then choose **Open in Showroom** if you want to
+see it in the disposable game session. The Studio export command refuses
+schema 2. The standalone game accepts schema 2 only through
+`--inspect-hull-package`. Schema 1 retains the 512-face native limit and
+excludes archived inspection packages from the flight export.

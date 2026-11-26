@@ -102,6 +102,23 @@ class HullStudioTests(unittest.TestCase):
         self.assertEqual(measured["maxMetres"], 1)
         self.assertEqual(measured["nearestPoint"][2], 0)
 
+    def test_archived_mesh_uses_inspect_and_refuses_flight_export(self):
+        archive = sample() | {"schema": 2}
+        with self.assertRaisesRegex(ValueError, "cannot be exported for flight"):
+            studio.flight_export_definition(archive)
+        ordinary = sample() | {"schema": 1}
+        self.assertIs(studio.flight_export_definition(ordinary), ordinary)
+
+        def validate(args, **kwargs):
+            self.assertEqual(args[1], "inspect")
+            self.assertEqual(definitions.parse(Path(args[2]).read_bytes())["schema"], 2)
+            Path(args[4]).write_bytes(b'{"valid":true}')
+            return mock.Mock(returncode=0)
+
+        with mock.patch.object(studio.subprocess, "run", side_effect=validate):
+            _, report = studio.build(archive, Path("/example/meridian-hull-tool"))
+        self.assertEqual(report, {"valid": True})
+
     def test_game_preview_uses_a_private_profile_and_the_exact_package(self):
         preview = studio.GamePreview(Path("/example/meridian-desktop"))
         finished, cleaned = threading.Event(), threading.Event()
