@@ -128,7 +128,11 @@ impl World {
             });
             if raw != FlightInput::default() || self.emp.electrical_disabled() || !local {
                 self.auto_docking = None;
-                self.cancel_targeting();
+                if local && !self.emp.electrical_disabled() {
+                    self.take_manual_control();
+                } else {
+                    self.cancel_targeting();
+                }
                 return raw;
             }
             if let Some(input) = self.docking_input() {

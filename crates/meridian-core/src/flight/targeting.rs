@@ -136,6 +136,7 @@ pub(super) struct State {
     selected: Option<TargetIdentity>,
     scanner: bool,
     manual: bool,
+    pilot_override: bool,
     work_status: Option<&'static str>,
     wreck_avoidance: Option<wreck_avoidance::Steering>,
     origin: Option<CombatIdentity>,
@@ -345,6 +346,7 @@ impl World {
         }
         self.auto_docking = None;
         self.targeting.scanner = true;
+        self.targeting.pilot_override = false;
         self.targeting.filter = TargetFilter::All;
         self.targeting.origin = Some(origin);
         self.targeting.selected = next;
@@ -361,7 +363,9 @@ impl World {
     pub fn manual_scanner_target(&self) -> bool {
         self.targeting.scanner
             && self.targeting.selected.is_some()
-            && (self.targeting.manual || self.targeting_tier().is_none())
+            && (self.targeting.manual
+                || self.targeting.pilot_override
+                || self.targeting_tier().is_none())
     }
 
     /// The pilot can operate real fitted work equipment while using steering assistance.
@@ -385,7 +389,8 @@ impl World {
             return Err(StepError::Paused);
         }
         self.targeting_origin().ok_or(StepError::InvalidMode)?;
-        self.targeting.manual = !self.targeting.manual;
+        self.targeting.manual = !(self.targeting.manual || self.targeting.pilot_override);
+        self.targeting.pilot_override = false;
         self.auto_docking = None;
         self.targeting.work_status = None;
         self.targeting.wreck_avoidance = None;
@@ -490,6 +495,16 @@ impl World {
                 .map_err(|_| StepError::InvalidMode)?;
         }
         Ok(selected.is_some())
+    }
+
+    pub(super) fn take_manual_control(&mut self) {
+        if self.targeting.scanner && self.targeting.selected.is_some() {
+            self.targeting.pilot_override = true;
+            self.targeting.work_status = None;
+            self.targeting.wreck_avoidance = None;
+        } else {
+            self.cancel_targeting();
+        }
     }
 
     pub fn cancel_targeting(&mut self) {
@@ -777,10 +792,13 @@ impl World {
         if input.pitch != 0.0
             || input.yaw != 0.0
             || input.roll != 0.0
-            || (work.is_some() || matches!(target, Candidate::Station(..) | Candidate::Work(_)))
+            || (work.is_some()
+                || self.station_docking_assistance()
+                || !self.targeting.scanner
+                    && matches!(target, Candidate::Station(..) | Candidate::Work(_)))
                 && (input.throttle != 0.0 || input.brake)
         {
-            self.cancel_targeting();
+            self.take_manual_control();
             return input;
         }
         if matches!(target, Candidate::Station(..)) && self.station_docking_assistance() {
