@@ -176,8 +176,9 @@ fn disposable_preview_selects_each_stock_shield_without_replacing_maximum_other_
     };
     let original = other_modules(&app.game.world);
     menu(&mut app);
-    press(&mut app, KeyCode::ArrowUp);
-    press(&mut app, KeyCode::ArrowUp);
+    for _ in 0..5 {
+        press(&mut app, KeyCode::ArrowDown);
+    }
     for grade in ShieldGrade::ALL {
         assert_eq!(
             app.xyzzy.as_ref().map(crate::xyzzy::Menu::action),
@@ -236,7 +237,9 @@ fn actual_max_tank_row_is_explicit_and_publishes_four_distinct_items_to_disk() {
     let directory = TestDirectory::new();
     let mut app = app(&directory);
     menu(&mut app);
-    press(&mut app, KeyCode::ArrowUp);
+    for _ in 0..6 {
+        press(&mut app, KeyCode::ArrowDown);
+    }
     assert_eq!(
         app.xyzzy.as_ref().map(crate::xyzzy::Menu::action),
         Some(XyzzyAction::MaximumFuelStorage)
@@ -288,6 +291,162 @@ fn actual_max_tank_row_is_explicit_and_publishes_four_distinct_items_to_disk() {
         app.game.world.modular_equipment_snapshot(),
         cold.modular_equipment_snapshot()
     );
+}
+
+#[test]
+fn dedicated_fuel_scoops_row_does_not_change_other_equipment_or_fuel() {
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    activate(&mut app);
+    let before = app.game.world.modular_equipment_snapshot();
+    let fuel = app.game.world.snapshot().navigation;
+    let cash = app.game.world.credits_tenths();
+    menu(&mut app);
+    for _ in 0..4 {
+        press(&mut app, KeyCode::ArrowDown);
+    }
+    assert_eq!(
+        app.xyzzy.as_ref().map(crate::xyzzy::Menu::action),
+        Some(XyzzyAction::FitFuelScoops)
+    );
+    press(&mut app, KeyCode::Enter);
+    press(&mut app, KeyCode::Enter);
+    assert_eq!(app.game.world.modular_equipment_snapshot(), before);
+    assert_eq!(app.game.world.snapshot().navigation, fuel);
+    assert_eq!(app.game.world.credits_tenths(), cash);
+    let saved = ok(fs::read(directory.0.join("commander.meridian")));
+    assert_eq!(
+        ok(World::from_save_bytes(&saved)).modular_equipment_snapshot(),
+        before
+    );
+}
+
+#[test]
+fn ecm_test_rows_persist_intent_and_manual_flight_binding_uses_real_energy() {
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    activate(&mut app);
+    let scoop = app
+        .game
+        .world
+        .fitted_fuel_scoops()
+        .unwrap_or_else(|| panic!("scoop"));
+    ok(app
+        .game
+        .command(Action::Module(meridian_core::ModuleAction::Store {
+            item: scoop.item,
+        })));
+    menu(&mut app);
+    press(&mut app, KeyCode::ArrowUp);
+    assert_eq!(
+        app.xyzzy.as_ref().map(crate::xyzzy::Menu::action),
+        Some(XyzzyAction::ToggleAutoEcm)
+    );
+    press(&mut app, KeyCode::Enter);
+    press(&mut app, KeyCode::Enter);
+    assert!(
+        app.game
+            .world
+            .xyzzy_snapshot()
+            .is_some_and(|s| !s.automatic_ecm)
+    );
+    press(&mut app, KeyCode::ArrowUp);
+    assert_eq!(
+        app.xyzzy.as_ref().map(crate::xyzzy::Menu::action),
+        Some(XyzzyAction::FitEcm)
+    );
+    press(&mut app, KeyCode::Enter);
+    press(&mut app, KeyCode::Enter);
+    press(&mut app, KeyCode::Escape);
+    let fitted = app.game.world.fitted_ecm().unwrap_or_else(|| panic!("ecm"));
+    let bytes = ok(fs::read(directory.0.join("commander.meridian")));
+    let cold = ok(World::from_save_bytes(&bytes));
+    assert_eq!(cold.fitted_ecm(), Some(fitted));
+    assert!(cold.xyzzy_snapshot().is_some_and(|s| !s.automatic_ecm));
+    ok(app.game.command(Action::ReviewPractice));
+    ok(app.game.command(Action::Confirm));
+    ok(app.game.command(Action::Launch));
+    ok(app.game.world.step(FlightInput::default()));
+    ok(app.game.command(Action::CycleMissileLock));
+    ok(app.game.command(Action::ToggleMissileArm));
+    ok(app.game.command(Action::FireMissile));
+    let projectile = app
+        .game
+        .world
+        .missile_projectiles()
+        .next()
+        .unwrap_or_else(|| panic!("projectile"));
+    assert_eq!(projectile.ended, None);
+    let before = app
+        .game
+        .world
+        .flight_resources_snapshot()
+        .unwrap_or_else(|| panic!("resources"));
+    ok(app.game.save());
+    let slot = directory.0.join("commander.meridian");
+    let retained = directory.0.join("retained-ecm-commander");
+    let game_before = ok(app.game.world.save_bytes());
+    let disk_before = ok(fs::read(&slot));
+    ok(fs::rename(&slot, &retained));
+    ok(fs::create_dir(&slot));
+    app.keys.insert(KeyCode::KeyU);
+    app.game_key(KeyCode::KeyK);
+    assert!(
+        app.notice
+            .text
+            .as_deref()
+            .is_some_and(|s| s.contains("could not be saved"))
+    );
+    assert!(app.keys.contains(&KeyCode::KeyU));
+    assert_eq!(ok(app.game.world.save_bytes()), game_before);
+    assert_eq!(ok(fs::read(&retained)), disk_before);
+    ok(fs::remove_dir(&slot));
+    ok(fs::rename(&retained, &slot));
+    assert_eq!(press(&mut app, KeyCode::KeyK), Some(KeyCode::KeyK));
+    app.game_key(KeyCode::KeyK);
+    assert!(!app.keys.contains(&KeyCode::KeyU));
+    assert!(
+        app.notice
+            .text
+            .as_deref()
+            .is_some_and(|s| s.contains("1 standard missiles terminated"))
+    );
+    let ended = app
+        .game
+        .world
+        .missile_projectiles()
+        .next()
+        .unwrap_or_else(|| panic!("projectile"));
+    assert_eq!(ended.origin, projectile.origin);
+    assert_eq!(ended.ended, Some(meridian_core::MissileEnd::Ecm));
+    let saved = ok(World::from_save_bytes(&ok(fs::read(&slot))));
+    assert_eq!(saved.missile_projectiles().next(), Some(ended));
+    assert!(
+        saved
+            .ecm_snapshot()
+            .is_some_and(|s| s.active.is_none() && s.remaining_ticks == 32)
+    );
+    let energy = app
+        .game
+        .world
+        .flight_resources_snapshot()
+        .unwrap_or_else(|| panic!("resources"));
+    assert_eq!(energy.energy_hundredths, before.energy_hundredths - 2200);
+    let capture = ok(crate::hud::cockpit::Cockpit::capture(
+        &app.game.world,
+        app.game.world.snapshot(),
+    ));
+    assert!(capture.ecm.is_some_and(|ecm| ecm.active.is_some()));
+    assert!(
+        app.route_keyboard(
+            PhysicalKey::Code(KeyCode::KeyK),
+            ElementState::Pressed,
+            true,
+            None
+        )
+        .is_none()
+    );
+    assert_eq!(app.game.world.flight_resources_snapshot(), Some(energy));
 }
 
 #[test]
@@ -360,7 +519,7 @@ fn activate_refit_and_toggle_fuel_without_leaving_the_menu() {
     assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
     let items = app.game.world.ammunition_snapshot();
     let modules = app.game.world.modular_equipment_snapshot();
-    for steps in [1, 1, 4] {
+    for steps in [1, 1, 7] {
         for _ in 0..steps {
             press(&mut app, KeyCode::ArrowDown);
         }
@@ -371,10 +530,10 @@ fn activate_refit_and_toggle_fuel_without_leaving_the_menu() {
         assert_eq!(app.game.world.modular_equipment_snapshot(), modules);
     }
     assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
-    // Up wraps through explicit tank and shield testing rows to the fuel action.
-    press(&mut app, KeyCode::ArrowUp);
-    press(&mut app, KeyCode::ArrowUp);
-    press(&mut app, KeyCode::ArrowUp);
+    // Wrap through the testing rows to the fuel action.
+    for _ in 0..6 {
+        press(&mut app, KeyCode::ArrowUp);
+    }
     press(&mut app, KeyCode::Enter);
     press(&mut app, KeyCode::ArrowDown);
     assert_eq!(

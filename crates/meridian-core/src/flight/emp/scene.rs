@@ -295,18 +295,20 @@ impl Scene {
         )?;
         // Membership and kinematic bounds come from the actual native missile producer. A
         // zero-length read query checks the scene without imposing a particular EMP ray.
-        world
-            .missiles
-            .validate_retained_beam(super::super::missiles::RetainedBeam {
+        world.missiles.validate_retained_beam(
+            &world.ecm,
+            super::super::missiles::RetainedBeam {
                 system: self.owner.system,
                 visit: self.owner.visit,
                 world_tick: self.world_tick,
                 physical_tick: self.physical_tick,
                 command_emission: Some(self.ordinary_cursor.checked_add(1).ok_or(INVALID)?),
+                ecm_after_scene: true,
                 ray: self.player,
                 point: self.player.position,
                 bodies: &self.missiles,
-            })?;
+            },
+        )?;
         Ok(())
     }
 }

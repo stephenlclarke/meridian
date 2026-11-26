@@ -2,7 +2,12 @@
 use core::fmt;
 
 pub const SAVE_VERSION: u16 = 17;
+/// Existing independently bounded base and ordinary evidence budget.
 pub const MAX_SAVE_BYTES: usize = 65_536;
+/// Solar history is decoded in fixed-size chunks, separate from the ordinary base budget.
+pub const MAX_SOLAR_HISTORY_BYTES: usize = 8 * 1024 * 1024;
+/// Whole atomic host file, including the unchanged ordinary base budget.
+pub const MAX_SAVE_FILE_BYTES: usize = MAX_SAVE_BYTES + MAX_SOLAR_HISTORY_BYTES;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SaveError {
@@ -93,6 +98,18 @@ impl<'a> Reader<'a> {
     }
     pub(crate) fn u8(&mut self) -> Result<u8, SaveError> {
         Ok(self.fixed::<1>()?[0])
+    }
+    pub(crate) fn consumed(&self) -> usize {
+        self.offset
+    }
+    pub(crate) fn subreader(&mut self, length: usize) -> Result<Self, SaveError> {
+        let end = self.offset.checked_add(length).ok_or(SaveError::TooLarge)?;
+        let bytes = self
+            .bytes
+            .get(self.offset..end)
+            .ok_or(SaveError::Truncated)?;
+        self.offset = end;
+        Ok(Self::new(bytes))
     }
     pub(crate) fn bool(&mut self) -> Result<bool, SaveError> {
         match self.u8()? {

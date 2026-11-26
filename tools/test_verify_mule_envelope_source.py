@@ -16,7 +16,8 @@ class MuleSourceVerification(unittest.TestCase):
         shutil.copytree(verifier.ROOT / core, root / core)
         for record in (verifier.PROTECTED_CORE, verifier.FLIGHT_COMPUTER_INVERSE,
                        verifier.HYPERSPACE_DRIVE_INVERSE, verifier.STOCK_SHIELD_INVERSE,
-                       verifier.FUEL_STORAGE_INVERSE):
+                       verifier.FUEL_STORAGE_INVERSE, verifier.SOLAR_SCOOPS_INVERSE,
+                       verifier.STOCK_ECM_INVERSE, verifier.STOCK_ECM_FIELD_INVERSE):
             (root / record).parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(verifier.ROOT / record, root / record)
         return root / core
@@ -29,6 +30,9 @@ class MuleSourceVerification(unittest.TestCase):
         self.assertEqual(result['protectedCoreFilesWithHyperspaceDriveChanges'], 12)
         self.assertEqual(result['protectedCoreFilesWithStockShieldChanges'], 16)
         self.assertEqual(result['protectedCoreFilesWithFuelStorageChanges'], 22)
+        self.assertEqual(result['protectedCoreFilesWithSolarScoopsChanges'], 16)
+        self.assertEqual(result['protectedCoreFilesWithStockEcmChanges'], 16)
+        self.assertEqual(result['protectedCoreFilesWithStockEcmFieldChanges'], 12)
         self.assertEqual(result['geometryCoreTests'], 1)
         self.assertEqual(result['restoreCoreTests'], 1)
         self.assertEqual(result['totalMuleCoreTests'], 24)
@@ -130,6 +134,25 @@ class MuleSourceVerification(unittest.TestCase):
             with self.assertRaisesRegex(AssertionError, 'fuel storage inverse manifest'):
                 verifier.verify_protected_core(root)
 
+    def test_solar_scoops_inverse_is_pinned_and_each_changed_source_remains_exact(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            core = self.copy_protected_sources(root)
+            inverse = verifier.solar_scoops_inverse(root, verifier.protected_core_pins(root))
+            self.assertEqual(len(inverse), 16)
+            for relative in inverse:
+                with self.subTest(relative=relative):
+                    source = core / relative
+                    original = source.read_bytes()
+                    source.write_bytes(original + b'\n')
+                    with self.assertRaisesRegex(AssertionError, relative):
+                        verifier.verify_protected_core(root)
+                    source.write_bytes(original)
+            manifest = root / verifier.SOLAR_SCOOPS_INVERSE
+            manifest.write_bytes(manifest.read_bytes() + b'\n')
+            with self.assertRaisesRegex(AssertionError, 'solar scoops inverse manifest'):
+                verifier.verify_protected_core(root)
+
     def test_hull_publications_must_each_be_removed_exactly_once(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -154,6 +177,44 @@ class MuleSourceVerification(unittest.TestCase):
                 with self.assertRaisesRegex(AssertionError, 'lib.rs'):
                     verifier.verify_protected_core(root)
 
+    def test_stock_ecm_inverse_is_pinned_and_every_changed_source_remains_exact(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            core = self.copy_protected_sources(root)
+            inverse = verifier.stock_ecm_inverse(root, verifier.protected_core_pins(root))
+            self.assertEqual(len(inverse), 16)
+            for relative in inverse:
+                with self.subTest(relative=relative):
+                    source = core / relative
+                    original = source.read_bytes()
+                    source.write_bytes(original + b'\n')
+                    with self.assertRaisesRegex(AssertionError, relative):
+                        verifier.verify_protected_core(root)
+                    source.write_bytes(original)
+            manifest = root / verifier.STOCK_ECM_INVERSE
+            manifest.write_bytes(manifest.read_bytes() + b'\n')
+            with self.assertRaisesRegex(AssertionError, 'stock ECM inverse manifest'):
+                verifier.verify_protected_core(root)
+
+    def test_stock_ecm_field_inverse_is_pinned_and_every_changed_source_remains_exact(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            core = self.copy_protected_sources(root)
+            inverse = verifier.stock_ecm_field_inverse(root, verifier.protected_core_pins(root))
+            self.assertEqual(len(inverse), 12)
+            for relative in inverse:
+                with self.subTest(relative=relative):
+                    source = core / relative
+                    original = source.read_bytes()
+                    source.write_bytes(original + b'\n')
+                    with self.assertRaisesRegex(AssertionError, relative):
+                        verifier.verify_protected_core(root)
+                    source.write_bytes(original)
+            manifest = root / verifier.STOCK_ECM_FIELD_INVERSE
+            manifest.write_bytes(manifest.read_bytes() + b'\n')
+            with self.assertRaisesRegex(AssertionError, 'stock ECM field inverse manifest'):
+                verifier.verify_protected_core(root)
+
     def test_historical_stag_check_still_refuses_a_forged_preimage(self):
         # Simulate even a mistakenly approved new inverse with bad historical bytes.
         with tempfile.TemporaryDirectory() as directory:
@@ -165,7 +226,13 @@ class MuleSourceVerification(unittest.TestCase):
             protected = verifier.protected_core_pins(root)
             current = verifier.undo_vulture_raider_publication(relative, (core / relative).read_bytes())
             current = verifier.undo_arna_cutter_publication(relative, current)
+            current = verifier.undo_flight_computer(relative, current,
+                                                     verifier.stock_ecm_field_inverse(root, protected))
+            current = verifier.undo_flight_computer(relative, current,
+                                                     verifier.stock_ecm_inverse(root, protected))
             current = verifier.undo_medusa_stock_publication(relative, current)
+            current = verifier.undo_flight_computer(relative, current,
+                                                     verifier.solar_scoops_inverse(root, protected))
             current = verifier.undo_flight_computer(relative, current,
                                                      verifier.fuel_storage_inverse(root, protected))
             current = verifier.undo_flight_computer(relative, current,

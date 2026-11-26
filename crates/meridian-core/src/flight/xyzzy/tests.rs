@@ -51,6 +51,115 @@ fn poison_refuses(w: &World, live: &mut World, before: &[u8]) {
 }
 
 #[test]
+fn maximum_fuel_history_requires_ecm_stored_at_the_actual_opening_revision() {
+    use crate::flight::persistence::Commerce;
+    fn prefix(world: &World) -> Result<Terms, SaveError> {
+        let account = world.commander_account.as_ref().unwrap();
+        let commerce = Commerce {
+            account: Some(account),
+            markets: world.station_markets.as_ref(),
+            lesson: &world.navigation_trade,
+            ammunition: &world.ammunition,
+            modular: &world.modular,
+            emp: &world.emp,
+        };
+        world.xyzzy.validate(world, account, &commerce)
+    }
+
+    let mut world = World::new_commander(15608).unwrap();
+    apply(&mut world, XyzzyAction::Enter);
+    let original_scoop = world.fitted_fuel_scoops().unwrap().item;
+    module(
+        &mut world,
+        ModuleAction::Store {
+            item: original_scoop,
+        },
+    );
+    apply(&mut world, XyzzyAction::FitEcm);
+    let ecm = world.fitted_ecm().unwrap().id;
+    let fitted = world.commander_account.as_ref().unwrap().revision();
+    assert_eq!(
+        world.review_xyzzy(XyzzyAction::MaximumFuelStorage, 0),
+        Err(XyzzyError::UtilityFitConflict)
+    );
+    let before = world.save_bytes().unwrap();
+    module(&mut world, ModuleAction::Store { item: ecm });
+    let stored = world.commander_account.as_ref().unwrap().revision();
+    assert_eq!(stored, fitted + 1);
+    assert!(world.modular.ecm_fitted_at_revision(15608, fitted).unwrap());
+    assert!(!world.modular.ecm_fitted_at_revision(15608, stored).unwrap());
+    assert_ne!(world.save_bytes().unwrap(), before);
+    apply(&mut world, XyzzyAction::MaximumFuelStorage);
+    world = cold(&world);
+    assert!(world.fitted_ecm().is_none());
+    assert!(prefix(&world).is_ok());
+
+    // Use normal paid jump fuel to bring the actual test tank back into
+    // ordinary limits, then re-install the same ECM item at a later berth.
+    apply(&mut world, XyzzyAction::ToggleUnlimitedFuel);
+    for destination in [
+        SystemId::LARERIA,
+        SystemId::AVENOR,
+        SystemId::LARERIA,
+        SystemId::AVENOR,
+    ] {
+        journey(&mut world, destination);
+    }
+    let tanks: Vec<_> = world
+        .modular_equipment_snapshot()
+        .unwrap()
+        .items
+        .into_iter()
+        .filter(|item| matches!(item.slot, Some(ModuleSlot::FuelStorage(_))))
+        .collect();
+    assert_eq!(tanks.len(), 4);
+    for tank in &tanks[..3] {
+        module(&mut world, ModuleAction::Store { item: tank.id });
+    }
+    let cargo = world.equipment_snapshot().unwrap().owned.unwrap();
+    world
+        .request_equipment(
+            crate::equipment::Command::UnfitCargoBay(cargo.id),
+            world.snapshot().tick,
+        )
+        .unwrap();
+    let scoop = world.fitted_fuel_scoops().unwrap().item;
+    module(&mut world, ModuleAction::Store { item: scoop });
+    module(
+        &mut world,
+        ModuleAction::Install {
+            item: ecm,
+            replacing: None,
+        },
+    );
+    world = cold(&world);
+    assert_eq!(world.fitted_ecm().unwrap().id, ecm);
+    assert!(prefix(&world).is_ok()); // The final fit does not invalidate a legitimate MAX.
+
+    let mut forged = cold(&world);
+    let max = forged
+        .xyzzy
+        .records
+        .iter_mut()
+        .find(|r| r.action == XyzzyAction::MaximumFuelStorage)
+        .unwrap();
+    assert_eq!(max.revision, stored + 1);
+    // Shift the MAX opening across the genuine store. At the forged opening
+    // the prior fit still contains ECM, irrespective of the ending fit.
+    max.revision = stored;
+    assert!(
+        forged
+            .modular
+            .ecm_fitted_at_revision(15608, max.revision - 1)
+            .unwrap()
+    );
+    assert!(prefix(&forged).is_err());
+    let mut live = cold(&world);
+    let retained = live.save_bytes().unwrap();
+    poison_refuses(&forged, &mut live, &retained);
+}
+
+#[test]
 fn explicit_activation_sets_clarke_once_and_grants_only_actual_supported_outfit_with_secret_provenance()
  {
     let mut w = World::new_commander(14101).unwrap();
