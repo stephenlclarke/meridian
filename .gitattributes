@@ -6,6 +6,15 @@ assets/fleet/sh001/visual.bin binary
 assets/fleet/sh008/** -text
 assets/fleet/sh008/visual.bin binary
 
+# Medusa artwork and receipts carry exact archive and authoring bytes.
+assets/fleet/sh171/** -text
+assets/fleet/sh171/*.gz binary
+assets/fleet/sh171/*.bin binary
+assets/fleet/sh171/source.vertices binary
+integration/sh171-medusa/*.json -text
+tools/prepare_medusa_inspection.py text eol=lf
+tools/verify_medusa_shield.py text eol=lf
+
 # Moose Clipper authoring and replay programs use exact LF bytes.
 tools/measure_moose_clipper.py text eol=lf
 tools/prepare_moose_clipper.py text eol=lf
