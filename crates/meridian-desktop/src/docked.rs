@@ -1429,8 +1429,24 @@ mod tests {
             .unwrap_or_else(|| panic!("navigation"));
         assert_eq!((nav.fuel_units, nav.fuel_capacity_units), (200, 200));
         assert_eq!(profile.world.modular_equipment_snapshot(), before_modules);
-        let recovered = ok(World::from_save_bytes(&ok(std::fs::read(&path))));
-        assert_eq!(ok(recovered.save_bytes()), ok(profile.world.save_bytes()));
+        let disk = ok(std::fs::read(&path));
+        assert_eq!(disk, ok(profile.world.save_bytes()));
+        let recovered = ok(World::from_save_bytes(&disk));
+        // Continue advances the mission epoch and review sequence deliberately. Compare the
+        // authoritative recovered game facts, not a new serialization of the invalidated session.
+        assert_eq!(recovered.snapshot().navigation, Some(nav));
+        assert_eq!(recovered.credits_tenths(), Some(before_cash - 140));
+        assert_eq!(recovered.modular_equipment_snapshot(), before_modules);
+        assert_eq!(recovered.commander_id(), profile.world.commander_id());
+        assert_eq!(recovered.player_ship_id(), profile.world.player_ship_id());
+        assert_eq!(
+            recovered.current_dock_context(),
+            profile.world.current_dock_context()
+        );
+        assert_eq!(
+            recovered.service_snapshot(),
+            profile.world.service_snapshot()
+        );
 
         let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
         let hit = frame
