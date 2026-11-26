@@ -1,0 +1,538 @@
+{
+  "base": "266e8f40708892c9c100eec113e82cb83b87bc21",
+  "files": {
+    "flight.rs": {
+      "beforeSHA256": "90c8193d20dd748b5af6233a6772357c8e4231145b668ff3d6541b4e989e0aed",
+      "afterSHA256": "b4c311af76c5629601f470aff69f17dead0a054f31fad29e2280a892a6c0fcae",
+      "hunks": [
+        {
+          "offset": 24177,
+          "before": "",
+          "after": "        } else {\n            self.advance_selected_work();\n"
+        }
+      ]
+    },
+    "flight/damage.rs": {
+      "beforeSHA256": "f70da0bf0dafe537f579d62b9551dc2d4035042e1dac843a4ca7d8e9c02ec799",
+      "afterSHA256": "9b3aa8b3803a55aa39e5fa15f7b211a7f5cf325cac80f7b5cf9b3bbaafe43614",
+      "hunks": [
+        {
+          "offset": 9000,
+          "before": "                        .front_at_physical(world, event.clock)\n",
+          "after": "                        .front_at_physical(world, event.clock, next_emission)\n"
+        }
+      ]
+    },
+    "flight/mining.rs": {
+      "beforeSHA256": "0adb85d84d4db6783fec3dff02cdb66a1ebeafc26d7637be43d56e8a9930cbdf",
+      "afterSHA256": "9b57fa350f66d7b690a3d5464e545347f9b59a280fdb4bdd7cecf232a0776e2b",
+      "hunks": [
+        {
+          "offset": 332,
+          "before": "",
+          "after": "mod collection;\n"
+        },
+        {
+          "offset": 11060,
+          "before": "    /// Paid fitted equipment alone cannot replace an eligible original physical ore actor.\n    /// Pending descriptions never confer collection authority or cargo ownership.\n    pub fn request_collect_mined_ore(&mut self, tick: u64) -> Result<(), MiningError> {\n        if tick != self.state.tick {\n            return Err(MiningError::StaleCommand);\n",
+          "after": "    pub(in crate::flight) fn auto_mine_tick(\n        &mut self,\n        id: crate::mining::AsteroidId,\n    ) -> &'static str {\n        if !self.mining_selected(id) {\n            return \"Target released\";\n"
+        },
+        {
+          "offset": 11274,
+          "before": "        if self.is_paused() {\n            return Err(MiningError::Paused);\n        }\n        if self.state.mode != FlightMode::Flight {\n            return Err(MiningError::NotInFlight);\n",
+          "after": "        let Some(body) = self\n            .mining\n            .body(usize::from(id.ordinal()))\n            .filter(|b| b.id == id)\n        else {\n            return \"Target unavailable\";\n        };\n        if body.remaining_energy <= 0.0 {\n            return if self.mining_collection_target(id).is_some() {\n                \"Ore ready\"\n            } else {\n                \"Mining complete\"\n            };\n"
+        },
+        {
+          "offset": 11739,
+          "before": "            Err(MiningError::NoScoops)\n        } else {\n            Err(MiningError::NoEligibleOreBody)\n",
+          "after": "            return \"Fit fuel scoops\";\n        }\n        match self.prepare_mining_intake_account(body.commodity) {\n            Err(MiningError::HoldFull) => return \"Cargo hold full\",\n            Err(_) => return \"Cargo unavailable\",\n            Ok(_) => {}\n        }\n        if self\n            .mining_belt_snapshot()\n            .and_then(|belt| belt.front_contact)\n            .is_none_or(|contact| contact.asteroid != id)\n        {\n            return \"Align mining laser\";\n        }\n        if self.select_auto_mining_tool().is_err() {\n            return \"Fit mining laser\";\n        }\n        let Ok(tool) = self.mining_tool_authority() else {\n            return \"Fit mining laser\";\n        };\n        match self.request_mining(tool, self.state.tick) {\n            Ok(shot) if shot.extracted_units > 0 => \"Ore ready\",\n            Ok(_) => \"Mining pulse\",\n            Err(MiningError::Resources) => \"Mining recharging\",\n            Err(MiningError::ProtectedActivity) => \"Protected activity\",\n            Err(_) => \"Mining unavailable\",\n"
+        }
+      ]
+    },
+    "flight/mining/persistence.rs": {
+      "beforeSHA256": "ead28490b90682e5d10eaafa9144b3225dd21337048e2dd09112109384d65e3b",
+      "afterSHA256": "51d1eeb37f54e93c92c12ba3c24db7b04dc9e72e6d85351f483b89561d7b1bd9",
+      "hunks": [
+        {
+          "offset": 4905,
+          "before": "        // Without an eligible original ore-body/intake producer, there is no cargo credit,\n        // market/revision adjustment or collected receipt to synthesize during load.\n",
+          "after": "        for receipt in self.mining.collections() {\n            if receipt.owner.owner != owner.owner\n                || receipt.owner.hull != owner.hull\n                || receipt.owner.visit > owner.visit\n                || receipt.world_tick > self.state.tick\n                || receipt.physical_tick > self.combat.physical_tick()\n                || self\n                    .jump_journal\n                    .system_at_visit(receipt.owner.visit, receipt.world_tick)?\n                    != receipt.owner.system\n                || self\n                    .commander_account\n                    .as_ref()\n                    .is_none_or(|a| receipt.revision > a.revision())\n                || !modules.scoop_was_fitted_for_collection(receipt)\n                || (receipt.world_tick == self.state.tick\n                    && (flight_pose(self.state.position, self.state.orientation)\n                        != Some(receipt.pose)\n                        || self.state.speed != receipt.speed))\n            {\n                return Err(invalid);\n            }\n        }\n"
+        }
+      ]
+    },
+    "flight/missiles/persistence.rs": {
+      "beforeSHA256": "2e718d247213f6781d000647881db3ff8e5874f4a9b81ca270d3b3a8e8f80cd2",
+      "afterSHA256": "492d9bd87244d79317fe79d8f74fa83755f0685250b659a6b8161ba42b122f7f",
+      "hunks": [
+        {
+          "offset": 52367,
+          "before": "                .front_weapon_at_tick(shot.fitted_item_id, shot.tick)\n",
+          "after": "                .front_weapon_at_tick(shot.fitted_item_id, shot.tick, emission)\n"
+        }
+      ]
+    },
+    "flight/modular.rs": {
+      "beforeSHA256": "048ce47658907fadd51459d1a53d630a9ba6d8536a663186770efa06e78d98fd",
+      "afterSHA256": "441e9444bf1fa9bf7a98b7f5b1a9c74b64e041bc4691f95a71929fb39571ea6a",
+      "hunks": [
+        {
+          "offset": 7259,
+          "before": "",
+          "after": "                | Self::MiningLaser\n"
+        },
+        {
+          "offset": 15672,
+          "before": "",
+          "after": "    #[doc(hidden)]\n    GrantStoredMiningLaser,\n    #[doc(hidden)]\n    FlightLaserExchange {\n        item: u64,\n        replacing: u64,\n        visit: u64,\n        clock: u64,\n        emission: u64,\n        restoring: bool,\n    },\n"
+        },
+        {
+          "offset": 16145,
+          "before": "            Self::PurchaseMiningLaser => Some(ModuleKind::MiningLaser),\n",
+          "after": "            Self::PurchaseMiningLaser | Self::GrantStoredMiningLaser => {\n                Some(ModuleKind::MiningLaser)\n            }\n"
+        },
+        {
+          "offset": 19541,
+          "before": "",
+          "after": "    auto_return: Option<u64>,\n"
+        },
+        {
+          "offset": 26587,
+          "before": "        if event.action == ModuleAction::GrantStoredSalvageCutter && !event.xyzzy {\n",
+          "after": "        if let ModuleAction::FlightLaserExchange {\n            item,\n            replacing,\n            restoring,\n            ..\n        } = event.action\n        {\n            if event.xyzzy\n                || event.item != item\n                || self.front().is_none_or(|front| front.id != replacing)\n            {\n                return Err(ModuleError::StaleOccupant);\n            }\n            let index = self\n                .items\n                .iter()\n                .position(|i| i.id == item && i.slot.is_none())\n                .ok_or(ModuleError::MissingItem)?;\n            let current = self.front().ok_or(ModuleError::MissingItem)?;\n            let target = self.items[index];\n            let combat = |kind| {\n                kind != ModuleKind::MiningLaser\n                    && super::OrdinaryWeapon::from_module(kind).is_some()\n            };\n            let adopting = !restoring\n                && current.kind == ModuleKind::MiningLaser\n                && combat(target.kind)\n                && self.auto_return.is_none();\n            if adopting {\n                self.auto_return = Some(item);\n            } else if !restoring\n                && target.kind == ModuleKind::MiningLaser\n                && combat(current.kind)\n                && self.auto_return.is_none()\n            {\n                self.auto_return = Some(replacing);\n            } else if restoring\n                && current.kind == ModuleKind::MiningLaser\n                && combat(target.kind)\n                && self.auto_return == Some(item)\n            {\n                self.auto_return = None;\n            } else {\n                return Err(ModuleError::StaleOccupant);\n            }\n            if !adopting {\n                self.install(index, Some(replacing))?;\n            }\n            self.revision = self\n                .revision\n                .checked_add(1)\n                .ok_or(ModuleError::SequenceExhausted)?;\n            return Ok(());\n        }\n        if matches!(\n            event.action,\n            ModuleAction::GrantStoredMiningLaser | ModuleAction::GrantStoredSalvageCutter\n        ) && !event.xyzzy\n        {\n"
+        },
+        {
+          "offset": 30339,
+          "before": "            if event.action != ModuleAction::GrantStoredSalvageCutter {\n",
+          "after": "            if !matches!(\n                event.action,\n                ModuleAction::GrantStoredMiningLaser | ModuleAction::GrantStoredSalvageCutter\n            ) {\n"
+        },
+        {
+          "offset": 30569,
+          "before": "",
+          "after": "                if kind.slot() == ModuleSlot::FrontLaser {\n                    self.auto_return = None;\n                }\n"
+        },
+        {
+          "offset": 31740,
+          "before": "",
+          "after": "                    if i.slot == Some(ModuleSlot::FrontLaser) {\n                        self.auto_return = None;\n                    }\n"
+        },
+        {
+          "offset": 32461,
+          "before": "",
+          "after": "                    if self.items[index].kind.slot() == ModuleSlot::FrontLaser {\n                        self.auto_return = None;\n                    }\n"
+        },
+        {
+          "offset": 32681,
+          "before": "",
+          "after": "                | ModuleAction::GrantStoredMiningLaser\n                | ModuleAction::FlightLaserExchange { .. }\n"
+        },
+        {
+          "offset": 38053,
+          "before": "",
+          "after": "            } else if matches!(e.action, ModuleAction::FlightLaserExchange { .. }) {\n                super::AccountEffect::Debit(0)\n"
+        },
+        {
+          "offset": 40019,
+          "before": "        for e in self.events.iter().filter(|e| e.tick <= hit.world_tick) {\n",
+          "after": "        for e in self\n            .events\n            .iter()\n            .filter(|e| e.revision <= hit.account_revision)\n        {\n"
+        },
+        {
+          "offset": 40321,
+          "before": "                || e.revision > hit.account_revision\n",
+          "after": "                || e.tick > hit.world_tick\n"
+        },
+        {
+          "offset": 40658,
+          "before": "                && matches!(i.provenance, ModuleProvenance::Paid { .. })\n",
+          "after": "                && matches!(\n                    i.provenance,\n                    ModuleProvenance::Paid { .. } | ModuleProvenance::XYZzy { .. }\n                )\n"
+        },
+        {
+          "offset": 41931,
+          "before": "",
+          "after": "            if let ModuleAction::FlightLaserExchange {\n                visit,\n                clock,\n                emission,\n                ..\n            } = e.action\n            {\n                let prior_dock = previous.map(|event| event.dock).ok_or(INVALID)?;\n                if e.dock != prior_dock\n                    || visit <= e.dock.visit()\n                    || visit > world.combat_identity().ok_or(INVALID)?.visit\n                    || clock == 0\n                    || clock > world.combat.physical_tick()\n                    || clock > e.tick\n                    || emission > world.combat.emissions\n                    || world.jump_journal.system_at_visit(visit, e.tick).is_err()\n                {\n                    return Err(INVALID);\n                }\n            }\n"
+        },
+        {
+          "offset": 42954,
+          "before": "",
+          "after": "                if kind == ModuleKind::MiningLaser\n                    && e.action != ModuleAction::GrantStoredMiningLaser\n                {\n                    return Err(INVALID);\n                }\n"
+        },
+        {
+          "offset": 52431,
+          "before": "",
+          "after": "    pub(in crate::flight) fn scoop_was_fitted_for_collection(\n        &self,\n        receipt: &crate::mining::Collection,\n    ) -> bool {\n        self.ledger_at_revision(receipt.owner.owner, receipt.revision.saturating_sub(1))\n            .ok()\n            .and_then(|ledger| ledger.fitted(ModuleSlot::UtilityFuelScoops))\n            .is_some_and(|item| item.id == receipt.item)\n            && self\n                .scoop_item_at(receipt.owner.owner, receipt.world_tick, receipt.owner.visit)\n                .is_some_and(|item| item.id == receipt.item)\n    }\n"
+        },
+        {
+          "offset": 56279,
+          "before": "",
+          "after": "                ModuleAction::GrantStoredMiningLaser => w.u8(19),\n                ModuleAction::FlightLaserExchange {\n                    replacing,\n                    visit,\n                    clock,\n                    emission,\n                    restoring,\n                    ..\n                } => {\n                    w.u8(18);\n                    for value in [replacing, visit, clock, emission] {\n                        w.u64(value);\n                    }\n                    w.bool(restoring);\n                }\n"
+        },
+        {
+          "offset": 58985,
+          "before": "",
+          "after": "            let exchange = if tag == 18 {\n                Some((r.u64()?, r.u64()?, r.u64()?, r.u64()?, r.bool()?))\n            } else {\n                None\n            };\n"
+        },
+        {
+          "offset": 59442,
+          "before": "",
+          "after": "                19 => ModuleAction::GrantStoredMiningLaser,\n                18 => {\n                    let (replacing, visit, clock, emission, restoring) =\n                        exchange.ok_or(SaveError::InvalidEncoding)?;\n                    ModuleAction::FlightLaserExchange {\n                        item,\n                        replacing,\n                        visit,\n                        clock,\n                        emission,\n                        restoring,\n                    }\n                }\n"
+        },
+        {
+          "offset": 67671,
+          "before": "                && matches!(i.provenance, ModuleProvenance::Paid { .. })\n",
+          "after": "                && matches!(\n                    i.provenance,\n                    ModuleProvenance::Paid { .. } | ModuleProvenance::XYZzy { .. }\n                )\n"
+        },
+        {
+          "offset": 69735,
+          "before": "        if action == ModuleAction::GrantStoredSalvageCutter {\n",
+          "after": "        if matches!(\n            action,\n            ModuleAction::GrantStoredSalvageCutter\n                | ModuleAction::GrantStoredMiningLaser\n                | ModuleAction::FlightLaserExchange { .. }\n        ) {\n"
+        },
+        {
+          "offset": 80129,
+          "before": "    pub(super) fn front_at_physical(&self, world: &World, clock: u64) -> Option<OwnedModule> {\n",
+          "after": "    pub(super) fn front_at_physical(\n        &self,\n        world: &World,\n        clock: u64,\n        firing_emission: u64,\n    ) -> Option<OwnedModule> {\n"
+        },
+        {
+          "offset": 80433,
+          "before": "            let at = world.damage.berth_clock(event.dock.sequence())?;\n            if at > clock {\n",
+          "after": "            if let ModuleAction::FlightLaserExchange {\n                clock: at,\n                emission,\n                ..\n            } = event.action\n            {\n                if at > clock || (at == clock && emission >= firing_emission) {\n                    break;\n                }\n            } else if world.damage.berth_clock(event.dock.sequence())? > clock {\n"
+        },
+        {
+          "offset": 80957,
+          "before": "    fn historical_front_at_tick(&self, tick: u64) -> Option<OwnedModule> {\n",
+          "after": "    fn historical_front_at_tick(&self, tick: u64, firing_emission: u64) -> Option<OwnedModule> {\n"
+        },
+        {
+          "offset": 81310,
+          "before": "",
+          "after": "            if matches!(event.action, ModuleAction::FlightLaserExchange { emission, .. } if event.tick == tick && emission >= firing_emission)\n            {\n                break;\n            }\n"
+        },
+        {
+          "offset": 81692,
+          "before": "",
+          "after": "        emission: u64,\n"
+        },
+        {
+          "offset": 81756,
+          "before": "        let fitted = self.historical_front_at_tick(tick)?;\n",
+          "after": "        let fitted = self.historical_front_at_tick(tick, emission)?;\n"
+        },
+        {
+          "offset": 82027,
+          "before": "        super::OrdinaryWeapon::from_module(self.historical_front_at_tick(tick)?.kind)\n",
+          "after": "        super::OrdinaryWeapon::from_module(self.historical_front_at_tick(tick, u64::MAX)?.kind)\n"
+        },
+        {
+          "offset": 82201,
+          "before": "",
+          "after": "    /// Select an actual owned work tool in the original front laser mount. No purchase,\n    /// new item, resource refill or extra mount is implied by selecting a rock.\n    pub(in crate::flight) fn select_auto_mining_tool(\n        &mut self,\n    ) -> Result<(), crate::mining::MiningError> {\n        use crate::mining::MiningError;\n        if self.state.mode != super::FlightMode::Flight || self.is_paused() || !self.pulse.alive() {\n            return Err(MiningError::NotInFlight);\n        }\n        if self.emp.input_blocked() {\n            return Err(MiningError::Resources);\n        }\n        if self\n            .selected_work_target()\n            .is_none_or(|target| !matches!(target.id, crate::equipment::WorkTargetId::Asteroid(_)))\n        {\n            return Err(MiningError::NoTarget);\n        }\n        if self.flight_reception.occupancy().1 > 0\n            || self.navigation_trade.occupancy().1 > 0\n            || self.practice.is_some_and(|p| !p.reception_is_terminal())\n            || self\n                .mission_snapshot()\n                .is_some_and(|s| s.freight.held_tonnes > 0)\n        {\n            return Err(MiningError::ProtectedActivity);\n        }\n        let account = self\n            .commander_account\n            .as_ref()\n            .ok_or(MiningError::NoCommander)?;\n        let ledger = self\n            .modular\n            .ledger(self, account)\n            .map_err(|_| MiningError::InvalidState)?;\n        let front = ledger.front().ok_or(MiningError::NoCompatibleFittedTool)?;\n        if front.kind == ModuleKind::MiningLaser {\n            if ledger.auto_return.is_some() {\n                return Ok(());\n            }\n            let combat = ledger\n                .items\n                .iter()\n                .filter(|i| {\n                    i.slot.is_none()\n                        && i.kind != ModuleKind::MiningLaser\n                        && super::OrdinaryWeapon::from_module(i.kind).is_some()\n                })\n                .max_by_key(|i| {\n                    (\n                        super::OrdinaryWeapon::from_module(i.kind).map(|w| w.damage_hundredths()),\n                        i.id,\n                    )\n                })\n                .copied();\n            return if let Some(combat) = combat {\n                self.exchange_auto_mining_tool(ledger, front, combat, false)\n            } else {\n                Ok(())\n            };\n        }\n        let mining = ledger\n            .items\n            .iter()\n            .find(|i| {\n                i.slot.is_none()\n                    && i.kind == ModuleKind::MiningLaser\n                    && matches!(\n                        i.provenance,\n                        ModuleProvenance::Paid { .. } | ModuleProvenance::XYZzy { .. }\n                    )\n            })\n            .copied()\n            .ok_or(MiningError::NoCompatibleFittedTool)?;\n        self.exchange_auto_mining_tool(ledger, front, mining, false)\n    }\n\n    pub(in crate::flight) fn restore_auto_mining_tool(\n        &mut self,\n    ) -> Result<(), crate::mining::MiningError> {\n        use crate::mining::MiningError;\n        // No full ledger replay on ordinary flight before automatic mining is used.\n        if !self\n            .modular\n            .events\n            .iter()\n            .rev()\n            .find_map(|e| match e.action {\n                ModuleAction::FlightLaserExchange { restoring, .. } => Some(!restoring),\n                _ => None,\n            })\n            .unwrap_or(false)\n        {\n            return Ok(());\n        }\n        let account = self\n            .commander_account\n            .as_ref()\n            .ok_or(MiningError::NoCommander)?;\n        let ledger = self\n            .modular\n            .ledger(self, account)\n            .map_err(|_| MiningError::InvalidState)?;\n        let Some(item) = ledger.auto_return else {\n            return Ok(());\n        };\n        if self.is_paused() || self.emp.input_blocked() || !self.pulse.alive() {\n            return Err(MiningError::Resources);\n        }\n        let front = ledger.front().ok_or(MiningError::InvalidState)?;\n        let combat = ledger\n            .items\n            .iter()\n            .find(|i| i.id == item && i.slot.is_none())\n            .copied()\n            .ok_or(MiningError::InvalidState)?;\n        self.exchange_auto_mining_tool(ledger, front, combat, true)\n    }\n\n    fn exchange_auto_mining_tool(\n        &mut self,\n        mut ledger: Ledger,\n        front: OwnedModule,\n        next: OwnedModule,\n        restoring: bool,\n    ) -> Result<(), crate::mining::MiningError> {\n        use crate::mining::MiningError;\n        let owner = self.combat_identity().ok_or(MiningError::NoCommander)?;\n        let current = self\n            .commander_account\n            .as_ref()\n            .ok_or(MiningError::NoCommander)?;\n        let dock = self\n            .modular\n            .events\n            .last()\n            .ok_or(MiningError::InvalidState)?\n            .dock;\n        let event = Event {\n            xyzzy: false,\n            action: ModuleAction::FlightLaserExchange {\n                item: next.id,\n                replacing: front.id,\n                visit: owner.visit,\n                clock: self.combat.physical_tick(),\n                emission: self.combat.emissions,\n                restoring,\n            },\n            item: next.id,\n            dock,\n            tick: self.state.tick,\n            revision: current\n                .revision()\n                .checked_add(1)\n                .ok_or(MiningError::ProofCapacity)?,\n        };\n        ledger\n            .apply(event, 0)\n            .map_err(|_| MiningError::InvalidState)?;\n        let allowance = if self.test_tank_custody_clear() {\n            ledger.test_tank_count()\n        } else {\n            0\n        };\n        ledger\n            .validate_budgets(current, self.emp.utility_mounts(), allowance)\n            .map_err(|_| MiningError::InvalidState)?;\n        let born = |slot, offset| {\n            ledger\n                .fitted(slot)\n                .is_some_and(|item| item.id == owner.owner + offset)\n        };\n        let account = current\n            .prepare_module(\n                0,\n                [\n                    born(ModuleSlot::FrontLaser, 7),\n                    born(ModuleSlot::Energy, 5),\n                    born(ModuleSlot::Navigation, 4),\n                    born(ModuleSlot::Drive, 6),\n                    born(ModuleSlot::Shield, 3),\n                ],\n                ledger.fuel_storage_count(),\n            )\n            .map_err(|_| MiningError::InvalidState)?;\n        let mut modules = self.modular.clone();\n        modules.events.push(event);\n        self.save_bytes_with_modules(&account, &modules)\n            .map_err(|_| MiningError::ProofCapacity)?;\n        self.modular = modules;\n        self.commander_account = Some(account);\n        Ok(())\n    }\n\n"
+        },
+        {
+          "offset": 90294,
+          "before": "        if cutter_stored && existing.is_some() {\n",
+          "after": "        if (cutter_stored || kind == ModuleKind::MiningLaser) && existing.is_some() {\n"
+        },
+        {
+          "offset": 91251,
+          "before": "",
+          "after": "                } else if kind == ModuleKind::MiningLaser {\n                    ModuleAction::GrantStoredMiningLaser\n"
+        }
+      ]
+    },
+    "flight/persistence.rs": {
+      "beforeSHA256": "d47cb4f2da1c40c2ed19ed02e751b03b5e0cdf59d84be0b23b25c355a4c5587c",
+      "afterSHA256": "7159416637afde17a598bc8c3375fcec163b21c7430d019e722fc1597db4e0be",
+      "hunks": [
+        {
+          "offset": 1055,
+          "before": "",
+          "after": "const MINING_INTAKE_EXTENSION: &[u8; 8] = b\"MINT0001\";\n"
+        },
+        {
+          "offset": 14788,
+          "before": "",
+          "after": "        if !self.mining.collections().is_empty() {\n            w.bytes.extend(MINING_INTAKE_EXTENSION);\n            self.mining.encode_collections(&mut w);\n        }\n"
+        },
+        {
+          "offset": 23198,
+          "before": "        candidate.mining = crate::mining::State::decode(&mut r)?;\n",
+          "after": "        candidate.mining = crate::mining::State::decode_base(&mut r)?;\n"
+        },
+        {
+          "offset": 23351,
+          "before": "        if !r.finished() {\n            let tag = r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)?;\n",
+          "after": "        let mut tag = if r.finished() {\n            None\n        } else {\n            Some(r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)?)\n        };\n        if tag == Some(*MINING_INTAKE_EXTENSION) {\n            candidate.mining.decode_collections(&mut r)?;\n            tag = if r.finished() {\n                None\n            } else {\n                Some(r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)?)\n            };\n        }\n        if let Some(tag) = tag {\n"
+        },
+        {
+          "offset": 32748,
+          "before": "        let services = if self.traffic.enabled() {\n            markets.validate_save_with_traffic(\n                nav.owner,\n                account.hold_capacity(),\n                account.equipment_state().historical_capacity(),\n                self.traffic.flows(),\n            )?\n        } else {\n            markets.validate_save(\n                nav.owner,\n                account.hold_capacity(),\n                account.equipment_state().historical_capacity(),\n            )?\n        };\n",
+          "after": "        let intakes = self.cargo_intakes(commerce.modular);\n        let services = markets.validate_save_with_intakes(\n            nav.owner,\n            account.hold_capacity(),\n            account.equipment_state().historical_capacity(),\n            if self.traffic.enabled() {\n                self.traffic.flows()\n            } else {\n                crate::traffic::Flows::default()\n            },\n            &intakes,\n        )?;\n"
+        },
+        {
+          "offset": 33827,
+          "before": "",
+          "after": "            intakes.len() as u64,\n"
+        },
+        {
+          "offset": 35965,
+          "before": "",
+          "after": "    intake_revisions: u64,\n"
+        },
+        {
+          "offset": 37688,
+          "before": "",
+          "after": "                + u128::from(intake_revisions)\n"
+        }
+      ]
+    },
+    "flight/traffic.rs": {
+      "beforeSHA256": "6fb44a0b0f2d078323a8645921c289db055cbf5e06e8bd8132523ffa53ee21ad",
+      "afterSHA256": "68a946da1a81c2c7cf108003411adff5e4d580b7d1df272f9035278a1dc16261",
+      "hunks": [
+        {
+          "offset": 795,
+          "before": "                BeamSource::Player { item, .. }\n                    if self.front_weapon_at_tick(item, shot.world_tick) != Some(shot.weapon) =>\n",
+          "after": "                BeamSource::Player { item, emission, .. }\n                    if self.front_weapon_at_tick(item, shot.world_tick, emission)\n                        != Some(shot.weapon) =>\n"
+        }
+      ]
+    },
+    "flight/xyzzy.rs": {
+      "beforeSHA256": "7fd935b391895e7ca1cf819f43b325ec9b0248d4a8e096ddc790d57ff6210b6e",
+      "afterSHA256": "04ca9973164108e94a06339fb7977c2b8869db1dc98d9df01ad501e0d1ffc08b",
+      "hunks": [
+        {
+          "offset": 26249,
+          "before": "",
+          "after": "                super::modular::ModuleKind::MiningLaser,\n"
+        }
+      ]
+    },
+    "flight/xyzzy/history.rs": {
+      "beforeSHA256": "22813a4331f1ec7c0debffd3c30640d6b1cab8f569ca31d3bc9a2a96129a6f68",
+      "afterSHA256": "5609a93205ac96bc02866070ba5cc2c307becfb9e3e70cf5c37d153d4b751e47",
+      "hunks": [
+        {
+          "offset": 2040,
+          "before": "",
+          "after": "        events.extend(\n            world\n                .cargo_intakes(commerce.modular)\n                .into_iter()\n                .map(|entry| AccountEvent {\n                    revision: entry.revision,\n                    effect: AccountEffect::Debit(0),\n                }),\n        );\n"
+        }
+      ]
+    },
+    "freight/g02.rs": {
+      "beforeSHA256": "c0c1af42ce440c8fe1c9c6f7d51aa75dcb982c195478da9a3904356586b98021",
+      "afterSHA256": "0edc740812d6c45ee9280af924368a066624b1af1667383ac6c425a7db0254ad",
+      "hunks": [
+        {
+          "offset": 19410,
+          "before": "",
+          "after": "    }\n\n    /// Prospective single-unit lawful intake, without buying stock or changing cash.\n    /// Only an accepted physical source may publish this candidate and its receipt.\n    pub(crate) fn prepare_cargo_intake(\n        &self,\n        freight: &State,\n        commodity: services::CommodityId,\n        reservations: services::Reservations,\n    ) -> Result<Self, services::Error> {\n        use services::{CargoUnit, Error as ServiceError};\n        if commodity.departure_legal_weight() != 0 {\n            return Err(ServiceError::InvalidAccount);\n        }\n        let before = reservations.apply(self.service_projection(freight)?)?;\n        if commodity.unit() == CargoUnit::Tonne && before.used_tonnes >= before.hold_capacity_tonnes\n        {\n            return Err(ServiceError::HoldFull);\n        }\n        let mut candidate = Self { data: self.data };\n        candidate.data.revision = before\n            .revision\n            .checked_add(1)\n            .ok_or(ServiceError::SequenceExhausted)?;\n        if commodity == services::CommodityId::Food {\n            candidate.data.food_tonnes = candidate\n                .data\n                .food_tonnes\n                .checked_add(1)\n                .ok_or(ServiceError::QuantityLimit)?;\n        } else {\n            let held = &mut candidate.data.other_commodities[commodity.index() - 1];\n            *held = held\n                .checked_add(1)\n                .filter(|&n| n <= services::MAX_MARKET_QUANTITY)\n                .ok_or(ServiceError::QuantityLimit)?;\n        }\n        reservations.apply(candidate.service_projection(freight)?)?;\n        Ok(candidate)\n"
+        }
+      ]
+    },
+    "mining.rs": {
+      "beforeSHA256": "6b8278efa71647548b317bedf352b9026eefbcdc1c7e738717f7df6da58ed798",
+      "afterSHA256": "645e1badff564ac2b6df2929f0f7c595821654adb7ee07d2e6a0ea006a12fd77",
+      "hunks": [
+        {
+          "offset": 438,
+          "before": "pub use ore::{OreId, OreSnapshot};\n",
+          "after": "pub(crate) use ore::Collection;\npub use ore::{OreId, OreSnapshot, SCOOP_DISTANCE, SCOOP_MAX_RELATIVE_SPEED};\n"
+        },
+        {
+          "offset": 7219,
+          "before": "",
+          "after": "    collected: Arc<Vec<Collection>>,\n"
+        },
+        {
+          "offset": 7441,
+          "before": "",
+          "after": "            collected: Arc::new(Vec::new()),\n"
+        }
+      ]
+    },
+    "mining/ledger.rs": {
+      "beforeSHA256": "eafb563854a8f89e2a7e12a3dc3a1730896e5178dac51118b003df2846b87f80",
+      "afterSHA256": "81dceb0c44ff22bd6e8db5565732f7daaf6032fa6b2fecf52a39d3be003e65ca",
+      "hunks": [
+        {
+          "offset": 999,
+          "before": "",
+          "after": "            && Arc::ptr_eq(&self.collected, &other.collected)\n"
+        },
+        {
+          "offset": 1442,
+          "before": "",
+          "after": "            collected: Arc::clone(&self.collected),\n"
+        },
+        {
+          "offset": 1871,
+          "before": "",
+          "after": "            collected: Arc::clone(&self.collected),\n"
+        },
+        {
+          "offset": 4147,
+          "before": "            return if self.strokes.is_empty() && self.expired == [None; BELT_BODY_COUNT] {\n",
+          "after": "            return if self.strokes.is_empty()\n                && self.collected.is_empty()\n                && self.expired == [None; BELT_BODY_COUNT]\n            {\n"
+        },
+        {
+          "offset": 4829,
+          "before": "",
+          "after": "            collected: Arc::clone(&self.collected),\n"
+        },
+        {
+          "offset": 6796,
+          "before": "                    .map(|b| usize::from(b.extracted_units))\n",
+          "after": "                    .map(|b| {\n                        usize::from(b.extracted_units).saturating_sub(\n                            self.collected\n                                .iter()\n                                .filter(|c| {\n                                    c.id.asteroid() == b.id && c.world_tick < hit.world_tick\n                                })\n                                .count(),\n                        )\n                    })\n"
+        },
+        {
+          "offset": 8031,
+          "before": "        Ok(())\n",
+          "after": "        self.validate_collections()\n"
+        }
+      ]
+    },
+    "mining/ore.rs": {
+      "beforeSHA256": "bfa604ac6206259de6aee39b5c4784bd27e85a63472f02b6fda5cb758aac9704",
+      "afterSHA256": "6234b28ffe814b33879e84f4598e0ccbe00ba05adf9e30f254a0f9cd9e356310",
+      "hunks": [
+        {
+          "offset": 87,
+          "before": "use super::{AsteroidId, CommodityId, State, Vec3, add, scale};\n",
+          "after": "use super::{\n    AsteroidId, CommodityId, INVALID, MiningError, Reader, RigidPose, SaveError, State, Vec3,\n    Writer, add, scale,\n};\nuse crate::{CombatIdentity, station_services::CargoIntake};\nuse std::sync::Arc;\n\npub const SCOOP_DISTANCE: f64 = 85.0;\npub const SCOOP_MAX_RELATIVE_SPEED: f64 = 15.0;\n/// Explicitly authored Meridian fragment geometry, not an original cargo hull.\nconst MAX_COLLECTIONS: usize = 277;\n"
+        },
+        {
+          "offset": 1015,
+          "before": "",
+          "after": "impl OreSnapshot {\n    pub fn vertices(self) -> [Vec3; 6] {\n        [\n            Vec3::new(7.0, 1.0, -2.0),\n            Vec3::new(-5.0, -1.0, 2.0),\n            Vec3::new(1.0, 10.0, 1.0),\n            Vec3::new(-2.0, -6.0, -1.0),\n            Vec3::new(2.0, 3.0, 6.0),\n            Vec3::new(-1.0, 0.0, -8.0),\n        ]\n        .map(|offset| add(self.position, offset))\n    }\n    pub(crate) fn scoop_admissible(self, pose: RigidPose, speed: f32, automatic: bool) -> bool {\n        let displacement = |p: Vec3| {\n            Vec3::new(\n                p.x - pose.position.x,\n                p.y - pose.position.y,\n                p.z - pose.position.z,\n            )\n        };\n        let centre = displacement(self.position);\n        if !pose.orientation.is_valid_rotation()\n            || !super::finite(pose.position)\n            || !speed.is_finite()\n            || !(0.0..=crate::flight::MAX_SPEED).contains(&speed)\n            || centre.dot(centre) >= SCOOP_DISTANCE * SCOOP_DISTANCE\n            || centre.dot(pose.orientation.y) >= 0.0\n            || centre.dot(pose.orientation.z) <= 0.0\n        {\n            return false;\n        }\n        if !automatic {\n            return true;\n        }\n        let ship_speed = f64::from(speed * crate::station::DISTANCE_PER_SPEED_UNIT);\n        let relative = add(self.velocity, scale(pose.orientation.z, -ship_speed));\n        relative.dot(relative) <= SCOOP_MAX_RELATIVE_SPEED * SCOOP_MAX_RELATIVE_SPEED\n            && self.vertices().into_iter().all(|p| {\n                let point = displacement(p);\n                point.dot(pose.orientation.y) < 0.0\n                    && point.dot(pose.orientation.z) > 0.0\n                    && point.dot(point) < SCOOP_DISTANCE * SCOOP_DISTANCE\n            })\n    }\n}\n\n#[derive(Debug, Clone, Copy, PartialEq)]\npub(crate) struct Collection {\n    pub(crate) id: OreId,\n    pub(crate) owner: CombatIdentity,\n    pub(crate) item: u64,\n    pub(crate) revision: u64,\n    pub(crate) world_tick: u64,\n    pub(crate) physical_tick: u64,\n    pub(crate) pose: RigidPose,\n    pub(crate) speed: f32,\n    pub(crate) automatic: bool,\n}\n"
+        },
+        {
+          "offset": 3364,
+          "before": "            .sum()\n",
+          "after": "            .sum::<usize>()\n            .saturating_sub(\n                self.collected\n                    .iter()\n                    .filter(|c| self.expired[usize::from(c.id.asteroid.ordinal)].is_none())\n                    .count(),\n            )\n"
+        },
+        {
+          "offset": 3940,
+          "before": "            let Some(release) = self.terminal_stroke(slot) else {\n",
+          "after": "            if self.terminal_stroke(slot).is_none() {\n"
+        },
+        {
+          "offset": 4020,
+          "before": "            };\n            let elapsed = physical_tick.saturating_sub(release.physical_tick) as f64 / 60.0;\n            let columns = body.initial_units.min(5);\n            let rows = body.initial_units / columns;\n",
+          "after": "            }\n"
+        },
+        {
+          "offset": 4086,
+          "before": "                // Original MiningLedger.yield grid: cargo fallback radius48 => spacing112.\n                let center = Vec3::new(\n                    f64::from(columns - 1) * 6.0,\n                    f64::from(rows - 1) * 6.0,\n                    10.0,\n                );\n                let offset = Vec3::new(\n                    (f64::from(fragment % columns) - f64::from(columns - 1) / 2.0) * 112.0,\n                    (f64::from(fragment / columns) - f64::from(rows - 1) / 2.0) * 112.0,\n                    0.0,\n                );\n                let velocity = Vec3::new(f64::from(fragment % 5), 2.0, 3.0);\n                ore.push(OreSnapshot {\n                    id: OreId {\n                        asteroid: body.id,\n                        fragment,\n                    },\n                    commodity: body.commodity,\n                    quantity: 1,\n                    position: add(\n                        add(body.position, add(center, offset)),\n                        scale(velocity, elapsed),\n                    ),\n                    velocity,\n                    released_tick: release.world_tick,\n                    released_physical_tick: release.physical_tick,\n                });\n",
+          "after": "                let id = OreId {\n                    asteroid: body.id,\n                    fragment,\n                };\n                if self.collected.iter().any(|c| c.id == id) {\n                    continue;\n                }\n                if let Some(snapshot) = self.fragment_at(id, physical_tick) {\n                    ore.push(snapshot);\n                }\n"
+        },
+        {
+          "offset": 4496,
+          "before": "",
+          "after": "    fn fragment_at(&self, id: OreId, physical_tick: u64) -> Option<OreSnapshot> {\n        let body = self.body(usize::from(id.asteroid.ordinal))?;\n        let release = self.terminal_stroke(usize::from(id.asteroid.ordinal))?;\n        if body.id != id.asteroid\n            || id.fragment >= body.initial_units\n            || physical_tick < release.physical_tick\n        {\n            return None;\n        }\n        let elapsed = (physical_tick - release.physical_tick) as f64 / 60.0;\n        let columns = body.initial_units.min(5);\n        let rows = body.initial_units / columns;\n        let fragment = id.fragment;\n        // Original MiningLedger.yield grid: cargo fallback radius48 => spacing112.\n        let center = Vec3::new(\n            f64::from(columns - 1) * 6.0,\n            f64::from(rows - 1) * 6.0,\n            10.0,\n        );\n        let offset = Vec3::new(\n            (f64::from(fragment % columns) - f64::from(columns - 1) / 2.0) * 112.0,\n            (f64::from(fragment / columns) - f64::from(rows - 1) / 2.0) * 112.0,\n            0.0,\n        );\n        let velocity = Vec3::new(f64::from(fragment % 5), 2.0, 3.0);\n        Some(OreSnapshot {\n            id,\n            commodity: body.commodity,\n            quantity: 1,\n            position: add(\n                add(body.position, add(center, offset)),\n                scale(velocity, elapsed),\n            ),\n            velocity,\n            released_tick: release.world_tick,\n            released_physical_tick: release.physical_tick,\n        })\n    }\n    pub(crate) fn collections(&self) -> &[Collection] {\n        &self.collected\n    }\n    pub(crate) fn cargo_intakes(&self) -> impl Iterator<Item = CargoIntake> + '_ {\n        self.collected.iter().filter_map(|receipt| {\n            self.body(usize::from(receipt.id.asteroid.ordinal))\n                .map(|body| CargoIntake {\n                    revision: receipt.revision,\n                    commodity: body.commodity,\n                })\n        })\n    }\n    pub(crate) fn prepare_collection(&self, collection: Collection) -> Result<Self, MiningError> {\n        let mut candidate = self.clone();\n        Arc::make_mut(&mut candidate.collected).push(collection);\n        candidate\n            .validate_collections()\n            .map_err(|_| MiningError::InvalidState)?;\n        Ok(candidate)\n    }\n    pub(super) fn validate_collections(&self) -> Result<(), SaveError> {\n        if self.collected.len() > MAX_COLLECTIONS {\n            return Err(INVALID);\n        }\n        let mut previous: Option<&Collection> = None;\n        for (index, receipt) in self.collected.iter().enumerate() {\n            let terminal = self\n                .terminal_stroke(usize::from(receipt.id.asteroid.ordinal))\n                .ok_or(INVALID)?;\n            let ore = self\n                .fragment_at(receipt.id, receipt.physical_tick)\n                .ok_or(INVALID)?;\n            if receipt.owner != terminal.owner\n                || receipt.item == 0\n                || receipt.revision <= terminal.account_revision\n                || receipt.world_tick < terminal.world_tick\n                || receipt.physical_tick > receipt.world_tick\n                || receipt.physical_tick - terminal.physical_tick\n                    > receipt.world_tick - terminal.world_tick\n                || self.expired[usize::from(receipt.id.asteroid.ordinal)]\n                    .is_some_and(|(tick, _)| receipt.world_tick >= tick)\n                || self.collected[..index]\n                    .iter()\n                    .any(|old| old.id == receipt.id)\n                || previous.is_some_and(|old| {\n                    old.revision >= receipt.revision\n                        || old.world_tick > receipt.world_tick\n                        || old.physical_tick > receipt.physical_tick\n                })\n                || !ore.scoop_admissible(receipt.pose, receipt.speed, receipt.automatic)\n            {\n                return Err(INVALID);\n            }\n            previous = Some(receipt);\n        }\n        Ok(())\n    }\n    pub(crate) fn encode_collections(&self, w: &mut Writer) {\n        w.u16(self.collected.len() as u16);\n        for c in self.collected.iter() {\n            w.u8(c.id.asteroid.ordinal);\n            w.u8(c.id.fragment);\n            for value in [\n                c.owner.owner,\n                c.owner.hull,\n                c.owner.visit,\n                c.item,\n                c.revision,\n                c.world_tick,\n                c.physical_tick,\n            ] {\n                w.u64(value);\n            }\n            super::persistence::rigid(w, c.pose);\n            w.f32(c.speed);\n            w.bool(c.automatic);\n        }\n    }\n    pub(crate) fn decode_collections(&mut self, r: &mut Reader<'_>) -> Result<(), SaveError> {\n        let count = usize::from(r.u16()?);\n        if count == 0 || count > MAX_COLLECTIONS {\n            return Err(INVALID);\n        }\n        let mut receipts = Vec::with_capacity(count);\n        for _ in 0..count {\n            let id = OreId {\n                asteroid: AsteroidId::from_ordinal(r.u8()?)?,\n                fragment: r.u8()?,\n            };\n            let owner = CombatIdentity {\n                owner: r.u64()?,\n                hull: r.u64()?,\n                visit: r.u64()?,\n                system: id.asteroid.system(),\n            };\n            receipts.push(Collection {\n                id,\n                owner,\n                item: r.u64()?,\n                revision: r.u64()?,\n                world_tick: r.u64()?,\n                physical_tick: r.u64()?,\n                pose: super::persistence::read_rigid(r)?,\n                speed: r.f32()?,\n                automatic: r.bool()?,\n            });\n        }\n        self.collected = Arc::new(receipts);\n        self.validate()\n    }\n"
+        }
+      ]
+    },
+    "mining/persistence.rs": {
+      "beforeSHA256": "086e4acc99fda02a148eb9b54058861da504f72c962b4b55756f13f2be6b53d7",
+      "afterSHA256": "5db46cbb51bfcff28ee37ee5a4e29a23cf814102bc72ca8ad1530e3482a839bd",
+      "hunks": [
+        {
+          "offset": 2137,
+          "before": "",
+          "after": "    #[cfg(test)]\n"
+        },
+        {
+          "offset": 2228,
+          "before": "",
+          "after": "        let value = Self::decode_base(r)?;\n        value.validate()?;\n        Ok(value)\n    }\n    pub(crate) fn decode_base(r: &mut Reader<'_>) -> Result<Self, SaveError> {\n"
+        },
+        {
+          "offset": 4327,
+          "before": "",
+          "after": "            collected: Arc::new(Vec::new()),\n"
+        },
+        {
+          "offset": 4383,
+          "before": "        value.validate()?;\n",
+          "after": ""
+        }
+      ]
+    },
+    "station_services.rs": {
+      "beforeSHA256": "2b4df3af565b0c88825103b4b0122f43783a63a1720fdf5def20e17a489216fb",
+      "afterSHA256": "53a4f0294b8f627b6a58fc2e0cfd81c8e4afab207a4a9fe69b42fa1c3d6ed7b7",
+      "hunks": [
+        {
+          "offset": 2747,
+          "before": "",
+          "after": "}\n\n/// One native unit acquired through a separately validated physical source.\n#[derive(Debug, Clone, Copy, PartialEq, Eq)]\npub(crate) struct CargoIntake {\n    pub(crate) revision: u64,\n    pub(crate) commodity: CommodityId,\n}\nimpl CargoIntake {\n    pub(crate) fn mass_event(self) -> Option<(u64, i16)> {\n        (self.commodity.unit() == CargoUnit::Tonne).then_some((self.revision, 1))\n    }\n"
+        }
+      ]
+    },
+    "station_services/history.rs": {
+      "beforeSHA256": "2288f995b478ca9d4c2fe4feca8929f2bafcfc3be6ea21ee7a53880c44da49de",
+      "afterSHA256": "dd40198c402f047a1406d2710e43cfac958b324bf457a12d0d3f513d8a3219df",
+      "hunks": [
+        {
+          "offset": 2847,
+          "before": "    pub(super) fn validate_receipts(&self) -> Result<(), SaveError> {\n",
+          "after": "    pub(super) fn validate_receipts(\n        &self,\n        intakes: &[super::CargoIntake],\n    ) -> Result<(), SaveError> {\n"
+        },
+        {
+          "offset": 3374,
+          "before": "",
+          "after": "        let mut incoming = intakes.to_vec();\n        incoming.sort_unstable_by_key(|entry| entry.revision);\n        if incoming\n            .iter()\n            .any(|entry| entry.revision == 0 || entry.commodity.departure_legal_weight() != 0)\n            || incoming\n                .windows(2)\n                .any(|entries| entries[0].revision == entries[1].revision)\n        {\n            return Err(invalid);\n        }\n        let mut incoming = incoming.into_iter().peekable();\n"
+        },
+        {
+          "offset": 3949,
+          "before": "",
+          "after": "                return Err(invalid);\n            }\n            while let Some(entry) = incoming.next_if(|entry| entry.revision < receipt.revision) {\n                let slot = &mut held[entry.commodity.index()];\n                *slot = slot\n                    .checked_add(1)\n                    .filter(|&n| n <= super::MAX_MARKET_QUANTITY)\n                    .ok_or(invalid)?;\n            }\n            if incoming\n                .peek()\n                .is_some_and(|entry| entry.revision == receipt.revision)\n            {\n"
+        }
+      ]
+    },
+    "station_services/persistence.rs": {
+      "beforeSHA256": "788333d0ae6e39df30c3e3db5665010b05387a49300951d4c750cb8e53c87b89",
+      "afterSHA256": "b4f707af376720a589c80c62b16810af4cec999855a3aeb2fe7fb3bcde7bd57d",
+      "hunks": [
+        {
+          "offset": 3518,
+          "before": "",
+          "after": "        self.validate_save_with_intakes(owner, capacity, historical_capacity, traffic, &[])\n    }\n    pub(crate) fn validate_save_with_intakes(\n        &self,\n        owner: u64,\n        capacity: u16,\n        historical_capacity: u16,\n        traffic: crate::traffic::Flows,\n        intakes: &[super::CargoIntake],\n    ) -> Result<SavedServiceSummary, SaveError> {\n"
+        },
+        {
+          "offset": 4056,
+          "before": "        self.validate_receipts()?;\n        let food_summary = validate_food_markets(&self.data, capacity, traffic)?;\n",
+          "after": "        self.validate_receipts(intakes)?;\n        let mut incoming = [0_u128; 17];\n        for entry in intakes {\n            incoming[entry.commodity.index()] += 1;\n        }\n        let food_summary = validate_food_markets(&self.data, capacity, traffic, incoming[0])?;\n"
+        },
+        {
+          "offset": 4636,
+          "before": "        let other = validate_other_markets(&self.data, historical_capacity, traffic)?;\n",
+          "after": "        let other = validate_other_markets(&self.data, historical_capacity, traffic, incoming)?;\n"
+        },
+        {
+          "offset": 5107,
+          "before": "        if sold > bought\n",
+          "after": "        if sold > bought + intakes.len() as u128\n"
+        },
+        {
+          "offset": 6527,
+          "before": "",
+          "after": "    incoming: [u128; 17],\n"
+        },
+        {
+          "offset": 8086,
+          "before": "        let held = commodity_bought\n",
+          "after": "        let held = (commodity_bought + incoming[id.index()])\n"
+        },
+        {
+          "offset": 9780,
+          "before": "",
+          "after": "    incoming: u128,\n"
+        },
+        {
+          "offset": 10893,
+          "before": "    let food = bought.checked_sub(sold).ok_or(invalid)?;\n",
+          "after": "    let food = (bought + incoming).checked_sub(sold).ok_or(invalid)?;\n"
+        }
+      ]
+    }
+  }
+}

@@ -52,6 +52,16 @@ SALVAGE_CUTTER_BASE = '4eabe14e93ac37dd3272b4d8076537fd87796758'
 SALVAGE_CUTTER_SHA256 = '4350bf75aae405e7baeb45ff38e2511e62b26160a57991c3b64e1bad24ae62eb'
 
 
+AUTOMATIC_WORK_INVERSE = Path('integration/sh001-mule/AUTOMATIC-WORK-INVERSE.json')
+AUTOMATIC_WORK_BASE = '266e8f40708892c9c100eec113e82cb83b87bc21'
+AUTOMATIC_WORK_SHA256 = 'e2fc8c2f107df6dfb17031f600e4a3a09ea98a6fc5b7ea9781e7ae11f9d98164'
+
+
+def automatic_work_inverse(root, protected):
+    return approved_inverse(root, protected, AUTOMATIC_WORK_INVERSE,
+                            AUTOMATIC_WORK_SHA256, AUTOMATIC_WORK_BASE, 'automatic work')
+
+
 def sha(data):
     return hashlib.sha256(data).hexdigest()
 
@@ -609,11 +619,13 @@ def verify_protected_core(root):
     combined_cabin = combined_cabin_inverse(root, baseline)
     combined_ecm = combined_ecm_inverse(root, baseline)
     salvage_cutter = salvage_cutter_inverse(root, baseline)
+    work = automatic_work_inverse(root, baseline)
     checked = set()
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        before_salvage = undo_flight_computer(relative, current, salvage_cutter)
+        before_work = undo_flight_computer(relative, current, work)
+        before_salvage = undo_flight_computer(relative, before_work, salvage_cutter)
         data = undo_combined_to_cabin(relative, before_salvage, combined_cabin, cabin_inverse)
         other = undo_combined_to_ecm(relative, before_salvage, combined_ecm, ecm_field_inverse, ecm_inverse)
         assert data == other, relative

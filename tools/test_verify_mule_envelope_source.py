@@ -19,7 +19,8 @@ class MuleSourceVerification(unittest.TestCase):
                        verifier.FUEL_STORAGE_INVERSE, verifier.SOLAR_SCOOPS_INVERSE,
                        verifier.PASSENGER_CABIN_INVERSE, verifier.STOCK_ECM_INVERSE,
                        verifier.STOCK_ECM_FIELD_INVERSE, verifier.COMBINED_CABIN_INVERSE,
-                       verifier.COMBINED_ECM_INVERSE, verifier.SALVAGE_CUTTER_INVERSE):
+                       verifier.COMBINED_ECM_INVERSE, verifier.SALVAGE_CUTTER_INVERSE,
+                       verifier.AUTOMATIC_WORK_INVERSE):
             (root / record).parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(verifier.ROOT / record, root / record)
         return root / core
@@ -250,6 +251,8 @@ class MuleSourceVerification(unittest.TestCase):
                  verifier.combined_cabin_inverse(root, protected)),
                 ('combined to ECM', verifier.COMBINED_ECM_INVERSE,
                  verifier.combined_ecm_inverse(root, protected)),
+                ('automatic work', verifier.AUTOMATIC_WORK_INVERSE,
+                 verifier.automatic_work_inverse(root, protected)),
                 ('salvage cutter', verifier.SALVAGE_CUTTER_INVERSE,
                  verifier.salvage_cutter_inverse(root, protected)),
             ):
@@ -278,6 +281,8 @@ class MuleSourceVerification(unittest.TestCase):
             relative = verifier.LIB_SOURCE
             protected = verifier.protected_core_pins(root)
             current = verifier.undo_flight_computer(relative, (core / relative).read_bytes(),
+                                                     verifier.automatic_work_inverse(root, protected))
+            current = verifier.undo_flight_computer(relative, current,
                                                      verifier.salvage_cutter_inverse(root, protected))
             current = verifier.undo_combined_to_cabin(
                 relative, current,
