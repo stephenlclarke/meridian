@@ -29,6 +29,13 @@ impl World {
     }
 
     pub fn work_targets(&self) -> Vec<WorkTarget> {
+        self.available_work_contacts(self.work_targeting_fit())
+    }
+
+    pub(in crate::flight) fn available_work_contacts(
+        &self,
+        fit: WorkTargetingFit,
+    ) -> Vec<WorkTarget> {
         if self.state.mode != crate::FlightMode::Flight
             || self.emp.electrical_disabled()
             || self
@@ -47,7 +54,6 @@ impl World {
         {
             return Vec::new();
         }
-        let fit = self.work_targeting_fit();
         let mut targets = Vec::new();
         if fit.mining && self.mining.enabled() && identity.system == SystemId::AVENOR {
             let pending = self.mining.pending_ore(self.combat.physical_tick());

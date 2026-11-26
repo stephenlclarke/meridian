@@ -96,7 +96,7 @@ pub enum TargetMode {
 pub struct TargetingSnapshot {
     pub tracked_fragment: Option<crate::mining::OreId>,
     pub identity: TargetIdentity,
-    pub tier: TargetingTier,
+    pub tier: Option<TargetingTier>,
     pub filter: TargetFilter,
     pub mode: TargetMode,
     pub guidance: &'static str,
@@ -134,6 +134,8 @@ impl Candidate {
 #[derive(Debug, Default, Clone)]
 pub(super) struct State {
     selected: Option<TargetIdentity>,
+    scanner: bool,
+    manual: bool,
     work_status: Option<&'static str>,
     wreck_avoidance: Option<wreck_avoidance::Steering>,
     origin: Option<CombatIdentity>,
@@ -235,7 +237,11 @@ impl World {
         self.combat_identity()
     }
 
-    fn targeting_candidates(&self, origin: CombatIdentity, tier: TargetingTier) -> Vec<Candidate> {
+    fn targeting_candidates(
+        &self,
+        origin: CombatIdentity,
+        include_station: bool,
+    ) -> Vec<Candidate> {
         let mut ships = self
             .traffic_snapshot()
             .map_or_else(Vec::new, |traffic| traffic.actors);
@@ -254,9 +260,7 @@ impl World {
             })
             .map(Candidate::Ship)
             .collect();
-        if tier >= TargetingTier::Docking
-            && let Some(station) = self.state.station
-        {
+        if include_station && let Some(station) = self.state.station {
             candidates.push(Candidate::Station(
                 TargetIdentity::Station {
                     system: origin.system,
@@ -266,6 +270,119 @@ impl World {
             ));
         }
         candidates
+    }
+
+    fn scanner_candidates(&self, origin: CombatIdentity) -> Vec<Candidate> {
+        let mut contacts = self.targeting_candidates(origin, true);
+        for work in self.available_work_contacts(crate::equipment::WorkTargetingFit {
+            mining: true,
+            salvage: true,
+        }) {
+            if matches!(work.id, WorkTargetId::Wreck(id) if contacts.iter().any(|c| c.identity() == TargetIdentity::Ship(id)))
+            {
+                continue;
+            }
+            contacts.push(Candidate::Work(work));
+        }
+        contacts
+    }
+
+    /// Selectable contacts in the scanner frame, independent of view and fitted assistance.
+    pub fn scanner_targets(&self) -> Vec<(TargetIdentity, Vec3)> {
+        let Some(origin) = self.targeting_origin() else {
+            return Vec::new();
+        };
+        let Some(player) = super::flight_pose(self.state.position, self.state.orientation) else {
+            return Vec::new();
+        };
+        let mut contacts: Vec<_> = self
+            .scanner_candidates(origin)
+            .into_iter()
+            .map(|c| (c.identity(), c.position()))
+            .collect();
+        let range = |position| {
+            let delta = offset(position, player.position);
+            delta.dot(delta)
+        };
+        contacts.sort_by(|(a, pa), (b, pb)| {
+            range(*pa)
+                .total_cmp(&range(*pb))
+                .then_with(|| a.order().cmp(&b.order()))
+        });
+        contacts
+    }
+
+    pub fn cycle_scanner_target(
+        &mut self,
+        expected_tick: u64,
+        size: [u32; 2],
+    ) -> Result<bool, StepError> {
+        if expected_tick != self.state.tick {
+            return Err(StepError::StaleCommand);
+        }
+        if self.is_paused() {
+            return Err(StepError::Paused);
+        }
+        if size.contains(&0) {
+            return Err(StepError::InvalidMode);
+        }
+        let origin = self.targeting_origin().ok_or(StepError::InvalidMode)?;
+        let ordered = self.scanner_targets();
+        if self.targeting.origin != Some(origin) || !self.targeting.scanner {
+            self.targeting.visited.clear();
+        }
+        let visited = &mut self.targeting.visited;
+        visited.retain(|id| ordered.iter().any(|(other, _)| id == other));
+        if visited.len() == ordered.len() {
+            visited.clear();
+        }
+        let next = ordered
+            .into_iter()
+            .map(|(id, _)| id)
+            .find(|id| !visited.contains(id));
+        if let Some(id) = next {
+            visited.push(id);
+        }
+        self.auto_docking = None;
+        self.targeting.scanner = true;
+        self.targeting.filter = TargetFilter::All;
+        self.targeting.origin = Some(origin);
+        self.targeting.selected = next;
+        self.targeting.size = size;
+        self.targeting.work_status = None;
+        self.targeting.wreck_avoidance = None;
+        if next.is_some() && !self.manual_scanner_target() {
+            self.request_flight_view(FlightView::Front, expected_tick)
+                .map_err(|_| StepError::InvalidMode)?;
+        }
+        Ok(next.is_some())
+    }
+
+    pub fn manual_scanner_target(&self) -> bool {
+        self.targeting.scanner
+            && self.targeting.selected.is_some()
+            && (self.targeting.manual || self.targeting_tier().is_none())
+    }
+
+    pub fn toggle_scanner_assistance(&mut self) -> Result<bool, StepError> {
+        if self.is_paused() {
+            return Err(StepError::Paused);
+        }
+        self.targeting_origin().ok_or(StepError::InvalidMode)?;
+        self.targeting.manual = !self.targeting.manual;
+        self.auto_docking = None;
+        self.targeting.work_status = None;
+        self.targeting.wreck_avoidance = None;
+        Ok(!self.targeting.manual)
+    }
+
+    pub(super) fn station_docking_assistance(&self) -> bool {
+        self.targeting_station_selected()
+            && !self.manual_scanner_target()
+            && self
+                .targeting_tier()
+                .is_some_and(|t| t >= TargetingTier::Docking)
+            && self.docking_computer_available()
     }
 
     pub fn cycle_targeting(
@@ -297,7 +414,7 @@ impl World {
             .ok_or(StepError::NonFiniteState)?;
         let filter = self.targeting.filter;
         let mut candidates = if matches!(filter, TargetFilter::Ships | TargetFilter::All) {
-            let mut ships = self.targeting_candidates(origin, tier);
+            let mut ships = self.targeting_candidates(origin, tier >= TargetingTier::Docking);
             ships.retain(|candidate| {
                 tier >= TargetingTier::Advanced
                     || grouped(*candidate, &viewport.front, work_visible) == 0
@@ -337,6 +454,7 @@ impl World {
             Some(TargetIdentity::Station { .. })
         );
         let selected = self.targeting.cycle(origin, tier, viewport.size, ordered);
+        self.targeting.scanner = false;
         if (station_was_selected || selected.is_some())
             && !matches!(selected, Some(TargetIdentity::Station { .. }))
         {
@@ -386,24 +504,32 @@ impl World {
         Ok(self.targeting.filter)
     }
 
-    fn current_target(&self) -> Option<(TargetingTier, Candidate)> {
+    fn current_target(&self) -> Option<(Option<TargetingTier>, Candidate)> {
         let selected = self.targeting.selected?;
         let origin = self.targeting_origin()?;
         if self.targeting.origin != Some(origin) {
             return None;
         }
-        let tier = self.targeting_tier()?;
+        let fitted = self.targeting_tier();
+        if self.targeting.scanner {
+            return self
+                .scanner_candidates(origin)
+                .into_iter()
+                .find(|c| c.identity() == selected)
+                .map(|c| (fitted, c));
+        }
+        let tier = fitted?;
         if let TargetIdentity::Work(id) = selected {
             return self
                 .work_targets()
                 .into_iter()
                 .find(|work| work.id == id && self.targeting.filter.includes_work(work.role))
-                .map(|work| (tier, Candidate::Work(work)));
+                .map(|work| (fitted, Candidate::Work(work)));
         }
-        self.targeting_candidates(origin, tier)
+        self.targeting_candidates(origin, tier >= TargetingTier::Docking)
             .into_iter()
             .find(|c| c.identity() == selected)
-            .map(|c| (tier, c))
+            .map(|c| (fitted, c))
     }
 
     pub fn targeting_station_selected(&self) -> bool {
@@ -413,11 +539,32 @@ impl World {
     pub fn selected_work_target(&self) -> Option<WorkTarget> {
         match self.current_target()? {
             (_, Candidate::Work(work)) => Some(work),
+            (_, Candidate::Ship(ship)) if self.targeting.scanner && ship.electrical_disabled => {
+                Some(WorkTarget {
+                    id: WorkTargetId::Wreck(ship.id),
+                    role: WorkTargetRole::WreckTracking,
+                    position: ship.pose.position,
+                })
+            }
             _ => None,
         }
     }
 
     fn automatic_work_target(&self, candidate: Candidate) -> Option<WorkTarget> {
+        if self.manual_scanner_target() {
+            return None;
+        }
+        if self.targeting.scanner
+            && let Candidate::Work(work) = candidate
+        {
+            let fit = self.work_targeting_fit();
+            if !match work.id {
+                WorkTargetId::Wreck(_) => fit.salvage,
+                _ => fit.mining,
+            } {
+                return None;
+            }
+        }
         match candidate {
             Candidate::Work(work) if work.role == WorkTargetRole::RockHold => {
                 if let WorkTargetId::Asteroid(id) = work.id
@@ -445,10 +592,37 @@ impl World {
         }
     }
 
+    /// Advanced targeting can fly the approach while the pilot still operates the tool.
+    fn approach_target(&self, candidate: Candidate) -> Option<WorkTarget> {
+        if let Some(work) = self.automatic_work_target(candidate) {
+            return Some(work);
+        }
+        if !self.targeting.scanner
+            || self.manual_scanner_target()
+            || self.targeting_tier()? < TargetingTier::Advanced
+        {
+            return None;
+        }
+        match candidate {
+            Candidate::Work(work) if work.role != WorkTargetRole::OreTracking => Some(work),
+            Candidate::Ship(ship) if ship.electrical_disabled => Some(WorkTarget {
+                id: WorkTargetId::Wreck(ship.id),
+                role: WorkTargetRole::WreckTracking,
+                position: ship.pose.position,
+            }),
+            _ => None,
+        }
+    }
+
     pub fn selected_disabled_salvage_target(&self) -> Option<NpcId> {
         let candidate = self.current_target()?.1;
-        let WorkTargetId::Wreck(id) = self.automatic_work_target(candidate)?.id else {
-            return None;
+        let id = match candidate {
+            Candidate::Ship(actor) => actor.id,
+            Candidate::Work(WorkTarget {
+                id: WorkTargetId::Wreck(id),
+                ..
+            }) => id,
+            _ => return None,
         };
         self.traffic_snapshot()?
             .actors
@@ -477,10 +651,11 @@ impl World {
             self.targeting.work_status = Some("Cutter return unavailable");
             return;
         }
-        let mining_lock = matches!(
-            selected.map(Candidate::identity),
-            Some(TargetIdentity::Work(WorkTargetId::Asteroid(_)))
-        );
+        let mining_lock = work.is_some()
+            && matches!(
+                selected.map(Candidate::identity),
+                Some(TargetIdentity::Work(WorkTargetId::Asteroid(_)))
+            );
         if let Some(WorkTargetId::Ore(ore)) = work.map(|target| target.id) {
             // Pursuing a released fragment keeps the original asteroid lock and tool.
             // The intake itself depends on the scoops, including for a direct ore lock.
@@ -579,7 +754,10 @@ impl World {
             self.cancel_targeting();
             return input;
         };
-        let work = self.automatic_work_target(target);
+        if self.manual_scanner_target() {
+            return input;
+        }
+        let work = self.approach_target(target);
         if input.pitch != 0.0
             || input.yaw != 0.0
             || input.roll != 0.0
@@ -589,7 +767,7 @@ impl World {
             self.cancel_targeting();
             return input;
         }
-        if matches!(target, Candidate::Station(..)) {
+        if matches!(target, Candidate::Station(..)) && self.station_docking_assistance() {
             return input;
         }
         let Some(player) = super::flight_pose(self.state.position, self.state.orientation) else {
@@ -659,7 +837,8 @@ impl World {
     }
 
     pub fn targeting_snapshot(&self) -> Option<TargetingSnapshot> {
-        let (tier, candidate) = self.current_target()?;
+        let (installed, candidate) = self.current_target()?;
+        let tier = installed.unwrap_or(TargetingTier::Basic);
         let identity = candidate.identity();
         let displayed_work = match candidate {
             Candidate::Work(work) => Some(self.automatic_work_target(candidate).unwrap_or(work)),
@@ -712,7 +891,13 @@ impl World {
                 let detailed = tier >= TargetingTier::Identification;
                 let player = super::flight_pose(self.state.position, self.state.orientation)?;
                 let delta = offset(pose.pose.position, player.position);
-                let status = self.auto_docking_status().unwrap_or("Aligning");
+                let status =
+                    self.auto_docking_status()
+                        .unwrap_or(if self.station_docking_assistance() {
+                            "Aligning for docking"
+                        } else {
+                            "Station bearing"
+                        });
                 let fields = if detailed {
                     vec![
                         (
@@ -777,10 +962,14 @@ impl World {
                 _ => None,
             }),
             identity,
-            tier,
+            tier: installed,
             filter: self.targeting.filter,
             mode,
-            guidance,
+            guidance: if self.manual_scanner_target() {
+                "Manual target"
+            } else {
+                guidance
+            },
             pose,
             model,
             status,
