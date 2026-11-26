@@ -602,12 +602,14 @@ impl World {
         }
         let previous_targeting = self.targeting.clone();
         let previous_docking = self.auto_docking;
+        let occupied_motion = self.occupied_motion_opening();
         let input = self.flight_computer_input(input);
         let result = self.step_flight(input);
         if result.is_err() {
             self.targeting = previous_targeting;
             self.auto_docking = previous_docking;
         } else {
+            self.occupied_salvage.before_motion = occupied_motion;
             if self.state.mode != FlightMode::Flight || self.state.motion_refusal.is_some() {
                 self.cancel_targeting();
                 self.cancel_auto_docking();

@@ -1506,7 +1506,7 @@ fn occupied_cut_requires_explicit_review_and_retains_actual_finite_game_contact(
     let retained = world.save_bytes().unwrap();
     let marker = retained
         .windows(8)
-        .position(|part| part == b"MCUT0001")
+        .position(|part| part == b"MCUT0002")
         .unwrap();
     let mut erased = retained[..marker].to_vec();
     erased.extend(crate::save::checksum(&erased).to_le_bytes());
@@ -1517,9 +1517,24 @@ fn occupied_cut_requires_explicit_review_and_retains_actual_finite_game_contact(
     world.step(FlightInput::default()).unwrap();
     assert!(world.fitted_salvage_cutter().is_none());
     assert!(world.modular.salvage_exchange_source().is_none());
-    let cold = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    let durable = world.save_bytes().unwrap();
+    let mut cold = World::from_save_bytes(&durable).unwrap();
     assert_eq!(cold.occupied_cut_contacts().collect::<Vec<_>>(), [contact]);
     assert!(cold.fitted_salvage_cutter().is_none());
+    // This tiny historical mutation still passes the relative-speed envelope;
+    // only the independently retained preceding traffic movement rejects it.
+    let radius = cold
+        .station_data
+        .as_ref()
+        .unwrap()
+        .player_clearance_radius();
+    cold.occupied_salvage
+        .alter_first_target_speed_for_test(0.01, radius);
+    assert!(cold.save_bytes().is_err());
+    let forged = cold.unchecked_test_save().unwrap();
+    assert!(World::from_save_bytes(&forged).is_err());
+    assert!(world.restore_bytes(&forged).is_err());
+    assert_eq!(world.save_bytes().unwrap(), durable);
 }
 
 #[test]

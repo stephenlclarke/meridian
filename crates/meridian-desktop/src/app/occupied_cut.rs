@@ -226,7 +226,9 @@ mod tests {
             Some(target)
         );
         let before = app.game.world.snapshot().tick;
-        ok(app.game.world.review_occupied_cut(target, before)).cancel();
+        // A cold load has no previous accepted local motion witness. The
+        // following real step supplies it before the game opens the review.
+        assert!(app.game.world.review_occupied_cut(target, before).is_err());
         // Existing physical hold means the next accepted tick is sufficient; a catch-up
         // frame must stop there, before any extra simulation time or held weapon input.
         assert!(matches!(

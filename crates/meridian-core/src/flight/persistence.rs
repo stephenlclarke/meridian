@@ -22,7 +22,7 @@ const SOLAR_EXTENSION: &[u8; 8] = b"MSOL0003";
 const ECM_EXTENSION: &[u8; 8] = b"MECM0002";
 const ECM_FIELD_EXTENSION: &[u8; 8] = b"MECM0003";
 const MINING_INTAKE_EXTENSION: &[u8; 8] = b"MINT0001";
-const OCCUPIED_CUT_EXTENSION: &[u8; 8] = b"MCUT0001";
+const OCCUPIED_CUT_EXTENSION: &[u8; 8] = b"MCUT0002";
 const CONTENT: &[u8] = concat!(
     "meridian-world/rules/17;explicit-xyzzy/account-prefix-replay-v2/a11fe169;distinct-emp/paid-defensive-local-v1/a11fe169;navigation-computer/exact-route-journal/a11fe169;lareria-main-services/station-combat-three-v1/a11fe169;rapid-lasers-energy/shared-nine-byte-resources-v1/a11fe169;mining/native-work-pending-v2;fuel-scoops/paid-utility-v1;npc-missiles/canonical-native-ray-v3;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
@@ -74,7 +74,7 @@ fn ecm_content_fingerprint(base: u64, field: bool) -> u64 {
 
 fn occupied_cut_fingerprint(base: u64) -> u64 {
     let mut bytes = base.to_le_bytes().to_vec();
-    bytes.extend(b"occupied-salvage-contact/v1");
+    bytes.extend(b"occupied-salvage-contact/v2-motion-witness");
     checksum(&bytes)
 }
 

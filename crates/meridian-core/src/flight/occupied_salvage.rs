@@ -92,14 +92,30 @@ struct Receipt {
     orientation: [f32; 4],
     speed: f32,
     target_speed: f64,
+    before_motion: MissileScene,
     scene: MissileScene,
 }
 
 #[derive(Debug, Clone, Default)]
 pub(super) struct State {
     contacts: Vec<Receipt>,
+    // Only an accepted local step can furnish this transient opening. It is
+    // retained in the save solely when the pilot confirms a contact.
+    pub(super) before_motion: Option<MissileScene>,
 }
 impl State {
+    #[cfg(test)]
+    pub(super) fn alter_first_target_speed_for_test(&mut self, speed: f64, radius: f64) {
+        let receipt = &mut self.contacts[0];
+        // Keep the other validation envelope satisfied; the mutation must
+        // fail precisely because it disagrees with measured motion.
+        let pose = super::flight_pose(receipt.position, receipt.orientation).unwrap();
+        let body = receipt.scene.target(receipt.contact.target).unwrap();
+        assert!(working_hold(pose, receipt.speed, body.pose, speed, radius));
+        assert_ne!(receipt.target_speed, speed);
+        receipt.target_speed = speed;
+    }
+
     pub(super) fn is_empty(&self) -> bool {
         self.contacts.is_empty()
     }
@@ -132,6 +148,7 @@ impl State {
             }
             w.f32(r.speed);
             w.u64(r.target_speed.to_bits());
+            r.before_motion.encode(w);
             r.scene.encode(w);
         }
     }
@@ -169,10 +186,14 @@ impl State {
                 orientation,
                 speed,
                 target_speed,
+                before_motion: MissileScene::decode(r)?,
                 scene: MissileScene::decode(r)?,
             });
         }
-        Ok(Self { contacts })
+        Ok(Self {
+            contacts,
+            before_motion: None,
+        })
     }
 
     pub(super) fn validate(
@@ -240,6 +261,21 @@ impl State {
             world
                 .traffic
                 .validate_missile_scene(&receipt.scene, world.state.tick, data)?;
+            world
+                .traffic
+                .validate_missile_scene(&receipt.before_motion, world.state.tick, data)?;
+            if !motion_matches(
+                contact.target,
+                &receipt.before_motion,
+                &receipt.scene,
+                receipt.target_speed,
+            ) || world
+                .traffic
+                .occupied_disabled_at(contact.target, &receipt.before_motion)
+                .is_err()
+            {
+                return Err(INVALID);
+            }
             let population = world
                 .traffic
                 .occupied_disabled_at(contact.target, &receipt.scene)?;
@@ -318,6 +354,31 @@ fn distance(a: Vec3, b: Vec3) -> f64 {
     d.dot(d).sqrt()
 }
 
+// Both endpoints come from the real game traffic step, not from a speed
+// field supplied by the caller. A disabled actor either coasts on its fixed
+// orientation or remains at the opening position when motion is refused.
+fn motion_matches(target: NpcId, before: &MissileScene, after: &MissileScene, speed: f64) -> bool {
+    if before.system != after.system
+        || before.world_tick.checked_add(1) != Some(after.world_tick)
+        || before.local_tick.checked_add(1) != Some(after.local_tick)
+        || !matches!((before.stage, after.stage), (SceneStage::Command(a), SceneStage::Command(b)) if a <= b)
+        || !(0.0..=34.3).contains(&speed)
+    {
+        return false;
+    }
+    let (Some(a), Some(b)) = (before.target(target), after.target(target)) else {
+        return false;
+    };
+    let travel = speed * 18.0 / 60.0;
+    let expected = Vec3::new(
+        a.pose.position.x + b.pose.orientation.z.x * travel,
+        a.pose.position.y + b.pose.orientation.z.y * travel,
+        a.pose.position.z + b.pose.orientation.z.z * travel,
+    );
+    distance(a.pose.orientation.z, b.pose.orientation.z) <= 1e-12
+        && distance(expected, b.pose.position) <= 1e-8
+}
+
 fn working_hold(
     player: RigidPose,
     speed: f32,
@@ -342,6 +403,16 @@ fn working_hold(
 }
 
 impl World {
+    pub(super) fn occupied_motion_opening(&self) -> Option<MissileScene> {
+        self.selected_disabled_salvage_target()?;
+        let owner = self.combat_identity()?;
+        Some(self.traffic.missile_scene(
+            owner.system,
+            self.state.tick,
+            SceneStage::Command(self.combat.emissions),
+        ))
+    }
+
     pub fn occupied_cut_contacts(&self) -> impl Iterator<Item = OccupiedCutContact> + '_ {
         self.occupied_salvage.contacts.iter().map(|r| r.contact)
     }
@@ -440,7 +511,7 @@ impl World {
             .and_then(|s| s.actors.into_iter().find(|a| a.id == review.target))
             .ok_or(OccupiedCutError::NotDisabledOccupied)?
             .speed_units;
-        let scene =
+        let (scene, before_motion) =
             self.occupied_cut_scene(review.target, review.tick, review.owner, target_speed)?;
         let physical = self.combat.physical_tick();
         let contact = OccupiedCutContact {
@@ -458,6 +529,7 @@ impl World {
             orientation: self.state.orientation,
             speed: self.state.speed,
             target_speed,
+            before_motion,
             scene,
         });
         let original = std::mem::replace(&mut self.occupied_salvage, candidate);
@@ -478,7 +550,7 @@ impl World {
         tick: u64,
         owner: CombatIdentity,
         target_speed: f64,
-    ) -> Result<MissileScene, OccupiedCutError> {
+    ) -> Result<(MissileScene, MissileScene), OccupiedCutError> {
         let physical = self.combat.physical_tick();
         let old = &self.occupied_salvage;
         if old.contacts.len() >= MAX_CONTACTS {
@@ -505,6 +577,15 @@ impl World {
         let body = scene
             .target(target)
             .ok_or(OccupiedCutError::ContactUnavailable)?;
+        let before = self
+            .occupied_salvage
+            .before_motion
+            .as_ref()
+            .filter(|before| motion_matches(target, before, &scene, target_speed))
+            .ok_or(OccupiedCutError::ContactUnavailable)?;
+        self.traffic
+            .occupied_disabled_at(target, before)
+            .map_err(|_| OccupiedCutError::ContactUnavailable)?;
         if !working_hold(
             pose,
             self.state.speed,
@@ -523,7 +604,7 @@ impl World {
         {
             return Err(OccupiedCutError::ContactUnavailable);
         }
-        Ok(scene)
+        Ok((scene, before.clone()))
     }
 }
 
