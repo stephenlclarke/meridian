@@ -585,6 +585,7 @@ fn genuine_planet_refusal_replays_attempted_input_and_rejects_forged_clear_stop_
             last.opening,
             Motion::Active(input),
             &scene,
+            None,
             &mut std::iter::empty()
         )
         .is_err()
@@ -642,6 +643,7 @@ fn genuine_planet_refusal_replays_attempted_input_and_rejects_forged_clear_stop_
             run.opening,
             fake,
             &clear_scene,
+            None,
             &mut std::iter::empty()
         )
         .is_err()
@@ -727,14 +729,22 @@ fn actual_npc_scene_proves_only_the_bound_attempted_sweep_and_witness_codec() {
         opening,
         motion,
         &scene,
+        None,
         &mut std::iter::once(&witness),
     )
     .unwrap();
     assert_eq!(stopped.position, frame.position);
     assert_eq!(stopped.speed, 0.0);
     assert!(
-        super::history::replay_motion(&world, opening, motion, &scene, &mut std::iter::empty())
-            .is_err()
+        super::history::replay_motion(
+            &world,
+            opening,
+            motion,
+            &scene,
+            None,
+            &mut std::iter::empty()
+        )
+        .is_err()
     );
     let mut wrong = witness;
     wrong.clock += 1;
@@ -744,9 +754,128 @@ fn actual_npc_scene_proves_only_the_bound_attempted_sweep_and_witness_codec() {
             opening,
             motion,
             &scene,
+            None,
             &mut std::iter::once(&wrong)
         )
         .is_err()
+    );
+}
+
+#[test]
+fn historic_mule_active_crossing_refuses_but_genuine_legacy_overlap_escape_remains_legal() {
+    let bytes = include_bytes!("../../../tests/fixtures/renas-mule-pre-pr-overlap-v17.bin");
+    let mut world = World::from_save_bytes(bytes).unwrap();
+    let identity = world.combat_identity().unwrap();
+    assert!(world.mule_actor_snapshot().is_none());
+    let collider = world
+        .historic_renas_mule_collider(identity.system, identity.visit)
+        .unwrap()
+        .unwrap();
+    let opening = State::anchor(
+        world.state,
+        identity.system,
+        identity.visit,
+        world.combat.physical_tick(),
+    );
+    let scene = State::scene(&world, identity.system, identity.visit, opening.tick).unwrap();
+    let clear_escape = super::history::replay_motion(
+        &world,
+        opening,
+        Motion::Active(FlightInput::default()),
+        &scene,
+        Some(&collider),
+        &mut std::iter::empty(),
+    )
+    .unwrap();
+    world.step(FlightInput::default()).unwrap();
+    assert_eq!(MotionFrame::from(world.snapshot()), clear_escape);
+    assert_eq!(world.snapshot().motion_refusal, None);
+
+    let data = world.station_data.as_ref().unwrap();
+    let source = crate::mule::MuleHullSource::bundled().unwrap();
+    let berth = data.renas_mule_berth(&source).unwrap();
+    let launch = data.launch_start().unwrap().position;
+    let dx = berth.position.x - f64::from(launch[0]);
+    let dz = berth.position.z - f64::from(launch[2]);
+    let distance = dx.hypot(dz);
+    let direction = [dx / distance, 0.0, dz / distance];
+    let yaw = dx.atan2(dz) as f32;
+    let orientation = super::super::axis_rotation(1, yaw);
+    let span = f64::from(
+        super::super::MAX_SPEED
+            * super::super::FIXED_DELTA_SECONDS
+            * super::super::DISTANCE_PER_SPEED_UNIT,
+    );
+    let input = FlightInput::default();
+    let mut crossing = None;
+    for step in 0..=((distance / span).ceil() as usize + 2) {
+        let frame = MotionFrame {
+            position: core::array::from_fn(|axis| {
+                launch[axis] + (direction[axis] * step as f64 * span) as f32
+            }),
+            orientation,
+            speed: super::super::MAX_SPEED,
+        };
+        let attempted = frame.advance(Motion::Active(input)).unwrap();
+        let before = crate::station::flight_pose(frame.position, frame.orientation).unwrap();
+        let after = crate::station::flight_pose(attempted.position, attempted.orientation).unwrap();
+        if !data.crosses_aperture(before, after)
+            && data.motion_clear(before, after, 0.0)
+            && world
+                .historic_renas_mule_motion_blocked(Some(&collider), before, after, 0.0)
+                .unwrap()
+        {
+            crossing = Some(frame);
+            break;
+        }
+    }
+    let frame = crossing.unwrap_or_else(|| {
+        panic!("actual fixed Mule collider did not block one accepted-size sweep")
+    });
+    let mut anchor = State::anchor(
+        world.state,
+        identity.system,
+        identity.visit,
+        world.combat.physical_tick(),
+    );
+    anchor.frame = frame;
+    let scene = State::scene(&world, identity.system, identity.visit, anchor.tick).unwrap();
+    assert!(
+        super::history::replay_motion(
+            &world,
+            anchor,
+            Motion::Active(input),
+            &scene,
+            Some(&collider),
+            &mut std::iter::empty()
+        )
+        .is_err()
+    );
+    let stopped = super::history::replay_motion(
+        &world,
+        anchor,
+        Motion::Stopped {
+            input,
+            kind: StopKind::Mule,
+        },
+        &scene,
+        Some(&collider),
+        &mut std::iter::empty(),
+    )
+    .unwrap();
+    assert_eq!(stopped.position, frame.position);
+    assert_eq!(stopped.speed, 0.0);
+    anchor.frame.speed = 0.0;
+    assert!(
+        super::history::replay_motion(
+            &world,
+            anchor,
+            Motion::Active(input),
+            &scene,
+            Some(&collider),
+            &mut std::iter::empty()
+        )
+        .is_ok()
     );
 }
 #[test]

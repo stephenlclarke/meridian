@@ -266,11 +266,19 @@ pub(super) fn replay_motion<'a>(
     anchor: Anchor,
     motion: Motion,
     scene: &crate::celestial::Snapshot,
+    mule: Option<&super::super::mule_renas::HistoricMuleCollider>,
     witnesses: &mut impl Iterator<Item = &'a NpcRefusal>,
 ) -> Result<MotionFrame, SaveError> {
     let input = motion.input();
     let attempted = anchor.frame.advance(Motion::Active(input)).ok_or(INVALID)?;
     let data = world.station_data.as_ref().ok_or(INVALID)?;
+    if scene.blocks_motion(
+        anchor.frame.position,
+        anchor.frame.position,
+        data.player_radius(),
+    ) {
+        return Err(INVALID);
+    }
     let celestial_blocked = scene.blocks_motion(
         anchor.frame.position,
         attempted.position,
@@ -304,8 +312,13 @@ pub(super) fn replay_motion<'a>(
         || world.mining_motion_clear_at_step(anchor.system, next_tick, before, after, angular);
     let crosses = || data.crosses_aperture(before, after);
     let station_clear = || data.motion_clear(before, after, angular);
+    let mule_blocked = || {
+        world
+            .historic_renas_mule_motion_blocked(mule, before, after, angular)
+            .map_err(|_| INVALID)
+    };
     let Motion::Stopped { kind, .. } = motion else {
-        if crosses() || !station_clear() || !asteroid_clear() {
+        if crosses() || !station_clear() || !asteroid_clear() || mule_blocked()? {
             return Err(INVALID);
         }
         return Ok(attempted);
@@ -331,9 +344,7 @@ pub(super) fn replay_motion<'a>(
                 data.player_clearance_radius(),
             )
         }
-        StopKind::Mule => world
-            .historic_renas_mule_motion_blocked(anchor.system, anchor.visit, before, after, angular)
-            .map_err(|_| INVALID)?,
+        StopKind::Mule => mule_blocked()?,
         StopKind::Asteroid => !asteroid_clear(),
         StopKind::Station => asteroid_clear() && !crosses() && !station_clear(),
         StopKind::Entry => {
@@ -520,6 +531,8 @@ impl State {
         let mut previous: Option<Last> = None;
         let mut receipts = self.receipts.iter();
         let mut witnesses = self.npc_refusals.iter();
+        let mut mule_visit = None;
+        let mut mule = None;
         for run in self.runs.iter() {
             run.opening.validate(world)?;
             if run.steps == 0
@@ -541,6 +554,12 @@ impl State {
                 run.opening.visit,
                 run.opening.tick,
             )?;
+            if mule_visit != Some(run.opening.visit) {
+                mule = world
+                    .historic_renas_mule_collider(run.opening.system, run.opening.visit)
+                    .map_err(|_| INVALID)?;
+                mule_visit = Some(run.opening.visit);
+            }
             let sun = scene.sun;
             let opening_ratio = run.opening.frame.ratio_and_nose(sun).0;
             let first_of_visit = previous.is_none_or(|last| last.anchor.visit != run.opening.visit);
@@ -573,7 +592,14 @@ impl State {
             let mut fuel = run.first_fuel;
             let mut revision = run.first_revision;
             for step in 0..run.steps {
-                let next = replay_motion(world, anchor, run.motion, &scene, &mut witnesses)?;
+                let next = replay_motion(
+                    world,
+                    anchor,
+                    run.motion,
+                    &scene,
+                    mule.as_ref(),
+                    &mut witnesses,
+                )?;
                 let (ratio, nose) = next.ratio_and_nose(sun);
                 if !next.valid()
                     || !ratio.is_finite()
