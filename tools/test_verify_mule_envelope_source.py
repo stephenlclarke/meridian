@@ -20,7 +20,7 @@ class MuleSourceVerification(unittest.TestCase):
                        verifier.PASSENGER_CABIN_INVERSE, verifier.STOCK_ECM_INVERSE,
                        verifier.STOCK_ECM_FIELD_INVERSE, verifier.COMBINED_CABIN_INVERSE,
                        verifier.COMBINED_ECM_INVERSE, verifier.SALVAGE_CUTTER_INVERSE,
-                       verifier.AUTOMATIC_WORK_INVERSE):
+                       verifier.AUTOMATIC_WORK_INVERSE, verifier.SCANNER_TARGET_CYCLE_INVERSE):
             (root / record).parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(verifier.ROOT / record, root / record)
         return root / core
@@ -40,6 +40,7 @@ class MuleSourceVerification(unittest.TestCase):
         self.assertEqual(result['protectedCoreFilesWithCombinedToCabinChanges'], 22)
         self.assertEqual(result['protectedCoreFilesWithCombinedToEcmChanges'], 20)
         self.assertEqual(result['protectedCoreFilesWithSalvageCutterChanges'], 10)
+        self.assertEqual(result['protectedCoreFilesWithScannerTargetCycleChanges'], 4)
         self.assertEqual(result['geometryCoreTests'], 1)
         self.assertEqual(result['restoreCoreTests'], 1)
         self.assertEqual(result['totalMuleCoreTests'], 24)
@@ -253,6 +254,8 @@ class MuleSourceVerification(unittest.TestCase):
                  verifier.combined_ecm_inverse(root, protected)),
                 ('automatic work', verifier.AUTOMATIC_WORK_INVERSE,
                  verifier.automatic_work_inverse(root, protected)),
+                ('scanner target cycle', verifier.SCANNER_TARGET_CYCLE_INVERSE,
+                 verifier.scanner_target_cycle_inverse(root, protected)),
                 ('salvage cutter', verifier.SALVAGE_CUTTER_INVERSE,
                  verifier.salvage_cutter_inverse(root, protected)),
             ):
@@ -271,6 +274,31 @@ class MuleSourceVerification(unittest.TestCase):
                     verifier.verify_protected_core(root)
                 manifest.write_bytes(original)
 
+    def test_scanner_inverse_cannot_approve_wrong_parent_or_forged_preimage(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            core = self.copy_protected_sources(root)
+            manifest = root / verifier.SCANNER_TARGET_CYCLE_INVERSE
+            original = manifest.read_bytes()
+            inverse = json.loads(original)
+            inverse['base'] = verifier.AUTOMATIC_WORK_BASE
+            raw = json.dumps(inverse).encode('utf-8')
+            manifest.write_bytes(raw)
+            with patch.object(verifier, 'SCANNER_TARGET_CYCLE_SHA256', verifier.sha(raw)):
+                with self.assertRaisesRegex(AssertionError, 'scanner target cycle inverse base'):
+                    verifier.verify_protected_core(root)
+
+            inverse = json.loads(original)
+            relative = next(iter(inverse['files']))
+            current = (core / relative).read_bytes()
+            before = verifier.undo_flight_computer(relative, current, inverse['files'])
+            inverse['files'][relative] = generator.file_inverse(before + b'\n', current)
+            raw = json.dumps(inverse).encode('utf-8')
+            manifest.write_bytes(raw)
+            with patch.object(verifier, 'SCANNER_TARGET_CYCLE_SHA256', verifier.sha(raw)):
+                with self.assertRaisesRegex(AssertionError, relative):
+                    verifier.verify_protected_core(root)
+
     def test_historical_stag_check_still_refuses_a_forged_preimage(self):
         # Simulate even a mistakenly approved new inverse with bad historical bytes.
         with tempfile.TemporaryDirectory() as directory:
@@ -281,6 +309,8 @@ class MuleSourceVerification(unittest.TestCase):
             relative = verifier.LIB_SOURCE
             protected = verifier.protected_core_pins(root)
             current = verifier.undo_flight_computer(relative, (core / relative).read_bytes(),
+                                                     verifier.scanner_target_cycle_inverse(root, protected))
+            current = verifier.undo_flight_computer(relative, current,
                                                      verifier.automatic_work_inverse(root, protected))
             current = verifier.undo_flight_computer(relative, current,
                                                      verifier.salvage_cutter_inverse(root, protected))

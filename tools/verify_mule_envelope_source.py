@@ -55,6 +55,14 @@ SALVAGE_CUTTER_SHA256 = '3227a053bf0e38c1f86b6e85a9349b96777f208e6c8d2d962d91d4e
 AUTOMATIC_WORK_INVERSE = Path('integration/sh001-mule/AUTOMATIC-WORK-INVERSE.json')
 AUTOMATIC_WORK_BASE = '1aeb3a9f3aeea609dbc106f18c68ed6b726a7d84'
 AUTOMATIC_WORK_SHA256 = 'c0d4a3df9f7ed3aa0738c2315b854e636dd10c444cd4fc2d789b4af100c2b7ee'
+SCANNER_TARGET_CYCLE_INVERSE = Path('integration/sh001-mule/SCANNER-TARGET-CYCLE-INVERSE.json')
+SCANNER_TARGET_CYCLE_BASE = '98ebd952a2b76f2c9dba424ff77037381cffb7a0'
+SCANNER_TARGET_CYCLE_SHA256 = '9bcd8f70c569074de3f013af7b32039c3c9b3750609800a1b6ce046fcb5db51e'
+
+
+def scanner_target_cycle_inverse(root, protected):
+    return approved_inverse(root, protected, SCANNER_TARGET_CYCLE_INVERSE,
+                            SCANNER_TARGET_CYCLE_SHA256, SCANNER_TARGET_CYCLE_BASE, 'scanner target cycle')
 
 
 def automatic_work_inverse(root, protected):
@@ -620,11 +628,13 @@ def verify_protected_core(root):
     combined_ecm = combined_ecm_inverse(root, baseline)
     salvage_cutter = salvage_cutter_inverse(root, baseline)
     work = automatic_work_inverse(root, baseline)
+    scanner = scanner_target_cycle_inverse(root, baseline)
     checked = set()
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        before_work = undo_flight_computer(relative, current, work)
+        before_scanner = undo_flight_computer(relative, current, scanner)
+        before_work = undo_flight_computer(relative, before_scanner, work)
         before_salvage = undo_flight_computer(relative, before_work, salvage_cutter)
         data = undo_combined_to_cabin(relative, before_salvage, combined_cabin, cabin_inverse)
         other = undo_combined_to_ecm(relative, before_salvage, combined_ecm, ecm_field_inverse, ecm_inverse)
@@ -677,7 +687,7 @@ def verify_protected_core(root):
     assert set(additions) <= checked and len(checked) == 115
     return (len(checked), len(additions), unchanged, len(inverse), len(drive_inverse), len(shield_inverse),
             len(fuel_inverse), len(solar_inverse), len(cabin_inverse), len(ecm_inverse), len(ecm_field_inverse),
-            len(combined_cabin), len(combined_ecm), len(salvage_cutter))
+            len(combined_cabin), len(combined_ecm), len(salvage_cutter), len(scanner))
 
 
 def verify_test_registry(criteria):
@@ -738,7 +748,7 @@ def verify():
     groups = verify_geometry(folder)
     (checked, hooks, unchanged, flight_computer, hyperspace_drive, stock_shield, fuel_storage,
      solar_scoops, passenger_cabin, stock_ecm, stock_ecm_field, combined_cabin, combined_ecm,
-     salvage_cutter) = verify_protected_core(ROOT)
+     salvage_cutter, scanner) = verify_protected_core(ROOT)
     counts = verify_historical_bindings(folder, groups)
     return {
         'status': 'PASS_SOURCE_ONLY',
@@ -756,6 +766,7 @@ def verify():
         'protectedCoreFilesWithCombinedToCabinChanges': combined_cabin,
         'protectedCoreFilesWithCombinedToEcmChanges': combined_ecm,
         'protectedCoreFilesWithSalvageCutterChanges': salvage_cutter,
+        'protectedCoreFilesWithScannerTargetCycleChanges': scanner,
         'protectedCoreFilesChecked': checked,
         **counts,
         'vertexEncoding': 5344,
