@@ -106,6 +106,10 @@ impl DockedScreens {
         self.scroll = 0;
         self.bump();
     }
+    pub(crate) fn select_initial_showroom_ship(&mut self, id: &str) {
+        self.ship = id.into();
+        self.bump();
+    }
     fn bump(&mut self) {
         self.ui_revision = self.ui_revision.wrapping_add(1);
         self.hovered = None;
@@ -225,8 +229,13 @@ impl DockedScreens {
         if context.review.is_some() {
             Outcome::Ignored
         } else if self.searching {
+            let limit = if self.screen == Screen::Showroom {
+                262
+            } else {
+                64
+            };
             for c in text.chars().filter(|c| !c.is_control()) {
-                if self.query.chars().count() < 64 {
+                if self.query.chars().count() < limit {
                     self.query.push(c);
                 }
             }

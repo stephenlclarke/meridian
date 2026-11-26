@@ -8,6 +8,7 @@ mod presentation;
 mod route;
 #[cfg(test)]
 mod tests;
+pub(crate) use catalogue::AuthoredRecord;
 pub use catalogue::{Catalogue, ObjectRecord, Specification, WorldRecord};
 pub use controller::DockedScreens;
 pub use layout::{ChartLayout, Rect, Viewport};

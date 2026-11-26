@@ -1,5 +1,6 @@
 //! GPU-ready docked screen geometry. Draws the exact immutable UI frame, not gameplay state.
 use crate::{
+    authored_hull::AuthoredHulls,
     docked_screens::{AvailableModel, Frame, Ink, ModelPreview, Orientation, Rect},
     mesh::Vertex,
 };
@@ -10,7 +11,7 @@ const MAX_GEOMETRY: usize = 180_000;
 const MAX_MODELS: usize = 2;
 const MAX_MODEL_VERTICES: usize = 10452 * MAX_MODELS * 9;
 const SHIP_KEY: &str = "assets/legacy/sh025.mesh";
-pub const MODELS: [AvailableModel<'static>; 4] = [
+const LEGACY_MODELS: [AvailableModel<'static>; 6] = [
     AvailableModel {
         object: "SH025",
         geometry_key: SHIP_KEY,
@@ -27,7 +28,31 @@ pub const MODELS: [AvailableModel<'static>; 4] = [
         object: "SH171",
         geometry_key: crate::mule_render::showroom::MEDUSA_GEOMETRY_KEY,
     },
+    AvailableModel {
+        object: "SH022",
+        geometry_key: crate::mule_render::showroom::PEREGRINE_I_GEOMETRY_KEY,
+    },
+    AvailableModel {
+        object: "SH023",
+        geometry_key: crate::mule_render::showroom::PEREGRINE_III_GEOMETRY_KEY,
+    },
 ];
+pub const MODELS: [AvailableModel<'static>;
+    LEGACY_MODELS.len() + crate::authored_hull::STOCK_MODELS.len()] = {
+    let mut models =
+        [LEGACY_MODELS[0]; LEGACY_MODELS.len() + crate::authored_hull::STOCK_MODELS.len()];
+    let mut i = 0;
+    while i < LEGACY_MODELS.len() {
+        models[i] = LEGACY_MODELS[i];
+        i += 1;
+    }
+    let mut j = 0;
+    while j < crate::authored_hull::STOCK_MODELS.len() {
+        models[i + j] = crate::authored_hull::STOCK_MODELS[j];
+        j += 1;
+    }
+    models
+};
 #[repr(C)]
 #[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct TextVertex {
@@ -421,12 +446,23 @@ impl Geometry {
             unavailable_models: 0,
         }
     }
+    #[cfg(test)]
     fn compose(
         &mut self,
         frame: &Frame,
         model: &Model,
         srgb: bool,
         planet_system: Option<meridian_core::navigation::SystemId>,
+    ) -> Result<(), String> {
+        self.compose_with_authored(frame, model, srgb, planet_system, &AuthoredHulls::default())
+    }
+    fn compose_with_authored(
+        &mut self,
+        frame: &Frame,
+        model: &Model,
+        srgb: bool,
+        planet_system: Option<meridian_core::navigation::SystemId>,
+        authored: &AuthoredHulls,
     ) -> Result<(), String> {
         self.shapes.clear();
         self.text.clear();
@@ -520,7 +556,7 @@ impl Geometry {
         if let Some(r) = frame.hovered {
             outline(&mut self.shapes, r, canvas, colour(Ink::Yellow, srgb), size);
         }
-        self.append_previews(frame, model, canvas, srgb, planet_system)?;
+        self.append_previews(frame, model, canvas, srgb, planet_system, authored)?;
         if self.shapes.len() > MAX_GEOMETRY || self.models.len() > MAX_MODEL_VERTICES {
             return Err("docked geometry exceeds fixed buffer capacity".into());
         }
@@ -533,9 +569,13 @@ impl Geometry {
         canvas: Rect,
         srgb: bool,
         planet_system: Option<meridian_core::navigation::SystemId>,
+        authored: &AuthoredHulls,
     ) -> Result<(), String> {
         for p in &frame.models {
-            if crate::mule_render::showroom::matches(p) {
+            if crate::mule_render::showroom::matches(p)
+                || authored.visual_for(p).is_some()
+                || crate::authored_hull::stock_matches(p)
+            {
                 continue;
             }
             if !model.matches(p) {
@@ -575,6 +615,7 @@ impl Geometry {
         Ok(())
     }
 }
+
 fn append_model(
     out: &mut Vec<Vertex>,
     preview: &ModelPreview,

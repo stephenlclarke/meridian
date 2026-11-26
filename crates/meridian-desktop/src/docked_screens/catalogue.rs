@@ -19,9 +19,9 @@ pub struct WorldRecord {
     pub climate: &'static str,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ObjectRecord {
-    pub id: &'static str,
-    pub name: &'static str,
+pub struct ObjectRecord<'a> {
+    pub id: &'a str,
+    pub name: &'a str,
     pub family: &'static str,
     pub kind: &'static str,
     pub role: &'static str,
@@ -39,8 +39,32 @@ pub struct Specification {
 #[derive(Debug)]
 pub struct Catalogue {
     pub worlds: Vec<WorldRecord>,
-    pub objects: Vec<ObjectRecord>,
+    pub objects: Vec<ObjectRecord<'static>>,
     pub specifications: Vec<Specification>,
+    authored: Vec<AuthoredRecord>,
+}
+
+/// Desktop-validated package display only; no exchange or flight authority.
+#[derive(Debug, Clone)]
+pub(crate) struct AuthoredRecord {
+    pub id: String,
+    pub name: String,
+    pub specifications: Vec<String>,
+}
+
+impl AuthoredRecord {
+    fn object(&self) -> ObjectRecord<'_> {
+        ObjectRecord {
+            id: &self.id,
+            name: &self.name,
+            family: "Authored package",
+            kind: "ship",
+            role: "Inspection only",
+            player_flyable: false,
+            purchase_policy: "Not admitted",
+            source_status: "Explicit local package; not an original fleet entry",
+        }
+    }
 }
 fn columns(line: &'static str, count: usize) -> Result<Vec<&'static str>, &'static str> {
     let row: Vec<_> = line.split('\t').collect();
@@ -69,6 +93,7 @@ impl Catalogue {
             worlds: Vec::with_capacity(2048),
             objects: Vec::with_capacity(171),
             specifications: Vec::new(),
+            authored: Vec::new(),
         };
         for (index, line) in worlds.lines().enumerate() {
             let c = columns(line, 16)?;
@@ -162,8 +187,45 @@ impl Catalogue {
         self.worlds
             .get(usize::from(id.galaxy) * 256 + usize::from(id.system))
     }
-    pub fn object(&self, id: &str) -> Option<&ObjectRecord> {
-        self.objects.iter().find(|o| o.id == id)
+    pub fn object(&self, id: &str) -> Option<ObjectRecord<'_>> {
+        if let Some(original) = self.objects.iter().copied().find(|o| o.id == id) {
+            return Some(original);
+        }
+        self.authored
+            .iter()
+            .find(|o| o.id == id)
+            .map(AuthoredRecord::object)
+    }
+    pub(crate) fn add_authored(&mut self, record: AuthoredRecord) -> Result<(), String> {
+        let id_key = record.id.trim().to_lowercase();
+        let name_key = record.name.trim().to_lowercase();
+        let collides = |id: &str, name: &str| {
+            let id = id.trim().to_lowercase();
+            let name = name.trim().to_lowercase();
+            id == id_key || id == name_key || name == id_key || name == name_key
+        };
+        if self.objects.iter().any(|o| collides(o.id, o.name))
+            || self.authored.iter().any(|o| collides(&o.id, &o.name))
+        {
+            return Err(format!(
+                "Authored hull identity conflict: {} ({})",
+                record.id, record.name
+            ));
+        }
+        self.authored.push(record);
+        Ok(())
+    }
+    pub(crate) fn authored_specifications(&self, id: &str) -> Option<&[String]> {
+        self.authored
+            .iter()
+            .find(|o| o.id == id)
+            .map(|o| o.specifications.as_slice())
+    }
+    pub(crate) fn object_count(&self) -> usize {
+        self.objects.len() + self.authored.len()
+    }
+    pub(crate) fn ship_count(&self) -> usize {
+        self.objects.iter().filter(|o| o.kind == "ship").count() + self.authored.len()
     }
     pub fn distance(&self, from: SystemId, to: SystemId) -> Option<f64> {
         if from.galaxy != to.galaxy {
@@ -183,19 +245,24 @@ impl Catalogue {
         rows.sort_by_key(|w| (!w.name.to_lowercase().starts_with(&q), w.name, w.id.system));
         rows
     }
-    pub fn search_ships(&self, query: &str) -> Vec<&ObjectRecord> {
+    pub fn search_ships(&self, query: &str) -> Vec<ObjectRecord<'_>> {
         let q = query.to_lowercase();
-        let mut rows: Vec<_> = self
-            .objects
-            .iter()
-            .filter(|o| {
-                o.kind == "ship"
-                    && format!("{} {} {} {}", o.id, o.name, o.family, o.role)
-                        .to_lowercase()
-                        .contains(&q)
-            })
-            .collect();
-        rows.sort_by_key(|o| (o.name, o.id));
+        let mut rows: Vec<ObjectRecord<'_>> = self.objects.to_vec();
+        rows.extend(self.authored.iter().map(AuthoredRecord::object));
+        rows.retain(|o| {
+            o.kind == "ship"
+                && format!("{} {} {} {}", o.id, o.name, o.family, o.role)
+                    .to_lowercase()
+                    .contains(&q)
+        });
+        rows.sort_by_key(|o| {
+            (
+                o.id.to_lowercase() != q,
+                o.name.to_lowercase() != q,
+                o.name,
+                o.id,
+            )
+        });
         rows
     }
 }

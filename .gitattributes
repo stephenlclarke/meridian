@@ -3,6 +3,11 @@ tools/rabbit_explorer_art_mesh.py text eol=lf
 tools/measure_rabbit_explorer.py text eol=lf
 tools/prepare_rabbit_explorer.py text eol=lf
 tools/verify_rabbit_explorer.py text eol=lf
+# Sparrowhawk replay helpers have published byte hashes.
+tools/measure_sparrowhawk_air.py text eol=lf
+tools/prepare_sparrowhawk_geometry.py text eol=lf
+tools/prepare_sparrowhawk_studio.py text eol=lf
+tools/verify_sparrowhawk_geometry.py text eol=lf
 
 # Asset and provenance hashes identify exact bytes on every platform.
 assets/legacy/** -text
@@ -177,3 +182,12 @@ integration/sh001-mule/*.patch -text
 integration/sh008-goshawk/*.json text eol=lf
 integration/scanner-preview/*.json text eol=lf
 integration/scanner-preview/historical/*.json text eol=lf
+
+# Bundled stock schema packages authenticate their exact exported bytes (including final LF).
+integration/**/*-STUDIO.json -text
+
+# Kite Interceptor replay helpers have published byte hashes.
+tools/measure_kite_interceptor_air.py text eol=lf
+tools/prepare_kite_interceptor_geometry.py text eol=lf
+tools/prepare_kite_interceptor_studio.py text eol=lf
+tools/verify_kite_interceptor_geometry.py text eol=lf

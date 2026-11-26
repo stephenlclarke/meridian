@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "showroom-studio-followup",
+  "undoBefore": [
+    "scanner-preview"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/showroom-studio-followup/PROTECTED-CORE-INVERSE.json",
+  "sha256": "9800c0c82da83d6179850e306feb329688d0d935137f221783b520b3e0a5db7d",
+  "base": "9d82467c8062c0ed31edf37e4e29e485dbdc2359",
+  "label": "showroom Studio integration"
+}
