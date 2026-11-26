@@ -74,9 +74,9 @@ impl Cockpit {
                     / f32::from(meridian_core::ENERGY_CAPACITY_HUNDREDTHS)
             }),
             heat: resources.map(|l| f32::from(l.heat_fifths) / (5.0 * 255.0)),
-            fuel: flight.navigation.map(|n| {
-                f32::from(n.fuel_units) / f32::from(meridian_core::navigation::FUEL_CAPACITY)
-            }),
+            fuel: flight
+                .navigation
+                .map(|n| f32::from(n.fuel_units) / f32::from(n.fuel_capacity_units)),
             missiles: world
                 .missile_rounds()
                 .map_or(0, |rounds| rounds.iter().flatten().count()),

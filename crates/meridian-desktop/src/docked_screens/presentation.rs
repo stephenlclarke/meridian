@@ -1010,7 +1010,7 @@ fn category(id: meridian_core::station_services::CommodityId) -> Ink {
 }
 fn market(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
     let body = f.viewport.body();
-    let cell = body.width / 3.0;
+    let cell = body.width / 4.0;
     for (i, (title, control)) in [
         ("Buy", Control::TradeMode(false)),
         ("Sell", Control::TradeMode(true)),
@@ -1022,18 +1022,23 @@ fn market(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
             },
             Control::Key(Key::Confirm),
         ),
+        ("Refuel (F)", Control::Key(Key::Refuel)),
     ]
     .into_iter()
     .enumerate()
     {
-        let enabled = !matches!(control, Control::Key(Key::Confirm)) || !c.paused;
+        let refusal = match control {
+            Control::Key(Key::Confirm) if c.paused => Some("Resume before trading"),
+            Control::Key(Key::Refuel) => super::market_refuel_admission(c.world).err(),
+            _ => None,
+        };
         button(
             f,
             title,
             Rect::new(body.x + i as f64 * cell, 77.0, cell - 4.0, 21.0),
             control,
-            enabled,
-            Some("Resume before trading"),
+            refusal.is_none(),
+            refusal,
         );
     }
     let offsets = [0.0, 0.38, 0.57, 0.73, 0.87];
@@ -1116,6 +1121,25 @@ fn market(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         });
     }
     let reserved = c.world.reserved_commodity_quantity(s.commodity);
+    let quote = super::market_refuel_quote(c.world).map_or_else(
+        || "Fuel status unavailable".into(),
+        |quote| {
+            format!(
+                "Fuel {:.1}/{:.1} LY | Refuel {} CR",
+                f64::from(quote.fuel) / 10.0,
+                f64::from(quote.capacity) / 10.0,
+                money(u64::from(quote.price))
+            )
+        },
+    );
+    label(
+        f,
+        quote,
+        body.x,
+        body.y + body.height - 40.0,
+        Ink::Yellow,
+        body,
+    );
     let text = reserved.map_or_else(
         || "Cargo custody unavailable".into(),
         |n| format!("Reserved: {n}; Mission cargo requires authorisation for sale."),

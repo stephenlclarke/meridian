@@ -183,7 +183,7 @@ impl NavigationState {
                 && (self.fuel_spent != 0 || self.system != SystemId::AVENOR)
             || self.completed_jumps > 0 && self.fuel_spent < self.completed_jumps
             || self.launches == 0 && mode != FlightMode::Docked
-            || u128::from(self.fuel_spent) > u128::from(self.completed_jumps) * u128::from(super::FUEL_CAPACITY)
+            || u128::from(self.fuel_spent) > u128::from(self.completed_jumps) * u128::from(super::MAX_FUEL_CAPACITY)
         {
             return Err(invalid);
         }

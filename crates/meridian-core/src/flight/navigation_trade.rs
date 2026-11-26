@@ -47,6 +47,7 @@ pub enum NavigationTradeError {
     Stock,
     Credits,
     Fuel,
+    TestFit,
     FitOrStockChanged,
     NotReady,
     ReceiptCapacity,
@@ -254,11 +255,13 @@ struct Terminal {
     dock: DockContext,
     outcome: NavigationTradeOutcome,
     fuel: FuelAnchor,
+    account_revision: Option<u64>,
 }
 #[derive(Debug, Clone, PartialEq)]
 struct Attempt {
     dock: DockContext,
     accepted_tick: u64,
+    accepted_account_revision: Option<u64>,
     plan: Option<Plan>,
     buy: Option<Trade>,
     journeys: Vec<Journey>,
@@ -277,6 +280,52 @@ impl State {
     }
     pub(super) fn occupancy(&self) -> (usize, usize) {
         (self.attempts.len(), usize::from(self.active().is_some()))
+    }
+    /// T04 consent/closure do not advance the account or simulation tick; only
+    /// a strictly interior retained tick proves a prior active interval.
+    pub(super) fn known_active_at(&self, tick: u64, revision: u64) -> bool {
+        self.attempts.iter().any(|attempt| {
+            if let Some(accepted) = attempt.accepted_account_revision {
+                accepted < revision
+                    && attempt.terminal.is_none_or(|terminal| {
+                        terminal
+                            .account_revision
+                            .map_or(terminal.tick > tick, |closed| closed >= revision)
+                    })
+            } else {
+                attempt.accepted_tick < tick
+                    && attempt.terminal.is_none_or(|terminal| terminal.tick > tick)
+            }
+        })
+    }
+    pub(super) fn known_acceptance_revisions(&self) -> impl Iterator<Item = u64> + '_ {
+        self.attempts
+            .iter()
+            .filter_map(|attempt| attempt.accepted_account_revision)
+    }
+    pub(super) fn post_test_acceptances_have_markers(
+        &self,
+        first_dock_sequence: u64,
+        first_tick: u64,
+    ) -> bool {
+        self.attempts.iter().all(|attempt| {
+            let demonstrably_later =
+                attempt.dock.sequence() > first_dock_sequence || attempt.accepted_tick > first_tick;
+            !demonstrably_later
+                || (attempt.accepted_account_revision.is_some()
+                    && attempt
+                        .terminal
+                        .is_none_or(|terminal| terminal.account_revision.is_some()))
+        })
+    }
+    #[cfg(test)]
+    pub(super) fn clear_last_custody_markers_for_test(&mut self) {
+        if let Some(attempt) = self.attempts.last_mut() {
+            attempt.accepted_account_revision = None;
+            if let Some(terminal) = attempt.terminal.as_mut() {
+                terminal.account_revision = None;
+            }
+        }
     }
     pub(super) fn reservations(&self) -> services::Reservations {
         let Some(a) = self.active() else {
