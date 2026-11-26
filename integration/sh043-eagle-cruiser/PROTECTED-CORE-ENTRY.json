@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh043-eagle-cruiser",
+  "undoBefore": [
+    "sh042-saker"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "eagle_cruiser",
+  "before": "pub mod docking;\n",
+  "after": "pub mod equipment;\n"
+}

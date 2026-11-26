@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh050-yak",
+  "undoBefore": [
+    "sh049-hyena"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "yak",
+  "before": "pub mod traffic;\n",
+  "after": "\npub use flight::GoshawkCustomApproachSnapshot;\n"
+}

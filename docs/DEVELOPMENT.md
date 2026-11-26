@@ -53,6 +53,10 @@ The same Linux job then opens a separate instrumented process with `--internal-m
 
 The coverage helpers read build and report files at fixed checkout paths and reject symlink redirection. Python coverage combines the two helpers' actual Linux runs with host tests for path validation, native coverage marker checks, and failure evidence.
 
+## Protected core source
+
+Register reviewed hull declarations and equipment inverses in [feature-owned protected core entries](PROTECTED-CORE-ENTRIES.md). Each feature declares its own undo dependencies.
+
 ## Repository maintenance
 
 Update README, implementation status and affected guides in the same change as behavior or acceptance. Keep a single current status page; identify historical contracts as historical. Replace stale pending/UNRUN wording when exact evidence exists, while preserving unresolved limits and failures. Keep PR descriptions aligned with their final scope and validation.

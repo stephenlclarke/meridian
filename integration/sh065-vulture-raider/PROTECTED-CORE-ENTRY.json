@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh065-vulture-raider",
+  "undoBefore": [
+    "sh064-arna-cutter"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "vulture_raider",
+  "before": "pub mod traffic;\n",
+  "after": "pub mod wombat;\n"
+}

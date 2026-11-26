@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh058-muskox",
+  "undoBefore": [
+    "sh057-falconet"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "muskox",
+  "before": "pub mod mule;\n",
+  "after": "pub mod navigation;\n"
+}

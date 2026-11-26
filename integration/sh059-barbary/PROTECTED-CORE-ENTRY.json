@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh059-barbary",
+  "undoBefore": [
+    "sh058-muskox"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "barbary",
+  "before": "pub mod banteng;\n",
+  "after": "pub mod caracal_scout;\n"
+}
