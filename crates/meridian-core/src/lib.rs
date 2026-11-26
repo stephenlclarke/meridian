@@ -70,6 +70,7 @@ pub mod springbok_starliner;
 pub mod station;
 pub mod station_services;
 pub mod tamaraw;
+pub mod tapir_mk_ii;
 pub mod tapir_shuttle;
 pub mod traffic;
 pub mod unwritten_route;

@@ -1,0 +1,222 @@
+{
+  "hull": "SH106 Tapir Mk II",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh106/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh106-tapir-mk-ii/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "7600000/252127",
+  "faces": {
+    "detailed": 2724,
+    "archivedNative": 908,
+    "candidateNative": 512,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-tapir-mk-ii",
+    "massKg": 199377
+  },
+  "supportGroups": 47,
+  "loop": {
+    "genus": 1,
+    "candidateFaces": 192,
+    "supportSpans": 24,
+    "dualMembershipVertices": 576
+  },
+  "minimumRouteClearanceMillimetres": 841,
+  "sourceContactCounts": {
+    "overlap": 7,
+    "unchangedNativeParts": 7
+  },
+  "candidateRebuild": "tools/rebuild_tapir_mk_ii.py",
+  "fitUpperMillimetres": {
+    "detailed": 4735,
+    "archivedNative": 4721,
+    "candidateNative": 4993
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 1236,
+      "upperCeiling": 1257
+    },
+    "candidateToArchive": {
+      "lowerFloor": 1141,
+      "upperCeiling": 1157
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 3773,
+      "upperCeiling": 3774
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 2372,
+      "upperCeiling": 2397
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh106-tapir-mk-ii/TAPIR-MK-II-STUDIO.json",
+    "bytes": 460577,
+    "sha256": "a052fa473731bcaccb36199e7e97b02e753d65bc5cea9f593528d636553f4e14",
+    "supports": 47,
+    "probes": 7,
+    "detail": "2,724 original detailed faces",
+    "native": "512 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 460577,
+        "sha256": "a052fa473731bcaccb36199e7e97b02e753d65bc5cea9f593528d636553f4e14"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 2724,
+      "nativeTriangles": 512,
+      "supportGroups": 47,
+      "engineeringReference": "finite-intrinsic-empty-tapir-mk-ii",
+      "massKg": 199377,
+      "receiptFiles": {
+        "tapir-mk-ii.hull.json": {
+          "bytes": 460576,
+          "sha256": "4dd2b6e612503c26574c2028570d0324b8fcfbda755b6221c4b7be047f7d10a1"
+        },
+        "tapir-mk-ii-repeat.hull.json": {
+          "bytes": 460576,
+          "sha256": "4dd2b6e612503c26574c2028570d0324b8fcfbda755b6221c4b7be047f7d10a1"
+        },
+        "studio.stdout.json": {
+          "bytes": 130509,
+          "sha256": "d331b19507c6992133e53be581ffa10c78756d9303c557c68a63e6a362aa9002"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 130509,
+          "sha256": "d331b19507c6992133e53be581ffa10c78756d9303c557c68a63e6a362aa9002"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "3b10a74250b3741b1aa16dfe1f046792f72e29319418e303bc2d7348768091f8"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "through-upper-loop",
+          "passed": true
+        },
+        {
+          "name": "through-port-loop",
+          "passed": true
+        },
+        {
+          "name": "through-starboard-loop",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_tapir_mk_ii.py --check",
+      "python3 -B tools/rebuild_tapir_mk_ii.py",
+      "python3 -B tools/verify_tapir_mk_ii.py | cmp - integration/sh106-tapir-mk-ii/CONTACT-RESULT.json",
+      "python3 -B tools/measure_tapir_mk_ii.py | cmp - integration/sh106-tapir-mk-ii/SURFACE-FIT.json",
+      "python3 -B tools/measure_tapir_mk_ii.py --fidelity | cmp - integration/sh106-tapir-mk-ii/CANDIDATE-FIDELITY.json",
+      "python3 -B tools/measure_tapir_mk_ii.py --directions | cmp - integration/sh106-tapir-mk-ii/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_tapir_mk_ii.py --reference-directions | cmp - integration/sh106-tapir-mk-ii/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T04:55:27Z",
+    "finishedUtc": "2026-11-25T04:55:55Z",
+    "log": {
+      "bytes": 872,
+      "sha256": "ed9ce45875f712106fb5d588efb98e801d9fb5cdf4eaf5707a56d669f9733998"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "4c8d5f6874b96f31768a28adaa548513f4fc28dc",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "integration/sh106-tapir-mk-ii/TAPIR-MK-II-STUDIO.json": "a052fa473731bcaccb36199e7e97b02e753d65bc5cea9f593528d636553f4e14",
+    "integration/sh106-tapir-mk-ii/FROZEN-SOURCES.json": "8bb6e15ddcfb962644b720fd670aecc33eaef1c5f4606f0e5db3887122fd3838",
+    "integration/sh106-tapir-mk-ii/CONTACT-CANDIDATE.json": "3a813e794e497e99935bb6e7c4537f431ddf9bb396d9f0a905a90c6dd305a497",
+    "integration/sh106-tapir-mk-ii/CONTACT-RESULT.json": "33bd6b1e98562696462fc9a45bed8130cbc43242fa2dabfdf067c20a88c9367e",
+    "integration/sh106-tapir-mk-ii/ORIGINAL-OWNERSHIP.json": "3720ad2f6ffc46ff1673f5649f0980101a33054dc87a8e3b271d5d0a1efc753a",
+    "integration/sh106-tapir-mk-ii/RETAINED-OVERLAPS.json": "875bd475664676e66f0cf09d0fa060ef5a56d6e7418698353e72205b785d2005",
+    "integration/sh106-tapir-mk-ii/CANDIDATE-FIDELITY.json": "7d87c1ae2669d24c16dd9325748d386682201b9663bfaff5d40eaea36bdb536b",
+    "integration/sh106-tapir-mk-ii/SUPPORT-FAN.json": "44a03052c43dc624fb608b5303b3b9c5c1dea4bac887cc83250086d0dad6f11d",
+    "integration/sh106-tapir-mk-ii/SURFACE-FIT.json": "ee9fb8898729d80d7c400c721f3f63c90f1754f2b43f225c3d001632990b7549",
+    "integration/sh106-tapir-mk-ii/ARCHIVED-OVERLAPS.json": "8e320a9cb8d9a40fa63de005a090b74c02d84e5f3529c80ed372fc22a3de7ed9",
+    "integration/sh106-tapir-mk-ii/CANDIDATE-TOPOLOGY-SURVEY.json": "60074eea93157ef651bfa2612e1d9d1e42e6a64c1b399e404442a9e4de7c3c31",
+    "integration/sh106-tapir-mk-ii/CANDIDATE-FIT-LOCALIZATION.json": "71c6154aeb1a10e668f8c87e620a551ce25eaff86d3e94bad3d3548ff93f0f72",
+    "integration/sh106-tapir-mk-ii/REFERENCE-FIT-LOCALIZATION.json": "5fdb824886a258fa5c4a172a730721256614270061c795275d3790e010437a1d",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_tapir_mk_ii.py": "713b26532c53b7daa2bd599dff1086690c60b826c1e0fa0a98605930f85ed1ac",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_tapir_mk_ii.py": "ccd157b3897510b9c2a198e777d30da85c278f6f275e3515978f308ea266af34",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/rebuild_tapir_mk_ii.py": "fe3d9b2bcb12cfb4ae2393ae8cf14eff963330cb47ec0e916fe1da02023437f7",
+    "tools/verify_tapir_mk_ii.py": "9758b10ff65635ab27d2fa8f5e628c3c12dd477bd15b1df50236ab98adb7c41f",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh106/GENERATED-COLLISION.json": "ecda9146a29c24d40b4211715c02a023bb6cf83bfdcd428dc50718330ef5c757",
+    "assets/fleet/sh106/SOURCE-GEOMETRY.json": "53bb376c83b50fc9c8a5dbd6af768067de7bc7f426df63e772a7d7903cd1a75a",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

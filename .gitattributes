@@ -360,3 +360,9 @@ tools/measure_tapir_shuttle.py text eol=lf
 tools/prepare_tapir_shuttle.py text eol=lf
 tools/rebuild_tapir_shuttle.py text eol=lf
 tools/verify_tapir_shuttle.py text eol=lf
+
+# Byte-pinned Tapir Mk II replay programs.
+tools/measure_tapir_mk_ii.py text eol=lf
+tools/prepare_tapir_mk_ii.py text eol=lf
+tools/rebuild_tapir_mk_ii.py text eol=lf
+tools/verify_tapir_mk_ii.py text eol=lf
