@@ -41,6 +41,10 @@ pub const BINDINGS: &[ui::BindingHint<'static>] = &[
         label: "Shift+G",
     },
     ui::BindingHint {
+        key: ui::Key::Refuel,
+        label: "F",
+    },
+    ui::BindingHint {
         key: ui::Key::Fit,
         label: "Y",
     },
@@ -343,6 +347,15 @@ impl Docked {
                 }) {
                     return Err("The active route does not need fuel".into());
                 }
+                self.feedback = profile.command(Action::StationService(
+                    station_services::Command::RefillFuel,
+                ))?;
+            }
+            ui::Request::RefuelMarket => {
+                if self.screen() != ui::Screen::Trading {
+                    return Err("Open Market to refuel".into());
+                }
+                ui::market_refuel_admission(world)?;
                 self.feedback = profile.command(Action::StationService(
                     station_services::Command::RefillFuel,
                 ))?;
@@ -1269,6 +1282,7 @@ pub fn key(code: winit::keyboard::KeyCode, shift: bool, screen: ui::Screen) -> O
         C::Delete => K::ClearSearch,
         C::KeyG if shift => K::Sell,
         C::KeyG => K::Buy,
+        C::KeyF if screen == ui::Screen::Trading && !shift => K::Refuel,
         C::KeyY => K::Fit,
         C::KeyU => K::Store,
         C::KeyO => K::Options,
@@ -1329,6 +1343,137 @@ mod tests {
         assert!(label.at[1] + 9.0 <= label.clip.y + label.clip.height);
         assert!(label.text.chars().count() <= (label.clip.width / 7.5).floor() as usize);
         menu.presented(frame);
+    }
+    fn fit_paid_tank(profile: &mut Profile) {
+        ok(profile.xyzzy(meridian_core::XyzzyAction::Enter));
+        let scoop = profile
+            .world
+            .modular_equipment_snapshot()
+            .and_then(|snapshot| {
+                snapshot
+                    .items
+                    .into_iter()
+                    .find(|item| item.kind == ModuleKind::FuelScoops && item.slot.is_some())
+            })
+            .unwrap_or_else(|| panic!("fitted scoop"));
+        ok(profile.command(Action::Module(ModuleAction::Store { item: scoop.id })));
+        ok(profile.command(Action::Module(ModuleAction::Purchase {
+            kind: ModuleKind::FuelStorage,
+        })));
+    }
+    #[test]
+    fn market_refuel_key_pays_for_actual_tank_and_preserves_identity() {
+        use winit::keyboard::KeyCode;
+        let (directory, mut profile, mut menu) = start();
+        fit_paid_tank(&mut profile);
+        let before_modules = profile.world.modular_equipment_snapshot();
+        let before_cash = profile.world.credits_tenths().unwrap_or_default();
+        let viewport = ui::Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));
+        let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
+        assert!(frame.labels.iter().any(|label| label.text == "Refuel (F)"));
+        assert!(
+            frame
+                .labels
+                .iter()
+                .any(|label| label.text == "Fuel 13.0/20.0 LY | Refuel 14.0 CR")
+        );
+        assert!(
+            frame
+                .hits
+                .iter()
+                .any(|hit| hit.control == ui::Control::Key(ui::Key::Refuel) && hit.enabled)
+        );
+        menu.presented(frame);
+        assert_eq!(key(KeyCode::KeyF, false, ui::Screen::Equipment), None);
+        assert_eq!(key(KeyCode::KeyF, true, ui::Screen::Trading), None);
+        let refuel = key(KeyCode::KeyF, false, ui::Screen::Trading)
+            .unwrap_or_else(|| panic!("Market F binding"));
+
+        let tick = profile.world.snapshot().tick;
+        ok(profile.world.request_pause(true, tick));
+        present(&mut menu, &profile);
+        let paused = ok(profile.world.save_bytes());
+        ok(menu.input(&mut profile, ui::Input::Key(refuel)));
+        assert_visible_feedback(&mut menu, &profile, "Resume before refuelling");
+        assert_eq!(ok(profile.world.save_bytes()), paused);
+        ok(profile.world.request_pause(false, tick));
+        present(&mut menu, &profile);
+        let before = ok(profile.world.save_bytes());
+
+        // A different pending review cannot be bypassed by the fuel shortcut.
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Buy)));
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(refuel)));
+        assert_eq!(ok(profile.world.save_bytes()), before);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Back)));
+        present(&mut menu, &profile);
+
+        // Refuelling uses Profile's durable transaction, not a direct world mutation.
+        let path = directory.0.join("commander.meridian");
+        let backup = directory.0.join("previous-save");
+        let disk_before = ok(std::fs::read(&path));
+        ok(std::fs::rename(&path, &backup));
+        ok(std::fs::create_dir(&path));
+        assert!(menu.input(&mut profile, ui::Input::Key(refuel)).is_err());
+        assert_eq!(ok(profile.world.save_bytes()), before);
+        assert_eq!(ok(std::fs::read(&backup)), disk_before);
+        ok(std::fs::remove_dir(&path));
+        ok(std::fs::rename(&backup, &path));
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(refuel)));
+        assert_eq!(profile.world.credits_tenths(), Some(before_cash - 140));
+        let nav = profile
+            .world
+            .snapshot()
+            .navigation
+            .unwrap_or_else(|| panic!("navigation"));
+        assert_eq!((nav.fuel_units, nav.fuel_capacity_units), (200, 200));
+        assert_eq!(profile.world.modular_equipment_snapshot(), before_modules);
+        let recovered = ok(World::from_save_bytes(&ok(std::fs::read(&path))));
+        assert_eq!(ok(recovered.save_bytes()), ok(profile.world.save_bytes()));
+
+        let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
+        let hit = frame
+            .hits
+            .iter()
+            .find(|hit| hit.control == ui::Control::Key(refuel))
+            .unwrap_or_else(|| panic!("refuel control"));
+        assert!(!hit.enabled);
+        let point = [hit.bounds.x + 5.0, hit.bounds.y + 5.0];
+        menu.presented(frame);
+        let full = ok(profile.world.save_bytes());
+        ok(menu.input(&mut profile, ui::Input::Click(point)));
+        assert_visible_feedback(&mut menu, &profile, "Fuel tank is already full");
+        ok(menu.input(&mut profile, ui::Input::Key(refuel)));
+        assert_eq!(ok(profile.world.save_bytes()), full);
+        assert_eq!(ok(std::fs::read(&path)), full);
+    }
+    #[test]
+    fn market_pointer_refuel_uses_the_same_paid_command() {
+        let (_directory, mut profile, mut menu) = start();
+        fit_paid_tank(&mut profile);
+        let before_modules = profile.world.modular_equipment_snapshot();
+        let cash = profile.world.credits_tenths().unwrap_or_default();
+        let viewport = ui::Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));
+        let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
+        let hit = frame
+            .hits
+            .iter()
+            .find(|hit| hit.control == ui::Control::Key(ui::Key::Refuel) && hit.enabled)
+            .unwrap_or_else(|| panic!("enabled refuel control"));
+        let point = [hit.bounds.x + 5.0, hit.bounds.y + 5.0];
+        menu.presented(frame);
+        ok(menu.input(&mut profile, ui::Input::Click(point)));
+        assert_eq!(profile.world.credits_tenths(), Some(cash - 140));
+        assert_eq!(
+            profile
+                .world
+                .snapshot()
+                .navigation
+                .map(|nav| nav.fuel_units),
+            Some(200)
+        );
+        assert_eq!(profile.world.modular_equipment_snapshot(), before_modules);
     }
     #[test]
     fn trading_writer_failure_is_visible_and_preserves_live_and_disk_state() {
