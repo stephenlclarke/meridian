@@ -524,3 +524,9 @@ tools/measure_lynx_escort.py text eol=lf
 tools/prepare_lynx_escort.py text eol=lf
 tools/rebuild_lynx_escort.py text eol=lf
 tools/verify_lynx_escort.py text eol=lf
+
+# Byte-pinned Osprey Scout replay programs.
+tools/measure_osprey_scout.py text eol=lf
+tools/prepare_osprey_scout.py text eol=lf
+tools/rebuild_osprey_scout.py text eol=lf
+tools/verify_osprey_scout.py text eol=lf
