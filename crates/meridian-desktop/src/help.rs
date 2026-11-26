@@ -105,7 +105,7 @@ impl Panel {
                 "J Jump | Shift+J Clue Journal | P Pause / resume",
                 "F6 Flight lesson | F12 Cancel | C Lesson details",
                 "Tab Cycle targets; select a ship to auto-align | Delete Release tracking",
-                "F Filter Ships / Mining / Salvage / All | I Mission | Shift+I Target details",
+                "F Filter Ships/Mining/Salvage/All | I Mission details | Shift+I Target details",
                 "Hold U 10 seconds: EMP | Release U cancels unfinished charge",
                 "F7 Close attempt | F8 Reception | F10 Practice review at Avenor berth",
                 "4 Trade review | 5 Plan | 6 Cancel | 7 Details",
