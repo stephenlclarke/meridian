@@ -21,6 +21,7 @@ FLEET = "Meridian Fleet Preview.app"
 MEDUSA = "Meridian Medusa Preview.app"
 STUDIO = "Meridian Hull Studio.app"
 SHOWROOM = f"{STUDIO}/Contents/Helpers/Meridian Hull Showroom.app"
+MAC_VALIDATOR = f"{STUDIO}/Contents/Frameworks/meridian-hull-tool"
 CODESIGN = "/usr/bin/codesign"
 STAPLER = "/usr/bin/xcrun"
 GATEKEEPER = "/usr/sbin/spctl"
@@ -223,7 +224,8 @@ def verify_inventory(archive, platform, approval):
             if key in folded:
                 raise ValueError(f"Duplicate or case-colliding Preview 12 ZIP path: {name}")
             folded.add(key)
-            for parent in PurePosixPath(name.removesuffix("/")).parents:
+            leaf = PurePosixPath(name.removesuffix("/"))
+            for parent in (leaf, *leaf.parents):
                 if parent.as_posix() == ".":
                     continue
                 parent_key = unicodedata.normalize("NFC", parent.as_posix()).casefold()
@@ -312,6 +314,7 @@ def _verify_mac_layout(members, compiled):
             _required_file(files, f"{path}/{suffix}")
     for app in (FLEET, MEDUSA):
         _required_file(files, f"{app}/Contents/MacOS/Meridian")
+    _required_file(files, MAC_VALIDATOR)
     for name in ("Read Me.txt", "BUILD-IDENTITY.json", "STUDIO-RUNTIME-MANIFEST.json", "SOURCE-NOTICE-INVENTORY.json"):
         _required_file(files, name)
 
@@ -356,13 +359,27 @@ def _checked_output(executable, *args):
     return result.stdout + result.stderr
 
 
+def _verify_macho_header(header, name, filetypes):
+    # A thin 64-bit Mach-O with CPU_TYPE_ARM64 and the expected native type. A matching
+    # textual target, universal binary or signed x86_64 executable is not enough.
+    if len(header) != 32 or struct.unpack_from("<II", header) != (0xFEEDFACF, 0x0100000C) or struct.unpack_from("<I", header, 12)[0] not in filetypes:
+        raise ValueError(f"Preview 12 Mac native member is not thin arm64 Mach-O: {name}")
+
+
+def _verify_macho_arm64(path):
+    with path.open("rb") as stream:
+        _verify_macho_header(stream.read(32), path.name, {2})
+
+
 def _verify_mac_bundle(app, identifier, executable, top_level):
     with (app / "Contents/Info.plist").open("rb") as stream:
         info = plistlib.load(stream)
     if (info.get("CFBundleIdentifier"), info.get("CFBundlePackageType"), info.get("CFBundleExecutable")) != (identifier, "APPL", executable):
         raise ValueError(f"Preview 12 Mac bundle plist identity differs: {app.name}")
-    if not (app / "Contents/MacOS" / executable).is_file():
+    native = app / "Contents/MacOS" / executable
+    if not native.is_file():
         raise ValueError(f"Preview 12 Mac bundle executable missing: {app.name}")
+    _verify_macho_arm64(native)
     _checked_output(CODESIGN, "--verify", "--deep", "--strict", str(app))
     signature = _checked_output(CODESIGN, "-dvv", str(app))
     lines = signature.splitlines()
@@ -403,15 +420,17 @@ def _verify_mac_identity(scratch, commit, tree, compiled):
         if name in (FLEET, MEDUSA):
             if (info.get("MeridianSourceRevision"), info.get("MeridianSourceTree"), info.get("MeridianCompiledRevision")) != (commit, tree, compiled) or info.get("MeridianSaveNamespace") != _namespace(name, compiled):
                 raise ValueError(f"Preview 12 Mac game source/save binding differs: {name}")
+            _verify_macho_arm64(wrapper / name / "Contents/MacOS/Meridian")
+    _verify_macho_arm64(wrapper / MAC_VALIDATOR)
 
 
-def verify_macos(archive, approval, commit, tree, run):
+def verify_macos(archive, approval, commit, tree, run, source_notices=None):
     members, links = verify_inventory(archive, "macos", approval)
     compiled = approval["compiledSource"]
     _verify_mac_layout(members, compiled)
     with zipfile.ZipFile(archive) as bundle:
         _verify_studio_runtime(bundle, members, "macos", commit, tree, compiled)
-        _verify_source_notices(bundle, members, "macos", commit, tree)
+        _verify_source_notices(bundle, members, "macos", commit, tree, source_notices)
     with tempfile.TemporaryDirectory(prefix="meridian-preview12-signature-") as folder:
         run("/usr/bin/ditto", "-x", "-k", str(archive), folder)
         scratch = Path(folder)
@@ -423,7 +442,56 @@ def _read_member(bundle, name):
     return bundle.read(f"{ROOT}/{name}")
 
 
-def _verify_source_notices(bundle, members, platform, commit, tree):
+def _git_bytes(*args):
+    return subprocess.check_output(["git", *args])
+
+
+def _notice_location(path):
+    item = PurePosixPath(path)
+    parts = item.parts
+    if parts[:2] == ("assets", "fleet") and len(parts) == 4 and (item.name == "LICENSE" or item.name.endswith((".json", ".toml", ".json.gz", ".toml.gz"))):
+        return f"Fleet provenance/{parts[2].upper()}/{item.name}"
+    if parts[:2] == ("assets", "legacy") and len(parts) == 3:
+        if item.name == "Elite-L337-MIT.txt":
+            return item.name
+        if item.suffix == ".json":
+            return f"Asset provenance/{item.name}"
+    if path == "LICENSE":
+        return "LICENSE"
+    if path == "docs/LEGACY-REUSE.md":
+        return "LEGACY-REUSE.md"
+    if path in {"integration/unwritten-route/LICENSE", "integration/unwritten-route/SOURCE.json"}:
+        return f"Original Unwritten Route provenance/{item.name}"
+    if path == "crates/meridian-desktop/src/audio/source-provenance.json":
+        return "Original audio provenance/SOURCE-PROVENANCE.json"
+    if path == "crates/meridian-desktop/src/audio/fixtures/manifest.json":
+        return "Original audio provenance/REFERENCE-WAVEFORMS.json"
+    return None
+
+
+def _expected_source_notices(commit):
+    """Derive every current notice/provenance path and byte pin from protected Git blobs."""
+    _hex(commit, 40)
+    result = {}
+    for entry in filter(None, _git_bytes("ls-tree", "-r", "-z", commit).split(b"\0")):
+        header, raw_path = entry.split(b"\t", 1)
+        mode, kind, blob = header.decode().split()
+        path = raw_path.decode()
+        destination = _notice_location(path)
+        if destination is None:
+            continue
+        if kind != "blob" or mode != "100644" or destination in result:
+            raise ValueError(f"Invalid or duplicated source notice location: {path}")
+        data = _git_bytes("cat-file", "blob", _hex(blob, 40))
+        result[destination] = {"sourcePath": path, "commit": commit, "blob": blob,
+                               "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest(), "mode": 0o644}
+    hulls = {name.split("/")[1] for name in result if name.startswith("Fleet provenance/")}
+    if not result or any(f"Fleet provenance/{hull}/LICENSE" not in result for hull in hulls):
+        raise ValueError("Incomplete current source notice inventory in protected Git tree")
+    return result
+
+
+def _verify_source_notices(bundle, members, platform, commit, tree, source_notices=None):
     files = _files(members)
     name = "SOURCE-NOTICE-INVENTORY.json"
     _required_file(files, name)
@@ -431,14 +499,16 @@ def _verify_source_notices(bundle, members, platform, commit, tree):
     if inventory.get("status") != "EXACT_SOURCE_INVENTORY" or inventory.get("sourceTrees") != {commit: tree}:
         raise ValueError(f"Preview 12 {platform} source notice inventory differs from release source")
     notices = inventory.get("files", {})
-    if not notices or inventory.get("noticeCount") != len(notices):
-        raise ValueError(f"Preview 12 {platform} missing exact notice records")
+    expected = _expected_source_notices(commit) if source_notices is None else source_notices
+    hulls = sorted({name.split("/")[1] for name in expected if name.startswith("Fleet provenance/")})
+    if notices != expected or inventory.get("noticeCount") != len(expected) or inventory.get("fleetHulls") != hulls or inventory.get("fleetHullCount") != len(hulls):
+        raise ValueError(f"Preview 12 {platform} incomplete or changed current Git source notice inventory")
     prefixes = [f"{app}/Contents/Resources/Notices/" for app in (FLEET, MEDUSA, SHOWROOM)] if platform == "macos" else ["notices/"]
     for relative, pin in notices.items():
         _member_name(relative)
         for prefix in prefixes:
             row = _required_file(files, prefix + relative)
-            if (row["size"], row["sha256"]) != (pin.get("bytes"), pin.get("sha256")):
+            if (row["size"], row["sha256"], stat.S_IMODE(row["mode"])) != (pin.get("bytes"), pin.get("sha256"), pin.get("mode")):
                 raise ValueError(f"Preview 12 {platform} source notice differs: {prefix}{relative}")
 
 
@@ -479,6 +549,14 @@ def _verify_studio_runtime(bundle, members, platform, commit, tree, compiled):
             raise ValueError(f"Preview 12 {platform} Studio runtime differs from approved archive: {path}")
         if stat.S_IMODE(_runtime_mode(item.get("mode"))) != stat.S_IMODE(row["mode"]):
             raise ValueError(f"Preview 12 {platform} Studio runtime mode differs: {path}")
+        if kind == "symlink" and item.get("target") != bundle.read(raw_name).decode("utf-8"):
+            raise ValueError(f"Preview 12 {platform} Studio runtime symlink target differs: {path}")
+        if platform == "macos" and kind == "file":
+            with bundle.open(raw_name) as stream:
+                header = stream.read(32)
+            macho_magic = {b"\xcf\xfa\xed\xfe", b"\xfe\xed\xfa\xcf", b"\xce\xfa\xed\xfe", b"\xfe\xed\xfa\xce", b"\xca\xfe\xba\xbe", b"\xbe\xba\xfe\xca", b"\xca\xfe\xba\xbf", b"\xbf\xba\xfe\xca"}
+            if header[:4] in macho_magic or path.endswith((".dylib", ".so")) or (".framework/" in path and PurePosixPath(path).name == "Python"):
+                _verify_macho_header(header, path, {2, 6, 8})
     if platform == "windows":
         actual = {path for path in files if path.casefold().endswith((".dll", ".pyd"))}
         declared = {path for path in runtime if path.casefold().endswith((".dll", ".pyd"))}
@@ -548,13 +626,13 @@ def _verify_windows_identity(bundle, members, commit, tree, compiled, run):
         raise ValueError("Preview 12 Windows Studio launcher differs from standalone command")
 
 
-def verify_windows(archive, approval, commit, tree, run):
+def verify_windows(archive, approval, commit, tree, run, source_notices=None):
     members, _ = verify_inventory(archive, "windows", approval)
     compiled = approval["compiledSource"]
     with zipfile.ZipFile(archive) as bundle:
         _verify_windows_identity(bundle, members, commit, tree, compiled, run)
         _verify_studio_runtime(bundle, members, "windows", commit, tree, compiled)
-        _verify_source_notices(bundle, members, "windows", commit, tree)
+        _verify_source_notices(bundle, members, "windows", commit, tree, source_notices)
 
 
 def verify(macos, windows, commit, run):
@@ -563,8 +641,9 @@ def verify(macos, windows, commit, run):
         raise ValueError("Preview 12 approved archives must share their fixed staging directory")
     path = macos.parent / APPROVAL
     approval, approval_sha = load_approval(path, commit, run)
-    verify_macos(macos, approval["platforms"]["macos"], commit, approval["tree"], run)
-    verify_windows(windows, approval["platforms"]["windows"], commit, approval["tree"], run)
+    source_notices = _expected_source_notices(commit)
+    verify_macos(macos, approval["platforms"]["macos"], commit, approval["tree"], run, source_notices)
+    verify_windows(windows, approval["platforms"]["windows"], commit, approval["tree"], run, source_notices)
     return approval_sha, {
         macos.name: approval["platforms"]["macos"]["archiveSha256"],
         windows.name: approval["platforms"]["windows"]["archiveSha256"],
