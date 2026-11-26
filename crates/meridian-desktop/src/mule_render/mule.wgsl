@@ -31,13 +31,20 @@ fn output_color(c:vec3<f32>)->vec3<f32> {
 struct Solid {
     @builtin(position) position:vec4<f32>, @location(0) color:vec4<f32>, @location(1) uv:vec2<f32>,
     @location(2) @interpolate(flat) layer:u32, @location(3) @interpolate(flat) emissive:u32,
+    @location(4) normal:vec3<f32>,
 }
 @vertex fn solid_vertex(@location(0) p:vec3<f32>, @location(1) normal:vec3<f32>, @location(2) color:vec4<f32>, @location(3) uv:vec2<f32>, @location(4) layer:u32, @location(5) emissive:u32)->Solid {
-    var out:Solid;out.position=project(to_view(p));out.color=color;out.uv=uv;out.layer=layer;out.emissive=emissive;return out;
+    var out:Solid;out.position=project(to_view(p));out.color=color;out.uv=uv;out.layer=layer;out.emissive=emissive;
+    out.normal=input.x.xyz*normal.x+input.y.xyz*normal.y+input.z.xyz*normal.z;return out;
 }
 @fragment fn solid_fragment(v:Solid)->@location(0) vec4<f32> {
+    let texel=textureSample(diffuse,repeat_sampler,v.uv,i32(min(v.layer,2u)));
+    if v.layer==0xffffffffu {
+        let light=normalize(vec3<f32>(-0.3,0.5,-1.0));
+        let shade=select(0.48+0.52*max(0.0,dot(normalize(v.normal),light)),1.0,v.emissive==1u);
+        return vec4<f32>(output_color(linear(v.color.rgb)*shade),v.color.a);
+    }
     // Diffuse source maps already contain restrained baked relief. Do not double-light them.
-    let texel=textureSample(diffuse,repeat_sampler,v.uv,i32(v.layer));
     return vec4<f32>(output_color(texel.rgb*linear(v.color.rgb)),1.0);
 }
 struct Screen { @builtin(position) position:vec4<f32>, @location(0) ray:vec3<f32> }

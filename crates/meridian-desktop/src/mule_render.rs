@@ -117,7 +117,7 @@ fn decode_visual(
             .chain(&v.color)
             .chain(&v.uv)
             .any(|x| !x.is_finite())
-            || v.texture >= 3
+            || (v.texture >= 3 && v.texture != u32::MAX)
             || v.emissive > 1
     }) {
         return Err("Invalid detailed visual attributes");
