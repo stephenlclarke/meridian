@@ -303,6 +303,14 @@ impl State {
             }
             events.push((clock, 0, sequence as u64 + 1, Effect::Recharge(rate)));
         }
+        for (sequence, (clock, grade)) in
+            world.modular.shield_changes(world)?.into_iter().enumerate()
+        {
+            if clock > end {
+                return Err(INVALID);
+            }
+            events.push((clock, 0, sequence as u64 + 1, Effect::ShieldFit(grade)));
+        }
         for (sequence, (clock, contact)) in world.emp.resource_effects().into_iter().enumerate() {
             if clock > end {
                 return Err(INVALID);
