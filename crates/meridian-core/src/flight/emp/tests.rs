@@ -665,6 +665,7 @@ fn actual_secret_base_release_spends_once_drains_shield_and_preserves_hull_cargo
         solar: w.solar.clone(),
         occupied_salvage: w.occupied_salvage.clone(),
         station_data: decoded.station_data,
+        medusa_preview_fit: decoded.medusa_preview_fit,
         navigation_catalogue: decoded.navigation_catalogue,
         navigation: w.navigation,
         navigation_route: decoded.navigation_route,

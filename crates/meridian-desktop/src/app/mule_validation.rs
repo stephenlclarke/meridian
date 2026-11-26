@@ -53,11 +53,21 @@ pub(super) enum View {
 #[derive(Debug, PartialEq, Eq)]
 pub(super) enum Launch {
     Profile(PathBuf),
+    MedusaPreview(PathBuf),
     Mule(View),
 }
 impl Launch {
     pub(super) fn parse(args: impl Iterator<Item = OsString>) -> io::Result<Self> {
         let args: Vec<_> = args.collect();
+        if args.first().is_some_and(|a| a == "--medusa-preview-dir") {
+            if args.len() != 2 || args[1].is_empty() || args[1].to_string_lossy().starts_with('-') {
+                return Err(io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    "Expected --medusa-preview-dir DIRECTORY; no ordinary profile arguments",
+                ));
+            }
+            return Ok(Self::MedusaPreview(PathBuf::from(&args[1])));
+        }
         if args
             .first()
             .is_some_and(|a| a == "--internal-mule-validation")
@@ -96,6 +106,7 @@ impl Launch {
     pub(super) fn open(self) -> Result<Profile, Box<dyn std::error::Error>> {
         match self {
             Self::Profile(directory) => Profile::open(directory),
+            Self::MedusaPreview(directory) => Profile::open_medusa_preview(directory),
             Self::Mule(view) => {
                 const SEED: u64 = 0x4d55_4c45;
                 let world = match view {
