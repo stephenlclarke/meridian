@@ -309,4 +309,71 @@ mod tests {
         assert!(World::from_medusa_preview_save(&broken).is_err());
         Ok(())
     }
+
+    #[test]
+    fn medusa_preview_actual_stock_rates_and_physical_return_survive_continue()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let mut world = World::new_medusa_preview()?;
+        world.request_launch(world.snapshot().tick)?;
+        let launch_speed = world.snapshot().speed;
+        world.step(FlightInput {
+            throttle: 1.0,
+            ..FlightInput::default()
+        })?;
+        assert!(
+            (world.snapshot().speed - (launch_speed + 18.0 * super::super::FIXED_DELTA_SECONDS))
+                .abs()
+                < 1e-6
+        );
+        // Move farther down the clear exit line before turning the real long hull.
+        for _ in 0..60 {
+            world.step(FlightInput::default())?;
+            assert_eq!(world.snapshot().motion_refusal, None);
+        }
+        for _ in 0..80 {
+            world.step(FlightInput {
+                brake: true,
+                ..FlightInput::default()
+            })?;
+            assert_eq!(world.snapshot().motion_refusal, None);
+        }
+        assert_eq!(world.snapshot().speed, 0.0);
+        for _ in 0..220 {
+            let orientation = world.snapshot().orientation;
+            let remaining = core::f64::consts::PI
+                - 2.0 * f64::from(orientation[1]).atan2(f64::from(orientation[3]));
+            if remaining <= 1e-6 {
+                break;
+            }
+            let yaw = (remaining / (1.12 * f64::from(super::super::FIXED_DELTA_SECONDS)))
+                .clamp(0.0, 1.0) as f32;
+            world.step(FlightInput {
+                yaw,
+                ..FlightInput::default()
+            })?;
+            assert_eq!(world.snapshot().motion_refusal, None);
+        }
+        let mut world = World::from_medusa_preview_save(&world.medusa_preview_save_bytes()?)?;
+        for _ in 0..4000 {
+            let throttle = if world.snapshot().speed < 4.0 {
+                1.0
+            } else {
+                0.0
+            };
+            world.step(FlightInput {
+                throttle,
+                ..FlightInput::default()
+            })?;
+            assert_eq!(world.snapshot().motion_refusal, None);
+            if world.snapshot().mode == FlightMode::Docked {
+                assert_eq!(world.snapshot().position, [0.0; 3]);
+                let continued =
+                    World::from_medusa_preview_save(&world.medusa_preview_save_bytes()?)?;
+                assert_eq!(continued.snapshot(), world.snapshot());
+                assert_eq!(continued.commander_id(), None);
+                return Ok(());
+            }
+        }
+        Err("Medusa preview did not return through SH028".into())
+    }
 }
