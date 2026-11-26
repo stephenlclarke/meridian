@@ -13,7 +13,8 @@ pub(crate) use persistence::SavedServiceSummary;
 
 const SEEDS: &[u8] = include_bytes!("../../../assets/legacy/g01-food.markets");
 
-pub(crate) const FUEL_PRICE_TENTHS: u32 = 2;
+/// Station fuel price in tenths of a credit for each tenth of a light-year.
+pub const FUEL_PRICE_TENTHS: u32 = 2;
 // Swift's supported 64-bit Int.max/17 quantity bound, not the immutable initial stock.
 pub(crate) const MAX_MARKET_QUANTITY: u64 = i64::MAX as u64 / 17;
 

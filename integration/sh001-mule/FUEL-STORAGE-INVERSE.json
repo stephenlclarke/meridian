@@ -936,35 +936,35 @@
     },
     "station_services.rs": {
       "beforeSHA256": "06bd7a7db6a9585ddeebe57ab812bb5f0778ee321082daa4e378a255fba8f399",
-      "afterSHA256": "2c2343f56f5be4165ef97aff47365ff99029a4c1f451c754849b5fc1a2d8dcb3",
+      "afterSHA256": "2b4df3af565b0c88825103b4b0122f43783a63a1720fdf5def20e17a489216fb",
       "hunks": [
         {
           "offset": 587,
-          "before": "const STOCK_FUEL_TENTHS: u16 = 130;\n",
-          "after": ""
+          "before": "const STOCK_FUEL_TENTHS: u16 = 130;\npub(crate) const FUEL_PRICE_TENTHS: u32 = 2;\n",
+          "after": "/// Station fuel price in tenths of a credit for each tenth of a light-year.\npub const FUEL_PRICE_TENTHS: u32 = 2;\n"
         },
         {
-          "offset": 2392,
+          "offset": 2462,
           "before": "",
           "after": "    pub(crate) fuel_capacity_tenths: u16,\n"
         },
         {
-          "offset": 11144,
+          "offset": 11214,
           "before": "                let missing = STOCK_FUEL_TENTHS - account.fuel_tenths;\n",
           "after": "                let missing = account.fuel_capacity_tenths - account.fuel_tenths;\n"
         },
         {
-          "offset": 11479,
+          "offset": 11549,
           "before": "                next_account.fuel_tenths = STOCK_FUEL_TENTHS;\n",
           "after": "                next_account.fuel_tenths = account.fuel_capacity_tenths;\n"
         },
         {
-          "offset": 16255,
+          "offset": 16325,
           "before": "        || account.fuel_tenths > STOCK_FUEL_TENTHS\n",
           "after": "        || account.fuel_tenths > account.fuel_capacity_tenths\n        || !(0..=crate::navigation::MAX_FUEL_STORAGE_UNITS)\n            .any(|count| crate::navigation::fuel_capacity(count) == account.fuel_capacity_tenths)\n"
         },
         {
-          "offset": 18785,
+          "offset": 18855,
           "before": "",
           "after": "            fuel_capacity_tenths: crate::navigation::FUEL_CAPACITY,\n"
         }
