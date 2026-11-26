@@ -4,6 +4,8 @@ In the development build, closing a profile releases its save lock immediately s
 
 Preview 10 opens on Commander Details. Press H or ? for the current screen’s controls and station navigation. Its docked exterior and flight HUD leave the view above the instruments clear at rest. [Download Preview 10 for macOS arm64 or Windows x64](https://github.com/stephenlclarke/meridian/releases/tag/v0.10.0-preview.1) · [Preview guide](docs/PREVIEW-RELEASES.md)
 
+The ordinary-drive development candidate adds the Basic, Intermediate and Advanced hyperspace drive slot to Equipment. Paid upgrades change the actual jump countdown and station mass lock; explicit XYZZY maximum fitting uses the Advanced drive. The [equipment implementation and testing ledger](docs/EQUIPMENT-PLAYABLE.md) records all catalogue grades, remaining gameplay paths and Medusa compatibility constraints. This candidate is not part of Preview 10 and awaits owned validation.
+
 ## Goshawk Explorer in the Ship Showroom
 
 In Preview 10, press 3 at a station and search for Goshawk Explorer. Compare shows the Peregrine Mk V beside the Goshawk for a new commander. Press C for a single-ship view. Mac testing verified the original dark green hull, silver cross-member, open wishbone and refusal of an unavailable exchange. Preview 9 predates this ship. [Goshawk geometry and Showroom controls](docs/GOSHAWK-GAMEPLAY-ENVELOPE.md)

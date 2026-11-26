@@ -2,6 +2,10 @@
 
 The development save store explicitly unlocks on close. Dell Linux reproduced the cold-reopen failure during concurrent process startup and verified the fix while retaining exclusive access for a live owner.
 
+## Ordinary hyperspace drive source candidate
+
+The station Equipment screen exposes the born Basic drive and the two original paid upgrades. Their actual countdowns are 10, 5 and 1 second, and the existing station mass-lock thresholds are 600, 480 and 360. Purchases, refitting, saved pending jumps, historical completed legs and the explicit XYZZY top-grade grant use the same owned equipment ledger. The [equipment implementation and testing ledger](EQUIPMENT-PLAYABLE.md) reconciles remaining original grades and Medusa design constraints. Authored source and regression coverage await the owning compiler, whole-slice review, CI and native preview.
+
 ## Medusa Showroom inspection
 
 SH171 is available for catalogue inspection with the original detailed artwork and seven materials. The archived native mesh has 76,228 faces and stays outside the 512-face flight gate. The source-bound shield uses 729 local supports and keeps the crown opening clear in its own geometry. See the [Medusa inspection record](../integration/sh171-medusa/README.md) for the measured bounds and the remaining flight, player and PLUGH fabrication work.

@@ -21,6 +21,45 @@ pub const STOCK_JUMP_REACH_LY: f64 = 9.0;
 pub const BASIC_SPOOL_TICKS: u32 = 600;
 pub const BASIC_MASS_LOCK_DISTANCE: f64 = 600.0;
 
+/// Stock ordinary grades from the original HyperspaceDriveDefinition.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DriveGrade {
+    Basic,
+    Intermediate,
+    Advanced,
+}
+impl DriveGrade {
+    pub const fn spool_ticks(self) -> u32 {
+        match self {
+            Self::Basic => BASIC_SPOOL_TICKS,
+            Self::Intermediate => 300,
+            Self::Advanced => 60,
+        }
+    }
+    pub const fn mass_lock_distance(self) -> f64 {
+        match self {
+            Self::Basic => BASIC_MASS_LOCK_DISTANCE,
+            Self::Intermediate => 480.0,
+            Self::Advanced => 360.0,
+        }
+    }
+    pub(super) const fn tag(self) -> u8 {
+        match self {
+            Self::Basic => 0,
+            Self::Intermediate => 1,
+            Self::Advanced => 2,
+        }
+    }
+    pub(super) fn from_tag(tag: u8) -> Result<Self, crate::save::SaveError> {
+        match tag {
+            0 => Ok(Self::Basic),
+            1 => Ok(Self::Intermediate),
+            2 => Ok(Self::Advanced),
+            _ => Err(crate::save::SaveError::InvalidEncoding),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct SystemId {
     pub galaxy: u8,
@@ -330,8 +369,8 @@ impl DockContext {
     }
 }
 
-// This is an actual starter inventory binding created with a fresh commander, not a label
-// interpreted as installed equipment. Paid upgrades/storage are deliberately absent.
+// The navigation header retains the actual born drive identity. Pending travel separately
+// binds the currently fitted item, which may instead be a paid or explicit test grant.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct StarterBasicDrive {
     owner: CommanderId,
@@ -458,6 +497,7 @@ impl NavigationState {
         station_distance: f64,
         fuel: u16,
         fitted_reach_ly: f64,
+        fitted_drive: (u64, DriveGrade),
     ) -> Result<(), NavigationError> {
         if self.pending.is_some() {
             return Err(NavigationError::AlreadyTravelling);
@@ -469,7 +509,7 @@ impl NavigationState {
         if target == self.system {
             return Err(NavigationError::InvalidDistance);
         }
-        if !station_distance.is_finite() || station_distance < BASIC_MASS_LOCK_DISTANCE {
+        if !station_distance.is_finite() || station_distance < fitted_drive.1.mass_lock_distance() {
             return Err(NavigationError::MassLocked);
         }
         if distance > fitted_reach_ly {
@@ -485,11 +525,14 @@ impl NavigationState {
             .ok_or(NavigationError::SequenceExhausted)?;
         self.pending = Some(PendingJump {
             destination: target,
-            remaining_ticks: BASIC_SPOOL_TICKS,
+            remaining_ticks: fitted_drive.1.spool_ticks(),
             fuel_debit: debit,
             source: self.system,
             source_visit: self.visit,
-            drive: self.drive,
+            drive: StarterBasicDrive {
+                item_ordinal: fitted_drive.0,
+                ..self.drive
+            },
         });
         Ok(())
     }
@@ -500,6 +543,7 @@ impl NavigationState {
         physical_entry: bool,
         tick: u64,
         fuel: u16,
+        fitted_drive: Option<(u64, DriveGrade)>,
     ) -> Result<Option<u16>, NavigationError> {
         if physical_entry {
             self.dock_sequence = self
@@ -513,7 +557,10 @@ impl NavigationState {
         let Some(mut jump) = self.pending else {
             return Ok(None);
         };
-        if jump.source != self.system || jump.source_visit != self.visit || jump.drive != self.drive
+        if jump.source != self.system
+            || jump.source_visit != self.visit
+            || jump.drive.owner != self.owner
+            || jump.drive.ship != self.ship
         {
             return Err(NavigationError::WrongMode);
         }
@@ -521,6 +568,10 @@ impl NavigationState {
             jump.remaining_ticks -= 1;
             self.pending = Some(jump);
             return Ok(None);
+        }
+        let fitted_drive = fitted_drive.ok_or(NavigationError::WrongMode)?;
+        if jump.drive.item_ordinal != fitted_drive.0 {
+            return Err(NavigationError::WrongMode);
         }
         fuel.checked_sub(jump.fuel_debit)
             .ok_or(NavigationError::InsufficientFuel)?;
@@ -551,6 +602,59 @@ impl NavigationState {
 mod tests {
     use super::*;
     use crate::{FlightInput, FlightMode, StepError, World};
+
+    #[test]
+    fn stock_drive_mass_lock_boundaries_and_spool_admission() {
+        let catalogue = OriginalNavigation::bundled().unwrap();
+        for (grade, distance, ticks) in [
+            (DriveGrade::Basic, 600.0, 600),
+            (DriveGrade::Intermediate, 480.0, 300),
+            (DriveGrade::Advanced, 360.0, 60),
+        ] {
+            let mut navigation = NavigationState::new(91, 92, 97);
+            navigation.launch().unwrap();
+            let before = navigation;
+            assert_eq!(
+                navigation.begin_jump(
+                    &catalogue,
+                    SystemId::RENAS,
+                    distance - 0.01,
+                    130,
+                    9.0,
+                    (111, grade)
+                ),
+                Err(NavigationError::MassLocked)
+            );
+            assert_eq!(navigation, before);
+            navigation
+                .begin_jump(
+                    &catalogue,
+                    SystemId::RENAS,
+                    distance,
+                    130,
+                    9.0,
+                    (111, grade),
+                )
+                .unwrap();
+            assert_eq!(
+                navigation.snapshot(130).travel.unwrap().remaining_ticks,
+                ticks
+            );
+            for tick in 1..ticks {
+                assert_eq!(navigation.step(false, u64::from(tick), 130, None), Ok(None));
+            }
+            let pending = navigation;
+            assert_eq!(
+                navigation.step(false, u64::from(ticks), 130, Some((112, grade))),
+                Err(NavigationError::WrongMode)
+            );
+            assert_eq!(navigation, pending);
+            assert_eq!(
+                navigation.step(false, u64::from(ticks), 130, Some((111, grade))),
+                Ok(Some(34))
+            );
+        }
+    }
 
     fn navigation(world: &World) -> NavigationSnapshot {
         world.snapshot().navigation.unwrap()
@@ -925,7 +1029,14 @@ mod tests {
         state.launch().unwrap();
         let before = state;
         assert_eq!(
-            state.begin_jump(&catalogue, SystemId::RENAS, 700.0, 33, STOCK_JUMP_REACH_LY),
+            state.begin_jump(
+                &catalogue,
+                SystemId::RENAS,
+                700.0,
+                33,
+                STOCK_JUMP_REACH_LY,
+                (state.drive_item_id(), DriveGrade::Basic)
+            ),
             Err(NavigationError::InsufficientFuel)
         );
         assert_eq!(state, before);

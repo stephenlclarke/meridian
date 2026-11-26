@@ -20,6 +20,9 @@ PROTECTED_CORE = Path('integration/sh001-mule/PROTECTED-CORE.json')
 FLIGHT_COMPUTER_INVERSE = Path('integration/sh001-mule/FLIGHT-COMPUTER-INVERSE.json')
 FLIGHT_COMPUTER_BASE = 'fcec61d182b66478846b92390ad17805b0dfc7e0'
 FLIGHT_COMPUTER_INVERSE_SHA256 = '094fb89c24d15d3b882c49e24a149a5ccb188ed6e949577691440f76b3872a1d'
+HYPERSPACE_DRIVE_INVERSE = Path('integration/sh001-mule/HYPERSPACE-DRIVE-INVERSE.json')
+HYPERSPACE_DRIVE_BASE = '7ecc9794db40b2207db5e66a96e7d45b1a84c9c4'
+HYPERSPACE_DRIVE_INVERSE_SHA256 = 'cfd9f7ce2cc2c35cd37407fb7b4483d821e9e9777d7fdd2def6845c6aefa9b00'
 
 
 def sha(data):
@@ -41,6 +44,16 @@ def flight_computer_inverse(root, protected):
     assert inverse['base'] == FLIGHT_COMPUTER_BASE, 'flight computer inverse base'
     files = inverse['files']
     assert files and files.keys() <= protected.keys(), 'flight computer inverse paths'
+    return files
+
+
+def hyperspace_drive_inverse(root, protected):
+    manifest = (root / HYPERSPACE_DRIVE_INVERSE).read_bytes()
+    assert sha(manifest) == HYPERSPACE_DRIVE_INVERSE_SHA256, 'hyperspace drive inverse manifest'
+    inverse = json.loads(manifest)
+    assert inverse['base'] == HYPERSPACE_DRIVE_BASE, 'hyperspace drive inverse base'
+    files = inverse['files']
+    assert files and files.keys() <= protected.keys(), 'hyperspace drive inverse paths'
     return files
 
 
@@ -482,11 +495,13 @@ def verify_protected_core(root):
     }
     baseline = protected_core_pins(root)
     inverse = flight_computer_inverse(root, baseline)
+    drive_inverse = hyperspace_drive_inverse(root, baseline)
     checked = set()
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_seriema_courier_publication(relative, current)
+        data = undo_flight_computer(relative, current, drive_inverse)
+        data = undo_seriema_courier_publication(relative, data)
         data = undo_moose_clipper_publication(relative, data)
         data = undo_saiga_publication(relative, data)
         data = undo_wombat_publication(relative, data)
@@ -528,7 +543,7 @@ def verify_protected_core(root):
         checked.add(relative)
         unchanged += data == current
     assert set(additions) <= checked and len(checked) == 115
-    return len(checked), len(additions), unchanged, len(inverse)
+    return len(checked), len(additions), unchanged, len(inverse), len(drive_inverse)
 
 
 def verify_test_registry(criteria):
@@ -587,7 +602,7 @@ def verify():
     folder = ROOT / 'assets/fleet/sh001'
     verify_inputs(folder)
     groups = verify_geometry(folder)
-    checked, hooks, unchanged, flight_computer = verify_protected_core(ROOT)
+    checked, hooks, unchanged, flight_computer, hyperspace_drive = verify_protected_core(ROOT)
     counts = verify_historical_bindings(folder, groups)
     return {
         'status': 'PASS_SOURCE_ONLY',
@@ -595,6 +610,7 @@ def verify():
         'protectedCoreFilesWithCommanderLaunch': 2,
         'protectedCoreFilesWithMuleHooks': hooks,
         'protectedCoreFilesWithFlightComputerChanges': flight_computer,
+        'protectedCoreFilesWithHyperspaceDriveChanges': hyperspace_drive,
         'protectedCoreFilesChecked': checked,
         **counts,
         'vertexEncoding': 5344,

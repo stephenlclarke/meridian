@@ -569,13 +569,17 @@ impl World {
             ),
         )?;
         let modular = commerce.modular.ledger(self, account)?;
-        navigation.validate_pending_reach(catalogue, modular.jump_reach_ly())?;
+        let fitted_drive = modular
+            .drive()
+            .ok_or(SaveError::InvalidState("missing fitted drive"))?;
+        navigation.validate_pending_reach(catalogue, modular.jump_reach_ly(), fitted_drive)?;
         self.jump_journal.validate(
             navigation,
             catalogue,
             self.state.tick,
             self.combat.physical_tick(),
             &modular.navigation_changes,
+            fitted_drive.1,
         )?;
         let ammunition = commerce.ammunition.ledger_with_module_count(
             self,

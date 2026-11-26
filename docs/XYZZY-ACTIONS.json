@@ -28,7 +28,7 @@
       "key": "2",
       "legacyBehavior": "Maximum hardware and refill current hull.",
       "state": "PARTIAL_CORE",
-      "dependency": "Actual Elite Energy, front Naval Laser, Advanced Navigation (21 LY), Fuel Scoops fitting, cargo bay, finite nine-pylon fill and 130-unit refill. Missing maximum components remain listed below."
+      "dependency": "Actual Elite Energy, front Naval Laser, Advanced Navigation (21 LY), Advanced Hyperspace Drive, Fuel Scoops fitting, cargo bay, finite nine-pylon fill and 130-unit refill. Missing maximum components remain listed below."
     },
     {
       "key": "C",
@@ -141,8 +141,8 @@
     {
       "key": "max/drive",
       "legacyBehavior": "Advanced hyperspace drive.",
-      "state": "DEPENDENCY",
-      "dependency": "Actual drive custody/spool/fuel/galaxy rules."
+      "state": "IMPLEMENTED_SOURCE",
+      "dependency": "Actual Advanced Hyperspace Drive item, one-second spool and 360-unit station mass lock; held paid item is reused. Ordinary route/fuel checks remain. Broader celestial/body mass lock, alien immediate drive and inter-galaxy travel remain separate."
     },
     {
       "key": "max/targeting",

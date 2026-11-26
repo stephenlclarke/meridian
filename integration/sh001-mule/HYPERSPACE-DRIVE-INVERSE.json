@@ -1,0 +1,547 @@
+{
+  "base": "7ecc9794db40b2207db5e66a96e7d45b1a84c9c4",
+  "files": {
+    "flight.rs": {
+      "beforeSHA256": "dd699789001f17118e6f6e93af48ff4779c780bd75e49572e7e2b9870c8aef00",
+      "afterSHA256": "e6e6c585b045173882ce7ef34687f9e002bd570efd87099b51dcbbf484d797fb",
+      "hunks": [
+        {
+          "offset": 12367,
+          "before": "            item.owner() == navigation.owner().seed()\n                && item.fitted_hull() == Some(navigation.ship().ordinal())\n",
+          "after": "            item.owner() == navigation.owner().seed() && item.is_standard_birth()\n"
+        },
+        {
+          "offset": 12978,
+          "before": "        self.modular\n            .ledger(self, account)\n            .ok()\n            .map(|ledger| ledger.jump_reach_ly())\n",
+          "after": "        let ledger = self.modular.ledger(self, account).ok()?;\n        ledger.drive()?;\n        Some(ledger.jump_reach_ly())\n"
+        },
+        {
+          "offset": 15081,
+          "before": "        let reach = self.jump_reach_ly().ok_or(NavigationError::WrongMode)?;\n",
+          "after": "        if !Self::has_bound_drive(navigation, account) {\n            return Err(NavigationError::WrongMode);\n        }\n        let ledger = self\n            .modular\n            .ledger(self, account)\n            .map_err(|_| NavigationError::WrongMode)?;\n        let drive = ledger.drive().ok_or(NavigationError::WrongMode)?;\n        let reach = ledger.jump_reach_ly();\n"
+        },
+        {
+          "offset": 15504,
+          "before": "        navigation.begin_jump(catalogue, target, distance, account.fuel_tenths(), reach)?;\n",
+          "after": "        navigation.begin_jump(\n            catalogue,\n            target,\n            distance,\n            account.fuel_tenths(),\n            reach,\n            drive,\n        )?;\n"
+        },
+        {
+          "offset": 27815,
+          "before": "                .as_mut()\n",
+          "after": "                .as_ref()\n"
+        },
+        {
+          "offset": 28019,
+          "before": "",
+          "after": "            // Fitting is station-only. The pending binding is checked when opened, on\n            // Continue, and once more before arrival; do not replay the ledger every tick.\n            let fitted_drive = if state\n                .snapshot(0)\n                .travel\n                .is_some_and(|travel| travel.remaining_ticks == 1)\n                && !entry\n            {\n                self.modular\n                    .ledger(self, account)\n                    .map_err(|_| StepError::NonFiniteState)?\n                    .drive()\n            } else {\n                None\n            };\n"
+        },
+        {
+          "offset": 28655,
+          "before": "                .step(entry, next.tick, account.fuel_tenths())\n",
+          "after": "                .step(entry, next.tick, account.fuel_tenths(), fitted_drive)\n"
+        },
+        {
+          "offset": 29924,
+          "before": "                    grade,\n",
+          "after": "                    (grade, fitted_drive.ok_or(StepError::NonFiniteState)?.1),\n"
+        }
+      ]
+    },
+    "flight/damage/rapid_energy_tests.rs": {
+      "beforeSHA256": "f08fc3300aa91c52d118824c089d8c35b987a46354011b198b1dc4bf15cb7340",
+      "afterSHA256": "6964c5266a8d1f0bf5baa6faed89c2874b54de89c59801ce087bce45b0a58bc7",
+      "hunks": [
+        {
+          "offset": 12067,
+          "before": "    assert_eq!(fit.items.len(), 3);\n",
+          "after": "    assert_eq!(fit.items.len(), 4);\n"
+        },
+        {
+          "offset": 12176,
+          "before": "        ModuleKind::PulseLaser | ModuleKind::BasicEnergySystem | ModuleKind::BasicNavigation\n",
+          "after": "        ModuleKind::PulseLaser\n            | ModuleKind::BasicEnergySystem\n            | ModuleKind::BasicNavigation\n            | ModuleKind::Drive(crate::navigation::DriveGrade::Basic)\n"
+        }
+      ]
+    },
+    "flight/equipment/tests.rs": {
+      "beforeSHA256": "4029b4039d385471cd044b5c2d0bfc01b065878209ede0ad07fd261e6e07f3bb",
+      "afterSHA256": "1a26073a2d5c79b1c04473796a283dceb631bec72ab3fe4c451f42b2cc499067",
+      "hunks": [
+        {
+          "offset": 143,
+          "before": "use crate::navigation::{BASIC_SPOOL_TICKS, SystemId};\n",
+          "after": "use crate::navigation::SystemId;\n"
+        },
+        {
+          "offset": 839,
+          "before": "    for _ in 0..BASIC_SPOOL_TICKS {\n",
+          "after": "    let remaining = world\n        .snapshot()\n        .navigation\n        .unwrap()\n        .travel\n        .unwrap()\n        .remaining_ticks;\n    for _ in 0..remaining {\n"
+        }
+      ]
+    },
+    "flight/modular.rs": {
+      "beforeSHA256": "4a59e658d2682417482918b20e118ff16d99bc05b513569c7a1b9df73fc9cbbd",
+      "afterSHA256": "ba9dbe7ef97f83a7ff3cae8d54b25bc7e2420ec0fdd91df3536f0ecadb460e51",
+      "hunks": [
+        {
+          "offset": 209,
+          "before": "    navigation::{DockContext, NavigationFitChange, NavigationGrade},\n",
+          "after": "    navigation::{DockContext, DriveGrade, NavigationFitChange, NavigationGrade},\n"
+        },
+        {
+          "offset": 1012,
+          "before": "",
+          "after": "    Drive(DriveGrade),\n"
+        },
+        {
+          "offset": 1648,
+          "before": "",
+          "after": "            Self::Drive(_) => \"hyperspace-drive\",\n"
+        },
+        {
+          "offset": 2965,
+          "before": "",
+          "after": "            Self::Drive(DriveGrade::Basic) => \"Basic Hyperspace Drive\",\n            Self::Drive(DriveGrade::Intermediate) => \"Intermediate Hyperspace Drive\",\n            Self::Drive(DriveGrade::Advanced) => \"Advanced Hyperspace Drive\",\n"
+        },
+        {
+          "offset": 5076,
+          "before": "",
+          "after": "            Self::Drive(_) => ModuleSlot::Drive,\n"
+        },
+        {
+          "offset": 6187,
+          "before": "",
+          "after": "                | Self::Drive(DriveGrade::Advanced)\n"
+        },
+        {
+          "offset": 6671,
+          "before": "",
+          "after": "            Self::Drive(DriveGrade::Intermediate | DriveGrade::Advanced) => 1,\n"
+        },
+        {
+          "offset": 7872,
+          "before": "",
+          "after": "            Self::Drive(DriveGrade::Basic) => None,\n            Self::Drive(DriveGrade::Intermediate) => Some((50_000, 10)),\n            Self::Drive(DriveGrade::Advanced) => Some((150_000, 13)),\n"
+        },
+        {
+          "offset": 8713,
+          "before": "",
+          "after": "            Self::Drive(DriveGrade::Intermediate) => Some(Self::Drive(DriveGrade::Basic)),\n            Self::Drive(DriveGrade::Advanced) => Some(Self::Drive(DriveGrade::Intermediate)),\n"
+        },
+        {
+          "offset": 9853,
+          "before": "",
+          "after": "            Self::Drive(DriveGrade::Basic) => 21,\n            Self::Drive(DriveGrade::Intermediate) => 22,\n            Self::Drive(DriveGrade::Advanced) => 23,\n"
+        },
+        {
+          "offset": 10841,
+          "before": "",
+          "after": "            21 => Ok(Self::Drive(DriveGrade::Basic)),\n            22 => Ok(Self::Drive(DriveGrade::Intermediate)),\n            23 => Ok(Self::Drive(DriveGrade::Advanced)),\n"
+        },
+        {
+          "offset": 11273,
+          "before": "",
+          "after": "    Drive,\n"
+        },
+        {
+          "offset": 13793,
+          "before": "",
+          "after": "    DriveRequired,\n"
+        },
+        {
+          "offset": 16818,
+          "before": "",
+          "after": "                OwnedModule {\n                    id: owner.checked_add(6).ok_or(INVALID)?,\n                    kind: ModuleKind::Drive(DriveGrade::Basic),\n                    slot: Some(ModuleSlot::Drive),\n                    provenance: ModuleProvenance::StandardBirth,\n                },\n"
+        },
+        {
+          "offset": 17712,
+          "before": "",
+          "after": "    }\n    pub(super) fn drive(&self) -> Option<(u64, DriveGrade)> {\n        let item = self.fitted(ModuleSlot::Drive)?;\n        match item.kind {\n            ModuleKind::Drive(grade) => Some((item.id, grade)),\n            _ => None,\n        }\n"
+        },
+        {
+          "offset": 19607,
+          "before": "",
+          "after": "    fn prerequisites_satisfied(&self, kind: ModuleKind) -> bool {\n        kind.prerequisite().is_none_or(|required| {\n            self.items.iter().any(|item| {\n                item.kind == required\n                    && (!matches!(kind, ModuleKind::Drive(_))\n                        || item.slot == Some(ModuleSlot::Drive))\n            })\n        })\n    }\n"
+        },
+        {
+          "offset": 20425,
+          "before": "            if !event.xyzzy\n                && kind\n                    .prerequisite()\n                    .is_some_and(|required| !self.items.iter().any(|i| i.kind == required))\n            {\n",
+          "after": "            if !event.xyzzy && !self.prerequisites_satisfied(kind) {\n"
+        },
+        {
+          "offset": 22053,
+          "before": "",
+          "after": "                    }\n                    if i.slot == Some(ModuleSlot::Drive) {\n                        return Err(ModuleError::DriveRequired);\n"
+        },
+        {
+          "offset": 28087,
+          "before": "",
+          "after": "            let previous_drive = ledger.drive();\n"
+        },
+        {
+          "offset": 28317,
+          "before": "            if grade != previous_grade {\n",
+          "after": "            let drive = ledger.drive().ok_or(INVALID)?;\n            if grade != previous_grade || Some(drive) != previous_drive {\n"
+        },
+        {
+          "offset": 28611,
+          "before": "",
+          "after": "                    drive: drive.1,\n"
+        },
+        {
+          "offset": 29134,
+          "before": "",
+          "after": "            (6, ModuleSlot::Drive, super::StarterComponent::BasicDrive),\n"
+        },
+        {
+          "offset": 36158,
+          "before": "",
+          "after": "            ModuleKind::Drive(DriveGrade::Intermediate),\n            ModuleKind::Drive(DriveGrade::Advanced),\n"
+        },
+        {
+          "offset": 46687,
+          "before": "",
+          "after": "        let drive_fitted = ledger.drive().is_some_and(|(id, _)| id == owner + 6);\n"
+        },
+        {
+          "offset": 46799,
+          "before": "            .prepare_module(paid, pulse_fitted, energy_fitted, navigation_fitted)\n",
+          "after": "            .prepare_module(\n                paid,\n                pulse_fitted,\n                energy_fitted,\n                navigation_fitted,\n                drive_fitted,\n            )\n"
+        },
+        {
+          "offset": 47401,
+          "before": "",
+          "after": "#[cfg(test)]\nmod drive_tests;\n"
+        },
+        {
+          "offset": 51938,
+          "before": "",
+          "after": "                born_fitted(ModuleSlot::Drive, 6),\n"
+        }
+      ]
+    },
+    "flight/modular/tests.rs": {
+      "beforeSHA256": "225ef5d2554942f1fb640255a04d71b04d1d929086cc1a054f223152cb27b05e",
+      "afterSHA256": "2e6fbf979a289166b89b1c657d24df6857ca78931fd1caf47099aef0e9a410e0",
+      "hunks": [
+        {
+          "offset": 6628,
+          "before": "    assert_eq!(after.items.len(), 4);\n",
+          "after": "    assert_eq!(after.items.len(), 5);\n"
+        },
+        {
+          "offset": 7079,
+          "before": "    assert_eq!(after.items[3].slot, Some(ModuleSlot::FrontLaser));\n    assert_eq!(after.items[3].kind, ModuleKind::MiningLaser);\n",
+          "after": "    assert_eq!(after.items[4].slot, Some(ModuleSlot::FrontLaser));\n    assert_eq!(after.items[4].kind, ModuleKind::MiningLaser);\n"
+        },
+        {
+          "offset": 7221,
+          "before": "        matches!(after.items[3].provenance, ModuleProvenance::Paid { transaction: 1, dock, paid_tenths: 33_000, .. } if dock == berth)\n",
+          "after": "        matches!(after.items[4].provenance, ModuleProvenance::Paid { transaction: 1, dock, paid_tenths: 33_000, .. } if dock == berth)\n"
+        },
+        {
+          "offset": 10345,
+          "before": "    assert_eq!(snap(&w).items.len(), 4);\n",
+          "after": "    assert_eq!(snap(&w).items.len(), 5);\n"
+        },
+        {
+          "offset": 10509,
+          "before": "        snap(&w).items[3].provenance,\n",
+          "after": "        snap(&w).items[4].provenance,\n"
+        }
+      ]
+    },
+    "flight/persistence.rs": {
+      "beforeSHA256": "0fc2dd17457df82c0d88c737a3e219ce153718b9a4cd70a97469d7e6f3f2944c",
+      "afterSHA256": "35567a7eabd9dda3f09430dd6e2591b7f30fa1e0f3b948bb0846a383f967d2a3",
+      "hunks": [
+        {
+          "offset": 23025,
+          "before": "        navigation.validate_pending_reach(catalogue, modular.jump_reach_ly())?;\n",
+          "after": "        let fitted_drive = modular\n            .drive()\n            .ok_or(SaveError::InvalidState(\"missing fitted drive\"))?;\n        navigation.validate_pending_reach(catalogue, modular.jump_reach_ly(), fitted_drive)?;\n"
+        },
+        {
+          "offset": 23439,
+          "before": "",
+          "after": "            fitted_drive.1,\n"
+        }
+      ]
+    },
+    "flight/xyzzy.rs": {
+      "beforeSHA256": "e7fd218c895c7212f329096317ff21d8293764e187b55354a96c27e06aadf4c9",
+      "afterSHA256": "8d2043b2f46d48369a646c6b6928a1120d530f1584daaaf69739f6799eec9b36",
+      "hunks": [
+        {
+          "offset": 13262,
+          "before": "",
+          "after": "                super::modular::ModuleKind::Drive(crate::navigation::DriveGrade::Advanced),\n"
+        }
+      ]
+    },
+    "flight/xyzzy/tests.rs": {
+      "beforeSHA256": "fdbeef17164286a5405a23852a996deb9d0636bcfbc9e64a7996db1e748c6416",
+      "afterSHA256": "1d367a46d6e67723f1d67a4ac64882295be03e5e8d511168fab3cb2c1f436322",
+      "hunks": [
+        {
+          "offset": 4609,
+          "before": "        assert_eq!(w.modular_equipment_snapshot().unwrap().items.len(), 3);\n",
+          "after": "        assert_eq!(w.modular_equipment_snapshot().unwrap().items.len(), 4);\n"
+        }
+      ]
+    },
+    "freight/g02.rs": {
+      "beforeSHA256": "17976d3fb40ee515d7a96e2c18311ebe153099363a501d46344df94ff6c486fe",
+      "afterSHA256": "08c7434c201e4c9107cf3a19f804d984932ad3281b6188b23254e15c681d7f08",
+      "hunks": [
+        {
+          "offset": 6215,
+          "before": "        matches!(index, 1 | 2 | 4) && self.modular_revision > 0 && item.fitted_hull.is_none()\n",
+          "after": "        matches!(index, 1..=4) && self.modular_revision > 0 && item.fitted_hull.is_none()\n"
+        },
+        {
+          "offset": 8958,
+          "before": "",
+          "after": "        drive_fitted: bool,\n"
+        },
+        {
+          "offset": 10136,
+          "before": "",
+          "after": "        let drive = data\n            .fit\n            .as_mut()\n            .and_then(|fit| fit.items[3].as_mut())\n            .ok_or(Error::MissingEquipment)?;\n        drive.fitted_hull = drive_fitted.then_some(data.hull);\n"
+        },
+        {
+          "offset": 41441,
+          "before": "    if fit.items[3].is_none_or(|item| item.fitted_hull != Some(account.hull)) {\n",
+          "after": "    if fit.items[3].is_none_or(|item| {\n        item.fitted_hull != Some(account.hull) && !account.allows_stored_starter(3, item)\n    }) {\n"
+        },
+        {
+          "offset": 41808,
+          "before": "    // The modular ledger can store the born Basic Energy or front Pulse. Consumed\n",
+          "after": "    // The modular ledger can displace born foundations or front Pulse. Consumed\n"
+        }
+      ]
+    },
+    "navigation.rs": {
+      "beforeSHA256": "f597ab501c65ca5e33f728e70487ba11f4c626bf5696523a3e96ba150195f4f3",
+      "afterSHA256": "bb3c5d55f3314a6d9e2a652791ada5fcea72b68c8de5c9872767ecca19b891d6",
+      "hunks": [
+        {
+          "offset": 975,
+          "before": "",
+          "after": "\n/// Stock ordinary grades from the original HyperspaceDriveDefinition.\n#[derive(Debug, Clone, Copy, PartialEq, Eq)]\npub enum DriveGrade {\n    Basic,\n    Intermediate,\n    Advanced,\n}\nimpl DriveGrade {\n    pub const fn spool_ticks(self) -> u32 {\n        match self {\n            Self::Basic => BASIC_SPOOL_TICKS,\n            Self::Intermediate => 300,\n            Self::Advanced => 60,\n        }\n    }\n    pub const fn mass_lock_distance(self) -> f64 {\n        match self {\n            Self::Basic => BASIC_MASS_LOCK_DISTANCE,\n            Self::Intermediate => 480.0,\n            Self::Advanced => 360.0,\n        }\n    }\n    pub(super) const fn tag(self) -> u8 {\n        match self {\n            Self::Basic => 0,\n            Self::Intermediate => 1,\n            Self::Advanced => 2,\n        }\n    }\n    pub(super) fn from_tag(tag: u8) -> Result<Self, crate::save::SaveError> {\n        match tag {\n            0 => Ok(Self::Basic),\n            1 => Ok(Self::Intermediate),\n            2 => Ok(Self::Advanced),\n            _ => Err(crate::save::SaveError::InvalidEncoding),\n        }\n    }\n}\n"
+        },
+        {
+          "offset": 11991,
+          "before": "// This is an actual starter inventory binding created with a fresh commander, not a label\n// interpreted as installed equipment. Paid upgrades/storage are deliberately absent.\n",
+          "after": "// The navigation header retains the actual born drive identity. Pending travel separately\n// binds the currently fitted item, which may instead be a paid or explicit test grant.\n"
+        },
+        {
+          "offset": 15623,
+          "before": "",
+          "after": "        fitted_drive: (u64, DriveGrade),\n"
+        },
+        {
+          "offset": 16118,
+          "before": "        if !station_distance.is_finite() || station_distance < BASIC_MASS_LOCK_DISTANCE {\n",
+          "after": "        if !station_distance.is_finite() || station_distance < fitted_drive.1.mass_lock_distance() {\n"
+        },
+        {
+          "offset": 16837,
+          "before": "            remaining_ticks: BASIC_SPOOL_TICKS,\n",
+          "after": "            remaining_ticks: fitted_drive.1.spool_ticks(),\n"
+        },
+        {
+          "offset": 16998,
+          "before": "            drive: self.drive,\n",
+          "after": "            drive: StarterBasicDrive {\n                item_ordinal: fitted_drive.0,\n                ..self.drive\n            },\n"
+        },
+        {
+          "offset": 17454,
+          "before": "",
+          "after": "        fitted_drive: Option<(u64, DriveGrade)>,\n"
+        },
+        {
+          "offset": 18037,
+          "before": "        if jump.source != self.system || jump.source_visit != self.visit || jump.drive != self.drive\n",
+          "after": "        if jump.source != self.system\n            || jump.source_visit != self.visit\n            || jump.drive.owner != self.owner\n            || jump.drive.ship != self.ship\n"
+        },
+        {
+          "offset": 18429,
+          "before": "",
+          "after": "        }\n        let fitted_drive = fitted_drive.ok_or(NavigationError::WrongMode)?;\n        if jump.drive.item_ordinal != fitted_drive.0 {\n            return Err(NavigationError::WrongMode);\n"
+        },
+        {
+          "offset": 19557,
+          "before": "",
+          "after": "\n    #[test]\n    fn stock_drive_mass_lock_boundaries_and_spool_admission() {\n        let catalogue = OriginalNavigation::bundled().unwrap();\n        for (grade, distance, ticks) in [\n            (DriveGrade::Basic, 600.0, 600),\n            (DriveGrade::Intermediate, 480.0, 300),\n            (DriveGrade::Advanced, 360.0, 60),\n        ] {\n            let mut navigation = NavigationState::new(91, 92, 97);\n            navigation.launch().unwrap();\n            let before = navigation;\n            assert_eq!(\n                navigation.begin_jump(\n                    &catalogue,\n                    SystemId::RENAS,\n                    distance - 0.01,\n                    130,\n                    9.0,\n                    (111, grade)\n                ),\n                Err(NavigationError::MassLocked)\n            );\n            assert_eq!(navigation, before);\n            navigation\n                .begin_jump(\n                    &catalogue,\n                    SystemId::RENAS,\n                    distance,\n                    130,\n                    9.0,\n                    (111, grade),\n                )\n                .unwrap();\n            assert_eq!(\n                navigation.snapshot(130).travel.unwrap().remaining_ticks,\n                ticks\n            );\n            for tick in 1..ticks {\n                assert_eq!(navigation.step(false, u64::from(tick), 130, None), Ok(None));\n            }\n            let pending = navigation;\n            assert_eq!(\n                navigation.step(false, u64::from(ticks), 130, Some((112, grade))),\n                Err(NavigationError::WrongMode)\n            );\n            assert_eq!(navigation, pending);\n            assert_eq!(\n                navigation.step(false, u64::from(ticks), 130, Some((111, grade))),\n                Ok(Some(34))\n            );\n        }\n    }\n"
+        },
+        {
+          "offset": 35279,
+          "before": "            state.begin_jump(&catalogue, SystemId::RENAS, 700.0, 33, STOCK_JUMP_REACH_LY),\n",
+          "after": "            state.begin_jump(\n                &catalogue,\n                SystemId::RENAS,\n                700.0,\n                33,\n                STOCK_JUMP_REACH_LY,\n                (state.drive_item_id(), DriveGrade::Basic)\n            ),\n"
+        }
+      ]
+    },
+    "navigation/journal.rs": {
+      "beforeSHA256": "28f288a81b7dfd5d06f13fba213dcddb307c2bee38cd549873e2baca7ea01877",
+      "afterSHA256": "f1d8738709338bce71336e06ed7d5fb3f7855905fefa7337736bfdd48bbb54db",
+      "hunks": [
+        {
+          "offset": 83,
+          "before": "    BASIC_SPOOL_TICKS, DockContext, FUEL_CAPACITY, NavigationState, OriginalNavigation,\n",
+          "after": "    DockContext, DriveGrade, FUEL_CAPACITY, NavigationState, OriginalNavigation,\n"
+        },
+        {
+          "offset": 1842,
+          "before": "        match r.u8()? {\n",
+          "after": "        Self::from_tag(r.u8()?)\n    }\n    fn from_tag(tag: u8) -> Result<Self, SaveError> {\n        match tag {\n"
+        },
+        {
+          "offset": 2308,
+          "before": "",
+          "after": "    pub(crate) drive: DriveGrade,\n"
+        },
+        {
+          "offset": 2548,
+          "before": "",
+          "after": "    drive: DriveGrade,\n"
+        },
+        {
+          "offset": 2826,
+          "before": "        grade: NavigationGrade,\n",
+          "after": "        grades: (NavigationGrade, DriveGrade),\n"
+        },
+        {
+          "offset": 3130,
+          "before": "            grade,\n",
+          "after": "            grade: grades.0,\n            drive: grades.1,\n"
+        },
+        {
+          "offset": 3475,
+          "before": "        w.u8(self.grade.tag());\n",
+          "after": "        // Basic drive is tag zero; retain the existing v17 record length and stock bytes.\n        w.u8(self.grade.tag() | (self.drive.tag() << 2));\n"
+        },
+        {
+          "offset": 3766,
+          "before": "",
+          "after": "        let source = read_system(r)?;\n        let destination = read_system(r)?;\n        let debit = r.u16()?;\n        let source_visit = r.u64()?;\n        let arrival_tick = r.u64()?;\n        let grades = r.u8()?;\n"
+        },
+        {
+          "offset": 3999,
+          "before": "            source: read_system(r)?,\n            destination: read_system(r)?,\n            debit: r.u16()?,\n            source_visit: r.u64()?,\n            arrival_tick: r.u64()?,\n            grade: NavigationGrade::decode(r)?,\n",
+          "after": "            source,\n            destination,\n            debit,\n            source_visit,\n            arrival_tick,\n            grade: NavigationGrade::from_tag(grades & 3)?,\n            drive: DriveGrade::from_tag(grades >> 2)?,\n"
+        },
+        {
+          "offset": 7288,
+          "before": "                    .checked_sub(u64::from(BASIC_SPOOL_TICKS))\n",
+          "after": "                    .checked_sub(u64::from(leg.drive.spool_ticks()))\n"
+        },
+        {
+          "offset": 7700,
+          "before": "",
+          "after": "        fitted_drive: DriveGrade,\n"
+        },
+        {
+          "offset": 7767,
+          "before": "        let spool = u64::from(BASIC_SPOOL_TICKS);\n",
+          "after": ""
+        },
+        {
+          "offset": 8082,
+          "before": "                    arrival.checked_sub(spool).ok_or(INVALID)?,\n",
+          "after": "                    arrival\n                        .checked_sub(u64::from(fitted_drive.spool_ticks()))\n                        .ok_or(INVALID)?,\n"
+        },
+        {
+          "offset": 8652,
+          "before": "",
+          "after": "        let mut drive = DriveGrade::Basic;\n"
+        },
+        {
+          "offset": 9036,
+          "before": "                    leg.arrival_tick.checked_sub(spool).ok_or(INVALID)?,\n",
+          "after": "                    leg.arrival_tick\n                        .checked_sub(u64::from(leg.drive.spool_ticks()))\n                        .ok_or(INVALID)?,\n"
+        },
+        {
+          "offset": 10289,
+          "before": "",
+          "after": "                drive = change.drive;\n"
+        },
+        {
+          "offset": 10794,
+          "before": "                .checked_add(spool)\n",
+          "after": "                .checked_add(u64::from(drive.spool_ticks()))\n"
+        },
+        {
+          "offset": 11508,
+          "before": "",
+          "after": "                || leg.drive != drive\n"
+        },
+        {
+          "offset": 12757,
+          "before": "",
+          "after": "            || drive != fitted_drive\n"
+        },
+        {
+          "offset": 12914,
+          "before": "",
+          "after": "\n    #[test]\n    fn shorter_leg_cannot_be_relabelled_as_a_drive_never_fitted_at_departure() {\n        let catalogue = OriginalNavigation::bundled().unwrap_or_else(|e| panic!(\"{e:?}\"));\n        let mut nav = NavigationState::new(18101, 18102, 18107);\n        nav.launches = 1;\n        nav.completed_jumps = 1;\n        nav.fuel_spent = 34;\n        nav.visit = 3;\n        nav.system = SystemId::RENAS;\n        nav.dock = None;\n        let leg = CompletedJump {\n            source: SystemId::AVENOR,\n            destination: SystemId::RENAS,\n            debit: 34,\n            source_visit: 2,\n            arrival_tick: 61,\n            grade: NavigationGrade::Basic,\n            drive: DriveGrade::Advanced,\n            account_revision: 1,\n            physical_tick: 61,\n        };\n        let journal = JumpJournal { legs: vec![leg] };\n        assert_eq!(\n            journal.validate(nav, &catalogue, 61, 61, &[], DriveGrade::Basic),\n            Err(INVALID)\n        );\n        let birth = NavigationState::new(18101, 18102, 18107)\n            .dock()\n            .unwrap_or_else(|| panic!(\"missing birth berth\"));\n        let fit = NavigationFitChange {\n            dock: birth,\n            tick: 0,\n            grade: NavigationGrade::Basic,\n            drive: DriveGrade::Advanced,\n        };\n        assert_eq!(\n            journal.validate(nav, &catalogue, 61, 61, &[fit], DriveGrade::Advanced),\n            Ok(())\n        );\n        let mut writer = Writer::new();\n        leg.encode(&mut writer);\n        assert_eq!(writer.bytes.len(), CompletedJump::ENCODED_SIZE);\n        let mut corrupted = writer.bytes;\n        corrupted[24] |= 0x80;\n        assert!(CompletedJump::decode(&mut Reader::new(&corrupted)).is_err());\n    }\n"
+        },
+        {
+          "offset": 15671,
+          "before": "",
+          "after": "            drive: DriveGrade::Basic,\n"
+        },
+        {
+          "offset": 16139,
+          "before": "",
+          "after": "                    drive: DriveGrade::Basic,\n"
+        },
+        {
+          "offset": 16564,
+          "before": "",
+          "after": "                    drive: DriveGrade::Basic,\n"
+        },
+        {
+          "offset": 17005,
+          "before": "",
+          "after": "                    drive: DriveGrade::Basic,\n"
+        },
+        {
+          "offset": 17116,
+          "before": "            journal.validate(nav, &catalogue, 1901, 1801, &[change]),\n",
+          "after": "            journal.validate(nav, &catalogue, 1901, 1801, &[change], DriveGrade::Basic),\n"
+        }
+      ]
+    },
+    "navigation/persistence.rs": {
+      "beforeSHA256": "49b162b101168a1a35263e47e584d1c323f178e60d50632db4aec091e0323ee1",
+      "afterSHA256": "065cb0669c5a1b493e8877a51b17a3da30433746752aba98e0a052cdac920a04",
+      "hunks": [
+        {
+          "offset": 54,
+          "before": "    BASIC_SPOOL_TICKS, CommanderId, DockContext, DockOrigin, NavigationState, OriginalNavigation,\n    PendingJump, PlayerShipId, StarterBasicDrive, SystemId, stock_jump_fuel_cost,\n",
+          "after": "    BASIC_SPOOL_TICKS, CommanderId, DockContext, DockOrigin, DriveGrade, NavigationState,\n    OriginalNavigation, PendingJump, PlayerShipId, StarterBasicDrive, SystemId,\n    stock_jump_fuel_cost,\n"
+        },
+        {
+          "offset": 4280,
+          "before": "",
+          "after": "        fitted_drive: (u64, DriveGrade),\n"
+        },
+        {
+          "offset": 4467,
+          "before": "            if catalogue\n                .distance_ly(pending.source, pending.destination)\n                .map_err(|_| invalid)?\n                > fitted_reach_ly\n",
+          "after": "            if pending.drive.item_ordinal != fitted_drive.0\n                || pending.remaining_ticks > fitted_drive.1.spool_ticks()\n                || catalogue\n                    .distance_ly(pending.source, pending.destination)\n                    .map_err(|_| invalid)?\n                    > fitted_reach_ly\n"
+        },
+        {
+          "offset": 7940,
+          "before": "                || p.drive != self.drive\n",
+          "after": "                || p.drive.owner != self.owner\n                || p.drive.ship != self.ship\n"
+        },
+        {
+          "offset": 10334,
+          "before": "            navigation.step(true, u64::MAX, 130),\n",
+          "after": "            navigation.step(true, u64::MAX, 130, None),\n"
+        }
+      ]
+    }
+  }
+}
