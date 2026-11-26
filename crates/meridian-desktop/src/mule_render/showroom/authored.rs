@@ -99,6 +99,7 @@ impl AuthoredPass {
                 points: &dummy,
                 visual: vertices,
                 authored_materials: true,
+                display_paint: crate::authored_hull::stock_matches(preview),
             },
         )?;
         queue.write_buffer(

@@ -373,6 +373,7 @@ impl Pass {
                 points: &triangles,
                 visual: &vertices,
                 authored_materials: false,
+                display_paint: true,
             },
         )?;
         // The uniform header and all source-local support records are contiguous in WGSL.

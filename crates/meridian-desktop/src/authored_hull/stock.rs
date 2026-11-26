@@ -30,6 +30,21 @@ struct StockDescriptor {
     export_fnv: Option<u64>,
 }
 
+macro_rules! stock_package {
+    ($id:literal, $name:literal, $path:literal, $fnv:literal) => {
+        StockDescriptor {
+            model: AvailableModel {
+                object: $id,
+                geometry_key: $path,
+            },
+            name: $name,
+            package: include_bytes!(concat!("../../../../", $path)),
+            fnv: $fnv,
+            export_fnv: None,
+        }
+    };
+}
+
 // One descriptor registers a checked-in schema package throughout catalogue, visual lookup and cache.
 const DESCRIPTORS: &[StockDescriptor] = &[
     StockDescriptor {
@@ -62,6 +77,156 @@ const DESCRIPTORS: &[StockDescriptor] = &[
         fnv: STAG_FNV,
         export_fnv: Some(STAG_EXPORT_FNV),
     },
+    stock_package!(
+        "SH042",
+        "Saker",
+        "integration/sh042-saker/SAKER-STUDIO.json",
+        0xa5a7_2dc4_6ce5_3390
+    ),
+    stock_package!(
+        "SH043",
+        "Eagle Cruiser",
+        "integration/sh043-eagle-cruiser/EAGLE-CRUISER-STUDIO.json",
+        0x9d7f_ab16_fabc_7bb9
+    ),
+    stock_package!(
+        "SH044",
+        "Harpy Assault",
+        "integration/sh044-harpy-assault/HARPY-ASSAULT-STUDIO.json",
+        0x8c13_9724_2d88_54f2
+    ),
+    stock_package!(
+        "SH045",
+        "Erne Corvette",
+        "integration/sh045-erne-corvette/ERNE-CORVETTE-STUDIO.json",
+        0x3dcd_bebd_ec10_ccf7
+    ),
+    stock_package!(
+        "SH046",
+        "Harpy Dropship",
+        "integration/sh046-harpy-dropship/HARPY-DROPSHIP-STUDIO.json",
+        0x331a_7266_78b7_b074
+    ),
+    stock_package!(
+        "SH047",
+        "Harpy Gunship",
+        "integration/sh047-harpy-gunship/HARPY-GUNSHIP-STUDIO.json",
+        0x4e7e_88c1_58fb_fe30
+    ),
+    stock_package!(
+        "SH048",
+        "Lanner",
+        "integration/sh048-lanner/LANNER-STUDIO.json",
+        0x3055_5234_66fe_7509
+    ),
+    stock_package!(
+        "SH049",
+        "Hyena",
+        "integration/sh049-hyena/HYENA-STUDIO.json",
+        0x9e1e_d894_aee8_e15d
+    ),
+    stock_package!(
+        "SH050",
+        "Yak",
+        "integration/sh050-yak/YAK-STUDIO.json",
+        0x7351_3510_2967_69e9
+    ),
+    stock_package!(
+        "SH051",
+        "Jackal",
+        "integration/sh051-jackal/JACKAL-STUDIO.json",
+        0x6ca4_5ddf_d1d7_2231
+    ),
+    stock_package!(
+        "SH052",
+        "Banteng",
+        "integration/sh052-banteng/BANTENG-STUDIO.json",
+        0x1aca_d5cc_9eaf_7610
+    ),
+    stock_package!(
+        "SH053",
+        "Caracal Scout",
+        "integration/sh053-caracal-scout/CARACAL-SCOUT-STUDIO.json",
+        0xe6a5_ce33_45de_3a30
+    ),
+    stock_package!(
+        "SH054",
+        "Hobby Fighter",
+        "integration/sh054-hobby-fighter/HOBBY-FIGHTER-STUDIO.json",
+        0x415b_5ee1_58af_22cd
+    ),
+    stock_package!(
+        "SH055",
+        "Condor",
+        "integration/sh055-condor/CONDOR-STUDIO.json",
+        0x6381_baf1_98ec_4a1f
+    ),
+    stock_package!(
+        "SH056",
+        "Aplomado Interceptor",
+        "integration/sh056-aplomado-interceptor/APLOMADO-INTERCEPTOR-STUDIO.json",
+        0xe90c_aa74_abfd_b501
+    ),
+    stock_package!(
+        "SH057",
+        "Falconet",
+        "integration/sh057-falconet/FALCONET-STUDIO.json",
+        0x9b2d_5ada_1eb9_7374
+    ),
+    stock_package!(
+        "SH058",
+        "Muskox",
+        "integration/sh058-muskox/MUSKOX-STUDIO.json",
+        0xe1ec_ad3b_644e_bb3d
+    ),
+    stock_package!(
+        "SH059",
+        "Barbary",
+        "integration/sh059-barbary/BARBARY-STUDIO.json",
+        0x07ba_a797_995b_3ed8
+    ),
+    stock_package!(
+        "SH060",
+        "Wombat",
+        "integration/sh060-wombat/WOMBAT-STUDIO.json",
+        0xe341_60a7_3c44_79f0
+    ),
+    stock_package!(
+        "SH061",
+        "Saiga",
+        "integration/sh061-saiga/SAIGA-STUDIO.json",
+        0xe099_121c_2673_bb02
+    ),
+    stock_package!(
+        "SH062",
+        "Moose Clipper",
+        "integration/sh062-moose-clipper/MOOSE-CLIPPER-STUDIO.json",
+        0xbd45_df1a_e94b_0861
+    ),
+    stock_package!(
+        "SH063",
+        "Seriema Courier",
+        "integration/sh063-seriema-courier/SERIEMA-COURIER-STUDIO.json",
+        0x4870_3225_5433_2199
+    ),
+    stock_package!(
+        "SH064",
+        "Arna Cutter",
+        "integration/sh064-arna-cutter/ARNA-CUTTER-STUDIO.json",
+        0x5e86_bbc7_340b_ce59
+    ),
+    stock_package!(
+        "SH065",
+        "Vulture Raider",
+        "integration/sh065-vulture-raider/VULTURE-RAIDER-STUDIO.json",
+        0xed14_2b3f_c558_8f3e
+    ),
+    stock_package!(
+        "SH066",
+        "Rabbit Explorer",
+        "integration/sh066-rabbit-explorer/RABBIT-EXPLORER-STUDIO.json",
+        0xe187_53ed_92e9_a9b4
+    ),
 ];
 pub(crate) const STOCK_MODELS: [AvailableModel<'static>; DESCRIPTORS.len()] = {
     let mut models = [DESCRIPTORS[0].model; DESCRIPTORS.len()];
@@ -159,6 +324,47 @@ mod tests {
     }
     fn load_sparrowhawk(bytes: &[u8]) -> Result<AuthoredVisual, String> {
         load_stock(descriptor("SH030"), bytes)
+    }
+
+    #[test]
+    fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
+        let catalogue = ok(crate::docked_screens::Catalogue::bundled());
+        assert_eq!(STOCK_MODELS.len(), 28);
+        let mut identities = std::collections::BTreeSet::new();
+        let mut keys = std::collections::BTreeSet::new();
+        for entry in DESCRIPTORS {
+            let id = entry.model.object;
+            assert!(identities.insert(id), "duplicate stock identity {id}");
+            assert!(
+                keys.insert(entry.model.geometry_key),
+                "duplicate stock geometry for {id}"
+            );
+            let catalogue_record = catalogue
+                .object(id)
+                .unwrap_or_else(|| panic!("missing catalogue identity {id}"));
+            assert_eq!(catalogue_record.id, id);
+            let raw = ok(authenticated_package_bytes(entry, entry.package));
+            let package = ok(HullPackage::from_json(raw));
+            assert_eq!(package.id(), id);
+            assert_eq!(package.name(), entry.name);
+            let preview = ModelPreview {
+                object: id.into(),
+                geometry_key: entry.model.geometry_key.into(),
+                bounds: Rect::new(0., 0., 200., 200.),
+                orientation: Orientation::default(),
+            };
+            let visual = stock_visual_for(&preview)
+                .unwrap_or_else(|error| panic!("{id}: {error}"))
+                .unwrap_or_else(|| panic!("missing {id} visual"));
+            assert_eq!(
+                visual.bytes().len(),
+                package.detail.triangles.len() * 3 * 56,
+                "{id}"
+            );
+            let mut crossed = preview;
+            crossed.object = format!("LOCAL:{id}");
+            assert!(ok(stock_visual_for(&crossed)).is_none());
+        }
     }
 
     #[test]

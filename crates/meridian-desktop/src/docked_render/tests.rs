@@ -420,6 +420,18 @@ fn selecting_stock_stag_routes_its_original_preview_without_granting_exchange() 
     );
 }
 
+#[test]
+fn every_admitted_stock_hull_routes_through_the_station_showroom_without_exchange() {
+    for stock in crate::authored_hull::STOCK_MODELS {
+        assert_original_preview(
+            stock.object,
+            stock.object,
+            stock.geometry_key,
+            crate::authored_hull::stock_matches,
+        );
+    }
+}
+
 fn assert_original_preview(
     name: &str,
     id: &str,
