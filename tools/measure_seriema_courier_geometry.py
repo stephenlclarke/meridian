@@ -3,6 +3,7 @@ from fractions import Fraction
 from math import isqrt
 import argparse
 import struct
+import sys
 import json
 import tomllib
 
@@ -12,9 +13,12 @@ import trimesh
 from banteng_art_mesh import assemble
 from prepare_seriema_courier_geometry import INTEGRATION, ORIGINAL, build, metre_space, require
 from measure_banteng_geometry import adaptive_upper, section, solid, upper
-from measure_lanner_geometry import make_fan
+from measure_lanner_geometry import load_reference_records, validated_reference_fan
 from vulture_mk_i_exact_fit import grid_index
 
+
+REFERENCE_FANS_SHA = "2d65eac7621dd2f27162c66b64458d530a9fafdbe933ac2df59af826f6adcea6"
+REFERENCE_DIAGNOSTIC_SHA = "af17ad60f9e05a2b060cd1f8a6f57dd1a9be75ff354c1d1a4949be23179d3d5d"
 
 
 def mesh(points, faces):
@@ -116,11 +120,14 @@ def support_fit(source,use_candidate):
         require(np.array_equal(points, bundled) and np.array_equal(member, membership),
                 "Seriema Courier fit differs from bundled collision geometry")
         points, member = bundled, membership
+    mode = "candidate" if use_candidate else "archive"
+    records = load_reference_records(INTEGRATION / "REFERENCE-FANS.json", REFERENCE_FANS_SHA,
+                                     REFERENCE_DIAGNOSTIC_SHA, mode, points, member, len(slots), "Seriema Courier")
     visible=["detailed","archiveNative","candidateNative"] if use_candidate else ["detailed","archiveNative"]
     indices={key:grid_index(mesh(source[key][0]["vertices"],source[key][0]["faces"])) for key in visible}
     rows={}
-    for (name,ordinal),index in slots.items():
-        fan=make_fan(points,np.flatnonzero(member==index))
+    for ((name, ordinal), index), record in zip(slots.items(), records, strict=True):
+        fan = validated_reference_fan(record, (name, ordinal), points, np.flatnonzero(member == index), "Seriema Courier")
         rows[f"{name}[{ordinal}]"]={lod:adaptive_upper(reference,points[fan],1600) for lod,reference in indices.items()}
     return {"roundingMetres":.02,"fullUpperMillimetres":{lod:max(row[lod] for row in rows.values()) for lod in indices},
             "pieces":rows}
@@ -132,7 +139,7 @@ def main():
     args = parser.parse_args()
     source = load()
     result = fidelity(source) if args.report == "candidate-fidelity" else support_fit(source, args.report == "candidate-fit")
-    print(json.dumps(result, indent=2))
+    sys.stdout.buffer.write((json.dumps(result, indent=2) + "\n").encode())
 
 
 if __name__ == "__main__":

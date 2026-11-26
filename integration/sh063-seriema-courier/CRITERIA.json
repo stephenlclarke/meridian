@@ -115,7 +115,19 @@
     "sourceReference": "finite-intrinsic-empty-seriema-courier",
     "massKg": 14539
   },
+  "referenceTriangulation": {
+    "originalCommit": "16dbbdcfa10bf5bf6a77f92e837f324c05b9eed6",
+    "originalDiagnosticSha256": "af17ad60f9e05a2b060cd1f8a6f57dd1a9be75ff354c1d1a4949be23179d3d5d",
+    "certificate": "integration/sh063-seriema-courier/REFERENCE-FANS.json",
+    "supportsPerMode": 30,
+    "historicalReplayPins": {
+      "tools/measure_seriema_courier_geometry.py": "0992ebf43e2ac8800c4f72adf55498efcd88da4003ec9c2ab256fc797f66055e",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235"
+    }
+  },
   "replayPins": {
+    "integration/sh063-seriema-courier/REFERENCE-FANS.json": "2d65eac7621dd2f27162c66b64458d530a9fafdbe933ac2df59af826f6adcea6",
     "integration/sh063-seriema-courier/FROZEN-SOURCES.json": "1f62f5962f0411e812079112837b9b73edc7e3144452a84e37cd00f921ed04c9",
     "integration/sh063-seriema-courier/ORIGINAL-OWNERSHIP.json": "c97ff5f6027e5df2d70d450da5c2aafc2b1b7b0ad7935231ec65eba81598dfee",
     "integration/sh063-seriema-courier/CREATOR-PINS.json": "271010ee6f0e0ebdd4d71c6193a5653dacc4f2f769a697e6d78bba6b17b917c1",
@@ -140,12 +152,12 @@
     "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
     "tools/lanner_art_mesh.py": "f5cb59dcc0940ee02e039ba5218eb42c638ba0fed692f4b2216699620aba334b",
     "tools/prepare_lanner_geometry.py": "3e1dc0ba15e493f8d53f385c7e2e166420e0082228b355547b3810fb028cdbc8",
-    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
     "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
-    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
     "tools/prepare_banteng_geometry.py": "30366a23a0deff7856d45719267e8cf57cfed24b1cea7e3655d998253afec972",
     "tools/prepare_seriema_courier_geometry.py": "179ecc3241c6cd08ca359725b95c7dd958ce31d0a5ab7a132dfcaf344a121bf2",
-    "tools/measure_seriema_courier_geometry.py": "0992ebf43e2ac8800c4f72adf55498efcd88da4003ec9c2ab256fc797f66055e",
+    "tools/measure_seriema_courier_geometry.py": "ed138de0a2f857d176a71d42f047daac5f266250c90195df3eb9202fd2c55fbf",
     "tools/verify_seriema_courier_geometry.py": "8c4ccd536e87c7d8414dca4919d1eb2954cc3b016b9143b18760f326a045008c",
     "assets/fleet/sh063/CREATOR-CANDIDATE.json": "01fe5a05526d0380715e7187992f447c66277d3ed708daf3655204a5d10a394d",
     "assets/fleet/sh063/source.vertices": "f1e05ca7bd948ab2487271bdaea0717c1da3d66e516a5e314aa606fd0ed745b5",
