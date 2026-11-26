@@ -410,6 +410,7 @@ impl State {
                         .state
                         .custody_clear_at(r.revision, r.dock.sequence())
                     || commerce.lesson.known_active_at(r.tick, r.revision)
+                    || commerce.modular.passenger_aboard_at(r.revision)
                     // A later store or remount must not change admission of the
                     // original MAX command. Its first revision is the account action.
                     || commerce.modular.ecm_fitted_at_revision(
@@ -520,7 +521,9 @@ impl PreparedXyzzy<'_> {
 }
 impl World {
     pub(super) fn test_tank_custody_clear(&self) -> bool {
-        self.active_freight_job().is_none() && self.navigation_trade.occupancy().1 == 0
+        self.active_freight_job().is_none()
+            && self.navigation_trade.occupancy().1 == 0
+            && self.modular.passenger_occupancy().1 == 0
     }
     fn xyzzy_has_free_ordinary_utility_mount(&self) -> Result<bool, SaveError> {
         let fit = self.fuel_scoops_snapshot().ok_or(INVALID)?;
@@ -702,6 +705,7 @@ impl World {
             for kind in [
                 super::modular::ModuleKind::EliteEnergyUnit,
                 super::modular::ModuleKind::NavalLaser,
+                super::modular::ModuleKind::MiningLaser,
                 super::modular::ModuleKind::AdvancedNavigation,
                 super::modular::ModuleKind::FuelScoops,
                 super::modular::ModuleKind::Targeting(crate::equipment::TargetingTier::Military),
@@ -747,8 +751,12 @@ impl World {
                     self.modular
                         .record_test_cargo_fit(&account, review.dock, review.tick)?;
                 }
+                if account.equipment_state().revision() != previous_cargo_revision {
+                    self.modular.record_bay(&account, review.dock);
+                }
                 self.commander_account = Some(account);
             }
+            self.grant_xyzzy_module(review.dock, review.tick, super::ModuleKind::SalvageCutter)?;
             // The present supported mutation boundary is docked: ordinary docking already reset
             // energy/shields. Do not clear heat/cooldown or erase retained combat/mining evidence.
         } else if let XyzzyAction::FitShield(grade) = review.action {

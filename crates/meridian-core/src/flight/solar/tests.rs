@@ -162,6 +162,53 @@ fn secret(world: &mut World, action: XyzzyAction) {
 }
 
 #[test]
+fn paid_solar_cabin_and_ecm_share_the_exact_combined_save() {
+    let mut world = earned_world(18294);
+    let tank = module(&mut world, ModuleKind::FuelStorage);
+    let scoop = module(&mut world, ModuleKind::FuelScoops);
+    let ecm = module(&mut world, ModuleKind::Ecm);
+    let cabin = module(
+        &mut world,
+        ModuleKind::Cabin(crate::CabinGrade::PackedStasis),
+    );
+    let fit = world.modular_equipment_snapshot().unwrap();
+    assert_eq!((fit.utility_mounts_used, fit.equipment_units_used), (3, 3));
+    assert_eq!(world.service_snapshot().unwrap().used_tonnes, 5);
+    for id in [tank, scoop, ecm, cabin] {
+        assert!(
+            fit.items
+                .iter()
+                .any(|item| item.id == id && item.slot.is_some())
+        );
+    }
+    world.request_refuel(world.snapshot().tick).unwrap();
+    journey(&mut world, SystemId::AVENOR);
+    solar_approach(&mut world);
+    refill_solar(&mut world, 8);
+    let solar = world.solar_snapshot().unwrap();
+    let fuel = fuel(&world);
+    let cabins = world.passenger_cabins();
+    let cash = world.credits_tenths();
+    let activation = world.request_ecm(world.snapshot().tick).unwrap();
+    assert_eq!(world.solar_snapshot(), Some(solar));
+    let bytes = world.save_bytes().unwrap();
+    assert!(bytes.windows(8).any(|tag| tag == b"MSOL0003"));
+    assert!(bytes.windows(8).any(|tag| tag == b"MECM0003"));
+    let restored = World::from_save_bytes(&bytes).unwrap();
+    assert_eq!(restored.solar_snapshot(), Some(solar));
+    assert_eq!(restored.snapshot().navigation.unwrap().fuel_units, fuel);
+    assert_eq!(restored.credits_tenths(), cash);
+    assert_eq!(restored.passenger_cabins(), cabins);
+    assert_eq!(restored.fitted_ecm().unwrap().id, ecm);
+    assert_eq!(
+        restored.ecm_snapshot().unwrap().last_activation,
+        Some(activation)
+    );
+    assert_eq!(restored.ecm_snapshot().unwrap().active, None);
+    assert_eq!(restored.ecm_snapshot().unwrap().remaining_ticks, 32);
+}
+
+#[test]
 fn real_earned_paid_scoops_add_unbought_fuel_to_the_extended_tank_and_resume_mid_fraction() {
     let mut world = earned_world(18291);
     module(&mut world, ModuleKind::FuelStorage);

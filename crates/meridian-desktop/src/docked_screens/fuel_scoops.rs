@@ -36,7 +36,7 @@ fn row(world: &World) -> Result<EquipmentRow, String> {
         fitted: 0,
         compatibility: format!("{} | Utility mounts {}/{}", snapshot.compatible_hull, snapshot.utility_mounts_used, snapshot.utility_mounts_capacity),
         refusal: None,
-        readout: vec!["A fitted utility module; does not replace the front laser".into(), "Solar fuel: face the sun and cruise inside three solar radii".into(), "Cargo collection still requires an eligible physical body; fitting does not grant cargo or sale income".into()],
+        readout: vec!["A fitted utility module; does not replace the front laser".into(), "Solar fuel: face the sun and cruise inside three solar radii".into(), "Ore: collect eligible physical fragments at the lower-forward scoop aperture; hold space required for tonnes".into()],
         options: Vec::new(),
         can_buy: false,
         can_fit: false,

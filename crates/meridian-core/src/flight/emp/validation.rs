@@ -24,12 +24,16 @@ impl State {
             return Err(INVALID);
         }
         for e in prefix.equipment.iter() {
-            if e.dock.visit() >= scene.owner.visit
-                || world
-                    .damage
-                    .berth_clock(e.dock.sequence())
-                    .is_none_or(|c| c > scene.physical_tick)
-            {
+            let valid = if let Some(flight) = e.flight {
+                flight.visit <= scene.owner.visit && flight.clock <= scene.physical_tick
+            } else {
+                e.dock.visit() < scene.owner.visit
+                    && world
+                        .damage
+                        .berth_clock(e.dock.sequence())
+                        .is_some_and(|c| c <= scene.physical_tick)
+            };
+            if !valid {
                 return Err(INVALID);
             }
         }
@@ -385,6 +389,7 @@ impl State {
                     i.slot,
                     Some(
                         super::super::ModuleSlot::UtilityFuelScoops
+                            | super::super::ModuleSlot::UtilitySalvageCutter
                             | super::super::ModuleSlot::UtilityEcm
                     )
                 )

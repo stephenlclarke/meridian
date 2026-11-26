@@ -23,6 +23,7 @@ impl State {
         self.enabled == other.enabled
             && self.expired == other.expired
             && Arc::ptr_eq(&self.strokes, &other.strokes)
+            && Arc::ptr_eq(&self.collected, &other.collected)
     }
     pub(crate) fn before_emission(&self, emission: u64) -> Self {
         Self {
@@ -35,6 +36,7 @@ impl State {
                     .collect(),
             ),
             expired: self.expired,
+            collected: Arc::clone(&self.collected),
         }
     }
     pub(crate) fn at_step(&self, tick: u64) -> Self {
@@ -48,6 +50,7 @@ impl State {
                     .collect(),
             ),
             expired: self.expired,
+            collected: Arc::clone(&self.collected),
         }
     }
     pub(crate) fn expiry_receipts(&self) -> impl Iterator<Item = (u64, u64)> + '_ {
@@ -111,7 +114,10 @@ impl State {
     }
     pub(crate) fn validate(&self) -> Result<(), SaveError> {
         if !self.enabled {
-            return if self.strokes.is_empty() && self.expired == [None; BELT_BODY_COUNT] {
+            return if self.strokes.is_empty()
+                && self.collected.is_empty()
+                && self.expired == [None; BELT_BODY_COUNT]
+            {
                 Ok(())
             } else {
                 Err(INVALID)
@@ -128,6 +134,7 @@ impl State {
             enabled: true,
             strokes: Arc::new(Vec::new()),
             expired: self.expired,
+            collected: Arc::clone(&self.collected),
         };
         for hit in self.strokes.iter() {
             let slot = usize::from(hit.contact.asteroid.ordinal);
@@ -170,7 +177,16 @@ impl State {
                             && self.expired[usize::from(b.id.ordinal)]
                                 .is_none_or(|(tick, _)| tick > hit.world_tick)
                     })
-                    .map(|b| usize::from(b.extracted_units))
+                    .map(|b| {
+                        usize::from(b.extracted_units).saturating_sub(
+                            self.collected
+                                .iter()
+                                .filter(|c| {
+                                    c.id.asteroid() == b.id && c.world_tick < hit.world_tick
+                                })
+                                .count(),
+                        )
+                    })
                     .sum::<usize>();
                 if pending + usize::from(body.initial_units) > MAX_PENDING_ORE {
                     return Err(INVALID);
@@ -190,7 +206,7 @@ impl State {
                 }
             }
         }
-        Ok(())
+        self.validate_collections()
     }
     pub(super) fn terminal_stroke(&self, slot: usize) -> Option<&MiningStroke> {
         let body = self.body(slot)?;

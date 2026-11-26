@@ -187,6 +187,18 @@ fn genuine_measured_return_writer_failure_back_and_reception_retry_keep_one_trac
     action(&mut p, Action::Confirm);
     let settled = some(p.world.flight_reception_snapshot());
     assert!(settled.trace.is_some());
+    let clues = some(p.world.unwritten_route_clue_progress());
+    assert_eq!(clues.earned.len(), 1);
+    assert_eq!(clues.earned[0].clue_id, "flight-reception-family-trace");
+    assert_eq!(clues.missing.len(), 63);
+    let journal = crate::help::Panel::clue_journal(&clues);
+    assert_eq!(journal.lines[0], "1 of 64 distinct source clues collected");
+    assert!(
+        journal
+            .lines
+            .iter()
+            .any(|line| line == "flight reception family trace")
+    );
     assert_eq!(
         settled.attempts[0].outcome,
         Some(FlightReceptionOutcome::Complete)
@@ -198,6 +210,7 @@ fn genuine_measured_return_writer_failure_back_and_reception_retry_keep_one_trac
     assert_eq!(ok(fs::read(&target)), saved);
     ok(p.continue_saved());
     assert_eq!(some(p.world.flight_reception_snapshot()), settled);
+    assert_eq!(p.world.unwritten_route_clue_progress(), Some(clues));
     assert_eq!(p.world.credits_tenths(), cash);
 }
 #[test]

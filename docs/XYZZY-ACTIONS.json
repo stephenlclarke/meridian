@@ -195,8 +195,8 @@
     {
       "key": "max/Salvage Cutter",
       "legacyBehavior": "Salvage Cutter when native work tool supports it.",
-      "state": "DEPENDENCY",
-      "dependency": "MC1 actual salvage work target/source/cargo/resource controller and compatible fit."
+      "state": "PARTIAL_CORE",
+      "dependency": "One compatible SH025 owned cutter; fit only when actual capacity permits, otherwise store it. No occupied-hull or cargo-claim authority follows from this grant."
     },
     {
       "key": "max/EMP Pirate Blaster",

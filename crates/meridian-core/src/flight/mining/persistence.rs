@@ -121,8 +121,46 @@ impl World {
                 },
             )?;
         }
-        // Without an eligible original ore-body/intake producer, there is no cargo credit,
-        // market/revision adjustment or collected receipt to synthesize during load.
+        for receipt in self.mining.collections() {
+            if receipt.owner.owner != owner.owner
+                || receipt.owner.hull != owner.hull
+                || receipt.owner.visit > owner.visit
+                || receipt.world_tick > self.state.tick
+                || receipt.physical_tick > self.combat.physical_tick()
+                || self
+                    .jump_journal
+                    .system_at_visit(receipt.owner.visit, receipt.world_tick)?
+                    != receipt.owner.system
+                || self
+                    .commander_account
+                    .as_ref()
+                    .is_none_or(|a| receipt.revision > a.revision())
+                || !modules.scoop_was_fitted_for_collection(receipt)
+                || (receipt.world_tick == self.state.tick
+                    && (flight_pose(self.state.position, self.state.orientation)
+                        != Some(receipt.pose)
+                        || self.state.speed != receipt.speed))
+            {
+                return Err(invalid);
+            }
+            let (jumps, arrival) = self.jump_journal.visit_origin(receipt.owner.visit);
+            let launch = receipt
+                .owner
+                .visit
+                .checked_sub(1)
+                .and_then(|v| v.checked_sub(jumps))
+                .ok_or(invalid)?;
+            let berth = self.damage.berth_clock(launch).ok_or(invalid)?;
+            if arrival.map_or(receipt.physical_tick <= berth, |arrival| {
+                receipt.physical_tick < arrival
+            }) || self
+                .damage
+                .berth_clock(launch.checked_add(1).ok_or(invalid)?)
+                .is_some_and(|next| receipt.physical_tick >= next)
+            {
+                return Err(invalid);
+            }
+        }
         if self.state.mode != FlightMode::Docked
             && !self.mining_motion_clear(
                 flight_pose(self.state.position, self.state.orientation).ok_or(invalid)?,
@@ -138,16 +176,12 @@ impl World {
         // Historical native contact lies outside the actual source mesh. A later terminal
         // tombstone must not legitimize having fired from inside an intact original rock.
         let original = self.mining.before_emission(emission);
-        let Some(data) = &self.station_data else {
-            return false;
-        };
-        original
-            .bodies()
-            .into_iter()
-            .filter(|body| body.remaining_energy > 0.0)
-            .all(|body| {
-                !body.contains_point(pose.position)
-                    && data.asteroid_motion_clear(pose, pose, 0.0, body)
-            })
+        self.mining_motion_clear_with(
+            &original,
+            crate::navigation::SystemId::AVENOR,
+            pose,
+            pose,
+            0.0,
+        )
     }
 }

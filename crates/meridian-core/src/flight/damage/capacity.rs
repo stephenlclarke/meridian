@@ -159,6 +159,11 @@ impl World {
             total = total
                 .checked_add(size(|w| dock.encode_save(w)) + 8 + 8 + 1 + 8)
                 .ok_or(SaveError::TooLarge)?;
+            if self.modular.history_active() {
+                total = total
+                    .checked_add(size(|w| dock.encode_save(w)))
+                    .ok_or(SaveError::TooLarge)?;
+            }
         }
         if journal_grows {
             total = total

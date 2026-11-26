@@ -663,6 +663,7 @@ fn actual_secret_base_release_spends_once_drains_shield_and_preserves_hull_cargo
         mining_scope: Arc::clone(&w.mining_scope),
         damage: w.damage.clone(),
         solar: w.solar.clone(),
+        occupied_salvage: w.occupied_salvage.clone(),
         station_data: decoded.station_data,
         navigation_catalogue: decoded.navigation_catalogue,
         navigation: w.navigation,
@@ -1251,6 +1252,11 @@ fn start_real_3d_charge(w: &mut World, target: crate::traffic::NpcId) {
     panic!("actual three-dimensional EMP aim never admitted its native attacker");
 }
 fn disabled_native_target() -> (World, crate::traffic::NpcId) {
+    disabled_native_target_with_fit(|_| {})
+}
+fn disabled_native_target_with_fit(
+    configure: impl FnOnce(&mut World),
+) -> (World, crate::traffic::NpcId) {
     let mut w = legacy_funded_paid_base();
     let item = w.owned_emp().unwrap().item;
     for axis in [EmpAxis::Power, EmpAxis::Capacity, EmpAxis::Recharge] {
@@ -1258,6 +1264,7 @@ fn disabled_native_target() -> (World, crate::traffic::NpcId) {
             equipment(&mut w, EmpEquipmentAction::Upgrade { item, axis });
         }
     }
+    configure(&mut w);
     let (mut w, target) = defender(w);
     leave_native_npc_beam_plane(&mut w);
     let mut shield_shots = 0;
@@ -1315,6 +1322,349 @@ fn disabled_native_target() -> (World, crate::traffic::NpcId) {
         w.step(track_real_target(&w, target)).unwrap();
     }
     panic!("actual aimed paid EMP releases did not disable the real recent attacker");
+}
+
+#[test]
+fn manual_scanner_occupied_review_without_computers_requires_safe_hold_and_consent() {
+    use crate::equipment::{WorkTarget, WorkTargetId, WorkTargetRole};
+    use crate::{ModuleAction, ModuleKind, ModuleSlot, OccupiedCutError};
+    let (mut pilot, target) = disabled_native_target_with_fit(|world| {
+        let tick = world.snapshot().tick;
+        let bay = world.equipment_snapshot().unwrap().owned.unwrap();
+        world
+            .request_equipment(crate::equipment::Command::UnfitCargoBay(bay.id), tick)
+            .unwrap();
+        for slot in [
+            ModuleSlot::MiningTargeting,
+            ModuleSlot::SalvageTargeting,
+            ModuleSlot::Targeting,
+            ModuleSlot::Navigation,
+        ] {
+            if let Some(item) = world
+                .modular_equipment_snapshot()
+                .unwrap()
+                .items
+                .into_iter()
+                .find(|i| i.slot == Some(slot))
+            {
+                let review = world
+                    .review_module(ModuleAction::Store { item: item.id }, tick)
+                    .unwrap();
+                world.prepare_module(review, tick).unwrap().commit();
+            }
+        }
+        if world.fitted_fuel_scoops().is_none() {
+            let review = world
+                .review_module(ModuleAction::PurchaseFuelScoops, tick)
+                .unwrap();
+            world.prepare_module(review, tick).unwrap().commit();
+        }
+        let review = world
+            .review_module(
+                ModuleAction::Purchase {
+                    kind: ModuleKind::SalvageCutter,
+                },
+                tick,
+            )
+            .unwrap();
+        world.prepare_module(review, tick).unwrap().commit();
+    });
+    pilot
+        .request_emp_trigger(false, pilot.snapshot().tick)
+        .unwrap();
+    assert_eq!(pilot.targeting_tier(), None);
+    for _ in pilot.scanner_targets() {
+        pilot
+            .cycle_scanner_target(pilot.snapshot().tick, [1280, 720])
+            .unwrap();
+        if pilot.selected_disabled_salvage_target() == Some(target) {
+            break;
+        }
+    }
+    assert!(pilot.pilot_operates_selected_tool());
+    let opening = pilot.snapshot().tick;
+    assert!(pilot.review_occupied_cut(target, opening).is_err());
+    let review = loop {
+        let tick = pilot.snapshot().tick;
+        assert!(
+            tick < opening + 1600,
+            "hand-flown cutter never reached the surface"
+        );
+        match pilot.review_occupied_cut(target, tick) {
+            Ok(review) => break review,
+            Err(OccupiedCutError::UnsafeHold | OccupiedCutError::ContactUnavailable) => {}
+            Err(e) => panic!("unexpected manual review refusal: {e}"),
+        }
+        let position = pilot
+            .traffic_snapshot()
+            .unwrap()
+            .actors
+            .into_iter()
+            .find(|a| a.id == target)
+            .unwrap()
+            .pose
+            .position;
+        let work = WorkTarget {
+            id: WorkTargetId::Wreck(target),
+            role: WorkTargetRole::WreckTracking,
+            position,
+        };
+        let controls = pilot.work_hold_input(work, steer_to_real_point(&pilot, position));
+        pilot.step(controls).unwrap();
+        assert_eq!(pilot.snapshot().motion_refusal, None);
+    };
+    let before = pilot.save_bytes().unwrap();
+    review.cancel();
+    assert_eq!(before, pilot.save_bytes().unwrap());
+    let review = pilot
+        .review_occupied_cut(target, pilot.snapshot().tick)
+        .unwrap();
+    let hold = pilot.service_snapshot();
+    let cash = pilot.credits_tenths();
+    let contact = pilot.prepare_occupied_cut(review).unwrap().commit();
+    assert_eq!(contact.target, target);
+    let loaded = cold(&pilot);
+    assert_eq!(
+        loaded.occupied_cut_contacts().collect::<Vec<_>>(),
+        vec![contact]
+    );
+    assert_eq!(loaded.service_snapshot(), hold);
+    assert_eq!(loaded.credits_tenths(), cash);
+}
+
+fn occupied_fixture(full_mounts: bool) -> (World, crate::traffic::NpcId, u64) {
+    use crate::equipment::TargetingTier;
+    use crate::{ModuleAction, ModuleKind, TargetingViewport};
+    fn buy(world: &mut World, kind: ModuleKind) {
+        let tick = world.snapshot().tick;
+        let action = if kind == ModuleKind::FuelScoops {
+            ModuleAction::PurchaseFuelScoops
+        } else {
+            ModuleAction::Purchase { kind }
+        };
+        let review = world.review_module(action, tick).unwrap();
+        world.prepare_module(review, tick).unwrap().commit();
+    }
+    let (mut world, target) = disabled_native_target_with_fit(|world| {
+        let bay = world.equipment_snapshot().unwrap().owned.unwrap();
+        // The three existing utility mounts are occupied. Use the normal berth
+        // equipment action before departure; never remove cargo capacity in flight.
+        world
+            .request_equipment(
+                crate::equipment::Command::UnfitCargoBay(bay.id),
+                world.snapshot().tick,
+            )
+            .unwrap();
+        if world.targeting_tier().is_none() {
+            buy(world, ModuleKind::Targeting(TargetingTier::Basic));
+        }
+        if !world.work_targeting_fit().salvage {
+            buy(world, ModuleKind::SalvageTargeting);
+        }
+        if world.fitted_fuel_scoops().is_none() {
+            buy(world, ModuleKind::FuelScoops);
+        }
+        buy(world, ModuleKind::SalvageCutter);
+        let cutter = world.fitted_salvage_cutter().unwrap();
+        let tick = world.snapshot().tick;
+        let review = world
+            .review_module(ModuleAction::Store { item: cutter.id }, tick)
+            .unwrap();
+        world.prepare_module(review, tick).unwrap().commit();
+        if full_mounts {
+            world
+                .request_equipment(
+                    crate::equipment::Command::FitCargoBay(bay.id),
+                    world.snapshot().tick,
+                )
+                .unwrap();
+        }
+    });
+    let cutter = world
+        .modular_equipment_snapshot()
+        .unwrap()
+        .items
+        .into_iter()
+        .find(|item| item.kind == ModuleKind::SalvageCutter)
+        .unwrap();
+    assert!(cutter.slot.is_none());
+    let cutter = cutter.id;
+    world
+        .request_emp_trigger(false, world.snapshot().tick)
+        .unwrap();
+    world.step(FlightInput::default()).unwrap();
+    let tick = world.snapshot().tick;
+    assert!(
+        world
+            .cycle_targeting(
+                tick,
+                TargetingViewport {
+                    size: [1280, 720],
+                    front: vec![target]
+                }
+            )
+            .unwrap()
+    );
+    for _ in 0..4 {
+        if world.selected_disabled_salvage_target() == Some(target) {
+            break;
+        }
+        world
+            .cycle_targeting(
+                tick,
+                TargetingViewport {
+                    size: [1280, 720],
+                    front: vec![target],
+                },
+            )
+            .unwrap();
+    }
+    assert_eq!(world.selected_disabled_salvage_target(), Some(target));
+    (world, target, cutter)
+}
+
+#[test]
+fn occupied_cut_requires_explicit_review_and_retains_actual_finite_game_contact() {
+    use crate::OccupiedCutError;
+    let (mut world, target, cutter) = occupied_fixture(false);
+    let tick = world.snapshot().tick;
+    // Readiness includes the actual working hold, so advance the ordinary guidance
+    // until the same review shown to the pilot becomes available.
+    let review = loop {
+        let now = world.snapshot().tick;
+        assert!(now - tick < 1600, "occupied hold did not settle");
+        match world.review_occupied_cut(target, now) {
+            Ok(review) => break review,
+            Err(
+                OccupiedCutError::UnsafeHold
+                | OccupiedCutError::ContactUnavailable
+                | OccupiedCutError::MissingFit,
+            ) => {
+                world.step(FlightInput::default()).unwrap();
+            }
+            Err(error) => panic!("unexpected occupied review refusal: {error}"),
+        }
+    };
+    let before = world.save_bytes().unwrap();
+    assert!(world.modular.salvage_exchange_source() == Some(target));
+    assert_eq!(world.fitted_salvage_cutter().unwrap().id, cutter);
+    assert!(review.warning().contains("OCCUPIED / CLAIMED"));
+    review.cancel();
+    assert_eq!(world.save_bytes().unwrap(), before);
+    let stale = world
+        .review_occupied_cut(target, world.snapshot().tick)
+        .unwrap();
+    world.step(FlightInput::default()).unwrap();
+    assert!(matches!(
+        world.prepare_occupied_cut(stale),
+        Err(OccupiedCutError::StaleReview)
+    ));
+    // The composed guidance owns the actual hold. Do not inject an actor, pose or cargo.
+    let contact = loop {
+        assert!(
+            world.snapshot().tick - tick < 1600,
+            "actual occupied hold did not settle before recovery"
+        );
+        let now = world.snapshot().tick;
+        let review = match world.review_occupied_cut(target, now) {
+            Ok(review) => review,
+            Err(OccupiedCutError::UnsafeHold | OccupiedCutError::ContactUnavailable) => {
+                world.step(FlightInput::default()).unwrap();
+                continue;
+            }
+            Err(error) => panic!("unexpected occupied review refusal: {error}"),
+        };
+        let actor_before = world.traffic_snapshot().unwrap().actors;
+        let account = world.service_snapshot();
+        let credits = world.credits_tenths();
+        let receipt_count = world.occupied_cut_contacts().count();
+        match world.prepare_occupied_cut(review) {
+            Ok(prepared) => {
+                assert_eq!(
+                    prepared.publish_with(|_| Err::<(), _>("writer")),
+                    Err("writer")
+                );
+                assert_eq!(world.occupied_cut_contacts().count(), receipt_count);
+                let opening = world.save_bytes().unwrap();
+                let again = world.review_occupied_cut(target, now).unwrap();
+                let prepared = world.prepare_occupied_cut(again).unwrap();
+                let cold = World::from_save_bytes(prepared.bytes()).unwrap();
+                let contact = prepared.commit();
+                assert_ne!(world.save_bytes().unwrap(), opening);
+                assert_eq!(contact.cutter_item, cutter);
+                assert_eq!(contact.target, target);
+                assert_eq!(cold.occupied_cut_contacts().collect::<Vec<_>>(), [contact]);
+                assert_eq!(world.traffic_snapshot().unwrap().actors, actor_before);
+                assert_eq!(world.service_snapshot(), account);
+                assert_eq!(world.credits_tenths(), credits);
+                assert!(matches!(
+                    world.review_occupied_cut(target, now),
+                    Err(OccupiedCutError::Cooldown)
+                ));
+                break contact;
+            }
+            Err(OccupiedCutError::UnsafeHold | OccupiedCutError::ContactUnavailable) => {
+                assert_eq!(world.occupied_cut_contacts().count(), receipt_count);
+                world.step(FlightInput::default()).unwrap();
+            }
+            Err(error) => panic!("unexpected occupied hold refusal: {error}"),
+        }
+    };
+    assert_eq!(world.occupied_cut_contacts().collect::<Vec<_>>(), [contact]);
+    let retained = world.save_bytes().unwrap();
+    let marker = retained
+        .windows(8)
+        .position(|part| part == b"MCUT0002")
+        .unwrap();
+    let mut erased = retained[..marker].to_vec();
+    erased.extend(crate::save::checksum(&erased).to_le_bytes());
+    assert!(World::from_save_bytes(&erased).is_err());
+    assert!(world.restore_bytes(&erased).is_err());
+    assert_eq!(world.save_bytes().unwrap(), retained);
+    world.cancel_targeting();
+    world.step(FlightInput::default()).unwrap();
+    assert!(world.fitted_salvage_cutter().is_none());
+    assert!(world.modular.salvage_exchange_source().is_none());
+    let durable = world.save_bytes().unwrap();
+    let mut cold = World::from_save_bytes(&durable).unwrap();
+    assert_eq!(cold.occupied_cut_contacts().collect::<Vec<_>>(), [contact]);
+    assert!(cold.fitted_salvage_cutter().is_none());
+    // This tiny historical mutation still passes the relative-speed envelope;
+    // only the independently retained preceding traffic movement rejects it.
+    let radius = cold
+        .station_data
+        .as_ref()
+        .unwrap()
+        .player_clearance_radius();
+    cold.occupied_salvage
+        .alter_first_target_speed_for_test(0.01, radius);
+    assert!(cold.save_bytes().is_err());
+    let forged = cold.unchecked_test_save().unwrap();
+    assert!(World::from_save_bytes(&forged).is_err());
+    assert!(world.restore_bytes(&forged).is_err());
+    assert_eq!(world.save_bytes().unwrap(), durable);
+}
+
+#[test]
+fn occupied_cut_with_all_mounts_committed_preserves_crew_and_equipment() {
+    let (mut world, target, _) = occupied_fixture(true);
+    let emp = world.owned_emp().unwrap();
+    let bay = world.equipment_snapshot().unwrap().owned.unwrap();
+    let scoops = world.fitted_fuel_scoops().unwrap().item;
+    assert!(emp.fitted && bay.fitted);
+    world.step(FlightInput::default()).unwrap();
+    assert_eq!(world.automatic_work_status(), Some("No free cutter mount"));
+    assert!(matches!(
+        world.review_occupied_cut(target, world.snapshot().tick),
+        Err(crate::OccupiedCutError::MissingFit)
+    ));
+    assert_eq!(world.owned_emp(), Some(emp));
+    assert_eq!(world.equipment_snapshot().unwrap().owned, Some(bay));
+    assert_eq!(world.fitted_fuel_scoops().unwrap().item, scoops);
+    assert!(world.fitted_salvage_cutter().is_none());
+    assert!(world.modular.salvage_exchange_source().is_none());
+    assert_eq!(world.occupied_cut_contacts().count(), 0);
+    assert!(World::from_save_bytes(&world.save_bytes().unwrap()).is_ok());
 }
 fn native_facing_budget(w: &World, target: crate::traffic::NpcId) -> Option<u32> {
     let p = w.snapshot();

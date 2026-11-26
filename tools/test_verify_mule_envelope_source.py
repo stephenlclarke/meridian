@@ -149,6 +149,86 @@ class MuleSourceVerification(unittest.TestCase):
         self.assert_inverse_remains_pinned('stock-ecm-field', 'STOCK-ECM-FIELD-INVERSE.json', 12,
                                            'stock ECM field')
 
+    def test_scanner_preview_inverse_restores_the_main_hull_publications_first(self):
+        root = verifier.ROOT
+        baseline = verifier.protected_core_pins(root)
+        entries = records.discover_entries(root, baseline)
+        plan = records.order_entries(entries)
+        scanner = entries['scanner-preview']
+        self.assertEqual(len(scanner.files), 40)
+        names = [entry.name for entry in plan]
+        self.assertLess(names.index('scanner-preview'), names.index('sh066-rabbit-explorer'))
+        self.assertLess(names.index('sh066-rabbit-explorer'), names.index('sh065-vulture-raider'))
+        self.assertLess(names.index('sh065-vulture-raider'), names.index('sh064-arna-cutter'))
+        current = (root / records.CORE_SOURCE / verifier.LIB_SOURCE).read_bytes()
+        main = verifier.restore_entries(verifier.LIB_SOURCE, current, plan[:names.index('sh066-rabbit-explorer')])
+        for name in ('sh066-rabbit-explorer', 'sh065-vulture-raider', 'sh064-arna-cutter'):
+            self.assertEqual(main.count(entries[name].declaration.line), 1)
+        self.assertEqual(records.sha(main), scanner.files[verifier.LIB_SOURCE]['beforeSHA256'])
+
+    def test_scanner_preview_inverse_rejects_source_drift_wrong_parent_and_forged_preimage(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            core = self.copy_protected_sources(root)
+            baseline = verifier.protected_core_pins(root)
+            entries = records.discover_entries(root, baseline)
+            scanner = entries['scanner-preview']
+            for relative in scanner.files:
+                with self.subTest(relative=relative):
+                    path = core / relative
+                    original = path.read_bytes()
+                    path.write_bytes(original + b'\n')
+                    with self.assertRaisesRegex(AssertionError, relative):
+                        verifier.verify_protected_core(root)
+                    path.write_bytes(original)
+
+            folder = root / 'integration/scanner-preview'
+            manifest = folder / records.INVERSE_FILE
+            raw = manifest.read_bytes()
+            manifest.write_bytes(raw + b'\n')
+            with self.assertRaisesRegex(AssertionError, 'scanner preview integration inverse manifest'):
+                verifier.verify_protected_core(root)
+
+            inverse = json.loads(raw)
+            entry_path = folder / records.ENTRY_FILE
+            entry_raw = entry_path.read_bytes()
+            entry = json.loads(entry_raw)
+            self.assertEqual(entry['base'], '344b2bf1b46bcf7c2ab62094e7200f8abc7da9c3')
+            inverse['base'] = '98ebd952a2b76f2c9dba424ff77037381cffb7a0'
+            changed = json.dumps(inverse).encode('utf-8')
+            manifest.write_bytes(changed)
+            entry['sha256'] = records.sha(changed)
+            entry_path.write_bytes(json.dumps(entry).encode('utf-8'))
+            with self.assertRaisesRegex(AssertionError, 'scanner preview integration inverse base'):
+                verifier.verify_protected_core(root)
+
+            manifest.write_bytes(raw)
+            entry_path.write_bytes(entry_raw)
+            relative = next(iter(scanner.files))
+            plan = records.order_entries(entries)
+            current = verifier.restore_entries(relative, (core / relative).read_bytes(),
+                                               plan[:plan.index(scanner)])
+            before = scanner.undo(relative, current)
+            forged = {**scanner.files, relative: generator.file_inverse(before + b'\n', current)}
+            approved = {**entries, scanner.name: replace(scanner, files=forged)}
+            with patch.object(verifier, 'discover_entries', return_value=approved):
+                with self.assertRaisesRegex(AssertionError, relative):
+                    verifier.verify_protected_core(root)
+
+    def test_historical_scanner_preview_receipts_are_preserved_separately_from_main(self):
+        path = verifier.ROOT / 'integration/scanner-preview/HISTORICAL-PREVIEW.json'
+        raw = path.read_bytes()
+        self.assertEqual(records.sha(raw), '70fb923e8c797f8df3882951605e812312dceec8bfab796e200f9f20b7fee6b8')
+        binding = json.loads(raw)
+        self.assertEqual(binding['protectedFiles'], 115)
+        self.assertEqual(len(binding['receipts']), 8)
+        for name, expected in binding['receipts'].items():
+            with self.subTest(receipt=name):
+                self.assertEqual(records.sha((verifier.ROOT / name).read_bytes()), expected)
+        scanner = json.loads((verifier.ROOT / 'integration/sh001-mule/SCANNER-TARGET-CYCLE-INVERSE.json').read_bytes())
+        self.assertEqual(scanner['base'], '98ebd952a2b76f2c9dba424ff77037381cffb7a0')
+        self.assertEqual(len(scanner['files']), 6)
+
     def test_historical_stag_check_still_refuses_a_forged_preimage(self):
         # Simulate even a mistakenly approved new inverse with bad historical bytes.
         with tempfile.TemporaryDirectory() as directory:

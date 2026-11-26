@@ -1,5 +1,9 @@
 # Implementation and validation status
 
+The scanner development branch adds distance-ordered Tab selection and manual designation without a targeting computer. Basic targeting aligns the ship. Advanced targeting can fly a work approach. Fitted docking and work modules enable the corresponding automatic sequence. Mac CI passed for the signed local Scanner Preview at `53e2210a`. Its Metal playtest selected a released ore fragment, switched from manual to assisted control, and saved the collected Alloys. Linux and native Windows tests covered hand-flown mining, scooping, salvage and occupied-ship review. Public release requires qualification of the combined main build.
+
+The [automatic work candidate](AUTOMATIC-WORK.md) uses the existing targets and fitted tools for approach, mining and salvage. Tab starts work with the required equipment. Delete clears the selection. Manual steering takes over while keeping the scanner mark. The target panel reports the current World operation. Dell passed the earned mining and cold Continue test at `200c0289`. The corrected earned salvage approach on Dell at `63fb125c` recovered all nine cargo units and preserved them through Continue. Combined native acceptance remains open.
+
 The development save store explicitly unlocks on close. Dell Linux reproduced the cold-reopen failure during concurrent process startup and verified the fix while retaining exclusive access for a live owner.
 
 ## Ordinary hyperspace drive source candidate
@@ -13,6 +17,14 @@ The [seven shield grades](SHIELD-GRADES.md) use the source-defined bank capaciti
 The [fuel storage source candidate](FUEL-STORAGE.md) implements four separately owned and paid physical units, up to three fitted normally on SH025, actual tank capacity and paid refuel, refusal to store occupied capacity, and an explicit four-tank XYZZY exception with current freight and trade custody guards. Gameplay replay, account/route persistence and native acceptance require owned validation.
 
 The [solar fuel source candidate](SOLAR-FUEL-SCOOPS.md) adds the original near-sun collection rate using the actual fitted Fuel Scoops and real current tank, independent cabin heat and lethal overheat, exact account/flight continuation receipts, an explicit scoop-only test action, and actual cockpit status. Physical ore and cargo intake remain open. Authored tests require owned native validation.
+
+## The Unwritten Route clue journal
+
+The [ordinary clue journal](../integration/unwritten-route/README.md) reads the existing first receipts for five playable source families against the original 64-clue catalogue. Shift+J opens the journal. Later trail instructions and the paid Medusa path follow the original quest prerequisites.
+
+## Passenger cabins and G04 source candidate
+
+The [six paid passenger cabin layouts](PASSENGER-CABINS.md) use actual hold and equipment capacity. The original G04 finite pair requires separate current consent, two distinct private awake cabin reservations, physical Renas reception or Avenor cancellation, and durable settlement once. The source candidate includes focused core and desktop regressions but awaits owned compilation, review, hosted and native testing. General life-support damage, hull-loss custody and other passenger contracts are open.
 
 ## Medusa Showroom inspection
 
@@ -580,3 +592,5 @@ The development branch retains the XYZZY menu selection after a successful save.
 ## Stock ECM candidate (source only)
 
 The [stock E.C.M. equipment and manual field candidate](STOCK-ECM.md) adds paid or guarded fitting, the actual shared energy debit and 32-tick field, durable manual termination of local standard projectiles (including player rounds), cold time-only cooldown and desktop controls. The automatic setting is retained intent only. Current NPC combat uses Pulse and does not produce incoming hostile missiles; incoming defence, automatic activation and full playable ECM acceptance remain open. A player round proves only the manual local effect. No Rust or native preview result is yet claimed for this source.
+
+The separate combined preview candidate retains the passenger cabin and clue journal source, the Medusa Showroom, solar fuel and the manual ECM field. Its added regression cases cover paid cabins and ECM through cold Continue and passenger delivery, and a paid solar collection save with a cabin and all three ordinary utility mounts occupied. Historical passenger admission counts the fitted ECM mount; historical MAX Fuel Storage requires ECM to have been stored at its actual opening revision, even if it is installed again later. Combined native qualification is pending.

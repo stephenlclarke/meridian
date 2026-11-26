@@ -263,13 +263,37 @@ impl Profile {
                     "Mining Laser purchased and fitted."
                 }
                 meridian_core::ModuleAction::PurchaseFuelScoops => {
-                    "Fuel Scoops purchased and fitted. Physical ore collection remains unavailable."
+                    "Fuel Scoops purchased and fitted for physical ore collection."
+                }
+                meridian_core::ModuleAction::GrantStoredMiningLaser
+                | meridian_core::ModuleAction::FlightLaserExchange { .. } => {
+                    "Automatic equipment action."
                 }
                 meridian_core::ModuleAction::Purchase { .. } => {
                     "Owned module purchased and fitted."
                 }
+                meridian_core::ModuleAction::GrantStoredSalvageCutter => {
+                    "Salvage Cutter grant is available only through the explicit test outfit."
+                }
+                meridian_core::ModuleAction::FlightSalvageExchange { .. } => {
+                    "Temporary salvage fit is controlled by the selected lawful recovery."
+                }
                 meridian_core::ModuleAction::Store { .. } => "Owned module stored.",
                 meridian_core::ModuleAction::Install { .. } => "Owned module fitted.",
+                meridian_core::ModuleAction::Passenger(action) => match action {
+                    meridian_core::PassengerAction::RequestReplies => {
+                        "Mira Talen and Oren Vey have replied. Review their current passage status."
+                    }
+                    meridian_core::PassengerAction::Board => {
+                        "Both consenting original people are aboard in separate private cabins."
+                    }
+                    meridian_core::PassengerAction::Receive => {
+                        "Both original people received at Renas. 610 CR and trusted clue awarded."
+                    }
+                    meridian_core::PassengerAction::Cancel => {
+                        "Both original people released to Avenor. No payment."
+                    }
+                },
             };
             let published = self
                 .store
@@ -476,6 +500,37 @@ impl Profile {
             };
         }
         self.session.command(&mut self.world, action)
+    }
+
+    pub fn confirm_occupied_cut(
+        &mut self,
+        review: meridian_core::OccupiedCutReview,
+    ) -> Result<String, String> {
+        self.require_profile()?;
+        if !self.playing {
+            return Err("No active commander".into());
+        }
+        let prepared = self
+            .world
+            .prepare_occupied_cut(review)
+            .map_err(|e| e.to_string())?;
+        let published = self
+            .store
+            .as_ref()
+            .ok_or("No profile storage")?
+            .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
+            .map_err(|error| format!("Occupied contact could not be saved: {error}"))?;
+        let contact = prepared.commit();
+        self.has_save = true;
+        self.session.invalidate();
+        publication_message(
+            published,
+            if contact.unlawful {
+                "Occupied contact recorded as unlawful; no verified material. Change saved.".into()
+            } else {
+                "Occupied contact attributed; no verified material. Change saved.".into()
+            },
+        )
     }
 
     pub(crate) fn navigation_route(

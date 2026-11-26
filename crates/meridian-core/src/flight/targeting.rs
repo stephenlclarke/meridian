@@ -6,6 +6,7 @@ use crate::docking::{RigidPose, Vec3};
 use crate::equipment::{TargetingTier, WorkTarget, WorkTargetId, WorkTargetRole};
 use crate::navigation::SystemId;
 use crate::traffic::{NpcId, NpcPhase, NpcSnapshot, Population};
+mod wreck_avoidance;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TargetIdentity {
@@ -93,8 +94,9 @@ pub enum TargetMode {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TargetingSnapshot {
+    pub tracked_fragment: Option<crate::mining::OreId>,
     pub identity: TargetIdentity,
-    pub tier: TargetingTier,
+    pub tier: Option<TargetingTier>,
     pub filter: TargetFilter,
     pub mode: TargetMode,
     pub guidance: &'static str,
@@ -132,6 +134,11 @@ impl Candidate {
 #[derive(Debug, Default, Clone)]
 pub(super) struct State {
     selected: Option<TargetIdentity>,
+    scanner: bool,
+    manual: bool,
+    pilot_override: bool,
+    work_status: Option<&'static str>,
+    wreck_avoidance: Option<wreck_avoidance::Steering>,
     origin: Option<CombatIdentity>,
     tier: Option<TargetingTier>,
     filter: TargetFilter,
@@ -177,6 +184,8 @@ impl State {
         self.cycle_filter = self.filter;
         self.size = size;
         self.membership = membership;
+        self.work_status = None;
+        self.wreck_avoidance = None;
         self.selected = self.remaining.first().copied();
         if let Some(id) = self.selected {
             self.remaining.remove(0);
@@ -229,7 +238,11 @@ impl World {
         self.combat_identity()
     }
 
-    fn targeting_candidates(&self, origin: CombatIdentity, tier: TargetingTier) -> Vec<Candidate> {
+    fn targeting_candidates(
+        &self,
+        origin: CombatIdentity,
+        include_station: bool,
+    ) -> Vec<Candidate> {
         let mut ships = self
             .traffic_snapshot()
             .map_or_else(Vec::new, |traffic| traffic.actors);
@@ -248,9 +261,7 @@ impl World {
             })
             .map(Candidate::Ship)
             .collect();
-        if tier >= TargetingTier::Docking
-            && let Some(station) = self.state.station
-        {
+        if include_station && let Some(station) = self.state.station {
             candidates.push(Candidate::Station(
                 TargetIdentity::Station {
                     system: origin.system,
@@ -260,6 +271,158 @@ impl World {
             ));
         }
         candidates
+    }
+
+    fn scanner_candidates(&self, origin: CombatIdentity) -> Vec<Candidate> {
+        let mut contacts = self.targeting_candidates(origin, true);
+        for work in self.available_work_contacts(false) {
+            if matches!(work.id, WorkTargetId::Wreck(id) if contacts.iter().any(|c| c.identity() == TargetIdentity::Ship(id)))
+            {
+                continue;
+            }
+            contacts.push(Candidate::Work(work));
+        }
+        contacts
+    }
+
+    /// Selectable contacts in the scanner frame, independent of view and fitted assistance.
+    pub fn scanner_targets(&self) -> Vec<(TargetIdentity, Vec3)> {
+        let Some(origin) = self.targeting_origin() else {
+            return Vec::new();
+        };
+        let Some(player) = super::flight_pose(self.state.position, self.state.orientation) else {
+            return Vec::new();
+        };
+        let mut contacts: Vec<_> = self
+            .scanner_candidates(origin)
+            .into_iter()
+            .map(|c| (c.identity(), c.position()))
+            .collect();
+        let range = |position| {
+            let delta = offset(position, player.position);
+            delta.dot(delta)
+        };
+        contacts.sort_by(|(a, pa), (b, pb)| {
+            range(*pa)
+                .total_cmp(&range(*pb))
+                .then_with(|| a.order().cmp(&b.order()))
+        });
+        contacts
+    }
+
+    pub fn cycle_scanner_target(
+        &mut self,
+        expected_tick: u64,
+        size: [u32; 2],
+    ) -> Result<bool, StepError> {
+        if expected_tick != self.state.tick {
+            return Err(StepError::StaleCommand);
+        }
+        if self.is_paused() {
+            return Err(StepError::Paused);
+        }
+        if size.contains(&0) {
+            return Err(StepError::InvalidMode);
+        }
+        let origin = self.targeting_origin().ok_or(StepError::InvalidMode)?;
+        let ordered = self.scanner_targets();
+        if self.targeting.origin != Some(origin) || !self.targeting.scanner {
+            self.targeting.visited.clear();
+        }
+        let visited = &mut self.targeting.visited;
+        visited.retain(|id| ordered.iter().any(|(other, _)| id == other));
+        if visited.len() == ordered.len() {
+            visited.clear();
+        }
+        let next = ordered
+            .into_iter()
+            .map(|(id, _)| id)
+            .find(|id| !visited.contains(id));
+        if let Some(id) = next {
+            visited.push(id);
+        }
+        self.auto_docking = None;
+        self.targeting.scanner = true;
+        self.targeting.pilot_override = false;
+        self.targeting.filter = TargetFilter::All;
+        self.targeting.origin = Some(origin);
+        self.targeting.selected = next;
+        self.targeting.size = size;
+        self.targeting.work_status = None;
+        self.targeting.wreck_avoidance = None;
+        if next.is_some() && !self.manual_scanner_target() {
+            self.request_flight_view(FlightView::Front, expected_tick)
+                .map_err(|_| StepError::InvalidMode)?;
+        }
+        Ok(next.is_some())
+    }
+
+    pub fn manual_scanner_target(&self) -> bool {
+        self.targeting.scanner
+            && self.targeting.selected.is_some()
+            && (self.targeting.manual
+                || self.targeting.pilot_override
+                || self.targeting_tier().is_none())
+    }
+
+    /// The pilot can operate real fitted work equipment while using steering assistance.
+    pub fn pilot_operates_selected_tool(&self) -> bool {
+        if !self.targeting.scanner {
+            return false;
+        }
+        let Some((_, candidate)) = self.current_target() else {
+            return false;
+        };
+        let is_work = match candidate {
+            Candidate::Work(_) => true,
+            Candidate::Ship(ship) => ship.electrical_disabled,
+            Candidate::Station(..) => false,
+        };
+        is_work && self.automatic_work_target(candidate).is_none()
+    }
+
+    fn mark_released_fragment(&mut self) {
+        let Some(TargetIdentity::Work(WorkTargetId::Asteroid(id))) = self.targeting.selected else {
+            return;
+        };
+        if self
+            .mining
+            .body(usize::from(id.ordinal()))
+            .is_some_and(|rock| rock.id == id && rock.remaining_energy <= 0.0)
+            && let Some(fragment) = self.mining_collection_target(id)
+        {
+            self.targeting.selected = Some(TargetIdentity::Work(WorkTargetId::Ore(fragment.id)));
+        }
+    }
+
+    pub fn toggle_scanner_assistance(&mut self) -> Result<bool, StepError> {
+        if self.is_paused() {
+            return Err(StepError::Paused);
+        }
+        self.targeting_origin().ok_or(StepError::InvalidMode)?;
+        self.targeting.manual = !(self.targeting.manual || self.targeting.pilot_override);
+        self.targeting.pilot_override = false;
+        if self.targeting.manual {
+            self.mark_released_fragment();
+        }
+        self.auto_docking = None;
+        self.targeting.work_status = None;
+        self.targeting.wreck_avoidance = None;
+        let enabled = !self.targeting.manual && self.targeting_tier().is_some();
+        if enabled && self.targeting.selected.is_some() {
+            self.request_flight_view(FlightView::Front, self.state.tick)
+                .map_err(|_| StepError::InvalidMode)?;
+        }
+        Ok(enabled)
+    }
+
+    pub(super) fn station_docking_assistance(&self) -> bool {
+        self.targeting_station_selected()
+            && !self.manual_scanner_target()
+            && self
+                .targeting_tier()
+                .is_some_and(|t| t >= TargetingTier::Docking)
+            && self.docking_computer_available()
     }
 
     pub fn cycle_targeting(
@@ -291,7 +454,7 @@ impl World {
             .ok_or(StepError::NonFiniteState)?;
         let filter = self.targeting.filter;
         let mut candidates = if matches!(filter, TargetFilter::Ships | TargetFilter::All) {
-            let mut ships = self.targeting_candidates(origin, tier);
+            let mut ships = self.targeting_candidates(origin, tier >= TargetingTier::Docking);
             ships.retain(|candidate| {
                 tier >= TargetingTier::Advanced
                     || grouped(*candidate, &viewport.front, work_visible) == 0
@@ -305,7 +468,10 @@ impl World {
                 self.work_targets()
                     .into_iter()
                     .filter(|work| filter.includes_work(work.role))
-                    .map(Candidate::Work),
+                    .filter(|work| !matches!(work.id, WorkTargetId::Wreck(id)
+                        if filter == TargetFilter::All && candidates.iter().any(|c| matches!(c, Candidate::Ship(ship) if ship.id == id))))
+                    .map(Candidate::Work)
+                    .collect::<Vec<_>>(),
             );
         }
         candidates.sort_by(|a, b| {
@@ -318,23 +484,47 @@ impl World {
                 .then_with(|| distance(*a).total_cmp(&distance(*b)))
                 .then_with(|| a.identity().order().cmp(&b.identity().order()))
         });
-        let ordered = candidates.into_iter().map(Candidate::identity).collect();
+        let ordered = candidates
+            .iter()
+            .copied()
+            .map(Candidate::identity)
+            .collect();
         let station_was_selected = matches!(
             self.targeting.selected,
             Some(TargetIdentity::Station { .. })
         );
         let selected = self.targeting.cycle(origin, tier, viewport.size, ordered);
+        self.targeting.scanner = false;
         if (station_was_selected || selected.is_some())
             && !matches!(selected, Some(TargetIdentity::Station { .. }))
         {
             self.auto_docking = None;
         }
+        self.targeting.work_status = selected
+            .and_then(|id| {
+                candidates
+                    .iter()
+                    .find(|candidate| candidate.identity() == id)
+            })
+            .and_then(|candidate| self.automatic_work_target(*candidate))
+            .map(|_| "Approaching work target");
         // Selection is a cockpit command, not an automatic launch or weapon command.
         if selected.is_some() {
             self.request_flight_view(FlightView::Front, expected_tick)
                 .map_err(|_| StepError::InvalidMode)?;
         }
         Ok(selected.is_some())
+    }
+
+    pub(super) fn take_manual_control(&mut self) {
+        if self.targeting.scanner && self.targeting.selected.is_some() {
+            self.mark_released_fragment();
+            self.targeting.pilot_override = true;
+            self.targeting.work_status = None;
+            self.targeting.wreck_avoidance = None;
+        } else {
+            self.cancel_targeting();
+        }
     }
 
     pub fn cancel_targeting(&mut self) {
@@ -344,7 +534,9 @@ impl World {
         ) {
             self.auto_docking = None;
         }
+        self.targeting.work_status = None;
         self.targeting.selected = None;
+        self.targeting.wreck_avoidance = None;
     }
 
     pub fn target_filter(&self) -> TargetFilter {
@@ -363,35 +555,258 @@ impl World {
         Ok(self.targeting.filter)
     }
 
-    fn current_target(&self) -> Option<(TargetingTier, Candidate)> {
+    fn current_target(&self) -> Option<(Option<TargetingTier>, Candidate)> {
         let selected = self.targeting.selected?;
         let origin = self.targeting_origin()?;
         if self.targeting.origin != Some(origin) {
             return None;
         }
-        let tier = self.targeting_tier()?;
+        let fitted = self.targeting_tier();
+        if self.targeting.scanner {
+            if let TargetIdentity::Work(WorkTargetId::Asteroid(id)) = selected {
+                // Only a previously acquired automated mining job can follow ore after
+                // its parent disappears. A fresh scanner pass lists the fragment itself.
+                let retain_source =
+                    !self.manual_scanner_target() && self.work_targeting_fit().mining;
+                return self
+                    .available_work_contacts(retain_source)
+                    .into_iter()
+                    .find(|work| work.id == WorkTargetId::Asteroid(id))
+                    .map(|work| (fitted, Candidate::Work(work)));
+            }
+            return self
+                .scanner_candidates(origin)
+                .into_iter()
+                .find(|c| c.identity() == selected)
+                .map(|c| (fitted, c));
+        }
+        let tier = fitted?;
         if let TargetIdentity::Work(id) = selected {
             return self
                 .work_targets()
                 .into_iter()
                 .find(|work| work.id == id && self.targeting.filter.includes_work(work.role))
-                .map(|work| (tier, Candidate::Work(work)));
+                .map(|work| (fitted, Candidate::Work(work)));
         }
-        self.targeting_candidates(origin, tier)
+        self.targeting_candidates(origin, tier >= TargetingTier::Docking)
             .into_iter()
             .find(|c| c.identity() == selected)
-            .map(|c| (tier, c))
+            .map(|c| (fitted, c))
     }
 
     pub fn targeting_station_selected(&self) -> bool {
-        matches!(self.current_target(), Some((_, Candidate::Station(..))))
+        matches!(
+            self.targeting.selected,
+            Some(TargetIdentity::Station { .. })
+        ) && matches!(self.current_target(), Some((_, Candidate::Station(..))))
     }
 
     pub fn selected_work_target(&self) -> Option<WorkTarget> {
         match self.current_target()? {
             (_, Candidate::Work(work)) => Some(work),
+            (_, Candidate::Ship(ship)) if self.targeting.scanner && ship.electrical_disabled => {
+                Some(WorkTarget {
+                    id: WorkTargetId::Wreck(ship.id),
+                    role: WorkTargetRole::WreckTracking,
+                    position: ship.pose.position,
+                })
+            }
             _ => None,
         }
+    }
+
+    fn automatic_work_target(&self, candidate: Candidate) -> Option<WorkTarget> {
+        if self.manual_scanner_target() {
+            return None;
+        }
+        if self.targeting.scanner
+            && let Candidate::Work(work) = candidate
+        {
+            let fit = self.work_targeting_fit();
+            if !match work.id {
+                WorkTargetId::Wreck(_) => fit.salvage,
+                _ => fit.mining,
+            } {
+                return None;
+            }
+        }
+        match candidate {
+            Candidate::Work(work) if work.role == WorkTargetRole::RockHold => {
+                if let WorkTargetId::Asteroid(id) = work.id
+                    && let Some(fragment) = self.mining_collection_target(id)
+                {
+                    return Some(WorkTarget {
+                        id: WorkTargetId::Ore(fragment.id),
+                        role: WorkTargetRole::OreTracking,
+                        position: fragment.position,
+                    });
+                }
+                Some(work)
+            }
+            Candidate::Work(work) => Some(work),
+            Candidate::Ship(ship)
+                if ship.electrical_disabled && self.work_targeting_fit().salvage =>
+            {
+                Some(WorkTarget {
+                    id: WorkTargetId::Wreck(ship.id),
+                    role: WorkTargetRole::WreckTracking,
+                    position: ship.pose.position,
+                })
+            }
+            _ => None,
+        }
+    }
+
+    /// Advanced targeting can fly the approach while the pilot still operates the tool.
+    fn approach_target(&self, candidate: Candidate) -> Option<WorkTarget> {
+        if let Some(work) = self.automatic_work_target(candidate) {
+            return Some(work);
+        }
+        if !self.targeting.scanner
+            || self.manual_scanner_target()
+            || self.targeting_tier()? < TargetingTier::Advanced
+        {
+            return None;
+        }
+        match candidate {
+            Candidate::Work(work) if work.role != WorkTargetRole::OreTracking => Some(work),
+            Candidate::Ship(ship) if ship.electrical_disabled => Some(WorkTarget {
+                id: WorkTargetId::Wreck(ship.id),
+                role: WorkTargetRole::WreckTracking,
+                position: ship.pose.position,
+            }),
+            _ => None,
+        }
+    }
+
+    pub fn selected_disabled_salvage_target(&self) -> Option<NpcId> {
+        let candidate = self.current_target()?.1;
+        let id = match candidate {
+            Candidate::Ship(actor) => actor.id,
+            Candidate::Work(WorkTarget {
+                id: WorkTargetId::Wreck(id),
+                ..
+            }) => id,
+            _ => return None,
+        };
+        self.traffic_snapshot()?
+            .actors
+            .into_iter()
+            .find(|actor| actor.id == id && actor.electrical_disabled && is_live(actor))
+            .map(|actor| actor.id)
+    }
+
+    pub fn automatic_work_status(&self) -> Option<&'static str> {
+        self.targeting.work_status
+    }
+
+    pub(super) fn advance_selected_work(&mut self) {
+        let selected = self.current_target().map(|(_, candidate)| candidate);
+        let work = selected.and_then(|candidate| self.automatic_work_target(candidate));
+        let wreck = work.and_then(|target| match target.id {
+            WorkTargetId::Wreck(id) => Some(id),
+            _ => None,
+        });
+        if self
+            .modular
+            .salvage_exchange_source()
+            .is_some_and(|id| Some(id) != wreck)
+            && self.restore_auto_salvage_tool().is_err()
+        {
+            self.targeting.work_status = Some("Cutter return unavailable");
+            return;
+        }
+        let mining_lock = work.is_some()
+            && matches!(
+                selected.map(Candidate::identity),
+                Some(TargetIdentity::Work(WorkTargetId::Asteroid(_)))
+            );
+        if let Some(WorkTargetId::Ore(ore)) = work.map(|target| target.id) {
+            // Pursuing a released fragment keeps the original asteroid lock and tool.
+            // The intake itself depends on the scoops, including for a direct ore lock.
+            let status = self.auto_scoop_mined_ore_tick(ore.asteroid());
+            let completed = self.current_target().is_none();
+            if completed {
+                self.cancel_targeting();
+            } else {
+                self.targeting.work_status = Some(status);
+            }
+            if (!mining_lock || completed) && self.restore_auto_mining_tool().is_err() {
+                self.targeting.work_status = Some("Tool change unavailable");
+            }
+            return;
+        }
+        if !mining_lock {
+            if self.restore_auto_mining_tool().is_err() {
+                self.targeting.work_status = Some("Tool change unavailable");
+                return;
+            }
+        } else if let Err(err) = self.select_auto_mining_tool() {
+            self.targeting.work_status = Some(match err {
+                crate::mining::MiningError::ProtectedActivity => "Protected activity",
+                crate::mining::MiningError::NoCompatibleFittedTool => "Fit mining laser",
+                _ => "Tool change unavailable",
+            });
+            return;
+        }
+        if let Some(id) = wreck
+            && let Err(error) = self.select_auto_salvage_tool(id)
+        {
+            self.targeting.work_status = Some(match error {
+                super::ModuleError::MissingItem => "Salvage cutter required",
+                super::ModuleError::Capacity => "No free cutter mount",
+                super::ModuleError::MissingPrerequisite if self.fitted_fuel_scoops().is_none() => {
+                    "Scoops not fitted"
+                }
+                _ => "Cutter unavailable",
+            });
+            return;
+        }
+        let Some(work) = work else {
+            self.targeting.work_status = None;
+            return;
+        };
+        if self.targeting.wreck_avoidance.is_some() {
+            self.targeting.work_status = Some("Braking for clearance");
+            return;
+        }
+        let Some(standoff) = self.work_standoff(work) else {
+            return;
+        };
+        let Some(pose) = super::flight_pose(self.state.position, self.state.orientation) else {
+            return;
+        };
+        let vector = offset(work.position, pose.position);
+        let range = vector.dot(vector).sqrt();
+        // Recheck the accepted pose and live target after both have moved this tick.
+        let at_work_speed = self
+            .moving_work_course(work, pose)
+            .map_or(self.state.speed <= 0.1, |(_, _, relative_speed)| {
+                relative_speed <= 1.0
+            });
+        let holding = (range - standoff).abs() <= 0.5
+            && at_work_speed
+            && vector.dot(pose.orientation.z) >= range * 0.999;
+        self.targeting.work_status = Some(if !holding {
+            "Approaching work target"
+        } else {
+            match work.id {
+                WorkTargetId::Asteroid(id) => self.auto_mine_tick(id),
+                WorkTargetId::Wreck(id) if self.selected_disabled_salvage_target() == Some(id) => {
+                    match self.review_occupied_cut(id, self.state.tick) {
+                        Ok(_) => "Occupied: confirm cut",
+                        Err(super::OccupiedCutError::MissingFit) => {
+                            "Check cutter and scoop fittings"
+                        }
+                        Err(super::OccupiedCutError::UnsafeHold) => "Establish salvage hold",
+                        Err(super::OccupiedCutError::Cooldown) => "Cutter cooling",
+                        Err(_) => "Occupied contact unavailable",
+                    }
+                }
+                WorkTargetId::Wreck(id) => self.auto_salvage_tick(id),
+                WorkTargetId::Ore(_) => return,
+            }
+        });
     }
 
     /// One selected live actor, not an owned missile lock. Manual steering releases tracking;
@@ -404,22 +819,54 @@ impl World {
             self.cancel_targeting();
             return input;
         };
+        if self.manual_scanner_target() {
+            return input;
+        }
+        let work = self.approach_target(target);
         if input.pitch != 0.0
             || input.yaw != 0.0
             || input.roll != 0.0
-            || matches!(target, Candidate::Station(..) | Candidate::Work(_))
+            || (work.is_some()
+                || self.station_docking_assistance()
+                || !self.targeting.scanner
+                    && matches!(target, Candidate::Station(..) | Candidate::Work(_)))
                 && (input.throttle != 0.0 || input.brake)
         {
-            self.cancel_targeting();
+            self.take_manual_control();
             return input;
         }
-        if matches!(target, Candidate::Station(..)) {
+        if matches!(target, Candidate::Station(..)) && self.station_docking_assistance() {
             return input;
         }
         let Some(player) = super::flight_pose(self.state.position, self.state.orientation) else {
             return input;
         };
-        let [bearing, elevation] = target_bearing(player, target.position());
+        let mut aim = work.map_or_else(|| target.position(), |work| work.position);
+        let collecting = work.is_some_and(|w| matches!(w.id, WorkTargetId::Ore(_)));
+        if !collecting && let Some(standoff) = work.and_then(|w| self.work_standoff(w)) {
+            let delta = offset(aim, player.position);
+            if delta.dot(delta).sqrt() < standoff - 0.25 {
+                // Only forward thrust is available. Face away to recover the work distance,
+                // then turn back towards the target for cutting or mining.
+                aim = offset(player.position, delta);
+            }
+        }
+        if let Some((point, _, _)) = work.and_then(|target| self.moving_work_course(target, player))
+        {
+            aim = point;
+        }
+        let [bearing, mut elevation] = target_bearing(player, aim);
+        if collecting {
+            let range = offset(aim, player.position);
+            if work
+                .and_then(|target| self.work_standoff(target))
+                .is_some_and(|distance| range.dot(range).sqrt() <= distance + 1.0)
+            {
+                // Turn above the fragment at the working distance, once its entire
+                // mesh can enter the lower-forward aperture.
+                elevation += 45.0_f64.atan2(55.0);
+            }
+        }
         let tolerance = 1.5 / (f64::from(self.targeting.size[1].max(1)) * 0.8);
         let control = |angle: f64, rate: f32| {
             if angle.abs() <= tolerance {
@@ -435,18 +882,36 @@ impl World {
             pitch,
             ..input
         };
-        if let Candidate::Work(work) = target
-            && work.role == WorkTargetRole::RockHold
-        {
-            self.asteroid_hold_input(work, output)
+        if let Some(work) = work {
+            let desired = self.work_hold_input(work, output);
+            if let WorkTargetId::Wreck(id) = work.id
+                && self.auto_salvage_eligible(id)
+                && let Some(standoff) = self.work_standoff(work)
+            {
+                return wreck_avoidance::protect(
+                    &mut self.targeting.wreck_avoidance,
+                    self.state,
+                    work.position,
+                    standoff,
+                    desired,
+                );
+            }
+            self.targeting.wreck_avoidance = None;
+            desired
         } else {
+            self.targeting.wreck_avoidance = None;
             output
         }
     }
 
     pub fn targeting_snapshot(&self) -> Option<TargetingSnapshot> {
-        let (tier, candidate) = self.current_target()?;
+        let (installed, candidate) = self.current_target()?;
+        let tier = installed.unwrap_or(TargetingTier::Basic);
         let identity = candidate.identity();
+        let displayed_work = match candidate {
+            Candidate::Work(work) => Some(self.automatic_work_target(candidate).unwrap_or(work)),
+            _ => None,
+        };
         let (mode, guidance, pose, model, status, fields) = match candidate {
             Candidate::Ship(actor) => {
                 let identified = tier >= TargetingTier::Identification;
@@ -494,7 +959,13 @@ impl World {
                 let detailed = tier >= TargetingTier::Identification;
                 let player = super::flight_pose(self.state.position, self.state.orientation)?;
                 let delta = offset(pose.pose.position, player.position);
-                let status = self.auto_docking_status().unwrap_or("Aligning");
+                let status =
+                    self.auto_docking_status()
+                        .unwrap_or(if self.station_docking_assistance() {
+                            "Aligning for docking"
+                        } else {
+                            "Station bearing"
+                        });
                 let fields = if detailed {
                     vec![
                         (
@@ -524,7 +995,8 @@ impl World {
                     fields,
                 )
             }
-            Candidate::Work(work) => {
+            Candidate::Work(selected) => {
+                let work = displayed_work.unwrap_or(selected);
                 let (model, guidance) = match work.role {
                     WorkTargetRole::RockHold => ("Asteroid", "Rock guidance"),
                     WorkTargetRole::OreTracking => ("Ore", "Ore tracking"),
@@ -553,11 +1025,19 @@ impl World {
             }
         };
         Some(TargetingSnapshot {
+            tracked_fragment: displayed_work.and_then(|work| match work.id {
+                WorkTargetId::Ore(id) => Some(id),
+                _ => None,
+            }),
             identity,
-            tier,
+            tier: installed,
             filter: self.targeting.filter,
             mode,
-            guidance,
+            guidance: if self.manual_scanner_target() {
+                "Manual target"
+            } else {
+                guidance
+            },
             pose,
             model,
             status,
@@ -861,6 +1341,38 @@ mod tests {
     }
 
     #[test]
+    fn selected_asteroid_starts_approach_and_manual_brake_releases_it() {
+        let mut world = fitted(TargetingTier::Military);
+        launch(&mut world);
+        world.cycle_target_filter().unwrap();
+        let tick = world.snapshot().tick;
+        assert!(world.cycle_targeting(tick, viewport(vec![])).unwrap());
+        let rock = world.selected_work_target().unwrap();
+        // Start on a clear exterior ray so this tests guidance, not station clearance.
+        world.state.position = [
+            rock.position.x as f32,
+            rock.position.y as f32,
+            rock.position.z as f32 - 300.0,
+        ];
+        world.state.orientation = [0.0, 0.0, 0.0, 1.0];
+        world.state.speed = 0.0;
+        world.step(FlightInput::default()).unwrap();
+        assert_eq!(
+            world.automatic_work_status(),
+            Some("Approaching work target")
+        );
+        assert!(world.state.speed > 0.0);
+        world
+            .step(FlightInput {
+                brake: true,
+                ..FlightInput::default()
+            })
+            .unwrap();
+        assert!(world.automatic_work_status().is_none());
+        assert!(world.selected_work_target().is_none());
+    }
+
+    #[test]
     fn work_filter_cycles_real_rock_ids_and_preserves_stable_remaining_order() {
         let mut world = fitted(TargetingTier::Military);
         launch(&mut world);
@@ -936,8 +1448,7 @@ mod tests {
     }
 
     #[test]
-    fn accepted_rock_obstruction_releases_selected_guidance_without_idle_retry_or_account_effects()
-    {
+    fn accepted_rock_obstruction_releases_guidance_and_returns_the_tool_without_retry() {
         let mut world = fitted(TargetingTier::Military);
         launch(&mut world);
         let belt = world.mining_belt_snapshot().unwrap();
@@ -968,6 +1479,7 @@ mod tests {
         );
         assert_eq!(world.selected_work_target().unwrap().id, target);
 
+        let equipment = world.modular_equipment_snapshot().unwrap();
         let account_revision = world.commander_account.as_ref().unwrap().revision();
         let credits = world.credits_tenths();
         let ammunition = world.ammunition_snapshot();
@@ -1007,8 +1519,11 @@ mod tests {
         }
         assert_eq!(
             world.commander_account.as_ref().unwrap().revision(),
-            account_revision
+            account_revision + 2
         );
+        let restored = world.modular_equipment_snapshot().unwrap();
+        assert_eq!(restored.fit_revision, equipment.fit_revision + 2);
+        assert_eq!(restored.items, equipment.items);
         assert_eq!(world.credits_tenths(), credits);
         assert_eq!(world.ammunition_snapshot(), ammunition);
         assert_eq!(world.mining.work_count(), work_count);

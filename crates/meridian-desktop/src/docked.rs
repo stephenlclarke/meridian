@@ -1,7 +1,8 @@
 //! Host menu state is ephemeral. Only Profile's prepared commands can change the game.
 use crate::{docked_screens as ui, profile::Profile, session::Action};
 use meridian_core::{
-    AmmunitionAction, ModuleAction, ModuleKind, ModuleSlot, World, equipment,
+    AmmunitionAction, ModuleAction, ModuleKind, ModuleSlot, PassageStatus, PassengerAction, World,
+    equipment,
     navigation::{DockContext, SystemId},
     station_services::{self, CommodityId},
 };
@@ -120,6 +121,7 @@ struct Anchor {
     equipment: Option<equipment::Snapshot>,
     ammunition: Option<meridian_core::AmmunitionSnapshot>,
     modules: Option<meridian_core::ModularEquipmentSnapshot>,
+    passage: Option<meridian_core::PassengerJourneySnapshot>,
     emp: Option<meridian_core::EmpSnapshot>,
     services: Option<meridian_core::ServiceSnapshot>,
     quotes: Vec<Option<station_services::CommodityQuote>>,
@@ -134,6 +136,7 @@ impl Anchor {
             equipment: world.equipment_snapshot(),
             ammunition: world.ammunition_snapshot(),
             modules: world.modular_equipment_snapshot(),
+            passage: world.passenger_journey_snapshot(),
             emp: world.emp_snapshot(),
             services: world.service_snapshot(),
             quotes: ids
@@ -496,15 +499,31 @@ impl Docked {
                 .unwrap_or_else(|| "This fitting action is unavailable".into()));
         }
         let action = equipment_action(world, &node, instance, &slot, operation)?;
-        let details = vec![
-            row.name.clone(),
-            row.price_tenths.map_or_else(
-                || "Owned item; no charge for fitting or storing".into(),
-                |p| format!("Offer {}.{} CR", p / 10, p % 10),
-            ),
-            "Confirm publishes the complete equipment change".into(),
-        ];
-        self.review(world, Intent::Change(action), "Equipment review", details)?;
+        let details = if slot == "passenger-service" {
+            let mut details = vec![row.name.clone()];
+            details.extend(row.readout.clone());
+            details.push("Confirm publishes the complete passage action".into());
+            details
+        } else {
+            vec![
+                row.name.clone(),
+                row.price_tenths.map_or_else(
+                    || "Owned item; no charge for fitting or storing".into(),
+                    |p| format!("Offer {}.{} CR", p / 10, p % 10),
+                ),
+                "Confirm publishes the complete equipment change".into(),
+            ]
+        };
+        self.review(
+            world,
+            Intent::Change(action),
+            if slot == "passenger-service" {
+                "Passenger service review"
+            } else {
+                "Equipment review"
+            },
+            details,
+        )?;
         Ok(())
     }
 
@@ -542,6 +561,19 @@ fn equipment_action(
     operation: ui::EquipmentOperation,
 ) -> Result<Action, String> {
     use ui::EquipmentOperation::{Buy, Fit, Store};
+    if slot == "passenger-service" {
+        if operation != Buy || instance.is_some() {
+            return Err("Select a passenger service action".into());
+        }
+        let action = match node {
+            "g04-request" => PassengerAction::RequestReplies,
+            "g04-board" => PassengerAction::Board,
+            "g04-receive" => PassengerAction::Receive,
+            "g04-cancel" => PassengerAction::Cancel,
+            _ => return Err("Unknown passenger service action".into()),
+        };
+        return Ok(Action::Module(ModuleAction::Passenger(action)));
+    }
     if slot == ui::emp::SLOT {
         return ui::emp::action(world, node, instance, operation).map(Action::Emp);
     }
@@ -606,6 +638,21 @@ fn equipment_action(
     if shield_node != (slot == "shield") {
         return Err("Select the shield system slot".into());
     }
+    let cabin_node = meridian_core::CabinGrade::ALL
+        .iter()
+        .any(|grade| grade.name() == node);
+    if cabin_node != (slot == "passenger-cabins") {
+        return Err("Select passenger cabins".into());
+    }
+    if cabin_node
+        && operation != Buy
+        && !modules
+            .items
+            .iter()
+            .any(|owned| Some(owned.id) == instance && owned.kind.node() == node)
+    {
+        return Err("Owned cabin selection changed".into());
+    }
     if shield_node
         && operation != Buy
         && !modules
@@ -640,6 +687,19 @@ fn equipment_action(
             .any(|owned| Some(owned.id) == instance && owned.kind == ModuleKind::Ecm)
     {
         return Err("Owned E.C.M. selection changed".into());
+    }
+    let cutter_node = node == ModuleKind::SalvageCutter.node();
+    if cutter_node != (slot == "utility-salvage-cutter") {
+        return Err("Select the Salvage Cutter utility slot".into());
+    }
+    if cutter_node
+        && operation != Buy
+        && !modules
+            .items
+            .iter()
+            .any(|owned| Some(owned.id) == instance && owned.kind == ModuleKind::SalvageCutter)
+    {
+        return Err("Owned Salvage Cutter selection changed".into());
     }
     if targeting_node
         && operation != Buy
@@ -676,7 +736,7 @@ fn equipment_action(
                 .kind;
             ModuleAction::Install {
                 item,
-                replacing: if kind == ModuleKind::FuelStorage {
+                replacing: if kind == ModuleKind::FuelStorage || cabin_node {
                     None
                 } else {
                     modules
@@ -727,10 +787,16 @@ fn module_rows(
         ModuleSlot::MiningTargeting => "Mining targeting",
         ModuleSlot::SalvageTargeting => "Salvage targeting",
         ModuleSlot::UtilityFuelScoops => "Fuel Scoops",
+        ModuleSlot::UtilitySalvageCutter => "Salvage Cutter",
         ModuleSlot::UtilityEcm => "E.C.M. utility",
         ModuleSlot::FuelStorage(_) => "Fuel storage",
+        ModuleSlot::PassengerCabin => "Passenger cabins",
     };
-    let fitted = modules.items.iter().find(|item| item.slot == Some(slot));
+    let fitted = if slot == ModuleSlot::PassengerCabin {
+        None
+    } else {
+        modules.items.iter().find(|item| item.slot == Some(slot))
+    };
     let mut rows = Vec::new();
     for item in modules.items.iter().filter(|item| item.kind.slot() == slot) {
         let mut row = base_row(item.kind.node(), item.kind.name(), label);
@@ -748,6 +814,50 @@ fn module_rows(
                 row.readout
                     .push(format!("Fitted tank position {}", index + 1));
             }
+        } else if let ModuleKind::Cabin(grade) = item.kind {
+            row.compatibility = "Separate 5t accommodation module | 1 equipment unit".into();
+            row.readout.push(format!(
+                "{} places | {}",
+                grade.places(),
+                if grade.supports_awake() {
+                    "Awake or stasis"
+                } else {
+                    "Stasis only"
+                }
+            ));
+            if let Some(cabin) = world
+                .passenger_cabins()
+                .and_then(|cabins| cabins.into_iter().find(|cabin| cabin.item == item.id))
+            {
+                if cabin.fitted {
+                    row.readout.push(format!(
+                        "Life support: {} | Stasis: {}",
+                        if cabin.life_support_working {
+                            "working"
+                        } else {
+                            "unavailable"
+                        },
+                        if cabin.stasis_working {
+                            "working"
+                        } else {
+                            "unavailable"
+                        }
+                    ));
+                }
+                row.readout.push(format!(
+                    "Free awake / stasis places {}/{}",
+                    cabin.free_awake_places, cabin.free_stasis_places
+                ));
+                if let Some(person) = cabin.passenger {
+                    row.readout
+                        .push(format!("Private reservation: {}", person.name));
+                }
+            }
+        } else if item.kind == ModuleKind::SalvageCutter {
+            row.compatibility =
+                "Unique SH025 work utility; 1 shared mount and 1 equipment unit".into();
+            row.readout
+                .push("Requires lawful salvage custody; not a combat laser".into());
         } else if item.kind == ModuleKind::Ecm {
             row.compatibility = "Unique SH025 utility; 1 shared mount and 1 equipment unit".into();
             row.readout
@@ -859,6 +969,16 @@ fn module_rows(
                 .push("Adds 7.0 LY of tank fuel; fuel not included".into());
             row.readout
                 .push("Normal SH025: 3 shared utility mounts; global ownership cap 4".into());
+        } else if let ModuleKind::Cabin(grade) = offer.kind {
+            row.readout.push(format!(
+                "5t | {} places | {}",
+                grade.places(),
+                if grade.supports_awake() {
+                    "Awake or stasis"
+                } else {
+                    "Stasis only"
+                }
+            ));
         }
         if offer.kind == ModuleKind::Ecm {
             row.readout
@@ -905,6 +1025,62 @@ fn shield_acquisition_rows() -> Vec<ui::EquipmentRow> {
         row
     })
     .collect()
+}
+fn passenger_service_rows(world: &World) -> Result<Vec<ui::EquipmentRow>, String> {
+    let journey = world
+        .passenger_journey_snapshot()
+        .ok_or("No passenger service")?;
+    let mut rows = Vec::new();
+    for (node, label, action, detail) in [
+        (
+            "g04-request",
+            "Request replies",
+            PassengerAction::RequestReplies,
+            "Both people evaluate current separate awake cabins and the Renas route.",
+        ),
+        (
+            "g04-board",
+            "Board both people",
+            PassengerAction::Board,
+            "Board the same two consenting people, one per private cabin.",
+        ),
+        (
+            "g04-receive",
+            "Renas reception / receive both",
+            PassengerAction::Receive,
+            "Actual Renas reception awards 610 CR and the first trusted clue once.",
+        ),
+        (
+            "g04-cancel",
+            "Avenor custodian / release both",
+            PassengerAction::Cancel,
+            "Return both original people to Avenor; no payment or clue.",
+        ),
+    ] {
+        let mut row = base_row(node, label, "G04 passenger service");
+        row.compatibility = "Avenor to Renas | 3.365 LY | Untimed | No deposit".into();
+        let status = match journey.status {
+            PassageStatus::Waiting => "Awaiting replies",
+            PassageStatus::Refused if journey.reply_is_current => "Refused current offer",
+            PassageStatus::Accepted if journey.reply_is_current => "Accepted current offer",
+            PassageStatus::Refused | PassageStatus::Accepted => "Reply stale; request again",
+            PassageStatus::Aboard => "Aboard in separate private cabins",
+            PassageStatus::Delivered => "Received at Renas",
+            PassageStatus::Cancelled => "Released to Avenor",
+        };
+        for person in journey.people {
+            row.readout.push(format!("{}: {status}", person.name));
+        }
+        row.readout.push(detail.into());
+        if let Some(clue) = journey.clue.and_then(|receipt| receipt.clue_id()) {
+            row.readout.push(format!("Trusted clue: {clue}"));
+        }
+        let review = world.review_module(ModuleAction::Passenger(action), world.snapshot().tick);
+        row.can_buy = review.is_ok();
+        row.refusal = review.err().map(|error| error.to_string());
+        rows.push(row);
+    }
+    Ok(rows)
 }
 fn append_pylon_slots(
     slots: &mut Vec<ui::EquipmentSlot>,
@@ -1003,6 +1179,29 @@ fn equipment_panel(
     });
     slots.push(ui::fuel_scoops::slot(world)?);
     slots.push(ui::emp::slot(world));
+    slots.push(ui::EquipmentSlot {
+        id: "passenger-cabins".into(),
+        label: "Passenger cabins".into(),
+        fitted: format!(
+            "{} fitted",
+            modules
+                .items
+                .iter()
+                .filter(|item| item.slot == Some(ModuleSlot::PassengerCabin))
+                .count()
+        ),
+        available: true,
+    });
+    slots.push(ui::EquipmentSlot {
+        id: "passenger-service".into(),
+        label: "G04 passenger service".into(),
+        fitted: world
+            .passenger_journey_snapshot()
+            .map_or("Unavailable".into(), |snapshot| {
+                format!("{:?}", snapshot.status)
+            }),
+        available: true,
+    });
     append_pylon_slots(&mut slots, &ammo);
     for (id, label, slot) in [
         ("targeting", "Targeting computer", ModuleSlot::Targeting),
@@ -1056,6 +1255,17 @@ fn equipment_panel(
             .into(),
         available: true,
     });
+    slots.push(ui::EquipmentSlot {
+        id: "utility-salvage-cutter".into(),
+        label: "Salvage Cutter".into(),
+        fitted: modules
+            .items
+            .iter()
+            .find(|item| item.slot == Some(ModuleSlot::UtilitySalvageCutter))
+            .map_or("Empty", |item| item.kind.name())
+            .into(),
+        available: true,
+    });
     let mut rows = Vec::new();
     let module_slot = match selected {
         "front-laser" => Some(ModuleSlot::FrontLaser),
@@ -1064,7 +1274,9 @@ fn equipment_panel(
         "drive" => Some(ModuleSlot::Drive),
         "shield" => Some(ModuleSlot::Shield),
         "fuel-storage" => Some(ModuleSlot::FuelStorage(0)),
+        "passenger-cabins" => Some(ModuleSlot::PassengerCabin),
         "utility-ecm" => Some(ModuleSlot::UtilityEcm),
+        "utility-salvage-cutter" => Some(ModuleSlot::UtilitySalvageCutter),
         "targeting" => Some(ModuleSlot::Targeting),
         "targeting-mining" => Some(ModuleSlot::MiningTargeting),
         "targeting-salvage" => Some(ModuleSlot::SalvageTargeting),
@@ -1075,6 +1287,8 @@ fn equipment_panel(
         if slot == ModuleSlot::Shield {
             rows.extend(shield_acquisition_rows());
         }
+    } else if selected == "passenger-service" {
+        rows = passenger_service_rows(world)?;
     } else if selected == ui::emp::SLOT {
         rows = ui::emp::rows(world);
     } else if selected == ui::fuel_scoops::SLOT {
@@ -1604,6 +1818,75 @@ mod tests {
     }
 
     #[test]
+    fn cabin_offers_and_separate_g04_review_use_real_demands_and_persist_refusal() {
+        let (directory, mut profile, mut menu) = start();
+        let panel = ok(equipment_panel(&profile.world, "passenger-cabins", ""));
+        assert_eq!(panel.rows.len(), 6);
+        for grade in meridian_core::CabinGrade::ALL {
+            let row = panel
+                .rows
+                .iter()
+                .find(|row| row.node == grade.name())
+                .unwrap_or_else(|| panic!("missing cabin"));
+            assert_eq!(row.price_tenths, Some(u64::from(grade.price_tenths())));
+            assert!(!row.can_buy);
+            assert_eq!(row.fitted, 0);
+        }
+        let panel = ok(equipment_panel(&profile.world, "passenger-service", ""));
+        assert!(
+            panel
+                .rows
+                .iter()
+                .any(|row| row.node == "g04-request" && row.can_buy)
+        );
+        assert!(
+            panel
+                .rows
+                .iter()
+                .any(|row| row.node == "g04-board" && !row.can_buy)
+        );
+        assert!(
+            equipment_action(
+                &profile.world,
+                "g04-request",
+                None,
+                "passenger-cabins",
+                ui::EquipmentOperation::Buy
+            )
+            .is_err()
+        );
+        ok(menu.open(&profile.world, ui::Screen::Equipment));
+        menu.slot = "passenger-service".into();
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm)));
+        assert!(
+            menu.pending
+                .as_ref()
+                .is_some_and(|pending| pending.view.title == "Passenger service review")
+        );
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm)));
+        let snapshot = profile
+            .world
+            .passenger_journey_snapshot()
+            .unwrap_or_else(|| panic!("passage"));
+        assert_eq!(snapshot.status, PassageStatus::Refused);
+        assert_eq!(profile.world.credits_tenths(), Some(7200));
+        drop(profile);
+        let mut continued = open(&directory.0);
+        ok(continued.continue_saved());
+        let restored = continued
+            .world
+            .passenger_journey_snapshot()
+            .unwrap_or_else(|| panic!("passage"));
+        assert_eq!(
+            (restored.status, restored.people, restored.cabins),
+            (snapshot.status, snapshot.people, None)
+        );
+        assert!(!restored.reply_is_current);
+    }
+
+    #[test]
     fn saved_route_requests_publish_before_commit_and_cold_continue_keeps_the_selected_course() {
         let (directory, mut profile, mut menu) = start();
         let plan = ok(profile.world.route_alternatives(SystemId::LARERIA))[0]
@@ -1853,7 +2136,7 @@ mod tests {
     fn front_module_rows_and_pylon_slots_use_real_owned_instances_and_admission() {
         let (_directory, profile, _menu) = start();
         let panel = ok(equipment_panel(&profile.world, "front-laser", ""));
-        assert_eq!(panel.slots.len(), 22);
+        assert_eq!(panel.slots.len(), 25);
         let actual: Vec<_> = panel.slots.iter().map(|slot| slot.id.as_str()).collect();
         assert_eq!(
             actual,
@@ -1866,6 +2149,8 @@ mod tests {
                 "shield",
                 ui::fuel_scoops::SLOT,
                 ui::emp::SLOT,
+                "passenger-cabins",
+                "passenger-service",
                 "pylon-0",
                 "pylon-1",
                 "pylon-2",
@@ -1879,7 +2164,8 @@ mod tests {
                 "targeting-mining",
                 "targeting-salvage",
                 "fuel-storage",
-                "utility-ecm"
+                "utility-ecm",
+                "utility-salvage-cutter"
             ]
         );
         let emp = panel

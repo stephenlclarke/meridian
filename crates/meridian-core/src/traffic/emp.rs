@@ -310,4 +310,72 @@ impl State {
             .and_then(|i| self.actors[i])
             .is_some_and(|a| a.resources.energy == 0 && a.resource_clock <= local)
     }
+
+    /// Check the retained game actor's actual resource state at a command witness.
+    pub(crate) fn occupied_disabled_at(
+        &self,
+        id: NpcId,
+        scene: &MissileScene,
+    ) -> Result<super::Population, SaveError> {
+        let actor = self.actors[self.actor_index(id).ok_or(INVALID)?].ok_or(INVALID)?;
+        if scene.target(id).is_none() || id.system() != scene.system {
+            return Err(INVALID);
+        }
+        let resources =
+            self.resources_at(actor, scene.local_tick, scene.world_tick, scene.stage)?;
+        if resources.energy == 0
+            || !resources
+                .electrical
+                .is_some_and(|pool| pool.disabled && pool.crew_aboard == 1)
+        {
+            return Err(INVALID);
+        }
+        Ok(actor.snapshot().population)
+    }
+
+    /// A temporary game-tool selection needs an independently retained disabled,
+    /// occupied actor at that command tick, even after that actor recovers or leaves.
+    pub(crate) fn occupied_disabled_at_tick(&self, id: NpcId, tick: u64) -> bool {
+        let Some(actor) = self.actor_index(id).and_then(|i| self.actors[i]) else {
+            return false;
+        };
+        if actor.born_world_tick > tick || actor.sold_world_tick.is_some_and(|t| t <= tick) {
+            return false;
+        }
+        let Some(emp_clock) = self
+            .emp_events
+            .iter()
+            .filter(|e| e.victim == id && e.world_tick <= tick)
+            .map(|e| e.local_tick)
+            .max()
+        else {
+            return false;
+        };
+        let clock = self
+            .shots
+            .iter()
+            .filter(|h| {
+                h.world_tick <= tick && (h.victim == id || h.source == super::BeamSource::Npc(id))
+            })
+            .map(|h| h.local_tick)
+            .chain(
+                self.missile_hits
+                    .iter()
+                    .filter(|h| h.victim == id && h.world_tick <= tick)
+                    .map(|h| h.local_tick),
+            )
+            .chain(
+                self.player_hits
+                    .iter()
+                    .filter(|h| h.attacker == id && h.world_tick <= tick)
+                    .map(|h| h.local_tick),
+            )
+            .fold(emp_clock, u64::max);
+        self.resources_at(actor, clock, tick, SceneStage::Command(u64::MAX))
+            .is_ok_and(|r| {
+                r.energy != 0
+                    && r.electrical
+                        .is_some_and(|p| p.disabled && p.crew_aboard == 1)
+            })
+    }
 }

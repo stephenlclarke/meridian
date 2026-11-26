@@ -58,6 +58,7 @@ pub(crate) fn glyph(character: char) -> [u8; 7] {
         '=' => [0, 0, 31, 0, 31, 0, 0],
         ',' => [0, 0, 0, 0, 4, 4, 8],
         '!' => [4, 4, 4, 4, 4, 0, 4],
+        '#' => [10, 10, 31, 10, 31, 10, 10],
         '|' => [4; 7],
         '[' => [14, 8, 8, 8, 8, 8, 14],
         ']' => [14, 2, 2, 2, 2, 2, 14],
@@ -186,6 +187,7 @@ mod tests {
             assert_eq!(glyph(c), glyph(c.to_ascii_lowercase()));
         }
         assert_eq!(glyph(' '), [0; 7]);
+        assert_ne!(glyph('#'), glyph('?'), "target identity prefix");
         assert_eq!(glyph('\u{2603}'), glyph('?'));
     }
     #[test]

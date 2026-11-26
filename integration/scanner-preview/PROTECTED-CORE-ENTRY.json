@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "scanner-preview",
+  "undoBefore": [
+    "sh066-rabbit-explorer"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/scanner-preview/PROTECTED-CORE-INVERSE.json",
+  "sha256": "e41348a34343dfb373d4d6e092a75b6be5f50b1e3aa978232eec3f0fde2f25b1",
+  "base": "344b2bf1b46bcf7c2ab62094e7200f8abc7da9c3",
+  "label": "scanner preview integration"
+}

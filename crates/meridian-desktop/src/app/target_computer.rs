@@ -1,77 +1,74 @@
 //! Host adapter for flight targeting. Keyboard ownership remains in App::game_key.
-use super::{App, StationScene};
-use meridian_core::TargetFilter;
+use super::{App, DEFAULT_FLIGHT_WINDOW};
+use meridian_core::{TargetingSnapshot, World};
+
+fn with_work_status(
+    mut target: TargetingSnapshot,
+    status: Option<&'static str>,
+) -> TargetingSnapshot {
+    if let Some(status) = status {
+        target.guidance = status;
+    }
+    target
+}
 
 impl App {
+    pub(super) fn target_readout(world: &World) -> Option<TargetingSnapshot> {
+        world
+            .targeting_snapshot()
+            .map(|target| with_work_status(target, world.automatic_work_status()))
+    }
+
     pub(super) fn cycle_computer_target(&mut self) {
-        let result = (|| {
-            if self.game.world.targeting_tier().is_none() {
-                return Err("Fit a targeting computer to select ships".to_owned());
-            }
-            let snapshot = self.game.world.snapshot();
-            let renderer = self
-                .renderer
-                .as_ref()
-                .ok_or("Targeting requires an active flight viewport")?;
-            let station = StationScene {
-                pose: snapshot.station.ok_or("No local station frame")?,
-                port: self
-                    .game
-                    .world
-                    .station_port()
-                    .ok_or("No local station geometry")?,
-                docked: false,
-            };
-            let traffic = self.game.world.traffic_snapshot();
-            let mule = self.game.world.mule_actor_snapshot();
-            let filter = self.game.world.target_filter();
-            let belt = (filter != TargetFilter::Ships)
-                .then(|| self.game.world.mining_belt_snapshot())
-                .flatten();
-            let (viewport, work_visible) = renderer.targeting_viewport(
-                &snapshot,
-                station,
-                traffic.as_ref(),
-                mule.as_ref(),
-                belt.as_ref(),
-            )?;
-            if !self
-                .game
-                .world
-                .cycle_targeting_with_work(snapshot.tick, viewport, &work_visible)
-                .map_err(|error| error.to_string())?
-            {
-                let fit = self.game.world.work_targeting_fit();
-                let message = match filter {
-                    TargetFilter::Mining if !fit.mining => "Fit a Mining Module",
-                    TargetFilter::Salvage if !fit.salvage => "Fit a Salvage Module",
-                    TargetFilter::Mining => "No eligible rocks or ore",
-                    TargetFilter::Salvage => "No eligible salvage targets",
-                    _ => "NO TARGETS",
-                };
-                return Ok(message.to_owned());
-            }
-            Ok(self.game.world.targeting_snapshot().map_or_else(
+        // Scanner membership comes from World, not camera clipping or fitted equipment.
+        let size = self
+            .renderer
+            .as_ref()
+            .map_or(DEFAULT_FLIGHT_WINDOW, |renderer| {
+                renderer.scanner_viewport()
+            });
+        let tick = self.game.world.snapshot().tick;
+        let message = match self.game.world.cycle_scanner_target(tick, size) {
+            Ok(true) => self.game.world.targeting_snapshot().map_or_else(
                 || "NO TARGETS".into(),
-                |target| format!("{} selected", target.identity.label()),
-            ))
-        })();
-        self.notice.set(match result {
-            Ok(message) | Err(message) => message,
-        });
+                |target| {
+                    format!(
+                        "{} selected{}",
+                        target.identity.label(),
+                        if self.game.world.manual_scanner_target() {
+                            " (manual)"
+                        } else {
+                            ""
+                        }
+                    )
+                },
+            ),
+            Ok(false) => "NO SCANNER TARGETS".into(),
+            Err(error) => error.to_string(),
+        };
+        self.notice.set(message);
         self.request_redraw();
     }
 
     pub(super) fn release_computer_target(&mut self) {
+        let working = self.game.world.automatic_work_status().is_some();
         self.game.world.cancel_targeting();
-        self.notice.set("Target released".into());
+        self.notice.set(if working {
+            "Automatic work cancelled".into()
+        } else {
+            "Target released".into()
+        });
         self.request_redraw();
     }
 
-    pub(super) fn cycle_computer_filter(&mut self) {
-        let result = self.game.world.cycle_target_filter();
+    pub(super) fn toggle_computer_assistance(&mut self) {
+        let result = self.game.world.toggle_scanner_assistance();
         self.notice.set(match result {
-            Ok(filter) => format!("TARGET FILTER: {}", filter.label()),
+            Ok(true) if self.game.world.targeting_tier().is_none() => {
+                "Manual targeting: fit a core for assistance".into()
+            }
+            Ok(true) => "Target assistance enabled".into(),
+            Ok(false) => "Manual target designation; assistance off".into(),
             Err(error) => error.to_string(),
         });
         self.request_redraw();
@@ -110,8 +107,50 @@ impl App {
 mod tests {
     use super::*;
     use crate::profile::tests::{TestDirectory, open};
-    use meridian_core::FlightInput;
+    use meridian_core::{FlightInput, FlightView, TargetFilter, XyzzyAction};
     use winit::keyboard::KeyCode;
+
+    #[test]
+    fn work_status_updates_existing_guidance_without_changing_target_fields() {
+        use meridian_core::docking::{Basis3, RigidPose};
+        use meridian_core::equipment::{TargetingTier, WorkTargetId, WorkTargetRole};
+        use meridian_core::{TargetIdentity, TargetMode};
+
+        let mut world = World::new_commander(98105).unwrap_or_else(|e| panic!("{e}"));
+        world.request_launch(0).unwrap_or_else(|e| panic!("{e}"));
+        for _ in 0..120 {
+            world
+                .step(FlightInput::default())
+                .unwrap_or_else(|e| panic!("{e}"));
+        }
+        let belt = world
+            .mining_belt_snapshot()
+            .unwrap_or_else(|| panic!("belt"));
+        let rock = belt.bodies[0];
+        let original = TargetingSnapshot {
+            tracked_fragment: None,
+            identity: TargetIdentity::Work(WorkTargetId::Asteroid(rock.id)),
+            tier: Some(TargetingTier::Docking),
+            filter: TargetFilter::All,
+            mode: TargetMode::Work(WorkTargetRole::RockHold),
+            guidance: "Rock guidance",
+            pose: RigidPose {
+                position: rock.position,
+                orientation: Basis3::IDENTITY,
+            },
+            model: Some("Asteroid"),
+            status: None,
+            fields: vec![("Range", "1 unit".into())],
+        };
+        assert_eq!(with_work_status(original.clone(), None), original);
+        // An independent presentation projection; only the World can publish a work status.
+        let mut expected = original.clone();
+        expected.guidance = "Approaching work target";
+        assert_eq!(
+            with_work_status(original, Some("Approaching work target")),
+            expected
+        );
+    }
 
     #[test]
     fn flight_t_requires_selected_ship_and_details_remain_host_local() {
@@ -131,6 +170,11 @@ mod tests {
             .world
             .step(FlightInput::default())
             .unwrap_or_else(|e| panic!("{e}"));
+        let tick = app.game.world.snapshot().tick;
+        app.game
+            .world
+            .request_flight_view(FlightView::Rear, tick)
+            .unwrap_or_else(|e| panic!("{e}"));
         let missile = app.game.world.missile_snapshot();
         let before = app
             .game
@@ -143,19 +187,39 @@ mod tests {
             Some("Lock an actual live target")
         );
         assert_eq!(app.game.world.missile_snapshot(), missile);
-        for (filter, label) in [
-            (TargetFilter::Mining, "Mining"),
-            (TargetFilter::Salvage, "Salvage"),
-            (TargetFilter::All, "All"),
-            (TargetFilter::Ships, "Ships"),
-        ] {
-            app.game_key(KeyCode::KeyF);
-            assert_eq!(app.game.world.target_filter(), filter);
-            assert_eq!(
-                app.notice.text.as_deref(),
-                Some(format!("TARGET FILTER: {label}").as_str())
-            );
-        }
+        assert!(app.game.world.targeting_tier().is_none());
+        let expected = app.game.world.scanner_targets();
+        assert!(expected.len() > 1);
+        app.game_key(KeyCode::Tab);
+        let first = app
+            .game
+            .world
+            .targeting_snapshot()
+            .unwrap_or_else(|| panic!("manual target"));
+        assert_eq!(first.identity, expected[0].0);
+        assert_eq!(first.tier, None);
+        assert!(app.game.world.manual_scanner_target());
+        assert_eq!(app.game.world.flight_view(), FlightView::Rear);
+        app.game_key(KeyCode::KeyF);
+        assert!(app.game.world.manual_scanner_target());
+        assert_eq!(
+            app.game
+                .world
+                .targeting_snapshot()
+                .map(|snapshot| snapshot.identity),
+            Some(first.identity)
+        );
+        app.game_key(KeyCode::Tab);
+        assert_eq!(
+            app.game
+                .world
+                .targeting_snapshot()
+                .map(|snapshot| snapshot.identity),
+            Some(expected[1].0)
+        );
+        assert_eq!(app.game.world.flight_view(), FlightView::Rear);
+        app.game_key(KeyCode::Delete);
+        assert!(app.game.world.targeting_snapshot().is_none());
         app.toggle_target_details();
         assert_eq!(app.target_details, Some(true));
         app.toggle_target_details();
@@ -172,6 +236,66 @@ mod tests {
                 .lines
                 .iter()
                 .any(|line| line.contains("T Lock selected ship"))
+        );
+    }
+
+    #[test]
+    fn scanner_assistance_toggle_preserves_the_actual_contact_and_tab_uses_the_next_contact() {
+        let directory = TestDirectory::new();
+        let mut profile = open(&directory.0);
+        assert!(
+            profile
+                .new_commander(98107)
+                .unwrap_or_else(|e| panic!("{e}"))
+        );
+        profile
+            .xyzzy(XyzzyAction::Enter)
+            .unwrap_or_else(|e| panic!("{e}"));
+        let mut app = App::with_profile(profile);
+        app.game
+            .world
+            .request_launch(0)
+            .unwrap_or_else(|e| panic!("{e}"));
+        app.game
+            .world
+            .step(FlightInput::default())
+            .unwrap_or_else(|e| panic!("{e}"));
+        let expected = app.game.world.scanner_targets();
+        assert!(expected.len() > 1);
+        app.game_key(KeyCode::Tab);
+        let first = app
+            .game
+            .world
+            .targeting_snapshot()
+            .unwrap_or_else(|| panic!("assisted target"));
+        assert_eq!(first.identity, expected[0].0);
+        assert!(first.tier.is_some());
+        assert!(!app.game.world.manual_scanner_target());
+        app.game_key(KeyCode::KeyF);
+        assert!(app.game.world.manual_scanner_target());
+        assert_eq!(
+            app.game
+                .world
+                .targeting_snapshot()
+                .map(|snapshot| snapshot.identity),
+            Some(first.identity)
+        );
+        app.game_key(KeyCode::KeyF);
+        assert!(!app.game.world.manual_scanner_target());
+        assert_eq!(
+            app.game
+                .world
+                .targeting_snapshot()
+                .map(|snapshot| snapshot.identity),
+            Some(first.identity)
+        );
+        app.game_key(KeyCode::Tab);
+        assert_eq!(
+            app.game
+                .world
+                .targeting_snapshot()
+                .map(|snapshot| snapshot.identity),
+            Some(expected[1].0)
         );
     }
 }
