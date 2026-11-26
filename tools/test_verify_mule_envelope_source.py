@@ -16,7 +16,7 @@ class MuleSourceVerification(unittest.TestCase):
         shutil.copytree(verifier.ROOT / core, root / core)
         for record in (verifier.PROTECTED_CORE, verifier.FLIGHT_COMPUTER_INVERSE,
                        verifier.HYPERSPACE_DRIVE_INVERSE, verifier.STOCK_SHIELD_INVERSE,
-                       verifier.FUEL_STORAGE_INVERSE):
+                       verifier.FUEL_STORAGE_INVERSE, verifier.SOLAR_SCOOPS_INVERSE):
             (root / record).parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(verifier.ROOT / record, root / record)
         return root / core
@@ -29,6 +29,7 @@ class MuleSourceVerification(unittest.TestCase):
         self.assertEqual(result['protectedCoreFilesWithHyperspaceDriveChanges'], 12)
         self.assertEqual(result['protectedCoreFilesWithStockShieldChanges'], 16)
         self.assertEqual(result['protectedCoreFilesWithFuelStorageChanges'], 22)
+        self.assertEqual(result['protectedCoreFilesWithSolarScoopsChanges'], 12)
         self.assertEqual(result['geometryCoreTests'], 1)
         self.assertEqual(result['restoreCoreTests'], 1)
         self.assertEqual(result['totalMuleCoreTests'], 24)
@@ -130,6 +131,25 @@ class MuleSourceVerification(unittest.TestCase):
             with self.assertRaisesRegex(AssertionError, 'fuel storage inverse manifest'):
                 verifier.verify_protected_core(root)
 
+    def test_solar_scoops_inverse_is_pinned_and_each_changed_source_remains_exact(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            core = self.copy_protected_sources(root)
+            inverse = verifier.solar_scoops_inverse(root, verifier.protected_core_pins(root))
+            self.assertEqual(len(inverse), 12)
+            for relative in inverse:
+                with self.subTest(relative=relative):
+                    source = core / relative
+                    original = source.read_bytes()
+                    source.write_bytes(original + b'\n')
+                    with self.assertRaisesRegex(AssertionError, relative):
+                        verifier.verify_protected_core(root)
+                    source.write_bytes(original)
+            manifest = root / verifier.SOLAR_SCOOPS_INVERSE
+            manifest.write_bytes(manifest.read_bytes() + b'\n')
+            with self.assertRaisesRegex(AssertionError, 'solar scoops inverse manifest'):
+                verifier.verify_protected_core(root)
+
     def test_hull_publications_must_each_be_removed_exactly_once(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -164,6 +184,8 @@ class MuleSourceVerification(unittest.TestCase):
             relative = verifier.LIB_SOURCE
             protected = verifier.protected_core_pins(root)
             current = verifier.undo_flight_computer(relative, (core / relative).read_bytes(),
+                                                     verifier.solar_scoops_inverse(root, protected))
+            current = verifier.undo_flight_computer(relative, current,
                                                      verifier.fuel_storage_inverse(root, protected))
             current = verifier.undo_flight_computer(relative, current,
                                                      verifier.stock_shield_inverse(root, protected))

@@ -1055,6 +1055,8 @@ impl State {
         owner: u64,
         start: u64,
         end: u64,
+        account: &CommanderAccount,
+        emp: &super::emp::State,
     ) -> Result<(), SaveError> {
         let fit_at = |revision| -> Result<Ledger, SaveError> {
             let mut ledger = Ledger::born(owner)?;
@@ -1088,11 +1090,15 @@ impl State {
             .iter()
             .find(|event| event.revision == end)
             .ok_or(INVALID)?;
+        let budget = crate::equipment::definition().map_err(|_| INVALID)?;
+        let cargo = self.known_cargo_mounts_at(account, end);
+        let mounts = u16::from(after_ledger.fuel_storage_count())
+            + 1
+            + cargo
+            + emp.utility_mounts_at_revision(end);
         if event.item != after.id
-            || u16::from(after_ledger.fuel_storage_count()) + 1
-                > crate::equipment::definition()
-                    .map_err(|_| INVALID)?
-                    .utility_mounts_capacity
+            || mounts > budget.utility_mounts_capacity
+            || after_ledger.fitted_units() + cargo > budget.equipment_units_capacity
         {
             return Err(INVALID);
         }
