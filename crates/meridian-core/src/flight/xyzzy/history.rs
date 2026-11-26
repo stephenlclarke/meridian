@@ -87,7 +87,7 @@ impl State {
                 }),
         );
         events.extend(world.jump_journal.account_events());
-        events.extend(world.solar.receipts().iter().map(|receipt| AccountEvent {
+        events.extend(world.solar.receipts().map(|receipt| AccountEvent {
             revision: receipt.revision,
             effect: AccountEffect::Solar {
                 before: receipt.before,

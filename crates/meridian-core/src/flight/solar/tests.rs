@@ -199,7 +199,7 @@ fn real_earned_paid_scoops_add_unbought_fuel_to_the_extended_tank_and_resume_mid
     assert!(world.solar.runs.len() < 50);
     let mut encoded = Writer::new();
     world.solar.encode(&mut encoded);
-    assert_eq!(world.solar.encoded_len(), encoded.bytes.len() + 8);
+    assert_eq!(world.solar.encoded_len(), encoded.bytes.len() + 12);
     let previous = world.solar_snapshot().unwrap();
     world.request_pause(true, world.snapshot().tick).unwrap();
     assert!(world.step(FlightInput::default()).is_err());
@@ -216,7 +216,7 @@ fn real_earned_paid_scoops_add_unbought_fuel_to_the_extended_tank_and_resume_mid
     assert_eq!(fuel(&world), fuel(&cold));
     let before = world.save_bytes().unwrap();
     let mut forged = World::from_save_bytes(&before).unwrap();
-    Arc::make_mut(&mut forged.solar.receipts)[0].added += 1;
+    forged.solar.receipts.get_mut(0).unwrap().added += 1;
     assert!(forged.save_bytes().is_err());
     assert!(
         world
@@ -386,7 +386,7 @@ fn removing_even_exterior_steps_from_a_same_visit_trace_refuses() {
         })
         .map(|(i, _)| i)
         .unwrap();
-    Arc::make_mut(&mut forged.solar.runs).remove(remove);
+    forged.solar.runs.remove(remove);
     assert!(forged.save_bytes().is_err());
     assert!(
         world
@@ -396,91 +396,142 @@ fn removing_even_exterior_steps_from_a_same_visit_trace_refuses() {
     assert_eq!(world.save_bytes().unwrap(), bytes);
 }
 
+fn leave_corona(world: &mut World) {
+    let outward = outward_target(world);
+    aim_3d(world, outward);
+    for _ in 0..1500 {
+        cruise(world, 34.3);
+        if ratio(world) > 4.05 {
+            break;
+        }
+    }
+    assert!(ratio(world) > 4.05);
+    stop(world);
+}
+
+fn return_to_corona(world: &mut World) {
+    let sun = world.celestial_snapshot().unwrap().sun.position;
+    aim_3d(world, sun);
+    for _ in 0..1500 {
+        cruise(world, 34.3);
+        if ratio(world) <= 4.0 {
+            return;
+        }
+        assert_eq!(world.snapshot().motion_refusal, None);
+    }
+    panic!("same commander could not return to the solar region");
+}
+
 #[test]
-fn proof_reserves_real_outward_steps_and_allows_safe_flight_after_exhaustion() {
-    assert!(!State::limit_for(0, 0, SOFT_PROOF_BYTES - 1));
-    assert!(State::limit_for(0, 0, SOFT_PROOF_BYTES));
-    assert!(State::limit_for(SOURCE_MAX_RUNS - EXIT_RUN_RESERVE, 0, 0));
-    assert!(State::limit_for(0, MAX_REPLAY_STEPS - EXIT_STEP_RESERVE, 0));
+fn chunked_history_crosses_old_limit_and_repeated_same_commander_scooping_remains_live() {
     let mut world = World::new_commander(18303).unwrap();
+    secret(&mut world, XyzzyAction::Enter);
+    secret(&mut world, XyzzyAction::ToggleUnlimitedFuel);
+    journey(&mut world, SystemId::RENAS);
+    let identity = world.commander_id();
+    let initial_fuel = fuel(&world);
+    let initial_cash = world.credits_tenths();
+    solar_approach(&mut world);
+    let mut first_disk = Vec::new();
+    let mut forced_limit = 0;
+    for cycle in 0..3 {
+        let opening = fuel(&world);
+        refill_solar(&mut world, 4);
+        assert!(fuel(&world) >= opening + 4);
+        leave_corona(&mut world);
+        // Distinct accepted controls deliberately cross many independently bounded chunks,
+        // including the former whole-file cap, without forcing flight or dropping evidence.
+        for index in 0..720 {
+            let yaw = if index % 2 == 0 { 0.1 } else { -0.1 };
+            world
+                .step(FlightInput {
+                    yaw,
+                    ..FlightInput::default()
+                })
+                .unwrap();
+        }
+        let current = world.save_bytes().unwrap();
+        assert!(current.len() > crate::save::MAX_SAVE_BYTES);
+        assert!(world.solar.runs.completed.len() > 1);
+        assert!(
+            world
+                .solar
+                .runs
+                .chunks()
+                .all(|chunk| chunk.len() <= RUNS_PER_CHUNK)
+        );
+        assert_eq!(world.commander_id(), identity);
+        let cold = World::from_save_bytes(&current).unwrap();
+        assert_eq!(cold.snapshot(), world.snapshot());
+        assert_eq!(cold.solar_snapshot(), world.solar_snapshot());
+        assert_eq!(cold.solar, world.solar);
+        if cycle == 0 {
+            forced_limit = world.solar.encoded_len();
+            first_disk = current;
+        } else {
+            assert_eq!(
+                super::super::persistence::solar_file_with_limit_test_input(&world, forced_limit),
+                Err(SaveError::TooLarge)
+            );
+            let previous = World::from_save_bytes(&first_disk).unwrap();
+            assert_eq!(previous.commander_id(), identity);
+            assert!(fuel(&previous) < fuel(&world));
+        }
+        world = cold;
+        if cycle < 2 {
+            return_to_corona(&mut world);
+        }
+    }
+    assert!(fuel(&world) >= initial_fuel + 12);
+    assert_eq!(world.credits_tenths(), initial_cash);
+    assert!(!world.solar_save_limit_reached());
+    return_to_corona(&mut world);
+    // Even after the forced outer refusal, the exact same pilot can still steer and scoop.
+    refill_solar(&mut world, 2);
+    assert_eq!(
+        super::super::persistence::solar_file_with_limit_test_input(&world, forced_limit),
+        Err(SaveError::TooLarge)
+    );
+    assert!(fuel(&world) >= initial_fuel + 14);
+}
+
+#[test]
+fn malformed_chunk_size_and_truncated_history_refuse_without_live_replacement() {
+    let mut world = World::new_commander(18306).unwrap();
     solar_approach(&mut world);
     stop(&mut world);
-    assert!(ratio(&world) <= THERMAL_LIMIT);
-    for index in 0..1000 {
-        let yaw = if index % 2 == 0 { 0.1 } else { -0.1 };
+    for i in 0..(RUNS_PER_CHUNK + 4) {
         world
             .step(FlightInput {
-                yaw,
+                yaw: if i % 2 == 0 { 0.1 } else { -0.1 },
                 ..FlightInput::default()
             })
             .unwrap();
-        if world.solar_history_limited() {
-            break;
-        }
     }
-    assert!(world.solar_history_limited());
-    assert!(!world.solar.sealed);
-    let opening = world.solar.encoded_len();
-    assert!(opening >= SOFT_PROOF_BYTES);
-    let mut cold = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
-    for _ in 0..EXIT_STEP_RESERVE {
-        if world.solar.sealed {
-            break;
-        }
-        let inward_command = FlightInput {
-            brake: true,
-            ..FlightInput::default()
-        };
-        world.step(inward_command).unwrap();
-        cold.step(inward_command).unwrap();
+    let before = world.save_bytes().unwrap();
+    let start = before.len() - 8 - world.solar.encoded_len();
+    let count_at = start + 8 + 1;
+    let length_at = count_at + 4;
+    let reseal = |bytes: &mut [u8]| {
+        let end = bytes.len() - 8;
+        let digest = crate::save::checksum(&bytes[..end]);
+        bytes[end..].copy_from_slice(&digest.to_le_bytes());
+    };
+    let mut oversized = before.clone();
+    oversized[count_at..count_at + 4].copy_from_slice(&u32::MAX.to_le_bytes());
+    reseal(&mut oversized);
+    let mut wrong_chunk = before.clone();
+    wrong_chunk[length_at..length_at + 2].copy_from_slice(&1_u16.to_le_bytes());
+    reseal(&mut wrong_chunk);
+    let mut truncated = before.clone();
+    truncated.remove(length_at + 2);
+    reseal(&mut truncated);
+    for bad in [oversized, wrong_chunk, truncated] {
+        assert!(World::from_save_bytes(&bad).is_err());
+        assert!(world.restore_bytes(&bad).is_err());
+        assert_eq!(world.save_bytes().unwrap(), before);
     }
-    assert!(world.solar.sealed);
-    assert!(ratio(&world) > THERMAL_LIMIT);
-    assert!(!world.combat_snapshot().unwrap().player.destroyed);
-    assert_eq!(cold.snapshot(), world.snapshot());
-    assert!(world.solar.encoded_len() - opening < EXIT_RUN_RESERVE * 99);
-    assert!(World::from_save_bytes(&world.save_bytes().unwrap()).is_ok());
-    let sun = world.celestial_snapshot().unwrap().sun.position;
-    aim_3d(&mut world, sun);
-    for _ in 0..1200 {
-        cruise(&mut world, 34.3);
-        if world.snapshot().motion_refusal == Some(crate::MotionRefusal::SolarHistoryLimit) {
-            break;
-        }
-    }
-    assert_eq!(
-        world.snapshot().motion_refusal,
-        Some(crate::MotionRefusal::SolarHistoryLimit)
-    );
-    assert!(ratio(&world) > THERMAL_LIMIT);
-    let proof = world.solar.encoded_len();
-    let orientation = world.snapshot().orientation;
-    world
-        .step(FlightInput {
-            yaw: 1.0,
-            ..FlightInput::default()
-        })
-        .unwrap();
-    assert_ne!(world.snapshot().orientation, orientation);
-    assert_eq!(world.snapshot().motion_refusal, None);
-    assert_eq!(world.solar.encoded_len(), proof);
-    world
-        .request_jump(SystemId::RENAS, world.snapshot().tick)
-        .unwrap();
-    for _ in 0..crate::navigation::BASIC_SPOOL_TICKS {
-        world.step(FlightInput::default()).unwrap();
-    }
-    assert_eq!(world.snapshot().navigation.unwrap().system, SystemId::RENAS);
-    crate::flight::missiles::tests::dock(&mut world);
-    assert_eq!(world.snapshot().mode, FlightMode::Docked);
-    assert!(world.solar_history_limited());
-    let mut continued = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
-    launch(&mut continued);
-    assert_eq!(continued.snapshot().mode, FlightMode::Flight);
-    assert!(continued.solar_history_limited());
-    assert!(!World::new_commander(18305).unwrap().solar_history_limited());
 }
-
 #[test]
 fn fitted_partially_charged_emp_keeps_actual_final_transfer_when_solar_heat_kills() {
     use crate::{EmpAxis, EmpEquipmentAction};

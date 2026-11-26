@@ -8,6 +8,55 @@ const RECEIPT_BYTES: usize = 20;
 const ANCHOR_BYTES: usize = 59;
 const LAST_BYTES: usize = 86;
 
+fn log_bytes<T, const N: usize>(log: &ChunkLog<T, N>, record_bytes: usize) -> usize {
+    4usize
+        .saturating_add(log.len().saturating_mul(record_bytes))
+        .saturating_add(log.len().div_ceil(N).saturating_mul(2))
+}
+
+fn encode_log<T, const N: usize>(
+    w: &mut Writer,
+    log: &ChunkLog<T, N>,
+    record_bytes: usize,
+    mut encode: impl FnMut(&mut Writer, &T),
+) {
+    w.u32(log.len() as u32);
+    for chunk in log.chunks() {
+        w.u16((chunk.len() * record_bytes) as u16);
+        for entry in chunk {
+            encode(w, entry);
+        }
+    }
+}
+
+fn decode_log<T: Clone, const N: usize>(
+    r: &mut Reader<'_>,
+    record_bytes: usize,
+    mut decode: impl FnMut(&mut Reader<'_>) -> Result<T, SaveError>,
+) -> Result<ChunkLog<T, N>, SaveError> {
+    let mut remaining = r.u32()? as usize;
+    if remaining > crate::save::MAX_SOLAR_HISTORY_BYTES / record_bytes {
+        return Err(SaveError::TooLarge);
+    }
+    let mut result = ChunkLog::default();
+    while remaining > 0 {
+        let count = remaining.min(N);
+        let length = usize::from(r.u16()?);
+        if length != count * record_bytes {
+            return Err(SaveError::InvalidEncoding);
+        }
+        let mut chunk = r.subreader(length)?;
+        for _ in 0..count {
+            result.push(decode(&mut chunk)?);
+        }
+        if !chunk.finished() {
+            return Err(SaveError::InvalidEncoding);
+        }
+        remaining -= count;
+    }
+    Ok(result)
+}
+
 impl MotionFrame {
     fn encode(self, w: &mut Writer) {
         for value in self
@@ -200,23 +249,17 @@ impl State {
         if self.is_empty() {
             0
         } else {
-            8 + 1
+            (12 + 1
                 + usize::from(self.legacy_origin.is_some()) * ANCHOR_BYTES
-                + 2
-                + 2
-                + self.runs.len() * RUN_BYTES
-                + 2
-                + self.receipts.len() * RECEIPT_BYTES
                 + 1
-                + usize::from(self.last.is_some()) * LAST_BYTES
+                + usize::from(self.last.is_some()) * LAST_BYTES)
+                .saturating_add(log_bytes(&self.runs, RUN_BYTES))
+                .saturating_add(log_bytes(&self.receipts, RECEIPT_BYTES))
         }
     }
     pub(in crate::flight) fn encode(&self, w: &mut Writer) {
         w.option(self.legacy_origin.as_ref(), |w, anchor| anchor.encode(w));
-        w.bool(self.sealed);
-        w.bool(self.external_limit);
-        w.u16(self.runs.len() as u16);
-        for run in self.runs.iter() {
+        encode_log(w, &self.runs, RUN_BYTES, |w, run| {
             run.opening.encode(w);
             w.u64(run.first_revision);
             w.u16(run.first_fuel);
@@ -224,14 +267,13 @@ impl State {
             w.u64(run.item);
             run.motion.encode(w);
             w.u16(run.steps);
-        }
-        w.u16(self.receipts.len() as u16);
-        for receipt in self.receipts.iter() {
+        });
+        encode_log(w, &self.receipts, RECEIPT_BYTES, |w, receipt| {
             w.u64(receipt.revision);
             w.u64(receipt.tick);
             w.u16(receipt.before);
             w.u16(receipt.added);
-        }
+        });
         w.option(self.last.as_ref(), |w, last| {
             last.anchor.encode(w);
             w.u16(last.fuel);
@@ -241,15 +283,8 @@ impl State {
     }
     pub(in crate::flight) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         let legacy_origin = r.option(Anchor::decode)?;
-        let sealed = r.bool()?;
-        let external_limit = r.bool()?;
-        let count = usize::from(r.u16()?);
-        if count > SOURCE_MAX_RUNS {
-            return Err(INVALID);
-        }
-        let mut runs = Vec::with_capacity(count);
-        for _ in 0..count {
-            runs.push(Run {
+        let runs = decode_log(r, RUN_BYTES, |r| {
+            Ok(Run {
                 opening: Anchor::decode(r)?,
                 first_revision: r.u64()?,
                 first_fuel: r.u16()?,
@@ -257,21 +292,16 @@ impl State {
                 item: r.u64()?,
                 motion: Motion::decode(r)?,
                 steps: r.u16()?,
-            });
-        }
-        let count = usize::from(r.u16()?);
-        if count > crate::save::MAX_SAVE_BYTES / RECEIPT_BYTES {
-            return Err(INVALID);
-        }
-        let mut receipts = Vec::with_capacity(count);
-        for _ in 0..count {
-            receipts.push(Receipt {
+            })
+        })?;
+        let receipts = decode_log(r, RECEIPT_BYTES, |r| {
+            Ok(Receipt {
                 revision: r.u64()?,
                 tick: r.u64()?,
                 before: r.u16()?,
                 added: r.u16()?,
-            });
-        }
+            })
+        })?;
         let last = r.option(|r| {
             Ok(Last {
                 anchor: Anchor::decode(r)?,
@@ -281,12 +311,11 @@ impl State {
             })
         })?;
         let result = Self {
-            runs: Arc::new(runs),
-            receipts: Arc::new(receipts),
+            runs,
+            receipts,
             last,
             legacy_origin,
-            sealed,
-            external_limit,
+            legacy_format: false,
         };
         if result.is_empty() {
             return Err(INVALID);
@@ -300,15 +329,8 @@ impl State {
         account: &CommanderAccount,
         modular: &crate::flight::modular::State,
     ) -> Result<(), SaveError> {
-        if self.runs.len() > SOURCE_MAX_RUNS
-            || self
-                .runs
-                .iter()
-                .map(|run| u64::from(run.steps))
-                .sum::<u64>()
-                > MAX_REPLAY_STEPS
-        {
-            return Err(INVALID);
+        if self.encoded_len() > crate::save::MAX_SOLAR_HISTORY_BYTES {
+            return Err(SaveError::TooLarge);
         }
         if self.is_empty() {
             let mut origin = Self::default();
@@ -316,8 +338,6 @@ impl State {
             return if self.receipts.is_empty()
                 && self.last.is_none()
                 && origin.legacy_origin.is_none()
-                && !self.sealed
-                && !self.external_limit
             {
                 Ok(())
             } else {
@@ -327,9 +347,7 @@ impl State {
         if !world.damage.enabled() {
             return Err(INVALID);
         }
-        if self.external_limit
-            && world.encoded_current_size()? < AGGREGATE_SOFT_BYTES - AGGREGATE_SHRINK_ALLOWANCE
-        {
+        if self.legacy_format {
             return Err(INVALID);
         }
         if let Some(origin) = self.legacy_origin {
@@ -454,22 +472,6 @@ impl State {
         if receipts.next().is_some() {
             return Err(INVALID);
         }
-        if self.sealed {
-            let last = self.last.ok_or(INVALID)?;
-            let sun = Self::sun(
-                world,
-                last.anchor.system,
-                last.anchor.visit,
-                last.anchor.tick,
-            )?;
-            let current = world.combat_identity().ok_or(INVALID)?;
-            if !self.soft_limit()
-                || (last.anchor.visit == current.visit
-                    && last.anchor.frame.ratio_and_nose(sun).0 <= THERMAL_LIMIT)
-            {
-                return Err(INVALID);
-            }
-        }
         match (previous, self.last) {
             (Some(replayed), Some(saved))
                 if replayed.anchor.near(saved.anchor)
@@ -519,13 +521,11 @@ impl State {
                 || self
                     .legacy_origin
                     .is_some_and(|origin| origin.visit == current.visit);
-            if (self.sealed && ratio <= THERMAL_LIMIT)
-                || (!self.sealed
-                    && (tracked || ratio <= THERMAL_LIMIT)
-                    && self.last.is_none_or(|last| !last.anchor.near(current))
-                    && self
-                        .legacy_origin
-                        .is_none_or(|origin| !origin.near(current)))
+            if (tracked || ratio <= THERMAL_LIMIT)
+                && self.last.is_none_or(|last| !last.anchor.near(current))
+                && self
+                    .legacy_origin
+                    .is_none_or(|origin| !origin.near(current))
             {
                 return Err(INVALID);
             }

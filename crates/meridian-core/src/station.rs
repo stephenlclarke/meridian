@@ -33,7 +33,6 @@ pub enum MotionRefusal {
     EntryConditions,
     CelestialContact,
     NpcContact,
-    SolarHistoryLimit,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

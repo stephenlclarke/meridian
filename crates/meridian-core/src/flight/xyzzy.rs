@@ -269,7 +269,6 @@ impl State {
                     world
                         .solar
                         .receipts()
-                        .iter()
                         .filter(|receipt| receipt.revision <= revision && receipt.tick <= tick)
                         .map(|receipt| u64::from(receipt.added))
                         .sum(),

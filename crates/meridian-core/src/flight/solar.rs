@@ -15,16 +15,81 @@ const COOLING: f64 = 1.0 - 0.14 * DELTA;
 const CORONA_LIMIT: f64 = 3.0;
 const THERMAL_LIMIT: f64 = 4.0;
 const NOSE_THRESHOLD: f64 = 0.8;
-const SOURCE_MAX_RUNS: usize = crate::save::MAX_SAVE_BYTES / 99;
-const MAX_REPLAY_STEPS: u64 = 250_000;
 const MAX_RUN_STEPS: u16 = 600;
-// Keep a separately reserved tail for an actual outward flight rather than
-// consuming the last representable step while the commander is in the corona.
-const EXIT_RUN_RESERVE: usize = 96;
-const EXIT_STEP_RESERVE: u64 = 6000;
-const SOFT_PROOF_BYTES: usize = 24_000;
-const AGGREGATE_SOFT_BYTES: usize = crate::save::MAX_SAVE_BYTES - 14_000;
-const AGGREGATE_SHRINK_ALLOWANCE: usize = 4096;
+const RUNS_PER_CHUNK: usize = 64;
+const RECEIPTS_PER_CHUNK: usize = 256;
+
+/// Immutable completed chunks are shared across prospective flight steps. Only the
+/// current, fixed-size tail is cloned for a normal append or held-control extension.
+#[derive(Debug, Clone, PartialEq)]
+struct ChunkLog<T, const N: usize> {
+    completed: Arc<Vec<Arc<Vec<T>>>>,
+    tail: Arc<Vec<T>>,
+    len: usize,
+}
+impl<T, const N: usize> Default for ChunkLog<T, N> {
+    fn default() -> Self {
+        Self {
+            completed: Arc::new(Vec::new()),
+            tail: Arc::new(Vec::new()),
+            len: 0,
+        }
+    }
+}
+impl<T, const N: usize> ChunkLog<T, N> {
+    fn len(&self) -> usize {
+        self.len
+    }
+    fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+    fn chunks(&self) -> impl Iterator<Item = &[T]> {
+        self.completed
+            .iter()
+            .map(|chunk| chunk.as_slice())
+            .chain(std::iter::once(self.tail.as_slice()))
+            .filter(|chunk| !chunk.is_empty())
+    }
+    fn iter(&self) -> impl Iterator<Item = &T> {
+        self.chunks().flatten()
+    }
+    fn last(&self) -> Option<&T> {
+        self.tail.last()
+    }
+}
+impl<T: Clone, const N: usize> ChunkLog<T, N> {
+    fn push(&mut self, value: T) {
+        if self.tail.len() == N {
+            Arc::make_mut(&mut self.completed).push(self.tail.clone());
+            self.tail = Arc::new(Vec::new());
+        }
+        Arc::make_mut(&mut self.tail).push(value);
+        self.len += 1;
+    }
+    fn last_mut(&mut self) -> Option<&mut T> {
+        Arc::make_mut(&mut self.tail).last_mut()
+    }
+    #[cfg(test)]
+    fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        if index >= self.len {
+            return None;
+        }
+        if index / N < self.completed.len() {
+            let chunks = Arc::make_mut(&mut self.completed);
+            return Arc::make_mut(&mut chunks[index / N]).get_mut(index % N);
+        }
+        Arc::make_mut(&mut self.tail).get_mut(index % N)
+    }
+    #[cfg(test)]
+    fn remove(&mut self, index: usize) {
+        let mut records = self.iter().cloned().collect::<Vec<_>>();
+        records.remove(index);
+        *self = Self::default();
+        for record in records {
+            self.push(record);
+        }
+    }
+}
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub enum SolarScoopStatus {
@@ -211,12 +276,11 @@ struct Last {
 }
 #[derive(Debug, Clone, Default, PartialEq)]
 pub(super) struct State {
-    runs: Arc<Vec<Run>>,
-    receipts: Arc<Vec<Receipt>>,
+    runs: ChunkLog<Run, RUNS_PER_CHUNK>,
+    receipts: ChunkLog<Receipt, RECEIPTS_PER_CHUNK>,
     last: Option<Last>,
     legacy_origin: Option<Anchor>,
-    sealed: bool,
-    external_limit: bool,
+    legacy_format: bool,
 }
 impl State {
     pub(super) fn current(&self, mode: FlightMode, visit: u64, clock: u64) -> SolarSnapshot {
@@ -238,8 +302,11 @@ impl State {
     fn before_sample(&self, opening: Anchor) -> SolarSnapshot {
         self.current(FlightMode::Flight, opening.visit, opening.clock)
     }
-    pub(super) fn receipts(&self) -> &[Receipt] {
-        &self.receipts
+    pub(super) fn receipts(&self) -> impl Iterator<Item = &Receipt> {
+        self.receipts.iter()
+    }
+    pub(super) fn receipt_count(&self) -> usize {
+        self.receipts.len()
     }
     pub(super) fn fatal_clock(&self) -> Option<u64> {
         self.last
@@ -272,84 +339,8 @@ impl State {
     pub(super) fn is_empty(&self) -> bool {
         self.runs.is_empty() && self.legacy_origin.is_none()
     }
-    fn steps(&self) -> u64 {
-        self.runs.iter().map(|run| u64::from(run.steps)).sum()
-    }
-    fn soft_limit(&self) -> bool {
-        self.external_limit || Self::limit_for(self.runs.len(), self.steps(), self.encoded_len())
-    }
-    fn limit_for(runs: usize, steps: u64, bytes: usize) -> bool {
-        runs >= SOURCE_MAX_RUNS - EXIT_RUN_RESERVE
-            || steps >= MAX_REPLAY_STEPS - EXIT_STEP_RESERVE
-            || bytes >= SOFT_PROOF_BYTES
-    }
-    fn egress_input(frame: MotionFrame, sun: Body) -> Option<FlightInput> {
-        let pose = crate::station::flight_pose(frame.position, frame.orientation)?;
-        let away = pose
-            .orientation
-            .inverse_coordinates(crate::docking::Vec3::new(
-                pose.position.x - sun.position.x,
-                pose.position.y - sun.position.y,
-                pose.position.z - sun.position.z,
-            ));
-        let yaw = away.x.atan2(away.z);
-        let pitch = away.y.atan2(away.x.hypot(away.z));
-        // A dead band wider than a full per-tick turn prevents alternating controls.
-        // Brake until radial orientation, then accelerate outward without teleporting.
-        const ALIGNED: f64 = 0.025;
-        Some(if yaw.abs() > ALIGNED {
-            FlightInput {
-                yaw: yaw.signum() as f32,
-                brake: true,
-                ..FlightInput::default()
-            }
-        } else if pitch.abs() > ALIGNED {
-            FlightInput {
-                pitch: pitch.signum() as f32,
-                brake: true,
-                ..FlightInput::default()
-            }
-        } else {
-            FlightInput {
-                throttle: 1.0,
-                ..FlightInput::default()
-            }
-        })
-    }
-    pub(super) fn escape_control(&self, world: &World) -> Option<FlightInput> {
-        if self.sealed || !self.soft_limit() || world.state.mode != FlightMode::Flight {
-            return None;
-        }
-        let identity = world.combat_identity()?;
-        let sun = Self::sun(world, identity.system, identity.visit, world.state.tick).ok()?;
-        let frame = MotionFrame::from(world.state);
-        if frame.ratio_and_nose(sun).0 <= THERMAL_LIMIT {
-            Self::egress_input(frame, sun)
-        } else {
-            None
-        }
-    }
-    pub(super) fn blocks_entry(&self, world: &World, next: Snapshot) -> bool {
-        if world.state.mode != FlightMode::Flight || !world.damage.enabled() {
-            return false;
-        }
-        let Some(identity) = world.combat_identity() else {
-            return false;
-        };
-        let Ok(sun) = Self::sun(world, identity.system, identity.visit, world.state.tick) else {
-            return false;
-        };
-        let entering = MotionFrame::from(next).ratio_and_nose(sun).0 <= THERMAL_LIMIT;
-        if !entering {
-            return false;
-        }
-        if self.sealed {
-            return true;
-        }
-        MotionFrame::from(world.state).ratio_and_nose(sun).0 > THERMAL_LIMIT
-            && world
-                .encoded_current_size()
-                .is_ok_and(|size| size >= AGGREGATE_SOFT_BYTES)
+    pub(super) fn legacy_header(&self) -> bool {
+        self.legacy_format && self.is_empty()
     }
     fn sun(world: &World, system: SystemId, visit: u64, tick: u64) -> Result<Body, SaveError> {
         let catalogue = world.navigation_catalogue.as_ref().ok_or(INVALID)?;
@@ -396,12 +387,6 @@ impl State {
         let after = Self::anchor(next, nav.system, nav.visit, clock);
         let sun = Self::sun(world, nav.system, nav.visit, next.tick)?;
         let (ratio, nose) = after.frame.ratio_and_nose(sun);
-        if self.sealed {
-            if ratio <= THERMAL_LIMIT {
-                return Err(INVALID);
-            }
-            return Ok((self.clone(), 0));
-        }
         // Once a visit has a solar opening, retain every subsequent accepted exterior
         // step as well. A re-entry can no longer insert an independently invented pose.
         let tracked = self.last.is_some_and(|last| last.anchor.visit == nav.visit)
@@ -409,11 +394,6 @@ impl State {
                 .legacy_origin
                 .is_some_and(|origin| origin.visit == nav.visit);
         if ratio > THERMAL_LIMIT && !tracked {
-            if self.soft_limit() {
-                let mut sealed = self.clone();
-                sealed.sealed = true;
-                return Ok((sealed, 0));
-            }
             return Ok((self.clone(), 0));
         }
         if !ratio.is_finite() || ratio <= 1.0 || !nose.is_finite() {
@@ -432,10 +412,19 @@ impl State {
         {
             return Err(INVALID);
         }
-        let item = world
-            .modular
-            .scoop_item_at(identity.owner, next.tick, nav.visit)
-            .map_or(0, |item| item.id);
+        let item = self
+            .runs
+            .last()
+            .filter(|run| run.opening.visit == nav.visit)
+            .map_or_else(
+                || {
+                    world
+                        .modular
+                        .scoop_item_at(identity.owner, next.tick, nav.visit)
+                        .map_or(0, |item| item.id)
+                },
+                |run| run.item,
+            );
         let fuel = account.fuel_tenths();
         let capacity = account.fuel_capacity();
         let revision = account.revision();
@@ -453,10 +442,8 @@ impl State {
         } else {
             revision.checked_add(1).ok_or(INVALID)?
         };
-        if self.steps() >= MAX_REPLAY_STEPS {
-            return Err(SaveError::TooLarge);
-        }
         let mut state = self.clone();
+        state.legacy_format = false;
         let extends = self.last.is_some_and(|last| {
             last.anchor == opening && last.fuel == fuel && last.revision == revision
         }) && self.runs.last().is_some_and(|run| {
@@ -466,13 +453,10 @@ impl State {
                 && run.steps < MAX_RUN_STEPS
         });
         if extends {
-            let run = Arc::make_mut(&mut state.runs).last_mut().ok_or(INVALID)?;
+            let run = state.runs.last_mut().ok_or(INVALID)?;
             run.steps += 1;
         } else {
-            if self.runs.len() >= SOURCE_MAX_RUNS {
-                return Err(SaveError::TooLarge);
-            }
-            Arc::make_mut(&mut state.runs).push(Run {
+            state.runs.push(Run {
                 opening,
                 first_revision: revision,
                 first_fuel: fuel,
@@ -483,7 +467,7 @@ impl State {
             });
         }
         if gained != 0 {
-            Arc::make_mut(&mut state.receipts).push(Receipt {
+            state.receipts.push(Receipt {
                 revision: next_revision,
                 tick: after.tick,
                 before: fuel,
@@ -496,20 +480,10 @@ impl State {
             revision: next_revision,
             condition,
         });
-        if !state.soft_limit() {
-            let growth = state.encoded_len().saturating_sub(self.encoded_len());
-            let total = world
-                .encoded_current_size()?
-                .checked_add(growth)
-                .ok_or(INVALID)?;
-            state.external_limit = total >= AGGREGATE_SOFT_BYTES;
-        }
-        if ratio > THERMAL_LIMIT && state.soft_limit() {
-            state.sealed = true;
-        }
         Ok((state, gained))
     }
     pub(super) fn initialize_legacy_origin(&mut self, world: &World) -> Result<(), SaveError> {
+        self.legacy_format = true;
         if !world.damage.enabled() || world.state.mode != FlightMode::Flight || !world.pulse.alive()
         {
             return Ok(());
@@ -524,6 +498,7 @@ impl State {
         let sun = Self::sun(world, identity.system, identity.visit, world.state.tick)?;
         if anchor.frame.ratio_and_nose(sun).0 <= THERMAL_LIMIT {
             self.legacy_origin = Some(anchor);
+            self.legacy_format = false;
         }
         Ok(())
     }
@@ -542,8 +517,9 @@ impl World {
                 .current(self.state.mode, identity.visit, self.combat.physical_tick()),
         )
     }
-    pub fn solar_history_limited(&self) -> bool {
-        self.solar.sealed || self.solar.soft_limit()
+    /// Storage exhaustion is a save refusal, never a flight-control condition.
+    pub fn solar_save_limit_reached(&self) -> bool {
+        self.solar.encoded_len() > crate::save::MAX_SOLAR_HISTORY_BYTES
     }
 }
 

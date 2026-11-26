@@ -458,7 +458,7 @@ impl App {
         let global = matches!(
             code,
             KeyCode::F5 | KeyCode::F9 | KeyCode::F11 | KeyCode::KeyP
-        );
+        ) || (self.quit_failed && code == KeyCode::KeyQ);
         if self.menu_active() && !global {
             if self.open_menu_key(code) {
                 return;
@@ -656,8 +656,9 @@ impl App {
                 self.paused = true;
                 self.reset_input();
                 self.quit_failed = true;
-                self.notice
-                    .set(format!("P resumes; Q quits without saving again. {error}"));
+                self.notice.set(format!(
+                    "P resumes; Q discards unsaved progress and quits. {error}"
+                ));
                 self.request_redraw();
             }
         }
@@ -886,9 +887,6 @@ impl App {
                         "Asteroid hull contact: stopped at last clear position"
                     }
                     MotionRefusal::NpcContact => "NPC hull contact: stopped at last clear position",
-                    MotionRefusal::SolarHistoryLimit => {
-                        "Solar history limit: steer clear of the corona"
-                    }
                     MotionRefusal::StationContact => {
                         "Station contact: stopped at last clear position"
                     }

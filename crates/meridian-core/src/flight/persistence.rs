@@ -8,14 +8,17 @@ use super::{
     FlightInput, MissionError, MissionSnapshot, ServiceSnapshot, StationNpc, StepError, SystemId,
 };
 use crate::freight::g02::SavedDomainSummary;
-use crate::save::{MAX_SAVE_BYTES, Reader, SAVE_VERSION, SaveError, Writer, checksum};
+use crate::save::{
+    MAX_SAVE_BYTES, MAX_SAVE_FILE_BYTES, MAX_SOLAR_HISTORY_BYTES, Reader, SAVE_VERSION, SaveError,
+    Writer, checksum,
+};
 use crate::station_services::{SavedServiceSummary, StationMarkets};
 
 const MAGIC: &[u8; 8] = b"MERSAVE1";
 // A route is optional in v17. The exact legacy encoding is retained when no
 // route exists; a distinct tag separates the additive trailer from corruption.
 const ROUTE_EXTENSION: &[u8; 8] = b"MRTE0001";
-const SOLAR_EXTENSION: &[u8; 8] = b"MSOL0001";
+const SOLAR_EXTENSION: &[u8; 8] = b"MSOL0002";
 const CONTENT: &[u8] = concat!(
     "meridian-world/rules/17;explicit-xyzzy/account-prefix-replay-v2/a11fe169;distinct-emp/paid-defensive-local-v1/a11fe169;navigation-computer/exact-route-journal/a11fe169;lareria-main-services/station-combat-three-v1/a11fe169;rapid-lasers-energy/shared-nine-byte-resources-v1/a11fe169;mining/native-work-pending-v2;fuel-scoops/paid-utility-v1;npc-missiles/canonical-native-ray-v3;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
@@ -51,7 +54,7 @@ fn compiled_content_fingerprint(content: &[u8]) -> u64 {
 /// Distinguish genuine pre-solar v17 saves from current saves independently of the trailer.
 fn solar_content_fingerprint(has_history: bool) -> u64 {
     let mut bytes = compiled_content_fingerprint(CONTENT).to_le_bytes().to_vec();
-    bytes.extend(b"solar-history/v1");
+    bytes.extend(b"solar-history/v2-chunks");
     bytes.push(u8::from(has_history));
     checksum(&bytes)
 }
@@ -79,15 +82,17 @@ impl<'a> Commerce<'a> {
     }
 }
 impl World {
+    /// The ordinary domains retain their original independent byte ceiling. The
+    /// separately bounded solar trailer never participates in per-step admission.
     pub(super) fn encoded_current_size(&self) -> Result<usize, SaveError> {
-        self.encode_saved_world(
+        self.encode_saved_base(
             self.practice,
             &self.practice_history,
             self.practice_trace,
             &self.flight_reception,
             &Commerce::current(self),
         )
-        .map(|b| b.len())
+        .map(|w| w.bytes.len() + 8)
     }
     /// Return a complete checked memory save. The host must atomically publish these bytes itself.
     pub fn save_bytes(&self) -> Result<Vec<u8>, SaveError> {
@@ -276,11 +281,47 @@ impl World {
         lesson: &flight_reception::State,
         commerce: &Commerce<'_>,
     ) -> Result<Vec<u8>, SaveError> {
+        let mut w = self.encode_saved_base(practice, history, trace, lesson, commerce)?;
+        self.encode_solar_extension(&mut w, MAX_SOLAR_HISTORY_BYTES)?;
+        let digest = checksum(&w.bytes);
+        w.u64(digest);
+        if w.bytes.len() > MAX_SAVE_FILE_BYTES {
+            return Err(SaveError::TooLarge);
+        }
+        Ok(w.bytes)
+    }
+
+    fn encode_solar_extension(&self, w: &mut Writer, limit: usize) -> Result<(), SaveError> {
+        if self.solar.encoded_len() > limit {
+            return Err(SaveError::TooLarge);
+        }
+        if !self.solar.is_empty() {
+            let base_len = u32::try_from(w.bytes.len()).map_err(|_| SaveError::TooLarge)?;
+            w.bytes.extend(SOLAR_EXTENSION);
+            self.solar.encode(w);
+            // Locate the bounded base before parsing any of its variable-length domains.
+            w.u32(base_len);
+        }
+        Ok(())
+    }
+
+    fn encode_saved_base(
+        &self,
+        practice: Option<practice::Practice>,
+        history: &[practice::Practice],
+        trace: Option<practice::PracticeAttemptId>,
+        lesson: &flight_reception::State,
+        commerce: &Commerce<'_>,
+    ) -> Result<Writer, SaveError> {
         let mut w = Writer::new();
         w.bytes.extend(MAGIC);
         w.u16(SAVE_VERSION);
         w.bytes.extend(CONTENT);
-        w.u64(solar_content_fingerprint(!self.solar.is_empty()));
+        w.u64(if self.solar.legacy_header() {
+            compiled_content_fingerprint(CONTENT)
+        } else {
+            solar_content_fingerprint(!self.solar.is_empty())
+        });
         write_flight(&mut w, &self.state);
         self.navigation
             .ok_or(SaveError::NoCommander)?
@@ -322,16 +363,11 @@ impl World {
             w.bytes.extend(ROUTE_EXTENSION);
             route.encode_save(&mut w);
         }
-        if !self.solar.is_empty() {
-            w.bytes.extend(SOLAR_EXTENSION);
-            self.solar.encode(&mut w);
-        }
-        let digest = checksum(&w.bytes);
-        w.u64(digest);
-        if w.bytes.len() > MAX_SAVE_BYTES {
+        // The checksum remains part of the original fixed ordinary budget.
+        if w.bytes.len() + 8 > MAX_SAVE_BYTES {
             return Err(SaveError::TooLarge);
         }
-        Ok(w.bytes)
+        Ok(w)
     }
 
     #[cfg(test)]
@@ -374,7 +410,7 @@ impl World {
     }
 
     pub(super) fn decode_saved_world(bytes: &[u8]) -> Result<Self, SaveError> {
-        if bytes.len() > MAX_SAVE_BYTES {
+        if bytes.len() > MAX_SAVE_FILE_BYTES {
             return Err(SaveError::TooLarge);
         }
         let end = bytes.len().checked_sub(8).ok_or(SaveError::Truncated)?;
@@ -383,18 +419,18 @@ impl World {
         if checksum(body) != stored {
             return Err(SaveError::ChecksumMismatch);
         }
-        let mut r = Reader::new(body);
-        if &r.fixed::<8>()? != MAGIC {
+        let mut header = Reader::new(body);
+        if &header.fixed::<8>()? != MAGIC {
             return Err(SaveError::InvalidEncoding);
         }
-        let version = r.u16()?;
+        let version = header.u16()?;
         if version != SAVE_VERSION {
             return Err(SaveError::UnsupportedVersion);
         }
-        if r.fixed::<{ CONTENT.len() }>()?.as_slice() != CONTENT {
+        if header.fixed::<{ CONTENT.len() }>()?.as_slice() != CONTENT {
             return Err(SaveError::ContentMismatch);
         }
-        let fingerprint = r.u64()?;
+        let fingerprint = header.u64()?;
         let solar_expected = if fingerprint == solar_content_fingerprint(true) {
             Some(true)
         } else if fingerprint == solar_content_fingerprint(false) {
@@ -404,6 +440,23 @@ impl World {
         } else {
             return Err(SaveError::ContentMismatch);
         };
+        let (base_end, solar_end) = if solar_expected == Some(true) {
+            let solar_end = body.len().checked_sub(4).ok_or(SaveError::Truncated)?;
+            let base_end = Reader::new(&body[solar_end..]).u32()? as usize;
+            if base_end < header.consumed()
+                || base_end >= solar_end
+                || solar_end - base_end + 4 > MAX_SOLAR_HISTORY_BYTES
+            {
+                return Err(SaveError::InvalidEncoding);
+            }
+            (base_end, solar_end)
+        } else {
+            (body.len(), body.len())
+        };
+        if base_end + 8 > MAX_SAVE_BYTES {
+            return Err(SaveError::TooLarge);
+        }
+        let mut r = Reader::new(&body[header.consumed()..base_end]);
         let station_data =
             OriginalStationData::bundled().map_err(|_| SaveError::ContentMismatch)?;
         let mut state = read_flight(&mut r, version)?;
@@ -468,22 +521,11 @@ impl World {
         candidate.damage = super::damage::State::decode(&mut r, version)?;
         candidate.mining = crate::mining::State::decode(&mut r)?;
         candidate.jump_journal = crate::navigation::JumpJournal::decode(&mut r)?;
-        let mut solar_present = false;
         if !r.finished() {
             let tag = r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)?;
             if tag == *ROUTE_EXTENSION {
                 candidate.navigation_route =
                     Some(crate::navigation::RoutePlan::decode_save(&mut r)?);
-                if !r.finished() {
-                    if r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)? != *SOLAR_EXTENSION {
-                        return Err(SaveError::InvalidEncoding);
-                    }
-                    candidate.solar = super::solar::State::decode(&mut r)?;
-                    solar_present = true;
-                }
-            } else if tag == *SOLAR_EXTENSION {
-                candidate.solar = super::solar::State::decode(&mut r)?;
-                solar_present = true;
             } else {
                 return Err(SaveError::InvalidEncoding);
             }
@@ -491,8 +533,15 @@ impl World {
         if !r.finished() {
             return Err(SaveError::InvalidEncoding);
         }
-        if solar_present != solar_expected.unwrap_or(false) {
-            return Err(SaveError::InvalidEncoding);
+        if solar_expected == Some(true) {
+            let mut solar = Reader::new(&body[base_end..solar_end]);
+            if solar.fixed::<8>()? != *SOLAR_EXTENSION {
+                return Err(SaveError::InvalidEncoding);
+            }
+            candidate.solar = super::solar::State::decode(&mut solar)?;
+            if !solar.finished() {
+                return Err(SaveError::InvalidEncoding);
+            }
         }
         if solar_expected.is_none() {
             let mut solar = super::solar::State::default();
@@ -551,6 +600,9 @@ impl World {
         lesson: &flight_reception::State,
         commerce: &Commerce<'_>,
     ) -> Result<(), SaveError> {
+        if self.solar.encoded_len() > MAX_SOLAR_HISTORY_BYTES {
+            return Err(SaveError::TooLarge);
+        }
         let navigation = self.navigation.ok_or(SaveError::NoCommander)?;
         let account = commerce.account.ok_or(SaveError::NoCommander)?;
         let session = self
@@ -723,10 +775,9 @@ impl World {
                 (
                     self.solar
                         .receipts()
-                        .iter()
                         .map(|receipt| u64::from(receipt.added))
                         .sum(),
-                    self.solar.receipts().len() as u64,
+                    self.solar.receipt_count() as u64,
                 ),
             ),
         )?;
@@ -839,7 +890,6 @@ pub(super) fn write_flight(w: &mut Writer, s: &Snapshot) {
         Some(MotionRefusal::CelestialContact) => 3,
         Some(MotionRefusal::NpcContact) => 4,
         Some(MotionRefusal::AsteroidContact) => 5,
-        Some(MotionRefusal::SolarHistoryLimit) => 6,
     });
 }
 pub(super) fn read_flight(r: &mut Reader<'_>, version: u16) -> Result<Snapshot, SaveError> {
@@ -860,7 +910,6 @@ pub(super) fn read_flight(r: &mut Reader<'_>, version: u16) -> Result<Snapshot, 
         3 => Some(MotionRefusal::CelestialContact),
         4 if version >= 15 => Some(MotionRefusal::NpcContact),
         5 if version >= 16 => Some(MotionRefusal::AsteroidContact),
-        6 if version >= 17 => Some(MotionRefusal::SolarHistoryLimit),
         _ => return Err(SaveError::InvalidEncoding),
     };
     Ok(Snapshot {
@@ -927,6 +976,32 @@ pub(in crate::flight) fn solar_trailer_removed_test_input(
     let digest = checksum(&bytes);
     bytes.extend(digest.to_le_bytes());
     Ok(bytes)
+}
+
+#[cfg(test)]
+pub(in crate::flight) fn solar_file_with_limit_test_input(
+    world: &World,
+    limit: usize,
+) -> Result<Vec<u8>, SaveError> {
+    let commerce = Commerce::current(world);
+    world.validate_saved_world(
+        world.practice,
+        &world.practice_history,
+        world.practice_trace,
+        &world.flight_reception,
+        &commerce,
+    )?;
+    let mut w = world.encode_saved_base(
+        world.practice,
+        &world.practice_history,
+        world.practice_trace,
+        &world.flight_reception,
+        &commerce,
+    )?;
+    world.encode_solar_extension(&mut w, limit)?;
+    let digest = checksum(&w.bytes);
+    w.u64(digest);
+    Ok(w.bytes)
 }
 
 /// Locate the current pulse field for semantic corruption tests without assuming

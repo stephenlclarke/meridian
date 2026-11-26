@@ -3,7 +3,7 @@
   "files": {
     "flight.rs": {
       "beforeSHA256": "62471ae9a52e13e16a239900827724e3fe155dd39ef16024497466d4a26320d5",
-      "afterSHA256": "283485adc6b701323d2e00b9bd73d64ccb5e97036e6c99a9918c1d6b46944c3e",
+      "afterSHA256": "cdb51c869616e1b1e08cc1d4c1e6440f4596c720f01ee42ddc51948d79a687a7",
       "hunks": [
         {
           "offset": 237,
@@ -21,72 +21,57 @@
           "after": "            solar: solar::State::default(),\n"
         },
         {
-          "offset": 22463,
-          "before": "            input\n",
-          "after": "            self.solar.escape_control(self).unwrap_or(input)\n"
-        },
-        {
-          "offset": 22973,
+          "offset": 22930,
           "before": "            return self.publish_step(next);\n",
           "after": "            return self.publish_step(next, None);\n"
         },
         {
-          "offset": 24297,
-          "before": "",
-          "after": "        if self.solar.blocks_entry(self, next) {\n            let mut stopped = self.state;\n            stopped.tick = next.tick;\n            stopped.speed = 0.0;\n            stopped.motion_refusal = Some(MotionRefusal::SolarHistoryLimit);\n            return self.publish_step(stopped, Some(solar::Motion::Stopped));\n        }\n"
-        },
-        {
-          "offset": 24869,
+          "offset": 24500,
           "before": "            return self.publish_step(stopped);\n",
           "after": "            return self.publish_step(stopped, Some(solar::Motion::Stopped));\n"
         },
         {
-          "offset": 25788,
+          "offset": 25419,
           "before": "                return self.publish_step(stopped);\n",
           "after": "                return self.publish_step(stopped, Some(solar::Motion::Stopped));\n"
         },
         {
-          "offset": 26161,
+          "offset": 25792,
           "before": "                return self.publish_step(stopped);\n",
           "after": "                return self.publish_step(stopped, Some(solar::Motion::Stopped));\n"
         },
         {
-          "offset": 26858,
+          "offset": 26489,
           "before": "                    return self.publish_step(stopped);\n",
           "after": "                    return self.publish_step(stopped, Some(solar::Motion::Stopped));\n"
         },
         {
-          "offset": 27409,
+          "offset": 27040,
           "before": "                    return self.publish_step(stopped);\n",
           "after": "                    return self.publish_step(stopped, Some(solar::Motion::Stopped));\n"
         },
         {
-          "offset": 27584,
+          "offset": 27215,
           "before": "        self.publish_step(next)\n",
           "after": "        self.publish_step(next, Some(solar::Motion::Active(input)))\n"
         },
         {
-          "offset": 28145,
+          "offset": 27776,
           "before": "    fn publish_step(&mut self, mut next: Snapshot) -> Result<(), StepError> {\n",
           "after": "    fn publish_step(\n        &mut self,\n        mut next: Snapshot,\n        motion: Option<solar::Motion>,\n    ) -> Result<(), StepError> {\n"
         },
         {
-          "offset": 33397,
+          "offset": 33028,
           "before": "",
           "after": "        let (solar, gained_fuel) = self\n            .solar\n            .prepare(\n                self,\n                next,\n                navigation,\n                prepared.combat.physical_tick(),\n                motion,\n                prepared.pulse.alive(),\n            )\n            .map_err(|_| StepError::TickOverflow)?;\n        if solar.fatal_clock() == Some(prepared.combat.physical_tick()) {\n            prepared.pulse.damage_energy(u16::MAX);\n            self.clear_missing_missile_lock(\n                &mut prepared.missiles,\n                &prepared.traffic,\n                prepared.practice,\n                false,\n            );\n        }\n        let solar_account = if gained_fuel == 0 {\n            None\n        } else {\n            if planned_debit.is_some() {\n                return Err(StepError::NonFiniteState);\n            }\n            Some(\n                self.commander_account\n                    .as_ref()\n                    .ok_or(StepError::NonFiniteState)?\n                    .prepare_solar_fuel(gained_fuel)\n                    .map_err(|_| StepError::NonFiniteState)?,\n            )\n        };\n"
         },
         {
-          "offset": 35111,
-          "before": "            (&damage, &mining, &emp.state),\n",
-          "after": "            (&damage, &mining, &emp.state, &solar),\n"
-        },
-        {
-          "offset": 35510,
+          "offset": 35143,
           "before": "",
-          "after": "        }\n        if let Some(account) = solar_account {\n            self.commander_account = Some(account);\n"
+          "after": "        if let Some(account) = solar_account {\n            self.commander_account = Some(account);\n        }\n"
         },
         {
-          "offset": 36307,
+          "offset": 35930,
           "before": "",
           "after": "        self.solar = solar;\n"
         }
@@ -120,32 +105,6 @@
           "offset": 18293,
           "before": "",
           "after": "            Effect::SolarFatal => {\n                if !pools.pulse.alive() {\n                    return Err(INVALID);\n                }\n                pools.pulse.damage_energy(u16::MAX);\n            }\n"
-        }
-      ]
-    },
-    "flight/damage/capacity.rs": {
-      "beforeSHA256": "775f62199dc0d584d932c7d64d0b13da31008e0500437e25c4ad8ec8466855d2",
-      "afterSHA256": "f21668f92ba16a9f551ac291f72be7bfc3b2cfccadecdafcf3878a438d665637",
-      "hunks": [
-        {
-          "offset": 2268,
-          "before": "        resources: (&State, &crate::mining::State, &crate::flight::emp::State),\n",
-          "after": "        resources: (\n            &State,\n            &crate::mining::State,\n            &crate::flight::emp::State,\n            &crate::flight::solar::State,\n        ),\n"
-        },
-        {
-          "offset": 2519,
-          "before": "        let (damage, mining, emp) = resources;\n",
-          "after": "        let (damage, mining, emp, solar) = resources;\n"
-        },
-        {
-          "offset": 3514,
-          "before": "",
-          "after": "            && solar.encoded_len() <= self.solar.encoded_len()\n"
-        },
-        {
-          "offset": 4514,
-          "before": "",
-          "after": "            .and_then(|n| n.checked_sub(self.solar.encoded_len()))\n            .and_then(|n| n.checked_add(solar.encoded_len()))\n"
         }
       ]
     },
@@ -194,134 +153,169 @@
     },
     "flight/navigation_trade/persistence.rs": {
       "beforeSHA256": "f16b44ab00d509dbdf352adda66bd792b4721b0a43a21fc79d215d2917d69205",
-      "afterSHA256": "f27fed99c3704a42eb7caa17afbf9c76533d7425c87a52c9eb1265bc5b16e540",
+      "afterSHA256": "53f29630f33377b27a7f275157d55a35299a2fa1f0c850ce149f39175caa42e0",
       "hunks": [
         {
           "offset": 8479,
           "before": "            );\n",
-          "after": "            ) + c\n                .world\n                .solar\n                .receipts()\n                .iter()\n                .filter(|receipt| {\n                    terminal\n                        .account_revision\n                        .map_or(receipt.tick > terminal.tick, |revision| {\n                            receipt.revision > revision\n                        })\n                })\n                .map(|receipt| u64::from(receipt.added))\n                .sum::<u64>();\n"
+          "after": "            ) + c\n                .world\n                .solar\n                .receipts()\n                .filter(|receipt| {\n                    terminal\n                        .account_revision\n                        .map_or(receipt.tick > terminal.tick, |revision| {\n                            receipt.revision > revision\n                        })\n                })\n                .map(|receipt| u64::from(receipt.added))\n                .sum::<u64>();\n"
         },
         {
-          "offset": 9155,
+          "offset": 9131,
           "before": "            self.validate_fuel_continuity(buy, end)?;\n",
           "after": "            self.validate_fuel_continuity(buy, end, c)?;\n"
         },
         {
-          "offset": 9243,
+          "offset": 9219,
           "before": "    fn validate_fuel_continuity(&self, buy: Trade, end: FuelAnchor) -> Result<(), SaveError> {\n",
           "after": "    fn validate_fuel_continuity(\n        &self,\n        buy: Trade,\n        end: FuelAnchor,\n        c: &Context<'_>,\n    ) -> Result<(), SaveError> {\n"
         },
         {
-          "offset": 9939,
+          "offset": 9915,
           "before": "",
-          "after": "            ));\n        }\n        for receipt in c.world.solar.receipts().iter().filter(|receipt| {\n            receipt.revision > buy.account_revision\n                && self.terminal.is_none_or(|terminal| {\n                    terminal\n                        .account_revision\n                        .map_or(receipt.tick <= terminal.tick, |revision| {\n                            receipt.revision <= revision\n                        })\n                })\n        }) {\n            events.push((\n                receipt.revision,\n                receipt.tick,\n                receipt.before,\n                receipt.before.checked_add(receipt.added).ok_or(INVALID)?,\n"
+          "after": "            ));\n        }\n        for receipt in c.world.solar.receipts().filter(|receipt| {\n            receipt.revision > buy.account_revision\n                && self.terminal.is_none_or(|terminal| {\n                    terminal\n                        .account_revision\n                        .map_or(receipt.tick <= terminal.tick, |revision| {\n                            receipt.revision <= revision\n                        })\n                })\n        }) {\n            events.push((\n                receipt.revision,\n                receipt.tick,\n                receipt.before,\n                receipt.before.checked_add(receipt.added).ok_or(INVALID)?,\n"
         }
       ]
     },
     "flight/persistence.rs": {
       "beforeSHA256": "69f972ef162a618a50a3ce7e295702a5cf3c4afe99ff99abfbe85eb19978f70e",
-      "afterSHA256": "40b9d2b3ae841a5d616fabc696d9b3ad058277a4d4c294fb46bcad5786306c5f",
+      "afterSHA256": "bdfdfbae02d9b802e88f8db1ca2a1282083050fd83a70758d325f1dedddf01ec",
       "hunks": [
         {
-          "offset": 855,
-          "before": "",
-          "after": "const SOLAR_EXTENSION: &[u8; 8] = b\"MSOL0001\";\n"
+          "offset": 459,
+          "before": "use crate::save::{MAX_SAVE_BYTES, Reader, SAVE_VERSION, SaveError, Writer, checksum};\n",
+          "after": "use crate::save::{\n    MAX_SAVE_BYTES, MAX_SAVE_FILE_BYTES, MAX_SOLAR_HISTORY_BYTES, Reader, SAVE_VERSION, SaveError,\n    Writer, checksum,\n};\n"
         },
         {
-          "offset": 3140,
+          "offset": 912,
           "before": "",
-          "after": "    checksum(&bytes)\n}\n\n/// Distinguish genuine pre-solar v17 saves from current saves independently of the trailer.\nfn solar_content_fingerprint(has_history: bool) -> u64 {\n    let mut bytes = compiled_content_fingerprint(CONTENT).to_le_bytes().to_vec();\n    bytes.extend(b\"solar-history/v1\");\n    bytes.push(u8::from(has_history));\n"
+          "after": "const SOLAR_EXTENSION: &[u8; 8] = b\"MSOL0002\";\n"
         },
         {
-          "offset": 11165,
+          "offset": 3221,
+          "before": "",
+          "after": "/// Distinguish genuine pre-solar v17 saves from current saves independently of the trailer.\nfn solar_content_fingerprint(has_history: bool) -> u64 {\n    let mut bytes = compiled_content_fingerprint(CONTENT).to_le_bytes().to_vec();\n    bytes.extend(b\"solar-history/v2-chunks\");\n    bytes.push(u8::from(has_history));\n    checksum(&bytes)\n}\n\n"
+        },
+        {
+          "offset": 4438,
+          "before": "",
+          "after": "    /// The ordinary domains retain their original independent byte ceiling. The\n    /// separately bounded solar trailer never participates in per-step admission.\n"
+        },
+        {
+          "offset": 4678,
+          "before": "        self.encode_saved_world(\n",
+          "after": "        self.encode_saved_base(\n"
+        },
+        {
+          "offset": 4890,
+          "before": "        .map(|b| b.len())\n",
+          "after": "        .map(|w| w.bytes.len() + 8)\n"
+        },
+        {
+          "offset": 11274,
+          "before": "",
+          "after": "        let mut w = self.encode_saved_base(practice, history, trace, lesson, commerce)?;\n        self.encode_solar_extension(&mut w, MAX_SOLAR_HISTORY_BYTES)?;\n        let digest = checksum(&w.bytes);\n        w.u64(digest);\n        if w.bytes.len() > MAX_SAVE_FILE_BYTES {\n            return Err(SaveError::TooLarge);\n        }\n        Ok(w.bytes)\n    }\n\n    fn encode_solar_extension(&self, w: &mut Writer, limit: usize) -> Result<(), SaveError> {\n        if self.solar.encoded_len() > limit {\n            return Err(SaveError::TooLarge);\n        }\n        if !self.solar.is_empty() {\n            let base_len = u32::try_from(w.bytes.len()).map_err(|_| SaveError::TooLarge)?;\n            w.bytes.extend(SOLAR_EXTENSION);\n            self.solar.encode(w);\n            // Locate the bounded base before parsing any of its variable-length domains.\n            w.u32(base_len);\n        }\n        Ok(())\n    }\n\n    fn encode_saved_base(\n        &self,\n        practice: Option<practice::Practice>,\n        history: &[practice::Practice],\n        trace: Option<practice::PracticeAttemptId>,\n        lesson: &flight_reception::State,\n        commerce: &Commerce<'_>,\n    ) -> Result<Writer, SaveError> {\n"
+        },
+        {
+          "offset": 12600,
           "before": "        w.u64(compiled_content_fingerprint(CONTENT));\n",
-          "after": "        w.u64(solar_content_fingerprint(!self.solar.is_empty()));\n"
+          "after": "        w.u64(if self.solar.legacy_header() {\n            compiled_content_fingerprint(CONTENT)\n        } else {\n            solar_content_fingerprint(!self.solar.is_empty())\n        });\n"
         },
         {
-          "offset": 12727,
-          "before": "",
-          "after": "        }\n        if !self.solar.is_empty() {\n            w.bytes.extend(SOLAR_EXTENSION);\n            self.solar.encode(&mut w);\n"
+          "offset": 14293,
+          "before": "        let digest = checksum(&w.bytes);\n        w.u64(digest);\n        if w.bytes.len() > MAX_SAVE_BYTES {\n",
+          "after": "        // The checksum remains part of the original fixed ordinary budget.\n        if w.bytes.len() + 8 > MAX_SAVE_BYTES {\n"
         },
         {
-          "offset": 15125,
+          "offset": 14472,
+          "before": "        Ok(w.bytes)\n",
+          "after": "        Ok(w)\n"
+        },
+        {
+          "offset": 15919,
+          "before": "        if bytes.len() > MAX_SAVE_BYTES {\n",
+          "after": "        if bytes.len() > MAX_SAVE_FILE_BYTES {\n"
+        },
+        {
+          "offset": 16292,
+          "before": "        let mut r = Reader::new(body);\n        if &r.fixed::<8>()? != MAGIC {\n",
+          "after": "        let mut header = Reader::new(body);\n        if &header.fixed::<8>()? != MAGIC {\n"
+        },
+        {
+          "offset": 16442,
+          "before": "        let version = r.u16()?;\n",
+          "after": "        let version = header.u16()?;\n"
+        },
+        {
+          "offset": 16581,
           "before": "        if r.fixed::<{ CONTENT.len() }>()?.as_slice() != CONTENT\n            || r.u64()? != compiled_content_fingerprint(CONTENT)\n        {\n",
-          "after": "        if r.fixed::<{ CONTENT.len() }>()?.as_slice() != CONTENT {\n"
+          "after": "        if header.fixed::<{ CONTENT.len() }>()?.as_slice() != CONTENT {\n"
         },
         {
-          "offset": 15254,
+          "offset": 16715,
           "before": "",
-          "after": "        let fingerprint = r.u64()?;\n        let solar_expected = if fingerprint == solar_content_fingerprint(true) {\n            Some(true)\n        } else if fingerprint == solar_content_fingerprint(false) {\n            Some(false)\n        } else if fingerprint == compiled_content_fingerprint(CONTENT) {\n            None\n        } else {\n            return Err(SaveError::ContentMismatch);\n        };\n"
+          "after": "        let fingerprint = header.u64()?;\n        let solar_expected = if fingerprint == solar_content_fingerprint(true) {\n            Some(true)\n        } else if fingerprint == solar_content_fingerprint(false) {\n            Some(false)\n        } else if fingerprint == compiled_content_fingerprint(CONTENT) {\n            None\n        } else {\n            return Err(SaveError::ContentMismatch);\n        };\n        let (base_end, solar_end) = if solar_expected == Some(true) {\n            let solar_end = body.len().checked_sub(4).ok_or(SaveError::Truncated)?;\n            let base_end = Reader::new(&body[solar_end..]).u32()? as usize;\n            if base_end < header.consumed()\n                || base_end >= solar_end\n                || solar_end - base_end + 4 > MAX_SOLAR_HISTORY_BYTES\n            {\n                return Err(SaveError::InvalidEncoding);\n            }\n            (base_end, solar_end)\n        } else {\n            (body.len(), body.len())\n        };\n        if base_end + 8 > MAX_SAVE_BYTES {\n            return Err(SaveError::TooLarge);\n        }\n        let mut r = Reader::new(&body[header.consumed()..base_end]);\n"
         },
         {
-          "offset": 17226,
+          "offset": 19427,
           "before": "",
           "after": "            solar: super::solar::State::default(),\n"
         },
         {
-          "offset": 18928,
-          "before": "",
-          "after": "        let mut solar_present = false;\n"
-        },
-        {
-          "offset": 18994,
+          "offset": 21156,
           "before": "            if r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)? != *ROUTE_EXTENSION {\n",
-          "after": "            let tag = r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)?;\n            if tag == *ROUTE_EXTENSION {\n                candidate.navigation_route =\n                    Some(crate::navigation::RoutePlan::decode_save(&mut r)?);\n                if !r.finished() {\n                    if r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)? != *SOLAR_EXTENSION {\n                        return Err(SaveError::InvalidEncoding);\n                    }\n                    candidate.solar = super::solar::State::decode(&mut r)?;\n                    solar_present = true;\n                }\n            } else if tag == *SOLAR_EXTENSION {\n                candidate.solar = super::solar::State::decode(&mut r)?;\n                solar_present = true;\n            } else {\n"
+          "after": "            let tag = r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)?;\n            if tag == *ROUTE_EXTENSION {\n                candidate.navigation_route =\n                    Some(crate::navigation::RoutePlan::decode_save(&mut r)?);\n            } else {\n"
         },
         {
-          "offset": 19844,
+          "offset": 21490,
           "before": "            candidate.navigation_route = Some(crate::navigation::RoutePlan::decode_save(&mut r)?);\n",
           "after": ""
         },
         {
-          "offset": 19933,
+          "offset": 21579,
           "before": "",
-          "after": "        }\n        if solar_present != solar_expected.unwrap_or(false) {\n            return Err(SaveError::InvalidEncoding);\n        }\n        if solar_expected.is_none() {\n            let mut solar = super::solar::State::default();\n            solar.initialize_legacy_origin(&candidate)?;\n            candidate.solar = solar;\n"
+          "after": "        }\n        if solar_expected == Some(true) {\n            let mut solar = Reader::new(&body[base_end..solar_end]);\n            if solar.fixed::<8>()? != *SOLAR_EXTENSION {\n                return Err(SaveError::InvalidEncoding);\n            }\n            candidate.solar = super::solar::State::decode(&mut solar)?;\n            if !solar.finished() {\n                return Err(SaveError::InvalidEncoding);\n            }\n        }\n        if solar_expected.is_none() {\n            let mut solar = super::solar::State::default();\n            solar.initialize_legacy_origin(&candidate)?;\n            candidate.solar = solar;\n"
         },
         {
-          "offset": 23675,
+          "offset": 24161,
+          "before": "",
+          "after": "        if self.solar.encoded_len() > MAX_SOLAR_HISTORY_BYTES {\n            return Err(SaveError::TooLarge);\n        }\n"
+        },
+        {
+          "offset": 25741,
           "before": "",
           "after": "        self.solar.validate(self, account, commerce.modular)?;\n"
         },
         {
-          "offset": 29003,
+          "offset": 31069,
           "before": "            secret,\n",
-          "after": "            (\n                secret,\n                (\n                    self.solar\n                        .receipts()\n                        .iter()\n                        .map(|receipt| u64::from(receipt.added))\n                        .sum(),\n                    self.solar.receipts().len() as u64,\n                ),\n            ),\n"
+          "after": "            (\n                secret,\n                (\n                    self.solar\n                        .receipts()\n                        .map(|receipt| u64::from(receipt.added))\n                        .sum(),\n                    self.solar.receipt_count() as u64,\n                ),\n            ),\n"
         },
         {
-          "offset": 30509,
+          "offset": 32542,
           "before": "    secret: super::xyzzy::Terms,\n",
           "after": "    (secret, solar): (super::xyzzy::Terms, (u64, u64)),\n"
         },
         {
-          "offset": 30865,
+          "offset": 32898,
           "before": "    let fuel = 130_u128 + u128::from(s.refilled_units) + secret.fuel_supplied;\n",
           "after": "    let fuel = 130_u128 + u128::from(s.refilled_units) + secret.fuel_supplied + u128::from(solar.0);\n"
         },
         {
-          "offset": 32016,
+          "offset": 34049,
           "before": "",
           "after": "                + u128::from(solar.1)\n"
         },
         {
-          "offset": 33542,
+          "offset": 37751,
           "before": "",
-          "after": "        Some(MotionRefusal::SolarHistoryLimit) => 6,\n"
-        },
-        {
-          "offset": 34373,
-          "before": "",
-          "after": "        6 if version >= 17 => Some(MotionRefusal::SolarHistoryLimit),\n"
-        },
-        {
-          "offset": 35824,
-          "before": "",
-          "after": "    Ok(bytes)\n}\n\n#[cfg(test)]\npub(in crate::flight) fn solar_trailer_removed_test_input(\n    world: &World,\n    genuine_legacy_header: bool,\n) -> Result<Vec<u8>, SaveError> {\n    let mut bytes = world.save_bytes()?;\n    let length = world.solar.encoded_len();\n    assert!(length > 0);\n    let end = bytes.len() - 8 - length;\n    assert_eq!(&bytes[end..end + 8], SOLAR_EXTENSION);\n    bytes.truncate(end);\n    if genuine_legacy_header {\n        let start = 10 + CONTENT.len();\n        bytes[start..start + 8]\n            .copy_from_slice(&compiled_content_fingerprint(CONTENT).to_le_bytes());\n    }\n    let digest = checksum(&bytes);\n    bytes.extend(digest.to_le_bytes());\n"
+          "after": "#[cfg(test)]\npub(in crate::flight) fn solar_trailer_removed_test_input(\n    world: &World,\n    genuine_legacy_header: bool,\n) -> Result<Vec<u8>, SaveError> {\n    let mut bytes = world.save_bytes()?;\n    let length = world.solar.encoded_len();\n    assert!(length > 0);\n    let end = bytes.len() - 8 - length;\n    assert_eq!(&bytes[end..end + 8], SOLAR_EXTENSION);\n    bytes.truncate(end);\n    if genuine_legacy_header {\n        let start = 10 + CONTENT.len();\n        bytes[start..start + 8]\n            .copy_from_slice(&compiled_content_fingerprint(CONTENT).to_le_bytes());\n    }\n    let digest = checksum(&bytes);\n    bytes.extend(digest.to_le_bytes());\n    Ok(bytes)\n}\n\n#[cfg(test)]\npub(in crate::flight) fn solar_file_with_limit_test_input(\n    world: &World,\n    limit: usize,\n) -> Result<Vec<u8>, SaveError> {\n    let commerce = Commerce::current(world);\n    world.validate_saved_world(\n        world.practice,\n        &world.practice_history,\n        world.practice_trace,\n        &world.flight_reception,\n        &commerce,\n    )?;\n    let mut w = world.encode_saved_base(\n        world.practice,\n        &world.practice_history,\n        world.practice_trace,\n        &world.flight_reception,\n        &commerce,\n    )?;\n    world.encode_solar_extension(&mut w, limit)?;\n    let digest = checksum(&w.bytes);\n    w.u64(digest);\n    Ok(w.bytes)\n}\n\n"
         }
       ]
     },
     "flight/xyzzy.rs": {
       "beforeSHA256": "ace092b9d6f4fa7dd0963ea00e70c16a5906f47f61f33c288344830e47ee9949",
-      "afterSHA256": "123c0bb3078dbe624bc72582bc1f9ee1f351030ccbc2c9a124f6c5224a9da8d9",
+      "afterSHA256": "8415a0cc0e089914b528a7c9bb910fb5f2caccae3d109490f5e5aba7195c8140",
       "hunks": [
         {
           "offset": 967,
@@ -361,20 +355,20 @@
         {
           "offset": 9214,
           "before": "",
-          "after": "            .and_then(|value| {\n                value.checked_add(\n                    world\n                        .solar\n                        .receipts()\n                        .iter()\n                        .filter(|receipt| receipt.revision <= revision && receipt.tick <= tick)\n                        .map(|receipt| u64::from(receipt.added))\n                        .sum(),\n                )\n            })\n"
+          "after": "            .and_then(|value| {\n                value.checked_add(\n                    world\n                        .solar\n                        .receipts()\n                        .filter(|receipt| receipt.revision <= revision && receipt.tick <= tick)\n                        .map(|receipt| u64::from(receipt.added))\n                        .sum(),\n                )\n            })\n"
         },
         {
-          "offset": 12647,
+          "offset": 12615,
           "before": "",
           "after": "                )?;\n            }\n            if r.action == XyzzyAction::FitFuelScoops {\n                commerce.modular.validate_scoop_test_record(\n                    r.dock.owner().seed(),\n                    r.revision,\n                    r.end_revision,\n                    account,\n                    commerce.emp,\n"
         },
         {
-          "offset": 19443,
+          "offset": 19411,
           "before": "",
           "after": "        if action == XyzzyAction::FitFuelScoops\n            && self.fitted_fuel_scoops().is_none()\n            && !self\n                .xyzzy_has_free_ordinary_utility_mount()\n                .map_err(XyzzyError::Save)?\n        {\n            return Err(XyzzyError::UtilityFitConflict);\n        }\n"
         },
         {
-          "offset": 26442,
+          "offset": 26410,
           "before": "",
           "after": "        } else if review.action == XyzzyAction::FitFuelScoops {\n            self.grant_xyzzy_module(\n                review.dock,\n                review.tick,\n                super::modular::ModuleKind::FuelScoops,\n            )?;\n"
         }
@@ -382,7 +376,7 @@
     },
     "flight/xyzzy/history.rs": {
       "beforeSHA256": "54363d66d816d992144a7109e7683613c37465c18ac89d7b2b78a1a877e5cf29",
-      "afterSHA256": "761c208675687186e295fbf7f9a91f0066fd18c4087be79bd65aef030a60876a",
+      "afterSHA256": "68f7d801fa4a6f6a69f2d930ac2d899c5c085b5c2aad85bc4d2636b9fe135549",
       "hunks": [
         {
           "offset": 562,
@@ -392,25 +386,25 @@
         {
           "offset": 3019,
           "before": "",
-          "after": "        events.extend(world.solar.receipts().iter().map(|receipt| AccountEvent {\n            revision: receipt.revision,\n            effect: AccountEffect::Solar {\n                before: receipt.before,\n                units: receipt.added,\n            },\n        }));\n"
+          "after": "        events.extend(world.solar.receipts().map(|receipt| AccountEvent {\n            revision: receipt.revision,\n            effect: AccountEffect::Solar {\n                before: receipt.before,\n                units: receipt.added,\n            },\n        }));\n"
         },
         {
-          "offset": 3878,
+          "offset": 3871,
           "before": "",
           "after": "        let mut solar_anchors = world.solar.opening_fuel_anchors().peekable();\n"
         },
         {
-          "offset": 4107,
+          "offset": 4100,
           "before": "",
           "after": "            }\n            while let Some((revision, opening)) = solar_anchors.peek().copied() {\n                if revision >= event.revision {\n                    break;\n                }\n                if revision < previous || opening != fuel {\n                    return Err(INVALID);\n                }\n                let _ = solar_anchors.next();\n"
         },
         {
-          "offset": 5752,
+          "offset": 5745,
           "before": "",
           "after": "                AccountEffect::Solar { before, units } => {\n                    if fuel != before || units == 0 {\n                        return Err(INVALID);\n                    }\n                    fuel = fuel\n                        .checked_add(units)\n                        .filter(|&value| value <= capacity)\n                        .ok_or(INVALID)?;\n                }\n"
         },
         {
-          "offset": 7183,
+          "offset": 7176,
           "before": "",
           "after": "        for (revision, opening) in solar_anchors {\n            if revision < previous || revision > account.revision() || opening != fuel {\n                return Err(INVALID);\n            }\n        }\n"
         }
@@ -449,14 +443,24 @@
         }
       ]
     },
-    "station.rs": {
-      "beforeSHA256": "186f6be460f99c34065000e4c7666884abad27190864942203703c6286ca4327",
-      "afterSHA256": "e2984f4e791d18b55049cd43ba464dfec1dbb834ae75f488c9bb4f723123bc68",
+    "save.rs": {
+      "beforeSHA256": "c2a27f055877c49e21be6f7205bc0846a2c8c3dfa86c4b9ad2569acad70b935d",
+      "afterSHA256": "8814000ff5afb67d8260cdec5e866829ec683d218dd6f58dbe5912bd6635baaf",
       "hunks": [
         {
-          "offset": 1315,
+          "offset": 135,
           "before": "",
-          "after": "    SolarHistoryLimit,\n"
+          "after": "/// Existing independently bounded base and ordinary evidence budget.\n"
+        },
+        {
+          "offset": 247,
+          "before": "",
+          "after": "/// Solar history is decoded in fixed-size chunks, separate from the ordinary base budget.\npub const MAX_SOLAR_HISTORY_BYTES: usize = 8 * 1024 * 1024;\n/// Whole atomic host file, including the unchanged ordinary base budget.\npub const MAX_SAVE_FILE_BYTES: usize = MAX_SAVE_BYTES + MAX_SOLAR_HISTORY_BYTES;\n"
+        },
+        {
+          "offset": 3223,
+          "before": "",
+          "after": "    pub(crate) fn consumed(&self) -> usize {\n        self.offset\n    }\n    pub(crate) fn subreader(&mut self, length: usize) -> Result<Self, SaveError> {\n        let end = self.offset.checked_add(length).ok_or(SaveError::TooLarge)?;\n        let bytes = self\n            .bytes\n            .get(self.offset..end)\n            .ok_or(SaveError::Truncated)?;\n        self.offset = end;\n        Ok(Self::new(bytes))\n    }\n"
         }
       ]
     }

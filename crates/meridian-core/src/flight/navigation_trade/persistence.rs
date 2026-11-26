@@ -238,7 +238,6 @@ impl Attempt {
                 .world
                 .solar
                 .receipts()
-                .iter()
                 .filter(|receipt| {
                     terminal
                         .account_revision
@@ -278,7 +277,7 @@ impl Attempt {
                 sale.fuel_at_trade,
             ));
         }
-        for receipt in c.world.solar.receipts().iter().filter(|receipt| {
+        for receipt in c.world.solar.receipts().filter(|receipt| {
             receipt.revision > buy.account_revision
                 && self.terminal.is_none_or(|terminal| {
                     terminal

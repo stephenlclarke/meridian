@@ -56,7 +56,7 @@ The correction to joined `f104eb4` binds every secret cash/fuel checkpoint to a 
 
 Five additional Rust tests passed in that Mac qualification: coordinated reset/current-wallet corruption, coordinated initial spent/added fuel corruption after a real leg, shifted on/off boundary/refill with unchanged final supply, shifted refill/final tank, and same-tick paid purchase before activation plus real sale after activation/cold continuation. Each negative checks save refusal, cold-load refusal and preservation of an existing live World. Earlier single-field negatives and earned-before-activation, Lareria/off/paid-refill, mining/work, finite item and publication-failure positives remain. Current v17 content identity changes again; previous layouts are unsupported. Root owns the separate host search/help correction and the combined review/execution handoff. No compiler, Cargo, Clippy, native or new review worker ran in this author lane.
 
-The retained service journal has a conservative2621-receipt cap under the existing65536-byte save limit; the full World byte bound can refuse earlier. Native timing and memory for the larger retained history are unmeasured and remain with the execution owners. No history is silently truncated or replaced by aggregate counters.
+The retained service journal has a conservative 2,621-receipt cap under the existing 65,536-byte ordinary save-base limit; the base byte bound can refuse earlier. Native timing and memory for the larger retained history are unmeasured and remain with the execution owners. No history is silently truncated or replaced by aggregate counters.
 
 ## EMP source candidate
 
