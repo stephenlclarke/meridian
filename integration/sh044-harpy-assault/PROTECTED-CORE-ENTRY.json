@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh044-harpy-assault",
+  "undoBefore": [
+    "sh043-eagle-cruiser"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "harpy_assault",
+  "before": "pub mod goshawk_custom;\n",
+  "after": "pub mod mining;\n"
+}

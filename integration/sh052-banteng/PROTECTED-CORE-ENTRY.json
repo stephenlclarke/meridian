@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh052-banteng",
+  "undoBefore": [
+    "sh051-jackal"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "banteng",
+  "before": "#![forbid(unsafe_code)]\n\n",
+  "after": "pub mod celestial;\n"
+}

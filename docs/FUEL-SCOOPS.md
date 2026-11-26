@@ -1,5 +1,7 @@
 # Fuel Scoops source and physical ore dependency
 
+The separately tracked [solar fuel source candidate](SOLAR-FUEL-SCOOPS.md) gives the same actual paid/test scoop its original near-sun fuel and thermal path. It uses the existing local celestial scene and does not change the physical ore/cargo custody blockers below.
+
 The following source trace is complete against immutable L337 `a11fe16924d87d06021816f9037952afcbac08db`, tree `68fec574df12ddf74acb14747e0dd6839f478642`. It identifies the real catalogue, paid fitting, pickup and actor-custody rules. **Positive physical ore collection is blocked by the missing eligible original cargo geometry input.** The following [paid equipment source](PAID-FUEL-SCOOPS.md) implements only genuine ownership/fitting. No physical collection implementation, positive intake or sale test, new actor, cargo credit or replacement mesh was invented. The existing mining checkpoint `03682dd` and its 15 authored **UNRUN** tests remain intact; `NoScoops` is still an explicit refusal, not full mining/cargo acceptance.
 
 ## Verified original equipment and pickup contract

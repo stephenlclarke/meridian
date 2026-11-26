@@ -171,5 +171,7 @@ tools/verify_stag_liner_geometry.py text eol=lf
 # These source and review fixtures are verified against their Git blob bytes.
 crates/meridian-core/src/**/*.rs text eol=lf
 integration/sh001-mule/*.json text eol=lf
+integration/*/PROTECTED-CORE-ENTRY.json text eol=lf
+integration/*/PROTECTED-CORE-INVERSE.json text eol=lf
 integration/sh001-mule/*.patch -text
 integration/sh008-goshawk/*.json text eol=lf

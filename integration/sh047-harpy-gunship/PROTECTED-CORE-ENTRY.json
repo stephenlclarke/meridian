@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh047-harpy-gunship",
+  "undoBefore": [
+    "sh046-harpy-dropship"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "harpy_gunship",
+  "before": "pub mod harpy_dropship;\n",
+  "after": "pub mod mining;\n"
+}

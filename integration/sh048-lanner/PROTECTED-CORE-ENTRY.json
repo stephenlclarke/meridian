@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh048-lanner",
+  "undoBefore": [
+    "sh047-harpy-gunship"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "lanner",
+  "before": "pub mod harpy_gunship;\n",
+  "after": "pub mod mining;\n"
+}

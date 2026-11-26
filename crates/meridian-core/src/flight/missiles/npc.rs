@@ -333,6 +333,15 @@ impl State {
                 }
             }
             Some(MissileEnd::Intercepted) => self.validate_interception(world, None, p, i)?,
+            Some(MissileEnd::Ecm) => {
+                if p.last_tick != motion_tick
+                    || p.propulsion_travel >= MISSILE_RANGE
+                    || p.age_ticks >= super::MISSILE_LIFETIME_TICKS
+                    || world.ecm.termination(p.origin.projectile).is_none()
+                {
+                    return Err(INVALID);
+                }
+            }
         }
         if (p.ended == Some(MissileEnd::Impact)) != p.contact.is_some()
             || e.loss.is_some() != (p.ended == Some(MissileEnd::TargetLost))

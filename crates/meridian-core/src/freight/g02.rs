@@ -658,6 +658,23 @@ impl CommanderAccount {
         self.data.revision = revision;
         Ok(())
     }
+    /// Only the flight's accepted solar exposure producer can add this unbought fuel.
+    pub(crate) fn prepare_solar_fuel(&self, units: u16) -> Result<Self, Error> {
+        if units == 0 {
+            return Err(Error::InvalidFit);
+        }
+        let mut data = self.data;
+        data.fuel_tenths = data
+            .fuel_tenths
+            .checked_add(units)
+            .filter(|&fuel| fuel <= self.fuel_capacity())
+            .ok_or(Error::InvalidFit)?;
+        data.revision = data
+            .revision
+            .checked_add(1)
+            .ok_or(Error::SequenceExhausted)?;
+        Ok(Self { data })
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

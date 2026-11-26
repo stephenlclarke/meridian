@@ -87,6 +87,21 @@ impl State {
             .copied()
     }
 
+    pub(super) fn known_cargo_mounts_at(&self, account: &CommanderAccount, revision: u64) -> u16 {
+        if let Some(event) = self.cargo_fit_at(revision) {
+            return u16::from(event.fitted);
+        }
+        let equipment = account.equipment_state();
+        // The legacy cargo codec retains acquisition but not intermediate ordinary fit/store
+        // revisions before the first MAX. A sole acquisition proves the historical fit.
+        u16::from(
+            equipment.revision() == 1
+                && equipment
+                    .account_event()
+                    .is_some_and(|event| event.revision <= revision),
+        )
+    }
+
     pub(in crate::flight) fn validate_test_custody_history(
         &self,
         world: &World,
@@ -168,6 +183,7 @@ impl State {
             let cargo = u16::from(cargo.fitted);
             let mounts = u16::from(ledger.fuel_storage_count())
                 + u16::from(ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())
+                + u16::from(ledger.fitted(ModuleSlot::UtilityEcm).is_some())
                 + cargo
                 + emp.utility_mounts_at_revision(revision);
             if mounts > budget.utility_mounts_capacity
