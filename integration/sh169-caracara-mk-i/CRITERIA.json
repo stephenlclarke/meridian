@@ -1,0 +1,224 @@
+{
+  "hull": "SH169 Caracara Mk I",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh169/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh169-caracara-mk-i/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "7500/697",
+  "faces": {
+    "detailed": 3948,
+    "archivedNative": 1364,
+    "candidateNative": 512,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-caracara-mk-i",
+    "massKg": 40500
+  },
+  "supportGroups": 81,
+  "candidateComponentInventory": {
+    "originalPartsRepresented": 21,
+    "unalteredNativeParts": 9,
+    "recessedWells": 4,
+    "partsUsingSelectedOriginalVertices": 6,
+    "sampledArcSections": 2,
+    "arcSeamVertices": 384
+  },
+  "minimumRouteClearanceMillimetres": 813,
+  "sourceContactCounts": {
+    "overlap": 22,
+    "unchangedNativeParts": 9
+  },
+  "candidateRebuild": "tools/rebuild_caracara_mk_i.py",
+  "fitUpperMillimetres": {
+    "detailed": 2780,
+    "archivedNative": 3735,
+    "candidateNative": 3921
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 960,
+      "upperCeiling": 985
+    },
+    "candidateToArchive": {
+      "lowerFloor": 887,
+      "upperCeiling": 912
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 1309,
+      "upperCeiling": 1324
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 992,
+      "upperCeiling": 1015
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh169-caracara-mk-i/CARACARA-MK-I-STUDIO.json",
+    "bytes": 633340,
+    "sha256": "b6e06abdd47282b38cc2f5119faa894fb91b3a4f0c5c37fde581abc4c9e2d17c",
+    "supports": 81,
+    "probes": 7,
+    "detail": "3,948 original detailed faces",
+    "native": "512 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 633340,
+        "sha256": "b6e06abdd47282b38cc2f5119faa894fb91b3a4f0c5c37fde581abc4c9e2d17c"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3948,
+      "nativeTriangles": 512,
+      "supportGroups": 81,
+      "engineeringReference": "finite-intrinsic-empty-caracara-mk-i",
+      "massKg": 40500,
+      "receiptFiles": {
+        "caracara-mk-i.hull.json": {
+          "bytes": 633339,
+          "sha256": "1c4d1c4a21bc5967376f4080e1980658c8e0f4f57d922bb31b3ed25e31cc716e"
+        },
+        "caracara-mk-i-repeat.hull.json": {
+          "bytes": 633339,
+          "sha256": "1c4d1c4a21bc5967376f4080e1980658c8e0f4f57d922bb31b3ed25e31cc716e"
+        },
+        "studio.stdout.json": {
+          "bytes": 161746,
+          "sha256": "77083a1336e1b6495c2b37ca4c3c933c04b424b3434180f228b7f33e9194001a"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 161746,
+          "sha256": "77083a1336e1b6495c2b37ca4c3c933c04b424b3434180f228b7f33e9194001a"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "02572e67ed7cd9fd00f36dbca3277495ec216d1156702c1354d2dfa2c9bc4ec5"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "through-collars-under-body",
+          "passed": true
+        },
+        {
+          "name": "port-through-collars",
+          "passed": true
+        },
+        {
+          "name": "starboard-through-collars",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_caracara_mk_i.py --check",
+      "python3 -B tools/rebuild_caracara_mk_i.py",
+      "python3 -B tools/verify_caracara_mk_i.py | cmp - integration/sh169-caracara-mk-i/CONTACT-RESULT.json",
+      "python3 -B tools/measure_caracara_mk_i.py | cmp - integration/sh169-caracara-mk-i/SURFACE-FIT.json",
+      "python3 -B tools/measure_caracara_mk_i.py --fidelity | cmp - integration/sh169-caracara-mk-i/CANDIDATE-FIDELITY.json",
+      "python3 -B tools/measure_caracara_mk_i.py --directions | cmp - integration/sh169-caracara-mk-i/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_caracara_mk_i.py --reference-directions | cmp - integration/sh169-caracara-mk-i/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T09:11:32Z",
+    "finishedUtc": "2026-11-25T09:12:13Z",
+    "log": {
+      "bytes": 734,
+      "sha256": "817fa826f14fabae0b502bf88d3f4ac0e037842d1af60edc82441712aa5b76a9"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "b45bc6d78140b543e67e5ea27439a613d37c88d0",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "integration/sh169-caracara-mk-i/CARACARA-MK-I-STUDIO.json": "b6e06abdd47282b38cc2f5119faa894fb91b3a4f0c5c37fde581abc4c9e2d17c",
+    "integration/sh169-caracara-mk-i/FROZEN-SOURCES.json": "e3f92971c1a09deb5e901b01719a01dcec91a8b088e70c0c77be25209cb399b4",
+    "integration/sh169-caracara-mk-i/CONTACT-CANDIDATE.json": "cb4cc9b6591cd7cf22edf8540127a392728abcdbd37340689ddddef1353c8a7a",
+    "integration/sh169-caracara-mk-i/CONTACT-RESULT.json": "b46fd46261a73aebdcd7d8287320cca71879b375cc3879be605754d4e0b4de9d",
+    "integration/sh169-caracara-mk-i/ORIGINAL-OWNERSHIP.json": "d2a82a8c5a9ff54e8e8691da2e058f0f03d6e66d207f5d0ce854853c5240aad8",
+    "integration/sh169-caracara-mk-i/RETAINED-OVERLAPS.json": "a2be4a93491734d061f7b4e4a1f18d8a5c28b14e0c85444c990dd0fac60c80fe",
+    "integration/sh169-caracara-mk-i/CANDIDATE-FIDELITY.json": "88c770d20f9db8a548a43fc5b0a2cfcb0afba994f1cbc2180edde5dea984995e",
+    "integration/sh169-caracara-mk-i/SUPPORT-FAN.json": "a3d4292fc066a4abbd3eb603206e61c72ac6ce5115049d57f11f402f9447a0a9",
+    "integration/sh169-caracara-mk-i/SURFACE-FIT.json": "4ec950146b97713ad8fc2e9b3e788cb84372e42e83ae35cf16b189ab4266f8cb",
+    "integration/sh169-caracara-mk-i/ARCHIVED-OVERLAPS.json": "61986d5ca55ccb5c2a83976c54066a2f4eae1849cccedb31eef186cda4e96b36",
+    "integration/sh169-caracara-mk-i/CANDIDATE-TOPOLOGY-SURVEY.json": "c0730ed850377a435ac3e8e0915fc26b0015106e5aa1e0cf4dbf398e1dc52044",
+    "integration/sh169-caracara-mk-i/CANDIDATE-FIT-LOCALIZATION.json": "ece60bfa675b7bb99468f8e55b7769f5b84490510a65ff43ceba47628975a8f5",
+    "integration/sh169-caracara-mk-i/REFERENCE-FIT-LOCALIZATION.json": "81d4aaffa5a030b2788e567c80fd23a03b27656ea3e72fd780ab4e3a412f66ec",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_caracara_mk_i.py": "81dbb4de4232cd23446c3ff927ce6a0e5ddee33096846f3764f11885229ef1ca",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_caracara_mk_i.py": "2b4e9909d2341df74c2ae6fe8966275e144a76d2de83f0cecd04fbce160760bd",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/rebuild_caracara_mk_i.py": "07a242e4536bf46186d4bab5dcc82f741ef2c9d67c157f871ac4f70b14ece2cd",
+    "tools/verify_caracara_mk_i.py": "cf5f6faa3b75890c26165dbfc0f08e3f9d985e05d2578348ddd04bba39303a96",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh169/GENERATED-COLLISION.json": "1267caabaad060f4fa7b55c6da62d12d46a7afe5820de93c3e43e9c4520bf222",
+    "assets/fleet/sh169/SOURCE-GEOMETRY.json": "f2fe8c0d596185db78a4e0dc24154828137093e122879607a7fee041341db90f",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}
