@@ -281,11 +281,16 @@ impl State {
 
 impl super::State {
     pub(in crate::flight) fn salvage_exchange_pending(&self) -> bool {
+        self.salvage_exchange_source().is_some()
+    }
+
+    pub(in crate::flight) fn salvage_exchange_source(&self) -> Option<NpcId> {
         self.events
             .iter()
             .rev()
             .find_map(|event| Exchange::from_action(event.action))
-            .is_some_and(|exchange| !exchange.restoring)
+            .filter(|exchange| !exchange.restoring)
+            .map(|exchange| exchange.source)
     }
 
     pub(in crate::flight) fn matches_salvage_emp_event(&self, link: SalvageEmpLink) -> bool {

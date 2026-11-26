@@ -460,6 +460,19 @@ impl World {
     pub(super) fn advance_selected_work(&mut self) {
         let selected = self.current_target().map(|(_, candidate)| candidate);
         let work = selected.and_then(|candidate| self.automatic_work_target(candidate));
+        let wreck = work.and_then(|target| match target.id {
+            WorkTargetId::Wreck(id) => Some(id),
+            _ => None,
+        });
+        if self
+            .modular
+            .salvage_exchange_source()
+            .is_some_and(|id| Some(id) != wreck)
+            && self.restore_auto_salvage_tool().is_err()
+        {
+            self.targeting.work_status = Some("Cutter return unavailable");
+            return;
+        }
         let mining_lock = matches!(
             selected.map(Candidate::identity),
             Some(TargetIdentity::Work(WorkTargetId::Asteroid(_)))
@@ -489,6 +502,19 @@ impl World {
                 crate::mining::MiningError::ProtectedActivity => "Protected activity",
                 crate::mining::MiningError::NoCompatibleFittedTool => "Fit mining laser",
                 _ => "Tool change unavailable",
+            });
+            return;
+        }
+        if let Some(id) = wreck
+            && let Err(error) = self.select_auto_salvage_tool(id)
+        {
+            self.targeting.work_status = Some(match error {
+                super::ModuleError::MissingItem => "Salvage cutter required",
+                super::ModuleError::Capacity => "No free cutter mount",
+                super::ModuleError::MissingPrerequisite if self.fitted_fuel_scoops().is_none() => {
+                    "Scoops not fitted"
+                }
+                _ => "Cutter unavailable",
             });
             return;
         }
