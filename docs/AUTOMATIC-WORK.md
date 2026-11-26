@@ -4,7 +4,17 @@ The Dell headless test on `200c0289` passed the paid mining journey, including c
 
 ## Controls and equipment
 
-Press **F** to choose Mining or Salvage, then **Tab** to select a visible target. With the matching targeting module fitted, the flight computer approaches the target and matches its motion. **Delete** or manual steering releases it. **N** starts or cancels automatic docking. **T** locks the selected ship for missiles. **Z** fires the fitted front laser.
+Press **Tab** to select the nearest scanner contact, including contacts behind you. Each press selects the nearest remaining contact. After the farthest, the cycle returns to the nearest. **Delete** releases the target. **F** switches between assisted and manual control while keeping the contact marked.
+
+| Equipment or mode | What the pilot controls |
+| --- | --- |
+| Hand flight, with any fit | Steer, set speed, line up with the docking entrance or target, and operate the fitted tool. A scanner mark works without a computer. |
+| Basic targeting | The computer turns to face the contact and tracks ships in the crosshairs. The pilot controls range and presses **Z** to fire. |
+| Advanced targeting | The computer can also approach and hold position relative to a rock or salvage target. The pilot can operate the tool. |
+| Docking targeting and navigation computer | Selecting a station starts the docking approach. **N** also starts or cancels automatic docking. |
+| Mining or Salvage targeting module and work equipment | Selecting the corresponding contact starts the work sequence. Occupied cutter contact still requires confirmation. |
+
+Press **T** to request a missile lock on the selected ship. Laser fire against a ship always needs pilot input.
 
 For mining, fit the targeting core, Mining Module and Fuel Scoops. Carry a Mining Laser in storage or fit it in front. The computer fits the owned laser, holds the ship clear of the rock and fires. Keep the same rock selected. When ore breaks free, the computer follows the moving fragment and guides it into the scoop below the nose. Once collection finishes, the previous front laser returns. The six vertices that define the visible Meridian ore fragment also determine whether it fits through the scoop.
 
@@ -12,7 +22,7 @@ For salvage, fit the targeting core, Salvage Module and Fuel Scoops, and carry a
 
 ## Occupied cutter contact
 
-When an actual disabled occupied ship reaches the accepted work hold and World exposes the current confirmation authority, a distinct warning opens for that exact target. This applies to both Ships/All selection and the Salvage filter. It does not open for ordinary healthy tracking or lawful external wreck recovery.
+When an actual disabled occupied ship reaches the accepted work hold and World exposes the current confirmation authority, a distinct warning opens for that exact target. The review identifies the selected ship. It does not open for ordinary healthy tracking or lawful external wreck recovery.
 
 The modal stops accepted simulation ticks and clears held flight inputs. It shows the original target identity, occupied/claimed warning, attributed contact and the absence of verified detachable material. This does not grant permission from the crew. Enter confirms one reviewed contact through the normal atomic commander writer. Escape, target loss or loss of focus cancels the review and releases the original selection. A refused write or completed contact also releases the selection. A new warning needs a new deliberate selection; neither held Enter nor the next simulation tick repeats the contact.
 

@@ -13,7 +13,7 @@ The [fuel storage development candidate](docs/FUEL-STORAGE.md) adds four separat
 The [solar fuel development candidate](docs/SOLAR-FUEL-SCOOPS.md) adds actual near-sun fuel collection with fitted scoops, independent cabin-temperature danger and retained collection receipts. Physical cargo and ore intake remain separate. Owned validation is pending.
 The passenger-cabin development candidate offers all six original paid cabin layouts, with real five-tonne fit costs and separate Avenor-to-Renas G04 passenger consent, boarding and reception. See [passenger cabins and G04 controls](docs/PASSENGER-CABINS.md). Owned validation is pending.
 
-The development build adds automatic mining. Select Mining with **F**, then select an asteroid with **Tab**. A paid commander on Dell completed the approach, mined and scooped ore, and kept it after Continue. Automatic salvage is also in development. [Work controls and required equipment](docs/AUTOMATIC-WORK.md)
+In the scanner development build, press **Tab** to mark the nearest contact. Press again to move through the others by distance. **F** switches between hand flight and the assistance your equipment provides. You can aim and fire at ships, fly a docking approach, mine or salvage by hand. [Flight controls and required equipment](docs/AUTOMATIC-WORK.md)
 
 ## Goshawk Explorer in the Ship Showroom
 
@@ -118,7 +118,7 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | P on the station Galaxy chart (development) | Toggle the best-profit scan of reachable markets; P in flight still pauses |
 | L; W/S; arrows; A/D; Q/E; Space | Launch; thrust; pitch; yaw; roll; brake |
 | N in flight (development) | Engage the fitted navigation computer for docking, or cancel the approach |
-| F / Tab / Delete / Shift+I in flight (development) | Cycle Ships/Mining/Salvage/All filter; select a healthy ship to align manually fired lasers or select eligible work for automatic operation without Z; release tracking/work; show target details |
+| Tab / F / Delete / Shift+I in flight (development) | Cycle scanner contacts by distance / switch between assisted and manual targeting / release target / show target details |
 | J; T (docked); R; Enter; B; F (docked) | Travel; select contact; review; confirm; cancel; buy fuel |
 | M; [ / ]; G / Shift+G | Market; commodity selection; buy/sell one native unit |
 | O; K; U; Y | Equipment panel; buy/fit cargo bay; store when docked; refit |
