@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh130-marmot-prospector",
+  "undoBefore": [
+    "sh129-warthog-escort"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "marmot_prospector",
+  "before": "pub mod mangalica;\n",
+  "after": "pub mod medusa;\n"
+}

@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh155-osprey-support",
+  "undoBefore": [
+    "sh154-osprey-patrol"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "osprey_support",
+  "before": "pub mod osprey_strike;\n",
+  "after": "pub mod owlet_mk_ii;\n"
+}

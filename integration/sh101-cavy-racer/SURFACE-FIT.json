@@ -1,0 +1,105 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 2400,
+    "native": 3550
+  },
+  "fullUpperMillimetres": {
+    "detailed": 1437,
+    "native": 3095
+  },
+  "pieces": {
+    "pressure spindle": {
+      "detailed": 1296,
+      "native": 3095
+    },
+    "port outrigger": {
+      "detailed": 431,
+      "native": 1191
+    },
+    "port brace": {
+      "detailed": 711,
+      "native": 711
+    },
+    "port nozzle": {
+      "detailed": 1437,
+      "native": 1437
+    },
+    "starboard outrigger": {
+      "detailed": 431,
+      "native": 1191
+    },
+    "starboard brace": {
+      "detailed": 711,
+      "native": 711
+    },
+    "starboard nozzle": {
+      "detailed": 1437,
+      "native": 1437
+    },
+    "canopy": {
+      "detailed": 346,
+      "native": 742
+    },
+    "canopy ridge": {
+      "detailed": 340,
+      "native": 937
+    },
+    "port service pipe": {
+      "detailed": 260,
+      "native": 1290
+    },
+    "port instrument housing": {
+      "detailed": 668,
+      "native": 1676
+    },
+    "port louvre 1": {
+      "detailed": 237,
+      "native": 901
+    },
+    "port louvre 2": {
+      "detailed": 237,
+      "native": 892
+    },
+    "port louvre 3": {
+      "detailed": 237,
+      "native": 884
+    },
+    "port louvre 4": {
+      "detailed": 237,
+      "native": 883
+    },
+    "port louvre 5": {
+      "detailed": 237,
+      "native": 891
+    },
+    "starboard service pipe": {
+      "detailed": 260,
+      "native": 731
+    },
+    "starboard instrument housing": {
+      "detailed": 668,
+      "native": 1682
+    },
+    "starboard louvre 1": {
+      "detailed": 237,
+      "native": 860
+    },
+    "starboard louvre 2": {
+      "detailed": 237,
+      "native": 862
+    },
+    "starboard louvre 3": {
+      "detailed": 237,
+      "native": 864
+    },
+    "starboard louvre 4": {
+      "detailed": 237,
+      "native": 865
+    },
+    "starboard louvre 5": {
+      "detailed": 237,
+      "native": 867
+    }
+  }
+}

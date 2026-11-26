@@ -1,0 +1,224 @@
+{
+  "hull": "SH167 Secretarybird Survey",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh167/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh167-secretarybird-survey/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "12500/1587",
+  "faces": {
+    "detailed": 1668,
+    "archivedNative": 620,
+    "candidateNative": 512,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-secretarybird-survey",
+    "massKg": 30401
+  },
+  "supportGroups": 67,
+  "candidateComponentInventory": {
+    "originalPartsRepresented": 21,
+    "unalteredNativeParts": 11,
+    "recessedWells": 4,
+    "partsUsingSelectedOriginalVertices": 6,
+    "sampledArcSections": 0,
+    "arcSeamVertices": 0
+  },
+  "minimumRouteClearanceMillimetres": 1431,
+  "sourceContactCounts": {
+    "overlap": 18,
+    "unchangedNativeParts": 11
+  },
+  "candidateRebuild": "tools/rebuild_secretarybird_survey.py",
+  "fitUpperMillimetres": {
+    "detailed": 2688,
+    "archivedNative": 3564,
+    "candidateNative": 3564
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 573,
+      "upperCeiling": 593
+    },
+    "candidateToArchive": {
+      "lowerFloor": 252,
+      "upperCeiling": 276
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 717,
+      "upperCeiling": 741
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 572,
+      "upperCeiling": 595
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh167-secretarybird-survey/SECRETARYBIRD-SURVEY-STUDIO.json",
+    "bytes": 282660,
+    "sha256": "6991c5530a84e4d9e042ea752be5aa3d27ba6861371eded2706068505c96f771",
+    "supports": 67,
+    "probes": 7,
+    "detail": "1,668 original detailed faces",
+    "native": "512 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 282660,
+        "sha256": "6991c5530a84e4d9e042ea752be5aa3d27ba6861371eded2706068505c96f771"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 1668,
+      "nativeTriangles": 512,
+      "supportGroups": 67,
+      "engineeringReference": "finite-intrinsic-empty-secretarybird-survey",
+      "massKg": 30401,
+      "receiptFiles": {
+        "secretarybird-survey.hull.json": {
+          "bytes": 282659,
+          "sha256": "cd32a6ebba28ed7d896bdc06c6672c5d7813b89381cf09218844b244e1e71290"
+        },
+        "secretarybird-survey-repeat.hull.json": {
+          "bytes": 282659,
+          "sha256": "cd32a6ebba28ed7d896bdc06c6672c5d7813b89381cf09218844b244e1e71290"
+        },
+        "studio.stdout.json": {
+          "bytes": 79784,
+          "sha256": "c4bfa0fce421ff5df1461343fc33cf6fd641eda71b7ff833b257d91d6a8c5c0a"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 79784,
+          "sha256": "c4bfa0fce421ff5df1461343fc33cf6fd641eda71b7ff833b257d91d6a8c5c0a"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "f96b0e127a80f1c963450ee76273dbc5cae8d360760415ded9639f9eb6a738e4"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "under-pressure-envelope",
+          "passed": true
+        },
+        {
+          "name": "over-port-wing",
+          "passed": true
+        },
+        {
+          "name": "over-starboard-wing",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_secretarybird_survey.py --check",
+      "python3 -B tools/rebuild_secretarybird_survey.py",
+      "python3 -B tools/verify_secretarybird_survey.py | cmp - integration/sh167-secretarybird-survey/CONTACT-RESULT.json",
+      "python3 -B tools/measure_secretarybird_survey.py | cmp - integration/sh167-secretarybird-survey/SURFACE-FIT.json",
+      "python3 -B tools/measure_secretarybird_survey.py --fidelity | cmp - integration/sh167-secretarybird-survey/CANDIDATE-FIDELITY.json",
+      "python3 -B tools/measure_secretarybird_survey.py --directions | cmp - integration/sh167-secretarybird-survey/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_secretarybird_survey.py --reference-directions | cmp - integration/sh167-secretarybird-survey/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T08:56:49Z",
+    "finishedUtc": "2026-11-25T08:57:15Z",
+    "log": {
+      "bytes": 783,
+      "sha256": "f74ba47a5068b21a69f059d093faf618fc7a578f196ae991541c3e553d4b5c93"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "df64264263b15faa5d6dc9135f5a3a60ffb77c86",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "integration/sh167-secretarybird-survey/SECRETARYBIRD-SURVEY-STUDIO.json": "6991c5530a84e4d9e042ea752be5aa3d27ba6861371eded2706068505c96f771",
+    "integration/sh167-secretarybird-survey/FROZEN-SOURCES.json": "d7cffef5fb70d3ca3042ae85d8566d8342864a4fa6799f6be960745a6a347c77",
+    "integration/sh167-secretarybird-survey/CONTACT-CANDIDATE.json": "7b0482c2e272d6859a12752b1cb2c6dc072e66399958fb78f41b86273ef7ed2b",
+    "integration/sh167-secretarybird-survey/CONTACT-RESULT.json": "5fbb9c6c345c1087a4797a17fc6993a7cce70c39c11e2b8f467a3d8b871ee274",
+    "integration/sh167-secretarybird-survey/ORIGINAL-OWNERSHIP.json": "530b287994e3801e434a2bb1b67c6b0a4178382f061837ae4f69f6f1c2e8d891",
+    "integration/sh167-secretarybird-survey/RETAINED-OVERLAPS.json": "f824aaacdb39ded36f7c9b26378794cf046a3e04f87603015ee593aa4833bfe1",
+    "integration/sh167-secretarybird-survey/CANDIDATE-FIDELITY.json": "cceec1bd79095a01ccef54c1ff55686b93e035acb04c001fa9af6736ab5ab281",
+    "integration/sh167-secretarybird-survey/SUPPORT-FAN.json": "d21ada07e21256a039bac543a3da4eab3b1f74eed665c89ab60baed5ba4077b9",
+    "integration/sh167-secretarybird-survey/SURFACE-FIT.json": "f0910db6e63235c2fed6f8e60fbf2655465ac161db8eaa96bf6c77cb39d3a440",
+    "integration/sh167-secretarybird-survey/ARCHIVED-OVERLAPS.json": "f7c3ccf697cc8e3010f2f747450f22f0a5bdfee72737afd6924de99d3e87b3e7",
+    "integration/sh167-secretarybird-survey/CANDIDATE-TOPOLOGY-SURVEY.json": "eb7dbff65fdb89428f3a21405740cb6968b6e11baf5285a61065131a007d561c",
+    "integration/sh167-secretarybird-survey/CANDIDATE-FIT-LOCALIZATION.json": "30e5e32f89c0604419d1e039ecbe65b04e951a7564f427367945dc9b4e5143f8",
+    "integration/sh167-secretarybird-survey/REFERENCE-FIT-LOCALIZATION.json": "1851fd3f996119c78d297c03a974359c80d76c38938d2f7b4cdf10ad9dd73a19",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_secretarybird_survey.py": "20379f6941b1261b743c7f7dd4d53f4963142a413358bd333ff65d05c1c77abb",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_secretarybird_survey.py": "34ec3ebe02892064a1abf7af7e36016e6b7bf6b8d7574dfc78490bdf28bb7c26",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/rebuild_secretarybird_survey.py": "e87f6f6d4642dad8b6b96a7531a6a814d0f212a8b2fa3cb95c6fbe82f70e3214",
+    "tools/verify_secretarybird_survey.py": "b07d42eb7f8dc9851c52ebe1215dfb345d5f3b58619281c1fd9840902464e269",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh167/GENERATED-COLLISION.json": "17ddad6a2ccb529dbc78db51b9b34b49934bb6f49ecb4275a275a990b42f049e",
+    "assets/fleet/sh167/SOURCE-GEOMETRY.json": "3fc81e21c9ab5f50d372e447daf450c6b54baf8cce961e37f258b619c9e93eff",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

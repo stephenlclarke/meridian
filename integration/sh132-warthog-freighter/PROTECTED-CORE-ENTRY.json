@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh132-warthog-freighter",
+  "undoBefore": [
+    "sh131-warthog-light"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "warthog_freighter",
+  "before": "pub mod warthog_escort;\n",
+  "after": "pub mod warthog_light;\n"
+}

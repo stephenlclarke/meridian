@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh167-secretarybird-survey",
+  "undoBefore": [
+    "sh166-camel-rescue"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "secretarybird_survey",
+  "before": "pub mod secretarybird;\n",
+  "after": "pub mod seriema_courier;\n"
+}

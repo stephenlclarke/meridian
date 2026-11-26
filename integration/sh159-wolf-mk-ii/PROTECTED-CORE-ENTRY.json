@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh159-wolf-mk-ii",
+  "undoBefore": [
+    "sh158-wolf-mk-i"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "wolf_mk_ii",
+  "before": "pub mod wolf_mk_i;\n",
+  "after": "pub mod wolf_scout;\n"
+}

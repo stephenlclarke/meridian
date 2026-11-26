@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh166-camel-rescue",
+  "undoBefore": [
+    "sh165-secretarybird"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "camel_rescue",
+  "before": "pub mod buzzard_mk_ii;\n",
+  "after": "pub mod carabao_freighter;\n"
+}

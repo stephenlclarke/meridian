@@ -413,6 +413,306 @@ const DESCRIPTORS: &[StockDescriptor] = &[
         "integration/sh098-anoa/ANOA-STUDIO.json",
         0x90b3_dc52_75c4_7b5b
     ),
+    stock_package!(
+        "SH099",
+        "Ox",
+        "integration/sh099-ox/OX-STUDIO.json",
+        0xe0be_46b0_9ab5_f467
+    ),
+    stock_package!(
+        "SH100",
+        "Ox Mk II",
+        "integration/sh100-ox-mk-ii/OX-MK-II-STUDIO.json",
+        0x4078_8977_0423_6730
+    ),
+    stock_package!(
+        "SH101",
+        "Cavy Racer",
+        "integration/sh101-cavy-racer/CAVY-RACER-STUDIO.json",
+        0x1474_312d_3f6b_cd46
+    ),
+    stock_package!(
+        "SH104",
+        "Wildebeest",
+        "integration/sh104-wildebeest/WILDEBEEST-STUDIO.json",
+        0xb41c_978c_6fbe_b473
+    ),
+    stock_package!(
+        "SH105",
+        "Tapir Shuttle",
+        "integration/sh105-tapir-shuttle/TAPIR-SHUTTLE-STUDIO.json",
+        0xc2f0_788a_76e8_90ae
+    ),
+    stock_package!(
+        "SH106",
+        "Tapir Mk II",
+        "integration/sh106-tapir-mk-ii/TAPIR-MK-II-STUDIO.json",
+        0xf7dc_fb94_e468_042e
+    ),
+    stock_package!(
+        "SH107",
+        "Magpie",
+        "integration/sh107-magpie/MAGPIE-STUDIO.json",
+        0xe495_9d18_e239_9d2d
+    ),
+    stock_package!(
+        "SH109",
+        "Hippo",
+        "integration/sh109-hippo/HIPPO-STUDIO.json",
+        0x3147_a04e_8e5c_44cb
+    ),
+    stock_package!(
+        "SH110",
+        "Leopard Fighter",
+        "integration/sh110-leopard-fighter/LEOPARD-FIGHTER-STUDIO.json",
+        0x3ef3_4f5b_5419_3e7c
+    ),
+    stock_package!(
+        "SH111",
+        "Puma",
+        "integration/sh111-puma/PUMA-STUDIO.json",
+        0x6845_7ebb_7fbc_4cff
+    ),
+    stock_package!(
+        "SH126",
+        "Mangalica",
+        "integration/sh126-mangalica/MANGALICA-STUDIO.json",
+        0xa4a7_4b2f_13fd_bbe7
+    ),
+    stock_package!(
+        "SH127",
+        "Gaur Trader",
+        "integration/sh127-gaur-trader/GAUR-TRADER-STUDIO.json",
+        0xd33d_78f7_722a_2e07
+    ),
+    stock_package!(
+        "SH128",
+        "Boar Transport",
+        "integration/sh128-boar-transport/BOAR-TRANSPORT-STUDIO.json",
+        0x9222_272d_9757_ed8c
+    ),
+    stock_package!(
+        "SH129",
+        "Warthog Escort",
+        "integration/sh129-warthog-escort/WARTHOG-ESCORT-STUDIO.json",
+        0x221e_e806_2df4_0983
+    ),
+    stock_package!(
+        "SH130",
+        "Marmot Prospector",
+        "integration/sh130-marmot-prospector/MARMOT-PROSPECTOR-STUDIO.json",
+        0x785e_a4d7_3481_c244
+    ),
+    stock_package!(
+        "SH131",
+        "Warthog Light",
+        "integration/sh131-warthog-light/WARTHOG-LIGHT-STUDIO.json",
+        0xca1e_e154_ce4f_f020
+    ),
+    stock_package!(
+        "SH132",
+        "Warthog Freighter",
+        "integration/sh132-warthog-freighter/WARTHOG-FREIGHTER-STUDIO.json",
+        0x50e2_1062_a9a6_6baf
+    ),
+    stock_package!(
+        "SH133",
+        "Warthog Tanker",
+        "integration/sh133-warthog-tanker/WARTHOG-TANKER-STUDIO.json",
+        0x7df1_fcbc_a5ca_dc99
+    ),
+    stock_package!(
+        "SH134",
+        "Warthog Heavy",
+        "integration/sh134-warthog-heavy/WARTHOG-HEAVY-STUDIO.json",
+        0x5d54_67b6_0198_ae17
+    ),
+    stock_package!(
+        "SH135",
+        "Javelina",
+        "integration/sh135-javelina/JAVELINA-STUDIO.json",
+        0x3f92_0508_49a5_ebf9
+    ),
+    stock_package!(
+        "SH136",
+        "Falcon Mk I",
+        "integration/sh136-falcon-mk-i/FALCON-MK-I-STUDIO.json",
+        0x3292_078f_31cb_f2a2
+    ),
+    stock_package!(
+        "SH137",
+        "Falcon Mk II",
+        "integration/sh137-falcon-mk-ii/FALCON-MK-II-STUDIO.json",
+        0xeeff_6ac7_29e4_2d82
+    ),
+    stock_package!(
+        "SH138",
+        "Falcon Mk III",
+        "integration/sh138-falcon-mk-iii/FALCON-MK-III-STUDIO.json",
+        0xddda_d72d_1a73_6d81
+    ),
+    stock_package!(
+        "SH139",
+        "Falcon Mk IV",
+        "integration/sh139-falcon-mk-iv/FALCON-MK-IV-STUDIO.json",
+        0xbbe8_e16b_8358_f170
+    ),
+    stock_package!(
+        "SH140",
+        "Chimango",
+        "integration/sh140-chimango/CHIMANGO-STUDIO.json",
+        0xa02c_6b8a_4936_dbba
+    ),
+    stock_package!(
+        "SH142",
+        "Buzzard Mk II",
+        "integration/sh142-buzzard-mk-ii/BUZZARD-MK-II-STUDIO.json",
+        0x9111_8763_ae0e_bc33
+    ),
+    stock_package!(
+        "SH143",
+        "Aardvark Miner",
+        "integration/sh143-aardvark-miner/AARDVARK-MINER-STUDIO.json",
+        0x4164_ddda_3d2f_aa22
+    ),
+    stock_package!(
+        "SH144",
+        "Razorback",
+        "integration/sh144-razorback/RAZORBACK-STUDIO.json",
+        0x9cb6_aa70_3a2e_e547
+    ),
+    stock_package!(
+        "SH145",
+        "Kestrel",
+        "integration/sh145-kestrel/KESTREL-STUDIO.json",
+        0x04c2_258f_545f_60fc
+    ),
+    stock_package!(
+        "SH146",
+        "Merlin",
+        "integration/sh146-merlin/MERLIN-STUDIO.json",
+        0x1d90_97a8_9888_c220
+    ),
+    stock_package!(
+        "SH147",
+        "Hawk",
+        "integration/sh147-hawk/HAWK-STUDIO.json",
+        0xf809_465b_66a0_c9eb
+    ),
+    stock_package!(
+        "SH148",
+        "Morepork",
+        "integration/sh148-morepork/MOREPORK-STUDIO.json",
+        0x069e_88c3_b1bc_5b28
+    ),
+    stock_package!(
+        "SH149",
+        "Owlet Mk II",
+        "integration/sh149-owlet-mk-ii/OWLET-MK-II-STUDIO.json",
+        0xb42b_65fd_d460_8589
+    ),
+    stock_package!(
+        "SH150",
+        "Reindeer Freighter",
+        "integration/sh150-reindeer-freighter/REINDEER-FREIGHTER-STUDIO.json",
+        0xf7c7_80a1_f084_4974
+    ),
+    stock_package!(
+        "SH151",
+        "Lynx Escort",
+        "integration/sh151-lynx-escort/LYNX-ESCORT-STUDIO.json",
+        0xeee6_b97f_3a18_c010
+    ),
+    stock_package!(
+        "SH152",
+        "Osprey Scout",
+        "integration/sh152-osprey-scout/OSPREY-SCOUT-STUDIO.json",
+        0x22b6_ac72_16a2_15f8
+    ),
+    stock_package!(
+        "SH153",
+        "Osprey Strike",
+        "integration/sh153-osprey-strike/OSPREY-STRIKE-STUDIO.json",
+        0x0688_d139_cabb_0612
+    ),
+    stock_package!(
+        "SH154",
+        "Osprey Patrol",
+        "integration/sh154-osprey-patrol/OSPREY-PATROL-STUDIO.json",
+        0xa33d_a9be_fdec_97f8
+    ),
+    stock_package!(
+        "SH155",
+        "Osprey Support",
+        "integration/sh155-osprey-support/OSPREY-SUPPORT-STUDIO.json",
+        0xbdde_60da_7833_232e
+    ),
+    stock_package!(
+        "SH157",
+        "Wolf Scout",
+        "integration/sh157-wolf-scout/WOLF-SCOUT-STUDIO.json",
+        0xcb1b_346f_472c_f467
+    ),
+    stock_package!(
+        "SH158",
+        "Wolf Mk I",
+        "integration/sh158-wolf-mk-i/WOLF-MK-I-STUDIO.json",
+        0xc976_0500_1bab_390b
+    ),
+    stock_package!(
+        "SH159",
+        "Wolf Mk II",
+        "integration/sh159-wolf-mk-ii/WOLF-MK-II-STUDIO.json",
+        0xb9e4_d4c5_8de9_a409
+    ),
+    stock_package!(
+        "SH160",
+        "Wolf Cutter",
+        "integration/sh160-wolf-cutter/WOLF-CUTTER-STUDIO.json",
+        0xf35e_051d_e326_d11d
+    ),
+    stock_package!(
+        "SH163",
+        "Lammergeier",
+        "integration/sh163-lammergeier/LAMMERGEIER-STUDIO.json",
+        0x87d4_fc04_8677_f022
+    ),
+    stock_package!(
+        "SH165",
+        "Secretarybird",
+        "integration/sh165-secretarybird/SECRETARYBIRD-STUDIO.json",
+        0x8c0d_ca10_e085_3881
+    ),
+    stock_package!(
+        "SH166",
+        "Camel Rescue",
+        "integration/sh166-camel-rescue/CAMEL-RESCUE-STUDIO.json",
+        0x4f86_653e_c977_0217
+    ),
+    stock_package!(
+        "SH167",
+        "Secretarybird Survey",
+        "integration/sh167-secretarybird-survey/SECRETARYBIRD-SURVEY-STUDIO.json",
+        0x4af9_70fd_6120_949b
+    ),
+    stock_package!(
+        "SH168",
+        "Armadillo Miner",
+        "integration/sh168-armadillo-miner/ARMADILLO-MINER-STUDIO.json",
+        0x976c_ca02_a209_e46e
+    ),
+    stock_package!(
+        "SH169",
+        "Caracara Mk I",
+        "integration/sh169-caracara-mk-i/CARACARA-MK-I-STUDIO.json",
+        0x5d09_fa06_8cfe_b4ff
+    ),
+    stock_package!(
+        "SH170",
+        "Caracara Mk II",
+        "integration/sh170-caracara-mk-ii/CARACARA-MK-II-STUDIO.json",
+        0x9a15_9ab1_5b81_ad36
+    ),
 ];
 pub(crate) const STOCK_MODELS: [AvailableModel<'static>; DESCRIPTORS.len()] = {
     let mut models = [DESCRIPTORS[0].model; DESCRIPTORS.len()];
@@ -515,8 +815,17 @@ mod tests {
     #[test]
     fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
         let catalogue = ok(crate::docked_screens::Catalogue::bundled());
-        assert_eq!(STOCK_MODELS.len(), 59);
-        assert!(!STOCK_MODELS.iter().any(|model| model.object == "SH082"));
+        assert_eq!(STOCK_MODELS.len(), 109);
+        for held in [
+            "SH082", "SH102", "SH103", "SH108", "SH112", "SH113", "SH114", "SH115", "SH116",
+            "SH117", "SH118", "SH119", "SH120", "SH121", "SH122", "SH123", "SH124", "SH125",
+            "SH141", "SH156", "SH161", "SH162", "SH164",
+        ] {
+            assert!(
+                !STOCK_MODELS.iter().any(|model| model.object == held),
+                "{held}"
+            );
+        }
         let mut identities = std::collections::BTreeSet::new();
         let mut keys = std::collections::BTreeSet::new();
         for entry in DESCRIPTORS {

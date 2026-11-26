@@ -24,7 +24,7 @@ The development source also provides a separate Goshawk Mk II Custom Showroom an
 
 Medusa (SH171) can be inspected in the station Showroom. The source package preserves both original meshes and the inspection shield. The Showroom lists the verified empty stock dry mass. [Medusa inspection and flight limits](integration/sh171-medusa/README.md)
 
-The follow-up development candidate offers 65 selectable stock previews in the ordinary station Showroom. This includes 59 validated Hull Studio schema-1 fleet packages and six original stock models. Cheetah (SH082) has no rendered preview because its contact requirement is unresolved. These are catalogue previews, not new ships for purchase or flight. [Hull Studio](docs/HULL-STUDIO.md) also opens a local or archived preview in a disposable Showroom session without changing the player's ship. The earlier 37-preview Mac build passed the stock loader and station Showroom tests; the full expanded registry still needs final platform and native presentation validation.
+The follow-up development candidate offers 115 selectable stock previews in the ordinary station Showroom. This includes 109 validated Hull Studio schema-1 fleet packages and six original stock models. Cheetah (SH082) and the 22 outstanding entries in the final fleet intake remain outside the preview registry. These are catalogue previews, not new ships for purchase or flight. [Hull Studio](docs/HULL-STUDIO.md) also opens a local or archived preview in a disposable Showroom session without changing the player's ship. The earlier 37-preview Mac build passed the stock loader and station Showroom tests; the expanded registry still needs final platform and native presentation validation. [Outstanding fleet scope](docs/IMPLEMENTATION-STATUS.md#outstanding-fleet-inspection-scope)
 
 The separate [Medusa player flight preview](integration/sh171-medusa-preview/README.md) uses a dedicated profile and the admitted reduced flight geometry. On signed Mac build `5a924315`, the original SH171 artwork was visible in actual flight at 50.30/50.30. A cold restart restored the same ship, speed and expanded 32 t hold. Native docking return and fit-limit refusal were not observed in that run. Ordinary progression, fabrication and exchange do not grant the Medusa. Final release qualification remains separate.
 
@@ -201,6 +201,9 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Wisent source envelope and Hull Studio definition](docs/WISENT-SOURCE.md)
 - [Wisent Mk II source envelope and Hull Studio definition](docs/WISENT-MK-II-SOURCE.md)
 - [Anoa source envelope and Hull Studio definition](docs/ANOA-SOURCE.md)
+- [Ox source envelope and Hull Studio definition](docs/OX-SOURCE.md)
+- [Ox Mk II source envelope and Hull Studio definition](docs/OX-MK-II-SOURCE.md)
+- [Cavy Racer source envelope and Hull Studio definition](docs/CAVY-RACER-SOURCE.md)
 - [Stag Liner source envelope and Hull Studio definition](docs/STAG-LINER-GAMEPLAY-ENVELOPE.md)
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)

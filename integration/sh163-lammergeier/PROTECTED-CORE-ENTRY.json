@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh163-lammergeier",
+  "undoBefore": [
+    "sh160-wolf-cutter"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "lammergeier",
+  "before": "pub mod laggar;\n",
+  "after": "pub mod lanner;\n"
+}

@@ -34,9 +34,19 @@ SH171 is available for catalogue inspection with the original detailed artwork a
 
 ## Combined Showroom and Hull Studio source candidate
 
-The ordinary station Showroom has 65 selectable stock previews: 59 authenticated schema-1 packages and six original stock models. The latest fleet batch includes SH070–SH081 and SH083–SH098. Cheetah (SH082) is excluded from the rendered stock registry because its contact requirement is unresolved. The Showroom keeps the linked source identities, engineering readouts and inspection-only exchange rules. The combined source also restores the Studio launcher, including explicit inspection of schema-2 archives. Stock ship and station finishes are display-only; local authored material colours remain exact. Mac build `5a924315` passed 647 core unit tests, 382 desktop unit tests and 13 core integration tests; 20 desktop tests were ignored. The desktop tests checked all 31 schema-package previews on that 37-preview build. Source checks for the later fleet additions passed. Final compiler checks and native presentation acceptance of the 65-preview registry remain separate.
+The ordinary station Showroom has 115 selectable stock previews: 109 authenticated schema-1 packages and six original stock models. The final fleet intake adds 78 authored stock packages from SH070 through SH170. The Showroom keeps the linked source identities, engineering readouts and inspection-only exchange rules. The combined source also restores the Studio launcher, including explicit inspection of schema-2 archives. Stock ship and station finishes are display-only; local authored material colours remain exact. Mac build `5a924315` passed 647 core unit tests, 382 desktop unit tests and 13 core integration tests; 20 desktop tests were ignored. The desktop tests checked all 31 schema-package previews on that 37-preview build. The MacBook Air's exact final 50-hull source packet at `e10ab45b` passed 259 Python tests and 107 focused Rust tests with 210 matching replay receipts. Final compiler checks and native presentation acceptance of the 115-preview registry remain separate.
 
 The separate [Medusa player preview](../integration/sh171-medusa-preview/README.md) connects the active World hull identity to the original detailed flight rendering. The renderer retains the Peregrine model for ordinary players and existing traffic. It does not use the archived 729-piece inspection shield or reduced contact hull as flight artwork. On the signed Mac build `5a924315` (tree `61214e3e28f6b2830cfd5c71d52482e049f29ef3`), the Orchestrator saw the original Medusa in flight at 50.30/50.30. The isolated pilot fitted the cargo expansion, launched, saved and cold-restarted. The new process restored FLIGHT, 50.30 and the expanded 32 t hold. The 69-byte save remained byte-identical through both process exits and the ordinary decoder refused it. Core tests at that source passed the actual launch/return, rear-side save and fit-limit cases; native docking return and fit-limit refusal were not observed in that run. This evidence is not publication or full final-build acceptance.
+
+### Outstanding fleet inspection scope
+
+Cheetah (SH082) remains outside the rendered stock registry because its candidate loses four required contacts. The final intake also excludes the following 22 entries in SH099–SH170:
+
+- SH102 Dhole Haven, SH103 Redtail Mk III, SH108 Besra, SH161 Wolf Citadel, SH162 Larvaal Probe and SH164 Toad Drug Factory: original source is outstanding in the queue.
+- SH112 Larvaal Warden, SH113 Larvaal Ravager, SH114 Larvaal Sentinel, SH115 Larvaal Lancer, SH116 Larvaal Broodlord, SH117 Larvaal Provoker, SH118 Larvaal Reaver, SH119 Larvaal Wraith, SH120 Larvaal Seeker, SH121 Larvaal Mender, SH122 Larvaal Harvester, SH123 Larvaal Sovereign, SH124 Larvaal Warship and SH125 Larvaal Drone: original finite-dry record is outstanding. SH123 also has unresolved engineering.
+- SH141 Salamander Station and SH156 Lion Bastion: no authored inspection packet is in the queued refs.
+
+These are outstanding content requirements, not an admission or acquisition decision. No placeholder artwork is registered for them.
 
 ## Station chart best-profit scan source candidate
 
@@ -307,6 +317,18 @@ Wisent Mk II preserves the original 2,600 detailed and 816 native faces. Its ind
 ## Anoa catalogue source
 
 Anoa preserves its original 6,720 detailed and 1,928 native faces. Its separate 512-face candidate retains all 34 native parts, the two closed collars, and all 40 measured native overlaps. [Anoa source and evidence](ANOA-SOURCE.md)
+
+## Ox catalogue source
+
+Ox preserves its original 688 detailed and 376 native faces. Both originals retain all 13 measured overlap pairs. Seven swept guards include the longitudinal service gap between the two freight decks. [Ox source and evidence](OX-SOURCE.md)
+
+## Ox Mk II catalogue source
+
+Ox Mk II preserves its own 688 detailed and 376 native faces. Both originals retain the same 13 measured overlap pairs. The seven guarded routes include the service gap between the original freight decks. [Ox Mk II source and evidence](OX-MK-II-SOURCE.md)
+
+## Cavy Racer catalogue source
+
+Cavy Racer preserves both original meshes at 3,084 detailed and 160 native faces. Both contain the same eight measured structural overlap pairs. Seven swept guards include the gap between the aft nozzles. [Cavy Racer source and evidence](CAVY-RACER-SOURCE.md)
 
 ## Goshawk Mk II Custom candidate
 

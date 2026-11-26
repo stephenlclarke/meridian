@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh151-lynx-escort",
+  "undoBefore": [
+    "sh150-reindeer-freighter"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "lynx_escort",
+  "before": "pub mod llama;\n",
+  "after": "pub mod magpie;\n"
+}

@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh110-leopard-fighter",
+  "undoBefore": [
+    "sh109-hippo"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "leopard_fighter",
+  "before": "pub mod lanner;\n",
+  "after": "pub mod llama;\n"
+}
