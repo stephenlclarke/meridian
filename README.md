@@ -196,6 +196,7 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Anoa source envelope and Hull Studio definition](docs/ANOA-SOURCE.md)
 - [Ox source envelope and Hull Studio definition](docs/OX-SOURCE.md)
 - [Ox Mk II source envelope and Hull Studio definition](docs/OX-MK-II-SOURCE.md)
+- [Cavy Racer source envelope and Hull Studio definition](docs/CAVY-RACER-SOURCE.md)
 - [Stag Liner source envelope and Hull Studio definition](docs/STAG-LINER-GAMEPLAY-ENVELOPE.md)
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)
