@@ -680,10 +680,10 @@ fn cabin_capacity_respects_t04_reservation_purchase_and_cancel_at_every_prefix()
 fn actual_four_tank_commander_records_410_fuel_refusal_and_cold_resume_without_passengers() {
     use crate::{XyzzyAction, navigation::MAX_FUEL_CAPACITY};
     let mut world = World::new_commander(31009).unwrap();
-    let review = world
+    let fuel_review = world
         .review_xyzzy(XyzzyAction::MaximumFuelStorage, 0)
         .unwrap();
-    world.prepare_xyzzy(review, 0).unwrap().commit();
+    world.prepare_xyzzy(fuel_review, 0).unwrap().commit();
     let tanks = world
         .modular_equipment_snapshot()
         .unwrap()
