@@ -32,7 +32,7 @@ fn medusa_profile_fit_and_cold_continue_do_not_touch_ordinary_slot()
     }
     preview.command(Action::SetFlightView(meridian_core::FlightView::Rear))?;
     let flight = preview.world.snapshot();
-    preview.save()?;
+    assert_eq!(preview.save()?, "Medusa preview saved");
     drop(preview);
     let mut restored = Profile::open_medusa_preview(dir.0.clone())?;
     assert_eq!(restored.world.player_hull_kind(), PlayerHullKind::Medusa);

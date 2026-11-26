@@ -249,13 +249,18 @@ impl Profile {
 
     pub fn continue_saved(&mut self) -> Result<(), String> {
         self.require_profile()?;
+        let missing = if self.is_medusa_preview() {
+            "No saved Medusa preview exists in this slot"
+        } else {
+            "No saved commander exists in this save slot"
+        };
         let bytes = self
             .store
             .as_ref()
             .ok_or("Internal validation has no profile storage")?
             .load(MAX_SAVE_FILE_BYTES)
             .map_err(|e| e.to_string())?
-            .ok_or("No saved commander exists in this save slot")?;
+            .ok_or(missing)?;
         self.accept_save(&bytes)
     }
 
@@ -662,12 +667,17 @@ impl Profile {
             .save(&bytes, file_limit)
             .map_err(|e| format!("Save failed; previous file retained: {e}"))?;
         self.has_save = true;
+        let saved_message = if self.is_medusa_preview() {
+            "Medusa preview saved"
+        } else {
+            "Commander saved"
+        };
         match committed {
             #[cfg(unix)]
-            SaveCommit::DirectorySynced => Ok("Commander saved".into()),
+            SaveCommit::DirectorySynced => Ok(saved_message.into()),
             SaveCommit::Published {
                 directory_sync_error: None,
-            } => Ok("Commander saved".into()),
+            } => Ok(saved_message.into()),
             SaveCommit::Published {
                 directory_sync_error: Some(error),
             } => Err(format!(
