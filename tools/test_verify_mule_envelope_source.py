@@ -14,7 +14,8 @@ class MuleSourceVerification(unittest.TestCase):
     def copy_protected_sources(self, root):
         core = Path('crates/meridian-core/src')
         shutil.copytree(verifier.ROOT / core, root / core)
-        for record in (verifier.PROTECTED_CORE, verifier.FLIGHT_COMPUTER_INVERSE):
+        for record in (verifier.PROTECTED_CORE, verifier.FLIGHT_COMPUTER_INVERSE,
+                       verifier.HYPERSPACE_DRIVE_INVERSE):
             (root / record).parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(verifier.ROOT / record, root / record)
         return root / core
@@ -24,6 +25,7 @@ class MuleSourceVerification(unittest.TestCase):
         self.assertEqual(result['protectedCoreFilesChecked'], 115)
         self.assertEqual(result['protectedCoreFilesWithMuleHooks'], 6)
         self.assertEqual(result['protectedCoreFilesWithFlightComputerChanges'], 17)
+        self.assertEqual(result['protectedCoreFilesWithHyperspaceDriveChanges'], 12)
         self.assertEqual(result['geometryCoreTests'], 1)
         self.assertEqual(result['restoreCoreTests'], 1)
         self.assertEqual(result['totalMuleCoreTests'], 24)
@@ -58,6 +60,25 @@ class MuleSourceVerification(unittest.TestCase):
             inverse = root / verifier.FLIGHT_COMPUTER_INVERSE
             inverse.write_bytes(inverse.read_bytes() + b'\n')
             with self.assertRaisesRegex(AssertionError, 'flight computer inverse manifest'):
+                verifier.verify_protected_core(root)
+
+    def test_hyperspace_inverse_is_pinned_and_each_changed_source_remains_exact(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            core = self.copy_protected_sources(root)
+            inverse = verifier.hyperspace_drive_inverse(root, verifier.protected_core_pins(root))
+            self.assertEqual(len(inverse), 12)
+            for relative in inverse:
+                with self.subTest(relative=relative):
+                    source = core / relative
+                    original = source.read_bytes()
+                    source.write_bytes(original + b'\n')
+                    with self.assertRaisesRegex(AssertionError, relative):
+                        verifier.verify_protected_core(root)
+                    source.write_bytes(original)
+            manifest = root / verifier.HYPERSPACE_DRIVE_INVERSE
+            manifest.write_bytes(manifest.read_bytes() + b'\n')
+            with self.assertRaisesRegex(AssertionError, 'hyperspace drive inverse manifest'):
                 verifier.verify_protected_core(root)
 
     def test_component_triangle_may_not_use_a_neighbouring_part_vertex(self):

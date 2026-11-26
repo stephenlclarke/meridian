@@ -3,7 +3,7 @@ use super::{FlightMode, World};
 use crate::{
     equipment::TargetingTier,
     freight::g02::CommanderAccount,
-    navigation::{DockContext, NavigationFitChange, NavigationGrade},
+    navigation::{DockContext, DriveGrade, NavigationFitChange, NavigationGrade},
     save::{Reader, SaveError, Writer},
 };
 use core::fmt;
@@ -31,6 +31,7 @@ pub enum ModuleKind {
     Targeting(TargetingTier),
     MiningTargeting,
     SalvageTargeting,
+    Drive(DriveGrade),
 }
 impl ModuleKind {
     pub fn family(self) -> &'static str {
@@ -47,6 +48,7 @@ impl ModuleKind {
             Self::Targeting(_) => "targeting-core",
             Self::MiningTargeting => "targeting-mining",
             Self::SalvageTargeting => "targeting-salvage",
+            Self::Drive(_) => "hyperspace-drive",
             _ => "energy",
         }
     }
@@ -75,6 +77,9 @@ impl ModuleKind {
             Self::FuelScoops => "Fuel Scoops",
             Self::MiningTargeting => "Mining Targeting Module",
             Self::SalvageTargeting => "Salvage Targeting Module",
+            Self::Drive(DriveGrade::Basic) => "Basic Hyperspace Drive",
+            Self::Drive(DriveGrade::Intermediate) => "Intermediate Hyperspace Drive",
+            Self::Drive(DriveGrade::Advanced) => "Advanced Hyperspace Drive",
             Self::BeamLaser => "Beam Laser",
             Self::MilitaryLaser => "Military Laser",
             Self::NavalLaser => "Naval Laser",
@@ -112,6 +117,7 @@ impl ModuleKind {
             Self::Targeting(_) => ModuleSlot::Targeting,
             Self::MiningTargeting => ModuleSlot::MiningTargeting,
             Self::SalvageTargeting => ModuleSlot::SalvageTargeting,
+            Self::Drive(_) => ModuleSlot::Drive,
             _ => ModuleSlot::Energy,
         }
     }
@@ -142,6 +148,7 @@ impl ModuleKind {
                 | Self::Targeting(TargetingTier::Military)
                 | Self::MiningTargeting
                 | Self::SalvageTargeting
+                | Self::Drive(DriveGrade::Advanced)
         )
     }
     pub fn navigation_reach_ly(self) -> Option<u8> {
@@ -154,6 +161,7 @@ impl ModuleKind {
             Self::NavalEnergyUnit => 3,
             Self::EliteEnergyUnit => 4,
             Self::Targeting(_) | Self::MiningTargeting | Self::SalvageTargeting => 1,
+            Self::Drive(DriveGrade::Intermediate | DriveGrade::Advanced) => 1,
             _ => 0,
         }
     }
@@ -175,6 +183,9 @@ impl ModuleKind {
             // Frozen original shop, in credit tenths and displayed technology levels.
             Self::MiningTargeting => Some((20_000, 6)),
             Self::SalvageTargeting => Some((40_000, 8)),
+            Self::Drive(DriveGrade::Basic) => None,
+            Self::Drive(DriveGrade::Intermediate) => Some((50_000, 10)),
+            Self::Drive(DriveGrade::Advanced) => Some((150_000, 13)),
         }
     }
     fn prerequisite(self) -> Option<Self> {
@@ -188,6 +199,8 @@ impl ModuleKind {
             Self::MiningTargeting | Self::SalvageTargeting => {
                 Some(Self::Targeting(TargetingTier::Basic))
             }
+            Self::Drive(DriveGrade::Intermediate) => Some(Self::Drive(DriveGrade::Basic)),
+            Self::Drive(DriveGrade::Advanced) => Some(Self::Drive(DriveGrade::Intermediate)),
             _ => None,
         }
     }
@@ -216,6 +229,9 @@ impl ModuleKind {
             Self::Targeting(tier) => 12 + tier as u8,
             Self::MiningTargeting => 19,
             Self::SalvageTargeting => 20,
+            Self::Drive(DriveGrade::Basic) => 21,
+            Self::Drive(DriveGrade::Intermediate) => 22,
+            Self::Drive(DriveGrade::Advanced) => 23,
         }
     }
     fn from_tag(tag: u8) -> Result<Self, SaveError> {
@@ -236,6 +252,9 @@ impl ModuleKind {
             13..=18 => Ok(Self::Targeting(TargetingTier::ALL[usize::from(tag - 13)])),
             19 => Ok(Self::MiningTargeting),
             20 => Ok(Self::SalvageTargeting),
+            21 => Ok(Self::Drive(DriveGrade::Basic)),
+            22 => Ok(Self::Drive(DriveGrade::Intermediate)),
+            23 => Ok(Self::Drive(DriveGrade::Advanced)),
             _ => Err(SaveError::InvalidEncoding),
         }
     }
@@ -249,6 +268,7 @@ pub enum ModuleSlot {
     Targeting,
     MiningTargeting,
     SalvageTargeting,
+    Drive,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleProvenance {
@@ -341,6 +361,7 @@ pub enum ModuleError {
     MissingPrerequisite,
     StaleOccupant,
     LowerTargetingGrade,
+    DriveRequired,
     NoChange,
     Capacity,
     InsufficientCredits,
@@ -442,6 +463,12 @@ impl Ledger {
                     slot: Some(ModuleSlot::Navigation),
                     provenance: ModuleProvenance::StandardBirth,
                 },
+                OwnedModule {
+                    id: owner.checked_add(6).ok_or(INVALID)?,
+                    kind: ModuleKind::Drive(DriveGrade::Basic),
+                    slot: Some(ModuleSlot::Drive),
+                    provenance: ModuleProvenance::StandardBirth,
+                },
             ],
             ..Self::default()
         })
@@ -459,6 +486,13 @@ impl Ledger {
     }
     pub(super) fn jump_reach_ly(&self) -> f64 {
         self.navigation_grade().reach_ly()
+    }
+    pub(super) fn drive(&self) -> Option<(u64, DriveGrade)> {
+        let item = self.fitted(ModuleSlot::Drive)?;
+        match item.kind {
+            ModuleKind::Drive(grade) => Some((item.id, grade)),
+            _ => None,
+        }
     }
     fn fitted_units(&self) -> u16 {
         self.items
@@ -508,6 +542,15 @@ impl Ledger {
         }
         self.apply(event, counters[index])
     }
+    fn prerequisites_satisfied(&self, kind: ModuleKind) -> bool {
+        kind.prerequisite().is_none_or(|required| {
+            self.items.iter().any(|item| {
+                item.kind == required
+                    && (!matches!(kind, ModuleKind::Drive(_))
+                        || item.slot == Some(ModuleSlot::Drive))
+            })
+        })
+    }
     fn apply(&mut self, event: Event, transaction: u32) -> Result<(), ModuleError> {
         if let Some(kind) = event.action.purchase_kind() {
             let price = if event.xyzzy {
@@ -518,11 +561,7 @@ impl Ledger {
             if self.items.iter().filter(|i| i.kind == kind).count() >= kind.maximum_owned() {
                 return Err(ModuleError::Capacity);
             }
-            if !event.xyzzy
-                && kind
-                    .prerequisite()
-                    .is_some_and(|required| !self.items.iter().any(|i| i.kind == required))
-            {
+            if !event.xyzzy && !self.prerequisites_satisfied(kind) {
                 return Err(ModuleError::MissingPrerequisite);
             }
             let replacing = self.fitted(kind.slot()).map(|i| i.id);
@@ -562,6 +601,9 @@ impl Ledger {
                         .ok_or(ModuleError::MissingItem)?;
                     if i.slot.is_none() {
                         return Err(ModuleError::NoChange);
+                    }
+                    if i.slot == Some(ModuleSlot::Drive) {
+                        return Err(ModuleError::DriveRequired);
                     }
                     i.slot = None;
                 }
@@ -728,15 +770,18 @@ impl State {
             };
             transaction = validate_module_purchase(e, owner, transaction)?;
             let previous_grade = ledger.navigation_grade();
+            let previous_drive = ledger.drive();
             ledger
                 .apply(*e, if e.xyzzy { serial } else { transaction })
                 .map_err(|_| INVALID)?;
             let grade = ledger.navigation_grade();
-            if grade != previous_grade {
+            let drive = ledger.drive().ok_or(INVALID)?;
+            if grade != previous_grade || Some(drive) != previous_drive {
                 ledger.navigation_changes.push(NavigationFitChange {
                     dock: e.dock,
                     tick: e.tick,
                     grade,
+                    drive: drive.1,
                 });
             }
             previous = Some(*e);
@@ -753,6 +798,7 @@ impl State {
                 ModuleSlot::Navigation,
                 super::StarterComponent::BasicNavigation,
             ),
+            (6, ModuleSlot::Drive, super::StarterComponent::BasicDrive),
         ] {
             let born = account
                 .starter_items()
@@ -936,6 +982,8 @@ impl World {
             ModuleKind::EliteEnergyUnit,
             ModuleKind::IntermediateNavigation,
             ModuleKind::AdvancedNavigation,
+            ModuleKind::Drive(DriveGrade::Intermediate),
+            ModuleKind::Drive(DriveGrade::Advanced),
             ModuleKind::Targeting(TargetingTier::Basic),
             ModuleKind::Targeting(TargetingTier::Advanced),
             ModuleKind::Targeting(TargetingTier::Docking),
@@ -1221,8 +1269,15 @@ impl World {
         let navigation_fitted = ledger
             .fitted(ModuleSlot::Navigation)
             .is_some_and(|item| item.id == owner + 4);
+        let drive_fitted = ledger.drive().is_some_and(|(id, _)| id == owner + 6);
         let account = current
-            .prepare_module(paid, pulse_fitted, energy_fitted, navigation_fitted)
+            .prepare_module(
+                paid,
+                pulse_fitted,
+                energy_fitted,
+                navigation_fitted,
+                drive_fitted,
+            )
             .map_err(|_| ModuleError::SequenceExhausted)?;
         let mut state = self.modular.clone();
         state.events.push(event);
@@ -1239,6 +1294,8 @@ impl World {
     }
 }
 
+#[cfg(test)]
+mod drive_tests;
 #[cfg(test)]
 mod navigation_tests;
 #[cfg(test)]
@@ -1374,6 +1431,7 @@ impl World {
                 born_fitted(ModuleSlot::FrontLaser, 7),
                 born_fitted(ModuleSlot::Energy, 5),
                 born_fitted(ModuleSlot::Navigation, 4),
+                born_fitted(ModuleSlot::Drive, 6),
             )
             .map_err(|_| INVALID)?;
         self.commander_account = Some(account);

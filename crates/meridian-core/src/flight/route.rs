@@ -34,6 +34,8 @@ impl World {
         }
         self.modular
             .ledger(self, account)
+            .ok()
+            .filter(|ledger| ledger.drive().is_some())
             .map_or(NavigationGrade::Empty, |ledger| ledger.navigation_grade())
     }
 

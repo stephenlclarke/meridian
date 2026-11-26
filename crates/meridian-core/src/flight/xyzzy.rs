@@ -371,6 +371,7 @@ impl World {
                 super::modular::ModuleKind::Targeting(crate::equipment::TargetingTier::Military),
                 super::modular::ModuleKind::MiningTargeting,
                 super::modular::ModuleKind::SalvageTargeting,
+                super::modular::ModuleKind::Drive(crate::navigation::DriveGrade::Advanced),
             ] {
                 self.grant_xyzzy_module(review.dock, review.tick, kind)?;
             }
