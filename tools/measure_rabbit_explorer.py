@@ -3,6 +3,7 @@
 import argparse
 from fractions import Fraction
 import json
+import sys
 from math import gcd
 
 import numpy as np
@@ -10,9 +11,9 @@ from scipy.spatial import ConvexHull
 import trimesh
 
 from measure_banteng_geometry import adaptive_upper, section, solid, upper
-from measure_lanner_geometry import make_fan
+from measure_lanner_geometry import load_reference_records, validated_reference_fan
 from measure_seriema_courier_geometry import silhouette
-from rabbit_explorer_art_mesh import ARC, SCALE, collision_groups, load, metre_space, require
+from rabbit_explorer_art_mesh import ARC, INTEGRATION, SCALE, collision_groups, load, metre_space, require
 from verify_eagle_cruiser_geometry import separating_planes
 from vulture_mk_i_exact_fit import grid_index
 
@@ -67,16 +68,24 @@ def route_report(source, candidate):
     return {"supportCount": len(groups), "routes": results}
 
 
+REFERENCE_FANS_SHA = "e8ac60c477f5b2dcd010cdaa3a39894748e3b3ae15c93a5b4e98f8ad4f3c6d94"
+REFERENCE_DIAGNOSTIC_SHA = "944f04b8eb701b9b012861606afa980d86cdf64bcd0b17bff84fe155f3e37ecf"
+
+
 def support_fit(source, candidate):
     points, groups = geometry(source, candidate)
+    mode = "candidate" if candidate else "archive"
+    membership = np.concatenate(list(groups.values()))
+    records = load_reference_records(INTEGRATION / "REFERENCE-FANS.json", REFERENCE_FANS_SHA,
+                                     REFERENCE_DIAGNOSTIC_SHA, mode, points, membership, len(groups), "Rabbit")
     targets = {"detailed": 1800, "archiveNative": 2000}
     if candidate:
         targets["candidateNative"] = 2200
     surfaces = source_surfaces(source)
     indices = {name: grid_index(surfaces[name]) for name in targets}
     rows = {}
-    for name, vertices in groups.items():
-        fan = make_fan(points, np.array(vertices))
+    for (name, vertices), record in zip(groups.items(), records, strict=True):
+        fan = validated_reference_fan(record, (name, 1), points, np.array(vertices), "Rabbit")
         rows[name] = {lod: adaptive_upper(index, points[fan], targets[lod]) for lod, index in indices.items()}
     return {
         "nominalPaddingMetres": .02,
@@ -161,7 +170,7 @@ def main():
     else:
         measure = route_report if args.report.endswith("-routes") else support_fit
         report = measure(source, args.report.startswith("candidate"))
-    print(json.dumps(report, indent=2))
+    sys.stdout.buffer.write((json.dumps(report, indent=2) + "\n").encode())
 
 
 if __name__ == "__main__":
