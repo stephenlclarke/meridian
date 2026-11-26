@@ -285,6 +285,27 @@ impl State {
         validate_laser_receipts(world, end, &lasers)?;
         Ok(events)
     }
+    /// Cross-check field command boundaries against the independent ordinary
+    /// emission sequence. The electrical replay remains independently testable.
+    pub(super) fn validate_ecm_emissions(&self, world: &World) -> Result<(), SaveError> {
+        let mut spends: Vec<_> = world.missiles.resource_emissions().collect();
+        for &(emission, clock) in &spends {
+            world.ecm.validate_emission(clock, emission)?;
+        }
+        spends.sort_unstable_by_key(|&(emission, _)| emission);
+        let mut missiles = spends.into_iter().peekable();
+        let mut next = 1;
+        for event in self
+            .events
+            .iter()
+            .filter(|event| !event.kind.is_berth() && event.kind != Kind::EcmLocalFlight)
+        {
+            next = merge_missile_emissions(&mut missiles, next, event.clock)?;
+            world.ecm.validate_emission(event.clock, next)?;
+            next += 1;
+        }
+        Ok(())
+    }
     pub(super) fn emp_berths(&self) -> Vec<u64> {
         self.events
             .iter()

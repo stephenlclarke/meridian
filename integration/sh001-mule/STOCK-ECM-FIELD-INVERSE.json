@@ -1,0 +1,302 @@
+{
+  "base": "8ba79ea995cd9439723a3c1e271ed4ecd6387e24",
+  "files": {
+    "flight.rs": {
+      "beforeSHA256": "c95aebe87d3313fb1ab9a0d9d29c1561929d3b5f5759c3675a45d6b3be52c00c",
+      "afterSHA256": "112b71f642d08fc678b630a985698fdb2d0397f34d078d1a5751c4b6fe5c349e",
+      "hunks": [
+        {
+          "offset": 246,
+          "before": "    ECM_ENERGY_HUNDREDTHS, ECM_FIELD_TICKS, EcmActivation, EcmError, EcmSnapshot, EcmTrigger,\n",
+          "after": "    ECM_ENERGY_HUNDREDTHS, ECM_FIELD_TICKS, EcmActivation, EcmError, EcmSnapshot, EcmTermination,\n    EcmTrigger, PreparedEcm,\n"
+        }
+      ]
+    },
+    "flight/damage.rs": {
+      "beforeSHA256": "d92e61f83f2f20c3f83764c66f20d09ff455939b3936b25409dd32fa0d872180",
+      "afterSHA256": "f70da0bf0dafe537f579d62b9551dc2d4035042e1dac843a4ca7d8e9c02ec799",
+      "hunks": [
+        {
+          "offset": 10124,
+          "before": "",
+          "after": "    }\n    /// Cross-check field command boundaries against the independent ordinary\n    /// emission sequence. The electrical replay remains independently testable.\n    pub(super) fn validate_ecm_emissions(&self, world: &World) -> Result<(), SaveError> {\n        let mut spends: Vec<_> = world.missiles.resource_emissions().collect();\n        for &(emission, clock) in &spends {\n            world.ecm.validate_emission(clock, emission)?;\n        }\n        spends.sort_unstable_by_key(|&(emission, _)| emission);\n        let mut missiles = spends.into_iter().peekable();\n        let mut next = 1;\n        for event in self\n            .events\n            .iter()\n            .filter(|event| !event.kind.is_berth() && event.kind != Kind::EcmLocalFlight)\n        {\n            next = merge_missile_emissions(&mut missiles, next, event.clock)?;\n            world.ecm.validate_emission(event.clock, next)?;\n            next += 1;\n        }\n        Ok(())\n"
+        }
+      ]
+    },
+    "flight/emp/runtime.rs": {
+      "beforeSHA256": "951e8fd668ea30d86f4cd5bf632cb108a99114eba9b78c565a6b7973b2390222",
+      "afterSHA256": "486d998bc2853b073eb51a4fa04a882c8240cef3d348a6114ce04f7591a63e8a",
+      "hunks": [
+        {
+          "offset": 15459,
+          "before": "        if self.active_ecm().is_some() {\n",
+          "after": "        if self.ecm_timer().is_some() {\n"
+        }
+      ]
+    },
+    "flight/emp/scene.rs": {
+      "beforeSHA256": "30744780d865793a36a7a021ec31b1b1737198be462d586939e048e3f9301660",
+      "afterSHA256": "a605ed41aa4baa6c66d4c5d2efba65f4adef80e6c64a7cfb0fbfb775dbe86b67",
+      "hunks": [
+        {
+          "offset": 10685,
+          "before": "        world\n            .missiles\n            .validate_retained_beam(super::super::missiles::RetainedBeam {\n",
+          "after": "        world.missiles.validate_retained_beam(\n            &world.ecm,\n            super::super::missiles::RetainedBeam {\n"
+        },
+        {
+          "offset": 11080,
+          "before": "",
+          "after": "                ecm_after_scene: true,\n"
+        },
+        {
+          "offset": 11238,
+          "before": "            })?;\n",
+          "after": "            },\n        )?;\n"
+        }
+      ]
+    },
+    "flight/emp/tests.rs": {
+      "beforeSHA256": "a6e3dcbedc769e049b5b61d1f153e35f91d3f66860092a89e8f01edb44af917d",
+      "afterSHA256": "a54c4d2586a1bff8bdf24b8ed49759b13bfc3427bf99b9a3585f4f0b292ab6bf",
+      "hunks": [
+        {
+          "offset": 42176,
+          "before": "    assert_eq!(loaded.ecm_snapshot(), w.ecm_snapshot());\n",
+          "after": "    let mut expected = w.ecm_snapshot().unwrap();\n    expected.active = None;\n    assert_eq!(loaded.ecm_snapshot(), Some(expected));\n"
+        }
+      ]
+    },
+    "flight/mining/persistence.rs": {
+      "beforeSHA256": "6d190da318e7fc70ebb5e6220a03674782e1a9c9666fbba24cd5b5d6e444af98",
+      "afterSHA256": "ead28490b90682e5d10eaafa9144b3225dd21337048e2dd09112109384d65e3b",
+      "hunks": [
+        {
+          "offset": 4310,
+          "before": "            self.missiles\n                .validate_retained_beam(super::super::missiles::RetainedBeam {\n",
+          "after": "            self.missiles.validate_retained_beam(\n                &self.ecm,\n                super::super::missiles::RetainedBeam {\n"
+        },
+        {
+          "offset": 4692,
+          "before": "",
+          "after": "                    ecm_after_scene: false,\n"
+        },
+        {
+          "offset": 4860,
+          "before": "                })?;\n",
+          "after": "                },\n            )?;\n"
+        }
+      ]
+    },
+    "flight/missiles.rs": {
+      "beforeSHA256": "76cac162e90f836db4d486bb98fc4750cfca3d5071e3075b146d8d4282501013",
+      "afterSHA256": "c704fc62602fbdbd21dbe1cb205ae0e9ba490b879804a6483777cf19acdd99a9",
+      "hunks": [
+        {
+          "offset": 506,
+          "before": "",
+          "after": "    /// EMP scene (start/release) or a physical step precedes a same-clock manual ECM.\n    pub(super) ecm_after_scene: bool,\n"
+        },
+        {
+          "offset": 3530,
+          "before": "",
+          "after": "    Ecm,\n"
+        },
+        {
+          "offset": 19125,
+          "before": "",
+          "after": "        let old_ecm = self.ecm.clone();\n"
+        },
+        {
+          "offset": 19454,
+          "before": "",
+          "after": "        let terminated = self.ecm.terminate_live(\n            &mut self.missiles,\n            owner,\n            tick,\n            origin.physical_tick,\n            emission,\n        );\n"
+        },
+        {
+          "offset": 19806,
+          "before": "        if self.save_bytes().is_err() {\n",
+          "after": "        if terminated.is_err() || self.save_bytes().is_err() {\n"
+        },
+        {
+          "offset": 20041,
+          "before": "",
+          "after": "            self.ecm = old_ecm;\n"
+        }
+      ]
+    },
+    "flight/missiles/npc.rs": {
+      "beforeSHA256": "4b84bc2f8c95e68520e38a1c8bd94a4fdd7fbd5cf3a2900de314b3a11e0d753a",
+      "afterSHA256": "14831f769de994c1ba853886e31b90db310240f58e17b900aa1108acbf60c345",
+      "hunks": [
+        {
+          "offset": 12252,
+          "before": "",
+          "after": "            Some(MissileEnd::Ecm) => {\n                if p.last_tick != motion_tick\n                    || p.propulsion_travel >= MISSILE_RANGE\n                    || p.age_ticks >= super::MISSILE_LIFETIME_TICKS\n                    || world.ecm.termination(p.origin.projectile).is_none()\n                {\n                    return Err(INVALID);\n                }\n            }\n"
+        }
+      ]
+    },
+    "flight/missiles/persistence.rs": {
+      "beforeSHA256": "db367137c9aff9025f2c962edb8708695be2bf4c56d96ebc932bf9c5da3feb40",
+      "afterSHA256": "2e718d247213f6781d000647881db3ff8e5874f4a9b81ca270d3b3a8e8f80cd2",
+      "hunks": [
+        {
+          "offset": 6513,
+          "before": "",
+          "after": "        MissileEnd::Ecm => 6,\n"
+        },
+        {
+          "offset": 6863,
+          "before": "",
+          "after": "        6 => MissileEnd::Ecm,\n"
+        },
+        {
+          "offset": 8223,
+          "before": "",
+          "after": "        ecm: &super::super::ecm::State,\n"
+        },
+        {
+          "offset": 8340,
+          "before": "        self.validate_retained_beam(super::RetainedBeam {\n            system: hit.attacker.system(),\n            visit: hit.visit,\n            world_tick: hit.world_tick,\n            physical_tick: hit.physical_tick,\n            command_emission: None,\n            ray: hit.source_pose,\n            point: hit.point,\n            bodies: &hit.missiles,\n        })\n",
+          "after": "        self.validate_retained_beam(\n            ecm,\n            super::RetainedBeam {\n                system: hit.attacker.system(),\n                visit: hit.visit,\n                world_tick: hit.world_tick,\n                physical_tick: hit.physical_tick,\n                command_emission: None,\n                ecm_after_scene: true,\n                ray: hit.source_pose,\n                point: hit.point,\n                bodies: &hit.missiles,\n            },\n        )\n"
+        },
+        {
+          "offset": 8892,
+          "before": "",
+          "after": "        ecm: &super::super::ecm::State,\n"
+        },
+        {
+          "offset": 9566,
+          "before": "",
+          "after": "                        || (p.ended == Some(MissileEnd::Ecm)\n                            && p.last_tick == hit.world_tick\n                            && (hit.ecm_after_scene\n                                || hit.command_emission.is_some_and(|emission| {\n                                    ecm.termination(p.origin.projectile)\n                                        .is_some_and(|end| end.after_emission >= emission)\n                                })))\n"
+        },
+        {
+          "offset": 30900,
+          "before": "",
+          "after": "            Some(MissileEnd::Ecm) => {\n                if p.propulsion_travel >= MISSILE_RANGE\n                    || p.age_ticks >= MISSILE_LIFETIME_TICKS\n                    || world.ecm.termination(p.origin.projectile).is_none()\n                {\n                    return Err(INVALID);\n                }\n            }\n"
+        },
+        {
+          "offset": 44845,
+          "before": "",
+          "after": "                // All physical motion precedes an accepted manual ECM command\n                // at this same World clock.\n                Some(MissileEnd::Ecm) => true,\n"
+        },
+        {
+          "offset": 48486,
+          "before": "            self.validate_intercepted_bodies(b, p, i, emission, (ray, d, id))?;\n",
+          "after": "            self.validate_intercepted_bodies(&world.ecm, b, p, i, emission, (ray, d, id))?;\n"
+        },
+        {
+          "offset": 50430,
+          "before": "",
+          "after": "        ecm: &super::super::ecm::State,\n"
+        },
+        {
+          "offset": 50674,
+          "before": "",
+          "after": "        let live_before = |other: ProjectileSnapshot| {\n            other.ended.is_none()\n                || other.last_tick > shot.tick\n                || (other.ended == Some(MissileEnd::Ecm)\n                    && other.last_tick == shot.tick\n                    && ecm\n                        .termination(other.origin.projectile)\n                        .is_some_and(|end| end.after_emission >= emission))\n        };\n"
+        },
+        {
+          "offset": 51174,
+          "before": "            if other.origin.emission < emission\n                && (other.ended.is_none() || other.last_tick > shot.tick)\n            {\n",
+          "after": "            if other.origin.emission < emission && live_before(*other) {\n"
+        },
+        {
+          "offset": 51447,
+          "before": "                other.origin.emission < emission\n                    && (slot == i || other.ended.is_none() || other.last_tick > shot.tick)\n",
+          "after": "                other.origin.emission < emission && (slot == i || live_before(other))\n"
+        }
+      ]
+    },
+    "flight/persistence.rs": {
+      "beforeSHA256": "9e9c57a35e7e09231b07b1d7050ea19997cc2fb148ca7a8dfa225f8f1c1b01af",
+      "afterSHA256": "cd09d67bfb9040a0331f28d3382a60e45bdec627205d5c2e6a493907e7aad8d4",
+      "hunks": [
+        {
+          "offset": 1004,
+          "before": "",
+          "after": "const ECM_FIELD_EXTENSION: &[u8; 8] = b\"MECM0003\";\n"
+        },
+        {
+          "offset": 3659,
+          "before": "fn ecm_content_fingerprint(base: u64) -> u64 {\n",
+          "after": "fn ecm_content_fingerprint(base: u64, field: bool) -> u64 {\n"
+        },
+        {
+          "offset": 3768,
+          "before": "    bytes.extend(b\"stock-ecm-history/v2-local-flight\");\n",
+          "after": "    bytes.extend(if field {\n        b\"stock-ecm-history/v3-local-field\".as_slice()\n    } else {\n        b\"stock-ecm-history/v2-local-flight\".as_slice()\n    });\n"
+        },
+        {
+          "offset": 13279,
+          "before": "            ecm_content_fingerprint(base_fingerprint)\n",
+          "after": "            ecm_content_fingerprint(base_fingerprint, self.ecm.has_field_history())\n"
+        },
+        {
+          "offset": 14915,
+          "before": "            w.bytes.extend(ECM_EXTENSION);\n",
+          "after": "            w.bytes.extend(if self.ecm.has_field_history() {\n                ECM_FIELD_EXTENSION\n            } else {\n                ECM_EXTENSION\n            });\n"
+        },
+        {
+          "offset": 15868,
+          "before": "",
+          "after": "        candidate.close_restored_ecm();\n"
+        },
+        {
+          "offset": 16336,
+          "before": "",
+          "after": "        candidate.close_restored_ecm();\n"
+        },
+        {
+          "offset": 16745,
+          "before": "",
+          "after": "    }\n\n    fn close_restored_ecm(&mut self) {\n        if self.state.mode == FlightMode::Flight\n            && let Some(owner) = self.combat_identity()\n        {\n            self.ecm.close_restored(\n                owner,\n                self.state.tick,\n                self.combat.physical_tick(),\n                self.combat.emissions,\n            );\n        }\n"
+        },
+        {
+          "offset": 18032,
+          "before": "        let (fingerprint, ecm_expected) = [\n",
+          "after": "        let (fingerprint, ecm_version) = [\n"
+        },
+        {
+          "offset": 18248,
+          "before": "        .find(|base| ecm_content_fingerprint(*base) == fingerprint)\n        .map_or((fingerprint, false), |base| (base, true));\n",
+          "after": "        .find_map(|base| {\n            [false, true]\n                .into_iter()\n                .find(|&field| ecm_content_fingerprint(base, field) == fingerprint)\n                .map(|field| (base, Some(field)))\n        })\n        .unwrap_or((fingerprint, None));\n        let ecm_expected = ecm_version.is_some();\n        let ecm_tag = if ecm_version == Some(true) {\n            ECM_FIELD_EXTENSION\n        } else {\n            ECM_EXTENSION\n        };\n"
+        },
+        {
+          "offset": 23395,
+          "before": "                if ecm_expected {\n                    if r.fixed::<8>()? != *ECM_EXTENSION {\n",
+          "after": "                if let Some(field) = ecm_version {\n                    if r.fixed::<8>()? != *ecm_tag {\n"
+        },
+        {
+          "offset": 23585,
+          "before": "                    candidate.ecm = super::ecm::State::decode(&mut r)?;\n",
+          "after": "                    candidate.ecm = super::ecm::State::decode(&mut r, field)?;\n"
+        },
+        {
+          "offset": 23682,
+          "before": "            } else if ecm_expected && tag == *ECM_EXTENSION {\n                candidate.ecm = super::ecm::State::decode(&mut r)?;\n",
+          "after": "            } else if let Some(field) = ecm_version\n                && tag == *ecm_tag\n            {\n                candidate.ecm = super::ecm::State::decode(&mut r, field)?;\n"
+        }
+      ]
+    },
+    "flight/traffic.rs": {
+      "beforeSHA256": "db6e9478f4266527723dbffa9b95da543f52bb1c77812cf52cb0db5a20231fd0",
+      "afterSHA256": "6fb44a0b0f2d078323a8645921c289db055cbf5e06e8bd8132523ffa53ee21ad",
+      "hunks": [
+        {
+          "offset": 1554,
+          "before": "            self.missiles.validate_npc_beam_scene(hit)?;\n",
+          "after": "            self.missiles.validate_npc_beam_scene(&self.ecm, hit)?;\n"
+        }
+      ]
+    },
+    "lib.rs": {
+      "beforeSHA256": "6abd79a54f4f9af2249c5efa518dc47f2930fb58b0978f7df8902c400e7bb4db",
+      "afterSHA256": "55ed01f56fe757bfd684d9e7f9d0c5adf654f8f9fc44de98c81177e2e6a1f520",
+      "hunks": [
+        {
+          "offset": 970,
+          "before": "    ECM_ENERGY_HUNDREDTHS, ECM_FIELD_TICKS, EcmActivation, EcmError, EcmSnapshot, EcmTrigger,\n",
+          "after": "    ECM_ENERGY_HUNDREDTHS, ECM_FIELD_TICKS, EcmActivation, EcmError, EcmSnapshot, EcmTermination,\n    EcmTrigger, PreparedEcm,\n"
+        }
+      ]
+    }
+  }
+}

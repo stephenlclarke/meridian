@@ -363,15 +363,69 @@ fn ecm_test_rows_persist_intent_and_manual_flight_binding_uses_real_energy() {
     let cold = ok(World::from_save_bytes(&bytes));
     assert_eq!(cold.fitted_ecm(), Some(fitted));
     assert!(cold.xyzzy_snapshot().is_some_and(|s| !s.automatic_ecm));
+    ok(app.game.command(Action::ReviewPractice));
+    ok(app.game.command(Action::Confirm));
     ok(app.game.command(Action::Launch));
     ok(app.game.world.step(FlightInput::default()));
+    ok(app.game.command(Action::CycleMissileLock));
+    ok(app.game.command(Action::ToggleMissileArm));
+    ok(app.game.command(Action::FireMissile));
+    let projectile = app
+        .game
+        .world
+        .missile_projectiles()
+        .next()
+        .unwrap_or_else(|| panic!("projectile"));
+    assert_eq!(projectile.ended, None);
     let before = app
         .game
         .world
         .flight_resources_snapshot()
         .unwrap_or_else(|| panic!("resources"));
+    ok(app.game.save());
+    let slot = directory.0.join("commander.meridian");
+    let retained = directory.0.join("retained-ecm-commander");
+    let game_before = ok(app.game.world.save_bytes());
+    let disk_before = ok(fs::read(&slot));
+    ok(fs::rename(&slot, &retained));
+    ok(fs::create_dir(&slot));
+    app.keys.insert(KeyCode::KeyU);
+    app.game_key(KeyCode::KeyK);
+    assert!(
+        app.notice
+            .text
+            .as_deref()
+            .is_some_and(|s| s.contains("could not be saved"))
+    );
+    assert!(app.keys.contains(&KeyCode::KeyU));
+    assert_eq!(ok(app.game.world.save_bytes()), game_before);
+    assert_eq!(ok(fs::read(&retained)), disk_before);
+    ok(fs::remove_dir(&slot));
+    ok(fs::rename(&retained, &slot));
     assert_eq!(press(&mut app, KeyCode::KeyK), Some(KeyCode::KeyK));
     app.game_key(KeyCode::KeyK);
+    assert!(!app.keys.contains(&KeyCode::KeyU));
+    assert!(
+        app.notice
+            .text
+            .as_deref()
+            .is_some_and(|s| s.contains("1 standard missiles terminated"))
+    );
+    let ended = app
+        .game
+        .world
+        .missile_projectiles()
+        .next()
+        .unwrap_or_else(|| panic!("projectile"));
+    assert_eq!(ended.origin, projectile.origin);
+    assert_eq!(ended.ended, Some(meridian_core::MissileEnd::Ecm));
+    let saved = ok(World::from_save_bytes(&ok(fs::read(&slot))));
+    assert_eq!(saved.missile_projectiles().next(), Some(ended));
+    assert!(
+        saved
+            .ecm_snapshot()
+            .is_some_and(|s| s.active.is_none() && s.remaining_ticks == 32)
+    );
     let energy = app
         .game
         .world

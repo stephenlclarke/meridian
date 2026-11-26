@@ -35,6 +35,9 @@ SOLAR_SCOOPS_INVERSE_SHA256 = '0c68577f581d05cf490cbdfaa1488bdc361d712b30751f683
 STOCK_ECM_INVERSE = Path('integration/sh001-mule/STOCK-ECM-INVERSE.json')
 STOCK_ECM_BASE = 'f32ada6970976e1a1e609e4777b3ef5c333f055d'
 STOCK_ECM_INVERSE_SHA256 = 'a470932b8b411825325bdb3e0fb9e38cb5919a44bac7e90d55332dfcff0d6a32'
+STOCK_ECM_FIELD_INVERSE = Path('integration/sh001-mule/STOCK-ECM-FIELD-INVERSE.json')
+STOCK_ECM_FIELD_BASE = '8ba79ea995cd9439723a3c1e271ed4ecd6387e24'
+STOCK_ECM_FIELD_INVERSE_SHA256 = '79dae295d74a7aee4115d3ec32022cfd72ca08d09e46021c9eefce4f11aa03ba'
 
 
 def sha(data):
@@ -86,6 +89,11 @@ def solar_scoops_inverse(root, protected):
 def stock_ecm_inverse(root, protected):
     return approved_inverse(root, protected, STOCK_ECM_INVERSE,
                             STOCK_ECM_INVERSE_SHA256, STOCK_ECM_BASE, 'stock ECM')
+
+
+def stock_ecm_field_inverse(root, protected):
+    return approved_inverse(root, protected, STOCK_ECM_FIELD_INVERSE,
+                            STOCK_ECM_FIELD_INVERSE_SHA256, STOCK_ECM_FIELD_BASE, 'stock ECM field')
 
 
 def undo_seriema_courier_publication(relative, data):
@@ -531,11 +539,13 @@ def verify_protected_core(root):
     fuel_inverse = fuel_storage_inverse(root, baseline)
     solar_inverse = solar_scoops_inverse(root, baseline)
     ecm_inverse = stock_ecm_inverse(root, baseline)
+    ecm_field_inverse = stock_ecm_field_inverse(root, baseline)
     checked = set()
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_flight_computer(relative, current, ecm_inverse)
+        data = undo_flight_computer(relative, current, ecm_field_inverse)
+        data = undo_flight_computer(relative, data, ecm_inverse)
         data = undo_flight_computer(relative, data, solar_inverse)
         data = undo_flight_computer(relative, data, fuel_inverse)
         data = undo_flight_computer(relative, data, shield_inverse)
@@ -582,7 +592,7 @@ def verify_protected_core(root):
         checked.add(relative)
         unchanged += data == current
     assert set(additions) <= checked and len(checked) == 115
-    return len(checked), len(additions), unchanged, len(inverse), len(drive_inverse), len(shield_inverse), len(fuel_inverse), len(solar_inverse), len(ecm_inverse)
+    return len(checked), len(additions), unchanged, len(inverse), len(drive_inverse), len(shield_inverse), len(fuel_inverse), len(solar_inverse), len(ecm_inverse), len(ecm_field_inverse)
 
 
 def verify_test_registry(criteria):
@@ -641,7 +651,7 @@ def verify():
     folder = ROOT / 'assets/fleet/sh001'
     verify_inputs(folder)
     groups = verify_geometry(folder)
-    checked, hooks, unchanged, flight_computer, hyperspace_drive, stock_shield, fuel_storage, solar_scoops, stock_ecm = verify_protected_core(ROOT)
+    checked, hooks, unchanged, flight_computer, hyperspace_drive, stock_shield, fuel_storage, solar_scoops, stock_ecm, stock_ecm_field = verify_protected_core(ROOT)
     counts = verify_historical_bindings(folder, groups)
     return {
         'status': 'PASS_SOURCE_ONLY',
@@ -654,6 +664,7 @@ def verify():
         'protectedCoreFilesWithFuelStorageChanges': fuel_storage,
         'protectedCoreFilesWithSolarScoopsChanges': solar_scoops,
         'protectedCoreFilesWithStockEcmChanges': stock_ecm,
+        'protectedCoreFilesWithStockEcmFieldChanges': stock_ecm_field,
         'protectedCoreFilesChecked': checked,
         **counts,
         'vertexEncoding': 5344,

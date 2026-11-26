@@ -5,7 +5,8 @@ pub use emp::{
 };
 mod ecm;
 pub use ecm::{
-    ECM_ENERGY_HUNDREDTHS, ECM_FIELD_TICKS, EcmActivation, EcmError, EcmSnapshot, EcmTrigger,
+    ECM_ENERGY_HUNDREDTHS, ECM_FIELD_TICKS, EcmActivation, EcmError, EcmSnapshot, EcmTermination,
+    EcmTrigger, PreparedEcm,
 };
 mod celestial;
 mod solar;

@@ -1122,7 +1122,9 @@ fn real_manual_ecm_cancels_an_unfinished_emp_without_a_discharge_and_cold_retain
     assert!(w.emp.pulses.is_empty());
     assert_eq!(w.request_emp_trigger(true, tick), Err(EmpError::Resources));
     let mut loaded = cold(&w);
-    assert_eq!(loaded.ecm_snapshot(), w.ecm_snapshot());
+    let mut expected = w.ecm_snapshot().unwrap();
+    expected.active = None;
+    assert_eq!(loaded.ecm_snapshot(), Some(expected));
     loaded.emp.charge.as_mut().unwrap().phase = EmpChargePhase::Charging;
     loaded.emp.charge.as_mut().unwrap().ended_at = None;
     assert!(loaded.save_bytes().is_err());
