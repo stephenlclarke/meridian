@@ -29,6 +29,7 @@ pub enum Action {
     CycleMissileLock,
     ToggleMissileArm,
     FireMissile,
+    ActivateEcm,
     ClearMissile,
     Contact,
     Review,
@@ -321,6 +322,12 @@ impl Session {
                 .toggle_auto_docking()
                 .map(|message| message.to_string())
                 .map_err(|error| error.to_string()),
+            Action::ActivateEcm => {
+                world
+                    .request_ecm(world.snapshot().tick)
+                    .map_err(|error| error.to_string())?;
+                Ok("E.C.M. field activated.".into())
+            }
             Action::SetFlightView(view) => {
                 self.invalidate();
                 world

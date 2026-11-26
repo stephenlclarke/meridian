@@ -32,6 +32,9 @@ FUEL_STORAGE_INVERSE_SHA256 = 'df6ad11baf04b127ed122b7f55e8893b15eba3386f91681fd
 SOLAR_SCOOPS_INVERSE = Path('integration/sh001-mule/SOLAR-SCOOPS-INVERSE.json')
 SOLAR_SCOOPS_BASE = '641dfc9b2f1834412cff3831d1b2eb5296dec507'
 SOLAR_SCOOPS_INVERSE_SHA256 = '0c68577f581d05cf490cbdfaa1488bdc361d712b30751f68300f1eb23da7ba67'
+STOCK_ECM_INVERSE = Path('integration/sh001-mule/STOCK-ECM-INVERSE.json')
+STOCK_ECM_BASE = 'f04385c9fd3119d6ddb797ea80ca419f7495944b'
+STOCK_ECM_INVERSE_SHA256 = '65c8433601da990abea476d880e6ec1e312189856d7ede5e9da1d03d0ba81a79'
 
 
 def sha(data):
@@ -78,6 +81,11 @@ def fuel_storage_inverse(root, protected):
 def solar_scoops_inverse(root, protected):
     return approved_inverse(root, protected, SOLAR_SCOOPS_INVERSE,
                             SOLAR_SCOOPS_INVERSE_SHA256, SOLAR_SCOOPS_BASE, 'solar scoops')
+
+
+def stock_ecm_inverse(root, protected):
+    return approved_inverse(root, protected, STOCK_ECM_INVERSE,
+                            STOCK_ECM_INVERSE_SHA256, STOCK_ECM_BASE, 'stock ECM')
 
 
 def undo_arna_cutter_publication(relative, data):
@@ -542,11 +550,13 @@ def verify_protected_core(root):
     shield_inverse = stock_shield_inverse(root, baseline)
     fuel_inverse = fuel_storage_inverse(root, baseline)
     solar_inverse = solar_scoops_inverse(root, baseline)
+    ecm_inverse = stock_ecm_inverse(root, baseline)
     checked = set()
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
         data = undo_arna_cutter_publication(relative, current)
+        data = undo_flight_computer(relative, data, ecm_inverse)
         data = undo_medusa_stock_publication(relative, data)
         data = undo_flight_computer(relative, data, solar_inverse)
         data = undo_flight_computer(relative, data, fuel_inverse)
@@ -594,7 +604,7 @@ def verify_protected_core(root):
         checked.add(relative)
         unchanged += data == current
     assert set(additions) <= checked and len(checked) == 115
-    return len(checked), len(additions), unchanged, len(inverse), len(drive_inverse), len(shield_inverse), len(fuel_inverse), len(solar_inverse)
+    return len(checked), len(additions), unchanged, len(inverse), len(drive_inverse), len(shield_inverse), len(fuel_inverse), len(solar_inverse), len(ecm_inverse)
 
 
 def verify_test_registry(criteria):
@@ -653,7 +663,7 @@ def verify():
     folder = ROOT / 'assets/fleet/sh001'
     verify_inputs(folder)
     groups = verify_geometry(folder)
-    checked, hooks, unchanged, flight_computer, hyperspace_drive, stock_shield, fuel_storage, solar_scoops = verify_protected_core(ROOT)
+    checked, hooks, unchanged, flight_computer, hyperspace_drive, stock_shield, fuel_storage, solar_scoops, stock_ecm = verify_protected_core(ROOT)
     counts = verify_historical_bindings(folder, groups)
     return {
         'status': 'PASS_SOURCE_ONLY',
@@ -665,6 +675,7 @@ def verify():
         'protectedCoreFilesWithStockShieldChanges': stock_shield,
         'protectedCoreFilesWithFuelStorageChanges': fuel_storage,
         'protectedCoreFilesWithSolarScoopsChanges': solar_scoops,
+        'protectedCoreFilesWithStockEcmChanges': stock_ecm,
         'protectedCoreFilesChecked': checked,
         **counts,
         'vertexEncoding': 5344,

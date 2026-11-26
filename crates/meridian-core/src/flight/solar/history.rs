@@ -181,7 +181,7 @@ impl Anchor {
     }
 }
 impl Motion {
-    fn encode(self, w: &mut Writer) {
+    pub(in crate::flight) fn encode(self, w: &mut Writer) {
         let tag = match self {
             Self::Active(_) => 1,
             Self::Stopped { kind, .. } => match kind {
@@ -200,7 +200,7 @@ impl Motion {
         }
         w.bool(input.brake);
     }
-    fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+    pub(in crate::flight) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         let tag = r.u8()?;
         let input = FlightInput {
             pitch: r.f32()?,
@@ -224,6 +224,132 @@ impl Motion {
         };
         Ok(Self::Stopped { input, kind })
     }
+}
+
+/// Replay the actual launch-mode transition from the original spawn. Refused
+/// movement leaves Launching intact except the station/entry branches, exactly
+/// as in World::step_flight. The independently retained NPC scene is required
+/// for both successful and refused launch attempts.
+pub(in crate::flight) fn replay_launch_step(
+    world: &World,
+    owner: super::super::CombatIdentity,
+    opening: Snapshot,
+    motion: Motion,
+    traffic: &crate::traffic::MissileScene,
+) -> Result<Snapshot, SaveError> {
+    if opening.mode != FlightMode::Launching
+        || traffic.system != owner.system
+        || traffic.world_tick != opening.tick
+        || !matches!(traffic.stage, crate::traffic::SceneStage::Command(emission) if emission <= world.combat.emissions)
+    {
+        return Err(INVALID);
+    }
+    let data = world.station_data.as_ref().ok_or(INVALID)?;
+    world
+        .traffic
+        .validate_missile_scene(traffic, world.state.tick, data)?;
+    let frame = MotionFrame::from(opening);
+    let input = motion.input();
+    let attempted = frame.advance(Motion::Active(input)).ok_or(INVALID)?;
+    let scene = State::scene(world, owner.system, owner.visit, opening.tick)?;
+    let before = crate::station::flight_pose(frame.position, frame.orientation).ok_or(INVALID)?;
+    let after =
+        crate::station::flight_pose(attempted.position, attempted.orientation).ok_or(INVALID)?;
+    let angular = f64::from(
+        input.pitch.abs() * super::super::PITCH_RATE
+            + input.yaw.abs() * super::super::YAW_RATE
+            + input.roll.abs() * super::super::ROLL_RATE,
+    ) * f64::from(super::super::FIXED_DELTA_SECONDS);
+    let tick = opening.tick.checked_add(1).ok_or(INVALID)?;
+    let mule = world
+        .historic_renas_mule_collider(owner.system, owner.visit)
+        .map_err(|_| INVALID)?;
+    let (expected, mode) =
+        if scene.blocks_motion(frame.position, attempted.position, data.player_radius()) {
+            (
+                Motion::Stopped {
+                    input,
+                    kind: StopKind::Celestial,
+                },
+                FlightMode::Launching,
+            )
+        } else if !traffic.player_motion_clear(
+            before.position,
+            after.position,
+            data.player_clearance_radius(),
+        ) {
+            (
+                Motion::Stopped {
+                    input,
+                    kind: StopKind::Traffic,
+                },
+                FlightMode::Launching,
+            )
+        } else if world
+            .historic_renas_mule_motion_blocked(mule.as_ref(), before, after, angular)
+            .map_err(|_| INVALID)?
+        {
+            (
+                Motion::Stopped {
+                    input,
+                    kind: StopKind::Mule,
+                },
+                FlightMode::Launching,
+            )
+        } else if !world.mining_motion_clear_at_step(owner.system, tick, before, after, angular) {
+            (
+                Motion::Stopped {
+                    input,
+                    kind: StopKind::Asteroid,
+                },
+                FlightMode::Launching,
+            )
+        } else if data.crosses_aperture(before, after) {
+            if data.entry_clear(
+                before,
+                after,
+                f64::from(attempted.speed * super::super::DISTANCE_PER_SPEED_UNIT),
+                f64::from(input.roll * super::super::ROLL_RATE),
+                angular,
+            ) {
+                (Motion::Active(input), FlightMode::Docked)
+            } else {
+                (
+                    Motion::Stopped {
+                        input,
+                        kind: StopKind::Entry,
+                    },
+                    FlightMode::Flight,
+                )
+            }
+        } else if !data.motion_clear(before, after, angular) {
+            (
+                Motion::Stopped {
+                    input,
+                    kind: StopKind::Station,
+                },
+                FlightMode::Flight,
+            )
+        } else {
+            (Motion::Active(input), FlightMode::Flight)
+        };
+    if motion != expected {
+        return Err(INVALID);
+    }
+    let result = frame.advance(motion).ok_or(INVALID)?;
+    Ok(Snapshot {
+        position: result.position,
+        orientation: result.orientation,
+        speed: if mode == FlightMode::Docked {
+            0.0
+        } else {
+            result.speed
+        },
+        tick,
+        mode,
+        motion_refusal: motion.refusal(),
+        ..opening
+    })
 }
 impl NpcRefusal {
     pub(super) fn encode(&self, w: &mut Writer) -> Result<(), SaveError> {

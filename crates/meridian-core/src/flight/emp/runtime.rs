@@ -141,6 +141,10 @@ impl State {
             charge.ended_at = Some(clock);
         }
     }
+    pub(in crate::flight) fn cancel_for_ecm(&mut self, clock: u64) {
+        self.cancel(clock);
+        self.held_tick = None;
+    }
     pub(in crate::flight) fn prepare_step(
         &self,
         world: &World,
@@ -408,6 +412,9 @@ impl World {
         if !held {
             self.emp.held_tick = None;
             return Ok(());
+        }
+        if self.active_ecm().is_some() {
+            return Err(EmpError::Resources);
         }
         if self.emp.charge.is_some() {
             self.emp.held_tick = Some(tick);

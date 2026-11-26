@@ -9,6 +9,7 @@ use crate::{
 use std::sync::Arc;
 
 mod history;
+pub(super) use history::replay_launch_step;
 const INVALID: SaveError = SaveError::InvalidState("solar exposure or fuel collection chronology");
 const DELTA: f64 = 1.0 / 60.0;
 const COOLING: f64 = 1.0 - 0.14 * DELTA;

@@ -11,6 +11,7 @@ enum Change {
     Energy(Option<u8>),
     Pulse(usize),
     Start,
+    Ecm,
 }
 struct Replay {
     meter: meter::Meter,
@@ -23,6 +24,42 @@ struct Replay {
     energy: Option<u8>,
 }
 impl Replay {
+    fn event(
+        &mut self,
+        clock: u64,
+        change: Change,
+        pulses: &[super::runtime::Pulse],
+        last_special: &mut Option<u64>,
+    ) -> Result<(), SaveError> {
+        match change {
+            Change::Boundary | Change::FinalDeath | Change::Pulse(_) => {
+                if clock == 0 || *last_special == Some(clock) {
+                    return Err(INVALID);
+                }
+                self.advance(clock - 1)?;
+                self.post(clock)?;
+                *last_special = Some(clock);
+                if matches!(change, Change::FinalDeath) && self.fitted {
+                    self.bank_clock = clock;
+                }
+                if let Change::Pulse(index) = change {
+                    self.apply_pulse(pulses, index, clock)?;
+                }
+            }
+            other => {
+                self.advance(clock)?;
+                match other {
+                    Change::Equipment(event) => self.equipment(event)?,
+                    Change::Energy(stage) => self.energy = stage,
+                    Change::Start => self.admission()?,
+                    Change::Ecm if self.meter.disabled_at.is_none() => {}
+                    Change::Ecm => return Err(INVALID),
+                    _ => return Err(INVALID),
+                }
+            }
+        }
+        Ok(())
+    }
     fn apply_pulse(
         &mut self,
         pulses: &[super::runtime::Pulse],
@@ -159,6 +196,11 @@ impl State {
         {
             events.push((charge.start.physical_tick, 3, Change::Start));
         }
+        // ECM is a command after the accepted step, including any same-clock
+        // EMP pulse/recovery. Check every historical activation, not only the tail.
+        for activation in world.ecm.activations() {
+            events.push((activation.physical_tick, 4, Change::Ecm));
+        }
         // An incoming fatal hit suppresses only the final bank transfer, after main posting.
         // A later command that destroys the player cannot erase the already accepted transfer.
         if end > 0 && !world.damage.alive_before_emp_step(world)? {
@@ -189,31 +231,7 @@ impl State {
             if clock > end {
                 return Err(INVALID);
             }
-            match change {
-                Change::Boundary | Change::FinalDeath | Change::Pulse(_) => {
-                    if clock == 0 || last_special == Some(clock) {
-                        return Err(INVALID);
-                    }
-                    replay.advance(clock - 1)?;
-                    replay.post(clock)?;
-                    last_special = Some(clock);
-                    if matches!(change, Change::FinalDeath) && replay.fitted {
-                        replay.bank_clock = clock;
-                    }
-                    if let Change::Pulse(index) = change {
-                        replay.apply_pulse(&self.pulses, index, clock)?;
-                    }
-                }
-                other => {
-                    replay.advance(clock)?;
-                    match other {
-                        Change::Equipment(event) => replay.equipment(event)?,
-                        Change::Energy(stage) => replay.energy = stage,
-                        Change::Start => replay.admission()?,
-                        _ => return Err(INVALID),
-                    }
-                }
-            }
+            replay.event(clock, change, &self.pulses, &mut last_special)?;
         }
         replay.advance(end)?;
         let expected_clock = if replay.acquired { end } else { 0 };
@@ -226,4 +244,72 @@ impl State {
         }
         Ok(())
     }
+}
+
+/// Isolated numerical fixture uses a real captured pulse identity but supplies
+/// a small, balanced main reserve to exercise the disabling edge deterministically.
+/// It is not a fabricated live encounter or a complete saved World.
+#[cfg(test)]
+pub(super) fn verify_ecm_disabled_fixture(
+    mut pulse: super::runtime::Pulse,
+) -> Result<(), SaveError> {
+    let release = pulse.release.physical_tick;
+    let main = 1;
+    let paid = u64::from(policy::PULSE_COST / 4 * 5);
+    let mut replay = Replay {
+        meter: meter::Meter {
+            main,
+            bank: policy::PULSE_COST,
+            generated: u64::from(main) + paid,
+            main_debited: paid,
+            bank_gained: u64::from(policy::PULSE_COST),
+            ..meter::Meter::default()
+        },
+        clock: release - 1,
+        bank_clock: release - 1,
+        present: true,
+        acquired: true,
+        fitted: true,
+        grades: EmpGrades::default(),
+        energy: Some(0),
+    };
+    replay.meter.validate()?;
+    let contact = pulse
+        .contacts
+        .iter_mut()
+        .find(|c| c.victim == scene::Victim::Player)
+        .ok_or(INVALID)?;
+    contact.power_hundredths = 100;
+    pulse.player_shield_absorbed = 0;
+    pulse.player_electrical_drained = main + replay.rate();
+    let pulses = [pulse];
+    let mut special = None;
+    replay.event(release, Change::Pulse(0), &pulses, &mut special)?;
+    assert_eq!(replay.meter.disabled_at, Some(release));
+    assert_eq!(
+        replay.event(release, Change::Ecm, &pulses, &mut special),
+        Err(INVALID)
+    );
+    assert_eq!(
+        replay.event(release + 1, Change::Ecm, &pulses, &mut special),
+        Err(INVALID)
+    );
+    assert_eq!(
+        replay.event(
+            release + policy::RECOVERY_TICKS,
+            Change::Ecm,
+            &pulses,
+            &mut special
+        ),
+        Err(INVALID)
+    );
+    assert_eq!(replay.meter.disabled_at, Some(release));
+    replay.event(
+        release + policy::RECOVERY_TICKS + 1,
+        Change::Ecm,
+        &pulses,
+        &mut special,
+    )?;
+    assert_eq!(replay.meter.disabled_at, None);
+    replay.meter.validate()
 }

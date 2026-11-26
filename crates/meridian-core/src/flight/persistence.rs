@@ -19,6 +19,7 @@ const MAGIC: &[u8; 8] = b"MERSAVE1";
 // route exists; a distinct tag separates the additive trailer from corruption.
 const ROUTE_EXTENSION: &[u8; 8] = b"MRTE0001";
 const SOLAR_EXTENSION: &[u8; 8] = b"MSOL0003";
+const ECM_EXTENSION: &[u8; 8] = b"MECM0002";
 const CONTENT: &[u8] = concat!(
     "meridian-world/rules/17;explicit-xyzzy/account-prefix-replay-v2/a11fe169;distinct-emp/paid-defensive-local-v1/a11fe169;navigation-computer/exact-route-journal/a11fe169;lareria-main-services/station-combat-three-v1/a11fe169;rapid-lasers-energy/shared-nine-byte-resources-v1/a11fe169;mining/native-work-pending-v2;fuel-scoops/paid-utility-v1;npc-missiles/canonical-native-ray-v3;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
@@ -56,6 +57,11 @@ fn solar_content_fingerprint(has_history: bool) -> u64 {
     let mut bytes = compiled_content_fingerprint(CONTENT).to_le_bytes().to_vec();
     bytes.extend(b"solar-history/v3-refusals");
     bytes.push(u8::from(has_history));
+    checksum(&bytes)
+}
+fn ecm_content_fingerprint(base: u64) -> u64 {
+    let mut bytes = base.to_le_bytes().to_vec();
+    bytes.extend(b"stock-ecm-history/v2-local-flight");
     checksum(&bytes)
 }
 
@@ -317,10 +323,15 @@ impl World {
         w.bytes.extend(MAGIC);
         w.u16(SAVE_VERSION);
         w.bytes.extend(CONTENT);
-        w.u64(if self.solar.legacy_header() {
+        let base_fingerprint = if self.solar.legacy_header() {
             compiled_content_fingerprint(CONTENT)
         } else {
             solar_content_fingerprint(!self.solar.is_empty())
+        };
+        w.u64(if self.ecm.is_empty() {
+            base_fingerprint
+        } else {
+            ecm_content_fingerprint(base_fingerprint)
         });
         write_flight(&mut w, &self.state);
         self.navigation
@@ -362,6 +373,10 @@ impl World {
         if let Some(route) = &self.navigation_route {
             w.bytes.extend(ROUTE_EXTENSION);
             route.encode_save(&mut w);
+        }
+        if !self.ecm.is_empty() {
+            w.bytes.extend(ECM_EXTENSION);
+            self.ecm.encode(&mut w);
         }
         // The checksum remains part of the original fixed ordinary budget.
         if w.bytes.len() + 8 > MAX_SAVE_BYTES {
@@ -431,6 +446,14 @@ impl World {
             return Err(SaveError::ContentMismatch);
         }
         let fingerprint = header.u64()?;
+        let (fingerprint, ecm_expected) = [
+            compiled_content_fingerprint(CONTENT),
+            solar_content_fingerprint(true),
+            solar_content_fingerprint(false),
+        ]
+        .into_iter()
+        .find(|base| ecm_content_fingerprint(*base) == fingerprint)
+        .map_or((fingerprint, false), |base| (base, true));
         let solar_expected = if fingerprint == solar_content_fingerprint(true) {
             Some(true)
         } else if fingerprint == solar_content_fingerprint(false) {
@@ -501,6 +524,7 @@ impl World {
             modular,
             xyzzy,
             emp,
+            ecm: super::ecm::State::default(),
             flight_reception,
             navigation_trade,
             practice_history,
@@ -526,11 +550,19 @@ impl World {
             if tag == *ROUTE_EXTENSION {
                 candidate.navigation_route =
                     Some(crate::navigation::RoutePlan::decode_save(&mut r)?);
+                if ecm_expected {
+                    if r.fixed::<8>()? != *ECM_EXTENSION {
+                        return Err(SaveError::InvalidEncoding);
+                    }
+                    candidate.ecm = super::ecm::State::decode(&mut r)?;
+                }
+            } else if ecm_expected && tag == *ECM_EXTENSION {
+                candidate.ecm = super::ecm::State::decode(&mut r)?;
             } else {
                 return Err(SaveError::InvalidEncoding);
             }
         }
-        if !r.finished() {
+        if !r.finished() || ecm_expected == candidate.ecm.is_empty() {
             return Err(SaveError::InvalidEncoding);
         }
         if solar_expected == Some(true) {
@@ -641,6 +673,7 @@ impl World {
             account.fuel_tenths(),
         )?;
         self.solar.validate(self, account, commerce.modular)?;
+        self.ecm.validate(self, commerce.modular)?;
         self.validate_saved_navigation_route()?;
         if !self.damage.enabled() {
             self.damage.validate_resources(self, nav.dock_sequence)?;
