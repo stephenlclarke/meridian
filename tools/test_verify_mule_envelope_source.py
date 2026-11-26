@@ -15,7 +15,7 @@ class MuleSourceVerification(unittest.TestCase):
         core = Path('crates/meridian-core/src')
         shutil.copytree(verifier.ROOT / core, root / core)
         for record in (verifier.PROTECTED_CORE, verifier.FLIGHT_COMPUTER_INVERSE,
-                       verifier.HYPERSPACE_DRIVE_INVERSE):
+                       verifier.HYPERSPACE_DRIVE_INVERSE, verifier.STOCK_SHIELD_INVERSE):
             (root / record).parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(verifier.ROOT / record, root / record)
         return root / core
@@ -26,6 +26,7 @@ class MuleSourceVerification(unittest.TestCase):
         self.assertEqual(result['protectedCoreFilesWithMuleHooks'], 6)
         self.assertEqual(result['protectedCoreFilesWithFlightComputerChanges'], 17)
         self.assertEqual(result['protectedCoreFilesWithHyperspaceDriveChanges'], 12)
+        self.assertEqual(result['protectedCoreFilesWithStockShieldChanges'], 16)
         self.assertEqual(result['geometryCoreTests'], 1)
         self.assertEqual(result['restoreCoreTests'], 1)
         self.assertEqual(result['totalMuleCoreTests'], 24)
@@ -81,6 +82,25 @@ class MuleSourceVerification(unittest.TestCase):
             with self.assertRaisesRegex(AssertionError, 'hyperspace drive inverse manifest'):
                 verifier.verify_protected_core(root)
 
+    def test_stock_shield_inverse_is_pinned_and_each_changed_source_remains_exact(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            core = self.copy_protected_sources(root)
+            inverse = verifier.stock_shield_inverse(root, verifier.protected_core_pins(root))
+            self.assertEqual(len(inverse), 16)
+            for relative in inverse:
+                with self.subTest(relative=relative):
+                    source = core / relative
+                    original = source.read_bytes()
+                    source.write_bytes(original + b'\n')
+                    with self.assertRaisesRegex(AssertionError, relative):
+                        verifier.verify_protected_core(root)
+                    source.write_bytes(original)
+            manifest = root / verifier.STOCK_SHIELD_INVERSE
+            manifest.write_bytes(manifest.read_bytes() + b'\n')
+            with self.assertRaisesRegex(AssertionError, 'stock shield inverse manifest'):
+                verifier.verify_protected_core(root)
+
     def test_component_triangle_may_not_use_a_neighbouring_part_vertex(self):
         part = dict(index=0, name='body primary pressure envelope', vertexStart=5,
                     vertexCount=3, faceStart=0, faceCount=1)
@@ -121,7 +141,12 @@ class MuleSourceVerification(unittest.TestCase):
             manifest = root / verifier.FLIGHT_COMPUTER_INVERSE
             inverse = json.loads(manifest.read_bytes())
             relative = verifier.LIB_SOURCE
+            protected = verifier.protected_core_pins(root)
             current = verifier.undo_medusa_stock_publication(relative, (core / relative).read_bytes())
+            current = verifier.undo_flight_computer(relative, current,
+                                                     verifier.stock_shield_inverse(root, protected))
+            current = verifier.undo_flight_computer(relative, current,
+                                                     verifier.hyperspace_drive_inverse(root, protected))
             current = verifier.undo_seriema_courier_publication(relative, current)
             current = verifier.undo_moose_clipper_publication(relative, current)
             current = verifier.undo_saiga_publication(relative, current)

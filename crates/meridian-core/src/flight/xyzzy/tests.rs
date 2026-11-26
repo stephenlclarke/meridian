@@ -119,7 +119,7 @@ fn normal_readouts_and_normal_continue_never_activate_grant_or_rename() {
         assert!(!w.xyzzy_snapshot().unwrap().active);
         assert!(!w.xyzzy_snapshot().unwrap().unlimited_fuel);
         assert_eq!(w.ammunition_snapshot().unwrap().items.len(), 3);
-        assert_eq!(w.modular_equipment_snapshot().unwrap().items.len(), 4);
+        assert_eq!(w.modular_equipment_snapshot().unwrap().items.len(), 5);
         assert!(w.equipment_snapshot().unwrap().owned.is_none());
     }
     assert_eq!(w.save_bytes().unwrap(), before);
@@ -129,6 +129,26 @@ fn normal_readouts_and_normal_continue_never_activate_grant_or_rename() {
         w.review_xyzzy(XyzzyAction::MaximumSupportedHardware, 0),
         Err(XyzzyError::Inactive)
     );
+}
+
+#[test]
+fn a_shield_test_record_cannot_relabel_a_real_selected_grade_or_claim_other_receipts() {
+    let mut w = World::new_commander(14211).unwrap();
+    apply(&mut w, XyzzyAction::Enter);
+    apply(
+        &mut w,
+        XyzzyAction::FitShield(crate::ShieldGrade::AdvancedII),
+    );
+    let bytes = w.save_bytes().unwrap();
+    let mut live = World::from_save_bytes(&bytes).unwrap();
+    let before = live.save_bytes().unwrap();
+    w.xyzzy.records.last_mut().unwrap().action =
+        XyzzyAction::FitShield(crate::ShieldGrade::Intermediate);
+    poison_refuses(&w, &mut live, &before);
+    let mut w = World::from_save_bytes(&bytes).unwrap();
+    let record = w.xyzzy.records.last_mut().unwrap();
+    record.end_revision = record.revision;
+    poison_refuses(&w, &mut live, &before);
 }
 
 #[test]

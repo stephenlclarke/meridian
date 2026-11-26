@@ -29,3 +29,18 @@ fn secret_elite_cannot_be_relabelled_as_paid_or_as_an_unsupported_secret_weapon(
     };
     refuses(&w, &mut live, &before);
 }
+
+#[test]
+fn a_specific_shield_test_grant_cannot_issue_a_different_grade() {
+    let mut w = active(15311);
+    let action = crate::XyzzyAction::FitShield(crate::ShieldGrade::AdvancedII);
+    let review = w.review_xyzzy(action, 0).unwrap();
+    w.prepare_xyzzy(review, 0).unwrap().commit();
+    let valid = w.save_bytes().unwrap();
+    let mut live = World::from_save_bytes(&valid).unwrap();
+    let before = live.save_bytes().unwrap();
+    w.modular.events.last_mut().unwrap().action = ModuleAction::Purchase {
+        kind: ModuleKind::Shield(crate::ShieldGrade::Intermediate),
+    };
+    refuses(&w, &mut live, &before);
+}
