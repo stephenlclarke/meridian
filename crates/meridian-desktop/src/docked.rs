@@ -1368,7 +1368,6 @@ mod tests {
         fit_paid_tank(&mut profile);
         let before_modules = profile.world.modular_equipment_snapshot();
         let before_cash = profile.world.credits_tenths().unwrap_or_default();
-        let before = ok(profile.world.save_bytes());
         let viewport = ui::Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));
         let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
         assert!(frame.labels.iter().any(|label| label.text == "Refuel (F)"));
@@ -1399,6 +1398,7 @@ mod tests {
         assert_eq!(ok(profile.world.save_bytes()), paused);
         ok(profile.world.request_pause(false, tick));
         present(&mut menu, &profile);
+        let before = ok(profile.world.save_bytes());
 
         // A different pending review cannot be bypassed by the fuel shortcut.
         ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Buy)));
