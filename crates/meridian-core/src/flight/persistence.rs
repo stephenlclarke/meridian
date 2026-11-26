@@ -21,6 +21,7 @@ const ROUTE_EXTENSION: &[u8; 8] = b"MRTE0001";
 const SOLAR_EXTENSION: &[u8; 8] = b"MSOL0003";
 const ECM_EXTENSION: &[u8; 8] = b"MECM0002";
 const ECM_FIELD_EXTENSION: &[u8; 8] = b"MECM0003";
+const MINING_INTAKE_EXTENSION: &[u8; 8] = b"MINT0001";
 const CONTENT: &[u8] = concat!(
     "meridian-world/rules/17;explicit-xyzzy/account-prefix-replay-v2/a11fe169;distinct-emp/paid-defensive-local-v1/a11fe169;navigation-computer/exact-route-journal/a11fe169;lareria-main-services/station-combat-three-v1/a11fe169;rapid-lasers-energy/shared-nine-byte-resources-v1/a11fe169;mining/native-work-pending-v2;fuel-scoops/paid-utility-v1;npc-missiles/canonical-native-ray-v3;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
@@ -375,6 +376,10 @@ impl World {
         self.damage.encode(&mut w);
         self.mining.encode(&mut w);
         self.jump_journal.encode(&mut w);
+        if !self.mining.collections().is_empty() {
+            w.bytes.extend(MINING_INTAKE_EXTENSION);
+            self.mining.encode_collections(&mut w);
+        }
         if let Some(route) = &self.navigation_route {
             w.bytes.extend(ROUTE_EXTENSION);
             route.encode_save(&mut w);
@@ -578,10 +583,22 @@ impl World {
         candidate.pulse = weapons::PulseResources::decode_save(&mut r)?;
         candidate.traffic = crate::traffic::State::decode_version(&mut r, version)?;
         candidate.damage = super::damage::State::decode(&mut r, version)?;
-        candidate.mining = crate::mining::State::decode(&mut r)?;
+        candidate.mining = crate::mining::State::decode_base(&mut r)?;
         candidate.jump_journal = crate::navigation::JumpJournal::decode(&mut r)?;
-        if !r.finished() {
-            let tag = r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)?;
+        let mut tag = if r.finished() {
+            None
+        } else {
+            Some(r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)?)
+        };
+        if tag == Some(*MINING_INTAKE_EXTENSION) {
+            candidate.mining.decode_collections(&mut r)?;
+            tag = if r.finished() {
+                None
+            } else {
+                Some(r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)?)
+            };
+        }
+        if let Some(tag) = tag {
             if tag == *ROUTE_EXTENSION {
                 candidate.navigation_route =
                     Some(crate::navigation::RoutePlan::decode_save(&mut r)?);
@@ -800,20 +817,18 @@ impl World {
                 ));
             }
         }
-        let services = if self.traffic.enabled() {
-            markets.validate_save_with_traffic(
-                nav.owner,
-                account.hold_capacity(),
-                account.equipment_state().historical_capacity(),
-                self.traffic.flows(),
-            )?
-        } else {
-            markets.validate_save(
-                nav.owner,
-                account.hold_capacity(),
-                account.equipment_state().historical_capacity(),
-            )?
-        };
+        let intakes = self.cargo_intakes(commerce.modular);
+        let services = markets.validate_save_with_intakes(
+            nav.owner,
+            account.hold_capacity(),
+            account.equipment_state().historical_capacity(),
+            if self.traffic.enabled() {
+                self.traffic.flows()
+            } else {
+                crate::traffic::Flows::default()
+            },
+            &intakes,
+        )?;
         let emp = commerce.emp.validate(self, account, commerce.modular)?;
         commerce.modular.validate_salvage(self, account)?;
         commerce
@@ -832,6 +847,7 @@ impl World {
             nav.jumps,
             nav.fuel_spent,
             self.combat.penalties(),
+            intakes.len() as u64,
             (
                 ammunition
                     .paid
@@ -890,6 +906,7 @@ fn validate_accounting(
     jumps: u64,
     fuel_spent: u64,
     penalties: u8,
+    intake_revisions: u64,
     equipment_and_passage: (u32, u64, u32),
     (secret, solar): (super::xyzzy::Terms, (u64, u64)),
 ) -> Result<(), SaveError> {
@@ -923,6 +940,7 @@ fn validate_accounting(
             != u128::from(d.freight_revision)
                 + u128::from(secret.revisions)
                 + u128::from(solar.1)
+                + u128::from(intake_revisions)
                 + u128::from(s.revision)
                 + u128::from(jumps)
                 + u128::from(d.equipment_revision)

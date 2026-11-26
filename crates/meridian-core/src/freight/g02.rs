@@ -595,6 +595,45 @@ impl CommanderAccount {
         })
     }
 
+    /// Prospective single-unit lawful intake, without buying stock or changing cash.
+    /// Only an accepted physical source may publish this candidate and its receipt.
+    pub(crate) fn prepare_cargo_intake(
+        &self,
+        freight: &State,
+        commodity: services::CommodityId,
+        reservations: services::Reservations,
+    ) -> Result<Self, services::Error> {
+        use services::{CargoUnit, Error as ServiceError};
+        if commodity.departure_legal_weight() != 0 {
+            return Err(ServiceError::InvalidAccount);
+        }
+        let before = reservations.apply(self.service_projection(freight)?)?;
+        if commodity.unit() == CargoUnit::Tonne && before.used_tonnes >= before.hold_capacity_tonnes
+        {
+            return Err(ServiceError::HoldFull);
+        }
+        let mut candidate = Self { data: self.data };
+        candidate.data.revision = before
+            .revision
+            .checked_add(1)
+            .ok_or(ServiceError::SequenceExhausted)?;
+        if commodity == services::CommodityId::Food {
+            candidate.data.food_tonnes = candidate
+                .data
+                .food_tonnes
+                .checked_add(1)
+                .ok_or(ServiceError::QuantityLimit)?;
+        } else {
+            let held = &mut candidate.data.other_commodities[commodity.index() - 1];
+            *held = held
+                .checked_add(1)
+                .filter(|&n| n <= services::MAX_MARKET_QUANTITY)
+                .ok_or(ServiceError::QuantityLimit)?;
+        }
+        reservations.apply(candidate.service_projection(freight)?)?;
+        Ok(candidate)
+    }
+
     #[cfg(test)]
     /// Retained ordinary domain entry point; World uses the prospective result for joint lesson publication.
     pub(crate) fn execute_station_service(

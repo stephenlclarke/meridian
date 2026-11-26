@@ -263,7 +263,11 @@ impl Profile {
                     "Mining Laser purchased and fitted."
                 }
                 meridian_core::ModuleAction::PurchaseFuelScoops => {
-                    "Fuel Scoops purchased and fitted. Physical ore collection remains unavailable."
+                    "Fuel Scoops purchased and fitted for physical ore collection."
+                }
+                meridian_core::ModuleAction::GrantStoredMiningLaser
+                | meridian_core::ModuleAction::FlightLaserExchange { .. } => {
+                    "Automatic equipment action."
                 }
                 meridian_core::ModuleAction::Purchase { .. } => {
                     "Owned module purchased and fitted."

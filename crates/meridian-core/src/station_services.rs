@@ -94,6 +94,18 @@ pub(crate) struct AccountProjection {
     pub(crate) reserved_commodities: [u64; 16],
 }
 
+/// One native unit acquired through a separately validated physical source.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct CargoIntake {
+    pub(crate) revision: u64,
+    pub(crate) commodity: CommodityId,
+}
+impl CargoIntake {
+    pub(crate) fn mass_event(self) -> Option<(u64, i16)> {
+        (self.commodity.unit() == CargoUnit::Tonne).then_some((self.revision, 1))
+    }
+}
+
 /// Ephemeral World-owned tutorial reservations, over the sole actual account projection.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct Reservations {

@@ -373,7 +373,12 @@ impl State {
         let freight = &world.freight_session.as_ref().ok_or(INVALID)?.state;
         let mut changes = Vec::new();
         let mut cargo = 0_i16;
-        for (revision, delta) in markets.cargo_mass_events() {
+        for (revision, delta) in markets.cargo_mass_events().into_iter().chain(
+            world
+                .cargo_intakes(self)
+                .into_iter()
+                .filter_map(crate::station_services::CargoIntake::mass_event),
+        ) {
             if revision <= anchor.revision {
                 cargo = cargo.checked_add(delta).ok_or(INVALID)?;
             } else {
@@ -476,7 +481,9 @@ impl State {
                 fitted_units = units;
                 cabin_mass = ledger.cabin_tonnes();
             } else {
-                if !self.history.owns_berth(event.dock) {
+                if !matches!(event.action, ModuleAction::FlightLaserExchange { .. })
+                    && !self.history.owns_berth(event.dock)
+                {
                     return Err(INVALID);
                 }
                 changes.push((event.revision, Change::Fit(units, ledger.cabin_tonnes())));

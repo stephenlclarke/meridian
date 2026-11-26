@@ -121,8 +121,29 @@ impl World {
                 },
             )?;
         }
-        // Without an eligible original ore-body/intake producer, there is no cargo credit,
-        // market/revision adjustment or collected receipt to synthesize during load.
+        for receipt in self.mining.collections() {
+            if receipt.owner.owner != owner.owner
+                || receipt.owner.hull != owner.hull
+                || receipt.owner.visit > owner.visit
+                || receipt.world_tick > self.state.tick
+                || receipt.physical_tick > self.combat.physical_tick()
+                || self
+                    .jump_journal
+                    .system_at_visit(receipt.owner.visit, receipt.world_tick)?
+                    != receipt.owner.system
+                || self
+                    .commander_account
+                    .as_ref()
+                    .is_none_or(|a| receipt.revision > a.revision())
+                || !modules.scoop_was_fitted_for_collection(receipt)
+                || (receipt.world_tick == self.state.tick
+                    && (flight_pose(self.state.position, self.state.orientation)
+                        != Some(receipt.pose)
+                        || self.state.speed != receipt.speed))
+            {
+                return Err(invalid);
+            }
+        }
         if self.state.mode != FlightMode::Docked
             && !self.mining_motion_clear(
                 flight_pose(self.state.position, self.state.orientation).ok_or(invalid)?,
