@@ -500,3 +500,9 @@ tools/verify_merlin.py text eol=lf
 tools/measure_hawk.py text eol=lf
 tools/prepare_hawk.py text eol=lf
 tools/verify_hawk.py text eol=lf
+
+# Byte-pinned Morepork replay programs.
+tools/measure_morepork.py text eol=lf
+tools/prepare_morepork.py text eol=lf
+tools/rebuild_morepork.py text eol=lf
+tools/verify_morepork.py text eol=lf
