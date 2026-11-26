@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh170-caracara-mk-ii",
+  "undoBefore": [
+    "sh169-caracara-mk-i"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "caracara_mk_ii",
+  "before": "pub mod caracara_mk_i;\n",
+  "after": "pub mod cavy_racer;\n"
+}
