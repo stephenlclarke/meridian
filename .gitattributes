@@ -15,6 +15,11 @@ integration/sh171-medusa/*.json -text
 tools/prepare_medusa_inspection.py text eol=lf
 tools/verify_medusa_shield.py text eol=lf
 
+# Seriema Courier authoring and replay programs use exact LF bytes.
+tools/measure_seriema_courier_geometry.py text eol=lf
+tools/prepare_seriema_courier_geometry.py text eol=lf
+tools/verify_seriema_courier_geometry.py text eol=lf
+
 # Moose Clipper authoring and replay programs use exact LF bytes.
 tools/measure_moose_clipper.py text eol=lf
 tools/prepare_moose_clipper.py text eol=lf
