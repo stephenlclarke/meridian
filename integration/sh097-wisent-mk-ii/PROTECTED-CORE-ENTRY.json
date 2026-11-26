@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh097-wisent-mk-ii",
+  "undoBefore": [
+    "sh096-wisent"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "wisent_mk_ii",
+  "before": "pub mod wisent;\n",
+  "after": "pub mod wombat;\n"
+}
