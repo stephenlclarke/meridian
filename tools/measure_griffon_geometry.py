@@ -1,6 +1,7 @@
 """Measure the frozen Griffon collision artifact against both original meshes."""
 import argparse
 import struct
+import sys
 import json
 import tomllib
 
@@ -104,7 +105,7 @@ def main():
     args = parser.parse_args()
     source = load()
     result = fidelity(source) if args.report == "candidate-fidelity" else support_fit(source, args.report == "candidate-fit")
-    print(json.dumps(result, indent=2))
+    sys.stdout.buffer.write((json.dumps(result, indent=2) + "\n").encode("utf-8"))
 
 
 if __name__ == "__main__":

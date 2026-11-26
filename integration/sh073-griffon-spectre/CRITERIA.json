@@ -188,7 +188,7 @@
     "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
     "tools/prepare_griffon_spectre_geometry.py": "a9ca9abfeefb7b3b9a0c4c714f3c1b52f7e60b3ea05ecb1cafe1bf18c0e172a3",
     "tools/verify_griffon_spectre_geometry.py": "6d5ed2d2c8337365964c68b50dfabb85f8f9426cfdf1a9023318873281124fe8",
-    "tools/measure_griffon_spectre_geometry.py": "f3d297247f617a748842c62e9323c9136d6ae8237a4e76153ba932328a5b9810",
+    "tools/measure_griffon_spectre_geometry.py": "a2dbf3f57c84ef626693d260bf8f13dab65e55de12adb82a319f12eef3c1c950",
     "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
   }
 }
