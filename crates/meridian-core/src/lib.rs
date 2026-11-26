@@ -24,6 +24,7 @@ pub mod hobby_fighter;
 pub mod hyena;
 pub mod jackal;
 pub mod lanner;
+pub mod medusa;
 pub mod mining;
 pub mod moose_clipper;
 pub mod mule;

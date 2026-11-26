@@ -389,6 +389,18 @@ fn assert_inspection_preview(name: &str, id: &str, key: &str) {
                 .iter()
                 .any(|label| label.text.contains("Authored flyable hull"))
         );
+        assert!(
+            frame
+                .labels
+                .iter()
+                .any(|label| label.text == "Empty stock dry mass: 40712 kg")
+        );
+        assert!(
+            frame
+                .labels
+                .iter()
+                .any(|label| label.text == "Stock figures exclude paid upgrades.")
+        );
     }
     assert!(solo.bounds.width > selected.bounds.width);
     assert!(
