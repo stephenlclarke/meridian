@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh086-alpaca",
+  "undoBefore": [
+    "sh085-laggar"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "alpaca",
+  "before": "#![forbid(unsafe_code)]\n\n",
+  "after": "pub mod aplomado_interceptor;\n"
+}

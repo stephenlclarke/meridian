@@ -1,0 +1,39 @@
+{
+  "exactParts": 9,
+  "resampledParts": [
+    0,
+    1,
+    8,
+    11,
+    12,
+    14,
+    15
+  ],
+  "openArcSolidTopology": {
+    "detailed": 2,
+    "archivedNative": 2,
+    "candidateNative": 2
+  },
+  "openArcOriginalToCandidateUpperMm": 1417,
+  "openArcCandidateToOriginalUpperMm": 1245,
+  "sampledSilhouetteOffsetMm": {
+    "detailed": {
+      "xy": 576,
+      "xz": 393,
+      "yz": 485
+    },
+    "archivedNative": {
+      "xy": 643,
+      "xz": 369,
+      "yz": 543
+    }
+  },
+  "wholeSurfaceUpperMm": {
+    "archivedNativeToCandidateNative": 1499,
+    "candidateNativeToArchivedNative": 1245,
+    "detailedToCandidateNative": 2245,
+    "candidateNativeToDetailed": 1499,
+    "detailedToArchivedNative": 2245,
+    "archivedNativeToDetailed": 1500
+  }
+}

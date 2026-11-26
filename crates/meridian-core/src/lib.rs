@@ -2,8 +2,11 @@
 
 #![forbid(unsafe_code)]
 
+pub mod alpaca;
+pub mod antelope;
 pub mod aplomado_interceptor;
 pub mod arna_cutter;
+pub mod aurochs;
 pub mod badger;
 pub mod banteng;
 pub mod barbary;
@@ -18,11 +21,15 @@ pub mod docking;
 pub mod dzo;
 pub mod dzo_mk_ii;
 pub mod eagle_cruiser;
+pub mod elephant;
+pub mod elk;
 pub mod equipment;
 pub mod erne_corvette;
 pub mod falconet;
 mod flight;
 pub mod freight;
+pub mod giraffe_liner;
+pub mod gopher;
 pub mod goshawk;
 pub mod goshawk_custom;
 pub mod griffon;
@@ -58,6 +65,7 @@ pub mod saker;
 pub mod save;
 pub mod seriema_courier;
 pub mod sparrowhawk;
+pub mod springbok_starliner;
 pub mod station;
 pub mod station_services;
 pub mod tamaraw;

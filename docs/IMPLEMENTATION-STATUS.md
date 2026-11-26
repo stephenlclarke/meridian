@@ -34,7 +34,7 @@ SH171 is available for catalogue inspection with the original detailed artwork a
 
 ## Combined Showroom and Hull Studio source candidate
 
-The ordinary station Showroom has 52 selectable stock previews: 46 authenticated schema-1 packages and six original stock models. The latest fleet batch includes SH070–SH081 and SH083–SH085. Cheetah (SH082) is excluded from the rendered stock registry because its contact requirement is unresolved. The Showroom keeps the linked source identities, engineering readouts and inspection-only exchange rules. The combined source also restores the Studio launcher, including explicit inspection of schema-2 archives. Stock ship and station finishes are display-only; local authored material colours remain exact. Portable Studio and source checks have passed during integration. Compiler checks and native presentation acceptance of the expanded registry are pending.
+The ordinary station Showroom has 60 selectable stock previews: 54 authenticated schema-1 packages and six original stock models. The latest fleet batch includes SH070–SH081 and SH083–SH093. Cheetah (SH082) is excluded from the rendered stock registry because its contact requirement is unresolved. The Showroom keeps the linked source identities, engineering readouts and inspection-only exchange rules. The combined source also restores the Studio launcher, including explicit inspection of schema-2 archives. Stock ship and station finishes are display-only; local authored material colours remain exact. Portable Studio and source checks have passed during integration. Compiler checks and native presentation acceptance of the expanded registry are pending.
 
 The separate [Medusa player preview](../integration/sh171-medusa-preview/README.md) now connects the active World hull identity to the original detailed flight rendering. The renderer retains the Peregrine model for ordinary players and existing traffic. It does not use the archived 729-piece inspection shield or reduced contact hull as flight artwork. The combined native acceptance is pending.
 
@@ -253,6 +253,38 @@ Llama preserves its original 3,096-face detailed and 172-face native artwork. Bo
 ## Laggar catalogue source
 
 Laggar preserves 3,108 detailed and 184 native original faces. Both meshes retain seven structural overlaps, including the canopy and outrigger assemblies, and preserve the original fin clearances. [Laggar source and evidence](LAGGAR-SOURCE.md)
+
+## Alpaca catalogue source
+
+Alpaca preserves 2,724 detailed and 908 native original faces. A separate, source-derived 508-face inspection candidate preserves the closed shield and ten measured original joins. [Alpaca source and evidence](ALPACA-SOURCE.md)
+
+## Elk catalogue source
+
+Elk preserves its original 1,584 detailed and 536 native faces. A separate 464-face inspection candidate retains all 14 parts and all nine measured original joins. [Elk source and evidence](ELK-SOURCE.md)
+
+## Springbok Starliner catalogue source
+
+Springbok Starliner preserves 2,672 detailed and 912 native original faces. A separate 504-face inspection candidate retains both caps, the open bow gap, and 12 measured original overlaps. [Springbok Starliner source and evidence](SPRINGBOK-STARLINER-SOURCE.md)
+
+## Antelope catalogue source
+
+Antelope preserves 2,672 detailed and 912 native original faces. A separate 504-face inspection candidate retains both caps, the open bow gap, and 14 measured original overlaps. [Antelope source and evidence](ANTELOPE-SOURCE.md)
+
+## Gopher catalogue source
+
+Gopher preserves its original 4,696 detailed and 212 native faces. Both meshes retain the roll frame, the bore assembly and nine measured joints. Four inspection routes pass through the frame openings. [Gopher source and evidence](GOPHER-SOURCE.md)
+
+## Elephant catalogue source
+
+Elephant preserves its original 4,368 detailed and 1,112 native faces. Its separate 512-face inspection candidate retains the shield shoulders, 19 exact original parts and all 22 measured original joins. [Elephant source and evidence](ELEPHANT-SOURCE.md)
+
+## Aurochs catalogue source
+
+Aurochs preserves its original 2,504 detailed and 720 native faces. Its separate 444-face inspection candidate preserves the staggered cargo capsules, 11 exact original parts and all 12 measured original overlaps. [Aurochs source and evidence](AUROCHS-SOURCE.md)
+
+## Giraffe Liner catalogue source
+
+Giraffe Liner preserves 3,492 detailed and 216 native faces, including both elevated galleries. Its evidence records the pressure-hull contacts in the detailed mesh and the gallery-strut separations in the native mesh. [Giraffe Liner source and evidence](GIRAFFE-LINER-SOURCE.md)
 
 ## Goshawk Mk II Custom candidate
 

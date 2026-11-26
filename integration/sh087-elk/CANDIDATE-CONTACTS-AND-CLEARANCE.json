@@ -1,0 +1,443 @@
+{
+  "metresPerSourceUnit": 11.554015020219527,
+  "scaleRatio": [
+    20000,
+    1731
+  ],
+  "faceCounts": {
+    "detailed": 1584,
+    "archivedNative": 536,
+    "candidateNative": 464
+  },
+  "contacts": {
+    "lost": [],
+    "retained": [
+      {
+        "parts": [
+          0,
+          5
+        ],
+        "names": [
+          "body primary pressure envelope",
+          "raised bridge structural envelope"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            1.8855943,
+            3.6638403,
+            -6.8885088
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -1.8467672,
+            3.9330225,
+            -2.0739704
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          0,
+          8
+        ],
+        "names": [
+          "body primary pressure envelope",
+          "engine_pair/negative side/connected support"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -4.9612612,
+            0.0648469,
+            -13.729863
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -4.9612612,
+            0.0648469,
+            -13.729863
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          0,
+          9
+        ],
+        "names": [
+          "body primary pressure envelope",
+          "engine_pair/negative side/propulsion casing"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -5.5118312,
+            -1.2425024,
+            -17.6316162
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -5.5118312,
+            -1.1816886,
+            -17.6316162
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          0,
+          11
+        ],
+        "names": [
+          "body primary pressure envelope",
+          "engine_pair/positive side/connected support"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            1.1787716,
+            1.5915713,
+            -10.6100187
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            1.1787716,
+            1.5915713,
+            -10.6100187
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          0,
+          12
+        ],
+        "names": [
+          "body primary pressure envelope",
+          "engine_pair/positive side/propulsion casing"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            5.633127,
+            -1.3724168,
+            -16.9410054
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            5.633127,
+            -1.3052444,
+            -16.9410054
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          5,
+          6
+        ],
+        "names": [
+          "raised bridge structural envelope",
+          "cockpit glazing envelope"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            2.4964233,
+            6.8516302,
+            9.9441188
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            2.4964233,
+            6.9031318,
+            9.9441188
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          6,
+          7
+        ],
+        "names": [
+          "cockpit glazing envelope",
+          "cockpit connected structural crossmember"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            2.7368694,
+            7.9592108,
+            10.1947282
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            2.7368694,
+            7.9592108,
+            10.1947282
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          8,
+          9
+        ],
+        "names": [
+          "engine_pair/negative side/connected support",
+          "engine_pair/negative side/propulsion casing"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -7.4951943,
+            0.1783529,
+            -16.8541388
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -7.4951943,
+            0.1783529,
+            -16.8541388
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          11,
+          12
+        ],
+        "names": [
+          "engine_pair/positive side/connected support",
+          "engine_pair/positive side/propulsion casing"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            6.8037465,
+            0.4500362,
+            -17.1012825
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            6.8037465,
+            0.4500362,
+            -17.1012825
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "unresolved": []
+  },
+  "routeClearanceMillimetres": {
+    "detailed": {
+      "dorsal": 1342,
+      "ventral": 1515,
+      "between-aft-drives": 271,
+      "port-outboard": 1620,
+      "port-forward-inner": 1597,
+      "starboard-outboard": 1620,
+      "starboard-forward-inner": 1597
+    },
+    "archivedNative": {
+      "dorsal": 1342,
+      "ventral": 1751,
+      "between-aft-drives": 271,
+      "port-outboard": 1620,
+      "port-forward-inner": 1885,
+      "starboard-outboard": 1620,
+      "starboard-forward-inner": 1885
+    },
+    "candidateNative": {
+      "dorsal": 1430,
+      "ventral": 2113,
+      "between-aft-drives": 271,
+      "port-outboard": 1620,
+      "port-forward-inner": 2029,
+      "starboard-outboard": 1620,
+      "starboard-forward-inner": 2029
+    }
+  }
+}

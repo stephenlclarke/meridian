@@ -1,0 +1,188 @@
+{
+  "hull": "SH087 Elk",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh087/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh087-elk/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "20000/1731",
+  "faces": {
+    "detailed": 1584,
+    "archivedNative": 536,
+    "candidateNative": 464,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-elk",
+    "massKg": 51639
+  },
+  "supportGroups": 24,
+  "minimumRouteClearanceMillimetres": 271,
+  "sourceContactCounts": {
+    "overlap": 9
+  },
+  "standaloneCreatorReplay": "integration/sh087-elk/CREATOR-REPLAY.json",
+  "fitUpperMillimetres": {
+    "detailed": 2448,
+    "archivedNative": 2559,
+    "candidateNative": 2861
+  },
+  "hullStudio": {
+    "definition": "integration/sh087-elk/ELK-STUDIO.json",
+    "bytes": 265592,
+    "sha256": "3724af32d23194e7ca79f2eceacf771013d0ee74da6907c1a7303aa76105f43c",
+    "supports": 24,
+    "probes": 7,
+    "detail": "1,584 original detailed faces",
+    "native": "464 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 265592,
+        "sha256": "3724af32d23194e7ca79f2eceacf771013d0ee74da6907c1a7303aa76105f43c"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 1584,
+      "nativeTriangles": 464,
+      "supportGroups": 24,
+      "engineeringReference": "finite-intrinsic-empty-elk",
+      "massKg": 51639,
+      "receiptFiles": {
+        "elk.hull.json": {
+          "bytes": 265591,
+          "sha256": "ab0a0809376265ae857e848a6a536c97721092000546babacf89bc8cbdae0363"
+        },
+        "elk-repeat.hull.json": {
+          "bytes": 265591,
+          "sha256": "ab0a0809376265ae857e848a6a536c97721092000546babacf89bc8cbdae0363"
+        },
+        "studio.stdout.json": {
+          "bytes": 72699,
+          "sha256": "8ea9c8badac29a6150b0395cfb7e6caaeb78902a340806e0304d1b85428bbc04"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 72699,
+          "sha256": "8ea9c8badac29a6150b0395cfb7e6caaeb78902a340806e0304d1b85428bbc04"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "0da48b6a0ac49eb71908f6a075458b135d681c9619497a2db510036c06ba5cb8"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "between-aft-drives",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "port-forward-inner",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-forward-inner",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_elk.py --check",
+      "python3 -B tools/verify_elk.py | cmp - integration/sh087-elk/CONTACT-RESULT.json",
+      "python3 -B tools/measure_elk.py | cmp - integration/sh087-elk/SURFACE-FIT.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T02:22:12Z",
+    "finishedUtc": "2026-11-25T02:22:19Z",
+    "log": {
+      "bytes": 292,
+      "sha256": "abd2d9a65fad2e591368a8ea05ab4b91c218de2b580252d63f230dfdd6ddb51c"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "d8e46fafda3caa52fe4d48baec7b0800f51dfd6c",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "integration/sh087-elk/ELK-STUDIO.json": "3724af32d23194e7ca79f2eceacf771013d0ee74da6907c1a7303aa76105f43c",
+    "integration/sh087-elk/FROZEN-SOURCES.json": "2e0516b6810ed689ac98f60dfa4ef3caf0653ced52c7b2a3f880eadce992826b",
+    "integration/sh087-elk/CONTACT-CANDIDATE.json": "2203302479b88b6003751be803ac025af8eea7c2871634dd5388fca808f681ff",
+    "integration/sh087-elk/CONTACT-RESULT.json": "3f02c4f09dc98a044144e377cecf010bf556c9dba140b57e4c38d22783d00fd3",
+    "integration/sh087-elk/ORIGINAL-OWNERSHIP.json": "457f64c0b7a70516e1269978b34a2e597bfcd474ee032b54a8dcf5a3b3f759b3",
+    "integration/sh087-elk/CANDIDATE-CONTACTS-AND-CLEARANCE.json": "a78396a489556bd45f2c87f3c99fb38c32b21f141e691ee8a92aed7ae2df0037",
+    "integration/sh087-elk/CANDIDATE-FIDELITY.json": "6f3f481ba50c6b18d9f5cae160c50f481ddf2c84869b4e03615f6e1659f7ec4d",
+    "integration/sh087-elk/SUPPORT-FAN.json": "feed2137d1ec464785e713716fc0137853f7d2a6f284b824fd2ccd3db9d38874",
+    "integration/sh087-elk/SURFACE-FIT.json": "49ace799964d433bbcd453f9e2ed1b534ca2e40a868b18bdd75b5741f5d9d076",
+    "integration/sh087-elk/CREATOR-REPLAY.json": "01c7ba778035c62793bacb8d4606396b9e33657c44c6a630cde6415684d77cae",
+    "assets/fleet/sh087/GENERATED-COLLISION.json": "6bb7fdd05c783fb7522e9bcec29132e04f1c51dc5ec7922006a1e65af3c4ae92",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_elk.py": "1824230144ae3fe0b50dbc5cacc5710d784f474ae565e1a5cb7260b36082bc94",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_elk.py": "9b5653164bdb04673d091e352c1088e3ed036b664e83acfcfa5f34d647a503a8",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/verify_elk.py": "5c3f876194ded16fcfc6c7426276df4078aa5f2ce319366f0e441a4377f1e0aa",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

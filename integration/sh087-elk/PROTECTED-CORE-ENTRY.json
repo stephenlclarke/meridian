@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh087-elk",
+  "undoBefore": [
+    "sh086-alpaca"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "elk",
+  "before": "pub mod eagle_cruiser;\n",
+  "after": "pub mod equipment;\n"
+}

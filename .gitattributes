@@ -1,3 +1,33 @@
+# Elephant source preparation and replay use exact LF bytes.
+tools/measure_elephant.py text eol=lf
+tools/prepare_elephant.py text eol=lf
+tools/verify_elephant.py text eol=lf
+
+# Gopher source preparation and replay use exact LF bytes.
+tools/measure_gopher.py text eol=lf
+tools/prepare_gopher.py text eol=lf
+tools/verify_gopher.py text eol=lf
+
+# Antelope source preparation and replay use exact LF bytes.
+tools/measure_antelope.py text eol=lf
+tools/prepare_antelope.py text eol=lf
+tools/verify_antelope.py text eol=lf
+
+# Springbok Starliner source preparation and replay use exact LF bytes.
+tools/measure_springbok_starliner.py text eol=lf
+tools/prepare_springbok_starliner.py text eol=lf
+tools/verify_springbok_starliner.py text eol=lf
+
+# Elk source preparation and replay use exact LF bytes.
+tools/measure_elk.py text eol=lf
+tools/prepare_elk.py text eol=lf
+tools/verify_elk.py text eol=lf
+
+# Alpaca source preparation and replay use exact LF bytes.
+tools/measure_alpaca.py text eol=lf
+tools/prepare_alpaca.py text eol=lf
+tools/verify_alpaca.py text eol=lf
+
 # Laggar source preparation and replay use exact LF bytes.
 tools/measure_laggar.py text eol=lf
 tools/prepare_laggar.py text eol=lf
@@ -283,3 +313,13 @@ tools/measure_kite_interceptor_air.py text eol=lf
 tools/prepare_kite_interceptor_geometry.py text eol=lf
 tools/prepare_kite_interceptor_studio.py text eol=lf
 tools/verify_kite_interceptor_geometry.py text eol=lf
+
+# Byte-pinned Aurochs replay programs.
+tools/measure_aurochs.py text eol=lf
+tools/prepare_aurochs.py text eol=lf
+tools/verify_aurochs.py text eol=lf
+
+# Byte-pinned Giraffe Liner replay programs.
+tools/measure_giraffe_liner.py text eol=lf
+tools/prepare_giraffe_liner.py text eol=lf
+tools/verify_giraffe_liner.py text eol=lf

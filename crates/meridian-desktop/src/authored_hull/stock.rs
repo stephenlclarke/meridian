@@ -335,6 +335,54 @@ const DESCRIPTORS: &[StockDescriptor] = &[
         "integration/sh085-laggar/LAGGAR-STUDIO.json",
         0xab22_1cd2_128f_187d
     ),
+    stock_package!(
+        "SH086",
+        "Alpaca",
+        "integration/sh086-alpaca/ALPACA-STUDIO.json",
+        0x9c33_4c7b_97fb_8728
+    ),
+    stock_package!(
+        "SH087",
+        "Elk",
+        "integration/sh087-elk/ELK-STUDIO.json",
+        0x7e1a_d35b_0e22_008f
+    ),
+    stock_package!(
+        "SH088",
+        "Springbok Starliner",
+        "integration/sh088-springbok-starliner/SPRINGBOK-STARLINER-STUDIO.json",
+        0x5483_af7e_126b_afca
+    ),
+    stock_package!(
+        "SH089",
+        "Antelope",
+        "integration/sh089-antelope/ANTELOPE-STUDIO.json",
+        0xcec1_6108_e8e7_5337
+    ),
+    stock_package!(
+        "SH090",
+        "Elephant",
+        "integration/sh090-elephant/ELEPHANT-STUDIO.json",
+        0x650b_5056_9d21_8f19
+    ),
+    stock_package!(
+        "SH091",
+        "Gopher",
+        "integration/sh091-gopher/GOPHER-STUDIO.json",
+        0x5cb3_a6e9_b960_cf9a
+    ),
+    stock_package!(
+        "SH092",
+        "Aurochs",
+        "integration/sh092-aurochs/AUROCHS-STUDIO.json",
+        0xc05c_6fdb_3696_ce74
+    ),
+    stock_package!(
+        "SH093",
+        "Giraffe Liner",
+        "integration/sh093-giraffe-liner/GIRAFFE-LINER-STUDIO.json",
+        0x4bf8_ee7a_34a4_c4c4
+    ),
 ];
 pub(crate) const STOCK_MODELS: [AvailableModel<'static>; DESCRIPTORS.len()] = {
     let mut models = [DESCRIPTORS[0].model; DESCRIPTORS.len()];
@@ -437,7 +485,7 @@ mod tests {
     #[test]
     fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
         let catalogue = ok(crate::docked_screens::Catalogue::bundled());
-        assert_eq!(STOCK_MODELS.len(), 46);
+        assert_eq!(STOCK_MODELS.len(), 54);
         assert!(!STOCK_MODELS.iter().any(|model| model.object == "SH082"));
         let mut identities = std::collections::BTreeSet::new();
         let mut keys = std::collections::BTreeSet::new();
