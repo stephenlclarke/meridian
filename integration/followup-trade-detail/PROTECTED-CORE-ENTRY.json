@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "followup-trade-detail",
+  "undoBefore": [
+    "sh098-anoa",
+    "showroom-studio-followup"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/followup-trade-detail/PROTECTED-CORE-INVERSE.json",
+  "sha256": "e8c08da2bc15f61b5b0a397cb4dcaf94a9fe0419ce8efba53d9cadc92285af4f",
+  "base": "482db0ad82889e4dca8e1ad7a8510a99c7c065e6",
+  "label": "Read-only route and profit detail"
+}

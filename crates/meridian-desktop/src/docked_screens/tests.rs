@@ -54,12 +54,86 @@ fn profit_scan_button_and_empty_state_use_chart_rows() {
             .iter()
             .any(|label| label.text.contains("Renas:"))
     );
+    let frame = ui.frame(&context, view());
+    assert!(
+        frame
+            .labels
+            .iter()
+            .any(|label| label.text.contains("ask") && label.text.contains("bid"))
+    );
     assert_eq!(
         presentation::profit_fields(&catalogue, &[]),
         ["No profitable destinations in range"]
     );
     ui.open(Screen::System);
     assert_eq!(key(&mut ui, &context, Key::ProfitScan), Outcome::Ignored);
+}
+
+#[test]
+fn route_trade_detail_draws_actual_rows_and_enter_only_closes_readout() {
+    let world = world();
+    let before = world.save_bytes().unwrap_or_else(|error| panic!("{error}"));
+    let catalogue = catalogue();
+    let ctx = context(&world, &catalogue);
+    let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+    let frame = ui.frame(&ctx, view());
+    let target = frame
+        .markers
+        .iter()
+        .find(|m| m.system == SystemId::RENAS)
+        .unwrap_or_else(|| panic!("Renas visible"));
+    assert_eq!(
+        ui.handle(Input::Click(target.point), &frame, &ctx),
+        Outcome::Updated
+    );
+    assert_eq!(key(&mut ui, &ctx, Key::Route), Outcome::Updated);
+    assert_eq!(
+        click(&mut ui, &ctx, Control::Key(Key::Details)),
+        Outcome::Updated
+    );
+    let detailed = ui.frame(&ctx, view());
+    assert!(
+        detailed
+            .labels
+            .iter()
+            .any(|label| label.text.contains("Avenor > Renas"))
+    );
+    assert!(
+        detailed
+            .labels
+            .iter()
+            .any(|label| label.text.contains("ask") && label.text.contains("bid"))
+    );
+    assert!(
+        !detailed
+            .hits
+            .iter()
+            .any(|hit| hit.control == Control::Key(Key::Confirm))
+    );
+    let small = Viewport::new(320.0, 240.0).unwrap_or_else(|| panic!("small viewport"));
+    let mut found = false;
+    for _ in 0..10 {
+        let frame = ui.frame(&ctx, small);
+        if frame.labels.iter().any(|label| label.text.contains("ask")) {
+            found = true;
+            break;
+        }
+        assert_eq!(
+            ui.handle(Input::Key(Key::PageNext), &frame, &ctx),
+            Outcome::Updated
+        );
+    }
+    assert!(found, "scrollable export row at minimum viewport");
+    assert_eq!(key(&mut ui, &ctx, Key::Confirm), Outcome::Updated);
+    assert!(world.active_route_progress().is_none());
+    assert_eq!(
+        world.save_bytes().unwrap_or_else(|error| panic!("{error}")),
+        before
+    );
+    assert!(matches!(
+        key(&mut ui, &ctx, Key::Confirm),
+        Outcome::Request(Request::SetNavigationRoute(_))
+    ));
 }
 fn key(ui: &mut DockedScreens, c: &Context<'_>, key: Key) -> Outcome {
     let frame = ui.frame(c, view());

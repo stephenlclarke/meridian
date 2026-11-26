@@ -11,7 +11,7 @@ pub(crate) use journal::{
 pub(crate) use persistence::SavedNavigationSummary;
 pub use route::{
     ROUTE_SYSTEMS, RouteAlternative, RouteError, RoutePlan, RoutePreference, RouteProgress,
-    RouteStatus,
+    RouteStatus, RouteTradeLeg, TradeExportEstimate,
 };
 pub(crate) use route::{RouteEconomy, route_alternatives, route_feasible, route_hop};
 use std::collections::VecDeque;

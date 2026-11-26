@@ -5,6 +5,7 @@ use super::{
     stock_jump_fuel_cost,
 };
 use crate::save::{Reader, SaveError, Writer};
+use crate::station_services::CommodityId;
 
 pub const ROUTE_SYSTEMS: [SystemId; 3] = [SystemId::AVENOR, SystemId::LARERIA, SystemId::RENAS];
 const INVALID: SaveError = SaveError::InvalidState("navigation computer plan");
@@ -158,6 +159,24 @@ pub struct RouteAlternative {
     pub risk: f64,
     pub trade_tenths: u64,
     pub cargo_sale_tenths: u64,
+    /// Read-only estimates from the same live quote snapshot as the route score.
+    pub trade_legs: Vec<RouteTradeLeg>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TradeExportEstimate {
+    pub commodity: CommodityId,
+    pub quantity: u64,
+    pub ask_tenths: u32,
+    pub bid_tenths: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RouteTradeLeg {
+    pub from: SystemId,
+    pub to: SystemId,
+    pub profit_tenths: u64,
+    pub exports: Vec<TradeExportEstimate>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -184,6 +203,7 @@ pub struct RouteProgress {
 pub(crate) struct RouteEconomy {
     pub(crate) trade: [[u64; ROUTE_SYSTEMS.len()]; ROUTE_SYSTEMS.len()],
     pub(crate) sale: [u64; ROUTE_SYSTEMS.len()],
+    pub(crate) exports: [[Vec<TradeExportEstimate>; ROUTE_SYSTEMS.len()]; ROUTE_SYSTEMS.len()],
 }
 
 pub(crate) fn route_station_index(system: SystemId) -> Option<usize> {
@@ -314,6 +334,7 @@ fn candidate(
     let mut risk = 0.0;
     let mut trade_tenths = 0u64;
     let mut cargo_sale_tenths = 0;
+    let mut trade_legs = Vec::new();
     for hop in systems.windows(2) {
         let from = route_station_index(hop[0]).ok_or(RouteError::UnsupportedSystem)?;
         let to = route_station_index(hop[1]).ok_or(RouteError::UnsupportedSystem)?;
@@ -324,6 +345,12 @@ fn candidate(
         risk += HOSTILITY[to];
         trade_tenths = trade_tenths.saturating_add(economy.trade[from][to]);
         cargo_sale_tenths = cargo_sale_tenths.max(economy.sale[to]);
+        trade_legs.push(RouteTradeLeg {
+            from: hop[0],
+            to: hop[1],
+            profit_tenths: economy.trade[from][to],
+            exports: economy.exports[from][to].clone(),
+        });
     }
     Ok(RouteAlternative {
         preferences: Vec::new(),
@@ -336,6 +363,7 @@ fn candidate(
         risk,
         trade_tenths,
         cargo_sale_tenths,
+        trade_legs,
     })
 }
 

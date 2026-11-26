@@ -72,7 +72,7 @@ fn wrapped(text: &str, columns: usize) -> Vec<String> {
     }
     result
 }
-fn paragraphs(f: &mut Frame, lines: &[String], area: Rect, scroll: usize) {
+pub(super) fn paragraphs(f: &mut Frame, lines: &[String], area: Rect, scroll: usize) {
     let columns = (area.width / 7.5).floor() as usize;
     let rows: Vec<_> = lines.iter().flat_map(|s| wrapped(s, columns)).collect();
     let count = (area.height / 18.0).floor() as usize;
@@ -502,7 +502,7 @@ fn chart(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
     );
     let mut fields = Vec::new();
     if s.profit_scan {
-        fields.extend(profit_fields(c.catalogue, &c.world.profit_destinations()));
+        fields.extend(profit_fields(c.catalogue, &c.world.profit_details()));
     }
     fields.extend(world_details(s, c));
     let details = Rect::new(
@@ -588,23 +588,51 @@ fn chart(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
 }
 pub(super) fn profit_fields(
     catalogue: &super::Catalogue,
-    results: &[meridian_core::ProfitDestination],
+    results: &[meridian_core::ProfitDetail],
 ) -> Vec<String> {
     if results.is_empty() {
         return vec!["No profitable destinations in range".into()];
     }
     let mut fields = vec!["Estimated profit (before fuel/risk):".into()];
     for (index, result) in results.iter().enumerate() {
-        if let Some(world) = catalogue.world(result.system) {
+        if let Some(world) = catalogue.world(result.destination.system) {
             fields.push(format!(
                 "{}. {}: {} CR",
                 index + 1,
                 world.name,
-                money(result.profit_tenths)
+                money(result.destination.profit_tenths)
             ));
+            fields.push(format!(
+                "Owned cargo sale here {} / there {} CR",
+                money(result.sale_here_tenths),
+                money(result.sale_there_tenths)
+            ));
+            fields.push(format!(
+                "Extra exports est. {} CR",
+                money(result.trade_tenths)
+            ));
+            fields.extend(result.exports.iter().map(export_line));
+            if result.exports.is_empty() {
+                fields.push("No affordable extra exports".into());
+            }
         }
     }
     fields
+}
+
+pub(super) fn export_line(row: &meridian_core::navigation::TradeExportEstimate) -> String {
+    let name = row
+        .commodity
+        .definition()
+        .map_or("Commodity", |definition| definition.name);
+    format!(
+        "{} {} {} | ask {} / bid {} CR/unit",
+        name,
+        row.quantity,
+        row.commodity.unit().symbol(),
+        money(u64::from(row.ask_tenths)),
+        money(u64::from(row.bid_tenths))
+    )
 }
 fn world_details(s: &DockedScreens, c: &Context<'_>) -> Vec<String> {
     let Some(w) = c.catalogue.world(s.selected_world) else {
