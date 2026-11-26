@@ -1,6 +1,6 @@
 //! Explicit testing menu; no readout or navigation grants gameplay state.
 use crate::help::Panel;
-use meridian_core::{World, XyzzyAction};
+use meridian_core::{ShieldGrade, World, XyzzyAction};
 
 pub fn provenance(value: meridian_core::ModuleProvenance) -> &'static str {
     match value {
@@ -13,6 +13,7 @@ pub fn provenance(value: meridian_core::ModuleProvenance) -> &'static str {
 #[derive(Default)]
 pub struct Menu {
     selected: usize,
+    shield_index: usize,
     pub reviewing: bool,
 }
 
@@ -34,15 +35,27 @@ const ACTIONS: [(XyzzyAction, &str); 4] = [
         "Toggle accounted unlimited fuel",
     ),
 ];
+const SHIELD_ACTION: usize = ACTIONS.len();
+const ACTION_COUNT: usize = ACTIONS.len() + 1;
 
 impl Menu {
     pub fn action(&self) -> XyzzyAction {
-        ACTIONS[self.selected].0
+        if self.selected == SHIELD_ACTION {
+            XyzzyAction::FitShield(ShieldGrade::ALL[self.shield_index])
+        } else {
+            ACTIONS[self.selected].0
+        }
     }
     pub fn select(&mut self, forward: bool) {
         if !self.reviewing {
             self.selected =
-                (self.selected + if forward { 1 } else { ACTIONS.len() - 1 }) % ACTIONS.len();
+                (self.selected + if forward { 1 } else { ACTION_COUNT - 1 }) % ACTION_COUNT;
+        }
+    }
+    pub fn select_shield(&mut self, forward: bool) {
+        if !self.reviewing && self.selected == SHIELD_ACTION {
+            let count = ShieldGrade::ALL.len();
+            self.shield_index = (self.shield_index + if forward { 1 } else { count - 1 }) % count;
         }
     }
     pub fn back(&mut self) -> bool {
@@ -72,6 +85,21 @@ impl Menu {
         lines.extend(ACTIONS.iter().enumerate().map(|(i, (_, label))| {
             format!("{} {}", if i == self.selected { ">" } else { " " }, label)
         }));
+        lines.push(format!(
+            "{} Test shield: {} (Left/Right)",
+            if self.selected == SHIELD_ACTION {
+                ">"
+            } else {
+                " "
+            },
+            ShieldGrade::ALL[self.shield_index].name()
+        ));
+        if let Some(combat) = world.combat_snapshot() {
+            lines.push(format!(
+                "Fitted shield: {}",
+                combat.player.shield_grade.name()
+            ));
+        }
         if let Some(emp) = world.owned_emp().filter(|item| item.fitted) {
             lines.push(format!(
                 "EMP power {} / capacity {} / recharge {}",
@@ -87,6 +115,9 @@ impl Menu {
                     "Sets cash to 1,000,000 CR once and fits maximum compatible equipment."
                 }
                 XyzzyAction::ToggleUnlimitedFuel => "Switch between normal and unlimited fuel.",
+                XyzzyAction::FitShield(_) => {
+                    "Fits only the selected shield grade; no cash or fuel grant."
+                }
                 _ => "Fits maximum compatible equipment regardless of local technology.",
             }
             .into(),
@@ -119,6 +150,8 @@ impl Menu {
                 "Actions publish the exact save before replacing the live commander",
                 "First activation names CLARKE and SETS cash to 1,000,000 CR once",
                 "Activation fits maximum compatible equipment at any station berth",
+                "Test shield: choose the row, then Left / Right selects one grade",
+                "Test shield fits only that grade, without a paid or earned receipt",
                 "After confirmation you can choose another action here",
                 "Fuel mode is accounted separately; paid transactions still charge",
                 "Missiles and cargo remain finite; full original parity is incomplete",
