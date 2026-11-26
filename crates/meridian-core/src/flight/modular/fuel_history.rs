@@ -215,6 +215,7 @@ impl State {
             let cargo = u16::from(cargo.fitted);
             let mounts = u16::from(ledger.fuel_storage_count())
                 + u16::from(ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())
+                + u16::from(ledger.fitted(ModuleSlot::UtilityEcm).is_some())
                 + cargo
                 + emp.utility_mounts_at_revision(revision);
             if mounts > budget.utility_mounts_capacity

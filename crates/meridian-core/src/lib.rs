@@ -45,6 +45,10 @@ pub use flight::GoshawkCustomApproachSnapshot;
 pub use flight::PreparedNavigationRoute;
 pub use flight::ProfitDestination;
 pub use flight::ShieldGrade;
+pub use flight::{
+    ECM_ENERGY_HUNDREDTHS, ECM_FIELD_TICKS, EcmActivation, EcmError, EcmSnapshot, EcmTermination,
+    EcmTrigger, PreparedEcm,
+};
 pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};
 pub use flight::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
 pub use flight::{SolarScoopStatus, SolarSnapshot};

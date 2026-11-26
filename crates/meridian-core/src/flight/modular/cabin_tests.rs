@@ -40,8 +40,11 @@ fn funded_avenor(seed: u64) -> World {
 
 fn journey_with_arrival(world: &mut World, target: SystemId) -> u64 {
     use crate::{FlightInput, FlightMode};
-    world.request_launch(world.snapshot().tick).unwrap();
-    world.step(FlightInput::default()).unwrap();
+    if world.snapshot().mode == FlightMode::Docked {
+        world.request_launch(world.snapshot().tick).unwrap();
+        world.step(FlightInput::default()).unwrap();
+    }
+    assert_eq!(world.snapshot().mode, FlightMode::Flight);
     world.request_jump(target, world.snapshot().tick).unwrap();
     let remaining = world
         .snapshot()
@@ -74,6 +77,81 @@ fn journey_with_arrival(world: &mut World, target: SystemId) -> u64 {
         assert_eq!(world.snapshot().motion_refusal, None);
     }
     panic!("actual public flight did not dock");
+}
+
+#[test]
+fn paid_ecm_and_private_cabins_share_save_custody_through_delivery() {
+    let mut world = funded_avenor(31010);
+    let cash = world.credits_tenths().unwrap();
+    let first = act(&mut world, buy(CabinGrade::Economy));
+    let second = act(&mut world, buy(CabinGrade::Economy));
+    let ecm = act(
+        &mut world,
+        ModuleAction::Purchase {
+            kind: ModuleKind::Ecm,
+        },
+    );
+    let fit = world.modular_equipment_snapshot().unwrap();
+    assert_eq!((fit.utility_mounts_used, fit.equipment_units_used), (1, 3));
+    assert_eq!(world.service_snapshot().unwrap().used_tonnes, 10);
+    assert_eq!(world.credits_tenths(), Some(cash - 71_000));
+    passage(&mut world, PassengerAction::RequestReplies);
+    passage(&mut world, PassengerAction::Board);
+    let aboard = world.passenger_journey_snapshot().unwrap();
+    let cabins = world.passenger_cabins();
+    assert_eq!(aboard.cabins, Some([first, second]));
+    world.request_launch(world.snapshot().tick).unwrap();
+    world.step(crate::FlightInput::default()).unwrap();
+    let tick = world.snapshot().tick;
+    let before = world.save_bytes().unwrap();
+    assert_eq!(
+        world
+            .prepare_ecm(tick)
+            .unwrap()
+            .publish_with(|_| Err::<(), _>("disk")),
+        Err("disk")
+    );
+    assert_eq!(world.save_bytes().unwrap(), before);
+    let activation = world.request_ecm(tick).unwrap();
+    let bytes = world.save_bytes().unwrap();
+    world = World::from_save_bytes(&bytes).unwrap();
+    assert_eq!(world.fitted_ecm().unwrap().id, ecm);
+    assert_eq!(
+        world.ecm_snapshot().unwrap().last_activation,
+        Some(activation)
+    );
+    assert_eq!(world.ecm_snapshot().unwrap().active, None);
+    assert_eq!(world.ecm_snapshot().unwrap().remaining_ticks, 32);
+    assert_eq!(world.passenger_cabins(), cabins);
+    assert_eq!(
+        world.passenger_journey_snapshot().unwrap().cabins,
+        aboard.cabins
+    );
+    assert_eq!(
+        world.passenger_journey_snapshot().unwrap().status,
+        PassageStatus::Aboard
+    );
+    journey_with_arrival(&mut world, SystemId::RENAS);
+    let cash = world.credits_tenths().unwrap();
+    passage(&mut world, PassengerAction::Receive);
+    world = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    assert_eq!(world.credits_tenths(), Some(cash + 6100));
+    assert_eq!(world.fitted_ecm().unwrap().id, ecm);
+    assert_eq!(
+        world.ecm_snapshot().unwrap().last_activation,
+        Some(activation)
+    );
+    let delivered = world.passenger_journey_snapshot().unwrap();
+    assert_eq!(delivered.cabins, Some([first, second]));
+    assert_eq!(delivered.status, PassageStatus::Delivered);
+    assert_eq!(
+        delivered.clue.and_then(|receipt| receipt.clue_id()),
+        Some(PASSAGE_CLUE_ID)
+    );
+    assert_eq!(
+        world.unwritten_route_clue_progress().unwrap().earned.len(),
+        1
+    );
 }
 
 fn reject_changed_history(world: &World, live: &mut World, retained: &[u8]) {

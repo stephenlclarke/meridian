@@ -5,7 +5,9 @@ mod persistence;
 mod route;
 use core::fmt;
 pub use journal::NavigationGrade;
-pub(crate) use journal::{CompletedJump, JumpJournal, NavigationFitChange};
+pub(crate) use journal::{
+    CompletedJump, EcmJumpStart, JumpJournal, JumpTiming, NavigationFitChange,
+};
 pub(crate) use persistence::SavedNavigationSummary;
 pub use route::{
     ROUTE_SYSTEMS, RouteAlternative, RouteError, RoutePlan, RoutePreference, RouteProgress,
@@ -499,6 +501,34 @@ impl NavigationState {
     }
     pub(crate) fn drive_item_id(self) -> u64 {
         self.drive.item_ordinal
+    }
+    pub(crate) fn pending_timing(
+        self,
+        tick: u64,
+        clock: u64,
+        drive: DriveGrade,
+    ) -> Result<Option<JumpTiming>, crate::save::SaveError> {
+        let Some(pending) = self.pending else {
+            return Ok(None);
+        };
+        let invalid = crate::save::SaveError::InvalidState("pending jump timing");
+        let remaining = u64::from(pending.remaining_ticks);
+        let duration = u64::from(drive.spool_ticks());
+        if remaining == 0 || remaining > duration {
+            return Err(invalid);
+        }
+        let arrival_tick = tick.checked_add(remaining).ok_or(invalid)?;
+        let arrival_clock = clock.checked_add(remaining).ok_or(invalid)?;
+        Ok(Some(JumpTiming {
+            source: pending.source,
+            destination: pending.destination,
+            visit: pending.source_visit,
+            departure_tick: arrival_tick.checked_sub(duration).ok_or(invalid)?,
+            departure_clock: arrival_clock.checked_sub(duration).ok_or(invalid)?,
+            arrival_tick,
+            arrival_clock,
+            spool: drive.spool_ticks(),
+        }))
     }
     pub(crate) fn launch(&mut self) -> Result<(), NavigationError> {
         let visit = self

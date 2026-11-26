@@ -29,6 +29,7 @@ pub enum Action {
     CycleMissileLock,
     ToggleMissileArm,
     FireMissile,
+    ActivateEcm,
     ClearMissile,
     Contact,
     Review,
@@ -321,6 +322,9 @@ impl Session {
                 .toggle_auto_docking()
                 .map(|message| message.to_string())
                 .map_err(|error| error.to_string()),
+            Action::ActivateEcm => {
+                Err("E.C.M. activation requires the durable profile path".into())
+            }
             Action::SetFlightView(view) => {
                 self.invalidate();
                 world

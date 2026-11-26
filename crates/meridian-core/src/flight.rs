@@ -3,6 +3,11 @@ pub use emp::{
     EmpAxis, EmpChargePhase, EmpEquipmentAction, EmpEquipmentOffer, EmpEquipmentReview, EmpError,
     EmpGrades, EmpOrigin, EmpProvenance, EmpSnapshot, OwnedEmp, PreparedEmpEquipment,
 };
+mod ecm;
+pub use ecm::{
+    ECM_ENERGY_HUNDREDTHS, ECM_FIELD_TICKS, EcmActivation, EcmError, EcmSnapshot, EcmTermination,
+    EcmTrigger, PreparedEcm,
+};
 mod celestial;
 mod solar;
 pub use solar::{SolarScoopStatus, SolarSnapshot};
@@ -207,6 +212,7 @@ pub struct World {
     modular: modular::State,
     xyzzy: xyzzy::State,
     emp: emp::State,
+    ecm: ecm::State,
     navigation_trade: navigation_trade::State,
     flight_reception: flight_reception::State,
     practice: Option<practice::Practice>,
@@ -258,6 +264,7 @@ impl World {
             modular: modular::State::default(),
             xyzzy: xyzzy::State::default(),
             emp: emp::State::default(),
+            ecm: ecm::State::default(),
             navigation_trade: navigation_trade::State::default(),
             flight_reception: flight_reception::State::default(),
             practice: None,
@@ -424,7 +431,38 @@ impl World {
         if !self.jump_journal.has_room() {
             return Err(NavigationError::SequenceExhausted);
         }
+        let owner = self.combat_identity().ok_or(NavigationError::WrongMode)?;
+        let tick = self.state.tick;
+        let clock = self.combat.physical_tick();
+        let ecm_start = ledger.fitted(ModuleSlot::UtilityEcm).is_some().then(|| {
+            crate::navigation::EcmJumpStart {
+                source: owner.system,
+                destination: target,
+                visit: owner.visit,
+                tick,
+                clock,
+                spool: drive.1.spool_ticks(),
+                before_activation: self.ecm.preceding_activation(owner, tick, clock),
+            }
+        });
+        let journal_growth = if ecm_start.is_some() {
+            self.jump_journal
+                .ecm_start_growth()
+                .ok_or(NavigationError::SequenceExhausted)?
+        } else {
+            0
+        };
+        let ecm = self
+            .ecm
+            .prepare_departure(owner, ecm_start)
+            .map_err(|_| NavigationError::SequenceExhausted)?;
+        self.check_ecm_command_capacity(&ecm, Some(navigation), journal_growth)
+            .map_err(|_| NavigationError::SequenceExhausted)?;
+        if let Some(start) = ecm_start {
+            self.jump_journal.append_ecm_start(start);
+        }
         self.navigation = Some(navigation);
+        self.ecm = ecm;
         self.cancel_route_on_manual_jump(origin, target);
         Ok(())
     }
@@ -523,11 +561,18 @@ impl World {
         if let Some(actor) = &mule_renas {
             self.validate_renas_mule_launch(actor, launch_pose)?;
         }
+        let ecm = self
+            .ecm
+            .prepare_launch(self, navigation)
+            .map_err(|_| StepError::TickOverflow)?;
+        self.check_ecm_command_capacity(&ecm, navigation, 0)
+            .map_err(|_| StepError::TickOverflow)?;
         if let Some(account) = &mut self.commander_account {
             account.record_departure_legality();
         }
         self.state = next;
         self.navigation = navigation;
+        self.ecm = ecm;
         self.missiles.berth();
         self.mule_renas = mule_renas;
         if let Some((session, epoch)) = self.freight_session.as_mut().zip(mission_epoch) {
@@ -827,9 +872,21 @@ impl World {
             prepared.practice,
             prepared.pulse.alive(),
         );
-        let damage =
-            self.damage
-                .step(self.state.mode, next.mode, prepared.combat.physical_tick())?;
+        let cancelled_ecm_jump = entry
+            && self
+                .navigation
+                .is_some_and(|n| n.snapshot(0).travel.is_some())
+            && self.fitted_ecm().is_some();
+        let ecm_launch_admitted = self.state.mode == FlightMode::Launching
+            && next.mode == FlightMode::Flight
+            && self.fitted_ecm().is_some();
+        let damage = self.damage.step(
+            self.state.mode,
+            next.mode,
+            prepared.combat.physical_tick(),
+            cancelled_ecm_jump,
+            ecm_launch_admitted,
+        )?;
         let emp = self.emp.prepare_step(
             self,
             emp::Frame {
@@ -886,6 +943,16 @@ impl World {
         if entry && !self.modular.has_berth_room() {
             return Err(StepError::TickOverflow);
         }
+        let ecm = self
+            .ecm
+            .prepare_step(
+                self,
+                next,
+                navigation,
+                prepared.combat.physical_tick(),
+                motion,
+            )
+            .map_err(|_| StepError::TickOverflow)?;
         if let (Some(practice), Some(nav), Some(data)) =
             (&mut prepared.practice, navigation, &self.station_data)
         {
@@ -896,7 +963,7 @@ impl World {
             navigation,
             &prepared,
             traffic.as_ref(),
-            (&damage, &mining, &emp.state),
+            (&damage, &mining, &emp.state, &ecm),
             navigation_trade.as_ref(),
         )
         .map_err(|_| StepError::TickOverflow)?;
@@ -928,6 +995,7 @@ impl World {
         self.damage = damage;
         self.solar = solar;
         self.emp = emp.state;
+        self.ecm = ecm;
         self.mining = mining;
         self.practice = prepared.practice;
         if let Some(account) = &mut self.commander_account {

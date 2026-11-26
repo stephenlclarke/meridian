@@ -35,6 +35,7 @@ pub enum ModuleKind {
     NavalEnergyUnit,
     EliteEnergyUnit,
     FuelScoops,
+    Ecm,
     FuelStorage,
     BasicNavigation,
     IntermediateNavigation,
@@ -55,6 +56,7 @@ impl ModuleKind {
             | Self::MilitaryLaser
             | Self::NavalLaser => "laser",
             Self::FuelScoops => "utility-fuelScoops",
+            Self::Ecm => "utility-ecm",
             Self::FuelStorage => "fuel-storage",
             Self::BasicNavigation | Self::IntermediateNavigation | Self::AdvancedNavigation => {
                 "navigation"
@@ -92,6 +94,7 @@ impl ModuleKind {
             Self::PulseLaser => "Pulse Laser",
             Self::MiningLaser => "Mining Laser",
             Self::FuelScoops => "Fuel Scoops",
+            Self::Ecm => "E.C.M. System",
             Self::FuelStorage => "Fuel Storage Unit",
             Self::MiningTargeting => "Mining Targeting Module",
             Self::SalvageTargeting => "Salvage Targeting Module",
@@ -131,6 +134,7 @@ impl ModuleKind {
             | Self::MilitaryLaser
             | Self::NavalLaser => ModuleSlot::FrontLaser,
             Self::FuelScoops => ModuleSlot::UtilityFuelScoops,
+            Self::Ecm => ModuleSlot::UtilityEcm,
             Self::FuelStorage => ModuleSlot::FuelStorage(0),
             Self::BasicNavigation | Self::IntermediateNavigation | Self::AdvancedNavigation => {
                 ModuleSlot::Navigation
@@ -168,6 +172,7 @@ impl ModuleKind {
                 | Self::EliteEnergyUnit
                 | Self::AdvancedNavigation
                 | Self::FuelScoops
+                | Self::Ecm
                 | Self::FuelStorage
                 | Self::Targeting(TargetingTier::Military)
                 | Self::MiningTargeting
@@ -187,7 +192,7 @@ impl ModuleKind {
             Self::EliteEnergyUnit => 4,
             Self::Targeting(_) | Self::MiningTargeting | Self::SalvageTargeting => 1,
             Self::Drive(DriveGrade::Intermediate | DriveGrade::Advanced) => 1,
-            Self::FuelStorage => 1,
+            Self::FuelStorage | Self::Ecm => 1,
             Self::Shield(grade) => grade.equipment_units(),
             Self::Cabin(_) => 1,
             _ => 0,
@@ -196,6 +201,7 @@ impl ModuleKind {
     fn shop(self) -> Option<(u32, u8)> {
         match self {
             Self::FuelScoops => Some((scoops::PRICE_TENTHS, scoops::REQUIRED_TL)),
+            Self::Ecm => Some((21_000, 5)),
             Self::FuelStorage => Some((20_000, 1)),
             Self::PulseLaser => Some((14500, 3)),
             Self::MiningLaser => Some((MINING_LASER_PRICE_TENTHS, MINING_LASER_REQUIRED_TL)),
@@ -269,6 +275,7 @@ impl ModuleKind {
             Self::Drive(DriveGrade::Advanced) => 23,
             Self::Shield(grade) => 24 + grade as u8,
             Self::FuelStorage => 31,
+            Self::Ecm => 32,
             Self::Cabin(grade) => 40 + grade as u8,
         }
     }
@@ -295,6 +302,7 @@ impl ModuleKind {
             23 => Ok(Self::Drive(DriveGrade::Advanced)),
             24..=30 => Ok(Self::Shield(ShieldGrade::from_tag(tag - 24)?)),
             31 => Ok(Self::FuelStorage),
+            32 => Ok(Self::Ecm),
             40..=45 => Ok(Self::Cabin(CabinGrade::ALL[usize::from(tag - 40)])),
             _ => Err(SaveError::InvalidEncoding),
         }
@@ -305,6 +313,7 @@ pub enum ModuleSlot {
     FrontLaser,
     Energy,
     UtilityFuelScoops,
+    UtilityEcm,
     FuelStorage(u8),
     Navigation,
     Targeting,
@@ -539,7 +548,7 @@ impl Ledger {
             ..Self::default()
         })
     }
-    fn fitted(&self, slot: ModuleSlot) -> Option<OwnedModule> {
+    pub(super) fn fitted(&self, slot: ModuleSlot) -> Option<OwnedModule> {
         self.items.iter().find(|i| i.slot == Some(slot)).copied()
     }
     fn front(&self) -> Option<OwnedModule> {
@@ -1014,6 +1023,7 @@ impl State {
                     ModuleKind::FuelScoops => {
                         world.xyzzy.authorizes_scoops(e.dock, e.tick, e.revision)
                     }
+                    ModuleKind::Ecm => world.xyzzy.authorizes_ecm(e.dock, e.tick, e.revision),
                     _ => world.xyzzy.authorizes(e.dock, e.tick, e.revision),
                 };
                 if !authorized {
@@ -1085,6 +1095,7 @@ impl State {
                     let budget = crate::equipment::definition().map_err(|_| INVALID)?;
                     if u16::from(tanks)
                         + u16::from(ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())
+                        + u16::from(ledger.fitted(ModuleSlot::UtilityEcm).is_some())
                         > budget.utility_mounts_capacity
                     {
                         return Err(INVALID);
@@ -1199,13 +1210,23 @@ impl State {
         self.ledger_at(owner, tick, visit)?
             .fitted(ModuleSlot::UtilityFuelScoops)
     }
-    pub(super) fn validate_scoop_test_record(
+    pub(super) fn ecm_item_at(&self, owner: u64, tick: u64, visit: u64) -> Option<OwnedModule> {
+        self.ledger_at(owner, tick, visit)?
+            .fitted(ModuleSlot::UtilityEcm)
+    }
+    pub(super) fn drive_at_visit(&self, owner: u64, tick: u64, visit: u64) -> Option<DriveGrade> {
+        self.ledger_at(owner, tick, visit)?
+            .drive()
+            .map(|(_, grade)| grade)
+    }
+    pub(super) fn validate_utility_test_record(
         &self,
         owner: u64,
         start: u64,
         end: u64,
         account: &CommanderAccount,
         emp: &super::emp::State,
+        kind: ModuleKind,
     ) -> Result<(), SaveError> {
         let fit_at = |revision| -> Result<Ledger, SaveError> {
             let mut ledger = Ledger::born(owner)?;
@@ -1219,11 +1240,10 @@ impl State {
             }
             Ok(ledger)
         };
-        let before = fit_at(start)?.fitted(ModuleSlot::UtilityFuelScoops);
+        let slot = kind.slot();
+        let before = fit_at(start)?.fitted(slot);
         let after_ledger = fit_at(end)?;
-        let after = after_ledger
-            .fitted(ModuleSlot::UtilityFuelScoops)
-            .ok_or(INVALID)?;
+        let after = after_ledger.fitted(slot).ok_or(INVALID)?;
         if start == end {
             return if before == Some(after) {
                 Ok(())
@@ -1242,7 +1262,8 @@ impl State {
         let budget = crate::equipment::definition().map_err(|_| INVALID)?;
         let cargo = self.known_cargo_mounts_at(account, end);
         let mounts = u16::from(after_ledger.fuel_storage_count())
-            + 1
+            + u16::from(after_ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())
+            + u16::from(after_ledger.fitted(ModuleSlot::UtilityEcm).is_some())
             + cargo
             + emp.utility_mounts_at_revision(end);
         if event.item != after.id
@@ -1252,9 +1273,9 @@ impl State {
             return Err(INVALID);
         }
         match event.action {
-            ModuleAction::Purchase {
-                kind: ModuleKind::FuelScoops,
-            } if event.xyzzy => Ok(()),
+            ModuleAction::Purchase { kind: purchased } if event.xyzzy && purchased == kind => {
+                Ok(())
+            }
             ModuleAction::Install {
                 item,
                 replacing: None,
@@ -1443,6 +1464,7 @@ impl World {
             ModuleKind::IntermediateNavigation,
             ModuleKind::AdvancedNavigation,
             ModuleKind::FuelStorage,
+            ModuleKind::Ecm,
             ModuleKind::Drive(DriveGrade::Intermediate),
             ModuleKind::Drive(DriveGrade::Advanced),
             ModuleKind::Shield(ShieldGrade::BasicII),
@@ -1612,6 +1634,11 @@ impl World {
         if changes_resources && !self.damage.enabled() {
             return Err(ModuleError::Save(SaveError::InvalidState(
                 "energy or shield fitting requires resource birth provenance",
+            )));
+        }
+        if action.purchase_kind() == Some(ModuleKind::Ecm) && !self.damage.enabled() {
+            return Err(ModuleError::Save(SaveError::InvalidState(
+                "ECM fitting requires resource birth provenance",
             )));
         }
         if let Some(kind) = action.purchase_kind() {

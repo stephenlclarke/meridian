@@ -94,6 +94,64 @@ pub(crate) struct CompletedJump {
     account_revision: u64,
     physical_tick: u64,
 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct JumpTiming {
+    pub(crate) source: SystemId,
+    pub(crate) destination: SystemId,
+    pub(crate) visit: u64,
+    pub(crate) departure_tick: u64,
+    pub(crate) departure_clock: u64,
+    pub(crate) arrival_tick: u64,
+    pub(crate) arrival_clock: u64,
+    pub(crate) spool: u32,
+}
+/// Navigation seals this at its actual accepted command, independently of
+/// the local ECM visit history. It remains even when a physical berth cancels
+/// the spool, so a later receipt cannot move the original departure clock.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct EcmJumpStart {
+    pub(crate) source: SystemId,
+    pub(crate) destination: SystemId,
+    pub(crate) visit: u64,
+    pub(crate) tick: u64,
+    pub(crate) clock: u64,
+    pub(crate) spool: u32,
+    pub(crate) before_activation: Option<u16>,
+}
+impl EcmJumpStart {
+    const ENCODED_SIZE: usize = 36;
+    fn encode(self, w: &mut Writer) {
+        write_system(w, self.source);
+        write_system(w, self.destination);
+        w.u64(self.visit);
+        w.u64(self.tick);
+        w.u64(self.clock);
+        w.u32(self.spool);
+        w.u16(self.before_activation.unwrap_or(0));
+    }
+    fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+        Ok(Self {
+            source: read_system(r)?,
+            destination: read_system(r)?,
+            visit: r.u64()?,
+            tick: r.u64()?,
+            clock: r.u64()?,
+            spool: r.u32()?,
+            before_activation: match r.u16()? {
+                0 => None,
+                n => Some(n),
+            },
+        })
+    }
+    fn matches(self, timing: JumpTiming) -> bool {
+        self.source == timing.source
+            && self.destination == timing.destination
+            && self.visit == timing.visit
+            && self.tick == timing.departure_tick
+            && self.clock == timing.departure_clock
+            && self.spool == timing.spool
+    }
+}
 impl CompletedJump {
     pub(crate) const ENCODED_SIZE: usize = 41;
 
@@ -153,9 +211,12 @@ impl CompletedJump {
 #[derive(Debug, Default)]
 pub(crate) struct JumpJournal {
     legs: Vec<CompletedJump>,
+    ecm_starts: Vec<EcmJumpStart>,
 }
 impl JumpJournal {
     const MAX_LEGS: usize = MAX_SAVE_BYTES / CompletedJump::ENCODED_SIZE;
+    const MAX_ECM_STARTS: usize = MAX_SAVE_BYTES / EcmJumpStart::ENCODED_SIZE;
+    const ECM_START_FLAG: u16 = 1 << 15;
 
     pub(crate) fn has_room(&self) -> bool {
         self.legs.len() < Self::MAX_LEGS
@@ -163,21 +224,78 @@ impl JumpJournal {
     pub(crate) fn append(&mut self, leg: CompletedJump) {
         self.legs.push(leg);
     }
+    pub(crate) fn ecm_starts(&self) -> impl Iterator<Item = EcmJumpStart> + '_ {
+        self.ecm_starts.iter().copied()
+    }
+    pub(crate) fn ecm_start_growth(&self) -> Option<usize> {
+        (self.ecm_starts.len() < Self::MAX_ECM_STARTS)
+            .then_some(EcmJumpStart::ENCODED_SIZE + if self.ecm_starts.is_empty() { 2 } else { 0 })
+    }
+    pub(crate) fn append_ecm_start(&mut self, start: EcmJumpStart) {
+        self.ecm_starts.push(start);
+    }
+    pub(crate) fn completed_timing(&self, visit: u64) -> Result<Option<JumpTiming>, SaveError> {
+        let Some(leg) = self.legs.iter().find(|leg| leg.source_visit == visit) else {
+            return Ok(None);
+        };
+        let spool = leg.drive.spool_ticks();
+        Ok(Some(JumpTiming {
+            source: leg.source,
+            destination: leg.destination,
+            visit,
+            departure_tick: leg
+                .arrival_tick
+                .checked_sub(u64::from(spool))
+                .ok_or(INVALID)?,
+            departure_clock: leg
+                .physical_tick
+                .checked_sub(u64::from(spool))
+                .ok_or(INVALID)?,
+            arrival_tick: leg.arrival_tick,
+            arrival_clock: leg.physical_tick,
+            spool,
+        }))
+    }
     pub(crate) fn encode(&self, w: &mut Writer) {
-        w.u16(self.legs.len() as u16);
+        w.u16(
+            self.legs.len() as u16
+                | if self.ecm_starts.is_empty() {
+                    0
+                } else {
+                    Self::ECM_START_FLAG
+                },
+        );
         for leg in &self.legs {
             leg.encode(w);
         }
+        if !self.ecm_starts.is_empty() {
+            w.u16(self.ecm_starts.len() as u16);
+            for start in &self.ecm_starts {
+                start.encode(w);
+            }
+        }
     }
     pub(crate) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
-        let count = usize::from(r.u16()?);
+        let tagged = r.u16()?;
+        let count = usize::from(tagged & !Self::ECM_START_FLAG);
         if count > Self::MAX_LEGS {
             return Err(SaveError::TooLarge);
         }
         let legs = (0..count)
             .map(|_| CompletedJump::decode(r))
             .collect::<Result<Vec<_>, _>>()?;
-        Ok(Self { legs })
+        let ecm_starts = if tagged & Self::ECM_START_FLAG != 0 {
+            let count = usize::from(r.u16()?);
+            if count == 0 || count > Self::MAX_ECM_STARTS {
+                return Err(INVALID);
+            }
+            (0..count)
+                .map(|_| EcmJumpStart::decode(r))
+                .collect::<Result<Vec<_>, _>>()?
+        } else {
+            Vec::new()
+        };
+        Ok(Self { legs, ecm_starts })
     }
 
     pub(crate) fn matches_route_prefix(&self, start: u64, travelled: &[SystemId]) -> bool {
@@ -428,6 +546,65 @@ impl JumpJournal {
         {
             return Err(INVALID);
         }
+        self.validate_ecm_starts(nav, catalogue, tick, physical_end, fitted_drive)?;
+        Ok(())
+    }
+    fn validate_ecm_starts(
+        &self,
+        nav: NavigationState,
+        catalogue: &OriginalNavigation,
+        tick: u64,
+        physical_end: u64,
+        drive: DriveGrade,
+    ) -> Result<(), SaveError> {
+        if self.ecm_starts.is_empty() {
+            return Ok(());
+        }
+        let pending = nav.pending_timing(tick, physical_end, drive)?;
+        let mut previous: Option<EcmJumpStart> = None;
+        for start in self.ecm_starts() {
+            if start.visit < 2
+                || start.visit > nav.visit
+                || start.tick > tick
+                || start.clock > physical_end
+                || start.clock > start.tick
+                || start.tick - start.clock > tick.checked_sub(physical_end).ok_or(INVALID)?
+                || start.source == start.destination
+                || self.system_at_visit(start.visit, start.tick)? != start.source
+                || catalogue
+                    .distance_ly(start.source, start.destination)
+                    .is_err()
+                || ![
+                    DriveGrade::Basic,
+                    DriveGrade::Intermediate,
+                    DriveGrade::Advanced,
+                ]
+                .into_iter()
+                .any(|grade| grade.spool_ticks() == start.spool)
+                || previous.is_some_and(|p| {
+                    p.visit >= start.visit
+                        || p.tick >= start.tick
+                        || p.clock >= start.clock
+                        || p.tick - p.clock > start.tick - start.clock
+                        || p.before_activation
+                            .zip(start.before_activation)
+                            .is_some_and(|(a, b)| a >= b)
+                })
+            {
+                return Err(INVALID);
+            }
+            if let Some(timing) = self.completed_timing(start.visit)? {
+                if !start.matches(timing) {
+                    return Err(INVALID);
+                }
+            } else if start.visit == nav.visit
+                && nav.dock.is_none()
+                && pending.is_none_or(|timing| !start.matches(timing))
+            {
+                return Err(INVALID);
+            }
+            previous = Some(start);
+        }
         Ok(())
     }
 }
@@ -435,6 +612,34 @@ impl JumpJournal {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn optional_ecm_start_codec_preserves_legacy_empty_journal_and_fixed_receipt_width() {
+        let mut journal = JumpJournal::default();
+        let mut writer = Writer::new();
+        journal.encode(&mut writer);
+        assert_eq!(writer.bytes, [0, 0]);
+        let start = EcmJumpStart {
+            source: SystemId::AVENOR,
+            destination: SystemId::RENAS,
+            visit: 2,
+            tick: 31,
+            clock: 29,
+            spool: 600,
+            before_activation: Some(1),
+        };
+        assert_eq!(journal.ecm_start_growth(), Some(38));
+        journal.append_ecm_start(start);
+        let mut writer = Writer::new();
+        journal.encode(&mut writer);
+        assert_eq!(writer.bytes.len(), 40);
+        let mut reader = Reader::new(&writer.bytes);
+        let cold = JumpJournal::decode(&mut reader).unwrap_or_else(|e| panic!("{e:?}"));
+        assert!(reader.finished());
+        assert_eq!(cold.ecm_starts().collect::<Vec<_>>(), [start]);
+        assert_eq!(cold.ecm_start_growth(), Some(36));
+        assert!(JumpJournal::decode(&mut Reader::new(&[0, 128, 0, 0])).is_err());
+    }
 
     #[test]
     fn shorter_leg_cannot_be_relabelled_as_a_drive_never_fitted_at_departure() {
@@ -457,7 +662,10 @@ mod tests {
             account_revision: 1,
             physical_tick: 61,
         };
-        let journal = JumpJournal { legs: vec![leg] };
+        let journal = JumpJournal {
+            legs: vec![leg],
+            ..JumpJournal::default()
+        };
         assert_eq!(
             journal.validate(nav, &catalogue, 61, 61, &[], DriveGrade::Basic),
             Err(INVALID)
@@ -548,6 +756,7 @@ mod tests {
                     drive: DriveGrade::Basic,
                 },
             ],
+            ..JumpJournal::default()
         };
         assert_eq!(
             journal.validate(nav, &catalogue, 1901, 1801, &[change], DriveGrade::Basic),

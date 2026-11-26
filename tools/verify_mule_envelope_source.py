@@ -35,6 +35,18 @@ SOLAR_SCOOPS_INVERSE_SHA256 = '0c68577f581d05cf490cbdfaa1488bdc361d712b30751f683
 PASSENGER_CABIN_INVERSE = Path('integration/sh001-mule/PASSENGER-CABIN-INVERSE.json')
 PASSENGER_CABIN_BASE = 'b026640a016f45918d4940b920489ea7d240cc2b'
 PASSENGER_CABIN_INVERSE_SHA256 = 'c1e13f79d4fee1fb24cb7ffcd5c03aee8300fa99064e09ae5391dd74c3eb6546'
+STOCK_ECM_INVERSE = Path('integration/sh001-mule/STOCK-ECM-INVERSE.json')
+STOCK_ECM_BASE = 'f32ada6970976e1a1e609e4777b3ef5c333f055d'
+STOCK_ECM_INVERSE_SHA256 = 'a470932b8b411825325bdb3e0fb9e38cb5919a44bac7e90d55332dfcff0d6a32'
+STOCK_ECM_FIELD_INVERSE = Path('integration/sh001-mule/STOCK-ECM-FIELD-INVERSE.json')
+STOCK_ECM_FIELD_BASE = '8ba79ea995cd9439723a3c1e271ed4ecd6387e24'
+STOCK_ECM_FIELD_INVERSE_SHA256 = '79dae295d74a7aee4115d3ec32022cfd72ca08d09e46021c9eefce4f11aa03ba'
+COMBINED_CABIN_INVERSE = Path('integration/sh001-mule/COMBINED-ECM-CABIN-INVERSE.json')
+COMBINED_CABIN_BASE = 'c55c36b2fbbc4c242d9a9c16df6c5a3d05b95a85'
+COMBINED_CABIN_SHA256 = '33ad6e12049e4ae13bc6ad66878f84d5ed2c9af2cf41994c42207500fdd1b75e'
+COMBINED_ECM_INVERSE = Path('integration/sh001-mule/COMBINED-CABIN-ECM-INVERSE.json')
+COMBINED_ECM_BASE = '7626d695bc453a71fcb80379f1e02b7f97feac58'
+COMBINED_ECM_SHA256 = '76a756ed730b162a7db9926be43d684132c3e2ae968d38d892c7afd9c87a6b63'
 
 
 def sha(data):
@@ -96,6 +108,39 @@ def undo_medusa_stock_publication(relative, data):
 def passenger_cabin_inverse(root, protected):
     return approved_inverse(root, protected, PASSENGER_CABIN_INVERSE,
                             PASSENGER_CABIN_INVERSE_SHA256, PASSENGER_CABIN_BASE, 'passenger cabin')
+
+
+def stock_ecm_inverse(root, protected):
+    return approved_inverse(root, protected, STOCK_ECM_INVERSE,
+                            STOCK_ECM_INVERSE_SHA256, STOCK_ECM_BASE, 'stock ECM')
+
+
+def stock_ecm_field_inverse(root, protected):
+    return approved_inverse(root, protected, STOCK_ECM_FIELD_INVERSE,
+                            STOCK_ECM_FIELD_INVERSE_SHA256, STOCK_ECM_FIELD_BASE, 'stock ECM field')
+
+
+def combined_cabin_inverse(root, protected):
+    return approved_inverse(root, protected, COMBINED_CABIN_INVERSE,
+                            COMBINED_CABIN_SHA256, COMBINED_CABIN_BASE, 'combined to cabin')
+
+
+def combined_ecm_inverse(root, protected):
+    return approved_inverse(root, protected, COMBINED_ECM_INVERSE,
+                            COMBINED_ECM_SHA256, COMBINED_ECM_BASE, 'combined to ECM')
+
+
+def undo_combined_to_cabin(relative, data, inverse, cabin):
+    data = undo_flight_computer(relative, data, inverse)
+    data = undo_flight_computer(relative, data, cabin)
+    data = undo_unwritten_route_publication(relative, data)
+    return undo_medusa_stock_publication(relative, data)
+
+
+def undo_combined_to_ecm(relative, data, inverse, field, ecm):
+    data = undo_flight_computer(relative, data, inverse)
+    data = undo_flight_computer(relative, data, field)
+    return undo_flight_computer(relative, data, ecm)
 
 
 def undo_seriema_courier_publication(relative, data):
@@ -551,13 +596,17 @@ def verify_protected_core(root):
     fuel_inverse = fuel_storage_inverse(root, baseline)
     solar_inverse = solar_scoops_inverse(root, baseline)
     cabin_inverse = passenger_cabin_inverse(root, baseline)
+    ecm_inverse = stock_ecm_inverse(root, baseline)
+    ecm_field_inverse = stock_ecm_field_inverse(root, baseline)
+    combined_cabin = combined_cabin_inverse(root, baseline)
+    combined_ecm = combined_ecm_inverse(root, baseline)
     checked = set()
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_flight_computer(relative, current, cabin_inverse)
-        data = undo_unwritten_route_publication(relative, data)
-        data = undo_medusa_stock_publication(relative, data)
+        data = undo_combined_to_cabin(relative, current, combined_cabin, cabin_inverse)
+        other = undo_combined_to_ecm(relative, current, combined_ecm, ecm_field_inverse, ecm_inverse)
+        assert data == other, relative
         data = undo_flight_computer(relative, data, solar_inverse)
         data = undo_flight_computer(relative, data, fuel_inverse)
         data = undo_flight_computer(relative, data, shield_inverse)
@@ -604,7 +653,9 @@ def verify_protected_core(root):
         checked.add(relative)
         unchanged += data == current
     assert set(additions) <= checked and len(checked) == 115
-    return len(checked), len(additions), unchanged, len(inverse), len(drive_inverse), len(shield_inverse), len(fuel_inverse), len(solar_inverse), len(cabin_inverse)
+    return (len(checked), len(additions), unchanged, len(inverse), len(drive_inverse), len(shield_inverse),
+            len(fuel_inverse), len(solar_inverse), len(cabin_inverse), len(ecm_inverse), len(ecm_field_inverse),
+            len(combined_cabin), len(combined_ecm))
 
 
 def verify_test_registry(criteria):
@@ -663,7 +714,8 @@ def verify():
     folder = ROOT / 'assets/fleet/sh001'
     verify_inputs(folder)
     groups = verify_geometry(folder)
-    checked, hooks, unchanged, flight_computer, hyperspace_drive, stock_shield, fuel_storage, solar_scoops, passenger_cabin = verify_protected_core(ROOT)
+    (checked, hooks, unchanged, flight_computer, hyperspace_drive, stock_shield, fuel_storage,
+     solar_scoops, passenger_cabin, stock_ecm, stock_ecm_field, combined_cabin, combined_ecm) = verify_protected_core(ROOT)
     counts = verify_historical_bindings(folder, groups)
     return {
         'status': 'PASS_SOURCE_ONLY',
@@ -676,6 +728,10 @@ def verify():
         'protectedCoreFilesWithFuelStorageChanges': fuel_storage,
         'protectedCoreFilesWithSolarScoopsChanges': solar_scoops,
         'protectedCoreFilesWithPassengerCabinChanges': passenger_cabin,
+        'protectedCoreFilesWithStockEcmChanges': stock_ecm,
+        'protectedCoreFilesWithStockEcmFieldChanges': stock_ecm_field,
+        'protectedCoreFilesWithCombinedToCabinChanges': combined_cabin,
+        'protectedCoreFilesWithCombinedToEcmChanges': combined_ecm,
         'protectedCoreFilesChecked': checked,
         **counts,
         'vertexEncoding': 5344,

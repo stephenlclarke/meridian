@@ -878,6 +878,7 @@ impl App {
         }
         let action = match code {
             KeyCode::KeyN if in_flight => Action::ToggleAutoDocking,
+            KeyCode::KeyK if in_flight => Action::ActivateEcm,
             KeyCode::Digit0 => Action::SetFlightView(FlightView::Front),
             KeyCode::Digit1 => Action::SetFlightView(FlightView::Rear),
             KeyCode::Digit2 => Action::SetFlightView(FlightView::Left),
@@ -946,6 +947,14 @@ impl App {
             _ => return,
         };
         let mut missile = false;
+        let prior_ecm = matches!(action, Action::ActivateEcm)
+            .then(|| {
+                self.game
+                    .world
+                    .ecm_snapshot()
+                    .and_then(|s| s.last_activation)
+            })
+            .flatten();
         self.notice.set(match self.game.command(action) {
             Ok(message) => {
                 missile = matches!(action, Action::FireMissile);
@@ -953,6 +962,18 @@ impl App {
             }
             Err(error) => error,
         });
+        // A directory-sync warning follows actual publication. Clear held EMP
+        // only when the World accepted a new field, not merely on UI success.
+        if matches!(action, Action::ActivateEcm)
+            && self
+                .game
+                .world
+                .ecm_snapshot()
+                .and_then(|s| s.last_activation)
+                .is_some_and(|a| Some(a) != prior_ecm)
+        {
+            self.keys.remove(&KeyCode::KeyU);
+        }
         self.notice.missile = missile;
         self.publish_audio(false);
     }

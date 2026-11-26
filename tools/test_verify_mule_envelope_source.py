@@ -17,7 +17,9 @@ class MuleSourceVerification(unittest.TestCase):
         for record in (verifier.PROTECTED_CORE, verifier.FLIGHT_COMPUTER_INVERSE,
                        verifier.HYPERSPACE_DRIVE_INVERSE, verifier.STOCK_SHIELD_INVERSE,
                        verifier.FUEL_STORAGE_INVERSE, verifier.SOLAR_SCOOPS_INVERSE,
-                       verifier.PASSENGER_CABIN_INVERSE):
+                       verifier.PASSENGER_CABIN_INVERSE, verifier.STOCK_ECM_INVERSE,
+                       verifier.STOCK_ECM_FIELD_INVERSE, verifier.COMBINED_CABIN_INVERSE,
+                       verifier.COMBINED_ECM_INVERSE):
             (root / record).parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(verifier.ROOT / record, root / record)
         return root / core
@@ -32,6 +34,10 @@ class MuleSourceVerification(unittest.TestCase):
         self.assertEqual(result['protectedCoreFilesWithFuelStorageChanges'], 22)
         self.assertEqual(result['protectedCoreFilesWithSolarScoopsChanges'], 16)
         self.assertEqual(result['protectedCoreFilesWithPassengerCabinChanges'], 19)
+        self.assertEqual(result['protectedCoreFilesWithStockEcmChanges'], 15)
+        self.assertEqual(result['protectedCoreFilesWithStockEcmFieldChanges'], 12)
+        self.assertEqual(result['protectedCoreFilesWithCombinedToCabinChanges'], 21)
+        self.assertEqual(result['protectedCoreFilesWithCombinedToEcmChanges'], 19)
         self.assertEqual(result['geometryCoreTests'], 1)
         self.assertEqual(result['restoreCoreTests'], 1)
         self.assertEqual(result['totalMuleCoreTests'], 24)
@@ -195,6 +201,70 @@ class MuleSourceVerification(unittest.TestCase):
                 with self.assertRaisesRegex(AssertionError, 'lib.rs'):
                     verifier.verify_protected_core(root)
 
+    def test_stock_ecm_inverse_is_pinned_and_every_changed_source_remains_exact(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            core = self.copy_protected_sources(root)
+            inverse = verifier.stock_ecm_inverse(root, verifier.protected_core_pins(root))
+            self.assertEqual(len(inverse), 15)
+            for relative in inverse:
+                with self.subTest(relative=relative):
+                    source = core / relative
+                    original = source.read_bytes()
+                    source.write_bytes(original + b'\n')
+                    with self.assertRaisesRegex(AssertionError, relative):
+                        verifier.verify_protected_core(root)
+                    source.write_bytes(original)
+            manifest = root / verifier.STOCK_ECM_INVERSE
+            manifest.write_bytes(manifest.read_bytes() + b'\n')
+            with self.assertRaisesRegex(AssertionError, 'stock ECM inverse manifest'):
+                verifier.verify_protected_core(root)
+
+    def test_stock_ecm_field_inverse_is_pinned_and_every_changed_source_remains_exact(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            core = self.copy_protected_sources(root)
+            inverse = verifier.stock_ecm_field_inverse(root, verifier.protected_core_pins(root))
+            self.assertEqual(len(inverse), 12)
+            for relative in inverse:
+                with self.subTest(relative=relative):
+                    source = core / relative
+                    original = source.read_bytes()
+                    source.write_bytes(original + b'\n')
+                    with self.assertRaisesRegex(AssertionError, relative):
+                        verifier.verify_protected_core(root)
+                    source.write_bytes(original)
+            manifest = root / verifier.STOCK_ECM_FIELD_INVERSE
+            manifest.write_bytes(manifest.read_bytes() + b'\n')
+            with self.assertRaisesRegex(AssertionError, 'stock ECM field inverse manifest'):
+                verifier.verify_protected_core(root)
+
+    def test_both_combined_inverses_are_pinned_and_reject_source_drift(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            core = self.copy_protected_sources(root)
+            protected = verifier.protected_core_pins(root)
+            for name, path, inverse in (
+                ('combined to cabin', verifier.COMBINED_CABIN_INVERSE,
+                 verifier.combined_cabin_inverse(root, protected)),
+                ('combined to ECM', verifier.COMBINED_ECM_INVERSE,
+                 verifier.combined_ecm_inverse(root, protected)),
+            ):
+                for relative in inverse:
+                    with self.subTest(name=name, relative=relative):
+                        source = core / relative
+                        original = source.read_bytes()
+                        source.write_bytes(original + b'\n')
+                        with self.assertRaisesRegex(AssertionError, relative):
+                            verifier.verify_protected_core(root)
+                        source.write_bytes(original)
+                manifest = root / path
+                original = manifest.read_bytes()
+                manifest.write_bytes(original + b'\n')
+                with self.assertRaisesRegex(AssertionError, name + ' inverse manifest'):
+                    verifier.verify_protected_core(root)
+                manifest.write_bytes(original)
+
     def test_historical_stag_check_still_refuses_a_forged_preimage(self):
         # Simulate even a mistakenly approved new inverse with bad historical bytes.
         with tempfile.TemporaryDirectory() as directory:
@@ -204,10 +274,10 @@ class MuleSourceVerification(unittest.TestCase):
             inverse = json.loads(manifest.read_bytes())
             relative = verifier.LIB_SOURCE
             protected = verifier.protected_core_pins(root)
-            current = verifier.undo_flight_computer(relative, (core / relative).read_bytes(),
-                                                     verifier.passenger_cabin_inverse(root, protected))
-            current = verifier.undo_unwritten_route_publication(relative, current)
-            current = verifier.undo_medusa_stock_publication(relative, current)
+            current = verifier.undo_combined_to_cabin(
+                relative, (core / relative).read_bytes(),
+                verifier.combined_cabin_inverse(root, protected),
+                verifier.passenger_cabin_inverse(root, protected))
             current = verifier.undo_flight_computer(relative, current,
                                                      verifier.solar_scoops_inverse(root, protected))
             current = verifier.undo_flight_computer(relative, current,

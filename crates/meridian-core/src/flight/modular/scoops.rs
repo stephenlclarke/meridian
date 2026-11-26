@@ -28,7 +28,7 @@ pub struct FuelScoopsSnapshot {
     pub owned: Option<OwnedModule>,
     pub fitted: Option<FittedFuelScoops>,
     pub current_offer: Option<ModuleOffer>,
-    /// Actual implemented cargo-expansion and scoop mounts; other utility families are absent.
+    /// All fitted utilities sharing this hull's mount budget.
     pub utility_mounts_used: u16,
     pub utility_mounts_capacity: u16,
 }
@@ -67,7 +67,11 @@ fn count_slots(
         .filter(|i| {
             matches!(
                 i.slot,
-                Some(ModuleSlot::UtilityFuelScoops | ModuleSlot::FuelStorage(_))
+                Some(
+                    ModuleSlot::UtilityFuelScoops
+                        | ModuleSlot::UtilityEcm
+                        | ModuleSlot::FuelStorage(_)
+                )
             )
         })
         .count();

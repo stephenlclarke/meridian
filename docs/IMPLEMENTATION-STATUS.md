@@ -572,3 +572,9 @@ The exact public Mac wrapper is installed side-by-side at `/Users/sclarke/Applic
 Route previews use the station profit scan’s finite wallet, stock, receiving capacity and cargo limits. Trade profit uses current quotes before fuel costs. Each leg is priced independently from the current wallet and hold. The best cargo-sale estimate shows what the existing unreserved cargo can earn at a single stop.
 
 The development branch retains the XYZZY menu selection after a successful save. A failed save retains the confirmation for retry or cancellation. The secret cargo-bay receipt now validates independently of the local shop offer. Native preview qualification is pending.
+
+## Stock ECM candidate (source only)
+
+The [stock E.C.M. equipment and manual field candidate](STOCK-ECM.md) adds paid or guarded fitting, the actual shared energy debit and 32-tick field, durable manual termination of local standard projectiles (including player rounds), cold time-only cooldown and desktop controls. The automatic setting is retained intent only. Current NPC combat uses Pulse and does not produce incoming hostile missiles; incoming defence, automatic activation and full playable ECM acceptance remain open. A player round proves only the manual local effect. No Rust or native preview result is yet claimed for this source.
+
+The separate combined preview candidate retains the passenger cabin and clue journal source, the Medusa Showroom, solar fuel and the manual ECM field. Its added regression cases cover paid cabins and ECM through cold Continue and passenger delivery, and a paid solar collection save with a cabin and all three ordinary utility mounts occupied. Combined native qualification is pending.

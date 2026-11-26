@@ -130,6 +130,8 @@ impl Profile {
                 meridian_core::XyzzyAction::ToggleUnlimitedFuel => "Fuel setting saved.",
                 meridian_core::XyzzyAction::FitShield(_) => "Selected shield test fit saved.",
                 meridian_core::XyzzyAction::FitFuelScoops => "Fuel Scoops-only test fit saved.",
+                meridian_core::XyzzyAction::FitEcm => "E.C.M.-only test fit saved.",
+                meridian_core::XyzzyAction::ToggleAutoEcm => "Automatic E.C.M. setting saved.",
                 meridian_core::XyzzyAction::MaximumFuelStorage => {
                     "TEST MAX: four fuel tanks fitted, filled and saved."
                 }
@@ -219,6 +221,29 @@ impl Profile {
         self.require_profile()?;
         if !self.playing {
             return Err("N starts a new commander; C continues the existing save".into());
+        }
+        if matches!(action, Action::ActivateEcm) {
+            let tick = self.world.snapshot().tick;
+            let prepared = self
+                .world
+                .prepare_ecm(tick)
+                .map_err(|error| error.to_string())?;
+            let terminated = prepared.terminated();
+            let published = self
+                .store
+                .as_ref()
+                .ok_or("Internal validation has no profile storage")?
+                .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
+                .map_err(|error| format!("E.C.M. activation could not be saved: {error}"))?;
+            prepared.commit();
+            self.has_save = true;
+            self.session.invalidate();
+            return publication_message(
+                published,
+                format!(
+                    "E.C.M. field active; {terminated} standard missiles terminated. Change saved."
+                ),
+            );
         }
         if let Action::Emp(command) = action {
             return self.emp_equipment(command);

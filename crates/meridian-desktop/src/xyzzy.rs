@@ -38,7 +38,9 @@ const ACTIONS: [(XyzzyAction, &str); 5] = [
 ];
 const SHIELD_ACTION: usize = ACTIONS.len();
 const MAX_TANK_ACTION: usize = SHIELD_ACTION + 1;
-const ACTION_COUNT: usize = ACTIONS.len() + 2;
+const ECM_FIT_ACTION: usize = MAX_TANK_ACTION + 1;
+const ECM_AUTO_ACTION: usize = ECM_FIT_ACTION + 1;
+const ACTION_COUNT: usize = ACTIONS.len() + 4;
 
 impl Menu {
     pub fn action(&self) -> XyzzyAction {
@@ -46,6 +48,10 @@ impl Menu {
             XyzzyAction::FitShield(ShieldGrade::ALL[self.shield_index])
         } else if self.selected == MAX_TANK_ACTION {
             XyzzyAction::MaximumFuelStorage
+        } else if self.selected == ECM_FIT_ACTION {
+            XyzzyAction::FitEcm
+        } else if self.selected == ECM_AUTO_ACTION {
+            XyzzyAction::ToggleAutoEcm
         } else {
             ACTIONS[self.selected].0
         }
@@ -106,6 +112,27 @@ impl Menu {
                 " "
             }
         ));
+        lines.push(format!(
+            "{} Fit E.C.M. only",
+            if self.selected == ECM_FIT_ACTION {
+                ">"
+            } else {
+                " "
+            }
+        ));
+        lines.push(format!(
+            "{} Toggle automatic E.C.M. ({})",
+            if self.selected == ECM_AUTO_ACTION {
+                ">"
+            } else {
+                " "
+            },
+            if snapshot.is_some_and(|s| s.automatic_ecm) {
+                "ON"
+            } else {
+                "OFF"
+            }
+        ));
         if let Some(combat) = world.combat_snapshot() {
             lines.push(format!(
                 "Fitted shield: {}",
@@ -132,6 +159,12 @@ impl Menu {
                 }
                 XyzzyAction::FitFuelScoops => {
                     "Fits only an eligible scoop in a free ordinary mount; no refuel."
+                }
+                XyzzyAction::FitEcm => {
+                    "Fits only stock E.C.M. in a free ordinary mount; no refuel."
+                }
+                XyzzyAction::ToggleAutoEcm => {
+                    "Save automatic intent; incoming NPC missiles are not yet supported."
                 }
                 XyzzyAction::MaximumFuelStorage => {
                     "Test-only 4 tanks; exceeds normal mounts. No active custody."
@@ -163,17 +196,16 @@ impl Menu {
         Panel {
             title: "XYZZY testing help".into(),
             lines: [
-                "Up / Down selects an action; Enter reviews, then Enter confirms",
+                "Up / Down chooses; Enter reviews, then confirms; choose again after save",
                 "Escape / B cancels a review, then closes this testing menu",
                 "Actions publish the exact save before replacing the live commander",
                 "First activation names CLARKE and SETS cash to 1,000,000 CR once",
                 "Activation fits maximum compatible equipment at any station berth",
-                "Test shield: choose the row, then Left / Right selects one grade",
-                "Test shield fits only that grade, without a paid or earned receipt",
+                "Test shield: Left / Right chooses one grade; no paid or earned receipt",
                 "TEST MAX fits 4 tanks beyond normal SH025 mounts; no active custody",
                 "Store test tanks to meet ordinary fitting limits before contracts",
-                "Limited outfits keep fitted tanks; optional utilities use free mounts",
-                "After confirmation you can choose another action here",
+                "Limited outfits keep tanks; E.C.M. needs a free mount or an existing fit",
+                "Auto E.C.M. setting only; incoming NPC missiles remain unavailable",
                 "Fuel mode is accounted separately; paid transactions still charge",
                 "Missiles and cargo remain finite; full original parity is incomplete",
                 "Close this menu first: 1 Galaxy | 2 System | 3 Showroom",
@@ -185,5 +217,26 @@ impl Menu {
             .collect(),
             footer: "Escape / H / ? Close help",
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn ecm_help_keeps_all_controls_and_footer_with_audio_line() {
+        let panel = super::Menu::default().help();
+        assert!(panel.lines.len() + 3 <= crate::help::MAX_LINES);
+        assert!(
+            panel
+                .lines
+                .iter()
+                .all(|line| line.len() <= crate::help::MAX_COLUMNS)
+        );
+        assert!(
+            panel
+                .lines
+                .iter()
+                .any(|line| line.contains("incoming NPC missiles"))
+        );
     }
 }

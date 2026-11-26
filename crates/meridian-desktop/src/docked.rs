@@ -675,6 +675,19 @@ fn equipment_action(
     {
         return Err("Owned fuel storage selection changed".into());
     }
+    let ecm_node = node == ModuleKind::Ecm.node();
+    if ecm_node != (slot == "utility-ecm") {
+        return Err("Select the E.C.M. utility slot".into());
+    }
+    if ecm_node
+        && operation != Buy
+        && !modules
+            .items
+            .iter()
+            .any(|owned| Some(owned.id) == instance && owned.kind == ModuleKind::Ecm)
+    {
+        return Err("Owned E.C.M. selection changed".into());
+    }
     if targeting_node
         && operation != Buy
         && !modules
@@ -761,6 +774,7 @@ fn module_rows(
         ModuleSlot::MiningTargeting => "Mining targeting",
         ModuleSlot::SalvageTargeting => "Salvage targeting",
         ModuleSlot::UtilityFuelScoops => "Fuel Scoops",
+        ModuleSlot::UtilityEcm => "E.C.M. utility",
         ModuleSlot::FuelStorage(_) => "Fuel storage",
         ModuleSlot::PassengerCabin => "Passenger cabins",
     };
@@ -825,6 +839,10 @@ fn module_rows(
                         .push(format!("Private reservation: {}", person.name));
                 }
             }
+        } else if item.kind == ModuleKind::Ecm {
+            row.compatibility = "Unique SH025 utility; 1 shared mount and 1 equipment unit".into();
+            row.readout
+                .push("K: activate E.C.M. in flight | Requires more than 22 energy".into());
         } else if let ModuleKind::Shield(grade) = item.kind {
             row.compatibility = "Owned SH025 shield module; one fitted shield required".into();
             row.readout.push(format!(
@@ -942,6 +960,13 @@ fn module_rows(
                     "Stasis only"
                 }
             ));
+        }
+        if offer.kind == ModuleKind::Ecm {
+            row.readout
+                .push("Unique utility; 1 shared mount | E.C.M. is distinct from EMP".into());
+            row.readout.push(
+                "Manual field ends owned standard missiles; incoming NPC defence open".into(),
+            );
         }
         let action = if offer.kind == ModuleKind::MiningLaser {
             ModuleAction::PurchaseMiningLaser
@@ -1200,6 +1225,17 @@ fn equipment_panel(
         ),
         available: true,
     });
+    slots.push(ui::EquipmentSlot {
+        id: "utility-ecm".into(),
+        label: "E.C.M. utility".into(),
+        fitted: modules
+            .items
+            .iter()
+            .find(|item| item.slot == Some(ModuleSlot::UtilityEcm))
+            .map_or("Empty", |item| item.kind.name())
+            .into(),
+        available: true,
+    });
     let mut rows = Vec::new();
     let module_slot = match selected {
         "front-laser" => Some(ModuleSlot::FrontLaser),
@@ -1209,6 +1245,7 @@ fn equipment_panel(
         "shield" => Some(ModuleSlot::Shield),
         "fuel-storage" => Some(ModuleSlot::FuelStorage(0)),
         "passenger-cabins" => Some(ModuleSlot::PassengerCabin),
+        "utility-ecm" => Some(ModuleSlot::UtilityEcm),
         "targeting" => Some(ModuleSlot::Targeting),
         "targeting-mining" => Some(ModuleSlot::MiningTargeting),
         "targeting-salvage" => Some(ModuleSlot::SalvageTargeting),
@@ -2068,7 +2105,7 @@ mod tests {
     fn front_module_rows_and_pylon_slots_use_real_owned_instances_and_admission() {
         let (_directory, profile, _menu) = start();
         let panel = ok(equipment_panel(&profile.world, "front-laser", ""));
-        assert_eq!(panel.slots.len(), 23);
+        assert_eq!(panel.slots.len(), 24);
         let actual: Vec<_> = panel.slots.iter().map(|slot| slot.id.as_str()).collect();
         assert_eq!(
             actual,
@@ -2095,7 +2132,8 @@ mod tests {
                 "targeting",
                 "targeting-mining",
                 "targeting-salvage",
-                "fuel-storage"
+                "fuel-storage",
+                "utility-ecm"
             ]
         );
         let emp = panel
@@ -2150,6 +2188,62 @@ mod tests {
                 .count(),
             3
         );
+    }
+
+    #[test]
+    fn stock_ecm_real_slot_exposes_paid_offer_then_retains_owned_fit_across_publications() {
+        use ui::EquipmentOperation::{Buy, Fit, Store};
+        let (directory, mut profile, _menu) = start();
+        let slot = "utility-ecm";
+        let node = ModuleKind::Ecm.node();
+        let panel = ok(equipment_panel(&profile.world, slot, ""));
+        let offer = panel
+            .rows
+            .iter()
+            .find(|r| r.node == node)
+            .unwrap_or_else(|| panic!("ECM offer"));
+        assert_eq!(offer.price_tenths, Some(21_000));
+        assert!(!offer.can_buy);
+        assert!(equipment_action(&profile.world, node, None, "energy", Buy).is_err());
+        ok(profile.xyzzy(meridian_core::XyzzyAction::Enter));
+        let scoop = profile
+            .world
+            .fitted_fuel_scoops()
+            .unwrap_or_else(|| panic!("scoop"));
+        ok(profile.command(Action::Module(ModuleAction::Store { item: scoop.item })));
+        let cash = profile
+            .world
+            .credits_tenths()
+            .unwrap_or_else(|| panic!("cash"));
+        let action = ok(equipment_action(&profile.world, node, None, slot, Buy));
+        ok(profile.command(action));
+        let item = profile
+            .world
+            .fitted_ecm()
+            .unwrap_or_else(|| panic!("fitted ECM"));
+        assert_eq!(profile.world.credits_tenths(), Some(cash - 21_000));
+        let action = ok(equipment_action(
+            &profile.world,
+            node,
+            Some(item.id),
+            slot,
+            Store,
+        ));
+        ok(profile.command(action));
+        assert!(profile.world.fitted_ecm().is_none());
+        let action = ok(equipment_action(
+            &profile.world,
+            node,
+            Some(item.id),
+            slot,
+            Fit,
+        ));
+        ok(profile.command(action));
+        let cold = ok(World::from_save_bytes(&ok(std::fs::read(
+            directory.0.join("commander.meridian"),
+        ))));
+        assert_eq!(cold.fitted_ecm(), Some(item));
+        assert_eq!(cold.credits_tenths(), Some(cash - 21_000));
     }
 
     #[test]

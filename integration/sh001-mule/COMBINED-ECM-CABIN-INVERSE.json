@@ -1,0 +1,836 @@
+{
+  "base": "c55c36b2fbbc4c242d9a9c16df6c5a3d05b95a85",
+  "files": {
+    "flight.rs": {
+      "beforeSHA256": "457d9cdbf01becac6ee550428792d282267a1c6aff864a3f6caefe85d3305c3a",
+      "afterSHA256": "90c8193d20dd748b5af6233a6772357c8e4231145b668ff3d6541b4e989e0aed",
+      "hunks": [
+        {
+          "offset": 219,
+          "before": "",
+          "after": "};\nmod ecm;\npub use ecm::{\n    ECM_ENERGY_HUNDREDTHS, ECM_FIELD_TICKS, EcmActivation, EcmError, EcmSnapshot, EcmTermination,\n    EcmTrigger, PreparedEcm,\n"
+        },
+        {
+          "offset": 8261,
+          "before": "",
+          "after": "    ecm: ecm::State,\n"
+        },
+        {
+          "offset": 10094,
+          "before": "",
+          "after": "            ecm: ecm::State::default(),\n"
+        },
+        {
+          "offset": 16483,
+          "before": "",
+          "after": "        let owner = self.combat_identity().ok_or(NavigationError::WrongMode)?;\n        let tick = self.state.tick;\n        let clock = self.combat.physical_tick();\n        let ecm_start = ledger.fitted(ModuleSlot::UtilityEcm).is_some().then(|| {\n            crate::navigation::EcmJumpStart {\n                source: owner.system,\n                destination: target,\n                visit: owner.visit,\n                tick,\n                clock,\n                spool: drive.1.spool_ticks(),\n                before_activation: self.ecm.preceding_activation(owner, tick, clock),\n            }\n        });\n        let journal_growth = if ecm_start.is_some() {\n            self.jump_journal\n                .ecm_start_growth()\n                .ok_or(NavigationError::SequenceExhausted)?\n        } else {\n            0\n        };\n        let ecm = self\n            .ecm\n            .prepare_departure(owner, ecm_start)\n            .map_err(|_| NavigationError::SequenceExhausted)?;\n        self.check_ecm_command_capacity(&ecm, Some(navigation), journal_growth)\n            .map_err(|_| NavigationError::SequenceExhausted)?;\n        if let Some(start) = ecm_start {\n            self.jump_journal.append_ecm_start(start);\n        }\n"
+        },
+        {
+          "offset": 17756,
+          "before": "",
+          "after": "        self.ecm = ecm;\n"
+        },
+        {
+          "offset": 22091,
+          "before": "",
+          "after": "        let ecm = self\n            .ecm\n            .prepare_launch(self, navigation)\n            .map_err(|_| StepError::TickOverflow)?;\n        self.check_ecm_command_capacity(&ecm, navigation, 0)\n            .map_err(|_| StepError::TickOverflow)?;\n"
+        },
+        {
+          "offset": 22527,
+          "before": "",
+          "after": "        self.ecm = ecm;\n"
+        },
+        {
+          "offset": 35218,
+          "before": "        let damage =\n            self.damage\n                .step(self.state.mode, next.mode, prepared.combat.physical_tick())?;\n",
+          "after": "        let cancelled_ecm_jump = entry\n            && self\n                .navigation\n                .is_some_and(|n| n.snapshot(0).travel.is_some())\n            && self.fitted_ecm().is_some();\n        let ecm_launch_admitted = self.state.mode == FlightMode::Launching\n            && next.mode == FlightMode::Flight\n            && self.fitted_ecm().is_some();\n        let damage = self.damage.step(\n            self.state.mode,\n            next.mode,\n            prepared.combat.physical_tick(),\n            cancelled_ecm_jump,\n            ecm_launch_admitted,\n        )?;\n"
+        },
+        {
+          "offset": 37723,
+          "before": "",
+          "after": "        let ecm = self\n            .ecm\n            .prepare_step(\n                self,\n                next,\n                navigation,\n                prepared.combat.physical_tick(),\n                motion,\n            )\n            .map_err(|_| StepError::TickOverflow)?;\n"
+        },
+        {
+          "offset": 38350,
+          "before": "            (&damage, &mining, &emp.state),\n",
+          "after": "            (&damage, &mining, &emp.state, &ecm),\n"
+        },
+        {
+          "offset": 39602,
+          "before": "",
+          "after": "        self.ecm = ecm;\n"
+        }
+      ]
+    },
+    "flight/damage.rs": {
+      "beforeSHA256": "4dc1b948a8dc704c315aac0f8be2642c1828ac41415062087058cdc4cb85c2ae",
+      "afterSHA256": "f70da0bf0dafe537f579d62b9551dc2d4035042e1dac843a4ca7d8e9c02ec799",
+      "hunks": [
+        {
+          "offset": 637,
+          "before": "",
+          "after": "    EcmCancelledBerth,\n    EcmLocalFlight,\n"
+        },
+        {
+          "offset": 741,
+          "before": "",
+          "after": "}\nimpl Kind {\n    fn is_berth(self) -> bool {\n        matches!(self, Self::Berth | Self::EcmCancelledBerth)\n    }\n"
+        },
+        {
+          "offset": 2867,
+          "before": "        self.events\n            .iter()\n            .all(|event| event.kind == Kind::Berth || event.clock <= through)\n",
+          "after": "        self.events.iter().all(|event| {\n            event.kind.is_berth() || event.kind == Kind::EcmLocalFlight || event.clock <= through\n        })\n"
+        },
+        {
+          "offset": 3259,
+          "before": "            .filter(|event| event.kind == Kind::Berth)\n",
+          "after": "            .filter(|event| event.kind.is_berth())\n"
+        },
+        {
+          "offset": 3414,
+          "before": "",
+          "after": "    }\n    pub(super) fn cancelled_ecm_berths(&self) -> impl Iterator<Item = (u64, u64)> + '_ {\n        self.events\n            .iter()\n            .filter(|e| e.kind.is_berth())\n            .enumerate()\n            .filter(|(_, e)| e.kind == Kind::EcmCancelledBerth)\n            .map(|(index, e)| (index as u64 + 2, e.clock))\n    }\n    pub(super) fn ecm_launch_clocks(&self) -> impl Iterator<Item = u64> + '_ {\n        self.events\n            .iter()\n            .filter(|e| e.kind == Kind::EcmLocalFlight)\n            .map(|e| e.clock)\n"
+        },
+        {
+          "offset": 4407,
+          "before": "",
+          "after": "        cancelled_ecm_jump: bool,\n        ecm_launch_admitted: bool,\n"
+        },
+        {
+          "offset": 4584,
+          "before": "            self.append(clock, Kind::Berth)\n",
+          "after": "            self.append(\n                clock,\n                if cancelled_ecm_jump {\n                    Kind::EcmCancelledBerth\n                } else {\n                    Kind::Berth\n                },\n            )\n            .map_err(|()| StepError::TickOverflow)\n        } else if ecm_launch_admitted {\n            self.append(clock, Kind::EcmLocalFlight)\n"
+        },
+        {
+          "offset": 5332,
+          "before": "",
+          "after": "                Kind::EcmCancelledBerth => 7,\n                Kind::EcmLocalFlight => 8,\n"
+        },
+        {
+          "offset": 6053,
+          "before": "",
+          "after": "                7 if version >= 17 => Kind::EcmCancelledBerth,\n                8 if version >= 17 => Kind::EcmLocalFlight,\n"
+        },
+        {
+          "offset": 7045,
+          "before": "",
+          "after": "        let mut previous_launch = false;\n"
+        },
+        {
+          "offset": 7307,
+          "before": "            if event.clock <= prior || event.clock > end {\n",
+          "after": "            if event.clock < prior\n                || event.clock == 0\n                || event.clock > end\n                || (event.clock == prior\n                    && (!previous_launch\n                        || event.kind.is_berth()\n                        || event.kind == Kind::EcmLocalFlight))\n            {\n"
+        },
+        {
+          "offset": 7708,
+          "before": "            if event.kind == Kind::Berth {\n",
+          "after": "            previous_launch = event.kind == Kind::EcmLocalFlight;\n            if previous_launch {\n                continue;\n            }\n            if event.kind.is_berth() {\n"
+        },
+        {
+          "offset": 10130,
+          "before": "",
+          "after": "    /// Cross-check field command boundaries against the independent ordinary\n    /// emission sequence. The electrical replay remains independently testable.\n    pub(super) fn validate_ecm_emissions(&self, world: &World) -> Result<(), SaveError> {\n        let mut spends: Vec<_> = world.missiles.resource_emissions().collect();\n        for &(emission, clock) in &spends {\n            world.ecm.validate_emission(clock, emission)?;\n        }\n        spends.sort_unstable_by_key(|&(emission, _)| emission);\n        let mut missiles = spends.into_iter().peekable();\n        let mut next = 1;\n        for event in self\n            .events\n            .iter()\n            .filter(|event| !event.kind.is_berth() && event.kind != Kind::EcmLocalFlight)\n        {\n            next = merge_missile_emissions(&mut missiles, next, event.clock)?;\n            world.ecm.validate_emission(event.clock, next)?;\n            next += 1;\n        }\n        Ok(())\n    }\n"
+        },
+        {
+          "offset": 11170,
+          "before": "            .filter(|event| event.kind == Kind::Berth)\n",
+          "after": "            .filter(|event| event.kind.is_berth())\n"
+        },
+        {
+          "offset": 14214,
+          "before": "",
+          "after": "        for activation in world.ecm.activations() {\n            // Manual activation belongs after the completed step. There is no\n            // supported incoming NPC projectile producer or automatic receipt yet.\n            events.push((activation.physical_tick, 5, u64::MAX, Effect::Ecm));\n        }\n"
+        },
+        {
+          "offset": 15483,
+          "before": "",
+          "after": "                && world.ecm.is_empty()\n"
+        },
+        {
+          "offset": 15988,
+          "before": "",
+          "after": "    }\n    /// Negative save fixtures can balance the shared pools independently before\n    /// testing another owner. This does not grant a production command.\n    #[cfg(test)]\n    pub(super) fn replayed_pulse_for_test(world: &World) -> Result<PulseResources, SaveError> {\n        let end = world.combat.physical_tick();\n        let dock = world.navigation.ok_or(INVALID)?.dock_sequence();\n        let events = world.damage.resource_events(world, dock)?;\n        Ok(replay(&events, end)?.pulse)\n"
+        },
+        {
+          "offset": 19870,
+          "before": "",
+          "after": "    Ecm,\n"
+        },
+        {
+          "offset": 21540,
+          "before": "",
+          "after": "            Effect::Ecm => {\n                pools.pulse = pools.pulse.prepare_ecm_discharge().map_err(|_| INVALID)?\n            }\n"
+        }
+      ]
+    },
+    "flight/damage/capacity.rs": {
+      "beforeSHA256": "f72c31102e250c0758da9ff22d5b073a553051993ccc1cde4abf4e81740856c9",
+      "afterSHA256": "6775979a7fc221c1f8df17c1e820a360eeea8aaeb23f27375409d0846e15753c",
+      "hunks": [
+        {
+          "offset": 2268,
+          "before": "        resources: (&State, &crate::mining::State, &crate::flight::emp::State),\n",
+          "after": "        resources: (\n            &State,\n            &crate::mining::State,\n            &crate::flight::emp::State,\n            &crate::flight::ecm::State,\n        ),\n"
+        },
+        {
+          "offset": 2517,
+          "before": "        let (damage, mining, emp) = resources;\n",
+          "after": "        let (damage, mining, emp, ecm) = resources;\n"
+        },
+        {
+          "offset": 3510,
+          "before": "",
+          "after": "            && ecm.unchanged_since(&self.ecm)\n"
+        },
+        {
+          "offset": 4493,
+          "before": "",
+          "after": "            .and_then(|n| n.checked_sub(self.ecm.encoded_len()))\n            .and_then(|n| n.checked_add(ecm.encoded_len()))\n"
+        }
+      ]
+    },
+    "flight/emp/replay.rs": {
+      "beforeSHA256": "d8276192e14e2dbc21e1ac3df3ea2e762930e0d11c4477a54c32e8acc6efcf9c",
+      "afterSHA256": "7f87762c7c740e83abeaa4206f7630b2529ebe87d2ea11d24c52e6ea35a50388",
+      "hunks": [
+        {
+          "offset": 368,
+          "before": "",
+          "after": "    Ecm,\n"
+        },
+        {
+          "offset": 577,
+          "before": "",
+          "after": "    fn event(\n        &mut self,\n        clock: u64,\n        change: Change,\n        pulses: &[super::runtime::Pulse],\n        last_special: &mut Option<u64>,\n    ) -> Result<(), SaveError> {\n        match change {\n            Change::Boundary | Change::FinalDeath | Change::Pulse(_) => {\n                if clock == 0 || *last_special == Some(clock) {\n                    return Err(INVALID);\n                }\n                self.advance(clock - 1)?;\n                self.post(clock)?;\n                *last_special = Some(clock);\n                if matches!(change, Change::FinalDeath) && self.fitted {\n                    self.bank_clock = clock;\n                }\n                if let Change::Pulse(index) = change {\n                    self.apply_pulse(pulses, index, clock)?;\n                }\n            }\n            other => {\n                self.advance(clock)?;\n                match other {\n                    Change::Equipment(event) => self.equipment(event)?,\n                    Change::Energy(stage) => self.energy = stage,\n                    Change::Start => self.admission()?,\n                    Change::Ecm if self.meter.disabled_at.is_none() => {}\n                    Change::Ecm => return Err(INVALID),\n                    _ => return Err(INVALID),\n                }\n            }\n        }\n        Ok(())\n    }\n"
+        },
+        {
+          "offset": 6374,
+          "before": "",
+          "after": "        // ECM is a command after the accepted step, including any same-clock\n        // EMP pulse/recovery. Check every historical activation, not only the tail.\n        for activation in world.ecm.activations() {\n            events.push((activation.physical_tick, 4, Change::Ecm));\n        }\n"
+        },
+        {
+          "offset": 7791,
+          "before": "            match change {\n                Change::Boundary | Change::FinalDeath | Change::Pulse(_) => {\n                    if clock == 0 || last_special == Some(clock) {\n                        return Err(INVALID);\n                    }\n                    replay.advance(clock - 1)?;\n                    replay.post(clock)?;\n                    last_special = Some(clock);\n                    if matches!(change, Change::FinalDeath) && replay.fitted {\n                        replay.bank_clock = clock;\n                    }\n                    if let Change::Pulse(index) = change {\n                        replay.apply_pulse(&self.pulses, index, clock)?;\n                    }\n                }\n                other => {\n                    replay.advance(clock)?;\n                    match other {\n                        Change::Equipment(event) => replay.equipment(event)?,\n                        Change::Energy(stage) => replay.energy = stage,\n                        Change::Start => replay.admission()?,\n                        _ => return Err(INVALID),\n                    }\n                }\n            }\n",
+          "after": "            replay.event(clock, change, &self.pulses, &mut last_special)?;\n"
+        },
+        {
+          "offset": 8241,
+          "before": "",
+          "after": "\n/// Isolated numerical fixture uses a real captured pulse identity but supplies\n/// a small, balanced main reserve to exercise the disabling edge deterministically.\n/// It is not a fabricated live encounter or a complete saved World.\n#[cfg(test)]\npub(super) fn verify_ecm_disabled_fixture(\n    mut pulse: super::runtime::Pulse,\n) -> Result<(), SaveError> {\n    let release = pulse.release.physical_tick;\n    let main = 1;\n    let paid = u64::from(policy::PULSE_COST / 4 * 5);\n    let mut replay = Replay {\n        meter: meter::Meter {\n            main,\n            bank: policy::PULSE_COST,\n            generated: u64::from(main) + paid,\n            main_debited: paid,\n            bank_gained: u64::from(policy::PULSE_COST),\n            ..meter::Meter::default()\n        },\n        clock: release - 1,\n        bank_clock: release - 1,\n        present: true,\n        acquired: true,\n        fitted: true,\n        grades: EmpGrades::default(),\n        energy: Some(0),\n    };\n    replay.meter.validate()?;\n    let contact = pulse\n        .contacts\n        .iter_mut()\n        .find(|c| c.victim == scene::Victim::Player)\n        .ok_or(INVALID)?;\n    contact.power_hundredths = 100;\n    pulse.player_shield_absorbed = 0;\n    pulse.player_electrical_drained = main + replay.rate();\n    let pulses = [pulse];\n    let mut special = None;\n    replay.event(release, Change::Pulse(0), &pulses, &mut special)?;\n    assert_eq!(replay.meter.disabled_at, Some(release));\n    assert_eq!(\n        replay.event(release, Change::Ecm, &pulses, &mut special),\n        Err(INVALID)\n    );\n    assert_eq!(\n        replay.event(release + 1, Change::Ecm, &pulses, &mut special),\n        Err(INVALID)\n    );\n    assert_eq!(\n        replay.event(\n            release + policy::RECOVERY_TICKS,\n            Change::Ecm,\n            &pulses,\n            &mut special\n        ),\n        Err(INVALID)\n    );\n    assert_eq!(replay.meter.disabled_at, Some(release));\n    replay.event(\n        release + policy::RECOVERY_TICKS + 1,\n        Change::Ecm,\n        &pulses,\n        &mut special,\n    )?;\n    assert_eq!(replay.meter.disabled_at, None);\n    replay.meter.validate()\n}\n"
+        }
+      ]
+    },
+    "flight/emp/runtime.rs": {
+      "beforeSHA256": "754f048a0fbb59a55822d664192e74ca0c0134b17b1bee14b66f26ec5ce32140",
+      "afterSHA256": "486d998bc2853b073eb51a4fa04a882c8240cef3d348a6114ce04f7591a63e8a",
+      "hunks": [
+        {
+          "offset": 5653,
+          "before": "",
+          "after": "    }\n    pub(in crate::flight) fn cancel_for_ecm(&mut self, clock: u64) {\n        self.cancel(clock);\n        self.held_tick = None;\n"
+        },
+        {
+          "offset": 15459,
+          "before": "",
+          "after": "        if self.ecm_timer().is_some() {\n            return Err(EmpError::Resources);\n        }\n"
+        }
+      ]
+    },
+    "flight/emp/scene.rs": {
+      "beforeSHA256": "30744780d865793a36a7a021ec31b1b1737198be462d586939e048e3f9301660",
+      "afterSHA256": "a605ed41aa4baa6c66d4c5d2efba65f4adef80e6c64a7cfb0fbfb775dbe86b67",
+      "hunks": [
+        {
+          "offset": 10685,
+          "before": "        world\n            .missiles\n            .validate_retained_beam(super::super::missiles::RetainedBeam {\n",
+          "after": "        world.missiles.validate_retained_beam(\n            &world.ecm,\n            super::super::missiles::RetainedBeam {\n"
+        },
+        {
+          "offset": 11080,
+          "before": "",
+          "after": "                ecm_after_scene: true,\n"
+        },
+        {
+          "offset": 11238,
+          "before": "            })?;\n",
+          "after": "            },\n        )?;\n"
+        }
+      ]
+    },
+    "flight/emp/tests.rs": {
+      "beforeSHA256": "e34a283b8bb06bb15ae093478afafd45980119e51e053d728a76485422def96e",
+      "afterSHA256": "a54c4d2586a1bff8bdf24b8ed49759b13bfc3427bf99b9a3585f4f0b292ab6bf",
+      "hunks": [
+        {
+          "offset": 24919,
+          "before": "",
+          "after": "        ecm: w.ecm.clone(),\n"
+        },
+        {
+          "offset": 26620,
+          "before": "",
+          "after": "    super::replay::verify_ecm_disabled_fixture(w.emp.pulses[0].clone()).unwrap();\n"
+        },
+        {
+          "offset": 40878,
+          "before": "",
+          "after": "\n#[test]\nfn real_manual_ecm_cancels_an_unfinished_emp_without_a_discharge_and_cold_retains_field() {\n    let mut w = World::new_commander(12001).unwrap();\n    secret(&mut w);\n    let scoop = w.fitted_fuel_scoops().unwrap();\n    let tick = w.snapshot().tick;\n    let review = w\n        .review_module(crate::ModuleAction::Store { item: scoop.item }, tick)\n        .unwrap();\n    w.prepare_module(review, tick).unwrap().commit();\n    let review = w.review_xyzzy(XyzzyAction::FitEcm, tick).unwrap();\n    w.prepare_xyzzy(review, tick).unwrap().commit();\n    let (mut w, target) = defender(w);\n    start_charge(&mut w, target);\n    let tick = w.snapshot().tick;\n    let before = w.flight_resources_snapshot().unwrap();\n    let activation = w.request_ecm(tick).unwrap();\n    let after = w.flight_resources_snapshot().unwrap();\n    assert_eq!(after.energy_hundredths, before.energy_hundredths - 2200);\n    assert_eq!(\n        w.emp.charge.as_ref().unwrap().phase,\n        EmpChargePhase::Cancelled\n    );\n    assert_eq!(\n        w.emp.charge.as_ref().unwrap().ended_at,\n        Some(activation.physical_tick)\n    );\n    assert_eq!(w.emp.meter.bank_spent, 0);\n    assert!(w.emp.pulses.is_empty());\n    assert_eq!(w.request_emp_trigger(true, tick), Err(EmpError::Resources));\n    let mut loaded = cold(&w);\n    let mut expected = w.ecm_snapshot().unwrap();\n    expected.active = None;\n    assert_eq!(loaded.ecm_snapshot(), Some(expected));\n    loaded.emp.charge.as_mut().unwrap().phase = EmpChargePhase::Charging;\n    loaded.emp.charge.as_mut().unwrap().ended_at = None;\n    assert!(loaded.save_bytes().is_err());\n}\n"
+        }
+      ]
+    },
+    "flight/emp/validation.rs": {
+      "beforeSHA256": "2d005616d4689727d27b859967d91757db6bdee86c06183e3ef35ccda35cb411",
+      "afterSHA256": "7fd4526c6dbf9d210ed92271ca21a0bdd292ded7f76f38730abf21a147777ab4",
+      "hunks": [
+        {
+          "offset": 2160,
+          "before": "",
+          "after": "        let begin = charge.start.physical_tick;\n        let end = charge.ended_at.unwrap_or(self.meter_clock);\n"
+        },
+        {
+          "offset": 2307,
+          "before": "",
+          "after": "            || world.ecm.activations().iter().any(|activation| {\n                let clock = activation.physical_tick;\n                activation.owner == charge.start.owner\n                    && if clock < begin {\n                        begin < clock.saturating_add(crate::ECM_FIELD_TICKS)\n                    } else {\n                        clock < end || (clock == end && charge.phase == EmpChargePhase::Charging)\n                    }\n            })\n"
+        },
+        {
+          "offset": 14963,
+          "before": "            .filter(|i| i.slot == Some(super::super::ModuleSlot::UtilityFuelScoops))\n",
+          "after": "            .filter(|i| {\n                matches!(\n                    i.slot,\n                    Some(\n                        super::super::ModuleSlot::UtilityFuelScoops\n                            | super::super::ModuleSlot::UtilityEcm\n                    )\n                )\n            })\n"
+        }
+      ]
+    },
+    "flight/mining/persistence.rs": {
+      "beforeSHA256": "6d190da318e7fc70ebb5e6220a03674782e1a9c9666fbba24cd5b5d6e444af98",
+      "afterSHA256": "ead28490b90682e5d10eaafa9144b3225dd21337048e2dd09112109384d65e3b",
+      "hunks": [
+        {
+          "offset": 4310,
+          "before": "            self.missiles\n                .validate_retained_beam(super::super::missiles::RetainedBeam {\n",
+          "after": "            self.missiles.validate_retained_beam(\n                &self.ecm,\n                super::super::missiles::RetainedBeam {\n"
+        },
+        {
+          "offset": 4692,
+          "before": "",
+          "after": "                    ecm_after_scene: false,\n"
+        },
+        {
+          "offset": 4860,
+          "before": "                })?;\n",
+          "after": "                },\n            )?;\n"
+        }
+      ]
+    },
+    "flight/missiles.rs": {
+      "beforeSHA256": "76cac162e90f836db4d486bb98fc4750cfca3d5071e3075b146d8d4282501013",
+      "afterSHA256": "c704fc62602fbdbd21dbe1cb205ae0e9ba490b879804a6483777cf19acdd99a9",
+      "hunks": [
+        {
+          "offset": 506,
+          "before": "",
+          "after": "    /// EMP scene (start/release) or a physical step precedes a same-clock manual ECM.\n    pub(super) ecm_after_scene: bool,\n"
+        },
+        {
+          "offset": 3530,
+          "before": "",
+          "after": "    Ecm,\n"
+        },
+        {
+          "offset": 19125,
+          "before": "",
+          "after": "        let old_ecm = self.ecm.clone();\n"
+        },
+        {
+          "offset": 19454,
+          "before": "",
+          "after": "        let terminated = self.ecm.terminate_live(\n            &mut self.missiles,\n            owner,\n            tick,\n            origin.physical_tick,\n            emission,\n        );\n"
+        },
+        {
+          "offset": 19806,
+          "before": "        if self.save_bytes().is_err() {\n",
+          "after": "        if terminated.is_err() || self.save_bytes().is_err() {\n"
+        },
+        {
+          "offset": 20041,
+          "before": "",
+          "after": "            self.ecm = old_ecm;\n"
+        }
+      ]
+    },
+    "flight/missiles/npc.rs": {
+      "beforeSHA256": "4b84bc2f8c95e68520e38a1c8bd94a4fdd7fbd5cf3a2900de314b3a11e0d753a",
+      "afterSHA256": "14831f769de994c1ba853886e31b90db310240f58e17b900aa1108acbf60c345",
+      "hunks": [
+        {
+          "offset": 12252,
+          "before": "",
+          "after": "            Some(MissileEnd::Ecm) => {\n                if p.last_tick != motion_tick\n                    || p.propulsion_travel >= MISSILE_RANGE\n                    || p.age_ticks >= super::MISSILE_LIFETIME_TICKS\n                    || world.ecm.termination(p.origin.projectile).is_none()\n                {\n                    return Err(INVALID);\n                }\n            }\n"
+        }
+      ]
+    },
+    "flight/missiles/persistence.rs": {
+      "beforeSHA256": "db367137c9aff9025f2c962edb8708695be2bf4c56d96ebc932bf9c5da3feb40",
+      "afterSHA256": "2e718d247213f6781d000647881db3ff8e5874f4a9b81ca270d3b3a8e8f80cd2",
+      "hunks": [
+        {
+          "offset": 6513,
+          "before": "",
+          "after": "        MissileEnd::Ecm => 6,\n"
+        },
+        {
+          "offset": 6863,
+          "before": "",
+          "after": "        6 => MissileEnd::Ecm,\n"
+        },
+        {
+          "offset": 8223,
+          "before": "",
+          "after": "        ecm: &super::super::ecm::State,\n"
+        },
+        {
+          "offset": 8340,
+          "before": "        self.validate_retained_beam(super::RetainedBeam {\n            system: hit.attacker.system(),\n            visit: hit.visit,\n            world_tick: hit.world_tick,\n            physical_tick: hit.physical_tick,\n            command_emission: None,\n            ray: hit.source_pose,\n            point: hit.point,\n            bodies: &hit.missiles,\n        })\n",
+          "after": "        self.validate_retained_beam(\n            ecm,\n            super::RetainedBeam {\n                system: hit.attacker.system(),\n                visit: hit.visit,\n                world_tick: hit.world_tick,\n                physical_tick: hit.physical_tick,\n                command_emission: None,\n                ecm_after_scene: true,\n                ray: hit.source_pose,\n                point: hit.point,\n                bodies: &hit.missiles,\n            },\n        )\n"
+        },
+        {
+          "offset": 8892,
+          "before": "",
+          "after": "        ecm: &super::super::ecm::State,\n"
+        },
+        {
+          "offset": 9566,
+          "before": "",
+          "after": "                        || (p.ended == Some(MissileEnd::Ecm)\n                            && p.last_tick == hit.world_tick\n                            && (hit.ecm_after_scene\n                                || hit.command_emission.is_some_and(|emission| {\n                                    ecm.termination(p.origin.projectile)\n                                        .is_some_and(|end| end.after_emission >= emission)\n                                })))\n"
+        },
+        {
+          "offset": 30900,
+          "before": "",
+          "after": "            Some(MissileEnd::Ecm) => {\n                if p.propulsion_travel >= MISSILE_RANGE\n                    || p.age_ticks >= MISSILE_LIFETIME_TICKS\n                    || world.ecm.termination(p.origin.projectile).is_none()\n                {\n                    return Err(INVALID);\n                }\n            }\n"
+        },
+        {
+          "offset": 44845,
+          "before": "",
+          "after": "                // All physical motion precedes an accepted manual ECM command\n                // at this same World clock.\n                Some(MissileEnd::Ecm) => true,\n"
+        },
+        {
+          "offset": 48486,
+          "before": "            self.validate_intercepted_bodies(b, p, i, emission, (ray, d, id))?;\n",
+          "after": "            self.validate_intercepted_bodies(&world.ecm, b, p, i, emission, (ray, d, id))?;\n"
+        },
+        {
+          "offset": 50430,
+          "before": "",
+          "after": "        ecm: &super::super::ecm::State,\n"
+        },
+        {
+          "offset": 50674,
+          "before": "",
+          "after": "        let live_before = |other: ProjectileSnapshot| {\n            other.ended.is_none()\n                || other.last_tick > shot.tick\n                || (other.ended == Some(MissileEnd::Ecm)\n                    && other.last_tick == shot.tick\n                    && ecm\n                        .termination(other.origin.projectile)\n                        .is_some_and(|end| end.after_emission >= emission))\n        };\n"
+        },
+        {
+          "offset": 51174,
+          "before": "            if other.origin.emission < emission\n                && (other.ended.is_none() || other.last_tick > shot.tick)\n            {\n",
+          "after": "            if other.origin.emission < emission && live_before(*other) {\n"
+        },
+        {
+          "offset": 51447,
+          "before": "                other.origin.emission < emission\n                    && (slot == i || other.ended.is_none() || other.last_tick > shot.tick)\n",
+          "after": "                other.origin.emission < emission && (slot == i || live_before(other))\n"
+        }
+      ]
+    },
+    "flight/modular.rs": {
+      "beforeSHA256": "e20dae03b66bf22f516fbb640fdf9b351622be7f24e33de6337d783780a5f01e",
+      "afterSHA256": "ec44d8deb772ebeff694585815ed10bf0277ed94c16bb32191d1d6e96c9ae0cf",
+      "hunks": [
+        {
+          "offset": 1226,
+          "before": "",
+          "after": "    Ecm,\n"
+        },
+        {
+          "offset": 1774,
+          "before": "",
+          "after": "            Self::Ecm => \"utility-ecm\",\n"
+        },
+        {
+          "offset": 3499,
+          "before": "",
+          "after": "            Self::Ecm => \"E.C.M. System\",\n"
+        },
+        {
+          "offset": 5592,
+          "before": "",
+          "after": "            Self::Ecm => ModuleSlot::UtilityEcm,\n"
+        },
+        {
+          "offset": 7123,
+          "before": "",
+          "after": "                | Self::Ecm\n"
+        },
+        {
+          "offset": 7924,
+          "before": "            Self::FuelStorage => 1,\n",
+          "after": "            Self::FuelStorage | Self::Ecm => 1,\n"
+        },
+        {
+          "offset": 8246,
+          "before": "",
+          "after": "            Self::Ecm => Some((21_000, 5)),\n"
+        },
+        {
+          "offset": 11923,
+          "before": "",
+          "after": "            Self::Ecm => 32,\n"
+        },
+        {
+          "offset": 13120,
+          "before": "",
+          "after": "            32 => Ok(Self::Ecm),\n"
+        },
+        {
+          "offset": 13419,
+          "before": "",
+          "after": "    UtilityEcm,\n"
+        },
+        {
+          "offset": 20246,
+          "before": "    fn fitted(&self, slot: ModuleSlot) -> Option<OwnedModule> {\n",
+          "after": "    pub(super) fn fitted(&self, slot: ModuleSlot) -> Option<OwnedModule> {\n"
+        },
+        {
+          "offset": 37942,
+          "before": "",
+          "after": "                    ModuleKind::Ecm => world.xyzzy.authorizes_ecm(e.dock, e.tick, e.revision),\n"
+        },
+        {
+          "offset": 41338,
+          "before": "",
+          "after": "                        + u16::from(ledger.fitted(ModuleSlot::UtilityEcm).is_some())\n"
+        },
+        {
+          "offset": 45774,
+          "before": "    pub(super) fn validate_scoop_test_record(\n",
+          "after": "    pub(super) fn ecm_item_at(&self, owner: u64, tick: u64, visit: u64) -> Option<OwnedModule> {\n        self.ledger_at(owner, tick, visit)?\n            .fitted(ModuleSlot::UtilityEcm)\n    }\n    pub(super) fn drive_at_visit(&self, owner: u64, tick: u64, visit: u64) -> Option<DriveGrade> {\n        self.ledger_at(owner, tick, visit)?\n            .drive()\n            .map(|(_, grade)| grade)\n    }\n    pub(super) fn validate_utility_test_record(\n"
+        },
+        {
+          "offset": 46362,
+          "before": "",
+          "after": "        kind: ModuleKind,\n"
+        },
+        {
+          "offset": 46854,
+          "before": "        let before = fit_at(start)?.fitted(ModuleSlot::UtilityFuelScoops);\n",
+          "after": "        let slot = kind.slot();\n        let before = fit_at(start)?.fitted(slot);\n"
+        },
+        {
+          "offset": 46977,
+          "before": "        let after = after_ledger\n            .fitted(ModuleSlot::UtilityFuelScoops)\n            .ok_or(INVALID)?;\n",
+          "after": "        let after = after_ledger.fitted(slot).ok_or(INVALID)?;\n"
+        },
+        {
+          "offset": 47667,
+          "before": "            + 1\n",
+          "after": "            + u16::from(after_ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())\n            + u16::from(after_ledger.fitted(ModuleSlot::UtilityEcm).is_some())\n"
+        },
+        {
+          "offset": 48159,
+          "before": "            ModuleAction::Purchase {\n                kind: ModuleKind::FuelScoops,\n            } if event.xyzzy => Ok(()),\n",
+          "after": "            ModuleAction::Purchase { kind: purchased } if event.xyzzy && purchased == kind => {\n                Ok(())\n            }\n"
+        },
+        {
+          "offset": 55393,
+          "before": "",
+          "after": "            ModuleKind::Ecm,\n"
+        },
+        {
+          "offset": 62126,
+          "before": "",
+          "after": "            )));\n        }\n        if action.purchase_kind() == Some(ModuleKind::Ecm) && !self.damage.enabled() {\n            return Err(ModuleError::Save(SaveError::InvalidState(\n                \"ECM fitting requires resource birth provenance\",\n"
+        }
+      ]
+    },
+    "flight/modular/scoops.rs": {
+      "beforeSHA256": "91a34dc7d3d4289a70fe995ecff90af52e950d5415aba0b34ea71a30fdfe9e5e",
+      "afterSHA256": "c5176dd7df6d8709283e34d9a499166d4939128cc1e77a05aef70b8a334b42a0",
+      "hunks": [
+        {
+          "offset": 1076,
+          "before": "    /// Actual implemented cargo-expansion and scoop mounts; other utility families are absent.\n",
+          "after": "    /// All fitted utilities sharing this hull's mount budget.\n"
+        },
+        {
+          "offset": 2252,
+          "before": "                Some(ModuleSlot::UtilityFuelScoops | ModuleSlot::FuelStorage(_))\n",
+          "after": "                Some(\n                    ModuleSlot::UtilityFuelScoops\n                        | ModuleSlot::UtilityEcm\n                        | ModuleSlot::FuelStorage(_)\n                )\n"
+        }
+      ]
+    },
+    "flight/persistence.rs": {
+      "beforeSHA256": "07e3f9710b0862c593adf429ddb6f5aa07a758d6d6feb3a42f5480cd80e5618a",
+      "afterSHA256": "a2cfdc95b51dbe5df8cca58937b49fa7c415288d12bb885a5c8172acfae5e1a9",
+      "hunks": [
+        {
+          "offset": 959,
+          "before": "",
+          "after": "const ECM_EXTENSION: &[u8; 8] = b\"MECM0002\";\nconst ECM_FIELD_EXTENSION: &[u8; 8] = b\"MECM0003\";\n"
+        },
+        {
+          "offset": 3636,
+          "before": "",
+          "after": "    checksum(&bytes)\n}\nfn ecm_content_fingerprint(base: u64, field: bool) -> u64 {\n    let mut bytes = base.to_le_bytes().to_vec();\n    bytes.extend(if field {\n        b\"stock-ecm-history/v3-local-field\".as_slice()\n    } else {\n        b\"stock-ecm-history/v2-local-flight\".as_slice()\n    });\n"
+        },
+        {
+          "offset": 12991,
+          "before": "        w.u64(if self.solar.legacy_header() {\n",
+          "after": "        let base_fingerprint = if self.solar.legacy_header() {\n"
+        },
+        {
+          "offset": 13183,
+          "before": "",
+          "after": "        };\n        w.u64(if self.ecm.is_empty() {\n            base_fingerprint\n        } else {\n            ecm_content_fingerprint(base_fingerprint, self.ecm.has_field_history())\n"
+        },
+        {
+          "offset": 14881,
+          "before": "",
+          "after": "        if !self.ecm.is_empty() {\n            w.bytes.extend(if self.ecm.has_field_history() {\n                ECM_FIELD_EXTENSION\n            } else {\n                ECM_EXTENSION\n            });\n            self.ecm.encode(&mut w);\n        }\n"
+        },
+        {
+          "offset": 15868,
+          "before": "",
+          "after": "        candidate.close_restored_ecm();\n"
+        },
+        {
+          "offset": 16336,
+          "before": "",
+          "after": "        candidate.close_restored_ecm();\n"
+        },
+        {
+          "offset": 16745,
+          "before": "",
+          "after": "    }\n\n    fn close_restored_ecm(&mut self) {\n        if self.state.mode == FlightMode::Flight\n            && let Some(owner) = self.combat_identity()\n        {\n            self.ecm.close_restored(\n                owner,\n                self.state.tick,\n                self.combat.physical_tick(),\n                self.combat.emissions,\n            );\n        }\n"
+        },
+        {
+          "offset": 18032,
+          "before": "",
+          "after": "        let (fingerprint, ecm_version) = [\n            compiled_content_fingerprint(CONTENT),\n            solar_content_fingerprint(true),\n            solar_content_fingerprint(false),\n        ]\n        .into_iter()\n        .find_map(|base| {\n            [false, true]\n                .into_iter()\n                .find(|&field| ecm_content_fingerprint(base, field) == fingerprint)\n                .map(|field| (base, Some(field)))\n        })\n        .unwrap_or((fingerprint, None));\n        let ecm_expected = ecm_version.is_some();\n        let ecm_tag = if ecm_version == Some(true) {\n            ECM_FIELD_EXTENSION\n        } else {\n            ECM_EXTENSION\n        };\n"
+        },
+        {
+          "offset": 22026,
+          "before": "",
+          "after": "            ecm: super::ecm::State::default(),\n"
+        },
+        {
+          "offset": 23395,
+          "before": "",
+          "after": "                if let Some(field) = ecm_version {\n                    if r.fixed::<8>()? != *ecm_tag {\n                        return Err(SaveError::InvalidEncoding);\n                    }\n                    candidate.ecm = super::ecm::State::decode(&mut r, field)?;\n                }\n            } else if let Some(field) = ecm_version\n                && tag == *ecm_tag\n            {\n                candidate.ecm = super::ecm::State::decode(&mut r, field)?;\n"
+        },
+        {
+          "offset": 23959,
+          "before": "        if !r.finished() {\n",
+          "after": "        if !r.finished() || ecm_expected == candidate.ecm.is_empty() {\n"
+        },
+        {
+          "offset": 28307,
+          "before": "",
+          "after": "        self.ecm.validate(self, commerce.modular)?;\n"
+        }
+      ]
+    },
+    "flight/traffic.rs": {
+      "beforeSHA256": "db6e9478f4266527723dbffa9b95da543f52bb1c77812cf52cb0db5a20231fd0",
+      "afterSHA256": "6fb44a0b0f2d078323a8645921c289db055cbf5e06e8bd8132523ffa53ee21ad",
+      "hunks": [
+        {
+          "offset": 1554,
+          "before": "            self.missiles.validate_npc_beam_scene(hit)?;\n",
+          "after": "            self.missiles.validate_npc_beam_scene(&self.ecm, hit)?;\n"
+        }
+      ]
+    },
+    "flight/weapons.rs": {
+      "beforeSHA256": "87f2c747dfdb44e1f39d16142273f59cfe18c0cfcf31f8cf98bbb7bc6315d600",
+      "afterSHA256": "635d6d624283c410b5fbcbf24cbe92be1c24abbeccf46649f3537f081077bb65",
+      "hunks": [
+        {
+          "offset": 5789,
+          "before": "",
+          "after": "        })\n    }\n    pub(super) fn prepare_ecm_discharge(self) -> Result<Self, FireError> {\n        if self.energy <= super::ecm::ECM_ENERGY_HUNDREDTHS {\n            return Err(FireError::InsufficientEnergy);\n        }\n        Ok(Self {\n            energy: self.energy - super::ecm::ECM_ENERGY_HUNDREDTHS,\n            ..self\n"
+        }
+      ]
+    },
+    "flight/xyzzy.rs": {
+      "beforeSHA256": "5a040ee9ef58d6b01c8ae9338988c6257c96f285fb69dafb6783cf3558cfcb29",
+      "afterSHA256": "b1da1a8c7a1bc394bde208beee290d567bfd1efcd091429b287de7a23114484c",
+      "hunks": [
+        {
+          "offset": 1063,
+          "before": "",
+          "after": "    FitEcm,\n    ToggleAutoEcm,\n"
+        },
+        {
+          "offset": 1393,
+          "before": "        self.outfit() || matches!(self, Self::FitShield(_) | Self::FitFuelScoops)\n",
+          "after": "        self.outfit()\n            || matches!(\n                self,\n                Self::FitShield(_) | Self::FitFuelScoops | Self::FitEcm\n            )\n"
+        },
+        {
+          "offset": 1597,
+          "before": "        !matches!(self, Self::FitShield(_) | Self::FitFuelScoops) && (self.outfit() || mode)\n",
+          "after": "        !matches!(\n            self,\n            Self::FitShield(_) | Self::FitFuelScoops | Self::FitEcm | Self::ToggleAutoEcm\n        ) && (self.outfit() || mode)\n"
+        },
+        {
+          "offset": 2113,
+          "before": "",
+          "after": "            Self::FitEcm => 13,\n            Self::ToggleAutoEcm => 14,\n"
+        },
+        {
+          "offset": 2619,
+          "before": "",
+          "after": "            13 => Ok(Self::FitEcm),\n            14 => Ok(Self::ToggleAutoEcm),\n"
+        },
+        {
+          "offset": 3585,
+          "before": "",
+          "after": "    pub automatic_ecm: bool,\n"
+        },
+        {
+          "offset": 4573,
+          "before": "",
+          "after": "    }\n    pub(super) fn automatic_ecm(&self) -> bool {\n        self.active()\n            && self\n                .records\n                .iter()\n                .filter(|record| record.action == XyzzyAction::ToggleAutoEcm)\n                .count()\n                .is_multiple_of(2)\n"
+        },
+        {
+          "offset": 6587,
+          "before": "",
+          "after": "    }\n    pub(super) fn authorizes_ecm(&self, dock: DockContext, tick: u64, revision: u64) -> bool {\n        self.records.iter().any(|record| {\n            record.action == XyzzyAction::FitEcm\n                && record.dock == dock\n                && record.tick == tick\n                && revision > record.revision\n                && revision <= record.end_revision\n        })\n"
+        },
+        {
+          "offset": 13666,
+          "before": "            if r.action == XyzzyAction::FitFuelScoops {\n                commerce.modular.validate_scoop_test_record(\n",
+          "after": "            if matches!(r.action, XyzzyAction::FitFuelScoops | XyzzyAction::FitEcm) {\n                commerce.modular.validate_utility_test_record(\n"
+        },
+        {
+          "offset": 13989,
+          "before": "",
+          "after": "                    if r.action == XyzzyAction::FitEcm {\n                        super::ModuleKind::Ecm\n                    } else {\n                        super::ModuleKind::FuelScoops\n                    },\n"
+        },
+        {
+          "offset": 14219,
+          "before": "",
+          "after": "            }\n            if r.action == XyzzyAction::ToggleAutoEcm && r.end_revision != r.revision {\n                return Err(INVALID);\n"
+        },
+        {
+          "offset": 19594,
+          "before": "",
+          "after": "            automatic_ecm: self.xyzzy.automatic_ecm(),\n"
+        },
+        {
+          "offset": 21005,
+          "before": "        if action == XyzzyAction::FitFuelScoops\n            && self.fitted_fuel_scoops().is_none()\n",
+          "after": "        if action == XyzzyAction::MaximumFuelStorage && self.fitted_ecm().is_some() {\n            // The existing four-tank exception reserves three other utility mounts;\n            // it does not grant permission for a fourth non-tank utility.\n            return Err(XyzzyError::UtilityFitConflict);\n        }\n        if action == XyzzyAction::FitEcm && !self.damage.enabled() {\n            return Err(XyzzyError::Save(SaveError::InvalidState(\n                \"ECM fitting requires resource birth provenance\",\n            )));\n        }\n        if ((action == XyzzyAction::FitFuelScoops && self.fitted_fuel_scoops().is_none())\n            || (action == XyzzyAction::FitEcm && self.fitted_ecm().is_none()))\n"
+        },
+        {
+          "offset": 28784,
+          "before": "        } else if review.action == XyzzyAction::FitFuelScoops {\n",
+          "after": "        } else if matches!(\n            review.action,\n            XyzzyAction::FitFuelScoops | XyzzyAction::FitEcm\n        ) {\n"
+        },
+        {
+          "offset": 29007,
+          "before": "                super::modular::ModuleKind::FuelScoops,\n",
+          "after": "                if review.action == XyzzyAction::FitEcm {\n                    super::ModuleKind::Ecm\n                } else {\n                    super::ModuleKind::FuelScoops\n                },\n"
+        }
+      ]
+    },
+    "lib.rs": {
+      "beforeSHA256": "3902f022803de7f58aa2b1cc47ae1a8c7ab324e757b783a37dfb99266680d184",
+      "afterSHA256": "83762b8778ffcde10a9e4693cc5621ec9fe7208f11f40a90828f7d3c02ed8314",
+      "hunks": [
+        {
+          "offset": 993,
+          "before": "",
+          "after": "pub use flight::{\n    ECM_ENERGY_HUNDREDTHS, ECM_FIELD_TICKS, EcmActivation, EcmError, EcmSnapshot, EcmTermination,\n    EcmTrigger, PreparedEcm,\n};\n"
+        }
+      ]
+    },
+    "navigation.rs": {
+      "beforeSHA256": "11745ab22969f49368642386fa9ad2707c0a8506504ec98e503dc12434d2f2ed",
+      "afterSHA256": "779554fcb85b68374e2034b24281b471242b42096610cb0e7357e06f62eb514d",
+      "hunks": [
+        {
+          "offset": 266,
+          "before": "pub(crate) use journal::{CompletedJump, JumpJournal, NavigationFitChange};\n",
+          "after": "pub(crate) use journal::{\n    CompletedJump, EcmJumpStart, JumpJournal, JumpTiming, NavigationFitChange,\n};\n"
+        },
+        {
+          "offset": 16104,
+          "before": "",
+          "after": "    }\n    pub(crate) fn pending_timing(\n        self,\n        tick: u64,\n        clock: u64,\n        drive: DriveGrade,\n    ) -> Result<Option<JumpTiming>, crate::save::SaveError> {\n        let Some(pending) = self.pending else {\n            return Ok(None);\n        };\n        let invalid = crate::save::SaveError::InvalidState(\"pending jump timing\");\n        let remaining = u64::from(pending.remaining_ticks);\n        let duration = u64::from(drive.spool_ticks());\n        if remaining == 0 || remaining > duration {\n            return Err(invalid);\n        }\n        let arrival_tick = tick.checked_add(remaining).ok_or(invalid)?;\n        let arrival_clock = clock.checked_add(remaining).ok_or(invalid)?;\n        Ok(Some(JumpTiming {\n            source: pending.source,\n            destination: pending.destination,\n            visit: pending.source_visit,\n            departure_tick: arrival_tick.checked_sub(duration).ok_or(invalid)?,\n            departure_clock: arrival_clock.checked_sub(duration).ok_or(invalid)?,\n            arrival_tick,\n            arrival_clock,\n            spool: drive.spool_ticks(),\n        }))\n"
+        }
+      ]
+    },
+    "navigation/journal.rs": {
+      "beforeSHA256": "37dfefbdc2473538ed3af3994e0188299bfc3fa8659be41dcdbc2bcf866bfb41",
+      "afterSHA256": "1da2ad0d4712fb6583ee9154648868784a62e9a1029719512d0fcd46200320ed",
+      "hunks": [
+        {
+          "offset": 2801,
+          "before": "",
+          "after": "#[derive(Debug, Clone, Copy, PartialEq, Eq)]\npub(crate) struct JumpTiming {\n    pub(crate) source: SystemId,\n    pub(crate) destination: SystemId,\n    pub(crate) visit: u64,\n    pub(crate) departure_tick: u64,\n    pub(crate) departure_clock: u64,\n    pub(crate) arrival_tick: u64,\n    pub(crate) arrival_clock: u64,\n    pub(crate) spool: u32,\n}\n/// Navigation seals this at its actual accepted command, independently of\n/// the local ECM visit history. It remains even when a physical berth cancels\n/// the spool, so a later receipt cannot move the original departure clock.\n#[derive(Debug, Clone, Copy, PartialEq, Eq)]\npub(crate) struct EcmJumpStart {\n    pub(crate) source: SystemId,\n    pub(crate) destination: SystemId,\n    pub(crate) visit: u64,\n    pub(crate) tick: u64,\n    pub(crate) clock: u64,\n    pub(crate) spool: u32,\n    pub(crate) before_activation: Option<u16>,\n}\nimpl EcmJumpStart {\n    const ENCODED_SIZE: usize = 36;\n    fn encode(self, w: &mut Writer) {\n        write_system(w, self.source);\n        write_system(w, self.destination);\n        w.u64(self.visit);\n        w.u64(self.tick);\n        w.u64(self.clock);\n        w.u32(self.spool);\n        w.u16(self.before_activation.unwrap_or(0));\n    }\n    fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {\n        Ok(Self {\n            source: read_system(r)?,\n            destination: read_system(r)?,\n            visit: r.u64()?,\n            tick: r.u64()?,\n            clock: r.u64()?,\n            spool: r.u32()?,\n            before_activation: match r.u16()? {\n                0 => None,\n                n => Some(n),\n            },\n        })\n    }\n    fn matches(self, timing: JumpTiming) -> bool {\n        self.source == timing.source\n            && self.destination == timing.destination\n            && self.visit == timing.visit\n            && self.tick == timing.departure_tick\n            && self.clock == timing.departure_clock\n            && self.spool == timing.spool\n    }\n}\n"
+        },
+        {
+          "offset": 6559,
+          "before": "",
+          "after": "    ecm_starts: Vec<EcmJumpStart>,\n"
+        },
+        {
+          "offset": 6689,
+          "before": "",
+          "after": "    const MAX_ECM_STARTS: usize = MAX_SAVE_BYTES / EcmJumpStart::ENCODED_SIZE;\n    const ECM_START_FLAG: u16 = 1 << 15;\n"
+        },
+        {
+          "offset": 6994,
+          "before": "",
+          "after": "    pub(crate) fn ecm_starts(&self) -> impl Iterator<Item = EcmJumpStart> + '_ {\n        self.ecm_starts.iter().copied()\n    }\n    pub(crate) fn ecm_start_growth(&self) -> Option<usize> {\n        (self.ecm_starts.len() < Self::MAX_ECM_STARTS)\n            .then_some(EcmJumpStart::ENCODED_SIZE + if self.ecm_starts.is_empty() { 2 } else { 0 })\n    }\n    pub(crate) fn append_ecm_start(&mut self, start: EcmJumpStart) {\n        self.ecm_starts.push(start);\n    }\n    pub(crate) fn completed_timing(&self, visit: u64) -> Result<Option<JumpTiming>, SaveError> {\n        let Some(leg) = self.legs.iter().find(|leg| leg.source_visit == visit) else {\n            return Ok(None);\n        };\n        let spool = leg.drive.spool_ticks();\n        Ok(Some(JumpTiming {\n            source: leg.source,\n            destination: leg.destination,\n            visit,\n            departure_tick: leg\n                .arrival_tick\n                .checked_sub(u64::from(spool))\n                .ok_or(INVALID)?,\n            departure_clock: leg\n                .physical_tick\n                .checked_sub(u64::from(spool))\n                .ok_or(INVALID)?,\n            arrival_tick: leg.arrival_tick,\n            arrival_clock: leg.physical_tick,\n            spool,\n        }))\n    }\n"
+        },
+        {
+          "offset": 8310,
+          "before": "        w.u16(self.legs.len() as u16);\n",
+          "after": "        w.u16(\n            self.legs.len() as u16\n                | if self.ecm_starts.is_empty() {\n                    0\n                } else {\n                    Self::ECM_START_FLAG\n                },\n        );\n"
+        },
+        {
+          "offset": 8597,
+          "before": "",
+          "after": "        if !self.ecm_starts.is_empty() {\n            w.u16(self.ecm_starts.len() as u16);\n            for start in &self.ecm_starts {\n                start.encode(w);\n            }\n        }\n"
+        },
+        {
+          "offset": 8868,
+          "before": "        let count = usize::from(r.u16()?);\n",
+          "after": "        let tagged = r.u16()?;\n        let count = usize::from(tagged & !Self::ECM_START_FLAG);\n"
+        },
+        {
+          "offset": 9178,
+          "before": "        Ok(Self { legs })\n",
+          "after": "        let ecm_starts = if tagged & Self::ECM_START_FLAG != 0 {\n            let count = usize::from(r.u16()?);\n            if count == 0 || count > Self::MAX_ECM_STARTS {\n                return Err(INVALID);\n            }\n            (0..count)\n                .map(|_| EcmJumpStart::decode(r))\n                .collect::<Result<Vec<_>, _>>()?\n        } else {\n            Vec::new()\n        };\n        Ok(Self { legs, ecm_starts })\n"
+        },
+        {
+          "offset": 19227,
+          "before": "",
+          "after": "        self.validate_ecm_starts(nav, catalogue, tick, physical_end, fitted_drive)?;\n        Ok(())\n    }\n    fn validate_ecm_starts(\n        &self,\n        nav: NavigationState,\n        catalogue: &OriginalNavigation,\n        tick: u64,\n        physical_end: u64,\n        drive: DriveGrade,\n    ) -> Result<(), SaveError> {\n        if self.ecm_starts.is_empty() {\n            return Ok(());\n        }\n        let pending = nav.pending_timing(tick, physical_end, drive)?;\n        let mut previous: Option<EcmJumpStart> = None;\n        for start in self.ecm_starts() {\n            if start.visit < 2\n                || start.visit > nav.visit\n                || start.tick > tick\n                || start.clock > physical_end\n                || start.clock > start.tick\n                || start.tick - start.clock > tick.checked_sub(physical_end).ok_or(INVALID)?\n                || start.source == start.destination\n                || self.system_at_visit(start.visit, start.tick)? != start.source\n                || catalogue\n                    .distance_ly(start.source, start.destination)\n                    .is_err()\n                || ![\n                    DriveGrade::Basic,\n                    DriveGrade::Intermediate,\n                    DriveGrade::Advanced,\n                ]\n                .into_iter()\n                .any(|grade| grade.spool_ticks() == start.spool)\n                || previous.is_some_and(|p| {\n                    p.visit >= start.visit\n                        || p.tick >= start.tick\n                        || p.clock >= start.clock\n                        || p.tick - p.clock > start.tick - start.clock\n                        || p.before_activation\n                            .zip(start.before_activation)\n                            .is_some_and(|(a, b)| a >= b)\n                })\n            {\n                return Err(INVALID);\n            }\n            if let Some(timing) = self.completed_timing(start.visit)? {\n                if !start.matches(timing) {\n                    return Err(INVALID);\n                }\n            } else if start.visit == nav.visit\n                && nav.dock.is_none()\n                && pending.is_none_or(|timing| !start.matches(timing))\n            {\n                return Err(INVALID);\n            }\n            previous = Some(start);\n        }\n"
+        },
+        {
+          "offset": 21624,
+          "before": "",
+          "after": "\n    #[test]\n    fn optional_ecm_start_codec_preserves_legacy_empty_journal_and_fixed_receipt_width() {\n        let mut journal = JumpJournal::default();\n        let mut writer = Writer::new();\n        journal.encode(&mut writer);\n        assert_eq!(writer.bytes, [0, 0]);\n        let start = EcmJumpStart {\n            source: SystemId::AVENOR,\n            destination: SystemId::RENAS,\n            visit: 2,\n            tick: 31,\n            clock: 29,\n            spool: 600,\n            before_activation: Some(1),\n        };\n        assert_eq!(journal.ecm_start_growth(), Some(38));\n        journal.append_ecm_start(start);\n        let mut writer = Writer::new();\n        journal.encode(&mut writer);\n        assert_eq!(writer.bytes.len(), 40);\n        let mut reader = Reader::new(&writer.bytes);\n        let cold = JumpJournal::decode(&mut reader).unwrap_or_else(|e| panic!(\"{e:?}\"));\n        assert!(reader.finished());\n        assert_eq!(cold.ecm_starts().collect::<Vec<_>>(), [start]);\n        assert_eq!(cold.ecm_start_growth(), Some(36));\n        assert!(JumpJournal::decode(&mut Reader::new(&[0, 128, 0, 0])).is_err());\n    }\n"
+        },
+        {
+          "offset": 23542,
+          "before": "        let journal = JumpJournal { legs: vec![leg] };\n",
+          "after": "        let journal = JumpJournal {\n            legs: vec![leg],\n            ..JumpJournal::default()\n        };\n"
+        },
+        {
+          "offset": 27062,
+          "before": "",
+          "after": "            ..JumpJournal::default()\n"
+        }
+      ]
+    }
+  }
+}
