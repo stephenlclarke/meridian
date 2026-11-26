@@ -6,6 +6,8 @@ use meridian_core::{
     mining::{ASTEROID_FACES, AsteroidId, BELT_BODY_COUNT, BeltSnapshot, MiningShot},
 };
 pub const VERTEX_COUNT: usize = BELT_BODY_COUNT * ASTEROID_FACES.len() * 3;
+pub const ORE_VERTEX_COUNT: usize =
+    meridian_core::mining::MAX_PENDING_ORE * ASTEROID_FACES.len() * 3;
 pub const BEAM_VERTEX_COUNT: usize = 12;
 #[derive(Debug, Clone, Copy)]
 pub struct MiningVisual {
