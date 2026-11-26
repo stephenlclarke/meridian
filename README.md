@@ -12,7 +12,7 @@ In Preview 10, press 3 at a station and search for Goshawk Explorer. Compare sho
 
 The development source also provides a separate Goshawk Mk II Custom Showroom and collision candidate. Its original detailed appearance, four lower mounts and SH028 fit evidence are in the [SH010 hull guide](docs/GOSHAWK-MK-II-CUSTOM.md). Owned native validation is pending.
 
-Medusa (SH171) can be inspected in the station Showroom. The source package preserves both original meshes and the inspection shield. [Medusa inspection and flight limits](integration/sh171-medusa/README.md)
+Medusa (SH171) can be inspected in the station Showroom. The source package preserves both original meshes and the inspection shield. The Showroom lists the verified empty stock dry mass. [Medusa inspection and flight limits](integration/sh171-medusa/README.md)
 
 ## Internal Mule docking validation
 
