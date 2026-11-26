@@ -881,7 +881,7 @@ impl App {
         if in_flight {
             match code {
                 KeyCode::Tab => return self.cycle_computer_target(),
-                KeyCode::KeyF => return self.cycle_computer_filter(),
+                KeyCode::KeyF => return self.toggle_computer_assistance(),
                 KeyCode::KeyT => return self.lock_computer_target(),
                 KeyCode::Backspace | KeyCode::Delete => return self.release_computer_target(),
                 KeyCode::KeyI if self.modifiers.shift_key() => return self.toggle_target_details(),
@@ -1362,14 +1362,8 @@ impl App {
             mut hud_lines,
             docked_frame,
         } = prepared;
-        if snapshot.mode == FlightMode::Flight {
-            let filter = self.game.world.target_filter();
-            if filter != meridian_core::TargetFilter::Ships {
-                hud_lines.insert(
-                    hud_lines.len().min(2),
-                    format!("TARGET FILTER: {} | F", filter.label()),
-                );
-            }
+        if snapshot.mode == FlightMode::Flight && self.game.world.manual_scanner_target() {
+            hud_lines.insert(hud_lines.len().min(2), "MANUAL TARGET | F ASSIST".into());
         }
         let belt = if snapshot.mode == FlightMode::Flight {
             self.game.world.mining_belt_snapshot()

@@ -123,24 +123,24 @@ impl Panel {
                 "T Lock selected ship for missiles | F1 Next missile target | F2 Arm / safe",
                 "F3 Launch missile | F4 Safe/clear target | K E.C.M. (22 energy)",
                 "J Jump | Shift+J Clue Journal | P Pause / resume",
-                "F6 Flight lesson | F12 Cancel | C Lesson details",
-                "Tab Cycle: healthy ships align; auto-work (no Z) | Delete/manual flight cancel",
-                "F Filter Ships/Mining/Salvage/All | I Mission details | Shift+I Target details",
+                "F6 Flight lesson | F12 Cancel | C Details | F7 Close attempt | F8 Reception",
+                "Tab Next scanner target (no core: mark) | F Manual/assist | Delete Release",
+                "Basic aligns | Advanced approaches | Docking+nav docks | Specialists auto-work",
+                "I Mission details | Shift+I Target details | Occupied: Enter/Escape",
                 "Hold U 10 seconds: EMP | Release U cancels unfinished charge",
-                "F7 Close attempt | F8 Reception | F10 Practice review at Avenor berth",
-                "4 Trade review | 5 Plan | 6 Cancel | 7 Details",
+                "F10 Practice review at Avenor | 4 Trade review | 5 Plan | 6 Cancel | 7 Details",
                 "F5 Save | F9 Reload | F11 Fullscreen | Escape Save/Quit",
             ],
         );
         panel.lines.insert(
             2,
             weapon.map_or_else(
-                || "Z unavailable: no fitted front laser".into(),
+                || "Z: no fitted front laser | scoop ore | cut wreck | occupied review".into(),
                 |weapon| {
                     if weapon == "Mining Laser" {
-                        "Z Mine eligible rock manually with fitted Mining Laser".into()
+                        "Z Mine with Mining Laser | scoop ore | cut wreck | occupied review".into()
                     } else {
-                        format!("Z Fire fitted {weapon}")
+                        format!("Z Fire fitted {weapon} | scoop ore | cut wreck | occupied review")
                     }
                 },
             ),
@@ -373,7 +373,7 @@ mod tests {
             flight
                 .lines
                 .iter()
-                .any(|line| line == "Z Fire fitted MINING")
+                .any(|line| line.starts_with("Z Fire fitted MINING"))
         );
         assert!(
             Panel::flight(None, None)
