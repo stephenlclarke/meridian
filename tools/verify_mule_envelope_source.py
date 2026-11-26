@@ -88,6 +88,16 @@ def stock_ecm_inverse(root, protected):
                             STOCK_ECM_INVERSE_SHA256, STOCK_ECM_BASE, 'stock ECM')
 
 
+def undo_arna_cutter_publication(relative, data):
+    if relative != LIB_SOURCE:
+        return data
+    declaration = b'pub mod arna_cutter;\n'
+    before, after = b'pub mod aplomado_interceptor;\n', b'pub mod banteng;\n'
+    span = before + declaration + after
+    assert data.count(declaration) == 1 and data.count(span) == 1, relative
+    return data.replace(span, before + after, 1)
+
+
 def undo_medusa_stock_publication(relative, data):
     if relative != LIB_SOURCE:
         return data
@@ -545,7 +555,8 @@ def verify_protected_core(root):
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_flight_computer(relative, current, ecm_inverse)
+        data = undo_arna_cutter_publication(relative, current)
+        data = undo_flight_computer(relative, data, ecm_inverse)
         data = undo_medusa_stock_publication(relative, data)
         data = undo_flight_computer(relative, data, solar_inverse)
         data = undo_flight_computer(relative, data, fuel_inverse)
