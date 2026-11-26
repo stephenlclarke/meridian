@@ -419,7 +419,7 @@ fn selected_energy_rate_and_rapid_spend_replay_after_actual_damage_phases_in_one
         ]
         .concat()
     );
-    assert_eq!(pools.shields, [18, 30000]);
+    assert_eq!(pools.shields.amounts(), [18, 30000]);
 }
 #[test]
 fn extending_selected_laser_classes_keeps_nine_byte_resource_events() {

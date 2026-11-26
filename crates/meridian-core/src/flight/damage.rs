@@ -1,4 +1,5 @@
 //! Exact shared player pools. World alone seals spends, berth resets and incoming hits.
+use super::shield::{ShieldGrade, ShieldPools};
 use super::weapons::PulseResources;
 use super::{FireError, FlightMode, OrdinaryTarget, StepError, World};
 use crate::save::{MAX_SAVE_BYTES, Reader, SaveError, Writer};
@@ -444,6 +445,7 @@ fn validate_exclusive_laser_targets(
 #[derive(Debug, Clone, Copy)]
 enum Effect {
     Berth,
+    ShieldFit(ShieldGrade),
     Laser(super::OrdinaryWeapon),
     Recharge(u16),
     Mining,
@@ -453,13 +455,13 @@ enum Effect {
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 struct Pools {
     pulse: PulseResources,
-    shields: [u16; 2],
+    shields: ShieldPools,
 }
 type ResourceEvent = (u64, u8, u64, Effect);
 fn replay(events: &[ResourceEvent], end: u64) -> Result<Pools, SaveError> {
     let mut pools = Pools {
         pulse: PulseResources::default(),
-        shields: [30000; 2],
+        shields: ShieldPools::default(),
     };
     let mut clock = 0;
     let mut recharge = 7;
@@ -468,8 +470,9 @@ fn replay(events: &[ResourceEvent], end: u64) -> Result<Pools, SaveError> {
         match effect {
             Effect::Berth => {
                 pools.pulse.replay_berth();
-                pools.shields = [30000; 2];
+                pools.shields.fill();
             }
+            Effect::ShieldFit(grade) => pools.shields.refit(grade),
             Effect::Laser(weapon) => {
                 pools.pulse = pools
                     .pulse
@@ -486,21 +489,17 @@ fn replay(events: &[ResourceEvent], end: u64) -> Result<Pools, SaveError> {
             Effect::Emp { contact } => {
                 pools.pulse = pools.pulse.prepare_emp_discharge().map_err(|_| INVALID)?;
                 if let Some((front, power, expected)) = contact {
-                    let shield = &mut pools.shields[usize::from(!front)];
-                    let absorbed = (*shield).min(power);
+                    let absorbed = pools.shields.absorb(front, power);
                     if absorbed != expected {
                         return Err(INVALID);
                     }
-                    *shield -= absorbed;
                 }
             }
             Effect::Hit { front, damage } => {
                 if phase == 2 && !pools.pulse.alive() {
                     return Err(INVALID);
                 }
-                let shield = &mut pools.shields[usize::from(!front)];
-                let absorbed = (*shield).min(damage);
-                *shield -= absorbed;
+                let absorbed = pools.shields.absorb(front, damage);
                 pools.pulse.damage_energy(damage - absorbed);
             }
         }
@@ -511,11 +510,7 @@ fn replay(events: &[ResourceEvent], end: u64) -> Result<Pools, SaveError> {
 }
 fn advance_with_rate(pools: &mut Pools, elapsed: u64, recharge: u16) {
     pools.pulse.replay_advance_with_rate(elapsed, recharge);
-    for shield in &mut pools.shields {
-        *shield = u64::from(*shield)
-            .saturating_add(elapsed.saturating_mul(3))
-            .min(30000) as u16;
-    }
+    pools.shields.advance(elapsed);
 }
 
 #[cfg(test)]

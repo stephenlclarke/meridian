@@ -61,12 +61,12 @@ impl Cockpit {
             view: world.flight_view(),
             shield: [
                 combat.map(|c| {
-                    f32::from(c.player.front_shield_hundredths)
-                        / f32::from(meridian_core::SHIELD_CAPACITY)
+                    c.player.front_shield_hundredths as f32
+                        / c.player.shield_capacity_hundredths as f32
                 }),
                 combat.map(|c| {
-                    f32::from(c.player.rear_shield_hundredths)
-                        / f32::from(meridian_core::SHIELD_CAPACITY)
+                    c.player.rear_shield_hundredths as f32
+                        / c.player.shield_capacity_hundredths as f32
                 }),
             ],
             energy: combat.map(|c| {

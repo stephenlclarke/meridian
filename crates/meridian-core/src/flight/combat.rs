@@ -1,10 +1,10 @@
 //! World-owned ordinary impacts. Presentation values confer no contact authority.
+pub use super::shield::SHIELD_CAPACITY;
+use super::shield::{ShieldGrade, ShieldPools};
 use super::{FireError, FlightMode, PulseContact, PulseShot, Snapshot, World, flight_pose};
 use crate::docking::Vec3;
 use crate::navigation::SystemId;
 use crate::save::{Reader, SaveError, Writer};
-pub const SHIELD_CAPACITY: u16 = 30_000;
-const SHIELD_RECHARGE: u16 = 3;
 const ATTACK_WINDOW: u64 = 600;
 
 /// Descriptive target and weapon classes. These values alone grant no impact.
@@ -112,8 +112,10 @@ pub struct OrdinaryImpact {
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PlayerCondition {
-    pub front_shield_hundredths: u16,
-    pub rear_shield_hundredths: u16,
+    pub front_shield_hundredths: u32,
+    pub rear_shield_hundredths: u32,
+    pub shield_capacity_hundredths: u32,
+    pub shield_grade: ShieldGrade,
     pub energy_hundredths: u16,
     pub destroyed: bool,
 }
@@ -132,8 +134,7 @@ pub(super) struct State {
     pub(super) emissions: u64,
     pub(super) incidents: u64,
     physical_tick: u64,
-    front: u16,
-    rear: u16,
+    shields: ShieldPools,
     windows: [Option<AttackWindow>; 3],
     penalties: u8,
     unbound_player_impact: bool,
@@ -145,8 +146,7 @@ impl Default for State {
             emissions: 0,
             incidents: 0,
             physical_tick: 0,
-            front: SHIELD_CAPACITY,
-            rear: SHIELD_CAPACITY,
+            shields: ShieldPools::default(),
             windows: [None; 3],
             penalties: 0,
             unbound_player_impact: false,
@@ -180,8 +180,11 @@ impl State {
             .ok_or(FireError::SequenceExhausted)?;
         Ok((next, next.emissions))
     }
-    pub(super) fn shields(self) -> [u16; 2] {
-        [self.front, self.rear]
+    pub(super) fn shields(self) -> ShieldPools {
+        self.shields
+    }
+    pub(super) fn refit_shields(&mut self, grade: ShieldGrade) {
+        self.shields.refit(grade);
     }
     /// Only sealed World producers call this; it never creates a player/station incident.
     pub(super) fn apply_bound_player_damage(
@@ -190,27 +193,14 @@ impl State {
         front: bool,
         damage: u16,
     ) {
-        let shield = if front {
-            &mut self.front
-        } else {
-            &mut self.rear
-        };
-        let absorbed = (*shield).min(damage);
-        *shield -= absorbed;
+        let absorbed = self.shields.absorb(front, damage);
         pulse.damage_energy(damage - absorbed);
     }
     pub(super) fn last_impact(self) -> Option<OrdinaryImpact> {
         self.last
     }
     pub(super) fn absorb_emp(&mut self, front: bool, power: u16) -> u16 {
-        let shield = if front {
-            &mut self.front
-        } else {
-            &mut self.rear
-        };
-        let absorbed = (*shield).min(power);
-        *shield -= absorbed;
-        absorbed
+        self.shields.absorb(front, power)
     }
     pub(super) fn physical_tick(self) -> u64 {
         self.physical_tick
@@ -284,11 +274,9 @@ impl State {
         }
         self.physical_tick += 1;
         if next == FlightMode::Docked {
-            self.front = SHIELD_CAPACITY;
-            self.rear = SHIELD_CAPACITY;
+            self.shields.fill();
         } else {
-            self.front = (self.front + SHIELD_RECHARGE).min(SHIELD_CAPACITY);
-            self.rear = (self.rear + SHIELD_RECHARGE).min(SHIELD_CAPACITY);
+            self.shields.advance(1);
         }
     }
     pub(super) fn can_advance(self, opening: FlightMode) -> bool {
@@ -320,8 +308,7 @@ impl State {
         w.u64(self.emissions);
         w.u64(self.incidents);
         w.u64(self.physical_tick);
-        w.u16(self.front);
-        w.u16(self.rear);
+        self.shields.encode(w);
         w.u8(self.penalties);
         w.bool(self.unbound_player_impact);
         for window in self.windows {
@@ -337,8 +324,7 @@ impl State {
             emissions: r.u64()?,
             incidents: r.u64()?,
             physical_tick: r.u64()?,
-            front: r.u16()?,
-            rear: r.u16()?,
+            shields: ShieldPools::decode(r)?,
             penalties: r.u8()?,
             unbound_player_impact: r.bool()?,
             windows: r.array(|r| {
@@ -354,9 +340,8 @@ impl State {
     }
     pub(super) fn validate_damage_boundary(self, world: &World) -> Result<(), SaveError> {
         if self.unbound_player_impact
-            || self.front > SHIELD_CAPACITY
-            || self.rear > SHIELD_CAPACITY
-            || ((self.front != SHIELD_CAPACITY || self.rear != SHIELD_CAPACITY)
+            || !self.shields.valid()
+            || (!self.shields.is_full()
                 && !world.missiles.has_player_hit()
                 && world.traffic.player_hits().is_empty())
         {
@@ -450,8 +435,10 @@ impl World {
         let laser = self.flight_resources_snapshot()?;
         Some(CombatSnapshot {
             player: PlayerCondition {
-                front_shield_hundredths: self.combat.front,
-                rear_shield_hundredths: self.combat.rear,
+                front_shield_hundredths: self.combat.shields.amounts()[0],
+                rear_shield_hundredths: self.combat.shields.amounts()[1],
+                shield_capacity_hundredths: self.combat.shields.capacity(),
+                shield_grade: self.combat.shields.grade(),
                 energy_hundredths: laser.energy_hundredths,
                 destroyed: laser.energy_hundredths == 0,
             },
