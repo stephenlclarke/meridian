@@ -20,6 +20,8 @@ Twelve local sectors follow the open curve. Their shared seam vertices are copie
 | Archived native mesh | 1,395 mm |
 | Creator-pinned native candidate | 1,579 mm |
 
+The fit replay preserves the complete independently captured reference triangulation as a derived proof input. Identical source coordinates can produce different Qhull facet diagonals across platforms, changing conservative per-piece bounds without changing the original artwork. The replay binds every support to its original scaled points and indices, revalidates closed outward topology with the existing exact radial proof, and recomputes every bound. The original report bytes and acceptance thresholds remain unchanged.
+
 The exact Studio definition retains the original relative coordinate scale and the 22,321 kg finite empty-dry record. The installed Developer ID signed Hull Studio exported the detailed artwork and the 456-face candidate twice offline. Both exports and both raw responses matched byte for byte. The signed receipt covers artwork export. The geometric results above come from the source replay.
 
 [Source pins and replay commands](../integration/sh048-lanner/CRITERIA.json)

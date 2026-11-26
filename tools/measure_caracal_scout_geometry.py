@@ -10,9 +10,13 @@ import trimesh
 
 from caracal_scout_art_mesh import SCALE, assemble
 from measure_banteng_geometry import adaptive_upper, section, solid, upper
-from measure_lanner_geometry import make_fan
+from measure_lanner_geometry import load_reference_records, validated_reference_fan
 from prepare_caracal_scout_geometry import INTEGRATION, ORIGINAL, build
 from vulture_mk_i_exact_fit import grid_index
+
+
+REFERENCE_FANS_SHA = "57d334ca12d86a668931951936c113f6c22c7006ddcc1487b7b4fca633d2b2d6"
+REFERENCE_DIAGNOSTIC_SHA = "cea0652cd77665eb472e89d35f59bfbbf8d9271b1fc2c3e6bd2254065af76539"
 
 
 def surface(section_data):
@@ -80,6 +84,11 @@ def compare(candidate_path):
     }
 
 
+def reference_records(mode, scaled, support_ids, count):
+    return load_reference_records(INTEGRATION / "REFERENCE-FANS.json", REFERENCE_FANS_SHA, REFERENCE_DIAGNOSTIC_SHA,
+                                  mode, scaled, support_ids, count, "Caracal Scout")
+
+
 def envelope_fit(candidate_path):
     source = tomllib.loads((ORIGINAL / "resource.toml").read_text())
     parts = json.loads((INTEGRATION / "ORIGINAL-OWNERSHIP.json").read_bytes())["models"]
@@ -91,6 +100,9 @@ def envelope_fit(candidate_path):
     slots, meshes = assemble((source["design"], parts["design"]["parts"]), native)
     scaled = np.array(meshes[0]["vertices"] + meshes[1]["vertices"]) * float(SCALE)
     support_ids = np.array(meshes[0]["groups"] + meshes[1]["groups"])
+    records = reference_records("candidate" if candidate else "archive", scaled, support_ids, len(slots))
+    fans = [validated_reference_fan(record, key, scaled, np.flatnonzero(support_ids == identifier), "Caracal Scout")
+            for (key, identifier), record in zip(slots.items(), records, strict=True)]
     targets = {"detailed": 1800, "archiveNative": 1800}
     original_native = source["nativeDesign"]
     references = {
@@ -105,9 +117,7 @@ def envelope_fit(candidate_path):
         for lod, (points, faces) in references.items()
     }
     rows = []
-    for (name, ordinal), identifier in slots.items():
-        point_ids = np.flatnonzero(support_ids == identifier)
-        fan = make_fan(scaled, point_ids)
+    for (name, ordinal), fan in zip(slots, fans, strict=True):
         rows.append({
             "part": name,
             "occurrence": ordinal,

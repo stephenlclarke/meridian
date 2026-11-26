@@ -1,5 +1,51 @@
 //! Pure replay and whole World refusal cases. Authored UNRUN in the source-only lane.
 use super::*;
+
+#[test]
+fn wide_shield_grade_changes_replay_with_damage_recharge_and_berth_without_reset() {
+    let effects = [
+        (0, 0, 1, Effect::ShieldFit(ShieldGrade::AdvancedII)),
+        (
+            1,
+            1,
+            1,
+            Effect::Hit {
+                front: true,
+                damage: 16_000,
+            },
+        ),
+        (
+            1,
+            2,
+            0,
+            Effect::Hit {
+                front: false,
+                damage: 1_500,
+            },
+        ),
+        (11, 0, 1, Effect::ShieldFit(ShieldGrade::Elite)),
+        (
+            12,
+            2,
+            1,
+            Effect::Hit {
+                front: true,
+                damage: 1_500,
+            },
+        ),
+    ];
+    let state = ok(replay(&effects, 12));
+    assert_eq!(state.shields.grade(), ShieldGrade::Elite);
+    // At 11 the old banks are 191030/205530 of 207000. Scale by exactly 4/3,
+    // round to nearest hundredth, then add one recharge tick and damage the front.
+    assert_eq!(state.shields.amounts(), [253_210, 274_043]);
+    assert_eq!(state.pulse, PulseResources::default());
+    let mut docked = effects.to_vec();
+    docked.push((13, 0, 0, Effect::Berth));
+    let state = ok(replay(&docked, 13));
+    assert_eq!(state.shields.amounts(), [276_000; 2]);
+    assert_eq!(state.shields.grade(), ShieldGrade::Elite);
+}
 fn ok<T, E: core::fmt::Debug>(value: Result<T, E>) -> T {
     value.unwrap_or_else(|e| panic!("unexpected refusal: {e:?}"))
 }
@@ -68,13 +114,9 @@ fn incoming_missile_then_pulse_share_facing_shields_and_actual_energy_once() {
     let mut expected = PulseResources::default();
     expected.damage_energy(3500);
     expected = ok(expected.prepare_discharge());
-    assert_eq!(
-        actual,
-        Pools {
-            pulse: expected,
-            shields: [0, 30000]
-        }
-    );
+    assert_eq!(actual.pulse, expected);
+    assert_eq!(actual.shields.amounts(), [0, 30000]);
+    assert_eq!(actual.shields.grade(), ShieldGrade::Basic);
     let after = ok(replay(&events, 19));
     let mut expected = actual;
     advance(&mut expected, 18);
@@ -110,7 +152,7 @@ fn rear_damage_and_true_berth_reset_are_exact_with_retained_weapon_cooldown() {
         (2, 0, 0, Effect::Berth),
     ];
     let actual = ok(replay(&events, 2));
-    assert_eq!(actual.shields, [30000; 2]);
+    assert_eq!(actual.shields.amounts(), [30000; 2]);
     let mut expected = ok(PulseResources::default().prepare_discharge());
     expected.replay_advance(1);
     expected.replay_berth();

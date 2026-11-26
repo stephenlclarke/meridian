@@ -32,21 +32,25 @@ def file_inverse(before, after):
     return record
 
 
-def generate(root):
+def generate(root, base=FLIGHT_COMPUTER_BASE):
     """Compare only the existing protected paths against their immutable Git blobs."""
     prefix = 'crates/meridian-core/src/'
     inverse = {}
     for relative in sorted(protected_core_pins(root)):
         path = prefix + relative
         before = subprocess.check_output(
-            ['git', 'cat-file', 'blob', FLIGHT_COMPUTER_BASE + ':' + path], cwd=root,
+            ['git', 'cat-file', 'blob', base + ':' + path], cwd=root,
         )
         after = (root / path).read_bytes()
         if before != after:
             inverse[relative] = file_inverse(before, after)
     assert inverse, 'flight computer source must have a protected delta'
-    return {'base': FLIGHT_COMPUTER_BASE, 'files': inverse}
+    return {'base': base, 'files': inverse}
 
 
 if __name__ == '__main__':
-    sys.stdout.buffer.write((json.dumps(generate(ROOT), indent=2) + '\n').encode('utf-8'))
+    # The default is the historical flight-computer source. A new, separately pinned
+    # inverse may use its own explicit immutable parent without rewriting old evidence.
+    base = sys.argv[1] if len(sys.argv) == 2 else FLIGHT_COMPUTER_BASE
+    assert len(sys.argv) <= 2 and len(base) == 40
+    sys.stdout.buffer.write((json.dumps(generate(ROOT, base), indent=2) + '\n').encode('utf-8'))

@@ -8,6 +8,7 @@ import tomllib
 import unittest
 from unittest.mock import patch
 
+import measure_wombat_geometry as measure
 import prepare_wombat_candidate as recipe
 import prepare_wombat_geometry as prep
 import verify_wombat_geometry as proof
@@ -103,6 +104,12 @@ class WombatSources(unittest.TestCase):
         for path, expected in criteria["replayPins"].items():
             with self.subTest(path=path):
                 self.assertEqual(prep.pin((prep.ROOT / path).read_bytes())["sha256"], expected)
+
+    def test_fit_rejects_an_unbound_reference_fan_before_measuring(self):
+        with patch.object(measure, "REFERENCE_FANS_SHA", "0" * 64), patch.object(measure, "adaptive_upper") as upper:
+            with self.assertRaisesRegex(ValueError, "Changed Wombat reference triangulation"):
+                measure.envelope_fit(None)
+            upper.assert_not_called()
 
     def test_studio_exact_scale_and_frozen_dry_record(self):
         outputs = prep.build()

@@ -42,19 +42,20 @@
     "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
     "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
     "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
-    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
     "tools/measure_moose_clipper.py": "d655c7ec8956d6354e02bf7e5fde1dcbac2f676ae81d81f65720833301839fd1",
     "tools/prepare_moose_clipper.py": "40c00dfe19da313808eefc323739e7b6d0fcc02ad104fddf1df15e411a817dd8",
     "tools/verify_moose_clipper.py": "e245b59eee7e116967bca17f96cc89397422e0b4f5ac3f08f1999576c0bc9eb5",
-    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6"
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
   },
   "byteReplay": {
     "host": "SteveMBA",
-    "startedUtc": "2026-11-24T19:20:07Z",
-    "finishedUtc": "2026-11-24T19:21:09Z",
+    "startedUtc": "2026-11-24T19:21:55Z",
+    "finishedUtc": "2026-11-24T19:22:56Z",
     "log": {
-      "bytes": 512,
-      "sha256": "f1c0f4788498bd4633ed60fe327b827de5f8919b0914c5e4a90f6e565d2d18d3"
+      "bytes": 609,
+      "sha256": "600dad32a93595fe97838d751ac941bc8c109e752b6180ca36b11a8f7cd45eaa"
     },
     "fitDependencies": {
       "python": "3.14.3",

@@ -1,13 +1,20 @@
 """Verify the two original Jackal meshes, separate candidate and grouped artwork."""
 
+from copy import deepcopy
 from fractions import Fraction
 import hashlib
 import json
+from pathlib import Path
 import struct
+import tempfile
 import tomllib
 import unittest
 from unittest.mock import patch
 
+import numpy as np
+
+import measure_lanner_geometry as shared_fans
+import measure_jackal_geometry as measure
 import prepare_jackal_geometry as prep
 import verify_jackal_geometry as proof
 
@@ -95,6 +102,59 @@ class JackalSources(unittest.TestCase):
         with patch.object(prep, "replace_output", side_effect=AssertionError("check rewrote stream")):
             with patch("sys.argv", ["prepare_jackal_geometry", "--check"]):
                 prep.main()
+
+    def test_both_complete_reference_fans_revalidate_original_points_without_qhull(self):
+        source = tomllib.loads((prep.ORIGINAL / "resource.toml").read_text())
+        ownership = json.loads((prep.INTEGRATION / "ORIGINAL-OWNERSHIP.json").read_bytes())["models"]
+        candidate = json.loads((prep.ORIGINAL / "SH051-candidate.json").read_bytes())
+        for mode, native in (
+            ("archive", (source["nativeDesign"], ownership["nativeDesign"]["parts"])),
+            ("candidate", (candidate["nativeCandidate"], candidate["parts"])),
+        ):
+            slots, meshes = measure.assemble((source["design"], ownership["design"]["parts"]), native)
+            scaled = np.array(meshes[0]["vertices"] + meshes[1]["vertices"]) * float(prep.SCALE)
+            groups = np.array(meshes[0]["groups"] + meshes[1]["groups"])
+            records = measure.reference_records(mode, scaled, groups, len(slots))
+            self.assertEqual(len(records), 163)
+            self.assertEqual(sum(len(record["triangles"]) for record in records), 3316)
+            self.assertEqual(sum(len(record["sourceIndices"]) for record in records),
+                             2576 if mode == "archive" else 2352)
+            with (self.subTest(mode=mode),
+                  patch.object(shared_fans, "ConvexHull", side_effect=AssertionError("unfrozen triangulation")),
+                  patch.object(shared_fans, "bound_fan", wraps=shared_fans.bound_fan) as outward):
+                for (key, identifier), record in zip(slots.items(), records, strict=True):
+                    point_ids = np.flatnonzero(groups == identifier)
+                    actual = measure.validated_reference_fan(record, key, scaled, point_ids, "Jackal")
+                    self.assertEqual(actual, [[record["sourceIndices"][i] for i in face] for face in record["triangles"]])
+                self.assertEqual(outward.call_count, 163)
+
+            key, identifier = tuple(slots.items())[5]
+            point_ids = np.flatnonzero(groups == identifier)
+            tampered = deepcopy(records[5])
+            tampered["triangles"][0][0] = len(point_ids)
+            with patch.object(shared_fans, "bound_fan") as outward:
+                with self.assertRaisesRegex(ValueError, "out-of-support Jackal"):
+                    measure.validated_reference_fan(tampered, key, scaled, point_ids, "Jackal")
+                outward.assert_not_called()
+            tampered = deepcopy(records[5])
+            tampered["sourceIndices"][0] += 1
+            with self.assertRaisesRegex(ValueError, "Jackal reference support point identity changed"):
+                measure.validated_reference_fan(tampered, key, scaled, point_ids, "Jackal")
+            tampered = deepcopy(records[5])
+            face = tampered["triangles"][0]
+            face[1], face[2] = face[2], face[1]
+            tampered["triangles"].sort()
+            with self.assertRaisesRegex(ValueError, "Jackal reference fan failed exact outward or radial proof"):
+                measure.validated_reference_fan(tampered, key, scaled, point_ids, "Jackal")
+            with patch.object(measure, "INTEGRATION", shared_fans.INTEGRATION):
+                with self.assertRaisesRegex(ValueError, "Changed Jackal reference triangulation"):
+                    measure.reference_records(mode, scaled, groups, len(slots))
+            raw = (prep.INTEGRATION / "REFERENCE-FANS.json").read_bytes()
+            with tempfile.TemporaryDirectory() as folder:
+                (Path(folder) / "REFERENCE-FANS.json").write_bytes(raw + b" ")
+                with patch.object(measure, "INTEGRATION", Path(folder)):
+                    with self.assertRaisesRegex(ValueError, "Changed Jackal reference triangulation"):
+                        measure.reference_records(mode, scaled, groups, len(slots))
 
 
 if __name__ == "__main__":

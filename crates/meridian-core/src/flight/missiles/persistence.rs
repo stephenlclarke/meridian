@@ -884,7 +884,7 @@ impl State {
         }
         // The only admitted shield damage has all of its bounded missile receipts retained.
         // Check the numeric result; loading never applies these effects to the World.
-        let mut shields = [30_000_u16; 2];
+        let mut shields = super::super::shield::ShieldPools::default();
         {
             let mut hits = self.retained_player_missile_hits(practice, history, dock_sequence);
             hits.sort_by_key(|h| h.incident);
@@ -895,13 +895,8 @@ impl State {
                         return Err(INVALID);
                     }
                     let elapsed = hit.physical_tick - clock;
-                    for shield in &mut shields {
-                        *shield = u64::from(*shield)
-                            .saturating_add(elapsed.saturating_mul(3))
-                            .min(30_000) as u16;
-                    }
-                    let side = usize::from(!front);
-                    shields[side] = shields[side].saturating_sub(16_000);
+                    shields.advance(elapsed);
+                    shields.absorb(front, 16_000);
                     clock = hit.physical_tick;
                 }
             }
@@ -910,18 +905,9 @@ impl State {
                 .physical_tick()
                 .checked_sub(clock)
                 .ok_or(INVALID)?;
-            for shield in &mut shields {
-                *shield = u64::from(*shield)
-                    .saturating_add(elapsed.saturating_mul(3))
-                    .min(30_000) as u16;
-            }
+            shields.advance(elapsed);
         }
-        let condition = world.combat_snapshot().ok_or(INVALID)?.player;
-        if [
-            condition.front_shield_hundredths,
-            condition.rear_shield_hundredths,
-        ] != shields
-        {
+        if world.combat.shields() != shields {
             return Err(INVALID);
         }
 

@@ -36,6 +36,8 @@ each upper aperture. The two underbody routes each retain 2,188 mm. Exact
 point-in-solid tests verify the four frame corners and the cockpit joint in all
 three meshes.
 
+The fit replay uses the support triangles captured on the original authoring machine for both the archived and candidate configurations. The shared verifier checks each triangle against the original vertices and support membership before recomputing its bounds. For service well 3-2 on the primary pressure envelope, the archived-native bound is 2,571 mm. The inspection criteria retain the original measurement and helper hashes alongside the current replay pins.
+
 Developer ID–signed Hull Studio produced two byte-identical offline artwork
 exports and responses for the 3,544/496 definition. The source verifier supplies
 the numeric fit, joint and clearance evidence. The frozen catalogue lists Wombat
