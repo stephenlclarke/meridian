@@ -18,6 +18,11 @@ tools/prepare_medusa_stock.py text eol=lf
 crates/meridian-core/src/medusa.rs text eol=lf
 integration/sh171-medusa/LEGACY-FINITE-*.py.txt -text
 
+# Vulture Raider authoring and replay programs use exact LF bytes.
+tools/measure_vulture_raider.py text eol=lf
+tools/prepare_vulture_raider.py text eol=lf
+tools/verify_vulture_raider.py text eol=lf
+
 # Arna Cutter authoring and replay programs use exact LF bytes.
 tools/measure_arna_cutter.py text eol=lf
 tools/prepare_arna_cutter.py text eol=lf
@@ -160,5 +165,7 @@ tools/verify_stag_liner_geometry.py text eol=lf
 # These source and review fixtures are verified against their Git blob bytes.
 crates/meridian-core/src/**/*.rs text eol=lf
 integration/sh001-mule/*.json text eol=lf
+integration/*/PROTECTED-CORE-ENTRY.json text eol=lf
+integration/*/PROTECTED-CORE-INVERSE.json text eol=lf
 integration/sh001-mule/*.patch -text
 integration/sh008-goshawk/*.json text eol=lf

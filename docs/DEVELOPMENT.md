@@ -53,6 +53,10 @@ The same Linux job then opens a separate instrumented process with `--internal-m
 
 The coverage helpers read build and report files at fixed checkout paths and reject symlink redirection. Python coverage combines the two helpers' actual Linux runs with host tests for path validation, native coverage marker checks, and failure evidence.
 
+## Protected core source
+
+Register reviewed hull declarations and equipment inverses in [feature-owned protected core entries](PROTECTED-CORE-ENTRIES.md). Each feature declares its own undo dependencies.
+
 ## Repository maintenance
 
 Update README, implementation status and affected guides in the same change as behavior or acceptance. Keep a single current status page; identify historical contracts as historical. Replace stale pending/UNRUN wording when exact evidence exists, while preserving unresolved limits and failures. Keep PR descriptions aligned with their final scope and validation.
@@ -92,3 +96,19 @@ to 44m54s. Both runs exercised the same tests and covered the same Python
 and Rust lines. The native frame hit counts varied. The runner image revisions
 also differed. See the [serial run](https://github.com/stephenlclarke/meridian/actions/runs/45843663640)
 and [parallel run](https://github.com/stephenlclarke/meridian/actions/runs/45843658736).
+
+### Recovering a hosted macOS allocation failure
+
+If GitHub reports a hosted macOS runner allocation failure, confirm the job
+shows no assigned runner and no executed steps. Wait for the sibling jobs to
+finish, then confirm the failed job's SHA still matches the PR head. Find the
+cancelled job's database ID and rerun just that job with
+`gh run rerun --job <job-id>`. Verify that the replacement job runs on the same
+SHA and passes. Diagnose source or test failures using the failing step and its
+logs before deciding whether to rerun.
+
+For the manual ECM PR, GitHub cancelled the allocation attempt before any
+steps ran. The replacement passed all 15 executed steps on the same SHA.
+The sibling jobs kept their original results.
+[Cancelled job](https://github.com/stephenlclarke/meridian/actions/runs/45853601013/job/140026080569) ·
+[Successful replacement](https://github.com/stephenlclarke/meridian/actions/runs/45853601013/job/140051784840)

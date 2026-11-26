@@ -156,6 +156,10 @@ Seriema Courier retains its 1,656-face detailed and 608-face native visible mesh
 
 Arna Cutter preserves the original 3,132-face detailed and 184-face native metre meshes. Signed Studio evidence covers offline artwork. Independent source replay verifies 27 groups, seven guarded routes, five overlapping joints and three flush deck contacts. [Arna Cutter source and evidence](ARNA-CUTTER-SOURCE.md)
 
+## Vulture Raider catalogue source
+
+Vulture Raider preserves the original 4,120-face detailed and 368-face native meshes in metres. Signed Studio evidence covers offline artwork. Independent source replay verifies 27 groups, seven guarded routes and nine overlapping joints. [Vulture Raider source and evidence](VULTURE-RAIDER-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)

@@ -38,6 +38,7 @@ pub mod seriema_courier;
 pub mod station;
 pub mod station_services;
 pub mod traffic;
+pub mod vulture_raider;
 pub mod wombat;
 pub mod yak;
 

@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh054-hobby-fighter",
+  "undoBefore": [
+    "sh053-caracal-scout"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "hobby_fighter",
+  "before": "pub mod harpy_gunship;\n",
+  "after": "pub mod hyena;\n"
+}
