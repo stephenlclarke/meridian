@@ -34,6 +34,6 @@ The original builder and tests retain the 30 CPU-second and 512 MiB limits. The 
 
 ## Outstanding integration
 
-- Flight needs a separately qualified low-detail mesh within 512 faces and a hull admission path that uses the finite-dry reference.
+- The [flight geometry adapter](../sh171-medusa-flight/README.md) uses the separate 512-face proxy and original SH028 port. Player admission still needs the finite-dry reference and owned-hull integration.
 - Player control and purchase need explicit admission, crew and equipment checks, and save/continue qualification.
 - The PLUGH fabrication quest, mission encounter, EMP disable, Salvage Beam lattice recovery and transfer of fabrication rights remain separate gameplay work.

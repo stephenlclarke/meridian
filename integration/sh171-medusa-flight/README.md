@@ -1,0 +1,9 @@
+# Medusa flight geometry
+
+The SH171 station adapter uses the 372-vertex, 512-triangle collision candidate and 70 rounded supports from the original-derived contact trial at `05188692`. Its source receipt retains the 5/41 metre calibration and the separate original detailed and native meshes. The original 76,228-face archive and the Showroom artwork retain their bytes. The 512-face mesh is a simpler physical proxy. The signed containment, crown corridor witnesses and measured fit limits remain in the trial receipt.
+
+`OriginalStationData::medusa_bundled()` loads the pinned proxy and the authentic SH028 station and port. It uses the same rounded supports for launch, continuous station contact and aperture fit. A box enclosing both the triangles and the rounded supports clears distant sweeps quickly. Near a possible contact, the adapter tests the rounded pieces. The query refuses uncertainty. `medusa_pieces()` exposes those same supports for the flight renderer or other physical queries. The empty stock engineering source is `medusa::STOCK_EMPTY_DRY` at 40,712 kg.
+
+Run `python3 -B tools/prepare_medusa_flight.py --check` to rebuild the compact geometry and compare the bytes. The tool pins the original-derived mesh and support trial, preserves face indices and strips only the diagnostic ray suffix. The triangle mesh requires valid indices and paired directed edges. Tests reject changed trial bytes.
+
+The geometry adapter can run an ordinary World launch and return through SH028 without granting an owned player hull. The centred route and the 25 m offset route use real station clearance and entry checks. The lip and outside routes refuse. Player selection, ownership, equipment fitting, save and Continue, native renderer binding and PLUGH acquisition are separate acceptance gates.

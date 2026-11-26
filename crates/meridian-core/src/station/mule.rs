@@ -18,7 +18,7 @@ impl OriginalStationData {
         self.rounded_station_motion_clear(source.pieces().as_ref(), start, end, angular_travel)
     }
 
-    fn rounded_station_motion_clear(
+    pub(super) fn rounded_station_motion_clear(
         &self,
         pieces: &[SmoothPiece],
         start: RigidPose,
@@ -40,7 +40,7 @@ impl OriginalStationData {
         self.rounded_station_launch_start(source.pieces().as_ref())
     }
 
-    fn rounded_station_launch_start(
+    pub(super) fn rounded_station_launch_start(
         &self,
         pieces: &[SmoothPiece],
     ) -> Result<FlightStart, StationError> {
@@ -121,7 +121,7 @@ impl OriginalStationData {
         )
     }
 
-    fn rounded_station_entry_conditions(
+    pub(super) fn rounded_station_entry_conditions(
         &self,
         pieces: &[SmoothPiece],
         start: RigidPose,
