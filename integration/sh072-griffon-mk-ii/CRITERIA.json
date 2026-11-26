@@ -188,7 +188,10 @@
     "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
     "tools/prepare_griffon_mk_ii_geometry.py": "d99b24ddde960a6aeac84bdee5901df90f90446f39691e6136f88346b6ba42d4",
     "tools/verify_griffon_mk_ii_geometry.py": "233d53cceaf889e7f99c40aca2ce31ce3df8672186fbc79b82b67344df4d44af",
-    "tools/measure_griffon_mk_ii_geometry.py": "1be87dbc299badba151264a3c4dccb23ad5a1e65ccfc0d805be8f24d75243f70",
-    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+    "tools/measure_griffon_mk_ii_geometry.py": "f7080a6dc5451dbfd73d878e3d194f4db87d081ea43946d4db52f54b189af780",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839",
+    "tools/measure_collar_support_fans.py": "8cf3668680568929c5f6d579d40b5d21c58b35c7bd36581ef7c273b10b84944b",
+    "integration/sh072-griffon-mk-ii/CANDIDATE-FIT-SUPPORT-FANS.json": "f4e700203cec01c0da9c060fe67a7c26abe4e423dd11ea2fa0f5c8cbc4ffbdec",
+    "integration/sh072-griffon-mk-ii/ARCHIVE-FIT-SUPPORT-FANS.json": "c0bfdd85746c8711a914fbc0ac5441e2eb38d0acc0a9fb844817ad6719e77527"
   }
 }

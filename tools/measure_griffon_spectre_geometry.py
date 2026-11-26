@@ -11,7 +11,7 @@ import trimesh
 from banteng_art_mesh import assemble
 from prepare_griffon_spectre_geometry import INTEGRATION, ORIGINAL, build, metre_space, require
 from measure_banteng_geometry import adaptive_upper, section, solid, upper
-from measure_lanner_geometry import make_fan
+from measure_collar_support_fans import validate_span_fans
 from measure_seriema_courier_geometry import silhouette
 from vulture_mk_i_exact_fit import grid_index
 
@@ -91,10 +91,16 @@ def support_fit(source,use_candidate):
         points, member = bundled, membership
     visible=["detailed","archiveNative","candidateNative"] if use_candidate else ["detailed","archiveNative"]
     indices={key:grid_index(mesh(source[key][0]["vertices"],source[key][0]["faces"])) for key in visible}
-    rows={}
-    for (name,ordinal),index in slots.items():
-        fan=make_fan(points,np.flatnonzero(member==index))
-        rows[f"{name}[{ordinal}]"]={lod:adaptive_upper(reference,points[fan],1600) for lod,reference in indices.items()}
+    names = [f"{name}[{ordinal}]" for name, ordinal in slots]
+    supports = [np.flatnonzero(member == index) for index in slots.values()]
+    mode = "candidate-fit" if use_candidate else "archive-fit"
+    authored = json.loads((INTEGRATION / f"{mode.upper()}-SUPPORT-FANS.json").read_bytes())
+    require(authored.keys() == set(names), f"Changed Griffon {mode} support inventory")
+    fans = validate_span_fans(points, supports, [authored[name] for name in names])
+    rows = {
+        name: {lod: adaptive_upper(reference, points[fan], 1600) for lod, reference in indices.items()}
+        for name, fan in zip(names, fans, strict=True)
+    }
     return {"roundingMetres":.02,"fullUpperMillimetres":{lod:max(row[lod] for row in rows.values()) for lod in indices},
             "pieces":rows}
 

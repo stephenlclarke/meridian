@@ -188,7 +188,10 @@
     "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
     "tools/prepare_griffon_geometry.py": "cacb71650b7a722d3c4fdbfbf216b27a91c3a9c23c8d838cbb70213fb5d8b1a1",
     "tools/verify_griffon_geometry.py": "4a3db567bdf36e9ca397261f9ec1675bdd35a4d005ab61ac567c9ce09d84d96f",
-    "tools/measure_griffon_geometry.py": "e618a94f8fea276982268a058ef37fba4b11a16883fcf500d0accf0229820953",
-    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+    "tools/measure_griffon_geometry.py": "1c63b26003e873f8420f7abc822906206d12e529d63c6c4b3f41aca01c0467bb",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839",
+    "tools/measure_collar_support_fans.py": "8cf3668680568929c5f6d579d40b5d21c58b35c7bd36581ef7c273b10b84944b",
+    "integration/sh071-griffon/ARCHIVE-FIT-SUPPORT-FANS.json": "d1c6cef2db3beb16405e2e55dbd2ef19ea76d0326a959916863b196def8466c0",
+    "integration/sh071-griffon/CANDIDATE-FIT-SUPPORT-FANS.json": "61fe3361419e652de170f24ca2d3125ebb65982703e2e3f1e52b09c6562e0b26"
   }
 }

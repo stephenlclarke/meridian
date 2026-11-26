@@ -188,7 +188,10 @@
     "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
     "tools/prepare_griffon_spectre_geometry.py": "a9ca9abfeefb7b3b9a0c4c714f3c1b52f7e60b3ea05ecb1cafe1bf18c0e172a3",
     "tools/verify_griffon_spectre_geometry.py": "6d5ed2d2c8337365964c68b50dfabb85f8f9426cfdf1a9023318873281124fe8",
-    "tools/measure_griffon_spectre_geometry.py": "a2dbf3f57c84ef626693d260bf8f13dab65e55de12adb82a319f12eef3c1c950",
-    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+    "tools/measure_griffon_spectre_geometry.py": "097b2f088e703e6e49338436816454273a5e07c022c83294d5074166e16f94c9",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839",
+    "tools/measure_collar_support_fans.py": "8cf3668680568929c5f6d579d40b5d21c58b35c7bd36581ef7c273b10b84944b",
+    "integration/sh073-griffon-spectre/CANDIDATE-FIT-SUPPORT-FANS.json": "23b0f9e14dc6cac14378113f6ea2da7aebce9980060766fde4553d56cb4b2669",
+    "integration/sh073-griffon-spectre/ARCHIVE-FIT-SUPPORT-FANS.json": "7eefcf36e135d8309b0599084f72a58160827f4faa19fb3a5bbcc1ca7c696c72"
   }
 }
