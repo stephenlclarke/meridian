@@ -84,6 +84,7 @@ pub mod traffic;
 pub mod unwritten_route;
 pub mod vulture_raider;
 pub mod warthog_escort;
+pub mod warthog_light;
 pub mod wildebeest;
 pub mod wisent;
 pub mod wisent_mk_ii;
