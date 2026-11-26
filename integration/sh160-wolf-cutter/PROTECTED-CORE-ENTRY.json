@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh160-wolf-cutter",
+  "undoBefore": [
+    "sh159-wolf-mk-ii"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "wolf_cutter",
+  "before": "pub mod wisent_mk_ii;\n",
+  "after": "pub mod wolf_mk_i;\n"
+}

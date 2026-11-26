@@ -1,0 +1,480 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 2800,
+    "archivedNative": 3800,
+    "candidateNative": 4400
+  },
+  "fullUpperMillimetres": {
+    "detailed": 2681,
+    "archivedNative": 2735,
+    "candidateNative": 2735
+  },
+  "pieces": {
+    "twin spine pressure envelope (1)": {
+      "detailed": 2681,
+      "archivedNative": 2681,
+      "candidateNative": 2681
+    },
+    "twin spine shoulder envelope (1)": {
+      "detailed": 1290,
+      "archivedNative": 1290,
+      "candidateNative": 1290
+    },
+    "twin spine shoulder service well (1)": {
+      "detailed": 1686,
+      "archivedNative": 507,
+      "candidateNative": 734
+    },
+    "twin spine shoulder service well/recess-service-strut-0 (1)": {
+      "detailed": 147,
+      "archivedNative": 262,
+      "candidateNative": 895
+    },
+    "twin spine shoulder service well/recess-service-strut-1 (1)": {
+      "detailed": 147,
+      "archivedNative": 552,
+      "candidateNative": 574
+    },
+    "twin spine shoulder service well/recess-service-strut-2 (1)": {
+      "detailed": 147,
+      "archivedNative": 262,
+      "candidateNative": 272
+    },
+    "twin spine shoulder service well (2)": {
+      "detailed": 1686,
+      "archivedNative": 507,
+      "candidateNative": 685
+    },
+    "twin spine shoulder service well/recess-service-strut-0 (2)": {
+      "detailed": 147,
+      "archivedNative": 262,
+      "candidateNative": 272
+    },
+    "twin spine shoulder service well/recess-service-strut-1 (2)": {
+      "detailed": 147,
+      "archivedNative": 552,
+      "candidateNative": 574
+    },
+    "twin spine shoulder service well/recess-service-strut-2 (2)": {
+      "detailed": 147,
+      "archivedNative": 262,
+      "candidateNative": 895
+    },
+    "twin spine shoulder service well (3)": {
+      "detailed": 1686,
+      "archivedNative": 507,
+      "candidateNative": 1664
+    },
+    "twin spine shoulder service well/recess-service-strut-0 (3)": {
+      "detailed": 147,
+      "archivedNative": 262,
+      "candidateNative": 272
+    },
+    "twin spine shoulder service well/recess-service-strut-1 (3)": {
+      "detailed": 147,
+      "archivedNative": 552,
+      "candidateNative": 589
+    },
+    "twin spine shoulder service well/recess-service-strut-2 (3)": {
+      "detailed": 147,
+      "archivedNative": 262,
+      "candidateNative": 895
+    },
+    "twin spine pressure envelope (2)": {
+      "detailed": 2681,
+      "archivedNative": 2681,
+      "candidateNative": 2681
+    },
+    "twin spine shoulder envelope (2)": {
+      "detailed": 1290,
+      "archivedNative": 1290,
+      "candidateNative": 1290
+    },
+    "twin spine shoulder service well (4)": {
+      "detailed": 1686,
+      "archivedNative": 507,
+      "candidateNative": 734
+    },
+    "twin spine shoulder service well/recess-service-strut-0 (4)": {
+      "detailed": 147,
+      "archivedNative": 262,
+      "candidateNative": 895
+    },
+    "twin spine shoulder service well/recess-service-strut-1 (4)": {
+      "detailed": 147,
+      "archivedNative": 552,
+      "candidateNative": 574
+    },
+    "twin spine shoulder service well/recess-service-strut-2 (4)": {
+      "detailed": 147,
+      "archivedNative": 262,
+      "candidateNative": 272
+    },
+    "twin spine shoulder service well (5)": {
+      "detailed": 1686,
+      "archivedNative": 507,
+      "candidateNative": 553
+    },
+    "twin spine shoulder service well/recess-service-strut-0 (5)": {
+      "detailed": 147,
+      "archivedNative": 262,
+      "candidateNative": 895
+    },
+    "twin spine shoulder service well/recess-service-strut-1 (5)": {
+      "detailed": 147,
+      "archivedNative": 552,
+      "candidateNative": 574
+    },
+    "twin spine shoulder service well/recess-service-strut-2 (5)": {
+      "detailed": 147,
+      "archivedNative": 262,
+      "candidateNative": 272
+    },
+    "twin spine shoulder service well (6)": {
+      "detailed": 1686,
+      "archivedNative": 507,
+      "candidateNative": 1660
+    },
+    "twin spine shoulder service well/recess-service-strut-0 (6)": {
+      "detailed": 147,
+      "archivedNative": 262,
+      "candidateNative": 272
+    },
+    "twin spine shoulder service well/recess-service-strut-1 (6)": {
+      "detailed": 147,
+      "archivedNative": 552,
+      "candidateNative": 574
+    },
+    "twin spine shoulder service well/recess-service-strut-2 (6)": {
+      "detailed": 147,
+      "archivedNative": 262,
+      "candidateNative": 895
+    },
+    "twin spine transverse bridge (1)": {
+      "detailed": 1444,
+      "archivedNative": 1444,
+      "candidateNative": 1444
+    },
+    "twin spine transverse bridge (2)": {
+      "detailed": 1444,
+      "archivedNative": 1444,
+      "candidateNative": 1444
+    },
+    "twin spine central forward envelope": {
+      "detailed": 1044,
+      "archivedNative": 1744,
+      "candidateNative": 1733
+    },
+    "twin spine central forward envelope/service-well-0-0": {
+      "detailed": 1767,
+      "archivedNative": 1611,
+      "candidateNative": 1608
+    },
+    "twin spine central forward envelope/service-well-0-0/recess-service-strut-0": {
+      "detailed": 146,
+      "archivedNative": 478,
+      "candidateNative": 478
+    },
+    "twin spine central forward envelope/service-well-0-0/recess-service-strut-1": {
+      "detailed": 146,
+      "archivedNative": 205,
+      "candidateNative": 225
+    },
+    "twin spine central forward envelope/service-well-0-0/recess-service-strut-2": {
+      "detailed": 146,
+      "archivedNative": 194,
+      "candidateNative": 154
+    },
+    "twin spine central forward envelope/service-well-0-1": {
+      "detailed": 1767,
+      "archivedNative": 909,
+      "candidateNative": 909
+    },
+    "twin spine central forward envelope/service-well-0-1/recess-service-strut-0": {
+      "detailed": 146,
+      "archivedNative": 577,
+      "candidateNative": 577
+    },
+    "twin spine central forward envelope/service-well-0-1/recess-service-strut-1": {
+      "detailed": 146,
+      "archivedNative": 642,
+      "candidateNative": 642
+    },
+    "twin spine central forward envelope/service-well-0-1/recess-service-strut-2": {
+      "detailed": 146,
+      "archivedNative": 483,
+      "candidateNative": 483
+    },
+    "twin spine central forward envelope/service-well-0-2": {
+      "detailed": 1767,
+      "archivedNative": 1624,
+      "candidateNative": 1625
+    },
+    "twin spine central forward envelope/service-well-0-2/recess-service-strut-0": {
+      "detailed": 146,
+      "archivedNative": 402,
+      "candidateNative": 402
+    },
+    "twin spine central forward envelope/service-well-0-2/recess-service-strut-1": {
+      "detailed": 146,
+      "archivedNative": 795,
+      "candidateNative": 795
+    },
+    "twin spine central forward envelope/service-well-0-2/recess-service-strut-2": {
+      "detailed": 146,
+      "archivedNative": 815,
+      "candidateNative": 815
+    },
+    "twin spine central forward envelope/service-well-1-0": {
+      "detailed": 1767,
+      "archivedNative": 1611,
+      "candidateNative": 1687
+    },
+    "twin spine central forward envelope/service-well-1-0/recess-service-strut-0": {
+      "detailed": 146,
+      "archivedNative": 477,
+      "candidateNative": 477
+    },
+    "twin spine central forward envelope/service-well-1-0/recess-service-strut-1": {
+      "detailed": 146,
+      "archivedNative": 203,
+      "candidateNative": 412
+    },
+    "twin spine central forward envelope/service-well-1-0/recess-service-strut-2": {
+      "detailed": 146,
+      "archivedNative": 192,
+      "candidateNative": 730
+    },
+    "twin spine central forward envelope/service-well-1-1": {
+      "detailed": 1767,
+      "archivedNative": 828,
+      "candidateNative": 906
+    },
+    "twin spine central forward envelope/service-well-1-1/recess-service-strut-0": {
+      "detailed": 139,
+      "archivedNative": 445,
+      "candidateNative": 575
+    },
+    "twin spine central forward envelope/service-well-1-1/recess-service-strut-1": {
+      "detailed": 139,
+      "archivedNative": 478,
+      "candidateNative": 626
+    },
+    "twin spine central forward envelope/service-well-1-1/recess-service-strut-2": {
+      "detailed": 139,
+      "archivedNative": 653,
+      "candidateNative": 484
+    },
+    "twin spine central forward envelope/service-well-1-2": {
+      "detailed": 1767,
+      "archivedNative": 1622,
+      "candidateNative": 1623
+    },
+    "twin spine central forward envelope/service-well-1-2/recess-service-strut-0": {
+      "detailed": 139,
+      "archivedNative": 425,
+      "candidateNative": 428
+    },
+    "twin spine central forward envelope/service-well-1-2/recess-service-strut-1": {
+      "detailed": 139,
+      "archivedNative": 792,
+      "candidateNative": 792
+    },
+    "twin spine central forward envelope/service-well-1-2/recess-service-strut-2": {
+      "detailed": 139,
+      "archivedNative": 812,
+      "candidateNative": 812
+    },
+    "twin spine central forward envelope/service-well-2-0": {
+      "detailed": 1767,
+      "archivedNative": 1611,
+      "candidateNative": 1688
+    },
+    "twin spine central forward envelope/service-well-2-0/recess-service-strut-0": {
+      "detailed": 146,
+      "archivedNative": 478,
+      "candidateNative": 478
+    },
+    "twin spine central forward envelope/service-well-2-0/recess-service-strut-1": {
+      "detailed": 146,
+      "archivedNative": 205,
+      "candidateNative": 413
+    },
+    "twin spine central forward envelope/service-well-2-0/recess-service-strut-2": {
+      "detailed": 146,
+      "archivedNative": 194,
+      "candidateNative": 725
+    },
+    "twin spine central forward envelope/service-well-2-1": {
+      "detailed": 1767,
+      "archivedNative": 2031,
+      "candidateNative": 2031
+    },
+    "twin spine central forward envelope/service-well-2-1/recess-service-strut-0": {
+      "detailed": 146,
+      "archivedNative": 579,
+      "candidateNative": 579
+    },
+    "twin spine central forward envelope/service-well-2-1/recess-service-strut-1": {
+      "detailed": 146,
+      "archivedNative": 644,
+      "candidateNative": 644
+    },
+    "twin spine central forward envelope/service-well-2-1/recess-service-strut-2": {
+      "detailed": 146,
+      "archivedNative": 338,
+      "candidateNative": 338
+    },
+    "twin spine central forward envelope/service-well-2-2": {
+      "detailed": 1767,
+      "archivedNative": 2191,
+      "candidateNative": 2191
+    },
+    "twin spine central forward envelope/service-well-2-2/recess-service-strut-0": {
+      "detailed": 146,
+      "archivedNative": 466,
+      "candidateNative": 466
+    },
+    "twin spine central forward envelope/service-well-2-2/recess-service-strut-1": {
+      "detailed": 146,
+      "archivedNative": 410,
+      "candidateNative": 410
+    },
+    "twin spine central forward envelope/service-well-2-2/recess-service-strut-2": {
+      "detailed": 146,
+      "archivedNative": 417,
+      "candidateNative": 417
+    },
+    "twin spine central forward envelope/service-well-3-0": {
+      "detailed": 1767,
+      "archivedNative": 1611,
+      "candidateNative": 1608
+    },
+    "twin spine central forward envelope/service-well-3-0/recess-service-strut-0": {
+      "detailed": 146,
+      "archivedNative": 477,
+      "candidateNative": 477
+    },
+    "twin spine central forward envelope/service-well-3-0/recess-service-strut-1": {
+      "detailed": 139,
+      "archivedNative": 207,
+      "candidateNative": 225
+    },
+    "twin spine central forward envelope/service-well-3-0/recess-service-strut-2": {
+      "detailed": 146,
+      "archivedNative": 192,
+      "candidateNative": 151
+    },
+    "twin spine central forward envelope/service-well-3-1": {
+      "detailed": 1767,
+      "archivedNative": 2031,
+      "candidateNative": 2031
+    },
+    "twin spine central forward envelope/service-well-3-1/recess-service-strut-0": {
+      "detailed": 146,
+      "archivedNative": 446,
+      "candidateNative": 585
+    },
+    "twin spine central forward envelope/service-well-3-1/recess-service-strut-1": {
+      "detailed": 146,
+      "archivedNative": 479,
+      "candidateNative": 637
+    },
+    "twin spine central forward envelope/service-well-3-1/recess-service-strut-2": {
+      "detailed": 146,
+      "archivedNative": 334,
+      "candidateNative": 334
+    },
+    "twin spine central forward envelope/service-well-3-2": {
+      "detailed": 1767,
+      "archivedNative": 908,
+      "candidateNative": 788
+    },
+    "twin spine central forward envelope/service-well-3-2/recess-service-strut-0": {
+      "detailed": 146,
+      "archivedNative": 424,
+      "candidateNative": 401
+    },
+    "twin spine central forward envelope/service-well-3-2/recess-service-strut-1": {
+      "detailed": 146,
+      "archivedNative": 409,
+      "candidateNative": 408
+    },
+    "twin spine central forward envelope/service-well-3-2/recess-service-strut-2": {
+      "detailed": 146,
+      "archivedNative": 416,
+      "candidateNative": 415
+    },
+    "twin spine central forward envelope/longitudinal-service-strut-0": {
+      "detailed": 164,
+      "archivedNative": 393,
+      "candidateNative": 393
+    },
+    "twin spine central forward envelope/longitudinal-service-strut-1": {
+      "detailed": 164,
+      "archivedNative": 2735,
+      "candidateNative": 2735
+    },
+    "cockpit glazing envelope": {
+      "detailed": 414,
+      "archivedNative": 420,
+      "candidateNative": 388
+    },
+    "cockpit connected structural crossmember": {
+      "detailed": 179,
+      "archivedNative": 179,
+      "candidateNative": 179
+    },
+    "engine_pair/negative side/connected support": {
+      "detailed": 890,
+      "archivedNative": 890,
+      "candidateNative": 890
+    },
+    "engine_pair/negative side/propulsion casing": {
+      "detailed": 2241,
+      "archivedNative": 2144,
+      "candidateNative": 2144
+    },
+    "engine_pair/negative side/propulsion luminous recess": {
+      "detailed": 1453,
+      "archivedNative": 1493,
+      "candidateNative": 1336
+    },
+    "engine_pair/positive side/connected support": {
+      "detailed": 890,
+      "archivedNative": 890,
+      "candidateNative": 890
+    },
+    "engine_pair/positive side/propulsion casing": {
+      "detailed": 2241,
+      "archivedNative": 2144,
+      "candidateNative": 2144
+    },
+    "engine_pair/positive side/propulsion luminous recess": {
+      "detailed": 1453,
+      "archivedNative": 1493,
+      "candidateNative": 1336
+    },
+    "explicit military mount upright (1)": {
+      "detailed": 831,
+      "archivedNative": 831,
+      "candidateNative": 831
+    },
+    "explicit military mount longitudinal member (1)": {
+      "detailed": 571,
+      "archivedNative": 571,
+      "candidateNative": 571
+    },
+    "explicit military mount upright (2)": {
+      "detailed": 831,
+      "archivedNative": 831,
+      "candidateNative": 831
+    },
+    "explicit military mount longitudinal member (2)": {
+      "detailed": 571,
+      "archivedNative": 571,
+      "candidateNative": 571
+    }
+  }
+}

@@ -566,3 +566,9 @@ tools/measure_wolf_mk_ii.py text eol=lf
 tools/prepare_wolf_mk_ii.py text eol=lf
 tools/rebuild_wolf_mk_ii.py text eol=lf
 tools/verify_wolf_mk_ii.py text eol=lf
+
+# Byte-pinned Wolf Cutter replay programs.
+tools/measure_wolf_cutter.py text eol=lf
+tools/prepare_wolf_cutter.py text eol=lf
+tools/rebuild_wolf_cutter.py text eol=lf
+tools/verify_wolf_cutter.py text eol=lf
