@@ -10,6 +10,8 @@ The station Equipment screen exposes the born Basic drive and the two original p
 
 The [seven shield grades](SHIELD-GRADES.md) use the source-defined bank capacities from 300 to 2,760 and unchanged recharge. Four successive shop grades are payable through the existing account; Advanced II retains its unavailable Elite-rank and PLUGH-only acquisition paths, and Elite remains acquisition-only with explicit maximum test access. A separate XYZZY grade selector exercises each real fit without cash, fuel or unrelated equipment changes. The wider bank codec, historical fit/damage replay, actual incoming hit, HUD and paid/refit/Continue regressions await owned execution; no native preview claim follows from authored source.
 
+The [fuel storage source candidate](FUEL-STORAGE.md) implements four separately owned and paid physical units, up to three fitted normally on SH025, actual tank capacity and paid refuel, refusal to store occupied capacity, and an explicit four-tank XYZZY exception with current freight and trade custody guards. Gameplay replay, account/route persistence and native acceptance require owned validation.
+
 ## The Unwritten Route clue journal
 
 The [ordinary clue journal](../integration/unwritten-route/README.md) reads the existing first receipts for four playable source families against the original 64-clue catalogue. Shift+J opens the journal. Later trail instructions and the paid Medusa path follow the original quest prerequisites.

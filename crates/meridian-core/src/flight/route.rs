@@ -2,8 +2,8 @@
 use super::profit_scan::{cargo_sale_tenths, trade_profit_tenths};
 use super::{FlightMode, World};
 use crate::navigation::{
-    FUEL_CAPACITY, NavigationGrade, ROUTE_SYSTEMS, RouteAlternative, RouteEconomy, RouteError,
-    RoutePlan, RouteProgress, RouteStatus, SystemId, route_alternatives, route_feasible, route_hop,
+    NavigationGrade, ROUTE_SYSTEMS, RouteAlternative, RouteEconomy, RouteError, RoutePlan,
+    RouteProgress, RouteStatus, SystemId, route_alternatives, route_feasible, route_hop,
 };
 use crate::save::SaveError;
 use crate::station_services::{AccountProjection, CommodityId, CommodityQuote};
@@ -65,6 +65,7 @@ impl World {
             origin_jumps: nav.jump_sequence(),
             grade,
             origin_fuel: current.fuel_units,
+            origin_storage_count: account.fuel_storage_count(),
             stop: 0,
             systems: Vec::new(),
         };
@@ -93,9 +94,7 @@ impl World {
     pub fn active_route_progress(&self) -> Option<RouteProgress> {
         let plan = self.navigation_route.as_ref()?;
         let catalogue = self.navigation_catalogue.as_ref()?;
-        let nav = self
-            .navigation?
-            .snapshot(self.commander_account.as_ref()?.fuel_tenths());
+        let nav = self.snapshot().navigation?;
         let mut result = RouteProgress {
             plan: plan.clone(),
             completed_legs: plan.stop,
@@ -113,7 +112,8 @@ impl World {
         if !route_feasible(
             catalogue,
             &plan.systems[usize::from(plan.stop)..],
-            FUEL_CAPACITY,
+            nav.fuel_capacity_units,
+            nav.fuel_capacity_units,
             self.navigation_computer_grade(),
         ) {
             result.status = RouteStatus::ComputerUnavailable;
@@ -220,7 +220,18 @@ impl World {
         let catalogue = self.navigation_catalogue.as_ref().ok_or(INVALID)?;
         let current = nav.snapshot(0);
         if !plan.agrees_with_ship(nav.ship())
-            || !route_feasible(catalogue, plan.systems(), plan.origin_fuel, plan.grade)
+            || !route_feasible(
+                catalogue,
+                plan.systems(),
+                plan.origin_fuel,
+                crate::navigation::fuel_capacity(plan.origin_storage_count),
+                plan.grade,
+            )
+            || !self.modular.storage_count_possible_at_visit(
+                plan.owner,
+                plan.origin_visit,
+                plan.origin_storage_count,
+            )?
             || plan.origin_visit > current.visit
         {
             return Err(INVALID);
