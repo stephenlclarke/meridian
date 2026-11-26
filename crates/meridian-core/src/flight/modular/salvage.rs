@@ -16,6 +16,9 @@ const INVALID: SaveError = SaveError::InvalidState("external salvage custody");
 const MAX_SOURCES: usize = 2;
 const MAX_UNITS: usize = 24;
 const RECOVERY_TICKS: u64 = 60;
+// The preceding development-only format had no pose/facing/speed evidence.
+const POSE_FORMAT: u8 = 0x80;
+const DIRECT_FEED: u8 = 1;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) struct Exchange {
@@ -90,7 +93,55 @@ struct Receipt {
     visit: u64,
     cutter: u64,
     scoops: u64,
+    pose: RecoveryPose,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct RecoveryPose {
     position: [u32; 3],
+    orientation: [u32; 4],
+    speed: u32,
+}
+
+impl RecoveryPose {
+    fn capture(snapshot: crate::Snapshot) -> Self {
+        Self {
+            position: snapshot.position.map(f32::to_bits),
+            orientation: snapshot.orientation.map(f32::to_bits),
+            speed: snapshot.speed.to_bits(),
+        }
+    }
+
+    fn snapshot(self, world: &World, tick: u64) -> Option<crate::Snapshot> {
+        let sample = crate::Snapshot {
+            position: self.position.map(f32::from_bits),
+            orientation: self.orientation.map(f32::from_bits),
+            speed: f32::from_bits(self.speed),
+            tick,
+            ..world.state
+        };
+        super::super::persistence::validate_flight(&sample).ok()?;
+        Some(sample)
+    }
+
+    fn encode(self, w: &mut Writer) {
+        for bits in self
+            .position
+            .into_iter()
+            .chain(self.orientation)
+            .chain([self.speed])
+        {
+            w.u32(bits);
+        }
+    }
+
+    fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+        Ok(Self {
+            position: [r.u32()?, r.u32()?, r.u32()?],
+            orientation: [r.u32()?, r.u32()?, r.u32()?, r.u32()?],
+            speed: r.u32()?,
+        })
+    }
 }
 
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
@@ -101,6 +152,7 @@ pub(super) struct State {
 
 fn claim_for(manifest: WreckManifest) -> Option<Claim> {
     (manifest.source.serial() == 1
+        && manifest.hull_id == "SH025"
         && (1..=12).contains(&manifest.quantity)
         && manifest.commodity.departure_legal_weight() == 0)
         .then_some(Claim {
@@ -111,20 +163,75 @@ fn claim_for(manifest: WreckManifest) -> Option<Claim> {
         })
 }
 
-fn collection_envelope(world: &World, source: Vec3, position: [f32; 3]) -> bool {
+/// Direct feed from the finite approved external source to the actual scoop aperture.
+/// The source is a terminal ordinary manifest; there is no issued moving cargo body,
+/// native cut section or new hull asset. The known SH025 clearance geometry explicitly
+/// describes the near external source and the lower-forward original scoop aperture.
+/// The same admission is used by the live transfer and every cold receipt.
+fn direct_feed_admissible(
+    world: &World,
+    manifest: WreckManifest,
+    retained: RecoveryPose,
+    tick: u64,
+) -> bool {
     let Some(station) = world.station_data.as_ref() else {
         return false;
     };
-    // Detached external cargo is collected from the near, non-overlap work envelope.
-    // The hull itself is not a capture volume; ordinary collision remains authoritative.
-    let offset = Vec3::new(
-        f64::from(position[0]) - source.x,
-        f64::from(position[1]) - source.y,
-        f64::from(position[2]) - source.z,
+    let Some(sample) = retained.snapshot(world, tick) else {
+        return false;
+    };
+    if sample.speed > 0.01
+        || manifest.hull_id != "SH025"
+        || !manifest.pose.orientation.is_valid_rotation()
+    {
+        return false;
+    }
+    let Some(player) = crate::station::flight_pose(sample.position, sample.orientation) else {
+        return false;
+    };
+    let source = manifest.pose.position;
+    let to_source = Vec3::new(
+        source.x - player.position.x,
+        source.y - player.position.y,
+        source.z - player.position.z,
     );
-    let distance = offset.dot(offset).sqrt();
-    let clearance = station.player_clearance_radius() * 2.0;
-    (clearance + 1.5..=clearance + 2.5).contains(&distance)
+    let range = to_source.dot(to_source).sqrt();
+    let radius = station.player_clearance_radius();
+    let standoff = 2.0 * radius + 2.0;
+    if !(standoff - 0.5..=standoff + 0.5).contains(&range)
+        || to_source.dot(player.orientation.z) < range * 0.999
+    {
+        return false;
+    }
+
+    // A direct transfer starts at the near face of the approved clearance shell,
+    // not the wreck centre, and ends at the actual nominal lower-forward aperture.
+    // Both must fit the existing scoop capture reach; the route must leave the source
+    // shell towards the player rather than enter the solid source envelope.
+    let factor = (range - radius) / range;
+    let near_face = Vec3::new(
+        to_source.x * factor,
+        to_source.y * factor,
+        to_source.z * factor,
+    );
+    let aperture = player.orientation.apply(Vec3::new(0.0, -45.0, 55.0));
+    let out_of_source = Vec3::new(
+        near_face.x - to_source.x,
+        near_face.y - to_source.y,
+        near_face.z - to_source.z,
+    );
+    let feed = Vec3::new(
+        aperture.x - near_face.x,
+        aperture.y - near_face.y,
+        aperture.z - near_face.z,
+    );
+    let reach_squared = crate::mining::SCOOP_DISTANCE.powi(2);
+    near_face.dot(near_face) < reach_squared
+        && near_face.dot(player.orientation.z) > 0.0
+        && aperture.dot(aperture) < reach_squared
+        && aperture.dot(player.orientation.y) < 0.0
+        && aperture.dot(player.orientation.z) > 0.0
+        && feed.dot(out_of_source) > 0.0
 }
 
 fn historical_claim(world: &World, id: NpcId) -> Option<Claim> {
@@ -208,7 +315,7 @@ impl State {
     }
 
     pub(super) fn encode(&self, w: &mut Writer) {
-        w.u8(self.claims.len() as u8);
+        w.u8(POSE_FORMAT | self.claims.len() as u8);
         for claim in &self.claims {
             claim.source.encode(w);
             w.u64(claim.terminal_tick);
@@ -222,15 +329,18 @@ impl State {
             for value in [r.revision, r.tick, r.physical, r.visit, r.cutter, r.scoops] {
                 w.u64(value);
             }
-            for coordinate in r.position {
-                w.u32(coordinate);
-            }
+            w.u8(DIRECT_FEED);
+            r.pose.encode(w);
         }
     }
 
     pub(super) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         let mut state = Self::default();
-        let count = usize::from(r.u8()?);
+        let format = r.u8()?;
+        if format & POSE_FORMAT == 0 {
+            return Err(INVALID);
+        }
+        let count = usize::from(format & !POSE_FORMAT);
         if count == 0 || count > MAX_SOURCES {
             return Err(INVALID);
         }
@@ -263,7 +373,12 @@ impl State {
                 visit: r.u64()?,
                 cutter: r.u64()?,
                 scoops: r.u64()?,
-                position: [r.u32()?, r.u32()?, r.u32()?],
+                pose: {
+                    if r.u8()? != DIRECT_FEED {
+                        return Err(INVALID);
+                    }
+                    RecoveryPose::decode(r)?
+                },
             });
         }
         Ok(state)
@@ -437,11 +552,10 @@ impl super::State {
                         .saturating_sub(world.combat.physical_tick())
                 || r.visit > world.combat_identity().ok_or(INVALID)?.visit
                 || world.jump_journal.system_at_visit(r.visit, r.tick)? != r.source.system()
-                || !collection_envelope(
-                    world,
-                    manifest.pose.position,
-                    r.position.map(f32::from_bits),
-                )
+                || !direct_feed_admissible(world, manifest, r.pose, r.tick)
+                || (r.tick == world.state.tick
+                    && r.physical == world.combat.physical_tick()
+                    && r.pose != RecoveryPose::capture(world.state))
                 || previous.is_some_and(|prior| {
                     r.revision <= prior.revision
                         || r.physical
@@ -741,9 +855,8 @@ impl World {
         let Ok(manifest) = self.wreck_manifest(id) else {
             return "Claim unavailable";
         };
-        if self.state.speed.abs() > 0.01
-            || !collection_envelope(self, manifest.pose.position, self.state.position)
-        {
+        let pose = RecoveryPose::capture(self.state);
+        if !direct_feed_admissible(self, manifest, pose, self.state.tick) {
             return "Hold for recovery";
         }
         let tick = self.state.tick;
@@ -796,7 +909,7 @@ impl World {
             visit: identity.visit,
             cutter: cutter.id,
             scoops: scoops.item,
-            position: self.state.position.map(f32::to_bits),
+            pose,
         });
         if self.save_bytes_with_modules(&candidate, &modular).is_err() {
             return "Salvage save refused";
@@ -1154,7 +1267,11 @@ mod tests {
                 visit: 1,
                 cutter: 1,
                 scoops: 2,
-                position: [0; 3],
+                pose: RecoveryPose {
+                    position: [0; 3],
+                    orientation: [0, 0, 0, 1.0_f32.to_bits()],
+                    speed: 0,
+                },
             }],
         };
         assert_eq!(state.recovered(source), 1);
@@ -1186,6 +1303,10 @@ mod tests {
                 }
             ]
         );
+        // The old radial-only preview format cannot prove orientation or velocity.
+        let mut old = writer.bytes.clone();
+        old[0] &= !POSE_FORMAT;
+        assert_eq!(State::decode(&mut Reader::new(&old)).unwrap_err(), INVALID);
         writer.bytes.pop();
         assert!(State::decode(&mut Reader::new(&writer.bytes)).is_err());
     }

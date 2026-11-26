@@ -271,6 +271,78 @@ fn select_wreck(world: &mut World, target: WorkTargetId) -> bool {
     ))
 }
 
+fn reject_altered_first_recovery_pose(
+    bytes: &[u8],
+    manifest: WreckManifest,
+    receipts: u8,
+    first: Snapshot,
+) {
+    // Match the exact new claim and first receipt identity rather than the current flight
+    // snapshot elsewhere in the save. The checksum is deliberately repaired so the
+    // semantic decoder, not corruption detection, must refuse the altered receipt.
+    let source = manifest.source;
+    let system = source.system();
+    let mut id = Vec::new();
+    id.extend(source.profile().to_le_bytes());
+    id.push(system.galaxy);
+    id.extend(system.system.to_le_bytes());
+    id.push(source.serial());
+    let mut prefix = vec![0x81];
+    prefix.extend(&id);
+    prefix.extend(manifest.destroyed_at_tick.to_le_bytes());
+    prefix.push(manifest.commodity.index() as u8);
+    prefix.push(manifest.quantity);
+    prefix.push(receipts);
+    prefix.extend(&id);
+    prefix.push(0); // first source ordinal
+    let matches = bytes
+        .windows(prefix.len())
+        .enumerate()
+        .filter_map(|(start, candidate)| (candidate == prefix.as_slice()).then_some(start))
+        .collect::<Vec<_>>();
+    assert_eq!(matches.len(), 1);
+    let method = matches[0] + prefix.len() + 6 * core::mem::size_of::<u64>();
+    assert_eq!(bytes[method], 1); // explicit direct cutter-to-scoop feed
+    let pose = method + 1;
+    let orientation = pose + 3 * core::mem::size_of::<f32>();
+    let speed = orientation + 4 * core::mem::size_of::<f32>();
+    for (index, value) in first
+        .position
+        .into_iter()
+        .chain(first.orientation)
+        .chain([first.speed])
+        .enumerate()
+    {
+        let offset = pose + index * core::mem::size_of::<f32>();
+        assert_eq!(&bytes[offset..offset + 4], &value.to_le_bytes());
+    }
+    let seal = |mut forged: Vec<u8>| {
+        let end = forged.len() - 8;
+        let digest = forged[..end]
+            .iter()
+            .fold(0xcbf2_9ce4_8422_2325_u64, |hash, byte| {
+                (hash ^ u64::from(*byte)).wrapping_mul(0x100_0000_01b3)
+            });
+        forged[end..].copy_from_slice(&digest.to_le_bytes());
+        assert!(matches!(
+            World::from_save_bytes(&forged),
+            Err(meridian_core::save::SaveError::InvalidState(
+                "external salvage custody"
+            ))
+        ));
+    };
+    let mut fast = bytes.to_vec();
+    fast[speed..speed + 4].copy_from_slice(&0.05_f32.to_le_bytes());
+    seal(fast);
+    let [x, y, z, w] = first.orientation;
+    let mut facing_away = bytes.to_vec();
+    for (index, turned) in [-z, w, x, -y].into_iter().enumerate() {
+        let offset = orientation + index * 4;
+        facing_away[offset..offset + 4].copy_from_slice(&turned.to_le_bytes());
+    }
+    seal(facing_away);
+}
+
 #[test]
 fn earned_external_salvage_recovers_only_the_actual_legal_manifest_once() {
     check_paid_wreck_recovery(finance_salvage());
@@ -304,6 +376,7 @@ fn check_paid_wreck_recovery(mut world: World) {
     assert!(world.automatic_work_status().is_some());
     let mut recovered = 0u64;
     let mut previous_recovery = None;
+    let mut first_recovery_pose = None;
     for _ in 0..12000 {
         ok(world.step(FlightInput::default()));
         assert_eq!(ok(world.wreck_manifest(manifest.source)), manifest);
@@ -324,7 +397,16 @@ fn check_paid_wreck_recovery(mut world: World) {
                 );
             }
             previous_recovery = Some(tick);
-            let continued = ok(World::from_save_bytes(&ok(world.save_bytes())));
+            let bytes = ok(world.save_bytes());
+            if recovered == 1 {
+                first_recovery_pose = Some(world.snapshot());
+                reject_altered_first_recovery_pose(&bytes, manifest, 1, some(first_recovery_pose));
+            } else if recovered == 2 {
+                // First receipt is now historical, so rejection must not rely only on
+                // equality with the current saved pose.
+                reject_altered_first_recovery_pose(&bytes, manifest, 2, some(first_recovery_pose));
+            }
+            let continued = ok(World::from_save_bytes(&bytes));
             assert_eq!(
                 continued.commodity_quantity(manifest.commodity),
                 Some(quantity)
