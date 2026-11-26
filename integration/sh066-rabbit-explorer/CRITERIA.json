@@ -198,6 +198,19 @@
       "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
     }
   },
+  "referenceTriangulation": {
+    "path": "integration/sh066-rabbit-explorer/REFERENCE-FANS.json",
+    "sourceSnapshotCommit": "f657af7c063a4e8b515de14bd6816d0fec381e31",
+    "sourceTree": "9b02f65167569f4ae8efb7a8652c8fd42d7ad091",
+    "historicalReplayPins": {
+      "tools/measure_rabbit_explorer.py": "697bae6dcc9d4e549f4e6702860914a8b351a1da807fc387efe042ab93ce1e10",
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/measure_seriema_courier_geometry.py": "0992ebf43e2ac8800c4f72adf55498efcd88da4003ec9c2ab256fc797f66055e"
+    },
+    "sourceDiagnosticScriptSha256": "6f1418a0b035951c0cd359043552c97ae52015646d46d149c0828097534530f9",
+    "sourceDiagnosticOutputSha256": "944f04b8eb701b9b012861606afa980d86cdf64bcd0b17bff84fe155f3e37ecf"
+  },
   "replayPins": {
     "integration/sh066-rabbit-explorer/ORIGINAL-OWNERSHIP.json": "cd19199e65b8cebca7003694865deeb378e9146a76cfcf4f6bed1615930654d7",
     "integration/sh066-rabbit-explorer/CREATOR-BLUEPRINT.json": "7a9dbb60f7fbf3f7f8bba738072449b408c197375e99464de2fbc12b0d593d72",
@@ -211,7 +224,7 @@
     "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
     "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
     "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
-    "tools/measure_rabbit_explorer.py": "697bae6dcc9d4e549f4e6702860914a8b351a1da807fc387efe042ab93ce1e10",
+    "tools/measure_rabbit_explorer.py": "41a0eb57d36c104130f2dafcec9edf1a9500c9f110e93fee6da4fed51c6ed0ff",
     "tools/measure_seriema_courier_geometry.py": "ed138de0a2f857d176a71d42f047daac5f266250c90195df3eb9202fd2c55fbf",
     "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
     "tools/prepare_rabbit_explorer.py": "ac0b8eaf90e7c8ec434044dad60d675a55cdbc5e1325ebb5b4c1c93b322a0dd3",
@@ -227,6 +240,7 @@
     "integration/sh066-rabbit-explorer/CANDIDATE-ROUTES.json": "13a30b9778d8859fbbde9935137b28fd1db72832d74ee1c9667c1a20b8b3ce00",
     "integration/sh066-rabbit-explorer/CANDIDATE-FIDELITY.json": "57ae8fef4432a4042c044818473caa26e364a3f04371ec4f9fab8142d9a605ed",
     "integration/sh066-rabbit-explorer/CONTACT-RESULT.json": "6a10041efdfd674f121fdfcdfccb48057307196bc07d0a4b9f6e6a8edaa4f1e2",
-    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839",
+    "integration/sh066-rabbit-explorer/REFERENCE-FANS.json": "e8ac60c477f5b2dcd010cdaa3a39894748e3b3ae15c93a5b4e98f8ad4f3c6d94"
   }
 }

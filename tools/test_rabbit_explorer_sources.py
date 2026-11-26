@@ -69,6 +69,13 @@ class RabbitExplorerSources(unittest.TestCase):
         self.assertEqual(package["engineering"]["centerOfMass"], finite["centreMetres"])
         self.assertEqual(sum(package["engineering"]["inertia"], []), finite["inertiaAboutCentreOfMassKgM2"])
 
+    def test_fit_refuses_a_changed_authoring_certificate(self):
+        import measure_rabbit_explorer as measure
+        with patch.object(measure, "REFERENCE_FANS_SHA", "0" * 64), patch.object(measure, "adaptive_upper") as upper:
+            with self.assertRaisesRegex(ValueError, "Changed Rabbit reference triangulation"):
+                measure.support_fit(binding.load()[3], True)
+            upper.assert_not_called()
+
     def test_replay_pins_and_check_without_rewriting(self):
         criteria = json.loads((prep.INTEGRATION / "CRITERIA.json").read_bytes())
         for command in criteria["byteReplay"]["commands"]:

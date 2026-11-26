@@ -34,3 +34,5 @@ visible source. Gameplay qualification remains open.
 [Frozen sources](../integration/sh066-rabbit-explorer/FROZEN-SOURCES.json) ·
 [Inspection criteria](../integration/sh066-rabbit-explorer/CRITERIA.json) ·
 [Exact route proof](../integration/sh066-rabbit-explorer/CONTACT-RESULT.json)
+
+Fit verification checks the original support triangles for both configurations before recomputing their per-piece bounds. The archived and candidate spans overlap by design. On candidate span 07, the archived-native bound is 1,769 mm and the candidate-native bound is 1,729 mm. The reference certificate and historical measurement inputs are identified in the inspection criteria.
