@@ -13,7 +13,9 @@ from unittest.mock import Mock, patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
+RABBIT_EXPLORER = 'sh066-rabbit-explorer'
 REQUIRED = {
+    RABBIT_EXPLORER,
     'sh044-harpy-assault', 'sh045-erne-corvette', 'sh046-harpy-dropship', 'sh047-harpy-gunship',
 }
 MODES = (((), 'SURFACE-FIT.json'), (('--difference',), 'ORIGINAL-DIFFERENCE.json'))
@@ -22,6 +24,11 @@ GEOMETRY_MODES = (
     (('archive-fit',), 'ARCHIVE-FIT.json'),
     (('candidate-fit',), 'candidate-fit.json'),
     (('candidate-fidelity',), 'candidate-fidelity.json'),
+)
+RABBIT_MODES = (
+    (('archive-fit',), 'ARCHIVE-FIT.json'),
+    (('candidate-fit',), 'CANDIDATE-FIT.json'),
+    (('candidate-fidelity',), 'CANDIDATE-FIDELITY.json'),
 )
 MAX_REPLAY_WORKERS = 4
 
@@ -98,7 +105,8 @@ def worker_count():
 
 
 class HullMeasurementReplays(unittest.TestCase):
-    def assert_replays(self, suffix, required, modes):
+    def assert_replays(self, suffix, required, modes, hull_modes=None):
+        hull_modes = {} if hull_modes is None else hull_modes
         cases = list(measurement_cases(suffix, modes))
         self.assertTrue(required <= {folder.name for folder, _ in cases})
         jobs = []
@@ -109,7 +117,7 @@ class HullMeasurementReplays(unittest.TestCase):
                 self.assertTrue(script.is_file(), f'Missing pinned measurement CLI: {script_name}')
                 self.assertEqual(hashlib.sha256(script.read_bytes()).hexdigest(),
                                  criteria['replayPins'][script_name])
-                for flags, receipt in modes:
+                for flags, receipt in hull_modes.get(folder.name, modes):
                     path = folder / receipt
                     name = path.relative_to(ROOT).as_posix()
                     command = receipt_command(folder, script, flags, receipt)
@@ -136,7 +144,8 @@ class HullMeasurementReplays(unittest.TestCase):
                         self.assertEqual(actual, expected)
 
     def test_frozen_fit_and_difference_are_recomputed_byte_for_byte(self):
-        self.assert_replays('', REQUIRED, MODES)
+        self.assert_replays('', REQUIRED, MODES,
+                            {RABBIT_EXPLORER: RABBIT_MODES})
 
     def test_archive_candidate_and_fidelity_are_recomputed_byte_for_byte(self):
         # The three-mode geometry convention qualifies both a frozen archive

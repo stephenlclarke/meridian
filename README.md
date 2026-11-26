@@ -156,6 +156,7 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Seriema Courier source envelope and Hull Studio definition](docs/SERIEMA-COURIER-SOURCE.md)
 - [Arna Cutter source envelope and Hull Studio definition](docs/ARNA-CUTTER-SOURCE.md)
 - [Vulture Raider source envelope and Hull Studio definition](docs/VULTURE-RAIDER-SOURCE.md)
+- [Rabbit Explorer source envelope and Hull Studio definition](docs/RABBIT-EXPLORER-SOURCE.md)
 - [Stag Liner source envelope and Hull Studio definition](docs/STAG-LINER-GAMEPLAY-ENVELOPE.md)
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)

@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh066-rabbit-explorer",
+  "undoBefore": [
+    "sh065-vulture-raider"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "rabbit_explorer",
+  "before": "pub mod navigation;\n",
+  "after": "pub mod saiga;\n"
+}
