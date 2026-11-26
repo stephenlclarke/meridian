@@ -286,6 +286,10 @@ fn real_unfitted_approach_overheats_and_destroys_without_granting_fuel() {
     let mut world = World::new_commander(18293).unwrap();
     let before = fuel(&world);
     solar_approach(&mut world);
+    world
+        .request_missile_arm(true, world.snapshot().tick)
+        .unwrap();
+    assert!(world.missile_snapshot().unwrap().armed);
     let mut seen = false;
     for _ in 0..1500 {
         if world.combat_snapshot().unwrap().player.destroyed {
@@ -302,6 +306,7 @@ fn real_unfitted_approach_overheats_and_destroys_without_granting_fuel() {
     assert_eq!(fuel(&world), before);
     assert_eq!(world.solar_snapshot().unwrap().cabin_temperature, 1.0);
     assert!(world.combat_snapshot().unwrap().player.destroyed);
+    assert!(!world.missile_snapshot().unwrap().armed);
     assert_eq!(
         world.solar.fatal_clock(),
         Some(world.combat.physical_tick())

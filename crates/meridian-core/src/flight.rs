@@ -828,6 +828,12 @@ impl World {
             .map_err(|_| StepError::TickOverflow)?;
         if solar.fatal_clock() == Some(prepared.combat.physical_tick()) {
             prepared.pulse.damage_energy(u16::MAX);
+            self.clear_missing_missile_lock(
+                &mut prepared.missiles,
+                &prepared.traffic,
+                prepared.practice,
+                false,
+            );
         }
         let solar_account = if gained_fuel == 0 {
             None

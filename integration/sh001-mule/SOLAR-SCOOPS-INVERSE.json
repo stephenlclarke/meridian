@@ -3,7 +3,7 @@
   "files": {
     "flight.rs": {
       "beforeSHA256": "62471ae9a52e13e16a239900827724e3fe155dd39ef16024497466d4a26320d5",
-      "afterSHA256": "daced342cfe6ba08cd321ca2c9ad14c993073b71b764d6678cc9300b664a5ff6",
+      "afterSHA256": "b325541e78567bfd3e2f57af2d9873ff95ec4a48c446493879fa9ad7776874c1",
       "hunks": [
         {
           "offset": 237,
@@ -63,20 +63,20 @@
         {
           "offset": 33028,
           "before": "",
-          "after": "        let (solar, gained_fuel) = self\n            .solar\n            .prepare(\n                self,\n                next,\n                navigation,\n                prepared.combat.physical_tick(),\n                motion,\n                prepared.pulse.alive(),\n            )\n            .map_err(|_| StepError::TickOverflow)?;\n        if solar.fatal_clock() == Some(prepared.combat.physical_tick()) {\n            prepared.pulse.damage_energy(u16::MAX);\n        }\n        let solar_account = if gained_fuel == 0 {\n            None\n        } else {\n            if planned_debit.is_some() {\n                return Err(StepError::NonFiniteState);\n            }\n            Some(\n                self.commander_account\n                    .as_ref()\n                    .ok_or(StepError::NonFiniteState)?\n                    .prepare_solar_fuel(gained_fuel)\n                    .map_err(|_| StepError::NonFiniteState)?,\n            )\n        };\n"
+          "after": "        let (solar, gained_fuel) = self\n            .solar\n            .prepare(\n                self,\n                next,\n                navigation,\n                prepared.combat.physical_tick(),\n                motion,\n                prepared.pulse.alive(),\n            )\n            .map_err(|_| StepError::TickOverflow)?;\n        if solar.fatal_clock() == Some(prepared.combat.physical_tick()) {\n            prepared.pulse.damage_energy(u16::MAX);\n            self.clear_missing_missile_lock(\n                &mut prepared.missiles,\n                &prepared.traffic,\n                prepared.practice,\n                false,\n            );\n        }\n        let solar_account = if gained_fuel == 0 {\n            None\n        } else {\n            if planned_debit.is_some() {\n                return Err(StepError::NonFiniteState);\n            }\n            Some(\n                self.commander_account\n                    .as_ref()\n                    .ok_or(StepError::NonFiniteState)?\n                    .prepare_solar_fuel(gained_fuel)\n                    .map_err(|_| StepError::NonFiniteState)?,\n            )\n        };\n"
         },
         {
-          "offset": 34549,
+          "offset": 34742,
           "before": "            (&damage, &mining, &emp.state),\n",
           "after": "            (&damage, &mining, &emp.state, &solar),\n"
         },
         {
-          "offset": 34948,
+          "offset": 35141,
           "before": "",
           "after": "        }\n        if let Some(account) = solar_account {\n            self.commander_account = Some(account);\n"
         },
         {
-          "offset": 35745,
+          "offset": 35938,
           "before": "",
           "after": "        self.solar = solar;\n"
         }
