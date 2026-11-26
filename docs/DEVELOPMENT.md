@@ -87,4 +87,8 @@ For a coverage timing trial, dispatch CI twice on the same commit with
 the Coverage reports job. The parallel schedule uses one runner and a second
 checkout for the Python suite. Compare test counts, LCOV and Python XML covered
 lines, job time and queue time before adopting a faster schedule. Full CI
-retains the serial schedule until a trial supports changing it.
+uses the parallel schedule. In a paired trial, collection fell from 53m00s
+to 44m54s. Both runs exercised the same tests and covered the same Python
+and Rust lines. The native frame hit counts varied. The runner image revisions
+also differed. See the [serial run](https://github.com/stephenlclarke/meridian/actions/runs/45843663640)
+and [parallel run](https://github.com/stephenlclarke/meridian/actions/runs/45843658736).

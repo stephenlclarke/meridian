@@ -92,7 +92,7 @@ jobs:
           python -m pip install --require-hashes --only-binary :all: -r .github/requirements-coverage-ci.txt
       - name: Collect Rust, native window and Python coverage
         env:
-          COVERAGE_SCHEDULE: ${{ inputs.coverage_trial == 'parallel' && 'parallel' || 'serial' }}
+          COVERAGE_SCHEDULE: ${{ inputs.coverage_trial == 'serial' && 'serial' || 'parallel' }}
         run: bash .github/scripts/collect_coverage.sh
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
