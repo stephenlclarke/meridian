@@ -232,6 +232,10 @@ Carabao Freighter preserves the original 2,448-face detailed and 204-face native
 
 Carabao Highliner preserves its original 2,856-face detailed and 236-face native artwork. Both original meshes include the passenger spine and preserve seven guarded inspection routes. [Carabao Highliner source and evidence](CARABAO-HIGHLINER-SOURCE.md)
 
+## Jaguar catalogue source
+
+Jaguar preserves its original 5,820-face detailed and 432-face native artwork. Both original records keep Jaguar unavailable for player flight and purchase. Four nozzle contacts and 14 overlap witnesses reproduce in both meshes. [Jaguar source and evidence](JAGUAR-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)

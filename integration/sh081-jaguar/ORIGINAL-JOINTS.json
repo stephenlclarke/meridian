@@ -1,0 +1,758 @@
+[
+  {
+    "name": "port-lower-arm-to-hull",
+    "pointMetres": [
+      -4.60976288,
+      -2.27985262,
+      -5.865071120000001
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-lower-arm": {
+          "faceRange": [
+            384,
+            396
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-lower-arm": {
+          "faceRange": [
+            64,
+            76
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            64
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-lower-pod-to-arm",
+    "pointMetres": [
+      -20.19023712,
+      -8.91161806,
+      -16.13492888
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-lower-pod": {
+          "faceRange": [
+            396,
+            780
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-lower-arm": {
+          "faceRange": [
+            384,
+            396
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-lower-pod": {
+          "faceRange": [
+            76,
+            108
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-lower-arm": {
+          "faceRange": [
+            64,
+            76
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-upper-arm-to-hull",
+    "pointMetres": [
+      -8.45122036,
+      3.12558796,
+      -9.288357040000001
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-upper-arm": {
+          "faceRange": [
+            1164,
+            1176
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-upper-arm": {
+          "faceRange": [
+            124,
+            136
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            64
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-upper-pod-to-arm",
+    "pointMetres": [
+      -20.19023712,
+      6.18294136,
+      -16.13492888
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-upper-pod": {
+          "faceRange": [
+            1176,
+            1560
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-upper-arm": {
+          "faceRange": [
+            1164,
+            1176
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-upper-pod": {
+          "faceRange": [
+            136,
+            168
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-upper-arm": {
+          "faceRange": [
+            124,
+            136
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-forward-connector-to-hull",
+    "pointMetres": [
+      -7.0,
+      0.20000000000000018,
+      12.2
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-forward-connector": {
+          "faceRange": [
+            2328,
+            2340
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-forward-connector": {
+          "faceRange": [
+            216,
+            228
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            64
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-forward-connector-to-outrigger",
+    "pointMetres": [
+      -12.75,
+      -0.8,
+      12.2
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-forward-connector": {
+          "faceRange": [
+            2328,
+            2340
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-forward-outrigger": {
+          "faceRange": [
+            1944,
+            2328
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-forward-connector": {
+          "faceRange": [
+            216,
+            228
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-forward-outrigger": {
+          "faceRange": [
+            184,
+            216
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-lower-arm-to-hull",
+    "pointMetres": [
+      4.60976288,
+      -2.27985262,
+      -5.865071120000001
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-lower-arm": {
+          "faceRange": [
+            2340,
+            2352
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-lower-arm": {
+          "faceRange": [
+            228,
+            240
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            64
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-lower-pod-to-arm",
+    "pointMetres": [
+      15.64877964,
+      -7.820147380000001,
+      -16.13492888
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-lower-pod": {
+          "faceRange": [
+            2352,
+            2736
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-lower-arm": {
+          "faceRange": [
+            2340,
+            2352
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-lower-pod": {
+          "faceRange": [
+            240,
+            272
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-lower-arm": {
+          "faceRange": [
+            228,
+            240
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-upper-arm-to-hull",
+    "pointMetres": [
+      4.60976288,
+      2.33411728,
+      -5.865071120000001
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-upper-arm": {
+          "faceRange": [
+            3120,
+            3132
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-upper-arm": {
+          "faceRange": [
+            288,
+            300
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            64
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-upper-pod-to-arm",
+    "pointMetres": [
+      15.64877964,
+      7.82014738,
+      -16.13492888
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-upper-pod": {
+          "faceRange": [
+            3132,
+            3516
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-upper-arm": {
+          "faceRange": [
+            3120,
+            3132
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-upper-pod": {
+          "faceRange": [
+            300,
+            332
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-upper-arm": {
+          "faceRange": [
+            288,
+            300
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-forward-connector-to-hull",
+    "pointMetres": [
+      4.5,
+      -0.8,
+      12.2
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-forward-connector": {
+          "faceRange": [
+            4284,
+            4296
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-forward-connector": {
+          "faceRange": [
+            380,
+            392
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            64
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-forward-connector-to-outrigger",
+    "pointMetres": [
+      10.75,
+      -0.8,
+      12.6
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-forward-connector": {
+          "faceRange": [
+            4284,
+            4296
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-forward-outrigger": {
+          "faceRange": [
+            3900,
+            4284
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-forward-connector": {
+          "faceRange": [
+            380,
+            392
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-forward-outrigger": {
+          "faceRange": [
+            348,
+            380
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "deckhouse-to-central-hull",
+    "pointMetres": [
+      -0.8,
+      9.56,
+      -21.91
+    ],
+    "originalFaces": {
+      "detailed": {
+        "dorsal-deckhouse": {
+          "faceRange": [
+            4296,
+            4680
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "dorsal-deckhouse": {
+          "faceRange": [
+            392,
+            424
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            64
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "canopy-to-deckhouse",
+    "pointMetres": [
+      -0.05,
+      12.775,
+      0.44
+    ],
+    "originalFaces": {
+      "detailed": {
+        "canopy": {
+          "faceRange": [
+            4680,
+            5640
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "dorsal-deckhouse": {
+          "faceRange": [
+            4296,
+            4680
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "canopy": {
+          "faceRange": [
+            424,
+            432
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "dorsal-deckhouse": {
+          "faceRange": [
+            392,
+            424
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  }
+]

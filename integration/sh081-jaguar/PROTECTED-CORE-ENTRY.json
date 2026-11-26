@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh081-jaguar",
+  "undoBefore": [
+    "sh080-carabao-highliner"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "jaguar",
+  "before": "pub mod jackal;\n",
+  "after": "pub mod lanner;\n"
+}
