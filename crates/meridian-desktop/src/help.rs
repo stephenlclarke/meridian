@@ -1,5 +1,6 @@
-//! Host-only modal help. Opening a panel never submits a gameplay command.
+//! Host-only panels. Opening a panel never submits a gameplay command.
 use crate::docked_screens::Screen;
+use meridian_core::unwritten_route::ClueProgress;
 
 pub const MAX_LINES: usize = 18;
 pub const MAX_COLUMNS: usize = 78;
@@ -21,6 +22,44 @@ impl Panel {
         }
     }
 
+    pub fn clue_journal(progress: &ClueProgress) -> Self {
+        let mut lines = vec![format!(
+            "{} of {} distinct source clues collected",
+            progress.earned.len(),
+            ClueProgress::REQUIRED
+        )];
+        if progress.complete() {
+            lines.push("Ask the AI at PLUGH to decode the collected traces.".into());
+        } else {
+            lines.push("Collect the remaining source clues to unlock the next instruction.".into());
+        }
+
+        if progress.earned.is_empty() {
+            lines.push("No clues earned yet.".into());
+        } else {
+            // Keep the text within the standard modal's bounds, including its footer.
+            let visible = MAX_LINES - lines.len() - 3;
+            lines.extend(
+                progress
+                    .earned
+                    .iter()
+                    .take(visible)
+                    .map(|clue| clue.clue_id.replace('-', " ")),
+            );
+            if progress.earned.len() > visible {
+                lines.push(format!(
+                    "{} more clues earned",
+                    progress.earned.len() - visible
+                ));
+            }
+        }
+        Self {
+            title: "The Unwritten Route - Clue Journal".into(),
+            lines,
+            footer: "Escape / Shift+J Close journal",
+        }
+    }
+
     pub fn title() -> Self {
         Self::new(
             "Commander",
@@ -35,7 +74,10 @@ impl Panel {
     pub fn commander(has_berth: bool) -> Self {
         let mut panel = Self::new(
             "Commander details",
-            &["F5 Save | F9 Reload | F11 Fullscreen | Escape Save/Quit"],
+            &[
+                "Shift+J Clue Journal",
+                "F5 Save | F9 Reload | F11 Fullscreen | Escape Save/Quit",
+            ],
         );
         if has_berth {
             panel
@@ -60,7 +102,7 @@ impl Panel {
                 "0 Front | 1 Rear | 2 Left | 3 Right view",
                 "T Lock selected ship | F1 Next missile target | F2 Arm / safe",
                 "F3 Launch one missile | F4 Safe and clear target",
-                "J Jump to selected route | P Pause / resume",
+                "J Jump | Shift+J Clue Journal | P Pause / resume",
                 "F6 Flight lesson | F12 Cancel | C Lesson details",
                 "I Mission details | Shift+I Target details | Tab Next target | Delete Release",
                 "F Cycle target filter: Ships / Mining / Salvage / All",
@@ -189,7 +231,7 @@ impl Panel {
             "0 Commander | 1 Galaxy | 2 System | 3 Showroom | 4 Market | 5 Equipment".into(),
             "Tab / Shift+Tab Next / previous station screen".into(),
             "Escape Back: leave search/details/options, then the HUD".into(),
-            "Ctrl+Shift+X XYZZY testing menu (docked commander only)".into(),
+            "Shift+J Clue Journal | Ctrl+Shift+X XYZZY (docked only)".into(),
         ]);
     }
 
@@ -206,6 +248,37 @@ impl Panel {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn clue_journal_displays_earned_names_and_hides_the_later_instruction_until_complete() {
+        use meridian_core::unwritten_route::BaseClue;
+        let progress = ClueProgress {
+            earned: vec![BaseClue {
+                source_id: "l337.training/flight-reception",
+                clue_id: "flight-reception-family-trace",
+            }],
+            missing: vec![BaseClue {
+                source_id: "l337.training/safe-gunnery",
+                clue_id: "safe-gunnery-family-trace",
+            }],
+        };
+        let panel = Panel::clue_journal(&progress);
+        assert_eq!(panel.lines[0], "1 of 64 distinct source clues collected");
+        assert!(
+            panel
+                .lines
+                .iter()
+                .any(|line| line == "flight reception family trace")
+        );
+        assert!(
+            panel
+                .lines
+                .iter()
+                .all(|line| !line.contains("safe gunnery") && !line.contains("PLUGH"))
+        );
+        assert!(panel.lines.len() + 2 <= MAX_LINES);
+        assert!(panel.lines.iter().all(|line| line.len() <= MAX_COLUMNS));
+    }
+
     #[test]
     fn all_station_contexts_and_reviews_explain_cross_screen_navigation() {
         for screen in Screen::ALL {

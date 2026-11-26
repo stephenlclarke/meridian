@@ -24,6 +24,7 @@ pub mod hobby_fighter;
 pub mod hyena;
 pub mod jackal;
 pub mod lanner;
+pub mod medusa;
 pub mod mining;
 pub mod moose_clipper;
 pub mod mule;
@@ -36,6 +37,7 @@ pub mod seriema_courier;
 pub mod station;
 pub mod station_services;
 pub mod traffic;
+pub mod unwritten_route;
 pub mod wombat;
 pub mod yak;
 

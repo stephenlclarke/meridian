@@ -223,6 +223,13 @@ fn actual_food_trip_cold_held_sold_complete_and_reception_error_keep_one_trace_w
     assert_eq!(p.world.credits_tenths(), cash);
     let complete = some(p.world.navigation_trade_snapshot());
     let trace = some(complete.trace);
+    let clues = some(p.world.unwritten_route_clue_progress());
+    assert!(
+        clues
+            .earned
+            .iter()
+            .any(|clue| clue.source_id == trace.source_id && clue.clue_id == trace.clue_id)
+    );
     assert_eq!(
         complete.attempts[0].outcome,
         Some(NavigationTradeOutcome::Complete)
@@ -233,6 +240,7 @@ fn actual_food_trip_cold_held_sold_complete_and_reception_error_keep_one_trace_w
     planned(&mut p);
     review(&mut p, Action::CancelTradeLesson);
     assert_eq!(some(p.world.navigation_trade_snapshot()).trace, Some(trace));
+    assert_eq!(p.world.unwritten_route_clue_progress(), Some(clues));
 }
 #[test]
 fn selected_commodity_plan_and_stale_reviews_are_visible_and_never_silently_repaired() {

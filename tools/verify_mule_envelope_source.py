@@ -80,6 +80,16 @@ def solar_scoops_inverse(root, protected):
                             SOLAR_SCOOPS_INVERSE_SHA256, SOLAR_SCOOPS_BASE, 'solar scoops')
 
 
+def undo_medusa_stock_publication(relative, data):
+    if relative != LIB_SOURCE:
+        return data
+    declaration = b'pub mod medusa;\n'
+    before, after = b'pub mod lanner;\n', b'pub mod mining;\n'
+    span = before + declaration + after
+    assert data.count(declaration) == 1 and data.count(span) == 1, relative
+    return data.replace(span, before + after, 1)
+
+
 def undo_seriema_courier_publication(relative, data):
     if relative != LIB_SOURCE:
         return data
@@ -105,6 +115,16 @@ def undo_saiga_publication(relative, data):
         return data
     declaration = b'pub mod saiga;\n'
     before, after = b'pub mod navigation;\n', b'pub mod saker;\n'
+    span = before + declaration + after
+    assert data.count(declaration) == 1 and data.count(span) == 1, relative
+    return data.replace(span, before + after, 1)
+
+
+def undo_unwritten_route_publication(relative, data):
+    if relative != LIB_SOURCE:
+        return data
+    declaration = b'pub mod unwritten_route;\n'
+    before, after = b'pub mod traffic;\n', b'pub mod wombat;\n'
     span = before + declaration + after
     assert data.count(declaration) == 1 and data.count(span) == 1, relative
     return data.replace(span, before + after, 1)
@@ -526,7 +546,9 @@ def verify_protected_core(root):
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_flight_computer(relative, current, solar_inverse)
+        data = undo_unwritten_route_publication(relative, current)
+        data = undo_medusa_stock_publication(relative, data)
+        data = undo_flight_computer(relative, data, solar_inverse)
         data = undo_flight_computer(relative, data, fuel_inverse)
         data = undo_flight_computer(relative, data, shield_inverse)
         data = undo_flight_computer(relative, data, drive_inverse)

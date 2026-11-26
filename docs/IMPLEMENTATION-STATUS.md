@@ -14,7 +14,13 @@ The [fuel storage source candidate](FUEL-STORAGE.md) implements four separately 
 
 The [solar fuel source candidate](SOLAR-FUEL-SCOOPS.md) adds the original near-sun collection rate using the actual fitted Fuel Scoops and real current tank, independent cabin heat and lethal overheat, exact account/flight continuation receipts, an explicit scoop-only test action, and actual cockpit status. Physical ore and cargo intake remain open. Authored tests require owned native validation.
 
+## The Unwritten Route clue journal
+
+The [ordinary clue journal](../integration/unwritten-route/README.md) reads the existing first receipts for four playable source families against the original 64-clue catalogue. Shift+J opens the journal. Later trail instructions and the paid Medusa path follow the original quest prerequisites.
+
 ## Medusa Showroom inspection
+
+The empty stock reference exposes 40,712 kg in the Showroom. The MacBook Air replayed the original 14 finite distributions and passed all six source tests. The live preview and exact-head compiler validation remain pending for this addition. Flight, exchange and PLUGH fabrication remain unavailable.
 
 SH171 is available for catalogue inspection with the original detailed artwork and seven materials. The archived native mesh has 76,228 faces and stays outside the 512-face flight gate. The source-bound shield uses 729 local supports and keeps the crown opening clear in its own geometry. See the [Medusa inspection record](../integration/sh171-medusa/README.md) for the measured bounds and the remaining flight, player and PLUGH fabrication work.
 

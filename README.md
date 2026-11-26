@@ -18,7 +18,7 @@ In Preview 10, press 3 at a station and search for Goshawk Explorer. Compare sho
 
 The development source also provides a separate Goshawk Mk II Custom Showroom and collision candidate. Its original detailed appearance, four lower mounts and SH028 fit evidence are in the [SH010 hull guide](docs/GOSHAWK-MK-II-CUSTOM.md). Owned native validation is pending.
 
-Medusa (SH171) can be inspected in the station Showroom. The source package preserves both original meshes and the inspection shield. [Medusa inspection and flight limits](integration/sh171-medusa/README.md)
+Medusa (SH171) can be inspected in the station Showroom. The source package preserves both original meshes and the inspection shield. The Showroom lists the verified empty stock dry mass. [Medusa inspection and flight limits](integration/sh171-medusa/README.md)
 
 ## Internal Mule docking validation
 
@@ -96,6 +96,8 @@ The next source increment adds the original Lareria G01-S091 main orbital. The p
 A separate explicitly prepared public-core setup supplied four nonfatal contacts and a live trader. One supported native final shot from a paid missile produced the exact terminal SH025 Food manifest, preserving its native endpoint and source pose across Save/Quit and new-process Continue. Cargo and cash stayed unchanged; the retained hull stopped the player on physical contact. Setup funding, piloting and earlier damage are not native journey credit. Physical pods, pickup, sale and salvage income remain unavailable. Independent audit cleared these bounded observations. Their source is included in Preview 7 through later joins; these native observations retain the earlier compiled identity. Preview 6 keeps its separate source and release evidence.
 
 ## Play
+
+Open the [Unwritten Route clue journal](integration/unwritten-route/README.md) with **Shift+J** to see the source clues your commander has earned.
 
 The current desktop source opens **Commander details** on startup. An empty slot starts a fresh commander at Avenor in memory. A valid slot shows the existing commander at the saved location before simulation resumes. Press **L** to launch from a station or **Enter** to resume a saved flight. Station services use **1–5** at a valid berth, and **0** returns to Commander details when docked. Use **H** or **?** for the current controls.
 

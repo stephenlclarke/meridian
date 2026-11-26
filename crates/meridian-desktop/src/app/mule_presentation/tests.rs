@@ -74,6 +74,11 @@ fn the_paid_freight_sortie_adds_mule_to_the_existing_camera_and_flight_mesh() {
         panic!("actual G02 load")
     };
     assert_eq!(units.len(), 8);
+    assert!(
+        some(world.unwritten_route_clue_progress())
+            .earned
+            .is_empty()
+    );
     dock_at_renas(&mut world);
 
     let receiver = world.station_contacts()[0];
@@ -105,6 +110,14 @@ fn the_paid_freight_sortie_adds_mule_to_the_existing_camera_and_flight_mesh() {
     ));
     assert_eq!(world.credits_tenths(), cash.map(|value| value + 7300));
     assert_eq!(some(world.mission_snapshot()).freight.held_tonnes, 0);
+    let clues = some(world.unwritten_route_clue_progress());
+    assert_eq!(clues.earned.len(), 1);
+    assert_eq!(clues.earned[0].clue_id, meridian_core::freight::CLUE_ID);
+    let saved = ok(world.save_bytes());
+    assert_eq!(
+        ok(World::from_save_bytes(&saved)).unwritten_route_clue_progress(),
+        Some(clues)
+    );
     assert!(world.mule_actor_snapshot().is_none());
     start_flight(&mut world);
     let snapshot = world.snapshot();
