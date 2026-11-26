@@ -606,6 +606,8 @@ impl World {
             // Otherwise selected work guidance resumes thrust on the next idle tick.
             self.cancel_targeting();
             self.cancel_auto_docking();
+        } else {
+            self.advance_selected_work();
         }
         result
     }

@@ -132,6 +132,7 @@ impl Candidate {
 #[derive(Debug, Default, Clone)]
 pub(super) struct State {
     selected: Option<TargetIdentity>,
+    work_status: Option<&'static str>,
     origin: Option<CombatIdentity>,
     tier: Option<TargetingTier>,
     filter: TargetFilter,
@@ -177,6 +178,7 @@ impl State {
         self.cycle_filter = self.filter;
         self.size = size;
         self.membership = membership;
+        self.work_status = None;
         self.selected = self.remaining.first().copied();
         if let Some(id) = self.selected {
             self.remaining.remove(0);
@@ -305,7 +307,10 @@ impl World {
                 self.work_targets()
                     .into_iter()
                     .filter(|work| filter.includes_work(work.role))
-                    .map(Candidate::Work),
+                    .filter(|work| !matches!(work.id, WorkTargetId::Wreck(id)
+                        if filter == TargetFilter::All && candidates.iter().any(|c| matches!(c, Candidate::Ship(ship) if ship.id == id))))
+                    .map(Candidate::Work)
+                    .collect::<Vec<_>>(),
             );
         }
         candidates.sort_by(|a, b| {
@@ -344,6 +349,7 @@ impl World {
         ) {
             self.auto_docking = None;
         }
+        self.targeting.work_status = None;
         self.targeting.selected = None;
     }
 
@@ -394,6 +400,76 @@ impl World {
         }
     }
 
+    fn automatic_work_target(&self, candidate: Candidate) -> Option<WorkTarget> {
+        match candidate {
+            Candidate::Work(work) if work.role == WorkTargetRole::RockHold => {
+                if let WorkTargetId::Asteroid(id) = work.id
+                    && let Some(fragment) = self.mining_collection_target(id)
+                {
+                    return Some(WorkTarget {
+                        id: WorkTargetId::Ore(fragment.id),
+                        role: WorkTargetRole::OreTracking,
+                        position: fragment.position,
+                    });
+                }
+                Some(work)
+            }
+            Candidate::Work(work) if work.role == WorkTargetRole::WreckTracking => Some(work),
+            Candidate::Ship(ship)
+                if ship.electrical_disabled && self.work_targeting_fit().salvage =>
+            {
+                Some(WorkTarget {
+                    id: WorkTargetId::Wreck(ship.id),
+                    role: WorkTargetRole::WreckTracking,
+                    position: ship.pose.position,
+                })
+            }
+            _ => None,
+        }
+    }
+
+    pub fn automatic_work_status(&self) -> Option<&'static str> {
+        self.targeting.work_status
+    }
+
+    pub(super) fn advance_selected_work(&mut self) {
+        if self.targeting.selected.is_none() {
+            return;
+        }
+        let Some(work) = self
+            .current_target()
+            .and_then(|(_, c)| self.automatic_work_target(c))
+        else {
+            self.targeting.work_status = None;
+            return;
+        };
+        if let WorkTargetId::Ore(ore) = work.id {
+            self.targeting.work_status = Some(self.auto_scoop_mined_ore_tick(ore.asteroid()));
+            return;
+        }
+        let Some(standoff) = self.work_standoff(work) else {
+            return;
+        };
+        let Some(pose) = super::flight_pose(self.state.position, self.state.orientation) else {
+            return;
+        };
+        let vector = offset(work.position, pose.position);
+        let range = vector.dot(vector).sqrt();
+        // Recheck the accepted pose and live target after both have moved this tick.
+        let holding = (range - standoff).abs() <= 0.5
+            && self.state.speed <= 0.1
+            && vector.dot(pose.orientation.z) >= range * 0.999;
+        self.targeting.work_status = Some(if !holding {
+            "Approaching work target"
+        } else {
+            match work.id {
+                WorkTargetId::Asteroid(id) => self.auto_mine_tick(id),
+                WorkTargetId::Wreck(id) => self.auto_salvage_tick(id),
+                WorkTargetId::Ore(_) => return,
+            }
+        });
+    }
+
     /// One selected live actor, not an owned missile lock. Manual steering releases tracking;
     /// station guidance is provided separately by the native docking controller.
     pub fn targeting_flight_input(&mut self, input: FlightInput) -> FlightInput {
@@ -404,10 +480,11 @@ impl World {
             self.cancel_targeting();
             return input;
         };
+        let work = self.automatic_work_target(target);
         if input.pitch != 0.0
             || input.yaw != 0.0
             || input.roll != 0.0
-            || matches!(target, Candidate::Station(..) | Candidate::Work(_))
+            || (work.is_some() || matches!(target, Candidate::Station(..) | Candidate::Work(_)))
                 && (input.throttle != 0.0 || input.brake)
         {
             self.cancel_targeting();
@@ -419,7 +496,16 @@ impl World {
         let Some(player) = super::flight_pose(self.state.position, self.state.orientation) else {
             return input;
         };
-        let [bearing, elevation] = target_bearing(player, target.position());
+        let mut aim = work.map_or_else(|| target.position(), |work| work.position);
+        if let Some(standoff) = work.and_then(|w| self.work_standoff(w)) {
+            let delta = offset(aim, player.position);
+            if delta.dot(delta).sqrt() < standoff - 0.25 {
+                // Only forward thrust is available. Face away to recover the work distance,
+                // then turn back towards the target for cutting or mining.
+                aim = offset(player.position, delta);
+            }
+        }
+        let [bearing, elevation] = target_bearing(player, aim);
         let tolerance = 1.5 / (f64::from(self.targeting.size[1].max(1)) * 0.8);
         let control = |angle: f64, rate: f32| {
             if angle.abs() <= tolerance {
@@ -435,10 +521,8 @@ impl World {
             pitch,
             ..input
         };
-        if let Candidate::Work(work) = target
-            && work.role == WorkTargetRole::RockHold
-        {
-            self.asteroid_hold_input(work, output)
+        if let Some(work) = work {
+            self.work_hold_input(work, output)
         } else {
             output
         }

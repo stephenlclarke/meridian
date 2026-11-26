@@ -4,6 +4,12 @@ use crate::equipment::{WorkTarget, WorkTargetId, WorkTargetRole, WorkTargetingFi
 use crate::navigation::SystemId;
 use crate::traffic::NpcPhase;
 
+use crate::docking::Vec3;
+
+fn difference(a: Vec3, b: Vec3) -> Vec3 {
+    Vec3::new(a.x - b.x, a.y - b.y, a.z - b.z)
+}
+
 impl World {
     pub fn work_targeting_fit(&self) -> WorkTargetingFit {
         let Some(ledger) = self
@@ -48,7 +54,10 @@ impl World {
                 self.mining
                     .bodies()
                     .into_iter()
-                    .filter(|body| body.remaining_energy > 0.0 && body.remaining_units > 0)
+                    .filter(|body| {
+                        (body.remaining_energy > 0.0 && body.remaining_units > 0)
+                            || self.mining_collection_target(body.id).is_some()
+                    })
                     .map(|body| WorkTarget {
                         id: WorkTargetId::Asteroid(body.id),
                         role: WorkTargetRole::RockHold,
@@ -77,8 +86,9 @@ impl World {
                     .filter(|actor| {
                         actor.id.profile() == identity.owner
                             && actor.id.system() == identity.system
-                            && actor.phase == NpcPhase::Destroyed
-                            && self.wreck_manifest(actor.id).is_ok()
+                            && (actor.electrical_disabled
+                                || (actor.phase == NpcPhase::Destroyed
+                                    && self.wreck_manifest(actor.id).is_ok()))
                     })
                     .map(|actor| WorkTarget {
                         id: WorkTargetId::Wreck(actor.id),
@@ -90,51 +100,54 @@ impl World {
         targets
     }
 
-    /// Longitudinal guidance for a fixed, live rock. Steering and ordinary swept motion
-    /// validation still run through the flight controller.
-    pub(in crate::flight) fn asteroid_hold_input(
+    /// Desired centre-to-centre separation, using the same hull bounds as swept motion.
+    pub(in crate::flight) fn work_standoff(&self, target: WorkTarget) -> Option<f64> {
+        let player_radius = self.station_data.as_ref()?.player_clearance_radius();
+        match target.id {
+            WorkTargetId::Asteroid(id) => {
+                let rock = self
+                    .mining
+                    .body(usize::from(id.ordinal()))
+                    .filter(|rock| rock.id == id)?;
+                let radius = rock
+                    .vertices
+                    .into_iter()
+                    .map(|vertex| {
+                        let delta = difference(vertex, rock.position);
+                        delta.dot(delta).sqrt()
+                    })
+                    .fold(0.0, f64::max);
+                Some(radius + player_radius + 1.0)
+            }
+            // Traffic rejects centre distances <= 2 * radius + 1.
+            WorkTargetId::Wreck(_) => Some(2.0 * player_radius + 2.0),
+            WorkTargetId::Ore(_) => Some(0.0),
+        }
+    }
+
+    pub(in crate::flight) fn work_hold_input(
         &self,
         target: WorkTarget,
         input: crate::FlightInput,
     ) -> crate::FlightInput {
-        let WorkTargetId::Asteroid(id) = target.id else {
-            return input;
-        };
-        let Some(body) = self
-            .mining
-            .body(usize::from(id.ordinal()))
-            .filter(|body| body.id == id && body.remaining_energy > 0.0)
-        else {
-            return input;
-        };
-        let Some(station) = &self.station_data else {
+        let Some(stand_off) = self.work_standoff(target) else {
             return input;
         };
         let Some(player) = crate::flight::flight_pose(self.state.position, self.state.orientation)
         else {
             return input;
         };
-        let offset = |point: crate::docking::Vec3| {
-            crate::docking::Vec3::new(
-                point.x - body.position.x,
-                point.y - body.position.y,
-                point.z - body.position.z,
-            )
+        let to_target = difference(target.position, player.position);
+        let distance = to_target.dot(to_target).sqrt();
+        let separation_error = distance - stand_off;
+        let retreating = separation_error < -0.25;
+        let room = if retreating {
+            -separation_error
+        } else {
+            separation_error.max(0.0)
         };
-        let radius = body
-            .vertices
-            .into_iter()
-            .map(|point| {
-                let delta = offset(point);
-                delta.dot(delta).sqrt()
-            })
-            .fold(0.0, f64::max);
-        let to_rock = offset(player.position);
-        let distance = to_rock.dot(to_rock).sqrt();
-        // Frozen RelativeWorkController.workMargin plus both hull radii.
-        let stand_off = radius + station.player_clearance_radius() + 1.0;
-        let room = (distance - stand_off).max(0.0);
-        let facing = -to_rock.dot(player.orientation.z) > distance * 0.995;
+        let direction = if retreating { -1.0 } else { 1.0 };
+        let facing = direction * to_target.dot(player.orientation.z) > distance * 0.995;
         let units = f64::from(crate::flight::DISTANCE_PER_SPEED_UNIT);
         let acceleration = f64::from(crate::flight::ACCELERATION) * units;
         let delta_t = f64::from(crate::FIXED_DELTA_SECONDS);
