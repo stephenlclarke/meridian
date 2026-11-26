@@ -45,6 +45,22 @@ def pe():
     return bytes(data)
 
 
+def macho(cpu=0x0100000C, filetype=2):
+    return struct.pack("<IIIIIIII", 0xFEEDFACF, cpu, 0, filetype, 0, 0, 0, 0)
+
+
+NOTICE_CONTENT = {
+    "LICENSE": ("LICENSE", b"approved source notice"),
+    "Fleet provenance/SH171/LICENSE": ("assets/fleet/sh171/LICENSE", b"hull licence"),
+}
+
+
+def expected_notices():
+    return {destination: {"sourcePath": path, "commit": SOURCE, "blob": str(index) * 40,
+                         "bytes": len(content), "sha256": digest(content), "mode": 0o644}
+            for index, (destination, (path, content)) in enumerate(NOTICE_CONTENT.items(), 1)}
+
+
 def archive(path, files):
     with zipfile.ZipFile(path, "w") as bundle:
         for relative, (mode, data) in files.items():
@@ -64,13 +80,13 @@ def archive(path, files):
 
 
 def notice_inventory(files, platform):
-    content = b"approved source notice"
-    inventory = {"status": "EXACT_SOURCE_INVENTORY", "sourceTrees": {SOURCE: TREE}, "noticeCount": 1,
-                 "files": {"LICENSE": {"bytes": len(content), "sha256": digest(content)}}}
+    inventory = {"status": "EXACT_SOURCE_INVENTORY", "sourceTrees": {SOURCE: TREE}, "noticeCount": 2,
+                 "fleetHulls": ["SH171"], "fleetHullCount": 1, "files": expected_notices()}
     files["SOURCE-NOTICE-INVENTORY.json"] = (FILE, encoded(inventory))
     prefixes = [f"{app}/Contents/Resources/Notices/" for app in (policy.FLEET, policy.MEDUSA, policy.SHOWROOM)] if platform == "macos" else ["notices/"]
     for prefix in prefixes:
-        files[prefix + "LICENSE"] = FILE, content
+        for destination, (_, content) in NOTICE_CONTENT.items():
+            files[prefix + destination] = FILE, content
 
 
 def runtime_manifest(files, platform, paths):
@@ -97,18 +113,19 @@ def mac_files():
         if app in (policy.FLEET, policy.MEDUSA):
             info.update(MeridianSourceRevision=SOURCE, MeridianSourceTree=TREE, MeridianCompiledRevision=COMPILED,
                         MeridianSaveNamespace=policy._namespace(app, COMPILED))
-            files[f"{app}/Contents/MacOS/Meridian"] = EXEC, b"game"
+            files[f"{app}/Contents/MacOS/Meridian"] = EXEC, macho()
         if app != policy.SHOWROOM:
             apps[app] = {"bundleIdentifier": identifier, "appleNotaryStatus": "Accepted",
                          "appleNotarySubmissionID": f"00000000-0000-0000-0000-{index:012d}"}
         files[f"{app}/Contents/Info.plist"] = FILE, plistlib.dumps(info)
-        files[f"{app}/Contents/MacOS/{executable}"] = EXEC, b"executable"
+        files[f"{app}/Contents/MacOS/{executable}"] = EXEC, macho()
         files[f"{app}/Contents/_CodeSignature/CodeResources"] = FILE, b"signature"
     files["BUILD-IDENTITY.json"] = FILE, encoded({"protectedReleaseSource": SOURCE, "protectedSourceTree": TREE,
         "compiledSource": COMPILED, "version": "0.12.0", "build": 12, "apps": apps})
     notice_inventory(files, "macos")
     runtime = f"{policy.STUDIO}/Contents/Frameworks/libpython.dylib"
-    files[runtime] = EXEC, b"library"
+    files[runtime] = EXEC, macho(filetype=6)
+    files[policy.MAC_VALIDATOR] = EXEC, macho()
     runtime_manifest(files, "macos", [runtime])
     files[f"__MACOSX/{policy.ROOT}/._Read Me.txt"] = FILE, APPLEDOUBLE
     return files
@@ -159,6 +176,11 @@ def signature(*args):
 
 
 class Preview12PolicyTests(unittest.TestCase):
+    def setUp(self):
+        self.expected = patch.object(policy, "_expected_source_notices", return_value=expected_notices())
+        self.expected.start()
+        self.addCleanup(self.expected.stop)
+
     def test_complete_mac_and_windows_layout_with_individual_signatures_tickets(self):
         with tempfile.TemporaryDirectory() as folder:
             mac, windows = Path(folder) / release.PACKAGE_FILES[0], Path(folder) / release.PACKAGE_FILES[1]
@@ -215,6 +237,46 @@ class Preview12PolicyTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Missing required Preview 12 file"):
                 policy.verify_macos(path, approved, SOURCE, TREE, run)
 
+    def test_actual_mac_native_architecture_and_omitted_git_notice_refuse(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "mac.zip"
+            for native in (f"{policy.FLEET}/Contents/MacOS/Meridian", f"{policy.MEDUSA}/Contents/MacOS/LaunchMedusa", policy.MAC_VALIDATOR,
+                           f"{policy.SHOWROOM}/Contents/MacOS/meridian-desktop", f"{policy.STUDIO}/Contents/MacOS/Meridian Hull Studio"):
+                with self.subTest(native=native):
+                    files = mac_files(); files[native] = EXEC, macho(0x01000007)
+                    approved = archive(path, files)
+                    with patch.object(policy, "_extract_inventory"), patch.object(policy, "_checked_output", side_effect=signature), self.assertRaisesRegex(ValueError, "not thin arm64"):
+                        policy.verify_macos(path, approved, SOURCE, TREE, run)
+            files = mac_files()
+            runtime = f"{policy.STUDIO}/Contents/Frameworks/libpython.dylib"
+            files[runtime] = EXEC, macho(0x01000007, filetype=6)
+            runtime_manifest(files, "macos", [runtime])
+            approved = archive(path, files)
+            with self.assertRaisesRegex(ValueError, "not thin arm64"):
+                policy.verify_macos(path, approved, SOURCE, TREE, run)
+            files = mac_files()
+            inventory = json.loads(files["SOURCE-NOTICE-INVENTORY.json"][1])
+            del inventory["files"]["Fleet provenance/SH171/LICENSE"]
+            inventory.update(noticeCount=1, fleetHulls=[], fleetHullCount=0)
+            files["SOURCE-NOTICE-INVENTORY.json"] = FILE, encoded(inventory)
+            for app in (policy.FLEET, policy.MEDUSA, policy.SHOWROOM):
+                del files[f"{app}/Contents/Resources/Notices/Fleet provenance/SH171/LICENSE"]
+            approved = archive(path, files)
+            with self.assertRaisesRegex(ValueError, "incomplete or changed current Git source"):
+                policy.verify_macos(path, approved, SOURCE, TREE, run)
+
+    def test_notice_derivation_reads_exact_git_blob_bytes_and_paths(self):
+        def git(*args):
+            if args[:2] == ("ls-tree", "-r"):
+                return b"".join(f"100644 blob {index * 40}\t{path}\0".encode()
+                                for index, (path, _) in ((str(i), v) for i, v in enumerate(NOTICE_CONTENT.values(), 1)))
+            if args[:2] == ("cat-file", "blob"):
+                return list(NOTICE_CONTENT.values())[int(args[-1][0]) - 1][1]
+            raise AssertionError(args)
+        self.expected.stop()
+        with patch.object(policy, "_git_bytes", side_effect=git):
+            self.assertEqual(policy._expected_source_notices(SOURCE), expected_notices())
+
     def test_windows_refuses_extra_runtime_wrong_launcher_and_non_x64(self):
         def add_unapproved_runtime_with_manifest(files):
             extra = f"{policy.WINDOWS_STUDIO}/_internal/VCRUNTIME140.dll"
@@ -261,6 +323,11 @@ class Preview12PolicyTests(unittest.TestCase):
             files = mac_files(); files[f"__MACOSX/{policy.ROOT}/._orphan"] = FILE, APPLEDOUBLE
             approved = archive(path, files)
             with self.assertRaisesRegex(ValueError, "Unpaired AppleDouble"):
+                policy.verify_inventory(path, "macos", approved)
+            files = mac_files(); files["Documentation/Case"] = FILE, b"file"
+            files["Documentation/case/child"] = FILE, b"case alias"
+            approved = archive(path, files)
+            with self.assertRaisesRegex(ValueError, "Case-colliding"):
                 policy.verify_inventory(path, "macos", approved)
 
     def test_preview12_dispatch_refuses_before_any_release_mutation(self):
