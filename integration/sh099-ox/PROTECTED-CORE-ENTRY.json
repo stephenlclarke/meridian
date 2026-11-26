@@ -3,7 +3,8 @@
   "id": "sh099-ox",
   "undoBefore": [
     "sh098-anoa",
-    "followup-trade-detail"
+    "followup-trade-detail",
+    "followup-bulk-market"
   ],
   "undoAfter": [],
   "kind": "declaration",

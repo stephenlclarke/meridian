@@ -21,6 +21,7 @@ pub struct DockedScreens {
     pub(super) compare: bool,
     pub(super) commodity: CommodityId,
     pub(super) sell: bool,
+    pub(super) quantity: u64,
     pub(super) body_index: usize,
     pub(super) equipment_index: usize,
     pub(super) option_index: usize,
@@ -56,6 +57,7 @@ impl DockedScreens {
             compare: true,
             commodity: CommodityId::Food,
             sell: false,
+            quantity: 1,
             body_index: 0,
             equipment_index: 0,
             option_index: 0,
@@ -98,6 +100,7 @@ impl DockedScreens {
     }
     pub fn open(&mut self, screen: Screen) {
         self.screen = screen;
+        self.quantity = 1;
         self.route_chooser = None;
         self.searching = false;
         self.query.clear();
@@ -350,6 +353,9 @@ impl DockedScreens {
                 Outcome::Updated
             }
             Control::SelectCommodity(id) => {
+                if self.commodity != *id {
+                    self.quantity = 1;
+                }
                 self.commodity = *id;
                 Outcome::Updated
             }
@@ -450,7 +456,11 @@ impl DockedScreens {
                         .iter()
                         .position(|id| *id == self.commodity)
                         .unwrap_or(0);
-                    self.commodity = order[moved(index, amount, order.len())];
+                    let next = order[moved(index, amount, order.len())];
+                    if next != self.commodity {
+                        self.quantity = 1;
+                    }
+                    self.commodity = next;
                 }
             }
             Screen::Equipment => {
@@ -690,6 +700,21 @@ impl DockedScreens {
     }
     fn market_key(&mut self, key: Key, c: &Context<'_>) -> Outcome {
         match key {
+            Key::QuantityLess | Key::QuantityMore | Key::QuantityLessTen | Key::QuantityMoreTen => {
+                let step = if matches!(key, Key::QuantityLessTen | Key::QuantityMoreTen) {
+                    10
+                } else {
+                    1
+                };
+                self.quantity = if matches!(key, Key::QuantityLess | Key::QuantityLessTen) {
+                    self.quantity.saturating_sub(step).max(1)
+                } else {
+                    self.quantity
+                        .saturating_add(step)
+                        .min(meridian_core::station_services::MAX_TRADE_QUANTITY)
+                };
+                Outcome::Updated
+            }
             Key::Previous | Key::Next | Key::PagePrevious | Key::PageNext => {
                 self.move_selection(selection_step(key), c);
                 Outcome::Updated
@@ -780,6 +805,7 @@ impl DockedScreens {
         Outcome::Request(Request::ReviewCommodity {
             commodity: self.commodity,
             buy,
+            quantity: self.quantity,
         })
     }
     fn route(&mut self, c: &Context<'_>) -> Outcome {

@@ -111,3 +111,21 @@ pub fn service_message(event: station_services::Event) -> Result<String, String>
         cash % 10
     ))
 }
+
+pub fn commodity_trade_message(
+    event: station_services::CommodityTradeEvent,
+) -> Result<String, String> {
+    let definition = event.commodity.definition().map_err(content_error)?;
+    let (verb, amount) = match event.side {
+        station_services::TradeSide::Buy => ("Bought", event.paid_tenths),
+        station_services::TradeSide::Sell => ("Sold", event.credited_tenths),
+    };
+    Ok(format!(
+        "{verb} {} {} {} for {}.{} CR.",
+        event.quantity,
+        definition.unit.symbol(),
+        definition.name,
+        amount / 10,
+        amount % 10
+    ))
+}

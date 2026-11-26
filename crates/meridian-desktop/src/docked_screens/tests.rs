@@ -345,9 +345,55 @@ fn market_keyboard_pointer_equivalence_outputs_review_only_and_preserves_world()
     let expected = Outcome::Request(Request::ReviewCommodity {
         commodity: CommodityId::Food,
         buy: true,
+        quantity: 1,
     });
     assert_eq!(key(&mut a, &ctx, Key::Confirm), expected);
     assert_eq!(click(&mut b, &ctx, Control::Key(Key::Confirm)), expected);
+    assert_eq!(w.save_bytes().unwrap_or_else(|e| panic!("{e}")), before);
+}
+
+#[test]
+fn market_quantity_controls_are_bounded_read_only_and_reset_on_new_selection() {
+    let c = catalogue();
+    let w = world();
+    let ctx = context(&w, &c);
+    let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+    ui.open(Screen::Trading);
+    let before = w.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(
+        click(&mut ui, &ctx, Control::Key(Key::QuantityMoreTen)),
+        Outcome::Updated
+    );
+    assert_eq!(key(&mut ui, &ctx, Key::QuantityMore), Outcome::Updated);
+    assert_eq!(
+        key(&mut ui, &ctx, Key::Confirm),
+        Outcome::Request(Request::ReviewCommodity {
+            commodity: CommodityId::Food,
+            buy: true,
+            quantity: 12
+        })
+    );
+    let min = Viewport::new(320.0, 240.0).unwrap_or_else(|| panic!("viewport"));
+    let frame = ui.frame(&ctx, min);
+    assert!(frame.labels.iter().any(|label| label.text == "Qty 12 t"));
+    assert!(
+        frame
+            .hits
+            .iter()
+            .any(|hit| matches!(hit.control, Control::SelectCommodity(_)))
+    );
+    assert_eq!(
+        click(&mut ui, &ctx, Control::SelectCommodity(CommodityId::Gold)),
+        Outcome::Updated
+    );
+    assert_eq!(
+        key(&mut ui, &ctx, Key::Sell),
+        Outcome::Request(Request::ReviewCommodity {
+            commodity: CommodityId::Gold,
+            buy: false,
+            quantity: 1
+        })
+    );
     assert_eq!(w.save_bytes().unwrap_or_else(|e| panic!("{e}")), before);
 }
 #[test]
@@ -365,7 +411,8 @@ fn selection_changes_do_not_execute_the_selected_commodity() {
         key(&mut ui, &ctx, Key::Sell),
         Outcome::Request(Request::ReviewCommodity {
             commodity: CommodityId::Gold,
-            buy: false
+            buy: false,
+            quantity: 1,
         })
     );
 }
@@ -967,7 +1014,8 @@ fn market_help_describes_enter_in_both_real_trade_modes() {
             key(&mut screens, &context, Key::Confirm),
             Outcome::Request(Request::ReviewCommodity {
                 commodity: CommodityId::Food,
-                buy
+                buy,
+                quantity: 1,
             })
         );
     }
