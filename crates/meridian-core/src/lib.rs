@@ -49,6 +49,7 @@ pub mod jackal;
 pub mod jaguar;
 pub mod laggar;
 pub mod lanner;
+pub mod leopard_fighter;
 pub mod llama;
 pub mod magpie;
 pub mod medusa;
