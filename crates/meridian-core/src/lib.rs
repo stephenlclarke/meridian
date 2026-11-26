@@ -32,6 +32,7 @@ pub mod mule;
 pub mod muskox;
 pub mod navigation;
 pub mod rabbit_explorer;
+pub mod rhinoceros_trader;
 pub mod saiga;
 pub mod saker;
 pub mod save;
