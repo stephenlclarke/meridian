@@ -280,6 +280,23 @@ fn basic_core_aligns_rear_station_but_needs_docking_tier_for_automatic_approach(
     assert!(!world.auto_docking_active());
     assert_eq!(world.snapshot().position, before);
     assert_eq!(world.snapshot().speed, 0.0);
+
+    // Basic targeting owns alignment only. The pilot retains longitudinal control
+    // without losing either the selected mark or the steering assistance.
+    let throttle = FlightInput {
+        throttle: 0.35,
+        ..FlightInput::default()
+    };
+    let assisted = world.targeting_flight_input(throttle);
+    assert_eq!(assisted.throttle, throttle.throttle);
+    assert!(assisted.yaw != 0.0 || assisted.pitch != 0.0);
+    assert!(!world.manual_scanner_target());
+    assert_eq!(some(world.targeting_snapshot()).identity, id);
+    ok(world.step(throttle));
+    assert!(world.snapshot().speed > 0.0);
+    assert_eq!(some(world.targeting_snapshot()).identity, id);
+    assert!(!world.manual_scanner_target());
+    assert!(!world.auto_docking_active());
 }
 
 #[test]
@@ -383,4 +400,91 @@ fn rock_is_a_real_track_without_specialist_and_auto_work_requires_matching_fit()
     assert_ne!(next, id);
     assert!(!fitted.manual_scanner_target());
     assert_eq!(some(fitted.targeting_snapshot()).identity, next);
+}
+
+#[test]
+fn advanced_aligns_approaches_and_holds_the_real_rock_without_operating_the_pilot_tool() {
+    const SH025_CLEARANCE_RADIUS: f64 = 72.5470172564567;
+    let mut world = basic_without_specialists(16844);
+    module(
+        &mut world,
+        ModuleAction::Purchase {
+            kind: ModuleKind::Targeting(TargetingTier::Advanced),
+        },
+    );
+    assert_eq!(world.targeting_tier(), Some(TargetingTier::Advanced));
+    assert!(!world.work_targeting_fit().mining);
+    // Install the actual owned mining utility through the ordinary reviewed berth command.
+    // The explicit outfit supplies the fixture's funds and property, not a fabricated fit.
+    let mining = owned(&world, ModuleKind::MiningLaser);
+    let previous_front = some(world.front_laser_snapshot()).fitted_item_id;
+    module(
+        &mut world,
+        ModuleAction::Install {
+            item: mining,
+            replacing: Some(previous_front),
+        },
+    );
+    assert_eq!(some(world.fitted_mining_tool()).item, mining);
+    assert!(world.fitted_fuel_scoops().is_some());
+    launch(&mut world);
+    stop(&mut world);
+    let opening = some(world.mining_belt_snapshot());
+    let rock = opening.bodies[0];
+    let cargo = world.commodity_quantity(rock.commodity);
+    let credits = world.credits_tenths();
+    let id = TargetIdentity::Work(WorkTargetId::Asteroid(rock.id));
+    let opening_range = distance_squared(&world, rock.position).sqrt();
+    // Source-derived immutable player hull bound plus this actual asteroid's public radius.
+    let standoff = SH025_CLEARANCE_RADIUS + rock.bounding_radius() + 2.0;
+    assert!(opening_range > standoff + 100.0);
+    select(&mut world, id);
+    assert!(world.pilot_operates_selected_tool());
+    assert!(!world.manual_scanner_target());
+
+    let holding = |world: &World| {
+        let delta = offset(world, rock.position);
+        let range = delta.dot(delta).sqrt();
+        (range - standoff).abs() <= 0.5
+            && world.snapshot().speed <= 0.1
+            && delta.dot(forward(world)) >= range * 0.999
+    };
+    let assert_no_emission = |world: &World| {
+        let resources = some(world.flight_resources_snapshot());
+        assert_eq!(resources.heat_fifths, 0);
+        assert_eq!(resources.cooldown_ticks, 0);
+        assert_eq!(some(world.targeting_snapshot()).identity, id);
+        assert_eq!(world.snapshot().motion_refusal, None);
+    };
+    let mut reached = false;
+    let mut moved = false;
+    for _ in 0..12000 {
+        ok(world.step(FlightInput::default()));
+        assert_no_emission(&world);
+        moved |= world.snapshot().speed > 0.1;
+        if holding(&world) {
+            reached = true;
+            break;
+        }
+    }
+    assert!(
+        moved && reached,
+        "Advanced steering did not establish the actual rock hold"
+    );
+    for _ in 0..120 {
+        ok(world.step(FlightInput::default()));
+        assert_no_emission(&world);
+        assert!(
+            holding(&world),
+            "Advanced steering did not retain the actual rock hold"
+        );
+    }
+    assert!(world.pilot_operates_selected_tool());
+    assert!(!world.manual_scanner_target());
+    assert_eq!(some(world.fitted_mining_tool()).item, mining);
+    let after = some(world.mining_belt_snapshot());
+    assert_eq!(after.bodies, opening.bodies);
+    assert!(after.pending_ore.is_empty());
+    assert_eq!(world.commodity_quantity(rock.commodity), cargo);
+    assert_eq!(world.credits_tenths(), credits);
 }
