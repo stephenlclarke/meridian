@@ -31,7 +31,7 @@ class MuleSourceVerification(unittest.TestCase):
         self.assertEqual(result['protectedCoreFilesWithStockShieldChanges'], 16)
         self.assertEqual(result['protectedCoreFilesWithFuelStorageChanges'], 22)
         self.assertEqual(result['protectedCoreFilesWithSolarScoopsChanges'], 16)
-        self.assertEqual(result['protectedCoreFilesWithStockEcmChanges'], 15)
+        self.assertEqual(result['protectedCoreFilesWithStockEcmChanges'], 16)
         self.assertEqual(result['geometryCoreTests'], 1)
         self.assertEqual(result['restoreCoreTests'], 1)
         self.assertEqual(result['totalMuleCoreTests'], 24)
@@ -181,7 +181,7 @@ class MuleSourceVerification(unittest.TestCase):
             root = Path(directory)
             core = self.copy_protected_sources(root)
             inverse = verifier.stock_ecm_inverse(root, verifier.protected_core_pins(root))
-            self.assertEqual(len(inverse), 15)
+            self.assertEqual(len(inverse), 16)
             for relative in inverse:
                 with self.subTest(relative=relative):
                     source = core / relative
@@ -204,9 +204,9 @@ class MuleSourceVerification(unittest.TestCase):
             inverse = json.loads(manifest.read_bytes())
             relative = verifier.LIB_SOURCE
             protected = verifier.protected_core_pins(root)
-            current = verifier.undo_medusa_stock_publication(relative, (core / relative).read_bytes())
-            current = verifier.undo_flight_computer(relative, current,
+            current = verifier.undo_flight_computer(relative, (core / relative).read_bytes(),
                                                      verifier.stock_ecm_inverse(root, protected))
+            current = verifier.undo_medusa_stock_publication(relative, current)
             current = verifier.undo_flight_computer(relative, current,
                                                      verifier.solar_scoops_inverse(root, protected))
             current = verifier.undo_flight_computer(relative, current,

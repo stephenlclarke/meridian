@@ -33,8 +33,8 @@ SOLAR_SCOOPS_INVERSE = Path('integration/sh001-mule/SOLAR-SCOOPS-INVERSE.json')
 SOLAR_SCOOPS_BASE = '641dfc9b2f1834412cff3831d1b2eb5296dec507'
 SOLAR_SCOOPS_INVERSE_SHA256 = '0c68577f581d05cf490cbdfaa1488bdc361d712b30751f68300f1eb23da7ba67'
 STOCK_ECM_INVERSE = Path('integration/sh001-mule/STOCK-ECM-INVERSE.json')
-STOCK_ECM_BASE = 'f32ada6970976e1a1e609e4777b3ef5c333f055d'
-STOCK_ECM_INVERSE_SHA256 = 'a470932b8b411825325bdb3e0fb9e38cb5919a44bac7e90d55332dfcff0d6a32'
+STOCK_ECM_BASE = 'f04385c9fd3119d6ddb797ea80ca419f7495944b'
+STOCK_ECM_INVERSE_SHA256 = '65c8433601da990abea476d880e6ec1e312189856d7ede5e9da1d03d0ba81a79'
 
 
 def sha(data):
@@ -545,8 +545,8 @@ def verify_protected_core(root):
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_medusa_stock_publication(relative, current)
-        data = undo_flight_computer(relative, data, ecm_inverse)
+        data = undo_flight_computer(relative, current, ecm_inverse)
+        data = undo_medusa_stock_publication(relative, data)
         data = undo_flight_computer(relative, data, solar_inverse)
         data = undo_flight_computer(relative, data, fuel_inverse)
         data = undo_flight_computer(relative, data, shield_inverse)

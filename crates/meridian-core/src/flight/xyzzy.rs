@@ -410,6 +410,12 @@ impl State {
                         .state
                         .custody_clear_at(r.revision, r.dock.sequence())
                     || commerce.lesson.known_active_at(r.tick, r.revision)
+                    // A later store or remount must not change admission of the
+                    // original MAX command. Its first revision is the account action.
+                    || commerce.modular.ecm_fitted_at_revision(
+                        r.dock.owner().seed(),
+                        r.revision.checked_sub(1).ok_or(INVALID)?,
+                    )?
                     || commerce
                         .modular
                         .fuel_capacity_at_revision(r.dock.owner().seed(), r.end_revision)?
