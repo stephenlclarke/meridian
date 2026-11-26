@@ -16,4 +16,6 @@ While docked, B fits or stores the preview cargo expansion. Brackets reduce or i
 
 This mode is an isolated test entitlement, not PLUGH fabrication, a paid stock hull, a maximum upgrade, or a mission actor. It has no ordinary commander identity, market, wallet, quest receipts, passengers, or service authority. It does not grant a source-unsupported intrinsic attachment or a paid upgrade. The ordinary Showroom and progression keep their existing acquisition refusals.
 
-Native acceptance must check the displayed SH171 identity, the actual geometry on launch and return, fit limit refusal and cold Continue. The exact renderer handoff remains independently owned. The source tests do not substitute for signed installed preview acceptance.
+In flight, the active World hull identity selects the original 162,548-face artwork. The GPU retains the detailed mesh and uses a closer chase camera in the shared flight projection. Near the station, the existing first-person view remains in use. The 512-face flight contact geometry is independent, and the archived 729-piece inspection shield is not rendered in flight.
+
+Native acceptance must check the displayed SH171 identity, the actual geometry on launch and return, fit limit refusal and cold Continue. The source tests do not substitute for signed installed preview acceptance.

@@ -4,8 +4,10 @@
 
 pub mod aplomado_interceptor;
 pub mod arna_cutter;
+pub mod badger;
 pub mod banteng;
 pub mod barbary;
+pub mod baza_fighter;
 pub mod caracal_scout;
 pub mod celestial;
 pub mod condor;
@@ -36,6 +38,7 @@ pub mod navigation;
 pub mod peregrine_mk3;
 pub mod peregrine_mk_i;
 pub mod rabbit_explorer;
+pub mod rhinoceros_trader;
 pub mod saiga;
 pub mod saker;
 pub mod save;

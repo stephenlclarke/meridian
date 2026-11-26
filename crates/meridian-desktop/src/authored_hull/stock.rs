@@ -227,6 +227,24 @@ const DESCRIPTORS: &[StockDescriptor] = &[
         "integration/sh066-rabbit-explorer/RABBIT-EXPLORER-STUDIO.json",
         0xe187_53ed_92e9_a9b4
     ),
+    stock_package!(
+        "SH067",
+        "Rhinoceros Trader",
+        "integration/sh067-rhinoceros-trader/RHINOCEROS-TRADER-STUDIO.json",
+        0xdbe0_0910_1625_6a8f
+    ),
+    stock_package!(
+        "SH068",
+        "Badger",
+        "integration/sh068-badger/BADGER-STUDIO.json",
+        0x96f6_fae5_829e_7274
+    ),
+    stock_package!(
+        "SH069",
+        "Baza Fighter",
+        "integration/sh069-baza-fighter/BAZA-FIGHTER-STUDIO.json",
+        0x6792_feef_26de_7571
+    ),
 ];
 pub(crate) const STOCK_MODELS: [AvailableModel<'static>; DESCRIPTORS.len()] = {
     let mut models = [DESCRIPTORS[0].model; DESCRIPTORS.len()];
@@ -329,7 +347,7 @@ mod tests {
     #[test]
     fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
         let catalogue = ok(crate::docked_screens::Catalogue::bundled());
-        assert_eq!(STOCK_MODELS.len(), 28);
+        assert_eq!(STOCK_MODELS.len(), 31);
         let mut identities = std::collections::BTreeSet::new();
         let mut keys = std::collections::BTreeSet::new();
         for entry in DESCRIPTORS {

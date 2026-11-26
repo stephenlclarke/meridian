@@ -34,7 +34,9 @@ SH171 is available for catalogue inspection with the original detailed artwork a
 
 ## Combined Showroom and Hull Studio source candidate
 
-The ordinary station Showroom has 34 selectable stock previews: 28 authenticated schema-1 packages and six original stock models. It keeps the linked source identities, engineering readouts and inspection-only exchange rules. The combined source also restores the Studio launcher, including explicit inspection of schema-2 archives. Stock ship and station finishes are display-only; local authored material colours remain exact. Portable Studio and source checks have passed during integration. Combined compiler checks and native presentation acceptance are pending.
+The ordinary station Showroom has 37 selectable stock previews: 31 authenticated schema-1 packages and six original stock models. It keeps the linked source identities, engineering readouts and inspection-only exchange rules. The combined source also restores the Studio launcher, including explicit inspection of schema-2 archives. Stock ship and station finishes are display-only; local authored material colours remain exact. Portable Studio and source checks have passed during integration. Combined compiler checks and native presentation acceptance are pending.
+
+The separate [Medusa player preview](../integration/sh171-medusa-preview/README.md) now connects the active World hull identity to the original detailed flight rendering. The renderer retains the Peregrine model for ordinary players and existing traffic. It does not use the archived 729-piece inspection shield or reduced contact hull as flight artwork. The combined native acceptance is pending.
 
 ## Station chart best-profit scan source candidate
 
@@ -179,6 +181,18 @@ Vulture Raider preserves the original 4,120-face detailed and 368-face native me
 ## Rabbit Explorer catalogue source
 
 Rabbit Explorer retains its original 2,648-face detailed and 888-face native artwork. The frozen creator recipe generated a separate 480-face inspection candidate. Signed Studio exports include four exterior probes. Independent source checks verify seven guarded routes, including the open bow. [Rabbit Explorer source and evidence](RABBIT-EXPLORER-SOURCE.md)
+
+## Rhinoceros Trader catalogue source
+
+Rhinoceros Trader preserves the original 700-face detailed and 388-face native meshes and their exact calibration. Signed Studio exports and independent checks cover seven inspection paths. [Rhinoceros Trader source and evidence](RHINOCEROS-TRADER-SOURCE.md)
+
+## Badger catalogue source
+
+Badger preserves the original 5,912-face detailed and 284-face native meshes in metres. Seven source checks verify guarded routes outside the collars. Both original meshes confirm that the forward pods occupy the collar centres. [Badger source and evidence](BADGER-SOURCE.md)
+
+## Baza Fighter catalogue source
+
+Baza Fighter preserves the original 2,340-face detailed and 152-face native meshes in metres. Signed Studio and independent source evidence cover seven guarded inspection routes. [Baza Fighter source and evidence](BAZA-FIGHTER-SOURCE.md)
 
 ## Goshawk Mk II Custom candidate
 

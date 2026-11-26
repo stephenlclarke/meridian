@@ -1,0 +1,380 @@
+[
+  {
+    "name": "cockpit-crossmember-to-glazing",
+    "pointMetres": [
+      -2.18817039534171,
+      8.220962304627644,
+      10.475022984983145
+    ],
+    "originalFaces": {
+      "detailed": {
+        "cockpit connected structural crossmember[1]": {
+          "faceRange": [
+            296,
+            308
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "cockpit glazing envelope[1]": {
+          "faceRange": [
+            60,
+            296
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "cockpit connected structural crossmember[1]": {
+          "faceRange": [
+            176,
+            188
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "cockpit glazing envelope[1]": {
+          "faceRange": [
+            60,
+            176
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-beam-to-drive-casing",
+    "pointMetres": [
+      -11.553556543058535,
+      -0.31843395648176526,
+      -18.092591173766472
+    ],
+    "originalFaces": {
+      "detailed": {
+        "engine_pair/negative side/connected support[1]": {
+          "faceRange": [
+            308,
+            320
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "engine_pair/negative side/propulsion casing[1]": {
+          "faceRange": [
+            320,
+            412
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "engine_pair/negative side/connected support[1]": {
+          "faceRange": [
+            188,
+            200
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "engine_pair/negative side/propulsion casing[1]": {
+          "faceRange": [
+            200,
+            244
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-beam-to-freight-deck",
+    "pointMetres": [
+      -10.69561446521606,
+      -0.5187557462457861,
+      -17.485550107263258
+    ],
+    "originalFaces": {
+      "detailed": {
+        "engine_pair/negative side/connected support[1]": {
+          "faceRange": [
+            308,
+            320
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "low freight deck[1]": {
+          "faceRange": [
+            0,
+            12
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "engine_pair/negative side/connected support[1]": {
+          "faceRange": [
+            188,
+            200
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "low freight deck[1]": {
+          "faceRange": [
+            0,
+            12
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-beam-to-aft-pressure-envelope",
+    "pointMetres": [
+      -8.845398406374501,
+      0.8575467361323936,
+      -15.921169169475943
+    ],
+    "originalFaces": {
+      "detailed": {
+        "engine_pair/negative side/connected support[1]": {
+          "faceRange": [
+            308,
+            320
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "raised aft pressure envelope[1]": {
+          "faceRange": [
+            12,
+            24
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "engine_pair/negative side/connected support[1]": {
+          "faceRange": [
+            188,
+            200
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "raised aft pressure envelope[1]": {
+          "faceRange": [
+            12,
+            24
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-beam-to-drive-casing",
+    "pointMetres": [
+      9.990150168556543,
+      -0.31843395648176526,
+      -17.45609102053325
+    ],
+    "originalFaces": {
+      "detailed": {
+        "engine_pair/positive side/connected support[1]": {
+          "faceRange": [
+            504,
+            516
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "engine_pair/positive side/propulsion casing[1]": {
+          "faceRange": [
+            516,
+            608
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "engine_pair/positive side/connected support[1]": {
+          "faceRange": [
+            288,
+            300
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "engine_pair/positive side/propulsion casing[1]": {
+          "faceRange": [
+            300,
+            344
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-beam-to-freight-deck",
+    "pointMetres": [
+      10.69561446521606,
+      -0.5187557462457861,
+      -17.485550107263258
+    ],
+    "originalFaces": {
+      "detailed": {
+        "engine_pair/positive side/connected support[1]": {
+          "faceRange": [
+            504,
+            516
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "low freight deck[1]": {
+          "faceRange": [
+            0,
+            12
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "engine_pair/positive side/connected support[1]": {
+          "faceRange": [
+            288,
+            300
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "low freight deck[1]": {
+          "faceRange": [
+            0,
+            12
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-beam-to-aft-pressure-envelope",
+    "pointMetres": [
+      2.1568326693227093,
+      0.8575467361323936,
+      -11.616503217897641
+    ],
+    "originalFaces": {
+      "detailed": {
+        "engine_pair/positive side/connected support[1]": {
+          "faceRange": [
+            504,
+            516
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "raised aft pressure envelope[1]": {
+          "faceRange": [
+            12,
+            24
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "engine_pair/positive side/connected support[1]": {
+          "faceRange": [
+            288,
+            300
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "raised aft pressure envelope[1]": {
+          "faceRange": [
+            12,
+            24
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  }
+]
