@@ -649,6 +649,12 @@ impl World {
         };
         let emp = commerce.emp.validate(self, account, commerce.modular)?;
         let secret = self.xyzzy.validate(self, account, commerce)?;
+        commerce.modular.validate_test_custody_history(
+            self,
+            account,
+            commerce.emp,
+            commerce.lesson,
+        )?;
         validate_accounting(
             domain,
             services,
