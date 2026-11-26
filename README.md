@@ -24,7 +24,7 @@ The development source also provides a separate Goshawk Mk II Custom Showroom an
 
 Medusa (SH171) can be inspected in the station Showroom. The source package preserves both original meshes and the inspection shield. The Showroom lists the verified empty stock dry mass. [Medusa inspection and flight limits](integration/sh171-medusa/README.md)
 
-The follow-up development candidate offers 60 selectable stock previews in the ordinary station Showroom. This includes 54 validated Hull Studio schema-1 fleet packages and six original stock models. Cheetah (SH082) has no rendered preview because its contact requirement is unresolved. These are catalogue previews, not new ships for purchase or flight. [Hull Studio](docs/HULL-STUDIO.md) also opens a local or archived preview in a disposable Showroom session without changing the player's ship. Native qualification of the combined candidate is pending.
+The follow-up development candidate offers 65 selectable stock previews in the ordinary station Showroom. This includes 59 validated Hull Studio schema-1 fleet packages and six original stock models. Cheetah (SH082) has no rendered preview because its contact requirement is unresolved. These are catalogue previews, not new ships for purchase or flight. [Hull Studio](docs/HULL-STUDIO.md) also opens a local or archived preview in a disposable Showroom session without changing the player's ship. Native qualification of the combined candidate is pending.
 
 The separate [Medusa player flight preview](integration/sh171-medusa-preview/README.md) uses a dedicated profile and the admitted reduced flight geometry. The chase view draws the original detailed artwork. Ordinary progression, fabrication and exchange do not grant the Medusa. Native validation of the combined player preview is pending.
 
@@ -193,6 +193,11 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Elephant source envelope and Hull Studio definition](docs/ELEPHANT-SOURCE.md)
 - [Aurochs source envelope and Hull Studio definition](docs/AUROCHS-SOURCE.md)
 - [Giraffe Liner source envelope and Hull Studio definition](docs/GIRAFFE-LINER-SOURCE.md)
+- [Shikra source envelope and Hull Studio definition](docs/SHIKRA-SOURCE.md)
+- [Shikra Interdictor source envelope and Hull Studio definition](docs/SHIKRA-INTERDICTOR-SOURCE.md)
+- [Wisent source envelope and Hull Studio definition](docs/WISENT-SOURCE.md)
+- [Wisent Mk II source envelope and Hull Studio definition](docs/WISENT-MK-II-SOURCE.md)
+- [Anoa source envelope and Hull Studio definition](docs/ANOA-SOURCE.md)
 - [Stag Liner source envelope and Hull Studio definition](docs/STAG-LINER-GAMEPLAY-ENVELOPE.md)
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)

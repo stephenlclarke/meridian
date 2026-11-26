@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh094-shikra",
+  "undoBefore": [
+    "sh093-giraffe-liner"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "shikra",
+  "before": "pub mod seriema_courier;\n",
+  "after": "pub mod sparrowhawk;\n"
+}

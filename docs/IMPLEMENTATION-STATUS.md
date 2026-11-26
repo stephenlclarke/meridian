@@ -34,7 +34,7 @@ SH171 is available for catalogue inspection with the original detailed artwork a
 
 ## Combined Showroom and Hull Studio source candidate
 
-The ordinary station Showroom has 60 selectable stock previews: 54 authenticated schema-1 packages and six original stock models. The latest fleet batch includes SH070–SH081 and SH083–SH093. Cheetah (SH082) is excluded from the rendered stock registry because its contact requirement is unresolved. The Showroom keeps the linked source identities, engineering readouts and inspection-only exchange rules. The combined source also restores the Studio launcher, including explicit inspection of schema-2 archives. Stock ship and station finishes are display-only; local authored material colours remain exact. Portable Studio and source checks have passed during integration. Compiler checks and native presentation acceptance of the expanded registry are pending.
+The ordinary station Showroom has 65 selectable stock previews: 59 authenticated schema-1 packages and six original stock models. The latest fleet batch includes SH070–SH081 and SH083–SH098. Cheetah (SH082) is excluded from the rendered stock registry because its contact requirement is unresolved. The Showroom keeps the linked source identities, engineering readouts and inspection-only exchange rules. The combined source also restores the Studio launcher, including explicit inspection of schema-2 archives. Stock ship and station finishes are display-only; local authored material colours remain exact. Portable Studio and source checks have passed during integration. Compiler checks and native presentation acceptance of the expanded registry are pending.
 
 The separate [Medusa player preview](../integration/sh171-medusa-preview/README.md) now connects the active World hull identity to the original detailed flight rendering. The renderer retains the Peregrine model for ordinary players and existing traffic. It does not use the archived 729-piece inspection shield or reduced contact hull as flight artwork. The combined native acceptance is pending.
 
@@ -285,6 +285,26 @@ Aurochs preserves its original 2,504 detailed and 720 native faces. Its separate
 ## Giraffe Liner catalogue source
 
 Giraffe Liner preserves 3,492 detailed and 216 native faces, including both elevated galleries. Its evidence records the pressure-hull contacts in the detailed mesh and the gallery-strut separations in the native mesh. [Giraffe Liner source and evidence](GIRAFFE-LINER-SOURCE.md)
+
+## Shikra catalogue source
+
+Shikra preserves the original 5,396 detailed and 1,404 native faces. Its separate 512-face inspection candidate retains all 41 native parts and all 18 measured native overlaps, with clear routes between the diagonal spars. [Shikra source and evidence](SHIKRA-SOURCE.md)
+
+## Shikra Interdictor catalogue source
+
+Shikra Interdictor preserves its original 5,396 detailed and 1,404 native faces. A separate 512-face candidate retains all 41 native parts and 18 measured original overlaps. The seven clearance guards include a 359 mm lower bound in each diagonal-spar opening. [Shikra Interdictor source and evidence](SHIKRA-INTERDICTOR-SOURCE.md)
+
+## Wisent catalogue source
+
+Wisent preserves the original 2,600 detailed and 816 native faces. Its historical 488-face candidate retains 26 native parts and all 35 measured original overlaps. The seven guarded routes include the dock aperture and central freight-bay lane. [Wisent source and evidence](WISENT-SOURCE.md)
+
+## Wisent Mk II catalogue source
+
+Wisent Mk II preserves the original 2,600 detailed and 816 native faces. Its independent 488-face historical candidate retains 26 native parts and all 35 measured native overlaps. The dock aperture retains a 1,469 mm guarded lower bound. [Wisent Mk II source and evidence](WISENT-MK-II-SOURCE.md)
+
+## Anoa catalogue source
+
+Anoa preserves its original 6,720 detailed and 1,928 native faces. Its separate 512-face candidate retains all 34 native parts, the two closed collars, and all 40 measured native overlaps. [Anoa source and evidence](ANOA-SOURCE.md)
 
 ## Goshawk Mk II Custom candidate
 

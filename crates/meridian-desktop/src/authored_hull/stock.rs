@@ -383,6 +383,36 @@ const DESCRIPTORS: &[StockDescriptor] = &[
         "integration/sh093-giraffe-liner/GIRAFFE-LINER-STUDIO.json",
         0x4bf8_ee7a_34a4_c4c4
     ),
+    stock_package!(
+        "SH094",
+        "Shikra",
+        "integration/sh094-shikra/SHIKRA-STUDIO.json",
+        0x5143_0e71_5404_a5f0
+    ),
+    stock_package!(
+        "SH095",
+        "Shikra Interdictor",
+        "integration/sh095-shikra-interdictor/SHIKRA-INTERDICTOR-STUDIO.json",
+        0x2ed8_67f0_46f4_4298
+    ),
+    stock_package!(
+        "SH096",
+        "Wisent",
+        "integration/sh096-wisent/WISENT-STUDIO.json",
+        0x547c_60dd_001d_dd4c
+    ),
+    stock_package!(
+        "SH097",
+        "Wisent Mk II",
+        "integration/sh097-wisent-mk-ii/WISENT-MK-II-STUDIO.json",
+        0xfcac_fcce_03d0_a4be
+    ),
+    stock_package!(
+        "SH098",
+        "Anoa",
+        "integration/sh098-anoa/ANOA-STUDIO.json",
+        0x90b3_dc52_75c4_7b5b
+    ),
 ];
 pub(crate) const STOCK_MODELS: [AvailableModel<'static>; DESCRIPTORS.len()] = {
     let mut models = [DESCRIPTORS[0].model; DESCRIPTORS.len()];
@@ -485,7 +515,7 @@ mod tests {
     #[test]
     fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
         let catalogue = ok(crate::docked_screens::Catalogue::bundled());
-        assert_eq!(STOCK_MODELS.len(), 54);
+        assert_eq!(STOCK_MODELS.len(), 59);
         assert!(!STOCK_MODELS.iter().any(|model| model.object == "SH082"));
         let mut identities = std::collections::BTreeSet::new();
         let mut keys = std::collections::BTreeSet::new();

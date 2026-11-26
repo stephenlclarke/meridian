@@ -3,6 +3,7 @@
 #![forbid(unsafe_code)]
 
 pub mod alpaca;
+pub mod anoa;
 pub mod antelope;
 pub mod aplomado_interceptor;
 pub mod arna_cutter;
@@ -64,6 +65,8 @@ pub mod saiga;
 pub mod saker;
 pub mod save;
 pub mod seriema_courier;
+pub mod shikra;
+pub mod shikra_interdictor;
 pub mod sparrowhawk;
 pub mod springbok_starliner;
 pub mod station;
@@ -72,6 +75,8 @@ pub mod tamaraw;
 pub mod traffic;
 pub mod unwritten_route;
 pub mod vulture_raider;
+pub mod wisent;
+pub mod wisent_mk_ii;
 pub mod wombat;
 pub mod yak;
 

@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh095-shikra-interdictor",
+  "undoBefore": [
+    "sh094-shikra"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "shikra_interdictor",
+  "before": "pub mod shikra;\n",
+  "after": "pub mod sparrowhawk;\n"
+}

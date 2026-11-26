@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh098-anoa",
+  "undoBefore": [
+    "sh097-wisent-mk-ii"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "anoa",
+  "before": "pub mod alpaca;\n",
+  "after": "pub mod antelope;\n"
+}

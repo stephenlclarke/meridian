@@ -1,0 +1,70 @@
+{
+  "host": "SteveMBA",
+  "python": "3.14.3",
+  "numpy": "2.5.5",
+  "pillow": "13.0.0",
+  "testCount": 4,
+  "testResult": "PASS",
+  "sourceRecipeRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "staging": "The driver redirects three staged SH097 blueprint input paths and one SH096 path for the sibling-rejection test. Both original blueprints are restored. The recipe and tests are byte-identical to the historical source.",
+  "candidate": {
+    "vertices": 296,
+    "triangles": 488,
+    "parts": 26,
+    "fixedParts": 19
+  },
+  "receipts": {
+    "SH097-candidate.json": {
+      "bytes": 60032,
+      "sha256": "b16513cb15778ec007d86b95b0cf46862c9849002ea17257c802afe153d7480e"
+    },
+    "Sources/L337Core/Resources/Ships/SH096.toml": {
+      "bytes": 415500,
+      "sha256": "c688f7050eb12abb2a2eb5f1351cb260d04d0e767ca63d58ca47b1831b92c2f7"
+    },
+    "Sources/L337Core/Resources/Ships/SH097.toml": {
+      "bytes": 430537,
+      "sha256": "6275b430223584d94ca9d151669acc1d16cad5fd7c9e29065fdfa256daa78536"
+    },
+    "docs/fleet-physical/SH096-native-candidate-blueprint.json": {
+      "bytes": 5123,
+      "sha256": "2faf281c435d4271967390d9db8296070230dbda7f9953f575f5feb041ed121b"
+    },
+    "docs/fleet-physical/SH097-native-candidate-blueprint.json": {
+      "bytes": 5221,
+      "sha256": "10be32348322f13b6e5ebff29654c825c470e4011bb44d181d6b3666e0764462"
+    },
+    "docs/fleet-physical/SH097-native-candidate-recipe.py": {
+      "bytes": 8762,
+      "sha256": "e3524eaf058137bf30bea2f5c37ca954b18258bcf35954e5788d91ebb8312d2b"
+    },
+    "docs/fleet-physical/SH097-native-candidate-tests.py": {
+      "bytes": 8875,
+      "sha256": "eec1f02ffb6cf6d82bff3358f85e66fc0f0c128d1c0253ff9a77e480f960bf5c"
+    },
+    "docs/fleet-physical/creator-ownership-records/SH097.json": {
+      "bytes": 81463,
+      "sha256": "40739377a932af8957c18604ce8beb630186be536198f3d1ed952e4a41b3bce0"
+    },
+    "original-creator/SH096-design.toml": {
+      "bytes": 391370,
+      "sha256": "3ed7051c06c65f78d7f58e7fdfc875b61aa54c616d8907aa9e37cf470ec69072"
+    },
+    "original-creator/SH097-design.toml": {
+      "bytes": 406396,
+      "sha256": "c5bff7a81f87ad4b6ad0a05ba8e689fc1114f1812e6e85461b09a4c15aac2b0a"
+    },
+    "original-creator/fleet_redesign.py": {
+      "bytes": 48273,
+      "sha256": "3f029d5a417dea1b787dc5f0327d72687822275cc372de79790c3531e7cba429"
+    },
+    "original-creator/generate.py": {
+      "bytes": 32122,
+      "sha256": "a80f3606edd1ca0c9e4f0133136ab97257b07b2afe3efbbeb8a46960eb836476"
+    },
+    "tests.log": {
+      "bytes": 2387,
+      "sha256": "31a0003fa68f90eabb693374d30e311a8d07c599ef76af530af7106407c7a82e"
+    }
+  }
+}
