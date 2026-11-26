@@ -1,6 +1,6 @@
 # Automatic mining and salvage
 
-The Dell headless test on `200c0289` passed the paid mining journey, including collection and cold Continue. The Mac preview and the salvage journey still await verification.
+The Dell headless test on `200c0289` passed the paid mining journey, including collection and cold Continue. The corrected salvage journey on Dell at `63fb125c` recovered nine units and passed cold Continue. Mac preview verification is pending.
 
 ## Controls and equipment
 
@@ -55,4 +55,4 @@ Observe that an ordinary healthy ship is not eligible for automatic recovery. A 
 
 Record separate native refusal cases for missing cutter, missing scoops, occupied or protected target, full hold, wrong/expired source and manual cancellation. A correct refusal preserves the held cargo and ownership and grants no credit. An eligible destroyed trader's descriptive manifest alone is not a recovered payload.
 
-Mining observes the real public `mining_collection_target` and `pending_ore` projections before and after intake and cold decoding. The external salvage case in `crates/meridian-core/tests/automatic_work_public/salvage.rs` uses the public `auto_salvage_eligible` and original `wreck_manifest` alongside actual native commodity quantities and wallet, not the manifest alone. The first earned salvage run stopped on contact during approach, before any of the nine units were recovered. The separate occupied-ship confirmation acceptance awaits its actual API and receipt. No positive native salvage result is claimed here. The ordinary player save and original clue journal remain separate from these scratch acceptance journeys.
+Mining observes the real public `mining_collection_target` and `pending_ore` projections before and after intake and cold decoding. The external salvage case in `crates/meridian-core/tests/automatic_work_public/salvage.rs` uses the public `auto_salvage_eligible` and original `wreck_manifest` alongside actual native commodity quantities and wallet, not the manifest alone. A corrected Dell run on `63fb125c` recovered all nine units and confirmed that selecting the wreck again after Continue could not duplicate them. The separate occupied-ship confirmation acceptance awaits its actual API and receipt. No positive native salvage result is claimed here. The ordinary player save and original clue journal remain separate from these scratch acceptance journeys.

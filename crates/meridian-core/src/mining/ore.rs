@@ -8,7 +8,6 @@ use std::sync::Arc;
 
 pub const SCOOP_DISTANCE: f64 = 85.0;
 pub const SCOOP_MAX_RELATIVE_SPEED: f64 = 15.0;
-/// Explicitly authored Meridian fragment geometry, not an original cargo hull.
 const MAX_COLLECTIONS: usize = 277;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct OreId {
@@ -34,6 +33,7 @@ pub struct OreSnapshot {
     pub released_physical_tick: u64,
 }
 impl OreSnapshot {
+    /// World vertices shared by the Meridian fragment mesh and automatic scoop checks.
     pub fn vertices(self) -> [Vec3; 6] {
         [
             Vec3::new(7.0, 1.0, -2.0),
