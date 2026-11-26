@@ -1442,7 +1442,7 @@ impl App {
                 mule_frame.as_ref(),
             );
             let practice = self.game.world.practice_snapshot();
-            let targeting = self.game.world.targeting_snapshot();
+            let targeting = Self::target_readout(&self.game.world);
             renderer.set_flight_view(if self.game.is_internal_validation() {
                 self.validation_view
             } else {

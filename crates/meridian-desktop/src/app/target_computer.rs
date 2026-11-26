@@ -1,12 +1,28 @@
 //! Host adapter for flight targeting. Keyboard ownership remains in App::game_key.
 use super::{App, StationScene};
-use meridian_core::TargetFilter;
+use meridian_core::{TargetFilter, TargetingSnapshot, World};
+
+fn with_work_status(
+    mut target: TargetingSnapshot,
+    status: Option<&'static str>,
+) -> TargetingSnapshot {
+    if let Some(status) = status {
+        target.guidance = status;
+    }
+    target
+}
 
 impl App {
+    pub(super) fn target_readout(world: &World) -> Option<TargetingSnapshot> {
+        world
+            .targeting_snapshot()
+            .map(|target| with_work_status(target, world.automatic_work_status()))
+    }
+
     pub(super) fn cycle_computer_target(&mut self) {
         let result = (|| {
             if self.game.world.targeting_tier().is_none() {
-                return Err("Fit a targeting computer to select ships".to_owned());
+                return Err("Fit a targeting computer to select targets".to_owned());
             }
             let snapshot = self.game.world.snapshot();
             let renderer = self
@@ -46,7 +62,7 @@ impl App {
                     TargetFilter::Mining if !fit.mining => "Fit a Mining Module",
                     TargetFilter::Salvage if !fit.salvage => "Fit a Salvage Module",
                     TargetFilter::Mining => "No eligible rocks or ore",
-                    TargetFilter::Salvage => "No eligible salvage targets",
+                    TargetFilter::Salvage => "No eligible disabled ships or recoverable wrecks",
                     _ => "NO TARGETS",
                 };
                 return Ok(message.to_owned());
@@ -63,8 +79,13 @@ impl App {
     }
 
     pub(super) fn release_computer_target(&mut self) {
+        let working = self.game.world.automatic_work_status().is_some();
         self.game.world.cancel_targeting();
-        self.notice.set("Target released".into());
+        self.notice.set(if working {
+            "Automatic work cancelled".into()
+        } else {
+            "Target released".into()
+        });
         self.request_redraw();
     }
 
@@ -112,6 +133,47 @@ mod tests {
     use crate::profile::tests::{TestDirectory, open};
     use meridian_core::FlightInput;
     use winit::keyboard::KeyCode;
+
+    #[test]
+    fn work_status_updates_existing_guidance_without_changing_target_fields() {
+        use meridian_core::docking::{Basis3, RigidPose};
+        use meridian_core::equipment::{TargetingTier, WorkTargetId, WorkTargetRole};
+        use meridian_core::{TargetIdentity, TargetMode};
+
+        let mut world = World::new_commander(98105).unwrap_or_else(|e| panic!("{e}"));
+        world.request_launch(0).unwrap_or_else(|e| panic!("{e}"));
+        for _ in 0..120 {
+            world
+                .step(FlightInput::default())
+                .unwrap_or_else(|e| panic!("{e}"));
+        }
+        let belt = world
+            .mining_belt_snapshot()
+            .unwrap_or_else(|| panic!("belt"));
+        let rock = belt.bodies[0];
+        let original = TargetingSnapshot {
+            identity: TargetIdentity::Work(WorkTargetId::Asteroid(rock.id)),
+            tier: TargetingTier::Docking,
+            filter: TargetFilter::All,
+            mode: TargetMode::Work(WorkTargetRole::RockHold),
+            guidance: "Rock guidance",
+            pose: RigidPose {
+                position: rock.position,
+                orientation: Basis3::IDENTITY,
+            },
+            model: Some("Asteroid"),
+            status: None,
+            fields: vec![("Range", "1 unit".into())],
+        };
+        assert_eq!(with_work_status(original.clone(), None), original);
+        // An independent presentation projection; only the World can publish a work status.
+        let mut expected = original.clone();
+        expected.guidance = "Approaching work target";
+        assert_eq!(
+            with_work_status(original, Some("Approaching work target")),
+            expected
+        );
+    }
 
     #[test]
     fn flight_t_requires_selected_ship_and_details_remain_host_local() {

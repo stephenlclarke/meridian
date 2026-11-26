@@ -607,7 +607,7 @@ fn title_and_actual_flight_refuse_secret_menu_without_creating_or_replacing_a_pr
 }
 
 #[test]
-fn paid_mining_fit_help_uses_real_tool_without_advertising_automatic_pickup() {
+fn paid_mining_fit_help_distinguishes_manual_tool_and_automatic_work() {
     let directory = TestDirectory::new();
     let mut app = app(&directory);
     activate(&mut app);
@@ -631,8 +631,10 @@ fn paid_mining_fit_help_uses_real_tool_without_advertising_automatic_pickup() {
     }
     let panel = app.help_panel();
     let text = panel.lines.join("\n");
-    assert!(text.contains("Z Mine eligible rock with fitted Mining Laser"));
-    assert!(text.contains("no automatic pickup"));
+    assert!(text.contains("Z Mine eligible rock manually with fitted Mining Laser"));
+    assert!(text.contains("auto-work (no Z)"));
+    assert!(text.contains("Delete/manual flight cancel"));
+    assert!(!text.contains("no automatic pickup"));
     assert!(!text.contains("Z unavailable"));
     assert!(!text.contains("Fire fitted Pulse"));
 }

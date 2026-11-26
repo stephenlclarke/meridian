@@ -247,7 +247,9 @@ fn flight_help_lists_the_computer_keys_and_consumes_them_while_open() {
     let text = help.lines.join("\n");
     for binding in [
         "N Start or cancel auto-docking",
-        "Tab Cycle targets; select a ship to auto-align",
+        "Tab Cycle: healthy ships align; auto-work (no Z)",
+        "Delete/manual flight cancel",
+        "F Filter Ships/Mining/Salvage/All",
         "T Lock selected ship for missiles",
         "Shift+I Target details",
     ] {
