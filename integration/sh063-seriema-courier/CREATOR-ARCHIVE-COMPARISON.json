@@ -1,0 +1,122 @@
+[
+  {
+    "index": 0,
+    "maxVertexDelta": 0.0,
+    "facesExact": false,
+    "uvExact": false
+  },
+  {
+    "index": 1,
+    "maxVertexDelta": 0.0,
+    "facesExact": true,
+    "uvExact": true
+  },
+  {
+    "index": 2,
+    "maxVertexDelta": 0.0,
+    "facesExact": true,
+    "uvExact": true
+  },
+  {
+    "index": 3,
+    "maxVertexDelta": 0.0,
+    "facesExact": true,
+    "uvExact": true
+  },
+  {
+    "index": 4,
+    "maxVertexDelta": 0.0,
+    "facesExact": true,
+    "uvExact": true
+  },
+  {
+    "index": 5,
+    "maxVertexDelta": 0.0,
+    "facesExact": true,
+    "uvExact": true
+  },
+  {
+    "index": 6,
+    "maxVertexDelta": 0.0,
+    "facesExact": false,
+    "uvExact": false
+  },
+  {
+    "index": 7,
+    "maxVertexDelta": 0.0,
+    "facesExact": true,
+    "uvExact": true
+  },
+  {
+    "index": 8,
+    "maxVertexDelta": 0.0,
+    "facesExact": true,
+    "uvExact": true
+  },
+  {
+    "index": 9,
+    "maxVertexDelta": 0.0,
+    "facesExact": true,
+    "uvExact": true
+  },
+  {
+    "index": 10,
+    "maxVertexDelta": 1.1245636363636367,
+    "facesExact": false,
+    "uvExact": false
+  },
+  {
+    "index": 11,
+    "maxVertexDelta": 0.0,
+    "facesExact": true,
+    "uvExact": true
+  },
+  {
+    "index": 12,
+    "maxVertexDelta": 0.0,
+    "facesExact": true,
+    "uvExact": true
+  },
+  {
+    "index": 13,
+    "maxVertexDelta": 1.1245636363636367,
+    "facesExact": false,
+    "uvExact": false
+  },
+  {
+    "index": 14,
+    "maxVertexDelta": 0.0,
+    "facesExact": true,
+    "uvExact": true
+  },
+  {
+    "index": 15,
+    "maxVertexDelta": 0.0,
+    "facesExact": true,
+    "uvExact": true
+  },
+  {
+    "index": 16,
+    "maxVertexDelta": 0.0,
+    "facesExact": true,
+    "uvExact": true
+  },
+  {
+    "index": 17,
+    "maxVertexDelta": 0.0,
+    "facesExact": true,
+    "uvExact": true
+  },
+  {
+    "index": 18,
+    "maxVertexDelta": 0.0,
+    "facesExact": true,
+    "uvExact": true
+  },
+  {
+    "index": 19,
+    "maxVertexDelta": 0.0,
+    "facesExact": true,
+    "uvExact": true
+  }
+]
