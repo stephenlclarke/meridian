@@ -427,7 +427,7 @@ impl World {
                 }
                 Some(work)
             }
-            Candidate::Work(work) if work.role == WorkTargetRole::WreckTracking => Some(work),
+            Candidate::Work(work) => Some(work),
             Candidate::Ship(ship)
                 if ship.electrical_disabled && self.work_targeting_fit().salvage =>
             {

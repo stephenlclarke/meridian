@@ -50,13 +50,14 @@ impl World {
         let fit = self.work_targeting_fit();
         let mut targets = Vec::new();
         if fit.mining && self.mining.enabled() && identity.system == SystemId::AVENOR {
+            let pending = self.mining.pending_ore(self.combat.physical_tick());
             targets.extend(
                 self.mining
                     .bodies()
                     .into_iter()
                     .filter(|body| {
                         (body.remaining_energy > 0.0 && body.remaining_units > 0)
-                            || self.mining_collection_target(body.id).is_some()
+                            || pending.iter().any(|ore| ore.id.asteroid() == body.id)
                     })
                     .map(|body| WorkTarget {
                         id: WorkTargetId::Asteroid(body.id),
@@ -64,17 +65,11 @@ impl World {
                         position: body.position,
                     }),
             );
-            // Pending ore is real; its current projection grants tracking only.
-            targets.extend(
-                self.mining
-                    .pending_ore(self.combat.physical_tick())
-                    .into_iter()
-                    .map(|ore| WorkTarget {
-                        id: WorkTargetId::Ore(ore.id),
-                        role: WorkTargetRole::OreTracking,
-                        position: ore.position,
-                    }),
-            );
+            targets.extend(pending.into_iter().map(|ore| WorkTarget {
+                id: WorkTargetId::Ore(ore.id),
+                role: WorkTargetRole::OreTracking,
+                position: ore.position,
+            }));
         }
         if fit.salvage
             && let Some(traffic) = self.traffic_snapshot()
