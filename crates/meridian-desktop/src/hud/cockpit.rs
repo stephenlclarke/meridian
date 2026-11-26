@@ -18,7 +18,7 @@ const NPC_CONTACT_START: usize = 4 + crate::mesh::MAX_MISSILE_PROJECTILES;
 pub const MAX_CONTACTS: usize = NPC_CONTACT_START + MAX_TRAFFIC_ACTORS;
 // Two line quads per additional scanner contact; eight edges per added pylon icon.
 pub const MAX_VERTICES: usize =
-    30_000 + (MAX_CONTACTS - 7) * 12 + (9 - 3) * 8 * 6 + (40 + 10) * 35 * 6;
+    30_000 + (MAX_CONTACTS - 7) * 12 + (9 - 3) * 8 * 6 + (40 + 12) * 35 * 6;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Cockpit {
@@ -516,6 +516,8 @@ pub fn append(c: &Cockpit, width: u32, height: u32, out: &mut Vec<Vertex>) {
     {
         let (message, color) = if ecm.active.is_some() {
             ("ECM ACTIVE", GREEN)
+        } else if ecm.remaining_ticks > 0 {
+            ("ECM COOLDOWN", CYAN)
         } else {
             ("ECM FITTED", YELLOW)
         };

@@ -413,7 +413,7 @@ impl World {
             self.emp.held_tick = None;
             return Ok(());
         }
-        if self.active_ecm().is_some() {
+        if self.ecm_timer().is_some() {
             return Err(EmpError::Resources);
         }
         if self.emp.charge.is_some() {

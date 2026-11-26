@@ -126,7 +126,12 @@ fn manual_field_exact_cost_same_clock_32_ticks_and_cold_resume() {
     assert_eq!(world.request_ecm(tick + 1), Err(EcmError::StaleCommand));
     assert_eq!(world.save_bytes().unwrap(), bytes);
     world = World::from_save_bytes(&bytes).unwrap();
-    assert_eq!(world.ecm_snapshot().unwrap().active, Some(activation));
+    assert_eq!(world.ecm_snapshot().unwrap().active, None);
+    assert_eq!(
+        world.ecm_snapshot().unwrap().last_activation,
+        Some(activation)
+    );
+    assert_eq!(world.ecm_snapshot().unwrap().remaining_ticks, 32);
     step(&mut world, 31);
     assert_eq!(world.ecm_snapshot().unwrap().remaining_ticks, 1);
     assert_eq!(
@@ -137,11 +142,13 @@ fn manual_field_exact_cost_same_clock_32_ticks_and_cold_resume() {
     assert_eq!(world.ecm_snapshot().unwrap().remaining_ticks, 0);
     let next = world.request_ecm(world.snapshot().tick).unwrap();
     assert_eq!(next.sequence, activation.sequence + 1);
+    let mut expected = world.ecm_snapshot().unwrap();
+    expected.active = None;
     assert_eq!(
         World::from_save_bytes(&world.save_bytes().unwrap())
             .unwrap()
             .ecm_snapshot(),
-        world.ecm_snapshot()
+        Some(expected)
     );
 }
 
@@ -227,7 +234,7 @@ fn resource_threshold_is_strict_and_retained_history_cannot_be_removed_or_forged
     world.request_pause(false, world.snapshot().tick).unwrap();
     let bytes = world.save_bytes().unwrap();
     // Strip only the tagged extension, keep the independent header marker, then re-checksum.
-    let from = bytes.windows(8).position(|tag| tag == b"MECM0002").unwrap();
+    let from = bytes.windows(8).position(|tag| tag == b"MECM0003").unwrap();
     let mut stripped = bytes[..from].to_vec();
     stripped.extend(crate::save::checksum(&stripped).to_le_bytes());
     assert!(World::from_save_bytes(&stripped).is_err());

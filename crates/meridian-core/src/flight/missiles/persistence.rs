@@ -190,6 +190,7 @@ fn end_tag(e: MissileEnd) -> u8 {
         MissileEnd::TargetLost => 3,
         MissileEnd::Culled => 4,
         MissileEnd::Intercepted => 5,
+        MissileEnd::Ecm => 6,
     }
 }
 fn read_end(r: &mut Reader<'_>) -> Result<MissileEnd, SaveError> {
@@ -200,6 +201,7 @@ fn read_end(r: &mut Reader<'_>) -> Result<MissileEnd, SaveError> {
         3 => MissileEnd::TargetLost,
         4 => MissileEnd::Culled,
         5 => MissileEnd::Intercepted,
+        6 => MissileEnd::Ecm,
         _ => return Err(SaveError::InvalidEncoding),
     })
 }
@@ -236,21 +238,27 @@ impl State {
     /// reconstruction of every intervening homing trajectory.
     pub(in crate::flight) fn validate_npc_beam_scene(
         &self,
+        ecm: &super::super::ecm::State,
         hit: &crate::traffic::NpcPlayerHit,
     ) -> Result<(), SaveError> {
-        self.validate_retained_beam(super::RetainedBeam {
-            system: hit.attacker.system(),
-            visit: hit.visit,
-            world_tick: hit.world_tick,
-            physical_tick: hit.physical_tick,
-            command_emission: None,
-            ray: hit.source_pose,
-            point: hit.point,
-            bodies: &hit.missiles,
-        })
+        self.validate_retained_beam(
+            ecm,
+            super::RetainedBeam {
+                system: hit.attacker.system(),
+                visit: hit.visit,
+                world_tick: hit.world_tick,
+                physical_tick: hit.physical_tick,
+                command_emission: None,
+                ecm_after_scene: true,
+                ray: hit.source_pose,
+                point: hit.point,
+                bodies: &hit.missiles,
+            },
+        )
     }
     pub(in crate::flight) fn validate_retained_beam(
         &self,
+        ecm: &super::super::ecm::State,
         hit: super::RetainedBeam<'_>,
     ) -> Result<(), SaveError> {
         let expected: Vec<_> = self
@@ -265,6 +273,13 @@ impl State {
                             && hit.command_emission.is_some_and(|e| p.origin.emission < e)))
                     && (p.ended.is_none()
                         || p.last_tick > hit.world_tick
+                        || (p.ended == Some(MissileEnd::Ecm)
+                            && p.last_tick == hit.world_tick
+                            && (hit.ecm_after_scene
+                                || hit.command_emission.is_some_and(|emission| {
+                                    ecm.termination(p.origin.projectile)
+                                        .is_some_and(|end| end.after_emission >= emission)
+                                })))
                         || (p.ended == Some(MissileEnd::Intercepted)
                             && p.last_tick == hit.world_tick
                             && hit
@@ -810,6 +825,14 @@ impl State {
             Some(MissileEnd::Intercepted) => {
                 self.validate_interception(world, Some(lesson), p, i)?
             }
+            Some(MissileEnd::Ecm) => {
+                if p.propulsion_travel >= MISSILE_RANGE
+                    || p.age_ticks >= MISSILE_LIFETIME_TICKS
+                    || world.ecm.termination(p.origin.projectile).is_none()
+                {
+                    return Err(INVALID);
+                }
+            }
         }
 
         Ok(())
@@ -1198,6 +1221,9 @@ impl State {
                         .find(|p| Some(p.origin.emission) == other.intercepting_emission)
                         .is_some_and(|p| usize::from(p.origin.projectile.ordinal) >= i)
                 }
+                // All physical motion precedes an accepted manual ECM command
+                // at this same World clock.
+                Some(MissileEnd::Ecm) => true,
                 Some(_) => slot >= i,
             }
         })
@@ -1298,7 +1324,7 @@ impl State {
             if distance != d || shot.end != add(shot.origin, scale(shot.direction, d)) {
                 return Err(INVALID);
             }
-            self.validate_intercepted_bodies(b, p, i, emission, (ray, d, id))?;
+            self.validate_intercepted_bodies(&world.ecm, b, p, i, emission, (ray, d, id))?;
             let station = world
                 .station_data
                 .as_ref()
@@ -1347,6 +1373,7 @@ impl State {
     }
     fn validate_intercepted_bodies(
         &self,
+        ecm: &super::super::ecm::State,
         b: &Beam,
         p: ProjectileSnapshot,
         i: usize,
@@ -1354,17 +1381,23 @@ impl State {
         (ray, d, id): (RigidPose, f64, ProjectileId),
     ) -> Result<(), SaveError> {
         let shot = b.shot;
+        let live_before = |other: ProjectileSnapshot| {
+            other.ended.is_none()
+                || other.last_tick > shot.tick
+                || (other.ended == Some(MissileEnd::Ecm)
+                    && other.last_tick == shot.tick
+                    && ecm
+                        .termination(other.origin.projectile)
+                        .is_some_and(|end| end.after_emission >= emission))
+        };
         for other in self.projectiles.iter().skip(b.bodies.len()).flatten() {
-            if other.origin.emission < emission
-                && (other.ended.is_none() || other.last_tick > shot.tick)
-            {
+            if other.origin.emission < emission && live_before(*other) {
                 return Err(INVALID);
             }
         }
         for (slot, body) in b.bodies.iter().copied().enumerate() {
             let expected = self.projectiles[slot].is_some_and(|other| {
-                other.origin.emission < emission
-                    && (slot == i || other.ended.is_none() || other.last_tick > shot.tick)
+                other.origin.emission < emission && (slot == i || live_before(other))
             });
             if body.is_some() != expected {
                 return Err(INVALID);

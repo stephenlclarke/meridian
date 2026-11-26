@@ -166,7 +166,7 @@
       "key": "max/E.C.M. System",
       "legacyBehavior": "ECM utility.",
       "state": "PARTIAL_CORE",
-      "dependency": "Dedicated guarded FitEcm action only, with real free ordinary mount and stock manual field; maximum full-mount refit and actual incoming missile interaction remain open."
+      "dependency": "Dedicated guarded FitEcm action only, with real free ordinary mount and actual manual local standard-projectile termination; maximum full-mount refit and incoming missile interaction remain open."
     },
     {
       "key": "max/Escape Pod",

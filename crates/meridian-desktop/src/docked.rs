@@ -864,7 +864,7 @@ fn module_rows(
             row.readout
                 .push("Unique utility; 1 shared mount | E.C.M. is distinct from EMP".into());
             row.readout.push(
-                "Manual field available; incoming NPC missile effects not supported yet".into(),
+                "Manual field ends owned standard missiles; incoming NPC defence open".into(),
             );
         }
         let action = if offer.kind == ModuleKind::MiningLaser {

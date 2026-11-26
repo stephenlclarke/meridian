@@ -106,17 +106,20 @@ impl World {
             }) {
                 return Err(invalid);
             }
-            self.missiles
-                .validate_retained_beam(super::super::missiles::RetainedBeam {
+            self.missiles.validate_retained_beam(
+                &self.ecm,
+                super::super::missiles::RetainedBeam {
                     system: hit.owner.system,
                     visit: hit.owner.visit,
                     world_tick: hit.world_tick,
                     physical_tick: hit.physical_tick,
                     command_emission: Some(hit.emission),
+                    ecm_after_scene: false,
                     ray: hit.pose,
                     point: hit.contact.point,
                     bodies: &hit.missiles,
-                })?;
+                },
+            )?;
         }
         // Without an eligible original ore-body/intake producer, there is no cargo credit,
         // market/revision adjustment or collected receipt to synthesize during load.
