@@ -945,6 +945,38 @@ mod tests {
     }
 
     #[test]
+    fn selected_asteroid_starts_approach_and_manual_brake_releases_it() {
+        let mut world = fitted(TargetingTier::Military);
+        launch(&mut world);
+        world.cycle_target_filter().unwrap();
+        let tick = world.snapshot().tick;
+        assert!(world.cycle_targeting(tick, viewport(vec![])).unwrap());
+        let rock = world.selected_work_target().unwrap();
+        // Start on a clear exterior ray so this tests guidance, not station clearance.
+        world.state.position = [
+            rock.position.x as f32,
+            rock.position.y as f32,
+            rock.position.z as f32 - 300.0,
+        ];
+        world.state.orientation = [0.0, 0.0, 0.0, 1.0];
+        world.state.speed = 0.0;
+        world.step(FlightInput::default()).unwrap();
+        assert_eq!(
+            world.automatic_work_status(),
+            Some("Approaching work target")
+        );
+        assert!(world.state.speed > 0.0);
+        world
+            .step(FlightInput {
+                brake: true,
+                ..FlightInput::default()
+            })
+            .unwrap();
+        assert!(world.automatic_work_status().is_none());
+        assert!(world.selected_work_target().is_none());
+    }
+
+    #[test]
     fn work_filter_cycles_real_rock_ids_and_preserves_stable_remaining_order() {
         let mut world = fitted(TargetingTier::Military);
         launch(&mut world);
