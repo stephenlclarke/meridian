@@ -1,3 +1,8 @@
+# Hog source preparation and replay use exact LF bytes.
+tools/measure_hog.py text eol=lf
+tools/prepare_hog.py text eol=lf
+tools/verify_hog.py text eol=lf
+
 # Dzo Mk II source preparation and replay use exact LF bytes.
 tools/measure_dzo_mk_ii.py text eol=lf
 tools/prepare_dzo_mk_ii.py text eol=lf
