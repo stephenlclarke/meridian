@@ -38,6 +38,7 @@ pub mod hyena;
 pub mod jackal;
 pub mod jaguar;
 pub mod lanner;
+pub mod llama;
 pub mod medusa;
 pub mod mining;
 pub mod moose_clipper;
