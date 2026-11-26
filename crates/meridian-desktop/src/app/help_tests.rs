@@ -246,13 +246,14 @@ fn flight_help_lists_the_computer_keys_and_consumes_them_while_open() {
     let help = app.help.as_ref().unwrap_or_else(|| panic!("flight help"));
     let text = help.lines.join("\n");
     for binding in [
-        "N Start / cancel auto-docking",
-        "Tab Next target",
+        "N Start or cancel auto-docking",
+        "Tab Cycle targets; select a ship to auto-align",
+        "T Lock selected ship for missiles",
         "Shift+I Target details",
     ] {
         assert!(text.contains(binding), "Missing {binding}");
     }
-    for key in [KeyCode::KeyN, KeyCode::Tab, KeyCode::Backspace] {
+    for key in [KeyCode::KeyN, KeyCode::KeyT, KeyCode::Tab, KeyCode::Backspace] {
         assert_eq!(press(&mut app, key, None), None);
     }
     assert!(app.help.is_some());

@@ -1,5 +1,7 @@
 # Implementation and validation status
 
+Flight help now identifies N for automatic docking, Tab for ship selection and automatic alignment, Z for the fitted front laser and T for missile lock.
+
 The development save store explicitly unlocks on close. Dell Linux reproduced the cold-reopen failure during concurrent process startup and verified the fix while retaining exclusive access for a live owner.
 
 ## Ordinary hyperspace drive source candidate

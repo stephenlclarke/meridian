@@ -116,13 +116,13 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | P on the station Galaxy chart (development) | Toggle the best-profit scan of reachable markets; P in flight still pauses |
 | L; W/S; arrows; A/D; Q/E; Space | Launch; thrust; pitch; yaw; roll; brake |
 | N in flight (development) | Engage the fitted navigation computer for docking, or cancel the approach |
-| F / Tab / Delete / Shift+I in flight (development) | Cycle Ships/Mining/Salvage/All filter; cycle target; release tracking; show target details |
+| F / Tab / Delete / Shift+I in flight (development) | Cycle Ships/Mining/Salvage/All filter; cycle targets (select a ship to auto-align, then press Z to fire the front laser); release tracking; show target details |
 | J; T (docked); R; Enter; B; F (docked) | Travel; select contact; review; confirm; cancel; buy fuel |
 | M; [ / ]; G / Shift+G | Market; commodity selection; buy/sell one native unit |
 | O; K; U; Y | Equipment panel; buy/fit cargo bay; store when docked; refit |
 | Hold U in active flight | Charge the fitted EMP for 600 accepted ticks; early release cancels |
 | I; V; X | Mission details; review all held freight deliveries; review abandonment |
-| T in flight; F1; F2; F3; F4 | Lock the selected ship; next ship/practice lock; arm/safe; launch one missile; safe/unlock |
+| T in flight; F1; F2; F3; F4 | Lock the selected ship for missiles; next ship/practice lock; arm/safe; launch one missile; safe/unlock |
 | F7; F8; F10 | Review attempt closure; reception; fresh consent |
 | F6; F12; C; 0/1/2/3 | Flight lesson consent/reception; cancellation; details; view direction |
 | P; F11; F5; F9 | Pause; fullscreen; save; reload the current qualified save |
