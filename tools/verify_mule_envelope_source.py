@@ -26,6 +26,9 @@ HYPERSPACE_DRIVE_INVERSE_SHA256 = 'cfd9f7ce2cc2c35cd37407fb7b4483d821e9e9777d7fd
 STOCK_SHIELD_INVERSE = Path('integration/sh001-mule/STOCK-SHIELD-INVERSE.json')
 STOCK_SHIELD_BASE = '0a7155698901f1b77846aeafbfcc000a42c62707'
 STOCK_SHIELD_INVERSE_SHA256 = '43ddbf3275610d1dd9026a0993a3996670dbefa36b8505f6b0ebf8f14264a6ed'
+PASSENGER_CABIN_INVERSE = Path('integration/sh001-mule/PASSENGER-CABIN-INVERSE.json')
+PASSENGER_CABIN_BASE = '25b91288347976228848326697deebae1bc15f7d'
+PASSENGER_CABIN_INVERSE_SHA256 = 'dff47456ab4f11322b1a2517f6194cc6c44b8214e6bda87b6b043eae15b82667'
 
 
 def sha(data):
@@ -63,6 +66,11 @@ def hyperspace_drive_inverse(root, protected):
 def stock_shield_inverse(root, protected):
     return approved_inverse(root, protected, STOCK_SHIELD_INVERSE,
                             STOCK_SHIELD_INVERSE_SHA256, STOCK_SHIELD_BASE, 'stock shield')
+
+
+def passenger_cabin_inverse(root, protected):
+    return approved_inverse(root, protected, PASSENGER_CABIN_INVERSE,
+                            PASSENGER_CABIN_INVERSE_SHA256, PASSENGER_CABIN_BASE, 'passenger cabin')
 
 
 def undo_seriema_courier_publication(relative, data):
@@ -505,11 +513,13 @@ def verify_protected_core(root):
     inverse = flight_computer_inverse(root, baseline)
     drive_inverse = hyperspace_drive_inverse(root, baseline)
     shield_inverse = stock_shield_inverse(root, baseline)
+    cabin_inverse = passenger_cabin_inverse(root, baseline)
     checked = set()
     unchanged = 0
     for relative, expected in baseline.items():
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_flight_computer(relative, current, shield_inverse)
+        data = undo_flight_computer(relative, current, cabin_inverse)
+        data = undo_flight_computer(relative, data, shield_inverse)
         data = undo_flight_computer(relative, data, drive_inverse)
         data = undo_seriema_courier_publication(relative, data)
         data = undo_moose_clipper_publication(relative, data)
@@ -553,7 +563,7 @@ def verify_protected_core(root):
         checked.add(relative)
         unchanged += data == current
     assert set(additions) <= checked and len(checked) == 115
-    return len(checked), len(additions), unchanged, len(inverse), len(drive_inverse), len(shield_inverse)
+    return len(checked), len(additions), unchanged, len(inverse), len(drive_inverse), len(shield_inverse), len(cabin_inverse)
 
 
 def verify_test_registry(criteria):
@@ -612,7 +622,7 @@ def verify():
     folder = ROOT / 'assets/fleet/sh001'
     verify_inputs(folder)
     groups = verify_geometry(folder)
-    checked, hooks, unchanged, flight_computer, hyperspace_drive, stock_shield = verify_protected_core(ROOT)
+    checked, hooks, unchanged, flight_computer, hyperspace_drive, stock_shield, passenger_cabin = verify_protected_core(ROOT)
     counts = verify_historical_bindings(folder, groups)
     return {
         'status': 'PASS_SOURCE_ONLY',
@@ -622,6 +632,7 @@ def verify():
         'protectedCoreFilesWithFlightComputerChanges': flight_computer,
         'protectedCoreFilesWithHyperspaceDriveChanges': hyperspace_drive,
         'protectedCoreFilesWithStockShieldChanges': stock_shield,
+        'protectedCoreFilesWithPassengerCabinChanges': passenger_cabin,
         'protectedCoreFilesChecked': checked,
         **counts,
         'vertexEncoding': 5344,

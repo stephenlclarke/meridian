@@ -119,16 +119,7 @@ impl World {
         if !legal_tonne(commodity) {
             return Err(Error::CommodityRequired);
         }
-        let account = self.commander_account.as_ref().ok_or(Error::NoCommander)?;
-        let p = account
-            .service_projection(
-                &self
-                    .freight_session
-                    .as_ref()
-                    .ok_or(Error::NoCommander)?
-                    .state,
-            )
-            .map_err(Error::Service)?;
+        let p = self.raw_service_projection().map_err(Error::Service)?;
         if quantity(p, commodity) != 0 {
             return Err(Error::CargoPresent);
         }

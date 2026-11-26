@@ -94,9 +94,10 @@ pub use flight::{
 };
 
 pub use flight::{
-    FittedFuelScoops, FittedMiningTool, FuelScoopsSnapshot, ModularEquipmentSnapshot, ModuleAction,
-    ModuleError, ModuleKind, ModuleOffer, ModuleProvenance, ModuleReview, ModuleSlot, OwnedModule,
-    PreparedModule,
+    CABIN_TONNES, CabinGrade, CabinStatus, FittedFuelScoops, FittedMiningTool, FuelScoopsSnapshot,
+    ModularEquipmentSnapshot, ModuleAction, ModuleError, ModuleKind, ModuleOffer, ModuleProvenance,
+    ModuleReview, ModuleSlot, OwnedModule, PASSAGE_REWARD_TENTHS, PassageStatus, PassengerAction,
+    PassengerIdentity, PassengerJourneySnapshot, PreparedModule,
 };
 
 pub use flight::{FlightResourcesSnapshot, FrontLaserSnapshot};

@@ -26,7 +26,8 @@ impl World {
         expected_tick: u64,
     ) -> Result<Event, MissionError> {
         let facts = self.current_service_facts(expected_tick)?;
-        let reserved_capacity = self.navigation_trade.reservations().capacity;
+        let reserved_capacity = self.navigation_trade.reservations().capacity
+            + self.cabin_tonnes().map_err(MissionError::Service)?;
         let account = self
             .commander_account
             .as_mut()
@@ -98,7 +99,10 @@ impl World {
                 &session.state,
                 facts,
                 command,
-                self.navigation_trade.reservations().capacity,
+                self.navigation_trade.reservations().capacity
+                    + self
+                        .cabin_tonnes()
+                        .map_err(|error| command_error(MissionError::Service(error)))?,
             )
             .map_err(|error| command_error(MissionError::Equipment(error)))?;
         let bytes = self

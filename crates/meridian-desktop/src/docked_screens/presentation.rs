@@ -1202,6 +1202,7 @@ fn equipment(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         );
         return;
     };
+    let passage_service = panel.selected_slot == "passenger-service";
     let mut lines = vec![
         row.group.clone(),
         row.name.clone(),
@@ -1224,6 +1225,11 @@ fn equipment(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
             _ => "Crew information unavailable".into(),
         },
     ];
+    if passage_service {
+        // Passage is a separate confirmed action, never a purchase or a free item grant.
+        lines.remove(3);
+        lines.remove(2);
+    }
     if let OfferQuantity::Available(n) = row.quantity {
         lines.push(format!("Available: {n}"));
     }
@@ -1289,7 +1295,13 @@ fn equipment(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
     let action_width = details.width / 4.0;
     for (i, (title, key, enabled)) in [
         (
-            if s.options { "Review option" } else { "Buy" },
+            if s.options {
+                "Review option"
+            } else if passage_service {
+                "Review"
+            } else {
+                "Buy"
+            },
             Key::Confirm,
             if s.options {
                 row.instance.is_some()

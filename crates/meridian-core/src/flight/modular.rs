@@ -7,6 +7,12 @@ use crate::{
     save::{Reader, SaveError, Writer},
 };
 use core::fmt;
+mod cabins;
+pub(super) use cabins::add_cabin_mass;
+pub use cabins::{
+    CABIN_TONNES, CabinGrade, CabinStatus, PASSAGE_REWARD_TENTHS, PassageStatus, PassengerAction,
+    PassengerIdentity, PassengerJourneySnapshot,
+};
 mod scoops;
 mod shields;
 pub(super) use shields::ResourceFitChange;
@@ -35,6 +41,7 @@ pub enum ModuleKind {
     SalvageTargeting,
     Drive(DriveGrade),
     Shield(ShieldGrade),
+    Cabin(CabinGrade),
 }
 impl ModuleKind {
     pub fn family(self) -> &'static str {
@@ -53,6 +60,7 @@ impl ModuleKind {
             Self::SalvageTargeting => "targeting-salvage",
             Self::Drive(_) => "hyperspace-drive",
             Self::Shield(_) => "shields",
+            Self::Cabin(_) => "passenger-cabins",
             _ => "energy",
         }
     }
@@ -86,6 +94,7 @@ impl ModuleKind {
             Self::Drive(DriveGrade::Intermediate) => "Intermediate Hyperspace Drive",
             Self::Drive(DriveGrade::Advanced) => "Advanced Hyperspace Drive",
             Self::Shield(grade) => grade.name(),
+            Self::Cabin(grade) => grade.name(),
             Self::BeamLaser => "Beam Laser",
             Self::MilitaryLaser => "Military Laser",
             Self::NavalLaser => "Naval Laser",
@@ -125,6 +134,7 @@ impl ModuleKind {
             Self::SalvageTargeting => ModuleSlot::SalvageTargeting,
             Self::Drive(_) => ModuleSlot::Drive,
             Self::Shield(_) => ModuleSlot::Shield,
+            Self::Cabin(_) => ModuleSlot::PassengerCabin,
             _ => ModuleSlot::Energy,
         }
     }
@@ -171,6 +181,7 @@ impl ModuleKind {
             Self::Targeting(_) | Self::MiningTargeting | Self::SalvageTargeting => 1,
             Self::Drive(DriveGrade::Intermediate | DriveGrade::Advanced) => 1,
             Self::Shield(grade) => grade.equipment_units(),
+            Self::Cabin(_) => 1,
             _ => 0,
         }
     }
@@ -196,6 +207,7 @@ impl ModuleKind {
             Self::Drive(DriveGrade::Intermediate) => Some((50_000, 10)),
             Self::Drive(DriveGrade::Advanced) => Some((150_000, 13)),
             Self::Shield(grade) => grade.ordinary_offer(),
+            Self::Cabin(grade) => Some((grade.price_tenths(), 1)),
         }
     }
     fn prerequisite(self) -> Option<Self> {
@@ -219,6 +231,8 @@ impl ModuleKind {
         match self {
             Self::PulseLaser | Self::BeamLaser | Self::MilitaryLaser | Self::NavalLaser => 4,
             Self::MiningLaser => 5,
+            // The shared inventory limit is stricter than the legacy ownership cap.
+            Self::Cabin(_) => 256,
             _ => 1,
         }
     }
@@ -244,6 +258,7 @@ impl ModuleKind {
             Self::Drive(DriveGrade::Intermediate) => 22,
             Self::Drive(DriveGrade::Advanced) => 23,
             Self::Shield(grade) => 24 + grade as u8,
+            Self::Cabin(grade) => 40 + grade as u8,
         }
     }
     fn from_tag(tag: u8) -> Result<Self, SaveError> {
@@ -268,6 +283,7 @@ impl ModuleKind {
             22 => Ok(Self::Drive(DriveGrade::Intermediate)),
             23 => Ok(Self::Drive(DriveGrade::Advanced)),
             24..=30 => Ok(Self::Shield(ShieldGrade::from_tag(tag - 24)?)),
+            40..=45 => Ok(Self::Cabin(CabinGrade::ALL[usize::from(tag - 40)])),
             _ => Err(SaveError::InvalidEncoding),
         }
     }
@@ -283,6 +299,7 @@ pub enum ModuleSlot {
     SalvageTargeting,
     Drive,
     Shield,
+    PassengerCabin,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleProvenance {
@@ -337,6 +354,7 @@ pub enum ModuleAction {
     PurchaseFuelScoops,
     Store { item: u64 },
     Install { item: u64, replacing: Option<u64> },
+    Passenger(PassengerAction),
 }
 impl ModuleAction {
     fn purchase_kind(self) -> Option<ModuleKind> {
@@ -377,6 +395,9 @@ pub enum ModuleError {
     LowerTargetingGrade,
     DriveRequired,
     ShieldRequired,
+    CabinOccupied,
+    PassageConsent,
+    PassageClosed,
     NoChange,
     Capacity,
     InsufficientCredits,
@@ -457,8 +478,12 @@ pub(super) struct Ledger {
     pub(super) paid: u32,
     pub(super) revision: u64,
     pub(super) navigation_changes: Vec<NavigationFitChange>,
+    passage: cabins::Passage,
 }
 impl Ledger {
+    pub(super) fn passenger_totals(&self) -> (u32, u64) {
+        (self.passage.reward(), self.passage.events)
+    }
     fn born(owner: u64) -> Result<Self, SaveError> {
         Ok(Self {
             items: vec![
@@ -526,6 +551,14 @@ impl Ledger {
     }
     fn install(&mut self, index: usize, replacing: Option<u64>) -> Result<(), ModuleError> {
         let slot = self.items[index].kind.slot();
+        // A cabin is a separate physical module; fitting one never ejects another.
+        if slot == ModuleSlot::PassengerCabin {
+            if replacing.is_some() {
+                return Err(ModuleError::StaleOccupant);
+            }
+            self.items[index].slot = Some(slot);
+            return Ok(());
+        }
         if matches!(
             slot,
             ModuleSlot::MiningTargeting | ModuleSlot::SalvageTargeting
@@ -587,7 +620,11 @@ impl Ledger {
             if !event.xyzzy && !self.prerequisites_satisfied(kind) {
                 return Err(ModuleError::MissingPrerequisite);
             }
-            let replacing = self.fitted(kind.slot()).map(|i| i.id);
+            let replacing = if kind.slot() == ModuleSlot::PassengerCabin {
+                None
+            } else {
+                self.fitted(kind.slot()).map(|i| i.id)
+            };
             self.items.push(OwnedModule {
                 id: event.item,
                 kind,
@@ -617,6 +654,9 @@ impl Ledger {
         } else {
             match event.action {
                 ModuleAction::Store { item } => {
+                    if self.passage.occupied(item) {
+                        return Err(ModuleError::CabinOccupied);
+                    }
                     let i = self
                         .items
                         .iter_mut()
@@ -649,6 +689,7 @@ impl Ledger {
                 | ModuleAction::Purchase { .. } => {
                     return Err(ModuleError::NotForSale);
                 }
+                ModuleAction::Passenger(action) => return self.apply_passage(event, action),
             }
         }
         self.revision = self
@@ -694,17 +735,46 @@ fn validate_module_purchase(e: &Event, owner: u64, mut transaction: u32) -> Resu
 }
 
 impl State {
+    pub(super) fn passenger_occupancy(&self) -> (usize, usize) {
+        let boarded = self
+            .events
+            .iter()
+            .any(|e| e.action == ModuleAction::Passenger(PassengerAction::Board));
+        let ended = self.events.iter().any(|e| {
+            matches!(
+                e.action,
+                ModuleAction::Passenger(PassengerAction::Receive | PassengerAction::Cancel)
+            )
+        });
+        (usize::from(boarded), usize::from(boarded && !ended))
+    }
+
     pub(super) fn account_events(&self) -> Vec<super::AccountEvent> {
         self.events
             .iter()
             .filter_map(|e| {
-                e.action.purchase_kind().map(|kind| super::AccountEvent {
-                    revision: e.revision,
-                    effect: super::AccountEffect::Debit(if e.xyzzy {
+                let effect = if let Some(kind) = e.action.purchase_kind() {
+                    super::AccountEffect::Debit(if e.xyzzy {
                         0
                     } else {
                         kind.shop().map_or(0, |s| s.0)
-                    }),
+                    })
+                } else if let ModuleAction::Passenger(action) = e.action {
+                    match action {
+                        PassengerAction::RequestReplies | PassengerAction::Board => {
+                            super::AccountEffect::ObserveFuel(cabins::receipt_fuel(e.item)?)
+                        }
+                        PassengerAction::Receive => {
+                            super::AccountEffect::Reward(PASSAGE_REWARD_TENTHS)
+                        }
+                        PassengerAction::Cancel => super::AccountEffect::Debit(0),
+                    }
+                } else {
+                    return None;
+                };
+                Some(super::AccountEvent {
+                    revision: e.revision,
+                    effect,
                 })
             })
             .collect()
@@ -801,6 +871,18 @@ impl State {
                 transaction
             };
             transaction = validate_module_purchase(e, owner, transaction)?;
+            if let ModuleAction::Passenger(action) = e.action {
+                world
+                    .jump_journal
+                    .validate_passenger_berth(e.dock, e.tick)?;
+                if matches!(
+                    action,
+                    PassengerAction::RequestReplies | PassengerAction::Board
+                ) && e.item / 256 > world.freight_session.as_ref().ok_or(INVALID)?.epoch()
+                {
+                    return Err(INVALID);
+                }
+            }
             let previous_grade = ledger.navigation_grade();
             let previous_drive = ledger.drive();
             ledger
@@ -860,6 +942,15 @@ impl State {
         if ledger.revision != account.modular_revision() {
             return Err(INVALID);
         }
+        if self.cabin_tonnes().map_err(|_| INVALID)? != ledger.cabin_tonnes() {
+            return Err(INVALID);
+        }
+        if ledger.cabin_tonnes() != 0 {
+            let projection = account
+                .service_projection(&world.freight_session.as_ref().ok_or(INVALID)?.state)
+                .map_err(|_| INVALID)?;
+            add_cabin_mass(projection, ledger.cabin_tonnes()).map_err(|_| INVALID)?;
+        }
         Ok(ledger)
     }
     fn ledger_at(&self, owner: u64, tick: u64, visit: u64) -> Option<Ledger> {
@@ -904,6 +995,12 @@ impl State {
                     w.u8(2);
                     w.option(replacing.as_ref(), |w, i| w.u64(*i));
                 }
+                ModuleAction::Passenger(action) => w.u8(match action {
+                    PassengerAction::RequestReplies => 4,
+                    PassengerAction::Board => 5,
+                    PassengerAction::Receive => 6,
+                    PassengerAction::Cancel => 7,
+                }),
             }
             w.u64(e.item);
             e.dock.encode_save(w);
@@ -950,6 +1047,10 @@ impl State {
                 3 if version >= 16 => ModuleAction::Purchase {
                     kind: kind.ok_or(SaveError::InvalidEncoding)?,
                 },
+                4 => ModuleAction::Passenger(PassengerAction::RequestReplies),
+                5 => ModuleAction::Passenger(PassengerAction::Board),
+                6 => ModuleAction::Passenger(PassengerAction::Receive),
+                7 => ModuleAction::Passenger(PassengerAction::Cancel),
                 _ => return Err(SaveError::InvalidEncoding),
             };
             events.push(Event {
@@ -1029,6 +1130,12 @@ impl World {
             ModuleKind::Targeting(TargetingTier::Military),
             ModuleKind::MiningTargeting,
             ModuleKind::SalvageTargeting,
+            ModuleKind::Cabin(CabinGrade::PackedStasis),
+            ModuleKind::Cabin(CabinGrade::Economy),
+            ModuleKind::Cabin(CabinGrade::Standard),
+            ModuleKind::Cabin(CabinGrade::Luxury),
+            ModuleKind::Cabin(CabinGrade::SingleStateroom),
+            ModuleKind::Cabin(CabinGrade::DoubleStateroom),
         ]
         .into_iter()
         .filter_map(|kind| {
@@ -1200,11 +1307,20 @@ impl World {
             .modular
             .ledger(self, account)
             .map_err(ModuleError::Save)?;
+        if matches!(action, ModuleAction::Passenger(PassengerAction::Board))
+            && !self.original_service_has_capacity()
+        {
+            return Err(ModuleError::Capacity);
+        }
+        let item = match action {
+            ModuleAction::Passenger(action) => cabins::receipt_data(self, action)?,
+            _ => 0,
+        };
         ledger.apply(
             Event {
                 xyzzy: false,
                 action,
-                item: 0,
+                item,
                 dock,
                 tick,
                 revision: account.revision(),
@@ -1234,6 +1350,23 @@ impl World {
             > budget.equipment_units_capacity
         {
             return Err(ModuleError::Capacity);
+        }
+        if ledger.cabin_tonnes() != 0 {
+            let projection = account
+                .service_projection(
+                    &self
+                        .freight_session
+                        .as_ref()
+                        .ok_or(ModuleError::NoCommander)?
+                        .state,
+                )
+                .map_err(|_| ModuleError::Capacity)?;
+            let projection = add_cabin_mass(projection, ledger.cabin_tonnes())
+                .map_err(|_| ModuleError::Capacity)?;
+            self.navigation_trade
+                .reservations()
+                .apply(projection)
+                .map_err(|_| ModuleError::Capacity)?;
         }
         Ok(ModuleReview {
             action,
@@ -1269,6 +1402,7 @@ impl World {
         } else {
             match review.action {
                 ModuleAction::Store { item } | ModuleAction::Install { item, .. } => item,
+                ModuleAction::Passenger(action) => cabins::receipt_data(self, action)?,
                 _ => return Err(ModuleError::NotForSale),
             }
         };
@@ -1312,8 +1446,10 @@ impl World {
             .fitted(ModuleSlot::Shield)
             .is_some_and(|item| item.id == owner + 3);
         let shield_grade = ledger.shield_grade().ok_or(ModuleError::ShieldRequired)?;
-        let account = current
-            .prepare_module(
+        let account = if let ModuleAction::Passenger(action) = review.action {
+            current.prepare_passage_action(action == PassengerAction::Receive)
+        } else {
+            current.prepare_module(
                 paid,
                 pulse_fitted,
                 energy_fitted,
@@ -1321,7 +1457,8 @@ impl World {
                 drive_fitted,
                 shield_fitted,
             )
-            .map_err(|_| ModuleError::SequenceExhausted)?;
+        }
+        .map_err(|_| ModuleError::SequenceExhausted)?;
         let mut state = self.modular.clone();
         state.events.push(event);
         let mut combat = self.combat;
@@ -1341,11 +1478,18 @@ impl World {
             account,
             combat,
             bytes,
-            item,
+            // Passage changes have a receipt, not an issued physical equipment item.
+            item: if matches!(review.action, ModuleAction::Passenger(_)) {
+                0
+            } else {
+                item
+            },
         })
     }
 }
 
+#[cfg(test)]
+mod cabin_tests;
 #[cfg(test)]
 mod drive_tests;
 #[cfg(test)]
