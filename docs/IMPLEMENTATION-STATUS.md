@@ -208,6 +208,10 @@ Griffon Spectre retains both original visible meshes, with 1,644 detailed and 59
 
 Dzo preserves the original 9,228-face detailed and 416-face native meshes. Eight overlapping spans per collar tighten the inspection envelope and preserve seven guarded routes. [Dzo source and evidence](DZO-SOURCE.md)
 
+## Dzo Mk II catalogue source
+
+Dzo Mk II preserves the original 9,612-face detailed and 448-face native meshes. Eight overlapping spans per collar tighten the inspection envelope and preserve seven guarded routes. [Dzo Mk II source and evidence](DZO-MK-II-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)
